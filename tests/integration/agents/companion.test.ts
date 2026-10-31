@@ -18,6 +18,7 @@ import { createCompanionConnection } from '@/app/automation/companion/connection
 import { startServer, type ServerHandle } from '#mcp/server'
 
 import { expectDefined } from '#tests/helpers/assert'
+import { testPath } from '#tests/helpers/paths'
 
 /**
  * The browser's agent host and the companion together: the app pairs, looks the agent up, starts
@@ -28,7 +29,7 @@ const claude = expectDefined(
   ACP_AGENTS.find((agent) => agent.id === 'claude-code'),
   'Claude Code'
 )
-const FAKE_AGENT = join(import.meta.dir, 'fixtures', 'acp-agent.ts')
+const FAKE_AGENT = testPath('helpers/agents/acp-agent.ts')
 
 let dir: string
 let server: ServerHandle

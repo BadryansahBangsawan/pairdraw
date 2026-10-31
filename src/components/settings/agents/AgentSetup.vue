@@ -3,7 +3,7 @@ import { useClipboard } from '@vueuse/core'
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import type { ACPAgentDef } from '@open-pencil/core/constants'
+import { IS_TAURI, type ACPAgentDef } from '@open-pencil/core/constants'
 import { useI18n } from '@open-pencil/vue/i18n'
 
 import type { AgentConnectStep } from '@/app/ai/agents/setup/connect'
@@ -16,6 +16,7 @@ import AppCopyField from '@/components/ui/input/AppCopyField.vue'
 import { NODE_DOWNLOAD_URL } from '@/constants'
 import theme from '@/theme/settings/agents'
 
+import AgentSetupCompanion from './AgentSetupCompanion.vue'
 import AgentSetupStep from './AgentSetupStep.vue'
 import AgentSignInProgress from './AgentSignInProgress.vue'
 import { useSetupProblemMessage } from './problem'
@@ -64,6 +65,7 @@ function stepLabel(step: AgentConnectStep): string {
     {{ ai.aiSetupAgentDescription({ agent: agent.name }) }}
     <SettingsLink :href="codingAgentGuideURL(agent.id)">{{ common.learnMore }}</SettingsLink>
   </p>
+  <AgentSetupCompanion v-if="!IS_TAURI" />
 
   <template v-if="setup.supported">
     <ol :class="styles.list()" :aria-label="ai.aiSetupConnect({ agent: agent.name })">

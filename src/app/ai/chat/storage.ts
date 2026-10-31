@@ -17,6 +17,7 @@ import {
 } from '@/app/ai/models'
 import { OPENPENCIL_AI_PROVIDER } from '@/app/ai/providers/openpencil/provider'
 import { enabledSkills } from '@/app/ai/skills/library'
+import { companion } from '@/app/automation/companion/connection'
 import { cloudAIAvailable } from '@/app/cloud/integration'
 import { appCredentialServices, browserCredentialsRemembered } from '@/app/settings/credentials/app'
 import {
@@ -45,7 +46,8 @@ export const isHarnessProvider = computed(() => providerID.value === 'harness:pi
 export const isAgentProvider = computed(() => isACPProvider.value || isHarnessProvider.value)
 
 export const isConfigured = computed(() => {
-  if (isACPProvider.value) return IS_TAURI
+  // The desktop app runs agents itself; the web app through a paired companion.
+  if (isACPProvider.value) return IS_TAURI || companion.connected()
   // Pi can use the CLI's own sign-in, so a key is optional.
   if (isHarnessProvider.value) return IS_TAURI
   // Cloud's AI service needs no key: the Home server's sign-in and a workspace stand in for one.

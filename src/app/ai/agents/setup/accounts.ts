@@ -41,11 +41,14 @@ const NOT_CHECKED: AgentAccount = {
 type Accounts = Partial<Record<ACPAgentID, AgentAccount>>
 
 export function createAgentAccounts(options: {
-  enabled: boolean
+  /** Whether agents can run here; a function when that changes, as a companion pairs. */
+  enabled: boolean | (() => boolean)
   /** The host that starts the agents, to read their login and sign them in. */
   host: Pick<AgentHost, 'check' | 'signIn'>
 }) {
   const { host } = options
+  const isEnabled = () =>
+    typeof options.enabled === 'function' ? options.enabled() : options.enabled
   const accounts = ref<Accounts>({})
   const methods = new Map<ACPAgentID, AgentAuthMethod[]>()
   const checks = new Map<ACPAgentID, Promise<void>>()
@@ -69,7 +72,7 @@ export function createAgentAccounts(options: {
 
   /** Starts the agent and records the login it reports; joins a check already running. */
   function check(agent: ACPAgentDef): Promise<void> {
-    if (!options.enabled) return Promise.resolve()
+    if (!isEnabled()) return Promise.resolve()
     const running = checks.get(agent.id)
     if (running) return running
     update(agent.id, { checking: true, error: null })
@@ -95,7 +98,7 @@ export function createAgentAccounts(options: {
   }
 
   async function signIn(agent: ACPAgentDef): Promise<void> {
-    if (!options.enabled || account(agent.id).signingIn) return
+    if (!isEnabled() || account(agent.id).signingIn) return
     if (!methods.has(agent.id)) await check(agent)
     const method = signInMethod(agent)
     if (!method) {
@@ -144,7 +147,17 @@ export function createAgentAccounts(options: {
     update(id, { status })
   }
 
-  return { supported: options.enabled, account, check, signIn, cancelSignIn, submitCode, report }
+  return {
+    get supported() {
+      return isEnabled()
+    },
+    account,
+    check,
+    signIn,
+    cancelSignIn,
+    submitCode,
+    report
+  }
 }
 
 export const agentAccounts = createAgentAccounts({

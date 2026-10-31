@@ -5,6 +5,7 @@ import { computed, ref, useTemplateRef } from 'vue'
 import { IS_TAURI } from '@open-pencil/core/constants'
 import { useI18n } from '@open-pencil/vue/i18n'
 
+import { agentHostAvailable } from '@/app/ai/agents/host/current'
 import type { AISetupEntry } from '@/app/ai/models/settings/onboarding/dialog'
 import type { OnboardingAccess } from '@/app/ai/models/settings/onboarding/plan'
 import { AI_SETUP_STEPS, useAIOnboarding } from '@/app/ai/models/settings/onboarding/use'
@@ -25,17 +26,21 @@ import AISetupSkills from './AISetupSkills.vue'
 const {
   entry,
   offersTour = true,
-  agentsAvailable = IS_TAURI
+  agentsAvailable = agentHostAvailable(),
+  desktop = IS_TAURI
 } = defineProps<{
   entry: AISetupEntry
   offersTour?: boolean
+  /** Coding agents run here: in the desktop app, or through a paired companion. */
   agentsAvailable?: boolean
+  /** Pi and subscription sign-ins need the desktop app itself. */
+  desktop?: boolean
 }>()
 const emit = defineEmits<{ close: []; advanced: []; tour: [] }>()
 const { ai, common } = useI18n()
 const styles = tv(theme)()
 
-const onboarding = useAIOnboarding({ agentsAvailable })
+const onboarding = useAIOnboarding({ agentsAvailable, desktop })
 const {
   answers,
   step,
@@ -168,6 +173,7 @@ async function finish(): Promise<void> {
         <AISetupAccess
           v-model="answers.access"
           :agents-available="agentsAvailable"
+          :desktop="desktop"
           :detections="detections"
         />
       </template>
@@ -239,7 +245,7 @@ async function finish(): Promise<void> {
           @choose="roles.choose"
           @use-recommended="roles.useRecommended"
         />
-        <AISetupSkills v-if="agentsAvailable" ref="skills" />
+        <AISetupSkills v-if="desktop" ref="skills" />
         <SettingsSaveFeedback
           :result="saveResult"
           :error="saveResult === 'saved' ? null : saveResult"

@@ -1,6 +1,7 @@
-import { reactive } from 'vue'
+import { reactive, watch } from 'vue'
 
 import { connectAutomation } from '@/app/automation/bridge/server'
+import { companion } from '@/app/automation/companion/connection'
 import type { EditorStore } from '@/app/editor/active-store'
 import { isTauri } from '@/app/tauri/env'
 
@@ -12,6 +13,7 @@ import {
   readAutomationHealth,
   getAutomationHealthFailure,
   getAutomationStartupFailure,
+  getAutomationSocketURL,
   getMCPServerURL,
   spawnMCPIfNeeded
 } from './spawn'
@@ -141,6 +143,7 @@ export function createMCPRuntimeService(dependencies: MCPRuntimeDependencies) {
   }
 
   async function startOperation(): Promise<MCPRuntimeResult> {
+    state.endpoint = getMCPServerURL()
     state.status = 'starting'
     state.failure = null
     state.externallyManaged = false
@@ -191,6 +194,8 @@ export function createMCPRuntimeService(dependencies: MCPRuntimeDependencies) {
 
   return {
     state,
+    /** Whether the editor started the runtime, so a restart has a store to connect. */
+    started: () => activeStore !== null,
     refresh: () => enqueue(refreshOperation),
     start(getStore: () => EditorStore): Promise<MCPRuntimeResult> {
       activeStore = getStore
@@ -212,13 +217,17 @@ export function createMCPRuntimeService(dependencies: MCPRuntimeDependencies) {
   }
 }
 
-/** The local server runs with the desktop app, and in development with the dev server. */
+/**
+ * The local server runs with the desktop app, in development with the dev server, and for the
+ * web app in a companion it paired with.
+ */
 export function localMCPAvailable(): boolean {
-  return import.meta.env.DEV || isTauri()
+  return import.meta.env.DEV || isTauri() || companion.connected()
 }
 
 const appMCPRuntime = createMCPRuntimeService({
-  connect: (getStore, authToken) => connectAutomation(getStore, authToken).disconnect,
+  connect: (getStore, authToken) =>
+    connectAutomation(getStore, authToken, getAutomationSocketURL()).disconnect,
   canConnect: localMCPAvailable,
   readHealth: readAutomationHealth,
   setToolDescriptors: setMCPToolDescriptors,
@@ -232,3 +241,11 @@ export const refreshMCPRuntime = appMCPRuntime.refresh
 export const restartMCPRuntime = () => appMCPRuntime.restart()
 export const startMCPRuntime = (getStore: () => EditorStore) => appMCPRuntime.start(getStore)
 export const stopMCPRuntime = () => appMCPRuntime.stop()
+
+// Pairing with a companion, or losing it, moves the app's bridge to the server it now has.
+watch(
+  () => companion.connected(),
+  () => {
+    if (appMCPRuntime.started()) void appMCPRuntime.restart()
+  }
+)

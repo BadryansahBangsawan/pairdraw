@@ -7,21 +7,13 @@ import { MCP_INSTALL_TARGET } from '@/app/automation/mcp/failure'
 import { resolvePlatformCommand } from '@/app/tauri/command'
 
 import type { PackageManager } from './companions'
+import { agentLookupSchema } from './schema'
 
-const lookupSchema = v.object({
-  executables: v.record(v.string(), v.nullable(v.string())),
-  /** Versions of OpenPencil's own companions, keyed by package name. */
-  versions: v.record(v.string(), v.nullable(v.string())),
-  /** Whether this user can write npm's global folder; null without npm. */
-  npmGlobalWritable: v.nullish(v.boolean()),
-  searchPath: v.string()
-})
-
-export type AgentLookup = v.InferOutput<typeof lookupSchema>
+export type AgentLookup = v.InferOutput<typeof agentLookupSchema>
 
 export async function lookupAgents(): Promise<AgentLookup> {
   const { invoke } = await import('@tauri-apps/api/core')
-  return v.parse(lookupSchema, await invoke<unknown>('agent_lookup'))
+  return v.parse(agentLookupSchema, await invoke<unknown>('agent_lookup'))
 }
 
 /** The folder coding agents start in, which the desktop shell creates in the app's data. */

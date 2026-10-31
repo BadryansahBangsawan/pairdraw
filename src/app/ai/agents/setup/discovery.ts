@@ -2,7 +2,7 @@ import { computed, ref, shallowRef } from 'vue'
 
 import { ACP_AGENTS, type ACPAgentDef, type ACPAgentID } from '@open-pencil/core/constants'
 
-import { agentHost, agentHostAvailable } from '@/app/ai/agents/host/current'
+import { agentHost, agentHostAvailable, piHostAvailable } from '@/app/ai/agents/host/current'
 import type { AgentHost } from '@/app/ai/agents/host/types'
 import {
   HARNESS_EXECUTABLE,
@@ -54,13 +54,18 @@ export type DiscoveryError =
   | 'npm-admin'
 
 export function createAgentDiscovery(options: {
-  enabled: boolean
+  /** Whether agents can run here; a function when that changes, as a companion pairs. */
+  enabled: boolean | (() => boolean)
+  /** Whether the host runs Pi, through the desktop app's Harness companion; defaults to true. */
+  runsPi?: boolean
   lookup: () => Promise<AgentLookup>
   install: (agent: ACPAgentDef, searchPath: string) => Promise<void>
   installBridge?: (searchPath: string, manager: PackageManager) => Promise<void>
   restartBridge?: () => Promise<void>
   installHarness?: (searchPath: string, manager: PackageManager) => Promise<void>
 }) {
+  const isEnabled = () =>
+    typeof options.enabled === 'function' ? options.enabled() : options.enabled
   const snapshot = shallowRef<AgentLookup | null>(null)
   const scanning = ref(false)
   const installing = ref<ACPAgentID | 'canvas' | 'harness' | null>(null)
@@ -135,7 +140,7 @@ export function createAgentDiscovery(options: {
   const adapterNeedsAdmin = computed(npmNeedsAdmin)
 
   function refresh(force = false): Promise<void> {
-    if (!options.enabled) return Promise.resolve()
+    if (!isEnabled()) return Promise.resolve()
     if (pending) return force ? pending.then(() => refresh()) : pending
     scanning.value = true
     error.value = null
@@ -156,7 +161,7 @@ export function createAgentDiscovery(options: {
   }
 
   async function install(id: ACPAgentID): Promise<void> {
-    if (!options.enabled || installing.value) return
+    if (!isEnabled() || installing.value) return
     const agent = agents.value.find((candidate) => candidate.definition.id === id)
     if (!agent?.definition.adapterPackage || agent.status !== 'needs-adapter') return
     if (!snapshot.value || !npmAvailable.value) {
@@ -185,7 +190,7 @@ export function createAgentDiscovery(options: {
   }
 
   async function setupCanvasBridge(): Promise<void> {
-    if (!options.enabled || installing.value || !snapshot.value) return
+    if (!isEnabled() || installing.value || !snapshot.value) return
     let installed = hasBridge() && !bridgeOutdated()
     const manager = managerFor(MCP_EXECUTABLE)
     if (!installed && !canInstallWith(manager)) {
@@ -217,7 +222,7 @@ export function createAgentDiscovery(options: {
   }
 
   async function setupHarness(): Promise<void> {
-    if (!options.enabled || installing.value || !snapshot.value) return
+    if (!isEnabled() || installing.value || !snapshot.value) return
     if (hasHarness() && !harnessOutdated()) return
     const manager = managerFor(HARNESS_EXECUTABLE)
     if (!canInstallWith(manager)) {
@@ -243,7 +248,10 @@ export function createAgentDiscovery(options: {
   }
 
   return {
-    supported: options.enabled,
+    get supported() {
+      return isEnabled()
+    },
+    runsPi: options.runsPi ?? true,
     agents,
     availableAgents,
     scanning,
@@ -272,10 +280,15 @@ export function createAgentDiscovery(options: {
 /** Discovery on the computer a host runs agents on, through what the host finds and installs. */
 export function createHostedAgentDiscovery(
   host: Pick<AgentHost, 'detect' | 'install'>,
-  options: { enabled: boolean; restartBridge?: () => Promise<void> }
+  options: {
+    enabled: boolean | (() => boolean)
+    runsPi?: boolean
+    restartBridge?: () => Promise<void>
+  }
 ) {
   return createAgentDiscovery({
     enabled: options.enabled,
+    runsPi: options.runsPi,
     lookup: () => host.detect(),
     // Agent adapters always come from npm.
     install: (agent, searchPath) =>
@@ -290,6 +303,7 @@ export function createHostedAgentDiscovery(
 
 export const agentDiscovery = createHostedAgentDiscovery(agentHost(), {
   enabled: agentHostAvailable,
+  runsPi: piHostAvailable,
   async restartBridge() {
     const { restartMCPRuntime } = await import('@/app/automation/mcp/runtime')
     const result = await restartMCPRuntime()

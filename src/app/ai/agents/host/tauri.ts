@@ -1,6 +1,6 @@
 import type { ACPAgentDef } from '@open-pencil/core/constants'
 
-import { checkAgentAuth, signInWithAgent, type ToolsProbe } from '@/app/ai/agents/acp/auth/session'
+import { checkAgentAuth } from '@/app/ai/agents/acp/auth/session'
 import { startTerminalSignIn } from '@/app/ai/agents/acp/auth/terminal'
 import { spawnACPProcess } from '@/app/ai/agents/acp/process'
 import {
@@ -11,6 +11,7 @@ import {
   lookupAgents
 } from '@/app/ai/agents/setup/native'
 
+import { chatToolsProbe, signInInsideAgent } from './shared'
 import type { AgentHost, AgentSignIn, AgentStreams } from './types'
 
 async function spawn(
@@ -35,18 +36,6 @@ async function spawn(
   }
 }
 
-/** Starts a session as a chat does: in the agent workspace, linked to OpenPencil's tools. */
-const chatTools: ToolsProbe = {
-  cwd: agentWorkspace,
-  link: async () => {
-    const [{ getAutomationAuthToken }, { linkOwnTools }] = await Promise.all([
-      import('@/app/automation/mcp/spawn'),
-      import('@/app/ai/agents/acp/tools')
-    ])
-    return linkOwnTools(await getAutomationAuthToken())
-  }
-}
-
 async function signIn(
   agent: ACPAgentDef,
   { methodId, onURL }: Parameters<AgentHost['signIn']>[1]
@@ -60,16 +49,7 @@ async function signIn(
     }
   }
   // The agent runs the login itself, such as Codex's ChatGPT login, and reports the new login.
-  const controller = new AbortController()
-  const done = signInWithAgent(agent, methodId, controller.signal, { spawn })
-  // A caller that only cancels must not see an unhandled rejection.
-  done.catch(() => undefined)
-  return {
-    done,
-    async cancel() {
-      controller.abort()
-    }
-  }
+  return signInInsideAgent(agent, methodId, spawn)
 }
 
 /** Agents the desktop shell runs through its pinned shell scope (`desktop/capabilities/**`). */
@@ -81,7 +61,7 @@ export const tauriAgentHost: AgentHost = {
     return installHarnessCompanion(searchPath, manager)
   },
   signIn,
-  check: (agent) => checkAgentAuth(agent, { spawn, tools: chatTools }),
+  check: (agent) => checkAgentAuth(agent, { spawn, tools: chatToolsProbe(agentWorkspace) }),
   spawn,
   workspace: agentWorkspace
 }

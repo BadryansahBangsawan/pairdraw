@@ -11,6 +11,7 @@ import {
 } from '@open-pencil/mcp/tools'
 import { randomHex } from '@open-pencil/scene-graph/random'
 
+import { companion } from '@/app/automation/companion/connection'
 import { APP_VERSION } from '@/app/runtime/version'
 import { decodeTauriStderr } from '@/app/shell/ui'
 import { resolvePlatformCommand } from '@/app/tauri/command'
@@ -54,8 +55,21 @@ export interface AutomationServerHandle {
 const DEV_AUTOMATION_HTTP_URL = import.meta.env.DEV
   ? __OPENPENCIL_LOCAL_AUTOMATION_HTTP_URL__
   : `http://127.0.0.1:${AUTOMATION_HTTP_PORT}`
+
+/** The MCP server the app uses: a paired companion's, or the local one. */
+function automationHTTPURL(): string {
+  return companion.connected() ? companion.url() : DEV_AUTOMATION_HTTP_URL
+}
+
 export function getMCPServerURL(): string {
-  return `${DEV_AUTOMATION_HTTP_URL}/mcp`
+  return `${automationHTTPURL()}/mcp`
+}
+
+/** Where the app's automation bridge connects: a paired companion, or the local server. */
+export function getAutomationSocketURL(): string {
+  return companion.connected()
+    ? companion.url().replace(/^http/, 'ws')
+    : __OPENPENCIL_LOCAL_AUTOMATION_URL__
 }
 
 const DEV_AUTOMATION_AUTH_TOKEN =
@@ -306,7 +320,7 @@ export async function readAutomationHealth(
 ): Promise<AutomationHealth | null> {
   try {
     const headers = authToken ? { Authorization: `Bearer ${authToken}` } : undefined
-    const res = await fetch(`${DEV_AUTOMATION_HTTP_URL}/health`, {
+    const res = await fetch(`${automationHTTPURL()}/health`, {
       headers,
       signal: AbortSignal.timeout(1000)
     })
@@ -327,7 +341,7 @@ export async function readAutomationHealth(
     runtimeAutomationHealthFailure = null
     return health
   } catch {
-    runtimeAutomationHealthFailure = mcpFailure('unreachable', DEV_AUTOMATION_HTTP_URL)
+    runtimeAutomationHealthFailure = mcpFailure('unreachable', automationHTTPURL())
     return null
   }
 }
@@ -401,6 +415,9 @@ async function waitForHealth(
 }
 
 export async function getAutomationAuthToken(): Promise<string | null> {
+  // A paired companion knows the tab by the token it paired with.
+  const companionToken = companion.token()
+  if (companionToken) return companionToken
   if (runtimeAutomationAuthToken) return runtimeAutomationAuthToken
   const health = await readAutomationHealth()
   if (!health) {
@@ -508,6 +525,9 @@ function exitedStartupError(
 async function startMCPIfNeeded(timing: MCPStartupTiming): Promise<AutomationServerHandle | null> {
   runtimeAutomationStartupError = null
   runtimeAutomationStartupFailure = null
+  // The companion the web app paired with already runs the server.
+  const companionToken = companion.token()
+  if (companionToken) return { disconnect: noop, authToken: companionToken, managed: false }
   if (import.meta.env.DEV) return configureDevMCP()
   if (!isTauri()) return null
 

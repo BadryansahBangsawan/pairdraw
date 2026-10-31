@@ -5,6 +5,7 @@ import { ReadOnlyDocumentError } from '@open-pencil/core'
 import { createRetainedScopePlugin } from '@open-pencil/vue/lifecycle/retention'
 
 import './app.css'
+import { connectCompanionFromLocation } from '@/app/automation/companion/connection'
 import { recordRuntimeError } from '@/app/diagnostics'
 import { installCanvasKitBinary, preloadCanvasKit } from '@/app/editor/canvas/canvaskit'
 import { preloadFonts } from '@/app/editor/fonts'
@@ -22,6 +23,8 @@ import router from './router'
  * evaluates the app bundle and can still show the gate's guidance.
  */
 export async function boot(): Promise<void> {
+  // A link from the companion pairs this tab; its one-time code leaves the address bar first.
+  if (!IS_TAURI) void connectCompanionFromLocation()
   installBundledFonts()
   installCanvasKitBinary()
   preloadCanvasKit()

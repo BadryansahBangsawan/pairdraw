@@ -399,6 +399,22 @@ export const aiMessageDefaults = {
   aiSetupPiSignIn:
     'To sign in to a provider or pick a default model, run pi in a terminal and type /login or /model.',
   aiSetupGetDesktop: 'Get the desktop app',
+  aiSetupCompanionDescription:
+    'In the browser, agents run on your computer through OpenPencil’s companion. Run this command in a terminal, then open the link it prints.',
+  aiSetupCompanionConnected: params('Connected to your computer · companion {version}'),
+  aiSetupCompanionDisconnect: 'Disconnect',
+  aiSetupCompanionPairing: 'Connecting to your computer…',
+  aiSetupCompanionRejected:
+    'That link expired or was already used. Press Enter in the companion’s terminal for a new one.',
+  aiSetupCompanionRateLimited:
+    'Too many attempts. Wait a minute, then open a new link from the companion.',
+  aiSetupCompanionUnreachable:
+    'The companion isn’t running. Start it again and open the link it prints.',
+  aiSetupCompanionExpired: 'The companion restarted. Open the new link it printed.',
+  aiSetupCompanionSafari:
+    'Safari doesn’t let websites reach programs on your computer. Use Chrome, Edge, or Firefox, or the desktop app.',
+  aiSetupCompanionOutdated:
+    'The companion’s version doesn’t match this app. Stop it and start it again with this command:',
   aiSetupMeteredNote:
     'OpenRouter gives you models from several vendors with one account and one key.',
   aiSetupSkillsTitle: 'Skills from your coding agents',

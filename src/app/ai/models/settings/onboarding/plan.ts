@@ -91,11 +91,13 @@ export interface CurrentOnboardingModels {
 }
 
 export interface PlanOptions {
-  /**
-   * Agents run as local processes and subscription sign-in returns to a local port, so only the
-   * desktop app can use them.
-   */
+  /** Coding agents run as local processes: in the desktop app, or through a paired companion. */
   agentsAvailable: boolean
+  /**
+   * Pi and subscription sign-ins need the desktop app itself: Pi runs through its Harness
+   * companion and a sign-in returns to a local port. Defaults to `agentsAvailable`.
+   */
+  desktop?: boolean
   current?: CurrentOnboardingModels
 }
 
@@ -112,12 +114,18 @@ export function isOnboardingAgent(providerID: string): boolean {
   return providerID.startsWith('acp:') || providerID === 'harness:pi'
 }
 
-/** Access that only the desktop app can use. */
+/** Access that only the desktop app can use: Pi and subscription sign-ins. */
 export function needsDesktop(providerID: string): boolean {
   return (
-    isOnboardingAgent(providerID) ||
+    providerID === 'harness:pi' ||
     (ONBOARDING_SUBSCRIPTIONS as readonly string[]).includes(providerID)
   )
+}
+
+/** Whether onboarding can offer this access where it runs. */
+export function accessAvailable(providerID: string, options: PlanOptions): boolean {
+  if (needsDesktop(providerID)) return options.desktop ?? options.agentsAvailable
+  return !isOnboardingAgent(providerID) || options.agentsAvailable
 }
 
 function isAgentModel(model: PlannedModel | null): boolean {
@@ -169,7 +177,7 @@ function hasVision(model: PlannedModel): boolean {
 }
 
 function availableAccess(answers: OnboardingAnswers, options: PlanOptions): OnboardingAccess[] {
-  return answers.access.filter((access) => options.agentsAvailable || !needsDesktop(access))
+  return answers.access.filter((access) => accessAvailable(access, options))
 }
 
 /** A configured model stays while its access is still selected or onboarding cannot offer it. */

@@ -37,7 +37,7 @@ const automation = useAutomationMessages()
 const settings = useSettingsMessages()
 const common = useCommonMessages()
 const ai = useAIMessages()
-const available = localMCPAvailable()
+const available = computed(localMCPAvailable)
 const restarting = computed(() => mcpRuntime.status === 'starting' || mcpRuntime.checking)
 const alertRestarts = computed(() =>
   Boolean(mcpRuntime.failure && restartFixesMCPFailure(mcpRuntime.failure))

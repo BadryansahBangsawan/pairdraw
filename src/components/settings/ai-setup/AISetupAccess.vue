@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { tv } from 'tailwind-variants'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useI18n } from '@open-pencil/vue/i18n'
 
@@ -12,6 +12,7 @@ import {
   ONBOARDING_MORE_API_PROVIDERS,
   ONBOARDING_SERVER_PROVIDER,
   ONBOARDING_SUBSCRIPTIONS,
+  needsDesktop,
   type OnboardingAccess
 } from '@/app/ai/models/settings/onboarding/plan'
 import SettingsLink from '@/components/settings/layout/SettingsLink.vue'
@@ -22,14 +23,23 @@ import AppCheckboxCard from '@/components/ui/toggle/AppCheckboxCard.vue'
 import { DESKTOP_DOWNLOAD_URL } from '@/constants'
 import theme from '@/theme/settings/ai-setup/flow'
 
-const { agentsAvailable, detections = {} } = defineProps<{
+const {
+  agentsAvailable,
+  desktop = agentsAvailable,
+  detections = {}
+} = defineProps<{
+  /** Coding agents run here: in the desktop app, or through a paired companion. */
   agentsAvailable: boolean
+  /** Pi and subscription sign-ins need the desktop app itself. */
+  desktop?: boolean
   /** What setup found of each agent on this computer. */
   detections?: Partial<Record<OnboardingAccess, AgentDetection>>
 }>()
 const access = defineModel<OnboardingAccess[]>({ required: true })
 const { ai } = useI18n()
 const styles = tv(theme)()
+/** Pi needs the desktop app's Harness companion, which the web app's companion lacks. */
+const agents = computed(() => ONBOARDING_AGENTS.filter((agent) => desktop || !needsDesktop(agent)))
 const moreOpen = ref(
   ONBOARDING_MORE_API_PROVIDERS.some((provider) => access.value.includes(provider))
 )
@@ -61,7 +71,7 @@ function toggle(providerID: OnboardingAccess, checked: boolean): void {
     <template v-if="agentsAvailable">
       <p :class="styles.help()">{{ ai.aiSetupAccessAgentsDescription }}</p>
       <AppCheckboxCard
-        v-for="agent in ONBOARDING_AGENTS"
+        v-for="agent in agents"
         :key="agent"
         :label="modelProviderName(agent)"
         :description="detectionText(agent)"
@@ -78,7 +88,7 @@ function toggle(providerID: OnboardingAccess, checked: boolean): void {
       </template>
     </AppAlert>
   </section>
-  <section v-if="agentsAvailable" :class="styles.group()">
+  <section v-if="desktop" :class="styles.group()">
     <h3 :class="styles.groupHeading()">{{ ai.aiSetupAccessSubscriptions }}</h3>
     <AppCheckboxCard
       v-for="subscription in ONBOARDING_SUBSCRIPTIONS"

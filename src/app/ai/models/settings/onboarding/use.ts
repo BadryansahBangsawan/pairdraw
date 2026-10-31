@@ -3,6 +3,7 @@ import { computed, reactive, ref, watch } from 'vue'
 
 import { ACP_AGENTS, IS_TAURI } from '@open-pencil/core/constants'
 
+import { agentHostAvailable } from '@/app/ai/agents/host/current'
 import {
   codingAgentDetection,
   piDetection,
@@ -22,6 +23,7 @@ import { applyOnboardingPlan } from './apply'
 import { existingOnboardingConnection, useOnboardingConnections } from './connections'
 import { currentOnboardingModels } from './current'
 import {
+  accessAvailable,
   isOnboardingAccess,
   ONBOARDING_AGENTS,
   ONBOARDING_GOALS,
@@ -52,11 +54,16 @@ function initialAnswers(): OnboardingAnswers {
 }
 
 interface AIOnboardingOptions {
-  /** Agents run as local processes, so only the desktop app offers them. */
+  /** Agents run as local processes: the desktop app or a paired companion offers them. */
   agentsAvailable?: boolean
+  /** Pi and subscription sign-ins need the desktop app itself. */
+  desktop?: boolean
 }
 
-export function useAIOnboarding({ agentsAvailable = IS_TAURI }: AIOnboardingOptions = {}) {
+export function useAIOnboarding({
+  agentsAvailable = agentHostAvailable(),
+  desktop = IS_TAURI
+}: AIOnboardingOptions = {}) {
   const answers = reactive<OnboardingAnswers>(initialAnswers())
   const current = currentOnboardingModels(aiModelSettings.value)
   const configured = [current.design, current.vision, current.review, current.fast].filter(
@@ -66,11 +73,11 @@ export function useAIOnboarding({ agentsAvailable = IS_TAURI }: AIOnboardingOpti
   const busy = ref(false)
   const saveResult = ref<SettingsSaveResult | null>(null)
 
-  const recommended = computed(() => planOnboarding(answers, { agentsAvailable, current }))
+  const recommended = computed(() => planOnboarding(answers, { agentsAvailable, desktop, current }))
   const roles = useOnboardingRoles(recommended, configured)
   const { plan } = roles
   /** Requested goals nothing selected covers; setup offers OpenRouter for them. */
-  const gaps = computed(() => uncoveredGoals(answers, { agentsAvailable, current }))
+  const gaps = computed(() => uncoveredGoals(answers, { agentsAvailable, desktop, current }))
   /** Setup can finish once there is a design model, planned or already configured. */
   const hasDesign = computed(() => recommended.value.design !== null || current.design !== null)
 
@@ -98,6 +105,7 @@ export function useAIOnboarding({ agentsAvailable = IS_TAURI }: AIOnboardingOpti
     const found: Partial<Record<OnboardingAccess, AgentDetection>> = {}
     if (!agentsAvailable) return found
     for (const providerID of ONBOARDING_AGENTS) {
+      if (!accessAvailable(providerID, { agentsAvailable, desktop })) continue
       const pi = agents.piSetup(providerID)
       const agent = ACP_AGENTS.find((candidate) => `acp:${candidate.id}` === providerID)
       if (pi) found[providerID] = piDetection(pi)
@@ -180,6 +188,7 @@ export function useAIOnboarding({ agentsAvailable = IS_TAURI }: AIOnboardingOpti
 
   return {
     agentsAvailable,
+    desktop,
     answers,
     step,
     recommended,

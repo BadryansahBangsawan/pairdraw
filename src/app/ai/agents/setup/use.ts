@@ -68,6 +68,8 @@ export function useAgentSetup(
     if (providerID !== 'harness:pi') return undefined
     return {
       ...mcpServerSetup(),
+      // Pi runs through the desktop app's Harness companion, which the web app's lacks.
+      supported: discovery.runsPi && discovery.supported,
       scanning: discovery.scanning.value || readingPi.value,
       companion: discovery.harnessAvailable.value,
       companionOutdated: discovery.harnessOutdated.value,

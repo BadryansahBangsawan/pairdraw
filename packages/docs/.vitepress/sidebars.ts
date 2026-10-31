@@ -83,6 +83,7 @@ export const programmableSidebar = (
       ...(!prefix
         ? [
             { text: 'Coding agents', link: '/programmable/coding-agents' },
+            { text: 'Coding agents in the browser', link: '/programmable/browser-agents' },
             {
               text: 'BYOK Compatibility',
               link: '/programmable/byok-provider-compatibility',

@@ -2,7 +2,7 @@
 
 The OpenPencil desktop app can use a coding agent you already have — Claude Code, Codex, Gemini CLI, or [Pi](#pi) — as its design agent. The agent runs on your computer with your own subscription and chooses its own model; OpenPencil starts it when you send a message, through the [Agent Client Protocol](https://agentclientprotocol.com/) or, for Pi, its Harness companion, and gives it the canvas tools through OpenPencil's local [MCP server](./mcp-server).
 
-Coding agents need the desktop app; the browser cannot start programs on your computer. They take only the **Design agent** role. Visual review, plan reviews, and fast background work need an API model, which guided setup can add for you.
+In the web app, a companion program on your computer starts them instead; see [Coding agents in the browser](./browser-agents). They take only the **Design agent** role. Visual review, plan reviews, and fast background work need an API model, which guided setup can add for you.
 
 ## What you need
 

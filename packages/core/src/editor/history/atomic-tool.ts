@@ -1,5 +1,5 @@
 import type { SceneGraph, SceneNode, Variable } from '@pairdraw/scene-graph'
-import { captureGraphCheckpoint } from '@pairdraw/scene-graph/checkpoint'
+import { captureEditCheckpoint } from '@pairdraw/scene-graph/checkpoint'
 
 import type { Editor } from '#core/editor/create'
 import { ReadOnlyDocumentError } from '#core/editor/read-only'
@@ -21,7 +21,8 @@ type MutationEditor = Pick<
 
 function changes<T extends object>(
   before: Map<string, T>,
-  after: Map<string, T>
+  after: Map<string, T>,
+  expectedSize = before.size
 ): FieldChanges<T>[] {
   const result: FieldChanges<T>[] = []
   for (const [id, previous] of before) {
@@ -30,7 +31,8 @@ function changes<T extends object>(
     const change = diffFields(id, previous, current)
     if (change) result.push(change)
   }
-  if (before.size !== after.size) throw new Error('Atomic tools must not create nodes or variables')
+  if (after.size !== expectedSize)
+    throw new Error('Atomic tools must not create nodes or variables')
   return result
 }
 
@@ -56,8 +58,10 @@ export function executeAtomicTool(
   if (graph.nodes.size + graph.variables.size > MAX_TRANSACTION_NODES) {
     throw new Error('Document too large for atomic agent editing (maximum 10000 nodes)')
   }
-  const checkpoint = captureGraphCheckpoint(graph)
-  const { nodes, variables } = checkpoint
+  // Rollback state costs what the call touches, not a copy of the document.
+  const checkpoint = captureEditCheckpoint(graph)
+  const { variables } = checkpoint
+  const nodeCount = graph.nodes.size
   const pageId = figma.currentPageId
 
   const replay = (
@@ -97,16 +101,17 @@ export function executeAtomicTool(
     if (result && typeof result === 'object' && 'error' in result) {
       throw new Error(String(result.error))
     }
-    checkpoint.assertPropertiesOnly()
+    const touched = checkpoint.assertPropertiesOnly()
     const variableChanges = changes(variables, graph.variables)
     layout(
       graph,
       editor,
       pageId,
       variableChanges.length > 0,
-      changes(nodes, graph.nodes).map((change) => change.id)
+      changes(touched, graph.nodes, nodeCount).map((change) => change.id)
     )
-    const nodeChanges = changes(nodes, graph.nodes)
+    // Layout may change other layers too.
+    const nodeChanges = changes(checkpoint.changedNodes(), graph.nodes, nodeCount)
     const contentChanged =
       variableChanges.length > 0 ||
       nodeChanges.some((change) => Object.keys(change.after).some((key) => key !== 'source'))
@@ -124,6 +129,8 @@ export function executeAtomicTool(
     checkpoint.restore()
     editor.requestRender()
     throw error
+  } finally {
+    checkpoint.release()
   }
 }
 

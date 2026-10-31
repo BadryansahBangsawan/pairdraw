@@ -23,8 +23,6 @@ import router from './router'
  * evaluates the app bundle and can still show the gate's guidance.
  */
 export async function boot(): Promise<void> {
-  // A link from the companion pairs this tab; its one-time code leaves the address bar first.
-  if (!IS_TAURI) void connectCompanionFromLocation()
   installBundledFonts()
   installCanvasKitBinary()
   preloadCanvasKit()
@@ -35,6 +33,9 @@ export async function boot(): Promise<void> {
   app.use(router).use(head).use(createRetainedScopePlugin()).mount('#app')
 
   await router.isReady()
+  // A link from the companion pairs this tab. Its one-time code leaves the address bar once the
+  // router has written its first entry, which would otherwise put it back.
+  if (!IS_TAURI) void connectCompanionFromLocation()
   await nextTick()
   const failure = bootErrors.stop()
   if (failure) {

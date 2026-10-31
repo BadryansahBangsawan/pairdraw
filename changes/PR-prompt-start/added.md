@@ -1,0 +1,1 @@
+- Home and an empty page of a design offer a prompt that starts the AI chat: describe what to design, and OpenPencil opens the document's chat and sends it, running AI setup first when no model is configured; **Prompt on empty pages** in **Settings → Models → Chat** turns off the one over the canvas.

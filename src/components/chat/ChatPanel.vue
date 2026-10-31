@@ -7,6 +7,7 @@ import { useI18n } from '@open-pencil/vue/i18n'
 
 import { isAttachableImageFile, revokeImagePreviewURL } from '@/app/ai/attachment/image/prepare'
 import { chatDocumentId } from '@/app/ai/chat/history/document'
+import { hasPendingPrompt, takePendingPrompt } from '@/app/ai/chat/pending-prompt'
 import {
   clearQueuedMessages,
   enqueueMessage,
@@ -22,7 +23,7 @@ import { useAIChat } from '@/app/ai/chat/use'
 import { openAISetup } from '@/app/ai/models/settings/onboarding/dialog'
 import { didHitStepLimit } from '@/app/ai/tools'
 import { cloudBillingURL } from '@/app/cloud/integration'
-import { getActiveEditorStore } from '@/app/editor/active-store'
+import { getActiveEditorStore, useActiveEditorStoreRef } from '@/app/editor/active-store'
 import { useDateFormat } from '@/app/i18n/date'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { openExternalLink, toast } from '@/app/shell/ui'
@@ -87,10 +88,34 @@ async function submitMessage(message: ChatSubmission) {
   if (generation === viewGeneration) chatInput.value?.restoreDraft(message)
   else for (const image of message.images) revokeImagePreviewURL(image.previewURL)
 }
+/** Set once the history holds the active document's conversation, which a waiting prompt joins. */
+let historyReady = false
+const activeStore = useActiveEditorStoreRef()
+/** Sends the prompt written for this document on Home or its empty canvas, once it can go. */
+function sendPendingPrompt() {
+  const store = activeStore.value
+  if (!historyReady || !store || store.state.preparation) return
+  const prompt = takePendingPrompt(store)
+  if (prompt) void submitMessage(prompt)
+}
+watch(
+  () => activeStore.value !== undefined && hasPendingPrompt(activeStore.value),
+  (waiting) => {
+    if (waiting) sendPendingPrompt()
+  }
+)
 // Restoring local history must not open a provider connection or read credentials.
-void history.initialize().catch(() => {
-  toast.error(ai.value.chatHistoryFailed)
-})
+async function initializeHistory() {
+  try {
+    await history.initialize()
+  } catch {
+    toast.error(ai.value.chatHistoryFailed)
+    return
+  }
+  historyReady = true
+  sendPendingPrompt()
+}
+void initializeHistory()
 
 const messages = computed(() => chat.value?.messages ?? history.messages.value)
 const historyOptions = computed(() => {
@@ -132,6 +157,8 @@ async function historyAction(action: () => Promise<unknown>) {
         // for no reply to end.
         sendNextQueued()
       }
+      // A prompt that arrived while the conversation changed goes into the one now open.
+      sendPendingPrompt()
     }
   }
 }
@@ -259,6 +286,7 @@ watch(
   async ([tabId, preparation], [previousTabId]) => {
     // Another tab's waiting messages never go to this one, even one that opens still preparing.
     if (tabId !== previousTabId) clearQueuedMessages()
+    historyReady = false
     if (preparation) {
       viewGeneration++
       submission.cancel()
@@ -270,6 +298,7 @@ watch(
     if (tabId !== previousTabId) chat.value = null
     try {
       await history.initialize()
+      historyReady = true
     } catch {
       if (generation === viewGeneration) {
         chat.value = null
@@ -278,9 +307,9 @@ watch(
       return
     }
     // A page switch keeps the document and its conversation, so a running chat stays attached.
-    if (generation === viewGeneration && history.current.value?.id !== conversationId) {
-      chat.value = null
-    }
+    if (generation !== viewGeneration) return
+    if (history.current.value?.id !== conversationId) chat.value = null
+    sendPendingPrompt()
   }
 )
 

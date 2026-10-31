@@ -6,6 +6,8 @@ import type { DocumentKind } from '@open-pencil/scene-graph'
 import { useDocumentWorkspace } from '@open-pencil/vue/document/workspace'
 import { useI18n } from '@open-pencil/vue/i18n'
 
+import { sendPromptToDocument } from '@/app/ai/chat/pending-prompt'
+import { ensureChatConfigured } from '@/app/ai/chat/setup'
 import { CLOUD_INCLUDED, CLOUD_STORAGE_PROVIDER_ID } from '@/app/cloud/integration'
 import { useHomeLocations } from '@/app/home/locations'
 import { useDateFormat } from '@/app/i18n/date'
@@ -27,11 +29,12 @@ import { useCredentialSettings } from '@/app/settings/credentials/preferences/us
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { createStoredDocument } from '@/app/storage/workspace/create'
 import { activeStorageLocation, createStorageWorkspaceSource } from '@/app/storage/workspace/source'
-import { openStorageDocumentInNewTab } from '@/app/tabs'
+import { createDocumentTab, openStorageDocumentInNewTab, type Tab } from '@/app/tabs'
 import { CloudSharedSection, CloudWorkspaceSection } from '@/components/cloud/integration'
 import DocumentDeleteDialog from '@/components/home/document/DocumentDeleteDialog.vue'
 import DocumentEntry from '@/components/home/document/DocumentEntry.vue'
 import HomeLayout from '@/components/home/HomeLayout.vue'
+import HomePromptComposer from '@/components/home/HomePromptComposer.vue'
 import RecentFilesSection from '@/components/home/recent/RecentFilesSection.vue'
 import HomeSearchActions from '@/components/home/search/HomeSearchActions.vue'
 import HomeLocationMenu from '@/components/home/sidebar/HomeLocationMenu.vue'
@@ -39,7 +42,6 @@ import HomeSidebar from '@/components/home/sidebar/HomeSidebar.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 
-const emit = defineEmits<{ 'new-document': [kind: DocumentKind] }>()
 const { locale, storage, files, common, settings, credentials } = useI18n()
 const view = useLocalStorage<'grid' | 'list'>('open-pencil:home-files-view', 'grid')
 const query = ref('')
@@ -48,10 +50,27 @@ const storageConfigured = ref(storagePreferencesComplete(activeStorageProviderID
 const places = useHomeLocations()
 
 /** A new document lands in the place Home shows: a Cloud workspace, the bucket, or a local file. */
-function newDocument(kind: DocumentKind) {
+function newDocument(kind: DocumentKind): Tab {
   const target = newDesignTarget.value
-  if (target) void createStoredDocument(target.location, kind)
-  else emit('new-document', kind)
+  return target ? createStoredDocument(target.location, kind) : createDocumentTab(kind)
+}
+
+const prompt = ref('')
+const startingFromPrompt = ref(false)
+/**
+ * Starts a new design from the prompt, whose chat sends it once open. Without a model to send it
+ * to, AI setup comes first; dismissing setup keeps the prompt here and creates nothing.
+ */
+async function startFromPrompt(text: string): Promise<void> {
+  if (startingFromPrompt.value) return
+  startingFromPrompt.value = true
+  try {
+    if (!(await ensureChatConfigured())) return
+    sendPromptToDocument(newDocument('design').store, text)
+    prompt.value = ''
+  } finally {
+    startingFromPrompt.value = false
+  }
 }
 
 const workspace = useRecentFilesWorkspace()
@@ -218,6 +237,7 @@ function formattedDate(updatedAt: string): string {
         @new-workspace="places.newWorkspace"
       />
     </template>
+    <HomePromptComposer v-model="prompt" :busy="startingFromPrompt" @submit="startFromPrompt" />
     <HomeSearchActions
       v-model="query"
       :destination="newDesignTarget?.label ?? null"

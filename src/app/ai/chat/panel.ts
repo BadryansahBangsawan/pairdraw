@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 
+import type { EditorStore } from '@/app/editor/active-store'
 import { appPreferences } from '@/app/settings/preferences/store'
 
 export type PropertiesTab = 'design' | 'code' | 'lint'
@@ -27,6 +28,16 @@ export const chatColumnOpen = computed({
 
 export function showChatPanel(): void {
   chatColumnOpen.value = true
+}
+
+/**
+ * Shows the chat of `store`'s document wherever this window shows it: the column on desktop, the
+ * drawer's AI tab on a phone, whose chat mounts only while that tab is open.
+ */
+export function showDocumentChat(store: EditorStore): void {
+  showChatPanel()
+  store.state.activeRibbonTab = 'ai'
+  if (store.state.mobileDrawerSnap === 'closed') store.state.mobileDrawerSnap = 'half'
 }
 
 export function toggleChatColumn(): void {

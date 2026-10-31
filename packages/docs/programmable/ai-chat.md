@@ -7,6 +7,12 @@ description: Built-in AI assistant with 90+ tools for creating and modifying des
 
 Press <kbd>⌘</kbd><kbd>J</kbd> (<kbd>Ctrl</kbd> + <kbd>J</kbd>), or click the sparkles button at the top of the properties panel, to open the AI assistant in its own column beside the Design panel. Describe what you want — it creates shapes, sets styles, manages layout, works with components, and analyzes your design.
 
+## Start from a prompt
+
+Home asks **What do you want to design?** above the search field. Describe a screen, a component, or a page and press <kbd>Enter</kbd> (<kbd>Shift</kbd> + <kbd>Enter</kbd> starts a new line): OpenPencil opens a new design where Home creates one, in your Cloud workspace or storage bucket when one is selected, opens its chat, and sends the prompt. When no model is set up yet, guided setup opens first and the prompt is sent once it finishes; closing setup keeps the prompt on Home.
+
+An empty page of a design offers the same prompt over the canvas on desktop. It sends into that document's chat and leaves once the page has a layer or an agent starts working, and the canvas around it keeps working as usual. Close it to hide it for that document, or turn off **Prompt on empty pages** in **Settings → Models → Chat**. Boards and read-only documents do not show it.
+
 ## Setup
 
 The first time you open OpenPencil, guided setup asks what AI should help with and what you already use: a [coding agent](./coding-agents) such as Claude Code, Codex, Gemini CLI, or Pi in the desktop app, an API account, or a local or company server. It connects that access and assigns it to the **Design agent** and **Vision** roles, keeping anything you configured by hand. With OpenRouter you can sign in instead of pasting an API key. Skip it to start designing, and run it again from **Settings → Models → Run guided setup**. To configure models by hand:

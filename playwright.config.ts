@@ -36,7 +36,9 @@ const appDefaults = {
   },
   use: {
     baseURL: origin,
-    // Tests start past the first-run AI setup offer; its own spec clears this.
+    // Tests start past the first-run AI setup offer, whose own spec clears this, and without the
+    // prompt an empty page offers over the canvas, which `tests/e2e/chat/canvas-prompt.spec.ts`
+    // turns on.
     storageState: {
       cookies: [],
       origins: [
@@ -45,7 +47,11 @@ const appDefaults = {
           localStorage: [
             {
               name: 'open-pencil:preferences:v1',
-              value: JSON.stringify({ version: 1, onboarding: { aiSetup: 'done' } })
+              value: JSON.stringify({
+                version: 1,
+                onboarding: { aiSetup: 'done' },
+                chat: { canvasPrompt: false }
+              })
             }
           ]
         }

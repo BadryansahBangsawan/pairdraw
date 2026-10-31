@@ -91,6 +91,8 @@ export interface AppPreferences {
     followAgents: boolean
     /** Whether the chat column beside the properties panel is open. */
     columnOpen: boolean
+    /** Whether an empty page offers a prompt that starts the AI chat over the canvas. */
+    canvasPrompt: boolean
   }
   files: { recentLimit: number }
   version: 1
@@ -123,7 +125,8 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
     maxAgentSteps: DEFAULT_AGENT_STEPS,
     changePreviewSize: 'medium',
     followAgents: true,
-    columnOpen: false
+    columnOpen: false,
+    canvasPrompt: true
   },
   files: { recentLimit: DEFAULT_RECENT_FILES_LIMIT },
   version: 1,
@@ -175,7 +178,8 @@ const appPreferencesSchema = section({
       defaults.chat.changePreviewSize
     ),
     followAgents: v.fallback(v.boolean(), defaults.chat.followAgents),
-    columnOpen: v.fallback(v.boolean(), defaults.chat.columnOpen)
+    columnOpen: v.fallback(v.boolean(), defaults.chat.columnOpen),
+    canvasPrompt: v.fallback(v.boolean(), defaults.chat.canvasPrompt)
   }),
   files: section({
     recentLimit: v.fallback(recentFilesLimitSchema, defaults.files.recentLimit)

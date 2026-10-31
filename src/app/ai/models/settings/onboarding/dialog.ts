@@ -1,3 +1,4 @@
+import { until } from '@vueuse/core'
 import { ref } from 'vue'
 
 import { aiModelSettings } from '@/app/ai/models/store'
@@ -17,6 +18,12 @@ export function openAISetup(entry: AISetupEntry = 'guided', offersTour = true): 
   aiSetupEntry.value = entry
   aiSetupOffersTour.value = offersTour
   aiSetupDialogOpen.value = true
+}
+
+/** Opens guided setup and resolves once it closes, whether finished or dismissed. */
+export async function runAISetup(): Promise<void> {
+  openAISetup()
+  await until(aiSetupDialogOpen).toBe(false)
 }
 
 /** Closing guided setup in any way counts as done, so the welcome is offered only once. */

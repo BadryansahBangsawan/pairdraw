@@ -34,7 +34,6 @@ import {
   activeTab,
   createHomeTab,
   ensureHomeTab,
-  createDocumentTab,
   createTab,
   getActiveStore,
   getTabsSnapshot,
@@ -301,10 +300,7 @@ onUnmounted(() => {
     <RenameSelectionDialog />
     <CommandPalette />
     <TabBar />
-    <HomeWorkspace
-      v-show="activeTab && activeTab.kind !== 'document'"
-      @new-document="createDocumentTab"
-    />
+    <HomeWorkspace v-show="activeTab && activeTab.kind !== 'document'" />
     <CloudVersionDialog />
     <EditorWorkspace
       v-if="shown && shown.tab.kind === 'document'"

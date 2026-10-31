@@ -31,6 +31,7 @@ import IconButton from '@/components/ui/button/IconButton.vue'
 import VariablesDialog from '@/components/variables/VariablesDialog.vue'
 import splitterTheme from '@/theme/splitter'
 
+import EditorCanvasPrompt from './EditorCanvasPrompt.vue'
 import { useEditorWorkspaceLayout } from './useEditorWorkspaceLayout'
 import WorkspacePill from './WorkspacePill.vue'
 
@@ -102,6 +103,7 @@ const { pending: roomPending } = useRoomActions()
     <SplitterPanel id="canvas" ref="canvasPanel" :order="2" :min-size="30" class="flex">
       <div class="relative flex min-w-0 flex-1">
         <CanvasSplitRoot />
+        <EditorCanvasPrompt />
         <ActiveRoomOverlay />
         <EditorToolbar />
       </div>

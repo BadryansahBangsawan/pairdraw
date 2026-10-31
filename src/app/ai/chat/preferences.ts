@@ -36,3 +36,14 @@ export const changePreviewSize = computed({
     }
   }
 })
+
+/** Whether an empty page offers a prompt over the canvas; Settings → AI turns it off. */
+export const canvasPrompt = computed({
+  get: () => appPreferences.value.chat.canvasPrompt,
+  set: (canvasPrompt: boolean) => {
+    appPreferences.value = {
+      ...appPreferences.value,
+      chat: { ...appPreferences.value.chat, canvasPrompt }
+    }
+  }
+})

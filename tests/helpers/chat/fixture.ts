@@ -1,4 +1,4 @@
-import { test as base, expect } from '@playwright/test'
+import { test as base, expect, type Page } from '@playwright/test'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { routeModelCatalog } from '#tests/helpers/chat/catalog'
@@ -27,5 +27,18 @@ export const test = base.extend<ChatFixtures>({
     await use(chat)
   }
 })
+
+/**
+ * The editor of a fresh test document, with the chat's model catalog and transport mocked as the
+ * `chat` fixture mocks them, for specs that also visit Home or set their own preferences.
+ */
+export async function openChatEditor(page: Page): Promise<ChatHarness> {
+  await routeModelCatalog(page)
+  await routeVisionModel(page)
+  await page.goto('/?test')
+  await new CanvasHelper(page).waitForInit()
+  await injectMockChatTransport(page)
+  return new ChatHarness(page)
+}
 
 export { expect }

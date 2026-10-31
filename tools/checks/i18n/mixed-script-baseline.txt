@@ -57,6 +57,7 @@ ja:ai.apiKey
 ja:ai.apiType
 ja:ai.baseURL
 ja:ai.baseURLPlaceholder
+ja:ai.canvasPromptDescription
 ja:ai.chatAuthenticationFailed
 ja:ai.chatForbidden
 ja:ai.chatNetworkFailed
@@ -282,6 +283,7 @@ zh-cn:ai.apiKey
 zh-cn:ai.apiType
 zh-cn:ai.baseURL
 zh-cn:ai.baseURLPlaceholder
+zh-cn:ai.canvasPromptDescription
 zh-cn:ai.chatAuthenticationFailed
 zh-cn:ai.chatForbidden
 zh-cn:ai.chatNetworkFailed

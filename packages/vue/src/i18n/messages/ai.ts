@@ -139,6 +139,16 @@ export const aiMessageDefaults = {
   changePreviewHint:
     'Before and after images kept with each AI edit in the chat history. Larger previews take more storage.',
   changePreviewOff: 'Off, structure only',
+  /** Home's prompt that starts a new design in the AI chat. */
+  promptStartTitle: 'What do you want to design?',
+  promptStartLabel: 'Describe a design',
+  promptStartPlaceholder: 'A sign-in screen for a banking app, a pricing section, a dashboard…',
+  /** The prompt over an empty page that starts the AI chat. */
+  canvasPromptTitle: 'Start with a prompt',
+  canvasPromptDescription: 'Describe what to design, and the AI agent builds it on this page.',
+  canvasPromptClose: 'Hide prompt',
+  canvasPrompt: 'Prompt on empty pages',
+  canvasPromptHint: 'An empty page offers to start the chat with a description of what to design.',
   changePreviewSmall: 'Small (240 px)',
   changePreviewMedium: 'Medium (480 px)',
   changePreviewLarge: 'Large (960 px)',

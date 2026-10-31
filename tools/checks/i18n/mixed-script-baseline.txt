@@ -53,6 +53,8 @@ ja:ai.aiSetupPiModel
 ja:ai.aiSetupPiNoModel
 ja:ai.aiSetupPiSignIn
 ja:ai.aiSetupAgentUpdateMCP
+ja:ai.aiSetupConnectStepInstall
+ja:ai.aiSetupConnectStepTools
 ja:ai.apiKey
 ja:ai.apiType
 ja:ai.baseURL
@@ -278,6 +280,8 @@ zh-cn:ai.aiSetupPiModel
 zh-cn:ai.aiSetupPiNoModel
 zh-cn:ai.aiSetupPiSignIn
 zh-cn:ai.aiSetupAgentUpdateMCP
+zh-cn:ai.aiSetupConnectStepInstall
+zh-cn:ai.aiSetupConnectStepTools
 ja:variables.copyAsCSS
 ja:variables.copyAsTailwindTheme
 zh-cn:ai.apiKey

@@ -4,6 +4,11 @@ import { expect, within } from 'storybook/test'
 import { ACP_AGENTS, type ACPAgentID } from '@open-pencil/core/constants'
 
 import type { AgentAccount } from '@/app/ai/agents/setup/accounts'
+import type {
+  AgentConnectProblem,
+  AgentConnectState,
+  AgentConnectStep
+} from '@/app/ai/agents/setup/connect'
 import type { DetectedAgent } from '@/app/ai/agents/setup/discovery'
 import type { AgentSetupState, PiSetupState } from '@/app/ai/agents/setup/view'
 
@@ -16,6 +21,7 @@ interface Args {
     | 'openai-compatible'
     | 'acp:claude-code'
     | 'acp:codex'
+    | 'acp:gemini-cli'
     | 'harness:pi'
   signInStatus: 'idle' | 'waiting' | 'verifying' | 'blocked' | 'cancelled' | 'expired' | 'failed'
   account: { label: string; freeTier: boolean } | null
@@ -60,6 +66,34 @@ function account(overrides: Partial<AgentAccount>): AgentAccount {
     error: null,
     ...overrides
   }
+}
+
+function connection(overrides: Partial<AgentConnectState>): AgentConnectState {
+  return {
+    steps: {
+      detect: 'pending',
+      install: 'pending',
+      'sign-in': 'pending',
+      tools: 'pending',
+      activate: 'pending'
+    },
+    running: false,
+    failure: null,
+    activates: false,
+    ...overrides
+  }
+}
+
+/** An attempt that stopped at `step`, after the steps before it finished. */
+function failedAt(step: AgentConnectStep, problem: AgentConnectProblem): AgentConnectState {
+  const order: AgentConnectStep[] = ['detect', 'install', 'sign-in', 'tools', 'activate']
+  const index = order.indexOf(step)
+  const steps = connection({}).steps
+  for (const [position, name] of order.entries()) {
+    if (position < index) steps[name] = 'done'
+  }
+  steps[step] = 'failed'
+  return connection({ steps, failure: { step, problem } })
 }
 
 function piSetup(overrides: Partial<PiSetupState>): PiSetupState {
@@ -169,9 +203,8 @@ export const CodingAgentInstalled: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.queryByRole('button', { name: 'Install adapter' })).toBeNull()
+    await expect(canvas.getByRole('button', { name: 'Connect Claude Code' })).toBeEnabled()
     await expect(canvas.queryByText(/npm i -g/)).toBeNull()
-    await expect(canvas.getByRole('button', { name: 'Check again' })).toBeVisible()
   }
 }
 export const CodingAgentNeedsAdapter: Story = {
@@ -182,28 +215,70 @@ export const CodingAgentNeedsAdapter: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole('button', { name: 'Install adapter' })).toBeVisible()
+    await expect(canvas.getByRole('button', { name: 'Connect Codex' })).toBeEnabled()
     await expect(
       canvas.getByText('Installing runs npm i -g @agentclientprotocol/codex-acp.')
     ).toBeVisible()
-    await expect(canvas.getByRole('button', { name: 'Install MCP server' })).toBeVisible()
     await expect(canvas.getByRole('link', { name: 'Learn more' })).toHaveAttribute(
       'href',
       'https://openpencil.dev/programmable/coding-agents#codex'
     )
   }
 }
+export const CodingAgentConnecting: Story = {
+  args: {
+    providerID: 'acp:codex',
+    recommended: false,
+    agentSetup: agentSetup({
+      detected: detected('codex', 'needs-adapter'),
+      installingAgent: true,
+      connection: connection({
+        running: true,
+        steps: { ...connection({}).steps, detect: 'done', install: 'running' }
+      })
+    })
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole('button', { name: 'Connecting…' })).toBeDisabled()
+  }
+}
 export const CodingAgentNeedsNpm: Story = {
   args: {
     providerID: 'acp:claude-code',
     recommended: false,
-    agentSetup: agentSetup({ detected: detected('claude-code', 'needs-adapter'), npm: false })
+    agentSetup: agentSetup({
+      detected: detected('claude-code', 'needs-adapter'),
+      npm: false,
+      error: 'npm',
+      connection: failedAt('install', 'npm')
+    })
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
+    await expect(canvas.getByRole('link', { name: 'Node.js' })).toBeVisible()
     await expect(canvas.getByText('npm i -g @agentclientprotocol/claude-agent-acp')).toBeVisible()
-    await expect(canvas.queryByRole('button', { name: 'Install adapter' })).toBeNull()
     await expect(canvas.getByText(/npm i -g @open-pencil\/mcp@/)).toBeVisible()
+    await expect(canvas.getByRole('button', { name: 'Retry' })).toBeEnabled()
+  }
+}
+export const CodingAgentNeedsAdmin: Story = {
+  args: {
+    providerID: 'acp:claude-code',
+    recommended: false,
+    agentSetup: agentSetup({
+      detected: detected('claude-code', 'needs-adapter'),
+      adapterNeedsAdmin: true,
+      bridgeNeedsAdmin: true,
+      bridgeCommand: 'sudo npm i -g @open-pencil/mcp@0.15.1',
+      error: 'npm-admin',
+      connection: failedAt('install', 'npm-admin')
+    })
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText(/needs administrator rights/)).toBeVisible()
+    await expect(canvas.getByText(/^sudo npm i -g @open-pencil\/mcp@/)).toBeVisible()
   }
 }
 export const CodingAgentSignedIn: Story = {
@@ -222,8 +297,7 @@ export const CodingAgentSignedIn: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText(/Claude Max · ada@example\.com/)).toBeVisible()
-    await expect(canvas.getByText(/Pairdraw tools · connected/)).toBeVisible()
-    await expect(canvas.queryByRole('button', { name: 'Sign in' })).toBeNull()
+    await expect(canvas.getByRole('button', { name: 'Check again' })).toBeEnabled()
   }
 }
 export const CodingAgentToolsUnreachable: Story = {
@@ -241,12 +315,12 @@ export const CodingAgentToolsUnreachable: Story = {
           reason:
             '[codex-acp] MCP server `open-pencil` was not started, because the Codex config already defines an MCP server with this name.'
         }
-      })
+      }),
+      connection: failedAt('tools', 'tools')
     })
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText(/Pairdraw tools · not reachable/)).toBeVisible()
     await expect(canvas.getByText(/Codex can’t reach Pairdraw’s tools/)).toBeVisible()
     await expect(canvas.getByText(/already defines an MCP server/)).toBeVisible()
   }
@@ -258,13 +332,14 @@ export const CodingAgentSignedOut: Story = {
     agentSetup: agentSetup({
       detected: detected('claude-code', 'available'),
       bridge: true,
-      account: account({})
+      account: account({}),
+      connection: failedAt('sign-in', 'signed-out')
     })
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText(/not signed in/)).toBeVisible()
-    await expect(canvas.getByRole('button', { name: 'Sign in' })).toBeVisible()
+    await expect(canvas.getByText(/isn’t signed in yet/)).toBeVisible()
+    await expect(canvas.getByRole('button', { name: 'Retry' })).toBeEnabled()
   }
 }
 export const CodingAgentSigningIn: Story = {
@@ -278,6 +353,10 @@ export const CodingAgentSigningIn: Story = {
         signingIn: true,
         signInURL: 'https://claude.com/cai/oauth/authorize',
         acceptsCode: true
+      }),
+      connection: connection({
+        running: true,
+        steps: { ...connection({}).steps, detect: 'done', install: 'skipped', 'sign-in': 'running' }
       })
     })
   },
@@ -296,7 +375,8 @@ export const CodingAgentOtherAdapter: Story = {
     agentSetup: agentSetup({
       detected: { ...detected('codex', 'available'), adapterPath: '/Users/ada/.bun/bin/codex-acp' },
       bridge: true,
-      account: account({ status: null, adapter: { name: 'codex-acp', version: '0.10.0' } })
+      account: account({ status: null, adapter: { name: 'codex-acp', version: '0.10.0' } }),
+      connection: failedAt('sign-in', 'adapter-mismatch')
     })
   },
   play: async ({ canvasElement }) => {
@@ -305,7 +385,33 @@ export const CodingAgentOtherAdapter: Story = {
       canvas.getByText(/found \/Users\/ada\/\.bun\/bin\/codex-acp, another adapter/)
     ).toBeVisible()
     await expect(canvas.getByText('npm i -g @agentclientprotocol/codex-acp')).toBeVisible()
-    await expect(canvas.queryByText(/Account/)).toBeNull()
+  }
+}
+export const CodingAgentCLIMissing: Story = {
+  args: {
+    providerID: 'acp:gemini-cli',
+    recommended: false,
+    agentSetup: agentSetup({
+      detected: detected('gemini-cli', 'not-installed'),
+      bridge: true,
+      connection: failedAt('install', 'cli-missing')
+    })
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole('link', { name: 'Install Gemini CLI' })).toBeVisible()
+    await expect(canvas.getByText('npm i -g @google/gemini-cli')).toBeVisible()
+  }
+}
+export const CodingAgentManualSignIn: Story = {
+  args: {
+    providerID: 'acp:gemini-cli',
+    recommended: false,
+    agentSetup: agentSetup({ detected: detected('gemini-cli', 'available'), bridge: true })
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText('gemini', { exact: true })).toBeVisible()
   }
 }
 export const PiNeedsCompanion: Story = {

@@ -371,6 +371,23 @@ export const aiMessageDefaults = {
   aiSetupAgentAdapterMismatch: params(
     'Pairdraw found {path}, another adapter it doesn’t support. Install the supported one, then remove this one or move it later on your PATH.'
   ),
+  aiSetupConnect: params('Connect {agent}'),
+  aiSetupConnecting: 'Connecting…',
+  aiSetupConnectStepDetect: 'Check this computer',
+  aiSetupConnectStepInstall: params('Install {agent} and OpenPencil’s MCP server'),
+  aiSetupConnectStepSignIn: params('Sign in to {agent}'),
+  aiSetupConnectStepTools: 'Reach OpenPencil’s tools',
+  aiSetupConnectStepActivate: 'Use it in the chat',
+  aiSetupConnectStepDone: 'done',
+  aiSetupConnectStepRunning: 'in progress',
+  aiSetupConnectStepFailed: 'needs attention',
+  aiSetupConnectStepManual: 'run it yourself',
+  aiSetupConnectStepPending: 'not started',
+  aiSetupConnectSignInCommand: 'To sign in, run this in a terminal and choose a sign-in method:',
+  aiSetupConnectCLIMissing: params('{agent} isn’t installed. Install it, then press Retry.'),
+  aiSetupConnectCheckFailed: params('Couldn’t start {agent} to check its account. Try again.'),
+  aiSetupConnectSignedOut: params('{agent} isn’t signed in yet. Press Retry to sign in.'),
+  aiSetupConnectActivateFailed: params('Couldn’t switch the chat to {agent}. Try again.'),
   aiSetupPiDescription:
     'Pairdraw runs Pi through its Harness companion and uses the providers you signed in to in Pi.',
   aiSetupPiCompanion: 'Harness companion',

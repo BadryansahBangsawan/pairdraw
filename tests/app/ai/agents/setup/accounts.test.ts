@@ -4,7 +4,7 @@ import { ACP_AGENTS, type ACPAgentDef } from '@open-pencil/core/constants'
 
 import type { AgentAuthCheck } from '@/app/ai/agents/acp/auth/session'
 import type { AgentAuthStatus } from '@/app/ai/agents/acp/auth/status'
-import type { TerminalSignIn } from '@/app/ai/agents/acp/auth/terminal'
+import type { AgentHost, AgentSignIn } from '@/app/ai/agents/host/types'
 import { createAgentAccounts } from '@/app/ai/agents/setup/accounts'
 import { createDeferred } from '@/app/runtime/deferred'
 
@@ -39,20 +39,15 @@ function signedOut(): AgentAuthCheck {
   }
 }
 
-function accountsWith(
-  checks: AgentAuthCheck[],
-  overrides: Partial<Parameters<typeof createAgentAccounts>[0]> = {}
-) {
+type AccountsHost = Pick<AgentHost, 'check' | 'signIn'>
+
+const unexpectedSignIn: AgentHost['signIn'] = async () => {
+  throw new Error('Not expected')
+}
+
+function accountsWith(checks: AgentAuthCheck[], signIn: AccountsHost['signIn'] = unexpectedSignIn) {
   const check = mock(async (_agent: ACPAgentDef) => expectDefined(checks.shift(), 'check'))
-  const accounts = createAgentAccounts({
-    enabled: true,
-    check,
-    signInWithAgent: async () => null,
-    startTerminalSignIn: async () => {
-      throw new Error('Not expected')
-    },
-    ...overrides
-  })
+  const accounts = createAgentAccounts({ enabled: true, host: { check, signIn } })
   return { accounts, check }
 }
 
@@ -91,25 +86,24 @@ describe('agent accounts', () => {
   test('marks a check that could not start the agent', async () => {
     const accounts = createAgentAccounts({
       enabled: true,
-      check: async () => {
-        throw new Error('spawn failed')
-      },
-      signInWithAgent: async () => null,
-      startTerminalSignIn: async () => {
-        throw new Error('Not expected')
+      host: {
+        check: async () => {
+          throw new Error('spawn failed')
+        },
+        signIn: unexpectedSignIn
       }
     })
     await accounts.check(claude)
     expect(accounts.account('claude-code')).toMatchObject({ checking: false, error: 'check' })
   })
 
-  test('signs in through the terminal login, then reads the new login from the agent', async () => {
-    const exited = createDeferred<undefined>()
+  test('signs in through a login that reads a code, then reads the new login from the agent', async () => {
+    const exited = createDeferred<null>()
     const submitCode = mock(async (_code: string) => undefined)
-    const startTerminalSignIn = mock(
-      async (_agent: ACPAgentDef, _args: string[], onURL: (url: string) => void) => {
-        onURL('https://claude.com/sign-in')
-        const login: TerminalSignIn = {
+    const signIn = mock(
+      async (_agent: ACPAgentDef, request: Parameters<AgentHost['signIn']>[1]) => {
+        request.onURL('https://claude.com/sign-in')
+        const login: AgentSignIn = {
           done: exited.promise,
           submitCode,
           cancel: async () => undefined
@@ -117,13 +111,11 @@ describe('agent accounts', () => {
         return login
       }
     )
-    const { accounts } = accountsWith([signedOut(), { ...signedOut(), status: CLAUDE_MAX }], {
-      startTerminalSignIn
-    })
+    const { accounts } = accountsWith([signedOut(), { ...signedOut(), status: CLAUDE_MAX }], signIn)
     await accounts.check(claude)
     const signingIn = accounts.signIn(claude)
     await Bun.sleep(0)
-    expect(startTerminalSignIn.mock.calls[0]?.[1]).toEqual(['--cli', 'auth', 'login', '--claudeai'])
+    expect(signIn.mock.calls[0]?.[1].methodId).toBe('claude-ai-login')
     expect(accounts.account('claude-code')).toMatchObject({
       signingIn: true,
       signInURL: 'https://claude.com/sign-in',
@@ -131,7 +123,7 @@ describe('agent accounts', () => {
     })
     await accounts.submitCode('claude-code', 'abc')
     expect(submitCode).toHaveBeenCalledWith('abc')
-    exited.resolve(undefined)
+    exited.resolve(null)
     await signingIn
     expect(accounts.account('claude-code')).toMatchObject({
       signingIn: false,
@@ -143,22 +135,33 @@ describe('agent accounts', () => {
 
   test('signs in through a method the agent runs itself', async () => {
     const chatGPT: AgentAuthStatus = { kind: 'account', label: 'ChatGPT Pro' }
-    const signInWithAgent = mock(async (_agent: ACPAgentDef, _method: string) => chatGPT)
+    const signIn = mock(
+      async (_agent: ACPAgentDef, _request: Parameters<AgentHost['signIn']>[1]) => ({
+        done: Promise.resolve(chatGPT),
+        cancel: async () => undefined
+      })
+    )
     const codexSignedOut = { ...signedOut(), adapter: null }
-    const { accounts } = accountsWith([codexSignedOut, { ...codexSignedOut, status: chatGPT }], {
-      signInWithAgent
-    })
+    const { accounts } = accountsWith(
+      [codexSignedOut, { ...codexSignedOut, status: chatGPT }],
+      signIn
+    )
     await accounts.signIn(codex)
-    expect(signInWithAgent.mock.calls[0]?.[1]).toBe('chat-gpt')
-    expect(accounts.account('codex')).toMatchObject({ signingIn: false, status: chatGPT })
+    expect(signIn.mock.calls[0]?.[1].methodId).toBe('chat-gpt')
+    expect(accounts.account('codex')).toMatchObject({
+      signingIn: false,
+      status: chatGPT,
+      acceptsCode: false
+    })
   })
 
   test('a cancelled sign-in is not a failure and does not check again', async () => {
-    const { accounts, check } = accountsWith([signedOut()], {
-      signInWithAgent: (_agent, _method, signal) =>
-        new Promise((_resolve, reject) => {
-          signal.addEventListener('abort', () => reject(new Error('aborted')))
-        })
+    const { accounts, check } = accountsWith([signedOut()], async () => {
+      const cancelled = createDeferred<null>()
+      return {
+        done: cancelled.promise,
+        cancel: async () => cancelled.reject(new Error('aborted'))
+      }
     })
     await accounts.check(codex)
     const signingIn = accounts.signIn(codex)
@@ -170,13 +173,11 @@ describe('agent accounts', () => {
   })
 
   test('a failed sign-in keeps the last known login', async () => {
-    const { accounts } = accountsWith([signedOut()], {
-      startTerminalSignIn: async () => ({
-        done: Promise.reject(new Error('exit 1')),
-        submitCode: async () => undefined,
-        cancel: async () => undefined
-      })
-    })
+    const { accounts } = accountsWith([signedOut()], async () => ({
+      done: Promise.reject(new Error('exit 1')),
+      submitCode: async () => undefined,
+      cancel: async () => undefined
+    }))
     await accounts.check(claude)
     await accounts.signIn(claude)
     expect(accounts.account('claude-code')).toMatchObject({ status: SIGNED_OUT, error: 'sign-in' })
@@ -192,11 +193,7 @@ describe('agent accounts', () => {
     const check = mock(async () => signedOut())
     const accounts = createAgentAccounts({
       enabled: false,
-      check,
-      signInWithAgent: async () => null,
-      startTerminalSignIn: async () => {
-        throw new Error('Not expected')
-      }
+      host: { check, signIn: unexpectedSignIn }
     })
     await accounts.check(claude)
     await accounts.signIn(claude)

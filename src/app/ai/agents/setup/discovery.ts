@@ -1,12 +1,9 @@
 import { computed, ref, shallowRef } from 'vue'
 
-import {
-  ACP_AGENTS,
-  IS_TAURI,
-  type ACPAgentDef,
-  type ACPAgentID
-} from '@open-pencil/core/constants'
+import { ACP_AGENTS, type ACPAgentDef, type ACPAgentID } from '@open-pencil/core/constants'
 
+import { agentHost, agentHostAvailable } from '@/app/ai/agents/host/current'
+import type { AgentHost } from '@/app/ai/agents/host/types'
 import {
   HARNESS_EXECUTABLE,
   HARNESS_INSTALL_TARGET,
@@ -21,13 +18,7 @@ import {
   isOutdatedCompanion,
   type PackageManager
 } from './companions'
-import {
-  installAgentAdapter,
-  installCanvasBridge,
-  installHarnessCompanion,
-  lookupAgents,
-  type AgentLookup
-} from './native'
+import type { AgentLookup } from './native'
 
 export type DetectedAgent = {
   definition: ACPAgentDef
@@ -278,12 +269,27 @@ export function createAgentDiscovery(options: {
   }
 }
 
-export const agentDiscovery = createAgentDiscovery({
-  enabled: IS_TAURI,
-  lookup: lookupAgents,
-  install: installAgentAdapter,
-  installBridge: installCanvasBridge,
-  installHarness: installHarnessCompanion,
+/** Discovery on the computer a host runs agents on, through what the host finds and installs. */
+export function createHostedAgentDiscovery(
+  host: Pick<AgentHost, 'detect' | 'install'>,
+  options: { enabled: boolean; restartBridge?: () => Promise<void> }
+) {
+  return createAgentDiscovery({
+    enabled: options.enabled,
+    lookup: () => host.detect(),
+    // Agent adapters always come from npm.
+    install: (agent, searchPath) =>
+      host.install({ kind: 'adapter', agent }, { searchPath, manager: 'npm' }),
+    installBridge: (searchPath, manager) =>
+      host.install({ kind: 'companion', companion: 'mcp' }, { searchPath, manager }),
+    installHarness: (searchPath, manager) =>
+      host.install({ kind: 'companion', companion: 'harness' }, { searchPath, manager }),
+    restartBridge: options.restartBridge
+  })
+}
+
+export const agentDiscovery = createHostedAgentDiscovery(agentHost(), {
+  enabled: agentHostAvailable,
   async restartBridge() {
     const { restartMCPRuntime } = await import('@/app/automation/mcp/runtime')
     const result = await restartMCPRuntime()

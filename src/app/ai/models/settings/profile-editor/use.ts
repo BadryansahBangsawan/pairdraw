@@ -13,7 +13,8 @@ import {
   modelProfile,
   removeModelProfile,
   saveModelProfileDraft,
-  setModelConnectionAPIKey
+  setModelConnectionAPIKey,
+  setModelRoleAssignment
 } from '@/app/ai/models'
 import type { ModelPickerLabels } from '@/app/ai/models/picker/options'
 import type { SettingsSaveResult } from '@/app/settings/save-result'
@@ -128,6 +129,13 @@ export function useModelProfileEditor({ profileId, keyInput, labels: ai }: Profi
     }
   }
 
+  /** Saves the model and makes it the chat's design model, as connecting an agent finishes. */
+  async function saveForChat(): Promise<SettingsSaveResult> {
+    const result = await save()
+    if (result === 'saved' && draft.profileId) setModelRoleAssignment('design', draft.profileId)
+    return result
+  }
+
   async function remove(): Promise<boolean> {
     if (!profileId || busy.value || !canRemoveModelProfile(profileId)) return false
     busy.value = true
@@ -192,6 +200,7 @@ export function useModelProfileEditor({ profileId, keyInput, labels: ai }: Profi
     updateProvider,
     updateModel,
     save,
+    saveForChat,
     clearKey,
     testConnection,
     remove

@@ -57,10 +57,13 @@ export async function createACPTransport(
   const agentDef = ACP_AGENTS.find((a) => a.id === agentId)
   if (!agentDef) throw new Error(`Unknown ACP agent: ${agentId}`)
 
-  const { ACPChatTransport } = await import('@/app/ai/transports/acp')
-  const { agentWorkspace } = await import('@/app/ai/agents/setup/native')
+  const [{ ACPChatTransport }, { agentHost }] = await Promise.all([
+    import('@/app/ai/transports/acp'),
+    import('@/app/ai/agents/host/current')
+  ])
+  const host = agentHost()
   // A folder of its own, not the home folder, whose project settings the agent would read.
-  return new ACPChatTransport({ agentDef, cwd: await agentWorkspace(), store, onUsage })
+  return new ACPChatTransport({ agentDef, cwd: await host.workspace(), store, onUsage, host })
 }
 
 /**

@@ -5,6 +5,11 @@ import { ACP_AGENTS, type ACPAgentDef, type ACPAgentID } from '@open-pencil/core
 import { readPiAccount } from '@/app/ai/agents/pi/settings'
 
 import { agentAccounts } from './accounts'
+import {
+  createAgentConnector,
+  type AgentConnectorOptions,
+  type AgentConnectResult
+} from './connect'
 import { agentDiscovery } from './discovery'
 import type { AgentSetupState, MCPServerSetupState, PiSetupState } from './view'
 
@@ -15,8 +20,11 @@ type AgentAccounts = typeof agentAccounts
 export function useAgentSetup(
   discovery: AgentDiscovery = agentDiscovery,
   readPi: typeof readPiAccount = readPiAccount,
-  accounts: AgentAccounts = agentAccounts
+  accounts: AgentAccounts = agentAccounts,
+  /** Makes a connected agent the chat's provider, where the caller does not do it itself. */
+  activate?: AgentConnectorOptions['activate']
 ) {
+  const connector = createAgentConnector({ discovery, accounts, activate })
   const piDefaultModel = ref<string | null>(null)
   const piSignedIn = ref<boolean | null>(null)
   const readingPi = ref(false)
@@ -33,7 +41,8 @@ export function useAgentSetup(
       detected: discovery.agents.value.find((agent) => agent.definition.id === id) ?? null,
       adapterNeedsAdmin: discovery.adapterNeedsAdmin.value,
       installingAgent: discovery.installing.value === id,
-      account: id ? accounts.account(id) : undefined
+      account: id ? accounts.account(id) : undefined,
+      connection: id ? connector.state(id) : undefined
     }
   }
 
@@ -152,6 +161,12 @@ export function useAgentSetup(
     return id ? run(id) : Promise.resolve()
   }
 
+  /** Connects the agent in one action, resuming from the step that stopped it last time. */
+  async function connectAgent(providerID: string): Promise<AgentConnectResult> {
+    const agent = ACP_AGENTS.find((definition) => definition.id === agentID(providerID))
+    return agent ? connector.connect(agent) : 'failed'
+  }
+
   return {
     agentSetup,
     piSetup,
@@ -161,6 +176,7 @@ export function useAgentSetup(
     checkOnce,
     checkAgent,
     signInAgent,
+    connectAgent,
     cancelAgentSignIn: (providerID: string) => agentAction(providerID, accounts.cancelSignIn),
     submitAgentSignInCode: (providerID: string, code: string) =>
       agentAction(providerID, (id) => accounts.submitCode(id, code)),
@@ -173,7 +189,17 @@ export function useAgentSetup(
  * settings show whether it is installed, signed in, and reaches OpenPencil's tools. Undefined
  * outside the desktop app, where agents cannot run.
  */
-export function useCodingAgentSetup(providerID: MaybeRefOrGetter<string>, setup = useAgentSetup()) {
+export function useCodingAgentSetup(
+  providerID: MaybeRefOrGetter<string>,
+  {
+    activate,
+    setup = useAgentSetup(agentDiscovery, readPiAccount, agentAccounts, activate)
+  }: {
+    /** Makes the agent the chat's provider once connecting reaches it. */
+    activate?: AgentConnectorOptions['activate']
+    setup?: ReturnType<typeof useAgentSetup>
+  } = {}
+) {
   const agent = computed(() =>
     ACP_AGENTS.find((definition) => `acp:${definition.id}` === toValue(providerID))
   )
@@ -197,6 +223,7 @@ export function useCodingAgentSetup(providerID: MaybeRefOrGetter<string>, setup 
     install: () => setup.installAgent(toValue(providerID)),
     installBridge: setup.setupCanvasBridge,
     signIn: () => setup.signInAgent(toValue(providerID)),
+    connect: () => setup.connectAgent(toValue(providerID)),
     cancelSignIn: () => setup.cancelAgentSignIn(toValue(providerID)),
     submitSignInCode: (code: string) => setup.submitAgentSignInCode(toValue(providerID), code)
   }
@@ -223,28 +250,5 @@ export function usePiSetup(active: MaybeRefOrGetter<boolean>, setup = useAgentSe
     refresh: setup.refreshAgents,
     installCompanion: () => setup.installAgent('harness:pi'),
     installBridge: setup.setupCanvasBridge
-  }
-}
-
-/**
- * The MCP server's setup while `active`, checked each time it becomes active, so Settings → MCP
- * can install or update the server with one click.
- */
-export function useMCPServerSetup(
-  active: MaybeRefOrGetter<boolean>,
-  discovery: AgentDiscovery = agentDiscovery
-) {
-  const setup = useAgentSetup(discovery)
-  watch(
-    () => toValue(active),
-    (on) => {
-      if (on) void discovery.refresh(true)
-    },
-    { immediate: true }
-  )
-  return {
-    state: computed(() => setup.mcpServerSetup()),
-    install: () => discovery.setupCanvasBridge(),
-    check: () => discovery.refresh(true)
   }
 }

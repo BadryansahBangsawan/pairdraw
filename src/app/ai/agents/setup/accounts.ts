@@ -1,15 +1,11 @@
 import { ref } from 'vue'
 
-import { IS_TAURI, type ACPAgentDef, type ACPAgentID } from '@open-pencil/core/constants'
+import type { ACPAgentDef, ACPAgentID } from '@open-pencil/core/constants'
 
-import {
-  checkAgentAuth,
-  signInWithAgent,
-  type AgentAuthCheck,
-  type ToolsProbe
-} from '@/app/ai/agents/acp/auth/session'
+import type { AgentAuthCheck } from '@/app/ai/agents/acp/auth/session'
 import type { AgentAuthMethod, AgentAuthStatus } from '@/app/ai/agents/acp/auth/status'
-import { startTerminalSignIn, type TerminalSignIn } from '@/app/ai/agents/acp/auth/terminal'
+import { agentHost, agentHostAvailable } from '@/app/ai/agents/host/current'
+import type { AgentHost, AgentSignIn } from '@/app/ai/agents/host/types'
 
 /** What setup knows about the account a coding agent uses. */
 export interface AgentAccount {
@@ -46,25 +42,14 @@ type Accounts = Partial<Record<ACPAgentID, AgentAccount>>
 
 export function createAgentAccounts(options: {
   enabled: boolean
-  check: (agent: ACPAgentDef) => Promise<AgentAuthCheck>
-  signInWithAgent: (
-    agent: ACPAgentDef,
-    methodId: string,
-    signal: AbortSignal
-  ) => Promise<AgentAuthStatus | null>
-  startTerminalSignIn: (
-    agent: ACPAgentDef,
-    args: string[],
-    onURL: (url: string) => void
-  ) => Promise<TerminalSignIn>
+  /** The host that starts the agents, to read their login and sign them in. */
+  host: Pick<AgentHost, 'check' | 'signIn'>
 }) {
+  const { host } = options
   const accounts = ref<Accounts>({})
   const methods = new Map<ACPAgentID, AgentAuthMethod[]>()
   const checks = new Map<ACPAgentID, Promise<void>>()
-  const signIns = new Map<
-    ACPAgentID,
-    { cancel(): Promise<void>; submitCode?: TerminalSignIn['submitCode'] }
-  >()
+  const signIns = new Map<ACPAgentID, Pick<AgentSignIn, 'cancel' | 'submitCode'>>()
 
   function account(id: ACPAgentID): AgentAccount {
     return accounts.value[id] ?? NOT_CHECKED
@@ -88,7 +73,7 @@ export function createAgentAccounts(options: {
     const running = checks.get(agent.id)
     if (running) return running
     update(agent.id, { checking: true, error: null })
-    const pending = options
+    const pending = host
       .check(agent)
       .then((result) => {
         methods.set(agent.id, result.methods)
@@ -118,35 +103,24 @@ export function createAgentAccounts(options: {
       return
     }
     update(agent.id, { signingIn: true, signInURL: null, acceptsCode: false, error: null })
-    // A field, so the cancel callbacks' writes are visible to the checks below.
+    // A field, so the cancel callback's write is visible to the checks below.
     const run = { cancelled: false, signedIn: false }
     try {
-      if (agent.signIn?.via === 'terminal') {
-        const login = await options.startTerminalSignIn(agent, agent.signIn.args, (url) =>
-          update(agent.id, { signInURL: url })
-        )
-        signIns.set(agent.id, {
-          cancel: () => {
-            run.cancelled = true
-            return login.cancel()
-          },
-          submitCode: login.submitCode
-        })
-        update(agent.id, { acceptsCode: true })
-        await login.done
-        run.signedIn = true
-      } else {
-        const controller = new AbortController()
-        signIns.set(agent.id, {
-          cancel: async () => {
-            run.cancelled = true
-            controller.abort()
-          }
-        })
-        const status = await options.signInWithAgent(agent, method.id, controller.signal)
-        if (status) update(agent.id, { status })
-        run.signedIn = true
-      }
+      const login = await host.signIn(agent, {
+        methodId: method.id,
+        onURL: (url) => update(agent.id, { signInURL: url })
+      })
+      signIns.set(agent.id, {
+        cancel: () => {
+          run.cancelled = true
+          return login.cancel()
+        },
+        submitCode: login.submitCode
+      })
+      if (login.submitCode) update(agent.id, { acceptsCode: true })
+      const status = await login.done
+      if (status) update(agent.id, { status })
+      run.signedIn = true
     } catch {
       if (!run.cancelled) update(agent.id, { error: 'sign-in' })
     } finally {
@@ -173,21 +147,7 @@ export function createAgentAccounts(options: {
   return { supported: options.enabled, account, check, signIn, cancelSignIn, submitCode, report }
 }
 
-/** Starts a session as a chat does: in the agent workspace, linked to OpenPencil's tools. */
-const chatTools: ToolsProbe = {
-  cwd: async () => (await import('@/app/ai/agents/setup/native')).agentWorkspace(),
-  link: async () => {
-    const [{ getAutomationAuthToken }, { linkOwnTools }] = await Promise.all([
-      import('@/app/automation/mcp/spawn'),
-      import('@/app/ai/agents/acp/tools')
-    ])
-    return linkOwnTools(await getAutomationAuthToken())
-  }
-}
-
 export const agentAccounts = createAgentAccounts({
-  enabled: IS_TAURI,
-  check: (agent) => checkAgentAuth(agent, { tools: chatTools }),
-  signInWithAgent: (agent, methodId, signal) => signInWithAgent(agent, methodId, signal),
-  startTerminalSignIn
+  enabled: agentHostAvailable,
+  host: agentHost()
 })

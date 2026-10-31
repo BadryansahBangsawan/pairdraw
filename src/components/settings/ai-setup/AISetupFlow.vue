@@ -224,7 +224,7 @@ async function finish(): Promise<void> {
           @check-agent="onboarding.refreshAgents()"
           @install-agent="onboarding.installAgent(providerID)"
           @install-bridge="onboarding.setupCanvasBridge()"
-          @sign-in-agent="onboarding.signInAgent(providerID)"
+          @connect-agent="onboarding.connectAgent(providerID)"
           @cancel-agent-sign-in="onboarding.cancelAgentSignIn(providerID)"
           @submit-agent-sign-in-code="onboarding.submitAgentSignInCode(providerID, $event)"
         />

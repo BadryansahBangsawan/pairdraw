@@ -4,8 +4,8 @@ import { promiseTimeout } from '@vueuse/core'
 
 import type { ACPAgentDef } from '@open-pencil/core/constants'
 
-import { spawnACPProcess } from '@/app/ai/agents/acp/process'
 import type { OwnToolsLink, OwnToolsOutcome } from '@/app/ai/agents/acp/tools'
+import type { AgentHost } from '@/app/ai/agents/host/types'
 import { createDeferred, type Deferred } from '@/app/runtime/deferred'
 
 import {
@@ -16,17 +16,9 @@ import {
   type AgentAuthStatus
 } from './status'
 
-/** An agent process's stdio and the way to stop it. */
-export interface AgentStreams {
-  input: WritableStream<Uint8Array>
-  output: ReadableStream<Uint8Array>
-  close(): Promise<void>
-}
-
-export type SpawnAgent = (agent: ACPAgentDef) => Promise<AgentStreams>
-
 export interface AuthSessionOptions {
-  spawn?: SpawnAgent
+  /** Starts the agent, as the host that runs it does. */
+  spawn: AgentHost['spawn']
   /** How long to wait for a login report; adapters read their CLI's with a 5 s limit. */
   statusTimeoutMs?: number
   /** How long an agent may take to answer `initialize` before it counts as stuck. */
@@ -54,25 +46,6 @@ export interface AgentAuthCheck {
   adapter: { name: string; version: string } | null
   /** Whether a session reached OpenPencil's tools; null when not checked or not signed in. */
   tools: OwnToolsOutcome | null
-}
-
-export async function spawnAgentStreams(agent: ACPAgentDef): Promise<AgentStreams> {
-  let closing = false
-  const { child, input, output } = await spawnACPProcess({
-    command: agent.command,
-    args: agent.args,
-    logId: `${agent.id} sign-in`,
-    destroying: () => closing,
-    onUnexpectedClose: () => undefined
-  })
-  return {
-    input,
-    output,
-    async close() {
-      closing = true
-      await child.kill().catch(() => undefined)
-    }
-  }
 }
 
 /** Login reports in arrival order, so a caller can wait for one newer than it has seen. */
@@ -105,9 +78,9 @@ function createStatusLog() {
 
 async function openAuthSession(
   agent: ACPAgentDef,
-  { spawn = spawnAgentStreams, initializeTimeoutMs = INITIALIZE_TIMEOUT_MS }: AuthSessionOptions
+  { spawn, initializeTimeoutMs = INITIALIZE_TIMEOUT_MS }: AuthSessionOptions
 ) {
-  const streams = await spawn(agent)
+  const streams = await spawn(agent, { logId: `${agent.id} sign-in` })
   const log = createStatusLog()
   let onUpdate: ((update: SessionUpdate) => void) | null = null
   const connection = new ClientSideConnection(
@@ -193,7 +166,7 @@ async function checkTools(session: AuthSession, probe: ToolsProbe): Promise<OwnT
 /** Starts the agent, reads the login it reports, and stops it. */
 export async function checkAgentAuth(
   agent: ACPAgentDef,
-  options: AuthSessionOptions = {}
+  options: AuthSessionOptions
 ): Promise<AgentAuthCheck> {
   const { statusTimeoutMs = STATUS_TIMEOUT_MS } = options
   const session = await openAuthSession(agent, options)
@@ -221,7 +194,7 @@ export async function signInWithAgent(
   agent: ACPAgentDef,
   methodId: string,
   signal: AbortSignal,
-  options: AuthSessionOptions = {}
+  options: AuthSessionOptions
 ): Promise<AgentAuthStatus | null> {
   const { statusTimeoutMs = STATUS_TIMEOUT_MS } = options
   const session = await openAuthSession(agent, options)

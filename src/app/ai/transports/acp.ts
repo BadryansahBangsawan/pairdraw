@@ -15,22 +15,21 @@ import type { ACPAgentDef } from '@open-pencil/core/constants'
 import { parseAuthStatusUpdate } from '@/app/ai/agents/acp/auth/status'
 import { setAgentCommands } from '@/app/ai/agents/acp/commands'
 import { createUpdateMapper } from '@/app/ai/agents/acp/events'
-import { spawnACPProcess } from '@/app/ai/agents/acp/process'
 import { linkOwnTools } from '@/app/ai/agents/acp/tools'
+import { agentHost } from '@/app/ai/agents/host/current'
+import type { AgentHost, AgentStreams } from '@/app/ai/agents/host/types'
 import SYSTEM_PROMPT from '@/app/ai/chat/system-prompt'
 import { endRun, forgetAgentChat, startAgentRun } from '@/app/ai/reply/run'
 import { describeDiagnosticError, recordACPTransportFailure } from '@/app/diagnostics'
 import type { EditorStore } from '@/app/editor/active-store'
 import { APP_NAME } from '@/constants'
 
-type TauriChild = Awaited<ReturnType<typeof spawnACPProcess>>['child']
-
 interface ACPSession {
   connection: ClientSideConnection
   sessionId: string
   /** The id the agent's tool calls carry, which ties them to this chat's replies. */
   chat: string
-  child: TauriChild
+  agent: AgentStreams
   onUpdate: ((params: SessionNotification) => void) | null
   dead: boolean
   /** The model the agent says it uses, once it has said; Codex names it, Claude in its usage. */
@@ -138,7 +137,9 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
   private sentContext = false
   private destroying = false
   /** The agent while it starts, before it becomes the session, so destroying can stop it. */
-  private starting: TauriChild | null = null
+  private starting: AgentStreams | null = null
+  /** Where the agent runs, which starts it and hands over its stdio. */
+  private host: AgentHost
 
   /** The chat's document, where each reply's run records the edits the agent makes in it. */
   private store: EditorStore | null
@@ -150,8 +151,10 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     store?: EditorStore
     /** Told each turn's tokens, which the Usage settings count with the chat's other models. */
     onUsage?: (usage: AgentTurnUsage) => void
+    host?: AgentHost
   }) {
     this.agentDef = options.agentDef
+    this.host = options.host ?? agentHost()
     this.cwd = options.cwd ?? '.'
     this.store = options.store ?? null
     this.onUsage = options.onUsage ?? null
@@ -178,7 +181,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
       const started = await this.spawnAgent()
       // Destroyed between startup and here: the agent is still `starting`, so stop it.
       if (this.destroying) {
-        await started.child.kill().catch(() => undefined)
+        await started.agent.close()
         throw new Error('The chat closed while its agent was starting.')
       }
       this.session = started
@@ -264,23 +267,20 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     this.destroying = true
     const starting = this.starting
     this.starting = null
-    await starting?.kill().catch(() => undefined)
+    await starting?.close()
     if (this.session) {
       forgetAgentChat(this.session.chat)
-      await this.session.child.kill()
+      await this.session.agent.close()
       this.session = null
     }
   }
 
   private async spawnAgent(): Promise<ACPSession> {
-    let process: Awaited<ReturnType<typeof spawnACPProcess>>
+    let agent: AgentStreams
     try {
-      process = await spawnACPProcess({
-        command: this.agentDef.command,
-        args: this.agentDef.args,
+      agent = await this.host.spawn(this.agentDef, {
         logId: this.agentDef.id,
-        destroying: () => this.destroying,
-        onUnexpectedClose: () => {
+        onExit: () => {
           if (!this.session) return
           this.session.dead = true
           this.session = null
@@ -290,8 +290,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
       recordACPTransportFailure({ operation: 'start', ...describeDiagnosticError(e) })
       throw new Error(formatConnectionError(e, this.agentDef))
     }
-    const { child, input, output } = process
-    const stream = ndJsonStream(input, output)
+    const stream = ndJsonStream(agent.input, agent.output)
     let onUpdate: ACPSession['onUpdate'] = null
     // Set once the session exists; the client reads it to record the model the agent names.
     let sessionRef: ACPSession | null = null
@@ -335,7 +334,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     }
 
     const connection = new ClientSideConnection((_agent: Agent) => clientImpl, stream)
-    this.starting = child
+    this.starting = agent
     // The SDK leaves requests pending when the agent exits, so each startup request races it.
     const stopped = connection.closed.then((): never => {
       throw new Error('The agent stopped while it was starting.')
@@ -347,7 +346,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     try {
       automationAuthToken = await getAutomationAuthToken()
     } catch (e) {
-      await child.kill().catch(() => undefined)
+      await agent.close()
       throw startupError(e, this.agentDef)
     }
 
@@ -359,7 +358,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
         })
       )
     } catch (e) {
-      await child.kill().catch(() => undefined)
+      await agent.close()
       throw startupError(e, this.agentDef)
     }
 
@@ -369,7 +368,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
       tools = await linkOwnTools(automationAuthToken)
     } catch (e) {
       // An outside MCP connection whose credential cannot be read fails here.
-      await child.kill().catch(() => undefined)
+      await agent.close()
       throw startupError(e, this.agentDef)
     }
     onUpdate = ({ update }) => tools.noteUpdate(update)
@@ -385,7 +384,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
       )
     } catch (e) {
       tools.stop()
-      await child.kill().catch(() => undefined)
+      await agent.close()
       throw startupError(e, this.agentDef)
     }
 
@@ -398,11 +397,11 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     }
     // Destroyed while starting, as when the chat closes: the agent must not get a prompt.
     if (this.destroying) {
-      await child.kill().catch(() => undefined)
+      await agent.close()
       throw new Error('The chat closed while its agent was starting.')
     }
     if (outcome.connected === false) {
-      await child.kill().catch(() => undefined)
+      await agent.close()
       const error = toolsUnreachableError(this.agentDef, outcome.reason)
       recordACPTransportFailure({ operation: 'start', ...describeDiagnosticError(error) })
       throw error
@@ -413,7 +412,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
       connection,
       sessionId: sessionResult.sessionId,
       chat: tools.chat,
-      child,
+      agent,
       dead: false,
       model: sessionResult.models?.currentModelId ?? null,
       get onUpdate() {

@@ -69,7 +69,7 @@ const emit = defineEmits<{
   checkAgent: []
   installAgent: []
   installBridge: []
-  signInAgent: []
+  connectAgent: []
   cancelAgentSignIn: []
   submitAgentSignInCode: [code: string]
 }>()
@@ -110,10 +110,7 @@ const keyHint = computed(() => {
       v-if="agent && agentSetup"
       :agent="agent"
       :setup="agentSetup"
-      @check="emit('checkAgent')"
-      @install-agent="emit('installAgent')"
-      @install-bridge="emit('installBridge')"
-      @sign-in="emit('signInAgent')"
+      @connect="emit('connectAgent')"
       @cancel-sign-in="emit('cancelAgentSignIn')"
       @submit-sign-in-code="emit('submitAgentSignInCode', $event)"
     />

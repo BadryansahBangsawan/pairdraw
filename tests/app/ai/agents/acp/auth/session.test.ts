@@ -11,14 +11,10 @@ import {
 
 import { ACP_AGENTS } from '@open-pencil/core/constants'
 
-import {
-  checkAgentAuth,
-  signInWithAgent,
-  type AgentStreams,
-  type ToolsProbe
-} from '@/app/ai/agents/acp/auth/session'
+import { checkAgentAuth, signInWithAgent, type ToolsProbe } from '@/app/ai/agents/acp/auth/session'
 import { AUTH_STATUS_UPDATE_METHOD, type AgentAuthStatus } from '@/app/ai/agents/acp/auth/status'
 import type { OwnToolsOutcome } from '@/app/ai/agents/acp/tools'
+import type { AgentStreams } from '@/app/ai/agents/host/types'
 import { createDeferred } from '@/app/runtime/deferred'
 
 import { expectDefined } from '#tests/helpers/assert'

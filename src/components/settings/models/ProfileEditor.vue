@@ -73,7 +73,14 @@ const {
   testConnection: runConnectionTest
 } = profile
 const pi = usePiSetup(isHarness)
-const codingAgent = useCodingAgentSetup(() => draft.providerID)
+const codingAgent = useCodingAgentSetup(() => draft.providerID, {
+  // Connecting finishes by saving this model and choosing it for the chat.
+  async activate() {
+    if (!(await feedback.validate('save')) || (await profile.saveForChat()) !== 'saved') {
+      throw new Error('The model could not be saved.')
+    }
+  }
+})
 const signIn = useProfileSignIn(keyInput)
 const customModelPlaceholder = computed(() =>
   isHarness.value ? (pi.state.value?.defaultModel ?? 'provider/model') : 'e.g. llama-3.3-70b'
@@ -130,6 +137,9 @@ async function testConnection() {
   }
   await runConnectionTest()
 }
+async function connectAgent() {
+  if ((await codingAgent.connect()) === 'connected') emit('done')
+}
 async function remove() {
   if (await profile.remove()) {
     deleteOpen.value = false
@@ -184,10 +194,7 @@ async function remove() {
             <AgentSetup
               :agent="codingAgent.agent.value"
               :setup="codingAgent.state.value"
-              @check="codingAgent.check()"
-              @install-agent="codingAgent.install()"
-              @install-bridge="codingAgent.installBridge()"
-              @sign-in="codingAgent.signIn()"
+              @connect="connectAgent"
               @cancel-sign-in="codingAgent.cancelSignIn()"
               @submit-sign-in-code="codingAgent.submitSignInCode($event)"
             />

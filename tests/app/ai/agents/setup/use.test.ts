@@ -7,12 +7,7 @@ import { ACP_AGENTS, type ACPAgentDef } from '@open-pencil/core/constants'
 import { createAgentAccounts, type AgentAccount } from '@/app/ai/agents/setup/accounts'
 import { createAgentDiscovery, type DetectedAgent } from '@/app/ai/agents/setup/discovery'
 import type { AgentLookup } from '@/app/ai/agents/setup/native'
-import {
-  useAgentSetup,
-  useCodingAgentSetup,
-  useMCPServerSetup,
-  usePiSetup
-} from '@/app/ai/agents/setup/use'
+import { useAgentSetup, useCodingAgentSetup, usePiSetup } from '@/app/ai/agents/setup/use'
 import {
   agentSetupView,
   mcpServerSetupView,
@@ -72,14 +67,13 @@ describe('useAgentSetup', () => {
       methods: [{ id: 'chat-gpt', name: 'ChatGPT' }],
       tools: null
     }))
-    const signInWithAgent = mock(async () => null)
+    const signInWithAgent = mock(async () => ({
+      done: Promise.resolve(null),
+      cancel: async () => undefined
+    }))
     const accounts = createAgentAccounts({
       enabled: true,
-      check,
-      signInWithAgent,
-      startTerminalSignIn: async () => {
-        throw new Error('Not expected')
-      }
+      host: { check, signIn: signInWithAgent }
     })
     const agents = useAgentSetup(discovery, async () => null, accounts)
     await agents.refreshAgents()
@@ -116,7 +110,7 @@ describe('useAgentSetup', () => {
   test('checks a coding agent whenever its model settings name it', async () => {
     const { agents, check, lookups } = signedInAgents()
     const providerID = ref('openrouter')
-    const codingAgent = useCodingAgentSetup(providerID, agents)
+    const codingAgent = useCodingAgentSetup(providerID, { setup: agents })
     expect(codingAgent.agent.value).toBeUndefined()
     expect(lookups()).toBe(0)
 
@@ -150,10 +144,11 @@ function signedInAgents() {
   }))
   const accounts = createAgentAccounts({
     enabled: true,
-    check,
-    signInWithAgent: async () => null,
-    startTerminalSignIn: async () => {
-      throw new Error('Not expected')
+    host: {
+      check,
+      signIn: async () => {
+        throw new Error('Not expected')
+      }
     }
   })
   return {
@@ -527,38 +522,5 @@ describe('mcpServerSetupView', () => {
     expect(view.manualCommand).toBe(MCP_INSTALL_COMMAND)
     // Nothing to install with, so no npm problem to report.
     expect(view.problem).toBeNull()
-  })
-})
-
-describe('useMCPServerSetup', () => {
-  test('checks while active, then installs and restarts the server with one click', async () => {
-    let installed = false
-    const installBridge = mock(async () => {
-      installed = true
-    })
-    const restartBridge = mock(async () => undefined)
-    const discovery = createAgentDiscovery({
-      enabled: true,
-      lookup: async (): Promise<AgentLookup> => ({
-        ...lookup('npm', ...(installed ? ['openpencil-mcp-http'] : [])),
-        versions: installed ? { '@open-pencil/mcp': '0.0.0-test' } : {}
-      }),
-      install: async () => undefined,
-      installBridge,
-      restartBridge
-    })
-    const active = ref(false)
-    const server = useMCPServerSetup(active, discovery)
-    expect(server.state.value.checked).toBe(false)
-
-    active.value = true
-    await nextTick()
-    await discovery.refresh()
-    expect(mcpServerSetupView(server.state.value).bridge.action).toBe('install')
-
-    await server.install()
-    expect(installBridge).toHaveBeenCalledTimes(1)
-    expect(restartBridge).toHaveBeenCalledTimes(1)
-    expect(mcpServerSetupView(server.state.value).bridge.ready).toBe(true)
   })
 })

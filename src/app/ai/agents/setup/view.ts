@@ -5,6 +5,14 @@ import { MCP_INSTALL_COMMAND } from '@/app/automation/mcp/failure'
 import { detectUserAgent } from '@/app/tauri/command'
 
 import { type AgentAccount } from './accounts'
+import {
+  AGENT_CONNECT_STEPS,
+  isOtherAdapter,
+  type AgentConnectFailure,
+  type AgentConnectProblem,
+  type AgentConnectState,
+  type AgentConnectStep
+} from './connect'
 import { type DetectedAgent, type DiscoveryError } from './discovery'
 
 /** What setup knows about one coding agent and the MCP server it needs. */
@@ -36,6 +44,8 @@ export interface AgentSetupState {
   error: DiscoveryError | null
   /** The account the agent uses, read from the agent once its adapter is installed. */
   account?: AgentAccount
+  /** Progress of connecting the agent in one action; absent before anyone connects it. */
+  connection?: AgentConnectState
 }
 
 /** What setup knows about Pi: the Harness companion that runs it and Pi's own settings. */
@@ -211,8 +221,7 @@ function accountView(setup: AgentSetupState, mismatch: boolean): AgentAccountVie
 }
 
 function adapterMismatch(agent: ACPAgentDef, setup: AgentSetupState): boolean {
-  const adapter = setup.account?.adapter
-  return Boolean(agent.adapterPackage && adapter && adapter.name !== agent.adapterPackage)
+  return isOtherAdapter(agent, setup.account?.adapter)
 }
 
 /** The agent's install command to run by hand, or null where one click installs its adapter. */
@@ -370,5 +379,91 @@ export function piSetupView(setup: PiSetupState): PiSetupView {
           ...(server.check.ready ? [] : [setup.bridgeCommand])
         ]
       : []
+  }
+}
+
+/** A connection step as setup shows it; `manual` is one only the person can do. */
+export type AgentConnectStepStatus = 'pending' | 'running' | 'done' | 'failed' | 'manual'
+
+export interface AgentConnectView {
+  /** The steps that apply to this agent, in order. */
+  steps: { step: AgentConnectStep; status: AgentConnectStepStatus }[]
+  running: boolean
+  /** Every step is done, so connecting again only checks. */
+  connected: boolean
+  failure: AgentConnectFailure | null
+  /** What stopped a lookup or install, which setup names the same as everywhere else. */
+  problem: SetupProblem | null
+  /** The command that signs in to an agent setup cannot sign in to, such as Gemini CLI. */
+  signInCommand: string | null
+}
+
+const DISCOVERY_PROBLEMS: ReadonlySet<AgentConnectProblem> = new Set([
+  'lookup',
+  'install',
+  'npm',
+  'canvas-install',
+  'canvas-start',
+  'npm-admin'
+])
+
+function isDiscoveryProblem(problem: AgentConnectProblem): problem is DiscoveryError {
+  return DISCOVERY_PROBLEMS.has(problem)
+}
+
+/** A check setup runs on its own, such as the lookup when the settings open. */
+function checking(
+  step: AgentConnectStep,
+  setup: AgentSetupState,
+  account: AgentAccountView | null
+) {
+  if (step === 'detect') return setup.scanning && !setup.checked
+  return step === 'sign-in' && (account?.state === 'checking' || account?.state === 'signing-in')
+}
+
+/** Steps already satisfied by what setup found, before or between attempts to connect. */
+function satisfied(
+  step: AgentConnectStep,
+  setup: AgentSetupState,
+  account: AgentAccountView | null
+) {
+  if (step === 'detect') return setup.checked && setup.error !== 'lookup'
+  if (step === 'install') {
+    return setup.detected?.status === 'available' && setup.bridge && !setup.bridgeOutdated
+  }
+  if (step === 'sign-in') return account?.state === 'signed-in'
+  if (step === 'tools') return account?.tools?.state === 'connected'
+  return false
+}
+
+/** The stepper for connecting a coding agent in one action. */
+export function agentConnectView(agent: ACPAgentDef, setup: AgentSetupState): AgentConnectView {
+  const connection = setup.connection
+  const { account, problem } = agentSetupView(agent, setup)
+  const failure = connection?.failure ?? null
+  const steps = AGENT_CONNECT_STEPS.filter((step) => {
+    // Only a login setup reads tells whether a session reaches the tools.
+    if (step === 'tools') return agent.signIn !== undefined
+    return step !== 'activate' || connection?.activates === true
+  }).map((step) => {
+    const recorded = connection?.steps[step] ?? 'pending'
+    let status: AgentConnectStepStatus = 'pending'
+    if (recorded === 'running' || recorded === 'failed') status = recorded
+    else if (checking(step, setup, account)) status = 'running'
+    else if (step === 'sign-in' && !agent.signIn) status = 'manual'
+    else if (recorded !== 'pending' || satisfied(step, setup, account)) status = 'done'
+    return { step, status }
+  })
+  const running = connection?.running === true
+  const discoveryFailure = failure && isDiscoveryProblem(failure.problem) ? failure.problem : null
+  return {
+    steps,
+    running,
+    connected: !running && steps.every(({ status }) => status === 'done' || status === 'manual'),
+    failure,
+    problem: discoveryFailure
+      ? (problem ?? setupProblem(discoveryFailure, false, ['install', 'canvas-install']))
+      : null,
+    signInCommand: agent.signIn ? null : (agent.cliCommand ?? agent.command)
   }
 }

@@ -26,3 +26,4 @@
 - Reloading a document with nothing unsaved, such as one undone back to where it started, no longer offers to recover it.
 - A coding agent's model, reasoning, and mode controls in a narrow chat show their icons side by side instead of overlapping.
 - Opening or closing a side panel no longer shows the canvas stretched for a frame before it redraws.
+- A failed Save As keeps saving to the file it saved to before, a failed open gives the reused Untitled tab its name back, and undoing a nudge also returns layers selected partway through it.

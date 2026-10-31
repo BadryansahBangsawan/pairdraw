@@ -288,7 +288,13 @@ function isDOMImportFile(file: File): boolean {
  * A tab a document opens in: a new one, or an untouched empty design in front; never Home. `from`
  * is the tab in front when the open began, which comes back to the front if the open fails.
  */
-type OpeningTab = { store: EditorStore; created: boolean; from: Tab | undefined }
+type OpeningTab = {
+  store: EditorStore
+  created: boolean
+  from: Tab | undefined
+  /** The reused tab's name before the open renamed it. */
+  documentName: string
+}
 
 function reusableTabStore(): OpeningTab {
   const current = activeTab.value
@@ -302,8 +308,16 @@ function reusableTabStore(): OpeningTab {
     current.store.getDraftId() === null &&
     source?.path === null &&
     source.handle === null
-  if (current && isUntouched) return { store: current.store, created: false, from: current }
-  return { store: createTab().store, created: true, from: current }
+  if (current && isUntouched) {
+    return {
+      store: current.store,
+      created: false,
+      from: current,
+      documentName: current.store.state.documentName
+    }
+  }
+  const { store } = createTab()
+  return { store, created: true, from: current, documentName: store.state.documentName }
 }
 
 /**
@@ -315,7 +329,11 @@ async function releaseOpeningTab(
   opening: OpeningTab,
   { keepRecovery = false }: { keepRecovery?: boolean } = {}
 ): Promise<void> {
-  if (!opening.created) return
+  if (!opening.created) {
+    // The reused tab stays, so it gets back the name the failed open gave it.
+    opening.store.state.documentName = opening.documentName
+    return
+  }
   const tab = getTabForStore(opening.store)
   if (!tab) return
   // The tab goes even when the recovery copy stays behind, which the next start offers again;

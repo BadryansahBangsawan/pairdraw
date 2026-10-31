@@ -277,6 +277,24 @@ describe('openFileInNewTab deduplication', () => {
     expect(getActiveStore()).toBe(home.store)
   })
 
+  test('a failed open in an untouched tab leaves it untitled and reusable', async () => {
+    ;(figModule.readFigFile as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error('read failed')
+    )
+    const blank = createTab()
+    const count = tabCount()
+
+    await expect(
+      settleFileOpen(openFileInNewTab(new File([], 'broken.fig'), undefined, '/tmp/broken.fig'))
+    ).rejects.toThrow('read failed')
+
+    expect(tabCount()).toBe(count)
+    expect(blank.store.state.documentName).toBe('Untitled')
+
+    await settleFileOpen(openFileInNewTab(new File([], 'next.fig'), undefined, '/tmp/next.fig'))
+    expect(tabCount()).toBe(count)
+  })
+
   test('activates the existing tab when the same path is opened again', async () => {
     const initialCount = tabCount()
     const file = new File([], 'design.fig')

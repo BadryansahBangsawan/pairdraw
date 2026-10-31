@@ -143,9 +143,11 @@ export function createNudgeActions(ctx: EditorContext) {
     const reordered = reorderInFlows(movable, dx, dy)
     const nudged = movable.filter((id) => !reordered.has(id))
 
-    if (nudged.length > 0 && !nudgeOriginals) {
-      nudgeOriginals = new Map()
+    // A run can span selection changes; each layer's start is recorded the first time it moves.
+    if (nudged.length > 0) {
+      nudgeOriginals ??= new Map()
       for (const id of nudged) {
+        if (nudgeOriginals.has(id)) continue
         const node = ctx.graph.getNode(id)
         if (node) nudgeOriginals.set(id, { x: node.x, y: node.y })
       }

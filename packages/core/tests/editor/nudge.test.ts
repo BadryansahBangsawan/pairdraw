@@ -101,6 +101,31 @@ describe('nudgeSelected', () => {
     expect(getNodeOrThrow(editor.graph, rect2.id).y).toBe(403)
   })
 
+  test('a layer selected partway through a run is restored by the same undo step', () => {
+    const { editor, rect } = setup()
+    const other = editor.graph.createNode('RECTANGLE', editor.graph.getPages()[0].id, {
+      name: 'Other',
+      x: 0,
+      y: 0,
+      width: 10,
+      height: 10
+    })
+
+    editor.nudgeSelected(1, 0)
+    editor.select([other.id])
+    editor.nudgeSelected(1, 0)
+    editor.select([rect.id, other.id])
+    editor.nudgeSelected(0, 1)
+    editor.flushNudge()
+
+    expect(getNodeOrThrow(editor.graph, other.id).x).toBe(1)
+    editor.undo.undo()
+    expect(getNodeOrThrow(editor.graph, rect.id).x).toBe(100)
+    expect(getNodeOrThrow(editor.graph, rect.id).y).toBe(200)
+    expect(getNodeOrThrow(editor.graph, other.id).x).toBe(0)
+    expect(getNodeOrThrow(editor.graph, other.id).y).toBe(0)
+  })
+
   test('separate nudge sequences create separate undo entries', () => {
     const { editor, rect } = setup()
 

@@ -82,14 +82,38 @@ export function createSaveActions({
     if (IS_TAURI) {
       const path = await chooseTauriFigSavePath(state.documentKind)
       if (!path) return false
+      const previous = {
+        filePath: getFilePath(),
+        fileHandle: getFileHandle(),
+        storageBinding: getStorageBinding(),
+        documentName: state.documentName
+      }
+      // A failed write leaves the document on the source it had.
+      const restore = () => {
+        setStorageBinding(previous.storageBinding)
+        setFileHandle(previous.fileHandle)
+        setFilePath(previous.filePath)
+        state.documentName = previous.documentName
+        if (previous.filePath || previous.fileHandle) startWatchingFile()
+      }
       setStorageBinding(null)
       setFilePath(path)
       setFileHandle(null)
       state.documentName = documentNameFromFigPath(path)
-      const wrote = await writeFile(data, version)
-      if (wrote) setSourceIdentity({ handle: null, path })
+      let wrote: boolean
+      try {
+        wrote = await writeFile(data, version)
+      } catch (error) {
+        restore()
+        throw error
+      }
+      if (!wrote) {
+        restore()
+        return false
+      }
+      setSourceIdentity({ handle: null, path })
       startWatchingFile()
-      return wrote
+      return true
     }
 
     // The picker helper returns null when the browser has no File System Access API.

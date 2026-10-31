@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'bun:test'
 
-import { PairdrawAPI } from '@pairdraw/core/pairdraw-api'
 import {
   createEditor,
   EDIT_VIEW,
@@ -8,6 +7,7 @@ import {
   type EditorProfileInputs
 } from '@pairdraw/core'
 import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { PairdrawAPI } from '@pairdraw/core/pairdraw-api'
 import { ALL_TOOLS, type ToolDef } from '@pairdraw/core/tools'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import { UndoManager } from '@pairdraw/scene-graph/undo'
@@ -35,6 +35,22 @@ function setup() {
     return def
   }
   return { graph, figma, editor, undo, rectangle, tool }
+}
+
+/** Everything a rollback must bring back, as plain copies, including page and child order. */
+function documentState(graph: SceneGraph) {
+  return structuredClone({
+    rootId: graph.rootId,
+    pages: graph.getPages().map((page) => page.id),
+    nodes: graph.nodes,
+    variables: graph.variables,
+    collections: graph.variableCollections,
+    activeMode: graph.activeMode,
+    instanceIndex: graph.instanceIndex,
+    images: [...graph.images.keys()],
+    enabledLibraries: graph.enabledLibraries,
+    documentColorSpace: graph.documentColorSpace
+  })
 }
 
 describe('atomic agent tools', () => {
@@ -298,6 +314,152 @@ describe('atomic agent tools', () => {
       'no longer open'
     )
     expect(rectangle.opacity).toBe(1)
+  })
+
+  test('a failure after many kinds of edits leaves the whole document as it was', () => {
+    const { graph, figma, editor, undo, rectangle, tool } = setup()
+    const firstPage = figma.currentPage.id
+    const second = graph.addPage('Second')
+    const frame = graph.createNode('FRAME', firstPage, { name: 'Frame' })
+    const child = graph.createNode('RECTANGLE', frame.id, { name: 'Child' })
+    const sibling = graph.createNode('ELLIPSE', frame.id, { name: 'Sibling' })
+    const elsewhere = graph.createNode('TEXT', second.id, { name: 'Elsewhere', text: 'Hi' })
+    const component = figma.createComponent()
+    const instance = component.createInstance()
+    const collection = graph.createCollection('Values')
+    const variable = graph.createVariable('Spacing', 'FLOAT', collection.id, 8)
+    const before = documentState(graph)
+    const objects = new Map(graph.nodes)
+    const variableObject = graph.variables.get(variable.id)
+    const def: ToolDef = {
+      ...tool('set_opacity'),
+      execute: () => {
+        rectangle.opacity = 0.25
+        graph.updateNode(elsewhere.id, { text: 'Changed', x: 40 })
+        graph.updateNode(child.id, { fills: [] })
+        graph.insertChildAt(sibling.id, frame.id, 0)
+        graph.reparentNode(child.id, second.id)
+        graph.insertChildAt(second.id, graph.rootId, 0)
+        graph.deleteNode(frame.id)
+        graph.createNode('RECTANGLE', firstPage, { name: 'Added' })
+        graph.updateNode(instance.id, { componentId: null })
+        graph.instanceIndex.delete(component.id)
+        const values = graph.variables.get(variable.id)?.valuesByMode
+        if (values) values[collection.defaultModeId] = 32
+        collection.name = 'Renamed'
+        graph.activeMode.set(collection.id, 'other')
+        throw new Error('Original failure')
+      }
+    }
+    expect(() => executeAtomicTool(editor, figma, def, {})).toThrow('Original failure')
+    expect(documentState(graph)).toEqual(before)
+    for (const [id, node] of objects) expect(graph.getNode(id)).toBe(node)
+    expect(graph.variables.get(variable.id)).toBe(variableObject)
+    expect(undo.canUndo).toBe(false)
+  })
+
+  test('a failure restores fields written straight into a layer, and its child order', () => {
+    const { graph, figma, editor, undo, tool } = setup()
+    const frame = graph.createNode('FRAME', figma.currentPage.id, { name: 'Frame' })
+    graph.createNode('RECTANGLE', frame.id, { name: 'First' })
+    const second = graph.createNode('RECTANGLE', frame.id, {
+      name: 'Second',
+      effects: [
+        {
+          type: 'DROP_SHADOW',
+          color: { r: 0, g: 0, b: 0, a: 0.5 },
+          offset: { x: 0, y: 2 },
+          radius: 4,
+          spread: 0,
+          visible: true
+        }
+      ]
+    })
+    const before = documentState(graph)
+    const node = graph.getNode(frame.id)
+    const shadowed = graph.getNode(second.id)
+    if (!node || !shadowed) throw new Error('Missing layers')
+    const def: ToolDef = {
+      ...tool('set_opacity'),
+      execute: () => {
+        // Writes no graph method made, so nothing announced them.
+        node.name = 'Renamed'
+        Reflect.deleteProperty(node, 'opacity')
+        node.childIds.reverse()
+        // A write into a value, announced first as the graph's contract asks.
+        graph.willChangeNode(shadowed)
+        const [shadow] = shadowed.effects
+        if (shadow && 'radius' in shadow) shadow.radius = 40
+        throw new Error('Original failure')
+      }
+    }
+    expect(() => executeAtomicTool(editor, figma, def, {})).toThrow('Original failure')
+    expect(documentState(graph)).toEqual(before)
+    expect(undo.canUndo).toBe(false)
+  })
+
+  test('a call aborted while it runs leaves the document as it was', () => {
+    const { graph, figma, editor, undo, rectangle, tool } = setup()
+    const before = documentState(graph)
+    const controller = new AbortController()
+    const def: ToolDef = {
+      ...tool('set_opacity'),
+      execute: () => {
+        rectangle.opacity = 0.5
+        rectangle.name = 'Aborted'
+        controller.abort()
+        controller.signal.throwIfAborted()
+      }
+    }
+    expect(() => executeAtomicTool(editor, figma, def, {}, { signal: controller.signal })).toThrow()
+    expect(documentState(graph)).toEqual(before)
+    expect(undo.canUndo).toBe(false)
+  })
+
+  test('a closed document is not edited, nor its history changed', () => {
+    const { graph, figma, editor, undo, rectangle, tool } = setup()
+    const before = documentState(graph)
+    expect(() =>
+      executeAtomicTool(
+        editor,
+        figma,
+        tool('set_opacity'),
+        { id: rectangle.id, value: 0.5 },
+        { isLive: () => false }
+      )
+    ).toThrow('no longer open')
+    expect(documentState(graph)).toEqual(before)
+    expect(undo.canUndo).toBe(false)
+  })
+
+  test('undo restores what layout changed after the edit, on any layer', () => {
+    const { graph, figma, undo, rectangle, tool } = setup()
+    const frame = graph.createNode('FRAME', figma.currentPage.id, { name: 'Frame', width: 10 })
+    let laidOut = false
+    const editor = {
+      graph,
+      state: {
+        documentKind: 'design' as const,
+        canvasView: EDIT_VIEW,
+        hostRestrictions: { readOnly: false }
+      },
+      // Layout writing straight into a layer it was not asked about, the first time it runs.
+      runLayoutForNode: () => {
+        const node = graph.getNode(frame.id)
+        if (node && !laidOut) node.width = 99
+        laidOut = true
+      },
+      requestRender: () => undefined,
+      pushUndoStep: undo.pushStep.bind(undo)
+    }
+    executeAtomicTool(editor, figma, tool('set_opacity'), { id: rectangle.id, value: 0.5 })
+    expect(graph.getNode(frame.id)?.width).toBe(99)
+    undo.undo()
+    expect(rectangle.opacity).toBe(1)
+    expect(graph.getNode(frame.id)?.width).toBe(10)
+    undo.redo()
+    expect(rectangle.opacity).toBe(0.5)
+    expect(graph.getNode(frame.id)?.width).toBe(99)
   })
 
   test('back-to-back calls produce separate undo entries', async () => {

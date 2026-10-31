@@ -1,12 +1,26 @@
+import 'fake-indexeddb/auto'
+import '#tests/helpers/fonts/offline'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import { bench, group, run } from 'mitata'
 
+import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
 import { parseFigFile, exportFigFile } from '@pairdraw/core/io/formats/fig'
+import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
+import { ALL_TOOLS } from '@pairdraw/core/tools'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import { copyFills } from '@pairdraw/scene-graph/copy'
+
+import { changePreviewSize } from '@/app/ai/chat/preferences'
+import { endRun, startRun } from '@/app/ai/reply/run'
+import { runEditorTool } from '@/app/ai/tools/runner'
+import { createEditorStore } from '@/app/editor/session/create'
+
+// `bun tests/engine/perf.bench.ts "AI agent run"` runs only the benchmarks whose name matches.
+const filter = process.argv[2] ? new RegExp(process.argv[2]) : undefined
 
 const FIXTURES = resolve(import.meta.dir, '../fixtures')
 
@@ -106,4 +120,107 @@ group('structuredClone vs copy (fills)', () => {
   })
 })
 
-await run()
+/**
+ * A chat reply editing a page of about 2,000 layers in ten large sections: each sample is one
+ * small call through the runner a reply's calls take, with its undo entry, recorded change, and
+ * JSX diff, each time on another layer.
+ */
+async function agentRunDocument(previews: boolean) {
+  const store = createEditorStore()
+  if (previews) {
+    const ck = await initCanvasKit()
+    const surface = ck.MakeSurface(1, 1)
+    if (!surface) throw new Error('Failed to create CanvasKit surface')
+    const renderer = new SkiaRenderer(ck, surface)
+    await renderer.loadFonts()
+    store.setCanvasKit(ck, renderer)
+  }
+  const pageId = store.state.currentPageId
+  const sections: string[] = []
+  const leaves: string[] = []
+  for (let s = 0; s < 10; s++) {
+    const section = store.graph.createNode('FRAME', pageId, {
+      name: `Section ${s}`,
+      x: s * 1500,
+      width: 1440,
+      height: 4000,
+      clipsContent: true
+    })
+    sections.push(section.id)
+    for (let c = 0; c < 20; c++) {
+      const card = store.graph.createNode('FRAME', section.id, {
+        name: `Card ${s}-${c}`,
+        x: 20,
+        y: c * 190,
+        width: 400,
+        height: 180
+      })
+      for (let l = 0; l < 9; l++) {
+        const text = l % 3 === 0
+        const leaf = store.graph.createNode(text ? 'TEXT' : 'RECTANGLE', card.id, {
+          name: `${text ? 'Label' : 'Row'} ${l}`,
+          x: 10,
+          y: l * 18,
+          width: 300,
+          height: 14,
+          ...(text && { text: `Item ${s}-${c}-${l}` })
+        })
+        leaves.push(leaf.id)
+      }
+    }
+  }
+  const figma = new FigmaAPI(store.graph)
+  figma.currentPage = figma.wrapNode(pageId)
+  const run = startRun(store, 1_000_000)
+  const tools = new Map(ALL_TOOLS.map((def) => [def.name, def]))
+  const argsFor: Record<string, (index: number) => Record<string, unknown>> = {
+    set_fill: (index) => ({
+      id: leaves[(index * 37) % leaves.length],
+      color: index % 2 ? '#FF0000' : '#00FF00'
+    }),
+    update_node: (index) => ({ id: leaves[(index * 41) % leaves.length], x: 10 + (index % 50) }),
+    render: (index) => ({
+      parent_id: sections[index % sections.length],
+      jsx: `<Frame name="Badge ${index}" w={120} h={40} bg="#EEEEEE"><Text>New ${index}</Text></Frame>`
+    })
+  }
+  let calls = 0
+
+  return {
+    /** The reply ends, so the design check it held off runs again. */
+    end: () => endRun(store, run),
+    call: async (name: string) => {
+      const def = tools.get(name)
+      const args = argsFor[name]
+      if (!def || !args) throw new Error(`Missing tool ${name}`)
+      const index = calls++
+      await runEditorTool({
+        store,
+        figma,
+        def,
+        args: args(index),
+        reply: { run, toolCallId: `call-${index}` }
+      })
+    }
+  }
+}
+
+group('AI agent run (2,000-layer page)', () => {
+  for (const name of ['set_fill', 'update_node', 'render']) {
+    bench(`${name} call`, function* () {
+      changePreviewSize.value = 'off'
+      const reply = agentRunDocument(false)
+      yield async () => (await reply).call(name)
+      void reply.then(({ end }) => end())
+    })
+  }
+
+  bench('render call with change previews on', function* () {
+    changePreviewSize.value = 'small'
+    const reply = agentRunDocument(true)
+    yield async () => (await reply).call('render')
+    void reply.then(({ end }) => end())
+  })
+})
+
+await run({ filter })

@@ -15,6 +15,8 @@ const APP_NOT_CONNECTED_MESSAGE =
 
 type BrowserRPCBridgeOptions = {
   authToken: string | null
+  /** Decides which tokens may register or authenticate; defaults to `authToken` alone. */
+  authorize?: (token: string | null) => boolean
   onConnectionChange: () => void
   /** How long an RPC waits for the app to register before failing with APP_NOT_CONNECTED. Defaults to 10 s. */
   appWaitTimeoutMs?: number
@@ -84,6 +86,7 @@ function createSettler<T>(resolve: (value: T) => void, reject: (error: Error) =>
 
 export function createBrowserRPCBridge({
   authToken,
+  authorize = (token) => isAuthorized(token, authToken),
   onConnectionChange,
   appWaitTimeoutMs = APP_WAIT_TIMEOUT
 }: BrowserRPCBridgeOptions) {
@@ -243,7 +246,7 @@ export function createBrowserRPCBridge({
 
   function registerBrowser(ws: WebSocket, token: string | null) {
     if (bridgeClosed) return
-    if (!isAuthorized(token, authToken)) {
+    if (!authorize(token)) {
       ws.close()
       return
     }
@@ -309,7 +312,7 @@ export function createBrowserRPCBridge({
       if (token === undefined) return
       if (msg.type === 'register') {
         registerBrowser(ws, token)
-      } else if (isAuthorized(token, authToken)) {
+      } else if (authorize(token)) {
         authenticatedClients.add(ws)
       } else {
         ws.close()

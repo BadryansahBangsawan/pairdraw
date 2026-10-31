@@ -144,6 +144,14 @@ export async function getDiscoveryPath(): Promise<string> {
 }
 
 /**
+ * The folder coding agents start in when the companion runs them, beside the discovery file and
+ * outside the person's projects, whose settings an agent would otherwise read.
+ */
+export async function getAgentWorkspacePath(): Promise<string> {
+  return join(await getPlatformDir(), 'agent-workspace')
+}
+
+/**
  * Returns true if the current platform supports Unix domain sockets.
  * Unix domain sockets are available on macOS, Linux, and other POSIX
  * platforms but not on native Windows. WSL is detected as Linux.

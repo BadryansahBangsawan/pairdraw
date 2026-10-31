@@ -7,10 +7,11 @@ import { Hono, type Context, type Next } from 'hono'
 import { cors } from 'hono/cors'
 import { resolveCommand } from 'package-manager-detector/commands'
 import { detect, getUserAgent } from 'package-manager-detector/detect'
-import { WebSocketServer, type WebSocket } from 'ws'
+import { WebSocketServer } from 'ws'
 
 import { MCP_AGENT_HEADER, MCP_CHAT_HEADER } from '@open-pencil/core/constants'
 
+import { createAgentBridge, type AgentBridge, type AgentBridgeOptions } from '#mcp/agents/index'
 import { bearerToken, isAuthorized, mcpRequestToken } from '#mcp/auth'
 import { createBrowserRPCBridge } from '#mcp/browser-rpc'
 import { MCP_CORS_HEADERS, MCP_CORS_METHODS, MCP_EXPOSED_HEADERS } from '#mcp/http-options'
@@ -22,8 +23,10 @@ import type { ToolDescriptor, ToolPolicy } from '#mcp/tool/metadata'
 import { applyToolPolicy } from '#mcp/tool/policy'
 import { registerTools, type MCPAgentSession } from '#mcp/tool/registration'
 import { scopeRPC, type MCPToolScope } from '#mcp/tool/scope'
+import { admittedOrigins } from '#mcp/transport/origins'
 
 import packageJSON from '../package.json' with { type: 'json' }
+import { wireConnectionHandling } from './server/connections'
 import {
   type ListenerState,
   cleanupDiscovery,
@@ -34,10 +37,10 @@ import {
   tryStartTcp,
   tryWriteDiscovery
 } from './server/lifecycle'
+import { createUpgradeHandler, originGuard } from './server/origin'
 
 export const MCP_VERSION: string = packageJSON.version
 
-const HEARTBEAT_INTERVAL_MS = 5_000
 const MCP_METHODS: readonly string[] = ['GET', 'POST', 'DELETE']
 
 let installCommandPromise: Promise<string> | null = null
@@ -111,6 +114,12 @@ export interface ServerOptions {
    * before the desktop app still succeeds; tests shorten it.
    */
   appWaitTimeoutMs?: number
+  /**
+   * Turns on the companion's agent bridge (`openpencil-connect`): pairing with the web app, and
+   * finding, installing, signing in to, and starting the coding agents in `ACP_AGENTS` for a
+   * paired tab. Off unless set.
+   */
+  agents?: AgentBridgeOptions
 }
 
 export interface ServerHandle {
@@ -124,12 +133,19 @@ export interface ServerHandle {
   httpPort: number
   /** Shut down the server: close listeners, remove socket and discovery files */
   close: () => Promise<void>
+  /** Issues a one-time pairing code, when the agent bridge is on; otherwise null. */
+  issuePairingCode: (() => string) | null
 }
 
 /** Set up Hono routes: /health, /rpc, /files, /mcp */
 function createHonoApp(options: {
   authToken: string | null
+  /** Whether a token reaches the app's routes: the server's own, or a paired tab's. */
+  verifyToken: (token: string | null) => boolean
   corsOrigin: string | readonly string[] | null
+  /** Origins whose pages may call the server; requests without an Origin come from programs. */
+  origins: readonly string[]
+  agentBridge: AgentBridge | null
   /** The root `/files` reads and writes inside, or null to leave the route out. */
   fileRoot: string | null
   browserRPC: ReturnType<typeof createBrowserRPCBridge>
@@ -138,9 +154,11 @@ function createHonoApp(options: {
   toolDescriptors: ToolDescriptor[]
 }): Hono {
   const { authToken, corsOrigin, fileRoot, browserRPC, mcpSessions, sendToBrowser } = options
-  const { toolDescriptors } = options
+  const { toolDescriptors, verifyToken, origins, agentBridge } = options
 
   const app = new Hono()
+
+  app.use('*', originGuard(origins))
 
   if (corsOrigin) {
     app.use(
@@ -156,7 +174,7 @@ function createHonoApp(options: {
 
   app.get('/health', async (c) => {
     const provided = bearerToken(c.req.header('authorization'))
-    const canInspectConfiguration = authToken === null || isAuthorized(provided, authToken)
+    const canInspectConfiguration = verifyToken(provided)
     return c.json({
       status: browserRPC.isConnected() ? 'ok' : 'no_app',
       version: MCP_VERSION,
@@ -171,11 +189,8 @@ function createHonoApp(options: {
   const requireToken = async (c: Context, next: Next) => {
     // When authToken is null (operator explicitly disabled auth), skip token check —
     // the Unix socket or localhost TCP already restricts access to local processes.
-    if (authToken !== null) {
-      const provided = bearerToken(c.req.header('authorization'))
-      if (!isAuthorized(provided, authToken)) {
-        return c.json({ error: 'Unauthorized' }, 401)
-      }
+    if (!verifyToken(bearerToken(c.req.header('authorization')))) {
+      return c.json({ error: 'Unauthorized' }, 401)
     }
     return next()
   }
@@ -206,11 +221,9 @@ function createHonoApp(options: {
   })
 
   app.all('/mcp', async (c) => {
-    if (authToken !== null) {
-      const token = mcpRequestToken(c.req.header('authorization'), c.req.header('x-mcp-token'))
-      if (!isAuthorized(token, authToken)) {
-        return c.json({ error: 'Unauthorized' }, 401)
-      }
+    const token = mcpRequestToken(c.req.header('authorization'), c.req.header('x-mcp-token'))
+    if (!verifyToken(token)) {
+      return c.json({ error: 'Unauthorized' }, 401)
     }
     if (!MCP_METHODS.includes(c.req.method)) {
       return c.json(
@@ -256,60 +269,9 @@ function createHonoApp(options: {
     return transport.handleRequest(c.req.raw)
   })
 
+  agentBridge?.routes(app)
+
   return app
-}
-
-/** Set up shared WebSocket connection handling and heartbeat. Call once. */
-function wireConnectionHandling(
-  wss: WebSocketServer,
-  browserRPC: ReturnType<typeof createBrowserRPCBridge>
-) {
-  const alive = new WeakMap<WebSocket, boolean>()
-
-  wss.on('connection', (ws: WebSocket) => {
-    alive.set(ws, true)
-    browserRPC.handleConnection(ws)
-
-    ws.on('pong', () => alive.set(ws, true))
-    ws.on('message', (raw) => {
-      alive.set(ws, true)
-      const data = typeof raw === 'string' ? raw : Buffer.from(raw as Buffer).toString('utf-8')
-      browserRPC.handleMessage(data, ws)
-    })
-
-    ws.on('close', () => {
-      browserRPC.handleClose(ws)
-    })
-
-    ws.on('error', () => {
-      try {
-        ws.terminate()
-      } catch {
-        alive.delete(ws)
-      }
-    })
-  })
-
-  const heartbeat = setInterval(() => {
-    for (const ws of wss.clients) {
-      if (alive.get(ws) === false) {
-        try {
-          ws.terminate()
-        } catch {
-          continue
-        }
-        continue
-      }
-      alive.set(ws, false)
-      try {
-        ws.ping()
-      } catch {
-        continue
-      }
-    }
-  }, HEARTBEAT_INTERVAL_MS)
-  heartbeat.unref()
-  wss.on('close', () => clearInterval(heartbeat))
 }
 
 function buildServerContext(options: ServerOptions) {
@@ -326,6 +288,13 @@ function buildServerContext(options: ServerOptions) {
     options.authToken === undefined ? randomBytes(16).toString('hex') : options.authToken
   const corsOrigin = options.corsOrigin ?? null
   const withTcp = options.withTcp ?? false
+  const origins = admittedOrigins(corsOrigin)
+  const agentBridge = options.agents
+    ? createAgentBridge({ ...options.agents, version: MCP_VERSION, entry: process.argv[1] ?? '' })
+    : null
+  /** The server's own token, or a tab paired through the agent bridge. */
+  const verifyToken = (token: string | null): boolean =>
+    isAuthorized(token, authToken) || (agentBridge?.isSession(token) ?? false)
 
   // Warn if auth is disabled while TCP is active — any local process can
   // interact with the server without authentication. Socket-only transport
@@ -364,6 +333,7 @@ function buildServerContext(options: ServerOptions) {
   })
   const browserRPC = createBrowserRPCBridge({
     authToken,
+    authorize: verifyToken,
     onConnectionChange: mcpSessions.notifyToolsChanged,
     appWaitTimeoutMs: options.appWaitTimeoutMs
   })
@@ -373,7 +343,10 @@ function buildServerContext(options: ServerOptions) {
 
   const app = createHonoApp({
     authToken,
+    verifyToken,
     corsOrigin,
+    origins,
+    agentBridge,
     // A client limited to the selection reaches no files, as the file tools are left out then.
     fileRoot: mcpRoot !== null && toolPolicy.scope !== 'selection' ? resolve(mcpRoot) : null,
     browserRPC,
@@ -382,6 +355,7 @@ function buildServerContext(options: ServerOptions) {
     toolDescriptors
   })
   const wss = new WebSocketServer({ noServer: true })
+  const upgrade = createUpgradeHandler(origins, wss, agentBridge)
 
   return {
     httpPort,
@@ -391,6 +365,8 @@ function buildServerContext(options: ServerOptions) {
     sendToBrowser,
     app,
     wss,
+    upgrade,
+    agentBridge,
     authToken,
     disabledTools: toolPolicy.disabledTools,
     scope: toolPolicy.scope
@@ -408,9 +384,16 @@ async function shutdownRuntime(
   browserRPC: ReturnType<typeof createBrowserRPCBridge>,
   mcpSessions: ReturnType<typeof createMCPSessionManager>,
   wss: WebSocketServer,
-  state: ListenerState
+  state: ListenerState,
+  agentBridge: AgentBridge | null
 ): Promise<void> {
   const errors: unknown[] = []
+  try {
+    // Agents and sign-ins the companion started end with it.
+    await agentBridge?.close()
+  } catch (e) {
+    errors.push(e)
+  }
   try {
     browserRPC.close()
   } catch (e) {
@@ -438,6 +421,7 @@ async function shutdownRuntime(
 function buildHandle(
   app: Hono,
   wss: WebSocketServer,
+  agentBridge: AgentBridge | null,
   browserRPC: ReturnType<typeof createBrowserRPCBridge>,
   mcpSessions: ReturnType<typeof createMCPSessionManager>,
   state: ListenerState,
@@ -465,7 +449,7 @@ function buildHandle(
         errors.push(error)
       }
       try {
-        await shutdownRuntime(browserRPC, mcpSessions, wss, state)
+        await shutdownRuntime(browserRPC, mcpSessions, wss, state, agentBridge)
       } catch (error) {
         errors.push(error)
       }
@@ -481,7 +465,8 @@ function buildHandle(
     server: primary,
     socketPath: resolvedSocketPath,
     httpPort: actualHttpPort,
-    close
+    close,
+    issuePairingCode: agentBridge ? agentBridge.issuePairingCode : null
   }
 }
 
@@ -498,8 +483,10 @@ export async function startServer(options: ServerOptions = {}): Promise<ServerHa
   const state: ListenerState = { socketResult: null, tcpResult: null }
   let startedAt: string
   try {
-    state.socketResult = await startSocketListener(ctx.app, ctx.wss, options.socketPath ?? null)
-    state.tcpResult = ctx.withTcp ? await tryStartTcp(ctx.app, ctx.wss, ctx.httpPort, state) : null
+    state.socketResult = await startSocketListener(ctx.app, ctx.upgrade, options.socketPath ?? null)
+    state.tcpResult = ctx.withTcp
+      ? await tryStartTcp(ctx.app, ctx.upgrade, ctx.httpPort, state)
+      : null
     const resolvedSocketPath = state.socketResult?.resolvedPath ?? null
     const actualHttpPort = state.tcpResult?.port ?? 0
 
@@ -522,7 +509,9 @@ export async function startServer(options: ServerOptions = {}): Promise<ServerHa
   } catch (err) {
     // Tear down any listeners that started before the failure, then close
     // all resources so nothing leaks when startServer rejects.
-    await shutdownRuntime(ctx.browserRPC, ctx.mcpSessions, ctx.wss, state).catch(() => undefined)
+    await shutdownRuntime(ctx.browserRPC, ctx.mcpSessions, ctx.wss, state, ctx.agentBridge).catch(
+      () => undefined
+    )
     throw err
   }
 
@@ -532,6 +521,7 @@ export async function startServer(options: ServerOptions = {}): Promise<ServerHa
   const handle = buildHandle(
     ctx.app,
     ctx.wss,
+    ctx.agentBridge,
     ctx.browserRPC,
     ctx.mcpSessions,
     state,

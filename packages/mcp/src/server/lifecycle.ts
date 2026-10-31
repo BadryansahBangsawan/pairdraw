@@ -1,12 +1,16 @@
 import { access, chmod, constants, mkdir, readFile, unlink } from 'node:fs/promises'
 import { createServer } from 'node:http'
-import type { Server as HttpServer } from 'node:http'
+import type { Server as HttpServer, IncomingMessage } from 'node:http'
 import { connect, type Socket } from 'node:net'
 import { dirname } from 'node:path'
+import type { Duplex } from 'node:stream'
 
 import { getRequestListener } from '@hono/node-server'
 import type { Hono } from 'hono'
 import type { WebSocketServer } from 'ws'
+
+/** Takes a WebSocket upgrade: checks where it came from and hands it to the right socket server. */
+export type UpgradeHandler = (request: IncomingMessage, socket: Duplex, head: Buffer) => void
 
 import type { MCPToolScope } from '#mcp/tool/scope'
 import {
@@ -44,18 +48,14 @@ export function createAppServer(app: Hono): HttpServer {
 }
 
 /** Wire the HTTP upgrade handler onto a server. Each server needs its own. */
-function wireUpgrade(server: HttpServer, wss: WebSocketServer) {
-  server.on('upgrade', (request, socket, head) => {
-    wss.handleUpgrade(request, socket, head, (ws) => {
-      wss.emit('connection', ws, request)
-    })
-  })
+function wireUpgrade(server: HttpServer, upgrade: UpgradeHandler) {
+  server.on('upgrade', upgrade)
 }
 
 /** Start socket listener; returns the resolved socket path, or null if skipped. */
 export async function startSocketListener(
   app: Hono,
-  wss: WebSocketServer,
+  upgrade: UpgradeHandler,
   socketPathOverride: string | null
 ): Promise<{ server: HttpServer; resolvedPath: string } | null> {
   // Unix domain sockets are not available on Windows — always use TCP there,
@@ -92,7 +92,7 @@ export async function startSocketListener(
   }
 
   const server = createAppServer(app)
-  wireUpgrade(server, wss)
+  wireUpgrade(server, upgrade)
 
   const ss = server
   ss.on('error', (err) => console.error('[MCP] Socket server error:', err))
@@ -136,12 +136,12 @@ export async function startSocketListener(
 /** Start TCP listener; returns the server and actual port, or null if skipped. */
 export async function startTcpListener(
   app: Hono,
-  wss: WebSocketServer,
+  upgrade: UpgradeHandler,
   httpPort: number
 ): Promise<{ server: HttpServer; port: number } | null> {
   const host = '127.0.0.1'
   const server = createAppServer(app)
-  wireUpgrade(server, wss)
+  wireUpgrade(server, upgrade)
 
   const ts = server
   ts.on('error', (err) => console.error('[MCP] TCP server error:', err))
@@ -347,12 +347,12 @@ export async function closeWssGracefully(wss: WebSocketServer): Promise<void> {
 
 export async function tryStartTcp(
   app: Hono,
-  wss: WebSocketServer,
+  upgrade: UpgradeHandler,
   httpPort: number,
   state: ListenerState
 ): Promise<{ server: HttpServer; port: number } | null> {
   try {
-    return await startTcpListener(app, wss, httpPort)
+    return await startTcpListener(app, upgrade, httpPort)
   } catch (err) {
     // If TCP listener fails after the socket listener succeeded, close the
     // socket listener and clean up the socket file to avoid a leak.

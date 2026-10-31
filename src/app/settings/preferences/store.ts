@@ -89,6 +89,8 @@ export interface AppPreferences {
     changePreviewSize: ChangePreviewSize
     /** Whether the view follows our AI agents while they work. */
     followAgents: boolean
+    /** Whether the chat column beside the properties panel is open. */
+    columnOpen: boolean
   }
   files: { recentLimit: number }
   version: 1
@@ -120,7 +122,8 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
     reasoningDisplay: 'collapsed',
     maxAgentSteps: DEFAULT_AGENT_STEPS,
     changePreviewSize: 'medium',
-    followAgents: true
+    followAgents: true,
+    columnOpen: false
   },
   files: { recentLimit: DEFAULT_RECENT_FILES_LIMIT },
   version: 1,
@@ -171,7 +174,8 @@ const appPreferencesSchema = section({
       v.picklist(CHANGE_PREVIEW_SIZES),
       defaults.chat.changePreviewSize
     ),
-    followAgents: v.fallback(v.boolean(), defaults.chat.followAgents)
+    followAgents: v.fallback(v.boolean(), defaults.chat.followAgents),
+    columnOpen: v.fallback(v.boolean(), defaults.chat.columnOpen)
   }),
   files: section({
     recentLimit: v.fallback(recentFilesLimitSchema, defaults.files.recentLimit)

@@ -21,7 +21,7 @@ import {
 } from '@/app/tabs'
 
 export function useKeyboard() {
-  const { activeTab } = useAIChat()
+  const { chatColumnOpen } = useAIChat()
   const store = useEditorStore()
   const { isMobile } = useViewportKind()
   const { runCommand, setOpacityTarget } = useEditorCommands()
@@ -30,7 +30,7 @@ export function useKeyboard() {
 
   const actions = createKeyboardActions({
     store,
-    activeTab,
+    chatColumnOpen,
     isMobile,
     runCommand,
     setOpacityTarget

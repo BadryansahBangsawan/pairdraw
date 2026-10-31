@@ -13,5 +13,6 @@
   "previewing": "Просмотр",
   "resetPreview": "Сбросить",
   "leavePreview": "Выйти из просмотра ({shortcut})",
+  "toggleAIChat": "AI-чат ({shortcut})",
   "startPreview": "Просмотр ({shortcut})"
 }

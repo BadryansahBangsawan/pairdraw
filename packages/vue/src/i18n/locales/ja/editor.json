@@ -13,5 +13,6 @@
   "previewing": "プレビュー中",
   "resetPreview": "リセット",
   "leavePreview": "プレビューを終了 ({shortcut})",
+  "toggleAIChat": "AIチャット ({shortcut})",
   "startPreview": "プレビュー ({shortcut})"
 }

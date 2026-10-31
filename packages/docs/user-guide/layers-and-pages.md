@@ -51,7 +51,7 @@ Disabling recovery stops automatic preservation and removes recovery copies owne
 
 ## Properties Panel
 
-The properties panel on the right has three tabs:
+The properties panel on the right has Design, Code, and [Lint](./checking-designs) tabs. The AI chat opens in its own column beside it.
 
 ### Design Tab
 
@@ -74,23 +74,23 @@ Displays the selected node as code with syntax highlighting, line numbers, and a
 - **OpenPencil JSX** — custom component tree compatible with `renderJSX()` for programmatic round-trip
 - **Tailwind CSS v4** — HTML with utility classes (`<div className="flex gap-4 p-3">`) ready to paste into React/Vue projects
 
-### AI Tab
+## AI Chat Column
 
-An [AI chat interface](../programmable/ai-chat) (also toggled with <kbd>⌘</kbd><kbd>J</kbd>) that can create and modify design elements via natural language. Configure reusable models and provider connections in Settings, and browse locally saved conversations.
+The [AI chat](../programmable/ai-chat) creates and changes design elements from natural-language requests. It opens in a column of its own to the right of the properties panel, so the Design tab stays in view while an agent works. Open and close it with the sparkles button at the top of the properties panel or with <kbd>⌘</kbd><kbd>J</kbd>; drag its edge to resize it. The column stays open or closed, at the width you left it, across reloads. Configure reusable models and provider connections in Settings, and browse locally saved conversations from the chat's history menu.
 
 ## Keyboard Shortcuts
 
 | Action | Mac | Windows / Linux |
 |--------|-----|-----------------|
-| Toggle AI chat | <kbd>⌘</kbd><kbd>J</kbd> | <kbd>Ctrl</kbd> + <kbd>J</kbd> |
+| Open or close the AI chat column | <kbd>⌘</kbd><kbd>J</kbd> | <kbd>Ctrl</kbd> + <kbd>J</kbd> |
 
 ## Mobile Layout
 
-On mobile and small screens, the side panels are replaced by a swipeable bottom drawer. Tabs at the top of the drawer switch between Layers, Properties, Design, and Code views. The toolbar collapses to a compact horizontal strip with category switching.
+On mobile and small screens, the side panels are replaced by a swipeable bottom drawer. Tabs at the top of the drawer switch between Layers, Properties, Design, Code, and AI views. The toolbar collapses to a compact horizontal strip with category switching.
 
 ## Tips
 
-- Panel widths are saved automatically — they persist across reloads.
+- Panel widths, the AI chat column’s included, are saved automatically and persist across reloads.
 - Use the layers panel to find overlapping nodes that are hard to click on the canvas.
 - The [context menu](./context-menu) provides additional actions for selected nodes.
 - See [Selection & Manipulation](./selection-and-manipulation) for z-order shortcuts (]/[) and visibility/lock toggles.

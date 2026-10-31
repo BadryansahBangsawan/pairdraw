@@ -5,13 +5,12 @@ import { generatedFrameText } from '@open-pencil/scene-graph/generated'
 import type { useEditorCommands } from '@open-pencil/vue/editor/commands'
 import type { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
 
-import type { PropertiesTab } from '@/app/ai/chat/panel'
 import { useComments } from '@/app/comments/use'
 import type { EditorStore } from '@/app/editor/active-store'
 
 type KeyboardActionsOptions = {
   store: EditorStore
-  activeTab: Ref<PropertiesTab>
+  chatColumnOpen: Ref<boolean>
   isMobile: ReturnType<typeof useViewportKind>['isMobile']
   runCommand: ReturnType<typeof useEditorCommands>['runCommand']
   setOpacityTarget: ReturnType<typeof useEditorCommands>['setOpacityTarget']
@@ -19,7 +18,7 @@ type KeyboardActionsOptions = {
 
 export function createKeyboardActions({
   store,
-  activeTab,
+  chatColumnOpen,
   isMobile,
   runCommand,
   setOpacityTarget
@@ -124,7 +123,7 @@ export function createKeyboardActions({
         store.state.mobileDrawerSnap = 'half'
       }
     } else {
-      activeTab.value = activeTab.value === 'ai' ? 'design' : 'ai'
+      chatColumnOpen.value = !chatColumnOpen.value
     }
   }
 

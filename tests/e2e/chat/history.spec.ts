@@ -50,7 +50,7 @@ test('saved transcripts remain readable after reload without provider setup', as
   await expect(chat.assistantMessage()).toBeVisible()
   await page.getByRole('button', { name: 'New chat', exact: true }).first().click()
   await page.reload()
-  await chat.chatTab.click()
+  await chat.openChat()
   await page.getByRole('button', { name: 'Conversation history', exact: true }).click()
   await page.getByRole('button', { name: 'All documents', exact: true }).click()
   await page.getByRole('button', { name: /A durable conversation/ }).click()

@@ -1,0 +1,1 @@
+- The AI chat opens in its own resizable column beside the properties panel, so the Design panel stays in view while an agent works; ⌘J or the sparkles button in the properties header opens and closes it, and the column keeps its width and open state across reloads.

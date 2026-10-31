@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
+import { ChatHarness } from '#tests/helpers/chat/harness'
 
 test('storage settings keep secrets behind the credential manager', async ({ page }) => {
   await page.goto('/?test')
@@ -198,7 +199,7 @@ test('remembered browser credentials survive reload and clear centrally', async 
   const canvas = new CanvasHelper(page)
   await canvas.waitForInit()
 
-  await page.getByRole('tab', { name: 'AI' }).click()
+  await new ChatHarness(page).openChat()
   await page.getByTestId('provider-setup-open-settings').click()
 
   await page.getByTestId('settings-section-general').click()
@@ -217,7 +218,7 @@ test('remembered browser credentials survive reload and clear centrally', async 
 
   await page.reload()
   await canvas.waitForInit()
-  await page.getByRole('tab', { name: 'AI' }).click()
+  await new ChatHarness(page).openChat()
   await expect(page.getByTestId('chat-input')).toBeVisible()
 
   await page.getByTestId('app-settings-trigger').click()
@@ -234,7 +235,7 @@ test('remembered browser credentials survive reload and clear centrally', async 
 
   await page.reload()
   await canvas.waitForInit()
-  await page.getByRole('tab', { name: 'AI' }).click()
+  await new ChatHarness(page).openChat()
   await expect(page.getByTestId('provider-setup-open-settings')).toBeVisible()
 })
 

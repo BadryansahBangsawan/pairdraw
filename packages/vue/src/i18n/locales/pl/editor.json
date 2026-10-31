@@ -13,5 +13,6 @@
   "previewing": "Podgląd",
   "resetPreview": "Resetuj",
   "leavePreview": "Zakończ podgląd ({shortcut})",
+  "toggleAIChat": "Czat AI ({shortcut})",
   "startPreview": "Podgląd ({shortcut})"
 }

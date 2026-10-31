@@ -47,9 +47,9 @@ Jeśli nic nie jest zaznaczone, karta pokazuje właściwości strony.
 
 Zaznaczony obiekt jest prezentowany jako JSX z wyróżnianiem składni. Dostępny jest także HTML z klasami Tailwind CSS v4.
 
-### AI
+### Czat AI
 
-Czat AI tworzy i zmienia obiekty na podstawie poleceń w zwykłym języku. Kartę można otworzyć lub zamknąć skrótem <kbd>⌘</kbd><kbd>J</kbd> albo <kbd>Ctrl</kbd><kbd>J</kbd>.
+Czat AI tworzy i zmienia obiekty na podstawie poleceń w zwykłym języku. Otwiera się we własnej kolumnie po prawej stronie panelu właściwości, więc karta Projekt pozostaje widoczna. Kolumnę otwiera i zamyka przycisk z iskrami u góry panelu właściwości albo skrót <kbd>⌘</kbd><kbd>J</kbd> lub <kbd>Ctrl</kbd><kbd>J</kbd>; jej szerokość można zmienić, przeciągając krawędź, i zostaje zapamiętana po przeładowaniu.
 
 ## Małe ekrany
 

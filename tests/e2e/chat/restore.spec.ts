@@ -8,12 +8,12 @@ test('a long restored conversation scrolls to its latest message on mount', asyn
   await chat.submit(text)
   await expect(chat.assistantMessage()).toBeVisible()
   await page.reload()
-  await chat.chatTab.click()
+  await chat.openChat()
   await page.getByRole('button', { name: 'Conversation history', exact: true }).click()
   await page.getByRole('button', { name: 'All documents', exact: true }).click()
   await page.getByRole('button', { name: /Restored line 0/ }).click()
-  await chat.designTab.click()
-  await chat.chatTab.click()
+  await chat.closeChat()
+  await chat.openChat()
   const viewport = page.getByTestId('chat-panel').locator('[data-reka-scroll-area-viewport]')
   await expect
     .poll(() =>

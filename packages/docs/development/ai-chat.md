@@ -2,6 +2,12 @@
 
 How the built-in AI chat turns a message into edits, how a reply ends, and how what happens to its edits afterwards reaches the transcript and the model. ACP and Pi chats share the transcript, the saved conversation, and the marks on a reply, but run their own tool loop and agent presence.
 
+## Where the chat lives
+
+On desktop the chat has a column of its own, the last panel of the editor's splitter to the right of the properties panel (`src/components/editor/EditorWorkspace.vue`), so the Design tab and the conversation show together. `chatColumnOpen` in `src/app/ai/chat/panel.ts` says whether it is open; it is the `chat.columnOpen` preference, so the column stays as the person left it across reloads. The sparkles button in the properties header, <kbd>⌘</kbd><kbd>J</kbd> (`toggleAI` in `src/app/shell/keyboard/actions.ts`), and a notification's click (`showChatPanel`) open it.
+
+`ChatPanel` is mounted once there and stays mounted while the column is closed: the panel collapses to no width rather than unmounting, because the panel owns the conversation's submission state, its queue of waiting messages, and the permission prompts an agent may raise while the column is shut. Opening and closing go through `useEditorWorkspaceLayout`, which gives the properties panel back its width afterwards so the canvas, not the properties panel, pays for the column. The side panels are sized in pixels and saved as `{ layers, properties, chat }` by `src/app/shell/layout-storage.ts`, which reads layouts saved in percent by earlier versions as the pixels they had. Phones keep the chat as a tab of the bottom drawer (`MobileDrawer.vue`), which mounts its own `ChatPanel`.
+
 ## A message goes out
 
 `src/app/ai/chat/submission/use.ts` sends a message through the AI SDK's `Chat`. Before sending, it appends notes for the model to the text: the layers you referenced, and the edits you undid or redid since the model last heard (`context.ts`). The transcript shows only what you wrote; `stripModelNotes` removes the notes. Notes go on the newest message only. Earlier messages never change, so the provider can keep caching the conversation up to the new message.

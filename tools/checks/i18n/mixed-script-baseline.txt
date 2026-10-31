@@ -160,6 +160,7 @@ ja:diagnostics.sharingDisabledByEnvironment
 ja:diagnostics.sharingQuestionTitle
 ja:diagnostics.sharingQuestionDescription
 ja:editor.showUI
+ja:editor.toggleAIChat
 ja:files.browserFileAPINotSupported
 ja:files.clipboardImageFetchFailed
 ja:files.clipboardImagesFetchFailed
@@ -607,3 +608,4 @@ zh-cn:ai.notificationsAllowHint
 zh-cn:ai.notificationsSystemHint
 zh-cn:ai.notifyReplyFinished
 zh-cn:ai.notifyReplyFailed
+zh-cn:editor.toggleAIChat

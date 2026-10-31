@@ -5,13 +5,13 @@ description: Built-in AI assistant with 90+ tools for creating and modifying des
 
 # AI Chat
 
-Press <kbd>⌘</kbd><kbd>J</kbd> (<kbd>Ctrl</kbd> + <kbd>J</kbd>) to open the AI assistant. Describe what you want — it creates shapes, sets styles, manages layout, works with components, and analyzes your design.
+Press <kbd>⌘</kbd><kbd>J</kbd> (<kbd>Ctrl</kbd> + <kbd>J</kbd>), or click the sparkles button at the top of the properties panel, to open the AI assistant in its own column beside the Design panel. Describe what you want — it creates shapes, sets styles, manages layout, works with components, and analyzes your design.
 
 ## Setup
 
 The first time you open OpenPencil, guided setup asks what AI should help with and what you already use: a [coding agent](./coding-agents) such as Claude Code, Codex, Gemini CLI, or Pi in the desktop app, an API account, or a local or company server. It connects that access and assigns it to the **Design agent** and **Vision** roles, keeping anything you configured by hand. With OpenRouter you can sign in instead of pasting an API key. Skip it to start designing, and run it again from **Settings → Models → Run guided setup**. To configure models by hand:
 
-1. Open the AI chat panel (<kbd>⌘</kbd><kbd>J</kbd>)
+1. Open the AI chat column (<kbd>⌘</kbd><kbd>J</kbd>)
 2. Click the settings icon
 3. Add a model and configure its provider, model ID, credentials, and capabilities
 4. Save the model and assign it to **Design agent**
@@ -120,7 +120,7 @@ Your next message tells the assistant which of its edits you undid or redid, so 
 
 ## Following the assistant
 
-With **Follow agents** on, the crosshair button at the top of the AI panel, your view follows the assistant while it works, including to another page when it edits layers there. Following ends when the reply finishes, is stopped, or fails. Clicking, scrolling, zooming, switching pages, or Escape stops following yourself.
+With **Follow agents** on, the crosshair button at the top of the AI chat, your view follows the assistant while it works, including to another page when it edits layers there. Following ends when the reply finishes, is stopped, or fails. Clicking, scrolling, zooming, switching pages, or Escape stops following yourself.
 
 ## Notifications
 

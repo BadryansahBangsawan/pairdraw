@@ -21,7 +21,7 @@ test('recovering an unsaved document restores its selected conversation automati
   await page.reload()
   await expect(page.getByRole('alertdialog', { name: 'Recover unsaved work' })).toBeVisible()
   await page.getByRole('button', { name: 'Restore', exact: true }).click()
-  await chat.chatTab.click()
+  await chat.openChat()
   await expect(chat.userMessage()).toContainText('Conversation belonging to recovered document')
   await expect(chat.assistantMessage()).toBeVisible()
   await expect(

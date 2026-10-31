@@ -68,7 +68,7 @@ test('reverting a reply undoes its edits, marks it, saves the chat, and tells th
     )
     .toBe(true)
   await page.reload()
-  await chat.chatTab.click()
+  await chat.openChat()
   await page.getByRole('button', { name: 'Conversation history', exact: true }).click()
   await page.getByRole('button', { name: 'All documents', exact: true }).click()
   await page.getByRole('button', { name: /Add a card/ }).click()

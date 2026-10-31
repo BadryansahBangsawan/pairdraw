@@ -1,10 +1,34 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
-export type PropertiesTab = 'design' | 'code' | 'ai' | 'lint'
+import { appPreferences } from '@/app/settings/preferences/store'
 
-/** The properties panel's tab; `ai` shows the chat. */
+export type PropertiesTab = 'design' | 'code' | 'lint'
+
+/** The properties panel's tab. */
 export const propertiesTab = ref<PropertiesTab>('design')
 
+/** The shortcut that opens and closes the chat column, as a portable token. */
+export const CHAT_COLUMN_SHORTCUT = 'MOD+J'
+
+/**
+ * Whether the AI chat has its own column beside the properties panel on desktop, so the design
+ * and the conversation show at once. It stays as the person left it across sessions.
+ */
+export const chatColumnOpen = computed({
+  get: () => appPreferences.value.chat.columnOpen,
+  set: (columnOpen: boolean) => {
+    if (appPreferences.value.chat.columnOpen === columnOpen) return
+    appPreferences.value = {
+      ...appPreferences.value,
+      chat: { ...appPreferences.value.chat, columnOpen }
+    }
+  }
+})
+
 export function showChatPanel(): void {
-  propertiesTab.value = 'ai'
+  chatColumnOpen.value = true
+}
+
+export function toggleChatColumn(): void {
+  chatColumnOpen.value = !chatColumnOpen.value
 }

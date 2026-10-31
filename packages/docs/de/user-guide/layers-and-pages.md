@@ -37,9 +37,9 @@ Zeigt Darstellung, Füllung, Kontur, Effekte, Typografie, Anordnung und Export d
 
 Zeigt die Auswahl als JSX mit Syntaxhervorhebung und ermöglicht den Export als HTML mit Tailwind CSS v4.
 
-### AI
+### AI-Chat
 
-Öffnet den AI-Chat. <kbd>⌘</kbd><kbd>J</kbd> beziehungsweise <kbd>Strg</kbd><kbd>J</kbd> schaltet ihn um.
+Der AI-Chat öffnet sich in einer eigenen Spalte rechts neben den Eigenschaften, sodass der Design-Bereich sichtbar bleibt. Die Schaltfläche mit den Funkeln oben in den Eigenschaften oder <kbd>⌘</kbd><kbd>J</kbd> beziehungsweise <kbd>Strg</kbd><kbd>J</kbd> öffnet und schließt die Spalte; ihre Breite lässt sich am Rand ziehen und bleibt nach dem Neuladen erhalten.
 
 ## Kleine Bildschirme
 

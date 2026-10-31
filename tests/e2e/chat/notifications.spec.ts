@@ -100,24 +100,24 @@ test('a finished reply notifies only when turned on and away, and its click show
     .poll(() => page.evaluate(() => document.documentElement.dataset.closedNotifications))
     .toBe('2')
 
-  // Another document and the Design tab are in view when the notification is clicked.
+  // Another tab is in view, and the chat column closed, when the notification is clicked.
   // The tab bar starts with Home; the chat's document is the tab after it.
   const tabs = page.getByTestId('tabbar-tab')
   const chatDocument = tabs.nth(1)
   await expect(chatDocument).toHaveAttribute('aria-selected', 'true')
+  await chat.closeChat()
   await page.getByTestId('tabbar-new').click()
   await expect(tabs.last()).toHaveAttribute('aria-selected', 'true')
-  await chat.designTab.click()
   await page.evaluate(() => document.dispatchEvent(new Event('notification-click')))
   await expect(chatDocument).toHaveAttribute('aria-selected', 'true')
-  await expect(chat.chatTab).toHaveAttribute('aria-selected', 'true')
+  await expect(chat.chatColumn).toBeVisible()
 
   // With the panels hidden, the click shows them again.
-  await chat.designTab.click()
+  await chat.closeChat()
   await page.keyboard.press('ControlOrMeta+Backslash')
-  await expect(chat.chatTab).toBeHidden()
+  await expect(chat.chatToggle).toBeHidden()
   await page.evaluate(() => document.dispatchEvent(new Event('notification-click')))
-  await expect(chat.chatTab).toHaveAttribute('aria-selected', 'true')
+  await expect(chat.chatColumn).toBeVisible()
 })
 
 test('a failed reply notifies when turned on, but not while its chat is in view', async ({

@@ -7,8 +7,13 @@ export class ChatHarness {
     return this.page.getByRole('textbox', { name: 'Describe a change' })
   }
 
-  get chatTab() {
-    return this.page.getByRole('tab', { name: 'AI' })
+  /** The properties panel's button that opens and closes the chat column. */
+  get chatToggle() {
+    return this.page.getByRole('button', { name: /^AI chat/ })
+  }
+
+  get chatColumn() {
+    return this.page.getByTestId('chat-column')
   }
 
   get designTab() {
@@ -45,8 +50,23 @@ export class ChatHarness {
     await this.page.waitForFunction(() => document.documentElement.dataset.theme === 'dark')
   }
 
+  /** Opens the chat column, which stays open across reloads once opened. */
+  async openChat(): Promise<void> {
+    if ((await this.chatToggle.getAttribute('aria-pressed')) !== 'true') {
+      await this.chatToggle.click()
+    }
+    await this.chatColumn.waitFor()
+  }
+
+  async closeChat(): Promise<void> {
+    if ((await this.chatToggle.getAttribute('aria-pressed')) === 'true') {
+      await this.chatToggle.click()
+    }
+    await this.chatColumn.waitFor({ state: 'hidden' })
+  }
+
   async configureOpenRouter(apiKey: string): Promise<void> {
-    await this.chatTab.click()
+    await this.openChat()
     await this.page.getByTestId('provider-setup-open-settings').click()
     await this.page.locator('[data-model-id]').first().click()
     await this.page.getByTestId('settings-model-provider').click()

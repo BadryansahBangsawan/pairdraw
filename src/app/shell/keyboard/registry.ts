@@ -7,6 +7,7 @@ import { BOARD_TOOL_SHORTCUTS, resolveEditorProfile } from '@open-pencil/core'
 import { isCanvasTextInput } from '@open-pencil/vue/canvas/text-edit'
 import { editorCommandMetadata, type EditorCommandId } from '@open-pencil/vue/editor/commands'
 
+import { CHAT_COLUMN_SHORTCUT } from '@/app/ai/chat/panel'
 import { isCloudBinding, openVersionDialog } from '@/app/cloud/integration'
 import { useComments } from '@/app/comments/use'
 import {
@@ -24,7 +25,7 @@ import type {
   KeyboardShortcutOptions,
   KeyboardShortcutRunOptions
 } from '@/app/shell/keyboard/types'
-import { appMenuTinykeysShortcut } from '@/app/shell/menu/shortcut'
+import { appMenuTinykeysShortcut, shortcutTokenToTinykeys } from '@/app/shell/menu/shortcut'
 import { showsDocument } from '@/app/tabs'
 
 type ShortcutAction = (options: KeyboardShortcutRunOptions) => void
@@ -266,7 +267,11 @@ export function registerKeyboardShortcuts(options: KeyboardShortcutOptions) {
       keys: appMenuTinykeysShortcut('toggle-ui') ?? '$mod+Backslash',
       run: ({ actions }) => actions.toggleUI()
     },
-    { id: 'toggle-ai', keys: '$mod+KeyJ', run: ({ actions }) => actions.toggleAI() },
+    {
+      id: 'toggle-ai',
+      keys: shortcutTokenToTinykeys(CHAT_COLUMN_SHORTCUT) ?? '$mod+KeyJ',
+      run: ({ actions }) => actions.toggleAI()
+    },
     {
       id: 'toggle-comments',
       keys: appMenuTinykeysShortcut('view-comments') ?? 'Shift+KeyC',

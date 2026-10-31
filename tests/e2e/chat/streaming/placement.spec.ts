@@ -4,6 +4,10 @@ import { setupPlacementScene, type PlacementScenario } from '#tests/helpers/chat
 import { documentSnapshot, previewKey, setupCanvas } from '#tests/helpers/chat/render-preview'
 import { installRenderStream } from '#tests/helpers/chat/render-stream'
 
+// The chat column stands beside the canvas; a wider window keeps the canvas wider than the region
+// its snapshots cover.
+test.use({ viewport: { width: 1640, height: 800 } })
+
 const scenarios: PlacementScenario[] = [
   'nested-fill',
   'nested-hug',

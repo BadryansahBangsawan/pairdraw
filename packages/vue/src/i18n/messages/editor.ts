@@ -24,6 +24,8 @@ export const editorMessageDefaults = {
   showUI: params('Show UI ({shortcut})'),
   previewing: 'Previewing',
   startPreview: params('Preview ({shortcut})'),
+  /** Opens and closes the AI chat's column beside the properties panel. */
+  toggleAIChat: params('AI chat ({shortcut})'),
   resetPreview: 'Reset',
   leavePreview: params('Leave preview ({shortcut})')
 } as const

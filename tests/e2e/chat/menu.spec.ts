@@ -60,7 +60,7 @@ test('deleting a conversation asks in a confirmation dialog', async ({
 
   // The conversation is gone from storage, not only from the panel.
   await page.reload()
-  await chat.chatTab.click()
+  await chat.openChat()
   await page.getByRole('button', { name: 'Conversation history', exact: true }).click()
   await page.getByRole('button', { name: 'All documents', exact: true }).click()
   await expect(page.getByRole('button', { name: /Conversation to keep/ })).toBeVisible()

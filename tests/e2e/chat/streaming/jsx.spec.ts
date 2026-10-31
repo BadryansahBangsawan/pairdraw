@@ -9,6 +9,10 @@ import {
 } from '#tests/helpers/chat/render-preview'
 import { installRenderStream } from '#tests/helpers/chat/render-stream'
 
+// The chat column stands beside the canvas; a wider window keeps the canvas wider than the region
+// its snapshots cover.
+test.use({ viewport: { width: 1640, height: 800 } })
+
 const opening =
   '<Frame name="Streaming card" w={280} h={180} bg="#20242f" flex="col" p={20} gap={12} rounded={16}><Text size={24} color="#ffffff">Streaming'
 const closing = ' preview</Text><Rect w={240} h={36} bg="#9747ff" rounded={8}/></Frame>'

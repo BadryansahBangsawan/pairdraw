@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui'
 import { tv } from 'tailwind-variants'
-import { computed } from 'vue'
+import { computed, useTemplateRef, type ComponentPublicInstance } from 'vue'
 
 import { resolveEditorProfile } from '@open-pencil/core'
 import { formatShortcut } from '@open-pencil/vue/editor/commands'
 import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
 import { useI18n } from '@open-pencil/vue/i18n'
 
+import { CHAT_COLUMN_SHORTCUT, chatColumnOpen, toggleChatColumn } from '@/app/ai/chat/panel'
 import { provideTabEditorStore } from '@/app/editor/active-store'
 import { appRuntimeConfig } from '@/app/runtime/config'
-import { loadEditorLayout, saveEditorLayout } from '@/app/shell/layout-storage'
+import { EDITOR_PANEL_LIMITS } from '@/app/shell/layout-storage'
 import { appMenuShortcut } from '@/app/shell/menu/shortcut'
 import type { Tab } from '@/app/tabs'
 import CanvasSplitRoot from '@/components/canvas/CanvasSplitRoot.vue'
+import ChatPanel from '@/components/chat/ChatPanel.vue'
 import CollabPanel from '@/components/collab-panel/CollabPanel.vue'
 import ActiveRoomOverlay from '@/components/collab-room/ActiveRoomOverlay.vue'
 import { useRoomActions } from '@/components/collab-room/useRoomActions'
@@ -29,6 +31,7 @@ import IconButton from '@/components/ui/button/IconButton.vue'
 import VariablesDialog from '@/components/variables/VariablesDialog.vue'
 import splitterTheme from '@/theme/splitter'
 
+import { useEditorWorkspaceLayout } from './useEditorWorkspaceLayout'
 import WorkspacePill from './WorkspacePill.vue'
 
 const showChrome = appRuntimeConfig.showChrome
@@ -41,22 +44,16 @@ const { tab } = defineProps<{ tab: Tab }>()
 const store = tab.store
 provideTabEditorStore(store)
 const { isMobile } = useViewportKind()
-/**
- * The layout the panels have. The splitter opens with it, also when showing the panels again
- * remounts it, so its opening report matches and only a resize differs.
- */
-let editorLayout = loadEditorLayout()
-/** How far apart two sizes, in percent, still count as one; the splitter rounds sizes finer. */
-const LAYOUT_TOLERANCE = 1e-6
-/**
- * Saves a layout the panels were resized to. The splitter also reports the layout it opens with,
- * which must not be saved: the right panel's default is a fixed width, and saved as a share of
- * this window it would open wider on a wider one.
- */
-function saveResizedLayout(layout: number[]) {
-  if (layout.every((size, index) => Math.abs(size - editorLayout[index]) < LAYOUT_TOLERANCE)) return
-  editorLayout = layout
-  saveEditorLayout(layout)
+const { layout: editorLayout, saveResizedLayout } = useEditorWorkspaceLayout({
+  group: useTemplateRef<ComponentPublicInstance>('splitterGroup'),
+  canvas: useTemplateRef('canvasPanel'),
+  properties: useTemplateRef('propertiesPanel'),
+  chat: useTemplateRef('chatPanel'),
+  chatOpen: chatColumnOpen
+})
+/** Dragging the chat column shut, or open again, is the same as its toggle. */
+function setChatColumnOpen(open: boolean) {
+  chatColumnOpen.value = open
 }
 const horizontalSplitterStyles = tv(splitterTheme)({ direction: 'horizontal' })
 /**
@@ -66,7 +63,7 @@ const horizontalSplitterStyles = tv(splitterTheme)({ direction: 'horizontal' })
 const canvasAlone = computed(
   () => !resolveEditorProfile(store.state).panels && store.visiblePaneCount.value <= 1
 )
-const { editor } = useI18n()
+const { editor, panels } = useI18n()
 // Until a room's document arrives there is nothing to edit, so its screen replaces the editor.
 const { pending: roomPending } = useRoomActions()
 </script>
@@ -78,6 +75,7 @@ const { pending: roomPending } = useRoomActions()
 
   <SplitterGroup
     v-else-if="!isMobile && showChrome && store.state.showUI && !canvasAlone"
+    ref="splitterGroup"
     :key="tab.id"
     direction="horizontal"
     class="flex-1 overflow-hidden"
@@ -85,9 +83,11 @@ const { pending: roomPending } = useRoomActions()
   >
     <SplitterPanel
       id="layers"
-      :default-size="editorLayout[0]"
-      :min-size="10"
-      :max-size="30"
+      :order="1"
+      size-unit="px"
+      :default-size="editorLayout.layers"
+      :min-size="EDITOR_PANEL_LIMITS.layers.min"
+      :max-size="EDITOR_PANEL_LIMITS.layers.max"
       class="flex"
     >
       <LayersPanel />
@@ -98,7 +98,8 @@ const { pending: roomPending } = useRoomActions()
     >
       <div :class="horizontalSplitterStyles.divider()" />
     </SplitterResizeHandle>
-    <SplitterPanel id="canvas" :default-size="editorLayout[1]" :min-size="30" class="flex">
+    <!-- The canvas has no size of its own: it takes what the side panels leave. -->
+    <SplitterPanel id="canvas" ref="canvasPanel" :order="2" :min-size="30" class="flex">
       <div class="relative flex min-w-0 flex-1">
         <CanvasSplitRoot />
         <ActiveRoomOverlay />
@@ -113,13 +114,26 @@ const { pending: roomPending } = useRoomActions()
     </SplitterResizeHandle>
     <SplitterPanel
       id="properties"
-      :default-size="editorLayout[2]"
-      :min-size="10"
-      :max-size="30"
+      ref="propertiesPanel"
+      :order="3"
+      size-unit="px"
+      :default-size="editorLayout.properties"
+      :min-size="EDITOR_PANEL_LIMITS.properties.min"
+      :max-size="EDITOR_PANEL_LIMITS.properties.max"
       class="flex flex-col"
     >
       <div class="flex shrink-0 items-center gap-1 border-b border-border px-1.5 py-1.5">
         <CollabPanel class="min-w-0 flex-1" />
+        <IconButton
+          :label="editor.toggleAIChat({ shortcut: formatShortcut(CHAT_COLUMN_SHORTCUT) ?? '' })"
+          toggle
+          :active="chatColumnOpen"
+          aria-controls="editor-chat-column"
+          data-test-id="editor-toggle-chat"
+          @click="toggleChatColumn"
+        >
+          <icon-lucide-sparkles class="size-3.5" />
+        </IconButton>
         <IconButton
           :label="
             editor.startPreview({
@@ -133,6 +147,41 @@ const { pending: roomPending } = useRoomActions()
         </IconButton>
       </div>
       <PropertiesPanel />
+    </SplitterPanel>
+    <SplitterResizeHandle
+      v-show="chatColumnOpen"
+      data-test-id="chat-splitter-handle"
+      :class="horizontalSplitterStyles.handle()"
+    >
+      <div :class="horizontalSplitterStyles.divider()" />
+    </SplitterResizeHandle>
+    <!--
+      The chat stays mounted while its column is closed, collapsed to nothing, so a reply that is
+      running keeps its composer, queue, and permission prompts.
+    -->
+    <SplitterPanel
+      id="chat"
+      ref="chatPanel"
+      :order="4"
+      size-unit="px"
+      collapsible
+      :collapsed-size="0"
+      :default-size="chatColumnOpen ? editorLayout.chat : 0"
+      :min-size="EDITOR_PANEL_LIMITS.chat.min"
+      :max-size="EDITOR_PANEL_LIMITS.chat.max"
+      class="flex"
+      @collapse="setChatColumnOpen(false)"
+      @expand="setChatColumnOpen(true)"
+    >
+      <aside
+        id="editor-chat-column"
+        data-test-id="chat-column"
+        :aria-label="panels.ai"
+        :hidden="!chatColumnOpen"
+        class="flex min-w-0 flex-1 flex-col overflow-hidden border-l border-border bg-panel"
+      >
+        <ChatPanel />
+      </aside>
     </SplitterPanel>
   </SplitterGroup>
 

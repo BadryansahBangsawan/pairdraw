@@ -9,7 +9,6 @@ import { useAIChat } from '@/app/ai/chat/use'
 import { isVersionHistoryOpen } from '@/app/cloud/integration'
 import { useEditorStore } from '@/app/editor/active-store'
 import { countIssues } from '@/app/editor/design-check/issues'
-import ChatPanel from '@/components/chat/ChatPanel.vue'
 import { CloudVersionHistory } from '@/components/cloud/integration'
 import propertiesTabsTheme from '@/theme/panel/properties-tabs'
 
@@ -66,10 +65,6 @@ const problemCount = computed(() => {
           <icon-lucide-code :class="tabStyles.icon()" aria-hidden="true" />
           <span :class="tabStyles.label()">{{ panels.code }}</span>
         </TabsTrigger>
-        <TabsTrigger value="ai" data-test-id="properties-tab-ai" :class="tabStyles.trigger()">
-          <icon-lucide-sparkles :class="tabStyles.icon()" aria-hidden="true" />
-          <span :class="tabStyles.label()">{{ panels.ai }}</span>
-        </TabsTrigger>
         <TabsTrigger
           value="lint"
           data-test-id="properties-tab-lint"
@@ -116,15 +111,6 @@ const problemCount = computed(() => {
         :hidden="activeTab !== 'lint'"
       >
         <DesignCheckPanel :active="activeTab === 'lint'" />
-      </TabsContent>
-
-      <TabsContent
-        value="ai"
-        class="flex min-h-0 flex-1 flex-col"
-        :force-mount="true"
-        :hidden="activeTab !== 'ai'"
-      >
-        <ChatPanel />
       </TabsContent>
     </TabsRoot>
   </aside>

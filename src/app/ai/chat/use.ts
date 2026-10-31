@@ -1,7 +1,7 @@
 import { IS_BROWSER } from '@open-pencil/core/constants'
 
 import { createConversationHistory } from '@/app/ai/chat/history/controller'
-import { propertiesTab } from '@/app/ai/chat/panel'
+import { chatColumnOpen, propertiesTab } from '@/app/ai/chat/panel'
 import { createChatSessionManager } from '@/app/ai/chat/session'
 import {
   apiKeyStatus,
@@ -79,6 +79,7 @@ export function useAIChat() {
     unsplashKeyStatus,
     setUnsplashKey,
     activeTab: propertiesTab,
+    chatColumnOpen,
     isConfigured,
     history,
     ensureChat: history.ensureChat,

@@ -13,5 +13,6 @@
   "previewing": "Vorschau",
   "resetPreview": "Zurücksetzen",
   "leavePreview": "Vorschau verlassen ({shortcut})",
+  "toggleAIChat": "KI-Chat ({shortcut})",
   "startPreview": "Vorschau ({shortcut})"
 }

@@ -87,7 +87,7 @@ test('reasoning preferences use AI settings and persist across reload', async ({
     .toBe('collapsible-up')
   await expect(page.locator('[data-slot="chat-reasoning-content"]')).toBeHidden()
   await page.reload()
-  await chat.chatTab.click()
+  await chat.openChat()
   await page.getByTestId('provider-settings-trigger').click()
   await expect(display).toContainText('Expanded by default')
 })

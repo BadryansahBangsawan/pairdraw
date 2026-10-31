@@ -13,5 +13,6 @@
   "previewing": "Anteprima",
   "resetPreview": "Ripristina",
   "leavePreview": "Esci dall’anteprima ({shortcut})",
+  "toggleAIChat": "Chat AI ({shortcut})",
   "startPreview": "Anteprima ({shortcut})"
 }

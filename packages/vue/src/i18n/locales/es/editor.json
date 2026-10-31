@@ -13,5 +13,6 @@
   "previewing": "Vista previa",
   "resetPreview": "Restablecer",
   "leavePreview": "Salir de la vista previa ({shortcut})",
+  "toggleAIChat": "Chat de IA ({shortcut})",
   "startPreview": "Vista previa ({shortcut})"
 }

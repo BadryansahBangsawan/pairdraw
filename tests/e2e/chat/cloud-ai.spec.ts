@@ -49,7 +49,7 @@ async function openCloudChat(
   const chat = new ChatHarness(page)
   await chat.open()
   await new CanvasHelper(page).waitForInit()
-  await chat.chatTab.click()
+  await chat.openChat()
   await page.getByTestId('provider-setup-open-settings').click()
   await page.locator('[data-model-id]').first().click()
   await page.getByTestId('settings-model-provider').click()

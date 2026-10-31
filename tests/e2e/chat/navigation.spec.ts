@@ -1,22 +1,29 @@
 import { expect, test } from '#tests/helpers/chat/fixture'
 
-test('⌘J switches between Design and AI', async ({ chat }) => {
+test('⌘J opens and closes the chat column beside Design', async ({ chat }) => {
   await chat.designTab.waitFor()
-  await chat.page.keyboard.press('Meta+j')
-  await expect(chat.chatTab).toHaveAttribute('data-state', 'active')
-  await chat.page.keyboard.press('Meta+j')
+  await expect(chat.chatColumn).toBeHidden()
+  await chat.page.keyboard.press('ControlOrMeta+j')
+  await expect(chat.chatColumn).toBeVisible()
+  await expect(chat.chatToggle).toHaveAttribute('aria-pressed', 'true')
+  // The design stays in view beside the chat.
+  await expect(chat.designTab).toHaveAttribute('data-state', 'active')
+  await expect(chat.page.getByTestId('properties-panel')).toBeVisible()
+  await chat.page.keyboard.press('ControlOrMeta+j')
+  await expect(chat.chatColumn).toBeHidden()
+  await expect(chat.chatToggle).toHaveAttribute('aria-pressed', 'false')
   await expect(chat.designTab).toHaveAttribute('data-state', 'active')
 })
 
-test('AI tab directs provider setup to unified settings', async ({ chat }) => {
-  await chat.chatTab.click()
+test('the chat column directs provider setup to unified settings', async ({ chat }) => {
+  await chat.openChat()
   await expect(chat.page.getByText('Connect an AI provider to start chatting.')).toBeVisible()
   await expect(chat.page.getByTestId('provider-setup-open-settings')).toBeVisible()
   await expect(chat.apiKeyInput).toBeHidden()
 })
 
 test('saving an API key in Settings opens the chat interface', async ({ chat }) => {
-  await chat.chatTab.click()
+  await chat.openChat()
   await chat.page.getByTestId('provider-setup-open-settings').click()
   await expect(chat.page.getByTestId('app-settings-dialog')).toBeVisible()
   await chat.page.locator('[data-model-id]').first().click()

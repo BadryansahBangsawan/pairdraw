@@ -76,12 +76,14 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
   const documentScope = ref(false)
   // Pages beyond the current one are checked only for the Document scope.
   const pagesNeeded = computed(() => enabled.value && documentScope.value)
+  /** Set while an agent's reply edits the document; its burst of edits is checked once, after. */
+  let agentEditing = false
   // Stopped in dispose, so it needs no effect scope of its own.
   const pages = createPageChecks({
     graph: () => editor.graph,
     currentPageId: () => state.currentPageId,
     isPending: (pageId) => isFigPagePending(editor.graph, pageId),
-    isBusy: () => editor.isInteractiveEditing(),
+    isBusy: () => editor.isInteractiveEditing() || agentEditing,
     check: checkPage
   })
 
@@ -174,9 +176,10 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
         if (enabled.value) schedule()
       }
     )
+    // An agent's edits are checked once its reply ends.
     watch(
       () => state.sceneVersion,
-      () => enabled.value && schedule()
+      () => enabled.value && !agentEditing && schedule()
     )
   })
 
@@ -211,6 +214,16 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
     if (editor.applyLintFixes(requests) > 0) run()
   }
 
+  /**
+   * Holds checks while an agent's reply runs, so its edits are not checked one by one while it
+   * works; the page is checked once the reply ends.
+   */
+  function holdForAgent(editing: boolean) {
+    if (agentEditing === editing) return
+    agentEditing = editing
+    if (!editing && enabled.value) schedule(0)
+  }
+
   function dispose() {
     cancel()
     unsubscribeGraph()
@@ -231,6 +244,7 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
     highlightIssue,
     openIssue,
     applyFixes,
+    holdForAgent,
     dispose
   }
 }

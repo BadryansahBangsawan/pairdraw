@@ -36,6 +36,8 @@ function includeReferencedStyles(source: SceneGraph, ids: Set<string>): void {
       if (styleId) referencedStyleIds.add(styleId)
     }
   }
+  // Style definitions can sit anywhere in the document; only layers that use one need the search.
+  if (referencedStyleIds.size === 0) return
   for (const node of source.getAllNodes()) {
     if (node.sharedStyleType && node.source.id && referencedStyleIds.has(node.source.id)) {
       ids.add(node.id)
@@ -262,7 +264,7 @@ function ancestorChain(source: SceneGraph, id: string): string[] {
 
 function collectSelectionIds(
   source: SceneGraph,
-  nodeIds: string[],
+  nodeIds: readonly string[],
   options: ExtractOptions = {}
 ): Set<string> {
   const ids = new Set<string>([source.rootId])
@@ -302,15 +304,18 @@ function rootNodeIds(source: SceneGraph): Set<string> {
   return ids
 }
 
-/** Clone `pageId` with only the subtrees of `nodeIds` (none keeps an empty page) and their dependencies. */
+/**
+ * Clone `pageId`, or each of several pages, with only the subtrees of `nodeIds` (none keeps an
+ * empty page) and their dependencies.
+ */
 export function extractPageContext(
   source: SceneGraph,
-  pageId: string,
-  nodeIds: string[],
+  pageId: string | readonly string[],
+  nodeIds: readonly string[],
   options: ExtractOptions = {}
 ): SceneGraph {
   const ids = collectSelectionIds(source, nodeIds, options)
-  ids.add(pageId)
+  for (const id of typeof pageId === 'string' ? [pageId] : pageId) ids.add(id)
   return cloneIntoGraph(source, ids, options)
 }
 

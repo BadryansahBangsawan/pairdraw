@@ -1,6 +1,7 @@
 import { executeAtomicTool, isEmptyDocumentChange, type DocumentChange } from '@pairdraw/core'
 import type { FigmaAPI } from '@pairdraw/core/figma-api'
 import { isAtomicTool, toolChangesDocument, toolFailure, type ToolDef } from '@pairdraw/core/tools'
+import type { SceneMutationImpact } from '@pairdraw/scene-graph/mutation-impact'
 
 import { showAIEdit } from '@/app/ai/motion'
 import {
@@ -59,14 +60,28 @@ function writtenPageId(figma: FigmaAPI, args: Record<string, unknown>): string {
   return page?.id ?? figma.currentPageId
 }
 
+/**
+ * The outermost layers an edit created or changed, whose text needs its fonts before layout;
+ * the whole page when the edit reported no change at all.
+ */
+function fontScope(store: EditorStore, pageId: string, impact: SceneMutationImpact): string[] {
+  const { graph } = store
+  if (impact.changedNodeIds.size === 0) return graph.getNode(pageId)?.childIds ?? []
+  const changed = new Set([...impact.changedNodeIds].filter((id) => graph.getNode(id)))
+  return [...changed].filter((id) => {
+    const parentId = graph.getNode(id)?.parentId
+    return !parentId || !graph.closest(parentId, (node) => changed.has(node.id))
+  })
+}
+
 async function execute(call: EditorToolCall, pageId: string): Promise<unknown> {
   const { store, figma, def, args } = call
   return store.runMutationWithLayout(
     () => def.execute(figma, args),
     pageId,
-    async () => {
-      const page = store.graph.getNode(pageId)
-      if (page) await ensureGraphFonts(store.graph, page.childIds, store.renderer)
+    async (_result, impact) => {
+      const nodeIds = fontScope(store, pageId, impact)
+      if (nodeIds.length > 0) await ensureGraphFonts(store.graph, nodeIds, store.renderer)
     }
   )
 }

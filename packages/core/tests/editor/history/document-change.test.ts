@@ -3,9 +3,17 @@ import { describe, expect, test } from 'bun:test'
 import { captureDocumentChange } from '#core/editor/history/document-change'
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { createEditor, graphFromDocumentChange, isEmptyDocumentChange } from '@pairdraw/core'
+import {
+  createEditor,
+  graphFromDocumentChange,
+  graphsFromDocumentChange,
+  isEmptyDocumentChange,
+  touchedTopLevelIds
+} from '@pairdraw/core'
+import { diffPageLayersJSX } from '@pairdraw/core/tools'
 import type { CommentThread } from '@pairdraw/scene-graph'
 import { readComments, writeComments } from '@pairdraw/scene-graph/comments'
+import { boundEndpoint, createConnector } from '@pairdraw/scene-graph/connectors'
 
 function setup() {
   const editor = createEditor()
@@ -265,5 +273,110 @@ describe('document changes', () => {
     editor.restoreDocumentChange(change, 'after')
     expect(graph.getNode(graph.rootId)?.name).toBe('Renamed')
     expect(readComments(graph)).toHaveLength(3)
+  })
+})
+
+describe('the layers a change touched', () => {
+  /** Records `edit` on the editor's page. */
+  function record(editor: Editor, edit: () => void) {
+    const finish = captureDocumentChange(editor.graph, editor.state.currentPageId)
+    edit()
+    return finish()
+  }
+
+  /** The JSX diff of both sides, built from whole pages and from only the touched layers. */
+  function diffs(editor: Editor, change: ReturnType<typeof record>) {
+    const { pageId } = change
+    const full = expectDefined(graphsFromDocumentChange(editor.graph, change), 'full graphs')
+    const layerIds = expectDefined(touchedTopLevelIds(editor.graph, change), 'touched layers')
+    const scoped = expectDefined(
+      graphsFromDocumentChange(editor.graph, change, layerIds),
+      'scoped graphs'
+    )
+    return {
+      full: diffPageLayersJSX(full.before, full.after, pageId),
+      scoped: diffPageLayersJSX(scoped.before, scoped.after, pageId, layerIds),
+      scopedGraphs: scoped
+    }
+  }
+
+  test('a change deep in a layer touches its page child, and copies only that', () => {
+    const { editor, card, title, other } = setup()
+    const change = record(editor, () => editor.graph.updateNode(title.id, { text: 'Changed' }))
+
+    expect(touchedTopLevelIds(editor.graph, change)).toEqual([card.id])
+    const { full, scoped, scopedGraphs } = diffs(editor, change)
+    expect(scoped).toEqual(full)
+    expect(scopedGraphs.before.getNode(title.id)?.text).toBe('Hello')
+    expect(scopedGraphs.after.getNode(title.id)?.text).toBe('Changed')
+    expect(scopedGraphs.after.getNode(other.id)).toBeUndefined()
+  })
+
+  test('created and deleted layers, nested or on the page, are found on their side', () => {
+    const { editor, pageId, card, badge, other } = setup()
+    let added = ''
+    const change = record(editor, () => {
+      editor.graph.deleteNode(badge.id)
+      added = editor.graph.createNode('ELLIPSE', pageId, { name: 'Added', x: 900 }).id
+      editor.graph.deleteNode(other.id)
+    })
+
+    expect(touchedTopLevelIds(editor.graph, change)?.toSorted()).toEqual(
+      [card.id, added, other.id].toSorted()
+    )
+    const { full, scoped, scopedGraphs } = diffs(editor, change)
+    expect(scoped).toEqual(full)
+    expect(scoped.map((layer) => layer.id)).toEqual([card.id, added, other.id])
+    expect(scopedGraphs.before.getNode(other.id)?.name).toBe('Other')
+    expect(scopedGraphs.before.getNode(badge.id)?.parentId).toBe(card.id)
+  })
+
+  test('a layer moved between page children touches both', () => {
+    const { editor, card, title, other } = setup()
+    const change = record(editor, () => editor.graph.reparentNode(title.id, other.id))
+
+    expect(touchedTopLevelIds(editor.graph, change)?.toSorted()).toEqual(
+      [card.id, other.id].toSorted()
+    )
+    const { full, scoped } = diffs(editor, change)
+    expect(scoped).toEqual(full)
+  })
+
+  test('a connector brings the layers its ends are bound to', () => {
+    const { editor, pageId, card, other } = setup()
+    const connector = createConnector(editor.graph, pageId, {
+      start: boundEndpoint(card.id),
+      end: boundEndpoint(other.id)
+    })
+    const change = record(editor, () => editor.graph.updateNode(connector.id, { opacity: 0.5 }))
+
+    expect(touchedTopLevelIds(editor.graph, change)?.toSorted()).toEqual(
+      [connector.id, card.id, other.id].toSorted()
+    )
+  })
+
+  test('a move to another page, or a change of variables, needs whole pages', () => {
+    const { editor, card } = setup()
+    const second = editor.graph.addPage('Second')
+    const moved = record(editor, () => editor.graph.reparentNode(card.id, second.id))
+    expect(touchedTopLevelIds(editor.graph, moved)).toBeNull()
+
+    const variables = record(editor, () => {
+      const collection = editor.graph.createCollection('Colors')
+      editor.graph.createVariable('Primary', 'COLOR', collection.id)
+    })
+    expect(touchedTopLevelIds(editor.graph, variables)).toBeNull()
+  })
+
+  test('both sides share one copy of variables the change left alone', () => {
+    const { editor, title } = setup()
+    const collection = editor.graph.createCollection('Colors')
+    editor.graph.createVariable('Primary', 'COLOR', collection.id)
+    const change = record(editor, () => editor.graph.updateNode(title.id, { text: 'Changed' }))
+
+    const graphs = expectDefined(graphsFromDocumentChange(editor.graph, change), 'graphs')
+    expect(graphs.before.variables).toBe(graphs.after.variables)
+    expect(graphs.before.variables).not.toBe(editor.graph.variables)
+    expect(graphs.after.variableCollections.get(collection.id)?.name).toBe('Colors')
   })
 })

@@ -15,7 +15,7 @@ export interface PageChecksOptions {
   currentPageId: () => string
   /** Pages a large `.fig` file has not loaded yet; checking them would load them. */
   isPending: (pageId: string) => boolean
-  /** Whether an interactive edit is under way, which background checks wait out. */
+  /** Whether an interactive edit or an agent's reply is under way; background checks wait. */
   isBusy: () => boolean
   check: (pageId: string) => DesignIssue[]
   /** Pauses before checking after an edit, and between pages; tests pass zero. */

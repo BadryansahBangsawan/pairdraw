@@ -11,6 +11,7 @@ import type {
   VectorVertex
 } from '@pairdraw/scene-graph'
 import type { CanvasGuide } from '@pairdraw/scene-graph/guides'
+import type { SceneMutationImpact } from '@pairdraw/scene-graph/mutation-impact'
 import type { Color, Rect, Vector } from '@pairdraw/scene-graph/primitives'
 import type { ShapeWithTextType } from '@pairdraw/scene-graph/shape-with-text'
 import type { SnapGuide } from '@pairdraw/scene-graph/snap'
@@ -319,7 +320,8 @@ export interface EditorContext {
   runMutationWithLayout: <T>(
     operation: () => T | Promise<T>,
     fallbackId?: string,
-    beforeLayout?: (result: T) => Promise<void> | void
+    /** Runs once the operation is done and before layout, with the layers it touched. */
+    beforeLayout?: (result: T, impact: SceneMutationImpact) => Promise<void> | void
   ) => Promise<T>
   subscribeToGraph: () => void
 }

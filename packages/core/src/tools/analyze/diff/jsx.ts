@@ -35,16 +35,21 @@ function layerJSX(graph: SceneGraph, id: string): string {
 /**
  * Top-level layers of a page whose JSX differs between two states of a document, in their
  * order afterwards, then removed ones. Both graphs must share node IDs, as a snapshot does.
+ * `layerIds` limits the comparison to those top-level layers, such as the ones an edit touched.
  */
 export function diffPageLayersJSX(
   before: SceneGraph,
   after: SceneGraph,
-  pageId: string
+  pageId: string,
+  layerIds?: readonly string[]
 ): LayerJSXChange[] {
-  const ids = new Set([
-    ...(after.getNode(pageId)?.childIds ?? []),
-    ...(before.getNode(pageId)?.childIds ?? [])
-  ])
+  const only = layerIds ? new Set(layerIds) : null
+  const ids = new Set(
+    [
+      ...(after.getNode(pageId)?.childIds ?? []),
+      ...(before.getNode(pageId)?.childIds ?? [])
+    ].filter((id) => !only || only.has(id))
+  )
   return [...ids].flatMap((id) => {
     const from = layerJSX(before, id)
     const to = layerJSX(after, id)

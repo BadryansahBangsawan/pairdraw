@@ -13,6 +13,7 @@ import { createMobileClipboardActions } from '@/app/editor/mobile-clipboard'
 import { createPenActions } from '@/app/editor/pen'
 import type { EditorPreparationController } from '@/app/editor/preparation/controller'
 import { createProfilerActions } from '@/app/editor/profiler'
+import { createDisposeListeners } from '@/app/editor/session/dispose'
 import type { AppEditorState } from '@/app/editor/session/types'
 import { createShaderClock } from '@/app/editor/shader-clock/create'
 import { createVectorEditActions } from '@/app/editor/vector'
@@ -69,6 +70,7 @@ export function createEditorStoreModules(
   const profiler = createProfilerActions(editor)
   const designCheck = createDesignCheck(editor, state)
   const shaderClock = createShaderClock(editor)
+  const { onDispose, notifyDispose } = createDisposeListeners()
 
   return {
     ...flash,
@@ -120,9 +122,11 @@ export function createEditorStoreModules(
     saveFigFileToStorage: documentIO.saveFigFileToStorage,
     startWatchingCurrentFile: documentIO.startWatchingCurrentFile,
     designCheck,
+    onDispose,
     dispose: () => {
       disposeFlashes()
       shaderClock.dispose()
+      notifyDispose()
       designCheck.dispose()
       editor.releaseGraphResources()
       editor.dispose()

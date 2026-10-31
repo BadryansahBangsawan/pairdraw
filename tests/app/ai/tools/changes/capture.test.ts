@@ -10,6 +10,8 @@ import { snapshotMessages, restoreMessages } from '@/app/ai/chat/history/message
 import { changePreviewSize } from '@/app/ai/chat/preferences'
 import { createAITools, startRun } from '@/app/ai/tools'
 import { clipChangedJSX } from '@/app/ai/tools/changes/capture'
+import * as images from '@/app/ai/tools/changes/images'
+import { changePreviewsDrained } from '@/app/ai/tools/changes/previews'
 import { clearToolChanges, readToolChange } from '@/app/ai/tools/changes/store'
 import * as figmaFactory from '@/app/automation/bridge/figma-factory'
 import { createEditorStore } from '@/app/editor/session/create'
@@ -98,6 +100,33 @@ test('keeps an undo step per structural call and records removed layers', async 
   expect(change?.jsx.after).toBe('')
   store.undo.undo()
   expect(store.graph.getNode(card.id)?.name).toBe('Card')
+})
+
+test('a preview copies the changed layer and the layers drawn over or under it', async () => {
+  changePreviewSize.value = 'small'
+  const pageId = store.state.currentPageId
+  const backdrop = store.graph.createNode('RECTANGLE', pageId, { name: 'Backdrop', width: 400 })
+  const card = store.graph.createNode('FRAME', pageId, { name: 'Card', x: 20, y: 20, width: 100 })
+  const far = store.graph.createNode('FRAME', pageId, { name: 'Far', x: 2000, width: 100 })
+  const regions: images.ChangeRegion[] = []
+  const render = spyOn(images, 'renderToolChangeImages').mockImplementation(async (_, region) => {
+    regions.push(region)
+    return null
+  })
+  try {
+    await execute('set_fill', { id: card.id, color: '#ff0000' }, 'preview-call')
+    await changePreviewsDrained(store)
+  } finally {
+    render.mockRestore()
+  }
+
+  const [region] = regions
+  expect(regions).toHaveLength(1)
+  expect(region?.beforeGraph.getNode(card.id)?.fills).toEqual([])
+  expect(region?.afterGraph.getNode(card.id)?.fills).toHaveLength(1)
+  expect(region?.beforeGraph.getNode(backdrop.id)?.name).toBe('Backdrop')
+  expect(region?.afterGraph.getNode(backdrop.id)?.name).toBe('Backdrop')
+  expect(region?.afterGraph.getNode(far.id)).toBeUndefined()
 })
 
 test('diff_changes compares the run page with its state before the run first edited it', async () => {

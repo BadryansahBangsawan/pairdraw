@@ -1,4 +1,4 @@
-import { isEqual } from 'es-toolkit'
+import { compact, isEqual, uniq, xor } from 'es-toolkit'
 
 import type {
   FigmaSourcePayload,
@@ -312,6 +312,122 @@ export function captureDocumentChange(graph: SceneGraph, pageId: string): () => 
     change.children.before.sort(byDepth(captured))
     return change
   }
+}
+
+/** Where a layer sits: its page and the page's child holding it, null for a page or the root. */
+interface Placement {
+  pageId: string | null
+  layerId: string | null
+}
+
+/** `undefined` when the layer's parents cannot be followed to a page or the root. */
+function placement(nodes: Lookup, id: string): Placement | undefined {
+  let child: SceneNode | null = null
+  for (const node of lineage(nodes, id)) {
+    if (node.type === 'CANVAS') return { pageId: node.id, layerId: child?.id ?? null }
+    if (!node.parentId) return { pageId: null, layerId: null }
+    child = node
+  }
+  return undefined
+}
+
+/**
+ * Layers as they were before the edit, read from the live graph: removed ones from their copies,
+ * and moved ones under the parent whose old child list held them.
+ */
+function layersBefore(graph: SceneGraph, change: DocumentChange): Lookup {
+  const created = new Set(change.created.map((node) => node.id))
+  const deleted = new Map(change.deleted.map((node) => [node.id, node]))
+  const parents = new Map<string, string>()
+  for (const { id, childIds } of change.children.before) {
+    for (const childId of childIds) parents.set(childId, id)
+  }
+  return {
+    size: graph.nodes.size + deleted.size,
+    get(id) {
+      if (created.has(id)) return undefined
+      const node = deleted.get(id) ?? graph.getNode(id)
+      const parentId = parents.get(id)
+      return node && parentId !== undefined && parentId !== node.parentId
+        ? { ...node, parentId }
+        : node
+    }
+  }
+}
+
+/** Layers the edit created, removed, changed, or moved, and the parents whose children changed. */
+function touchedLayerIds(change: DocumentChange): string[] {
+  const lists = (side: Side) =>
+    new Map(change.children[side].map(({ id, childIds }) => [id, childIds]))
+  const before = lists('before')
+  const after = lists('after')
+  // A reorder changes only its parent; a move also touches the layers that came or went.
+  const moved = uniq([...before.keys(), ...after.keys()]).flatMap((id) => [
+    id,
+    ...xor(before.get(id) ?? [], after.get(id) ?? [])
+  ])
+  return uniq([
+    ...change.created.map((node) => node.id),
+    ...change.deleted.map((node) => node.id),
+    ...change.updated.map((update) => update.id),
+    ...moved
+  ])
+}
+
+/** The ends of the connectors in the graph or removed by the edit, on either side of it. */
+function connectorEnds(graph: SceneGraph, change: DocumentChange): Map<string, string[]> {
+  const ends = new Map<string, string[]>()
+  const add = (id: string, nodes: Partial<SceneNode>[]) => {
+    const nodeIds = nodes.flatMap((node) => [
+      node.connectorStart?.nodeId,
+      node.connectorEnd?.nodeId
+    ])
+    ends.set(id, uniq([...(ends.get(id) ?? []), ...compact(nodeIds)]))
+  }
+  for (const id of graph.connectorIds) add(id, compact([graph.getNode(id)]))
+  for (const node of change.deleted) if (node.type === 'CONNECTOR') add(node.id, [node])
+  for (const update of change.updated) {
+    if (update.fields && ends.has(update.id)) add(update.id, [update.fields.before])
+  }
+  return ends
+}
+
+/**
+ * The page children holding what an edit touched, on either side of it, for diffing and drawing
+ * just those instead of whole pages (`graphsFromDocumentChange`). A layer whose connector draws
+ * to a layer elsewhere brings that layer too, as JSX writes the end by it. `null` when part of
+ * the page cannot be told apart this way: the edit changed variables, which any layer may show,
+ * moved a layer to another page, or left a layer whose parents cannot be followed.
+ */
+export function touchedTopLevelIds(graph: SceneGraph, change: DocumentChange): string[] | null {
+  if (change.variables.length > 0 || change.collections.length > 0) return null
+  const before = layersBefore(graph, change)
+  const sides = [before, graph.nodes]
+  const holders = (id: string): (string | null)[] | null => {
+    const placements = sides.map((nodes) => (nodes.get(id) ? placement(nodes, id) : null))
+    if (placements.includes(undefined)) return null
+    const [was, is] = placements
+    if (was?.pageId && is?.pageId && was.pageId !== is.pageId) return null
+    return placements.map((place) => place?.layerId ?? null)
+  }
+  const layers = new Set<string>()
+  for (const id of touchedLayerIds(change)) {
+    const held = holders(id)
+    if (!held) return null
+    for (const layerId of compact(held)) layers.add(layerId)
+  }
+  const ends = connectorEnds(graph, change)
+  for (let grew = true; grew;) {
+    grew = false
+    for (const [connectorId, endIds] of ends) {
+      if (!holders(connectorId)?.some((layerId) => layerId && layers.has(layerId))) continue
+      for (const layerId of compact(endIds.flatMap((id) => holders(id) ?? []))) {
+        grew ||= !layers.has(layerId)
+        layers.add(layerId)
+      }
+    }
+  }
+  return [...layers]
 }
 
 export function isEmptyDocumentChange(change: DocumentChange): boolean {

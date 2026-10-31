@@ -1,5 +1,3 @@
-import { promiseTimeout } from '@vueuse/core'
-
 import {
   comparePNGs,
   computeContentBounds,
@@ -7,7 +5,11 @@ import {
   renderRegionToImage
 } from '@pairdraw/core/io/formats/raster'
 import type { SceneGraph } from '@pairdraw/scene-graph'
-import type { VisualBounds } from '@pairdraw/scene-graph/geometry'
+import {
+  intersectVisualBounds,
+  nodeVisualBounds,
+  type VisualBounds
+} from '@pairdraw/scene-graph/geometry'
 
 import { boundedImageScale } from '@/app/ai/tools/vision/inspect'
 import type { EditorStore } from '@/app/editor/active-store'
@@ -25,11 +27,12 @@ const CHANGE_PREVIEW_MAX_EDGE: Record<Exclude<ChangePreviewSize, 'off'>, number>
 /** Context kept around the changed layers, in document units. */
 const REGION_MARGIN = 16
 
-interface ChangeRegion {
+/** What a change preview draws: one region of a page, in frozen copies of both states. */
+export interface ChangeRegion {
   beforeGraph: SceneGraph
   afterGraph: SceneGraph
   pageId: string
-  nodeIds: string[]
+  bounds: VisualBounds
   size: Exclude<ChangePreviewSize, 'off'>
 }
 
@@ -38,8 +41,15 @@ function regionOf(graph: SceneGraph, nodeIds: string[]): VisualBounds | null {
   return present.length > 0 ? computeContentBounds(graph, present) : null
 }
 
-function unionRegion(regions: (VisualBounds | null)[]): VisualBounds | null {
-  const known = regions.filter((region) => region !== null)
+/** The region around the changed layers in either state, with some context around it. */
+export function changeBounds(
+  beforeGraph: SceneGraph,
+  afterGraph: SceneGraph,
+  nodeIds: string[]
+): VisualBounds | null {
+  const known = [regionOf(beforeGraph, nodeIds), regionOf(afterGraph, nodeIds)].filter(
+    (region) => region !== null
+  )
   if (known.length === 0) return null
   return {
     minX: Math.min(...known.map((region) => region.minX)) - REGION_MARGIN,
@@ -49,24 +59,49 @@ function unionRegion(regions: (VisualBounds | null)[]): VisualBounds | null {
   }
 }
 
+/** Whether anything of the layer may be drawn inside `bounds`. */
+function mayDrawIn(graph: SceneGraph, id: string, bounds: VisualBounds): boolean {
+  const node = graph.getNode(id)
+  if (!node?.visible) return false
+  // A layer that clips its content draws nothing outside its own bounds, so its sublayers,
+  // often most of the page, need no measuring.
+  const clips =
+    node.clipsContent &&
+    (node.type === 'FRAME' || node.type === 'COMPONENT' || node.type === 'INSTANCE')
+  const drawn = clips
+    ? nodeVisualBounds(node, (nodeId) => graph.getAbsolutePosition(nodeId))
+    : computeContentBounds(graph, [id])
+  return drawn !== null && intersectVisualBounds(drawn, bounds) !== null
+}
+
+/**
+ * The page's top-level layers, other than `except`, that may draw into `bounds`, so a preview
+ * built from only the changed layers still shows what lies over or under them.
+ */
+export function layersInBounds(
+  graph: SceneGraph,
+  pageId: string,
+  bounds: VisualBounds,
+  except: ReadonlySet<string>
+): string[] {
+  const childIds = graph.getNode(pageId)?.childIds ?? []
+  return childIds.filter((id) => !except.has(id) && mayDrawIn(graph, id, bounds))
+}
+
 function pngBlob(bytes: Uint8Array | null): Blob | null {
   return bytes ? new Blob([new Uint8Array(bytes)], { type: 'image/png' }) : null
 }
 
 /**
  * Renders the changed region in both states at the same bounds and scale, and highlights the
- * pixels that differ. Runs after the tool returns so the model never waits for it.
+ * pixels that differ. The preview queue runs it between tool calls, so the model never waits.
  */
 export async function renderToolChangeImages(
   store: EditorStore,
-  { beforeGraph, afterGraph, pageId, nodeIds, size }: ChangeRegion
+  { beforeGraph, afterGraph, pageId, bounds, size }: ChangeRegion
 ): Promise<ToolChangeImages | null> {
-  // Let the tool result reach the model before rendering.
-  await promiseTimeout(0)
   const renderer = store.renderer
   if (!renderer) return null
-  const bounds = unionRegion([regionOf(beforeGraph, nodeIds), regionOf(afterGraph, nodeIds)])
-  if (!bounds) return null
   const scale = boundedImageScale(
     bounds.maxX - bounds.minX,
     bounds.maxY - bounds.minY,

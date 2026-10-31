@@ -80,6 +80,11 @@ export class Run {
   settled(): Promise<void> {
     return this.whenSettled
   }
+
+  /** Whether a tool of this run is editing now. */
+  get editing(): boolean {
+    return this.toolsInFlight > 0
+  }
 }
 
 class RunState {
@@ -104,6 +109,7 @@ export function startRun(store: EditorStore, maxSteps: number, model?: string): 
   const state = getRunState(store)
   const pageId = store.state.currentPageId
   state.run = new Run(maxSteps, pageId)
+  store.designCheck.holdForAgent(true)
   state.agent ??= addAgent(store, 'chat', model)
   state.agent.update({ status: 'thinking', model, pageId })
   return state.run
@@ -119,6 +125,7 @@ const agentChats = new Map<string, EditorStore>()
 export function startAgentRun(store: EditorStore, chat: string): Run {
   const state = getRunState(store)
   state.run = new Run(DEFAULT_AGENT_STEPS, store.state.currentPageId, false)
+  store.designCheck.holdForAgent(true)
   agentChats.set(chat, store)
   return state.run
 }
@@ -146,7 +153,10 @@ export function endRun(store: EditorStore, run = currentRun(store)): void {
   const state = getRunState(store)
   if (!run.active) return
   run.active = false
-  if (state.run !== run || !run.presence) return
+  if (state.run !== run) return
+  // The design check held off while the latest reply edited, and checks its result now.
+  store.designCheck.holdForAgent(false)
+  if (!run.presence) return
   state.agent?.update({
     status: 'idle',
     cursor: undefined,

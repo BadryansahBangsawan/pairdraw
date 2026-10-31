@@ -224,3 +224,25 @@ describe('a view that shows issues', () => {
     expect(store.designCheck.enabled.value).toBe(false)
   })
 })
+
+describe("an agent's reply", () => {
+  test('is checked once, after it ends, rather than edit by edit', async () => {
+    jest.useFakeTimers()
+    const { store, first, firstText, checkedPages } = await twoPagesWithIssues()
+    checkedPages.length = 0
+
+    store.designCheck.holdForAgent(true)
+    store.updateNode(firstText.id, { fontSize: 16 })
+    await settleCheck()
+    store.updateNode(firstText.id, { fontSize: 6 })
+    await settleCheck()
+    expect(checkedPages).toEqual([])
+
+    store.designCheck.holdForAgent(false)
+    await settleCheck()
+    expect(checkedPages).toEqual([first.id])
+    expect(store.designCheck.snapshot.value?.issues.map((issue) => issue.nodeId)).toContain(
+      firstText.id
+    )
+  })
+})

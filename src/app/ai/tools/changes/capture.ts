@@ -1,16 +1,25 @@
 import { diffLines, type ChangeObject } from 'diff'
 import { compact, uniq } from 'es-toolkit/array'
 
-import { graphFromDocumentChange, isEmptyDocumentChange, type DocumentChange } from '@pairdraw/core'
+import {
+  graphsFromDocumentChange,
+  isEmptyDocumentChange,
+  touchedTopLevelIds,
+  type DocumentChange
+} from '@pairdraw/core'
 import { diffPageLayersJSX } from '@pairdraw/core/tools'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { changePreviewSize } from '@/app/ai/chat/preferences'
 import type { EditorStore } from '@/app/editor/active-store'
+import type { ChangePreviewSize } from '@/app/settings/preferences/store'
 
-import { renderToolChangeImages } from './images'
+import { changeBounds, layersInBounds } from './images'
+import { queueChangePreview } from './previews'
 import { setToolChange } from './store'
 import type { ToolChange } from './types'
+
+type ChangeGraphs = NonNullable<ReturnType<typeof graphsFromDocumentChange>>
 
 /** Longer sources keep only the changed region, so the history stays small. */
 const MAX_JSX_LENGTH = 40_000
@@ -48,19 +57,57 @@ export function clipChangedJSX(before: string, after: string): [string, string] 
 }
 
 /** The first page, the call's own one first, whose layers the change added, removed, or changed. */
-function changedPage(before: SceneGraph, after: SceneGraph, change: DocumentChange) {
+function changedPage(
+  before: SceneGraph,
+  after: SceneGraph,
+  change: DocumentChange,
+  layerIds: readonly string[] | undefined
+) {
   for (const pageId of uniq([change.pageId, ...change.pageIds])) {
-    const layers = diffPageLayersJSX(before, after, pageId)
+    const layers = diffPageLayersJSX(before, after, pageId, layerIds)
     if (layers.length > 0) return { pageId, layers }
   }
   return null
 }
 
 /**
+ * Queues the change's preview images, drawn from copies holding the changed layers and whatever
+ * other layers draw into their region, so the images match the whole page's.
+ */
+function queuePreview(
+  store: EditorStore,
+  change: ToolChange,
+  documentChange: DocumentChange,
+  scope: { graphs: ChangeGraphs; layerIds: readonly string[] | undefined },
+  size: Exclude<ChangePreviewSize, 'off'>
+): void {
+  let { graphs } = scope
+  const bounds = changeBounds(graphs.before, graphs.after, change.nodeIds)
+  if (!bounds) return
+  if (scope.layerIds) {
+    const shown = new Set(scope.layerIds)
+    const nearby = layersInBounds(store.graph, change.pageId, bounds, shown)
+    if (nearby.length > 0) {
+      const wider = graphsFromDocumentChange(store.graph, documentChange, [...shown, ...nearby])
+      if (wider) graphs = wider
+    }
+  }
+  queueChangePreview(store, change, {
+    beforeGraph: graphs.before,
+    afterGraph: graphs.after,
+    pageId: change.pageId,
+    bounds,
+    size
+  })
+}
+
+/**
  * Records what a finished call changed, called right after it while the document is as the call
  * left it. The review shows one page: the one the call ran on when its layers changed, otherwise
- * the first other page whose layers did. The structural diff is immediate; images render
- * afterwards from frozen copies of both states, so later edits cannot leak into them.
+ * the first other page whose layers did. Only the top-level layers the call touched are copied
+ * and compared, unless that cannot be told; the structural diff is immediate, and images render
+ * later, between the reply's calls, from frozen copies of both states, so later edits cannot
+ * leak into them.
  */
 export function recordToolChange(
   store: EditorStore,
@@ -68,11 +115,11 @@ export function recordToolChange(
   documentChange: DocumentChange
 ): ToolChange | null {
   if (isEmptyDocumentChange(documentChange)) return null
-  const beforeGraph = graphFromDocumentChange(store.graph, documentChange, 'before')
-  const afterGraph = graphFromDocumentChange(store.graph, documentChange, 'after')
-  if (!beforeGraph || !afterGraph) return null
+  const layerIds = touchedTopLevelIds(store.graph, documentChange) ?? undefined
+  const graphs = graphsFromDocumentChange(store.graph, documentChange, layerIds)
+  if (!graphs) return null
   // The same JSX diff `diff_jsx` returns decides which layers changed.
-  const shown = changedPage(beforeGraph, afterGraph, documentChange)
+  const shown = changedPage(graphs.before, graphs.after, documentChange, layerIds)
   if (!shown) return null
   const { pageId, layers } = shown
   const nodeIds = layers.map((layer) => layer.id)
@@ -88,17 +135,6 @@ export function recordToolChange(
   }
   setToolChange(change)
   const size = changePreviewSize.value
-  if (size !== 'off') {
-    void (async () => {
-      const images = await renderToolChangeImages(store, {
-        beforeGraph,
-        afterGraph,
-        pageId,
-        nodeIds,
-        size
-      })
-      if (images) setToolChange({ ...change, images })
-    })().catch((error: unknown) => console.warn('Could not render AI change previews', error))
-  }
+  if (size !== 'off') queuePreview(store, change, documentChange, { graphs, layerIds }, size)
   return change
 }

@@ -94,10 +94,13 @@ const PATCHABLE_NODE_KEYS = new Set<keyof SceneNode>([
 function patchTreeNode(id: string, changes: Partial<SceneNode>) {
   // A layout mode turns a layer's rows between front-most first and flow order.
   const reordersRows = 'layoutMode' in changes && !!nodesById.get(id)?.children?.length
+  // Coalesced with creates and deletes, so an edit that moves many layers rebuilds once.
   if ('childIds' in changes || 'parentId' in changes || reordersRows) {
-    rebuildTree()
+    scheduleTreeRebuild()
     return
   }
+  // The rebuild reads every row again.
+  if (rebuildPending) return
   if (!(Object.keys(changes) as (keyof SceneNode)[]).some((key) => PATCHABLE_NODE_KEYS.has(key))) {
     return
   }

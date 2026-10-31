@@ -66,13 +66,14 @@ Every call of a Pairdraw tool, from the chat, a coding agent through MCP, or Web
 
 - Calls that change a document take its lock in turn, since whole-page snapshots must not interleave. A reply's call that gets the lock after the reply ended changes nothing and returns an error.
 - The document change is captured and pushed as one undo step; a call that throws part way, such as a failing `eval`, is put back whole from that capture and pushes none (`rollbackOnThrow` in `editor/history/edit.ts`), unless something else wrote to the document meanwhile: a recorded step, another open edit or batch, text editing, or a room's change (`noteOutsideWrite` in `document/io/outside-writes.ts`). Then the call keeps its step, so the other writes are not reverted. The automation bridge's `eval` takes the same lock (`acquireDocumentEdit`). A reply's call labels it `aiUndoLabel(tool)` and records it on the call's own run, the one it started in, even if a later reply has begun; another client's call is labelled by its source, such as `Agent` or `WebMCP`.
-- The change is recorded for the chat's change review, and the agent points at it.
+- The change is recorded for the chat's change review, and the agent points at it. `recordToolChange` (`tools/changes/capture.ts`) copies only the page children the change touched (`touchedTopLevelIds`), on both sides, and diffs their JSX; a change to variables or a move to another page copies whole pages instead. Fonts load for the layers the call touched, not the whole page.
+- Preview images of the change render later, from those frozen copies plus the layers drawn over or under the changed region, through a queue per document (`tools/changes/previews.ts`): one at a time, only while none of the reply's calls is editing and after a short pause, yielding between previews. Closing the document drops the queue.
 - A call's result reaches the model as JSON. `eval` converts what a script returns, as MCP and the CLI print it.
 - If you undid or redid the run's own edits since the model last heard, the result carries an `undoNote` saying so.
 
 ## A reply ends
 
-A run ends once, in one of three ways: finished (`onFinish`), failed (`handleError`), or stopped (the request's abort signal). The agent goes idle and its cursor leaves the canvas. A tool already running keeps going: its edit lands in its run, but cannot move the agent again.
+A run ends once, in one of three ways: finished (`onFinish`), failed (`handleError`), or stopped (the request's abort signal). The agent goes idle and its cursor leaves the canvas, and the design check, held off while the reply edited, checks the page once. A tool already running keeps going: its edit lands in its run, but cannot move the agent again.
 
 When the chat's own `onFinish` reports a reply that was stopped, failed, or cut off, `settleEndedReply` waits for the run's last edit, then settles the message (`reply/settle.ts`):
 
@@ -102,7 +103,7 @@ Edit → Undo and the chat's **Revert changes** therefore end in the same state:
 
 ## Saved conversations
 
-A reply's metadata (`chat/metadata.ts`) keeps whether you stopped it, and its edits with those undone and what the model was last told. Conversations save messages with `structuredClone`, so metadata is written from the plain message, never from the chat's reactive copy. Reopening a conversation settles any reply saved mid-way. The undo history does not survive closing a document, so a reopened reply keeps its marks but offers no Revert or Restore.
+A reply's metadata (`chat/metadata.ts`) keeps whether you stopped it, and its edits with those undone and what the model was last told. Conversations save messages with `structuredClone`, so metadata is written from the plain message, never from the chat's reactive copy. A save copies only messages and changes replaced since the last one, and the reply still streaming (`chat/history/messages.ts`); while a reply runs, the conversation is saved at most every five seconds and once as it ends (`chat/history/session.ts`). Reopening a conversation settles any reply saved mid-way. The undo history does not survive closing a document, so a reopened reply keeps its marks but offers no Revert or Restore.
 
 ## Traces
 

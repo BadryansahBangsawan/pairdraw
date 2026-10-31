@@ -1,9 +1,18 @@
-import { watchThrottled } from '@vueuse/core'
+import { useThrottleFn } from '@vueuse/core'
 import { watch } from 'vue'
 
 import { toolChangesVersion } from '@/app/ai/tools/changes/store'
 
 import type { HistoryChat } from './types'
+
+/** How often a changed conversation is saved while no reply runs. */
+const IDLE_SAVE_INTERVAL_MS = 500
+/** How often a reply in progress is saved; it is saved once more as it ends. */
+const REPLY_SAVE_INTERVAL_MS = 5_000
+
+function replying(chat: HistoryChat): boolean {
+  return chat.status === 'submitted' || chat.status === 'streaming'
+}
 
 /** Owns live subscriptions; a failed final save deliberately leaves the session attached. */
 export function createHistorySession(reset: () => Promise<void>) {
@@ -20,11 +29,15 @@ export function createHistorySession(reset: () => Promise<void>) {
     function save() {
       if (live === next && generation === activeGeneration) void flush().catch(() => undefined)
     }
-    const stopMessages = watchThrottled(() => next.messages, save, {
-      deep: true,
-      throttle: 500,
-      trailing: true
-    })
+    const saveSoon = useThrottleFn(
+      save,
+      () => (replying(next) ? REPLY_SAVE_INTERVAL_MS : IDLE_SAVE_INTERVAL_MS),
+      true,
+      true
+    )
+    // The chat replaces a message, or the list, whenever one changes, so comparing which
+    // messages the list holds finds every change without walking their parts.
+    const stopMessages = watch(() => [...next.messages], saveSoon)
     const stopStatus = watch(
       () => next.status,
       () => {
@@ -32,8 +45,8 @@ export function createHistorySession(reset: () => Promise<void>) {
         save()
       }
     )
-    // Change previews render after their message settles; save them when they arrive.
-    const stopChanges = watchThrottled(toolChangesVersion, save, { throttle: 500, trailing: true })
+    // Change previews render after their call; save them when they arrive.
+    const stopChanges = watch(toolChangesVersion, saveSoon)
     stopWatch = () => {
       stopMessages()
       stopStatus()

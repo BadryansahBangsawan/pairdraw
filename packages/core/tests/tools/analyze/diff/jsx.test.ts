@@ -30,3 +30,27 @@ test('reports top-level layers changed deep in their subtree, added, or removed'
   expect(removed?.after).toBe('')
   expect(diffPageLayersJSX(editor.graph, editor.graph, pageId)).toEqual([])
 })
+
+test('compares only the top-level layers it is given', () => {
+  const editor = createEditor()
+  const pageId = editor.state.currentPageId
+  const card = editor.graph.createNode('FRAME', pageId, { name: 'Card', width: 120, height: 80 })
+  const label = editor.graph.createNode('TEXT', card.id, { name: 'Label', text: 'Hello' })
+  const other = editor.graph.createNode('RECTANGLE', pageId, { name: 'Other', x: 300 })
+  const before = expectDefined(
+    graphFromPageSnapshot(editor.graph, editor.snapshotPage(pageId)),
+    'before'
+  )
+
+  editor.graph.updateNode(label.id, { text: 'Hi' })
+  editor.graph.deleteNode(other.id)
+
+  const all = diffPageLayersJSX(before, editor.graph, pageId)
+  expect(diffPageLayersJSX(before, editor.graph, pageId, [card.id])).toEqual(
+    all.filter((change) => change.id === card.id)
+  )
+  expect(diffPageLayersJSX(before, editor.graph, pageId, [other.id]).map(({ id }) => id)).toEqual([
+    other.id
+  ])
+  expect(diffPageLayersJSX(before, editor.graph, pageId, [])).toEqual([])
+})

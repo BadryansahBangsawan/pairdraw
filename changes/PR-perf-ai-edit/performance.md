@@ -1,0 +1,1 @@
+- An AI agent editing a large page stalls the editor far less after each change: the change review copies and compares only the layers the call touched, its preview images render one at a time between the agent's calls, the chat saves at most every five seconds while the agent works, and the design check runs once the reply ends.

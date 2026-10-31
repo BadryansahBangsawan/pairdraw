@@ -36,10 +36,18 @@ export {
 export { createDefaultEditorState, createEditor } from './create'
 export { syncEditedComponents } from './component-sync'
 export { executeAtomicTool } from './history/atomic-tool'
-export { isEmptyDocumentChange, type DocumentChange } from './history/document-change'
+export {
+  isEmptyDocumentChange,
+  touchedTopLevelIds,
+  type DocumentChange
+} from './history/document-change'
 export type { RecordEditOptions } from './history/edit'
 export type { PageSnapshot } from './history/snapshot/page'
-export { graphFromDocumentChange, graphFromPageSnapshot } from './history/snapshot/graph'
+export {
+  graphFromDocumentChange,
+  graphFromPageSnapshot,
+  graphsFromDocumentChange
+} from './history/snapshot/graph'
 export type { ClipboardPayload, ClipboardSnapshot, CopyOptions } from './clipboard/copy'
 export {
   clipboardImportHasConflicts,

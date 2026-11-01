@@ -1,4 +1,10 @@
-import { WEB_APP_URL } from '#mcp/transport/origins'
+import { randomBytes } from 'node:crypto'
+import { rm, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+
+import { uniq } from 'es-toolkit'
+
+import { resolveCORSOrigins, WEB_APP_URL } from '#mcp/transport/origins'
 
 /** Hosts a development server may run the app on with plain HTTP. */
 function isLocalHost(hostname: string): boolean {
@@ -37,4 +43,36 @@ export function connectLink(appURL: URL, code: string, port: number, defaultPort
   if (port !== defaultPort) params.set('port', String(port))
   link.hash = params.toString()
   return link.toString()
+}
+
+/**
+ * The origins the companion lets call it: the configured ones and the app it pairs with. `*`
+ * would let any site drive the agent bridge, so it is dropped here, whatever was configured.
+ */
+export function connectCORSOrigins(raw: string | undefined, appURL: URL): string[] {
+  const configured = resolveCORSOrigins(raw).filter((origin) => origin !== '*')
+  return uniq([...configured, appURL.origin])
+}
+
+function escapeAttribute(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')
+}
+
+/**
+ * Writes a page that forwards to the link, readable only by this user, so the browser is opened
+ * with the page's path rather than the link: a command line, which other users of the computer
+ * can list, then never holds the pairing code. Returns the path and a function that deletes it.
+ */
+export async function writeConnectPage(
+  dir: string,
+  link: string
+): Promise<{ path: string; remove: () => Promise<void> }> {
+  const path = join(dir, `connect-${randomBytes(8).toString('hex')}.html`)
+  const href = escapeAttribute(link)
+  const html =
+    `<!doctype html><meta charset="utf-8"><meta name="referrer" content="no-referrer">` +
+    `<meta http-equiv="refresh" content="0;url=${href}"><title>OpenPencil</title>` +
+    `<a href="${href}">Open OpenPencil</a>\n`
+  await writeFile(path, html, { mode: 0o600, flag: 'wx' })
+  return { path, remove: () => rm(path, { force: true }) }
 }

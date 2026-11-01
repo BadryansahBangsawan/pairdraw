@@ -143,6 +143,14 @@ export async function getDiscoveryPath(): Promise<string> {
   return join(dir, DISCOVERY_FILENAME)
 }
 
+/** The private folder (0700) the companion keeps its pairing pages in, beside the discovery file. */
+export async function getCompanionDir(): Promise<string> {
+  const dir = join(await getPlatformDir(), 'connect')
+  await mkdir(dir, { recursive: true, mode: 0o700 })
+  if (!isWindows) await chmod(dir, 0o700)
+  return dir
+}
+
 /**
  * The folder coding agents start in when the companion runs them, beside the discovery file and
  * outside the person's projects, whose settings an agent would otherwise read.

@@ -2,11 +2,17 @@
 import { spawn } from 'node:child_process'
 import { platform } from 'node:os'
 
-import { connectLink, resolveConnectAppURL } from '#mcp/agents/link'
+import {
+  connectCORSOrigins,
+  connectLink,
+  resolveConnectAppURL,
+  writeConnectPage
+} from '#mcp/agents/link'
+import { pairingFingerprint } from '#mcp/agents/pairing'
 import { resolveMCPRoot } from '#mcp/root'
 import { MCP_VERSION, startServer } from '#mcp/server'
 import { readToolPolicyFromEnv } from '#mcp/tool/policy'
-import { resolveCORSOrigins } from '#mcp/transport/origins'
+import { getCompanionDir } from '#mcp/transport/paths'
 
 const DEFAULT_PORT = 7600
 
@@ -73,8 +79,13 @@ try {
     mcpRoot: resolveMCPRoot(process.env.OPENPENCIL_MCP_ROOT),
     // Auth always stays on: a paired tab and local MCP clients each bring their own token.
     authToken: explicitToken || undefined,
-    corsOrigin: [...resolveCORSOrigins(process.env.OPENPENCIL_MCP_CORS_ORIGIN), appURL.origin],
-    agents: {}
+    corsOrigin: connectCORSOrigins(process.env.OPENPENCIL_MCP_CORS_ORIGIN, appURL),
+    agents: {
+      onPaired: () =>
+        process.stdout.write(
+          'A browser tab connected. If you did not open the link, press Ctrl+C to stop.\n'
+        )
+    }
   })
 } catch (error) {
   const code = error instanceof Error && 'code' in error ? error.code : null
@@ -90,7 +101,7 @@ try {
 const issueCode = handle.issuePairingCode
 if (!issueCode) fail('The agent bridge did not start.')
 
-/** Opens the link in the default browser, without a shell. */
+/** Opens a file or link in the default browser, without a shell. */
 function openBrowser(url: string): void {
   const os = platform()
   let command = 'xdg-open'
@@ -110,15 +121,33 @@ function openBrowser(url: string): void {
 }
 
 const shouldOpen = !process.argv.includes('--no-open')
+/** How long the page that forwards to a link stays on disk; the browser reads it at once. */
+const PAGE_LIFETIME_MS = 30_000
+
+/**
+ * Opens the link through a private page, so no command line holds the code, and deletes the
+ * page soon after.
+ */
+async function openLink(link: string): Promise<void> {
+  try {
+    const page = await writeConnectPage(await getCompanionDir(), link)
+    openBrowser(page.path)
+    setTimeout(() => void page.remove(), PAGE_LIFETIME_MS).unref()
+  } catch {
+    process.stdout.write('Could not open the browser; open the link above yourself.\n')
+  }
+}
 
 function announceLink(open: boolean) {
-  const link = connectLink(appURL, issueCode(), handle.httpPort, DEFAULT_PORT)
+  const code = issueCode()
+  const link = connectLink(appURL, code, handle.httpPort, DEFAULT_PORT)
   process.stdout.write(
     `\nOpen this link to connect OpenPencil to this computer (works once, for 2 minutes):\n` +
-      `  ${link}\n\n` +
+      `  ${link}\n` +
+      `The tab asks you to confirm; check that it shows ${pairingFingerprint(code)}.\n\n` +
       `Press Enter for a new link. Press Ctrl+C to stop.\n`
   )
-  if (open) openBrowser(link)
+  if (open) void openLink(link)
 }
 
 process.stdout.write(`OpenPencil companion ${MCP_VERSION}\n`)

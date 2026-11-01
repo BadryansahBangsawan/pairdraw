@@ -140,8 +140,10 @@ export interface ServerHandle {
 /** Set up Hono routes: /health, /rpc, /files, /mcp */
 function createHonoApp(options: {
   authToken: string | null
-  /** Whether a token reaches the app's routes: the server's own, or a paired tab's. */
+  /** Whether a token reaches the app's bridge, `/rpc`, and `/files`: the server's own, or a paired tab's. */
   verifyToken: (token: string | null) => boolean
+  /** Whether a token reaches `/mcp`: also the agent token a paired tab hands its agents. */
+  verifyMCPToken: (token: string | null) => boolean
   corsOrigin: string | readonly string[] | null
   /** Origins whose pages may call the server; requests without an Origin come from programs. */
   origins: readonly string[]
@@ -154,7 +156,7 @@ function createHonoApp(options: {
   toolDescriptors: ToolDescriptor[]
 }): Hono {
   const { authToken, corsOrigin, fileRoot, browserRPC, mcpSessions, sendToBrowser } = options
-  const { toolDescriptors, verifyToken, origins, agentBridge } = options
+  const { toolDescriptors, verifyToken, verifyMCPToken, origins, agentBridge } = options
 
   const app = new Hono()
 
@@ -174,7 +176,7 @@ function createHonoApp(options: {
 
   app.get('/health', async (c) => {
     const provided = bearerToken(c.req.header('authorization'))
-    const canInspectConfiguration = verifyToken(provided)
+    const canInspectConfiguration = verifyMCPToken(provided)
     return c.json({
       status: browserRPC.isConnected() ? 'ok' : 'no_app',
       version: MCP_VERSION,
@@ -202,10 +204,7 @@ function createHonoApp(options: {
     registerFileRoutes(app, fileRoot)
   }
 
-  // Historical note: before the isConnected() guard was removed, a disconnected
-  // app returned 503 here. Now errors from sendToBrowser surface as 502. This
-  // is a semantic shift from 503 → 502; callers that distinguished 503 may
-  // need to handle 502 equivalently.
+  // Errors from sendToBrowser surface as 502, including a disconnected app (formerly 503).
   app.post('/rpc', async (c) => {
     const body = await c.req.json().catch(() => null)
     if (!body || typeof body !== 'object' || Array.isArray(body)) {
@@ -222,7 +221,7 @@ function createHonoApp(options: {
 
   app.all('/mcp', async (c) => {
     const token = mcpRequestToken(c.req.header('authorization'), c.req.header('x-mcp-token'))
-    if (!verifyToken(token)) {
+    if (!verifyMCPToken(token)) {
       return c.json({ error: 'Unauthorized' }, 401)
     }
     if (!MCP_METHODS.includes(c.req.method)) {
@@ -289,12 +288,22 @@ function buildServerContext(options: ServerOptions) {
   const corsOrigin = options.corsOrigin ?? null
   const withTcp = options.withTcp ?? false
   const origins = admittedOrigins(corsOrigin)
+  // The bridge learns the TCP port once the listener is up; agents may reach only that `/mcp`.
+  const listening = { port: 0 }
+  const bridgeOptions = {
+    port: () => listening.port,
+    version: MCP_VERSION,
+    entry: process.argv[1] ?? ''
+  }
   const agentBridge = options.agents
-    ? createAgentBridge({ ...options.agents, version: MCP_VERSION, entry: process.argv[1] ?? '' })
+    ? createAgentBridge({ ...options.agents, ...bridgeOptions })
     : null
   /** The server's own token, or a tab paired through the agent bridge. */
   const verifyToken = (token: string | null): boolean =>
     isAuthorized(token, authToken) || (agentBridge?.isSession(token) ?? false)
+  // Agents' own token reaches only `/mcp`: not the app's bridge or the routes that start programs.
+  const verifyMCPToken = (token: string | null): boolean =>
+    verifyToken(token) || (agentBridge?.isAgentToken(token) ?? false)
 
   // Warn if auth is disabled while TCP is active — any local process can
   // interact with the server without authentication. Socket-only transport
@@ -344,6 +353,7 @@ function buildServerContext(options: ServerOptions) {
   const app = createHonoApp({
     authToken,
     verifyToken,
+    verifyMCPToken,
     corsOrigin,
     origins,
     agentBridge,
@@ -367,6 +377,7 @@ function buildServerContext(options: ServerOptions) {
     wss,
     upgrade,
     agentBridge,
+    listening,
     authToken,
     disabledTools: toolPolicy.disabledTools,
     scope: toolPolicy.scope
@@ -487,6 +498,7 @@ export async function startServer(options: ServerOptions = {}): Promise<ServerHa
     state.tcpResult = ctx.withTcp
       ? await tryStartTcp(ctx.app, ctx.upgrade, ctx.httpPort, state)
       : null
+    ctx.listening.port = state.tcpResult?.port ?? 0
     const resolvedSocketPath = state.socketResult?.resolvedPath ?? null
     const actualHttpPort = state.tcpResult?.port ?? 0
 

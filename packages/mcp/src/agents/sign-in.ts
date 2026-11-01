@@ -40,6 +40,8 @@ export function runSignIn(
   context: AgentProcessContext
 ): void {
   const args = agent.terminalSignIn
+  // The socket may have closed while the workspace was prepared; nothing would stop the login.
+  if (ws.readyState !== ws.OPEN) return
   if (!args) {
     ws.close(CLOSE_CODES.unsupported, 'This agent signs in inside its own session')
     return

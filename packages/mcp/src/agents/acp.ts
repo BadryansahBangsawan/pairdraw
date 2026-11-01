@@ -20,17 +20,20 @@ export interface AgentProcessContext {
   track(child: ChildProcess): void
 }
 
+export interface AgentPipeContext extends AgentProcessContext {
+  /** Rewrites what the app sends the agent; null closes the socket (`createACPFilter`). */
+  filter(chunk: Buffer): Buffer | null
+}
+
 /**
  * Starts an agent's ACP program for one authenticated socket and pipes its stdio as binary
- * frames: frames from the app go to the program's stdin, its stdout comes back. The program's
- * command line is the registry's, and it runs in the companion's workspace. Closing the socket
- * stops the program; the program exiting closes the socket.
+ * frames: frames from the app go to the program's stdin through `filter`, its stdout comes back.
+ * The program's command line is the registry's, and it runs in the companion's workspace.
+ * Closing the socket stops the program; the program exiting closes the socket.
  */
-export function pipeAgent(
-  ws: WebSocket,
-  agent: CompanionAgent,
-  context: AgentProcessContext
-): void {
+export function pipeAgent(ws: WebSocket, agent: CompanionAgent, context: AgentPipeContext): void {
+  // The socket may have closed while the workspace was prepared; nothing would stop the agent.
+  if (ws.readyState !== ws.OPEN) return
   let child: ChildProcess
   try {
     child = spawnFixed(agent.command, agent.args, {
@@ -90,7 +93,12 @@ export function pipeAgent(
       ws.close(CLOSE_CODES.unsupported, 'Binary frames only')
       return
     }
-    if (!stdin.write(rawBytes(data))) {
+    const bytes = context.filter(rawBytes(data))
+    if (bytes === null) {
+      ws.close(CLOSE_CODES.unsupported, 'Not an ACP message')
+      return
+    }
+    if (bytes.length > 0 && !stdin.write(bytes)) {
       ws.pause()
       stdin.once('drain', () => ws.resume())
     }

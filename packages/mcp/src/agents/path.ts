@@ -1,6 +1,6 @@
 import { accessSync, constants, statSync } from 'node:fs'
 import { homedir, platform } from 'node:os'
-import { delimiter, join } from 'node:path'
+import { delimiter, isAbsolute, join } from 'node:path'
 
 const isWindows = platform() === 'win32'
 
@@ -33,9 +33,17 @@ function isDirectory(path: string): boolean {
   }
 }
 
-/** Appends the candidate folders that exist and the current PATH is missing. */
+/**
+ * The absolute folders of a PATH. A relative entry, such as `.` or an empty one, would resolve
+ * against whatever folder a program runs in, so a file there could pose as an agent or npm.
+ */
+function absoluteEntries(path: string): string[] {
+  return path.split(delimiter).filter((entry) => entry.length > 0 && isAbsolute(entry))
+}
+
+/** Keeps the current PATH's absolute folders and appends the candidates that exist and it lacks. */
 export function augmentPath(path: string, candidates: readonly string[] = candidateDirs()): string {
-  const entries = path.split(delimiter).filter((entry) => entry.length > 0)
+  const entries = absoluteEntries(path)
   for (const candidate of candidates) {
     if (!entries.includes(candidate) && isDirectory(candidate)) entries.push(candidate)
   }
@@ -67,8 +75,7 @@ export function which(command: string, searchPath: string): string | null {
   // Only bare names are looked up; a path or a name with separators is never resolved.
   if (!/^[\w.@-]+$/.test(command)) return null
   const extensions = isWindows ? windowsExtensions() : ['']
-  for (const dir of searchPath.split(delimiter)) {
-    if (!dir) continue
+  for (const dir of absoluteEntries(searchPath)) {
     for (const extension of extensions) {
       const candidate = join(dir, `${command}${extension}`)
       if (isExecutableFile(candidate)) return candidate

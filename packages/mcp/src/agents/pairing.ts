@@ -2,6 +2,8 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
 
 /** How long a printed link may be opened. */
 export const PAIRING_CODE_TTL_MS = 2 * 60_000
+/** A paired tab that sends nothing this long is signed out; an open tab checks in every 10 s. */
+export const SESSION_IDLE_TIMEOUT_MS = 30 * 60_000
 /** Wrong codes allowed in a window before `/pair` refuses everything until it ends. */
 const MAX_FAILED_ATTEMPTS = 10
 const ATTEMPT_WINDOW_MS = 60_000
@@ -9,11 +11,12 @@ const ATTEMPT_WINDOW_MS = 60_000
 const MAX_SESSIONS = 16
 
 export type PairingResult =
-  | { ok: true; token: string }
+  | { ok: true; token: string; agentToken: string }
   | { ok: false; reason: 'rejected' | 'rate-limited' }
 
 export interface PairingOptions {
   ttlMs?: number
+  idleTimeoutMs?: number
   now?: () => number
 }
 
@@ -21,25 +24,54 @@ function digest(value: string): Buffer {
   return createHash('sha256').update(value, 'utf8').digest()
 }
 
+function key(token: string): string {
+  return digest(token).toString('hex')
+}
+
 /**
- * One-time codes and the session tokens they buy. A code is printed in the link the companion
- * opens, works once, and expires; the token lives only in this process and in the paired tab's
- * memory, so restarting the companion signs every tab out.
+ * Six characters derived from a pairing code, shown by the companion and by the tab that opens
+ * its link, so the person can tell the link is the one their terminal printed. The app derives
+ * the same characters (`companionFingerprint` in `src/app/automation/companion/`).
+ */
+export function pairingFingerprint(code: string): string {
+  const hex = key(code).slice(0, 6).toUpperCase()
+  return `${hex.slice(0, 3)}-${hex.slice(3)}`
+}
+
+interface Session {
+  lastUsed: number
+  /** The digest of the token this tab hands its agents for OpenPencil's MCP server. */
+  agentKey: string
+}
+
+/**
+ * One-time codes and the tokens they buy. A code is printed in the link the companion opens,
+ * works once, and expires. Pairing returns two tokens: the tab's session token, which reaches
+ * the agent routes, and an agent token, which reaches only the MCP server and is what the tab
+ * hands the agents it starts. Both live only in this process and the tab's memory, so
+ * restarting the companion signs every tab out.
  */
 export function createPairing({
   ttlMs = PAIRING_CODE_TTL_MS,
+  idleTimeoutMs = SESSION_IDLE_TIMEOUT_MS,
   now = Date.now
 }: PairingOptions = {}) {
   let code: { digest: Buffer; expiresAt: number } | null = null
   // Keyed by the token's digest, so a lookup never compares the secret itself.
-  const sessions = new Map<string, number>()
+  const sessions = new Map<string, Session>()
+  const agentTokens = new Map<string, string>()
   let failures = 0
   let windowStart = now()
 
-  /** Issues a new code and invalidates the previous one. */
+  /**
+   * Issues a new code and invalidates the previous one. It also lifts a lockout, since the person
+   * at the terminal asked for it, so a local program spending attempts cannot keep them out.
+   */
   function issueCode(): string {
     const value = randomBytes(16).toString('hex')
     code = { digest: digest(value), expiresAt: now() + ttlMs }
+    failures = 0
+    windowStart = now()
     return value
   }
 
@@ -51,7 +83,13 @@ export function createPairing({
     return failures >= MAX_FAILED_ATTEMPTS
   }
 
-  /** Trades a code for a session token: once, before it expires, compared in constant time. */
+  function drop(sessionKey: string) {
+    const session = sessions.get(sessionKey)
+    if (session) agentTokens.delete(session.agentKey)
+    sessions.delete(sessionKey)
+  }
+
+  /** Trades a code for the tokens: once, before it expires, compared in constant time. */
   function exchange(candidate: string): PairingResult {
     if (rateLimited()) return { ok: false, reason: 'rate-limited' }
     const current = code
@@ -65,25 +103,50 @@ export function createPairing({
     }
     code = null
     const token = randomBytes(32).toString('hex')
-    sessions.set(digest(token).toString('hex'), now())
+    const agentToken = randomBytes(32).toString('hex')
+    const sessionKey = key(token)
+    sessions.set(sessionKey, { lastUsed: now(), agentKey: key(agentToken) })
+    agentTokens.set(key(agentToken), sessionKey)
     while (sessions.size > MAX_SESSIONS) {
       const oldest = sessions.keys().next().value
       if (oldest === undefined) break
-      sessions.delete(oldest)
+      drop(oldest)
     }
-    return { ok: true, token }
+    return { ok: true, token, agentToken }
   }
 
+  /** The live session a token names, after dropping it if it sat idle too long. */
+  function live(sessionKey: string): Session | null {
+    const session = sessions.get(sessionKey)
+    if (!session) return null
+    if (now() - session.lastUsed >= idleTimeoutMs) {
+      drop(sessionKey)
+      return null
+    }
+    return session
+  }
+
+  /** Whether a token is a paired tab's session token; using it keeps the session alive. */
   function isSession(token: string | null | undefined): boolean {
     if (!token) return false
-    return sessions.has(digest(token).toString('hex'))
+    const session = live(key(token))
+    if (session) session.lastUsed = now()
+    return session !== null
   }
 
-  function forget(token: string): void {
-    sessions.delete(digest(token).toString('hex'))
+  /** Whether a token is an agent token of a live session; it reaches only the MCP server. */
+  function isAgentToken(token: string | null | undefined): boolean {
+    if (!token) return false
+    const sessionKey = agentTokens.get(key(token))
+    return sessionKey !== undefined && live(sessionKey) !== null
   }
 
-  return { issueCode, exchange, isSession, forget }
+  /** Signs a tab out: its session and agent tokens stop working at once. */
+  function revoke(token: string): void {
+    drop(key(token))
+  }
+
+  return { issueCode, exchange, isSession, isAgentToken, revoke }
 }
 
 export type Pairing = ReturnType<typeof createPairing>

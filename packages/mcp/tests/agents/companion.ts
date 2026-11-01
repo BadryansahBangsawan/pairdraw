@@ -28,8 +28,13 @@ export interface TestCompanion {
   base: string
   ws: string
   installs: string[]
+  /** The folders installs ran in. */
+  installCwds: string[]
+  workspace: string
   /** Pairs like a tab opening the printed link, and returns the session token. */
   pair(): Promise<string>
+  /** Pairs and returns both tokens: the tab's and the one it hands its agents. */
+  pairTokens(): Promise<{ token: string; agentToken: string }>
   close(): Promise<void>
 }
 
@@ -42,6 +47,7 @@ export async function startCompanion(): Promise<TestCompanion> {
   writeFileSync(wrapper, `#!/bin/sh\nexec "${process.execPath}" "${FAKE_AGENT}" "$@"\n`)
   chmodSync(wrapper, 0o755)
   const installs: string[] = []
+  const installCwds: string[] = []
   const handle = await startServer({
     httpPort: 0,
     withTcp: true,
@@ -53,31 +59,39 @@ export async function startCompanion(): Promise<TestCompanion> {
       registry: [FAKE_AGENT_ENTRY, { id: 'plain', command: 'fake-acp', args: ['echo'] }],
       searchPath: bin,
       workspace,
-      installer: async (packageName) => {
+      installer: async (packageName, _searchPath, cwd) => {
+        installCwds.push(cwd)
         installs.push(packageName)
       }
     }
   })
   const base = `http://127.0.0.1:${handle.httpPort}`
-  const issue = handle.issuePairingCode
-  if (!issue) throw new Error('The agent bridge did not start')
+  const issueCode = handle.issuePairingCode
+  if (!issueCode) throw new Error('The agent bridge did not start')
+  const issue: () => string = issueCode
+  async function pairTokens() {
+    const response = await fetch(`${base}/pair`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', origin: APP_ORIGIN },
+      body: JSON.stringify({ code: issue() })
+    })
+    return v.parse(
+      v.pipe(v.string(), v.parseJson(), v.object({ token: v.string(), agentToken: v.string() })),
+      await response.text()
+    )
+  }
+
   return {
     handle,
     base,
     ws: `ws://127.0.0.1:${handle.httpPort}`,
     installs,
+    installCwds,
+    workspace,
     async pair() {
-      const response = await fetch(`${base}/pair`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', origin: APP_ORIGIN },
-        body: JSON.stringify({ code: issue() })
-      })
-      const body = v.parse(
-        v.pipe(v.string(), v.parseJson(), v.object({ token: v.string() })),
-        await response.text()
-      )
-      return body.token
+      return (await pairTokens()).token
     },
+    pairTokens,
     async close() {
       await handle.close()
       rmSync(dir, { recursive: true, force: true })
@@ -88,10 +102,11 @@ export async function startCompanion(): Promise<TestCompanion> {
 /** Opens a socket and reports whether the server upgraded it, or the HTTP status it refused with. */
 export function openSocket(
   url: string,
-  origin?: string
+  origin?: string,
+  headers: Record<string, string> = {}
 ): Promise<{ ws: WebSocket } | { status: number }> {
   return new Promise((resolve, reject) => {
-    const ws = new WebSocket(url, origin ? { headers: { origin } } : {})
+    const ws = new WebSocket(url, { headers: origin ? { ...headers, origin } : headers })
     ws.once('open', () => resolve({ ws }))
     ws.once('unexpected-response', (_request, response) =>
       resolve({ status: response.statusCode ?? 0 })

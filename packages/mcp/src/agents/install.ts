@@ -10,13 +10,22 @@ export function npmInstallArgs(packageName: string): string[] {
   return ['install', '--global', packageName, PUBLIC_REGISTRY]
 }
 
-/** Installs an agent's adapter package globally with npm; rejects when npm did not finish. */
-export type PackageInstaller = (packageName: string, searchPath: string) => Promise<void>
+/**
+ * Installs an agent's adapter package globally with npm; rejects when npm did not finish. It
+ * runs in the companion's workspace, so an `.npmrc` in the folder the companion started in
+ * cannot point npm elsewhere.
+ */
+export type PackageInstaller = (
+  packageName: string,
+  searchPath: string,
+  cwd: string
+) => Promise<void>
 
-export const installWithNpm: PackageInstaller = (packageName, searchPath) =>
+export const installWithNpm: PackageInstaller = (packageName, searchPath, cwd) =>
   new Promise((resolve, reject) => {
     const child = spawnFixed('npm', npmInstallArgs(packageName), {
       searchPath,
+      cwd,
       stdio: ['ignore', 'ignore', 'ignore']
     })
     const timer = setTimeout(() => {

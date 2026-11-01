@@ -11,6 +11,7 @@ import { bearerToken } from '#mcp/auth'
 import { getAgentWorkspacePath } from '#mcp/transport/paths'
 
 import { pipeAgent, type AgentProcessContext } from './acp'
+import { createACPFilter, isLoopbackMCP } from './filter'
 import { installWithNpm, type PackageInstaller } from './install'
 import { ensureWorkspace, lookupAgents } from './lookup'
 import { createPairing, type PairingOptions } from './pairing'
@@ -25,8 +26,10 @@ import { authenticate, CLOSE_CODES, keepAlive } from './socket'
 const ACP_MAX_FRAME_BYTES = 16 * 1024 * 1024
 const CONTROL_MAX_FRAME_BYTES = 64 * 1024
 const MAX_REQUEST_BYTES = 1024
-/** Agents running at once, across every paired tab. */
+/** Agents and sign-ins running at once, across every paired tab. */
 const MAX_AGENT_PROCESSES = 8
+/** Sockets that may wait for their first message at once, so unpaired clients cannot pile up. */
+const MAX_UNAUTHENTICATED_SOCKETS = 16
 
 export interface AgentBridgeOptions {
   /** Where agents start, created on first use; defaults to a folder beside the discovery file. */
@@ -38,6 +41,10 @@ export interface AgentBridgeOptions {
   /** Installs adapter packages; defaults to `npm install --global`. */
   installer?: PackageInstaller
   pairing?: PairingOptions
+  /** The TCP port the server listens on, which is where the companion's own MCP endpoint is. */
+  port?: () => number
+  /** Told each time a tab pairs, so the companion can say so in its terminal. */
+  onPaired?: () => void
 }
 
 const AGENT_SOCKET_PATH = /^\/agents\/([\w-]{1,64})\/(acp|sign-in)$/
@@ -67,6 +74,9 @@ export function createAgentBridge(
   })
   let installing = false
   let closed = false
+  let reserved = 0
+  let unauthenticated = 0
+  let workspacePath: Promise<string> | null = null
 
   function track(child: ChildProcess) {
     children.add(child)
@@ -74,8 +84,29 @@ export function createAgentBridge(
     child.once('error', () => children.delete(child))
   }
 
-  async function workspace(): Promise<string> {
-    return ensureWorkspace(options.workspace ?? (await getAgentWorkspacePath()))
+  /**
+   * Holds a place for a process before anything is awaited, so sockets authenticating at once
+   * cannot all pass the limit. The place is released once the process is tracked, or not started.
+   */
+  function reserve(): (() => void) | null {
+    if (children.size + reserved >= MAX_AGENT_PROCESSES) return null
+    reserved++
+    let released = false
+    return () => {
+      if (released) return
+      released = true
+      reserved--
+    }
+  }
+
+  function workspace(): Promise<string> {
+    workspacePath ??= (async () =>
+      ensureWorkspace(options.workspace ?? (await getAgentWorkspacePath())))()
+    // A failed attempt, such as a folder that could not be created, is tried again next time.
+    workspacePath.catch(() => {
+      workspacePath = null
+    })
+    return workspacePath
   }
 
   async function processContext(): Promise<AgentProcessContext> {
@@ -95,7 +126,14 @@ export function createAgentBridge(
       )
       if (!body.success) return c.json({ error: 'Invalid request body' }, 400)
       const result = pairing.exchange(body.output.code)
-      if (result.ok) return c.json({ token: result.token, version: options.version })
+      if (result.ok) {
+        options.onPaired?.()
+        return c.json({
+          token: result.token,
+          agentToken: result.agentToken,
+          version: options.version
+        })
+      }
       if (result.reason === 'rate-limited') {
         return c.json(
           { error: 'Too many attempts' },
@@ -114,6 +152,14 @@ export function createAgentBridge(
     app.use('/companion', requireSession)
     app.use('/agents', requireSession)
     app.use('/agents/*', requireSession)
+    app.use('/pair/revoke', requireSession)
+
+    // The tab signs out, as when the person disconnects it; its tokens stop working at once.
+    app.post('/pair/revoke', limit, (c) => {
+      const token = bearerToken(c.req.header('authorization'))
+      if (token) pairing.revoke(token)
+      return c.body(null, 204)
+    })
 
     app.get('/companion', async (c) =>
       c.json({ version: options.version, workspace: await workspace() })
@@ -133,7 +179,7 @@ export function createAgentBridge(
       if (installing) return c.json({ error: 'Another installation is running' }, 409)
       installing = true
       try {
-        await installer(agent.adapterPackage, searchPath)
+        await installer(agent.adapterPackage, searchPath, await workspace())
         return c.json({ ok: true })
       } catch {
         return c.json({ error: 'The installation failed' }, 500)
@@ -145,26 +191,44 @@ export function createAgentBridge(
 
   async function serveSocket(ws: WebSocket, agent: CompanionAgent, kind: 'acp' | 'sign-in') {
     keepAlive(ws)
-    if (!(await authenticate(ws, pairing.isSession))) return
+    unauthenticated++
+    let authenticated: boolean
+    try {
+      authenticated = await authenticate(ws, pairing.isSession)
+    } finally {
+      unauthenticated--
+    }
+    if (!authenticated) return
     if (closed) {
       ws.close(1001, 'Companion is shutting down')
       return
     }
-    if (kind === 'sign-in') {
-      if (signIns.has(agent.id)) {
-        ws.close(CLOSE_CODES.conflict, 'A sign-in is already running')
-        return
-      }
-      signIns.set(agent.id, ws)
-      ws.once('close', () => signIns.delete(agent.id))
-      runSignIn(ws, agent, await processContext())
+    if (kind === 'sign-in' && signIns.has(agent.id)) {
+      ws.close(CLOSE_CODES.conflict, 'A sign-in is already running')
       return
     }
-    if (children.size >= MAX_AGENT_PROCESSES) {
+    const release = reserve()
+    if (!release) {
       ws.close(CLOSE_CODES.busy, 'Too many agents are running')
       return
     }
-    pipeAgent(ws, agent, await processContext())
+    try {
+      if (kind === 'sign-in') {
+        signIns.set(agent.id, ws)
+        ws.once('close', () => signIns.delete(agent.id))
+        runSignIn(ws, agent, await processContext())
+        return
+      }
+      const context = await processContext()
+      const filter = createACPFilter({
+        workspace: context.workspace,
+        isOwnMCP: (url) => isLoopbackMCP(url, options.port?.() ?? 0)
+      })
+      pipeAgent(ws, agent, { ...context, filter })
+    } finally {
+      // The process, if it started, is tracked by now; otherwise its place is free again.
+      release()
+    }
   }
 
   /** Takes upgrades under `/agents/`; returns false for other paths. The caller checked Origin. */
@@ -175,6 +239,10 @@ export function createAgentBridge(
     const agent = match ? findCompanionAgent(registry, match[1]) : undefined
     if (!match || !agent || closed) {
       rejectUpgrade(socket, 404, 'Not Found')
+      return true
+    }
+    if (unauthenticated >= MAX_UNAUTHENTICATED_SOCKETS) {
+      rejectUpgrade(socket, 503, 'Service Unavailable')
       return true
     }
     const kind = match[2] === 'acp' ? 'acp' : 'sign-in'
@@ -203,7 +271,8 @@ export function createAgentBridge(
     handleUpgrade,
     close,
     issuePairingCode: pairing.issueCode,
-    isSession: pairing.isSession
+    isSession: pairing.isSession,
+    isAgentToken: pairing.isAgentToken
   }
 }
 

@@ -1,0 +1,1 @@
+- An AI agent's cursor moves smoothly while it writes a design, and the live preview of what it writes updates about three times faster on long designs.

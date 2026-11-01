@@ -216,10 +216,18 @@ export class TextPreparationCache {
   }
 
   clear(): void {
+    this.releaseLayers()
+    this.results.clear()
+  }
+
+  /**
+   * Forget every layer, keeping what identical text shaped to, such as its sizes. For a renderer
+   * that draws a new graph each time, whose layer IDs can name different text from one to the next.
+   */
+  releaseLayers(): void {
     this.nodeKeys.clear()
     this.shaping = new WeakMap()
     this.invalidatedShaping.clear()
-    this.results.clear()
     this.entries.clear()
   }
 }

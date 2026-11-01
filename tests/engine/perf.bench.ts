@@ -6,10 +6,12 @@ import { resolve } from 'node:path'
 import { bench, group, run } from 'mitata'
 
 import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { createJSXPreviewRecorder, stageJSXPreview } from '@pairdraw/core/design-jsx'
 import { FigmaAPI } from '@pairdraw/core/figma-api'
 import { parseFigFile, exportFigFile } from '@pairdraw/core/io/formats/fig'
 import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
 import { ALL_TOOLS } from '@pairdraw/core/tools'
+import { createStreamingJSXParser } from '@pairdraw/design-jsx'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import { copyFills } from '@pairdraw/scene-graph/copy'
@@ -220,6 +222,45 @@ group('AI agent run (2,000-layer page)', () => {
     const reply = agentRunDocument(true)
     yield async () => (await reply).call('render')
     void reply.then(({ end }) => end())
+  })
+})
+
+/** A landing page of `rows` rows of two cards, as an agent's `render` call streams it. */
+function landingJSX(rows: number): string {
+  const card = (i: number) =>
+    `<Frame name="Card ${i}" flex="col" gap={8} p={16} w={320} bg="#FFFFFF" rounded={12}><Text size={18} weight="bold">Feature ${i}</Text><Text size={14} color="#555555">Some description text for feature ${i} that wraps.</Text><Frame flex="row" gap={8}><Frame w={80} h={32} bg="#3366FF" rounded={8} /><Frame w={80} h={32} bg="#EEEEEE" rounded={8} /></Frame></Frame>`
+  const body = Array.from(
+    { length: rows },
+    (_, i) => `<Frame flex="row" gap={16}>${card(i)}${card(i + 100)}</Frame>`
+  ).join('')
+  return `<Frame name="Landing" flex="col" w={1440} gap={24} p={48} bg="#F8F8F8"><Text size={48} weight="bold">Hero</Text>${body}</Frame>`
+}
+
+group('Streamed render preview (60 cards)', () => {
+  // One preview update as the agent finishes writing: the staged copy and its picture, after the
+  // updates before it, which leave the text they shaped behind for this one.
+  bench('preview update', function* () {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const ready = (async () => {
+      const ck = await initCanvasKit()
+      const recorder = createJSXPreviewRecorder(ck)
+      const signal = new AbortController().signal
+      const stage = async (rows: number) => {
+        const jsx = landingJSX(rows)
+        const tree = createStreamingJSXParser().append(jsx).tree
+        if (!tree) throw new Error('Missing preview tree')
+        const staged = await stageJSXPreview(graph, tree, {}, pageId)
+        if (!staged) throw new Error('Missing staged preview')
+        return staged
+      }
+      for (const rows of [10, 20, 29]) (await recorder.record(await stage(rows), signal))?.delete()
+      return { recorder, signal, stage }
+    })()
+    yield async () => {
+      const { recorder, signal, stage } = await ready
+      ;(await recorder.record(await stage(30), signal))?.delete()
+    }
   })
 })
 

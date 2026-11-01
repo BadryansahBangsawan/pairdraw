@@ -459,8 +459,9 @@ export class SkiaRenderer {
     RendererState.invalidateScenePicture(this)
   }
 
-  invalidateAllPictures(): void {
-    RendererState.invalidateAllPictures(this)
+  /** Drop every cached picture; `keepShapedText` keeps the sizes identical text shaped to. */
+  invalidateAllPictures(options?: { keepShapedText?: boolean }): void {
+    RendererState.invalidateAllPictures(this, options)
   }
 
   /**

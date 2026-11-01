@@ -24,8 +24,9 @@ export function clearSubtreePictureCache(r: SkiaRenderer): void {
   r.subtreePictureCacheFontGeneration = -1
 }
 
-export function invalidateAllPictures(r: SkiaRenderer): void {
-  r.textPreparationCache.clear()
+export function invalidateAllPictures(r: SkiaRenderer, { keepShapedText = false } = {}): void {
+  if (keepShapedText) r.textPreparationCache.releaseLayers()
+  else r.textPreparationCache.clear()
   invalidateScenePicture(r)
   r.tiledScene.invalidateStructure()
   for (const pic of r.nodePictureCache.values()) pic?.delete()

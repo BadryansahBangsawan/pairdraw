@@ -2,7 +2,12 @@ import type { CanvasKit, SkPicture } from 'canvaskit-wasm'
 import { uniq } from 'es-toolkit/array'
 import { watch } from 'vue'
 
-import { recordJSXPreview, stageJSXPreview, type StagedJSXPreview } from '@pairdraw/core/design-jsx'
+import {
+  createJSXPreviewRecorder,
+  stageJSXPreview,
+  type JSXPreviewRecorder,
+  type StagedJSXPreview
+} from '@pairdraw/core/design-jsx'
 import { computeContentBounds } from '@pairdraw/core/io/formats/raster'
 import type { JSXPreviewNode } from '@pairdraw/design-jsx'
 import type { SceneGraph } from '@pairdraw/scene-graph'
@@ -98,6 +103,16 @@ export function createCanvasJSXPreview(
   { onFocus, activeTabOnly = true }: CanvasJSXPreviewOptions = {}
 ) {
   let subscriptions: (() => void)[] = []
+  // One per CanvasKit while previews run, so a growing preview reuses what its text shaped to.
+  const recorders = new Map<CanvasKit, JSXPreviewRecorder>()
+
+  function recorderFor(ck: CanvasKit): JSXPreviewRecorder {
+    const existing = recorders.get(ck)
+    if (existing) return existing
+    const recorder = createJSXPreviewRecorder(ck)
+    recorders.set(ck, recorder)
+    return recorder
+  }
 
   const isShown = () => !activeTabOnly || getActiveEditorStoreOrNull() === store
 
@@ -112,6 +127,8 @@ export function createCanvasJSXPreview(
   function unsubscribe(): void {
     for (const stop of subscriptions) stop()
     subscriptions = []
+    for (const recorder of recorders.values()) recorder.destroy()
+    recorders.clear()
   }
 
   function capture(): PreviewTarget | null {
@@ -159,7 +176,7 @@ export function createCanvasJSXPreview(
     try {
       for (const renderer of store.canvasRenderers) {
         if (pictures.has(renderer.ck)) continue
-        const picture = await recordJSXPreview(renderer.ck, staged, signal)
+        const picture = await recorderFor(renderer.ck).record(staged, signal)
         if (!picture) {
           deletePictures()
           return null

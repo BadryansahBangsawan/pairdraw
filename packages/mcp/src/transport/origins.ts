@@ -53,3 +53,20 @@ export function admittedOrigins(corsOrigin: string | readonly string[] | null): 
   const configured = typeof corsOrigin === 'string' ? [corsOrigin] : (corsOrigin ?? [])
   return uniq([...configured, ...DESKTOP_APP_ORIGINS])
 }
+
+/**
+ * Whether a request's `Host` names this machine: `127.0.0.1`, `localhost`, `[::1]`, or a
+ * `*.localhost` name, which resolve only to loopback. A page that rebinds its own DNS name to
+ * 127.0.0.1 still sends that name, so it is refused. Requests without one are allowed.
+ */
+export function isLoopbackHost(host: string | undefined | null): boolean {
+  if (host === undefined || host === null || host === '') return true
+  const hostname = /^(\[[^\]]*\]|[^:]*)(?::\d+)?$/.exec(host.trim().toLowerCase())?.[1]
+  if (!hostname) return false
+  return (
+    hostname === '127.0.0.1' ||
+    hostname === 'localhost' ||
+    hostname === '[::1]' ||
+    hostname.endsWith('.localhost')
+  )
+}

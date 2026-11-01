@@ -2,17 +2,19 @@ import type { MiddlewareHandler } from 'hono'
 import type { WebSocketServer } from 'ws'
 
 import type { AgentBridge } from '#mcp/agents/index'
-import { isAllowedOrigin } from '#mcp/transport/origins'
+import { isAllowedOrigin, isLoopbackHost } from '#mcp/transport/origins'
 
 import type { UpgradeHandler } from './lifecycle'
 
 /**
- * Refuses requests from pages of other sites. CORS only hides answers from them; refusing the
- * request also stops them from acting, such as spending pairing attempts or reaching the server
- * through a DNS name they rebound to this machine.
+ * Refuses requests from pages of other sites, and requests addressed to a name other than this
+ * machine's, as a page that rebound its DNS name to 127.0.0.1 sends. CORS only hides answers from
+ * other sites; refusing the request also stops them from acting, such as spending pairing
+ * attempts.
  */
 export function originGuard(origins: readonly string[]): MiddlewareHandler {
   return async (c, next) => {
+    if (!isLoopbackHost(c.req.header('host'))) return c.json({ error: 'Host not allowed' }, 403)
     if (!isAllowedOrigin(c.req.header('origin'), origins)) {
       return c.json({ error: 'Origin not allowed' }, 403)
     }
@@ -36,7 +38,10 @@ export function createUpgradeHandler(
   agentBridge: AgentBridge | null
 ): UpgradeHandler {
   return (request, socket, head) => {
-    if (!isAllowedOrigin(request.headers.origin, origins)) {
+    if (
+      !isLoopbackHost(request.headers.host) ||
+      !isAllowedOrigin(request.headers.origin, origins)
+    ) {
       socket.end('HTTP/1.1 403 Forbidden\r\nConnection: close\r\nContent-Length: 0\r\n\r\n')
       return
     }

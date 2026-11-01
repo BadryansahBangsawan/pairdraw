@@ -35,6 +35,8 @@ interface Companion {
   child: ChildProcess
   port: number
   link: string
+  /** What the companion prints beside the link for the tab to show. */
+  fingerprint: string
 }
 
 async function startCompanion(appURL: string, dir: string): Promise<Companion> {
@@ -58,16 +60,17 @@ async function startCompanion(appURL: string, dir: string): Promise<Companion> {
       OPENPENCIL_MCP_ROOT: dir
     }
   })
-  const link = await new Promise<string>((resolve, reject) => {
+  const printed = await new Promise<{ link: string; fingerprint: string }>((resolve, reject) => {
     let output = ''
     child.once('exit', (code) => reject(new Error(`The companion exited (${code}): ${output}`)))
     child.stdout?.on('data', (chunk: Buffer) => {
       output += chunk.toString('utf8')
-      const found = /(https?:\/\/\S+#connect=\S+)/.exec(output)?.[1]
-      if (found) resolve(found)
+      const link = /(https?:\/\/\S+#connect=\S+)/.exec(output)?.[1]
+      const fingerprint = /shows ([0-9A-F]{3}-[0-9A-F]{3})/.exec(output)?.[1]
+      if (link && fingerprint) resolve({ link, fingerprint })
     })
   })
-  return { child, port, link }
+  return { child, port, ...printed }
 }
 
 test('a tab opened from the companion’s link pairs and chats with an agent on this computer', async ({
@@ -82,6 +85,10 @@ test('a tab opened from the companion’s link pairs and chats with an agent on 
     await new CanvasHelper(page).waitForInit()
     // The one-time code leaves the address bar.
     await expect(page).not.toHaveURL(/connect=/)
+    // Nothing pairs until the person confirms the characters the terminal printed.
+    const dialog = page.getByRole('alertdialog')
+    await expect(dialog).toContainText(companion.fingerprint)
+    await dialog.getByRole('button', { name: 'Connect' }).click()
 
     // The app's bridge registers with the companion over its origin-checked socket.
     await expect

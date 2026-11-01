@@ -18,19 +18,28 @@ export const COMPANION_COMMAND = `npx -p @open-pencil/mcp@${APP_VERSION} openpen
 /**
  * The companion (`openpencil-connect`) runs OpenPencil's MCP server and the coding agents on the
  * person's computer for the web app. A tab pairs with it through the one-time link the companion
- * prints, and keeps the session token only in memory: reloading or closing the tab, or
- * restarting the companion, needs a new link.
+ * prints, after the person confirms it, and keeps the tokens only in memory: reloading or closing
+ * the tab, or restarting the companion, needs a new link.
  */
 export type CompanionStatus = 'idle' | 'pairing' | 'connected' | 'lost'
 
 /** Why the tab is not connected, for the settings card to explain. */
 export type CompanionFailure = 'rejected' | 'rate-limited' | 'unreachable' | 'expired'
 
+/** A link waiting for the person to confirm it, as the tab shows it; the code stays private. */
+export interface CompanionPendingLink {
+  port: number
+  /** The characters the companion's terminal printed beside the link. */
+  fingerprint: string
+}
+
 export interface CompanionState {
   status: CompanionStatus
   failure: CompanionFailure | null
   /** The companion's version, once paired. */
   version: string | null
+  /** A link the tab was opened with, which pairs only once the person confirms it. */
+  pending: CompanionPendingLink | null
 }
 
 /** A link the companion printed: `#connect=<code>`, with `&port=` when it is not the default. */
@@ -60,6 +69,19 @@ export function parseCompanionLink(hash: string): CompanionLink | null {
   return port >= 1024 && port <= 65535 ? { code, port } : null
 }
 
+/**
+ * Six characters derived from a pairing code, as the companion prints them beside its link
+ * (`pairingFingerprint` in `packages/mcp/src/agents/pairing.ts`).
+ */
+export async function companionFingerprint(code: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(code))
+  const hex = [...new Uint8Array(digest).slice(0, 3)]
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('')
+    .toUpperCase()
+  return `${hex.slice(0, 3)}-${hex.slice(3)}`
+}
+
 /** The slice of `fetch` the connection calls, so tests can stand in for it. */
 export type CompanionFetch = (url: string, init?: RequestInit) => Promise<Response>
 
@@ -67,21 +89,44 @@ export interface CompanionConnectionOptions {
   fetch?: CompanionFetch
 }
 
+interface CompanionSession {
+  /** Reaches the agent routes and the app's bridge. */
+  token: string
+  /** Reaches only the MCP server; the tab hands it to the agents it starts. */
+  agentToken: string
+  port: number
+}
+
 export function createCompanionConnection({
   // Looked up at each call, so a fetch installed later, as by a test, is the one used.
   fetch: request = (input, init) => fetch(input, init)
 }: CompanionConnectionOptions = {}) {
-  const state = reactive<CompanionState>({ status: 'idle', failure: null, version: null })
-  let session: { token: string; port: number } | null = null
+  const state = reactive<CompanionState>({
+    status: 'idle',
+    failure: null,
+    version: null,
+    pending: null
+  })
+  let session: CompanionSession | null = null
+  let pendingLink: CompanionLink | null = null
   const checker = useIntervalFn(() => void check(), CHECK_INTERVAL_MS, { immediate: false })
+
+  function base(port: number): string {
+    return `http://127.0.0.1:${port}`
+  }
 
   /** The companion's HTTP address on this machine. */
   function url(): string {
-    return `http://127.0.0.1:${session?.port ?? AUTOMATION_HTTP_PORT}`
+    return base(session?.port ?? AUTOMATION_HTTP_PORT)
   }
 
   function token(): string | null {
     return state.status === 'connected' ? (session?.token ?? null) : null
+  }
+
+  /** The token agents reach OpenPencil's MCP server with, which starts no programs. */
+  function agentToken(): string | null {
+    return state.status === 'connected' ? (session?.agentToken ?? null) : null
   }
 
   function connected(): boolean {
@@ -92,13 +137,13 @@ export function createCompanionConnection({
     const current = session
     if (!current) return
     try {
-      const response = await request(`${url()}/companion`, {
+      const response = await request(`${base(current.port)}/companion`, {
         headers: { Authorization: `Bearer ${current.token}` },
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
       })
       if (session !== current) return
       if (response.status === 401) {
-        // The companion restarted, so this token is gone for good.
+        // The companion restarted or signed the tab out, so this token is gone for good.
         forget('expired')
         return
       }
@@ -126,36 +171,39 @@ export function createCompanionConnection({
     state.version = null
   }
 
-  /** Trades the link's code for a session token. */
+  /** A pairing that did not finish leaves the tab as it was: still paired, if it was. */
+  function failPairing(failure: CompanionFailure): false {
+    state.failure = failure
+    state.status = session ? 'connected' : 'idle'
+    return false
+  }
+
+  /**
+   * Trades the link's code for the tab's tokens. An existing pairing is replaced only once the
+   * new one succeeds, so a link that fails cannot sign the tab out.
+   */
   async function pair(link: CompanionLink): Promise<boolean> {
-    forget(null)
-    state.status = 'pairing'
-    const base = `http://127.0.0.1:${link.port}`
+    if (!session) state.status = 'pairing'
     let response: Response
     try {
-      response = await request(`${base}/pair`, {
+      response = await request(`${base(link.port)}/pair`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: link.code }),
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
       })
     } catch {
-      forget('unreachable')
-      return false
+      return failPairing('unreachable')
     }
-    if (!response.ok) {
-      forget(response.status === 429 ? 'rate-limited' : 'rejected')
-      return false
-    }
+    if (!response.ok) return failPairing(response.status === 429 ? 'rate-limited' : 'rejected')
     const paired = v.safeParse(
       v.pipe(v.string(), v.parseJson(), companionPairingSchema),
       await response.text()
     )
-    if (!paired.success) {
-      forget('rejected')
-      return false
-    }
-    session = { token: paired.output.token, port: link.port }
+    if (!paired.success) return failPairing('rejected')
+    const previous = session
+    session = { token: paired.output.token, agentToken: paired.output.agentToken, port: link.port }
+    if (previous) void revoke(previous)
     state.version = paired.output.version
     state.status = 'connected'
     state.failure = null
@@ -163,12 +211,55 @@ export function createCompanionConnection({
     return true
   }
 
-  /** Forgets the token; the companion keeps running for other tabs. */
-  function disconnect() {
-    forget(null)
+  /** Tells the companion to drop a session's tokens; best effort, as it may have stopped. */
+  async function revoke(old: CompanionSession): Promise<void> {
+    await request(`${base(old.port)}/pair/revoke`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${old.token}` },
+      keepalive: true
+    }).catch(() => undefined)
   }
 
-  return { state, url, token, connected, pair, check, disconnect }
+  /** Holds a link until the person confirms it; nothing reaches the companion before that. */
+  async function offer(link: CompanionLink): Promise<void> {
+    pendingLink = link
+    state.pending = { port: link.port, fingerprint: await companionFingerprint(link.code) }
+  }
+
+  /** Pairs with the link the person confirmed. */
+  function confirm(): Promise<boolean> {
+    const link = pendingLink
+    pendingLink = null
+    state.pending = null
+    return link ? pair(link) : Promise.resolve(false)
+  }
+
+  /** Drops the link the person did not confirm. */
+  function dismiss(): void {
+    pendingLink = null
+    state.pending = null
+  }
+
+  /** Signs the tab out, here and in the companion, which keeps running for other tabs. */
+  function disconnect() {
+    const current = session
+    forget(null)
+    if (current) void revoke(current)
+  }
+
+  return {
+    state,
+    url,
+    token,
+    agentToken,
+    connected,
+    pair,
+    offer,
+    confirm,
+    dismiss,
+    check,
+    disconnect
+  }
 }
 
 export type CompanionConnection = ReturnType<typeof createCompanionConnection>
@@ -176,18 +267,21 @@ export type CompanionConnection = ReturnType<typeof createCompanionConnection>
 export const companion = createCompanionConnection()
 
 /**
- * Pairs with the companion when the page was opened from its link, and removes the code from
- * the address bar and history so it is not bookmarked, shared, or reused.
+ * Takes the pairing link from the address the tab opened with, removes the code from the address
+ * bar and history so it is not bookmarked, shared, or reused, and holds the link for the person
+ * to confirm. Any page can open a link, so pairing never starts without that confirmation.
  */
-export function connectCompanionFromLocation(
+export async function connectCompanionFromLocation(
   location: Pick<Location, 'hash' | 'href'> = window.location,
   history: Pick<History, 'replaceState' | 'state'> = window.history,
-  connection: Pick<CompanionConnection, 'pair'> = companion
+  connection: Pick<CompanionConnection, 'offer'> = companion
 ): Promise<boolean> {
-  if (!location.hash.includes('connect=')) return Promise.resolve(false)
+  if (!location.hash.includes('connect=')) return false
   const link = parseCompanionLink(location.hash)
   const clean = new URL(location.href)
   clean.hash = ''
   history.replaceState(history.state, '', clean.href.replace(/#$/, ''))
-  return link ? connection.pair(link) : Promise.resolve(false)
+  if (!link) return false
+  await connection.offer(link)
+  return true
 }

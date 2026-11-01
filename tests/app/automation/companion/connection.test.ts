@@ -1,8 +1,10 @@
 import { describe, expect, mock, test } from 'bun:test'
+import { createHash } from 'node:crypto'
 
 import { AUTOMATION_HTTP_PORT } from '@open-pencil/core/constants'
 
 import {
+  companionFingerprint,
   connectCompanionFromLocation,
   createCompanionConnection,
   parseCompanionLink
@@ -10,6 +12,7 @@ import {
 
 const CODE = '0123456789abcdef0123456789abcdef'
 const TOKEN = 'f'.repeat(64)
+const AGENT_TOKEN = 'a'.repeat(64)
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status })
@@ -38,17 +41,66 @@ describe('parseCompanionLink', () => {
 describe('companion connection', () => {
   test('pairs with the code on this machine and keeps the token', async () => {
     const request = mock(async (_url: string, _init?: RequestInit) =>
-      jsonResponse({ token: TOKEN, version: '0.16.0' })
+      jsonResponse({ token: TOKEN, agentToken: AGENT_TOKEN, version: '0.16.0' })
     )
     const connection = createCompanionConnection({ fetch: request })
     expect(await connection.pair({ code: CODE, port: 7601 })).toBe(true)
     expect(String(request.mock.calls[0]?.[0])).toBe('http://127.0.0.1:7601/pair')
     expect(connection.connected()).toBe(true)
     expect(connection.token()).toBe(TOKEN)
+    expect(connection.agentToken()).toBe(AGENT_TOKEN)
     expect(connection.url()).toBe('http://127.0.0.1:7601')
     expect(connection.state.version).toBe('0.16.0')
     connection.disconnect()
     expect(connection.token()).toBeNull()
+    expect(connection.agentToken()).toBeNull()
+    // Disconnecting signs the tab out in the companion too.
+    const [url, init] = request.mock.calls.at(-1) ?? []
+    expect(String(url)).toBe('http://127.0.0.1:7601/pair/revoke')
+    expect(new Headers(init?.headers).get('authorization')).toBe(`Bearer ${TOKEN}`)
+  })
+
+  test('keeps an existing pairing when a new link fails', async () => {
+    let refuse = false
+    const connection = createCompanionConnection({
+      fetch: async () =>
+        refuse
+          ? jsonResponse({ error: 'no' }, 401)
+          : jsonResponse({ token: TOKEN, agentToken: AGENT_TOKEN, version: '0.16.0' })
+    })
+    await connection.pair({ code: CODE, port: 7600 })
+    refuse = true
+    expect(await connection.pair({ code: CODE, port: 7601 })).toBe(false)
+    expect(connection.state).toMatchObject({ status: 'connected', failure: 'rejected' })
+    expect(connection.token()).toBe(TOKEN)
+    expect(connection.url()).toBe('http://127.0.0.1:7600')
+  })
+
+  test('pairs with a link only once the person confirms it', async () => {
+    const request = mock(async (_url: string, _init?: RequestInit) =>
+      jsonResponse({ token: TOKEN, agentToken: AGENT_TOKEN, version: '0.16.0' })
+    )
+    const connection = createCompanionConnection({ fetch: request })
+    await connection.offer({ code: CODE, port: 7601 })
+    expect(connection.state.pending).toEqual({
+      port: 7601,
+      fingerprint: await companionFingerprint(CODE)
+    })
+    expect(request).not.toHaveBeenCalled()
+    connection.dismiss()
+    expect(connection.state.pending).toBeNull()
+    expect(await connection.confirm()).toBe(false)
+    expect(request).not.toHaveBeenCalled()
+
+    await connection.offer({ code: CODE, port: 7601 })
+    expect(await connection.confirm()).toBe(true)
+    expect(connection.state.pending).toBeNull()
+    expect(String(request.mock.calls[0]?.[0])).toBe('http://127.0.0.1:7601/pair')
+  })
+
+  test('derives the fingerprint the companion prints', async () => {
+    const hex = createHash('sha256').update(CODE).digest('hex').slice(0, 6).toUpperCase()
+    expect(await companionFingerprint(CODE)).toBe(`${hex.slice(0, 3)}-${hex.slice(3)}`)
   })
 
   test.each([
@@ -77,7 +129,9 @@ describe('companion connection', () => {
     let restarted = false
     const connection = createCompanionConnection({
       fetch: async () =>
-        restarted ? jsonResponse({}, 401) : jsonResponse({ token: TOKEN, version: '0.16.0' })
+        restarted
+          ? jsonResponse({}, 401)
+          : jsonResponse({ token: TOKEN, agentToken: AGENT_TOKEN, version: '0.16.0' })
     })
     await connection.pair({ code: CODE, port: 7600 })
     restarted = true
@@ -92,7 +146,7 @@ describe('companion connection', () => {
       fetch: async (url) => {
         if (down) throw new TypeError('Failed to fetch')
         return String(url).endsWith('/pair')
-          ? jsonResponse({ token: TOKEN, version: '0.16.0' })
+          ? jsonResponse({ token: TOKEN, agentToken: AGENT_TOKEN, version: '0.16.0' })
           : jsonResponse({ version: '0.16.0', workspace: '/tmp/agents' })
       }
     })
@@ -108,30 +162,30 @@ describe('companion connection', () => {
 })
 
 describe('connectCompanionFromLocation', () => {
-  test('removes the code from the address before pairing', async () => {
+  test('removes the code from the address and holds the link for confirmation', async () => {
     const replaceState = mock(
       (_state: unknown, _unused: string, _url?: string | URL | null) => undefined
     )
-    const pair = mock(async () => true)
-    const paired = await connectCompanionFromLocation(
+    const offer = mock(async () => undefined)
+    const offered = await connectCompanionFromLocation(
       { hash: `#connect=${CODE}`, href: `https://app.openpencil.dev/?test#connect=${CODE}` },
       { replaceState, state: null },
-      { pair }
+      { offer }
     )
-    expect(paired).toBe(true)
+    expect(offered).toBe(true)
     expect(replaceState.mock.calls[0]?.[2]).toBe('https://app.openpencil.dev/?test')
-    expect(pair).toHaveBeenCalledWith({ code: CODE, port: AUTOMATION_HTTP_PORT })
+    expect(offer).toHaveBeenCalledWith({ code: CODE, port: AUTOMATION_HTTP_PORT })
   })
 
   test('leaves other fragments alone', async () => {
     const replaceState = mock(() => undefined)
-    const pair = mock(async () => true)
+    const offer = mock(async () => undefined)
     await connectCompanionFromLocation(
       { hash: '#section', href: 'https://app.openpencil.dev/#section' },
       { replaceState, state: null },
-      { pair }
+      { offer }
     )
     expect(replaceState).not.toHaveBeenCalled()
-    expect(pair).not.toHaveBeenCalled()
+    expect(offer).not.toHaveBeenCalled()
   })
 })

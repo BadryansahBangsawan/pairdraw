@@ -3,6 +3,7 @@ import * as v from 'valibot'
 /** What `POST /pair` answers once the companion accepts a code. */
 export const companionPairingSchema = v.object({
   token: v.pipe(v.string(), v.minLength(32), v.maxLength(256)),
+  agentToken: v.pipe(v.string(), v.minLength(32), v.maxLength(256)),
   version: v.pipe(v.string(), v.maxLength(64))
 })
 

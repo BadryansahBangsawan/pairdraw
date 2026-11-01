@@ -399,6 +399,14 @@ export const aiMessageDefaults = {
   aiSetupPiSignIn:
     'To sign in to a provider or pick a default model, run pi in a terminal and type /login or /model.',
   aiSetupGetDesktop: 'Get the desktop app',
+  companionPairTitle: 'Connect this tab to your computer?',
+  companionPairDescription: params(
+    'OpenPencil’s companion will run coding agents on your computer for this tab. Connect only if you just started it and its terminal shows {fingerprint}.'
+  ),
+  companionPairPortWarning: params(
+    'This link uses port {port} instead of 7600. Connect only if you started the companion on that port.'
+  ),
+  companionPairConfirm: 'Connect',
   aiSetupCompanionDescription:
     'In the browser, agents run on your computer through OpenPencil’s companion. Run this command in a terminal, then open the link it prints.',
   aiSetupCompanionConnected: params('Connected to your computer · companion {version}'),

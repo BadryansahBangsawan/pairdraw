@@ -622,3 +622,5 @@ ja:ai.aiSetupCompanionRejected
 ja:ai.aiSetupCompanionSafari
 zh-cn:ai.aiSetupCompanionDescription
 zh-cn:ai.aiSetupCompanionSafari
+ja:ai.companionPairDescription
+zh-cn:ai.companionPairDescription

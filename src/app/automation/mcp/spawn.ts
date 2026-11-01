@@ -415,8 +415,8 @@ async function waitForHealth(
 }
 
 export async function getAutomationAuthToken(): Promise<string | null> {
-  // A paired companion knows the tab by the token it paired with.
-  const companionToken = companion.token()
+  // Agents reach a paired companion's MCP server with a token that starts no programs.
+  const companionToken = companion.agentToken()
   if (companionToken) return companionToken
   if (runtimeAutomationAuthToken) return runtimeAutomationAuthToken
   const health = await readAutomationHealth()

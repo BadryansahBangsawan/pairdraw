@@ -3,6 +3,7 @@ import { afterEach, describe, expect, spyOn, test } from 'bun:test'
 import { companionAgentHost } from '@/app/ai/agents/host/companion'
 import { agentHost, agentHostAvailable, piHostAvailable } from '@/app/ai/agents/host/current'
 import { companion } from '@/app/automation/companion/connection'
+import { getAutomationAuthToken } from '@/app/automation/mcp/spawn'
 
 import { asDouble } from '#tests/helpers/doubles'
 
@@ -17,7 +18,7 @@ describe('agent host selection outside the desktop app', () => {
 
     const request = spyOn(globalThis, 'fetch').mockImplementation(
       asDouble<typeof fetch>(async () =>
-        Response.json({ token: 'f'.repeat(64), version: '0.16.0' })
+        Response.json({ token: 'f'.repeat(64), agentToken: 'a'.repeat(64), version: '0.16.0' })
       )
     )
     try {
@@ -26,6 +27,8 @@ describe('agent host selection outside the desktop app', () => {
       request.mockRestore()
     }
     expect(agentHostAvailable()).toBe(true)
+    // Agents get the token that reaches only the MCP server, never the tab's own.
+    expect(await getAutomationAuthToken()).toBe('a'.repeat(64))
 
     companion.disconnect()
     expect(agentHostAvailable()).toBe(false)

@@ -57,7 +57,7 @@ async function addRectangle(page: Page) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
 })
 

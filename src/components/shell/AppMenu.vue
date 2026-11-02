@@ -15,6 +15,7 @@ import {
 import { tv } from 'tailwind-variants'
 import IconChevronRight from '~icons/lucide/chevron-right'
 
+import type { MenuEntry } from '@open-pencil/vue/editor/menu-model'
 import { vTestId } from '@open-pencil/vue/testing'
 
 import { useAppMenu } from '@/app/shell/menu/app-menu'
@@ -48,6 +49,22 @@ const menuCls = useMenuUI()
 const mainMenuCls = useMenuUI({ content: 'min-w-44' })
 const subMenuCls = useMenuUI({ content: 'min-w-52' })
 const nestedMenuCls = useMenuUI({ content: 'min-w-44' })
+
+/**
+ * Set by an action item. Focus then stays where the action put it, such as on the icon picker it
+ * opened, instead of returning to the brand, which would dismiss a popover it opened.
+ */
+let ranAction = false
+
+function run(item: MenuEntry) {
+  ranAction = true
+  runMenuAction(item)
+}
+
+function onCloseAutoFocus(event: Event) {
+  if (ranAction) event.preventDefault()
+  ranAction = false
+}
 </script>
 
 <template>
@@ -64,7 +81,12 @@ const nestedMenuCls = useMenuUI({ content: 'min-w-44' })
     </DropdownMenuTrigger>
 
     <DropdownMenuPortal>
-      <DropdownMenuContent :side-offset="4" align="start" :class="mainMenuCls.content">
+      <DropdownMenuContent
+        :side-offset="4"
+        align="start"
+        :class="mainMenuCls.content"
+        @close-auto-focus="onCloseAutoFocus"
+      >
         <DropdownMenuSub v-for="menu in topMenus" :key="menu.label">
           <DropdownMenuSubTrigger
             v-test-id="`menubar-${menu.label.toLowerCase()}`"
@@ -106,7 +128,7 @@ const nestedMenuCls = useMenuUI({ content: 'min-w-44' })
                               v-else
                               :class="menuCls.item"
                               :disabled="menuDisabled(sub)"
-                              @select="runMenuAction(sub)"
+                              @select="run(sub)"
                             >
                               <span class="flex-1">{{ menuLabel(sub) }}</span>
                               <AppShortcutText v-if="menuShortcut(sub)">{{
@@ -133,7 +155,7 @@ const nestedMenuCls = useMenuUI({ content: 'min-w-44' })
                     v-else
                     :class="menuCls.item"
                     :disabled="menuDisabled(item)"
-                    @select="runMenuAction(item)"
+                    @select="run(item)"
                   >
                     <span class="flex-1">{{ menuLabel(item) }}</span>
                     <AppShortcutText v-if="menuShortcut(item)">{{

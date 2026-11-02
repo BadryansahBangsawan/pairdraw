@@ -11,6 +11,7 @@ import {
   companionSocketMessageSchema
 } from '@/app/automation/companion/schema'
 import { createDeferred } from '@/app/runtime/deferred'
+import { APP_NAME } from '@/constants'
 
 import { chatToolsProbe, signInInsideAgent } from './shared'
 import type { AgentHost, AgentSignIn, AgentSpawnOptions, AgentStreams } from './types'
@@ -34,7 +35,7 @@ type SocketMessage = v.InferOutput<typeof companionSocketMessageSchema>
 
 export class CompanionNotConnectedError extends Error {
   constructor() {
-    super('OpenPencil is not connected to your computer. Run the companion and open its link.')
+    super(`${APP_NAME} is not connected to your computer. Run the companion and open its link.`)
     this.name = 'CompanionNotConnectedError'
   }
 }

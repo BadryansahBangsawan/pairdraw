@@ -35,7 +35,7 @@ export function codingAgentSetupPrompt(agentID: ACPAgentID): string {
     4. Confirm both commands are found, for example with \`which ${agent.command}\` and \`which openpencil-mcp-http\` (\`where\` on Windows). If a global npm folder is missing from my PATH, tell me how to add it.
     5. ${SIGN_IN[agentID]}
 
-    Then tell me what you installed and anything I still need to do myself. I will press "Check again" in ${APP_NAME}'s AI setup afterwards.
+    Then tell me what you installed and anything I still need to do myself. I will press "Connect ${agent.name}" or "Retry" in ${APP_NAME}'s AI setup afterwards.
 
     Setup guide: ${codingAgentGuideURL(agentID)}
   `

@@ -367,16 +367,16 @@ export const aiMessageDefaults = {
     '{agent} can’t reach Pairdraw’s tools, so chats with it won’t start.'
   ),
   aiSetupAgentToolsHint:
-    'Check that Pairdraw’s MCP server is running in Settings → MCP, then press Check again.',
+    'Check that Pairdraw’s MCP server is running in Settings → MCP, then press Retry.',
   aiSetupAgentAdapterMismatch: params(
     'Pairdraw found {path}, another adapter it doesn’t support. Install the supported one, then remove this one or move it later on your PATH.'
   ),
   aiSetupConnect: params('Connect {agent}'),
   aiSetupConnecting: 'Connecting…',
   aiSetupConnectStepDetect: 'Check this computer',
-  aiSetupConnectStepInstall: params('Install {agent} and OpenPencil’s MCP server'),
+  aiSetupConnectStepInstall: params('Install {agent} and Pairdraw’s MCP server'),
   aiSetupConnectStepSignIn: params('Sign in to {agent}'),
-  aiSetupConnectStepTools: 'Reach OpenPencil’s tools',
+  aiSetupConnectStepTools: 'Reach Pairdraw’s tools',
   aiSetupConnectStepActivate: 'Use it in the chat',
   aiSetupConnectStepDone: 'done',
   aiSetupConnectStepRunning: 'in progress',
@@ -401,14 +401,14 @@ export const aiMessageDefaults = {
   aiSetupGetDesktop: 'Get the desktop app',
   companionPairTitle: 'Connect this tab to your computer?',
   companionPairDescription: params(
-    'OpenPencil’s companion will run coding agents on your computer for this tab. Connect only if you just started it and its terminal shows {fingerprint}.'
+    'Pairdraw’s companion will run coding agents on your computer for this tab. Connect only if you just started it and its terminal shows {fingerprint}.'
   ),
   companionPairPortWarning: params(
     'This link uses port {port} instead of 7600. Connect only if you started the companion on that port.'
   ),
   companionPairConfirm: 'Connect',
   aiSetupCompanionDescription:
-    'In the browser, agents run on your computer through OpenPencil’s companion. Run this command in a terminal, then open the link it prints.',
+    'In the browser, agents run on your computer through Pairdraw’s companion. Run this command in a terminal, then open the link it prints.',
   aiSetupCompanionConnected: params('Connected to your computer · companion {version}'),
   aiSetupCompanionDisconnect: 'Disconnect',
   aiSetupCompanionPairing: 'Connecting to your computer…',

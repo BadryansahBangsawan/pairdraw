@@ -8,6 +8,7 @@ import { expect, test } from '@playwright/test'
 import * as v from 'valibot'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
+import { ChatHarness } from '#tests/helpers/chat/harness'
 import { repoPath, testPath } from '#tests/helpers/paths'
 
 /**
@@ -112,14 +113,13 @@ test('a tab opened from the companion’s link pairs and chats with an agent on 
     )
     await page.getByTestId('app-settings-done').click()
 
-    await page.getByRole('tab', { name: 'AI' }).click()
-    const input = page.getByRole('textbox', { name: 'Describe a change' })
-    await input.fill('hello from the browser')
-    await page.getByTestId('chat-send-button').click()
-    await expect(page.getByTestId('chat-message-assistant').last()).toContainText(
-      'echo: hello from the browser',
-      { timeout: 60_000 }
-    )
+    const chat = new ChatHarness(page)
+    await chat.openChat()
+    await chat.input.fill('hello from the browser')
+    await chat.sendButton.click()
+    await expect(chat.assistantMessage()).toContainText('echo: hello from the browser', {
+      timeout: 60_000
+    })
   } finally {
     companion.child.kill('SIGINT')
     rmSync(dir, { recursive: true, force: true })

@@ -82,7 +82,18 @@ export const commandMessageDefaults = {
   toggleAIChat: 'Show or hide AI chat',
   nudgeSelection: 'Nudge selection',
   nudgeSelectionFurther: 'Nudge selection further',
-  panWhileHeld: 'Pan while held'
+  panWhileHeld: 'Pan while held',
+  shortcutSheetVectorEdit: 'Vector edit mode',
+  vectorCutTool: 'Cut tool',
+  vectorJoinEndpoints: 'Join end points',
+  vectorNudgePoints: 'Nudge points',
+  vectorNudgePointsFurther: 'Nudge points further',
+  vectorDuplicatePoints: 'Duplicate points',
+  vectorStraightenSegment: 'Straighten segment',
+  vectorSmoothCorner: 'Switch point between smooth and corner',
+  gestureDrag: 'drag',
+  gestureDoubleClickSegment: 'double-click a segment',
+  gestureDoubleClickPoint: 'double-click a point'
 } as const
 
 export const commandMessages = i18n('commands', commandMessageDefaults)

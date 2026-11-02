@@ -80,5 +80,16 @@
   "toggleAIChat": "显示或隐藏 AI 聊天",
   "nudgeSelection": "微移所选内容",
   "nudgeSelectionFurther": "大幅移动所选内容",
-  "panWhileHeld": "按住时平移视图"
+  "panWhileHeld": "按住时平移视图",
+  "shortcutSheetVectorEdit": "矢量编辑模式",
+  "vectorCutTool": "剪切工具",
+  "vectorJoinEndpoints": "连接端点",
+  "vectorNudgePoints": "微移锚点",
+  "vectorNudgePointsFurther": "大幅移动锚点",
+  "vectorDuplicatePoints": "复制锚点",
+  "vectorStraightenSegment": "拉直线段",
+  "vectorSmoothCorner": "在平滑和尖角之间切换锚点",
+  "gestureDrag": "拖动",
+  "gestureDoubleClickSegment": "双击线段",
+  "gestureDoubleClickPoint": "双击锚点"
 }

@@ -55,6 +55,20 @@ describe('shortcutSheetSections', () => {
     expect(sections.map((section) => section.id)).toEqual(['a', 'b'])
     expect(sections[1]?.entries.map((entry) => entry.id)).toEqual(['redo'])
   })
+
+  test('keeps entries with the same keys and name but different pointer actions', () => {
+    const sections = shortcutSheetSections([
+      {
+        id: 'vector',
+        label: 'Vector',
+        entries: [
+          { id: 'a', label: 'Edit', shortcut: '⌘', gesture: 'drag' },
+          { id: 'b', label: 'Edit', shortcut: '⌘', gesture: 'double-click' }
+        ]
+      }
+    ])
+    expect(sections[0]?.entries).toHaveLength(2)
+  })
 })
 
 describe('filterShortcutSheet', () => {
@@ -89,6 +103,21 @@ describe('filterShortcutSheet', () => {
     expect(shown.flatMap((section) => section.entries.map((entry) => entry.id))).toEqual([
       'replace'
     ])
+  })
+
+  test('matches the pointer action of an entry', () => {
+    const vector: ShortcutSheetSection[] = [
+      {
+        id: 'vector-edit',
+        label: 'Vector edit mode',
+        entries: [
+          { id: 'cut', label: 'Cut tool', shortcut: 'X' },
+          { id: 'smooth', label: 'Smooth or corner', shortcut: '', gesture: 'double-click a point' }
+        ]
+      }
+    ]
+    const shown = filterShortcutSheet(vector, 'double-click')
+    expect(shown[0]?.entries.map((entry) => entry.id)).toEqual(['smooth'])
   })
 
   test('a matching section name keeps the whole section', () => {

@@ -80,5 +80,16 @@
   "toggleAIChat": "AI チャットの表示/非表示",
   "nudgeSelection": "選択範囲を少し移動",
   "nudgeSelectionFurther": "選択範囲を大きく移動",
-  "panWhileHeld": "押している間ビューを移動"
+  "panWhileHeld": "押している間ビューを移動",
+  "shortcutSheetVectorEdit": "ベクター編集モード",
+  "vectorCutTool": "カットツール",
+  "vectorJoinEndpoints": "端点を結合",
+  "vectorNudgePoints": "ポイントを少し移動",
+  "vectorNudgePointsFurther": "ポイントを大きく移動",
+  "vectorDuplicatePoints": "ポイントを複製",
+  "vectorStraightenSegment": "セグメントを直線にする",
+  "vectorSmoothCorner": "ポイントをスムーズとコーナーで切り替え",
+  "gestureDrag": "ドラッグ",
+  "gestureDoubleClickSegment": "セグメントをダブルクリック",
+  "gestureDoubleClickPoint": "ポイントをダブルクリック"
 }

@@ -16,6 +16,7 @@ export default {
     label: 'min-w-0 truncate text-xs text-muted',
     keys: 'flex shrink-0 items-center gap-1',
     separator: '-ml-0.5 text-xs text-muted',
+    gesture: 'text-xs text-muted',
     key: 'inline-flex min-w-5 items-center justify-center rounded-md bg-panel-field px-1.5 py-0.5 font-mono text-[11px] leading-none text-surface'
   }
 } as const

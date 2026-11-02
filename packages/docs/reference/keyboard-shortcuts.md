@@ -116,7 +116,6 @@ In the app, press <kbd>?</kbd> or click the keyboard button at the end of the to
 | <kbd>⌘</kbd><kbd>G</kbd> | Group Selection | ✅ |
 | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>G</kbd> | Ungroup | ✅ |
 | <kbd>⇧</kbd><kbd>A</kbd> | Add Auto Layout | ✅ |
-| <kbd>⌥</kbd><kbd>⇧</kbd><kbd>A</kbd> | Remove Auto Layout (every selected frame) | ✅ |
 | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> | Create Component | ✅ |
 | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd> | Detach Instance | ✅ |
 | <kbd>⌘</kbd><kbd>R</kbd> | Rename Selection | ✅ |
@@ -150,6 +149,21 @@ In the app, press <kbd>?</kbd> or click the keyboard button at the end of the to
 | <kbd>⌃</kbd><kbd>⌥</kbd><kbd>H</kbd> | Distribute Horizontal Spacing | ✅ |
 | <kbd>⌃</kbd><kbd>⌥</kbd><kbd>V</kbd> | Distribute Vertical Spacing | ✅ |
 | <kbd>⌃</kbd><kbd>⌥</kbd><kbd>T</kbd> | Tidy Up | ✅ |
+| <kbd>⌥</kbd><kbd>⇧</kbd><kbd>A</kbd> | Remove Auto Layout (every selected frame) | ✅ |
+
+## Vector Edit Mode
+
+These keys work while a path is being edited (double-click a vector or press <kbd>↩</kbd> on it).
+
+| Input | Action | Status |
+|-------|--------|--------|
+| <kbd>X</kbd> | Cut tool: click a segment or a point to cut the path there | ✅ |
+| <kbd>⌘</kbd><kbd>J</kbd> | Join the two selected end points (outside vector edit mode it shows or hides the AI chat) | ✅ |
+| <kbd>⌥</kbd>+Drag | Duplicate the dragged points or segments | ✅ |
+| <kbd>⌘</kbd>+Double-click a segment | Straighten the segment | ✅ |
+| Double-click a point | Switch the point between smooth and corner | ✅ |
+| Arrow keys | Nudge the selected points by the small nudge (<kbd>⇧</kbd> for the big one) | ✅ |
+| <kbd>Escape</kbd> | Put the cut tool down, or leave vector edit mode | ✅ |
 
 ## Text
 

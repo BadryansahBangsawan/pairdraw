@@ -80,5 +80,16 @@
   "toggleAIChat": "Mostra o nascondi la chat IA",
   "nudgeSelection": "Sposta la selezione",
   "nudgeSelectionFurther": "Sposta di più la selezione",
-  "panWhileHeld": "Sposta la vista tenendo premuto"
+  "panWhileHeld": "Sposta la vista tenendo premuto",
+  "shortcutSheetVectorEdit": "Modalità modifica vettoriale",
+  "vectorCutTool": "Strumento taglio",
+  "vectorJoinEndpoints": "Unisci punti finali",
+  "vectorNudgePoints": "Sposta i punti",
+  "vectorNudgePointsFurther": "Sposta di più i punti",
+  "vectorDuplicatePoints": "Duplica i punti",
+  "vectorStraightenSegment": "Raddrizza il segmento",
+  "vectorSmoothCorner": "Alterna il punto tra morbido e angolo",
+  "gestureDrag": "trascina",
+  "gestureDoubleClickSegment": "doppio clic su un segmento",
+  "gestureDoubleClickPoint": "doppio clic su un punto"
 }

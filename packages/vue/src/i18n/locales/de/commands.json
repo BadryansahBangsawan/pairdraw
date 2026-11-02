@@ -80,5 +80,16 @@
   "toggleAIChat": "KI-Chat ein- oder ausblenden",
   "nudgeSelection": "Auswahl verschieben",
   "nudgeSelectionFurther": "Auswahl weiter verschieben",
-  "panWhileHeld": "Ansicht verschieben, solange gedrückt"
+  "panWhileHeld": "Ansicht verschieben, solange gedrückt",
+  "shortcutSheetVectorEdit": "Vektorbearbeitung",
+  "vectorCutTool": "Schneidewerkzeug",
+  "vectorJoinEndpoints": "Endpunkte verbinden",
+  "vectorNudgePoints": "Punkte verschieben",
+  "vectorNudgePointsFurther": "Punkte weiter verschieben",
+  "vectorDuplicatePoints": "Punkte duplizieren",
+  "vectorStraightenSegment": "Segment begradigen",
+  "vectorSmoothCorner": "Punkt zwischen glatt und Ecke wechseln",
+  "gestureDrag": "ziehen",
+  "gestureDoubleClickSegment": "Doppelklick auf ein Segment",
+  "gestureDoubleClickPoint": "Doppelklick auf einen Punkt"
 }

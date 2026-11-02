@@ -14,8 +14,10 @@ export const SHORTCUT_SHEET_KEYBINDINGS = ['Shift+?']
 export interface ShortcutSheetEntry {
   id: string
   label: string
-  /** The keys as this platform prints them, such as `⌥⌘G` or `Ctrl+Alt+G`. */
+  /** The keys as this platform prints them, such as `⌥⌘G` or `Ctrl+Alt+G`; empty for none. */
   shortcut: string
+  /** The pointer action that goes with the keys, such as dragging or double-clicking. */
+  gesture?: string
 }
 
 export interface ShortcutSheetSection {
@@ -51,7 +53,7 @@ export function shortcutSheetSections(
   const seen = new Set<string>()
   return sections.flatMap((section) => {
     const entries = section.entries.filter((entry) => {
-      const key = `${entry.shortcut}\0${entry.label}`
+      const key = `${entry.shortcut}\0${entry.gesture ?? ''}\0${entry.label}`
       if (seen.has(key)) return false
       seen.add(key)
       return true
@@ -76,7 +78,10 @@ function searchText(value: string): string {
   return value.normalize('NFKC').toLocaleLowerCase().replaceAll(/\s+/g, ' ').trim()
 }
 
-/** The entries whose name or keys contain the query; a section's name matches all of it. */
+/**
+ * The entries whose name, keys, or pointer action contain the query; a section's name matches all
+ * of it.
+ */
 export function filterShortcutSheet(
   sections: readonly ShortcutSheetSection[],
   query: string
@@ -87,7 +92,9 @@ export function filterShortcutSheet(
     if (searchText(section.label).includes(needle)) return [section]
     const entries = section.entries.filter(
       (entry) =>
-        searchText(entry.label).includes(needle) || searchText(entry.shortcut).includes(needle)
+        searchText(entry.label).includes(needle) ||
+        searchText(entry.shortcut).includes(needle) ||
+        searchText(entry.gesture ?? '').includes(needle)
     )
     return entries.length > 0 ? [{ ...section, entries }] : []
   })

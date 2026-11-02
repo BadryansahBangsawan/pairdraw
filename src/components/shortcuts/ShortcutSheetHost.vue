@@ -9,7 +9,7 @@ import {
   useEditorCommands,
   type EditorCommandId
 } from '@open-pencil/vue/editor/commands'
-import { useCommandMessages, useMenuMessages, usePanelMessages } from '@open-pencil/vue/i18n'
+import { useCommandMessages, useMenuMessages } from '@open-pencil/vue/i18n'
 
 import { CHAT_COLUMN_SHORTCUT } from '@/app/ai/chat/panel'
 import { useEditorStore } from '@/app/editor/active-store'
@@ -19,7 +19,6 @@ import {
   type CanvasContextActionMeta
 } from '@/app/editor/canvas/menu/registry'
 import { toolShortcutLabels } from '@/app/editor/toolbar/shortcuts'
-import { REMOVE_AUTO_LAYOUT_SHORTCUT } from '@/app/shell/keyboard/auto-layout'
 import {
   menuShortcutEntries,
   SHORTCUT_SHEET_SHORTCUT,
@@ -42,7 +41,6 @@ const { topMenus } = useAppMenu()
 const { getCommand } = useEditorCommands()
 const commands = useCommandMessages()
 const menu = useMenuMessages()
-const panels = usePanelMessages()
 const toolLabels = useToolLabels()
 
 /** The command palette's own key, which `CommandPalette.vue` binds. */
@@ -60,6 +58,16 @@ const CANVAS_COMMANDS: readonly EditorCommandId[] = [
 function entry(id: string, label: string, token: string): ShortcutSheetEntry[] {
   const shortcut = formatShortcut(token)
   return shortcut ? [{ id, label, shortcut }] : []
+}
+
+/** A pointer action, with the keys held during it when there are any. */
+function gestureEntry(
+  id: string,
+  label: string,
+  token: string,
+  gesture: string
+): ShortcutSheetEntry[] {
+  return [{ id, label, shortcut: formatShortcut(token) ?? '', gesture }]
 }
 
 const toolEntries = computed(() => {
@@ -91,11 +99,32 @@ const canvasEntries = computed(() => [
   ...entry('nudge-further', commands.value.nudgeSelectionFurther, 'SHIFT+←→↑↓'),
   ...canvasActionEntries(CANVAS_COPY_AS_ACTIONS),
   ...canvasActionEntries(CANVAS_PROPERTIES_ACTIONS),
-  ...entry('remove-auto-layout', panels.value.removeAutoLayout, REMOVE_AUTO_LAYOUT_SHORTCUT),
   ...entry('toggle-ai', commands.value.toggleAIChat, CHAT_COLUMN_SHORTCUT),
   ...entry('command-palette', commands.value.paletteAriaLabel, COMMAND_PALETTE_SHORTCUT),
   ...entry('shortcut-sheet', commands.value.shortcutSheet, SHORTCUT_SHEET_SHORTCUT)
 ])
+
+/**
+ * The keys and pointer actions of vector edit mode (`src/app/shell/keyboard/node-edit.ts`); ⌘J
+ * joins end points there and shows or hides the AI chat everywhere else.
+ */
+const vectorEditEntries = computed((): ShortcutSheetEntry[] => {
+  const t = commands.value
+  return [
+    ...entry('vector-cut-tool', t.vectorCutTool, 'X'),
+    ...entry('vector-join', t.vectorJoinEndpoints, CHAT_COLUMN_SHORTCUT),
+    ...entry('vector-nudge', t.vectorNudgePoints, '←→↑↓'),
+    ...entry('vector-nudge-further', t.vectorNudgePointsFurther, 'SHIFT+←→↑↓'),
+    ...gestureEntry('vector-duplicate', t.vectorDuplicatePoints, 'ALT', t.gestureDrag),
+    ...gestureEntry(
+      'vector-straighten',
+      t.vectorStraightenSegment,
+      'MOD',
+      t.gestureDoubleClickSegment
+    ),
+    ...gestureEntry('vector-smooth-corner', t.vectorSmoothCorner, '', t.gestureDoubleClickPoint)
+  ]
+})
 
 const open = computed({
   get: () => shortcutSheetOpen.value,
@@ -112,7 +141,12 @@ const sections = computed<ShortcutSheetSection[]>(() =>
       label: group.label,
       entries: menuShortcutEntries(group.items)
     })),
-    { id: 'canvas', label: commands.value.shortcutSheetCanvas, entries: canvasEntries.value }
+    { id: 'canvas', label: commands.value.shortcutSheetCanvas, entries: canvasEntries.value },
+    {
+      id: 'vector-edit',
+      label: commands.value.shortcutSheetVectorEdit,
+      entries: vectorEditEntries.value
+    }
   ])
 )
 </script>

@@ -80,5 +80,16 @@
   "toggleAIChat": "Pokaż lub ukryj czat AI",
   "nudgeSelection": "Przesuń zaznaczenie",
   "nudgeSelectionFurther": "Przesuń zaznaczenie dalej",
-  "panWhileHeld": "Przesuwaj widok, przytrzymując"
+  "panWhileHeld": "Przesuwaj widok, przytrzymując",
+  "shortcutSheetVectorEdit": "Tryb edycji wektora",
+  "vectorCutTool": "Narzędzie cięcia",
+  "vectorJoinEndpoints": "Połącz punkty końcowe",
+  "vectorNudgePoints": "Przesuń punkty",
+  "vectorNudgePointsFurther": "Przesuń punkty dalej",
+  "vectorDuplicatePoints": "Duplikuj punkty",
+  "vectorStraightenSegment": "Wyprostuj segment",
+  "vectorSmoothCorner": "Przełącz punkt między gładkim a narożnym",
+  "gestureDrag": "przeciągnij",
+  "gestureDoubleClickSegment": "kliknij dwukrotnie segment",
+  "gestureDoubleClickPoint": "kliknij dwukrotnie punkt"
 }

@@ -80,5 +80,16 @@
   "toggleAIChat": "Показать или скрыть чат ИИ",
   "nudgeSelection": "Сдвинуть выделение",
   "nudgeSelectionFurther": "Сдвинуть выделение сильнее",
-  "panWhileHeld": "Перемещать вид, пока клавиша нажата"
+  "panWhileHeld": "Перемещать вид, пока клавиша нажата",
+  "shortcutSheetVectorEdit": "Режим редактирования вектора",
+  "vectorCutTool": "Инструмент разрезания",
+  "vectorJoinEndpoints": "Соединить конечные точки",
+  "vectorNudgePoints": "Сдвинуть точки",
+  "vectorNudgePointsFurther": "Сдвинуть точки сильнее",
+  "vectorDuplicatePoints": "Дублировать точки",
+  "vectorStraightenSegment": "Выпрямить сегмент",
+  "vectorSmoothCorner": "Переключить точку между гладкой и угловой",
+  "gestureDrag": "перетаскивание",
+  "gestureDoubleClickSegment": "двойной щелчок по сегменту",
+  "gestureDoubleClickPoint": "двойной щелчок по точке"
 }

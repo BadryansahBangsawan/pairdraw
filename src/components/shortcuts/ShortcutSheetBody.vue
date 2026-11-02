@@ -67,6 +67,7 @@ defineExpose({ focus: () => search.value?.focus() })
                   {{ cap }}
                 </kbd>
               </template>
+              <span v-if="entry.gesture" :class="styles.gesture()">{{ entry.gesture }}</span>
             </dd>
           </div>
         </dl>

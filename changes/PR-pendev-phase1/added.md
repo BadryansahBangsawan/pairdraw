@@ -66,3 +66,7 @@
 - The shader fill picker offers a gallery of ready-made shaders, each built from several effects, that apply in one click or with the arrow keys and stay editable effect by effect.
 - The documentation has a design system tutorial that builds a themed Button and Card library with variables, variants, component properties, and slots, with a downloadable example file and the script that builds it.
 - The documentation explains how to show readable diffs of `.fig` files in Git with `openpencil diff files` as a diff driver, a textconv outline, or `git difftool`.
+- The Arrange menu has Remove Auto Layout (⇧⌥A), the Object menu has Convert to Frame, and the View menu has Layers Panel and Properties Panel switches and Keyboard Shortcuts.
+- The keyboard shortcut sheet lists the keys and pointer actions of vector edit mode.
+- The set_image_fill tool's STRETCH scale mode stretches the whole image to the layer, as the image fill panel's Stretch does.
+- The AI chat fills a component's slots with the components suggested for them.

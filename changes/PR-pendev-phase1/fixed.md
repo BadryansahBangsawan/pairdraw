@@ -4,3 +4,7 @@
 - Dropping one end point of a path on the other now closes and fills the path, and other fills of the path are kept.
 - When an open file changes on disk while it has unsaved edits, Pairdraw now asks whether to reload it or keep your edits, instead of reloading it and discarding them.
 - Undoing Detach instance restores the instance fully, so later changes to its main component reach it again.
+- Copy as PNG in the desktop app puts the image on the system clipboard, including on Linux.
+- `openpencil eval` prints its whole result and script output when piped, instead of stopping at 64 KB.
+- Edits to a main component made with `openpencil eval`, `tool call`, or `shell` update its instances before the file is saved.
+- Opening a `.pen` document without variables or themes no longer adds an empty Theme variable collection.

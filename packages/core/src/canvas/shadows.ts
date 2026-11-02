@@ -399,7 +399,9 @@ export function renderEffects(
   graph: SceneGraph,
   pass: EffectPass
 ): void {
-  if (pass === 'front') renderNoiseEffects(r, canvas, node)
+  // Noise draws per pixel and a background blur reads back what is behind; both are left out
+  // while the renderer keeps effects cheap.
+  if (pass === 'front' && !r.effectsReduced) renderNoiseEffects(r, canvas, node)
 
   const ownShadows = !isLayerContainer(node)
   for (const effect of node.effects) {
@@ -409,7 +411,7 @@ export function renderEffects(
       renderDropShadow(r, canvas, graph, node, effect, false)
     }
 
-    if (pass === 'behind' && effect.type === 'BACKGROUND_BLUR') {
+    if (pass === 'behind' && effect.type === 'BACKGROUND_BLUR' && !r.effectsReduced) {
       const shape =
         node.type === 'BOOLEAN_OPERATION' ? makeBooleanOperationPath(r, node, graph) : null
       r.applyClippedBlur(canvas, node, blurSigma(effect.radius), shape)

@@ -8,6 +8,8 @@ const homeLocationSchema = v.variant('kind', [
   v.object({ kind: v.literal('recent') }),
   v.object({ kind: v.literal('storage') }),
   v.object({ kind: v.literal('shared') }),
+  /** The design systems: component libraries a new design can start from. */
+  v.object({ kind: v.literal('libraries') }),
   /** A workspace of the server Home shows. */
   v.object({ kind: v.literal('workspace'), id: v.string() })
 ])

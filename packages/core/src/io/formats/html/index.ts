@@ -12,13 +12,21 @@ import { exportWebFontFaceAssets } from '#core/text/web-font/assets'
 
 import { vectorElement } from './vectors'
 
-function designDocument(graph: SceneGraph, nodeIds: string[]): DesignDocument {
+function designDocument(
+  graph: SceneGraph,
+  nodeIds: string[],
+  options: HTMLExportOptions
+): DesignDocument {
+  // Layer names help find a layer in the markup; IDs only matter to tools that link back.
+  const projection = {
+    vectorElement,
+    includeLayerNames: options.layerNames ?? true,
+    includeSourceIds: options.layerIds ?? false
+  }
   return {
     type: 'document',
     sourceGraph: graph,
-    children: nodeIds.flatMap(
-      (id) => sceneNodeToDesignDocument(graph, id, { vectorElement }).children
-    )
+    children: nodeIds.flatMap((id) => sceneNodeToDesignDocument(graph, id, projection).children)
   }
 }
 
@@ -34,7 +42,7 @@ export async function renderNodesToHTML(
   options: HTMLExportOptions = {},
   fileName?: string
 ): Promise<{ html: string; assets: ExportAsset[] }> {
-  const bundle = await exportHTMLBundle(designDocument(graph, nodeIds), {
+  const bundle = await exportHTMLBundle(designDocument(graph, nodeIds, options), {
     html: options.html,
     style: options.style,
     assets: options.assets,
@@ -43,7 +51,8 @@ export async function renderNodesToHTML(
         ? async (fonts, basePath) =>
             (await exportWebFontFaceAssets({ fonts, assetBasePath: basePath })).assets
         : 'none',
-    assetBasePath: assetBasePath(fileName)
+    assetBasePath: assetBasePath(fileName),
+    loadTailwindStylesheet: options.loadTailwindStylesheet
   })
   const page = bundle.files.find((file) => file.path === bundle.entrypoint)
   if (typeof page?.content !== 'string') throw new Error('HTML export produced no page')

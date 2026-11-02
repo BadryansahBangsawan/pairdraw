@@ -231,6 +231,8 @@ export interface EditorEvents extends SceneGraphEvents {
   'page:changed': (pageId: string, previousPageId: string) => void
   'guides:changed': (ownerId: string, guides: readonly CanvasGuide[]) => void
   'clipboard:images-missing': (resolution: ClipboardImageResolution) => void
+  /** Turning a main component back into a frame was asked for; the front end confirms it. */
+  'component:to-frame-requested': (componentId: string) => void
   'font:resolution-changed': (event: FontResolutionEvent, snapshot: FontResolutionSnapshot) => void
   /** A font face finished loading, however it was asked for. */
   'font:loaded': (family: string, style: string) => void

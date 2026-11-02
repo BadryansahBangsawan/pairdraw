@@ -13,6 +13,7 @@ import { tokenExpressionForValue, type BindingScope } from '@open-pencil/scene-g
 
 import { reconcileVariableLayouts } from '#core/layout/variables'
 
+import { loadBoundFonts } from './text/bound-fonts'
 import type { EditorContext } from './types'
 
 /** What a variable means as a design token beyond its values: how CSS and code read it. */
@@ -68,7 +69,7 @@ export function createVariableActions(ctx: EditorContext) {
    * without an editor action, such as a collaborator's, take effect through it.
    */
   function refreshVariables(scope: BindingScope) {
-    reconcileVariableLayouts(ctx.graph, scope)
+    loadBoundFonts(ctx, reconcileVariableLayouts(ctx.graph, scope))
     ctx.requestRender()
   }
 

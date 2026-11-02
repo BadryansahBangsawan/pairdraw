@@ -8,6 +8,7 @@ import { CLI_ENTRY, FIXTURES } from '#cli-tests/helpers/paths'
 import * as v from 'valibot'
 
 import { getTextMeasurer } from '@open-pencil/core/layout'
+import { imageSize } from '@open-pencil/scene-graph/images'
 
 import { loadDocument, measureDocumentText } from '#cli/headless'
 
@@ -159,5 +160,26 @@ describe('eval CLI', () => {
     // Not the 1 × 1 placeholder, and the Cover page's 3:2 card rather than the first page's.
     expect(Math.min(width, height)).toBeGreaterThan(1)
     expect(width / height).toBeCloseTo(300 / 200, 2)
+  })
+
+  test('--preview-output draws the page the script left current', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-eval-preview-'))
+    const html = join(dir, 'tall.html')
+    const file = join(dir, 'doc.fig')
+    const preview = join(dir, 'preview.png')
+    await writeFile(html, '<div style="width:100px;height:400px;background:#000"></div>')
+    expect((await cli(['import', html, '-o', file])).exitCode).toBe(0)
+
+    const script = `
+      const page = figma.createPage()
+      await figma.setCurrentPageAsync(page)
+      const card = figma.createRectangle()
+      card.resize(300, 200)
+    `
+    const run = await cli(['eval', file, '--stdin', '--preview-output', preview], script)
+    expect(run.exitCode).toBe(0)
+    expect(run.stderr).toContain(`Preview: ${preview}`)
+    // The new page's 300 × 200 card, not the first page's tall block.
+    expect(imageSize(new Uint8Array(await readFile(preview)))).toEqual({ width: 300, height: 200 })
   })
 })

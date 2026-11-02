@@ -1,5 +1,6 @@
 import type { ACPAgentDef } from '@open-pencil/core/constants'
 
+import { externalConfigCloud, type ClaudeCodeCloud } from './external'
 import { agentSetupView, type AgentSetupState, type PiSetupState } from './view'
 
 /** What setup found of an agent on this computer, shown before the person picks it. */
@@ -11,6 +12,11 @@ export type AgentDetection =
   | { state: 'signed-out' }
   /** `account` joins the plan and email when the agent names them. */
   | { state: 'signed-in'; account: string | null }
+  /**
+   * Set up outside the app to reach Claude through a cloud, so it needs no sign-in: the agent
+   * reports that login, or has not reported one yet.
+   */
+  | { state: 'external-config'; cloud: ClaudeCodeCloud }
 
 function joined(parts: (string | null)[]): string | null {
   const present = parts.filter((part): part is string => part !== null)
@@ -21,6 +27,8 @@ export function codingAgentDetection(agent: ACPAgentDef, setup: AgentSetupState)
   if (!setup.checked) return { state: 'checking' }
   const detected = setup.detected
   if (detected?.status === 'available') {
+    const cloud = externalConfigCloud(detected.externalConfig, setup.account?.status)
+    if (cloud) return { state: 'external-config', cloud }
     const account = agentSetupView(agent, setup).account
     if (account?.state === 'checking') return { state: 'checking' }
     if (account?.state === 'signed-out') return { state: 'signed-out' }

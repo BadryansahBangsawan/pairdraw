@@ -1,19 +1,26 @@
 <script setup lang="ts">
 import { useLocalStorage } from '@vueuse/core'
 import { tv } from 'tailwind-variants'
-import { computed, ref, shallowRef } from 'vue'
+import { computed, ref } from 'vue'
 
+import type { LibrarySummary } from '@open-pencil/core/library'
 import type { DocumentKind } from '@open-pencil/scene-graph'
 import { useDocumentWorkspace } from '@open-pencil/vue/document/workspace'
-import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
 import { useI18n } from '@open-pencil/vue/i18n'
 
 import { agentAutoConnect } from '@/app/ai/agents/auto/session'
 import { sendPromptToDocument } from '@/app/ai/chat/pending-prompt'
 import { ensureChatConfigured } from '@/app/ai/chat/setup'
 import { CLOUD_INCLUDED, CLOUD_STORAGE_PROVIDER_ID } from '@/app/cloud/integration'
+import { startDesignWith } from '@/app/home/design-systems'
 import { useHomeLocations } from '@/app/home/locations'
-import { useDateFormat } from '@/app/i18n/date'
+import {
+  canSaveDocumentCopy,
+  recentCopySource,
+  saveDocumentCopy,
+  type DocumentCopySource
+} from '@/app/home/save-copy'
+import { notificationMessages } from '@/app/i18n/notifications'
 import {
   activeStorageProviderID,
   readStoragePreferences,
@@ -28,35 +35,28 @@ import {
   openRecentDocument,
   useRecentFilesWorkspace
 } from '@/app/recent-files/workspace'
-import { useCredentialSettings } from '@/app/settings/credentials/preferences/use'
-import { openSettingsDialog } from '@/app/settings/dialog'
+import { toast } from '@/app/shell/ui'
 import { createStoredDocument } from '@/app/storage/workspace/create'
 import { activeStorageLocation, createStorageWorkspaceSource } from '@/app/storage/workspace/source'
 import { createDocumentTab, openStorageDocumentInNewTab, type Tab } from '@/app/tabs'
 import { CloudSharedSection, CloudWorkspaceSection } from '@/components/cloud/integration'
-import DocumentDeleteDialog from '@/components/home/document/DocumentDeleteDialog.vue'
-import DocumentEntry from '@/components/home/document/DocumentEntry.vue'
+import DesignSystemsSection from '@/components/home/design-systems/DesignSystemsSection.vue'
 import HomeLayout from '@/components/home/HomeLayout.vue'
 import HomePromptComposer from '@/components/home/HomePromptComposer.vue'
 import RecentFilesSection from '@/components/home/recent/RecentFilesSection.vue'
 import HomeSearchActions from '@/components/home/search/HomeSearchActions.vue'
 import HomeLocationMenu from '@/components/home/sidebar/HomeLocationMenu.vue'
 import HomeSidebar from '@/components/home/sidebar/HomeSidebar.vue'
-import AppButton from '@/components/ui/button/AppButton.vue'
-import IconButton from '@/components/ui/button/IconButton.vue'
-import AppSkeleton from '@/components/ui/feedback/AppSkeleton.vue'
-import { skeleton } from '@/components/ui/feedback/skeleton'
+import StorageWorkspaceSection from '@/components/home/storage/StorageWorkspaceSection.vue'
 import documentsTheme from '@/theme/home/documents'
 
-const { ai, locale, storage, files, common, settings, credentials } = useI18n()
+const { ai, locale, storage, files, settings } = useI18n()
 const view = useLocalStorage<'grid' | 'list'>('open-pencil:home-files-view', 'grid')
 const query = ref('')
 const openError = ref<string | null>(null)
 const storageConfigured = ref(storagePreferencesComplete(activeStorageProviderID.value))
 const places = useHomeLocations()
-const { isTouch } = useViewportKind()
 const styles = tv(documentsTheme)()
-const loading = skeleton()
 
 /** A new document lands in the place Home shows: a Cloud workspace, the bucket, or a local file. */
 function newDocument(kind: DocumentKind): Tab {
@@ -103,25 +103,6 @@ const storageWorkspace = useDocumentWorkspace<StorageDocument>({
 })
 const storageDocuments = storageWorkspace.documents
 const storageLocation = computed(() => activeStorageLocation())
-const deletingStorageDocument = shallowRef<StorageDocument | null>(null)
-function documentMenu(document: StorageDocument) {
-  return {
-    actions: files.value.documentActions({ name: document.name }),
-    delete: files.value.deleteDocument
-  }
-}
-const storageLoading = storageWorkspace.loading
-// Paused credential access has its own fix, so the card offers it instead of the raw native error.
-const credentialAccess = useCredentialSettings()
-async function retryCredentialAccess() {
-  await credentialAccess.retry()
-  if (!credentialAccess.paused.value) await storageWorkspace.refresh()
-}
-const storageError = computed(() => {
-  const error = storageWorkspace.error.value
-  if (error == null) return null
-  return error instanceof Error ? error.message : String(error)
-})
 const storageDescription = computed(() => {
   const provider = storageProviderRegistry.get(activeStorageProviderID.value)
   const preferences = readStoragePreferences(activeStorageProviderID.value)
@@ -178,8 +159,6 @@ const newDesignTarget = computed<{ location: StorageLocation; label: string } | 
   }
   return null
 })
-const storagePreviewURL = storageWorkspace.previewURL
-const vStoragePreview = storageWorkspace.previewDirective
 const normalizedQuery = computed(() => query.value.trim().toLocaleLowerCase(locale.value))
 const filteredRecentFiles = computed(() =>
   matchingRecentFiles(documents.value, normalizedQuery.value, locale.value)
@@ -193,34 +172,73 @@ const filteredStorageDocuments = computed(() => {
 const noSearchMatches = computed(
   () =>
     Boolean(normalizedQuery.value) &&
+    places.location.value.kind !== 'libraries' &&
     filteredRecentFiles.value.length === 0 &&
     filteredStorageDocuments.value.length === 0
 )
 
-async function openRecent(document: RecentDocument): Promise<void> {
+/**
+ * Opens documents one after another, in the order picked, so their tabs keep that order. One that
+ * cannot open does not stop the rest; Home names every failure once all have been tried.
+ */
+async function openEach<Document>(
+  documents: readonly Document[],
+  open: (document: Document) => Promise<void>
+): Promise<void> {
   openError.value = null
-  try {
-    // Before the storage list first loads, an empty list would hide the revision to check.
-    const listed = storageWorkspace.lastRefreshedAt.value ? storageDocuments.value : undefined
-    await openRecentDocument(document, listed)
-  } catch (error) {
-    openError.value = error instanceof Error ? error.message : String(error)
+  const failures: string[] = []
+  for (const document of documents) {
+    try {
+      await open(document)
+    } catch (error) {
+      failures.push(error instanceof Error ? error.message : String(error))
+    }
   }
+  openError.value = failures.length ? failures.join('\n') : null
 }
 
-async function openStorageDocument(document: StorageDocument): Promise<void> {
-  openError.value = null
-  try {
+function openRecentDocuments(documents: readonly RecentDocument[]): Promise<void> {
+  // Before the storage list first loads, an empty list would hide the revision to check.
+  const listed = storageWorkspace.lastRefreshedAt.value ? storageDocuments.value : undefined
+  return openEach(documents, (document) => openRecentDocument(document, listed))
+}
+
+function openStorageDocuments(documents: readonly StorageDocument[]): Promise<void> {
+  return openEach(documents, async (document) => {
     await openStorageDocumentInNewTab(document)
+  })
+}
+
+/** Saves a copy of a document from Home, saying where it went or why it could not. */
+async function saveCopy(source: DocumentCopySource): Promise<void> {
+  if (!canSaveDocumentCopy(source)) return
+  try {
+    const result = await saveDocumentCopy(source)
+    if (result.status === 'saved') toast.info(files.value.savedDocumentAs({ name: result.name }))
   } catch (error) {
-    openError.value = error instanceof Error ? error.message : String(error)
+    const message = error instanceof Error ? error.message : String(error)
+    toast.error(files.value.saveDocumentAsFailed({ name: source.name, error: message }))
   }
 }
 
-const dates = useDateFormat()
-/** A file's last change; a file that never reported one shows nothing. */
-function formattedDate(updatedAt: string): string {
-  return Date.parse(updatedAt) === 0 ? '' : dates.format(updatedAt, 'dateTime')
+function saveStoredCopy(document: StorageDocument) {
+  return saveCopy({
+    kind: 'storage',
+    documentId: document.id,
+    name: document.name,
+    location: storageLocation.value
+  })
+}
+
+/** Opens a new design with the design system's library turned on. */
+async function startWithDesignSystem(library: LibrarySummary): Promise<void> {
+  const tab = newDocument('design')
+  try {
+    await startDesignWith(tab.store, library)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    toast.error(notificationMessages.get().operationFailed({ error: message }))
+  }
 }
 </script>
 
@@ -266,7 +284,9 @@ function formattedDate(updatedAt: string): string {
       @new-document="newDocument"
     />
 
-    <p v-if="openError" class="mb-4 text-xs text-error" role="alert">{{ openError }}</p>
+    <p v-if="openError" class="mb-4 text-xs whitespace-pre-line text-error" role="alert">
+      {{ openError }}
+    </p>
     <!-- Nothing until Cloud says which workspace Home opens on. -->
     <template v-if="places.settling.value" />
     <CloudWorkspaceSection
@@ -291,120 +311,31 @@ function formattedDate(updatedAt: string): string {
         :workspace="workspace"
         :documents="filteredRecentFiles"
         :query="normalizedQuery"
-        @open="openRecent"
+        @open="openRecentDocuments([$event])"
+        @open-many="openRecentDocuments"
+        @save-as="saveCopy(recentCopySource($event))"
       />
 
-      <section v-if="places.location.value.kind === 'storage'" :class="styles.section()">
-        <div :class="styles.header()">
-          <div :class="styles.heading()">
-            <h2 :class="styles.title()">{{ storage.workspace }}</h2>
-            <p :class="styles.description()">{{ storageDescription }}</p>
-          </div>
-          <div :class="styles.actions()">
-            <IconButton
-              :label="common.refresh"
-              :size="isTouch ? 'lg' : 'sm'"
-              @click="storageWorkspace.refresh"
-            >
-              <icon-lucide-refresh-cw class="size-3.5" />
-            </IconButton>
-            <IconButton
-              :label="settings.title"
-              :size="isTouch ? 'lg' : 'sm'"
-              @click="openSettingsDialog('storage')"
-            >
-              <icon-lucide-settings-2 class="size-3.5" />
-            </IconButton>
-          </div>
-        </div>
+      <StorageWorkspaceSection
+        v-if="places.location.value.kind === 'storage'"
+        v-model:view="view"
+        :workspace="storageWorkspace"
+        :documents="filteredStorageDocuments"
+        :configured="storageConfigured"
+        :description="storageDescription"
+        :location="storageLocation"
+        :query="normalizedQuery"
+        @open="openStorageDocuments([$event])"
+        @open-many="openStorageDocuments"
+        @save-as="saveStoredCopy"
+      />
 
-        <div
-          v-if="storageLoading && storageDocuments.length === 0"
-          :class="[styles.grid(), loading.group()]"
-          :aria-label="storage.loadingWorkspace"
-        >
-          <div v-for="index in 3" :key="index" :class="styles.skeleton()">
-            <AppSkeleton :class="styles.skeletonPreview()" />
-            <AppSkeleton :class="styles.skeletonName()" />
-            <AppSkeleton :class="styles.skeletonMeta()" />
-          </div>
-        </div>
-
-        <div
-          v-else-if="storageError && storageDocuments.length === 0"
-          :class="styles.error()"
-          role="alert"
-        >
-          <template v-if="credentialAccess.paused.value">
-            <p :class="styles.errorText()">{{ credentials.accessPaused }}</p>
-            <AppButton
-              variant="outline"
-              :class="styles.errorAction()"
-              :loading="credentialAccess.busy.value"
-              data-test-id="home-storage-retry-access"
-              @click="retryCredentialAccess"
-            >
-              {{ credentials.retryAccess }}
-            </AppButton>
-          </template>
-          <template v-else>
-            <p :class="styles.errorText()">{{ storageError }}</p>
-            <AppButton
-              variant="outline"
-              :class="styles.errorAction()"
-              @click="storageWorkspace.refresh"
-            >
-              {{ common.refresh }}
-            </AppButton>
-          </template>
-        </div>
-
-        <div v-else-if="filteredStorageDocuments.length && view === 'grid'" :class="styles.grid()">
-          <DocumentEntry
-            v-for="document in filteredStorageDocuments"
-            :key="document.id"
-            v-storage-preview="document.id"
-            :name="document.name"
-            :metadata="formattedDate(document.updatedAt)"
-            :previewURL="storagePreviewURL(document.id)"
-            :menu="documentMenu(document)"
-            @open="openStorageDocument(document)"
-            @delete="deletingStorageDocument = document"
-          />
-        </div>
-
-        <div v-else-if="filteredStorageDocuments.length" :class="styles.list()">
-          <DocumentEntry
-            v-for="document in filteredStorageDocuments"
-            :key="document.id"
-            view="list"
-            :name="document.name"
-            :metadata="formattedDate(document.updatedAt)"
-            :menu="documentMenu(document)"
-            @open="openStorageDocument(document)"
-            @delete="deletingStorageDocument = document"
-          />
-        </div>
-
-        <div v-else-if="!storageConfigured" :class="styles.empty()">
-          <p>{{ storage.notConfigured }}</p>
-          <AppButton
-            variant="outline"
-            :class="styles.emptyAction()"
-            @click="openSettingsDialog('storage')"
-          >
-            {{ settings.title }}
-          </AppButton>
-        </div>
-
-        <div v-else-if="!normalizedQuery" :class="styles.empty()">
-          {{ storage.emptyStorageWorkspace }}
-        </div>
-        <DocumentDeleteDialog
-          v-model:document="deletingStorageDocument"
-          :location="storageLocation"
-        />
-      </section>
+      <DesignSystemsSection
+        v-if="places.location.value.kind === 'libraries'"
+        v-model:view="view"
+        :query="query.trim()"
+        @start="startWithDesignSystem"
+      />
     </template>
   </HomeLayout>
 </template>

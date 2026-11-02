@@ -14,5 +14,7 @@
   "resetPreview": "Ripristina",
   "leavePreview": "Esci dall’anteprima ({shortcut})",
   "toggleAIChat": "Chat AI ({shortcut})",
-  "startPreview": "Anteprima ({shortcut})"
+  "startPreview": "Anteprima ({shortcut})",
+  "toggleLayersPanel": "Pannello livelli",
+  "togglePropertiesPanel": "Pannello proprietà"
 }

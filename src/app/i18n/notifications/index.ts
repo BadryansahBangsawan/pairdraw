@@ -30,7 +30,7 @@ export const notificationMessageDefaults = {
   vectorizeCredentialRequired: params('Add a {provider} API key in Settings → Image services.'),
   vectorizeImageMissing: 'Image data is missing for this layer.',
   vectorizingImage: 'Vectorizing image…',
-  imageConvertedToVectors: 'Image converted to vectors.',
+  imageConvertedToVectors: 'Vectors added beside the image.',
   vectorizeCredentialFailed: params('{error}. Update it in Settings → Image services.'),
   vectorizeFailed: params('{provider} could not vectorize this image: {error}'),
   operationFailed: params('Operation failed: {error}'),
@@ -40,7 +40,11 @@ export const notificationMessageDefaults = {
   deepLinkPickerDismissed: 'Link cancelled: no file was chosen.',
   deepLinkCancelled: params('Link cancelled: expected a file ending in “{file}”.'),
   deepLinkNodeNotFound: params('Node “{node}” was not found in “{file}”.'),
-  openQueuedFilesFailed: params('Could not open the files handed to Pairdraw: {error}')
+  openQueuedFilesFailed: params('Could not open the files handed to Pairdraw: {error}'),
+  placeImageUnsupported: 'Choose a PNG, JPEG, WebP, GIF, AVIF, or SVG file to place.',
+  placeImageFailed: params('Could not place the files: {error}'),
+  exportPDFEmpty: 'This page has no frames to export.',
+  exportPDFFailed: params('Could not export the PDF: {error}')
 } as const
 
 const localeLoaders = {

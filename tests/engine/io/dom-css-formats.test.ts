@@ -84,6 +84,28 @@ describe('HTML export asset paths', () => {
   })
 })
 
+describe('HTML export asset URLs', () => {
+  test('percent-encode a file name a URL would misread', async () => {
+    const { graph, page } = cardGraph()
+    for (const html of ['standalone', 'fragment'] as const) {
+      const result = await io.exportContent(
+        'html',
+        { graph, target: { scope: 'page', pageId: page.id }, fileName: 'out/Card #1?.html' },
+        { html, assets: 'external' }
+      )
+      const markup = String(result.data)
+      const paths = (result.assets ?? []).map((asset) => asset.path)
+
+      // The files keep the name; the markup points at them by URL.
+      expect(paths).toContain('Card #1?.assets/images/image-1.png')
+      expect(markup).toContain('src="Card%20%231%3F.assets/images/image-1.png"')
+      expect(markup).not.toContain('Card #1')
+      if (html === 'standalone')
+        expect(markup).toContain('href="Card%20%231%3F.assets/openpencil.css"')
+    }
+  })
+})
+
 describe('Tailwind JSX export format', () => {
   test('is a registered export next to OpenPencil JSX', async () => {
     const { graph, card } = cardGraph()

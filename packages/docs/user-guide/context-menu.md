@@ -16,11 +16,17 @@ The **Copy/Paste as** submenu offers additional clipboard formats for the select
 | Copy as SVG | — | — |
 | Copy as PNG | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>C</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>C</kbd> |
 | Copy as JSX | — | — |
+| Copy as HTML | — | — |
 
 - **Copy as text** — copies visible text content from the selection
 - **Copy as SVG** — copies the node tree as SVG markup
 - **Copy as PNG** — renders at 2× and places on the system clipboard (paste into Slack, Notion, etc.)
 - **Copy as JSX** — copies the OpenPencil JSX representation for use with `renderJsx()`
+- **Copy as HTML** — copies an HTML fragment with inline styles and images inlined, ready to paste into a page or an email; it also works in read-only documents
+
+## Run sticky as prompt
+
+When only sticky notes are selected and at least one has text, **Run sticky as prompt** sends their text to the document's [AI chat](../programmable/ai-chat), with a reference to each note so the assistant knows which notes it came from. It appears only in documents you can edit. When no model is set up yet, OpenPencil looks for a coding agent on your computer first and opens guided setup when none is found, then sends the prompt.
 
 ## Clipboard Actions
 
@@ -75,7 +81,7 @@ Component actions are displayed in purple to match the component color theme.
 | Action | Shortcut (Mac) | Shortcut (Win/Linux) | Available on |
 |--------|----------------|----------------------|--------------|
 | Create component | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>K</kbd> | Any selection |
-| Create component set | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>K</kbd> | 2+ selected components |
+| Create component set | — | — | 2+ selected components |
 | Create instance | — | — | Components (no shortcut) |
 | Go to main component | — | — | Instances |
 | Detach instance | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd> | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>B</kbd> | Instances |

@@ -21,5 +21,8 @@
   "noSelectionComponents": "Les composants {framework} sont générés pour les calques sélectionnés.",
   "writeJSX": "Écrire du JSX",
   "canvasChangedExpression": "Le canevas indique maintenant {value} ; l’expression reste telle qu’écrite.",
-  "canvasChangedOrder": "Le canevas ordonne maintenant ces calques autrement ; le code reste tel qu’écrit."
+  "canvasChangedOrder": "Le canevas ordonne maintenant ces calques autrement ; le code reste tel qu’écrit.",
+  "iconPackage": "Icônes",
+  "exportHTML": "Exporter en HTML",
+  "exportFailed": "Export impossible : {error}"
 }

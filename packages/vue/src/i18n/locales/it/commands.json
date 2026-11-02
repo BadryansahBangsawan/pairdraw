@@ -7,6 +7,7 @@
   "group": "Raggruppa",
   "ungroup": "Separa",
   "createComponent": "Crea componente",
+  "convertToFrame": "Converti in cornice",
   "createSlot": "Crea slot",
   "createComponentSet": "Crea set di componenti",
   "createInstance": "Crea istanza",
@@ -69,5 +70,15 @@
   "paletteSearchAriaLabel": "Cerca comandi",
   "paletteDescription": "Cerca ed esegui i comandi di Pairdraw.",
   "paletteNoCommands": "Nessun comando trovato.",
-  "paletteBack": "Indietro"
+  "paletteBack": "Indietro",
+  "shortcutSheet": "Scorciatoie da tastiera",
+  "shortcutSheetDescription": "Tasti che funzionano quando la tela ha il focus.",
+  "shortcutSheetSearch": "Cerca scorciatoie",
+  "shortcutSheetEmpty": "Nessuna scorciatoia trovata.",
+  "shortcutSheetTools": "Strumenti",
+  "shortcutSheetCanvas": "Tela e selezione",
+  "toggleAIChat": "Mostra o nascondi la chat IA",
+  "nudgeSelection": "Sposta la selezione",
+  "nudgeSelectionFurther": "Sposta di più la selezione",
+  "panWhileHeld": "Sposta la vista tenendo premuto"
 }

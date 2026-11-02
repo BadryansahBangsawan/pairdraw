@@ -8,7 +8,7 @@ import type { Color } from '../primitives'
 import { pixelLength } from '../text/lengths'
 import type { Fill, SceneNode, Stroke, StyleRun, TextLength } from '../types'
 import { NUMERIC_FIELDS, isNumericVariableBindingField, paintBindingTarget } from './fields'
-import { variableText, variableTruthy } from './text'
+import { variableFontFamily, variableText, variableTruthy } from './text'
 import { variableValueReferences } from './value'
 export {
   isNumericVariableBindingField,
@@ -80,11 +80,11 @@ export function resolvedNumericBindings(
 }
 
 /**
- * The text and visibility a node's string and boolean bindings resolve to in its mode, for the
- * fields whose stored value differs. Text or visibility an instance overrides, which typing in a
- * layer or toggling its eye records, keeps its own value, as an overridden width or height does.
- * A bound font family is left as stored: changing it needs the font loaded, which resolving a
- * binding cannot do.
+ * The text, font family, and visibility a node's string and boolean bindings resolve to in its
+ * mode, for the fields whose stored value differs. Text, a font family, or visibility an instance
+ * overrides, which typing in a layer or toggling its eye records, keeps its own value, as an
+ * overridden width or height does. A font family is only named here; the editor loads its faces
+ * after the reconcile (`loadBoundFonts` in Core), and the text draws in a fallback until they do.
  */
 export function resolvedValueBindings(
   graph: SceneGraph,
@@ -92,25 +92,27 @@ export function resolvedValueBindings(
   fallback: VariableModeFallback = 'active'
 ): Partial<SceneNode> {
   const updates: Partial<SceneNode> = {}
-  const resolve = (field: 'text' | 'visible') => {
+  const resolve = (field: 'text' | 'fontFamily' | 'visible') => {
     const variableId = node.boundVariables[field]
     if (!variableId || hasInstanceOverride(graph, node.id, field)) return undefined
     return graph.resolveVariableForNode(node.id, variableId, fallback)
   }
   const text = node.type === 'TEXT' ? variableText(resolve('text')) : undefined
   if (text !== undefined && text !== node.text) updates.text = text
+  const fontFamily = node.type === 'TEXT' ? variableFontFamily(resolve('fontFamily')) : undefined
+  if (fontFamily !== undefined && fontFamily !== node.fontFamily) updates.fontFamily = fontFamily
   // Figma binds visibility to text too, and shows the layer when the text reads as true.
   const visible = variableTruthy(resolve('visible'))
   if (visible !== undefined && visible !== node.visible) updates.visible = visible
   return updates
 }
 
-/** Fields of a range of characters a bound number gives its value; the rest need fonts loaded. */
+/** Fields of a range of characters a bound number gives its value. */
 const NUMERIC_RUN_FIELDS = ['fontSize', 'fontWeight', 'letterSpacing', 'lineHeight'] as const
 
 /**
- * The runs a text's character bindings resolve to in its mode, when a bound number differs from
- * what its characters hold. Bound font families and styles are left as stored, as the text's own.
+ * The runs a text's character bindings resolve to in its mode, when a bound number or font family
+ * differs from what its characters hold. Bound font styles are left as stored.
  */
 export function resolvedRunBindings(
   graph: SceneGraph,
@@ -130,6 +132,12 @@ export function resolvedRunBindings(
       if (isEqual(style[field], next)) continue
       style = { ...style, [field]: next }
     }
+    const familyId = bound.fontFamily
+    const family = familyId
+      ? variableFontFamily(graph.resolveVariableForNode(node.id, familyId, fallback))
+      : undefined
+    if (family !== undefined && family !== style.fontFamily)
+      style = { ...style, fontFamily: family }
     return style === run.style ? run : { ...run, style }
   })
   const changed = styleRuns.some((run, index) => run !== node.styleRuns[index])
@@ -257,7 +265,7 @@ function scopedNodes(graph: SceneGraph, scope: BindingScope | undefined): Iterab
 }
 
 /**
- * Resolve live numeric, text, and visibility bindings, numbers in scene units, without authoring
+ * Resolve live numeric, text, font family, and visibility bindings, numbers in scene units, without authoring
  * instance overrides. A scope limits it to the layers a change can reach, so layers whose saved
  * values differ from their bindings elsewhere in the document are left as saved.
  */

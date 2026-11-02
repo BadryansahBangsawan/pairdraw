@@ -1,4 +1,4 @@
-import { params } from '@nanostores/i18n'
+import { count, params } from '@nanostores/i18n'
 
 import { i18n } from '#vue/i18n/create'
 
@@ -46,9 +46,44 @@ export const filesMessageDefaults = {
   deleteDocumentDescription:
     'The document is deleted for everyone who can open it. This can’t be undone.',
   deleteDocumentFailed: params('Couldn’t delete “{name}”. Try again.'),
+  deleteDocumentsConfirmation: count({
+    one: 'Delete {count} document?',
+    many: 'Delete {count} documents?'
+  }),
+  deleteDocumentsDescription:
+    'The documents are deleted for everyone who can open them. This can’t be undone.',
+  sortFiles: params('Sort by {order}'),
+  sortByName: 'Name',
+  sortByLastUsed: 'Last used',
+  sortByCreated: 'Created',
+  selectDocument: 'Select',
+  deselectDocument: 'Deselect',
+  documentSelected: 'Selected',
+  selectAllDocuments: 'Select all',
+  clearDocumentSelection: 'Clear selection',
+  selectedDocuments: count({ one: '{count} selected', many: '{count} selected' }),
+  selectionActions: 'Selected files',
+  openSelectedDocuments: 'Open',
+  removeFromRecents: 'Remove from Recents',
+  saveDocumentAs: 'Save As…',
+  savedDocumentAs: params('Saved a copy as “{name}”.'),
+  saveDocumentAsFailed: params('Couldn’t save a copy of “{name}”. {error}'),
+  designSystems: 'Design systems',
+  designSystemsDescription: 'Start a new design with the components of a published library.',
+  noDesignSystems: 'No design systems yet',
+  noDesignSystemsDescription:
+    'Publish a library from a document’s Assets panel to start new designs from it here.',
+  designSystemComponents: count({ one: '{count} component', many: '{count} components' }),
+  newDesignWith: params('New design with {name}'),
+  loadingDesignSystems: 'Loading design systems…',
   saveAsPrompt: 'Save as:',
   browserFileAPINotSupported:
-    "Your browser doesn't support the local file API. Files will be downloaded instead of saved in place."
+    "Your browser doesn't support the local file API. Files will be downloaded instead of saved in place.",
+  fileChangedOnDisk: params('“{name}” changed on disk'),
+  fileChangedOnDiskDescription:
+    'Another app changed this file while you have unsaved edits. Reload to open the file’s version and discard your edits, or ignore the change and keep editing. Saving replaces the file with your version.',
+  reloadFromDisk: 'Reload',
+  ignoreDiskChange: 'Ignore'
 } as const
 
 export const filesMessages = i18n('files', filesMessageDefaults)

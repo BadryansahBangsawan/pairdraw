@@ -31,6 +31,8 @@ bun open-pencil export design.fig --node 12:34 -o icon.svg
 
 La exportación HTML genera un documento independiente con la estructura y los estilos disponibles. Está pensada para entrega, inspección y procesamiento posterior, no como sustituto exacto del renderizador CanvasKit. Solo está disponible al trabajar con archivos.
 
+La exportación HTML escribe el nombre de cada capa en el atributo `data-name`. `--no-layer-names` omite los nombres y `--layer-ids` añade el ID de cada capa como `data-open-pencil-node-id` para las herramientas que vinculan el marcado con el documento.
+
 ## JSX con Tailwind
 
 Exporta JSX con clases de utilidad Tailwind:

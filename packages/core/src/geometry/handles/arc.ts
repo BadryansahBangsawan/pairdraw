@@ -153,3 +153,35 @@ export function arcChanges(
 ): Partial<SceneNode> {
   return { arcData: arcAtPoint(node, handle, local, snap), fillGeometry: [], strokeGeometry: [] }
 }
+
+/**
+ * An arc's numbers as the properties panel shows them, beside its handles: the start in degrees,
+ * the sweep in percent of a turn, and the ratio in percent of the radius.
+ */
+export type ArcField = 'start' | 'sweep' | 'ratio'
+
+/** What a field shows for an arc, to one decimal as its handle's label does. */
+export function arcFieldValue(arc: ArcData, field: ArcField): number {
+  const { startingAngle: start, endingAngle: end, innerRadius } = arc
+  let value = innerRadius * 100
+  if (field === 'start') value = (start * 180) / Math.PI
+  else if (field === 'sweep') value = ((end - start) / FULL_TURN) * 100
+  return Math.round(value * 10) / 10 || 0
+}
+
+/**
+ * The arc a typed field gives. A start turns the whole arc, kept within one turn, as its handle
+ * does; a sweep runs from the start, a full turn either way at most; a ratio is clamped to the
+ * radius. A value that is not a number leaves the arc as it is.
+ */
+export function arcWithField(arc: ArcData, field: ArcField, value: number): ArcData {
+  if (!Number.isFinite(value)) return arc
+  const { startingAngle: start, endingAngle: end } = arc
+  if (field === 'ratio') return { ...arc, innerRadius: clamp(value / 100, 0, 1) }
+  if (field === 'start') {
+    const radians = (value * Math.PI) / 180
+    const turned = ((radians % FULL_TURN) + FULL_TURN) % FULL_TURN
+    return { ...arc, startingAngle: turned, endingAngle: turned + end - start }
+  }
+  return { ...arc, endingAngle: start + (clamp(value, -100, 100) / 100) * FULL_TURN }
+}

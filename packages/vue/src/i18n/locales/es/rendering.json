@@ -3,8 +3,11 @@
   "settingsDescription": "Elige cómo presenta Pairdraw los lienzos grandes.",
   "progressiveTiled": "Renderizado progresivo",
   "progressiveTiledDescription": "Actualiza los lienzos grandes en mosaicos más pequeños mientras navegas.",
+  "progressiveTiledByUltralight": "Siempre activado mientras el modo ultraligero está activado.",
   "reloadRequired": "Recarga Pairdraw para aplicar este cambio.",
   "wideGamutUnavailable": "Esta pantalla o este navegador no pueden mostrar colores Display-P3, así que el lienzo los previsualiza en sRGB. El documento conserva su espacio de color.",
   "urlOverride": "El renderizador de esta sesión está controlado por un parámetro de URL. Tu preferencia guardada se aplicará al eliminarlo.",
-  "experimental": "Experimental"
+  "experimental": "Experimental",
+  "ultralight": "Modo ultraligero",
+  "ultralightDescription": "Ahorra energía y memoria en equipos más lentos: desactiva las animaciones, renderiza en mosaicos a resolución estándar y simplifica desenfoques, ruido y sombras."
 }

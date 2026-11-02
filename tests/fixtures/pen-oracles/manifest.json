@@ -75,8 +75,8 @@
     {
       "node": "P Other types",
       "penNodeId": "c6sX3L",
-      "maximumDifferentPercent": 9.45,
-      "note": "Note, context, and prompt layers are pen.dev's own and are not read."
+      "maximumDifferentPercent": 15.9,
+      "note": "Note, context, and prompt layers become sticky notes at their boxes, in the nearest sticky colour; pen.dev draws its own cards with a header, past the box."
     },
     {
       "node": "M Gradients",

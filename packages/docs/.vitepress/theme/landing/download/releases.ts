@@ -3,8 +3,17 @@ import { maxBy, partition } from 'es-toolkit/array'
 export const PLATFORMS = ['mac', 'windows', 'linux'] as const
 export type Platform = (typeof PLATFORMS)[number]
 export type Arch = 'arm64' | 'x64'
-/** Installer formats, in the order a platform's list shows them. */
-export const FILE_FORMATS = ['dmg', 'exe', 'msi', 'appimage', 'deb', 'rpm'] as const
+/** Installer and archive formats, in the order a platform's list shows them. */
+export const FILE_FORMATS = [
+  'dmg',
+  'zip',
+  'exe',
+  'msi',
+  'appimage',
+  'deb',
+  'rpm',
+  'tar.gz'
+] as const
 export type FileFormat = (typeof FILE_FORMATS)[number]
 
 /** A file someone downloads to install the app; updater payloads and signatures are left out. */
@@ -43,6 +52,8 @@ export interface Releases {
 const FILE_PATTERNS: { pattern: RegExp; platform: Platform; arch: Arch; format: FileFormat }[] = [
   { pattern: /_aarch64\.dmg$/, platform: 'mac', arch: 'arm64', format: 'dmg' },
   { pattern: /_x64\.dmg$/, platform: 'mac', arch: 'x64', format: 'dmg' },
+  { pattern: /_aarch64\.zip$/, platform: 'mac', arch: 'arm64', format: 'zip' },
+  { pattern: /_x64\.zip$/, platform: 'mac', arch: 'x64', format: 'zip' },
   { pattern: /_x64-setup\.exe$/, platform: 'windows', arch: 'x64', format: 'exe' },
   { pattern: /_arm64-setup\.exe$/, platform: 'windows', arch: 'arm64', format: 'exe' },
   { pattern: /_x64_[\w-]+\.msi$/, platform: 'windows', arch: 'x64', format: 'msi' },
@@ -52,7 +63,10 @@ const FILE_PATTERNS: { pattern: RegExp; platform: Platform; arch: Arch; format: 
   { pattern: /_amd64\.deb$/, platform: 'linux', arch: 'x64', format: 'deb' },
   { pattern: /_arm64\.deb$/, platform: 'linux', arch: 'arm64', format: 'deb' },
   { pattern: /\.x86_64\.rpm$/, platform: 'linux', arch: 'x64', format: 'rpm' },
-  { pattern: /\.aarch64\.rpm$/, platform: 'linux', arch: 'arm64', format: 'rpm' }
+  { pattern: /\.aarch64\.rpm$/, platform: 'linux', arch: 'arm64', format: 'rpm' },
+  // The macOS updater payload ends in `.app.tar.gz`, which neither pattern matches.
+  { pattern: /_amd64\.tar\.gz$/, platform: 'linux', arch: 'x64', format: 'tar.gz' },
+  { pattern: /_aarch64\.tar\.gz$/, platform: 'linux', arch: 'arm64', format: 'tar.gz' }
 ]
 
 /** The installer a release asset is, or null for signatures, updater payloads, and manifests. */

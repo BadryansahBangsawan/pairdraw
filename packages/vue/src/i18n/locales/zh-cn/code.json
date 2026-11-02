@@ -21,5 +21,8 @@
   "noSelectionComponents": "为所选图层生成 {framework} 组件。",
   "writeJSX": "编写 JSX",
   "canvasChangedExpression": "画布上现在是 {value}；表达式保持原样。",
-  "canvasChangedOrder": "画布上这些图层的顺序已改变；代码保持原样。"
+  "canvasChangedOrder": "画布上这些图层的顺序已改变；代码保持原样。",
+  "iconPackage": "图标",
+  "exportHTML": "导出 HTML",
+  "exportFailed": "无法导出：{error}"
 }

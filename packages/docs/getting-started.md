@@ -12,11 +12,14 @@ Pre-built binaries for macOS, Windows, and Linux are available on the [download 
 
 | Platform | Download |
 | --------------------- | -------------------- |
-| macOS (Apple Silicon) | `.dmg` (aarch64) |
-| macOS (Intel) | `.dmg` (x64) |
+| macOS (Apple Silicon) | `.dmg` / `.zip` (aarch64) |
+| macOS (Intel) | `.dmg` / `.zip` (x64) |
 | Windows (x64) | `.msi` / `.exe` |
 | Windows (ARM) | `.msi` / `.exe` |
-| Linux (x64) | `.AppImage` / `.deb` |
+| Linux (x64) | `.AppImage` / `.deb` / `.rpm` / `.tar.gz` |
+| Linux (ARM64) | `.AppImage` / `.deb` / `.rpm` / `.tar.gz` |
+
+To check for a newer version of the desktop app, choose **Check for Updates…** in the **Help** menu on Windows and Linux, or in the application menu on macOS. The **About** item next to it shows the installed version.
 
 ## System Requirements
 

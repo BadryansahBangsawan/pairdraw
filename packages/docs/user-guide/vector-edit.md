@@ -63,6 +63,24 @@ This activates geometry editing for the selected vector.
 - A deleted segment takes only the anchors it leaves unconnected, so deleting the middle segment of a path splits it in two.
 - Deleting everything deletes the layer.
 
+## Cut, Join, and Reshape
+
+| Action                 | Mac                           | Windows / Linux                |
+| ---------------------- | ----------------------------- | ------------------------------ |
+| Cut tool               | <kbd>X</kbd>                  | <kbd>X</kbd>                   |
+| Smooth or corner point | Double-click a point          | Double-click a point           |
+| Straighten a segment   | <kbd>Cmd</kbd> + double-click | <kbd>Ctrl</kbd> + double-click |
+| Join two end points    | <kbd>Cmd</kbd> + <kbd>J</kbd> | <kbd>Ctrl</kbd> + <kbd>J</kbd> |
+| Duplicate points       | <kbd>Option</kbd> + drag      | <kbd>Alt</kbd> + drag          |
+| Move points            | Arrow keys                    | Arrow keys                     |
+
+- **Cut tool:** press <kbd>X</kbd>, then click a segment to cut it there, or click a point to separate the segments that meet at it. Curves keep their shape, and a closed shape that is cut stops filling. Press <kbd>X</kbd> again, <kbd>Escape</kbd>, or another tool key to put it down.
+- **Smooth or corner:** double-click a corner point to give it handles along the line between its neighbours, and double-click a smooth point to remove its handles.
+- **Straighten:** <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + double-click a curved segment to remove both of its handles.
+- **Join:** select two end points and press <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + <kbd>J</kbd>. Points in the same place become one point; points apart are joined by a straight segment. Joining the two ends of one path closes and fills it. While a path is being edited, this shortcut joins points instead of opening the chat.
+- **Duplicate:** hold <kbd>Option</kbd>/<kbd>Alt</kbd> and drag selected points or segments to drag a copy. A single point's copy stays joined to it, so the drag extends the path.
+- **Nudge:** the arrow keys move the selected points by the nudge distance set in Settings → Editor, and <kbd>Shift</kbd> + arrow by the large nudge distance.
+
 ## Handle Drag Modifiers
 
 | Action                           | Mac                      | Windows / Linux         |

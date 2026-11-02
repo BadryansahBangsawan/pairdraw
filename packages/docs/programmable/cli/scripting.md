@@ -81,6 +81,12 @@ Use `--output` / `-o` to write to a new file:
 openpencil eval design.fig -c "figma.currentPage.name = 'Updated'" -o updated.fig
 ```
 
+Use `--preview-output` to write a PNG of the page the script leaves current, after it runs:
+
+```sh
+openpencil eval design.fig --stdin --write --preview-output preview.png < transform.js
+```
+
 ## Read scripts from stdin
 
 ```sh

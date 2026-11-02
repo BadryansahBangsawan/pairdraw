@@ -1,8 +1,9 @@
 import { computed, type Component } from 'vue'
+import IconImagePlus from '~icons/lucide/image-plus'
 import IconSmilePlus from '~icons/lucide/smile-plus'
 
 import type { Tool } from '@open-pencil/core'
-import { useI18n, usePanelMessages } from '@open-pencil/vue/i18n'
+import { useI18n, useMenuMessages, usePanelMessages } from '@open-pencil/vue/i18n'
 
 import type { ToolbarEntry } from '@/app/editor/toolbar/layout'
 import { toolIcons } from '@/components/icons'
@@ -33,13 +34,16 @@ export function useToolLabels() {
 export function useToolbarEntryLabels() {
   const toolLabels = useToolLabels()
   const panels = usePanelMessages()
+  const menu = useMenuMessages()
   return computed<Record<ToolbarEntry, string>>(() => ({
     ...toolLabels.value,
+    'place-image': menu.value.placeImage,
     'insert-icon': panels.value.insertIcon
   }))
 }
 
 export const toolbarEntryIcons: Readonly<Record<ToolbarEntry, Component>> = {
   ...toolIcons,
+  'place-image': IconImagePlus,
   'insert-icon': IconSmilePlus
 }

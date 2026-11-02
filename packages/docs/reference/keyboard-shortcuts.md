@@ -7,6 +7,8 @@ description: Figma-compatible keyboard shortcut reference for OpenPencil tools, 
 
 Full Figma-compatible shortcut map. ✅ = implemented.
 
+In the app, press <kbd>?</kbd> or click the keyboard button at the end of the toolbar to see every shortcut, searchable, with the keys for your platform.
+
 ::: tip Symbol Legend
 ⌘ = Cmd (Mac) / Ctrl (Win/Linux) · ⇧ = Shift · ⌥ = Alt/Option · ⌃ = Ctrl · ⌫ = Backspace
 :::
@@ -29,7 +31,7 @@ Full Figma-compatible shortcut map. ✅ = implemented.
 | <kbd>P</kbd> | Pen | ✅ |
 | <kbd>⇧</kbd><kbd>P</kbd> | Pencil | ✅ |
 | <kbd>T</kbd> | Text | ✅ |
-| — | Sticky note (FigJam) | ✅ (toolbar, hidden by default) |
+| — | Sticky note (FigJam) | ✅ (toolbar, after Text; <kbd>N</kbd> stays Zoom to Next Frame) |
 | — | Connector (FigJam) | ✅ (toolbar, hidden by default) |
 | <kbd>C</kbd> | Comment | ✅ |
 | <kbd>I</kbd> | Eyedropper | 🔲 |
@@ -38,9 +40,10 @@ Full Figma-compatible shortcut map. ✅ = implemented.
 
 | Shortcut | Action | Status |
 |----------|--------|--------|
-| <kbd>⌘</kbd><kbd>N</kbd> | New Tab | ✅ |
+| <kbd>⌘</kbd><kbd>N</kbd> | New Design | ✅ |
 | <kbd>⌘</kbd><kbd>T</kbd> | New Tab | ✅ |
 | <kbd>⌘</kbd><kbd>O</kbd> | Open File | ✅ |
+| <kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd> | Place Image | ✅ |
 | <kbd>⌘</kbd><kbd>W</kbd> | Close Tab | ✅ |
 | <kbd>⌘</kbd><kbd>S</kbd> | Save | ✅ |
 | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>S</kbd> | Save As | ✅ |
@@ -56,6 +59,7 @@ Full Figma-compatible shortcut map. ✅ = implemented.
 | <kbd>⌘</kbd><kbd>C</kbd> | Copy | ✅ |
 | <kbd>⌘</kbd><kbd>V</kbd> | Paste | ✅ |
 | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>V</kbd> | Paste Over Selection | 🔲 |
+| <kbd>⇧</kbd><kbd>⌘</kbd><kbd>R</kbd> | Paste to Replace | ✅ |
 | <kbd>⌘</kbd><kbd>D</kbd> | Duplicate | ✅ |
 | <kbd>⌫</kbd> | Delete | ✅ |
 | <kbd>⌘</kbd><kbd>A</kbd> | Select All | ✅ |
@@ -90,6 +94,8 @@ Full Figma-compatible shortcut map. ✅ = implemented.
 | <kbd>Page Up</kbd> | Previous Page | ✅ |
 | <kbd>Z</kbd> | Zoom Tool | 🔲 |
 | <kbd>⌘</kbd><kbd>J</kbd> | Toggle AI Chat | ✅ |
+| <kbd>⌘</kbd><kbd>K</kbd> | Command Palette | ✅ |
+| <kbd>?</kbd> | Keyboard Shortcuts | ✅ |
 
 ## Selection
 
@@ -99,17 +105,19 @@ Full Figma-compatible shortcut map. ✅ = implemented.
 | <kbd>⇧</kbd><kbd>↩</kbd> or <kbd>\\</kbd> | Select Parent | ✅ |
 | <kbd>⇥</kbd> | Select Next Sibling | ✅ |
 | <kbd>⇧</kbd><kbd>⇥</kbd> | Select Previous Sibling | ✅ |
+| <kbd>1</kbd>–<kbd>9</kbd>, <kbd>0</kbd> | Set Opacity (10–90%, 100%; type two digits for other values) | ✅ |
+| Arrow keys | Nudge by the small nudge (<kbd>⇧</kbd> for the big one), 1 px and 10 px unless changed in Settings | ✅ |
 
 ## Object
 
 | Shortcut | Action | Status |
 |----------|--------|--------|
-| <kbd>⌥</kbd><kbd>⌘</kbd><kbd>G</kbd> | Frame Selection | 🔲 |
+| <kbd>⌥</kbd><kbd>⌘</kbd><kbd>G</kbd> | Frame Selection | ✅ |
 | <kbd>⌘</kbd><kbd>G</kbd> | Group Selection | ✅ |
 | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>G</kbd> | Ungroup | ✅ |
 | <kbd>⇧</kbd><kbd>A</kbd> | Add Auto Layout | ✅ |
+| <kbd>⌥</kbd><kbd>⇧</kbd><kbd>A</kbd> | Remove Auto Layout (every selected frame) | ✅ |
 | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> | Create Component | ✅ |
-| <kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd> | Create Component Set | ✅ |
 | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd> | Detach Instance | ✅ |
 | <kbd>⌘</kbd><kbd>R</kbd> | Rename Selection | ✅ |
 | <kbd>⌘</kbd><kbd>]</kbd> | Bring Forward | ✅ |
@@ -122,7 +130,26 @@ Full Figma-compatible shortcut map. ✅ = implemented.
 | <kbd>⇧</kbd><kbd>V</kbd> | Flip Vertical | ✅ |
 | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>H</kbd> | Toggle Visibility | ✅ |
 | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>L</kbd> | Toggle Lock | ✅ |
-| <kbd>⌘</kbd><kbd>E</kbd> | Flatten | 🔲 |
+| <kbd>⌥</kbd><kbd>⇧</kbd><kbd>U</kbd> | Union Selection | ✅ |
+| <kbd>⌥</kbd><kbd>⇧</kbd><kbd>S</kbd> | Subtract Selection | ✅ |
+| <kbd>⌥</kbd><kbd>⇧</kbd><kbd>I</kbd> | Intersect Selection | ✅ |
+| <kbd>⌥</kbd><kbd>⇧</kbd><kbd>E</kbd> | Exclude Selection | ✅ |
+| <kbd>⌥</kbd><kbd>⇧</kbd><kbd>F</kbd> | Flatten | ✅ |
+| <kbd>⌘</kbd><kbd>E</kbd> | Flatten (Figma's key) | 🔲 |
+
+## Arrange
+
+| Shortcut | Action | Status |
+|----------|--------|--------|
+| <kbd>⌥</kbd><kbd>A</kbd> | Align Left | ✅ |
+| <kbd>⌥</kbd><kbd>H</kbd> | Align Horizontal Centers | ✅ |
+| <kbd>⌥</kbd><kbd>D</kbd> | Align Right | ✅ |
+| <kbd>⌥</kbd><kbd>W</kbd> | Align Top | ✅ |
+| <kbd>⌥</kbd><kbd>V</kbd> | Align Vertical Centers | ✅ |
+| <kbd>⌥</kbd><kbd>S</kbd> | Align Bottom | ✅ |
+| <kbd>⌃</kbd><kbd>⌥</kbd><kbd>H</kbd> | Distribute Horizontal Spacing | ✅ |
+| <kbd>⌃</kbd><kbd>⌥</kbd><kbd>V</kbd> | Distribute Vertical Spacing | ✅ |
+| <kbd>⌃</kbd><kbd>⌥</kbd><kbd>T</kbd> | Tidy Up | ✅ |
 
 ## Text
 

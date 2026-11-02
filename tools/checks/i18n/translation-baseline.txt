@@ -49,6 +49,7 @@ de:panels.linearGradient
 de:panels.maskTypeAlpha
 de:panels.maxHeightShort
 de:panels.minHeightShort
+de:panels.missingLibraryUsage
 de:panels.position
 de:panels.radialGradient
 de:panels.radius
@@ -103,6 +104,7 @@ es:panels.colorFormatRgb
 es:panels.framePresetCategoryFigmaCommunity
 es:panels.kerning
 es:panels.localLibraries
+es:panels.missingLibraryUsage
 es:panels.radialGradient
 es:panels.stickyColor
 es:panels.textCaseOriginal
@@ -170,6 +172,7 @@ fr:panels.maskTypeAlpha
 fr:panels.maskTypeLuminance
 fr:panels.maxHeightShort
 fr:panels.minHeightShort
+fr:panels.missingLibraryUsage
 fr:panels.nestedInstance
 fr:panels.page
 fr:panels.pages
@@ -239,6 +242,7 @@ it:panels.behaviourMin
 it:panels.behaviourMax
 it:panels.behaviourStateHover
 it:panels.behaviourStateFocus
+it:panels.missingLibraryUsage
 it:panels.shader
 it:panels.variableModeAuto
 it:panels.variableModeAutoMixed
@@ -267,6 +271,7 @@ ja:panels.colorFormatHsl
 ja:panels.colorFormatOkhcl
 ja:panels.colorFormatRgb
 ja:panels.framePresetCategoryFigmaCommunity
+ja:panels.missingLibraryUsage
 ja:settings.mcp
 ja:storage.providerAmazonS3
 ja:storage.providerBackblaze
@@ -303,6 +308,7 @@ pl:panels.framePresetCategoryFigmaCommunity
 pl:panels.framePresetCategoryTablet
 pl:panels.kerning
 pl:panels.behaviourMin
+pl:panels.missingLibraryUsage
 pl:panels.shader
 pl:settings.mcp
 pl:settings.media
@@ -327,6 +333,7 @@ ru:panels.colorFormatHsl
 ru:panels.colorFormatOkhcl
 ru:panels.colorFormatRgb
 ru:panels.framePresetCategoryFigmaCommunity
+ru:panels.missingLibraryUsage
 ru:settings.mcp
 ru:storage.providerAmazonS3
 ru:storage.providerBackblaze
@@ -352,6 +359,7 @@ zh-cn:panels.colorFormatOkhcl
 zh-cn:panels.colorFormatRgb
 zh-cn:panels.framePresetCategoryFigmaCommunity
 zh-cn:panels.maskTypeAlpha
+zh-cn:panels.missingLibraryUsage
 zh-cn:settings.mcp
 zh-cn:storage.providerAmazonS3
 zh-cn:storage.providerBackblaze
@@ -551,3 +559,9 @@ zh-cn:settings.groupAI
 de:settings.cloud
 fr:settings.cloud
 it:settings.cloud
+de:ai.fileAttachmentDetails
+es:ai.fileAttachmentDetails
+it:ai.fileAttachmentDetails
+ja:ai.fileAttachmentDetails
+pl:ai.fileAttachmentDetails
+zh-cn:ai.fileAttachmentDetails

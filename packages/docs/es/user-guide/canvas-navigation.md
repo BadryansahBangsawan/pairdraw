@@ -25,6 +25,8 @@ Pulsa <kbd>H</kbd>. Mientras esté activa, cualquier arrastre desplaza la vista 
 
 El zoom se centra en la posición del puntero. Se puede controlar con <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + desplazamiento, el gesto de pellizco o los atajos.
 
+Con **Hacer zoom con la rueda** en **Ajustes → Editor**, la rueda del ratón amplía sin pulsar ninguna tecla; <kbd>Shift</kbd> + rueda sigue desplazando en horizontal. **Invertir la dirección del zoom** cambia el sentido de la rueda; el pellizco del trackpad mantiene el suyo.
+
 | Acción | macOS | Windows / Linux |
 |--------|-------|-----------------|
 | 100 % | <kbd>⌘</kbd><kbd>0</kbd> | <kbd>Ctrl</kbd><kbd>0</kbd> |

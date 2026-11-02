@@ -7,6 +7,7 @@
   "group": "Agrupar",
   "ungroup": "Desagrupar",
   "createComponent": "Crear componente",
+  "convertToFrame": "Convertir en marco",
   "createSlot": "Crear slot",
   "createComponentSet": "Crear conjunto de componentes",
   "createInstance": "Crear instancia",
@@ -69,5 +70,15 @@
   "paletteSearchAriaLabel": "Buscar comandos",
   "paletteDescription": "Busca y ejecuta comandos de Pairdraw.",
   "paletteNoCommands": "No se encontraron comandos.",
-  "paletteBack": "Atrás"
+  "paletteBack": "Atrás",
+  "shortcutSheet": "Atajos de teclado",
+  "shortcutSheetDescription": "Teclas que funcionan mientras el lienzo tiene el foco.",
+  "shortcutSheetSearch": "Buscar atajos",
+  "shortcutSheetEmpty": "No se encontraron atajos.",
+  "shortcutSheetTools": "Herramientas",
+  "shortcutSheetCanvas": "Lienzo y selección",
+  "toggleAIChat": "Mostrar u ocultar el chat de IA",
+  "nudgeSelection": "Desplazar la selección",
+  "nudgeSelectionFurther": "Desplazar más la selección",
+  "panWhileHeld": "Desplazar la vista mientras se mantiene"
 }

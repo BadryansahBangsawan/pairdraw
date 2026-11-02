@@ -26,7 +26,7 @@ Feature-by-feature comparison of Figma Design capabilities with Open Pencil's cu
 | Find and replace | 🔲 | Text search/replace across document |
 | Layer outlines view | 🔲 | Wireframe view of all layers |
 | Custom file thumbnails | 🔲 | Saved files preview their first page, as Figma's do without a Cover page; no thumbnail picker |
-| Nudge value settings | 🔲 | Default 1px/10px; Figma allows custom small/big nudge values |
+| Nudge value settings | ✅ | Small and big nudge distances in **Settings → Editor**, 1 px and 10 px by default |
 | App menu (browser mode) | ✅ | File, Edit, View, Object, Text, Arrange menus; Tauri uses native menus |
 | AI tools | 🟡 | 126 tools in the AI chat, coding agents (ACP), and MCP; stock photos and image vectorization; no AI image generation or AI search |
 
@@ -158,7 +158,7 @@ Feature-by-feature comparison of Figma Design capabilities with Open Pencil's cu
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Create components | ✅ | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> creates from frame/group or wraps selection; component properties UI supports text, visibility, instance swap, and variants |
-| Component sets | ✅ | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd> combines components; multidimensional sparse variant authoring with duplicate validation and top-left default |
+| Component sets | ✅ | **Create component set** combines components; multidimensional sparse variant authoring with duplicate validation and top-left default |
 | Component instances | ✅ | Assets browsing, insertion, editable component properties and overrides, variant switching, live sync, and update review |
 | Variants | ✅ | Multidimensional sparse combinations, authoring, instance switching, duplicate validation, and top-left fallback |
 | Component properties | ✅ | Boolean, text, instance-swap, and slot properties; expose nested instances and reorder from the panel |

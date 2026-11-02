@@ -45,7 +45,15 @@ function cornersOf(node: Pick<SceneNode, 'width' | 'height'>): number[] {
 }
 
 export function getAxisAlignedWorldBounds(node: SceneNode, graph: Pick<SceneGraph, 'getNode'>) {
-  return boundsOfPoints(Matrix.mapPoints(getWorldMatrix(node, graph), cornersOf(node)))
+  return getAxisAlignedBoundsAt(node, getWorldMatrix(node, graph))
+}
+
+/**
+ * Axis-aligned canvas box of a node drawn with the world matrix `world`, for walks down the tree
+ * that compose each child's matrix from its parent's instead of climbing the ancestors again.
+ */
+export function getAxisAlignedBoundsAt(node: Pick<SceneNode, 'width' | 'height'>, world: Mat3) {
+  return boundsOfPoints(Matrix.mapPoints(world, cornersOf(node)))
 }
 
 /** World matrix of a parent; the document root and a missing parent are the identity. */

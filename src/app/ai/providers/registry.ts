@@ -9,6 +9,11 @@ import {
   createAnthropicCompatibleAdapter,
   createOpenAICompatibleAdapter
 } from '@/app/ai/providers/compatible'
+import {
+  createOpenCodeAdapter,
+  OPENCODE_GO_BASE_URL,
+  OPENCODE_ZEN_BASE_URL
+} from '@/app/ai/providers/opencode'
 import type { ModelProviderAdapter } from '@/app/ai/providers/types'
 
 type DirectProviderID = Exclude<AIProviderID, `acp:${string}` | `harness:${string}`>
@@ -44,6 +49,20 @@ const MODEL_PROVIDER_ADAPTERS = {
   },
   zai: createAnthropicCompatibleAdapter({ baseURL: 'https://api.z.ai/api/anthropic' }),
   minimax: createOpenAICompatibleAdapter({ baseURL: 'https://api.minimax.io/v1', mode: 'chat' }),
+  xai: createOpenAICompatibleAdapter({ baseURL: 'https://api.x.ai/v1', mode: 'chat' }),
+  meta: createOpenAICompatibleAdapter({ baseURL: 'https://api.meta.ai/v1', mode: 'chat' }),
+  'kimi-for-coding': createOpenAICompatibleAdapter({
+    baseURL: 'https://api.kimi.ai/coding/v1',
+    mode: 'chat'
+  }),
+  moonshot: createOpenAICompatibleAdapter({ baseURL: 'https://api.moonshot.ai/v1', mode: 'chat' }),
+  together: createOpenAICompatibleAdapter({ baseURL: 'https://api.together.xyz/v1', mode: 'chat' }),
+  fireworks: createOpenAICompatibleAdapter({
+    baseURL: 'https://api.fireworks.ai/inference/v1',
+    mode: 'chat'
+  }),
+  'opencode-zen': createOpenCodeAdapter(OPENCODE_ZEN_BASE_URL),
+  'opencode-go': createOpenCodeAdapter(OPENCODE_GO_BASE_URL),
   'openai-compatible': createOpenAICompatibleAdapter({
     baseURL: (config) => config.customBaseURL,
     mode: 'configurable'

@@ -3,8 +3,11 @@
   "settingsDescription": "Wähle, wie Pairdraw große Arbeitsflächen darstellt.",
   "progressiveTiled": "Progressives Rendering",
   "progressiveTiledDescription": "Aktualisiert große Zeichenflächen beim Navigieren in kleineren Kacheln.",
+  "progressiveTiledByUltralight": "Immer an, solange der Ultralight-Modus an ist.",
   "reloadRequired": "Lade Pairdraw neu, um diese Änderung anzuwenden.",
   "wideGamutUnavailable": "Dieses Display oder dieser Browser kann Display-P3-Farben nicht darstellen, daher zeigt die Zeichenfläche sie in sRGB an. Das Dokument behält seinen Farbraum.",
   "urlOverride": "Der Renderer dieser Sitzung wird durch einen URL-Parameter gesteuert. Deine gespeicherte Einstellung gilt, sobald der Parameter entfernt wird.",
-  "experimental": "Experimentell"
+  "experimental": "Experimentell",
+  "ultralight": "Ultralight-Modus",
+  "ultralightDescription": "Spart auf langsameren Computern Strom und Speicher: schaltet Animationen aus, rendert in Kacheln mit Standardauflösung und vereinfacht Unschärfen, Rauschen und Schatten."
 }

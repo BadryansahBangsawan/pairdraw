@@ -2,6 +2,8 @@ import { afterEach, expect, test } from 'bun:test'
 
 import { toRaw } from 'vue'
 
+import { SceneGraph } from '@open-pencil/scene-graph'
+
 import { chatColumnOpen } from '@/app/ai/chat/panel'
 import {
   hasPendingPrompt,
@@ -20,8 +22,9 @@ afterEach(() => {
   appPreferences.value = structuredClone(savedPreferences)
 })
 
-function documentStore(): EditorStore {
+function documentStore(graph = new SceneGraph()): EditorStore {
   return asDouble<EditorStore>({
+    graph,
     state: { activeRibbonTab: 'panels', mobileDrawerSnap: 'closed' }
   })
 }
@@ -64,4 +67,18 @@ test('sending a prompt to a document leaves it for that chat and shows the chat 
   // A phone shows the chat in the drawer's AI tab, opened halfway.
   expect(store.state.activeRibbonTab).toBe('ai')
   expect(store.state.mobileDrawerSnap).toBe('half')
+})
+
+test('a prompt sent to a document carries the layers it references, as from the composer', () => {
+  const graph = new SceneGraph()
+  const hero = graph.createNode('FRAME', graph.getPages()[0].id, { name: 'Hero' })
+  const store = documentStore(graph)
+  const text = `Make [Hero](openpencil://node/${encodeURIComponent(hero.id)}) taller, and [Gone](openpencil://node/0:404) too`
+  sendPromptToDocument(store, text)
+
+  const prompt = takePendingPrompt(store)
+  expect(prompt?.modelText).toBe(text)
+  expect(prompt?.displayText).toBe(text)
+  // Only layers the document still has go with it.
+  expect(prompt?.nodes).toEqual([{ id: hero.id, name: 'Hero', type: 'FRAME' }])
 })

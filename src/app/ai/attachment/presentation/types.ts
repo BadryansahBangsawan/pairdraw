@@ -6,7 +6,7 @@ import type { ImageAttachmentMediaType } from '@/app/ai/attachment/image/types'
 export interface AttachmentBase {
   id: string
   messageId: string
-  kind: 'image' | 'node'
+  kind: 'image' | 'node' | 'file'
   name: string
   preview: Blob
 }
@@ -24,4 +24,12 @@ export interface NodePresentation extends AttachmentBase {
   originalSize: Vector
 }
 
-export type AttachmentPresentation = ImagePresentation | NodePresentation
+/** A text file attached to the message; its preview holds the text. */
+export interface FilePresentation extends AttachmentBase {
+  kind: 'file'
+  mediaType: string
+  /** Bytes, as the file had them. */
+  size: number
+}
+
+export type AttachmentPresentation = ImagePresentation | NodePresentation | FilePresentation

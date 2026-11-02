@@ -52,8 +52,8 @@ test('create component from selection (⌘⌥K)', async () => {
   componentId = selectedId
 })
 
-test('component shows its type icon in the design panel', async () => {
-  await expect(editor.page.getByRole('img', { name: 'COMPONENT' })).toBeVisible()
+test('component shows its layer type menu in the design panel', async () => {
+  await expect(editor.page.getByRole('button', { name: 'Layer type', exact: true })).toBeVisible()
 })
 
 test('component visible in layers panel', async () => {

@@ -54,6 +54,13 @@ export function useSelectionState() {
     return !!slotOwner(editor.graph, first)
   })
 
+  /** Whether the selection is one main component outside a set, which can become a frame again. */
+  const canConvertToFrame = useSceneComputed(() => {
+    if (selectedIds.value.size !== 1) return false
+    const [id] = selectedIds.value
+    return editor.canConvertToFrame(id)
+  })
+
   /** Whether the selection holds layers the Auto Arrange layouts take. */
   const canAutoArrange = useSceneComputed(() => editor.canAutoArrangeNodes([...selectedIds.value]))
 
@@ -70,6 +77,7 @@ export function useSelectionState() {
     isGroup,
     canCreateComponentSet,
     canCreateSlot,
+    canConvertToFrame,
     canAutoArrange
   }
 }

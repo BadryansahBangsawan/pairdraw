@@ -38,6 +38,8 @@ export type NodeEditState = {
   hoveredRegion: number | null
   /** Regions picked by clicking inside them; their points are selected with them. */
   selectedRegions: Set<number>
+  /** Whether the cut tool (X) is picked up: a click cuts the path instead of selecting. */
+  cutTool: boolean
 }
 
 export type VectorEditState = EditorState & { nodeEditState: NodeEditState | null }

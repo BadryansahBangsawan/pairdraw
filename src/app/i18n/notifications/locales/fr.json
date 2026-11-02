@@ -14,7 +14,7 @@
   "vectorizeCredentialRequired": "Ajoutez une clé API {provider} dans Réglages → Services d’image.",
   "vectorizeImageMissing": "Les données d’image de ce calque sont manquantes.",
   "vectorizingImage": "Vectorisation de l’image…",
-  "imageConvertedToVectors": "Image convertie en vecteurs.",
+  "imageConvertedToVectors": "Vecteurs ajoutés à côté de l’image.",
   "vectorizeCredentialFailed": "{error}. Mettez-la à jour dans Réglages → Services d’image.",
   "vectorizeFailed": "{provider} n’a pas pu vectoriser cette image : {error}",
   "operationFailed": "Échec de l’opération : {error}",
@@ -32,5 +32,9 @@
   "tokensLeftOut": "Non inclus dans la feuille de style : {names}.",
   "designTokensLeftOut": "Exclus des design tokens : {names}.",
   "designTokensImported": "{count} design tokens importés.",
-  "unsupportedVariableExpressions": "Pairdraw ne sait pas encore évaluer ces variables ; les calques gardent les valeurs enregistrées dans le fichier : {names}."
+  "unsupportedVariableExpressions": "Pairdraw ne sait pas encore évaluer ces variables ; les calques gardent les valeurs enregistrées dans le fichier : {names}.",
+  "placeImageUnsupported": "Choisissez un fichier PNG, JPEG, WebP, GIF, AVIF ou SVG à placer.",
+  "placeImageFailed": "Impossible de placer les fichiers : {error}",
+  "exportPDFEmpty": "Cette page n’a aucun cadre à exporter.",
+  "exportPDFFailed": "Impossible d’exporter le PDF : {error}"
 }

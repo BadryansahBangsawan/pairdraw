@@ -16,6 +16,7 @@ function selection(overrides: Partial<CanvasMenuOptions['selection']> = {}) {
     isIcon: ref(false),
     canCreateComponentSet: ref(false),
     canCreateSlot: ref(false),
+    canConvertToFrame: ref(false),
     canAutoArrange: ref(false),
     ...overrides
   } as CanvasMenuOptions['selection']
@@ -85,6 +86,22 @@ describe('buildCanvasContextMenu', () => {
     )
     expect(ids).toContain('selection.createSlot')
     expect(itemIds(buildCanvasContextMenu(options()))).not.toContain('selection.createSlot')
+  })
+
+  test('offers Convert to frame beside Create instance for a main component', () => {
+    const ids = itemIds(
+      buildCanvasContextMenu(
+        options({
+          selection: selection({
+            isComponent: computed(() => true),
+            canConvertToFrame: computed(() => true)
+          })
+        })
+      )
+    )
+    expect(ids).toContain('selection.createInstance')
+    expect(ids).toContain('selection.convertToFrame')
+    expect(itemIds(buildCanvasContextMenu(options()))).not.toContain('selection.convertToFrame')
   })
 
   test('offers Auto arrange for layers that can be arranged', () => {

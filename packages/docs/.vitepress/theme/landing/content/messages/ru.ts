@@ -290,11 +290,13 @@ export const ru: LandingMessages = {
     },
     formats: {
       dmg: 'Образ диска',
+      zip: 'Приложение в zip-архиве',
       exe: 'Установщик',
       msi: 'Для управляемой установки',
       appimage: 'Работает в большинстве дистрибутивов',
       deb: 'Debian, Ubuntu',
-      rpm: 'Fedora, openSUSE'
+      rpm: 'Fedora, openSUSE',
+      'tar.gz': 'Запускается из любой папки без установки'
     },
     requirements: 'Системные требования',
     allTitle: 'Все загрузки',

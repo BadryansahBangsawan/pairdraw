@@ -40,8 +40,8 @@ describe('normalizeToolbarLayout', () => {
     const groups = [['SELECT', 'LASSO', 'SELECT'], [], ['FRAME', 'SECTION', 'FRAME']]
     const result = normalizeToolbarLayout(groups, ['HAND', 'HAND', 'GHOST'])
     expect(result.groups.slice(0, 2)).toEqual([['SELECT'], ['FRAME', 'SECTION']])
-    // The sticky, shape and connector tools are placed hidden, as the default layout keeps them.
-    expect(result.hidden).toEqual(['HAND', 'STICKY', 'SHAPE_WITH_TEXT', 'CONNECTOR'])
+    // The shape and connector tools are placed hidden, as the default layout keeps them.
+    expect(result.hidden).toEqual(['HAND', 'SHAPE_WITH_TEXT', 'CONNECTOR'])
   })
 
   test('never hides Move', () => {
@@ -50,13 +50,14 @@ describe('normalizeToolbarLayout', () => {
 
   test('keeps commands out of flyouts', () => {
     const result = layout([['SELECT', 'insert-icon', 'HAND'], ['COMMENT']])
-    expect(result.groups.slice(-6)).toEqual([
+    expect(result.groups.slice(-7)).toEqual([
       ['STICKY'],
       ['SHAPE_WITH_TEXT'],
       ['CONNECTOR'],
       ['insert-icon'],
       ['HAND'],
-      ['COMMENT']
+      ['COMMENT'],
+      ['place-image']
     ])
   })
 
@@ -79,18 +80,37 @@ describe('normalizeToolbarLayout', () => {
       ['PEN', 'PENCIL'],
       ['HAND'],
       ['COMMENT'],
+      ['place-image'],
       ['insert-icon']
     ])
   })
 })
 
 describe('tools hidden by default', () => {
-  test('a layout stored before the sticky tool gets it hidden, and a shown one stays shown', () => {
-    const before = DEFAULT_TOOLBAR_LAYOUT.groups.map((group) =>
-      group.filter((entry) => entry !== 'STICKY')
+  test('the design toolbar shows the sticky note and hides the shape and connector', () => {
+    const shown = toolbarItems(DEFAULT_TOOLBAR_LAYOUT, LABELS, SHORTCUTS).map((item) =>
+      item.kind === 'tool' ? item.tool.key : item.action
     )
-    expect(layout(before).hidden).toEqual(['STICKY'])
+    expect(shown).toContain('STICKY')
+    expect(shown).not.toContain('SHAPE_WITH_TEXT')
+    expect(shown).not.toContain('CONNECTOR')
+    // The sticky note has no key in a design file: N stays Zoom to Next Frame, as in Figma.
+    expect(SHORTCUTS.STICKY).toBe('')
+  })
+
+  test('a layout stored before the connector gets it hidden, and a shown one stays shown', () => {
+    const before = DEFAULT_TOOLBAR_LAYOUT.groups.map((group) =>
+      group.filter((entry) => entry !== 'CONNECTOR')
+    )
+    expect(layout(before, ['SHAPE_WITH_TEXT']).hidden).toEqual(['SHAPE_WITH_TEXT', 'CONNECTOR'])
     expect(layout(DEFAULT_TOOLBAR_LAYOUT.groups, []).hidden).toEqual([])
+  })
+
+  test('a layout stored before Place image shows its button, with the other commands', () => {
+    const before = DEFAULT_TOOLBAR_LAYOUT.groups.filter(([entry]) => entry !== 'place-image')
+    const placed = layout(before, DEFAULT_TOOLBAR_LAYOUT.hidden)
+    expect(placed.groups.slice(-2)).toEqual([['place-image'], ['insert-icon']])
+    expect(placed.hidden).not.toContain('place-image')
   })
 })
 

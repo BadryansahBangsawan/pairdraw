@@ -6,6 +6,7 @@ import { AVAILABLE_LOCALES, locale, setLocale, type Locale } from '@open-pencil/
 
 import { agentStepLimitSchema } from '@/app/ai/reply/schema'
 import { applySnappingPreferences, setDesignIssuesOnCanvas } from '@/app/settings/preferences/apply'
+import { nudgeDistanceSchema } from '@/app/settings/preferences/schema'
 import {
   ANIMATION_PREFERENCES,
   appPreferences,
@@ -14,6 +15,7 @@ import {
   DESIGN_CHECK_PRESETS,
   REASONING_DISPLAYS,
   updateDesignCheckPreferences,
+  updateNudgePreferences,
   type AppPreferences
 } from '@/app/settings/preferences/store'
 import { APP_THEMES, type AppTheme } from '@/app/settings/theme'
@@ -56,13 +58,23 @@ const automationSettingsPatchSchema = v.strictObject({
         v.strictObject({
           geometry: optionalBooleanSchema,
           objects: optionalBooleanSchema,
-          pixelGrid: optionalBooleanSchema
+          pixelGrid: optionalBooleanSchema,
+          halfPixel: optionalBooleanSchema
+        })
+      ),
+      nudge: v.optional(
+        v.strictObject({
+          small: v.optional(nudgeDistanceSchema),
+          large: v.optional(nudgeDistanceSchema)
         })
       )
     })
   ),
   rendering: v.optional(
-    v.strictObject({ canvasMode: v.optional(v.picklist(CANVAS_RENDERING_MODES)) })
+    v.strictObject({
+      canvasMode: v.optional(v.picklist(CANVAS_RENDERING_MODES)),
+      ultralight: optionalBooleanSchema
+    })
   ),
   recovery: v.optional(v.strictObject({ enabled: optionalBooleanSchema })),
   chat: v.optional(
@@ -93,7 +105,10 @@ export function readAutomationSettings(): AutomationSettings {
       animations: preferences.appearance.animations,
       accent: { ...preferences.appearance.accent }
     },
-    editing: { snapping: { ...preferences.editing.snapping } },
+    editing: {
+      snapping: { ...preferences.editing.snapping },
+      nudge: { ...preferences.editing.nudge }
+    },
     rendering: { ...preferences.rendering },
     recovery: { ...preferences.recovery },
     chat: { ...preferences.chat },
@@ -127,6 +142,7 @@ export function updateAutomationSettings(input: unknown): AutomationSettings {
     chat: { ...current.chat, ...patch.chat }
   }
   if (patch.editing?.snapping) applySnappingPreferences(patch.editing.snapping)
+  if (patch.editing?.nudge) updateNudgePreferences(patch.editing.nudge)
   const { showOnCanvas, ...designCheck } = patch.designCheck ?? {}
   if (!isEmptyObject(designCheck)) updateDesignCheckPreferences(designCheck)
   // Through the menu's setter, so the native View menu checkmark follows.

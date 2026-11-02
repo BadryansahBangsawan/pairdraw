@@ -17,11 +17,15 @@ export interface FakeComputer {
   /** npm's global folder is writable without administrator rights. */
   npmWritable?: boolean
   signedIn?: boolean
+  /** The login a signed-in agent reports; a Claude Max account unless set. */
+  signedInAs?: AgentAuthStatus
   /** The agents report no login at all, as an agent that sends no status does. */
   silent?: boolean
   toolsReachable?: boolean
   /** The sign-in ends without a login, as when the person closes the browser. */
   signInEndsSignedOut?: boolean
+  /** Claude Code is set up for a cloud with its `CLAUDE_CODE_USE_*` switches. */
+  claudeCodeCloud?: 'bedrock' | 'vertex' | 'foundry'
 }
 
 function toolsOutcome(reachable: boolean): OwnToolsOutcome {
@@ -61,7 +65,8 @@ export function fakeAgentHost(initial: FakeComputer) {
         searchPath: '/test/bin',
         executables: Object.fromEntries(executables.map((name) => [name, `/test/bin/${name}`])),
         versions,
-        npmGlobalWritable: computer.executables.has('npm') ? computer.npmWritable : null
+        npmGlobalWritable: computer.executables.has('npm') ? computer.npmWritable : null,
+        ...(computer.claudeCodeCloud ? { claudeCodeCloud: computer.claudeCodeCloud } : {})
       }
     },
     async install(target) {
@@ -77,7 +82,7 @@ export function fakeAgentHost(initial: FakeComputer) {
     async check(agent) {
       calls.push('check')
       if (holds.check) await holds.check
-      const status = computer.signedIn ? SIGNED_IN : SIGNED_OUT
+      const status = computer.signedIn ? (computer.signedInAs ?? SIGNED_IN) : SIGNED_OUT
       return {
         status: computer.silent ? null : status,
         methods: agent.signIn

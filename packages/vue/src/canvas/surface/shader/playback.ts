@@ -93,8 +93,14 @@ export function useShaderPlayback(options: {
   getView: () => Pick<EditorState, 'panX' | 'panY' | 'zoom' | 'currentPageId'> & EditorProfileInputs
   getViewport: () => { width: number; height: number }
   markDirty: () => void
+  /**
+   * The device pixels the canvas draws per CSS pixel, which may be capped below the display's;
+   * shaders play at that density too. The display's ratio by default.
+   */
+  getPixelRatio?: () => number
 }) {
   const { editor, getRenderer, getView, getViewport, markDirty } = options
+  const pixelRatio = options.getPixelRatio ?? (() => window.devicePixelRatio || 1)
   const frames = shaderFrames(editor)
   const players = new Map<string, Player>()
   /** Players starting at a new size beside the ones they replace, by image. */
@@ -141,7 +147,7 @@ export function useShaderPlayback(options: {
 
   /** How many pixels a shader painted over `bounds` covers on screen, at most. */
   function screenSize(bounds: Rect[]): { width: number; height: number } {
-    const scale = getView().zoom * (window.devicePixelRatio || 1)
+    const scale = getView().zoom * pixelRatio()
     const width = Math.max(...bounds.map((rect) => rect.width)) * scale
     const height = Math.max(...bounds.map((rect) => rect.height)) * scale
     const fit = Math.min(1, MAX_PLAY_EDGE / Math.max(width, height, 1))
@@ -250,6 +256,7 @@ export function useShaderPlayback(options: {
   }
 
   function resized(canvas: HTMLCanvasElement, size: { width: number; height: number }) {
+    // The library scales the canvas by the display's ratio, so this is the buffer `start` asked for.
     return differs(canvas.width * (window.devicePixelRatio || 1), size)
   }
 

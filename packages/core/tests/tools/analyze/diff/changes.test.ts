@@ -7,7 +7,7 @@ import { FigmaAPI } from '@open-pencil/core/figma-api'
 import { ALL_TOOLS } from '@open-pencil/core/tools'
 import { sceneNodeToJSX } from '@open-pencil/design-jsx'
 
-type ChangesResult = { diff?: string | null; message?: string; error?: string }
+type ChangesResult = { diff?: string | null; message?: string; error?: string; marked?: string }
 
 const diffChanges = expectDefined(
   ALL_TOOLS.find((tool) => tool.name === 'diff_changes'),
@@ -123,6 +123,35 @@ test('explains when there is no run or no edit to compare with', async () => {
   const { figma } = setup()
   const noRun = new FigmaAPI(figma.graph)
   noRun.currentPage = figma.currentPage
-  expect((await run(noRun)).error).toContain('AI chat run')
+  expect(await run(noRun)).toEqual({
+    diff: null,
+    message: 'Nothing to compare with yet: call diff_changes with mark: true'
+  })
   expect(await run(figma)).toEqual({ diff: null, message: 'This run has not changed that page' })
+})
+
+test('outside an AI run, a mark records the page and later calls patch against it', async () => {
+  const { editor, pageId, card } = setup()
+  const client = () => {
+    // Each MCP call builds its own figma over the open document.
+    const figma = new FigmaAPI(editor.graph)
+    figma.currentPage = figma.wrapNode(pageId)
+    return figma
+  }
+  expect(await run(client(), { mark: true })).toMatchObject({ marked: pageId })
+  expect(await run(client())).toEqual({ diff: null, message: 'No differences found' })
+
+  editor.graph.updateNode(card.id, { width: 180 })
+  expect((await run(client(), { id: card.id })).diff).toBe(
+    `@@ /Card #${card.id}\n-w={100}\n+w={180}`
+  )
+
+  // A new mark moves the starting point.
+  await run(client(), { mark: true })
+  expect((await run(client())).diff).toBeNull()
+})
+
+test('an AI run keeps its own starting point and refuses a mark', async () => {
+  const { figma } = setup()
+  expect((await run(figma, { mark: true })).error).toContain('AI chat run')
 })

@@ -437,17 +437,39 @@ describe('list_recent_files', () => {
   test('lists local files newest first within the recent files limit', async () => {
     const updatedAt = '2026-01-01T00:00:00.000Z'
     recentDocuments.value = [
-      { id: 'local:/a.fig', kind: 'local', path: '/a.fig', name: 'a.fig', updatedAt },
+      {
+        id: 'local:/a.fig',
+        kind: 'local',
+        path: '/a.fig',
+        name: 'a.fig',
+        updatedAt,
+        createdAt: updatedAt
+      },
       {
         id: 'storage:s3:doc',
         kind: 'storage',
         providerId: 's3',
         documentId: 'doc',
         name: 'Stored',
-        updatedAt
+        updatedAt,
+        createdAt: updatedAt
       },
-      { id: 'local:/b.fig', kind: 'local', path: '/b.fig', name: 'b.fig', updatedAt },
-      { id: 'local:/c.fig', kind: 'local', path: '/c.fig', name: 'c.fig', updatedAt }
+      {
+        id: 'local:/b.fig',
+        kind: 'local',
+        path: '/b.fig',
+        name: 'b.fig',
+        updatedAt,
+        createdAt: updatedAt
+      },
+      {
+        id: 'local:/c.fig',
+        kind: 'local',
+        path: '/c.fig',
+        name: 'c.fig',
+        updatedAt,
+        createdAt: updatedAt
+      }
     ]
     recentFilesLimit.value = 3
 

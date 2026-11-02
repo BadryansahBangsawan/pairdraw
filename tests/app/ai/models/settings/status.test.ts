@@ -35,6 +35,13 @@ describe('model connection state', () => {
     expect(state({ ...codex, agent: signedIn, toolsUnreachable: true })).toBe('tools-unreachable')
   })
 
+  test('reads an agent set up outside the app for a cloud as external config', () => {
+    const claude = { providerID: 'acp:claude-code' }
+    const bedrock: AgentDetection = { state: 'external-config', cloud: 'bedrock' }
+    expect(state({ ...claude, agent: bedrock })).toBe('external-config')
+    expect(state({ ...claude, agent: bedrock, toolsUnreachable: true })).toBe('tools-unreachable')
+  })
+
   test("reads Cloud's AI service from the Home server, not a saved key", () => {
     const cloud = { providerID: OPENPENCIL_AI_PROVIDER }
     expect(state({ ...cloud, cloudAI: true })).toBe('connected')

@@ -117,9 +117,26 @@ export function updateNode(
   internals: NodeProxyInternals,
   changes: Partial<SceneNode>
 ): void {
-  assertProxyEditable(target, internals)
-  const g = graph(target, internals)
-  const id = nodeId(target, internals)
+  editNode(
+    graph(target, internals),
+    nodeId(target, internals),
+    changes,
+    hostFitOptions(target, internals)
+  )
+}
+
+/**
+ * Applies `changes` to a layer as node proxy setters do: refused on a read-only library
+ * definition, leaving the styles whose fields it changes, measuring auto-sizing text, recording
+ * an override inside an instance, and refitting the groups a moved layer sits in.
+ */
+export function editNode(
+  g: SceneGraph,
+  id: string,
+  changes: Partial<SceneNode>,
+  fitOptions: GroupFitOptions
+): void {
+  assertNodeEditable(g, id)
   const applied = Object.fromEntries(
     Object.keys(changes)
       .filter((key) => Reflect.get(changes, key) !== undefined)
@@ -138,6 +155,6 @@ export function updateNode(
   g.updateNode(id, edit)
   recordInstanceOverride(g, id, changed)
   if (Object.keys(edit).some((key) => GEOMETRY_FIELDS.has(key))) {
-    fitGroupsAround(g, g.getNode(id)?.parentId, hostFitOptions(target, internals))
+    fitGroupsAround(g, g.getNode(id)?.parentId, fitOptions)
   }
 }

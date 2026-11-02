@@ -21,6 +21,8 @@ Appuyez sur <kbd>H</kbd>. Tant qu’il est actif, tout glissement déplace la vu
 
 Le zoom est centré sur le pointeur. Utilisez <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + molette, le pincement ou les raccourcis.
 
+Avec **Zoomer avec la molette** dans **Paramètres → Éditeur**, la molette zoome sans touche ; <kbd>Shift</kbd> + molette fait toujours défiler horizontalement. **Inverser le sens du zoom** inverse le sens de la molette ; le pincement sur le trackpad garde le sien.
+
 | Action | macOS | Windows / Linux |
 |--------|-------|-----------------|
 | 100 % | <kbd>⌘</kbd><kbd>0</kbd> | <kbd>Ctrl</kbd><kbd>0</kbd> |

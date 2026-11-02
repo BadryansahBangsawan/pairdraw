@@ -20,6 +20,10 @@ concurrency:
 
 env:
   WORKFLOW_COMMIT: ${{ github.workflow_sha }}
+  # The update feed native builds check and the key the publish job verifies against; release
+  # tooling refuses to run without the key (tools/release/release-packages/src/native/updater.ts).
+  UPDATER_PUBLIC_KEY: ${{ vars.UPDATER_PUBLIC_KEY }}
+  UPDATER_ENDPOINT: ${{ vars.UPDATER_ENDPOINT }}
 
 jobs:
   plan:

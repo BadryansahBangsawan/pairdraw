@@ -14,7 +14,7 @@
   "vectorizeCredentialRequired": "Dodaj klucz API {provider} w Ustawienia → Usługi obrazów.",
   "vectorizeImageMissing": "Brakuje danych obrazu dla tej warstwy.",
   "vectorizingImage": "Wektoryzowanie obrazu…",
-  "imageConvertedToVectors": "Obraz przekonwertowano na wektory.",
+  "imageConvertedToVectors": "Dodano wektory obok obrazu.",
   "vectorizeCredentialFailed": "{error}. Zaktualizuj klucz w Ustawienia → Usługi obrazów.",
   "vectorizeFailed": "{provider} nie mógł zwektoryzować tego obrazu: {error}",
   "operationFailed": "Operacja nie powiodła się: {error}",
@@ -32,5 +32,9 @@
   "tokensLeftOut": "Pominięte w arkuszu stylów: {names}.",
   "designTokensLeftOut": "Pominięte w tokenach projektowych: {names}.",
   "designTokensImported": "Zaimportowano tokeny projektowe: {count}.",
-  "unsupportedVariableExpressions": "Pairdraw nie potrafi jeszcze obliczyć tych zmiennych, więc warstwy zachowują wartości zapisane w pliku: {names}."
+  "unsupportedVariableExpressions": "Pairdraw nie potrafi jeszcze obliczyć tych zmiennych, więc warstwy zachowują wartości zapisane w pliku: {names}.",
+  "placeImageUnsupported": "Wybierz plik PNG, JPEG, WebP, GIF, AVIF lub SVG do umieszczenia.",
+  "placeImageFailed": "Nie udało się umieścić plików: {error}",
+  "exportPDFEmpty": "Na tej stronie nie ma ramek do wyeksportowania.",
+  "exportPDFFailed": "Nie udało się wyeksportować pliku PDF: {error}"
 }

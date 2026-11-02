@@ -9,10 +9,16 @@ import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
 import { useI18n } from '@open-pencil/vue/i18n'
 
 import { chatColumnOpen } from '@/app/ai/chat/panel'
+import { isVersionHistoryOpen } from '@/app/cloud/integration'
 import { provideTabEditorStore } from '@/app/editor/active-store'
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { EDITOR_PANEL_LIMITS } from '@/app/shell/layout-storage'
 import { appMenuShortcut } from '@/app/shell/menu/shortcut'
+import {
+  layersPanelOpen,
+  openPropertiesPanelWhile,
+  propertiesPanelOpen
+} from '@/app/shell/side-panels'
 import type { Tab } from '@/app/tabs'
 import CanvasSplitRoot from '@/components/canvas/CanvasSplitRoot.vue'
 import ChatPanel from '@/components/chat/ChatPanel.vue'
@@ -24,6 +30,7 @@ import LayersPanel from '@/components/LayersPanel.vue'
 import MobileDrawer from '@/components/MobileDrawer.vue'
 import MobileHud from '@/components/MobileHud/MobileHud.vue'
 import PropertiesPanel from '@/components/PropertiesPanel.vue'
+import ComponentToFrameDialog from '@/components/selection/ComponentToFrameDialog.vue'
 import { SHELL_TOP_BAR_ACTIONS_ID } from '@/components/shell/top-bar'
 import StatusesDialog from '@/components/statuses/StatusesDialog.vue'
 import EditorToolbar from '@/components/toolbar/EditorToolbar.vue'
@@ -46,17 +53,22 @@ const { tab } = defineProps<{ tab: Tab }>()
 const store = tab.store
 provideTabEditorStore(store)
 const { isMobile } = useViewportKind()
-const { layout: editorLayout, saveResizedLayout } = useEditorWorkspaceLayout({
+const {
+  layout: editorLayout,
+  saveResizedLayout,
+  setPanelOpen
+} = useEditorWorkspaceLayout({
   group: useTemplateRef<ComponentPublicInstance>('splitterGroup'),
+  layers: useTemplateRef('layersPanel'),
   canvas: useTemplateRef('canvasPanel'),
   properties: useTemplateRef('propertiesPanel'),
   chat: useTemplateRef('chatPanel'),
+  layersOpen: layersPanelOpen,
+  propertiesOpen: propertiesPanelOpen,
   chatOpen: chatColumnOpen
 })
-/** Dragging the chat column shut, or open again, is the same as its toggle. */
-function setChatColumnOpen(open: boolean) {
-  chatColumnOpen.value = open
-}
+// The comments list and version history take the properties panel's place, so they open it.
+openPropertiesPanelWhile(() => store.state.activeTool === 'COMMENT' || isVersionHistoryOpen(store))
 // The handles sit on the cards' edges, which draw their own borders.
 const horizontalSplitterStyles = tv(splitterTheme)({ direction: 'horizontal', seam: true })
 const workspace = tv(workspaceTheme)
@@ -92,18 +104,25 @@ const { pending: roomPending } = useRoomActions()
       :class="workspaceStyles.group()"
       @layout="saveResizedLayout"
     >
+      <!-- A closed side panel stays mounted, collapsed to nothing, and reopens as it was. -->
       <SplitterPanel
         id="layers"
+        ref="layersPanel"
         :order="1"
         size-unit="px"
-        :default-size="editorLayout.layers"
+        collapsible
+        :collapsed-size="0"
+        :default-size="layersPanelOpen ? editorLayout.layers : 0"
         :min-size="EDITOR_PANEL_LIMITS.layers.min"
         :max-size="EDITOR_PANEL_LIMITS.layers.max"
         :class="workspaceStyles.dock()"
+        @collapse="setPanelOpen('layers', false)"
+        @expand="setPanelOpen('layers', true)"
       >
-        <LayersPanel :class="cards.layers" />
+        <LayersPanel id="editor-layers-panel" :hidden="!layersPanelOpen" :class="cards.layers" />
       </SplitterPanel>
       <SplitterResizeHandle
+        v-show="layersPanelOpen"
         data-test-id="left-splitter-handle"
         :class="horizontalSplitterStyles.handle()"
       >
@@ -119,6 +138,7 @@ const { pending: roomPending } = useRoomActions()
         </div>
       </SplitterPanel>
       <SplitterResizeHandle
+        v-show="propertiesPanelOpen"
         data-test-id="right-splitter-handle"
         :class="horizontalSplitterStyles.handle()"
       >
@@ -129,12 +149,20 @@ const { pending: roomPending } = useRoomActions()
         ref="propertiesPanel"
         :order="3"
         size-unit="px"
-        :default-size="editorLayout.properties"
+        collapsible
+        :collapsed-size="0"
+        :default-size="propertiesPanelOpen ? editorLayout.properties : 0"
         :min-size="EDITOR_PANEL_LIMITS.properties.min"
         :max-size="EDITOR_PANEL_LIMITS.properties.max"
         :class="workspaceStyles.dock()"
+        @collapse="setPanelOpen('properties', false)"
+        @expand="setPanelOpen('properties', true)"
       >
-        <PropertiesPanel :class="cards.properties" />
+        <PropertiesPanel
+          id="editor-properties-panel"
+          :hidden="!propertiesPanelOpen"
+          :class="cards.properties"
+        />
       </SplitterPanel>
       <SplitterResizeHandle
         v-show="chatColumnOpen"
@@ -158,8 +186,8 @@ const { pending: roomPending } = useRoomActions()
         :min-size="EDITOR_PANEL_LIMITS.chat.min"
         :max-size="EDITOR_PANEL_LIMITS.chat.max"
         :class="workspaceStyles.dock()"
-        @collapse="setChatColumnOpen(false)"
-        @expand="setChatColumnOpen(true)"
+        @collapse="setPanelOpen('chat', false)"
+        @expand="setPanelOpen('chat', true)"
       >
         <aside
           id="editor-chat-column"
@@ -225,4 +253,5 @@ const { pending: roomPending } = useRoomActions()
   <VariablesDialog />
   <StatusesDialog />
   <CommentDeleteDialog />
+  <ComponentToFrameDialog />
 </template>

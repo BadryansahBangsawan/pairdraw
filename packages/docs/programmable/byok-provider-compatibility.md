@@ -17,22 +17,32 @@ than a few months as unverified.
 ## Provider CORS support
 
 Whether the **web build** can reach the provider at all. The desktop build bypasses CORS entirely
-(it routes through `tauriFetch`), so a ❌ here still works on desktop.
+(it routes through `tauriFetch`), so a ❌ here still works on desktop. ⚠️ marks a provider whose
+CORS headers differ between success and error responses, or whose success response has not been
+measured with a key yet.
 
-| Provider             | Base URL                                          | Browser | Notes                                                                                          | Tested     |
-| -------------------- | ------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------- | ---------- |
-| OpenRouter           | `https://openrouter.ai/api/v1`                    | ✅      | `ACAO: *`                                                                                      | 2026-07-30 |
-| OpenAI               | `https://api.openai.com/v1`                       | ✅      | `ACAO: *`                                                                                      | 2026-07-30 |
-| Groq                 | `https://api.groq.com/openai/v1`                  | ✅      | `ACAO: *`                                                                                      | 2026-07-30 |
-| Google               | `https://generativelanguage.googleapis.com`       | ✅      | echoes origin                                                                                  | 2026-07-30 |
-| DeepSeek             | `https://api.deepseek.com`                        | ✅      | echoes origin                                                                                  | 2026-07-30 |
-| Z.ai                 | `https://api.z.ai/api/anthropic`                  | ✅      | echoes origin                                                                                  | 2026-07-30 |
-| MiniMax              | `https://api.minimax.io/v1`                       | ✅      | echoes origin                                                                                  | 2026-07-30 |
-| Nebius AI Studio     | `https://api.studio.nebius.com/v1`                | ✅      | `ACAO: *`                                                                                      | 2026-07-30 |
-| Nebius Token Factory | `https://api.tokenfactory.<region>.nebius.com/v1` | ✅      | `ACAO: *`; catalog differs per region                                                          | 2026-07-30 |
-| Anthropic            | `https://api.anthropic.com`                       | ✅      | Requires `anthropic-dangerous-direct-browser-access: true`; OpenPencil sends it in the web app | 2026-07-30 |
-| Scaleway             | `https://api.scaleway.ai/<project-id>/v1`         | ⚠️      | `ACAO: *` on success, **absent on errors** — a bad key reads as a network failure              | 2026-07-31 |
-| TensorX              | `https://api.tensorx.ai/v1`                       | ⚠️      | `ACAO: *` on success, **absent on errors** (401/403/500). Reported to their support            | 2026-07-31 |
+| Provider             | Base URL                                          | Browser | Notes                                                                                                                               | Tested     |
+| -------------------- | ------------------------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| OpenRouter           | `https://openrouter.ai/api/v1`                    | ✅      | `ACAO: *`                                                                                                                           | 2026-07-30 |
+| OpenAI               | `https://api.openai.com/v1`                       | ✅      | `ACAO: *`                                                                                                                           | 2026-07-30 |
+| Groq                 | `https://api.groq.com/openai/v1`                  | ✅      | `ACAO: *`                                                                                                                           | 2026-07-30 |
+| Google               | `https://generativelanguage.googleapis.com`       | ✅      | echoes origin                                                                                                                       | 2026-07-30 |
+| DeepSeek             | `https://api.deepseek.com`                        | ✅      | echoes origin                                                                                                                       | 2026-07-30 |
+| Z.ai                 | `https://api.z.ai/api/anthropic`                  | ✅      | echoes origin                                                                                                                       | 2026-07-30 |
+| MiniMax              | `https://api.minimax.io/v1`                       | ✅      | echoes origin                                                                                                                       | 2026-07-30 |
+| xAI                  | `https://api.x.ai/v1`                             | ⚠️      | `ACAO: *` on the preflight and on a 400 for a bad key; success path not yet tested with a key                                       | 2026-11-02 |
+| Meta                 | `https://api.meta.ai/v1`                          | ⚠️      | `ACAO: *` on the preflight and on a 401; success path not yet tested with a key                                                     | 2026-11-02 |
+| Moonshot AI          | `https://api.moonshot.ai/v1`                      | ⚠️      | echoes origin on the preflight and on a 401; success path not yet tested with a key                                                 | 2026-11-02 |
+| Together AI          | `https://api.together.xyz/v1`                     | ⚠️      | `ACAO: *` on the preflight and on a 401; success path not yet tested with a key                                                     | 2026-11-02 |
+| Fireworks AI         | `https://api.fireworks.ai/inference/v1`           | ⚠️      | `ACAO: *` on the preflight and on a 404 for an unknown model; success path not yet tested with a key                                | 2026-11-02 |
+| Kimi For Coding      | `https://api.kimi.ai/coding/v1`                   | ❌      | preflight answers 404 and the 401 has no `ACAO`; desktop only                                                                       | 2026-11-02 |
+| OpenCode Zen         | `https://opencode.ai/inference/openai/v1`         | ❌      | preflight answers 404 and errors have no `ACAO`; desktop only                                                                       | 2026-11-02 |
+| OpenCode Go          | `https://opencode.ai/inference/go/openai/v1`      | ❌      | preflight answers 404 and errors have no `ACAO`; desktop only. Requests need an `x-opencode-session` header, which OpenPencil sends | 2026-11-02 |
+| Nebius AI Studio     | `https://api.studio.nebius.com/v1`                | ✅      | `ACAO: *`                                                                                                                           | 2026-07-30 |
+| Nebius Token Factory | `https://api.tokenfactory.<region>.nebius.com/v1` | ✅      | `ACAO: *`; catalog differs per region                                                                                               | 2026-07-30 |
+| Anthropic            | `https://api.anthropic.com`                       | ✅      | Requires `anthropic-dangerous-direct-browser-access: true`; OpenPencil sends it in the web app                                      | 2026-07-30 |
+| Scaleway             | `https://api.scaleway.ai/<project-id>/v1`         | ⚠️      | `ACAO: *` on success, **absent on errors** — a bad key reads as a network failure                                                   | 2026-07-31 |
+| TensorX              | `https://api.tensorx.ai/v1`                       | ⚠️      | `ACAO: *` on success, **absent on errors** (401/403/500). Reported to their support                                                 | 2026-07-31 |
 
 ### The common failure
 

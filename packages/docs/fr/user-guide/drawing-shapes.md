@@ -19,6 +19,12 @@ La barre inférieure contient les outils de création de formes, cadres et secti
 
 Polygone et Étoile sont disponibles dans le menu des formes.
 
+## Placer des images
+
+Choisissez **Fichier › Placer une image…** (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd>, ou <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>K</kbd> sous Windows et Linux) ou cliquez sur le bouton image de la barre d’outils, puis sélectionnez des fichiers PNG, JPEG, WebP, GIF, AVIF ou SVG. Ils apparaissent sélectionnés au centre de la vue, en une seule étape annulable ; un SVG devient des calques modifiables.
+
+L’outil **Note autocollante** suit Texte dans la barre d’outils. Il n’a pas de touche : <kbd>N</kbd> zoome toujours sur le cadre suivant.
+
 ## Conserver les proportions
 
 Avec <kbd>Shift</kbd>, un rectangle devient carré, une ellipse devient cercle et une ligne s’aligne sur 0°, 45° ou 90°.

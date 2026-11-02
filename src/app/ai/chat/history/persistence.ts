@@ -10,6 +10,8 @@ interface PersistenceOptions {
   messages: Ref<UIMessage[]>
   readOnly: Ref<boolean>
   content(): { messages: UIMessage[]; interrupted: boolean }
+  /** The model profile in use, which the conversation remembers as its last. */
+  profileId(): string | null
   refresh(): Promise<void>
 }
 
@@ -30,6 +32,7 @@ export function createHistoryPersistence(options: PersistenceOptions) {
           ? fallbackTitle(content.messages)
           : conversation.title,
       updatedAt: new Date().toISOString(),
+      profileId: options.profileId() ?? conversation.profileId,
       interrupted: content.interrupted,
       messages: snapshotMessages(content.messages)
     }
@@ -51,5 +54,24 @@ export function createHistoryPersistence(options: PersistenceOptions) {
     return writes
   }
 
-  return { flush, storageError }
+  /**
+   * Remembers a conversation's model profile without counting it as activity, queued behind the
+   * pending snapshots so an earlier one cannot land after it and bring the old profile back.
+   */
+  function saveProfile(id: string, profileId: string): Promise<void> {
+    writes = writes
+      .catch(() => undefined)
+      .then(async () => {
+        await options.store.setProfile(id, profileId)
+        storageError.value = false
+        return undefined
+      })
+      .catch((error) => {
+        storageError.value = true
+        throw error
+      })
+    return writes
+  }
+
+  return { flush, saveProfile, storageError }
 }

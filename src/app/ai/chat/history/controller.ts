@@ -1,5 +1,5 @@
 import type { UIMessage } from 'ai'
-import { ref, shallowRef } from 'vue'
+import { ref, shallowRef, watch } from 'vue'
 
 import { chatDocumentId, resolveChatDocumentId, type ChatDocumentEditor } from './document'
 import { createConversationStore } from './idb'
@@ -29,17 +29,47 @@ export function createConversationHistory<TChat extends HistoryChat>(
   let owner: WeakRef<ChatDocumentEditor> | null = null
   let operation: Promise<unknown> = Promise.resolve()
   const session = createHistorySession(() => runtime.resetChat())
-  const { flush, storageError } = createHistoryPersistence({
+  const { flush, saveProfile, storageError } = createHistoryPersistence({
     store,
     current,
     messages,
     readOnly,
     refresh,
+    profileId: () => runtime.profileId(),
     content: () => ({
       messages: session.chat?.messages ?? messages.value,
       interrupted: session.interrupted
     })
   })
+
+  // A model switched mid-conversation is remembered at once, so reopening it keeps the switch
+  // even when nothing was sent after it. Only the profile is written: the switch is not activity
+  // that moves the conversation up the history, and it touches no messages a write could race.
+  watch(
+    () => runtime.profileId(),
+    (profileId) => {
+      const conversation = current.value
+      if (!conversation || readOnly.value || !profileId || conversation.profileId === profileId)
+        return
+      current.value = { ...conversation, profileId }
+      void saveProfile(conversation.id, profileId).catch(() => undefined)
+    }
+  )
+
+  /**
+   * Whether reopening the conversation should select the model it last used. Another document's
+   * conversation only shows. A transcript does not restore a coding agent's session, so one that
+   * already has messages continues only on a built-in model: an agent conversation, or an agent
+   * profile, is left alone rather than switching the model for the next chat to something that
+   * cannot continue this one.
+   */
+  function restorableProfile(conversation: Conversation): string | null {
+    const { profileId } = conversation
+    if (readOnly.value || !profileId || profileId === runtime.profileId()) return null
+    if (!conversation.messages.length) return profileId
+    if (conversation.backend !== 'direct') return null
+    return runtime.profileBackend(profileId) === 'direct' ? profileId : null
+  }
 
   function serialize<T>(run: () => Promise<T>): Promise<T> {
     const next = operation.then(async () => {
@@ -67,6 +97,8 @@ export function createConversationHistory<TChat extends HistoryChat>(
     ownerRecoveryId = editor.getRecoveryId()
     session.restoreInterrupted(conversation.interrupted)
     readOnly.value = conversation.documentId !== chatDocumentId(editor)
+    const profileId = restorableProfile(conversation)
+    if (profileId) runtime.restoreProfile(profileId)
     current.value = conversation
     messages.value = restoreMessages(conversation.messages)
     if (conversation.messages.length || conversation.titleSource !== 'fallback') {

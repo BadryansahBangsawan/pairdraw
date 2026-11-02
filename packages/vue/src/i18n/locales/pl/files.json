@@ -35,6 +35,47 @@
   "deleteDocumentConfirmation": "Usunąć „{name}”?",
   "deleteDocumentDescription": "Dokument zostanie usunięty dla wszystkich, którzy mogą go otworzyć. Tej operacji nie można cofnąć.",
   "deleteDocumentFailed": "Nie udało się usunąć „{name}”. Spróbuj ponownie.",
+  "deleteDocumentsConfirmation": {
+    "one": "Usunąć {count} dokument?",
+    "few": "Usunąć {count} dokumenty?",
+    "many": "Usunąć {count} dokumentów?"
+  },
+  "deleteDocumentsDescription": "Dokumenty zostaną usunięte dla wszystkich, którzy mogą je otworzyć. Tej operacji nie można cofnąć.",
+  "sortFiles": "Sortuj według: {order}",
+  "sortByName": "Nazwa",
+  "sortByLastUsed": "Ostatnie użycie",
+  "sortByCreated": "Data utworzenia",
+  "selectDocument": "Zaznacz",
+  "deselectDocument": "Odznacz",
+  "documentSelected": "Zaznaczony",
+  "selectAllDocuments": "Zaznacz wszystko",
+  "clearDocumentSelection": "Wyczyść zaznaczenie",
+  "selectedDocuments": {
+    "one": "Zaznaczono {count}",
+    "few": "Zaznaczono {count}",
+    "many": "Zaznaczono {count}"
+  },
+  "selectionActions": "Zaznaczone pliki",
+  "openSelectedDocuments": "Otwórz",
+  "removeFromRecents": "Usuń z ostatnich",
+  "saveDocumentAs": "Zapisz jako…",
+  "savedDocumentAs": "Zapisano kopię jako „{name}”.",
+  "saveDocumentAsFailed": "Nie udało się zapisać kopii „{name}”. {error}",
+  "designSystems": "Systemy projektowe",
+  "designSystemsDescription": "Zacznij nowy projekt z komponentami opublikowanej biblioteki.",
+  "noDesignSystems": "Brak systemów projektowych",
+  "noDesignSystemsDescription": "Opublikuj bibliotekę z panelu Zasoby dokumentu, aby zaczynać tutaj nowe projekty z jej użyciem.",
+  "designSystemComponents": {
+    "one": "{count} komponent",
+    "few": "{count} komponenty",
+    "many": "{count} komponentów"
+  },
+  "newDesignWith": "Nowy projekt z {name}",
+  "loadingDesignSystems": "Wczytywanie systemów projektowych…",
   "saveAsPrompt": "Zapisz jako:",
-  "browserFileAPINotSupported": "Twoja przeglądarka nie obsługuje interfejsu API plików lokalnych. Pliki będą pobierane zamiast zapisywane w bieżącym miejscu."
+  "browserFileAPINotSupported": "Twoja przeglądarka nie obsługuje interfejsu API plików lokalnych. Pliki będą pobierane zamiast zapisywane w bieżącym miejscu.",
+  "fileChangedOnDisk": "Plik „{name}” zmienił się na dysku",
+  "fileChangedOnDiskDescription": "Inna aplikacja zmieniła ten plik, gdy masz niezapisane zmiany. Wczytaj go ponownie, aby otworzyć wersję z pliku i odrzucić swoje zmiany, albo zignoruj zmianę i edytuj dalej. Zapisanie zastąpi plik Twoją wersją.",
+  "reloadFromDisk": "Wczytaj ponownie",
+  "ignoreDiskChange": "Ignoruj"
 }

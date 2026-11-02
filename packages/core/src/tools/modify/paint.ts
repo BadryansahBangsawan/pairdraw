@@ -6,7 +6,7 @@ import { gradientTransformRows, linearGradientTransform } from '@open-pencil/sce
 import type { Vector } from '@open-pencil/scene-graph/primitives'
 
 import { storeImage } from '#core/figma-api/images'
-import { defineTool, nodeIdInputSchema, toolNumber } from '#core/tools/schema'
+import { defineTool, nodeIdInputSchema, toolFailure, toolNumber } from '#core/tools/schema'
 
 export const setFill = defineTool({
   name: 'set_fill',
@@ -106,27 +106,47 @@ export const setStroke = defineTool({
 export const setImageFill = defineTool({
   name: 'set_image_fill',
 
-  description: 'Set an image fill on a node from base64-encoded image data.',
-  execution: { kind: 'sync', mutation: 'document' },
+  description:
+    'Set an image fill on a node from base64-encoded image data or an image URL (http, https, or data). A URL is fetched as figma.createImageAsync fetches it, up to 64 MB.',
+  execution: { kind: 'async', mutation: 'document' },
+  capabilities: ['document:write', 'network:access'],
   input: v.strictObject({
     id: nodeIdInputSchema,
-    image_data: v.pipe(
-      v.string(),
-      v.description('Base64-encoded image bytes (PNG, JPEG, or WEBP)')
+    image_data: v.optional(
+      v.pipe(v.string(), v.description('Base64-encoded image bytes (PNG, JPEG, or WEBP)'))
+    ),
+    url: v.optional(
+      v.pipe(
+        v.string(),
+        v.nonEmpty(),
+        v.description('Image URL to fetch (http, https, or data), instead of image_data')
+      )
     ),
     scale_mode: v.optional(
       v.pipe(v.picklist(['FILL', 'FIT', 'CROP', 'TILE']), v.description('Image scale mode')),
       'FILL'
     )
   }),
-  execute: (figma, { id, image_data, scale_mode }) => {
+  execute: async (figma, { id, image_data, url, scale_mode }) => {
+    if (!figma.getNodeById(id)) return { error: `Node "${id}" not found` }
+    if ((image_data === undefined) === (url === undefined)) {
+      return { error: 'Provide either image_data or url' }
+    }
+    let imageHash: string
+    if (url !== undefined) {
+      try {
+        imageHash = (await figma.createImageAsync(url)).hash
+      } catch (error) {
+        return toolFailure(error)
+      }
+    } else {
+      if (!image_data || !isValid(image_data)) return { error: 'image_data is not valid Base64' }
+      imageHash = storeImage(figma.graph, toUint8Array(image_data))
+    }
+    // The fetch may outlast the node: another edit can remove it meanwhile.
     const node = figma.getNodeById(id)
     if (!node) return { error: `Node "${id}" not found` }
-    if (!isValid(image_data)) return { error: 'image_data is not valid Base64' }
-    const bytes = toUint8Array(image_data)
-    const imageHash = storeImage(figma.graph, bytes)
-    const mode = scale_mode
-    node.fills = [{ type: 'IMAGE', imageHash, scaleMode: mode }]
-    return { id, imageHash, scaleMode: mode }
+    node.fills = [{ type: 'IMAGE', imageHash, scaleMode: scale_mode }]
+    return { id, imageHash, scaleMode: scale_mode }
   }
 })

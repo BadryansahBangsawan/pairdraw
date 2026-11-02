@@ -8,8 +8,10 @@ export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set([
   // Reads
   'acceptingParent',
   'acceptsChildren',
+  'canConvertToFrame',
   'canDistributeNodes',
   'collectVariantOptions',
+  'componentInstanceCount',
   'findVariantByValues',
   'getChildren',
   'getCollection',
@@ -122,6 +124,7 @@ export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set([
   'togglePlay',
 
   // Copying out
+  'copySelectionAsHTML',
   'copySelectionAsJSX',
   'copySelectionAsSVG',
   'copySelectionAsText',

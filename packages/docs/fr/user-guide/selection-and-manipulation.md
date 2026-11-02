@@ -12,14 +12,16 @@ Les objets sélectionnés peuvent être déplacés, redimensionnés, tournés, d
 - Un clic sur un objet remplace la sélection actuelle.
 - <kbd>Shift</kbd> + clic ajoute ou retire un objet.
 - Un glissement sur une zone libre de la zone de travail crée une sélection rectangulaire et sélectionne les objets qu’elle traverse.
+- <kbd>⌘</kbd> + glissement (<kbd>Ctrl</kbd> + glissement sous Windows et Linux) crée une sélection rectangulaire qui sélectionne les calques imbriqués les plus profonds qu’elle touche. Elle démarre là où démarre une sélection rectangulaire normale : sur le canevas vide ou sur le fond vide d’un cadre de premier niveau ou d’une section. Sur un calque ou sur le fond d’un cadre, d’un composant ou d’une instance imbriqués, <kbd>⌘</kbd> + glissement sélectionne ce calque et le déplace. Appuyez sur <kbd>⌘</kbd> ou relâchez-la pendant le glissement pour passer de la sélection profonde à la sélection normale.
 - <kbd>⌘</kbd><kbd>A</kbd> sélectionne tous les objets de la page actuelle.
 - Un clic sur une zone libre annule la sélection.
 
 ## Déplacer
 
 - Faites glisser un objet sélectionné.
-- Les touches fléchées déplacent de 1 px.
-- <kbd>Shift</kbd> + flèches déplacent de 10 px.
+- Les touches fléchées déplacent du petit décalage, 1 px par défaut.
+- <kbd>Shift</kbd> + flèches déplacent du grand décalage, 10 px par défaut.
+- Réglez les deux distances dans **Paramètres → Éditeur → Décalage aux flèches**.
 
 ## Redimensionner
 

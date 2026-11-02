@@ -4,6 +4,7 @@ import type { Ref } from 'vue'
 
 import type { Editor } from '@open-pencil/core'
 
+import { canvasPixelRatio } from '#vue/canvas/surface/gl-surface'
 import {
   createCanvasSurfaceManager,
   useCanvasSurfaceLifecycle
@@ -61,7 +62,8 @@ export function useCanvas(
       getRenderer: surface.getRenderer,
       getView: () => options?.getRenderState?.() ?? editor.state,
       getViewport: () => ({ width: viewport.width.value, height: viewport.height.value }),
-      markDirty: surface.markDirty
+      markDirty: surface.markDirty,
+      getPixelRatio: () => canvasPixelRatio(options?.maxPixelRatio)
     })
   }
 

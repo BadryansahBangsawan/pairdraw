@@ -5,8 +5,6 @@ import { resolve } from 'node:path'
 import type { McpServer } from '@modelcontextprotocol/server'
 import { Hono, type Context, type Next } from 'hono'
 import { cors } from 'hono/cors'
-import { resolveCommand } from 'package-manager-detector/commands'
-import { detect, getUserAgent } from 'package-manager-detector/detect'
 import { WebSocketServer } from 'ws'
 
 import { MCP_AGENT_HEADER, MCP_CHAT_HEADER } from '@open-pencil/core/constants'
@@ -18,6 +16,7 @@ import { MCP_CORS_HEADERS, MCP_CORS_METHODS, MCP_EXPOSED_HEADERS } from '#mcp/ht
 import type { RPCJSONObject } from '#mcp/json'
 import { registerFileRoutes } from '#mcp/server/files'
 import { createMCPSessionManager, sessionOpener } from '#mcp/server/sessions'
+import { createServerInstructions } from '#mcp/skill/instructions'
 import { createToolDescriptors } from '#mcp/tool/manifest'
 import type { ToolDescriptor, ToolPolicy } from '#mcp/tool/metadata'
 import { applyToolPolicy } from '#mcp/tool/policy'
@@ -27,6 +26,7 @@ import { admittedOrigins } from '#mcp/transport/origins'
 
 import packageJSON from '../package.json' with { type: 'json' }
 import { wireConnectionHandling } from './server/connections'
+import { mcpInstallCommand } from './server/install-command'
 import {
   type ListenerState,
   cleanupDiscovery,
@@ -42,27 +42,6 @@ import { createUpgradeHandler, originGuard } from './server/origin'
 export const MCP_VERSION: string = packageJSON.version
 
 const MCP_METHODS: readonly string[] = ['GET', 'POST', 'DELETE']
-
-let installCommandPromise: Promise<string> | null = null
-
-async function resolveMCPInstallCommand(): Promise<string> {
-  const agent =
-    getUserAgent() ??
-    (
-      await detect({
-        strategies: ['install-metadata', 'lockfile', 'packageManager-field', 'devEngines-field']
-      })
-    )?.agent ??
-    'npm'
-  const resolved = resolveCommand(agent, 'global', [`@open-pencil/mcp@${MCP_VERSION}`])
-  if (!resolved) return `npm install -g @open-pencil/mcp@${MCP_VERSION}`
-  return [resolved.command, ...resolved.args].join(' ')
-}
-
-function mcpInstallCommand(): Promise<string> {
-  installCommandPromise ??= resolveMCPInstallCommand()
-  return installCommandPromise
-}
 
 export { fail, ok, type MCPContent, type MCPResult } from '#mcp/result'
 
@@ -180,7 +159,7 @@ function createHonoApp(options: {
     return c.json({
       status: browserRPC.isConnected() ? 'ok' : 'no_app',
       version: MCP_VERSION,
-      installCommand: await mcpInstallCommand(),
+      installCommand: await mcpInstallCommand(MCP_VERSION),
       authRequired: authToken !== null,
       // Tells the app it reports agent_session_opened, so a chat may wait for its agent.
       agentSessionEvents: true,
@@ -327,6 +306,12 @@ function buildServerContext(options: ServerOptions) {
         sendRPC: sendToBrowser,
         agentSession,
         onToolSettled
+      }),
+    instructions: ({ kind }) =>
+      createServerInstructions({
+        policy: toolPolicy,
+        filesystemEnabled: Boolean(mcpRoot),
+        agentKind: kind
       }),
     onSessionOpened: ({ id, kind, chat }) => {
       sendToBrowser({ command: 'agent_session_opened', args: { session: id, kind, chat } }).catch(

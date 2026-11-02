@@ -72,3 +72,20 @@ test('the canvas around the prompt still draws, and the first layer hides it', a
   await offer.getByRole('button', { name: 'Hide prompt' }).click()
   await expect(offer).toBeHidden()
 })
+
+test('an example fills the prompt to read and edit, and sends nothing yet', async ({ page }) => {
+  const chat = await openChatEditor(page)
+  const offer = page.getByRole('region', { name: 'Start with a prompt' })
+  await expect(offer).toBeVisible()
+  const prompt = offer.getByRole('textbox', { name: 'Describe a design' })
+
+  await offer
+    .getByRole('list', { name: 'Examples' })
+    .getByRole('button', { name: 'Dashboard' })
+    .click()
+  await expect(prompt).toHaveValue(/dashboard/i)
+  await expect(prompt).toBeFocused()
+  await expect(offer).toBeVisible()
+  await expect(chat.chatColumn).toBeHidden()
+  await expect(page.getByTestId('ai-setup-dialog')).toHaveCount(0)
+})

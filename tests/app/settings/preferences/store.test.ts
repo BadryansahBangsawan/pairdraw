@@ -1,6 +1,16 @@
 import { describe, expect, test } from 'bun:test'
 
-import { DEFAULT_APP_PREFERENCES, parseAppPreferences } from '@/app/settings/preferences/store'
+import { toRaw } from 'vue'
+
+import {
+  appPreferences,
+  DEFAULT_APP_PREFERENCES,
+  parseAppPreferences,
+  updateCanvasRenderingMode,
+  updateNavigationPreferences,
+  updateRenderingPreferences,
+  updateZoomSpeed
+} from '@/app/settings/preferences/store'
 
 describe('parseAppPreferences', () => {
   test('starts from the defaults when nothing usable is stored', () => {
@@ -97,6 +107,75 @@ describe('parseAppPreferences', () => {
     expect(parseAppPreferences({ navigation: { zoomSpeed: 0.25 } }).navigation.zoomSpeed).toBe(0.25)
     for (const zoomSpeed of [undefined, '0.5', 0, 0.3, 5, Number.NaN]) {
       expect(parseAppPreferences({ navigation: { zoomSpeed } }).navigation.zoomSpeed).toBe(1)
+    }
+  })
+
+  test('keeps nudge distances within range and defaults the rest to Figma’s 1 and 10', () => {
+    expect(DEFAULT_APP_PREFERENCES.editing.nudge).toEqual({ small: 1, large: 10 })
+    expect(
+      parseAppPreferences({ editing: { nudge: { small: 0.5, large: 8 } } }).editing.nudge
+    ).toEqual({ small: 0.5, large: 8 })
+    // Values off the presets and between whole pixels are kept, as Settings can type them.
+    expect(
+      parseAppPreferences({ editing: { nudge: { small: 0.25, large: 1.5 } } }).editing.nudge
+    ).toEqual({ small: 0.25, large: 1.5 })
+    for (const small of [undefined, '2', 0, -1, 0.05, 1001, Infinity, Number.NaN]) {
+      expect(parseAppPreferences({ editing: { nudge: { small } } }).editing.nudge.small).toBe(1)
+    }
+  })
+
+  test('keeps half-pixel snapping beside the other snapping choices', () => {
+    expect(DEFAULT_APP_PREFERENCES.editing.snapping.halfPixel).toBe(false)
+    const { snapping } = parseAppPreferences({
+      editing: { snapping: { halfPixel: true, pixelGrid: false } }
+    }).editing
+    expect(snapping).toEqual({ geometry: true, objects: true, pixelGrid: false, halfPixel: true })
+    expect(
+      parseAppPreferences({ editing: { snapping: { halfPixel: 'yes' } } }).editing.snapping
+        .halfPixel
+    ).toBe(false)
+  })
+
+  test('keeps wheel zoom choices off unless turned on', () => {
+    expect(parseAppPreferences({}).navigation).toEqual({
+      zoomSpeed: 1,
+      wheelZoom: false,
+      invertZoom: false
+    })
+    expect(
+      parseAppPreferences({ navigation: { zoomSpeed: 2, wheelZoom: true, invertZoom: 'on' } })
+        .navigation
+    ).toEqual({ zoomSpeed: 2, wheelZoom: true, invertZoom: false })
+  })
+
+  test('remembers the pixel grid, Ultralight mode, and which side panels are open', () => {
+    const preferences = parseAppPreferences({
+      view: { pixelGrid: false },
+      rendering: { ultralight: true },
+      workspace: { layersOpen: false, propertiesOpen: 'no' }
+    })
+    expect(preferences.view).toEqual({ pixelGrid: false })
+    expect(preferences.rendering).toEqual({ canvasMode: 'retained', ultralight: true })
+    expect(preferences.workspace).toEqual({ layersOpen: false, propertiesOpen: true })
+    expect(parseAppPreferences({}).view.pixelGrid).toBe(true)
+    expect(parseAppPreferences({}).rendering.ultralight).toBe(false)
+  })
+
+  test('changing one navigation or rendering choice keeps the others', () => {
+    const stored = structuredClone(toRaw(appPreferences.value))
+    try {
+      updateNavigationPreferences({ wheelZoom: true })
+      updateZoomSpeed(0.5)
+      expect(appPreferences.value.navigation).toEqual({
+        ...stored.navigation,
+        zoomSpeed: 0.5,
+        wheelZoom: true
+      })
+      updateRenderingPreferences({ ultralight: true })
+      updateCanvasRenderingMode('tiled')
+      expect(appPreferences.value.rendering).toEqual({ canvasMode: 'tiled', ultralight: true })
+    } finally {
+      appPreferences.value = stored
     }
   })
 

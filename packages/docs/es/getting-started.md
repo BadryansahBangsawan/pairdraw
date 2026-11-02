@@ -12,11 +12,14 @@ Las versiones preparadas para macOS, Windows y Linux están disponibles en la [p
 
 | Plataforma | Archivo |
 | --------------------- | -------------------- |
-| macOS (Apple Silicon) | `.dmg` (aarch64) |
-| macOS (Intel) | `.dmg` (x64) |
+| macOS (Apple Silicon) | `.dmg` / `.zip` (aarch64) |
+| macOS (Intel) | `.dmg` / `.zip` (x64) |
 | Windows (x64) | `.msi` / `.exe` |
 | Windows (ARM) | `.msi` / `.exe` |
-| Linux (x64) | `.AppImage` / `.deb` |
+| Linux (x64) | `.AppImage` / `.deb` / `.rpm` / `.tar.gz` |
+| Linux (ARM64) | `.AppImage` / `.deb` / `.rpm` / `.tar.gz` |
+
+Para buscar una versión más reciente de la aplicación de escritorio, elige **Check for Updates…** en el menú **Help** en Windows y Linux, o en el menú de la aplicación en macOS. La opción **About** de al lado muestra la versión instalada.
 
 ## Requisitos del sistema {#system-requirements}
 

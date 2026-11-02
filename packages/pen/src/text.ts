@@ -1,4 +1,9 @@
-import type { SceneNode, TextAlignVertical, TextAutoResize } from '@open-pencil/scene-graph'
+import type {
+  SceneNode,
+  StyleRun,
+  TextAlignVertical,
+  TextAutoResize
+} from '@open-pencil/scene-graph'
 import { percentLength, pixelLength } from '@open-pencil/scene-graph/text'
 
 import type { PenNode } from './schema'
@@ -53,7 +58,7 @@ const TEXT_GROWTH: Partial<Record<string, TextAutoResize>> = {
 /**
  * A text layer's content and style. Content that reads like a variable reference stays as written,
  * as pen.dev shows it. pen.dev 2.21 draws no underline, strikethrough, or text stroke, so those
- * are left out to match it.
+ * are left out to match it. An `href` is kept as a link, drawn without an underline.
  */
 export function applyTextProps(node: SceneNode, pen: PenNode, ctx: VarContext): void {
   const isIconFont = pen.type === 'icon_font'
@@ -79,4 +84,12 @@ export function applyTextProps(node: SceneNode, pen: PenNode, ctx: VarContext): 
   // pen.dev draws every font at its default optical size, whatever the text's size.
   node.opticalSizeFromFontSize = false
   node.strokes = []
+  node.styleRuns = textLink(pen, node.text, ctx)
+}
+
+/** A text's `href` links all of its characters, as one run. */
+function textLink(pen: PenNode, text: string, ctx: VarContext): StyleRun[] {
+  const href = pen.type === 'text' ? resolveString(pen.href ?? undefined, ctx)?.trim() : undefined
+  if (!href || text.length === 0) return []
+  return [{ start: 0, length: text.length, style: { hyperlink: { type: 'URL', value: href } } }]
 }

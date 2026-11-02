@@ -8,7 +8,7 @@ import type { SceneGraph } from '@open-pencil/scene-graph'
 
 import type { IOFormatAdapter } from '#core/io/types'
 
-import { sceneGraphFromStyledHTML } from './layers'
+import { htmlClassNames, sceneGraphFromStyledHTML, type HTMLStyler } from './layers'
 
 export interface ReadHTMLOptions {
   /** A stylesheet applied after the document's own `<style>` blocks. */
@@ -37,6 +37,14 @@ export async function readHTMLDocument(
     ? await tailwindHTMLToDesignDocument(html, options.tailwind, { css: options.cssText, runtime })
     : await htmlToDesignDocument(html, { cssText: options.cssText, runtime })
   return { styled, graph: sceneGraphFromStyledHTML(styled, { pageName: options.pageName }) }
+}
+
+/** Styles HTML for `import_html` with the headless CSS runtime, where Node runs the tools. */
+export const headlessHTMLStyler: HTMLStyler = (html, { cssText, tailwind }) => {
+  const runtime = createHeadlessCSSRuntime()
+  return tailwind
+    ? tailwindHTMLToDesignDocument(html, htmlClassNames(html), { css: cssText, runtime })
+    : htmlToDesignDocument(html, { cssText, runtime })
 }
 
 /** Reads HTML files where the headless CSS runtime is available, as in the CLI. */

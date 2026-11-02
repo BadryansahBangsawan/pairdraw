@@ -118,6 +118,17 @@ function rawNoiseEffects(node: SceneNode): RawNoiseEffect[] {
   )
 }
 
+/**
+ * Whether a node carries an effect a reduced-effects canvas leaves out, so a picture recorded on
+ * one would not match an export.
+ */
+export function hasReducibleEffects(node: SceneNode): boolean {
+  return (
+    node.effects.some((effect) => effect.visible && effect.type === 'BACKGROUND_BLUR') ||
+    rawNoiseEffects(node).length > 0
+  )
+}
+
 function seededNoise(seed: number): number {
   const x = Math.sin(seed * 12.9898) * 43758.5453
   return x - Math.floor(x)

@@ -1,7 +1,20 @@
 import * as v from 'valibot'
 
+import type { ComponentPropertyDefinition, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import { isPreferredComponent } from '@open-pencil/scene-graph/slots'
+
 import { getComponentCatalog } from '#core/tools/component-catalog'
 import { toolNumber, defineTool } from '#core/tools/schema'
+
+interface SlotResult {
+  name: string
+  description?: string
+  /** Components suggested for the slot, resolved to the document's when it has them. */
+  preferred: Array<{ id: string; name: string } | { key: string }>
+  preferredOnly: boolean
+  minChildren?: number
+  maxChildren?: number
+}
 
 interface DocumentComponentResult {
   id: string
@@ -9,6 +22,43 @@ interface DocumentComponentResult {
   type: string
   page: string
   source: 'document'
+  slots?: SlotResult[]
+}
+
+/** A slot's settings, with its preferred values named by the components they stand for. */
+function slotResult(
+  components: readonly SceneNode[],
+  definition: ComponentPropertyDefinition
+): SlotResult {
+  const settings = definition.slotSettings
+  const slot: SlotResult = {
+    name: definition.name,
+    preferred: (definition.preferredValues ?? []).map((value) => {
+      const component = components.find((node) => isPreferredComponent(node, [value]))
+      return component ? { id: component.id, name: component.name } : { key: value }
+    }),
+    preferredOnly: settings?.allowPreferredValuesOnly ?? false
+  }
+  if (definition.description) slot.description = definition.description
+  if (settings?.minChildren !== undefined) slot.minChildren = settings.minChildren
+  if (settings?.maxChildren !== undefined) slot.maxChildren = settings.maxChildren
+  return slot
+}
+
+/** The slots of each component, reading the document's components once, when one has a slot. */
+function slotReader(graph: SceneGraph): (id: string) => SlotResult[] {
+  let components: SceneNode[] | undefined
+  return (id) => {
+    const definitions = (graph.getNode(id)?.componentPropertyDefinitions ?? []).filter(
+      (definition) => definition.type === 'SLOT'
+    )
+    if (definitions.length === 0) return []
+    components ??= [...graph.getAllNodes()].filter(
+      (node) => node.type === 'COMPONENT' || node.type === 'COMPONENT_SET'
+    )
+    const found = components
+    return definitions.map((definition) => slotResult(found, definition))
+  }
 }
 
 interface LibraryComponentResult {
@@ -27,7 +77,7 @@ interface LibraryComponentResult {
 export const getComponents = defineTool({
   name: 'get_components',
   description:
-    'List reusable components from the document and enabled component libraries, optionally filtered by name.',
+    'List reusable components from the document and enabled component libraries, optionally filtered by name. A document component with slots lists each slot with the components suggested for it (preferred) and whether it takes only those; fill a slot with instances of its preferred components.',
   execution: { kind: 'async', mutation: 'none' },
   input: v.strictObject({
     name: v.optional(
@@ -51,6 +101,7 @@ export const getComponents = defineTool({
     const source = args.source
     const nameFilter = args.name?.toLowerCase()
     const documentComponents: DocumentComponentResult[] = []
+    const componentSlots = slotReader(figma.graph)
 
     if (source !== 'libraries') {
       for (const page of figma.root.children) {
@@ -59,12 +110,14 @@ export const getComponents = defineTool({
           if (documentComponents.length >= limit) return false
           if (node.type !== 'COMPONENT' && node.type !== 'COMPONENT_SET') return false
           if (nameFilter && !node.name.toLowerCase().includes(nameFilter)) return false
+          const slots = componentSlots(node.id)
           documentComponents.push({
             id: node.id,
             name: node.name,
             type: node.type,
             page: page.name,
-            source: 'document'
+            source: 'document',
+            ...(slots.length > 0 ? { slots } : {})
           })
           return false
         })

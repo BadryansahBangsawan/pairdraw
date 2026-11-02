@@ -3,6 +3,8 @@ import * as v from 'valibot'
 import { sceneNodeToJSX } from '@open-pencil/design-jsx'
 import type { SceneGraph } from '@open-pencil/scene-graph'
 
+import { graphFromPageSnapshot } from '#core/editor/history/snapshot/graph'
+import { snapshotPage, type PageSnapshot } from '#core/editor/history/snapshot/page'
 import { findPageId } from '#core/io/subgraph'
 import { defineTool } from '#core/tools/schema'
 
@@ -40,25 +42,61 @@ function nodeChanges(
   )
 }
 
+/**
+ * Pages marked with `diff_changes` `mark`, by document, for callers outside an AI chat run, such
+ * as MCP clients, which have no run to compare with. Each call builds a new `figma`, so the marks
+ * live with the document's graph.
+ */
+const marks = new WeakMap<SceneGraph, Map<string, PageSnapshot>>()
+
+function markedBaseline(graph: SceneGraph, pageId: string): SceneGraph | null {
+  const snapshot = marks.get(graph)?.get(pageId)
+  return snapshot ? graphFromPageSnapshot(graph, snapshot) : null
+}
+
 export const diffChanges = defineTool({
   name: 'diff_changes',
   description:
-    'Patch of what this run changed: a node, or the whole current page, compared with its page before the run first edited it. Same format as diff_create, matching nodes by ID, so diff_apply can replay it on the starting state. Use it before reporting to confirm that only the intended layers changed.',
+    'Patch of what changed: a node, or the whole current page, compared with its page before an AI chat run first edited it or, elsewhere, when diff_changes was last called with mark: true. Call it with mark: true first to record the page as it is now, then later to see what you or the designer changed since. Same format as diff_create, matching nodes by ID, so diff_apply can replay it on the starting state. Use it before reporting to confirm that only the intended layers changed.',
   execution: { kind: 'sync', mutation: 'none' },
-  // Only an AI chat run records the state it started from.
-  exposure: { mcp: false, webmcp: false },
+  exposure: { webmcp: false },
   input: v.strictObject({
-    id: v.optional(v.pipe(v.string(), v.description('Node to compare (default: the current page)')))
+    id: v.optional(
+      v.pipe(v.string(), v.description('Node to compare (default: the current page)'))
+    ),
+    mark: v.optional(
+      v.pipe(
+        v.boolean(),
+        v.description(
+          'Record the page as it is now as the starting point of later calls, instead of comparing'
+        )
+      )
+    )
   }),
   execute: (figma, args) => {
-    if (!figma.changeBaseline) return { error: 'diff_changes is available only in an AI chat run' }
     const targetId = args.id ?? figma.currentPage.id
     // A node is compared with its own page's baseline; a removed one is looked up on this page.
     const pageId = args.id
       ? (findPageId(figma.graph, args.id) ?? figma.currentPage.id)
       : figma.currentPage.id
-    const baseline = figma.changeBaseline(pageId)
-    if (!baseline) return { diff: null, message: 'This run has not changed that page' }
+    if (args.mark) {
+      if (figma.changeBaseline) {
+        return { error: 'An AI chat run compares with the page before the run edited it' }
+      }
+      if (!figma.graph.getNode(targetId)) return { error: `Node "${targetId}" not found` }
+      const pages = marks.get(figma.graph) ?? new Map<string, PageSnapshot>()
+      pages.set(pageId, snapshotPage(figma.graph, pageId))
+      marks.set(figma.graph, pages)
+      return { marked: pageId, message: 'Later calls show changes to this page since now' }
+    }
+    const baseline = figma.changeBaseline
+      ? figma.changeBaseline(pageId)
+      : markedBaseline(figma.graph, pageId)
+    if (!baseline) {
+      return figma.changeBaseline
+        ? { diff: null, message: 'This run has not changed that page' }
+        : { diff: null, message: 'Nothing to compare with yet: call diff_changes with mark: true' }
+    }
     if (!baseline.getNode(targetId) && !figma.graph.getNode(targetId)) {
       return { error: `Node "${targetId}" not found` }
     }

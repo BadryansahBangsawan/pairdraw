@@ -30,6 +30,12 @@ export const desktopBuilds = [
     platform: 'ubuntu-22.04',
     label: 'linux-x64',
     saveBunCache: true
+  },
+  {
+    target: 'aarch64-unknown-linux-gnu',
+    platform: 'ubuntu-22.04-arm',
+    label: 'linux-arm64',
+    saveBunCache: true
   }
 ] as const
 
@@ -37,14 +43,27 @@ export const desktopTargets = desktopBuilds.map((build) => build.target)
 
 export type DesktopTarget = (typeof desktopTargets)[number]
 
+/** Archives the release tooling packs itself, since Tauri bundles neither (`native/pack.ts`). */
+export type ArchiveFormat = 'zip' | 'tar.gz'
+
 export interface DesktopAsset {
+  /** The bundle Tauri reports, or for a packed archive the bundle it is packed from. */
   source: string
+  /** The published file name. */
   name: string
   updaterKeys: string[]
   signed: boolean
+  pack?: ArchiveFormat
 }
 
-/** Required OpenPencil release outputs, not a discovery or packaging implementation. */
+/**
+ * Tauri names bundles after `productName`, which stays OpenPencil so existing installs keep their
+ * application and data directories; only the published names carry the product name.
+ */
+export const BUNDLE_NAME = 'OpenPencil'
+const RELEASE_NAME = 'Pairdraw'
+
+/** Required Pairdraw release outputs, not a discovery or packaging implementation. */
 export function desktopAssets(target: DesktopTarget, version: string): DesktopAsset[] {
   releaseVersion(`v${version}`)
 
@@ -53,14 +72,21 @@ export function desktopAssets(target: DesktopTarget, version: string): DesktopAs
     const platform = arch === 'x64' ? 'darwin-x86_64' : 'darwin-aarch64'
     return [
       {
-        source: `OpenPencil_${version}_${arch}.dmg`,
-        name: `OpenPencil_${version}_${arch}.dmg`,
+        source: `${BUNDLE_NAME}_${version}_${arch}.dmg`,
+        name: `${RELEASE_NAME}_${version}_${arch}.dmg`,
         updaterKeys: [],
         signed: false
       },
       {
-        source: 'OpenPencil.app.tar.gz',
-        name: `OpenPencil_${arch}.app.tar.gz`,
+        source: `${BUNDLE_NAME}.app`,
+        name: `${RELEASE_NAME}_${version}_${arch}.zip`,
+        updaterKeys: [],
+        signed: false,
+        pack: 'zip'
+      },
+      {
+        source: `${BUNDLE_NAME}.app.tar.gz`,
+        name: `${RELEASE_NAME}_${arch}.app.tar.gz`,
         updaterKeys: [platform, `${platform}-app`],
         signed: true
       }
@@ -71,37 +97,54 @@ export function desktopAssets(target: DesktopTarget, version: string): DesktopAs
     const platform = target.startsWith('aarch64') ? 'windows-aarch64' : 'windows-x86_64'
     return [
       {
-        source: `OpenPencil_${version}_${arch}-setup.exe`,
-        name: `OpenPencil_${version}_${arch}-setup.exe`,
+        source: `${BUNDLE_NAME}_${version}_${arch}-setup.exe`,
+        name: `${RELEASE_NAME}_${version}_${arch}-setup.exe`,
         updaterKeys: [`${platform}-nsis`],
         signed: true
       },
       {
-        source: `OpenPencil_${version}_${arch}_en-US.msi`,
-        name: `OpenPencil_${version}_${arch}_en-US.msi`,
+        source: `${BUNDLE_NAME}_${version}_${arch}_en-US.msi`,
+        name: `${RELEASE_NAME}_${version}_${arch}_en-US.msi`,
         updaterKeys: [platform, `${platform}-msi`],
         signed: true
       }
     ]
   }
+  // Each Linux format spells the architecture its own way, as Tauri's bundler does.
+  const arm = target.startsWith('aarch64')
+  const appImageArch = arm ? 'aarch64' : 'amd64'
+  const debArch = arm ? 'arm64' : 'amd64'
+  const rpmArch = arm ? 'aarch64' : 'x86_64'
+  const platform = arm ? 'linux-aarch64' : 'linux-x86_64'
+  const deb = `${BUNDLE_NAME}_${version}_${debArch}.deb`
   return [
     {
-      source: `OpenPencil_${version}_amd64.AppImage`,
-      name: `OpenPencil_${version}_amd64.AppImage`,
-      updaterKeys: ['linux-x86_64', 'linux-x86_64-appimage'],
+      source: `${BUNDLE_NAME}_${version}_${appImageArch}.AppImage`,
+      name: `${RELEASE_NAME}_${version}_${appImageArch}.AppImage`,
+      updaterKeys: [platform, `${platform}-appimage`],
       signed: true
     },
     {
-      source: `OpenPencil_${version}_amd64.deb`,
-      name: `OpenPencil_${version}_amd64.deb`,
-      updaterKeys: ['linux-x86_64-deb'],
+      source: deb,
+      name: `${RELEASE_NAME}_${version}_${debArch}.deb`,
+      updaterKeys: [`${platform}-deb`],
       signed: true
     },
     {
-      source: `OpenPencil-${version}-1.x86_64.rpm`,
-      name: `OpenPencil-${version}-1.x86_64.rpm`,
-      updaterKeys: ['linux-x86_64-rpm'],
+      source: `${BUNDLE_NAME}-${version}-1.${rpmArch}.rpm`,
+      name: `${RELEASE_NAME}-${version}-1.${rpmArch}.rpm`,
+      updaterKeys: [`${platform}-rpm`],
       signed: true
+    },
+    // The Debian package's files, so the app runs from any folder without installing. It does
+    // not update itself: the app skips update checks for a copy the package manager did not
+    // install (`src/app/shell/updater/feed.ts`), as its binary would install the `.deb`.
+    {
+      source: deb,
+      name: `${RELEASE_NAME}_${version}_${appImageArch}.tar.gz`,
+      updaterKeys: [],
+      signed: false,
+      pack: 'tar.gz'
     }
   ]
 }

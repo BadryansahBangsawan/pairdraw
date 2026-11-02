@@ -101,14 +101,22 @@ function protocol(src: string): string | null {
   }
 }
 
+/** A response body that passed `MAX_IMAGE_FETCH_BYTES`, declared or as read. */
+export class ImageTooLargeError extends Error {
+  constructor() {
+    super('Image is too large')
+    this.name = 'ImageTooLargeError'
+  }
+}
+
 /**
- * The body of `response`, refused as too large once it passes `MAX_IMAGE_FETCH_BYTES`. It reads
- * chunk by chunk and cancels there, so a body that declares no length, or a smaller one, cannot
- * fill memory first.
+ * The body of `response`, refused with `ImageTooLargeError` once it passes
+ * `MAX_IMAGE_FETCH_BYTES`. It reads chunk by chunk and cancels there, so a body that declares no
+ * length, or a smaller one, cannot fill memory first.
  */
-async function readBounded(response: Response): Promise<Uint8Array> {
+export async function readBoundedImage(response: Response): Promise<Uint8Array> {
   if (Number(response.headers.get('content-length') ?? 0) > MAX_IMAGE_FETCH_BYTES) {
-    throw new Error('Image is too large')
+    throw new ImageTooLargeError()
   }
   const reader = response.body?.getReader()
   if (!reader) return new Uint8Array()
@@ -120,7 +128,7 @@ async function readBounded(response: Response): Promise<Uint8Array> {
     length += value.byteLength
     if (length > MAX_IMAGE_FETCH_BYTES) {
       await reader.cancel()
-      throw new Error('Image is too large')
+      throw new ImageTooLargeError()
     }
     chunks.push(value)
   }
@@ -159,7 +167,7 @@ export async function fetchImage(
     throw new Error(`Unable to fetch image: ${reason}`)
   })
   if (!response.ok) throw new Error(`Unable to fetch image. Response status: ${response.status}`)
-  const data = await readBounded(response)
+  const data = await readBoundedImage(response)
   const problem = imageProblem(data)
   if (problem) throw new Error(problem)
   return figmaImage(graph, storeImage(graph, data))

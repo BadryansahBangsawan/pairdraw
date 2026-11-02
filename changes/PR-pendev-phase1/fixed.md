@@ -1,0 +1,6 @@
+- Frame selection (Cmd/Ctrl+Alt+G), the align keys (Alt+A/H/D/W/V/S), the boolean and Flatten keys (Alt+Shift+U/S/I/E/F), and Paste to replace (Cmd/Ctrl+Shift+R) now work in the browser, not only in the desktop app.
+- In the browser, Cmd/Ctrl+Shift+C copies the selection as PNG, as the canvas menu shows.
+- Changing the zoom speed or the progressive rendering setting no longer resets other navigation and rendering settings.
+- Dropping one end point of a path on the other now closes and fills the path, and other fills of the path are kept.
+- When an open file changes on disk while it has unsaved edits, Pairdraw now asks whether to reload it or keep your edits, instead of reloading it and discarding them.
+- Undoing Detach instance restores the instance fully, so later changes to its main component reach it again.

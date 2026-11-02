@@ -14,6 +14,9 @@ import {
   populateWholeDocument,
   writeFigDocument
 } from '#cli/headless'
+import { headlessPreview } from '#cli/session/open'
+import { appPreview, previewNotice, previewOptions, previewScale } from '#cli/session/preview'
+import { createHeadlessFigma } from '#cli/tool-data'
 
 function printResult(value: unknown, json: boolean) {
   if (json || !process.stdout.isTTY) {
@@ -32,6 +35,10 @@ function serializeResult(value: unknown): unknown {
   return value
 }
 
+function reportPreview(notice: string, args: { quiet?: boolean; json?: boolean }) {
+  if (!args.quiet && !args.json) console.error(notice)
+}
+
 export default defineCommand({
   meta: { description: 'Execute JavaScript with Figma plugin API' },
   args: {
@@ -43,6 +50,7 @@ export default defineCommand({
     code: { type: 'string', alias: 'c', description: 'JavaScript code to execute' },
     stdin: { type: 'boolean', description: 'Read code from stdin' },
     ...documentWriteOptions,
+    ...previewOptions,
     ...appTargetOptions,
     json: { type: 'boolean', description: 'Output as JSON' },
     quiet: { type: 'boolean', alias: 'q', description: 'Suppress output' }
@@ -61,11 +69,23 @@ export default defineCommand({
       process.exit(1)
     }
 
+    let scale = 1
+    try {
+      scale = previewScale(args['preview-scale'])
+    } catch (error) {
+      printError(error)
+      process.exit(1)
+    }
+    const preview = args['preview-output']
+
     if (isAppMode(args.file)) {
-      const result = await rpc('eval', { code, ...appTargetRPCArgs(args) })
+      const target = appTargetRPCArgs(args)
+      const result = await rpc('eval', { code, ...target })
       if (!args.quiet && result !== undefined && result !== null) {
         printResult(result, !!args.json)
       }
+      if (preview)
+        reportPreview(await previewNotice(preview, () => appPreview(target, scale)), args)
       return
     }
 
@@ -85,6 +105,17 @@ export default defineCommand({
 
     if (!args.quiet && result !== undefined) {
       printResult(serializeResult(result), !!args.json)
+    }
+
+    if (preview) {
+      const render = async () => {
+        // The script's API has no raster export, so a headless one draws the page it left current.
+        const exporter = await createHeadlessFigma(graph)
+        const page = exporter.getNodeById(figma.currentPageId)
+        if (page) exporter.currentPage = page
+        return headlessPreview({ graph, figma: exporter }, scale)
+      }
+      reportPreview(await previewNotice(preview, render), args)
     }
 
     if (args.write || args.output) {

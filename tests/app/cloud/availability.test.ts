@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, spyOn, test } from 'bun:test'
+import { afterEach, describe, expect, mock, spyOn, test } from 'bun:test'
 
 import {
   cloudOfficialListed,
@@ -19,6 +19,8 @@ function officialServer(answer: () => Response) {
 afterEach(async () => {
   officialServer(() => Response.error())
   await checkCloudAvailability(`${EDITOR}?cloud=off`)
+  // Later files in the same process reach real servers through the global `fetch`.
+  mock.restore()
 })
 
 describe('Cloud availability', () => {

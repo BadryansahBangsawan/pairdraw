@@ -233,14 +233,16 @@ function canUseWorker(): boolean {
 }
 
 function compressViaWorker(
-  schemaDeflated: Uint8Array,
-  kiwiData: Uint8Array,
-  thumbnailPNG: Uint8Array,
-  metaJSON: string,
-  imageEntries: Array<{ name: string; data: Uint8Array }>,
-  figKiwiVersion?: number,
-  compressionLevel?: number,
-  kind?: FigFileKind
+  ...[
+    schemaDeflated,
+    kiwiData,
+    thumbnailPNG,
+    metaJSON,
+    imageEntries,
+    figKiwiVersion,
+    compressionLevel,
+    kind
+  ]: Parameters<typeof compressFigData>
 ): Promise<Uint8Array> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(new URL('./worker.js', import.meta.url), {

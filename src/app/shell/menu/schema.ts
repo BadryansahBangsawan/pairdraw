@@ -75,6 +75,16 @@ const SETTINGS_MENU_ITEM = {
   accelerator: 'CmdOrCtrl+,'
 } satisfies AppMenuActionItem
 
+/**
+ * About and Check for Updates…, which macOS keeps in the application menu and Windows and Linux
+ * in Help (`desktop/src/menu/mod.rs`).
+ */
+const ABOUT_MENU_ITEM = { id: 'about', label: 'About Pairdraw' } satisfies AppMenuActionItem
+const CHECK_UPDATES_MENU_ITEM = {
+  id: 'check-updates',
+  label: 'Check for Updates…'
+} satisfies AppMenuActionItem
+
 export const APP_MENU_SCHEMA = [
   {
     label: 'File',
@@ -84,6 +94,13 @@ export const APP_MENU_SCHEMA = [
       { id: 'new-tab', label: 'New Tab', shortcut: 'MOD+T' },
       { id: 'open', label: 'Open…', shortcut: 'MOD+O' },
       { id: 'open-recent', label: 'Open Recent', target: 'native' },
+      // Figma's File › Place image…, which places images and SVG files in the middle of the view.
+      {
+        id: 'place-image',
+        label: 'Place Image…',
+        shortcut: 'MOD+SHIFT+K',
+        palette: { keywords: ['import', 'picture', 'photo', 'png', 'jpeg', 'svg', 'upload'] }
+      },
       { id: 'open-tour', label: 'Open the Tour', handler: 'shell' },
       {
         id: 'diagnostics',
@@ -135,6 +152,12 @@ export const APP_MENU_SCHEMA = [
             palette: { icon: 'download', label: 'exportSelectionAsFig' }
           }
         ]
+      },
+      // Figma's File › Export frames to PDF…: one PDF page per frame, in layer order.
+      {
+        id: 'export-pdf',
+        label: 'Export Frames to PDF…',
+        palette: { icon: 'download', keywords: ['pdf', 'slides', 'presentation', 'print'] }
       },
       { type: 'separator' },
       { id: 'autosave', label: 'Autosave', checkbox: true, feature: 'local-file' },
@@ -541,6 +564,16 @@ export const APP_MENU_SCHEMA = [
         ]
       }
     ]
+  },
+  {
+    // The desktop app's Help menu; macOS shows these in the application menu instead.
+    label: 'Help',
+    target: 'native',
+    items: [
+      { ...CHECK_UPDATES_MENU_ITEM, handler: 'shell' },
+      { type: 'separator' },
+      ABOUT_MENU_ITEM
+    ]
   }
 ] satisfies AppMenuGroupSchema[]
 
@@ -551,8 +584,8 @@ export const APP_MENU_SCHEMA = [
  * sit between them. Only the labels and accelerators are shared here.
  */
 export const APP_MENU_APP_ITEMS = [
-  { id: 'about', label: 'About Pairdraw' },
-  { id: 'check-updates', label: 'Check for Updates…' },
+  ABOUT_MENU_ITEM,
+  CHECK_UPDATES_MENU_ITEM,
   SETTINGS_MENU_ITEM,
   { id: 'quit', label: 'Quit Pairdraw', shortcut: 'MOD+Q' }
 ] satisfies AppMenuActionItem[]

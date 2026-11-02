@@ -6,11 +6,20 @@
     "strict": true,
     "skipLibCheck": true,
     "paths": {
-      "#mcp/*": ["./src/*"]
+      "#mcp/*": ["./src/*"],
+      "#skills/*": ["../../skills/*"]
     },
     "noCheck": true,
     "outDir": "dist",
     "rootDir": "src"
   },
-  "include": ["src/index.ts", "src/connect.ts", "src/server.ts", "src/stdio.ts", "src/transport/**/*.ts"]
+  "include": [
+    "src/global.d.ts",
+    "src/index.ts",
+    "src/connect.ts",
+    "src/server.ts",
+    "src/stdio.ts",
+    "src/transport/**/*.ts",
+    "src/skill/**/*.ts"
+  ]
 }

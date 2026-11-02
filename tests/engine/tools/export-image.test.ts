@@ -57,6 +57,43 @@ describe('export_image tool', () => {
     expect(calls[0]?.scale).toBe(1)
   })
 
+  test('passes a JPG or WEBP quality to the encoder and leaves it off PNG', async () => {
+    const { figma } = setupToolTest()
+    const frame = figma.createFrame()
+    frame.resize(100, 100)
+    const calls: Array<{ format?: string; quality?: number }> = []
+    figma.exportImage = async (_ids, options) => {
+      calls.push(options)
+      return new Uint8Array([1])
+    }
+
+    const jpg = await getTool('export_image').execute(figma, {
+      ids: [frame.id],
+      format: 'JPG',
+      quality: 40
+    })
+    await getTool('export_image').execute(figma, { ids: [frame.id], format: 'PNG', quality: 40 })
+    await getTool('export_image').execute(figma, { ids: [frame.id], format: 'WEBP' })
+
+    expect(calls.map(({ format, quality }) => ({ format, quality }))).toEqual([
+      { format: 'JPG', quality: 40 },
+      { format: 'PNG', quality: undefined },
+      { format: 'WEBP', quality: undefined }
+    ])
+    expect(jpg).toMatchObject({ mimeType: 'image/jpeg', quality: 40 })
+  })
+
+  test('rejects a quality outside 1 to 100', () => {
+    const { figma } = setupToolTest()
+    const frame = figma.createFrame()
+    figma.exportImage = async () => new Uint8Array([1])
+    for (const quality of [0, 101, 50.5]) {
+      expect(() =>
+        getTool('export_image').execute(figma, { ids: [frame.id], format: 'JPG', quality })
+      ).toThrow('Invalid arguments for export_image')
+    }
+  })
+
   test('names an ID that is not in the document instead of reporting nothing visible', async () => {
     const { figma } = setupToolTest()
     const frame = figma.createFrame()

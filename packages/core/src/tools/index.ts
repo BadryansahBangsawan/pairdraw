@@ -6,8 +6,15 @@ export type {
   ComponentCatalogInsertInput,
   ComponentCatalogLibraryAsset
 } from './component-catalog'
+export { getHTMLToolHost, registerHTMLToolHost, type HTMLToolHost } from './html-host'
 export { ALL_TOOLS, CORE_TOOLS, EXTENDED_TOOLS } from './registry'
-export { exportImage } from './vector'
+export {
+  exportImage,
+  getImageVectorizer,
+  registerImageVectorizer,
+  type ImageVectorizer,
+  type ImageVectorizeRequest
+} from './vector'
 export {
   defineTool,
   nodeToResult,

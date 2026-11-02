@@ -15,6 +15,7 @@ export type EditorCommandId =
   | 'selection.frameSelection'
   | 'selection.ungroup'
   | 'selection.createComponent'
+  | 'selection.convertToFrame'
   | 'selection.createComponentSet'
   | 'selection.createInstance'
   | 'selection.detachInstance'

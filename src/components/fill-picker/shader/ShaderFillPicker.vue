@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { isEqual } from 'es-toolkit'
 import { computed, onMounted, ref, shallowRef, type ComponentPublicInstance } from 'vue'
 
 import type { ShaderPreset } from '@open-pencil/scene-graph/shaders'
@@ -6,6 +7,7 @@ import { canDrawShaders } from '@open-pencil/vue/canvas/surface'
 import {
   addShaderEffect,
   DEFAULT_SHADER_EFFECT,
+  DEFAULT_SHADER_PRESET,
   loadShaderCatalog,
   moveShaderEffect,
   parseShaderPreset,
@@ -20,6 +22,7 @@ import { useFlatReorderDrag } from '@open-pencil/vue/shared/drag'
 
 import ShaderEffectControls from '@/components/fill-picker/shader/ShaderEffectControls.vue'
 import ShaderEffectThumb from '@/components/fill-picker/shader/ShaderEffectThumb.vue'
+import ShaderFillPickerGallery from '@/components/fill-picker/shader/ShaderFillPickerGallery.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import AppAlert from '@/components/ui/feedback/AppAlert.vue'
@@ -30,8 +33,9 @@ import AppCombobox from '@/components/ui/select/AppCombobox.vue'
 
 /**
  * Edits a shader paint's preset as the properties panel edits effects: a list of the shader's
- * effects, top first, each with its type and settings, reordered by dragging; and the preset as
- * JSON, which also takes a preset copied from shaders.com.
+ * effects, top first, each with its type and settings, reordered by dragging; a gallery of
+ * complete shaders to start from, which a paint that just became a shader opens on; and the
+ * preset as JSON, which also takes a preset copied from shaders.com.
  */
 const { preset } = defineProps<{ preset: ShaderPreset }>()
 const emit = defineEmits<{ update: [preset: ShaderPreset] }>()
@@ -66,9 +70,24 @@ const rows = computed(() =>
 
 const expanded = ref<number | null>(null)
 
+/** What the picker shows below its header: the effects, the gallery, or the preset's JSON. */
+const view = ref<'effects' | 'gallery' | 'json'>(
+  isEqual(preset, DEFAULT_SHADER_PRESET) ? 'gallery' : 'effects'
+)
+
 function add() {
   emit('update', addShaderEffect(preset, DEFAULT_SHADER_EFFECT))
   expanded.value = preset.components.length
+  view.value = 'effects'
+}
+
+function toggleGallery() {
+  view.value = view.value === 'gallery' ? 'effects' : 'gallery'
+}
+
+function applyGallery(next: ShaderPreset) {
+  emit('update', next)
+  expanded.value = null
 }
 
 function remove(index: number) {
@@ -104,11 +123,10 @@ function dropPosition(id: string) {
   return reorder.instruction.value?.operation === 'reorder-before' ? 'before' : 'after'
 }
 
-const editingJSON = ref(false)
 const json = ref('')
 const invalid = ref(false)
 function toggleJSON() {
-  editingJSON.value = !editingJSON.value
+  view.value = view.value === 'json' ? 'effects' : 'json'
   json.value = shaderPresetJSON(preset)
   invalid.value = false
 }
@@ -118,7 +136,7 @@ function applyJSON() {
   if (!parsed) return
   emit('update', parsed)
   expanded.value = null
-  editingJSON.value = false
+  view.value = 'effects'
 }
 </script>
 
@@ -133,11 +151,23 @@ function applyJSON() {
 
     <div>
       <div class="mb-1 flex items-center justify-between">
-        <span class="text-[11px] text-muted">{{ panels.effects }}</span>
+        <span class="text-[11px] text-muted">
+          {{ view === 'gallery' ? panels.shaderGallery : panels.effects }}
+        </span>
         <div class="flex items-center">
           <IconButton
+            :label="panels.shaderGallery"
+            :active="view === 'gallery'"
+            toggle
+            data-test-id="shader-gallery-toggle"
+            @click="toggleGallery"
+          >
+            <icon-lucide-layout-grid class="size-3" />
+          </IconButton>
+          <IconButton
             :label="panels.shaderPreset"
-            :data-active="editingJSON || undefined"
+            :active="view === 'json'"
+            toggle
             data-test-id="shader-preset-toggle"
             @click="toggleJSON"
           >
@@ -149,11 +179,13 @@ function applyJSON() {
         </div>
       </div>
 
-      <div v-if="editingJSON" class="flex flex-col gap-1.5">
+      <ShaderFillPickerGallery v-if="view === 'gallery'" :preset="preset" @apply="applyGallery" />
+
+      <div v-else-if="view === 'json'" class="flex flex-col gap-1.5">
         <AppTextarea v-model="json" :rows="8" class="font-mono text-[11px]" />
         <AppAlert v-if="invalid" tone="error" :heading="panels.invalidShaderPreset" />
         <div class="flex justify-end gap-1.5">
-          <AppButton variant="ghost" size="sm" @click="editingJSON = false">
+          <AppButton variant="ghost" size="sm" @click="view = 'effects'">
             {{ common.cancel }}
           </AppButton>
           <AppButton size="sm" data-test-id="shader-preset-apply" @click="applyJSON">

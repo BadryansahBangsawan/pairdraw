@@ -7,7 +7,7 @@ import { createInstanceSyncContext, groupCopyRemovals, removeLeftoverCopies } fr
 import { canCreateInstance } from './cycles'
 import { INSTANCE_OVERRIDE_FIELDS, INSTANCE_SYNC_PROPS } from './fields'
 import {
-  clearInstanceOverrides,
+  createInstanceOverrideState,
   getInstanceOverride,
   hasInstanceOverride as hasNodeInstanceOverride,
   setInstanceOverride
@@ -209,12 +209,12 @@ function syncInstancesOf(
 export function detachInstance(graph: SceneGraph, instanceId: string): void {
   const node = graph.nodes.get(instanceId)
   if (node?.type !== 'INSTANCE') return
-  if (node.componentId) {
-    graph.instanceIndex.get(node.componentId)?.delete(instanceId)
-  }
-  node.type = 'FRAME'
-  node.componentId = null
-  clearInstanceOverrides(node.instanceOverrides)
+  // Through `updateNode`, so the instance index, change observers, and undo recorders see it.
+  graph.updateNode(instanceId, {
+    type: 'FRAME',
+    componentId: null,
+    instanceOverrides: createInstanceOverrideState()
+  })
 }
 
 export function getMainComponent(graph: SceneGraph, instanceId: string): SceneNode | undefined {

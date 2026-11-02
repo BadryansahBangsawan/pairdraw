@@ -6,7 +6,11 @@ import type { DesignDocument, DesignElement, DesignNode } from '../types'
 import { shaderEffectAttributes } from './components/shaders'
 import { SHADER_UTILITIES } from './components/styling'
 import { mergeClassNames, serializeTailwindClasses } from './html'
-import { sceneNodeToDesignDocument, type SceneGraphToDesignOptions } from './projection'
+import {
+  ownLayerName,
+  sceneNodeToDesignDocument,
+  type SceneGraphToDesignOptions
+} from './projection'
 
 /** Engine services the projection takes, such as drawing vector layers as SVG. */
 type ProjectionServices = Pick<SceneGraphToDesignOptions, 'vectorElement'>
@@ -36,9 +40,8 @@ function tagName(node: DesignElement): string {
 
 function attributes(node: DesignElement, themeVariables: readonly string[]): SyntaxNode[] {
   const { class: className, ...attrs } = node.attrs
-  const name = node.sourceSceneNode?.name
   const entries: [string, string | undefined][] = [
-    ['data-name', name && name !== node.sourceSceneNode?.type ? name : undefined],
+    ['data-name', node.sourceSceneNode && ownLayerName(node.sourceSceneNode)],
     ...Object.entries(attrs),
     ['className', mergeClassNames(className, serializeTailwindClasses(node, themeVariables))]
   ]

@@ -20,10 +20,11 @@ export {
 } from './render'
 export type { IconCollection, IconData, IconOption, IconPath, IconSearchResult } from './types'
 export { createMaterialSymbolsProvider } from './material-symbols/provider'
-export { MATERIAL_SYMBOLS_PREFIXES } from './material-symbols/font'
+export { MATERIAL_SYMBOLS_OPTIONS, MATERIAL_SYMBOLS_PREFIXES } from './material-symbols/font'
 export { createIconSetsProvider, type IconSetSource, type IconSetsOptions } from './sets'
 export {
   createSFSymbolsProvider,
+  SF_SYMBOLS_OPTIONS,
   SF_SYMBOLS_PREFIX,
   type SFSymbolsHost
 } from './sf-symbols/provider'

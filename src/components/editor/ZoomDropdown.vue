@@ -17,7 +17,8 @@ import { useEditorStore } from '@/app/editor/active-store'
 import {
   setCommentsOnCanvas,
   setDesignIssuesOnCanvas,
-  setSnappingPreference
+  setSnappingPreference,
+  togglePixelGrid
 } from '@/app/settings/preferences/apply'
 import { appPreferences } from '@/app/settings/preferences/store'
 import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
@@ -63,11 +64,6 @@ function cancelInput() {
 
 function toggleRulers() {
   store.state.showRulers = !store.state.showRulers
-  store.requestRepaint()
-}
-
-function togglePixelGrid() {
-  store.state.showPixelGrid = store.state.showPixelGrid === false
   store.requestRepaint()
 }
 
@@ -174,7 +170,7 @@ watch(open, (v) => {
 
           <DropdownMenuSeparator :class="menuCls.separator" />
 
-          <DropdownMenuItem :class="itemCls" @select.prevent="togglePixelGrid">
+          <DropdownMenuItem :class="itemCls" @select.prevent="togglePixelGrid(store)">
             <icon-lucide-check
               v-if="store.state.showPixelGrid !== false"
               class="absolute left-2 size-3.5"

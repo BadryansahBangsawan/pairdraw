@@ -176,6 +176,8 @@ export interface DragMarquee {
   startY: number
   /** The open frame or section the marquee started in, whose layers it selects. */
   containerId?: string
+  /** Selected instead if the press ends as a click without dragging. */
+  selectOnClick?: string
 }
 
 export interface DragRotate {
@@ -221,6 +223,11 @@ export interface DragEditNode {
    * with Shift takes it out of the selection.
    */
   click?: { part: 'segment' | 'region'; index: number; deselect: boolean }
+  /**
+   * ⌥/Alt was held on the press: once the pointer moves past the drag threshold the selection is
+   * copied and the copies drag instead; `false` once copied.
+   */
+  duplicate?: boolean
 }
 
 export interface DragEditHandle {

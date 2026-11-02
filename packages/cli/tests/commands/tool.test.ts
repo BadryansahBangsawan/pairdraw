@@ -1,11 +1,12 @@
 import { describe, expect, setDefaultTimeout, test } from 'bun:test'
-import { mkdtemp } from 'node:fs/promises'
+import { mkdtemp, readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { CLI_ENTRY, FIXTURES } from '#cli-tests/helpers/paths'
 import * as v from 'valibot'
 
-import { CLI_ENTRY, FIXTURES } from '#cli-tests/helpers/paths'
+import { imageSize } from '@open-pencil/scene-graph/images'
 
 setDefaultTimeout(60_000)
 
@@ -80,5 +81,30 @@ describe('tool CLI', () => {
     const badArgs = await cli(['tool', 'call', 'list_pages', FIXTURE, '--args', '[1]'])
     expect(badArgs.exitCode).toBe(1)
     expect(badArgs.stderr + badArgs.stdout).toContain('Tool arguments must be a JSON object')
+  })
+
+  test('--preview-output writes a PNG of the current page after a change', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-tool-preview-'))
+    const preview = join(dir, 'preview.png')
+    const shape = '{"type":"RECTANGLE","x":0,"y":0,"width":120,"height":80}'
+    const created = await cli([
+      'tool',
+      'call',
+      'create_shape',
+      FIXTURE,
+      '--args',
+      shape,
+      '--preview-output',
+      preview
+    ])
+    expect(created.exitCode).toBe(0)
+    expect(created.stderr).toContain(`Preview: ${preview}`)
+    expect(imageSize(new Uint8Array(await readFile(preview)))?.width).toBeGreaterThan(0)
+
+    // A read leaves the document as it was, so it draws nothing.
+    const unchanged = join(dir, 'unchanged.png')
+    const read = await cli(['tool', 'call', 'list_pages', FIXTURE, '--preview-output', unchanged])
+    expect(read.exitCode).toBe(0)
+    expect(await Bun.file(unchanged).exists()).toBe(false)
   })
 })

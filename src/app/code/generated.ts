@@ -4,6 +4,7 @@ import {
   layerComponents,
   layerMarkup,
   type ComponentStyling,
+  type IconPackage,
   type LayerComponent
 } from '@open-pencil/dom-css/export'
 import type { SceneGraph } from '@open-pencil/scene-graph'
@@ -40,13 +41,15 @@ function componentFiles(files: readonly LayerComponent['files'][number][]): Gene
 /**
  * Code generated for the selection that takes a moment to make: Vue and React components, as
  * the Storybook export generates them, and the same markup as HTML, images as the files they
- * would be written to rather than inlined. Each is styled with a stylesheet or with Tailwind.
+ * would be written to rather than inlined. Each is styled with a stylesheet or with Tailwind;
+ * components draw icons from `icons`, Iconify by default.
  */
 export async function generatedCodeAsync(
   source: AsyncCodeSource,
   styling: ComponentStyling,
   graph: SceneGraph,
-  nodeIds: string[]
+  nodeIds: string[],
+  icons: IconPackage = 'iconify'
 ): Promise<GeneratedCode> {
   if (source === 'html-css') {
     const { html, css, layerIds } = await layerMarkup(graph, nodeIds, { vectorElement, styling })
@@ -55,6 +58,10 @@ export async function generatedCodeAsync(
       ? { code: `<style>\n${css}\n</style>\n\n${html}`, layerIds: [null, ...layerIds] }
       : { code: html, layerIds }
   }
-  const components = await layerComponents(graph, nodeIds, source, { vectorElement, styling })
+  const components = await layerComponents(graph, nodeIds, source, {
+    vectorElement,
+    styling,
+    icons
+  })
   return componentFiles(components.flatMap((component) => component.files))
 }

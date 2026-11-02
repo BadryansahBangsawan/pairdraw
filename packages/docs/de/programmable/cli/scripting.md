@@ -17,7 +17,7 @@ Beginnt der Code nicht mit `return`, führt OpenPencil ihn in einer asynchronen 
 
 ## Ändern und speichern
 
-`--write` schreibt in die Eingabedatei, `--output` in eine neue Datei. Längere Skripte können über die Standardeingabe gelesen werden.
+`--write` schreibt in die Eingabedatei, `--output` in eine neue Datei. Längere Skripte können über die Standardeingabe gelesen werden. `--preview-output preview.png` schreibt nach dem Skript ein PNG der Seite, die es als aktuelle Seite hinterlässt.
 
 ## Geöffnetes Dokument
 

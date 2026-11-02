@@ -1,0 +1,68 @@
+- Linux ARM64 desktop builds as AppImage, .deb and .rpm packages, with automatic updates.
+- Portable .tar.gz downloads for Linux x64 and ARM64 that run from any folder without installing; to update, download the new version.
+- macOS .zip downloads of the signed app for Apple Silicon and Intel.
+- The desktop app on Windows and Linux has a Help menu with Check for Updates… and About Pairdraw.
+- File › Place Image… (⇧⌘K / Ctrl+Shift+K) and a toolbar button place PNG, JPEG, WebP, GIF, AVIF, and SVG files in the middle of the view as one undoable step.
+- File › Export Frames to PDF… saves the page's frames, or the selected layers, as one PDF with a page per frame.
+- Press ? or click the keyboard button in the toolbar to see every keyboard shortcut, with search and the keys for your platform.
+- Shift+Alt+A removes auto layout from every selected frame at once.
+- Hold Cmd (Ctrl on Windows and Linux) while dragging a marquee from empty canvas or from the background of a top-level frame or section to select the deepest nested layers it touches; pressing or releasing the key mid-drag switches between the deep and the plain marquee.
+- Settings → Editor sets how far the arrow keys nudge layers, with and without Shift, including fractions such as 0.25.
+- Snap to half pixels lets Snap to pixel grid also land on half pixels in a design.
+- Zoom with scroll wheel lets a mouse wheel zoom the canvas without a modifier, and Invert zoom direction reverses mouse-wheel zoom, including Ctrl+wheel on Linux, while trackpad pinches keep their direction.
+- Ultralight mode in Settings → Editor → Rendering turns off animations and, after a reload, renders the canvas in tiles at one device pixel per CSS pixel without background blurs or noise, while exported images keep every effect.
+- The layers panel and the properties panel close and reopen one at a time from the top bar, keep their widths, and stay as you left them; the comment tool and version history open a closed properties panel while in use.
+- Vector edit mode has a cut tool: press X, then click a segment or a point to cut the path there.
+- Double-clicking a point in vector edit mode switches it between smooth and corner, and Cmd/Ctrl+double-clicking a segment straightens it.
+- Cmd/Ctrl+J joins the two selected end points while a path is being edited, closing and filling the path when they are its two ends.
+- Option/Alt-dragging points or segments in vector edit mode drags a copy of them.
+- The arrow keys move the selected points of a path being edited by the nudge distance set in Settings, instead of moving the whole layer.
+- Opening a .pen file reads files with JSON comments and trailing commas, and keeps text links.
+- Notes, prompts, and context notes in .pen files open as sticky notes at the size of their cards instead of being dropped or opening as empty frames.
+- Line layers in .pen files open as lines instead of empty frames.
+- Slot frames in .pen components open as slots that suggest the components the file lists, and instances that fill a slot stay instances.
+- The pen.dev context, metadata, placeholder, and slot fields are kept on layers as shared plugin data in the `pen` namespace, where agents can read them.
+- AI and MCP agents can export layers as HTML with plain CSS or Tailwind classes, as a fragment or a standalone page with inline or separate assets (including web fonts), with or without layer names and IDs, using the export_html tool.
+- AI and MCP agents can import HTML and CSS, including Tailwind classes, as editable layers in the open document with the import_html tool.
+- AI and MCP agents can find a free spot on the canvas for new content with the find_empty_space tool.
+- AI and MCP agents can replace a fill, text, or stroke color, stroke weight, corner radius, font family, font style, or font size everywhere on a page or selection with the replace_matching_properties tool, which keeps instance overrides and leaves library components unchanged.
+- MCP clients can see what changed in a document since a point they mark, using diff_changes with mark: true.
+- The export_image tool takes a quality from 1 to 100 for JPG and WEBP.
+- Agents can read and set the components suggested for a slot through get_components and create_slot, including preferred-only slots and child limits that can be cleared.
+- The insert_icon tool sets weight, fill, grade, and optical size for Material Symbols icons.
+- The set_image_fill tool can fill a layer with an image from a URL.
+- The MCP server serves the OpenPencil agent skill to clients that cannot install skills: a `read_skill` tool, Markdown resources at `openpencil://skills/open-pencil/`, a `design` prompt, and server instructions that tell agents to read the skill before designing and name only the tools Tool access and the shared scope leave on.
+- The MCP server documentation covers setup for Codex, GitHub Copilot in VS Code, Antigravity, and Hermes Agent.
+- Up and Down in the chat composer bring back the prompts sent earlier in the conversation.
+- Chat messages can carry Markdown, CSS, code, and other text files, chosen with the attach button, pasted, or dropped on the chat.
+- On the desktop, links to files on your computer in chat replies show the file in its folder.
+- The chat asks before a model switch that leaves context behind: a coding agent does not see the earlier messages, and a built-in model taking over from an agent does not get what the agent's own session held.
+- Copy as HTML in the canvas context menu copies the selected layers as an HTML fragment with inline styles.
+- Run sticky as prompt sends the text of the selected sticky notes to the document's AI chat, with a reference to each note.
+- Apply with AI on a comment thread, or on all open comments from the comments list, asks the AI chat to apply the feedback, reply, and resolve the thread.
+- Example prompts under the Home prompt and the empty-canvas prompt fill the prompt with a starting idea to edit before sending.
+- The code generation guide that agents read now covers Next.js (App Router), Styled Components, building controls on shadcn/ui, Radix, Chakra UI, or MUI, and emitting icons from Lucide, Heroicons, Font Awesome, Phosphor, or React Icons.
+- Export HTML from the Export panel or the Code panel, choosing whether to include the HTML scaffold, CSS or Tailwind styling, embedded images or separate image files saved together in a zip, and whether to write layer names and layer IDs as attributes.
+- JPG and WEBP exports have a quality setting from 1 to 100, saved with the layer.
+- Vue and React code in the Code panel can take icons from Lucide, Heroicons, or Font Awesome instead of Iconify, and React code can also use React Icons.
+- Home sorts recent files by name, last use, or when they were added, and remembers the order.
+- Home lists can select several files with Cmd/Ctrl+click, Shift+click, or Cmd/Ctrl+A, then open them in tabs, remove them from Recents, or delete stored documents together.
+- A recent file's menu offers Remove from Recents, and recent and stored files offer Save As… to save a copy without opening them.
+- Home has a Design systems section that lists published component libraries and starts a new design with the chosen library turned on.
+- The Library manager lists enabled libraries that are no longer available and lets you relink each one to another library, so its components get updates again; relinking can be undone.
+- Bind a text layer's font family to a text variable in the Typography section. The family follows the variable's value and mode, its fonts load when it changes, and picking a font detaches the variable.
+- Set the weight, fill, grade, and optical size of Material Symbols icons, and the weight, scale, and rendering of SF Symbols, from the Icon section.
+- Load an image fill from an image URL, and place images in the new Stretch mode.
+- Type an ellipse's arc start, sweep, and inner ratio in the Appearance section.
+- Auto layout frames can include strokes in their layout: the frame's own stroke pushes its content inward, and its children's outside strokes take up space, toggled with Include strokes in layout in the layout section.
+- Pressing Cmd/Ctrl+Alt+K on a main component, or choosing Convert to frame from its context menu or layer type menu, turns it back into a frame after a confirmation that detaches its instances, including copies nested in other components' instances, as one undo step.
+- Settings → Models and guided setup offer API-key presets for xAI, Meta, Moonshot AI, Together AI, and Fireworks AI, and in the desktop app also for Kimi For Coding, OpenCode Zen, and OpenCode Go, each with recommended models and a link to get a key.
+- Claude Code set up for Amazon Bedrock, Google Vertex AI, or Microsoft Foundry with its CLAUDE_CODE_USE_* switches shows as External config, and setup offers a sign-in only if Claude Code reports it is signed out.
+- Convert to vector works on any layer showing an image fill, including frames with content and ellipses.
+- AI chat and MCP agents can vectorize images with the `vectorize_image` tool, using the vectorize service and key set up in Settings → Image services.
+- `openpencil shell` opens a document once and runs editor tools on it line by line, with `save()`, `preview()`, and `exit()`. Leaving with `exit()`, Ctrl+C, or Ctrl+D asks again before discarding unsaved changes. It also reads a script of lines from stdin or drives the running app.
+- `--preview-output` on `shell`, `tool call`, and `eval` writes a PNG of the current page after each change, with its longest edge at most 1280 pixels.
+- `openpencil models` lists the AI providers, their models and default model, and the ACP agents, as text or JSON.
+- The shader fill picker offers a gallery of ready-made shaders, each built from several effects, that apply in one click or with the arrow keys and stay editable effect by effect.
+- The documentation has a design system tutorial that builds a themed Button and Card library with variables, variants, component properties, and slots, with a downloadable example file and the script that builds it.
+- The documentation explains how to show readable diffs of `.fig` files in Git with `openpencil diff files` as a diff driver, a textconv outline, or `git difftool`.

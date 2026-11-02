@@ -12,11 +12,14 @@ Gotowe wersje dla macOS, Windows i Linux są dostępne na [stronie pobierania](/
 
 | Platforma | Plik |
 | --------------------- | -------------------- |
-| macOS (Apple Silicon) | `.dmg` (aarch64) |
-| macOS (Intel) | `.dmg` (x64) |
+| macOS (Apple Silicon) | `.dmg` / `.zip` (aarch64) |
+| macOS (Intel) | `.dmg` / `.zip` (x64) |
 | Windows (x64) | `.msi` / `.exe` |
 | Windows (ARM) | `.msi` / `.exe` |
-| Linux (x64) | `.AppImage` / `.deb` |
+| Linux (x64) | `.AppImage` / `.deb` / `.rpm` / `.tar.gz` |
+| Linux (ARM64) | `.AppImage` / `.deb` / `.rpm` / `.tar.gz` |
+
+Aby sprawdzić, czy jest nowsza wersja aplikacji na komputer, wybierz **Check for Updates…** w menu **Help** w systemach Windows i Linux albo w menu aplikacji w macOS. Pozycja **About** obok pokazuje zainstalowaną wersję.
 
 ## Wymagania systemowe {#system-requirements}
 

@@ -1,9 +1,13 @@
 import { FigmaAPI, MAX_IMAGE_FETCH_BYTES } from '@open-pencil/core/figma-api'
 import { createCanvasKitRasterCodec } from '@open-pencil/core/io/formats/raster'
+import { registerHTMLToolHost, type HTMLToolHost } from '@open-pencil/core/tools'
 
 import { renderAutomationImage } from '@/app/automation/bridge/export-handlers'
+import { styleHTMLInBrowser } from '@/app/code/html-styler'
+import { loadTailwindStylesheet } from '@/app/document/export/html'
 import type { EditorStore } from '@/app/editor/active-store'
 import { listFamilies, listFonts } from '@/app/editor/fonts'
+import { bindAgentImageVectorizer } from '@/app/editor/vectorize/agent'
 import { createTauriFetch } from '@/app/tauri/http'
 import { IS_TAURI } from '@/constants'
 
@@ -13,11 +17,20 @@ const imageFetch = IS_TAURI
   ? createTauriFetch({ maxResponseBytes: MAX_IMAGE_FETCH_BYTES })
   : undefined
 
+/**
+ * The HTML tools style markup with the browser's own CSS engine, as the code preview does, and
+ * read Tailwind's stylesheets from the bundle, as the export dialog does.
+ */
+const htmlToolHost: HTMLToolHost = { style: styleHTMLInBrowser, loadTailwindStylesheet }
+
 export function makeFigmaFromStore(
   store: EditorStore,
   pageId = store.state.currentPageId
 ): FigmaAPI {
   const api = new FigmaAPI(store.graph, { fetch: imageFetch })
+  // `vectorize_image` runs on the service and key set up in Settings, which stay in the app.
+  bindAgentImageVectorizer(store)
+  registerHTMLToolHost(store.graph, htmlToolHost)
   api.setRenderer(store.renderer ?? null)
   api.icons = store.iconProvider
   api.theme = store.state.theme ?? 'light'
@@ -42,7 +55,8 @@ export function makeFigmaFromStore(
       nodeIds,
       opts.scale ?? 1,
       opts.format ?? 'PNG',
-      opts.pageId ?? pageId
+      opts.pageId ?? pageId,
+      opts.quality
     )
   if (store.renderer) api.rasterCodec = createCanvasKitRasterCodec(store.renderer.ck)
   api.listAvailableFontsAsync = async () => {

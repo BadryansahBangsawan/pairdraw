@@ -29,6 +29,8 @@ Powiększenie zmienia się względem położenia wskaźnika:
 - gest zsuwania lub rozsuwania palców na gładziku;
 - skróty klawiaturowe z poniższej tabeli.
 
+Po włączeniu **Powiększaj kółkiem myszy** w **Ustawienia → Edytor** kółko myszy powiększa bez wciskania klawisza; <kbd>Shift</kbd> + kółko nadal przewija w poziomie. **Odwróć kierunek powiększania** zmienia kierunek kółka, a gest na gładziku zachowuje swój.
+
 Gest zmiany powiększenia jest wyłączony na panelach warstw i właściwości, aby nie zmieniał przypadkowo powiększenia całej strony w przeglądarce.
 
 ## Linijki

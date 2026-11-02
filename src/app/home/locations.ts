@@ -12,11 +12,13 @@ export type HomeLocationView =
   | { kind: 'workspace'; id: string }
   | { kind: 'shared'; id: 'shared' }
   | { kind: 'storage'; id: 'storage' }
+  | { kind: 'libraries'; id: 'libraries' }
 
 const VIEWS = {
   recent: { kind: 'recent', id: 'recent' },
   shared: { kind: 'shared', id: 'shared' },
-  storage: { kind: 'storage', id: 'storage' }
+  storage: { kind: 'storage', id: 'storage' },
+  libraries: { kind: 'libraries', id: 'libraries' }
 } as const satisfies Record<Exclude<HomeLocation['kind'], 'workspace'>, HomeLocationView>
 
 function toView(location: HomeLocation): HomeLocationView {
@@ -28,10 +30,10 @@ function fromView(location: HomeLocationView): HomeLocation {
 }
 
 /**
- * Where Home can list documents from: Recent, the workspaces and shared documents of the server
- * Home shows when signed in to it, and storage. Until the person picks a place, Home shows
- * Recent, or the first workspace where this app keeps no recent files. A Cloud location the
- * account can no longer reach falls back to Recent.
+ * Where Home can list documents from: Recent, the design systems, the workspaces and shared
+ * documents of the server Home shows when signed in to it, and storage. Until the person picks a
+ * place, Home shows Recent, or the first workspace where this app keeps no recent files. A Cloud
+ * location the account can no longer reach falls back to Recent.
  */
 export function useHomeLocations() {
   const cloud = useHomeCloud()

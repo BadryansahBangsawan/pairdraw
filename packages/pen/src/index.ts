@@ -8,6 +8,7 @@ export {
   type PenIconRequest
 } from './assets'
 export type { PenIconSource } from './nodes'
+export { PEN_PLUGIN_DATA_NAMESPACE } from './plugin-data'
 export {
   buildPenGraph,
   parsePenDocument,

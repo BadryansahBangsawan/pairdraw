@@ -8,6 +8,8 @@ export default {
       'mb-4 text-center text-xl font-semibold tracking-tight text-balance text-surface @2xl/home:mb-5 @2xl/home:text-2xl',
     /** Taller than the chat's field at rest, as the page's main ask. */
     field: 'min-h-24',
+    /** Example prompts under the field, which fill it when picked. */
+    examples: 'mt-3',
     /**
      * What the prompt waits for while it starts, such as the lookup for a coding agent; it sits
      * in the space below the composer, so nothing moves when it shows.

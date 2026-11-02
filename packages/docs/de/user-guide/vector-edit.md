@@ -24,6 +24,15 @@ Im Vektorbearbeitungsmodus wird die Geometrie eines Pfads verändert: Position d
 
 Beim Ziehen eines Ankerpunkts mit <kbd>Cmd</kbd>/<kbd>Strg</kbd> bestimmt OpenPencil den Zielgriff anhand der Richtung des verbundenen Segments. Das funktioniert auch bei verzweigten Vektornetzen.
 
+## Schneiden, verbinden und umformen
+
+- <kbd>X</kbd> wählt das Schneidewerkzeug. Ein Klick auf ein Segment schneidet es dort, ein Klick auf einen Ankerpunkt trennt die Segmente, die sich dort treffen. <kbd>X</kbd>, <kbd>Escape</kbd> oder eine andere Werkzeugtaste legt es wieder ab.
+- Doppelklick auf einen Ankerpunkt wechselt zwischen glattem Punkt und Eckpunkt.
+- <kbd>Cmd</kbd>/<kbd>Strg</kbd> + Doppelklick auf ein Segment entfernt seine Griffe und macht es gerade.
+- <kbd>Cmd</kbd>/<kbd>Strg</kbd> + <kbd>J</kbd> verbindet zwei ausgewählte Endpunkte: Punkte an derselben Stelle werden zu einem Punkt, sonst entsteht ein gerades Segment. Verbindet es die beiden Enden eines Pfads, wird er geschlossen und gefüllt. Während ein Pfad bearbeitet wird, öffnet dieses Kürzel nicht den Chat.
+- <kbd>Option</kbd>/<kbd>Alt</kbd> + Ziehen zieht eine Kopie der ausgewählten Punkte oder Segmente. Die Kopie eines einzelnen Punkts bleibt mit ihm verbunden.
+- Die Pfeiltasten verschieben die ausgewählten Punkte um den Abstand aus Einstellungen → Editor, mit <kbd>Shift</kbd> um den großen Abstand.
+
 ## Zeichenstift im Bearbeitungsmodus
 
 - Klick auf ein Segment fügt einen Ankerpunkt ein.

@@ -18,6 +18,7 @@ import {
   isOutdatedCompanion,
   type PackageManager
 } from './companions'
+import { EXTERNAL_CONFIG_AGENT, type ClaudeCodeCloud } from './external'
 import type { AgentLookup } from './native'
 
 export type DetectedAgent = {
@@ -25,6 +26,8 @@ export type DetectedAgent = {
   cliPath: string | null
   adapterPath: string | null
   status: 'available' | 'needs-adapter' | 'not-installed'
+  /** A cloud the agent is set up to use instead of its own sign-in; absent when none is. */
+  externalConfig?: ClaudeCodeCloud
 }
 
 export function detectedAgents(lookup: AgentLookup): DetectedAgent[] {
@@ -33,11 +36,14 @@ export function detectedAgents(lookup: AgentLookup): DetectedAgent[] {
     const adapterPath = lookup.executables[definition.command] ?? null
     // An adapter package carries its agent, so it installs whether or not the CLI is there.
     const unavailableStatus = definition.adapterPackage ? 'needs-adapter' : 'not-installed'
+    const externalConfig =
+      definition.id === EXTERNAL_CONFIG_AGENT ? lookup.claudeCodeCloud : undefined
     return {
       definition,
       cliPath,
       adapterPath,
-      status: adapterPath ? 'available' : unavailableStatus
+      status: adapterPath ? 'available' : unavailableStatus,
+      ...(externalConfig ? { externalConfig } : {})
     }
   })
 }

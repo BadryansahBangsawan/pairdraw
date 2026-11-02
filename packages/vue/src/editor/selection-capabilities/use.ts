@@ -70,6 +70,7 @@ export function useSelectionCapabilities() {
     ),
     canGoToMainComponent: computed(() => selection.isInstance.value),
     canCreateInstance: computed(() => selectedNode.value?.type === 'COMPONENT'),
+    canConvertToFrame: selection.canConvertToFrame,
     canCreateSlot: selection.canCreateSlot,
     canMoveToPage: useSceneComputed(() => hasSelection.value && editor.graph.getPages().length > 1),
     canSetOpacity: computed(() => hasSelection.value),

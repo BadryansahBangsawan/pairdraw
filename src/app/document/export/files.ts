@@ -11,6 +11,7 @@ import {
 import { type RasterExportFormat, renderNodesToImage } from '@open-pencil/core/io/formats/raster'
 import type { SceneGraph } from '@open-pencil/scene-graph'
 
+import { htmlExportOptions } from '@/app/document/export/html'
 import type { ExportOptions } from '@/app/document/export/types'
 import { pickBrowserSaveFile, supportsFileSystemAccess } from '@/app/document/io/capability'
 import { isTauri } from '@/app/tauri/env'
@@ -19,12 +20,21 @@ type ExportData = string | ArrayBuffer | Uint8Array
 
 type DownloadBlob = (data: Uint8Array, filename: string, mime: string) => void
 
+/** A file an export writes beside its main file, such as an HTML page's images. */
+export interface ExportedAsset {
+  /** Relative to the main file, as the main file refers to it. */
+  path: string
+  bytes: Uint8Array
+}
+
 export interface ExportedFile {
   bytes: Uint8Array
   fileName: string
   format: string
   ext: string
   mime: string
+  /** Files the main file refers to, saved beside it in a zip. */
+  assets?: ExportedAsset[]
 }
 
 // Layer/page names flow into zip entry keys; flatten them to a single safe
@@ -45,13 +55,14 @@ function sanitizeZipEntryName(name: string): string {
   return flat.length > 0 ? flat : 'export'
 }
 
-// Bundle several exported files into a single zip, disambiguating any
-// duplicate file names (e.g. two layers both producing "Frame@1x.png").
-export function bundleExportFiles(files: ExportedFile[]): Uint8Array {
-  const entries: Zippable = {}
+/**
+ * Gives out file names for one export, each a safe zip entry name, numbering repeats
+ * (`Frame@1x.png`, `Frame@1x (2).png`), so files and the assets named after them stay apart.
+ */
+export function createExportNameClaimer(): (fileName: string) => string {
   const used = new Set<string>()
-  for (const file of files) {
-    let name = sanitizeZipEntryName(file.fileName)
+  return (fileName) => {
+    let name = sanitizeZipEntryName(fileName)
     if (used.has(name)) {
       const tail = extname(name)
       const stem = name.slice(0, name.length - tail.length)
@@ -60,7 +71,28 @@ export function bundleExportFiles(files: ExportedFile[]): Uint8Array {
       name = `${stem} (${i})${tail}`
     }
     used.add(name)
-    entries[name] = file.bytes
+    return name
+  }
+}
+
+/** An asset's relative path with each folder and name made a safe zip entry name. */
+function sanitizeZipEntryPath(path: string): string {
+  return path
+    .split(/[/\\]+/)
+    .filter((segment) => segment.length > 0)
+    .map(sanitizeZipEntryName)
+    .join('/')
+}
+
+// Bundle several exported files into a single zip, disambiguating any
+// duplicate file names (e.g. two layers both producing "Frame@1x.png"),
+// with the assets each file refers to at the paths it refers to them by.
+export function bundleExportFiles(files: ExportedFile[]): Uint8Array {
+  const entries: Zippable = {}
+  const claim = createExportNameClaimer()
+  for (const file of files) {
+    entries[claim(file.fileName)] = file.bytes
+    for (const asset of file.assets ?? []) entries[sanitizeZipEntryPath(asset.path)] = asset.bytes
   }
   return zipSync(entries)
 }
@@ -76,8 +108,11 @@ export function getExportBaseName(graph: SceneGraph, target: ExportRequest['targ
 
 export function getExportOptions(format: IOFormatAdapter, options?: ExportOptions): unknown {
   if (format.exportOptions?.scale) {
-    return { scale: options?.scale ?? 1, quality: options?.quality }
+    const quality = format.exportOptions.quality ? options?.quality : undefined
+    return { scale: options?.scale ?? 1, ...(quality === undefined ? {} : { quality }) }
   }
+  if (format.id === 'html' && options?.html) return htmlExportOptions(options.html)
+  if (format.id === 'pdf' && options?.pdfPages) return { pages: options.pdfPages }
   return undefined
 }
 
@@ -105,7 +140,8 @@ export function createExportTargetActions(editor: Editor, state: EditorState, io
     nodeIds: string[],
     scale: number,
     format: RasterExportFormat,
-    pageId = state.currentPageId
+    pageId = state.currentPageId,
+    quality?: number
   ): Promise<Uint8Array<ArrayBuffer> | null> {
     const renderer = editor.renderer
     if (!renderer) return null
@@ -114,7 +150,8 @@ export function createExportTargetActions(editor: Editor, state: EditorState, io
     const ownerPageId = findPageId(editor.graph, ids[0]) ?? pageId
     return renderNodesToImage(renderer.ck, renderer, editor.graph, ownerPageId, ids, {
       scale,
-      format
+      format,
+      quality
     })
   }
 

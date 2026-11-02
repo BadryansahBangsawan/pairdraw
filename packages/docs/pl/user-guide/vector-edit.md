@@ -56,6 +56,15 @@ Gdy przeciągasz punkt z wciśniętym <kbd>Cmd</kbd> albo <kbd>Ctrl</kbd>, edyto
 
 Działa to również dla rozgałęzionych punktów w sieci wektorowej. Po wybraniu docelowy uchwyt nie zmienia się do końca przeciągania.
 
+## Cięcie, łączenie i zmiana kształtu
+
+- <kbd>X</kbd> włącza narzędzie Nożyczki. Kliknij segment, aby go w tym miejscu przeciąć, albo punkt, aby rozdzielić spotykające się w nim segmenty. <kbd>X</kbd>, <kbd>Escape</kbd> lub klawisz innego narzędzia je wyłącza.
+- Dwukrotne kliknięcie punktu przełącza go między punktem gładkim a narożnym.
+- <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + dwukrotne kliknięcie segmentu usuwa jego uchwyty i prostuje go.
+- <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + <kbd>J</kbd> łączy dwa zaznaczone punkty końcowe: punkty w tym samym miejscu stają się jednym punktem, a odległe łączy prosty segment. Połączenie obu końców ścieżki zamyka ją i wypełnia. Podczas edycji ścieżki ten skrót nie otwiera czatu.
+- <kbd>Option</kbd>/<kbd>Alt</kbd> + przeciągnięcie przeciąga kopię zaznaczonych punktów lub segmentów. Kopia pojedynczego punktu pozostaje z nim połączona.
+- Klawisze strzałek przesuwają zaznaczone punkty o odległość z Ustawienia → Edytor, a z <kbd>Shift</kbd> o dużą odległość.
+
 ## Pióro w trybie edycji
 
 - Kliknij segment, aby dodać punkt i podzielić segment.

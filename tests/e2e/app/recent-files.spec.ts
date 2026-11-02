@@ -38,7 +38,11 @@ test.describe('a populated recent files list', () => {
   }) => {
     await page.goto('/?recent-files')
     await page.getByTestId('recent-files-home').waitFor()
-    const documents = page.getByRole('button', { name: /Recent design/ })
+    // Each entry also has a menu button, so count the entries rather than buttons named after them.
+    const documents = page
+      .getByTestId('recent-files-home')
+      .locator('[data-slot="document-entry"]')
+      .filter({ hasText: /Recent design/ })
     await expect(documents).toHaveCount(10)
 
     await page.keyboard.press(process.platform === 'darwin' ? 'Meta+,' : 'Control+,')

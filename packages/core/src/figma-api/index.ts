@@ -64,7 +64,12 @@ export { getPageBackgrounds, setPageBackgrounds } from './page-backgrounds'
 export { flushPendingLayout } from './pending-layout'
 export type { FigmaEffect } from './effects'
 export type { ExportImageOptions } from './types'
-export { MAX_IMAGE_FETCH_BYTES, type ImageFetch } from './images'
+export {
+  ImageTooLargeError,
+  MAX_IMAGE_FETCH_BYTES,
+  readBoundedImage,
+  type ImageFetch
+} from './images'
 export {
   FigmaVariable,
   FigmaVariableCollection,

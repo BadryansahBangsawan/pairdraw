@@ -140,9 +140,10 @@ function reviewConflicts() {
   if (conflicted) open(conflicted)
 }
 
-const deleting = shallowRef<StorageDocument | null>(null)
-function requestDelete(row: CloudDocumentRow) {
-  deleting.value = listed.value.find((candidate) => candidate.id === row.id) ?? null
+const deleting = shallowRef<readonly StorageDocument[]>([])
+function requestDelete(rows: readonly CloudDocumentRow[]) {
+  const ids = new Set(rows.map((row) => row.id))
+  deleting.value = listed.value.filter((candidate) => ids.has(candidate.id))
 }
 
 function open(row: CloudDocumentRow) {
@@ -164,11 +165,12 @@ function open(row: CloudDocumentRow) {
     :can-create="workspace.role !== 'viewer'"
     :can-delete="workspace.role !== 'viewer'"
     @open="open"
+    @open-many="(rows) => rows.forEach(open)"
     @delete="requestDelete"
     @members="openWorkspaceMembers(serverId, workspace.id)"
     @refresh="files.refresh"
     @new-design="createStoredDocument(location)"
     @review-conflicts="reviewConflicts"
   />
-  <DocumentDeleteDialog v-model:document="deleting" :location="location" />
+  <DocumentDeleteDialog v-model:documents="deleting" :location="location" />
 </template>

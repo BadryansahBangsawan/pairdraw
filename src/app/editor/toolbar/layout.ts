@@ -3,7 +3,7 @@ import { uniq } from 'es-toolkit'
 import { EDITOR_TOOLS, type EditorToolDef, type Tool } from '@open-pencil/core'
 
 /** Toolbar buttons that run a command instead of switching the tool. */
-export const TOOLBAR_ACTIONS = ['insert-icon'] as const
+export const TOOLBAR_ACTIONS = ['place-image', 'insert-icon'] as const
 export type ToolbarAction = (typeof TOOLBAR_ACTIONS)[number]
 export type ToolbarEntry = Tool | ToolbarAction
 
@@ -20,10 +20,11 @@ export interface ToolbarLayout {
 export const PINNED_TOOLBAR_ENTRY: ToolbarEntry = 'SELECT'
 
 /**
- * Tools the toolbar keeps hidden until shown from Customize toolbar, such as FigJam's sticky
- * note, shape and connector, which Figma's own toolbar does not offer.
+ * Tools the toolbar keeps hidden until shown from Customize toolbar: FigJam's shape and
+ * connector, which Figma's own toolbar does not offer. The sticky note shows, without a key,
+ * since N stays Zoom to Next Frame as in Figma.
  */
-const HIDDEN_BY_DEFAULT: readonly ToolbarEntry[] = ['STICKY', 'SHAPE_WITH_TEXT', 'CONNECTOR']
+const HIDDEN_BY_DEFAULT: readonly ToolbarEntry[] = ['SHAPE_WITH_TEXT', 'CONNECTOR']
 
 export const DEFAULT_TOOLBAR_LAYOUT: Readonly<ToolbarLayout> = {
   groups: [

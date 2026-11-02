@@ -6,6 +6,7 @@ import { computed, useTemplateRef } from 'vue'
 
 import { useI18n } from '@open-pencil/vue/i18n'
 
+import { createPromptRecall } from '@/app/ai/chat/history/prompts'
 import { useChatEditor } from '@/components/chat/composer/useChatEditor'
 import { chatInputTheme } from '@/components/chat/ui'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -15,7 +16,8 @@ const {
   status,
   disabled = false,
   completions = [],
-  takeBack
+  takeBack,
+  prompts
 } = defineProps<{
   status: ChatStatus
   disabled?: boolean
@@ -23,6 +25,8 @@ const {
   completions?: CompletionSource[]
   /** Messages waiting to be sent, taken back into the field by Up on its first line. */
   takeBack?: () => string | null
+  /** Prompts sent in this conversation, oldest first, which Up and Down step through. */
+  prompts?: () => readonly string[]
 }>()
 const emit = defineEmits<{
   /** `afterWork` asks, while the agent works, to wait until it has finished (Alt+Enter). */
@@ -38,6 +42,7 @@ const ui = chatInputTheme()
 /** The agent is replying; messages written now wait for it, so the field stays open. */
 const working = computed(() => status === 'streaming' || status === 'submitted')
 const host = useTemplateRef<HTMLDivElement>('host')
+const recall = createPromptRecall(() => prompts?.() ?? [])
 const editor = useChatEditor(host, {
   label: () => ai.value.describeChange,
   placeholder: () => (working.value ? ai.value.queueMessage : ai.value.describeChange),
@@ -50,7 +55,9 @@ const editor = useChatEditor(host, {
     emit('interrupt')
     return true
   },
-  onTakeBack: () => takeBack?.() ?? null
+  onTakeBack: () => takeBack?.() ?? null,
+  onRecall: (direction, current) =>
+    direction === 'older' ? recall.older(current) : recall.newer(current)
 })
 const { text } = editor
 /** Stop while the agent works; once something is typed, Send queues it instead. */

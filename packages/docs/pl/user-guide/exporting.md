@@ -14,7 +14,7 @@ Zaznacz obiekt i otwórz sekcję „Eksport” na panelu właściwości.
 ### Ustawienia
 
 - **Skala:** od 0,5× do 4×. Dla SVG nie jest wyświetlana, ponieważ grafika wektorowa nie zależy od rozdzielczości.
-- **Format:** PNG z przezroczystym tłem, JPG z białym tłem, WEBP z przezroczystym tłem, SVG albo osobny dokument `.fig`.
+- **Format:** PNG z przezroczystym tłem, JPG z białym tłem, WEBP z przezroczystym tłem, SVG, PDF, HTML, PPTX (PowerPoint) albo draw.io.
 
 Dla jednego obiektu można dodać kilka wariantów eksportu. Podgląd na tle szachownicy pokazuje przyszły wynik.
 
@@ -27,6 +27,14 @@ Dla jednego obiektu można dodać kilka wariantów eksportu. Podgląd na tle sza
 | Panel właściwości | Przycisk Eksport | Przycisk Eksport |
 
 W aplikacji komputerowej ścieżkę wybiera się w oknie systemowym. W przeglądarce plik jest pobierany w zwykły sposób.
+
+## HTML, PDF i jakość
+
+- **Wiersze JPG i WEBP** mają pole jakości od 1 do 100 (domyślnie 90), zapisywane razem z warstwą.
+- **PDF** przy kilku zaznaczonych warstwach tworzy jeden plik PDF ze stroną na każdą warstwę, w kolejności zaznaczenia, każdą w rozmiarze swojej warstwy.
+- **Plik › Eksportuj ramki do PDF…** zapisuje ramki strony jako jeden plik PDF, ze stroną na każdą ramkę w kolejności warstw, każdą w rozmiarze swojej ramki. Liczą się też ramki w sekcjach, a luźne kształty, teksty i grupy nie. Przy zaznaczonych warstwach eksportowane są tylko one.
+- **HTML** zapisuje warstwę jako stronę internetową. Przycisk opcji obok formatu decyduje, czy dołączyć szkielet HTML (cała strona albo fragment do wklejenia), czy stylować przez CSS czy Tailwind, czy osadzić obrazy, czy zapisać je jako osobne pliki (razem w pliku `.zip`), oraz czy zapisywać jako atrybuty nazwy warstw (`data-name`, domyślnie włączone) i identyfikatory warstw (`data-open-pencil-node-id`, domyślnie wyłączone). Widok HTML panelu Kod eksportuje tak samo, ze stylowaniem, które pokazuje.
+- W panelu Kod komponenty Vue i React mogą brać ikony z Lucide, Heroicons lub Font Awesome zamiast z Iconify, a komponenty React także z React Icons; ikona, której pakiet nie ma, zostaje przy Iconify.
 
 ## Kopiuj jako
 

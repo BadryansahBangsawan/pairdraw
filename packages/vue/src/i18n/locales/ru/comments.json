@@ -12,6 +12,8 @@
   "deleteCommentDescription": "Комментарий и все ответы будут удалены для всех.",
   "deleteReply": "Удалить ответ",
   "copyText": "Копировать текст",
+  "applyWithAI": "Применить с помощью ИИ",
+  "applyOpenWithAI": "Применить открытые комментарии с помощью ИИ",
   "goToComment": "Перейти к комментарию",
   "moreActions": "Другие действия",
   "searchComments": "Поиск по комментариям",

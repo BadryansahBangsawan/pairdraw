@@ -62,12 +62,14 @@ function statusLabel(state: ModelConnectionState): string {
       return ai.value.modelToolsUnreachable
     case 'agent':
       return ai.value.modelAgentConnection
+    case 'external-config':
+      return ai.value.modelExternalConfig
   }
 }
 
 /** Green when it works, amber when the person has something to fix, grey otherwise. */
 function statusTone(state: ModelConnectionState): 'ok' | 'attention' | 'neutral' {
-  if (state === 'connected') return 'ok'
+  if (state === 'connected' || state === 'external-config') return 'ok'
   if (state === 'signed-out' || state === 'tools-unreachable' || state === 'not-installed') {
     return 'attention'
   }

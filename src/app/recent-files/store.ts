@@ -1,42 +1,43 @@
 import { useLocalStorage } from '@vueuse/core'
 import { basename } from 'pathe'
+import * as v from 'valibot'
 import { computed } from 'vue'
 
 import {
   DEFAULT_STORAGE_PROFILE,
   storageLocationOf,
   storageProfileId,
-  type StorageDocumentBinding,
-  type StorageProviderID
+  type StorageDocumentBinding
 } from '@/app/integrations/storage'
 
 import { recentFilesLimit } from './preferences'
+import { recentDocumentSchema } from './schema'
 import { clearRecentFileThumbnails } from './thumbnails'
 
 const RECENT_DOCUMENTS_STORAGE_KEY = 'open-pencil:recent-documents'
 
-export interface RecentLocalDocument {
-  id: string
-  kind: 'local'
-  path: string
-  name: string
-  updatedAt: string
+export type RecentDocument = v.InferOutput<typeof recentDocumentSchema>
+export type RecentLocalDocument = Extract<RecentDocument, { kind: 'local' }>
+export type RecentStorageDocument = Extract<RecentDocument, { kind: 'storage' }>
+
+const storedRecentDocumentsSchema = v.pipe(v.string(), v.parseJson(), v.array(v.unknown()))
+
+/**
+ * The recent documents kept in `raw`. An entry this version cannot read is dropped rather than
+ * emptying the list, and one kept before creation dates were recorded is dated by its last use.
+ */
+export function readStoredRecentDocuments(raw: string): RecentDocument[] {
+  const parsed = v.safeParse(storedRecentDocumentsSchema, raw)
+  if (!parsed.success) return []
+  return parsed.output.flatMap((entry): RecentDocument[] => {
+    const document = v.safeParse(recentDocumentSchema, entry)
+    return document.success ? [document.output] : []
+  })
 }
 
-export interface RecentStorageDocument {
-  id: string
-  kind: 'storage'
-  providerId: StorageProviderID
-  profileId?: string
-  containerId?: string
-  documentId: string
-  name: string
-  updatedAt: string
-}
-
-export type RecentDocument = RecentLocalDocument | RecentStorageDocument
-
-export const recentDocuments = useLocalStorage<RecentDocument[]>(RECENT_DOCUMENTS_STORAGE_KEY, [])
+export const recentDocuments = useLocalStorage<RecentDocument[]>(RECENT_DOCUMENTS_STORAGE_KEY, [], {
+  serializer: { read: readStoredRecentDocuments, write: (documents) => JSON.stringify(documents) }
+})
 
 function fileName(path: string): string {
   return basename(path) || path
@@ -66,36 +67,52 @@ export const recentLocalFilePaths = computed<string[]>(() =>
   )
 )
 
+/** Puts a document first; one already listed keeps the date it was first added. */
 function remember(document: RecentDocument): void {
+  const createdAt =
+    recentDocuments.value.find((recent) => recent.id === document.id)?.createdAt ??
+    document.createdAt
   recentDocuments.value = [
-    document,
+    { ...document, createdAt },
     ...normalizedRecentDocuments().filter((recent) => recent.id !== document.id)
   ].slice(0, recentFilesLimit.value)
 }
 
 export function rememberRecentFile(path: string): void {
+  const now = new Date().toISOString()
   remember({
     id: localDocumentId(path),
     kind: 'local',
     path,
     name: fileName(path),
-    updatedAt: new Date().toISOString()
+    updatedAt: now,
+    createdAt: now
   })
 }
 
 export function rememberRecentStorageDocument(binding: StorageDocumentBinding, name: string): void {
+  const now = new Date().toISOString()
   remember({
     id: storageDocumentId(binding),
     kind: 'storage',
     ...storageLocationOf(binding),
     documentId: binding.documentId,
     name,
-    updatedAt: new Date().toISOString()
+    updatedAt: now,
+    createdAt: now
   })
 }
 
 export function forgetRecentDocument(id: string): void {
-  recentDocuments.value = normalizedRecentDocuments().filter((document) => document.id !== id)
+  forgetRecentDocuments([id])
+}
+
+/** Removes documents from the recent files; the files themselves stay where they are. */
+export function forgetRecentDocuments(ids: Iterable<string>): void {
+  const forgotten = new Set(ids)
+  recentDocuments.value = normalizedRecentDocuments().filter(
+    (document) => !forgotten.has(document.id)
+  )
 }
 
 export function forgetRecentFile(path: string): void {

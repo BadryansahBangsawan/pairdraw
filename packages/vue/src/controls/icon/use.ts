@@ -1,8 +1,8 @@
 import { watchImmediate } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { computed, ref, shallowRef } from 'vue'
 
-import { iconColor } from '@open-pencil/core/icons'
-import { isIconModified, readIcon } from '@open-pencil/scene-graph/icons'
+import { iconColor, type IconOption } from '@open-pencil/core/icons'
+import { isIconModified, readIcon, type IconOptions } from '@open-pencil/scene-graph/icons'
 import type { Color } from '@open-pencil/scene-graph/primitives'
 
 import { useUndoBatch } from '#vue/controls/undo-batch/use'
@@ -10,7 +10,10 @@ import { useEditor } from '#vue/editor/context'
 import { useSelectionState } from '#vue/editor/selection-state/use'
 import { useSceneComputed } from '#vue/internal/scene-computed/use'
 
-/** Headless state and actions for the selected icon: its name and its color. */
+/**
+ * Headless state and actions for the selected icon: its name, its color, and, for a set drawn
+ * with options such as Material Symbols' axes, how it is drawn.
+ */
 export function useIcon() {
   const editor = useEditor()
   const { selectedNode } = useSelectionState()
@@ -30,10 +33,13 @@ export function useIcon() {
   const preview = ref<string | null>(null)
   /** The name of the set the icon comes from, such as Lucide, once the catalogue is in. */
   const setName = ref<string | null>(null)
+  /** How icons of the selected icon's set can be drawn, once the catalogue is in; none for most. */
+  const optionControls = shallowRef<readonly IconOption[]>([])
   watchImmediate(name, async (current) => {
     // The last icon's preview never stands in for the next one while it loads.
     preview.value = null
     setName.value = null
+    optionControls.value = []
     if (!current) return
     const prefix = current.slice(0, current.indexOf(':'))
     const [drawn, sets] = await Promise.all([
@@ -42,7 +48,18 @@ export function useIcon() {
     ])
     if (name.value !== current) return
     preview.value = drawn?.get(current) ?? null
-    setName.value = sets.find((info) => info.prefix === prefix)?.name ?? null
+    const set = sets.find((info) => info.prefix === prefix)
+    setName.value = set?.name ?? null
+    optionControls.value = set?.options ?? []
+  })
+
+  /** The options the selected icon was drawn with, each one its set's default where unset. */
+  const options = useSceneComputed((): IconOptions => {
+    const node = selectedNode.value
+    const drawn = node ? readIcon(node)?.options : undefined
+    return Object.fromEntries(
+      optionControls.value.map((option) => [option.key, drawn?.[option.key] ?? option.default])
+    )
   })
 
   /** The selected icon's layer, so a question asked about it can be dropped if it changes. */
@@ -78,6 +95,17 @@ export function useIcon() {
     await editor.swapIconGlyph(node.id, next)
   }
 
+  /**
+   * Draws the icon again with one option changed, as one step. Like a reset, it discards edits
+   * to the icon's paths, so the panel asks first when there are some.
+   */
+  async function setOption(key: string, value: number | string) {
+    const node = selectedNode.value
+    if (!node || !name.value || options.value[key] === value) return
+    batch.flush()
+    await editor.setIconOptions(node.id, { [key]: value })
+  }
+
   // A drag in the open color picker sends many colors; they undo as one step, committed when
   // the picker closes. A color typed in while it is closed is a step of its own.
   let picking = false
@@ -100,6 +128,9 @@ export function useIcon() {
     preview,
     setName,
     modified,
+    optionControls,
+    options,
+    setOption,
     swap,
     reset,
     detach,

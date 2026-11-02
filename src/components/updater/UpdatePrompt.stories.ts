@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, within } from 'storybook/test'
 
 import type { ReleaseInfo, UpdaterState } from '@/app/shell/updater/session'
 
@@ -106,5 +107,30 @@ export const UpToDate: Story = {
 }
 
 export const CheckFailed: Story = {
-  args: { state: { status: 'failed', step: 'check', error: 'network unreachable' } }
+  args: { state: { status: 'failed', step: 'check', error: 'network unreachable' } },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole('alert')).toHaveAttribute('data-tone', 'error')
+    await expect(canvas.getByRole('button', { name: 'Try Again' })).toBeVisible()
+  }
+}
+
+/**
+ * A build without an update feed, such as a local or fork build, or a copy unpacked from the
+ * Linux `.tar.gz`: a lasting fact shown as information, with nothing to retry.
+ */
+export const NotSetUp: Story = {
+  args: {
+    state: {
+      status: 'failed',
+      step: 'check',
+      error: 'Updater does not have any endpoints set.'
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const notice = canvas.getByText('Updates aren’t set up for this build of Pairdraw.')
+    await expect(notice.closest('[data-tone]')).toHaveAttribute('data-tone', 'info')
+    await expect(canvas.queryByRole('button', { name: 'Try Again' })).toBeNull()
+  }
 }

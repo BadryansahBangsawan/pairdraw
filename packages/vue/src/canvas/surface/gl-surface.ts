@@ -67,12 +67,18 @@ export function releaseWebGLContext(
   if (wasCurrent) park(ck)
 }
 
+/** The device pixels a canvas draws per CSS pixel: the display's, at most `maxPixelRatio`. */
+export function canvasPixelRatio(maxPixelRatio = Number.POSITIVE_INFINITY): number {
+  return Math.min(IS_BROWSER ? window.devicePixelRatio || 1 : 1, maxPixelRatio)
+}
+
 export function sizeCanvas(
   canvas: HTMLCanvasElement,
   editor: Editor,
-  onViewportResize?: (width: number, height: number) => void
+  onViewportResize?: (width: number, height: number) => void,
+  maxPixelRatio = Number.POSITIVE_INFINITY
 ) {
-  const dpr = IS_BROWSER ? window.devicePixelRatio || 1 : 1
+  const dpr = canvasPixelRatio(maxPixelRatio)
   const width = canvas.clientWidth
   const height = canvas.clientHeight
   canvas.width = width * dpr

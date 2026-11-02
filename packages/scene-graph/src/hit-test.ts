@@ -1,7 +1,8 @@
 import { hitsConnectorLine } from './connectors/hit'
-import { getWorldMatrix } from './coordinate'
+import { getAxisAlignedBoundsAt, getNodeLocalMatrix, getWorldMatrix } from './coordinate'
 import type { SceneGraph } from './graph'
-import Matrix from './matrix'
+import Matrix, { type Mat3 } from './matrix'
+import type { Rect } from './primitives'
 import type { SceneNode, NodeType } from './types'
 
 const CONTAINER_TYPES = new Set<NodeType>([
@@ -332,6 +333,79 @@ export function hitTestOpenContainer(
     node = node.parentId ? graph.nodes.get(node.parentId) : undefined
   }
   return deepest
+}
+
+function rectsTouch(a: Rect, b: Rect): boolean {
+  return a.x + a.width > b.x && a.x < b.x + b.width && a.y + a.height > b.y && a.y < b.y + b.height
+}
+
+function rectOverlap(a: Rect, b: Rect): Rect | null {
+  if (!rectsTouch(a, b)) return null
+  const x = Math.max(a.x, b.x)
+  const y = Math.max(a.y, b.y)
+  return {
+    x,
+    y,
+    width: Math.min(a.x + a.width, b.x + b.width) - x,
+    height: Math.min(a.y + a.height, b.y + b.height) - y
+  }
+}
+
+/**
+ * Whether a deep marquee touching a container, but none of its layers, selects it: where a deep
+ * click there would select it (a group's box, a painted container, the empty area a top-level frame
+ * with auto layout owns), except a board or section whose empty area a press treats as background.
+ */
+function selectsByOwnArea(graph: SceneGraph, node: SceneNode): boolean {
+  if (node.type === 'GROUP' || ownsItsEmptyArea(graph, node)) return true
+  return hasVisibleFillOrStroke(node) && !opensByItself(graph, node)
+}
+
+/**
+ * Collects the deepest layers among `parent`'s children that touch `rect`. Each child's world
+ * matrix is composed from its parent's, so a walk over a large page climbs no ancestor chains.
+ */
+function collectDeepestInRect(
+  graph: SceneGraph,
+  parent: SceneNode,
+  parentWorld: Mat3,
+  rect: Rect,
+  hits: SceneNode[]
+) {
+  // A clipping container draws nothing outside itself, so its layers meet only that part of the rect.
+  const area =
+    parent.clipsContent && parent.type !== 'CANVAS'
+      ? rectOverlap(rect, getAxisAlignedBoundsAt(parent, parentWorld))
+      : rect
+  if (!area) return
+  for (const childId of parent.childIds) {
+    const child = graph.nodes.get(childId)
+    if (!child || child.internalOnly || !child.visible || child.locked) continue
+    const world = Matrix.multiply(parentWorld, getNodeLocalMatrix(child))
+    const touches = rectsTouch(area, getAxisAlignedBoundsAt(child, world))
+    if (!CONTAINER_TYPES.has(child.type) || child.childIds.length === 0) {
+      if (touches) hits.push(child)
+      continue
+    }
+    const before = hits.length
+    collectDeepestInRect(graph, child, world, area, hits)
+    if (hits.length === before && touches && selectsByOwnArea(graph, child)) hits.push(child)
+  }
+}
+
+/**
+ * The deepest layers a deep (⌘) marquee over `rect` selects, as in Figma, by the rules a deep click
+ * follows: it looks into frames, groups, sections, components, component sets, and instances, keeps
+ * a boolean's operands inside it, and skips hidden, locked, and internal layers with their contents.
+ * A container is selected itself only where the rect touches its own area and none of its layers.
+ * Layers are compared by their axis-aligned canvas bounds, as a plain marquee compares them.
+ */
+export function hitTestDeepInRect(graph: SceneGraph, rect: Rect, scopeId: string): SceneNode[] {
+  const scope = graph.nodes.get(scopeId)
+  if (!scope) return []
+  const hits: SceneNode[] = []
+  collectDeepestInRect(graph, scope, getWorldMatrix(scope, graph), rect, hits)
+  return hits
 }
 
 /** Whether the point lies inside the node's rotated and flipped bounds. */

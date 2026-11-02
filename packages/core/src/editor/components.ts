@@ -8,6 +8,7 @@ import { createComponentInstanceActions } from './components/instances'
 import { createComponentPropertyActions } from './components/properties'
 import { createSlotActions } from './components/slots'
 import { createSlotAuthoringActions } from './components/slots/authoring'
+import { createComponentToFrameActions } from './components/to-frame'
 import { applyVariantProperties, variantSetProps } from './components/variant-set'
 import { createVariantActions } from './components/variants'
 import type { EditorContext } from './types'
@@ -90,6 +91,7 @@ export function createComponentActions(ctx: EditorContext) {
     ...createSlotActions(ctx),
     ...createComponentAuthoringActions(ctx),
     ...createSlotAuthoringActions(ctx),
+    ...createComponentToFrameActions(ctx),
     ...createBehaviourActions(ctx, variantActions)
   }
 }

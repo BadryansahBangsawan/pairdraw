@@ -43,7 +43,7 @@ Each page has its own canvas and viewport state.
 
 ## Documents and Recovery
 
-The Home workspace lists recent local documents and documents from configured storage providers. Use grid or list view, or open multiple selected files into separate editor tabs.
+The Home workspace lists recent local documents and documents from configured storage providers. Use grid or list view, and sort recent files by **Name**, **Last used**, or **Created**. <kbd>⌘</kbd>/<kbd>Ctrl</kbd>-click adds a file to the selection, <kbd>Shift</kbd>-click selects a range, and <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+<kbd>A</kbd> selects every listed file; the selection bar then opens them in separate editor tabs, removes them from Recents, or deletes stored documents. A file's <kbd>⋯</kbd> menu or right-click menu offers **Remove from Recents**, which forgets the file without deleting it, and **Save As…**, which saves a copy elsewhere. **Design systems** lists the component libraries you have published; picking one opens a new design with that library turned on in the Assets panel.
 
 In **Settings → General → Recovery**, **Automatically preserve unsaved work** controls local recovery copies. With recovery enabled, unsaved documents without a file path remain recoverable even after their tabs close. When OpenPencil offers **Recover unsaved work**, choose **Restore** to reopen a document or **Discard** to remove its recovery copy.
 

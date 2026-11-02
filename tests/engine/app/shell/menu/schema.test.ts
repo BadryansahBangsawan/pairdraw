@@ -58,8 +58,28 @@ describe('APP_MENU_SCHEMA', () => {
       'theme-auto',
       'snap-geometry',
       'snap-objects',
-      'snap-pixel-grid'
+      'snap-pixel-grid',
+      'check-updates'
     ])
+  })
+
+  // Windows and Linux have no application menu, so their Help menu holds what macOS keeps there.
+  test('gives the desktop app a Help menu with Check for Updates and About', () => {
+    const help = APP_MENU_SCHEMA.find((group) => group.label === 'Help')
+    expect(help).toMatchObject({ target: 'native' })
+    const ids = (help ? actionItems(help.items) : []).map((entry) =>
+      'type' in entry ? '' : entry.id
+    )
+    expect(ids).toEqual(['check-updates', 'about'])
+  })
+
+  test('places images and exports frames to PDF from the File menu', () => {
+    const fileMenu = APP_MENU_SCHEMA.find((group) => group.label === 'File')
+    const ids = (fileMenu ? actionItems(fileMenu.items) : []).map((entry) =>
+      'type' in entry ? '' : entry.id
+    )
+    expect(ids).toContain('place-image')
+    expect(ids).toContain('export-pdf')
   })
 
   // As in Figma, files are browsed on Home and in a New tab, so the File menu creates and saves.

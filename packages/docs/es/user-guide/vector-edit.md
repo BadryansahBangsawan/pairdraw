@@ -31,6 +31,15 @@ Pulsa <kbd>Delete</kbd> o <kbd>Backspace</kbd> para eliminar los puntos seleccio
 
 Haz clic en un segmento para seleccionarlo. Arrástralo para curvarlo; OpenPencil crea los tiradores necesarios. Haz doble clic para añadir un punto.
 
+## Cortar, unir y remodelar
+
+- <kbd>X</kbd> activa la herramienta Cortar. Haz clic en un segmento para cortarlo en ese lugar, o en un punto para separar los segmentos que se unen en él. <kbd>X</kbd>, <kbd>Escape</kbd> u otra tecla de herramienta la desactivan.
+- Haz doble clic en un punto para alternar entre punto suave y esquina.
+- <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + doble clic en un segmento quita sus tiradores y lo endereza.
+- <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>J</kbd> une dos extremos seleccionados: si están en el mismo lugar se convierten en un punto; si no, se unen con un segmento recto. Unir los dos extremos de una ruta la cierra y la rellena. Mientras editas una ruta, este atajo no abre el chat.
+- <kbd>Option</kbd>/<kbd>Alt</kbd> + arrastrar arrastra una copia de los puntos o segmentos seleccionados. La copia de un punto aislado queda unida a él.
+- Las teclas de flecha mueven los puntos seleccionados la distancia de Ajustes → Editor, y con <kbd>Shift</kbd> la distancia grande.
+
 ## Continuar rutas abiertas
 
 Selecciona un extremo y usa Pluma para prolongar la ruta. Puedes cerrar la forma haciendo clic en el extremo opuesto.

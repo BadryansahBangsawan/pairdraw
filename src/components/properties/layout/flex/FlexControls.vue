@@ -10,6 +10,7 @@ import AppSelect from '@/components/ui/select/AppSelect.vue'
 import LayoutAlignmentControl from '../alignment/LayoutAlignmentControl.vue'
 import ClipContentControl from '../ClipContentControl.vue'
 import PaddingControls from '../padding/PaddingControls.vue'
+import StrokesInLayoutControl from '../StrokesInLayoutControl.vue'
 import FlexGapField from './FlexGapField.vue'
 
 const ctx = useLayoutControlsContext()
@@ -65,4 +66,5 @@ const alignmentCells = computed(() => {
   </div>
   <PaddingControls />
   <ClipContentControl />
+  <StrokesInLayoutControl />
 </template>

@@ -19,8 +19,24 @@ const PROVIDER_KEYS: Partial<Record<AIProviderID, readonly string[]>> = {
   google: ['google'],
   deepseek: ['deepseek'],
   zai: ['zhipuai'],
-  minimax: ['minimax']
+  minimax: ['minimax'],
+  xai: ['xai'],
+  meta: ['meta'],
+  'kimi-for-coding': ['kimi-code-plan-global'],
+  moonshot: ['moonshotai'],
+  together: ['togetherai'],
+  fireworks: ['fireworks-ai'],
+  'opencode-zen': ['opencode'],
+  'opencode-go': ['opencode-go']
 }
+
+/**
+ * OpenCode serves some models only through Anthropic's, Google's, or OpenAI's own APIs, named by
+ * the model's `provider.npm` in models.dev. Its presets speak the chat completions API, so they
+ * list only the models that endpoint serves.
+ */
+const CHAT_COMPLETIONS_ONLY = new Set<AIProviderID>(['opencode-zen', 'opencode-go'])
+const CHAT_COMPLETIONS_PACKAGE = '@ai-sdk/openai-compatible'
 
 type ModelsDevModel = {
   id?: unknown
@@ -31,6 +47,8 @@ type ModelsDevModel = {
   release_date?: unknown
   modalities?: { output?: unknown }
   limit?: { output?: unknown }
+  /** Overrides the provider's API for this model, such as `{ npm: '@ai-sdk/anthropic' }`. */
+  provider?: { npm?: unknown }
 }
 
 type ModelsDevProvider = {
@@ -47,7 +65,8 @@ const modelsDevCatalogSchema = v.record(
         v.string(),
         v.looseObject({
           modalities: v.optional(v.looseObject({ output: v.optional(v.unknown()) })),
-          limit: v.optional(v.looseObject({ output: v.optional(v.unknown()) }))
+          limit: v.optional(v.looseObject({ output: v.optional(v.unknown()) })),
+          provider: v.optional(v.looseObject({ npm: v.optional(v.unknown()) }))
         })
       )
     )
@@ -105,6 +124,13 @@ function curatedProviderModels(providerID: AIProviderID): ModelOption[] {
   return AI_PROVIDERS.find((provider) => provider.id === providerID)?.models ?? []
 }
 
+/** Whether the preset's API reaches the model: OpenCode's chat presets reach only chat models. */
+function reachable(providerID: AIProviderID, model: ModelsDevModel): boolean {
+  if (!CHAT_COMPLETIONS_ONLY.has(providerID)) return true
+  const sdk = model.provider?.npm
+  return sdk === undefined || sdk === CHAT_COMPLETIONS_PACKAGE
+}
+
 function supportsDesignWork(model: ModelsDevModel): boolean {
   if (model.tool_call !== true || model.status === 'deprecated') return false
   const outputModalities = model.modalities?.output
@@ -152,7 +178,7 @@ export async function listCatalogModels(
 
   const models = providerKeys.flatMap((providerKey) =>
     Object.entries(catalog[providerKey]?.models ?? {})
-      .filter(([, model]) => supportsDesignWork(model))
+      .filter(([, model]) => supportsDesignWork(model) && reachable(providerID, model))
       .map(([id, model]) => normalizeModel(id, model))
   )
   return models.length ? mergeCuratedModels(curated, models) : curated
@@ -172,7 +198,7 @@ export async function resolveModelsDevModel(
     const models = catalog[providerKey]?.models
     for (const candidate of modelIDCandidates(providerKey, modelID)) {
       const matched = models?.[candidate]
-      if (matched) return normalizeModel(modelID, matched)
+      if (matched && reachable(providerID, matched)) return normalizeModel(modelID, matched)
     }
   }
   return null

@@ -14,11 +14,13 @@ import { appPreferences } from '@/app/settings/preferences/store'
 import { useActionToast } from '@/app/shell/toast/action'
 import InsertIconButton from '@/components/icon-picker/InsertIconButton.vue'
 import { toolIcons } from '@/components/icons'
+import ShortcutSheetButton from '@/components/shortcuts/ShortcutSheetButton.vue'
 import { useToolbarActions } from '@/components/toolbar/actions'
 import DesktopToolbar from '@/components/toolbar/DesktopToolbar.vue'
 import { useToolLabels } from '@/components/toolbar/labels'
 import MobileToolbar from '@/components/toolbar/MobileToolbar.vue'
 import ToolbarContextMenu from '@/components/toolbar/ToolbarContextMenu.vue'
+import ToolbarPlaceImageButton from '@/components/toolbar/ToolbarPlaceImageButton.vue'
 import type { ToolbarActionItem } from '@/components/toolbar/types'
 import { useMenuUI } from '@/components/ui/menu/menu'
 
@@ -84,11 +86,15 @@ function onActionTap(item: ToolbarActionItem) {
       >
         <template #action="{ action }">
           <InsertIconButton v-if="action === 'insert-icon'" :ui="toolbarUI" />
+          <ToolbarPlaceImageButton v-else-if="action === 'place-image'" :ui="toolbarUI" />
         </template>
         <template #hidden>
           <template v-for="action in hiddenActions" :key="action">
             <InsertIconButton v-if="action === 'insert-icon'" anchored />
           </template>
+        </template>
+        <template #end>
+          <ShortcutSheetButton :ui="toolbarUI" />
         </template>
       </DesktopToolbar>
 
@@ -115,6 +121,7 @@ function onActionTap(item: ToolbarActionItem) {
         <template #end>
           <template v-for="action in actionItems" :key="action">
             <InsertIconButton v-if="action === 'insert-icon'" mobile :ui="toolbarUI" />
+            <ToolbarPlaceImageButton v-else-if="action === 'place-image'" mobile :ui="toolbarUI" />
           </template>
           <template v-for="action in hiddenActions" :key="action">
             <InsertIconButton v-if="action === 'insert-icon'" anchored />

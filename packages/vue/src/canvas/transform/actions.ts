@@ -28,8 +28,8 @@ export function createTransformInputActions(editor: Editor, setDrag: SetDrag) {
     handleTextSelectMoveAction(editor, cx, cy)
   }
 
-  function handleMarqueeMove(d: DragMarquee, cx: number, cy: number) {
-    handleMarqueeMoveAction(editor, d, cx, cy)
+  function handleMarqueeMove(d: DragMarquee, cx: number, cy: number, deep = false) {
+    handleMarqueeMoveAction(editor, d, cx, cy, deep)
   }
 
   return {

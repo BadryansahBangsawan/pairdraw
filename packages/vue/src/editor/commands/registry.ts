@@ -37,7 +37,9 @@ export const EDITOR_COMMAND_METADATA = {
     keybinding: '$mod+Alt+KeyK',
     contextTestId: 'context-create-component'
   },
-  'selection.createComponentSet': { shortcut: 'MOD+SHIFT+K', keybinding: '$mod+Shift+KeyK' },
+  'selection.convertToFrame': { contextTestId: 'context-convert-to-frame' },
+  // ⇧⌘K is File › Place Image…, as in Figma, which gives Combine as variants no key.
+  'selection.createComponentSet': {},
   'selection.detachInstance': { shortcut: 'MOD+ALT+B', keybinding: '$mod+Alt+KeyB' },
   'selection.detachIcon': {},
   'selection.goToMainComponent': {},

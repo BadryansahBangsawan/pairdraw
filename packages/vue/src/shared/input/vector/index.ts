@@ -36,6 +36,8 @@ type NodeEditEditor = Partial<{
   penResumeFromEndpoint: (nodeId: string, endpointVertexIndex: number) => void
   penStartPiece: (nodeId: string, point: Vector) => void
   nodeEditAddVertex: (cx: number, cy: number) => boolean
+  nodeEditCutAt: (cx: number, cy: number) => boolean
+  nodeEditDuplicateSelection: () => Map<number, number> | null
   nodeEditPushHistory: () => void
   nodeEditSetHandle: (
     segmentIndex: number,
@@ -60,6 +62,13 @@ export function handleNodeEditDown(
   if (!es) return
   const nodeEditEditor = editor as Editor & NodeEditEditor
 
+  // The cut tool cuts what the primary button presses, and drags nothing; another button, such as
+  // the one that opens the context menu, cuts nothing.
+  if (es.cutTool) {
+    if (e.button === 0) nodeEditEditor.nodeEditCutAt?.(cx, cy)
+    return
+  }
+
   const handleHit = hitTestEditHandle(editor, cx, cy)
   const ri = handleHit ? null : hitTestEditRegion(editor, cx, cy)
   if (!e.shiftKey && !pressesPickedRegion(es, ri)) es.selectedRegions = new Set()
@@ -75,35 +84,13 @@ export function handleNodeEditDown(
   if (ri !== null) {
     const click = pickRegion(es, ri, e.shiftKey)
     editor.requestRepaint()
-    startPointsDrag(es, regionPoints(es, ri), cx, cy, nodeEditEditor, setDrag, click)
+    startPointsDrag(es, regionPoints(es, ri), cx, cy, nodeEditEditor, setDrag, click, e.altKey)
     return
   }
 
   const vi = hitTestEditVertex(editor, cx, cy)
   if (vi !== null) {
-    if (!e.shiftKey) es.selectedHandles = new Set()
-
-    if (e.metaKey || e.ctrlKey) {
-      nodeEditEditor.nodeEditSelectVertex?.(vi, false)
-      nodeEditEditor.nodeEditPushHistory?.()
-      setDrag({
-        type: 'bend-handle',
-        vertexIndex: vi,
-        startX: es.vertices[vi].x,
-        startY: es.vertices[vi].y,
-        lockedMode: null,
-        dragSamples: [],
-        targetSegmentIndex: null,
-        targetTangentField: null
-      })
-      return
-    }
-
-    if (!(es.selectedVertexIndices.has(vi) && !e.shiftKey)) {
-      nodeEditEditor.nodeEditSelectVertex?.(vi, e.shiftKey)
-    }
-
-    startPointsDrag(es, [vi], cx, cy, nodeEditEditor, setDrag)
+    pressVertex(e, es, vi, cx, cy, nodeEditEditor, setDrag)
     return
   }
 
@@ -115,7 +102,7 @@ export function handleNodeEditDown(
     const click = selectPressedSegment(es, si, e.shiftKey)
     editor.requestRepaint()
     const { start, end } = es.segments[si]
-    startPointsDrag(es, [start, end], cx, cy, nodeEditEditor, setDrag, click)
+    startPointsDrag(es, [start, end], cx, cy, nodeEditEditor, setDrag, click, e.altKey)
     return
   }
 
@@ -127,6 +114,44 @@ export function handleNodeEditDown(
     baseSelection: e.shiftKey ? new Set(es.selectedVertexIndices) : new Set(),
     baseSegments: e.shiftKey ? new Set(es.selectedSegmentIndices) : new Set()
   })
+}
+
+/**
+ * A press on a point: ⌘/Ctrl starts pulling handles out of it, anything else selects it and
+ * starts dragging the selection, or with ⌥/Alt a copy of it.
+ */
+function pressVertex(
+  e: MouseEvent,
+  es: NodeEditState,
+  vi: number,
+  cx: number,
+  cy: number,
+  nodeEditEditor: NodeEditEditor,
+  setDrag: (d: DragState) => void
+) {
+  if (!e.shiftKey) es.selectedHandles = new Set()
+
+  if (e.metaKey || e.ctrlKey) {
+    nodeEditEditor.nodeEditSelectVertex?.(vi, false)
+    nodeEditEditor.nodeEditPushHistory?.()
+    setDrag({
+      type: 'bend-handle',
+      vertexIndex: vi,
+      startX: es.vertices[vi].x,
+      startY: es.vertices[vi].y,
+      lockedMode: null,
+      dragSamples: [],
+      targetSegmentIndex: null,
+      targetTangentField: null
+    })
+    return
+  }
+
+  if (!(es.selectedVertexIndices.has(vi) && !e.shiftKey)) {
+    nodeEditEditor.nodeEditSelectVertex?.(vi, e.shiftKey)
+  }
+
+  startPointsDrag(es, [vi], cx, cy, nodeEditEditor, setDrag, undefined, e.altKey)
 }
 
 /**
@@ -228,6 +253,7 @@ function pickRegion(es: NodeEditState, regionIndex: number, add: boolean): DragE
 /**
  * Drags the selected points and segments, and `pressed` with them, from where the pointer went
  * down. `click` is what a release without a drag does to the selected part that was pressed.
+ * `duplicate` (⌥/Alt held) drags copies of the selection instead, as in Figma.
  */
 function startPointsDrag(
   es: NodeEditState,
@@ -236,7 +262,8 @@ function startPointsDrag(
   cy: number,
   nodeEditEditor: NodeEditEditor,
   setDrag: (d: DragState) => void,
-  click?: DragEditNode['click']
+  click?: DragEditNode['click'],
+  duplicate = false
 ) {
   const segmentEnds = [...es.selectedSegmentIndices].flatMap((index) => {
     const segment = es.segments.at(index)
@@ -247,7 +274,29 @@ function startPointsDrag(
     origPositions.set(index, { x: es.vertices[index].x, y: es.vertices[index].y })
   }
   nodeEditEditor.nodeEditPushHistory?.()
-  setDrag({ type: 'edit-node', startX: cx, startY: cy, origPositions, click })
+  setDrag({ type: 'edit-node', startX: cx, startY: cy, origPositions, click, duplicate })
+}
+
+/**
+ * Copies the selection once an ⌥/Alt drag leaves the drag threshold, and points the drag at the
+ * copies. False while the pointer is still within the threshold, when nothing should move.
+ */
+function duplicateDraggedPoints(d: DragEditNode, dx: number, dy: number, editor: Editor): boolean {
+  if (!d.duplicate) return true
+  const zoom = editor.state.zoom
+  if (!isPastPointerDragThreshold(0, 0, dx * zoom, dy * zoom)) return false
+  d.duplicate = false
+  const copies = (editor as Editor & NodeEditEditor).nodeEditDuplicateSelection?.()
+  if (!copies) return true
+  const origPositions = new Map<number, Vector>()
+  for (const [index, position] of d.origPositions) {
+    const copy = copies.get(index)
+    if (copy !== undefined) origPositions.set(copy, position)
+  }
+  d.origPositions = origPositions
+  // The copies are what moves; a release then has no part of the original to click.
+  d.click = undefined
+  return true
 }
 
 /**
@@ -382,6 +431,7 @@ export function handleNodeEditMove(
     const unsnappedDy = cy - d.startY
     const es = getNodeEditState(editor)
     if (!es) return
+    if (!duplicateDraggedPoints(d, unsnappedDx, unsnappedDy, editor)) return
     let snapped = { x: unsnappedDx, y: unsnappedDy }
     if (disableSnapping) editor.setSnapGuides([])
     else snapped = applyNodeEditSnap(d, unsnappedDx, unsnappedDy, editor, es)

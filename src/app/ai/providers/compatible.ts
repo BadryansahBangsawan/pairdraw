@@ -14,6 +14,8 @@ export type CompatibleEndpoint = string | ((config: ModelConfig) => string)
 type OpenAICompatibleOptions = {
   baseURL?: CompatibleEndpoint
   mode?: 'default' | 'chat' | 'configurable'
+  /** Extra headers for each model the adapter creates, made once per model. */
+  headers?: () => Record<string, string>
 }
 
 type AnthropicCompatibleOptions = {
@@ -32,7 +34,8 @@ export function createOpenAICompatibleAdapter(
       const provider = createOpenAI({
         apiKey: config.apiKey,
         baseURL: resolveEndpoint(options.baseURL, config),
-        fetch: runtime.fetch
+        fetch: runtime.fetch,
+        headers: options.headers?.()
       })
       const modelID = config.customModelID.trim() || config.modelID
       if (options.mode === 'chat') return provider.chat(modelID)

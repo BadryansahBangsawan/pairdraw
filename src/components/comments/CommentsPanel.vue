@@ -19,6 +19,8 @@ import { computed } from 'vue'
 import { commentThreadNumbers, listCommentThreads } from '@open-pencil/scene-graph/comments'
 import { useCommentMessages } from '@open-pencil/vue/i18n'
 
+import { commentThreadsPrompt, openCommentThreads } from '@/app/ai/chat/entry/comments'
+import { acceptsDocumentPrompts, runPromptInDocument } from '@/app/ai/chat/entry/run'
 import { useComments } from '@/app/comments/use'
 import { useEditorStore } from '@/app/editor/active-store'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -62,6 +64,15 @@ function pageName(pageId: string, fallback?: string) {
   return store.graph.getNode(pageId)?.name ?? fallback ?? ''
 }
 
+/** The listed threads still open, which Apply with AI hands to the chat together. */
+const openListed = computed(() => openCommentThreads(listed.value))
+const appliesWithAI = computed(() => acceptsDocumentPrompts(store))
+
+async function applyOpenWithAI() {
+  const prompt = commentThreadsPrompt(store.graph, openListed.value)
+  if (prompt) await runPromptInDocument(store, prompt)
+}
+
 function setSort(value: unknown) {
   if (value === 'newest' || value === 'oldest') listSort.value = value
 }
@@ -73,6 +84,15 @@ function setSort(value: unknown) {
       <template #icon><icon-lucide-messages-square class="size-3.5" /></template>
       {{ messages.comments }}
       <template #actions>
+        <IconButton
+          v-if="appliesWithAI"
+          :label="messages.applyOpenWithAI"
+          :disabled="openListed.length === 0"
+          data-command="comments-apply-open-with-ai"
+          @click="applyOpenWithAI"
+        >
+          <icon-lucide-sparkles class="size-3.5" />
+        </IconButton>
         <DropdownMenuRoot :modal="false">
           <DropdownMenuTrigger as-child>
             <IconButton :label="messages.filterAndSort" :active="filtered">

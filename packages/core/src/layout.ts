@@ -4,7 +4,6 @@ import {
   Display,
   FlexDirection,
   Gutter,
-  Edge,
   MeasureMode,
   Overflow,
   Wrap,
@@ -41,6 +40,7 @@ import { isGeneratedFrame } from '@open-pencil/scene-graph/generated'
 import { layoutSizing } from '@open-pencil/scene-graph/layout'
 
 import { fitShapeWithTextFrame } from './layout/shape-with-text'
+import { applyContentInsets, applyStrokeMargins, strokeRoom } from './layout/strokes'
 import { estimateTextSize, getTextMeasurer, measureTextForLayout } from './layout/text-measurement'
 import {
   applyMinMaxConstraints,
@@ -201,6 +201,7 @@ function buildYogaTree(
     } else {
       configureChildAsLeaf(yogaChild, child, frame, graph)
     }
+    applyStrokeMargins(yogaChild, child, frame)
 
     root.insertChild(yogaChild, root.getChildCount())
   }
@@ -226,10 +227,7 @@ function configureFlexContainer(
     yogaNode.setAlignContent(Align.SpaceBetween)
   }
 
-  yogaNode.setPadding(Edge.Top, node.paddingTop)
-  yogaNode.setPadding(Edge.Right, node.paddingRight)
-  yogaNode.setPadding(Edge.Bottom, node.paddingBottom)
-  yogaNode.setPadding(Edge.Left, node.paddingLeft)
+  applyContentInsets(yogaNode, node)
 
   // Space between takes the place of the gap in Figma's auto layout. A generated frame keeps it
   // as the least space between its sublayers, as a sticky note keeps its author clear of a long body.
@@ -268,10 +266,7 @@ function configureChildAsGrid(
   yogaChild.setGap(Gutter.Column, child.gridColumnGap)
   yogaChild.setGap(Gutter.Row, child.gridRowGap)
 
-  yogaChild.setPadding(Edge.Top, child.paddingTop)
-  yogaChild.setPadding(Edge.Right, child.paddingRight)
-  yogaChild.setPadding(Edge.Bottom, child.paddingBottom)
-  yogaChild.setPadding(Edge.Left, child.paddingLeft)
+  applyContentInsets(yogaChild, child)
 
   const isParentRow = parent.layoutMode === 'HORIZONTAL'
   const selfOverride = child.layoutAlignSelf !== 'AUTO'
@@ -310,26 +305,28 @@ function configureChildAsGrid(
       configureAbsoluteChild(yogaGC, gc)
       yogaChild.insertChild(yogaGC, yogaChild.getChildCount())
     } else {
-      yogaChild.insertChild(createGridChildNode(graph, gc), yogaChild.getChildCount())
+      const yogaGC = createGridChildNode(graph, gc)
+      applyStrokeMargins(yogaGC, gc, child)
+      yogaChild.insertChild(yogaGC, yogaChild.getChildCount())
     }
   }
 }
 
 function sizesFitParent(
   parent: SceneNode,
-  childCount: number,
+  children: readonly SceneNode[],
   sizes: Array<number | undefined>,
   axis: 'width' | 'height'
 ): boolean {
   if (sizes.some((size) => size === undefined)) return false
   const padding =
-    axis === 'width'
+    (axis === 'width'
       ? parent.paddingLeft + parent.paddingRight
-      : parent.paddingTop + parent.paddingBottom
+      : parent.paddingTop + parent.paddingBottom) + strokeRoom(parent, children, axis)
   const gap =
     parent.primaryAxisAlign === 'SPACE_BETWEEN'
       ? 0
-      : parent.itemSpacing * Math.max(0, childCount - 1)
+      : parent.itemSpacing * Math.max(0, children.length - 1)
   const available = axis === 'width' ? parent.width : parent.height
   const total = sizes.reduce<number>((sum, size) => sum + (size ?? 0), padding + gap)
   return Math.abs(total - available) < 0.001
@@ -348,10 +345,7 @@ function derivedMainAxisFitsParent(
   if (children.length === 0) return false
 
   const sizes = children.map((candidate) => candidate.derivedLayout?.[axis])
-  return (
-    sizesFitParent(parent, children.length, sizes, axis) &&
-    child.derivedLayout?.[axis] !== undefined
-  )
+  return sizesFitParent(parent, children, sizes, axis) && child.derivedLayout?.[axis] !== undefined
 }
 
 function configureAutoLayoutChildSizing(
@@ -428,6 +422,7 @@ function configureChildAsAutoLayout(
     } else {
       configureChildAsLeaf(yogaGC, gc, child, graph)
     }
+    applyStrokeMargins(yogaGC, gc, child)
     yogaChild.insertChild(yogaGC, yogaChild.getChildCount())
   }
 }
@@ -448,7 +443,7 @@ function derivedGrowingLeafFitsParent(
     if (candidate.layoutGrow > 0) return candidate.derivedLayout?.[axis]
     return axis === 'width' ? candidate.width : candidate.height
   })
-  return sizesFitParent(parent, children.length, sizes, axis)
+  return sizesFitParent(parent, children, sizes, axis)
 }
 
 /**

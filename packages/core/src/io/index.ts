@@ -35,6 +35,7 @@ export type {
   ExportAsset,
   ExportResult,
   HTMLExportOptions,
+  PDFFormatExportOptions,
   IOContext,
   FigWriteOptions,
   RasterExportOptions,

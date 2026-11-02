@@ -113,6 +113,28 @@ export const aiMessageDefaults = {
   viewAttachment: params('View attachment {name}'),
   attachmentPreview: 'Attachment preview',
   closeAttachmentPreview: 'Close attachment preview',
+  attachFiles: 'Attach images or files',
+  removeFileAttachment: params('Remove file {name}'),
+  dropFilesToAttach: 'Drop images or files to attach',
+  dropFilesAfterReply: 'Attach files after the reply',
+  dropFilesLimit: params('Up to {count} files per message'),
+  fileAttachmentUnsupported: params(
+    '{name} can’t be attached. Attach images, or text files such as Markdown, CSS, or code.'
+  ),
+  fileAttachmentTooLarge: params('{name} is too large. Text files can be up to {size} KB.'),
+  fileAttachmentNotText: params('{name} isn’t a text file.'),
+  fileAttachmentLimit: params('{name} wasn’t attached: up to {count} files per message.'),
+  fileAttachmentDetails: params('{type} · {size} KB'),
+  revealLocalFile: params('Show {path} in its folder'),
+  revealLocalFileFailed: params('Couldn’t show {path}. It may have been moved or deleted.'),
+  switchProfileHeading: params('Switch to {name}?'),
+  switchProfileDescription: params(
+    '{name} won’t see the messages above. A coding agent keeps a conversation in its own session, so it isn’t carried across a switch. Start a new chat to keep this one as it is.'
+  ),
+  switchProfileAgentSessionDescription: params(
+    '{name} will see the messages above, but not what the agent’s own session held, such as the files it read and its tool results.'
+  ),
+  switchProfileConfirm: 'Switch',
   mentionSelection: 'Mention the selected layers',
   thinking: 'Thinking…',
   reasoning: 'Reasoning',
@@ -160,6 +182,29 @@ export const aiMessageDefaults = {
   canvasPromptTitle: 'Start with a prompt',
   canvasPromptDescription: 'Describe what to design, and the AI agent builds it on this page.',
   canvasPromptClose: 'Hide prompt',
+  /** Example prompts under Home's and the empty page's prompt; picking one fills the field. */
+  promptExamples: 'Examples',
+  promptExampleLanding: 'Landing page',
+  promptExampleLandingPrompt:
+    'A landing page for a coffee subscription with a hero, three plan cards, testimonials, and a footer',
+  promptExampleSignIn: 'Sign-in screen',
+  promptExampleSignInPrompt:
+    'A mobile sign-in screen for a banking app with email and password fields, a Face ID button, and a sign-up link',
+  promptExampleDashboard: 'Dashboard',
+  promptExampleDashboardPrompt:
+    'An analytics dashboard with a sidebar, four KPI cards, a revenue line chart, and a table of recent orders',
+  promptExamplePricing: 'Pricing',
+  promptExamplePricingPrompt:
+    'A pricing section with three plans, a monthly and yearly switch, and the recommended plan highlighted',
+  /** After a sticky note's text sent as a prompt; `note` is a reference to the note. */
+  stickyPromptSource: params('From the sticky note {note}'),
+  /** What the chat is asked when comment threads are applied with AI; the threads follow. */
+  commentPromptApply:
+    'Apply the feedback in this comment thread, then reply to it with what you changed and resolve it.',
+  commentPromptApplyAll:
+    'Apply the feedback in these comment threads, then reply to each with what you changed and resolve it.',
+  commentPromptThread: params('Thread {id}'),
+  commentPromptThreadOnLayer: params('Thread {id} on {layer}'),
   canvasPrompt: 'Prompt on empty pages',
   canvasPromptHint:
     'Offer a prompt over an empty page that starts the chat with a description of what to design.',
@@ -196,6 +241,7 @@ export const aiMessageDefaults = {
   modelInstalled: 'Installed',
   modelSignedOut: 'Signed out',
   modelToolsUnreachable: 'Tools unreachable',
+  modelExternalConfig: 'External config',
   thinkingLevel: 'Thinking level',
   thinkingLevelDescription:
     'How much the model reasons before answering. You can change it for each message in the chat.',
@@ -353,6 +399,7 @@ export const aiMessageDefaults = {
   aiSetupDetectSignedOut: 'Found · not signed in',
   aiSetupDetectSignedIn: 'Signed in',
   aiSetupDetectSignedInAs: params('Signed in · {account}'),
+  aiSetupDetectExternalConfig: params('External config · {cloud}'),
   aiSetupAgentAccount: 'Account',
   aiSetupAgentAccountChecking: 'checking…',
   aiSetupAgentAccountUnknown: 'couldn’t check',

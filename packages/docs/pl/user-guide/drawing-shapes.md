@@ -17,6 +17,12 @@ Dolny pasek narzędzi zawiera narzędzia do tworzenia kształtów, ramek i sekcj
 | Ramka | <kbd>F</kbd> | Kontener na inne obiekty |
 | Sekcja | <kbd>Shift</kbd> + <kbd>S</kbd> | Kontener najwyższego poziomu przejmujący przecinające się obiekty |
 
+## Umieszczanie obrazów
+
+Wybierz **Plik › Umieść obraz…** (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd> lub <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>K</kbd> w systemach Windows i Linux) albo kliknij przycisk obrazu na pasku narzędzi i wskaż pliki PNG, JPEG, WebP, GIF, AVIF lub SVG. Pojawią się zaznaczone na środku widoku jako jeden krok, który można cofnąć; plik SVG staje się edytowalnymi warstwami.
+
+Narzędzie **Karteczka** jest na pasku narzędzi zaraz po narzędziu Tekst. Nie ma klawisza, więc <kbd>N</kbd> nadal przybliża do następnej ramki.
+
 ## Dodatkowe kształty
 
 W rozwijanym menu dostępne są:

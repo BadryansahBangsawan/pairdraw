@@ -5,11 +5,14 @@ import { isTauri } from '@/app/tauri/env'
 export const DESIGN_ISSUES_MENU_ID = 'view-design-issues'
 export const COMMENTS_MENU_ID = 'view-comments'
 
+/** The snapping choices the native View menu checks; half-pixel snapping lives in Settings. */
+type NativeSnappingPreference = Exclude<keyof SnappingPreferences, 'halfPixel'>
+
 const SNAPPING_MENU_IDS = {
   geometry: 'snap-geometry',
   objects: 'snap-objects',
   pixelGrid: 'snap-pixel-grid'
-} satisfies Record<keyof SnappingPreferences, string>
+} satisfies Record<NativeSnappingPreference, string>
 
 export async function syncNativeSnappingMenu(preferences: SnappingPreferences): Promise<void> {
   if (!isTauri()) return
@@ -18,7 +21,7 @@ export async function syncNativeSnappingMenu(preferences: SnappingPreferences): 
     Object.entries(SNAPPING_MENU_IDS).map(([preference, id]) =>
       invoke('set_native_menu_checked', {
         id,
-        checked: preferences[preference as keyof SnappingPreferences]
+        checked: preferences[preference as NativeSnappingPreference]
       })
     )
   )

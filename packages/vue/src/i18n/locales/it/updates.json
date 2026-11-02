@@ -21,5 +21,6 @@
   "installFailed": "Impossibile installare l’aggiornamento: {error}",
   "restartFailed": "Impossibile riavviare Pairdraw: {error}",
   "unavailable": "Gli aggiornamenti non sono ancora disponibili. Pubblica prima una release firmata con latest.json.",
+  "notConfigured": "Gli aggiornamenti non sono configurati per questa build di Pairdraw.",
   "checkFailed": "Impossibile controllare gli aggiornamenti: {error}"
 }

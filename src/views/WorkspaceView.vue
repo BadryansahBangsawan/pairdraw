@@ -50,6 +50,7 @@ import HomeWorkspace from '@/components/home/HomeWorkspace.vue'
 import RenameSelectionDialog from '@/components/selection/RenameSelectionDialog.vue'
 import LoadingScreen from '@/components/shell/LoadingScreen.vue'
 import ShellTopBar from '@/components/shell/ShellTopBar.vue'
+import ShortcutSheetHost from '@/components/shortcuts/ShortcutSheetHost.vue'
 import { IS_BROWSER } from '@/constants'
 
 const route = useRoute()
@@ -281,6 +282,7 @@ onUnmounted(() => {
     <FontStatusBanner />
     <RenameSelectionDialog />
     <CommandPalette />
+    <ShortcutSheetHost />
     <ShellTopBar />
     <HomeWorkspace v-show="activeTab && activeTab.kind !== 'document'" />
     <CloudVersionDialog />

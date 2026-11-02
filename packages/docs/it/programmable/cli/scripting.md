@@ -23,7 +23,7 @@ openpencil eval design.fig -c "return figma.currentPage.findAll((n) => n.type ==
 
 ## Modificare e salvare
 
-`--write` o `-w` sovrascrive il file di input. `--output` o `-o` crea un altro file.
+`--write` o `-w` sovrascrive il file di input. `--output` o `-o` crea un altro file. `--preview-output preview.png` scrive, dopo lo script, un PNG della pagina che lascia come corrente.
 
 ## Script da stdin
 

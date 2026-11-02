@@ -233,6 +233,18 @@ export class SkiaRenderer {
   /** Screen rectangles of UI floating over this canvas, which overlays such as edge pins avoid. */
   overlayObstacles: readonly Rect[] = []
 
+  /**
+   * The most device pixels this canvas draws per CSS pixel; a low-power canvas caps it at 1 so a
+   * high-density display draws a quarter of the pixels. The canvas buffer must be sized the same.
+   */
+  maxPixelRatio = Number.POSITIVE_INFINITY
+  /**
+   * Draws expensive effects cheaply on this canvas: background blurs and noise are left out, and
+   * cached shadows keep one pixel per unit at any zoom. Exports still draw every effect.
+   */
+  reducedEffects = false
+  /** Set while an export draws the document, so every effect is drawn whatever `reducedEffects` says. */
+  drawingFullEffects = false
   boundEffectLayersToViewport = false
   worldViewport = { x: 0, y: 0, w: 0, h: 0 }
   _nodeCount = 0
@@ -582,6 +594,11 @@ export class SkiaRenderer {
     )
   }
 
+  /** Whether effects are drawn cheaply right now: on a reduced-effects canvas, outside exports. */
+  get effectsReduced(): boolean {
+    return this.reducedEffects && !this.drawingFullEffects
+  }
+
   renderSceneToCanvas(canvas: Canvas, graph: SceneGraph, pageId: string): void {
     RenderPipeline.renderSceneToCanvas(this, canvas, graph, pageId)
   }
@@ -596,7 +613,7 @@ export class SkiaRenderer {
     layer: RenderPipeline.RenderLayer = 'full',
     interactive = false
   ): void {
-    const dpr = IS_BROWSER ? window.devicePixelRatio || 1 : 1
+    const dpr = Math.min(IS_BROWSER ? window.devicePixelRatio || 1 : 1, this.maxPixelRatio)
     RenderPipeline.renderFromEditorState(
       this,
       state,

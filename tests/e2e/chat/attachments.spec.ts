@@ -142,11 +142,119 @@ test('images dropped anywhere on the chat attach, with SVGs drawn as PNGs', asyn
   await expect(chat.page.getByText('icon.png', { exact: true })).toBeVisible()
 })
 
-test('a drag without images is left to the window', async ({ configuredChat: chat }) => {
+test('a drag of design files is left to the window', async ({ configuredChat: chat }) => {
   // The window still takes it, to open documents, but the chat does not offer to attach it.
-  const notes: DroppedFile[] = [{ name: 'notes.txt', type: 'text/plain', content: 'text' }]
-  await dragOntoChat(chat.page, notes, { drop: false })
+  const design: DroppedFile[] = [{ name: 'design.fig', type: '', content: 'text' }]
+  await dragOntoChat(chat.page, design, { drop: false })
   await expect(chat.page.locator('[data-slot="drop-overlay"]')).toBeHidden()
+})
+
+test('text files dropped on the chat attach beside images', async ({ configuredChat: chat }) => {
+  const files: DroppedFile[] = [
+    { name: 'notes.md', type: 'text/markdown', content: 'text' },
+    { name: 'photo.png', type: 'image/png', content: 'png' }
+  ]
+  expect(await dragOntoChat(chat.page, files, { drop: false })).toBe(true)
+  const overlay = chat.page.locator('[data-slot="drop-overlay"]')
+  await expect(overlay).toBeVisible()
+
+  await dragOntoChat(chat.page, files)
+  await expect(overlay).toBeHidden()
+  await expect(chat.page.getByRole('button', { name: 'Remove file notes.md' })).toBeVisible()
+  await expect(chat.page.getByText('photo.png', { exact: true })).toBeVisible()
+})
+
+test('code files the system reports no type for still attach when dropped', async ({
+  configuredChat: chat
+}) => {
+  // macOS browsers report `.tsx` with no type and `.ts` as video; the drop judges them by name.
+  const files: DroppedFile[] = [
+    { name: 'Button.tsx', type: '', content: 'text' },
+    { name: 'tokens.ts', type: 'video/mp2t', content: 'text' }
+  ]
+  await dragOntoChat(chat.page, files, { drop: false })
+  const overlay = chat.page.locator('[data-slot="drop-overlay"]')
+  await expect(overlay).toBeHidden()
+
+  await dragOntoChat(chat.page, files)
+  await expect(chat.page.getByRole('button', { name: 'Remove file Button.tsx' })).toBeVisible()
+  await expect(chat.page.getByRole('button', { name: 'Remove file tokens.ts' })).toBeVisible()
+  // Taken whole by the chat, the drop does not also reach the window's document opener.
+  await expect(chat.page.getByText(/Unsupported document format/)).toHaveCount(0)
+})
+
+test('Markdown, CSS, and code files go to the model and show in history', async ({
+  configuredChat: chat
+}) => {
+  const css = ':root { --brand: #ff5b2e; }'
+  await chat.input.fill('Use these tokens')
+  const chooser = chat.page.waitForEvent('filechooser')
+  await chat.page.getByRole('button', { name: 'Attach images or files' }).click()
+  await (
+    await chooser
+  ).setFiles([
+    { name: 'tokens.css', mimeType: 'text/css', buffer: Buffer.from(css) },
+    { name: 'Card.tsx', mimeType: '', buffer: Buffer.from('export const Card = () => null') }
+  ])
+  await expect(chat.page.getByRole('button', { name: 'Remove file tokens.css' })).toBeVisible()
+  await expect(chat.page.getByRole('button', { name: 'Remove file Card.tsx' })).toBeVisible()
+  await chat.sendButton.click()
+
+  // The transcript shows the text as written, with the files as attachments.
+  await expect(chat.userMessage()).toContainText('Use these tokens')
+  await expect(chat.userMessage()).not.toContainText(css)
+  const tokens = chat.userMessage().getByRole('button', { name: 'View attachment tokens.css' })
+  await expect(tokens).toBeVisible()
+  await expect
+    .poll(() => chat.page.locator('html').getAttribute('data-last-chat-request'))
+    .toContain(css)
+
+  await tokens.click()
+  await expect(chat.page.getByRole('dialog')).toContainText(css)
+})
+
+test('an edited message is sent again with its files', async ({ configuredChat: chat }) => {
+  const { page } = chat
+  const css = ':root { --brand: #ff5b2e; }'
+  await chat.input.fill('Use these tokens')
+  const chooser = page.waitForEvent('filechooser')
+  await page.getByRole('button', { name: 'Attach images or files' }).click()
+  await (
+    await chooser
+  ).setFiles({ name: 'tokens.css', mimeType: 'text/css', buffer: Buffer.from(css) })
+  await chat.sendButton.click()
+  await expect(chat.assistantMessage()).toBeVisible()
+
+  await chat.userMessage().hover()
+  await page.getByRole('button', { name: 'Edit message' }).click()
+  const editor = page.getByRole('textbox', { name: 'Edit message' })
+  await editor.fill('Use these tokens for the buttons')
+  await page.keyboard.press('Enter')
+
+  await expect(chat.userMessage()).toContainText('Use these tokens for the buttons')
+  await expect(
+    chat.userMessage().getByRole('button', { name: 'View attachment tokens.css' })
+  ).toBeVisible()
+  await expect
+    .poll(() => page.locator('html').getAttribute('data-last-chat-request'))
+    .toContain('for the buttons')
+  await expect
+    .poll(() => page.locator('html').getAttribute('data-last-chat-request'))
+    .toContain(css)
+})
+
+test('a file that is not text does not attach', async ({ configuredChat: chat }) => {
+  const chooser = chat.page.waitForEvent('filechooser')
+  await chat.page.getByRole('button', { name: 'Attach images or files' }).click()
+  await (
+    await chooser
+  ).setFiles({
+    name: 'notes.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from([0xff, 0xfe, 0x00, 0x80])
+  })
+  await expect(chat.page.getByText(/notes\.txt/)).toBeVisible()
+  await expect(chat.page.getByRole('button', { name: 'Remove file notes.txt' })).toHaveCount(0)
 })
 
 test('the drop overlay leaves with the drag even when the leave no longer lists the image', async ({

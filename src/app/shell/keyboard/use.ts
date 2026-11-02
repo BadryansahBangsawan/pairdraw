@@ -9,6 +9,7 @@ import { useEditorStore } from '@/app/editor/active-store'
 import { createKeyboardActions } from '@/app/shell/keyboard/actions'
 import { bindEditorClipboard } from '@/app/shell/keyboard/clipboard'
 import { isInputElement } from '@/app/shell/keyboard/focus'
+import { bindNodeEditKeys } from '@/app/shell/keyboard/node-edit'
 import { bindNudgeKeys } from '@/app/shell/keyboard/nudging'
 import { registerKeyboardShortcuts } from '@/app/shell/keyboard/registry'
 import { openFileDialog } from '@/app/shell/menu/use'
@@ -38,6 +39,8 @@ export function useKeyboard() {
 
   bindEditorClipboard(store)
   bindNudgeKeys(store)
+  // Before the editor's shortcuts, so keys on a path being edited take precedence over them.
+  bindNodeEditKeys(store, inputFocused)
 
   registerKeyboardShortcuts({
     inputFocused,

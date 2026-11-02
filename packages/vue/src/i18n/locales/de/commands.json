@@ -7,6 +7,7 @@
   "group": "Gruppieren",
   "ungroup": "Gruppierung aufheben",
   "createComponent": "Komponente erstellen",
+  "convertToFrame": "In Frame umwandeln",
   "createSlot": "Slot erstellen",
   "createComponentSet": "Komponentensatz erstellen",
   "createInstance": "Instanz erstellen",
@@ -69,5 +70,15 @@
   "paletteSearchAriaLabel": "Befehle suchen",
   "paletteDescription": "Pairdraw-Befehle suchen und ausführen.",
   "paletteNoCommands": "Keine Befehle gefunden.",
-  "paletteBack": "Zurück"
+  "paletteBack": "Zurück",
+  "shortcutSheet": "Tastaturkürzel",
+  "shortcutSheetDescription": "Tasten, die funktionieren, solange die Arbeitsfläche den Fokus hat.",
+  "shortcutSheetSearch": "Tastaturkürzel suchen",
+  "shortcutSheetEmpty": "Keine Tastaturkürzel gefunden.",
+  "shortcutSheetTools": "Werkzeuge",
+  "shortcutSheetCanvas": "Arbeitsfläche und Auswahl",
+  "toggleAIChat": "KI-Chat ein- oder ausblenden",
+  "nudgeSelection": "Auswahl verschieben",
+  "nudgeSelectionFurther": "Auswahl weiter verschieben",
+  "panWhileHeld": "Ansicht verschieben, solange gedrückt"
 }

@@ -81,6 +81,11 @@ export function useSelectionLayout() {
 
   /** Undefined when nothing selected can clip. */
   const clipsContent = computed(() => shared(containers.value.map((node) => node.clipsContent)))
+  const autoLayouts = computed(() => containers.value.filter((node) => node.layoutMode !== 'NONE'))
+  /** Undefined when nothing selected has an auto layout. */
+  const strokesIncludedInLayout = computed(() =>
+    shared(autoLayouts.value.map((node) => node.strokesIncludedInLayout))
+  )
 
   function setTextResize(mode: TextResizeMode) {
     editor.undo.runBatch('Set text resizing', () => {
@@ -104,6 +109,15 @@ export function useSelectionLayout() {
     })
   }
 
+  /** A mixed checkbox includes strokes, as a mixed clip content checkbox clips. */
+  function toggleStrokesIncludedInLayout() {
+    const included = strokesIncludedInLayout.value !== true
+    editor.undo.runBatch('Toggle strokes in layout', () => {
+      for (const node of autoLayouts.value)
+        editor.updateNodeWithUndo(node.id, { strokesIncludedInLayout: included })
+    })
+  }
+
   return {
     editor,
     nodes,
@@ -112,12 +126,14 @@ export function useSelectionLayout() {
     textResize,
     layoutMode,
     clipsContent,
+    strokesIncludedInLayout,
     spacingAxis,
     spacing,
     setSpacing,
     flushSpacing: batch.flush,
     setTextResize,
     setLayoutMode,
-    toggleClipsContent
+    toggleClipsContent,
+    toggleStrokesIncludedInLayout
   }
 }

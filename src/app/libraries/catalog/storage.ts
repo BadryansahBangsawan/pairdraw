@@ -4,6 +4,7 @@ import {
   createLibraryRevision,
   deserializeLibraryRevision,
   encodeStoredLibraryRevision,
+  LibraryRevisionNotFoundError,
   MAX_LIBRARY_REVISION_BYTES,
   storedLibraryLatestManifestSchema,
   storedLibraryRevisionSchema,
@@ -72,9 +73,9 @@ export class StorageLibraryCatalog implements LibraryCatalog {
 
   async getRevision(libraryId: string, revisionId?: string): Promise<ComponentLibraryRevision> {
     const resolvedRevisionId = revisionId ?? (await this.#latest(libraryId))?.latestRevisionId
-    if (!resolvedRevisionId) throw new Error(`Library not found: ${libraryId}`)
+    if (!resolvedRevisionId) throw new LibraryRevisionNotFoundError(libraryId)
     const bytes = await this.#objects.getObject(revisionKey(libraryId, resolvedRevisionId))
-    if (!bytes) throw new Error(`Library revision not found: ${libraryId}/${resolvedRevisionId}`)
+    if (!bytes) throw new LibraryRevisionNotFoundError(libraryId, resolvedRevisionId)
     if (bytes.byteLength > MAX_LIBRARY_REVISION_BYTES)
       throw new Error('Component library revision exceeds size limit')
     const revision = decodeRevision(bytes)

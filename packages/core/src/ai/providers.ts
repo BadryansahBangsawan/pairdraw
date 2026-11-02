@@ -1,5 +1,7 @@
 /** ACP agents, direct AI providers, and the models each provider recommends. */
 
+import { OPENAI_COMPATIBLE_PRESETS } from './presets'
+
 export type ACPAgentID = 'claude-code' | 'codex' | 'gemini-cli'
 
 export interface ACPAgentDef {
@@ -69,6 +71,14 @@ export type AIProviderID =
   | 'openai-compatible'
   | 'zai'
   | 'minimax'
+  | 'xai'
+  | 'meta'
+  | 'kimi-for-coding'
+  | 'moonshot'
+  | 'together'
+  | 'fireworks'
+  | 'opencode-zen'
+  | 'opencode-go'
   | 'anthropic-compatible'
   | 'openpencil'
   | 'harness:pi'
@@ -347,6 +357,7 @@ export const AI_PROVIDERS: AIProviderDef[] = [
       { id: 'MiniMax-M3', name: 'MiniMax-M3' }
     ]
   },
+  ...OPENAI_COMPATIBLE_PRESETS,
   {
     id: 'openai-compatible',
     name: 'OpenAI-compatible',

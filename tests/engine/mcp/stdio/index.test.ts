@@ -10,6 +10,7 @@ import * as v from 'valibot'
 import { SceneGraph } from '@open-pencil/scene-graph'
 
 import { startServer, type ServerHandle } from '#mcp/server'
+import { SKILL_FILES, skillResourceURI } from '#mcp/skill/content'
 
 import { expectDefined, getNodeOrThrow } from '#tests/helpers/assert'
 import {
@@ -297,6 +298,19 @@ describe('MCP stdio transport', () => {
     expect(result.isError).not.toBe(true)
     const data = parseTextContent(result.content, v.object({ prompt: v.string() }))
     expect(data.prompt.length).toBeGreaterThan(100)
+  }, 10000)
+
+  test('serves the agent skill via stdio', async () => {
+    const client = requireClient()
+    // A stdio client is an external one, so its instructions point at the skill.
+    const instructions = expectDefined(client.getInstructions(), 'server instructions')
+    expect(instructions).toContain('read_skill')
+    expect(instructions).toContain(skillResourceURI('SKILL.md'))
+    const result = await client.callTool({ name: 'read_skill', arguments: {} })
+    expect(result.isError).not.toBe(true)
+    expect(result.content).toEqual([{ type: 'text', text: SKILL_FILES['SKILL.md'].text }])
+    const { resources } = await client.listResources()
+    expect(resources.map((resource) => resource.uri)).toContain(skillResourceURI('SKILL.md'))
   }, 10000)
 
   test('sequential tool calls work (create then delete)', async () => {

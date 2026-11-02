@@ -1,6 +1,6 @@
 ---
 title: Controlling the App
-description: Open, save, switch, and close documents, undo and redo, change settings, and call any editor tool in the running app from the CLI.
+description: Open, save, switch, and close documents, undo and redo, change settings, call any editor tool in the running app or in an interactive shell, and list AI models from the CLI.
 ---
 
 # Controlling the App
@@ -110,4 +110,58 @@ openpencil tool call create_page design.fig --args '{"name":"Icons"}' --write
 openpencil tool call get_page_tree design.fig --json
 ```
 
-For multi-step edits, [`eval`](./scripting) runs a whole script against the same Figma-compatible API.
+For multi-step edits, [`eval`](./scripting) runs a whole script against the same Figma-compatible API, and `shell` runs tools one line at a time.
+
+Pass `--preview-output` to write a PNG of the current page after a tool changes the document. The preview is drawn by `export_image`, headless or in the app. `--preview-scale` sets its scale, from 0.1 to 4, and the longest edge stays within 1280 pixels:
+
+```sh
+openpencil tool call create_shape design.fig --args '{"type":"RECTANGLE","x":0,"y":0,"width":120,"height":80}' \
+  --write --preview-output preview.png
+```
+
+A tool that only reads, or one that returns an error, writes no preview. If the page has nothing visible, or the renderer cannot draw it, the command warns and keeps the change.
+
+## Interactive shell
+
+`shell` opens a document once and keeps it loaded while you run tools on it, one per line. Each tool sees the changes the previous ones made, and nothing is written until you call `save()`:
+
+```sh
+openpencil shell design.fig --preview-output preview.png
+```
+
+```text
+design.fig> create_page {"name": "Icons"}
+design.fig> switch_page({"page": "Icons"})
+design.fig> create_shape {"type": "ELLIPSE", "x": 0, "y": 0, "width": 48, "height": 48}
+design.fig> save()
+design.fig> exit()
+```
+
+| Line | Effect |
+|------|--------|
+| `<tool>`, `<tool> {...}`, `<tool>({...})` | Run a tool from `tool list` with a JSON object of arguments |
+| `tools()` | List the tools |
+| `help()`, `help("<tool>")` | Show the shell commands, or a tool's description |
+| `save()`, `save("copy.fig")` | Save as `.fig` to the input file, the `--output` path, or the given path |
+| `preview()`, `preview("page.png")` | Write a PNG of the current page now |
+| `exit()` | Leave the shell |
+
+Tab completes tool names. A failing line prints its error and the shell carries on. Ctrl+C clears a half-typed line; on an empty line, Ctrl+C and Ctrl+D leave as `exit()` does. With unsaved changes, leaving asks you to save first, and a second `exit()`, Ctrl+C or Ctrl+D discards them. `save()` writes `.fig` only, so a `.pen` or `.html` input needs a `.fig` path, either `--output` or `save("name.fig")`.
+
+When standard input is not a terminal, the shell reads one line at a time from it and exits at the end of the input or at `exit()`. The command exits with status 1 if any line failed:
+
+```sh
+printf '%s\n' 'create_page {"name": "Icons"}' 'save()' | openpencil shell design.fig -o out.fig
+```
+
+Without a file, `shell` sends each line to the document open in the running app, or to the one `--document-id` names. There, `save()` saves that document like `documents save`.
+
+## AI models
+
+`models` lists the AI providers the chat can use and the models each one offers, with its default model. ACP agents such as Claude Code and Codex are listed too; they run their own models.
+
+```sh
+openpencil models
+openpencil models --provider openrouter
+openpencil models --json
+```

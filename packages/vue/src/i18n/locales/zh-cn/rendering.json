@@ -3,8 +3,11 @@
   "settingsDescription": "选择 Pairdraw 显示大型画布的方式。",
   "progressiveTiled": "渐进式渲染",
   "progressiveTiledDescription": "导航时将大型画布分成较小的图块进行更新。",
+  "progressiveTiledByUltralight": "超轻模式开启时始终开启。",
   "reloadRequired": "重新加载 Pairdraw 以应用此更改。",
   "wideGamutUnavailable": "此显示器或浏览器无法显示 Display-P3 颜色，因此画布以 sRGB 预览。文档的色彩空间保持不变.",
   "urlOverride": "当前会话的渲染器由 URL 参数控制。移除该参数后将应用已保存的偏好设置。",
-  "experimental": "实验性功能"
+  "experimental": "实验性功能",
+  "ultralight": "超轻模式",
+  "ultralightDescription": "在较慢的电脑上节省电量和内存：关闭动画，以标准分辨率分块渲染，并简化模糊、噪点和阴影。"
 }

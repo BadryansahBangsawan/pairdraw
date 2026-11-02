@@ -15,6 +15,7 @@ Select objects to move, resize, rotate, duplicate, and organize them on the canv
 - <kbd>Shift</kbd> + click to add or remove a node from the current selection. A layer and its own parent or child are never selected together, so Shift-clicking one replaces the other
 - **Double-click a frame's or component's name** above it on the canvas to rename it in place
 - **Marquee drag** — drag on empty canvas to draw a selection rectangle; intersecting nodes are selected on release. Started inside a top-level frame without auto layout or a section, it selects that container's layers; from the page, a frame or section that holds layers is selected only when fully enclosed
+- <kbd>⌘</kbd> + drag (<kbd>Ctrl</kbd> + drag on Windows and Linux) draws a marquee that selects the deepest nested layers it touches. It starts where a plain marquee does, on empty canvas or the empty background of a top-level frame or a section; from a layer, or the background of a nested frame, component, or instance, <kbd>⌘</kbd> + drag selects that layer and moves it. Press or release <kbd>⌘</kbd> mid-drag to switch between the deep and the plain marquee
 - <kbd>⌘</kbd><kbd>A</kbd> — select all nodes on the current page
 - <kbd>Enter</kbd> — select the children of the selected layers; on a vector it edits the path and on text it edits the text
 - <kbd>Shift</kbd> + <kbd>Enter</kbd> or <kbd>\\</kbd> — select the parent of the selected layers
@@ -24,8 +25,10 @@ Select objects to move, resize, rotate, duplicate, and organize them on the canv
 ## Moving
 
 - **Drag** a selected node to move it (all selected nodes move together)
-- **Arrow keys** — nudge selected nodes by 1 px
-- <kbd>Shift</kbd> + arrow keys — nudge by 10 px
+- **Arrow keys** — nudge selected nodes by the small nudge, 1 px unless changed
+- <kbd>Shift</kbd> + arrow keys — nudge by the big nudge, 10 px unless changed
+
+Set both distances under **Settings → Editor → Nudge**.
 
 ## Resizing
 

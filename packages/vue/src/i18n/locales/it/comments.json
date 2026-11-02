@@ -12,6 +12,8 @@
   "deleteCommentDescription": "Il commento e tutte le sue risposte verranno rimossi per tutti.",
   "deleteReply": "Elimina risposta",
   "copyText": "Copia testo",
+  "applyWithAI": "Applica con l’IA",
+  "applyOpenWithAI": "Applica i commenti aperti con l’IA",
   "goToComment": "Vai al commento",
   "moreActions": "Altre azioni",
   "searchComments": "Cerca nei commenti",

@@ -81,12 +81,13 @@ const lastRequest = computed(() => messages.findLast((m) => m.role === 'user'))
 const editableRequestId = computed(() => {
   const request = lastRequest.value
   if (!request) return undefined
-  // Images would be lost when the text is sent again; layer previews follow the edited text.
+  // Images would be lost when the text is sent again; layer previews follow the edited text,
+  // and files go with it.
   const attachments = [
     ...(presentations?.[request.id]?.attachments ?? []),
     ...attachmentsForMessage(request.id).value
   ]
-  return attachments.some((attachment) => attachment.kind !== 'node') ? undefined : request.id
+  return attachments.some((attachment) => attachment.kind === 'image') ? undefined : request.id
 })
 const transcriptContent = ref<HTMLDivElement>()
 const viewportComponent = ref<{ viewportElement?: HTMLElement }>()

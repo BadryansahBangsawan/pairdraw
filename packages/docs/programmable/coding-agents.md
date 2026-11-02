@@ -38,6 +38,8 @@ npm install -g @agentclientprotocol/claude-agent-acp
 
 Sign in from guided setup, or by running `claude` and using `/login`. The ACP program uses the same account as Claude Code. If the browser cannot hand the sign-in back, the sign-in page shows a code to paste into guided setup.
 
+Claude Code can instead reach Claude through Amazon Bedrock, Google Vertex AI, or Microsoft Foundry, set up outside the app with `CLAUDE_CODE_USE_BEDROCK`, `CLAUDE_CODE_USE_VERTEX`, or `CLAUDE_CODE_USE_FOUNDRY` and that cloud's credentials. OpenPencil looks for these switches in the environment it starts agents with and in the `env` block of Claude Code's user settings (`~/.claude/settings.json`, or `CLAUDE_CONFIG_DIR`) and managed settings; it reads nothing else from those files. When one is on, the model list shows **External config**, guided setup names the cloud, and setup skips the sign-in step. If Claude Code itself then reports that it is not signed in, for example because a project setting turns the switch off, setup trusts that report and offers the sign-in. The cloud's credentials and model choice stay in Claude Code's own configuration.
+
 ## Codex
 
 ```sh

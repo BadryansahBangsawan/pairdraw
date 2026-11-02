@@ -21,6 +21,20 @@ export function isLibraryRevisionIntegrityError(
   return error instanceof LibraryRevisionIntegrityError
 }
 
+/** A catalog has no such library, or not the requested revision of it. */
+export class LibraryRevisionNotFoundError extends Error {
+  constructor(libraryId: string, revisionId?: string) {
+    super(`Library revision not found: ${libraryId}/${revisionId ?? 'latest'}`)
+    this.name = 'LibraryRevisionNotFoundError'
+  }
+}
+
+export function isLibraryRevisionNotFoundError(
+  error: unknown
+): error is LibraryRevisionNotFoundError {
+  return error instanceof LibraryRevisionNotFoundError
+}
+
 function integrityError(message: string): never {
   throw new LibraryRevisionIntegrityError(message)
 }

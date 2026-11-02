@@ -1,3 +1,5 @@
+export { createVectorFrameBeside, VECTORIZE_RESULT_GAP } from './beside'
+export { vectorizableImageFill, type VectorizableImageFill } from './image'
 export {
   createVectorFrameChildren,
   resolveVectorFramePlacement,

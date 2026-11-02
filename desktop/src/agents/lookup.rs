@@ -5,7 +5,8 @@ use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
 // Only inspect known executables. Discovery never launches an agent or reads credentials;
-// it runs only OpenPencil's own companions, and only to ask their version.
+// it runs only OpenPencil's own companions, and only to ask their version. Of Claude Code's
+// settings it reads only the switches that pick a cloud provider.
 const EXECUTABLES: &[&str] = &[
     "claude",
     "claude-agent-acp",
@@ -34,6 +35,9 @@ pub struct AgentLookup {
     /// does not say where it is. A distribution's Node usually needs administrator rights there.
     npm_global_writable: Option<bool>,
     search_path: String,
+    /// The cloud Claude Code is set up to use instead of an Anthropic sign-in, read from its
+    /// switches alone (`claude_cloud`); `None` when it uses its own sign-in.
+    claude_code_cloud: Option<&'static str>,
 }
 
 /// Long enough for a cold Node start, short enough that a companion which ignores the flags
@@ -173,6 +177,7 @@ fn lookup_with(
             })
             .collect(),
         search_path,
+        claude_code_cloud: None,
     }
 }
 
@@ -182,12 +187,14 @@ pub async fn agent_lookup() -> Result<AgentLookup, String> {
         let current = std::env::var("PATH").unwrap_or_default();
         let search_path = super::path::augment_path(&current, &super::path::candidate_dirs());
         let cwd = std::env::current_dir().unwrap_or_else(|_| Path::new("/").to_path_buf());
-        lookup_with(
+        let mut lookup = lookup_with(
             search_path.clone(),
             |command| which::which_in(command, Some(&search_path), &cwd).ok(),
             |executable| companion_version(executable, &search_path, VERSION_TIMEOUT),
             |npm| npm_global_writable(npm, &search_path, VERSION_TIMEOUT),
-        )
+        );
+        lookup.claude_code_cloud = super::claude_cloud::claude_code_cloud();
+        lookup
     })
     .await
     .map_err(|_| "Could not discover local agents.".to_owned())

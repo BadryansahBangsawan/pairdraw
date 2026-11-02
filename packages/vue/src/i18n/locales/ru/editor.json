@@ -14,5 +14,7 @@
   "resetPreview": "Сбросить",
   "leavePreview": "Выйти из просмотра ({shortcut})",
   "toggleAIChat": "AI-чат ({shortcut})",
-  "startPreview": "Просмотр ({shortcut})"
+  "startPreview": "Просмотр ({shortcut})",
+  "toggleLayersPanel": "Панель слоёв",
+  "togglePropertiesPanel": "Панель свойств"
 }

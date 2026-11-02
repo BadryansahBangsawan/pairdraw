@@ -5,11 +5,12 @@ use std::collections::HashMap;
 use std::path::Path;
 use std::sync::Mutex;
 use tauri::menu::{
-    CheckMenuItemBuilder, MenuBuilder, MenuItemBuilder, MenuItemKind, Submenu, SubmenuBuilder,
+    CheckMenuItemBuilder, MenuBuilder, MenuItemBuilder, MenuItemKind, PredefinedMenuItem, Submenu,
+    SubmenuBuilder,
 };
 
-#[cfg(any(target_os = "macos", target_os = "windows"))]
-use tauri::menu::PredefinedMenuItem;
+#[cfg(not(target_os = "macos"))]
+use tauri::menu::{AboutMetadata, AboutMetadataBuilder};
 
 #[derive(Deserialize)]
 struct MenuGroup {
@@ -73,26 +74,63 @@ fn app_menu_file() -> tauri::Result<AppMenuFile> {
     ))?)
 }
 
-/// The macOS application menu holds Settings…, so the schema's copy is left out there, along
-/// with a separator it would leave at the end of its menu.
-fn platform_entries<'a>(items: &'a [MenuEntry], features: &[String]) -> Vec<&'a MenuEntry> {
+/// Schema items the macOS application menu holds instead (`install_app_menu`): Settings… in
+/// File, and Help's About and Check for Updates….
+const MACOS_APP_MENU_IDS: [&str; 3] = ["settings", "about", "check-updates"];
+
+fn is_separator(entry: &MenuEntry) -> bool {
+    entry.r#type.as_deref() == Some("separator")
+}
+
+fn shown_on_platform(entry: &MenuEntry, macos: bool) -> bool {
+    !(macos
+        && entry
+            .id
+            .as_deref()
+            .is_some_and(|id| MACOS_APP_MENU_IDS.contains(&id)))
+}
+
+/// The entries a menu shows: those another platform menu holds and those waiting for a feature
+/// are left out, along with the separators that would then start or end the menu.
+fn entries_for<'a>(items: &'a [MenuEntry], features: &[String], macos: bool) -> Vec<&'a MenuEntry> {
     let mut entries: Vec<&MenuEntry> = items
         .iter()
-        .filter(|entry| !(cfg!(target_os = "macos") && entry.id.as_deref() == Some("settings")))
+        .filter(|entry| shown_on_platform(entry, macos))
         .filter(|entry| {
             entry
                 .feature
                 .as_ref()
                 .is_none_or(|feature| features.contains(feature))
         })
+        .skip_while(|entry| is_separator(entry))
         .collect();
-    while entries
-        .last()
-        .is_some_and(|entry| entry.r#type.as_deref() == Some("separator"))
-    {
+    while entries.last().is_some_and(|entry| is_separator(entry)) {
         entries.pop();
     }
     entries
+}
+
+fn platform_entries<'a>(items: &'a [MenuEntry], features: &[String]) -> Vec<&'a MenuEntry> {
+    entries_for(items, features, cfg!(target_os = "macos"))
+}
+
+/// What the About dialog of Windows and Linux shows: the name the window carries, which is the
+/// one people see, the version, and the app icon.
+#[cfg(not(target_os = "macos"))]
+fn about_metadata<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> AboutMetadata<'_> {
+    let info = app.package_info();
+    let name = app
+        .config()
+        .app
+        .windows
+        .first()
+        .map(|window| window.title.clone())
+        .unwrap_or_else(|| info.name.clone());
+    AboutMetadataBuilder::new()
+        .name(Some(name))
+        .version(Some(info.version.to_string()))
+        .icon(app.default_window_icon().cloned())
+        .build()
 }
 
 fn build_submenu<R: tauri::Runtime>(
@@ -110,6 +148,14 @@ fn build_submenu<R: tauri::Runtime>(
         }
 
         let label = entry.label.as_deref().unwrap_or_default();
+        // Windows and Linux show About in Help as their own About dialog; macOS keeps it in the
+        // application menu.
+        #[cfg(not(target_os = "macos"))]
+        if entry.id.as_deref() == Some("about") {
+            let about = PredefinedMenuItem::about(app, Some(label), Some(about_metadata(app)))?;
+            builder = builder.item(&about);
+            continue;
+        }
         if entry.id.as_deref() == Some("open-recent") {
             let submenu = build_recent_files_submenu(app, label, &build.inputs.recent_files)?;
             builder = builder.item(&submenu);
@@ -220,8 +266,14 @@ fn build_schema_menus<R: tauri::Runtime>(
     build: &MenuBuild,
 ) -> tauri::Result<Vec<Submenu<R>>> {
     let groups: Vec<MenuGroup> = serde_json::from_str(include_str!("../../generated/menu.json"))?;
+    // A menu left with nothing, such as Help on macOS, is not shown.
     groups
         .iter()
+        .filter(|group| {
+            platform_entries(&group.items, &build.inputs.features)
+                .iter()
+                .any(|entry| !is_separator(entry))
+        })
         .map(|group| build_submenu(app, &group.label, &group.items, build))
         .collect()
 }
@@ -307,6 +359,55 @@ pub fn set_native_menu_checked<R: tauri::Runtime>(
     }
 }
 
+/// One item of a menu as native tests read it: its id and whether the OS draws it, as it does
+/// About on every platform.
+#[cfg(feature = "native-test")]
+#[derive(serde::Serialize)]
+pub struct NativeMenuOutlineItem {
+    id: String,
+    predefined: bool,
+}
+
+/// Whether an item is an entry of its menu rather than a separator, a predefined item without
+/// text.
+#[cfg(feature = "native-test")]
+fn menu_item_shown<R: tauri::Runtime>(item: &MenuItemKind<R>) -> tauri::Result<bool> {
+    match item {
+        MenuItemKind::Predefined(item) => Ok(!item.text()?.is_empty()),
+        _ => Ok(true),
+    }
+}
+
+/// The menu bar's menus, each as the ids of its items, separators left out, so native tests can
+/// check what each platform shows, such as Help on Windows and Linux.
+#[cfg(feature = "native-test")]
+#[tauri::command]
+pub fn native_test_menu_outline<R: tauri::Runtime>(
+    app: tauri::AppHandle<R>,
+) -> Result<Vec<Vec<NativeMenuOutlineItem>>, String> {
+    let menu = app
+        .menu()
+        .ok_or_else(|| "Application menu is unavailable".to_string())?;
+    let mut outline = Vec::new();
+    for item in menu.items().map_err(|error| error.to_string())? {
+        let MenuItemKind::Submenu(submenu) = item else {
+            continue;
+        };
+        let mut items = Vec::new();
+        for child in submenu.items().map_err(|error| error.to_string())? {
+            if !menu_item_shown(&child).map_err(|error| error.to_string())? {
+                continue;
+            }
+            items.push(NativeMenuOutlineItem {
+                id: child.id().0.clone(),
+                predefined: matches!(child, MenuItemKind::Predefined(_)),
+            });
+        }
+        outline.push(items);
+    }
+    Ok(outline)
+}
+
 pub fn install_app_menu<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
     inputs: &NativeMenuInputs,
@@ -387,4 +488,50 @@ pub fn set_native_menu_features<R: tauri::Runtime>(
     features: Vec<String>,
 ) -> Result<(), String> {
     update_app_menu(&app, |inputs| inputs.features = features)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{entries_for, MenuGroup};
+
+    fn help_menu() -> MenuGroup {
+        let menus: Vec<MenuGroup> =
+            serde_json::from_str(include_str!("../../generated/menu.json")).unwrap();
+        menus
+            .into_iter()
+            .find(|group| group.label == "Help")
+            .expect("the schema has a Help menu")
+    }
+
+    fn ids(group: &MenuGroup, macos: bool) -> Vec<Option<String>> {
+        entries_for(&group.items, &[], macos)
+            .into_iter()
+            .map(|entry| entry.id.clone())
+            .collect()
+    }
+
+    #[test]
+    fn windows_and_linux_show_about_and_updates_in_help() {
+        let help = help_menu();
+        let shown = ids(&help, false);
+        assert!(shown.contains(&Some("about".to_string())));
+        assert!(shown.contains(&Some("check-updates".to_string())));
+    }
+
+    #[test]
+    fn macos_leaves_help_empty_for_the_application_menu() {
+        assert!(ids(&help_menu(), true).is_empty());
+    }
+
+    #[test]
+    fn macos_keeps_settings_out_of_file_without_a_trailing_separator() {
+        let menus: Vec<MenuGroup> =
+            serde_json::from_str(include_str!("../../generated/menu.json")).unwrap();
+        let file = menus.iter().find(|group| group.label == "File").unwrap();
+        let entries = entries_for(&file.items, &[], true);
+        assert!(entries
+            .iter()
+            .all(|entry| entry.id.as_deref() != Some("settings")));
+        assert!(entries.last().is_some_and(|entry| entry.r#type.is_none()));
+    }
 }

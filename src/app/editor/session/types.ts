@@ -13,6 +13,8 @@ export function createInitialAppEditorState(pageId: string): AppEditorState {
     // New pages and sections take their colors from the interface theme, as in Figma.
     theme: resolvedAppTheme.value,
     snappingPreferences: { ...appPreferences.value.editing.snapping },
+    // The pixel grid stays as the person last left it, View → Pixel grid or Shift+'.
+    showPixelGrid: appPreferences.value.view.pixelGrid,
     showUI: true,
     // Rulers stay out of the way until asked for, with Shift+R or View › Rulers.
     showRulers: false,

@@ -4,6 +4,9 @@ import { IS_BROWSER } from '@/constants'
 export type SceneRendererMode = CanvasRenderingMode
 export type CollaborationTransportMode = 'default' | 'test'
 
+/** Ultralight mode draws at most one device pixel per CSS pixel. */
+export const ULTRALIGHT_MAX_PIXEL_RATIO = 1
+
 export interface AppRuntimeConfig {
   test: boolean
   navigationBenchmark: boolean
@@ -12,18 +15,30 @@ export interface AppRuntimeConfig {
   showRulers: boolean
   sceneRenderer: SceneRendererMode
   sceneRendererOverride: boolean
+  /** Ultralight mode as this session started; changing it applies after a reload. */
+  ultralight: boolean
+  /** The most device pixels the canvas draws per CSS pixel, or none to follow the display. */
+  maxPixelRatio: number | undefined
+  /** The canvas draws background blurs, noise, and zoomed shadows cheaply. */
+  reducedEffects: boolean
   collaborationTransport: CollaborationTransportMode
   collaborationRelayURL: string | null
 }
 
+/**
+ * Reads the session's flags from the URL over the saved preferences. Ultralight mode renders in
+ * tiles, at most one device pixel per CSS pixel, with cheaper effects; a `renderer` URL override
+ * still picks the renderer.
+ */
 export function parseAppRuntimeConfig(
   search: string,
-  preferredRenderer: SceneRendererMode = 'retained'
+  preferredRenderer: SceneRendererMode = 'retained',
+  ultralight = false
 ): AppRuntimeConfig {
   const params = new URLSearchParams(search)
   const renderer = params.get('renderer')
-  const sceneRenderer =
-    renderer === 'tiled' || renderer === 'retained' ? renderer : preferredRenderer
+  const preferred: SceneRendererMode = ultralight ? 'tiled' : preferredRenderer
+  const sceneRenderer = renderer === 'tiled' || renderer === 'retained' ? renderer : preferred
   return {
     test: params.has('test'),
     navigationBenchmark: params.has('navigation-benchmark'),
@@ -32,6 +47,9 @@ export function parseAppRuntimeConfig(
     showRulers: !params.has('no-rulers'),
     sceneRenderer,
     sceneRendererOverride: renderer === 'tiled' || renderer === 'retained',
+    ultralight,
+    maxPixelRatio: ultralight ? ULTRALIGHT_MAX_PIXEL_RATIO : undefined,
+    reducedEffects: ultralight,
     collaborationTransport: params.get('collabTransport') === 'test' ? 'test' : 'default',
     collaborationRelayURL: params.get('collabRelay')
   }
@@ -39,5 +57,6 @@ export function parseAppRuntimeConfig(
 
 export const appRuntimeConfig = parseAppRuntimeConfig(
   IS_BROWSER ? window.location.search : '',
-  appPreferences.value.rendering.canvasMode
+  appPreferences.value.rendering.canvasMode,
+  appPreferences.value.rendering.ultralight
 )

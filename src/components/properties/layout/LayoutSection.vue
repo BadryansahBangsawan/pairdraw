@@ -11,6 +11,7 @@ import LayoutFlowControl from '@/components/properties/layout/LayoutFlowControl.
 import LayoutWrapToggle from '@/components/properties/layout/LayoutWrapToggle.vue'
 import PaddingControls from '@/components/properties/layout/padding/PaddingControls.vue'
 import SizeControls from '@/components/properties/layout/size/SizeControls.vue'
+import StrokesInLayoutControl from '@/components/properties/layout/StrokesInLayoutControl.vue'
 import TextResizingControl from '@/components/properties/layout/TextResizingControl.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import PanelSection from '@/components/ui/panel/PanelSection.vue'
@@ -66,6 +67,7 @@ const { panels } = useI18n()
             <GridControls />
             <PaddingControls />
             <ClipContentControl />
+            <StrokesInLayoutControl />
           </template>
         </template>
       </PanelSection>

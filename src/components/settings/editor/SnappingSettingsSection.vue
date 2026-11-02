@@ -4,8 +4,8 @@ import { computed } from 'vue'
 import { DEFAULT_SNAPPING_PREFERENCES } from '@open-pencil/core'
 import { useSettingsMessages } from '@open-pencil/vue/i18n'
 
-import { setSnappingPreference } from '@/app/settings/preferences/apply'
-import { appPreferences } from '@/app/settings/preferences/store'
+import { setPixelGridShown, setSnappingPreference } from '@/app/settings/preferences/apply'
+import { appPreferences, DEFAULT_APP_PREFERENCES } from '@/app/settings/preferences/store'
 import SettingsGroup from '@/components/settings/layout/SettingsGroup.vue'
 import SettingsRow from '@/components/settings/layout/SettingsRow.vue'
 import SettingsSection from '@/components/settings/layout/SettingsSection.vue'
@@ -26,6 +26,18 @@ const snapToObjects = computed({
 const snapToPixelGrid = computed({
   get: () => appPreferences.value.editing.snapping.pixelGrid,
   set: (enabled: boolean) => setSnappingPreference('pixelGrid', enabled)
+})
+
+const defaultHalfPixel = DEFAULT_SNAPPING_PREFERENCES.halfPixel ?? false
+const snapToHalfPixel = computed({
+  get: () => appPreferences.value.editing.snapping.halfPixel ?? defaultHalfPixel,
+  set: (enabled: boolean) => setSnappingPreference('halfPixel', enabled)
+})
+
+const defaultPixelGrid = DEFAULT_APP_PREFERENCES.view.pixelGrid
+const showPixelGrid = computed({
+  get: () => appPreferences.value.view.pixelGrid,
+  set: setPixelGridShown
 })
 </script>
 
@@ -72,6 +84,32 @@ const snapToPixelGrid = computed({
           v-model="snapToPixelGrid"
           :label="settings.snapToPixelGrid"
           data-test-id="settings-snap-pixel-grid"
+        />
+      </SettingsRow>
+      <SettingsRow
+        as="label"
+        :label="settings.snapToHalfPixel"
+        :description="settings.snapToHalfPixelDescription"
+        :modified="snapToHalfPixel !== defaultHalfPixel"
+        @reset="snapToHalfPixel = defaultHalfPixel"
+      >
+        <AppSwitch
+          v-model="snapToHalfPixel"
+          :label="settings.snapToHalfPixel"
+          data-test-id="settings-snap-half-pixel"
+        />
+      </SettingsRow>
+      <SettingsRow
+        as="label"
+        :label="settings.showPixelGrid"
+        :description="settings.showPixelGridDescription"
+        :modified="showPixelGrid !== defaultPixelGrid"
+        @reset="showPixelGrid = defaultPixelGrid"
+      >
+        <AppSwitch
+          v-model="showPixelGrid"
+          :label="settings.showPixelGrid"
+          data-test-id="settings-show-pixel-grid"
         />
       </SettingsRow>
     </SettingsGroup>

@@ -3,6 +3,7 @@ import type { SceneNode } from '@open-pencil/scene-graph'
 import { generatedFrameOwner, generatedFrameText } from '@open-pencil/scene-graph/generated'
 
 import type { CanvasLabelKind } from '#vue/canvas/labels/edit'
+import { handleNodeEditDoubleClick } from '#vue/canvas/vector-input/double-click'
 import type { DragState } from '#vue/shared/input/types'
 
 type NodeEditMethods = Partial<{ enterNodeEditMode: (nodeId: string) => void }>
@@ -155,6 +156,7 @@ export function createTextEditInput(options: TextEditInputOptions) {
     if (editor.state.editingTextId) return
 
     const { cx, cy } = getCoords(e)
+    if (handleNodeEditDoubleClick(e, cx, cy, editor)) return
     const readOnly = !resolveEditorProfile(editor.state).edits
     if (!readOnly && startLabelRename(cx, cy)) return
 

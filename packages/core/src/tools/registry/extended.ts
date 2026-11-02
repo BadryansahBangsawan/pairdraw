@@ -24,6 +24,7 @@ import {
   createSlot,
   fetchIconsTool,
   getBehaviour,
+  importHTML,
   importMermaid,
   importSVG,
   insertIcon,
@@ -39,6 +40,7 @@ import {
   setImageFill,
   setLocked,
   setMinMax,
+  replaceMatchingProperties,
   setOpacity,
   setRotation,
   setStrokeAlign,
@@ -46,6 +48,7 @@ import {
   setVisible
 } from '#core/tools/modify'
 import {
+  findEmptySpaceTool,
   getComponents,
   getCurrentPage,
   getFontStatus,
@@ -97,6 +100,7 @@ import {
   booleanIntersect,
   booleanSubtract,
   booleanUnion,
+  exportHTML,
   exportImage,
   exportPDF,
   exportSVG,
@@ -105,6 +109,7 @@ import {
   pathMove,
   pathScale,
   pathSet,
+  vectorizeImage,
   viewportGet,
   viewportSet
 } from '#core/tools/vector'
@@ -125,6 +130,7 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   insertLibraryComponent,
   switchPage,
   pageBounds,
+  findEmptySpaceTool,
   getComments,
   addComment,
   replyToComment,
@@ -152,6 +158,7 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   createConnectorTool,
   importSVG,
   importMermaid,
+  importHTML,
   // Modify (advanced)
   setEffects,
   setOpacity,
@@ -166,6 +173,7 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   setLocked,
   setStrokeAlign,
   setImageFill,
+  replaceMatchingProperties,
   // Structure (advanced)
   cloneNode,
   nodeMove,
@@ -204,11 +212,13 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   pathScale,
   pathFlip,
   pathMove,
+  vectorizeImage,
   viewportGet,
   viewportSet,
   exportSVG,
   exportPDF,
   exportImage,
+  exportHTML,
   // Analyze & diff
   analyzeColors,
   analyzeTypography,

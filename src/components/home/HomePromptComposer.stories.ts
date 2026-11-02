@@ -52,7 +52,7 @@ export const Sending: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement)
     const field = canvas.getByRole('textbox')
-    const send = canvas.getByRole('button')
+    const send = canvas.getByRole('button', { name: 'Send message' })
     await expect(send).toBeDisabled()
     await userEvent.type(field, '{Enter}')
     await expect(args.onSubmit).not.toHaveBeenCalled()
@@ -65,5 +65,18 @@ export const Sending: Story = {
     await userEvent.type(field, '{Enter}')
     await expect(args.onSubmit).toHaveBeenCalledOnce()
     await expect(args.onSubmit).toHaveBeenCalledWith('A pricing page\nwith three plans')
+  }
+}
+
+/** Picking an example writes its prompt into the field to edit, and sends nothing yet. */
+export const PickingExample: Story = {
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const field = canvas.getByRole('textbox')
+    const examples = within(canvas.getByRole('list')).getAllByRole('button')
+    await userEvent.click(examples[0])
+    await expect(field).not.toHaveValue('')
+    await expect(field).toHaveFocus()
+    await expect(args.onSubmit).not.toHaveBeenCalled()
   }
 }

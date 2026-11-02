@@ -22,5 +22,6 @@ export type {
   BindingTarget,
   BoundEditPolicy
 } from '#vue/controls/binding-provider/types'
+export { useFontFamilyBindingProvider } from '#vue/controls/binding-provider/font-family'
 export { useTextContentBindingProvider } from '#vue/controls/binding-provider/text'
 export { useVisibilityBindingProvider } from '#vue/controls/binding-provider/visibility'

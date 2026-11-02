@@ -57,3 +57,15 @@ export function pathNetwork(pen: PenNode, width: number, height: number): Vector
   }
   return network
 }
+
+/** A `line`'s geometry: from its box's top-left corner to its bottom-right, as pen.dev draws it. */
+export function lineNetwork(width: number, height: number): VectorNetwork {
+  return {
+    vertices: [
+      { x: 0, y: 0 },
+      { x: width, y: height }
+    ],
+    segments: [{ start: 0, end: 1, tangentStart: { x: 0, y: 0 }, tangentEnd: { x: 0, y: 0 } }],
+    regions: []
+  }
+}

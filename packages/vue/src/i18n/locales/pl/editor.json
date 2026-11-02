@@ -14,5 +14,7 @@
   "resetPreview": "Resetuj",
   "leavePreview": "Zakończ podgląd ({shortcut})",
   "toggleAIChat": "Czat AI ({shortcut})",
-  "startPreview": "Podgląd ({shortcut})"
+  "startPreview": "Podgląd ({shortcut})",
+  "toggleLayersPanel": "Panel warstw",
+  "togglePropertiesPanel": "Panel właściwości"
 }

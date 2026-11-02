@@ -19,6 +19,12 @@ La barra inferiore contiene gli strumenti per creare forme, frame e sezioni. Sel
 
 Poligono e Stella sono disponibili nel menu delle forme.
 
+## Inserire immagini
+
+Scegli **File › Inserisci immagine…** (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd>, o <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>K</kbd> su Windows e Linux) o fai clic sul pulsante immagine della barra degli strumenti, poi seleziona file PNG, JPEG, WebP, GIF, AVIF o SVG. Compaiono selezionati al centro della vista, in un solo passaggio annullabile; un SVG diventa livelli modificabili.
+
+Lo strumento **Nota adesiva** segue Testo nella barra degli strumenti. Non ha un tasto, quindi <kbd>N</kbd> continua a zoomare sul frame successivo.
+
 ## Mantenere le proporzioni
 
 Con <kbd>Shift</kbd>, un rettangolo diventa quadrato, un’ellisse diventa cerchio e una linea si allinea a 0°, 45° o 90°.

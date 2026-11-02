@@ -2,11 +2,15 @@ import {
   EXPORT_FORMATS,
   EXPORT_FORMAT_OPTIONS,
   EXPORT_SCALES,
+  DEFAULT_EXPORT_QUALITY,
+  MAX_EXPORT_QUALITY,
   MAX_EXPORT_SCALE,
+  MIN_EXPORT_QUALITY,
   MIN_EXPORT_SCALE,
   clampExportScale,
   createExportSettingActions,
   createExportTargetState,
+  formatSupportsQuality,
   formatSupportsScale
 } from '#vue/document/export/helpers'
 import { useEditor } from '#vue/editor/context'
@@ -32,6 +36,10 @@ export function useExport() {
     formats: EXPORT_FORMATS,
     formatOptions: EXPORT_FORMAT_OPTIONS,
     formatSupportsScale,
+    formatSupportsQuality,
+    minQuality: MIN_EXPORT_QUALITY,
+    maxQuality: MAX_EXPORT_QUALITY,
+    defaultQuality: DEFAULT_EXPORT_QUALITY,
     ...targetState,
     ...settingActions
   }

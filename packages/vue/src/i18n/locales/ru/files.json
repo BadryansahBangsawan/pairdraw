@@ -35,6 +35,47 @@
   "deleteDocumentConfirmation": "Удалить «{name}»?",
   "deleteDocumentDescription": "Документ будет удалён для всех, кто может его открыть. Это действие нельзя отменить.",
   "deleteDocumentFailed": "Не удалось удалить «{name}». Попробуйте ещё раз.",
+  "deleteDocumentsConfirmation": {
+    "one": "Удалить {count} документ?",
+    "few": "Удалить {count} документа?",
+    "many": "Удалить {count} документов?"
+  },
+  "deleteDocumentsDescription": "Документы будут удалены для всех, кто может их открыть. Это действие нельзя отменить.",
+  "sortFiles": "Сортировка: {order}",
+  "sortByName": "Название",
+  "sortByLastUsed": "Последнее использование",
+  "sortByCreated": "Дата создания",
+  "selectDocument": "Выбрать",
+  "deselectDocument": "Снять выбор",
+  "documentSelected": "Выбран",
+  "selectAllDocuments": "Выбрать все",
+  "clearDocumentSelection": "Сбросить выбор",
+  "selectedDocuments": {
+    "one": "Выбран {count}",
+    "few": "Выбрано {count}",
+    "many": "Выбрано {count}"
+  },
+  "selectionActions": "Выбранные файлы",
+  "openSelectedDocuments": "Открыть",
+  "removeFromRecents": "Убрать из недавних",
+  "saveDocumentAs": "Сохранить как…",
+  "savedDocumentAs": "Копия сохранена как «{name}».",
+  "saveDocumentAsFailed": "Не удалось сохранить копию «{name}». {error}",
+  "designSystems": "Дизайн-системы",
+  "designSystemsDescription": "Начните новый дизайн с компонентами опубликованной библиотеки.",
+  "noDesignSystems": "Дизайн-систем пока нет",
+  "noDesignSystemsDescription": "Опубликуйте библиотеку на панели «Ассеты» документа, чтобы начинать с ней новые дизайны здесь.",
+  "designSystemComponents": {
+    "one": "{count} компонент",
+    "few": "{count} компонента",
+    "many": "{count} компонентов"
+  },
+  "newDesignWith": "Новый дизайн с {name}",
+  "loadingDesignSystems": "Загрузка дизайн-систем…",
   "saveAsPrompt": "Сохранить как:",
-  "browserFileAPINotSupported": "Ваш браузер не поддерживает API локальных файлов. Вместо сохранения на месте файлы будут скачиваться."
+  "browserFileAPINotSupported": "Ваш браузер не поддерживает API локальных файлов. Вместо сохранения на месте файлы будут скачиваться.",
+  "fileChangedOnDisk": "Файл «{name}» изменён на диске",
+  "fileChangedOnDiskDescription": "Другое приложение изменило этот файл, пока у вас есть несохранённые правки. Перезагрузите его, чтобы открыть версию из файла и отменить свои правки, или проигнорируйте изменение и продолжайте работу. При сохранении файл будет заменён вашей версией.",
+  "reloadFromDisk": "Перезагрузить",
+  "ignoreDiskChange": "Игнорировать"
 }

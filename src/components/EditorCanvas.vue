@@ -112,6 +112,8 @@ useCanvas(sceneCanvasRef, store, {
     drawnView.value = view
   },
   sceneRenderer: appRuntimeConfig.sceneRenderer,
+  maxPixelRatio: appRuntimeConfig.maxPixelRatio,
+  reducedEffects: appRuntimeConfig.reducedEffects,
   onReady: canvasReady,
   onFailed: (error) =>
     store.preparationController.failCanvas(
@@ -135,6 +137,8 @@ const {
   hitTestStatusLabel
 } = useCanvas(canvasRef, store, {
   layer: 'overlays',
+  // Drawn at the scene canvas's density, so the two layers line up.
+  maxPixelRatio: appRuntimeConfig.maxPixelRatio,
   // The scene canvas reports a canvas that cannot start.
   onFailed: () => undefined,
   get showRulers() {
@@ -165,7 +169,11 @@ const {
   updatePaneCursor,
   activatePane,
   () => isActivePane.value,
-  () => appPreferences.value.navigation.zoomSpeed
+  () => appPreferences.value.navigation.zoomSpeed,
+  () => ({
+    wheelZooms: appPreferences.value.navigation.wheelZoom,
+    invert: appPreferences.value.navigation.invertZoom
+  })
 )
 
 watch(isActivePane, (active) => {

@@ -1,5 +1,10 @@
 import type { Editor } from '@open-pencil/core'
-import { nearestPointOnNetwork, removeVertex, splitSegmentAt } from '@open-pencil/core/vector'
+import {
+  joinEndpoints,
+  nearestPointOnNetwork,
+  removeVertex,
+  splitSegmentAt
+} from '@open-pencil/core/vector'
 import type { VectorNetwork } from '@open-pencil/scene-graph'
 
 import { pushNodeEditHistory } from './history'
@@ -40,32 +45,18 @@ export function createVectorEditNetworkActions(
 ) {
   const nodeEditHitThreshold = 8
 
+  /**
+   * Merges end point `a` into end point `b`, as dropping a dragged end point on another does. It is
+   * the same join as ⌘/Ctrl+J, so a path whose two ends meet closes and fills either way.
+   */
   function nodeEditConnectEndpoints(a: number, b: number) {
     const es = getNodeEditState()
-    if (!es || a === b) return
-    if (a < 0 || b < 0 || a >= es.vertices.length || b >= es.vertices.length) return
+    if (!es) return
+    const joined = joinEndpoints(getLiveNetwork(es), a, b, Infinity)
+    if (!joined) return
     pushNodeEditHistory(es)
-
-    const removeIndex = a
-    const keepIndex = b > a ? b - 1 : b
-    const remap = (idx: number): number => {
-      if (idx === removeIndex) return keepIndex
-      return idx > removeIndex ? idx - 1 : idx
-    }
-
-    const nextVertices = es.vertices.filter((_, idx) => idx !== removeIndex)
-    const nextSegments = es.segments
-      .map((seg) => ({
-        ...seg,
-        tangentStart: { ...seg.tangentStart },
-        tangentEnd: { ...seg.tangentEnd },
-        start: remap(seg.start),
-        end: remap(seg.end)
-      }))
-      .filter((seg) => seg.start !== seg.end)
-
-    setNodeEditNetwork(es, { vertices: nextVertices, segments: nextSegments, regions: [] })
-    es.selectedVertexIndices = new Set([keepIndex])
+    setNodeEditNetwork(es, joined.network)
+    es.selectedVertexIndices = new Set(joined.vertexIndices)
     es.selectedSegmentIndices = new Set()
     es.selectedRegions = new Set()
     es.selectedHandles = new Set()

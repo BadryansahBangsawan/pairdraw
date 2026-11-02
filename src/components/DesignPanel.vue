@@ -59,7 +59,7 @@ import VariablesSection from './properties/VariablesSection.vue'
 const store = useEditorStore()
 const libraryService = useLibraryService()
 const activeTool = computed(() => store.state.activeTool)
-const { selectedNode: node, selectedCount: multiCount } = useSelectionState()
+const { selectedNode: node, selectedCount: multiCount, canConvertToFrame } = useSelectionState()
 const swapBinding = usePropertyBinding('INSTANCE_SWAP')
 const swapLinked = computed(() => !!swapBinding.definition.value)
 const showBooleanOperations = computed(() => multiCount.value >= 2)
@@ -154,7 +154,12 @@ const { panels } = useI18n()
       <PanelHeader :component="isComponentType">
         <template #icon>
           <LayerTypeMenu
-            v-if="node.type === 'FRAME' || node.type === 'GROUP' || node.type === 'SECTION'"
+            v-if="
+              node.type === 'FRAME' ||
+              node.type === 'GROUP' ||
+              node.type === 'SECTION' ||
+              (node.type === 'COMPONENT' && canConvertToFrame)
+            "
             :node="node"
             :icon="selectedIcon"
           />

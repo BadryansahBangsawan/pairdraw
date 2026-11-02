@@ -9,6 +9,7 @@ import {
   CANVAS_COPY_AS_ACTIONS,
   CANVAS_COPY_AS_GROUP_TEST_ID,
   CANVAS_PROPERTIES_ACTIONS,
+  CANVAS_RUN_STICKY_PROMPT_TEST_ID,
   CANVAS_VECTORIZE_TEST_ID,
   type CanvasContextActionId,
   type CanvasContextActionMeta
@@ -24,11 +25,13 @@ type CanvasCopyLabels = {
   copyAsSVG: string
   copyAsPNG: string
   copyAsJSX: string
+  copyAsHTML: string
   copyNodeId: string
   copyXPath: string
   copyProperties: string
   pasteProperties: string
   convertToVector: string
+  runStickyAsPrompt: string
 }
 
 function withoutStaticSelectionCommands(entries: readonly MenuEntry[]): MenuEntry[] {
@@ -62,6 +65,8 @@ function copyAction(
       return runAsync(actions.copyAsPNG)
     case 'copy-as-jsx':
       return runAsync(() => actions.clipboardWrite(editor.copySelectionAsJSX(actions.ids()), 'JSX'))
+    case 'copy-as-html':
+      return runAsync(actions.copyAsHTML)
     case 'copy-node-id':
       return runAsync(actions.copyNodeId)
     case 'copy-xpath':
@@ -116,6 +121,16 @@ export function useCanvasContextMenu(
           label: labels.value.convertToVector,
           testId: CANVAS_VECTORIZE_TEST_ID,
           action: runAsync(actions.vectorizeImage)
+        }
+      )
+    }
+    if (actions.canRunStickyPrompt()) {
+      entries.push(
+        { separator: true },
+        {
+          label: labels.value.runStickyAsPrompt,
+          testId: CANVAS_RUN_STICKY_PROMPT_TEST_ID,
+          action: runAsync(actions.runStickyPrompt)
         }
       )
     }

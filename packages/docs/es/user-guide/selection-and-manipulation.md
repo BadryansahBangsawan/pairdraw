@@ -12,14 +12,16 @@ Los objetos seleccionados se pueden mover, redimensionar, rotar, duplicar y camb
 - Un clic en un objeto sustituye la selección actual.
 - <kbd>Shift</kbd> + clic añade o elimina un objeto.
 - Arrastrar sobre una zona libre del lienzo crea una selección rectangular e incluye los objetos que intersecta.
+- <kbd>⌘</kbd> + arrastrar (<kbd>Ctrl</kbd> + arrastrar en Windows y Linux) crea una selección rectangular que elige las capas anidadas más profundas que toca. Empieza donde empieza una selección rectangular normal: en el lienzo vacío o en el fondo vacío de un marco de nivel superior o de una sección. Sobre una capa o el fondo de un marco, componente o instancia anidados, <kbd>⌘</kbd> + arrastrar selecciona esa capa y la mueve. Pulsa o suelta <kbd>⌘</kbd> mientras arrastras para cambiar entre la selección profunda y la normal.
 - <kbd>⌘</kbd><kbd>A</kbd> selecciona todos los objetos de la página actual.
 - Un clic en una zona libre cancela la selección.
 
 ## Mover
 
 - Arrastra un objeto seleccionado.
-- Las teclas de flecha desplazan 1 px.
-- <kbd>Shift</kbd> + flechas desplazan 10 px.
+- Las teclas de flecha desplazan el desplazamiento pequeño, 1 px por defecto.
+- <kbd>Shift</kbd> + flechas desplazan el desplazamiento grande, 10 px por defecto.
+- Ambas distancias se ajustan en **Ajustes → Editor → Desplazamiento con flechas**.
 
 ## Redimensionar
 

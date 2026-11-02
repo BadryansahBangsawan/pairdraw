@@ -134,7 +134,23 @@ export function createSelectionCommands({
         return t.value.createComponent
       },
       enabled: capabilities.canCreateComponent,
-      run: () => editor.createComponentFromSelection()
+      // On a main component the same keys turn it back into a frame, once the front end confirms.
+      run: () => {
+        const node = selection.selectedNode.value
+        if (node && capabilities.canConvertToFrame.value) editor.requestComponentToFrame(node.id)
+        else editor.createComponentFromSelection()
+      }
+    },
+    'selection.convertToFrame': {
+      id: 'selection.convertToFrame',
+      get label() {
+        return t.value.convertToFrame
+      },
+      enabled: capabilities.canConvertToFrame,
+      run: () => {
+        const node = selection.selectedNode.value
+        if (node) editor.requestComponentToFrame(node.id)
+      }
     },
     'selection.createComponentSet': {
       id: 'selection.createComponentSet',

@@ -12,11 +12,14 @@ OpenPencil работает прямо в браузере и не требуе�
 
 | Платформа | Файл |
 | --------------------- | -------------------- |
-| macOS (Apple Silicon) | `.dmg` (aarch64) |
-| macOS (Intel) | `.dmg` (x64) |
+| macOS (Apple Silicon) | `.dmg` / `.zip` (aarch64) |
+| macOS (Intel) | `.dmg` / `.zip` (x64) |
 | Windows (x64) | `.msi` / `.exe` |
 | Windows (ARM) | `.msi` / `.exe` |
-| Linux (x64) | `.AppImage` / `.deb` |
+| Linux (x64) | `.AppImage` / `.deb` / `.rpm` / `.tar.gz` |
+| Linux (ARM64) | `.AppImage` / `.deb` / `.rpm` / `.tar.gz` |
+
+Чтобы проверить, есть ли новая версия приложения для компьютера, выберите **Check for Updates…** в меню **Help** в Windows и Linux или в меню приложения в macOS. Пункт **About** рядом показывает установленную версию.
 
 ## Системные требования {#system-requirements}
 

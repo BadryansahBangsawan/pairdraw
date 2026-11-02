@@ -29,6 +29,14 @@ Możesz utworzyć kilka modeli i osobno przypisać je do projektowania, przeglą
 | **DeepSeek**           | DeepSeek Flash, DeepSeek V4 Pro                                        | Klucz API z [platform.deepseek.com](https://platform.deepseek.com/api_keys)                                |
 | **Z.ai**               | GLM-5.3, GLM-5.3-Flash, GLM-5.3-FlashX, GLM-5V-Turbo                   | Klucz API zgodnie z [dokumentacją Z.ai](https://docs.z.ai/devpack/quick-start)                             |
 | **MiniMax**            | MiniMax-M3.1-Flash, MiniMax-M3                                         | Klucz API z [platform.minimax.io](https://platform.minimax.io/user-center/basic-information/interface-key) |
+| **xAI**                | Grok 4.7, Grok 4.6, Grok Build 0.1                                     | Klucz API z [console.x.ai](https://console.x.ai)                                                           |
+| **Meta**               | Muse Spark 1.3, Muse Wonder                                            | Klucz API z [dev.meta.ai](https://dev.meta.ai)                                                             |
+| **Kimi For Coding**    | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi For Coding                | Klucz API planu Kimi Code z [kimi.ai](https://www.kimi.ai/code/console). Tylko w aplikacji desktopowej.    |
+| **Moonshot AI**        | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi K3                        | Klucz API z [platform.moonshot.ai](https://platform.moonshot.ai/console/api-keys)                          |
+| **Together AI**        | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Muse Spark Open                 | Klucz API z [together.ai](https://api.together.ai/settings/api-keys)                                       |
+| **Fireworks AI**       | Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, MiniMax-M3.1-Flash              | Klucz API z [fireworks.ai](https://app.fireworks.ai/settings/users/api-keys)                               |
+| **OpenCode Zen**       | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Big Pickle                      | Klucz API z [opencode.ai](https://opencode.ai/auth). Tylko w aplikacji desktopowej.                        |
+| **OpenCode Go**        | Kimi K3.1 Pro, MiniMax M3.1 Flash, GLM-5.3, DeepSeek V4.1 Flash        | Klucz API planu Go z [opencode.ai](https://opencode.ai/auth). Tylko w aplikacji desktopowej.               |
 | **Zgodny z OpenAI**    | Dowolny punkt końcowy w formacie OpenAI API                            | Własny adres bazowy i klucz; wybór Completions API lub Responses API                                       |
 | **Zgodny z Anthropic** | Dowolny punkt końcowy w formacie Anthropic API                         | Własny adres bazowy i klucz                                                                                |
 

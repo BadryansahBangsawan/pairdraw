@@ -13,6 +13,7 @@ import AISetupFlow from './AISetupFlow.vue'
 
 interface Args {
   agentsAvailable: boolean
+  desktop?: boolean
 }
 
 const freshInstall: AIModelSettings = {
@@ -90,6 +91,27 @@ export const AccessOnDesktop: Story = {
   play: async () => {
     await next()
     await expect(page().getByRole('checkbox', { name: 'Claude Code' })).toBeVisible()
+  }
+}
+/** Kimi For Coding and OpenCode send no CORS headers, so only the desktop app offers them. */
+export const MoreProvidersInBrowser: Story = {
+  play: async () => {
+    await next()
+    await userEvent.click(page().getByRole('button', { name: 'More providers' }))
+    await expect(page().getByRole('checkbox', { name: 'xAI' })).toBeVisible()
+    await expect(page().queryByRole('checkbox', { name: 'Kimi For Coding' })).toBeNull()
+    await expect(page().queryByRole('checkbox', { name: 'OpenCode Zen' })).toBeNull()
+    await expect(page().queryByRole('checkbox', { name: 'OpenCode Go' })).toBeNull()
+  }
+}
+export const MoreProvidersOnDesktop: Story = {
+  args: { agentsAvailable: true, desktop: true },
+  play: async () => {
+    await next()
+    await userEvent.click(page().getByRole('button', { name: 'More providers' }))
+    await expect(page().getByRole('checkbox', { name: 'Kimi For Coding' })).toBeVisible()
+    await expect(page().getByRole('checkbox', { name: 'OpenCode Zen' })).toBeVisible()
+    await expect(page().getByRole('checkbox', { name: 'OpenCode Go' })).toBeVisible()
   }
 }
 

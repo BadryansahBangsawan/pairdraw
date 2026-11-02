@@ -10,6 +10,7 @@ import { CORNER_FIELDS } from '@open-pencil/scene-graph/fields'
 import { fillSizingFields } from '@open-pencil/scene-graph/layout'
 import type { Color } from '@open-pencil/scene-graph/primitives'
 
+import { applyAnnotation, createAnnotation, isAnnotation } from './annotations'
 import { convertEffects } from './effects'
 import { ellipseArc } from './geometry'
 import { drawIcon, insideComponent, useIconComponent } from './icons'
@@ -24,7 +25,9 @@ import {
 } from './layout'
 import { applyStroke, convertPaints, strokeFields } from './paints'
 import { isPlain, type PenPlacement } from './placement'
+import { applyPenPluginData } from './plugin-data'
 import type { NodeFields, PenNode, PenOverride } from './schema'
+import { createPenSlot } from './slots'
 import { applyTextProps } from './text'
 import { bindIfVar, resolveBoolean, resolveNumber, type VarContext } from './variables'
 
@@ -81,8 +84,19 @@ function penPlacement(pen: PenOverride, ctx: VarContext): PenPlacement {
   }
 }
 
-function sceneType(pen: PenNode): NodeType {
+/**
+ * A `line` runs from its box's top-left corner to its bottom-right, so a line with no height is
+ * a line layer and any other one a vector drawn across its box.
+ */
+function isFlatLine(pen: PenNode, ctx: VarContext): boolean {
+  const height = parseSize(pen.height, 100, ctx)
+  return height.sizing === 'FIXED' && height.value === 0
+}
+
+function sceneType(pen: PenNode, ctx: VarContext): NodeType {
   if (pen.type === 'frame') return pen.reusable ? 'COMPONENT' : 'FRAME'
+  if (pen.type === 'line') return isFlatLine(pen, ctx) ? 'LINE' : 'VECTOR'
+  if (isAnnotation(pen)) return 'STICKY'
   if (pen.type === 'rectangle') return 'RECTANGLE'
   if (pen.type === 'ellipse') return 'ELLIPSE'
   if (pen.type === 'polygon') return 'POLYGON'
@@ -153,7 +167,8 @@ const STROKE_WRITES = [
  */
 const PROPERTY_FIELDS = {
   name: ['name'],
-  context: [],
+  context: ['pluginData'],
+  metadata: ['pluginData'],
   x: PLACEMENT_FIELDS,
   y: PLACEMENT_FIELDS,
   width: ['width'],
@@ -181,8 +196,8 @@ const PROPERTY_FIELDS = {
   justifyContent: ['primaryAxisAlign'],
   alignItems: ['counterAxisAlign'],
   clip: ['clipsContent'],
-  placeholder: [],
-  slot: [],
+  placeholder: ['pluginData'],
+  slot: ['pluginData'],
   innerRadius: ['arcData'],
   startAngle: ['arcData'],
   sweepAngle: ['arcData'],
@@ -202,13 +217,14 @@ const PROPERTY_FIELDS = {
   textAlignVertical: ['textAlignVertical'],
   underline: [],
   strikethrough: [],
-  href: [],
+  href: ['styleRuns'],
   library: [],
   icon: [],
   weight: [],
   iconFontName: [],
   iconFontFamily: [],
-  ref: []
+  ref: [],
+  model: ['pluginData']
 } satisfies Record<keyof NodeFields, readonly (keyof SceneNode)[]>
 
 const isProperty = (key: string): key is keyof typeof PROPERTY_FIELDS => key in PROPERTY_FIELDS
@@ -245,6 +261,10 @@ export function redrawIconAtLaidOutSize(node: SceneNode, pen: PenNode, build: Bu
  */
 // eslint-disable-next-line complexity -- .pen node mapping touches many format-specific fields
 export function applyPenProperties(node: SceneNode, pen: PenNode, build: Build): void {
+  if (node.type === 'STICKY') {
+    applyAnnotation(node, pen, build)
+    return
+  }
   const { graph, ctx } = build
   const { w, h, layout, isTextLike } = resolveSizing(pen, ctx)
   const hasChildren = (pen.children?.length ?? 0) > 0 || node.childIds.length > 0
@@ -294,6 +314,9 @@ export function applyPenProperties(node: SceneNode, pen: PenNode, build: Build):
 
   node.fills = convertPaints(pen.fill, 'fills', ctx, node, build.images)
   applyStroke(node, strokeFields(pen), ctx, build.images)
+  // A line layer has no inside or outside; its stroke is centred on it.
+  if (node.type === 'LINE')
+    node.strokes = node.strokes.map((paint) => ({ ...paint, align: 'CENTER' }))
   node.effects = convertEffects(pen.effect, ctx)
   applyCornerRadius(node, pen.cornerRadius, ctx)
   applyPadding(node, pen.padding, ctx)
@@ -309,6 +332,7 @@ export function applyPenProperties(node: SceneNode, pen: PenNode, build: Build):
     if (w.sizing === 'FILL') Object.assign(node, fillSizingFields(flowLayout, 'HORIZONTAL'))
     if (h.sizing === 'FILL') Object.assign(node, fillSizingFields(flowLayout, 'VERTICAL'))
   }
+  applyPenPluginData(node, pen)
   build.effective.set(node.id, pen)
 }
 
@@ -331,8 +355,7 @@ function instanceFields(ref: PenNode, component: PenNode | undefined): PenNode {
 }
 
 /** Builds a layer and its children in the layer's theme, merged over its parent's. */
-export function createSceneNode(pen: PenNode, parentId: string, build: Build): string | null {
-  if (pen.type === 'prompt') return null
+export function createSceneNode(pen: PenNode, parentId: string, build: Build): string {
   const component = pen.type === 'ref' && pen.ref ? build.components.get(pen.ref) : undefined
   // A component that is not a frame has no instances; its uses are plain copies.
   const instanceOf = pen.type === 'ref' && component?.type === 'frame' ? component : undefined
@@ -340,8 +363,11 @@ export function createSceneNode(pen: PenNode, parentId: string, build: Build): s
   const iconInstance = fields.type === 'icon' && insideComponent(build.graph, parentId)
   const leaveTheme = fields.theme ? build.ctx.enterTheme(fields.theme) : undefined
   try {
-    const type = instanceOf || iconInstance ? 'INSTANCE' : sceneType(fields)
-    const node = build.graph.createNode(type, parentId, { id: pen.id })
+    const type = instanceOf || iconInstance ? 'INSTANCE' : sceneType(fields, build.ctx)
+    const node =
+      type === 'STICKY'
+        ? createAnnotation({ ...fields, id: pen.id }, parentId, build)
+        : build.graph.createNode(type, parentId, { id: pen.id })
     applyPenProperties(node, fields, build)
     if (instanceOf) {
       node.componentId = instanceOf.id
@@ -355,6 +381,7 @@ export function createSceneNode(pen: PenNode, parentId: string, build: Build): s
           build
         )
       }
+      createPenSlot(node, fields, build)
     }
     return node.id
   } finally {

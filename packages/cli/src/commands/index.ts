@@ -12,11 +12,13 @@ import importCmd from './import'
 import info from './info'
 import libraries from './libraries'
 import lint from './lint'
+import models from './models'
 import node from './node'
 import pages from './pages'
 import query from './query'
 import selection from './selection'
 import settings from './settings'
+import shell from './shell'
 import tokens from './tokens'
 import tool from './tool'
 import tree from './tree'
@@ -40,12 +42,14 @@ export const COMMANDS = {
   info,
   lint,
   libraries,
+  models,
   query,
   node,
   pages,
   redo,
   selection,
   settings,
+  shell,
   tool,
   tokens,
   tree,

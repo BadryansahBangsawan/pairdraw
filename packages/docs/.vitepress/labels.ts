@@ -18,6 +18,7 @@ export interface SidebarLabels {
   components: string
   variables: string
   checkingDesigns: string
+  designSystem: string
   openPencilCloud: string
   cloudStorage: string
   overview: string
@@ -37,6 +38,7 @@ export interface ProgrammableLabels {
   exporting: string
   analyzing: string
   comparing: string
+  git: string
   appControl: string
   scripting: string
   jsxRenderer: string
@@ -62,6 +64,7 @@ export const EN_PROG: ProgrammableLabels = {
   exporting: 'Exporting',
   analyzing: 'Analyzing Designs',
   comparing: 'Comparing Designs',
+  git: 'Versioning with Git',
   appControl: 'Controlling the App',
   scripting: 'Scripting',
   jsxRenderer: 'JSX Renderer',
@@ -76,6 +79,7 @@ export const DE_PROG: ProgrammableLabels = {
   exporting: 'Exportieren',
   analyzing: 'Designs analysieren',
   comparing: 'Designs vergleichen',
+  git: 'Versionierung mit Git',
   appControl: 'App steuern',
   scripting: 'Skripte',
   jsxRenderer: 'JSX-Renderer',
@@ -90,6 +94,7 @@ export const IT_PROG: ProgrammableLabels = {
   exporting: 'Esportazione',
   analyzing: 'Analisi design',
   comparing: 'Confronto dei design',
+  git: 'Versionamento con Git',
   appControl: 'Controllare l’app',
   scripting: 'Scripting',
   jsxRenderer: 'Renderer JSX',
@@ -104,6 +109,7 @@ export const FR_PROG: ProgrammableLabels = {
   exporting: 'Exporter',
   analyzing: 'Analyser les designs',
   comparing: 'Comparer des designs',
+  git: 'Versionner avec Git',
   appControl: 'Piloter l’application',
   scripting: 'Scripts',
   jsxRenderer: 'Moteur JSX',
@@ -118,6 +124,7 @@ export const ES_PROG: ProgrammableLabels = {
   exporting: 'Exportar',
   analyzing: 'Analizar diseños',
   comparing: 'Comparar diseños',
+  git: 'Versionar con Git',
   appControl: 'Controlar la app',
   scripting: 'Scripts',
   jsxRenderer: 'Renderizador JSX',
@@ -132,6 +139,7 @@ export const PL_PROG: ProgrammableLabels = {
   exporting: 'Eksportowanie',
   analyzing: 'Analiza projektów',
   comparing: 'Porównywanie projektów',
+  git: 'Wersjonowanie w Git',
   appControl: 'Sterowanie aplikacją',
   scripting: 'Skrypty',
   jsxRenderer: 'Renderer JSX',
@@ -146,6 +154,7 @@ export const RU_PROG: ProgrammableLabels = {
   exporting: 'Экспорт',
   analyzing: 'Анализ дизайна',
   comparing: 'Сравнение дизайнов',
+  git: 'Версии в Git',
   appControl: 'Управление приложением',
   scripting: 'Скрипты',
   jsxRenderer: 'JSX-рендерер',
@@ -172,6 +181,7 @@ export const EN: SidebarLabels = {
   components: 'Components',
   variables: 'Variables',
   checkingDesigns: 'Checking Designs',
+  designSystem: 'Building a Design System',
   openPencilCloud: 'OpenPencil Cloud',
   cloudStorage: 'Cloud Storage',
   icons: 'Icons',
@@ -203,6 +213,7 @@ export const DE: SidebarLabels = {
   components: 'Komponenten',
   variables: 'Variablen',
   checkingDesigns: 'Designs prüfen',
+  designSystem: 'Ein Designsystem aufbauen',
   openPencilCloud: 'OpenPencil Cloud',
   cloudStorage: 'Cloud-Speicher',
   icons: 'Symbole',
@@ -234,6 +245,7 @@ export const IT: SidebarLabels = {
   components: 'Componenti',
   variables: 'Variabili',
   checkingDesigns: 'Verificare i design',
+  designSystem: 'Creare un design system',
   openPencilCloud: 'OpenPencil Cloud',
   cloudStorage: 'Archiviazione cloud',
   icons: 'Icone',
@@ -265,6 +277,7 @@ export const FR: SidebarLabels = {
   components: 'Composants',
   variables: 'Variables',
   checkingDesigns: 'Vérifier les designs',
+  designSystem: 'Créer un design system',
   openPencilCloud: 'OpenPencil Cloud',
   cloudStorage: 'Stockage cloud',
   icons: 'Icônes',
@@ -296,6 +309,7 @@ export const ES: SidebarLabels = {
   components: 'Componentes',
   variables: 'Variables',
   checkingDesigns: 'Revisar diseños',
+  designSystem: 'Crear un sistema de diseño',
   openPencilCloud: 'OpenPencil Cloud',
   cloudStorage: 'Almacenamiento en la nube',
   icons: 'Iconos',
@@ -327,6 +341,7 @@ export const PL: SidebarLabels = {
   components: 'Komponenty',
   variables: 'Zmienne',
   checkingDesigns: 'Sprawdzanie projektów',
+  designSystem: 'Budowanie design systemu',
   openPencilCloud: 'OpenPencil Cloud',
   cloudStorage: 'Przechowywanie w chmurze',
   icons: 'Ikony',
@@ -358,6 +373,7 @@ export const RU: SidebarLabels = {
   components: 'Компоненты',
   variables: 'Переменные',
   checkingDesigns: 'Проверка дизайна',
+  designSystem: 'Создание дизайн-системы',
   openPencilCloud: 'OpenPencil Cloud',
   cloudStorage: 'Облачное хранилище',
   icons: 'Иконки',

@@ -7,6 +7,7 @@
   "group": "グループ化",
   "ungroup": "グループ解除",
   "createComponent": "コンポーネントを作成",
+  "convertToFrame": "フレームに変換",
   "createSlot": "スロットを作成",
   "createComponentSet": "コンポーネントセットを作成",
   "createInstance": "インスタンスを作成",
@@ -69,5 +70,15 @@
   "paletteSearchAriaLabel": "コマンドを検索",
   "paletteDescription": "Pairdraw のコマンドを検索して実行します。",
   "paletteNoCommands": "コマンドが見つかりません。",
-  "paletteBack": "戻る"
+  "paletteBack": "戻る",
+  "shortcutSheet": "キーボードショートカット",
+  "shortcutSheetDescription": "キャンバスにフォーカスがあるときに使えるキーです。",
+  "shortcutSheetSearch": "ショートカットを検索",
+  "shortcutSheetEmpty": "ショートカットが見つかりません。",
+  "shortcutSheetTools": "ツール",
+  "shortcutSheetCanvas": "キャンバスと選択",
+  "toggleAIChat": "AI チャットの表示/非表示",
+  "nudgeSelection": "選択範囲を少し移動",
+  "nudgeSelectionFurther": "選択範囲を大きく移動",
+  "panWhileHeld": "押している間ビューを移動"
 }

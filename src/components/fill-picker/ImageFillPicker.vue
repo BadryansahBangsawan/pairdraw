@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import { useFileDialog } from '@vueuse/core'
-import { computed, useTemplateRef } from 'vue'
+import { computed, shallowRef, useTemplateRef } from 'vue'
 
 import type { StockPhotoResult } from '@open-pencil/core/tools'
-import type { Fill, ImageScaleMode } from '@open-pencil/scene-graph'
+import type { Fill } from '@open-pencil/scene-graph'
 import { coverImageTransform } from '@open-pencil/scene-graph/images'
 import { useI18n } from '@open-pencil/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
+import {
+  IMAGE_FILL_MODES,
+  imageFillMode,
+  withImageFillMode,
+  type ImageFillMode
+} from '@/app/editor/images/scale-mode'
+import { downloadImageURL, type ImageURLFailure } from '@/app/editor/images/url'
 import { downloadPhoto } from '@/app/editor/photos/download'
 import type { PhotoService } from '@/app/editor/photos/search'
 import { toast } from '@/app/shell/ui'
@@ -18,14 +25,8 @@ import IconButton from '@/components/ui/button/IconButton.vue'
 import { useImageDrop } from '@/components/ui/drop/useImageDrop'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
 
+import ImageFillPickerURLField from './ImageFillPickerURLField.vue'
 import { useImageFill } from './useImageFill'
-
-const IMAGE_SCALE_MODES: { value: ImageScaleMode; label: string }[] = [
-  { value: 'FILL', label: 'Fill' },
-  { value: 'FIT', label: 'Fit' },
-  { value: 'CROP', label: 'Crop' },
-  { value: 'TILE', label: 'Tile' }
-]
 
 const { fill, layerSize = null } = defineProps<{
   fill: Fill
@@ -36,6 +37,18 @@ const emit = defineEmits<{ update: [fill: Fill] }>()
 
 const store = useEditorStore()
 const { panels } = useI18n()
+
+const MODE_LABELS = {
+  FILL: 'imageModeFill',
+  FIT: 'imageModeFit',
+  STRETCH: 'imageModeStretch',
+  CROP: 'imageModeCrop',
+  TILE: 'imageModeTile'
+} as const satisfies Record<ImageFillMode, keyof typeof panels.value>
+
+const modeOptions = computed(() =>
+  IMAGE_FILL_MODES.map((value) => ({ value, label: panels.value[MODE_LABELS[value]] }))
+)
 
 const { url: imagePreviewURL, size: imageSize } = useImageFill(() => fill.imageHash, {
   measure: true
@@ -76,6 +89,37 @@ const { dragging } = useImageDrop(well, {
   }
 })
 
+/** An image address being loaded, and why the last one gave no image. */
+const urlPending = shallowRef(false)
+const urlFailure = shallowRef<{ reason: ImageURLFailure; status?: number } | null>(null)
+
+const URL_FAILURES = {
+  'invalid-url': 'imageURLInvalid',
+  'too-large': 'imageURLTooLarge',
+  unsupported: 'imageURLUnsupported',
+  unreachable: 'imageURLUnreachable'
+} as const satisfies Record<Exclude<ImageURLFailure, 'status'>, keyof typeof panels.value>
+
+const urlError = computed(() => {
+  const failure = urlFailure.value
+  if (!failure) return null
+  if (failure.reason === 'status')
+    return panels.value.imageURLStatus({ status: failure.status ?? 0 })
+  return panels.value[URL_FAILURES[failure.reason]]
+})
+
+async function fillWithURL(url: string) {
+  urlPending.value = true
+  urlFailure.value = null
+  try {
+    const result = await downloadImageURL(url)
+    if (result.ok) fillWith(result.bytes)
+    else urlFailure.value = { reason: result.reason, status: result.status }
+  } finally {
+    urlPending.value = false
+  }
+}
+
 async function fillWithPhoto(photo: StockPhotoResult, service: PhotoService) {
   try {
     fillWith((await downloadPhoto(service, photo)).bytes)
@@ -94,13 +138,17 @@ function cropStart(): Fill['imageTransform'] {
   return coverImageTransform(layerSize.width, layerSize.height, image.width, image.height)
 }
 
+/**
+ * A crop that frames the whole image stores what Stretch stores, as when the layer and image share
+ * proportions, so the picker shows whichever of the two was chosen here.
+ */
+const pickedMode = shallowRef<ImageFillMode | null>(null)
 const scaleMode = computed({
-  get: () => fill.imageScaleMode ?? ('FILL' as ImageScaleMode),
-  set: (mode: ImageScaleMode) => {
-    if (mode === scaleMode.value) return
-    const next: Fill = { ...fill, imageScaleMode: mode }
-    if (mode === 'CROP') next.imageTransform = cropStart()
-    emit('update', next)
+  get: () => imageFillMode(fill, pickedMode.value),
+  set: (mode: ImageFillMode) => {
+    const current = scaleMode.value
+    pickedMode.value = mode
+    if (mode !== current) emit('update', withImageFillMode(fill, mode, cropStart))
   }
 })
 
@@ -145,7 +193,7 @@ function rotate() {
           @click="pickImage()"
         >
           <template #leading><icon-lucide-upload class="size-3" /></template>
-          {{ fill.imageHash ? 'Replace' : 'Choose image' }}
+          {{ fill.imageHash ? panels.imageReplace : panels.imageChoose }}
         </AppButton>
         <PhotoPicker :heading="panels.stockPhoto" @select="fillWithPhoto">
           <template #trigger>
@@ -162,12 +210,20 @@ function rotate() {
         </PhotoPicker>
       </div>
     </div>
+    <ImageFillPickerURLField
+      :pending="urlPending"
+      :error="urlError"
+      @submit="fillWithURL"
+      @edit="urlFailure = null"
+    />
     <div class="flex items-center gap-1.5">
       <AppSelect
         :ui="{ trigger: 'min-w-0 flex-1' }"
+        :label="panels.imageScaleMode"
         :model-value="scaleMode"
-        :options="IMAGE_SCALE_MODES"
-        @update:model-value="(m) => (scaleMode = m as ImageScaleMode)"
+        :options="modeOptions"
+        data-test-id="fill-picker-image-mode"
+        @update:model-value="(m) => (scaleMode = m as ImageFillMode)"
       />
       <div v-if="scaleMode === 'TILE'" class="w-17 flex-none">
         <NumberField
@@ -180,9 +236,9 @@ function rotate() {
           @commit="setTileScale"
         />
       </div>
-      <!-- A crop holds its own turn in its transform, so only the other modes turn the image. -->
+      <!-- A crop, and so a stretch, holds its own turn in its transform; the other modes turn it. -->
       <IconButton
-        v-if="scaleMode !== 'CROP'"
+        v-if="scaleMode !== 'CROP' && scaleMode !== 'STRETCH'"
         :label="panels.rotate90"
         data-test-id="fill-picker-rotate-image"
         @click="rotate"

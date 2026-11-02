@@ -12,14 +12,16 @@ Gli oggetti selezionati possono essere spostati, ridimensionati, ruotati, duplic
 - Un clic su un oggetto sostituisce la selezione corrente.
 - <kbd>Shift</kbd> + clic aggiunge o rimuove un oggetto.
 - Trascinare in un’area libera crea una selezione rettangolare.
+- <kbd>⌘</kbd> + trascinamento (<kbd>Ctrl</kbd> + trascinamento su Windows e Linux) crea una selezione rettangolare che seleziona i livelli annidati più profondi che tocca. Parte dove parte una selezione rettangolare normale: sulla tela vuota o sullo sfondo vuoto di un frame di primo livello o di una sezione. Su un livello o sullo sfondo di un frame, componente o istanza annidati, <kbd>⌘</kbd> + trascinamento seleziona quel livello e lo sposta. Premi o rilascia <kbd>⌘</kbd> durante il trascinamento per passare dalla selezione profonda a quella normale.
 - <kbd>⌘</kbd><kbd>A</kbd> seleziona tutti gli oggetti della pagina corrente.
 - Un clic su un’area libera annulla la selezione.
 
 ## Spostare
 
 - Trascina un oggetto selezionato.
-- Le frecce spostano di 1 px.
-- <kbd>Shift</kbd> + frecce spostano di 10 px.
+- Le frecce spostano dello spostamento piccolo, 1 px di predefinito.
+- <kbd>Shift</kbd> + frecce spostano dello spostamento grande, 10 px di predefinito.
+- Imposta entrambe le distanze in **Impostazioni → Editor → Spostamento con le frecce**.
 
 ## Ridimensionare
 

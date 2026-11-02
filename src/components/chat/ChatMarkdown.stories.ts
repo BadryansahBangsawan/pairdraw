@@ -5,6 +5,7 @@ import ChatMarkdown from './ChatMarkdown.vue'
 type ChatMarkdownStoryArgs = {
   content: string
   mode?: 'static' | 'streaming'
+  localFiles?: boolean
 }
 
 /**
@@ -119,5 +120,22 @@ export const Streaming: Story = {
     mode: 'streaming',
     content:
       'The assistant is writing **streamed content** with `inline_code` and an unfinished [link'
+  }
+}
+
+/** On the desktop, links to files on this computer show the file in its folder. */
+export const LocalFileLinks: Story = {
+  args: {
+    localFiles: true,
+    content:
+      'I saved the tokens to [tokens.css](file:///Users/me/Designs/tokens.css) and the export to <file:///Users/me/Designs/hero.png>.'
+  }
+}
+
+/** In the browser the same links stay inert text. */
+export const LocalFileLinksInBrowser: Story = {
+  args: {
+    localFiles: false,
+    content: 'I saved the tokens to [tokens.css](file:///Users/me/Designs/tokens.css).'
   }
 }

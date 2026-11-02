@@ -3,7 +3,7 @@ import * as v from 'valibot'
 import { behaviourSchema } from '../behaviours/schema'
 import type { OkHCLPayload } from '../color/okhcl'
 import { commentThreadsSchema } from '../comments/schema'
-import { isExportFormatId, type ExportFormatId } from '../export-format'
+import { clampExportQuality, isExportFormatId, type ExportFormatId } from '../export-format'
 import { clampExportScale } from '../export-scale'
 import { FIG_COMPRESSIONS } from '../fig-compression'
 import { iconSchema, iconTintSchema } from '../icons/schema'
@@ -60,10 +60,15 @@ const exportSettingsSchema: v.GenericSchema<unknown, ExportSetting[]> = v.array(
   v.pipe(
     v.object({
       scale: v.pipe(v.number(), v.finite()),
-      format: v.custom<ExportFormatId>(isExportFormatId)
+      format: v.custom<ExportFormatId>(isExportFormatId),
+      quality: v.optional(v.pipe(v.number(), v.finite()))
     }),
     // Clamp at the file boundary: imported plugin data may carry a scale the UI never produces.
-    v.transform(({ scale, format }) => ({ scale: clampExportScale(scale), format }))
+    v.transform(({ scale, format, quality }) => ({
+      scale: clampExportScale(scale),
+      format,
+      ...(quality === undefined ? {} : { quality: clampExportQuality(quality) })
+    }))
   )
 )
 

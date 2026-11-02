@@ -37,6 +37,18 @@ const node: AttachmentPresentation = {
   originalSize: { x: 320, y: 240 }
 }
 
+const stylesheet = ':root {\n  --brand: #ff5b2e;\n  --radius-card: 14px;\n}\n'
+
+const file: AttachmentPresentation = {
+  id: 'file',
+  messageId: 'message',
+  kind: 'file',
+  name: 'tokens.css',
+  preview: new Blob([stylesheet], { type: 'text/plain;charset=utf-8' }),
+  mediaType: 'text/css',
+  size: stylesheet.length
+}
+
 type AttachmentListStoryArgs = {
   attachments: AttachmentPresentation[]
 }
@@ -58,3 +70,6 @@ type Story = StoryObj<AttachmentListStoryArgs>
 export const Image: Story = { args: { attachments: [image] } }
 export const Node: Story = { args: { attachments: [node] } }
 export const Mixed: Story = { args: { attachments: [node, image] } }
+/** A text file, such as a stylesheet or notes, shows its name; its text opens in the viewer. */
+export const TextFile: Story = { args: { attachments: [file] } }
+export const TextFileWithImages: Story = { args: { attachments: [node, file, image] } }

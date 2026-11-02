@@ -12,6 +12,8 @@ export type PresetNumberUI = ComponentUI<PresetNumberTheme> & {
 
 /** Sentinel option value; never a real number so it cannot collide with a preset. */
 const CUSTOM_OPTION = 'custom'
+/** How far the arrow keys and spinner move a fractional custom value. */
+const FRACTIONAL_STEP = 0.1
 
 export interface PresetNumberFieldProps {
   /** Values offered directly; the current value selects one of them when it matches. */
@@ -24,6 +26,8 @@ export interface PresetNumberFieldProps {
   customLabel: string
   /** Translated message shown when a custom value is outside the range. */
   rangeMessage: string
+  /** Accepts custom values between whole numbers, such as 0.25; whole numbers only by default. */
+  fractional?: boolean
   disabled?: boolean
   class?: HTMLAttributes['class']
   ui?: PresetNumberUI
@@ -46,6 +50,7 @@ const {
   label,
   customLabel,
   rangeMessage,
+  fractional = false,
   disabled = false,
   ui,
   class: className
@@ -98,7 +103,8 @@ watch(value, (next) => {
 
 function commitDraft(): void {
   const parsed = Number(draft.value)
-  const valid = Number.isInteger(parsed) && parsed >= min && parsed <= max
+  const allowed = fractional ? Number.isFinite(parsed) : Number.isInteger(parsed)
+  const valid = allowed && parsed >= min && parsed <= max
   invalid.value = !valid
   if (!valid || parsed === value.value) return
   value.value = parsed
@@ -128,7 +134,7 @@ function commitDraft(): void {
         size="xs"
         :min="min"
         :max="max"
-        :step="1"
+        :step="fractional ? FRACTIONAL_STEP : 1"
         :disabled="disabled"
         :aria-label="`${label}: ${customLabel}`"
         :aria-invalid="invalid"

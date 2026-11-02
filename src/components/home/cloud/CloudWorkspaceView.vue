@@ -5,8 +5,13 @@ import { computed } from 'vue'
 import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
 import { useCloudMessages, useCommonMessages, useFileMessages } from '@open-pencil/vue/i18n'
 
+import { useDocumentSelection } from '@/app/home/selection'
 import { formatStorageBytes } from '@/app/storage/format-bytes'
 import DocumentEntry from '@/components/home/document/DocumentEntry.vue'
+import DocumentSelectionBar from '@/components/home/document/DocumentSelectionBar.vue'
+import type { DocumentEntryAction } from '@/components/home/document/types'
+import { useDocumentEntryMenu } from '@/components/home/document/useDocumentEntryMenu'
+import { useDocumentListKeys } from '@/components/home/document/useDocumentListKeys'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import AppAlert from '@/components/ui/feedback/AppAlert.vue'
@@ -24,7 +29,8 @@ import type { CloudDocumentRow } from './types'
 
 /**
  * One Cloud workspace on the home tab: its files with where each stands against the server, how
- * much of the workspace's storage they use, and what needs attention.
+ * much of the workspace's storage they use, and what needs attention. Cmd/Ctrl+click and
+ * Shift+click select files to open, or delete where the person may, together.
  */
 const {
   heading,
@@ -52,7 +58,10 @@ const {
 const view = defineModel<'grid' | 'list'>('view', { default: 'grid' })
 const emit = defineEmits<{
   open: [document: CloudDocumentRow]
-  delete: [document: CloudDocumentRow]
+  /** Open these documents, in this order. */
+  openMany: [documents: CloudDocumentRow[]]
+  /** Delete these documents, after asking. */
+  delete: [documents: CloudDocumentRow[]]
   newDesign: []
   members: []
   refresh: []
@@ -65,13 +74,33 @@ const files = useFileMessages()
 const { isTouch } = useViewportKind()
 const styles = tv(documentsTheme)()
 const loading = skeleton()
+const selection = useDocumentSelection(() => documents.map((document) => document.id))
+const selectedDocuments = computed(() => documents.filter((document) => selection.has(document.id)))
+const onKeydown = useDocumentListKeys(selection)
+const entryMenu = useDocumentEntryMenu()
 const menu = (document: CloudDocumentRow) =>
-  canDelete
-    ? {
-        actions: files.value.documentActions({ name: document.name }),
-        delete: files.value.deleteDocument
-      }
-    : undefined
+  entryMenu(document.name, { selected: selection.has(document.id), delete: canDelete })
+
+function act(document: CloudDocumentRow, action: DocumentEntryAction) {
+  if (action === 'select' || action === 'deselect') selection.select(document.id, 'toggle')
+  else if (action === 'delete') emit('delete', [document])
+}
+
+function open(document: CloudDocumentRow) {
+  selection.clear()
+  emit('open', document)
+}
+
+function openSelected() {
+  const opening = selectedDocuments.value
+  selection.clear()
+  emit('openMany', opening)
+}
+
+// The selection stays until the documents are gone, so cancelling keeps it.
+function deleteSelected() {
+  emit('delete', selectedDocuments.value)
+}
 const conflicts = computed(() => documents.filter((document) => document.sync === 'conflict'))
 const usageLabel = computed(() => {
   if (!usage) return null
@@ -85,7 +114,7 @@ const metadata = (document: CloudDocumentRow) =>
 </script>
 
 <template>
-  <section :class="styles.section()">
+  <section :class="styles.section()" @keydown="onKeydown">
     <header :class="styles.header()">
       <div :class="styles.heading()">
         <div :class="styles.titleRow()">
@@ -164,6 +193,23 @@ const metadata = (document: CloudDocumentRow) =>
       </template>
     </AppAlert>
 
+    <DocumentSelectionBar
+      v-if="selection.count.value > 0"
+      :count="selection.count.value"
+      :total="documents.length"
+      @select-all="selection.selectAll"
+      @clear="selection.clear"
+    >
+      <AppButton variant="outline" @click="openSelected">
+        <template #leading><icon-lucide-folder-open /></template>
+        {{ files.openSelectedDocuments }}
+      </AppButton>
+      <AppButton v-if="canDelete" variant="outline" @click="deleteSelected">
+        <template #leading><icon-lucide-trash-2 /></template>
+        {{ files.deleteDocument }}
+      </AppButton>
+    </DocumentSelectionBar>
+
     <div
       v-if="state === 'loading'"
       :class="[styles.grid(), loading.group()]"
@@ -202,8 +248,11 @@ const metadata = (document: CloudDocumentRow) =>
         :metadata="metadata(document)"
         :previewURL="document.previewURL"
         :menu="menu(document)"
-        @open="emit('open', document)"
-        @delete="emit('delete', document)"
+        selectable
+        :selected="selection.has(document.id)"
+        @open="open(document)"
+        @select="selection.select(document.id, $event)"
+        @action="act(document, $event)"
       >
         <template #status>
           <Tip v-if="document.permission === 'view'" :label="t.homeViewOnlyTip">

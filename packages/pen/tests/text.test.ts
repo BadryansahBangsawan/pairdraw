@@ -81,6 +81,25 @@ describe('parsePenFile — text', () => {
     expect(node.fontSize).toBe(22)
     expect(node.boundVariables.fontSize).toBeDefined()
   })
+
+  test('links all of a text with an href', () => {
+    const node = textOf({ content: 'Docs', href: 'https://pen.dev/docs' })
+    expect(node.styleRuns).toEqual([
+      { start: 0, length: 4, style: { hyperlink: { type: 'URL', value: 'https://pen.dev/docs' } } }
+    ])
+  })
+
+  test('links nothing without an href, with a null one, or with no text', () => {
+    expect(textOf({}).styleRuns).toEqual([])
+    expect(textOf({ href: null }).styleRuns).toEqual([])
+    expect(textOf({ href: '  ' }).styleRuns).toEqual([])
+    expect(textOf({ content: '', href: 'https://pen.dev' }).styleRuns).toEqual([])
+  })
+
+  test('resolves an href variable', () => {
+    const node = textOf({ href: '$site' }, { site: { type: 'string', value: 'https://a.test' } })
+    expect(node.styleRuns[0]?.style.hyperlink).toEqual({ type: 'URL', value: 'https://a.test' })
+  })
 })
 
 describe('parsePenFile — absolute layers', () => {

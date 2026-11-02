@@ -1,6 +1,7 @@
 import * as v from 'valibot'
 
 import { parseColor } from '@open-pencil/scene-graph/color'
+import { iconOptionsSchema, type IconOptions } from '@open-pencil/scene-graph/icons'
 
 import { placeIcon } from '#core/icons'
 import { toolNumber, defineTool } from '#core/tools/schema'
@@ -37,11 +38,66 @@ export const fetchIconsTool = defineTool({
   }
 })
 
+/**
+ * How a set with options draws its icons, as Material Symbols' variable axes. Sets without
+ * options ignore them; a value outside an axis is clamped to it.
+ */
+const iconOptionInputs = {
+  weight: v.optional(
+    toolNumber(
+      v.pipe(
+        v.number(),
+        v.description('Stroke weight, 100 to 700 (Material Symbols; default: 400)')
+      )
+    )
+  ),
+  fill: v.optional(
+    v.pipe(v.boolean(), v.description('Filled rather than outlined (Material Symbols)'))
+  ),
+  grade: v.optional(
+    toolNumber(
+      v.pipe(
+        v.number(),
+        v.description('Grade, -50 to 200: thickness without resizing (Material Symbols)')
+      )
+    )
+  ),
+  optical_size: v.optional(
+    toolNumber(
+      v.pipe(v.number(), v.description('Optical size, 20 to 48 (Material Symbols; default: 24)'))
+    )
+  ),
+  options: v.optional(
+    v.pipe(
+      iconOptionsSchema,
+      v.description(
+        'Other options of a set that has them, by key, such as an SF Symbols weight or scale'
+      )
+    )
+  )
+}
+
+/** The named options as the axes a set reads, over any given by key. */
+function iconOptions(args: {
+  weight?: number
+  fill?: boolean
+  grade?: number
+  optical_size?: number
+  options?: IconOptions
+}): IconOptions | undefined {
+  const options: IconOptions = { ...args.options }
+  if (args.optical_size !== undefined) options.opsz = args.optical_size
+  if (args.weight !== undefined) options.wght = args.weight
+  if (args.fill !== undefined) options.FILL = args.fill ? 1 : 0
+  if (args.grade !== undefined) options.GRAD = args.grade
+  return Object.keys(options).length > 0 ? options : undefined
+}
+
 export const insertIcon = defineTool({
   name: 'insert_icon',
 
   description:
-    'Insert one or more vector icons onto the canvas. Pass a single name or multiple names to batch-insert into the same parent. If already cached by fetch_icons — instant, no network request.',
+    'Insert one or more vector icons onto the canvas. Pass a single name or multiple names to batch-insert into the same parent. If already cached by fetch_icons — instant, no network request. Material Symbols icons (material-symbols-outlined, -rounded, -sharp) take weight, fill, grade, and optical_size; the icon keeps them when swapped.',
   execution: { kind: 'async', mutation: 'document' },
   capabilities: ['document:write', 'network:access'],
   input: v.strictObject({
@@ -63,7 +119,8 @@ export const insertIcon = defineTool({
     color: v.optional(
       v.pipe(v.string(), v.description('Icon color hex (replaces currentColor). Default: #000000'))
     ),
-    parent_id: v.optional(v.pipe(v.string(), v.description('Parent node ID for all icons')))
+    parent_id: v.optional(v.pipe(v.string(), v.description('Parent node ID for all icons'))),
+    ...iconOptionInputs
   }),
   execute: async (figma, args) => {
     const names = args.names ?? (args.name ? [args.name] : [])
@@ -72,10 +129,11 @@ export const insertIcon = defineTool({
     const size = args.size ?? 24
     const color = args.color ?? '#000000'
     const parsedColor = parseColor(color)
+    const options = iconOptions(args)
 
     let icons
     try {
-      icons = await figma.icons.icons(names, size)
+      icons = await figma.icons.icons(names, size, options)
     } catch (e) {
       return { error: (e as Error).message }
     }

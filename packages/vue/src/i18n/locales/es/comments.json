@@ -12,6 +12,8 @@
   "deleteCommentDescription": "Se eliminarán el comentario y todas sus respuestas para todos.",
   "deleteReply": "Eliminar respuesta",
   "copyText": "Copiar texto",
+  "applyWithAI": "Aplicar con IA",
+  "applyOpenWithAI": "Aplicar comentarios abiertos con IA",
   "goToComment": "Ir al comentario",
   "moreActions": "Más acciones",
   "searchComments": "Buscar comentarios",

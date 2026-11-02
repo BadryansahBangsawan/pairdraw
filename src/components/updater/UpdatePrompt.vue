@@ -6,7 +6,7 @@ import { computed } from 'vue'
 import { useI18n } from '@open-pencil/vue/i18n'
 
 import { openExternalLink } from '@/app/shell/ui'
-import { updateFailureText } from '@/app/shell/updater/messages'
+import { updateFailureNotice } from '@/app/shell/updater/messages'
 import { downloadProgressLabel } from '@/app/shell/updater/progress'
 import type { UpdaterState } from '@/app/shell/updater/session'
 import BrandMark from '@/components/brand/BrandMark.vue'
@@ -56,7 +56,7 @@ const progress = computed(() => {
   }
 })
 const failure = computed(() =>
-  state.status === 'failed' ? updateFailureText(t.value, state.step, state.error) : null
+  state.status === 'failed' ? updateFailureNotice(t.value, state.step, state.error) : null
 )
 const ui = computed(() => {
   const theme = updatePromptTheme()
@@ -84,7 +84,7 @@ function openNotesLink(event: MouseEvent) {
       <BrandMark variant="app-icon" decorative :class="ui.icon" />
 
       <div :class="ui.content">
-        <AppAlert v-if="failure" tone="error" :heading="failure" :class="ui.alert" />
+        <AppAlert v-if="failure" :tone="failure.tone" :heading="failure.text" :class="ui.alert" />
 
         <template v-if="state.status === 'installed'">
           <h1 :class="ui.title">{{ t.installed({ version: release.version }) }}</h1>
@@ -124,7 +124,12 @@ function openNotesLink(event: MouseEvent) {
         <icon-lucide-loader-circle :class="ui.spinner" aria-hidden="true" />
         <p>{{ t.checking }}</p>
       </template>
-      <AppAlert v-else-if="failure" tone="error" :heading="failure" class="w-full text-start" />
+      <AppAlert
+        v-else-if="failure"
+        :tone="failure.tone"
+        :heading="failure.text"
+        class="w-full text-start"
+      />
     </AppPlaceholder>
 
     <footer :class="ui.footer">
@@ -150,7 +155,7 @@ function openNotesLink(event: MouseEvent) {
             {{ release ? t.later : common.close }}
           </AppButton>
           <AppButton
-            v-if="state.status === 'failed'"
+            v-if="failure?.retryable"
             color="primary"
             variant="solid"
             @click="emit('retry')"

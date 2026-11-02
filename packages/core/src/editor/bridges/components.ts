@@ -27,6 +27,10 @@ export function createComponentBridge(
       ),
     createInstanceFromComponent: components.createInstanceFromComponent,
     detachInstance: () => components.detachInstance(selection.getSelectedNode()),
+    canConvertToFrame: components.canConvertToFrame,
+    componentInstanceCount: components.componentInstanceCount,
+    requestComponentToFrame: components.requestComponentToFrame,
+    convertComponentToFrame: components.convertComponentToFrame,
     focusComponent: (componentId: string) =>
       components.focusComponent(componentId, pages.switchPage),
     goToMainComponent: () =>

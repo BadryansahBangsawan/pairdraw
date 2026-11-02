@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { BlendMode } from '@open-pencil/scene-graph'
 import { POINT_COUNT_RANGE } from '@open-pencil/scene-graph/polygon'
+import { useArc } from '@open-pencil/vue/controls/appearance'
 import { MIXED } from '@open-pencil/vue/controls/node-props'
 import { useVariableModes } from '@open-pencil/vue/controls/variable-modes'
 import { useI18n } from '@open-pencil/vue/i18n'
@@ -15,6 +16,7 @@ import PanelGrid from '@/components/ui/panel/PanelGrid.vue'
 import PanelSection from '@/components/ui/panel/PanelSection.vue'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
 
+import ArcControls from './arc/ArcControls.vue'
 import VariableBoundRow from './binding/VariableBoundRow.vue'
 import PropertyBoundField from './component-properties/PropertyBoundField.vue'
 import VariableModeMenu from './variable-modes/VariableModeMenu.vue'
@@ -23,6 +25,7 @@ import VisibilityControl from './visibility/VisibilityControl.vue'
 
 const { panels } = useI18n()
 const variableModes = useVariableModes()
+const arc = useArc()
 type BlendModeSelectValue = BlendMode | 'MIXED'
 
 const baseBlendModeGroups = useBlendModeGroups(true)
@@ -260,6 +263,17 @@ function blendModeGroups(value: BlendMode | typeof MIXED) {
           </NumberField>
         </PanelFieldGroup>
       </PanelGrid>
+
+      <ArcControls
+        v-if="arc.active.value"
+        class="mt-1.5"
+        :start="arc.start.value"
+        :sweep="arc.sweep.value"
+        :ratio="arc.ratio.value"
+        @update="arc.update"
+        @commit="arc.commit"
+        @cancel="arc.cancel"
+      />
 
       <PanelGrid v-if="hasCornerRadius && !cornerRadiusDisabled" :columns="2" class="mt-1.5">
         <PanelFieldGroup :label="panels.cornerSmoothing">

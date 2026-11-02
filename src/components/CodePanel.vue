@@ -14,6 +14,7 @@ import {
 
 import { resolveEditorProfile } from '@open-pencil/core'
 import { JSX_REFERENCE } from '@open-pencil/design-jsx'
+import { iconPackagesFor, isIconPackage } from '@open-pencil/dom-css/export'
 import type { SceneNode } from '@open-pencil/scene-graph'
 import { useEditorEvent } from '@open-pencil/vue/editor/events'
 import { useI18n } from '@open-pencil/vue/i18n'
@@ -26,6 +27,7 @@ import {
   type DOMCodeSession
 } from '@/app/code/dom-preview'
 import { generatedCodeAsync, generatedDesignJSX } from '@/app/code/generated'
+import { codeIconPackage, ICON_PACKAGE_LABELS, iconPackageFor } from '@/app/code/icons'
 import { useCodeLayers } from '@/app/code/layers/use'
 import {
   createDesignJSXEditSession,
@@ -37,8 +39,11 @@ import {
 } from '@/app/code/live-preview'
 import { codeStyling } from '@/app/code/styling'
 import { starterSourceFor, type CodeSource } from '@/app/code/templates'
+import { htmlExportSettings } from '@/app/document/export/html'
 import { useEditorStore } from '@/app/editor/active-store'
+import HTMLExportOptionsPopover from '@/components/export/HTMLExportOptionsPopover.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
+import IconButton from '@/components/ui/button/IconButton.vue'
 import AppPlaceholder from '@/components/ui/feedback/AppPlaceholder.vue'
 import Tip from '@/components/ui/overlay/Tip.vue'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
@@ -139,6 +144,16 @@ const stylingOptions = computed(() => [
   { value: 'css', label: code.value.stylingCSS },
   { value: 'tailwind', label: code.value.stylingTailwind }
 ])
+/** The framework generated components are for, whose icon packages the panel offers. */
+const iconFramework = computed(() => (source.value === 'vue' ? 'vue' : 'react'))
+const iconPackageOptions = computed(() =>
+  iconPackagesFor(iconFramework.value).map((value) => ({
+    value,
+    label: ICON_PACKAGE_LABELS[value]
+  }))
+)
+/** The remembered package, or Iconify where it draws no icons for this framework. */
+const iconPackage = computed(() => iconPackageFor(iconFramework.value))
 /** Components are generated; Design JSX and HTML are edited into layers. */
 const readOnly = computed(() => source.value === 'vue' || source.value === 'react')
 /** A read-only document's code is read, never previewed or applied back. */
@@ -311,6 +326,39 @@ function changeStyling(next: string): Promise<void> | undefined {
   return regenerate(() => (codeStyling.value = next))
 }
 
+function changeIconPackage(next: string): Promise<void> | undefined {
+  if (next === iconPackage.value || !isIconPackage(next)) return
+  return regenerate(() => (codeIconPackage.value = next))
+}
+
+const exportingHTML = ref(false)
+
+/**
+ * Saves the selection as an HTML file, styled as the panel styles it and written as the HTML
+ * export settings say, zipped with its images when they are separate files.
+ */
+async function exportHTML(): Promise<void> {
+  const nodeIds = [...store.state.selectedIds]
+  if (nodeIds.length === 0 || exportingHTML.value) return
+  exportingHTML.value = true
+  try {
+    // What the code previewed is what the canvas now holds, and so what is exported.
+    await commitCurrentSession()
+    await store.exportTarget({ scope: 'selection', nodeIds }, 'html', {
+      html: {
+        ...htmlExportSettings.value,
+        style: codeStyling.value === 'tailwind' ? 'tailwind' : 'inline'
+      }
+    })
+  } catch (exportError) {
+    console.error('[Code] Could not export HTML:', exportError)
+    const detail = exportError instanceof Error ? exportError.message : String(exportError)
+    error.value = code.value.exportFailed({ error: detail })
+  } finally {
+    exportingHTML.value = false
+  }
+}
+
 const selectionKey = computed(() => [...store.state.selectedIds].join(','))
 
 /** Generations of components and HTML in flight; only the latest shows. */
@@ -333,8 +381,14 @@ function showCanvas(next: CodeSource) {
     return
   }
   const styling = codeStyling.value
-  void generatedCodeAsync(next, styling, store.graph, selected).then((generated) => {
-    if (current !== generation || source.value !== next || codeStyling.value !== styling)
+  const icons = iconPackage.value
+  void generatedCodeAsync(next, styling, store.graph, selected, icons).then((generated) => {
+    if (
+      current !== generation ||
+      source.value !== next ||
+      codeStyling.value !== styling ||
+      iconPackage.value !== icons
+    )
       return generated
     codeLayers.showGenerated(generated)
     draft.value = generated.code
@@ -429,6 +483,21 @@ watch(
       </Tip>
     </header>
 
+    <div
+      v-if="readOnly"
+      class="flex shrink-0 items-center justify-between gap-2 border-b border-border px-3.5 py-2 text-xs text-muted"
+    >
+      <span>{{ code.iconPackage }}</span>
+      <AppSelect
+        :model-value="iconPackage"
+        :options="iconPackageOptions"
+        :label="code.iconPackage"
+        data-test-id="code-panel-icon-package"
+        :ui="{ trigger: 'w-auto min-w-0' }"
+        @update:model-value="changeIconPackage"
+      />
+    </div>
+
     <AppPlaceholder
       v-if="showEmptyState"
       :label="code.noSelection"
@@ -498,6 +567,17 @@ watch(
           <icon-lucide-rotate-ccw class="size-3" />
           {{ code.reset }}
         </AppButton>
+        <template v-if="source === 'html-css' && store.state.selectedIds.size > 0">
+          <HTMLExportOptionsPopover :show-styling="false" side="top" />
+          <IconButton
+            :label="code.exportHTML"
+            :disabled="exportingHTML"
+            data-test-id="code-panel-export-html"
+            @click="exportHTML"
+          >
+            <icon-lucide-download class="size-3.5" />
+          </IconButton>
+        </template>
         <AppButton
           color="neutral"
           variant="ghost"

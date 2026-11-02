@@ -14,6 +14,7 @@ import type { HitTestFns } from '#vue/shared/input/select'
 import { hitTestLabel } from '#vue/shared/input/select/hit'
 import { scalesByHandles } from '#vue/shared/input/sticky/scale'
 import { getNodeEditState } from '#vue/shared/input/vector'
+import { nodeEditCursor } from '#vue/shared/input/vector/cursor'
 
 function getResizeCursorForSelection(cx: number, cy: number, editor: Editor): string | null {
   for (const id of editor.state.selectedIds) {
@@ -85,7 +86,7 @@ export function updateHoverCursor(
 ): string | null {
   if (getNodeEditState(editor)) {
     editor.setHoveredNode(null)
-    return null
+    return nodeEditCursor(editor)
   }
 
   // As a press does: a line's ends, a connector's line handles, then resizing, then a label, then

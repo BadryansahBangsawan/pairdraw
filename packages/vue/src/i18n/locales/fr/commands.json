@@ -7,6 +7,7 @@
   "group": "Grouper",
   "ungroup": "Dégrouper",
   "createComponent": "Créer un composant",
+  "convertToFrame": "Convertir en cadre",
   "createSlot": "Créer un slot",
   "createComponentSet": "Créer un jeu de composants",
   "createInstance": "Créer une instance",
@@ -69,5 +70,15 @@
   "paletteSearchAriaLabel": "Rechercher des commandes",
   "paletteDescription": "Rechercher et exécuter des commandes Pairdraw.",
   "paletteNoCommands": "Aucune commande trouvée.",
-  "paletteBack": "Retour"
+  "paletteBack": "Retour",
+  "shortcutSheet": "Raccourcis clavier",
+  "shortcutSheetDescription": "Touches actives lorsque le canevas a le focus.",
+  "shortcutSheetSearch": "Rechercher des raccourcis",
+  "shortcutSheetEmpty": "Aucun raccourci trouvé.",
+  "shortcutSheetTools": "Outils",
+  "shortcutSheetCanvas": "Canevas et sélection",
+  "toggleAIChat": "Afficher ou masquer le chat IA",
+  "nudgeSelection": "Décaler la sélection",
+  "nudgeSelectionFurther": "Décaler davantage la sélection",
+  "panWhileHeld": "Déplacer la vue en maintenant la touche"
 }

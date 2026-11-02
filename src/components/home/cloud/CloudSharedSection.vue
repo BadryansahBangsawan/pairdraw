@@ -102,6 +102,7 @@ function open(row: CloudDocumentRow) {
     :documents="matching"
     :state="state"
     @open="open"
+    @open-many="(rows) => rows.forEach(open)"
     @refresh="refresh"
   />
 </template>

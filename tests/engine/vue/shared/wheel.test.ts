@@ -157,3 +157,64 @@ describe('wheel steps', () => {
     expect(2 ** PINCH_SCALE_EXPONENT).toBeCloseTo(chromium)
   })
 })
+
+describe('wheel zoom preferences', () => {
+  const wheelZooms = () => ({ wheelZooms: true, invert: false })
+  const inverted = () => ({ wheelZooms: false, invert: true })
+
+  test('zooms with a plain wheel like a Meta+wheel turn when the wheel is set to zoom', () => {
+    const step = createWheelSteps('mac', () => 1, wheelZooms)
+    expect(zoomScale(step(event(10)))).toBeCloseTo(Math.exp(-0.05))
+    expect(zoomScale(step(event(-10)))).toBeCloseTo(Math.exp(0.05))
+  })
+
+  test('still pans with Shift or a mainly sideways movement while the wheel zooms', () => {
+    const step = createWheelSteps('mac', () => 1, wheelZooms)
+    expect(step(event(4, { shiftKey: true }))).toEqual({ kind: 'pan', dx: 8, dy: 0 })
+    expect(step(event(1, { deltaX: 6 }))).toEqual({ kind: 'pan', dx: 12, dy: 2 })
+  })
+
+  test('zooms a Windows wheel notch with the notch step when the wheel is set to zoom', () => {
+    const step = createWheelSteps('windows', () => 1, wheelZooms)
+    expect(zoomScale(step(notch(0)))).toBeCloseTo(Math.exp(-0.04))
+  })
+
+  test('scales a plain wheel zoom by the zoom speed', () => {
+    const step = createWheelSteps('mac', () => 0.5, wheelZooms)
+    expect(zoomScale(step(event(10)))).toBeCloseTo(Math.exp(-0.025))
+  })
+
+  test('inverts a wheel zoom but leaves a trackpad pinch going the way the fingers move', () => {
+    const step = createWheelSteps('mac', () => 1, inverted)
+    expect(zoomScale(step(event(10, { metaKey: true })))).toBeCloseTo(Math.exp(0.05))
+    expect(zoomScale(step(event(50, { ctrlKey: true })))).toBeCloseTo(0.5)
+    const windows = createWheelSteps('windows', () => 1, inverted)
+    expect(zoomScale(windows(notch(0, { ctrlKey: true })))).toBeCloseTo(Math.exp(0.04))
+  })
+
+  test('inverts a Ctrl+wheel notch or line turn on Linux and macOS, but not a pinch', () => {
+    for (const platform of ['other', 'mac'] as const) {
+      const step = createWheelSteps(platform, () => 1, inverted)
+      const plain = createWheelSteps(platform)
+      // Linux Chromium reports a notch as 120 px; Firefox reports lines.
+      const pixelNotch = event(120, { ctrlKey: true })
+      expect(zoomScale(step(pixelNotch))).toBeCloseTo(1 / zoomScale(plain(pixelNotch)))
+      const lines = event(3, { ctrlKey: true, deltaMode: 1 })
+      expect(zoomScale(step(lines))).toBeCloseTo(1 / zoomScale(plain(lines)))
+      expect(zoomScale(step(event(1.5, { ctrlKey: true })))).toBeLessThan(1)
+    }
+  })
+
+  test('inverts a plain wheel zoom too', () => {
+    const step = createWheelSteps(
+      'mac',
+      () => 1,
+      () => ({ wheelZooms: true, invert: true })
+    )
+    expect(zoomScale(step(event(10)))).toBeCloseTo(Math.exp(0.05))
+  })
+
+  test('pans a plain wheel by default', () => {
+    expect(createWheelSteps('mac')(event(4))).toEqual({ kind: 'pan', dx: 0, dy: 8 })
+  })
+})

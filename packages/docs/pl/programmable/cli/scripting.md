@@ -27,7 +27,7 @@ openpencil eval design.fig -c "
 
 ## Zmiana i zapis
 
-`--write` albo `-w` zapisuje zmiany w pliku wejściowym. `--output` albo `-o` tworzy nowy plik.
+`--write` albo `-w` zapisuje zmiany w pliku wejściowym. `--output` albo `-o` tworzy nowy plik. `--preview-output preview.png` zapisuje po skrypcie PNG strony, którą zostawił jako bieżącą.
 
 ## Skrypt ze standardowego wejścia
 

@@ -1,6 +1,6 @@
 /**
  * The chat's message box, here and on Home: a card on the panel holding the field, the images
- * attached to it, and a toolbar whose send button carries the accent.
+ * and files attached to it, and a toolbar whose send button carries the accent.
  */
 export default {
   slots: {
@@ -18,6 +18,11 @@ export default {
     image:
       'flex max-w-full min-w-0 items-center gap-2 rounded-lg border border-border bg-panel-field p-1.5',
     imageThumb: 'size-10 shrink-0 rounded-md border border-border object-cover',
-    imageName: 'min-w-0 flex-1 truncate text-[10px] text-surface'
+    imageName: 'min-w-0 flex-1 truncate text-[10px] text-surface',
+    /** A text file attached to the message, beside the images. */
+    file: 'flex max-w-full min-w-0 items-center gap-2 rounded-lg border border-border bg-panel-field p-1.5',
+    fileIcon:
+      'flex size-10 shrink-0 items-center justify-center rounded-md border border-border bg-panel text-muted',
+    fileName: 'min-w-0 flex-1 truncate text-[10px] text-surface'
   }
 } as const

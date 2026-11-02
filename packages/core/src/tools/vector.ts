@@ -4,4 +4,12 @@ export { pathFlip, pathGet, pathMove, pathScale, pathSet } from './vector/path'
 
 export { viewportGet, viewportSet, viewportZoomToFit } from './vector/viewport'
 
-export { exportImage, exportPDF, exportSVG } from './vector/export'
+export { exportHTML, exportImage, exportPDF, exportSVG } from './vector/export'
+
+export {
+  getImageVectorizer,
+  registerImageVectorizer,
+  vectorizeImage,
+  type ImageVectorizer,
+  type ImageVectorizeRequest
+} from './vector/vectorize'

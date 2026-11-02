@@ -21,7 +21,25 @@ export const ONBOARDING_SUBSCRIPTIONS = ['chatgpt'] as const
 /** API accounts, in the order onboarding prefers them when several are available. */
 export const ONBOARDING_API_PROVIDERS = ['anthropic', 'openai', 'google', 'openrouter'] as const
 /** Further API accounts the catalog supports, offered behind "More providers". */
-export const ONBOARDING_MORE_API_PROVIDERS = ['deepseek', 'zai', 'minimax'] as const
+export const ONBOARDING_MORE_API_PROVIDERS = [
+  'deepseek',
+  'zai',
+  'minimax',
+  'xai',
+  'meta',
+  'kimi-for-coding',
+  'moonshot',
+  'together',
+  'fireworks',
+  'opencode-zen',
+  'opencode-go'
+] as const
+/** API accounts whose endpoints send no CORS headers, so only the desktop app can reach them. */
+export const ONBOARDING_DESKTOP_API_PROVIDERS: readonly string[] = [
+  'kimi-for-coding',
+  'opencode-zen',
+  'opencode-go'
+]
 /** A local model server or a company proxy that speaks the OpenAI API. */
 export const ONBOARDING_SERVER_PROVIDER = 'openai-compatible'
 /** One account for models from several vendors, recommended when no API account exists yet. */
@@ -114,11 +132,15 @@ export function isOnboardingAgent(providerID: string): boolean {
   return providerID.startsWith('acp:') || providerID === 'harness:pi'
 }
 
-/** Access that only the desktop app can use: Pi and subscription sign-ins. */
+/**
+ * Access that only the desktop app can use: Pi, subscription sign-ins, and API accounts the
+ * browser cannot reach.
+ */
 export function needsDesktop(providerID: string): boolean {
   return (
     providerID === 'harness:pi' ||
-    (ONBOARDING_SUBSCRIPTIONS as readonly string[]).includes(providerID)
+    (ONBOARDING_SUBSCRIPTIONS as readonly string[]).includes(providerID) ||
+    ONBOARDING_DESKTOP_API_PROVIDERS.includes(providerID)
   )
 }
 

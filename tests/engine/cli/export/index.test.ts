@@ -147,9 +147,34 @@ test('export CLI writes HTML with inline styles by default', async () => {
   expect(exitCode).toBe(0)
 
   const html = await Bun.file(output).text()
-  expect(html).toContain('data-open-pencil-node-id')
+  // Layer names are written by default, layer IDs only when asked for.
+  expect(html).toContain('data-name="Export Card"')
+  expect(html).not.toContain('data-open-pencil-node-id')
   expect(html).toContain('style=')
   expect(html).toContain('display: flex')
+})
+
+test('export CLI writes layer IDs and leaves names out when asked', async () => {
+  const { dir, figPath } = await createFigFixture()
+  const output = join(dir, 'card-ids.html')
+
+  const { stderr, exitCode } = await runOpenPencilCLI([
+    'export',
+    figPath,
+    '--format',
+    'html',
+    '--layer-ids',
+    '--no-layer-names',
+    '--output',
+    output
+  ])
+
+  expect(stderr).toBe('')
+  expect(exitCode).toBe(0)
+
+  const html = await Bun.file(output).text()
+  expect(html).toContain('data-open-pencil-node-id')
+  expect(html).not.toContain('data-name=')
 })
 
 test('export CLI can write HTML styles as Tailwind classes', async () => {
@@ -171,7 +196,7 @@ test('export CLI can write HTML styles as Tailwind classes', async () => {
   expect(exitCode).toBe(0)
 
   const html = await Bun.file(output).text()
-  expect(html).toContain('data-open-pencil-node-id')
+  expect(html).toContain('data-name="Export Card"')
   expect(html).toContain('class="')
   expect(html).toContain('flex')
   expect(html).not.toContain('style=')

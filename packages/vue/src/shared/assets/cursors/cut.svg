@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+    <feDropShadow dx="0" dy="1.25" stdDeviation="1" flood-opacity="0.5"/>
+  </filter>
+  <g filter="url(#shadow)" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="translate(6.4 6.4) scale(0.8)">
+      <g fill="#fff" stroke="#fff" stroke-width="3.75">
+        <circle cx="6" cy="6" r="3"/>
+        <circle cx="6" cy="18" r="3"/>
+        <path d="M8.12 8.12 12 12M20 4 8.12 15.88M14.8 14.8 20 20"/>
+      </g>
+      <g fill="#fff" stroke="#000" stroke-width="1.25">
+        <circle cx="6" cy="6" r="3"/>
+        <circle cx="6" cy="18" r="3"/>
+      </g>
+      <path fill="none" stroke="#000" stroke-width="1.25" d="M8.12 8.12 12 12M20 4 8.12 15.88M14.8 14.8 20 20"/>
+    </g>
+  </g>
+</svg>

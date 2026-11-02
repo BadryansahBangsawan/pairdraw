@@ -1,6 +1,7 @@
 export { setEffects } from './modify/effects'
 export { setMinMax, setOpacity, setRadius, setRotation } from './modify/geometry'
 export { setConstraints, setLayout, setLayoutChild } from './modify/layout'
+export { replaceMatchingProperties } from './modify/matching'
 export { setFill, setImageFill, setStroke } from './modify/paint'
 export { setBlend, setLocked, setStrokeAlign, setVisible } from './modify/state'
 export { setFont, setFontRange, setText, setTextProperties, setTextResize } from './modify/text'

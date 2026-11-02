@@ -97,11 +97,52 @@ export function appendSkillContext(text: string, skill: InvokedSkill | null): st
   return `${text}${SKILL_CONTEXT_MARKER}<skill name="${escape(skill.name)}">\n${skill.instructions}\n</skill>`
 }
 
+export const FILE_CONTEXT_MARKER = '\n\n[Files the user attached to this message]\n'
+const FILE_CLOSE = '\n</file>'
+
+/** A text file attached to a message, as the model reads it. */
+export interface AttachedFile {
+  name: string
+  mediaType: string
+  text: string
+}
+
+/** A code fence longer than any run of backticks in the text, so the text cannot close it. */
+function fenceFor(text: string): string {
+  let longest = 0
+  for (const match of text.matchAll(/`+/g)) longest = Math.max(longest, match[0].length)
+  return '`'.repeat(Math.max(3, longest + 1))
+}
+
+function fenceLanguage(name: string): string {
+  const dot = name.lastIndexOf('.')
+  const extension = dot > 0 ? name.slice(dot + 1).toLowerCase() : ''
+  return /^[a-z0-9]+$/.test(extension) ? extension : ''
+}
+
+/**
+ * Gives the model the text of the files the person attached. The transcript shows them as
+ * attachments, so the note is stripped from the message it displays.
+ */
+export function appendFileContext(
+  text: string,
+  files: readonly AttachedFile[] | undefined
+): string {
+  if (!files?.length) return text
+  const blocks = files.map((file) => {
+    const fence = fenceFor(file.text)
+    const body = file.text.endsWith('\n') ? file.text : `${file.text}\n`
+    return `<file name="${escape(file.name)}" type="${escape(file.mediaType)}">\n${fence}${fenceLanguage(file.name)}\n${body}${fence}${FILE_CLOSE}`
+  })
+  return `${text}${FILE_CONTEXT_MARKER}${blocks.join('\n')}`
+}
+
 /** Each note the chat adds to a request for the model only starts with one of these. */
 const MODEL_NOTE_MARKERS = [
   REFERENCED_NODE_CONTEXT_MARKER,
   UNDONE_CALLS_CONTEXT_MARKER,
-  SKILL_CONTEXT_MARKER
+  SKILL_CONTEXT_MARKER,
+  FILE_CONTEXT_MARKER
 ]
 
 /** What the person wrote, without the notes the chat added for the model after it. */
@@ -110,4 +151,21 @@ export function stripModelNotes(text: string): string {
     (index) => index !== -1
   )
   return starts.length === 0 ? text : text.slice(0, Math.min(...starts))
+}
+
+/**
+ * The note of attached files a request carries, from its marker to the next note, or an empty
+ * string; an edited message keeps the files it was sent with.
+ */
+export function fileContextOf(text: string): string {
+  const start = text.indexOf(FILE_CONTEXT_MARKER)
+  if (start === -1) return ''
+  const after = start + FILE_CONTEXT_MARKER.length
+  const ends = MODEL_NOTE_MARKERS.map((marker) => text.indexOf(marker, after)).filter(
+    (index) => index !== -1
+  )
+  const note = text.slice(start, ends.length === 0 ? text.length : Math.min(...ends))
+  // Image findings follow the whole request, after its last file.
+  const close = note.lastIndexOf(FILE_CLOSE)
+  return close === -1 ? '' : note.slice(0, close + FILE_CLOSE.length)
 }

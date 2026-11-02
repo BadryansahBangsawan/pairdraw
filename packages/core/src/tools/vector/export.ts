@@ -3,6 +3,7 @@ import * as v from 'valibot'
 
 import { PDF_MODES, PDFPlanError, planPDFPages } from '#core/io/formats/pdf/plan'
 import type { RasterExportFormat } from '#core/io/formats/raster'
+import { getHTMLToolHost } from '#core/tools/html-host'
 import { toolNumber, defineTool } from '#core/tools/schema'
 
 const exportInputs = {
@@ -157,7 +158,7 @@ export const exportPDF = defineTool({
 export const exportImage = defineTool({
   name: 'export_image',
   description:
-    'Export nodes as a raster image (PNG, JPG, or WEBP). Returns base64-encoded image data. Use to visually verify designs.',
+    'Export nodes as a raster image (PNG, JPG, or WEBP). Returns base64-encoded image data. Use to visually verify designs. quality sets JPG and WEBP compression.',
   execution: { kind: 'async', mutation: 'none' },
   exposure: { webmcp: false },
   input: v.strictObject({
@@ -165,6 +166,17 @@ export const exportImage = defineTool({
     format: v.optional(
       v.pipe(v.picklist(['PNG', 'JPG', 'WEBP']), v.description('Image format')),
       'PNG'
+    ),
+    quality: v.optional(
+      toolNumber(
+        v.pipe(
+          v.number(),
+          v.integer(),
+          v.minValue(1),
+          v.maxValue(100),
+          v.description('JPG and WEBP quality from 1 to 100 (default: 90). PNG ignores it.')
+        )
+      )
     ),
     ...rasterScaleInputs
   }),
@@ -201,9 +213,12 @@ export const exportImage = defineTool({
     const height = bounds.maxY - bounds.minY
     const boundedScale = boundedRasterScale(width, height, requestedScale, maxEdge)
     if (boundedScale <= 0) return { error: 'No visible nodes to export' }
+    // PNG is lossless, so a quality would only be ignored by the encoder.
+    const quality = format === 'PNG' ? undefined : args.quality
     const data = await figma.exportImage(ids, {
       scale: boundedScale,
-      format
+      format,
+      ...(quality === undefined ? {} : { quality })
     })
     if (!data || data.length === 0) {
       return { error: 'The renderer returned no image for these nodes' }
@@ -216,7 +231,93 @@ export const exportImage = defineTool({
       byteLength: data.length,
       width: Math.ceil(width * boundedScale),
       height: Math.ceil(height * boundedScale),
-      scale: boundedScale
+      scale: boundedScale,
+      ...(quality === undefined ? {} : { quality })
+    }
+  }
+})
+
+/** How `export_html` styles the markup, by the names `HTMLExportOptions` uses. */
+const HTML_STYLES = { css: 'inline', tailwind: 'tailwind' } as const
+
+export const exportHTML = defineTool({
+  name: 'export_html',
+  description:
+    'Export nodes as HTML code. style "css" (default) writes plain CSS: style attributes in a fragment, a stylesheet in a standalone document; "tailwind" writes Tailwind utility classes. html "fragment" (default) returns markup to paste into a page; "standalone" returns a whole document. assets "inline" (default) embeds images as data URLs; "external", for a standalone document, returns its stylesheet, images, and web fonts as separate files, listed in assets. layer_names writes each layer name as data-name; layer_ids writes each layer ID as data-open-pencil-node-id.',
+  execution: { kind: 'async', mutation: 'none' },
+  exposure: { webmcp: false },
+  // A standalone page with separate files downloads the web fonts it ships.
+  capabilities: ['document:read', 'network:access'],
+  input: v.strictObject({
+    ids: exportInputs.ids,
+    style: v.optional(
+      v.pipe(
+        v.picklist(['css', 'tailwind']),
+        v.description('"css": plain CSS. "tailwind": Tailwind utility classes.')
+      ),
+      'css'
+    ),
+    html: v.optional(
+      v.pipe(
+        v.picklist(['fragment', 'standalone']),
+        v.description('"fragment": markup for a page. "standalone": a complete HTML document.')
+      ),
+      'fragment'
+    ),
+    assets: v.optional(
+      v.pipe(
+        v.picklist(['inline', 'external']),
+        v.description(
+          '"inline": images as data URLs. "external" (standalone only): images and the stylesheet as separate files.'
+        )
+      ),
+      'inline'
+    ),
+    layer_names: v.optional(
+      v.pipe(
+        v.boolean(),
+        v.description('Write each layer name as a data-name attribute (default: true)')
+      ),
+      true
+    ),
+    layer_ids: v.optional(
+      v.pipe(
+        v.boolean(),
+        v.description(
+          'Write each layer ID as a data-open-pencil-node-id attribute, to map markup back to layers (default: false)'
+        )
+      ),
+      false
+    )
+  }),
+  execute: async (figma, args) => {
+    const ids =
+      args.ids && args.ids.length > 0 ? args.ids : figma.currentPage.children.map((node) => node.id)
+    const missing = ids.find((id) => !figma.graph.getNode(id))
+    if (missing) return { error: `Node "${missing}" not found` }
+    if (ids.length === 0) return { error: 'No nodes to export' }
+    const { renderNodesToHTML } = await import('#core/io/formats/html')
+    const { html, assets } = await renderNodesToHTML(figma.graph, ids, {
+      html: args.html,
+      style: HTML_STYLES[args.style],
+      assets: args.assets,
+      fonts: args.html === 'standalone' && args.assets === 'external' ? 'assets' : 'none',
+      layerNames: args.layer_names,
+      layerIds: args.layer_ids,
+      loadTailwindStylesheet: getHTMLToolHost(figma.graph)?.loadTailwindStylesheet
+    })
+    if (!html) return { error: 'No visible nodes to export' }
+    return {
+      html,
+      ...(assets.length > 0
+        ? {
+            assets: assets.map(({ path, content }) =>
+              typeof content === 'string'
+                ? { path, text: content }
+                : { path, base64: fromUint8Array(content), byteLength: content.length }
+            )
+          }
+        : {})
     }
   }
 })

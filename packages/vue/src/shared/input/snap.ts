@@ -21,7 +21,7 @@ function roundTo(value: number, step: number): number {
 /**
  * Lands the bounds on the snap grid, as Figma's Snap to pixel grid does at any zoom: a move ends on
  * a whole position and a resized edge on a whole size, even from a fractional start. The grid is
- * the editor profile's: whole pixels in a design, FigJam's 16 units on a board.
+ * `step`, from {@link snapGridStep}.
  */
 export function computePixelGridSnap(bounds: Rect, step = 1): PixelSnapResult {
   return {
@@ -31,10 +31,23 @@ export function computePixelGridSnap(bounds: Rect, step = 1): PixelSnapResult {
   }
 }
 
-/** How a drawn layer's corners land while Snap to pixel grid is on, on the profile's grid. */
+/** A design's pixel grid, the one grid that half-pixel snapping halves. */
+const WHOLE_PIXEL = 1
+const HALF_PIXEL = 0.5
+
+/**
+ * The step Snap to pixel grid lands on: the editor profile's grid, whole pixels in a design and
+ * FigJam's 16 units on a board, or half pixels in a design while half-pixel snapping is on.
+ */
+export function snapGridStep(editor: Editor): number {
+  const grid = resolveEditorProfile(editor.state).snapGrid
+  return grid === WHOLE_PIXEL && editor.state.snappingPreferences.halfPixel ? HALF_PIXEL : grid
+}
+
+/** How a drawn layer's corners land while Snap to pixel grid is on, on the snap grid. */
 export function gridRounding(editor: Editor): (value: number) => number {
   if (!editor.state.snappingPreferences.pixelGrid) return (value) => value
-  const step = resolveEditorProfile(editor.state).snapGrid
+  const step = snapGridStep(editor)
   return (value) => roundTo(value, step)
 }
 
@@ -144,7 +157,7 @@ export function resolveObjectPixelSnap(
     ? computeSnap(movingIds, movingBounds, targets, threshold)
     : { dx: 0, dy: 0, guides: [] }
   const pixelSnap = editor.state.snappingPreferences.pixelGrid
-    ? computePixelGridSnap(movingBounds, resolveEditorProfile(editor.state).snapGrid)
+    ? computePixelGridSnap(movingBounds, snapGridStep(editor))
     : { delta: { x: 0, y: 0 }, guides: [] }
   const objectX = objectSnap.guides.some((guide) => guide.axis === 'x')
   const objectY = objectSnap.guides.some((guide) => guide.axis === 'y')

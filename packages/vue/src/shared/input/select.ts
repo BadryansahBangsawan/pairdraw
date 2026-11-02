@@ -28,11 +28,53 @@ export interface HitTestFns {
   hitTestFrameTitle: (cx: number, cy: number) => SceneNode | null
 }
 
-/** Clears the selection and starts a marquee in the open frame or section under the press. */
+/**
+ * Clears the selection and starts a marquee in the open frame or section under the press, looked
+ * up inside the container the user entered, if any.
+ */
 function startMarquee(cx: number, cy: number, editor: Editor, setDrag: (d: DragState) => void) {
   editor.clearSelection()
-  const container = editor.graph.hitTestOpenContainer(cx, cy, editor.state.currentPageId)
+  const scopeId = editor.state.enteredContainerId ?? editor.state.currentPageId
+  const container = editor.graph.hitTestOpenContainer(cx, cy, scopeId)
   setDrag({ type: 'marquee', startX: cx, startY: cy, containerId: container?.id })
+}
+
+/**
+ * Whether a ⌘ press on `hit` starts a deep marquee rather than a move, as in Figma: only where a
+ * plain press would start a marquee too, on the empty background of a board, section, or component
+ * set, which a deep hit stops at when it is painted. Anywhere else, including the background of a
+ * nested frame, component, instance, or group, a ⌘ press selects the deepest layer and moves it; a
+ * press on the selection, a locked layer, a label, or with Shift keeps the usual press.
+ */
+function startsDeepMarquee(
+  hit: SceneNode,
+  e: MouseEvent,
+  cx: number,
+  cy: number,
+  editor: Editor,
+  fns: HitTestFns
+) {
+  const scopeId = editor.state.enteredContainerId ?? editor.state.currentPageId
+  return (
+    !e.shiftKey &&
+    !hit.locked &&
+    !editor.state.selectedIds.has(hit.id) &&
+    !pressesSelection(hit, cx, cy, editor) &&
+    !hitTestLabel(cx, cy, fns) &&
+    editor.graph.hitTestOpenContainer(cx, cy, scopeId)?.id === hit.id
+  )
+}
+
+/** Starts a ⌘ marquee scoped to the pressed container; a click without a drag still selects it. */
+function startDeepMarquee(
+  hit: SceneNode,
+  cx: number,
+  cy: number,
+  editor: Editor,
+  setDrag: (d: DragState) => void
+) {
+  editor.clearSelection()
+  setDrag({ type: 'marquee', startX: cx, startY: cy, containerId: hit.id, selectOnClick: hit.id })
 }
 
 /**
@@ -108,10 +150,15 @@ export function handleSelectDown(
 
   if (tryStartHandleDrag(cx, cy, sx, sy, e.altKey, editor, fns, tryStartRotation, setDrag)) return
 
-  const hit =
-    tinySelectionAt(cx, cy, editor) ?? resolveHit(cx, cy, editor, fns, e.metaKey || e.ctrlKey)
+  const deep = e.metaKey || e.ctrlKey
+  const hit = tinySelectionAt(cx, cy, editor) ?? resolveHit(cx, cy, editor, fns, deep)
   if (!hit) {
-    if (!editor.state.enteredContainerId) startMarquee(cx, cy, editor, setDrag)
+    // ⌘ drags a marquee from empty space inside an entered container too.
+    if (deep || !editor.state.enteredContainerId) startMarquee(cx, cy, editor, setDrag)
+    return
+  }
+  if (deep && startsDeepMarquee(hit, e, cx, cy, editor, fns)) {
+    startDeepMarquee(hit, cx, cy, editor, setDrag)
     return
   }
 

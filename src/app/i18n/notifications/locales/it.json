@@ -14,7 +14,7 @@
   "vectorizeCredentialRequired": "Aggiungi una chiave API {provider} in Impostazioni → Servizi per immagini.",
   "vectorizeImageMissing": "Mancano i dati immagine per questo livello.",
   "vectorizingImage": "Vettorializzazione dell’immagine…",
-  "imageConvertedToVectors": "Immagine convertita in vettori.",
+  "imageConvertedToVectors": "Vettori aggiunti accanto all’immagine.",
   "vectorizeCredentialFailed": "{error}. Aggiornala in Impostazioni → Servizi per immagini.",
   "vectorizeFailed": "{provider} non ha potuto vettorializzare questa immagine: {error}",
   "operationFailed": "Operazione non riuscita: {error}",
@@ -32,5 +32,9 @@
   "tokensLeftOut": "Esclusi dal foglio di stile: {names}.",
   "designTokensLeftOut": "Esclusi dai design token: {names}.",
   "designTokensImported": "Importati {count} design token.",
-  "unsupportedVariableExpressions": "Pairdraw non sa ancora valutare queste variabili, quindi i livelli mantengono i valori salvati nel file: {names}."
+  "unsupportedVariableExpressions": "Pairdraw non sa ancora valutare queste variabili, quindi i livelli mantengono i valori salvati nel file: {names}.",
+  "placeImageUnsupported": "Scegli un file PNG, JPEG, WebP, GIF, AVIF o SVG da inserire.",
+  "placeImageFailed": "Impossibile inserire i file: {error}",
+  "exportPDFEmpty": "Questa pagina non ha cornici da esportare.",
+  "exportPDFFailed": "Impossibile esportare il PDF: {error}"
 }

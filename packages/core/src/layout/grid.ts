@@ -1,9 +1,10 @@
-import { Direction, Display, Gutter, Edge, type Node as YogaNode } from 'yoga-layout'
+import { Direction, Display, Gutter, type Node as YogaNode } from 'yoga-layout'
 
 import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
 import { layoutSizing } from '@open-pencil/scene-graph/layout'
 import { resolveNodeLayoutDirection } from '@open-pencil/scene-graph/text/direction'
 
+import { applyContentInsets, applyStrokeMargins } from './strokes'
 import { configureAbsoluteChild, createYogaNode, mapGridTrack } from './yoga-helpers'
 
 function configureAsGrid(
@@ -28,10 +29,7 @@ function configureAsGrid(
   yogaNode.setGap(Gutter.Column, node.gridColumnGap)
   yogaNode.setGap(Gutter.Row, node.gridRowGap)
 
-  yogaNode.setPadding(Edge.Top, node.paddingTop)
-  yogaNode.setPadding(Edge.Right, node.paddingRight)
-  yogaNode.setPadding(Edge.Bottom, node.paddingBottom)
-  yogaNode.setPadding(Edge.Left, node.paddingLeft)
+  applyContentInsets(yogaNode, node)
 }
 
 export function createGridChildNode(graph: SceneGraph, child: SceneNode): YogaNode {
@@ -72,6 +70,7 @@ export function buildGridTree(
       root.insertChild(yogaChild, root.getChildCount())
     } else {
       const yogaChild = createGridChildNode(graph, child)
+      applyStrokeMargins(yogaChild, child, frame)
       if (
         child.layoutMode === 'GRID' ||
         child.layoutMode === 'HORIZONTAL' ||

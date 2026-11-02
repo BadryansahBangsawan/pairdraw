@@ -51,10 +51,12 @@ describe('raster export', () => {
     const viewport = { x: 1, y: 2, w: 3, h: 4 }
     const renderer = {
       viewportImageRendering: true,
+      drawingFullEffects: false,
       worldViewport: viewport,
       nodePaths: new NodePathCaches(),
       renderNode() {
         expect(this.viewportImageRendering).toBe(false)
+        expect(this.drawingFullEffects).toBe(true)
         throw new Error('drawing failed')
       }
     }
@@ -62,6 +64,7 @@ describe('raster export', () => {
       'drawing failed'
     )
     expect(renderer.viewportImageRendering).toBe(true)
+    expect(renderer.drawingFullEffects).toBe(false)
     expect(renderer.worldViewport).toBe(viewport)
   })
 

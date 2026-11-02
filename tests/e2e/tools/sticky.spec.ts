@@ -28,9 +28,12 @@ async function clickNote(x: number, y: number) {
   await editor.canvas.waitForRender()
 }
 
-test('the toolbar keeps the sticky tool hidden, and S does not pick it', async () => {
-  await expect(editor.page.getByTestId(toolbarToolTestId('STICKY'))).toHaveCount(0)
+test('the toolbar shows the sticky tool, and neither S nor N picks it', async () => {
+  await expect(editor.page.getByTestId(toolbarToolTestId('STICKY'))).toBeVisible()
   await editor.page.keyboard.press('s')
+  expect((await sticky.focus()).tool).toBe('SELECT')
+  // N stays Zoom to Next Frame, as in Figma.
+  await editor.page.keyboard.press('n')
   expect((await sticky.focus()).tool).toBe('SELECT')
 })
 

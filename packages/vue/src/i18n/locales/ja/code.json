@@ -21,5 +21,8 @@
   "noSelectionComponents": "選択したレイヤーから {framework} コンポーネントを生成します。",
   "writeJSX": "JSX を書く",
   "canvasChangedExpression": "キャンバスでは {value} になりました。式は書かれたまま残しています。",
-  "canvasChangedOrder": "キャンバスではこれらのレイヤーの順序が変わりました。コードは書かれたまま残しています。"
+  "canvasChangedOrder": "キャンバスではこれらのレイヤーの順序が変わりました。コードは書かれたまま残しています。",
+  "iconPackage": "アイコン",
+  "exportHTML": "HTML をエクスポート",
+  "exportFailed": "エクスポートできませんでした: {error}"
 }

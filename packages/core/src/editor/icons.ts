@@ -103,6 +103,18 @@ export function createIconActions(ctx: EditorContext) {
     if (icon) await drawIcon('Reset icon', frameId, icon.name, icon.options)
   }
 
+  /**
+   * Draws the icon `frameId` again with `options` set over the ones it was drawn with, such as a
+   * Material Symbol's weight or fill, keeping its size, position, and color, as one step. Sets
+   * without options ignore them; edits to its paths are discarded, as a reset does.
+   */
+  async function setIconOptions(frameId: string, options: IconOptions) {
+    const frame = ctx.graph.getNode(frameId)
+    const icon = frame && readIcon(frame)
+    if (icon)
+      await drawIcon('Change icon options', frameId, icon.name, { ...icon.options, ...options })
+  }
+
   /** Makes the icon `frameId` plain artwork that keeps its paths; see `detachIcon`. */
   function detachIconFrame(frameId: string) {
     const frame = ctx.graph.getNode(frameId)
@@ -134,6 +146,7 @@ export function createIconActions(ctx: EditorContext) {
     insertIcon,
     swapIconGlyph,
     resetIcon,
+    setIconOptions,
     detachIcon: detachIconFrame,
     setIconColor
   }

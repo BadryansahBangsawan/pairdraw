@@ -27,6 +27,8 @@ export type ModelConnectionState =
   | 'tools-unreachable'
   /** An agent seen outside the desktop app, where it cannot run. */
   | 'agent'
+  /** An agent set up outside the app, such as Claude Code through Amazon Bedrock. */
+  | 'external-config'
 
 export interface ModelConnectionInput {
   providerID: string
@@ -67,6 +69,8 @@ export function modelConnectionState({
         return 'signed-out'
       case 'signed-in':
         return toolsUnreachable ? 'tools-unreachable' : 'connected'
+      case 'external-config':
+        return toolsUnreachable ? 'tools-unreachable' : 'external-config'
     }
   }
   if (credential === 'locked' || credential === 'unavailable') return 'unavailable'

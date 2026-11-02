@@ -22,8 +22,16 @@ export {
   hitTestShapeHandles
 } from './handles/shape'
 export type { RadiusCorner, ShapeHandle, ShapeHandleKind } from './handles/shape'
-export { ARC_HANDLE, arcAtPoint, arcChanges, arcOf, isWholeArc } from './handles/arc'
-export type { ArcHandleKind } from './handles/arc'
+export {
+  ARC_HANDLE,
+  arcAtPoint,
+  arcChanges,
+  arcFieldValue,
+  arcOf,
+  arcWithField,
+  isWholeArc
+} from './handles/arc'
+export type { ArcField, ArcHandleKind } from './handles/arc'
 export {
   GRADIENT_HANDLE,
   gradientHandleLayout,

@@ -12,14 +12,16 @@ Zaznacz jeden lub kilka obiektów, aby je przesuwać, skalować, obracać, kopio
 - Kliknij obiekt, aby zaznaczyć tylko jego.
 - Przytrzymaj <kbd>Shift</kbd> i klikaj obiekty, aby dodawać je do zaznaczenia albo z niego usuwać.
 - Rozpocznij przeciąganie na pustym obszarze, aby utworzyć prostokąt zaznaczenia. Po zwolnieniu przycisku zostaną zaznaczone wszystkie przecinające się obiekty.
+- Przeciągnij z wciśniętym <kbd>⌘</kbd> (<kbd>Ctrl</kbd> w systemach Windows i Linux), aby zaznaczyć najgłębiej zagnieżdżone warstwy, których dotyka prostokąt. Przeciąganie zaczyna się tam, gdzie zwykłe zaznaczanie prostokątem: na pustym płótnie lub pustym tle ramki najwyższego poziomu lub sekcji. Na warstwie albo na tle zagnieżdżonej ramki, komponentu lub instancji <kbd>⌘</kbd> + przeciąganie zaznacza tę warstwę i ją przesuwa. Wciśnij lub puść <kbd>⌘</kbd> w trakcie przeciągania, aby przełączyć się między zaznaczaniem głębokim a zwykłym.
 - Naciśnij <kbd>⌘</kbd><kbd>A</kbd> albo <kbd>Ctrl</kbd> + <kbd>A</kbd>, aby zaznaczyć wszystkie obiekty bieżącej strony.
 - Kliknij pusty obszar, aby usunąć zaznaczenie.
 
 ## Przesuwanie
 
 - Przeciągnij dowolny zaznaczony obiekt. Pozostałe zaznaczone obiekty przesuną się razem z nim.
-- Klawisze strzałek przesuwają zaznaczenie o 1 piksel.
-- <kbd>Shift</kbd> + strzałka przesuwa je o 10 pikseli.
+- Klawisze strzałek przesuwają zaznaczenie o małe przesunięcie, domyślnie 1 piksel.
+- <kbd>Shift</kbd> + strzałka przesuwa je o duże przesunięcie, domyślnie 10 pikseli.
+- Obie odległości ustawisz w **Ustawienia → Edytor → Przesuwanie strzałkami**.
 
 ## Rozmiar
 

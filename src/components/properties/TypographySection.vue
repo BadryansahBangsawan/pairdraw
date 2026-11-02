@@ -8,10 +8,10 @@ import { TypographyControlsRoot } from '@open-pencil/vue/primitives/TypographyCo
 import { loadFont } from '@/app/editor/fonts'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
-import FontPicker from '@/components/font-picker/FontPicker.vue'
 import NumberField from '@/components/inputs/NumberField.vue'
 import SharedStyleField from '@/components/properties/shared-style/SharedStyleField.vue'
 import FontAxisField from '@/components/properties/typography/FontAxisField.vue'
+import FontFamilyField from '@/components/properties/typography/FontFamilyField.vue'
 import LetterSpacingField from '@/components/properties/typography/LetterSpacingField.vue'
 import LineHeightField from '@/components/properties/typography/LineHeightField.vue'
 import VariableNumberField from '@/components/properties/VariableNumberField.vue'
@@ -83,11 +83,9 @@ function picked<T>(value: MixedValue<T>): T | '' {
       <SharedStyleField kind="text" :label="panels.textStyle" />
 
       <div class="mb-1.5 flex min-w-0 items-center gap-1.5">
-        <FontPicker
-          class="min-w-0 flex-1"
-          :model-value="picked(ctx.merged('fontFamily'))"
-          :label="panels.fontFamily"
-          :placeholder="panels.mixed"
+        <FontFamilyField
+          :node-ids="ctx.nodes.value.map((text) => text.id)"
+          :family="picked(ctx.merged('fontFamily'))"
           @select="ctx.actions.setFamily"
         />
         <!-- Where fonts come from is an app preference; it lives in Settings. -->

@@ -14,7 +14,7 @@
   "vectorizeCredentialRequired": "Füge einen {provider}-API-Schlüssel unter Einstellungen → Bilddienste hinzu.",
   "vectorizeImageMissing": "Für diese Ebene fehlen Bilddaten.",
   "vectorizingImage": "Bild wird vektorisiert…",
-  "imageConvertedToVectors": "Bild in Vektoren umgewandelt.",
+  "imageConvertedToVectors": "Vektoren neben dem Bild hinzugefügt.",
   "vectorizeCredentialFailed": "{error}. Aktualisiere den Schlüssel unter Einstellungen → Bilddienste.",
   "vectorizeFailed": "{provider} konnte dieses Bild nicht vektorisieren: {error}",
   "operationFailed": "Vorgang fehlgeschlagen: {error}",
@@ -32,5 +32,9 @@
   "tokensLeftOut": "Nicht im Stylesheet enthalten: {names}.",
   "designTokensLeftOut": "Nicht in den Design-Tokens enthalten: {names}.",
   "designTokensImported": "{count} Design-Tokens importiert.",
-  "unsupportedVariableExpressions": "Pairdraw kann diese Variablen noch nicht auswerten, daher behalten Ebenen die in der Datei gespeicherten Werte: {names}."
+  "unsupportedVariableExpressions": "Pairdraw kann diese Variablen noch nicht auswerten, daher behalten Ebenen die in der Datei gespeicherten Werte: {names}.",
+  "placeImageUnsupported": "Wähle eine PNG-, JPEG-, WebP-, GIF-, AVIF- oder SVG-Datei zum Platzieren.",
+  "placeImageFailed": "Die Dateien konnten nicht platziert werden: {error}",
+  "exportPDFEmpty": "Diese Seite hat keine Rahmen zum Exportieren.",
+  "exportPDFFailed": "Das PDF konnte nicht exportiert werden: {error}"
 }

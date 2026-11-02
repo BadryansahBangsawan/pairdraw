@@ -57,6 +57,8 @@ openpencil export design.fig -f html --html standalone --css tailwind --assets e
 
 При автономном экспорте Tailwind CSS компилируется сразу, поэтому браузерная среда Tailwind не требуется. `--assets external` сохраняет CSS и извлечённые изображения рядом с HTML. В сочетании с ним `--fonts assets` находит шрифты текстовых объектов SceneGraph через настроенных поставщиков веб-шрифтов и создаёт локальные файлы `@font-face`.
 
+Экспорт HTML записывает имя каждого слоя в атрибут `data-name`. `--no-layer-names` опускает имена, а `--layer-ids` добавляет ID каждого слоя как `data-open-pencil-node-id` для инструментов, которые связывают разметку с документом.
+
 Экспорт HTML доступен при работе с файлом.
 
 ## Экспорт в Storybook

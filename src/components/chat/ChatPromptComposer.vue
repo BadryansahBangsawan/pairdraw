@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick, useTemplateRef } from 'vue'
 
 import { useI18n } from '@open-pencil/vue/i18n'
 
@@ -33,6 +33,20 @@ const emit = defineEmits<{ submit: [text: string] }>()
 const { ai } = useI18n()
 const styles = chatInputTheme()
 const prompt = computed(() => text.value.trim())
+const field = useTemplateRef<HTMLTextAreaElement>('field')
+/**
+ * Puts the caret at the end of the prompt once a new value shows, as after picking an example to
+ * edit before sending.
+ */
+defineExpose({
+  focus: () =>
+    nextTick(() => {
+      const element = field.value
+      if (!element) return
+      element.focus()
+      element.setSelectionRange(element.value.length, element.value.length)
+    })
+})
 
 function submit() {
   if (busy || !prompt.value) return
@@ -53,6 +67,7 @@ function onKeydown(event: KeyboardEvent) {
   <form @submit.prevent="submit">
     <InputGroup size="md" :ui="{ root: styles.group() }">
       <textarea
+        ref="field"
         v-model="text"
         :rows="rows"
         :aria-label="label"

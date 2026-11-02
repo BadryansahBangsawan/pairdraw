@@ -7,7 +7,8 @@ import { appRuntimeConfig } from '@/app/runtime/config'
 import {
   appPreferences,
   DEFAULT_APP_PREFERENCES,
-  updateCanvasRenderingMode
+  updateCanvasRenderingMode,
+  updateRenderingPreferences
 } from '@/app/settings/preferences/store'
 import SettingsGroup from '@/components/settings/layout/SettingsGroup.vue'
 import SettingsRow from '@/components/settings/layout/SettingsRow.vue'
@@ -18,10 +19,19 @@ import AppSwitch from '@/components/ui/toggle/AppSwitch.vue'
 
 const { rendering } = useI18n()
 const hasURLOverride = appRuntimeConfig.sceneRendererOverride
+const defaults = DEFAULT_APP_PREFERENCES.rendering
 const tiledRendering = computed(() => appPreferences.value.rendering.canvasMode === 'tiled')
-const defaultTiledRendering = DEFAULT_APP_PREFERENCES.rendering.canvasMode === 'tiled'
+const defaultTiledRendering = defaults.canvasMode === 'tiled'
+/** Ultralight mode renders in tiles whatever the Progressive rendering choice. */
+const ultralight = computed({
+  get: () => appPreferences.value.rendering.ultralight,
+  set: (enabled: boolean) => updateRenderingPreferences({ ultralight: enabled })
+})
+/** The renderer this session would start with now, against the one it started with. */
 const changed = computed(
-  () => appPreferences.value.rendering.canvasMode !== appRuntimeConfig.sceneRenderer
+  () =>
+    (ultralight.value ? 'tiled' : appPreferences.value.rendering.canvasMode) !==
+      appRuntimeConfig.sceneRenderer || ultralight.value !== appRuntimeConfig.ultralight
 )
 
 function setTiledRendering(enabled: boolean): void {
@@ -35,10 +45,15 @@ function setTiledRendering(enabled: boolean): void {
     <template #description>{{ rendering.settingsDescription }}</template>
 
     <SettingsGroup>
+      <!-- Ultralight renders in tiles whatever this choice, so the switch shows that and waits. -->
       <SettingsRow
         as="label"
-        :description="rendering.progressiveTiledDescription"
-        :modified="tiledRendering !== defaultTiledRendering"
+        :description="
+          ultralight
+            ? rendering.progressiveTiledByUltralight
+            : rendering.progressiveTiledDescription
+        "
+        :modified="!ultralight && tiledRendering !== defaultTiledRendering"
         @reset="setTiledRendering(defaultTiledRendering)"
       >
         <template #label>
@@ -50,10 +65,24 @@ function setTiledRendering(enabled: boolean): void {
           </span>
         </template>
         <AppSwitch
-          :model-value="tiledRendering"
+          :model-value="ultralight || tiledRendering"
           :label="rendering.progressiveTiled"
+          :disabled="ultralight"
           data-test-id="settings-progressive-tiled-rendering"
           @update:model-value="setTiledRendering"
+        />
+      </SettingsRow>
+      <SettingsRow
+        as="label"
+        :label="rendering.ultralight"
+        :description="rendering.ultralightDescription"
+        :modified="ultralight !== defaults.ultralight"
+        @reset="ultralight = defaults.ultralight"
+      >
+        <AppSwitch
+          v-model="ultralight"
+          :label="rendering.ultralight"
+          data-test-id="settings-ultralight"
         />
       </SettingsRow>
     </SettingsGroup>

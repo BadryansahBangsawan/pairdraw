@@ -100,6 +100,12 @@ export function createConversationStore(): ConversationStore {
       if (meta) await transaction.store.put({ ...meta, title: trimmed, titleSource: 'manual' })
       await transaction.done
     },
+    async setProfile(id, profileId) {
+      const transaction = (await getDatabase()).transaction('conversations', 'readwrite')
+      const meta = await transaction.store.get(id)
+      if (meta) await transaction.store.put({ ...meta, profileId })
+      await transaction.done
+    },
     async remove(id) {
       const transaction = (await getDatabase()).transaction(
         ['conversations', 'messages', 'selected', 'deleted', 'runs'],

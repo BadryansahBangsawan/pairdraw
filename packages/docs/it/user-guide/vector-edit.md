@@ -31,6 +31,15 @@ Premi <kbd>Delete</kbd> o <kbd>Backspace</kbd> per eliminare i punti selezionati
 
 Fai clic su un segmento per selezionarlo. Trascinalo per incurvarlo; OpenPencil crea le maniglie necessarie. Fai doppio clic per aggiungere un punto.
 
+## Tagliare, unire e rimodellare
+
+- <kbd>X</kbd> attiva lo strumento Taglia. Fai clic su un segmento per tagliarlo in quel punto, o su un punto per separare i segmenti che vi si incontrano. <kbd>X</kbd>, <kbd>Escape</kbd> o un altro tasto strumento lo disattivano.
+- Fai doppio clic su un punto per passare da punto morbido ad angolo e viceversa.
+- <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + doppio clic su un segmento ne rimuove le maniglie e lo raddrizza.
+- <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>J</kbd> unisce due estremi selezionati: se coincidono diventano un solo punto, altrimenti li collega un segmento dritto. Unire i due estremi di un tracciato lo chiude e lo riempie. Durante la modifica di un tracciato questa scorciatoia non apre la chat.
+- <kbd>Option</kbd>/<kbd>Alt</kbd> + trascina trascina una copia dei punti o segmenti selezionati. La copia di un punto isolato resta collegata a esso.
+- I tasti freccia spostano i punti selezionati della distanza impostata in Impostazioni → Editor, e con <kbd>Shift</kbd> della distanza grande.
+
 ## Continuare tracciati aperti
 
 Seleziona un’estremità e usa Penna per prolungare il tracciato. Fai clic sull’estremità opposta per chiudere la forma.

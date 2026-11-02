@@ -1,10 +1,11 @@
 import { FigmaAPI } from '@open-pencil/core/figma-api'
+import { headlessHTMLStyler } from '@open-pencil/core/io/formats/html/import'
 import {
   createCanvasKitRasterCodec,
   headlessRenderNodes,
   initCanvasKit
 } from '@open-pencil/core/io/formats/raster'
-import { ALL_TOOLS } from '@open-pencil/core/tools'
+import { ALL_TOOLS, registerHTMLToolHost, type ToolDef } from '@open-pencil/core/tools'
 import type { SceneGraph } from '@open-pencil/scene-graph'
 
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
@@ -22,7 +23,33 @@ export async function createHeadlessFigma(graph: SceneGraph): Promise<FigmaAPI> 
   figma.exportImage = (nodeIds, options) =>
     headlessRenderNodes(graph, options.pageId ?? figma.currentPageId, nodeIds, options)
   figma.rasterCodec = createCanvasKitRasterCodec(await initCanvasKit())
+  // Node reads Tailwind's stylesheets from the installed package, so export needs no loader.
+  registerHTMLToolHost(graph, { style: headlessHTMLStyler })
   return figma
+}
+
+/** A document file loaded for headless tool calls, with the Figma API the tools run on. */
+export interface HeadlessToolDocument {
+  graph: SceneGraph
+  figma: FigmaAPI
+}
+
+/** Loads `file` with every page populated and its text measured, ready for tool calls. */
+export async function loadHeadlessToolDocument(file: string): Promise<HeadlessToolDocument> {
+  const graph = await loadDocument(file)
+  populateWholeDocument(graph)
+  await measureDocumentText(graph)
+  return { graph, figma: await createHeadlessFigma(graph) }
+}
+
+/** Runs `tool` on a headless document: loads its fonts, then sizes the text it changes. */
+export async function runHeadlessTool(
+  headless: HeadlessToolDocument,
+  tool: ToolDef,
+  args: Record<string, unknown>
+): Promise<unknown> {
+  await tool.loadFonts(headless.figma, args)
+  return editDocument(headless.graph, () => tool.execute(headless.figma, args))
 }
 
 /**
@@ -41,10 +68,6 @@ export async function runToolData(
   }
   const tool = ALL_TOOLS.find((candidate) => candidate.name === name)
   if (!tool) throw new Error(`Unknown tool: ${name}`)
-  const graph = await loadDocument(requireFile(file))
-  populateWholeDocument(graph)
-  await measureDocumentText(graph)
-  const figma = await createHeadlessFigma(graph)
-  await tool.loadFonts(figma, args)
-  return { result: await editDocument(graph, () => tool.execute(figma, args)), graph }
+  const headless = await loadHeadlessToolDocument(requireFile(file))
+  return { result: await runHeadlessTool(headless, tool, args), graph: headless.graph }
 }

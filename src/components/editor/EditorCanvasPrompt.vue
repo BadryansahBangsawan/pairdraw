@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 
 import { useI18n } from '@open-pencil/vue/i18n'
 
@@ -8,6 +8,7 @@ import { sendPromptToDocument } from '@/app/ai/chat/pending-prompt'
 import { ensureChatConfigured } from '@/app/ai/chat/setup'
 import { useEditorStore } from '@/app/editor/active-store'
 import ChatPromptComposer from '@/components/chat/ChatPromptComposer.vue'
+import ChatPromptExamples from '@/components/chat/ChatPromptExamples.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import AppPlaceholder from '@/components/ui/feedback/AppPlaceholder.vue'
 
@@ -21,6 +22,13 @@ const { ai } = useI18n()
 const offered = computed(() => offersCanvasPrompt(store))
 const prompt = ref('')
 const starting = ref(false)
+const composer = useTemplateRef('composer')
+
+/** An example goes into the field to read and edit before it is sent. */
+function pickExample(example: string) {
+  prompt.value = example
+  void composer.value?.focus()
+}
 
 /**
  * Sends the prompt into this document's chat. Without a model, the chat looks for a coding agent
@@ -66,6 +74,7 @@ async function start(text: string): Promise<void> {
       >
         <template #icon><icon-lucide-sparkles class="size-4" /></template>
         <ChatPromptComposer
+          ref="composer"
           v-model="prompt"
           :label="ai.promptStartLabel"
           :placeholder="ai.promptStartPlaceholder"
@@ -73,6 +82,7 @@ async function start(text: string): Promise<void> {
           :rows="2"
           @submit="start"
         />
+        <ChatPromptExamples :disabled="starting" class="mt-3" @pick="pickExample" />
       </AppPlaceholder>
     </section>
   </div>

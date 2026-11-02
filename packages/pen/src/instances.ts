@@ -12,6 +12,7 @@ import {
 
 import { applyPenProperties, createSceneNode, fieldsSetBy, type Build } from './nodes'
 import type { PenNode, PenOverride } from './schema'
+import { claimSlot } from './slots'
 
 /** Fills an instance read from `.pen`, after the instances inside its component. */
 type Populate = (id: string) => void
@@ -158,7 +159,17 @@ function recordOwnFields(graph: SceneGraph, instance: SceneNode, ref: PenNode): 
   recordInstanceOverride(graph, instance.id, [...changed, ...fieldsSetBy(ref)])
 }
 
-function overrideLayer(build: Build, target: SceneNode, override: PenOverride): void {
+/**
+ * Gives a copy an override's fields. Children the override gives a slot of `instance` become the
+ * instance's content for that slot; any other layer's children are replaced, which detaches the
+ * instances holding it.
+ */
+function overrideLayer(
+  build: Build,
+  target: SceneNode,
+  override: PenOverride,
+  instance?: SceneNode
+): void {
   const { graph, ctx, effective } = build
   const base = effective.get(target.id) ?? { type: 'frame', id: target.id }
   const { descendants: _descendants, children, ...fields } = override
@@ -170,10 +181,11 @@ function overrideLayer(build: Build, target: SceneNode, override: PenOverride): 
       applyPenProperties(target, merged, build)
       recordChangedFields(graph, target, before, fields)
       if (children) {
+        const fillsSlot = instance !== undefined && claimSlot(build, instance, target)
         const replaced = target.childIds
         for (const childId of replaced) graph.deleteNode(childId)
         for (const child of children) createSceneNode(child, target.id, build)
-        build.replaced.add(target.id)
+        if (!fillsSlot) build.replaced.add(target.id)
       }
     } finally {
       leave?.()
@@ -208,7 +220,7 @@ function applyDescendants(
     const target = resolvePath(build.graph, instance, path)
     if (!target) continue
     if (override.type) replaceLayer(build, target, override, populate)
-    else overrideLayer(build, target, override)
+    else overrideLayer(build, target, override, instance)
   }
 }
 

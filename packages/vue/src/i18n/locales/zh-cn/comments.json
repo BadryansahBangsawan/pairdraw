@@ -12,6 +12,8 @@
   "deleteCommentDescription": "这会为所有人删除该评论及其全部回复。",
   "deleteReply": "删除回复",
   "copyText": "复制文本",
+  "applyWithAI": "用 AI 处理",
+  "applyOpenWithAI": "用 AI 处理未解决的评论",
   "goToComment": "转到评论",
   "moreActions": "更多操作",
   "searchComments": "搜索评论",

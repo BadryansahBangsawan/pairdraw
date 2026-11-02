@@ -22,6 +22,11 @@
         "label": "Open Recent"
       },
       {
+        "id": "place-image",
+        "label": "Place Image…",
+        "accelerator": "CmdOrCtrl+Shift+K"
+      },
+      {
         "id": "open-tour",
         "label": "Open the Tour"
       },
@@ -86,6 +91,10 @@
             "label": ".fig"
           }
         ]
+      },
+      {
+        "id": "export-pdf",
+        "label": "Export Frames to PDF…"
       },
       {
         "type": "separator"
@@ -462,8 +471,7 @@
       },
       {
         "id": "selection.createComponentSet",
-        "label": "Create Component Set",
-        "accelerator": "CmdOrCtrl+Shift+K"
+        "label": "Create Component Set"
       },
       {
         "id": "selection.createInstance",
@@ -648,6 +656,22 @@
             "label": "Network"
           }
         ]
+      }
+    ]
+  },
+  {
+    "label": "Help",
+    "items": [
+      {
+        "id": "check-updates",
+        "label": "Check for Updates…"
+      },
+      {
+        "type": "separator"
+      },
+      {
+        "id": "about",
+        "label": "About Pairdraw"
       }
     ]
   }

@@ -327,6 +327,23 @@ export const CodingAgentSignedOut: Story = {
     await expect(canvas.getByRole('button', { name: 'Retry' })).toBeEnabled()
   }
 }
+export const CodingAgentExternalConfig: Story = {
+  args: {
+    providerID: 'acp:claude-code',
+    recommended: false,
+    agentSetup: agentSetup({
+      detected: { ...detected('claude-code', 'available'), externalConfig: 'bedrock' },
+      bridge: true,
+      account: account({ status: { kind: 'external', label: 'AWS Bedrock' }, canSignIn: false })
+    })
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    // Set up for Amazon Bedrock outside the app, and reporting that login, it needs no sign-in.
+    await expect(canvas.getByText(/External config · Amazon Bedrock/)).toBeVisible()
+    await expect(canvas.queryByRole('button', { name: /Sign in/ })).toBeNull()
+  }
+}
 export const CodingAgentSigningIn: Story = {
   args: {
     providerID: 'acp:claude-code',

@@ -1,6 +1,8 @@
 export { loadShaderCatalog, shaderEffectLabel } from './catalog'
-export { shaderEffectPreview } from './preview'
+export { SHADER_GALLERY, shaderGalleryEntryOf, shaderPresetColors } from './gallery'
+export { shaderEffectPreview, shaderGalleryPreview } from './preview'
 export type { ShaderEffect, ShaderPropControl } from './catalog'
+export type { ShaderGalleryEntry, ShaderGalleryId } from './gallery'
 export {
   addShaderEffect,
   DEFAULT_SHADER_EFFECT,

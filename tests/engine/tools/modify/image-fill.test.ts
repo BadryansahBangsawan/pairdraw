@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
+import { toUint8Array } from 'js-base64'
+
 import { FigmaAPI } from '@open-pencil/core/figma-api'
 import { ALL_TOOLS } from '@open-pencil/core/tools'
 import { SceneGraph } from '@open-pencil/scene-graph'
@@ -7,6 +9,10 @@ import { SceneGraph } from '@open-pencil/scene-graph'
 import { expectDefined, expectFills } from '#tests/helpers/assert'
 
 const PNG_MAGIC = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+/** A whole 1×1 PNG, which an image fetched by URL must be. */
+const PIXEL_PNG = toUint8Array(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+)
 
 function setup() {
   const graph = new SceneGraph()
@@ -20,7 +26,7 @@ describe('set_image_fill tool', () => {
     'set_image_fill tool'
   )
 
-  test('sets an IMAGE fill with correct imageHash and scaleMode', () => {
+  test('sets an IMAGE fill with correct imageHash and scaleMode', async () => {
     const { figma } = setup()
     const shape = expectDefined(
       ALL_TOOLS.find((t) => t.name === 'create_shape'),
@@ -35,7 +41,7 @@ describe('set_image_fill tool', () => {
     }) as { id: string }
 
     const b64 = PNG_MAGIC.toBase64()
-    const result = tool.execute(figma, { id: node.id, image_data: b64 }) as {
+    const result = (await tool.execute(figma, { id: node.id, image_data: b64 })) as {
       id: string
       imageHash: string
       scaleMode: string
@@ -53,15 +59,18 @@ describe('set_image_fill tool', () => {
     })
   })
 
-  test('returns error for non-existent node', () => {
+  test('returns error for non-existent node', async () => {
     const { figma } = setup()
-    const result = tool.execute(figma, { id: 'nonexistent', image_data: PNG_MAGIC.toBase64() }) as {
+    const result = (await tool.execute(figma, {
+      id: 'nonexistent',
+      image_data: PNG_MAGIC.toBase64()
+    })) as {
       error: string
     }
     expect(result.error).toContain('not found')
   })
 
-  test('default scale mode is FILL', () => {
+  test('default scale mode is FILL', async () => {
     const { figma } = setup()
     const shape = expectDefined(
       ALL_TOOLS.find((t) => t.name === 'create_shape'),
@@ -71,13 +80,16 @@ describe('set_image_fill tool', () => {
       id: string
     }
 
-    const result = tool.execute(figma, { id: node.id, image_data: PNG_MAGIC.toBase64() }) as {
+    const result = (await tool.execute(figma, {
+      id: node.id,
+      image_data: PNG_MAGIC.toBase64()
+    })) as {
       scaleMode: string
     }
     expect(result.scaleMode).toBe('FILL')
   })
 
-  test('all scale modes work', () => {
+  test('all scale modes work', async () => {
     const modes = ['FILL', 'FIT', 'CROP', 'TILE'] as const
     for (const mode of modes) {
       const { figma } = setup()
@@ -93,11 +105,11 @@ describe('set_image_fill tool', () => {
         height: 50
       }) as { id: string }
 
-      const result = tool.execute(figma, {
+      const result = (await tool.execute(figma, {
         id: node.id,
         image_data: PNG_MAGIC.toBase64(),
         scale_mode: mode
-      }) as { scaleMode: string }
+      })) as { scaleMode: string }
       expect(result.scaleMode).toBe(mode)
 
       const fills = expectFills(
@@ -107,7 +119,7 @@ describe('set_image_fill tool', () => {
     }
   })
 
-  test('image data is stored in graph.images', () => {
+  test('image data is stored in graph.images', async () => {
     const { graph, figma } = setup()
     const shape = expectDefined(
       ALL_TOOLS.find((t) => t.name === 'create_shape'),
@@ -117,9 +129,59 @@ describe('set_image_fill tool', () => {
       id: string
     }
 
-    const result = tool.execute(figma, { id: node.id, image_data: PNG_MAGIC.toBase64() }) as {
+    const result = (await tool.execute(figma, {
+      id: node.id,
+      image_data: PNG_MAGIC.toBase64()
+    })) as {
       imageHash: string
     }
     expect(graph.images.get(result.imageHash)).toEqual(PNG_MAGIC)
+  })
+
+  test('fetches an image URL through the host fetch and fills with it', async () => {
+    const graph = new SceneGraph()
+    const requested: string[] = []
+    const figma = new FigmaAPI(graph, {
+      fetch: async (input) => {
+        requested.push(String(input))
+        return new Response(PIXEL_PNG.slice())
+      }
+    })
+    const rect = figma.createRectangle()
+
+    const result = (await tool.execute(figma, {
+      id: rect.id,
+      url: 'https://images.example/photo.png',
+      scale_mode: 'FIT'
+    })) as { imageHash: string; scaleMode: string }
+
+    expect(requested).toEqual(['https://images.example/photo.png'])
+    expect(graph.images.get(result.imageHash)).toEqual(PIXEL_PNG)
+    expect(expectFills(expectDefined(figma.getNodeById(rect.id), 'rect').fills)[0]).toMatchObject({
+      type: 'IMAGE',
+      imageHash: result.imageHash,
+      scaleMode: 'FIT'
+    })
+  })
+
+  test('reports a failed fetch and needs exactly one image source', async () => {
+    const figma = new FigmaAPI(new SceneGraph(), {
+      fetch: async () => new Response('missing', { status: 404 })
+    })
+    const rect = figma.createRectangle()
+    const before = rect.fills
+    expect(await tool.execute(figma, { id: rect.id, url: 'https://images.example/x.png' })).toEqual(
+      { error: 'Unable to fetch image. Response status: 404' }
+    )
+    expect(await tool.execute(figma, { id: rect.id, url: 'ftp://images.example/x.png' })).toEqual({
+      error: 'createImageAsync requires an absolute URL (http:// or https://) or a data URI'
+    })
+    expect(await tool.execute(figma, { id: rect.id })).toEqual({
+      error: 'Provide either image_data or url'
+    })
+    expect(
+      await tool.execute(figma, { id: rect.id, url: 'https://a.example/x.png', image_data: 'AA==' })
+    ).toEqual({ error: 'Provide either image_data or url' })
+    expect(rect.fills).toEqual(before)
   })
 })

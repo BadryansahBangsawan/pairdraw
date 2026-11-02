@@ -21,6 +21,7 @@ import { kickSyncEngine } from '@/app/storage/sync'
 import { prepareForReload } from '@/app/tabs'
 import { CloudHosts } from '@/components/cloud/integration'
 import CompanionPairDialog from '@/components/companion/CompanionPairDialog.vue'
+import DiskChangeDialogHost from '@/components/document/DiskChangeDialogHost.vue'
 import UnsavedChangesDialog from '@/components/document/UnsavedChangesDialog.vue'
 import PublishLibraryDialog from '@/components/libraries/PublishLibraryDialog.vue'
 import LibraryUpdateReviewDialog from '@/components/libraries/review/LibraryUpdateReviewDialog.vue'
@@ -76,6 +77,7 @@ onMounted(() => {
       <CloudHosts />
       <RecoveryDialog />
       <UnsavedChangesDialog />
+      <DiskChangeDialogHost />
       <PublishLibraryDialog />
       <LibraryUpdateReviewDialog />
       <UsageStatsPrompt />

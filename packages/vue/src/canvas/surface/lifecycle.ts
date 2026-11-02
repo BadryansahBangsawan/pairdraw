@@ -33,6 +33,15 @@ type SurfaceManagerState = {
   presentation: PresentationColorSpace | null
 }
 
+/** What a canvas asks of its renderer: its layer, renderer mode, pixel density, and effects. */
+function applyRenderOptions(renderer: SkiaRenderer, options: UseCanvasOptions | undefined) {
+  renderer.tracksSceneSettlement = options?.layer !== 'overlays'
+  renderer.tiledSceneEnabled = options?.sceneRenderer === 'tiled'
+  // The canvas buffer is sized for this ratio, so the renderer must draw at the same one.
+  renderer.maxPixelRatio = options?.maxPixelRatio ?? Number.POSITIVE_INFINITY
+  renderer.reducedEffects = options?.reducedEffects ?? false
+}
+
 export function createCanvasSurfaceManager({
   editor,
   canvasRef,
@@ -109,7 +118,7 @@ export function createCanvasSurfaceManager({
     state.renderer = null
     releaseGLContext()
 
-    sizeCanvas(canvas, editor, options?.onViewportResize)
+    sizeCanvas(canvas, editor, options?.onViewportResize, options?.maxPixelRatio)
 
     const result = makeGLSurface(
       ck,
@@ -134,8 +143,7 @@ export function createCanvasSurfaceManager({
     state.renderer.onImagePreviewReady = () => renderLoop.markDirty()
     state.renderer.imagePreviews.setDecoder(createImagePreviewDecoder())
     state.renderer.presentationColorSpace = result.presentation ?? 'srgb'
-    state.renderer.tracksSceneSettlement = options?.layer !== 'overlays'
-    state.renderer.tiledSceneEnabled = options?.sceneRenderer === 'tiled'
+    applyRenderOptions(state.renderer, options)
     showPlaceholders(state.renderer)
     editor.setCanvasKit(ck, state.renderer)
     // The scene surface draws shader frames; an overlay surface has none to draw.
@@ -208,7 +216,7 @@ export function createCanvasSurfaceManager({
       return
     }
 
-    sizeCanvas(canvas, editor, options?.onViewportResize)
+    sizeCanvas(canvas, editor, options?.onViewportResize, options?.maxPixelRatio)
 
     const result = makeGLSurface(
       ck,

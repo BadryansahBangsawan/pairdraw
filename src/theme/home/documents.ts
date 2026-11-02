@@ -24,6 +24,9 @@ export default {
     error: 'rounded-xl border border-error-border bg-error-bg px-4 py-6 text-center',
     errorText: 'text-xs text-error',
     errorAction: 'mt-3',
+    // A design system has no preview, so its card and row show the library icon.
+    designSystemPreview: 'size-8 text-muted/50',
+    designSystemIcon: 'size-4 shrink-0 text-muted',
     // A loading card in the shape of a document card: preview, name, and date.
     skeleton: 'min-w-0 rounded-card border border-border p-1.5',
     skeletonPreview: 'aspect-[4/3] h-auto w-full rounded-lg',

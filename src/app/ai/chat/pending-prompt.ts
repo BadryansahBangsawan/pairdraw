@@ -1,6 +1,8 @@
 import { shallowReactive } from 'vue'
 
+import type { ReferencedNode } from '@/app/ai/chat/context'
 import { showDocumentChat } from '@/app/ai/chat/panel'
+import { mentionedNodes } from '@/app/ai/chat/references/nodes'
 import type { ChatSubmission } from '@/app/ai/chat/submission/types'
 import type { EditorStore } from '@/app/editor/active-store'
 
@@ -13,9 +15,9 @@ import type { EditorStore } from '@/app/editor/active-store'
  */
 const pending = shallowReactive(new WeakMap<EditorStore, ChatSubmission>())
 
-/** A plain text prompt as the chat sends what the composer submits. */
-export function promptSubmission(text: string): ChatSubmission {
-  return { modelText: text, displayText: text, images: [], nodes: [] }
+/** A text prompt as the chat sends what the composer submits, with the layers it mentions. */
+export function promptSubmission(text: string, nodes: ReferencedNode[] = []): ChatSubmission {
+  return { modelText: text, displayText: text, images: [], nodes }
 }
 
 /** Leaves `submission` for the chat of `store`'s document, replacing one still waiting there. */
@@ -36,8 +38,11 @@ export function takePendingPrompt(store: EditorStore): ChatSubmission | null {
   return submission
 }
 
-/** Sends `text` from outside the chat to `store`'s document's chat, and shows that chat. */
+/**
+ * Sends `text` from outside the chat to `store`'s document's chat, and shows that chat. Layers it
+ * references (`[Hero](openpencil://node/1:2)`) go with it as previews, as from the composer.
+ */
 export function sendPromptToDocument(store: EditorStore, text: string): void {
-  setPendingPrompt(store, promptSubmission(text))
+  setPendingPrompt(store, promptSubmission(text, mentionedNodes(store.graph, text)))
   showDocumentChat(store)
 }

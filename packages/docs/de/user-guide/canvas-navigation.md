@@ -27,6 +27,8 @@ Der Zoom richtet sich nach der Position des Mauszeigers:
 - Zwei-Finger-Zoom auf dem Trackpad;
 - Tastenkürzel aus der Tabelle.
 
+Mit **Mit dem Mausrad zoomen** unter **Einstellungen → Editor** zoomt das Mausrad ohne Taste; <kbd>Shift</kbd> + Mausrad verschiebt weiterhin seitwärts. **Zoomrichtung umkehren** dreht die Richtung des Mausrads um, Trackpad-Gesten behalten ihre.
+
 Gesten über den Ebenen- und Eigenschaften-Panels werden nicht an die Arbeitsfläche weitergegeben.
 
 ## Lineale

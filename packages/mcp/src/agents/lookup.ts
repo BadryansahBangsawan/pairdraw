@@ -2,6 +2,7 @@ import { access, constants, mkdir, rm, stat, writeFile } from 'node:fs/promises'
 import { platform } from 'node:os'
 import { dirname, join } from 'node:path'
 
+import { claudeCodeCloud, type ClaudeCodeCloud } from './claude-cloud'
 import { which } from './path'
 import { spawnFixed, terminate } from './process'
 import type { CompanionAgent } from './registry'
@@ -18,6 +19,8 @@ export interface CompanionLookup {
   versions: Record<string, string | null>
   npmGlobalWritable: boolean | null
   searchPath: string
+  /** The cloud Claude Code is set up to use instead of an Anthropic sign-in. */
+  claudeCodeCloud: ClaudeCodeCloud | null
 }
 
 const OUTPUT_TIMEOUT_MS = 5_000
@@ -99,8 +102,9 @@ async function npmGlobalWritable(searchPath: string): Promise<boolean | null> {
 
 /**
  * Looks up the agents in `registry`, the package managers, and OpenPencil's companions, as the
- * desktop shell's `agent_lookup` does. It never starts an agent: only `npm prefix` runs. The
- * MCP server is this program itself, so it reports its own entry and version.
+ * desktop shell's `agent_lookup` does. It never starts an agent: only `npm prefix` runs, and of
+ * Claude Code's settings only the switches that pick a cloud are read. The MCP server is this
+ * program itself, so it reports its own entry and version.
  */
 export async function lookupAgents(
   registry: readonly CompanionAgent[],
@@ -119,7 +123,8 @@ export async function lookupAgents(
     executables,
     versions: { [MCP_PACKAGE]: options.version, [HARNESS_PACKAGE]: null },
     npmGlobalWritable: executables.npm ? await npmGlobalWritable(searchPath) : null,
-    searchPath
+    searchPath,
+    claudeCodeCloud: await claudeCodeCloud()
   }
 }
 

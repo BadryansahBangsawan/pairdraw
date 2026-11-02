@@ -50,7 +50,8 @@ export function joinWaitingPrompt(
     modelText: `${waiting.modelText}\n\n${next.modelText}`,
     displayText: `${waiting.displayText}\n\n${next.displayText}`,
     images: [...waiting.images, ...next.images],
-    nodes: uniqBy([...waiting.nodes, ...next.nodes], (node) => node.id)
+    nodes: uniqBy([...waiting.nodes, ...next.nodes], (node) => node.id),
+    files: [...(waiting.files ?? []), ...(next.files ?? [])]
   }
 }
 

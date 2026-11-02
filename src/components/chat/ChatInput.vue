@@ -7,11 +7,17 @@ import { useI18n } from '@open-pencil/vue/i18n'
 
 import { revokeImagePreviewURL } from '@/app/ai/attachment/image/prepare'
 import { MAX_IMAGE_ATTACHMENTS } from '@/app/ai/attachment/image/types'
+import {
+  MAX_TEXT_ATTACHMENT_BYTES,
+  MAX_TEXT_ATTACHMENTS,
+  type TextAttachmentRefusal
+} from '@/app/ai/attachment/text/types'
 import { takeBackMessages } from '@/app/ai/chat/queue'
 import type { ChatSubmission } from '@/app/ai/chat/submission/types'
 import { useAIChat } from '@/app/ai/chat/use'
 import { designModelProfile } from '@/app/ai/models'
 import { openSettingsDialog } from '@/app/settings/dialog'
+import ChatDraftFile from '@/components/chat/attachment/ChatDraftFile.vue'
 import ChatCreditBalance from '@/components/chat/ChatCreditBalance.vue'
 import ChatProfileSelect from '@/components/chat/ChatProfileSelect.vue'
 import ChatThinkingSelect from '@/components/chat/ChatThinkingSelect.vue'
@@ -31,12 +37,18 @@ const ui = chatInputTheme()
 const {
   status,
   disabled = false,
-  dragging = false
+  dragging = false,
+  draggedTypes = [],
+  prompts = []
 } = defineProps<{
   status: 'ready' | 'submitted' | 'streaming' | 'error'
   disabled?: boolean
-  /** Whether images are being dragged over the chat, which shows where they will go. */
+  /** Whether images or files are being dragged over the chat, which shows where they will go. */
   dragging?: boolean
+  /** The types of the files being dragged, which say whether they would fit. */
+  draggedTypes?: readonly string[]
+  /** Prompts sent in this conversation, oldest first, which Up and Down bring back. */
+  prompts?: readonly string[]
 }>()
 
 const emit = defineEmits<{
@@ -47,18 +59,35 @@ const emit = defineEmits<{
   error: [message: string]
 }>()
 
+function describeFileRefusal(name: string, refusal: TextAttachmentRefusal | 'limit'): string {
+  switch (refusal) {
+    case 'unsupported':
+      return ai.value.fileAttachmentUnsupported({ name })
+    case 'too-large':
+      return ai.value.fileAttachmentTooLarge({ name, size: MAX_TEXT_ATTACHMENT_BYTES / 1024 })
+    case 'not-text':
+      return ai.value.fileAttachmentNotText({ name })
+    case 'limit':
+      return ai.value.fileAttachmentLimit({ name, count: MAX_TEXT_ATTACHMENTS })
+  }
+}
+
 const attachments = useAttachmentDrafts({
   editor,
   selectedIds,
-  reportError: (message) => emit('error', message)
+  reportError: (message) => emit('error', message),
+  describeFileRefusal
 })
 const {
   images,
+  files,
+  full,
   canMentionSelection,
   selectionMentions,
-  openImageDialog,
+  openFileDialog,
   addFiles,
   removeImage,
+  removeFile,
   handlePaste,
   takeSubmission,
   restoreSubmission
@@ -74,7 +103,7 @@ const profileSelect = useTemplateRef<{ show: () => void }>('profileSelect')
 
 const completions = useComposerCompletions()
 
-/** Up on the first line takes waiting messages back to edit, their images with them. */
+/** Up on the first line takes waiting messages back to edit, their attachments with them. */
 function takeBack(): string | null {
   const taken = takeBackMessages()
   if (taken.length === 0) return null
@@ -101,16 +130,31 @@ function restoreWaiting(submission: ChatSubmission): boolean {
 
 /** A reply is on its way, so the credit balance waits to update until it ends. */
 const replying = computed(() => status === 'streaming' || status === 'submitted')
-/** Why images dropped now would not be attached, or null when they would. */
+/** The drag carries files other than images, which attach as text. */
+const draggingText = computed(() => draggedTypes.some((type) => !type.startsWith('image/')))
+const draggingImages = computed(() => draggedTypes.some((type) => type.startsWith('image/')))
+/** Why files dropped now would not be attached, or null when they would. */
 const dropRefusal = computed(() => {
-  if (disabled) return ai.value.dropImagesAfterReply
-  if (images.value.length >= MAX_IMAGE_ATTACHMENTS) {
+  if (disabled) {
+    return draggingText.value ? ai.value.dropFilesAfterReply : ai.value.dropImagesAfterReply
+  }
+  const imagesFull = images.value.length >= MAX_IMAGE_ATTACHMENTS
+  const filesFull = files.value.length >= MAX_TEXT_ATTACHMENTS
+  if (imagesFull && (!draggingText.value || filesFull)) {
     return ai.value.dropImagesLimit({ count: MAX_IMAGE_ATTACHMENTS })
+  }
+  if (filesFull && !draggingImages.value) {
+    return ai.value.dropFilesLimit({ count: MAX_TEXT_ATTACHMENTS })
   }
   return null
 })
+const dropLabel = computed(
+  () =>
+    dropRefusal.value ??
+    (draggingText.value ? ai.value.dropFilesToAttach : ai.value.dropImagesToAttach)
+)
 
-/** Attaches images dropped on the chat, unless they cannot be attached right now. */
+/** Attaches images and files dropped on the chat, unless they cannot be attached right now. */
 function dropFiles(files: File[]): void {
   if (dropRefusal.value) {
     emit('error', dropRefusal.value)
@@ -163,13 +207,14 @@ const selectedProfileName = computed(
     :disabled="disabled"
     :completions="completions"
     :take-back="takeBack"
+    :prompts="() => prompts"
     @submit="(text, afterWork) => emit('submit', takeSubmission(text), afterWork)"
     @stop="emit('stop')"
     @interrupt="emit('interrupt')"
     @paste="handlePaste"
     @settings="openSettingsDialog('ai')"
   >
-    <template v-if="images.length" #attachment>
+    <template v-if="images.length || files.length" #attachment>
       <div :class="ui.attachments()">
         <div v-for="(image, index) in images" :key="image.previewURL" :class="ui.image()">
           <img
@@ -190,6 +235,12 @@ const selectedProfileName = computed(
             <icon-lucide-x class="size-3" />
           </IconButton>
         </div>
+        <ChatDraftFile
+          v-for="(file, index) in files"
+          :key="`${index}:${file.name}`"
+          :name="file.name"
+          @remove="removeFile(index)"
+        />
       </div>
     </template>
     <template #overlay>
@@ -197,7 +248,7 @@ const selectedProfileName = computed(
         shape="field"
         :visible="dragging"
         :accepts="!dropRefusal"
-        :label="dropRefusal ?? ai.dropImagesToAttach"
+        :label="dropLabel"
       />
     </template>
     <template #leading>
@@ -211,12 +262,12 @@ const selectedProfileName = computed(
         <icon-lucide-mouse-pointer-2 class="size-4" />
       </IconButton>
       <IconButton
-        :label="ai.attachImages"
+        :label="ai.attachFiles"
         size="sm"
-        :disabled="disabled || images.length >= MAX_IMAGE_ATTACHMENTS"
-        @click="openImageDialog()"
+        :disabled="disabled || full"
+        @click="openFileDialog()"
       >
-        <icon-lucide-image-plus class="size-4" />
+        <icon-lucide-paperclip class="size-4" />
       </IconButton>
     </template>
     <template #model>

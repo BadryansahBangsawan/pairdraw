@@ -12,6 +12,16 @@ export function variableText(value: VariableValue | undefined): string | undefin
   return undefined
 }
 
+/**
+ * The family a variable bound to a font family names: text, trimmed, as Figma's font picker
+ * matches it. Empty text and other types name no family, so the stored one stays.
+ */
+export function variableFontFamily(value: VariableValue | undefined): string | undefined {
+  if (typeof value !== 'string') return undefined
+  const family = value.trim()
+  return family === '' ? undefined : family
+}
+
 const INT32_MIN = -2_147_483_648
 const INT32_MAX = 2_147_483_647
 

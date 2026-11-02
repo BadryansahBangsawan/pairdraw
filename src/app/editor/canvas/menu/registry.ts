@@ -5,6 +5,7 @@ export type CanvasContextActionId =
   | 'copy-as-svg'
   | 'copy-as-png'
   | 'copy-as-jsx'
+  | 'copy-as-html'
   | 'copy-node-id'
   | 'copy-xpath'
   | 'copy-properties'
@@ -15,6 +16,7 @@ export type CanvasContextLabelKey =
   | 'copyAsSVG'
   | 'copyAsPNG'
   | 'copyAsJSX'
+  | 'copyAsHTML'
   | 'copyNodeId'
   | 'copyXPath'
   | 'copyProperties'
@@ -29,6 +31,7 @@ export type CanvasContextActionMeta = {
 
 export const CANVAS_COPY_AS_GROUP_TEST_ID = 'context-copy-paste-as' satisfies TestId
 export const CANVAS_VECTORIZE_TEST_ID = 'context-vectorize' satisfies TestId
+export const CANVAS_RUN_STICKY_PROMPT_TEST_ID = 'context-run-sticky-prompt' satisfies TestId
 export const COPY_AS_PNG_SHORTCUT = 'MOD+SHIFT+C'
 
 export const CANVAS_COPY_AS_ACTIONS = [
@@ -36,6 +39,8 @@ export const CANVAS_COPY_AS_ACTIONS = [
   { id: 'copy-as-svg', labelKey: 'copyAsSVG', testId: 'context-copy-as-svg' },
   { id: 'copy-as-png', labelKey: 'copyAsPNG', shortcut: COPY_AS_PNG_SHORTCUT },
   { id: 'copy-as-jsx', labelKey: 'copyAsJSX', testId: 'context-copy-as-jsx' },
+  // No shortcut: Cmd+Alt+C stays Copy properties, as in Figma.
+  { id: 'copy-as-html', labelKey: 'copyAsHTML', testId: 'context-copy-as-html' },
   { id: 'copy-node-id', labelKey: 'copyNodeId' },
   { id: 'copy-xpath', labelKey: 'copyXPath' }
 ] satisfies CanvasContextActionMeta[]

@@ -150,6 +150,64 @@ describe('models.dev catalog', () => {
     expect(zai.find((model) => model.id === 'glm-5v-turbo')?.capabilities).toContain('vision')
   })
 
+  test('lists only the models an OpenCode preset reaches through chat completions', async () => {
+    const opencode = {
+      models: {
+        'kimi-k3': { name: 'Kimi K3', tool_call: true, modalities: { output: ['text'] } },
+        'glm-5.3': {
+          name: 'GLM-5.3',
+          tool_call: true,
+          modalities: { output: ['text'] },
+          provider: { npm: '@ai-sdk/openai-compatible' }
+        },
+        'claude-sonnet-5-5': {
+          name: 'Claude Sonnet 5.5',
+          tool_call: true,
+          modalities: { output: ['text'] },
+          provider: { npm: '@ai-sdk/anthropic', api: 'https://opencode.ai/inference/anthropic/v1' }
+        },
+        'gpt-6.1-sol': {
+          name: 'GPT-6.1 Sol',
+          tool_call: true,
+          modalities: { output: ['text'] },
+          provider: { npm: '@ai-sdk/openai' }
+        }
+      }
+    }
+    const ids = (await listCatalogModels('opencode-zen', catalogResponse({ opencode }))).map(
+      (model) => model.id
+    )
+    expect(ids).toContain('kimi-k3')
+    expect(ids).toContain('glm-5.3')
+    expect(ids).not.toContain('claude-sonnet-5-5')
+    expect(ids).not.toContain('gpt-6.1-sol')
+    expect(
+      await resolveModelsDevModel(
+        'opencode-zen',
+        'claude-sonnet-5-5',
+        catalogResponse({ opencode })
+      )
+    ).toBeNull()
+  })
+
+  test('reads each preset from its models.dev provider', async () => {
+    const model = { name: 'Grok 4.7', tool_call: true, attachment: true }
+    expect(
+      await resolveModelsDevModel(
+        'xai',
+        'grok-4.7',
+        catalogResponse({ xai: { models: { 'grok-4.7': model } } })
+      )
+    ).toMatchObject({ id: 'grok-4.7', capabilities: ['tools', 'vision'] })
+    expect(
+      await resolveModelsDevModel(
+        'kimi-for-coding',
+        'k3.1-pro',
+        catalogResponse({ 'kimi-code-plan-global': { models: { 'k3.1-pro': model } } })
+      )
+    ).toMatchObject({ id: 'k3.1-pro' })
+  })
+
   test('returns null when the provider or model is unknown', async () => {
     expect(
       await resolveModelsDevModel('openai-compatible', 'local', catalogResponse({}))

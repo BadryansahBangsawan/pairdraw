@@ -5,13 +5,13 @@ import { join } from 'node:path'
 import { readReleaseNotes } from '#release/release-notes'
 import { isEqual } from 'es-toolkit'
 import { decode, toUint8Array } from 'js-base64'
-import * as v from 'valibot'
 
 import { desktopAssets } from './catalog.ts'
 import { releaseCommands } from './commands.ts'
 import { createReleaseContext } from './context.ts'
 import { digestFile, validateTargetManifests } from './manifest.ts'
 import { assertSignedVersion } from './signature.ts'
+import { updaterFeed } from './updater.ts'
 
 const { identity, repository, version, paths } = createReleaseContext()
 const { verifySignature } = releaseCommands(paths.root)
@@ -29,10 +29,8 @@ const manifests = validateTargetManifests(
 const notes = await readFile(paths.notes, 'utf8')
 const sourceNotes = await readReleaseNotes(join(paths.root, 'CHANGELOG.md'), version)
 if (notes !== sourceNotes) throw new Error('Release notes do not match the source changelog')
-const config = v.parse(
-  v.object({ plugins: v.object({ updater: v.object({ pubkey: v.string() }) }) }),
-  JSON.parse(await readFile(paths.tauriConfig, 'utf8'))
-)
+// The same key the native builds were configured with (`frontend.ts`), never the checked-in one.
+const { pubkey } = updaterFeed(process.env, repository)
 
 const temporary = await mkdtemp(join(tmpdir(), 'open-pencil-signatures-'))
 const output = paths.output
@@ -43,7 +41,7 @@ const platforms: Record<string, { signature: string; url: string }> = {}
 
 try {
   const publicKey = join(temporary, 'key.pub')
-  await writeFile(publicKey, toUint8Array(config.plugins.updater.pubkey))
+  await writeFile(publicKey, toUint8Array(pubkey))
 
   for (const [index, manifest] of manifests.entries()) {
     const directory = directories[index]

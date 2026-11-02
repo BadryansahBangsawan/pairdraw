@@ -6,12 +6,21 @@
 
 `.github/workflows/build.yml` runs on a new release tag, or through `workflow_dispatch` with an existing one. Release tags are stable `vX.Y.Z` or beta pre-releases `vX.Y.Z-beta.N` (`src/version.ts`). A dispatch uses the selected workflow revision but builds the immutable application commit resolved from that tag. The source must be an ancestor of `origin/master`.
 
-1. **Plan:** resolve the source commit and generate the native matrix from `native/catalog.ts`.
+1. **Plan:** refuse a release without its own update feed (see below), resolve the source commit, and generate the native matrix from `native/catalog.ts`.
 2. **Frontend:** build packages and the desktop frontend once; prepare and pack npm archives without rebuilding. Archive `dist`, desktop icons, and generated menus together and record its SHA-256.
-3. **Native:** five independent jobs check out that same source, verify and extract the shared inputs, then build through Node's Tauri CLI launcher. A generated config sets `build.beforeBuildCommand` to `null` and, for a beta, the numeric MSI version `X.Y.Z.N`; the checked-in local build hook is unchanged. No native job uploads release assets.
+3. **Native:** six independent jobs (macOS arm64 and x64, Windows x64 and arm64, Linux x64 and arm64) check out that same source, verify and extract the shared inputs, then build through Node's Tauri CLI launcher. A generated config sets `build.beforeBuildCommand` to `null`, turns on signed updater artifacts with the release's update feed, and, for a beta, sets the numeric MSI version `X.Y.Z.N`; the checked-in local build hook is unchanged. Collection then packs the archives Tauri does not bundle. No native job uploads release assets.
 4. **Publish:** require the complete matrix with identical source/workflow/run/attempt/frontend identity. Verify file inventories, hashes, every updater signature and the release version it records (the desktop updater sets `requireSignedVersion`), and exact source changelog notes. Generate the updater JSON, source/workflow manifest, and checksums; attest and verify the complete output set. Verify npm consumers and publish the original tarballs with npm provenance. Replace every expected draft asset, then download and verify all uploaded bytes.
 
 Workflow tooling is checked out separately in `.pipeline` and installed from its own frozen lockfile where it runs. Application dependency installation and builds remain owned by the tagged checkout; rebuilding an older tag must not accidentally execute its older release orchestration. Dependency installation is not frontend/package compilation.
+
+## Update feed
+
+The checked-in `desktop/tauri.conf.json` names no update feed: its updater `endpoints` and `pubkey` are empty and `createUpdaterArtifacts` is off, so local and fork builds never check for updates and never offer OpenPencil releases. Only the release config adds a feed, from two repository variables read by `native/updater.ts`:
+
+- `UPDATER_PUBLIC_KEY` (required): the base64 minisign public key, the same text `tauri signer generate` writes to its `.pub` file. It must pair with the `TAURI_SIGNING_PRIVATE_KEY` secret; the publish job verifies every updater signature against it. OpenPencil's keys are refused.
+- `UPDATER_ENDPOINT` (optional): where installed apps fetch `latest.json`; an `https` URL. It defaults to `https://github.com/<repository>/releases/latest/download/latest.json`, where this workflow publishes it. A feed serving `open-pencil/open-pencil` is refused.
+
+Changing either after a release strands installed apps on the old feed or key, so generate the key once and keep the private half safe.
 
 ## Pre-releases
 
@@ -23,7 +32,7 @@ The workflow leaves the GitHub Release **draft**. After successful verification,
 
 ## Artifact policy and provenance
 
-`native/catalog.ts` is OpenPencil's required asset/naming policy, not a replacement for Tauri artifact discovery. Collection consumes `tauri-action`'s `artifactPaths` output and refuses missing, duplicate, unexpected, empty, or escaping files. The macOS `.app` directory is ignored in favor of its required signed archive. Stable architecture-qualified macOS archive names are preserved.
+`native/catalog.ts` is Pairdraw's required asset/naming policy, not a replacement for Tauri artifact discovery. Tauri names bundles after `productName`, which stays `OpenPencil` so existing installs keep their application and data directories; every published file is renamed to `Pairdraw_*`. Collection consumes `tauri-action`'s `artifactPaths` output and refuses missing, duplicate, unexpected, empty, or escaping files. Two archives are packed rather than copied (`native/pack.ts`): the signed macOS `.app` as `Pairdraw_<version>_<arch>.zip` with `ditto`, and on Linux the Debian package's files as `Pairdraw_<version>_<arch>.tar.gz`, which runs from any folder on a system with WebKitGTK. Packed archives are unsigned download-only files covered by the manifest, checksums, and attestations; the updater keeps using the macOS `.app.tar.gz`, the Windows installers, and the Linux packages. A copy run from the `.tar.gz` does not update itself: its binary carries the `.deb` bundle type, so `tauri-plugin-updater` would install the `.deb` system-wide. The archive always holds `usr/lib/OpenPencil`, which makes Tauri resolve that copy's resources outside `/usr/lib/`, and `src/app/shell/updater/feed.ts` then skips the update check and says updates aren't set up.
 
 GitHub's default provenance identifies the **workflow execution revision**, which can differ from the tagged application source in a manual rebuild. The independently attested `release-manifest.json` records both commits, the workflow run/attempt, shared frontend digest, target file digests, and npm tarball digests. Do not describe the default workflow provenance alone as proof of the application's checked-out source. npm also emits its own provenance from the same workflow execution; the signed manifest binds its exact tarballs to the application source.
 

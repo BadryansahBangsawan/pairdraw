@@ -120,6 +120,32 @@ test('a family chosen while loading skips layers deleted in the meantime', async
   expect(editor.graph.getNode(first.id)).toBeUndefined()
 })
 
+test('a family picked for bound and unbound layers detaches the binding in one undo step', async () => {
+  const { editor, first, second, selection, actions, finishLoading } = setup()
+  const brand = editor.graph.createCollection('Brand')
+  const variable = editor.graph.createVariable('Type/Family', 'STRING', brand.id, 'Oswald')
+  editor.bindVariable(first.id, 'fontFamily', variable.id)
+  expect(first.fontFamily).toBe('Oswald')
+  selection.value = [first, second]
+
+  finishLoading()
+  await actions.setFamily('Lora')
+  expect(
+    [first, second].map((text) => [text.fontFamily, 'fontFamily' in text.boundVariables])
+  ).toEqual([
+    ['Lora', false],
+    ['Lora', false]
+  ])
+  // A later edit of the variable no longer reaches the layer.
+  editor.updateVariableValue(variable.id, brand.defaultModeId, 'Inter')
+  expect(first.fontFamily).toBe('Lora')
+
+  editor.undo.undo()
+  editor.undo.undo()
+  expect(first.boundVariables.fontFamily).toBe(variable.id)
+  expect(second.fontFamily).not.toBe('Lora')
+})
+
 /** Text layers in Inter at these styles, with typography actions and face lists over them. */
 function styled(
   ...styles: { fontWeight: number; italic?: boolean; fontFamily?: string; fontStyle?: string }[]

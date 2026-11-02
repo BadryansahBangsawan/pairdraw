@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import 'fake-indexeddb/auto'
 
+import { isLibraryRevisionNotFoundError } from '@open-pencil/core/library'
 import { SceneGraph } from '@open-pencil/scene-graph'
 
 import type { LibraryObjectStore } from '@/app/integrations/storage'
@@ -92,5 +93,24 @@ describe('routed library catalog', () => {
     await expect(
       routed.getRevision('design-system', published.manifest.revisionId)
     ).rejects.toThrow('hash mismatch')
+  })
+
+  test('reports an unreachable remote, not a missing library, when nothing is cached', async () => {
+    const objects = new MemoryObjects()
+    const routed = new RoutedLibraryCatalog(isolatedCatalog())
+    routed.useStorage(new StorageLibraryCatalog(objects))
+    objects.fail = true
+
+    const error = await routed.getRevision('design-system', 'r1').catch((caught) => caught)
+    expect(isLibraryRevisionNotFoundError(error)).toBe(false)
+    expect(error).toHaveProperty('message', 'offline')
+  })
+
+  test('reports a library neither catalog has as not found', async () => {
+    const routed = new RoutedLibraryCatalog(isolatedCatalog())
+    routed.useStorage(new StorageLibraryCatalog(new MemoryObjects()))
+
+    const error = await routed.getRevision('design-system').catch((caught) => caught)
+    expect(isLibraryRevisionNotFoundError(error)).toBe(true)
   })
 })

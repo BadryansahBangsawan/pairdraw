@@ -1,5 +1,7 @@
 import * as v from 'valibot'
 
+import { stripJSONComments } from './jsonc'
+
 /**
  * The `.pen` document as pen.dev writes it (schema 2.21), plus the older forms still found in
  * files: the object `stroke` of 2.8 and `icon_font` nodes. Properties typed `…OrVariable` hold a
@@ -96,6 +98,11 @@ const cornerRadiusSchema = v.union([numSchema, v.array(numSchema)])
 const nodeFields = {
   name: v.optional(strSchema),
   context: v.optional(strSchema),
+  /**
+   * What a layer is, for agents: pen.dev writes a `type` and any fields of its own. It is only kept
+   * as plugin data, so any value is read as it is rather than rejecting the document.
+   */
+  metadata: v.optional(v.unknown()),
   x: v.optional(v.number()),
   y: v.optional(v.number()),
   width: v.optional(sizeSchema),
@@ -148,7 +155,7 @@ const nodeFields = {
   textAlignVertical: v.optional(strSchema),
   underline: v.optional(boolSchema),
   strikethrough: v.optional(boolSchema),
-  href: v.optional(strSchema),
+  href: v.optional(v.nullable(strSchema)),
 
   library: v.optional(strSchema),
   icon: v.optional(strSchema),
@@ -156,7 +163,9 @@ const nodeFields = {
   iconFontName: v.optional(strSchema),
   iconFontFamily: v.optional(strSchema),
 
-  ref: v.optional(strSchema)
+  ref: v.optional(strSchema),
+  /** The model a `prompt` node asks. */
+  model: v.optional(strSchema)
 }
 
 export type NodeFields = v.InferOutput<v.ObjectSchema<typeof nodeFields, undefined>>
@@ -231,4 +240,10 @@ export type PenEffect = v.InferOutput<typeof effectSchema>
 export type PenSides = v.InferOutput<typeof sidesSchema>
 export type PenNumber = v.InferOutput<typeof numSchema>
 
-export const penFileSchema = v.pipe(v.string(), v.parseJson(), penDocumentSchema)
+/** A `.pen` file's text, which may hold comments, as its document. */
+export const penFileSchema = v.pipe(
+  v.string(),
+  v.transform(stripJSONComments),
+  v.parseJson(),
+  penDocumentSchema
+)

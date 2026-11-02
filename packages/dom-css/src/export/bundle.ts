@@ -41,7 +41,15 @@ export interface ExportHTMLBundleOptions {
   /** Resolves font files to include with external assets; `none` includes no fonts. */
   fonts?: 'none' | WebFontFaceResolver
   assetBasePath?: string
+  /**
+   * Reads one of Tailwind's stylesheets, `tailwindcss/theme.css` or `tailwindcss/utilities.css`,
+   * for a standalone Tailwind page. Browsers pass one; Node and Bun read the installed package.
+   */
+  loadTailwindStylesheet?: TailwindStylesheetLoader
 }
+
+export type TailwindStylesheetLoader = (id: TailwindStylesheetId) => Promise<string>
+export type TailwindStylesheetId = 'tailwindcss/theme.css' | 'tailwindcss/utilities.css'
 
 export interface ExportHTMLFile {
   path: string
@@ -204,15 +212,21 @@ async function tokenCSS(document: DesignDocument, format: TokenStylesheetFormat)
   return css
 }
 
-async function compileTailwindClasses(classNames: string[], tokens: string): Promise<string> {
+async function readInstalledTailwindStylesheet(id: TailwindStylesheetId): Promise<string> {
+  const { readFile } = await import(/* @vite-ignore */ 'node:fs/promises')
+  return readFile(new URL(import.meta.resolve(id)), 'utf8')
+}
+
+async function compileTailwindClasses(
+  classNames: string[],
+  tokens: string,
+  load: TailwindStylesheetLoader = readInstalledTailwindStylesheet
+): Promise<string> {
   if (classNames.length === 0) return ''
-  const [{ compile }, { readFile }] = await Promise.all([
+  const [{ compile }, themeCSS, utilitiesCSS] = await Promise.all([
     import('tailwindcss'),
-    import(/* @vite-ignore */ 'node:fs/promises')
-  ])
-  const [themeCSS, utilitiesCSS] = await Promise.all([
-    readFile(new URL(import.meta.resolve('tailwindcss/theme.css')), 'utf8'),
-    readFile(new URL(import.meta.resolve('tailwindcss/utilities.css')), 'utf8')
+    load('tailwindcss/theme.css'),
+    load('tailwindcss/utilities.css')
   ])
   const compiler = await compile(`${themeCSS}\n${tokens}\n${utilitiesCSS}`)
   return compiler.build(classNames)
@@ -234,15 +248,25 @@ function serializeFontWeight(weight: string | number | [number, number]): string
   return Array.isArray(weight) ? weight.join(' ') : String(weight)
 }
 
+/**
+ * A relative file path as a URL that points at it: each folder and file name percent-encoded,
+ * so a page named `Card #1` finds `Card #1.assets/` rather than reading `#1` as a fragment.
+ */
+function assetURL(path: string): string {
+  return path.split('/').map(encodeURIComponent).join('/')
+}
+
 function fontSourceValue(asset: WebFontFaceAsset, from: string): string {
   // Relative to the stylesheet's folder, which the asset's path may start with.
   const path =
     from && asset.path.startsWith(`${from}/`) ? asset.path.slice(from.length + 1) : asset.path
-  const url = new URL(path, 'file:///')
-  const escapedPath = url.pathname.slice(1)
-  return ['url(', JSON.stringify(escapedPath), ') format(', JSON.stringify(asset.format), ')'].join(
-    ''
-  )
+  return [
+    'url(',
+    JSON.stringify(assetURL(path)),
+    ') format(',
+    JSON.stringify(asset.format),
+    ')'
+  ].join('')
 }
 
 interface FontFaceCSSOptions {
@@ -290,12 +314,15 @@ export async function fontFaceStylesheet(
 
 async function fontFaceAssets(
   document: DesignDocument,
-  options: Required<ExportHTMLBundleOptions>
+  options: ResolvedBundleOptions
 ): Promise<{ css: string; files: ExportHTMLFile[] }> {
   if (options.fonts === 'none' || options.assets !== 'external') return { css: '', files: [] }
   const assets = await options.fonts(designFontRequests(document), `${options.assetBasePath}/fonts`)
-  // The page's stylesheet sits at the top, so font paths stay as they are.
-  return { css: await fontFaceStylesheet(assets, { from: '' }), files: assets }
+  // The page's stylesheet sits in the asset folder, beside the fonts' own folder.
+  return {
+    css: await fontFaceStylesheet(assets, { from: options.assetBasePath }),
+    files: assets
+  }
 }
 
 function dataImageParts(value: string): { mime: string; base64: string } | undefined {
@@ -332,28 +359,31 @@ export function extractImageAssets(
     if (!parts) return
     const cachedPath = sources.get(src.value)
     if (cachedPath) {
-      src.value = cachedPath
+      src.value = assetURL(cachedPath)
       return
     }
     const path = `${assetBasePath}/images/image-${sources.size + 1}.${extensionForMime(parts.mime)}`
     sources.set(src.value, path)
     files.push({ path, content: toUint8Array(parts.base64) })
-    src.value = path
+    src.value = assetURL(path)
   })
   return { html: serialize(fragment), files }
 }
 
 function stylesheetLink(path: string): string {
-  return `<link rel="stylesheet" href="${path}">`
+  return `<link rel="stylesheet" href="${assetURL(path)}">`
 }
 
 function styleTag(css: string): string {
   return css ? `<style>${css}</style>` : ''
 }
 
+type ResolvedBundleOptions = Required<Omit<ExportHTMLBundleOptions, 'loadTailwindStylesheet'>> &
+  Pick<ExportHTMLBundleOptions, 'loadTailwindStylesheet'>
+
 async function exportStandaloneHTML(
   document: DesignDocument,
-  options: Required<ExportHTMLBundleOptions>
+  options: ResolvedBundleOptions
 ): Promise<ExportHTMLBundle> {
   const size = standaloneSize(document)
   const doc = standaloneDocument(document, size)
@@ -365,7 +395,8 @@ async function exportStandaloneHTML(
     body = serializeHTML(doc, { style: 'tailwind' })
     css += await compileTailwindClasses(
       classNamesFromHTML(body),
-      await tokenCSS(document, 'tailwind')
+      await tokenCSS(document, 'tailwind'),
+      options.loadTailwindStylesheet
     )
   } else {
     css += await tokenCSS(document, 'css')
@@ -406,20 +437,25 @@ export async function exportHTMLBundle(
   document: DesignDocument,
   options: ExportHTMLBundleOptions = {}
 ): Promise<ExportHTMLBundle> {
-  const resolvedOptions: Required<ExportHTMLBundleOptions> = {
+  const resolvedOptions: ResolvedBundleOptions = {
     html: options.html ?? 'fragment',
     style: options.style ?? 'inline',
     assets: options.assets ?? 'inline',
     fonts: options.fonts ?? 'none',
-    assetBasePath: options.assetBasePath ?? 'assets'
+    assetBasePath: options.assetBasePath ?? 'assets',
+    loadTailwindStylesheet: options.loadTailwindStylesheet
   }
 
   if (resolvedOptions.html === 'standalone') return exportStandaloneHTML(document, resolvedOptions)
 
+  const fragment = serializeHTML(document, { style: resolvedOptions.style })
+  if (resolvedOptions.assets !== 'external') {
+    return { entrypoint: 'index.html', files: [{ path: 'index.html', content: fragment }] }
+  }
+  // A fragment has no stylesheet to declare fonts in, so only its images become files.
+  const extracted = extractImageAssets(fragment, resolvedOptions.assetBasePath)
   return {
     entrypoint: 'index.html',
-    files: [
-      { path: 'index.html', content: serializeHTML(document, { style: resolvedOptions.style }) }
-    ]
+    files: [{ path: 'index.html', content: extracted.html }, ...extracted.files]
   }
 }

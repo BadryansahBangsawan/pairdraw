@@ -24,7 +24,9 @@ const defaultNames = new Set([
   // Lets the model look at what it built.
   'export_image',
   'list_pages',
-  'create_page'
+  'create_page',
+  // Vectorizing runs on the user's own service and key, which only the app holds.
+  'vectorize_image'
 ])
 
 export const aiToolDefinitions = ALL_TOOLS.filter((tool) => isToolExposed(tool, 'ai'))

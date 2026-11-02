@@ -18,6 +18,7 @@ import { layoutAuthoredNodes } from '#core/layout'
 
 import type { DrawIOExportTarget } from './formats/drawio/export'
 import { exportFigFile, parseFigFile } from './formats/fig'
+import type { PDFPageSpec } from './formats/pdf/plan'
 import type { PPTXExportOptions } from './formats/pptx'
 import { headlessRenderNodes, renderNodesToImage, type RasterExportFormat } from './formats/raster'
 import { extractExportGraph, findPageId } from './subgraph'
@@ -30,6 +31,7 @@ import type {
   IOFormatAdapter,
   IOFormatExportOptions,
   IOFormatSupport,
+  PDFFormatExportOptions,
   RasterExportOptions,
   ReadDocumentInput,
   SVGExportOptions
@@ -465,6 +467,36 @@ export const svgFormat: IOFormatAdapter<'svg'> = {
   }
 }
 
+/**
+ * The PDF pages an export makes. A selection gets a page per layer in the order it lists them,
+ * each sized to its layer, as slides and Figma's frame export do, unless `single` asks for one
+ * page; a page or a document is one page of its layers unless `frames` asks for a page each.
+ */
+async function pdfPageSpecs(
+  request: ExportRequest,
+  options: PDFFormatExportOptions | undefined
+): Promise<PDFPageSpec[]> {
+  const frames = options?.pages ? options.pages === 'frames' : request.target.scope === 'selection'
+  if (frames) {
+    const { target } = request
+    let ids: string[] | undefined
+    if (target.scope === 'selection') ids = target.nodeIds
+    else if (target.scope === 'node') ids = [target.nodeId]
+    const first = ids?.[0]
+    let currentPageId: string | null | undefined
+    if (first) currentPageId = findPageId(request.graph, first)
+    else if (target.scope === 'page') currentPageId = target.pageId
+    else if (target.scope === 'document') currentPageId = request.graph.getPages()[0]?.id
+    if (!currentPageId) throw new Error('Nothing to export')
+    // Without IDs, the plan takes the page's visible layers, in layer order.
+    const { planPDFPages } = await import('./formats/pdf/plan')
+    return planPDFPages(request.graph, { mode: 'frames', ids, currentPageId })
+  }
+  const target = resolveExportNodes(request)
+  if (!target) throw new Error('Nothing to export')
+  return [target]
+}
+
 export const pdfFormat: IOFormatAdapter<'pdf'> = {
   id: 'pdf',
   label: 'PDF',
@@ -474,12 +506,11 @@ export const pdfFormat: IOFormatAdapter<'pdf'> = {
   mimeTypes: ['application/pdf'],
   support: EXPORT_EVERY_TARGET,
   exportOptions: FIXED_SIZE_EXPORT,
-  async exportContent(request) {
-    const target = resolveExportNodes(request)
-    if (!target) throw new Error('Nothing to export')
+  async exportContent(request, options?: PDFFormatExportOptions) {
+    const specs = await pdfPageSpecs(request, options)
     // Embedded, as Figma embeds every face its PDFs draw.
     const { exportPDFDocument } = await import('./formats/pdf/document')
-    const data = (await exportPDFDocument(request.graph, [target], { embedFonts: true }))?.data
+    const data = (await exportPDFDocument(request.graph, specs, { embedFonts: true }))?.data
     if (!data) throw new Error('Nothing to export')
     return {
       format: 'pdf',

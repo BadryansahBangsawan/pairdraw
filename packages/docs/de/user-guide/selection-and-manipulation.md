@@ -12,14 +12,16 @@ Ausgewählte Objekte können verschoben, skaliert, gedreht, dupliziert und in de
 - Ein Klick auf ein Objekt ersetzt die aktuelle Auswahl.
 - <kbd>Shift</kbd> + Klick fügt ein Objekt hinzu oder entfernt es.
 - Ziehen auf einer freien Fläche erstellt eine Rahmenauswahl; alle geschnittenen Objekte werden ausgewählt.
+- <kbd>⌘</kbd> + Ziehen (<kbd>Ctrl</kbd> + Ziehen unter Windows und Linux) erstellt eine Rahmenauswahl, die die tiefsten verschachtelten Ebenen auswählt. Sie beginnt dort, wo auch eine normale Rahmenauswahl beginnt: auf leerer Arbeitsfläche oder dem leeren Hintergrund eines Rahmens der obersten Ebene oder eines Abschnitts. Auf einer Ebene oder dem Hintergrund eines verschachtelten Rahmens, einer Komponente oder einer Instanz wählt <kbd>⌘</kbd> + Ziehen dieses Objekt aus und verschiebt es. Drückst oder lässt du <kbd>⌘</kbd> während des Ziehens los, wechselt die Auswahl zwischen tiefer und normaler Rahmenauswahl.
 - <kbd>⌘</kbd><kbd>A</kbd> wählt alle Objekte der aktuellen Seite.
 - Ein Klick auf eine freie Stelle hebt die Auswahl auf.
 
 ## Verschieben
 
 - Ausgewähltes Objekt ziehen.
-- Pfeiltasten verschieben um 1 px.
-- <kbd>Shift</kbd> + Pfeiltasten verschieben um 10 px.
+- Pfeiltasten verschieben um den kleinen Schritt, standardmäßig 1 px.
+- <kbd>Shift</kbd> + Pfeiltasten verschieben um den großen Schritt, standardmäßig 10 px.
+- Beide Abstände stellst du unter **Einstellungen → Editor → Pfeiltasten** ein.
 
 ## Größe ändern
 

@@ -6,10 +6,11 @@ import SettingsPage from '@/components/settings/layout/SettingsPage.vue'
 import ToolbarSettingsPanel from '@/components/settings/toolbar/ToolbarSettingsPanel.vue'
 
 import NavigationSettingsSection from './NavigationSettingsSection.vue'
+import NudgeSettingsSection from './NudgeSettingsSection.vue'
 import RenderingSettingsSection from './RenderingSettingsSection.vue'
 import SnappingSettingsSection from './SnappingSettingsSection.vue'
 
-/** How the canvas and its tools behave: snapping, navigation, the toolbar, and rendering. */
+/** How the canvas and its tools behave: snapping, nudging, navigation, the toolbar, and rendering. */
 const toolbar = useTemplateRef<HTMLElement>('toolbar')
 
 // Customize toolbar opens this page on the toolbar.
@@ -29,6 +30,7 @@ watch(
   <SettingsPage data-test-id="settings-editor-panel">
     <div class="flex flex-col gap-6">
       <SnappingSettingsSection />
+      <NudgeSettingsSection />
       <NavigationSettingsSection />
       <div ref="toolbar" class="scroll-mt-4">
         <ToolbarSettingsPanel />

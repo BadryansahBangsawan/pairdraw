@@ -8,6 +8,7 @@ import {
 import { withTimeout } from 'es-toolkit/promise'
 
 import { createPendingRequests } from '#mcp/server/pending-requests'
+import { registerSkill } from '#mcp/skill/register'
 import { MCP_AGENT_KINDS, type MCPAgentSession, type MCPToolSettled } from '#mcp/tool/registration'
 
 export type MCPTransport = {
@@ -35,6 +36,8 @@ type MCPSessionManagerOptions = {
     session: MCPAgentSession,
     onToolSettled: MCPToolSettled
   ) => void
+  /** What the server tells the session's client when it connects; none when omitted. */
+  instructions?: (session: MCPAgentSession) => string | undefined
   /** Told when a client's initialize succeeds, so an app chat knows its agent reached the tools. */
   onSessionOpened?: (session: MCPAgentSession) => void
   /** Told when a session ends, so the app stops showing its agent. */
@@ -97,6 +100,7 @@ async function isInitializeResult(response: Response, id: string): Promise<boole
 export function createMCPSessionManager({
   serverVersion,
   registerTools,
+  instructions,
   onSessionOpened,
   onSessionClosed,
   sessionIdleTimeoutMs = MCP_SESSION_IDLE_TIMEOUT_MS
@@ -160,8 +164,11 @@ export function createMCPSessionManager({
     if (inFlight) return inFlight
 
     const promise = (async () => {
-      const server = new McpServer({ name: 'open-pencil', version: serverVersion })
       const agent: MCPAgentSession = { id, ...opener }
+      const server = new McpServer(
+        { name: 'open-pencil', version: serverVersion },
+        { instructions: instructions?.(agent) }
+      )
 
       const transport = new WebStandardStreamableHTTPServerTransport({
         sessionIdGenerator: () => id,
@@ -173,6 +180,8 @@ export function createMCPSessionManager({
       // does not establish a valid MCP session.
       try {
         registerTools(server, agent, requests.releaseCancelled)
+        // Every session serves the agent skill, whatever tools its policy leaves on.
+        registerSkill(server)
         await server.connect(transport)
       } catch (e) {
         await closeSession({ transport, server })

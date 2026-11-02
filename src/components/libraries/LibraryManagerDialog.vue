@@ -6,6 +6,7 @@ import { useI18n } from '@open-pencil/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { openLibraryReview, openPublishLibraryDialog, useLibraryService } from '@/app/libraries'
+import MissingLibraries from '@/components/libraries/MissingLibraries.vue'
 import { useLibraryManager } from '@/components/libraries/useLibraryManager'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -45,7 +46,8 @@ const {
   toggleLibrary,
   preferLibrary,
   updateAsset,
-  updateAll
+  updateAll,
+  relinkLibrary
 } = useLibraryManager(open, editor, service)
 watch(open, (isOpen) => {
   if (isOpen) section.value = initialSection
@@ -113,6 +115,12 @@ function reviewUpdate(group: (typeof visibleUpdateGroups.value)[number]) {
               { value: 'storage', label: panels.storageLibraries }
             ]"
             @update:model-value="selectSource"
+          />
+          <MissingLibraries
+            :missing="service.missing.value"
+            :libraries="service.summaries.value"
+            :disabled="applying !== null"
+            @relink="relinkLibrary"
           />
           <div
             v-for="library in service.summaries.value"

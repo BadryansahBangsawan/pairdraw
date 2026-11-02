@@ -33,7 +33,10 @@ export type VectorElementRenderer = (graph: SceneGraph, node: SceneNode) => Desi
 
 export interface SceneGraphToDesignOptions {
   rootId?: string
+  /** Write each layer's ID as `data-open-pencil-node-id`. Default true. */
   includeSourceIds?: boolean
+  /** Write each layer's own name as `data-name`, as the Tailwind JSX export does. Default false. */
+  includeLayerNames?: boolean
   /** Write variable-bound values as `var(--name)` where CSS resolves them as drawn. Default true. */
   tokens?: boolean
   /** Vector, boolean, star, polygon, and icon layers as inline SVG; without it they project as boxes. */
@@ -392,14 +395,23 @@ function imageSourceURL(node: SceneNode): string | undefined {
   )?.value
 }
 
+/** A layer's name, unless it only repeats the layer's type. */
+export function ownLayerName(node: SceneNode): string | undefined {
+  return node.name && node.name !== node.type ? node.name : undefined
+}
+
 function attrsForNode(
   graph: SceneGraph,
   node: SceneNode,
-  includeSourceIds: boolean
+  {
+    includeSourceIds,
+    includeLayerNames
+  }: Pick<ProjectionContext, 'includeSourceIds' | 'includeLayerNames'>
 ): Record<string, string> {
-  const attrs: Record<string, string> = includeSourceIds
-    ? { 'data-open-pencil-node-id': node.id }
-    : {}
+  const attrs: Record<string, string> = {}
+  const name = includeLayerNames ? ownLayerName(node) : undefined
+  if (name) attrs['data-name'] = name
+  if (includeSourceIds) attrs['data-open-pencil-node-id'] = node.id
   const sourceURL = imageSourceURL(node)
   if (sourceURL) attrs.src = sourceURL
   const fill = node.fills.at(0)
@@ -420,6 +432,7 @@ function tagNameForNode(node: SceneNode): string {
 interface ProjectionContext {
   graph: SceneGraph
   includeSourceIds: boolean
+  includeLayerNames: boolean
   tokens: DesignTokens | undefined
   vectorElement: VectorElementRenderer | undefined
   shown: ReadonlySet<string> | undefined
@@ -456,11 +469,11 @@ function sceneNodeToDesignNode(
   root: boolean
 ): DesignNode | null {
   if ((!node.visible && !context.shown?.has(node.id)) || node.internalOnly) return null
-  const { graph, includeSourceIds, tokens } = context
+  const { graph, tokens } = context
   const parent = node.parentId ? graph.getNode(node.parentId) : undefined
   const entered = tokens?.enter(node, inherited, root)
   const modes = entered?.modes ?? inherited
-  const attrs = { ...attrsForNode(graph, node, includeSourceIds), ...entered?.attrs }
+  const attrs = { ...attrsForNode(graph, node, context), ...entered?.attrs }
   const css: FieldCSS = (field, literal) => tokens?.reference(node, field, modes) ?? literal
 
   if (node.type === 'TEXT') {
@@ -514,11 +527,18 @@ function sceneNodeToDesignNode(
 
 function projectionContext(
   graph: SceneGraph,
-  { includeSourceIds = true, tokens = true, vectorElement, shown }: SceneGraphToDesignOptions
+  {
+    includeSourceIds = true,
+    includeLayerNames = false,
+    tokens = true,
+    vectorElement,
+    shown
+  }: SceneGraphToDesignOptions
 ): ProjectionContext {
   return {
     graph,
     includeSourceIds,
+    includeLayerNames,
     tokens: tokens ? new DesignTokens(graph) : undefined,
     vectorElement,
     shown

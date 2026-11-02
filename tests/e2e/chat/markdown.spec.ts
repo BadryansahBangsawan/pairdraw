@@ -60,6 +60,15 @@ test('Markdown blocks unsafe links and cross-origin images', async ({ configured
   )
 })
 
+test('links to local files stay inert in the browser', async ({ configuredChat: chat }) => {
+  // The mock echoes the request, so its reply carries the link. Only the desktop app shows files.
+  await chat.submit('Saved [tokens](file:///Users/me/tokens.css)')
+  const assistant = chat.assistantMessage()
+  await expect(assistant).toContainText('tokens')
+  await expect(assistant.locator('a[href^="file:"]')).toHaveCount(0)
+  await expect(assistant.locator('[data-slot="chat-file-link"]')).toHaveCount(0)
+})
+
 test('tables read as part of the reply, with copy as their only action', async ({
   configuredChat: chat
 }) => {

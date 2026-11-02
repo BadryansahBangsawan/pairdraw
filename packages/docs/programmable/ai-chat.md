@@ -13,6 +13,15 @@ Home asks **What do you want to design?** above the search field. Describe a scr
 
 An empty page of a design offers the same prompt over the canvas on desktop. It sends into that document's chat and leaves once the page has a layer or an agent starts working, and the canvas around it keeps working as usual. Close it to hide it for that document, or turn off **Prompt on empty pages** in **Settings → Models → Chat**. Boards and read-only documents do not show it.
 
+Both prompts list example chips — **Landing page**, **Sign-in screen**, **Dashboard**, and **Pricing**. Picking one fills the prompt with a starting idea and focuses it so you can edit it before sending; nothing is sent until you press <kbd>Enter</kbd>.
+
+## Send work from the canvas
+
+- **Run sticky as prompt** in the canvas [context menu](../user-guide/context-menu#run-sticky-as-prompt) sends the text of the selected sticky notes, with a reference to each note.
+- **Apply with AI** in a comment thread's menu asks the assistant to apply that thread's feedback, reply saying what changed, and resolve it. The prompt quotes the comment and its replies and links the layer the thread is pinned to. **Apply open comments with AI** in the comments list does the same for every open thread it shows; resolved threads are left out.
+
+Both send into the document's chat, are offered only in documents you can edit, and set up a model first the way the Home prompt does when none is configured. Layers a prompt links to go with it as references, as they do when you mention them in the chat field.
+
 ## Setup
 
 OpenPencil opens no setup dialog on first launch. While no model is set up, it looks for a [coding agent](./coding-agents) already on your computer: Claude Code, then Codex, then Gemini CLI. One that is installed and signed in becomes the design agent right away, and the chat says **Using Claude Code from this computer** with **Change** to pick another model. An agent that does not report whether it is signed in, such as Gemini CLI, is used too; if it turns out to be signed out, the chat shows the command that signs in to it. An agent that still needs a sign-in, or its ACP program or the MCP server installed, gets one button in the chat column, and nothing is signed in to or installed until you press it. A model you set up yourself is never replaced.
@@ -78,10 +87,20 @@ In the Chat settings beside the model overview, choose whether reasoning is **Co
 | **DeepSeek**             | DeepSeek Flash, DeepSeek V4 Pro                                        | API key from [platform.deepseek.com](https://platform.deepseek.com/api_keys)                                |
 | **Z.ai**                 | GLM-5.3, GLM-5.3-Flash, GLM-5.3-FlashX, GLM-5V-Turbo                   | API key from [docs.z.ai](https://docs.z.ai/devpack/quick-start)                                             |
 | **MiniMax**              | MiniMax-M3.1-Flash, MiniMax-M3                                         | API key from [platform.minimax.io](https://platform.minimax.io/user-center/basic-information/interface-key) |
+| **xAI**                  | Grok 4.7, Grok 4.6, Grok Build 0.1                                     | API key from [console.x.ai](https://console.x.ai)                                                           |
+| **Meta**                 | Muse Spark 1.3, Muse Wonder                                            | API key from [dev.meta.ai](https://dev.meta.ai)                                                             |
+| **Kimi For Coding**      | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi For Coding                | Kimi Code plan API key from [kimi.ai](https://www.kimi.ai/code/console). Desktop app only.                  |
+| **Moonshot AI**          | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi K3                        | API key from [platform.moonshot.ai](https://platform.moonshot.ai/console/api-keys)                          |
+| **Together AI**          | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Muse Spark Open                 | API key from [together.ai](https://api.together.ai/settings/api-keys)                                       |
+| **Fireworks AI**         | Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, MiniMax-M3.1-Flash              | API key from [fireworks.ai](https://app.fireworks.ai/settings/users/api-keys)                               |
+| **OpenCode Zen**         | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Big Pickle                      | API key from [opencode.ai](https://opencode.ai/auth). Desktop app only.                                     |
+| **OpenCode Go**          | Kimi K3.1 Pro, MiniMax M3.1 Flash, GLM-5.3, DeepSeek V4.1 Flash        | Go plan API key from [opencode.ai](https://opencode.ai/auth). Desktop app only.                             |
 | **OpenAI-compatible**    | Any endpoint with OpenAI API format                                    | Custom base URL + key. Supports Completions and Responses API toggle.                                       |
 | **Anthropic-compatible** | Any endpoint with Anthropic API format                                 | Custom base URL + key                                                                                       |
 
 No backend — your key or sign-in talks directly to the provider. Browser requests are subject to each provider's CORS policy, and model deployments vary in how reliably they stream tool calls. See [BYOK provider and model compatibility](./byok-provider-compatibility) for measured results and reproduction steps.
+
+The xAI, Meta, Kimi For Coding, Moonshot AI, Together AI, Fireworks AI, and OpenCode presets use each provider's OpenAI-compatible chat endpoint, so only the base URL and the recommended models differ; the full model list comes from models.dev. OpenCode Zen and Go list only the models they serve through that endpoint, so Claude, GPT, and Gemini models there are left out: use the Anthropic, OpenAI, or Google AI provider for those. Kimi For Coding and both OpenCode presets send no CORS headers, so they work in the desktop app only.
 
 **ChatGPT** uses your ChatGPT plan instead of an API key, through the same backend and sign-in as OpenAI's Codex CLI. Signing in opens the browser and returns to the desktop app on `localhost:1455`, the only address OpenAI accepts for it, so close a running `codex login` first. The sign-in is stored like a key and refreshes itself; the model list comes from your account. The browser app does not offer it.
 

@@ -1,9 +1,7 @@
+import type { HomeLocationView } from '@/app/home/locations'
+
 /** A place the home tab lists documents from. */
-export type HomeLocation =
-  | { kind: 'recent'; id: 'recent' }
-  | { kind: 'workspace'; id: string }
-  | { kind: 'shared'; id: 'shared' }
-  | { kind: 'storage'; id: 'storage' }
+export type HomeLocation = HomeLocationView
 
 export type HomeCloudAccount = {
   id: string

@@ -28,6 +28,8 @@ Zoom in and out centered on your cursor position.
 - **Pinch gesture** — pinch on a trackpad to zoom in/out
 - **Keyboard shortcuts** — see table below
 
+For a mouse, turn on **Zoom with scroll wheel** in **Settings → Editor → Navigation** to zoom with the wheel alone; <kbd>Shift</kbd> + wheel still pans sideways. **Invert zoom direction** swaps which way the wheel zooms, while a trackpad pinch keeps its own direction.
+
 Pinch-to-zoom on UI panels (layers, properties) is prevented so it doesn't accidentally change the browser zoom level.
 
 ## Keyboard Shortcuts
@@ -57,7 +59,15 @@ Pinch-to-zoom on UI panels (layers, properties) is prevented so it doesn't accid
 
 ## Pixel Grid
 
-Zoomed in far enough that each document pixel covers eight screen pixels (800% on a standard display, 400% on a Retina one), the canvas shows a line at every pixel, as in Figma. Turn it off or on with **View → Pixel Grid**.
+Zoomed in far enough that each document pixel covers eight screen pixels (800% on a standard display, 400% on a Retina one), the canvas shows a line at every pixel, as in Figma. Turn it off or on with **View → Pixel Grid**, <kbd>Shift</kbd> + <kbd>'</kbd>, or **Show pixel grid** in **Settings → Editor**; the choice applies to every open document and is kept between sessions.
+
+## Side Panels
+
+The panel buttons at the end of the top bar close and reopen the layers panel and the properties panel one at a time. The canvas takes the room of a closed panel, which reopens at the width it had, and each panel stays open or closed between sessions. <kbd>⌘</kbd><kbd>\\</kbd> (<kbd>Ctrl</kbd> + <kbd>\\</kbd>) still hides every panel at once. The comments list and version history show in the properties panel, so the comment tool and version history open it while you use them and close it again afterwards.
+
+## Ultralight Mode
+
+On a slow or battery-powered computer, turn on **Ultralight mode** in **Settings → Editor → Rendering**. It turns off interface animations at once and, after a reload, renders the canvas in tiles at one device pixel per screen pixel and leaves out background blurs and noise, drawing shadows at a lower resolution when zoomed in. Progressive rendering stays on while Ultralight is on. Exported images keep every effect.
 
 ## Ruler Guides
 
@@ -75,6 +85,8 @@ Under **View → Preferences**, toggle **Snap to Geometry**, **Snap to Objects**
 Geometry and object snapping help align vector points, moved layers, and resized edges with nearby geometry, objects, guides, and frame bounds. Alignment lines appear for those targets; pixel-grid rounding does not draw an alignment line for every pixel.
 
 With **Snap to Pixel Grid** on, moved layers, resized edges, and drawn layers land on whole pixels at any zoom, even when they started between pixels. A snap to an object or guide wins over the grid. Arrow-key nudges and values typed in the properties panel keep their fractions.
+
+Turn on **Snap to half pixels** in **Settings → Editor** to let the pixel grid snap land on half pixels as well, so a 1 px stroke can sit centered on a pixel edge. A board keeps its 16-unit grid.
 
 Hold <kbd>Control</kbd> during a layer drag to temporarily bypass object and pixel snapping, including on macOS where this is Control, not Command.
 

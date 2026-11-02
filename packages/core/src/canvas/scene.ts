@@ -26,7 +26,7 @@ import { isOpenVectorNetwork } from '#core/vector/connectivity'
 
 import { needsIsolatedBlendLayer, setPaintBlendMode } from './blend'
 import { renderBooleanOperation } from './boolean'
-import { blurSigma } from './effects'
+import { blurSigma, hasReducibleEffects } from './effects'
 import { drawVectorMultiStyleFills, paintFills } from './fills'
 import { drawLayoutGrids } from './layout-grids'
 import { renderMaskedChildIds } from './masks'
@@ -531,13 +531,16 @@ export function renderShape(
   graph: SceneGraph
 ): void {
   const hasEffects = shapeEffects(node).length > 0
-  if (r.viewportImageRendering || !hasEffects) {
+  // A reduced-effects canvas and an export draw these nodes differently, so neither may reuse
+  // the other's picture.
+  if (r.viewportImageRendering || !hasEffects || (r.reducedEffects && hasReducibleEffects(node))) {
     r.renderShapeUncached(canvas, node, graph)
     return
   }
 
   const canRasterCache = r.renderingSceneBacking && canRasterCacheEffects(node)
-  const targetScale = effectRasterScale(r.zoom * r.dpr)
+  // Cheap effects keep their cached shadows at one pixel per unit however far the view zooms in.
+  const targetScale = effectRasterScale(r.effectsReduced ? 1 : r.zoom * r.dpr)
   const cachedRaster = canRasterCache ? r.effectRasterCache.get(node.id) : null
   if (
     cachedRaster &&

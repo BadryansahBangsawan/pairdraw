@@ -1,13 +1,16 @@
 import type { SceneNode } from '@open-pencil/scene-graph'
 
 import { useEditorStore } from '@/app/editor/active-store'
+import { openPlaceImageDialog } from '@/app/editor/place/dialog'
 import {
   setCommentsOnCanvas,
   setDesignIssuesOnCanvas,
-  setSnappingPreference
+  setSnappingPreference,
+  togglePixelGrid
 } from '@/app/settings/preferences/apply'
 import { appPreferences } from '@/app/settings/preferences/store'
 import { onCanvasSelection } from '@/app/shell/commands/focused'
+import { exportFramesToPDF } from '@/app/shell/menu/actions/pdf'
 
 type TextFormatUpdates = {
   fontWeight?: number
@@ -65,10 +68,7 @@ export function createSharedEditorMenuActions(
       store.state.showRulers = !store.state.showRulers
       store.requestRepaint()
     },
-    'view-pixel-grid': () => {
-      store.state.showPixelGrid = store.state.showPixelGrid === false
-      store.requestRepaint()
-    },
+    'view-pixel-grid': () => togglePixelGrid(store),
     'view-multiplayer-cursors': () => {
       store.state.showRemoteCursors = !store.state.showRemoteCursors
       store.requestRepaint()
@@ -89,6 +89,8 @@ export function createSharedEditorMenuActions(
     'insert-icon': () => {
       store.state.iconPickerOpen = true
     },
+    'place-image': () => openPlaceImageDialog(store),
+    'export-pdf': () => void exportFramesToPDF(store),
     'theme-light': () => setTheme('light'),
     'theme-dark': () => setTheme('dark'),
     'theme-auto': () => setTheme('auto'),

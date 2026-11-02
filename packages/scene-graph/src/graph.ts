@@ -388,6 +388,19 @@ export class SceneGraph {
   private unindexInstance(componentId: string, instanceId: string): void {
     this.instanceIndex.get(componentId)?.delete(instanceId)
   }
+  /**
+   * The index lists instances by component, so a change of either, such as undoing a detach that
+   * turns a frame back into an instance, moves the layer in it.
+   */
+  private reindexInstance(node: SceneNode, changes: Partial<SceneNode>): void {
+    const indexedBefore = node.type === 'INSTANCE' ? node.componentId : null
+    const componentAfter =
+      'componentId' in changes ? (changes.componentId ?? null) : node.componentId
+    const indexedAfter = (changes.type ?? node.type) === 'INSTANCE' ? componentAfter : null
+    if (indexedBefore === indexedAfter) return
+    if (indexedBefore) this.unindexInstance(indexedBefore, node.id)
+    if (indexedAfter) this.indexInstance(indexedAfter, node.id)
+  }
   private registerNode(node: SceneNode, parentId: string | null): SceneNode {
     node.parentId = parentId
     this.nodes.set(node.id, node)
@@ -567,14 +580,7 @@ export class SceneGraph {
     // Fills, strokes, effects, plugin data changes do NOT affect absolute position.
     const affectsLayout = Object.keys(changes).some((k) => LAYOUT_AFFECTING_KEYS.has(k))
     if (affectsLayout) this.absPosCache.clear()
-    if (
-      node.type === 'INSTANCE' &&
-      'componentId' in changes &&
-      changes.componentId !== node.componentId
-    ) {
-      if (node.componentId) this.unindexInstance(node.componentId, id)
-      if (changes.componentId) this.indexInstance(changes.componentId, id)
-    }
+    this.reindexInstance(node, changes)
     if (node.type === 'TEXT') invalidateTextCaches(node, changes)
     if (this.scopeDepths.sourceMetadata === 0 && !this.isApplyingLayout) {
       markSourceFieldsEdited(node, Object.keys(changes))

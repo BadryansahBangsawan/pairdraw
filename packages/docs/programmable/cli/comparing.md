@@ -71,6 +71,8 @@ openpencil diff files before.fig after.fig --page "Mobile" --json
 
 Compares two documents page by page. Pages match by name and nodes by name path, so two versions of a file compare even though node IDs differ; the patch applies to the first document. Patches do not add or remove pages: a page only one document has is listed by name and status instead. Like `diff(1)`, the command exits with status 1 when the documents differ.
 
+To see these diffs in `git diff` and `git log`, set it up as Git's diff driver for `.fig` files ([Versioning Designs with Git](./git)).
+
 ## Agents
 
 The same operations are available as the `diff_create`, `diff_jsx`, `diff_show`, `diff_apply`, and `diff_visual` tools for the built-in AI chat and MCP clients. `diff_visual` returns its image to the model, so an agent can confirm that an edit touched only the intended region.

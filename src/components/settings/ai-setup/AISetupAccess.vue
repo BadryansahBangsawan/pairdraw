@@ -5,6 +5,7 @@ import { computed, ref } from 'vue'
 import { useI18n } from '@open-pencil/vue/i18n'
 
 import type { AgentDetection } from '@/app/ai/agents/setup/detection'
+import { CLAUDE_CODE_CLOUD_NAMES } from '@/app/ai/agents/setup/external'
 import { modelProviderName } from '@/app/ai/models/provider-name'
 import {
   ONBOARDING_AGENTS,
@@ -40,9 +41,11 @@ const { ai } = useI18n()
 const styles = tv(theme)()
 /** Pi needs the desktop app's Harness companion, which the web app's companion lacks. */
 const agents = computed(() => ONBOARDING_AGENTS.filter((agent) => desktop || !needsDesktop(agent)))
-const moreOpen = ref(
-  ONBOARDING_MORE_API_PROVIDERS.some((provider) => access.value.includes(provider))
+/** Some API endpoints send no CORS headers, so only the desktop app can reach them. */
+const moreProviders = computed(() =>
+  ONBOARDING_MORE_API_PROVIDERS.filter((provider) => desktop || !needsDesktop(provider))
 )
+const moreOpen = ref(moreProviders.value.some((provider) => access.value.includes(provider)))
 
 function detectionText(providerID: OnboardingAccess): string | undefined {
   const detection = detections[providerID]
@@ -50,6 +53,9 @@ function detectionText(providerID: OnboardingAccess): string | undefined {
   if (detection.state === 'checking') return ai.value.aiSetupAgentChecking
   if (detection.state === 'not-found') return ai.value.aiSetupDetectNotFound
   if (detection.state === 'signed-out') return ai.value.aiSetupDetectSignedOut
+  if (detection.state === 'external-config') {
+    return ai.value.aiSetupDetectExternalConfig({ cloud: CLAUDE_CODE_CLOUD_NAMES[detection.cloud] })
+  }
   if (detection.state === 'signed-in') {
     return detection.account
       ? ai.value.aiSetupDetectSignedInAs({ account: detection.account })
@@ -119,7 +125,7 @@ function toggle(providerID: OnboardingAccess, checked: boolean): void {
     >
       <div :class="styles.moreGroup()">
         <AppCheckboxCard
-          v-for="provider in ONBOARDING_MORE_API_PROVIDERS"
+          v-for="provider in moreProviders"
           :key="provider"
           :label="modelProviderName(provider)"
           :model-value="access.includes(provider)"

@@ -6,14 +6,17 @@ import {
   imageDraftPresentations,
   preparedImagePresentations
 } from '@/app/ai/attachment/image/presentation'
-import { snapshotNodes } from '@/app/ai/attachment/node/snapshot'
 import {
   deleteMessageAttachments,
   setMessageAttachments
 } from '@/app/ai/attachment/presentation/store'
-import { appendSkillContext } from '@/app/ai/chat/context'
+import { appendFileContext, appendSkillContext } from '@/app/ai/chat/context'
 import { setVisibleMessageText } from '@/app/ai/chat/presentation'
-import { mentionedNodes } from '@/app/ai/chat/references/nodes'
+import {
+  editedAttachments,
+  hasAttachments,
+  listedAttachments
+} from '@/app/ai/chat/submission/attachments'
 import { reportSubmissionError, type SubmissionErrorOptions } from '@/app/ai/chat/submission/errors'
 import { prepareSubmittedImages } from '@/app/ai/chat/submission/images'
 import { chatToResend } from '@/app/ai/chat/submission/resend'
@@ -78,14 +81,14 @@ export function useChatSubmission(options: SubmissionOptions) {
   ): Promise<void> {
     const messageId = crypto.randomUUID()
     const editor = options.getEditor()
-    const nodeAttachments = snapshotNodes(editor, messageId, submission.nodes)
+    const listed = listedAttachments(editor, messageId, submission)
     currentChat.messages = [
       ...currentChat.messages,
       { id: messageId, role: 'user', parts: [{ type: 'text', text: submission.modelText }] }
     ]
     setVisibleMessageText(messageId, submission.displayText)
     const draftImages = imageDraftPresentations(messageId, submission.images)
-    setMessageAttachments(messageId, [...nodeAttachments, ...draftImages])
+    setMessageAttachments(messageId, [...listed, ...draftImages])
     // The message previews its images from their files; the composer's previews go once sent.
     const send = () => {
       dispatch()
@@ -117,7 +120,7 @@ export function useChatSubmission(options: SubmissionOptions) {
       submission.images,
       preparedImages
     )
-    setMessageAttachments(messageId, [...nodeAttachments, ...normalizedImages])
+    setMessageAttachments(messageId, [...listed, ...normalizedImages])
     send()
     await withTurn(currentChat, () =>
       currentChat
@@ -162,13 +165,13 @@ export function useChatSubmission(options: SubmissionOptions) {
         return false
       }
       const note = undone.note(submission.modelText, currentChat.messages)
-      const noted = { ...submission, modelText: appendSkillContext(note.text, skill) }
-      const previousIds = new Set(currentChat.messages.map((message) => message.id))
-      if (submission.images.length === 0 && submission.nodes.length === 0) {
-        await sendText(currentChat, noted, dispatch)
-      } else {
-        await sendAttachments(currentChat, noted, version, dispatch)
+      const noted = {
+        ...submission,
+        modelText: appendSkillContext(appendFileContext(note.text, submission.files), skill)
       }
+      const previousIds = new Set(currentChat.messages.map((message) => message.id))
+      if (hasAttachments(submission)) await sendAttachments(currentChat, noted, version, dispatch)
+      else await sendText(currentChat, noted, dispatch)
       const request = currentChat.messages.find(
         (message) => message.role === 'user' && !previousIds.has(message.id)
       )
@@ -211,24 +214,23 @@ export function useChatSubmission(options: SubmissionOptions) {
     const trimmed = text.trim()
     if (!currentChat || !trimmed) return
     const index = currentChat.messages.findIndex((message) => message.id === messageId)
+    const edited = currentChat.messages.at(index)
     const later = currentChat.messages.slice(index + 1)
-    if (index === -1 || later.some((message) => message.role === 'user')) return
+    if (index === -1 || !edited || later.some((message) => message.role === 'user')) return
     options.clearFailure()
     for (const message of later) if (message.role === 'assistant') revertTurn(message.id)
     // Replies after the edited message are replaced; what it reported needs a new report.
     const note = undone.note(trimmed, currentChat.messages.slice(0, index))
     const skill = await invokedSkill(trimmed)
     setVisibleMessageText(messageId, trimmed)
-    // The layers the edited text mentions replace the previews the message showed.
-    const editor = options.getEditor()
-    setMessageAttachments(
-      messageId,
-      snapshotNodes(editor, messageId, mentionedNodes(editor.graph, trimmed))
-    )
+    // The layers the edited text mentions replace the previews the message showed; the files it
+    // was sent with go with its new text.
+    const { attachments, fileNote } = editedAttachments(options.getEditor(), edited, trimmed)
+    setMessageAttachments(messageId, attachments)
     try {
       await withTurn(currentChat, () =>
         currentChat
-          .sendMessage({ messageId, text: appendSkillContext(note.text, skill) })
+          .sendMessage({ messageId, text: appendSkillContext(`${note.text}${fileNote}`, skill) })
           .catch(() => undefined)
       )
       undone.reported(currentChat, note.reports, messageId)

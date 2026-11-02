@@ -1,5 +1,6 @@
 import { IS_BROWSER } from '@open-pencil/core/constants'
 
+import { providerBackend } from '@/app/ai/chat/history/backend'
 import { createConversationHistory } from '@/app/ai/chat/history/controller'
 import { chatColumnOpen, propertiesTab } from '@/app/ai/chat/panel'
 import { createChatSessionManager } from '@/app/ai/chat/session'
@@ -21,7 +22,12 @@ import {
   resolveAPIKey,
   setAPIKey
 } from '@/app/ai/chat/storage'
-import { designModelProfile } from '@/app/ai/models'
+import {
+  designModelProfile,
+  designModelProfiles,
+  modelConnection,
+  setModelRoleAssignment
+} from '@/app/ai/models'
 import { exposeChatTransportOverride } from '@/app/browser-bridge'
 import { getActiveEditorStore } from '@/app/editor/active-store'
 import {
@@ -43,6 +49,16 @@ const chatSession = createChatSessionManager({
 
 const history = createConversationHistory({
   profileId: () => designModelProfile.value?.id ?? null,
+  restoreProfile: (profileId) => {
+    const profile = designModelProfiles().find((candidate) => candidate.id === profileId)
+    if (profile) setModelRoleAssignment('design', profile.id)
+  },
+  profileBackend: (profileId) => {
+    const profile = designModelProfiles().find((candidate) => candidate.id === profileId)
+    if (!profile) return null
+    const providerID = modelConnection(profile.connectionId)?.providerID
+    return providerID ? providerBackend(providerID) : 'direct'
+  },
   getEditor: getActiveEditorStore,
   ensureChat: chatSession.ensureChat,
   resetChat: chatSession.resetChat,

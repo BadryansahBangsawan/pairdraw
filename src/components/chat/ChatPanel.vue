@@ -6,8 +6,10 @@ import { computed, nextTick, shallowRef, useTemplateRef, watch } from 'vue'
 import { useI18n } from '@open-pencil/vue/i18n'
 
 import { agentAutoConnect } from '@/app/ai/agents/auto/session'
-import { isAttachableImageFile, revokeImagePreviewURL } from '@/app/ai/attachment/image/prepare'
+import { carriesAttachableFile, isAttachableFile } from '@/app/ai/attachment/accept'
+import { revokeImagePreviewURL } from '@/app/ai/attachment/image/prepare'
 import { chatDocumentId } from '@/app/ai/chat/history/document'
+import { sentPrompts } from '@/app/ai/chat/history/prompts'
 import { hasPendingPrompt, setPendingPrompt, takePendingPrompt } from '@/app/ai/chat/pending-prompt'
 import {
   clearQueuedMessages,
@@ -80,10 +82,11 @@ const chatInput = useTemplateRef<{
   focus: () => void
 }>('chatInput')
 const panel = useTemplateRef<HTMLElement>('panel')
-// Images dropped anywhere on the chat go to the composer, when there is one to take them.
-const { dragging: draggingImages } = useImageDrop(panel, {
+// Images and text files dropped anywhere on the chat go to the composer, when there is one.
+const { dragging: draggingFiles, types: draggedTypes } = useImageDrop(panel, {
   enabled: () => chatInput.value !== null,
-  accepts: isAttachableImageFile,
+  accepts: isAttachableFile,
+  carries: carriesAttachableFile,
   onImages: (files) => chatInput.value?.dropFiles(files)
 })
 let viewGeneration = 0
@@ -181,6 +184,8 @@ async function initializeHistory() {
 void initializeHistory()
 
 const messages = computed(() => chat.value?.messages ?? history.messages.value)
+/** What was sent in this conversation, for Up and Down in the composer. */
+const prompts = computed(() => sentPrompts(messages.value))
 const historyOptions = computed(() => {
   const current = history.current.value
   const rows = [...history.conversations.value]
@@ -503,7 +508,9 @@ function handleStop() {
       v-if="!agentHistoryReadOnly && !history.readOnly.value"
       ref="chatInput"
       :status="status"
-      :dragging="draggingImages"
+      :dragging="draggingFiles"
+      :dragged-types="draggedTypes"
+      :prompts="prompts"
       :disabled="submission.busy.value || history.busy.value"
       @submit="sendOrQueue"
       @stop="handleStop"

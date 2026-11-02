@@ -22,9 +22,17 @@ import { useI18n } from '@open-pencil/vue/i18n'
 
 import { connectsWithoutClick } from '@/app/ai/agents/auto/pick'
 import { agentAutoConnect } from '@/app/ai/agents/auto/session'
+import {
+  providerBackend,
+  switchContextLoss,
+  type ChatModelChoice,
+  type ContextLoss
+} from '@/app/ai/chat/history/backend'
 import { isConfigured } from '@/app/ai/chat/storage'
+import { useAIChat } from '@/app/ai/chat/use'
 import {
   aiModelSettings,
+  designModelProfile,
   designModelProfiles,
   modelConnection,
   setModelRoleAssignment
@@ -35,11 +43,14 @@ import { openSettingsDialog } from '@/app/settings/dialog'
 import { toast } from '@/app/shell/ui'
 import ChatProfileItem from '@/components/chat/ChatProfileItem.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
+import AppConfirmationDialog from '@/components/ui/dialog/AppConfirmationDialog.vue'
+import { useHeldContent } from '@/components/ui/overlay/held'
 import { useSelectUI } from '@/components/ui/select/select'
 
 import { chatProfileTheme } from './ui'
 
-const { ai } = useI18n()
+const { ai, common } = useI18n()
+const { history } = useAIChat()
 const open = ref(false)
 const profiles = computed(designModelProfiles)
 const ui = chatProfileTheme()
@@ -51,9 +62,49 @@ const selectCls = useSelectUI({
   contentVariants: { padding: 'none' }
 })
 
+/** A switch that waits for the person to accept losing part of the conversation's context. */
+type PendingSwitch = { loss: Exclude<ContextLoss, 'none'> } & (
+  | { kind: 'profile'; id: AIModelProfileId; name: string }
+  | { kind: 'agent'; agent: ACPAgentDef }
+)
+const pendingSwitch = ref<PendingSwitch | null>(null)
+const pendingShown = useHeldContent(pendingSwitch)
+const pendingName = computed(() => {
+  const pending = pendingShown.value
+  if (!pending) return ''
+  return pending.kind === 'profile' ? pending.name : pending.agent.name
+})
+const pendingDescription = computed(() => {
+  const params = { name: pendingName.value }
+  return pendingShown.value?.loss === 'agentSession'
+    ? ai.value.switchProfileAgentSessionDescription(params)
+    : ai.value.switchProfileDescription(params)
+})
+
+function profileChoice(profile: AIModelProfile): ChatModelChoice {
+  const providerID = modelConnection(profile.connectionId)?.providerID
+  return { id: profile.id, backend: providerID ? providerBackend(providerID) : 'direct' }
+}
+
+/** What of the open conversation's context switching to `to` would leave behind. */
+function contextLoss(to: ChatModelChoice): ContextLoss {
+  const current = designModelProfile.value
+  const hasMessages =
+    history.messages.value.length > 0 || (history.current.value?.messages.length ?? 0) > 0
+  return switchContextLoss(hasMessages, current ? profileChoice(current) : null, to)
+}
+
 const selectedProfileId = computed({
   get: () => aiModelSettings.value.assignments.design,
-  set: (profileId: AIModelProfileId) => setModelRoleAssignment('design', profileId)
+  set: (profileId: AIModelProfileId) => {
+    const profile = profiles.value.find((candidate) => candidate.id === profileId)
+    const loss = profile ? contextLoss(profileChoice(profile)) : 'none'
+    if (profile && loss !== 'none') {
+      pendingSwitch.value = { loss, kind: 'profile', id: profile.id, name: profile.name }
+      return
+    }
+    setModelRoleAssignment('design', profileId)
+  }
 })
 
 function profileMetadata(profile: AIModelProfile): string {
@@ -89,11 +140,29 @@ async function chooseAgent(event: SelectItemSelectEvent<AcceptableValue>, agent:
   // The agent has no profile to select yet; switching to it makes one.
   event.preventDefault()
   open.value = false
+  const loss = contextLoss({ id: `agent:${agent.id}`, backend: 'acp' })
+  if (loss !== 'none') {
+    pendingSwitch.value = { loss, kind: 'agent', agent }
+    return
+  }
+  await switchToAgent(agent)
+}
+
+async function switchToAgent(agent: ACPAgentDef) {
   const result = await agentAutoConnect.switchTo(agent.id)
   // Without a model, the chat column shows what stopped it; otherwise say so here.
   if (result === 'failed' && isConfigured.value) {
     toast.error(ai.value.aiSetupConnectActivateFailed({ agent: agent.name }))
   }
+}
+
+/** The person accepted losing the context: the switch goes ahead. */
+function confirmSwitch() {
+  const pending = pendingSwitch.value
+  pendingSwitch.value = null
+  if (!pending) return
+  if (pending.kind === 'profile') setModelRoleAssignment('design', pending.id)
+  else void switchToAgent(pending.agent)
 }
 
 defineExpose({
@@ -181,4 +250,14 @@ defineExpose({
       </SelectContent>
     </SelectPortal>
   </SelectRoot>
+  <AppConfirmationDialog
+    :open="pendingSwitch !== null"
+    tone="warning"
+    :heading="ai.switchProfileHeading({ name: pendingName })"
+    :description="pendingDescription"
+    :cancel-label="common.cancel"
+    :confirm-label="ai.switchProfileConfirm"
+    @update:open="(isOpen) => !isOpen && (pendingSwitch = null)"
+    @confirm="confirmSwitch"
+  />
 </template>

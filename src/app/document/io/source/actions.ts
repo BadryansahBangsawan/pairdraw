@@ -34,6 +34,8 @@ type DocumentSourceOptions = DocumentSourceAccess & {
   state: DocumentSourceState
   stopWatchingFile: () => void
   startWatchingFile: () => Promise<void>
+  /** Whether the file changed on disk and the person has not chosen what to keep yet. */
+  isDiskChangePending?: () => boolean
   getRenderer: () => Editor['renderer']
 }
 
@@ -55,6 +57,7 @@ export function createDocumentSourceActions({
   getSavedVersion,
   setSavedVersion,
   setLastWriteTime,
+  isDiskChangePending = () => false,
   getRenderer
 }: DocumentSourceOptions) {
   const changes = createDocumentChanges(editor)
@@ -118,7 +121,8 @@ export function createDocumentSourceActions({
     state,
     version: changes.capture,
     getSavedVersion,
-    hasWritableSource,
+    // Autosave would write over the changed file before the person chose to keep it or not.
+    hasWritableSource: () => hasWritableSource() && !isDiskChangePending(),
     saveCurrentDocument: async (version) => {
       const revision = changes.capture()
       const data = await buildFigFile()

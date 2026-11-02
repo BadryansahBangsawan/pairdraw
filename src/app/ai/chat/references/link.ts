@@ -29,11 +29,11 @@ function isKind(kind: string): kind is ChatReferenceKind {
   return KINDS.has(kind)
 }
 
-function escapeLabel(label: string): string {
+export function escapeLabel(label: string): string {
   return label.replace(/[\\[\]]/g, '\\$&').replace(/\s+/g, ' ')
 }
 
-function unescapeLabel(label: string): string {
+export function unescapeLabel(label: string): string {
   return label.replace(/\\(.)/g, '$1')
 }
 
@@ -93,7 +93,7 @@ export function withReferenceLabels(text: string): string {
   return result + text.slice(at)
 }
 
-function attribute(value: string): string {
+export function attribute(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;')
 }
 

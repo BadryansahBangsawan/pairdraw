@@ -10,16 +10,25 @@ import { editorCommandMetadata, type EditorCommandId } from '@open-pencil/vue/ed
 import { CHAT_COLUMN_SHORTCUT } from '@/app/ai/chat/panel'
 import { isCloudBinding, openVersionDialog } from '@/app/cloud/integration'
 import { useComments } from '@/app/comments/use'
+import { COPY_AS_PNG_SHORTCUT } from '@/app/editor/canvas/menu/registry'
+import { pasteClipboardToReplace } from '@/app/editor/clipboard/paste/replace'
+import { copySelectionAsPNG } from '@/app/editor/clipboard/png'
 import {
   copySelectionProperties,
   pasteClipboardProperties
 } from '@/app/editor/clipboard/properties'
+import { openPlaceImageDialog } from '@/app/editor/place/dialog'
 import { requestRenameSelection } from '@/app/editor/selection/rename-dialog'
 import { TOOL_SHORTCUTS } from '@/app/editor/session'
 import { openSettingsDialog } from '@/app/settings/dialog'
-import { setSnappingPreference } from '@/app/settings/preferences/apply'
+import { setSnappingPreference, togglePixelGrid } from '@/app/settings/preferences/apply'
+import {
+  REMOVE_AUTO_LAYOUT_SHORTCUT,
+  removeSelectionAutoLayout
+} from '@/app/shell/keyboard/auto-layout'
 import { isButtonActivation, isEditing } from '@/app/shell/keyboard/focus'
 import { shortcutEvent } from '@/app/shell/keyboard/layout'
+import { openShortcutSheet, SHORTCUT_SHEET_KEYBINDINGS } from '@/app/shell/keyboard/sheet'
 import { bindSpaceHandTool } from '@/app/shell/keyboard/space-tool'
 import type {
   KeyboardShortcutOptions,
@@ -52,6 +61,77 @@ function commandShortcuts(...commands: EditorCommandId[]): ShortcutDefinition[] 
     const shortcut = commandShortcut(command)
     return shortcut ? [shortcut] : []
   })
+}
+
+type AlignAxis = 'horizontal' | 'vertical'
+type AlignEdge = 'min' | 'center' | 'max'
+
+/**
+ * The Arrange menu's align keys (⌥A/H/D, ⌥W/V/S). They are matched by key code, since macOS
+ * Option turns the letter into another character (⌥W types ∑).
+ */
+const ALIGN_SHORTCUTS: readonly [string, AlignAxis, AlignEdge][] = [
+  ['arrange.align-left', 'horizontal', 'min'],
+  ['arrange.align-center', 'horizontal', 'center'],
+  ['arrange.align-right', 'horizontal', 'max'],
+  ['arrange.align-top', 'vertical', 'min'],
+  ['arrange.align-middle', 'vertical', 'center'],
+  ['arrange.align-bottom', 'vertical', 'max']
+]
+
+function alignShortcuts(): ShortcutDefinition[] {
+  return ALIGN_SHORTCUTS.flatMap(([id, axis, edge]) => {
+    const keys = appMenuTinykeysShortcut(id)
+    if (!keys) return []
+    return [
+      {
+        id,
+        keys,
+        run: ({ store }: KeyboardShortcutRunOptions) =>
+          store.alignNodes([...store.state.selectedIds], axis, edge)
+      }
+    ]
+  })
+}
+
+/**
+ * Menu and canvas-menu keys the browser build binds itself; the desktop app's native menu binds
+ * them too, and Copy as PNG, Remove auto layout, and the shortcut sheet are not in a menu.
+ */
+function browserMenuShortcuts(): ShortcutDefinition[] {
+  return [
+    ...commandShortcuts(
+      'selection.frameSelection',
+      'selection.booleanUnion',
+      'selection.booleanSubtract',
+      'selection.booleanIntersect',
+      'selection.booleanExclude',
+      'selection.flatten'
+    ),
+    ...alignShortcuts(),
+    {
+      // Also stops the browser's hard reload, which ⇧⌘R would otherwise start.
+      id: 'paste-to-replace',
+      keys: appMenuTinykeysShortcut('paste-to-replace') ?? '$mod+Shift+KeyR',
+      run: ({ store }) => void pasteClipboardToReplace(store)
+    },
+    {
+      id: 'copy-as-png',
+      keys: shortcutTokenToTinykeys(COPY_AS_PNG_SHORTCUT) ?? '$mod+Shift+KeyC',
+      run: ({ store }) => copySelectionAsPNG(store)
+    },
+    {
+      id: 'remove-auto-layout',
+      keys: shortcutTokenToTinykeys(REMOVE_AUTO_LAYOUT_SHORTCUT) ?? 'Shift+Alt+KeyA',
+      run: ({ store }) => void removeSelectionAutoLayout(store)
+    },
+    {
+      id: 'shortcut-sheet',
+      keys: SHORTCUT_SHEET_KEYBINDINGS,
+      run: () => openShortcutSheet(),
+      view: true
+    }
+  ]
 }
 
 function zoomAtViewportCenter(delta: number): ShortcutAction {
@@ -251,10 +331,7 @@ export function registerKeyboardShortcuts(options: KeyboardShortcutOptions) {
     {
       id: 'toggle-pixel-grid',
       keys: 'Shift+Quote',
-      run: ({ store }) => {
-        store.state.showPixelGrid = store.state.showPixelGrid === false
-        store.requestRepaint()
-      }
+      run: ({ store }) => togglePixelGrid(store)
     },
     {
       id: 'toggle-pixel-grid-snap',
@@ -363,6 +440,11 @@ export function registerKeyboardShortcuts(options: KeyboardShortcutOptions) {
       keys: appMenuTinykeysShortcut('open') ?? '$mod+KeyO',
       run: ({ openFileDialog }) => openFileDialog()
     },
+    {
+      id: 'place-image',
+      keys: appMenuTinykeysShortcut('place-image') ?? '$mod+Shift+KeyK',
+      run: ({ store }) => openPlaceImageDialog(store)
+    },
     ...commandShortcuts('selection.group'),
     {
       id: 'toggle-auto-layout',
@@ -387,7 +469,8 @@ export function registerKeyboardShortcuts(options: KeyboardShortcutOptions) {
     },
     siblingShortcut('selection.selectNextSibling'),
     siblingShortcut('selection.selectPreviousSibling'),
-    ...opacityBindings()
+    ...opacityBindings(),
+    ...browserMenuShortcuts()
   ]
 
   const bindings: KeyBindingMap = {}

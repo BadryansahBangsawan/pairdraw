@@ -2,7 +2,7 @@ import * as v from 'valibot'
 
 import { SceneGraph } from '@open-pencil/scene-graph'
 
-import { pathNetwork } from './geometry'
+import { lineNetwork, pathNetwork } from './geometry'
 import { removeUnusedIconComponents } from './icons'
 import { createImageStore } from './images'
 import { inAncestorThemes, populateInstances } from './instances'
@@ -43,8 +43,8 @@ function groupsInFlow(graph: SceneGraph, groupIds: Iterable<string>): boolean {
 }
 
 /**
- * Draws each path in its box once boxes have their final size, which fill and fit sizing only give
- * once laid out, and redraws each icon laying out sized.
+ * Draws each path and slanted line in its box once boxes have their final size, which fill and
+ * fit sizing only give once laid out, and redraws each icon laying out sized.
  */
 function drawAtFinalSize(build: Build, laidOut: boolean): void {
   for (const [id, pen] of build.effective) {
@@ -53,6 +53,8 @@ function drawAtFinalSize(build: Build, laidOut: boolean): void {
     if (pen.type === 'path') {
       const network = pathNetwork(pen, node.width, node.height)
       if (network) node.vectorNetwork = network
+    } else if (pen.type === 'line' && node.type === 'VECTOR') {
+      node.vectorNetwork = lineNetwork(node.width, node.height)
     } else if (pen.type === 'icon' && laidOut) {
       // In the themes the icon was read in, which its colour and glyph may take variables from.
       inAncestorThemes(build, node, () => {

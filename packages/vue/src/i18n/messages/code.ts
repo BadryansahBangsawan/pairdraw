@@ -25,7 +25,10 @@ export const codeMessageDefaults = {
   noSelection: 'Select a layer to see its code',
   noSelectionDesignJSX: 'Or write Design JSX to add new layers to the page.',
   noSelectionComponents: params('{framework} components are generated for the selected layers.'),
-  writeJSX: 'Write JSX'
+  writeJSX: 'Write JSX',
+  iconPackage: 'Icons',
+  exportHTML: 'Export HTML',
+  exportFailed: params('Could not export: {error}')
 } as const
 
 export const codeMessages = i18n('code', codeMessageDefaults)

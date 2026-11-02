@@ -150,15 +150,23 @@ export function createTypographyActions({
   let previewKey: keyof SceneNode | undefined
   const beforePreview = new Map<string, Preview>()
 
-  /** Applies one change per text layer in one undo step. */
+  /**
+   * Applies one change per text layer in one undo step. A field named in `detach` is unbound
+   * first in that step, since a value chosen here replaces the variable's, as in Figma.
+   */
   function updateEach(
     label: string,
     changes: (node: SceneNode) => Partial<SceneNode>,
-    targets = nodes.value
+    targets = nodes.value,
+    detach?: keyof SceneNode
   ) {
     if (targets.length === 0) return
     editor.undo.runBatch(label, () => {
-      for (const target of targets) editor.updateNodeWithUndo(target.id, changes(target), label)
+      for (const target of targets) {
+        if (detach && editor.graph.getNode(target.id)?.boundVariables[detach])
+          editor.unbindVariable(target.id, detach)
+        editor.updateNodeWithUndo(target.id, changes(target), label)
+      }
     })
   }
 
@@ -178,7 +186,8 @@ export function createTypographyActions({
     label: string,
     fields: readonly (keyof SceneNode)[],
     prepare: (target: SceneNode) => Promise<Partial<SceneNode> | null>,
-    targets = nodes.value
+    targets = nodes.value,
+    detach?: keyof SceneNode
   ) {
     if (targets.length === 0) return
     const request = Symbol(label)
@@ -195,12 +204,14 @@ export function createTypographyActions({
     const live = current.filter(
       (target) => editor.graph.getNode(target.id) && changed.get(target.id)
     )
-    updateEach(label, (target) => changed.get(target.id) ?? {}, live)
+    updateEach(label, (target) => changed.get(target.id) ?? {}, live, detach)
   }
 
   /**
    * Keeps each layer's weight and slant where the family has them, otherwise takes the nearest
-   * face, as Figma does: Black goes to Bold in a family that ends at Bold.
+   * face, as Figma does: Black goes to Bold in a family that ends at Bold. A layer whose family
+   * follows a variable is detached from it in the same step, so the next mode switch or variable
+   * edit cannot take the chosen family back.
    */
   async function setFamily(family: string) {
     const faces = fontManager.familyFaces(family)
@@ -221,7 +232,9 @@ export function createTypographyActions({
           italic,
           fontVariations: styleFontVariations(target)
         }
-      }
+      },
+      nodes.value,
+      'fontFamily'
     )
   }
 

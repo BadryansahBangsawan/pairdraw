@@ -41,6 +41,10 @@ export const menuMessageDefaults = {
   settings: 'Settings…',
   variables: 'Variables…',
   insertIcon: 'Insert Icon…',
+  placeImage: 'Place image…',
+  exportFramesToPDF: 'Export frames to PDF…',
+  /** The kind of file Place image's desktop dialog lists. */
+  imageFiles: 'Images',
   rulers: 'Rulers',
   pixelGrid: 'Pixel grid',
   multiplayerCursors: 'Multiplayer cursors',
@@ -82,9 +86,12 @@ export const menuMessageDefaults = {
   copyAsSVG: 'Copy as SVG',
   copyAsPNG: 'Copy as PNG',
   copyAsJSX: 'Copy as JSX',
+  copyAsHTML: 'Copy as HTML',
   copyNodeId: 'Copy node ID',
   copyXPath: 'Copy XPath',
   convertToVector: 'Convert to vector',
+  /** Sends the selected sticky notes' text to the document's AI chat. */
+  runStickyAsPrompt: 'Run sticky as prompt',
   booleanOperations: 'Boolean operations',
   arrangeAlignLeft: 'Align left',
   arrangeAlignCenter: 'Align center',

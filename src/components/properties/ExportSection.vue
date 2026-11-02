@@ -2,11 +2,17 @@
 import { tryOnScopeDispose, useObjectUrl } from '@vueuse/core'
 import { computed, onActivated, onDeactivated, ref, shallowRef, watch } from 'vue'
 
+import type { ExportSetting } from '@open-pencil/scene-graph'
 import { useExport } from '@open-pencil/vue/document/export'
 import { useI18n } from '@open-pencil/vue/i18n'
 import { useRetainedActivity } from '@open-pencil/vue/lifecycle/retention'
 
+import type { ExportTargetRequest } from '@/app/document/export/create'
+import { htmlExportSettings } from '@/app/document/export/html'
+import type { ExportOptions } from '@/app/document/export/types'
 import { useEditorStore } from '@/app/editor/active-store'
+import HTMLExportOptionsPopover from '@/components/export/HTMLExportOptionsPopover.vue'
+import NumberField from '@/components/inputs/NumberField.vue'
 import ExportScaleInput from '@/components/properties/ExportScaleInput.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -28,7 +34,12 @@ const {
   removeSetting,
   updateScale,
   updateFormat,
+  updateQuality,
   formatSupportsScale,
+  formatSupportsQuality,
+  minQuality,
+  maxQuality,
+  defaultQuality,
   formatOptions,
   scales,
   clampExportScale
@@ -54,22 +65,40 @@ onActivated(() => {
 
 const PREVIEW_WIDTH = 480
 
+/** Several selected layers export to PDF as one file, a page each in the order selected. */
+const pdfTogether = computed(() => activeTarget.value === 'selection' && targetIds.value.length > 1)
+const showsPDFPages = computed(
+  () => pdfTogether.value && activeSettings.value.some((setting) => setting.format === 'pdf')
+)
+
+function exportOptions(setting: ExportSetting): ExportOptions {
+  return {
+    scale: setting.scale,
+    quality: setting.quality,
+    html: setting.format === 'html' ? htmlExportSettings.value : undefined
+  }
+}
+
 async function doExport() {
   exporting.value = true
   try {
-    const requests = []
+    const requests: ExportTargetRequest[] = []
+    const ids = targetIds.value.filter((id) => editorStore.graph.getNode(id))
     // Export exactly the rows shown in the panel (activeSettings) for every target,
     // so a multi-selection exports what the user sees rather than each node's own
     // (possibly hidden / divergent) settings.
-    for (const id of targetIds.value) {
-      const node = editorStore.graph.getNode(id)
-      if (!node) continue
-      const target =
-        activeTarget.value === 'page'
-          ? ({ scope: 'page', pageId: id } as const)
-          : ({ scope: 'node', nodeId: id } as const)
-      for (const setting of activeSettings.value) {
-        requests.push({ target, formatId: setting.format, options: { scale: setting.scale } })
+    for (const setting of activeSettings.value) {
+      const options = exportOptions(setting)
+      if (setting.format === 'pdf' && pdfTogether.value && ids.length > 1) {
+        requests.push({ target: { scope: 'selection', nodeIds: ids }, formatId: 'pdf', options })
+        continue
+      }
+      for (const id of ids) {
+        const target =
+          activeTarget.value === 'page'
+            ? ({ scope: 'page', pageId: id } as const)
+            : ({ scope: 'node', nodeId: id } as const)
+        requests.push({ target, formatId: setting.format, options })
       }
     }
     // A single file downloads directly; multiple files bundle into one zip.
@@ -77,6 +106,20 @@ async function doExport() {
   } finally {
     exporting.value = false
   }
+}
+
+/** A quality being scrubbed, shown until it commits. */
+const qualityDraft = ref<{ index: number; value: number } | null>(null)
+
+function shownQuality(index: number, setting: ExportSetting): number {
+  const draft = qualityDraft.value
+  if (draft?.index === index) return draft.value
+  return setting.quality ?? defaultQuality
+}
+
+function commitQuality(index: number, value: number) {
+  qualityDraft.value = null
+  updateQuality(index, value)
 }
 
 async function updatePreview() {
@@ -151,10 +194,25 @@ watch(previewKey, updatePreview, { flush: 'post' })
         :model-value="setting.format"
         :options="formatOptions"
         :label="panels.exportFormat"
-        :ui="{ trigger: 'w-auto flex-1' }"
+        :ui="{ trigger: 'w-auto min-w-0 flex-1' }"
         data-property="export-format"
         @update:model-value="updateFormat(index, $event)"
       />
+      <Tip v-if="formatSupportsQuality(setting.format)" :label="panels.exportQuality">
+        <NumberField
+          :model-value="shownQuality(index, setting)"
+          :min="minQuality"
+          :max="maxQuality"
+          :step="1"
+          :aria-label="panels.exportQuality"
+          :ui="{ root: 'w-14 shrink-0' }"
+          data-property="export-quality"
+          @update:model-value="qualityDraft = { index, value: $event }"
+          @commit="commitQuality(index, $event)"
+          @cancel="qualityDraft = null"
+        />
+      </Tip>
+      <HTMLExportOptionsPopover v-if="setting.format === 'html'" />
       <template #rail="{ removeClass }">
         <IconButton
           :label="panels.removeExport"
@@ -165,6 +223,10 @@ watch(previewKey, updatePreview, { flush: 'post' })
         </IconButton>
       </template>
     </PanelItemRow>
+
+    <p v-if="showsPDFPages" class="text-[11px] text-muted" data-test-id="export-pdf-pages">
+      {{ panels.exportPDFPages }}
+    </p>
 
     <AppButton
       v-if="activeSettings.length > 0"

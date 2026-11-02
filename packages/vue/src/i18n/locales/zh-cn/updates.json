@@ -21,5 +21,6 @@
   "installFailed": "无法安装更新：{error}",
   "restartFailed": "无法重新启动 Pairdraw：{error}",
   "unavailable": "更新暂不可用。请先发布包含 latest.json 的已签名版本。",
+  "notConfigured": "此 Pairdraw 构建未配置更新。",
   "checkFailed": "无法检查更新：{error}"
 }

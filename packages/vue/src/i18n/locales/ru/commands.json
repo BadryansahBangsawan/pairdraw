@@ -7,6 +7,7 @@
   "group": "Сгруппировать",
   "ungroup": "Разгруппировать",
   "createComponent": "Создать компонент",
+  "convertToFrame": "Преобразовать во фрейм",
   "createSlot": "Создать слот",
   "createComponentSet": "Создать набор компонентов",
   "createInstance": "Создать экземпляр",
@@ -69,5 +70,15 @@
   "paletteSearchAriaLabel": "Поиск команд",
   "paletteDescription": "Поиск и выполнение команд Pairdraw.",
   "paletteNoCommands": "Команды не найдены.",
-  "paletteBack": "Назад"
+  "paletteBack": "Назад",
+  "shortcutSheet": "Сочетания клавиш",
+  "shortcutSheetDescription": "Клавиши, которые работают, когда фокус на холсте.",
+  "shortcutSheetSearch": "Поиск сочетаний",
+  "shortcutSheetEmpty": "Сочетания не найдены.",
+  "shortcutSheetTools": "Инструменты",
+  "shortcutSheetCanvas": "Холст и выделение",
+  "toggleAIChat": "Показать или скрыть чат ИИ",
+  "nudgeSelection": "Сдвинуть выделение",
+  "nudgeSelectionFurther": "Сдвинуть выделение сильнее",
+  "panWhileHeld": "Перемещать вид, пока клавиша нажата"
 }

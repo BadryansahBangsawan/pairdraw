@@ -17,7 +17,7 @@ Rahmen oder Gruppe auswählen und <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> drüc
 
 ## Komponentensätze und Varianten
 
-Mindestens zwei Komponenten auswählen und <kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd> drücken. Varianten können mehrere Merkmale wie `Size=Small`, `State=Hover` und `Theme=Dark` besitzen. Nicht jede Kombination muss vorhanden sein. Die Variante oben links dient als Standard und Ersatz.
+Mindestens zwei Komponenten auswählen und im Kontextmenü **Komponentensatz erstellen** wählen. Varianten können mehrere Merkmale wie `Size=Small`, `State=Hover` und `Theme=Dark` besitzen. Nicht jede Kombination muss vorhanden sein. Die Variante oben links dient als Standard und Ersatz.
 
 ## Komponenteneigenschaften
 
@@ -46,5 +46,4 @@ Heruntergeladene Versionen werden lokal gespeichert. Verbindungen und benötigte
 | Aktion | macOS | Windows / Linux |
 |--------|-------|-----------------|
 | Komponente erstellen | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> | <kbd>Strg</kbd><kbd>Alt</kbd><kbd>K</kbd> |
-| Komponentensatz erstellen | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd> | <kbd>Shift</kbd><kbd>Strg</kbd><kbd>K</kbd> |
 | Instanz lösen | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd> | <kbd>Strg</kbd><kbd>Alt</kbd><kbd>B</kbd> |

@@ -54,7 +54,7 @@ Działania dotyczące komponentów są wyświetlane na fioletowo.
 | Działanie | macOS | Windows / Linux | Dostępne dla |
 |-----------|-------|-----------------|--------------|
 | Utwórz komponent | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>K</kbd> | Ramki, grupy i kilka obiektów |
-| Utwórz zestaw komponentów | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>K</kbd> | Co najmniej dwa komponenty |
+| Utwórz zestaw komponentów | — | — | Co najmniej dwa komponenty |
 | Utwórz egzemplarz | — | — | Komponenty |
 | Przejdź do głównego komponentu | — | — | Egzemplarze |
 | Odłącz egzemplarz | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd> | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>B</kbd> | Egzemplarze |

@@ -8,12 +8,21 @@ import {
 
 import { reconcileVariableLayouts } from '#core/layout/variables'
 
+import { loadBoundFonts } from './text/bound-fonts'
 import type { EditorContext } from './types'
+
+/**
+ * Fields whose value undoing a binding puts back: numbers, and a font family, whose change shows
+ * as a different typeface. Text and visibility keep what the variable gave them, as in Figma.
+ */
+function restoresValue(path: string): boolean {
+  return isNumericVariableBindingField(path) || path === 'fontFamily'
+}
 
 export function createVariableBindingActions(ctx: EditorContext) {
   /** A binding change reaches only the layer it is on and the layers inside it. */
   function refreshBindings(nodeId: string) {
-    reconcileVariableLayouts(ctx.graph, { subtrees: [nodeId] })
+    loadBoundFonts(ctx, reconcileVariableLayouts(ctx.graph, { subtrees: [nodeId] }))
     ctx.requestRender()
   }
 
@@ -23,7 +32,7 @@ export function createVariableBindingActions(ctx: EditorContext) {
     const previous = {
       boundVariables: { ...node.boundVariables },
       variableBindingScales: { ...node.variableBindingScales },
-      ...(isNumericVariableBindingField(path) ? { [path]: node[path as keyof SceneNode] } : {})
+      ...(restoresValue(path) ? { [path]: node[path as keyof SceneNode] } : {})
     }
     const owner = variableBindingOwner(ctx.graph, node)
     const nearest = findInstanceAncestor(ctx.graph, nodeId)

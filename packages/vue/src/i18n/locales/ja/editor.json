@@ -14,5 +14,7 @@
   "resetPreview": "リセット",
   "leavePreview": "プレビューを終了 ({shortcut})",
   "toggleAIChat": "AIチャット ({shortcut})",
-  "startPreview": "プレビュー ({shortcut})"
+  "startPreview": "プレビュー ({shortcut})",
+  "toggleLayersPanel": "レイヤーパネル",
+  "togglePropertiesPanel": "プロパティパネル"
 }

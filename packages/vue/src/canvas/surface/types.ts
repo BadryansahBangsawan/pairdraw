@@ -21,6 +21,16 @@ export interface UseCanvasOptions {
    */
   sceneRenderer?: 'retained' | 'tiled'
   /**
+   * The most device pixels this canvas draws per CSS pixel, read when the surface is created and
+   * resized. A low-power canvas passes 1 so a high-density display draws a quarter of the pixels.
+   */
+  maxPixelRatio?: number
+  /**
+   * Draws expensive effects cheaply: background blurs and noise are left out, and cached
+   * shadows keep one pixel per unit at any zoom.
+   */
+  reducedEffects?: boolean
+  /**
    * Forces ruler visibility on or off for this canvas.
    *
    * When omitted, the composable falls back to viewport and URL-param logic.

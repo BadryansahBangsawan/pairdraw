@@ -16,14 +16,15 @@ export function renderAutomationImage(
   nodeIds: string[],
   scale: number,
   format: RasterExportFormat,
-  pageId?: string
+  pageId?: string,
+  quality?: number
 ): Promise<Uint8Array | null> {
   if (!store.renderer) {
     throw new Error(
       'This document has no canvas renderer, so it cannot be exported as an image: its canvas has not started or could not create a WebGL surface'
     )
   }
-  return store.renderExportImage(nodeIds, scale, format, pageId)
+  return store.renderExportImage(nodeIds, scale, format, pageId, quality)
 }
 
 type ExportArgs = { nodeIds?: string[]; scope?: 'page'; scale?: number; format?: string }

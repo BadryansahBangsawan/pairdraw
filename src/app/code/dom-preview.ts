@@ -1,11 +1,8 @@
 import { sceneGraphFromStyledHTML } from '@open-pencil/core/io/formats/html/layers'
-import {
-  browserHTMLToDesignDocument,
-  browserTailwindHTMLToDesignDocument
-} from '@open-pencil/dom-css/browser'
 import type { ComponentStyling } from '@open-pencil/dom-css/export'
 import type { SceneGraph } from '@open-pencil/scene-graph'
 
+import { styleHTMLInBrowser } from '@/app/code/html-styler'
 import type { EditorStore } from '@/app/editor/active-store'
 
 export type DOMCodeSession = {
@@ -24,23 +21,8 @@ export function createDOMCodeSession(store: EditorStore): DOMCodeSession {
   }
 }
 
-/** Every class the markup names, which Tailwind builds its utilities for. */
-function classNames(html: string): string[] {
-  const parsed = new DOMParser().parseFromString(html, 'text/html')
-  return [...parsed.querySelectorAll('[class]')].flatMap((element) => [...element.classList])
-}
-
-/** Tailwind's own stylesheet, loaded with the first Tailwind preview rather than with the app. */
-async function loadTailwindStylesheet(): Promise<string> {
-  const { default: css } = await import('tailwindcss/index.css?raw')
-  return css
-}
-
-async function designDocument(source: string, styling: ComponentStyling) {
-  if (styling === 'css') return browserHTMLToDesignDocument(source)
-  return browserTailwindHTMLToDesignDocument(source, classNames(source), {
-    loadStylesheet: loadTailwindStylesheet
-  })
+function designDocument(source: string, styling: ComponentStyling) {
+  return styleHTMLInBrowser(source, { tailwind: styling !== 'css' })
 }
 
 export async function previewDOMCode(

@@ -14,5 +14,7 @@
   "resetPreview": "重置",
   "leavePreview": "退出预览 ({shortcut})",
   "toggleAIChat": "AI 聊天 ({shortcut})",
-  "startPreview": "预览 ({shortcut})"
+  "startPreview": "预览 ({shortcut})",
+  "toggleLayersPanel": "图层面板",
+  "togglePropertiesPanel": "属性面板"
 }

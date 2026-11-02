@@ -12,7 +12,7 @@ import {
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import { useCloudMessages } from '@open-pencil/vue/i18n'
+import { useCloudMessages, useFileMessages } from '@open-pencil/vue/i18n'
 
 import { menu } from '@/components/ui/menu/menu'
 import homeLocationMenuTheme from '@/theme/home/location-menu'
@@ -51,8 +51,10 @@ const emit = defineEmits<{
 const ui = homeLocationMenu()
 const menuUI = menu()
 const t = useCloudMessages()
+const files = useFileMessages()
 const current = computed(() => {
   if (active.kind === 'recent') return t.value.homeRecent
+  if (active.kind === 'libraries') return files.value.designSystems
   if (active.kind === 'shared') return t.value.homeSharedWithYou
   if (active.kind === 'storage') return storage?.label ?? t.value.homeStorage
   return workspaces.find((workspace) => workspace.id === active.id)?.name ?? t.value.workspace
@@ -65,6 +67,7 @@ const isActive = (location: HomeLocation) =>
   <DropdownMenuRoot>
     <DropdownMenuTrigger :class="ui.trigger()">
       <icon-lucide-clock v-if="active.kind === 'recent'" :class="ui.icon()" />
+      <icon-lucide-library-big v-else-if="active.kind === 'libraries'" :class="ui.icon()" />
       <icon-lucide-users v-else-if="active.kind === 'shared'" :class="ui.icon()" />
       <icon-lucide-database v-else-if="active.kind === 'storage'" :class="ui.icon()" />
       <icon-lucide-layers v-else :class="ui.icon()" />
@@ -86,6 +89,17 @@ const isActive = (location: HomeLocation) =>
           <span :class="ui.itemLabel()">{{ t.homeRecent }}</span>
           <icon-lucide-check
             v-if="isActive({ kind: 'recent', id: 'recent' })"
+            :class="ui.check()"
+          />
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          :class="menuUI.item({ justify: 'start' })"
+          @select="emit('select', { kind: 'libraries', id: 'libraries' })"
+        >
+          <icon-lucide-library-big :class="menuUI.icon()" />
+          <span :class="ui.itemLabel()">{{ files.designSystems }}</span>
+          <icon-lucide-check
+            v-if="isActive({ kind: 'libraries', id: 'libraries' })"
             :class="ui.check()"
           />
         </DropdownMenuItem>

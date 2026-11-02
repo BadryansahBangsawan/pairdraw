@@ -4,7 +4,11 @@ import type { Chat } from '@ai-sdk/vue'
 import type { UIMessage } from 'ai'
 import { ref, shallowRef } from 'vue'
 
+import { SceneGraph } from '@open-pencil/scene-graph'
+
 import { AgentSetupError } from '@/app/ai/agents/setup/readiness'
+import { attachmentsForMessage } from '@/app/ai/attachment/presentation/store'
+import { stripModelNotes } from '@/app/ai/chat/context'
 import { useChatSubmission } from '@/app/ai/chat/submission/use'
 import type { EditorStore } from '@/app/editor/active-store'
 
@@ -25,14 +29,17 @@ const messages = ref({
   }
 })
 
-function submission(ensureChat: () => Promise<Chat<UIMessage> | null>) {
+function submission(
+  ensureChat: () => Promise<Chat<UIMessage> | null>,
+  editor: EditorStore = asDouble<EditorStore>({})
+) {
   const reportError = mock(() => undefined)
   const openSetup = mock(() => undefined)
   const chat = useChatSubmission({
     chat: shallowRef<Chat<UIMessage> | null>(null),
     ensureChat,
     clearFailure: () => undefined,
-    getEditor: () => ({}) as EditorStore,
+    getEditor: () => editor,
     messages,
     reportError,
     openModelSettings: () => undefined,
@@ -93,6 +100,65 @@ describe('useChatSubmission', () => {
     } finally {
       revoke.mockRestore()
     }
+  })
+})
+
+describe('text files attached to a message', () => {
+  const tokens = {
+    name: 'tokens.css',
+    mediaType: 'text/css',
+    text: ':root { --brand: red; }',
+    size: 23
+  }
+
+  function sentTexts(target: Chat<UIMessage>) {
+    const texts: string[] = []
+    target.sendMessage = async (message) => {
+      if (message && 'text' in message && typeof message.text === 'string') {
+        texts.push(message.text)
+      }
+    }
+    return texts
+  }
+
+  test('the model reads the files, and the transcript lists them beside the text', async () => {
+    const target = fakeChat()
+    const texts = sentTexts(target)
+    const { chat } = submission(
+      async () => target,
+      asDouble<EditorStore>({ graph: new SceneGraph() })
+    )
+    expect(await chat.submit({ ...message, files: [tokens] })).toBe(true)
+
+    expect(texts).toHaveLength(1)
+    expect(texts[0]).toContain(':root { --brand: red; }')
+    expect(stripModelNotes(texts[0] ?? '')).toBe('Draw a card')
+    const sent = target.messages.at(-1)
+    expect(sent?.role).toBe('user')
+    const listed = attachmentsForMessage(sent?.id ?? '').value
+    expect(listed.map((attachment) => [attachment.kind, attachment.name])).toEqual([
+      ['file', 'tokens.css']
+    ])
+  })
+
+  test('an edited message is sent again with the files it had', async () => {
+    const target = fakeChat()
+    const texts = sentTexts(target)
+    const { chat } = submission(
+      async () => target,
+      asDouble<EditorStore>({ graph: new SceneGraph() })
+    )
+    await chat.submit({ ...message, files: [tokens] })
+    const sent = target.messages.at(-1)
+    if (!sent) throw new Error('Missing sent message')
+
+    await chat.resend(sent.id, 'Draw a pricing card')
+    expect(texts).toHaveLength(2)
+    expect(stripModelNotes(texts[1] ?? '')).toBe('Draw a pricing card')
+    expect(texts[1]).toContain(':root { --brand: red; }')
+    expect(attachmentsForMessage(sent.id).value.map((attachment) => attachment.name)).toEqual([
+      'tokens.css'
+    ])
   })
 })
 

@@ -11,7 +11,10 @@ import { computed } from 'vue'
 import type { CommentThread } from '@open-pencil/scene-graph'
 import { useCommentMessages, useCommonMessages } from '@open-pencil/vue/i18n'
 
+import { commentThreadsPrompt } from '@/app/ai/chat/entry/comments'
+import { acceptsDocumentPrompts, runPromptInDocument } from '@/app/ai/chat/entry/run'
 import { useComments } from '@/app/comments/use'
+import { useEditorStore } from '@/app/editor/active-store'
 import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
 import { useActionToast } from '@/app/shell/toast/action'
 import AppShortcutText from '@/components/ui/menu/AppShortcutText.vue'
@@ -32,6 +35,7 @@ const {
 }>()
 
 const comments = useComments()
+const store = useEditorStore()
 const messages = useCommentMessages()
 const common = useCommonMessages()
 const { copy } = useClipboard({ legacy: true })
@@ -42,6 +46,16 @@ const Item = computed(() => (kind === 'context' ? ContextMenuItem : DropdownMenu
 const Separator = computed(() =>
   kind === 'context' ? ContextMenuSeparator : DropdownMenuSeparator
 )
+
+/** An open thread can go to the AI chat, which applies it, replies, and resolves it. */
+const appliesWithAI = computed(
+  () => !thread.resolved && !thread.deleted && acceptsDocumentPrompts(store)
+)
+
+async function applyWithAI() {
+  const prompt = commentThreadsPrompt(store.graph, [thread])
+  if (prompt) await runPromptInDocument(store, prompt)
+}
 
 async function copyText() {
   await copy(thread.text)
@@ -59,6 +73,16 @@ async function copyText() {
   >
     <icon-lucide-locate-fixed :class="menuCls.icon" />
     <span>{{ messages.goToComment }}</span>
+  </component>
+  <component
+    :is="Item"
+    v-if="appliesWithAI"
+    :class="menuCls.item"
+    data-command="comment-apply-with-ai"
+    @select="applyWithAI"
+  >
+    <icon-lucide-sparkles :class="menuCls.icon" />
+    <span>{{ messages.applyWithAI }}</span>
   </component>
   <component
     :is="Item"

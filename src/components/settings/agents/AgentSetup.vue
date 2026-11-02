@@ -6,6 +6,7 @@ import { computed } from 'vue'
 import { IS_TAURI, type ACPAgentDef } from '@open-pencil/core/constants'
 import { useI18n } from '@open-pencil/vue/i18n'
 
+import { CLAUDE_CODE_CLOUD_NAMES } from '@/app/ai/agents/setup/external'
 import { codingAgentGuideURL, codingAgentSetupPrompt } from '@/app/ai/agents/setup/prompt'
 import { agentConnectView, agentSetupView, type AgentSetupState } from '@/app/ai/agents/setup/view'
 import SettingsLink from '@/components/settings/layout/SettingsLink.vue'
@@ -35,8 +36,10 @@ const view = computed(() => agentSetupView(agent, setup))
 const progress = computed(() => agentConnectView(agent, setup))
 const failure = computed(() => progress.value.failure)
 const account = computed(() => view.value.account)
-/** The plan and email a signed-in agent reports. */
+/** The plan and email a signed-in agent reports, or the cloud it is set up to use instead. */
 const accountDetail = computed(() => {
+  const cloud = view.value.externalConfig
+  if (cloud) return ai.value.aiSetupDetectExternalConfig({ cloud: CLAUDE_CODE_CLOUD_NAMES[cloud] })
   const current = account.value
   if (current?.state !== 'signed-in') return ''
   return [current.label, current.detail].filter((part) => part !== null).join(' · ')

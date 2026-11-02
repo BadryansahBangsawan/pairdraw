@@ -5,9 +5,12 @@ import * as v from 'valibot'
 import { desktopBuilds } from './catalog.ts'
 import { releaseCommands } from './commands.ts'
 import { commitSchema, releaseVersion } from './context.ts'
+import { updaterFeed } from './updater.ts'
 
 const tag = process.env.RELEASE_TAG ?? ''
 const version = releaseVersion(tag)
+// Refuse before any build: native jobs need the update feed, the publish job its key.
+updaterFeed(process.env, v.parse(v.string(), process.env.GITHUB_REPOSITORY))
 const { git } = releaseCommands(process.cwd())
 const sourceCommit = v.parse(
   commitSchema,

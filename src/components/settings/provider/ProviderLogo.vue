@@ -5,13 +5,20 @@ import IconAnthropic from '~icons/ai/anthropic'
 import IconClaudeCode from '~icons/ai/claudecode'
 import IconCodex from '~icons/ai/codex'
 import IconDeepSeek from '~icons/ai/deepseek'
+import IconFireworks from '~icons/ai/fireworks'
 import IconGemini from '~icons/ai/gemini'
 import IconGeminiCLI from '~icons/ai/geminicli'
+import IconKimi from '~icons/ai/kimi'
 import IconLMStudio from '~icons/ai/lmstudio'
+import IconMeta from '~icons/ai/meta'
 import IconMiniMax from '~icons/ai/minimax'
+import IconMoonshot from '~icons/ai/moonshot'
 import IconOllama from '~icons/ai/ollama'
 import IconOpenAI from '~icons/ai/openai'
+import IconOpenCode from '~icons/ai/opencode'
 import IconOpenRouter from '~icons/ai/openrouter'
+import IconTogether from '~icons/ai/together'
+import IconXAI from '~icons/ai/xai'
 import IconZai from '~icons/ai/zai'
 import IconBot from '~icons/lucide/bot'
 import IconServer from '~icons/lucide/server'
@@ -28,6 +35,14 @@ const LOGOS: Record<string, Component> = {
   deepseek: IconDeepSeek,
   zai: IconZai,
   minimax: IconMiniMax,
+  xai: IconXAI,
+  meta: IconMeta,
+  'kimi-for-coding': IconKimi,
+  moonshot: IconMoonshot,
+  together: IconTogether,
+  fireworks: IconFireworks,
+  'opencode-zen': IconOpenCode,
+  'opencode-go': IconOpenCode,
   ollama: IconOllama,
   lmstudio: IconLMStudio,
   'acp:claude-code': IconClaudeCode,

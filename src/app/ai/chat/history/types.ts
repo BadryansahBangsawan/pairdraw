@@ -14,6 +14,13 @@ export interface HistoryRuntime<TChat extends HistoryChat> {
   resetChat(): Promise<void>
   backend(): ConversationMeta['backend']
   profileId(): string | null
+  /**
+   * Makes the model profile a reopened conversation last used the chat's model again; one that
+   * no longer exists leaves the current model.
+   */
+  restoreProfile(profileId: string): void
+  /** What a model profile runs on, or null when it no longer exists. */
+  profileBackend(profileId: string): ConversationMeta['backend'] | null
 }
 
 export interface ConversationMeta {
@@ -24,6 +31,7 @@ export interface ConversationMeta {
   titleSource: 'fallback' | 'manual' | 'generated'
   createdAt: string
   updatedAt: string
+  /** The model profile the conversation last used, which reopening it selects again. */
   profileId: string | null
   backend: 'direct' | 'acp' | 'harness'
   interrupted: boolean
@@ -46,6 +54,8 @@ export interface ConversationStore {
   read(id: string): Promise<Conversation | null>
   write(conversation: Conversation): Promise<void>
   rename(id: string, title: string): Promise<void>
+  /** Records the model profile a saved conversation uses, leaving its messages and time alone. */
+  setProfile(id: string, profileId: string): Promise<void>
   remove(id: string): Promise<void>
   resolveFile(handle: FileSystemFileHandle): Promise<string>
   reassignDocument(from: string, to: string, name: string): Promise<void>

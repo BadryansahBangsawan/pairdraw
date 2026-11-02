@@ -53,6 +53,11 @@ interface ChatEditorOptions {
    * to put ahead of what is typed; null leaves Up to move the caret.
    */
   onTakeBack?: () => string | null
+  /**
+   * Up on the first line with nothing taken back, or Down on the last: an earlier or later sent
+   * prompt to show instead of the text, or null to leave the arrow to the caret.
+   */
+  onRecall?: (direction: 'older' | 'newer', current: string) => string | null
 }
 
 /**
@@ -110,10 +115,28 @@ export function useChatEditor(
               const { head } = editor.state.selection.main
               if (completionStatus(editor.state) === 'active') return false
               if (editor.state.doc.lineAt(head).number !== 1) return false
-              const taken = options.onTakeBack?.()
-              if (!taken) return false
               const current = editor.state.doc.toString()
-              setText(current.trim() ? `${taken}\n${current}` : taken)
+              // Waiting messages come back first; earlier prompts only once none wait.
+              const taken = options.onTakeBack?.()
+              if (taken) {
+                setText(current.trim() ? `${taken}\n${current}` : taken)
+                return true
+              }
+              const recalled = options.onRecall?.('older', current)
+              if (recalled === null || recalled === undefined) return false
+              setText(recalled)
+              return true
+            }
+          },
+          {
+            key: 'ArrowDown',
+            run: (editor) => {
+              const { head } = editor.state.selection.main
+              if (completionStatus(editor.state) === 'active') return false
+              if (editor.state.doc.lineAt(head).number !== editor.state.doc.lines) return false
+              const recalled = options.onRecall?.('newer', editor.state.doc.toString())
+              if (recalled === null || recalled === undefined) return false
+              setText(recalled)
               return true
             }
           },

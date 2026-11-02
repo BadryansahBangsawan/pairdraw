@@ -21,5 +21,6 @@
   "installFailed": "Не удалось установить обновление: {error}",
   "restartFailed": "Не удалось перезапустить Pairdraw: {error}",
   "unavailable": "Обновления пока недоступны. Сначала опубликуйте подписанный релиз с latest.json.",
+  "notConfigured": "Обновления не настроены для этой сборки Pairdraw.",
   "checkFailed": "Не удалось проверить обновления: {error}"
 }

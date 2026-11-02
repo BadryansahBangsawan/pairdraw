@@ -1,5 +1,6 @@
 import type { CanvasKit } from 'canvaskit-wasm'
 
+import type { TailwindStylesheetLoader } from '@open-pencil/dom-css/export'
 import type { SceneGraph } from '@open-pencil/scene-graph'
 import type { RenderColorSpace } from '@open-pencil/scene-graph/color'
 
@@ -113,6 +114,21 @@ export interface HTMLExportOptions {
   assets?: 'inline' | 'external'
   /** `assets` ships web fonts with external assets. */
   fonts?: 'assets' | 'none'
+  /** Write each layer's name as a `data-name` attribute. Default true. */
+  layerNames?: boolean
+  /** Write each layer's ID as a `data-open-pencil-node-id` attribute. Default false. */
+  layerIds?: boolean
+  /** Reads Tailwind's stylesheets for a standalone Tailwind page where Node cannot, in browsers. */
+  loadTailwindStylesheet?: TailwindStylesheetLoader
+}
+
+/** How an export with several layers makes its PDF. */
+export interface PDFFormatExportOptions {
+  /**
+   * `frames`: a page per layer, in the order given, each sized to its layer, the default for a
+   * selection. `single`: every layer on one page, the default for a page or document.
+   */
+  pages?: 'single' | 'frames'
 }
 
 export interface IOFormatSupport {

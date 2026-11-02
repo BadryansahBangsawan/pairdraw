@@ -21,6 +21,8 @@ Premi <kbd>H</kbd>. Finché è attivo, qualsiasi trascinamento sposta la vista s
 
 Lo zoom è centrato sul puntatore. Usa <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + rotella, il gesto di pizzicamento o le scorciatoie.
 
+Con **Zoom con la rotellina** in **Impostazioni → Editor**, la rotellina ingrandisce senza tasti; <kbd>Shift</kbd> + rotella scorre ancora in orizzontale. **Inverti la direzione dello zoom** inverte il verso della rotellina; il pizzico sul trackpad mantiene il suo.
+
 | Azione | macOS | Windows / Linux |
 |--------|-------|-----------------|
 | 100% | <kbd>⌘</kbd><kbd>0</kbd> | <kbd>Ctrl</kbd><kbd>0</kbd> |

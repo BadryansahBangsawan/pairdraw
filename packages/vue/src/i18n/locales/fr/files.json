@@ -35,6 +35,44 @@
   "deleteDocumentConfirmation": "Supprimer « {name} » ?",
   "deleteDocumentDescription": "Le document est supprimé pour toutes les personnes qui peuvent l’ouvrir. Cette action est irréversible.",
   "deleteDocumentFailed": "Impossible de supprimer « {name} ». Réessayez.",
+  "deleteDocumentsConfirmation": {
+    "one": "Supprimer {count} document ?",
+    "many": "Supprimer {count} documents ?"
+  },
+  "deleteDocumentsDescription": "Les documents sont supprimés pour toutes les personnes qui peuvent les ouvrir. Cette action est irréversible.",
+  "sortFiles": "Trier par {order}",
+  "sortByName": "Nom",
+  "sortByLastUsed": "Dernière utilisation",
+  "sortByCreated": "Création",
+  "selectDocument": "Sélectionner",
+  "deselectDocument": "Désélectionner",
+  "documentSelected": "Sélectionné",
+  "selectAllDocuments": "Tout sélectionner",
+  "clearDocumentSelection": "Effacer la sélection",
+  "selectedDocuments": {
+    "one": "{count} sélectionné",
+    "many": "{count} sélectionnés"
+  },
+  "selectionActions": "Fichiers sélectionnés",
+  "openSelectedDocuments": "Ouvrir",
+  "removeFromRecents": "Retirer des récents",
+  "saveDocumentAs": "Enregistrer sous…",
+  "savedDocumentAs": "Copie enregistrée sous « {name} ».",
+  "saveDocumentAsFailed": "Impossible d’enregistrer une copie de « {name} ». {error}",
+  "designSystems": "Systèmes de design",
+  "designSystemsDescription": "Commencez un nouveau design avec les composants d’une bibliothèque publiée.",
+  "noDesignSystems": "Aucun système de design pour l’instant",
+  "noDesignSystemsDescription": "Publiez une bibliothèque depuis le panneau Ressources d’un document pour commencer de nouveaux designs avec elle ici.",
+  "designSystemComponents": {
+    "one": "{count} composant",
+    "many": "{count} composants"
+  },
+  "newDesignWith": "Nouveau design avec {name}",
+  "loadingDesignSystems": "Chargement des systèmes de design…",
   "saveAsPrompt": "Enregistrer sous :",
-  "browserFileAPINotSupported": "Votre navigateur ne prend pas en charge l’API de fichiers locaux. Les fichiers seront téléchargés au lieu d’être enregistrés sur place."
+  "browserFileAPINotSupported": "Votre navigateur ne prend pas en charge l’API de fichiers locaux. Les fichiers seront téléchargés au lieu d’être enregistrés sur place.",
+  "fileChangedOnDisk": "« {name} » a été modifié sur le disque",
+  "fileChangedOnDiskDescription": "Une autre application a modifié ce fichier alors que vous avez des modifications non enregistrées. Rechargez-le pour ouvrir la version du fichier et abandonner vos modifications, ou ignorez le changement et continuez à modifier. L’enregistrement remplacera le fichier par votre version.",
+  "reloadFromDisk": "Recharger",
+  "ignoreDiskChange": "Ignorer"
 }

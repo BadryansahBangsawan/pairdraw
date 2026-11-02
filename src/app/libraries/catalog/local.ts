@@ -10,6 +10,7 @@ import type {
 import {
   createLibraryRevision,
   deserializeLibraryRevision,
+  LibraryRevisionNotFoundError,
   serializeLibraryRevision
 } from '@open-pencil/core/library'
 
@@ -76,8 +77,7 @@ export class LocalLibraryCatalog implements LibraryCatalog {
     const stored = resolvedRevisionId
       ? await database.get('revisions', [libraryId, resolvedRevisionId])
       : undefined
-    if (!stored)
-      throw new Error(`Library revision not found: ${libraryId}/${revisionId ?? 'latest'}`)
+    if (!stored) throw new LibraryRevisionNotFoundError(libraryId, revisionId)
     return deserializeLibraryRevision(stored.revision)
   }
 

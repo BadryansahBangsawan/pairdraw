@@ -257,6 +257,9 @@ openpencil tool list
 openpencil tool describe set_fill                      # JSON Schema for the arguments
 openpencil tool call set_fill --document-id tab-123 --args '{"id":"0:5","color":"#2563eb"}'
 openpencil tool call create_page design.fig --args '{"name":"Icons"}' --write   # headless
+openpencil tool call create_shape design.fig --args '{"type":"FRAME","x":0,"y":0,"width":320,"height":200}' -w --preview-output preview.png
+printf '%s\n' 'create_page {"name":"Icons"}' 'save()' | openpencil shell design.fig   # one load, many tool lines
+openpencil models --json                               # AI providers and their models
 ```
 
 Every command that reports structured data supports `--json` when appropriate.
@@ -337,9 +340,15 @@ Discover available tools and their arguments from the connected server or browse
 - **`diff_visual`** — pixel diff between two rendered nodes; use it to confirm an edit changed only the intended region.
 - **`describe`** — semantic analysis of role, visual style, layout, and design issues.
 - **`batch_update`** — apply multiple node updates efficiently.
-- **`export_image` / `export_svg` / `export_pdf`** — visual verification and deliverables.
+- **`export_image` / `export_svg` / `export_pdf`** — visual verification and deliverables; `export_image` takes `quality` (1–100) for JPG and WEBP.
+- **`export_html` / `import_html`** — layers to HTML with CSS or Tailwind (fragment or standalone, `layer_ids` to map markup back to layers), and HTML/CSS back into editable layers in the open document.
+- **`diff_changes`** — outside AI chat, call it with `mark: true`, then later without it to see what you or the designer changed since.
+- **`find_empty_space`** — a free spot of a given size beside existing content, before placing new frames.
+- **`replace_matching_properties`** — swap a fill, text, or stroke color, stroke weight, radius, font family, style, or size everywhere on a page or selection; layers of read-only library components come back in `read_only`.
+- **`vectorize_image`** — turn a layer's image fill into editable vector paths in a new frame beside the image, with the user's own vectorize service; it works only through the running app, takes up to a few minutes, and reports a missing key for the user to add in Settings → Image services.
 - **`viewport_zoom_to_fit` / `viewport_set` / `viewport_get`** — move the user's view only when they ask to be shown something.
 - **`get_codegen_prompt`** — retrieve OpenPencil's current JSX/codegen guidance.
+- **`read_skill`** — read this skill (`SKILL.md`) or `references/design-authoring.md` from the connected server, for clients that cannot install skills; the same files are the `openpencil://skills/open-pencil/` resources and the `design` prompt.
 - **`undo` / `redo`** — revert or reapply your newest change; they refuse to touch the user's edits.
 - **`list_documents` / `activate_document`** — discover open tabs and show the one you worked on.
 

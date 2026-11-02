@@ -14,6 +14,7 @@ import {
   type AgentConnectStep
 } from './connect'
 import { type DetectedAgent, type DiscoveryError } from './discovery'
+import { externalConfigCloud, type ClaudeCodeCloud } from './external'
 
 /** What setup knows about one coding agent and the MCP server it needs. */
 export interface AgentSetupState {
@@ -162,6 +163,11 @@ export interface AgentSetupView {
    * published under another package, so it neither reports nor signs in to the account.
    */
   adapterMismatch: boolean
+  /**
+   * A cloud the agent is set up to use outside the app, in place of a sign-in; dropped once the
+   * agent reports it is signed out.
+   */
+  externalConfig?: ClaudeCodeCloud
 }
 
 /** The agent's account as setup shows it. */
@@ -222,6 +228,12 @@ function accountView(setup: AgentSetupState, mismatch: boolean): AgentAccountVie
   }
 }
 
+/** The cloud an installed agent is set up to use, while its login does not say otherwise. */
+function setupCloud(setup: AgentSetupState): ClaudeCodeCloud | undefined {
+  if (setup.detected?.status !== 'available') return undefined
+  return externalConfigCloud(setup.detected.externalConfig, setup.account?.status)
+}
+
 function adapterMismatch(agent: ACPAgentDef, setup: AgentSetupState): boolean {
   return isOtherAdapter(agent, setup.account?.adapter)
 }
@@ -263,6 +275,7 @@ export function agentSetupView(agent: ACPAgentDef, setup: AgentSetupState): Agen
     (status === 'needs-adapter' || (bridgeMissing && !bridgeInstallable && !bridgeAdmin))
   const needsAdmin = (status === 'needs-adapter' && adapterAdmin) || (bridgeMissing && bridgeAdmin)
   const mismatch = status === 'available' && adapterMismatch(agent, setup)
+  const cloud = setupCloud(setup)
   return {
     bridge,
     canInstallAdapter: status === 'needs-adapter' && setup.npm && !adapterAdmin,
@@ -273,7 +286,8 @@ export function agentSetupView(agent: ACPAgentDef, setup: AgentSetupState): Agen
       : manualAgentCommand(agent, setup),
     manualBridgeCommand: manualBridgeCommand(setup, bridge),
     account: accountView(setup, mismatch),
-    adapterMismatch: mismatch
+    adapterMismatch: mismatch,
+    ...(cloud ? { externalConfig: cloud } : {})
   }
 }
 
@@ -433,7 +447,9 @@ function satisfied(
   if (step === 'install') {
     return setup.detected?.status === 'available' && setup.bridge && !setup.bridgeOutdated
   }
-  if (step === 'sign-in') return account?.state === 'signed-in'
+  if (step === 'sign-in') {
+    return account?.state === 'signed-in' || Boolean(setupCloud(setup))
+  }
   if (step === 'tools') return account?.tools?.state === 'connected'
   return false
 }

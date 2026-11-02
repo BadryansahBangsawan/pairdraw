@@ -19,6 +19,12 @@ La barra inferior contiene herramientas para crear formas, marcos y secciones. S
 
 Polígono y Estrella están disponibles en el menú de formas.
 
+## Colocar imágenes
+
+Elige **Archivo › Colocar imagen…** (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd>, o <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>K</kbd> en Windows y Linux) o pulsa el botón de imagen de la barra de herramientas y escoge archivos PNG, JPEG, WebP, GIF, AVIF o SVG. Aparecen seleccionados en el centro de la vista, en un solo paso que se puede deshacer; un SVG se convierte en capas editables.
+
+La herramienta **Nota adhesiva** sigue a Texto en la barra de herramientas. No tiene tecla, así que <kbd>N</kbd> sigue haciendo zoom al siguiente marco.
+
 ## Mantener proporciones
 
 Con <kbd>Shift</kbd>, el rectángulo se convierte en cuadrado, la elipse en círculo y la línea se ajusta a 0°, 45° y 90°.

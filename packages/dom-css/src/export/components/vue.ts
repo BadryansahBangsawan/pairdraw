@@ -10,6 +10,15 @@ import type { ShaderComponent } from '@open-pencil/scene-graph/shaders'
 
 import { claimName } from '../storybook/names'
 import { progressWidth } from './fields'
+import {
+  drawingImports,
+  iconDrawing,
+  iconImportDeclarations,
+  iconNamer,
+  type IconDrawing,
+  type IconImport,
+  type IconPackage
+} from './icons'
 import type {
   ComponentBinding,
   ComponentElement,
@@ -18,7 +27,7 @@ import type {
   ComponentNode,
   GeneratedKind
 } from './model'
-import type { ComponentReference } from './references'
+import type { ComponentReference, IconReference } from './references'
 import {
   drawnEffects,
   SHADER_CANVAS,
@@ -176,7 +185,13 @@ interface TemplateUses {
   reka: Set<string>
   /** Other generated components. */
   components: Set<string>
+  /** Whether an icon is drawn by Iconify. */
   icons: boolean
+  /** The package icons come from, and what the icons drawn from it import. */
+  iconPackage: IconPackage
+  iconImports: IconImport[]
+  /** Names an icon's imports apart from the component's other names. */
+  nameIcon: (drawing: IconDrawing) => IconDrawing
   /** The class a layer's readable class name stands for, as the component is styled. */
   classOf: (className: string) => string
   /** The layer each element draws, which code links back to. */
@@ -190,6 +205,23 @@ interface TemplateUses {
 
 /** The Iconify component, named apart from any component the design calls `Icon`. */
 const ICONIFY = 'IconifyIcon'
+
+/** An icon: its package's own component where it has the icon, Iconify's otherwise. */
+function iconElement(node: IconReference, uses: TemplateUses): vue.VueElement {
+  const className = vue.attribute('class', uses.classOf(node.className))
+  const found = iconDrawing(node.icon, uses.iconPackage, 'vue')
+  const drawn = found && uses.nameIcon(found)
+  if (!drawn) {
+    uses.icons = true
+    return vue.element(ICONIFY, [vue.attribute('icon', node.icon), className])
+  }
+  uses.iconImports.push(...drawingImports(drawn))
+  if (drawn.type === 'component') return vue.element(drawn.import.local, [className])
+  return vue.element(drawn.component.local, [
+    vue.bound('icon', identifier(drawn.import.local)),
+    className
+  ])
+}
 
 function reference(node: ComponentReference, uses: TemplateUses): vue.VueElement {
   uses.components.add(node.component)
@@ -287,14 +319,7 @@ function templateNode(node: ComponentNode, uses: TemplateUses): vue.VueNode {
   if (node.type === 'textProp') return vue.interpolation(identifier(node.name))
   if (node.type === 'reference') return drawing(reference(node, uses), node.layerId, uses)
   if (node.type === 'input') return drawing(inputNode(node.className, uses), node.layerId, uses)
-  if (node.type === 'icon') {
-    uses.icons = true
-    const icon = vue.element(ICONIFY, [
-      vue.attribute('icon', node.icon),
-      vue.attribute('class', uses.classOf(node.className))
-    ])
-    return drawing(icon, node.layerId, uses)
-  }
+  if (node.type === 'icon') return drawing(iconElement(node, uses), node.layerId, uses)
   return designElement(node, uses)
 }
 
@@ -379,6 +404,7 @@ function scriptImports(uses: TemplateUses): es.SyntaxNode[] {
   return [
     ...(helpers.length > 0 ? [namedImport(helpers, 'vue')] : []),
     ...(uses.icons ? [namedImport(['Icon'], '@iconify/vue', () => ICONIFY)] : []),
+    ...iconImportDeclarations(uses.iconImports),
     ...(uses.reka.size > 0 ? [namedImport([...uses.reka].sort(), 'reka-ui')] : []),
     ...(uses.shaders.size > 0 ? [shaderImport('shaders/vue', uses.shaders)] : []),
     ...[...uses.components].sort().flatMap(
@@ -453,6 +479,9 @@ export const vueComponent: ComponentGenerator = async (component, options = {}) 
     reka: new Set(),
     components: new Set(),
     icons: false,
+    iconPackage: options.icons ?? 'iconify',
+    iconImports: [],
+    nameIcon: iconNamer(component, [ICONIFY, ...taken]),
     shaders: new Set(),
     models: [],
     // Refs share the script with the component's own props and model.

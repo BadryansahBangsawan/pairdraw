@@ -1,5 +1,6 @@
 import { es, jsx } from '@open-pencil/emit'
 
+import type { IconDrawing, IconImport, IconPackage } from '../icons'
 import type { ComponentModel, GeneratedKind } from '../model'
 
 /** `styles.thumb`, or `styles['switch-thumb']` for a class that isn't an identifier. */
@@ -20,7 +21,13 @@ export interface MarkupUses {
   choice: ComponentModel['choice']
   /** Other generated components. */
   components: Set<string>
+  /** Whether an icon is drawn by Iconify. */
   icons: boolean
+  /** The package icons come from, and what the icons drawn from it import. */
+  iconPackage: IconPackage
+  iconImports: IconImport[]
+  /** Names an icon's imports apart from the component's other names. */
+  nameIcon: (drawing: IconDrawing) => IconDrawing
   /** A layer's class as the component is styled: its CSS module class, or its utilities. */
   classOf: (className: string) => es.SyntaxNode
   /** The layer each JSX element draws, which code links back to. */

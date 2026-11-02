@@ -1,31 +1,23 @@
-import { preprocessForVectorize, svgToVectorPaths } from '@open-pencil/core/vector'
-import type { Fill, SceneNode } from '@open-pencil/scene-graph'
+import { svgToVectorPaths, vectorizableImageFill } from '@open-pencil/core/vector'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { notificationMessages } from '@/app/i18n/notifications'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { toast } from '@/app/shell/ui'
 
-import { resolveVectorizeCredential } from './credentials'
-import { vectorizeProviderID } from './preferences'
-import { getVectorizeProvider } from './providers'
+import { requestVectorSVG, selectedVectorizeProvider } from './request'
 import { VectorizeAuthError } from './types'
 
 const activeStores = new WeakSet<EditorStore>()
 const ERROR_MAX_LENGTH = 240
 
-function imageFill(node: SceneNode): Fill | null {
-  if (node.type !== 'RECTANGLE' || node.childIds.length > 0 || node.fills.length !== 1) return null
-  const fill = node.fills[0]
-  return fill.type === 'IMAGE' && fill.imageHash ? fill : null
-}
-
+/** Whether the selection is one layer showing an image, of any kind, and none is converting. */
 export function canVectorizeImageNode(store: EditorStore): boolean {
   if (store.state.selectedIds.size !== 1 || activeStores.has(store)) return false
   const nodeId = store.state.selectedIds.values().next().value
   if (!nodeId) return false
   const node = store.graph.getNode(nodeId)
-  return Boolean(node && imageFill(node))
+  return Boolean(node && vectorizableImageFill(node))
 }
 
 function vectorizeErrorMessage(error: unknown): string {
@@ -35,17 +27,26 @@ function vectorizeErrorMessage(error: unknown): string {
   return message.length <= ERROR_MAX_LENGTH ? message : `${message.slice(0, ERROR_MAX_LENGTH)}…`
 }
 
+/** Converts a layer's image into vector layers beside it, keeping the image, as one undo step. */
 export async function vectorizeImageNode(store: EditorStore, nodeId: string): Promise<void> {
   if (activeStores.has(store)) return
   const node = store.graph.getNode(nodeId)
-  const fill = node ? imageFill(node) : null
-  if (!node || fill?.type !== 'IMAGE' || !fill.imageHash) return
+  const fill = node ? vectorizableImageFill(node) : null
+  if (!node || !fill) return
 
-  const provider = getVectorizeProvider(vectorizeProviderID.value)
+  const provider = selectedVectorizeProvider()
   activeStores.add(store)
   try {
-    const apiKey = await resolveVectorizeCredential(provider.id)
-    if (!apiKey) {
+    const imageBytes = store.graph.images.get(fill.imageHash)
+    if (!imageBytes) {
+      toast.error(notificationMessages.get().vectorizeImageMissing)
+      return
+    }
+
+    const result = await requestVectorSVG(store, provider, imageBytes, () => {
+      toast.info(notificationMessages.get().vectorizingImage)
+    })
+    if (result.status === 'missing-key') {
       toast.error(
         notificationMessages.get().vectorizeCredentialRequired({ provider: provider.name })
       )
@@ -53,30 +54,18 @@ export async function vectorizeImageNode(store: EditorStore, nodeId: string): Pr
       return
     }
 
-    const imageBytes = store.graph.images.get(fill.imageHash)
-    if (!imageBytes) {
-      toast.error(notificationMessages.get().vectorizeImageMissing)
-      return
-    }
-
-    toast.info(notificationMessages.get().vectorizingImage)
-    const preprocessed = preprocessForVectorize(imageBytes, () => store.renderer?.ck ?? null)
-    if (!preprocessed) throw new Error('Could not prepare this image for vectorization')
-
-    const svg = await provider.vectorize(preprocessed.pngBytes, apiKey)
     const currentNode = store.graph.getNode(node.id)
-    const currentFill = currentNode ? imageFill(currentNode) : null
-    if (!currentNode || currentFill?.type !== 'IMAGE' || currentFill.imageHash !== fill.imageHash) {
+    if (!currentNode || vectorizableImageFill(currentNode)?.imageHash !== fill.imageHash) {
       throw new Error('The image changed before vectorization finished')
     }
-    const vectorized = svgToVectorPaths(svg, {
+    const vectorized = svgToVectorPaths(result.svg, {
       width: currentNode.width,
       height: currentNode.height
     })
     if (!vectorized?.paths.length) throw new Error('The vectorizer returned no editable paths')
 
-    const frameId = store.replaceNodeWithVectorFrame(currentNode.id, vectorized)
-    if (!frameId) throw new Error('Could not replace this image with vector layers')
+    const frameId = store.addVectorFrameBeside(currentNode.id, vectorized)
+    if (!frameId) throw new Error('Could not add vector layers beside this image')
     toast.info(notificationMessages.get().imageConvertedToVectors)
   } catch (error) {
     if (error instanceof VectorizeAuthError) {

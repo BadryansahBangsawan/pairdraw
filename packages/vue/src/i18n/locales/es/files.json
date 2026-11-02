@@ -35,6 +35,44 @@
   "deleteDocumentConfirmation": "¿Eliminar «{name}»?",
   "deleteDocumentDescription": "El documento se elimina para todas las personas que pueden abrirlo. No se puede deshacer.",
   "deleteDocumentFailed": "No se pudo eliminar «{name}». Inténtalo de nuevo.",
+  "deleteDocumentsConfirmation": {
+    "one": "¿Eliminar {count} documento?",
+    "many": "¿Eliminar {count} documentos?"
+  },
+  "deleteDocumentsDescription": "Los documentos se eliminan para todas las personas que pueden abrirlos. No se puede deshacer.",
+  "sortFiles": "Ordenar por {order}",
+  "sortByName": "Nombre",
+  "sortByLastUsed": "Último uso",
+  "sortByCreated": "Creación",
+  "selectDocument": "Seleccionar",
+  "deselectDocument": "Deseleccionar",
+  "documentSelected": "Seleccionado",
+  "selectAllDocuments": "Seleccionar todo",
+  "clearDocumentSelection": "Borrar selección",
+  "selectedDocuments": {
+    "one": "{count} seleccionado",
+    "many": "{count} seleccionados"
+  },
+  "selectionActions": "Archivos seleccionados",
+  "openSelectedDocuments": "Abrir",
+  "removeFromRecents": "Quitar de Recientes",
+  "saveDocumentAs": "Guardar como…",
+  "savedDocumentAs": "Se guardó una copia como «{name}».",
+  "saveDocumentAsFailed": "No se pudo guardar una copia de «{name}». {error}",
+  "designSystems": "Sistemas de diseño",
+  "designSystemsDescription": "Empieza un diseño nuevo con los componentes de una biblioteca publicada.",
+  "noDesignSystems": "Aún no hay sistemas de diseño",
+  "noDesignSystemsDescription": "Publica una biblioteca desde el panel Recursos de un documento para empezar diseños nuevos con ella aquí.",
+  "designSystemComponents": {
+    "one": "{count} componente",
+    "many": "{count} componentes"
+  },
+  "newDesignWith": "Nuevo diseño con {name}",
+  "loadingDesignSystems": "Cargando sistemas de diseño…",
   "saveAsPrompt": "Guardar como:",
-  "browserFileAPINotSupported": "Tu navegador no admite la API de archivos locales. Los archivos se descargarán en lugar de guardarse en el mismo lugar."
+  "browserFileAPINotSupported": "Tu navegador no admite la API de archivos locales. Los archivos se descargarán en lugar de guardarse en el mismo lugar.",
+  "fileChangedOnDisk": "«{name}» cambió en el disco",
+  "fileChangedOnDiskDescription": "Otra aplicación cambió este archivo mientras tienes cambios sin guardar. Vuelve a cargarlo para abrir la versión del archivo y descartar tus cambios, o ignora el cambio y sigue editando. Al guardar, el archivo se reemplaza con tu versión.",
+  "reloadFromDisk": "Volver a cargar",
+  "ignoreDiskChange": "Ignorar"
 }

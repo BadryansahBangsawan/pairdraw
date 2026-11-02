@@ -1,6 +1,7 @@
 import type { DownloadEvent } from '@tauri-apps/plugin-updater'
 import { shallowRef, type ShallowRef } from 'vue'
 
+import { checkUpdateFeed } from './feed'
 import type { UpdateFailureStep } from './messages'
 import type { DownloadProgress } from './progress'
 import { requestRestartApproval } from './restart'
@@ -240,10 +241,7 @@ function errorMessage(error: unknown): string {
 
 export function createTauriUpdaterBackend(): UpdaterBackend {
   return {
-    async check() {
-      const { check } = await import('@tauri-apps/plugin-updater')
-      return check()
-    },
+    check: checkUpdateFeed,
     confirmRestart: requestRestartApproval,
     async relaunch() {
       const { relaunch } = await import('@tauri-apps/plugin-process')

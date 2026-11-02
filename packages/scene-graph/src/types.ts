@@ -446,6 +446,8 @@ export interface PluginDataEntry {
 export interface ExportSetting {
   scale: number
   format: ExportFormatId
+  /** JPG and WEBP quality from 1 to 100; absent means the encoder's default. */
+  quality?: number
 }
 
 export interface PluginRelaunchDataEntry {

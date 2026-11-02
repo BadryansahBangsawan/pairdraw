@@ -16,6 +16,8 @@ import { recentFilesLimitSchema } from '@/app/recent-files/schema'
 import { DEFAULT_ACCENT } from '@/app/shell/accent/palette'
 import { accentPreferenceSchema, type AccentPreference } from '@/app/shell/accent/schema'
 
+import { nudgeDistanceSchema } from './schema'
+
 export const ANIMATION_PREFERENCES = ['system', 'off'] as const
 export type AnimationPreference = (typeof ANIMATION_PREFERENCES)[number]
 
@@ -32,6 +34,12 @@ export type CanvasRenderingMode = (typeof CANVAS_RENDERING_MODES)[number]
 /** Multipliers for how far each wheel or pinch event zooms the canvas; 1 is Figma's rate. */
 export const ZOOM_SPEEDS = [0.1, 0.25, 0.5, 0.75, 1, 1.5, 2] as const
 export type ZoomSpeed = (typeof ZOOM_SPEEDS)[number]
+
+/** How far the arrow keys move the selection: `small` alone, `large` with Shift. */
+export interface NudgePreferences {
+  small: number
+  large: number
+}
 
 export const DESIGN_CHECK_PRESETS = ['recommended', 'strict', 'accessibility'] as const
 export type DesignCheckPreset = (typeof DESIGN_CHECK_PRESETS)[number]
@@ -101,12 +109,32 @@ export interface AppPreferences {
   }
   editing: {
     snapping: SnappingPreferences
+    nudge: NudgePreferences
   }
   navigation: {
     zoomSpeed: ZoomSpeed
+    /** A mouse wheel zooms without Ctrl or Cmd; Shift+wheel still pans. */
+    wheelZoom: boolean
+    /** Wheel zoom goes the other way; a trackpad pinch keeps its direction. */
+    invertZoom: boolean
   }
   rendering: {
     canvasMode: CanvasRenderingMode
+    /**
+     * Ultralight mode: tiled rendering, no animations, cheaper effects, and at most one device
+     * pixel per CSS pixel, for slow or battery-powered machines.
+     */
+    ultralight: boolean
+  }
+  /** What the canvas shows, kept across documents and sessions. */
+  view: {
+    /** The pixel grid when zoomed in close; View → Pixel grid, Shift+'. */
+    pixelGrid: boolean
+  }
+  /** Which side panels of the desktop editor are open. */
+  workspace: {
+    layersOpen: boolean
+    propertiesOpen: boolean
   }
   designCheck: DesignCheckPreferences
   comments: CommentPreferences
@@ -133,10 +161,13 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
   version: 1,
   recovery: { enabled: true },
   editing: {
-    snapping: { ...DEFAULT_SNAPPING_PREFERENCES }
+    snapping: { ...DEFAULT_SNAPPING_PREFERENCES },
+    nudge: { small: 1, large: 10 }
   },
-  navigation: { zoomSpeed: 1 },
-  rendering: { canvasMode: 'retained' },
+  navigation: { zoomSpeed: 1, wheelZoom: false, invertZoom: false },
+  rendering: { canvasMode: 'retained', ultralight: false },
+  view: { pixelGrid: true },
+  workspace: { layersOpen: true, propertiesOpen: true },
   designCheck: { showOnCanvas: true, preset: 'recommended', disabledRules: [] },
   comments: {
     showOnCanvas: true,
@@ -161,6 +192,7 @@ function section<TEntries extends v.ObjectEntries>(entries: TEntries) {
 
 const defaults = DEFAULT_APP_PREFERENCES
 const snapping = defaults.editing.snapping
+const nudge = defaults.editing.nudge
 
 /** Stored preferences, read field by field so one bad value keeps the rest. */
 const appPreferencesSchema = section({
@@ -191,14 +223,29 @@ const appPreferencesSchema = section({
     snapping: section({
       geometry: v.fallback(v.boolean(), snapping.geometry),
       objects: v.fallback(v.boolean(), snapping.objects),
-      pixelGrid: v.fallback(v.boolean(), snapping.pixelGrid)
+      pixelGrid: v.fallback(v.boolean(), snapping.pixelGrid),
+      halfPixel: v.fallback(v.boolean(), snapping.halfPixel ?? false)
+    }),
+    nudge: section({
+      small: v.fallback(nudgeDistanceSchema, nudge.small),
+      large: v.fallback(nudgeDistanceSchema, nudge.large)
     })
   }),
   navigation: section({
-    zoomSpeed: v.fallback(v.picklist(ZOOM_SPEEDS), defaults.navigation.zoomSpeed)
+    zoomSpeed: v.fallback(v.picklist(ZOOM_SPEEDS), defaults.navigation.zoomSpeed),
+    wheelZoom: v.fallback(v.boolean(), defaults.navigation.wheelZoom),
+    invertZoom: v.fallback(v.boolean(), defaults.navigation.invertZoom)
   }),
   rendering: section({
-    canvasMode: v.fallback(v.picklist(CANVAS_RENDERING_MODES), defaults.rendering.canvasMode)
+    canvasMode: v.fallback(v.picklist(CANVAS_RENDERING_MODES), defaults.rendering.canvasMode),
+    ultralight: v.fallback(v.boolean(), defaults.rendering.ultralight)
+  }),
+  view: section({
+    pixelGrid: v.fallback(v.boolean(), defaults.view.pixelGrid)
+  }),
+  workspace: section({
+    layersOpen: v.fallback(v.boolean(), defaults.workspace.layersOpen),
+    propertiesOpen: v.fallback(v.boolean(), defaults.workspace.propertiesOpen)
   }),
   designCheck: section({
     showOnCanvas: v.fallback(v.boolean(), defaults.designCheck.showOnCanvas),
@@ -294,14 +341,49 @@ export function updateNotificationPreferences(changes: Partial<NotificationPrefe
 }
 
 export function updateCanvasRenderingMode(canvasMode: CanvasRenderingMode): void {
+  updateRenderingPreferences({ canvasMode })
+}
+
+export function updateRenderingPreferences(changes: Partial<AppPreferences['rendering']>): void {
   appPreferences.value = {
     ...appPreferences.value,
-    rendering: { canvasMode }
+    rendering: { ...appPreferences.value.rendering, ...changes }
   }
 }
 
 export function updateZoomSpeed(zoomSpeed: ZoomSpeed): void {
-  appPreferences.value = { ...appPreferences.value, navigation: { zoomSpeed } }
+  updateNavigationPreferences({ zoomSpeed })
+}
+
+export function updateNavigationPreferences(changes: Partial<AppPreferences['navigation']>): void {
+  appPreferences.value = {
+    ...appPreferences.value,
+    navigation: { ...appPreferences.value.navigation, ...changes }
+  }
+}
+
+export function updateNudgePreferences(changes: Partial<NudgePreferences>): void {
+  appPreferences.value = {
+    ...appPreferences.value,
+    editing: {
+      ...appPreferences.value.editing,
+      nudge: { ...appPreferences.value.editing.nudge, ...changes }
+    }
+  }
+}
+
+export function updateViewPreferences(changes: Partial<AppPreferences['view']>): void {
+  appPreferences.value = {
+    ...appPreferences.value,
+    view: { ...appPreferences.value.view, ...changes }
+  }
+}
+
+export function updateWorkspacePreferences(changes: Partial<AppPreferences['workspace']>): void {
+  appPreferences.value = {
+    ...appPreferences.value,
+    workspace: { ...appPreferences.value.workspace, ...changes }
+  }
 }
 
 export function updateSnappingPreferences(changes: Partial<SnappingPreferences>): void {

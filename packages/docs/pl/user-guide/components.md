@@ -19,7 +19,7 @@ Zaznacz ramkę lub grupę i naciśnij <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd>. 
 
 ## Zestawy komponentów i warianty
 
-Zaznacz co najmniej dwa komponenty i naciśnij <kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd>. OpenPencil połączy je w zestaw z fioletową przerywaną ramką.
+Zaznacz co najmniej dwa komponenty i wybierz **Utwórz zestaw komponentów** z menu kontekstowego. OpenPencil połączy je w zestaw z fioletową przerywaną ramką.
 
 Każdy komponent w zestawie może określać kilka wymiarów wariantu, na przykład `Size=Small`, `State=Hover` i `Theme=Dark`. Nie trzeba tworzyć wszystkich kombinacji. Wariant w lewym górnym rogu jest domyślny i służy jako zamiennik, gdy dokładna kombinacja nie istnieje.
 

@@ -4,6 +4,7 @@ import { createVectorEditHandleActions } from './handle-actions'
 import { createVectorEditHistoryActions } from './history'
 import { createVectorEditLifecycle } from './lifecycle'
 import { createVectorEditNetworkActions, getLiveNetwork, setNodeEditNetwork } from './network'
+import { createVectorEditPathActions } from './path-actions'
 import { createVectorEditSelectionActions } from './selection'
 import type { VectorEditState } from './types'
 
@@ -25,6 +26,7 @@ export function createVectorEditActions(editor: Editor, state: VectorEditState) 
   )
   const { nodeEditConnectEndpoints, nodeEditAddVertex, nodeEditRemoveVertex } =
     createVectorEditNetworkActions(editor, state, getNodeEditState)
+  const pathActions = createVectorEditPathActions(editor, state, getNodeEditState)
 
   function cancelNodeEditDrag() {
     const editState = getNodeEditState()
@@ -33,6 +35,19 @@ export function createVectorEditActions(editor: Editor, state: VectorEditState) 
     if (!previous) return
     setNodeEditNetwork(editState, previous)
     editState.history.pop()
+    // An ⌥/Alt drag selected copies the snapshot does not have; keep only what still exists.
+    const below = (indices: Set<number>, length: number) =>
+      new Set([...indices].filter((index) => index < length))
+    editState.selectedVertexIndices = below(
+      editState.selectedVertexIndices,
+      previous.vertices.length
+    )
+    editState.selectedSegmentIndices = below(
+      editState.selectedSegmentIndices,
+      previous.segments.length
+    )
+    editState.selectedRegions = below(editState.selectedRegions, previous.regions.length)
+    editState.selectedHandles = below(editState.selectedHandles, previous.segments.length * 2)
     editor.requestRender()
   }
 
@@ -62,6 +77,7 @@ export function createVectorEditActions(editor: Editor, state: VectorEditState) 
     nodeEditBreakAtVertex,
     nodeEditPushHistory,
     nodeEditUndo,
-    nodeEditRedo
+    nodeEditRedo,
+    ...pathActions
   }
 }

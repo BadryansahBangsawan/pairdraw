@@ -9,6 +9,7 @@ import {
   createDocumentSourceState
 } from '@/app/document/io/source/actions'
 import type { ViewportSize } from '@/app/document/io/types'
+import { createDiskChangeGuard } from '@/app/document/io/watch/guard'
 import { createFileWatcher } from '@/app/document/io/watch/watcher'
 import type { EditorPreparationController } from '@/app/editor/preparation/controller'
 
@@ -35,14 +36,30 @@ export function createDocumentIOActions(
     markDocumentSaved: () => sourceActions.markDocumentSaved(),
     preparationController
   })
-  const { startWatchingFile, stopWatchingFile } = createFileWatcher({
-    getFilePath: sourceState.getFilePath,
-    getFileHandle: sourceState.getFileHandle,
-    getLastWriteTime: sourceState.getLastWriteTime,
+  const diskChange = createDiskChangeGuard({
+    hasUnsavedChanges: () => sourceActions.hasUnsavedChanges(),
+    getDocumentName: () => state.documentName,
     reloadFromDisk: () => {
       void reloadFromDisk()
     }
   })
+  const watcher = createFileWatcher({
+    getFilePath: sourceState.getFilePath,
+    getFileHandle: sourceState.getFileHandle,
+    getLastWriteTime: sourceState.getLastWriteTime,
+    onDiskChange: () => {
+      void diskChange.onDiskChange()
+    }
+  })
+  // A question about a file the document no longer follows has no answer worth acting on.
+  const startWatchingFile = () => {
+    diskChange.follow(sourceState.getFilePath() ?? sourceState.getFileHandle())
+    return watcher.startWatchingFile()
+  }
+  const stopWatchingFile = () => {
+    diskChange.follow(null)
+    watcher.stopWatchingFile()
+  }
   const { setViewportSize, getViewportSize, fitCurrentPageToViewport } =
     createDocumentViewportActions(editor, viewportSize)
   const sourceActions = createDocumentSourceActions({
@@ -50,6 +67,7 @@ export function createDocumentIOActions(
     state,
     stopWatchingFile,
     startWatchingFile,
+    isDiskChangePending: diskChange.isPending,
     getRenderer: () => editor.renderer,
     ...sourceState
   })

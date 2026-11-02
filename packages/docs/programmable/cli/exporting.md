@@ -89,6 +89,8 @@ openpencil export design.fig -f html --html standalone --css tailwind --assets e
 
 Standalone Tailwind output is compiled during export; it does not depend on the Tailwind browser runtime. Use `--assets external` to write CSS and extracted image assets next to the HTML file. Use `--fonts assets` with external assets to resolve detected SceneGraph text fonts through OpenPencil's configured web-font providers and emit local `@font-face` files.
 
+HTML export writes each layer's name as a `data-name` attribute. `--no-layer-names` leaves the names out, and `--layer-ids` adds each layer's ID as `data-open-pencil-node-id` for tools that link markup back to the document.
+
 HTML export is available in file mode.
 
 ### Tokens in exported code

@@ -35,6 +35,44 @@
   "deleteDocumentConfirmation": "Eliminare «{name}»?",
   "deleteDocumentDescription": "Il documento viene eliminato per tutti coloro che possono aprirlo. L’operazione non può essere annullata.",
   "deleteDocumentFailed": "Impossibile eliminare «{name}». Riprova.",
+  "deleteDocumentsConfirmation": {
+    "one": "Eliminare {count} documento?",
+    "many": "Eliminare {count} documenti?"
+  },
+  "deleteDocumentsDescription": "I documenti vengono eliminati per tutti coloro che possono aprirli. L’operazione non può essere annullata.",
+  "sortFiles": "Ordina per {order}",
+  "sortByName": "Nome",
+  "sortByLastUsed": "Ultimo utilizzo",
+  "sortByCreated": "Creazione",
+  "selectDocument": "Seleziona",
+  "deselectDocument": "Deseleziona",
+  "documentSelected": "Selezionato",
+  "selectAllDocuments": "Seleziona tutto",
+  "clearDocumentSelection": "Cancella selezione",
+  "selectedDocuments": {
+    "one": "{count} selezionato",
+    "many": "{count} selezionati"
+  },
+  "selectionActions": "File selezionati",
+  "openSelectedDocuments": "Apri",
+  "removeFromRecents": "Rimuovi dai recenti",
+  "saveDocumentAs": "Salva con nome…",
+  "savedDocumentAs": "Copia salvata come «{name}».",
+  "saveDocumentAsFailed": "Impossibile salvare una copia di «{name}». {error}",
+  "designSystems": "Design system",
+  "designSystemsDescription": "Inizia un nuovo design con i componenti di una libreria pubblicata.",
+  "noDesignSystems": "Ancora nessun design system",
+  "noDesignSystemsDescription": "Pubblica una libreria dal pannello Risorse di un documento per iniziare qui nuovi design con essa.",
+  "designSystemComponents": {
+    "one": "{count} componente",
+    "many": "{count} componenti"
+  },
+  "newDesignWith": "Nuovo design con {name}",
+  "loadingDesignSystems": "Caricamento dei design system…",
   "saveAsPrompt": "Salva con nome:",
-  "browserFileAPINotSupported": "Il browser non supporta l’API dei file locali. I file verranno scaricati anziché salvati nella posizione corrente."
+  "browserFileAPINotSupported": "Il browser non supporta l’API dei file locali. I file verranno scaricati anziché salvati nella posizione corrente.",
+  "fileChangedOnDisk": "«{name}» è stato modificato sul disco",
+  "fileChangedOnDiskDescription": "Un’altra app ha modificato questo file mentre hai modifiche non salvate. Ricaricalo per aprire la versione del file ed eliminare le tue modifiche, oppure ignora la modifica e continua a lavorare. Il salvataggio sostituirà il file con la tua versione.",
+  "reloadFromDisk": "Ricarica",
+  "ignoreDiskChange": "Ignora"
 }

@@ -1,5 +1,7 @@
 import { computed, onScopeDispose, ref, watch, type Ref } from 'vue'
 
+import { panelMessages } from '@open-pencil/vue/i18n'
+
 import type { EditorStore } from '@/app/editor/session'
 import { notificationMessages } from '@/app/i18n/notifications'
 import { createActiveStorageAdapter, storagePreferencesComplete } from '@/app/integrations/storage'
@@ -127,6 +129,26 @@ export function useLibraryManager(
     }
   }
 
+  /** Points a missing library's components at another library, then says what moved. */
+  async function relinkLibrary(fromLibraryId: string, toLibraryId: string) {
+    applying.value = `relink:${fromLibraryId}`
+    try {
+      await runOperation(async () => {
+        const result = await service.relink(editor, fromLibraryId, toLibraryId)
+        const messages = panelMessages.get()
+        const relinked = messages.libraryRelinked(result.relinkedInstanceCount)
+        toast.info(
+          result.unmatched.length > 0
+            ? messages.libraryRelinkedUnmatched({ relinked, names: result.unmatched.join(', ') })
+            : relinked
+        )
+        await refresh()
+      })
+    } finally {
+      applying.value = null
+    }
+  }
+
   async function updateAll() {
     applying.value = 'all'
     try {
@@ -173,6 +195,7 @@ export function useLibraryManager(
     toggleLibrary,
     preferLibrary,
     updateAsset,
-    updateAll
+    updateAll,
+    relinkLibrary
   }
 }

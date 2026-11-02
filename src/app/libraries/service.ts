@@ -35,6 +35,13 @@ import {
   writeLibraryCatalogSource,
   writeLibraryPriority
 } from '@/app/libraries/preferences'
+import {
+  findMissingLibraries,
+  relinkMissingLibrary,
+  unlessMissing,
+  type LibraryRelinkResult,
+  type MissingLibrary
+} from '@/app/libraries/relink'
 import type { LibraryAssetUpdateGroup } from '@/app/libraries/update-groups'
 
 export type EnabledLibraryAsset = ComponentCatalogLibraryAsset
@@ -46,6 +53,7 @@ export class LibraryService implements ComponentCatalog {
   readonly #enabledAssets = shallowRef<EnabledLibraryAsset[]>([])
   readonly #updates = shallowRef<LibraryUpdateSummary[]>([])
   readonly #updateImpacts = shallowRef(new Map<string, LibraryUpdateImpact>())
+  readonly #missing = shallowRef<MissingLibrary[]>([])
   readonly #revisionCache = new Map<string, ComponentLibraryRevision>()
   #activeEditor: EditorStore | null = null
 
@@ -88,6 +96,11 @@ export class LibraryService implements ComponentCatalog {
 
   get updateImpacts() {
     return this.#updateImpacts
+  }
+
+  /** Enabled libraries the catalog cannot provide, from the last refresh. */
+  get missing() {
+    return this.#missing
   }
 
   async listLibraries(): Promise<LibrarySummary[]> {
@@ -156,10 +169,14 @@ export class LibraryService implements ComponentCatalog {
   async refresh(editor: EditorStore): Promise<void> {
     this.#activeEditor = editor
     this.#summaries.value = await this.#catalog.listLibraries()
+    const available = new Set<string>()
     const assets: EnabledLibraryAsset[] = []
     for (const binding of editor.graph.enabledLibraries.values()) {
       if (!binding.enabled) continue
-      const revision = await this.#getRevision(binding.libraryId, binding.revisionId)
+      // A library, or the revision this document uses, that no catalog can read is missing.
+      const revision = await unlessMissing(this.#getRevision(binding.libraryId, binding.revisionId))
+      if (!revision) continue
+      available.add(binding.libraryId)
       assets.push(
         ...revision.manifest.assets.map((asset) => ({
           libraryId: binding.libraryId,
@@ -172,6 +189,7 @@ export class LibraryService implements ComponentCatalog {
       )
     }
     this.#enabledAssets.value = assets
+    this.#missing.value = findMissingLibraries(editor.graph, available)
     await this.refreshUpdates(editor)
   }
 
@@ -181,8 +199,9 @@ export class LibraryService implements ComponentCatalog {
     )
     const updates: LibraryUpdateSummary[] = []
     const impacts = new Map<string, LibraryUpdateImpact>()
+    const missing = new Set(this.#missing.value.map((library) => library.libraryId))
     for (const binding of editor.graph.enabledLibraries.values()) {
-      if (!binding.enabled) continue
+      if (!binding.enabled || missing.has(binding.libraryId)) continue
       const latestId = summariesById.get(binding.libraryId)?.latestRevisionId
       if (!latestId || latestId === binding.revisionId) continue
       const current = await this.#getRevision(binding.libraryId, binding.revisionId)
@@ -219,15 +238,11 @@ export class LibraryService implements ComponentCatalog {
     let appliedPlans: ReturnType<typeof planLibraryInstanceUpdates> = []
     let createdRootIds: string[] = []
     const applyRevision = () => {
-      const existingNodeIds = new Set(editor.graph.nodes.keys())
-      for (const asset of updatable) this.#materializeAsset(editor, latest, asset.key)
-      createdRootIds = [...editor.graph.getAllNodes()]
-        .filter((node) => {
-          if (existingNodeIds.has(node.id)) return false
-          const parent = node.parentId ? editor.graph.getNode(node.parentId) : undefined
-          return !parent || existingNodeIds.has(parent.id)
-        })
-        .map((node) => node.id)
+      createdRootIds = this.#materializeAssets(
+        editor,
+        latest,
+        updatable.map((asset) => asset.key)
+      )
       appliedPlans = planLibraryInstanceUpdates(
         editor.graph,
         libraryId,
@@ -266,6 +281,26 @@ export class LibraryService implements ComponentCatalog {
       inverse: restorePrevious
     })
     await this.refresh(editor)
+  }
+
+  /**
+   * Points a missing library's assets at the chosen library's latest revision, as one undoable
+   * step; see `relinkMissingLibrary`.
+   */
+  async relink(
+    editor: EditorStore,
+    fromLibraryId: string,
+    toLibraryId: string
+  ): Promise<LibraryRelinkResult> {
+    const revision = await this.#getRevision(toLibraryId)
+    const result = relinkMissingLibrary({
+      editor,
+      fromLibraryId,
+      revision,
+      materialize: (assetKeys) => this.#materializeAssets(editor, revision, assetKeys)
+    })
+    await this.refresh(editor)
+    return result
   }
 
   async applyInstanceUpdate(editor: EditorStore, instanceId: string): Promise<void> {
@@ -313,10 +348,7 @@ export class LibraryService implements ComponentCatalog {
         if (!assetKey || !latestAsset) continue
         let previousAssets = previousAssetsByRevision.get(identity.revisionId)
         if (!previousAssets) {
-          const previous = await this.#getRevision(summary.libraryId, identity.revisionId)
-          previousAssets = new Map(
-            previous.manifest.assets.map((asset) => [asset.key, asset.contentHash])
-          )
+          previousAssets = await this.#assetHashes(summary.libraryId, identity.revisionId)
           previousAssetsByRevision.set(identity.revisionId, previousAssets)
         }
         if (previousAssets.get(assetKey) === latestAsset.contentHash) continue
@@ -538,6 +570,32 @@ export class LibraryService implements ComponentCatalog {
     const result = this.#materializeAsset(editor, revision, assetKey)
     editor.requestRender()
     return result
+  }
+
+  /**
+   * Each asset's content hash in a revision. A revision the catalog no longer has has none, so
+   * its assets' latest versions are offered as updates.
+   */
+  async #assetHashes(libraryId: string, revisionId: string): Promise<Map<string, string>> {
+    const revision = await unlessMissing(this.#getRevision(libraryId, revisionId))
+    return new Map(revision?.manifest.assets.map((asset) => [asset.key, asset.contentHash]))
+  }
+
+  /** Copies a revision's assets into the document and returns the roots it created. */
+  #materializeAssets(
+    editor: EditorStore,
+    revision: ComponentLibraryRevision,
+    assetKeys: string[]
+  ): string[] {
+    const existingNodeIds = new Set(editor.graph.nodes.keys())
+    for (const assetKey of assetKeys) this.#materializeAsset(editor, revision, assetKey)
+    return [...editor.graph.getAllNodes()]
+      .filter((node) => {
+        if (existingNodeIds.has(node.id)) return false
+        const parent = node.parentId ? editor.graph.getNode(node.parentId) : undefined
+        return !parent || existingNodeIds.has(parent.id)
+      })
+      .map((node) => node.id)
   }
 
   /** Copies a library asset into the document, which enables its library, and announces that. */

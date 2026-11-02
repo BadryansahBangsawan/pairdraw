@@ -37,6 +37,8 @@ openpencil export design.fig -f html --html standalone --assets external
 
 Der eigenständige HTML-Export wird sofort mit Tailwind kompiliert und benötigt keine Browser-Laufzeit. `--assets external` schreibt CSS und Bilder neben die HTML-Datei. `--fonts assets` speichert aufgelöste Webschriften als lokale `@font-face`-Dateien.
 
+Der HTML-Export schreibt den Namen jeder Ebene als Attribut `data-name`. `--no-layer-names` lässt die Namen weg, und `--layer-ids` ergänzt die ID jeder Ebene als `data-open-pencil-node-id` für Werkzeuge, die das Markup zurück auf das Dokument beziehen.
+
 Der HTML-Export dient Übergabe und Weiterverarbeitung, nicht als pixelgenauer Ersatz für die Darstellung auf der Arbeitsfläche.
 
 ## Storybook

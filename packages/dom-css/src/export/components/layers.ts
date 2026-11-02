@@ -44,9 +44,10 @@ export async function layerComponents(
     const layer = graph.getNode(layerId)
     if (!layer) continue
     const name = claimName(identifierName(layer.name, 'Component'), taken)
-    const model = componentModel(graph, layer, { ...options, name })
+    // No other layer is a generated component here, but icons from a set are still used.
+    const model = componentModel(graph, layer, { ...options, name, references: new Map() })
     if (!model) continue
-    const { files } = await generate(model, { styling: options.styling })
+    const { files } = await generate(model, { styling: options.styling, icons: options.icons })
     components.push({ name, layerId, files })
   }
   return components

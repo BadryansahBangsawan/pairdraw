@@ -46,6 +46,8 @@ defineSlots<{
   action(props: { action: ToolbarAction }): unknown
   /** Pickers whose buttons are hidden, anchored to the toolbar's top edge. */
   hidden(): unknown
+  /** Fixed buttons after the layout's own, which Customize toolbar does not move or hide. */
+  end(): unknown
 }>()
 </script>
 
@@ -88,6 +90,7 @@ defineSlots<{
           </Tip>
         </ToolbarItem>
       </template>
+      <slot name="end" />
     </ToolbarRoot>
     <slot name="hidden" />
   </div>

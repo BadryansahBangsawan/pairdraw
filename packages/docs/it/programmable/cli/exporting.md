@@ -25,6 +25,8 @@ SVG conserva la geometria vettoriale ed è adatto a icone, revisione e modifiche
 
 L’esportazione HTML crea un documento autonomo con struttura e stili disponibili. È pensata per consegna, ispezione ed elaborazioni successive, non come sostituto identico del rendering CanvasKit. È disponibile solo lavorando su file.
 
+L’esportazione HTML scrive il nome di ogni livello nell’attributo `data-name`. `--no-layer-names` omette i nomi e `--layer-ids` aggiunge l’ID di ogni livello come `data-open-pencil-node-id` per gli strumenti che collegano il markup al documento.
+
 ## Tailwind JSX
 
 Per esportare JSX con classi di utilità Tailwind:

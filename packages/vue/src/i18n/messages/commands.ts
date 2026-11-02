@@ -12,6 +12,7 @@ export const commandMessageDefaults = {
   frameSelection: 'Frame selection',
   ungroup: 'Ungroup',
   createComponent: 'Create component',
+  convertToFrame: 'Convert to frame',
   createSlot: 'Create slot',
   createComponentSet: 'Create component set',
   createInstance: 'Create instance',
@@ -71,7 +72,17 @@ export const commandMessageDefaults = {
   paletteSearchAriaLabel: 'Search commands',
   paletteDescription: 'Search and run Pairdraw commands.',
   paletteNoCommands: 'No commands found.',
-  paletteBack: 'Back'
+  paletteBack: 'Back',
+  shortcutSheet: 'Keyboard shortcuts',
+  shortcutSheetDescription: 'Keys that work while the canvas has focus.',
+  shortcutSheetSearch: 'Search shortcuts',
+  shortcutSheetEmpty: 'No shortcuts found.',
+  shortcutSheetTools: 'Tools',
+  shortcutSheetCanvas: 'Canvas and selection',
+  toggleAIChat: 'Show or hide AI chat',
+  nudgeSelection: 'Nudge selection',
+  nudgeSelectionFurther: 'Nudge selection further',
+  panWhileHeld: 'Pan while held'
 } as const
 
 export const commandMessages = i18n('commands', commandMessageDefaults)

@@ -14,7 +14,7 @@
   "vectorizeCredentialRequired": "Добавьте API-ключ {provider} в Настройки → Сервисы изображений.",
   "vectorizeImageMissing": "Для этого слоя отсутствуют данные изображения.",
   "vectorizingImage": "Векторизация изображения…",
-  "imageConvertedToVectors": "Изображение преобразовано в векторы.",
+  "imageConvertedToVectors": "Векторы добавлены рядом с изображением.",
   "vectorizeCredentialFailed": "{error}. Обновите ключ в Настройки → Сервисы изображений.",
   "vectorizeFailed": "{provider} не смог векторизовать это изображение: {error}",
   "operationFailed": "Не удалось выполнить операцию: {error}",
@@ -32,5 +32,9 @@
   "tokensLeftOut": "Не вошли в таблицу стилей: {names}.",
   "designTokensLeftOut": "Не вошли в дизайн-токены: {names}.",
   "designTokensImported": "Импортировано дизайн-токенов: {count}.",
-  "unsupportedVariableExpressions": "Pairdraw пока не умеет вычислять эти переменные, поэтому слои сохраняют значения из файла: {names}."
+  "unsupportedVariableExpressions": "Pairdraw пока не умеет вычислять эти переменные, поэтому слои сохраняют значения из файла: {names}.",
+  "placeImageUnsupported": "Выберите файл PNG, JPEG, WebP, GIF, AVIF или SVG, чтобы поместить его.",
+  "placeImageFailed": "Не удалось поместить файлы: {error}",
+  "exportPDFEmpty": "На этой странице нет фреймов для экспорта.",
+  "exportPDFFailed": "Не удалось экспортировать PDF: {error}"
 }

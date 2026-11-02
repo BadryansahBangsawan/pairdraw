@@ -15,6 +15,7 @@ import { CODEGEN_PROMPT } from '@open-pencil/core/tools'
 
 import type { RPCJSONObject } from '#mcp/json'
 import { MAX_RESULT_BYTES, fail, ok, resultTooLargeMessage } from '#mcp/result'
+import { SKILL_FILE_PATHS, SKILL_FILES, type SkillFilePath } from '#mcp/skill/content'
 import { createToolDescriptors, getMCPToolDefinitions } from '#mcp/tool/manifest'
 import type { ToolDescriptor, ToolEffect, ToolPolicy } from '#mcp/tool/metadata'
 import { resolveSafePath, writeToolOutput, writesFileOutput } from '#mcp/tool/output'
@@ -497,5 +498,23 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
       inputSchema: v.strictObject({})
     },
     async () => ok({ prompt: CODEGEN_PROMPT })
+  )
+
+  register(
+    'read_skill',
+    {
+      inputSchema: v.strictObject({
+        path: v.optional(
+          v.pipe(
+            v.picklist(SKILL_FILE_PATHS),
+            v.description('File inside the skill, as SKILL.md links it. Defaults to SKILL.md.')
+          )
+        )
+      })
+    },
+    // Markdown goes back as is: wrapped in JSON, its code examples would arrive escaped.
+    async (args: { path?: SkillFilePath }) => ({
+      content: [{ type: 'text' as const, text: SKILL_FILES[args.path ?? 'SKILL.md'].text }]
+    })
   )
 }

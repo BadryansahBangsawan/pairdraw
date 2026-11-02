@@ -418,53 +418,6 @@ export function deleteVectorParts(
   return { vertices: nextVertices, segments: nextSegments, regions: nextRegions }
 }
 
-// Break network at vertex
-// ---------------------------------------------------------------------------
-
-/**
- * Break the network at a vertex — duplicates the vertex so connected
- * segments are split into two groups. For closed paths this "opens" them.
- */
-export function breakAtVertex(network: VectorNetwork, vertexIndex: number): VectorNetwork {
-  const { vertices, segments } = network
-
-  // Find connected segments and split them into "incoming" and "outgoing"
-  const incoming: number[] = []
-  const outgoing: number[] = []
-
-  for (let i = 0; i < segments.length; i++) {
-    const s = segments[i]
-    if (s.end === vertexIndex) incoming.push(i)
-    else if (s.start === vertexIndex) outgoing.push(i)
-  }
-
-  // If vertex has connections in only one direction, nothing to break
-  if (incoming.length === 0 || outgoing.length === 0) return network
-
-  // Duplicate the vertex
-  const dupIndex = vertices.length
-  const newVertices = [...vertices, { ...vertices[vertexIndex] }]
-
-  // Redirect all outgoing segments to the duplicate
-  const newSegments = segments.map((s, i) => {
-    if (outgoing.includes(i)) {
-      return { ...s, start: dupIndex }
-    }
-    return { ...s }
-  })
-
-  // Clear tangent handles at the break point
-  for (const i of incoming) {
-    newSegments[i] = { ...newSegments[i], tangentEnd: { x: 0, y: 0 } }
-  }
-  for (const i of outgoing) {
-    newSegments[i] = { ...newSegments[i], tangentStart: { x: 0, y: 0 } }
-  }
-
-  // Remove all regions (breaking always opens the path)
-  return { vertices: newVertices, segments: newSegments, regions: [] }
-}
-
 // ---------------------------------------------------------------------------
 // Region loop helpers
 // ---------------------------------------------------------------------------

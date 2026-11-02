@@ -1,5 +1,6 @@
 import {
   isLibraryRevisionIntegrityError,
+  isLibraryRevisionNotFoundError,
   type ComponentLibraryRevision,
   type LibraryCatalog,
   type LibrarySummary,
@@ -53,7 +54,14 @@ export class RoutedLibraryCatalog implements LibraryCatalog {
     } catch (error) {
       if (isLibraryRevisionIntegrityError(error)) throw error
       console.warn('[Libraries] Remote revision unavailable, using cached revision', error)
-      return this.#local.getRevision(libraryId, revisionId)
+      try {
+        return await this.#local.getRevision(libraryId, revisionId)
+      } catch (localError) {
+        // Without a cached copy the remote failure is the reason, unless the remote has none.
+        if (isLibraryRevisionNotFoundError(localError) && !isLibraryRevisionNotFoundError(error))
+          throw error
+        throw localError
+      }
     }
   }
 

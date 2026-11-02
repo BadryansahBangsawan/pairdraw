@@ -38,6 +38,7 @@ import {
   type ItemBuilder,
   type ItemKind
 } from './groups'
+import type { IconPackage } from './icons'
 import {
   booleanProps,
   slotProps,
@@ -210,6 +211,8 @@ export interface GeneratedComponent {
 export interface ComponentGeneratorOptions {
   /** A stylesheet beside the component, by default, or Tailwind utilities in its markup. */
   styling?: ComponentStyling
+  /** The package icons come from; Iconify by default, and for any icon the package lacks. */
+  icons?: IconPackage
 }
 
 export type ComponentGenerator = (

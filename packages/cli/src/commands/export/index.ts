@@ -48,6 +48,8 @@ export interface ExportArgs {
   css: string
   assets: string
   fonts?: string
+  'layer-names': boolean
+  'layer-ids': boolean
   framework: string
   'design-images': boolean
   watch?: boolean
@@ -201,7 +203,14 @@ async function executeFileExport(
 function exportOptions(format: string, args: ExportArgs): unknown {
   if (format === 'FIG') return { renderThumbnail: true }
   if (format === 'HTML')
-    return { html: args.html, style: args.css, assets: args.assets, fonts: args.fonts ?? 'none' }
+    return {
+      html: args.html,
+      style: args.css,
+      assets: args.assets,
+      fonts: args.fonts ?? 'none',
+      layerNames: args['layer-names'],
+      layerIds: args['layer-ids']
+    }
   if (formatSupportsScale(format))
     return {
       format,
@@ -329,6 +338,17 @@ export default defineCommand({
       type: 'string',
       description:
         'HTML and Storybook font files: assets or none (default: none for HTML, assets for Storybook)'
+    },
+    'layer-names': {
+      type: 'boolean',
+      description: 'HTML: write each layer name as a data-name attribute (default: true)',
+      default: true
+    },
+    'layer-ids': {
+      type: 'boolean',
+      description:
+        'HTML: write each layer ID as a data-open-pencil-node-id attribute (default: false)',
+      default: false
     },
     framework: {
       type: 'string',

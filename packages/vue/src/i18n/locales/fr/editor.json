@@ -14,5 +14,7 @@
   "resetPreview": "Réinitialiser",
   "leavePreview": "Quitter l’aperçu ({shortcut})",
   "toggleAIChat": "Chat IA ({shortcut})",
-  "startPreview": "Aperçu ({shortcut})"
+  "startPreview": "Aperçu ({shortcut})",
+  "toggleLayersPanel": "Panneau des calques",
+  "togglePropertiesPanel": "Panneau des propriétés"
 }

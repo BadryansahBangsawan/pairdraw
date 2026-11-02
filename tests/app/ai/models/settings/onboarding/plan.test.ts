@@ -77,6 +77,19 @@ describe('planOnboarding', () => {
     expect(plan.design).toMatchObject({ providerID: 'openai' })
   })
 
+  test('ignores API accounts the browser cannot reach outside the desktop app', () => {
+    const access: OnboardingAnswers['access'] = ['kimi-for-coding', 'opencode-zen', 'opencode-go']
+    const companion = { agentsAvailable: true, desktop: false }
+    for (const options of [browser, companion]) {
+      const plan = planOnboarding(answers({ goals: ['design', 'vision'], access }), options)
+      expect(plan.design).toBeNull()
+      expect(plan.connections).toEqual([])
+    }
+    const onDesktop = planOnboarding(answers({ access }), { agentsAvailable: true, desktop: true })
+    expect(onDesktop.design).toMatchObject({ providerID: 'kimi-for-coding' })
+    expect(onDesktop.connections).toEqual(access)
+  })
+
   test('reuses a vision-capable design model for visual review', () => {
     const plan = planOnboarding(
       answers({ goals: ['design', 'vision'], access: ['anthropic'] }),

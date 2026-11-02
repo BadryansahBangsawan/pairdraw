@@ -35,6 +35,41 @@
   "deleteDocumentConfirmation": "删除“{name}”？",
   "deleteDocumentDescription": "该文档将对所有可以打开它的人删除。此操作无法撤销。",
   "deleteDocumentFailed": "无法删除“{name}”。请重试。",
+  "deleteDocumentsConfirmation": {
+    "many": "删除 {count} 个文档？"
+  },
+  "deleteDocumentsDescription": "这些文档将对所有可以打开它们的人删除。此操作无法撤销。",
+  "sortFiles": "排序方式：{order}",
+  "sortByName": "名称",
+  "sortByLastUsed": "上次使用",
+  "sortByCreated": "创建时间",
+  "selectDocument": "选择",
+  "deselectDocument": "取消选择",
+  "documentSelected": "已选择",
+  "selectAllDocuments": "全选",
+  "clearDocumentSelection": "清除选择",
+  "selectedDocuments": {
+    "many": "已选择 {count} 个"
+  },
+  "selectionActions": "所选文件",
+  "openSelectedDocuments": "打开",
+  "removeFromRecents": "从最近使用中移除",
+  "saveDocumentAs": "另存为…",
+  "savedDocumentAs": "已将副本另存为“{name}”。",
+  "saveDocumentAsFailed": "无法保存“{name}”的副本。{error}",
+  "designSystems": "设计系统",
+  "designSystemsDescription": "使用已发布库中的组件开始新设计。",
+  "noDesignSystems": "还没有设计系统",
+  "noDesignSystemsDescription": "在文档的资源面板中发布库后，即可在此用它开始新设计。",
+  "designSystemComponents": {
+    "many": "{count} 个组件"
+  },
+  "newDesignWith": "使用 {name} 新建设计",
+  "loadingDesignSystems": "正在加载设计系统…",
   "saveAsPrompt": "另存为：",
-  "browserFileAPINotSupported": "你的浏览器不支持本地文件 API。文件将被下载，而不是保存在原位置。"
+  "browserFileAPINotSupported": "你的浏览器不支持本地文件 API。文件将被下载，而不是保存在原位置。",
+  "fileChangedOnDisk": "“{name}”已在磁盘上更改",
+  "fileChangedOnDiskDescription": "在你有未保存的编辑时，另一个应用更改了此文件。重新加载会打开文件中的版本并丢弃你的编辑；忽略则可继续编辑，保存时会用你的版本替换该文件。",
+  "reloadFromDisk": "重新加载",
+  "ignoreDiskChange": "忽略"
 }

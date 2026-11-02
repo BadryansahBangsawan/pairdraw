@@ -292,11 +292,13 @@ export const es: LandingMessages = {
     },
     formats: {
       dmg: 'Imagen de disco',
+      zip: 'App en un archivo zip',
       exe: 'Instalador',
       msi: 'Para instalaciones gestionadas',
       appimage: 'Funciona en la mayoría de distribuciones',
       deb: 'Debian, Ubuntu',
-      rpm: 'Fedora, openSUSE'
+      rpm: 'Fedora, openSUSE',
+      'tar.gz': 'Se ejecuta desde cualquier carpeta, sin instalar'
     },
     requirements: 'Requisitos del sistema',
     allTitle: 'Todas las descargas',

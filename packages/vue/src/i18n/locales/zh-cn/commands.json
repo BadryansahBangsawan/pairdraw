@@ -7,6 +7,7 @@
   "group": "编组",
   "ungroup": "取消编组",
   "createComponent": "创建组件",
+  "convertToFrame": "转换为画框",
   "createSlot": "创建插槽",
   "createComponentSet": "创建组件集",
   "createInstance": "创建实例",
@@ -69,5 +70,15 @@
   "paletteSearchAriaLabel": "搜索命令",
   "paletteDescription": "搜索并运行 Pairdraw 命令。",
   "paletteNoCommands": "未找到命令。",
-  "paletteBack": "返回"
+  "paletteBack": "返回",
+  "shortcutSheet": "键盘快捷键",
+  "shortcutSheetDescription": "画布获得焦点时可用的按键。",
+  "shortcutSheetSearch": "搜索快捷键",
+  "shortcutSheetEmpty": "未找到快捷键。",
+  "shortcutSheetTools": "工具",
+  "shortcutSheetCanvas": "画布与选择",
+  "toggleAIChat": "显示或隐藏 AI 聊天",
+  "nudgeSelection": "微移所选内容",
+  "nudgeSelectionFurther": "大幅移动所选内容",
+  "panWhileHeld": "按住时平移视图"
 }

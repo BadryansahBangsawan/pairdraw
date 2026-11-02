@@ -8,6 +8,7 @@ import { camelCase, upperFirst } from 'es-toolkit/string'
 import { es, jsx } from '@open-pencil/emit'
 import type { ShaderComponent } from '@open-pencil/scene-graph/shaders'
 
+import { drawingImports, iconDrawing, iconImportDeclarations, iconNamer } from '../icons'
 import type {
   ComponentElement,
   ComponentGenerator,
@@ -16,7 +17,7 @@ import type {
   ComponentNode,
   GeneratedKind
 } from '../model'
-import type { ComponentReference } from '../references'
+import type { ComponentReference, IconReference } from '../references'
 import {
   drawnEffects,
   SHADER_CANVAS,
@@ -120,6 +121,30 @@ const disabledFlag = (kind: GeneratedKind) =>
 /** The Iconify component, named apart from any component the design calls `Icon`. */
 const ICONIFY = 'IconifyIcon'
 
+/** An icon: its package's own component where it has the icon, Iconify's otherwise. */
+function iconElement(node: IconReference, uses: MarkupUses, depth: number): es.SyntaxNode {
+  const className = jsx.attribute('className', classValue(uses.classOf(node.className)))
+  const found = iconDrawing(node.icon, uses.iconPackage, 'react')
+  const drawn = found && uses.nameIcon(found)
+  if (!drawn) {
+    uses.icons = true
+    return jsx.element(
+      ICONIFY,
+      [jsx.attribute('icon', jsx.stringValue(node.icon)), className],
+      [],
+      depth
+    )
+  }
+  uses.iconImports.push(...drawingImports(drawn))
+  if (drawn.type === 'component') return jsx.element(drawn.import.local, [className], [], depth)
+  return jsx.element(
+    drawn.component.local,
+    [jsx.attribute('icon', jsx.container(es.identifier(drawn.import.local))), className],
+    [],
+    depth
+  )
+}
+
 /** `defaultChecked`: Radix's uncontrolled value, which a nested control starts from. */
 const defaultOf = (model: string) => `default${upperFirst(model)}`
 
@@ -154,22 +179,7 @@ function element(node: ComponentNode, uses: MarkupUses, depth: number): es.Synta
   if (node.type === 'reference') return reference(node, uses, depth)
   if (node.type === 'input')
     return drawing(inputElement(node.className, uses, depth), node.layerId, uses)
-  if (node.type === 'icon') {
-    uses.icons = true
-    return drawing(
-      jsx.element(
-        ICONIFY,
-        [
-          jsx.attribute('icon', jsx.stringValue(node.icon)),
-          jsx.attribute('className', classValue(uses.classOf(node.className)))
-        ],
-        [],
-        depth
-      ),
-      node.layerId,
-      uses
-    )
-  }
+  if (node.type === 'icon') return drawing(iconElement(node, uses, depth), node.layerId, uses)
   return designElement(node, uses, depth)
 }
 
@@ -512,11 +522,20 @@ export const reactComponent: ComponentGenerator = async (component, options = {}
     components: new Set(),
     layers: new WeakMap(),
     icons: false,
+    iconPackage: options.icons ?? 'iconify',
+    iconImports: [],
+    nameIcon: iconNamer(component, [
+      ICONIFY,
+      'styles',
+      `${component.name}Props`,
+      ...(radix ? [radix.namespace, PRIMITIVE(radix.namespace)] : [])
+    ]),
     shaders: new Set()
   }
   const body = element(component.tree, uses, 1)
   const imports = [
     ...(uses.icons ? ICONIFY_IMPORT : []),
+    ...iconImportDeclarations(uses.iconImports),
     ...(uses.shaders.size > 0 ? [shaderImport('shaders/react', uses.shaders)] : []),
     ...(radix
       ? es.fill(RADIX_IMPORT, {

@@ -3,6 +3,7 @@ import type { BuiltinIOFormatId, ExportRequest, IORegistry } from '@open-pencil/
 
 import {
   bundleExportFiles,
+  createExportNameClaimer,
   createExportTargetActions,
   getExportBaseName,
   getExportBytes,
@@ -31,34 +32,63 @@ export function createDocumentExportActions(
   const { renderExportImage, getSelectionExportTarget, listSelectionExportFormats } =
     createExportTargetActions(editor, state, io)
 
+  /**
+   * Renders one export. `claimName` settles its file name before it renders, so assets named
+   * after the file, such as an HTML page's `<name>.assets/` folder, stay apart from another's.
+   */
   async function renderExportFile(
     target: ExportRequest['target'],
     formatId: string,
-    options?: ExportOptions
+    options?: ExportOptions,
+    claimName: (fileName: string) => string = createExportNameClaimer()
   ): Promise<ExportedFile> {
     const format = io.getFormat(formatId)
     if (!format) throw new Error(`Unknown export format: ${formatId}`)
 
     const exportOptions = getExportOptions(format, options)
+    const baseName = getExportBaseName(editor.graph, target)
+    const extension = format.extensions[0] ?? formatId
+    const fileName = claimName(getExportFileName(baseName, format, extension, options))
 
     const result = await io.exportContent(
       formatId,
-      { graph: editor.graph, target },
+      { graph: editor.graph, target, fileName },
       exportOptions,
       editor.renderer ? { canvasKit: editor.renderer.ck, renderer: editor.renderer } : undefined
     )
 
-    const baseName = getExportBaseName(editor.graph, target)
     return {
       bytes: getExportBytes(result.data),
-      fileName: getExportFileName(baseName, format, result.extension, options),
+      fileName,
       format: format.label,
       ext: `.${result.extension}`,
-      mime: result.mimeType
+      mime: result.mimeType,
+      assets: result.assets?.map(({ path, content }) => ({
+        path,
+        bytes: getExportBytes(content)
+      }))
     }
   }
 
+  /** The name a zip of `file` and its assets is saved as: the file's, ending in `.zip`. */
+  function zipName(file: ExportedFile): string {
+    return file.fileName.endsWith(file.ext)
+      ? `${file.fileName.slice(0, -file.ext.length)}.zip`
+      : `${file.fileName}.zip`
+  }
+
+  /** Saves a file, or a zip of it and the assets it refers to. */
   function saveExportFile(file: ExportedFile): Promise<boolean> {
+    if (file.assets && file.assets.length > 0) {
+      return saveExportedFile(
+        bundleExportFiles([file]),
+        zipName(file),
+        'ZIP',
+        '.zip',
+        'application/zip',
+        downloadBlob
+      )
+    }
     return saveExportedFile(
       file.bytes,
       file.fileName,
@@ -85,8 +115,11 @@ export function createDocumentExportActions(
     if (requests.length === 0) return
 
     const files: ExportedFile[] = []
+    const claimName = createExportNameClaimer()
     for (const request of requests) {
-      files.push(await renderExportFile(request.target, request.formatId, request.options))
+      files.push(
+        await renderExportFile(request.target, request.formatId, request.options, claimName)
+      )
     }
 
     const baseNames = new Set(requests.map((r) => getExportBaseName(editor.graph, r.target)))

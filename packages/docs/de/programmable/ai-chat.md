@@ -29,6 +29,14 @@ Mehrere Modelle können getrennt für Gestaltung, Prüfung, schnelle Aufgaben un
 | **DeepSeek**             | DeepSeek Flash und DeepSeek V4 Pro                                        | API-Schlüssel von [platform.deepseek.com](https://platform.deepseek.com/api_keys)                                |
 | **Z.ai**                 | GLM-5.3, GLM-5.3-Flash, GLM-5.3-FlashX und GLM-5V-Turbo                   | API-Schlüssel laut [Z.ai-Dokumentation](https://docs.z.ai/devpack/quick-start)                                   |
 | **MiniMax**              | MiniMax-M3.1-Flash und MiniMax-M3                                         | API-Schlüssel von [platform.minimax.io](https://platform.minimax.io/user-center/basic-information/interface-key) |
+| **xAI**                  | Grok 4.7, Grok 4.6, Grok Build 0.1                                        | API-Schlüssel von [console.x.ai](https://console.x.ai)                                                           |
+| **Meta**                 | Muse Spark 1.3, Muse Wonder                                               | API-Schlüssel von [dev.meta.ai](https://dev.meta.ai)                                                             |
+| **Kimi For Coding**      | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi For Coding                   | API-Schlüssel des Kimi-Code-Abos von [kimi.ai](https://www.kimi.ai/code/console). Nur in der Desktop-App.        |
+| **Moonshot AI**          | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi K3                           | API-Schlüssel von [platform.moonshot.ai](https://platform.moonshot.ai/console/api-keys)                          |
+| **Together AI**          | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Muse Spark Open                    | API-Schlüssel von [together.ai](https://api.together.ai/settings/api-keys)                                       |
+| **Fireworks AI**         | Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, MiniMax-M3.1-Flash                 | API-Schlüssel von [fireworks.ai](https://app.fireworks.ai/settings/users/api-keys)                               |
+| **OpenCode Zen**         | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Big Pickle                         | API-Schlüssel von [opencode.ai](https://opencode.ai/auth). Nur in der Desktop-App.                               |
+| **OpenCode Go**          | Kimi K3.1 Pro, MiniMax M3.1 Flash, GLM-5.3, DeepSeek V4.1 Flash           | API-Schlüssel des Go-Abos von [opencode.ai](https://opencode.ai/auth). Nur in der Desktop-App.                   |
 | **OpenAI-kompatibel**    | Endpunkt im OpenAI-API-Format                                             | Eigene Basisadresse und Schlüssel                                                                                |
 | **Anthropic-kompatibel** | Endpunkt im Anthropic-API-Format                                          | Eigene Basisadresse und Schlüssel                                                                                |
 

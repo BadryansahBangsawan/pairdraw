@@ -1,11 +1,11 @@
 ---
 title: MCP Server
-description: Connect Claude Code, Cursor, Windsurf, and other MCP clients to OpenPencil for AI-assisted design inspection and editing.
+description: Connect Claude Code, Codex, VS Code Copilot, Antigravity, Hermes Agent, Cursor, and other MCP clients to OpenPencil for AI-assisted design inspection and editing.
 ---
 
 # MCP Server
 
-OpenPencil includes an MCP (Model Context Protocol) server that lets AI coding tools — Claude Code, Cursor, Windsurf, etc. — read and modify designs through the running app.
+OpenPencil includes an MCP (Model Context Protocol) server that lets AI coding tools — Claude Code, Codex, GitHub Copilot in VS Code, Antigravity, Hermes Agent, Cursor, Windsurf, etc. — read and modify designs through the running app.
 
 Two transports: **stdio** for MCP clients, and **Streamable HTTP** for browser extensions and scripts. On macOS and Linux, local clients prefer a private Unix domain socket; Windows and unavailable sockets fall back to localhost TCP.
 
@@ -43,9 +43,11 @@ This surface does **not** expose structural creation/deletion, arbitrary JavaScr
 npm install -g @open-pencil/mcp
 ```
 
-## Stdio (Claude Code, Cursor, etc.)
+## Stdio (Claude Code, Codex, VS Code, etc.)
 
 The stdio server discovers the running OpenPencil app automatically. It prefers the app's Unix domain socket on macOS and Linux and falls back to localhost TCP when needed. Make sure the desktop app is open with a document loaded.
+
+Every client below starts the same command, `openpencil-mcp`, from `npm install -g @open-pencil/mcp`. Name the server `open-pencil` so tool names and the examples here match.
 
 ### Claude Code
 
@@ -79,6 +81,76 @@ Example prompt:
 ```text
 Use the open-pencil MCP server to inspect the current page and create a small hero section on the canvas.
 ```
+
+Type `/mcp__open-pencil__design` to load the [design skill](#design-skill) into the conversation, or mention `@open-pencil:openpencil://skills/open-pencil/SKILL.md` to attach it.
+
+### Codex
+
+Register the server with the Codex CLI:
+
+```sh
+codex mcp add open-pencil -- openpencil-mcp
+```
+
+This writes the entry to `~/.codex/config.toml`, where you can also add it by hand:
+
+```toml
+[mcp_servers.open-pencil]
+command = "openpencil-mcp"
+```
+
+Run `/mcp` in Codex to check the connection. The Codex IDE extension reads the same file. Codex follows the server's instructions, which tell it to call `read_skill` before designing.
+
+### GitHub Copilot in VS Code
+
+Add the server to the workspace's `.vscode/mcp.json`. VS Code uses a `servers` key, not `mcpServers`:
+
+```json
+{
+  "servers": {
+    "open-pencil": {
+      "type": "stdio",
+      "command": "openpencil-mcp"
+    }
+  }
+}
+```
+
+To add it to your user profile instead, run:
+
+```sh
+code --add-mcp '{"name":"open-pencil","type":"stdio","command":"openpencil-mcp"}'
+```
+
+Start the server from the `mcp.json` editor or with **MCP: List Servers**, then use the tools from Copilot Chat in agent mode. Type `/open-pencil.design` to load the [design skill](#design-skill), or attach its files from **Add Context** → **MCP Resources**.
+
+### Antigravity
+
+In the Agent panel, open the **…** menu and choose **MCP Servers** → **Manage MCP Servers** → **View raw config**. Add the server to `mcp_config.json` and save:
+
+```json
+{
+  "mcpServers": {
+    "open-pencil": {
+      "command": "openpencil-mcp"
+    }
+  }
+}
+```
+
+Keep any servers already in the file. Refresh the list in **Manage MCP Servers** to connect.
+
+### Hermes Agent
+
+Add the server under `mcp_servers` in `~/.hermes/config.yaml`:
+
+```yaml
+mcp_servers:
+  open-pencil:
+    command: "openpencil-mcp"
+```
+
+Run `/reload-mcp` in a running session, or start a new one. Hermes also offers the server's resources and prompts as tools, so the agent can read the [design skill](#design-skill) through `read_skill` or the resources.
 
 ### Other MCP clients
 
@@ -173,6 +245,17 @@ npx skills add open-pencil/open-pencil
 ```
 
 Works with Claude Code, Cursor, Windsurf, Codex, and any agent that supports [skills](https://skills.sh). The skill covers the CLI, MCP tools, JSX rendering, eval, and the running app's automation bridge.
+
+### Design skill over MCP {#design-skill}
+
+Clients that cannot install skills read the same skill from the server, which embeds the copy it was released with:
+
+- **Instructions** — when a client connects, the server tells it to read the skill before designing, naming only the tools that Tool access and the shared scope leave on. Codex, Claude Code, and other clients that support server instructions pass this to the model. Agents in the app's own chat skip this step, because their prompt already includes the design reference.
+- **`read_skill` tool** — returns `SKILL.md`, or with `path: "references/design-authoring.md"` the JSX reference for `render`. It works in every client that supports tools.
+- **Resources** — `openpencil://skills/open-pencil/SKILL.md` and `openpencil://skills/open-pencil/references/design-authoring.md`, as Markdown.
+- **`design` prompt** — loads both files into the conversation, with an optional `task` such as `a pricing page`. Clients show it as a slash command.
+
+The resources and the prompt stay available when `read_skill` is turned off in **Tool access** or the server [shares only the selection](#selection-scope).
 
 ## Tools
 
@@ -303,6 +386,7 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 | `path_scale` | Scale a vector path |
 | `path_flip` | Flip a vector path horizontally or vertically |
 | `path_move` | Translate a vector path |
+| `vectorize_image` | Convert a layer's image fill into editable vector paths in a new frame beside it, keeping the image. Runs in the app with the vectorize service and key set up in Settings → Image services |
 
 ### Export
 
@@ -375,6 +459,13 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 | Tool | Description |
 |------|-------------|
 | `switch_page` | Switch to a page by name or ID |
+
+### Guidance
+
+| Tool | Description |
+|------|-------------|
+| `read_skill` | Read the OpenPencil agent skill or its design authoring reference; see [Design skill over MCP](#design-skill) |
+| `get_codegen_prompt` | Get the design-to-code guidelines to follow before generating frontend code |
 
 ### Escape Hatch
 

@@ -96,6 +96,8 @@ pub fn run() {
             set_native_menu_features,
             native_menu_checked,
             set_native_menu_checked,
+            #[cfg(feature = "native-test")]
+            menu::native_test_menu_outline,
             launch::take_pending_open,
             launch::take_pending_rooms,
             system::env::sharing_disabled_by_env,

@@ -3,7 +3,6 @@ export * from './handle-selection'
 export { freehandNetwork, simplifyFreehand } from './freehand'
 
 export {
-  breakAtVertex,
   computeAccurateBounds,
   deleteVectorParts,
   deleteVertex,
@@ -14,6 +13,18 @@ export {
   removeVertex,
   splitSegmentAt
 } from './bezier'
+export {
+  breakAtVertex,
+  cutAtVertex,
+  cutSegmentAt,
+  duplicateVectorParts,
+  isSmoothVertex,
+  joinEndpoints,
+  straightenSegment,
+  toggleVertexSmooth,
+  type VectorDuplicateResult,
+  type VectorEditResult
+} from './edit'
 
 import type { CanvasKit, Path } from 'canvaskit-wasm'
 

@@ -3,8 +3,11 @@
   "settingsDescription": "Scegli come Pairdraw visualizza le aree di lavoro di grandi dimensioni.",
   "progressiveTiled": "Rendering progressivo",
   "progressiveTiledDescription": "Aggiorna le tele di grandi dimensioni in riquadri più piccoli durante la navigazione.",
+  "progressiveTiledByUltralight": "Sempre attivo finché la modalità ultraleggera è attiva.",
   "reloadRequired": "Ricarica Pairdraw per applicare questa modifica.",
   "wideGamutUnavailable": "Questo schermo o browser non può mostrare i colori Display-P3, quindi la tela li visualizza in sRGB. Il documento mantiene il suo spazio colore.",
   "urlOverride": "Il renderer della sessione corrente è controllato da un parametro URL. La preferenza salvata verrà applicata quando il parametro sarà rimosso.",
-  "experimental": "Sperimentale"
+  "experimental": "Sperimentale",
+  "ultralight": "Modalità ultraleggera",
+  "ultralightDescription": "Risparmia energia e memoria sui computer più lenti: disattiva le animazioni, esegue il rendering a riquadri con risoluzione standard e semplifica sfocature, rumore e ombre."
 }

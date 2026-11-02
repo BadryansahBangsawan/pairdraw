@@ -1,4 +1,20 @@
+import { readFileSync } from 'node:fs'
+
 import { defineConfig } from 'tsdown'
+import type { Rolldown } from 'tsdown'
+
+/** Embeds `?raw` imports as text, so the published server carries the agent skill it serves. */
+function rawText(): Rolldown.Plugin {
+  return {
+    name: 'raw-text',
+    load(id) {
+      if (id.endsWith('?raw')) {
+        const path = id.slice(0, -'?raw'.length)
+        return `export default ${JSON.stringify(readFileSync(path, 'utf8'))}`
+      }
+    }
+  }
+}
 
 export default defineConfig({
   entry: {
@@ -10,6 +26,7 @@ export default defineConfig({
     discovery: './src/transport/discovery.ts',
     tools: './src/tool/index.ts'
   },
+  plugins: [rawText()],
   platform: 'node',
   format: ['esm'],
   dts: true,

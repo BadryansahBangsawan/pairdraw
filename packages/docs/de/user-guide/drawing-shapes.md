@@ -19,6 +19,12 @@ Die untere Werkzeugleiste enthält Werkzeuge für Formen, Rahmen und Sektionen. 
 
 Polygon und Stern befinden sich im Formenmenü.
 
+## Bilder platzieren
+
+**Datei › Bild platzieren…** (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd>, unter Windows und Linux <kbd>Shift</kbd> + <kbd>Strg</kbd> + <kbd>K</kbd>) oder die Bild-Schaltfläche in der Werkzeugleiste öffnet eine Auswahl für PNG-, JPEG-, WebP-, GIF-, AVIF- und SVG-Dateien. Sie erscheinen ausgewählt in der Mitte der Ansicht, als ein Schritt, der sich rückgängig machen lässt; SVG wird zu bearbeitbaren Ebenen.
+
+Das Werkzeug **Haftnotiz** steht in der Werkzeugleiste nach Text. Es hat keine Taste, sodass <kbd>N</kbd> weiterhin zum nächsten Rahmen zoomt.
+
 ## Proportionen beibehalten
 
 Mit <kbd>Shift</kbd> wird ein Rechteck zum Quadrat, eine Ellipse zum Kreis und eine Linie rastet bei 0°, 45° und 90° ein.

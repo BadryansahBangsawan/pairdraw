@@ -17,6 +17,8 @@ export type NodeEditState = {
   } | null
   hoveredRegion?: number | null
   selectedRegions?: Set<number>
+  /** Whether the cut tool is picked up, so a press cuts the path. */
+  cutTool?: boolean
 }
 
 export function getNodeEditState(editor: Editor): NodeEditState | null {

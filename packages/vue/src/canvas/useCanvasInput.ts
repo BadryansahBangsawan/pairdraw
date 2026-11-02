@@ -38,6 +38,7 @@ import { useSpaceHeld } from '#vue/shared/input/space-key'
 import { applyStickyScale } from '#vue/shared/input/sticky/scale'
 import type { DragState } from '#vue/shared/input/types'
 import { handleNodeEditMarqueeMove, handleNodeEditMove } from '#vue/shared/input/vector'
+import { DEFAULT_WHEEL_ZOOM_OPTIONS, type WheelZoomOptions } from '#vue/shared/input/wheel'
 
 /**
  * Wires pointer and mouse interaction to an OpenPencil canvas.
@@ -67,7 +68,9 @@ export function useCanvasInput(
   onActivate?: () => void,
   isEnabled: () => boolean = () => true,
   /** How far wheel and pinch zoom move per event; 1 is the default rate. */
-  zoomSpeed: () => number = () => 1
+  zoomSpeed: () => number = () => 1,
+  /** Whether a plain wheel zooms and whether a wheel zoom is inverted. */
+  zoomOptions: () => WheelZoomOptions = () => DEFAULT_WHEEL_ZOOM_OPTIONS
 ) {
   const drag = ref<DragState | null>(null)
   const profile = () => resolveEditorProfile(editor.state)
@@ -390,7 +393,8 @@ export function useCanvasInput(
       return
     }
 
-    handleMarqueeMove(d, cx, cy)
+    // While ⌘ or Ctrl is held the marquee reaches nested layers, as in Figma.
+    handleMarqueeMove(d, cx, cy, e.metaKey || e.ctrlKey)
   }
 
   function onMouseUp() {
@@ -499,6 +503,15 @@ export function useCanvasInput(
     updateModifier(event.code, false)
     refreshConnectorDrag(drag.value, lastPointer.value, event, editor)
   })
+  // Pressing or releasing ⌘ or Ctrl mid-drag switches a marquee between deep and plain at once.
+  useEventListener(window, ['keydown', 'keyup'], (event: KeyboardEvent) => {
+    const d = drag.value
+    const pointer = lastPointer.value
+    // Before the first move there is no marquee to redo.
+    if (d?.type !== 'marquee' || !pointer || !editor.state.marquee || !isEnabled()) return
+    if (!event.code.startsWith('Meta') && !event.code.startsWith('Control')) return
+    handleMarqueeMove(d, pointer.cx, pointer.cy, event.metaKey || event.ctrlKey)
+  })
   useEventListener(
     window,
     'keydown',
@@ -591,7 +604,7 @@ export function useCanvasInput(
     canvasLabelEdit.commit()
   })
 
-  setupPanZoom(canvasRef, editor, drag, onMouseDown, onMouseMove, onMouseUp, zoomSpeed)
+  setupPanZoom(canvasRef, editor, drag, onMouseDown, onMouseMove, onMouseUp, zoomSpeed, zoomOptions)
   return {
     drag,
     cursorOverride,

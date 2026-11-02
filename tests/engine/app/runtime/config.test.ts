@@ -16,6 +16,9 @@ describe('app runtime configuration', () => {
       showRulers: false,
       sceneRenderer: 'tiled',
       sceneRendererOverride: true,
+      ultralight: false,
+      maxPixelRatio: undefined,
+      reducedEffects: false,
       collaborationTransport: 'test',
       collaborationRelayURL: 'ws://localhost:4000'
     })
@@ -31,6 +34,24 @@ describe('app runtime configuration', () => {
     expect(parseAppRuntimeConfig('?renderer=tiled', 'retained').sceneRenderer).toBe('tiled')
   })
 
+  test('Ultralight mode renders in tiles at one device pixel per CSS pixel with cheap effects', () => {
+    const config = parseAppRuntimeConfig('', 'retained', true)
+    expect(config).toMatchObject({
+      ultralight: true,
+      sceneRenderer: 'tiled',
+      maxPixelRatio: 1,
+      reducedEffects: true
+    })
+  })
+
+  test('a renderer URL override still picks the renderer in Ultralight mode', () => {
+    expect(parseAppRuntimeConfig('?renderer=retained', 'tiled', true)).toMatchObject({
+      sceneRenderer: 'retained',
+      maxPixelRatio: 1,
+      reducedEffects: true
+    })
+  })
+
   test('uses production-safe defaults for absent or unknown values', () => {
     expect(parseAppRuntimeConfig('?renderer=unknown')).toEqual({
       test: false,
@@ -40,6 +61,9 @@ describe('app runtime configuration', () => {
       showRulers: true,
       sceneRenderer: 'retained',
       sceneRendererOverride: false,
+      ultralight: false,
+      maxPixelRatio: undefined,
+      reducedEffects: false,
       collaborationTransport: 'default',
       collaborationRelayURL: null
     })

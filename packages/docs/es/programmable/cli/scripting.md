@@ -38,7 +38,7 @@ openpencil eval design.fig -c "
 
 ## Modificar y guardar
 
-`--write` o `-w` sobrescribe el archivo de entrada. `--output` o `-o` crea otro.
+`--write` o `-w` sobrescribe el archivo de entrada. `--output` o `-o` crea otro. `--preview-output preview.png` escribe, tras el script, un PNG de la página que deja como actual.
 
 ```sh
 openpencil eval design.fig -c "figma.currentPage.name = 'Updated'" -o updated.fig

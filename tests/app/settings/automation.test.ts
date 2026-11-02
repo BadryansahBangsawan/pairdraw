@@ -83,6 +83,20 @@ test.each([
   expect(readAutomationSettings()).toEqual(before)
 })
 
+test('changes nudge distances, half-pixel snapping, and Ultralight mode', () => {
+  const before = readAutomationSettings()
+  const after = updateAutomationSettings({
+    editing: { snapping: { halfPixel: true }, nudge: { large: 8 } },
+    rendering: { ultralight: true }
+  })
+  expect(after.editing.snapping).toEqual({ ...before.editing.snapping, halfPixel: true })
+  expect(after.editing.nudge).toEqual({ ...before.editing.nudge, large: 8 })
+  expect(after.rendering).toEqual({ ...before.rendering, ultralight: true })
+  expect(() => updateAutomationSettings({ editing: { nudge: { small: 0 } } })).toThrow(
+    'editing.nudge.small'
+  )
+})
+
 test('sets a preset or custom accent and rejects one that is not a color', () => {
   expect(
     updateAutomationSettings({ appearance: { accent: { kind: 'preset', preset: 'purple' } } })

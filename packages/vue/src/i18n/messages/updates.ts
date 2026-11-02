@@ -25,6 +25,7 @@ export const updatesMessageDefaults = {
   installFailed: params('Could not install the update: {error}'),
   restartFailed: params('Could not restart Pairdraw: {error}'),
   unavailable: 'Updates are not available yet. Publish a signed release with latest.json first.',
+  notConfigured: 'Updates aren’t set up for this build of Pairdraw.',
   checkFailed: params('Could not check for updates: {error}')
 } as const
 

@@ -26,6 +26,8 @@ export const editorMessageDefaults = {
   startPreview: params('Preview ({shortcut})'),
   /** Opens and closes the AI chat's column beside the properties panel. */
   toggleAIChat: params('AI chat ({shortcut})'),
+  toggleLayersPanel: 'Layers panel',
+  togglePropertiesPanel: 'Properties panel',
   resetPreview: 'Reset',
   leavePreview: params('Leave preview ({shortcut})')
 } as const

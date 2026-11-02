@@ -62,6 +62,22 @@ export type WheelPanDelta = { dx: number; dy: number }
 export type WheelPlatform = 'mac' | 'windows' | 'other'
 export type WheelStep = { kind: 'pan'; dx: number; dy: number } | { kind: 'zoom'; scale: number }
 
+/** How a plain wheel and a wheel zoom behave, from the person's navigation preferences. */
+export interface WheelZoomOptions {
+  /**
+   * A wheel without Ctrl or Cmd zooms instead of panning, as a mouse user may prefer; Shift and
+   * a mainly sideways movement still pan.
+   */
+  wheelZooms: boolean
+  /** A wheel zoom goes the other way. A trackpad pinch keeps its direction. */
+  invert: boolean
+}
+
+export const DEFAULT_WHEEL_ZOOM_OPTIONS: Readonly<WheelZoomOptions> = {
+  wheelZooms: false,
+  invert: false
+}
+
 export function currentWheelPlatform(): WheelPlatform {
   if (typeof navigator === 'undefined') return 'other'
   if (/Mac|iPhone|iPad|iPod/.test(navigator.platform)) return 'mac'
@@ -99,8 +115,8 @@ function capLength(delta: WheelPanDelta, max: number): WheelPanDelta {
   return { dx: (delta.dx * max) / length, dy: (delta.dy * max) / length }
 }
 
-/** Whole wheel notches in deltaY's direction, when this Windows event is a mouse wheel notch. */
-function windowsNotches(event: WheelInput): WheelPanDelta | null {
+/** Whole wheel notches in deltaY's direction, when this event is a mouse wheel notch. */
+function wheelNotches(event: WheelInput): WheelPanDelta | null {
   if (!Number.isInteger(event.deltaX) || !Number.isInteger(event.deltaY)) return null
   const notches =
     event.wheelDeltaX !== undefined && event.wheelDeltaY !== undefined
@@ -110,18 +126,36 @@ function windowsNotches(event: WheelInput): WheelPanDelta | null {
   return { dx: notches.dx / WHEEL_NOTCH, dy: notches.dy / WHEEL_NOTCH }
 }
 
+/**
+ * Whether a Ctrl+wheel event came from a mouse wheel rather than a trackpad pinch: a wheel
+ * reports lines or pages, or whole notches such as Linux Chromium's 120 px, while a pinch
+ * reports small fractional pixel deltas.
+ */
+function isMouseWheelTurn(event: WheelInput): boolean {
+  return event.deltaMode !== 0 || wheelNotches(event) !== null
+}
+
 function zoomStep(delta: number, perDelta: number): WheelStep {
   const exponent = Math.max(-MAX_ZOOM_STEP, Math.min(MAX_ZOOM_STEP, -delta * perDelta))
   return { kind: 'zoom', scale: Math.exp(exponent) }
 }
 
+/** Whether a wheel event without Ctrl or Cmd zooms, when the plain wheel is set to zoom. */
+function plainWheelZooms(event: WheelPanInput, options: WheelZoomOptions): boolean {
+  if (!options.wheelZooms || event.shiftKey) return false
+  const { dx, dy } = normalizedWheelDelta(event)
+  return Math.abs(dy) >= Math.abs(dx)
+}
+
 /**
  * Turns wheel events into pan and zoom steps. It keeps the last Windows notch so a fast spin
- * accelerates, so each canvas uses its own. `zoomSpeed` multiplies how far each event zooms.
+ * accelerates, so each canvas uses its own. `zoomSpeed` multiplies how far each event zooms, and
+ * `zoomOptions` lets a plain wheel zoom and turns a wheel zoom around.
  */
 export function createWheelSteps(
   platform: WheelPlatform = currentWheelPlatform(),
-  zoomSpeed: () => number = () => 1
+  zoomSpeed: () => number = () => 1,
+  zoomOptions: () => WheelZoomOptions = () => DEFAULT_WHEEL_ZOOM_OPTIONS
 ) {
   let lastNotch = { time: Number.NEGATIVE_INFINITY, signX: 0, signY: 0, step: 0 }
 
@@ -145,13 +179,20 @@ export function createWheelSteps(
   }
 
   return function wheelStep(event: WheelInput): WheelStep {
-    const zoom = isWheelZoom(event)
-    const notches = platform === 'windows' ? windowsNotches(event) : null
+    const options = zoomOptions()
+    const zoom = isWheelZoom(event) || plainWheelZooms(event, options)
+    const notches = platform === 'windows' ? wheelNotches(event) : null
     const delta = notches ? notchStep(event, notches, zoom) : normalizedWheelDelta(event)
 
     if (zoom) {
-      const perDelta = event.ctrlKey && !notches ? PINCH_ZOOM_PER_DELTA : WHEEL_ZOOM_PER_DELTA
-      return zoomStep(delta.dy, perDelta * zoomSpeed())
+      // Chromium reports a trackpad pinch as Ctrl+wheel; its direction follows the fingers.
+      const pinch = event.ctrlKey && !notches
+      const perDelta = pinch ? PINCH_ZOOM_PER_DELTA : WHEEL_ZOOM_PER_DELTA
+      // Off Windows, Ctrl+wheel keeps the pinch rate, but a mouse wheel turned with Ctrl, the
+      // usual zoom on Linux, still follows the invert preference.
+      const fingers = pinch && !isMouseWheelTurn(event)
+      const direction = options.invert && !fingers ? -1 : 1
+      return zoomStep(delta.dy * direction, perDelta * zoomSpeed())
     }
 
     const pan = shiftToHorizontal(delta, event.shiftKey)
@@ -167,12 +208,13 @@ const NAVIGATION_SETTLE_DELAY_MS = 120
 
 /**
  * Wheel and pinch zoom on the canvas. `zoomSpeed` scales how far each event zooms: 1 keeps
- * Figma's rate, 0.5 zooms half as far.
+ * Figma's rate, 0.5 zooms half as far. `zoomOptions` makes a plain wheel zoom or inverts it.
  */
 export function setupWheelPanZoom(
   canvasRef: Ref<HTMLCanvasElement | null>,
   editor: Editor,
-  zoomSpeed: () => number = () => 1
+  zoomSpeed: () => number = () => 1,
+  zoomOptions: () => WheelZoomOptions = () => DEFAULT_WHEEL_ZOOM_OPTIONS
 ) {
   const wheelAccum: WheelAccum = {
     deltaX: 0,
@@ -183,7 +225,7 @@ export function setupWheelPanZoom(
     hasZoom: false
   }
 
-  const wheelStep = createWheelSteps(currentWheelPlatform(), zoomSpeed)
+  const wheelStep = createWheelSteps(currentWheelPlatform(), zoomSpeed, zoomOptions)
   let settleTimer: ReturnType<typeof setTimeout> | null = null
 
   function scheduleSettle() {

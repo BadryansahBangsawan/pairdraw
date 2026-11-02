@@ -50,7 +50,7 @@ test('general snapping preferences persist and apply to editor sessions', async 
     .poll(() =>
       page.evaluate(() => window.openPencil?.getStore?.().state.snappingPreferences ?? null)
     )
-    .toEqual({ geometry: false, objects: false, pixelGrid: false })
+    .toEqual({ geometry: false, objects: false, pixelGrid: false, halfPixel: false })
 
   await page.getByTestId('app-settings-done').click()
   await page.reload()
@@ -62,7 +62,7 @@ test('general snapping preferences persist and apply to editor sessions', async 
   await expect(pixelGrid).not.toBeChecked()
   await expect(
     page.evaluate(() => window.openPencil?.getStore?.().state.snappingPreferences ?? null)
-  ).resolves.toEqual({ geometry: false, objects: false, pixelGrid: false })
+  ).resolves.toEqual({ geometry: false, objects: false, pixelGrid: false, halfPixel: false })
 
   await geometry.click()
   await objects.click()

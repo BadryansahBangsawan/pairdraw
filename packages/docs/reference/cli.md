@@ -173,6 +173,8 @@ openpencil eval [file] [options]
 | `--stdin` | | Read code from stdin |
 | `--write` | `-w` | Write changes back to the input file |
 | `--output` | `-o` | Write to a different file |
+| `--preview-output` | | Write a PNG of the current page after the script runs |
+| `--preview-scale` | | Preview scale from 0.1 to 4 (default: 1); the longest edge stays within 1280 pixels |
 | `--json` | | Output as JSON |
 | `--quiet` | `-q` | Suppress output |
 
@@ -372,6 +374,37 @@ openpencil tool call <name> [file] [options]
 | `--args-file` | | Read arguments from a JSON file, or `-` for stdin |
 | `--write` | `-w` | Headless: write changes back to the input file |
 | `--output` | `-o` | Headless: write changes to a different file |
+| `--preview-output` | | Write a PNG of the current page after the tool changes the document |
+| `--preview-scale` | | Preview scale from 0.1 to 4 (default: 1); the longest edge stays within 1280 pixels |
 | `--document-id` | | App: target document |
 | `--page-id` | | App: target page |
+| `--json` | | Output as JSON |
+
+## shell
+
+Open a document once and run tools on it line by line, with `save()` and `exit()`. Reads lines from stdin when it is not a terminal and exits with status 1 if any line failed. See [Controlling the App](/programmable/cli/app-control#interactive-shell).
+
+```sh
+openpencil shell [file] [options]
+```
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--output` | `-o` | Where `save()` writes without a path (default: the input file) |
+| `--preview-output` | | Write a PNG of the current page after each change |
+| `--preview-scale` | | Preview scale from 0.1 to 4 (default: 1); the longest edge stays within 1280 pixels |
+| `--document-id` | | App: target document |
+| `--page-id` | | App: target page |
+
+## models
+
+List the AI providers and models the chat can use, and the ACP agents.
+
+```sh
+openpencil models [--provider <id>] [--json]
+```
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--provider` | `-p` | Only this provider or ACP agent, by ID (for example `openrouter` or `acp:codex`) |
 | `--json` | | Output as JSON |

@@ -27,6 +27,8 @@ SVG préserve la géométrie vectorielle et convient aux icônes, à la revue et
 
 L’exportation HTML crée un document autonome avec la structure et les styles disponibles. Elle vise la transmission, l’inspection et les traitements ultérieurs, pas le remplacement à l’identique du rendu CanvasKit. Elle n’est disponible qu’en mode fichier.
 
+L’exportation HTML écrit le nom de chaque calque dans l’attribut `data-name`. `--no-layer-names` omet les noms et `--layer-ids` ajoute l’ID de chaque calque en `data-open-pencil-node-id` pour les outils qui relient le balisage au document.
+
 ## JSX Tailwind
 
 Exportez en JSX avec des classes utilitaires Tailwind :

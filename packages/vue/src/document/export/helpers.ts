@@ -4,7 +4,14 @@ import type { ComputedRef } from 'vue'
 import type { Editor } from '@open-pencil/core'
 import { BUILTIN_IO_FORMATS, IORegistry, type BuiltinIOFormatId } from '@open-pencil/core/io'
 import type { ExportSetting, PluginDataEntry } from '@open-pencil/scene-graph'
-import { EXPORT_FORMAT_IDS, type ExportFormatId } from '@open-pencil/scene-graph/export-format'
+import {
+  DEFAULT_EXPORT_QUALITY,
+  EXPORT_FORMAT_IDS,
+  MAX_EXPORT_QUALITY,
+  MIN_EXPORT_QUALITY,
+  clampExportQuality,
+  type ExportFormatId
+} from '@open-pencil/scene-graph/export-format'
 import {
   MAX_EXPORT_SCALE,
   MIN_EXPORT_SCALE,
@@ -28,6 +35,7 @@ export type ExportPanelTarget = 'selection' | 'page'
 // Re-exported from core so the UI and the .fig file-format boundary share one
 // definition of the export-scale bounds (see scene-graph/export-scale).
 export { MIN_EXPORT_SCALE, MAX_EXPORT_SCALE, clampExportScale }
+export { MIN_EXPORT_QUALITY, MAX_EXPORT_QUALITY, DEFAULT_EXPORT_QUALITY, clampExportQuality }
 
 const io = new IORegistry(BUILTIN_IO_FORMATS)
 
@@ -46,6 +54,11 @@ export function createDefaultExportSetting(): ExportSetting {
 
 export function formatSupportsScale(format: ExportFormatId) {
   return io.getFormat(format)?.exportOptions?.scale ?? false
+}
+
+/** Whether the format compresses with a quality, as JPG and WEBP do. */
+export function formatSupportsQuality(format: ExportFormatId) {
+  return io.getFormat(format)?.exportOptions?.quality ?? false
 }
 
 export function createExportTargetState(editor: Editor, selectedIds: ComputedRef<string[]>) {
@@ -107,7 +120,11 @@ function exportSettingsEqual(a: ExportSetting[], b: ExportSetting[]) {
   if (a.length !== b.length) return false
   return a.every((setting, index) => {
     const other = b[index]
-    return setting.scale === other.scale && setting.format === other.format
+    return (
+      setting.scale === other.scale &&
+      setting.format === other.format &&
+      setting.quality === other.quality
+    )
   })
 }
 
@@ -117,7 +134,8 @@ function nextExportSetting(settings: ExportSetting[]): ExportSetting {
   // Each added row doubles the previous scale (1x → 2x → 4x …).
   return {
     scale: clampExportScale(last.scale * 2),
-    format: last.format
+    format: last.format,
+    ...(last.quality === undefined ? {} : { quality: last.quality })
   }
 }
 
@@ -179,7 +197,21 @@ export function createExportSettingActions(editor: Editor, targetIds: ComputedRe
 
   function updateFormat(index: number, format: ExportFormatId) {
     updateEveryTarget(editor, targetIds, 'Update export format', (settings) =>
-      settings.map((setting, i) => (i === index ? { ...setting, format } : setting))
+      settings.map((setting, i) => {
+        if (i !== index) return setting
+        // A quality only means something to the formats that compress with one.
+        if (formatSupportsQuality(format)) return { ...setting, format }
+        return { scale: setting.scale, format }
+      })
+    )
+  }
+
+  /** Sets a JPG or WEBP row's quality, from 1 to 100. */
+  function updateQuality(index: number, quality: number) {
+    updateEveryTarget(editor, targetIds, 'Update export quality', (settings) =>
+      settings.map((setting, i) =>
+        i === index ? { ...setting, quality: clampExportQuality(quality) } : setting
+      )
     )
   }
 
@@ -188,6 +220,7 @@ export function createExportSettingActions(editor: Editor, targetIds: ComputedRe
     removeSetting,
     updateScale,
     updateFormat,
+    updateQuality,
     addSelectionSetting: addSetting,
     addPageSetting: addSetting,
     removeSelectionSetting: removeSetting,

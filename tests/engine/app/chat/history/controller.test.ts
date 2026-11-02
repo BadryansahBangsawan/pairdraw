@@ -29,6 +29,8 @@ test('adopting recovery in the same editor loads its selection instead of moving
       getEditor: () => active,
       ensureChat: async () => null,
       profileId: () => null,
+      restoreProfile: () => undefined,
+      profileBackend: () => 'direct',
       resetChat: async () => undefined,
       backend: () => 'direct'
     },
@@ -72,6 +74,8 @@ function fixture() {
         resets++
       },
       profileId: () => null,
+      restoreProfile: () => undefined,
+      profileBackend: () => 'direct',
       backend: () => 'direct'
     },
     {
@@ -163,6 +167,8 @@ test('a pending transport is rejected when the active document changes', async (
         return pending.promise
       },
       profileId: () => null,
+      restoreProfile: () => undefined,
+      profileBackend: () => 'direct',
       resetChat: async () => undefined,
       backend: () => 'direct'
     },

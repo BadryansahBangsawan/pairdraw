@@ -6,6 +6,7 @@ import type {
   LibrarySummary,
   PublishLibraryInput
 } from './types'
+import { LibraryRevisionNotFoundError } from './validation'
 
 function revisionKey(libraryId: string, revisionId: string): string {
   return `${libraryId}\u0000${revisionId}`
@@ -37,8 +38,7 @@ export class MemoryLibraryCatalog implements LibraryCatalog {
     const revision = resolvedRevisionId
       ? this.#revisions.get(revisionKey(libraryId, resolvedRevisionId))
       : undefined
-    if (!revision)
-      throw new Error(`Library revision not found: ${libraryId}/${revisionId ?? 'latest'}`)
+    if (!revision) throw new LibraryRevisionNotFoundError(libraryId, revisionId)
     return deserializeLibraryRevision(serializeLibraryRevision(revision))
   }
 

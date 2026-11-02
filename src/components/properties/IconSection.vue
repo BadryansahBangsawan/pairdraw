@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { tv } from 'tailwind-variants'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { iconLayerName } from '@open-pencil/scene-graph/icons'
 import { useIcon } from '@open-pencil/vue/controls/icon'
@@ -9,6 +9,7 @@ import { useCommonMessages, usePanelMessages } from '@open-pencil/vue/i18n'
 import ColorInput from '@/components/ColorPicker/ColorInput.vue'
 import IconPicker from '@/components/icon-picker/IconPicker.vue'
 import IconPreview from '@/components/icon-picker/IconPreview.vue'
+import IconOptionControls from '@/components/properties/icon/IconOptionControls.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import { AppConfirmationDialog } from '@/components/ui/dialog'
 import { useHeldContent } from '@/components/ui/overlay/held'
@@ -25,6 +26,9 @@ const {
   preview,
   setName,
   modified,
+  optionControls,
+  options,
+  setOption,
   swap,
   reset,
   detach,
@@ -33,25 +37,56 @@ const {
 } = useIcon()
 const styles = tv(theme)()
 
-/** An icon picked to replace an edited one, waiting for the edits to be given up. */
-const pendingSwap = ref<string | null>(null)
-const swapShown = useHeldContent(pendingSwap)
+/**
+ * A change that draws an edited icon again, waiting for the edits to be given up: another icon
+ * picked to replace it, or an option such as its weight.
+ */
+type PendingChange =
+  | { kind: 'swap'; name: string }
+  | { kind: 'option'; key: string; value: number | string }
+
+const pending = ref<PendingChange | null>(null)
+const pendingShown = useHeldContent(pending)
 // The question is about the icon selected when it was asked; another selection drops it, so a
-// confirmation never swaps an icon it did not describe.
+// confirmation never changes an icon it did not describe.
 watch(frameId, () => {
-  pendingSwap.value = null
+  pending.value = null
 })
 
-function pick(next: string) {
-  if (modified.value) pendingSwap.value = next
-  else void swap(next)
+function apply(change: PendingChange) {
+  if (change.kind === 'swap') void swap(change.name)
+  else void setOption(change.key, change.value)
 }
 
-function confirmSwap() {
-  const next = pendingSwap.value
-  pendingSwap.value = null
-  if (next) void swap(next)
+function request(change: PendingChange) {
+  if (modified.value) pending.value = change
+  else apply(change)
 }
+
+function pick(next: string) {
+  request({ kind: 'swap', name: next })
+}
+
+function confirmPending() {
+  const change = pending.value
+  pending.value = null
+  if (change) apply(change)
+}
+
+const confirmation = computed(() => {
+  const change = pendingShown.value
+  return change?.kind === 'option'
+    ? {
+        description: panels.value.changeEditedIconDescription,
+        confirm: panels.value.redrawIcon
+      }
+    : {
+        description: panels.value.swapEditedIconDescription({
+          name: iconLayerName(change?.name ?? '')
+        }),
+        confirm: panels.value.swapIcon
+      }
+})
 </script>
 
 <template>
@@ -92,6 +127,13 @@ function confirmSwap() {
         </template>
       </IconPicker>
     </PanelFieldGroup>
+    <IconOptionControls
+      v-if="optionControls.length > 0"
+      class="mt-1.5"
+      :controls="optionControls"
+      :values="options"
+      @change="(key, value) => request({ kind: 'option', key, value })"
+    />
     <PanelFieldGroup v-if="color" :label="panels.iconColor" class="mt-1.5">
       <ColorInput
         :color="color"
@@ -102,14 +144,14 @@ function confirmSwap() {
       />
     </PanelFieldGroup>
     <AppConfirmationDialog
-      :open="pendingSwap !== null"
+      :open="pending !== null"
       :heading="panels.swapEditedIconHeading"
-      :description="panels.swapEditedIconDescription({ name: iconLayerName(swapShown ?? '') })"
+      :description="confirmation.description"
       :cancel-label="common.cancel"
-      :confirm-label="panels.swapIcon"
+      :confirm-label="confirmation.confirm"
       tone="warning"
-      @update:open="(open: boolean) => !open && (pendingSwap = null)"
-      @confirm="confirmSwap"
+      @update:open="(open: boolean) => !open && (pending = null)"
+      @confirm="confirmPending"
     />
   </PanelSection>
 </template>

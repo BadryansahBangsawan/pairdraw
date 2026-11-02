@@ -16,6 +16,12 @@ The bottom toolbar provides tools for creating shapes, frames, and sections. Sel
 | Frame | <kbd>F</kbd> or <kbd>A</kbd> | Draws a frame (container for other nodes) |
 | Section | <kbd>Shift</kbd> + <kbd>S</kbd> | Draws a section (takes in the siblings it fully covers) |
 
+## Placing Images
+
+Choose **File › Place Image…** (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd>, or <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>K</kbd> on Windows and Linux) or click the image button in the toolbar, then pick PNG, JPEG, WebP, GIF, AVIF, or SVG files. They land in the middle of the view, selected, as one step you can undo; an SVG becomes editable layers.
+
+The **Sticky note** tool follows Text in the toolbar. It has no key, so <kbd>N</kbd> still zooms to the next frame.
+
 ## Shapes Flyout
 
 The shapes flyout (accessible from the toolbar) includes additional shapes:

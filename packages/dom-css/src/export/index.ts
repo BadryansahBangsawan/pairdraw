@@ -22,12 +22,21 @@ export {
   type LayerMarkup
 } from './components/layers'
 export { COMPONENT_STYLINGS, type ComponentStyling } from './components/styling'
+export {
+  ICON_PACKAGES,
+  iconPackagesFor,
+  isIconPackage,
+  type IconFramework,
+  type IconPackage
+} from './components/icons'
 export * from '../tokens'
 export * from '../behaviours'
 export type {
   ExportHTMLBundle,
   ExportHTMLBundleOptions,
   ExportHTMLFile,
+  TailwindStylesheetId,
+  TailwindStylesheetLoader,
   WebFontFaceAsset,
   WebFontFaceRequest,
   WebFontFaceResolver

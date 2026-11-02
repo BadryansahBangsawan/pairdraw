@@ -67,7 +67,10 @@ const groups = computed(() => {
     {
       key: 'api',
       title: ai.value.aiSetupAccessAPI,
-      choices: [...ONBOARDING_API_PROVIDERS, ...ONBOARDING_MORE_API_PROVIDERS].map((id) => ({ id }))
+      // Some API endpoints send no CORS headers, so only the desktop app can reach them.
+      choices: [...ONBOARDING_API_PROVIDERS, ...ONBOARDING_MORE_API_PROVIDERS]
+        .filter((id) => IS_TAURI || !needsDesktop(id))
+        .map((id) => ({ id }))
     },
     {
       key: 'servers',

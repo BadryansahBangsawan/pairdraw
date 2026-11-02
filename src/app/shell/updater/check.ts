@@ -4,6 +4,7 @@ import type { Ref } from 'vue'
 import { toast } from '@/app/shell/ui'
 import { isTauri } from '@/app/tauri/env'
 
+import { checkUpdateFeed, isMissingUpdateFeed } from './feed'
 import { updateFailureText, type UpdaterMessages } from './messages'
 import { openUpdaterWindow } from './window'
 
@@ -40,8 +41,7 @@ export function scheduleStartupUpdateCheck(messages: Ref<UpdaterMessages>) {
 // window checks again for its own handle, then shows the notes and installs.
 async function runUpdateCheck(silent: boolean, messages: Ref<UpdaterMessages>) {
   try {
-    const { check } = await import('@tauri-apps/plugin-updater')
-    const update = await check()
+    const update = await checkUpdateFeed()
     if (!update) {
       if (!silent) toast.info(messages.value.upToDate)
       return
@@ -49,9 +49,10 @@ async function runUpdateCheck(silent: boolean, messages: Ref<UpdaterMessages>) {
     await update.close()
     await openUpdaterWindow(messages.value.windowTitle)
   } catch (error) {
-    if (!silent) {
-      const message = error instanceof Error ? error.message : String(error)
-      toast.warning(updateFailureText(messages.value, 'check', message))
-    }
+    if (silent) return
+    const message = error instanceof Error ? error.message : String(error)
+    // A build without an update feed makes no request, so asking is not a failed check.
+    if (isMissingUpdateFeed(message)) toast.info(messages.value.notConfigured)
+    else toast.warning(updateFailureText(messages.value, 'check', message))
   }
 }

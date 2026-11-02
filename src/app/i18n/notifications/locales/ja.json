@@ -14,7 +14,7 @@
   "vectorizeCredentialRequired": "設定 → 画像サービスで {provider} の API キーを追加してください。",
   "vectorizeImageMissing": "このレイヤーの画像データがありません。",
   "vectorizingImage": "画像をベクター化しています…",
-  "imageConvertedToVectors": "画像をベクターに変換しました。",
+  "imageConvertedToVectors": "画像の横にベクターを追加しました。",
   "vectorizeCredentialFailed": "{error}。設定 → 画像サービスで更新してください。",
   "vectorizeFailed": "{provider} でこの画像をベクター化できませんでした: {error}",
   "operationFailed": "操作に失敗しました: {error}",
@@ -32,5 +32,9 @@
   "tokensLeftOut": "スタイルシートに含まれていません: {names}",
   "designTokensLeftOut": "デザイントークンに含まれていません: {names}",
   "designTokensImported": "{count} 個のデザイントークンを読み込みました。",
-  "unsupportedVariableExpressions": "Pairdraw はまだこれらの変数を評価できないため、レイヤーはファイルに保存された値を保ちます: {names}"
+  "unsupportedVariableExpressions": "Pairdraw はまだこれらの変数を評価できないため、レイヤーはファイルに保存された値を保ちます: {names}",
+  "placeImageUnsupported": "配置する PNG、JPEG、WebP、GIF、AVIF、SVG ファイルを選択してください。",
+  "placeImageFailed": "ファイルを配置できませんでした: {error}",
+  "exportPDFEmpty": "このページにはエクスポートするフレームがありません。",
+  "exportPDFFailed": "PDF をエクスポートできませんでした: {error}"
 }

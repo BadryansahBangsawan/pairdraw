@@ -7,7 +7,7 @@ const TAURI_WATCH_DELAY_MS = 500
 export async function watchTauriFile(
   filePath: string,
   getLastWriteTime: () => number,
-  reloadFromDisk: () => void
+  onDiskChange: () => void
 ) {
   const { watch: tauriWatch } = await import('@tauri-apps/plugin-fs')
   const unwatch = await tauriWatch(
@@ -15,7 +15,7 @@ export async function watchTauriFile(
     (event) => {
       if (typeof event.type !== 'object' || !('modify' in event.type)) return
       if (Date.now() - getLastWriteTime() < RECENT_WRITE_MS) return
-      reloadFromDisk()
+      onDiskChange()
     },
     { delayMs: TAURI_WATCH_DELAY_MS }
   )
@@ -26,7 +26,7 @@ export async function watchBrowserFile(
   fileHandle: FileSystemFileHandle,
   getActiveFileHandle: () => FileSystemFileHandle | null,
   getLastWriteTime: () => number,
-  reloadFromDisk: () => void,
+  onDiskChange: () => void,
   stopWatchingFile: () => void
 ) {
   let lastModified = (await fileHandle.getFile()).lastModified
@@ -49,7 +49,7 @@ export async function watchBrowserFile(
       if (file.lastModified > lastModified) {
         lastModified = file.lastModified
         if (Date.now() - getLastWriteTime() < RECENT_WRITE_MS) return
-        reloadFromDisk()
+        onDiskChange()
       }
     } catch {
       stopWatchingFile()

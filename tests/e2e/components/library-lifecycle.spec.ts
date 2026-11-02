@@ -193,8 +193,11 @@ test('publishes, consumes, saves, and reopens a multidimensional library instanc
   await page.keyboard.press('Escape')
   await expect(page.getByTestId('asset-libraries-dialog')).toBeHidden()
 
+  // ⌘N opens a new design in a tab of its own, as File › New design does.
+  const tabs = page.getByTestId('tabbar-tab')
+  const tabCount = await tabs.count()
   await page.keyboard.press('ControlOrMeta+KeyN')
-  await page.getByRole('button', { name: 'New design', exact: true }).click()
+  await expect(tabs).toHaveCount(tabCount + 1)
   await expect
     .poll(() =>
       page.evaluate(() => {

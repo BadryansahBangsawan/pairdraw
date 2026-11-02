@@ -13,8 +13,12 @@ async function addProfile(page: Page, name: string, providerID: string) {
       const storePath = '/src/app/ai/models/store.ts'
       const store = await import(storePath)
       const settings = store.modelSettingsSnapshot()
-      const [connection] = settings.connections
       const [profile] = settings.models
+      // The configured model's own connection, which holds its key; a fresh install also keeps an
+      // unused default connection first.
+      const connection = settings.connections.find(
+        (entry: { id: string }) => entry.id === profile?.connectionId
+      )
       if (!connection || !profile) throw new Error('Expected a configured model')
       const suffix = name.toLowerCase().replaceAll(/\W+/g, '-')
       settings.connections.push({ ...connection, id: `connection-${suffix}`, providerID })

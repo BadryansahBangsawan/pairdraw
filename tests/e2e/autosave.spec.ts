@@ -34,7 +34,10 @@ test('autosave triggers after scene changes with a file handle', async () => {
       write: async () => undefined,
       close: async () => undefined
     }
+    // A picked file has a name, which titles the document, and contents, which are watched.
     const mockHandle = {
+      name: 'Autosave.fig',
+      getFile: async () => new File([], 'Autosave.fig'),
       createWritable: async () => mockWritable
     }
     window.showSaveFilePicker = async () => mockHandle as FileSystemFileHandle

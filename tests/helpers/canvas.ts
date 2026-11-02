@@ -1,5 +1,7 @@
 import type { Page, Locator } from '@playwright/test'
 
+import type { Vector } from '@open-pencil/scene-graph/primitives'
+
 import { OFFICIAL_CLOUD_URL } from '@/constants'
 
 /**
@@ -117,7 +119,7 @@ export class CanvasHelper {
    * Mouse events carry whole pixels and drop a fraction, so from a canvas edge between pixels a
    * point would land up to a pixel short; from here it lands within half a pixel of it.
    */
-  async pointerOrigin(): Promise<{ x: number; y: number }> {
+  async pointerOrigin(): Promise<Vector> {
     const b = await this.canvas.boundingBox()
     if (!b) throw new Error('Canvas has no bounding box — is it visible?')
     return { x: Math.round(b.x), y: Math.round(b.y) }

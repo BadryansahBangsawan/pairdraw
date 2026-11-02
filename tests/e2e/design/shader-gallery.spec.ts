@@ -12,7 +12,8 @@ const ctx = useEditorSetupWithClear()
 
 async function expectCanvas(name: string) {
   ctx.canvas.assertNoErrors()
-  const buffer = await ctx.canvas.screenshotCanvasRegion()
+  // Only the canvas around the layer: the properties panel beside it is not what is checked.
+  const buffer = await ctx.canvas.screenshotCanvasRegion(600, 400)
   expect(buffer).toMatchSnapshot(`${name}.png`)
 }
 

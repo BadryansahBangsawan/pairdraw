@@ -40,6 +40,11 @@ export interface CompanionState {
   version: string | null
   /** A link the tab was opened with, which pairs only once the person confirms it. */
   pending: CompanionPendingLink | null
+  /**
+   * Whether the session is the one `bun run dev` gave this tab (`adopt`), rather than one from a
+   * link; the development server's MCP server is then the companion.
+   */
+  dev: boolean
 }
 
 /** A link the companion printed: `#connect=<code>`, with `&port=` when it is not the default. */
@@ -89,7 +94,8 @@ export interface CompanionConnectionOptions {
   fetch?: CompanionFetch
 }
 
-interface CompanionSession {
+/** A companion's tokens and the port it listens on, on this machine. */
+export interface CompanionSession {
   /** Reaches the agent routes and the app's bridge. */
   token: string
   /** Reaches only the MCP server; the tab hands it to the agents it starts. */
@@ -105,7 +111,8 @@ export function createCompanionConnection({
     status: 'idle',
     failure: null,
     version: null,
-    pending: null
+    pending: null,
+    dev: false
   })
   let session: CompanionSession | null = null
   let pendingLink: CompanionLink | null = null
@@ -143,6 +150,9 @@ export function createCompanionConnection({
       })
       if (session !== current) return
       if (response.status === 401) {
+        // The development server's MCP server keeps its session while it runs, so a refusal
+        // comes from another server on its port; keep checking until that one stops.
+        if (state.dev) throw new Error('HTTP 401')
         // The companion restarted or signed the tab out, so this token is gone for good.
         forget('expired')
         return
@@ -169,6 +179,7 @@ export function createCompanionConnection({
     state.status = 'idle'
     state.failure = failure
     state.version = null
+    state.dev = false
   }
 
   /** A pairing that did not finish leaves the tab as it was: still paired, if it was. */
@@ -202,13 +213,32 @@ export function createCompanionConnection({
     )
     if (!paired.success) return failPairing('rejected')
     const previous = session
+    const previousDev = state.dev
     session = { token: paired.output.token, agentToken: paired.output.agentToken, port: link.port }
-    if (previous) void revoke(previous)
+    if (previous && !previousDev) void revoke(previous)
+    state.dev = false
     state.version = paired.output.version
     state.status = 'connected'
     state.failure = null
     checker.resume()
     return true
+  }
+
+  /**
+   * Uses a session the development server set up for this tab (`dev.ts`), with no `/pair` and no
+   * confirmation: the development server made the tokens, gave them to the MCP server it started,
+   * and put them in this tab's bundle. Resolves once that server answered, or did not.
+   */
+  function adopt(next: CompanionSession): Promise<void> {
+    const previous = session
+    if (previous && !state.dev) void revoke(previous)
+    session = { token: next.token, agentToken: next.agentToken, port: next.port }
+    state.dev = true
+    state.status = 'pairing'
+    state.failure = null
+    state.version = null
+    checker.resume()
+    return check()
   }
 
   /** Tells the companion to drop a session's tokens; best effort, as it may have stopped. */
@@ -240,11 +270,15 @@ export function createCompanionConnection({
     state.pending = null
   }
 
-  /** Signs the tab out, here and in the companion, which keeps running for other tabs. */
+  /**
+   * Signs the tab out, here and in the companion, which keeps running for other tabs. The
+   * development server's session is only forgotten here, as the companion keeps it until it stops.
+   */
   function disconnect() {
     const current = session
+    const dev = state.dev
     forget(null)
-    if (current) void revoke(current)
+    if (current && !dev) void revoke(current)
   }
 
   return {
@@ -254,6 +288,7 @@ export function createCompanionConnection({
     agentToken,
     connected,
     pair,
+    adopt,
     offer,
     confirm,
     dismiss,

@@ -112,7 +112,7 @@ OPENPENCIL_TEST_SERVER=app OPENPENCIL_TEST_PORT=1482 OPENPENCIL_TEST_MCP_PORT=76
   bunx playwright test tests/e2e/properties/effect-panel.spec.ts --project=openpencil
 ```
 
-Use the configured base URL and same-origin paths, never hard-coded ports in specs or adapters. For intentional debugging against a verified matching server, set `OPENPENCIL_TEST_REUSE_SERVER=1`. HTTP readiness alone does not prove checkout identity, so do not reuse servers for baseline comparisons. Portless remains the preferred interactive preview workflow, separate from managed fixed-port tests.
+Use the configured base URL and same-origin paths, never hard-coded ports in specs or adapters. For intentional debugging against a verified matching server, set `OPENPENCIL_TEST_REUSE_SERVER=1`, and start that server with `OPENPENCIL_DEV_AGENTS=0`, or its tabs find and can start the coding agents on your computer. HTTP readiness alone does not prove checkout identity, so do not reuse servers for baseline comparisons. Portless remains the preferred interactive preview workflow, separate from managed fixed-port tests.
 
 ## External-system acceptance
 

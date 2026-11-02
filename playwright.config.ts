@@ -126,7 +126,10 @@ export default defineConfig({
             env: {
               OPENPENCIL_DEV_ORIGIN: origin,
               OPENPENCIL_DEV_MCP_PORT: mcpPort,
-              PORTLESS_URL: ''
+              PORTLESS_URL: '',
+              // Tests never find, or start, the coding agents on the machine that runs them. A
+              // reused server keeps its own environment, so start it with OPENPENCIL_DEV_AGENTS=0.
+              OPENPENCIL_DEV_AGENTS: '0'
             },
             reuseExistingServer: !process.env.CI && reuse === '1'
           }

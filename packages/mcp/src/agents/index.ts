@@ -14,11 +14,11 @@ import { pipeAgent, type AgentProcessContext } from './acp'
 import { createACPFilter, isLoopbackMCP } from './filter'
 import { installWithNpm, type PackageInstaller } from './install'
 import { ensureWorkspace, lookupAgents } from './lookup'
-import { createPairing, type PairingOptions } from './pairing'
+import { createPairing, type PairingOptions, type TrustedSession } from './pairing'
 import { augmentPath } from './path'
 import { terminate } from './process'
 import { COMPANION_AGENTS, findCompanionAgent, type CompanionAgent } from './registry'
-import { pairRequestSchema } from './schema'
+import { devAgentSessionEnvSchema, pairRequestSchema } from './schema'
 import { runSignIn } from './sign-in'
 import { authenticate, CLOSE_CODES, keepAlive } from './socket'
 
@@ -40,7 +40,13 @@ export interface AgentBridgeOptions {
   searchPath?: string
   /** Installs adapter packages; defaults to `npm install --global`. */
   installer?: PackageInstaller
-  pairing?: PairingOptions
+  /** Code and session lifetimes; trusted sessions come from `trustedSessions`. */
+  pairing?: Omit<PairingOptions, 'trusted'>
+  /**
+   * Sessions that need no `/pair`, for the tab of the process that started the server
+   * (`devAgentBridgeFromEnv`). They never expire and cannot be revoked.
+   */
+  trustedSessions?: readonly TrustedSession[]
   /** The TCP port the server listens on, which is where the companion's own MCP endpoint is. */
   port?: () => number
   /** Told each time a tab pairs, so the companion can say so in its terminal. */
@@ -48,6 +54,20 @@ export interface AgentBridgeOptions {
 }
 
 const AGENT_SOCKET_PATH = /^\/agents\/([\w-]{1,64})\/(acp|sign-in)$/
+
+/**
+ * The bridge `bun run dev` asks the MCP server it starts for: `OPENPENCIL_MCP_AGENTS=1`, with its
+ * tab's session in `OPENPENCIL_MCP_AGENT_SESSION` and `OPENPENCIL_MCP_AGENT_TOKEN`. Null without
+ * them or when they are malformed, and the server then has no bridge. The tokens stay in this
+ * process: the discovery file never holds them.
+ */
+export function devAgentBridgeFromEnv(
+  env: NodeJS.ProcessEnv = process.env
+): AgentBridgeOptions | null {
+  if (env.OPENPENCIL_MCP_AGENTS !== '1') return null
+  const session = v.safeParse(devAgentSessionEnvSchema, env)
+  return session.success ? { trustedSessions: [session.output] } : null
+}
 
 function rejectUpgrade(socket: Duplex, status: number, reason: string): void {
   socket.end(`HTTP/1.1 ${status} ${reason}\r\nConnection: close\r\nContent-Length: 0\r\n\r\n`)
@@ -64,7 +84,7 @@ export function createAgentBridge(
   const registry = options.registry ?? COMPANION_AGENTS
   const searchPath = options.searchPath ?? augmentPath(process.env.PATH ?? '')
   const installer = options.installer ?? installWithNpm
-  const pairing = createPairing(options.pairing)
+  const pairing = createPairing({ ...options.pairing, trusted: options.trustedSessions })
   const children = new Set<ChildProcess>()
   const signIns = new Map<string, WebSocket>()
   const acpSockets = new WebSocketServer({ noServer: true, maxPayload: ACP_MAX_FRAME_BYTES })

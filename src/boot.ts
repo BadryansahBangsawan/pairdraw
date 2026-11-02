@@ -6,6 +6,7 @@ import { createRetainedScopePlugin } from '@open-pencil/vue/lifecycle/retention'
 
 import './app.css'
 import { connectCompanionFromLocation } from '@/app/automation/companion/connection'
+import { adoptDevCompanion } from '@/app/automation/companion/dev'
 import { recordRuntimeError } from '@/app/diagnostics'
 import { installCanvasKitBinary, preloadCanvasKit } from '@/app/editor/canvas/canvaskit'
 import { preloadFonts } from '@/app/editor/fonts'
@@ -23,6 +24,9 @@ import router from './router'
  * evaluates the app bundle and can still show the gate's guidance.
  */
 export async function boot(): Promise<void> {
+  // In `bun run dev` the tab uses the development server's agent bridge with no pairing link.
+  // It starts first, so its check usually finishes before the editor looks for agents.
+  if (!IS_TAURI) void adoptDevCompanion()
   installBundledFonts()
   installCanvasKitBinary()
   preloadCanvasKit()

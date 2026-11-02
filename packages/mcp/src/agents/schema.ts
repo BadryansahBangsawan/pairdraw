@@ -52,3 +52,26 @@ export const acpHTTPServerSchema = v.looseObject({
   type: v.picklist(['http', 'sse']),
   url: v.pipe(v.string(), v.maxLength(2048))
 })
+
+/** A token the development server makes with 32 random bytes, as lowercase hex. */
+const devTokenSchema = v.pipe(v.string(), v.regex(/^[0-9a-f]{64}$/))
+
+/**
+ * The tab session `bun run dev` gives the MCP server it starts, in the environment, so its own
+ * tab reaches the agent bridge without pairing. The two tokens must differ: the agent token
+ * reaches only `/mcp`, and agents hold it.
+ */
+export const devAgentSessionEnvSchema = v.pipe(
+  v.object({
+    OPENPENCIL_MCP_AGENT_SESSION: devTokenSchema,
+    OPENPENCIL_MCP_AGENT_TOKEN: devTokenSchema
+  }),
+  v.check(
+    (env) => env.OPENPENCIL_MCP_AGENT_SESSION !== env.OPENPENCIL_MCP_AGENT_TOKEN,
+    'The session and agent tokens must differ'
+  ),
+  v.transform((env) => ({
+    token: env.OPENPENCIL_MCP_AGENT_SESSION,
+    agentToken: env.OPENPENCIL_MCP_AGENT_TOKEN
+  }))
+)

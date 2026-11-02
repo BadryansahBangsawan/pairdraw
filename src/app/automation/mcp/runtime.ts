@@ -242,9 +242,10 @@ export const restartMCPRuntime = () => appMCPRuntime.restart()
 export const startMCPRuntime = (getStore: () => EditorStore) => appMCPRuntime.start(getStore)
 export const stopMCPRuntime = () => appMCPRuntime.stop()
 
-// Pairing with a companion, or losing it, moves the app's bridge to the server it now has.
+// Pairing with a companion, or losing it, moves the app's bridge to the server it now has. The
+// development server's own session keeps the bridge where it is, so it never restarts it.
 watch(
-  () => companion.connected(),
+  () => companion.connected() && !companion.state.dev,
   () => {
     if (appMCPRuntime.started()) void appMCPRuntime.restart()
   }

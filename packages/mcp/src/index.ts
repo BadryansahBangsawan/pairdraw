@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { devAgentBridgeFromEnv } from '#mcp/agents/index'
 import { resolveMCPRoot } from '#mcp/root'
 import { MCP_VERSION, startServer } from '#mcp/server'
 import { readToolPolicyFromEnv } from '#mcp/tool/policy'
@@ -43,7 +44,15 @@ if (process.argv.includes('--help') || process.argv.includes('-h')) {
       `                               manual/CLI use, since nothing may ever register.\n` +
       `  OPENPENCIL_MCP_EXIT_ON_STDIN_CLOSE  Set to 1 to shut down when stdin closes, so a\n` +
       `                               parent that starts the server through a shell wrapper\n` +
-      `                               can stop it by closing the pipe. Unset for manual/CLI use.\n`
+      `                               can stop it by closing the pipe. Unset for manual/CLI use.\n` +
+      `  OPENPENCIL_MCP_AGENTS        Set to 1, with the two variables below, to start the agent\n` +
+      `                               bridge for one browser tab that the parent process gave\n` +
+      `                               the same tokens, as \`bun run dev\` does; no pairing link.\n` +
+      `                               The tokens are never written to the discovery file,\n` +
+      `                               and the eval tool stays off.\n` +
+      `  OPENPENCIL_MCP_AGENT_SESSION The tab's session token: 64 lowercase hex characters.\n` +
+      `  OPENPENCIL_MCP_AGENT_TOKEN   The token the tab hands its agents, which reaches only\n` +
+      `                               /mcp: 64 lowercase hex characters, not the session token.\n`
   )
   process.exit(0)
 }
@@ -87,11 +96,28 @@ const sessionIdleTimeoutMs = readTimeoutEnv('OPENPENCIL_MCP_SESSION_IDLE_TIMEOUT
 
 const toolPolicy = readToolPolicyFromEnv()
 
+// The agent bridge starts programs, so a malformed session leaves it off rather than guessing.
+const agents = devAgentBridgeFromEnv()
+if (process.env.OPENPENCIL_MCP_AGENTS === '1' && !agents) {
+  process.stderr.write(
+    'Warning: OPENPENCIL_MCP_AGENTS=1 needs OPENPENCIL_MCP_AGENT_SESSION and ' +
+      'OPENPENCIL_MCP_AGENT_TOKEN as two different 64-character lowercase hex tokens. ' +
+      'Starting without the agent bridge.\n'
+  )
+}
+// As in `openpencil-connect`: agents reach `/mcp`, where eval would run any script they send.
+if (agents && toolPolicy.allowEval) {
+  process.stderr.write(
+    'Warning: OPENPENCIL_MCP_EVAL=1 is ignored while the agent bridge is on ' +
+      '(OPENPENCIL_MCP_AGENTS=1). Starting without the eval tool.\n'
+  )
+}
+
 const handle = await startServer({
   httpPort: withTcp ? port : 0,
   withTcp,
   socketPath: process.env.OPENPENCIL_MCP_SOCKET?.trim() || null,
-  enableEval: toolPolicy.allowEval,
+  enableEval: toolPolicy.allowEval && !agents,
   disabledTools: toolPolicy.disabledTools,
   scope: toolPolicy.scope,
   mcpRoot: resolveMCPRoot(process.env.OPENPENCIL_MCP_ROOT),
@@ -114,7 +140,8 @@ const handle = await startServer({
   })(),
   corsOrigin: resolveCORSOrigins(process.env.OPENPENCIL_MCP_CORS_ORIGIN),
   appAttachTimeoutMs,
-  sessionIdleTimeoutMs
+  sessionIdleTimeoutMs,
+  agents: agents ?? undefined
 })
 
 const readyMarker = process.env.OPENPENCIL_MCP_READY_MARKER

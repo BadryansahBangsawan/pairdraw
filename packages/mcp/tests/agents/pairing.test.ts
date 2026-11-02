@@ -86,4 +86,39 @@ describe('companion pairing', () => {
     expect(pairing.isSession(result.agentToken)).toBe(false)
     expect(pairing.isAgentToken(result.token)).toBe(false)
   })
+
+  describe('trusted sessions', () => {
+    const trusted = { token: 'd'.repeat(64), agentToken: 'e'.repeat(64) }
+
+    test('are accepted without a code and outlast idle tabs, newer tabs, and sign-outs', () => {
+      const time = clock()
+      const pairing = createPairing({ now: time.now, trusted: [trusted] })
+      expect(pairing.isSession(trusted.token)).toBe(true)
+      expect(pairing.isAgentToken(trusted.agentToken)).toBe(true)
+
+      time.advance(SESSION_IDLE_TIMEOUT_MS * 2)
+      for (let tab = 0; tab < 17; tab++) {
+        expect(pairing.exchange(pairing.issueCode()).ok).toBe(true)
+      }
+      pairing.revoke(trusted.token)
+
+      expect(pairing.isSession(trusted.token)).toBe(true)
+      expect(pairing.isAgentToken(trusted.agentToken)).toBe(true)
+    })
+
+    test('keep the agent token apart from the session token', () => {
+      const pairing = createPairing({ trusted: [trusted] })
+      expect(pairing.isSession(trusted.agentToken)).toBe(false)
+      expect(pairing.isAgentToken(trusted.token)).toBe(false)
+    })
+
+    test('need two different tokens', () => {
+      expect(() =>
+        createPairing({ trusted: [{ token: trusted.token, agentToken: trusted.token }] })
+      ).toThrow(RangeError)
+      expect(() =>
+        createPairing({ trusted: [{ token: '', agentToken: trusted.agentToken }] })
+      ).toThrow(RangeError)
+    })
+  })
 })

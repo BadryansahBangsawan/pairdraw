@@ -10,7 +10,9 @@ import type { Plugin } from 'vite'
 
 import { serializeDisabledTools } from '@open-pencil/mcp/tools'
 import { platformHasUnixSockets } from '@open-pencil/mcp/transport'
+import { randomHex } from '@open-pencil/scene-graph/random'
 
+import type { CompanionSession } from '../companion/connection'
 import {
   DEV_MCP_RESTART_PATH,
   parseDevMCPConfiguration,
@@ -18,8 +20,23 @@ import {
 } from '../mcp/dev-control'
 import { waitForChildReady } from './child-ready'
 
+/**
+ * The tab session the development server gives the MCP server it starts and, through
+ * `__OPENPENCIL_LOCAL_AGENT_SESSION__`, its own tab, so the tab reaches the agent bridge without
+ * a pairing link (`src/app/automation/companion/dev.ts`). It is the companion session the tab
+ * adopts, without the port the tab already knows.
+ */
+export type DevAgentSession = Pick<CompanionSession, 'token' | 'agentToken'>
+
+/** Two unrelated random tokens, so neither can be derived from the other or the dev token. */
+export function createDevAgentSession(): DevAgentSession {
+  return { token: randomHex(32), agentToken: randomHex(32) }
+}
+
 interface AutomationEnvironmentOptions {
   authToken: string | null
+  /** The tab session for the agent bridge, or null to start the server without the bridge. */
+  agentSession?: DevAgentSession | null
   baseEnv: NodeJS.ProcessEnv
   configuration: DevMCPConfiguration
   corsOrigin: string
@@ -36,6 +53,10 @@ export function createAutomationEnvironment(
   const childEnv = { ...baseEnv }
   delete childEnv.OPENPENCIL_MCP_SOCKET
   delete childEnv.OPENPENCIL_MCP_AUTH_TOKEN
+  // Only a session this server made, and handed its own tab, may start the agent bridge.
+  delete childEnv.OPENPENCIL_MCP_AGENTS
+  delete childEnv.OPENPENCIL_MCP_AGENT_SESSION
+  delete childEnv.OPENPENCIL_MCP_AGENT_TOKEN
   const environment: NodeJS.ProcessEnv = {
     ...childEnv,
     PORT: String(httpPort),
@@ -48,6 +69,11 @@ export function createAutomationEnvironment(
   }
   if (socketPath) environment.OPENPENCIL_MCP_SOCKET = socketPath
   if (discoveryPath) environment.OPENPENCIL_MCP_DISCOVERY_PATH = discoveryPath
+  if (options.agentSession) {
+    environment.OPENPENCIL_MCP_AGENTS = '1'
+    environment.OPENPENCIL_MCP_AGENT_SESSION = options.agentSession.token
+    environment.OPENPENCIL_MCP_AGENT_TOKEN = options.agentSession.agentToken
+  }
   return environment
 }
 
@@ -128,6 +154,8 @@ export async function waitForAutomationHealth(
 }
 
 interface AutomationPluginOptions {
+  /** Kept for the plugin's lifetime, so a restarted server still accepts the tab's session. */
+  agentSession?: DevAgentSession | null
   browserURL: string
   corsOrigin: string
   httpPort: number
@@ -208,6 +236,7 @@ export function automationPlugin(
       env: {
         ...createAutomationEnvironment({
           authToken,
+          agentSession: options.agentSession,
           baseEnv: process.env,
           configuration,
           corsOrigin: options.corsOrigin,

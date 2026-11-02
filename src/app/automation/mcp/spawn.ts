@@ -11,7 +11,7 @@ import {
 } from '@open-pencil/mcp/tools'
 import { randomHex } from '@open-pencil/scene-graph/random'
 
-import { companion } from '@/app/automation/companion/connection'
+import { companion, type CompanionConnection } from '@/app/automation/companion/connection'
 import { APP_VERSION } from '@/app/runtime/version'
 import { decodeTauriStderr } from '@/app/shell/ui'
 import { resolvePlatformCommand } from '@/app/tauri/command'
@@ -522,12 +522,24 @@ function exitedStartupError(
   )
 }
 
+/**
+ * The server of a companion the tab paired with through a link, which already runs and keeps its
+ * own settings. Null otherwise, and for the session `bun run dev` gave the tab (`adopt`): that
+ * server is the development one, which still takes the root, tools, scope, and auth settings.
+ */
+export function pairedCompanionServer(
+  connection: Pick<CompanionConnection, 'state' | 'token'> = companion
+): AutomationServerHandle | null {
+  const token = connection.token()
+  if (!token || connection.state.dev) return null
+  return { disconnect: noop, authToken: token, managed: false }
+}
+
 async function startMCPIfNeeded(timing: MCPStartupTiming): Promise<AutomationServerHandle | null> {
   runtimeAutomationStartupError = null
   runtimeAutomationStartupFailure = null
-  // The companion the web app paired with already runs the server.
-  const companionToken = companion.token()
-  if (companionToken) return { disconnect: noop, authToken: companionToken, managed: false }
+  const paired = pairedCompanionServer()
+  if (paired) return paired
   if (import.meta.env.DEV) return configureDevMCP()
   if (!isTauri()) return null
 

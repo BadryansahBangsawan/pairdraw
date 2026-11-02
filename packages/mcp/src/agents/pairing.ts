@@ -14,10 +14,22 @@ export type PairingResult =
   | { ok: true; token: string; agentToken: string }
   | { ok: false; reason: 'rejected' | 'rate-limited' }
 
+/** The two tokens of a session that exists without `/pair`. */
+export interface TrustedSession {
+  token: string
+  agentToken: string
+}
+
 export interface PairingOptions {
   ttlMs?: number
   idleTimeoutMs?: number
   now?: () => number
+  /**
+   * Sessions the process that started the server set up for its own tab, as `bun run dev` does
+   * through the environment. They never sit idle too long, are never forgotten for newer tabs,
+   * and cannot be revoked; they end with the server.
+   */
+  trusted?: readonly TrustedSession[]
 }
 
 function digest(value: string): Buffer {
@@ -49,17 +61,28 @@ interface Session {
  * works once, and expires. Pairing returns two tokens: the tab's session token, which reaches
  * the agent routes, and an agent token, which reaches only the MCP server and is what the tab
  * hands the agents it starts. Both live only in this process and the tab's memory, so
- * restarting the companion signs every tab out.
+ * restarting the companion signs every tab out. Trusted sessions skip the code: the process that
+ * started the server made their tokens and gave them to its own tab.
  */
 export function createPairing({
   ttlMs = PAIRING_CODE_TTL_MS,
   idleTimeoutMs = SESSION_IDLE_TIMEOUT_MS,
-  now = Date.now
+  now = Date.now,
+  trusted = []
 }: PairingOptions = {}) {
   let code: { digest: Buffer; expiresAt: number } | null = null
   // Keyed by the token's digest, so a lookup never compares the secret itself.
   const sessions = new Map<string, Session>()
   const agentTokens = new Map<string, string>()
+  const trustedSessions = new Set(trusted.map((session) => key(session.token)))
+  const trustedAgentTokens = new Set(trusted.map((session) => key(session.agentToken)))
+  // A token that is both would let the agents a tab starts reach the routes that start programs.
+  if (
+    trusted.some((session) => !session.token || !session.agentToken) ||
+    [...trustedSessions].some((sessionKey) => trustedAgentTokens.has(sessionKey))
+  ) {
+    throw new RangeError('A trusted session needs a session token and a different agent token')
+  }
   let failures = 0
   let windowStart = now()
 
@@ -129,7 +152,9 @@ export function createPairing({
   /** Whether a token is a paired tab's session token; using it keeps the session alive. */
   function isSession(token: string | null | undefined): boolean {
     if (!token) return false
-    const session = live(key(token))
+    const sessionKey = key(token)
+    if (trustedSessions.has(sessionKey)) return true
+    const session = live(sessionKey)
     if (session) session.lastUsed = now()
     return session !== null
   }
@@ -137,13 +162,20 @@ export function createPairing({
   /** Whether a token is an agent token of a live session; it reaches only the MCP server. */
   function isAgentToken(token: string | null | undefined): boolean {
     if (!token) return false
-    const sessionKey = agentTokens.get(key(token))
+    const agentKey = key(token)
+    if (trustedAgentTokens.has(agentKey)) return true
+    const sessionKey = agentTokens.get(agentKey)
     return sessionKey !== undefined && live(sessionKey) !== null
   }
 
-  /** Signs a tab out: its session and agent tokens stop working at once. */
+  /**
+   * Signs a tab out: its session and agent tokens stop working at once. A trusted session stays,
+   * since its tab cannot pair again.
+   */
   function revoke(token: string): void {
-    drop(key(token))
+    const sessionKey = key(token)
+    if (trustedSessions.has(sessionKey)) return
+    drop(sessionKey)
   }
 
   return { issueCode, exchange, isSession, isAgentToken, revoke }

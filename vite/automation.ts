@@ -4,12 +4,37 @@ import process from 'node:process'
 import { AUTOMATION_HTTP_PORT } from '@open-pencil/core/constants'
 
 import { devAutomationRoute } from '../src/app/automation/bridge/portless-route'
-import { automationPlugin } from '../src/app/automation/bridge/vite-plugin'
+import {
+  automationPlugin,
+  createDevAgentSession,
+  type DevAgentSession
+} from '../src/app/automation/bridge/vite-plugin'
 
 const devAutomationAuthToken = process.env.OPENPENCIL_DEV_TOKEN ?? randomUUID()
+let devAgentSession: DevAgentSession | null = null
 
 export function localAutomationToken(command: string): string | null {
   return command === 'serve' ? devAutomationAuthToken : null
+}
+
+/**
+ * The tab session that lets the development server's own tab start coding agents through its MCP
+ * server without a pairing link, made once per Vite process and never derived from
+ * `OPENPENCIL_DEV_TOKEN`. Null for builds, the Cloud and metrics modes, Tauri development (the
+ * desktop app runs agents itself, and `TAURI_DEV_HOST` exposes the server beyond this machine),
+ * Portless (its MCP server is not on the port the tab knows), and `OPENPENCIL_DEV_AGENTS=0`.
+ */
+export function localAgentSession(
+  command: string,
+  mode: string,
+  env: NodeJS.ProcessEnv = process.env
+): DevAgentSession | null {
+  if (command !== 'serve' || mode === 'cloud' || mode === 'metrics') return null
+  if (env.TAURI_DEV_HOST || env.TAURI_ENV_PLATFORM) return null
+  if (env.PORTLESS_URL) return null
+  if (env.OPENPENCIL_DEV_AGENTS === '0') return null
+  devAgentSession ??= createDevAgentSession()
+  return devAgentSession
 }
 
 export function automationCORSOrigin(host: string | undefined): string {
@@ -29,6 +54,13 @@ export function localAutomationRoute(host: string | undefined) {
   return { ...devAutomationRoute(process.env.PORTLESS_URL, port, origin), httpPort: port }
 }
 
-export function openPencilAutomationPlugin(command: string, host: string | undefined) {
-  return automationPlugin(localAutomationToken(command), localAutomationRoute(host))
+export function openPencilAutomationPlugin(
+  command: string,
+  host: string | undefined,
+  mode: string
+) {
+  return automationPlugin(localAutomationToken(command), {
+    ...localAutomationRoute(host),
+    agentSession: localAgentSession(command, mode)
+  })
 }

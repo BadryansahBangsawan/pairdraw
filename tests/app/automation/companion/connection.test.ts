@@ -161,6 +161,110 @@ describe('companion connection', () => {
   })
 })
 
+describe('the development server session', () => {
+  function companionAnswer(url: string): Response {
+    return String(url).endsWith('/companion')
+      ? jsonResponse({ version: '0.16.0', workspace: '/tmp/agents' })
+      : jsonResponse({ error: 'unexpected' }, 404)
+  }
+
+  test('connects without a link, a confirmation, or a pairing request', async () => {
+    const request = mock(async (url: string, _init?: RequestInit) => companionAnswer(url))
+    const connection = createCompanionConnection({ fetch: request })
+    await connection.adopt({ token: TOKEN, agentToken: AGENT_TOKEN, port: 7600 })
+
+    expect(connection.state).toMatchObject({ status: 'connected', dev: true, pending: null })
+    expect(connection.token()).toBe(TOKEN)
+    expect(connection.agentToken()).toBe(AGENT_TOKEN)
+    const urls = request.mock.calls.map(([url]) => String(url))
+    expect(urls).toEqual(['http://127.0.0.1:7600/companion'])
+    const [, init] = request.mock.calls[0] ?? []
+    expect(new Headers(init?.headers).get('authorization')).toBe(`Bearer ${TOKEN}`)
+    connection.disconnect()
+  })
+
+  test('keeps checking a session that another server on its port refuses', async () => {
+    // A companion or another MCP server holds the port, and the development one could not start.
+    let refused = true
+    const connection = createCompanionConnection({
+      fetch: async (url) =>
+        refused ? jsonResponse({ error: 'Unauthorized' }, 401) : companionAnswer(url)
+    })
+    await connection.adopt({ token: TOKEN, agentToken: AGENT_TOKEN, port: 7600 })
+    expect(connection.state).toMatchObject({ status: 'lost', failure: 'unreachable', dev: true })
+    expect(connection.token()).toBeNull()
+
+    refused = false
+    await connection.check()
+    expect(connection.state).toMatchObject({ status: 'connected', failure: null, dev: true })
+    expect(connection.token()).toBe(TOKEN)
+    connection.disconnect()
+  })
+
+  test('still forgets a paired session its companion no longer accepts', async () => {
+    let refused = false
+    const connection = createCompanionConnection({
+      fetch: async () =>
+        refused
+          ? jsonResponse({ error: 'Unauthorized' }, 401)
+          : jsonResponse({ token: TOKEN, agentToken: AGENT_TOKEN, version: '0.16.0' })
+    })
+    await connection.pair({ code: CODE, port: 7601 })
+    refused = true
+    await connection.check()
+
+    expect(connection.state).toMatchObject({ status: 'idle', failure: 'expired', dev: false })
+    expect(connection.token()).toBeNull()
+  })
+
+  test('waits for a server that has not started yet', async () => {
+    let down = true
+    const connection = createCompanionConnection({
+      fetch: async (url) => {
+        if (down) throw new TypeError('Failed to fetch')
+        return companionAnswer(url)
+      }
+    })
+    await connection.adopt({ token: TOKEN, agentToken: AGENT_TOKEN, port: 7600 })
+    expect(connection.state).toMatchObject({ status: 'lost', dev: true })
+    down = false
+    await connection.check()
+    expect(connection.token()).toBe(TOKEN)
+    connection.disconnect()
+  })
+
+  test('disconnecting forgets it here without signing the server out', async () => {
+    const request = mock(async (url: string, _init?: RequestInit) => companionAnswer(url))
+    const connection = createCompanionConnection({ fetch: request })
+    await connection.adopt({ token: TOKEN, agentToken: AGENT_TOKEN, port: 7600 })
+    connection.disconnect()
+
+    expect(connection.state).toMatchObject({ status: 'idle', dev: false })
+    expect(connection.token()).toBeNull()
+    expect(request.mock.calls.map(([url]) => String(url))).not.toContain(
+      'http://127.0.0.1:7600/pair/revoke'
+    )
+  })
+
+  test('a confirmed link replaces it', async () => {
+    const request = mock(async (url: string, _init?: RequestInit) =>
+      String(url).endsWith('/pair')
+        ? jsonResponse({ token: 'b'.repeat(64), agentToken: 'c'.repeat(64), version: '0.16.0' })
+        : companionAnswer(url)
+    )
+    const connection = createCompanionConnection({ fetch: request })
+    await connection.adopt({ token: TOKEN, agentToken: AGENT_TOKEN, port: 7600 })
+    expect(await connection.pair({ code: CODE, port: 7601 })).toBe(true)
+
+    expect(connection.state).toMatchObject({ status: 'connected', dev: false })
+    expect(connection.url()).toBe('http://127.0.0.1:7601')
+    expect(request.mock.calls.map(([url]) => String(url))).not.toContain(
+      'http://127.0.0.1:7600/pair/revoke'
+    )
+    connection.disconnect()
+  })
+})
+
 describe('connectCompanionFromLocation', () => {
   test('removes the code from the address and holds the link for confirmation', async () => {
     const replaceState = mock(

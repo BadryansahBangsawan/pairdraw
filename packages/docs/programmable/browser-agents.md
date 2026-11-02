@@ -35,6 +35,18 @@ The link works once and for two minutes. Press <kbd>Enter</kbd> in the companion
 
 Agents still ask before acting on your computer, as on the desktop, and an agent you allow to edit files can edit them. Keep the companion running only while you use it.
 
+## Development server
+
+`bun run dev` connects its own tab without the companion or a link. The MCP server it starts runs the agent bridge with a session made for that development server and handed to its tab, so the chat finds and starts agents on your computer as soon as the app loads. The session lives in the development server's process, the MCP server's environment, and the tab's bundle; it is never written to the discovery file, and it ends when the development server stops.
+
+- Requests and sockets still pass the same checks: the MCP server listens only on `127.0.0.1`, and only the development server's origin may call it.
+- Like the development server's automation token, the session is in the scripts it serves, so programs on your computer that can load them can use it. On a computer you share with other accounts, set `OPENPENCIL_DEV_AGENTS=0`.
+- As with the companion, the MCP server's `eval` tool stays off, even with `OPENPENCIL_MCP_EVAL=1`. To use it, start the development server with `OPENPENCIL_DEV_AGENTS=0`.
+- Builds never carry a session, and neither do `--mode cloud`, `--mode metrics`, `bun run tauri dev` (the desktop app starts agents itself), or a server with `TAURI_DEV_HOST`.
+- `bun run dev:portless` does not connect the tab this way yet; pair it with the companion as above, with `OPENPENCIL_CONNECT_APP_URL` set to the app's address.
+- When the desktop app, a companion, or another MCP server already listens on the development server's MCP port, the development server cannot start its own, and the tab keeps trying. Quit the other server and reload the tab.
+- Set `OPENPENCIL_DEV_AGENTS=0` to start the development server without it. The Playwright configuration does this so that tests never find the agents on your computer; start a server you reuse for tests (`OPENPENCIL_TEST_REUSE_SERVER=1`) the same way.
+
 ## Troubleshooting
 
 - **That link expired or was already used.** Press <kbd>Enter</kbd> in the companion's terminal and open the new link.

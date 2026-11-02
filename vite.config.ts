@@ -15,6 +15,7 @@ import packageJson from './package.json'
 import { viteBuildTarget } from './src/app/shell/support/baseline'
 import { createOpenPencilAliases } from './vite/aliases'
 import {
+  localAgentSession,
   localAutomationRoute,
   localAutomationToken,
   openPencilAutomationPlugin
@@ -60,6 +61,10 @@ export default defineConfig(async ({ command, mode }) => {
       __OPENPENCIL_LOCAL_AUTOMATION_URL__: JSON.stringify(automationRoute.browserURL),
       __OPENPENCIL_LOCAL_AUTOMATION_HTTP_URL__: JSON.stringify(
         automationRoute.browserURL.replace(/^ws/, 'http')
+      ),
+      // The development server's own tab reaches its agent bridge with this; null in every build.
+      __OPENPENCIL_LOCAL_AGENT_SESSION__: JSON.stringify(
+        automation ? localAgentSession(command, mode) : null
       )
     },
     // Dynamic browser fixtures must not trigger a dependency-optimizer reload mid-test.
@@ -74,7 +79,7 @@ export default defineConfig(async ({ command, mode }) => {
       tailwindcss(),
       Icons({ compiler: 'vue3', customCollections: { ai: aiIconCollection() } }),
       Components({ resolvers: [IconsResolver({ prefix: 'icon', customCollections: ['ai'] })] }),
-      automation ? openPencilAutomationPlugin(command, host) : undefined,
+      automation ? openPencilAutomationPlugin(command, host, mode) : undefined,
       vue(),
       metrics ? metricsBrandPlugin((outDir) => resolve(outDir, '..')) : openPencilPwaPlugin(),
       cloudSite ? cloudSitePlugin() : undefined

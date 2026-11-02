@@ -64,7 +64,8 @@ function disconnect() {
         <AppStatus tone="success">
           {{ ai.aiSetupCompanionConnected({ version: state.version ?? '' }) }}
         </AppStatus>
-        <AppButton size="xs" variant="outline" @click="disconnect">
+        <!-- The development server's session comes back on reload, so it offers no Disconnect. -->
+        <AppButton v-if="!state.dev" size="xs" variant="outline" @click="disconnect">
           {{ ai.aiSetupCompanionDisconnect }}
         </AppButton>
       </div>

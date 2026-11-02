@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 import * as v from 'valibot'
+
+import { devAgentBridgeFromEnv } from '#mcp/agents/index'
 
 import {
   APP_ORIGIN,
@@ -215,5 +220,152 @@ describe('agent sockets', () => {
     expect((await install('fake')).status).toBe(200)
     expect((await install('plain')).status).toBe(400)
     expect(companion.installs).toEqual(['@example/fake-acp'])
+  })
+})
+
+describe('the tab session a development server hands the MCP server', () => {
+  const ENTRY = Bun.resolveSync('#mcp/index', import.meta.dir)
+  const session = { token: 'd'.repeat(64), agentToken: 'e'.repeat(64) }
+  const sessionEnv = {
+    OPENPENCIL_MCP_AGENTS: '1',
+    OPENPENCIL_MCP_AGENT_SESSION: session.token,
+    OPENPENCIL_MCP_AGENT_TOKEN: session.agentToken
+  }
+  const servers: Array<() => void> = []
+
+  afterEach(() => {
+    for (const stop of servers.splice(0)) stop()
+  })
+
+  function freePort(): number {
+    const probe = Bun.serve({ port: 0, fetch: () => new Response('') })
+    const { port } = probe
+    void probe.stop(true)
+    if (port === undefined) throw new Error('No free port was assigned')
+    return port
+  }
+
+  /**
+   * Starts `openpencil-mcp-http` as `bun run dev` does, and waits until it listens. Its runtime
+   * folder, where the bridge keeps the agents' workspace, is the test's own, never the person's.
+   */
+  async function startHTTPServer(env: Record<string, string>) {
+    const directory = mkdtempSync(join(tmpdir(), 'op-mcp-dev-agents-'))
+    const port = freePort()
+    const discoveryPath = join(directory, 'mcp.json')
+    const child = Bun.spawn(['bun', ENTRY], {
+      stdin: 'ignore',
+      stdout: 'ignore',
+      stderr: 'pipe',
+      env: {
+        ...process.env,
+        HOME: directory,
+        XDG_RUNTIME_DIR: directory,
+        LOCALAPPDATA: directory,
+        PORT: String(port),
+        OPENPENCIL_MCP_SOCKET: join(directory, 'mcp.sock'),
+        OPENPENCIL_MCP_DISCOVERY_PATH: discoveryPath,
+        OPENPENCIL_MCP_AUTH_TOKEN: MASTER_TOKEN,
+        OPENPENCIL_MCP_CORS_ORIGIN: APP_ORIGIN,
+        ...env
+      }
+    })
+    servers.push(() => {
+      child.kill()
+      rmSync(directory, { recursive: true, force: true })
+    })
+    const reader = child.stderr.getReader()
+    const decoder = new TextDecoder()
+    let output = ''
+    while (!output.includes('HTTP:')) {
+      const { done, value } = await reader.read()
+      if (done) throw new Error(`The server exited before it was ready: ${output}`)
+      output += decoder.decode(value)
+    }
+    reader.releaseLock()
+    return { base: `http://127.0.0.1:${port}`, directory, discoveryPath, output }
+  }
+
+  /** Whether the server offers eval, as its own token sees the tools in `/health`. */
+  async function evalEnabled(base: string): Promise<boolean | undefined> {
+    const response = await request(base, '/health', MASTER_TOKEN)
+    const health = v.parse(
+      v.object({ tools: v.array(v.object({ name: v.string(), enabled: v.boolean() })) }),
+      await response.json()
+    )
+    return health.tools.find((tool) => tool.name === 'eval')?.enabled
+  }
+
+  function request(base: string, path: string, token: string) {
+    return fetch(`${base}${path}`, {
+      headers: { authorization: `Bearer ${token}`, origin: APP_ORIGIN }
+    })
+  }
+
+  test('reaches the agent routes with that session alone', async () => {
+    const server = await startHTTPServer(sessionEnv)
+    const companion = await request(server.base, '/companion', session.token)
+    expect(companion.status).toBe(200)
+    // The agents' workspace is in the runtime folder the test set, not the person's.
+    const info = v.parse(v.object({ workspace: v.string() }), await companion.json())
+    expect(info.workspace.startsWith(server.directory)).toBe(true)
+    // The discovery-file token, which is also the dev automation token, still starts nothing.
+    expect((await request(server.base, '/agents', MASTER_TOKEN)).status).toBe(401)
+    // Agents hold the agent token; it reaches `/mcp`, never the routes that start programs.
+    expect((await request(server.base, '/agents', session.agentToken)).status).toBe(401)
+    // The tab cannot sign itself out of a session it cannot pair again.
+    await fetch(`${server.base}/pair/revoke`, {
+      method: 'POST',
+      headers: { authorization: `Bearer ${session.token}`, origin: APP_ORIGIN }
+    })
+    expect((await request(server.base, '/companion', session.token)).status).toBe(200)
+    const discovery = readFileSync(server.discoveryPath, 'utf8')
+    expect(discovery).not.toContain(session.token)
+    expect(discovery).not.toContain(session.agentToken)
+  })
+
+  test('keeps eval off while the bridge is on, as the companion does', async () => {
+    const bridged = await startHTTPServer({ ...sessionEnv, OPENPENCIL_MCP_EVAL: '1' })
+    expect(bridged.output).toContain('OPENPENCIL_MCP_EVAL=1 is ignored')
+    expect(await evalEnabled(bridged.base)).toBe(false)
+    const plain = await startHTTPServer({ OPENPENCIL_MCP_AGENTS: '', OPENPENCIL_MCP_EVAL: '1' })
+    expect(await evalEnabled(plain.base)).toBe(true)
+  })
+
+  test('still refuses other sites', async () => {
+    const server = await startHTTPServer(sessionEnv)
+    const response = await fetch(`${server.base}/companion`, {
+      headers: { authorization: `Bearer ${session.token}`, origin: 'https://evil.example' }
+    })
+    expect(response.status).toBe(403)
+  })
+
+  test('starts no bridge without the switch, or with a malformed session', async () => {
+    const unset = await startHTTPServer({
+      OPENPENCIL_MCP_AGENTS: '',
+      OPENPENCIL_MCP_AGENT_SESSION: session.token,
+      OPENPENCIL_MCP_AGENT_TOKEN: session.agentToken
+    })
+    // Without the bridge its routes do not exist.
+    expect((await request(unset.base, '/companion', session.token)).status).toBe(404)
+    const malformed = await startHTTPServer({
+      ...sessionEnv,
+      OPENPENCIL_MCP_AGENT_TOKEN: session.token
+    })
+    expect((await request(malformed.base, '/companion', session.token)).status).toBe(404)
+  })
+
+  test.each([
+    ['no switch', { ...sessionEnv, OPENPENCIL_MCP_AGENTS: '0' }],
+    ['a short token', { ...sessionEnv, OPENPENCIL_MCP_AGENT_SESSION: 'd'.repeat(32) }],
+    ['uppercase hex', { ...sessionEnv, OPENPENCIL_MCP_AGENT_TOKEN: 'E'.repeat(64) }],
+    ['the same token twice', { ...sessionEnv, OPENPENCIL_MCP_AGENT_TOKEN: session.token }],
+    ['a missing agent token', { ...sessionEnv, OPENPENCIL_MCP_AGENT_TOKEN: undefined }]
+  ])('reads no session from %s', (_label, env) => {
+    expect(devAgentBridgeFromEnv(env)).toBeNull()
+  })
+
+  test('reads the session the development server set', () => {
+    expect(devAgentBridgeFromEnv(sessionEnv)).toEqual({ trustedSessions: [session] })
   })
 })

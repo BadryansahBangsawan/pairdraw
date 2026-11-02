@@ -15,6 +15,12 @@ declare const __OPENPENCIL_OFFICIAL_CLOUD_URL__: string | null
 declare const __OPENPENCIL_LOCAL_AUTOMATION_TOKEN__: string | null
 declare const __OPENPENCIL_LOCAL_AUTOMATION_URL__: string
 declare const __OPENPENCIL_LOCAL_AUTOMATION_HTTP_URL__: string
+/**
+ * The session `bun run dev` gave its MCP server's agent bridge, so this tab starts coding agents
+ * without a pairing link (`src/app/automation/companion/dev.ts`). Null in builds, Cloud and
+ * metrics modes, Tauri and Portless development, and with `OPENPENCIL_DEV_AGENTS=0`.
+ */
+declare const __OPENPENCIL_LOCAL_AGENT_SESSION__: { token: string; agentToken: string } | null
 
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'

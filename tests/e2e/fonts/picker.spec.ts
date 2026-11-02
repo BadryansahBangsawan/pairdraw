@@ -18,6 +18,16 @@ async function openTypographyForText(page: Page) {
   })
 }
 
+/**
+ * The browser reaches no web font provider. Google is mocked; Fontsource, the browser's other
+ * provider, fails, so picking a family nobody serves never waits on the real network.
+ */
+async function blockFontsource(page: Page) {
+  await page.route(/^https:\/\/(api\.fontsource\.org|cdn\.jsdelivr\.net\/fontsource)\//, (route) =>
+    route.abort('internetdisconnected')
+  )
+}
+
 async function openFontPicker(page: Page) {
   await page.getByTestId('font-picker-trigger').click()
 }
@@ -28,6 +38,7 @@ async function searchFonts(page: Page, query: string) {
 
 test('font picker selects local fonts without browser web-font access', async ({ page }) => {
   const fonts = await mockGoogleFonts(page)
+  await blockFontsource(page)
   await page.addInitScript(() => {
     Object.defineProperty(window, 'queryLocalFonts', {
       configurable: true,
@@ -74,6 +85,7 @@ test('font picker keeps bundled fonts when local and web fonts are unavailable',
   page
 }) => {
   const fonts = await mockGoogleFonts(page)
+  await blockFontsource(page)
   await page.addInitScript(() => {
     Reflect.deleteProperty(window, 'queryLocalFonts')
   })
@@ -93,6 +105,7 @@ test('font picker keeps bundled fonts when local and web fonts are unavailable',
 
 test('font picker keeps bundled fonts when local font permission is rejected', async ({ page }) => {
   const fonts = await mockGoogleFonts(page)
+  await blockFontsource(page)
   await page.addInitScript(() => {
     Object.defineProperty(window, 'queryLocalFonts', {
       configurable: true,

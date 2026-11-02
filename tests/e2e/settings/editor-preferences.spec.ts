@@ -16,6 +16,12 @@ async function openEditorSettings(page: Page) {
   await expect(page.getByTestId('settings-editor-panel')).toBeVisible()
 }
 
+/** Closes Settings and waits until its dialog has gone, so the canvas gets the next wheel. */
+async function closeSettings(page: Page) {
+  await page.getByTestId('app-settings-done').click()
+  await expect(page.getByTestId('settings-editor-panel')).toBeHidden()
+}
+
 function editorState(page: Page) {
   return page.evaluate(() => {
     const store = window.openPencil?.getStore?.()
@@ -79,14 +85,14 @@ test('a plain wheel zooms once Zoom with scroll wheel is on, and Invert flips it
 
   await openEditorSettings(page)
   await page.getByRole('switch', { name: 'Zoom with scroll wheel' }).click()
-  await page.getByTestId('app-settings-done').click()
+  await closeSettings(page)
   await wheelOverCanvas(canvas, 100)
   const zoomedOut = await editorState(page)
   expect(zoomedOut.zoom).toBeLessThan(scrolled.zoom)
 
   await openEditorSettings(page)
   await page.getByRole('switch', { name: 'Invert zoom direction' }).click()
-  await page.getByTestId('app-settings-done').click()
+  await closeSettings(page)
   await wheelOverCanvas(canvas, 100)
   expect((await editorState(page)).zoom).toBeGreaterThan(zoomedOut.zoom)
   canvas.assertNoErrors()

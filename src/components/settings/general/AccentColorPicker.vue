@@ -18,6 +18,7 @@ const messages = useSettingsMessages()
 const styles = tv(theme)()
 
 const presetLabels = computed<Record<AccentPreset, string>>(() => ({
+  pairdraw: messages.value.accentPairdraw,
   blue: messages.value.accentBlue,
   purple: messages.value.accentPurple,
   pink: messages.value.accentPink,

@@ -62,6 +62,12 @@ export {
 import type { Color } from '@open-pencil/scene-graph/primitives'
 
 /**
+ * The product name people see in the interface. Packages, commands, storage keys, and other
+ * identifiers keep the `open-pencil` and `OpenPencil` names.
+ */
+export const APP_NAME = 'Pairdraw'
+
+/**
  * The collaboration namespace. It names the shared document format and how peers send it, so
  * builds that sync the layer tree or variables differently, or encode what they send
  * differently, never join each other's rooms; change it with either.

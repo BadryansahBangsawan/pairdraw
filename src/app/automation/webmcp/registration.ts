@@ -4,6 +4,8 @@ import type { WebMCP } from 'webmcp-types'
 
 import { parseToolArgs, type ToolDef } from '@open-pencil/core/tools'
 
+import { APP_NAME } from '@/constants'
+
 import { getWebMCPTools } from './policy'
 import { type WebMCPMode } from './schema'
 
@@ -35,7 +37,7 @@ export function registerWebMCPTools(
         await context.registerTool(
           {
             name: def.name,
-            description: `${def.description} Targets the active OpenPencil document.`,
+            description: `${def.description} Targets the active ${APP_NAME} document.`,
             inputSchema: toJSONSchema(schema, { typeMode: 'input' }),
             annotations: { readOnlyHint: !def.mutates, untrustedContentHint: true },
             execute: async (input, options?: WebMCP.ToolExecuteCallbackOptions) => {

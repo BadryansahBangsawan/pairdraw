@@ -31,12 +31,13 @@ import UsageStatsPrompt from '@/components/sharing/UsageStatsPrompt.vue'
 import AppShell from '@/components/shell/AppShell.vue'
 import AppToaster from '@/components/shell/AppToaster.vue'
 import VoiceCallAudio from '@/components/voice-call/VoiceCallAudio.vue'
+import { APP_NAME } from '@/constants'
 
 const { updates, locale } = useI18n()
 const router = useRouter()
 
 useHead({
-  titleTemplate: (title) => (title ? `${title} — OpenPencil` : 'OpenPencil'),
+  titleTemplate: (title) => (title ? `${title} — ${APP_NAME}` : APP_NAME),
   htmlAttrs: {
     lang: locale,
     'data-motion': computed(() => (animationsEnabled.value ? 'full' : 'off'))

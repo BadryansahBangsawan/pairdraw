@@ -213,6 +213,7 @@ ja:settings.baseURLHint
 ja:settings.invalidURL
 ja:settings.modelIDHint
 ja:settings.temporaryDisableSnappingHint
+ja:settings.accentPairdraw
 ja:storage.accessKeyID
 ja:storage.copyCors
 ja:storage.providerS3
@@ -432,6 +433,7 @@ zh-cn:rendering.wideGamutUnavailable
 zh-cn:settings.baseURLHint
 zh-cn:settings.invalidURL
 zh-cn:settings.temporaryDisableSnappingHint
+zh-cn:settings.accentPairdraw
 zh-cn:storage.accessKeyID
 zh-cn:storage.copyCors
 zh-cn:storage.providerS3

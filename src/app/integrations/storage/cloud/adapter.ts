@@ -5,6 +5,7 @@ import { extractFigThumbnailFromReader } from '@open-pencil/fig'
 import { cloudServerHost } from '@/app/cloud/servers/address'
 import { findCloudServer } from '@/app/cloud/servers/store'
 import { cloudAPIClient, recheckedCloudConnection } from '@/app/cloud/sessions/connection'
+import { APP_NAME } from '@/constants'
 
 import { StorageRevisionConflictError, StorageUnavailableError } from '../errors'
 import { storageFetch } from '../s3/fetch'
@@ -89,7 +90,7 @@ export function createCloudStorageAdapter(
         const workspaces = await (await client()).listWorkspaces()
         const found = workspaces.workspaces.some((workspace) => workspace.id === workspaceId())
         return found
-          ? { ok: true, message: 'Connected to OpenPencil Cloud.' }
+          ? { ok: true, message: `Connected to ${APP_NAME} Cloud.` }
           : { ok: false, message: 'This workspace is no longer available.' }
       } catch (error) {
         return { ok: false, message: error instanceof Error ? error.message : String(error) }

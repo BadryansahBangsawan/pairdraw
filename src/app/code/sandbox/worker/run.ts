@@ -1,6 +1,6 @@
 import type { SandboxRunRequest, SandboxRunResult } from '@/app/code/sandbox/schema'
 import type { DesignJSXHelperDescriptor } from '@/app/code/sandbox/types'
-import { validateStructuredData } from '@/app/code/sandbox/validate'
+import { DESIGN_JSX_EMPTY_OUTPUT_ERROR, validateStructuredData } from '@/app/code/sandbox/validate'
 
 type Element = {
   type: unknown
@@ -119,7 +119,7 @@ export function runDesignJSX({
       ...names.map((name) => tags[name]),
       ...helpers.map(runtime.byName)
     )
-    if (value === undefined) throw new Error('Design JSX must return an OpenPencil element.')
+    if (value === undefined) throw new Error(DESIGN_JSX_EMPTY_OUTPUT_ERROR)
     validateStructuredData(runtime.collections, limits, validateStructuredData(value, limits))
     return { id, ok: true, value, collections: runtime.collections }
   } catch (error) {

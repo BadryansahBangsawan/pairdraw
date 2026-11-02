@@ -17,6 +17,7 @@ import {
   providerCredentialRef
 } from '@/app/settings/credentials/migration'
 import type { CredentialRef, CredentialStatus } from '@/app/settings/credentials/types'
+import { APP_NAME } from '@/constants'
 
 export type DirectAIModelRuntime = {
   kind: 'direct'
@@ -90,7 +91,7 @@ export class CloudAIUnavailableError extends Error {
   override readonly name = 'CloudAIUnavailableError'
 
   constructor() {
-    super('OpenPencil Cloud AI is unavailable')
+    super(`${APP_NAME} Cloud AI is unavailable`)
   }
 }
 

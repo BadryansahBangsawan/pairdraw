@@ -2,6 +2,7 @@
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
+import { APP_NAME } from '@/constants'
 import brandMarkTheme from '@/theme/brand'
 
 import type { BrandMarkProps } from './types'
@@ -22,7 +23,7 @@ const sources = {
   'app-icon': 'app-icon'
 } as const
 const source = computed(() => {
-  // The ivory tile owns its background and always uses the light palette.
+  // The orange tile owns its background and draws the same white mark in both themes.
   const suffix = variant !== 'app-icon' && appearance === 'dark' ? '-dark' : ''
   return `/brand/${sources[variant]}${suffix}.svg`
 })
@@ -32,7 +33,7 @@ const source = computed(() => {
   <img
     :src="source"
     :class="brandMark({ class: className })"
-    :alt="decorative ? '' : 'OpenPencil'"
+    :alt="decorative ? '' : APP_NAME"
     width="16"
     height="16"
   />

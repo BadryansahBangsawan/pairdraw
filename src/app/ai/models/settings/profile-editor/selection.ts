@@ -11,6 +11,7 @@ import type { AIModelProfileDraft, AIModelCapability } from '@/app/ai/models'
 import { resolveModelsDevModel } from '@/app/ai/models/catalog'
 import { useProviderModelCatalog } from '@/app/ai/models/catalog/use'
 import { modelPickerOptions, type ModelPickerLabels } from '@/app/ai/models/picker/options'
+import { modelProviderName } from '@/app/ai/models/provider-name'
 import { supportsThinkingLevel } from '@/app/ai/models/thinking'
 import { OPENPENCIL_AI_PROVIDER } from '@/app/ai/providers/openpencil/provider'
 
@@ -41,7 +42,7 @@ export function useProfileModelSelection(
   const isHarness = computed(() => draft.providerID === 'harness:pi')
   const supportsThinking = computed(() => supportsThinkingLevel(draft.providerID))
   const providerDisplayName = computed(() => {
-    if (!isACP.value) return providerDef.value.name
+    if (!isACP.value) return modelProviderName(providerDef.value.id)
 
     const agentID = draft.providerID.slice('acp:'.length)
     return ACP_AGENTS.find((agent) => agent.id === agentID)?.name ?? draft.providerID

@@ -13,7 +13,7 @@ import {
   DESIGN_JSX_MAX_STRING_LENGTH,
   resolveDesignJSXValidationLimits
 } from '@/app/code/sandbox/types'
-import { validateDesignJSXOutput } from '@/app/code/sandbox/validate'
+import { DESIGN_JSX_EMPTY_OUTPUT_ERROR, validateDesignJSXOutput } from '@/app/code/sandbox/validate'
 import { runDesignJSX } from '@/app/code/sandbox/worker/run'
 
 const limits = resolveDesignJSXValidationLimits({})
@@ -51,12 +51,10 @@ describe('Design JSX sandbox output', () => {
   })
 
   test('rejects empty output and malformed elements before rendering', () => {
-    expect(() => validateDesignJSXOutput(undefined, limits)).toThrow(
-      'must return an OpenPencil element'
-    )
-    expect(() => validateDesignJSXOutput([], limits)).toThrow('must return an OpenPencil element')
+    expect(() => validateDesignJSXOutput(undefined, limits)).toThrow(DESIGN_JSX_EMPTY_OUTPUT_ERROR)
+    expect(() => validateDesignJSXOutput([], limits)).toThrow(DESIGN_JSX_EMPTY_OUTPUT_ERROR)
     expect(() => convertDesignJSXRoots([{ type: 'frame', props: {}, children: null }])).toThrow(
-      'must return an OpenPencil element'
+      DESIGN_JSX_EMPTY_OUTPUT_ERROR
     )
   })
 
@@ -92,7 +90,7 @@ describe('Design JSX sandbox output', () => {
 
   test('counts container and primitive data toward the output limit', () => {
     const tiny = resolveDesignJSXValidationLimits({ outputBytes: 1 })
-    expect(() => validateDesignJSXOutput([], tiny)).toThrow('must return an OpenPencil element')
+    expect(() => validateDesignJSXOutput([], tiny)).toThrow(DESIGN_JSX_EMPTY_OUTPUT_ERROR)
     expect(() => validateDesignJSXOutput(true, tiny)).toThrow('too large')
     expect(() => validateDesignJSXOutput(1, tiny)).toThrow('too large')
     expect(() => validateDesignJSXOutput(frame(), tiny)).toThrow('too large')
@@ -207,7 +205,7 @@ return __h(Frame, { fill: t.Page, mode: dark }, __h(Button.Root, null), 'Hi', fa
     expect(run('none', 'const frame = __h(Frame, null)')).toEqual({
       id: 'none',
       ok: false,
-      error: 'Design JSX must return an OpenPencil element.'
+      error: DESIGN_JSX_EMPTY_OUTPUT_ERROR
     })
     expect(run('date', 'return __h(Frame, { when: new Date(0) })')).toEqual({
       id: 'date',

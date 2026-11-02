@@ -6,16 +6,22 @@ import {
 import sharp from 'sharp'
 
 import { appArtwork, loadArtwork, recolor } from './artwork.ts'
+import { targetArtwork } from './config.ts'
 
 export type BrandFiles = Map<string, Buffer>
 
-export async function generateWeb(root: string): Promise<BrandFiles> {
-  const { adapter, main, micro } = await loadArtwork(root)
-  const darkMicro = recolor(micro, adapter, 'dark')
-  const app = appArtwork(main, adapter, 'web')
-  const tile = appArtwork(main, adapter, 'tile')
-  const favicon = appArtwork(micro, adapter, 'tile')
-  const maskable = appArtwork(main, adapter, 'maskable')
+/** The app's or the documentation's browser assets, each from its own artwork. */
+export async function generateWeb(
+  root: string,
+  target: 'web' | 'docs' = 'web'
+): Promise<BrandFiles> {
+  const artwork = targetArtwork(target)
+  const { adapter, main, micro } = await loadArtwork(root, artwork)
+  const darkMicro = recolor(micro, adapter, artwork, 'dark')
+  const app = appArtwork(main, adapter, artwork, 'web')
+  const tile = appArtwork(main, adapter, artwork, 'tile')
+  const favicon = appArtwork(micro, adapter, artwork, 'favicon')
+  const maskable = appArtwork(main, adapter, artwork, 'maskable')
   const icon = initFaviconIconSettings()
   icon.desktop.darkIconType = 'specific'
   // Use precomposed tiles with no generator background/clip transforms. This also
@@ -42,11 +48,11 @@ export async function generateWeb(root: string): Promise<BrandFiles> {
   files.set('brand/app-icon.svg', Buffer.from(tile))
   files.set('brand/app-icon-1024.png', await sharp(Buffer.from(tile)).png().toBuffer())
   files.set('brand/mark.svg', Buffer.from(main))
-  files.set('brand/mark-dark.svg', Buffer.from(recolor(main, adapter, 'dark')))
+  files.set('brand/mark-dark.svg', Buffer.from(recolor(main, adapter, artwork, 'dark')))
   files.set('brand/mark-micro.svg', Buffer.from(micro))
   files.set('brand/mark-micro-dark.svg', Buffer.from(darkMicro))
-  files.set('brand/mark-mono.svg', Buffer.from(recolor(main, adapter, 'mono')))
-  files.set('brand/mark-mono-dark.svg', Buffer.from(recolor(main, adapter, 'mono-dark')))
+  files.set('brand/mark-mono.svg', Buffer.from(recolor(main, adapter, artwork, 'mono')))
+  files.set('brand/mark-mono-dark.svg', Buffer.from(recolor(main, adapter, artwork, 'mono-dark')))
   for (const size of [192, 512]) {
     files.set(
       `brand/pwa-${size}.png`,

@@ -2,6 +2,7 @@ import type { AutomationDocumentSummary } from '@open-pencil/core/rpc'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { getTabById, getTabForStore, getTabsSnapshot } from '@/app/tabs'
+import { APP_NAME } from '@/constants'
 
 export type UnknownRecord = { [key: string]: unknown }
 
@@ -83,7 +84,7 @@ export function resolveAutomationTarget(
     throw new Error(
       requestedDocumentId
         ? `Document "${requestedDocumentId}" not found`
-        : 'No active OpenPencil document'
+        : `No active ${APP_NAME} document`
     )
   }
 

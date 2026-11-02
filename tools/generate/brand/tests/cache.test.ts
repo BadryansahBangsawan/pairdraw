@@ -74,9 +74,12 @@ describe('brand asset preparation', () => {
     const key = await fingerprint(root)
     expect(await isCached(root, 'web', key)).toBe(true)
     expect(await isCached(root, 'docs', key)).toBe(true)
-    expect(await readFile(join(root, 'public/favicon.ico'))).toEqual(
-      await readFile(join(root, 'packages/docs/public/favicon.ico'))
-    )
+    // Each target publishes its own artwork: the app Pairdraw's, the docs OpenPencil's.
+    for (const [output, master] of [
+      ['public/brand/mark.svg', 'assets/brand/mark.svg'],
+      ['packages/docs/public/brand/mark.svg', 'assets/brand/openpencil/mark.svg']
+    ])
+      expect(await readFile(join(root, output))).toEqual(await readFile(join(root, master)))
   })
 
   test.skipIf(process.platform === 'win32')(

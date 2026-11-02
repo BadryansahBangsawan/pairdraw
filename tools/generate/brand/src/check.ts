@@ -11,10 +11,11 @@ export async function checkBrandAssets(
   root: string,
   selected: readonly BrandTarget[]
 ): Promise<void> {
-  const generators = { web: generateWeb, docs: generateWeb, desktop: generateDesktop }
+  const generate = (target: BrandTarget) =>
+    target === 'desktop' ? generateDesktop(root) : generateWeb(root, target)
   for (const target of selected) {
-    const first = await generators[target](root)
-    const second = await generators[target](root)
+    const first = await generate(target)
+    const second = await generate(target)
     await validateFiles(first, target)
     for (const name of targetFiles(target)) {
       assert.deepEqual(

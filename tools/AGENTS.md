@@ -49,4 +49,4 @@ The `/demo` document is a tour of eight chapters on one page, each a section sta
 
 ## Brand assets
 
-Canonical artwork lives in `assets/brand/` (main mark and optical micro master; see its README). `tools/generate/brand/` derives web, docs, and native icons with RealFaviconGenerator and Tauri; generated assets are ignored, not committed. Vite and VitePress configs prepare their own targets, and Tauri dev/build hooks prepare native icons.
+Canonical artwork lives in `assets/brand/` (main mark and 16px micro master, plus the docs-only OpenPencil masters in `assets/brand/openpencil/`; see its README). `tools/generate/brand/` derives web, docs, and native icons with RealFaviconGenerator and Tauri; generated assets are ignored, not committed. Vite and VitePress configs prepare their own targets, and Tauri dev/build hooks prepare native icons.

@@ -2,6 +2,12 @@ import type { DesignJSXValidationLimits } from '@/app/code/sandbox/schema'
 
 const BLOCKED_KEYS = new Set(['__proto__', 'prototype', 'constructor'])
 
+/**
+ * The error a run gets when its code returns no element. It spells the product name out
+ * because the sandbox worker imports this module and must not load `@/constants`.
+ */
+export const DESIGN_JSX_EMPTY_OUTPUT_ERROR = 'Design JSX must return a Pairdraw element.'
+
 export type ValidationState = {
   elements: number
   bytes: number
@@ -111,9 +117,9 @@ export function validateDesignJSXOutput(
   limits: DesignJSXValidationLimits,
   collections: unknown = []
 ): unknown[] {
-  if (value === undefined) throw new Error('Design JSX must return an OpenPencil element.')
+  if (value === undefined) throw new Error(DESIGN_JSX_EMPTY_OUTPUT_ERROR)
   const roots = Array.isArray(value) ? value : [value]
-  if (roots.length === 0) throw new Error('Design JSX must return an OpenPencil element.')
+  if (roots.length === 0) throw new Error(DESIGN_JSX_EMPTY_OUTPUT_ERROR)
   if (!Array.isArray(collections))
     throw new Error('Design JSX output must contain plain structured data only.')
   validateStructuredData(collections, limits, validateStructuredData(roots, limits))

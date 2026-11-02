@@ -28,11 +28,10 @@ export async function ensureBrandAssets(
   })
   try {
     const key = await fingerprint(root)
-    let web: Awaited<ReturnType<typeof generateWeb>> | undefined
     for (const target of selected) {
       if (!options.force && (await isCached(root, target, key))) continue
       const files =
-        target === 'desktop' ? await generateDesktop(root) : (web ??= await generateWeb(root))
+        target === 'desktop' ? await generateDesktop(root) : await generateWeb(root, target)
       await validateFiles(files, target)
       await publish(root, target, key, files)
       console.info(`Generated ${target} brand assets`)

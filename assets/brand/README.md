@@ -1,12 +1,12 @@
-# OpenPencil brand sources
+# Pairdraw brand sources
 
-- `mark.svg` is the teal pencil-P master: a long pointed stem, contrasting teal blocks, a faint clipped pixel grid, and white editing handles with blue borders (`#005CFF`). The square sits at the top-left; the circle sits on the outer curve.
-- `mark-micro.svg` renders at 16px and preserves the main P's geometry and proportions. Its square and circular handles are enlarged for small sizes, with the circle slightly larger than the square. It has no grid.
-- Both use the same tight `28 28 228 228` viewBox. Keep the P geometry aligned between masters; optical adjustments belong to the handles, not the letter's proportions.
-- Both use real transparent counters and no white outline. Preserve the `data-part` attributes used for derived dark and monochrome artwork.
-- Dark artwork has its own brighter teal palette, lighter blue borders, soft-white handle centers, and a subtler grid. Monochrome artwork omits the grid.
+- `mark.svg` is the Pairdraw symbol: one vector curve pulled by two anchors, an ink (`#17171C`) square for the person and a Pair Orange (`#FF5B2E`) circle for the agent. The square sits at the bottom-left with a transparent counter; the circle sits at the top-right end of the curve.
+- `mark-micro.svg` is the 16px master. It keeps the main geometry; only its intrinsic size differs.
+- Both use the same tight `24 24 208 208` viewBox, no `<title>`, and a `data-part` on every element (`square`, `curve`, `anchor`), which the generator uses to derive dark, monochrome, and tile artwork.
+- Dark artwork turns the square and the curve white (`#FFFFFF`) and keeps the orange circle. Monochrome artwork is all ink or all white. The circle is orange in every color version.
+- `openpencil/` keeps the previous OpenPencil masters, teal pencil-P with an ivory (`#F5F5EF`) tile, for the documentation site, which is still named OpenPencil. Do not edit them for Pairdraw changes; the generator's `openpencil` artwork holds their colors and compositions.
 
-Edit these SVGs, not generated files. Platform backgrounds, padding, and dark colors live in `tools/generate/brand/src/config.ts`. The approved main colors are defined by the SVG artwork. The official app-icon variant puts the light-palette mark on an ivory (`#F5F5EF`) rounded tile that fills the image, with transparency only at the rounded corners. Native desktop assets retain their platform-specific outer margin. Desktop icons, any-purpose PWA icons, and larger in-app branding share this composition. The tile stays ivory in both themes; use `BrandMark` with `variant="app-icon"` for larger placements. The editor header uses a 24px tile. Favicons use the same tile with the optical micro master inside, in both browser themes. Generated `brand/app-icon.svg` and `brand/app-icon-1024.png` are suitable for profile images. Apple Touch keeps an opaque square for platform rounding; maskable artwork stays opaque and inside the central 80%-diameter safe circle.
+Edit these SVGs, not generated files. Platform backgrounds, padding, and derived colors live in `tools/generate/brand/src/config.ts`, one artwork per target: `pairdraw` for the app and desktop, `openpencil` for the docs. The official app-icon variant draws the whole mark in white on a Pair Orange rounded tile that fills the image, with transparency only at the rounded corners, in both themes. Native desktop assets retain their platform-specific outer margin. Desktop icons, any-purpose PWA icons, and larger in-app branding share this composition; use `BrandMark` with `variant="app-icon"` for those placements. Favicons use the same tile with the micro master inside, drawn larger so the square's counter still reads at 16px, in both browser themes. Generated `brand/app-icon.svg` and `brand/app-icon-1024.png` are suitable for profile images. Apple Touch keeps an opaque orange square for platform rounding; maskable artwork stays opaque and inside the central 80%-diameter safe circle.
 
 ## Generation
 
@@ -20,7 +20,7 @@ bun run check:icons                       # Fresh generation, contracts, reprodu
 bun test tools/generate/brand/tests
 ```
 
-Generation is local using pinned RealFaviconGenerator/Sharp and Tauri versions; no hosted generator or credentials are needed. Generated assets and the cache are ignored by Git. Only the two artwork masters, settings, code, tests, and the normal Playwright visual baseline are tracked.
+Generation is local using pinned RealFaviconGenerator/Sharp and Tauri versions; no hosted generator or credentials are needed. Generated assets and the cache are ignored by Git. Only the artwork masters, settings, code, tests, and the normal Playwright visual baseline are tracked.
 
 Vite ensures web assets before app dev/build. VitePress ensures docs assets before docs dev/build. Storybook prepares the assets for its stories. Tauri's dev/build hooks prepare native icons before compilation. Direct Cargo commands bypass those hooks: run `bun run generate:icons --target desktop` before `cargo check` or `cargo build` on a fresh checkout. CI's native-contract job does this explicitly. No icon generation runs in the shipped application.
 

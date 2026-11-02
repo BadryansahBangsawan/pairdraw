@@ -24,15 +24,16 @@ export function openPencilPwaPlugin() {
       navigateFallbackDenylist: NOT_EDITOR_PAGES
     },
     manifest: {
-      name: 'OpenPencil',
-      short_name: 'OpenPencil',
+      name: 'Pairdraw',
+      short_name: 'Pairdraw',
       description: 'Open-source design editor',
       display: 'standalone',
       orientation: 'any',
       start_url: '/',
       scope: '/',
-      theme_color: '#1e1e1e',
-      background_color: '#1e1e1e',
+      // A manifest holds one color for both themes; this is the dark --color-canvas.
+      theme_color: '#141416',
+      background_color: '#141416',
       categories: ['design', 'productivity'],
       icons: [
         { src: '/brand/pwa-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 
 import sharp from 'sharp'
 
-import { brand, targetFiles } from './config.ts'
+import { targetArtwork, targetFiles } from './config.ts'
 import type { BrandTarget } from './config.ts'
 import type { BrandFiles } from './web.ts'
 
@@ -44,14 +44,12 @@ export function icoSizes(data: Buffer): number[] {
   })
 }
 
-export async function validateMaskable(data: Buffer): Promise<void> {
+export async function validateMaskable(data: Buffer, tile: string): Promise<void> {
   const { data: pixels, info } = await sharp(data)
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true })
-  const background = [1, 3, 5].map((offset) =>
-    Number.parseInt(brand.background.slice(offset, offset + 2), 16)
-  )
+  const background = [1, 3, 5].map((offset) => Number.parseInt(tile.slice(offset, offset + 2), 16))
   const radius = info.width * 0.4
   let foreground = 0
   for (let y = 0; y < info.height; y++) {
@@ -85,6 +83,7 @@ function pngSize(name: string): number | undefined {
 }
 
 export async function validateFiles(files: BrandFiles, target: BrandTarget): Promise<void> {
+  const { background } = targetArtwork(target)
   for (const name of targetFiles(target)) {
     const data = files.get(name)
     assert.ok(data && data.length > 0, `Missing brand output: ${name}`)
@@ -104,7 +103,7 @@ export async function validateFiles(files: BrandFiles, target: BrandTarget): Pro
           .toBuffer({ resolveWithObject: true })
         assert.equal(
           `#${corner.subarray(0, 3).toString('hex')}`.toUpperCase(),
-          brand.background,
+          background,
           'Touch icon must not bake in rounded corners'
         )
       }
@@ -122,6 +121,6 @@ export async function validateFiles(files: BrandFiles, target: BrandTarget): Pro
   if (target === 'web') {
     const maskable = files.get('brand/pwa-maskable-512.png')
     assert.ok(maskable)
-    await validateMaskable(maskable)
+    await validateMaskable(maskable, background)
   }
 }

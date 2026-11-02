@@ -6,9 +6,60 @@ export const repositoryRoot = await resolveWorkspaceRoot(fileURLToPath(import.me
 export const targets = ['web', 'docs', 'desktop'] as const
 export type BrandTarget = (typeof targets)[number]
 
-export const brand = {
+/** The compositions an app-icon tile is drawn in. */
+export type AppArtworkKind = 'web' | 'maskable' | 'tile' | 'favicon' | 'desktop'
+
+export interface BrandArtwork {
+  /** Folder holding the `mark.svg` and `mark-micro.svg` masters. */
+  masters: string
+  /** The app-icon tile; touch and maskable icons fill with it. */
+  background: string
+  /** Fills every part of the mark on the tile; without it the tile keeps the master's colors. */
+  tileMark?: string
+  /** Flat monochrome artwork for light and dark surfaces. */
+  ink: string
+  paper: string
+  /** Dark artwork recolors these `data-part`s; the others keep their color. */
+  darkPalette: Readonly<Record<string, string>>
+  /** Dark artwork's opacity for a master's `data-detail="grid"`. */
+  darkGridOpacity?: number
+  tileInset: number
+  tileRadius: number
+  /** The mark's share of the 1024px canvas, per composition. */
+  scales: Readonly<Record<AppArtworkKind, number>>
+}
+
+/** Pairdraw, for the app and the native icons. */
+export const pairdraw = {
+  masters: 'assets/brand',
+  /** Pair Orange in both themes. */
+  background: '#FF5B2E',
+  tileMark: '#FFFFFF',
+  ink: '#17171C',
+  paper: '#FFFFFF',
+  /** Dark artwork lightens the ink parts; the orange anchor keeps its color. */
+  darkPalette: { square: '#FFFFFF', curve: '#FFFFFF' },
+  tileInset: 64,
+  tileRadius: 200,
+  scales: {
+    web: 0.62,
+    tile: 0.62,
+    // Larger in favicons, so the square's counter still reads at 16px.
+    favicon: 0.7,
+    desktop: 0.54,
+    // The square's outer corner sits 0.70 of the mark's size from its centre, so this stays
+    // below 0.57 to keep the mark inside the 0.4-radius safe circle.
+    maskable: 0.54
+  }
+} as const satisfies BrandArtwork
+
+/** OpenPencil, which the documentation site is still named after, so it keeps this artwork. */
+export const openpencil = {
+  masters: 'assets/brand/openpencil',
+  /** Ivory in both themes; the tile shows the light-palette mark. */
   background: '#F5F5EF',
-  darkBackground: '#202B2D',
+  ink: '#202B2D',
+  paper: '#F5F5EF',
   darkPalette: {
     body: '#55BAAC',
     upper: '#258E83',
@@ -21,10 +72,12 @@ export const brand = {
   darkGridOpacity: 0.6,
   tileInset: 64,
   tileRadius: 200,
-  appScale: 0.82,
-  tileScale: 0.88,
-  maskableScale: 0.66
-} as const
+  scales: { web: 0.82, tile: 0.88, favicon: 0.88, desktop: 0.82, maskable: 0.66 }
+} as const satisfies BrandArtwork
+
+export function targetArtwork(target: BrandTarget): BrandArtwork {
+  return target === 'docs' ? openpencil : pairdraw
+}
 
 export const webFiles = [
   'brand/favicon.svg',

@@ -1,6 +1,7 @@
 import { createCloudStorageAdapter } from '@/app/integrations/storage/cloud/adapter'
 import { defineStorageProvider } from '@/app/integrations/storage/registry'
 import type { StorageProviderRegistration } from '@/app/integrations/storage/types'
+import { APP_NAME } from '@/constants'
 
 import { CLOUD_SESSION_FIELD, CLOUD_STORAGE_PROVIDER_ID } from '../sessions/token'
 
@@ -12,8 +13,8 @@ import { CLOUD_SESSION_FIELD, CLOUD_STORAGE_PROVIDER_ID } from '../sessions/toke
 export const CLOUD_STORAGE_PROVIDERS: readonly StorageProviderRegistration[] = [
   defineStorageProvider({
     id: CLOUD_STORAGE_PROVIDER_ID,
-    label: 'OpenPencil Cloud',
-    description: 'Workspaces on OpenPencil Cloud or your team’s own server',
+    label: `${APP_NAME} Cloud`,
+    description: `Workspaces on ${APP_NAME} Cloud or your team’s own server`,
     preferenceFields: [],
     credentialFields: [{ id: CLOUD_SESSION_FIELD, label: 'Session' }],
     createAdapter: (runtime) => createCloudStorageAdapter(runtime)

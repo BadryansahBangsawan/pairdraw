@@ -222,7 +222,7 @@ export const CodingAgentSignedIn: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText(/Claude Max · ada@example\.com/)).toBeVisible()
-    await expect(canvas.getByText(/OpenPencil tools · connected/)).toBeVisible()
+    await expect(canvas.getByText(/Pairdraw tools · connected/)).toBeVisible()
     await expect(canvas.queryByRole('button', { name: 'Sign in' })).toBeNull()
   }
 }
@@ -246,8 +246,8 @@ export const CodingAgentToolsUnreachable: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText(/OpenPencil tools · not reachable/)).toBeVisible()
-    await expect(canvas.getByText(/Codex can’t reach OpenPencil’s tools/)).toBeVisible()
+    await expect(canvas.getByText(/Pairdraw tools · not reachable/)).toBeVisible()
+    await expect(canvas.getByText(/Codex can’t reach Pairdraw’s tools/)).toBeVisible()
     await expect(canvas.getByText(/already defines an MCP server/)).toBeVisible()
   }
 }
@@ -355,7 +355,7 @@ export const PiOutdatedMCPFromBun: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText(/OpenPencil MCP server · update needed/)).toBeVisible()
+    await expect(canvas.getByText(/Pairdraw MCP server · update needed/)).toBeVisible()
     await expect(canvas.getByRole('button', { name: 'Update MCP server' })).toBeVisible()
     await expect(canvas.getByText('bun add -g @open-pencil/mcp@0.15.1')).toBeVisible()
   }

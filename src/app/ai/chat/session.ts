@@ -14,6 +14,7 @@ import SYSTEM_PROMPT from '@/app/ai/chat/system-prompt'
 import { chatThinkingLevel } from '@/app/ai/chat/thinking'
 import { createAIModelRuntime, resolveModelConnectionAPIKey } from '@/app/ai/models'
 import { resolveLanguageModelID } from '@/app/ai/models/language-model'
+import { modelProviderName } from '@/app/ai/models/provider-name'
 import { cloudCreditRefusal } from '@/app/ai/providers/openpencil/failure'
 import { OPENPENCIL_AI_PROVIDER } from '@/app/ai/providers/openpencil/provider'
 import { settleMessage } from '@/app/ai/reply/settle'
@@ -77,12 +78,6 @@ async function settleEndedReply(
   updateMessage(chat, messageId, (message) =>
     settleMessage(message, { stopped, changed: (toolCallId) => run.changedCalls.has(toolCallId) })
   )
-}
-
-/** The agent or provider a chat runs on, as the composer names it. */
-function providerName(id: AIProviderID): string {
-  const agent = ACP_AGENTS.find((candidate) => `acp:${candidate.id}` === id)
-  return agent?.name ?? AI_PROVIDERS.find((provider) => provider.id === id)?.name ?? id
 }
 
 export function createChatSessionManager({
@@ -306,7 +301,7 @@ export function createChatSessionManager({
           if (!event.isAbort && !event.isDisconnect)
             void notifyReplyEnded(
               store,
-              providerName(chatProviderID),
+              modelProviderName(chatProviderID),
               event.isError ? null : event.message
             )
         }

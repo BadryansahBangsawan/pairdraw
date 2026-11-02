@@ -21,6 +21,7 @@ import SYSTEM_PROMPT from '@/app/ai/chat/system-prompt'
 import { endRun, forgetAgentChat, startAgentRun } from '@/app/ai/reply/run'
 import { describeDiagnosticError, recordACPTransportFailure } from '@/app/diagnostics'
 import type { EditorStore } from '@/app/editor/active-store'
+import { APP_NAME } from '@/constants'
 
 type TauriChild = Awaited<ReturnType<typeof spawnACPProcess>>['child']
 
@@ -72,7 +73,7 @@ function isMissingCommandError(message: string): boolean {
 function missingCommandMessage(agentDef?: ACPAgentDef): string {
   if (!agentDef) return 'ACP agent CLI is not installed.'
   if (!agentDef.installCommand) {
-    return `"${agentDef.command}" is not installed. Install it and restart OpenPencil.`
+    return `"${agentDef.command}" is not installed. Install it and restart ${APP_NAME}.`
   }
   return `"${agentDef.command}" is not installed. Install it with: ${agentDef.installCommand}`
 }
@@ -106,7 +107,7 @@ function isAuthRequiredError(e: unknown): boolean {
 /** The agent never opened its session with OpenPencil's MCP server, so it has no design tools. */
 function toolsUnreachableError(agentDef: ACPAgentDef, reason: string | null): Error {
   return new Error(
-    `${agentDef.name} couldn't reach OpenPencil's tools, so your message wasn't sent.` +
+    `${agentDef.name} couldn't reach ${APP_NAME}'s tools, so your message wasn't sent.` +
       (reason ? ` ${agentDef.name} reported: ${reason}` : '')
   )
 }

@@ -25,7 +25,7 @@ const cls = usePopoverUI({
   content: 'w-[var(--reka-combobox-trigger-width)] min-w-56 overflow-hidden p-0'
 })
 const selectCls = useSelectUI({
-  trigger: 'w-full rounded px-2 py-1 text-xs',
+  trigger: 'w-full px-2 py-1 text-xs',
   item: 'w-full gap-2 px-3 py-2.5 text-sm leading-tight'
 })
 

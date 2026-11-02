@@ -85,6 +85,7 @@
   "exportSelectionAsDrawIO": "Eksportuj zaznaczenie jako draw.io",
   "exportSelectionAsFig": "Eksportuj zaznaczenie jako .fig",
   "togglePreview": "Podgląd",
+  "documentName": "Nazwa dokumentu",
   "saveTo": "Zapisz w…",
   "showVersionHistory": "Pokaż historię wersji",
   "saveToVersionHistory": "Zapisz w historii wersji…"

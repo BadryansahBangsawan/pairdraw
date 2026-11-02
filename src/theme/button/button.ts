@@ -28,8 +28,8 @@ export default {
       lg: { base: 'h-9 px-3.5 text-sm' }
     },
     shape: {
-      square: { base: 'rounded' },
-      rounded: { base: 'rounded-md' },
+      square: { base: 'rounded-md' },
+      rounded: { base: 'rounded-lg' },
       pill: { base: 'rounded-full' }
     }
   },
@@ -67,27 +67,29 @@ export default {
     {
       color: 'primary',
       variant: 'solid',
-      class: { base: 'bg-primary text-on-primary hover:bg-primary/90' }
+      // Ink, like the neutral solid: the accent stays for selection, focus, and sending.
+      class: { base: 'bg-surface text-panel hover:bg-surface/85' }
     } as const,
     {
       color: 'primary',
       variant: 'outline',
-      class: { base: 'border border-primary/50 text-primary hover:bg-primary/10' }
+      class: { base: 'border border-primary/50 text-primary hover:bg-primary/8' }
     } as const,
     {
       color: 'primary',
       variant: 'soft',
-      class: { base: 'bg-primary/10 text-primary hover:bg-primary/15' }
+      // Faint tints, so accent text keeps AA contrast on them in the light theme too.
+      class: { base: 'bg-primary/5 text-primary hover:bg-primary/8' }
     } as const,
     {
       color: 'primary',
       variant: 'subtle',
-      class: { base: 'border border-primary/25 bg-primary/10 text-primary hover:bg-primary/15' }
+      class: { base: 'border border-primary/25 bg-primary/5 text-primary hover:bg-primary/8' }
     } as const,
     {
       color: 'primary',
       variant: 'ghost',
-      class: { base: 'text-primary hover:bg-primary/10' }
+      class: { base: 'text-primary hover:bg-primary/8' }
     } as const,
     { color: 'primary', variant: 'link', class: { base: 'text-primary hover:underline' } } as const,
     {

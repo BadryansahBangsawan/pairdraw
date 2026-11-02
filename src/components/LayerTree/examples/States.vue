@@ -254,7 +254,7 @@ const states: Array<{
 </script>
 
 <template>
-  <div class="w-72 rounded-lg border border-border bg-panel p-2 shadow-lg">
+  <div class="w-72 rounded-card border border-border bg-panel p-2 elevation-card">
     <div class="mb-2 text-[11px] font-semibold tracking-wider text-muted uppercase">
       Layer Tree states
     </div>

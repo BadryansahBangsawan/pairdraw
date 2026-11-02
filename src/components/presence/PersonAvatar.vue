@@ -54,7 +54,7 @@ const voiceState = computed(() => {
     >
       <icon-lucide-mic-off :class="ui.mutedIcon()" aria-hidden="true" />
     </span>
-    <span v-if="agentCount > 0" :class="ui.badge()" :style="{ color: colorToCSS(color) }">
+    <span v-if="agentCount > 0" :class="ui.badge()">
       <icon-lucide-sparkle :class="ui.badgeIcon()" />{{ agentCount }}
     </span>
   </span>

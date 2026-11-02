@@ -28,9 +28,10 @@ const { common, settings } = useI18n()
       @close="toast.remove(t.id)"
       @action="t.action?.run()"
     />
+    <!-- Below the top bar, so a toast never covers the tabs. -->
     <ToastViewport
       :label="`${settings.notifications} (F8)`"
-      class="fixed top-2 left-1/2 z-[9999] flex -translate-x-1/2 flex-col items-center gap-1.5"
+      class="fixed top-13 left-1/2 z-[9999] flex -translate-x-1/2 flex-col items-center gap-1.5"
     />
   </ToastProvider>
 </template>

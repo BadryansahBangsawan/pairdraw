@@ -41,7 +41,7 @@ function isOpen(group: CapabilityGroup) {
 
 <template>
   <div
-    class="@container/capabilities shrink-0 overflow-clip rounded border border-border text-xs"
+    class="@container/capabilities shrink-0 overflow-clip rounded-xl border border-border text-xs"
     data-slot="capability-list"
   >
     <template v-for="group in groups" :key="group.key">

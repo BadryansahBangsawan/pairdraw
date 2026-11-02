@@ -85,6 +85,7 @@
   "exportSelectionAsDrawIO": "Auswahl als draw.io exportieren",
   "exportSelectionAsFig": "Auswahl als .fig exportieren",
   "togglePreview": "Vorschau",
+  "documentName": "Dokumentname",
   "saveTo": "Speichern in…",
   "showVersionHistory": "Versionsverlauf anzeigen",
   "saveToVersionHistory": "Im Versionsverlauf speichern…"

@@ -6,6 +6,7 @@ import { computed } from 'vue'
 
 import type { MetricsSnapshot } from '@open-pencil/feedback/contract'
 
+import { portalAppearance } from '@/app/cloud-portal/theme'
 import { utcDayOfTimestamp } from '@/app/metrics/days'
 import {
   formatCount,
@@ -176,7 +177,7 @@ const sharingNote = computed(() => {
 <template>
   <div :class="ui.page()">
     <header :class="ui.bar()">
-      <BrandMark variant="micro" decorative />
+      <BrandMark variant="micro" :appearance="portalAppearance" decorative />
       <span :class="ui.barTitle()">Metrics</span>
       <span :class="ui.barHost()">{{ host }}</span>
       <div :class="ui.barEnd()">

@@ -67,13 +67,20 @@ function countOf(value: string) {
     <div v-if="searchLabel || filters.length" :class="ui.toolbar()">
       <!-- On a narrow page the filters scroll sideways rather than leave it. -->
       <div v-if="filters.length" class="max-w-full overflow-x-auto">
-        <!-- As tall as the search field beside it, in the same type. -->
+        <!--
+          As tall as the search field beside it, in the same type. On the page's backdrop the
+          track is a ringed panel, since a field's fill matches the backdrop in light, and the
+          chosen pill takes an inset ring to stand off a track as white as it.
+        -->
         <SegmentedControl
           v-model="filterValue"
           required
           :label="label"
           :options="filters"
-          :ui="{ root: 'h-8', item: 'h-7 px-2.5 text-xs' }"
+          :ui="{
+            root: 'h-8 bg-panel ring-1 ring-border ring-inset',
+            item: 'h-7 px-2.5 text-xs data-[state=on]:inset-ring data-[state=on]:inset-ring-border'
+          }"
         >
           <template #option="{ option }">
             {{ option.label }}

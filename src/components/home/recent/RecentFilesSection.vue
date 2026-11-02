@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
 import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
@@ -10,6 +11,7 @@ import type { RecentFilesWorkspace } from '@/app/recent-files/workspace'
 import DocumentEntry from '@/components/home/document/DocumentEntry.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import SegmentedControl from '@/components/ui/select/SegmentedControl.vue'
+import documentsTheme from '@/theme/home/documents'
 
 /** The recent files, as a grid or a list, with the files `documents` keeps of them. */
 const { workspace, documents, query } = defineProps<{
@@ -25,6 +27,7 @@ const dates = useDateFormat()
 const previewURL = workspace.previewURL
 const vWorkspacePreview = workspace.previewDirective
 const hasRecentFiles = computed(() => workspace.documents.value.length > 0)
+const styles = tv(documentsTheme)()
 
 /** A file's last change; a file that never reported one shows nothing. */
 function formattedDate(updatedAt: string): string {
@@ -33,17 +36,17 @@ function formattedDate(updatedAt: string): string {
 </script>
 
 <template>
-  <section>
-    <div class="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2">
-      <div class="col-span-2 min-w-0 sm:col-span-1">
-        <h1 class="text-base font-semibold">{{ files.recentFiles }}</h1>
-        <p class="mt-0.5 text-pretty text-xs text-muted">{{ files.recentFilesDescription }}</p>
+  <section :class="styles.section()">
+    <div :class="styles.header()">
+      <div :class="styles.heading()">
+        <h1 :class="styles.title()">{{ files.recentFiles }}</h1>
+        <p :class="styles.description()">{{ files.recentFilesDescription }}</p>
       </div>
-      <div class="col-span-2 flex items-center justify-end gap-1 sm:col-span-1">
+      <div :class="styles.actions()">
         <IconButton
           v-if="hasRecentFiles"
           :label="common.clear"
-          class="size-10 sm:size-7"
+          :size="isTouch ? 'lg' : 'sm'"
           data-test-id="recent-files-clear"
           @click="clearRecentFiles"
         >
@@ -67,10 +70,7 @@ function formattedDate(updatedAt: string): string {
       </div>
     </div>
 
-    <div
-      v-if="documents.length && view === 'grid'"
-      class="grid grid-cols-1 gap-x-5 gap-y-6 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))]"
-    >
+    <div v-if="documents.length && view === 'grid'" :class="styles.grid()">
       <DocumentEntry
         v-for="document in documents"
         :key="document.id"
@@ -82,7 +82,7 @@ function formattedDate(updatedAt: string): string {
       />
     </div>
 
-    <div v-else-if="documents.length" class="overflow-hidden rounded-lg border border-border">
+    <div v-else-if="documents.length" :class="styles.list()">
       <DocumentEntry
         v-for="document in documents"
         :key="document.id"
@@ -93,12 +93,9 @@ function formattedDate(updatedAt: string): string {
       />
     </div>
 
-    <div
-      v-else-if="!query"
-      class="rounded-lg border border-dashed border-border px-4 py-4 text-center sm:py-6"
-    >
-      <p class="text-xs font-medium">{{ files.noRecentFiles }}</p>
-      <p class="mt-1 text-xs text-muted">{{ files.noRecentFilesDescription }}</p>
+    <div v-else-if="!query" :class="styles.empty()">
+      <p :class="styles.emptyTitle()">{{ files.noRecentFiles }}</p>
+      <p :class="styles.emptyDescription()">{{ files.noRecentFilesDescription }}</p>
     </div>
   </section>
 </template>

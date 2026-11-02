@@ -2,9 +2,9 @@ import { motionStyles } from '@/theme/motion/styles'
 
 export default {
   slots: {
-    overlay: ['fixed inset-0 z-40 bg-black/50', motionStyles.overlay],
+    overlay: ['fixed inset-0 z-40 bg-black/40', motionStyles.overlay],
     content: [
-      'fixed top-1/2 left-1/2 z-50 flex max-h-[min(90vh,48rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl bg-panel shadow-[0_8px_30px_rgb(0_0_0/0.4)] outline-none data-[state=open]:zoom-in-98 data-[state=closed]:zoom-out-98',
+      'fixed top-1/2 left-1/2 z-50 flex max-h-[min(90vh,48rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden bg-panel outline-none data-[state=open]:zoom-in-98 data-[state=closed]:zoom-out-98',
       motionStyles.overlay
     ],
     header: 'flex shrink-0 items-start justify-between gap-3 border-b border-border px-4 py-3',
@@ -12,7 +12,7 @@ export default {
     title: 'text-sm font-semibold text-surface data-[visually-hidden=true]:sr-only',
     description: 'text-xs text-muted',
     close:
-      'flex size-6 shrink-0 cursor-pointer items-center justify-center rounded border-none bg-transparent text-muted hover:bg-hover hover:text-surface',
+      'flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg border-none bg-transparent text-muted outline-none hover:bg-hover hover:text-surface focus-visible:ring-2 focus-visible:ring-accent/50',
     body: 'min-h-0 flex-1 overflow-y-auto p-4',
     footer: 'flex shrink-0 items-center justify-end gap-2 border-t border-border px-4 py-3'
   },
@@ -30,6 +30,17 @@ export default {
       tall: { content: 'h-[min(75vh,48rem)]' },
       full: { content: 'h-[min(90vh,56rem)]' },
       screen: { content: 'h-[96vh] max-h-[96vh]' }
+    },
+    /**
+     * The corners and shadow. A dialog is the largest card; a command surface such as the command
+     * palette is drawn as the menus are, since it is a quick list rather than a window.
+     */
+    surface: {
+      dialog: { content: 'rounded-dialog elevation-dialog' },
+      floating: { content: 'rounded-xl ring-1 ring-border elevation-floating' }
     }
+  },
+  defaultVariants: {
+    surface: 'dialog'
   }
 } as const

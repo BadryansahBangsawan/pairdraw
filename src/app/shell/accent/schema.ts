@@ -1,6 +1,7 @@
 import * as v from 'valibot'
 
 export const ACCENT_PRESETS = [
+  'pairdraw',
   'blue',
   'purple',
   'pink',

@@ -23,7 +23,7 @@ const pageStates = [
 
 <template>
   <div class="grid max-w-3xl grid-cols-2 gap-6">
-    <section class="rounded-lg border border-border bg-panel p-3 shadow-lg">
+    <section class="rounded-card border border-border bg-panel p-3 elevation-card">
       <h2 class="mb-3 text-[11px] font-semibold tracking-wider text-muted uppercase">
         Page and panel states
       </h2>
@@ -65,28 +65,33 @@ const pageStates = [
       </div>
     </section>
 
-    <section class="rounded-lg border border-border bg-canvas p-3 shadow-lg">
+    <!-- The tabs sit on the backdrop, as in the top bar. -->
+    <section class="rounded-card border border-border bg-canvas p-3 elevation-card">
       <h2 class="mb-3 text-[11px] font-semibold tracking-wider text-muted uppercase">Tab states</h2>
       <div :class="tabStyles().root()">
         <div :class="tabStyles().list()">
-          <button
-            aria-label="Active tab"
-            :class="tabStyles({ active: true }).trigger()"
-            data-active
-          >
-            <icon-lucide-file :class="tabStyles().icon()" />
-            <span :class="tabStyles().label()">Active</span>
+          <div :class="tabStyles({ active: true }).item()" data-active>
+            <button
+              aria-label="Active tab"
+              :class="tabStyles({ active: true }).trigger()"
+              data-active
+            >
+              <icon-lucide-file :class="tabStyles().icon()" />
+              <span :class="tabStyles().label()">Active</span>
+            </button>
             <span :class="tabStyles({ active: true }).close()" data-active>
               <icon-lucide-x :class="tabStyles().closeIcon()" />
             </span>
-          </button>
-          <button aria-label="Inactive tab" :class="tabStyles({ active: false }).trigger()">
-            <icon-lucide-file :class="tabStyles().icon()" />
-            <span :class="tabStyles().label()">Inactive</span>
+          </div>
+          <div :class="tabStyles({ active: false }).item()">
+            <button aria-label="Inactive tab" :class="tabStyles({ active: false }).trigger()">
+              <icon-lucide-file :class="tabStyles().icon()" />
+              <span :class="tabStyles().label()">Inactive</span>
+            </button>
             <span :class="tabStyles({ active: false }).close()">
               <icon-lucide-x :class="tabStyles().closeIcon()" />
             </span>
-          </button>
+          </div>
         </div>
         <button aria-label="New tab" :class="tabStyles().newTab()">
           <icon-lucide-plus :class="tabStyles().newIcon()" />

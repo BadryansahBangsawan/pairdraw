@@ -3,7 +3,7 @@ import { motionStyles } from '../motion/styles'
 export default {
   slots: {
     trigger:
-      'min-w-0 max-w-full gap-1 rounded border-none bg-transparent px-1.5 py-0.5 text-[10px] text-muted',
+      'min-w-0 max-w-full gap-1 rounded-md border-none bg-transparent px-1.5 py-0.5 text-[10px] text-muted',
     triggerIcon: 'size-3 shrink-0',
     triggerValue: 'min-w-0 truncate',
     triggerChevron: 'size-2.5 shrink-0',
@@ -12,7 +12,7 @@ export default {
     header: 'px-2 pt-1.5 pb-2',
     headerLabel: 'text-[9px] font-medium tracking-wide text-muted uppercase',
     headerDescription: 'mt-0.5 text-[9px] leading-3 text-muted',
-    item: 'grid h-auto min-h-11 grid-cols-[14px_minmax(0,1fr)_auto] gap-2 rounded px-2 py-1.5',
+    item: 'grid h-auto min-h-11 grid-cols-[14px_minmax(0,1fr)_auto] gap-2 rounded-md px-2 py-1.5',
     indicator: 'flex size-3.5 shrink-0 items-center justify-center text-primary',
     indicatorIcon: 'size-3',
     text: 'min-w-0',

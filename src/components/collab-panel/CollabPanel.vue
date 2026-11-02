@@ -9,6 +9,10 @@ import CollabSharePopover from '@/components/collab-panel/CollabSharePopover.vue
 import { provideCollabPanel } from '@/components/collab-panel/context'
 import VoiceCallControl from '@/components/voice-call/VoiceCallControl.vue'
 
+/**
+ * Who is in the document, its call, and Share, which comes last. The slot goes between them, so
+ * the top bar can put the document's other controls before Share.
+ */
 const collab = provideCollabPanel()
 const store = useEditorStore()
 // Cloud documents share through their server; everything else through a peer-to-peer room.
@@ -16,10 +20,10 @@ const cloud = computed(() => isCloudBinding(store.getStorageBinding()))
 </script>
 
 <template>
-  <div class="flex w-full items-center justify-end gap-1.5">
+  <div class="flex items-center gap-1.5">
     <CollabAvatarStack />
     <VoiceCallControl v-if="collab.state.inRoom" :people="collab.callRows" />
-    <div class="flex-1" />
+    <slot />
     <CloudShareButton v-if="cloud" />
     <CollabSharePopover v-else />
   </div>

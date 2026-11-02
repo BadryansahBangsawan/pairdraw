@@ -15,7 +15,15 @@ const splitterTheme = {
         handle: '-my-1 h-2 cursor-row-resize',
         divider: 'inset-x-0 top-1/2 h-px -translate-y-1/2'
       }
+    },
+    // At a card's edge, which draws its own border: no line until the handle is hovered or dragged.
+    // The handle stacks above the cards it overlaps, so its whole width starts a resize.
+    seam: {
+      true: { handle: 'z-20', divider: 'inset-y-2.5 rounded-full bg-transparent' }
     }
+  },
+  defaultVariants: {
+    seam: false
   }
 }
 

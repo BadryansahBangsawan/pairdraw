@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { Primitive } from 'reka-ui'
+import { tv } from 'tailwind-variants'
+
+import theme from '@/theme/settings/layout'
 
 import SettingsResetButton from './SettingsResetButton.vue'
 
@@ -21,24 +24,19 @@ const {
   modified?: boolean
 }>()
 const emit = defineEmits<{ reset: [] }>()
+const styles = tv(theme)()
 </script>
 
 <template>
-  <Primitive
-    :as="as"
-    class="flex items-center justify-between gap-4 px-3 py-2.5"
-    data-slot="settings-row"
-  >
-    <span class="block min-w-0 flex-1">
-      <span class="block text-xs font-medium text-surface"
+  <Primitive :as="as" :class="styles.row()" data-slot="settings-row">
+    <span :class="styles.rowText()">
+      <span :class="styles.rowLabel()"
         ><slot name="label">{{ label }}</slot></span
       >
-      <span v-if="description" class="mt-1 block text-[11px] leading-relaxed text-muted">{{
-        description
-      }}</span>
+      <span v-if="description" :class="styles.rowDescription()">{{ description }}</span>
       <slot name="description" />
     </span>
-    <span class="flex shrink-0 items-center gap-1">
+    <span :class="styles.rowControl()">
       <SettingsResetButton v-if="modified" @reset="emit('reset')" />
       <slot />
     </span>

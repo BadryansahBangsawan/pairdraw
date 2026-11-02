@@ -24,6 +24,7 @@ import {
   setModelRoleAssignment
 } from '@/app/ai/models'
 import type { AIModelProfile, AIModelProfileId } from '@/app/ai/models'
+import { modelProviderName } from '@/app/ai/models/provider-name'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import ChatProfileItem from '@/components/chat/ChatProfileItem.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
@@ -53,7 +54,7 @@ function profileMetadata(profile: AIModelProfile): string {
   const provider = AI_PROVIDERS.find((candidate) => candidate.id === connection?.providerID)
   const modelID = profile.customModelID || profile.modelID
   const modelName = provider?.models.find((model) => model.id === modelID)?.name || modelID
-  return compact([modelName, provider?.name ?? connection?.providerID]).join(' · ')
+  return compact([modelName, connection && modelProviderName(connection.providerID)]).join(' · ')
 }
 
 function manageModels(): void {

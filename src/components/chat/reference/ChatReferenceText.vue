@@ -2,11 +2,16 @@
 import { computed } from 'vue'
 
 import { findReferences, type ChatReference } from '@/app/ai/chat/references/link'
+import type { ChatReferenceTone } from '@/components/chat/ui'
 
 import ChatReferenceChip from './ChatReferenceChip.vue'
 
 /** Plain text, such as what the person wrote, with its references shown as chips. */
-const { text } = defineProps<{ text: string }>()
+const { text, tone = 'field' } = defineProps<{
+  text: string
+  /** `ink` inside the person's own message bubble. */
+  tone?: ChatReferenceTone
+}>()
 
 type Segment = { key: number; text: string } | { key: number; reference: ChatReference }
 
@@ -25,7 +30,7 @@ const segments = computed<Segment[]>(() => {
 
 <template>
   <template v-for="segment in segments" :key="segment.key">
-    <ChatReferenceChip v-if="'reference' in segment" :reference="segment.reference" />
+    <ChatReferenceChip v-if="'reference' in segment" :reference="segment.reference" :tone="tone" />
     <template v-else>{{ segment.text }}</template>
   </template>
 </template>

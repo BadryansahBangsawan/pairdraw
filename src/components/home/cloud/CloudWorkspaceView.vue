@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
+import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
 import { useCloudMessages, useCommonMessages, useFileMessages } from '@open-pencil/vue/i18n'
 
 import { formatStorageBytes } from '@/app/storage/format-bytes'
@@ -11,8 +13,11 @@ import AppAlert from '@/components/ui/feedback/AppAlert.vue'
 import AppBadge from '@/components/ui/feedback/AppBadge.vue'
 import AppPlaceholder from '@/components/ui/feedback/AppPlaceholder.vue'
 import AppProgress from '@/components/ui/feedback/AppProgress.vue'
+import AppSkeleton from '@/components/ui/feedback/AppSkeleton.vue'
+import { skeleton } from '@/components/ui/feedback/skeleton'
 import Tip from '@/components/ui/overlay/Tip.vue'
 import SegmentedControl from '@/components/ui/select/SegmentedControl.vue'
+import documentsTheme from '@/theme/home/documents'
 
 import CloudSyncIcon from './CloudSyncIcon.vue'
 import type { CloudDocumentRow } from './types'
@@ -57,6 +62,9 @@ const emit = defineEmits<{
 const t = useCloudMessages()
 const common = useCommonMessages()
 const files = useFileMessages()
+const { isTouch } = useViewportKind()
+const styles = tv(documentsTheme)()
+const loading = skeleton()
 const menu = (document: CloudDocumentRow) =>
   canDelete
     ? {
@@ -77,17 +85,14 @@ const metadata = (document: CloudDocumentRow) =>
 </script>
 
 <template>
-  <section class="flex min-w-0 flex-col gap-4">
-    <header class="flex flex-wrap items-start gap-x-4 gap-y-2">
-      <div class="min-w-0 flex-1">
-        <div class="flex items-center gap-2">
-          <h1 class="truncate text-base font-semibold">{{ heading }}</h1>
+  <section :class="styles.section()">
+    <header :class="styles.header()">
+      <div :class="styles.heading()">
+        <div :class="styles.titleRow()">
+          <h1 :class="styles.title()">{{ heading }}</h1>
           <AppBadge v-if="role">{{ role }}</AppBadge>
         </div>
-        <div
-          v-if="subtitle || usageLabel"
-          class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs whitespace-nowrap text-muted"
-        >
+        <div v-if="subtitle || usageLabel" :class="styles.details()">
           <span v-if="subtitle">{{ subtitle }}</span>
           <span v-if="subtitle && usageLabel" aria-hidden="true">·</span>
           <template v-if="usage && usage.totalBytes !== null && usageLabel">
@@ -101,12 +106,12 @@ const metadata = (document: CloudDocumentRow) =>
           <span v-else-if="usageLabel">{{ usageLabel }}</span>
         </div>
       </div>
-      <div class="flex items-center gap-1">
+      <div :class="styles.actions()">
         <AppButton v-if="role" size="sm" variant="ghost" @click="emit('members')">
           <template #leading><icon-lucide-users class="size-3.5" /></template>
           {{ t.homeMembers }}
         </AppButton>
-        <IconButton :label="common.refresh" class="size-7" @click="emit('refresh')">
+        <IconButton :label="common.refresh" :size="isTouch ? 'lg' : 'sm'" @click="emit('refresh')">
           <icon-lucide-refresh-cw class="size-3.5" />
         </IconButton>
         <SegmentedControl
@@ -161,13 +166,13 @@ const metadata = (document: CloudDocumentRow) =>
 
     <div
       v-if="state === 'loading'"
-      class="grid grid-cols-1 gap-x-5 gap-y-6 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))]"
+      :class="[styles.grid(), loading.group()]"
       :aria-label="t.homeLoadingFiles"
     >
-      <div v-for="index in 4" :key="index" class="min-w-0 animate-pulse motion-reduce:animate-none">
-        <div class="aspect-video rounded-lg border border-border bg-panel-field" />
-        <div class="mt-2 h-3 w-2/3 rounded bg-panel-field" />
-        <div class="mt-1.5 h-2.5 w-1/3 rounded bg-panel-field" />
+      <div v-for="index in 4" :key="index" :class="styles.skeleton()">
+        <AppSkeleton :class="styles.skeletonPreview()" />
+        <AppSkeleton :class="styles.skeletonName()" />
+        <AppSkeleton :class="styles.skeletonMeta()" />
       </div>
     </div>
 
@@ -177,7 +182,7 @@ const metadata = (document: CloudDocumentRow) =>
       label-as="h2"
       :label="role ? t.homeEmptyWorkspace({ workspace: heading }) : t.homeNothingShared"
       :description="role ? t.homeEmptyWorkspaceDescription : t.homeNothingSharedDescription"
-      :ui="{ root: 'rounded-lg border border-dashed border-border py-10' }"
+      :ui="{ root: styles.empty() }"
     >
       <template #icon><icon-lucide-layers class="size-5" /></template>
       <template v-if="canCreate" #action>
@@ -188,14 +193,7 @@ const metadata = (document: CloudDocumentRow) =>
       </template>
     </AppPlaceholder>
 
-    <div
-      v-else
-      :class="
-        view === 'grid'
-          ? 'grid grid-cols-1 gap-x-5 gap-y-6 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))]'
-          : 'overflow-hidden rounded-lg border border-border'
-      "
-    >
+    <div v-else :class="view === 'grid' ? styles.grid() : styles.list()">
       <DocumentEntry
         v-for="document in documents"
         :key="document.id"

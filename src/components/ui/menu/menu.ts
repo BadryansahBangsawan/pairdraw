@@ -8,17 +8,17 @@ export const menu = tv({
     // Reka sets only the open menu's own variable, so one chain caps every kind of menu just short
     // of the window edge; a `MenuScrollArea` inside scrolls a taller one.
     content: [
-      'z-50 flex max-h-[calc(var(--reka-menubar-content-available-height,var(--reka-dropdown-menu-content-available-height,var(--reka-context-menu-content-available-height)))-0.5rem)] flex-col p-1',
+      'z-50 flex max-h-[calc(var(--reka-menubar-content-available-height,var(--reka-dropdown-menu-content-available-height,var(--reka-context-menu-content-available-height)))-0.5rem)] flex-col p-1.5',
       floatingSurface,
       motionStyles.floating
     ],
-    item: 'flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-[11px] outline-none select-none data-[disabled]:cursor-default data-[disabled]:text-muted/50 data-[highlighted]:bg-hover',
+    item: 'flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-xs outline-none select-none data-[disabled]:cursor-default data-[disabled]:text-muted/50 data-[highlighted]:bg-hover',
     separator: 'mx-1 my-1 h-px bg-border',
     label: 'px-2 pt-1.5 pb-1 text-[11px] text-muted select-none',
     shortcut: 'text-[11px] text-muted',
-    icon: 'size-3 text-muted',
+    icon: 'size-3.5 text-muted',
     subTrigger:
-      'flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-[11px] outline-none select-none',
+      'flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-xs outline-none select-none data-[highlighted]:bg-hover data-[state=open]:bg-hover',
     // As in Figma and macOS menus: no scrollbar, a chevron strip over each end that has more.
     // No overscroll: WebKit's bounce takes the top past zero, which kept the top strip showing.
     scrollRoot: 'relative flex min-h-0 flex-col',

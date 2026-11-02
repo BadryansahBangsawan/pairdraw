@@ -11,6 +11,7 @@ import {
 } from '@open-pencil/core/constants'
 import { useAIMessages } from '@open-pencil/vue/i18n'
 
+import { modelProviderName } from '@/app/ai/models/provider-name'
 import { OPENPENCIL_AI_PROVIDER } from '@/app/ai/providers/openpencil/provider'
 import { cloudAIAvailable } from '@/app/cloud/integration'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
@@ -73,7 +74,7 @@ const displayName = computed(() => {
     const agentId = providerID.value.replace('acp:', '')
     return ACP_AGENTS.find((agent) => agent.id === agentId)?.name ?? providerID.value
   }
-  return providerDef.value.name
+  return modelProviderName(providerDef.value.id)
 })
 
 const groups = computed(() => {
@@ -100,11 +101,11 @@ const groups = computed(() => {
           cloudAIAvailable.value ||
           providerID.value === OPENPENCIL_AI_PROVIDER)
     )
-      .sort((left, right) => left.name.localeCompare(right.name))
       .map((provider) => ({
         value: provider.id,
-        label: provider.name
+        label: modelProviderName(provider.id)
       }))
+      .sort((left, right) => left.label.localeCompare(right.label))
   })
 
   return result

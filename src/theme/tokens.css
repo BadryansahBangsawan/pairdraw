@@ -27,9 +27,10 @@
   }
 }
 
+/* The thumb mixes the muted text color, since the hairline border color all but vanishes on panels. */
 @utility scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-border) transparent;
+  scrollbar-color: color-mix(in oklab, var(--color-muted) 40%, transparent) transparent;
   &::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -38,7 +39,7 @@
     background: transparent;
   }
   &::-webkit-scrollbar-thumb {
-    background: var(--color-border);
+    background: color-mix(in oklab, var(--color-muted) 40%, transparent);
     border-radius: 3px;
   }
   &::-webkit-scrollbar-thumb:hover {
@@ -51,23 +52,33 @@
   --color-*: initial;
   --color-white: #ffffff;
   --color-black: #000000;
-  --color-panel: #2a2a2a;
-  --color-panel-secondary: #242424;
-  --color-panel-field: #383838;
-  --color-panel-field-hover: #404040;
-  --color-panel-focus: #3b82f6;
-  --color-panel-selected: #2f6fdd;
-  --color-panel-selected-muted: #353b46;
-  --color-canvas: #1e1e1e;
-  --color-border: #3a3a3a;
-  --color-hover: #353535;
-  /* The accent family; src/app/shell/accent/palette.ts derives other accents from it. */
-  --color-accent: #2563eb;
-  --color-on-accent: #ffffff;
-  --color-on-primary: #1f2328;
-  --color-surface: #f0f0f0;
-  --color-muted: #a6a6a6;
-  --color-input: #1e1e1e;
+  /* The window backdrop: the top bar, the gaps around the side cards, and Home. */
+  --color-canvas: #141416;
+  --color-panel: #1c1c1f;
+  --color-panel-secondary: #19191c;
+  --color-panel-field: #26262a;
+  --color-panel-field-hover: #2c2c31;
+  /* The active segment, tab, or toggle, raised above the field or bar it sits in. */
+  --color-raised: #303035;
+  --color-border: #2a2a2e;
+  /* Translucent, so a hover reads the same on panels, fields, and the canvas-colored bar. */
+  --color-hover: rgb(255 255 255 / 0.06);
+  /*
+   * The accent family, as src/app/shell/accent/palette.ts derives it for the default Pairdraw
+   * preset in this theme; the palette writes the chosen accent's values over these at runtime.
+   */
+  --color-accent: #ff5b2e;
+  --color-panel-focus: #ff8469;
+  --color-panel-selected: #f76e52;
+  --color-panel-selected-muted: #372421;
+  --color-primary: #ffb4a9;
+  --color-on-accent: #17171c;
+  --color-on-primary: #17171c;
+  --color-surface: #ededef;
+  --color-muted: #8e8e96;
+  --color-input: #141416;
+  /* AI agents at work: their cursors, labels, and presence. */
+  --color-agent: #7c5cff;
   --color-component: #bb8cff;
   --color-slot: #f45cc4;
   /*
@@ -80,8 +91,7 @@
   --color-warning-border: rgb(245 158 11 / 0.3);
   --color-warning-action: #fcd34d;
   --color-success: #4ade80;
-  --color-primary: #60a5fa;
-  --color-inverted: #1f2328;
+  --color-inverted: #17171c;
   --color-error: #fa8585;
   --color-error-bg: rgb(250 133 133 / 0.1);
   --color-error-border: rgb(250 133 133 / 0.4);
@@ -104,26 +114,44 @@
   --color-chart-1: #3987e5;
   --color-chart-2: #d95926;
   --color-chart-3: #199e70;
+
+  /* Corner radii: side and Home cards, property fields, and dialogs. */
+  --radius-card: 14px;
+  --radius-field: 7px;
+  --radius-dialog: 16px;
+}
+
+/*
+ * Elevation, per theme. Tailwind inlines a `--shadow-*` theme value into its utility, so a light
+ * override would never apply; these are plain variables read by the `elevation-*` utilities.
+ */
+:root {
+  --elevation-card: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.35);
+  --elevation-floating: 0 2px 4px rgb(0 0 0 / 0.35), 0 12px 32px rgb(0 0 0 / 0.45);
+  --elevation-dialog: 0 4px 8px rgb(0 0 0 / 0.35), 0 24px 64px rgb(0 0 0 / 0.55);
 }
 
 html[data-theme='light'] {
+  --color-canvas: #f4f4f2;
   --color-panel: #ffffff;
-  --color-panel-secondary: #f7f8fa;
-  --color-panel-field: #f0f1f3;
-  --color-panel-field-hover: #e4e7ea;
-  --color-panel-focus: #2563eb;
-  --color-panel-selected: #2563eb;
-  --color-panel-selected-muted: #e5e7eb;
-  --color-canvas: #f3f4f6;
-  --color-border: #d8dce3;
-  --color-hover: #eef1f5;
-  --color-accent: #2563eb;
-  --color-primary: #1d4ed8;
+  --color-panel-secondary: #fafaf9;
+  --color-panel-field: #f4f4f2;
+  --color-panel-field-hover: #e9e8e5;
+  --color-raised: #ffffff;
+  --color-border: #e8e7e4;
+  --color-hover: rgb(23 23 28 / 0.05);
+  --color-accent: #ff5b2e;
+  --color-panel-focus: #ff5b2e;
+  --color-panel-selected: #ff5b2e;
+  --color-panel-selected-muted: #ffebe6;
+  --color-primary: #d42e00;
+  --color-on-accent: #17171c;
   --color-on-primary: #ffffff;
   --color-inverted: #ffffff;
-  --color-surface: #1f2328;
-  --color-muted: #5f6673;
+  --color-surface: #17171c;
+  --color-muted: #6e6e75;
   --color-input: #ffffff;
+  --color-agent: #7c5cff;
   --color-component: #7c3aed;
   --color-slot: #db2777;
   --color-warning: #8f5500;
@@ -147,6 +175,43 @@ html[data-theme='light'] {
   --color-chart-1: #2a78d6;
   --color-chart-2: #eb6834;
   --color-chart-3: #1baf7a;
+  --elevation-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.05);
+  --elevation-floating: 0 1px 3px rgb(0 0 0 / 0.06), 0 8px 24px rgb(0 0 0 / 0.1);
+  --elevation-dialog: 0 2px 6px rgb(0 0 0 / 0.06), 0 16px 48px rgb(0 0 0 / 0.14);
+}
+
+/*
+ * Each elevation is Tailwind's shadow stack with its own `--tw-shadow`, so it composes with
+ * `ring-*` the way `shadow-*` does.
+ */
+@utility elevation-card {
+  --tw-shadow: var(--elevation-card);
+  box-shadow:
+    var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+@utility elevation-floating {
+  --tw-shadow: var(--elevation-floating);
+  box-shadow:
+    var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+@utility elevation-dialog {
+  --tw-shadow: var(--elevation-dialog);
+  box-shadow:
+    var(--tw-inset-shadow, 0 0 #0000), var(--tw-inset-ring-shadow, 0 0 #0000),
+    var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+/*
+ * A quiet dot grid for the Home backdrop, drawn in the border color over whatever background the
+ * element already has. Named outside `bg-*` so tailwind-merge does not drop a `bg-*` color beside it.
+ */
+@utility dot-grid {
+  background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+  background-size: 16px 16px;
 }
 
 /* Points vccs charts at the theme: series colors, quiet grid and axes, panel tooltips. */

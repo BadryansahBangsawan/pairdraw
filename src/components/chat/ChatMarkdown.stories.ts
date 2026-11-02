@@ -35,7 +35,7 @@ const meta = {
     components: { ChatMarkdown },
     setup: () => ({ args }),
     template:
-      '<div class="w-80 rounded-xl bg-hover px-3 py-2 text-surface"><ChatMarkdown v-bind="args" /></div>'
+      '<div class="w-80 bg-panel px-3.5 py-3 text-xs leading-relaxed text-surface"><ChatMarkdown v-bind="args" /></div>'
   })
 } satisfies Meta<ChatMarkdownStoryArgs>
 

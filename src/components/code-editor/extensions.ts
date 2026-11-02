@@ -12,6 +12,8 @@ import {
   elementPropsByName
 } from '@open-pencil/design-jsx'
 
+import { APP_NAME } from '@/constants'
+
 const ELEMENTS = DESIGN_JSX_ELEMENTS.map(({ name }) => name)
 const PROPS = DESIGN_JSX_PROPERTIES.map(({ name }) => name)
 const HELPERS = DESIGN_JSX_HELPERS.map(({ name }) => name)
@@ -102,7 +104,7 @@ function semanticDiagnostics(view: EditorView): Diagnostic[] {
           from: node.from,
           to: node.to,
           severity: 'warning',
-          message: `Unknown OpenPencil property “${name}”.`
+          message: `Unknown ${APP_NAME} property “${name}”.`
         })
         return
       }
@@ -117,7 +119,7 @@ function semanticDiagnostics(view: EditorView): Diagnostic[] {
           from: node.from,
           to: node.to,
           severity: 'warning',
-          message: `Unknown OpenPencil element <${name}>.`
+          message: `Unknown ${APP_NAME} element <${name}>.`
         })
       }
     }

@@ -15,8 +15,8 @@ const appPickerTheme = {
     ],
     // The title and close button line up with the panel's section headers and the search field.
     header: 'flex h-9 shrink-0 items-center gap-1.5 border-b border-border pr-2 pl-3',
-    title: 'min-w-0 flex-1 truncate text-[11px] font-semibold text-surface',
-    search: [panelFieldBase, 'relative m-2 flex h-7 shrink-0 items-center'],
+    title: 'min-w-0 flex-1 truncate text-xs font-medium text-surface',
+    search: [panelFieldBase, 'relative m-2 flex shrink-0 items-center'],
     searchIcon: 'pointer-events-none absolute left-2 size-3.5 text-muted',
     input:
       'h-full min-w-0 flex-1 bg-transparent pr-2 pl-7 text-xs text-surface outline-none placeholder:text-muted',

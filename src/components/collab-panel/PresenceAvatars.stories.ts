@@ -38,7 +38,7 @@ const meta = {
     components: { PresenceAvatars },
     setup: () => ({ args }),
     template:
-      '<div class="flex justify-end bg-panel p-3 pb-48"><PresenceAvatars v-bind="args" /></div>'
+      '<div class="flex justify-end bg-canvas p-3 pb-48"><PresenceAvatars data-surface="canvas" v-bind="args" /></div>'
   })
 } satisfies Meta<Args & { onFollow: () => void; onRename: () => void; onLeave: () => void }>
 

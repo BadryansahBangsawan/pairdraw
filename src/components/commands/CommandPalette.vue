@@ -57,9 +57,10 @@ if (IS_BROWSER) {
   <AppDialogRoot
     v-model:open="open"
     size="md"
+    surface="floating"
     :ui="{
       content: 'w-[min(40rem,94vw)] p-0',
-      overlay: 'bg-black/40'
+      overlay: 'bg-black/25'
     }"
     @escape-key-down="close"
   >

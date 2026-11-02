@@ -9,10 +9,13 @@ defineOptions({ inheritAttrs: false })
 const {
   size = 'md',
   height = 'auto',
+  surface = 'dialog',
   ui
 } = defineProps<{
   size?: DialogVariants['size']
   height?: DialogVariants['height']
+  /** `floating` draws a quick command surface, such as the command palette, as menus are drawn. */
+  surface?: DialogVariants['surface']
   ui?: DialogUI
 }>()
 
@@ -24,7 +27,7 @@ const emit = defineEmits<{
 
 const open = defineModel<boolean>('open', { default: false })
 const attrs = useAttrs()
-const cls = computed(() => useDialogUI(ui, { size, height }))
+const cls = computed(() => useDialogUI(ui, { size, height, surface }))
 </script>
 
 <template>

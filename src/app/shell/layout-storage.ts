@@ -1,11 +1,14 @@
-import { clamp } from 'es-toolkit'
+import { clamp, mapValues } from 'es-toolkit'
 import * as v from 'valibot'
 
 import { IS_BROWSER } from '@open-pencil/core/constants'
 
 const EDITOR_LAYOUT_KEY = 'open-pencil:editor-layout'
 
-/** How wide each side panel is, in pixels; the canvas takes what is left of the window. */
+/**
+ * How wide each side panel is, in pixels, with the inset that keeps its card off the window's edge;
+ * the canvas takes what is left of the window.
+ */
 export interface EditorLayout {
   layers: number
   properties: number
@@ -15,24 +18,27 @@ export interface EditorLayout {
 
 export type EditorSidePanel = keyof EditorLayout
 
+/**
+ * The backdrop between a side panel's card and the window's edge, in pixels, which every width
+ * here includes (`src/theme/editor/workspace.ts`).
+ */
+export const EDITOR_PANEL_INSET = 10
+
 /** How narrow and wide a person can make each side panel, in pixels. */
 export const EDITOR_PANEL_LIMITS: Readonly<Record<EditorSidePanel, { min: number; max: number }>> =
   {
-    layers: { min: 160, max: 480 },
-    properties: { min: 200, max: 480 },
-    chat: { min: 280, max: 640 }
+    layers: { min: 160 + EDITOR_PANEL_INSET, max: 480 + EDITOR_PANEL_INSET },
+    properties: { min: 200 + EDITOR_PANEL_INSET, max: 480 + EDITOR_PANEL_INSET },
+    chat: { min: 280 + EDITOR_PANEL_INSET, max: 640 + EDITOR_PANEL_INSET }
   }
 
-/** The layers panel's share of the window when the editor first opens. */
-const DEFAULT_LAYERS_SHARE = 0.18
 /**
- * How wide the properties panel opens, whatever the window's width: wide enough for its fields,
- * without growing on a large screen as a share of the window would.
+ * How wide each panel opens, whatever the window's width: the layers panel room for a nested
+ * tree, the properties panel for its fields, and the chat column for a message and the changes
+ * it made. None grows on a large screen as a share of the window would.
  */
-const DEFAULT_PROPERTIES_WIDTH = 256
-/** How wide the chat column opens: room for a message and the changes it made. */
-const DEFAULT_CHAT_WIDTH = 360
-/** The window width a layout is made for before there is a window, as in tests. */
+const DEFAULT_CARD_WIDTHS: Readonly<EditorLayout> = { layers: 240, properties: 256, chat: 320 }
+/** The window width an old percent layout is read for before there is a window, as in tests. */
 const NOMINAL_WINDOW_WIDTH = 1280
 
 function clampWidth(panel: EditorSidePanel, width: number): number {
@@ -40,12 +46,8 @@ function clampWidth(panel: EditorSidePanel, width: number): number {
   return clamp(width, min, max)
 }
 
-export function defaultEditorLayout(windowWidth: number): EditorLayout {
-  return {
-    layers: clampWidth('layers', windowWidth * DEFAULT_LAYERS_SHARE),
-    properties: DEFAULT_PROPERTIES_WIDTH,
-    chat: DEFAULT_CHAT_WIDTH
-  }
+export function defaultEditorLayout(): EditorLayout {
+  return mapValues(DEFAULT_CARD_WIDTHS, (width) => width + EDITOR_PANEL_INSET)
 }
 
 const widthSchema = v.pipe(v.number(), v.finite(), v.minValue(0))
@@ -67,7 +69,7 @@ const storedEditorLayoutSchema = v.pipe(
  * defaulting the rest. A layout saved in percent by earlier versions becomes the pixels it had.
  */
 export function parseEditorLayout(text: string | null, windowWidth: number): EditorLayout {
-  const fallback = defaultEditorLayout(windowWidth)
+  const fallback = defaultEditorLayout()
   const parsed = v.safeParse(storedEditorLayoutSchema, text)
   if (!parsed.success) return fallback
   const stored = Array.isArray(parsed.output)
@@ -88,11 +90,11 @@ function windowWidth(): number {
 }
 
 export function loadEditorLayout(): EditorLayout {
-  if (!IS_BROWSER) return defaultEditorLayout(NOMINAL_WINDOW_WIDTH)
+  if (!IS_BROWSER) return defaultEditorLayout()
   try {
     return parseEditorLayout(window.localStorage.getItem(EDITOR_LAYOUT_KEY), windowWidth())
   } catch {
-    return defaultEditorLayout(windowWidth())
+    return defaultEditorLayout()
   }
 }
 

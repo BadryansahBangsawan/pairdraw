@@ -4,12 +4,12 @@ import { afterEach, expect, spyOn, test } from 'bun:test'
 import { createEditorStore } from '@/app/editor/session/create'
 import {
   addAgent,
+  AGENT_PRESENCE_COLOR,
   follow,
   followedLabel,
   presenceByPage,
   presenceOf,
   renameAgent,
-  setOwnerColor,
   setPeers
 } from '@/app/presence/registry'
 
@@ -26,19 +26,18 @@ function setup() {
 
 const red = { r: 1, g: 0, b: 0, a: 1 }
 
-test('draws active agents on their page, in their owner color', () => {
+test('draws active agents on their page in the agent violet', () => {
   const { store, pageId, other } = setup()
   const here = addAgent(store, 'chat')
   const there = addAgent(store, 'chat')
   here.update({ status: 'editing', cursor: { x: 5, y: 6, pageId } })
   there.update({ status: 'editing', cursor: { x: 1, y: 1, pageId: other } })
-  setOwnerColor(store, red)
   expect(store.state.presenceCursors).toEqual([
     {
       id: `agent:${here.id}`,
       kind: 'agent',
       name: here.name,
-      color: red,
+      color: AGENT_PRESENCE_COLOR,
       x: 5,
       y: 6,
       selection: undefined,
@@ -55,7 +54,7 @@ test('hides idle agents and gives each a different callsign', () => {
   expect(store.state.presenceCursors).toEqual([])
 })
 
-test('draws people and their agents with the person color', () => {
+test('draws people in their color and their agents in the agent violet', () => {
   const { store, pageId } = setup()
   setPeers(store, [
     {
@@ -72,7 +71,7 @@ test('draws people and their agents with the person color', () => {
     store.state.presenceCursors.map(({ kind, name, color }) => ({ kind, name, color }))
   ).toEqual([
     { kind: 'person', name: 'Ana', color: red },
-    { kind: 'agent', name: 'Orbit', color: red }
+    { kind: 'agent', name: 'Orbit', color: AGENT_PRESENCE_COLOR }
   ])
 })
 
@@ -244,7 +243,12 @@ test('labels a followed agent with the person who runs it', () => {
     { clientId: 4, name: 'Ana', color: red, agents: [{ ...fern, cursor: { x: 1, y: 1, pageId } }] }
   ])
   follow(store, { kind: 'agent', agentId: 'fern' })
-  expect(followedLabel(store)).toEqual({ kind: 'agent', name: 'Fern', owner: 'Ana', color: red })
+  expect(followedLabel(store)).toEqual({
+    kind: 'agent',
+    name: 'Fern',
+    owner: 'Ana',
+    color: AGENT_PRESENCE_COLOR
+  })
 })
 
 test('renames our agents, and their handles report the new name', () => {
@@ -275,7 +279,12 @@ test("lists people and working agents by page, knowing an agent's page before it
       ?.map((entry) => entry.name)
   ).toEqual(['Ana'])
   expect(presenceByPage(store).get(other)).toEqual([
-    { id: `agent:${thinking.id}`, kind: 'agent', name: thinking.name, color: expect.anything() }
+    {
+      id: `agent:${thinking.id}`,
+      kind: 'agent',
+      name: thinking.name,
+      color: AGENT_PRESENCE_COLOR
+    }
   ])
 })
 

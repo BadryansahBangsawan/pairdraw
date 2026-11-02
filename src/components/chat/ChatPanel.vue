@@ -337,7 +337,7 @@ function handleStop() {
     >
       <template #actions><ChatFollowAgentsToggle /></template>
     </ChatHistory>
-    <p v-if="history.storageError.value" role="alert" class="px-3 py-2 text-xs text-error">
+    <p v-if="history.storageError.value" role="alert" class="px-3.5 py-2 text-xs text-error">
       {{ ai.chatStorageFailed }}
     </p>
     <ChatProviderSetup v-if="!isConfigured" />
@@ -346,7 +346,7 @@ function handleStop() {
       <p
         v-if="history.current.value?.interrupted && status === 'ready'"
         role="status"
-        class="px-3 py-2 text-xs text-muted"
+        class="px-3.5 py-2 text-xs text-muted"
       >
         {{ ai.chatInterrupted }}
       </p>
@@ -373,10 +373,10 @@ function handleStop() {
         "
       />
 
-      <p v-if="agentHistoryReadOnly" role="status" class="px-3 py-2 text-xs text-muted">
+      <p v-if="agentHistoryReadOnly" role="status" class="px-3.5 py-2 text-xs text-muted">
         {{ ai.chatAgentReadOnly }}
       </p>
-      <p v-if="history.readOnly.value" role="status" class="px-3 py-2 text-xs text-muted">
+      <p v-if="history.readOnly.value" role="status" class="px-3.5 py-2 text-xs text-muted">
         {{ ai.chatReadOnly }}
       </p>
       <ChatRunLocation

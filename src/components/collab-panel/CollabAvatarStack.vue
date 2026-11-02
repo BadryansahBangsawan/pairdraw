@@ -7,7 +7,9 @@ const collab = useCollabPanelContext()
 </script>
 
 <template>
+  <!-- On the top bar, so the rings parting the avatars take the window backdrop's color. -->
   <PresenceAvatars
+    data-surface="canvas"
     :rows="collab.presenceRows"
     :following="collab.following"
     :connected="collab.state.status === 'live'"

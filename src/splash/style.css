@@ -1,20 +1,21 @@
+/* The splash is inlined into each page's head, so it mirrors --color-canvas and --color-surface. */
 :root {
-  --loader-bg: #1e1e1e;
-  --loader-fg: 255, 255, 255;
+  --loader-bg: #141416;
+  --loader-fg: 237, 237, 239;
 }
 @media (prefers-color-scheme: light) {
   :root {
-    --loader-bg: #f3f4f6;
-    --loader-fg: 32, 33, 36;
+    --loader-bg: #f4f4f2;
+    --loader-fg: 23, 23, 28;
   }
 }
 html[data-theme='dark'] {
-  --loader-bg: #1e1e1e;
-  --loader-fg: 255, 255, 255;
+  --loader-bg: #141416;
+  --loader-fg: 237, 237, 239;
 }
 html[data-theme='light'] {
-  --loader-bg: #f3f4f6;
-  --loader-fg: 32, 33, 36;
+  --loader-bg: #f4f4f2;
+  --loader-fg: 23, 23, 28;
 }
 body {
   margin: 0;

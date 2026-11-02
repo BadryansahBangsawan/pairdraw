@@ -1,8 +1,13 @@
+/**
+ * The open document's Cloud status on the top bar, at the scale of the bar's other controls, and
+ * the popover it opens. View only sits on the window backdrop as a panel-colored chip, since the
+ * field color matches the light backdrop.
+ */
 export default {
   slots: {
     trigger:
-      'flex h-6 shrink-0 items-center gap-1 rounded px-1 text-muted outline-none hover:bg-hover hover:text-surface focus-visible:ring-2 focus-visible:ring-accent/50 data-[state=open]:bg-hover data-[state-sync=conflict]:bg-warning-bg data-[state-sync=conflict]:text-warning data-[state-sync=error]:text-error data-[state-sync=view]:bg-panel-field data-[state-sync=view]:text-surface data-[state-sync=not-live]:bg-warning-bg data-[state-sync=not-live]:text-warning',
-    triggerLabel: 'text-[11px] font-medium',
+      'flex h-7 shrink-0 items-center gap-1.5 rounded-lg border border-transparent px-1.5 text-muted outline-none hover:bg-hover hover:text-surface focus-visible:ring-2 focus-visible:ring-accent/50 data-[state=open]:bg-hover data-[state-sync=conflict]:bg-warning-bg data-[state-sync=conflict]:text-warning data-[state-sync=error]:text-error data-[state-sync=view]:border-border data-[state-sync=view]:bg-panel data-[state-sync=view]:text-surface data-[state-sync=not-live]:bg-warning-bg data-[state-sync=not-live]:text-warning',
+    triggerLabel: 'text-xs font-medium',
     header: 'flex items-start gap-2.5',
     headerIcon:
       'flex size-8 shrink-0 items-center justify-center rounded-md bg-panel-field text-muted data-[state-sync=synced]:text-primary data-[state-sync=conflict]:bg-warning-bg data-[state-sync=conflict]:text-warning data-[state-sync=error]:bg-error-bg data-[state-sync=error]:text-error data-[state-sync=not-live]:bg-warning-bg data-[state-sync=not-live]:text-warning',

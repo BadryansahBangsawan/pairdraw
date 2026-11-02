@@ -10,20 +10,26 @@ import { getActiveEditorStoreOrNull, useActiveEditorStoreRef } from '@/app/edito
 import { notificationMessages } from '@/app/i18n/notifications'
 import { toast } from '@/app/shell/ui'
 import { CHAT_NODES_LIVE } from '@/components/chat/tool/context'
-import { chatReferenceTheme } from '@/components/chat/ui'
+import { chatReferenceTheme, type ChatReferenceTone } from '@/components/chat/ui'
 import { sceneNodeIcon } from '@/components/icons'
 
 /**
  * A layer, page, or skill named in chat text. In the transcript it shows its target when
  * clicked; in the composer it is part of the text and only shows what it names.
  */
-const { reference, interactive = true } = defineProps<{
+const {
+  reference,
+  interactive = true,
+  tone = 'field'
+} = defineProps<{
   reference: ChatReference
   interactive?: boolean
+  /** `ink` inside the person's own message bubble. */
+  tone?: ChatReferenceTone
 }>()
 
 const ai = useAIMessages()
-const ui = chatReferenceTheme()
+const ui = computed(() => chatReferenceTheme({ tone }))
 const live = inject(CHAT_NODES_LIVE, ref(true))
 const activeStore = useActiveEditorStoreRef()
 

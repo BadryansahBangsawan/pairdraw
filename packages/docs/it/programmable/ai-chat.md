@@ -5,7 +5,7 @@ description: Assistente integrato con oltre 90 strumenti per creare, modificare 
 
 # Chat con AI
 
-Premi <kbd>⌘</kbd><kbd>J</kbd> o <kbd>Ctrl</kbd><kbd>J</kbd>. L’assistente può creare forme, modificare stili, configurare disposizioni, lavorare con componenti e analizzare il documento.
+Premi <kbd>⌘</kbd><kbd>J</kbd> o <kbd>Ctrl</kbd><kbd>J</kbd>, oppure fai clic sul pulsante con le scintille tra le azioni del documento nella barra superiore, per aprire l’assistente nella sua colonna. L’assistente può creare forme, modificare stili, configurare disposizioni, lavorare con componenti e analizzare il documento.
 
 ## Configurare i modelli
 

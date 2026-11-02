@@ -4,5 +4,16 @@ export default {
     root: 'mx-px inline-flex max-w-48 cursor-pointer items-center gap-1 rounded border border-border bg-input px-1 align-[-0.2em] text-[0.92em] leading-[1.35] text-surface hover:border-accent hover:text-primary disabled:cursor-default disabled:hover:border-border disabled:hover:text-surface data-[present=false]:text-muted data-[present=false]:line-through',
     icon: 'size-3 shrink-0 text-muted',
     label: 'truncate'
-  }
+  },
+  variants: {
+    /** In what the person wrote, the chip takes the ink bubble's colors rather than a field's. */
+    tone: {
+      field: {},
+      ink: {
+        root: 'border-panel/25 bg-panel/10 text-panel hover:border-panel/60 hover:text-panel disabled:hover:border-panel/25 disabled:hover:text-panel data-[present=false]:text-panel/70',
+        icon: 'text-panel/70'
+      }
+    }
+  },
+  defaultVariants: { tone: 'field' as const }
 } as const

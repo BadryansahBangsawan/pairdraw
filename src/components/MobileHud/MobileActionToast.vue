@@ -1,18 +1,18 @@
 <script setup lang="ts">
+import { tv } from 'tailwind-variants'
+
 import { useMobileHudContext } from '@/components/MobileHud/context'
+import indicatorsTheme from '@/theme/mobile/indicators'
 import { feedbackTransition } from '@/theme/motion/styles'
 
 const hud = useMobileHudContext()
+const styles = tv(indicatorsTheme)()
 </script>
 
 <template>
   <Transition v-bind="feedbackTransition">
-    <div
-      v-if="hud.actionToast"
-      :key="hud.actionToast"
-      class="flex h-8 items-center rounded-full border border-accent/20 bg-panel/70 px-3 shadow-md backdrop-blur-xl"
-    >
-      <span class="text-xs whitespace-nowrap text-primary">{{ hud.actionToast }}</span>
+    <div v-if="hud.actionToast" :key="hud.actionToast" :class="styles.toast()">
+      {{ hud.actionToast }}
     </div>
   </Transition>
 </template>

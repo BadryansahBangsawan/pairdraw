@@ -21,7 +21,6 @@ import { useCommentMessages } from '@open-pencil/vue/i18n'
 
 import { useComments } from '@/app/comments/use'
 import { useEditorStore } from '@/app/editor/active-store'
-import ZoomDropdown from '@/components/editor/ZoomDropdown.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import AppPlaceholder from '@/components/ui/feedback/AppPlaceholder.vue'
 import AppInput from '@/components/ui/input/AppInput.vue'
@@ -74,7 +73,6 @@ function setSort(value: unknown) {
       <template #icon><icon-lucide-messages-square class="size-3.5" /></template>
       {{ messages.comments }}
       <template #actions>
-        <ZoomDropdown />
         <DropdownMenuRoot :modal="false">
           <DropdownMenuTrigger as-child>
             <IconButton :label="messages.filterAndSort" :active="filtered">

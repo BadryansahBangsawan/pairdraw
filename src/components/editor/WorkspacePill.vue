@@ -10,11 +10,18 @@ import IconButton from '@/components/ui/button/IconButton.vue'
  * The pill of the canvas-only layout: the document name and the way back. In preview it says
  * so, resets the controls, and leaves preview.
  */
-const { documentName, mode, shortcut } = defineProps<{
+const {
+  documentName,
+  mode,
+  shortcut,
+  rulers = false
+} = defineProps<{
   documentName: string
   mode: 'collapsed' | 'preview'
   /** The shortcut of the way back: Toggle UI, or leaving preview. */
   shortcut: string
+  /** Whether the canvas draws its rulers, which the pill then sits clear of. */
+  rulers?: boolean
 }>()
 const emit = defineEmits<{ showUi: []; reset: []; leave: [] }>()
 const { editor } = useI18n()
@@ -22,8 +29,9 @@ const { editor } = useI18n()
 
 <template>
   <div
-    class="absolute top-7 left-7 z-10 flex items-center gap-2 rounded-lg border border-border bg-panel px-2 py-1 shadow-sm"
+    class="absolute start-2.5 top-2.5 z-10 flex items-center gap-2 rounded-xl border border-border bg-panel py-1 ps-1.5 pe-1 elevation-card data-rulers:start-8.5 data-rulers:top-8.5"
     :data-mode="mode"
+    :data-rulers="rulers || undefined"
   >
     <BrandMark variant="app-icon" :appearance="resolvedAppTheme" class="size-6" />
     <span data-test-id="editor-document-name" class="text-xs text-surface">{{ documentName }}</span>
@@ -31,16 +39,16 @@ const { editor } = useI18n()
       v-if="mode === 'collapsed'"
       :label="editor.showUI({ shortcut })"
       data-test-id="editor-show-ui"
-      class="ml-1"
+      class="ms-1"
       @click="emit('showUi')"
     >
       <icon-lucide-sidebar class="size-3.5" />
     </IconButton>
     <template v-else>
       <span
-        class="ml-1 flex h-5 items-center gap-1 rounded bg-accent/15 px-1.5 text-[10px] font-medium text-primary"
+        class="ms-1 flex h-5 items-center gap-1 rounded-md bg-accent/15 px-1.5 text-[10px] font-medium text-surface"
       >
-        <icon-lucide-play class="size-3" />
+        <icon-lucide-play class="size-3 text-primary" />
         {{ editor.previewing }}
       </span>
       <AppButton size="xs" variant="soft" data-property="preview-reset" @click="emit('reset')">

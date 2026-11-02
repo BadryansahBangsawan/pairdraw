@@ -5,7 +5,7 @@ description: Asistente integrado con más de 90 herramientas para crear, modific
 
 # Chat con AI
 
-Pulsa <kbd>⌘</kbd><kbd>J</kbd> o <kbd>Ctrl</kbd><kbd>J</kbd>. El asistente puede crear formas, modificar estilos, configurar disposiciones, trabajar con componentes y analizar el documento.
+Pulsa <kbd>⌘</kbd><kbd>J</kbd> o <kbd>Ctrl</kbd><kbd>J</kbd>, o haz clic en el botón de las chispas entre las acciones del documento en la barra superior, para abrir el asistente en su propia columna. El asistente puede crear formas, modificar estilos, configurar disposiciones, trabajar con componentes y analizar el documento.
 
 ## Configurar modelos
 

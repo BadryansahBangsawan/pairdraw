@@ -3,15 +3,26 @@ import { openAppMenu } from '#tests/helpers/menu'
 
 const editor = useEditorSetup()
 
-test('menu bar is visible in browser mode', async () => {
-  const menubar = editor.page.locator('[role="menubar"]')
-  await expect(menubar).toBeVisible()
+test('the brand opens the app menus in browser mode', async () => {
+  await expect(editor.page.getByTestId('app-main-menu')).toBeVisible()
+  await expect(editor.page.getByTestId('app-main-menu')).toHaveAttribute('aria-haspopup', 'menu')
 })
 
-test('menu bar has all top-level menus', async () => {
-  const triggers = editor.page.locator('[role="menubar"] [role="menuitem"]')
-  const labels = await triggers.allTextContents()
-  expect(labels).toEqual(['File', 'Edit', 'View', 'Object', 'Text', 'Arrange'])
+test('the brand menu holds every top-level menu', async () => {
+  await expect(editor.page.getByRole('menu')).toHaveCount(0)
+  await editor.page.getByTestId('app-main-menu').click()
+  const menu = editor.page.getByRole('menu')
+  await expect(menu).toBeVisible()
+  const labels = await menu.locator('[role="menuitem"]').allTextContents()
+  expect(labels.map((label) => label.trim())).toEqual([
+    'File',
+    'Edit',
+    'View',
+    'Object',
+    'Text',
+    'Arrange'
+  ])
+  await editor.page.keyboard.press('Escape')
 })
 
 test('File menu opens and shows items', async () => {
@@ -157,8 +168,8 @@ test('Zoom to fit via View menu works', async () => {
 })
 
 test('Open storage workspace navigates from the File menu', async () => {
-  await editor.page.getByRole('menuitem', { name: 'File', exact: true }).click()
-  await editor.page.getByRole('menuitem', { name: 'Open storage workspace…' }).click()
+  const fileMenu = await openAppMenu(editor.page, 'File')
+  await fileMenu.getByRole('menuitem', { name: 'Open storage workspace…' }).click()
 
   await expect(editor.page).toHaveURL(/\/$/)
   await expect(editor.page.getByTestId('recent-files-home')).toBeVisible()

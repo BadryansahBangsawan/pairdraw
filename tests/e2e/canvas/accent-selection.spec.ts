@@ -11,6 +11,7 @@ test('selection chrome, size pill and ruler badges follow the accent color', asy
     .click()
   await page.getByTestId('app-settings-done').click()
   await expect(page.getByRole('dialog', { name: 'Settings' })).toBeHidden()
+  await page.keyboard.press('Shift+R')
 
   await canvas.drawRect(160, 140, 240, 160)
   await canvas.waitForRender()

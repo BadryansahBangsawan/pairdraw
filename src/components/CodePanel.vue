@@ -396,13 +396,13 @@ watch(
 
 <template>
   <div data-test-id="code-panel-root" class="flex min-h-0 flex-1 flex-col">
-    <header class="flex shrink-0 items-center gap-2 border-b border-border px-3 py-2">
+    <header class="flex shrink-0 items-center gap-2 border-b border-border px-3.5 py-2.5">
       <AppSelect
         :model-value="source"
         :options="sourceOptions"
         :label="code.source"
         data-test-id="code-panel-source"
-        :ui="{ trigger: 'h-7 min-w-0 flex-1 text-[11px]' }"
+        :ui="{ trigger: 'min-w-0 flex-1' }"
         @update:model-value="changeSource"
       />
       <SegmentedControl
@@ -469,14 +469,14 @@ watch(
       v-if="error"
       role="alert"
       data-test-id="code-panel-error"
-      class="shrink-0 border-t border-error-border bg-error-bg px-3 py-2 text-[11px] leading-snug text-error"
+      class="shrink-0 border-t border-error-border bg-error-bg px-3.5 py-2 text-[11px] leading-snug text-error"
     >
       {{ error }}
     </div>
 
     <footer
       v-if="!showEmptyState"
-      class="flex shrink-0 items-center justify-between gap-2 border-t border-border px-3 py-2"
+      class="flex shrink-0 items-center justify-between gap-2 border-t border-border px-3.5 py-2"
     >
       <span
         data-test-id="code-panel-status"

@@ -14,6 +14,7 @@ export default {
     optionMark:
       'mt-0.5 size-3.5 shrink-0 rounded-full border border-muted/60 group-data-[state=checked]:border-4 group-data-[state=checked]:border-accent group-data-[tone=danger]:group-data-[state=checked]:border-error',
     optionLabel: 'block text-xs font-medium text-surface',
-    optionDescription: 'mt-0.5 block text-[11px] leading-relaxed text-muted'
+    optionDescription:
+      'mt-0.5 block text-[11px] leading-relaxed text-muted group-data-[state=checked]:text-surface/75'
   }
 } as const

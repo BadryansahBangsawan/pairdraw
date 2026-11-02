@@ -63,7 +63,10 @@ export const Grouped: Story = {
   })
 }
 
-/** Each row is one step of the control scale: the input, select, combobox, and button line up. */
+/**
+ * Each row is one step of the control scale: the input, select, and combobox line up. From `sm`
+ * up the button does too; at `xs` the fields are the property field, one step taller than it.
+ */
 export const ControlSizes: Story = {
   render: () => ({
     components: { AppSelect, AppButton, AppCombobox, AppInput },

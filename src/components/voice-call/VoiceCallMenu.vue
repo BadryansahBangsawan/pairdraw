@@ -116,6 +116,7 @@ function onOpenChange(open: boolean) {
       :label="muteLabel"
       :active="muted"
       side="bottom"
+      :class="ui.mute()"
       @click="emit('toggleMute')"
     >
       <icon-lucide-mic-off v-if="muted" class="size-3.5" />

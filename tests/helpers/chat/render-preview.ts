@@ -1,6 +1,9 @@
 import type { Page } from '@playwright/test'
 
-/** Clears the page and fixes the view; rendering snapshots compare it, so agents are not followed. */
+/**
+ * Clears the page and fixes the view; rendering snapshots compare it, so agents are not followed.
+ * Rulers are turned on because the committed baselines include them.
+ */
 export async function setupCanvas(page: Page) {
   const followAgents = page.getByTestId('chat-follow-agents')
   if ((await followAgents.getAttribute('aria-pressed')) === 'true') await followAgents.click()
@@ -14,6 +17,7 @@ export async function setupCanvas(page: Page) {
     store.state.panX = 0
     store.state.panY = 0
     store.state.zoom = 1
+    store.state.showRulers = true
     store.requestRender()
   })
 }

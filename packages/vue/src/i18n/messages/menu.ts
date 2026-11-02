@@ -64,6 +64,8 @@ export const menuMessageDefaults = {
   back: 'Back',
   toggleUI: 'Toggle UI',
   togglePreview: 'Preview',
+  /** The field that renames the document, in place of its tab's name. */
+  documentName: 'Document name',
 
   bold: 'Bold',
   italic: 'Italic',

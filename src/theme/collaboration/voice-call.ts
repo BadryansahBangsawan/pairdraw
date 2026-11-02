@@ -2,6 +2,8 @@
 export default {
   slots: {
     root: 'flex shrink-0 items-center',
+    /** Muted, its raised pill takes a ring on the top bar's backdrop, like the front tab. */
+    mute: 'data-[state=on]:ring-1 data-[state=on]:ring-border',
     trigger: 'relative',
     /** How many people are in a call we are not in yet. */
     count:

@@ -19,7 +19,7 @@ const meta = {
         { value: 'text', label: 'Text', icon: IconType }
       ]
     }),
-    template: `<ToolbarRoot aria-label="Design tools" class="flex w-fit gap-0.5 rounded-xl bg-panel p-1">
+    template: `<ToolbarRoot aria-label="Design tools" class="flex w-fit gap-0.5 rounded-xl border border-border bg-panel p-1 elevation-card">
       <ToolButton v-for="tool in tools" :key="tool.value" :label="tool.label" :icon="tool.icon" :active="selected === tool.value" @click="selected = tool.value" />
     </ToolbarRoot>`
   })

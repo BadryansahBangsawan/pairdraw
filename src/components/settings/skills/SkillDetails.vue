@@ -71,7 +71,7 @@ const useDescription = computed(() => {
       </SettingsSection>
       <SettingsSection>
         <template #title>{{ ai.skillsInstructions }}</template>
-        <div class="rounded border border-border px-4 py-3">
+        <div class="rounded-xl border border-border px-4 py-3">
           <MarkdownContent :content="skill.instructions" />
         </div>
       </SettingsSection>

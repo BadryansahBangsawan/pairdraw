@@ -49,7 +49,7 @@ Zaznaczony obiekt jest prezentowany jako JSX z wyróżnianiem składni. Dostępn
 
 ### Czat AI
 
-Czat AI tworzy i zmienia obiekty na podstawie poleceń w zwykłym języku. Otwiera się we własnej kolumnie po prawej stronie panelu właściwości, więc karta Projekt pozostaje widoczna. Kolumnę otwiera i zamyka przycisk z iskrami u góry panelu właściwości albo skrót <kbd>⌘</kbd><kbd>J</kbd> lub <kbd>Ctrl</kbd><kbd>J</kbd>; jej szerokość można zmienić, przeciągając krawędź, i zostaje zapamiętana po przeładowaniu.
+Czat AI tworzy i zmienia obiekty na podstawie poleceń w zwykłym języku. Otwiera się we własnej kolumnie po prawej stronie panelu właściwości, więc karta Projekt pozostaje widoczna. Kolumnę otwiera i zamyka przycisk z iskrami wśród działań dokumentu na górnym pasku albo skrót <kbd>⌘</kbd><kbd>J</kbd> lub <kbd>Ctrl</kbd><kbd>J</kbd>; jej szerokość można zmienić, przeciągając krawędź, i zostaje zapamiętana po przeładowaniu.
 
 ## Małe ekrany
 

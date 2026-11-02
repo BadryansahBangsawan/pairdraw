@@ -3,6 +3,7 @@ import { useElementSize, useWindowSize } from '@vueuse/core'
 import { motion } from 'motion-v'
 import type { PanInfo } from 'motion-v'
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from 'reka-ui'
+import { tv } from 'tailwind-variants'
 import { computed, ref } from 'vue'
 
 import { useI18n } from '@open-pencil/vue/i18n'
@@ -18,6 +19,7 @@ import {
   SWIPE_THRESHOLD,
   SWIPE_VELOCITY_THRESHOLD
 } from '@/constants'
+import drawerTheme from '@/theme/mobile/drawer'
 
 import CodePanel from './CodePanel.vue'
 import CommentsPanel from './comments/CommentsPanel.vue'
@@ -29,7 +31,8 @@ type Snap = 'closed' | 'half' | 'full'
 type DrawerTab = 'layers' | 'design' | 'code' | 'ai'
 
 const store = useEditorStore()
-const { settings } = useI18n()
+const { settings, panels } = useI18n()
+const styles = tv(drawerTheme)()
 
 const headerRef = ref<HTMLElement | null>(null)
 
@@ -118,88 +121,88 @@ const drawerTransition = useMotionTransition({
 <template>
   <motion.div
     data-test-id="mobile-drawer"
-    class="fixed inset-x-0 bottom-0 z-30 flex touch-none flex-col rounded-t-3xl bg-panel pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_10px_rgba(0,0,0,0.3)]"
+    :class="styles.root()"
     :animate="{ height: `${targetHeight}px` }"
     :transition="drawerTransition"
     @pan="onPan"
     @panEnd="onPanEnd"
   >
-    <TabsRoot :model-value="getDrawerTab()" class="flex min-h-0 flex-1 flex-col">
-      <nav
-        ref="headerRef"
-        :aria-label="settings.mobilePanelNavigation"
-        class="flex shrink-0 flex-col"
-      >
-        <div class="flex w-full justify-center pt-2">
-          <div class="h-1 w-8 rounded-full bg-muted/40" />
+    <TabsRoot :model-value="getDrawerTab()" :class="styles.tabs()">
+      <nav ref="headerRef" :aria-label="settings.mobilePanelNavigation" :class="styles.header()">
+        <div :class="styles.grabber()">
+          <div :class="styles.grabberBar()" />
         </div>
-        <TabsList class="flex w-full items-center px-2 py-2">
+        <TabsList :class="styles.list()">
           <TabsTrigger
             data-test-id="mobile-ribbon-layers"
             value="layers"
-            class="flex h-full cursor-pointer items-center justify-center gap-1.5 px-4 text-xs transition-colors outline-none select-none data-[state=active]:text-primary"
+            :aria-label="panels.layers"
+            :class="styles.trigger()"
             @click="toggleTab('layers')"
           >
-            <icon-lucide-layers class="size-4" />
+            <icon-lucide-layers :class="styles.triggerIcon()" />
           </TabsTrigger>
 
           <TabsTrigger
             data-test-id="mobile-ribbon-design"
             value="design"
-            class="flex h-full cursor-pointer items-center justify-center gap-1.5 px-4 text-xs transition-colors outline-none select-none data-[state=active]:text-primary"
+            :aria-label="panels.design"
+            :class="styles.trigger()"
             @click="toggleTab('design')"
           >
-            <icon-lucide-sliders-horizontal class="size-4" />
+            <icon-lucide-sliders-horizontal :class="styles.triggerIcon()" />
           </TabsTrigger>
 
-          <div class="flex-1" />
+          <div :class="styles.spacer()" />
 
           <TabsTrigger
             data-test-id="mobile-ribbon-code"
             value="code"
-            class="flex h-full cursor-pointer items-center justify-center px-3 transition-colors outline-none select-none data-[state=active]:text-primary"
+            :aria-label="panels.code"
+            :class="styles.trigger()"
             @click="toggleTab('code')"
           >
-            <icon-lucide-code class="size-4" />
+            <icon-lucide-code :class="styles.triggerIcon()" />
           </TabsTrigger>
 
           <TabsTrigger
             data-test-id="mobile-ribbon-ai"
             value="ai"
-            class="flex h-full cursor-pointer items-center justify-center px-3 transition-colors outline-none select-none data-[state=active]:text-primary"
+            :aria-label="panels.ai"
+            :class="styles.trigger()"
             @click="toggleTab('ai')"
           >
-            <icon-lucide-sparkles class="size-4" />
+            <icon-lucide-sparkles :class="styles.triggerIcon()" />
           </TabsTrigger>
         </TabsList>
       </nav>
 
-      <div data-test-id="mobile-drawer-content" class="min-h-0 flex-1 overflow-y-auto">
-        <TabsContent value="layers" class="mt-0 h-full data-[state=inactive]:hidden">
-          <div data-test-id="mobile-drawer-layers" class="flex h-full flex-col">
+      <div data-test-id="mobile-drawer-content" :class="styles.content()">
+        <TabsContent value="layers" :class="styles.page()">
+          <div data-test-id="mobile-drawer-layers" :class="styles.pageBody()">
             <PagesPanel />
-            <div class="border-t border-border" />
-            <header class="shrink-0 px-3 py-2 text-[11px] font-semibold text-muted">Layers</header>
-            <LayerTree class="min-h-0 flex-1" />
+            <div :class="styles.divider()" />
+            <header :class="styles.heading()">{{ panels.layers }}</header>
+            <LayerTree :class="styles.layers()" />
           </div>
         </TabsContent>
 
-        <TabsContent value="design" class="mt-0 h-full data-[state=inactive]:hidden">
-          <div data-test-id="mobile-drawer-design" class="flex h-full flex-col">
+        <TabsContent value="design" :class="styles.page()">
+          <div data-test-id="mobile-drawer-design" :class="styles.pageBody()">
             <!-- The Comment tool turns the properties into the comments list, as on desktop. -->
             <CommentsPanel v-if="store.state.activeTool === 'COMMENT'" />
             <DesignPanel v-else />
           </div>
         </TabsContent>
 
-        <TabsContent value="code" class="mt-0 h-full data-[state=inactive]:hidden">
-          <div data-test-id="mobile-drawer-code" class="flex h-full flex-col">
+        <TabsContent value="code" :class="styles.page()">
+          <div data-test-id="mobile-drawer-code" :class="styles.pageBody()">
             <CodePanel :active="isOpen && getDrawerTab() === 'code'" />
           </div>
         </TabsContent>
 
-        <TabsContent value="ai" class="mt-0 h-full data-[state=inactive]:hidden">
-          <div data-test-id="mobile-drawer-ai" class="flex h-full flex-col">
+        <TabsContent value="ai" :class="styles.page()">
+          <div data-test-id="mobile-drawer-ai" :class="styles.pageBody()">
             <ChatPanel />
           </div>
         </TabsContent>

@@ -13,6 +13,7 @@ import AppButton from '@/components/ui/button/AppButton.vue'
 import { AppDialogBody, AppDialogFooter, AppDialogHeader } from '@/components/ui/dialog'
 import AppAlert from '@/components/ui/feedback/AppAlert.vue'
 import AppCheckboxCard from '@/components/ui/toggle/AppCheckboxCard.vue'
+import { APP_NAME } from '@/constants'
 import theme from '@/theme/settings/ai-setup/flow'
 
 import AISetupAccess from './AISetupAccess.vue'
@@ -90,7 +91,7 @@ const header = computed(() => {
 
 /** Runs in the click handler, so the browser allows the sign-in popup. */
 function signIn(providerID: OnboardingAccess): void {
-  onboarding.signIn(providerID, { keyLabel: 'OpenPencil' })
+  onboarding.signIn(providerID, { keyLabel: APP_NAME })
 }
 
 function back(): void {
@@ -125,11 +126,19 @@ async function finish(): Promise<void> {
     <div :class="styles.body()" :data-ai-setup-step="phase === 'wizard' ? step : phase">
       <template v-if="phase === 'welcome'">
         <section :class="styles.intro()">
-          <h3 :class="styles.introHeading()">{{ ai.aiSetupWelcomeAITitle }}</h3>
-          <p :class="styles.introText()">{{ ai.aiSetupWelcomeAIDescription }}</p>
+          <span :class="styles.introIcon()" aria-hidden="true">
+            <icon-lucide-sparkles class="size-4" />
+          </span>
+          <div :class="styles.introBody()">
+            <h3 :class="styles.introHeading()">{{ ai.aiSetupWelcomeAITitle }}</h3>
+            <p :class="styles.introText()">{{ ai.aiSetupWelcomeAIDescription }}</p>
+          </div>
         </section>
         <section v-if="offersTour" :class="styles.tour()" data-test-id="ai-setup-tour">
-          <div>
+          <span :class="styles.introIcon()" aria-hidden="true">
+            <icon-lucide-compass class="size-4" />
+          </span>
+          <div :class="styles.introBody()">
             <h3 :class="styles.introHeading()">{{ ai.aiSetupWelcomeTourTitle }}</h3>
             <p :class="styles.introText()">{{ ai.aiSetupWelcomeTourDescription }}</p>
           </div>

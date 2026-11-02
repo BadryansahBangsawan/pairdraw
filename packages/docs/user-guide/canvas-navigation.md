@@ -61,7 +61,7 @@ Zoomed in far enough that each document pixel covers eight screen pixels (800% o
 
 ## Ruler Guides
 
-Enable **View → Rulers**, then drag from the top ruler for a horizontal guide or the left ruler for a vertical guide. Drop onto the page for a canvas guide, or onto a frame for a guide in that frame's coordinates.
+Rulers are hidden until you turn them on with **View → Rulers** or <kbd>Shift</kbd> + <kbd>R</kbd>. Then drag from the top ruler for a horizontal guide or the left ruler for a vertical guide. Drop onto the page for a canvas guide, or onto a frame for a guide in that frame's coordinates.
 
 - Click a guide to select it; drag it to reposition it or transfer it between the page and a frame.
 - Hold <kbd>Option</kbd> / <kbd>Alt</kbd> while dragging an existing guide to duplicate it.

@@ -146,7 +146,7 @@ function handleAlign(
             </template>
           </NumberField>
         </Tip>
-        <div class="flex h-6 items-center justify-end gap-0.5">
+        <div class="flex h-7 items-center justify-end gap-0.5">
           <IconButton :label="panels.flipHorizontal" size="xs" @click="actions.flip('horizontal')">
             <icon-lucide-flip-horizontal-2 class="size-3.5" />
           </IconButton>

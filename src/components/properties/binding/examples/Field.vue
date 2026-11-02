@@ -53,7 +53,7 @@ function tooltip(variableName: string, resolvedValue: unknown) {
     >
       <div
         v-bind="{ ...attrs, ...binding.stateAttrs }"
-        class="group/binding flex h-6 min-w-0 items-center rounded border border-transparent bg-panel-field text-xs text-surface outline-none hover:bg-panel-field-hover focus-within:border-panel-focus data-[derived]:text-muted"
+        class="group/binding flex h-7 min-w-0 items-center rounded-field border border-transparent bg-panel-field text-xs text-surface outline-none hover:bg-panel-field-hover focus-within:border-panel-focus data-[derived]:text-muted"
         :data-derived="derived ? '' : undefined"
         @pointerdown="
           !editing &&

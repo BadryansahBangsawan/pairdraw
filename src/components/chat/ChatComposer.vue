@@ -7,6 +7,7 @@ import { computed, useTemplateRef } from 'vue'
 import { useI18n } from '@open-pencil/vue/i18n'
 
 import { useChatEditor } from '@/components/chat/composer/useChatEditor'
+import { chatInputTheme } from '@/components/chat/ui'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import InputGroup from '@/components/ui/input/InputGroup.vue'
 
@@ -33,6 +34,7 @@ const emit = defineEmits<{
   paste: [event: ClipboardEvent]
 }>()
 const { ai } = useI18n()
+const ui = chatInputTheme()
 /** The agent is replying; messages written now wait for it, so the field stays open. */
 const working = computed(() => status === 'streaming' || status === 'submitted')
 const host = useTemplateRef<HTMLDivElement>('host')
@@ -81,12 +83,9 @@ defineExpose({ restoreDraft, insert: editor.insert, focus: editor.focus })
 <template>
   <TooltipProvider>
     <!-- The message box rests on the panel as a card, its shadow parting it from the messages. -->
-    <div class="shrink-0 px-2.5 pt-1 pb-2.5">
+    <div :class="ui.root()">
       <form class="relative" @submit="handleSubmit" @paste.stop="emit('paste', $event)">
-        <InputGroup
-          :disabled="disabled"
-          :ui="{ root: 'shadow-[0_1px_2px_rgb(0_0_0/0.08),0_4px_14px_rgb(0_0_0/0.12)]' }"
-        >
+        <InputGroup :disabled="disabled" :ui="{ root: ui.group() }">
           <template v-if="$slots.attachment" #attachment><slot name="attachment" /></template>
 
           <div ref="host" class="min-w-0" @copy.stop @cut.stop />
@@ -109,10 +108,10 @@ defineExpose({ restoreDraft, insert: editor.insert, focus: editor.focus })
               :label="ai.stopGenerating"
               size="sm"
               data-test-id="chat-stop-button"
-              class="border border-border"
+              :class="ui.stop()"
               @click="emit('stop')"
             >
-              <icon-lucide-square class="size-3" />
+              <icon-lucide-square :class="ui.stopIcon()" />
             </IconButton>
             <IconButton
               v-else
@@ -120,10 +119,10 @@ defineExpose({ restoreDraft, insert: editor.insert, focus: editor.focus })
               size="sm"
               type="submit"
               data-test-id="chat-send-button"
-              class="bg-accent text-on-accent hover:bg-accent/90 hover:text-on-accent"
+              :class="ui.send()"
               :disabled="!text.trim()"
             >
-              <icon-lucide-send class="size-3.5" />
+              <icon-lucide-arrow-up :class="ui.sendIcon()" />
             </IconButton>
           </template>
         </InputGroup>

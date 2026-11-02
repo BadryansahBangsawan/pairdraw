@@ -13,10 +13,12 @@ export default {
     line: 'absolute top-0 bottom-[-0.75rem] left-1/2 w-px -translate-x-1/2 bg-border',
     body: 'flex min-w-0 flex-col gap-0.5',
     title: 'min-w-0 truncate font-semibold text-surface',
-    current: 'min-w-0 truncate font-semibold text-surface group-data-[selected]/item:text-accent',
+    // Stays ink on the selected tint, where the accent falls far below AA; the marker turns accent.
+    current: 'min-w-0 truncate font-semibold text-surface',
     description: 'line-clamp-3 min-w-0 break-words text-surface/80',
-    author: 'min-w-0 truncate text-[11px] text-muted',
-    time: 'text-[11px] text-muted',
+    // Quiet text darkens on the selected entry's tint, where muted would read too faint.
+    author: 'min-w-0 truncate text-[11px] text-muted group-data-[selected]/item:text-surface/75',
+    time: 'text-[11px] text-muted group-data-[selected]/item:text-surface/75',
     actions:
       'invisible absolute top-1.5 right-3 group-focus-within/item:visible group-hover/item:visible group-data-[selected]/item:visible group-data-[menu-open]/item:visible',
     more: 'flex justify-center px-3 py-2',

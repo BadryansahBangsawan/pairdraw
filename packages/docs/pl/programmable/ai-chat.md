@@ -5,7 +5,7 @@ description: Wbudowany asystent z ponad 90 narzędziami do tworzenia i zmieniani
 
 # Czat AI
 
-Naciśnij <kbd>⌘</kbd><kbd>J</kbd> albo <kbd>Ctrl</kbd> + <kbd>J</kbd>. Asystent tworzy figury, zmienia style i układ, pracuje z komponentami oraz analizuje dokument.
+Naciśnij <kbd>⌘</kbd><kbd>J</kbd> albo <kbd>Ctrl</kbd> + <kbd>J</kbd> lub kliknij przycisk z iskrami wśród działań dokumentu na górnym pasku, aby otworzyć asystenta we własnej kolumnie. Asystent tworzy figury, zmienia style i układ, pracuje z komponentami oraz analizuje dokument.
 
 ## Konfiguracja
 

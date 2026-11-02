@@ -3,6 +3,7 @@ import { computed } from 'vue'
 
 import { useI18n } from '@open-pencil/vue/i18n'
 
+import { chatInputTheme } from '@/components/chat/ui'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import InputGroup from '@/components/ui/input/InputGroup.vue'
 
@@ -16,7 +17,8 @@ const {
   label,
   placeholder,
   busy = false,
-  rows = 3
+  rows = 3,
+  ui
 } = defineProps<{
   /** The field's accessible name. */
   label: string
@@ -24,9 +26,12 @@ const {
   /** A send is under way, such as the AI setup it waits for; another cannot start. */
   busy?: boolean
   rows?: number
+  /** Per-instance classes merged over the theme, such as a taller field for a page's first ask. */
+  ui?: { field?: string }
 }>()
 const emit = defineEmits<{ submit: [text: string] }>()
 const { ai } = useI18n()
+const styles = chatInputTheme()
 const prompt = computed(() => text.value.trim())
 
 function submit() {
@@ -46,13 +51,13 @@ function onKeydown(event: KeyboardEvent) {
 
 <template>
   <form @submit.prevent="submit">
-    <InputGroup size="md" :ui="{ root: 'bg-panel shadow-sm' }">
+    <InputGroup size="md" :ui="{ root: styles.group() }">
       <textarea
         v-model="text"
         :rows="rows"
         :aria-label="label"
         :placeholder="placeholder"
-        class="block max-h-60 min-h-16 w-full resize-none bg-transparent px-3 pt-2.5 text-sm leading-relaxed text-surface outline-none field-sizing-content placeholder:text-muted"
+        :class="styles.field({ class: ui?.field })"
         @keydown="onKeydown"
       />
       <template #actions>
@@ -61,9 +66,9 @@ function onKeydown(event: KeyboardEvent) {
           size="sm"
           type="submit"
           :disabled="busy || !prompt"
-          class="bg-accent text-on-accent hover:bg-accent/90 hover:text-on-accent"
+          :class="styles.send()"
         >
-          <icon-lucide-arrow-up class="size-3.5" />
+          <icon-lucide-arrow-up :class="styles.sendIcon()" />
         </IconButton>
       </template>
     </InputGroup>

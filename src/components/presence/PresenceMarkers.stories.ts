@@ -3,15 +3,14 @@ import { expect, within } from 'storybook/test'
 
 import type { PagePresenceEntry } from '@/app/presence/registry'
 
+import { colors } from './examples/room'
 import PresenceMarkers from './PresenceMarkers.vue'
 
-const ana = { r: 0.92, g: 0.34, b: 0.29, a: 1 }
-const ben = { r: 0.2, g: 0.55, b: 0.95, a: 1 }
-const you = { r: 0.3, g: 0.7, b: 0.45, a: 1 }
+const { ana, ben, agent } = colors
 
 const anaWithAgent: PagePresenceEntry[] = [
   { id: 'person:ana', kind: 'person', name: 'Ana', color: ana },
-  { id: 'agent:orbit', kind: 'agent', name: 'Orbit', color: ana }
+  { id: 'agent:orbit', kind: 'agent', name: 'Orbit', color: agent }
 ]
 
 type Args = { entries: PagePresenceEntry[] }
@@ -43,7 +42,7 @@ export const PersonAndTheirAgent: Story = {
 }
 
 export const YourAgent: Story = {
-  args: { entries: [{ id: 'agent:fern', kind: 'agent', name: 'Fern', color: you }] }
+  args: { entries: [{ id: 'agent:fern', kind: 'agent', name: 'Fern', color: agent }] }
 }
 
 export const MoreThanFit: Story = {
@@ -51,8 +50,8 @@ export const MoreThanFit: Story = {
     entries: [
       ...anaWithAgent,
       { id: 'person:ben', kind: 'person', name: 'Ben', color: ben },
-      { id: 'agent:pixel', kind: 'agent', name: 'Pixel', color: ben },
-      { id: 'agent:fern', kind: 'agent', name: 'Fern', color: you }
+      { id: 'agent:pixel', kind: 'agent', name: 'Pixel', color: agent },
+      { id: 'agent:fern', kind: 'agent', name: 'Fern', color: agent }
     ]
   },
   play: async ({ canvasElement }) => {

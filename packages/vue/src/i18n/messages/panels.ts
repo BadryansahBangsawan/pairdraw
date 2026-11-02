@@ -13,6 +13,7 @@ export const panelMessageDefaults = {
   assets: 'Assets',
   searchLocalComponents: 'Search local components',
   assetView: 'Asset view',
+  leftPanelView: 'Left panel view',
   gridView: 'Grid view',
   listView: 'List view',
   viewDetails: 'View details',

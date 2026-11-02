@@ -56,6 +56,7 @@ The supported browser baseline lives in `src/app/shell/support/baseline.ts` and 
 - System notifications go through `notify` in `src/app/shell/notifications/`: each event has a preference under `notifications`, nothing is sent while the person is looking at the tab it concerns, and the click shows that tab. Features describe the event and what to open; they never call the Notification API or the Tauri plugin themselves (`tests/e2e/chat/notifications.spec.ts`).
 - Code that can only run inline, such as the code panel's opaque-origin sandbox frame and the `blob:` worker it starts, is an ordinary module imported as `?script`, which bundles it into a string (`vite/inline-script.ts`); never write it as a source string or serialize functions (`src/app/code/sandbox/frame.ts`).
 - Keep the app manifest in `vite/pwa.ts`; use `BrandMark` for in-app branding; never symlink web assets to desktop icons (`tools/AGENTS.md`, Brand assets).
+- A document's own actions are teleported from its `EditorWorkspace` into the top bar's `SHELL_TOP_BAR_ACTIONS_ID` element, so they stay bound to their tab; do not mount them in `ShellTopBar` itself. The brand menu follows the active tab, like the native menus (`src/components/shell/ShellTopBar.vue`).
 
 ## UI
 
@@ -72,12 +73,14 @@ The supported browser baseline lives in `src/app/shell/support/baseline.ts` and 
 - Design tokens, custom variants, and custom utilities live in `src/theme/tokens.css`, which the docs site also imports; `src/app.css` keeps only the app's document-level rules.
 - Tailwind 4 and `tw-animate-css`; no static inline styling or component `<style>` blocks. Dynamic `:style` bindings are allowed for runtime geometry and CSS variables.
 - Colors are the `--color-*` tokens in `src/theme/tokens.css`, each defined for both themes; statuses use one family each: `error` and `warning` have a text color, a `-bg` tint, and a `-border`, `success` a text color; `error-fill` and `success-fill` are solid, and `warning-action` colors buttons on the warning tint. Name the token's utility (`text-warning`), not `[var(--color-warning)]` or a default palette color (`open-pencil/no-unknown-tailwind-classes`).
+- Elevation comes from the `elevation-card`, `elevation-floating`, and `elevation-dialog` utilities, never `--shadow-*` theme tokens, which Tailwind inlines into the utility so a light-theme value never applies. Cards, fields, and dialogs take `rounded-card`, `rounded-field`, and `rounded-dialog`, not their values as arbitrary radii; other surfaces stay on Tailwind's scale, such as `rounded-lg` buttons and `rounded-xl` menus and popovers. tailwind-merge cannot drop these utilities for a `rounded-*` or `shadow-*` override, so replace them instead of stacking (`src/theme/tokens.css`).
 - Bind visual state through semantic `data-*` attributes. Steiger rejects template-time `use*UI()`, visual-state utility branches, and raw SVG app icons.
 - `Tip`, not native `title`; Lucide/Iconify components, not raw SVG or Unicode icons; `e.code`, not `e.key`, for modified shortcuts.
 - A theme file default-exports a plain slots object; the component side wraps it with `tv` once and derives its `UI` type with `ComponentUI` (`open-pencil/no-tailwind-variants-in-themes`, `check:arch`).
 - A family of parts keeps one theme in `src/theme/<family>/index.ts`, wraps it in `ui.ts` as `<family>` and `use<Family>UI`, and exports its parts from `index.ts`; a single component keeps `src/theme/<family>/<component>.ts` and a wrapper of the same name (`src/components/ui/table/ui.ts`, `src/components/ui/feedback/toast.ts`).
 - Compose a family's parts as components whose slots carry content, not data a part could render itself (`src/components/ui/table/`).
 - App dialogs compose the Reka-backed components under `src/components/ui/dialog/` and the typed theme in `src/theme/dialog/index.ts`. Do not repeat portal, overlay, content, header, or footer infrastructure in feature dialogs.
+- A dialog picks its corners and shadow through the dialog theme's `surface` variant (`dialog` or `floating`), never through `ui.content` overrides (`src/theme/dialog/index.ts`).
 - SDK property primitives, binding fields, commands, and i18n: `packages/vue/AGENTS.md`.
 
 ### Layout
@@ -85,7 +88,9 @@ The supported browser baseline lives in `src/app/shell/support/baseline.ts` and 
 - Lay a component out by the space it is given, not the window: panels, dialogs, and inspectors appear in docks, split views, and phones alike. Restyle with named Tailwind container queries (`@container/name`, `@2xl/name:`) on the element whose width matters, which for a list beside an inspector is the list itself (`src/theme/variables/table.ts`, `src/theme/panel/properties-tabs.ts`).
 - When the width changes structure, such as a side inspector becoming a drill-in, measure the container with VueUse `useElementSize` and keep the threshold beside the theme (`TOKENS_PANEL_COMPACT_WIDTH`).
 - Viewport breakpoints (`md:`, `useViewportKind`) are for app-shell decisions only: dock placement, sheets versus popovers, full-screen dialogs (`src/theme/dialog/index.ts`).
+- A Reka `SplitterPanel` never gets padding: the splitter sizes it with `flex-basis: 0`, so padding adds to its share. Inset its content with margins instead (`src/theme/editor/workspace.ts`).
 - Stories for adaptive components render fixed container widths as separate stories rather than relying on the viewport toolbar (`src/components/variables/TokensPanel.stories.ts`).
+- Home sections size by the documents card, the named container `@container/home` (`@md/home:`, `@2xl/home:`), not by viewport breakpoints, and their stories render inside that container at fixed widths (`src/theme/home/layout.ts`).
 
 ### Settings
 

@@ -30,3 +30,7 @@ El zoom se centra en la posición del puntero. Se puede controlar con <kbd>Ctrl<
 | 100 % | <kbd>⌘</kbd><kbd>0</kbd> | <kbd>Ctrl</kbd><kbd>0</kbd> |
 | Encajar documento | <kbd>⌘</kbd><kbd>1</kbd> | <kbd>Ctrl</kbd><kbd>1</kbd> |
 | Ampliar selección | <kbd>⌘</kbd><kbd>2</kbd> | <kbd>Ctrl</kbd><kbd>2</kbd> |
+
+## Reglas
+
+Las reglas están ocultas hasta que las activas con **Ver → Reglas** o <kbd>Shift</kbd> + <kbd>R</kbd>.

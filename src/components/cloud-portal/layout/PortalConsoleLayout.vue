@@ -5,6 +5,7 @@ import { useTemplateRef, watch } from 'vue'
 
 import { useCloudPortalMessages } from '@open-pencil/vue/i18n'
 
+import { portalAppearance } from '@/app/cloud-portal/theme'
 import BrandMark from '@/components/brand/BrandMark.vue'
 import AccountAvatar from '@/components/presence/AccountAvatar.vue'
 import { useAppButtonUI } from '@/components/ui/button/button'
@@ -60,7 +61,7 @@ watch(
   <div :class="ui.page()">
     <header :class="ui.bar()">
       <a href="/" :class="ui.barHome()">
-        <BrandMark variant="micro" decorative />
+        <BrandMark variant="micro" :appearance="portalAppearance" decorative />
         <span :class="ui.barTitle()">{{ messages.productName }}</span>
       </a>
       <span :class="ui.barHost()">{{ host }}</span>

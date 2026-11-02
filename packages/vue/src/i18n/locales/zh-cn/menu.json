@@ -85,6 +85,7 @@
   "exportSelectionAsDrawIO": "将所选内容导出为 draw.io",
   "exportSelectionAsFig": "将所选内容导出为 .fig",
   "togglePreview": "预览",
+  "documentName": "文档名称",
   "saveTo": "保存到…",
   "showVersionHistory": "显示版本历史",
   "saveToVersionHistory": "保存到版本历史…"

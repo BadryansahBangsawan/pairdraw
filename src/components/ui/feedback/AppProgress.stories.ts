@@ -35,6 +35,6 @@ export const OnColouredSurface: Story = {
     components: { AppProgress },
     setup: () => ({ args }),
     template:
-      '<div class="w-72 rounded-md bg-accent p-3 text-white"><AppProgress v-bind="args" /></div>'
+      '<div class="w-72 rounded-md bg-accent p-3 text-on-accent"><AppProgress v-bind="args" /></div>'
   })
 }

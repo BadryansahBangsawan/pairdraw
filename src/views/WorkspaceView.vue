@@ -52,7 +52,7 @@ import FontStatusBanner from '@/components/font-status/FontStatusBanner.vue'
 import HomeWorkspace from '@/components/home/HomeWorkspace.vue'
 import RenameSelectionDialog from '@/components/selection/RenameSelectionDialog.vue'
 import LoadingScreen from '@/components/shell/LoadingScreen.vue'
-import TabBar from '@/components/TabBar.vue'
+import ShellTopBar from '@/components/shell/ShellTopBar.vue'
 import { IS_BROWSER } from '@/constants'
 
 const route = useRoute()
@@ -299,7 +299,7 @@ onUnmounted(() => {
     <FontStatusBanner />
     <RenameSelectionDialog />
     <CommandPalette />
-    <TabBar />
+    <ShellTopBar />
     <HomeWorkspace v-show="activeTab && activeTab.kind !== 'document'" />
     <CloudVersionDialog />
     <EditorWorkspace

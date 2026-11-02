@@ -7,6 +7,7 @@ import AppButton from '@/components/ui/button/AppButton.vue'
 import AppAlertDialogRoot from './AppAlertDialogRoot.vue'
 import AppDialogBody from './AppDialogBody.vue'
 import AppDialogFooter from './AppDialogFooter.vue'
+import { useDialogUI } from './ui'
 
 const {
   heading,
@@ -36,6 +37,7 @@ function confirm() {
   emit('confirm')
   open.value = false
 }
+const cls = useDialogUI()
 const confirmColor = computed(() => {
   if (tone === 'danger') return 'error'
   if (tone === 'neutral') return 'neutral'
@@ -45,11 +47,11 @@ const confirmColor = computed(() => {
 
 <template>
   <AppAlertDialogRoot v-model:open="open">
-    <div class="border-b border-border px-4 py-3">
-      <AlertDialogTitle class="text-sm font-semibold text-surface">{{ heading }}</AlertDialogTitle>
-    </div>
+    <header data-slot="dialog-header" :class="cls.header">
+      <AlertDialogTitle :class="cls.title">{{ heading }}</AlertDialogTitle>
+    </header>
     <AppDialogBody v-if="description || $slots.default">
-      <AlertDialogDescription v-if="description" class="text-xs text-muted">{{
+      <AlertDialogDescription v-if="description" :class="cls.description">{{
         description
       }}</AlertDialogDescription>
       <!-- What the person must do before confirming, such as typing a name. -->

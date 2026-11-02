@@ -8,7 +8,8 @@ export const completionListStyles = {
     color: 'var(--color-surface)',
     border: 'none',
     borderRadius: '12px',
-    boxShadow: '0 0 0 1px var(--color-border), 0 8px 30px rgb(0 0 0 / 0.4)',
+    // The floating edge and the theme's floating elevation, as `floatingSurface` draws them.
+    boxShadow: '0 0 0 1px var(--color-border), var(--elevation-floating)',
     padding: '4px',
     marginTop: '6px'
   },

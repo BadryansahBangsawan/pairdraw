@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto'
-import { afterEach, expect, test } from 'bun:test'
+import { afterEach, beforeEach, expect, test } from 'bun:test'
 
 import { toRaw } from 'vue'
 
@@ -14,6 +14,10 @@ import { appPreferences } from '@/app/settings/preferences/store'
 
 const savedPreferences = structuredClone(toRaw(appPreferences.value))
 const stores: ReturnType<typeof createEditorStore>[] = []
+beforeEach(() => {
+  // The prompt is opt-in; these tests cover it turned on, and the last one turns it off again.
+  canvasPrompt.value = true
+})
 afterEach(() => {
   appPreferences.value = structuredClone(savedPreferences)
   for (const store of stores.splice(0)) store.dispose()
@@ -71,4 +75,10 @@ test('boards, read-only documents, and the preference turned off never offer it'
   const design = emptyDocument()
   canvasPrompt.value = false
   expect(offersCanvasPrompt(design)).toBe(false)
+})
+
+test('a fresh profile does not offer it until the preference is turned on', () => {
+  appPreferences.value = structuredClone(savedPreferences)
+  canvasPrompt.value = false
+  expect(offersCanvasPrompt(emptyDocument())).toBe(false)
 })

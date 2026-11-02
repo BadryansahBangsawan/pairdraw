@@ -56,7 +56,7 @@ const styles = computed(() => tv(paintFieldTheme)())
       :min="0"
       :max="100"
       :ui="{
-        root: 'h-full rounded-none border-0 bg-transparent shadow-none',
+        root: 'h-full min-h-0 rounded-none border-0 bg-transparent shadow-none',
         leading: 'hidden',
         field: 'pl-1.5',
         display: 'pl-1.5'

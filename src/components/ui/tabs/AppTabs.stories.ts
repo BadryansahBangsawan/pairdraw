@@ -36,7 +36,7 @@ const meta = {
           <AppTabsTrigger value="media">
             <template #leading><IconImage class="size-3.5" /></template>
             Media
-            <template #trailing><span class="rounded bg-accent px-1 text-white">3</span></template>
+            <template #trailing><span class="rounded bg-accent px-1 text-on-accent">3</span></template>
           </AppTabsTrigger>
           <AppTabsTrigger value="unavailable" disabled>Unavailable</AppTabsTrigger>
         </AppTabsList>

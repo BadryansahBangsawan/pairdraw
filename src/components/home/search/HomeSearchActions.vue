@@ -11,6 +11,7 @@ import { useI18n } from '@open-pencil/vue/i18n'
 import { openFileDialog } from '@/app/shell/menu/use'
 import { activeTab } from '@/app/tabs'
 import AppButton from '@/components/ui/button/AppButton.vue'
+import type { AppButtonColor, AppButtonVariant } from '@/components/ui/button/button'
 import AppInput from '@/components/ui/input/AppInput.vue'
 import Tip from '@/components/ui/overlay/Tip.vue'
 
@@ -20,11 +21,33 @@ import HomeJoinRoom from './HomeJoinRoom.vue'
 const { destination = null } = defineProps<{ destination?: string | null }>()
 const emit = defineEmits<{ 'new-document': [kind: DocumentKind] }>()
 
-/** What Home offers to create, side by side, as Figma's Home and New file tab offer theirs. */
+/**
+ * What Home offers to create, side by side, as Figma's Home and New file tab offer theirs. A new
+ * design is the page's main action, so it alone is filled, and it comes last, where a row of
+ * actions ends.
+ */
 const CREATE_CHOICES = [
-  { kind: 'design', label: 'createDesign', icon: IconLucidePenTool },
-  { kind: 'board', label: 'createBoard', icon: IconLucideStickyNote }
-] as const satisfies ReadonlyArray<{ kind: DocumentKind; label: string; icon: unknown }>
+  {
+    kind: 'board',
+    label: 'createBoard',
+    icon: IconLucideStickyNote,
+    color: 'neutral',
+    variant: 'outline'
+  },
+  {
+    kind: 'design',
+    label: 'createDesign',
+    icon: IconLucidePenTool,
+    color: 'primary',
+    variant: 'solid'
+  }
+] as const satisfies ReadonlyArray<{
+  kind: DocumentKind
+  label: string
+  icon: unknown
+  color: AppButtonColor
+  variant: AppButtonVariant
+}>
 const query = defineModel<string>({ required: true })
 const { menu, files } = useI18n()
 const { isMobile, isTouch } = useViewportKind()
@@ -56,14 +79,15 @@ watch(
 </script>
 
 <template>
-  <div class="mb-4 flex flex-col gap-3 md:mb-6 md:flex-row md:items-center">
+  <!-- A row once the documents card is wide enough (`@container/home`), a stack before. -->
+  <div class="mb-6 flex flex-col gap-3 @2xl/home:mb-8 @2xl/home:flex-row @2xl/home:items-center">
     <AppInput
       ref="searchInput"
       v-model="query"
       type="search"
       name="file-search"
       autocomplete="off"
-      class="md:flex-1"
+      class="@2xl/home:flex-1"
       size="md"
       :density="isTouch ? 'comfortable' : 'compact'"
       :placeholder="isMobile ? files.searchFiles : files.searchRecentAndStorageFiles"
@@ -71,14 +95,14 @@ watch(
     >
       <template #leading><icon-lucide-search class="size-4" /></template>
     </AppInput>
-    <div class="grid grid-cols-2 gap-2 md:contents">
-      <div class="col-span-2 grid md:contents">
+    <div class="grid grid-cols-2 gap-2 @2xl/home:contents">
+      <div class="col-span-2 grid @2xl/home:contents">
         <HomeJoinRoom :size="isTouch ? 'lg' : 'md'" />
       </div>
       <AppButton
         :size="isTouch ? 'lg' : 'md'"
         variant="outline"
-        class="col-span-2 md:col-span-1"
+        class="col-span-2 @2xl/home:col-span-1"
         data-test-id="home-open-file"
         @click="openFileDialog"
       >
@@ -94,7 +118,8 @@ watch(
       >
         <AppButton
           :size="isTouch ? 'lg' : 'md'"
-          variant="outline"
+          :color="choice.color"
+          :variant="choice.variant"
           :data-test-id="`home-new-${choice.kind}`"
           @click="emit('new-document', choice.kind)"
         >

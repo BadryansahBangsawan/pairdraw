@@ -9,6 +9,7 @@ import { useLayoutControlsContext } from '@open-pencil/vue/primitives/LayoutCont
 import VariableNumberField from '@/components/properties/VariableNumberField.vue'
 import AppSelectContent from '@/components/ui/select/AppSelectContent.vue'
 import AppSelectItem from '@/components/ui/select/AppSelectItem.vue'
+import { panelFieldBase } from '@/theme/panel/field/base'
 
 const { axis = 'primary' } = defineProps<{ axis?: 'primary' | 'counter' }>()
 const ctx = useLayoutControlsContext()
@@ -37,13 +38,13 @@ function setMode(value: string) {
       <div
         v-if="auto"
         data-test-id="layout-gap-input"
-        class="flex h-[26px] items-center rounded border border-border bg-input focus-within:border-panel-focus"
+        :class="[panelFieldBase, 'flex items-center text-xs']"
       >
         <span class="px-[5px] text-muted">
           <icon-lucide-align-horizontal-space-between v-if="horizontal" class="size-3.5" />
           <icon-lucide-align-vertical-space-between v-else class="size-3.5" />
         </span>
-        <span class="min-w-0 flex-1 truncate text-xs text-surface">{{ panels.auto }}</span>
+        <span class="min-w-0 flex-1 truncate">{{ panels.auto }}</span>
         <SelectTrigger
           data-test-id="layout-gap-menu"
           :aria-label="label"

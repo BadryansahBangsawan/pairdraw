@@ -3,9 +3,10 @@ import { expect, fn, userEvent, within } from 'storybook/test'
 
 import type { FollowedLabel } from '@/app/presence/registry'
 
+import { colors } from './examples/room'
 import FollowFrame from './FollowFrame.vue'
 
-const ana = { r: 0.92, g: 0.34, b: 0.29, a: 1 }
+const { ana, agent } = colors
 
 type Args = { followed: FollowedLabel; onStop: () => void }
 
@@ -33,5 +34,5 @@ export const FollowingAPerson: Story = {
 }
 
 export const FollowingTheirAgent: Story = {
-  args: { followed: { kind: 'agent', name: 'Orbit', owner: 'Ana', color: ana } }
+  args: { followed: { kind: 'agent', name: 'Orbit', owner: 'Ana', color: agent } }
 }

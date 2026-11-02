@@ -7,12 +7,13 @@ export const APP_THEMES = ['dark', 'light', 'auto'] as const
 export type AppTheme = (typeof APP_THEMES)[number]
 
 export const THEME_STORAGE_KEY = 'open-pencil:theme'
-export const DEFAULT_THEME: AppTheme = 'dark'
+export const DEFAULT_THEME: AppTheme = 'auto'
 
-/** The theme in effect; a stored value that is not a theme reads as the default dark. */
+/** The theme in effect; a stored value that is not a theme reads as the default, the system's. */
 export function resolveAppTheme(setting: unknown, prefersDark: boolean): 'dark' | 'light' {
-  if (setting === 'auto') return prefersDark ? 'dark' : 'light'
-  return setting === 'light' ? 'light' : 'dark'
+  const theme = APP_THEMES.find((candidate) => candidate === setting) ?? DEFAULT_THEME
+  if (theme === 'auto') return prefersDark ? 'dark' : 'light'
+  return theme
 }
 
 /** The stored setting as the page starts, or null where storage cannot be read. */

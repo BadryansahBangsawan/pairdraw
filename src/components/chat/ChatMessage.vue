@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { refAutoReset, useClipboard } from '@vueuse/core'
 import { isReasoningUIPart, isTextUIPart } from 'ai'
 import type { UIMessage } from 'ai'
 import { computed, ref } from 'vue'
@@ -21,6 +20,7 @@ import ChatReferenceText from '@/components/chat/reference/ChatReferenceText.vue
 import ChatToolCallGroup from '@/components/chat/tool/ChatToolCallGroup.vue'
 import ChatMessageEditor from '@/components/chat/turn/ChatMessageEditor.vue'
 import ChatTurnActions from '@/components/chat/turn/ChatTurnActions.vue'
+import { chatMessageTheme } from '@/components/chat/ui'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 
@@ -48,6 +48,7 @@ const {
 const emit = defineEmits<{ regenerate: []; revert: []; restore: []; edit: [text: string] }>()
 const editing = ref(false)
 const { ai } = useI18n()
+const ui = chatMessageTheme()
 const markdownMode = computed(() => (streaming ? 'streaming' : 'static'))
 const storedAttachments = attachmentsForMessage(message.id)
 const attachments = computed(() => presentation?.attachments ?? storedAttachments.value)
@@ -74,18 +75,6 @@ function saveEdit(text: string): void {
   emit('edit', text)
 }
 
-const firstAssistantTextPartIndex = computed(() =>
-  message.parts.findIndex((part) => isTextUIPart(part) && part.text.length > 0)
-)
-const copied = refAutoReset(false, 1500)
-const { copy, isSupported: clipboardSupported } = useClipboard()
-
-async function copyResponse(): Promise<void> {
-  if (!assistantText.value || !clipboardSupported.value) return
-  await copy(assistantText.value)
-  copied.value = true
-}
-
 // The AI SDK updates parts in place and replaces only the message, so copy each part for
 // the cards' computed state to see the new values.
 const undo = computed(() => undoOf(message))
@@ -107,22 +96,10 @@ function groupKey(group: MessagePartGroup): string {
 </script>
 
 <template>
-  <div
-    v-test-id="`chat-message-${message.role}`"
-    :class="message.role === 'user' ? 'flex justify-end' : ''"
-  >
-    <div
-      class="min-w-0 space-y-2 select-text"
-      :class="message.role === 'user' ? 'max-w-[85%]' : ''"
-    >
+  <div v-test-id="`chat-message-${message.role}`" :class="ui.root()" :data-role="message.role">
+    <div :class="ui.column()">
       <template v-if="message.role === 'assistant'">
-        <!-- A reverted reply's edits are gone; its content stays, dimmed, under its actions. Text
-             dims to the muted color rather than through opacity, so it still reads at 4.5:1. -->
-        <div
-          class="space-y-2 data-[reverted=true]:**:text-muted data-[reverted=true]:[&_img]:opacity-50"
-          data-slot="chat-reply-content"
-          :data-reverted="reverted"
-        >
+        <div data-slot="chat-reply-content" :data-reverted="reverted" :class="ui.reply()">
           <template v-for="group in groups" :key="groupKey(group)">
             <ChatToolCallGroup
               v-if="group.kind === 'tools'"
@@ -141,32 +118,20 @@ function groupKey(group: MessagePartGroup): string {
               :duration-label="(seconds) => ai.thoughtFor({ seconds })"
             />
 
-            <!-- Text -->
+            <!-- Text: the reply reads as plain text on the panel. -->
             <div
               v-else-if="isTextUIPart(group.part) && group.part.text"
               data-test-id="chat-text-bubble"
-              class="group/response relative rounded-xl rounded-tl-md bg-hover px-3 py-2 text-xs leading-relaxed text-surface"
+              :class="ui.text()"
             >
               <ChatMarkdown :content="group.part.text" :mode="markdownMode" />
-              <IconButton
-                v-if="
-                  group.index === firstAssistantTextPartIndex && assistantText && clipboardSupported
-                "
-                :label="copied ? ai.responseCopied : ai.copyResponse"
-                size="xs"
-                data-slot="chat-copy-response"
-                class="absolute right-1 bottom-1 opacity-0 focus-visible:opacity-100 group-hover/response:opacity-100"
-                @click="copyResponse"
-              >
-                <icon-lucide-check v-if="copied" class="size-3 text-success" />
-                <icon-lucide-copy v-else class="size-3" />
-              </IconButton>
             </div>
           </template>
         </div>
         <ChatTurnActions
-          v-if="!streaming"
           :message-id="message.id"
+          :text="assistantText"
+          :streaming="streaming"
           :can-regenerate="canRegenerate"
           :empty="empty"
           :reverted="reverted"
@@ -188,25 +153,22 @@ function groupKey(group: MessagePartGroup): string {
           @save="saveEdit"
           @cancel="editing = false"
         />
-        <div v-else class="group/request relative">
-          <div
-            data-test-id="chat-text-bubble"
-            class="rounded-xl rounded-br-md bg-accent px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap text-on-accent"
-          >
-            <ChatReferenceText :text="userText" />
+        <div v-else :class="ui.request()">
+          <div data-test-id="chat-text-bubble" data-slot="chat-user-bubble" :class="ui.bubble()">
+            <ChatReferenceText :text="userText" tone="ink" />
           </div>
           <IconButton
             v-if="canEdit"
             :label="ai.editMessage"
             size="xs"
             data-slot="chat-edit-message"
-            class="absolute top-1/2 -left-7 -translate-y-1/2 opacity-0 focus-visible:opacity-100 group-hover/request:opacity-100"
+            :class="ui.edit()"
             @click="editing = true"
           >
             <icon-lucide-pencil class="size-3" />
           </IconButton>
         </div>
-        <div v-if="canRetry && !editing" class="flex justify-end">
+        <div v-if="canRetry && !editing" :class="ui.retry()">
           <AppButton
             size="xs"
             variant="ghost"

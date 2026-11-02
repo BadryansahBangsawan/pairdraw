@@ -52,7 +52,7 @@ const emit = defineEmits<{
   signOut: []
 }>()
 
-const ui = sideList()
+const ui = sideList({ surface: 'card' })
 const menuUI = menu()
 const t = useCloudMessages()
 const isActive = (location: HomeLocation) =>

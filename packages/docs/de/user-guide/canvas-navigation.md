@@ -29,6 +29,10 @@ Der Zoom richtet sich nach der Position des Mauszeigers:
 
 Gesten über den Ebenen- und Eigenschaften-Panels werden nicht an die Arbeitsfläche weitergegeben.
 
+## Lineale
+
+Lineale sind ausgeblendet, bis Sie sie mit **Ansicht → Lineale** oder <kbd>Shift</kbd> + <kbd>R</kbd> einblenden.
+
 ## Tastenkürzel
 
 | Aktion | macOS | Windows / Linux |

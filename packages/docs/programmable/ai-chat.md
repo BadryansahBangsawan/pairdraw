@@ -5,7 +5,7 @@ description: Built-in AI assistant with 90+ tools for creating and modifying des
 
 # AI Chat
 
-Press <kbd>⌘</kbd><kbd>J</kbd> (<kbd>Ctrl</kbd> + <kbd>J</kbd>), or click the sparkles button at the top of the properties panel, to open the AI assistant in its own column beside the Design panel. Describe what you want — it creates shapes, sets styles, manages layout, works with components, and analyzes your design.
+Press <kbd>⌘</kbd><kbd>J</kbd> (<kbd>Ctrl</kbd> + <kbd>J</kbd>), or click the sparkles button among the document's actions in the top bar, to open the AI assistant in its own column beside the Design panel. Describe what you want — it creates shapes, sets styles, manages layout, works with components, and analyzes your design.
 
 ## Start from a prompt
 

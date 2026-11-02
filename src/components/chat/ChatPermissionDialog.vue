@@ -15,6 +15,7 @@ import {
   rejectCurrentPermission,
   respondToPermission
 } from '@/app/ai/agents/acp/permission'
+import AppButton from '@/components/ui/button/AppButton.vue'
 import { AppAlertDialogRoot } from '@/components/ui/dialog'
 import { useHeldContent } from '@/components/ui/overlay/held'
 
@@ -59,7 +60,7 @@ function handleDismiss() {
 <template>
   <AppAlertDialogRoot
     :open="open"
-    :ui="{ overlay: 'z-50', content: 'w-80 rounded-lg p-4 shadow-xl' }"
+    :ui="{ overlay: 'z-50', content: 'w-80 p-4' }"
     data-test-id="acp-permission-dialog"
     @overlay-click="handleDismiss"
     @escape-key-down="handleDismiss"
@@ -74,28 +75,35 @@ function handleDismiss() {
 
     <pre
       v-if="toolInput"
-      class="mt-2 max-h-32 overflow-auto rounded bg-input p-2 text-[10px] text-muted"
+      class="mt-2 max-h-32 overflow-auto rounded-md bg-panel-field p-2 text-[10px] text-muted"
       >{{ toolInput }}</pre>
 
     <div class="mt-4 flex flex-col gap-2">
       <AlertDialogAction
         v-for="opt in allowOptions"
         :key="opt.optionId"
-        v-test-id="acpPermissionOptionTestId(opt.kind)"
-        class="w-full rounded bg-accent px-3 py-1.5 text-xs font-medium text-on-accent hover:bg-accent/90"
+        as-child
         @click="respondToPermission(opt.optionId)"
       >
-        {{ opt.name }}
+        <AppButton
+          v-test-id="acpPermissionOptionTestId(opt.kind)"
+          color="primary"
+          variant="solid"
+          class="w-full"
+        >
+          {{ opt.name }}
+        </AppButton>
       </AlertDialogAction>
 
       <AlertDialogCancel
         v-for="opt in rejectOptions"
         :key="opt.optionId"
-        v-test-id="acpPermissionOptionTestId(opt.kind)"
-        class="w-full rounded border border-border bg-canvas px-3 py-1.5 text-xs text-muted hover:bg-hover hover:text-surface"
+        as-child
         @click="respondToPermission(opt.optionId)"
       >
-        {{ opt.name }}
+        <AppButton v-test-id="acpPermissionOptionTestId(opt.kind)" variant="outline" class="w-full">
+          {{ opt.name }}
+        </AppButton>
       </AlertDialogCancel>
     </div>
   </AppAlertDialogRoot>

@@ -5,6 +5,7 @@ import { computed, ref, watch } from 'vue'
 
 import type { ReasoningDisplay } from '@/app/settings/preferences/store'
 import ChatMarkdown from '@/components/chat/ChatMarkdown.vue'
+import { chatReasoningTheme } from '@/components/chat/ui'
 import { collapsibleContentMotion } from '@/theme/collapsible/collapsible'
 
 const {
@@ -24,6 +25,7 @@ const {
   durationLabel?: (seconds: number) => string
 }>()
 
+const ui = chatReasoningTheme()
 const open = ref(display === 'expanded' || (display === 'while-thinking' && streaming))
 const userChangedOpen = ref(false)
 const markdownMode = computed(() => (streaming ? 'streaming' : 'static'))
@@ -78,29 +80,21 @@ function updateOpen(value: boolean): void {
   <CollapsibleRoot
     :open="open"
     :unmount-on-hide="false"
-    class="rounded-lg border border-border bg-canvas"
+    :class="ui.root()"
     @update:open="updateOpen"
   >
     <CollapsibleTrigger
       data-slot="chat-reasoning-trigger"
       :data-streaming="streaming || undefined"
-      class="flex w-full cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-left text-[11px] text-muted hover:bg-hover hover:text-surface"
+      :class="ui.trigger()"
     >
-      <icon-lucide-brain class="size-3.5 shrink-0 text-primary" aria-hidden="true" />
-      <span class="flex-1">{{ streaming ? thinkingLabel : finishedLabel }}</span>
-      <icon-lucide-loader-circle
-        v-if="streaming"
-        class="size-3 animate-spin motion-reduce:animate-none"
-        aria-hidden="true"
-      />
-      <icon-lucide-chevron-down
-        v-else
-        class="size-3 transition-transform motion-reduce:transition-none [[data-state=open]>&]:rotate-180"
-        aria-hidden="true"
-      />
+      <icon-lucide-brain :class="ui.icon()" aria-hidden="true" />
+      <span :class="ui.label()">{{ streaming ? thinkingLabel : finishedLabel }}</span>
+      <icon-lucide-loader-circle v-if="streaming" :class="ui.spinner()" aria-hidden="true" />
+      <icon-lucide-chevron-down v-else :class="ui.chevron()" aria-hidden="true" />
     </CollapsibleTrigger>
     <CollapsibleContent data-slot="chat-reasoning-content" :class="collapsibleContentMotion">
-      <div class="border-t border-border px-2 py-1.5 text-[11px] leading-relaxed text-muted">
+      <div :class="ui.body()">
         <ChatMarkdown :content="text" :mode="markdownMode" surface="reasoning" />
       </div>
     </CollapsibleContent>

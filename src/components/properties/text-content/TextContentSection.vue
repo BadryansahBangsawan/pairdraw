@@ -16,7 +16,7 @@ const { panels } = useI18n()
 
 <template>
   <!-- Both rows render nothing while unbound; `empty:hidden` then drops the band too. -->
-  <div class="border-b border-border px-3 pt-2 pb-1.5 empty:hidden">
+  <div class="border-b border-border px-3.5 pt-2.5 pb-2 empty:hidden">
     <PropertyBoundField field="TEXT" :label="panels.content" />
     <VariableBoundRow :node-id="nodeId" field="TEXT" :label="panels.content" />
   </div>

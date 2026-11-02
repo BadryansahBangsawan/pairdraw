@@ -6,22 +6,38 @@ import HomePromptComposer from './HomePromptComposer.vue'
 
 type Args = { modelValue: string; busy: boolean; onSubmit: (text: string) => void }
 
+/**
+ * Draws the composer at the top of Home's documents card at a fixed width. The card is the `home`
+ * container the composer sizes its heading and spacing by.
+ */
+function inDocumentsCard(width: string) {
+  return (args: Args) => ({
+    components: { HomePromptComposer },
+    setup: () => ({ args, width, prompt: ref(args.modelValue) }),
+    template: `
+      <div :class="width" class="@container/home max-w-full rounded-card border border-border bg-panel text-surface">
+        <div class="p-4">
+          <HomePromptComposer v-model="prompt" :busy="args.busy" @submit="args.onSubmit" />
+        </div>
+      </div>`
+  })
+}
+
 const meta = {
   title: 'App/Home/Prompt Composer',
   component: HomePromptComposer,
   args: { modelValue: '', busy: false, onSubmit: fn() },
-  render: (args) => ({
-    components: { HomePromptComposer },
-    setup: () => ({ args, prompt: ref(args.modelValue) }),
-    template:
-      '<div class="bg-canvas p-4 text-surface"><HomePromptComposer v-model="prompt" :busy="args.busy" @submit="args.onSubmit" /></div>'
-  })
+  render: inDocumentsCard('w-[720px]')
 } satisfies Meta<Args>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
+/** From a 42rem card the heading is larger, with more room above and below. */
 export const Empty: Story = {}
+
+/** In a narrow card, such as on a phone, the heading is smaller and closer to the field. */
+export const Narrow: Story = { render: inDocumentsCard('w-[360px]') }
 
 export const Written: Story = {
   args: { modelValue: 'A sign-in screen for a banking app with a passkey option' }

@@ -6,15 +6,15 @@ import { computed, ref } from 'vue'
 import { useI18n } from '@open-pencil/vue/i18n'
 import { vTestId } from '@open-pencil/vue/testing'
 
-import AppMenu from '@/components/shell/AppMenu.vue'
 import SegmentedControl from '@/components/ui/select/SegmentedControl.vue'
+import sidePanelTheme from '@/theme/panel/side'
 import splitterTheme from '@/theme/splitter'
 
 import AssetsPanel from './assets-panel/AssetsPanel.vue'
 import LayerTree from './LayerTree/LayerTree.vue'
 import PagesPanel from './PagesPanel.vue'
 
-const { menu, panels } = useI18n()
+const { panels } = useI18n()
 const activePanel = ref<'file' | 'assets'>('file')
 const panelModel = computed({
   get: () => activePanel.value,
@@ -23,25 +23,21 @@ const panelModel = computed({
   }
 })
 const panelOptions = computed(() => [
-  { value: 'file', label: menu.value.file },
+  { value: 'file', label: panels.value.layers },
   { value: 'assets', label: panels.value.assets }
 ])
 const panelTabsUI = { root: 'w-full' }
 const splitterStyles = tv(splitterTheme)({ direction: 'vertical' })
+const sideStyles = tv(sidePanelTheme)()
 </script>
 
 <template>
-  <aside
-    data-test-id="layers-panel"
-    class="flex min-w-0 flex-1 flex-col overflow-hidden border-r border-border bg-panel"
-    style="contain: paint layout style"
-  >
-    <AppMenu />
-    <div class="shrink-0 border-b border-border px-2 py-1.5">
+  <aside data-test-id="layers-panel" :class="sideStyles.root()">
+    <div :class="sideStyles.switcher()">
       <SegmentedControl
         v-model="panelModel"
         :options="panelOptions"
-        :label="panels.layers"
+        :label="panels.leftPanelView"
         :ui="panelTabsUI"
       >
         <template #option="{ option }">
@@ -73,10 +69,7 @@ const splitterStyles = tv(splitterTheme)({ direction: 'vertical' })
         <div :class="splitterStyles.divider()" />
       </SplitterResizeHandle>
       <SplitterPanel :default-size="70" :min-size="20" class="flex flex-col overflow-hidden">
-        <header
-          data-test-id="layers-header"
-          class="shrink-0 px-3 py-2 text-[11px] font-semibold text-surface"
-        >
+        <header data-test-id="layers-header" :class="sideStyles.heading()">
           {{ panels.layers }}
         </header>
         <LayerTree data-test-id="layers-tree" />

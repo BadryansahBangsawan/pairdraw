@@ -10,6 +10,7 @@ import type { AttachmentPresentation } from '@/app/ai/attachment/presentation/ty
 import type { QueuedMessage } from '@/app/ai/chat/queue'
 import type { ReasoningDisplay } from '@/app/settings/preferences/store'
 import { CHAT_NODES_LIVE } from '@/components/chat/tool/context'
+import { chatTranscriptTheme } from '@/components/chat/ui'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import AppPlaceholder from '@/components/ui/feedback/AppPlaceholder.vue'
@@ -17,6 +18,9 @@ import AppPlaceholder from '@/components/ui/feedback/AppPlaceholder.vue'
 import ChatMessage from './ChatMessage.vue'
 import { useScrollFollowing } from './transcript/useScrollFollowing'
 import ChatMessageQueued from './turn/ChatMessageQueued.vue'
+
+/** The typing indicator's dots, each bouncing a beat after the one before. */
+const DOT_STEPS = [0, 1, 2] as const
 
 const {
   messages,
@@ -53,6 +57,7 @@ const emit = defineEmits<{
   removeQueued: [id: string]
 }>()
 const { ai } = useI18n()
+const ui = chatTranscriptTheme()
 provide(
   CHAT_NODES_LIVE,
   computed(() => nodesLive)
@@ -94,8 +99,8 @@ const { arrivedState, resumeFollowing } = useScrollFollowing(
 </script>
 
 <template>
-  <ScrollAreaRoot class="relative min-h-0 flex-1">
-    <ScrollAreaViewport ref="viewportComponent" class="h-full px-3 py-3 [&>div]:h-full">
+  <ScrollAreaRoot :class="ui.root()">
+    <ScrollAreaViewport ref="viewportComponent" :class="ui.viewport()">
       <AppPlaceholder
         v-if="messages.length === 0"
         data-test-id="chat-empty-state"
@@ -108,7 +113,7 @@ const { arrivedState, resumeFollowing } = useScrollFollowing(
       </AppPlaceholder>
 
       <!-- Messages -->
-      <div v-else ref="transcriptContent" data-test-id="chat-messages" class="flex flex-col gap-3">
+      <div v-else ref="transcriptContent" data-test-id="chat-messages" :class="ui.list()">
         <ChatMessage
           v-for="(msg, index) in messages"
           :key="msg.id"
@@ -126,25 +131,13 @@ const { arrivedState, resumeFollowing } = useScrollFollowing(
         />
 
         <!-- Thinking indicator: shown when AI is working but no visible activity -->
-        <div v-if="isThinking" data-test-id="chat-typing-indicator" class="flex gap-2">
-          <div
-            class="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted/20 text-[10px] font-bold text-muted"
-          >
-            AI
-          </div>
-          <div class="flex items-center gap-1 py-2">
-            <span
-              class="size-1.5 animate-bounce motion-reduce:animate-none rounded-full bg-muted"
-            />
-            <span
-              class="size-1.5 animate-bounce motion-reduce:animate-none rounded-full bg-muted"
-              :style="{ animationDelay: '150ms' }"
-            />
-            <span
-              class="size-1.5 animate-bounce motion-reduce:animate-none rounded-full bg-muted"
-              :style="{ animationDelay: '300ms' }"
-            />
-          </div>
+        <div v-if="isThinking" data-test-id="chat-typing-indicator" :class="ui.typing()">
+          <span :class="ui.typingAvatar()" aria-hidden="true">
+            <icon-lucide-sparkle :class="ui.typingIcon()" />
+          </span>
+          <span :class="ui.dots()">
+            <span v-for="step in DOT_STEPS" :key="step" :class="ui.dot()" :data-step="step" />
+          </span>
         </div>
 
         <ChatMessageQueued
@@ -156,7 +149,7 @@ const { arrivedState, resumeFollowing } = useScrollFollowing(
         />
 
         <!-- Continue button when step limit reached -->
-        <div v-if="showContinue" class="flex justify-center py-2">
+        <div v-if="showContinue" :class="ui.continue()">
           <AppButton color="primary" variant="soft" shape="pill" @click="emit('continue')">
             <template #leading><icon-lucide-play class="size-3" /></template>
             {{ ai.continueChat }}
@@ -164,13 +157,13 @@ const { arrivedState, resumeFollowing } = useScrollFollowing(
         </div>
       </div>
     </ScrollAreaViewport>
-    <ScrollAreaScrollbar orientation="vertical" class="flex w-1.5 touch-none p-px select-none">
-      <ScrollAreaThumb class="relative flex-1 rounded-full bg-muted/30" />
+    <ScrollAreaScrollbar orientation="vertical" :class="ui.scrollbar()">
+      <ScrollAreaThumb :class="ui.thumb()" />
     </ScrollAreaScrollbar>
     <IconButton
       v-if="messages.length && !arrivedState.bottom"
       :label="ai.jumpToLatest"
-      class="absolute right-3 bottom-3 border border-border bg-panel shadow-sm"
+      :class="ui.jump()"
       @click="resumeFollowing"
       ><icon-lucide-arrow-down class="size-4"
     /></IconButton>

@@ -1,5 +1,13 @@
+<script setup lang="ts">
+import { tv } from 'tailwind-variants'
+
+import theme from '@/theme/settings/layout'
+
+const styles = tv(theme)()
+</script>
+
 <template>
-  <div class="flex flex-col divide-y divide-border rounded border border-border">
+  <div :class="styles.group()">
     <slot />
   </div>
 </template>

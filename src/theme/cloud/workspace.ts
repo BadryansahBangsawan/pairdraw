@@ -9,7 +9,7 @@ export default {
     sectionTitle: 'text-[11px] font-medium text-muted',
     sent: 'flex flex-col gap-1.5',
     note: 'text-[11px] text-muted',
-    list: 'flex flex-col divide-y divide-border rounded border border-border',
+    list: 'flex flex-col divide-y divide-border rounded-xl border border-border',
     row: 'flex items-center gap-3 px-3 py-2',
     person: 'flex min-w-0 flex-1 flex-col',
     personName: 'truncate text-xs text-surface',
@@ -21,7 +21,7 @@ export default {
     /** A role in the invite menu, with what it lets someone do on a second line. */
     roleItem: 'h-auto max-w-80 py-1',
     dangerTitle: 'text-[11px] font-medium text-error',
-    dangerList: 'flex flex-col divide-y divide-error-border rounded border border-error-border',
+    dangerList: 'flex flex-col divide-y divide-error-border rounded-xl border border-error-border',
     dangerRow: 'flex items-center gap-3 px-3 py-2.5',
     dangerDescription: 'text-[11px] text-pretty text-muted',
     confirmName: 'mt-3 flex flex-col gap-1.5',

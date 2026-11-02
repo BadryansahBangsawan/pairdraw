@@ -31,6 +31,10 @@ Powiększenie zmienia się względem położenia wskaźnika:
 
 Gest zmiany powiększenia jest wyłączony na panelach warstw i właściwości, aby nie zmieniał przypadkowo powiększenia całej strony w przeglądarce.
 
+## Linijki
+
+Linijki są ukryte, dopóki nie włączysz ich poleceniem **Widok → Linijki** lub skrótem <kbd>Shift</kbd> + <kbd>R</kbd>.
+
 ## Skróty klawiaturowe
 
 | Działanie | macOS | Windows / Linux |

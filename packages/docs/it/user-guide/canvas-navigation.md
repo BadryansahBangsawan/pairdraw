@@ -27,6 +27,10 @@ Lo zoom è centrato sul puntatore. Usa <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + rotella,
 | Adatta documento | <kbd>⌘</kbd><kbd>1</kbd> | <kbd>Ctrl</kbd><kbd>1</kbd> |
 | Inquadra selezione | <kbd>⌘</kbd><kbd>2</kbd> | <kbd>Ctrl</kbd><kbd>2</kbd> |
 
+## Righelli
+
+I righelli sono nascosti finché non li attivi con **Visualizza → Righelli** o <kbd>Shift</kbd> + <kbd>R</kbd>.
+
 ## Palette dei comandi
 
 Premi <kbd>⌘</kbd><kbd>K</kbd> su macOS o <kbd>Ctrl</kbd> + <kbd>K</kbd> su Windows/Linux per cercare azioni dell’editor e dell’applicazione. Seleziona un risultato per eseguirlo; le azioni non disponibili restano soggette alla selezione e allo stato del documento.

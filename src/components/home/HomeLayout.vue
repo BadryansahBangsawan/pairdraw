@@ -3,16 +3,21 @@
  * The home tab: where documents come from on the side, what is there in the middle. Phones get
  * the locations as a menu above the documents instead of the sidebar.
  */
+import { tv } from 'tailwind-variants'
+
+import theme from '@/theme/home/layout'
+
+const styles = tv(theme)()
 </script>
 
 <template>
-  <div class="flex min-h-0 flex-1 bg-canvas text-surface">
-    <div class="hidden md:flex">
+  <div :class="styles.root()">
+    <div :class="styles.sidebar()">
       <slot name="sidebar" />
     </div>
-    <main class="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
-      <div class="flex w-full flex-col px-4 py-4 sm:px-6 sm:py-5">
-        <div v-if="$slots.locations" class="mb-3 md:hidden"><slot name="locations" /></div>
+    <main :class="styles.main()">
+      <div :class="styles.content()">
+        <div v-if="$slots.locations" :class="styles.locations()"><slot name="locations" /></div>
         <slot />
       </div>
     </main>

@@ -1,3 +1,5 @@
+import { panelField } from '@/theme/control'
+
 import { panelFieldBase, panelFieldState } from '../panel/field/base'
 
 const defaultInputBase =
@@ -17,7 +19,8 @@ export default {
       panel: panelFieldBase
     },
     size: {
-      xs: 'h-6 px-2 text-[11px]',
+      // `xs`, the theme default, is the property field, as tall as an `xs` select beside it.
+      xs: [panelField.height, 'px-2', panelField.text],
       sm: 'h-7 px-2.5 text-xs',
       md: 'h-8 px-3 text-xs',
       lg: 'h-9 px-3 text-sm'
@@ -31,6 +34,7 @@ export default {
   defaultVariants: {
     tone: 'default' as const,
     size: 'xs' as const,
+    density: 'compact' as const,
     state: 'idle' as const
   }
 }

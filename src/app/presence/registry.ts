@@ -1,7 +1,7 @@
 import { shallowRef, type ShallowRef } from 'vue'
 
-import { AI_ACTIVE_COLOR } from '@open-pencil/core/constants'
 import { computeContentBounds } from '@open-pencil/core/io/formats/raster'
+import { parseColor } from '@open-pencil/scene-graph/color'
 import type { Color } from '@open-pencil/scene-graph/primitives'
 import { randomHex } from '@open-pencil/scene-graph/random'
 
@@ -14,16 +14,18 @@ import { glideViewTo, showCursors, stopViewGlide, type TrackedCursor } from './c
 import { MAX_NAME_LENGTH } from './schema'
 import type { AgentKind, AgentPresence, FollowTarget, PersonPoint } from './types'
 
-/** Agents' color outside a room, where there is no collaborator color to inherit. */
-const SOLO_AGENT_COLOR: Color = { ...AI_ACTIVE_COLOR, a: 1 }
+/**
+ * Every agent's color, ours and other people's: the `--color-agent` violet of
+ * `src/theme/tokens.css`, which the canvas cannot read from the stylesheet. One color for all of
+ * them tells agents from people at a glance; whose agent it is shows in the room's people list.
+ */
+export const AGENT_PRESENCE_COLOR: Color = parseColor('#7c5cff')
 
 interface Presence {
   /** Agents running in this app for the document. */
   agents: ShallowRef<readonly AgentPresence[]>
   /** People in the room, with their agents. */
   peers: ShallowRef<readonly RemotePeer[]>
-  /** The local collaborator's color while in a room. */
-  ownerColor: ShallowRef<Color | null>
   /** Who the viewport follows, if anyone. */
   following: ShallowRef<FollowTarget | null>
   /** The page following put the view on; landing anywhere else means you left. */
@@ -46,7 +48,6 @@ export function presenceOf(store: EditorStore): Presence {
   const presence: Presence = {
     agents: shallowRef([]),
     peers: shallowRef([]),
-    ownerColor: shallowRef(null),
     following: shallowRef(null),
     followPage: null,
     switching: null,
@@ -65,10 +66,6 @@ export function presenceOf(store: EditorStore): Presence {
     if (presence.following.value && !presence.moving) stopFollowing(store, true)
   })
   return presence
-}
-
-function localAgentColor(store: EditorStore): Color {
-  return presenceOf(store).ownerColor.value ?? SOLO_AGENT_COLOR
 }
 
 /** Someone working on a page, as page lists show them. */
@@ -107,7 +104,7 @@ export function presenceByPage(store: EditorStore): Map<string, PagePresenceEntr
         id: `agent:${agent.id}`,
         kind: 'agent',
         name: agent.name,
-        color: peer.color
+        color: AGENT_PRESENCE_COLOR
       })
   }
   for (const agent of agents.value) {
@@ -115,13 +112,13 @@ export function presenceByPage(store: EditorStore): Map<string, PagePresenceEntr
       id: `agent:${agent.id}`,
       kind: 'agent',
       name: agent.name,
-      color: localAgentColor(store)
+      color: AGENT_PRESENCE_COLOR
     })
   }
   return byPage
 }
 
-function agentCursor(agent: AgentPresence, color: Color, pageId: string): TrackedCursor[] {
+function agentCursor(agent: AgentPresence, pageId: string): TrackedCursor[] {
   if (agent.status === 'idle' || agent.cursor?.pageId !== pageId) return []
   const { x, y } = agent.cursor
   return [
@@ -129,7 +126,7 @@ function agentCursor(agent: AgentPresence, color: Color, pageId: string): Tracke
       id: `agent:${agent.id}`,
       kind: 'agent',
       name: agent.name,
-      color,
+      color: AGENT_PRESENCE_COLOR,
       x,
       y,
       selection: agent.selection,
@@ -156,9 +153,9 @@ export function refreshCursors(store: EditorStore): void {
             }
           ]
         : []),
-      ...peer.agents.flatMap((agent) => agentCursor(agent, peer.color, pageId))
+      ...peer.agents.flatMap((agent) => agentCursor(agent, pageId))
     ]),
-    ...agents.value.flatMap((agent) => agentCursor(agent, localAgentColor(store), pageId))
+    ...agents.value.flatMap((agent) => agentCursor(agent, pageId))
   ])
   autoFollow(store)
   keepFollowing(store)
@@ -281,7 +278,7 @@ function declineFollowed(presence: Presence): void {
   if (agent && isWorking(agent)) presence.declined.add(agent.id)
 }
 
-/** Who the view follows, for showing it: their name, an agent's owner, and the color. */
+/** Who the view follows, for showing it: their name, an agent's owner, and their color. */
 export interface FollowedLabel {
   kind: FollowTarget['kind']
   name: string
@@ -291,7 +288,7 @@ export interface FollowedLabel {
 }
 
 export function followedLabel(store: EditorStore): FollowedLabel | null {
-  const { agents, peers, ownerColor, following } = presenceOf(store)
+  const { agents, peers, following } = presenceOf(store)
   const target = following.value
   if (!target) return null
   if (target.kind === 'person') {
@@ -299,10 +296,11 @@ export function followedLabel(store: EditorStore): FollowedLabel | null {
     return peer ? { kind: 'person', name: peer.name, color: peer.color } : null
   }
   const own = agents.value.find((agent) => agent.id === target.agentId)
-  if (own) return { kind: 'agent', name: own.name, color: ownerColor.value ?? SOLO_AGENT_COLOR }
+  if (own) return { kind: 'agent', name: own.name, color: AGENT_PRESENCE_COLOR }
   for (const peer of peers.value) {
     const agent = peer.agents.find((entry) => entry.id === target.agentId)
-    if (agent) return { kind: 'agent', name: agent.name, owner: peer.name, color: peer.color }
+    if (agent)
+      return { kind: 'agent', name: agent.name, owner: peer.name, color: AGENT_PRESENCE_COLOR }
   }
   return null
 }
@@ -346,11 +344,6 @@ export function renameAgent(store: EditorStore, agentId: string, name: string): 
 
 export function setPeers(store: EditorStore, peers: readonly RemotePeer[]): void {
   presenceOf(store).peers.value = peers
-  refreshCursors(store)
-}
-
-export function setOwnerColor(store: EditorStore, color: Color | null): void {
-  presenceOf(store).ownerColor.value = color
   refreshCursors(store)
 }
 

@@ -5,7 +5,7 @@ description: Integrierter AI-Assistent mit mehr als 90 Werkzeugen zum Erstellen 
 
 # AI-Chat
 
-<kbd>⌘</kbd><kbd>J</kbd> beziehungsweise <kbd>Strg</kbd><kbd>J</kbd> öffnet den Assistenten. Eine Anweisung kann Formen erstellen, Stile ändern, die Anordnung konfigurieren, Komponenten bearbeiten oder das Dokument analysieren.
+<kbd>⌘</kbd><kbd>J</kbd> beziehungsweise <kbd>Strg</kbd><kbd>J</kbd> oder die Schaltfläche mit den Funkeln bei den Aktionen des Dokuments in der oberen Leiste öffnet den Assistenten in einer eigenen Spalte. Eine Anweisung kann Formen erstellen, Stile ändern, die Anordnung konfigurieren, Komponenten bearbeiten oder das Dokument analysieren.
 
 ## Einrichtung
 

@@ -1,7 +1,7 @@
 const constraintsTheme = {
   slots: {
     root: 'grid grid-cols-[72px_minmax(0,1fr)] items-center gap-1.5',
-    diagram: 'relative h-16 w-[72px] rounded border border-border bg-panel-field',
+    diagram: 'relative h-16 w-[72px] rounded-field border border-border bg-panel-field',
     pin: 'absolute flex cursor-pointer items-center justify-center rounded-sm border border-transparent bg-transparent text-muted outline-none hover:bg-hover hover:text-surface focus-visible:ring-1 focus-visible:ring-panel-focus',
     pinMark: 'block rounded-full bg-current',
     scaleBadge:

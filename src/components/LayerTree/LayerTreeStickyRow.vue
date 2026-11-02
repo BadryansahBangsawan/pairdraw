@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
 import { stickyTopLevelRow, useLayerTree } from '@open-pencil/vue/primitives/LayerTree'
 
 import type { LayerIssueMark } from '@/app/editor/design-check/layers'
+import layerTreeTheme from '@/theme/layer-tree'
 
 import { LAYER_TREE_ROW_HEIGHT } from './geometry'
 import LayerTreeNodeRow from './LayerTreeNodeRow.vue'
 import type { LayerTreeChrome, LayerTreeItemActions } from './types'
+import { useLayerTreeUI } from './ui'
 
 /**
  * The top-level layer pinned at the top of the panel while its children scroll beneath it, as in
@@ -27,6 +30,8 @@ const emit = defineEmits<{
 }>()
 
 const tree = useLayerTree()
+const ui = useLayerTreeUI()
+const styles = tv(layerTreeTheme)()
 
 const pinned = computed(() => {
   const rows = tree.visibleRows.value
@@ -60,7 +65,7 @@ function select(event: MouseEvent) {
     data-test-id="layers-sticky-row"
     :data-node-id="pinned.row.node.id"
     :data-pushing-away="pinned.offset < 0 || undefined"
-    class="absolute inset-x-1 top-0 z-10 border-b border-border bg-panel"
+    :class="styles.sticky({ class: ui?.sticky })"
     :style="{ transform: `translateY(${pinned.offset}px)` }"
     @click="select"
   >

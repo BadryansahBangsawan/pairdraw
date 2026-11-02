@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import {
+  EDITOR_PANEL_INSET,
   EDITOR_PANEL_LIMITS,
   defaultEditorLayout,
   parseEditorLayout
@@ -18,11 +19,11 @@ describe('parseEditorLayout', () => {
     const layout = parseEditorLayout(JSON.stringify([20, 60, 20]), WINDOW)
     expect(layout.layers).toBeCloseTo(WINDOW * 0.2)
     expect(layout.properties).toBeCloseTo(WINDOW * 0.2)
-    expect(layout.chat).toBe(defaultEditorLayout(WINDOW).chat)
+    expect(layout.chat).toBe(defaultEditorLayout().chat)
   })
 
   test('defaults what is missing or broken and keeps the rest', () => {
-    const defaults = defaultEditorLayout(WINDOW)
+    const defaults = defaultEditorLayout()
     expect(parseEditorLayout(JSON.stringify({ properties: 300 }), WINDOW)).toEqual({
       ...defaults,
       properties: 300
@@ -50,11 +51,19 @@ describe('parseEditorLayout', () => {
 })
 
 describe('defaultEditorLayout', () => {
-  test('opens the properties panel and the chat at one width on any window', () => {
-    const narrow = defaultEditorLayout(1280)
-    const wide = defaultEditorLayout(2560)
-    expect(wide.properties).toBe(narrow.properties)
-    expect(wide.chat).toBe(narrow.chat)
-    expect(wide.layers).toBeGreaterThan(narrow.layers)
+  test('opens each panel’s card at its width, with the inset beside it', () => {
+    expect(defaultEditorLayout()).toEqual({
+      layers: 240 + EDITOR_PANEL_INSET,
+      properties: 256 + EDITOR_PANEL_INSET,
+      chat: 320 + EDITOR_PANEL_INSET
+    })
+  })
+
+  test('opens within every panel’s limits', () => {
+    const layout = defaultEditorLayout()
+    for (const panel of ['layers', 'properties', 'chat'] as const) {
+      expect(layout[panel]).toBeGreaterThanOrEqual(EDITOR_PANEL_LIMITS[panel].min)
+      expect(layout[panel]).toBeLessThanOrEqual(EDITOR_PANEL_LIMITS[panel].max)
+    }
   })
 })

@@ -27,6 +27,10 @@ Le zoom est centré sur le pointeur. Utilisez <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + m
 | Ajuster le document | <kbd>⌘</kbd><kbd>1</kbd> | <kbd>Ctrl</kbd><kbd>1</kbd> |
 | Zoomer sur la sélection | <kbd>⌘</kbd><kbd>2</kbd> | <kbd>Ctrl</kbd><kbd>2</kbd> |
 
+## Règles
+
+Les règles sont masquées jusqu’à ce que vous les affichiez avec **Affichage → Règles** ou <kbd>Shift</kbd> + <kbd>R</kbd>.
+
 ## Palette de commandes
 
 Appuyez sur <kbd>⌘</kbd><kbd>K</kbd> sous macOS ou <kbd>Ctrl</kbd><kbd>K</kbd> sous Windows/Linux pour rechercher des actions de l’éditeur et de l’application. Sélectionnez un résultat pour l’exécuter ; les actions indisponibles restent soumises à la sélection et à l’état du document.

@@ -23,6 +23,7 @@ import PanelSection from '@/components/ui/panel/PanelSection.vue'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
 import SegmentedControl from '@/components/ui/select/SegmentedControl.vue'
 import AppSwitch from '@/components/ui/toggle/AppSwitch.vue'
+import { segmentedTrack } from '@/theme/select/segmented-control'
 
 const { panels, menu, fonts } = useI18n()
 const fontLoader = { load: loadFont }
@@ -241,11 +242,7 @@ function picked<T>(value: MixedValue<T>): T | '' {
           class="mb-3"
           :ui="{ container: 'flex-row gap-1.5' }"
         >
-          <div
-            class="inline-flex items-center gap-0.5 rounded bg-panel-field p-0.5 hover:bg-panel-field-hover"
-            role="toolbar"
-            :aria-label="panels.textFormatting"
-          >
+          <div :class="segmentedTrack" role="toolbar" :aria-label="panels.textFormatting">
             <IconButton
               :label="`${menu.bold} (${appMenuShortcutLabel('text.bold')})`"
               size="xs"

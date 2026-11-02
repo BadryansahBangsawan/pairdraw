@@ -81,10 +81,7 @@ function followLabel(name: string, target: FollowTarget): string {
       </div>
       <ul v-if="person.agents.length > 0">
         <li v-for="agent in person.agents" :key="agent.id" data-slot="agent" :class="ui.agent()">
-          <icon-lucide-sparkle
-            :class="ui.agentIcon()"
-            :style="{ color: colorToCSS(person.color) }"
-          />
+          <icon-lucide-sparkle :class="ui.agentIcon()" />
           <input
             v-if="rename.editingId.value === agent.id"
             :ref="focusRename"

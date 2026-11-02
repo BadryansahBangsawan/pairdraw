@@ -85,6 +85,7 @@
   "exportSelectionAsDrawIO": "選択範囲を draw.io としてエクスポート",
   "exportSelectionAsFig": "選択範囲を .fig としてエクスポート",
   "togglePreview": "プレビュー",
+  "documentName": "ドキュメント名",
   "saveTo": "保存先を選んで保存…",
   "showVersionHistory": "バージョン履歴を表示",
   "saveToVersionHistory": "バージョン履歴に保存…"

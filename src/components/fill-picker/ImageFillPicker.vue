@@ -169,7 +169,7 @@ function rotate() {
         :options="IMAGE_SCALE_MODES"
         @update:model-value="(m) => (scaleMode = m as ImageScaleMode)"
       />
-      <div v-if="scaleMode === 'TILE'" class="w-16 flex-none">
+      <div v-if="scaleMode === 'TILE'" class="w-17 flex-none">
         <NumberField
           :model-value="tileScale"
           :min="1"

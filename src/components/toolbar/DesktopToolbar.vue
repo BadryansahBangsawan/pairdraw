@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ToolbarRoot } from 'reka-ui'
+import { tv } from 'tailwind-variants'
 
 import type { EditorToolDef, Tool } from '@open-pencil/core'
 import {
@@ -16,6 +17,7 @@ import ToolButton from '@/components/toolbar/ToolButton.vue'
 import ToolFlyout from '@/components/toolbar/ToolFlyout.vue'
 import type { ToolbarUI, ToolIconMap, ToolLabels } from '@/components/toolbar/types'
 import Tip from '@/components/ui/overlay/Tip.vue'
+import toolbarTheme from '@/theme/toolbar'
 
 const { items, activeTool, flyoutSelections, toolIcons, toolLabels, toolShortcuts, ui } =
   defineProps<{
@@ -32,6 +34,8 @@ const emit = defineEmits<{
   setTool: [tool: Tool]
 }>()
 
+const styles = tv(toolbarTheme)()
+
 /** The tool a flyout's button shows: the active one if it is in the flyout, else the last used. */
 function selectedTool(tool: EditorToolDef) {
   return getToolbarToolSelection(tool, activeTool, flyoutSelections)
@@ -46,14 +50,8 @@ defineSlots<{
 </script>
 
 <template>
-  <div
-    data-canvas-obstacle
-    class="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center"
-  >
-    <ToolbarRoot
-      data-test-id="toolbar"
-      class="flex gap-0.5 rounded-xl bg-panel p-1 shadow-[0_8px_30px_rgb(0_0_0/0.4)]"
-    >
+  <div data-canvas-obstacle :class="styles.dock({ class: ui?.dock })">
+    <ToolbarRoot data-test-id="toolbar" :class="styles.bar({ class: ui?.bar })">
       <template v-for="item in items" :key="item.kind === 'tool' ? item.tool.key : item.action">
         <slot v-if="item.kind === 'action'" name="action" :action="item.action" />
 

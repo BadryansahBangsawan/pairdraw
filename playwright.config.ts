@@ -38,7 +38,8 @@ const appDefaults = {
     baseURL: origin,
     // Tests start past the first-run AI setup offer, whose own spec clears this, and without the
     // prompt an empty page offers over the canvas, which `tests/e2e/chat/canvas-prompt.spec.ts`
-    // turns on.
+    // turns on. They draw in the blue accent the canvas snapshots were recorded in; the default
+    // Pairdraw accent is covered by `tests/app/settings/preferences/store.test.ts`.
     storageState: {
       cookies: [],
       origins: [
@@ -49,6 +50,7 @@ const appDefaults = {
               name: 'open-pencil:preferences:v1',
               value: JSON.stringify({
                 version: 1,
+                appearance: { accent: { kind: 'preset', preset: 'blue' } },
                 onboarding: { aiSetup: 'done' },
                 chat: { canvasPrompt: false }
               })

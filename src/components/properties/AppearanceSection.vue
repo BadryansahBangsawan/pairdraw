@@ -157,7 +157,7 @@ function blendModeGroups(value: BlendMode | typeof MIXED) {
             </template>
           </NumberField>
         </PanelFieldGroup>
-        <div v-if="splitsCorners" class="flex h-6 items-center justify-end">
+        <div v-if="splitsCorners" class="flex h-7 items-center justify-end">
           <IconButton
             :label="panels.independentCornerRadii"
             size="xs"

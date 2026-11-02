@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { TabsList, TabsRoot, TabsTrigger } from 'reka-ui'
 import { tv } from 'tailwind-variants'
-import { computed, useTemplateRef, watch } from 'vue'
+import { computed, useTemplateRef, watch, type ComponentPublicInstance } from 'vue'
 
 import { useI18n } from '@open-pencil/vue/i18n'
 
+import { useEditorStore } from '@/app/editor/active-store'
+import { useDocumentNameRename } from '@/app/shell/menu/document-name'
 import { animationsEnabled } from '@/app/shell/motion'
 import { openNewFileTab, useTabsStore } from '@/app/tabs'
 import PreparationIndicator from '@/components/preparation/tab/PreparationIndicator.vue'
@@ -12,11 +14,34 @@ import { useScrollOverflow } from '@/components/ui/list/useScrollOverflow'
 import Tip from '@/components/ui/overlay/Tip.vue'
 import tabBarTheme from '@/theme/tab-bar'
 
-const { files } = useI18n()
+const { files, menu } = useI18n()
 
 const { tabs, activeTabId, switchTab, closeTab } = useTabsStore()
 const tabBarStyles = tv(tabBarTheme)
 const baseStyles = tabBarStyles()
+
+/**
+ * Double-clicking the tab in front renames its document. The bar sits outside every workspace,
+ * so the rename goes to the active tab's store.
+ */
+const { rename, editingName, startRename, commitRename } = useDocumentNameRename(useEditorStore())
+
+function renames(tab: { isHome: boolean; isNewFile: boolean }): boolean {
+  return !tab.isHome && !tab.isNewFile
+}
+
+function onRenameInput(element: Element | ComponentPublicInstance | null) {
+  if (element instanceof HTMLInputElement) void rename.focusInput(element)
+}
+
+function onRenameKeydown(event: KeyboardEvent) {
+  // The tab list moves between tabs on arrow keys; keep them in the field.
+  event.stopPropagation()
+  rename.onKeydown(event)
+}
+
+// Another tab coming to the front leaves the name as it was.
+watch(activeTabId, () => rename.cancel())
 
 const scroller = useTemplateRef<HTMLElement>('scroller')
 const { overflowing, overflowStart, overflowEnd, scrollTowardHidden } = useScrollOverflow(
@@ -89,13 +114,25 @@ function onClose(e: MouseEvent, tabId: string) {
           :class="tabBarStyles({ active: tab.isActive, home: tab.isHome }).item()"
           @mousedown="onMiddleClick($event, tab.id, tab.isHome)"
         >
+          <input
+            v-if="tab.isActive && editingName && renames(tab)"
+            :ref="onRenameInput"
+            data-test-id="app-document-name-input"
+            :aria-label="menu.documentName"
+            :class="baseStyles.renameInput()"
+            :value="tab.name"
+            @blur="commitRename($event)"
+            @keydown="onRenameKeydown"
+          />
           <TabsTrigger
+            v-else
             :value="tab.id"
             data-test-id="tabbar-tab"
             :class="tabBarStyles({ active: tab.isActive, home: tab.isHome }).trigger()"
             :aria-label="tab.isHome ? files.home : undefined"
             :data-active="tab.isActive || undefined"
             :data-dirty="tab.isDirty || undefined"
+            @dblclick="tab.isActive && renames(tab) && startRename()"
           >
             <icon-lucide-house v-if="tab.isHome" :class="baseStyles.icon()" />
             <PreparationIndicator v-else-if="tab.isPreparing" :progress="tab.preparationProgress" />

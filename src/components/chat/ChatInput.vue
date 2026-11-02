@@ -17,6 +17,7 @@ import ChatProfileSelect from '@/components/chat/ChatProfileSelect.vue'
 import ChatThinkingSelect from '@/components/chat/ChatThinkingSelect.vue'
 import { useComposerCompletions } from '@/components/chat/composer/useComposerCompletions'
 import { useAttachmentDrafts } from '@/components/chat/input/useAttachments'
+import { chatInputTheme } from '@/components/chat/ui'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import AppDropOverlay from '@/components/ui/feedback/AppDropOverlay.vue'
 
@@ -25,6 +26,7 @@ import ChatComposer from './ChatComposer.vue'
 const { providerID, providerDef, modelID, customModelID } = useAIChat()
 const { editor, selectedIds } = useSelectionState()
 const { ai } = useI18n()
+const ui = chatInputTheme()
 
 const {
   status,
@@ -147,20 +149,16 @@ const selectedProfileName = computed(
     @settings="openSettingsDialog('ai')"
   >
     <template v-if="images.length" #attachment>
-      <div class="flex flex-wrap gap-1.5">
-        <div
-          v-for="(image, index) in images"
-          :key="image.previewURL"
-          class="flex min-w-0 max-w-full items-center gap-2 rounded-lg border border-border bg-canvas p-1.5 shadow-xs"
-        >
+      <div :class="ui.attachments()">
+        <div v-for="(image, index) in images" :key="image.previewURL" :class="ui.image()">
           <img
             :src="image.previewURL"
             :alt="image.file.name"
             width="40"
             height="40"
-            class="size-10 shrink-0 rounded-md border border-border object-cover"
+            :class="ui.imageThumb()"
           />
-          <span class="min-w-0 flex-1 truncate text-[10px] text-surface">
+          <span :class="ui.imageName()">
             {{ image.file.name }}
           </span>
           <IconButton
@@ -203,9 +201,9 @@ const selectedProfileName = computed(
     <template #model>
       <div class="@container flex min-w-0 items-center">
         <template v-if="isAgentProvider">
-          <div class="flex min-w-0 items-center gap-1 px-1.5 text-[10px] text-muted">
-            <icon-lucide-bot class="size-3 shrink-0" />
-            <span class="truncate">{{ agentName }}</span>
+          <div :class="ui.agent()">
+            <icon-lucide-bot :class="ui.agentIcon()" />
+            <span :class="ui.agentName()">{{ agentName }}</span>
           </div>
         </template>
         <template v-else>

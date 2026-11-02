@@ -76,7 +76,7 @@ Displays the selected node as code with syntax highlighting, line numbers, and a
 
 ## AI Chat Column
 
-The [AI chat](../programmable/ai-chat) creates and changes design elements from natural-language requests. It opens in a column of its own to the right of the properties panel, so the Design tab stays in view while an agent works. Open and close it with the sparkles button at the top of the properties panel or with <kbd>⌘</kbd><kbd>J</kbd>; drag its edge to resize it. The column stays open or closed, at the width you left it, across reloads. Configure reusable models and provider connections in Settings, and browse locally saved conversations from the chat's history menu.
+The [AI chat](../programmable/ai-chat) creates and changes design elements from natural-language requests. It opens in a column of its own to the right of the properties panel, so the Design tab stays in view while an agent works. Open and close it with the sparkles button among the document's actions in the top bar or with <kbd>⌘</kbd><kbd>J</kbd>; drag its edge to resize it. The column stays open or closed, at the width you left it, across reloads. Configure reusable models and provider connections in Settings, and browse locally saved conversations from the chat's history menu.
 
 ## Keyboard Shortcuts
 

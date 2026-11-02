@@ -53,7 +53,7 @@ const meta = {
               <input v-model="selected.title" class="min-w-0 flex-1 rounded border border-border bg-input p-1" />
             </label>
           </fieldset>
-          <section aria-label="Chat preview" :data-narrow="args.narrow" class="flex h-[620px] w-[420px] max-w-full flex-col overflow-hidden rounded-xl border border-border bg-panel data-[narrow=true]:w-[300px]">
+          <section aria-label="Chat preview" :data-narrow="args.narrow" class="flex h-[620px] w-[420px] max-w-full flex-col overflow-hidden rounded-card border border-border bg-panel elevation-card data-[narrow=true]:w-[300px]">
             <ChatHistory
               :saved="hasSavedConversation"
               :conversations="conversationOptions"

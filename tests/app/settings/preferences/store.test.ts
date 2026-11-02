@@ -57,7 +57,16 @@ describe('parseAppPreferences', () => {
     })
   })
 
-  test('keeps a preset or a custom accent and falls back to blue for anything else', () => {
+  test('a fresh profile starts on the Pairdraw accent', () => {
+    for (const stored of [undefined, {}, { appearance: {} }]) {
+      expect(parseAppPreferences(stored).appearance.accent).toEqual({
+        kind: 'preset',
+        preset: 'pairdraw'
+      })
+    }
+  })
+
+  test('keeps a preset or a custom accent and falls back to the default for anything else', () => {
     const accent = (value: unknown) =>
       parseAppPreferences({ appearance: { accent: value } }).appearance.accent
     expect(accent({ kind: 'preset', preset: 'green' })).toEqual({ kind: 'preset', preset: 'green' })

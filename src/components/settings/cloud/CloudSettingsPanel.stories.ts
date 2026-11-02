@@ -43,8 +43,8 @@ const meta = {
         <div class="flex w-full max-w-2xl flex-col">
           <CloudSettingsPanel :servers="args.servers" :listed="args.listed" @connect="args.onConnect">
             <template #hosted>
-              <div class="rounded border border-dashed border-border p-3 text-[11px] text-muted">
-                The OpenPencil Cloud waitlist
+              <div class="rounded-xl border border-dashed border-border p-3 text-[11px] text-muted">
+                The Pairdraw Cloud waitlist
               </div>
             </template>
           </CloudSettingsPanel>

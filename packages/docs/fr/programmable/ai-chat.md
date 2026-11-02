@@ -5,7 +5,7 @@ description: Assistant intégré avec plus de 90 outils pour créer, modifier et
 
 # Chat avec l’AI
 
-Appuyez sur <kbd>⌘</kbd><kbd>J</kbd> ou <kbd>Ctrl</kbd><kbd>J</kbd>. L’assistant peut créer des formes, modifier des styles, configurer des dispositions, travailler avec les composants et analyser le document.
+Appuyez sur <kbd>⌘</kbd><kbd>J</kbd> ou <kbd>Ctrl</kbd><kbd>J</kbd>, ou cliquez sur le bouton aux étincelles parmi les actions du document dans la barre supérieure, pour ouvrir l’assistant dans sa propre colonne. L’assistant peut créer des formes, modifier des styles, configurer des dispositions, travailler avec les composants et analyser le document.
 
 ## Configurer les modèles
 

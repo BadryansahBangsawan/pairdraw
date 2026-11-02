@@ -7,6 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from 'reka-ui'
+import { tv } from 'tailwind-variants'
 import { nextTick, ref, watch } from 'vue'
 
 import { useEditorCommands } from '@open-pencil/vue/editor/commands'
@@ -23,6 +24,7 @@ import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
 import AppShortcutText from '@/components/ui/menu/AppShortcutText.vue'
 import { menuItem, useMenuUI } from '@/components/ui/menu/menu'
 import MenuScrollArea from '@/components/ui/menu/MenuScrollArea.vue'
+import zoomDropdownTheme from '@/theme/zoom-dropdown'
 
 const store = useEditorStore()
 const { getCommand } = useEditorCommands()
@@ -33,6 +35,7 @@ const editing = ref(false)
 const inputRef = ref<HTMLInputElement | null>()
 const inputValue = ref('')
 
+const zoom = tv(zoomDropdownTheme)()
 const menuCls = useMenuUI({ content: 'min-w-52' })
 const itemCls = menuItem({ justify: 'start', class: 'relative pl-7' })
 
@@ -105,11 +108,9 @@ watch(open, (v) => {
 <template>
   <DropdownMenuRoot v-model:open="open">
     <DropdownMenuTrigger as-child>
-      <button
-        data-test-id="zoom-dropdown-trigger"
-        class="ml-auto cursor-pointer rounded px-1.5 py-0.5 text-[11px] text-muted hover:bg-hover"
-      >
+      <button type="button" data-test-id="zoom-dropdown-trigger" :class="zoom.trigger()">
         {{ zoomPercent() }}%
+        <icon-lucide-chevron-down :class="zoom.chevron()" aria-hidden="true" />
       </button>
     </DropdownMenuTrigger>
 
@@ -128,7 +129,7 @@ watch(open, (v) => {
               ref="inputRef"
               v-model="inputValue"
               data-test-id="zoom-input"
-              class="w-full rounded border border-accent bg-input px-2 py-1 text-xs text-surface outline-none"
+              :class="zoom.input()"
               @blur="commitInput"
               @keydown.enter="commitInput"
               @keydown.escape.stop="cancelInput"
@@ -136,7 +137,7 @@ watch(open, (v) => {
             <button
               v-else
               data-test-id="zoom-input-trigger"
-              class="w-full cursor-pointer rounded border border-border bg-input px-2 py-1 text-left text-xs text-surface hover:border-muted"
+              :class="zoom.inputTrigger()"
               @click="startEditing"
             >
               {{ zoomPercent() }}%

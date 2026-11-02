@@ -80,11 +80,7 @@ function navigationClass(disabled: boolean) {
   <div
     data-test-id="mobile-toolbar"
     data-canvas-obstacle
-    class="fixed left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5"
-    :style="{
-      maxWidth: 'calc(100vw - 2rem)',
-      bottom: `calc(56px + env(safe-area-inset-bottom) + 0.75rem)`
-    }"
+    :class="styles.mobileDock({ class: ui?.mobileDock })"
   >
     <motion.button
       data-test-id="mobile-toolbar-prev"
@@ -102,7 +98,7 @@ function navigationClass(disabled: boolean) {
       <motion.div
         :layout="animationsEnabled"
         data-test-id="mobile-toolbar-container"
-        class="relative flex h-11 items-center overflow-hidden rounded-[8px] border border-border bg-panel px-2 shadow-lg"
+        :class="styles.mobileBar({ class: ui?.mobileBar })"
         :transition="layoutTransition"
       >
         <AnimatePresence mode="popLayout" :custom="slideDirection">
@@ -110,7 +106,7 @@ function navigationClass(disabled: boolean) {
             v-if="mobileCategory === 0"
             key="tools"
             data-test-id="mobile-toolbar-tools"
-            class="flex gap-0.5"
+            :class="styles.mobileGroup({ class: ui?.mobileGroup })"
             :variants="slideVariants"
             initial="initial"
             animate="animate"
@@ -154,7 +150,7 @@ function navigationClass(disabled: boolean) {
             v-else-if="mobileCategory === 1"
             key="edit"
             data-test-id="mobile-toolbar-edit"
-            class="flex gap-0.5"
+            :class="styles.mobileGroup({ class: ui?.mobileGroup })"
             :variants="slideVariants"
             initial="initial"
             animate="animate"
@@ -173,7 +169,7 @@ function navigationClass(disabled: boolean) {
             v-else
             key="arrange"
             data-test-id="mobile-toolbar-arrange"
-            class="flex gap-0.5"
+            :class="styles.mobileGroup({ class: ui?.mobileGroup })"
             :variants="slideVariants"
             initial="initial"
             animate="animate"

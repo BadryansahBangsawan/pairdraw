@@ -7,7 +7,8 @@ export default {
       'flex size-8 shrink-0 items-center justify-center rounded-md bg-panel text-muted group-data-[state=checked]:text-primary',
     choiceBody: 'min-w-0 flex-1',
     choiceLabel: 'block text-xs font-medium text-surface',
-    choiceDescription: 'mt-0.5 block truncate text-[11px] text-muted',
+    choiceDescription:
+      'mt-0.5 block truncate text-[11px] text-muted group-data-[state=checked]:text-surface/75',
     choiceMark:
       'size-3.5 shrink-0 rounded-full border border-border group-data-[state=checked]:border-4 group-data-[state=checked]:border-accent',
     address: 'mt-3 flex flex-col gap-1.5',

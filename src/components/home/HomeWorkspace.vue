@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useLocalStorage } from '@vueuse/core'
+import { tv } from 'tailwind-variants'
 import { computed, ref, shallowRef } from 'vue'
 
 import type { DocumentKind } from '@open-pencil/scene-graph'
 import { useDocumentWorkspace } from '@open-pencil/vue/document/workspace'
+import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
 import { useI18n } from '@open-pencil/vue/i18n'
 
 import { sendPromptToDocument } from '@/app/ai/chat/pending-prompt'
@@ -41,6 +43,9 @@ import HomeLocationMenu from '@/components/home/sidebar/HomeLocationMenu.vue'
 import HomeSidebar from '@/components/home/sidebar/HomeSidebar.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
+import AppSkeleton from '@/components/ui/feedback/AppSkeleton.vue'
+import { skeleton } from '@/components/ui/feedback/skeleton'
+import documentsTheme from '@/theme/home/documents'
 
 const { locale, storage, files, common, settings, credentials } = useI18n()
 const view = useLocalStorage<'grid' | 'list'>('open-pencil:home-files-view', 'grid')
@@ -48,6 +53,9 @@ const query = ref('')
 const openError = ref<string | null>(null)
 const storageConfigured = ref(storagePreferencesComplete(activeStorageProviderID.value))
 const places = useHomeLocations()
+const { isTouch } = useViewportKind()
+const styles = tv(documentsTheme)()
+const loading = skeleton()
 
 /** A new document lands in the place Home shows: a Cloud workspace, the bucket, or a local file. */
 function newDocument(kind: DocumentKind): Tab {
@@ -259,10 +267,7 @@ function formattedDate(updatedAt: string): string {
       :query="normalizedQuery"
     />
     <template v-else>
-      <p
-        v-if="noSearchMatches"
-        class="rounded-lg border border-dashed border-border px-4 py-8 text-center text-xs text-muted"
-      >
+      <p v-if="noSearchMatches" :class="styles.empty()">
         {{ files.noMatchingFiles({ query: query.trim() }) }}
       </p>
 
@@ -275,25 +280,23 @@ function formattedDate(updatedAt: string): string {
         @open="openRecent"
       />
 
-      <section v-if="places.location.value.kind === 'storage'">
-        <div class="mb-3 flex items-start gap-3">
-          <div class="min-w-0">
-            <h2 class="text-base font-semibold">{{ storage.workspace }}</h2>
-            <p class="mt-0.5 truncate text-xs text-muted sm:whitespace-normal">
-              {{ storageDescription }}
-            </p>
+      <section v-if="places.location.value.kind === 'storage'" :class="styles.section()">
+        <div :class="styles.header()">
+          <div :class="styles.heading()">
+            <h2 :class="styles.title()">{{ storage.workspace }}</h2>
+            <p :class="styles.description()">{{ storageDescription }}</p>
           </div>
-          <div class="ml-auto flex shrink-0 items-center gap-1">
+          <div :class="styles.actions()">
             <IconButton
               :label="common.refresh"
-              class="size-10 sm:size-7"
+              :size="isTouch ? 'lg' : 'sm'"
               @click="storageWorkspace.refresh"
             >
               <icon-lucide-refresh-cw class="size-3.5" />
             </IconButton>
             <IconButton
               :label="settings.title"
-              class="size-10 sm:size-7"
+              :size="isTouch ? 'lg' : 'sm'"
               @click="openSettingsDialog('storage')"
             >
               <icon-lucide-settings-2 class="size-3.5" />
@@ -303,30 +306,26 @@ function formattedDate(updatedAt: string): string {
 
         <div
           v-if="storageLoading && storageDocuments.length === 0"
-          class="grid grid-cols-1 gap-x-5 gap-y-6 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))]"
+          :class="[styles.grid(), loading.group()]"
           :aria-label="storage.loadingWorkspace"
         >
-          <div
-            v-for="index in 3"
-            :key="index"
-            class="min-w-0 animate-pulse motion-reduce:animate-none"
-          >
-            <div class="aspect-video rounded-lg border border-border bg-panel-field" />
-            <div class="mt-2 h-3 w-2/3 rounded bg-panel-field" />
-            <div class="mt-1.5 h-2.5 w-1/3 rounded bg-panel-field" />
+          <div v-for="index in 3" :key="index" :class="styles.skeleton()">
+            <AppSkeleton :class="styles.skeletonPreview()" />
+            <AppSkeleton :class="styles.skeletonName()" />
+            <AppSkeleton :class="styles.skeletonMeta()" />
           </div>
         </div>
 
         <div
           v-else-if="storageError && storageDocuments.length === 0"
-          class="rounded-lg border border-error/40 px-4 py-6 text-center"
+          :class="styles.error()"
           role="alert"
         >
           <template v-if="credentialAccess.paused.value">
-            <p class="text-xs text-error">{{ credentials.accessPaused }}</p>
+            <p :class="styles.errorText()">{{ credentials.accessPaused }}</p>
             <AppButton
               variant="outline"
-              class="mt-3"
+              :class="styles.errorAction()"
               :loading="credentialAccess.busy.value"
               data-test-id="home-storage-retry-access"
               @click="retryCredentialAccess"
@@ -335,17 +334,18 @@ function formattedDate(updatedAt: string): string {
             </AppButton>
           </template>
           <template v-else>
-            <p class="text-xs text-error">{{ storageError }}</p>
-            <AppButton variant="outline" class="mt-3" @click="storageWorkspace.refresh">
+            <p :class="styles.errorText()">{{ storageError }}</p>
+            <AppButton
+              variant="outline"
+              :class="styles.errorAction()"
+              @click="storageWorkspace.refresh"
+            >
               {{ common.refresh }}
             </AppButton>
           </template>
         </div>
 
-        <div
-          v-else-if="filteredStorageDocuments.length && view === 'grid'"
-          class="grid grid-cols-1 gap-x-5 gap-y-6 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))]"
-        >
+        <div v-else-if="filteredStorageDocuments.length && view === 'grid'" :class="styles.grid()">
           <DocumentEntry
             v-for="document in filteredStorageDocuments"
             :key="document.id"
@@ -359,10 +359,7 @@ function formattedDate(updatedAt: string): string {
           />
         </div>
 
-        <div
-          v-else-if="filteredStorageDocuments.length"
-          class="overflow-hidden rounded-lg border border-border"
-        >
+        <div v-else-if="filteredStorageDocuments.length" :class="styles.list()">
           <DocumentEntry
             v-for="document in filteredStorageDocuments"
             :key="document.id"
@@ -375,20 +372,18 @@ function formattedDate(updatedAt: string): string {
           />
         </div>
 
-        <div
-          v-else-if="!storageConfigured"
-          class="rounded-lg border border-dashed border-border px-4 py-4 text-center text-xs text-muted sm:py-6"
-        >
+        <div v-else-if="!storageConfigured" :class="styles.empty()">
           <p>{{ storage.notConfigured }}</p>
-          <AppButton variant="outline" class="mt-3" @click="openSettingsDialog('storage')">
+          <AppButton
+            variant="outline"
+            :class="styles.emptyAction()"
+            @click="openSettingsDialog('storage')"
+          >
             {{ settings.title }}
           </AppButton>
         </div>
 
-        <div
-          v-else-if="!normalizedQuery"
-          class="rounded-lg border border-dashed border-border px-4 py-4 text-center text-xs text-muted sm:py-6"
-        >
+        <div v-else-if="!normalizedQuery" :class="styles.empty()">
           {{ storage.emptyStorageWorkspace }}
         </div>
         <DocumentDeleteDialog

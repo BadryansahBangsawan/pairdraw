@@ -18,7 +18,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'People draw as arrows filled with their color; agents in the color of the person running them, with an outlined label that starts with a sparkle, and what they edit outlined.'
+          'People draw as arrows filled with their color; agents in the color they are given, which the app sets to its agent violet, with an outlined label that starts with a sparkle, and what they edit outlined.'
       }
     }
   },

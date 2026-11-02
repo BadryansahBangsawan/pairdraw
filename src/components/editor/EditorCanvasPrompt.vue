@@ -44,12 +44,12 @@ async function start(text: string): Promise<void> {
   >
     <section
       :aria-label="ai.canvasPromptTitle"
-      class="pointer-events-auto relative w-full max-w-md animate-in rounded-xl border border-border bg-panel shadow-lg fade-in motion-reduce:animate-none"
+      class="pointer-events-auto relative w-full max-w-md animate-in rounded-card border border-border bg-panel elevation-card fade-in motion-reduce:animate-none"
     >
       <IconButton
         :label="ai.canvasPromptClose"
         size="sm"
-        class="absolute top-2 right-2"
+        class="absolute end-2 top-2"
         @click="closeCanvasPrompt(store)"
       >
         <icon-lucide-x class="size-3.5" />

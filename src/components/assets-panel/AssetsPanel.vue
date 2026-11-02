@@ -344,7 +344,7 @@ async function insertSelectedAsset() {
 
 <template>
   <section data-test-id="assets-panel" class="flex min-h-0 flex-1 flex-col overflow-hidden">
-    <div class="flex shrink-0 items-center gap-2 px-2 py-2">
+    <div class="flex shrink-0 items-center gap-2 px-3.5 py-2.5">
       <AppInput
         v-model="query"
         type="search"
@@ -381,9 +381,9 @@ async function insertSelectedAsset() {
       </SegmentedControl>
     </div>
 
-    <div class="scrollbar-thin flex min-h-0 flex-1 flex-col overflow-y-auto px-2 pb-2">
+    <div class="scrollbar-thin flex min-h-0 flex-1 flex-col overflow-y-auto px-2.5 pb-2">
       <section v-for="group in assetGroups" :key="group.pageId" class="mb-3">
-        <h2 class="mb-1 px-1 text-[11px] font-semibold text-muted">
+        <h2 class="mb-1 px-1 text-xs font-medium text-surface">
           {{ group.pageName }}
         </h2>
         <div :class="assetView === 'grid' ? 'grid grid-cols-2 gap-2' : 'flex flex-col gap-0.5'">

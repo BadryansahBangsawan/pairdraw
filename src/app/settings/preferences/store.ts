@@ -126,7 +126,8 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
     changePreviewSize: 'medium',
     followAgents: true,
     columnOpen: false,
-    canvasPrompt: true
+    // The prompt over an empty page is opt-in; Home and the chat column start a design by default.
+    canvasPrompt: false
   },
   files: { recentLimit: DEFAULT_RECENT_FILES_LIMIT },
   version: 1,

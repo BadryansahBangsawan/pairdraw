@@ -119,7 +119,7 @@ function setShown(entry: ToolbarEntry, shown: boolean) {
         :kind="boxIndex === 0 ? 'end' : 'between'"
         :dropping="dropJoint === box.head.index"
       />
-      <div class="flex flex-col rounded border border-border">
+      <div class="flex flex-col rounded-xl border border-border">
         <template v-for="{ row, index } in box.rows" :key="row.entry">
           <ToolbarLayoutJoint v-if="row.joined" kind="inside" :dropping="dropJoint === index" />
           <div

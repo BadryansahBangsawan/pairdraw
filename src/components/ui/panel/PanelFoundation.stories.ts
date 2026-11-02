@@ -14,6 +14,7 @@ import IconButton from '@/components/ui/button/IconButton.vue'
 import AppInput from '@/components/ui/input/AppInput.vue'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
 import SegmentedControl from '@/components/ui/select/SegmentedControl.vue'
+import { panelField } from '@/theme/control'
 
 import PanelFieldGroup from './PanelFieldGroup.vue'
 import PanelGrid from './PanelGrid.vue'
@@ -27,7 +28,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'The 24px properties-panel foundation: strict grids, field groups, action rails, and semantic field states.'
+          'The 28px properties-panel foundation: strict grids, field groups, action rails, and semantic field states.'
       }
     }
   }
@@ -170,8 +171,14 @@ export const StateMatrix: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const controls = Array.from(canvasElement.querySelectorAll<HTMLElement>('[data-story-control]'))
+    // Each control is a property field; measure the field scale itself so the two cannot drift.
+    const probe = document.createElement('div')
+    probe.className = panelField.height
+    canvasElement.append(probe)
+    const fieldHeight = getComputedStyle(probe).height
+    probe.remove()
 
-    for (const control of controls) await expect(control).toHaveStyle({ height: '24px' })
+    for (const control of controls) await expect(control).toHaveStyle({ height: fieldHeight })
 
     await userEvent.click(canvas.getByLabelText('Height'))
     await userEvent.hover(canvas.getByLabelText('Width'))

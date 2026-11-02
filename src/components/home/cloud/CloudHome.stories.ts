@@ -75,7 +75,7 @@ const meta = {
     },
     setup: () => ({ args, workspaces, query: ref(''), view: ref<'grid' | 'list'>('grid') }),
     template: `
-      <div :class="['flex h-dvh max-h-[760px] flex-col', args.realActions && '-m-8 max-h-none']">
+      <div :class="['flex h-dvh max-h-[760px] flex-col bg-canvas pt-2.5', args.realActions && '-m-8 max-h-none']">
         <HomeLayout>
           <template #sidebar>
             <HomeSidebar

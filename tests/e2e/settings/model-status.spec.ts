@@ -76,9 +76,11 @@ test('a provider preset tests its key against its own endpoint and shows as conn
   await expect(editor.getByText('Connected successfully. Model is reachable.')).toBeVisible()
   expect(requests).toContainEqual({ model: 'grok-4.7', authorization: 'Bearer xai-e2e-key' })
 
+  // A new model needs a name before it saves.
+  await editor.getByRole('textbox', { name: 'Name', exact: true }).fill('Preset model')
   await page.getByRole('button', { name: 'Save model' }).click()
   const row = page.getByTestId('settings-model-list').locator('[data-model-id]', {
-    hasText: 'Grok 4.7'
+    hasText: 'Preset model'
   })
   await expect(row).toContainText('xAI')
   await expect(row.getByText('Connected', { exact: true })).toBeVisible()

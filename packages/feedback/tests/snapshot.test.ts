@@ -182,6 +182,13 @@ describe('release files', () => {
     expect(releaseFileKind('OpenPencil_x64.app.tar.gz.sig')).toBeUndefined()
     expect(releaseFileKind('SHA256SUMS')).toBeUndefined()
   })
+
+  test('counts the macOS .zip and the portable Linux .tar.gz as installers', () => {
+    expect(releaseFileKind('Pairdraw_0.16.0_aarch64.zip')).toBe('macos-installer')
+    expect(releaseFileKind('Pairdraw_0.16.0_amd64.tar.gz')).toBe('linux-installer')
+    expect(releaseFileKind('Pairdraw_aarch64.app.tar.gz')).toBe('macos-update')
+    expect(releaseFileKind('Pairdraw_0.16.0_amd64.tar.gz.sig')).toBeUndefined()
+  })
 })
 
 describe('metrics snapshot', () => {

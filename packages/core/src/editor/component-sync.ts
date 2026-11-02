@@ -59,6 +59,31 @@ function affectedPageIds(
   return pageIds
 }
 
+/**
+ * Brings the instances of the components that contain `editedIds` up to date with them, nested
+ * components first, and lays out the pages that changed. `editedIds` are the layers an edit
+ * changed, plus the parents of those it removed or moved away. Returns whether any component
+ * was synced.
+ */
+export function syncEditedComponents(
+  graph: SceneGraph,
+  editedIds: Iterable<string>,
+  computeLayouts: ComputeLayouts = computeAllLayouts
+): boolean {
+  const ids = [...editedIds]
+  const componentIds = new Set<string>()
+  for (const id of ids) {
+    const component = graph.closest(id, isComponent)
+    if (component) componentIds.add(component.id)
+  }
+  if (componentIds.size === 0) return false
+  graph.syncInstancesTogether(componentSyncOrder(graph, componentIds))
+  const pageIds = affectedPageIds(graph, ids, componentIds)
+  if (pageIds.size === 0) computeLayouts(graph)
+  else for (const pageId of pageIds) computeLayouts(graph, pageId)
+  return true
+}
+
 export function createComponentSyncScheduler(
   getGraph: () => SceneGraph,
   requestRender: () => void,
@@ -73,19 +98,7 @@ export function createComponentSyncScheduler(
     pendingComponentSync = null
     isFlushingComponentSync = true
     try {
-      const graph = getGraph()
-      const componentIds = new Set<string>()
-      for (const id of ids) {
-        const component = graph.closest(id, isComponent)
-        if (component) componentIds.add(component.id)
-      }
-      graph.syncInstancesTogether(componentSyncOrder(graph, componentIds))
-      if (componentIds.size > 0) {
-        const pageIds = affectedPageIds(graph, ids, componentIds)
-        if (pageIds.size === 0) computeLayouts(graph)
-        else for (const pageId of pageIds) computeLayouts(graph, pageId)
-        requestRender()
-      }
+      if (syncEditedComponents(getGraph(), ids, computeLayouts)) requestRender()
     } finally {
       isFlushingComponentSync = false
     }

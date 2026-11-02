@@ -1,6 +1,7 @@
 import { readFile, realpath } from 'node:fs/promises'
 import { dirname, resolve, sep } from 'node:path'
 
+import { syncEditedComponents } from '@open-pencil/core'
 import { SkiaRenderer } from '@open-pencil/core/canvas'
 import { BUILTIN_IO_FORMATS, IORegistry } from '@open-pencil/core/io'
 import { populateAllFigPages, populateFigPage } from '@open-pencil/core/io/formats/fig'
@@ -14,7 +15,11 @@ import {
 import { writeFileAtomic } from '@open-pencil/core/node/fs'
 import { prepareGraphFonts, type DocumentFontStatus } from '@open-pencil/core/text'
 import type { SceneGraph } from '@open-pencil/scene-graph'
-import { collectSceneMutation } from '@open-pencil/scene-graph/mutation-impact'
+import {
+  collectSceneMutation,
+  createSceneMutationImpact,
+  recordSceneMutations
+} from '@open-pencil/scene-graph/mutation-impact'
 
 import { printError } from '#cli/format'
 
@@ -161,13 +166,27 @@ export function requirePage(graph: SceneGraph, pageName?: string) {
  * Runs `edit` on `graph`, then loads the fonts the text it touched needs and sizes that text again
  * in them. Text is sized as it is edited, before the fonts for new characters (Japanese in a
  * Latin-only web font, say) can load, so without this it would save the size and glyphs of a
- * stand-in.
+ * stand-in. The instances of the components it changed then follow them, as the editor's
+ * component sync makes them.
  */
 export async function editDocument<T>(graph: SceneGraph, edit: () => T | Promise<T>): Promise<T> {
-  const { result, impact } = await collectSceneMutation(graph, edit)
-  const textIds = [...impact.changedNodeIds].filter((id) => graph.getNode(id)?.type === 'TEXT')
-  if (textIds.length === 0) return result
-  await prepareGraphFonts(graph, textIds)
-  for (const id of textIds) sizeAutoResizingText(graph, id)
-  return result
+  const authored = createSceneMutationImpact()
+  // Layout's writes and pages loading are results, not edits, as the editor's sync treats them.
+  const stopRecording = recordSceneMutations(
+    graph,
+    authored,
+    () => !graph.isApplyingLayout && !graph.isApplyingImportedState
+  )
+  try {
+    const { result, impact } = await collectSceneMutation(graph, edit)
+    const textIds = [...impact.changedNodeIds].filter((id) => graph.getNode(id)?.type === 'TEXT')
+    if (textIds.length > 0) {
+      await prepareGraphFonts(graph, textIds)
+      for (const id of textIds) sizeAutoResizingText(graph, id)
+    }
+    syncEditedComponents(graph, [...authored.changedNodeIds, ...authored.previousParentIds])
+    return result
+  } finally {
+    stopRecording()
+  }
 }

@@ -25,6 +25,7 @@ export {
   pickEditorViewState
 } from './state/view'
 export { createDefaultEditorState, createEditor } from './create'
+export { syncEditedComponents } from './component-sync'
 export { executeAtomicTool } from './history/atomic-tool'
 export { isEmptyDocumentChange, type DocumentChange } from './history/document-change'
 export type { RecordEditOptions } from './history/edit'

@@ -3,7 +3,7 @@ import { join } from 'node:path'
 
 import { FIXTURES } from '#cli-tests/helpers/paths'
 
-import { getTextMeasurer } from '@open-pencil/core/layout'
+import { computeAllLayouts, getTextMeasurer } from '@open-pencil/core/layout'
 import { fontManager } from '@open-pencil/core/text'
 import { SceneGraph } from '@open-pencil/scene-graph'
 
@@ -40,4 +40,27 @@ test('sizes the text an edit writes in the fonts its characters load after it', 
   } finally {
     fontManager.setHostFontLoader(null)
   }
+})
+
+test('brings the instances of a component an edit changes up to date with it', async () => {
+  const graph = new SceneGraph()
+  const pageId = graph.getPages()[0].id
+  const component = graph.createNode('COMPONENT', pageId, {
+    name: 'Badge',
+    layoutMode: 'HORIZONTAL',
+    primaryAxisSizing: 'HUG',
+    counterAxisSizing: 'HUG'
+  })
+  const box = graph.createNode('RECTANGLE', component.id, { name: 'Box', width: 40, height: 40 })
+  computeAllLayouts(graph)
+  const instance = graph.createInstance(component.id, pageId, { x: 200, y: 0 })
+  if (!instance) throw new Error('Expected the instance')
+  expect([instance.width, instance.height]).toEqual([40, 40])
+
+  await editDocument(graph, () => graph.updateNode(box.id, { width: 100, height: 80 }))
+
+  expect([component.width, component.height]).toEqual([100, 80])
+  expect([instance.width, instance.height]).toEqual([100, 80])
+  const copy = graph.getNode(instance.childIds[0])
+  expect([copy?.width, copy?.height]).toEqual([100, 80])
 })

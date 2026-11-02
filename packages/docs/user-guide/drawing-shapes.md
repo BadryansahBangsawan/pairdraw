@@ -60,7 +60,9 @@ Every shape can have a fill. The fill section supports:
 
 - **Solid color** — pick via the HSV color picker or type a hex value
 - **Gradient** — Linear, Radial, Angular, or Diamond with editable gradient stops. While the gradient's picker is open, the canvas shows its handles: drag an end or a radius dot to move it, hold <kbd>Shift</kbd> to turn it in 15° steps, and drag a stop's square to slide the stop along the line
-- **Image** — select an image file as the fill
+- **Image** — select an image file as the fill, or paste an address in **Image URL** and choose **Load** to fetch a PNG, JPEG, GIF, or WebP image from the web (or a `data:` URL) of up to 64 MB
+
+An image fill is placed in one of five modes: **Fill** covers the layer and crops the image, **Fit** shows the whole image inside the layer, **Stretch** stretches the whole image to the layer's proportions, **Crop** lets you choose the part of the image to show, and **Tile** repeats the image. Stretch is stored as a crop of the whole image, as `.pen` files store it and Figma reads it.
 
 ### Stroke
 
@@ -78,6 +80,10 @@ Add an outline to any shape. Stroke properties include:
 Available for rectangles, frames, components, instances, polygons, and stars. Click the independent corners toggle to set each corner (top-left, top-right, bottom-left, bottom-right) separately; a polygon's or star's corners share one radius, which rounds its inner corners too.
 
 On the canvas, hover a selected rectangle to show a handle inside each corner and drag one to round the corners. Equal corners change together and differing ones one at a time; hold <kbd>⌥</kbd> to swap the two and <kbd>⇧</kbd> to round to tens. A polygon or star has one radius handle, below its top point, which rounds all of its corners; drag the handle on its next point around the centre to change the point count, and a star's handle on its first inner point towards or away from the centre to change its ratio. The handles hide while the shape is under 108 pixels across on screen; zoom in to reach them.
+
+### Ellipse Arcs
+
+Select an ellipse to see its arc in the Appearance section: **Start** is the angle the arc starts at, in degrees; **Sweep** is how much of the full turn it covers, in percent; and **Ratio** is the size of the hole in the middle, as a percentage of the ellipse, for rings and donut charts. Type a value or drag the field; the canvas handles of the ellipse change the same three values.
 
 ### Effects
 

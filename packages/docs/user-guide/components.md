@@ -112,6 +112,10 @@ Instance creation is available only through the context menu — there's no tool
 
 Select an instance and press <kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd> (<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>B</kbd>) to detach it. The instance becomes a regular frame with no link to the original component. All overrides are baked in.
 
+## Convert to Frame
+
+Select a main component and press <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> (<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>K</kbd>), the Create component keys, or choose **Convert to frame** from its context menu, the layer type menu, or **Object › Convert to Frame**, to turn it back into a frame. When the component has instances, a confirmation says how many; converting detaches every instance into a frame that keeps its look, including copies nested in other components' instances. The whole change is one undo step.
+
 ## Go to Main Component
 
 Right-click an instance and select **Go to main component**. The editor navigates to and selects the main component, switching pages if needed.

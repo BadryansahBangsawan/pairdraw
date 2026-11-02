@@ -34,6 +34,8 @@ Selecting a placed icon adds an **Icon** section to the Design panel.
 - **Swap icon** opens the picker and draws the chosen icon in place of the current one. The icon keeps its size, position, and color.
 - **Icon color** changes the color of the icon's own paths. Icons drawn in several fixed colors, such as brand logos, keep those colors and don't show this field.
 
+Material Symbols icons (outlined, rounded, and sharp) also show their font axes: **Weight**, **Filled**, **Grade**, and **Optical size**; a Material Symbols icon keeps them when you swap it. SF Symbols, in the desktop app on macOS 14 or later, show **Weight** from Ultralight to Black, **Scale** (Small, Medium, or Large), and **Rendering** (Monochrome or Hierarchical).
+
 Each swap or color change is one undo step; dragging in the color picker undoes as a single change.
 
 An icon is a frame of vector paths, named after the icon, such as `cat`, and marked with a smiley in the layer tree. Unlike other frames on the page, it has no title on the canvas, and resizing it scales its paths. Its layers, constraints, effects, and the rest of the Design panel work as they do for any frame.

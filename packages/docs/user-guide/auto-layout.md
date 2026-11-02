@@ -59,6 +59,10 @@ Each child in an auto-layout frame can have its own sizing mode:
 - **Fill** — stretches to fill available space in the parent
 - **Hug** — shrinks to fit the child's content
 
+## Include Strokes in Layout
+
+By default an auto layout frame lays its content out as if no layer had a stroke, as Figma does. Turn on **Include strokes in layout** in the Layout section to make room for strokes: the frame's own stroke pushes its content inward, and the outside strokes of its children take up space between them.
+
 ## Drag Reordering
 
 Within an auto-layout frame, drag a child to reorder it among its siblings. A visual insertion indicator shows where the child will be dropped. Dragging a node from elsewhere into an auto-layout frame inserts it the same way; in a wrapping frame, it goes into the line under the cursor. Drawing inside an auto-layout frame adds the new node to the end of its flow.

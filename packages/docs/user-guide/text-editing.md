@@ -69,6 +69,10 @@ Open the font picker in the Typography section of the properties panel to change
 - **Virtual scroll** — handles large font lists efficiently
 - **Scroll-to-current** — the current font is highlighted when the picker opens
 
+## Font Family Variables
+
+A font family can come from a string variable. In the Typography section, choose **Apply variable to font family** beside the family and pick a variable whose value is a font family name. The text then follows the variable: switching the variable's mode, or changing its value, changes the family, and the editor loads the new family's fonts. Picking a font in the font picker detaches the variable and sets that font directly.
+
 ## Text on a Path
 
 Imported Figma text-on-path layers retain their curved glyph layout. You can edit their text and typography, resize and select them, and save or export the result while preserving the path layout. This is support for existing imported path-text layers, not a separate drawing tool for attaching arbitrary text to a new path.

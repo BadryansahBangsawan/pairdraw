@@ -1,0 +1,2 @@
+- A fresh install no longer opens the welcome dialog; AI setup opens only when a prompt finds no coding agent to use.
+- A signed-out coding agent asks you to sign in again instead of reporting a failed request.

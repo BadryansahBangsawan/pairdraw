@@ -3,7 +3,6 @@ import { expect, within } from 'storybook/test'
 
 import { ACP_AGENTS, type ACPAgentID } from '@open-pencil/core/constants'
 
-import type { AgentAccount } from '@/app/ai/agents/setup/accounts'
 import type {
   AgentConnectProblem,
   AgentConnectState,
@@ -11,6 +10,7 @@ import type {
 } from '@/app/ai/agents/setup/connect'
 import type { DetectedAgent } from '@/app/ai/agents/setup/discovery'
 import type { AgentSetupState, PiSetupState } from '@/app/ai/agents/setup/view'
+import { agentAccount as account } from '@/components/settings/agents/stories/fixtures'
 
 import AISetupConnection from './AISetupConnection.vue'
 
@@ -48,21 +48,6 @@ function agentSetup(overrides: Partial<AgentSetupState>): AgentSetupState {
     npm: true,
     installingAgent: false,
     installingBridge: false,
-    error: null,
-    ...overrides
-  }
-}
-
-function account(overrides: Partial<AgentAccount>): AgentAccount {
-  return {
-    checking: false,
-    status: { kind: 'none', label: 'Not logged in' },
-    adapter: { name: '@agentclientprotocol/claude-agent-acp', version: '0.93.0' },
-    canSignIn: true,
-    signingIn: false,
-    signInURL: null,
-    acceptsCode: false,
-    tools: null,
     error: null,
     ...overrides
   }

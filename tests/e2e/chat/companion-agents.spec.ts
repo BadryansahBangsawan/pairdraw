@@ -1,15 +1,13 @@
-import { spawn, type ChildProcess } from 'node:child_process'
-import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
-import { createServer } from 'node:net'
+import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { delimiter, join } from 'node:path'
+import { join } from 'node:path'
 
 import { expect, test } from '@playwright/test'
 import * as v from 'valibot'
 
+import { startCompanion } from '#tests/helpers/agents/companion'
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { ChatHarness } from '#tests/helpers/chat/harness'
-import { repoPath, testPath } from '#tests/helpers/paths'
 
 /**
  * The web app with the companion, as a person runs it: `openpencil-connect` prints a link, the
@@ -19,60 +17,6 @@ import { repoPath, testPath } from '#tests/helpers/paths'
 test.skip(process.platform === 'win32', 'The stand-in agent is a shell script')
 
 const healthSchema = v.looseObject({ status: v.string() })
-
-function freePort(): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const server = createServer()
-    server.once('error', reject)
-    server.listen(0, '127.0.0.1', () => {
-      const address = server.address()
-      const port = typeof address === 'object' && address ? address.port : 0
-      server.close(() => resolve(port))
-    })
-  })
-}
-
-interface Companion {
-  child: ChildProcess
-  port: number
-  link: string
-  /** What the companion prints beside the link for the tab to show. */
-  fingerprint: string
-}
-
-async function startCompanion(appURL: string, dir: string): Promise<Companion> {
-  const bin = join(dir, 'bin')
-  mkdirSync(bin)
-  const agent = join(bin, 'claude-agent-acp')
-  // It answers as Claude's supported adapter does.
-  const fixture = testPath('helpers/agents/acp-agent.ts')
-  writeFileSync(agent, `#!/bin/sh\nexec bun "${fixture}" @agentclientprotocol/claude-agent-acp\n`)
-  chmodSync(agent, 0o755)
-  const port = await freePort()
-  const child = spawn(process.execPath, [repoPath('packages/mcp/dist/connect.mjs'), '--no-open'], {
-    stdio: ['pipe', 'pipe', 'inherit'],
-    env: {
-      ...process.env,
-      PATH: `${bin}${delimiter}${process.env.PATH ?? ''}`,
-      PORT: String(port),
-      OPENPENCIL_CONNECT_APP_URL: appURL,
-      OPENPENCIL_MCP_SOCKET: join(dir, 'mcp.sock'),
-      OPENPENCIL_MCP_DISCOVERY_PATH: join(dir, 'mcp.json'),
-      OPENPENCIL_MCP_ROOT: dir
-    }
-  })
-  const printed = await new Promise<{ link: string; fingerprint: string }>((resolve, reject) => {
-    let output = ''
-    child.once('exit', (code) => reject(new Error(`The companion exited (${code}): ${output}`)))
-    child.stdout?.on('data', (chunk: Buffer) => {
-      output += chunk.toString('utf8')
-      const link = /(https?:\/\/\S+#connect=\S+)/.exec(output)?.[1]
-      const fingerprint = /shows ([0-9A-F]{3}-[0-9A-F]{3})/.exec(output)?.[1]
-      if (link && fingerprint) resolve({ link, fingerprint })
-    })
-  })
-  return { child, port, ...printed }
-}
 
 test('a tab opened from the companion’s link pairs and chats with an agent on this computer', async ({
   page,

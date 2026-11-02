@@ -1,5 +1,6 @@
 import { tv, type VariantProps } from 'tailwind-variants'
 
+import agentTheme from '@/theme/chat/agent'
 import inputTheme from '@/theme/chat/input'
 import messageTheme from '@/theme/chat/message'
 import profileTheme from '@/theme/chat/profile'
@@ -8,6 +9,7 @@ import referenceTheme from '@/theme/chat/reference'
 import thinkingTheme from '@/theme/chat/thinking'
 import transcriptTheme from '@/theme/chat/transcript'
 
+export const chatAgentTheme = tv(agentTheme)
 export const chatInputTheme = tv(inputTheme)
 export const chatMessageTheme = tv(messageTheme)
 export const chatProfileTheme = tv(profileTheme)

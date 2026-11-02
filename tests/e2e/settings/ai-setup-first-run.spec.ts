@@ -1,34 +1,29 @@
 import { expect, test } from '@playwright/test'
 
-import { CanvasHelper } from '#tests/helpers/canvas'
 import { waitForDemo } from '#tests/helpers/demo'
 
-// `?test` suppresses the first-run offer, so these load the app as a person would, with none
-// of the stored preferences the other browser tests start from.
+// `?test` suppresses the first-run lookup, so these load the app as a person would, with none
+// of the stored preferences the other browser tests start from. The browser has no companion,
+// so no coding agent can be found either.
 test.use({ storageState: { cookies: [], origins: [] } })
 
-test('a fresh install offers guided AI setup once and remembers skipping it', async ({ page }) => {
+test('a fresh install opens no setup dialog, then or after a reload', async ({ page }) => {
   await page.goto('/')
-  // The offer is made while the workspace starts, so it is open once the canvas is ready.
-  await new CanvasHelper(page).waitForInit()
+  // The lookup starts with the workspace, so anything it opened shows once Home is there.
+  const home = page.getByTestId('recent-files-home')
+  await expect(home).toBeVisible()
   const setup = page.getByTestId('ai-setup-dialog')
-  await expect(setup.getByRole('heading', { name: 'Welcome to Pairdraw' })).toBeVisible()
-  await setup.getByRole('button', { name: 'Start designing' }).click()
   await expect(setup).toHaveCount(0)
 
   await page.reload()
-  await new CanvasHelper(page).waitForInit()
+  await expect(home).toBeVisible()
   await expect(setup).toHaveCount(0)
 })
 
-test('a first visit to the demo offers the welcome without pointing to the tour', async ({
-  page
-}) => {
+test('a first visit to the demo opens no setup dialog over the tour', async ({ page }) => {
   await page.goto('/demo')
   await waitForDemo(page)
-  const setup = page.getByTestId('ai-setup-dialog')
-  await expect(setup.getByRole('heading', { name: 'Welcome to Pairdraw' })).toBeVisible()
-  await expect(setup.getByTestId('ai-setup-tour')).toHaveCount(0)
+  await expect(page.getByTestId('ai-setup-dialog')).toHaveCount(0)
 })
 
 const CONFIGURED_MODEL_SETTINGS = {
@@ -76,9 +71,9 @@ test.describe('an install with a configured model', () => {
     }
   })
 
-  test('never sees the first-run offer', async ({ page }) => {
+  test('never sees a setup dialog', async ({ page }) => {
     await page.goto('/')
-    await new CanvasHelper(page).waitForInit()
+    await expect(page.getByTestId('recent-files-home')).toBeVisible()
     await expect(page.getByTestId('ai-setup-dialog')).toHaveCount(0)
   })
 })

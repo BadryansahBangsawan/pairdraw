@@ -9,7 +9,8 @@ export {
   offerUsageStatsPrompt,
   setUsageStatsConsent,
   usageStatsConsent,
-  usageStatsPrompt
+  usageStatsPrompt,
+  type UsageStatsPromptSource
 } from './consent'
 export type { UsageEventInput } from './client'
 

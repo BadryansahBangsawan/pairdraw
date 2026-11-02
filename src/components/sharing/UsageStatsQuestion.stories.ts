@@ -6,20 +6,20 @@ import {
   updateSharingPreferences,
   type UsageStatsConsent
 } from '@/app/settings/preferences/store'
-import { usageStatsPrompt } from '@/app/telemetry'
+import { usageStatsPrompt, type UsageStatsPromptSource } from '@/app/telemetry'
 
 import UsageStatsPrompt from './UsageStatsPrompt.vue'
 import UsageStatsQuestion from './UsageStatsQuestion.vue'
 
 interface Args {
   consent: UsageStatsConsent
-  source: 'welcome' | 'prompt'
+  source: UsageStatsPromptSource
 }
 
 const meta = {
   title: 'App/Settings/Sharing/Usage Stats Question',
   component: UsageStatsQuestion,
-  args: { consent: 'unset', source: 'welcome' },
+  args: { consent: 'unset', source: 'prompt' },
   render: (args) => ({
     components: { UsageStatsQuestion },
     setup() {
@@ -49,13 +49,13 @@ export const Answering: Story = {
   }
 }
 
-/** The card shown once the first-run welcome closes, and on a later launch until answered. */
+/** The card shown once the window shows what it opened, on each launch until answered. */
 export const Prompt: Story = {
   render: () => ({
     components: { UsageStatsPrompt },
     setup() {
       updateSharingPreferences({ usageStats: 'unset' })
-      usageStatsPrompt.value = 'welcome'
+      usageStatsPrompt.value = 'prompt'
       return {}
     },
     template: '<UsageStatsPrompt />'

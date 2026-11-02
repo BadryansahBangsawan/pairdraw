@@ -12,6 +12,7 @@ import * as v from 'valibot'
 
 import type { ACPAgentDef } from '@open-pencil/core/constants'
 
+import { AgentSignInRequiredError } from '@/app/ai/agents/acp/auth/required'
 import { parseAuthStatusUpdate } from '@/app/ai/agents/acp/auth/status'
 import { setAgentCommands } from '@/app/ai/agents/acp/commands'
 import { createUpdateMapper } from '@/app/ai/agents/acp/events'
@@ -113,7 +114,9 @@ function toolsUnreachableError(agentDef: ACPAgentDef, reason: string | null): Er
 
 function startupError(error: unknown, agentDef: ACPAgentDef): Error {
   recordACPTransportFailure({ operation: 'start', ...describeDiagnosticError(error) })
-  return new Error(formatConnectionError(error, agentDef))
+  const message = formatConnectionError(error, agentDef)
+  // The chat tells a signed-out agent apart, so it can show where to sign in.
+  return isAuthRequiredError(error) ? new AgentSignInRequiredError(message) : new Error(message)
 }
 
 export function buildCrashChunks(

@@ -6,20 +6,18 @@ import { computed } from 'vue'
 import { IS_TAURI, type ACPAgentDef } from '@open-pencil/core/constants'
 import { useI18n } from '@open-pencil/vue/i18n'
 
-import type { AgentConnectStep } from '@/app/ai/agents/setup/connect'
 import { codingAgentGuideURL, codingAgentSetupPrompt } from '@/app/ai/agents/setup/prompt'
 import { agentConnectView, agentSetupView, type AgentSetupState } from '@/app/ai/agents/setup/view'
 import SettingsLink from '@/components/settings/layout/SettingsLink.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
-import AppAlert from '@/components/ui/feedback/AppAlert.vue'
 import AppCopyField from '@/components/ui/input/AppCopyField.vue'
-import { NODE_DOWNLOAD_URL } from '@/constants'
 import theme from '@/theme/settings/agents'
 
 import AgentSetupCompanion from './AgentSetupCompanion.vue'
+import AgentSetupFailure from './AgentSetupFailure.vue'
 import AgentSetupStep from './AgentSetupStep.vue'
 import AgentSignInProgress from './AgentSignInProgress.vue'
-import { useSetupProblemMessage } from './problem'
+import { useConnectStepLabel } from './step'
 
 const { agent, setup } = defineProps<{ agent: ACPAgentDef; setup: AgentSetupState }>()
 const emit = defineEmits<{
@@ -29,7 +27,7 @@ const emit = defineEmits<{
 }>()
 const { ai, common } = useI18n()
 const styles = tv(theme)()
-const setupProblemMessage = useSetupProblemMessage()
+const stepLabel = useConnectStepLabel()
 const { copy, copied } = useClipboard({ copiedDuring: 1500 })
 
 const prompt = computed(() => codingAgentSetupPrompt(agent.id))
@@ -43,21 +41,12 @@ const accountDetail = computed(() => {
   if (current?.state !== 'signed-in') return ''
   return [current.label, current.detail].filter((part) => part !== null).join(' · ')
 })
-const installProblem = computed(() => setupProblemMessage(progress.value.problem))
 const connectLabel = computed(() => {
   if (progress.value.running) return ai.value.aiSetupConnecting
   if (failure.value) return ai.value.retryRequest
   if (progress.value.connected) return ai.value.aiSetupAgentCheckAgain
   return ai.value.aiSetupConnect({ agent: agent.name })
 })
-
-function stepLabel(step: AgentConnectStep): string {
-  if (step === 'detect') return ai.value.aiSetupConnectStepDetect
-  if (step === 'install') return ai.value.aiSetupConnectStepInstall({ agent: agent.name })
-  if (step === 'sign-in') return ai.value.aiSetupConnectStepSignIn({ agent: agent.name })
-  if (step === 'tools') return ai.value.aiSetupConnectStepTools
-  return ai.value.aiSetupConnectStepActivate
-}
 </script>
 
 <template>
@@ -70,7 +59,7 @@ function stepLabel(step: AgentConnectStep): string {
   <template v-if="setup.supported">
     <ol :class="styles.list()" :aria-label="ai.aiSetupConnect({ agent: agent.name })">
       <AgentSetupStep v-for="{ step, status } in progress.steps" :key="step" :status="status">
-        {{ stepLabel(step) }}
+        {{ stepLabel(step, agent) }}
         <span v-if="step === 'sign-in' && accountDetail" :class="styles.detail()">
           · {{ accountDetail }}
         </span>
@@ -98,80 +87,7 @@ function stepLabel(step: AgentConnectStep): string {
       />
     </template>
 
-    <template v-if="failure">
-      <AppAlert v-if="installProblem" tone="warning" :heading="installProblem">
-        <template v-if="progress.problem === 'needs-npm'" #actions>
-          <SettingsLink :href="NODE_DOWNLOAD_URL">Node.js</SettingsLink>
-        </template>
-      </AppAlert>
-      <AppAlert
-        v-else-if="failure.problem === 'cli-missing'"
-        tone="warning"
-        :heading="ai.aiSetupConnectCLIMissing({ agent: agent.name })"
-      >
-        <template v-if="agent.setupURL" #actions>
-          <SettingsLink :href="agent.setupURL">
-            {{ ai.aiSetupAgentGetCLI({ agent: agent.name }) }}
-          </SettingsLink>
-        </template>
-      </AppAlert>
-      <AppAlert
-        v-else-if="failure.problem === 'adapter-mismatch'"
-        tone="warning"
-        :heading="
-          ai.aiSetupAgentAdapterMismatch({
-            path: setup.detected?.adapterPath ?? agent.command
-          })
-        "
-      />
-      <AppAlert
-        v-else-if="failure.problem === 'check'"
-        tone="warning"
-        :heading="ai.aiSetupConnectCheckFailed({ agent: agent.name })"
-      />
-      <AppAlert
-        v-else-if="failure.problem === 'sign-in'"
-        tone="warning"
-        :heading="ai.aiSetupAgentSignInFailed({ agent: agent.name })"
-      />
-      <AppAlert
-        v-else-if="failure.problem === 'signed-out'"
-        tone="warning"
-        :heading="ai.aiSetupConnectSignedOut({ agent: agent.name })"
-      />
-      <AppAlert
-        v-else-if="failure.problem === 'tools'"
-        tone="warning"
-        :heading="ai.aiSetupAgentToolsFailed({ agent: agent.name })"
-        :description="account?.tools?.reason ?? ai.aiSetupAgentToolsHint"
-      />
-      <AppAlert
-        v-else-if="failure.problem === 'activate'"
-        tone="warning"
-        :heading="ai.aiSetupConnectActivateFailed({ agent: agent.name })"
-      />
-
-      <template v-if="failure.step === 'install' || failure.problem === 'adapter-mismatch'">
-        <template v-if="view.manualAgentCommand">
-          <p :class="styles.help()">
-            {{ view.adapterMismatch ? ai.aiSetupAgentInstallSupported : ai.aiSetupAgentInstall }}
-          </p>
-          <AppCopyField
-            :value="view.manualAgentCommand"
-            :copy-label="common.copy"
-            :copied-label="common.copied"
-          />
-        </template>
-        <template v-if="view.manualBridgeCommand">
-          <p :class="styles.help()">{{ ai.aiSetupAgentMCPInstall }}</p>
-          <AppCopyField
-            :value="view.manualBridgeCommand"
-            :copy-label="common.copy"
-            :copied-label="common.copied"
-          />
-        </template>
-      </template>
-    </template>
+    <AgentSetupFailure :agent="agent" :setup="setup" />
 
     <div :class="styles.actions()">
       <AppButton

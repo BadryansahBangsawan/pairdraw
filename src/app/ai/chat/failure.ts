@@ -1,5 +1,7 @@
 import { APICallError, StreamProviderError } from 'ai'
 
+import { AgentSignInRequiredError } from '@/app/ai/agents/acp/auth/required'
+
 export type AIChatFailureReason =
   | 'authentication'
   | 'forbidden'
@@ -86,6 +88,8 @@ function statusFailureReason(status: number | null): AIChatFailureReason | null 
 }
 
 function failureReason(error: unknown): AIChatFailureReason {
+  // A coding agent has no key: what it refuses is its own sign-in.
+  if (error instanceof AgentSignInRequiredError) return 'sign-in-expired'
   const statusReason = statusFailureReason(providerErrorStatus(error))
   if (statusReason) return statusReason
   if (isInsufficientCreditError(error)) return 'insufficient-credit'

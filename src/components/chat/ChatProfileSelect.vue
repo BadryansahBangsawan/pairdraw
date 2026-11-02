@@ -9,14 +9,20 @@ import {
   SelectLabel,
   SelectPortal,
   SelectRoot,
+  SelectSeparator,
   SelectTrigger,
-  SelectViewport
+  SelectViewport,
+  type AcceptableValue,
+  type SelectItemSelectEvent
 } from 'reka-ui'
 import { computed, ref } from 'vue'
 
-import { AI_PROVIDERS } from '@open-pencil/core/constants'
+import { AI_PROVIDERS, type ACPAgentDef } from '@open-pencil/core/constants'
 import { useI18n } from '@open-pencil/vue/i18n'
 
+import { connectsWithoutClick } from '@/app/ai/agents/auto/pick'
+import { agentAutoConnect } from '@/app/ai/agents/auto/session'
+import { isConfigured } from '@/app/ai/chat/storage'
 import {
   aiModelSettings,
   designModelProfiles,
@@ -26,6 +32,7 @@ import {
 import type { AIModelProfile, AIModelProfileId } from '@/app/ai/models'
 import { modelProviderName } from '@/app/ai/models/provider-name'
 import { openSettingsDialog } from '@/app/settings/dialog'
+import { toast } from '@/app/shell/ui'
 import ChatProfileItem from '@/components/chat/ChatProfileItem.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import { useSelectUI } from '@/components/ui/select/select'
@@ -61,6 +68,40 @@ function manageModels(): void {
   open.value = false
   openSettingsDialog('ai')
 }
+
+/**
+ * Coding agents found on this computer that need nothing more and have no model yet; choosing
+ * one switches the chat to it, as auto-connect would have.
+ */
+const computerAgents = computed(() =>
+  agentAutoConnect.state.candidates
+    .filter(connectsWithoutClick)
+    .map((candidate) => candidate.agent)
+    .filter(
+      (agent) =>
+        !profiles.value.some(
+          (profile) => modelConnection(profile.connectionId)?.providerID === `acp:${agent.id}`
+        )
+    )
+)
+
+async function chooseAgent(event: SelectItemSelectEvent<AcceptableValue>, agent: ACPAgentDef) {
+  // The agent has no profile to select yet; switching to it makes one.
+  event.preventDefault()
+  open.value = false
+  const result = await agentAutoConnect.switchTo(agent.id)
+  // Without a model, the chat column shows what stopped it; otherwise say so here.
+  if (result === 'failed' && isConfigured.value) {
+    toast.error(ai.value.aiSetupConnectActivateFailed({ agent: agent.name }))
+  }
+}
+
+defineExpose({
+  /** Opens the list, such as from the notice naming the agent the chat switched to. */
+  show: () => {
+    open.value = true
+  }
+})
 </script>
 
 <template>
@@ -105,6 +146,33 @@ function manageModels(): void {
               </SelectItemText>
             </SelectItem>
           </SelectGroup>
+          <template v-if="computerAgents.length">
+            <SelectSeparator :class="selectCls.separator" />
+            <SelectGroup>
+              <div :class="ui.header()">
+                <SelectLabel :class="ui.headerLabel()">{{
+                  ai.chatAgentOnThisComputer
+                }}</SelectLabel>
+              </div>
+              <SelectItem
+                v-for="agent in computerAgents"
+                :key="agent.id"
+                :value="`agent:${agent.id}`"
+                :text-value="agent.name"
+                :class="selectCls.item"
+                @select="void chooseAgent($event, agent)"
+              >
+                <span :class="ui.indicator()" />
+                <SelectItemText as-child>
+                  <span :class="ui.text()">
+                    <span :class="ui.name()">{{ agent.name }}</span>
+                    <span :class="ui.metadata()">{{ ai.aiSetupAgentModel }}</span>
+                  </span>
+                </SelectItemText>
+                <span :class="ui.capability()" />
+              </SelectItem>
+            </SelectGroup>
+          </template>
           <AppButton class="w-full justify-start" @click="manageModels">
             <template #leading><icon-lucide-settings :class="ui.footerIcon()" /></template>
             {{ ai.manageModelsAndRoles }}

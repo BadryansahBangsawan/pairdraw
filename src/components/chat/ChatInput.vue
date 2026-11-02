@@ -66,8 +66,11 @@ const {
 
 const composer = useTemplateRef<{
   restoreDraft: (text: string) => boolean
+  prependDraft: (text: string) => void
   insert: (text: string) => void
+  focus: () => void
 }>('composer')
+const profileSelect = useTemplateRef<{ show: () => void }>('profileSelect')
 
 const completions = useComposerCompletions()
 
@@ -83,6 +86,17 @@ function takeBack(): string | null {
 function restoreDraft(submission: ChatSubmission): void {
   if (composer.value?.restoreDraft(submission.displayText)) restoreSubmission(submission)
   else for (const image of submission.images) revokeImagePreviewURL(image.previewURL)
+}
+
+/**
+ * Puts back a prompt that waited for setup, with its images, ahead of anything written since:
+ * the person may have kept typing while setup ran, and both stay. Returns whether it did.
+ */
+function restoreWaiting(submission: ChatSubmission): boolean {
+  if (!composer.value) return false
+  composer.value.prependDraft(submission.displayText)
+  restoreSubmission(submission)
+  return true
 }
 
 /** A reply is on its way, so the credit balance waits to update until it ends. */
@@ -105,7 +119,14 @@ function dropFiles(files: File[]): void {
   void addFiles(files)
 }
 
-defineExpose({ restoreDraft, dropFiles })
+defineExpose({
+  restoreDraft,
+  restoreWaiting,
+  dropFiles,
+  focus: () => composer.value?.focus(),
+  /** Opens the model picker, such as to change the agent the chat switched to. */
+  openModels: () => profileSelect.value?.show()
+})
 
 const isAgentProvider = computed(
   () => providerID.value.startsWith('acp:') || providerID.value === 'harness:pi'
@@ -200,18 +221,15 @@ const selectedProfileName = computed(
     </template>
     <template #model>
       <div class="@container flex min-w-0 items-center">
-        <template v-if="isAgentProvider">
-          <div :class="ui.agent()">
-            <icon-lucide-bot :class="ui.agentIcon()" />
-            <span :class="ui.agentName()">{{ agentName }}</span>
-          </div>
-        </template>
-        <template v-else>
-          <ChatProfileSelect>
-            <template #value>
-              <span class="min-w-0 truncate">{{ selectedProfileName }}</span>
-            </template>
-          </ChatProfileSelect>
+        <!-- An agent picks its own model and thinking, so only the profile can change. -->
+        <ChatProfileSelect ref="profileSelect">
+          <template #value>
+            <span class="min-w-0 truncate">
+              {{ isAgentProvider ? agentName : selectedProfileName }}
+            </span>
+          </template>
+        </ChatProfileSelect>
+        <template v-if="!isAgentProvider">
           <ChatThinkingSelect />
           <ChatCreditBalance :replying="replying" />
         </template>

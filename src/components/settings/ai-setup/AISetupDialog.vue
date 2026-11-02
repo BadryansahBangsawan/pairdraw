@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import {
-  aiSetupDialogOpen,
-  aiSetupEntry,
-  aiSetupOffersTour,
-  closeAISetup
-} from '@/app/ai/models/settings/onboarding/dialog'
-import { openTour } from '@/app/demo/document'
+import { aiSetupDialogOpen, closeAISetup } from '@/app/ai/models/settings/onboarding/dialog'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { AppDialogRoot } from '@/components/ui/dialog'
 
@@ -19,14 +13,6 @@ function openAdvancedSettings(): void {
   closeAISetup()
   openSettingsDialog('ai')
 }
-
-/** The tour opens in a tab of its own; AI stays one click away in Settings. */
-function takeTour(): void {
-  closeAISetup()
-  openTour().catch((error: unknown) => {
-    console.error('[Tour] Could not open the tour:', error)
-  })
-}
 </script>
 
 <template>
@@ -36,12 +22,6 @@ function takeTour(): void {
     data-test-id="ai-setup-dialog"
     @update:open="onOpenChange"
   >
-    <AISetupFlow
-      :entry="aiSetupEntry"
-      :offers-tour="aiSetupOffersTour"
-      @close="closeAISetup"
-      @advanced="openAdvancedSettings"
-      @tour="takeTour"
-    />
+    <AISetupFlow @close="closeAISetup" @advanced="openAdvancedSettings" />
   </AppDialogRoot>
 </template>

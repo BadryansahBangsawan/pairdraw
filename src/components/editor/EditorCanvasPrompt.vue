@@ -22,7 +22,10 @@ const offered = computed(() => offersCanvasPrompt(store))
 const prompt = ref('')
 const starting = ref(false)
 
-/** Sends the prompt into this document's chat; without a model, AI setup comes first. */
+/**
+ * Sends the prompt into this document's chat. Without a model, the chat looks for a coding agent
+ * on this computer first, and guided setup opens only when it finds none.
+ */
 async function start(text: string): Promise<void> {
   if (starting.value) return
   starting.value = true

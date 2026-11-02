@@ -8,6 +8,7 @@ import { useDocumentWorkspace } from '@open-pencil/vue/document/workspace'
 import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
 import { useI18n } from '@open-pencil/vue/i18n'
 
+import { agentAutoConnect } from '@/app/ai/agents/auto/session'
 import { sendPromptToDocument } from '@/app/ai/chat/pending-prompt'
 import { ensureChatConfigured } from '@/app/ai/chat/setup'
 import { CLOUD_INCLUDED, CLOUD_STORAGE_PROVIDER_ID } from '@/app/cloud/integration'
@@ -47,7 +48,7 @@ import AppSkeleton from '@/components/ui/feedback/AppSkeleton.vue'
 import { skeleton } from '@/components/ui/feedback/skeleton'
 import documentsTheme from '@/theme/home/documents'
 
-const { locale, storage, files, common, settings, credentials } = useI18n()
+const { ai, locale, storage, files, common, settings, credentials } = useI18n()
 const view = useLocalStorage<'grid' | 'list'>('open-pencil:home-files-view', 'grid')
 const query = ref('')
 const openError = ref<string | null>(null)
@@ -65,9 +66,17 @@ function newDocument(kind: DocumentKind): Tab {
 
 const prompt = ref('')
 const startingFromPrompt = ref(false)
+/** Says why the prompt has not gone yet while it looks for a coding agent on this computer. */
+const promptStatus = computed(() =>
+  startingFromPrompt.value && agentAutoConnect.state.phase === 'detecting'
+    ? ai.value.chatAgentDetecting
+    : null
+)
 /**
  * Starts a new design from the prompt, whose chat sends it once open. Without a model to send it
- * to, AI setup comes first; dismissing setup keeps the prompt here and creates nothing.
+ * to, the chat looks for a coding agent on this computer first: one that needs a sign-in or an
+ * install waits in the new design's chat column with the prompt. Without one, guided setup opens;
+ * dismissing it keeps the prompt here and creates nothing.
  */
 async function startFromPrompt(text: string): Promise<void> {
   if (startingFromPrompt.value) return
@@ -245,7 +254,12 @@ function formattedDate(updatedAt: string): string {
         @new-workspace="places.newWorkspace"
       />
     </template>
-    <HomePromptComposer v-model="prompt" :busy="startingFromPrompt" @submit="startFromPrompt" />
+    <HomePromptComposer
+      v-model="prompt"
+      :busy="startingFromPrompt"
+      :status="promptStatus"
+      @submit="startFromPrompt"
+    />
     <HomeSearchActions
       v-model="query"
       :destination="newDesignTarget?.label ?? null"

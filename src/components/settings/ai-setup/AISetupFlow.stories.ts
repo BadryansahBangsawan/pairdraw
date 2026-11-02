@@ -12,8 +12,6 @@ import { AppDialogRoot } from '@/components/ui/dialog'
 import AISetupFlow from './AISetupFlow.vue'
 
 interface Args {
-  entry: 'welcome' | 'guided'
-  offersTour?: boolean
   agentsAvailable: boolean
 }
 
@@ -45,7 +43,7 @@ const freshInstall: AIModelSettings = {
 
 const meta = {
   title: 'App/Settings/AI Setup/Guided Setup',
-  args: { entry: 'guided', agentsAvailable: false },
+  args: { agentsAvailable: false },
   parameters: {
     docs: {
       description: {
@@ -79,10 +77,6 @@ async function next() {
   await userEvent.click(page().getByRole('button', { name: 'Continue' }))
 }
 
-export const Welcome: Story = { args: { entry: 'welcome' } }
-
-/** Offered over the demo, which is the tour, so it does not point to it. */
-export const WelcomeInTour: Story = { args: { entry: 'welcome', offersTour: false } }
 export const Goals: Story = {}
 export const AccessInBrowser: Story = {
   play: async () => {

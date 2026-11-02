@@ -18,10 +18,6 @@ export default {
     image:
       'flex max-w-full min-w-0 items-center gap-2 rounded-lg border border-border bg-panel-field p-1.5',
     imageThumb: 'size-10 shrink-0 rounded-md border border-border object-cover',
-    imageName: 'min-w-0 flex-1 truncate text-[10px] text-surface',
-    /** An agent's name where other providers show the model and thinking pickers. */
-    agent: 'flex min-w-0 items-center gap-1 px-1.5 text-[10px] text-muted',
-    agentIcon: 'size-3 shrink-0',
-    agentName: 'truncate'
+    imageName: 'min-w-0 flex-1 truncate text-[10px] text-surface'
   }
 } as const

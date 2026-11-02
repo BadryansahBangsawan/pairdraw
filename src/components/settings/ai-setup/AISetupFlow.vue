@@ -6,7 +6,6 @@ import { IS_TAURI } from '@open-pencil/core/constants'
 import { useI18n } from '@open-pencil/vue/i18n'
 
 import { agentHostAvailable } from '@/app/ai/agents/host/current'
-import type { AISetupEntry } from '@/app/ai/models/settings/onboarding/dialog'
 import type { OnboardingAccess } from '@/app/ai/models/settings/onboarding/plan'
 import { AI_SETUP_STEPS, useAIOnboarding } from '@/app/ai/models/settings/onboarding/use'
 import SettingsSaveFeedback from '@/components/settings/layout/SettingsSaveFeedback.vue'
@@ -23,20 +22,13 @@ import AISetupReview from './AISetupReview.vue'
 import AISetupRoles from './AISetupRoles.vue'
 import AISetupSkills from './AISetupSkills.vue'
 
-const {
-  entry,
-  offersTour = true,
-  agentsAvailable = agentHostAvailable(),
-  desktop = IS_TAURI
-} = defineProps<{
-  entry: AISetupEntry
-  offersTour?: boolean
+const { agentsAvailable = agentHostAvailable(), desktop = IS_TAURI } = defineProps<{
   /** Coding agents run here: in the desktop app, or through a paired companion. */
   agentsAvailable?: boolean
   /** Pi and subscription sign-ins need the desktop app itself. */
   desktop?: boolean
 }>()
-const emit = defineEmits<{ close: []; advanced: []; tour: [] }>()
+const emit = defineEmits<{ close: []; advanced: [] }>()
 const { ai, common } = useI18n()
 const styles = tv(theme)()
 
@@ -55,7 +47,7 @@ const {
   detections
 } = onboarding
 const { isRecommended } = roles
-const phase = ref<'welcome' | 'wizard' | 'saved'>(entry === 'welcome' ? 'welcome' : 'wizard')
+const phase = ref<'wizard' | 'saved'>('wizard')
 
 const goals = computed(() => [
   {
@@ -70,12 +62,6 @@ const goals = computed(() => [
   }
 ])
 const header = computed(() => {
-  if (phase.value === 'welcome') {
-    return {
-      heading: ai.value.aiSetupWelcomeTitle,
-      description: ai.value.aiSetupWelcomeDescription
-    }
-  }
   if (phase.value === 'saved') {
     return { heading: ai.value.aiSetupSavedTitle, description: ai.value.aiSetupSavedDescription }
   }
@@ -100,9 +86,7 @@ function signIn(providerID: OnboardingAccess): void {
 }
 
 function back(): void {
-  if (onboarding.back()) return
-  if (entry === 'welcome') phase.value = 'welcome'
-  else emit('close')
+  if (!onboarding.back()) emit('close')
 }
 
 const skills = useTemplateRef<{ apply: () => void }>('skills')
@@ -129,31 +113,7 @@ async function finish(): Promise<void> {
 
   <AppDialogBody>
     <div :class="styles.body()" :data-ai-setup-step="phase === 'wizard' ? step : phase">
-      <template v-if="phase === 'welcome'">
-        <section :class="styles.intro()">
-          <span :class="styles.introIcon()" aria-hidden="true">
-            <icon-lucide-sparkles class="size-4" />
-          </span>
-          <div :class="styles.introBody()">
-            <h3 :class="styles.introHeading()">{{ ai.aiSetupWelcomeAITitle }}</h3>
-            <p :class="styles.introText()">{{ ai.aiSetupWelcomeAIDescription }}</p>
-          </div>
-        </section>
-        <section v-if="offersTour" :class="styles.tour()" data-test-id="ai-setup-tour">
-          <span :class="styles.introIcon()" aria-hidden="true">
-            <icon-lucide-compass class="size-4" />
-          </span>
-          <div :class="styles.introBody()">
-            <h3 :class="styles.introHeading()">{{ ai.aiSetupWelcomeTourTitle }}</h3>
-            <p :class="styles.introText()">{{ ai.aiSetupWelcomeTourDescription }}</p>
-          </div>
-          <AppButton variant="outline" :class="styles.tourAction()" @click="emit('tour')">
-            {{ ai.aiSetupTakeTour }}
-          </AppButton>
-        </section>
-      </template>
-
-      <template v-else-if="phase === 'saved'">
+      <template v-if="phase === 'saved'">
         <AISetupReview :plan="plan" />
       </template>
 
@@ -255,13 +215,7 @@ async function finish(): Promise<void> {
   </AppDialogBody>
 
   <AppDialogFooter :ui="{ footer: 'justify-between' }">
-    <template v-if="phase === 'welcome'">
-      <AppButton variant="outline" @click="emit('close')">{{ ai.aiSetupSkip }}</AppButton>
-      <AppButton color="primary" variant="solid" @click="phase = 'wizard'">
-        {{ ai.aiSetupStart }}
-      </AppButton>
-    </template>
-    <template v-else-if="phase === 'saved'">
+    <template v-if="phase === 'saved'">
       <AppButton class="ml-auto" color="primary" variant="solid" @click="emit('close')">
         {{ common.done }}
       </AppButton>

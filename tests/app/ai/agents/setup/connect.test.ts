@@ -2,14 +2,10 @@ import { describe, expect, mock, test } from 'bun:test'
 
 import { ACP_AGENTS, type ACPAgentDef } from '@open-pencil/core/constants'
 
-import type { AgentAuthStatus } from '@/app/ai/agents/acp/auth/status'
-import type { OwnToolsOutcome } from '@/app/ai/agents/acp/tools'
 import type { AgentHost } from '@/app/ai/agents/host/types'
-import { createAgentAccounts } from '@/app/ai/agents/setup/accounts'
 import { createAgentConnector } from '@/app/ai/agents/setup/connect'
-import { createHostedAgentDiscovery } from '@/app/ai/agents/setup/discovery'
-import { APP_VERSION } from '@/app/runtime/version'
 
+import { fakeAgentHost, hostedAgentSetup, MCP } from '#tests/helpers/agents/fake-host'
 import { expectDefined } from '#tests/helpers/assert'
 
 const claude = expectDefined(
@@ -21,93 +17,13 @@ const gemini = expectDefined(
   'Gemini CLI'
 )
 
-const MCP = 'openpencil-mcp-http'
-const SIGNED_OUT: AgentAuthStatus = { kind: 'none', label: 'Not logged in' }
-const SIGNED_IN: AgentAuthStatus = { kind: 'account', label: 'Claude Max' }
-
-interface Computer {
-  executables: string[]
-  /** npm's global folder is writable without administrator rights. */
-  npmWritable?: boolean
-  signedIn?: boolean
-  toolsReachable?: boolean
-  /** The sign-in ends without a login, as when the person closes the browser. */
-  signInEndsSignedOut?: boolean
-}
-
-function toolsOutcome(reachable: boolean): OwnToolsOutcome {
-  return reachable
-    ? { connected: true }
-    : { connected: false, reason: 'The MCP server is not running.' }
-}
-
-/** A host whose computer changes as setup installs and signs in, recording what it was asked. */
-function fakeHost(initial: Computer) {
-  const computer = {
-    npmWritable: true,
-    signedIn: false,
-    toolsReachable: true,
-    signInEndsSignedOut: false,
-    ...initial,
-    executables: new Set(initial.executables)
-  }
-  const calls: string[] = []
-  const host: AgentHost = {
-    async detect() {
-      calls.push('detect')
-      const executables = [...computer.executables]
-      const versions: Record<string, string> = computer.executables.has(MCP)
-        ? { '@open-pencil/mcp': APP_VERSION }
-        : {}
-      return {
-        searchPath: '/test/bin',
-        executables: Object.fromEntries(executables.map((name) => [name, `/test/bin/${name}`])),
-        versions,
-        npmGlobalWritable: computer.executables.has('npm') ? computer.npmWritable : null
-      }
-    },
-    async install(target) {
-      const name = target.kind === 'adapter' ? target.agent.command : MCP
-      calls.push(`install ${name}`)
-      computer.executables.add(name)
-    },
-    async signIn(_agent, { methodId }) {
-      calls.push(`sign-in ${methodId}`)
-      computer.signedIn = !computer.signInEndsSignedOut
-      return { done: Promise.resolve(null), cancel: async () => undefined }
-    },
-    async check(agent) {
-      calls.push('check')
-      const status = computer.signedIn ? SIGNED_IN : SIGNED_OUT
-      return {
-        status,
-        methods: [{ id: 'claude-ai-login', name: 'Claude Subscription', type: 'terminal' }],
-        adapter: agent.adapterPackage ? { name: agent.adapterPackage, version: '1.0.0' } : null,
-        tools: computer.signedIn ? toolsOutcome(computer.toolsReachable) : null
-      }
-    },
-    async spawn() {
-      throw new Error('Connecting does not start a chat.')
-    },
-    async workspace() {
-      return '/test/workspace'
-    }
-  }
-  return { host, computer, calls }
-}
-
 function connectorFor(host: AgentHost, activate?: (agent: ACPAgentDef) => Promise<void>) {
-  const discovery = createHostedAgentDiscovery(host, {
-    enabled: true,
-    restartBridge: async () => undefined
-  })
-  const accounts = createAgentAccounts({ enabled: true, host })
-  return createAgentConnector({ discovery, accounts, activate })
+  return createAgentConnector({ ...hostedAgentSetup(host), activate })
 }
 
 describe('connecting a coding agent', () => {
   test('finds, installs, signs in, checks the tools, and activates the agent in order', async () => {
-    const { host, calls } = fakeHost({ executables: ['npm', 'claude'] })
+    const { host, calls } = fakeAgentHost({ executables: ['npm', 'claude'] })
     const activated: string[] = []
     const connector = connectorFor(host, async (agent) => {
       calls.push('activate')
@@ -136,7 +52,7 @@ describe('connecting a coding agent', () => {
   })
 
   test('skips the steps a ready agent has already done', async () => {
-    const { host, calls } = fakeHost({
+    const { host, calls } = fakeAgentHost({
       executables: ['npm', 'claude-agent-acp', MCP],
       signedIn: true
     })
@@ -156,7 +72,7 @@ describe('connecting a coding agent', () => {
   })
 
   test('stops at the step that fails and leaves the later ones untouched', async () => {
-    const { host, calls } = fakeHost({ executables: ['npm', 'claude'], npmWritable: false })
+    const { host, calls } = fakeAgentHost({ executables: ['npm', 'claude'], npmWritable: false })
     const activate = mock(async () => undefined)
     const connector = connectorFor(host, activate)
 
@@ -179,7 +95,7 @@ describe('connecting a coding agent', () => {
   })
 
   test('resumes from the failed step after the person fixes it', async () => {
-    const { host, computer, calls } = fakeHost({
+    const { host, computer, calls } = fakeAgentHost({
       executables: ['npm', 'claude-agent-acp', MCP],
       signedIn: true,
       toolsReachable: false
@@ -202,7 +118,7 @@ describe('connecting a coding agent', () => {
   })
 
   test('resuming an install looks again for what the person installed by hand', async () => {
-    const { host, computer, calls } = fakeHost({ executables: ['npm'], npmWritable: false })
+    const { host, computer, calls } = fakeAgentHost({ executables: ['npm'], npmWritable: false })
     const connector = connectorFor(host)
     await connector.connect(claude)
     expect(connector.state('claude-code').failure?.problem).toBe('npm-admin')
@@ -216,7 +132,7 @@ describe('connecting a coding agent', () => {
   })
 
   test('reports a sign-in that ended without a login', async () => {
-    const { host } = fakeHost({
+    const { host } = fakeAgentHost({
       executables: ['npm', 'claude-agent-acp', MCP],
       signInEndsSignedOut: true
     })
@@ -230,7 +146,7 @@ describe('connecting a coding agent', () => {
   })
 
   test('stops at activation when the chat cannot switch, and retries only that', async () => {
-    const { host, calls } = fakeHost({
+    const { host, calls } = fakeAgentHost({
       executables: ['npm', 'claude-agent-acp', MCP],
       signedIn: true
     })
@@ -252,7 +168,7 @@ describe('connecting a coding agent', () => {
   })
 
   test('asks for the vendor CLI an agent without an adapter needs', async () => {
-    const { host, computer, calls } = fakeHost({ executables: ['npm', MCP] })
+    const { host, computer, calls } = fakeAgentHost({ executables: ['npm', MCP] })
     const connector = connectorFor(host)
 
     expect(await connector.connect(gemini)).toBe('failed')
@@ -272,8 +188,66 @@ describe('connecting a coding agent', () => {
     })
   })
 
+  test('waits for the person before installing, then installs when connected again', async () => {
+    const { host, calls } = fakeAgentHost({ executables: ['npm', 'claude'], signedIn: true })
+    const connector = connectorFor(host)
+
+    expect(await connector.connect(claude, { installs: false })).toBe('failed')
+    expect(connector.state('claude-code')).toMatchObject({
+      failure: { step: 'install', problem: 'install-needed' },
+      steps: { detect: 'done', install: 'failed', 'sign-in': 'pending' }
+    })
+    expect(calls).toEqual(['detect'])
+
+    calls.length = 0
+    expect(await connector.connect(claude)).toBe('connected')
+    expect(calls).toEqual([
+      'detect',
+      'install claude-agent-acp',
+      'detect',
+      'install openpencil-mcp-http',
+      'detect',
+      'check'
+    ])
+  })
+
+  test('uses the lookup it already has when asked not to look again', async () => {
+    const { host, calls } = fakeAgentHost({
+      executables: ['npm', 'claude-agent-acp', MCP],
+      signedIn: true
+    })
+    const setup = hostedAgentSetup(host)
+    await setup.discovery.refresh()
+    await setup.accounts.check(claude)
+    calls.length = 0
+
+    const connector = createAgentConnector(setup)
+    expect(await connector.connect(claude, { installs: false, rescan: false })).toBe('connected')
+    expect(calls).toEqual([])
+  })
+
+  test('is not stopped by another install that failed earlier', async () => {
+    const { host } = fakeAgentHost({
+      executables: ['npm', 'claude-agent-acp', 'codex', MCP],
+      signedIn: true,
+      npmWritable: false
+    })
+    const setup = hostedAgentSetup(host)
+    await setup.discovery.refresh()
+    // Installing Codex's adapter elsewhere needed administrator rights.
+    await setup.discovery.install('codex')
+    expect(setup.discovery.error.value).toBe('npm-admin')
+
+    const connector = createAgentConnector(setup)
+    expect(await connector.connect(claude, { installs: false, rescan: false })).toBe('connected')
+    expect(connector.state('claude-code').failure).toBeNull()
+  })
+
   test('runs one attempt at a time', async () => {
-    const { host } = fakeHost({ executables: ['npm', 'claude-agent-acp', MCP], signedIn: true })
+    const { host } = fakeAgentHost({
+      executables: ['npm', 'claude-agent-acp', MCP],
+      signedIn: true
+    })
     const connector = connectorFor(host)
 
     const first = connector.connect(claude)

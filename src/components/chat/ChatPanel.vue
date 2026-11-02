@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { Chat } from '@ai-sdk/vue'
 import type { UIMessage } from 'ai'
-import { computed, shallowRef, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, shallowRef, useTemplateRef, watch } from 'vue'
 
 import { useI18n } from '@open-pencil/vue/i18n'
 
+import { agentAutoConnect } from '@/app/ai/agents/auto/session'
 import { isAttachableImageFile, revokeImagePreviewURL } from '@/app/ai/attachment/image/prepare'
 import { chatDocumentId } from '@/app/ai/chat/history/document'
-import { hasPendingPrompt, takePendingPrompt } from '@/app/ai/chat/pending-prompt'
+import { hasPendingPrompt, setPendingPrompt, takePendingPrompt } from '@/app/ai/chat/pending-prompt'
 import {
   clearQueuedMessages,
   enqueueMessage,
@@ -16,6 +17,7 @@ import {
   takeNextMessage
 } from '@/app/ai/chat/queue'
 import { useChatRunLocation } from '@/app/ai/chat/run-location'
+import { ensureChatConfigured, joinWaitingPrompt } from '@/app/ai/chat/setup'
 import type { ChatSubmission } from '@/app/ai/chat/submission/types'
 import { useChatSubmission } from '@/app/ai/chat/submission/use'
 import { saveChatTrace } from '@/app/ai/chat/trace/export'
@@ -28,11 +30,13 @@ import { useDateFormat } from '@/app/i18n/date'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { openExternalLink, toast } from '@/app/shell/ui'
 import { activeTab } from '@/app/tabs'
+import ChatAgentNotice from '@/components/chat/agent/ChatAgentNotice.vue'
+import ChatAgentSetup from '@/components/chat/agent/ChatAgentSetup.vue'
+import { useChatAgentSetup } from '@/components/chat/agent/useChatAgentSetup'
 import ChatFollowAgentsToggle from '@/components/chat/ChatFollowAgentsToggle.vue'
 import ChatHistory from '@/components/chat/ChatHistory.vue'
 import ChatInput from '@/components/chat/ChatInput.vue'
 import ChatPermissionDialog from '@/components/chat/ChatPermissionDialog.vue'
-import ChatProviderSetup from '@/components/chat/ChatProviderSetup.vue'
 import ChatRunLocation from '@/components/chat/ChatRunLocation.vue'
 import ChatTranscript from '@/components/chat/ChatTranscript.vue'
 import { useImageDrop } from '@/components/ui/drop/useImageDrop'
@@ -70,7 +74,10 @@ const submission = useChatSubmission({
 
 const chatInput = useTemplateRef<{
   restoreDraft: (submission: ChatSubmission) => void
+  restoreWaiting: (submission: ChatSubmission) => boolean
   dropFiles: (files: File[]) => void
+  openModels: () => void
+  focus: () => void
 }>('chatInput')
 const panel = useTemplateRef<HTMLElement>('panel')
 // Images dropped anywhere on the chat go to the composer, when there is one to take them.
@@ -91,10 +98,42 @@ async function submitMessage(message: ChatSubmission) {
 /** Set once the history holds the active document's conversation, which a waiting prompt joins. */
 let historyReady = false
 const activeStore = useActiveEditorStoreRef()
-/** Sends the prompt written for this document on Home or its empty canvas, once it can go. */
+const agentSetup = useChatAgentSetup(activeStore)
+/** The coding agent the chat switched to on its own, while it is still the chat's model. */
+const autoAgent = computed(() => {
+  const agent = agentAutoConnect.state.notice
+  return agent && providerID.value === `acp:${agent.id}` ? agent : null
+})
+/**
+ * The coding agent auto-connect set the chat up with, on its own or on a click, while it is still
+ * the chat's model.
+ */
+const connectedAgent = computed(() => {
+  const { phase, candidate } = agentAutoConnect.state
+  if (phase !== 'connected' || !candidate) return null
+  return providerID.value === `acp:${candidate.agent.id}` ? candidate.agent : null
+})
+/**
+ * That agent, when it refused the last message because nobody is signed in to it. An agent that
+ * does not report its login is switched on without a click, so this is where its sign-in shows:
+ * in the chat column, with the command that signs in, instead of a notice that leads elsewhere.
+ */
+const signedOutAgent = computed(() => {
+  const reason = chatFailure.value?.reason
+  return reason === 'sign-in-expired' || reason === 'authentication' ? connectedAgent.value : null
+})
+/** The command that signs in to an agent from a terminal: its own CLI, not its adapter. */
+const signedOutCommand = computed(() => {
+  const agent = signedOutAgent.value
+  return agent ? (agent.cliCommand ?? agent.command) : null
+})
+/**
+ * Sends the prompt written for this document on Home, its empty canvas, or this chat before AI
+ * was set up, once it can go.
+ */
 function sendPendingPrompt() {
   const store = activeStore.value
-  if (!historyReady || !store || store.state.preparation) return
+  if (!historyReady || !store || store.state.preparation || !isConfigured.value) return
   const prompt = takePendingPrompt(store)
   if (prompt) void submitMessage(prompt)
 }
@@ -104,6 +143,30 @@ watch(
     if (waiting) sendPendingPrompt()
   }
 )
+// A prompt waiting for setup goes once the chat has a model, such as an agent just connected.
+watch(isConfigured, (configured) => {
+  if (configured) sendPendingPrompt()
+})
+/**
+ * Holds a message written before the chat can send while AI is set up: an agent on this
+ * computer, or guided setup when there is none. Dismissing setup puts it back in the composer.
+ * The composer stays open meanwhile, and what is written next joins the prompt that waits.
+ */
+async function sendAfterSetup(message: ChatSubmission) {
+  const store = activeStore.value
+  if (!store) return
+  setPendingPrompt(store, joinWaitingPrompt(takePendingPrompt(store), message))
+  if (await ensureChatConfigured()) return
+  // Another document shows now; the prompt keeps waiting for its own chat.
+  if (store !== activeStore.value) return
+  const unsent = takePendingPrompt(store)
+  // It goes ahead of what was typed meanwhile; without a composer to take it, it keeps waiting.
+  if (unsent && !chatInput.value?.restoreWaiting(unsent)) setPendingPrompt(store, unsent)
+}
+/** The setup card went while it had the keyboard focus, as when its agent connected. */
+function focusComposer() {
+  void nextTick(() => chatInput.value?.focus())
+}
 // Restoring local history must not open a provider connection or read credentials.
 async function initializeHistory() {
   try {
@@ -230,6 +293,12 @@ const status = computed(() => chat.value?.status ?? 'ready')
  * takes in once the current tool calls finish, and Alt+Enter waits until all work is done.
  */
 function sendOrQueue(message: ChatSubmission, afterWork: boolean) {
+  if (!isConfigured.value) {
+    void sendAfterSetup(message)
+    return
+  }
+  // Writing again shows the person knows which agent answers.
+  agentAutoConnect.dismissNotice()
   if (status.value === 'streaming' || status.value === 'submitted') {
     enqueueMessage(message, afterWork ? 'follow-up' : 'steer')
     return
@@ -255,6 +324,8 @@ const showContinue = computed(() => {
 
 // Asking again clears the failure, and its notice goes with it.
 let failureToast: number | null = null
+/** The message the last failure stopped, which Retry sends again. */
+let failedMessageId: string | undefined
 /** The notice outlives a switch to another tab, whose chat its Retry must not touch. */
 function retryFailed(messageId: string | undefined): void {
   if (messageId && chat.value?.messages.at(-1)?.id === messageId) void submission.regenerate()
@@ -266,12 +337,19 @@ watch(
     failureToast = null
     if (!reason) return
     const failedId = chat.value?.messages.at(-1)?.id
+    failedMessageId = failedId
+    // The chat column shows where to sign in to the agent itself.
+    if (signedOutAgent.value) return
     failureToast = toast.error(
       failureMessage.value ?? ai.value.chatRequestFailed,
       failureAction(failedId)
     )
   }
 )
+/** Sends the message a signed-out agent refused again, once the person signed in. */
+function retrySignedOut(): void {
+  retryFailed(failedMessageId)
+}
 function failureAction(failedId: string | undefined): { label: string; run: () => void } {
   const billingURL = cloudBillingURL.value
   if (chatFailure.value?.reason === 'cloud-credits-exhausted' && billingURL) {
@@ -340,8 +418,31 @@ function handleStop() {
     <p v-if="history.storageError.value" role="alert" class="px-3.5 py-2 text-xs text-error">
       {{ ai.chatStorageFailed }}
     </p>
-    <ChatProviderSetup v-if="!isConfigured" />
+    <ChatAgentSetup
+      v-if="!isConfigured"
+      :phase="agentSetup.phase.value"
+      :candidate="agentSetup.candidate.value"
+      :setup="agentSetup.setup.value"
+      :waiting="agentSetup.waiting.value"
+      :fill="!messages.length"
+      @show="agentSetup.look"
+      @connect="agentSetup.connect"
+      @cancel-sign-in="agentSetup.cancelSignIn"
+      @submit-sign-in-code="agentSetup.submitSignInCode"
+      @set-up="agentSetup.setUp"
+      @open-settings="agentSetup.openSettings"
+      @release-focus="focusComposer"
+    />
 
+    <!-- Stays mounted, so the notice is read out when it appears with the chat's model. -->
+    <div role="status">
+      <ChatAgentNotice
+        v-if="autoAgent && (isConfigured || messages.length)"
+        :agent="autoAgent.name"
+        @change="chatInput?.openModels()"
+        @dismiss="agentAutoConnect.dismissNotice()"
+      />
+    </div>
     <template v-if="isConfigured || messages.length">
       <p
         v-if="history.current.value?.interrupted && status === 'ready'"
@@ -385,19 +486,29 @@ function handleStop() {
         :page="runLocation.page"
         @open="runLocation.open"
       />
-      <ChatInput
-        v-if="isConfigured && !agentHistoryReadOnly && !history.readOnly.value"
-        ref="chatInput"
-        :status="status"
-        :dragging="draggingImages"
-        :disabled="submission.busy.value || history.busy.value"
-        @submit="sendOrQueue"
-        @stop="handleStop"
-        @interrupt="handleStop"
-        @error="toast.error"
-      />
 
       <ChatPermissionDialog />
     </template>
+    <ChatAgentNotice
+      v-if="signedOutAgent"
+      signed-out
+      :agent="signedOutAgent.name"
+      :sign-in-command="signedOutCommand"
+      @retry="retrySignedOut"
+      @change="chatInput?.openModels()"
+      @dismiss="clearChatFailure()"
+    />
+    <!-- Shown before AI is set up too: sending sets it up, and the prompt waits for it. -->
+    <ChatInput
+      v-if="!agentHistoryReadOnly && !history.readOnly.value"
+      ref="chatInput"
+      :status="status"
+      :dragging="draggingImages"
+      :disabled="submission.busy.value || history.busy.value"
+      @submit="sendOrQueue"
+      @stop="handleStop"
+      @interrupt="handleStop"
+      @error="toast.error"
+    />
   </div>
 </template>

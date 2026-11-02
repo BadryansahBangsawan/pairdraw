@@ -3,15 +3,19 @@ import { tv } from 'tailwind-variants'
 
 import { useI18n } from '@open-pencil/vue/i18n'
 
-import { setUsageStatsConsent, usageStatsConsent } from '@/app/telemetry'
+import {
+  setUsageStatsConsent,
+  usageStatsConsent,
+  type UsageStatsPromptSource
+} from '@/app/telemetry'
 import ExternalLink from '@/components/links/ExternalLink.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import { PRIVACY_URL } from '@/constants'
 import theme from '@/theme/sharing/question'
 
 const { source, headingId } = defineProps<{
-  /** Right after the first-run welcome, or on a later launch. */
-  source: 'welcome' | 'prompt'
+  /** Where the question was asked, which the answer reports. */
+  source: UsageStatsPromptSource
   headingId?: string
 }>()
 const { diagnostics } = useI18n()

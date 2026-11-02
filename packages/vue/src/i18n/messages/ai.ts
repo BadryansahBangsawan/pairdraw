@@ -60,6 +60,20 @@ export const aiMessageDefaults = {
   chatInterrupted: 'This response was interrupted.',
   chatAgentWorkingOn: params('{agent} is working on “{page}”'),
   chatGoToPage: 'Go to page',
+  chatAgentDetecting: 'Looking for coding agents on this computer…',
+  chatAgentUsing: params('Using {agent} from this computer.'),
+  chatAgentChange: 'Change',
+  chatAgentSignInNeeded: params('{agent} is on this computer but signed out.'),
+  chatAgentSignIn: params('Sign in to {agent}'),
+  chatAgentInstallNeeded: params(
+    '{agent} is on this computer. Pairdraw needs its connector ({package}) to talk to it.'
+  ),
+  chatAgentInstall: 'Install and connect',
+  chatAgentPromptWaiting: params('Your prompt is sent once {agent} is connected.'),
+  chatAgentPromptWaitingSetup: 'Your prompt is sent once AI is set up.',
+  chatAgentNoneFound: 'No coding agent found on this computer.',
+  chatAgentSetUp: 'Set up AI',
+  chatAgentOnThisComputer: 'On this computer',
   connectProvider: 'Connect an AI provider to start chatting.',
   connectionTestSuccess: 'Connected successfully. Model is reachable.',
   connectionTestMissingAPIKey: 'Enter an API key before testing.',
@@ -147,7 +161,8 @@ export const aiMessageDefaults = {
   canvasPromptDescription: 'Describe what to design, and the AI agent builds it on this page.',
   canvasPromptClose: 'Hide prompt',
   canvasPrompt: 'Prompt on empty pages',
-  canvasPromptHint: 'Offer a prompt over an empty page that starts the chat with a description of what to design.',
+  canvasPromptHint:
+    'Offer a prompt over an empty page that starts the chat with a description of what to design.',
   changePreviewSmall: 'Small (240 px)',
   changePreviewMedium: 'Medium (480 px)',
   changePreviewLarge: 'Large (960 px)',
@@ -273,18 +288,6 @@ export const aiMessageDefaults = {
     'Pi has no model to use. Run pi in a terminal and type /model, or choose one in Settings.',
   completions: 'Completions',
   responses: 'Responses',
-  aiSetupWelcomeTitle: 'Welcome to Pairdraw',
-  aiSetupWelcomeDescription:
-    'Create and edit designs on an open canvas. Import Figma files and make them your own.',
-  aiSetupWelcomeAITitle: 'Design with AI',
-  aiSetupWelcomeAIDescription:
-    'Connect the AI you already use to edit the canvas and review designs. You can change it later in Settings.',
-  aiSetupWelcomeTourTitle: 'Take the tour',
-  aiSetupWelcomeTourDescription:
-    'A short file that walks through components and slots, working controls, modes, shaders, code, and lint, with a card on each that says what to try.',
-  aiSetupTakeTour: 'Open the tour',
-  aiSetupStart: 'Set up AI',
-  aiSetupSkip: 'Start designing',
   aiSetupProgress: params('Step {current} of {total}'),
   aiSetupAdvanced: 'Advanced settings',
   aiSetupContinue: 'Continue',
@@ -341,6 +344,7 @@ export const aiMessageDefaults = {
   aiSetupAgentMCPStartFailed:
     'The MCP server is installed but didn’t start. Restart Pairdraw, then check again.',
   aiSetupAgentLookupFailed: 'Couldn’t check this computer. Try again.',
+  aiSetupProblemInstallNeeded: params('{agent} needs its connector installed first.'),
   aiSetupAgentCopyPrompt: 'Copy setup prompt',
   aiSetupAgentCheckAgain: 'Check again',
   aiSetupAgentInstallRuns: params('Installing runs {command}.'),

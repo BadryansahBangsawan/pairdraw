@@ -14,10 +14,13 @@ import { sharingDisabledByEnvironment, sharingState } from './state'
 const askable = ref(false)
 
 /**
- * Where the question is open, or `null`: `welcome` right after the first-run welcome closes,
- * `prompt` on a later launch, for installs that updated or never answered.
+ * Where the app asks on its own: `prompt`, once the window shows what it opened. The feedback
+ * contract still accepts `welcome` from versions that asked after a first-run welcome.
  */
-export const usageStatsPrompt = ref<Exclude<ConsentSource, 'settings'> | null>(null)
+export type UsageStatsPromptSource = Exclude<ConsentSource, 'settings' | 'welcome'>
+
+/** Where the question is open, or `null`. */
+export const usageStatsPrompt = ref<UsageStatsPromptSource | null>(null)
 
 export const usageStatsConsent = computed(() => appPreferences.value.sharing.usageStats)
 
@@ -41,7 +44,7 @@ export function setUsageStatsConsent(granted: boolean, source: ConsentSource): v
 }
 
 /** Opens the question unless this build or environment sends nothing, or it was answered. */
-export function offerUsageStatsPrompt(source: Exclude<ConsentSource, 'settings'>): void {
+export function offerUsageStatsPrompt(source: UsageStatsPromptSource): void {
   if (!askable.value || usageStatsConsent.value !== 'unset') return
   usageStatsPrompt.value = source
 }

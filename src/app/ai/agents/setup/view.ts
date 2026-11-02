@@ -108,6 +108,8 @@ export type SetupProblem =
   | 'install-failed'
   | 'mcp-start-failed'
   | 'lookup-failed'
+  /** The adapter or MCP server is missing, and connecting waits for the person to install it. */
+  | 'install-needed'
 
 function companionCheck(
   installed: boolean,
@@ -441,6 +443,8 @@ export function agentConnectView(agent: ACPAgentDef, setup: AgentSetupState): Ag
   const connection = setup.connection
   const { account, problem } = agentSetupView(agent, setup)
   const failure = connection?.failure ?? null
+  // An attempt not allowed to install leaves that step to the person's click.
+  const waitsForInstall = failure?.problem === 'install-needed' ? failure.step : null
   const steps = AGENT_CONNECT_STEPS.filter((step) => {
     // Only a login setup reads tells whether a session reaches the tools.
     if (step === 'tools') return agent.signIn !== undefined
@@ -448,7 +452,8 @@ export function agentConnectView(agent: ACPAgentDef, setup: AgentSetupState): Ag
   }).map((step) => {
     const recorded = connection?.steps[step] ?? 'pending'
     let status: AgentConnectStepStatus = 'pending'
-    if (recorded === 'running' || recorded === 'failed') status = recorded
+    if (step === waitsForInstall) status = 'manual'
+    else if (recorded === 'running' || recorded === 'failed') status = recorded
     else if (checking(step, setup, account)) status = 'running'
     else if (step === 'sign-in' && !agent.signIn) status = 'manual'
     else if (recorded !== 'pending' || satisfied(step, setup, account)) status = 'done'
@@ -456,14 +461,16 @@ export function agentConnectView(agent: ACPAgentDef, setup: AgentSetupState): Ag
   })
   const running = connection?.running === true
   const discoveryFailure = failure && isDiscoveryProblem(failure.problem) ? failure.problem : null
+  let connectProblem: SetupProblem | null = waitsForInstall ? 'install-needed' : null
+  if (discoveryFailure) {
+    connectProblem = problem ?? setupProblem(discoveryFailure, false, ['install', 'canvas-install'])
+  }
   return {
     steps,
     running,
     connected: !running && steps.every(({ status }) => status === 'done' || status === 'manual'),
     failure,
-    problem: discoveryFailure
-      ? (problem ?? setupProblem(discoveryFailure, false, ['install', 'canvas-install']))
-      : null,
+    problem: connectProblem,
     signInCommand: agent.signIn ? null : (agent.cliCommand ?? agent.command)
   }
 }

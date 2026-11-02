@@ -115,6 +115,22 @@ describe('agentConnectView', () => {
     expect(view.problem).toBe('needs-admin')
   })
 
+  test('leaves an install the attempt could not run to the person', () => {
+    const view = agentConnectView(
+      claude,
+      agentState({
+        detected: { ...installed(claude), status: 'needs-adapter' },
+        connection: connection({
+          steps: { ...connection().steps, detect: 'done', install: 'failed' },
+          failure: { step: 'install', problem: 'install-needed' }
+        })
+      })
+    )
+    expect(statuses(view)).toMatchObject({ detect: 'done', install: 'manual' })
+    expect(view.problem).toBe('install-needed')
+    expect(view.connected).toBe(false)
+  })
+
   test('leaves the sign-in of an agent setup cannot sign in to for the person to run', () => {
     const view = agentConnectView(gemini, agentState({ detected: installed(gemini) }))
     expect(statuses(view)).toEqual({ detect: 'done', install: 'done', 'sign-in': 'manual' })

@@ -214,12 +214,14 @@ test('remembered browser credentials survive reload and clear centrally', async 
   await page.getByTestId('provider-settings-api-key').fill('sk-or-remembered-test-key')
   await page.getByRole('button', { name: 'Save model' }).click()
   await page.getByTestId('app-settings-done').click()
-  await expect(page.getByTestId('chat-input')).toBeVisible()
+  await expect(page.getByTestId('provider-setup')).toHaveCount(0)
 
   await page.reload()
   await canvas.waitForInit()
   await new ChatHarness(page).openChat()
+  // The composer shows before AI is set up too; the remembered key leaves nothing to set up.
   await expect(page.getByTestId('chat-input')).toBeVisible()
+  await expect(page.getByTestId('provider-setup')).toHaveCount(0)
 
   await page.getByTestId('app-settings-trigger').click()
   await page.getByTestId('settings-section-ai').click()

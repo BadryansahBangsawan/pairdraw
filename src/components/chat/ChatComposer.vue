@@ -78,7 +78,11 @@ function restoreDraft(draft: string): boolean {
   editor.setText(draft)
   return true
 }
-defineExpose({ restoreDraft, insert: editor.insert, focus: editor.focus })
+/** Puts back a message that waited, ahead of anything typed since, so neither is lost. */
+function prependDraft(draft: string): void {
+  editor.setText(text.value.trim() ? `${draft}\n\n${text.value}` : draft)
+}
+defineExpose({ restoreDraft, prependDraft, insert: editor.insert, focus: editor.focus })
 </script>
 <template>
   <TooltipProvider>

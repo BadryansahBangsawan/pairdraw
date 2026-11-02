@@ -32,7 +32,7 @@ describe('usage stats consent', () => {
   })
 
   test('a build that sends nothing never asks', () => {
-    offerUsageStatsPrompt('welcome')
+    offerUsageStatsPrompt('prompt')
     expect(usageStatsPrompt.value).toBeNull()
   })
 })

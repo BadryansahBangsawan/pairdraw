@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { APICallError, StreamProviderError } from 'ai'
 
+import { AgentSignInRequiredError } from '@/app/ai/agents/acp/auth/required'
 import {
   classifyAIChatError,
   classifyAIChatFinish,
@@ -58,6 +59,14 @@ describe('AI chat failures', () => {
       'plan-forbidden'
     )
     expect(classifyAIChatError({ statusCode: 429 }, { signInOnly: true }).reason).toBe('rate-limit')
+  })
+
+  test('reports a coding agent nobody is signed in to as its sign-in', () => {
+    const signedOut = new AgentSignInRequiredError('Gemini CLI is not signed in.')
+    expect(classifyAIChatError(signedOut)).toMatchObject({
+      reason: 'sign-in-expired',
+      detail: 'Gemini CLI is not signed in.'
+    })
   })
 
   test('classifies provider errors reported after the stream started', () => {

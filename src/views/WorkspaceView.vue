@@ -6,10 +6,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useI18n } from '@open-pencil/vue/i18n'
 
-import {
-  aiSetupDialogOpen,
-  offerAISetupOnFirstRun
-} from '@/app/ai/models/settings/onboarding/dialog'
+import { detectAgentsOnFirstRun } from '@/app/ai/models/settings/onboarding/dialog'
 import { exposeAutomationTestRequests } from '@/app/automation/bridge/test-hooks'
 import { startMCPRuntime, stopMCPRuntime } from '@/app/automation/mcp/runtime'
 import { startWebMCP } from '@/app/automation/webmcp/runtime'
@@ -130,33 +127,18 @@ function openFirstTab(): Tab {
   }
 }
 
-// A first visit to the demo link is a first run too; the welcome there skips the tour offer.
-const welcomeShown =
-  createdInitialTab && (route.path === '/' || route.meta.demo) && !appRuntimeConfig.test
-    ? offerAISetupOnFirstRun({ inTour: route.meta.demo === true })
-    : false
+// A fresh install looks for a coding agent in the background; it opens nothing.
+void detectAgentsOnFirstRun()
 const sharingStarted = startSharing()
-// One question per surface: a first run is asked about usage stats once the welcome closes.
-if (welcomeShown) {
-  whenever(
-    () => !aiSetupDialogOpen.value,
-    async () => {
-      await sharingStarted
-      offerUsageStatsPrompt('welcome')
-    },
-    { once: true }
-  )
-} else {
-  // Asked once the window shows what it opened, not over the loading screen.
-  whenever(
-    () => !openingCloudLink.value,
-    async () => {
-      await sharingStarted
-      offerUsageStatsPrompt('prompt')
-    },
-    { once: true, immediate: true }
-  )
-}
+// Asked once the window shows what it opened, not over the loading screen.
+whenever(
+  () => !openingCloudLink.value,
+  async () => {
+    await sharingStarted
+    offerUsageStatsPrompt('prompt')
+  },
+  { once: true, immediate: true }
+)
 
 useHead({ title: route.meta.demo ? 'Demo' : undefined })
 useKeyboard()

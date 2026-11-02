@@ -19,6 +19,8 @@ export type AgentConnectProblem =
   | DiscoveryError
   /** The agent's own CLI is missing and only the person can install it, as for Gemini CLI. */
   | 'cli-missing'
+  /** The adapter or MCP server is missing or outdated, and this attempt was not allowed to install. */
+  | 'install-needed'
   /** Setup could not start the agent to read its login. */
   | 'check'
   /** The program under the adapter's name is another adapter, which cannot sign in. */
@@ -47,10 +49,27 @@ export interface AgentConnectState {
 
 export type AgentConnectResult = 'connected' | 'failed' | 'busy'
 
+/** How one attempt to connect may act on the agents' computer. */
+export interface AgentConnectOptions {
+  /**
+   * Whether the attempt may install the agent's adapter and the MCP server; true by default.
+   * Without it, a missing or outdated one stops the attempt with `install-needed`, so nothing is
+   * installed until the person asks.
+   */
+  installs?: boolean
+  /**
+   * Whether the attempt looks the computer up again; true by default. Without it, it uses the
+   * lookup discovery already holds, joining one that is still running.
+   */
+  rescan?: boolean
+}
+
 type Discovery = Pick<
   typeof agentDiscovery,
   | 'agents'
   | 'error'
+  | 'checked'
+  | 'scanning'
   | 'refresh'
   | 'install'
   | 'setupCanvasBridge'
@@ -102,7 +121,8 @@ export function isOtherAdapter(
  * Connects a coding agent in one action: finds it, installs its adapter and OpenPencil's MCP
  * server when missing, signs in when needed, checks that a session reaches OpenPencil's tools,
  * and makes it the chat's provider. It stops at the first step that fails, and connecting again
- * resumes from that step; steps already satisfied finish without doing anything.
+ * resumes from that step; steps already satisfied finish without doing anything. An attempt that
+ * may not install stops before installing anything, so a later one the person asks for can.
  */
 export function createAgentConnector({ discovery, accounts, activate }: AgentConnectorOptions) {
   const states = ref<Partial<Record<ACPAgentID, AgentConnectState>>>({})
@@ -135,18 +155,33 @@ export function createAgentConnector({ discovery, accounts, activate }: AgentCon
     if (error) throw new StepFailureError(error)
   }
 
-  async function detect(): Promise<AgentConnectStepState> {
-    await discovery.refresh(true)
-    assertNoDiscoveryError()
+  async function detect(rescan: boolean): Promise<AgentConnectStepState> {
+    if (rescan) await discovery.refresh(true)
+    // A lookup still running is joined; one that finished is used as it is.
+    else if (!discovery.checked.value || discovery.scanning.value) await discovery.refresh()
+    // Only the lookup counts here: an earlier install that failed, such as Pi's, is no reason to
+    // stop, and the install step reports this agent's own.
+    if (discovery.error.value === 'lookup') throw new StepFailureError('lookup')
     return 'done'
   }
 
-  async function install(agent: ACPAgentDef, resumed: boolean): Promise<AgentConnectStepState> {
+  function bridgeMissing(): boolean {
+    return !discovery.canvasBridgeAvailable.value || discovery.canvasBridgeOutdated.value
+  }
+
+  async function install(
+    agent: ACPAgentDef,
+    resumed: boolean,
+    installs: boolean
+  ): Promise<AgentConnectStepState> {
     // Resuming after an install by hand must see what is there now.
-    if (resumed) await detect()
+    if (resumed) await detect(true)
     const found = detected(agent)
     if (!found) throw new StepFailureError('lookup')
     if (found.status === 'not-installed') throw new StepFailureError('cli-missing')
+    if (!installs && (found.status === 'needs-adapter' || bridgeMissing())) {
+      throw new StepFailureError('install-needed')
+    }
     let changed = false
     if (found.status === 'needs-adapter') {
       await discovery.install(agent.id)
@@ -154,12 +189,10 @@ export function createAgentConnector({ discovery, accounts, activate }: AgentCon
       if (detected(agent)?.status !== 'available') throw new StepFailureError('install')
       changed = true
     }
-    if (!discovery.canvasBridgeAvailable.value || discovery.canvasBridgeOutdated.value) {
+    if (bridgeMissing()) {
       await discovery.setupCanvasBridge()
       assertNoDiscoveryError()
-      if (!discovery.canvasBridgeAvailable.value || discovery.canvasBridgeOutdated.value) {
-        throw new StepFailureError('canvas-install')
-      }
+      if (bridgeMissing()) throw new StepFailureError('canvas-install')
       changed = true
     }
     return changed ? 'done' : 'skipped'
@@ -208,10 +241,11 @@ export function createAgentConnector({ discovery, accounts, activate }: AgentCon
   function runStep(
     step: AgentConnectStep,
     agent: ACPAgentDef,
-    resumed: boolean
+    resumed: boolean,
+    { installs = true, rescan = true }: AgentConnectOptions
   ): Promise<AgentConnectStepState> {
-    if (step === 'detect') return detect()
-    if (step === 'install') return install(agent, resumed)
+    if (step === 'detect') return detect(rescan)
+    if (step === 'install') return install(agent, resumed, installs)
     if (step === 'sign-in') {
       // A new adapter, or a resumed attempt, must be asked again.
       return signIn(agent, resumed || state(agent.id).steps.install === 'done')
@@ -221,7 +255,10 @@ export function createAgentConnector({ discovery, accounts, activate }: AgentCon
   }
 
   /** Runs the steps from the one that failed last, or from the start. */
-  async function connect(agent: ACPAgentDef): Promise<AgentConnectResult> {
+  async function connect(
+    agent: ACPAgentDef,
+    options: AgentConnectOptions = {}
+  ): Promise<AgentConnectResult> {
     const current = state(agent.id)
     if (current.running) return 'busy'
     const from = current.failure ? AGENT_CONNECT_STEPS.indexOf(current.failure.step) : 0
@@ -233,7 +270,7 @@ export function createAgentConnector({ discovery, accounts, activate }: AgentCon
         if (index < from) continue
         mark(agent.id, step, 'running')
         try {
-          mark(agent.id, step, await runStep(step, agent, from > 0 && index === from))
+          mark(agent.id, step, await runStep(step, agent, from > 0 && index === from, options))
         } catch (error) {
           const problem = error instanceof StepFailureError ? error.problem : FALLBACK_PROBLEM[step]
           mark(agent.id, step, 'failed')

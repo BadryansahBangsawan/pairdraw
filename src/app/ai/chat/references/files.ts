@@ -58,8 +58,12 @@ export function fileLinkComponents(markdown: string): string {
   )
 }
 
-/** Shows the file in the system's file manager, selected; the desktop app only. */
+/**
+ * Shows the file in the system's file manager, selected; the desktop app only. The
+ * `reveal_local_file` command refuses relative paths, `..`, paths on other computers, and files
+ * that do not exist (`desktop/src/system/opener.rs`).
+ */
 export async function revealLocalFile(path: string): Promise<void> {
-  const { revealItemInDir } = await import('@tauri-apps/plugin-opener')
-  await revealItemInDir(path)
+  const { invoke } = await import('@tauri-apps/api/core')
+  await invoke('reveal_local_file', { path })
 }

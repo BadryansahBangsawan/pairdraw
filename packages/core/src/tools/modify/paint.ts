@@ -8,6 +8,15 @@ import type { Vector } from '@open-pencil/scene-graph/primitives'
 import { storeImage } from '#core/figma-api/images'
 import { defineTool, nodeIdInputSchema, toolFailure, toolNumber } from '#core/tools/schema'
 
+/**
+ * Stretch as Figma's API writes it: a crop whose window is the whole image, which the image fill
+ * panel's Stretch and `.pen`'s `stretch` also store.
+ */
+const STRETCH_IMAGE_TRANSFORM: [[number, number, number], [number, number, number]] = [
+  [1, 0, 0],
+  [0, 1, 0]
+]
+
 export const setFill = defineTool({
   name: 'set_fill',
 
@@ -123,7 +132,12 @@ export const setImageFill = defineTool({
       )
     ),
     scale_mode: v.optional(
-      v.pipe(v.picklist(['FILL', 'FIT', 'CROP', 'TILE']), v.description('Image scale mode')),
+      v.pipe(
+        v.picklist(['FILL', 'FIT', 'CROP', 'TILE', 'STRETCH']),
+        v.description(
+          'Image scale mode. STRETCH stretches the whole image to the layer, ignoring its aspect ratio, as the Stretch mode of the image fill panel does.'
+        )
+      ),
       'FILL'
     )
   }),
@@ -146,7 +160,11 @@ export const setImageFill = defineTool({
     // The fetch may outlast the node: another edit can remove it meanwhile.
     const node = figma.getNodeById(id)
     if (!node) return { error: `Node "${id}" not found` }
-    node.fills = [{ type: 'IMAGE', imageHash, scaleMode: scale_mode }]
+    node.fills = [
+      scale_mode === 'STRETCH'
+        ? { type: 'IMAGE', imageHash, scaleMode: 'CROP', imageTransform: STRETCH_IMAGE_TRANSFORM }
+        : { type: 'IMAGE', imageHash, scaleMode: scale_mode }
+    ]
     return { id, imageHash, scaleMode: scale_mode }
   }
 })

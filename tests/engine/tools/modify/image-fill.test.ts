@@ -119,6 +119,24 @@ describe('set_image_fill tool', () => {
     }
   })
 
+  test('STRETCH crops to the whole image, as the panel and .pen import store it', async () => {
+    const { graph, figma } = setup()
+    const rect = figma.createRectangle()
+
+    const result = (await tool.execute(figma, {
+      id: rect.id,
+      image_data: PNG_MAGIC.toBase64(),
+      scale_mode: 'STRETCH'
+    })) as { scaleMode: string }
+
+    expect(result.scaleMode).toBe('STRETCH')
+    expect(expectDefined(graph.getNode(rect.id), 'stretched node').fills[0]).toMatchObject({
+      type: 'IMAGE',
+      imageScaleMode: 'CROP',
+      imageTransform: { m00: 1, m01: 0, m02: 0, m10: 0, m11: 1, m12: 0 }
+    })
+  })
+
   test('image data is stored in graph.images', async () => {
     const { graph, figma } = setup()
     const shape = expectDefined(

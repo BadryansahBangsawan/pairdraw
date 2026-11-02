@@ -227,7 +227,8 @@ test('HTML export options make a fragment with separate image files in a zip', a
   ])
   const html = strFromU8(files['Pricing card.html'] ?? new Uint8Array())
   expect(html).not.toContain('<!doctype html>')
-  expect(html).toContain('Pricing card.assets/images/image-1.png')
+  // The image is linked by URL, so the space in the file's folder name is percent-encoded.
+  expect(html).toContain('src="Pricing%20card.assets/images/image-1.png"')
   expect(html).toContain('data-open-pencil-node-id')
   editor.canvas.assertNoErrors()
 })

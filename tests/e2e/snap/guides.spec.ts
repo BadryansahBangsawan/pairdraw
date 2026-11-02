@@ -124,8 +124,11 @@ test('pixel snapping preference controls fractional object movement', async () =
     const id = store.createShape('RECTANGLE', 120.25, 100.25, 80, 80)
     store.select([id])
   })
-  const box = await page.getByTestId('canvas-element').boundingBox()
-  if (!box) throw new Error('No canvas')
+  const canvasBox = await page.getByTestId('canvas-element').boundingBox()
+  if (!canvasBox) throw new Error('No canvas')
+  // The pointer moves by the fractions below from a whole page pixel, wherever the canvas sits:
+  // mouse events report whole pixels, so a fractional canvas edge would shift the rounding.
+  const box = { x: Math.round(canvasBox.x), y: Math.round(canvasBox.y) }
 
   await page.mouse.move(box.x + 160.25, box.y + 140.25)
   await page.mouse.down()
@@ -140,7 +143,7 @@ test('pixel snapping preference controls fractional object movement', async () =
   })
   await page.mouse.move(box.x + 166.25, box.y + 147.25)
   await page.mouse.down()
-  await page.mouse.move(box.x + 172.8, box.y + 155.05, { steps: 5 })
+  await page.mouse.move(box.x + 173.3, box.y + 155.05, { steps: 5 })
   expect(await snapGuides()).toEqual([])
   if (process.platform === 'darwin') {
     expect(await canvas.screenshotCanvas()).toMatchSnapshot('pixel-rounding-without-guides.png')

@@ -93,5 +93,9 @@
   "documentName": "Название документа",
   "saveTo": "Сохранить в…",
   "showVersionHistory": "Показать историю версий",
-  "saveToVersionHistory": "Сохранить в историю версий…"
+  "saveToVersionHistory": "Сохранить в историю версий…",
+  "layersPanel": "Панель слоёв",
+  "propertiesPanel": "Панель свойств",
+  "keyboardShortcuts": "Сочетания клавиш",
+  "removeAutoLayout": "Убрать автораскладку"
 }

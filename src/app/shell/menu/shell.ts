@@ -1,3 +1,5 @@
+import { watch } from 'vue'
+
 import { useI18n } from '@open-pencil/vue/i18n'
 
 import { openTour } from '@/app/demo/document'
@@ -7,11 +9,19 @@ import { setDesignIssuesOnCanvas, setSnappingPreference } from '@/app/settings/p
 import {
   syncNativeCommentsMenu,
   syncNativeDesignIssuesMenu,
+  syncNativeSidePanelsMenu,
   syncNativeSnappingMenu
 } from '@/app/settings/preferences/native-menu'
 import { appPreferences } from '@/app/settings/preferences/store'
+import { openShortcutSheet } from '@/app/shell/keyboard/sheet'
 import { useNativeMenuEvents } from '@/app/shell/menu/native-events'
 import { APP_MENU_SCHEMA, type AppMenuEntry } from '@/app/shell/menu/schema'
+import {
+  layersPanelOpen,
+  propertiesPanelOpen,
+  toggleLayersPanel,
+  togglePropertiesPanel
+} from '@/app/shell/side-panels'
 import { useAppTheme } from '@/app/shell/theme'
 import { checkForAppUpdate } from '@/app/shell/updater/check'
 import { isTauri } from '@/app/tauri/env'
@@ -49,6 +59,17 @@ export function useShellMenu() {
     }
   )
 
+  // The top bar's buttons open and close the panels too, so the menu follows the preference.
+  watch(
+    [layersPanelOpen, propertiesPanelOpen],
+    ([layers, properties]) => {
+      void syncNativeSidePanelsMenu(layers, properties).catch((error: unknown) => {
+        console.error('[Menu] Failed to synchronize the native panel menu:', error)
+      })
+    },
+    { immediate: true }
+  )
+
   const { setTheme } = useAppTheme()
   const { updates } = useI18n()
   const actions: Partial<Record<string, () => void>> = {
@@ -71,6 +92,9 @@ export function useShellMenu() {
     },
     'view-design-issues': () =>
       setDesignIssuesOnCanvas(!appPreferences.value.designCheck.showOnCanvas),
+    'view-layers-panel': toggleLayersPanel,
+    'view-properties-panel': togglePropertiesPanel,
+    'keyboard-shortcuts': openShortcutSheet,
     'theme-light': () => setTheme('light'),
     'theme-dark': () => setTheme('dark'),
     'theme-auto': () => setTheme('auto'),

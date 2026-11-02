@@ -93,5 +93,9 @@
   "documentName": "Dokumentname",
   "saveTo": "Speichern in…",
   "showVersionHistory": "Versionsverlauf anzeigen",
-  "saveToVersionHistory": "Im Versionsverlauf speichern…"
+  "saveToVersionHistory": "Im Versionsverlauf speichern…",
+  "layersPanel": "Ebenenbereich",
+  "propertiesPanel": "Eigenschaftenbereich",
+  "keyboardShortcuts": "Tastaturkürzel",
+  "removeAutoLayout": "Auto-Layout entfernen"
 }

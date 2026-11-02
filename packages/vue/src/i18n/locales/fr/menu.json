@@ -93,5 +93,9 @@
   "documentName": "Nom du document",
   "saveTo": "Enregistrer dans…",
   "showVersionHistory": "Afficher l’historique des versions",
-  "saveToVersionHistory": "Enregistrer dans l’historique des versions…"
+  "saveToVersionHistory": "Enregistrer dans l’historique des versions…",
+  "layersPanel": "Panneau des calques",
+  "propertiesPanel": "Panneau des propriétés",
+  "keyboardShortcuts": "Raccourcis clavier",
+  "removeAutoLayout": "Retirer l'auto-layout"
 }

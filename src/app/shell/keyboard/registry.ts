@@ -22,10 +22,7 @@ import { requestRenameSelection } from '@/app/editor/selection/rename-dialog'
 import { TOOL_SHORTCUTS } from '@/app/editor/session'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { setSnappingPreference, togglePixelGrid } from '@/app/settings/preferences/apply'
-import {
-  REMOVE_AUTO_LAYOUT_SHORTCUT,
-  removeSelectionAutoLayout
-} from '@/app/shell/keyboard/auto-layout'
+import { removeSelectionAutoLayout } from '@/app/shell/keyboard/auto-layout'
 import { isButtonActivation, isEditing } from '@/app/shell/keyboard/focus'
 import { shortcutEvent } from '@/app/shell/keyboard/layout'
 import { openShortcutSheet, SHORTCUT_SHEET_KEYBINDINGS } from '@/app/shell/keyboard/sheet'
@@ -96,7 +93,7 @@ function alignShortcuts(): ShortcutDefinition[] {
 
 /**
  * Menu and canvas-menu keys the browser build binds itself; the desktop app's native menu binds
- * them too, and Copy as PNG, Remove auto layout, and the shortcut sheet are not in a menu.
+ * them too, and Copy as PNG and the ? key of the shortcut sheet are not in a menu.
  */
 function browserMenuShortcuts(): ShortcutDefinition[] {
   return [
@@ -122,7 +119,7 @@ function browserMenuShortcuts(): ShortcutDefinition[] {
     },
     {
       id: 'remove-auto-layout',
-      keys: shortcutTokenToTinykeys(REMOVE_AUTO_LAYOUT_SHORTCUT) ?? 'Shift+Alt+KeyA',
+      keys: appMenuTinykeysShortcut('remove-auto-layout') ?? 'Shift+Alt+KeyA',
       run: ({ store }) => void removeSelectionAutoLayout(store)
     },
     {

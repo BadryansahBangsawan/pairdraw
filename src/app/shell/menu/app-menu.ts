@@ -34,6 +34,7 @@ import {
   setSnappingPreference
 } from '@/app/settings/preferences/apply'
 import { appPreferences } from '@/app/settings/preferences/store'
+import { openShortcutSheet } from '@/app/shell/keyboard/sheet'
 import { createSharedEditorMenuActions } from '@/app/shell/menu/actions/editor'
 import { createSelectionMenuActions } from '@/app/shell/menu/actions/selection'
 import { menuFeatureAvailable } from '@/app/shell/menu/features'
@@ -48,6 +49,12 @@ import type {
 import { APP_MENU_SCHEMA } from '@/app/shell/menu/schema'
 import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
 import { openFileDialog } from '@/app/shell/menu/use'
+import {
+  layersPanelOpen,
+  propertiesPanelOpen,
+  toggleLayersPanel,
+  togglePropertiesPanel
+} from '@/app/shell/side-panels'
 import { useAppTheme } from '@/app/shell/theme'
 import { closeTab, activeTab, switchAdjacentTab } from '@/app/tabs'
 
@@ -139,6 +146,10 @@ export function useAppMenu() {
     'view-multiplayer-cursors': 'multiplayerCursors',
     'view-design-issues': 'designIssues',
     'view-comments': 'comments',
+    'view-layers-panel': 'layersPanel',
+    'view-properties-panel': 'propertiesPanel',
+    'keyboard-shortcuts': 'keyboardShortcuts',
+    'remove-auto-layout': 'removeAutoLayout',
     'snap-geometry': 'snapToGeometry',
     'snap-objects': 'snapToObjects',
     'snap-pixel-grid': 'snapToPixelGrid',
@@ -200,6 +211,9 @@ export function useAppMenu() {
     settings: openSettingsDialog,
     diagnostics: () => openSettingsDialog('diagnostics'),
     variables: () => openVariablesDialog(store),
+    'view-layers-panel': toggleLayersPanel,
+    'view-properties-panel': togglePropertiesPanel,
+    'keyboard-shortcuts': openShortcutSheet,
     'export-png': () => exportSelection('png'),
     'export-svg': () => exportSelection('svg'),
     'export-pptx': () => exportSelection('pptx'),
@@ -228,6 +242,10 @@ export function useAppMenu() {
         return appPreferences.value.designCheck.showOnCanvas
       case 'view-comments':
         return appPreferences.value.comments.showOnCanvas
+      case 'view-layers-panel':
+        return layersPanelOpen.value
+      case 'view-properties-panel':
+        return propertiesPanelOpen.value
       case 'snap-geometry':
         return store.state.snappingPreferences.geometry
       case 'snap-objects':
@@ -269,6 +287,14 @@ export function useAppMenu() {
         return (value: boolean) => setDesignIssuesOnCanvas(value)
       case 'view-comments':
         return (value: boolean) => setCommentsOnCanvas(value)
+      case 'view-layers-panel':
+        return (value: boolean) => {
+          layersPanelOpen.value = value
+        }
+      case 'view-properties-panel':
+        return (value: boolean) => {
+          propertiesPanelOpen.value = value
+        }
       case 'snap-geometry':
         return (value: boolean) => setSnappingPreference('geometry', value)
       case 'snap-objects':

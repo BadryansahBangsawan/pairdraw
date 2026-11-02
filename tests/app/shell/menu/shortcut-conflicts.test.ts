@@ -57,6 +57,10 @@ describe('shortcut conflicts', () => {
     expect(conflicts(keyOwners())).toEqual({})
   })
 
+  test('Arrange › Remove auto layout owns ⇧⌥A, which the browser build binds itself', () => {
+    expect([...(keyOwners().get('Shift+Alt+KeyA') ?? [])]).toEqual(['remove-auto-layout'])
+  })
+
   test('⇧⌘K places an image, as in Figma, and Create Component Set has no key', () => {
     expect([...(keyOwners().get('$mod+Shift+KeyK') ?? [])]).toEqual(['place-image'])
     expect(EDITOR_COMMAND_METADATA['selection.createComponentSet']).toEqual({})

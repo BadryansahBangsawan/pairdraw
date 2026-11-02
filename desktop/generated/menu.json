@@ -301,6 +301,19 @@
         "type": "separator"
       },
       {
+        "id": "view-layers-panel",
+        "label": "Layers Panel",
+        "checkbox": true
+      },
+      {
+        "id": "view-properties-panel",
+        "label": "Properties Panel",
+        "checkbox": true
+      },
+      {
+        "type": "separator"
+      },
+      {
         "id": "theme",
         "label": "Theme",
         "sub": [
@@ -358,6 +371,10 @@
         "id": "toggle-preview",
         "label": "Preview",
         "accelerator": "CmdOrCtrl+Alt+Enter"
+      },
+      {
+        "id": "keyboard-shortcuts",
+        "label": "Keyboard Shortcuts"
       },
       {
         "type": "separator"
@@ -482,6 +499,10 @@
         "label": "Create Slot"
       },
       {
+        "id": "selection.convertToFrame",
+        "label": "Convert to Frame"
+      },
+      {
         "id": "selection.goToMainComponent",
         "label": "Go to Main Component"
       },
@@ -546,6 +567,11 @@
         "id": "selection.wrapInAutoLayout",
         "label": "Wrap in Auto Layout",
         "accelerator": "Shift+A"
+      },
+      {
+        "id": "remove-auto-layout",
+        "label": "Remove Auto Layout",
+        "accelerator": "Shift+Alt+A"
       },
       {
         "type": "separator"

@@ -10,6 +10,7 @@ import {
 } from '@/app/settings/preferences/apply'
 import { appPreferences } from '@/app/settings/preferences/store'
 import { onCanvasSelection } from '@/app/shell/commands/focused'
+import { removeSelectionAutoLayout } from '@/app/shell/keyboard/auto-layout'
 import { exportFramesToPDF } from '@/app/shell/menu/actions/pdf'
 
 type TextFormatUpdates = {
@@ -102,6 +103,7 @@ export function createSharedEditorMenuActions(
     'arrange.align-right': onCanvasSelection(() => alignSelected('horizontal', 'max')),
     'arrange.align-top': onCanvasSelection(() => alignSelected('vertical', 'min')),
     'arrange.align-middle': onCanvasSelection(() => alignSelected('vertical', 'center')),
-    'arrange.align-bottom': onCanvasSelection(() => alignSelected('vertical', 'max'))
+    'arrange.align-bottom': onCanvasSelection(() => alignSelected('vertical', 'max')),
+    'remove-auto-layout': onCanvasSelection(() => void removeSelectionAutoLayout(store))
   }
 }

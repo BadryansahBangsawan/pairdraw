@@ -93,5 +93,9 @@
   "documentName": "文档名称",
   "saveTo": "保存到…",
   "showVersionHistory": "显示版本历史",
-  "saveToVersionHistory": "保存到版本历史…"
+  "saveToVersionHistory": "保存到版本历史…",
+  "layersPanel": "图层面板",
+  "propertiesPanel": "属性面板",
+  "keyboardShortcuts": "键盘快捷键",
+  "removeAutoLayout": "移除自动布局"
 }

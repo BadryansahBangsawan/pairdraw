@@ -93,5 +93,9 @@
   "documentName": "Nome del documento",
   "saveTo": "Salva in…",
   "showVersionHistory": "Mostra cronologia versioni",
-  "saveToVersionHistory": "Salva nella cronologia versioni…"
+  "saveToVersionHistory": "Salva nella cronologia versioni…",
+  "layersPanel": "Pannello livelli",
+  "propertiesPanel": "Pannello proprietà",
+  "keyboardShortcuts": "Scorciatoie da tastiera",
+  "removeAutoLayout": "Rimuovi auto-layout"
 }

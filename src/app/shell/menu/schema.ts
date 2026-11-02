@@ -1,5 +1,7 @@
 import type { EditorCommandId } from '@open-pencil/vue/editor/commands'
 
+import { REMOVE_AUTO_LAYOUT_SHORTCUT } from '@/app/shell/keyboard/auto-layout'
+
 export type AppMenuTarget = 'all' | 'browser' | 'native'
 
 export type AppMenuIcon =
@@ -268,6 +270,10 @@ export const APP_MENU_SCHEMA = [
       { id: 'view-design-issues', label: 'Design Issues', checkbox: true, handler: 'shell' },
       { id: 'view-comments', label: 'Comments', checkbox: true, shortcut: 'SHIFT+C' },
       { type: 'separator' },
+      // The top bar's panel buttons; each panel stays as left across documents and sessions.
+      { id: 'view-layers-panel', label: 'Layers Panel', checkbox: true, handler: 'shell' },
+      { id: 'view-properties-panel', label: 'Properties Panel', checkbox: true, handler: 'shell' },
+      { type: 'separator' },
       {
         id: 'theme',
         label: 'Theme',
@@ -307,6 +313,8 @@ export const APP_MENU_SCHEMA = [
       { type: 'separator' },
       { id: 'toggle-ui', label: 'Toggle UI', shortcut: 'MOD+\\' },
       { id: 'toggle-preview', label: 'Preview', shortcut: 'MOD+ALT+↩' },
+      // The shortcut sheet, which ? also opens; ? is typed differently per layout, so no accelerator.
+      { id: 'keyboard-shortcuts', label: 'Keyboard Shortcuts', handler: 'shell' },
       { type: 'separator' },
       { id: 'profiler', label: 'Profiler', checkbox: true, target: 'browser' },
       {
@@ -427,6 +435,11 @@ export const APP_MENU_SCHEMA = [
         command: 'selection.createSlot'
       },
       {
+        id: 'selection.convertToFrame',
+        label: 'Convert to Frame',
+        command: 'selection.convertToFrame'
+      },
+      {
         id: 'selection.goToMainComponent',
         label: 'Go to Main Component',
         command: 'selection.goToMainComponent'
@@ -487,6 +500,12 @@ export const APP_MENU_SCHEMA = [
         id: 'selection.wrapInAutoLayout',
         label: 'Wrap in Auto Layout',
         command: 'selection.wrapInAutoLayout'
+      },
+      // Figma's Remove auto layout, on every selected frame at once.
+      {
+        id: 'remove-auto-layout',
+        label: 'Remove Auto Layout',
+        shortcut: REMOVE_AUTO_LAYOUT_SHORTCUT
       },
       { type: 'separator' },
       { id: 'arrange.align-left', label: 'Align Left', shortcut: 'ALT+A' },

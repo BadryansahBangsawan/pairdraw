@@ -93,5 +93,9 @@
   "documentName": "ドキュメント名",
   "saveTo": "保存先を選んで保存…",
   "showVersionHistory": "バージョン履歴を表示",
-  "saveToVersionHistory": "バージョン履歴に保存…"
+  "saveToVersionHistory": "バージョン履歴に保存…",
+  "layersPanel": "レイヤーパネル",
+  "propertiesPanel": "プロパティパネル",
+  "keyboardShortcuts": "キーボードショートカット",
+  "removeAutoLayout": "オートレイアウトを削除"
 }

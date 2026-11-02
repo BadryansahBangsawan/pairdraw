@@ -104,7 +104,11 @@ export const menuMessageDefaults = {
   splitRight: 'Split right',
   splitDown: 'Split down',
   closeView: 'Close view',
-  removeGuide: 'Remove guide'
+  removeGuide: 'Remove guide',
+  layersPanel: 'Layers panel',
+  propertiesPanel: 'Properties panel',
+  keyboardShortcuts: 'Keyboard shortcuts',
+  removeAutoLayout: 'Remove auto layout'
 } as const
 
 export const menuMessages = i18n('menu', menuMessageDefaults)

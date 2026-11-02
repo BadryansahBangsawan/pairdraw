@@ -32,7 +32,7 @@ test('Home lists no design systems until a library is published', async ({ page 
   await page.goto('/?recent-files')
   const home = page.getByTestId('recent-files-home')
   await home.getByRole('navigation').getByRole('button', { name: 'Design systems' }).click()
-  await expect(home.getByRole('heading', { name: 'Design systems' })).toBeVisible()
+  await expect(home.getByRole('heading', { name: 'Design systems', exact: true })).toBeVisible()
   await expect(home.getByRole('heading', { name: 'No design systems yet' })).toBeVisible()
 })
 

@@ -4,12 +4,10 @@ import { panelMessages } from '@open-pencil/vue/i18n'
 
 import type { EditorStore } from '@/app/editor/session'
 import { notificationMessages } from '@/app/i18n/notifications'
-import { createActiveStorageAdapter, storagePreferencesComplete } from '@/app/integrations/storage'
-import { activeStorageProviderID } from '@/app/integrations/storage/preferences'
 import {
+  activeStorageLibraryCatalog,
   readLibraryCatalogSource,
   readLibraryPriority,
-  StorageLibraryCatalog,
   type LibraryService
 } from '@/app/libraries'
 import type { LibraryAssetUpdateGroup } from '@/app/libraries/update-groups'
@@ -84,13 +82,7 @@ export function useLibraryManager(
   async function setSource(source: 'local' | 'storage') {
     await runOperation(async () => {
       if (source === 'local') service.useLocalCatalog()
-      else {
-        const providerId = activeStorageProviderID.value
-        if (!storagePreferencesComplete(providerId)) throw new Error('Storage is not configured')
-        const objects = createActiveStorageAdapter(providerId).libraryObjects
-        if (!objects) throw new Error('Storage libraries are unavailable')
-        service.useStorageCatalog(new StorageLibraryCatalog(objects))
-      }
+      else service.useStorageCatalog(activeStorageLibraryCatalog())
       await refresh()
     })
   }

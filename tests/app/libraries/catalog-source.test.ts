@@ -1,0 +1,52 @@
+import { describe, expect, test } from 'bun:test'
+
+import 'fake-indexeddb/auto'
+
+import type { LibraryCatalog, LibrarySummary } from '@open-pencil/core/library'
+
+import { LibraryService } from '@/app/libraries/service'
+
+import { asDouble } from '#tests/helpers/doubles'
+
+const stored: LibrarySummary = {
+  libraryId: 'stored-kit',
+  name: 'Stored kit',
+  latestRevisionId: 'r1',
+  publishedAt: '2026-10-01T00:00:00.000Z',
+  assetCount: 2
+}
+
+function storageCatalog(): LibraryCatalog {
+  return asDouble<LibraryCatalog>({ listLibraries: async () => [stored] })
+}
+
+describe('the stored library catalog source', () => {
+  test('reads from storage at once when storage was chosen last', async () => {
+    const service = new LibraryService()
+    service.restoreCatalogSource('storage', storageCatalog)
+
+    expect(service.catalogSource).toBe('storage')
+    expect(await service.listLibraries()).toEqual([stored])
+  })
+
+  test('keeps the local catalog when it was chosen, without opening storage', () => {
+    const service = new LibraryService()
+    let opened = false
+    service.restoreCatalogSource('local', () => {
+      opened = true
+      return storageCatalog()
+    })
+
+    expect(opened).toBe(false)
+    expect(service.catalogSource).toBe('local')
+  })
+
+  test('keeps the local catalog when storage is no longer set up', () => {
+    const service = new LibraryService()
+    service.restoreCatalogSource('storage', () => {
+      throw new Error('Storage is not configured')
+    })
+
+    expect(service.catalogSource).toBe('local')
+  })
+})

@@ -1,3 +1,4 @@
+export { activeStorageLibraryCatalog } from './catalog/active-storage'
 export { LocalLibraryCatalog } from './catalog/local'
 export { RoutedLibraryCatalog } from './catalog/routed'
 export type { LibraryCatalogSource } from './catalog/routed'

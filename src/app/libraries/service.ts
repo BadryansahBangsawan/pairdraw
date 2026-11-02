@@ -28,9 +28,11 @@ import type {
 } from '@open-pencil/core/tools'
 
 import type { EditorStore } from '@/app/editor/session'
+import { activeStorageLibraryCatalog } from '@/app/libraries/catalog/active-storage'
 import { LocalLibraryCatalog } from '@/app/libraries/catalog/local'
 import { RoutedLibraryCatalog, type LibraryCatalogSource } from '@/app/libraries/catalog/routed'
 import {
+  readLibraryCatalogSource,
   readLibraryPriority,
   writeLibraryCatalogSource,
   writeLibraryPriority
@@ -80,6 +82,21 @@ export class LibraryService implements ComponentCatalog {
   useStorageCatalog(catalog: LibraryCatalog): void {
     this.#routedCatalog?.useStorage(catalog)
     writeLibraryCatalogSource('storage')
+  }
+
+  /**
+   * Reads from storage again when that is the catalog last chosen, so lists shown before the
+   * library manager opens, such as Home's design systems, hold its libraries. Storage no longer
+   * set up keeps the local catalog and the stored choice, for when it is set up again.
+   */
+  restoreCatalogSource(source: LibraryCatalogSource, storageCatalog: () => LibraryCatalog): void {
+    if (source !== 'storage' || !this.#routedCatalog || this.#routedCatalog.source === 'storage')
+      return
+    try {
+      this.#routedCatalog.useStorage(storageCatalog())
+    } catch (error) {
+      console.warn('[Libraries] Could not read libraries from storage', error)
+    }
   }
 
   get summaries() {
@@ -630,6 +647,9 @@ export class LibraryService implements ComponentCatalog {
 let service: LibraryService | undefined
 
 export function useLibraryService(): LibraryService {
-  service ??= new LibraryService()
+  if (!service) {
+    service = new LibraryService()
+    service.restoreCatalogSource(readLibraryCatalogSource(), activeStorageLibraryCatalog)
+  }
   return service
 }

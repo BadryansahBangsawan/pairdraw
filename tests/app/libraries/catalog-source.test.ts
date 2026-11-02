@@ -4,6 +4,7 @@ import 'fake-indexeddb/auto'
 
 import type { LibraryCatalog, LibrarySummary } from '@open-pencil/core/library'
 
+import { restoreLibraryCatalogSource } from '@/app/libraries/catalog/active-storage'
 import { LibraryService } from '@/app/libraries/service'
 
 import { asDouble } from '#tests/helpers/doubles'
@@ -23,7 +24,7 @@ function storageCatalog(): LibraryCatalog {
 describe('the stored library catalog source', () => {
   test('reads from storage at once when storage was chosen last', async () => {
     const service = new LibraryService()
-    service.restoreCatalogSource('storage', storageCatalog)
+    restoreLibraryCatalogSource(service, 'storage', storageCatalog)
 
     expect(service.catalogSource).toBe('storage')
     expect(await service.listLibraries()).toEqual([stored])
@@ -32,7 +33,7 @@ describe('the stored library catalog source', () => {
   test('keeps the local catalog when it was chosen, without opening storage', () => {
     const service = new LibraryService()
     let opened = false
-    service.restoreCatalogSource('local', () => {
+    restoreLibraryCatalogSource(service, 'local', () => {
       opened = true
       return storageCatalog()
     })
@@ -43,7 +44,7 @@ describe('the stored library catalog source', () => {
 
   test('keeps the local catalog when storage is no longer set up', () => {
     const service = new LibraryService()
-    service.restoreCatalogSource('storage', () => {
+    restoreLibraryCatalogSource(service, 'storage', () => {
       throw new Error('Storage is not configured')
     })
 

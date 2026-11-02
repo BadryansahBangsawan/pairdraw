@@ -4,8 +4,9 @@ import { shallowRef, toValue, type MaybeRefOrGetter, type Ref } from 'vue'
 /**
  * Takes images dropped anywhere on `target`, keeping the files `accepts` takes. A drop none of
  * whose files it takes, such as a `.fig`, is left to the window, which opens documents; so are
- * the other files of a mixed drop. A drop it takes whole stops here, so the window does not also
- * try to open those files.
+ * the other files of a mixed drop, whose taken files `onImages` gets with the drop event so the
+ * window can leave them alone. A drop it takes whole stops here, so the window does not also try
+ * to open those files.
  *
  * The drag shows `dragging` only for items whose type `carries` approves, but the drop judges the
  * files themselves: a system reports no type, or a misleading one, for many files (`.tsx` none,
@@ -21,7 +22,7 @@ export function useImageDrop(
   options: {
     enabled?: MaybeRefOrGetter<boolean>
     accepts: (file: File) => boolean
-    onImages: (files: File[]) => void
+    onImages: (files: File[], event: DragEvent) => void
     /**
      * Whether a dragged item is one to take, judged by its type alone; images by default. A
      * target that takes other files too, such as the chat's text files, widens it.
@@ -76,7 +77,7 @@ export function useImageDrop(
     // A drag that looked like ours is ours even when nothing in it is taken.
     if (looked || taken.length > 0) event.preventDefault()
     if (taken.length > 0 && taken.length === files.length) event.stopPropagation()
-    if (taken.length > 0) options.onImages(taken)
+    if (taken.length > 0) options.onImages(taken, event)
   })
   // No pointer events reach the page during a drag, so the first one means it ended, even when
   // it ended without a leave or drop reaching the target.

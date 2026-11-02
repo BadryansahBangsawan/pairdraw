@@ -30,6 +30,7 @@ import { cloudBillingURL } from '@/app/cloud/integration'
 import { getActiveEditorStore, useActiveEditorStoreRef } from '@/app/editor/active-store'
 import { useDateFormat } from '@/app/i18n/date'
 import { openSettingsDialog } from '@/app/settings/dialog'
+import { claimDroppedFiles } from '@/app/shell/document-drop'
 import { openExternalLink, toast } from '@/app/shell/ui'
 import { activeTab } from '@/app/tabs'
 import ChatAgentNotice from '@/components/chat/agent/ChatAgentNotice.vue'
@@ -87,7 +88,11 @@ const { dragging: draggingFiles, types: draggedTypes } = useImageDrop(panel, {
   enabled: () => chatInput.value !== null,
   accepts: isAttachableFile,
   carries: carriesAttachableFile,
-  onImages: (files) => chatInput.value?.dropFiles(files)
+  onImages: (files, event) => {
+    // A mixed drop goes on to the window, which opens its documents but not these files.
+    claimDroppedFiles(event, files)
+    chatInput.value?.dropFiles(files)
+  }
 })
 let viewGeneration = 0
 

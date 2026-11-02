@@ -1,3 +1,5 @@
+import { format } from 'node:util'
+
 import { defineCommand } from 'citty'
 
 import { FigmaAPI, flushPendingLayout } from '@open-pencil/core/figma-api'
@@ -5,7 +7,7 @@ import { compileScript } from '@open-pencil/core/tools'
 
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
 import { appTargetOptions, appTargetRPCArgs } from '#cli/app/target'
-import { printError } from '#cli/format'
+import { printError, writeStdout } from '#cli/format'
 import {
   documentWriteOptions,
   editDocument,
@@ -18,11 +20,28 @@ import { headlessPreview } from '#cli/session/open'
 import { appPreview, previewNotice, previewOptions, previewScale } from '#cli/session/preview'
 import { createHeadlessFigma } from '#cli/tool-data'
 
-function printResult(value: unknown, json: boolean) {
+async function printResult(value: unknown, json: boolean) {
   if (json || !process.stdout.isTTY) {
-    console.log(JSON.stringify(value, null, 2))
+    await writeStdout(`${JSON.stringify(value, null, 2)}\n`)
   } else {
     console.log(value)
+  }
+}
+
+/**
+ * Runs a script with its `console.log` written to the stdout stream when that is a pipe, where
+ * Bun's `console.log` would drop what the pipe does not take at once.
+ */
+async function withStreamedLog<T>(run: () => Promise<T>): Promise<T> {
+  if (process.stdout.isTTY) return run()
+  const log = console.log
+  console.log = (...data: unknown[]) => {
+    process.stdout.write(`${format(...data)}\n`)
+  }
+  try {
+    return await run()
+  } finally {
+    console.log = log
   }
 }
 
@@ -82,7 +101,7 @@ export default defineCommand({
       const target = appTargetRPCArgs(args)
       const result = await rpc('eval', { code, ...target })
       if (!args.quiet && result !== undefined && result !== null) {
-        printResult(result, !!args.json)
+        await printResult(result, !!args.json)
       }
       if (preview)
         reportPreview(await previewNotice(preview, () => appPreview(target, scale)), args)
@@ -97,14 +116,16 @@ export default defineCommand({
 
     let result: unknown
     try {
-      result = await editDocument(graph, () => compileScript(code)(figma))
+      result = await withStreamedLog(() => editDocument(graph, () => compileScript(code)(figma)))
     } catch (err) {
       printError(err instanceof Error ? err.message : String(err))
-      process.exit(1)
+      // Exiting at once would drop what the script logged that stdout has not taken yet.
+      process.exitCode = 1
+      return
     }
 
     if (!args.quiet && result !== undefined) {
-      printResult(serializeResult(result), !!args.json)
+      await printResult(serializeResult(result), !!args.json)
     }
 
     if (preview) {

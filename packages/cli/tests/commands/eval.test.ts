@@ -182,4 +182,73 @@ describe('eval CLI', () => {
     // The new page's 300 × 200 card, not the first page's tall block.
     expect(imageSize(new Uint8Array(await readFile(preview)))).toEqual({ width: 300, height: 200 })
   })
+
+  // A shell pipe, since Bun.spawn reads a child's output as it comes and the pipe never fills.
+  test.skipIf(process.platform === 'win32')(
+    'pipes output larger than the pipe takes at once without losing its end',
+    async () => {
+      const dir = await mkdtemp(join(tmpdir(), 'open-pencil-eval-pipe-'))
+      const stderr = join(dir, 'stderr.txt')
+      const script = `
+        console.log('a'.repeat(100_000))
+        console.error('EVAL-RAN')
+        return 'b'.repeat(100_000)
+      `
+      // The reader waits until the script has run, so the pipe is full when the result is printed.
+      const pipeline = `"$0" "$1" eval "$2" --code "$3" 2>"$4" | {
+        n=0
+        until grep -q EVAL-RAN "$4" || [ $n -gt 600 ]; do n=$((n + 1)); sleep 0.1; done
+        sleep 0.5
+        cat
+      }`
+      const proc = Bun.spawn(
+        [
+          'sh',
+          '-c',
+          pipeline,
+          process.execPath,
+          CLI_ENTRY,
+          join(FIXTURES, 'circle-text.fig'),
+          script,
+          stderr
+        ],
+        { stdout: 'pipe' }
+      )
+      const stdout = await new Response(proc.stdout).text()
+      expect(await proc.exited).toBe(0)
+      expect(stdout).toBe(`${'a'.repeat(100_000)}\n${JSON.stringify('b'.repeat(100_000))}\n`)
+    }
+  )
+
+  test('--write saves the instances of a component the script changed at its new size', async () => {
+    const file = join(await mkdtemp(join(tmpdir(), 'open-pencil-eval-sync-')), 'badge.fig')
+    const create = `
+      const badge = figma.createComponent()
+      badge.name = 'Sync Badge'
+      badge.layoutMode = 'HORIZONTAL'
+      badge.primaryAxisSizingMode = 'AUTO'
+      badge.counterAxisSizingMode = 'AUTO'
+      const box = figma.createRectangle()
+      box.resize(40, 40)
+      badge.appendChild(box)
+      badge.createInstance().name = 'Sync Copy'
+    `
+    const source = join(FIXTURES, 'circle-text.fig')
+    expect((await cli(['eval', source, '--stdin', '-o', file, '-q'], create)).exitCode).toBe(0)
+    const resize = `figma.currentPage.findOne((n) => n.name === 'Sync Badge').children[0].resize(100, 80)`
+    expect((await cli(['eval', file, '--stdin', '-w', '-q'], resize)).exitCode).toBe(0)
+
+    const read = await cli([
+      'eval',
+      file,
+      '--json',
+      '--code',
+      `
+        const copy = figma.currentPage.findOne((n) => n.name === 'Sync Copy')
+        return [copy.width, copy.height, copy.children[0].width, copy.children[0].height]
+      `
+    ])
+    const parsed = v.safeParse(v.pipe(v.string(), v.parseJson(), v.array(v.number())), read.stdout)
+    expect(parsed.success && parsed.output).toEqual([100, 80, 100, 80])
+  })
 })

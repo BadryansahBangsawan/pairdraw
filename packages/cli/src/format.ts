@@ -218,6 +218,17 @@ export function formatNodeSingle(node: SceneNode): string {
   return fmtNode(nodeToData(node), nodeDetails(node))
 }
 
+/**
+ * Writes `text` to standard output and resolves once it is handed to the system. Under Bun,
+ * `console.log` drops what a pipe does not take at once (64 KB) after anything touches
+ * `process.stdout`, so large output goes through the stream instead.
+ */
+export function writeStdout(text: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    process.stdout.write(text, (error) => (error ? reject(error) : resolve()))
+  })
+}
+
 export function printError(error: unknown): void {
   const message = error instanceof Error ? error.message : String(error)
   console.error(fail(message))

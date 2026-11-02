@@ -124,11 +124,9 @@ test('pixel snapping preference controls fractional object movement', async () =
     const id = store.createShape('RECTANGLE', 120.25, 100.25, 80, 80)
     store.select([id])
   })
-  const canvasBox = await page.getByTestId('canvas-element').boundingBox()
-  if (!canvasBox) throw new Error('No canvas')
-  // The pointer moves by the fractions below from a whole page pixel, wherever the canvas sits:
-  // mouse events report whole pixels, so a fractional canvas edge would shift the rounding.
-  const box = { x: Math.round(canvasBox.x), y: Math.round(canvasBox.y) }
+  // From a whole page pixel, so the fractions below move the pointer the same wherever the canvas
+  // sits.
+  const box = await canvas.pointerOrigin()
 
   await page.mouse.move(box.x + 160.25, box.y + 140.25)
   await page.mouse.down()

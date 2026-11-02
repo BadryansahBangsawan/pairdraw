@@ -60,8 +60,7 @@ test('a click with the sticky tool places a note with its corner there, to type 
 
 /** Presses at `from` with the sticky tool and moves to `to`, both page points, holding the button. */
 async function pressAndDrag(from: Vector, to: Vector) {
-  const box = await editor.canvas.canvas.boundingBox()
-  if (!box) throw new Error('Missing canvas')
+  const box = await editor.canvas.pointerOrigin()
   const start = sticky.point(from.x, from.y)
   const end = sticky.point(to.x, to.y)
   await editor.page.mouse.move(box.x + start.x, box.y + start.y)

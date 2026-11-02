@@ -112,19 +112,24 @@ export class CanvasHelper {
     })
   }
 
-  private async canvasBounds() {
+  /**
+   * The page point the canvas's pointer coordinates count from, at the nearest whole page pixel.
+   * Mouse events carry whole pixels and drop a fraction, so from a canvas edge between pixels a
+   * point would land up to a pixel short; from here it lands within half a pixel of it.
+   */
+  async pointerOrigin(): Promise<{ x: number; y: number }> {
     const b = await this.canvas.boundingBox()
     if (!b) throw new Error('Canvas has no bounding box — is it visible?')
-    return b
+    return { x: Math.round(b.x), y: Math.round(b.y) }
   }
 
   async click(canvasX: number, canvasY: number) {
-    const box = await this.canvasBounds()
+    const box = await this.pointerOrigin()
     await this.page.mouse.click(box.x + canvasX, box.y + canvasY)
   }
 
   async drag(fromX: number, fromY: number, toX: number, toY: number, steps = 10) {
-    const box = await this.canvasBounds()
+    const box = await this.pointerOrigin()
     await this.page.mouse.move(box.x + fromX, box.y + fromY)
     await this.page.mouse.down()
     await this.page.mouse.move(box.x + toX, box.y + toY, { steps })
@@ -194,7 +199,7 @@ export class CanvasHelper {
   }
 
   async marquee(x1: number, y1: number, x2: number, y2: number, steps = 10) {
-    const box = await this.canvasBounds()
+    const box = await this.pointerOrigin()
     await this.page.mouse.move(box.x + x1, box.y + y1)
     await this.page.mouse.down()
     await this.page.mouse.move(box.x + x2, box.y + y2, { steps })
@@ -203,7 +208,7 @@ export class CanvasHelper {
   }
 
   async hover(x: number, y: number) {
-    const box = await this.canvasBounds()
+    const box = await this.pointerOrigin()
     await this.page.mouse.move(box.x + x, box.y + y)
     await this.waitForRender()
   }
@@ -223,7 +228,7 @@ export class CanvasHelper {
   }
 
   async altDrag(fromX: number, fromY: number, toX: number, toY: number) {
-    const box = await this.canvasBounds()
+    const box = await this.pointerOrigin()
     await this.page.keyboard.down('Alt')
     await this.page.mouse.move(box.x + fromX, box.y + fromY)
     await this.page.mouse.down()
@@ -234,7 +239,7 @@ export class CanvasHelper {
   }
 
   async shiftDrag(fromX: number, fromY: number, toX: number, toY: number) {
-    const box = await this.canvasBounds()
+    const box = await this.pointerOrigin()
     await this.page.keyboard.down('Shift')
     await this.page.mouse.move(box.x + fromX, box.y + fromY)
     await this.page.mouse.down()
@@ -245,7 +250,7 @@ export class CanvasHelper {
   }
 
   async dblclick(x: number, y: number) {
-    const box = await this.canvasBounds()
+    const box = await this.pointerOrigin()
     await this.page.mouse.dblclick(box.x + x, box.y + y)
     await this.waitForRender()
   }

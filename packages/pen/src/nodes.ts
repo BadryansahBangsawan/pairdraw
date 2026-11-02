@@ -291,7 +291,7 @@ export function applyPenProperties(node: SceneNode, pen: PenNode, build: Build):
     layoutGrow: 0,
     layoutAlignSelf: 'AUTO',
     boundVariables: {},
-    variableModes: pen.theme ? { [ctx.collectionId]: ctx.modeId() } : {}
+    variableModes: pen.theme && ctx.collectionId ? { [ctx.collectionId]: ctx.modeId() } : {}
   } satisfies Partial<SceneNode>)
   bindIfVar(node, 'visible', pen.enabled, ctx)
   bindIfVar(node, 'opacity', pen.opacity, ctx)

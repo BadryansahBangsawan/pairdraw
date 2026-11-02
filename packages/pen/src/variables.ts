@@ -21,7 +21,8 @@ type Theme = Record<string, string>
  * one mode of a single collection, since a variable can depend on several axes at once.
  */
 export interface VarContext {
-  collectionId: string
+  /** The collection the document's variables and themes make, or `null` when it has neither. */
+  collectionId: string | null
   byName: Map<string, Variable>
   resolveColor(ref: string): Color
   resolveNumber(ref: string): number
@@ -194,16 +195,20 @@ export function buildVarContext(graph: SceneGraph, doc: PenDocument): VarContext
     name: axes.length === 0 ? 'Default' : axes.map(([axis]) => theme[axis]).join(' / ')
   }))
   const modeByTheme = new Map(themes.map((theme, index) => [themeKey(theme, axes), modes[index]]))
-  const collectionId = generateId()
-  graph.addCollection({
-    id: collectionId,
-    name: axes.length === 1 ? axes[0][0] : 'Theme',
-    modes,
-    defaultModeId: modes[0].modeId,
-    variableIds: []
-  })
-
   const definitions = Object.entries(doc.variables ?? {})
+  const collectionId = generateId()
+  // A document with neither variables nor themes, such as a new one, gets no empty collection.
+  const hasCollection = definitions.length > 0 || axes.length > 0
+  if (hasCollection) {
+    graph.addCollection({
+      id: collectionId,
+      name: axes.length === 1 ? axes[0][0] : 'Theme',
+      modes,
+      defaultModeId: modes[0].modeId,
+      variableIds: []
+    })
+  }
+
   const ids = new Map(definitions.map(([name]) => [name, generateId()]))
   const byName = new Map<string, Variable>()
   const byId = new Map<string, Variable>()
@@ -243,7 +248,7 @@ export function buildVarContext(graph: SceneGraph, doc: PenDocument): VarContext
   }
 
   return {
-    collectionId,
+    collectionId: hasCollection ? collectionId : null,
     byName,
     resolveColor(ref) {
       const value = resolve(ref)

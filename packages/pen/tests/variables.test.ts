@@ -148,6 +148,25 @@ describe.each(['', '--'])('parsePenFile — $%sname references (#563)', (prefix)
 })
 
 // Measured on pen.dev 2.21 with two theme axes.
+test('gives a document with neither variables nor themes no variable collection', () => {
+  const graph = parsePenFile(
+    JSON.stringify({
+      version: '2.21',
+      children: [{ id: 'themed', type: 'frame', theme: { mode: 'dark' } }]
+    } satisfies PenDocument)
+  )
+  expect(graph.variableCollections.size).toBe(0)
+  expect(graph.getNode('themed')?.variableModes).toEqual({})
+})
+
+test('keeps the collection of a document with themes but no variables', () => {
+  const graph = parsePenFile(
+    JSON.stringify({ version: '2.21', themes: { mode: ['light', 'dark'] }, children: [] })
+  )
+  const collections = [...graph.variableCollections.values()]
+  expect(collections.map((collection) => collection.name)).toEqual(['mode'])
+})
+
 describe('parsePenFile — themes', () => {
   const themes = { mode: ['light', 'dark'], density: ['compact', 'cozy'] }
   const variables: PenDocument['variables'] = {

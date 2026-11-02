@@ -329,21 +329,13 @@ export const APP_MENU_SCHEMA = [
     label: 'Object',
     paletteIcon: 'layers',
     items: [
-      {
-        id: 'selection.group',
-        label: 'Group Selection',
-        command: 'selection.group'
-      },
+      { id: 'selection.group', label: 'Group Selection', command: 'selection.group' },
       {
         id: 'selection.frameSelection',
         label: 'Frame Selection',
         command: 'selection.frameSelection'
       },
-      {
-        id: 'selection.ungroup',
-        label: 'Ungroup Selection',
-        command: 'selection.ungroup'
-      },
+      { id: 'selection.ungroup', label: 'Ungroup Selection', command: 'selection.ungroup' },
       { type: 'separator' },
       {
         id: 'insert-icon',
@@ -398,11 +390,7 @@ export const APP_MENU_SCHEMA = [
         label: 'Exclude selection',
         command: 'selection.booleanExclude'
       },
-      {
-        id: 'selection.flatten',
-        label: 'Flatten',
-        command: 'selection.flatten'
-      },
+      { id: 'selection.flatten', label: 'Flatten', command: 'selection.flatten' },
       {
         id: 'selection.outlineText',
         label: 'Outline text',

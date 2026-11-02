@@ -28,7 +28,7 @@ Feature-by-feature comparison of Figma Design capabilities with Open Pencil's cu
 | Custom file thumbnails | 🔲 | Saved files preview their first page, as Figma's do without a Cover page; no thumbnail picker |
 | Nudge value settings | ✅ | Small and big nudge distances in **Settings → Editor**, 1 px and 10 px by default |
 | App menu (browser mode) | ✅ | File, Edit, View, Object, Text, Arrange menus; Tauri uses native menus |
-| AI tools | 🟡 | 126 tools in the AI chat, coding agents (ACP), and MCP; stock photos and image vectorization; no AI image generation or AI search |
+| AI tools | 🟡 | 132 tools in the AI chat, coding agents (ACP), and MCP; stock photos and image vectorization; no AI image generation or AI search |
 
 ## Layers & Shapes
 
@@ -219,7 +219,7 @@ Feature-by-feature comparison of Figma Design capabilities with Open Pencil's cu
 | Code snippets | 🟡 | Design JSX, HTML, Vue, and React with CSS or Tailwind and token-aware values; no Swift, Kotlin, or Compose |
 | Tailwind CSS v4 export | ✅ | Export as HTML with Tailwind utility classes from Code panel, CLI, or programmatically |
 | Figma for VS Code | 🔲 | Editor plugin integration |
-| MCP server | ✅ | `@open-pencil/mcp` with stdio + HTTP transports; 125 core tools plus document, history, and settings tools |
+| MCP server | ✅ | `@open-pencil/mcp` with stdio + HTTP transports; 132 core tools plus document, history, and settings tools |
 | CLI tools | ✅ | 24 commands, including info, tree, find, query, node, pages, variables, tokens, fonts, lint, analyze, export, import, convert, diff, eval, and tool |
 
 ## Figma Draw

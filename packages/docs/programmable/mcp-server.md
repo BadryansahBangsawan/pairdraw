@@ -300,7 +300,7 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 | `get_current_page` | Get the current page name and ID |
 | `get_node` | Get detailed properties of a node by ID |
 | `find_nodes` | Find nodes by name pattern and/or type |
-| `get_components` | List all components in the document |
+| `get_components` | List the document's components and those of enabled libraries; a component with slots lists each slot's preferred components and whether it takes only those |
 | `list_pages` | List all pages |
 | `list_variables` | List design variables |
 | `list_collections` | List variable collections |
@@ -308,6 +308,7 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 | `list_available_fonts` | List font families the current host can render |
 | `get_font_status` | Report requested faces, loaded sources, active substitutions, why an installed face could not be loaded, and affected nodes |
 | `page_bounds` | Get bounding box of all objects on the current page |
+| `find_empty_space` | Find a free spot of a given size for new content, beside everything on the page or next to `near_id`, optionally on one side (`direction`) with a `gap`; returns `x` and `y` ready for `render` or the create tools |
 | `node_bounds` | Get bounding box of a node |
 | `node_ancestors` | Get ancestor chain of a node |
 | `node_children` | Get direct children of a node |
@@ -326,7 +327,9 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 | `render` | Render JSX to design nodes — create entire component trees in one call |
 | `create_component` | Convert a frame/group into a component |
 | `create_instance` | Create an instance of a component |
-| `create_slot` | Make a frame inside a main component a slot |
+| `create_slot` | Make a frame inside a main component a slot, optionally with preferred components, only those allowed, and a child limit |
+| `insert_icon` | Insert icons by name; Material Symbols icons take `weight`, `fill`, `grade`, and `optical_size`, which they keep when swapped |
+| `import_html` | Import HTML and CSS as editable layers: `<style>` blocks apply, `css` adds a stylesheet, and `tailwind: true` compiles the Tailwind classes the markup uses; flex and grid become auto layout |
 | `set_behaviour` | Make a component behave as a Reka UI control, by its property and slot names; `null` removes it |
 | `get_behaviour` | Read a component's behaviour and what it still misses; without an ID, list every kind |
 | `node_to_component` | Convert an existing node into a component in-place |
@@ -336,6 +339,8 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 | Tool | Description |
 |------|-------------|
 | `set_fill` | Set fill color (hex) |
+| `set_image_fill` | Fill a layer with an image from base64 `image_data` or a `url` (http, https, or data); `scale_mode` is `FILL` (default), `FIT`, `CROP`, `TILE`, or `STRETCH`, which stretches the whole image to the layer as the image fill panel's Stretch does |
+| `replace_matching_properties` | Swap fill, text, or stroke colors, stroke weights, corner radii, font families, styles, or sizes for others everywhere on the page, the selection, or given layers; keeps instance overrides, and returns the layers of read-only library components it left unchanged in `read_only` |
 | `set_stroke` | Set stroke color, weight, alignment |
 | `set_effects` | Add shadow or blur effects |
 | `update_node` | Update position, size, opacity, corner radius, text, font |
@@ -392,7 +397,8 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 
 | Tool | Description |
 |------|-------------|
-| `export_image` | Export nodes as PNG, JPG, or WEBP. Returns base64-encoded image data |
+| `export_image` | Export nodes as PNG, JPG, or WEBP. Returns base64-encoded image data; `quality` (1–100, default 90) sets JPG and WEBP compression |
+| `export_html` | Export nodes as HTML: `style` `css` (default) or `tailwind`; `html` `fragment` (default) or `standalone`; `assets` `inline` (default) or `external`, which returns a standalone page's stylesheet, images, and web fonts as separate files; `layer_names` (default true) writes `data-name` and `layer_ids` (default false) writes each layer's ID |
 | `export_svg` | Export nodes as SVG markup |
 
 ### Viewport
@@ -437,6 +443,7 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 | `diff_show` | Preview the patch that setting JSX attributes on a node would produce |
 | `diff_apply` | Apply a patch after checking the nodes still match its old values |
 | `diff_visual` | Pixel diff between two rendered nodes, returned as an image |
+| `diff_changes` | Patch of what changed on a node or the current page: call it with `mark: true` to record the page as it is, then again to see what changed since; in the AI chat it compares with the page before the run first edited it |
 
 ### Comments
 

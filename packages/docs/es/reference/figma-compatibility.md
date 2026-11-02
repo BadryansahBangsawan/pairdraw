@@ -28,7 +28,7 @@ Comparación entre las funciones de Figma Design y el estado actual de OpenPenci
 | Miniatura propia | 🔲 | Los archivos guardados muestran su primera página, como Figma cuando no hay página de portada; no puede elegirse otra |
 | Paso de movimiento | 🔲 | 1 px y 10 px; sin valores personalizados |
 | Menú de aplicación | ✅ | Archivo, Editar, Ver, Objeto, Texto y Organizar en navegador; menús nativos en Tauri |
-| Herramientas de AI | 🟡 | 126 herramientas en el chat de AI, agentes de programación (ACP) y MCP; fotos de stock y vectorización de imágenes; sin generación de imágenes ni búsqueda con AI |
+| Herramientas de AI | 🟡 | 132 herramientas en el chat de AI, agentes de programación (ACP) y MCP; fotos de stock y vectorización de imágenes; sin generación de imágenes ni búsqueda con AI |
 
 ## Capas y formas
 
@@ -206,7 +206,7 @@ Conexiones, activadores, acciones, animaciones, transiciones, superposiciones, d
 | Fragmentos de código | 🟡 | Design JSX, HTML, Vue y React con CSS o Tailwind y valores basados en tokens; sin Swift, Kotlin ni Compose |
 | Tailwind CSS v4 | ✅ | HTML con clases de utilidad desde el panel Código, CLI o API |
 | Figma para VS Code | 🔲 | Sin integración con extensión del editor |
-| Servidor MCP | ✅ | `@open-pencil/mcp` con stdio y HTTP; 125 herramientas principales más herramientas de documento, historial y ajustes |
+| Servidor MCP | ✅ | `@open-pencil/mcp` con stdio y HTTP; 132 herramientas principales más herramientas de documento, historial y ajustes |
 | CLI | ✅ | 24 comandos, entre ellos `info`, `tree`, `find`, `query`, `node`, `pages`, `variables`, `tokens`, `fonts`, `lint`, `analyze`, `export`, `import`, `convert`, `diff`, `eval` y `tool` |
 
 ## Figma Draw

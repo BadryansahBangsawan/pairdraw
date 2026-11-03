@@ -1,0 +1,5 @@
+- Zoom to fit, to selection, and to 100%, the zoom menu's levels, zoom in and out, and the next or previous frame glide to their view, and jump instead when animations are off, Ultralight mode is on, or the system asks for reduced motion.
+- pen.dev files with `space_around` now open as Space around auto layout. Before, they got a fixed gap and padding that only looked the same.
+- An AI or MCP tool call that fails part way, including an `eval` script that throws, now leaves the document as it was instead of keeping its partial changes, unless someone else edited the document while it ran.
+- An instance that sets the mode of one variable collection keeps following its component's modes in every other collection.
+- When the libraries a `.pen` document imports can't be read, as in the browser or for a file dropped onto the desktop app, their components show as dashed placeholders and a message names the missing libraries and how to open them.

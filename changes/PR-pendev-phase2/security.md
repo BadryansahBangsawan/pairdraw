@@ -1,0 +1,2 @@
+- HTML styled for import no longer keeps event handlers, and the frame that styles it cannot run scripts.
+- Only the parent page at exactly the origin named in the embed URL can connect, once per load, and every request is validated; an embed opens no Cloud, room or file link from its own address and sends no usage statistics.

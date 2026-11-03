@@ -123,3 +123,27 @@ describe('read-only documents', () => {
     expect(getNodeOrThrow(editor.graph, rect.id).opacity).toBe(0.5)
   })
 })
+
+describe('read-only documents that take comments', () => {
+  test('keep the Comment tool and refuse edits', () => {
+    const { editor } = setup()
+    editor.setReadOnly(true, { comments: true })
+    editor.setTool('COMMENT')
+    expect(editor.state.activeTool).toBe('COMMENT')
+    expect(() => editor.setOpacity(0.5)).toThrow(ReadOnlyDocumentError)
+    // A tool that would edit is refused; the Comment tool stays.
+    editor.setTool('RECTANGLE')
+    expect(editor.state.activeTool).toBe('COMMENT')
+  })
+
+  test('drop the Comment tool once comments end, and editable again takes everything', () => {
+    const { editor } = setup()
+    editor.setReadOnly(true, { comments: true })
+    editor.setTool('COMMENT')
+    editor.setReadOnly(true)
+    expect(editor.state.activeTool).toBe('SELECT')
+    expect(editor.state.hostRestrictions).toEqual({ readOnly: true, comments: false })
+    editor.setReadOnly(false, { comments: true })
+    expect(editor.state.hostRestrictions).toEqual({ readOnly: false, comments: false })
+  })
+})

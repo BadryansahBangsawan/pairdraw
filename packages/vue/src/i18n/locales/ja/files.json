@@ -18,6 +18,10 @@
   "clipboardImageFetchFailed": "Figmaから画像1件を取得できませんでした。元のファイルにアクセスできることを確認して、もう一度お試しください。",
   "clipboardImagesFetchFailed": "Figmaから画像{count}件を取得できませんでした。元のファイルにアクセスできることを確認して、もう一度お試しください。",
   "mermaidPasteFailed": "Mermaid の図を読み込めませんでした。{error}",
+  "webPasteFailed": "ウェブコンテンツを貼り付けられませんでした。{error}",
+  "webCaptureUnreadable": "コピーしたウェブキャプチャを読み込めませんでした。ページをもう一度キャプチャしてください。",
+  "webCaptureNewer": "コピーしたウェブキャプチャは新しいキャプチャ拡張機能で作成されています。貼り付けるには Pairdraw を更新してください。",
+  "webCaptureTruncated": "ページが大きすぎて全体をキャプチャできなかったため、一部を省きました。",
   "recentFiles": "最近使用したファイル",
   "recentFilesDescription": "デザインの作業を続けるか、新しく始めます。",
   "noRecentFiles": "最近使用したファイルはありません",
@@ -71,5 +75,21 @@
   "fileChangedOnDisk": "「{name}」がディスク上で変更されました",
   "fileChangedOnDiskDescription": "未保存の編集がある間に、別のアプリがこのファイルを変更しました。再読み込みするとファイル側のバージョンが開き、編集内容は破棄されます。無視すると編集を続けられ、保存するとファイルがあなたのバージョンで置き換えられます。",
   "reloadFromDisk": "再読み込み",
-  "ignoreDiskChange": "無視"
+  "ignoreDiskChange": "無視",
+  "pasteImportHeading": "変数とスタイルを読み込みますか？",
+  "pasteImportDescription": "これらのレイヤーは別のドキュメントの変数やスタイルを使用しています。読み込むとレイヤーとのリンクが保たれます。見た目のまま貼り付けることもできます。",
+  "pasteImportConflicts": "このドキュメントに既にあるもの",
+  "pasteImportConflictsHint": "このドキュメントにあるものを使うか、コピーしたものを別の名前で追加します。",
+  "pasteImportUseExisting": "既存のものを使用",
+  "pasteImportAddRenamed": "名前を変えて追加",
+  "pasteImportVariables": {
+    "many": "{count} 個の変数"
+  },
+  "pasteImportFillStyle": "カラースタイル",
+  "pasteImportTextStyle": "テキストスタイル",
+  "pasteImportEffectStyle": "エフェクトスタイル",
+  "pasteImportGridStyle": "グリッドスタイル",
+  "pasteImportChoiceLabel": "{name}：既存のものを使用するか、名前を変えて追加",
+  "pasteImportAsIs": "そのまま貼り付け",
+  "pasteImportConfirm": "読み込む"
 }

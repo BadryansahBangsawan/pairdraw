@@ -1,0 +1,56 @@
+{
+  "extensionName": {
+    "message": "Pairdraw Web Capture"
+  },
+  "extensionDescription": {
+    "message": "Скопируйте веб-страницу или её элемент и вставьте в Pairdraw как редактируемые слои со стилями."
+  },
+  "actionTitle": {
+    "message": "Копировать в Pairdraw"
+  },
+  "popupTitle": {
+    "message": "Копировать в Pairdraw"
+  },
+  "copyPage": {
+    "message": "Копировать страницу"
+  },
+  "copyPageHint": {
+    "message": "Всю страницу в том виде, как вы её видите"
+  },
+  "pickElement": {
+    "message": "Выбрать элемент"
+  },
+  "pickElementHint": {
+    "message": "Нажмите на любую часть страницы"
+  },
+  "includeImages": {
+    "message": "Включать изображения с других сайтов"
+  },
+  "includeImagesHint": {
+    "message": "Запрашивает разрешение читать изображения с любых сайтов во время снимка."
+  },
+  "statusCopying": {
+    "message": "Копирование…"
+  },
+  "statusCopied": {
+    "message": "Скопировано. Вставьте на холст Pairdraw."
+  },
+  "statusUnavailable": {
+    "message": "Эту страницу нельзя снять. Попробуйте обычную веб-страницу."
+  },
+  "statusNeedsSecurePage": {
+    "message": "Для копирования страница должна открываться по HTTPS."
+  },
+  "statusFailed": {
+    "message": "Не удалось скопировать снимок: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Network error"
+      }
+    }
+  },
+  "pickerHint": {
+    "message": "Нажмите на элемент или Enter, чтобы скопировать его · ↑ ↓ переходят к родителю или потомку · Esc отменяет"
+  }
+}

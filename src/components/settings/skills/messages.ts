@@ -1,8 +1,9 @@
 import { useAIMessages } from '@open-pencil/vue/i18n'
 
 import { MAX_SKILL_DESCRIPTION_LENGTH, MAX_SKILL_NAME_LENGTH } from '@/app/ai/skills/parse'
+import { builtinSkillName, type BuiltinSkillName } from '@/app/ai/skills/sources/builtin'
 import type { SkillUploadFailure } from '@/app/ai/skills/sources/uploaded'
-import type { SkillParseError, SkillWarning } from '@/app/ai/skills/types'
+import type { Skill, SkillParseError, SkillWarning } from '@/app/ai/skills/types'
 
 /** What a skill's warnings, read errors, and upload failures say, in the user's language. */
 export function useSkillMessages() {
@@ -45,5 +46,28 @@ export function useSkillMessages() {
     return messages[failure.reason]
   }
 
-  return { warning, error, uploadFailure }
+  /**
+   * What a skill is for, as a list shows it: the built-in skills in the user's language, the
+   * rest as their SKILL.md describes them. The model always reads the SKILL.md description.
+   */
+  function description(skill: Pick<Skill, 'source' | 'name' | 'description'>): string {
+    const name = builtinSkillName(skill)
+    if (name === null) return skill.description
+    const summaries: Record<BuiltinSkillName, string> = {
+      'landing-page': ai.value.builtinSkillLandingPage,
+      'mobile-app': ai.value.builtinSkillMobileApp,
+      'web-app': ai.value.builtinSkillWebApp,
+      dashboard: ai.value.builtinSkillDashboard,
+      slides: ai.value.builtinSkillSlides,
+      'design-system': ai.value.builtinSkillDesignSystem,
+      'tailwind-v4': ai.value.builtinSkillTailwindV4,
+      layout: ai.value.builtinSkillLayout,
+      restyle: ai.value.builtinSkillRestyle,
+      'dark-mode': ai.value.builtinSkillDarkMode,
+      'design-review': ai.value.builtinSkillDesignReview
+    }
+    return summaries[name]
+  }
+
+  return { warning, error, uploadFailure, description }
 }

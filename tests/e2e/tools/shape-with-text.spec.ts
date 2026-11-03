@@ -26,8 +26,7 @@ async function clickAt(x: number, y: number) {
 }
 
 async function dragFrom(from: Vector, to: Vector) {
-  const box = await editor.canvas.canvas.boundingBox()
-  if (!box) throw new Error('Missing canvas')
+  const box = await editor.canvas.pointerOrigin()
   const start = shapes.point(from.x, from.y)
   const end = shapes.point(to.x, to.y)
   await editor.page.mouse.move(box.x + start.x, box.y + start.y)

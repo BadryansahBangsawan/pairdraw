@@ -80,6 +80,25 @@ Las variables y los estilos pasan entre OpenPencil, Figma y el código como [des
 - **Elegir el destino:** antes de cambiar nada, el diálogo muestra cada colección y modo que encontró y adónde va: a una colección o un modo nuevos, a uno existente o a ninguna parte. Las variables y los estilos con el mismo nombre se actualizan y el resto se añade; no se elimina nada. Cuenta lo que se añadirá, actualizará y omitirá, y explica por qué se omitió cada token
 - La importación es un solo paso: **Deshacer** la revierte entera
 
+## Sincronizar con una hoja de estilos
+
+Las propiedades personalizadas de un archivo CSS se convierten en variables, y las variables vuelven a él. Haz clic en **Sincronizar con CSS** en la barra de variables:
+
+- **Importar variables CSS…** lee un archivo `.css`. `:root`, `html` y el `@theme` de Tailwind contienen los valores predeterminados de cada colección; `[data-theme="dark"]`, una clase como `.dark` y los bloques `:root` dentro de `@media`, `@supports` o `@container` se convierten en modos con esa condición. Los colores, las longitudes en `px` o `rem`, las duraciones, los números, el texto entre comillas y las listas de fuentes se convierten en variables, `var(--name)` en un alias, y `calc()` o `clamp()` conserva su CSS como expresión CSS. El mismo diálogo de importación muestra adónde va cada colección y cada modo antes de cambiar nada
+- **Traer de** vuelve a leer el archivo vinculado y muestra qué cambió. Una hoja de estilos exportada desde el documento vuelve a las mismas variables y modos
+- **Enviar a** escribe las variables en el propio archivo vinculado: los valores cambiados se reescriben en su notación, los que faltan se añaden a su bloque, y los comentarios, las demás reglas y las propiedades sin variable quedan como estaban. No se elimina nada. Si el navegador no puede escribir el archivo, se guarda una copia
+- **Traer cuando cambie el archivo** importa cada guardado del archivo vinculado, en escritorio y en navegadores con acceso a archivos, como un solo paso de deshacer
+
+## Pegar entre documentos
+
+Las capas copiadas en un documento abierto y pegadas en otro pueden traer las variables y los estilos que usan. Antes de pegar, un diálogo pregunta cómo:
+
+- **Sí, importar** — añade las variables y los estilos, para que las capas pegadas sigan vinculadas a ellos
+- **Pegar tal cual** — pega las capas con los valores que mostraban, sin vínculo a ninguna variable ni estilo
+- **Usar existentes** o **Añadir con otro nombre** — cuando este documento ya tiene una colección o un estilo con el mismo nombre, elige en cada fila: usar el de aquí, donde las variables coinciden por nombre y las que faltan se añaden, o añadir la copia con un nombre nuevo como «Spacing 2»
+
+Pegar es un solo paso: **Deshacer** quita las capas y todo lo que se añadió. **Pegar propiedades** usa las colecciones y los estilos con el mismo nombre de la misma forma.
+
 ## Vincular variables a rellenos
 
 En la sección Relleno del panel de propiedades, usa el selector de variables para vincular una variable de color al relleno de un objeto.

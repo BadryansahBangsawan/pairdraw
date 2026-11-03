@@ -3,7 +3,12 @@ import { dirname, resolve, sep } from 'node:path'
 
 import { syncEditedComponents } from '@open-pencil/core'
 import { SkiaRenderer } from '@open-pencil/core/canvas'
-import { BUILTIN_IO_FORMATS, IORegistry } from '@open-pencil/core/io'
+import {
+  BUILTIN_IO_FORMATS,
+  IORegistry,
+  type ReadDocumentInput,
+  type ReadDocumentWarning
+} from '@open-pencil/core/io'
 import { populateAllFigPages, populateFigPage } from '@open-pencil/core/io/formats/fig'
 import { headlessHTMLReader } from '@open-pencil/core/io/formats/html/import'
 import { initCanvasKit } from '@open-pencil/core/io/formats/raster'
@@ -21,7 +26,7 @@ import {
   recordSceneMutations
 } from '@open-pencil/scene-graph/mutation-impact'
 
-import { printError } from '#cli/format'
+import { printError, warn } from '#cli/format'
 
 export { initCanvasKit }
 
@@ -43,16 +48,58 @@ function documentAssetReader(filePath: string) {
   }
 }
 
+/** Only documents a document imports are read for it this way: `.pen` libraries. */
+const IMPORTABLE_DOCUMENT = /\.pen$/i
+
+/** Whether `path` lies in `folder` or deeper. */
+const isWithin = (folder: string, path: string) => path === folder || path.startsWith(folder + sep)
+
+/**
+ * Opens the `.pen` libraries a document imports, by their path relative to it. They may sit
+ * outside its folder, as a shared library does, but not outside the working directory a
+ * repository's tooling runs in; a document outside the working directory imports only from its own
+ * folder. Each reads its own images beside itself and its own imports relative to itself.
+ */
+function documentImportOpener(filePath: string): ReadDocumentInput['openImport'] {
+  return async (path) => {
+    const folder = await realpath(dirname(filePath))
+    const cwd = await realpath(process.cwd())
+    const root = isWithin(cwd, folder) ? cwd : folder
+    const target = await realpath(resolve(folder, path)).catch(() => null)
+    if (!target || !isWithin(root, target) || !IMPORTABLE_DOCUMENT.test(target)) return null
+    return {
+      name: target,
+      data: new Uint8Array(await readFile(target)),
+      readAsset: documentAssetReader(target),
+      openImport: documentImportOpener(target)
+    }
+  }
+}
+
+/** Tells the user on stderr what a document opened without, keeping stdout for the output. */
+function printReadWarnings(filePath: string, warnings: readonly ReadDocumentWarning[] = []): void {
+  for (const warning of warnings) {
+    console.error(
+      warn(
+        `${filePath}: could not open the libraries it imports (${warning.paths.join(', ')}); their components read as placeholders.`
+      )
+    )
+  }
+}
+
 export async function loadDocument(filePath: string): Promise<SceneGraph> {
   const bytes = new Uint8Array(await readFile(filePath))
   // A format laid out as it is read places its layers by their text's size, which is measured
   // as an export draws it rather than estimated.
   if (io.findReader(filePath)?.laysOutOnRead) await measureTextHeadlessly()
-  const { graph } = await io.readDocument({
-    name: filePath,
+  const { graph, warnings } = await io.readDocument({
+    // The path its imports resolve to, so an import leading back to it is recognized.
+    name: await realpath(filePath),
     data: bytes,
-    readAsset: documentAssetReader(filePath)
+    readAsset: documentAssetReader(filePath),
+    openImport: documentImportOpener(filePath)
   })
+  printReadWarnings(filePath, warnings)
   graph.applyDerivedLayoutDuring(() => computeAllLayouts(graph))
   return graph
 }

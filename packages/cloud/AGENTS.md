@@ -22,6 +22,8 @@ Optional, self-hostable backend; the design is in `packages/docs/development/clo
 - Database rows use `crypto.randomUUID()`; secrets that leave the server use `randomHex` from `@open-pencil/scene-graph/random`, are stored as SHA-256 digests (a single-use OAuth continuation keeps a JWE copy), and travel in URL fragments (`src/server/sharing/capabilities/service.ts`).
 - An admin list takes `search`, `filter`, `limit`, and `offset` through `listQuery` and answers with its rows, `total`, and per-filter `counts`; it declares its filters once as `ListFilters`, which count in one query and page with the same condition (`src/admin/list.ts`, `tests/integration/admin/lists.test.ts`).
 - Every HTTP body goes through `validatedJSON` with a contract schema, and every response the client reads is parsed with Valibot (`src/server/validation.ts`, `src/client/api.ts`).
+- A snapshot link (`document_share.revision_id`) is always view-only, never issues a collaboration ticket, and keeps its revision out of compaction while it is active (`tests/integration/server/sharing/capabilities/snapshots.test.ts`).
+- Public profiles serve only workspaces their administrators published and whose policy allows links and guest viewing, checked when published and again when read (`tests/integration/server/profiles/routes.test.ts`).
 - A revision's images live in `revision_image`; code that makes a revision from another copies them with `copyRevisionImages`, and a storage object a `workspace_image` holds is never unreferenced (`src/server/documents/images.ts`, `tests/integration/server/documents/images.test.ts`).
 - Add schema changes as a new numbered migration in `src/server/db/migrations/` registered in `src/server/db/migrate.ts`; never edit a migration that has shipped. Better Auth's tables have their own versioned migration (`016_auth_schema.ts`).
 - Raw SQL lives only in migrations and the reviewed helpers in `src/server/db/expressions.ts`; everything else uses typed Kysely queries (`open-pencil/no-cloud-raw-sql`).
@@ -30,7 +32,8 @@ Optional, self-hostable backend; the design is in `packages/docs/development/clo
 ## Collaboration relay
 
 - The relay hub in `src/server/collaboration/relay/` is runtime-neutral: runtimes hand it sockets through `RelaySocket` and own listening (`src/runtime/node/relay.ts`). It joins every room as the `server` peer, so it must keep answering `sync-step1` and saving the room document.
-- Viewers may send only the channels in `VIEWER_ACTIONS`; every other channel from them is dropped, and presence is stamped from the ticket by `stampAwareness` (`tests/server/collaboration/relay/hub.test.ts`).
+- Viewers may send only the channels in `VIEWER_ACTIONS`, and commenters also the `comments` channel; every other channel from them is dropped, and presence is stamped from the ticket by `stampAwareness` (`tests/server/collaboration/relay/hub.test.ts`).
+- Commenters never write the room themselves: the relay decodes their threads, keeps only new threads, new replies, and resolving, stamps the ticket's name as author (for guests, the name they chose, so it is not proof of identity) and its own clock as every timestamp, writes them in the room layout of `src/contract/comments.ts`, and sends the change to everyone as its own update (`tests/server/collaboration/relay/comments.test.ts`).
 - Decoders must consume exactly the frame's bytes and copy payloads out, since socket buffers are pooled (`src/contract/relay.ts`, `tests/contract/relay.test.ts`).
 - Send frames through `relayServerMessages` and `relayClientMessages`, which split anything past `RELAY_FRAGMENT_BYTES` into fragments, and read sockets through the matching assemblers; never send an encoded frame whole (`tests/server/collaboration/relay/hub.test.ts`).
 

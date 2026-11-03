@@ -39,6 +39,8 @@ Haz clic en un segmento para seleccionarlo. Arrástralo para curvarlo; OpenPenci
 - <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>J</kbd> une dos extremos seleccionados: si están en el mismo lugar se convierten en un punto; si no, se unen con un segmento recto. Unir los dos extremos de una ruta la cierra y la rellena. Mientras editas una ruta, este atajo no abre el chat.
 - <kbd>Option</kbd>/<kbd>Alt</kbd> + arrastrar arrastra una copia de los puntos o segmentos seleccionados. La copia de un punto aislado queda unida a él.
 - Las teclas de flecha mueven los puntos seleccionados la distancia de Ajustes → Editor, y con <kbd>Shift</kbd> la distancia grande.
+- <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + arrastrar un segmento lo curva para que el lugar que agarraste siga al puntero. Un extremo suave sigue siendo suave y su otro tirador gira con él. Con <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>Option</kbd>/<kbd>Alt</kbd>, los tiradores de los segmentos vecinos no se mueven y los extremos pasan a ser esquinas.
+- Con dos puntos o segmentos seleccionados aparece un cuadro de transformación a su alrededor. Arrastra una esquina o un borde para escalar los puntos desde el lado opuesto; con <kbd>Shift</kbd> se mantienen las proporciones y con <kbd>Option</kbd>/<kbd>Alt</kbd> se escala desde el centro. Arrastra justo fuera de una esquina para girarlos alrededor del centro del cuadro, con <kbd>Shift</kbd> en pasos de 15°. Cada transformación se deshace en un solo paso.
 
 ## Continuar rutas abiertas
 

@@ -1,0 +1,17 @@
+{
+  "mode": "Shader-Modus",
+  "open": "Im Shader-Modus öffnen",
+  "region": "Shader-Modus: {name}",
+  "done": "Fertig",
+  "leave": "Shader-Modus verlassen ({shortcut})",
+  "play": "Abspielen",
+  "pause": "Pausieren",
+  "restart": "Zum Anfang",
+  "phase": "Animationsphase",
+  "position": "{time} von {duration}",
+  "preview": "Shader-Vorschau",
+  "settings": "Shader-Einstellungen",
+  "starting": "Shader wird gestartet …",
+  "failed": "Dieser Shader lässt sich hier nicht abspielen, daher wird sein Standbild gezeigt.",
+  "readOnly": "Dieses Dokument ist schreibgeschützt: Der Shader läuft, seine Einstellungen lassen sich aber nicht ändern."
+}

@@ -10,7 +10,10 @@ import {
 const messages = {
   requiredField: 'Required',
   invalidURL: 'Invalid URL',
-  designToolsRequired: 'Tools required'
+  designToolsRequired: 'Tools required',
+  vertexProjectRequired: 'Project required',
+  vertexProjectInvalid: 'Invalid project',
+  vertexClaudeAccessToken: 'Access token required'
 }
 const context: ModelProfileValidationContext = {
   customModel: false,
@@ -29,7 +32,10 @@ const values = {
   tools: true
 }
 
-function errors(options: Partial<ModelProfileValidationContext>, input = values) {
+function errors(
+  options: Partial<ModelProfileValidationContext>,
+  input: Record<string, unknown> = values
+) {
   const result = v.safeParse(modelProfileSchema({ ...context, ...options }, messages), input)
   return result.success ? {} : v.flatten(result.issues).nested
 }
@@ -71,4 +77,30 @@ test('OpenPencil Cloud needs a workspace and a model, but no key', () => {
     cloudWorkspace: ['Required']
   })
   expect(errors(cloud, { ...values, cloudWorkspace: 'workspace' })).toEqual({})
+})
+
+test('Claude on Vertex AI refuses to save or test without a valid project or with an API key', () => {
+  const claude = { vertex: { claude: true } }
+  const vertex = { ...values, vertexProject: '', vertexCredentialKind: 'access-token' }
+  for (const intent of ['save', 'test'] as const) {
+    expect(errors({ ...claude, intent }, { ...vertex, credential: true })).toEqual({
+      vertexProject: ['Project required']
+    })
+  }
+  expect(errors(claude, { ...vertex, vertexProject: 'My-Project' })).toEqual({
+    vertexProject: ['Invalid project']
+  })
+  expect(
+    errors(claude, { ...vertex, vertexProject: 'design-team', vertexCredentialKind: 'api-key' })
+  ).toEqual({ vertexCredentialKind: ['Access token required'] })
+  expect(errors(claude, { ...vertex, vertexProject: 'design-team' })).toEqual({})
+})
+
+test('Gemini on Vertex AI may use express mode with an API key, but not a mistyped project', () => {
+  const gemini = { vertex: { claude: false } }
+  const vertex = { ...values, vertexProject: '', vertexCredentialKind: 'api-key' }
+  expect(errors(gemini, vertex)).toEqual({})
+  expect(errors(gemini, { ...vertex, vertexProject: 'my project' })).toEqual({
+    vertexProject: ['Invalid project']
+  })
 })

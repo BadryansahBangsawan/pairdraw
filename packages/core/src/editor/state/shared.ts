@@ -10,6 +10,7 @@ export function createDefaultEditorSharedState(): EditorSharedState {
     snappingPreferences: { ...DEFAULT_SNAPPING_PREFERENCES },
     showPixelGrid: true,
     gradientEdit: null,
+    imageEdit: null,
     presenceCursors: [],
     documentName: 'Untitled',
     designIssues: null,

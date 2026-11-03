@@ -18,7 +18,7 @@ Gli oggetti possono scorrere in orizzontale, verticale o andare a capo. La spazi
 
 ## Allineamento
 
-L’asse principale offre inizio, centro, fine e spazio tra gli elementi. L’asse trasversale offre inizio, centro, fine ed estensione.
+L’asse principale offre inizio, centro, fine, spazio tra gli elementi e spazio attorno. Con lo spazio attorno ogni oggetto riceve una parte uguale dello spazio libero, metà per lato, oltre alla spaziatura; si sceglie dal menu del campo di spaziatura. L’asse trasversale offre inizio, centro, fine ed estensione.
 
 ## Dimensionamento
 

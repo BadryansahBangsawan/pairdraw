@@ -46,11 +46,13 @@ import { createGraphEventSubscription } from './graph-events'
 import { createGraphReadActions } from './graph-reads'
 import { createGuideActions } from './guides'
 import { createIconActions } from './icons'
+import { createImageEditActions } from './image-edit'
 import { createDesignIssueActions } from './issues'
 import { createLineEndActions } from './line-ends'
 import { createNodeActions } from './nodes'
 import { createPageActions } from './pages'
 import { createReadOnlyActions, guardReadOnly, guardUndo } from './read-only'
+import { createScaleActions } from './scale'
 import { createSelectionActions } from './selection'
 import { createShaderActions } from './shaders/actions'
 import { createShaderFrames } from './shaders/frames'
@@ -61,6 +63,7 @@ import { createStatusActions } from './statuses'
 import { createStickyActions } from './stickies'
 import { createStructureActions } from './structure'
 import { createTextActions } from './text'
+import { createTextHyperlinkActions } from './text/hyperlink'
 import { createPendingTextLayout } from './text/pending-layout'
 import { createTextSelectionStyle } from './text/selection-style'
 import { createGeneratedTextActions } from './text/typeface'
@@ -309,6 +312,7 @@ export function createEditor(options?: EditorOptions) {
   const vectorize = createVectorizeActions(ctx)
   const icons = createIconActions(ctx)
   const stickies = createStickyActions(ctx, nodes)
+  const scale = createScaleActions(ctx, nodes.beginNodePreview)
   const shapesWithText = createShapeWithTextActions(ctx, nodes)
   const generatedText = createGeneratedTextActions(ctx, nodes)
   const statuses = createStatusActions(ctx)
@@ -323,9 +327,10 @@ export function createEditor(options?: EditorOptions) {
   const connectorLines = createConnectorLineActions(ctx, nodes.beginNodePreview)
   const connectorStyles = createConnectorStyleActions(ctx, nodes)
   const lineEnds = createLineEndActions(ctx, nodes.beginNodePreview)
+  const imageEdit = createImageEditActions(ctx, nodes.updateNodeWithUndo)
   const shaders = createShaderActions(ctx, nodes)
   const alignment = createAlignmentActions(ctx)
-  const canvasViews = createCanvasViewActions(ctx)
+  const canvasViews = createCanvasViewActions(ctx, viewport)
   const clipboardBridge = createClipboardBridge(clipboard, selection)
   const componentBridge = createComponentBridge(components, selection, structure, pages)
   const structureBridge = createStructureBridge(structure, selection)
@@ -333,6 +338,12 @@ export function createEditor(options?: EditorOptions) {
   const undoBridge = createUndoBridge(undoActions, selection, nodes.flushNudge)
   const lintFixBridge = createLintFixBridge(ctx, nodes, structure, clipboard)
   const textSelectionStyle = createTextSelectionStyle(ctx, text.runTextEditStep)
+  const textHyperlinks = createTextHyperlinkActions(ctx, {
+    updateNodeWithUndo: nodes.updateNodeWithUndo,
+    runTextEditStep: text.runTextEditStep,
+    switchPage: (pageId) => pages.switchPage(pageId),
+    revealNodes: viewport.revealNodes
+  })
   /** Whether the editor refuses edits: its profile offers none, as for a read-only document. */
   const readsOnly = () => !resolveEditorProfile(state).edits
   const readOnly = createReadOnlyActions(ctx, () => {
@@ -342,6 +353,7 @@ export function createEditor(options?: EditorOptions) {
     shapes.penCancel()
     shapes.pencilCancel()
     state.gradientEdit = null
+    state.imageEdit = null
   })
 
   // The edited text follows changes made outside the editor, such as a panel field being
@@ -495,6 +507,8 @@ export function createEditor(options?: EditorOptions) {
     ...vectorize,
     ...icons,
     ...stickies,
+    // The Scale tool: layers scale with their text, strokes, effects, radii, and spacing
+    ...scale,
     ...shapesWithText,
     ...generatedText,
     statusWorkflow: statuses.statusWorkflow,
@@ -505,6 +519,7 @@ export function createEditor(options?: EditorOptions) {
     ...connectorEndpoints,
     ...connectorLines,
     ...lineEnds,
+    ...imageEdit,
     ...connectorStyles,
     ...shaders,
     ...shaderFrames,
@@ -515,6 +530,7 @@ export function createEditor(options?: EditorOptions) {
 
     // Text editing
     ...text,
+    ...textHyperlinks,
 
     // Viewport
     ...viewport,

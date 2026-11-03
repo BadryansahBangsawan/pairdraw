@@ -1,0 +1,22 @@
+{
+  "title": "スライド",
+  "listLabel": "このページのスライド",
+  "slideLabel": "スライド {number}: {name}",
+  "reorderHint": "ドラッグするか、Alt と上下の矢印キーで並べ替えます。",
+  "slideMoved": "{name} はスライド {number} になりました。",
+  "present": "プレゼンテーション ({shortcut})",
+  "presentFromSlide": "このスライドからプレゼンテーション",
+  "exportPDF": "スライドを PDF にエクスポート",
+  "exportPPTX": "スライドを PowerPoint にエクスポート",
+  "exportPPTXFailed": "スライドをエクスポートできませんでした: {error}",
+  "emptyTitle": "スライドはまだありません",
+  "emptyDescription": "このページの最上位フレームが、レイヤー順にスライドになります。",
+  "nothingToPresent": "プレゼンテーションするには、このページに最上位フレームを追加してください。",
+  "presentation": "プレゼンテーション",
+  "previousSlide": "前のスライド",
+  "nextSlide": "次のスライド",
+  "position": "{number} / {count}",
+  "fitToScreen": "画面に合わせる",
+  "actualSize": "実際のサイズ",
+  "exitPresentation": "プレゼンテーションを終了 ({shortcut})"
+}

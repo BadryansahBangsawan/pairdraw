@@ -21,6 +21,7 @@ const LOCALES_DIR = 'packages/vue/src/i18n/locales'
  * Namespaces of one domain share a folder (`cloud/editor`, `cloud/portal`), not a file prefix.
  */
 const LOCALE_FILE_NAMES: Record<string, string> = {
+  chatContext: 'chat-context',
   cloud: 'cloud/editor',
   cloudPortal: 'cloud/portal',
   designCheck: 'design-check',

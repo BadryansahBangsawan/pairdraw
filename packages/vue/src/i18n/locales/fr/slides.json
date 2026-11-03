@@ -1,0 +1,22 @@
+{
+  "title": "Diapositives",
+  "listLabel": "Diapositives de cette page",
+  "slideLabel": "Diapositive {number} : {name}",
+  "reorderHint": "Faites glisser pour réorganiser, ou appuyez sur Alt avec la flèche haut ou bas.",
+  "slideMoved": "{name} est maintenant la diapositive {number}.",
+  "present": "Présenter ({shortcut})",
+  "presentFromSlide": "Présenter à partir de cette diapositive",
+  "exportPDF": "Exporter les diapositives en PDF",
+  "exportPPTX": "Exporter les diapositives vers PowerPoint",
+  "exportPPTXFailed": "Impossible d’exporter les diapositives : {error}",
+  "emptyTitle": "Aucune diapositive pour l’instant",
+  "emptyDescription": "Les cadres de premier niveau de cette page deviennent des diapositives, dans l’ordre des calques.",
+  "nothingToPresent": "Ajoutez un cadre de premier niveau à cette page pour la présenter.",
+  "presentation": "Présentation",
+  "previousSlide": "Diapositive précédente",
+  "nextSlide": "Diapositive suivante",
+  "position": "{number} sur {count}",
+  "fitToScreen": "Adapter à l’écran",
+  "actualSize": "Taille réelle",
+  "exitPresentation": "Quitter la présentation ({shortcut})"
+}

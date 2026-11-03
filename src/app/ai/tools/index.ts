@@ -17,6 +17,7 @@ import { recordToolCompleted, type AIDiagnosticContext } from '@/app/diagnostics
 import type { EditorStore } from '@/app/editor/active-store'
 import { useLibraryService } from '@/app/libraries'
 
+import { actionRefusal, type ActionApproval } from './approval'
 import { aiToolDefinitions } from './catalog'
 import { runEditorTool } from './runner'
 
@@ -41,7 +42,16 @@ function withUndoNote(result: unknown, note: string): unknown {
   return isPlainObject(result) ? { ...result, undoNote: note } : { result, undoNote: note }
 }
 
-export function createAITools(store: EditorStore, diagnosticContext?: AIDiagnosticContext) {
+export interface AIToolOptions {
+  /** Asks the person before a call runs, when Settings → AI wants each change approved. */
+  approve?: ActionApproval['approve']
+}
+
+export function createAITools(
+  store: EditorStore,
+  diagnosticContext?: AIDiagnosticContext,
+  { approve }: AIToolOptions = {}
+) {
   const libraryService = useLibraryService()
   libraryService.bindEditor(store)
   registerComponentCatalog(store.graph, libraryService)
@@ -57,18 +67,16 @@ export function createAITools(store: EditorStore, diagnosticContext?: AIDiagnost
         }
         return figma
       },
-      executeTool: async (def, figma, args, { toolCallId }) =>
-        withUndoNote(
-          // The call belongs to the reply that made it, even if a later one starts meanwhile.
-          await runEditorTool({
-            store,
-            figma,
-            def,
-            args,
-            reply: { run: currentRun(store), toolCallId }
-          }),
+      executeTool: async (def, figma, args, { toolCallId }) => {
+        // The call belongs to the reply that made it, even if a later one starts meanwhile.
+        const run = currentRun(store)
+        const approval = approve ? await approve(def, args, toolCallId) : 'allowed'
+        if (approval !== 'allowed') return { error: actionRefusal(approval) }
+        return withUndoNote(
+          await runEditorTool({ store, figma, def, args, reply: { run, toolCallId } }),
           takeRunUndoNote(store)
-        ),
+        )
+      },
       onAfterExecute: (def) => {
         if (def.mutates && !isAtomicTool(def)) store.requestRender()
       },

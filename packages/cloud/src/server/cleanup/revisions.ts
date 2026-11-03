@@ -78,7 +78,10 @@ export function createRevisionCompactionService(
     return pruned
   }
 
-  /** Saves that may go: old, unversioned, not current, in a document that is not deleted. */
+  /**
+   * Saves that may go: old, unversioned, not current, not shown by a snapshot link, in a document
+   * that is not deleted.
+   */
   function compactable(source: Kysely<CloudDatabase> | Transaction<CloudDatabase>, before: Date) {
     return source
       .selectFrom('documentRevision')
@@ -98,6 +101,17 @@ export function createRevisionCompactionService(
               .selectFrom('documentVersion')
               .select('documentVersion.id')
               .whereRef('documentVersion.revisionId', '=', 'documentRevision.id')
+          )
+        )
+      )
+      .where((expression) =>
+        expression.not(
+          expression.exists(
+            expression
+              .selectFrom('documentShare')
+              .select('documentShare.id')
+              .whereRef('documentShare.revisionId', '=', 'documentRevision.id')
+              .where('documentShare.revokedAt', 'is', null)
           )
         )
       )

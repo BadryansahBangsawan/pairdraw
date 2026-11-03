@@ -95,6 +95,7 @@ function metadata(library: LibrarySummary): string {
     <div
       v-if="!designSystems.loaded.value && designSystems.loading.value"
       :class="[styles.grid(), loading.group()]"
+      role="status"
       :aria-label="files.loadingDesignSystems"
     >
       <div v-for="index in 3" :key="index" :class="styles.skeleton()">

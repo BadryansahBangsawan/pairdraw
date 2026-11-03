@@ -55,5 +55,29 @@ test('a file that holds no skill is refused', async ({ page }) => {
   await openSkills(page)
   await upload(page, 'notes.zip', Buffer.from(zipSync({ 'README.md': strToU8('# Notes') })))
   await expect(page.getByRole('alert')).toBeVisible()
-  await expect(page.locator('[data-item]')).toHaveCount(0)
+  await expect(page.locator('[data-group="openpencil"] [data-item]')).toHaveCount(0)
+})
+
+test('the built-in skills are listed, read in their details, and turned off together', async ({
+  page
+}) => {
+  await page.goto('/?test')
+  await new CanvasHelper(page).waitForInit()
+  await openSkills(page)
+
+  const panel = page.getByTestId('settings-skills-panel')
+  const builtin = panel.locator('[data-group="builtin"]')
+  await expect(builtin).toContainText('Built-in')
+  const darkMode = builtin.getByRole('switch', { name: 'dark-mode', exact: true })
+  await expect(darkMode).toHaveAttribute('data-state', 'checked')
+
+  await builtin.locator('[data-item="design-system"]').getByRole('button').first().click()
+  const details = page.getByTestId('settings-skill-details')
+  await expect(details).toContainText('references/token-scale.md')
+  // Built-in skills ship with the app, so there is nothing to delete.
+  await expect(details.getByRole('button', { name: 'Delete skill' })).toHaveCount(0)
+  await details.getByRole('button', { name: 'Done' }).click()
+
+  await builtin.getByRole('switch', { name: 'Built-in', exact: true }).click()
+  await expect(darkMode).toBeDisabled()
 })

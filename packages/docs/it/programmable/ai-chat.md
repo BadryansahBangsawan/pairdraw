@@ -19,7 +19,7 @@ Puoi salvare più profili e assegnarli separatamente a design, revisioni, attivi
 
 ## Provider
 
-OpenPencil supporta connessioni compatibili con OpenAI e Anthropic, oltre a OpenRouter, Google, Z.ai e provider locali.
+OpenPencil supporta connessioni compatibili con OpenAI e Anthropic, oltre a OpenRouter, Google, Amazon Bedrock, Google Vertex AI, Z.ai e provider locali. Amazon Bedrock usa una regione e una chiave API di Bedrock, o chiavi di accesso AWS nell’app desktop; Vertex AI usa un progetto, una posizione e un token di accesso.
 
 Non usa un server intermedio. Le richieste vengono inviate direttamente al provider; nel browser si applicano le sue regole CORS. L’affidabilità delle chiamate agli strumenti in streaming può variare tra i deployment. Consulta la [compatibilità BYOK](/programmable/byok-provider-compatibility).
 
@@ -28,6 +28,8 @@ Non usa un server intermedio. Le richieste vengono inviate direttamente al provi
 L’app desktop può avviare agenti ACP e collegarli a server remoti attendibili compatibili con [Model Context Protocol](https://modelcontextprotocol.io/). In **Impostazioni → Connessioni MCP**, aggiungi un endpoint HTTP trasmissibile, un nome e, se necessario, un token Bearer.
 
 Il token è conservato nell’archivio sicuro delle credenziali, non nelle normali impostazioni, e viene recuperato solo all’avvio della sessione ACP.
+
+Anche la chat integrata con API diretta usa le connessioni attive e offre i loro strumenti al modello come `mcp__<server>__<strumento>`. I server ospitati come Notion o Linear usano l’**Accesso OAuth**: salva la connessione, poi fai clic su **Accedi**. Nell’app desktop una connessione può anche essere un **Comando locale**, un programma che parla MCP su stdin e stdout, con un argomento per riga e variabili d’ambiente facoltative `NOME=valore`. Prima di eseguire una riga di comando per la prima volta, l’app chiede conferma in una finestra di sistema; variabili come `PATH` o `NODE_OPTIONS`, che caricano codice, non sono consentite. Finché la chat chiede prima di agire, chiede anche prima di ogni strumento esterno che il suo server non segna come di sola lettura. Nell’app web un server remoto deve accettare richieste dall’origine dell’app (CORS).
 
 ## Strumenti
 
@@ -39,7 +41,20 @@ Per l’ispezione, `get_jsx` offre la vista JSX di andata e ritorno, `diff_creat
 
 Le skill sono cartelle con un `SKILL.md` nel formato [Agent Skills](https://agentskills.io/specification): istruzioni per un tipo di lavoro, con file di riferimento facoltativi. L’IA integrata vede nome e descrizione di ogni skill attiva e ne carica le istruzioni quando una richiesta corrisponde; gli script di una skill non vengono eseguiti.
 
-In **Impostazioni → Skill** carica una skill come ZIP della sua cartella o come `SKILL.md`. Nell’app desktop vengono lette anche `~/.agents/skills` e `~/.claude/skills`, e le cartelle `.agents/skills` e `.claude/skills` accanto al documento aperto, usate solo dopo **Fidati della cartella**. Digita `/` all’inizio di un messaggio per scegliere una skill e `@` per menzionare un livello, una pagina o una skill. Le menzioni appaiono come chip, anche nelle risposte; un clic mostra il livello sulla tela.
+In **Impostazioni → Skill** carica una skill come ZIP della sua cartella o come `SKILL.md`. Nell’app desktop vengono lette anche `~/.agents/skills` e `~/.claude/skills`, e le cartelle `.agents/skills` e `.claude/skills` accanto al documento aperto, usate solo dopo **Fidati della cartella**. OpenPencil include skill integrate: guide per landing page, app mobili, app web, dashboard, slide, design system e Tailwind CSS v4, più `layout`, `restyle`, `dark-mode` e `design-review` per un design esistente; una tua skill con lo stesso nome ha la precedenza. Digita `/` all’inizio di un messaggio o usa **Scegli una competenza** sotto il campo del messaggio per scegliere una skill e `@` per menzionare un livello, una pagina o una skill. Le menzioni appaiono come chip, anche nelle risposte; un clic mostra il livello sulla tela.
+
+## Esplorare varianti
+
+**Lascia cuocere**, il cappello da chef sotto il campo del messaggio, esplora una richiesta invece di rispondere una volta sola:
+
+- **Varianti** chiede da due a sei design affiancati, ognuno un nuovo frame di primo livello a destra di tutto ciò che c’è nella pagina. Scegli se esplorano il **Layout** (struttura e disposizione, con un solo stile) o lo **Stile** (colori, tipografia e immagini, con un solo layout). Con un livello selezionato o menzionato, le varianti partono da quello e lo lasciano com’era.
+- **Non iterare** chiede un solo design in un unico passaggio, senza la revisione e le correzioni che l’assistente fa di solito.
+
+La scelta resta attiva per i messaggi successivi, e il pulsante la mostra, finché non torni su **Disattivato**.
+
+## Note per l’IA
+
+Seleziona un livello e aggiungi le **Note per l’IA** in fondo al pannello Design. **Contesto** dice agli agenti cosa significa o fa il livello, ad esempio «apre la finestra di registrazione»; **Prompt** è una richiesta sul livello che **Esegui prompt** invia alla chat. Un messaggio porta con sé le note dei livelli che riguarda: quelli che menziona e la selezione oppure, se non ce ne sono, l’intera pagina. Gli agenti rispettano il contesto e agiscono su un prompt solo quando viene chiesto. Le note sono salvate nel file insieme al livello, e le note `context` e le schede prompt di un file `.pen` vengono lette allo stesso modo.
 
 ## Verifica visiva
 

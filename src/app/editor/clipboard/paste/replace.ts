@@ -17,3 +17,26 @@ export async function pasteClipboardToReplace(store: EditorStore) {
     toast.error(notificationMessages.get().clipboardAccessBlocked)
   }
 }
+
+/**
+ * pen.dev's Replace inside instance (⌥⇧R): the clipboard's layer takes the place of each selected
+ * layer inside an instance, kept as that instance's override. A selection with no such layer
+ * pastes to replace as usual.
+ */
+export async function pasteClipboardToReplaceInInstance(store: EditorStore) {
+  if (store.replaceableInstanceLayers(store.state.selectedIds).length === 0) {
+    await pasteClipboardToReplace(store)
+    return
+  }
+  try {
+    const html = await readClipboardHTML()
+    if (!html) {
+      toast.error(notificationMessages.get().clipboardMissingDesignData)
+      return
+    }
+    await pasteClipboardHTML(store, html, undefined, { replaceInInstance: true })
+  } catch (error) {
+    console.warn('Replace inside instance failed', error)
+    toast.error(notificationMessages.get().clipboardAccessBlocked)
+  }
+}

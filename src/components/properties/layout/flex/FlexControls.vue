@@ -15,6 +15,11 @@ import FlexGapField from './FlexGapField.vue'
 
 const ctx = useLayoutControlsContext()
 const { panels } = useI18n()
+/** Space between or around, which the grid keeps while it moves children across. */
+const distribution = computed(() => {
+  const align = ctx.node.primaryAxisAlign
+  return align === 'SPACE_BETWEEN' || align === 'SPACE_AROUND' ? align : null
+})
 const alignmentCells = computed(() => {
   const horizontal = [
     panels.value.alignLeft,
@@ -30,7 +35,7 @@ const alignmentCells = computed(() => {
     ...cell,
     label: `${vertical[Math.floor(index / 3)]}, ${horizontal[index % 3]}`,
     active:
-      ctx.node.primaryAxisAlign === (ctx.gapAuto ? 'SPACE_BETWEEN' : cell.primary) &&
+      ctx.node.primaryAxisAlign === (distribution.value ?? cell.primary) &&
       ctx.node.counterAxisAlign === cell.counter
   }))
 })
@@ -55,9 +60,7 @@ const alignmentCells = computed(() => {
       data-test-id="layout-alignment-grid"
       :label="panels.alignment"
       :cells="alignmentCells"
-      @select="
-        (primary, counter) => ctx.setAlignment(ctx.gapAuto ? 'SPACE_BETWEEN' : primary, counter)
-      "
+      @select="(primary, counter) => ctx.setAlignment(distribution ?? primary, counter)"
     />
     <div class="flex min-w-0 flex-col gap-1.5">
       <FlexGapField />

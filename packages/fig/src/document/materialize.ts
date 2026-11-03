@@ -38,6 +38,7 @@ import type { ComponentConstruction } from './components'
 import { loadPageTransaction } from './load-transaction'
 import { applyDocumentMetadata } from './metadata'
 import { createArchiveDocumentReader, createDocumentReader } from './read'
+import { applyStoredReplacedLayers, syncInstancesOfReplacingComponents } from './replaced-layers'
 import {
   materializeVariableResources,
   type UnsupportedVariableExpressionDiagnostic
@@ -523,6 +524,11 @@ function materializeReaderInto(
   for (const page of pages) populateInstances(page)
   for (const instanceId of resync) graph.syncInstance(instanceId)
   if (resync.size > 0) restoreDerivedSizes(graph, derivedSizes)
+  // Instances show the layers they replaced their components' with, before bindings resolve.
+  const added = [...graph.nodes.values()].filter((node) => !existingNodeIds.has(node.id))
+  applyStoredReplacedLayers({ graph, blobs, sources }, added)
+  // Instances of a component that replaces a layer show the replacement from its definition.
+  if (syncInstancesOfReplacingComponents(graph, added)) restoreDerivedSizes(graph, derivedSizes)
   // Records name other layers by GUID, so links wait until every layer of the pass exists,
   // instances and the layers inside them included.
   const layerOf = (sourceId: string) => sources.get(sourceId)

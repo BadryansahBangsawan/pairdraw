@@ -35,6 +35,8 @@ Mit <kbd>Shift</kbd> wird ein Rechteck zum Quadrat, eine Ellipse zum Kreis und e
 
 Volltonfarbe, linearer, radialer, Winkel- oder Diamantverlauf sowie Bildfüllung.
 
+Ein Bild schneiden Sie direkt auf der Arbeitsfläche zu, indem Sie die Ebene doppelt anklicken, sie auswählen und <kbd>Enter</kbd> drücken oder **Bild zuschneiden** im Kontextmenü oder in der Bildfüllung wählen. Das ganze Bild erscheint, außerhalb der Ebene abgeblendet. Ziehen Sie die Eckwinkel oder Kantenbalken der Ebene, um sie über dem stillstehenden Bild zuzuschneiden, ziehen Sie das Bild, um es hinter der Ebene zu verschieben, und ziehen Sie seine Eckpunkte, um es zu skalieren. <kbd>Shift</kbd> hält die Proportionen oder eine Achse, <kbd>Alt</kbd> arbeitet von der Mitte aus. Jedes Ziehen ist ein Schritt zum Rückgängigmachen; <kbd>Enter</kbd>, <kbd>Esc</kbd>, ein Doppelklick oder ein Klick außerhalb des Bildes beendet den Modus. Vektoren, Ebenen mit Inhalt und Ebenen, die Auto-Layout platziert, behalten ihre Kanten; bei ihnen können Sie das Bild nur verschieben und skalieren.
+
 ### Kontur
 
 Gemeinsame oder seitenspezifische Stärke, Farbe, Ausrichtung innen/mittig/außen, Enden, Verbindungen und Strichelung.

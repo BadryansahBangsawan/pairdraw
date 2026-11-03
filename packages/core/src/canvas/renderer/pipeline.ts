@@ -97,6 +97,7 @@ export function renderFromEditorState(
       hoveredNodeId: editChrome ? state.hoveredNodeId : null,
       showPixelGrid: editChrome && state.showPixelGrid !== false,
       gradientEdit: state.gradientEdit,
+      imageEdit: state.imageEdit,
       transforming: state.transforming,
       measurementMode: state.measurementMode,
       enteredContainerId: state.enteredContainerId,
@@ -117,7 +118,9 @@ export function renderFromEditorState(
           }
         : null,
       pencilState: state.pencilState,
-      nodeEditState: state.nodeEditState ?? null,
+      nodeEditState: state.nodeEditState
+        ? { ...state.nodeEditState, pointsTransformable: state.activeTool === 'SELECT' }
+        : null,
       presenceCursors: state.presenceCursors,
       designIssues: state.designIssues,
       codeFocusNodeId: state.codeFocusNodeId,

@@ -23,6 +23,8 @@ Selecciona el componente y elige **Crear instancia**, o insértalo desde Recurso
 
 Las propiedades modificadas en una instancia se guardan como sustituciones. Los cambios posteriores del componente principal siguen llegando, excepto en las propiedades sustituidas.
 
+Una instancia que fija el modo de una colección de variables sigue tomando los modos del componente para las demás colecciones. El botón de intercambio de la cabecera de una instancia, también anidada, muestra otro componente en su lugar. <kbd>⌥</kbd><kbd>⇧</kbd><kbd>R</kbd> reemplaza la capa seleccionada dentro de una instancia por la capa copiada como sustitución, sin separar la instancia; **Restaurar capa del componente** recupera la capa original.
+
 ## Propiedades de componente
 
 Se admiten texto, visibilidad booleana, intercambio de instancia y variantes. Las propiedades aparecen en el panel derecho al seleccionar una instancia.

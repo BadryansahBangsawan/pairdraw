@@ -47,3 +47,17 @@ export const canvasPrompt = computed({
     }
   }
 })
+
+/**
+ * Whether the built-in chat asks before each call that changes the document; Settings → AI turns
+ * it on. Coding agents ask through their own permission requests instead.
+ */
+export const approveActions = computed({
+  get: () => appPreferences.value.chat.approveActions,
+  set: (approveActions: boolean) => {
+    appPreferences.value = {
+      ...appPreferences.value,
+      chat: { ...appPreferences.value.chat, approveActions }
+    }
+  }
+})

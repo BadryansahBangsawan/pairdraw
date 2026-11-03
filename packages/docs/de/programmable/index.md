@@ -40,7 +40,7 @@ Die CLI untersucht, exportiert und analysiert `.fig`-Dateien ohne geöffneten Ed
 
 ## MCP-Server
 
-Claude Code, Cursor, Windsurf und andere MCP-Clients können dieselben 90 Werkzeuge verwenden wie der integrierte AI-Chat. Der Server unterstützt stdio und HTTP mit Sitzungen.
+Claude Code, Cursor, Windsurf und andere MCP-Clients können dieselben 138 Werkzeuge verwenden wie der integrierte AI-Chat. Der Server unterstützt stdio und HTTP mit Sitzungen.
 
 [MCP-Server →](/programmable/mcp-server)
 

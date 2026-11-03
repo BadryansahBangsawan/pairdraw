@@ -46,6 +46,7 @@
   "flattenSelection": "Сгладить",
   "outlineText": "Преобразовать текст в контуры",
   "outlineStroke": "Преобразовать обводку в контур",
+  "cropImage": "Обрезать изображение",
   "useAsMask": "Использовать как маску",
   "removeMask": "Убрать маску",
   "bringForward": "Переместить вперёд",
@@ -91,5 +92,8 @@
   "vectorSmoothCorner": "Переключить точку между гладкой и угловой",
   "gestureDrag": "перетаскивание",
   "gestureDoubleClickSegment": "двойной щелчок по сегменту",
-  "gestureDoubleClickPoint": "двойной щелчок по точке"
+  "gestureDoubleClickPoint": "двойной щелчок по точке",
+  "vectorBendSegment": "Изогнуть сегмент",
+  "vectorBendSegmentKeepHandles": "Изогнуть сегмент, не сдвигая соседние рычаги",
+  "gestureDragSegment": "перетаскивание сегмента"
 }

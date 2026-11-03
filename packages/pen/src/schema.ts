@@ -165,7 +165,19 @@ const nodeFields = {
 
   ref: v.optional(strSchema),
   /** The model a `prompt` node asks. */
-  model: v.optional(strSchema)
+  model: v.optional(strSchema),
+
+  /** A `script` node's JavaScript file, relative to the document. */
+  scriptUri: v.optional(strSchema),
+  /** A `script` node's input values by name. */
+  inputs: v.optional(v.record(strSchema, v.unknown())),
+  /** The page a `browser` node shows; empty asks for one. */
+  url: v.optional(strSchema),
+  /** The device a `browser` node emulates; responsive without one. */
+  deviceId: v.optional(strSchema),
+  zoom: v.optional(numSchema),
+  scrollX: v.optional(numSchema),
+  scrollY: v.optional(numSchema)
 }
 
 export type NodeFields = v.InferOutput<v.ObjectSchema<typeof nodeFields, undefined>>

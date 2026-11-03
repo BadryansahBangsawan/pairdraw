@@ -39,6 +39,16 @@ export interface ReadCollection {
 export type DesignTokenReadIssue =
   | { kind: 'invalid-file'; file: string }
   | { kind: 'missing-file'; file: string; from: string }
+  /** A stylesheet rule whose custom properties no mode can hold, as the stylesheet writes it. */
+  | { kind: 'unsupported-css'; file: string; rule: string }
+  /** A mode's rule that sets a variable of another collection, which varies only by its own. */
+  | {
+      kind: 'foreign-css-override'
+      file: string
+      rule: string
+      property: string
+      collection: string
+    }
 
 /** What a set of token files holds: collections of modes, and composite tokens for styles. */
 export interface DesignTokenBundle {

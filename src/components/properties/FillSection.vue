@@ -159,6 +159,7 @@ function updateSolidColor(
                   :okhcl="createFillOkhclAdapter(okhcl, activeNode, index)"
                   :shader="fillShader(activeNode, fill)"
                   :layer-size="selectedNodeIds.length === 1 ? activeNode : null"
+                  :fill-index="index"
                   :keep-open="gradients.pressesHandle"
                   :active-stop="gradients.stop(gradients.target(selectedNodeIds, 'fills', index))"
                   @update:active-stop="
@@ -170,6 +171,9 @@ function updateSolidColor(
                     )
                   "
                   @update-shader="store.setShaderPaint(selectedNodeIds, 'fills', index, $event)"
+                  @open-shader-mode="
+                    store.startShaderMode({ nodeId: activeNode?.id, image: $event })
+                  "
                   @open-change="onPickerOpenChange(selectedNodeIds, index, $event, binding.actions)"
                   @cancel="cancelPaintMutation(binding.actions)"
                 />

@@ -122,7 +122,14 @@ const vectorEditEntries = computed((): ShortcutSheetEntry[] => {
       'MOD',
       t.gestureDoubleClickSegment
     ),
-    ...gestureEntry('vector-smooth-corner', t.vectorSmoothCorner, '', t.gestureDoubleClickPoint)
+    ...gestureEntry('vector-smooth-corner', t.vectorSmoothCorner, '', t.gestureDoubleClickPoint),
+    ...gestureEntry('vector-bend', t.vectorBendSegment, 'MOD', t.gestureDragSegment),
+    ...gestureEntry(
+      'vector-bend-keep-handles',
+      t.vectorBendSegmentKeepHandles,
+      'MOD+ALT',
+      t.gestureDragSegment
+    )
   ]
 })
 

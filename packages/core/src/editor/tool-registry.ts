@@ -8,7 +8,8 @@ export interface EditorToolDef {
 }
 
 export const EDITOR_TOOLS: EditorToolDef[] = [
-  { key: 'SELECT', label: 'Move', shortcut: 'V' },
+  // Figma keeps Scale (K) in the Move flyout.
+  { key: 'SELECT', label: 'Move', shortcut: 'V', flyout: ['SELECT', 'SCALE'] },
   { key: 'FRAME', label: 'Frame', shortcut: 'F', flyout: ['FRAME', 'SECTION'] },
   {
     key: 'RECTANGLE',
@@ -24,7 +25,8 @@ export const EDITOR_TOOLS: EditorToolDef[] = [
   { key: 'SHAPE_WITH_TEXT', label: 'Shape', shortcut: '' },
   // FigJam's X; Figma Design has no connector tool to take a key from.
   { key: 'CONNECTOR', label: 'Connector', shortcut: '' },
-  { key: 'HAND', label: 'Hand', shortcut: 'H' },
+  // Zoom is held on Z, as in Figma, or picked here to stay on.
+  { key: 'HAND', label: 'Hand', shortcut: 'H', flyout: ['HAND', 'ZOOM'] },
   { key: 'COMMENT', label: 'Comment', shortcut: 'C' }
 ]
 
@@ -40,7 +42,9 @@ export const TOOL_SHORTCUTS: Partial<Record<string, Tool>> = {
   KeyP: 'PEN',
   'Shift+KeyP': 'PENCIL',
   KeyH: 'HAND',
-  KeyC: 'COMMENT'
+  KeyC: 'COMMENT',
+  KeyK: 'SCALE',
+  KeyZ: 'ZOOM'
 }
 
 /**
@@ -55,7 +59,8 @@ export const BOARD_TOOLS: ReadonlySet<Tool> = new Set<Tool>([
   'CONNECTOR',
   'SECTION',
   'TEXT',
-  'COMMENT'
+  'COMMENT',
+  'ZOOM'
 ])
 
 /** A board's tool keys, as in FigJam: S places a sticky note, R a shape, and X a connector. */
@@ -67,5 +72,6 @@ export const BOARD_TOOL_SHORTCUTS: Partial<Record<string, Tool>> = {
   KeyR: 'SHAPE_WITH_TEXT',
   KeyX: 'CONNECTOR',
   KeyT: 'TEXT',
-  KeyC: 'COMMENT'
+  KeyC: 'COMMENT',
+  KeyZ: 'ZOOM'
 }

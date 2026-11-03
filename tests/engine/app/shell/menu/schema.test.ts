@@ -53,12 +53,15 @@ describe('APP_MENU_SCHEMA', () => {
       'diagnostics',
       'settings',
       'view-design-issues',
+      'view-layers-panel',
+      'view-properties-panel',
       'theme-light',
       'theme-dark',
       'theme-auto',
       'snap-geometry',
       'snap-objects',
       'snap-pixel-grid',
+      'keyboard-shortcuts',
       'check-updates'
     ])
   })

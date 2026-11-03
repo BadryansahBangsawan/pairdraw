@@ -1,5 +1,7 @@
 import type { FigmaAPI } from '@open-pencil/core/figma-api'
 
+import { createMutex } from '@/app/ai/tools/mutex'
+import { noOutsideWritesSince } from '@/app/document/io/outside-writes'
 import type { EditorStore } from '@/app/editor/active-store'
 import { ensureGraphFonts } from '@/app/editor/fonts'
 
@@ -12,6 +14,22 @@ export function automationUndoLabel(operation: string): string {
 
 export function isAutomationUndoLabel(label: string | null): boolean {
   return label?.startsWith(`${AUTOMATION_UNDO_LABEL}: `) === true
+}
+
+/** Each document's agent edits, from any client, run one at a time. */
+const editLocks = new WeakMap<EditorStore, () => Promise<() => void>>()
+
+/**
+ * Waits for a document's turn to edit and resolves with the release. Agent edits that await take
+ * it, so none records or rolls back another's writes as its own.
+ */
+export function acquireDocumentEdit(store: EditorStore): Promise<() => void> {
+  let lock = editLocks.get(store)
+  if (!lock) {
+    lock = createMutex()
+    editLocks.set(store, lock)
+  }
+  return lock()
 }
 
 /**
@@ -42,7 +60,9 @@ export async function loadAtomicToolFonts(
 /**
  * Run a structural edit as one undo step by recording what it changes in the document, as the
  * AI chat does, so `undo` reverts what an automation client created, moved, or deleted on any
- * page, and the variables it changed.
+ * page, and the variables it changed. It waits for the document's other agent edits. An edit that
+ * throws part way, such as a failing script, is put back whole and leaves no step, unless
+ * something else wrote to the document meanwhile.
  */
 export async function executeWithDocumentUndo<T>(
   store: EditorStore,
@@ -50,5 +70,13 @@ export async function executeWithDocumentUndo<T>(
   label: string,
   run: () => Promise<T>
 ): Promise<T> {
-  return store.recordEditAsync({ label, pageId }, run)
+  const release = await acquireDocumentEdit(store)
+  try {
+    return await store.recordEditAsync(
+      { label, pageId, rollbackOnThrow: true, canRollBack: noOutsideWritesSince(store) },
+      run
+    )
+  } finally {
+    release()
+  }
 }

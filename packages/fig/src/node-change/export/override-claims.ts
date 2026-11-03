@@ -6,9 +6,11 @@ import {
 import { compact } from 'es-toolkit'
 
 import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import { isInShownReplacedLayer, showsReplacedLayer } from '@open-pencil/scene-graph/instances'
 import {
   forEachInstanceOverride,
-  overriddenBindingField
+  overriddenBindingField,
+  overriddenVariableModeCollection
 } from '@open-pencil/scene-graph/instances/overrides'
 import type { GUID, Vector } from '@open-pencil/scene-graph/primitives'
 import { scaleNodeChanges } from '@open-pencil/scene-graph/scaling'
@@ -214,8 +216,10 @@ function overrideClaim(
   if (field === 'componentId')
     return exportedSwapOverride(input.context, input.target, path, counter)
   const binding = overriddenBindingField(field)
+  // A mode set for one collection is claimed as the layer's modes, the only claim Figma has.
+  const scene = overriddenVariableModeCollection(field) === null ? field : 'variableModes'
   const claim =
-    binding === null ? registryClaim(field as keyof SceneNode, input) : bindingClaim(input, binding)
+    binding === null ? registryClaim(scene as keyof SceneNode, input) : bindingClaim(input, binding)
   return claim && { guidPath: { guids: path }, ...claim }
 }
 
@@ -235,6 +239,8 @@ export function serializeRuntimePropertyOverrides(
     const target = context.graph.getNode(targetId)
     if (!target || (target.id !== instance.id && !isDescendantOf(context, targetId, instance.id)))
       return undefined
+    // A replaced layer, a copy of one, and their layers have no component address.
+    if (isInShownReplacedLayer(context.graph, targetId)) return undefined
     const path = instanceExportAddress(context.graph, instance, target, resolveGuid)
     return path ? { target, path } : undefined
   }
@@ -245,6 +251,7 @@ export function serializeRuntimePropertyOverrides(
     return found && { target: found.target, path: [...found.path] }
   }
   const visit = (node: SceneNode): void => {
+    if (node.id !== instance.id && showsReplacedLayer(context.graph, node)) return
     if (node.type === 'INSTANCE')
       forEachInstanceOverride(node.instanceOverrides, (nodeId, field, value) => {
         const resolved = resolveTarget(node, nodeId)

@@ -1,5 +1,6 @@
 import * as v from 'valibot'
 
+import { isVertexProject } from '@/app/ai/providers/vertex/endpoint'
 import {
   requiredSetting,
   requiredSettingsURL,
@@ -13,10 +14,25 @@ export interface ModelProfileValidationContext {
   supportsCustomBaseURL: boolean
   design: boolean
   intent: 'save' | 'test'
+  /** Set for a Vertex AI model; Claude there needs a project and an access token. */
+  vertex?: { claude: boolean }
 }
 
 export interface ModelProfileValidationMessages extends SettingsValidationMessages {
   designToolsRequired: string
+  vertexProjectRequired: string
+  vertexProjectInvalid: string
+  vertexClaudeAccessToken: string
+}
+
+/** The project typed for a Vertex AI model; Claude cannot fall back to express mode. */
+function vertexProjectSchema(claude: boolean, messages: ModelProfileValidationMessages) {
+  return v.pipe(
+    v.string(),
+    v.trim(),
+    v.check((project) => !claude || project.length > 0, messages.vertexProjectRequired),
+    v.check((project) => !project || isVertexProject(project), messages.vertexProjectInvalid)
+  )
 }
 
 export function modelProfileSchema(
@@ -49,6 +65,16 @@ export function modelProfileSchema(
         context.providerKind === 'cloud'
           ? requiredSetting(messages.requiredField)
           : v.optional(v.string()),
+      vertexProject: context.vertex
+        ? vertexProjectSchema(context.vertex.claude, messages)
+        : v.optional(v.string()),
+      // An API key reaches Gemini only, so Claude would fail to sign in at chat time.
+      vertexCredentialKind: context.vertex?.claude
+        ? v.pipe(
+            v.string(),
+            v.check((kind: string) => kind !== 'api-key', messages.vertexClaudeAccessToken)
+          )
+        : v.optional(v.string()),
       tools: v.boolean()
     }),
     v.forward(

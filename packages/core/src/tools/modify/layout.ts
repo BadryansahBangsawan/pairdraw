@@ -42,8 +42,10 @@ export const setLayout = defineTool({
     ),
     align: v.optional(
       v.pipe(
-        v.picklist(['MIN', 'CENTER', 'MAX', 'SPACE_BETWEEN']),
-        v.description('Primary axis alignment (only changes if provided)')
+        v.picklist(['MIN', 'CENTER', 'MAX', 'SPACE_BETWEEN', 'SPACE_AROUND']),
+        v.description(
+          'Primary axis alignment (only changes if provided). SPACE_AROUND gives each child an equal share of the free space, half on each side, on top of the gap'
+        )
       )
     ),
     counter_align: v.optional(

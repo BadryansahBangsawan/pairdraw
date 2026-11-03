@@ -31,7 +31,8 @@ Odstęp określa odległość między sąsiednimi elementami. Wypełnienie okre�
 - początek;
 - środek;
 - koniec;
-- równy odstęp między obiektami.
+- równy odstęp między obiektami;
+- odstęp dookoła: każdy obiekt dostaje równą część wolnego miejsca, po połowie z każdej strony, oprócz odstępu; opcję wybiera się w menu pola odstępu.
 
 ### Oś poprzeczna
 

@@ -39,6 +39,8 @@ Fai clic su un segmento per selezionarlo. Trascinalo per incurvarlo; OpenPencil 
 - <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>J</kbd> unisce due estremi selezionati: se coincidono diventano un solo punto, altrimenti li collega un segmento dritto. Unire i due estremi di un tracciato lo chiude e lo riempie. Durante la modifica di un tracciato questa scorciatoia non apre la chat.
 - <kbd>Option</kbd>/<kbd>Alt</kbd> + trascina trascina una copia dei punti o segmenti selezionati. La copia di un punto isolato resta collegata a esso.
 - I tasti freccia spostano i punti selezionati della distanza impostata in Impostazioni → Editor, e con <kbd>Shift</kbd> della distanza grande.
+- <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + trascina su un segmento lo incurva in modo che il punto afferrato segua il puntatore. Un estremo morbido resta morbido e l’altra sua maniglia ruota con esso. Con <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>Option</kbd>/<kbd>Alt</kbd> le maniglie dei segmenti vicini restano ferme e gli estremi diventano angoli.
+- Con due punti o segmenti selezionati compare un riquadro di trasformazione intorno a loro. Trascina un angolo o un lato per scalare i punti dal lato opposto; con <kbd>Shift</kbd> mantieni le proporzioni e con <kbd>Option</kbd>/<kbd>Alt</kbd> scali dal centro. Trascina appena fuori da un angolo per ruotarli attorno al centro del riquadro, con <kbd>Shift</kbd> a passi di 15°. Ogni trasformazione si annulla in un solo passaggio.
 
 ## Continuare tracciati aperti
 

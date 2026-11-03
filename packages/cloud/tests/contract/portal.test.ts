@@ -11,7 +11,8 @@ describe('Cloud portal pages', () => {
       '/account',
       '/account/pending',
       '/admin',
-      '/admin/people'
+      '/admin/people',
+      '/u/ada'
     ])
       expect(isCloudPortalPage(path)).toBe(true)
   })
@@ -26,7 +27,9 @@ describe('Cloud portal pages', () => {
       '/.well-known/openpencil-cloud',
       '/accounts',
       '/administrator',
-      '/authors'
+      '/authors',
+      '/users',
+      '/view/abc'
     ])
       expect(isCloudPortalPage(path)).toBe(false)
   })

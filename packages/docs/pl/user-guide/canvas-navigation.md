@@ -33,6 +33,12 @@ Po włączeniu **Powiększaj kółkiem myszy** w **Ustawienia → Edytor** kół
 
 Gest zmiany powiększenia jest wyłączony na panelach warstw i właściwości, aby nie zmieniał przypadkowo powiększenia całej strony w przeglądarce.
 
+## Narzędzie Powiększenie
+
+Przytrzymaj <kbd>Z</kbd> i kliknij, aby powiększyć w miejscu wskaźnika, lub kliknij z <kbd>Option</kbd>/<kbd>Alt</kbd>, aby pomniejszyć; przeciągnij, aby powiększyć zaznaczony obszar. Puszczenie <kbd>Z</kbd> przywraca poprzednie narzędzie. Krótkie naciśnięcie <kbd>Z</kbd> pozostawia narzędzie Powiększenie włączone; jest ono też w menu narzędzia Dłoń na pasku narzędzi.
+
+Dopasowanie widoku, powiększenie do zaznaczenia i do 100%, poziomy z menu powiększenia oraz następna lub poprzednia ramka przechodzą płynnie do swojego widoku zamiast skakać. Skaczą, gdy animacje są wyłączone, tryb Ultralight jest włączony lub system prosi o ograniczenie ruchu.
+
 ## Linijki
 
 Linijki są ukryte, dopóki nie włączysz ich poleceniem **Widok → Linijki** lub skrótem <kbd>Shift</kbd> + <kbd>R</kbd>.

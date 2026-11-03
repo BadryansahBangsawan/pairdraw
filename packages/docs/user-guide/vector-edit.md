@@ -25,7 +25,7 @@ This activates geometry editing for the selected vector.
 
 - The normal transform bounding box is disabled for the object.
 - Anchor, segment, and handle editing becomes available.
-- Cursor behavior does not switch to resize/rotate at bbox corners.
+- Cursor behavior does not switch to resize/rotate at the layer's bbox corners; it does over the transform box of selected points (see [Transform Selected Points](#transform-selected-points)).
 
 ## Basic Actions
 
@@ -65,14 +65,16 @@ This activates geometry editing for the selected vector.
 
 ## Cut, Join, and Reshape
 
-| Action                 | Mac                           | Windows / Linux                |
-| ---------------------- | ----------------------------- | ------------------------------ |
-| Cut tool               | <kbd>X</kbd>                  | <kbd>X</kbd>                   |
-| Smooth or corner point | Double-click a point          | Double-click a point           |
-| Straighten a segment   | <kbd>Cmd</kbd> + double-click | <kbd>Ctrl</kbd> + double-click |
-| Join two end points    | <kbd>Cmd</kbd> + <kbd>J</kbd> | <kbd>Ctrl</kbd> + <kbd>J</kbd> |
-| Duplicate points       | <kbd>Option</kbd> + drag      | <kbd>Alt</kbd> + drag          |
-| Move points            | Arrow keys                    | Arrow keys                     |
+| Action                 | Mac                                       | Windows / Linux                         |
+| ---------------------- | ----------------------------------------- | --------------------------------------- |
+| Cut tool               | <kbd>X</kbd>                              | <kbd>X</kbd>                            |
+| Smooth or corner point | Double-click a point                      | Double-click a point                    |
+| Straighten a segment   | <kbd>Cmd</kbd> + double-click             | <kbd>Ctrl</kbd> + double-click          |
+| Bend a segment         | <kbd>Cmd</kbd> + drag a segment           | <kbd>Ctrl</kbd> + drag a segment        |
+| Bend, keep neighbours  | <kbd>Cmd</kbd> + <kbd>Option</kbd> + drag | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + drag |
+| Join two end points    | <kbd>Cmd</kbd> + <kbd>J</kbd>             | <kbd>Ctrl</kbd> + <kbd>J</kbd>          |
+| Duplicate points       | <kbd>Option</kbd> + drag                  | <kbd>Alt</kbd> + drag                   |
+| Move points            | Arrow keys                                | Arrow keys                              |
 
 - **Cut tool:** press <kbd>X</kbd>, then click a segment to cut it there, or click a point to separate the segments that meet at it. Curves keep their shape, and a closed shape that is cut stops filling. Press <kbd>X</kbd> again, <kbd>Escape</kbd>, or another tool key to put it down.
 - **Smooth or corner:** double-click a corner point to give it handles along the line between its neighbours, and double-click a smooth point to remove its handles.
@@ -80,6 +82,15 @@ This activates geometry editing for the selected vector.
 - **Join:** select two end points and press <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + <kbd>J</kbd>. Points in the same place become one point; points apart are joined by a straight segment. Joining the two ends of one path closes and fills it. While a path is being edited, this shortcut joins points instead of opening the chat.
 - **Duplicate:** hold <kbd>Option</kbd>/<kbd>Alt</kbd> and drag selected points or segments to drag a copy. A single point's copy stays joined to it, so the drag extends the path.
 - **Nudge:** the arrow keys move the selected points by the nudge distance set in Settings → Editor, and <kbd>Shift</kbd> + arrow by the large nudge distance.
+- **Bend:** <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + drag a segment to bend it so the place you grabbed follows the pointer. A smooth end point stays smooth and its other handle turns with it. Add <kbd>Option</kbd>/<kbd>Alt</kbd> to leave the handles of the neighbouring segments where they are; the end points then become corners.
+
+## Transform Selected Points
+
+When two points or segments are selected, a transform box surrounds them.
+
+- Drag a corner or an edge to scale the selected points from the opposite side. Hold <kbd>Shift</kbd> to keep proportions and <kbd>Option</kbd>/<kbd>Alt</kbd> to scale from the centre.
+- Drag just outside a corner to rotate them around the centre of the box. Hold <kbd>Shift</kbd> to rotate in 15° steps.
+- Points and segments under the pointer stay draggable on top of the box, and each transform undoes in one step.
 
 ## Handle Drag Modifiers
 

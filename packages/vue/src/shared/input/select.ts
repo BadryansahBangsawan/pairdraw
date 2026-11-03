@@ -2,12 +2,13 @@ import { getNodeEditState, handleNodeEditDown } from '#vue/shared/input/vector'
 export { resolveHit } from '#vue/shared/input/select/hit'
 import { hitTestLabel, resolveHit, tinySelectionAt } from '#vue/shared/input/select/hit'
 export { updateHoverCursor } from '#vue/shared/input/select/hover'
-import { editedGradient, resolveEditorProfile, type Editor } from '@open-pencil/core'
+import { editedGradient, editedImage, resolveEditorProfile, type Editor } from '@open-pencil/core'
 import type { SceneNode } from '@open-pencil/scene-graph'
 
 import { tryStartConnectorEndDrag } from '#vue/shared/input/connector/end'
 import { tryStartConnectorLineDrag } from '#vue/shared/input/connector/line'
 import { tryStartGradientDrag } from '#vue/shared/input/gradient'
+import { tryStartImageCropDrag } from '#vue/shared/input/image-crop'
 import { tryStartLineEndDrag } from '#vue/shared/input/line/end'
 import { tryStartResize } from '#vue/shared/input/resize'
 import {
@@ -97,6 +98,9 @@ function tryStartHandleDrag(
   if (tryStartGradientDrag(editor, sx, sy, setDrag)) return true
   // An open gradient's handles replace the layer's selection handles, which then do not respond.
   if (editedGradient(editor.graph, editor.state.gradientEdit)) return false
+  // So do an edited image's crop handles; a press outside the image leaves image edit mode.
+  if (tryStartImageCropDrag(editor, sx, sy, setDrag)) return true
+  if (editedImage(editor.graph, editor.state.imageEdit)) return false
   if (tryStartShapeHandleDrag(editor, sx, sy, altKey, setDrag)) return true
   if (tryStartConnectorEndDrag(editor, sx, sy, setDrag)) return true
   if (tryStartConnectorLineDrag(editor, cx, cy, sx, sy, setDrag)) return true

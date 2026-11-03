@@ -1,5 +1,6 @@
 import * as v from 'valibot'
 
+import { agentNotesSchema } from '../agent-notes/schema'
 import { behaviourSchema } from '../behaviours/schema'
 import type { OkHCLPayload } from '../color/okhcl'
 import { commentThreadsSchema } from '../comments/schema'
@@ -107,6 +108,23 @@ const enabledLibrariesSchema: v.GenericSchema<unknown, EnabledLibraryBinding[]> 
 // Shape only. Whether a string is valid CSS is checked where it is written into a stylesheet.
 const cssTextSchema = v.pipe(v.string(), v.trim(), v.nonEmpty(), v.maxLength(1000))
 
+/**
+ * A layer an instance shows in place of one of its component's layers, which Figma has no
+ * override for: the GUID path of the component layer it replaces, as an override's `guidPath`
+ * spells it, and the replacement's own records as a Base64 Kiwi `NODE_CHANGES` message.
+ */
+export interface StoredReplacedLayer {
+  path: string[]
+  records: string
+}
+
+const replacedLayersSchema: v.GenericSchema<unknown, StoredReplacedLayer[]> = v.array(
+  v.object({
+    path: v.pipe(v.array(v.pipe(v.string(), v.regex(/^\d+:\d+$/))), v.minLength(1)),
+    records: v.pipe(v.string(), v.nonEmpty())
+  })
+)
+
 /** Token fields Figma has no slot for, with mode ids as the file spells them. */
 export interface StoredToken {
   unit?: TokenUnit
@@ -154,11 +172,18 @@ export const OPEN_PENCIL_PLUGIN_DATA = {
   textDirection: textPluginDataField('textDirection', 'format', DIRECTIONS),
   /** An auto-layout frame's direction. */
   layoutDirection: textPluginDataField('layoutDirection', 'format', DIRECTIONS),
+  /**
+   * A primary axis alignment Figma has no mode for, on auto-layout frames; the record keeps
+   * Figma's space between, and a frame whose record says otherwise was changed in Figma.
+   */
+  primaryAxisAlign: textPluginDataField('primaryAxisAlign', 'format', ['SPACE_AROUND']),
   /** Marks a component set Figma would read as a plain frame. */
   nodeType: textPluginDataField('nodeType', 'format', ['COMPONENT_SET']),
   /** Variable bindings by field path, including those Figma cannot store natively. */
   boundVariables: jsonPluginDataField('boundVariables', 'format', boundVariablesSchema),
   exportSettings: jsonPluginDataField('exportSettings', 'format', exportSettingsSchema),
+  /** Layers an instance shows in place of its component's, on the instance's own record. */
+  replacedLayers: jsonPluginDataField('replacedLayers', 'format', replacedLayersSchema),
   /** The node-local rect a TEXT_PATH layout maps onto, which Kiwi has no field for. */
   textPathBox: jsonPluginDataField('textPathBox', 'format', textPathBoxSchema),
   /** The library asset a node was inserted from. */
@@ -211,7 +236,9 @@ export const OPEN_PENCIL_PLUGIN_DATA = {
   /** Which of an icon path's paints its icon's color sets, on each path the source drew in it. */
   iconTint: jsonPluginDataField('iconTint', 'content', iconTintSchema),
   /** One entry per paint that draws a shader, matched to its image paint by the frame's hash. */
-  shader: jsonPluginDataField('shader', 'content', shaderPaintSchema)
+  shader: jsonPluginDataField('shader', 'content', shaderPaintSchema),
+  /** Notes a person left on a layer for agents: what it means or does, and a request about it. */
+  agentNotes: jsonPluginDataField('agentNotes', 'content', agentNotesSchema)
 } satisfies Record<string, PluginDataKey>
 
 const NOT_CONTENT = Object.values(OPEN_PENCIL_PLUGIN_DATA).filter(

@@ -6,9 +6,13 @@ import {
   changeCloudLink,
   changeCloudMember,
   cloudLinkURL,
+  cloudSnapshotURL,
+  deleteCloudSnapshot,
   inviteToCloudDocument,
   readCloudSharing,
   resetCloudLink,
+  resetCloudSnapshot,
+  shareCloudSnapshot,
   type cloudShareTarget,
   type CloudShareLink,
   type CloudSharing
@@ -33,6 +37,8 @@ export function useCloudSharing(target: MaybeRefOrGetter<ShareTarget | null>) {
    * so the link cannot be fetched after it.
    */
   const linkURL = shallowRef<string | null>(null)
+  /** The snapshot link, ready before anyone asks, as the live link is. */
+  const snapshotURL = shallowRef<string | null>(null)
   const inviting = ref(false)
   // Each read is numbered so a slower earlier one never replaces a newer one.
   let latestRead = 0
@@ -43,6 +49,7 @@ export function useCloudSharing(target: MaybeRefOrGetter<ShareTarget | null>) {
     () => {
       sharing.value = null
       linkURL.value = null
+      snapshotURL.value = null
     }
   )
 
@@ -63,16 +70,37 @@ export function useCloudSharing(target: MaybeRefOrGetter<ShareTarget | null>) {
     }
     if (!still()) return true
     sharing.value = next
+    const snapshotRead = await readSnapshotURL(current, next, still)
     if (next.link.access !== 'link') {
       linkURL.value = null
-      return true
+      return snapshotRead
     }
     try {
       const url = await cloudLinkURL(current)
       if (still()) linkURL.value = url
-      return true
+      return snapshotRead
     } catch {
       if (still()) linkURL.value = null
+      return !still()
+    }
+  }
+
+  /** Reads the snapshot link; false when it could not be read. */
+  async function readSnapshotURL(
+    current: ShareTarget,
+    next: CloudSharing,
+    still: () => boolean
+  ): Promise<boolean> {
+    if (next.snapshot.state !== 'shared' || !next.snapshot.copyable) {
+      snapshotURL.value = null
+      return true
+    }
+    try {
+      const url = await cloudSnapshotURL(current)
+      if (still()) snapshotURL.value = url
+      return true
+    } catch {
+      if (still()) snapshotURL.value = null
       return !still()
     }
   }
@@ -85,6 +113,7 @@ export function useCloudSharing(target: MaybeRefOrGetter<ShareTarget | null>) {
     const current = toValue(target)
     if (!current) return true
     linkURL.value = null
+    snapshotURL.value = null
     let changed = true
     try {
       await run(current)
@@ -107,12 +136,17 @@ export function useCloudSharing(target: MaybeRefOrGetter<ShareTarget | null>) {
   return {
     sharing,
     linkURL,
+    snapshotURL,
     inviting,
     refresh,
     invite,
     changeMember: (id: string, permission: DocumentPermission | 'remove') =>
       change((current) => changeCloudMember(current, id, permission)),
     changeLink: (link: CloudShareLink) => change((current) => changeCloudLink(current, link)),
-    resetLink: () => change((current) => resetCloudLink(current))
+    resetLink: () => change((current) => resetCloudLink(current)),
+    /** Makes the snapshot link, or updates it to the revision the document holds now. */
+    shareSnapshot: () => change((current) => shareCloudSnapshot(current)),
+    deleteSnapshot: () => change((current) => deleteCloudSnapshot(current)),
+    resetSnapshot: () => change((current) => resetCloudSnapshot(current))
   }
 }

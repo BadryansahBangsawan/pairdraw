@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pairdraw</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="header">
+      <img class="mark" src="icons/icon-96.png" alt="" width="20" height="20" />
+      <h1 class="title" data-i18n="popupTitle">Copy to Pairdraw</h1>
+    </header>
+    <main class="actions">
+      <button id="copy-page" class="action" type="button">
+        <span class="action-label" data-i18n="copyPage">Copy page</span>
+        <span class="action-hint" data-i18n="copyPageHint">The whole page, as you see it</span>
+      </button>
+      <button id="pick-element" class="action" type="button">
+        <span class="action-label" data-i18n="pickElement">Select an element</span>
+        <span class="action-hint" data-i18n="pickElementHint">Click any part of the page</span>
+      </button>
+    </main>
+    <label class="option">
+      <input id="images" type="checkbox" />
+      <span>
+        <span class="option-label" data-i18n="includeImages">Include images from other sites</span>
+        <span class="option-hint" data-i18n="includeImagesHint"
+          >Asks to read images from any site while you capture.</span
+        >
+      </span>
+    </label>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+    <script src="popup.js"></script>
+  </body>
+</html>

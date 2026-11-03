@@ -7,7 +7,7 @@ OpenPencil maps browser-computed DOM/CSS styles into SceneGraph fields through `
 | CSS | SceneGraph | Notes |
 |---|---|---|
 | `display: flex` / `inline-flex` | `layoutMode` | `flex-direction: row` maps to horizontal; `column` maps to vertical. |
-| `justify-content` | `primaryAxisAlign` | Supports start, center, end/flex-end, and space-between. |
+| `justify-content` | `primaryAxisAlign` | Supports start, center, end/flex-end, space-between, and space-around. |
 | `align-items` | `counterAxisAlign` | Supports start, center, end/flex-end, stretch, and baseline. |
 | `align-self` | `layoutAlignSelf` | Supports start, center, end/flex-end, stretch, and baseline. |
 | `flex-wrap: wrap` | `layoutWrap: WRAP` | Counter-axis spacing is preserved when gaps are available. |

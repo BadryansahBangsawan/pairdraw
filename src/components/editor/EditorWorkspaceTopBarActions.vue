@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { formatShortcut } from '@open-pencil/vue/editor/commands'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n, useSlidesMessages } from '@open-pencil/vue/i18n'
 
 import { CHAT_COLUMN_SHORTCUT, chatColumnOpen, toggleChatColumn } from '@/app/ai/chat/panel'
 import { useEditorStore } from '@/app/editor/active-store'
@@ -12,6 +12,7 @@ import {
   toggleLayersPanel,
   togglePropertiesPanel
 } from '@/app/shell/side-panels'
+import { startPresentation } from '@/app/slides/present'
 import { CloudDocumentStatusHost } from '@/components/cloud/integration'
 import CollabPanel from '@/components/collab-panel/CollabPanel.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -25,6 +26,7 @@ import ZoomDropdown from './ZoomDropdown.vue'
  */
 const store = useEditorStore()
 const { editor, settings } = useI18n()
+const slides = useSlidesMessages()
 </script>
 
 <template>
@@ -84,6 +86,15 @@ const { editor, settings } = useI18n()
         @click="store.startPlay()"
       >
         <icon-lucide-play class="size-4" />
+      </IconButton>
+      <IconButton
+        :label="slides.present({ shortcut: formatShortcut(appMenuShortcut('present')) ?? '' })"
+        size="sm"
+        side="bottom"
+        data-test-id="editor-start-presentation"
+        @click="startPresentation(store)"
+      >
+        <icon-lucide-presentation class="size-4" />
       </IconButton>
       <IconButton
         :label="settings.title"

@@ -12,16 +12,23 @@ import {
   MAX_TEXT_ATTACHMENTS,
   type TextAttachmentRefusal
 } from '@/app/ai/attachment/text/types'
+import { chatProjectFolder } from '@/app/ai/chat/project-folder'
 import { takeBackMessages } from '@/app/ai/chat/queue'
 import type { ChatSubmission } from '@/app/ai/chat/submission/types'
 import { useAIChat } from '@/app/ai/chat/use'
+import { exploreSetting, withExploreRequest } from '@/app/ai/explore/state'
 import { designModelProfile } from '@/app/ai/models'
+import { withSkillCommand } from '@/app/ai/skills/invoke'
 import { openSettingsDialog } from '@/app/settings/dialog'
+import ChatAgentSessionControls from '@/components/chat/agent/ChatAgentSessionControls.vue'
 import ChatDraftFile from '@/components/chat/attachment/ChatDraftFile.vue'
 import ChatCreditBalance from '@/components/chat/ChatCreditBalance.vue'
+import ChatExplorePicker from '@/components/chat/ChatExplorePicker.vue'
 import ChatProfileSelect from '@/components/chat/ChatProfileSelect.vue'
+import ChatSkillPicker from '@/components/chat/ChatSkillPicker.vue'
 import ChatThinkingSelect from '@/components/chat/ChatThinkingSelect.vue'
 import { useComposerCompletions } from '@/components/chat/composer/useComposerCompletions'
+import { useComposerSkills } from '@/components/chat/composer/useComposerSkills'
 import { useAttachmentDrafts } from '@/components/chat/input/useAttachments'
 import { chatInputTheme } from '@/components/chat/ui'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -98,10 +105,21 @@ const composer = useTemplateRef<{
   prependDraft: (text: string) => void
   insert: (text: string) => void
   focus: () => void
+  edit: (update: (current: string) => string) => void
 }>('composer')
 const profileSelect = useTemplateRef<{ show: () => void }>('profileSelect')
 
 const completions = useComposerCompletions()
+const {
+  offered: skillsOffered,
+  skills: pickableSkills,
+  refresh: refreshSkills
+} = useComposerSkills()
+
+/** Starts the message with the picked skill, in place of one already there. */
+function startWithSkill(name: string) {
+  composer.value?.edit((text) => withSkillCommand(text, name))
+}
 
 /** Up on the first line takes waiting messages back to edit, their attachments with them. */
 function takeBack(): string | null {
@@ -180,6 +198,13 @@ const agentName = computed(() => {
   const agentId = providerID.value.replace('acp:', '')
   return ACP_AGENTS.find((a) => a.id === agentId)?.name ?? agentId
 })
+/** The coding agent whose session's model, reasoning, and mode the composer offers. */
+const acpAgentId = computed(() =>
+  providerID.value.startsWith('acp:') ? providerID.value.slice('acp:'.length) : null
+)
+const chatHistory = useAIChat().history
+/** Whether this chat's agent works in a project folder, where only model and reasoning carry over. */
+const inProjectFolder = computed(() => chatProjectFolder(chatHistory.current.value?.id) !== null)
 const isCustomProvider = computed(
   () => providerID.value === 'openai-compatible' || providerID.value === 'anthropic-compatible'
 )
@@ -208,7 +233,9 @@ const selectedProfileName = computed(
     :completions="completions"
     :take-back="takeBack"
     :prompts="() => prompts"
-    @submit="(text, afterWork) => emit('submit', takeSubmission(text), afterWork)"
+    @submit="
+      (text, afterWork) => emit('submit', withExploreRequest(takeSubmission(text)), afterWork)
+    "
     @stop="emit('stop')"
     @interrupt="emit('interrupt')"
     @paste="handlePaste"
@@ -269,10 +296,19 @@ const selectedProfileName = computed(
       >
         <icon-lucide-paperclip class="size-4" />
       </IconButton>
+      <ChatSkillPicker
+        v-if="skillsOffered"
+        :skills="pickableSkills"
+        :disabled="disabled"
+        @open="refreshSkills"
+        @pick="startWithSkill"
+        @manage="openSettingsDialog('skills')"
+      />
+      <ChatExplorePicker v-model="exploreSetting" :disabled="disabled" />
     </template>
     <template #model>
       <div class="@container flex min-w-0 items-center">
-        <!-- An agent picks its own model and thinking, so only the profile can change. -->
+        <!-- A coding agent offers what its sessions advertise; Pi picks its own model. -->
         <ChatProfileSelect ref="profileSelect">
           <template #value>
             <span class="min-w-0 truncate">
@@ -280,6 +316,13 @@ const selectedProfileName = computed(
             </span>
           </template>
         </ChatProfileSelect>
+        <ChatAgentSessionControls
+          v-if="acpAgentId"
+          :agent-id="acpAgentId"
+          :project-folder="inProjectFolder"
+          :agent="agentName"
+          @error="emit('error', $event)"
+        />
         <template v-if="!isAgentProvider">
           <ChatThinkingSelect />
           <ChatCreditBalance :replying="replying" />

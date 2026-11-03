@@ -80,6 +80,8 @@ export type AIProviderID =
   | 'opencode-zen'
   | 'opencode-go'
   | 'anthropic-compatible'
+  | 'amazon-bedrock'
+  | 'google-vertex'
   | 'openpencil'
   | 'harness:pi'
   | `acp:${ACPAgentID}`
@@ -129,6 +131,36 @@ const OPENAI_MODELS: ModelOption[] = [
   },
   { id: 'gpt-6-luna', name: 'GPT-6 Luna', tag: 'Fast', capabilities: ['tools', 'vision'] }
 ]
+
+/** Claude on a cloud platform: the same models under the platform's own IDs. */
+function claudeModels(prefix: string): ModelOption[] {
+  return [
+    {
+      id: `${prefix}claude-sonnet-5-5`,
+      name: 'Claude Sonnet 5.5',
+      tag: 'Best for design',
+      capabilities: ['tools', 'vision']
+    },
+    {
+      id: `${prefix}claude-opus-5-5`,
+      name: 'Claude Opus 5.5',
+      tag: 'Deep reasoning',
+      capabilities: ['tools', 'vision']
+    },
+    {
+      id: `${prefix}claude-fable-5-1`,
+      name: 'Claude Fable 5.1',
+      tag: 'Most capable',
+      capabilities: ['tools', 'vision']
+    },
+    {
+      id: `${prefix}claude-haiku-5-5`,
+      name: 'Claude Haiku 5.5',
+      tag: 'Fast',
+      capabilities: ['tools', 'vision']
+    }
+  ]
+}
 
 export const HARNESS_PROVIDER_ID = 'harness:pi' as const
 
@@ -377,6 +409,42 @@ export const AI_PROVIDERS: AIProviderDef[] = [
     models: [],
     supportsCustomBaseURL: true,
     supportsCustomModel: true
+  },
+  {
+    // Claude in Amazon Bedrock: the Messages API at `bedrock-mantle.<region>.api.aws`, reached
+    // with a Bedrock API key or AWS access keys. The connection's base URL holds the region.
+    id: 'amazon-bedrock',
+    name: 'Amazon Bedrock',
+    keyPlaceholder: 'ABSK… / bedrock-api-key-…',
+    keyURL: 'https://console.aws.amazon.com/bedrock/home#/api-keys',
+    defaultModel: 'anthropic.claude-sonnet-5-5',
+    supportsCustomModel: true,
+    models: claudeModels('anthropic.')
+  },
+  {
+    // Vertex AI serves Claude through `:rawPredict` and Gemini through `:generateContent`. The
+    // connection's base URL holds the project and location.
+    id: 'google-vertex',
+    name: 'Google Vertex AI',
+    keyPlaceholder: 'ya29.… / AIza…',
+    keyURL: 'https://console.cloud.google.com/vertex-ai',
+    defaultModel: 'claude-sonnet-5-5',
+    supportsCustomModel: true,
+    models: [
+      ...claudeModels(''),
+      {
+        id: 'gemini-3.8-flash',
+        name: 'Gemini 3.8 Flash',
+        tag: 'Fast',
+        capabilities: ['tools', 'vision']
+      },
+      {
+        id: 'gemini-4-argon',
+        name: 'Gemini 4 Argon',
+        capabilities: ['tools', 'vision'],
+        minReasoningEffort: 'low'
+      }
+    ]
   },
   {
     id: 'openpencil',

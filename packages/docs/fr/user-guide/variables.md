@@ -80,6 +80,25 @@ Les variables et les styles circulent entre OpenPencil, Figma et le code sous fo
 - **Choisir la destination :** avant tout changement, la boîte de dialogue montre chaque collection et chaque mode trouvés et où ils vont : dans une nouvelle collection ou un nouveau mode, dans un existant, ou nulle part. Les variables et les styles de même nom sont mis à jour et le reste est ajouté ; rien n’est supprimé. Elle compte ce qui sera ajouté, mis à jour et ignoré, et indique pourquoi chaque token ignoré a été écarté
 - L’import est une seule étape : **Annuler** le reprend en entier
 
+## Synchroniser avec une feuille de style
+
+Les propriétés personnalisées d’un fichier CSS deviennent des variables, et les variables y retournent. Cliquez sur **Synchroniser avec le CSS** dans la barre des variables :
+
+- **Importer des variables CSS…** lit un fichier `.css`. `:root`, `html` et le `@theme` de Tailwind contiennent les valeurs par défaut de chaque collection ; `[data-theme="dark"]`, une classe comme `.dark` et les blocs `:root` dans `@media`, `@supports` ou `@container` deviennent des modes avec cette condition. Les couleurs, longueurs en `px` ou `rem`, durées, nombres, textes entre guillemets et listes de polices deviennent des variables, `var(--name)` un alias, et `calc()` ou `clamp()` garde son CSS comme expression CSS. La même boîte d’import montre où va chaque collection et chaque mode avant tout changement
+- **Récupérer depuis** relit le fichier lié et montre ce qui a changé. Une feuille de style exportée du document revient sur les mêmes variables et modes
+- **Envoyer vers** écrit les variables dans le fichier lié lui-même : les valeurs modifiées sont réécrites dans leur notation, celles qui manquent sont ajoutées à leur bloc, et les commentaires, les autres règles et les propriétés sans variable restent tels quels. Rien n’est supprimé. Si le navigateur ne peut pas écrire le fichier, une copie est enregistrée
+- **Récupérer quand le fichier change** importe chaque enregistrement du fichier lié, sur ordinateur et dans les navigateurs qui donnent accès aux fichiers, en une étape d’annulation chacun
+
+## Coller entre documents
+
+Les calques copiés dans un document ouvert et collés dans un autre peuvent apporter les variables et les styles qu’ils utilisent. Avant de coller, une boîte de dialogue demande comment :
+
+- **Oui, importer** — ajoute les variables et les styles, pour que les calques collés y restent liés
+- **Coller tel quel** — colle les calques avec les valeurs qu’ils affichaient, liés à aucune variable ni aucun style
+- **Utiliser l’existant** ou **Ajouter renommé** — quand ce document a déjà une collection ou un style du même nom, choisissez pour chaque ligne : utiliser celui d’ici, où les variables sont associées par nom et les manquantes y sont ajoutées, ou ajouter la copie sous un nouveau nom comme « Spacing 2 »
+
+Le collage est une seule étape : **Annuler** retire les calques et tout ce qui a été ajouté. **Coller les propriétés** utilise de la même façon les collections et les styles du même nom.
+
 ## Lier des variables aux remplissages
 
 Dans la section Remplissage du panneau des propriétés, utilisez le sélecteur de variables pour lier une variable de couleur au remplissage d’un objet.

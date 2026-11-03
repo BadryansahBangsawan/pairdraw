@@ -3,10 +3,13 @@ export {
   iconOptions,
   isDataURL,
   isDocumentAssetPath,
+  parseImportedImageURL,
   penAssets,
   type PenAssets,
   type PenIconRequest
 } from './assets'
+export { importedDocument, type PenImport, type PenImports } from './imports'
+export { withUsedImports } from './library'
 export type { PenIconSource } from './nodes'
 export { PEN_PLUGIN_DATA_NAMESPACE } from './plugin-data'
 export {

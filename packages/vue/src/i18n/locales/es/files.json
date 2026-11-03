@@ -18,6 +18,10 @@
   "clipboardImageFetchFailed": "No se ha podido obtener 1 imagen de Figma. Comprueba que el archivo de origen sea accesible e inténtalo de nuevo.",
   "clipboardImagesFetchFailed": "No se han podido obtener {count} imágenes de Figma. Comprueba que el archivo de origen sea accesible e inténtalo de nuevo.",
   "mermaidPasteFailed": "No se ha podido leer el diagrama de Mermaid. {error}",
+  "webPasteFailed": "No se ha podido pegar el contenido web. {error}",
+  "webCaptureUnreadable": "No se ha podido leer la captura web copiada. Vuelve a capturar la página.",
+  "webCaptureNewer": "La captura web copiada procede de una extensión de captura más reciente. Actualiza Pairdraw para pegarla.",
+  "webCaptureTruncated": "La página era demasiado grande para capturarla entera, así que se ha omitido una parte.",
   "recentFiles": "Archivos recientes",
   "recentFilesDescription": "Continúa trabajando en un diseño o crea uno nuevo.",
   "noRecentFiles": "Aún no hay archivos recientes",
@@ -74,5 +78,22 @@
   "fileChangedOnDisk": "«{name}» cambió en el disco",
   "fileChangedOnDiskDescription": "Otra aplicación cambió este archivo mientras tienes cambios sin guardar. Vuelve a cargarlo para abrir la versión del archivo y descartar tus cambios, o ignora el cambio y sigue editando. Al guardar, el archivo se reemplaza con tu versión.",
   "reloadFromDisk": "Volver a cargar",
-  "ignoreDiskChange": "Ignorar"
+  "ignoreDiskChange": "Ignorar",
+  "pasteImportHeading": "¿Importar variables y estilos?",
+  "pasteImportDescription": "Estas capas usan variables o estilos de otro documento. Impórtalos para que las capas sigan vinculadas a ellos, o pega las capas tal como se ven.",
+  "pasteImportConflicts": "Ya están en este documento",
+  "pasteImportConflictsHint": "Usa los de este documento o añade los copiados con otro nombre.",
+  "pasteImportUseExisting": "Usar existentes",
+  "pasteImportAddRenamed": "Añadir con otro nombre",
+  "pasteImportVariables": {
+    "one": "{count} variable",
+    "many": "{count} variables"
+  },
+  "pasteImportFillStyle": "Estilo de color",
+  "pasteImportTextStyle": "Estilo de texto",
+  "pasteImportEffectStyle": "Estilo de efecto",
+  "pasteImportGridStyle": "Estilo de cuadrícula",
+  "pasteImportChoiceLabel": "{name}: usar existente o añadir con otro nombre",
+  "pasteImportAsIs": "Pegar tal cual",
+  "pasteImportConfirm": "Sí, importar"
 }

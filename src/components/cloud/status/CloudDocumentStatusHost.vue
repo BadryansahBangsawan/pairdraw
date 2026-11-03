@@ -21,6 +21,7 @@ import { toast } from '@/app/shell/ui'
 import { getLocalCanvasStore } from '@/app/storage/local-store'
 import { resumeStorageSync } from '@/app/storage/sync'
 import CloudConflictDialog from '@/components/cloud/conflict/CloudConflictDialog.vue'
+import CloudSharedLinkStatus from '@/components/cloud/share/CloudSharedLinkStatus.vue'
 
 import CloudDocumentStatus from './CloudDocumentStatus.vue'
 
@@ -33,7 +34,10 @@ const { state, location, meta } = useCloudDocumentStatus(() => store.getStorageB
 
 const ago = (iso: string | null | undefined) => (iso ? dates.relative(iso) : '')
 const savedAgo = computed(() => ago(meta.value?.lastSyncedAt) || null)
-const viewOnly = computed(() => cloudRoomPermissions.value.get(store) === 'view')
+const viewOnly = computed(() => {
+  const permission = cloudRoomPermissions.value.get(store)
+  return permission === 'view' || permission === 'comment'
+})
 const notLive = computed(() => cloudRoomsRefused.value.has(store))
 /** Rejoining shows the document as the server holds it, so it waits for this tab's edits. */
 const canRejoin = computed(() => state.value === 'synced' && !store.hasUnsavedChanges())
@@ -139,4 +143,5 @@ function retry() {
       @later="resolving = false"
     />
   </template>
+  <CloudSharedLinkStatus />
 </template>

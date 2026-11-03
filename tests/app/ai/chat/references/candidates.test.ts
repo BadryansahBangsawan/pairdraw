@@ -4,6 +4,7 @@ import { SceneGraph } from '@open-pencil/scene-graph'
 
 import { commandCandidates, referenceCandidates } from '@/app/ai/chat/references/candidates'
 import { resolveReference } from '@/app/ai/chat/references/resolve'
+import type { Skill } from '@/app/ai/skills/types'
 
 import { skillFixture } from '#tests/helpers/chat/skills'
 
@@ -55,6 +56,24 @@ describe('reference candidates', () => {
         (command) => command.insert
       )
     ).toEqual(['/review '])
+  })
+
+  test('a skill command shows what the caller describes it as; an agent command its own', () => {
+    const skills = [skillFixture({ name: 'dark-mode', source: 'builtin' })]
+    const describe = (skill: Skill) => `Summary of ${skill.name}`
+    expect(commandCandidates(null, skills, describe).map((command) => command.detail)).toEqual([
+      'Summary of dark-mode'
+    ])
+    expect(commandCandidates(null, skills).map((command) => command.detail)).toEqual([
+      'Lay out pages on an eight-point grid.'
+    ])
+    expect(
+      commandCandidates(
+        [{ name: 'review', description: 'Review', hint: null }],
+        skills,
+        describe
+      ).map((command) => command.detail)
+    ).toEqual(['Review'])
   })
 })
 

@@ -68,6 +68,7 @@ export const menuMessageDefaults = {
   back: 'Back',
   toggleUI: 'Toggle UI',
   togglePreview: 'Preview',
+  present: 'Present',
   /** The field that renames the document, in place of its tab's name. */
   documentName: 'Document name',
 
@@ -78,6 +79,7 @@ export const menuMessageDefaults = {
 
   pasteHere: 'Paste here',
   pasteToReplace: 'Paste to replace',
+  replaceInInstance: 'Replace inside instance',
   copyProperties: 'Copy properties',
   pasteProperties: 'Paste properties',
   renameSelection: 'Rename selection…',

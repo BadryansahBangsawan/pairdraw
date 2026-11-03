@@ -19,6 +19,7 @@ import PortalFieldDialog from '../account/PortalFieldDialog.vue'
 import PortalPasswordDialog from '../account/PortalPasswordDialog.vue'
 import PortalPictureDialog from '../account/PortalPictureDialog.vue'
 import PortalProfile from '../account/PortalProfile.vue'
+import PortalPublicProfile from '../account/PortalPublicProfile.vue'
 import PortalLoadAlert from '../layout/PortalLoadAlert.vue'
 import PortalPageSkeleton from '../layout/PortalPageSkeleton.vue'
 
@@ -195,6 +196,7 @@ onMounted(async () => {
       @remove-picture="removeOpen = true"
     />
     <PortalPageSkeleton v-else-if="loaded.status.value === 'loading'" avatar :groups="[2, 1]" />
+    <PortalPublicProfile v-if="profile" />
     <AppConfirmationDialog
       v-model:open="removeOpen"
       tone="danger"

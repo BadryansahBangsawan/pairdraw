@@ -25,6 +25,19 @@ export {
   type VectorDuplicateResult,
   type VectorEditResult
 } from './edit'
+export { bendSegment, type BendSegmentOptions } from './bend'
+export {
+  boxCorners,
+  rotateBoxMatrix,
+  rotationAbout,
+  scaleBoxMatrix,
+  scalesBox,
+  selectedVectorPoints,
+  transformBoxPoints,
+  transformVectorPoints,
+  vectorPointsBox,
+  type ScaleBoxOptions
+} from './point-transform'
 
 import type { CanvasKit, Path } from 'canvaskit-wasm'
 

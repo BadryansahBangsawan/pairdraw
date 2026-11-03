@@ -39,7 +39,11 @@ describe('normalizeToolbarLayout', () => {
   test('drops unknown entries, repeats and empty groups', () => {
     const groups = [['SELECT', 'LASSO', 'SELECT'], [], ['FRAME', 'SECTION', 'FRAME']]
     const result = normalizeToolbarLayout(groups, ['HAND', 'HAND', 'GHOST'])
-    expect(result.groups.slice(0, 2)).toEqual([['SELECT'], ['FRAME', 'SECTION']])
+    // Scale, which the stored layout lacks, joins Move's flyout, its default place.
+    expect(result.groups.slice(0, 2)).toEqual([
+      ['SELECT', 'SCALE'],
+      ['FRAME', 'SECTION']
+    ])
     // The shape and connector tools are placed hidden, as the default layout keeps them.
     expect(result.hidden).toEqual(['HAND', 'SHAPE_WITH_TEXT', 'CONNECTOR'])
   })
@@ -55,7 +59,7 @@ describe('normalizeToolbarLayout', () => {
       ['SHAPE_WITH_TEXT'],
       ['CONNECTOR'],
       ['insert-icon'],
-      ['HAND'],
+      ['HAND', 'ZOOM'],
       ['COMMENT'],
       ['place-image']
     ])
@@ -74,11 +78,11 @@ describe('normalizeToolbarLayout', () => {
       ['STICKY'],
       ['SHAPE_WITH_TEXT'],
       ['CONNECTOR'],
-      ['SELECT'],
+      ['SELECT', 'SCALE'],
       ['FRAME', 'SECTION'],
       SHAPES,
       ['PEN', 'PENCIL'],
-      ['HAND'],
+      ['HAND', 'ZOOM'],
       ['COMMENT'],
       ['place-image'],
       ['insert-icon']
@@ -163,14 +167,14 @@ describe('editing', () => {
   test('a button swaps with the button or flyout next to it', () => {
     const moved = moveToolbarEntry(base, 'TEXT', -1)
     expect(moved.groups.slice(3, 5)).toEqual([['TEXT'], ['PEN', 'PENCIL']])
-    expect(moveToolbarEntry(base, 'SELECT', -1)).toBe(base)
+    expect(moveToolbarEntry(base, 'insert-icon', 1)).toBe(base)
   })
 
   test('a flyout member moves inside the flyout and past its end becomes a button', () => {
     const inside = moveToolbarEntry(base, 'SECTION', -1)
     expect(inside.groups[1]).toEqual(['SECTION', 'FRAME'])
     const out = moveToolbarEntry(inside, 'SECTION', -1)
-    expect(out.groups.slice(0, 3)).toEqual([['SELECT'], ['SECTION'], ['FRAME']])
+    expect(out.groups.slice(0, 3)).toEqual([['SELECT', 'SCALE'], ['SECTION'], ['FRAME']])
     const below = moveToolbarEntry(base, 'SECTION', 1)
     expect(below.groups.slice(1, 3)).toEqual([['FRAME'], ['SECTION']])
   })
@@ -197,8 +201,9 @@ describe('editing', () => {
     expect(row('SELECT')).toMatchObject({
       joined: false,
       canJoin: false,
-      canMoveUp: false
+      inFlyout: true
     })
+    expect(row('SCALE')).toMatchObject({ joined: true, canJoin: false, above: 'SELECT' })
     expect(row('SECTION')).toMatchObject({
       joined: true,
       canJoin: false,
@@ -276,16 +281,16 @@ describe('toolbarLayoutFor', () => {
     expect(toolbarLayoutFor(base, profileTools(false))).toBe(base)
   })
 
-  test('keeps Move and Hand in a read-only document, as Figma does while a version is viewed', () => {
+  test('keeps Move, Hand, and Zoom in a read-only document, as Figma does while a version is viewed', () => {
     const keys = (groups: ToolbarEntry[][]) =>
       toolbarItems(toolbarLayoutFor(layout(groups), profileTools(true)), LABELS, SHORTCUTS).map(
         (item) =>
           item.kind === 'tool' ? [item.tool.key, ...(item.tool.flyout ?? [])] : item.action
       )
     expect(keys([['SELECT', 'HAND'], ['FRAME'], ['insert-icon']])).toEqual([
-      ['SELECT', 'SELECT', 'HAND']
+      ['SELECT', 'SELECT', 'HAND', 'ZOOM']
     ])
-    expect(keys(DEFAULT_TOOLBAR_LAYOUT.groups)).toEqual([['SELECT'], ['HAND']])
+    expect(keys(DEFAULT_TOOLBAR_LAYOUT.groups)).toEqual([['SELECT'], ['HAND', 'HAND', 'ZOOM']])
   })
 
   test('shows every tool a board offers, even those the layout hides', () => {

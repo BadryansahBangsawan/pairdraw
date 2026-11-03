@@ -59,6 +59,8 @@ OpenPencil używa binarnego formatu `.fig` Figmy i otwiera również dokumenty `
 |-----------|-------|-----------------|
 | Otwórz plik | <kbd>⌘</kbd><kbd>O</kbd> | <kbd>Ctrl</kbd> + <kbd>O</kbd> |
 
+Dokument `.pen`, który importuje biblioteki `.pen`, otwiera się z używanymi komponentami bibliotek, wczytanymi z plików wskazanych względem dokumentu. W dokumencie są to komponenty biblioteki tylko do odczytu; zmieniaj je w bibliotece. Przeglądarka nie może czytać plików obok dokumentu, więc tam te komponenty są przerywanymi symbolami zastępczymi, a komunikat podaje nazwy bibliotek; otwórz plik w aplikacji desktopowej lub w CLI, aby je wczytać. Aplikacja desktopowa czyta biblioteki najwyżej dwa foldery nad dokumentem, ale nigdy z folderu domowego ani wyżej i nie przez dowiązania; plik upuszczony na okno nie wczytuje żadnych, więc otwórz go przez Plik > Otwórz…. CLI czyta biblioteki w katalogu roboczym. Węzły skryptu i przeglądarki, których OpenPencil nie uruchamia, również otwierają się jako symbole zastępcze z zachowanym plikiem skryptu lub adresem strony.
+
 ### Zapisywanie
 
 | Działanie | macOS | Windows / Linux |

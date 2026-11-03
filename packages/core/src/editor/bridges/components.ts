@@ -81,6 +81,10 @@ export function createComponentBridge(
     setInstanceExposed: components.setInstanceExposed,
     resetSlot: components.resetSlot,
     clearSlot: components.clearSlot,
-    addInstanceToSlot: components.addInstanceToSlot
+    addInstanceToSlot: components.addInstanceToSlot,
+    replaceableInstanceLayers: components.replaceableInstanceLayers,
+    replaceInstanceLayersWith: components.replaceInstanceLayersWith,
+    restoreReplacedInstanceLayer: components.restoreReplacedInstanceLayer,
+    swapInstance: components.swapInstance
   }
 }

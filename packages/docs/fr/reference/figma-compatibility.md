@@ -28,7 +28,7 @@ Comparaison entre les fonctions de Figma Design et l’état actuel d’OpenPenc
 | Miniature personnalisée | 🔲 | Les fichiers enregistrés montrent leur première page, comme Figma sans page de couverture ; pas de choix de miniature |
 | Pas de déplacement | 🔲 | 1 px et 10 px ; pas de valeurs personnalisées |
 | Menu de l’application | ✅ | Menus dans le navigateur et menus natifs Tauri |
-| Outils AI | 🟡 | 126 outils dans le chat AI, les agents de code (ACP) et MCP ; photos libres de droits et vectorisation d’images ; pas de génération d’images ni de recherche AI |
+| Outils AI | 🟡 | 138 outils dans le chat AI, les agents de code (ACP) et MCP ; photos libres de droits, vectorisation d’images, ainsi que génération d’images, suppression et remplacement d’arrière-plans et génération de SVG avec les clés de l’utilisateur pour ses services d’image ; pas de recherche AI |
 
 ## Calques et formes
 
@@ -52,7 +52,7 @@ Ombres, flous, épaisseur de contour, extrémités, jointures, tirets, alignemen
 
 ## Disposition automatique
 
-Flexbox, Grid, direction, espacement, marges intérieures, alignement, modes de taille, retour à la ligne, dispositions imbriquées, réordonnancement par glissement et dimensions minimales et maximales sont pris en charge.
+Flexbox, Grid, direction, espacement, marges intérieures, alignement, modes de taille, retour à la ligne, dispositions imbriquées, réordonnancement par glissement et dimensions minimales et maximales sont pris en charge. L’espace autour n’existe que dans OpenPencil ; Figma affiche ces cadres en espace entre les éléments.
 
 ## Composants et systèmes de design
 
@@ -95,7 +95,7 @@ Connexions, déclencheurs, actions, animations, superpositions, défilement, par
 | Extraits de code | 🟡 | Design JSX, HTML, Vue et React avec CSS ou Tailwind et valeurs liées aux tokens ; pas de Swift, Kotlin ni Compose |
 | Tailwind CSS v4 | ✅ | HTML avec classes utilitaires depuis Code, la CLI ou l’API |
 | Figma pour VS Code | 🔲 | Pas d’intégration à l’extension de l’éditeur |
-| Serveur MCP | ✅ | `@open-pencil/mcp` avec stdio et HTTP ; 125 outils du cœur plus des outils de document, d’historique et de réglages |
+| Serveur MCP | ✅ | `@open-pencil/mcp` avec stdio et HTTP ; 138 outils du cœur plus des outils de document, d’historique et de réglages |
 | CLI | ✅ | 24 commandes, dont `info`, `tree`, `find`, `query`, `node`, `pages`, `variables`, `tokens`, `fonts`, `lint`, `analyze`, `export`, `import`, `convert`, `diff`, `eval` et `tool` |
 
 ## Figma Draw

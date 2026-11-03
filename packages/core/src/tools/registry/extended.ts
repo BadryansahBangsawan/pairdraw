@@ -32,6 +32,12 @@ import {
   setBehaviour
 } from '#core/tools/create'
 import {
+  generateImage,
+  generateSVG,
+  removeBackground,
+  replaceBackground
+} from '#core/tools/image-ai'
+import {
   setBlend,
   setConstraints,
   setEffects,
@@ -41,6 +47,7 @@ import {
   setLocked,
   setMinMax,
   replaceMatchingProperties,
+  rescale,
   setOpacity,
   setRotation,
   setStrokeAlign,
@@ -81,6 +88,7 @@ import {
   renameNode,
   ungroupNode
 } from '#core/tools/structure'
+import { getStyle } from '#core/tools/styles'
 import {
   bindVariable,
   createCollection,
@@ -140,6 +148,8 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   getFontStatus,
   listFonts,
   listAvailableFonts,
+  // Style directions
+  getStyle,
   // Create (advanced)
   createShape,
   searchIconsTool,
@@ -159,6 +169,11 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   importSVG,
   importMermaid,
   importHTML,
+  // Image AI, run on the services the user set up in the app
+  generateImage,
+  generateSVG,
+  removeBackground,
+  replaceBackground,
   // Modify (advanced)
   setEffects,
   setOpacity,
@@ -174,6 +189,7 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   setStrokeAlign,
   setImageFill,
   replaceMatchingProperties,
+  rescale,
   // Structure (advanced)
   cloneNode,
   nodeMove,

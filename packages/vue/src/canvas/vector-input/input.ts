@@ -49,6 +49,28 @@ export function updateNodeEditHover(editor: Editor, cx: number, cy: number): boo
 
 export { handleBendHandleMove, resolveBendTargetHandle }
 
+/** An end point dragged alone and dropped on another end point joins it. */
+function joinDroppedEndpoint(
+  origPositions: ReadonlyMap<number, unknown>,
+  editor: Editor,
+  methods: CanvasNodeEditMethods
+) {
+  const state = getCanvasNodeEditState(editor)
+  if (!state || origPositions.size !== 1) return
+  const [draggedIndex] = origPositions.keys()
+  if (!isEndpoint(draggedIndex, state.segments)) return
+  const vertex = state.vertices[draggedIndex]
+  const threshold = NODE_HIT_THRESHOLD / editor.state.zoom
+  for (let index = 0; index < state.vertices.length; index++) {
+    if (index === draggedIndex || !isEndpoint(index, state.segments)) continue
+    const target = state.vertices[index]
+    if (Math.hypot(vertex.x - target.x, vertex.y - target.y) < threshold) {
+      methods.nodeEditConnectEndpoints?.(draggedIndex, index)
+      return
+    }
+  }
+}
+
 export function handleNodeEditPointerUp(drag: Ref<DragState | null>, editor: Editor): boolean {
   const methods = editor as Editor & CanvasNodeEditMethods
   const current = drag.value
@@ -63,22 +85,7 @@ export function handleNodeEditPointerUp(drag: Ref<DragState | null>, editor: Edi
   if (current.type === 'edit-node') {
     editor.setSnapGuides([])
     finishPartClick(current, editor)
-    const state = getCanvasNodeEditState(editor)
-    if (state && current.origPositions.size === 1) {
-      const [draggedIndex] = current.origPositions.keys()
-      if (isEndpoint(draggedIndex, state.segments)) {
-        const vertex = state.vertices[draggedIndex]
-        const threshold = NODE_HIT_THRESHOLD / editor.state.zoom
-        for (let index = 0; index < state.vertices.length; index++) {
-          if (index === draggedIndex || !isEndpoint(index, state.segments)) continue
-          const target = state.vertices[index]
-          if (Math.hypot(vertex.x - target.x, vertex.y - target.y) < threshold) {
-            methods.nodeEditConnectEndpoints?.(draggedIndex, index)
-            break
-          }
-        }
-      }
-    }
+    joinDroppedEndpoint(current.origPositions, editor, methods)
     methods.commitNodeEditChanges?.()
     drag.value = null
     return true
@@ -94,6 +101,12 @@ export function handleNodeEditPointerUp(drag: Ref<DragState | null>, editor: Edi
     drag.value = null
     return true
   }
+  if (current.type === 'bend-segment' || current.type === 'edit-transform') {
+    methods.nodeEditEndPointsTransform?.()
+    methods.commitNodeEditChanges?.()
+    drag.value = null
+    return true
+  }
   return false
 }
 
@@ -102,7 +115,9 @@ export function cancelNodeEditDrag(current: DragState | null, editor: Editor) {
   if (
     current?.type === 'edit-node' ||
     current?.type === 'edit-handle' ||
-    current?.type === 'bend-handle'
+    current?.type === 'bend-handle' ||
+    current?.type === 'bend-segment' ||
+    current?.type === 'edit-transform'
   ) {
     ;(editor as Editor & CanvasNodeEditMethods).nodeEditCancelDrag?.()
   }

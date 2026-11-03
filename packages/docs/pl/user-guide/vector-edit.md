@@ -64,6 +64,8 @@ Działa to również dla rozgałęzionych punktów w sieci wektorowej. Po wybran
 - <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + <kbd>J</kbd> łączy dwa zaznaczone punkty końcowe: punkty w tym samym miejscu stają się jednym punktem, a odległe łączy prosty segment. Połączenie obu końców ścieżki zamyka ją i wypełnia. Podczas edycji ścieżki ten skrót nie otwiera czatu.
 - <kbd>Option</kbd>/<kbd>Alt</kbd> + przeciągnięcie przeciąga kopię zaznaczonych punktów lub segmentów. Kopia pojedynczego punktu pozostaje z nim połączona.
 - Klawisze strzałek przesuwają zaznaczone punkty o odległość z Ustawienia → Edytor, a z <kbd>Shift</kbd> o dużą odległość.
+- <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + przeciągnięcie segmentu wygina go tak, że chwycone miejsce podąża za wskaźnikiem. Gładki punkt końcowy pozostaje gładki, a jego drugi uchwyt obraca się razem z nim. Z <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + <kbd>Option</kbd>/<kbd>Alt</kbd> uchwyty sąsiednich segmentów zostają na miejscu, a punkty końcowe stają się narożnikami.
+- Gdy zaznaczone są dwa punkty lub segmenty, otacza je ramka transformacji. Przeciągnij róg lub krawędź, aby skalować punkty od przeciwnej strony; z <kbd>Shift</kbd> proporcje zostają zachowane, a z <kbd>Option</kbd>/<kbd>Alt</kbd> skalowanie odbywa się od środka. Przeciągnij tuż za rogiem, aby obrócić je wokół środka ramki, z <kbd>Shift</kbd> co 15°. Każdą transformację cofa się jednym krokiem.
 
 ## Pióro w trybie edycji
 

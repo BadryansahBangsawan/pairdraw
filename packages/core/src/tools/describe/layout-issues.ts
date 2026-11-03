@@ -49,6 +49,12 @@ function isEffectivelyFilling(node: SceneNode, isRow: boolean, graph: SceneGraph
   return parentDim > 0 && Math.abs(nodeDim - parentDim) < 2
 }
 
+/** Design JSX names of the alignments that spread children over free space. */
+const DISTRIBUTIONS: Partial<Record<SceneNode['primaryAxisAlign'], string>> = {
+  SPACE_BETWEEN: 'between',
+  SPACE_AROUND: 'around'
+}
+
 function checkAlignmentIssues(ctx: LayoutContext): void {
   const { node, isRow, children, issues } = ctx
 
@@ -59,13 +65,14 @@ function checkAlignmentIssues(ctx: LayoutContext): void {
     })
   }
 
+  const distribution = DISTRIBUTIONS[node.primaryAxisAlign]
   if (
-    node.primaryAxisAlign === 'SPACE_BETWEEN' &&
+    distribution &&
     node.primaryAxisSizing === 'HUG' &&
     !isEffectivelyFilling(node, isRow, ctx.graph)
   ) {
     issues.push({
-      message: `justify="between" on "${node.name}" with HUG sizing — no effect when parent shrinks to fit`,
+      message: `justify="${distribution}" on "${node.name}" with HUG sizing — no effect when parent shrinks to fit`,
       suggestion: 'Set a fixed size or use w="fill"'
     })
   }

@@ -51,7 +51,7 @@ test('typography controls use compact labeled anatomy', async () => {
   await canvas.waitForRender()
 
   const typography = page.getByRole('region', { name: 'Typography' })
-  await expect(typography.getByRole('button', { name: 'Font family' })).toBeVisible()
+  await expect(typography.getByRole('button', { name: 'Font family', exact: true })).toBeVisible()
   await expect(typography.getByRole('combobox', { name: 'Font weight' })).toBeVisible()
   await expect(typography.getByRole('spinbutton', { name: 'Font size' })).toBeVisible()
   await expect(typography.getByRole('spinbutton', { name: 'Line height' })).toBeVisible()

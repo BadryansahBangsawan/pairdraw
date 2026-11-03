@@ -7,7 +7,8 @@ const DARK = 0x1e / 255
 const LIGHT = 0.96
 
 async function openFresh(page: Page) {
-  await page.goto('/')
+  // Bare / opens Home; ?test starts on a new document.
+  await page.goto('/?test')
   await page.getByTestId('canvas-element').and(page.locator('[data-ready="1"]')).waitFor()
   await page.locator('#loader').waitFor({ state: 'detached' })
 }

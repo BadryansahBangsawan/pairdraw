@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
 
 import CloudShareDialog from './CloudShareDialog.vue'
-import type { ShareLinkState, ShareMember } from './types'
+import type { ShareLinkState, ShareMember, ShareSnapshotState } from './types'
 
 type Args = {
   members: ShareMember[]
@@ -10,6 +10,8 @@ type Args = {
   canManage: boolean
   copied: boolean
   sendsLink: boolean
+  snapshot: ShareSnapshotState
+  snapshotCopied: boolean
   onInvite: (email: string, permission: string) => void
 }
 
@@ -23,6 +25,7 @@ const members: ShareMember[] = [
   },
   { id: 'user-ben', name: 'Ben Ortiz', email: 'ben@studio.example', permission: 'edit' },
   { id: 'user-mia', name: 'Mia Chen', email: 'mia@client.example', permission: 'view' },
+  { id: 'user-leo', name: 'Leo Park', email: 'leo@client.example', permission: 'comment' },
   {
     id: 'invite-chloe',
     name: 'chloe@agency.example',
@@ -41,6 +44,8 @@ const meta = {
     canManage: true,
     copied: false,
     sendsLink: false,
+    snapshot: { state: 'none' },
+    snapshotCopied: false,
     onInvite: fn()
   },
   render: (args) => ({
@@ -57,6 +62,8 @@ const meta = {
           :can-manage="args.canManage"
           :copied="args.copied"
           :sends-link="args.sendsLink"
+          :snapshot="args.snapshot"
+          :snapshot-copied="args.snapshotCopied"
           @invite="args.onInvite"
         />
       </div>`
@@ -91,4 +98,26 @@ export const ViewerCannotManage: Story = {
     members: members.map((member) => ({ ...member, you: member.id === 'user-mia' })),
     link: { access: 'link', permission: 'view', copyable: true }
   }
+}
+
+/** Commenters see the file and leave comments without editing it. */
+export const AnyoneWithTheLinkCanComment: Story = {
+  args: { link: { access: 'link', permission: 'comment', copyable: true } }
+}
+
+/** A snapshot link shows the file as it was shared; Update snapshot appears once it falls behind. */
+export const SnapshotBehind: Story = {
+  args: { snapshot: { state: 'shared', copyable: true, behind: true } }
+}
+
+export const SnapshotCopied: Story = {
+  args: { snapshot: { state: 'shared', copyable: true, behind: false }, snapshotCopied: true }
+}
+
+export const SnapshotMadeOnAnotherDevice: Story = {
+  args: { snapshot: { state: 'shared', copyable: false, behind: false } }
+}
+
+export const SnapshotBeforeFirstSave: Story = {
+  args: { snapshot: { state: 'unsaved' } }
 }

@@ -1,4 +1,5 @@
 import type { SceneGraph } from '../graph'
+import { numberedName } from '../naming'
 import type { ComponentPropertyDefinition, SceneNode, SlotSettings } from '../types'
 import { slotPropertyId } from './frames'
 
@@ -29,11 +30,10 @@ export function canCreateSlot(graph: SceneGraph, node: SceneNode): boolean {
 }
 
 function uniqueSlotName(owner: SceneNode, base: string): string {
-  const taken = new Set(owner.componentPropertyDefinitions.map((definition) => definition.name))
-  if (!taken.has(base)) return base
-  let index = 2
-  while (taken.has(`${base} ${index}`)) index++
-  return `${base} ${index}`
+  return numberedName(
+    base,
+    owner.componentPropertyDefinitions.map((definition) => definition.name)
+  )
 }
 
 /**

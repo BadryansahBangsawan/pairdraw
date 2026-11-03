@@ -266,6 +266,8 @@ export const panelMessageDefaults = {
   slotItemCount: count({ one: '{count} item', many: '{count} items' }),
   addInstances: 'Add instances',
   searchInstances: 'Search components',
+  swapInstance: 'Swap instance',
+  restoreComponentLayer: 'Restore component layer',
   preferredInstances: 'Preferred',
   allInstances: 'All components',
   noInstancesFound: 'No components found',
@@ -622,6 +624,7 @@ export const panelMessageDefaults = {
   layoutGrid: 'Grid layout',
   layoutWrap: 'Wrap layout',
   gapAuto: 'Auto gap',
+  spaceAround: 'Space around',
   horizontalGap: 'Horizontal gap',
   verticalGap: 'Vertical gap',
   auto: 'Auto',
@@ -730,7 +733,21 @@ export const panelMessageDefaults = {
   brightness: 'Brightness',
   lightness: 'Lightness',
   chroma: 'Chroma',
-  alpha: 'Alpha'
+  alpha: 'Alpha',
+  /** The Scale tool's panel, which scales the selection with its contents. */
+  scale: 'Scale',
+  scaleFactor: 'Scale factor',
+  /** The anchor grid: the point of the selection that stays put while it scales. */
+  scaleFrom: 'Scale from',
+  scaleAnchorTopLeft: 'Top left',
+  scaleAnchorTop: 'Top',
+  scaleAnchorTopRight: 'Top right',
+  scaleAnchorLeft: 'Left',
+  scaleAnchorCenter: 'Center',
+  scaleAnchorRight: 'Right',
+  scaleAnchorBottomLeft: 'Bottom left',
+  scaleAnchorBottom: 'Bottom',
+  scaleAnchorBottomRight: 'Bottom right'
 } as const
 
 export const panelMessages = i18n('panels', panelMessageDefaults)

@@ -432,7 +432,11 @@ export interface GridPosition {
   columnSpan: number
   rowSpan: number
 }
-export type LayoutAlign = 'MIN' | 'CENTER' | 'MAX' | 'SPACE_BETWEEN'
+/**
+ * Primary axis alignment of an auto layout's children. `SPACE_AROUND` is OpenPencil's own:
+ * Figma has no such mode, so `.fig` files keep it as plugin data over Figma's space between.
+ */
+export type LayoutAlign = 'MIN' | 'CENTER' | 'MAX' | 'SPACE_BETWEEN' | 'SPACE_AROUND'
 export type LayoutCounterAlign = 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'BASELINE'
 export type LayoutAlignSelf = 'AUTO' | 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'BASELINE'
 export type LayoutWrap = 'NO_WRAP' | 'WRAP'

@@ -6,7 +6,14 @@ import type { SceneNode } from '@open-pencil/scene-graph'
 import { getAxisAlignedWorldBounds, getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
 import Matrix from '@open-pencil/scene-graph/matrix'
 import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
-import { computeSnap, type SnapGuide } from '@open-pencil/scene-graph/snap'
+import {
+  computeSnap,
+  computeSpacingGuides,
+  computeSpacingSnap,
+  spacingTargets,
+  type SnapGuide,
+  type SpacingTargets
+} from '@open-pencil/scene-graph/snap'
 
 export interface PixelSnapResult {
   delta: Vector
@@ -67,7 +74,10 @@ export interface ObjectPixelSnapResult {
 function deduplicateGuides(guides: SnapGuide[]): SnapGuide[] {
   const merged = new Map<string, SnapGuide>()
   for (const guide of guides) {
-    const key = `${guide.axis}:${guide.position}`
+    // Gaps on one line are separate indicators, each with its own size.
+    const key = guide.spacing
+      ? `spacing:${guide.axis}:${guide.position}:${guide.from}:${guide.to}`
+      : `${guide.axis}:${guide.position}`
     const current = merged.get(key)
     if (!current) merged.set(key, { ...guide })
     else {
@@ -94,6 +104,60 @@ function winningCorrection(
   if (explicit) return explicit.delta
   return objectMatched ? objectDelta : pixelDelta
 }
+
+export interface ObjectSnapOptions {
+  /**
+   * Also snap to equal spacing between neighbours and show the gaps that match, as a move does in
+   * Figma. A resize measures one edge, so it leaves this off.
+   */
+  spacing?: boolean
+}
+
+/** How one axis snaps to other layers: by alignment or, when it is nearer, by equal spacing. */
+interface ObjectAxisSnap {
+  matched: boolean
+  delta: number
+  spaced: boolean
+}
+
+function objectAxisSnap(
+  aligned: boolean,
+  alignDelta: number,
+  spacing: number | null
+): ObjectAxisSnap {
+  if (spacing !== null && (!aligned || Math.abs(spacing) < Math.abs(alignDelta))) {
+    return { matched: true, delta: spacing, spaced: true }
+  }
+  return { matched: aligned, delta: alignDelta, spaced: false }
+}
+
+function objectSnaps(
+  movingIds: Set<string>,
+  movingBounds: Rect,
+  targets: SceneNode[],
+  threshold: number,
+  spacing: SpacingTargets | null
+): { x: ObjectAxisSnap; y: ObjectAxisSnap; guides: SnapGuide[] } {
+  const align = computeSnap(movingIds, movingBounds, targets, threshold)
+  const spaced = spacing
+    ? computeSpacingSnap(spacing, movingBounds, threshold)
+    : { dx: null, dy: null }
+  const x = objectAxisSnap(
+    align.guides.some((guide) => guide.axis === 'x'),
+    align.dx,
+    spaced.dx
+  )
+  const y = objectAxisSnap(
+    align.guides.some((guide) => guide.axis === 'y'),
+    align.dy,
+    spaced.dy
+  )
+  // An axis that snapped to a gap shows the gap, not alignment it did not take.
+  const guides = align.guides.filter((guide) => !(guide.axis === 'x' ? x.spaced : y.spaced))
+  return { x, y, guides }
+}
+
+const NO_OBJECT_AXIS_SNAP: ObjectAxisSnap = { matched: false, delta: 0, spaced: false }
 
 interface AxisCandidate<T extends SnapGuide> {
   delta: number
@@ -128,7 +192,8 @@ export function resolveObjectPixelSnap(
   targets: SceneNode[],
   editor: Editor,
   explicitTargets: ExplicitSnapTarget[] = [],
-  geometryTargets: GeometrySnapTarget[] = []
+  geometryTargets: GeometrySnapTarget[] = [],
+  options: ObjectSnapOptions = {}
 ): ObjectPixelSnapResult {
   const threshold = snappingThreshold(editor)
   const xAnchors = [
@@ -153,14 +218,17 @@ export function resolveObjectPixelSnap(
     yAnchors,
     threshold
   )
-  const objectSnap = editor.state.snappingPreferences.objects
-    ? computeSnap(movingIds, movingBounds, targets, threshold)
-    : { dx: 0, dy: 0, guides: [] }
+  const objects = editor.state.snappingPreferences.objects
+  // Sorted once per move and shared by the snap and the indicators.
+  const spacing = options.spacing && objects ? spacingTargets(movingIds, targets) : null
+  const objectSnap = objects
+    ? objectSnaps(movingIds, movingBounds, targets, threshold, spacing)
+    : { x: NO_OBJECT_AXIS_SNAP, y: NO_OBJECT_AXIS_SNAP, guides: [] }
   const pixelSnap = editor.state.snappingPreferences.pixelGrid
     ? computePixelGridSnap(movingBounds, snapGridStep(editor))
     : { delta: { x: 0, y: 0 }, guides: [] }
-  const objectX = objectSnap.guides.some((guide) => guide.axis === 'x')
-  const objectY = objectSnap.guides.some((guide) => guide.axis === 'y')
+  const objectX = objectSnap.x.matched
+  const objectY = objectSnap.y.matched
   const explicitGuides = [explicitX?.target, explicitY?.target].flatMap((guide) =>
     guide ? [guide] : []
   )
@@ -169,11 +237,20 @@ export function resolveObjectPixelSnap(
   )
   const xBlockedByGeometry = Boolean(geometryX)
   const yBlockedByGeometry = Boolean(geometryY)
+  const correction = {
+    x: winningCorrection(geometryX, explicitX, objectX, objectSnap.x.delta, pixelSnap.delta.x),
+    y: winningCorrection(geometryY, explicitY, objectY, objectSnap.y.delta, pixelSnap.delta.y)
+  }
+  // The gaps that match where the bounds land, whichever snap put them there.
+  const spacingGuides = spacing
+    ? computeSpacingGuides(spacing, {
+        ...movingBounds,
+        x: movingBounds.x + correction.x,
+        y: movingBounds.y + correction.y
+      })
+    : []
   return {
-    correction: {
-      x: winningCorrection(geometryX, explicitX, objectX, objectSnap.dx, pixelSnap.delta.x),
-      y: winningCorrection(geometryY, explicitY, objectY, objectSnap.dy, pixelSnap.delta.y)
-    },
+    correction,
     guides: deduplicateGuides([
       ...geometryGuides,
       ...explicitGuides.filter((guide) =>
@@ -182,6 +259,7 @@ export function resolveObjectPixelSnap(
       ...objectSnap.guides.filter((guide) =>
         guide.axis === 'x' ? !xBlockedByGeometry && !explicitX : !yBlockedByGeometry && !explicitY
       ),
+      ...spacingGuides,
       ...pixelSnap.guides.filter((guide) =>
         guide.axis === 'x'
           ? !xBlockedByGeometry && !explicitX && !objectX

@@ -8,9 +8,11 @@ import {
   useSettingsMessages
 } from '@open-pencil/vue/i18n'
 
-import { mcpConnectionSettings } from '@/app/integrations/mcp'
+import { mcpConnectionSettings, type MCPConnection } from '@/app/integrations/mcp'
+import { useMCPConnectionAccess } from '@/app/integrations/mcp/settings/access'
 import { useMCPConnectionForm } from '@/app/integrations/mcp/settings/form'
 import { useMCPConnectionSettings } from '@/app/integrations/mcp/settings/use'
+import { parseMCPEnvironment } from '@/app/integrations/mcp/stdio/env'
 import { useSettingsFormGuard } from '@/app/settings/navigation/use'
 import SettingsLink from '@/components/settings/layout/SettingsLink.vue'
 import SettingsPage from '@/components/settings/layout/SettingsPage.vue'
@@ -35,15 +37,25 @@ const editorElement = useTemplateRef('editorElement')
 const form = useMCPConnectionForm(settings, automation)
 const { draft, errors: fieldErrors } = form
 const connection = useMCPConnectionSettings(draft, tokenDraft, automation)
-const { tokenStatus, error, saveResult, clearCredential } = connection
+const { tokenStatus, error, saveResult, clearCredential, envDraft, envStatus } = connection
 watch(
   () => Boolean(tokenDraft.value.trim() || tokenStatus.value === 'configured'),
   form.setCredentialReady,
   { immediate: true, flush: 'sync' }
 )
+watch(() => parseMCPEnvironment(envDraft.value) !== null, form.setEnvironmentValid, {
+  immediate: true,
+  flush: 'sync'
+})
 const dirty = computed(
-  () => form.dirty.value || tokenDraft.value.length > 0 || connection.credentialCleared.value
+  () =>
+    form.dirty.value ||
+    tokenDraft.value.length > 0 ||
+    envDraft.value.length > 0 ||
+    connection.credentialCleared.value ||
+    connection.envCleared.value
 )
+const access = useMCPConnectionAccess(connection.savedConnection, dirty)
 const busy = computed(() => connection.busy.value || form.isSubmitting.value)
 useSettingsFormGuard(
   {
@@ -67,6 +79,13 @@ async function startEdit(id: string) {
 }
 function cancel() {
   editing.value = false
+}
+/** The row's second line: where a remote server answers, or the command a local one runs. */
+function connectionTarget(item: MCPConnection): string {
+  const { transport } = item
+  return transport.type === 'stdio'
+    ? [transport.command, ...transport.args].join(' ')
+    : transport.url
 }
 /**
  * The draft and token are cleared once the editor has slid away, so it never shows them emptying;
@@ -99,13 +118,27 @@ async function remove() {
         :token-status="tokenStatus"
         :error="error"
         :save-result="saveResult"
+        v-model:env="envDraft"
+        :env-status="envStatus"
         :field-errors="fieldErrors"
         :busy="busy"
+        :signed-in="access.signedIn.value"
+        :sign-in-status="access.signInStatus.value"
+        :can-sign-in="access.canSignIn.value"
+        :can-test="access.canTest.value"
+        :test-status="access.testStatus.value"
+        :test-result="access.testResult.value"
         @cancel="cancel"
         @save="save"
         @blur-field="form.blur"
         @remove="deleteOpen = true"
         @clear="clearCredential"
+        @clear-env="connection.clearEnvironment"
+        @sign-in="access.signIn"
+        @reopen="access.reopen"
+        @cancel-sign-in="access.cancel"
+        @sign-out="access.signOut"
+        @test="access.test"
       />
     </template>
     <SettingsPage>
@@ -130,9 +163,12 @@ async function remove() {
               :disabled="busy"
               @click="startEdit(item.id)"
             >
-              <template #leading><icon-lucide-plug class="size-3.5" /></template>
+              <template #leading>
+                <icon-lucide-terminal v-if="item.transport.type === 'stdio'" class="size-3.5" />
+                <icon-lucide-plug v-else class="size-3.5" />
+              </template>
               {{ item.name }}
-              <template #description>{{ item.transport.url }}</template>
+              <template #description>{{ connectionTarget(item) }}</template>
               <template #trailing>
                 <span class="text-xs">{{ item.enabled ? common.enabled : common.disabled }}</span>
                 <icon-lucide-chevron-right class="size-3.5" />

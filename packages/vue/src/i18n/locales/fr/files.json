@@ -18,6 +18,10 @@
   "clipboardImageFetchFailed": "Impossible de récupérer 1 image depuis Figma. Vérifiez que le fichier source est accessible, puis réessayez.",
   "clipboardImagesFetchFailed": "Impossible de récupérer {count} images depuis Figma. Vérifiez que le fichier source est accessible, puis réessayez.",
   "mermaidPasteFailed": "Impossible de lire le diagramme Mermaid. {error}",
+  "webPasteFailed": "Impossible de coller le contenu web. {error}",
+  "webCaptureUnreadable": "Impossible de lire la capture web copiée. Capturez à nouveau la page.",
+  "webCaptureNewer": "La capture web copiée provient d’une extension de capture plus récente. Mettez à jour Pairdraw pour la coller.",
+  "webCaptureTruncated": "La page était trop grande pour être capturée en entier : une partie a été omise.",
   "recentFiles": "Fichiers récents",
   "recentFilesDescription": "Continuez un design ou commencez-en un nouveau.",
   "noRecentFiles": "Aucun fichier récent",
@@ -74,5 +78,22 @@
   "fileChangedOnDisk": "« {name} » a été modifié sur le disque",
   "fileChangedOnDiskDescription": "Une autre application a modifié ce fichier alors que vous avez des modifications non enregistrées. Rechargez-le pour ouvrir la version du fichier et abandonner vos modifications, ou ignorez le changement et continuez à modifier. L’enregistrement remplacera le fichier par votre version.",
   "reloadFromDisk": "Recharger",
-  "ignoreDiskChange": "Ignorer"
+  "ignoreDiskChange": "Ignorer",
+  "pasteImportHeading": "Importer les variables et les styles ?",
+  "pasteImportDescription": "Ces calques utilisent des variables ou des styles d’un autre document. Importez-les pour que les calques y restent liés, ou collez les calques tels qu’ils apparaissent.",
+  "pasteImportConflicts": "Déjà dans ce document",
+  "pasteImportConflictsHint": "Utilisez ceux de ce document ou ajoutez les copies sous un nouveau nom.",
+  "pasteImportUseExisting": "Utiliser l’existant",
+  "pasteImportAddRenamed": "Ajouter renommé",
+  "pasteImportVariables": {
+    "one": "{count} variable",
+    "many": "{count} variables"
+  },
+  "pasteImportFillStyle": "Style de couleur",
+  "pasteImportTextStyle": "Style de texte",
+  "pasteImportEffectStyle": "Style d’effet",
+  "pasteImportGridStyle": "Style de grille",
+  "pasteImportChoiceLabel": "{name} : utiliser l’existant ou ajouter renommé",
+  "pasteImportAsIs": "Coller tel quel",
+  "pasteImportConfirm": "Oui, importer"
 }

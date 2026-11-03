@@ -1,6 +1,7 @@
 import { watchDebounced } from '@vueuse/core'
 import { watch, type WatchHandle } from 'vue'
 
+import type { DocumentSourceIdentity } from '@/app/document/io/types'
 import { getRecoveryStore } from '@/app/document/recovery/store'
 import type { RecoveryStore } from '@/app/document/recovery/types'
 import { createCanvasId } from '@/app/storage/id'
@@ -11,6 +12,15 @@ interface DocumentRecoveryOptions {
   version: () => number
   buildFigFile: () => Promise<Uint8Array> | Uint8Array
   hasWritableSource: () => boolean
+  /**
+   * The file the document saves to, when it has one: its unsaved changes are kept as a backup of
+   * that file, offered when the file opens again.
+   */
+  fileSource?: () => DocumentSourceIdentity | null
+  /** Whether autosave writes the file's changes itself, so only an explicit persist backs them up. */
+  autosaveCovers?: () => boolean
+  /** Whether the document keeps its changes elsewhere, such as in its draft, so it needs no copy. */
+  keptElsewhere?: () => boolean
   isEnabled?: () => boolean
   store?: RecoveryStore
   recoveryId?: string
@@ -30,6 +40,9 @@ export function createDocumentRecovery({
   version: currentVersion,
   buildFigFile,
   hasWritableSource,
+  fileSource = () => null,
+  autosaveCovers = () => false,
+  keptElsewhere = () => false,
   isEnabled = () => true,
   store = getRecoveryStore(),
   recoveryId = createCanvasId()
@@ -43,16 +56,29 @@ export function createDocumentRecovery({
   let cleanup: Promise<void> = Promise.resolve()
   let disposed = false
 
+  /**
+   * What the copy is for: a document with no source gets a recovery copy, a file a backup of its
+   * unsaved changes; null when the document's changes are kept by its storage or its draft.
+   */
+  function copyTarget(): { source: DocumentSourceIdentity | null } | null {
+    if (keptElsewhere()) return null
+    const file = fileSource()
+    if (file) return { source: file }
+    return hasWritableSource() ? null : { source: null }
+  }
+
   async function runWrites(generation: number): Promise<void> {
     if (disposed || generation !== lifecycleGeneration || !isEnabled()) return
-    if (hasWritableSource() || requestedVersion === protectedVersion) return
+    if (!copyTarget() || requestedVersion === protectedVersion) return
     const version = requestedVersion
     const bytes = await buildFigFile()
-    if (generation !== lifecycleGeneration || hasWritableSource() || !isEnabled()) return
+    const target = copyTarget()
+    if (generation !== lifecycleGeneration || !target || !isEnabled()) return
     await store.write({
       id,
       documentName: state.documentName,
-      figBytes: bytes
+      figBytes: bytes,
+      source: target.source
     })
     persistedVersion = version
     if (generation !== lifecycleGeneration) return
@@ -62,7 +88,7 @@ export function createDocumentRecovery({
 
   async function persistNow(): Promise<void> {
     await cleanup
-    if (disposed || hasWritableSource() || !isEnabled()) return
+    if (disposed || !copyTarget() || !isEnabled()) return
     requestedVersion = currentVersion()
     if (requestedVersion === protectedVersion) return
     if (!writing) {
@@ -77,6 +103,8 @@ export function createDocumentRecovery({
   const stopVersionWatch: WatchHandle = watchDebounced(
     currentVersion,
     () => {
+      // Autosave writes a file's changes within the same wait, so a backup would only repeat it.
+      if (copyTarget()?.source && autosaveCovers()) return
       void persistNow().catch((error) => console.warn('[Recovery] Snapshot failed:', error))
     },
     { debounce: 3000, maxWait: 10000 }

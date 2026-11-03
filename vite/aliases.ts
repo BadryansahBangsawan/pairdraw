@@ -74,6 +74,15 @@ export function createOpenPencilAliases(rootDir: string, options: { cloud?: bool
       find: /^@open-pencil\/emit$/,
       replacement: resolve(rootDir, 'packages/emit/src/index.ts')
     },
+    { find: '#web-capture', replacement: resolve(rootDir, 'packages/web-capture/src') },
+    {
+      find: /^@open-pencil\/web-capture\/capturer$/,
+      replacement: resolve(rootDir, 'packages/web-capture/src/capturer/index.ts')
+    },
+    {
+      find: /^@open-pencil\/web-capture$/,
+      replacement: resolve(rootDir, 'packages/web-capture/src/index.ts')
+    },
     { find: '#design-jsx', replacement: resolve(rootDir, 'packages/design-jsx/src') },
     {
       find: /^@open-pencil\/design-jsx$/,

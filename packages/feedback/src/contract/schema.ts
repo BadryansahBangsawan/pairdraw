@@ -43,6 +43,8 @@ export const AI_PROVIDERS = [
   'opencode-zen',
   'opencode-go',
   'anthropic-compatible',
+  'amazon-bedrock',
+  'google-vertex',
   'openpencil',
   'harness:pi',
   'acp:claude-code',

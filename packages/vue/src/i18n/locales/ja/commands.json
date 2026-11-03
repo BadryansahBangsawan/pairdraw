@@ -46,6 +46,7 @@
   "flattenSelection": "フラット化",
   "outlineText": "テキストのアウトライン化",
   "outlineStroke": "線の境界線をプレビュー (パスのアウトライン化)",
+  "cropImage": "画像を切り抜き",
   "useAsMask": "マスクとして使用",
   "removeMask": "マスクを解除",
   "bringForward": "前面へ移動",
@@ -91,5 +92,8 @@
   "vectorSmoothCorner": "ポイントをスムーズとコーナーで切り替え",
   "gestureDrag": "ドラッグ",
   "gestureDoubleClickSegment": "セグメントをダブルクリック",
-  "gestureDoubleClickPoint": "ポイントをダブルクリック"
+  "gestureDoubleClickPoint": "ポイントをダブルクリック",
+  "vectorBendSegment": "セグメントを曲げる",
+  "vectorBendSegmentKeepHandles": "隣のハンドルを動かさずにセグメントを曲げる",
+  "gestureDragSegment": "セグメントをドラッグ"
 }

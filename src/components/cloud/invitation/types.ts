@@ -9,7 +9,7 @@ export type CloudInvitationState =
 
 /** What the invitation opens: one document, or a whole workspace. */
 export type CloudInvitationSummary = (
-  | { kind: 'document'; documentName: string; permission: 'edit' | 'view' }
+  | { kind: 'document'; documentName: string; permission: 'edit' | 'comment' | 'view' }
   | { kind: 'workspace'; workspaceName: string; role: 'admin' | 'editor' | 'viewer' }
 ) & {
   inviterName: string

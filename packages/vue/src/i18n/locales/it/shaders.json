@@ -1,0 +1,17 @@
+{
+  "mode": "Modalità shader",
+  "open": "Apri in modalità shader",
+  "region": "Modalità shader: {name}",
+  "done": "Fine",
+  "leave": "Esci dalla modalità shader ({shortcut})",
+  "play": "Riproduci",
+  "pause": "Metti in pausa",
+  "restart": "Torna all’inizio",
+  "phase": "Fase dell’animazione",
+  "position": "{time} di {duration}",
+  "preview": "Anteprima dello shader",
+  "settings": "Impostazioni dello shader",
+  "starting": "Avvio dello shader…",
+  "failed": "Questo shader non può essere riprodotto qui, quindi viene mostrato il fotogramma fisso.",
+  "readOnly": "Questo documento è di sola lettura: lo shader viene riprodotto, ma le sue impostazioni non si possono modificare."
+}

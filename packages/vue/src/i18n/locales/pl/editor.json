@@ -16,5 +16,19 @@
   "toggleAIChat": "Czat AI ({shortcut})",
   "startPreview": "Podgląd ({shortcut})",
   "toggleLayersPanel": "Panel warstw",
-  "togglePropertiesPanel": "Panel właściwości"
+  "togglePropertiesPanel": "Panel właściwości",
+  "textLink": "Link",
+  "addTextLink": "Dodaj link",
+  "editTextLink": "Edytuj link",
+  "removeTextLink": "Usuń link",
+  "openTextLink": "Otwórz link",
+  "textLinkAddress": "Adres linku",
+  "textLinkPlaceholder": "Wklej link lub adres e-mail",
+  "textLinkInvalid": "Użyj adresu strony lub adresu e-mail.",
+  "textLinkMixed": "Kilka linków",
+  "textLinkToLayer": "Prowadzi do {name}",
+  "embedWaiting": "Oczekiwanie na stronę osadzającą",
+  "embedWaitingDescription": "Projekt otworzy się, gdy połączy się strona, w której jest osadzony.",
+  "embedInvalidOrigin": "To osadzenie nie może się połączyć",
+  "embedInvalidOriginDescription": "Jego link musi wskazywać źródło strony osadzającej, na przykład https://example.com."
 }

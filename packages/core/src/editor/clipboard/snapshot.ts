@@ -1,6 +1,7 @@
 import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
 import { styleRunReferences } from '@open-pencil/scene-graph/text'
 
+import { resolvedClipboardBindings } from './detach'
 import { clipboardPlacement, type ClipboardPlacement } from './placement'
 import { captureClipboardVariables, type ClipboardVariables } from './variables'
 
@@ -15,6 +16,11 @@ export interface ClipboardSnapshot {
   /** Where the copied layers sat on the canvas when they were copied. */
   placement: ClipboardPlacement
   images: Map<string, Uint8Array>
+  /**
+   * By copied layer id, the values its variable bindings showed where it was copied, for the
+   * fields whose stored value differs; a paste as is in another document writes them.
+   */
+  resolvedBindings?: Map<string, Partial<SceneNode>>
   /** Written by Copy properties: Paste skips it and Paste properties reads it, as in Figma. */
   properties?: boolean
 }
@@ -44,8 +50,11 @@ export function captureClipboardSnapshot(
   const roots = selectedNodes.filter((node) => !node.parentId || !selectedIds.has(node.parentId))
   const images = new Map<string, Uint8Array>()
   const capturedNodes: SceneNode[] = []
+  const resolvedBindings = new Map<string, Partial<SceneNode>>()
   function capture(node: SceneNode): ClipboardNodeTree {
     capturedNodes.push(node)
+    const resolved = resolvedClipboardBindings(graph, node)
+    if (resolved) resolvedBindings.set(node.id, resolved)
     for (const paint of node.fills) {
       if (!paint.imageHash) continue
       const bytes = graph.images.get(paint.imageHash)
@@ -80,6 +89,7 @@ export function captureClipboardSnapshot(
     variableDependencies: captureClipboardVariables(graph, capturedNodes),
     nodes,
     placement: clipboardPlacement(graph, roots),
-    images
+    images,
+    resolvedBindings
   }
 }

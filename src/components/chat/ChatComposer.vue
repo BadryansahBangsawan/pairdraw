@@ -89,7 +89,12 @@ function restoreDraft(draft: string): boolean {
 function prependDraft(draft: string): void {
   editor.setText(text.value.trim() ? `${draft}\n\n${text.value}` : draft)
 }
-defineExpose({ restoreDraft, prependDraft, insert: editor.insert, focus: editor.focus })
+/** Rewrites the message, such as to start it with a skill, leaving the caret at its end. */
+function edit(update: (current: string) => string): void {
+  editor.setText(update(text.value))
+  editor.focusEnd()
+}
+defineExpose({ restoreDraft, prependDraft, edit, insert: editor.insert, focus: editor.focus })
 </script>
 <template>
   <TooltipProvider>

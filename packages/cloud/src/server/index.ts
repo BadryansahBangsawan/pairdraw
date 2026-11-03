@@ -220,6 +220,7 @@ export {
   createPublicSharingRoutes,
   decryptContinuationToken,
   DocumentShareInvalidError,
+  DocumentShareKindError,
   DocumentShareSignInRequiredError,
   encryptContinuationToken,
   hashCapability,
@@ -277,3 +278,11 @@ export {
   type WorkspaceRouteEnvironment,
   type WorkspaceService
 } from './workspaces'
+export {
+  createPublicProfileRoutes,
+  createPublicProfileService,
+  createPublicProfileSettingsRoutes,
+  PublicProfileForbiddenError,
+  PublicProfileHandleTakenError,
+  type PublicProfileService
+} from './profiles'

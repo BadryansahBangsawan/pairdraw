@@ -87,6 +87,8 @@ function resolveBrowserDocument(documentOverride: Document | undefined): Documen
 function attributesToRecord(element: Element): Record<string, string> {
   const attrs: Record<string, string> = {}
   for (const attr of Array.from(element.attributes)) {
+    // Event handlers draw nothing, and the styled copy of the markup must not run them.
+    if (attr.name.toLowerCase().startsWith('on')) continue
     attrs[attr.name] = attr.value
   }
   return attrs
@@ -234,6 +236,8 @@ async function computeStylesInIframe(
 ): Promise<DesignDocument> {
   const iframe = browserDocument.createElement('iframe')
   applySandboxHostStyle(iframe)
+  // Same origin so its styles can be read, without scripts so imported markup never runs.
+  iframe.setAttribute('sandbox', 'allow-same-origin')
   browserDocument.body.append(iframe)
 
   try {

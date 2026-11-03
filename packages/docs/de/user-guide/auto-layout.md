@@ -26,7 +26,7 @@ Der Abstand bestimmt den Raum zwischen benachbarten Objekten. Der Innenabstand b
 
 ## Ausrichtung
 
-Entlang der Hauptachse sind Anfang, Mitte, Ende und gleichmäßige Verteilung verfügbar. Auf der Querachse stehen Anfang, Mitte, Ende und Strecken zur Verfügung.
+Entlang der Hauptachse sind Anfang, Mitte, Ende, gleichmäßige Verteilung und „Abstand ringsum“ verfügbar. Bei „Abstand ringsum“ erhält jedes Objekt zusätzlich zum Abstand einen gleichen Anteil des freien Raums, je zur Hälfte auf beiden Seiten; die Option steht im Menü des Abstandsfelds. Auf der Querachse stehen Anfang, Mitte, Ende und Strecken zur Verfügung.
 
 ## Größenmodi
 

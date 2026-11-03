@@ -25,23 +25,19 @@ import {
 import { createSceneGeometry, type RotationPreview } from '#core/geometry'
 
 import { inNodeSpace, outlineNode } from './outline'
+import { drawSpacingGuide, guideScreenLine } from './spacing'
 
 export function drawSnapGuides(r: SkiaRenderer, canvas: Canvas, guides?: SnapGuide[]): void {
   if (!guides || guides.length === 0) return
 
   for (const guide of guides) {
-    const paint = guide.marks ? vertexSnapPaint(r, VERTEX_SNAP_GUIDE_ALPHA) : r.snapPaint
-    if (guide.axis === 'x') {
-      const x = guide.position * r.zoom + r.panX
-      const y1 = guide.from * r.zoom + r.panY
-      const y2 = guide.to * r.zoom + r.panY
-      canvas.drawLine(x, y1, x, y2, paint)
-    } else {
-      const y = guide.position * r.zoom + r.panY
-      const x1 = guide.from * r.zoom + r.panX
-      const x2 = guide.to * r.zoom + r.panX
-      canvas.drawLine(x1, y, x2, y, paint)
+    if (guide.spacing) {
+      drawSpacingGuide(r, canvas, guide)
+      continue
     }
+    const paint = guide.marks ? vertexSnapPaint(r, VERTEX_SNAP_GUIDE_ALPHA) : r.snapPaint
+    const { x1, y1, x2, y2 } = guideScreenLine(r, guide)
+    canvas.drawLine(x1, y1, x2, y2, paint)
   }
 }
 

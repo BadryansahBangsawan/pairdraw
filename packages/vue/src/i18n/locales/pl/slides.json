@@ -1,0 +1,22 @@
+{
+  "title": "Slajdy",
+  "listLabel": "Slajdy na tej stronie",
+  "slideLabel": "Slajd {number}: {name}",
+  "reorderHint": "Przeciągnij, aby zmienić kolejność, lub naciśnij Alt ze strzałką w górę lub w dół.",
+  "slideMoved": "{name} jest teraz slajdem {number}.",
+  "present": "Prezentuj ({shortcut})",
+  "presentFromSlide": "Prezentuj od tego slajdu",
+  "exportPDF": "Eksportuj slajdy do PDF",
+  "exportPPTX": "Eksportuj slajdy do PowerPointa",
+  "exportPPTXFailed": "Nie udało się wyeksportować slajdów: {error}",
+  "emptyTitle": "Nie ma jeszcze slajdów",
+  "emptyDescription": "Ramki najwyższego poziomu na tej stronie stają się slajdami w kolejności warstw.",
+  "nothingToPresent": "Dodaj ramkę najwyższego poziomu do tej strony, aby ją zaprezentować.",
+  "presentation": "Prezentacja",
+  "previousSlide": "Poprzedni slajd",
+  "nextSlide": "Następny slajd",
+  "position": "{number} z {count}",
+  "fitToScreen": "Dopasuj do ekranu",
+  "actualSize": "Rzeczywisty rozmiar",
+  "exitPresentation": "Zakończ prezentację ({shortcut})"
+}

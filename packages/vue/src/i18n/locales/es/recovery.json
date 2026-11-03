@@ -7,5 +7,28 @@
   "settingsTitle": "Recuperación",
   "settingsDescription": "Controla las copias locales de recuperación de documentos no guardados.",
   "restore": "Restaurar",
-  "discard": "Descartar"
+  "discard": "Descartar",
+  "drafts": "Borradores",
+  "draftsDescription": "Los diseños nuevos se quedan aquí, en este dispositivo, hasta que los guardes en otro lugar.",
+  "loadingDrafts": "Cargando borradores",
+  "noDrafts": "Aún no hay borradores",
+  "noDraftsDescription": "Un diseño nuevo se guarda aquí como borrador mientras trabajas en él.",
+  "draftsOff": "Los borradores están desactivados",
+  "draftsOffDescription": "Los diseños nuevos solo se guardan aquí mientras «Conservar automáticamente el trabajo no guardado» esté activado en Ajustes y este navegador conserve los datos del sitio.",
+  "deleteDraft": "Eliminar borrador",
+  "deleteDraftConfirmation": "¿Eliminar el borrador «{name}»?",
+  "deleteDraftsConfirmation": {
+    "one": "¿Eliminar {count} borrador?",
+    "many": "¿Eliminar {count} borradores?"
+  },
+  "deleteDraftDescription": "Los borradores solo existen en este dispositivo. No se puede deshacer.",
+  "deleteDraftFailed": "No se pudo eliminar el borrador «{name}». Inténtalo de nuevo.",
+  "draftUnavailable": "Este borrador ya no está disponible.",
+  "recoveredChangesTitle": "Cambios recuperados",
+  "recoveredChangesDescription": "«{name}» tiene cambios del {time} que nunca se guardaron en el archivo. Guárdalos en el archivo, guárdalos como un archivo nuevo o descártalos.",
+  "saveRecovered": "Guardar",
+  "saveRecoveredAs": "Guardar como…",
+  "discardRecovered": "No guardar",
+  "recoveredChangesFailed": "No se pudieron guardar los cambios recuperados: {error}",
+  "backupUnavailable": "La copia de seguridad de estos cambios ya no está disponible."
 }

@@ -19,7 +19,7 @@ import {
 } from '@open-pencil/vue/editor/commands'
 import { useMenuModel } from '@open-pencil/vue/editor/menu-model'
 import { useSelectionState } from '@open-pencil/vue/editor/selection-state'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useEditorMessages, useI18n } from '@open-pencil/vue/i18n'
 import { vTestId } from '@open-pencil/vue/testing'
 
 import { useEditorStore } from '@/app/editor/active-store'
@@ -40,7 +40,15 @@ const { menu: t } = useI18n()
 
 const canvasMenuActions = createCanvasMenuActions(store, selectedIds)
 const { execCommand } = canvasMenuActions
-const contextMenu = useCanvasContextMenu(canvasMenu, hasSelection, editor, canvasMenuActions, t)
+const editorMessages = useEditorMessages()
+const contextMenu = useCanvasContextMenu(
+  canvasMenu,
+  hasSelection,
+  editor,
+  canvasMenuActions,
+  t,
+  editorMessages
+)
 
 const selectedGuide = computed(() => store.state.guides.selected)
 
@@ -114,6 +122,15 @@ function contextCommandTestId(id: EditorCommandId | undefined): string | undefin
           @select="canvasMenuActions.pasteToReplace"
         >
           <span>{{ t.pasteToReplace }}</span>
+        </ContextMenuItem>
+        <ContextMenuItem
+          v-if="canvasMenuActions.canReplaceInInstance()"
+          data-test-id="context-replace-in-instance"
+          :class="cls.item"
+          @select="canvasMenuActions.replaceInInstance"
+        >
+          <span>{{ t.replaceInInstance }}</span
+          ><AppShortcutText>{{ appMenuShortcutLabel('replace-in-instance') }}</AppShortcutText>
         </ContextMenuItem>
         <ContextMenuItem
           data-test-id="context-duplicate"

@@ -145,3 +145,17 @@ export function variableCSSNames(variables: Iterable<Variable>): Map<string, str
 export function cssNameCodeSyntax(name: string): string {
   return `var(--${name})`
 }
+
+/** Namespaces longest first, so `font-weight-bold` reads as `font-weight`, not `font`. */
+const NAMESPACES_BY_LENGTH = [...themeNamespaces].sort((a, b) => b.length - a.length)
+
+/**
+ * The variable name a custom property reads as: a Tailwind namespace becomes the group, so
+ * `color-gray-50` is `color/gray-50` and `radius-md` is `radius/md`; any other name stays as it
+ * is. Variables made this way keep the property in their `WEB` code syntax, so the stylesheet
+ * writes the same name back.
+ */
+export function cssNameVariableName(name: string): string {
+  const namespace = NAMESPACES_BY_LENGTH.find((candidate) => name.startsWith(`${candidate}-`))
+  return namespace ? `${namespace}/${name.slice(namespace.length + 1)}` : name
+}

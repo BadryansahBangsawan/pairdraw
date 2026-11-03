@@ -5,7 +5,8 @@ import { effectScope, onScopeDispose, shallowRef, watch } from 'vue'
 import {
   cloudPresenceSchema,
   RELAY_SERVER_PEER,
-  type CollaborationTicket
+  type CollaborationTicket,
+  type DocumentPermission
 } from '@open-pencil/cloud/contract'
 
 import type { RoomImageStore } from '@/app/collab/images'
@@ -34,12 +35,14 @@ import { cloudRoomImages } from './images'
 import { onceOnServer, shareRoomUploads, uploadStoredDocument } from './upload'
 
 /** Each Cloud tab's permission in its room, for the status beside the name. */
-export const cloudRoomPermissions = shallowRef<ReadonlyMap<EditorStore, 'edit' | 'view'>>(new Map())
+export const cloudRoomPermissions = shallowRef<ReadonlyMap<EditorStore, DocumentPermission>>(
+  new Map()
+)
 /** Tabs the relay turned away for good, for the status beside the name; they do not rejoin on their own. */
 export const cloudRoomsRefused = shallowRef<ReadonlySet<EditorStore>>(new Set())
 const starting = new WeakSet<EditorStore>()
 
-function setPermission(store: EditorStore, permission: 'edit' | 'view' | null) {
+function setPermission(store: EditorStore, permission: DocumentPermission | null) {
   const next = new Map(cloudRoomPermissions.value)
   if (permission) next.set(store, permission)
   else next.delete(store)
@@ -173,7 +176,7 @@ export function openCloudDocumentRoom(
   options: {
     roomId: string
     transport: JoinCollabRoom
-    permission: 'edit' | 'view'
+    permission: DocumentPermission
     /** A guest from a link edits but has no account to save with. */
     guest?: boolean
     /**
@@ -197,14 +200,17 @@ export function openCloudDocumentRoom(
     options.roomId,
     options.transport,
     options.identity,
-    options.images
+    options.images,
+    // A commenter's comments go through the relay's comment channel, never as edits.
+    { commentRelay: options.permission === 'comment' }
   )
   // Everything the room follows lives in one scope, so stopping it leaves nothing behind.
   const scope = effectScope(true)
   const uploads = scope.run(() => {
     setPermission(store, options.permission)
-    // A viewer sees the room's edits and makes none, as Figma's view-only files do.
-    store.setReadOnly(!canEdit)
+    // A viewer sees the room's edits and makes none, as Figma's view-only files do; a commenter
+    // also keeps the Comment tool.
+    store.setReadOnly(!canEdit, { comments: options.permission === 'comment' })
     if (!canSave) store.state.autosaveEnabled = false
     onScopeDispose(() => {
       setPermission(store, null)
@@ -311,11 +317,11 @@ function setRefused(store: EditorStore, refused: boolean) {
  */
 export function leaveRefusedRoom(
   store: EditorStore,
-  room: { permission: 'edit' | 'view'; canSave: boolean }
+  room: { permission: DocumentPermission; canSave: boolean }
 ): void {
   setRefused(store, true)
   leaveCloudRoom(store)
-  if (room.permission === 'view') {
+  if (room.permission !== 'edit') {
     store.setReadOnly(true)
     return
   }

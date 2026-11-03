@@ -49,6 +49,23 @@ The stdio server discovers the running OpenPencil app automatically. It prefers 
 
 Every client below starts the same command, `openpencil-mcp`, from `npm install -g @open-pencil/mcp`. Name the server `open-pencil` so tool names and the examples here match.
 
+### Set up from the desktop app {#client-setup}
+
+The desktop app can write the entry for you. Open **Settings → MCP → Other apps** and turn on each app you use: Claude Code, Claude Desktop, Codex, Gemini CLI, OpenCode, Kiro, Cursor, or VS Code. Turning a switch on adds an `open-pencil` entry that starts `openpencil-mcp` to that app's own config file, the file this page names for it; turning it off removes the entry again. Everything else in the file, including comments and formatting, stays as it was, and before its first change the app keeps a copy of the file next to it with `.open-pencil.bak` appended to the name.
+
+| App | File |
+|-----|------|
+| Claude Code | `~/.claude.json` (in `CLAUDE_CONFIG_DIR` when set) |
+| Claude Desktop | `claude_desktop_config.json` in Claude's settings folder |
+| Codex | `~/.codex/config.toml` (in `CODEX_HOME` when set) |
+| Gemini CLI | `~/.gemini/settings.json` |
+| OpenCode | `~/.config/opencode/opencode.json`, or `opencode.jsonc` when only that exists |
+| Kiro | `~/.kiro/settings/mcp.json` |
+| Cursor | `~/.cursor/mcp.json` |
+| VS Code | `mcp.json` in your user profile |
+
+An app shows as not found until its settings folder exists, so run it once first. A switch stays locked when the file has syntax errors, or when the entry was written by hand in a form the app does not rewrite, such as a Codex inline table, or Codex keeps all its servers in one inline `mcp_servers = { … }` table; edit the file yourself in those cases. The desktop shell checks each write itself and refuses one that would change anything in the file beyond that entry. Restart the app, or reload its MCP servers, after a change. Apps started from the Dock or Start menu may not see the folder npm installs global commands into; if one cannot start `openpencil-mcp`, set the entry's `command` to the full path that `which openpencil-mcp` (or `where openpencil-mcp` on Windows) prints.
+
 ### Claude Code
 
 Install the MCP package and register it with Claude Code:
@@ -280,7 +297,7 @@ OpenPencil currently registers 100+ shared design tools, plus MCP-only document 
 | `undo` | Undo the newest change made through MCP or the CLI |
 | `redo` | Redo the newest change undone through MCP or the CLI |
 
-The history is shared with the person in the editor. `undo` and `redo` refuse when the newest step was made in the editor, so an agent never reverts the user's work. Each editing tool call is one undo step. An `eval` script is recorded against its target page, so edits it makes after switching `figma.currentPage` are not undoable.
+The history is shared with the person in the editor. `undo` and `redo` refuse when the newest step was made in the editor, so an agent never reverts the user's work. Each editing tool call is one undo step, wherever in the document its edits land, including those an `eval` script makes after switching `figma.currentPage`. A call that fails part way, such as an `eval` script that throws, is rolled back whole: the document is left as it was and no step is recorded. If someone else changed the document while the call ran, such as you in the editor or a collaborator, nothing is rolled back, so their work stays, and the failed call is kept as one undo step.
 
 ### Settings
 
@@ -334,6 +351,17 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 | `get_behaviour` | Read a component's behaviour and what it still misses; without an ID, list every kind |
 | `node_to_component` | Convert an existing node into a component in-place |
 
+### Image AI
+
+These run in the app on the services and keys set up in **Settings → Image services** (BYOK); elsewhere they answer that they are unavailable. Each result is one undo step, and a layer or image that changed while the service worked is left alone.
+
+| Tool | Description |
+|------|-------------|
+| `generate_image` | Generate an image from a prompt: with `id` it fills that layer, replacing the image it shows; without, it becomes a new rectangle at the image's size (or `width`), beside the page's content unless `x` and `y` are given. `orientation` is `square`, `landscape`, or `portrait`; `transparent` asks for a cut-out |
+| `remove_background` | Cut the subject of a layer's image out onto transparency, keeping the layer's size and crop |
+| `replace_background` | Replace the background of a layer's image with one a `prompt` describes, keeping the subject |
+| `generate_svg` | Generate vector art from a prompt with the vectorize service and import it as editable layers, as `import_svg` does |
+
 ### Modify
 
 | Tool | Description |
@@ -352,16 +380,17 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 | `set_minmax` | Set min/max width and height constraints |
 | `set_text` | Set text content of a `TEXT` node |
 | `set_font` | Set font family and weight |
-| `set_font_range` | Set font properties on a character range |
+| `set_font_range` | Set font properties, color, or a `hyperlink` on a character range |
 | `set_text_resize` | Set text auto-resize mode (fixed/auto-width/auto-height) |
 | `set_visible` | Show or hide a node |
 | `set_blend` | Set blend mode |
 | `set_locked` | Lock or unlock a node |
 | `set_stroke_align` | Set stroke alignment (inside/center/outside) |
-| `set_text_properties` | Set text layout: alignment, auto-resize, text case, decoration, truncation |
+| `set_text_properties` | Set text layout: alignment, auto-resize, text case, decoration, truncation, and a `hyperlink` for the whole text. Links take http, https, and mailto addresses (`example.com` becomes `https://example.com`); `null` or `""` removes one |
 | `set_layout_child` | Configure auto-layout child: sizing, grow, alignment, absolute positioning |
 | `node_move` | Move a node to a new position |
 | `node_resize` | Resize a node |
+| `rescale` | Scale layers as the Scale tool (K) does, with their text, strokes, radii, effects, and spacing, around an `anchor` of their joint bounds (`top-left` by default); `factor` 2 doubles; locked layers and layers inside instances are listed in `skipped` |
 | `node_replace_with` | Replace a node with another node |
 | `arrange` | Spread overlapping layers apart, pack them, place them in a grid, row, or column, or lay them out along their connectors as a flow, tree, radial map, or network |
 
@@ -473,6 +502,7 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 |------|-------------|
 | `read_skill` | Read the OpenPencil agent skill or its design authoring reference; see [Design skill over MCP](#design-skill) |
 | `get_codegen_prompt` | Get the design-to-code guidelines to follow before generating frontend code |
+| `get_style` | List curated style directions, best match first for a `query`, or get one by `id`: palette by role, font pairing, type scale, radii, spacing, elevation, and written guidance |
 
 ### Escape Hatch
 

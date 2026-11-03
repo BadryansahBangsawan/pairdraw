@@ -4,3 +4,13 @@ export { useCanvasContext } from '#vue/canvas/context'
 export type { CanvasContext } from '#vue/canvas/context'
 export { default as PlayIslands } from '#vue/canvas/islands/IslandLayer.vue'
 export { useCanvasInput } from './useCanvasInput'
+export {
+  animateViewport,
+  easeViewport,
+  interpolateViewport,
+  isViewportTweening,
+  setViewportMotion,
+  stopViewportTween,
+  VIEWPORT_TWEEN_MS
+} from './viewport/tween'
+export type { ViewportFrame } from './viewport/tween'

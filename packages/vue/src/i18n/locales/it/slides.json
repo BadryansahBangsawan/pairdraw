@@ -1,0 +1,22 @@
+{
+  "title": "Diapositive",
+  "listLabel": "Diapositive di questa pagina",
+  "slideLabel": "Diapositiva {number}: {name}",
+  "reorderHint": "Trascina per riordinare, oppure premi Alt con la freccia su o giù.",
+  "slideMoved": "{name} è ora la diapositiva {number}.",
+  "present": "Presenta ({shortcut})",
+  "presentFromSlide": "Presenta da questa diapositiva",
+  "exportPDF": "Esporta diapositive in PDF",
+  "exportPPTX": "Esporta le slide in PowerPoint",
+  "exportPPTXFailed": "Impossibile esportare le slide: {error}",
+  "emptyTitle": "Ancora nessuna diapositiva",
+  "emptyDescription": "Le cornici di primo livello di questa pagina diventano diapositive, nell’ordine dei livelli.",
+  "nothingToPresent": "Aggiungi una cornice di primo livello a questa pagina per presentarla.",
+  "presentation": "Presentazione",
+  "previousSlide": "Diapositiva precedente",
+  "nextSlide": "Diapositiva successiva",
+  "position": "{number} di {count}",
+  "fitToScreen": "Adatta allo schermo",
+  "actualSize": "Dimensioni reali",
+  "exitPresentation": "Esci dalla presentazione ({shortcut})"
+}

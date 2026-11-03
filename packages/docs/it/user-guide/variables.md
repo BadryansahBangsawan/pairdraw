@@ -80,6 +80,25 @@ Variabili e stili passano tra OpenPencil, Figma e il codice come [design token W
 - **Scegliere la destinazione:** prima che cambi qualcosa, la finestra mostra ogni raccolta e modalità trovata e dove va: in una nuova raccolta o modalità, in una esistente o da nessuna parte. Variabili e stili con lo stesso nome vengono aggiornati e il resto viene aggiunto; nulla viene eliminato. Conta cosa verrà aggiunto, aggiornato e saltato, e spiega perché ogni token saltato è stato escluso
 - L’importazione è un solo passaggio: **Annulla** la ritira tutta
 
+## Sincronizzare con un foglio di stile
+
+Le proprietà personalizzate di un file CSS diventano variabili, e le variabili ci tornano. Fai clic su **Sincronizza con CSS** nella barra delle variabili:
+
+- **Importa variabili CSS…** legge un file `.css`. `:root`, `html` e il `@theme` di Tailwind contengono i valori predefiniti di ogni raccolta; `[data-theme="dark"]`, una classe come `.dark` e i blocchi `:root` dentro `@media`, `@supports` o `@container` diventano modalità con quella condizione. Colori, lunghezze in `px` o `rem`, durate, numeri, testo tra virgolette ed elenchi di font diventano variabili, `var(--name)` un alias, e `calc()` o `clamp()` mantiene il suo CSS come espressione CSS. La stessa finestra di importazione mostra dove va ogni raccolta e modalità prima che cambi qualcosa
+- **Recupera da** rilegge il file collegato e mostra cosa è cambiato. Un foglio di stile esportato dal documento torna sulle stesse variabili e modalità
+- **Invia a** scrive le variabili direttamente nel file collegato: i valori cambiati vengono riscritti nella loro notazione, quelli mancanti aggiunti al loro blocco, e commenti, altre regole e proprietà senza variabile restano come sono. Non viene rimosso nulla. Se il browser non può scrivere il file, ne salva una copia
+- **Recupera quando il file cambia** importa ogni salvataggio del file collegato, su desktop e nei browser che danno accesso ai file, come un unico passo di annullamento
+
+## Incollare tra documenti
+
+I livelli copiati in un documento aperto e incollati in un altro possono portare con sé le variabili e gli stili che usano. Prima di incollare, una finestra chiede come:
+
+- **Sì, importa** — aggiunge le variabili e gli stili, così i livelli incollati restano collegati
+- **Incolla così com’è** — incolla i livelli con i valori che mostravano, senza collegamenti a variabili o stili
+- **Usa esistenti** o **Aggiungi rinominati** — quando questo documento ha già una collezione o uno stile con lo stesso nome, scegli per ogni riga: usare quello presente, dove le variabili corrispondono per nome e quelle mancanti vengono aggiunte, oppure aggiungere la copia con un nuovo nome come “Spacing 2”
+
+Incollare è un solo passaggio: **Annulla** rimuove i livelli e tutto ciò che è stato aggiunto. **Incolla proprietà** usa allo stesso modo le collezioni e gli stili con lo stesso nome.
+
 ## Collegare le variabili ai riempimenti
 
 Nella sezione Riempimento del pannello delle proprietà, usa il selettore delle variabili per collegare una variabile colore al riempimento di un oggetto.

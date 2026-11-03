@@ -15,6 +15,7 @@ export const cloudMessageDefaults = {
   viewOnly: 'View only',
   canEdit: 'Can edit',
   canView: 'Can view',
+  canComment: 'Can comment',
   roleViewer: 'Viewer',
   roleEditor: 'Editor',
   roleAdmin: 'Admin',
@@ -75,6 +76,7 @@ export const cloudMessageDefaults = {
   invitedYou: params('{name} invited you'),
   invitationEditDescription: params('To edit a document on {host}.'),
   invitationViewDescription: params('To view a document on {host}.'),
+  invitationCommentDescription: params('To view and comment on a document on {host}.'),
   invitationWorkspaceDescription: params('To join a workspace on {host}.'),
   joinWorkspace: 'Join workspace',
   invitationChecking: 'Checking the invitation…',
@@ -160,6 +162,19 @@ export const cloudMessageDefaults = {
   shareSendLink: 'Share link',
   shareLoadFailed: 'Couldn’t load who has access. Check your connection and try again.',
   shareChangeFailed: 'That change didn’t go through. Try again in a moment.',
+  shareSnapshotHeading: 'Snapshot',
+  shareSnapshotDescription:
+    'A view-only link to the file as it is now, which anyone with it can download as a .fig file.',
+  shareSnapshotCreate: 'Create snapshot link',
+  shareSnapshotCopy: 'Copy snapshot link',
+  shareSnapshotCopied: 'Snapshot link copied',
+  shareSnapshotUpdate: 'Update snapshot',
+  shareSnapshotDelete: 'Delete snapshot link',
+  shareSnapshotCurrent: 'Shows the latest saved version',
+  shareSnapshotBehind: 'New changes since the snapshot',
+  shareSnapshotNeedsSave: 'Save the file to Cloud before sharing a snapshot.',
+  shareSnapshotResetTip:
+    'This snapshot link was made on another device. Reset it to copy it here; the old link stops working.',
 
   // Conflict
   conflictKeepBoth: 'Keep both',
@@ -349,6 +364,16 @@ export const cloudMessageDefaults = {
   documentLinkFailed: 'Couldn’t open this document. Ask its owner for access.',
   documentLinkUnknownServer: params('Sign in to {host} first to open this link.'),
   shareOpenedInBrowser: 'Opened in the browser',
+  sharedSnapshot: 'Snapshot',
+  sharedSnapshotDetail: 'You’re viewing a snapshot of this file.',
+  sharedViewDetail: 'You can view this file.',
+  sharedCommentDetail: 'You can view and comment on this file.',
+  sharedEditDetail: 'You can edit this file with others.',
+  sharedPublicDetail: 'This file is public.',
+  downloadFig: 'Download .fig',
+  downloadFigFailed: 'Couldn’t download the file. Try again.',
+  publicDocumentFailed: 'This file isn’t public anymore.',
+  publicDocumentUnreachable: 'Couldn’t open this file. Check your connection and try again.',
   openInDesktopApp: 'Open in the desktop app',
 
   // Version history

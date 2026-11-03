@@ -142,6 +142,20 @@ Overrides in a `.fig` file come back as overrides when you open it, and are save
 
 When you add a child to a component, all existing instances gain a cloned copy automatically. Child order in instances always matches the component.
 
+### Variable Modes
+
+An instance, or a layer inside one, that sets the mode of one variable collection keeps that mode and still takes the component's modes for every other collection. Change the main component's density mode and an instance that only switched its theme follows the new density.
+
+### Swapping an Instance
+
+Select an instance, a nested one included, and click the swap button in its header to show another component in its place. The list holds every component in the document; one that would contain itself is disabled. A swapped nested instance stays swapped when its enclosing component changes. When the swap is linked to an instance-swap property, the header shows the property instead.
+
+### Replacing a Layer Inside an Instance
+
+Copy a layer, select a layer inside an instance, and press <kbd>⌥</kbd><kbd>⇧</kbd><kbd>R</kbd> (<kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>) or choose **Replace inside instance** from the Edit or context menu. The copied layer takes the place and position of the selected one as an override of the instance, without detaching it: the rest of the instance keeps following its component, and the replacement stays when the component changes, until the component deletes the layer it replaced. With several layers selected, each gets its own copy. With nothing inside an instance selected, the keys paste to replace.
+
+Select the replacement and click **Restore component layer** in its header to bring the component's layer back. Replacements are saved in `.fig` files as OpenPencil plugin data on the instance; Figma shows the component's layer instead.
+
 ## Hit Testing
 
 Components and instances are opaque containers — clicking on a child selects the component itself, not the child. **Double-click** to enter the component and select children inside it.

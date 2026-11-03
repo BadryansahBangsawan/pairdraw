@@ -24,7 +24,9 @@ const SIGN_IN_PATH = '/auth/sign-in'
  */
 export function isSecretCloudLink(url: URL): boolean {
   const path = parseCloudLinkPath(url.pathname)
-  return path !== null && path.kind !== 'documents' && url.hash.length > 1
+  return (
+    path !== null && (path.kind === 'share' || path.kind === 'invitations') && url.hash.length > 1
+  )
 }
 
 /** Whether this browser chose to use the server's editor without an account. */
@@ -61,6 +63,8 @@ export function siteDestination(visit: {
 }): string | null {
   const { path, account } = visit
   if (account === 'unreachable' || account?.state === 'active') return null
+  // A public profile's document opens for anyone, as a link with its secret does.
+  if (parseCloudLinkPath(path)?.kind === 'view') return null
   if (parseCloudLinkPath(path)?.kind === 'documents') {
     if (account) return WELCOME_PATH
     const redirect = path + (visit.search ?? '')

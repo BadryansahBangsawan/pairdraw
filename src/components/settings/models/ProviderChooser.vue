@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 
 import { IS_TAURI, type AIProviderID } from '@open-pencil/core/constants'
-import { useAIMessages } from '@open-pencil/vue/i18n'
+import { useAIMessages, useSettingsMessages } from '@open-pencil/vue/i18n'
 
 import { aiModelSettings, modelConnection } from '@/app/ai/models'
 import { modelProviderName } from '@/app/ai/models/provider-name'
@@ -27,6 +27,7 @@ import AppActionRow from '@/components/ui/list/AppActionRow.vue'
  */
 const emit = defineEmits<{ choose: [providerID: AIProviderID] }>()
 const ai = useAIMessages()
+const settings = useSettingsMessages()
 
 /** Providers a model in the list already runs on; choosing one again adds another model. */
 const setUp = computed(
@@ -71,6 +72,13 @@ const groups = computed(() => {
       choices: [...ONBOARDING_API_PROVIDERS, ...ONBOARDING_MORE_API_PROVIDERS]
         .filter((id) => IS_TAURI || !needsDesktop(id))
         .map((id) => ({ id }))
+    },
+    {
+      // Claude and Gemini billed to the person's own AWS or Google Cloud account.
+      key: 'cloud-platforms',
+      title: settings.value.cloudPlatforms,
+      description: settings.value.cloudPlatformsDescription,
+      choices: [{ id: 'amazon-bedrock' }, { id: 'google-vertex' }]
     },
     {
       key: 'servers',

@@ -23,6 +23,8 @@ Seleziona il componente e scegli **Crea istanza**, oppure inseriscilo da Risorse
 
 Le proprietà modificate in un’istanza vengono salvate come sostituzioni. Le modifiche successive al componente principale continuano ad arrivare, tranne per le proprietà sostituite.
 
+Un’istanza che imposta la modalità di una raccolta di variabili continua a ricevere le modalità del componente per le altre raccolte. Il pulsante di scambio nell’intestazione di un’istanza, anche annidata, mostra un altro componente al suo posto. <kbd>⌥</kbd><kbd>⇧</kbd><kbd>R</kbd> sostituisce il livello selezionato dentro un’istanza con il livello copiato, come sostituzione, senza scollegare l’istanza; **Ripristina livello del componente** riporta il livello originale.
+
 ## Proprietà del componente
 
 Sono supportati testo, visibilità booleana, scambio di istanza e varianti. Le proprietà appaiono a destra quando è selezionata un’istanza.

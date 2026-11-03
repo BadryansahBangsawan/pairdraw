@@ -25,6 +25,16 @@ describe('sceneNodeToJSX', () => {
     expect(sceneNodeToJSX(node.id, graph)).toContain('items="baseline"')
   })
 
+  test('a row spreading its children with space around exports justify="around"', () => {
+    const graph = makeGraph()
+    const node = graph.createNode('FRAME', pageId(graph), {
+      name: 'Row',
+      layoutMode: 'HORIZONTAL',
+      primaryAxisAlign: 'SPACE_AROUND'
+    })
+    expect(sceneNodeToJSX(node.id, graph)).toContain('justify="around"')
+  })
+
   test('basic rectangle', () => {
     const graph = makeGraph()
     const node = graph.createNode('RECTANGLE', pageId(graph), {

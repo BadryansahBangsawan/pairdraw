@@ -21,19 +21,33 @@ const horizontal = computed(() => (ctx.node.layoutMode === 'HORIZONTAL') === (ax
 const label = computed(() =>
   horizontal.value ? panels.value.horizontalGap : panels.value.verticalGap
 )
-const auto = computed(() => axis === 'primary' && ctx.gapAuto && ctx.node.layoutWrap !== 'WRAP')
-const allowAuto = computed(() => axis === 'primary' && ctx.node.layoutWrap !== 'WRAP')
+type GapMode = 'FIXED' | 'AUTO' | 'AROUND'
+const wrapped = computed(() => ctx.node.layoutWrap === 'WRAP')
+const auto = computed(() => axis === 'primary' && ctx.gapAuto && !wrapped.value)
+// Space around shares the free space on top of the gap, so the gap stays editable.
+const around = computed(() => axis === 'primary' && ctx.node.primaryAxisAlign === 'SPACE_AROUND')
+const mode = computed<GapMode>(() => {
+  if (auto.value) return 'AUTO'
+  return around.value ? 'AROUND' : 'FIXED'
+})
+// Auto gap is space between, which a wrapping layout does not offer.
+const modes = computed<GapMode[]>(() =>
+  wrapped.value ? ['FIXED', 'AROUND'] : ['FIXED', 'AUTO', 'AROUND']
+)
+const hasModes = computed(() => axis === 'primary')
+function modeLabel(value: GapMode) {
+  if (value === 'AUTO') return panels.value.auto
+  if (value === 'AROUND') return panels.value.spaceAround
+  return Math.round(ctx.node.itemSpacing)
+}
 function setMode(value: string) {
-  ctx.setGapAuto(value === 'AUTO')
+  if (value === 'AROUND') ctx.setAlignment('SPACE_AROUND', ctx.node.counterAxisAlign)
+  else ctx.setGapAuto(value === 'AUTO')
 }
 </script>
 
 <template>
-  <SelectRoot
-    v-model:open="popupOpen"
-    :model-value="auto ? 'AUTO' : 'FIXED'"
-    @update:model-value="setMode"
-  >
+  <SelectRoot v-model:open="popupOpen" :model-value="mode" @update:model-value="setMode">
     <div ref="anchor" class="min-w-0">
       <div
         v-if="auto"
@@ -68,10 +82,16 @@ function setMode(value: string) {
         @cancel="ctx.cancelPreview"
       >
         <template #icon>
-          <icon-lucide-align-horizontal-space-between v-if="horizontal" class="size-3.5" />
-          <icon-lucide-align-vertical-space-between v-else class="size-3.5" />
+          <template v-if="around">
+            <icon-lucide-align-horizontal-space-around v-if="horizontal" class="size-3.5" />
+            <icon-lucide-align-vertical-space-around v-else class="size-3.5" />
+          </template>
+          <template v-else>
+            <icon-lucide-align-horizontal-space-between v-if="horizontal" class="size-3.5" />
+            <icon-lucide-align-vertical-space-between v-else class="size-3.5" />
+          </template>
         </template>
-        <template v-if="allowAuto" #after-variable>
+        <template v-if="hasModes" #after-variable>
           <SelectTrigger
             data-test-id="layout-gap-menu"
             :aria-label="label"
@@ -84,9 +104,9 @@ function setMode(value: string) {
         </template>
       </VariableNumberField>
     </div>
-    <AppSelectContent v-if="allowAuto && portalActive" align="end">
-      <AppSelectItem v-for="mode in ['FIXED', 'AUTO']" :key="mode" :value="mode">
-        {{ mode === 'AUTO' ? panels.auto : Math.round(ctx.node.itemSpacing) }}
+    <AppSelectContent v-if="hasModes && portalActive" align="end">
+      <AppSelectItem v-for="option in modes" :key="option" :value="option">
+        {{ modeLabel(option) }}
       </AppSelectItem>
     </AppSelectContent>
   </SelectRoot>

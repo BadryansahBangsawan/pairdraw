@@ -78,6 +78,25 @@ export function createViewportActions(ctx: EditorContext) {
     emitViewportChanged(previous)
   }
 
+  /**
+   * Fits the world area to the viewport, edge to edge and at any zoom, as a drag of Figma's zoom
+   * tool does; `zoomToBounds` instead leaves a margin and never zooms past 100%. An area with no
+   * width or height leaves the view alone.
+   */
+  function zoomToArea(minX: number, minY: number, maxX: number, maxY: number) {
+    const width = maxX - minX
+    const height = maxY - minY
+    if (!(width > 0) || !(height > 0)) return
+    const previous = currentViewport()
+    const { width: viewW, height: viewH } = ctx.getViewportSize()
+    const zoom = Math.max(0.02, Math.min(256, Math.min(viewW / width, viewH / height)))
+    ctx.state.zoom = zoom
+    ctx.state.panX = viewW / 2 - (minX + width / 2) * zoom
+    ctx.state.panY = viewH / 2 - (minY + height / 2) * zoom
+    ctx.requestRepaint()
+    emitViewportChanged(previous)
+  }
+
   /** Put the world point (x, y) at the center of the viewport, at `zoom` (the current one by default). */
   function centerOn(x: number, y: number, zoom = ctx.state.zoom) {
     const previous = currentViewport()
@@ -165,6 +184,7 @@ export function createViewportActions(ctx: EditorContext) {
     applyZoom,
     pan,
     zoomToBounds,
+    zoomToArea,
     centerOn,
     zoomToFit,
     zoomTo100,

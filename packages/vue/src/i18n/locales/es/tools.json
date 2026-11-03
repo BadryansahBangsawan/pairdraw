@@ -14,5 +14,7 @@
   "shape": "Forma",
   "connector": "Conector",
   "hand": "Mano",
-  "comment": "Comentario"
+  "comment": "Comentario",
+  "zoom": "Zoom",
+  "scale": "Escalar"
 }

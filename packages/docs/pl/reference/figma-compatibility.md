@@ -28,7 +28,7 @@ Porównanie funkcji Figma Design z obecnymi możliwościami OpenPencil.
 | Własna miniatura | 🔲 | Zapisane pliki pokazują pierwszą stronę, jak w Figmie bez strony okładki; nie można wybrać innej miniatury |
 | Krok przesunięcia | 🔲 | Dostępne 1 i 10 pikseli; brak wartości własnych |
 | Menu aplikacji | ✅ | File, Edit, View, Object, Text i Arrange w przeglądarce; menu systemowe w Tauri |
-| Narzędzia AI | 🟡 | 126 narzędzi w czacie AI, agentach programistycznych (ACP) i MCP; zdjęcia stockowe i wektoryzacja obrazów; brak generowania obrazów i wyszukiwania AI |
+| Narzędzia AI | 🟡 | 138 narzędzi w czacie AI, agentach programistycznych (ACP) i MCP; zdjęcia stockowe, wektoryzacja obrazów oraz generowanie obrazów, usuwanie i zastępowanie tła i generowanie SVG z własnymi kluczami użytkownika do usług graficznych; brak wyszukiwania AI |
 
 ## Warstwy i kształty
 
@@ -132,7 +132,7 @@ Porównanie funkcji Figma Design z obecnymi możliwościami OpenPencil.
 | Przepływ poziomy i pionowy | ✅ | Flexbox Yoga WASM |
 | Włączanie | ✅ | <kbd>⇧</kbd><kbd>A</kbd> dla ramki lub zaznaczenia |
 | Odstęp i wypełnienie | ✅ | Wspólne lub osobne wartości |
-| Wyrównanie | ✅ | Początek, środek, koniec, rozciągnięcie i rozdzielenie |
+| Wyrównanie | ✅ | Początek, środek, koniec, rozciągnięcie i rozdzielenie; odstęp dookoła istnieje tylko w OpenPencil, a Figma pokazuje go jako rozdzielenie |
 | Rozmiary | ✅ | Stały, Wypełnij i Dopasuj |
 | Zawijanie | ✅ | Flex wrap |
 | Grid | ✅ | CSS Grid przez odmianę Yoga |
@@ -179,7 +179,7 @@ Połączenia, wyzwalacze, działania, animacje, nakładki, przewijanie, przepły
 | Współpraca | ✅ | Pokoje P2P (Trystero i Yjs) z kursorami, trybem śledzenia, rozmowami głosowymi i kursorami agentów; bez serwera |
 | Tryb programisty | 🟡 | Karta Kod pokazuje zaznaczenie jako design JSX, HTML, Vue lub React z CSS albo Tailwind; statusy Ready for dev; brak trybu inspekcji z wymiarami |
 | Tailwind CSS v4 | ✅ | HTML z klasami przez panel Kod, CLI lub API |
-| Serwer MCP | ✅ | `@open-pencil/mcp` ze stdio i HTTP; 125 podstawowych narzędzi oraz narzędzia dokumentu, historii i ustawień |
+| Serwer MCP | ✅ | `@open-pencil/mcp` ze stdio i HTTP; 138 podstawowych narzędzi oraz narzędzia dokumentu, historii i ustawień |
 | CLI | ✅ | 24 polecenia, m.in. `info`, `tree`, `find`, `query`, `node`, `pages`, `variables`, `tokens`, `fonts`, `lint`, `analyze`, `export`, `import`, `convert`, `diff`, `eval` i `tool` |
 
 ## Figma Draw

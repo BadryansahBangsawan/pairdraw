@@ -35,6 +35,9 @@ export {
   type TokenImportPlan
 } from './plan'
 export type { PlannedStyle } from './plan/styles'
+export { countTokenImportChanges } from './plan/changes'
+export { readCSSDesignTokens, type CSSTokenReadOptions } from './css/read'
+export { patchTokenStylesheet, syncTokenStylesheet, type TokenStylesheetSync } from './css/sync'
 export {
   applyTokenImport,
   importTokensIntoGraph,

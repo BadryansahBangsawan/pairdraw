@@ -16,6 +16,7 @@ import {
   type NodeEditState
 } from '#vue/shared/input/vector/hit-test'
 import { applyNodeEditSnap } from '#vue/shared/input/vector/snap'
+import { tryStartPointsTransform, tryStartSegmentBend } from '#vue/shared/input/vector/transform'
 
 export {
   getNodeEditState,
@@ -70,6 +71,9 @@ export function handleNodeEditDown(
   }
 
   const handleHit = hitTestEditHandle(editor, cx, cy)
+  // The box around two selected parts or more scales them from its corners and edges and turns
+  // them from just outside its corners; points and handles stay on top of it.
+  if (!handleHit && tryStartPointsTransform(e, cx, cy, editor, setDrag)) return
   const ri = handleHit ? null : hitTestEditRegion(editor, cx, cy)
   if (!e.shiftKey && !pressesPickedRegion(es, ri)) es.selectedRegions = new Set()
 
@@ -99,6 +103,8 @@ export function handleNodeEditDown(
   // selection so all of it drags; the click acts only on a release without a drag.
   const si = hitTestEditSegment(editor, cx, cy)
   if (si !== null) {
+    // ⌘/Ctrl bends the segment instead, as in Figma; ⌥/Alt with it keeps the neighbours' handles.
+    if ((e.metaKey || e.ctrlKey) && tryStartSegmentBend(cx, cy, editor, setDrag)) return
     const click = selectPressedSegment(es, si, e.shiftKey)
     editor.requestRepaint()
     const { start, end } = es.segments[si]

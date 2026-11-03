@@ -1,5 +1,6 @@
 import { useEventListener } from '@vueuse/core'
 
+import { resolveEditorProfile } from '@open-pencil/core'
 import { extractImageFilesFromClipboard } from '@open-pencil/vue/canvas/drop'
 
 import type { EditorStore } from '@/app/editor/active-store'
@@ -44,6 +45,11 @@ function selectionMatches(store: EditorStore, selectedIds: Set<string>): boolean
   )
 }
 
+/** Whether the canvas shows a view that runs only its own keys, which cut and paste nothing. */
+function viewOnly(store: EditorStore): boolean {
+  return resolveEditorProfile(store.state).shortcuts === 'view'
+}
+
 export function bindEditorClipboard(store: EditorStore) {
   useEventListener(window, 'copy', (e: ClipboardEvent) => {
     if (isEditing(e) || hasDocumentTextSelection()) return
@@ -56,7 +62,7 @@ export function bindEditorClipboard(store: EditorStore) {
   })
 
   useEventListener(window, 'cut', (e: ClipboardEvent) => {
-    if (isEditing(e)) return
+    if (isEditing(e) || viewOnly(store)) return
     e.preventDefault()
     if (isTauri()) {
       const selectedIds = new Set(store.state.selectedIds)
@@ -70,7 +76,7 @@ export function bindEditorClipboard(store: EditorStore) {
   })
 
   useEventListener(window, 'paste', (e: ClipboardEvent) => {
-    if (isEditing(e)) return
+    if (isEditing(e) || viewOnly(store)) return
     e.preventDefault()
 
     const cursorPos = cursorPosition(store)

@@ -23,7 +23,7 @@ export function createPublicDocumentRoutes(
         )
         return context.json({
           resolution,
-          document: await documents.downloadShared(resolution.documentId)
+          document: await documents.downloadShared(resolution.documentId, resolution.revisionId)
         })
       })
     )

@@ -183,6 +183,15 @@ export class SceneGraph {
     )
   }
 
+  /**
+   * Mints IDs from this graph's generator for variables, collections, and modes built outside
+   * it, such as a paste's: none is in use, and none repeats one this minter gave.
+   */
+  entityIdMinter(): () => string {
+    const issued = new Set<string>()
+    return () => this.generateEntityId(issued)
+  }
+
   removeCollection(id: string): void {
     Variables.removeCollection(this, id)
   }
@@ -737,6 +746,19 @@ export class SceneGraph {
     parentId: string,
     overrides: Partial<SceneNode> = {}
   ): SceneNode | null {
+    const copies = new Map<string, string>()
+    const clone = this.cloneSubtree(sourceId, parentId, overrides, copies)
+    // A copied instance records the overrides of its own layers, which are the cloned ones.
+    Instances.retargetCopiedOverrides(this, copies)
+    return clone
+  }
+
+  private cloneSubtree(
+    sourceId: string,
+    parentId: string,
+    overrides: Partial<SceneNode>,
+    copies: Map<string, string>
+  ): SceneNode | null {
     const src = this.nodes.get(sourceId)
     if (!src) return null
 
@@ -746,10 +768,11 @@ export class SceneGraph {
     // A copy is a new design nobody has reviewed: Figma's duplicate and clone() drop the status.
     props.status = null
     const clone = this.createNode(src.type, parentId, { ...props, ...overrides })
+    copies.set(src.id, clone.id)
     if (src.status) markSourceFieldsEdited(clone, ['status'])
 
     for (const childId of src.childIds) {
-      this.cloneTree(childId, clone.id)
+      this.cloneSubtree(childId, clone.id, {}, copies)
     }
 
     return clone

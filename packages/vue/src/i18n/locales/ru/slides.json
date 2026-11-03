@@ -1,0 +1,22 @@
+{
+  "title": "Слайды",
+  "listLabel": "Слайды на этой странице",
+  "slideLabel": "Слайд {number}: {name}",
+  "reorderHint": "Перетащите, чтобы изменить порядок, или нажмите Alt со стрелкой вверх или вниз.",
+  "slideMoved": "{name} теперь слайд {number}.",
+  "present": "Начать показ ({shortcut})",
+  "presentFromSlide": "Начать показ с этого слайда",
+  "exportPDF": "Экспортировать слайды в PDF",
+  "exportPPTX": "Экспортировать слайды в PowerPoint",
+  "exportPPTXFailed": "Не удалось экспортировать слайды: {error}",
+  "emptyTitle": "Слайдов пока нет",
+  "emptyDescription": "Фреймы верхнего уровня на этой странице становятся слайдами в порядке слоёв.",
+  "nothingToPresent": "Добавьте на эту страницу фрейм верхнего уровня, чтобы показать её.",
+  "presentation": "Презентация",
+  "previousSlide": "Предыдущий слайд",
+  "nextSlide": "Следующий слайд",
+  "position": "{number} из {count}",
+  "fitToScreen": "По размеру экрана",
+  "actualSize": "Реальный размер",
+  "exitPresentation": "Завершить показ ({shortcut})"
+}

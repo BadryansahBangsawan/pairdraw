@@ -1,2 +1,9 @@
 export { scaleNodeChanges } from './node'
-export { rescaleNodeTree } from './tree'
+export {
+  assertRescaleFactor,
+  isRescalable,
+  MIN_RESCALE,
+  rescaleNodeTree,
+  rescaleNodeTreeChanges,
+  rescaleSubtree
+} from './tree'

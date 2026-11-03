@@ -27,6 +27,8 @@ export const SNAP_COLOR = { r: 1.0, g: 0.0, b: 0.56, a: 1 } satisfies Color
 export const VERTEX_SNAP_COLOR = { r: 0.81, g: 0.3, b: 0.18, a: 1 } satisfies Color
 export const VERTEX_SNAP_GUIDE_ALPHA = 0.6
 export const VERTEX_SNAP_MARK_RADIUS = 2.5
+/** Half the length of the ticks that end an equal-spacing indicator, in screen pixels. */
+export const SPACING_GUIDE_CAP = 4
 export const MEASUREMENT_COLOR = { r: 0.949, g: 0.282, b: 0.133, a: 1 } satisfies Color
 export const MEASUREMENT_PILL_PADDING_X = 5
 export const MEASUREMENT_PILL_HEIGHT = 18

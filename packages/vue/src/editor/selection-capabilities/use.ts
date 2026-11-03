@@ -68,6 +68,10 @@ export function useSelectionCapabilities() {
     canOutlineStroke: useSceneComputed(
       () => layersToOutline(editor.getSelectedNodes(), editor.graph).length > 0
     ),
+    canCropImage: useSceneComputed(
+      () =>
+        editor.state.selectedIds.size === 1 && editor.canEditImage([...editor.state.selectedIds][0])
+    ),
     canGoToMainComponent: computed(() => selection.isInstance.value),
     canCreateInstance: computed(() => selectedNode.value?.type === 'COMPONENT'),
     canConvertToFrame: selection.canConvertToFrame,

@@ -37,7 +37,9 @@ const TOOL_CURSORS: Record<Tool, string> = {
   PEN: PEN_CURSOR,
   PENCIL: PENCIL_CURSOR,
   HAND: HAND_CURSOR,
-  COMMENT: COMMENT_CURSOR
+  COMMENT: COMMENT_CURSOR,
+  ZOOM: 'zoom-in',
+  SCALE: 'default'
 }
 
 export function toolCursor(tool: Tool, override?: string | null): string {

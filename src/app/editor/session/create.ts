@@ -13,7 +13,6 @@ import {
   useEditorStore
 } from '@/app/editor/active-store'
 import { resolveFigmaClipboardImages } from '@/app/editor/clipboard/figma-images'
-import { bindClipboardNotifications } from '@/app/editor/clipboard/notifications'
 import { loadFont } from '@/app/editor/fonts'
 import { appIcons } from '@/app/editor/icons/provider'
 import { createRecentPages } from '@/app/editor/pages/recent'
@@ -25,6 +24,7 @@ import {
   type EditorPreparationEvents
 } from '@/app/editor/preparation/events'
 import { pageProgressUnit, type EditorPreparationHandle } from '@/app/editor/preparation/types'
+import { bindEditorServices } from '@/app/editor/session/bindings'
 import {
   createEditorComputedRefs,
   createEditorStoreModules,
@@ -65,7 +65,7 @@ function buildEditorStore(initialGraph?: SceneGraph) {
   })
   const canvasReadiness = createDeferred<undefined>()
   const io = new IORegistry(BUILTIN_IO_FORMATS)
-  bindClipboardNotifications(editor)
+  bindEditorServices(editor)
 
   if (initialGraph) {
     editor.subscribeToGraph()

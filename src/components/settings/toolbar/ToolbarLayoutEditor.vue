@@ -60,6 +60,13 @@ const boxes = computed(() => {
   return result
 })
 
+/** What a row joins: the box above it, named by that box's first entry, as its flyout is. */
+function groupWithLabel(row: ToolbarRow): string | undefined {
+  if (!row.canJoin || !row.above) return undefined
+  const box = boxes.value.find(({ rows }) => rows.some((placed) => placed.row.entry === row.above))
+  return labels.value[box?.head.row.entry ?? row.above]
+}
+
 const drag = useFlatReorderDrag({
   items: () => rows.value.map((row) => ({ id: row.entry })),
   operations: (source, target) =>
@@ -136,7 +143,7 @@ function setShown(entry: ToolbarEntry, shown: boolean) {
               :pinned="row.entry === PINNED_TOOLBAR_ENTRY"
               :can-move-up="row.canMoveUp"
               :can-move-down="row.canMoveDown"
-              :group-with="row.canJoin && row.above ? labels[row.above] : undefined"
+              :group-with="groupWithLabel(row)"
               :in-flyout="row.inFlyout"
               :drop-target="isCombineTarget(row.entry)"
               :focus="focusFor(row.entry)"

@@ -18,7 +18,7 @@ In the app, press <kbd>?</kbd> or click the keyboard button at the end of the to
 | Key | Tool | Status |
 |-----|------|--------|
 | <kbd>V</kbd> | Move/Select | ✅ |
-| <kbd>K</kbd> | Scale | 🔲 |
+| <kbd>K</kbd> | Scale | ✅ |
 | <kbd>H</kbd> | Hand | ✅ |
 | <kbd>F</kbd> or <kbd>A</kbd> | Frame | ✅ |
 | <kbd>⇧</kbd><kbd>S</kbd> | Section | ✅ |
@@ -92,7 +92,7 @@ In the app, press <kbd>?</kbd> or click the keyboard button at the end of the to
 | <kbd>⇧</kbd><kbd>N</kbd> | Zoom to Previous Frame | ✅ |
 | <kbd>Page Down</kbd> | Next Page | ✅ |
 | <kbd>Page Up</kbd> | Previous Page | ✅ |
-| <kbd>Z</kbd> | Zoom Tool | 🔲 |
+| <kbd>Z</kbd> | Zoom Tool (hold to zoom, tap to keep it) | ✅ |
 | <kbd>⌘</kbd><kbd>J</kbd> | Toggle AI Chat | ✅ |
 | <kbd>⌘</kbd><kbd>K</kbd> | Command Palette | ✅ |
 | <kbd>?</kbd> | Keyboard Shortcuts | ✅ |
@@ -118,6 +118,7 @@ In the app, press <kbd>?</kbd> or click the keyboard button at the end of the to
 | <kbd>⇧</kbd><kbd>A</kbd> | Add Auto Layout | ✅ |
 | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> | Create Component | ✅ |
 | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd> | Detach Instance | ✅ |
+| <kbd>⌥</kbd><kbd>⇧</kbd><kbd>R</kbd> | Replace Inside Instance | ✅ |
 | <kbd>⌘</kbd><kbd>R</kbd> | Rename Selection | ✅ |
 | <kbd>⌘</kbd><kbd>]</kbd> | Bring Forward | ✅ |
 | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>]</kbd> | Bring to Front | 🔲 |
@@ -161,6 +162,8 @@ These keys work while a path is being edited (double-click a vector or press <kb
 | <kbd>⌘</kbd><kbd>J</kbd> | Join the two selected end points (outside vector edit mode it shows or hides the AI chat) | ✅ |
 | <kbd>⌥</kbd>+Drag | Duplicate the dragged points or segments | ✅ |
 | <kbd>⌘</kbd>+Double-click a segment | Straighten the segment | ✅ |
+| <kbd>⌘</kbd>+Drag a segment | Bend the segment (<kbd>⌘</kbd><kbd>⌥</kbd> keeps the neighbouring handles) | ✅ |
+| Drag the box around selected points | Scale them (<kbd>⇧</kbd> proportional, <kbd>⌥</kbd> from the centre), or rotate from outside a corner (<kbd>⇧</kbd> 15° steps) | ✅ |
 | Double-click a point | Switch the point between smooth and corner | ✅ |
 | Arrow keys | Nudge the selected points by the small nudge (<kbd>⇧</kbd> for the big one) | ✅ |
 | <kbd>Escape</kbd> | Put the cut tool down, or leave vector edit mode | ✅ |

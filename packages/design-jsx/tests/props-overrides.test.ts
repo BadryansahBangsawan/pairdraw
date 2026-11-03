@@ -33,6 +33,12 @@ describe('stack alignment', () => {
     expect(propsToOverrides({ flex: 'row', justify: 'between' }, false, 'NONE')).toMatchObject({
       primaryAxisAlign: 'SPACE_BETWEEN'
     })
+    expect(propsToOverrides({ flex: 'row', justify: 'around' }, false, 'NONE')).toMatchObject({
+      primaryAxisAlign: 'SPACE_AROUND'
+    })
+    expect(
+      propsToOverrides({ flex: 'row', justifyContent: 'space-around' }, false, 'NONE')
+    ).toMatchObject({ primaryAxisAlign: 'SPACE_AROUND' })
     expect(propsToOverrides({ flex: 'row', alignItems: 'flex-end' }, false, 'NONE')).toMatchObject({
       counterAxisAlign: 'MAX'
     })

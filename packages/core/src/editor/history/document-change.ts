@@ -356,11 +356,24 @@ export function applyDocumentChange(graph: SceneGraph, change: DocumentChange, s
   graph.clearAbsPosCache()
 }
 
-/** Undoes or redoes an edit in the editor, whichever page is on screen. */
+/** Drops the selected and hovered layers that no longer exist, and keeps the rest. */
+function keepLiveSelection(ctx: EditorContext): void {
+  const live = [...ctx.state.selectedIds].filter((id) => ctx.graph.getNode(id))
+  if (live.length !== ctx.state.selectedIds.size) ctx.setSelectedIds(new Set(live))
+  const hovered = ctx.state.hoveredNodeId
+  if (hovered !== null && !ctx.graph.getNode(hovered)) ctx.state.hoveredNodeId = null
+}
+
+/**
+ * Undoes or redoes an edit in the editor, whichever page is on screen. Undo and redo clear the
+ * selection on that page; `keepSelection`, for an edit put back that the person did not ask to
+ * undo, keeps the selected layers that still exist.
+ */
 export function restoreDocumentChange(
   ctx: EditorContext,
   change: DocumentChange,
-  side: Side
+  side: Side,
+  options: { keepSelection?: boolean } = {}
 ): void {
   applyDocumentChange(ctx.graph, change, side)
   const pageIds = new Set(change.pageIds)
@@ -369,7 +382,9 @@ export function restoreDocumentChange(
   for (const pageId of pageIds) {
     if (ctx.graph.getNode(pageId)) computeAllLayouts(ctx.graph, pageId)
   }
-  if (pageIds.has(ctx.state.currentPageId)) {
+  if (options.keepSelection) {
+    keepLiveSelection(ctx)
+  } else if (pageIds.has(ctx.state.currentPageId)) {
     ctx.setSelectedIds(new Set())
     ctx.state.hoveredNodeId = null
   }

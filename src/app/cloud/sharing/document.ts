@@ -27,10 +27,22 @@ export type CloudShareLink =
   | { access: 'restricted' }
   | { access: 'link'; permission: DocumentPermission; copyable: boolean }
 
+/**
+ * The document's snapshot link: none yet, none possible until the document has a saved revision
+ * or where the server does not say which revision it holds, as servers before snapshot links do,
+ * or one that shows the revision it pins, possibly behind what the document holds now.
+ */
+export type CloudSnapshotLink =
+  | { state: 'none' }
+  | { state: 'unsaved' }
+  | { state: 'unavailable' }
+  | { state: 'shared'; copyable: boolean; behind: boolean }
+
 export type CloudSharing = {
   canManage: boolean
   members: CloudShareMember[]
   link: CloudShareLink
+  snapshot: CloudSnapshotLink
   /** What the workspace's plan allows for links. */
   links: CloudLinkPolicy
 }
@@ -69,7 +81,33 @@ export function cloudShareTarget(binding: StorageDocumentBinding): Target | null
   }
 }
 
-const activeShare = (shares: DocumentShare[]) => shares.find((share) => !share.revokedAt) ?? null
+/** The live link: the one share that opens the document's room. */
+const activeShare = (shares: DocumentShare[]) =>
+  shares.find((share) => !share.revokedAt && !share.revisionId) ?? null
+/** The snapshot link: the one share that shows a pinned revision. */
+const activeSnapshot = (shares: DocumentShare[]) =>
+  shares.find((share) => !share.revokedAt && Boolean(share.revisionId)) ?? null
+
+/**
+ * The snapshot link, given the revision the document holds now: null before its first save, and
+ * undefined where the server does not say.
+ */
+async function readSnapshot(
+  target: Target,
+  shares: DocumentShare[],
+  current: string | null | undefined
+): Promise<CloudSnapshotLink> {
+  const snapshot = activeSnapshot(shares)
+  if (!snapshot) {
+    if (current === undefined) return { state: 'unavailable' }
+    return current === null ? { state: 'unsaved' } : { state: 'none' }
+  }
+  return {
+    state: 'shared',
+    copyable: Boolean(await readShareSecret(target.server.id, snapshot.id)),
+    behind: typeof current === 'string' && current !== snapshot.revisionId
+  }
+}
 
 /** Who can open the document and whether its link is on, as this account may see it. */
 export async function readCloudSharing(target: Target): Promise<CloudSharing> {
@@ -77,7 +115,13 @@ export async function readCloudSharing(target: Target): Promise<CloudSharing> {
   const access = await client.getDocumentAccess(documentId)
   const closed: CloudLinkPolicy = { allowed: false, guestView: false, guestEdit: false }
   if (!access.canManageSharing) {
-    return { canManage: false, members: [], link: { access: 'restricted' }, links: closed }
+    return {
+      canManage: false,
+      members: [],
+      link: { access: 'restricted' },
+      snapshot: { state: 'none' },
+      links: closed
+    }
   }
   const [grants, invitations, shares, entitlements] = await Promise.all([
     client.listDocumentGrants(documentId),
@@ -120,7 +164,8 @@ export async function readCloudSharing(target: Target): Promise<CloudSharing> {
         copyable: Boolean(await readShareSecret(target.server.id, share.id))
       }
     : { access: 'restricted' }
-  return { canManage: true, members: [...people, ...pending], link, links }
+  const snapshot = await readSnapshot(target, shares, access.currentRevisionId)
+  return { canManage: true, members: [...people, ...pending], link, snapshot, links }
 }
 
 export async function inviteToCloudDocument(
@@ -184,4 +229,48 @@ export async function cloudLinkURL(target: Target): Promise<string | null> {
   if (!share) return null
   const secret = await readShareSecret(target.server.id, share.id)
   return secret ? cloudShareURL(target.server.url, share.id, secret) : null
+}
+
+/**
+ * Makes the document's snapshot link to the revision it holds now, or pins the existing one to it,
+ * as Update snapshot does. A new link's secret is kept on this device so it can be copied here.
+ */
+export async function shareCloudSnapshot(target: Target): Promise<void> {
+  const { client, documentId, server } = target
+  const snapshot = activeSnapshot(await client.listDocumentShares(documentId))
+  if (snapshot) {
+    await client.updateDocumentShare(documentId, snapshot.id, { snapshot: 'current' })
+    return
+  }
+  const created = await client.createDocumentShare(documentId, {
+    permission: 'view',
+    snapshot: 'current'
+  })
+  await saveShareSecret(server.id, created.share.id, created.secret)
+}
+
+/** Deletes the snapshot link, so it stops opening anything. */
+export async function deleteCloudSnapshot(target: Target): Promise<void> {
+  const { client, documentId, server } = target
+  const snapshot = activeSnapshot(await client.listDocumentShares(documentId))
+  if (!snapshot) return
+  await client.revokeDocumentShare(documentId, snapshot.id)
+  await clearShareSecret(server.id, snapshot.id)
+}
+
+/** Replaces the snapshot link's secret, so this device can copy it and old copies stop working. */
+export async function resetCloudSnapshot(target: Target): Promise<void> {
+  const { client, documentId, server } = target
+  const snapshot = activeSnapshot(await client.listDocumentShares(documentId))
+  if (!snapshot) return
+  const rotated = await client.rotateDocumentShare(documentId, snapshot.id)
+  await saveShareSecret(server.id, rotated.share.id, rotated.secret)
+}
+
+/** The snapshot link to copy, when this device has its secret. */
+export async function cloudSnapshotURL(target: Target): Promise<string | null> {
+  const snapshot = activeSnapshot(await target.client.listDocumentShares(target.documentId))
+  if (!snapshot) return null
+  const secret = await readShareSecret(target.server.id, snapshot.id)
+  return secret ? cloudShareURL(target.server.url, snapshot.id, secret) : null
 }

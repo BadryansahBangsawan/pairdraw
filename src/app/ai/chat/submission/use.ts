@@ -10,7 +10,6 @@ import {
   deleteMessageAttachments,
   setMessageAttachments
 } from '@/app/ai/attachment/presentation/store'
-import { appendFileContext, appendSkillContext } from '@/app/ai/chat/context'
 import { setVisibleMessageText } from '@/app/ai/chat/presentation'
 import {
   editedAttachments,
@@ -19,6 +18,8 @@ import {
 } from '@/app/ai/chat/submission/attachments'
 import { reportSubmissionError, type SubmissionErrorOptions } from '@/app/ai/chat/submission/errors'
 import { prepareSubmittedImages } from '@/app/ai/chat/submission/images'
+import { appendCanvasNotes, appendEditedCanvasNotes } from '@/app/ai/chat/submission/notes'
+import { requestText, type RequestNotes } from '@/app/ai/chat/submission/request'
 import { chatToResend } from '@/app/ai/chat/submission/resend'
 import type { ChatInstance, ChatSubmission } from '@/app/ai/chat/submission/types'
 import { restoreTurn, revertTurn } from '@/app/ai/reply/turns'
@@ -32,6 +33,8 @@ interface SubmissionOptions extends SubmissionErrorOptions {
   flush?: () => Promise<void>
   clearFailure: () => void
   getEditor: () => EditorStore
+  /** What the conversation keeps pinned, which a request carries when it changed. */
+  pins?: RequestNotes['pins']
 }
 
 export function useChatSubmission(options: SubmissionOptions) {
@@ -41,16 +44,12 @@ export function useChatSubmission(options: SubmissionOptions) {
   const undone = useUndoRecords(options)
   const { withTurn } = undone
 
-  /** Redoes a reply's undone edits; Redo noticing them removes the marks. */
-  async function restore(messageId: string): Promise<void> {
-    if (!readyChat() || !restoreTurn(messageId)) return
-    await options.flush?.().catch(() => undefined)
-  }
-
-  /** Undoes a reply's edits; the history change marks them, for the chat and the next request. */
-  async function revert(messageId: string): Promise<void> {
-    if (!readyChat() || !revertTurn(messageId)) return
-    await options.flush?.().catch(() => undefined)
+  /** Redoes or undoes a reply's edits; the history change marks them, for chat and model. */
+  function turnAction(act: (messageId: string) => boolean) {
+    return async (messageId: string): Promise<void> => {
+      if (!readyChat() || !act(messageId)) return
+      await options.flush?.().catch(() => undefined)
+    }
   }
 
   async function sendText(
@@ -164,11 +163,10 @@ export function useChatSubmission(options: SubmissionOptions) {
         if (submission.images.length > 0) options.reportError(options.messages.value.requestFailed)
         return false
       }
-      const note = undone.note(submission.modelText, currentChat.messages)
-      const noted = {
-        ...submission,
-        modelText: appendSkillContext(appendFileContext(note.text, submission.files), skill)
-      }
+      const canvas = appendCanvasNotes(options.getEditor(), submission, currentChat.messages)
+      const note = undone.note(canvas, currentChat.messages)
+      const notes = { skill, earlier: currentChat.messages, pins: options.pins }
+      const noted = { ...submission, modelText: requestText(note.text, notes, submission.files) }
       const previousIds = new Set(currentChat.messages.map((message) => message.id))
       if (hasAttachments(submission)) await sendAttachments(currentChat, noted, version, dispatch)
       else await sendText(currentChat, noted, dispatch)
@@ -220,8 +218,10 @@ export function useChatSubmission(options: SubmissionOptions) {
     options.clearFailure()
     for (const message of later) if (message.role === 'assistant') revertTurn(message.id)
     // Replies after the edited message are replaced; what it reported needs a new report.
-    const note = undone.note(trimmed, currentChat.messages.slice(0, index))
-    const skill = await invokedSkill(trimmed)
+    const earlier = currentChat.messages.slice(0, index)
+    const canvas = appendEditedCanvasNotes(options.getEditor(), trimmed, edited, earlier)
+    const note = undone.note(canvas, earlier)
+    const notes = { skill: await invokedSkill(trimmed), earlier, pins: options.pins }
     setVisibleMessageText(messageId, trimmed)
     // The layers the edited text mentions replace the previews the message showed; the files it
     // was sent with go with its new text.
@@ -230,7 +230,7 @@ export function useChatSubmission(options: SubmissionOptions) {
     try {
       await withTurn(currentChat, () =>
         currentChat
-          .sendMessage({ messageId, text: appendSkillContext(`${note.text}${fileNote}`, skill) })
+          .sendMessage({ messageId, text: requestText(`${note.text}${fileNote}`, notes) })
           .catch(() => undefined)
       )
       undone.reported(currentChat, note.reports, messageId)
@@ -253,7 +253,7 @@ export function useChatSubmission(options: SubmissionOptions) {
     submit,
     regenerate,
     resend,
-    revert,
-    restore
+    revert: turnAction(revertTurn),
+    restore: turnAction(restoreTurn)
   }
 }

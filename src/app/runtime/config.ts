@@ -1,3 +1,4 @@
+import { parseEmbedParams, type EmbedParams } from '@/app/embed/params'
 import { appPreferences, type CanvasRenderingMode } from '@/app/settings/preferences/store'
 import { IS_BROWSER } from '@/constants'
 
@@ -23,6 +24,21 @@ export interface AppRuntimeConfig {
   reducedEffects: boolean
   collaborationTransport: CollaborationTransportMode
   collaborationRelayURL: string | null
+  /**
+   * Viewport changes such as zoom to fit glide, where animations play; a test run keeps them
+   * instant unless its URL asks for `viewport-motion`.
+   */
+  viewportMotion: boolean
+  /**
+   * New documents keep their changes as drafts on this device; a test run starts without them,
+   * so a new document stays unsaved, unless its URL asks for `drafts`.
+   */
+  drafts: boolean
+  /**
+   * The window is embedded in a host page through `?embed`: chrome hides unless the URL asks for
+   * `chrome`, and nothing is kept as a draft, since the host owns the document.
+   */
+  embed: EmbedParams | null
 }
 
 /**
@@ -39,11 +55,12 @@ export function parseAppRuntimeConfig(
   const renderer = params.get('renderer')
   const preferred: SceneRendererMode = ultralight ? 'tiled' : preferredRenderer
   const sceneRenderer = renderer === 'tiled' || renderer === 'retained' ? renderer : preferred
+  const embed = parseEmbedParams(search)
   return {
     test: params.has('test'),
     navigationBenchmark: params.has('navigation-benchmark'),
     recentFiles: params.has('recent-files'),
-    showChrome: !params.has('no-chrome'),
+    showChrome: embed ? embed.chrome : !params.has('no-chrome'),
     showRulers: !params.has('no-rulers'),
     sceneRenderer,
     sceneRendererOverride: renderer === 'tiled' || renderer === 'retained',
@@ -51,7 +68,10 @@ export function parseAppRuntimeConfig(
     maxPixelRatio: ultralight ? ULTRALIGHT_MAX_PIXEL_RATIO : undefined,
     reducedEffects: ultralight,
     collaborationTransport: params.get('collabTransport') === 'test' ? 'test' : 'default',
-    collaborationRelayURL: params.get('collabRelay')
+    collaborationRelayURL: params.get('collabRelay'),
+    viewportMotion: !params.has('test') || params.has('viewport-motion'),
+    drafts: !embed && (!params.has('test') || params.has('drafts')),
+    embed
   }
 }
 

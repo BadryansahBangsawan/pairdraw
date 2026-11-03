@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
+import { resolveEditorProfile } from '@open-pencil/core'
 import { MIXED, type MixedValue } from '@open-pencil/vue/controls/node-props'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useEditorMessages, useI18n } from '@open-pencil/vue/i18n'
 import { TypographyControlsRoot } from '@open-pencil/vue/primitives/TypographyControls'
 
+import { useEditorStore } from '@/app/editor/active-store'
 import { loadFont } from '@/app/editor/fonts'
+import {
+  isTextLinkEditorOpen,
+  openTextLinkEditor,
+  textLinkTargets,
+  textLinkValue
+} from '@/app/editor/links'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
 import NumberField from '@/components/inputs/NumberField.vue'
@@ -26,6 +34,16 @@ import AppSwitch from '@/components/ui/toggle/AppSwitch.vue'
 import { segmentedTrack } from '@/theme/select/segmented-control'
 
 const { panels, menu, fonts } = useI18n()
+const editorMessages = useEditorMessages()
+const store = useEditorStore()
+/** Whether the texts, or the characters being edited, link anywhere. */
+const hasLink = computed(() => textLinkValue(store, textLinkTargets(store)) !== null)
+/** A read-only document opens links from the canvas but cannot change them. */
+const canEditLinks = computed(() => resolveEditorProfile(store.state).edits)
+function editLink(event: MouseEvent) {
+  const button = event.currentTarget
+  openTextLinkEditor(store, button instanceof HTMLElement ? button : null)
+}
 const fontLoader = { load: loadFont }
 const alignmentOptions = computed(() => [
   { value: 'LEFT', label: panels.value.alignLeft },
@@ -272,6 +290,17 @@ function picked<T>(value: MixedValue<T>): T | '' {
               @click="ctx.actions.toggleDecoration('STRIKETHROUGH')"
             >
               <icon-lucide-strikethrough class="size-3.5" />
+            </IconButton>
+            <IconButton
+              v-if="canEditLinks"
+              :label="hasLink ? editorMessages.editTextLink : editorMessages.addTextLink"
+              size="xs"
+              aria-haspopup="dialog"
+              :aria-expanded="isTextLinkEditorOpen(store)"
+              data-property="text-link"
+              @click="editLink"
+            >
+              <icon-lucide-link class="size-3.5" />
             </IconButton>
           </div>
         </PanelFieldGroup>

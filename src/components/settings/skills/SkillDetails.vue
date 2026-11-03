@@ -25,6 +25,8 @@ const messages = useSkillMessages()
 
 const skill = computed(() => entry.skill)
 const uploaded = computed(() => skill.value.source === 'openpencil')
+/** Uploads and built-in skills have no place on disk to show. */
+const located = computed(() => !uploaded.value && skill.value.source !== 'builtin')
 const useDescription = computed(() => {
   if (entry.untrusted) return ai.value.skillsFolderUntrusted
   if (!entry.sourceEnabled) return ai.value.skillsSourceOff
@@ -38,7 +40,7 @@ const useDescription = computed(() => {
     <div class="flex flex-col gap-6">
       <SettingsSection>
         <template #title>{{ skill.name }}</template>
-        <template #description>{{ skill.description }}</template>
+        <template #description>{{ messages.description(skill) }}</template>
         <SettingsGroup>
           <SettingsRow as="label" :label="ai.skillsUse" :description="useDescription">
             <AppSwitch
@@ -48,7 +50,7 @@ const useDescription = computed(() => {
               @update:model-value="emit('set-enabled', $event)"
             />
           </SettingsRow>
-          <SettingsRow v-if="!uploaded" :label="ai.skillsLocation">
+          <SettingsRow v-if="located" :label="ai.skillsLocation">
             <code class="text-[11px] break-all text-muted">{{ skill.location }}</code>
           </SettingsRow>
           <SettingsRow v-if="skill.files.length" :label="ai.skillsFiles">

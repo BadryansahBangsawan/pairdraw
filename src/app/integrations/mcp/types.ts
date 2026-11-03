@@ -7,13 +7,33 @@ export type MCPHTTPTransport = {
   url: string
 }
 
-export type MCPAuthentication = { type: 'none' } | { type: 'bearer'; credentialRef: CredentialRef }
+/**
+ * A local program the desktop app starts and talks to over its standard input and output.
+ * The variables' values are credentials; only their names are kept with the connection.
+ */
+export type MCPStdioTransport = {
+  type: 'stdio'
+  command: string
+  args: string[]
+  envNames: string[]
+}
+
+export type MCPConnectionTransport = MCPHTTPTransport | MCPStdioTransport
+export type MCPTransportType = MCPConnectionTransport['type']
+
+/** OAuth tokens and the client registration live in the credential store, never in settings. */
+export type MCPAuthentication =
+  | { type: 'none' }
+  | { type: 'bearer'; credentialRef: CredentialRef }
+  | { type: 'oauth'; credentialRef: CredentialRef }
+
+export type MCPAuthenticationType = MCPAuthentication['type']
 
 export type MCPConnection = {
   id: MCPConnectionID
   name: string
   enabled: boolean
-  transport: MCPHTTPTransport
+  transport: MCPConnectionTransport
   authentication: MCPAuthentication
 }
 
@@ -25,7 +45,11 @@ export type MCPConnectionSettings = {
 export type MCPConnectionDraft = {
   id: MCPConnectionID | null
   name: string
-  url: string
   enabled: boolean
-  authenticationType: MCPAuthentication['type']
+  transportType: MCPTransportType
+  url: string
+  command: string
+  /** One argument per line, so arguments with spaces need no quoting. */
+  args: string
+  authenticationType: MCPAuthenticationType
 }

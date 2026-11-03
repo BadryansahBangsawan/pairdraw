@@ -101,6 +101,8 @@ export interface AppPreferences {
     columnOpen: boolean
     /** Whether an empty page offers a prompt that starts the AI chat over the canvas. */
     canvasPrompt: boolean
+    /** Whether the built-in chat asks before each tool call that changes the document. */
+    approveActions: boolean
   }
   files: { recentLimit: number }
   version: 1
@@ -155,7 +157,9 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
     followAgents: true,
     columnOpen: false,
     // The prompt over an empty page is opt-in; Home and the chat column start a design by default.
-    canvasPrompt: false
+    canvasPrompt: false,
+    // Edits are undoable and reviewable per reply, so asking before each one is opt-in.
+    approveActions: false
   },
   files: { recentLimit: DEFAULT_RECENT_FILES_LIMIT },
   version: 1,
@@ -212,7 +216,8 @@ const appPreferencesSchema = section({
     ),
     followAgents: v.fallback(v.boolean(), defaults.chat.followAgents),
     columnOpen: v.fallback(v.boolean(), defaults.chat.columnOpen),
-    canvasPrompt: v.fallback(v.boolean(), defaults.chat.canvasPrompt)
+    canvasPrompt: v.fallback(v.boolean(), defaults.chat.canvasPrompt),
+    approveActions: v.fallback(v.boolean(), defaults.chat.approveActions)
   }),
   files: section({
     recentLimit: v.fallback(recentFilesLimitSchema, defaults.files.recentLimit)

@@ -16,5 +16,19 @@
   "toggleAIChat": "AI-чат ({shortcut})",
   "startPreview": "Просмотр ({shortcut})",
   "toggleLayersPanel": "Панель слоёв",
-  "togglePropertiesPanel": "Панель свойств"
+  "togglePropertiesPanel": "Панель свойств",
+  "textLink": "Ссылка",
+  "addTextLink": "Добавить ссылку",
+  "editTextLink": "Изменить ссылку",
+  "removeTextLink": "Удалить ссылку",
+  "openTextLink": "Открыть ссылку",
+  "textLinkAddress": "Адрес ссылки",
+  "textLinkPlaceholder": "Вставьте ссылку или адрес почты",
+  "textLinkInvalid": "Укажите веб-адрес или адрес электронной почты.",
+  "textLinkMixed": "Несколько ссылок",
+  "textLinkToLayer": "Ссылка на {name}",
+  "embedWaiting": "Ожидание страницы-хоста",
+  "embedWaitingDescription": "Дизайн откроется, когда подключится страница, в которую он встроен.",
+  "embedInvalidOrigin": "Это встраивание не может подключиться",
+  "embedInvalidOriginDescription": "Его ссылка должна указывать источник встраивающей страницы, например https://example.com."
 }

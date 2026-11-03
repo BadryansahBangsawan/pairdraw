@@ -82,6 +82,16 @@ describe('HTML flow as auto layout', () => {
     expect(sizing(byName('grown'))[1]).toBe('FILL')
   })
 
+  it('reads justify-content: space-around as space around, keeping the gap', async () => {
+    const { byName } = await importHTML(
+      `<div id="row" style="display:flex;justify-content:space-around;gap:6px;width:300px">
+        <div style="width:20px;height:20px"></div>
+        <div style="width:20px;height:20px"></div>
+      </div>`
+    )
+    expect(byName('row')).toMatchObject({ primaryAxisAlign: 'SPACE_AROUND', itemSpacing: 6 })
+  })
+
   it('places padding and borders outside an explicit size unless border-box', async () => {
     const { byName } = await importHTML(
       `<div id="content" style="width:100px;height:50px;padding:10px;border:2px solid #000">A</div>

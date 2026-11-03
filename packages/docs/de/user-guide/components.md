@@ -41,6 +41,8 @@ Heruntergeladene Versionen werden lokal gespeichert. Verbindungen und benötigte
 
 Änderungen an der Hauptkomponente aktualisieren Breite, Höhe, Füllungen, Konturen, Effekte, Deckkraft, Eckenradien, Anordnung und Beschnitt der Instanzen. Überschriebene Werte bleiben erhalten.
 
+Setzt eine Instanz den Modus einer Variablensammlung, übernimmt sie für alle anderen Sammlungen weiterhin die Modi der Komponente. Über die Tauschen-Schaltfläche im Kopf einer Instanz, auch einer verschachtelten, zeigt sie eine andere Komponente. Mit <kbd>⌥</kbd><kbd>⇧</kbd><kbd>R</kbd> ersetzt die kopierte Ebene eine ausgewählte Ebene innerhalb einer Instanz als Überschreibung, ohne die Instanz zu lösen; **Komponentenebene wiederherstellen** holt die ursprüngliche Ebene zurück.
+
 ## Tastenkürzel
 
 | Aktion | macOS | Windows / Linux |

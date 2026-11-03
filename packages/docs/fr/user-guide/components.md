@@ -23,6 +23,8 @@ Sélectionnez le composant et choisissez **Créer une instance**, ou insérez-le
 
 Les propriétés modifiées dans une instance sont enregistrées comme surcharges. Les changements ultérieurs du composant principal continuent d’arriver, sauf pour les propriétés surchargées.
 
+Une instance qui fixe le mode d’une collection de variables reçoit toujours les modes du composant pour les autres collections. Le bouton de permutation dans l’en-tête d’une instance, même imbriquée, affiche un autre composant à sa place. <kbd>⌥</kbd><kbd>⇧</kbd><kbd>R</kbd> remplace le calque sélectionné dans une instance par le calque copié, comme surcharge, sans détacher l’instance ; **Restaurer le calque du composant** rétablit le calque d’origine.
+
 ## Propriétés de composant
 
 Texte, visibilité booléenne, permutation d’instance et variantes sont pris en charge. Ces propriétés apparaissent à droite lorsqu’une instance est sélectionnée.

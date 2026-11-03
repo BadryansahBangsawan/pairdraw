@@ -4,6 +4,7 @@ import type { UIMessage } from 'ai'
 import type { ImageAttachmentDraft } from '@/app/ai/attachment/image/types'
 import type { TextAttachmentDraft } from '@/app/ai/attachment/text/types'
 import type { ReferencedNode } from '@/app/ai/chat/context'
+import type { ExploreRequest } from '@/app/ai/explore/request'
 
 export interface ChatSubmission {
   modelText: string
@@ -15,6 +16,8 @@ export interface ChatSubmission {
    * transcript shows them as attachments. Absent where a prompt can carry none.
    */
   files?: TextAttachmentDraft[]
+  /** How "Let it cook" asked for the message to be explored; absent when it was off. */
+  explore?: ExploreRequest
 }
 
 /** The part of the AI SDK Chat that submissions drive. */

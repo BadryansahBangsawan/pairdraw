@@ -116,7 +116,7 @@ Work with open pull requests. It may change before it merges:
 - Improve deterministic CLI/MCP export and comparison tools for CI.
 - Add more design linting and migration helpers for batch `.fig` and `.pen` workflows.
 - Make `.pen` a first-class editable save target across app, CLI, MCP, and SDK workflows rather than an import-only or automation-specific format.
-- Extend HTML, CSS, Tailwind, and JSX support from editable import toward URL-based website capture, direct JSX paste/edit workflows, and component-aware design↔code updates that preserve intentional code structure instead of regenerating whole files.
+- Extend HTML, CSS, Tailwind, and JSX support from editable import and web capture (the Chrome extension, the capturer SDK, and plain web HTML paste; `programmable/web-capture.md`) toward URL-based capture in an in-app browser, direct JSX paste/edit workflows, and component-aware design↔code updates that preserve intentional code structure instead of regenerating whole files.
 - Provide an adapter contract for additional design sources such as Stitch and Pixso, prioritizing formats with documented or testable semantics over brittle UI scraping.
 - Package desktop-side MCP integration so local agent workflows do not require global installs.
 

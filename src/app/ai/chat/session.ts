@@ -9,6 +9,7 @@ import type { ACPAgentID, AIProviderID } from '@open-pencil/core/constants'
 import { AgentSetupError, assertAgentReady } from '@/app/ai/agents/setup/readiness'
 import { classifyAIChatError, type AIChatFailure } from '@/app/ai/chat/failure'
 import { notifyReplyEnded } from '@/app/ai/chat/notifications'
+import { chatProjectFolder } from '@/app/ai/chat/project-folder'
 import { hasSteeringMessage } from '@/app/ai/chat/queue'
 import SYSTEM_PROMPT from '@/app/ai/chat/system-prompt'
 import { chatThinkingLevel } from '@/app/ai/chat/thinking'
@@ -46,12 +47,19 @@ type ChatSessionOptions = {
   providerID: Ref<AIProviderID>
   credentialsReady: Promise<void>
   getActiveEditorStore: () => EditorStore
+  /** How a coding agent's chat starts; tests pass doubles instead of starting a process. */
+  agents?: {
+    ready?: typeof assertAgentReady
+    createACPTransport?: typeof createACPTransport
+  }
 }
 
 export async function createACPTransport(
   providerID: AIProviderID,
   store?: EditorStore,
-  onUsage?: (usage: AgentTurnUsage) => void
+  onUsage?: (usage: AgentTurnUsage) => void,
+  /** The project folder the person chose for this chat on desktop, which the agent works in. */
+  projectFolder?: string | null
 ) {
   const agentId = providerID.replace('acp:', '') as ACPAgentID
   const agentDef = ACP_AGENTS.find((a) => a.id === agentId)
@@ -62,8 +70,17 @@ export async function createACPTransport(
     import('@/app/ai/agents/host/current')
   ])
   const host = agentHost()
-  // A folder of its own, not the home folder, whose project settings the agent would read.
-  return new ACPChatTransport({ agentDef, cwd: await host.workspace(), store, onUsage, host })
+  // A folder of its own, not the home folder, whose project settings the agent would read,
+  // unless the person chose a project folder for this chat.
+  const cwd = projectFolder ?? (await host.workspace())
+  return new ACPChatTransport({
+    agentDef,
+    cwd,
+    projectFolder: projectFolder != null,
+    store,
+    onUsage,
+    host
+  })
 }
 
 /**
@@ -89,7 +106,11 @@ export function createChatSessionManager({
   isHarnessProvider,
   providerID,
   credentialsReady,
-  getActiveEditorStore
+  getActiveEditorStore,
+  agents: {
+    ready = assertAgentReady,
+    createACPTransport: startACPTransport = createACPTransport
+  } = {}
 }: ChatSessionOptions) {
   const failure = ref<AIChatFailure | null>(null)
   let transportDirty = false
@@ -97,6 +118,8 @@ export function createChatSessionManager({
   const currentChatMessages = new WeakMap<EditorStore, UIMessage[]>()
   let chat: Chat<UIMessage> | null = null
   let acpTransportInstance: { destroy(): Promise<void> } | null = null
+  /** The project folder the running agent session works in, null for the app's workspace. */
+  let acpProjectFolder: string | null = null
   let harnessTransportInstance: { stop(): Promise<void> } | null = null
   let overrideTransport: (() => ChatTransport<UIMessage>) | null = null
   let activeProviderError: unknown = null
@@ -150,13 +173,19 @@ export function createChatSessionManager({
 
   async function createActiveACPTransport(store: EditorStore, context: AIDiagnosticContext) {
     await destroyAgentTransports()
-    await assertAgentReady('acp')
+    await ready('acp')
     const provider = providerID.value
+    const folder = chatProjectFolder(context.sessionId)
     // An agent's turn counts as one step of the model it names, or of the agent itself.
-    const transport = await createACPTransport(provider, store, ({ model, ...tokens }) =>
-      recordModelStepCompleted({ provider, model: model ?? provider, ...tokens }, context)
+    const transport = await startACPTransport(
+      provider,
+      store,
+      ({ model, ...tokens }) =>
+        recordModelStepCompleted({ provider, model: model ?? provider, ...tokens }, context),
+      folder
     )
     acpTransportInstance = transport
+    acpProjectFolder = folder
     return transport as ChatTransport<UIMessage>
   }
 
@@ -248,6 +277,10 @@ export function createChatSessionManager({
       currentChatMessages.set(currentChatStore, chat.messages)
     }
 
+    // A project folder chosen or cleared since starts the agent again in the new folder.
+    if (chat && isACPProvider.value && chatProjectFolder(sessionId) !== acpProjectFolder) {
+      transportDirty = true
+    }
     if (!chat || transportDirty || currentChatStore !== store) {
       const messages = initialMessages ?? currentChatMessages.get(store)
       const diagnosticContext: AIDiagnosticContext = { sessionId, runId: crypto.randomUUID() }

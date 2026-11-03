@@ -66,7 +66,8 @@ export function openDocumentRoom(
   roomId: string,
   transport: JoinCollabRoom,
   identity?: RoomIdentity,
-  images?: RoomImageStore
+  images?: RoomImageStore,
+  options: { commentRelay?: boolean } = {}
 ): RoomSession {
   const existing = roomForStore(store)
   if (existing?.roomId === roomId) return existing
@@ -80,7 +81,8 @@ export function openDocumentRoom(
     holdsDocument: true,
     leavable: false,
     identity,
-    images
+    images,
+    commentRelay: options.commentRelay
   })
   addSession(session)
   return session
@@ -109,6 +111,8 @@ export function joinRoom(
   }
   const tab = createTab()
   tab.store.state.documentName = tabName
+  // The room's document is not this person's draft; leaving with a copy makes it one.
+  tab.store.suspendDraft(true)
   const session = openRoomSession({
     roomId,
     store: tab.store,
@@ -129,6 +133,7 @@ export function leaveRoom(session: RoomSession): void {
   const tab = getTabForStore(session.store)
   if (!tab) return
   if (session.hasDocument.value) {
+    session.store.suspendDraft(false)
     leftRooms.value = [...leftRooms.value, session.store]
     return
   }

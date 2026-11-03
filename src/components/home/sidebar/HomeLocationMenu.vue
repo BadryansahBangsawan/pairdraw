@@ -12,7 +12,7 @@ import {
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import { useCloudMessages, useFileMessages } from '@open-pencil/vue/i18n'
+import { useCloudMessages, useFileMessages, useRecoveryMessages } from '@open-pencil/vue/i18n'
 
 import { menu } from '@/components/ui/menu/menu'
 import homeLocationMenuTheme from '@/theme/home/location-menu'
@@ -52,8 +52,10 @@ const ui = homeLocationMenu()
 const menuUI = menu()
 const t = useCloudMessages()
 const files = useFileMessages()
+const recovery = useRecoveryMessages()
 const current = computed(() => {
   if (active.kind === 'recent') return t.value.homeRecent
+  if (active.kind === 'drafts') return recovery.value.drafts
   if (active.kind === 'libraries') return files.value.designSystems
   if (active.kind === 'shared') return t.value.homeSharedWithYou
   if (active.kind === 'storage') return storage?.label ?? t.value.homeStorage
@@ -67,6 +69,7 @@ const isActive = (location: HomeLocation) =>
   <DropdownMenuRoot>
     <DropdownMenuTrigger :class="ui.trigger()">
       <icon-lucide-clock v-if="active.kind === 'recent'" :class="ui.icon()" />
+      <icon-lucide-file-pen-line v-else-if="active.kind === 'drafts'" :class="ui.icon()" />
       <icon-lucide-library-big v-else-if="active.kind === 'libraries'" :class="ui.icon()" />
       <icon-lucide-users v-else-if="active.kind === 'shared'" :class="ui.icon()" />
       <icon-lucide-database v-else-if="active.kind === 'storage'" :class="ui.icon()" />
@@ -89,6 +92,17 @@ const isActive = (location: HomeLocation) =>
           <span :class="ui.itemLabel()">{{ t.homeRecent }}</span>
           <icon-lucide-check
             v-if="isActive({ kind: 'recent', id: 'recent' })"
+            :class="ui.check()"
+          />
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          :class="menuUI.item({ justify: 'start' })"
+          @select="emit('select', { kind: 'drafts', id: 'drafts' })"
+        >
+          <icon-lucide-file-pen-line :class="menuUI.icon()" />
+          <span :class="ui.itemLabel()">{{ recovery.drafts }}</span>
+          <icon-lucide-check
+            v-if="isActive({ kind: 'drafts', id: 'drafts' })"
             :class="ui.check()"
           />
         </DropdownMenuItem>

@@ -67,7 +67,9 @@ export function applyMoveSnap(
     selectionBounds,
     parentTargets(parentId, editor),
     editor,
-    explicitSnapTargets(parentId, editor)
+    explicitSnapTargets(parentId, editor),
+    [],
+    { spacing: true }
   )
   editor.setSnapGuides(snap.guides)
   const localCorrection = worldDeltaToParentLocal(snap.correction, parentId, editor)

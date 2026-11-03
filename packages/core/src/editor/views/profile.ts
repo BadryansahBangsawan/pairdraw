@@ -8,8 +8,11 @@ import type { CanvasView, EditorProfile, EditorProfileInputs, EditorRestrictions
 
 export const EDIT_VIEW: CanvasView = { id: 'edit' }
 
-/** The tools a read-only document keeps, as Figma's toolbar shows while a version is viewed. */
-export const READ_ONLY_TOOLS: ReadonlySet<Tool> = new Set<Tool>(['SELECT', 'HAND'])
+/**
+ * The tools a read-only document keeps, as Figma's toolbar shows while a version is viewed, and
+ * the zoom tool, which only navigates.
+ */
+export const READ_ONLY_TOOLS: ReadonlySet<Tool> = new Set<Tool>(['SELECT', 'HAND', 'ZOOM'])
 
 /** What the document's kind decides: the tools and keys it offers and the grid it snaps to. */
 type DocumentBehaviour = Pick<EditorProfile, 'edits' | 'tools' | 'toolKeys' | 'snapGrid'>
@@ -43,16 +46,33 @@ function playBehaviour(revision: number): ViewBehaviour {
   }
 }
 
+/**
+ * Shader Mode shows one shader on its own, which plays in its own preview, so the canvas runs
+ * nothing live; the panels give way to the shader's settings, and only the view's keys run.
+ */
+const SHADER_BEHAVIOUR: ViewBehaviour = {
+  pointer: 'pan',
+  shortcuts: 'view',
+  editChrome: false,
+  live: null,
+  panels: false,
+  leaveTo: EDIT_VIEW
+}
+
 function viewBehaviour(view: CanvasView): ViewBehaviour {
+  // A presentation is a preview shown a slide at a time; the front end keeps it on its slide.
+  if (view.id === 'present') return playBehaviour(view.revision)
+  if (view.id === 'shader') return SHADER_BEHAVIOUR
   return view.id === 'play' ? playBehaviour(view.revision) : EDIT_BEHAVIOUR
 }
 
 /** Narrows a profile by the host's restrictions; a restriction only ever takes away. */
 function restrict(profile: EditorProfile, restrictions: EditorRestrictions): EditorProfile {
   if (!restrictions.readOnly) return profile
-  const tools = profile.tools
-    ? new Set([...profile.tools].filter((tool) => READ_ONLY_TOOLS.has(tool)))
-    : READ_ONLY_TOOLS
+  const kept = (tool: Tool) =>
+    READ_ONLY_TOOLS.has(tool) || (restrictions.comments === true && tool === 'COMMENT')
+  const offered = profile.tools ?? new Set<Tool>([...READ_ONLY_TOOLS, 'COMMENT'])
+  const tools = new Set([...offered].filter(kept))
   return { ...profile, edits: false, tools }
 }
 

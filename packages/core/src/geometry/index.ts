@@ -49,6 +49,30 @@ export type {
   GradientStopLayout
 } from './gradient'
 export {
+  IMAGE_CROP_GHOST_ALPHA,
+  IMAGE_CROP_HANDLE,
+  coveringImageBounds,
+  croppedImageTransform,
+  hitTestImageCrop,
+  imageCropHandles,
+  imageCropHitDirection,
+  imageCropLayout,
+  imageCropQuad,
+  imageTransformFromLocalMatrix,
+  pannedImageTransform,
+  quadContains,
+  resizedCropRect,
+  scaledImageTransform
+} from './image-crop'
+export type {
+  CropResizeOptions,
+  ImageCropCorner,
+  ImageCropHit,
+  ImageCropLayout,
+  ImageCropQuad,
+  ImageScaleOptions
+} from './image-crop'
+export {
   CONNECTOR_SEGMENT_HANDLE,
   connectorRouteHandles,
   connectorScreenEnds,

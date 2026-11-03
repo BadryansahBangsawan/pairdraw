@@ -26,7 +26,9 @@ export function useToolLabels() {
     SHAPE_WITH_TEXT: tools.value.shape,
     CONNECTOR: tools.value.connector,
     HAND: tools.value.hand,
-    COMMENT: tools.value.comment
+    COMMENT: tools.value.comment,
+    ZOOM: tools.value.zoom,
+    SCALE: tools.value.scale
   }))
 }
 

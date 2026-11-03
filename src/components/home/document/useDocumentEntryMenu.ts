@@ -1,6 +1,6 @@
 import { compact } from 'es-toolkit'
 
-import { useFileMessages } from '@open-pencil/vue/i18n'
+import { useFileMessages, useRecoveryMessages } from '@open-pencil/vue/i18n'
 
 import type { DocumentEntryMenu } from './types'
 
@@ -11,6 +11,8 @@ export type DocumentEntryMenuOptions = {
   saveAs?: boolean
   removeRecent?: boolean
   delete?: boolean
+  /** Delete is Delete draft, as a draft lives only on this device. */
+  deleteDraft?: boolean
 }
 
 /**
@@ -19,6 +21,7 @@ export type DocumentEntryMenuOptions = {
  */
 export function useDocumentEntryMenu() {
   const files = useFileMessages()
+  const recovery = useRecoveryMessages()
   return (name: string, options: DocumentEntryMenuOptions): DocumentEntryMenu => ({
     actions: files.value.documentActions({ name }),
     items: compact([
@@ -27,7 +30,10 @@ export function useDocumentEntryMenu() {
         : { action: 'select', label: files.value.selectDocument },
       options.saveAs && { action: 'save-as', label: files.value.saveDocumentAs },
       options.removeRecent && { action: 'remove-recent', label: files.value.removeFromRecents },
-      options.delete && { action: 'delete', label: files.value.deleteDocument }
+      options.delete && {
+        action: 'delete',
+        label: options.deleteDraft ? recovery.value.deleteDraft : files.value.deleteDocument
+      }
     ] as const)
   })
 }

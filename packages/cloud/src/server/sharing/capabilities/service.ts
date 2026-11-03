@@ -3,6 +3,7 @@ import type {
   DocumentPermission,
   DocumentShare,
   ResolveDocumentShareInput,
+  ShareSnapshot,
   UpdateDocumentShareInput
 } from '#cloud/contract'
 import type { CloudActor } from '#cloud/server/auth'
@@ -10,14 +11,18 @@ import type { CloudDatabase } from '#cloud/server/db'
 import { DocumentNotFoundError } from '#cloud/server/documents/errors'
 import { CLOUD_FEATURE_KEYS } from '#cloud/server/policy/keys'
 import type { CloudPolicy } from '#cloud/server/policy/policy'
-import type { Kysely, UpdateObject } from 'kysely'
+import type { Kysely, Transaction, UpdateObject } from 'kysely'
 
 import { randomHex } from '@open-pencil/scene-graph/random'
 
 import { advanceCollaborationEpoch, requireSharingAccess } from '../access'
 import { shareContract } from '../contracts'
 import { capabilityHashMatches, hashCapability } from '../crypto'
-import { DocumentShareInvalidError, DocumentShareSignInRequiredError } from '../errors'
+import {
+  DocumentShareInvalidError,
+  DocumentShareKindError,
+  DocumentShareSignInRequiredError
+} from '../errors'
 import { createSharingPolicy } from '../policy'
 
 const SHARE_SECRET_BYTES = 24
@@ -37,11 +42,41 @@ export type ResolvedDocumentShare = {
   permission: DocumentPermission
   principal: ResolvedSharePrincipal
   roomEpoch: number
+  /** The revision a snapshot link shows; null for a live link. */
+  revisionId: string | null
 }
 
 export type CapabilityServiceOptions = {
   policy?: CloudPolicy
   deploymentMode?: 'official' | 'self-hosted'
+}
+
+/**
+ * The revision a snapshot pins: the document's current one, or one of its own revisions. Anything
+ * else, as a document with no revision yet, cannot be shared as a snapshot.
+ */
+async function snapshotRevision(
+  database: Kysely<CloudDatabase> | Transaction<CloudDatabase>,
+  documentId: string,
+  snapshot: ShareSnapshot
+): Promise<string> {
+  if (snapshot === 'current') {
+    const document = await database
+      .selectFrom('document')
+      .select('currentRevisionId')
+      .where('id', '=', documentId)
+      .executeTakeFirst()
+    if (!document?.currentRevisionId) throw new DocumentShareKindError()
+    return document.currentRevisionId
+  }
+  const revision = await database
+    .selectFrom('documentRevision')
+    .select('id')
+    .where('id', '=', snapshot)
+    .where('documentId', '=', documentId)
+    .executeTakeFirst()
+  if (!revision) throw new DocumentShareKindError()
+  return revision.id
 }
 
 export function createCapabilityService(
@@ -98,18 +133,23 @@ export function createCapabilityService(
           .where('id', '=', documentId)
           .forUpdate()
           .executeTakeFirstOrThrow()
+        const revisionId = input.snapshot
+          ? await snapshotRevision(transaction, documentId, input.snapshot)
+          : null
         return transaction
           .insertInto('documentShare')
           .values({
             id,
             documentId,
-            permission: input.permission,
+            // A snapshot shows a frozen revision, so it only ever lets people look.
+            permission: revisionId ? 'view' : input.permission,
             secretHash: hashCapability(secret),
             roomEpoch: document.collaborationEpoch,
             createdBy: userId,
             expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
             revokedAt: null,
-            lastUsedAt: null
+            lastUsedAt: null,
+            revisionId
           })
           .returningAll()
           .executeTakeFirstOrThrow()
@@ -128,15 +168,24 @@ export function createCapabilityService(
       await requireSharingAccess(database, userId, documentId)
       const current = await database
         .selectFrom('documentShare')
-        .select('id')
+        .select(['id', 'revisionId'])
         .where('id', '=', shareId)
         .where('documentId', '=', documentId)
         .where('revokedAt', 'is', null)
         .executeTakeFirst()
       if (!current) throw new DocumentNotFoundError()
       await sharingPolicy.requireCapabilityLink({ actorId: userId, documentId })
+      const snapshot = current.revisionId !== null
+      if (input.snapshot !== undefined && !snapshot) throw new DocumentShareKindError()
+      if (snapshot && input.permission !== undefined && input.permission !== 'view') {
+        throw new DocumentShareKindError()
+      }
       const changes: UpdateObject<CloudDatabase, 'documentShare'> = { updatedAt: new Date() }
       if (input.permission) changes.permission = input.permission
+      // Update snapshot: the same link shows the revision named now.
+      if (input.snapshot !== undefined) {
+        changes.revisionId = await snapshotRevision(database, documentId, input.snapshot)
+      }
       if (input.expiresAt !== undefined) {
         changes.expiresAt = input.expiresAt ? new Date(input.expiresAt) : null
       }
@@ -179,15 +228,17 @@ export function createCapabilityService(
     async revokeShare(userId: string, documentId: string, shareId: string): Promise<void> {
       await database.transaction().execute(async (transaction) => {
         await requireSharingAccess(transaction, userId, documentId)
-        const result = await transaction
+        const revoked = await transaction
           .updateTable('documentShare')
           .set({ revokedAt: new Date(), updatedAt: new Date() })
           .where('id', '=', shareId)
           .where('documentId', '=', documentId)
           .where('revokedAt', 'is', null)
+          .returning('revisionId')
           .executeTakeFirst()
-        if (Number(result.numUpdatedRows) === 0) throw new DocumentNotFoundError()
-        await advanceCollaborationEpoch(transaction, documentId)
+        if (!revoked) throw new DocumentNotFoundError()
+        // Nobody joins the room through a snapshot link, so its room carries on undisturbed.
+        if (revoked.revisionId === null) await advanceCollaborationEpoch(transaction, documentId)
       })
     },
 
@@ -205,7 +256,8 @@ export function createCapabilityService(
           'documentShare.permission',
           'documentShare.secretHash',
           'documentShare.roomEpoch',
-          'documentShare.expiresAt'
+          'documentShare.expiresAt',
+          'documentShare.revisionId'
         ])
         .where('documentShare.id', '=', shareId)
         .where('documentShare.revokedAt', 'is', null)
@@ -224,6 +276,7 @@ export function createCapabilityService(
           .select('workspaceId')
           .where('id', '=', row.documentId)
           .executeTakeFirstOrThrow()
+        // Commenting is looking with a say: guests who may view a link may comment through it.
         const featureKey =
           row.permission === 'edit' ? CLOUD_FEATURE_KEYS.guestEdit : CLOUD_FEATURE_KEYS.guestView
         if (
@@ -248,12 +301,15 @@ export function createCapabilityService(
         permission: row.permission,
         principal: actor
           ? { kind: 'user', userId: actor.userId, name: actor.name, email: actor.email }
-          : {
+          : // A guest goes by the name they chose: it labels their presence and comments,
+            // and proves nothing about who they are.
+            {
               kind: 'guest',
               guestId: input.guestId ?? crypto.randomUUID(),
               name: input.guestName ?? 'Guest'
             },
-        roomEpoch: row.roomEpoch
+        roomEpoch: row.roomEpoch,
+        revisionId: row.revisionId
       }
     }
   }

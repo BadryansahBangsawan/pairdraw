@@ -146,6 +146,8 @@ export function createCollaborationTicketService({
       actor?: CloudActor
     ): Promise<CollaborationTicket> {
       const resolved = await sharing.resolveShare(shareId, input, actor)
+      // A snapshot link shows one revision as it was shared; it has no room to join.
+      if (resolved.revisionId) throw new DocumentNotFoundError()
       if (policy) {
         const workspace = await database
           .selectFrom('document')

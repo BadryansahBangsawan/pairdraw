@@ -45,6 +45,7 @@
         "@open-pencil/pen": "workspace:*",
         "@open-pencil/scene-graph": "workspace:*",
         "@open-pencil/vue": "workspace:*",
+        "@open-pencil/web-capture": "workspace:*",
         "@openrouter/ai-sdk-provider": "^3.1.0",
         "@smithy/fetch-http-handler": "^5.8.0",
         "@stream-markdown/code": "2.0.0-beta.5",
@@ -649,6 +650,23 @@
       "optionalPeers": [
         "canvaskit-wasm",
       ],
+    },
+    "packages/web-capture": {
+      "name": "@open-pencil/web-capture",
+      "version": "0.16.0",
+      "dependencies": {
+        "entities": "^8.0.0",
+        "es-toolkit": "^1.52.0",
+        "fflate": "^0.8.3",
+        "js-base64": "^3.9.3",
+        "valibot": "^1.5.0",
+      },
+      "devDependencies": {
+        "@types/bun": "^1.3.14",
+        "happy-dom": "^20.14.6",
+        "tsdown": "^0.22.14",
+        "typescript": "npm:@typescript/typescript6@^6.0.2",
+      },
     },
     "tools": {
       "name": "@open-pencil/tools",
@@ -1751,6 +1769,8 @@
     "@open-pencil/vite-config": ["@open-pencil/vite-config@workspace:vite"],
 
     "@open-pencil/vue": ["@open-pencil/vue@workspace:packages/vue"],
+
+    "@open-pencil/web-capture": ["@open-pencil/web-capture@workspace:packages/web-capture"],
 
     "@openfeature/core": ["@openfeature/core@1.12.0", "", {}, "sha512-7PCPzyd1OC19begz30+CRknFB0ChtyaZUhk7YWrk+Bov1fpVw0HYkTXtoxxsvPfDZB9P9WsT7uixN+Z8f9+bcA=="],
 

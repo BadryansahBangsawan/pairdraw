@@ -1,7 +1,7 @@
+import { recoverySnapshotMeta } from '@/app/document/recovery/meta'
 import type {
   RecoverySnapshot,
   RecoverySnapshotInput,
-  RecoverySnapshotMeta,
   RecoveryStore
 } from '@/app/document/recovery/types'
 
@@ -19,13 +19,7 @@ export function createMemoryRecoveryStore(): RecoveryStore {
       return snapshot ? structuredClone(snapshot) : null
     },
     async write(input: RecoverySnapshotInput) {
-      const metadata: RecoverySnapshotMeta = {
-        id: input.id,
-        documentName: input.documentName || 'Untitled',
-        updatedAt: new Date().toISOString(),
-        byteLength: input.figBytes.byteLength,
-        formatVersion: 1
-      }
+      const metadata = recoverySnapshotMeta(input)
       snapshots.set(input.id, {
         ...metadata,
         figBytes: new Uint8Array(input.figBytes)

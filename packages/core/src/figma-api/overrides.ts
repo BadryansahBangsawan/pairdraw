@@ -7,8 +7,11 @@ import type {
   SceneNode,
   Stroke
 } from '@open-pencil/scene-graph'
-import { findInstanceAncestor } from '@open-pencil/scene-graph/instances'
-import type { InstanceOverrideState } from '@open-pencil/scene-graph/instances/overrides'
+import { findInstanceAncestor, isReplacedLayer } from '@open-pencil/scene-graph/instances'
+import {
+  overriddenVariableModeCollection,
+  type InstanceOverrideState
+} from '@open-pencil/scene-graph/instances/overrides'
 
 import type { NodeProxyInternals, ProxyThis } from './accessor-utils'
 import { assertProxyEditable, graph, raw } from './accessor-utils'
@@ -177,7 +180,10 @@ function editedFields(graph: SceneGraph, node: SceneNode, root: SceneNode): stri
   const fields = [
     ...(node.type === 'INSTANCE' ? node.instanceOverrides.self.keys() : []),
     ...(owner?.instanceOverrides.descendants.get(node.id)?.keys() ?? [])
-  ]
+  ].map((field) =>
+    // A mode set for one collection is an override of the layer's modes, as Figma lists it.
+    overriddenVariableModeCollection(field) === null ? field : 'variableModes'
+  )
   // The instance's own size counts once it differs, as a layer that grows it makes it.
   if (node.id === root.id) fields.push('width', 'height')
   return uniq(fields).filter((field) => differs(node, source, field))
@@ -221,6 +227,16 @@ function withoutEdits(graph: SceneGraph, state: InstanceOverrideState): Instance
  * components, keeping the values their component properties set.
  */
 function resetInstanceOverrides(graph: SceneGraph, root: SceneNode): void {
+  // A layer put in place of a component's layer goes, and the sync brings that layer back.
+  const replaced: string[] = []
+  const collect = (node: SceneNode) => {
+    for (const child of graph.getChildren(node.id)) {
+      if (isReplacedLayer(graph, child)) replaced.push(child.id)
+      else collect(child)
+    }
+  }
+  collect(root)
+  for (const id of replaced) graph.deleteNode(id)
   const visit = (node: SceneNode) => {
     if (node.type === 'INSTANCE')
       graph.updateNode(node.id, { instanceOverrides: withoutEdits(graph, node.instanceOverrides) })

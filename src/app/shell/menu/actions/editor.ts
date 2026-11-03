@@ -12,6 +12,7 @@ import { appPreferences } from '@/app/settings/preferences/store'
 import { onCanvasSelection } from '@/app/shell/commands/focused'
 import { removeSelectionAutoLayout } from '@/app/shell/keyboard/auto-layout'
 import { exportFramesToPDF } from '@/app/shell/menu/actions/pdf'
+import { togglePresentation } from '@/app/slides/present'
 
 type TextFormatUpdates = {
   fontWeight?: number
@@ -87,6 +88,7 @@ export function createSharedEditorMenuActions(
       store.state.showUI = !store.state.showUI
     },
     'toggle-preview': () => store.togglePlay(),
+    present: () => togglePresentation(store),
     'insert-icon': () => {
       store.state.iconPickerOpen = true
     },

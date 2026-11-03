@@ -33,6 +33,10 @@ const toolCall = computed(
 )
 
 const toolName = computed(() => toolCall.value.title ?? ai.value.unknownTool)
+/** The app's own requests say what is asked in the person's language; an agent's name the tool. */
+const description = computed(
+  () => permission.value?.description ?? ai.value.permissionRequest({ tool: toolName.value })
+)
 
 const toolInput = computed(() => {
   const raw = toolCall.value.rawInput
@@ -70,7 +74,7 @@ function handleDismiss() {
     </AlertDialogTitle>
 
     <AlertDialogDescription class="mt-2 text-xs text-muted">
-      {{ ai.permissionRequest({ tool: toolName }) }}
+      {{ description }}
     </AlertDialogDescription>
 
     <pre

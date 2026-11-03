@@ -20,6 +20,7 @@ import {
 } from '#core/vector'
 import { evalCubic, segmentToAbsolute } from '#core/vector/curve-math'
 
+import { drawNodeEditTransformBox } from './node-edit/transform-box'
 import { drawRegionHatch } from './region-hatch'
 import type { SkiaRenderer, RenderOverlays } from './renderer'
 
@@ -41,6 +42,12 @@ export interface NodeEditOverlayState {
   hoveredHandleInfo?: HandleInfo
   hoveredRegion?: number | null
   selectedRegions?: Set<number>
+  /** While the cut tool is picked up there is no transform box. */
+  cutTool?: boolean
+  /** False while presses go to a tool other than Select, which has no transform box. */
+  pointsTransformable?: boolean
+  /** The corners of a transform box a drag is turning or scaling. */
+  transformBox?: Vector[] | null
 }
 
 // Blue = rgb(59,130,246) ≈ 0.23, 0.51, 0.96
@@ -127,6 +134,9 @@ export function drawNodeEditOverlay(
     selectedHandles,
     hovered
   )
+
+  // The transform box around two selected points or more, under the points themselves
+  drawNodeEditTransformBox(r, canvas, editState)
 
   // Draw vertex circles
   drawEditVertices(r, canvas, vertices, selectedVertexIndices, toScreen)

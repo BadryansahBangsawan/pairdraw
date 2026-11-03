@@ -29,6 +29,7 @@ import type { ViewportTransform } from '@open-pencil/core/geometry'
 import { PlayIslands, useCanvasInput } from '@open-pencil/vue/canvas'
 import { useCanvasDrop } from '@open-pencil/vue/canvas/drop'
 import { useCanvasIssueMarkers } from '@open-pencil/vue/canvas/issues'
+import { useCanvasLinks } from '@open-pencil/vue/canvas/links'
 import { useCanvasVirtualReference } from '@open-pencil/vue/canvas/overlays'
 import { useCanvasStatusLabels } from '@open-pencil/vue/canvas/statuses'
 import { useCanvas } from '@open-pencil/vue/canvas/surface'
@@ -56,6 +57,7 @@ import { floatingSurface } from '@/theme/overlay'
 import CanvasMenu from './canvas/CanvasMenu.vue'
 import CanvasLabelEditor from './canvas/labels/CanvasLabelEditor.vue'
 import { canvasLabelPresentation } from './canvas/labels/presentation'
+import TextLinkEditor from './canvas/links/TextLinkEditor.vue'
 import NumberField from './inputs/NumberField.vue'
 
 const { paneId } = defineProps<{
@@ -208,6 +210,9 @@ const { detailMarker: hoveredIssueMarker, cursor: issueMarkerCursor } = useCanva
 )
 
 useTextEdit(canvasRef, store, { isEnabled: () => isActivePane.value })
+const { cursor: linkCursor } = useCanvasLinks(canvasRef, store, {
+  isEnabled: () => isActivePane.value
+})
 const { isDraggingOver } = useCanvasDrop(canvasRef, store, activatePane)
 
 const valueFieldIcons = {
@@ -268,7 +273,7 @@ const valueEditorIcon = computed(() => {
 const cursor = computed(() =>
   toolCursor(
     store.state.activeTool,
-    issueMarkerCursor.value ?? statusLabelCursor.value ?? cursorOverride.value
+    issueMarkerCursor.value ?? statusLabelCursor.value ?? linkCursor.value ?? cursorOverride.value
   )
 )
 </script>
@@ -360,6 +365,7 @@ const cursor = computed(() =>
           @stop="followView.stop"
         />
         <CommentsLayer v-if="isActivePane" :canvas-el="canvasRef" :drawn="drawnView" />
+        <TextLinkEditor v-if="isActivePane" :canvas="canvasRef" />
         <PreparationOverlay
           v-if="store.state.preparation && store.state.preparation.kind !== 'font-retry'"
           :preparation="store.state.preparation"

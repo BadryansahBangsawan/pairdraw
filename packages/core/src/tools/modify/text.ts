@@ -6,6 +6,7 @@ import type { FigmaAPI, FigmaNodeProxy } from '#core/figma-api'
 import type { FigmaFontName, FigmaFontNameInput } from '#core/figma-api/fonts/names'
 import type { FigmaVariationSettings } from '#core/figma-api/fonts/variations'
 import { OpenPencilAPI } from '#core/openpencil-api'
+import { normalizeLinkURL } from '#core/text/hyperlink'
 import { collectNodeFontFaces } from '#core/text/requirements/collect'
 import {
   toolNumber,
@@ -14,6 +15,55 @@ import {
   nodeNotFound,
   toolFailure
 } from '#core/tools/schema'
+
+/**
+ * A link a text tool sets, as the editor's link field takes it: a web or mail address, with
+ * `https:` or `mailto:` added when typed without a scheme. Null or blank removes the link.
+ */
+const hyperlinkInputSchema = v.optional(
+  v.pipe(
+    v.nullable(v.string()),
+    v.description(
+      'Link the text opens: an http(s) or mailto address ("example.com" becomes https://example.com, "hi@example.com" becomes mailto:). null or "" removes the link. Links are not underlined automatically; set text_decoration for that.'
+    )
+  )
+)
+
+/**
+ * A scheme at the start of a typed link, even with a digit after its colon (`tel:123`), unless it
+ * reads as a host and port (`localhost:3000`, `example.com:8080`), which gets `https://`.
+ */
+const TYPED_SCHEME = /^([a-z][a-z\d+.-]*):/i
+
+/** A web address in the form the Figma API's link setter takes: `http(s)://host…`. */
+const WEB_URL = /^https?:\/\/[^\s/?#]+\S*$/
+
+/** Whether a typed link names a scheme other than the http, https, and mailto links take. */
+function hasForeignScheme(typed: string): boolean {
+  const scheme = TYPED_SCHEME.exec(typed)?.[1]?.toLowerCase()
+  if (!scheme || scheme.includes('.') || scheme === 'localhost') return false
+  return !['http', 'https', 'mailto'].includes(scheme)
+}
+
+/** What setting `hyperlink` asks for: no change, a removal, a URL, or an address it refuses. */
+function requestedHyperlink(
+  hyperlink: string | null | undefined
+): { link: { type: 'URL'; value: string } | null } | { error: string } | null {
+  if (hyperlink === undefined) return null
+  if (hyperlink === null || hyperlink.trim() === '') return { link: null }
+  const url = hasForeignScheme(hyperlink.trim()) ? null : normalizeLinkURL(hyperlink)
+  if (!url) {
+    return {
+      error: `"${hyperlink}" is not a link the editor opens: use an http, https, or mailto address`
+    }
+  }
+  // Figma keeps schemes in lower case and web addresses as `scheme://host`, so a loosely typed
+  // `http:example.com` is written as the URL it parses to.
+  const lowered = url.replace(TYPED_SCHEME, (scheme) => scheme.toLowerCase())
+  const value =
+    lowered.startsWith('mailto:') || WEB_URL.test(lowered) ? lowered : new URL(lowered).href
+  return { link: { type: 'URL', value } }
+}
 
 /** The fonts a text layer uses, which an edit that lays it out again needs loaded. */
 export function textFonts(figma: FigmaAPI, id: string): FigmaFontNameInput[] {
@@ -138,7 +188,7 @@ function rangeFont(
 export const setFontRange = defineTool({
   name: 'set_font_range',
 
-  description: 'Set font properties for a text range.',
+  description: 'Set font properties, color, or a link for a text range.',
   execution: { kind: 'sync', mutation: 'properties' },
   input: v.strictObject({
     id: nodeIdInputSchema,
@@ -148,7 +198,8 @@ export const setFontRange = defineTool({
     size: v.optional(toolNumber(v.pipe(v.number(), v.minValue(1), v.description('Font size')))),
     style: v.optional(v.pipe(v.string(), v.description('Font style'))),
     variations: variationsInputSchema,
-    color: v.optional(v.pipe(v.string(), v.description('Text color (hex)')))
+    color: v.optional(v.pipe(v.string(), v.description('Text color (hex)'))),
+    hyperlink: hyperlinkInputSchema
   }),
   fonts: (figma, args) => {
     const node = figma.getNodeById(args.id)
@@ -162,11 +213,21 @@ export const setFontRange = defineTool({
     const node = figma.getNodeById(args.id)
     if (!node) return nodeNotFound(args.id)
     const { start, end } = args
-    if (!args.family && !args.size && !args.style && !args.variations && !args.color) {
+    if (
+      !args.family &&
+      !args.size &&
+      !args.style &&
+      !args.variations &&
+      !args.color &&
+      args.hyperlink === undefined
+    ) {
       return {
-        error: 'set_font_range needs at least one of family, size, style, variations, or color'
+        error:
+          'set_font_range needs at least one of family, size, style, variations, color, or hyperlink'
       }
     }
+    const hyperlink = requestedHyperlink(args.hyperlink)
+    if (hyperlink && 'error' in hyperlink) return hyperlink
     // The range methods reject an empty range or one past the text, before changing anything.
     try {
       if (args.size) node.setRangeFontSize(start, end, args.size)
@@ -176,10 +237,15 @@ export const setFontRange = defineTool({
       if (args.color) {
         node.setRangeFills(start, end, [{ type: 'SOLID', color: parseColor(args.color) }])
       }
+      if (hyperlink) node.setRangeHyperlink(start, end, hyperlink.link)
     } catch (error) {
       return toolFailure(error)
     }
-    return { id: args.id, range: { start, end } }
+    return {
+      id: args.id,
+      range: { start, end },
+      ...(hyperlink ? { hyperlink: hyperlink.link?.value ?? null } : {})
+    }
   }
 })
 
@@ -208,7 +274,7 @@ export const setTextProperties = defineTool({
   name: 'set_text_properties',
 
   description:
-    'Set text layout properties: alignment, auto-resize, text case, decoration, truncation.',
+    'Set text layout properties: alignment, auto-resize, text case, decoration, truncation, and a link for the whole text.',
   execution: { kind: 'sync', mutation: 'properties' },
   input: v.strictObject({
     id: v.pipe(v.string(), v.description('Text node ID')),
@@ -232,13 +298,17 @@ export const setTextProperties = defineTool({
     ),
     text_decoration: v.optional(
       v.pipe(v.picklist(['NONE', 'UNDERLINE', 'STRIKETHROUGH']), v.description('Text decoration'))
-    )
+    ),
+    hyperlink: hyperlinkInputSchema
   }),
   fonts: (figma, { id }) => textFonts(figma, id),
   execute: (figma, args) => {
     const node = figma.getNodeById(args.id)
     if (!node) return nodeNotFound(args.id)
     if (node.type !== 'TEXT') return { error: `Node "${args.id}" is not a TEXT node` }
+    // Refused before anything changes, so a bad address leaves the text as it was.
+    const hyperlink = requestedHyperlink(args.hyperlink)
+    if (hyperlink && 'error' in hyperlink) return hyperlink
     const updated: string[] = []
     if (args.align_horizontal !== undefined) {
       node.textAlignHorizontal = args.align_horizontal
@@ -259,6 +329,14 @@ export const setTextProperties = defineTool({
     if (args.text_decoration !== undefined) {
       node.textDecoration = args.text_decoration
       updated.push('textDecoration')
+    }
+    if (hyperlink) {
+      try {
+        node.hyperlink = hyperlink.link
+      } catch (error) {
+        return toolFailure(error)
+      }
+      updated.push('hyperlink')
     }
     return { id: args.id, updated }
   }

@@ -7,5 +7,28 @@
   "settingsTitle": "Récupération",
   "settingsDescription": "Gérez les copies locales de récupération des documents non enregistrés.",
   "restore": "Restaurer",
-  "discard": "Supprimer"
+  "discard": "Supprimer",
+  "drafts": "Brouillons",
+  "draftsDescription": "Les nouveaux designs restent ici, sur cet appareil, jusqu’à ce que vous les enregistriez ailleurs.",
+  "loadingDrafts": "Chargement des brouillons",
+  "noDrafts": "Aucun brouillon",
+  "noDraftsDescription": "Un nouveau design est conservé ici comme brouillon pendant que vous travaillez.",
+  "draftsOff": "Les brouillons sont désactivés",
+  "draftsOffDescription": "Les nouveaux designs sont conservés ici uniquement si « Conserver automatiquement le travail non enregistré » est activé dans les réglages et si ce navigateur conserve les données du site.",
+  "deleteDraft": "Supprimer le brouillon",
+  "deleteDraftConfirmation": "Supprimer le brouillon « {name} » ?",
+  "deleteDraftsConfirmation": {
+    "one": "Supprimer {count} brouillon ?",
+    "many": "Supprimer {count} brouillons ?"
+  },
+  "deleteDraftDescription": "Les brouillons n’existent que sur cet appareil. Cette action est irréversible.",
+  "deleteDraftFailed": "Impossible de supprimer le brouillon « {name} ». Réessayez.",
+  "draftUnavailable": "Ce brouillon n’est plus disponible.",
+  "recoveredChangesTitle": "Modifications récupérées",
+  "recoveredChangesDescription": "« {name} » contient des modifications du {time} qui n’ont jamais été enregistrées dans le fichier. Enregistrez-les dans le fichier, dans un nouveau fichier, ou abandonnez-les.",
+  "saveRecovered": "Enregistrer",
+  "saveRecoveredAs": "Enregistrer sous…",
+  "discardRecovered": "Ne pas enregistrer",
+  "recoveredChangesFailed": "Impossible d’enregistrer les modifications récupérées : {error}",
+  "backupUnavailable": "La sauvegarde de ces modifications n’est plus disponible."
 }

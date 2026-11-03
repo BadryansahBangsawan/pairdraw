@@ -1,5 +1,7 @@
+import { agentMessageDefaults, agentMessages } from '#vue/i18n/messages/agents'
 import { aiMessageDefaults, aiMessages } from '#vue/i18n/messages/ai'
 import { automationMessageDefaults, automationMessages } from '#vue/i18n/messages/automation'
+import { chatContextMessageDefaults, chatContextMessages } from '#vue/i18n/messages/chat-context'
 import { cloudMessageDefaults, cloudMessages } from '#vue/i18n/messages/cloud/editor'
 import { cloudPortalMessageDefaults, cloudPortalMessages } from '#vue/i18n/messages/cloud/portal'
 import { codeMessageDefaults, codeMessages } from '#vue/i18n/messages/code'
@@ -14,6 +16,7 @@ import { credentialsMessageDefaults, credentialsMessages } from '#vue/i18n/messa
 import { designCheckMessageDefaults, designCheckMessages } from '#vue/i18n/messages/design-check'
 import { diagnosticsMessageDefaults, diagnosticsMessages } from '#vue/i18n/messages/diagnostics'
 import { editorMessageDefaults, editorMessages } from '#vue/i18n/messages/editor'
+import { exploreMessageDefaults, exploreMessages } from '#vue/i18n/messages/explore'
 import { figJamMessageDefaults, figJamMessages } from '#vue/i18n/messages/figjam'
 import { filesMessageDefaults, filesMessages } from '#vue/i18n/messages/files'
 import { fontsMessageDefaults, fontsMessages } from '#vue/i18n/messages/fonts'
@@ -25,7 +28,9 @@ import { recoveryMessageDefaults, recoveryMessages } from '#vue/i18n/messages/re
 import { renameMessageDefaults, renameMessages } from '#vue/i18n/messages/rename'
 import { renderingMessageDefaults, renderingMessages } from '#vue/i18n/messages/rendering'
 import { settingsMessageDefaults, settingsMessages } from '#vue/i18n/messages/settings'
+import { shaderMessageDefaults, shaderMessages } from '#vue/i18n/messages/shaders'
 import { shapeMessageDefaults, shapeMessages } from '#vue/i18n/messages/shapes'
+import { slidesMessageDefaults, slidesMessages } from '#vue/i18n/messages/slides'
 import { statusMessageDefaults, statusMessages } from '#vue/i18n/messages/statuses'
 import { storageMessageDefaults, storageMessages } from '#vue/i18n/messages/storage'
 import { toolMessageDefaults, toolMessages } from '#vue/i18n/messages/tools'
@@ -37,8 +42,10 @@ import {
 } from '#vue/i18n/messages/variables/types'
 
 export {
+  agentMessages,
   aiMessages,
   automationMessages,
+  chatContextMessages,
   codeMessages,
   collaborationMessages,
   commandMessages,
@@ -48,6 +55,7 @@ export {
   designCheckMessages,
   diagnosticsMessages,
   editorMessages,
+  exploreMessages,
   figJamMessages,
   filesMessages,
   fontsMessages,
@@ -59,7 +67,9 @@ export {
   renderingMessages,
   renameMessages,
   settingsMessages,
+  shaderMessages,
   shapeMessages,
+  slidesMessages,
   statusMessages,
   storageMessages,
   toolMessages,
@@ -71,8 +81,10 @@ export {
 }
 
 export const messageDefaults = {
+  agents: agentMessageDefaults,
   ai: aiMessageDefaults,
   automation: automationMessageDefaults,
+  chatContext: chatContextMessageDefaults,
   code: codeMessageDefaults,
   collaboration: collaborationMessageDefaults,
   commands: commandMessageDefaults,
@@ -82,6 +94,7 @@ export const messageDefaults = {
   designCheck: designCheckMessageDefaults,
   diagnostics: diagnosticsMessageDefaults,
   editor: editorMessageDefaults,
+  explore: exploreMessageDefaults,
   figjam: figJamMessageDefaults,
   files: filesMessageDefaults,
   fonts: fontsMessageDefaults,
@@ -93,7 +106,9 @@ export const messageDefaults = {
   rendering: renderingMessageDefaults,
   rename: renameMessageDefaults,
   settings: settingsMessageDefaults,
+  shaders: shaderMessageDefaults,
   shapes: shapeMessageDefaults,
+  slides: slidesMessageDefaults,
   statuses: statusMessageDefaults,
   storage: storageMessageDefaults,
   tools: toolMessageDefaults,

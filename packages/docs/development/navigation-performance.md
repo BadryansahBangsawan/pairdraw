@@ -1,6 +1,6 @@
 # Navigation performance benchmark
 
-The navigation benchmark measures the complete wheel/trackpad-to-render pipeline. It is intentionally separate from the synchronous microbenchmark in `tests/e2e/viewport/zoom-pan.spec.ts`: accepting JavaScript calls quickly does not prove smooth navigation.
+The navigation benchmark measures the complete wheel/trackpad-to-render pipeline. It is intentionally separate from the synchronous microbenchmark in `tests/e2e/viewport/zoom/pan.spec.ts`: accepting JavaScript calls quickly does not prove smooth navigation.
 
 ## Renderer lifecycle and ownership
 

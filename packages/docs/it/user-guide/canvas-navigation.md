@@ -29,6 +29,12 @@ Con **Zoom con la rotellina** in **Impostazioni → Editor**, la rotellina ingra
 | Adatta documento | <kbd>⌘</kbd><kbd>1</kbd> | <kbd>Ctrl</kbd><kbd>1</kbd> |
 | Inquadra selezione | <kbd>⌘</kbd><kbd>2</kbd> | <kbd>Ctrl</kbd><kbd>2</kbd> |
 
+## Strumento Zoom
+
+Tieni premuto <kbd>Z</kbd> e fai clic per ingrandire sul puntatore, oppure fai clic con <kbd>Option</kbd>/<kbd>Alt</kbd> per ridurre; trascina per ingrandire l'area che delimiti. Rilasciando <kbd>Z</kbd> torni allo strumento precedente. Un tocco breve di <kbd>Z</kbd> lascia attivo lo strumento Zoom, presente anche nel menu dello strumento Mano nella barra degli strumenti.
+
+Adatta alla vista, alla selezione e al 100%, i livelli del menu di zoom e la cornice successiva o precedente scorrono fino alla loro vista invece di saltare. Saltano quando le animazioni sono disattivate, la modalità Ultralight è attiva o il sistema chiede di ridurre il movimento.
+
 ## Righelli
 
 I righelli sono nascosti finché non li attivi con **Visualizza → Righelli** o <kbd>Shift</kbd> + <kbd>R</kbd>.

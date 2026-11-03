@@ -1,0 +1,56 @@
+{
+  "extensionName": {
+    "message": "Pairdraw Web Capture"
+  },
+  "extensionDescription": {
+    "message": "复制网页或其中的元素，并以可编辑、带样式的图层粘贴到 Pairdraw。"
+  },
+  "actionTitle": {
+    "message": "复制到 Pairdraw"
+  },
+  "popupTitle": {
+    "message": "复制到 Pairdraw"
+  },
+  "copyPage": {
+    "message": "复制页面"
+  },
+  "copyPageHint": {
+    "message": "按你看到的样子复制整个页面"
+  },
+  "pickElement": {
+    "message": "选择元素"
+  },
+  "pickElementHint": {
+    "message": "点击页面的任意部分"
+  },
+  "includeImages": {
+    "message": "包含其他网站的图片"
+  },
+  "includeImagesHint": {
+    "message": "捕获时请求读取任意网站图片的权限。"
+  },
+  "statusCopying": {
+    "message": "正在复制…"
+  },
+  "statusCopied": {
+    "message": "已复制。请粘贴到 Pairdraw 画布中。"
+  },
+  "statusUnavailable": {
+    "message": "无法捕获此页面。请在普通网页上重试。"
+  },
+  "statusNeedsSecurePage": {
+    "message": "复制需要通过 HTTPS 提供的页面。"
+  },
+  "statusFailed": {
+    "message": "无法复制捕获内容：$ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Network error"
+      }
+    }
+  },
+  "pickerHint": {
+    "message": "点击元素或按 Enter 即可复制 · ↑ ↓ 移到父元素或子元素 · Esc 取消"
+  }
+}

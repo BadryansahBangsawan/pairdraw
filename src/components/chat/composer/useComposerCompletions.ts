@@ -7,6 +7,7 @@ import { commandCandidates, referenceCandidates } from '@/app/ai/chat/references
 import { useAIChat } from '@/app/ai/chat/use'
 import { enabledSkills, refreshSkills } from '@/app/ai/skills/library'
 import { getActiveEditorStoreOrNull } from '@/app/editor/active-store'
+import { useSkillMessages } from '@/components/settings/skills/messages'
 
 import { commandCompletion, referenceCompletion } from './complete'
 
@@ -16,6 +17,7 @@ import { commandCompletion, referenceCompletion } from './complete'
  */
 export function useComposerCompletions() {
   const ai = useAIMessages()
+  const skillMessages = useSkillMessages()
   const { providerID } = useAIChat()
 
   function acpAgentId(): string | null {
@@ -36,7 +38,8 @@ export function useComposerCompletions() {
       const agentId = acpAgentId()
       return commandCandidates(
         agentId ? (agentCommands.value[agentId] ?? []) : null,
-        enabledSkills.value
+        enabledSkills.value,
+        skillMessages.description
       )
     }, sections),
     referenceCompletion((query) => {

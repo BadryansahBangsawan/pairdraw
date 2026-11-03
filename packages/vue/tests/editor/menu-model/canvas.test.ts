@@ -8,9 +8,13 @@ import { buildCanvasContextMenu } from '#vue/editor/menu-model/canvas'
 import type { CanvasMenuOptions } from '#vue/editor/menu-model/canvas'
 
 /** The canvas menu's command ids for a selection that is an icon or not. */
-function menuIds(isIcon: boolean) {
+function menuIds(isIcon: boolean, enabled: ReadonlySet<EditorCommandId> = new Set()) {
   const menu = buildCanvasContextMenu({
-    commandMenuItem: (id: EditorCommandId) => ({ id, label: id }),
+    commandMenuItem: (id: EditorCommandId) => ({
+      id,
+      label: id,
+      ...(enabled.has(id) ? { disabled: false } : {})
+    }),
     otherPages: [],
     moveSelectionToPage: (pageId: string) => pageId,
     selection: {
@@ -33,5 +37,12 @@ describe('canvas menu for icons', () => {
   test('offers Detach icon only for icons', () => {
     expect(menuIds(true)).toContain('selection.detachIcon')
     expect(menuIds(false)).not.toContain('selection.detachIcon')
+  })
+})
+
+describe('canvas menu for images', () => {
+  test('offers Crop image only while the selection can be cropped', () => {
+    expect(menuIds(false, new Set(['selection.cropImage']))).toContain('selection.cropImage')
+    expect(menuIds(false)).not.toContain('selection.cropImage')
   })
 })

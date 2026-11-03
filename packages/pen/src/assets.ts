@@ -58,11 +58,29 @@ export function isDataURL(url: string): boolean {
   return /^data:/i.test(url)
 }
 
+/** How an imported document's image files are named in the document importing it. */
+export const IMPORTED_IMAGE_PREFIX = 'pen-import:'
+
+/**
+ * An image URL `importedImageURL` gave an imported document's file, split into the alias of the
+ * import it came from and its URL there; null for any other URL.
+ */
+export function parseImportedImageURL(url: string): { alias: string; url: string } | null {
+  if (!url.startsWith(IMPORTED_IMAGE_PREFIX)) return null
+  const rest = url.slice(IMPORTED_IMAGE_PREFIX.length)
+  const slash = rest.indexOf('/')
+  if (slash <= 0) return null
+  return { alias: rest.slice(0, slash), url: rest.slice(slash + 1) }
+}
+
 /** What a document draws from outside itself. */
 export interface PenAssets {
   /** Every icon, each way it is drawn. */
   icons: PenIconRequest[]
-  /** Images to load: files relative to the document, and data URLs. */
+  /**
+   * Images to load: files relative to the document, data URLs, and files of the documents it
+   * imports, by the names `importedImageURL` gives them.
+   */
   images: string[]
 }
 
@@ -74,7 +92,8 @@ function paintList(paints: PenPaints | undefined): PenPaint[] {
 function paintImages(paints: PenPaints | undefined, images: Set<string>) {
   for (const paint of paintList(paints)) {
     if (typeof paint === 'object' && paint.type === 'image' && typeof paint.url === 'string') {
-      if (isDocumentAssetPath(paint.url) || isDataURL(paint.url)) images.add(paint.url)
+      const { url } = paint
+      if (isDocumentAssetPath(url) || isDataURL(url) || parseImportedImageURL(url)) images.add(url)
     }
   }
 }

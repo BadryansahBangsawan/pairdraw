@@ -1,4 +1,5 @@
 import type { McpServer } from '@agentclientprotocol/sdk'
+import { compact } from 'es-toolkit'
 
 import {
   MCP_AGENT_HEADER,
@@ -8,8 +9,12 @@ import {
 
 import { getMCPServerURL } from '@/app/automation/mcp/spawn'
 import { describeDiagnosticError, recordMCPConnectionFailure } from '@/app/diagnostics'
-import { appCredentialServices } from '@/app/settings/credentials/app'
+import { isTauri } from '@/app/tauri/env'
 
+import { mcpAuthorizationHeader } from './auth'
+import { readMCPConnectionEnv } from './stdio/credentials'
+import { tauriMCPStdio, type MCPStdioNative } from './stdio/native'
+import { mcpStdioRequest } from './stdio/request'
 import { enabledMCPConnections } from './store'
 import type { MCPConnection } from './types'
 
@@ -35,29 +40,62 @@ export function builtInMCPServer(options: BuiltInMCPServerOptions): McpServer {
   }
 }
 
-async function externalMCPServer(connection: MCPConnection): Promise<McpServer> {
-  const headers = []
-  if (connection.authentication.type === 'bearer') {
+/** What handing local commands to a coding agent reaches outside this module; tests pass their own. */
+export interface ACPMCPServerDependencies {
+  /** Whether this app can run local commands: only the desktop shell can. */
+  desktop: () => boolean
+  stdio: Pick<MCPStdioNative, 'approve'>
+}
+
+const defaultACPMCPServerDependencies: ACPMCPServerDependencies = {
+  desktop: isTauri,
+  stdio: tauriMCPStdio
+}
+
+async function externalMCPServer(
+  connection: MCPConnection,
+  dependencies: ACPMCPServerDependencies
+): Promise<McpServer | null> {
+  const { transport } = connection
+  if (transport.type === 'stdio') {
+    // Only the desktop runs local commands, and only ones the person approved in the shell's
+    // own dialog, as the built-in chat does; the agent then starts the approved program itself.
+    if (!dependencies.desktop()) return null
+    const env = await readMCPConnectionEnv(connection.id)
+    let program: string
     try {
-      const token = await appCredentialServices.resolver.resolve(
-        connection.authentication.credentialRef
-      )
-      if (!token) throw new Error('MCP connection needs a bearer token')
-      headers.push({ name: 'Authorization', value: `Bearer ${token}` })
+      program = await dependencies.stdio.approve(mcpStdioRequest({ ...connection, transport }, env))
     } catch (error) {
       recordMCPConnectionFailure({ operation: 'connect', ...describeDiagnosticError(error) })
-      throw error
+      return null
+    }
+    return {
+      name: connection.name,
+      command: program,
+      args: transport.args,
+      env: Object.entries(env).map(([name, value]) => ({ name, value }))
     }
   }
+  const authorization = await mcpAuthorizationHeader(connection)
   return {
     type: 'http',
     name: connection.name,
-    url: connection.transport.url,
-    headers
+    url: transport.url,
+    headers: authorization ? [{ name: 'Authorization', value: authorization }] : []
   }
 }
 
-export async function buildACPMCPServers(options: BuiltInMCPServerOptions): Promise<McpServer[]> {
-  const external = await Promise.all(enabledMCPConnections.value.map(externalMCPServer))
-  return [builtInMCPServer(options), ...external]
+/**
+ * The MCP servers a coding agent gets: the app's own, then the enabled external ones. A local
+ * command is left out in the browser and when the person declines it.
+ */
+export async function buildACPMCPServers(
+  options: BuiltInMCPServerOptions,
+  dependencies: ACPMCPServerDependencies = defaultACPMCPServerDependencies
+): Promise<McpServer[]> {
+  // The shell asks about one command line at a time, so approval dialogs never stack.
+  const external = await Promise.all(
+    enabledMCPConnections.value.map((connection) => externalMCPServer(connection, dependencies))
+  )
+  return [builtInMCPServer(options), ...compact(external)]
 }

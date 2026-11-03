@@ -18,7 +18,7 @@ Los objetos pueden fluir en horizontal, vertical o con salto de línea. La separ
 
 ## Alineación
 
-En el eje principal están disponibles inicio, centro, final y espacio entre elementos. En el eje transversal se ofrecen inicio, centro, final y estirar.
+En el eje principal están disponibles inicio, centro, final, espacio entre elementos y espacio alrededor. Con espacio alrededor, cada objeto recibe una parte igual del espacio libre, la mitad a cada lado, además de la separación; se elige en el menú del campo de separación. En el eje transversal se ofrecen inicio, centro, final y estirar.
 
 ## Tamaño
 

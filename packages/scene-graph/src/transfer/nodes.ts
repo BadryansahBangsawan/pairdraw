@@ -1,5 +1,9 @@
 import { cloneNodeProps } from '../copy'
-import { overriddenBindingField, remapInstanceOverrideState } from '../instances/overrides'
+import {
+  isLayerReferenceOverride,
+  overriddenBindingField,
+  remapInstanceOverrideState
+} from '../instances/overrides'
 import { remapStyleRunReferences, styleRunReferences } from '../text/references'
 import type { ComponentPropertyType, SceneNode } from '../types'
 import { requireTransferReference as required } from './references'
@@ -35,9 +39,7 @@ export function semanticTransferReferences(node: SceneNode): string[] {
       ...[...node.instanceOverrides.descendants.values()].flatMap((fields) => [...fields])
     ].flatMap(([field, value]) =>
       typeof value === 'string' &&
-      (field === 'componentId' ||
-        field === 'sourceComponentId' ||
-        overriddenBindingField(field) !== null)
+      (isLayerReferenceOverride(field) || overriddenBindingField(field) !== null)
         ? [value]
         : []
     )

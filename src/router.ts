@@ -22,6 +22,8 @@ const router = createRouter({
     // Cloud invitations and links; the app takes their secret out of the address on start.
     { path: '/invitations/:invitationId', component: WorkspaceView },
     { path: '/share/:shareId', component: WorkspaceView },
+    // A document a public profile lists, open to anyone, signed in or not.
+    { path: '/view/:documentId', component: WorkspaceView },
     // A Cloud document, or one of its versions, for whoever signs in with access to it.
     { path: '/documents/:documentId', component: WorkspaceView }
   ]

@@ -14,5 +14,7 @@
   "shape": "Kształt",
   "connector": "Łącznik",
   "hand": "Dłoń",
-  "comment": "Komentarz"
+  "comment": "Komentarz",
+  "zoom": "Powiększenie",
+  "scale": "Skalowanie"
 }

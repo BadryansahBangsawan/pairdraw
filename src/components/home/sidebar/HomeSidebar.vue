@@ -10,7 +10,7 @@ import {
 } from 'reka-ui'
 import { computed } from 'vue'
 
-import { useCloudMessages, useFileMessages } from '@open-pencil/vue/i18n'
+import { useCloudMessages, useFileMessages, useRecoveryMessages } from '@open-pencil/vue/i18n'
 
 import AccountAvatar from '@/components/presence/AccountAvatar.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -21,9 +21,9 @@ import Tip from '@/components/ui/overlay/Tip.vue'
 import type { HomeCloudAccount, HomeLocation } from '../cloud/types'
 
 /**
- * Where the home tab can show documents from: recent files, the design systems a new design can
- * start from, each Cloud workspace of the signed-in account, documents shared with that account,
- * and the configured storage bucket.
+ * Where the home tab can show documents from: recent files, the drafts of new designs, the design
+ * systems a new design can start from, each Cloud workspace of the signed-in account, documents
+ * shared with that account, and the configured storage bucket.
  */
 const {
   active,
@@ -57,6 +57,7 @@ const ui = sideList({ surface: 'card' })
 const menuUI = menu()
 const t = useCloudMessages()
 const files = useFileMessages()
+const recovery = useRecoveryMessages()
 const isActive = (location: HomeLocation) =>
   active.kind === location.kind && active.id === location.id
 const workspaceLocations = computed(() =>
@@ -78,6 +79,15 @@ const workspaceLocations = computed(() =>
       >
         <icon-lucide-clock :class="ui.icon()" />
         <span :class="ui.label()">{{ t.homeRecent }}</span>
+      </button>
+      <button
+        type="button"
+        :class="ui.item()"
+        :data-active="isActive({ kind: 'drafts', id: 'drafts' })"
+        @click="emit('select', { kind: 'drafts', id: 'drafts' })"
+      >
+        <icon-lucide-file-pen-line :class="ui.icon()" />
+        <span :class="ui.label()">{{ recovery.drafts }}</span>
       </button>
       <button
         type="button"

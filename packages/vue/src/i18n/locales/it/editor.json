@@ -16,5 +16,19 @@
   "toggleAIChat": "Chat AI ({shortcut})",
   "startPreview": "Anteprima ({shortcut})",
   "toggleLayersPanel": "Pannello livelli",
-  "togglePropertiesPanel": "Pannello proprietà"
+  "togglePropertiesPanel": "Pannello proprietà",
+  "textLink": "Link",
+  "addTextLink": "Aggiungi link",
+  "editTextLink": "Modifica link",
+  "removeTextLink": "Rimuovi link",
+  "openTextLink": "Apri link",
+  "textLinkAddress": "Indirizzo del link",
+  "textLinkPlaceholder": "Incolla un link o un indirizzo email",
+  "textLinkInvalid": "Usa un indirizzo web o un indirizzo email.",
+  "textLinkMixed": "Più link",
+  "textLinkToLayer": "Collega a {name}",
+  "embedWaiting": "In attesa della pagina host",
+  "embedWaitingDescription": "Il design si apre quando la pagina in cui è incorporato si collega.",
+  "embedInvalidOrigin": "Questo incorporamento non può collegarsi",
+  "embedInvalidOriginDescription": "Il suo link deve indicare l’origine della pagina che lo incorpora, ad esempio https://example.com."
 }

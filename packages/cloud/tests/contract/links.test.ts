@@ -5,6 +5,8 @@ import {
   cloudDocumentURL,
   cloudInvitationURL,
   cloudShareURL,
+  cloudPublicDocumentURL,
+  cloudPublicProfilePath,
   parseCloudLinkPath
 } from '#cloud/contract'
 
@@ -47,9 +49,16 @@ test('link paths name their kind and decoded ID', () => {
   expect(parseCloudLinkPath('/share/s%201')).toEqual({ kind: 'share', id: 's 1' })
   expect(parseCloudLinkPath('/invitations/abc')).toEqual({ kind: 'invitations', id: 'abc' })
   expect(parseCloudLinkPath('/documents/abc')).toEqual({ kind: 'documents', id: 'abc' })
+  expect(parseCloudLinkPath('/view/abc')).toEqual({ kind: 'view', id: 'abc' })
   for (const path of ['/rooms/abc', '/share/abc/more', '/share/', '/share/%E0%A4', '/']) {
     expect(parseCloudLinkPath(path)).toBeNull()
   }
+})
+
+test('a public document link names the document on the server and carries no secret', () => {
+  const url = new URL(cloudPublicDocumentURL(server, 'doc-id'))
+  expect(url.href).toBe('https://company.example/view/doc-id')
+  expect(cloudPublicProfilePath('ada studio')).toBe('/u/ada%20studio')
 })
 
 test('desktop links carry the web link under the app scheme, with the secret in the fragment', () => {

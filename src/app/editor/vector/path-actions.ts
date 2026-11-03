@@ -5,6 +5,7 @@ import {
   duplicateVectorParts,
   joinEndpoints,
   nearestPointOnNetwork,
+  selectedVectorPoints,
   straightenSegment,
   toggleVertexSmooth,
   type VectorEditResult
@@ -22,14 +23,7 @@ const JOIN_MERGE_DISTANCE = 1
 
 /** The points a selection moves: selected points and the ends of selected segments. */
 export function selectedEditPoints(es: NodeEditState): number[] {
-  const points = new Set(es.selectedVertexIndices)
-  for (const index of es.selectedSegmentIndices) {
-    const segment = es.segments.at(index)
-    if (!segment) continue
-    points.add(segment.start)
-    points.add(segment.end)
-  }
-  return [...points].filter((index) => index >= 0 && index < es.vertices.length)
+  return selectedVectorPoints(es, es.selectedVertexIndices, es.selectedSegmentIndices)
 }
 
 function isEndPoint(es: NodeEditState, vertex: number) {

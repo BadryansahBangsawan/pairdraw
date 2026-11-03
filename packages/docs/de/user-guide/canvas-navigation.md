@@ -31,6 +31,12 @@ Mit **Mit dem Mausrad zoomen** unter **Einstellungen → Editor** zoomt das Maus
 
 Gesten über den Ebenen- und Eigenschaften-Panels werden nicht an die Arbeitsfläche weitergegeben.
 
+## Zoomwerkzeug
+
+Halten Sie <kbd>Z</kbd> gedrückt und klicken Sie, um am Zeiger hineinzuzoomen, oder klicken Sie mit <kbd>Option</kbd>/<kbd>Alt</kbd>, um herauszuzoomen; ziehen Sie einen Bereich auf, um auf ihn zu zoomen. Beim Loslassen von <kbd>Z</kbd> kehrt das vorherige Werkzeug zurück. Ein kurzes Tippen auf <kbd>Z</kbd> lässt das Zoomwerkzeug aktiv; es steht auch im Menü des Handwerkzeugs in der Werkzeugleiste.
+
+Zoom auf alles, auf die Auswahl und auf 100 %, die Stufen des Zoommenüs und der nächste oder vorherige Rahmen gleiten in ihre Ansicht, statt zu springen. Sie springen, wenn Animationen ausgeschaltet sind, der Ultralight-Modus aktiv ist oder das System reduzierte Bewegung verlangt.
+
 ## Lineale
 
 Lineale sind ausgeblendet, bis Sie sie mit **Ansicht → Lineale** oder <kbd>Shift</kbd> + <kbd>R</kbd> einblenden.

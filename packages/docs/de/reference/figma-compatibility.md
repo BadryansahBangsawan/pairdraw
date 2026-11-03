@@ -28,7 +28,7 @@ Vergleich der Funktionen von Figma Design mit dem aktuellen Stand von OpenPencil
 | Eigene Miniatur | 🔲 | Gespeicherte Dateien zeigen ihre erste Seite, wie Figma ohne Cover-Seite; keine eigene Auswahl |
 | Schrittweite | 🔲 | 1 px und 10 px, keine eigenen Werte |
 | Anwendungsmenü | ✅ | Browsermenü und native Tauri-Menüs |
-| AI-Werkzeuge | 🟡 | 126 Werkzeuge im AI-Chat, für Coding-Agents (ACP) und über MCP; Stockfotos und Bildvektorisierung; keine Bilderzeugung oder AI-Suche |
+| AI-Werkzeuge | 🟡 | 138 Werkzeuge im AI-Chat, für Coding-Agents (ACP) und über MCP; Stockfotos, Bildvektorisierung sowie Bilderzeugung, Entfernen und Ersetzen von Hintergründen und SVG-Erzeugung mit den eigenen Schlüsseln für Bilddienste; keine AI-Suche |
 
 ## Ebenen und Formen
 
@@ -76,7 +76,7 @@ Schatten, Ebenen-/Hintergrund-/Vordergrundunschärfe, Konturstärke, Enden, Verb
 
 ## Automatische Anordnung
 
-Flexbox, Grid, Richtung, Abstand, Innenabstand, Ausrichtung, Größenmodi, Umbruch, verschachtelte Anordnungen, Neuordnung durch Ziehen sowie Mindest- und Höchstmaße werden unterstützt.
+Flexbox, Grid, Richtung, Abstand, Innenabstand, Ausrichtung, Größenmodi, Umbruch, verschachtelte Anordnungen, Neuordnung durch Ziehen sowie Mindest- und Höchstmaße werden unterstützt. „Abstand ringsum“ gibt es nur in OpenPencil; Figma zeigt solche Rahmen als gleichmäßige Verteilung.
 
 ## Komponenten und Designsysteme
 

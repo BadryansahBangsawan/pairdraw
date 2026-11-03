@@ -5,7 +5,7 @@ import type { SnapGuide } from '@open-pencil/scene-graph/snap'
 import type { GuideOverlayState } from '#core/canvas/guides/types'
 import type { DesignIssueOverlay } from '#core/canvas/issues/types'
 import type { ConnectorTarget } from '#core/editor/connectors/attach'
-import type { ShapeHandleHover, GradientEdit, PencilState } from '#core/editor/types'
+import type { ShapeHandleHover, GradientEdit, ImageEdit, PencilState } from '#core/editor/types'
 import type { RotationPreview } from '#core/geometry'
 import type { TextEditor } from '#core/text/editor'
 
@@ -49,6 +49,8 @@ export interface RenderOverlays {
   showPixelGrid?: boolean
   /** The gradient whose handles to draw in place of the selection. */
   gradientEdit?: GradientEdit | null
+  /** The image fill whose crop and framing to draw in place of the selection. */
+  imageEdit?: ImageEdit | null
   transforming?: boolean
   measurementMode?: MeasurementMode
   enteredContainerId?: string | null
@@ -111,6 +113,12 @@ export interface RenderOverlays {
     hoveredRegion?: number | null
     /** Regions picked by clicking inside them, hatched while selected. */
     selectedRegions?: Set<number>
+    /** While the cut tool is picked up there is no transform box. */
+    cutTool?: boolean
+    /** False while presses go to a tool other than Select, which has no transform box. */
+    pointsTransformable?: boolean
+    /** The corners of a transform box a drag is turning or scaling the selected points with. */
+    transformBox?: Vector[] | null
   } | null
   presenceCursors?: PresenceCursor[]
   designIssues?: DesignIssueOverlay | null

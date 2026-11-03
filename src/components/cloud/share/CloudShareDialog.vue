@@ -17,14 +17,16 @@ import Tip from '@/components/ui/overlay/Tip.vue'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
 import cloudShareTheme from '@/theme/cloud/share'
 
-import type { SharePermission, ShareMember, ShareLinkState } from './types'
+import CloudShareSnapshot from './CloudShareSnapshot.vue'
+import type { SharePermission, ShareMember, ShareLinkState, ShareSnapshotState } from './types'
 
 const cloudShare = tv(cloudShareTheme)
 
 /**
  * Who can open a Cloud document and how: people invited by email, the workspace it lives in, and
- * whether anyone with the link may open it. Links are kept only as a hash on the server, so a
- * link made on another device has to be reset before it can be copied here.
+ * whether anyone with the link may open it, and a view-only snapshot link to one saved version.
+ * Links are kept only as a hash on the server, so a link made on another device has to be reset
+ * before it can be copied here.
  */
 const {
   documentName,
@@ -35,7 +37,9 @@ const {
   inviting = false,
   copied = false,
   sendsLink = false,
-  links = { allowed: true, guestView: true, guestEdit: true }
+  links = { allowed: true, guestView: true, guestEdit: true },
+  snapshot = { state: 'none' },
+  snapshotCopied = false
 } = defineProps<{
   documentName: string
   /** The workspace the document lives in, when this account belongs to it. */
@@ -49,6 +53,9 @@ const {
   sendsLink?: boolean
   /** What the workspace's plan allows for links, and whether guests may follow them. */
   links?: CloudLinkPolicy
+  /** The document's snapshot link; shown to people who manage sharing where links are allowed. */
+  snapshot?: ShareSnapshotState
+  snapshotCopied?: boolean
 }>()
 
 const open = defineModel<boolean>('open', { default: false })
@@ -58,6 +65,10 @@ const emit = defineEmits<{
   changeLink: [state: ShareLinkState]
   copyLink: []
   resetLink: []
+  shareSnapshot: []
+  copySnapshot: []
+  resetSnapshot: []
+  deleteSnapshot: []
 }>()
 
 const ui = cloudShare()
@@ -67,6 +78,7 @@ const email = ref('')
 const invitePermission = ref<SharePermission>('edit')
 const permissionOptions = computed(() => [
   { value: 'edit' as const, label: t.value.canEdit },
+  { value: 'comment' as const, label: t.value.canComment },
   { value: 'view' as const, label: t.value.canView }
 ])
 const memberOptions = computed(() => [
@@ -82,7 +94,12 @@ const linkPermission = computed<SharePermission>(() =>
   link.access === 'link' ? link.permission : 'view'
 )
 const permissionLabel = (permission: SharePermission | 'owner') =>
-  ({ owner: t.value.shareOwner, edit: t.value.canEdit, view: t.value.canView })[permission]
+  ({
+    owner: t.value.shareOwner,
+    edit: t.value.canEdit,
+    comment: t.value.canComment,
+    view: t.value.canView
+  })[permission]
 
 function submitInvite() {
   const value = email.value.trim()
@@ -230,6 +247,20 @@ function submitInvite() {
           />
         </div>
       </section>
+
+      <CloudShareSnapshot
+        v-if="
+          canManage &&
+          snapshot.state !== 'unavailable' &&
+          (links.allowed || snapshot.state === 'shared')
+        "
+        :snapshot="snapshot"
+        :copied="snapshotCopied"
+        @share="emit('shareSnapshot')"
+        @copy="emit('copySnapshot')"
+        @reset="emit('resetSnapshot')"
+        @delete="emit('deleteSnapshot')"
+      />
     </AppDialogBody>
 
     <AppDialogFooter :ui="{ footer: 'justify-between' }">

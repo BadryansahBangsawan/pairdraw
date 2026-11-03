@@ -7,5 +7,29 @@
   "settingsTitle": "Odzyskiwanie",
   "settingsDescription": "Zarządzaj lokalnymi kopiami odzyskiwania niezapisanych dokumentów.",
   "restore": "Przywróć",
-  "discard": "Odrzuć"
+  "discard": "Odrzuć",
+  "drafts": "Szkice",
+  "draftsDescription": "Nowe projekty zostają tutaj, na tym urządzeniu, dopóki nie zapiszesz ich w innym miejscu.",
+  "loadingDrafts": "Wczytywanie szkiców",
+  "noDrafts": "Nie ma jeszcze szkiców",
+  "noDraftsDescription": "Nowy projekt jest przechowywany tutaj jako szkic, gdy nad nim pracujesz.",
+  "draftsOff": "Szkice są wyłączone",
+  "draftsOffDescription": "Nowe projekty są tu przechowywane tylko wtedy, gdy w ustawieniach włączono „Automatycznie zachowuj niezapisaną pracę”, a ta przeglądarka przechowuje dane witryn.",
+  "deleteDraft": "Usuń szkic",
+  "deleteDraftConfirmation": "Usunąć szkic „{name}”?",
+  "deleteDraftsConfirmation": {
+    "one": "Usunąć {count} szkic?",
+    "few": "Usunąć {count} szkice?",
+    "many": "Usunąć {count} szkiców?"
+  },
+  "deleteDraftDescription": "Szkice istnieją tylko na tym urządzeniu. Tej operacji nie można cofnąć.",
+  "deleteDraftFailed": "Nie udało się usunąć szkicu „{name}”. Spróbuj ponownie.",
+  "draftUnavailable": "Ten szkic nie jest już dostępny.",
+  "recoveredChangesTitle": "Odzyskane zmiany",
+  "recoveredChangesDescription": "„{name}” ma zmiany z {time}, które nigdy nie zostały zapisane w pliku. Zapisz je w pliku, zapisz jako nowy plik albo je odrzuć.",
+  "saveRecovered": "Zapisz",
+  "saveRecoveredAs": "Zapisz jako…",
+  "discardRecovered": "Nie zapisuj",
+  "recoveredChangesFailed": "Nie udało się zapisać odzyskanych zmian: {error}",
+  "backupUnavailable": "Kopia zapasowa tych zmian nie jest już dostępna."
 }

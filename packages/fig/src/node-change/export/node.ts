@@ -54,6 +54,7 @@ import {
 } from './context'
 import { generatedFrameRecord, writesGeneratedFrame } from './generated'
 import { mergeOverrides, serializeRuntimePropertyOverrides } from './override-claims'
+import { applyReplacedLayersPluginData } from './replaced-layers'
 import { exportedNode } from './resolved-bindings'
 import { slotDefinitionFields } from './slots'
 import { serializeText } from './text'
@@ -989,6 +990,7 @@ export function sceneNodeToKiwiWithContext(
   applyNodeVisualProps(context, node, nc)
   applyComponentMetadata(context, node, nc, localIdCounter)
   applyInstancePayload(context, node, nc, localIdCounter)
+  applyReplacedLayersPluginData(context, node, localIdCounter)
   if (node.type === 'COMPONENT_SET')
     node.pluginData = withPluginData(node.pluginData, OPEN_PENCIL_PLUGIN_DATA.nodeType, node.type)
   if (nc.type === 'CANVAS') nc.pageType = 'DESIGN'

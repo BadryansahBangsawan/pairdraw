@@ -1,25 +1,9 @@
-import type { NodeType, SceneGraph } from '@open-pencil/scene-graph'
+import { pageSlides } from '@open-pencil/core'
+import type { SceneGraph } from '@open-pencil/scene-graph'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { notificationMessages } from '@/app/i18n/notifications'
 import { toast } from '@/app/shell/ui'
-
-/** The layers Figma counts as frames for Export frames to PDF, as for N and Shift+N. */
-const PDF_FRAME_TYPES: ReadonlySet<NodeType> = new Set<NodeType>([
-  'FRAME',
-  'COMPONENT',
-  'COMPONENT_SET',
-  'INSTANCE'
-])
-
-/** The visible top-level frames under a page or section, in layer order, with sections opened. */
-function topLevelFrameIds(graph: SceneGraph, parentId: string): string[] {
-  return graph.getChildren(parentId).flatMap((node) => {
-    if (!node.visible) return []
-    if (node.type === 'SECTION') return topLevelFrameIds(graph, node.id)
-    return PDF_FRAME_TYPES.has(node.type) ? [node.id] : []
-  })
-}
 
 /**
  * The layers Export frames to PDF puts on its pages, one page each, in the page's layer order:
@@ -35,7 +19,7 @@ export function pdfFrameIds(
   const page = graph.getNode(pageId)
   if (!page) return []
   const selected = [...selectedIds]
-  if (selected.length === 0) return topLevelFrameIds(graph, pageId)
+  if (selected.length === 0) return pageSlides(graph, pageId).map((slide) => slide.id)
   const ranks = new Map(
     selected.map((id) => {
       const topLevel = graph.closest(id, (node) => node.parentId === pageId)
@@ -51,8 +35,15 @@ export function pdfFrameIds(
  * sized to its frame, as Figma's File › Export frames to PDF… does.
  */
 export async function exportFramesToPDF(store: EditorStore): Promise<void> {
+  await exportLayersToPDF(
+    store,
+    pdfFrameIds(store.graph, store.state.currentPageId, store.state.selectedIds)
+  )
+}
+
+/** Saves the layers as one PDF, a page per layer in the order given, each sized to its layer. */
+export async function exportLayersToPDF(store: EditorStore, ids: string[]): Promise<void> {
   const messages = notificationMessages.get()
-  const ids = pdfFrameIds(store.graph, store.state.currentPageId, store.state.selectedIds)
   if (ids.length === 0) {
     toast.info(messages.exportPDFEmpty)
     return

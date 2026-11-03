@@ -58,9 +58,12 @@ test('MCP connections keep bearer tokens out of ordinary settings', async ({ pag
   await expect(section.getByLabel('MCP server URL')).toHaveAttribute('aria-invalid', 'true')
 
   await section.getByLabel('MCP server URL').fill('https://example.com/mcp')
-  await section.getByRole('switch', { name: 'Enable for ACP agents' }).click()
-  await section.getByRole('switch', { name: 'Use bearer authentication' }).click()
-  await section.getByLabel('Bearer token').fill('secret-mcp-token')
+  await section.getByRole('switch', { name: 'Enable for AI chat and agents' }).click()
+  await section.getByRole('button', { name: 'Bearer token', exact: true }).click()
+  await section
+    .getByLabel('Bearer token', { exact: true })
+    .and(page.locator('input'))
+    .fill('secret-mcp-token')
   await section.getByRole('button', { name: 'Save' }).click()
 
   await expect(section).toContainText('GitHub')
@@ -86,7 +89,7 @@ test('MCP connections keep bearer tokens out of ordinary settings', async ({ pag
   await expect(section.getByPlaceholder(/Key saved/)).toHaveCount(0)
   await section.getByRole('button', { name: 'Delete connection' }).click()
   const confirmation = page.getByRole('alertdialog')
-  await expect(confirmation).toContainText('remove its saved bearer token')
+  await expect(confirmation).toContainText('remove its saved credentials')
   await confirmation.getByRole('button', { name: 'Delete connection' }).click()
   await expect(section).toContainText('No external MCP connections configured')
 })

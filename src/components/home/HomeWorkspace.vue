@@ -12,12 +12,15 @@ import { agentAutoConnect } from '@/app/ai/agents/auto/session'
 import { sendPromptToDocument } from '@/app/ai/chat/pending-prompt'
 import { ensureChatConfigured } from '@/app/ai/chat/setup'
 import { CLOUD_INCLUDED, CLOUD_STORAGE_PROVIDER_ID } from '@/app/cloud/integration'
+import { draftsAvailable, draftsWorkspaceSource, type DraftMeta } from '@/app/document/drafts'
+import { recoveryEnabled } from '@/app/document/recovery/preferences'
 import { startDesignWith } from '@/app/home/design-systems'
 import { useHomeLocations } from '@/app/home/locations'
 import {
   canSaveDocumentCopy,
   recentCopySource,
   saveDocumentCopy,
+  type DocumentCopyResult,
   type DocumentCopySource
 } from '@/app/home/save-copy'
 import { notificationMessages } from '@/app/i18n/notifications'
@@ -39,8 +42,10 @@ import { toast } from '@/app/shell/ui'
 import { createStoredDocument } from '@/app/storage/workspace/create'
 import { activeStorageLocation, createStorageWorkspaceSource } from '@/app/storage/workspace/source'
 import { createDocumentTab, openStorageDocumentInNewTab, type Tab } from '@/app/tabs'
+import { openDraftInTab, saveDraftAs } from '@/app/tabs/open/draft'
 import { CloudSharedSection, CloudWorkspaceSection } from '@/components/cloud/integration'
 import DesignSystemsSection from '@/components/home/design-systems/DesignSystemsSection.vue'
+import DraftsSection from '@/components/home/drafts/DraftsSection.vue'
 import HomeLayout from '@/components/home/HomeLayout.vue'
 import HomePromptComposer from '@/components/home/HomePromptComposer.vue'
 import RecentFilesSection from '@/components/home/recent/RecentFilesSection.vue'
@@ -173,6 +178,7 @@ const noSearchMatches = computed(
   () =>
     Boolean(normalizedQuery.value) &&
     places.location.value.kind !== 'libraries' &&
+    places.location.value.kind !== 'drafts' &&
     filteredRecentFiles.value.length === 0 &&
     filteredStorageDocuments.value.length === 0
 )
@@ -210,15 +216,33 @@ function openStorageDocuments(documents: readonly StorageDocument[]): Promise<vo
 }
 
 /** Saves a copy of a document from Home, saying where it went or why it could not. */
-async function saveCopy(source: DocumentCopySource): Promise<void> {
+async function saveCopy(
+  source: DocumentCopySource,
+  save: () => Promise<DocumentCopyResult> = () => saveDocumentCopy(source)
+): Promise<void> {
   if (!canSaveDocumentCopy(source)) return
   try {
-    const result = await saveDocumentCopy(source)
+    const result = await save()
     if (result.status === 'saved') toast.info(files.value.savedDocumentAs({ name: result.name }))
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     toast.error(files.value.saveDocumentAsFailed({ name: source.name, error: message }))
   }
+}
+
+/** Whether new designs are kept as drafts here, which Drafts says when it has none. */
+const draftsOn = computed(() => recoveryEnabled.value && draftsAvailable())
+
+function openDrafts(drafts: readonly DraftMeta[]): Promise<void> {
+  return openEach(drafts, async (draft) => {
+    await openDraftInTab(draft.id)
+  })
+}
+
+function saveDraftCopy(draft: DraftMeta) {
+  return saveCopy({ kind: 'draft', draftId: draft.id, name: draft.name }, () =>
+    saveDraftAs(draft.id, draft.name)
+  )
 }
 
 function saveStoredCopy(document: StorageDocument) {
@@ -328,6 +352,17 @@ async function startWithDesignSystem(library: LibrarySummary): Promise<void> {
         @open="openStorageDocuments([$event])"
         @open-many="openStorageDocuments"
         @save-as="saveStoredCopy"
+      />
+
+      <DraftsSection
+        v-if="places.location.value.kind === 'drafts'"
+        v-model:view="view"
+        :source="draftsWorkspaceSource"
+        :available="draftsOn"
+        :query="normalizedQuery"
+        @open="openDrafts([$event])"
+        @open-many="openDrafts"
+        @save-as="saveDraftCopy"
       />
 
       <DesignSystemsSection

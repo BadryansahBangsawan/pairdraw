@@ -5,7 +5,8 @@ const editor = useEditorSetupWithClear('/?test')
 test('draw section in full editor without browser errors', async () => {
   await editor.canvas.drawSection(100, 100, 240, 160)
 
-  await expect(editor.page.getByRole('img', { name: 'SECTION' })).toBeVisible()
+  // A section's panel header offers its layer type as a menu.
+  await expect(editor.page.getByRole('button', { name: 'Layer type' })).toBeVisible()
   await expect
     .poll(async () => {
       return editor.page.evaluate(() => {

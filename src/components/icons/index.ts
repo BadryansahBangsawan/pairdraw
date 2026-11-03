@@ -15,6 +15,7 @@ import IconMousePointer from '~icons/lucide/mouse-pointer'
 import IconPenTool from '~icons/lucide/pen-tool'
 import IconPencil from '~icons/lucide/pencil'
 import IconRows from '~icons/lucide/rows-3'
+import IconScaling from '~icons/lucide/scaling'
 import IconShapes from '~icons/lucide/shapes'
 import IconSmile from '~icons/lucide/smile'
 import IconSpline from '~icons/lucide/spline'
@@ -25,6 +26,7 @@ import IconStar from '~icons/lucide/star'
 import IconStickyNote from '~icons/lucide/sticky-note'
 import IconTriangle from '~icons/lucide/triangle'
 import IconType from '~icons/lucide/type'
+import IconZoomIn from '~icons/lucide/zoom-in'
 
 import type { Tool } from '@open-pencil/core'
 import type { SceneNode } from '@open-pencil/scene-graph'
@@ -52,7 +54,9 @@ export const toolIcons: Record<Tool, Component> = {
   SHAPE_WITH_TEXT: IconShapes,
   CONNECTOR: IconSpline,
   HAND: IconHand,
-  COMMENT: IconMessageCircle
+  COMMENT: IconMessageCircle,
+  ZOOM: IconZoomIn,
+  SCALE: IconScaling
 }
 
 export const NODE_ICONS: Partial<Record<string, typeof IconSquare>> = {

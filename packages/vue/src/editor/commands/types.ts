@@ -53,6 +53,7 @@ export type EditorCommandId =
   | 'selection.flatten'
   | 'selection.outlineText'
   | 'selection.outlineStroke'
+  | 'selection.cropImage'
   | 'selection.moveToPage'
   | 'selection.setOpacity'
   | 'view.zoom100'

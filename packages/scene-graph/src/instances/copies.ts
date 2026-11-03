@@ -8,6 +8,7 @@ import {
   hasInstanceOverride as hasNodeInstanceOverride,
   type InstanceOverrideState
 } from './overrides'
+import { replacedComponentLayerId } from './replacements'
 
 /**
  * One instance's sync: the copies it has matched to the component's layers, the parents it
@@ -31,9 +32,16 @@ export function createInstanceSyncContext(
   return { instanceId, overrides, matched: new Set(), leftovers: new Set() }
 }
 
-/** The component layer a copy in the instance stands for. */
-function copiedLayerId(node: SceneNode, context: InstanceSyncContext): string | undefined {
-  return copiedComponentLayerId(context.overrides, context.instanceId, node)
+/** The component layer a copy in the instance stands for, or a replaced layer stands in for. */
+function copiedLayerId(
+  graph: SceneGraph,
+  node: SceneNode,
+  context: InstanceSyncContext
+): string | undefined {
+  return (
+    replacedComponentLayerId(graph, node) ??
+    copiedComponentLayerId(context.overrides, context.instanceId, node)
+  )
 }
 
 /** Whether sync goes inside a copy: not into slot content, a swapped instance, or an instance. */
@@ -53,7 +61,7 @@ function copiesOf(graph: SceneGraph, context: InstanceSyncContext): Map<string, 
     for (const id of parent.childIds) {
       const child = graph.nodes.get(id)
       if (!child) continue
-      const layerId = copiedLayerId(child, context)
+      const layerId = copiedLayerId(graph, child, context)
       if (layerId) copies.set(layerId, [...(copies.get(layerId) ?? []), child])
       if (syncsInside(graph, child, context)) visit(child)
     }
@@ -206,7 +214,7 @@ export function removeLeftoverCopies(
   const store = removedCopyStore(graph)
   for (const id of context.leftovers) {
     const node = graph.nodes.get(id)
-    const layerId = node ? copiedLayerId(node, context) : undefined
+    const layerId = node ? copiedLayerId(graph, node, context) : undefined
     if (!node || !layerId || context.matched.has(id)) continue
     const nodes: SceneNode[] = []
     const collect = (current: SceneNode) => {

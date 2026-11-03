@@ -14,5 +14,7 @@
   "shape": "Forme",
   "connector": "Connecteur",
   "hand": "Main",
-  "comment": "Commentaire"
+  "comment": "Commentaire",
+  "zoom": "Zoom",
+  "scale": "Mettre à l'échelle"
 }

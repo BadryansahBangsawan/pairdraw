@@ -58,9 +58,12 @@ const description = computed(() => {
   if (invitation.kind === 'workspace') {
     return t.value.invitationWorkspaceDescription({ host: invitation.host })
   }
-  return invitation.permission === 'edit'
-    ? t.value.invitationEditDescription({ host: invitation.host })
-    : t.value.invitationViewDescription({ host: invitation.host })
+  const describe = {
+    edit: t.value.invitationEditDescription,
+    comment: t.value.invitationCommentDescription,
+    view: t.value.invitationViewDescription
+  }[invitation.permission]
+  return describe({ host: invitation.host })
 })
 const roles = computed(() => ({
   admin: t.value.roleAdmin,
@@ -74,7 +77,11 @@ const target = computed(() => {
     ? { name: invitation.workspaceName, access: roles.value[invitation.role] }
     : {
         name: invitation.documentName,
-        access: invitation.permission === 'edit' ? t.value.canEdit : t.value.canView
+        access: {
+          edit: t.value.canEdit,
+          comment: t.value.canComment,
+          view: t.value.canView
+        }[invitation.permission]
       }
 })
 </script>

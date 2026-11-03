@@ -1,0 +1,56 @@
+{
+  "extensionName": {
+    "message": "Pairdraw Web Capture"
+  },
+  "extensionDescription": {
+    "message": "Copia una página web o uno de sus elementos y pégalo en Pairdraw como capas editables con estilo."
+  },
+  "actionTitle": {
+    "message": "Copiar a Pairdraw"
+  },
+  "popupTitle": {
+    "message": "Copiar a Pairdraw"
+  },
+  "copyPage": {
+    "message": "Copiar página"
+  },
+  "copyPageHint": {
+    "message": "La página entera, tal como la ves"
+  },
+  "pickElement": {
+    "message": "Seleccionar un elemento"
+  },
+  "pickElementHint": {
+    "message": "Haz clic en cualquier parte de la página"
+  },
+  "includeImages": {
+    "message": "Incluir imágenes de otros sitios"
+  },
+  "includeImagesHint": {
+    "message": "Pide permiso para leer imágenes de cualquier sitio durante la captura."
+  },
+  "statusCopying": {
+    "message": "Copiando…"
+  },
+  "statusCopied": {
+    "message": "Copiado. Pégalo en un lienzo de Pairdraw."
+  },
+  "statusUnavailable": {
+    "message": "Esta página no se puede capturar. Prueba con una página web normal."
+  },
+  "statusNeedsSecurePage": {
+    "message": "Para copiar, la página debe servirse por HTTPS."
+  },
+  "statusFailed": {
+    "message": "No se ha podido copiar la captura: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Network error"
+      }
+    }
+  },
+  "pickerHint": {
+    "message": "Haz clic en un elemento o pulsa Intro para copiarlo · ↑ ↓ pasan a su contenedor o a su hijo · Esc cancela"
+  }
+}

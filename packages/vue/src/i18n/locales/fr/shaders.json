@@ -1,0 +1,17 @@
+{
+  "mode": "Mode shader",
+  "open": "Ouvrir en mode shader",
+  "region": "Mode shader : {name}",
+  "done": "Terminé",
+  "leave": "Quitter le mode shader ({shortcut})",
+  "play": "Lire",
+  "pause": "Mettre en pause",
+  "restart": "Revenir au début",
+  "phase": "Phase de l’animation",
+  "position": "{time} sur {duration}",
+  "preview": "Aperçu du shader",
+  "settings": "Réglages du shader",
+  "starting": "Démarrage du shader…",
+  "failed": "Ce shader ne peut pas être lu ici : son image fixe est affichée.",
+  "readOnly": "Ce document est en lecture seule : le shader se lit, mais ses réglages ne peuvent pas changer."
+}

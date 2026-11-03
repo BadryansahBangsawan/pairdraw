@@ -1,5 +1,5 @@
 import type { AttachModifiers, MovePlace, Tool } from '@open-pencil/core'
-import type { HandlePosition } from '@open-pencil/core/geometry'
+import type { HandlePosition, TransformZone } from '@open-pencil/core/geometry'
 import type {
   DerivedTextGlyph,
   GeometryPath,
@@ -262,6 +262,34 @@ export interface DragBendHandle {
   targetTangentField: 'tangentStart' | 'tangentEnd' | null
 }
 
+/**
+ * A ⌘/Ctrl drag on a segment of the path being edited: bends the segment so the pressed point on it
+ * follows the pointer, or with ⌥/Alt too, without turning the handles of the segments beside it.
+ */
+export interface DragBendSegment {
+  type: 'bend-segment'
+  segmentIndex: number
+  /** Where along the segment it was pressed, as a share of it. */
+  t: number
+  startX: number
+  startY: number
+  /** The path as the press found it; each move bends from it. */
+  origin: VectorNetwork
+}
+
+/** A drag on the transform box around selected points: scales them from a handle or turns them. */
+export interface DragEditTransform {
+  type: 'edit-transform'
+  zone: TransformZone
+  /** The selected points, and the box around them as the press found it. */
+  points: number[]
+  box: Rect
+  startX: number
+  startY: number
+  /** The path as the press found it; each move transforms from it. */
+  origin: VectorNetwork
+}
+
 export interface DragGuide {
   type: 'guide'
   axis: 'x' | 'y'
@@ -287,6 +315,37 @@ export interface DragGradient {
   cancel: () => void
 }
 
+/** Dragging a crop handle, an image corner, or the image itself in image edit mode. */
+export interface DragImageCrop {
+  type: 'image-crop'
+  /** Applies the drag up to a screen point; Shift keeps proportions or an axis, Alt the centre. */
+  update: (screenX: number, screenY: number, modifiers: { shift: boolean; alt: boolean }) => void
+  commit: () => void
+  cancel: () => void
+}
+
+/** A zoom tool press: a click zooms in or out on the pointer, a drag frames an area to zoom to. */
+export interface DragZoom {
+  type: 'zoom'
+  /** Follows the pointer, in canvas and screen coordinates; ⌥ or Alt zooms out. */
+  update: (cx: number, cy: number, sx: number, sy: number, altKey: boolean) => void
+  commit: () => void
+  cancel: () => void
+}
+
+/**
+ * A Scale tool handle drag: the selection scales with its contents from the opposite handle, or
+ * from its center while ⌥ or Alt is held.
+ */
+export interface DragScale {
+  type: 'scale'
+  /** The resize cursor the drag keeps. */
+  cursor: string
+  update: (cx: number, cy: number, sx: number, sy: number, altKey: boolean) => void
+  commit: () => void
+  cancel: () => void
+}
+
 /** Dragging a radius, point count, or ratio handle of the selected rectangle, polygon, or star. */
 export interface DragShapeHandle {
   type: 'shape-handle'
@@ -305,10 +364,13 @@ export type DragState =
   | DragConnectorLine
   | DragLineEnd
   | DragGradient
+  | DragImageCrop
   | DragMove
   | DragPan
   | DragResize
   | DragStickyScale
+  | DragZoom
+  | DragScale
   | DragMarquee
   | DragRotate
   | DragPen
@@ -318,6 +380,8 @@ export type DragState =
   | DragEditHandle
   | DragEditMarquee
   | DragBendHandle
+  | DragBendSegment
+  | DragEditTransform
   | DragGuide
 
 export const TOOL_TO_NODE: Partial<Record<Tool, NodeType>> = {

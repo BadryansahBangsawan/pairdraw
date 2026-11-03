@@ -26,6 +26,12 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./agent-notes": {
+      "types": "./dist/agent-notes/index.d.ts",
+      "bun": "./src/agent-notes/index.ts",
+      "import": "./dist/agent-notes/index.js",
+      "default": "./dist/agent-notes/index.js"
+    },
     "./arrow-caps": {
       "types": "./dist/arrow-caps.d.ts",
       "bun": "./src/arrow-caps.ts",
@@ -211,6 +217,12 @@
       "bun": "./src/mutation-impact.ts",
       "import": "./dist/mutation-impact.js",
       "default": "./dist/mutation-impact.js"
+    },
+    "./naming": {
+      "types": "./dist/naming.d.ts",
+      "bun": "./src/naming.ts",
+      "import": "./dist/naming.js",
+      "default": "./dist/naming.js"
     },
     "./node-defaults": {
       "types": "./dist/node-defaults.d.ts",

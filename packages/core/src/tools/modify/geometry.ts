@@ -1,6 +1,16 @@
 import * as v from 'valibot'
 
-import { toolNumber, nodeIdInputSchema, defineTool, nodeNotFound } from '#core/tools/schema'
+import { MIN_RESCALE } from '@open-pencil/scene-graph/scaling'
+
+import { assertNodeEditable } from '#core/editor/capabilities'
+import { rescaleNodes, SCALE_ANCHORS } from '#core/editor/scale'
+import {
+  toolNumber,
+  nodeIdInputSchema,
+  defineTool,
+  nodeNotFound,
+  toolFailure
+} from '#core/tools/schema'
 
 export const setRotation = defineTool({
   name: 'set_rotation',
@@ -119,5 +129,60 @@ export const setMinMax = defineTool({
       minHeight: node.minHeight,
       maxHeight: node.maxHeight
     }
+  }
+})
+
+export const rescale = defineTool({
+  name: 'rescale',
+
+  description:
+    'Scale layers as Figma’s Scale tool (K) does: their size together with text sizes, stroke weights, corner radii, effects, padding, and gaps, and their children with them, unlike node_resize, which changes only the box. Several layers scale together around one anchor of their joint bounds. Locked layers, layers inside instances, and connectors, sections, and sticky shapes are left as they are and listed in skipped.',
+  execution: { kind: 'sync', mutation: 'document' },
+  input: v.strictObject({
+    ids: v.pipe(v.array(nodeIdInputSchema), v.minLength(1), v.description('Layers to scale')),
+    factor: toolNumber(
+      v.pipe(
+        v.number(),
+        v.minValue(MIN_RESCALE),
+        v.description('Scale factor: 2 doubles, 0.5 halves')
+      )
+    ),
+    anchor: v.optional(
+      v.pipe(
+        v.picklist(SCALE_ANCHORS),
+        v.description('Point of the layers’ joint bounds that stays put (default: top-left)')
+      ),
+      'top-left'
+    )
+  }),
+  execute: (figma, { ids, factor, anchor }) => {
+    const missing = ids.find((id) => !figma.graph.getNode(id))
+    if (missing) return nodeNotFound(missing)
+    // Locked layers stay as they are, as the editor's Scale tool leaves them (`unlocked()` in
+    // editor/scale/actions.ts).
+    const unlocked = ids.filter((id) => figma.graph.getNode(id)?.locked === false)
+    let scaled: string[]
+    try {
+      for (const id of unlocked) assertNodeEditable(figma.graph, id)
+      scaled = rescaleNodes(figma.graph, unlocked, factor, anchor)
+    } catch (error) {
+      return toolFailure(error)
+    }
+    if (scaled.length === 0) {
+      return {
+        error:
+          'None of these layers can be scaled: they are locked, inside instances, or of a kind the Scale tool leaves alone'
+      }
+    }
+    // A layer below a scaled one scaled with it; the rest were left as they are.
+    const roots = new Set(scaled)
+    const scaledWithRoot = (id: string) => {
+      for (let at = figma.graph.getNode(id)?.parentId; at; at = figma.graph.getNode(at)?.parentId) {
+        if (roots.has(at)) return true
+      }
+      return false
+    }
+    const skipped = ids.filter((id) => !roots.has(id) && !scaledWithRoot(id))
+    return { scaled, factor, anchor, ...(skipped.length > 0 ? { skipped } : {}) }
   }
 })

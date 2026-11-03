@@ -29,6 +29,12 @@ Wokół zaznaczenia pojawia się osiem uchwytów: cztery w narożnikach i cztery
 
 Przytrzymaj <kbd>Shift</kbd> podczas przeciągania narożnego uchwytu, aby zachować proporcje.
 
+## Narzędzie Skalowanie
+
+Naciśnij <kbd>K</kbd> lub wybierz **Skalowanie** z menu narzędzia Przesuń, aby skalować warstwy razem z całą zawartością: rozmiary tekstu, obrysy, efekty, promienie narożników i odstępy automatycznego układu rosną i maleją razem z warstwą. Przeciągnij uchwyt zaznaczenia, aby skalować od przeciwnej strony, lub przytrzymaj <kbd>Option</kbd>/<kbd>Alt</kbd>, aby skalować od środka; kilka zaznaczonych warstw skaluje się razem wokół wspólnej ramki.
+
+Gdy narzędzie jest włączone, panel Projekt pokazuje szerokość i wysokość zaznaczenia, współczynnik skali i siatkę punktu zaczepienia. Wpisana szerokość lub wysokość skaluje zaznaczenie proporcjonalnie; współczynnik przyjmuje `2`, `2x` lub `200%`. Siatka wybiera punkt, który pozostaje na miejscu. Każde skalowanie to jeden krok cofania.
+
 ## Obrót
 
 Umieść wskaźnik nieco poza narożnym uchwytem. Gdy pojawi się kursor obrotu, rozpocznij przeciąganie.

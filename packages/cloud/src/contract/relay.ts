@@ -30,6 +30,8 @@ export const COLLAB_ACTIONS = {
   awareness: 'awareness',
   agentPreview: 'agent-preview',
   upload: 'upload',
+  /** A commenter's comment threads, which the relay checks and writes into the room itself. */
+  comments: 'comments',
   /** From the server only: the document's version history changed, so open lists load it again. */
   versions: 'versions'
 } as const

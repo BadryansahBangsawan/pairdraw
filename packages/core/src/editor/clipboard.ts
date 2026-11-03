@@ -10,8 +10,10 @@ import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
 import { parseOpenPencilClipboard } from '#core/clipboard'
 import { prepareClipboardImport } from '#core/clipboard/fig-import'
 import { computeAllLayouts } from '#core/layout'
+import { reconcileVariableLayouts } from '#core/layout/variables'
 
 import { createClipboardAssetActions } from './clipboard/assets'
+import type { ClipboardImportChoice } from './clipboard/conflicts'
 import type { ClipboardSnapshot } from './clipboard/copy'
 import { createClipboardCopyActions } from './clipboard/copy'
 import { importClipboardDependenciesWithUndo } from './clipboard/dependencies'
@@ -30,12 +32,27 @@ import {
   createClipboardPlacementActions,
   type ClipboardPlacement
 } from './clipboard/placement'
+import { createStyledPasteActions } from './clipboard/styled'
+import { replaceableInstanceLayers, replaceInstanceLayersWith } from './components/replace'
 import { acceptsChildren, prepareSlotEdits } from './components/slots'
 import { collectSubtrees, restoreSubtree, snapshotSubtree } from './history/subtree'
+import { loadBoundFonts } from './text/bound-fonts'
 import type { EditorContext } from './types'
 
 type PasteOptions = {
   replaceSelection?: boolean
+  /**
+   * Put the pasted layer in place of each selected layer inside an instance, as an override of
+   * that instance (pen.dev's Replace inside instance), in the same undo step as the paste.
+   */
+  replaceInInstance?: boolean
+  /** How a copy from another document brings its variables and styles (`planClipboardImport`). */
+  dependencies?: ClipboardImportChoice
+}
+
+type PasteNodesOptions = PasteOptions & {
+  /** Resolve the pasted layers' variable bindings where they land, before history records them. */
+  resolveBindings?: boolean
 }
 
 /**
@@ -128,6 +145,11 @@ export function createClipboardActions(ctx: EditorContext) {
     }
   }
 
+  /** The selected layers a paste replaces inside their instances, read before it selects others. */
+  function instanceReplacementTargets(options: PasteOptions): string[] {
+    return options.replaceInInstance ? replaceableInstanceLayers(ctx, ctx.state.selectedIds) : []
+  }
+
   function pushCreatedNodesUndo(
     created: string[],
     prevSelection: Set<string>,
@@ -163,14 +185,14 @@ export function createClipboardActions(ctx: EditorContext) {
     if (snapshot.properties) return
     let created: string[] = []
     ctx.undo.runBatch('Paste', () => {
-      const dependencies = importClipboardDependenciesWithUndo(ctx, snapshot)
+      const dependencies = importClipboardDependenciesWithUndo(ctx, snapshot, options.dependencies)
       created = pasteOpenPencilNodes(
         dependencies.nodes,
         snapshot.placement,
         snapshot.images,
         dependencies.componentDependencies,
         cursorPos,
-        options
+        { ...options, resolveBindings: dependencies.resolveBindings }
       )
     })
     await fontActions.loadFontsForNodes(created)
@@ -201,6 +223,7 @@ export function createClipboardActions(ctx: EditorContext) {
       const pasted = ctx.undo.runBatch('Paste', () => {
         const prevSelection = new Set(ctx.state.selectedIds)
         const replacementTargets = options.replaceSelection ? selectedReplacementTargets(ctx) : []
+        const instanceTargets = instanceReplacementTargets(options)
         const pasteTarget = replacementTargets[0]?.parentId ?? resolvePasteTarget(ctx)
         if (!prepareSlotEdits(ctx, [pasteTarget])) return null
         const operation = prepareClipboardImport(figma.nodes, ctx.graph, pasteTarget, figma.blobs)
@@ -221,6 +244,7 @@ export function createClipboardActions(ctx: EditorContext) {
           computeAllLayouts(ctx.graph, ctx.state.currentPageId)
           ctx.setSelectedIds(new Set(created))
           pushCreatedNodesUndo(created, prevSelection, 'Paste', operation)
+          replaceInstanceLayersWith(ctx, instanceTargets, created)
         }
         return { created, deliveryError }
       })
@@ -242,10 +266,11 @@ export function createClipboardActions(ctx: EditorContext) {
     images: Map<string, Uint8Array>,
     dependencies: Array<SceneNode & { children?: SceneNode[] }> = [],
     cursorPos?: Vector,
-    options: PasteOptions = {}
+    options: PasteNodesOptions = {}
   ) {
     const prevSelection = new Set(ctx.state.selectedIds)
     const replacementTargets = options.replaceSelection ? selectedReplacementTargets(ctx) : []
+    const instanceTargets = instanceReplacementTargets(options)
     for (const [hash, bytes] of images) ctx.graph.images.set(hash, bytes)
 
     const created: string[] = []
@@ -292,6 +317,11 @@ export function createClipboardActions(ctx: EditorContext) {
       }
       ctx.graph.updateNode(id, { componentId: componentId ?? node.componentId, instanceOverrides })
     }
+    // Variables of this document can give the layers other values than the copied ones.
+    if (options.resolveBindings) {
+      const subtrees = [...dependencyRootIds, ...created]
+      loadBoundFonts(ctx, reconcileVariableLayouts(ctx.graph, { subtrees }))
+    }
     if (dependencyRootIds.length > 0) {
       const snapshots = collectSubtrees(ctx.graph, dependencyRootIds)
       ctx.undo.push({
@@ -315,6 +345,7 @@ export function createClipboardActions(ctx: EditorContext) {
     ctx.setSelectedIds(new Set(created))
 
     pushCreatedNodesUndo(created, prevSelection)
+    replaceInstanceLayersWith(ctx, instanceTargets, created)
     return created
   }
 
@@ -440,6 +471,11 @@ export function createClipboardActions(ctx: EditorContext) {
   const fontActions = createClipboardFontActions(ctx)
   const assetActions = createClipboardAssetActions(ctx, pushCreatedNodesUndo)
   const placementActions = createClipboardPlacementActions(ctx)
+  const styledActions = createStyledPasteActions(ctx, {
+    pushCreatedNodesUndo,
+    placeForeignPaste: placementActions.placeForeignPaste,
+    loadFontsForNodes: fontActions.loadFontsForNodes
+  })
 
   return {
     collectSubtrees,
@@ -455,6 +491,7 @@ export function createClipboardActions(ctx: EditorContext) {
     deleteNodes,
     deleteSelected,
     ...assetActions,
+    ...styledActions,
     ...exportActions
   }
 }

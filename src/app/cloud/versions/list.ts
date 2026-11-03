@@ -62,7 +62,10 @@ function createVersionList(document: EditorStore) {
         (!onlyYours.value || version.createdBy.id === accountId.value)
     )
   )
-  const canEdit = computed(() => cloudRoomPermissions.value.get(document) !== 'view')
+  const canEdit = computed(() => {
+    const permission = cloudRoomPermissions.value.get(document)
+    return permission === undefined || permission === 'edit'
+  })
 
   return {
     document,

@@ -46,6 +46,7 @@
   "flattenSelection": "Appiattisci",
   "outlineText": "Converti testo in tracciato",
   "outlineStroke": "Converti traccia in contorno",
+  "cropImage": "Ritaglia immagine",
   "useAsMask": "Usa come maschera",
   "removeMask": "Rimuovi maschera",
   "bringForward": "Porta avanti",
@@ -91,5 +92,8 @@
   "vectorSmoothCorner": "Alterna il punto tra morbido e angolo",
   "gestureDrag": "trascina",
   "gestureDoubleClickSegment": "doppio clic su un segmento",
-  "gestureDoubleClickPoint": "doppio clic su un punto"
+  "gestureDoubleClickPoint": "doppio clic su un punto",
+  "vectorBendSegment": "Incurva segmento",
+  "vectorBendSegmentKeepHandles": "Incurva segmento senza spostare le maniglie vicine",
+  "gestureDragSegment": "trascina un segmento"
 }

@@ -132,6 +132,8 @@ export const EDITOR_COMMAND_METADATA = {
   },
   'selection.outlineText': { contextTestId: 'context-outline-text' },
   'selection.outlineStroke': { contextTestId: 'context-outline-stroke' },
+  // Enter or a double-click opens a selected image too, so the app binds it with them.
+  'selection.cropImage': { shortcut: '↵', contextTestId: 'context-crop-image' },
   'selection.moveToPage': {},
   'selection.setOpacity': { shortcut: '1-9, 0' },
   'view.zoom100': { shortcut: 'MOD+0', keybinding: ['$mod+Digit0', 'Shift+Digit0'] },

@@ -1,0 +1,56 @@
+{
+  "extensionName": {
+    "message": "Pairdraw Web Capture"
+  },
+  "extensionDescription": {
+    "message": "Copy a web page or one of its elements and paste it into Pairdraw as editable, styled layers."
+  },
+  "actionTitle": {
+    "message": "Copy to Pairdraw"
+  },
+  "popupTitle": {
+    "message": "Copy to Pairdraw"
+  },
+  "copyPage": {
+    "message": "Copy page"
+  },
+  "copyPageHint": {
+    "message": "The whole page, as you see it"
+  },
+  "pickElement": {
+    "message": "Select an element"
+  },
+  "pickElementHint": {
+    "message": "Click any part of the page"
+  },
+  "includeImages": {
+    "message": "Include images from other sites"
+  },
+  "includeImagesHint": {
+    "message": "Asks to read images from any site while you capture."
+  },
+  "statusCopying": {
+    "message": "Copying…"
+  },
+  "statusCopied": {
+    "message": "Copied. Paste it into a Pairdraw canvas."
+  },
+  "statusUnavailable": {
+    "message": "This page can’t be captured. Try a regular web page."
+  },
+  "statusNeedsSecurePage": {
+    "message": "Copying needs a page served over HTTPS."
+  },
+  "statusFailed": {
+    "message": "Couldn’t copy the capture: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Network error"
+      }
+    }
+  },
+  "pickerHint": {
+    "message": "Click an element or press Enter to copy it · ↑ ↓ move to its parent or child · Esc cancels"
+  }
+}

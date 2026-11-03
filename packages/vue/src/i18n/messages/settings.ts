@@ -111,7 +111,37 @@ export const settingsMessageDefaults = {
   storage: 'Storage',
   cloud: 'Cloud',
   mobilePanelNavigation: 'Mobile panel navigation',
-  notifications: 'Notifications'
+  notifications: 'Notifications',
+  cloudPlatforms: 'Cloud platforms',
+  cloudPlatformsDescription: 'Use Claude and Gemini through your AWS or Google Cloud account.',
+  platformRegion: 'Region',
+  platformAuthentication: 'Authentication',
+  bedrockAPIKey: 'Bedrock API key',
+  bedrockAccessKeys: 'AWS access keys',
+  bedrockAccessKeysDesktop:
+    'AWS access keys work in the desktop app only. In the browser, use a Bedrock API key.',
+  awsAccessKeyID: 'Access key ID',
+  awsSecretAccessKey: 'Secret access key',
+  awsSessionToken: 'Session token',
+  awsSessionTokenHint: 'Only for temporary credentials. Enter new ones when they expire.',
+  awsAccessKeysHint: 'Use the keys of an IAM user or role that may call Claude in Bedrock.',
+  awsAccessKeysSavedHint:
+    'Leave these fields blank to keep the saved keys. To replace them, enter both keys again.',
+  vertexProject: 'Project ID',
+  vertexProjectHint:
+    'Required for Claude. Gemini can run without a project when you use an API key.',
+  vertexProjectInvalid: 'Enter a project ID with lowercase letters, digits, and hyphens.',
+  vertexProjectRequired: 'Claude models on Vertex AI need a project ID.',
+  vertexLocation: 'Location',
+  vertexLocationExpress:
+    'Without a project, Gemini runs in express mode, which chooses the location itself.',
+  vertexLocationHint:
+    'Global sends requests to any region with capacity. Single regions serve only older Claude models.',
+  vertexCredential: 'Access token or API key',
+  vertexCredentialHint:
+    'An access token from gcloud auth print-access-token lasts one hour. An API key reaches Gemini models only.',
+  vertexClaudeAccessToken:
+    'Claude on Vertex AI needs an access token. An API key reaches Gemini models only.'
 } as const
 
 export const settingsMessages = i18n('settings', settingsMessageDefaults)

@@ -21,6 +21,7 @@ import { openPendingFiles } from '@/app/document/io/pending-open'
 import { openWebLinkFromLocation, withoutWebLinkParams } from '@/app/document/io/web-link'
 import { setActiveEditorStore } from '@/app/editor/active-store'
 import { focusNodesByName } from '@/app/editor/selection/focus'
+import { embedStatus, startEmbed } from '@/app/embed'
 import { notificationMessages } from '@/app/i18n/notifications'
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { useDocumentDrop } from '@/app/shell/document-drop'
@@ -44,9 +45,11 @@ import ColorSpaceBanner from '@/components/canvas/ColorSpaceBanner.vue'
 import { CloudVersionDialog } from '@/components/cloud/integration'
 import CommandPalette from '@/components/commands/CommandPalette.vue'
 import EditorWorkspace from '@/components/editor/EditorWorkspace.vue'
+import EmbedStatusOverlay from '@/components/embed/EmbedStatusOverlay.vue'
 import FileApiBanner from '@/components/FileApiBanner.vue'
 import FontStatusBanner from '@/components/font-status/FontStatusBanner.vue'
 import HomeWorkspace from '@/components/home/HomeWorkspace.vue'
+import ImageAIPromptDialog from '@/components/image-ai/ImageAIPromptDialog.vue'
 import RenameSelectionDialog from '@/components/selection/RenameSelectionDialog.vue'
 import LoadingScreen from '@/components/shell/LoadingScreen.vue'
 import ShellTopBar from '@/components/shell/ShellTopBar.vue'
@@ -77,11 +80,14 @@ const router = useRouter()
 const createdInitialTab = tabCount() === 0
 // Home is pinned first everywhere but tests and the demo, and opens in front, as Figma's does:
 // it is where a design or a board is started, with or without recent files to list.
-const pinHome = !appRuntimeConfig.test && !route.meta.demo
+// An embed shows the one document its host page hands it, with no Home and none of the app's
+// own services: no agents, MCP, usage stats, rooms, or links read off its address.
+const embed = appRuntimeConfig.embed
+const pinHome = !appRuntimeConfig.test && !route.meta.demo && !embed
 const showHomeFirst = route.path === '/' && pinHome
 // The view stays mounted from /demo to /, so Home is pinned once a route that has it is reached.
 watch(
-  () => !appRuntimeConfig.test && !route.meta.demo,
+  () => !appRuntimeConfig.test && !route.meta.demo && !embed,
   (pins) => {
     if (pins) ensureHomeTab()
   }
@@ -101,6 +107,7 @@ const joinRoomFromInput = useJoinRoom()
  * the app has one, is pinned first behind it.
  */
 function openFirstTab(): Tab {
+  if (embed) return createTab()
   const roomId = typeof route.params.roomId === 'string' ? route.params.roomId : null
   if (pinHome) createHomeTab()
   if (roomId) {
@@ -128,28 +135,32 @@ function openFirstTab(): Tab {
   }
 }
 
-// A fresh install looks for a coding agent in the background; it opens nothing.
-void detectAgentsOnFirstRun()
-const sharingStarted = startSharing()
-// Asked once the window shows what it opened, not over the loading screen.
-whenever(
-  () => !openingCloudLink.value,
-  async () => {
-    await sharingStarted
-    offerUsageStatsPrompt('prompt')
-  },
-  { once: true, immediate: true }
-)
+if (!embed) {
+  // A fresh install looks for a coding agent in the background; it opens nothing.
+  void detectAgentsOnFirstRun()
+  const sharingStarted = startSharing()
+  // Asked once the window shows what it opened, not over the loading screen.
+  whenever(
+    () => !openingCloudLink.value,
+    async () => {
+      await sharingStarted
+      offerUsageStatsPrompt('prompt')
+    },
+    { once: true, immediate: true }
+  )
+}
 
 useHead({ title: route.meta.demo ? 'Demo' : undefined })
 useKeyboard()
 useEditorMenu()
-useDocumentDrop()
+// An embed's document comes from its host page, never from a file dropped on it.
+if (!embed) useDocumentDrop()
 
 const collab = useCollab()
 provide(COLLAB_KEY, collab)
 exposeCollaborationActions(collab, joinRoomFromInput)
 exposeAutomationTestRequests()
+const stopEmbed = embed ? startEmbed(embed) : undefined
 syncTabAddress(router, route)
 
 useEventListener(
@@ -236,8 +247,10 @@ async function bindAssociatedFileOpen(): Promise<void> {
 let stopWebMCP: (() => void) | undefined
 
 onMounted(async () => {
-  stopWebMCP = startWebMCP(getActiveStore)
-  await startMCPRuntime(getActiveStore)
+  if (!embed) {
+    stopWebMCP = startWebMCP(getActiveStore)
+    await startMCPRuntime(getActiveStore)
+  }
 
   try {
     await bindAssociatedFileOpen()
@@ -255,7 +268,7 @@ onMounted(async () => {
 
   // The browser twin of the deep link: the desktop build takes its links through the
   // deep-link plugin above, so only a real browser reads them off the address bar.
-  if (IS_BROWSER && !isTauri()) {
+  if (IS_BROWSER && !isTauri() && !embed) {
     try {
       await openWebLinkFromLocation(window.location.search, stripWebLinkParams, {
         selectByName: selectNodeByName,
@@ -270,6 +283,7 @@ onMounted(async () => {
 onUnmounted(() => {
   stopWebMCP?.()
   void stopMCPRuntime()
+  stopEmbed?.()
   fileAssociationCleanup.value?.()
   roomLinksCleanup.value?.()
 })
@@ -281,9 +295,10 @@ onUnmounted(() => {
     <ColorSpaceBanner />
     <FontStatusBanner />
     <RenameSelectionDialog />
-    <CommandPalette />
+    <CommandPalette v-if="!embed" />
+    <ImageAIPromptDialog />
     <ShortcutSheetHost />
-    <ShellTopBar />
+    <ShellTopBar v-if="!embed" />
     <HomeWorkspace v-show="activeTab && activeTab.kind !== 'document'" />
     <CloudVersionDialog />
     <EditorWorkspace
@@ -291,6 +306,7 @@ onUnmounted(() => {
       :key="shown.key"
       :tab="shown.tab"
     />
-    <LoadingScreen v-if="openingCloudLink" />
+    <LoadingScreen v-if="openingCloudLink && !embed" />
+    <EmbedStatusOverlay v-if="embed" :status="embedStatus" />
   </div>
 </template>

@@ -77,6 +77,18 @@ describe('Tailwind JSX layout classes', () => {
     expect(jsx).toContain('w-80')
   })
 
+  test('space around → justify-around', () => {
+    const graph = makeGraph()
+    const frame = graph.createNode('FRAME', pageId(graph), {
+      width: 320,
+      height: 40,
+      layoutMode: 'HORIZONTAL',
+      primaryAxisAlign: 'SPACE_AROUND',
+      primaryAxisSizing: 'FIXED'
+    })
+    expect(tw(graph, frame.id)).toContain('justify-around')
+  })
+
   test('asymmetric padding', () => {
     const graph = makeGraph()
     const frame = graph.createNode('FRAME', pageId(graph), {

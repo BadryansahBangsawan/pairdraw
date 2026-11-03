@@ -24,8 +24,9 @@ import {
   parseSize
 } from './layout'
 import { applyStroke, convertPaints, strokeFields } from './paints'
+import { applyPlaceholderLook, isPlaceholder, placeholderLabel } from './placeholders'
 import { isPlain, type PenPlacement } from './placement'
-import { applyPenPluginData } from './plugin-data'
+import { applyPenPluginData, UNRESOLVED_REF } from './plugin-data'
 import type { NodeFields, PenNode, PenOverride } from './schema'
 import { createPenSlot } from './slots'
 import { applyTextProps } from './text'
@@ -64,8 +65,6 @@ export interface Build {
   placements: Map<string, PenPlacement>
   /** Groups in reading order. */
   groupIds: Set<string>
-  /** Frames spreading their children with `space_around`. */
-  aroundIds: Set<string>
   /** The components icons in components are instances of, by glyph and size. */
   iconComponents: Map<string, string>
   /** The page those components are on, added with the first one. */
@@ -224,7 +223,14 @@ const PROPERTY_FIELDS = {
   iconFontName: [],
   iconFontFamily: [],
   ref: [],
-  model: ['pluginData']
+  model: ['pluginData'],
+  scriptUri: ['pluginData'],
+  inputs: ['pluginData'],
+  url: ['pluginData'],
+  deviceId: ['pluginData'],
+  zoom: ['pluginData'],
+  scrollX: ['pluginData'],
+  scrollY: ['pluginData']
 } satisfies Record<keyof NodeFields, readonly (keyof SceneNode)[]>
 
 const isProperty = (key: string): key is keyof typeof PROPERTY_FIELDS => key in PROPERTY_FIELDS
@@ -304,8 +310,6 @@ export function applyPenProperties(node: SceneNode, pen: PenNode, build: Build):
     const heightSizing = flowLayout === 'NONE' && h.sizing === 'FILL' ? 'FIXED' : h.sizing
     applyAutoLayout(node, layout, pen, widthSizing, heightSizing, ctx)
   }
-  if (layout !== 'NONE' && pen.justifyContent === 'space_around') build.aroundIds.add(node.id)
-  else build.aroundIds.delete(node.id)
 
   const placement = penPlacement(pen, ctx)
   if (pen.type === 'group') build.groupIds.add(node.id)
@@ -332,26 +336,48 @@ export function applyPenProperties(node: SceneNode, pen: PenNode, build: Build):
     if (w.sizing === 'FILL') Object.assign(node, fillSizingFields(flowLayout, 'HORIZONTAL'))
     if (h.sizing === 'FILL') Object.assign(node, fillSizingFields(flowLayout, 'VERTICAL'))
   }
+  if (isPlaceholder(pen)) applyPlaceholderLook(node, pen)
   applyPenPluginData(node, pen)
   build.effective.set(node.id, pen)
 }
 
 /**
  * The fields an instance draws with: its component's, with the `ref` node's own replacing them one
- * by one, as pen.dev reads them. A theme on both merges axis by axis.
+ * by one, as pen.dev reads them. A theme on both merges axis by axis. A `ref` whose component is
+ * missing, such as one from a library the host could not read, is a placeholder naming it.
  */
 function instanceFields(ref: PenNode, component: PenNode | undefined): PenNode {
   const { ref: _ref, type: _type, descendants: _descendants, children: _children, ...own } = ref
-  if (!component) return { ...own, type: 'frame' }
+  if (!component) return { ...own, type: 'frame', [UNRESOLVED_REF]: ref.ref ?? '' }
   const {
     id: _id,
     reusable: _reusable,
+    ref: _componentRef,
     children: _componentChildren,
     descendants: _componentDescendants,
     ...inherited
   } = component
   const theme = component.theme || ref.theme ? { ...component.theme, ...ref.theme } : undefined
   return { ...inherited, ...own, theme, name: ref.name ?? component.name }
+}
+
+/**
+ * Builds the layers inside a layer that is no instance: a `ref`'s copies of its component's, named
+ * by the path to them, or the layer's own, then a placeholder's label and a slot.
+ */
+function createChildren(node: SceneNode, pen: PenNode, fields: PenNode, build: Build): void {
+  const component = pen.type === 'ref' && pen.ref ? build.components.get(pen.ref) : undefined
+  const children = pen.type === 'ref' ? (component?.children ?? []) : (pen.children ?? [])
+  for (const child of children) {
+    createSceneNode(
+      pen.type === 'ref' ? { ...child, id: `${pen.id}/${child.id}` } : child,
+      node.id,
+      build
+    )
+  }
+  const label = placeholderLabel(fields, node.id)
+  if (label) createSceneNode(label, node.id, build)
+  createPenSlot(node, fields, build)
 }
 
 /** Builds a layer and its children in the layer's theme, merged over its parent's. */
@@ -373,15 +399,7 @@ export function createSceneNode(pen: PenNode, parentId: string, build: Build): s
       node.componentId = instanceOf.id
       build.instances.set(node.id, pen)
     } else {
-      const children = pen.type === 'ref' ? (component?.children ?? []) : (pen.children ?? [])
-      for (const child of children) {
-        createSceneNode(
-          pen.type === 'ref' ? { ...child, id: `${pen.id}/${child.id}` } : child,
-          node.id,
-          build
-        )
-      }
-      createPenSlot(node, fields, build)
+      createChildren(node, pen, fields, build)
     }
     return node.id
   } finally {

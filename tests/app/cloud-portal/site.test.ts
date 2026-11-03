@@ -64,6 +64,12 @@ describe('Cloud server editor pages', () => {
     expect(visit('/documents/a', account('active'))).toBeNull()
   })
 
+  test('open a public profile’s document for anyone, signed in or not', () => {
+    expect(visit('/view/a', null)).toBeNull()
+    expect(visit('/view/a', null, { localEditor: false })).toBeNull()
+    expect(visit('/view/a', account('pending'))).toBeNull()
+  })
+
   test('tell links that carry their secret, which open on their own, from look-alikes', () => {
     const link = (address: string) => isSecretCloudLink(new URL(address, 'https://cloud.example'))
     expect(link('/documents/a')).toBe(false)
@@ -72,6 +78,7 @@ describe('Cloud server editor pages', () => {
     expect(link('/share/b')).toBe(false)
     expect(link('/share/b/c#secret')).toBe(false)
     expect(link('/rooms/b#secret')).toBe(false)
+    expect(link('/view/b#secret')).toBe(false)
   })
 
   test('open the editor when the server cannot say, since the editor works without it', () => {

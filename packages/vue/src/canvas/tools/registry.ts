@@ -4,6 +4,8 @@ import type { Editor, Tool } from '@open-pencil/core'
 
 import { startPenInput, updatePenHover } from '#vue/canvas/pen/input'
 import { startPencilInput } from '#vue/canvas/pencil/input'
+import { onSelectionHandle, scaleHoverCursor, tryStartScaleDrag } from '#vue/canvas/scale/input'
+import { startZoomDrag, zoomToolCursor } from '#vue/canvas/zoom/input'
 import { HAND_GRAB_CURSOR } from '#vue/editor/tool-cursor'
 import { attachModifiers, startConnectorDraw } from '#vue/shared/input/connector/draw'
 import { startShapeDraw, startTextDraw } from '#vue/shared/input/draw'
@@ -52,26 +54,60 @@ const shape: CanvasTool = {
   press: ({ cx, cy }, { editor, setDrag }) => startShapeDraw(cx, cy, editor, setDrag)
 }
 
+/** Selects, moves, resizes, and turns layers: the Move tool. */
+const select: CanvasTool = {
+  press: ({ event, cx, cy, sx, sy }, context) =>
+    handleSelectDown(
+      event,
+      cx,
+      cy,
+      sx,
+      sy,
+      context.editor,
+      context.hitFns,
+      context.tryStartRotation,
+      context.handleTextEditClick,
+      context.setDrag
+    ),
+  hover: (pointer, { hoverLayers }) => hoverLayers(pointer)
+}
+
 /**
  * Every tool's canvas behaviour, by id. A tool added to `Tool` needs an entry here, and the
  * editor's profile decides which tools are on offer.
  */
 export const CANVAS_TOOLS: Readonly<Record<Tool, CanvasTool>> = {
-  SELECT: {
-    press: ({ event, cx, cy, sx, sy }, context) =>
-      handleSelectDown(
-        event,
-        cx,
-        cy,
-        sx,
-        sy,
-        context.editor,
-        context.hitFns,
-        context.tryStartRotation,
-        context.handleTextEditClick,
-        context.setDrag
-      ),
-    hover: (pointer, { hoverLayers }) => hoverLayers(pointer)
+  SELECT: select,
+  // Handles scale the selection with its contents, and never resize it as Move's do; elsewhere a
+  // press selects as Move does.
+  SCALE: {
+    press: (pointer, context) => {
+      const drag = tryStartScaleDrag(pointer.cx, pointer.cy, context.editor)
+      if (drag) {
+        context.setDrag(drag)
+        context.cursorOverride.value = drag.cursor
+      } else if (!onSelectionHandle(pointer.cx, pointer.cy, context.editor)) {
+        select.press(pointer, context)
+      }
+    },
+    hover: (pointer, context) => {
+      context.hoverLayers(pointer)
+      const cursor = scaleHoverCursor(pointer.cx, pointer.cy, context.editor)
+      if (cursor) context.cursorOverride.value = cursor
+      else if (onSelectionHandle(pointer.cx, pointer.cy, context.editor)) {
+        context.cursorOverride.value = null
+      }
+    }
+  },
+  ZOOM: {
+    press: ({ event, cx, cy, sx, sy }, { editor, setDrag, cursorOverride }) => {
+      if (event.button !== 0) return
+      setDrag(startZoomDrag(cx, cy, sx, sy, event.altKey, editor))
+      cursorOverride.value = zoomToolCursor(event.altKey)
+    },
+    hover: ({ event }, { cursorOverride }) => {
+      cursorOverride.value = zoomToolCursor(event.altKey)
+    }
   },
   HAND: pan,
   // Comments are placed by the app's comments layer above the canvas.

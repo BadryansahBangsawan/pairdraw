@@ -46,7 +46,7 @@ CLI łączy się również przez RPC z uruchomioną aplikacją komputerową i st
 
 ## Serwer MCP
 
-Claude Code, Cursor, Windsurf i inni klienci MCP mogą korzystać z tych samych 90 narzędzi co czat AI. Serwer obsługuje stdio i HTTP z sesjami.
+Claude Code, Cursor, Windsurf i inni klienci MCP mogą korzystać z tych samych 138 narzędzi co czat AI. Serwer obsługuje stdio i HTTP z sesjami.
 
 [Serwer MCP →](/programmable/mcp-server)
 

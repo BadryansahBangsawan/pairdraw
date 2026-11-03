@@ -17,6 +17,7 @@ import {
   declareVariableBindingUnits,
   declareSourceVariableBindingUnits
 } from './bindings/variables'
+import { invalidateInheritedPluginData } from './claimed-plugin-data'
 import { completeClearedStyleClaim } from './cleared-style'
 import { applyDerivedEntry } from './derived-symbol-data'
 import { COMPONENT_IDENTITY_FIELDS } from './fields'
@@ -253,6 +254,7 @@ function interpretRoot(
     completeClearedStyleClaim(target, retained, sources.get(target.sourceId))
     declareVariableBindingUnits(target, retained)
     invalidateInheritedTextData(target.properties, retained)
+    invalidateInheritedPluginData(target.properties, retained)
     Object.assign(
       target.properties,
       cloneRecord(retained),

@@ -18,6 +18,10 @@
   "clipboardImageFetchFailed": "无法从 Figma 获取 1 张图片。请检查源文件是否可访问，然后重试。",
   "clipboardImagesFetchFailed": "无法从 Figma 获取 {count} 张图片。请检查源文件是否可访问，然后重试。",
   "mermaidPasteFailed": "无法读取 Mermaid 图表。{error}",
+  "webPasteFailed": "无法粘贴网页内容。{error}",
+  "webCaptureUnreadable": "无法读取复制的网页捕获。请重新捕获该页面。",
+  "webCaptureNewer": "复制的网页捕获来自更新版本的捕获扩展。请更新 Pairdraw 后再粘贴。",
+  "webCaptureTruncated": "页面过大，无法完整捕获，因此省略了部分内容。",
   "recentFiles": "最近使用的文件",
   "recentFilesDescription": "继续编辑设计或新建设计。",
   "noRecentFiles": "暂无最近使用的文件",
@@ -71,5 +75,21 @@
   "fileChangedOnDisk": "“{name}”已在磁盘上更改",
   "fileChangedOnDiskDescription": "在你有未保存的编辑时，另一个应用更改了此文件。重新加载会打开文件中的版本并丢弃你的编辑；忽略则可继续编辑，保存时会用你的版本替换该文件。",
   "reloadFromDisk": "重新加载",
-  "ignoreDiskChange": "忽略"
+  "ignoreDiskChange": "忽略",
+  "pasteImportHeading": "导入变量和样式？",
+  "pasteImportDescription": "这些图层使用了另一个文档中的变量或样式。导入后图层会保持与它们的关联，也可以按当前外观粘贴图层。",
+  "pasteImportConflicts": "此文档中已有",
+  "pasteImportConflictsHint": "使用此文档中已有的，或以新名称添加复制的内容。",
+  "pasteImportUseExisting": "使用现有",
+  "pasteImportAddRenamed": "重命名后添加",
+  "pasteImportVariables": {
+    "many": "{count} 个变量"
+  },
+  "pasteImportFillStyle": "颜色样式",
+  "pasteImportTextStyle": "文本样式",
+  "pasteImportEffectStyle": "效果样式",
+  "pasteImportGridStyle": "网格样式",
+  "pasteImportChoiceLabel": "{name}：使用现有或重命名后添加",
+  "pasteImportAsIs": "按原样粘贴",
+  "pasteImportConfirm": "是，导入"
 }

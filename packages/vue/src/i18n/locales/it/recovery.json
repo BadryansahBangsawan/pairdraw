@@ -7,5 +7,28 @@
   "settingsTitle": "Ripristino",
   "settingsDescription": "Gestisci le copie locali di ripristino dei documenti non salvati.",
   "restore": "Ripristina",
-  "discard": "Scarta"
+  "discard": "Scarta",
+  "drafts": "Bozze",
+  "draftsDescription": "I nuovi design restano qui, su questo dispositivo, finché non li salvi altrove.",
+  "loadingDrafts": "Caricamento bozze",
+  "noDrafts": "Ancora nessuna bozza",
+  "noDraftsDescription": "Un nuovo design viene conservato qui come bozza mentre ci lavori.",
+  "draftsOff": "Le bozze sono disattivate",
+  "draftsOffDescription": "I nuovi design vengono conservati qui solo se «Conserva automaticamente il lavoro non salvato» è attivo nelle impostazioni e questo browser mantiene i dati del sito.",
+  "deleteDraft": "Elimina bozza",
+  "deleteDraftConfirmation": "Eliminare la bozza “{name}”?",
+  "deleteDraftsConfirmation": {
+    "one": "Eliminare {count} bozza?",
+    "many": "Eliminare {count} bozze?"
+  },
+  "deleteDraftDescription": "Le bozze esistono solo su questo dispositivo. L’operazione non può essere annullata.",
+  "deleteDraftFailed": "Impossibile eliminare la bozza “{name}”. Riprova.",
+  "draftUnavailable": "Questa bozza non è più disponibile.",
+  "recoveredChangesTitle": "Modifiche recuperate",
+  "recoveredChangesDescription": "“{name}” contiene modifiche del {time} mai salvate nel file. Salvale nel file, salvale come nuovo file o scartale.",
+  "saveRecovered": "Salva",
+  "saveRecoveredAs": "Salva con nome…",
+  "discardRecovered": "Non salvare",
+  "recoveredChangesFailed": "Impossibile salvare le modifiche recuperate: {error}",
+  "backupUnavailable": "Il backup di queste modifiche non è più disponibile."
 }

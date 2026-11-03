@@ -35,7 +35,8 @@ const {
   swatchBackground,
   keepOpen,
   shader = null,
-  layerSize = null
+  layerSize = null,
+  fillIndex = null
 } = defineProps<{
   fill: Fill
   /** The shader the paint draws, when it is a shader's frame; the picker then edits the shader. */
@@ -48,6 +49,8 @@ const {
   keepOpen?: (event: PointerEvent) => boolean
   /** The one layer the paint is on, which an image crop starts by covering. */
   layerSize?: { width: number; height: number } | null
+  /** Where the paint sits in the layer's fills, when it is a fill rather than a stroke. */
+  fillIndex?: number | null
 }>()
 /** An image fill's swatch shows its image, covering the swatch as Fill would. */
 const image = useImageFill(() => (fill.type === 'IMAGE' ? fill.imageHash : undefined))
@@ -58,6 +61,8 @@ const activeStop = defineModel<number>('activeStop')
 const emit = defineEmits<{
   update: [fill: Fill]
   updateShader: [preset: ShaderPreset]
+  /** Opens the paint's shader in Shader Mode, by the shader's image. */
+  openShaderMode: [image: string]
   openChange: [open: boolean]
   cancel: []
 }>()
@@ -95,6 +100,7 @@ function cancelFromEscape(event: KeyboardEvent) {
           type="button"
           :aria-label="label ?? panels.fill"
           data-test-id="fill-picker-swatch"
+          :data-shader-image="shader?.image"
           class="size-4 shrink-0 cursor-pointer rounded-sm border-0 bg-transparent p-0"
         >
           <FillSwatch :fill="fill" class="size-full" v-slot="swatch">
@@ -180,13 +186,16 @@ function cancelFromEscape(event: KeyboardEvent) {
           <ShaderFillPicker
             v-if="shader"
             :preset="shader.preset"
+            can-open-mode
             @update="emit('updateShader', $event)"
+            @open-mode="emit('openShaderMode', shader.image)"
           />
 
           <ImageFillPicker
             v-else-if="root.category === 'IMAGE'"
             :fill="root.fill"
             :layer-size="layerSize"
+            :fill-index="fillIndex"
             @update="emit('update', $event)"
           />
         </PopoverContent>

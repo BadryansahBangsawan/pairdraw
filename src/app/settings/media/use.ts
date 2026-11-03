@@ -5,6 +5,7 @@ import type { StockPhotoKeyCheck } from '@open-pencil/core/tools'
 
 import { vectorizeProviderID } from '@/app/editor/vectorize'
 import { useVectorizeSettings } from '@/app/editor/vectorize/settings/use'
+import { runCredentialSave } from '@/app/settings/credentials/key-draft'
 import {
   checkMediaKey,
   pexelsKeyStatus,
@@ -76,11 +77,8 @@ export function useMediaSettingsEditor(service: MediaSettingsService, services =
     return disposed
   }
 
-  async function save(): Promise<boolean> {
-    if (busy.value || isDisposed()) return false
-    busy.value = true
-    saveError.value = ''
-    try {
+  function save(): Promise<boolean> {
+    return runCredentialSave({ busy, saveError, isDisposed }, async () => {
       if (vector) {
         const saved =
           removeKey.value && !key.value.trim()
@@ -91,13 +89,8 @@ export function useMediaSettingsEditor(service: MediaSettingsService, services =
       } else if (service !== 'vectorize' && (key.value.trim() || removeKey.value)) {
         await services[service].set(key.value.trim())
       }
-      return !isDisposed()
-    } catch (cause) {
-      if (!isDisposed()) saveError.value = cause instanceof Error ? cause.message : String(cause)
-      return false
-    } finally {
-      busy.value = false
-    }
+      return true
+    })
   }
 
   return {

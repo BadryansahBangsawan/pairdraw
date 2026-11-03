@@ -10,6 +10,7 @@ import {
 import { tv } from 'tailwind-variants'
 import { nextTick, ref, watch } from 'vue'
 
+import { animateViewport } from '@open-pencil/vue/canvas'
 import { useEditorCommands } from '@open-pencil/vue/editor/commands'
 import { useI18n } from '@open-pencil/vue/i18n'
 
@@ -53,7 +54,7 @@ function startEditing() {
 function commitInput() {
   const parsed = Number.parseInt(inputValue.value, 10)
   if (!Number.isNaN(parsed) && parsed > 0) {
-    store.zoomToLevel(parsed / 100)
+    zoomToLevel(parsed / 100)
   }
   editing.value = false
 }
@@ -72,14 +73,19 @@ function toggleRemoteCursors() {
   store.requestRepaint()
 }
 
+/** Glides to a zoom level, keeping the view's center. */
+function zoomToLevel(level: number) {
+  animateViewport(store, () => store.zoomToLevel(level))
+}
+
 function zoomIn() {
   const center = store.viewportScreenCenter()
-  store.applyZoom(-100, center.x, center.y)
+  animateViewport(store, () => store.applyZoom(-100, center.x, center.y))
 }
 
 function zoomOut() {
   const center = store.viewportScreenCenter()
-  store.applyZoom(100, center.x, center.y)
+  animateViewport(store, () => store.applyZoom(100, center.x, center.y))
 }
 
 const ZOOM_PRESETS = [
@@ -158,7 +164,7 @@ watch(open, (v) => {
             v-for="preset in ZOOM_PRESETS"
             :key="preset.level"
             :class="itemCls"
-            @select="store.zoomToLevel(preset.level)"
+            @select="zoomToLevel(preset.level)"
           >
             <icon-lucide-check
               v-if="isActivePreset(preset.level)"

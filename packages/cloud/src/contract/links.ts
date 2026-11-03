@@ -3,10 +3,13 @@ import { encodeParam, parseURL, withFragment, withQuery } from 'ufo'
 /** The two kinds of Cloud link that carry a secret: invitations and documents shared by link. */
 export type CloudLinkKind = 'invitations' | 'share'
 
-/** Every kind of Cloud link: those that carry a secret, and a document's address for members. */
-export type CloudLinkPathKind = CloudLinkKind | 'documents'
+/**
+ * Every kind of Cloud link: those that carry a secret, a document's address for members, and a
+ * document a public profile lists, which anyone may view.
+ */
+export type CloudLinkPathKind = CloudLinkKind | 'documents' | 'view'
 
-const CLOUD_LINK_PATH = /^\/(invitations|share|documents)\/([^/]+)$/
+const CLOUD_LINK_PATH = /^\/(invitations|share|documents|view)\/([^/]+)$/
 
 /**
  * A link on the server's own editor. The server is the link's own address, so the link needs
@@ -51,6 +54,19 @@ export function cloudDocumentURL(
   })
 }
 
+/**
+ * A document in a workspace on someone's public profile, `/view/:id`, which anyone may open
+ * read-only without signing in.
+ */
+export function cloudPublicDocumentURL(serverURL: string, documentId: string): string {
+  return serverLink(serverURL, `/view/${encodeParam(documentId)}`)
+}
+
+/** A public profile's page on the server, `/u/:handle`. */
+export function cloudPublicProfilePath(handle: string): string {
+  return `/u/${encodeParam(handle)}`
+}
+
 export function cloudDocumentPath(documentId: string): string {
   return `/documents/${encodeParam(documentId)}`
 }
@@ -63,7 +79,12 @@ export function parseCloudLinkPath(
   pathname: string
 ): { kind: CloudLinkPathKind; id: string } | null {
   const [, kind, id] = pathname.match(CLOUD_LINK_PATH) ?? []
-  if ((kind !== 'invitations' && kind !== 'share' && kind !== 'documents') || !id) return null
+  if (
+    (kind !== 'invitations' && kind !== 'share' && kind !== 'documents' && kind !== 'view') ||
+    !id
+  ) {
+    return null
+  }
   try {
     return { kind, id: decodeURIComponent(id) }
   } catch {

@@ -23,6 +23,15 @@ export const notificationMessageDefaults = {
   xPaths: 'XPaths',
   pngClipboardUnavailable: 'PNG clipboard export is not available in this browser.',
   openFileFailed: params('Could not open “{name}”: {error}'),
+  importedLibrariesNeedDesktop: params(
+    'The browser can’t open the libraries “{name}” imports ({paths}), so their components show as placeholders. Open the file in the desktop app to see them.'
+  ),
+  importedLibrariesNeedOpenDialog: params(
+    'A dropped file can’t open the libraries “{name}” imports ({paths}), so their components show as placeholders. Open it with File > Open… to see them.'
+  ),
+  importedLibrariesUnreadable: params(
+    'Couldn’t open the libraries “{name}” imports ({paths}), so their components show as placeholders.'
+  ),
   viewDiagnostics: 'View diagnostics',
   importedDOMCSS: 'Imported DOM/CSS document.',
   importDOMCSSFailed: params('Could not import DOM/CSS: {error}'),
@@ -33,6 +42,23 @@ export const notificationMessageDefaults = {
   imageConvertedToVectors: 'Vectors added beside the image.',
   vectorizeCredentialFailed: params('{error}. Update it in Settings → Image services.'),
   vectorizeFailed: params('{provider} could not vectorize this image: {error}'),
+  imageAIRemovingBackground: 'Removing background…',
+  imageAIReplacingBackground: 'Replacing background…',
+  imageAIGeneratingImage: 'Generating image…',
+  imageAIGeneratingSVG: 'Generating SVG…',
+  imageAICredentialRequired: params('Add a {service} API key in Settings → Image services.'),
+  imageAIBaseURLRequired: params('Add the {service} address in Settings → Image services.'),
+  imageAICredentialRejected: params(
+    '{service} rejected the saved API key. Update it in Settings → Image services.'
+  ),
+  imageAIFailed: params('{service} could not finish: {error}'),
+  imageAITargetChanged: 'The layer changed before the result arrived, so it was left as it is.',
+  imageAIPlaceFailed: 'The result arrived but could not be placed on the canvas.',
+  imageAIBackgroundRemoved: 'Background removed.',
+  imageAIBackgroundReplaced: 'Background replaced.',
+  imageAIImageGenerated: 'Image generated.',
+  imageAISVGGenerated: 'SVG generated.',
+  imageAIBusy: 'An image request is still running.',
   operationFailed: params('Operation failed: {error}'),
   storageConnected: 'Connected. Storage namespace is ready.',
   storageConnectionFailed: params('Could not connect to storage: {error}'),

@@ -1,5 +1,6 @@
 import type { DBSchema } from 'idb'
 
+import { recoverySnapshotMeta } from '@/app/document/recovery/meta'
 import type {
   RecoverySnapshot,
   RecoverySnapshotInput,
@@ -63,13 +64,7 @@ export function createIdbRecoveryStore(): RecoveryStore {
       const db = await database.open()
       const storeBinary = await binaryStorage()
       const transaction = db.transaction(['meta', 'fig'], 'readwrite')
-      const metadata: RecoverySnapshotMeta = {
-        id: input.id,
-        documentName: input.documentName || 'Untitled',
-        updatedAt: new Date().toISOString(),
-        byteLength: input.figBytes.byteLength,
-        formatVersion: 1
-      }
+      const metadata = recoverySnapshotMeta(input)
       await Promise.all([
         transaction.objectStore('meta').put(metadata),
         transaction.objectStore('fig').put(storeBinary(input.figBytes), input.id),

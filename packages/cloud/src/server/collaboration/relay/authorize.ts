@@ -1,5 +1,6 @@
 import {
   collaborationPrincipalSchema,
+  documentPermissionSchema,
   type CollaborationPrincipal,
   type DocumentPermission
 } from '#cloud/contract'
@@ -10,7 +11,7 @@ const relayClaimsSchema = v.object({
   documentId: v.pipe(v.string(), v.uuid()),
   roomId: v.string(),
   principal: collaborationPrincipalSchema,
-  permission: v.picklist(['view', 'edit']),
+  permission: documentPermissionSchema,
   roomEpoch: v.pipe(v.number(), v.integer(), v.minValue(0)),
   serverEnforcedWrites: v.literal(true),
   exp: v.pipe(v.number(), v.integer())

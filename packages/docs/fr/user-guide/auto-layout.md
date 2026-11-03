@@ -18,7 +18,7 @@ Les objets peuvent s’enchaîner horizontalement, verticalement ou revenir à l
 
 ## Alignement
 
-L’axe principal propose début, centre, fin et espace entre les éléments. L’axe transversal propose début, centre, fin et étirement.
+L’axe principal propose début, centre, fin, espace entre les éléments et espace autour. Avec l’espace autour, chaque objet reçoit une part égale de l’espace libre, moitié de chaque côté, en plus de l’espacement ; l’option se choisit dans le menu du champ d’espacement. L’axe transversal propose début, centre, fin et étirement.
 
 ## Taille
 

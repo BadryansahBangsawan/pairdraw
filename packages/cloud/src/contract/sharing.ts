@@ -14,22 +14,44 @@ export const documentShareSchema = v.object({
   updatedAt: v.string(),
   expiresAt: v.nullable(v.string()),
   revokedAt: v.nullable(v.string()),
-  lastUsedAt: v.nullable(v.string())
+  lastUsedAt: v.nullable(v.string()),
+  /**
+   * The revision a snapshot link shows, frozen as it was shared, or null for a live link that
+   * opens the document's room. Servers that predate snapshots leave it out.
+   */
+  revisionId: v.optional(v.nullable(v.pipe(v.string(), v.uuid())), null)
 })
 export type DocumentShare = v.InferOutput<typeof documentShareSchema>
+
+/**
+ * Which revision a snapshot link pins: the document's current one, or one of its revisions by ID.
+ * A snapshot link is always view-only and never opens the document's room.
+ */
+export const shareSnapshotSchema = v.union([v.literal('current'), v.pipe(v.string(), v.uuid())])
+export type ShareSnapshot = v.InferOutput<typeof shareSnapshotSchema>
 
 /** When a link stops working, as an ISO timestamp; `null` keeps it working until revoked. */
 const shareExpirySchema = v.optional(v.nullable(v.pipe(v.string(), v.isoTimestamp())))
 
-export const createDocumentShareSchema = v.object({
-  permission: documentPermissionSchema,
-  expiresAt: shareExpirySchema
-})
+export const createDocumentShareSchema = v.pipe(
+  v.object({
+    permission: documentPermissionSchema,
+    expiresAt: shareExpirySchema,
+    /** Makes a snapshot link to this revision instead of a live link. */
+    snapshot: v.optional(shareSnapshotSchema)
+  }),
+  v.check(
+    (input) => input.snapshot === undefined || input.permission === 'view',
+    'A snapshot link only lets people view'
+  )
+)
 export type CreateDocumentShareInput = v.InferOutput<typeof createDocumentShareSchema>
 
 export const updateDocumentShareSchema = v.object({
   permission: v.optional(documentPermissionSchema),
-  expiresAt: shareExpirySchema
+  expiresAt: shareExpirySchema,
+  /** Pins a snapshot link to another revision, as Update snapshot does; live links refuse it. */
+  snapshot: v.optional(shareSnapshotSchema)
 })
 export type UpdateDocumentShareInput = v.InferOutput<typeof updateDocumentShareSchema>
 
@@ -55,7 +77,9 @@ export const resolvedDocumentShareSchema = v.object({
   documentId: v.pipe(v.string(), v.uuid()),
   permission: documentPermissionSchema,
   principal: collaborationPrincipalSchema,
-  roomEpoch: v.pipe(v.number(), v.integer(), v.minValue(0))
+  roomEpoch: v.pipe(v.number(), v.integer(), v.minValue(0)),
+  /** The revision a snapshot link shows; null for a live link. */
+  revisionId: v.optional(v.nullable(v.pipe(v.string(), v.uuid())), null)
 })
 export type ResolvedDocumentShare = v.InferOutput<typeof resolvedDocumentShareSchema>
 

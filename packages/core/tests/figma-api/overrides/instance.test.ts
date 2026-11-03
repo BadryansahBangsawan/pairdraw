@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 
 import { FigmaAPI, type FigmaNodeProxy } from '@open-pencil/core/figma-api'
 import { SceneGraph } from '@open-pencil/scene-graph'
+import { replaceInstanceLayer } from '@open-pencil/scene-graph/instances'
 
 import { registerTestFont } from '#core-tests/helpers/figma-api'
 
@@ -149,5 +150,17 @@ describe('instance.resetOverrides', () => {
   test('is an instance’s alone', () => {
     const { card } = setup()
     expect(() => card.resetOverrides()).toThrow('resetOverrides() can only be called on instances')
+  })
+})
+
+describe('instance.resetOverrides with a replaced layer', () => {
+  test('brings back the component layer the replacement stood in for', () => {
+    const { figma, instance, find } = setup()
+    const star = figma.createStar()
+    star.name = 'Star'
+    expect(replaceInstanceLayer(figma.graph, find('Box').id, star.id)).toBe(true)
+    instance.resetOverrides()
+    expect(instance.findOne((node: FigmaNodeProxy) => node.name === 'Star')).toBeNull()
+    expect(find('Box').type).toBe('RECTANGLE')
   })
 })

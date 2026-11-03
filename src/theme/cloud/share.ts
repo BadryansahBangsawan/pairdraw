@@ -18,6 +18,11 @@ export default {
     accessBody: 'min-w-0 flex-1',
     accessLabel: 'text-xs font-medium text-surface',
     accessDetail: 'text-[11px] text-muted',
-    footnote: 'text-[11px] text-muted'
+    footnote: 'text-[11px] text-muted',
+    snapshotActions: 'mt-2 flex flex-wrap items-center gap-2',
+    sharedStatus: 'flex shrink-0 items-center gap-1.5',
+    sharedLabel:
+      'flex h-6 items-center gap-1 rounded-md bg-panel-field px-2 text-[11px] font-medium text-muted outline-none focus-visible:ring-2 focus-visible:ring-accent/50',
+    sharedDetail: 'sr-only'
   }
 } as const

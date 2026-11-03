@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import { appendSkillContext, stripModelNotes } from '@/app/ai/chat/context'
-import { invokedSkill } from '@/app/ai/skills/invoke'
+import { invokedSkill, withSkillCommand } from '@/app/ai/skills/invoke'
 import type { SkillLibrary } from '@/app/ai/skills/library'
 import type { Skill } from '@/app/ai/skills/types'
 
@@ -33,6 +33,25 @@ describe('running a skill by name', () => {
     expect(await invokedSkill('/skill:missing', skills)).toBeNull()
     expect(await invokedSkill('/skill:brand', skills)).toBeNull()
     expect(skills.reads).toBe(2)
+  })
+
+  test('a picked skill starts the message, replacing a skill already there', () => {
+    expect(withSkillCommand('', 'dark-mode')).toBe('/skill:dark-mode ')
+    expect(withSkillCommand('make the hero darker', 'dark-mode')).toBe(
+      '/skill:dark-mode make the hero darker'
+    )
+    expect(withSkillCommand('  /skill:layout  tidy the cards', 'restyle')).toBe(
+      '/skill:restyle tidy the cards'
+    )
+    // A path or another agent's command is text the user wrote, not a skill to replace.
+    expect(withSkillCommand('/tmp/hero.png is the photo', 'restyle')).toBe(
+      '/skill:restyle /tmp/hero.png is the photo'
+    )
+    // The line breaks after a replaced skill are the message's layout, not its separator.
+    expect(withSkillCommand('/skill:layout\n\n1. tidy\n2. align', 'restyle')).toBe(
+      '/skill:restyle\n\n1. tidy\n2. align'
+    )
+    expect(withSkillCommand('/skill:layout \t\nfix it', 'restyle')).toBe('/skill:restyle\nfix it')
   })
 
   test('gives the model the instructions in a note the transcript leaves out', () => {

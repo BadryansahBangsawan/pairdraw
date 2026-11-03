@@ -9,7 +9,12 @@ import type {
 import { DEFAULT_STROKE_WEIGHT } from '@open-pencil/scene-graph/constants'
 import { normalizeFontFamily } from '@open-pencil/scene-graph/font-style'
 import { fractionalPosition } from '@open-pencil/scene-graph/order-keys'
-import { OPEN_PENCIL_PLUGIN_DATA, withPluginData } from '@open-pencil/scene-graph/plugin-data'
+import {
+  hasPluginData,
+  OPEN_PENCIL_PLUGIN_DATA,
+  readPluginData,
+  withPluginData
+} from '@open-pencil/scene-graph/plugin-data'
 import type { GUID, JSONObject } from '@open-pencil/scene-graph/primitives'
 
 import { effectiveFigmaRawNodeFields } from '../source-metadata'
@@ -163,8 +168,9 @@ function normalizeStackSizing(value: string | undefined): KiwiNodeChange['stackP
     : undefined
 }
 
+/** Figma has no space evenly or space around; both are written as its space between. */
 function normalizeStackJustify(value: string | undefined): string | undefined {
-  return value === 'SPACE_EVENLY' ? 'SPACE_BETWEEN' : value
+  return value === 'SPACE_EVENLY' || value === 'SPACE_AROUND' ? 'SPACE_BETWEEN' : value
 }
 
 function normalizeStackCounterAlign(value: string | undefined): string | undefined {
@@ -286,8 +292,21 @@ function writeLayoutDirection(node: SceneNode): void {
   )
 }
 
+/**
+ * Keeps space around, which Figma's record can only hold as space between, as plugin data;
+ * an entry left from an earlier alignment goes. Unchanged entries stay where they are.
+ */
+function writePrimaryAxisAlign(node: SceneNode): void {
+  const field = OPEN_PENCIL_PLUGIN_DATA.primaryAxisAlign
+  const value = node.primaryAxisAlign === 'SPACE_AROUND' ? node.primaryAxisAlign : undefined
+  const stored = readPluginData(node.pluginData, field)
+  if (stored === value && (value !== undefined || !hasPluginData(node.pluginData, field))) return
+  node.pluginData = withPluginData(node.pluginData, field, value)
+}
+
 function serializeLayoutProps(node: SceneNode, nc: KiwiNodeChange, graph: SceneGraph): void {
   if (!node.source.id) writeLayoutDirection(node)
+  writePrimaryAxisAlign(node)
   serializeSizeConstraints(node, nc)
   const figLayout = node.source.fig.layout
   if (figLayout) {

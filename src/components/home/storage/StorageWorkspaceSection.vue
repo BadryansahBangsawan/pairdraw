@@ -157,6 +157,7 @@ function deleteSelected() {
     <div
       v-if="workspaceLoading && allDocuments.length === 0"
       :class="[styles.grid(), loading.group()]"
+      role="status"
       :aria-label="storage.loadingWorkspace"
     >
       <div v-for="index in 3" :key="index" :class="styles.skeleton()">

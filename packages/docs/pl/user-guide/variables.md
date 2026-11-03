@@ -80,6 +80,25 @@ Zmienne i style przechodzą między OpenPencil, Figmą i kodem jako [tokeny proj
 - **Wybór miejsca:** zanim cokolwiek się zmieni, okno pokazuje każdą znalezioną kolekcję i tryb oraz to, dokąd trafią: do nowej kolekcji lub trybu, do istniejącego albo nigdzie. Zmienne i style o tej samej nazwie są aktualizowane, a reszta dodawana; nic nie jest usuwane. Okno podaje, co zostanie dodane, zaktualizowane i pominięte, oraz dlaczego pominięto każdy token
 - Import to jeden krok: **Cofnij** wycofuje go w całości
 
+## Synchronizacja z arkuszem stylów
+
+Właściwości niestandardowe z pliku CSS stają się zmiennymi, a zmienne wracają do pliku. Kliknij **Synchronizuj z CSS** na pasku zmiennych:
+
+- **Importuj zmienne CSS…** wczytuje plik `.css`. `:root`, `html` i `@theme` z Tailwinda zawierają domyślne wartości każdej kolekcji; `[data-theme="dark"]`, klasa taka jak `.dark` oraz bloki `:root` w `@media`, `@supports` lub `@container` stają się trybami z tym warunkiem. Kolory, długości w `px` lub `rem`, czasy trwania, liczby, tekst w cudzysłowie i listy fontów stają się zmiennymi, `var(--name)` aliasem, a `calc()` lub `clamp()` zachowuje swój CSS jako wyrażenie CSS. To samo okno importu pokazuje, dokąd trafi każda kolekcja i tryb, zanim cokolwiek się zmieni
+- **Pobierz z** ponownie wczytuje połączony plik i pokazuje, co się zmieniło. Arkusz wyeksportowany z dokumentu wraca na te same zmienne i tryby
+- **Zapisz do** zapisuje zmienne bezpośrednio w połączonym pliku: zmienione wartości są przepisywane w ich własnym zapisie, brakujące dopisywane do ich bloku, a komentarze, inne reguły i właściwości bez zmiennej zostają bez zmian. Nic nie jest usuwane. Gdy przeglądarka nie może zapisać pliku, zapisuje kopię
+- **Pobieraj, gdy plik się zmieni** importuje każdy zapis połączonego pliku, na komputerze i w przeglądarkach z dostępem do plików, jako jeden krok cofania
+
+## Wklejanie między dokumentami
+
+Warstwy skopiowane w jednym otwartym dokumencie i wklejone do innego mogą przenieść zmienne i style, których używają. Przed wklejeniem okno pyta, jak to zrobić:
+
+- **Tak, zaimportuj** — dodaje zmienne i style, dzięki czemu wklejone warstwy pozostają z nimi połączone
+- **Wklej bez zmian** — wkleja warstwy z wartościami, które pokazywały, bez połączenia ze zmiennymi czy stylami
+- **Użyj istniejących** lub **Dodaj pod nową nazwą** — gdy ten dokument ma już kolekcję lub styl o tej samej nazwie, wybierz w każdym wierszu: użyj tej z dokumentu, w której zmienne są dopasowywane po nazwie, a brakujące zostają dodane, albo dodaj kopię pod nową nazwą, na przykład „Spacing 2”
+
+Wklejenie to jeden krok: **Cofnij** usuwa warstwy i wszystko, co zostało dodane. **Wklej właściwości** w ten sam sposób używa kolekcji i stylów o tej samej nazwie.
+
 ## Powiązywanie zmiennych z zalewami
 
 W sekcji „Zalew” panelu właściwości użyj wyboru zmiennej, aby powiązać zmienną koloru z zalewem obiektu.

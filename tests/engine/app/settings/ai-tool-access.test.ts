@@ -42,7 +42,13 @@ test('AI catalog includes exposed extended tools while preserving compact defaul
     'lint_fix',
     'export_image',
     'list_pages',
-    'create_page'
+    'create_page',
+    'get_style',
+    'rescale',
+    'generate_image',
+    'remove_background',
+    'replace_background',
+    'generate_svg'
   ]) {
     expect(defaults).toContain(name)
   }

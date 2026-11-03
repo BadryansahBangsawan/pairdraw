@@ -160,9 +160,9 @@ test('MCP requires a token only for enabled bearer connections and preserves fai
   await page
     .getByRole('textbox', { name: 'MCP server URL', exact: true })
     .fill('https://example.com/mcp')
-  await page.getByRole('switch', { name: 'Enable for ACP agents' }).click()
-  await page.getByRole('switch', { name: 'Use bearer authentication' }).click()
-  const key = page.getByRole('textbox', { name: 'Bearer token', exact: true })
+  await page.getByRole('switch', { name: 'Enable for AI chat and agents' }).click()
+  await page.getByRole('button', { name: 'Bearer token', exact: true }).click()
+  const key = page.getByLabel('Bearer token', { exact: true }).and(page.locator('input'))
   await page.getByRole('button', { name: 'Save', exact: true }).click()
   await expect(key).toBeFocused()
   await expect(key).toHaveAttribute('aria-invalid', 'true')

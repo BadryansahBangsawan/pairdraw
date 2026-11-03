@@ -16,5 +16,19 @@
   "toggleAIChat": "AIチャット ({shortcut})",
   "startPreview": "プレビュー ({shortcut})",
   "toggleLayersPanel": "レイヤーパネル",
-  "togglePropertiesPanel": "プロパティパネル"
+  "togglePropertiesPanel": "プロパティパネル",
+  "textLink": "リンク",
+  "addTextLink": "リンクを追加",
+  "editTextLink": "リンクを編集",
+  "removeTextLink": "リンクを削除",
+  "openTextLink": "リンクを開く",
+  "textLinkAddress": "リンク先",
+  "textLinkPlaceholder": "リンクまたはメールアドレスを貼り付け",
+  "textLinkInvalid": "ウェブアドレスかメールアドレスを入力してください。",
+  "textLinkMixed": "複数のリンク",
+  "textLinkToLayer": "{name} へのリンク",
+  "embedWaiting": "ホストページを待っています",
+  "embedWaitingDescription": "このデザインを埋め込んでいるページが接続すると、デザインが開きます。",
+  "embedInvalidOrigin": "この埋め込みは接続できません",
+  "embedInvalidOriginDescription": "リンクには、埋め込むページのオリジン（例: https://example.com）を指定する必要があります。"
 }

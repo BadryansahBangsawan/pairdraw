@@ -19,6 +19,7 @@ import { useDocumentShortcuts } from '@/app/shell/keyboard/document'
 import { toast } from '@/app/shell/ui'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import { AppDialogClose, AppDialogRoot } from '@/components/ui/dialog'
+import TokenCSSSyncMenu from '@/components/variables/TokenCSSSyncMenu.vue'
 import TokensPanel from '@/components/variables/TokensPanel.vue'
 
 const store = useEditorStore()
@@ -85,6 +86,13 @@ watch(
   { immediate: true }
 )
 
+/** A linked stylesheet's custom properties, previewed in the same import dialog. */
+function previewCSS(bundle: DesignTokenBundle) {
+  importRequest++
+  importBundle.value = bundle
+  importOpen.value = true
+}
+
 function exportTokens() {
   exportDesignTokenArchive(store).catch(reportFailure)
 }
@@ -109,6 +117,7 @@ function exportTokens() {
         >
           <icon-lucide-file-input class="size-3.5" />
         </IconButton>
+        <TokenCSSSyncMenu @preview="previewCSS" />
         <IconButton
           :label="expanded ? variables.collapse : variables.expand"
           data-test-id="variables-expand"

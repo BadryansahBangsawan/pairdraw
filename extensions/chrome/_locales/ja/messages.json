@@ -1,0 +1,56 @@
+{
+  "extensionName": {
+    "message": "Pairdraw Web Capture"
+  },
+  "extensionDescription": {
+    "message": "Web ページやその要素をコピーし、スタイル付きの編集可能なレイヤーとして Pairdraw に貼り付けます。"
+  },
+  "actionTitle": {
+    "message": "Pairdraw にコピー"
+  },
+  "popupTitle": {
+    "message": "Pairdraw にコピー"
+  },
+  "copyPage": {
+    "message": "ページをコピー"
+  },
+  "copyPageHint": {
+    "message": "表示どおりのページ全体"
+  },
+  "pickElement": {
+    "message": "要素を選択"
+  },
+  "pickElementHint": {
+    "message": "ページ上の任意の部分をクリック"
+  },
+  "includeImages": {
+    "message": "他のサイトの画像を含める"
+  },
+  "includeImagesHint": {
+    "message": "キャプチャ時にすべてのサイトの画像を読み取る許可を求めます。"
+  },
+  "statusCopying": {
+    "message": "コピー中…"
+  },
+  "statusCopied": {
+    "message": "コピーしました。Pairdraw のキャンバスに貼り付けてください。"
+  },
+  "statusUnavailable": {
+    "message": "このページはキャプチャできません。通常の Web ページでお試しください。"
+  },
+  "statusNeedsSecurePage": {
+    "message": "コピーするには HTTPS で配信されているページが必要です。"
+  },
+  "statusFailed": {
+    "message": "キャプチャをコピーできませんでした: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Network error"
+      }
+    }
+  },
+  "pickerHint": {
+    "message": "要素をクリックするか Enter でコピー · ↑ ↓ で親要素・子要素に移動 · Esc でキャンセル"
+  }
+}

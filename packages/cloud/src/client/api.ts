@@ -59,6 +59,7 @@ import { hc } from 'hono/client'
 import * as v from 'valibot'
 
 import { createImageRequests } from './images'
+import { createProfileRequests } from './profiles'
 import { CloudAPIError, parseResponse, responseBody, type CloudClientDiagnostic } from './response'
 import { createWorkspaceRequests } from './workspaces'
 
@@ -170,6 +171,7 @@ export function createCloudAPIClient(baseURL: string, options: CloudRequestOptio
       return response.user
     },
     ...createWorkspaceRequests(client, options.onDiagnostic),
+    ...createProfileRequests(client, publicClient, options.onDiagnostic),
     ...createImageRequests(client, publicClient, options.onDiagnostic),
     /** Documents shared with the person directly, outside their workspaces. */
     async listSharedDocuments(): Promise<SharedDocument[]> {

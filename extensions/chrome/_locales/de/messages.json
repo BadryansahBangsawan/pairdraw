@@ -1,0 +1,56 @@
+{
+  "extensionName": {
+    "message": "Pairdraw Web Capture"
+  },
+  "extensionDescription": {
+    "message": "Kopiere eine Webseite oder eines ihrer Elemente und füge sie in Pairdraw als bearbeitbare, gestaltete Ebenen ein."
+  },
+  "actionTitle": {
+    "message": "In Pairdraw kopieren"
+  },
+  "popupTitle": {
+    "message": "In Pairdraw kopieren"
+  },
+  "copyPage": {
+    "message": "Seite kopieren"
+  },
+  "copyPageHint": {
+    "message": "Die ganze Seite, wie du sie siehst"
+  },
+  "pickElement": {
+    "message": "Element auswählen"
+  },
+  "pickElementHint": {
+    "message": "Klicke auf einen Teil der Seite"
+  },
+  "includeImages": {
+    "message": "Bilder von anderen Websites einbeziehen"
+  },
+  "includeImagesHint": {
+    "message": "Fragt beim Aufnehmen nach der Berechtigung, Bilder von jeder Website zu lesen."
+  },
+  "statusCopying": {
+    "message": "Wird kopiert …"
+  },
+  "statusCopied": {
+    "message": "Kopiert. Füge es in eine Pairdraw-Arbeitsfläche ein."
+  },
+  "statusUnavailable": {
+    "message": "Diese Seite kann nicht aufgenommen werden. Versuche es mit einer normalen Webseite."
+  },
+  "statusNeedsSecurePage": {
+    "message": "Zum Kopieren muss die Seite über HTTPS geladen sein."
+  },
+  "statusFailed": {
+    "message": "Die Aufnahme konnte nicht kopiert werden: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Network error"
+      }
+    }
+  },
+  "pickerHint": {
+    "message": "Klicke auf ein Element oder drücke Enter, um es zu kopieren · ↑ ↓ wechseln zum übergeordneten oder untergeordneten · Esc bricht ab"
+  }
+}

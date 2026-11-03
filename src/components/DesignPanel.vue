@@ -4,6 +4,7 @@ import { computed } from 'vue'
 import { getNodeEditCapability } from '@open-pencil/core'
 import { layerResizes, layerStrokesAndEffects } from '@open-pencil/scene-graph/generated'
 import { readIcon } from '@open-pencil/scene-graph/icons'
+import { isReplacedLayer } from '@open-pencil/scene-graph/instances'
 import { useEditorCommands } from '@open-pencil/vue/editor/commands'
 import { useSelectionState } from '@open-pencil/vue/editor/selection-state'
 import { useI18n } from '@open-pencil/vue/i18n'
@@ -17,10 +18,13 @@ import IconButton from '@/components/ui/button/IconButton.vue'
 import Tip from '@/components/ui/overlay/Tip.vue'
 import PanelHeader from '@/components/ui/panel/PanelHeader.vue'
 
+import AgentNotesSection from './properties/agent-notes/AgentNotesSection.vue'
 import AppearanceSection from './properties/AppearanceSection.vue'
 import BehaviourPanel from './properties/component-properties/behaviour/BehaviourPanel.vue'
 import ComponentPropertiesSection from './properties/component-properties/ComponentPropertiesSection.vue'
 import ComponentPropertyListSection from './properties/component-properties/ComponentPropertyListSection.vue'
+import InstanceSwapPicker from './properties/component-properties/instance-swap/InstanceSwapPicker.vue'
+import { useInstanceSwap } from './properties/component-properties/instance-swap/use'
 import InstanceUpdateAction from './properties/component-properties/instance-update/InstanceUpdateAction.vue'
 import PropertyBindButton from './properties/component-properties/PropertyBindButton.vue'
 import PropertyBoundField from './properties/component-properties/PropertyBoundField.vue'
@@ -43,6 +47,7 @@ import MaskSection from './properties/MaskSection.vue'
 import PageSection from './properties/PageSection.vue'
 import RetainedPanel from './properties/panel/RetainedPanel.vue'
 import PositionSection from './properties/PositionSection.vue'
+import ScaleSection from './properties/scale/ScaleSection.vue'
 import SelectionColorsSection from './properties/selection/SelectionColorsSection.vue'
 import SelectionLayoutSection from './properties/selection/SelectionLayoutSection.vue'
 import SelectionActionsControl from './properties/SelectionActionsControl.vue'
@@ -62,6 +67,16 @@ const activeTool = computed(() => store.state.activeTool)
 const { selectedNode: node, selectedCount: multiCount, canConvertToFrame } = useSelectionState()
 const swapBinding = usePropertyBinding('INSTANCE_SWAP')
 const swapLinked = computed(() => !!swapBinding.definition.value)
+const {
+  open: swapOpen,
+  items: swapItems,
+  current: swapCurrent,
+  swap: swapInstance
+} = useInstanceSwap(node, store)
+// A layer pasted in place of one inside an instance can give that place back to the component.
+const replacedLayer = useSceneComputed(
+  () => !!node.value && isReplacedLayer(store.graph, node.value)
+)
 const showBooleanOperations = computed(() => multiCount.value >= 2)
 const { getCommand } = useEditorCommands()
 const goToMainComponent = getCommand('selection.goToMainComponent')
@@ -70,8 +85,9 @@ const isComponentType = computed(() => {
   const type = node.value?.type
   return type ? COMPONENT_TYPES.has(type) : false
 })
-// A library's components are edited in the library, so Add variant has nothing to change here.
-const canAddVariant = computed(
+// A library's components are edited in the library, so Add variant, swap, and restore have
+// nothing to change here.
+const canEditSelected = computed(
   () => !!node.value && getNodeEditCapability(store.graph, node.value.id).editable
 )
 const selectedIcon = computed(() => (node.value ? sceneNodeIcon(node.value) : undefined))
@@ -98,6 +114,10 @@ const supportsLayoutGuides = useSceneComputed(() => {
 const strokesAndEffects = useSceneComputed(() =>
   store.getSelectedNodes().every((selected) => layerStrokesAndEffects(selected))
 )
+// The Scale tool's panel replaces selection properties while it can scale the selection, as in Figma.
+const showsScalePanel = useSceneComputed(
+  () => activeTool.value === 'SCALE' && store.scaleSelectionBounds() !== null
+)
 const { panels } = useI18n()
 </script>
 
@@ -108,6 +128,14 @@ const { panels } = useI18n()
     class="scrollbar-thin flex-1 overflow-x-hidden overflow-y-auto pb-4"
   >
     <FramePresetsSection />
+  </div>
+
+  <div
+    v-else-if="showsScalePanel"
+    data-test-id="design-panel-scale"
+    class="scrollbar-thin flex-1 overflow-x-hidden overflow-y-auto pb-4"
+  >
+    <ScaleSection />
   </div>
 
   <!-- Multi-select summary -->
@@ -145,7 +173,7 @@ const { panels } = useI18n()
   </div>
 
   <!-- Single selection: retain one paused subtree while frame presets are shown. -->
-  <RetainedPanel :active="activeTool !== 'FRAME' && multiCount === 1 && !!node">
+  <RetainedPanel :active="activeTool !== 'FRAME' && !showsScalePanel && multiCount === 1 && !!node">
     <div
       v-if="node"
       data-test-id="design-panel-single"
@@ -179,12 +207,30 @@ const { panels } = useI18n()
             v-if="node.type === 'COMPONENT' || node.type === 'COMPONENT_SET'"
             :label="panels.addVariant"
             data-test-id="add-variant"
-            :disabled="!canAddVariant"
+            :disabled="!canEditSelected"
             @click="store.addVariant(node.id)"
           >
             <icon-lucide-diamond-plus class="size-3.5" />
           </IconButton>
           <PropertyBindButton v-if="node.type === 'INSTANCE'" field="INSTANCE_SWAP" />
+          <!-- A swap linked to a property is chosen in the heading instead. -->
+          <InstanceSwapPicker
+            v-if="node.type === 'INSTANCE' && !swapLinked"
+            v-model:open="swapOpen"
+            :items="swapItems"
+            :selected="swapCurrent"
+            :disabled="!canEditSelected"
+            @select="swapInstance"
+          />
+          <IconButton
+            v-if="replacedLayer"
+            :label="panels.restoreComponentLayer"
+            data-test-id="instance-restore-layer"
+            :disabled="!canEditSelected"
+            @click="store.restoreReplacedInstanceLayer(node.id)"
+          >
+            <icon-lucide-rotate-ccw class="size-3.5" />
+          </IconButton>
           <TextContentControl v-if="node.type === 'TEXT'" :node-id="node.id" :text="node.text" />
           <InstanceUpdateAction
             v-if="node.type === 'INSTANCE'"
@@ -258,6 +304,7 @@ const { panels } = useI18n()
       <LayoutGridSection v-if="supportsLayoutGuides" />
 
       <ExportSection />
+      <AgentNotesSection />
     </div>
   </RetainedPanel>
 

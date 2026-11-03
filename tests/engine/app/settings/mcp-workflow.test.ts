@@ -9,11 +9,13 @@ import {
 } from '@/app/integrations/mcp'
 import { useMCPConnectionSettings } from '@/app/integrations/mcp/settings/use'
 
+const SERVER_URL = 'https://example.com/mcp'
+
 const connection: MCPConnection = {
   id: 'mcp-test',
   name: 'Test',
   enabled: true,
-  transport: { type: 'streamable-http', url: 'https://example.com/mcp' },
+  transport: { type: 'streamable-http', url: SERVER_URL },
   authentication: { type: 'none' }
 }
 
@@ -189,7 +191,7 @@ test('clear never persists unsaved fields and cancel discards removal', async ()
           setCredential: async () => undefined,
           save: (draft) => {
             names.push(draft.name)
-            expect(draft.url).toBe(connection.transport.url)
+            expect(draft.url).toBe(SERVER_URL)
             return connection
           },
           remove: async () => undefined

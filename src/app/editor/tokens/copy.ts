@@ -13,7 +13,7 @@ const FORMAT_LABELS: Record<TokenStylesheetFormat, string> = {
 }
 
 /** The variable, or the collection and mode, an issue is about. */
-function issueSubject(store: EditorStore, issue: TokenStylesheetIssue): string {
+export function issueSubject(store: EditorStore, issue: TokenStylesheetIssue): string {
   const variable = issue.variableId ? store.graph.variables.get(issue.variableId) : undefined
   if (variable) return variable.name
   const collection = issue.collectionId

@@ -191,6 +191,7 @@ export const APP_MENU_SCHEMA = [
       { id: 'cut', label: 'Cut', shortcut: 'MOD+X' },
       { id: 'paste', label: 'Paste', shortcut: 'MOD+V' },
       { id: 'paste-to-replace', label: 'Paste to replace', shortcut: 'MOD+SHIFT+R' },
+      { id: 'replace-in-instance', label: 'Replace inside instance', shortcut: 'ALT+SHIFT+R' },
       {
         id: 'selection.duplicate',
         label: 'Duplicate',
@@ -313,6 +314,7 @@ export const APP_MENU_SCHEMA = [
       { type: 'separator' },
       { id: 'toggle-ui', label: 'Toggle UI', shortcut: 'MOD+\\' },
       { id: 'toggle-preview', label: 'Preview', shortcut: 'MOD+ALT+↩' },
+      { id: 'present', label: 'Present', shortcut: 'MOD+↩', palette: { keywords: ['slides'] } },
       // The shortcut sheet, which ? also opens; ? is typed differently per layout, so no accelerator.
       { id: 'keyboard-shortcuts', label: 'Keyboard Shortcuts', handler: 'shell' },
       { type: 'separator' },

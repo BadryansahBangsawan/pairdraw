@@ -1,3 +1,4 @@
+import { noop } from 'es-toolkit/function'
 import { omitBy, pick } from 'es-toolkit/object'
 
 import { materializeFigFragment } from '@open-pencil/fig'
@@ -15,7 +16,9 @@ import { STYLE_LINK_FIELDS, sharedStyleRefKey } from '@open-pencil/scene-graph/s
 import { parseOpenPencilClipboard } from '#core/clipboard'
 import { importClipboardDependenciesWithUndo } from '#core/editor/clipboard/dependencies'
 import type { ClipboardSnapshot } from '#core/editor/clipboard/snapshot'
+import { loadBoundFonts } from '#core/editor/text/bound-fonts'
 import type { EditorContext } from '#core/editor/types'
+import { reconcileVariableLayouts } from '#core/layout/variables'
 
 /**
  * Figma's Paste properties: the look of the one copied layer, applied to others. Position, size,
@@ -195,6 +198,18 @@ export function createClipboardPropertiesActions(
     })
   }
 
+  /**
+   * Resolves the bindings brought onto `changed` against this document's variables, whose values
+   * can differ from the copied ones, now and again on redo after the pasted values return.
+   */
+  function resolveBindings(changed: string[]) {
+    const resolve = () =>
+      loadBoundFonts(ctx, reconcileVariableLayouts(ctx.graph, { subtrees: changed }))
+    resolve()
+    // Undoing the paste puts back every field it set, so this step has nothing of its own to undo.
+    ctx.undo.push({ label: LABEL, forward: resolve, inverse: noop })
+  }
+
   async function finish(changed: string[]): Promise<number> {
     if (changed.length > 0) {
       await loadFontsForNodes(changed)
@@ -206,14 +221,18 @@ export function createClipboardPropertiesActions(
   /**
    * Paste properties from a copy made in this app: the look of its one layer, with the styles and
    * variables it uses, onto every selected layer in one undo step. Returns how many changed.
+   * From another document, a collection or style this one has by name is used, not added again.
    */
   async function pastePropertiesFromSnapshot(snapshot: ClipboardSnapshot): Promise<number> {
     const nodes = targets()
     if (snapshot.nodes.length !== 1 || !hasPastableProperties(snapshot.nodes[0])) return 0
     if (nodes.length === 0) return 0
     const changed = ctx.undo.runBatch(LABEL, () => {
-      const [source] = importClipboardDependenciesWithUndo(ctx, snapshot).nodes
-      return apply(source, snapshot.images, nodes)
+      const dependencies = importClipboardDependenciesWithUndo(ctx, snapshot, { mode: 'import' })
+      const [source] = dependencies.nodes
+      const pasted = apply(source, snapshot.images, nodes)
+      if (dependencies.resolveBindings && pasted.length > 0) resolveBindings(pasted)
+      return pasted
     })
     return finish(changed)
   }

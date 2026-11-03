@@ -52,6 +52,10 @@ export type Tool =
   | 'PENCIL'
   | 'HAND'
   | 'COMMENT'
+  /** Figma's Z: a click zooms in, ⌥ and a click out, and a drag zooms to the dragged area. */
+  | 'ZOOM'
+  /** Figma's K: handles scale layers with their text, strokes, effects, and spacing. */
+  | 'SCALE'
 
 /** The gradient whose handles the canvas shows while its paint picker is open. */
 export interface GradientEdit {
@@ -60,6 +64,13 @@ export interface GradientEdit {
   index: number
   /** The selected stop, shared by the canvas handles and the picker. */
   stop: number
+}
+
+/** The image fill being cropped and reframed on the canvas. */
+export interface ImageEdit {
+  nodeId: string
+  /** The fill's index in the layer's fills. */
+  index: number
 }
 
 /** The selected shape's radius, point count, and ratio handles, shown while the pointer is over it. */
@@ -91,6 +102,8 @@ export interface EditorSharedState {
   showPixelGrid?: boolean
   /** The gradient being edited, whose handles the canvas draws and drags. */
   gradientEdit?: GradientEdit | null
+  /** The image fill whose crop and framing the canvas edits, in place of the selection handles. */
+  imageEdit?: ImageEdit | null
   presenceCursors: PresenceCursor[]
   documentName: string
   /** Design check markers and highlight, shared by every canvas pane. */
@@ -229,10 +242,14 @@ export interface EditorEvents extends SceneGraphEvents {
   'rotation:preview-changed': (preview: RotationPreview | null) => void
   'tool:changed': (tool: Tool, previousTool: Tool) => void
   'page:changed': (pageId: string, previousPageId: string) => void
+  /** Another page is about to show, before the current page's view is saved for coming back. */
+  'page:leaving': (pageId: string, nextPageId: string) => void
   'guides:changed': (ownerId: string, guides: readonly CanvasGuide[]) => void
   'clipboard:images-missing': (resolution: ClipboardImageResolution) => void
   /** Turning a main component back into a frame was asked for; the front end confirms it. */
   'component:to-frame-requested': (componentId: string) => void
+  /** A text link to a web or mail address was followed; the front end opens it outside. */
+  'hyperlink:open': (url: string) => void
   'font:resolution-changed': (event: FontResolutionEvent, snapshot: FontResolutionSnapshot) => void
   /** A font face finished loading, however it was asked for. */
   'font:loaded': (family: string, style: string) => void

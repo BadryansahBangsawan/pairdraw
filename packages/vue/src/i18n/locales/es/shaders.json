@@ -1,0 +1,17 @@
+{
+  "mode": "Modo shader",
+  "open": "Abrir en modo shader",
+  "region": "Modo shader: {name}",
+  "done": "Listo",
+  "leave": "Salir del modo shader ({shortcut})",
+  "play": "Reproducir",
+  "pause": "Pausar",
+  "restart": "Volver al inicio",
+  "phase": "Fase de la animación",
+  "position": "{time} de {duration}",
+  "preview": "Vista previa del shader",
+  "settings": "Ajustes del shader",
+  "starting": "Iniciando el shader…",
+  "failed": "Este shader no puede reproducirse aquí, así que se muestra su fotograma fijo.",
+  "readOnly": "Este documento es de solo lectura: el shader se reproduce, pero sus ajustes no se pueden cambiar."
+}

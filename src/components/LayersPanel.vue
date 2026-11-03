@@ -3,7 +3,7 @@ import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui'
 import { tv } from 'tailwind-variants'
 import { computed, ref } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n, useSlidesMessages } from '@open-pencil/vue/i18n'
 import { vTestId } from '@open-pencil/vue/testing'
 
 import SegmentedControl from '@/components/ui/select/SegmentedControl.vue'
@@ -13,18 +13,29 @@ import splitterTheme from '@/theme/splitter'
 import AssetsPanel from './assets-panel/AssetsPanel.vue'
 import LayerTree from './LayerTree/LayerTree.vue'
 import PagesPanel from './PagesPanel.vue'
+import SlidesPanel from './slides/SlidesPanel.vue'
 
 const { panels } = useI18n()
-const activePanel = ref<'file' | 'assets'>('file')
+const slidesMessages = useSlidesMessages()
+const PANEL_VIEWS = ['file', 'assets', 'slides'] as const
+type PanelView = (typeof PANEL_VIEWS)[number]
+const PANEL_TAB_TEST_IDS: Readonly<Partial<Record<string, string>>> = {
+  file: 'left-panel-layers-tab',
+  assets: 'left-panel-assets-tab',
+  slides: 'left-panel-slides-tab'
+}
+const activePanel = ref<PanelView>('file')
 const panelModel = computed({
   get: () => activePanel.value,
   set: (value: string) => {
-    if (value === 'file' || value === 'assets') activePanel.value = value
+    const view = PANEL_VIEWS.find((candidate) => candidate === value)
+    if (view) activePanel.value = view
   }
 })
 const panelOptions = computed(() => [
   { value: 'file', label: panels.value.layers },
-  { value: 'assets', label: panels.value.assets }
+  { value: 'assets', label: panels.value.assets },
+  { value: 'slides', label: slidesMessages.value.title }
 ])
 const panelTabsUI = { root: 'w-full' }
 const splitterStyles = tv(splitterTheme)({ direction: 'vertical' })
@@ -41,16 +52,14 @@ const sideStyles = tv(sidePanelTheme)()
         :ui="panelTabsUI"
       >
         <template #option="{ option }">
-          <span
-            v-test-id="option.value === 'file' ? 'left-panel-layers-tab' : 'left-panel-assets-tab'"
-            class="truncate"
-          >
+          <span v-test-id="PANEL_TAB_TEST_IDS[option.value]" class="truncate">
             {{ option.label }}
           </span>
         </template>
       </SegmentedControl>
     </div>
     <AssetsPanel v-if="activePanel === 'assets'" />
+    <SlidesPanel v-else-if="activePanel === 'slides'" />
     <SplitterGroup
       v-else
       direction="vertical"

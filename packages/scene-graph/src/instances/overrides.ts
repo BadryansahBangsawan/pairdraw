@@ -22,6 +22,37 @@ export function overriddenBindingField(field: InstanceOverrideField): string | n
     : null
 }
 
+const VARIABLE_MODE_OVERRIDE_PREFIX = 'variableModes/'
+
+/**
+ * The override field that keeps a layer's mode for one collection through a sync, so the
+ * component's modes for other collections still reach it. `variableModes` alone keeps them all.
+ */
+export function variableModeOverrideField(collectionId: string): InstanceOverrideField {
+  return `${VARIABLE_MODE_OVERRIDE_PREFIX}${collectionId}`
+}
+
+/** The collection a mode override field claims, or null for an override of anything else. */
+export function overriddenVariableModeCollection(field: InstanceOverrideField): string | null {
+  return field.startsWith(VARIABLE_MODE_OVERRIDE_PREFIX)
+    ? field.slice(VARIABLE_MODE_OVERRIDE_PREFIX.length)
+    : null
+}
+
+/**
+ * The override field that marks a layer of an instance as one put in place of a component's
+ * layer, recorded by the nearest instance above it. Its value is the layer it replaces, which
+ * sync matches it to instead of copying that layer in again.
+ */
+export const REPLACED_LAYER_OVERRIDE = 'replacedLayer'
+
+/** Override fields whose value names another layer of the document. */
+export function isLayerReferenceOverride(field: InstanceOverrideField): boolean {
+  return (
+    field === 'componentId' || field === 'sourceComponentId' || field === REPLACED_LAYER_OVERRIDE
+  )
+}
+
 export function createInstanceOverrideState(): InstanceOverrideState {
   return { self: new Map(), descendants: new Map() }
 }
@@ -118,7 +149,7 @@ export function remapInstanceOverrideState(
 ): InstanceOverrideState {
   const remapValue = (field: string, value: unknown): unknown => {
     if (typeof value !== 'string') return structuredClone(value)
-    if (field === 'componentId' || field === 'sourceComponentId') return references.node(value)
+    if (isLayerReferenceOverride(field)) return references.node(value)
     if (overriddenBindingField(field) !== null) return references.variable(value)
     return value
   }

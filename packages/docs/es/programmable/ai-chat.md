@@ -19,7 +19,7 @@ Puedes guardar varios perfiles y asignarlos por separado a diseño, revisiones, 
 
 ## Proveedores
 
-OpenPencil admite conexiones compatibles con OpenAI y Anthropic, además de OpenRouter, Google, Z.ai y proveedores locales. Los modelos y capacidades disponibles dependen de cada servicio.
+OpenPencil admite conexiones compatibles con OpenAI y Anthropic, además de OpenRouter, Google, Amazon Bedrock, Google Vertex AI, Z.ai y proveedores locales. Amazon Bedrock usa una región y una clave de API de Bedrock, o claves de acceso de AWS en la app de escritorio; Vertex AI usa un proyecto, una ubicación y un token de acceso. Los modelos y capacidades disponibles dependen de cada servicio.
 
 OpenPencil no usa un servidor intermediario. Las solicitudes se envían directamente al proveedor; en el navegador se aplican sus políticas CORS. La fiabilidad de las llamadas de herramientas en flujo continuo también puede variar entre despliegues. Consulta [Compatibilidad BYOK](/programmable/byok-provider-compatibility) para ver mediciones y pasos de reproducción.
 
@@ -29,6 +29,8 @@ La aplicación de escritorio puede ejecutar agentes ACP y conectarlos a servidor
 
 El token se guarda en el almacén seguro de credenciales, no en los ajustes ordinarios, y solo se recupera al iniciar la sesión ACP.
 
+El chat integrado con API directa también usa las conexiones activadas y ofrece sus herramientas al modelo como `mcp__<servidor>__<herramienta>`. Los servidores alojados, como Notion o Linear, usan **Inicio de sesión OAuth**: guarda la conexión y pulsa **Iniciar sesión**. En la app de escritorio una conexión también puede ser un **Comando local**, un programa que habla MCP por stdin y stdout, con un argumento por línea y variables de entorno opcionales `NOMBRE=valor`. Antes de ejecutar una línea de comandos por primera vez, la app pide permiso en un diálogo del sistema; no se permiten variables como `PATH` o `NODE_OPTIONS` que cargan código. Mientras el chat pida permiso antes de actuar, también lo pide antes de cada herramienta externa que su servidor no marque como de solo lectura. En la app web, un servidor remoto debe aceptar peticiones desde el origen de la app (CORS).
+
 ## Herramientas
 
 Las herramientas cubren lectura, creación, modificación, estructura, variables, vectores, análisis, descripción, generación de código e imágenes de stock. Cada llamada actúa sobre el editor activo y participa en su historial de deshacer cuando corresponde.
@@ -37,7 +39,20 @@ Las herramientas cubren lectura, creación, modificación, estructura, variables
 
 Las habilidades son carpetas con un `SKILL.md` en el formato [Agent Skills](https://agentskills.io/specification): instrucciones para un tipo de trabajo, con archivos de referencia opcionales. La IA integrada ve el nombre y la descripción de cada habilidad activa y carga sus instrucciones cuando una solicitud coincide; los scripts de una habilidad no se ejecutan.
 
-En **Ajustes → Habilidades** sube una habilidad como ZIP de su carpeta o como `SKILL.md`. En la app de escritorio también se leen `~/.agents/skills` y `~/.claude/skills`, y las carpetas `.agents/skills` y `.claude/skills` junto al documento abierto, que solo se usan tras **Confiar en la carpeta**. Escribe `/` al principio de un mensaje para elegir una habilidad, y `@` para mencionar una capa, una página o una habilidad. Las menciones aparecen como chips, también en las respuestas; al hacer clic se muestra la capa en el lienzo.
+En **Ajustes → Habilidades** sube una habilidad como ZIP de su carpeta o como `SKILL.md`. En la app de escritorio también se leen `~/.agents/skills` y `~/.claude/skills`, y las carpetas `.agents/skills` y `.claude/skills` junto al documento abierto, que solo se usan tras **Confiar en la carpeta**. OpenPencil incluye habilidades integradas: guías para landing pages, apps móviles, apps web, paneles, diapositivas, sistemas de diseño y Tailwind CSS v4, además de `layout`, `restyle`, `dark-mode` y `design-review` para diseños existentes; una habilidad tuya con el mismo nombre tiene prioridad. Escribe `/` al principio de un mensaje o usa **Elegir una habilidad** bajo el campo de mensaje para elegir una habilidad, y `@` para mencionar una capa, una página o una habilidad. Las menciones aparecen como chips, también en las respuestas; al hacer clic se muestra la capa en el lienzo.
+
+## Explorar variantes
+
+**Déjalo cocinar**, el gorro de chef bajo el campo de mensaje, explora una petición en lugar de responderla una vez:
+
+- **Variantes** pide de dos a seis diseños uno al lado de otro, cada uno un marco nuevo de nivel superior a la derecha de todo lo que hay en la página. Elige si exploran el **Diseño** (estructura y disposición, con un solo estilo) o el **Estilo** (colores, tipografía e imágenes, con un solo diseño). Con una capa seleccionada o mencionada, las variantes parten de ella y la dejan como estaba.
+- **No iterar** pide un solo diseño en una pasada, sin la revisión y los retoques que el asistente hace normalmente.
+
+La elección sigue activa en los mensajes siguientes, y el botón la muestra, hasta que vuelvas a **Desactivado**.
+
+## Notas para la IA
+
+Selecciona una capa y añade **Notas para la IA** al final del panel Diseño. **Contexto** indica a los agentes qué significa o hace la capa, como «abre el diálogo de registro»; **Prompt** es una petición sobre la capa que **Ejecutar prompt** envía al chat. Un mensaje lleva las notas de las capas que le conciernen: las que menciona y la selección o, si no hay ninguna, toda la página. Los agentes respetan el contexto y solo actúan sobre un prompt cuando se les pide. Las notas se guardan en el archivo con la capa, y las notas `context` y las tarjetas de prompt de un archivo `.pen` se leen igual.
 
 ## Verificación visual
 

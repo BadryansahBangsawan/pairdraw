@@ -7,5 +7,27 @@
   "settingsTitle": "復元",
   "settingsDescription": "未保存ドキュメントのローカル復元コピーを管理します。",
   "restore": "復元",
-  "discard": "破棄"
+  "discard": "破棄",
+  "drafts": "下書き",
+  "draftsDescription": "新しいデザインは、どこかに保存するまでこのデバイスのここに保管されます。",
+  "loadingDrafts": "下書きを読み込み中",
+  "noDrafts": "下書きはまだありません",
+  "noDraftsDescription": "新しいデザインは、作業中に下書きとしてここに保管されます。",
+  "draftsOff": "下書きはオフです",
+  "draftsOffDescription": "新しいデザインがここに保存されるのは、設定で「未保存の作業を自動的に保持」がオンで、このブラウザがサイトデータを保持している場合のみです。",
+  "deleteDraft": "下書きを削除",
+  "deleteDraftConfirmation": "下書き「{name}」を削除しますか？",
+  "deleteDraftsConfirmation": {
+    "many": "{count} 件の下書きを削除しますか？"
+  },
+  "deleteDraftDescription": "下書きはこのデバイスにのみ保存されています。この操作は元に戻せません。",
+  "deleteDraftFailed": "下書き「{name}」を削除できませんでした。もう一度お試しください。",
+  "draftUnavailable": "この下書きはもう利用できません。",
+  "recoveredChangesTitle": "復元された変更",
+  "recoveredChangesDescription": "「{name}」には、ファイルに保存されなかった {time} の変更があります。ファイルに保存するか、新しいファイルとして保存するか、破棄してください。",
+  "saveRecovered": "保存",
+  "saveRecoveredAs": "別名で保存…",
+  "discardRecovered": "保存しない",
+  "recoveredChangesFailed": "復元された変更を保存できませんでした: {error}",
+  "backupUnavailable": "これらの変更のバックアップはもう利用できません。"
 }

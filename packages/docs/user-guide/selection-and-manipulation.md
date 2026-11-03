@@ -36,6 +36,12 @@ Selected nodes show 8 resize handles (4 corners + 4 edge midpoints). Drag any ha
 
 - <kbd>Shift</kbd> + drag a corner handle to constrain proportions
 
+## Scale Tool
+
+Press <kbd>K</kbd>, or pick **Scale** from the Move tool's toolbar menu, to scale layers with everything in them: text sizes, strokes, effects, corner radii, and auto layout spacing grow and shrink with the layer, as with Figma's Scale tool. Drag a selection handle to scale from the opposite side, or hold <kbd>Option</kbd>/<kbd>Alt</kbd> to scale from the center; several selected layers scale together around their joint bounds.
+
+While the Scale tool is on, the Design panel shows the selection's width and height, a scale factor, and an anchor grid. Typing a width or height scales the selection proportionally to it; the factor takes `2`, `2x`, or `200%`. The anchor grid picks the point that stays in place. Each scale is one undo step.
+
 ## Moving into and out of frames
 
 A dragged node lands in the frame under the cursor when you release it, however little of it is inside, and leaves its frame as soon as the cursor does. Groups and locked frames never take dropped nodes, and a component set takes back only its own variants; a node inside a group stays in it unless you drop it on a different frame, and the group resizes to fit what it holds. A group whose last node leaves is removed. Pressing inside a selected frame, group, or component set drags it rather than the node under the cursor.
@@ -103,6 +109,7 @@ A section takes in the sibling nodes it fully covers when you draw it, move it, 
 | Select all | <kbd>⌘</kbd><kbd>A</kbd> | <kbd>Ctrl</kbd> + <kbd>A</kbd> |
 | Duplicate | <kbd>⌘</kbd><kbd>D</kbd> | <kbd>Ctrl</kbd> + <kbd>D</kbd> |
 | Duplicate + move | <kbd>⌥</kbd> + drag | <kbd>Alt</kbd> + drag |
+| Scale tool | <kbd>K</kbd> | <kbd>K</kbd> |
 | Move along one axis | <kbd>⇧</kbd> + drag | <kbd>Shift</kbd> + drag |
 | Keep current parent | <kbd>Space</kbd> while dragging | <kbd>Space</kbd> while dragging |
 | Move without snapping | <kbd>⌃</kbd> + drag | <kbd>Ctrl</kbd> + drag |

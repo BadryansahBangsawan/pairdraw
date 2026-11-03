@@ -73,9 +73,9 @@ export function createEditorStoreModules(
     ...pen,
     ...vectorEdit,
     /** Going read-only keeps a vector edit in progress, as the editor keeps edited text. */
-    setReadOnly(readOnly: boolean) {
+    setReadOnly(readOnly: boolean, options?: { comments?: boolean }) {
       if (readOnly) vectorEdit.exitNodeEditMode(true)
-      editor.setReadOnly(readOnly)
+      editor.setReadOnly(readOnly, options)
     },
     openFigFile: documentIO.openFigFile,
     openDOMFile: documentIO.openDOMFile,
@@ -103,6 +103,13 @@ export function createEditorStoreModules(
     adoptRecoverySnapshot: documentIO.adoptRecoverySnapshot,
     persistRecoveryNow: documentIO.persistRecoveryNow,
     discardRecovery: documentIO.discardRecovery,
+    /** The draft a new document keeps its changes in, once it has one. */
+    getDraftId: documentIO.getDraftId,
+    adoptDraft: documentIO.adoptDraft,
+    persistDraftNow: documentIO.persistDraftNow,
+    discardDraft: documentIO.discardDraft,
+    /** Holds drafting while the document is someone else's, such as a joined room's. */
+    suspendDraft: documentIO.suspendDraft,
     setDocumentSource: documentIO.setDocumentSource,
     setStorageDocumentSource: documentIO.setStorageDocumentSource,
     setPlannedFilePath: documentIO.setPlannedFilePath,

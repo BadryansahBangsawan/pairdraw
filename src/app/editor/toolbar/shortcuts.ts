@@ -28,7 +28,9 @@ const UNKEYED: Readonly<Record<Tool, string>> = {
   SHAPE_WITH_TEXT: '',
   CONNECTOR: '',
   HAND: '',
-  COMMENT: ''
+  COMMENT: '',
+  ZOOM: '',
+  SCALE: ''
 }
 
 /**

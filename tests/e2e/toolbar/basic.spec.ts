@@ -72,8 +72,14 @@ test('shape flyout remembers its selection independently of the active tool', as
 })
 
 test('Pen creates VECTOR node with 3 vertices on Enter', async () => {
+  // The flyout the test before left open takes the first Escape; P reaches the editor once it closed.
   await editor.canvas.pressKey('Escape')
+  await expect(editor.page.getByTestId(toolbarFlyoutItemTestId('RECTANGLE'))).toBeHidden()
   await editor.canvas.pressKey('p')
+  await expect(editor.page.getByTestId(toolbarToolTestId('PEN'))).toHaveAttribute(
+    'aria-pressed',
+    'true'
+  )
   await editor.canvas.click(100, 400)
   await editor.canvas.waitForRender()
   await editor.canvas.click(200, 400)

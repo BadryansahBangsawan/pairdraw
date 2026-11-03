@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useAgentMessages, useI18n } from '@open-pencil/vue/i18n'
 
 import {
+  approveActions,
   canvasPrompt,
   changePreviewSize,
   maxAgentSteps,
@@ -20,6 +21,7 @@ import AppSelect from '@/components/ui/select/AppSelect.vue'
 import AppSwitch from '@/components/ui/toggle/AppSwitch.vue'
 
 const { ai, automation, settings } = useI18n()
+const agents = useAgentMessages()
 const stepPresets = [25, 50, 100, 200]
 const limitMessage = computed(() =>
   ai.value.maxAgentStepsRange({ min: AGENT_STEP_LIMIT_MIN, max: AGENT_STEP_LIMIT_MAX })
@@ -78,6 +80,13 @@ const previewOptions = computed(() => [
       </SettingsRow>
       <SettingsRow :label="ai.canvasPrompt" :description="ai.canvasPromptHint">
         <AppSwitch v-model="canvasPrompt" :label="ai.canvasPrompt" />
+      </SettingsRow>
+      <SettingsRow :label="agents.approveActions" :description="agents.approveActionsHint">
+        <AppSwitch
+          v-model="approveActions"
+          :label="agents.approveActions"
+          data-test-id="settings-ai-approve-actions"
+        />
       </SettingsRow>
     </SettingsGroup>
     <SettingsGroup>

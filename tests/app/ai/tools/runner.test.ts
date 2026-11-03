@@ -79,3 +79,37 @@ test('undoing an asynchronous tool call returns the document to saved', async ()
   await Promise.resolve()
   expect(store.hasUnsavedChanges()).toBe(false)
 })
+
+test('a structural call that throws part way leaves the document as it was', async () => {
+  const evalTool = expectDefined(
+    ALL_TOOLS.find((tool) => tool.name === 'eval'),
+    'eval'
+  )
+  const pageId = store.state.currentPageId
+  const figma = makeFigmaFromStore(store, pageId)
+  const card = store.graph.createNode('FRAME', pageId, { name: 'Card', width: 100, height: 60 })
+  store.markDocumentSaved()
+  const before = store.snapshotPage(pageId)
+
+  const call = runEditorTool({
+    store,
+    figma,
+    def: evalTool,
+    args: {
+      code: `
+        const card = figma.getNodeById(${JSON.stringify(card.id)})
+        card.name = 'Renamed'
+        card.appendChild(figma.createRectangle())
+        figma.currentPage.appendChild(figma.createEllipse())
+        throw new Error('script failed')
+      `
+    },
+    source: 'MCP'
+  })
+
+  await expect(call).rejects.toThrow('script failed')
+  await Promise.resolve()
+  expect(store.snapshotPage(pageId)).toEqual(before)
+  expect(store.undo.peekUndo()).toBeUndefined()
+  expect(store.hasUnsavedChanges()).toBe(false)
+})

@@ -84,10 +84,14 @@ export function referenceCandidates(
   ]
 }
 
-/** What `/` offers: an ACP agent's own commands, or else the skills the user can run. */
+/**
+ * What `/` offers: an ACP agent's own commands, or else the skills the user can run, each
+ * described by `describe`, which gives the built-in skills in the user's language.
+ */
 export function commandCandidates(
   agentCommands: readonly AgentCommand[] | null,
-  skills: readonly Skill[]
+  skills: readonly Skill[],
+  describe: (skill: Skill) => string = (skill) => skill.description
 ): CommandCandidate[] {
   if (agentCommands) {
     return agentCommands.map((command) => ({
@@ -100,7 +104,7 @@ export function commandCandidates(
   return runnableSkills(skills).map((skill) => ({
     kind: 'skill' as const,
     label: `/skill:${skill.name}`,
-    detail: skill.description,
+    detail: describe(skill),
     insert: `/skill:${skill.name} `
   }))
 }

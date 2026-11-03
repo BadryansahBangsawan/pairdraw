@@ -25,8 +25,9 @@ describe('auto layout keywords', () => {
     expect(parsePrimaryAxisAlign('between')).toBe('SPACE_BETWEEN')
     expect(parsePrimaryAxisAlign('flex-end')).toBe('MAX')
     expect(parsePrimaryAxisAlign(' Center ')).toBe('CENTER')
-    // Auto layout cannot distribute space around or evenly.
-    expect(parsePrimaryAxisAlign('space-around')).toBeUndefined()
+    expect(parsePrimaryAxisAlign('space-around')).toBe('SPACE_AROUND')
+    expect(parsePrimaryAxisAlign('around')).toBe('SPACE_AROUND')
+    // Auto layout cannot distribute space evenly.
     expect(parsePrimaryAxisAlign('space-evenly')).toBeUndefined()
   })
 

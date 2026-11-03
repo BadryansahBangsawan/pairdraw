@@ -27,6 +27,12 @@ Gli oggetti selezionati possono essere spostati, ridimensionati, ruotati, duplic
 
 La selezione mostra otto maniglie. Trascinane una per modificare larghezza e altezza. Tieni premuto <kbd>Shift</kbd> su una maniglia angolare per conservare le proporzioni.
 
+## Strumento Scala
+
+Premi <kbd>K</kbd>, o scegli **Ridimensiona in scala** nel menu dello strumento Sposta, per ridimensionare i livelli con tutto il loro contenuto: dimensioni del testo, tratti, effetti, raggi degli angoli e spaziature del layout automatico crescono e diminuiscono con il livello. Trascina una maniglia della selezione per scalare dal lato opposto, oppure tieni premuto <kbd>Option</kbd>/<kbd>Alt</kbd> per scalare dal centro; più livelli selezionati scalano insieme attorno al loro riquadro comune.
+
+Con lo strumento attivo, il pannello Design mostra larghezza e altezza della selezione, un fattore di scala e una griglia di ancoraggio. Digitando una larghezza o un'altezza la selezione scala in proporzione; il fattore accetta `2`, `2x` o `200%`. La griglia di ancoraggio sceglie il punto che resta fermo. Ogni ridimensionamento è un solo passaggio di annullamento.
+
 ## Ruotare
 
 Porta il puntatore poco oltre una maniglia angolare finché compare il cursore di rotazione, quindi trascina. <kbd>Shift</kbd> allinea la rotazione a intervalli di 15°.

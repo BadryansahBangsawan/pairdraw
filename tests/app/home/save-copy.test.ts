@@ -62,6 +62,12 @@ describe('Save As from Home', () => {
     }
     expect(documentCopyFileName(board)).toBe('Retro.jam')
   })
+
+  test('copies a draft anywhere, as a .fig file named after it', () => {
+    const draft: DocumentCopySource = { kind: 'draft', draftId: 'd', name: 'Landing page' }
+    expect(canSaveDocumentCopy(draft, false)).toBe(true)
+    expect(documentCopyFileName(draft)).toBe('Landing page.fig')
+  })
 })
 
 const BUCKET = { providerId: 's3-compatible' }

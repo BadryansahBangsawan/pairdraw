@@ -28,6 +28,11 @@ export const filesMessageDefaults = {
     'Failed to fetch {count} images from Figma. Check that the source file is accessible and try again.'
   ),
   mermaidPasteFailed: params('Could not read the Mermaid diagram. {error}'),
+  webPasteFailed: params('Could not paste the web content. {error}'),
+  webCaptureUnreadable: 'The copied web capture could not be read. Capture the page again.',
+  webCaptureNewer:
+    'The copied web capture is from a newer capture extension. Update Pairdraw to paste it.',
+  webCaptureTruncated: 'The page was too large to capture whole, so part of it was left out.',
   recentFiles: 'Recent files',
   recentFilesDescription: 'Continue working on a design or start a new one.',
   noRecentFiles: 'No recent files yet',
@@ -83,7 +88,23 @@ export const filesMessageDefaults = {
   fileChangedOnDiskDescription:
     'Another app changed this file while you have unsaved edits. Reload to open the file’s version and discard your edits, or ignore the change and keep editing. Saving replaces the file with your version.',
   reloadFromDisk: 'Reload',
-  ignoreDiskChange: 'Ignore'
+  ignoreDiskChange: 'Ignore',
+  pasteImportHeading: 'Import variables and styles?',
+  pasteImportDescription:
+    'These layers use variables or styles from another document. Import them to keep the layers linked to them, or paste the layers as they look.',
+  pasteImportConflicts: 'Already in this document',
+  pasteImportConflictsHint:
+    'Use the ones this document has, or add the copied ones under a new name.',
+  pasteImportUseExisting: 'Use existing',
+  pasteImportAddRenamed: 'Add renamed',
+  pasteImportVariables: count({ one: '{count} variable', many: '{count} variables' }),
+  pasteImportFillStyle: 'Color style',
+  pasteImportTextStyle: 'Text style',
+  pasteImportEffectStyle: 'Effect style',
+  pasteImportGridStyle: 'Grid style',
+  pasteImportChoiceLabel: params('{name}: use existing or add renamed'),
+  pasteImportAsIs: 'Paste as is',
+  pasteImportConfirm: 'Yes, import'
 } as const
 
 export const filesMessages = i18n('files', filesMessageDefaults)

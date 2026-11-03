@@ -18,6 +18,10 @@
   "clipboardImageFetchFailed": "1 Bild konnte nicht aus Figma abgerufen werden. Prüfe, ob die Quelldatei zugänglich ist, und versuche es erneut.",
   "clipboardImagesFetchFailed": "{count} Bilder konnten nicht aus Figma abgerufen werden. Prüfe, ob die Quelldatei zugänglich ist, und versuche es erneut.",
   "mermaidPasteFailed": "Das Mermaid-Diagramm konnte nicht gelesen werden. {error}",
+  "webPasteFailed": "Der Webinhalt konnte nicht eingefügt werden. {error}",
+  "webCaptureUnreadable": "Die kopierte Webaufnahme konnte nicht gelesen werden. Nimm die Seite erneut auf.",
+  "webCaptureNewer": "Die kopierte Webaufnahme stammt aus einer neueren Aufnahme-Erweiterung. Aktualisiere Pairdraw, um sie einzufügen.",
+  "webCaptureTruncated": "Die Seite war zu groß, um sie ganz aufzunehmen. Ein Teil wurde weggelassen.",
   "recentFiles": "Zuletzt verwendete Dateien",
   "recentFilesDescription": "Arbeite an einem Entwurf weiter oder beginne einen neuen.",
   "noRecentFiles": "Noch keine zuletzt verwendeten Dateien",
@@ -74,5 +78,22 @@
   "fileChangedOnDisk": "„{name}“ wurde auf dem Datenträger geändert",
   "fileChangedOnDiskDescription": "Eine andere App hat diese Datei geändert, während du ungespeicherte Änderungen hast. Lade sie neu, um die Version der Datei zu öffnen und deine Änderungen zu verwerfen, oder ignoriere die Änderung und arbeite weiter. Beim Speichern wird die Datei durch deine Version ersetzt.",
   "reloadFromDisk": "Neu laden",
-  "ignoreDiskChange": "Ignorieren"
+  "ignoreDiskChange": "Ignorieren",
+  "pasteImportHeading": "Variablen und Stile importieren?",
+  "pasteImportDescription": "Diese Ebenen verwenden Variablen oder Stile aus einem anderen Dokument. Importiere sie, damit die Ebenen mit ihnen verknüpft bleiben, oder füge die Ebenen so ein, wie sie aussehen.",
+  "pasteImportConflicts": "Bereits in diesem Dokument",
+  "pasteImportConflictsHint": "Verwende die vorhandenen oder füge die kopierten unter einem neuen Namen hinzu.",
+  "pasteImportUseExisting": "Vorhandene verwenden",
+  "pasteImportAddRenamed": "Umbenannt hinzufügen",
+  "pasteImportVariables": {
+    "one": "{count} Variable",
+    "many": "{count} Variablen"
+  },
+  "pasteImportFillStyle": "Farbstil",
+  "pasteImportTextStyle": "Textstil",
+  "pasteImportEffectStyle": "Effektstil",
+  "pasteImportGridStyle": "Rasterstil",
+  "pasteImportChoiceLabel": "{name}: vorhandene verwenden oder umbenannt hinzufügen",
+  "pasteImportAsIs": "Unverändert einfügen",
+  "pasteImportConfirm": "Ja, importieren"
 }

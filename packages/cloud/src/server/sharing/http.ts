@@ -1,6 +1,7 @@
 import { DocumentForbiddenError, DocumentNotFoundError } from '#cloud/server/documents'
 import {
   DocumentShareInvalidError,
+  DocumentShareKindError,
   DocumentShareSignInRequiredError,
   InvitationDeliveryError
 } from '#cloud/server/sharing/errors'
@@ -14,6 +15,9 @@ export function sharingDomainError(context: Context, error: unknown): Response |
     error instanceof WorkspaceInvitationInvalidError
   ) {
     return context.json({ error: { code: 'not_found' as const } }, 404)
+  }
+  if (error instanceof DocumentShareKindError) {
+    return context.json({ error: { code: 'invalid_request' as const } }, 400)
   }
   if (error instanceof DocumentShareSignInRequiredError) {
     return context.json({ error: { code: 'unauthorized' as const } }, 401)

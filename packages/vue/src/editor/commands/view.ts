@@ -1,5 +1,7 @@
 import { computed } from 'vue'
 
+import { animateViewport } from '#vue/canvas/viewport/tween'
+
 import type { EditorCommandMapOptions } from './context'
 import type { EditorCommand, EditorCommandId } from './types'
 
@@ -15,7 +17,7 @@ export function createViewCommands({
         return t.value.zoomTo100
       },
       enabled: computed(() => true),
-      run: () => editor.zoomTo100()
+      run: () => animateViewport(editor, () => editor.zoomTo100())
     },
     'view.zoomFit': {
       id: 'view.zoomFit',
@@ -23,7 +25,7 @@ export function createViewCommands({
         return t.value.zoomToFit
       },
       enabled: computed(() => true),
-      run: () => editor.zoomToFit()
+      run: () => animateViewport(editor, () => editor.zoomToFit())
     },
     'view.zoomSelection': {
       id: 'view.zoomSelection',
@@ -31,7 +33,7 @@ export function createViewCommands({
         return t.value.zoomToSelection
       },
       enabled: capabilities.canZoomToSelection,
-      run: () => editor.zoomToSelection()
+      run: () => animateViewport(editor, () => editor.zoomToSelection())
     },
     'view.zoomNextFrame': {
       id: 'view.zoomNextFrame',
@@ -39,7 +41,7 @@ export function createViewCommands({
         return t.value.zoomToNextFrame
       },
       enabled: computed(() => true),
-      run: () => editor.zoomToNextFrame()
+      run: () => animateViewport(editor, () => editor.zoomToNextFrame())
     },
     'view.zoomPreviousFrame': {
       id: 'view.zoomPreviousFrame',
@@ -47,7 +49,7 @@ export function createViewCommands({
         return t.value.zoomToPreviousFrame
       },
       enabled: computed(() => true),
-      run: () => editor.zoomToPreviousFrame()
+      run: () => animateViewport(editor, () => editor.zoomToPreviousFrame())
     },
     'view.nextPage': {
       id: 'view.nextPage',

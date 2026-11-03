@@ -46,6 +46,8 @@ Przytrzymaj <kbd>Shift</kbd> podczas przeciągania:
 - gradient liniowy, radialny, kątowy lub diamentowy;
 - obraz jako zalew.
 
+Aby przyciąć lub przekadrować obraz na płótnie, kliknij dwukrotnie warstwę, naciśnij <kbd>Enter</kbd>, gdy jest zaznaczona, albo wybierz **Przytnij obraz** z menu kontekstowego lub z wypełnienia obrazem. Obraz pojawia się w całości, przygaszony poza warstwą. Przeciągnij narożniki lub paski krawędzi warstwy, aby przyciąć ją nad nieruchomym obrazem, przeciągnij obraz, aby przesunąć go pod warstwą, i przeciągnij jego narożne punkty, aby go przeskalować. <kbd>Shift</kbd> zachowuje proporcje lub jedną oś, a <kbd>Alt</kbd> działa od środka. Każde przeciągnięcie to jeden krok do cofnięcia; <kbd>Enter</kbd>, <kbd>Esc</kbd>, dwuklik lub kliknięcie poza obrazem kończy. Wektory, warstwy z dziećmi i warstwy rozmieszczane przez auto layout zachowują swoje krawędzie; w nich możesz tylko przesuwać i skalować obraz.
+
 ### Obwiednia
 
 - wspólna grubość albo osobna dla każdego boku;

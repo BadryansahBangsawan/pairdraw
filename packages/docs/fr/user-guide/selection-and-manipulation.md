@@ -29,6 +29,12 @@ La sélection affiche huit poignées : quatre aux coins et quatre au milieu des 
 
 Maintenez <kbd>Shift</kbd> sur une poignée d’angle pour conserver les proportions.
 
+## Outil Mise à l'échelle
+
+Appuyez sur <kbd>K</kbd>, ou choisissez **Mettre à l'échelle** dans le menu de l'outil Déplacer, pour mettre des calques à l'échelle avec tout leur contenu : tailles de texte, contours, effets, rayons d'angle et espacements de la mise en page automatique suivent le calque. Faites glisser une poignée de la sélection pour partir du côté opposé, ou maintenez <kbd>Option</kbd>/<kbd>Alt</kbd> pour partir du centre ; plusieurs calques sélectionnés se mettent à l'échelle ensemble autour de leur cadre commun.
+
+Tant que l'outil est actif, le panneau Design affiche la largeur et la hauteur de la sélection, un facteur d'échelle et une grille d'ancrage. Saisir une largeur ou une hauteur met la sélection à l'échelle proportionnellement ; le facteur accepte `2`, `2x` ou `200%`. La grille d'ancrage choisit le point qui reste en place. Chaque mise à l'échelle est une seule étape d'annulation.
+
 ## Faire pivoter
 
 Placez le pointeur juste à l’extérieur d’une poignée d’angle jusqu’à l’apparition du curseur de rotation, puis faites glisser. <kbd>Shift</kbd> aligne la rotation par pas de 15°.

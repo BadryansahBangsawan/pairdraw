@@ -9,6 +9,7 @@ import { drawComponentSetBorders } from '#core/canvas/overlays/component-sets'
 import { drawConnectorTarget } from '#core/canvas/overlays/connectors'
 import { drawDropTarget, drawEditingText } from '#core/canvas/overlays/feedback'
 import { drawGradientHandles } from '#core/canvas/overlays/gradient-handles'
+import { drawImageCrop } from '#core/canvas/overlays/image-crop'
 import { drawLayoutOutlines } from '#core/canvas/overlays/layout-outlines'
 import { drawMeasurementSegment } from '#core/canvas/overlays/measurement'
 import { drawPixelGrid } from '#core/canvas/overlays/pixel-grid'
@@ -18,6 +19,7 @@ import { drawSlotOutlines } from '#core/canvas/overlays/slots'
 import type { RenderOverlays, SkiaRenderer } from '#core/canvas/renderer'
 import { RULER_SIZE } from '#core/constants'
 import { editedGradient } from '#core/editor/gradient-edit'
+import { editedImage } from '#core/editor/image-edit'
 
 function measurementVisible(overlays: RenderOverlays): boolean {
   return (
@@ -91,6 +93,28 @@ function updateIssueMarkers(r: SkiaRenderer, graph: SceneGraph, overlays: Render
   })
 }
 
+/**
+ * While a gradient is edited, Figma shows its handles instead of the layer's selection, and an
+ * image being cropped shows itself whole with its crop handles; a previewing canvas shows neither.
+ */
+function drawPaintEditHandles(
+  r: SkiaRenderer,
+  canvas: Canvas,
+  graph: SceneGraph,
+  overlays: RenderOverlays
+): boolean {
+  if (overlays.playing) return false
+  if (editedGradient(graph, overlays.gradientEdit)) {
+    drawGradientHandles(r, canvas, graph, overlays.gradientEdit, overlays.rotationPreview)
+    return true
+  }
+  if (editedImage(graph, overlays.imageEdit)) {
+    drawImageCrop(r, canvas, graph, overlays.imageEdit, overlays.rotationPreview)
+    return true
+  }
+  return false
+}
+
 export function drawOverlayPass(
   r: SkiaRenderer,
   canvas: Canvas,
@@ -117,11 +141,7 @@ export function drawOverlayPass(
   drawConnectorTarget(r, canvas, graph, overlays.connectorTarget, overlays.rotationPreview)
   drawEditingText(r, canvas, graph, overlays)
   r.profiler.beginPhase('render:selection')
-  // While a gradient is edited, Figma shows its handles instead of the layer's selection; a
-  // previewing canvas shows neither.
-  if (!overlays.playing && editedGradient(graph, overlays.gradientEdit))
-    drawGradientHandles(r, canvas, graph, overlays.gradientEdit, overlays.rotationPreview)
-  else {
+  if (!drawPaintEditHandles(r, canvas, graph, overlays)) {
     r.drawSelection(canvas, graph, selectedIds, overlays)
     if (!overlays.transforming && r.editHandles)
       drawShapeHandles(

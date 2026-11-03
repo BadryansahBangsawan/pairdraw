@@ -65,6 +65,8 @@ Egzemplarz może nadpisać wybrane właściwości bez utraty powiązania. Dotycz
 
 Dodanie obiektu potomnego do głównego komponentu dodaje jego kopię do istniejących egzemplarzy.
 
+Egzemplarz, który ustawia tryb jednej kolekcji zmiennych, nadal przejmuje tryby komponentu dla pozostałych kolekcji. Przycisk zamiany w nagłówku egzemplarza, także zagnieżdżonego, pokazuje w jego miejscu inny komponent. <kbd>⌥</kbd><kbd>⇧</kbd><kbd>R</kbd> zastępuje zaznaczoną warstwę wewnątrz egzemplarza skopiowaną warstwą jako nadpisanie, bez odłączania egzemplarza; **Przywróć warstwę komponentu** przywraca pierwotną warstwę.
+
 ## Wskazówki
 
 - Zmiana tekstu wewnątrz egzemplarza tworzy nadpisanie.

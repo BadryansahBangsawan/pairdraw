@@ -20,6 +20,11 @@ export type IOTextData = string
 export type IOData = IOBinaryData | IOTextData
 
 export interface ReadDocumentInput {
+  /**
+   * The file's name, which its format is told by. A host that passes `openImport` names the
+   * document by the path its imports resolve paths to, as `openImport` names what it opens, so an
+   * import leading back to the document is recognized.
+   */
   name?: string
   mimeType?: string
   data: Uint8Array
@@ -28,11 +33,33 @@ export interface ReadDocumentInput {
    * when it cannot. Hosts that know where the document lives pass it.
    */
   readAsset?(path: string): Promise<Uint8Array | null>
+  /**
+   * Opens a document this one imports, such as a `.pen` library, by the path it names it with,
+   * relative to this document; null when it cannot. What it gives reads the imported document's
+   * own files and imports relative to that document, and names it by a path that tells one file
+   * from another, so a document importing itself through others is read once. Hosts that can read
+   * files beside the document pass it; without it, imports stay unresolved.
+   */
+  openImport?(path: string): Promise<ReadDocumentInput | null>
+}
+
+/** Something a document names that reading it could not bring in; it opens without it. */
+export interface ReadDocumentWarning {
+  kind: 'unresolved-imports'
+  /**
+   * Why: the host gives no access to files beside the document, as a browser does, or the files
+   * could not be read or are not documents of the format.
+   */
+  reason: 'no-file-access' | 'unreadable'
+  /** The paths the document names them with. */
+  paths: string[]
 }
 
 export interface ReadDocumentResult {
   graph: SceneGraph
   sourceFormat: string
+  /** What the document names that it opened without, for the host to tell the user. */
+  warnings?: ReadDocumentWarning[]
 }
 
 export interface ExportTargetDocument {

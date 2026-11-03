@@ -46,7 +46,7 @@ type ModelsDevModel = {
   status?: unknown
   release_date?: unknown
   modalities?: { output?: unknown }
-  limit?: { output?: unknown }
+  limit?: { output?: unknown; context?: unknown }
   /** Overrides the provider's API for this model, such as `{ npm: '@ai-sdk/anthropic' }`. */
   provider?: { npm?: unknown }
 }
@@ -65,7 +65,9 @@ const modelsDevCatalogSchema = v.record(
         v.string(),
         v.looseObject({
           modalities: v.optional(v.looseObject({ output: v.optional(v.unknown()) })),
-          limit: v.optional(v.looseObject({ output: v.optional(v.unknown()) })),
+          limit: v.optional(
+            v.looseObject({ output: v.optional(v.unknown()), context: v.optional(v.unknown()) })
+          ),
           provider: v.optional(v.looseObject({ npm: v.optional(v.unknown()) }))
         })
       )
@@ -184,11 +186,12 @@ export async function listCatalogModels(
   return models.length ? mergeCuratedModels(curated, models) : curated
 }
 
-export async function resolveModelsDevModel(
+/** The models.dev entry of a provider's model, tried under the IDs the provider may use for it. */
+async function findModelsDevModel(
   providerID: AIProviderID,
   modelID: string,
   fetcher?: typeof fetch
-): Promise<ModelOption | null> {
+): Promise<ModelsDevModel | null> {
   const providerKeys = PROVIDER_KEYS[providerID]
   if (!providerKeys?.length || !modelID) return null
   const catalog = await modelsDevCatalog.get(fetcher)
@@ -198,10 +201,29 @@ export async function resolveModelsDevModel(
     const models = catalog[providerKey]?.models
     for (const candidate of modelIDCandidates(providerKey, modelID)) {
       const matched = models?.[candidate]
-      if (matched && reachable(providerID, matched)) return normalizeModel(modelID, matched)
+      if (matched && reachable(providerID, matched)) return matched
     }
   }
   return null
+}
+
+export async function resolveModelsDevModel(
+  providerID: AIProviderID,
+  modelID: string,
+  fetcher?: typeof fetch
+): Promise<ModelOption | null> {
+  const matched = await findModelsDevModel(providerID, modelID, fetcher)
+  return matched ? normalizeModel(modelID, matched) : null
+}
+
+/** How many tokens the model's context window holds, as models.dev lists it, or null. */
+export async function resolveModelContextWindow(
+  providerID: AIProviderID,
+  modelID: string,
+  fetcher?: typeof fetch
+): Promise<number | null> {
+  const context = (await findModelsDevModel(providerID, modelID, fetcher))?.limit?.context
+  return typeof context === 'number' && Number.isFinite(context) && context > 0 ? context : null
 }
 
 export function resetModelsDevCatalogForTests(): void {

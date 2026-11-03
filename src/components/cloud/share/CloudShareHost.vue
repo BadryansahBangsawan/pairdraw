@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useClipboard } from '@vueuse/core'
 import { computed, watch } from 'vue'
 
 import type { DocumentPermission } from '@open-pencil/cloud/contract'
@@ -28,7 +29,7 @@ const target = computed(() => {
   return binding ? cloudShareTarget(binding) : null
 })
 const cloudSharing = useCloudSharing(target)
-const { sharing, linkURL, inviting } = cloudSharing
+const { sharing, linkURL, snapshotURL, inviting } = cloudSharing
 
 /**
  * The dialog appears once the document's sharing has loaded, so it never opens on a restricted
@@ -44,6 +45,7 @@ const dialogOpen = computed({
 const shownTarget = useHeldContent(target)
 const shown = useHeldContent(sharing, dialogOpen)
 const { sendsLink, copied, send } = useSendLink()
+const { copy: copySnapshotURL, copied: snapshotCopied } = useClipboard({ legacy: true })
 
 const workspace = computed(() => {
   const binding = storeRef.value?.getStorageBinding()
@@ -79,6 +81,19 @@ const changeMember = (id: string, permission: DocumentPermission | 'remove') =>
   changed(cloudSharing.changeMember(id, permission))
 const changeLink = (link: CloudShareLink) => changed(cloudSharing.changeLink(link))
 const resetLink = () => changed(cloudSharing.resetLink())
+const shareSnapshot = () => changed(cloudSharing.shareSnapshot())
+const resetSnapshot = () => changed(cloudSharing.resetSnapshot())
+const deleteSnapshot = () => changed(cloudSharing.deleteSnapshot())
+
+/** Copies the snapshot link prepared with the sharing, so it copies straight from the tap. */
+function copySnapshot() {
+  const url = snapshotURL.value
+  if (!url) {
+    toast.error(t.value.shareLoadFailed)
+    return
+  }
+  void copySnapshotURL(url)
+}
 
 /** Sends the link prepared with the sharing, so the share sheet opens straight from the tap. */
 function sendLink() {
@@ -111,6 +126,8 @@ watch(
     :link="shown?.link ?? { access: 'restricted' }"
     :can-manage="shown?.canManage ?? false"
     :links="shown?.links"
+    :snapshot="shown?.snapshot"
+    :snapshot-copied="snapshotCopied"
     :inviting="inviting"
     :copied="copied"
     :sends-link="sendsLink"
@@ -119,5 +136,9 @@ watch(
     @change-link="changeLink"
     @copy-link="sendLink"
     @reset-link="resetLink"
+    @share-snapshot="shareSnapshot"
+    @copy-snapshot="copySnapshot"
+    @reset-snapshot="resetSnapshot"
+    @delete-snapshot="deleteSnapshot"
   />
 </template>

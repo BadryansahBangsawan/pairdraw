@@ -1,0 +1,56 @@
+{
+  "extensionName": {
+    "message": "Pairdraw Web Capture"
+  },
+  "extensionDescription": {
+    "message": "Skopiuj stronę internetową lub jeden z jej elementów i wklej do Pairdraw jako edytowalne warstwy ze stylami."
+  },
+  "actionTitle": {
+    "message": "Kopiuj do Pairdraw"
+  },
+  "popupTitle": {
+    "message": "Kopiuj do Pairdraw"
+  },
+  "copyPage": {
+    "message": "Kopiuj stronę"
+  },
+  "copyPageHint": {
+    "message": "Całą stronę, tak jak ją widzisz"
+  },
+  "pickElement": {
+    "message": "Wybierz element"
+  },
+  "pickElementHint": {
+    "message": "Kliknij dowolną część strony"
+  },
+  "includeImages": {
+    "message": "Dołącz obrazy z innych witryn"
+  },
+  "includeImagesHint": {
+    "message": "Prosi o zgodę na odczyt obrazów z dowolnej witryny podczas przechwytywania."
+  },
+  "statusCopying": {
+    "message": "Kopiowanie…"
+  },
+  "statusCopied": {
+    "message": "Skopiowano. Wklej do obszaru roboczego Pairdraw."
+  },
+  "statusUnavailable": {
+    "message": "Nie można przechwycić tej strony. Spróbuj na zwykłej stronie internetowej."
+  },
+  "statusNeedsSecurePage": {
+    "message": "Kopiowanie wymaga strony udostępnianej przez HTTPS."
+  },
+  "statusFailed": {
+    "message": "Nie udało się skopiować przechwycenia: $ERROR$",
+    "placeholders": {
+      "error": {
+        "content": "$1",
+        "example": "Network error"
+      }
+    }
+  },
+  "pickerHint": {
+    "message": "Kliknij element lub naciśnij Enter, aby go skopiować · ↑ ↓ przechodzą do elementu nadrzędnego lub podrzędnego · Esc anuluje"
+  }
+}

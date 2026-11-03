@@ -32,12 +32,19 @@ For a mouse, turn on **Zoom with scroll wheel** in **Settings → Editor → Nav
 
 Pinch-to-zoom on UI panels (layers, properties) is prevented so it doesn't accidentally change the browser zoom level.
 
+## Zoom Tool
+
+Hold <kbd>Z</kbd> and click to zoom in on the pointer, or <kbd>Option</kbd>/<kbd>Alt</kbd> + click to zoom out; drag to zoom to the area you frame. Releasing <kbd>Z</kbd> brings back the tool you had. A quick tap of <kbd>Z</kbd> keeps the zoom tool on, and the Hand tool's toolbar menu offers it too.
+
+Zoom to fit, to selection, and to 100%, the zoom menu's levels, and the next or previous frame glide to their view instead of jumping. They jump when animations are off, Ultralight mode is on, or the system asks for reduced motion.
+
 ## Keyboard Shortcuts
 
 | Action | Mac | Windows / Linux |
 |--------|-----|-----------------|
 | Pan | <kbd>Space</kbd> + drag | <kbd>Space</kbd> + drag |
 | Hand tool | <kbd>H</kbd> | <kbd>H</kbd> |
+| Zoom tool | <kbd>Z</kbd> | <kbd>Z</kbd> |
 | Zoom in | <kbd>⌘</kbd><kbd>+</kbd> | <kbd>Ctrl</kbd> + <kbd>+</kbd> |
 | Zoom out | <kbd>⌘</kbd><kbd>−</kbd> | <kbd>Ctrl</kbd> + <kbd>−</kbd> |
 | Zoom in / out | <kbd>+</kbd> / <kbd>−</kbd> | <kbd>+</kbd> / <kbd>−</kbd> |
@@ -83,6 +90,8 @@ Rulers are hidden until you turn them on with **View → Rulers** or <kbd>Shift<
 Under **View → Preferences**, toggle **Snap to Geometry**, **Snap to Objects**, and **Snap to Pixel Grid** independently. Preferences are saved between sessions.
 
 Geometry and object snapping help align vector points, moved layers, and resized edges with nearby geometry, objects, guides, and frame bounds. Alignment lines appear for those targets; pixel-grid rounding does not draw an alignment line for every pixel.
+
+With **Snap to Objects** on, a moved layer also snaps to equal spacing: it centers between its two neighbors, or lands as far from a neighbor as two other neighbors in the same row or column are apart. Every gap of that size shows a pink indicator with its size. Resizing does not snap to spacing.
 
 With **Snap to Pixel Grid** on, moved layers, resized edges, and drawn layers land on whole pixels at any zoom, even when they started between pixels. A snap to an object or guide wins over the grid. Arrow-key nudges and values typed in the properties panel keep their fractions.
 

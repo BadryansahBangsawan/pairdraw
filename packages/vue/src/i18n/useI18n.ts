@@ -5,8 +5,10 @@ import type { Ref } from 'vue'
 import { locale, setLocale, AVAILABLE_LOCALES, LOCALE_LABELS } from '#vue/i18n/locale'
 import type { Locale } from '#vue/i18n/locale'
 import {
+  agentMessages,
   aiMessages,
   automationMessages,
+  chatContextMessages,
   codeMessages,
   collaborationMessages,
   commandMessages,
@@ -16,6 +18,7 @@ import {
   designCheckMessages,
   diagnosticsMessages,
   editorMessages,
+  exploreMessages,
   figJamMessages,
   filesMessages,
   fontsMessages,
@@ -27,7 +30,9 @@ import {
   renderingMessages,
   renameMessages,
   settingsMessages,
+  shaderMessages,
   shapeMessages,
+  slidesMessages,
   statusMessages,
   storageMessages,
   toolMessages,
@@ -42,8 +47,10 @@ export function useI18nNamespace<MessagesStore extends Store>(messages: Messages
   return useStore(messages) as Ref<StoreValue<MessagesStore>>
 }
 
+export const useAgentMessages = () => useI18nNamespace(agentMessages)
 export const useAIMessages = () => useI18nNamespace(aiMessages)
 export const useAutomationMessages = () => useI18nNamespace(automationMessages)
+export const useChatContextMessages = () => useI18nNamespace(chatContextMessages)
 export const useCodeMessages = () => useI18nNamespace(codeMessages)
 export const useCollaborationMessages = () => useI18nNamespace(collaborationMessages)
 export const useCommandMessages = () => useI18nNamespace(commandMessages)
@@ -53,6 +60,7 @@ export const useCredentialMessages = () => useI18nNamespace(credentialsMessages)
 export const useDesignCheckMessages = () => useI18nNamespace(designCheckMessages)
 export const useDiagnosticsMessages = () => useI18nNamespace(diagnosticsMessages)
 export const useEditorMessages = () => useI18nNamespace(editorMessages)
+export const useExploreMessages = () => useI18nNamespace(exploreMessages)
 export const useFigJamMessages = () => useI18nNamespace(figJamMessages)
 export const useFileMessages = () => useI18nNamespace(filesMessages)
 export const useFontMessages = () => useI18nNamespace(fontsMessages)
@@ -64,7 +72,9 @@ export const useRecoveryMessages = () => useI18nNamespace(recoveryMessages)
 export const useRenderingMessages = () => useI18nNamespace(renderingMessages)
 export const useRenameMessages = () => useI18nNamespace(renameMessages)
 export const useSettingsMessages = () => useI18nNamespace(settingsMessages)
+export const useShaderMessages = () => useI18nNamespace(shaderMessages)
 export const useShapeMessages = () => useI18nNamespace(shapeMessages)
+export const useSlidesMessages = () => useI18nNamespace(slidesMessages)
 export const useStatusMessages = () => useI18nNamespace(statusMessages)
 export const useStorageMessages = () => useI18nNamespace(storageMessages)
 export const useToolMessages = () => useI18nNamespace(toolMessages)

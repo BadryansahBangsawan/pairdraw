@@ -18,6 +18,10 @@
   "clipboardImageFetchFailed": "Nie udało się pobrać 1 obrazu z Figmy. Sprawdź, czy plik źródłowy jest dostępny, i spróbuj ponownie.",
   "clipboardImagesFetchFailed": "Nie udało się pobrać {count} obrazów z Figmy. Sprawdź, czy plik źródłowy jest dostępny, i spróbuj ponownie.",
   "mermaidPasteFailed": "Nie udało się odczytać diagramu Mermaid. {error}",
+  "webPasteFailed": "Nie udało się wkleić treści z sieci. {error}",
+  "webCaptureUnreadable": "Nie udało się odczytać skopiowanego przechwycenia strony. Przechwyć stronę ponownie.",
+  "webCaptureNewer": "Skopiowane przechwycenie strony pochodzi z nowszego rozszerzenia. Zaktualizuj Pairdraw, aby je wkleić.",
+  "webCaptureTruncated": "Strona była zbyt duża, by przechwycić ją w całości, więc jej część pominięto.",
   "recentFiles": "Ostatnie pliki",
   "recentFilesDescription": "Kontynuuj pracę nad projektem lub rozpocznij nowy.",
   "noRecentFiles": "Brak ostatnich plików",
@@ -77,5 +81,23 @@
   "fileChangedOnDisk": "Plik „{name}” zmienił się na dysku",
   "fileChangedOnDiskDescription": "Inna aplikacja zmieniła ten plik, gdy masz niezapisane zmiany. Wczytaj go ponownie, aby otworzyć wersję z pliku i odrzucić swoje zmiany, albo zignoruj zmianę i edytuj dalej. Zapisanie zastąpi plik Twoją wersją.",
   "reloadFromDisk": "Wczytaj ponownie",
-  "ignoreDiskChange": "Ignoruj"
+  "ignoreDiskChange": "Ignoruj",
+  "pasteImportHeading": "Zaimportować zmienne i style?",
+  "pasteImportDescription": "Te warstwy używają zmiennych lub stylów z innego dokumentu. Zaimportuj je, aby warstwy pozostały z nimi połączone, albo wklej warstwy tak, jak wyglądają.",
+  "pasteImportConflicts": "Już w tym dokumencie",
+  "pasteImportConflictsHint": "Użyj tych z tego dokumentu lub dodaj skopiowane pod nową nazwą.",
+  "pasteImportUseExisting": "Użyj istniejących",
+  "pasteImportAddRenamed": "Dodaj pod nową nazwą",
+  "pasteImportVariables": {
+    "one": "{count} zmienna",
+    "few": "{count} zmienne",
+    "many": "{count} zmiennych"
+  },
+  "pasteImportFillStyle": "Styl koloru",
+  "pasteImportTextStyle": "Styl tekstu",
+  "pasteImportEffectStyle": "Styl efektu",
+  "pasteImportGridStyle": "Styl siatki",
+  "pasteImportChoiceLabel": "{name}: użyj istniejącego lub dodaj pod nową nazwą",
+  "pasteImportAsIs": "Wklej bez zmian",
+  "pasteImportConfirm": "Tak, zaimportuj"
 }

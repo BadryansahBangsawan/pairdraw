@@ -29,6 +29,12 @@ La selección muestra ocho tiradores: cuatro en las esquinas y cuatro en el cent
 
 Mantén <kbd>Shift</kbd> al arrastrar un tirador de esquina para conservar las proporciones.
 
+## Herramienta Escalar
+
+Pulsa <kbd>K</kbd>, o elige **Escalar** en el menú de la herramienta Mover, para escalar capas con todo su contenido: tamaños de texto, trazos, efectos, radios de esquina y espaciado de la disposición automática crecen y se reducen con la capa. Arrastra un tirador de la selección para escalar desde el lado opuesto, o mantén pulsada <kbd>Option</kbd>/<kbd>Alt</kbd> para escalar desde el centro; varias capas seleccionadas se escalan juntas alrededor de su contorno común.
+
+Mientras la herramienta Escalar está activa, el panel Diseño muestra el ancho y el alto de la selección, un factor de escala y una cuadrícula de anclaje. Escribir un ancho o un alto escala la selección proporcionalmente; el factor acepta `2`, `2x` o `200%`. La cuadrícula de anclaje elige el punto que se queda en su sitio. Cada escalado es un solo paso de deshacer.
+
 ## Rotar
 
 Sitúa el puntero justo fuera de un tirador de esquina hasta que aparezca el cursor de rotación y arrastra. Con <kbd>Shift</kbd>, la rotación se ajusta en pasos de 15°.

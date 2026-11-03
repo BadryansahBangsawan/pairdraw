@@ -10,7 +10,7 @@ import type { Kysely, Transaction } from 'kysely'
 
 export type AccessDatabase = Kysely<CloudDatabase> | Transaction<CloudDatabase>
 
-const PERMISSION_WEIGHT: Record<DocumentPermission, number> = { view: 1, edit: 2 }
+const PERMISSION_WEIGHT: Record<DocumentPermission, number> = { view: 1, comment: 2, edit: 3 }
 
 function workspacePermission(role: WorkspaceRole): DocumentPermission {
   return role === 'viewer' ? 'view' : 'edit'

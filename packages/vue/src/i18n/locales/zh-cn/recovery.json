@@ -7,5 +7,27 @@
   "settingsTitle": "恢复",
   "settingsDescription": "管理未保存文档的本地恢复副本。",
   "restore": "恢复",
-  "discard": "丢弃"
+  "discard": "丢弃",
+  "drafts": "草稿",
+  "draftsDescription": "新设计会保留在此设备上，直到你把它保存到其他位置。",
+  "loadingDrafts": "正在加载草稿",
+  "noDrafts": "还没有草稿",
+  "noDraftsDescription": "新设计在你编辑时会作为草稿保存在这里。",
+  "draftsOff": "草稿已关闭",
+  "draftsOffDescription": "只有在设置中开启“自动保留未保存的工作”且此浏览器保留网站数据时，新设计才会保存在这里。",
+  "deleteDraft": "删除草稿",
+  "deleteDraftConfirmation": "删除草稿“{name}”？",
+  "deleteDraftsConfirmation": {
+    "many": "删除 {count} 个草稿？"
+  },
+  "deleteDraftDescription": "草稿只保存在此设备上。此操作无法撤销。",
+  "deleteDraftFailed": "无法删除草稿“{name}”。请重试。",
+  "draftUnavailable": "此草稿已不可用。",
+  "recoveredChangesTitle": "已恢复的更改",
+  "recoveredChangesDescription": "“{name}”有 {time} 的更改从未保存到文件。将它们保存到文件、另存为新文件，或丢弃它们。",
+  "saveRecovered": "保存",
+  "saveRecoveredAs": "另存为…",
+  "discardRecovered": "不保存",
+  "recoveredChangesFailed": "无法保存恢复的更改：{error}",
+  "backupUnavailable": "这些更改的备份已不可用。"
 }

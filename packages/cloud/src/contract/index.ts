@@ -46,6 +46,7 @@ export {
   type CollaborationTicket
 } from './collaboration'
 export * from './relay'
+export * from './comments'
 export { workspaceEntitlementsSchema, type WorkspaceEntitlements } from './entitlements'
 export {
   CLOUD_DISCOVERY_PATH,
@@ -109,6 +110,7 @@ export {
   type DocumentImageDownload,
   type DocumentImageLink,
   type DocumentPermission,
+  DOCUMENT_PERMISSIONS,
   type DocumentSummary,
   type RequestImageLinksInput,
   type ImageUploadOffer,
@@ -142,6 +144,7 @@ export {
   requestSharedImageLinksSchema,
   resolveDocumentShareSchema,
   resolvedDocumentShareSchema,
+  shareSnapshotSchema,
   updateDocumentShareSchema,
   type AcceptDocumentInvitationInput,
   type CloudUserProfile,
@@ -159,6 +162,7 @@ export {
   type RequestSharedImageLinksInput,
   type ResolveDocumentShareInput,
   type ResolvedDocumentShare,
+  type ShareSnapshot,
   type UpdateDocumentShareInput
 } from './sharing'
 export {
@@ -194,10 +198,13 @@ export {
   cloudDocumentPath,
   cloudDocumentURL,
   cloudInvitationURL,
+  cloudPublicDocumentURL,
+  cloudPublicProfilePath,
   cloudShareURL,
   parseCloudLinkPath,
   type CloudLinkKind,
   type CloudLinkPathKind
 } from './links'
 export { CLOUD_PORTAL_PAGE_ROOTS, isCloudPortalPage } from './portal'
+export * from './profiles'
 export * from './versions'

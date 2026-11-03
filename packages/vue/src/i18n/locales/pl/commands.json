@@ -46,6 +46,7 @@
   "flattenSelection": "Spłaszcz",
   "outlineText": "Kontur tekstu",
   "outlineStroke": "Kontur obrysu",
+  "cropImage": "Przytnij obraz",
   "useAsMask": "Użyj jako maski",
   "removeMask": "Usuń maskę",
   "bringForward": "Przesuń do przodu",
@@ -91,5 +92,8 @@
   "vectorSmoothCorner": "Przełącz punkt między gładkim a narożnym",
   "gestureDrag": "przeciągnij",
   "gestureDoubleClickSegment": "kliknij dwukrotnie segment",
-  "gestureDoubleClickPoint": "kliknij dwukrotnie punkt"
+  "gestureDoubleClickPoint": "kliknij dwukrotnie punkt",
+  "vectorBendSegment": "Wygnij segment",
+  "vectorBendSegmentKeepHandles": "Wygnij segment bez przesuwania sąsiednich uchwytów",
+  "gestureDragSegment": "przeciągnij segment"
 }

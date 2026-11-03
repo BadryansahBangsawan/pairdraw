@@ -33,6 +33,12 @@ Con **Hacer zoom con la rueda** en **Ajustes → Editor**, la rueda del ratón a
 | Encajar documento | <kbd>⌘</kbd><kbd>1</kbd> | <kbd>Ctrl</kbd><kbd>1</kbd> |
 | Ampliar selección | <kbd>⌘</kbd><kbd>2</kbd> | <kbd>Ctrl</kbd><kbd>2</kbd> |
 
+## Herramienta Zoom
+
+Mantén pulsada <kbd>Z</kbd> y haz clic para acercar en el puntero, o haz clic con <kbd>Option</kbd>/<kbd>Alt</kbd> para alejar; arrastra para acercar al área que enmarques. Al soltar <kbd>Z</kbd> vuelves a la herramienta anterior. Una pulsación breve de <kbd>Z</kbd> deja activa la herramienta Zoom, que también aparece en el menú de la herramienta Mano de la barra de herramientas.
+
+Ajustar a la vista, a la selección y al 100 %, los niveles del menú de zoom y el marco siguiente o anterior se deslizan hasta su vista en lugar de saltar. Saltan cuando las animaciones están desactivadas, el modo Ultralight está activo o el sistema pide reducir el movimiento.
+
 ## Reglas
 
 Las reglas están ocultas hasta que las activas con **Ver → Reglas** o <kbd>Shift</kbd> + <kbd>R</kbd>.

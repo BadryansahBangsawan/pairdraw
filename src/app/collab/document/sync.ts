@@ -2,6 +2,7 @@ import { isEqual, isPlainObject, keyBy } from 'es-toolkit'
 import * as v from 'valibot'
 import type * as Y from 'yjs'
 
+import { packCommentRelayMessages, ROOM_COMMENT_THREADS } from '@open-pencil/cloud/contract'
 import type {
   CommentReply,
   CommentThread,
@@ -58,7 +59,7 @@ export type YDocumentData = {
 export function roomDocumentData(ydoc: Y.Doc): YDocumentData {
   return {
     entries: ydoc.getMap('documentEntries'),
-    threads: ydoc.getMap('commentThreads'),
+    threads: ydoc.getMap(ROOM_COMMENT_THREADS),
     libraries: ydoc.getMap('libraries'),
     settings: ydoc.getMap('documentSettings')
   }
@@ -159,18 +160,22 @@ const readThreadRecord = (value: unknown) => {
  * Keeps what the document holds outside its layers in step with the room: the document node's
  * plugin data, which holds the review statuses and file settings, entry by entry; comment
  * threads one by one with their replies by id, so people commenting at once all keep theirs;
- * the libraries it uses; and its color space. A viewer receives these and sends none.
+ * the libraries it uses; and its color space. A viewer receives these and sends none; a commenter
+ * sends only its changed comment threads, through `sendComments`, for the relay to write.
  */
 export function bindDocumentSync({
   store,
   ydoc,
   data,
-  meta
+  meta,
+  sendComments
 }: {
   store: EditorStore
   ydoc: Y.Doc
   data: YDocumentData
   meta: YMeta
+  /** Sends an encoded comment channel message to the relay, for a tab that may only comment. */
+  sendComments?: (payload: Uint8Array) => void
 }) {
   // What the room holds as this peer last wrote or read it, so only what changed since is sent.
   let sent = readDocumentData(store)
@@ -181,8 +186,31 @@ export function bindDocumentSync({
 
   function send() {
     // A joining tab's own document is not the room's until it follows the room.
-    if (receiving || store.state.hostRestrictions.readOnly || !holdsRoomRoot()) return
-    write()
+    if (receiving || !holdsRoomRoot()) return
+    if (!store.state.hostRestrictions.readOnly) write()
+    else if (sendComments && store.state.hostRestrictions.comments) sendCommentChanges(sendComments)
+  }
+
+  /**
+   * Sends the threads that changed since the room last had them; the relay writes what a
+   * commenter may change and sends it back to everyone, this tab too. A thread the room has goes
+   * with only its new replies, since the relay takes nothing else from it but whether it is
+   * resolved, so a reply in a long thread stays small. Messages stay within the relay's limits on
+   * threads and bytes; a change too large for any message is not sent, as the relay would refuse it.
+   */
+  function sendCommentChanges(deliver: (payload: Uint8Array) => void) {
+    const next = readDocumentData(store).threads
+    const changed = [...next]
+      .filter(([id, record]) => !isEqual(sent.threads.get(id), record))
+      .flatMap(([id, record]) => {
+        const thread = readThread(record)
+        if (!thread) return []
+        const known = sent.threads.get(id)?.replies
+        if (!known) return [thread]
+        return [{ ...thread, replies: thread.replies.filter((reply) => !(reply.id in known)) }]
+      })
+    sent = { ...sent, threads: structuredClone(next) }
+    for (const message of packCommentRelayMessages(changed).messages) deliver(message)
   }
 
   function write() {

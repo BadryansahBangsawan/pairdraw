@@ -1,5 +1,7 @@
 import type { DBSchema } from 'idb'
+import * as v from 'valibot'
 
+import { conversationPinsSchema } from '@/app/ai/chat/pins/schema'
 import type { RunTrace, TraceAsset, TraceStore } from '@/app/ai/chat/trace/types'
 import { APP_DATABASE_NAMES, defineAppDatabase, connectAppDatabase } from '@/app/storage/idb'
 
@@ -17,11 +19,13 @@ interface ChatDatabase extends DBSchema {
   runs: { key: [string, string]; value: RunTrace; indexes: { conversation: string } }
   /** Instructions and tool sets runs share, under their fingerprints. */
   traceAssets: { key: string; value: TraceAsset }
+  /** `Conversation['pins']` with each Blob stored as bytes (`./blobs`), under the conversation. */
+  pins: { key: string; value: unknown }
 }
 
 const definition = defineAppDatabase<ChatDatabase>({
   name: APP_DATABASE_NAMES.chats,
-  version: 4,
+  version: 5,
   callbacks: {
     upgrade(database, oldVersion) {
       if (oldVersion < 1) {
@@ -39,9 +43,17 @@ const definition = defineAppDatabase<ChatDatabase>({
           .createIndex('conversation', 'conversationId')
         database.createObjectStore('traceAssets')
       }
+      if (oldVersion < 5) database.createObjectStore('pins')
     }
   }
 })
+
+/** Stored pins, or none when they are missing or no longer read as pins. */
+function restorePins(stored: unknown): Conversation['pins'] {
+  if (stored === undefined) return undefined
+  const parsed = v.safeParse(conversationPinsSchema, fromStorableBlobs(stored))
+  return parsed.success ? parsed.output : undefined
+}
 
 /** Transcript snapshots and Blob previews are committed atomically with their list metadata. */
 export function createConversationStore(): ConversationStore {
@@ -57,21 +69,23 @@ export function createConversationStore(): ConversationStore {
       return rows.toSorted((left, right) => right.updatedAt.localeCompare(left.updatedAt))
     },
     async read(id) {
-      const transaction = (await getDatabase()).transaction(['conversations', 'messages'])
+      const transaction = (await getDatabase()).transaction(['conversations', 'messages', 'pins'])
       const meta = await transaction.objectStore('conversations').get(id)
       const messages = await transaction.objectStore('messages').get(id)
+      const pins = restorePins(await transaction.objectStore('pins').get(id))
       await transaction.done
       if (!meta) return null
       // Written only by `write` below, from `Conversation['messages']`.
       const restored = fromStorableBlobs(messages ?? []) as Conversation['messages']
-      return { ...meta, messages: restored }
+      return pins ? { ...meta, messages: restored, pins } : { ...meta, messages: restored }
     },
     async write(conversation) {
-      const { messages, ...meta } = conversation
+      const { messages, pins, ...meta } = conversation
       // Before the transaction opens: awaiting anything but its own requests would end it.
       const stored = await toStorableBlobs(messages)
+      const storedPins = pins ? await toStorableBlobs(pins) : undefined
       const transaction = (await getDatabase()).transaction(
-        ['conversations', 'messages', 'deleted'],
+        ['conversations', 'messages', 'deleted', 'pins'],
         'readwrite'
       )
       if (await transaction.objectStore('deleted').get(meta.id)) {
@@ -90,6 +104,8 @@ export function createConversationStore(): ConversationStore {
       }
       await transaction.objectStore('conversations').put(meta)
       await transaction.objectStore('messages').put(stored, meta.id)
+      if (storedPins === undefined) await transaction.objectStore('pins').delete(meta.id)
+      else await transaction.objectStore('pins').put(storedPins, meta.id)
       await transaction.done
     },
     async rename(id, title) {
@@ -108,17 +124,33 @@ export function createConversationStore(): ConversationStore {
     },
     async remove(id) {
       const transaction = (await getDatabase()).transaction(
-        ['conversations', 'messages', 'selected', 'deleted', 'runs'],
+        ['conversations', 'messages', 'selected', 'deleted', 'runs', 'pins'],
         'readwrite'
       )
       await transaction.objectStore('deleted').put(true, id)
       await transaction.objectStore('conversations').delete(id)
       await transaction.objectStore('messages').delete(id)
+      await transaction.objectStore('pins').delete(id)
       let run = await transaction.objectStore('runs').index('conversation').openCursor(id)
       while (run) {
         await run.delete()
         run = await run.continue()
       }
+      let cursor = await transaction.objectStore('selected').openCursor()
+      while (cursor) {
+        if (cursor.value === id) await cursor.delete()
+        cursor = await cursor.continue()
+      }
+      await transaction.done
+    },
+    async discard(id) {
+      const transaction = (await getDatabase()).transaction(
+        ['conversations', 'messages', 'selected', 'pins'],
+        'readwrite'
+      )
+      await transaction.objectStore('conversations').delete(id)
+      await transaction.objectStore('messages').delete(id)
+      await transaction.objectStore('pins').delete(id)
       let cursor = await transaction.objectStore('selected').openCursor()
       while (cursor) {
         if (cursor.value === id) await cursor.delete()

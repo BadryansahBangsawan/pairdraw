@@ -23,6 +23,8 @@ export type CanvasNodeEditMethods = Partial<{
     targetTangentField: 'tangentStart' | 'tangentEnd' | null
   ) => void
   nodeEditCancelDrag: () => void
+  /** Ends a transform box drag, so the box fits the selected points again. */
+  nodeEditEndPointsTransform: () => void
   commitNodeEditChanges: () => void
   nodeEditZeroVertexHandles: (vertexIndex: number) => void
   nodeEditConnectEndpoints: (a: number, b: number) => void

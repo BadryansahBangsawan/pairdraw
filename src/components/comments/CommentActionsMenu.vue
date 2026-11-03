@@ -98,16 +98,18 @@ async function copyText() {
     <icon-lucide-copy :class="menuCls.icon" />
     <span>{{ messages.copyText }}</span>
   </component>
-  <component :is="Separator" :class="menuCls.separator" />
-  <component
-    :is="Item"
-    :class="menuCls.item"
-    data-command="comment-delete"
-    @select="comments.requestDelete(thread.id)"
-  >
-    <icon-lucide-trash-2 :class="menuCls.icon" />
-    <span>{{ messages.delete }}</span>
-  </component>
+  <template v-if="!comments.commentsOnly.value">
+    <component :is="Separator" :class="menuCls.separator" />
+    <component
+      :is="Item"
+      :class="menuCls.item"
+      data-command="comment-delete"
+      @select="comments.requestDelete(thread.id)"
+    >
+      <icon-lucide-trash-2 :class="menuCls.icon" />
+      <span>{{ messages.delete }}</span>
+    </component>
+  </template>
   <template v-if="showHide">
     <component :is="Separator" :class="menuCls.separator" />
     <component

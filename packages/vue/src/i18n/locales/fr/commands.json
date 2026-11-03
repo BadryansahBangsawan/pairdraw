@@ -46,6 +46,7 @@
   "flattenSelection": "Aplatir",
   "outlineText": "Vectoriser le texte",
   "outlineStroke": "Vectoriser le contour",
+  "cropImage": "Recadrer l'image",
   "useAsMask": "Utiliser comme masque",
   "removeMask": "Retirer le masque",
   "bringForward": "Avancer",
@@ -91,5 +92,8 @@
   "vectorSmoothCorner": "Basculer le point entre lisse et angle",
   "gestureDrag": "glisser",
   "gestureDoubleClickSegment": "double-clic sur un segment",
-  "gestureDoubleClickPoint": "double-clic sur un point"
+  "gestureDoubleClickPoint": "double-clic sur un point",
+  "vectorBendSegment": "Courber le segment",
+  "vectorBendSegmentKeepHandles": "Courber le segment sans bouger les poignées voisines",
+  "gestureDragSegment": "glisser un segment"
 }

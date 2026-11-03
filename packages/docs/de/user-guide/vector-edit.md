@@ -32,6 +32,8 @@ Beim Ziehen eines Ankerpunkts mit <kbd>Cmd</kbd>/<kbd>Strg</kbd> bestimmt OpenPe
 - <kbd>Cmd</kbd>/<kbd>Strg</kbd> + <kbd>J</kbd> verbindet zwei ausgewählte Endpunkte: Punkte an derselben Stelle werden zu einem Punkt, sonst entsteht ein gerades Segment. Verbindet es die beiden Enden eines Pfads, wird er geschlossen und gefüllt. Während ein Pfad bearbeitet wird, öffnet dieses Kürzel nicht den Chat.
 - <kbd>Option</kbd>/<kbd>Alt</kbd> + Ziehen zieht eine Kopie der ausgewählten Punkte oder Segmente. Die Kopie eines einzelnen Punkts bleibt mit ihm verbunden.
 - Die Pfeiltasten verschieben die ausgewählten Punkte um den Abstand aus Einstellungen → Editor, mit <kbd>Shift</kbd> um den großen Abstand.
+- <kbd>Cmd</kbd>/<kbd>Strg</kbd> + Ziehen an einem Segment biegt es, sodass die gegriffene Stelle dem Zeiger folgt. Ein glatter Endpunkt bleibt glatt, sein anderer Griff dreht mit. Mit <kbd>Cmd</kbd>/<kbd>Strg</kbd> + <kbd>Option</kbd>/<kbd>Alt</kbd> bleiben die Griffe der Nachbarsegmente stehen, und die Endpunkte werden zu Eckpunkten.
+- Sind zwei Punkte oder Segmente ausgewählt, umgibt sie ein Transformationsrahmen. Ziehen an einer Ecke oder Kante skaliert die Punkte von der Gegenseite aus, mit <kbd>Shift</kbd> proportional und mit <kbd>Option</kbd>/<kbd>Alt</kbd> von der Mitte aus. Ziehen knapp außerhalb einer Ecke dreht sie um die Mitte des Rahmens, mit <kbd>Shift</kbd> in 15°-Schritten. Jede Transformation ist ein Rückgängig-Schritt.
 
 ## Zeichenstift im Bearbeitungsmodus
 

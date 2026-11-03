@@ -6,8 +6,15 @@ import { filesMessages } from '@open-pencil/vue/i18n'
 
 import { toast } from '@/app/shell/ui'
 
+import { isLayerClipboardHTML } from '../html'
 import { matchingClipboardSnapshot } from '../memory'
+import { chooseClipboardImport } from './import-prompt'
+import { pasteWebClipboardHTML } from './web'
 
+/**
+ * Paste the clipboard's design. Layers copied from another open document that use its
+ * variables or styles first ask whether to import them; cancelling pastes nothing.
+ */
 export async function pasteClipboardHTML(
   editor: Editor,
   html: string,
@@ -15,8 +22,20 @@ export async function pasteClipboardHTML(
   options: Parameters<Editor['pasteFromHTML']>[2] = {}
 ): Promise<void> {
   const snapshot = matchingClipboardSnapshot(html)
-  if (snapshot) await editor.pasteSnapshot(snapshot, cursorPos, options)
-  else await editor.pasteFromHTML(html, cursorPos, options)
+  if (!snapshot) {
+    // HTML without layers is web content: a capture, or a page's own clipboard fragment.
+    if (!isLayerClipboardHTML(html) && (await pasteWebClipboardHTML(editor, html, cursorPos))) {
+      return
+    }
+    await editor.pasteFromHTML(html, cursorPos, options)
+    return
+  }
+  // Copy properties marks a snapshot Paste skips, so it never asks about one.
+  const dependencies = snapshot.properties
+    ? undefined
+    : await chooseClipboardImport(editor.graph, snapshot)
+  if (dependencies === null) return
+  await editor.pasteSnapshot(snapshot, cursorPos, { ...options, dependencies })
 }
 
 /** Where a paste without a copied position goes: the cursor, else the middle of the view. */

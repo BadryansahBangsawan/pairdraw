@@ -10,7 +10,7 @@ Confronto tra le funzioni di Figma Design e lo stato attuale di OpenPencil.
 
 ## Interfaccia e navigazione
 
-Barra degli strumenti personalizzabile, livelli, pagine, proprietà, zoom, spostamento, righelli, sfondo, guide trascinabili dai righelli, palette dei comandi (<kbd>⌘</kbd><kbd>K</kbd>), menu contestuale e menu dell’applicazione sono disponibili. Le scorciatoie sono parziali (mancano Scala, Freccia, Contagocce e lo strumento Zoom), così come gli strumenti AI, che non generano immagini né offrono ricerca AI. Ricerca e sostituzione, vista reticolare, miniatura personalizzata e passo di spostamento personalizzato mancano.
+Barra degli strumenti personalizzabile, livelli, pagine, proprietà, zoom, spostamento, righelli, sfondo, guide trascinabili dai righelli, palette dei comandi (<kbd>⌘</kbd><kbd>K</kbd>), menu contestuale e menu dell’applicazione sono disponibili. Le scorciatoie sono parziali (mancano Scala, Freccia, Contagocce e lo strumento Zoom), così come gli strumenti AI, che generano immagini, rimuovono e sostituiscono gli sfondi e generano SVG con le chiavi dell’utente per i suoi servizi di immagini, ma non offrono ricerca AI. Ricerca e sostituzione, vista reticolare, miniatura personalizzata e passo di spostamento personalizzato mancano.
 
 ## Livelli e forme
 
@@ -34,7 +34,7 @@ Ombre, sfocature, spessore del contorno, estremità, giunzioni, tratteggio, alli
 
 ## Disposizione automatica
 
-Flexbox, Grid, direzione, spaziatura, margini interni, allineamento, modalità di dimensionamento, ritorno a capo, disposizioni annidate, riordino tramite trascinamento e dimensioni minime e massime sono supportati.
+Flexbox, Grid, direzione, spaziatura, margini interni, allineamento, modalità di dimensionamento, ritorno a capo, disposizioni annidate, riordino tramite trascinamento e dimensioni minime e massime sono supportati. Lo spazio attorno esiste solo in OpenPencil; Figma mostra questi frame con spazio tra gli elementi.
 
 ## Componenti e sistemi di design
 

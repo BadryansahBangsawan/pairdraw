@@ -141,6 +141,31 @@ to its new address, so the approval stays with the account.
 Collaboration tickets are signed, epoch-scoped JWTs naming the principal and permission. Rotating a
 capability secret keeps the current epoch; revoking access advances it so old tickets stop working.
 
+### Permissions, snapshot links, and public profiles
+
+A document permission is `view`, `comment`, or `edit`, for links, grants, and invitations alike.
+`comment` lets someone see the document and its room and add comments, never edit layers; guests
+following a comment link need the workspace's `guestView` entitlement, as view links do.
+
+A link is live by default: it follows the document and, for `comment` and `edit`, opens its room.
+Creating or updating a share with `snapshot: 'current'` or a revision ID pins it to one revision,
+stored as the share's `revisionId`. A snapshot link is always `view`, never issues a collaboration
+ticket, and `POST /api/shares/:id/document` returns the pinned revision. A document has at most one
+active live link and one active snapshot link. Updating a snapshot re-pins the same link; revoking
+it leaves the room epoch alone, so people editing live stay connected. Revision compaction keeps any
+revision an active snapshot pins. `GET /api/documents/:id/access` also returns the document's
+`currentRevisionId`, so the share dialog can tell when a snapshot falls behind.
+
+A person claims a public profile, `/u/<handle>`, with `GET` and `PUT /api/profile`. A workspace
+administrator makes a workspace public with `PUT /api/workspaces/:id/public`, which needs links and
+guest viewing in the workspace's policy; the workspace records when and by whom (`public_at`,
+`public_by`), and only that administrator's profile lists it. Anyone may read
+`GET /api/public/profiles/:handle` and download a listed document with
+`POST /api/public/documents/:id/document`, which the editor opens read-only at `/view/:id`. Every
+public read checks the policy again and that the publisher still administers the workspace and
+may use the server: a banned account, or one whose enrollment is no longer approved, takes its
+profile and its public files offline. A deleted account's handle is free again.
+
 ## Live collaboration
 
 Collaboration in the editor runs Yjs sync and awareness over a `CollabRoomTransport`. Local
@@ -198,6 +223,15 @@ The relay enforces what the ticket allows: a viewer's document updates and sync 
 it, and presence updates are rewritten so others see the ticket's name and a `cloud` field with the
 verified identity and permission. A peer cannot claim presence clients another peer owns. Voice is
 not carried over the relay yet; the transport reports no media.
+
+A commenter's document updates are dropped too. Its comments travel on their own `comments`
+channel to the server peer, as JSON threads (`encodeCommentRelayMessage`, at most 20 threads and
+192 KiB a message). The relay keeps only new threads, new replies, and resolving or reopening,
+stamps them with the ticket's name and its own clock, writes them into the room's `commentThreads`
+map in the layout editors write, and sends the change to everyone as its own update. A guest's
+name is the one the guest chose, so it labels a comment without proving who wrote it. Commenters
+add comments; deleting them, deleting replies, and moving pins stay with editors, and the editor
+offers none of them to a commenter.
 
 ## Enrollment and administration
 

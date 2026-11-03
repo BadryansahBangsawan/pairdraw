@@ -15,6 +15,7 @@ describe('CSS layout values', () => {
     // Design JSX and .pen spellings are not CSS.
     expect(parseCSSFlexDirection('col')).toBeUndefined()
     expect(parseCSSJustifyContent('between')).toBeUndefined()
+    expect(parseCSSJustifyContent('around')).toBeUndefined()
     expect(parseCSSJustifyContent('space-between')).toBe('SPACE_BETWEEN')
   })
 
@@ -23,7 +24,8 @@ describe('CSS layout values', () => {
     expect(parseCSSJustifyContent('unsafe flex-end')).toBe('MAX')
     expect(parseCSSAlignItems('first baseline')).toBe('BASELINE')
     expect(parseCSSAlignItems('last baseline')).toBeUndefined()
-    expect(parseCSSJustifyContent('space-around')).toBeUndefined()
+    expect(parseCSSJustifyContent('space-around')).toBe('SPACE_AROUND')
+    expect(parseCSSJustifyContent('space-evenly')).toBeUndefined()
     expect(parseCSSAlignItems('var(--align)')).toBeUndefined()
   })
 

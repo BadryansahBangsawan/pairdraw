@@ -35,7 +35,7 @@ const meta = {
           :custom-label="args.customLabel"
           :range-message="args.rangeMessage"
         />
-        <p data-testid="committed" class="text-xs text-muted">{{ shown }}</p>
+        <p data-test-id="committed" class="text-xs text-muted">{{ shown }}</p>
       </div>`
   })
 } satisfies Meta<{

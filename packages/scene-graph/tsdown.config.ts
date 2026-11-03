@@ -3,6 +3,7 @@ import { defineConfig } from 'tsdown'
 export default defineConfig({
   entry: {
     index: './src/index.ts',
+    'agent-notes/index': './src/agent-notes/index.ts',
     'arrow-caps': './src/arrow-caps.ts',
     'asset-keys': './src/asset-keys.ts',
     'behaviours/index': './src/behaviours/index.ts',
@@ -34,6 +35,7 @@ export default defineConfig({
     'layout/index': './src/layout/index.ts',
     matrix: './src/matrix.ts',
     'mutation-impact': './src/mutation-impact.ts',
+    naming: './src/naming.ts',
     'node-defaults': './src/node-defaults.ts',
     'order-keys': './src/order-keys.ts',
     'paints/index': './src/paints/index.ts',

@@ -29,7 +29,28 @@ export const editorMessageDefaults = {
   toggleLayersPanel: 'Layers panel',
   togglePropertiesPanel: 'Properties panel',
   resetPreview: 'Reset',
-  leavePreview: params('Leave preview ({shortcut})')
+  leavePreview: params('Leave preview ({shortcut})'),
+  /** The text panel's button and the canvas menu's entry for a text's link. */
+  textLink: 'Link',
+  addTextLink: 'Add link',
+  editTextLink: 'Edit link',
+  removeTextLink: 'Remove link',
+  openTextLink: 'Open link',
+  /** The field a text's link address is typed into. */
+  textLinkAddress: 'Link address',
+  textLinkPlaceholder: 'Paste a link or email address',
+  textLinkInvalid: 'Use a web address or an email address.',
+  /** Shown in the link field when the selected characters link to different places. */
+  textLinkMixed: 'Several links',
+  /** Shown in the link field for a link to a layer or page of the document. */
+  textLinkToLayer: params('Links to {name}'),
+  /** Shown over an embedded editor until the page it is embedded in connects. */
+  embedWaiting: 'Waiting for the host page',
+  embedWaitingDescription: 'The design opens once the page it is embedded in connects.',
+  /** Shown when an embed link names no valid host origin, so no page can connect. */
+  embedInvalidOrigin: 'This embed cannot connect',
+  embedInvalidOriginDescription:
+    'Its link must name the embedding page’s origin, such as https://example.com.'
 } as const
 
 export const editorMessages = i18n('editor', editorMessageDefaults)

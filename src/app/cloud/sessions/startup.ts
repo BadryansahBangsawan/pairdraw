@@ -21,6 +21,7 @@ import {
   resumeCloudLink
 } from '../links'
 import { addCloudSiteServer, cloudServers, findCloudServer } from '../servers/store'
+import { openCloudPublicLink, readCloudPublicLink } from '../sharing/public'
 import { cloudConnection, refreshCloudConnection } from './connection'
 import { leftForCloudSignIn, takePendingCloudSignIn } from './sign-in'
 
@@ -37,6 +38,7 @@ function opensWithCloudDocument(): boolean {
   return (
     readCloudDocumentLink(address) !== null ||
     readCloudLink(address)?.kind === 'share' ||
+    readCloudPublicLink(address) !== null ||
     leftForCloudSignIn()
   )
 }
@@ -59,6 +61,7 @@ export async function startCloudSessions(options: {
     const address = new URL(globalThis.location.href)
     const link = readCloudLink(address)
     const documentLink = readCloudDocumentLink(address)
+    const publicLink = readCloudPublicLink(address)
     // The link the tab opens with is the one to open, not one kept from an earlier sign-in.
     if (documentLink || link) {
       forgetCloudDocumentLink()
@@ -82,6 +85,7 @@ export async function startCloudSessions(options: {
     if (link?.kind !== 'invitations') resumeCloudInvitation()
     if (link) await openCloudLink(link)
     if (documentLink) await openCloudDocumentLink(documentLink)
+    if (publicLink) await openCloudPublicLink(publicLink)
   } finally {
     // A link that needs a sign-in leaves for the server's page, so nothing shows before it goes.
     openingCloudLink.value = leftForCloudSignIn()

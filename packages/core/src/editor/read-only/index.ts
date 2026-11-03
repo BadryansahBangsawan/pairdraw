@@ -51,12 +51,16 @@ export function guardUndo(undo: UndoManager, isReadOnly: () => boolean): UndoMan
 export function createReadOnlyActions(ctx: EditorContext, endEdits: () => void) {
   /**
    * Opens the document read-only or editable again. Going read-only ends what is being edited and
-   * drops a tool that would edit, as Figma does on opening version history.
+   * drops a tool that would edit, as Figma does on opening version history; `comments` keeps the
+   * Comment tool, for people who can comment.
    */
-  function setReadOnly(readOnly: boolean): void {
-    if (ctx.state.hostRestrictions.readOnly === readOnly) return
-    if (readOnly) endEdits()
-    ctx.state.hostRestrictions = { ...ctx.state.hostRestrictions, readOnly }
+  function setReadOnly(readOnly: boolean, options: { comments?: boolean } = {}): void {
+    // Only a read-only document takes comments apart from edits; an editable one takes both.
+    const comments = readOnly && options.comments === true
+    const current = ctx.state.hostRestrictions
+    if (current.readOnly === readOnly && (current.comments ?? false) === comments) return
+    if (readOnly && !current.readOnly) endEdits()
+    ctx.state.hostRestrictions = { ...current, readOnly, comments }
     ctx.setActiveTool(offeredTool(ctx.state, ctx.state.activeTool))
     ctx.emitEditorEvent('document:read-only-changed', readOnly)
     ctx.requestRepaint()

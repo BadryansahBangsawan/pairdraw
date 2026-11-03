@@ -35,6 +35,7 @@ import { openExternalLink, toast } from '@/app/shell/ui'
 import { activeTab } from '@/app/tabs'
 import ChatAgentNotice from '@/components/chat/agent/ChatAgentNotice.vue'
 import ChatAgentSetup from '@/components/chat/agent/ChatAgentSetup.vue'
+import ChatProjectFolder from '@/components/chat/agent/ChatProjectFolder.vue'
 import { useChatAgentSetup } from '@/components/chat/agent/useChatAgentSetup'
 import ChatFollowAgentsToggle from '@/components/chat/ChatFollowAgentsToggle.vue'
 import ChatHistory from '@/components/chat/ChatHistory.vue'
@@ -42,6 +43,7 @@ import ChatInput from '@/components/chat/ChatInput.vue'
 import ChatPermissionDialog from '@/components/chat/ChatPermissionDialog.vue'
 import ChatRunLocation from '@/components/chat/ChatRunLocation.vue'
 import ChatTranscript from '@/components/chat/ChatTranscript.vue'
+import ChatContextBar from '@/components/chat/context/ChatContextBar.vue'
 import { useImageDrop } from '@/components/ui/drop/useImageDrop'
 
 const { isConfigured, ensureChat, history, chatFailure, clearChatFailure, providerID } = useAIChat()
@@ -56,6 +58,7 @@ const submission = useChatSubmission({
   flush: history.flush,
   clearFailure: clearChatFailure,
   getEditor: getActiveEditorStore,
+  pins: () => history.pins.value,
   messages: computed(() => ({
     openSettings: ai.value.openProviderSettingsAction,
     requestFailed: ai.value.chatRequestFailed,
@@ -423,7 +426,10 @@ function handleStop() {
       @save-trace="saveTrace"
       @delete="historyAction(() => history.remove($event))"
     >
-      <template #actions><ChatFollowAgentsToggle /></template>
+      <template #actions
+        ><ChatContextBar :messages="messages" /><ChatProjectFolder
+          @error="toast.error" /><ChatFollowAgentsToggle
+      /></template>
     </ChatHistory>
     <p v-if="history.storageError.value" role="alert" class="px-3.5 py-2 text-xs text-error">
       {{ ai.chatStorageFailed }}

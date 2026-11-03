@@ -105,6 +105,11 @@ export function createCloudPortalRouter(context: PortalContext) {
         meta: { account: true, admin: true }
       },
       {
+        path: '/u/:handle',
+        name: 'public-profile',
+        component: () => import('@/views/cloud/PublicProfileView.vue')
+      },
+      {
         path: '/admin/people/:userId',
         name: 'person',
         component: () => import('@/views/cloud/ConsoleView.vue'),

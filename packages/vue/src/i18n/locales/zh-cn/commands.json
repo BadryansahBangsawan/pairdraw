@@ -46,6 +46,7 @@
   "flattenSelection": "扁平化",
   "outlineText": "文本转轮廓",
   "outlineStroke": "描边转轮廓",
+  "cropImage": "裁剪图片",
   "useAsMask": "用作蒙版",
   "removeMask": "取消蒙版",
   "bringForward": "上移一层",
@@ -91,5 +92,8 @@
   "vectorSmoothCorner": "在平滑和尖角之间切换锚点",
   "gestureDrag": "拖动",
   "gestureDoubleClickSegment": "双击线段",
-  "gestureDoubleClickPoint": "双击锚点"
+  "gestureDoubleClickPoint": "双击锚点",
+  "vectorBendSegment": "弯曲线段",
+  "vectorBendSegmentKeepHandles": "弯曲线段并保持相邻控制柄不动",
+  "gestureDragSegment": "拖动线段"
 }

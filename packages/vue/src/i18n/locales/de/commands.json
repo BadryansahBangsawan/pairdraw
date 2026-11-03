@@ -46,6 +46,7 @@
   "flattenSelection": "Abflachen",
   "outlineText": "Text in Pfade umwandeln",
   "outlineStroke": "Kontur in Pfad umwandeln",
+  "cropImage": "Bild zuschneiden",
   "useAsMask": "Als Maske verwenden",
   "removeMask": "Maske entfernen",
   "bringForward": "Nach vorne",
@@ -91,5 +92,8 @@
   "vectorSmoothCorner": "Punkt zwischen glatt und Ecke wechseln",
   "gestureDrag": "ziehen",
   "gestureDoubleClickSegment": "Doppelklick auf ein Segment",
-  "gestureDoubleClickPoint": "Doppelklick auf einen Punkt"
+  "gestureDoubleClickPoint": "Doppelklick auf einen Punkt",
+  "vectorBendSegment": "Segment biegen",
+  "vectorBendSegmentKeepHandles": "Segment biegen, benachbarte Griffe beibehalten",
+  "gestureDragSegment": "ein Segment ziehen"
 }

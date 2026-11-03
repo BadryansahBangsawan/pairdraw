@@ -48,14 +48,16 @@ export function isSkillsFolderTrusted(path: string, preferences: SkillPreference
 }
 
 /**
- * Uploads and folders next to a document are chosen for design work; the folders coding agents
- * share hold their own workflows, such as releases or email, so they start off until picked.
+ * Uploads, folders next to a document, and the built-in skills are chosen for design work; the
+ * folders coding agents share hold their own workflows, such as releases or email, so they start
+ * off until picked.
  */
 const SOURCES_ON_BY_DEFAULT: Record<SkillSourceID, boolean> = {
   openpencil: true,
   project: true,
   agents: false,
-  claude: false
+  claude: false,
+  builtin: true
 }
 
 export function isSkillSourceEnabled(source: SkillSourceID, preferences: SkillPreferences) {

@@ -7,5 +7,28 @@
   "settingsTitle": "Wiederherstellung",
   "settingsDescription": "Lokale Wiederherstellungskopien für ungespeicherte Dokumente verwalten.",
   "restore": "Wiederherstellen",
-  "discard": "Verwerfen"
+  "discard": "Verwerfen",
+  "drafts": "Entwürfe",
+  "draftsDescription": "Neue Designs bleiben hier auf diesem Gerät, bis du sie woanders speicherst.",
+  "loadingDrafts": "Entwürfe werden geladen",
+  "noDrafts": "Noch keine Entwürfe",
+  "noDraftsDescription": "Ein neues Design wird hier als Entwurf aufbewahrt, während du daran arbeitest.",
+  "draftsOff": "Entwürfe sind aus",
+  "draftsOffDescription": "Neue Designs werden hier nur aufbewahrt, solange „Ungespeicherte Arbeit automatisch sichern“ in den Einstellungen aktiv ist und dieser Browser Websitedaten behält.",
+  "deleteDraft": "Entwurf löschen",
+  "deleteDraftConfirmation": "Entwurf „{name}“ löschen?",
+  "deleteDraftsConfirmation": {
+    "one": "{count} Entwurf löschen?",
+    "many": "{count} Entwürfe löschen?"
+  },
+  "deleteDraftDescription": "Entwürfe gibt es nur auf diesem Gerät. Das lässt sich nicht rückgängig machen.",
+  "deleteDraftFailed": "Der Entwurf „{name}“ konnte nicht gelöscht werden. Versuche es erneut.",
+  "draftUnavailable": "Dieser Entwurf ist nicht mehr verfügbar.",
+  "recoveredChangesTitle": "Wiederhergestellte Änderungen",
+  "recoveredChangesDescription": "„{name}“ hat Änderungen vom {time}, die nie in der Datei gespeichert wurden. Speichere sie in der Datei, als neue Datei oder verwirf sie.",
+  "saveRecovered": "Speichern",
+  "saveRecoveredAs": "Speichern unter…",
+  "discardRecovered": "Nicht speichern",
+  "recoveredChangesFailed": "Die wiederhergestellten Änderungen konnten nicht gespeichert werden: {error}",
+  "backupUnavailable": "Die Sicherung dieser Änderungen ist nicht mehr verfügbar."
 }

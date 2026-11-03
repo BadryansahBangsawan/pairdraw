@@ -1,0 +1,22 @@
+{
+  "title": "Folien",
+  "listLabel": "Folien auf dieser Seite",
+  "slideLabel": "Folie {number}: {name}",
+  "reorderHint": "Zum Umsortieren ziehen oder Alt mit Pfeil nach oben oder unten drücken.",
+  "slideMoved": "{name} ist jetzt Folie {number}.",
+  "present": "Präsentieren ({shortcut})",
+  "presentFromSlide": "Ab dieser Folie präsentieren",
+  "exportPDF": "Folien als PDF exportieren",
+  "exportPPTX": "Folien als PowerPoint exportieren",
+  "exportPPTXFailed": "Die Folien konnten nicht exportiert werden: {error}",
+  "emptyTitle": "Noch keine Folien",
+  "emptyDescription": "Rahmen der obersten Ebene auf dieser Seite werden in Ebenenreihenfolge zu Folien.",
+  "nothingToPresent": "Füge dieser Seite einen Rahmen der obersten Ebene hinzu, um sie zu präsentieren.",
+  "presentation": "Präsentation",
+  "previousSlide": "Vorherige Folie",
+  "nextSlide": "Nächste Folie",
+  "position": "{number} von {count}",
+  "fitToScreen": "An Bildschirm anpassen",
+  "actualSize": "Originalgröße",
+  "exitPresentation": "Präsentation beenden ({shortcut})"
+}

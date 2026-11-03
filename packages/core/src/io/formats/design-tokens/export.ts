@@ -8,6 +8,7 @@ import type {
   VariableCollection,
   VariableCollectionMode
 } from '@open-pencil/scene-graph'
+import { numberedName } from '@open-pencil/scene-graph/naming'
 import { printFormula, variableValueReferences } from '@open-pencil/scene-graph/variables'
 
 import { fileSegment, placeTokens, tokenPath, tokenReference, tokenTree } from './paths'
@@ -35,8 +36,7 @@ export const STYLES_FILE = 'styles.tokens.json'
 function distinct(names: readonly string[], reserved: readonly string[] = []): string[] {
   const taken = new Set(reserved)
   return names.map((name) => {
-    let candidate = name
-    for (let count = 2; taken.has(candidate); count++) candidate = `${name} ${count}`
+    const candidate = numberedName(name, taken)
     taken.add(candidate)
     return candidate
   })

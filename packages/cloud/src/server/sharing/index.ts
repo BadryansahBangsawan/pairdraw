@@ -12,6 +12,7 @@ export {
 } from './crypto'
 export {
   DocumentShareInvalidError,
+  DocumentShareKindError,
   DocumentShareSignInRequiredError,
   InvitationDeliveryError
 } from './errors'

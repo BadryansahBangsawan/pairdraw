@@ -161,9 +161,17 @@ const REASONS: Record<ImportSkipReason, () => string> = {
 }
 
 function issueText(issue: DesignTokenReadIssue): string {
-  return issue.kind === 'invalid-file'
-    ? variables.value.importInvalidFile({ file: issue.file })
-    : variables.value.importMissingFile({ file: issue.file, from: issue.from })
+  if (issue.kind === 'invalid-file') return variables.value.importInvalidFile({ file: issue.file })
+  if (issue.kind === 'unsupported-css')
+    return variables.value.importUnsupportedCSS({ file: issue.file, rule: issue.rule })
+  if (issue.kind === 'foreign-css-override') return variables.value.importForeignCSSOverride(issue)
+  return variables.value.importMissingFile({ file: issue.file, from: issue.from })
+}
+
+function issueKey(issue: DesignTokenReadIssue): string {
+  if (issue.kind === 'foreign-css-override')
+    return `${issue.kind}:${issue.file}:${issue.rule}:${issue.property}`
+  return `${issue.kind}:${issue.file}:${issue.kind === 'unsupported-css' ? issue.rule : ''}`
 }
 
 const changes = computed(() =>
@@ -201,7 +209,7 @@ function importTokens() {
 
       <AppAlert
         v-for="issue in bundle?.issues ?? []"
-        :key="`${issue.kind}:${issue.file}`"
+        :key="issueKey(issue)"
         tone="warning"
         :heading="issueText(issue)"
       />

@@ -31,7 +31,9 @@ import MobileDrawer from '@/components/MobileDrawer.vue'
 import MobileHud from '@/components/MobileHud/MobileHud.vue'
 import PropertiesPanel from '@/components/PropertiesPanel.vue'
 import ComponentToFrameDialog from '@/components/selection/ComponentToFrameDialog.vue'
+import ShaderModeStage from '@/components/shader-mode/ShaderModeStage.vue'
 import { SHELL_TOP_BAR_ACTIONS_ID } from '@/components/shell/top-bar'
+import SlidesPresentation from '@/components/slides/SlidesPresentation.vue'
 import StatusesDialog from '@/components/statuses/StatusesDialog.vue'
 import EditorToolbar from '@/components/toolbar/EditorToolbar.vue'
 import VariablesDialog from '@/components/variables/VariablesDialog.vue'
@@ -44,6 +46,8 @@ import { useEditorWorkspaceLayout } from './useEditorWorkspaceLayout'
 import WorkspacePill from './WorkspacePill.vue'
 
 const showChrome = appRuntimeConfig.showChrome
+/** An embed has no top bar: its host page owns the document's actions. */
+const hasTopBar = !appRuntimeConfig.embed
 /**
  * The document tab this workspace edits. WorkspaceView keys the workspace by tab, so the tab and
  * its store are fixed for its lifetime, and its editor UI stays bound to that document rather
@@ -87,6 +91,13 @@ const canvasAlone = computed(
   () => !resolveEditorProfile(store.state).panels && store.visiblePaneCount.value <= 1
 )
 const { panels } = useI18n()
+/** A presentation takes the whole window, over the top bar and every pane. */
+const presenting = computed(() => store.getPresentation() !== null)
+/** Shader Mode shows one shader on its own, in place of the panels and the canvas. */
+const shaderMode = computed(() => {
+  void store.state.sceneVersion
+  return store.getShaderMode() !== null
+})
 // Until a room's document arrives there is nothing to edit, so its screen replaces the editor.
 const { pending: roomPending } = useRoomActions()
 </script>
@@ -95,6 +106,10 @@ const { pending: roomPending } = useRoomActions()
   <div v-if="roomPending" :key="'room-' + tab.id" class="relative flex flex-1 overflow-hidden">
     <ActiveRoomOverlay />
   </div>
+
+  <SlidesPresentation v-else-if="presenting" :key="'present-' + tab.id" />
+
+  <ShaderModeStage v-else-if="shaderMode" :key="'shader-' + tab.id" />
 
   <template v-else-if="!isMobile && showChrome && store.state.showUI && !canvasAlone">
     <SplitterGroup
@@ -201,7 +216,7 @@ const { pending: roomPending } = useRoomActions()
       </SplitterPanel>
     </SplitterGroup>
     <!-- The document's actions live in the top bar, bound to this tab like the panels. -->
-    <Teleport defer :to="topBarActions">
+    <Teleport v-if="hasTopBar" defer :to="topBarActions">
       <EditorWorkspaceTopBarActions />
     </Teleport>
   </template>

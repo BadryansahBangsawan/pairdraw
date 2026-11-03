@@ -15,6 +15,7 @@ type CanvasMenuCommand =
   | 'selection.ungroupWhenGroup'
   | 'selection.moveToPageWhenAvailable'
   | 'selection.arrangeWhenAvailable'
+  | 'selection.cropImageWhenAvailable'
 
 type CanvasMenuGroup = readonly CanvasMenuCommand[]
 
@@ -57,7 +58,7 @@ const CANVAS_MENU_GROUPS = [
     'selection.iconActions'
   ],
   ['selection.toggleVisibility', 'selection.toggleLock'],
-  ['selection.flipHorizontal', 'selection.flipVertical'],
+  ['selection.flipHorizontal', 'selection.flipVertical', 'selection.cropImageWhenAvailable'],
   ['selection.arrangeWhenAvailable']
 ] satisfies readonly CanvasMenuGroup[]
 
@@ -136,6 +137,11 @@ function conditionalCommand(command: CanvasMenuCommand, options: CanvasMenuOptio
       return instanceItems(options)
     case 'selection.iconActions':
       return iconItems(options)
+    case 'selection.cropImageWhenAvailable': {
+      // Offered only while the command is known to be available: for a layer showing an image.
+      const item = options.commandMenuItem('selection.cropImage')
+      return item.disabled === false ? [item] : []
+    }
     case 'selection.ungroupWhenGroup':
       return options.selection.isGroup.value ? [options.commandMenuItem('selection.ungroup')] : []
     default:

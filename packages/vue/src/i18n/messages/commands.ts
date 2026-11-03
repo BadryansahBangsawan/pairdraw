@@ -35,6 +35,7 @@ export const commandMessageDefaults = {
   flattenSelection: 'Flatten',
   outlineText: 'Outline text',
   outlineStroke: 'Outline stroke',
+  cropImage: 'Crop image',
   booleanOperations: 'Boolean operations',
   flipHorizontal: 'Flip horizontal',
   flipVertical: 'Flip vertical',
@@ -93,7 +94,10 @@ export const commandMessageDefaults = {
   vectorSmoothCorner: 'Switch point between smooth and corner',
   gestureDrag: 'drag',
   gestureDoubleClickSegment: 'double-click a segment',
-  gestureDoubleClickPoint: 'double-click a point'
+  gestureDoubleClickPoint: 'double-click a point',
+  vectorBendSegment: 'Bend segment',
+  vectorBendSegmentKeepHandles: 'Bend segment, keeping neighboring handles',
+  gestureDragSegment: 'drag a segment'
 } as const
 
 export const commandMessages = i18n('commands', commandMessageDefaults)

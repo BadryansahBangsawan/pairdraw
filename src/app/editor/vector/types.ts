@@ -5,7 +5,7 @@ import type {
   VectorSegment,
   VectorVertex
 } from '@open-pencil/scene-graph'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
 
 export type NodeEditState = {
   nodeId: string
@@ -40,6 +40,11 @@ export type NodeEditState = {
   selectedRegions: Set<number>
   /** Whether the cut tool (X) is picked up: a click cuts the path instead of selecting. */
   cutTool: boolean
+  /**
+   * The four corners of the transform box while a drag scales or turns the selected points, so the
+   * box turns with them; `null` otherwise, when it fits the selected points.
+   */
+  transformBox: Vector[] | null
 }
 
 export type VectorEditState = EditorState & { nodeEditState: NodeEditState | null }

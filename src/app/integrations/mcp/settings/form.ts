@@ -5,6 +5,7 @@ import { computed, reactive, ref, watch, type Ref } from 'vue'
 
 import {
   createMCPConnectionDraft,
+  isValidMCPCommand,
   validateMCPConnectionURL,
   mcpConnectionSettings,
   MCP_CONNECTION_NAME_MAX_LENGTH
@@ -12,16 +13,33 @@ import {
 import { requiredSetting, type SettingsValidationMessages } from '@/app/settings/validation/schema'
 import { validateAfterFirstError } from '@/app/settings/validation/use'
 
+import { parseMCPArguments } from '../stdio/env'
 import type { MCPConnectionDraft } from '../types'
 
 interface ConnectionFormMessages {
   connectionNameInvalid: string
   serverURLHint: string
   bearerTokenRequired: string
+  commandRequired: string
+  environmentInvalid: string
 }
-export type MCPConnectionFieldErrors = Partial<Record<'name' | 'url' | 'credential', string>>
+export type MCPConnectionField = 'name' | 'url' | 'command' | 'credential' | 'environment'
+export type MCPConnectionFieldErrors = Partial<Record<MCPConnectionField, string>>
 
-/** Only credential availability enters form state, never entered or saved secrets. */
+function validURL(value: string): boolean {
+  try {
+    validateMCPConnectionURL(value.trim())
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Only credential availability and validity enter form state, never entered or saved secrets:
+ * `credential` says a bearer token is typed or saved, `environment` that the typed variables
+ * parse.
+ */
 export function useMCPConnectionForm(
   messages: Readonly<Ref<SettingsValidationMessages>>,
   automation: Readonly<Ref<ConnectionFormMessages>>
@@ -43,50 +61,92 @@ export function useMCPConnectionForm(
             automation.value.connectionNameInvalid
           )
         ),
-        url: v.pipe(
-          requiredSetting(messages.value.requiredField),
-          v.check((value) => {
-            try {
-              validateMCPConnectionURL(value)
-              return true
-            } catch {
-              return false
-            }
-          }, automation.value.serverURLHint)
-        ),
+        transportType: v.picklist(['streamable-http', 'stdio']),
+        url: v.string(),
+        command: v.string(),
+        args: v.string(),
         enabled: v.boolean(),
-        authenticationType: v.picklist(['none', 'bearer']),
-        credential: v.boolean()
+        authenticationType: v.picklist(['none', 'bearer', 'oauth']),
+        credential: v.boolean(),
+        environment: v.boolean()
       }),
       v.forward(
         v.partialCheck(
-          [['enabled'], ['authenticationType'], ['credential']],
-          (value) => !value.enabled || value.authenticationType !== 'bearer' || value.credential,
+          [['transportType'], ['url']],
+          (value) => value.transportType !== 'streamable-http' || validURL(value.url),
+          automation.value.serverURLHint
+        ),
+        ['url']
+      ),
+      v.forward(
+        v.partialCheck(
+          [['transportType'], ['command'], ['args']],
+          (value) =>
+            value.transportType !== 'stdio' ||
+            isValidMCPCommand(value.command, parseMCPArguments(value.args)),
+          automation.value.commandRequired
+        ),
+        ['command']
+      ),
+      v.forward(
+        v.partialCheck(
+          [['transportType'], ['environment']],
+          (value) => value.transportType !== 'stdio' || value.environment,
+          automation.value.environmentInvalid
+        ),
+        ['environment']
+      ),
+      v.forward(
+        v.partialCheck(
+          [['enabled'], ['transportType'], ['authenticationType'], ['credential']],
+          (value) =>
+            !value.enabled ||
+            value.transportType !== 'streamable-http' ||
+            value.authenticationType !== 'bearer' ||
+            value.credential,
           automation.value.bearerTokenRequired
         ),
         ['credential']
       )
     )
   )
+  const initialValues = (draft: MCPConnectionDraft) => ({
+    ...omit(draft, ['id']),
+    credential: false,
+    environment: true
+  })
   const form = useForm({
-    initialValues: { ...omit(createMCPConnectionDraft(), ['id']), credential: false },
+    initialValues: initialValues(createMCPConnectionDraft()),
     validationSchema: schema
   })
   const config = validateAfterFirstError
   const [name] = form.defineField('name', config)
+  const [transportType] = form.defineField('transportType', config)
   const [url] = form.defineField('url', config)
+  const [command] = form.defineField('command', config)
+  const [args] = form.defineField('args', config)
   const [enabled] = form.defineField('enabled', config)
   const [authenticationType] = form.defineField('authenticationType', config)
   form.defineField('credential', config)
-  watch([enabled, authenticationType], () => {
+  form.defineField('environment', config)
+  watch([enabled, authenticationType, transportType], () => {
     if (form.errors.value.credential) void form.validateField('credential')
   })
-  const fields = reactive({ id, name, url, enabled, authenticationType })
+  const fields = reactive({
+    id,
+    name,
+    enabled,
+    transportType,
+    url,
+    command,
+    args,
+    authenticationType
+  })
   const draft = computed<MCPConnectionDraft>({
     get: () => fields,
     set: (values) => {
       id.value = values.id
-      form.resetForm({ values: { ...omit(values, ['id']), credential: false } })
+      form.resetForm({ values: initialValues(values) })
     }
   })
 
@@ -94,8 +154,9 @@ export function useMCPConnectionForm(
     draft,
     dirty: computed(() => form.meta.value.dirty),
     errors: form.errors,
-    blur: (field: 'name' | 'url' | 'credential') => form.validateField(field),
+    blur: (field: MCPConnectionField) => form.validateField(field),
     setCredentialReady: (ready: boolean) => form.resetField('credential', { value: ready }),
+    setEnvironmentValid: (valid: boolean) => form.resetField('environment', { value: valid }),
     handleSubmit: form.handleSubmit,
     isSubmitting: form.isSubmitting
   }

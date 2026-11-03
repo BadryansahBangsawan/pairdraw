@@ -39,6 +39,8 @@ Mehrere Modelle können getrennt für Gestaltung, Prüfung, schnelle Aufgaben un
 | **OpenCode Go**          | Kimi K3.1 Pro, MiniMax M3.1 Flash, GLM-5.3, DeepSeek V4.1 Flash           | API-Schlüssel des Go-Abos von [opencode.ai](https://opencode.ai/auth). Nur in der Desktop-App.                   |
 | **OpenAI-kompatibel**    | Endpunkt im OpenAI-API-Format                                             | Eigene Basisadresse und Schlüssel                                                                                |
 | **Anthropic-kompatibel** | Endpunkt im Anthropic-API-Format                                          | Eigene Basisadresse und Schlüssel                                                                                |
+| **Amazon Bedrock**       | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5    | Region und Bedrock-API-Schlüssel oder AWS-Zugriffsschlüssel in der Desktop-App                                   |
+| **Google Vertex AI**     | Claude Sonnet 5.5, Claude Opus 5.5, Gemini 3.8 Flash, Gemini 4 Argon      | Projekt und Standort mit Zugriffstoken; ein API-Schlüssel erreicht nur Gemini                                    |
 
 Anfragen gehen direkt an den Anbieter. Im Browser gelten dessen CORS-Regeln. Bereitstellungen unterscheiden sich darin, wie zuverlässig Werkzeugaufrufe gestreamt werden. Messergebnisse stehen unter [BYOK-Kompatibilität](/programmable/byok-provider-compatibility).
 
@@ -48,6 +50,8 @@ Desktop-ACP-Agenten können vertrauenswürdige entfernte MCP-Server verwenden. U
 
 Token werden im Anmeldedatenspeicher und erst beim Start einer ACP-Sitzung gelesen. Entfernte Server müssen HTTPS verwenden; für lokale Entwicklung sind Loopback-Adressen über HTTP erlaubt.
 
+Auch der eingebaute Chat mit direkter API nutzt aktivierte Verbindungen: Er bietet ihre Werkzeuge dem Modell als `mcp__<Server>__<Werkzeug>` an. Gehostete Server wie Notion oder Linear melden dich über **OAuth-Anmeldung** an; speichere die Verbindung und klicke dann auf **Anmelden**. In der Desktop-App kann eine Verbindung außerdem ein **lokaler Befehl** sein, ein Programm, das MCP über stdin und stdout spricht, mit einem Argument pro Zeile und optionalen Umgebungsvariablen `NAME=Wert`. Vor dem ersten Ausführen einer Befehlszeile fragt die App in einem Systemdialog nach; Variablen wie `PATH` oder `NODE_OPTIONS`, die Code laden, sind nicht erlaubt. Solange der Chat vor Aktionen nachfragt, fragt er auch vor jedem externen Werkzeug, das sein Server nicht als nur lesend kennzeichnet. In der Web-App muss ein entfernter Server Anfragen vom Ursprung der App zulassen (CORS).
+
 ## Werkzeuge
 
 Der Assistent verfügt über mehr als 90 Werkzeuge für Erstellung, Gestaltung, Anordnung, Komponenten, Variablen, Suche, Prüfung, Analyse, Export und Vektorbearbeitung.
@@ -56,7 +60,20 @@ Der Assistent verfügt über mehr als 90 Werkzeuge für Erstellung, Gestaltung, 
 
 Skills sind Ordner mit einer `SKILL.md` im Format [Agent Skills](https://agentskills.io/specification): Anweisungen für eine Art von Arbeit, mit optionalen Referenzdateien. Die eingebaute KI sieht Name und Beschreibung jedes aktiven Skills und lädt seine Anweisungen, wenn eine Anfrage passt; Skripte in einem Skill laufen nicht.
 
-Unter **Einstellungen → Skills** lädst du einen Skill als ZIP seines Ordners oder als `SKILL.md` hoch. In der Desktop-App kommen `~/.agents/skills` und `~/.claude/skills` dazu sowie die Ordner `.agents/skills` und `.claude/skills` neben dem geöffneten Dokument, die erst nach **Ordner vertrauen** gelten. Tippe `/` am Anfang einer Nachricht, um einen Skill auszuwählen, und `@`, um eine Ebene, eine Seite oder einen Skill zu erwähnen. Erwähnungen erscheinen als Chips, auch in den Antworten; ein Klick zeigt die Ebene auf der Arbeitsfläche.
+Unter **Einstellungen → Skills** lädst du einen Skill als ZIP seines Ordners oder als `SKILL.md` hoch. In der Desktop-App kommen `~/.agents/skills` und `~/.claude/skills` dazu sowie die Ordner `.agents/skills` und `.claude/skills` neben dem geöffneten Dokument, die erst nach **Ordner vertrauen** gelten. Integrierte Skills liefert OpenPencil gleich mit: Leitfäden für Landingpages, Mobile-Apps, Web-Apps, Dashboards, Folien, Designsysteme und Tailwind CSS v4 sowie `layout`, `restyle`, `dark-mode` und `design-review` für bestehende Designs; ein eigener Skill mit gleichem Namen hat Vorrang. Tippe `/` am Anfang einer Nachricht oder nutze **Skill auswählen** unter dem Eingabefeld, um einen Skill auszuwählen, und `@`, um eine Ebene, eine Seite oder einen Skill zu erwähnen. Erwähnungen erscheinen als Chips, auch in den Antworten; ein Klick zeigt die Ebene auf der Arbeitsfläche.
+
+## Varianten erkunden
+
+**Kochen lassen**, die Kochmütze unter dem Nachrichtenfeld, erkundet eine Anfrage, statt sie einmal zu beantworten:
+
+- **Varianten** fordert zwei bis sechs Entwürfe nebeneinander an, jeder ein neuer Rahmen oberster Ebene rechts neben allem auf der Seite. Wähle, ob sie das **Layout** (Aufbau und Anordnung bei einem Stil) oder den **Stil** (Farben, Schrift und Bilder bei einem Layout) erkunden. Ist eine Ebene ausgewählt oder erwähnt, gehen die Varianten von ihr aus und lassen sie unverändert.
+- **Nicht iterieren** fordert einen Entwurf in einem Durchgang an, ohne die Prüfung und Überarbeitung, die der Assistent sonst vornimmt.
+
+Die Auswahl bleibt für die nächsten Nachrichten aktiv, und die Schaltfläche zeigt sie an, bis du sie wieder auf **Aus** stellst.
+
+## Notizen für die KI
+
+Wähle eine Ebene und füge unten im Design-Panel **Notizen für die KI** hinzu. **Kontext** sagt Agenten, was die Ebene bedeutet oder tut, etwa „öffnet den Registrierungsdialog“; **Prompt** ist eine Anfrage zu der Ebene, die **Prompt ausführen** an den Chat sendet. Eine Nachricht enthält die Notizen der Ebenen, die sie betrifft: die erwähnten und die Auswahl, ohne beides die ganze Seite. Agenten beachten den Kontext und handeln nach einem Prompt nur auf Anfrage. Notizen werden mit der Ebene in der Datei gespeichert; `context`-Notizen und Prompt-Karten aus `.pen`-Dateien werden genauso gelesen.
 
 ## Visuelle Prüfung
 

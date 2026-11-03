@@ -30,6 +30,7 @@ export type {
   IOData,
   ReadDocumentInput,
   ReadDocumentResult,
+  ReadDocumentWarning,
   ExportTarget,
   ExportRequest,
   ExportAsset,

@@ -1,5 +1,8 @@
 import type { UIMessage } from 'ai'
-import { ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
+
+import { emptyPins, hasPins, type ConversationPins } from '@/app/ai/chat/pins/types'
+import { setChatProjectFolder } from '@/app/ai/chat/project-folder'
 
 import { chatDocumentId, resolveChatDocumentId, type ChatDocumentEditor } from './document'
 import { createConversationStore } from './idb'
@@ -13,6 +16,8 @@ import type {
   HistoryChat,
   HistoryRuntime
 } from './types'
+
+const MAX_LEFT_DRAFTS = 8
 
 /** Coordinates document ownership and serialized public conversation actions. */
 export function createConversationHistory<TChat extends HistoryChat>(
@@ -28,6 +33,9 @@ export function createConversationHistory<TChat extends HistoryChat>(
   // Weak, so the history does not keep a closed document's editor alive.
   let owner: WeakRef<ChatDocumentEditor> | null = null
   let operation: Promise<unknown> = Promise.resolve()
+  // Drafts left before anything saved them, kept so a reference still being described when the
+  // person switched can save its draft. Few are kept: each switch away from a draft adds one.
+  const leftDrafts = new Map<string, Conversation>()
   const session = createHistorySession(() => runtime.resetChat())
   const { flush, saveProfile, storageError } = createHistoryPersistence({
     store,
@@ -87,8 +95,16 @@ export function createConversationHistory<TChat extends HistoryChat>(
   async function refresh() {
     conversations.value = await store.list()
   }
-  function detach() {
-    return session.detach(flush)
+  async function detach() {
+    const leaving = readOnly.value ? null : current.value
+    await session.detach(flush)
+    const left = current.value
+    if (!leaving || left?.id !== leaving.id || left.messages.length || hasPins(left.pins)) return
+    if (left.titleSource !== 'fallback') return
+    leftDrafts.delete(left.id)
+    leftDrafts.set(left.id, left)
+    const oldest = leftDrafts.keys().next().value
+    if (leftDrafts.size > MAX_LEFT_DRAFTS && oldest !== undefined) leftDrafts.delete(oldest)
   }
 
   async function activate(conversation: Conversation) {
@@ -213,6 +229,30 @@ export function createConversationHistory<TChat extends HistoryChat>(
       await refresh()
     })
   }
+  /**
+   * Changes what a conversation keeps pinned. A reference still being described when the person
+   * switched conversations lands in the one it was pinned to, even a draft nothing saved yet. A
+   * conversation the change leaves empty is forgotten rather than listed as a blank chat.
+   */
+  function updatePins(id: string, change: (pins: ConversationPins) => ConversationPins) {
+    return serialize(async () => {
+      const conversation = current.value
+      if (conversation?.id === id) {
+        if (readOnly.value) return
+        current.value = { ...conversation, pins: change(conversation.pins ?? emptyPins()) }
+        await flush(true)
+        return
+      }
+      const saved = (await store.read(id)) ?? leftDrafts.get(id)
+      if (!saved) throw new Error('The conversation the pin belongs to no longer exists')
+      leftDrafts.delete(id)
+      const next = { ...saved, pins: change(saved.pins ?? emptyPins()) }
+      if (next.messages.length || next.titleSource !== 'fallback' || hasPins(next.pins))
+        await store.write(next)
+      else await store.discard(id)
+      await refresh()
+    })
+  }
   function remove(id: string) {
     return serialize(async () => {
       if (current.value?.id === id) {
@@ -220,14 +260,21 @@ export function createConversationHistory<TChat extends HistoryChat>(
         current.value = null
         messages.value = []
       }
+      leftDrafts.delete(id)
       await store.remove(id)
+      // A deleted chat leaves no path to the person's project behind.
+      setChatProjectFolder(id, null)
       if (!current.value) await createDraft()
       await refresh()
     })
   }
 
+  const pins = computed(() => current.value?.pins ?? emptyPins())
+
   return {
     current,
+    pins,
+    updatePins,
     messages,
     conversations,
     readOnly,

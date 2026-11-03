@@ -4,6 +4,7 @@ import { IndexeddbPersistence } from 'y-indexeddb'
 import * as awarenessProtocol from 'y-protocols/awareness'
 import * as Y from 'yjs'
 
+import { RELAY_SERVER_PEER } from '@open-pencil/cloud/contract'
 import type { Color } from '@open-pencil/scene-graph/primitives'
 
 import { shareAgentPreviews } from '@/app/collab/agent-preview'
@@ -33,6 +34,7 @@ import {
   createYjsGraphSync,
   registerYjsObservers
 } from '@/app/collab/yjs-sync'
+import { noteOutsideWrite } from '@/app/document/io/outside-writes'
 import type { EditorStore } from '@/app/editor/active-store'
 import { setPeers } from '@/app/presence/registry'
 import { ROOM_STATUS_TICK_MS, ROOM_UNREACHABLE_MS } from '@/constants'
@@ -109,6 +111,11 @@ export interface RoomSessionOptions {
   leavable?: boolean
   /** Where the room keeps its images instead of in its document, as a Cloud room does. */
   images?: RoomImageStore
+  /**
+   * Whether this read-only tab sends its comments through the relay's comment channel, as someone
+   * who can comment on a Cloud document does.
+   */
+  commentRelay?: boolean
 }
 
 function openIndexedDBCopy(roomId: string, ydoc: Y.Doc): RoomSavedCopy {
@@ -128,7 +135,8 @@ export function openRoomSession({
   tickMs = ROOM_STATUS_TICK_MS,
   holdsDocument = false,
   leavable = true,
-  images
+  images,
+  commentRelay = false
 }: RoomSessionOptions): RoomSession {
   const ydoc = new Y.Doc()
   const awareness = new awarenessProtocol.Awareness(ydoc)
@@ -160,7 +168,16 @@ export function openRoomSession({
     documentData.libraries,
     documentData.settings
   ])
-  const documentSync = bindDocumentSync({ store, ydoc, data: documentData, meta })
+  const documentSync = bindDocumentSync({
+    store,
+    ydoc,
+    data: documentData,
+    meta,
+    // Called only after the connection below exists: comments change once the room is open.
+    sendComments: commentRelay
+      ? (payload) => connection.comments[0](payload, RELAY_SERVER_PEER)
+      : undefined
+  })
   const adopt = (apply: () => void) => (holdsDocument ? store.adoptChanges(apply) : apply())
 
   const peers = shallowRef<RemotePeer[]>([])
@@ -254,6 +271,11 @@ export function openRoomSession({
     }
   })
   meta.observe(refreshDocument)
+  // The room's writes reach the document outside its history, so an agent call that fails while
+  // they arrive keeps its step rather than rolling them back with its own.
+  ydoc.on('afterTransaction', (transaction) => {
+    if (!transaction.local) noteOutsideWrite(store)
+  })
   // A rename reaches the room once the tab shows the room's copy; before that the room's name
   // wins, as the room's other document data does when the tab starts following it.
   function publishName(name: string) {

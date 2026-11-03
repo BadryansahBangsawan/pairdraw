@@ -213,6 +213,7 @@ const metadata = (document: CloudDocumentRow) =>
     <div
       v-if="state === 'loading'"
       :class="[styles.grid(), loading.group()]"
+      role="status"
       :aria-label="t.homeLoadingFiles"
     >
       <div v-for="index in 4" :key="index" :class="styles.skeleton()">
@@ -255,7 +256,7 @@ const metadata = (document: CloudDocumentRow) =>
         @action="act(document, $event)"
       >
         <template #status>
-          <Tip v-if="document.permission === 'view'" :label="t.homeViewOnlyTip">
+          <Tip v-if="document.permission !== 'edit'" :label="t.homeViewOnlyTip">
             <icon-lucide-eye class="size-3" role="img" :aria-label="t.viewOnly" />
           </Tip>
           <Tip v-if="document.shared" :label="t.homeSharedTip">

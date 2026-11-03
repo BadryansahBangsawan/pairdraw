@@ -4,6 +4,7 @@ import type * as Y from 'yjs'
 
 import { SceneGraph } from '@open-pencil/scene-graph'
 
+import { executeWithDocumentUndo } from '@/app/automation/execution/editor'
 import { openRoomSession, type RoomSession, type RoomSessionOptions } from '@/app/collab/session'
 import { claimRoot } from '@/app/collab/shared-tree/fields'
 import { createEditorStore, type EditorStore } from '@/app/editor/session'
@@ -251,6 +252,30 @@ describe('room sessions', () => {
       expect(guest.graph.getNode('after-leave')).toBeUndefined()
       expect(joined.peers.value).toEqual([])
       expect(presenceOf(guest).peers.value).toEqual([])
+    })
+  })
+
+  test('an agent edit that fails while a peer edits keeps its step instead of undoing theirs', async () => {
+    await withRooms(async (open, settle) => {
+      const host = newStore()
+      open({ roomId: ROOM_A, store: host, origin: 'shared' }).shareDocument()
+      const guest = newStore()
+      open({ roomId: ROOM_A, store: guest, origin: 'joined' })
+      await settle()
+      const pageId = firstPageId(guest)
+
+      const edit = executeWithDocumentUndo(guest, pageId, 'Agent: eval', async () => {
+        guest.graph.createNode('RECTANGLE', pageId, { id: 'agent' })
+        // The host draws while the guest's script waits on fonts or layout.
+        host.graph.createNode('RECTANGLE', firstPageId(host), { id: 'peer' })
+        await settle()
+        throw new Error('script failed')
+      })
+
+      await expect(edit).rejects.toThrow('script failed')
+      expect(guest.graph.getNode('peer')).toBeDefined()
+      expect(guest.graph.getNode('agent')).toBeDefined()
+      expect(guest.undo.undoLabel).toBe('Agent: eval')
     })
   })
 })

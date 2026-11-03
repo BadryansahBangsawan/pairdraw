@@ -16,5 +16,19 @@
   "toggleAIChat": "Chat de IA ({shortcut})",
   "startPreview": "Vista previa ({shortcut})",
   "toggleLayersPanel": "Panel de capas",
-  "togglePropertiesPanel": "Panel de propiedades"
+  "togglePropertiesPanel": "Panel de propiedades",
+  "textLink": "Enlace",
+  "addTextLink": "Añadir enlace",
+  "editTextLink": "Editar enlace",
+  "removeTextLink": "Quitar enlace",
+  "openTextLink": "Abrir enlace",
+  "textLinkAddress": "Dirección del enlace",
+  "textLinkPlaceholder": "Pega un enlace o una dirección de correo",
+  "textLinkInvalid": "Usa una dirección web o de correo electrónico.",
+  "textLinkMixed": "Varios enlaces",
+  "textLinkToLayer": "Enlaza a {name}",
+  "embedWaiting": "Esperando a la página anfitriona",
+  "embedWaitingDescription": "El diseño se abrirá cuando se conecte la página en la que está incrustado.",
+  "embedInvalidOrigin": "Esta inserción no puede conectarse",
+  "embedInvalidOriginDescription": "Su enlace debe indicar el origen de la página que la incrusta, por ejemplo https://example.com."
 }

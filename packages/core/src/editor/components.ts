@@ -6,6 +6,7 @@ import { becomesComponent, componentWrapProps } from './components/create'
 import { createComponentFocusActions } from './components/focus'
 import { createComponentInstanceActions } from './components/instances'
 import { createComponentPropertyActions } from './components/properties'
+import { createInstanceReplaceActions } from './components/replace'
 import { createSlotActions } from './components/slots'
 import { createSlotAuthoringActions } from './components/slots/authoring'
 import { createComponentToFrameActions } from './components/to-frame'
@@ -89,6 +90,7 @@ export function createComponentActions(ctx: EditorContext) {
     ...variantActions,
     ...componentPropertyActions,
     ...createSlotActions(ctx),
+    ...createInstanceReplaceActions(ctx),
     ...createComponentAuthoringActions(ctx),
     ...createSlotAuthoringActions(ctx),
     ...createComponentToFrameActions(ctx),

@@ -455,7 +455,34 @@ export const cloudPortalMessageDefaults = {
   errorEmailUnchanged: 'That’s already your email.',
   errorCurrentSession: 'Sign out to end the session you’re using.',
   errorPictureInvalid: 'The server can’t use this picture. Choose another image.',
-  passwordResetSent: 'We emailed you a link to set a password.'
+  passwordResetSent: 'We emailed you a link to set a password.',
+
+  publicProfile: 'Public profile',
+  publicProfileDescription: params(
+    'A page at {address} that lists the workspaces you make public. Anyone can open their files read-only.'
+  ),
+  publicProfileHandle: 'Handle',
+  publicProfileHandleHint: 'Use 3–32 lowercase letters, numbers, or dashes.',
+  publicProfileBio: 'Bio',
+  publicProfileSaved: 'Public profile saved',
+  publicProfileRemove: 'Remove public profile',
+  publicProfileRemoved: 'Public profile removed',
+  publicProfileHandleTaken: 'That handle is taken. Try another.',
+  publicProfileView: 'View profile',
+  publicProfileWorkspaces: 'Public workspaces',
+  publicProfileWorkspacesDescription: 'You can make public the workspaces you administer.',
+  publicProfileNoWorkspaces: 'You don’t administer any workspaces yet.',
+  publicProfileShowWorkspace: params('Show {workspace} on your profile'),
+  publicProfilePublishFailed:
+    'Couldn’t change this workspace. Its plan may not allow public files.',
+  publicProfilePublishHeading: params('Make {workspace} public?'),
+  publicProfilePublishDescription:
+    'Anyone, signed in or not, will be able to open and download every file in this workspace, including files added later. If another admin made it public, it moves from their profile to yours.',
+  publicProfilePublishConfirm: 'Make public',
+  publicProfileNotFound: 'No profile here',
+  publicProfileNotFoundDescription: 'Check the address, or ask for a new link.',
+  publicProfileEmpty: 'Nothing public yet.',
+  publicProfileUpdated: params('Updated {date}')
 } as const
 
 export const cloudPortalMessages = i18n('cloudPortal', cloudPortalMessageDefaults)

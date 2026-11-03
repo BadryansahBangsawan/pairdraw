@@ -72,6 +72,7 @@ Figma's auto-layout properties map to Yoga flexbox:
 | `stackSpacing` | `gap` |
 | `stackPadding` | `padding` |
 | `stackJustify: MIN/CENTER/MAX/SPACE_BETWEEN` | `justifyContent` |
+| `primaryAxisAlign: SPACE_AROUND` (OpenPencil only, plugin data in `.fig`) | `justifyContent: space-around` |
 | `stackCounterAlign` | `alignItems` |
 | `stackPrimarySizing: FIXED/HUG/FILL` | width/height + flex-grow |
 | `stackChildPrimaryGrow` | `flexGrow` |

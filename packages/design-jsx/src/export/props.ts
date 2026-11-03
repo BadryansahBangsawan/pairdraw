@@ -72,6 +72,7 @@ function collectFlexAlignmentProps(node: SceneNode, props: JSXProp[]): void {
   if (node.primaryAxisAlign === 'CENTER') props.push(['justify', 'center'])
   else if (node.primaryAxisAlign === 'MAX') props.push(['justify', 'end'])
   else if (node.primaryAxisAlign === 'SPACE_BETWEEN') props.push(['justify', 'between'])
+  else if (node.primaryAxisAlign === 'SPACE_AROUND') props.push(['justify', 'around'])
 
   if (node.counterAxisAlign === 'CENTER') props.push(['items', 'center'])
   else if (node.counterAxisAlign === 'MAX') props.push(['items', 'end'])

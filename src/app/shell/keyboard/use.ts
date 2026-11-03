@@ -6,6 +6,7 @@ import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
 
 import { useAIChat } from '@/app/ai/chat/use'
 import { useEditorStore } from '@/app/editor/active-store'
+import { appRuntimeConfig } from '@/app/runtime/config'
 import { createKeyboardActions } from '@/app/shell/keyboard/actions'
 import { bindEditorClipboard } from '@/app/shell/keyboard/clipboard'
 import { isInputElement } from '@/app/shell/keyboard/focus'
@@ -42,19 +43,27 @@ export function useKeyboard() {
   // Before the editor's shortcuts, so keys on a path being edited take precedence over them.
   bindNodeEditKeys(store, inputFocused)
 
+  // An embed shows the one document its host page hands it, so its keys open and close no tabs.
+  const opensTabs = !appRuntimeConfig.embed
   registerKeyboardShortcuts({
     inputFocused,
     store,
     runCommand,
     actions,
     openFileDialog: () => {
-      void openFileDialog()
+      if (opensTabs) void openFileDialog()
     },
     closeActiveTab: () => {
-      if (activeTabRef.value) void closeTab(activeTabRef.value.id)
+      if (opensTabs && activeTabRef.value) void closeTab(activeTabRef.value.id)
     },
-    createTab: () => createTab(),
-    openNewFileTab: () => openNewFileTab(),
-    switchAdjacentTab
+    createTab: () => {
+      if (opensTabs) createTab()
+    },
+    openNewFileTab: () => {
+      if (opensTabs) openNewFileTab()
+    },
+    switchAdjacentTab: (step) => {
+      if (opensTabs) switchAdjacentTab(step)
+    }
   })
 }

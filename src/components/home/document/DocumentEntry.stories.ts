@@ -114,3 +114,18 @@ export const DesignSystemRow: Story = {
   args: { ...DesignSystem.args, view: 'list' },
   render: inDocumentsCard('w-[720px]')
 }
+
+/** A draft's menu: it lives only on this device, so Delete is Delete draft. */
+const draftMenu: DocumentEntryMenu = {
+  actions: 'Actions for Untitled',
+  items: [
+    { action: 'select', label: 'Select' },
+    { action: 'save-as', label: 'Save As…' },
+    { action: 'delete', label: 'Delete draft' }
+  ]
+}
+
+/** A draft on Home: a new design this device keeps until it is saved somewhere. */
+export const Draft: Story = {
+  args: { name: 'Untitled', metadata: 'Nov 3, 2026, 9:41 AM', menu: draftMenu, selectable: true }
+}

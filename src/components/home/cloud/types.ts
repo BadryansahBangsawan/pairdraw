@@ -24,5 +24,5 @@ export type CloudDocumentRow = {
   sync: CloudSyncState
   /** Shared beyond the workspace, with people or a link. */
   shared?: boolean
-  permission: 'edit' | 'view'
+  permission: 'edit' | 'comment' | 'view'
 }

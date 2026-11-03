@@ -164,7 +164,11 @@ export function useModelProfileEditor({ profileId, keyInput, labels: ai }: Profi
       draft.modelID,
       draft.cloudWorkspaceId
     ],
-    resetConnectionTest
+    () => {
+      resetConnectionTest()
+      // Another base URL, such as a Bedrock region, can be another saved connection with its own key.
+      void refreshKeyStatus()
+    }
   )
 
   void refreshKeyStatus()

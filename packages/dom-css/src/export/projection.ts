@@ -66,6 +66,7 @@ function justifyContentToCSS(value: SceneNode['primaryAxisAlign']): string | und
   if (value === 'CENTER') return 'center'
   if (value === 'MAX') return 'flex-end'
   if (value === 'SPACE_BETWEEN') return 'space-between'
+  if (value === 'SPACE_AROUND') return 'space-around'
   return undefined
 }
 

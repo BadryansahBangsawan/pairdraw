@@ -23,4 +23,9 @@ describe('toolCursor', () => {
     expect(toolCursor('SELECT')).toBe('default')
     expect(toolCursor('HAND', 'move')).toBe('move')
   })
+
+  test('the zoom tool shows a magnifier and the scale tool the arrow', () => {
+    expect(toolCursor('ZOOM')).toBe('zoom-in')
+    expect(toolCursor('SCALE')).toBe('default')
+  })
 })

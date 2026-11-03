@@ -5,10 +5,10 @@ import { resolveEditorProfile, type Editor } from '@open-pencil/core'
 import type { SceneNode } from '@open-pencil/scene-graph'
 
 import { createAutoLayoutValueEdit } from '#vue/canvas/auto-layout/value-edit'
-import { createGuideInput, selectedTopLevelGuideFrameId } from '#vue/canvas/guides/input'
+import { createGuideInput } from '#vue/canvas/guides/input'
 import { createCanvasLabelEdit } from '#vue/canvas/labels/edit'
-import { handlePenDragMove } from '#vue/canvas/pen/input'
-import { finishPencilDrag, handlePencilDragMove } from '#vue/canvas/pencil/input'
+import { finishPencilDrag } from '#vue/canvas/pencil/input'
+import { moveDrag, type DragMoveContext } from '#vue/canvas/pointer/drag-move'
 import { createCanvasPointer } from '#vue/canvas/pointer/use'
 import { createTextEditInput } from '#vue/canvas/text-edit/input'
 import { hoverCanvasTool, pressCanvasTool } from '#vue/canvas/tools/input'
@@ -17,27 +17,20 @@ import { createCanvasTransformInput } from '#vue/canvas/transform/input'
 import { finishMarquee } from '#vue/canvas/transform/marquee'
 import {
   cancelNodeEditDrag,
-  handleBendHandleMove,
   handleNodeEditPointerUp,
   updateNodeEditHover
 } from '#vue/canvas/vector-input/input'
+import { stopViewportTween } from '#vue/canvas/viewport/tween'
 import { resolveAutoLayoutHover } from '#vue/shared/input/auto-layout-hover'
 import { createClickCounter } from '#vue/shared/input/click-count'
-import {
-  attachModifiers,
-  handleConnectorDrawMove,
-  refreshConnectorDrag
-} from '#vue/shared/input/connector/draw'
-import { handleDrawMove } from '#vue/shared/input/draw'
-import { cancelMove, handleMoveMove, handleMoveUp } from '#vue/shared/input/move/drag'
+import { refreshConnectorDrag } from '#vue/shared/input/connector/draw'
+import { cancelMove, handleMoveUp } from '#vue/shared/input/move/drag'
 import { setupPanZoom } from '#vue/shared/input/pan/zoom'
-import { applyResize, cancelResizePreview, commitResizePreview } from '#vue/shared/input/resize'
+import { cancelResizePreview, commitResizePreview } from '#vue/shared/input/resize'
 import { updateHoverCursor } from '#vue/shared/input/select'
 import { resolveShapeHandleHover } from '#vue/shared/input/shape-handles'
 import { useSpaceHeld } from '#vue/shared/input/space-key'
-import { applyStickyScale } from '#vue/shared/input/sticky/scale'
 import type { DragState } from '#vue/shared/input/types'
-import { handleNodeEditMarqueeMove, handleNodeEditMove } from '#vue/shared/input/vector'
 import { DEFAULT_WHEEL_ZOOM_OPTIONS, type WheelZoomOptions } from '#vue/shared/input/wheel'
 
 /**
@@ -51,11 +44,14 @@ import { DEFAULT_WHEEL_ZOOM_OPTIONS, type WheelZoomOptions } from '#vue/shared/i
 const ESCAPABLE_DRAGS: ReadonlySet<DragState['type']> = new Set<DragState['type']>([
   'draw',
   'gradient',
+  'image-crop',
   'rotate',
   'connector-draw',
   'connector-end',
   'connector-line',
-  'line-end'
+  'line-end',
+  'zoom',
+  'scale'
 ])
 
 export function useCanvasInput(
@@ -196,6 +192,12 @@ export function useCanvasInput(
     handleTextSelectMove,
     handleMarqueeMove
   } = createCanvasTransformInput(editor, setDrag)
+  const dragMoveContext: DragMoveContext = {
+    editor,
+    guideInput,
+    transform: { handlePanMove, handleRotateMove, handleTextSelectMove, handleMarqueeMove },
+    spaceHeld: () => spaceHeld.value
+  }
 
   function onDblClick(e: MouseEvent) {
     if (profile().pointer === 'pan') return
@@ -245,6 +247,8 @@ export function useCanvasInput(
     // cursor until the pointer leaves the canvas; the canvas handles its own drags.
     if (e.button === 0) e.preventDefault()
     editor.setMeasurementMode('off')
+    // A press takes the view over from a glide, where it is.
+    stopViewportTween(editor)
     const openValueEdit = valueEdit.edit.value
     if (openValueEdit) valueEdit.commit(openValueEdit.value)
     if (!editor.state.editingTextId) canvasRef.value?.focus()
@@ -268,8 +272,6 @@ export function useCanvasInput(
     pressCanvasTool({ event: e, cx, cy, sx, sy }, toolContext)
   }
 
-  // Dispatching the full drag union is intentionally centralized here.
-  // eslint-disable-next-line complexity
   function onMouseMove(e: MouseEvent) {
     if (!isEnabled()) return
     pointerInside.value = true
@@ -289,112 +291,7 @@ export function useCanvasInput(
     }
 
     if (!drag.value) return
-    const d = drag.value
-
-    if (d.type === 'pan') {
-      handlePanMove(d, e)
-      return
-    }
-
-    const { sx, sy, cx, cy } = getCoords(e)
-
-    if (d.type === 'gradient' || d.type === 'shape-handle') {
-      d.update(sx, sy, e.shiftKey)
-      return
-    }
-
-    if (d.type === 'guide') {
-      const frameId = e.altKey && !d.guideId ? selectedTopLevelGuideFrameId(editor) : null
-      guideInput.handleMove(
-        d,
-        sx,
-        sy,
-        cx,
-        cy,
-        frameId ? { frameId, deep: e.metaKey || e.ctrlKey } : undefined
-      )
-      return
-    }
-
-    if (d.type === 'rotate') {
-      handleRotateMove(d, cx, cy, e.shiftKey)
-      return
-    }
-    if (d.type === 'move') {
-      handleMoveMove(d, cx, cy, sx, sy, editor, { ctrlKey: e.ctrlKey, shiftKey: e.shiftKey })
-      return
-    }
-    if (d.type === 'text-select') {
-      handleTextSelectMove(cx, cy)
-      return
-    }
-    if (d.type === 'resize') {
-      applyResize(d, cx, cy, e.shiftKey, editor, e.ctrlKey)
-      return
-    }
-
-    if (d.type === 'pen-drag') {
-      handlePenDragMove(d, cx, cy, spaceHeld.value, e, editor)
-      return
-    }
-
-    if (d.type === 'pencil-drag') {
-      handlePencilDragMove(cx, cy, e.shiftKey, editor)
-      return
-    }
-
-    if (d.type === 'edit-node' || d.type === 'edit-handle') {
-      handleNodeEditMove(d, cx, cy, editor, e.altKey, e.metaKey || e.ctrlKey, e.shiftKey, e.ctrlKey)
-      return
-    }
-
-    if (d.type === 'bend-handle') {
-      handleBendHandleMove(d, cx, cy, e, editor)
-      return
-    }
-
-    if (d.type === 'edit-marquee') {
-      handleNodeEditMarqueeMove(d, cx, cy, editor)
-      return
-    }
-
-    if (d.type === 'draw') {
-      handleDrawMove(d, cx, cy, e.shiftKey)
-      return
-    }
-
-    if (d.type === 'sticky-draw') {
-      d.move(cx, cy)
-      return
-    }
-
-    if (d.type === 'connector-draw') {
-      handleConnectorDrawMove(d, cx, cy, sx, sy, editor, attachModifiers(e))
-      return
-    }
-
-    if (d.type === 'connector-end') {
-      editor.connectorEndpointDrag(cx, cy, attachModifiers(e))
-      return
-    }
-
-    if (d.type === 'connector-line') {
-      editor.connectorLineDrag(cx, cy)
-      return
-    }
-
-    if (d.type === 'line-end') {
-      editor.lineEndDrag(cx, cy, { shift: e.shiftKey, alt: e.altKey })
-      return
-    }
-
-    if (d.type === 'sticky-scale') {
-      applyStickyScale(d, cx, cy, editor)
-      return
-    }
-
-    // While ⌘ or Ctrl is held the marquee reaches nested layers, as in Figma.
-    handleMarqueeMove(d, cx, cy, e.metaKey || e.ctrlKey)
+    moveDrag(drag.value, e, coords, dragMoveContext)
   }
 
   function onMouseUp() {
@@ -589,7 +486,9 @@ export function useCanvasInput(
           type === 'sticky-draw' ||
           type === 'rotate' ||
           type === 'shape-handle' ||
-          type === 'sticky-scale'
+          type === 'image-crop' ||
+          type === 'sticky-scale' ||
+          type === 'scale'
         )
           cancelPointerInteraction()
       })

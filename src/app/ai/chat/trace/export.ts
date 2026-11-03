@@ -41,7 +41,8 @@ export async function chatTrace(
       format: CHAT_TRACE_FORMAT,
       version: CHAT_TRACE_VERSION,
       environment: diagnosticsEnvironment(),
-      conversation: omit(conversation, ['messages']),
+      // The requests carry what was pinned in their notes; the images themselves stay out.
+      conversation: omit(conversation, ['messages', 'pins']),
       messages: snapshotMessages(messages),
       runs,
       assets,

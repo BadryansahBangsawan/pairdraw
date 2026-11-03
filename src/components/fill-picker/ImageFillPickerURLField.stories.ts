@@ -24,7 +24,7 @@ const meta = {
     template: `
       <div class="w-[240px] bg-panel p-4">
         <ImageFillPickerURLField @submit="submitted = $event" />
-        <p data-testid="submitted" class="mt-2 text-xs text-muted">{{ submitted }}</p>
+        <p data-test-id="submitted" class="mt-2 text-xs text-muted">{{ submitted }}</p>
       </div>`
   })
 } satisfies Meta

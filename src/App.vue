@@ -12,6 +12,7 @@ import { useI18n } from '@open-pencil/vue/i18n'
 import { startCloud } from '@/app/cloud/integration'
 import { useDocumentCloseProtection } from '@/app/document/close/use'
 import { useFollowingEditorStore } from '@/app/editor/active-store'
+import { appRuntimeConfig } from '@/app/runtime/config'
 import { animationsEnabled } from '@/app/shell/motion'
 import { useAppTheme } from '@/app/shell/theme'
 import { toast } from '@/app/shell/ui'
@@ -19,12 +20,14 @@ import { useRestartApprovals } from '@/app/shell/updater/approvals'
 import { scheduleStartupUpdateCheck } from '@/app/shell/updater/check'
 import { kickSyncEngine } from '@/app/storage/sync'
 import { prepareForReload } from '@/app/tabs'
+import ClipboardImportDialogHost from '@/components/clipboard/ClipboardImportDialogHost.vue'
 import { CloudHosts } from '@/components/cloud/integration'
 import CompanionPairDialog from '@/components/companion/CompanionPairDialog.vue'
 import DiskChangeDialogHost from '@/components/document/DiskChangeDialogHost.vue'
 import UnsavedChangesDialog from '@/components/document/UnsavedChangesDialog.vue'
 import PublishLibraryDialog from '@/components/libraries/PublishLibraryDialog.vue'
 import LibraryUpdateReviewDialog from '@/components/libraries/review/LibraryUpdateReviewDialog.vue'
+import RecoveredChangesDialogHost from '@/components/recovery/RecoveredChangesDialogHost.vue'
 import RecoveryDialog from '@/components/recovery/RecoveryDialog.vue'
 import SaveToHost from '@/components/save-to/SaveToHost.vue'
 import AISetupDialog from '@/components/settings/ai-setup/AISetupDialog.vue'
@@ -58,6 +61,8 @@ onMounted(() => {
   toast.setupGlobalErrorHandler()
   scheduleStartupUpdateCheck(updates)
   void kickSyncEngine()
+  // An embed opens only what its host page hands it, never a Cloud link from its address.
+  if (appRuntimeConfig.embed) return
   onUnmounted(
     startCloud({ leaveLinkAddress: () => router.isReady().then(() => router.replace('/')) })
   )
@@ -76,8 +81,10 @@ onMounted(() => {
       <SaveToHost />
       <CloudHosts />
       <RecoveryDialog />
+      <RecoveredChangesDialogHost />
       <UnsavedChangesDialog />
       <DiskChangeDialogHost />
+      <ClipboardImportDialogHost />
       <PublishLibraryDialog />
       <LibraryUpdateReviewDialog />
       <UsageStatsPrompt />

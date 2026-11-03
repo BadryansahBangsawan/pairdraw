@@ -111,6 +111,8 @@ export function mapJustify(align: string): Justify {
       return Justify.FlexEnd
     case 'SPACE_BETWEEN':
       return Justify.SpaceBetween
+    case 'SPACE_AROUND':
+      return Justify.SpaceAround
     default:
       return Justify.FlexStart
   }

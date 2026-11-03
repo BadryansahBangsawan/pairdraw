@@ -1,4 +1,7 @@
+import type { Vector } from '@open-pencil/scene-graph/primitives'
+
 import type { EditorState, Tool } from '#core/editor/types'
+import type { ViewportTransform } from '#core/geometry/types'
 
 /**
  * What the host takes away from every view, whatever the canvas shows: a read-only document, as
@@ -6,13 +9,58 @@ import type { EditorState, Tool } from '#core/editor/types'
  */
 export interface EditorRestrictions {
   readOnly: boolean
+  /**
+   * Whether a read-only document still takes comments, as for someone who can comment on a shared
+   * document: the Comment tool stays on offer.
+   */
+  comments?: boolean
 }
 
 /**
- * What a canvas pane shows: the design being edited, or the design running as a preview whose
- * controls respond to the pointer. Each pane has its own.
+ * How a presentation sizes its slide: fitted whole to the screen, or at 100% so a long page
+ * scrolls, as a website does.
  */
-export type CanvasView = { id: 'edit' } | { id: 'play'; revision: number }
+export type PresentationScale = 'fit' | 'actual'
+
+/** The world point at the screen's center and the zoom, as a presentation places the canvas. */
+export type ViewportCenter = Vector & { zoom: number }
+
+/** The canvas's pan and zoom, which a presentation returns to. */
+export type ViewportPlace = ViewportTransform
+
+/**
+ * A presentation: the design running as a preview, one slide (a top-level frame of the page) at a
+ * time. It keeps the pan and zoom the canvas had, so leaving it returns there, however the
+ * screen changed size meanwhile.
+ */
+export interface PresentView {
+  id: 'present'
+  revision: number
+  slideId: string
+  scale: PresentationScale
+  returnTo: ViewportPlace
+}
+
+/**
+ * Shader Mode: one shader paint of a layer shown large on its own, to play, scrub, and tune. The
+ * paint is named by its image, which stays with the shader however the layer's paints move.
+ */
+export interface ShaderView {
+  id: 'shader'
+  nodeId: string
+  image: string
+}
+
+/**
+ * What a canvas pane shows: the design being edited, the design running as a preview whose
+ * controls respond to the pointer, that preview presented a slide at a time, or one shader in
+ * Shader Mode. Each pane has its own.
+ */
+export type CanvasView =
+  | { id: 'edit' }
+  | { id: 'play'; revision: number }
+  | PresentView
+  | ShaderView
 
 /**
  * How the editor behaves for a canvas, resolved from what the document is for and the view it

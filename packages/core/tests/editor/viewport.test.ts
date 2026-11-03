@@ -40,3 +40,23 @@ describe('centerOn', () => {
     expect({ ...center(editor), zoom: editor.state.zoom }).toEqual(before)
   })
 })
+
+describe('zoomToArea', () => {
+  test('fits the area edge to edge, past 100%, centered in the viewport', () => {
+    const editor = createEditor({ getViewportSize: () => VIEWPORT })
+
+    editor.zoomToArea(100, 100, 200, 150)
+
+    expect(editor.state.zoom).toBe(8)
+    expect(center(editor)).toEqual({ x: 150, y: 125 })
+  })
+
+  test('leaves the view alone for an area with no width or height', () => {
+    const editor = createEditor({ getViewportSize: () => VIEWPORT })
+    const before = { ...center(editor), zoom: editor.state.zoom }
+
+    editor.zoomToArea(100, 100, 100, 300)
+
+    expect({ ...center(editor), zoom: editor.state.zoom }).toEqual(before)
+  })
+})

@@ -14,5 +14,7 @@
   "shape": "Form",
   "connector": "Verbinder",
   "hand": "Hand",
-  "comment": "Kommentar"
+  "comment": "Kommentar",
+  "zoom": "Zoomen",
+  "scale": "Skalieren"
 }

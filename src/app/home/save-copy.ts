@@ -1,5 +1,8 @@
 import { basename, extname } from 'pathe'
 
+import { recoveryMessages } from '@open-pencil/vue/i18n'
+
+import { readDraft } from '@/app/document/drafts'
 import { downloadBlob } from '@/app/document/io/browser'
 import { isFileWriteRefused, pickBrowserSaveFile } from '@/app/document/io/capability'
 import { documentFileName, isFigArchiveName } from '@/app/document/io/names'
@@ -13,10 +16,11 @@ import { rememberRecentFile, type RecentDocument } from '@/app/recent-files'
 import { getLocalCanvasStore } from '@/app/storage/local-store'
 import { IS_TAURI } from '@/constants'
 
-/** A document Home can save a copy of: a file on disk, or a document kept in storage. */
+/** A document Home can save a copy of: a file on disk, a document kept in storage, or a draft. */
 export type DocumentCopySource =
   | { kind: 'local'; path: string; name: string }
   | { kind: 'storage'; documentId: string; name: string; location: StorageLocation }
+  | { kind: 'draft'; draftId: string; name: string }
 
 /** What Save As from Home did: saved a copy under `name`, or nothing when the person cancelled. */
 export type DocumentCopyResult = { status: 'saved'; name: string } | { status: 'cancelled' }
@@ -39,7 +43,7 @@ export function recentCopySource(document: RecentDocument): DocumentCopySource {
  * desktop app, which can read it.
  */
 export function canSaveDocumentCopy(source: DocumentCopySource, desktop = IS_TAURI): boolean {
-  return source.kind === 'storage' || desktop
+  return source.kind !== 'local' || desktop
 }
 
 /** The name a copy is offered under: a file keeps its own; a stored design gets `.fig`. */
@@ -85,6 +89,11 @@ export async function storedDocumentBytes(
 
 async function documentBytes(source: DocumentCopySource): Promise<Uint8Array> {
   if (source.kind === 'storage') return storedDocumentBytes(source.documentId, source.location)
+  if (source.kind === 'draft') {
+    const draft = await readDraft(source.draftId)
+    if (!draft) throw new Error(recoveryMessages.get().draftUnavailable)
+    return draft.figBytes
+  }
   const { readFile } = await import('@tauri-apps/plugin-fs')
   return readFile(source.path)
 }

@@ -465,6 +465,16 @@ export function createSelectionCommands({
       enabled: capabilities.canOutlineStroke,
       run: () => editor.outlineStrokeSelected()
     },
+    'selection.cropImage': {
+      id: 'selection.cropImage',
+      get label() {
+        return t.value.cropImage
+      },
+      enabled: capabilities.canCropImage,
+      run: () => {
+        editor.startImageEdit()
+      }
+    },
     'selection.moveToPage': {
       id: 'selection.moveToPage',
       get label() {

@@ -32,11 +32,11 @@ export function parseCSSFlexDirection(value: string | undefined): AutoLayoutDire
 
 /**
  * Primary axis alignment from `justify-content`; `normal` packs flex items at the start. Design
- * JSX's `between` is not CSS, which browsers ignore, so it is not read here.
+ * JSX's `between` and `around` are not CSS, which browsers ignore, so they are not read here.
  */
 export function parseCSSJustifyContent(value: string | undefined): LayoutAlign | undefined {
   const keyword = alignmentKeyword(value)
-  if (keyword === 'between') return undefined
+  if (keyword === 'between' || keyword === 'around') return undefined
   return keyword === 'normal' ? 'MIN' : parsePrimaryAxisAlign(keyword)
 }
 

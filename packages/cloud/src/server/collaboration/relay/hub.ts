@@ -1,6 +1,7 @@
 import {
   COLLAB_ACTIONS,
   createRelayClientAssembler,
+  decodeCommentRelayMessage,
   encodeSyncReply,
   decodeRelayClientFrame,
   decodeRoomUpdate,
@@ -8,12 +9,15 @@ import {
   RELAY_CLOSE,
   RELAY_SERVER_PEER,
   relayServerMessages,
+  ROOM_COMMENT_THREADS,
+  writeRoomCommentThread,
   type RelayServerFrame
 } from '#cloud/contract'
 import * as Y from 'yjs'
 
 import { authorizeRelayTicket, principalKey, type RelayAuthorization } from './authorize'
 import { stampAwareness } from './awareness'
+import { commenterThreadWrites } from './comments'
 import type { CollaborationStateStore } from './persistence'
 
 /** One client's socket, as a runtime adapter hands it to the relay. */
@@ -60,6 +64,13 @@ export type CollaborationRelayOptions = {
 
 /** Messages a viewer may send; their document writes never leave the relay. */
 const VIEWER_ACTIONS = new Set<string>([COLLAB_ACTIONS.syncStep1, COLLAB_ACTIONS.awareness])
+/** A commenter may also send its comment threads, which the relay writes into the room itself. */
+const COMMENTER_ACTIONS = new Set<string>([...VIEWER_ACTIONS, COLLAB_ACTIONS.comments])
+
+function mayAct(permission: RelayAuthorization['permission'], namespace: string): boolean {
+  if (permission === 'edit') return true
+  return (permission === 'comment' ? COMMENTER_ACTIONS : VIEWER_ACTIONS).has(namespace)
+}
 
 type Peer = {
   id: string
@@ -215,6 +226,34 @@ export function createCollaborationRelay(options: CollaborationRelayOptions) {
     }
   }
 
+  /**
+   * Writes what a commenter's threads may change into the room's comment threads, and sends the
+   * change to everyone in the room, the commenter too, as the server's own update.
+   */
+  function applyComments(room: Room, peer: Peer, payload: Uint8Array) {
+    const incoming = decodeCommentRelayMessage(payload)
+    if (!incoming) {
+      peer.socket.close(RELAY_CLOSE.protocol, 'Malformed comments')
+      return
+    }
+    const threads = room.document.getMap<unknown>(ROOM_COMMENT_THREADS)
+    const writes = commenterThreadWrites(threads, incoming, peer.authorization.principal.name)
+    if (writes.length === 0) return
+    const before = Y.encodeStateVector(room.document)
+    room.document.transact(() => {
+      for (const thread of writes) writeRoomCommentThread(threads, thread)
+    }, peer.id)
+    sendAll(
+      [...room.peers.values()].map((other) => other.socket),
+      {
+        type: 'message',
+        namespace: COLLAB_ACTIONS.yjsUpdate,
+        from: RELAY_SERVER_PEER,
+        payload: Y.encodeStateAsUpdateV2(room.document, before)
+      }
+    )
+  }
+
   function handleMessage(
     room: Room,
     peer: Peer,
@@ -222,10 +261,14 @@ export function createCollaborationRelay(options: CollaborationRelayOptions) {
     target: string | null,
     payload: Uint8Array
   ) {
-    const readOnly = peer.authorization.permission === 'view'
-    if (readOnly && !VIEWER_ACTIONS.has(namespace)) return
+    if (!mayAct(peer.authorization.permission, namespace)) return
     // Only the server says the history changed.
     if (namespace === COLLAB_ACTIONS.versions) return
+    // Comments go to the server alone, which writes what they may change.
+    if (namespace === COLLAB_ACTIONS.comments) {
+      applyComments(room, peer, payload)
+      return
+    }
 
     let forwarded = payload
     if (namespace === COLLAB_ACTIONS.awareness) {

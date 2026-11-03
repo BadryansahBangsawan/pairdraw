@@ -17,7 +17,7 @@ import {
   shaderPresetJSON,
   type ShaderEffect
 } from '@open-pencil/vue/controls/shader'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n, useShaderMessages } from '@open-pencil/vue/i18n'
 import { useFlatReorderDrag } from '@open-pencil/vue/shared/drag'
 
 import ShaderEffectControls from '@/components/fill-picker/shader/ShaderEffectControls.vue'
@@ -35,11 +35,17 @@ import AppCombobox from '@/components/ui/select/AppCombobox.vue'
  * Edits a shader paint's preset as the properties panel edits effects: a list of the shader's
  * effects, top first, each with its type and settings, reordered by dragging; a gallery of
  * complete shaders to start from, which a paint that just became a shader opens on; and the
- * preset as JSON, which also takes a preset copied from shaders.com.
+ * preset as JSON, which also takes a preset copied from shaders.com. Where it can, it opens the
+ * shader in Shader Mode, large on its own.
  */
-const { preset } = defineProps<{ preset: ShaderPreset }>()
-const emit = defineEmits<{ update: [preset: ShaderPreset] }>()
+const { preset, canOpenMode = false } = defineProps<{
+  preset: ShaderPreset
+  /** Whether it offers to open the shader in Shader Mode, which emits `openMode`. */
+  canOpenMode?: boolean
+}>()
+const emit = defineEmits<{ update: [preset: ShaderPreset]; openMode: [] }>()
 const { panels, common } = useI18n()
+const shaderMessages = useShaderMessages()
 
 const catalog = shallowRef<ShaderEffect[]>([])
 onMounted(async () => {
@@ -155,6 +161,14 @@ function applyJSON() {
           {{ view === 'gallery' ? panels.shaderGallery : panels.effects }}
         </span>
         <div class="flex items-center">
+          <IconButton
+            v-if="canOpenMode"
+            :label="shaderMessages.open"
+            data-test-id="shader-open-mode"
+            @click="emit('openMode')"
+          >
+            <icon-lucide-maximize-2 class="size-3" />
+          </IconButton>
           <IconButton
             :label="panels.shaderGallery"
             :active="view === 'gallery'"

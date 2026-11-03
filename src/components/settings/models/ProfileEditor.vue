@@ -18,11 +18,13 @@ import SettingsSection from '@/components/settings/layout/SettingsSection.vue'
 import ProfileCapabilities from '@/components/settings/models/ProfileCapabilities.vue'
 import ProviderChooser from '@/components/settings/models/ProviderChooser.vue'
 import ProviderSelect from '@/components/settings/provider-select/ProviderSelect.vue'
+import BedrockConnectionFields from '@/components/settings/provider/BedrockConnectionFields.vue'
 import ChatGPTSignInField from '@/components/settings/provider/ChatGPTSignInField.vue'
 import ProviderConnectionTestButton from '@/components/settings/provider/ProviderConnectionTestButton.vue'
 import ProviderSettingsField from '@/components/settings/provider/ProviderSettingsField.vue'
 import ProviderSettingsInput from '@/components/settings/provider/ProviderSettingsInput.vue'
 import ProviderSettingsKeyField from '@/components/settings/provider/ProviderSettingsKeyField.vue'
+import VertexConnectionFields from '@/components/settings/provider/VertexConnectionFields.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import { AppConfirmationDialog } from '@/components/ui/dialog'
 import AppCombobox from '@/components/ui/select/AppCombobox.vue'
@@ -41,6 +43,8 @@ defineExpose({
   }
 })
 const keyInput = ref('')
+/** The Vertex AI project as typed, checked before the draft's base URL takes it. */
+const vertexProject = ref('')
 const deleteOpen = ref(false)
 const profile = useModelProfileEditor({ profileId, keyInput, labels: ai })
 const {
@@ -85,7 +89,7 @@ const signIn = useProfileSignIn(keyInput)
 const customModelPlaceholder = computed(() =>
   isHarness.value ? (pi.state.value?.defaultModel ?? 'provider/model') : 'e.g. llama-3.3-70b'
 )
-const feedback = useModelProfileFeedback(profile, keyInput, settings)
+const feedback = useModelProfileFeedback(profile, keyInput, settings, { vertexProject })
 const { errors: fieldErrors } = feedback
 const busy = computed(() => saving.value || connectionTestStatus.value === 'testing')
 const cloudWorkspaceOptions = computed(() =>
@@ -136,6 +140,10 @@ async function testConnection() {
     return
   }
   await runConnectionTest()
+}
+function blurVertexCredential() {
+  void feedback.blur('credential')
+  void feedback.blur('vertexCredentialKind')
 }
 async function connectAgent() {
   if ((await codingAgent.connect()) === 'connected') emit('done')
@@ -317,8 +325,35 @@ async function remove() {
               />
             </ProviderSettingsField>
 
+            <BedrockConnectionFields
+              v-if="draft.providerID === 'amazon-bedrock'"
+              v-model:base-url="draft.customBaseURL"
+              v-model:credential="keyInput"
+              :draft="draft"
+              :saved="hasExistingKey"
+              :error="fieldErrors.credential"
+              :key-placeholder="providerDef.keyPlaceholder"
+              :key-u-r-l="providerDef.keyURL"
+              @clear="clearKey"
+              @blur="feedback.blur('credential')"
+            />
+            <VertexConnectionFields
+              v-else-if="draft.providerID === 'google-vertex'"
+              v-model:base-url="draft.customBaseURL"
+              v-model:credential="keyInput"
+              v-model:project="vertexProject"
+              :draft="draft"
+              :saved="hasExistingKey"
+              :error="fieldErrors.credential ?? fieldErrors.vertexCredentialKind"
+              :project-error="fieldErrors.vertexProject"
+              :key-placeholder="providerDef.keyPlaceholder"
+              :key-u-r-l="providerDef.keyURL"
+              @clear="clearKey"
+              @blur="blurVertexCredential"
+              @project-blur="feedback.blur('vertexProject')"
+            />
             <ChatGPTSignInField
-              v-if="providerDef.signInOnly"
+              v-else-if="providerDef.signInOnly"
               :saved="hasExistingKey"
               :signed-in="signIn.signedIn.value"
               :email="signIn.email.value"

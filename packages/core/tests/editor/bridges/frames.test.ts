@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
+import { createEditor, pageSlides, slideMoveTarget } from '@open-pencil/core'
 
 const VIEWPORT = { width: 800, height: 600 }
 
@@ -61,5 +61,51 @@ describe('frame navigation', () => {
     const centerY = (VIEWPORT.height / 2 - panY) / zoom
     expect(centerX).toBeCloseTo(right.x + right.width / 2)
     expect(centerY).toBeCloseTo(right.y + right.height / 2)
+  })
+})
+
+// The Slides panel: dragging a slide before or after another reorders the page's layers.
+describe('slide order', () => {
+  function slides() {
+    const editor = createEditor({ getViewportSize: () => VIEWPORT })
+    const pageId = editor.state.currentPageId
+    const a = editor.graph.createNode('FRAME', pageId, { name: 'A', width: 100, height: 100 })
+    const shape = editor.graph.createNode('RECTANGLE', pageId, { width: 10, height: 10 })
+    const b = editor.graph.createNode('FRAME', pageId, { name: 'B', width: 100, height: 100 })
+    const section = editor.graph.createNode('SECTION', pageId, { x: 500, width: 300 })
+    const c = editor.graph.createNode('FRAME', section.id, { name: 'C', width: 100, height: 100 })
+    const order = () => pageSlides(editor.graph, pageId).map((slide) => slide.name)
+    function move(slideId: string, targetId: string, place: 'before' | 'after') {
+      const target = slideMoveTarget(editor.graph, pageId, slideId, targetId, place)
+      if (target) editor.reorderChildWithUndo(slideId, target.parentId, target.index)
+      return target
+    }
+    return { editor, pageId, a, b, c, shape, section, order, move }
+  }
+
+  test('moves a slide before or after another among its siblings, as one undo step', () => {
+    const { editor, a, b, order, move } = slides()
+    expect(order()).toEqual(['A', 'B', 'C'])
+    move(a.id, b.id, 'after')
+    expect(order()).toEqual(['B', 'A', 'C'])
+    editor.undoAction()
+    expect(order()).toEqual(['A', 'B', 'C'])
+    move(b.id, a.id, 'before')
+    expect(order()).toEqual(['B', 'A', 'C'])
+  })
+
+  test('a slide dropped next to a slide in a section joins that section', () => {
+    const { editor, a, c, section, order, move } = slides()
+    move(a.id, c.id, 'after')
+    expect(order()).toEqual(['B', 'C', 'A'])
+    expect(editor.graph.getNode(a.id)?.parentId).toBe(section.id)
+  })
+
+  test('a drop that keeps the order, or onto a layer that is not a slide, changes nothing', () => {
+    const { a, b, shape, move } = slides()
+    expect(move(a.id, b.id, 'before')).toBeNull()
+    expect(move(b.id, a.id, 'after')).toBeNull()
+    expect(move(a.id, a.id, 'after')).toBeNull()
+    expect(move(a.id, shape.id, 'after')).toBeNull()
   })
 })

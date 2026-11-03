@@ -35,6 +35,8 @@ Con <kbd>Shift</kbd>, el rectángulo se convierte en cuadrado, la elipse en cír
 
 Color sólido, degradado lineal, radial, angular o diamante, e imagen.
 
+Para recortar o reencuadrar una imagen en el lienzo, haz doble clic en la capa, pulsa <kbd>Enter</kbd> con ella seleccionada o elige **Recortar imagen** en su menú contextual o en su relleno de imagen. La imagen aparece entera, atenuada fuera de la capa. Arrastra las esquinas o las barras de los bordes de la capa para recortarla sobre la imagen quieta, arrastra la imagen para moverla detrás de la capa y arrastra sus puntos de esquina para escalarla. <kbd>Shift</kbd> mantiene las proporciones o un eje y <kbd>Alt</kbd> trabaja desde el centro. Cada arrastre es un paso que se puede deshacer; <kbd>Enter</kbd>, <kbd>Esc</kbd>, un doble clic o un clic fuera de la imagen termina. Los vectores, las capas con hijos y las capas que coloca el auto layout conservan sus bordes; en ellas solo puedes mover y escalar la imagen.
+
 ### Contorno
 
 Grosor común o por lado, color, alineación interior/central/exterior, extremos, uniones y guiones.

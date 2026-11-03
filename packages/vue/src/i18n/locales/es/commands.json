@@ -46,6 +46,7 @@
   "flattenSelection": "Aplanar",
   "outlineText": "Contornear texto",
   "outlineStroke": "Cortornear trazo",
+  "cropImage": "Recortar imagen",
   "useAsMask": "Usar como máscara",
   "removeMask": "Quitar máscara",
   "bringForward": "Adelantar",
@@ -91,5 +92,8 @@
   "vectorSmoothCorner": "Alternar punto entre suave y esquina",
   "gestureDrag": "arrastrar",
   "gestureDoubleClickSegment": "doble clic en un segmento",
-  "gestureDoubleClickPoint": "doble clic en un punto"
+  "gestureDoubleClickPoint": "doble clic en un punto",
+  "vectorBendSegment": "Curvar segmento",
+  "vectorBendSegmentKeepHandles": "Curvar segmento sin mover los tiradores vecinos",
+  "gestureDragSegment": "arrastrar un segmento"
 }

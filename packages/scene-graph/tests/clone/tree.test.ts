@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import { SceneGraph } from '@open-pencil/scene-graph'
+import { recordInstanceOverride } from '@open-pencil/scene-graph/instances'
 
 import { expectDefined, getNodeOrThrow } from '../helpers/assert'
 
@@ -145,5 +146,25 @@ describe('SceneGraph.cloneTree', () => {
     // Original must be unaffected
     expect(original.source.fig.rawNodeFields).toEqual({ visible: true, opacity: 1 })
     expect(original.source.fig.rawSize).toEqual({ x: 100, y: 50 })
+  })
+
+  test('a cloned instance keeps its layers’ overrides through a sync', () => {
+    const graph = new SceneGraph()
+    const page = graph.getPages()[0]
+    const button = graph.createNode('COMPONENT', page.id, { name: 'Button', width: 120 })
+    const label = graph.createNode('RECTANGLE', button.id, { name: 'Label', width: 60 })
+    const instance = expectDefined(graph.createInstance(button.id, page.id, { x: 300 }))
+    const [labelCopy] = graph.getChildren(instance.id)
+    graph.updateNode(labelCopy.id, { opacity: 0.3 })
+    recordInstanceOverride(graph, labelCopy.id, ['opacity'])
+
+    const clone = expectDefined(graph.cloneTree(instance.id, page.id), 'clone')
+    const [clonedLabel] = graph.getChildren(clone.id)
+    expect([...getNodeOrThrow(graph, clone.id).instanceOverrides.descendants.keys()]).toEqual([
+      clonedLabel.id
+    ])
+    graph.updateNode(label.id, { opacity: 0.9 })
+    graph.syncInstances(button.id)
+    expect(getNodeOrThrow(graph, clonedLabel.id).opacity).toBe(0.3)
   })
 })

@@ -29,6 +29,12 @@ Avec **Zoomer avec la molette** dans **Paramètres → Éditeur**, la molette zo
 | Ajuster le document | <kbd>⌘</kbd><kbd>1</kbd> | <kbd>Ctrl</kbd><kbd>1</kbd> |
 | Zoomer sur la sélection | <kbd>⌘</kbd><kbd>2</kbd> | <kbd>Ctrl</kbd><kbd>2</kbd> |
 
+## Outil Zoom
+
+Maintenez <kbd>Z</kbd> et cliquez pour zoomer sur le pointeur, ou cliquez avec <kbd>Option</kbd>/<kbd>Alt</kbd> pour dézoomer ; faites glisser pour zoomer sur la zone tracée. Relâcher <kbd>Z</kbd> rend l'outil précédent. Un appui bref sur <kbd>Z</kbd> garde l'outil Zoom actif ; il figure aussi dans le menu de l'outil Main de la barre d'outils.
+
+Zoomer pour tout afficher, sur la sélection et à 100 %, les niveaux du menu de zoom et le cadre suivant ou précédent glissent jusqu'à leur vue au lieu de sauter. Ils sautent lorsque les animations sont désactivées, que le mode Ultralight est actif ou que le système demande de réduire les animations.
+
 ## Règles
 
 Les règles sont masquées jusqu’à ce que vous les affichiez avec **Affichage → Règles** ou <kbd>Shift</kbd> + <kbd>R</kbd>.

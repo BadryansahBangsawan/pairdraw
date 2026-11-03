@@ -5,7 +5,10 @@ import { nodeToXPath } from '@open-pencil/core/xpath'
 import { acceptsDocumentPrompts, runPromptInDocument } from '@/app/ai/chat/entry/run'
 import { stickyPrompt } from '@/app/ai/chat/entry/sticky'
 import type { EditorStore } from '@/app/editor/active-store'
-import { pasteClipboardToReplace } from '@/app/editor/clipboard/paste/replace'
+import {
+  pasteClipboardToReplace,
+  pasteClipboardToReplaceInInstance
+} from '@/app/editor/clipboard/paste/replace'
 import { copyLayersAsPNG } from '@/app/editor/clipboard/png'
 import {
   copySelectionProperties,
@@ -13,6 +16,12 @@ import {
 } from '@/app/editor/clipboard/properties'
 import { executeClipboardCommand } from '@/app/editor/clipboard/system'
 import { copyPendingText, createTextClipboard } from '@/app/editor/clipboard/text'
+import {
+  canEditImageBackground,
+  canGenerateImageFill,
+  openImageAIPrompt,
+  removeImageBackground
+} from '@/app/editor/image-ai'
 import { canVectorizeImageNode, vectorizeImageNode } from '@/app/editor/vectorize'
 import { notificationMessages } from '@/app/i18n/notifications'
 import { toast } from '@/app/shell/ui'
@@ -116,6 +125,13 @@ export function createCanvasMenuActions(store: EditorStore, selectedIds: Ref<Set
     ids,
     execCommand,
     pasteToReplace: () => pasteClipboardToReplace(store),
+    /** Whether the selection holds a layer the clipboard can replace inside its instance. */
+    canReplaceInInstance: () => {
+      void selectedIds.value
+      void store.state.sceneVersion
+      return store.replaceableInstanceLayers(ids()).length > 0
+    },
+    replaceInInstance: () => pasteClipboardToReplaceInInstance(store),
     copyProperties: () => copySelectionProperties(store),
     pasteProperties: () => pasteClipboardProperties(store),
     clipboardWrite,
@@ -132,6 +148,20 @@ export function createCanvasMenuActions(store: EditorStore, selectedIds: Ref<Set
     vectorizeImage: async () => {
       const nodeId = ids()[0]
       if (nodeId) await vectorizeImageNode(store, nodeId)
-    }
+    },
+    canEditImageBackground: () => {
+      void selectedIds.value
+      return canEditImageBackground(store)
+    },
+    canGenerateImageFill: () => {
+      void selectedIds.value
+      return canGenerateImageFill(store)
+    },
+    removeImageBackground: async () => {
+      const nodeId = ids()[0]
+      if (nodeId) await removeImageBackground(store, nodeId)
+    },
+    replaceImageBackground: () => openImageAIPrompt(store, 'replace-background'),
+    generateImageFill: () => openImageAIPrompt(store, 'generate-fill')
   }
 }

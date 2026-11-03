@@ -16,6 +16,13 @@ import { AgentSignInRequiredError } from '@/app/ai/agents/acp/auth/required'
 import { parseAuthStatusUpdate } from '@/app/ai/agents/acp/auth/status'
 import { setAgentCommands } from '@/app/ai/agents/acp/commands'
 import { createUpdateMapper } from '@/app/ai/agents/acp/events'
+import { sessionModel } from '@/app/ai/agents/acp/session/controls'
+import {
+  agentSessionControls,
+  noteAgentSessionUpdate,
+  sessionControlSetter,
+  startAgentSessionControls
+} from '@/app/ai/agents/acp/session/store'
 import { linkOwnTools } from '@/app/ai/agents/acp/tools'
 import { agentHost } from '@/app/ai/agents/host/current'
 import type { AgentHost, AgentStreams } from '@/app/ai/agents/host/types'
@@ -35,6 +42,8 @@ interface ACPSession {
   dead: boolean
   /** The model the agent says it uses, once it has said; Codex names it, Claude in its usage. */
   model: string | null
+  /** Unlinks the composer's model, reasoning, and mode pickers from this session. */
+  endControls: () => void
 }
 
 /** One agent turn's tokens, as an ACP agent reports them with its answer to the prompt. */
@@ -137,6 +146,8 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
   private session: ACPSession | null = null
   private agentDef: ACPAgentDef
   private cwd: string
+  /** Whether `cwd` is a project folder the person chose, where saved modes do not carry over. */
+  private projectFolder: boolean
   private sentContext = false
   private destroying = false
   /** The agent while it starts, before it becomes the session, so destroying can stop it. */
@@ -151,6 +162,8 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
   constructor(options: {
     agentDef: ACPAgentDef
     cwd?: string
+    /** Whether `cwd` is a project folder the person chose for the chat. */
+    projectFolder?: boolean
     store?: EditorStore
     /** Told each turn's tokens, which the Usage settings count with the chat's other models. */
     onUsage?: (usage: AgentTurnUsage) => void
@@ -159,6 +172,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     this.agentDef = options.agentDef
     this.host = options.host ?? agentHost()
     this.cwd = options.cwd ?? '.'
+    this.projectFolder = options.projectFolder ?? false
     this.store = options.store ?? null
     this.onUsage = options.onUsage ?? null
   }
@@ -184,6 +198,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
       const started = await this.spawnAgent()
       // Destroyed between startup and here: the agent is still `starting`, so stop it.
       if (this.destroying) {
+        started.endControls()
         await started.agent.close()
         throw new Error('The chat closed while its agent was starting.')
       }
@@ -273,6 +288,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     await starting?.close()
     if (this.session) {
       forgetAgentChat(this.session.chat)
+      this.session.endControls()
       await this.session.agent.close()
       this.session = null
     }
@@ -285,6 +301,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
         logId: this.agentDef.id,
         onExit: () => {
           if (!this.session) return
+          this.session.endControls()
           this.session.dead = true
           this.session = null
         }
@@ -325,6 +342,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
         if (update.sessionUpdate === 'available_commands_update') {
           setAgentCommands(agentId, update.availableCommands)
         }
+        noteAgentSessionUpdate(agentId, update)
         onUpdate?.(params)
       },
 
@@ -411,13 +429,36 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     }
     onUpdate = null
 
+    // The person's model, reasoning, and mode choices apply before the first prompt.
+    const linking = startAgentSessionControls(
+      agentId,
+      sessionResult,
+      sessionControlSetter(connection, sessionResult.sessionId),
+      (controls) => {
+        const model = sessionModel(controls)
+        if (model && sessionRef) sessionRef.model = model
+      },
+      { projectFolder: this.projectFolder }
+    )
+    let endControls: () => void
+    try {
+      endControls = await untilStopped(linking)
+    } catch (e) {
+      // The agent stopped first; the link it would have made goes once it is made.
+      void linking.then((end) => end()).catch(() => undefined)
+      await agent.close()
+      throw startupError(e, this.agentDef)
+    }
+
     const session: ACPSession = {
       connection,
       sessionId: sessionResult.sessionId,
       chat: tools.chat,
       agent,
       dead: false,
-      model: sessionResult.models?.currentModelId ?? null,
+      model:
+        sessionModel(agentSessionControls(agentId)) ?? sessionResult.models?.currentModelId ?? null,
+      endControls,
       get onUpdate() {
         return onUpdate
       },

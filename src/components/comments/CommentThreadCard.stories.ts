@@ -8,7 +8,11 @@ import CommentComposer from './CommentComposer.vue'
 import CommentThreadCard from './CommentThreadCard.vue'
 import { discussed, long, resolved } from './examples/threads'
 
-type Args = { thread: CommentThread; onReply: (threadId: string, text: string) => void }
+type Args = {
+  thread: CommentThread
+  canDeleteReplies?: boolean
+  onReply: (threadId: string, text: string) => void
+}
 
 const meta = {
   title: 'App/Editor/Comments/Thread Card',
@@ -21,7 +25,11 @@ const meta = {
     template: `
       <TooltipProvider>
         <div class="flex max-h-[28rem] w-80 flex-col overflow-hidden rounded-xl bg-panel shadow-[0_0_0_1px_var(--color-border)]">
-          <CommentThreadCard :thread="args.thread" @reply="args.onReply" />
+          <CommentThreadCard
+            :thread="args.thread"
+            :can-delete-replies="args.canDeleteReplies ?? true"
+            @reply="args.onReply"
+          />
         </div>
       </TooltipProvider>
     `
@@ -37,6 +45,16 @@ export const Formatted: Story = {}
 export const Resolved: Story = { args: { thread: resolved } }
 
 export const LongThread: Story = { args: { thread: long } }
+
+/** For someone who can only comment: they reply and resolve, and delete no one's replies. */
+export const CommentOnly: Story = {
+  args: { canDeleteReplies: false },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.queryAllByRole('button', { name: 'Delete reply' })).toHaveLength(0)
+    await expect(canvas.getByRole('textbox', { name: 'Reply' })).toBeVisible()
+  }
+}
 
 export const Replying: Story = {
   play: async ({ canvasElement, args }) => {

@@ -4,6 +4,7 @@ import type { Editor, EditorState } from '@open-pencil/core'
 import { exportFigFile } from '@open-pencil/core/io/formats/fig'
 
 import { createAutosave } from '@/app/document/autosave'
+import { createDocumentDraft, draftsAvailable } from '@/app/document/drafts'
 import { createDocumentChanges } from '@/app/document/io/changes'
 import {
   documentFileName,
@@ -15,6 +16,7 @@ import { createSaveActions } from '@/app/document/io/save/actions'
 import { createDocumentSourceState } from '@/app/document/io/source/state'
 import type { DocumentSourceAccess } from '@/app/document/io/types'
 import { createDocumentRecovery } from '@/app/document/recovery'
+import { removeFileBackups } from '@/app/document/recovery/backups'
 import { recoveryEnabled } from '@/app/document/recovery/preferences'
 import { storageLocationOf } from '@/app/integrations/storage/location'
 import type { StorageDocumentBinding, StorageLocation } from '@/app/integrations/storage/types'
@@ -86,13 +88,50 @@ export function createDocumentSourceActions({
     })
   }
 
+  /** The file a save writes in place, whose unsaved changes recovery backs up. */
+  function writableFile() {
+    if (getStorageBinding()) return null
+    const handle = getFileHandle()
+    if (handle) return { handle, path: null }
+    const path = getFilePath()
+    return path && isTauri() ? { handle: null, path } : null
+  }
+
+  const draft = createDocumentDraft({
+    state,
+    version: changes.capture,
+    buildFigFile,
+    isSourceless: () => !hasWritableSource() && !getFilePath() && !getDownloadName(),
+    isEnabled: () => recoveryEnabled.value && !state.hostRestrictions.readOnly && draftsAvailable(),
+    markSaved: (version) => changes.markSaved(version),
+    // The draft holds what a recovery copy would, so the copy goes once it is written.
+    onPersisted: () => recovery.discardRecovery()
+  })
+
   const recovery = createDocumentRecovery({
     state,
     version: changes.capture,
     isEnabled: () => recoveryEnabled.value,
     buildFigFile: buildRecoveryFigFile,
-    hasWritableSource
+    hasWritableSource,
+    fileSource: writableFile,
+    autosaveCovers: () => state.autosaveEnabled && !isDiskChangePending(),
+    keptElsewhere: () => draft.keepsChanges()
   })
+
+  /**
+   * A save to a place of the document's own: recovery's copy and the draft are done, and so is
+   * any backup of the file from an earlier session, which holds older changes than the file now.
+   */
+  async function afterSave(version: number) {
+    await recovery.markProtectedVersion(version)
+    await draft.release()
+    const file = writableFile()
+    if (!file) return
+    await removeFileBackups(file, { except: recovery.getRecoveryId() }).catch((error: unknown) => {
+      console.warn('[Recovery] Deleting the saved file’s older backups failed:', error)
+    })
+  }
 
   const { saveFigFile, saveFigFileAs, writeFile } = createSaveActions({
     state,
@@ -113,8 +152,8 @@ export function createDocumentSourceActions({
     startWatchingFile: () => {
       void startWatchingFile()
     },
-    onWriteSuccess: (version) => recovery.markProtectedVersion(version),
-    onDownloadSuccess: (version) => recovery.markProtectedVersion(version)
+    onWriteSuccess: afterSave,
+    onDownloadSuccess: afterSave
   })
 
   const autosave = createAutosave({
@@ -142,8 +181,9 @@ export function createDocumentSourceActions({
     const trimmed = name.trim()
     if (state.hostRestrictions.readOnly || !trimmed || trimmed === state.documentName) return
     state.documentName = trimmed
-    // Storage keeps the name with the document; a file's name is its path, which saving leaves as is.
-    if (getStorageBinding()) changes.markChanged()
+    // Storage and drafts keep the name with the document; a file's name is its path, which saving
+    // leaves as is.
+    if (getStorageBinding() || draft.keepsChanges()) changes.markChanged()
     void renamed.trigger(trimmed)
   }
 
@@ -271,6 +311,7 @@ export function createDocumentSourceActions({
     changes.dispose()
     stopWatchingFile()
     autosave.disposeAutosave()
+    draft.dispose()
     recovery.disposeRecovery()
   }
 
@@ -298,7 +339,19 @@ export function createDocumentSourceActions({
       changes.markChanged()
       return recovery.adoptRecoverySnapshot(id)
     },
-    persistRecoveryNow: () => recovery.persistNow(),
-    discardRecovery: () => recovery.discardRecovery()
+    persistRecoveryNow: async () => {
+      await draft.persistNow()
+      await recovery.persistNow()
+    },
+    discardRecovery: () => recovery.discardRecovery(),
+    getDraftId: () => draft.getDraftId(),
+    /** Ties the document to the draft it was opened from, saved as it is now. */
+    adoptDraft: (id: string) => {
+      draft.adopt(id)
+      markDocumentSaved()
+    },
+    persistDraftNow: () => draft.persistNow(),
+    discardDraft: () => draft.discard(),
+    suspendDraft: (suspended: boolean) => draft.suspend(suspended)
   }
 }

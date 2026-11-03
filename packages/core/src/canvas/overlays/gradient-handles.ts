@@ -4,6 +4,7 @@ import type { SceneGraph } from '@open-pencil/scene-graph'
 import type { Color, Vector } from '@open-pencil/scene-graph/primitives'
 
 import { getCachedMaskBlur } from '#core/canvas/effects'
+import { polyline } from '#core/canvas/overlays/paths'
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import { editedGradient, editedGradientLayout } from '#core/editor/gradient-edit'
 import type { GradientEdit } from '#core/editor/types'
@@ -15,15 +16,6 @@ const STOP_BORDER = { r: 0xd0 / 255, g: 0xd0 / 255, b: 0xd0 / 255 }
 const SHADOW_ALPHA = 0.35
 const SHADOW_BLUR = 1
 const POINTER_HALF_WIDTH = 3
-
-function polyline(r: SkiaRenderer, points: readonly Vector[], close: boolean) {
-  const path = new r.ck.PathBuilder()
-  points.forEach((point, index) =>
-    index === 0 ? path.moveTo(point.x, point.y) : path.lineTo(point.x, point.y)
-  )
-  if (close) path.close()
-  return path.detachAndDelete()
-}
 
 /** The angular gradient's ellipse: a unit circle mapped onto its two axes. */
 function ellipsePath(r: SkiaRenderer, ellipse: NonNullable<GradientHandleLayout['ellipse']>) {

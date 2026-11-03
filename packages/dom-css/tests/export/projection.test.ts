@@ -47,6 +47,20 @@ describe('DOM projection', () => {
     const root = element(sceneNodeToDesignDocument(graph, column.id).children[0])
     expect(root.inlineStyle?.['align-items']).toBe('flex-start')
   })
+
+  test('space around keeps its gap, which flexbox adds to the share of free space', () => {
+    const graph = new SceneGraph()
+    const page = graph.getPages()[0]
+    const row = graph.createNode('FRAME', page.id, {
+      name: 'Row',
+      layoutMode: 'HORIZONTAL',
+      primaryAxisAlign: 'SPACE_AROUND',
+      itemSpacing: 8
+    })
+
+    const root = element(sceneNodeToDesignDocument(graph, row.id).children[0])
+    expect(root.inlineStyle).toMatchObject({ 'justify-content': 'space-around', gap: '8px' })
+  })
 })
 
 describe('DOM projection sizes', () => {

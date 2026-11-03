@@ -29,6 +29,12 @@ Eine Auswahl zeigt acht Griffe: vier an den Ecken und vier in der Mitte der Kant
 
 Mit <kbd>Shift</kbd> beim Ziehen eines Eckgriffs bleiben die Proportionen erhalten.
 
+## Skalierwerkzeug
+
+Drücken Sie <kbd>K</kbd> oder wählen Sie **Skalieren** im Menü des Werkzeugs „Verschieben“, um Ebenen mit ihrem gesamten Inhalt zu skalieren: Schriftgrößen, Konturen, Effekte, Eckenradien und Abstände der automatischen Anordnung wachsen und schrumpfen mit. Ziehen Sie einen Auswahlgriff, um von der gegenüberliegenden Seite aus zu skalieren, oder halten Sie <kbd>Option</kbd>/<kbd>Alt</kbd> gedrückt, um von der Mitte aus zu skalieren; mehrere ausgewählte Ebenen skalieren gemeinsam um ihren gemeinsamen Rahmen.
+
+Solange das Skalierwerkzeug aktiv ist, zeigt das Design-Panel Breite und Höhe der Auswahl, einen Skalierungsfaktor und ein Ankerraster. Eine eingegebene Breite oder Höhe skaliert die Auswahl proportional darauf; der Faktor nimmt `2`, `2x` oder `200%` an. Das Ankerraster legt fest, welcher Punkt an seinem Platz bleibt. Jede Skalierung ist ein Rückgängig-Schritt.
+
 ## Drehen
 
 Bewegen Sie den Mauszeiger knapp außerhalb eines Eckgriffs, bis der Drehcursor erscheint, und ziehen Sie anschließend. Mit <kbd>Shift</kbd> rastet die Drehung in Schritten von 15° ein.

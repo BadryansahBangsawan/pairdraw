@@ -49,7 +49,12 @@ export const requestImageLinksSchema = v.object({
 })
 export type RequestImageLinksInput = v.InferOutput<typeof requestImageLinksSchema>
 
-export const documentPermissionSchema = v.picklist(['view', 'edit'])
+/**
+ * What someone may do with a document: look at it, look at it and comment, or edit it. Commenters
+ * join its room read-only and send comments through the relay's comment channel.
+ */
+export const DOCUMENT_PERMISSIONS = ['view', 'comment', 'edit'] as const
+export const documentPermissionSchema = v.picklist(DOCUMENT_PERMISSIONS)
 export type DocumentPermission = v.InferOutput<typeof documentPermissionSchema>
 
 export const documentAccessSourceSchema = v.picklist(['owner', 'workspace', 'direct-grant'])
@@ -58,7 +63,12 @@ export type DocumentAccessSource = v.InferOutput<typeof documentAccessSourceSche
 export const documentAccessSchema = v.object({
   permission: documentPermissionSchema,
   canManageSharing: v.boolean(),
-  sources: v.array(documentAccessSourceSchema)
+  sources: v.array(documentAccessSourceSchema),
+  /**
+   * The revision the document holds now, null before its first save; servers from before snapshot
+   * links leave it out.
+   */
+  currentRevisionId: v.optional(v.nullable(v.pipe(v.string(), v.uuid())))
 })
 export type DocumentAccess = v.InferOutput<typeof documentAccessSchema>
 

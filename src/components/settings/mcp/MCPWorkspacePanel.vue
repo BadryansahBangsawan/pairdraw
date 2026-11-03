@@ -11,6 +11,7 @@ import { isTauri } from '@/app/tauri/env'
 import ToolAccessSettingsPanel from '@/components/settings/tool-access/ToolAccessSettingsPanel.vue'
 import PanelDrillIn from '@/components/ui/panel/PanelDrillIn.vue'
 
+import MCPClientsSettings from './MCPClientsSettings.vue'
 import MCPConnectionsSection from './MCPConnectionsSection.vue'
 import MCPSettingsPanel from './MCPSettingsPanel.vue'
 import WebMCPSettingsPanel from './WebMCPSettingsPanel.vue'
@@ -40,6 +41,8 @@ onUnmounted(() => {
     <div class="flex min-h-0 min-w-0 flex-1 flex-col" data-test-id="settings-mcp-panel">
       <MCPConnectionsSection>
         <MCPSettingsPanel />
+        <!-- Other apps' config files are reachable only from the desktop shell. -->
+        <MCPClientsSettings v-if="isTauri()" />
         <!-- WebMCP serves agents built into a browser; the desktop webview has neither the API nor an agent. -->
         <WebMCPSettingsPanel v-if="!isTauri()" v-model="webmcpMode" :state="webmcpRuntime" />
       </MCPConnectionsSection>

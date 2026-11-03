@@ -5,6 +5,7 @@ import type { UIMessage } from 'ai'
 import { ref, shallowRef } from 'vue'
 
 import { SceneGraph } from '@open-pencil/scene-graph'
+import { withAgentNotes } from '@open-pencil/scene-graph/agent-notes'
 
 import { AgentSetupError } from '@/app/ai/agents/setup/readiness'
 import { attachmentsForMessage } from '@/app/ai/attachment/presentation/store'
@@ -28,6 +29,14 @@ const messages = ref({
     'pi-model': 'Pi model'
   }
 })
+
+/** A document with one empty page and nothing selected, which a message reads as it is sent. */
+function documentDouble(graph = new SceneGraph()): EditorStore {
+  return asDouble<EditorStore>({
+    graph,
+    state: { currentPageId: graph.getPages()[0].id, selectedIds: new Set<string>() }
+  })
+}
 
 function submission(
   ensureChat: () => Promise<Chat<UIMessage> | null>,
@@ -124,10 +133,7 @@ describe('text files attached to a message', () => {
   test('the model reads the files, and the transcript lists them beside the text', async () => {
     const target = fakeChat()
     const texts = sentTexts(target)
-    const { chat } = submission(
-      async () => target,
-      asDouble<EditorStore>({ graph: new SceneGraph() })
-    )
+    const { chat } = submission(async () => target, documentDouble())
     expect(await chat.submit({ ...message, files: [tokens] })).toBe(true)
 
     expect(texts).toHaveLength(1)
@@ -144,10 +150,7 @@ describe('text files attached to a message', () => {
   test('an edited message is sent again with the files it had', async () => {
     const target = fakeChat()
     const texts = sentTexts(target)
-    const { chat } = submission(
-      async () => target,
-      asDouble<EditorStore>({ graph: new SceneGraph() })
-    )
+    const { chat } = submission(async () => target, documentDouble())
     await chat.submit({ ...message, files: [tokens] })
     const sent = target.messages.at(-1)
     if (!sent) throw new Error('Missing sent message')
@@ -159,6 +162,81 @@ describe('text files attached to a message', () => {
     expect(attachmentsForMessage(sent.id).value.map((attachment) => attachment.name)).toEqual([
       'tokens.css'
     ])
+  })
+})
+
+describe('canvas notes a message carries', () => {
+  const tokens = {
+    name: 'tokens.css',
+    mediaType: 'text/css',
+    text: ':root { --x: 1px; }',
+    size: 19
+  }
+  const explore = { kind: 'variants', count: 3, axis: 'layout' } as const
+
+  /** A page with one layer noted for agents, and a way to change its note. */
+  function notedDocument(context: string) {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const node = graph.createNode('FRAME', pageId, { name: 'Pay', width: 200, height: 60 })
+    const note = (text: string) =>
+      graph.updateNode(node.id, { pluginData: withAgentNotes(node, { context: text }) })
+    note(context)
+    return { editor: documentDouble(graph), note }
+  }
+
+  /** A chat that keeps each text it is sent, as a user message the next request reads. */
+  function recordingChat() {
+    const target = fakeChat()
+    const texts: string[] = []
+    target.sendMessage = async (message) => {
+      if (!message || !('text' in message) || typeof message.text !== 'string') return
+      texts.push(message.text)
+      if (message.messageId) return
+      const sent: UIMessage = {
+        id: `sent-${texts.length}`,
+        role: 'user',
+        parts: [{ type: 'text', text: message.text }]
+      }
+      target.messages = [...target.messages, sent]
+    }
+    return { target, texts }
+  }
+
+  const count = (text: string | undefined, part: string) => (text ?? '').split(part).length - 1
+
+  test('an edited message keeps its explore note and files, and reads the notes again', async () => {
+    const { editor, note } = notedDocument('Opens the receipt dialog')
+    const { target, texts } = recordingChat()
+    const { chat } = submission(async () => target, editor)
+    expect(await chat.submit({ ...message, explore, files: [tokens] })).toBe(true)
+    const sent = target.messages.at(-1)
+    if (!sent) throw new Error('Missing sent message')
+
+    note('Opens the payment sheet')
+    await chat.resend(sent.id, 'Draw a pricing card')
+    expect(texts).toHaveLength(2)
+    const edited = texts[1]
+    expect(stripModelNotes(edited ?? '')).toBe('Draw a pricing card')
+    expect(count(edited, '<explore ')).toBe(1)
+    expect(count(edited, ':root { --x: 1px; }')).toBe(1)
+    expect(edited).toContain('Opens the payment sheet')
+    expect(edited).not.toContain('Opens the receipt dialog')
+  })
+
+  test('a later message leaves out notes the model already read, until they change', async () => {
+    const { editor, note } = notedDocument('x'.repeat(3000))
+    const { target, texts } = recordingChat()
+    const { chat } = submission(async () => target, editor)
+    await chat.submit(message)
+    await chat.submit({ ...message, modelText: 'Again', displayText: 'Again' })
+    note('Opens the payment sheet')
+    await chat.submit({ ...message, modelText: 'Once more', displayText: 'Once more' })
+
+    expect(texts).toHaveLength(3)
+    expect(count(texts[0], '<layer-note ')).toBe(1)
+    expect(texts[1]).toBe('Again')
+    expect(texts[2]).toContain('Opens the payment sheet')
   })
 })
 

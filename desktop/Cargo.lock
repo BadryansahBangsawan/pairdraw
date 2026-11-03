@@ -3339,6 +3339,7 @@ dependencies = [
  "tauri-plugin-updater",
  "tauri-plugin-wdio-webdriver",
  "tokio",
+ "toml 1.1.4+spec-1.1.0",
  "url",
  "which",
  "write-fonts",

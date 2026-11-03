@@ -311,6 +311,32 @@ describe('parsePenFile — space around', () => {
     ])
     // 210 of free space: 70 per child, 35 on each side of each.
     expect(['a', 'b', 'c'].map((id) => graph.getNode(id)?.x)).toEqual([35, 135, 235])
+    // Read as auto layout's own space around, leaving the gap and padding as authored.
+    expect(graph.getNode('row')).toMatchObject({
+      primaryAxisAlign: 'SPACE_AROUND',
+      itemSpacing: 0,
+      paddingLeft: 0,
+      paddingRight: 0
+    })
+  })
+
+  test('spreads the children of an instance resized wider than its component', () => {
+    const graph = parseLayoutDocument([
+      {
+        id: 'bar',
+        type: 'frame',
+        reusable: true,
+        layout: 'horizontal',
+        justifyContent: 'space_around',
+        width: 100,
+        height: 20,
+        children: ['a', 'b'].map((id) => ({ id, type: 'rectangle', width: 10, height: 10 }))
+      },
+      { id: 'wide', type: 'ref', ref: 'bar', width: 200, height: 20 }
+    ])
+    // 180 of free space: 90 per child, 45 on each side of each.
+    const copies = graph.getChildren('wide')
+    expect(copies.map((copy) => copy.x)).toEqual([45, 145])
   })
 })
 

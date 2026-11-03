@@ -1,5 +1,5 @@
 export { setEffects } from './modify/effects'
-export { setMinMax, setOpacity, setRadius, setRotation } from './modify/geometry'
+export { rescale, setMinMax, setOpacity, setRadius, setRotation } from './modify/geometry'
 export { setConstraints, setLayout, setLayoutChild } from './modify/layout'
 export { replaceMatchingProperties } from './modify/matching'
 export { setFill, setImageFill, setStroke } from './modify/paint'

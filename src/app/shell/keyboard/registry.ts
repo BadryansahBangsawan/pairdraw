@@ -4,6 +4,7 @@ import { createKeybindingsHandler } from 'tinykeys'
 import type { KeyBindingMap } from 'tinykeys'
 
 import { BOARD_TOOL_SHORTCUTS, resolveEditorProfile } from '@open-pencil/core'
+import { animateViewport } from '@open-pencil/vue/canvas'
 import { isCanvasTextInput } from '@open-pencil/vue/canvas/text-edit'
 import { editorCommandMetadata, type EditorCommandId } from '@open-pencil/vue/editor/commands'
 
@@ -11,7 +12,10 @@ import { CHAT_COLUMN_SHORTCUT } from '@/app/ai/chat/panel'
 import { isCloudBinding, openVersionDialog } from '@/app/cloud/integration'
 import { useComments } from '@/app/comments/use'
 import { COPY_AS_PNG_SHORTCUT } from '@/app/editor/canvas/menu/registry'
-import { pasteClipboardToReplace } from '@/app/editor/clipboard/paste/replace'
+import {
+  pasteClipboardToReplace,
+  pasteClipboardToReplaceInInstance
+} from '@/app/editor/clipboard/paste/replace'
 import { copySelectionAsPNG } from '@/app/editor/clipboard/png'
 import {
   copySelectionProperties,
@@ -31,7 +35,9 @@ import type {
   KeyboardShortcutOptions,
   KeyboardShortcutRunOptions
 } from '@/app/shell/keyboard/types'
+import { bindZoomToolKey } from '@/app/shell/keyboard/zoom-tool'
 import { appMenuTinykeysShortcut, shortcutTokenToTinykeys } from '@/app/shell/menu/shortcut'
+import { togglePresentation } from '@/app/slides/present'
 import { showsDocument } from '@/app/tabs'
 
 type ShortcutAction = (options: KeyboardShortcutRunOptions) => void
@@ -113,6 +119,12 @@ function browserMenuShortcuts(): ShortcutDefinition[] {
       run: ({ store }) => void pasteClipboardToReplace(store)
     },
     {
+      // pen.dev's key for Replace inside instance.
+      id: 'replace-in-instance',
+      keys: appMenuTinykeysShortcut('replace-in-instance') ?? 'Shift+Alt+KeyR',
+      run: ({ store }) => void pasteClipboardToReplaceInInstance(store)
+    },
+    {
       id: 'copy-as-png',
       keys: shortcutTokenToTinykeys(COPY_AS_PNG_SHORTCUT) ?? '$mod+Shift+KeyC',
       run: ({ store }) => copySelectionAsPNG(store)
@@ -131,10 +143,20 @@ function browserMenuShortcuts(): ShortcutDefinition[] {
   ]
 }
 
+/** ⌘↩ presents the page's slides, and leaves the presentation again. */
+function presentationShortcut(): ShortcutDefinition {
+  return {
+    id: 'present',
+    keys: appMenuTinykeysShortcut('present') ?? '$mod+Enter',
+    run: ({ store }) => togglePresentation(store),
+    view: true
+  }
+}
+
 function zoomAtViewportCenter(delta: number): ShortcutAction {
   return ({ store }) => {
     const center = store.viewportCanvasCenter()
-    store.applyZoom(delta, center.x, center.y)
+    animateViewport(store, () => store.applyZoom(delta, center.x, center.y))
   }
 }
 
@@ -252,6 +274,8 @@ function bindToolShortcuts(bindings: KeyBindingMap, options: KeyboardShortcutRun
 
 export function registerKeyboardShortcuts(options: KeyboardShortcutOptions) {
   const spaceTool = bindSpaceHandTool(options.inputFocused, options.store)
+  // Before the shortcut handler, which picks the zoom tool, so it sees the tool Z replaces.
+  bindZoomToolKey(options.inputFocused, options.store)
   const runOptions = (event: KeyboardEvent): KeyboardShortcutRunOptions => ({
     ...options,
     keyEvent: event,
@@ -308,6 +332,7 @@ export function registerKeyboardShortcuts(options: KeyboardShortcutOptions) {
       run: ({ actions }) => actions.togglePlay(),
       view: true
     },
+    presentationShortcut(),
     {
       id: 'toggle-rulers',
       keys: 'Shift+KeyR',

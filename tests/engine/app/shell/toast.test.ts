@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from 'bun:test'
+import { beforeEach, describe, expect, test } from 'bun:test'
 
 import { toast, toastDuration } from '@/app/shell/ui'
 
@@ -8,7 +8,8 @@ function entryAt(index = 0) {
   return entry
 }
 
-afterEach(() => {
+// Toasts are app-wide; one left by an earlier file in the same process would take index 0.
+beforeEach(() => {
   for (const entry of toast.toasts.value) toast.remove(entry.id)
 })
 

@@ -31,6 +31,10 @@ export type CanvasContextActionMeta = {
 
 export const CANVAS_COPY_AS_GROUP_TEST_ID = 'context-copy-paste-as' satisfies TestId
 export const CANVAS_VECTORIZE_TEST_ID = 'context-vectorize' satisfies TestId
+export const CANVAS_IMAGE_AI_TEST_ID = 'context-image-ai' satisfies TestId
+export const CANVAS_REMOVE_BACKGROUND_TEST_ID = 'context-remove-background' satisfies TestId
+export const CANVAS_REPLACE_BACKGROUND_TEST_ID = 'context-replace-background' satisfies TestId
+export const CANVAS_GENERATE_IMAGE_FILL_TEST_ID = 'context-generate-image-fill' satisfies TestId
 export const CANVAS_RUN_STICKY_PROMPT_TEST_ID = 'context-run-sticky-prompt' satisfies TestId
 export const COPY_AS_PNG_SHORTCUT = 'MOD+SHIFT+C'
 

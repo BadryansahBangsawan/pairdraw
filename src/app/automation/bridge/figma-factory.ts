@@ -1,12 +1,17 @@
 import { FigmaAPI, MAX_IMAGE_FETCH_BYTES } from '@open-pencil/core/figma-api'
 import { createCanvasKitRasterCodec } from '@open-pencil/core/io/formats/raster'
-import { registerHTMLToolHost, type HTMLToolHost } from '@open-pencil/core/tools'
+import {
+  registerHTMLToolHost,
+  registerImageAIService,
+  type HTMLToolHost
+} from '@open-pencil/core/tools'
 
 import { renderAutomationImage } from '@/app/automation/bridge/export-handlers'
 import { styleHTMLInBrowser } from '@/app/code/html-styler'
 import { loadTailwindStylesheet } from '@/app/document/export/html'
 import type { EditorStore } from '@/app/editor/active-store'
 import { listFamilies, listFonts } from '@/app/editor/fonts'
+import { bindAgentImageAIService } from '@/app/editor/image-ai/agent'
 import { bindAgentImageVectorizer } from '@/app/editor/vectorize/agent'
 import { createTauriFetch } from '@/app/tauri/http'
 import { IS_TAURI } from '@/constants'
@@ -30,6 +35,8 @@ export function makeFigmaFromStore(
   const api = new FigmaAPI(store.graph, { fetch: imageFetch })
   // `vectorize_image` runs on the service and key set up in Settings, which stay in the app.
   bindAgentImageVectorizer(store)
+  // The image AI tools run on the image services and keys set up in Settings, as vectorizing does.
+  bindAgentImageAIService(store, registerImageAIService)
   registerHTMLToolHost(store.graph, htmlToolHost)
   api.setRenderer(store.renderer ?? null)
   api.icons = store.iconProvider

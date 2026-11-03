@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach, jest } from 'bun:test'
+import { describe, expect, test, beforeEach, jest, spyOn } from 'bun:test'
 
 import type { RequestPermissionRequest, RequestPermissionResponse } from '@agentclientprotocol/sdk'
 
@@ -163,6 +163,78 @@ describe('acp-permission', () => {
       respondToPermission('allow')
       jest.advanceTimersByTime(AGENT_INPUT_NOTIFY_DELAY_MS)
       expect(unanswered).toBe(1)
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  test('an aborted signal rejects the waiting request and takes it from the dialog', async () => {
+    const controller = new AbortController()
+    const promise = requestPermissionFromUser(makeRequest(), undefined, {
+      signal: controller.signal
+    })
+    expect(permissionQueue.value).toHaveLength(1)
+    controller.abort()
+    expect(selectedOptionId(await promise)).toBe('reject')
+    expect(permissionQueue.value).toHaveLength(0)
+  })
+
+  test('a request asked with an aborted signal never reaches the dialog', async () => {
+    const controller = new AbortController()
+    controller.abort()
+    const promise = requestPermissionFromUser(makeRequest(), undefined, {
+      signal: controller.signal
+    })
+    expect(permissionQueue.value).toHaveLength(0)
+    expect(selectedOptionId(await promise)).toBe('reject')
+  })
+
+  test('the app’s own request carries its wording for the dialog', () => {
+    void requestPermissionFromUser(makeRequest(), undefined, { description: 'Run set_fill?' })
+    expect(currentPermission.value?.description).toBe('Run set_fill?')
+    respondToPermission('allow')
+  })
+
+  test('a request stops listening to a shared signal however it ends', async () => {
+    jest.useFakeTimers()
+    const controller = new AbortController()
+    const removed = spyOn(controller.signal, 'removeEventListener')
+    try {
+      const answered = requestPermissionFromUser(makeRequest(), undefined, {
+        signal: controller.signal
+      })
+      respondToPermission('allow')
+      await answered
+      expect(removed).toHaveBeenCalledTimes(1)
+
+      const timedOut = requestPermissionFromUser(makeRequest(), undefined, {
+        signal: controller.signal,
+        timeoutMs: 1_000
+      })
+      jest.advanceTimersByTime(1_000)
+      await timedOut
+      expect(removed).toHaveBeenCalledTimes(2)
+    } finally {
+      removed.mockRestore()
+      jest.useRealTimers()
+    }
+  })
+
+  test('a request can wait longer than an agent’s and says when nobody answered', async () => {
+    jest.useFakeTimers()
+    try {
+      let timedOut = false
+      const promise = requestPermissionFromUser(makeRequest(), undefined, {
+        timeoutMs: 120_000,
+        onTimeout: () => {
+          timedOut = true
+        }
+      })
+      jest.advanceTimersByTime(60_000)
+      expect(permissionQueue.value).toHaveLength(1)
+      jest.advanceTimersByTime(60_000)
+      expect(selectedOptionId(await promise)).toBe('reject')
+      expect(timedOut).toBe(true)
     } finally {
       jest.useRealTimers()
     }

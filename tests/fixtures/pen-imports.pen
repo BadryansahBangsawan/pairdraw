@@ -1,0 +1,40 @@
+{
+  "version": "2.21",
+  "imports": { "ui": "./library/ui.lib.pen" },
+  "children": [
+    {
+      "type": "frame",
+      "id": "screen",
+      "name": "Screen",
+      "x": 0,
+      "y": 0,
+      "width": 800,
+      "height": 300,
+      "fill": "#FFFFFF",
+      "layout": "none",
+      "children": [
+        { "type": "ref", "id": "cta", "ref": "ui:button", "x": 24, "y": 24 },
+        {
+          "type": "script",
+          "id": "chart",
+          "x": 240,
+          "y": 24,
+          "width": 240,
+          "height": 160,
+          "scriptUri": "./scripts/chart.js",
+          "inputs": { "bars": 5 }
+        },
+        {
+          "type": "browser",
+          "id": "site",
+          "x": 520,
+          "y": 24,
+          "width": 240,
+          "height": 240,
+          "cornerRadius": 12,
+          "url": "https://example.com"
+        }
+      ]
+    }
+  ]
+}

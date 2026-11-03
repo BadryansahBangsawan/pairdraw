@@ -555,4 +555,16 @@ test.describe('@open-pencil/dom-css browser CSS runtime oracle', () => {
     expect(card.itemSpacing).toBe(12)
     expect(card.paddingLeft).toBe(24)
   })
+
+  test('styles imported HTML without running its event handlers', async ({ page }) => {
+    const card = await publicBrowserHTMLSceneGraph(
+      page,
+      '<div style="display: flex; width: 120px; height: 40px" onclick="window.__domCssRan = true"><img src="data:,x" onerror="window.__domCssRan = true"></div>'
+    )
+
+    expect(card).toMatchObject({ type: 'FRAME', width: 120, height: 40 })
+    // A broken image fires its error within a frame; give a handler time to run if it could.
+    await page.waitForTimeout(300)
+    expect(await page.evaluate(() => Reflect.get(window, '__domCssRan'))).toBeUndefined()
+  })
 })

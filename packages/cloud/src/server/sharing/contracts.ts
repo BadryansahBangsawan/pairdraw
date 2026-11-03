@@ -21,6 +21,7 @@ export function shareContract(row: {
   expiresAt: Date | string | null
   revokedAt: Date | string | null
   lastUsedAt: Date | string | null
+  revisionId: string | null
 }): DocumentShare {
   // Rows carry the secret's hash; responses name each field so it never goes out.
   return {
@@ -33,7 +34,8 @@ export function shareContract(row: {
     updatedAt: dateString(row.updatedAt) ?? '',
     expiresAt: dateString(row.expiresAt),
     revokedAt: dateString(row.revokedAt),
-    lastUsedAt: dateString(row.lastUsedAt)
+    lastUsedAt: dateString(row.lastUsedAt),
+    revisionId: row.revisionId
   }
 }
 

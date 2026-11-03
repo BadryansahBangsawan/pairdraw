@@ -95,6 +95,25 @@ Variables and styles move between OpenPencil, Figma, and code as [W3C design tok
 - **Choose where it goes:** before anything changes, the dialog shows each collection and mode it found and where it goes: a new collection or mode, an existing one, or nowhere. Variables and styles with the same name are updated and the rest is added; nothing is deleted. It counts what will be added, updated, and skipped, and lists why each skipped token was left out
 - The import is one step: **Undo** takes it all back
 
+## Syncing With a Stylesheet
+
+Custom properties in a CSS file become variables, and variables go back into it. Click the **Sync with CSS** button in the variables toolbar:
+
+- **Import CSS variables…** reads a `.css` file. `:root`, `html` and Tailwind's `@theme` hold each collection's default values; `[data-theme="dark"]`, a class such as `.dark`, and `:root` blocks inside `@media`, `@supports` or `@container` become modes with that condition. Colors, lengths in `px` or `rem`, durations, numbers, quoted text and font lists become variables, `var(--name)` becomes an alias, and `calc()` or `clamp()` keeps its CSS as a CSS expression. The same import dialog shows where each collection and mode goes before anything changes
+- **Pull from** reads the linked file again and shows what changed. A stylesheet exported from the document maps back onto the same variables and modes
+- **Push to** writes the variables into the linked file in place: changed values are rewritten in their own notation, missing ones are added to their block, and comments, other rules and properties without a variable stay as they are. Nothing is removed. Where the browser cannot write the file, a copy is saved instead
+- **Pull when the file changes** imports every save of the linked file, on desktop and in browsers that grant file access, as one undo step each
+
+## Pasting Between Documents
+
+Layers copied in one open document and pasted into another can bring the variables and styles they use. Before anything is pasted, a dialog asks how:
+
+- **Yes, import** — adds the variables and styles, so the pasted layers stay linked to them
+- **Paste as is** — pastes the layers with the values they showed, linked to no variable or style
+- **Use existing** or **Add renamed** — when this document already has a collection or style with the same name, choose per row: use the one here, where variables match by name and missing ones are added to it, or add the copy under a new name such as "Spacing 2"
+
+The paste is one step: **Undo** removes the layers and everything it added. **Paste properties** uses same-named collections and styles the same way.
+
 ## Binding Variables to Fills
 
 In the Fill section of the properties panel, use the variable picker to bind a color variable to a node's fill.

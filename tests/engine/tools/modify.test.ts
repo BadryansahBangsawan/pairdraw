@@ -257,7 +257,8 @@ describe('set_font_range', () => {
       error: expect.stringContaining('Range outside of available characters')
     })
     expect(await runTool(figma, 'set_font_range', { id, start: 2, end: 2 })).toEqual({
-      error: 'set_font_range needs at least one of family, size, style, variations, or color'
+      error:
+        'set_font_range needs at least one of family, size, style, variations, color, or hyperlink'
     })
     expect(getNodeOrThrow(graph, id).styleRuns).toEqual([])
   })

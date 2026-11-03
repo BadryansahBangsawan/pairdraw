@@ -22,7 +22,7 @@ graph TB
                 Kiwi --- SVG[SVG export]
             end
         end
-        MCP["MCP Server (90 tools, stdio+HTTP)"]
+        MCP["MCP Server (138 tools, stdio+HTTP)"]
         Collab["P2P Collab (Trystero + Yjs)"]
     end
 ```
@@ -113,7 +113,7 @@ When the desktop app is running, CLI commands connect to it via WebSocket instea
 
 ### Full figma-use Tool Set
 
-The MCP server currently exposes 90 tools. The reference implementation in [figma-use](https://github.com/dannote/figma-use) has 118. The remaining tools cover advanced layout constraints, prototype connections, advanced component property editing, and bulk document operations.
+The MCP server currently exposes 138 tools; the reference implementation in [figma-use](https://github.com/dannote/figma-use) has 118. Tools figma-use has and OpenPencil lacks cover advanced layout constraints, prototype connections, advanced component property editing, and bulk document operations.
 
 ### CI Design Tooling
 

@@ -3,12 +3,18 @@ import { computed, type Ref } from 'vue'
 import type { Editor } from '@open-pencil/core'
 import { formatShortcut } from '@open-pencil/vue/editor/commands'
 import type { MenuEntry } from '@open-pencil/vue/editor/menu-model'
+import { useMediaMessages } from '@open-pencil/vue/i18n'
 
 import type { createCanvasMenuActions } from '@/app/editor/canvas/menu/actions'
+import { textLinkMenuEntries, type TextLinkMenuLabels } from '@/app/editor/canvas/menu/links'
 import {
   CANVAS_COPY_AS_ACTIONS,
   CANVAS_COPY_AS_GROUP_TEST_ID,
+  CANVAS_GENERATE_IMAGE_FILL_TEST_ID,
+  CANVAS_IMAGE_AI_TEST_ID,
   CANVAS_PROPERTIES_ACTIONS,
+  CANVAS_REMOVE_BACKGROUND_TEST_ID,
+  CANVAS_REPLACE_BACKGROUND_TEST_ID,
   CANVAS_RUN_STICKY_PROMPT_TEST_ID,
   CANVAS_VECTORIZE_TEST_ID,
   type CanvasContextActionId,
@@ -82,6 +88,35 @@ function copyAction(
   }
 }
 
+type ImageAILabels = ReturnType<typeof useMediaMessages>['value']
+
+/** The AI image submenu for one selected layer: its background, or a generated fill. */
+function imageAIEntry(actions: CanvasMenuActions, labels: ImageAILabels): MenuEntry | null {
+  const sub: MenuEntry[] = []
+  if (actions.canEditImageBackground()) {
+    sub.push(
+      {
+        label: labels.removeBackground,
+        testId: CANVAS_REMOVE_BACKGROUND_TEST_ID,
+        action: runAsync(actions.removeImageBackground)
+      },
+      {
+        label: labels.replaceBackground,
+        testId: CANVAS_REPLACE_BACKGROUND_TEST_ID,
+        action: actions.replaceImageBackground
+      }
+    )
+  }
+  if (actions.canGenerateImageFill()) {
+    sub.push({
+      label: labels.generateImageFill,
+      testId: CANVAS_GENERATE_IMAGE_FILL_TEST_ID,
+      action: actions.generateImageFill
+    })
+  }
+  return sub.length ? { label: labels.aiImage, testId: CANVAS_IMAGE_AI_TEST_ID, sub } : null
+}
+
 function copyPasteAsEntry(
   editor: Editor,
   actions: CanvasMenuActions,
@@ -109,11 +144,14 @@ export function useCanvasContextMenu(
   hasSelection: Ref<boolean>,
   editor: Editor,
   actions: CanvasMenuActions,
-  labels: Ref<CanvasCopyLabels>
+  labels: Ref<CanvasCopyLabels>,
+  linkLabels: Ref<TextLinkMenuLabels>
 ) {
+  const media = useMediaMessages()
   return computed<MenuEntry[]>(() => {
     const entries = withoutStaticSelectionCommands(baseEntries.value)
     if (!hasSelection.value) return entries
+    entries.push(...textLinkMenuEntries(editor, linkLabels.value))
     if (actions.canVectorizeImage()) {
       entries.push(
         { separator: true },
@@ -124,6 +162,8 @@ export function useCanvasContextMenu(
         }
       )
     }
+    const imageAI = imageAIEntry(actions, media.value)
+    if (imageAI) entries.push({ separator: true }, imageAI)
     if (actions.canRunStickyPrompt()) {
       entries.push(
         { separator: true },

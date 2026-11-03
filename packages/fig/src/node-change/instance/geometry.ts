@@ -2,7 +2,7 @@ import type { DerivedSymbolOverride } from '#fig/instance-overrides/types'
 
 import type { GUID } from '@open-pencil/kiwi/fig'
 import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { findInstanceAncestor } from '@open-pencil/scene-graph/instances'
+import { findInstanceAncestor, showsReplacedLayer } from '@open-pencil/scene-graph/instances'
 import { copiedComponentLayerId } from '@open-pencil/scene-graph/instances/overrides'
 import { ownsSlotContent } from '@open-pencil/scene-graph/slots'
 
@@ -47,7 +47,7 @@ function sourceOf(scope: SceneNode, node: SceneNode): string | null {
  * A source that itself sits inside an instance (a nested instance's child as seen from the
  * enclosing component) resolves through its own correspondence until it leaves every instance.
  */
-function definitionSource(graph: SceneGraph, id: string | null): string | undefined {
+export function definitionSource(graph: SceneGraph, id: string | null): string | undefined {
   const seen = new Set<string>()
   let current = id ? graph.getNode(id) : undefined
   while (current) {
@@ -83,6 +83,9 @@ export function snapshotInstanceGeometry(
   const visited = new Set<string>()
   const visit = (node: SceneNode): void => {
     for (const child of graph.getChildren(node.id)) {
+      // A replaced layer copies no component layer; it is written as plugin data instead. A copy
+      // of one, in an instance of the component that holds it, has no address either.
+      if (showsReplacedLayer(graph, child)) continue
       const path = instanceExportAddress(graph, owner, child, resolveGuid)
       if (!path)
         throw new Error(`Missing instance geometry address for ${child.id} under ${owner.id}`)

@@ -14,6 +14,11 @@ import {
   type DocumentVersionService
 } from '#cloud/server/documents/versions'
 import type { EntitlementService } from '#cloud/server/policy'
+import {
+  createPublicProfileRoutes,
+  createPublicProfileSettingsRoutes,
+  type PublicProfileService
+} from '#cloud/server/profiles'
 import type { DocumentSharingService } from '#cloud/server/sharing'
 import {
   createDocumentSharingRoutes,
@@ -38,20 +43,27 @@ export type CloudAPIServices = {
   aiTokens?: AITokenService
   workspaces: WorkspaceService
   workspaceMembers: WorkspaceMemberService
+  /** Public profiles; without it the deployment serves none. */
+  profiles?: PublicProfileService
 }
 
 export function createPublicCloudAPIRouter(services: CloudAPIServices) {
-  return new Hono<CloudAPIEnvironment>()
-    .route('/', createPublicSharingRoutes(services.sharing, services.resolveSession))
-    .route(
-      '/',
-      createPublicDocumentRoutes(services.sharing, services.documents, services.resolveSession)
-    )
-    .route('/', createPublicCollaborationRoutes(services.collaboration, services.resolveSession))
+  return (
+    new Hono<CloudAPIEnvironment>()
+      // Profiles and the documents they list, under `/api/public`, which the public budget covers.
+      .route('/public', createPublicProfileRoutes(services.profiles, services.documents))
+      .route('/', createPublicSharingRoutes(services.sharing, services.resolveSession))
+      .route(
+        '/',
+        createPublicDocumentRoutes(services.sharing, services.documents, services.resolveSession)
+      )
+      .route('/', createPublicCollaborationRoutes(services.collaboration, services.resolveSession))
+  )
 }
 
 export function createCloudAPIRouter(services: CloudAPIServices) {
   return new Hono<CloudAPIEnvironment>()
+    .route('/', createPublicProfileSettingsRoutes(services.profiles))
     .route('/public', createPublicCloudAPIRouter(services))
     .get('/workspaces/:workspaceId/entitlements', async (context) => {
       if (!services.entitlements)

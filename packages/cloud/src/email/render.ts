@@ -30,8 +30,14 @@ async function rendered(
   return { subject, html, text }
 }
 
+const DOCUMENT_PERMISSION_LABELS = {
+  edit: 'edit',
+  comment: 'view and comment on',
+  view: 'view'
+} as const
+
 async function renderDocumentInvitation(payload: DocumentInvitationEmailPayload) {
-  const permissionLabel = payload.permission === 'edit' ? 'edit' : 'view'
+  const permissionLabel = DOCUMENT_PERMISSION_LABELS[payload.permission]
   return rendered(
     DocumentInvitationEmail,
     {

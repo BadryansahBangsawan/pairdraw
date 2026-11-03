@@ -20,7 +20,7 @@ export type PersistStorageCanvasOptions = StorageLocation & {
 }
 
 /** The preview a `.fig` carries, read in place. */
-function figThumbnail(figBytes: Uint8Array): Promise<Uint8Array | null> {
+export function figThumbnail(figBytes: Uint8Array): Promise<Uint8Array | null> {
   return extractFigThumbnailFromReader({
     size: figBytes.byteLength,
     async read(start, endExclusive) {

@@ -41,6 +41,7 @@ Controls how children are distributed along the layout direction:
 - **Center** — children are centered
 - **End** — children pack to the end
 - **Space between** — children spread with equal space between them
+- **Space around** — each child gets an equal share of the free space, half on each side, on top of the gap; choose it from the gap field's menu
 
 ### Align (cross axis)
 

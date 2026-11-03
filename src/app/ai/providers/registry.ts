@@ -4,6 +4,7 @@ import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 
 import type { AIProviderID } from '@open-pencil/core/constants'
 
+import { bedrockAdapter } from '@/app/ai/providers/bedrock/adapter'
 import { chatGPTAdapter } from '@/app/ai/providers/chatgpt/adapter'
 import {
   createAnthropicCompatibleAdapter,
@@ -15,6 +16,7 @@ import {
   OPENCODE_ZEN_BASE_URL
 } from '@/app/ai/providers/opencode'
 import type { ModelProviderAdapter } from '@/app/ai/providers/types'
+import { vertexAdapter } from '@/app/ai/providers/vertex/adapter'
 
 type DirectProviderID = Exclude<AIProviderID, `acp:${string}` | `harness:${string}`>
 
@@ -70,6 +72,9 @@ const MODEL_PROVIDER_ADAPTERS = {
   'anthropic-compatible': createAnthropicCompatibleAdapter({
     baseURL: (config) => config.customBaseURL
   }),
+  // Their connections keep the region, or the project and location, as the base URL.
+  'amazon-bedrock': bedrockAdapter,
+  'google-vertex': vertexAdapter,
   // The base URL and the token-carrying fetch come from Cloud's AI service, not from settings.
   openpencil: createOpenAICompatibleAdapter({
     baseURL: (config) => config.customBaseURL,

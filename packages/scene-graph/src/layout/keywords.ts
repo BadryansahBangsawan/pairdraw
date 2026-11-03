@@ -37,13 +37,14 @@ export function parseAutoLayoutDirection(
 }
 
 /**
- * Primary axis alignment from a `justify-content` keyword. Auto layout has no
- * `space-around` or `space-evenly`, so those, like unknown keywords, give `undefined`.
+ * Primary axis alignment from a `justify-content` keyword. Auto layout has no `space-evenly`,
+ * so it, like unknown keywords, gives `undefined`.
  */
 export function parsePrimaryAxisAlign(value: string | undefined): LayoutAlign | undefined {
   const name = keyword(value)
   if (name === undefined) return undefined
   if (name === 'space-between' || name === 'between') return 'SPACE_BETWEEN'
+  if (name === 'space-around' || name === 'around') return 'SPACE_AROUND'
   return POSITIONS.get(name)
 }
 

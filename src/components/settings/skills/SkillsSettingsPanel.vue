@@ -68,11 +68,12 @@ const SOURCE_TITLES: Record<SkillSourceID, () => string> = {
   openpencil: () => ai.value.skillsUploadedSource,
   project: () => ai.value.skillsProjectSource,
   agents: () => ai.value.skillsAgentsSource,
-  claude: () => ai.value.skillsClaudeSource
+  claude: () => ai.value.skillsClaudeSource,
+  builtin: () => ai.value.skillsBuiltinSource
 }
 
 function matches(skill: Skill, query: string): boolean {
-  return `${skill.name} ${skill.description}`.toLowerCase().includes(query)
+  return `${skill.name} ${messages.description(skill)}`.toLowerCase().includes(query)
 }
 
 const listGroups = computed<CapabilityGroup[]>(() => {
@@ -94,7 +95,7 @@ const listGroups = computed<CapabilityGroup[]>(() => {
       .map((entry): CapabilityItem => ({
         key: skillPreferenceKey(entry.skill),
         name: entry.skill.name,
-        description: entry.skill.description,
+        description: messages.description(entry.skill),
         enabled: entry.enabled,
         locked: !group.enabled,
         ...(entry.untrusted && { note: ai.value.skillsNotTrusted }),

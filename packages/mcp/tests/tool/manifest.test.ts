@@ -12,7 +12,13 @@ const EXPECTED = {
   find_empty_space: { effect: 'read', capabilities: ['document:read'] },
   replace_matching_properties: { effect: 'write', capabilities: ['document:write'] },
   diff_changes: { effect: 'read', capabilities: ['document:read'] },
-  set_image_fill: { effect: 'write', capabilities: ['document:write', 'network:access'] }
+  set_image_fill: { effect: 'write', capabilities: ['document:write', 'network:access'] },
+  get_style: { effect: 'read', capabilities: ['document:read'] },
+  rescale: { effect: 'write', capabilities: ['document:write'] },
+  generate_image: { effect: 'write', capabilities: ['document:write', 'network:access'] },
+  remove_background: { effect: 'write', capabilities: ['document:write', 'network:access'] },
+  replace_background: { effect: 'write', capabilities: ['document:write', 'network:access'] },
+  generate_svg: { effect: 'write', capabilities: ['document:write', 'network:access'] }
 } as const
 
 describe('MCP exposes the agent tools for code, space, and change review', () => {
@@ -48,5 +54,9 @@ describe('MCP exposes the agent tools for code, space, and change review', () =>
     )
     expect(properties('set_image_fill')).toContain('url')
     expect(properties('diff_changes')).toContain('mark')
+    expect(properties('set_text_properties')).toContain('hyperlink')
+    expect(properties('set_font_range')).toContain('hyperlink')
+    expect(properties('get_style')).toEqual(expect.arrayContaining(['id', 'query', 'appearance']))
+    expect(properties('rescale')).toEqual(expect.arrayContaining(['ids', 'factor', 'anchor']))
   })
 })

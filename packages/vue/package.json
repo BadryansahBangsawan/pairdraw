@@ -29,6 +29,11 @@
       "import": "./dist/canvas/labels/index.js",
       "default": "./dist/canvas/labels/index.js"
     },
+    "./canvas/links": {
+      "types": "./dist/canvas/links/index.d.ts",
+      "import": "./dist/canvas/links/index.js",
+      "default": "./dist/canvas/links/index.js"
+    },
     "./canvas/overlays": {
       "types": "./dist/canvas/overlays/index.d.ts",
       "import": "./dist/canvas/overlays/index.js",

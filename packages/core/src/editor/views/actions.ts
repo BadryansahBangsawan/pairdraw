@@ -1,11 +1,20 @@
 import type { EditorContext } from '#core/editor/types'
 
+import {
+  createPresentationActions,
+  returnFromPresentation,
+  type PresentationViewport
+} from './present'
 import { EDIT_VIEW, resolveEditorProfile } from './profile'
+import { createShaderModeActions } from './shader'
 import type { CanvasView } from './types'
 
-export function createCanvasViewActions(ctx: EditorContext) {
+export function createCanvasViewActions(ctx: EditorContext, viewport: PresentationViewport) {
   function setCanvasView(view: CanvasView): void {
+    const left = ctx.state.canvasView
     ctx.state.canvasView = view
+    // However a presentation is left, the canvas returns to where it looked before it.
+    if (left.id === 'present' && view.id !== 'present') returnFromPresentation(ctx, left, viewport)
     ctx.requestRepaint()
   }
 
@@ -43,5 +52,16 @@ export function createCanvasViewActions(ctx: EditorContext) {
   // Another document's layers start from their designed state, not from the old islands'.
   ctx.onEditorEvent('graph:replaced', resetPlay)
 
-  return { leaveCanvasView, startPlay, stopPlay, togglePlay, resetPlay }
+  const presentation = createPresentationActions(ctx, viewport, setCanvasView)
+  const shaderMode = createShaderModeActions(ctx, setCanvasView)
+
+  return {
+    leaveCanvasView,
+    startPlay,
+    stopPlay,
+    togglePlay,
+    resetPlay,
+    ...presentation,
+    ...shaderMode
+  }
 }

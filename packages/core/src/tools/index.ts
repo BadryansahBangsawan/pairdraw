@@ -52,6 +52,30 @@ export {
   parseOverlapSeverity
 } from './analyze/overlaps/params'
 export { setPexelsAPIKey, setUnsplashAccessKey } from './stock-photo'
+export {
+  canHoldImageFill,
+  getImageAIService,
+  IMAGE_AI_ORIENTATIONS,
+  layerNameFromPrompt,
+  orientationFor,
+  registerImageAIService,
+  type ImageAIImage,
+  type ImageAIOrientation,
+  type ImageAIService
+} from './image-ai'
+export {
+  getStyleArchetype,
+  searchStyleArchetypes,
+  STYLE_ARCHETYPE_IDS,
+  STYLE_ARCHETYPES,
+  type StyleArchetype,
+  type StyleArchetypeId,
+  type StyleArchetypeWithGuide,
+  type StyleElevation,
+  type StyleFont,
+  type StylePalette,
+  type StyleSearch
+} from './styles'
 export { importMermaid, importSVG } from './create'
 export { arrangeNodes } from './structure'
 export {

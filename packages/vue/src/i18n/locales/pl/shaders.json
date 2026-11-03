@@ -1,0 +1,17 @@
+{
+  "mode": "Tryb shadera",
+  "open": "Otwórz w trybie shadera",
+  "region": "Tryb shadera: {name}",
+  "done": "Gotowe",
+  "leave": "Zamknij tryb shadera ({shortcut})",
+  "play": "Odtwórz",
+  "pause": "Wstrzymaj",
+  "restart": "Wróć do początku",
+  "phase": "Faza animacji",
+  "position": "{time} z {duration}",
+  "preview": "Podgląd shadera",
+  "settings": "Ustawienia shadera",
+  "starting": "Uruchamianie shadera…",
+  "failed": "Tego shadera nie da się tu odtworzyć, więc pokazana jest jego nieruchoma klatka.",
+  "readOnly": "Ten dokument jest tylko do odczytu: shader jest odtwarzany, ale jego ustawień nie można zmienić."
+}

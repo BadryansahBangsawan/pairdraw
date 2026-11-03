@@ -558,6 +558,16 @@ function targetAspectRatio(nc: NodeChange): SceneNode['targetAspectRatio'] {
   return { x: value.x, y: value.y }
 }
 
+/**
+ * Figma's alignment, or space around where OpenPencil kept it as plugin data over Figma's space
+ * between. A record that no longer says space between was changed in Figma, which wins.
+ */
+function convertPrimaryAxisAlign(nc: NodeChange): LayoutAlign {
+  const align = mapStackJustify(nc.stackPrimaryAlignItems ?? nc.stackJustify)
+  if (align !== 'SPACE_BETWEEN') return align
+  return readNodeChangePluginData(nc, OPEN_PENCIL_PLUGIN_DATA.primaryAxisAlign) ?? align
+}
+
 function convertLayoutProps(
   nc: NodeChange
 ): Pick<
@@ -603,7 +613,7 @@ function convertLayoutProps(
     ...convertLayoutPadding(nc),
     primaryAxisSizing,
     counterAxisSizing,
-    primaryAxisAlign: mapStackJustify(nc.stackPrimaryAlignItems ?? nc.stackJustify),
+    primaryAxisAlign: convertPrimaryAxisAlign(nc),
     counterAxisAlign: mapStackCounterAlign(nc.stackCounterAlignItems ?? nc.stackCounterAlign),
     layoutWrap: nc.stackWrap === 'WRAP' ? 'WRAP' : 'NO_WRAP',
     counterAxisSpacing: nc.stackCounterSpacing ?? 0,

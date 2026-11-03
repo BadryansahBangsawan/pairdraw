@@ -18,6 +18,10 @@
   "clipboardImageFetchFailed": "Impossibile recuperare 1 immagine da Figma. Controlla che il file sorgente sia accessibile e riprova.",
   "clipboardImagesFetchFailed": "Impossibile recuperare {count} immagini da Figma. Controlla che il file sorgente sia accessibile e riprova.",
   "mermaidPasteFailed": "Impossibile leggere il diagramma Mermaid. {error}",
+  "webPasteFailed": "Impossibile incollare il contenuto web. {error}",
+  "webCaptureUnreadable": "Impossibile leggere l’acquisizione web copiata. Acquisisci di nuovo la pagina.",
+  "webCaptureNewer": "L’acquisizione web copiata proviene da un’estensione di acquisizione più recente. Aggiorna Pairdraw per incollarla.",
+  "webCaptureTruncated": "La pagina era troppo grande per essere acquisita per intero, quindi una parte è stata omessa.",
   "recentFiles": "File recenti",
   "recentFilesDescription": "Continua a lavorare su un progetto o iniziane uno nuovo.",
   "noRecentFiles": "Nessun file recente",
@@ -74,5 +78,22 @@
   "fileChangedOnDisk": "«{name}» è stato modificato sul disco",
   "fileChangedOnDiskDescription": "Un’altra app ha modificato questo file mentre hai modifiche non salvate. Ricaricalo per aprire la versione del file ed eliminare le tue modifiche, oppure ignora la modifica e continua a lavorare. Il salvataggio sostituirà il file con la tua versione.",
   "reloadFromDisk": "Ricarica",
-  "ignoreDiskChange": "Ignora"
+  "ignoreDiskChange": "Ignora",
+  "pasteImportHeading": "Importare variabili e stili?",
+  "pasteImportDescription": "Questi livelli usano variabili o stili di un altro documento. Importali per mantenere i livelli collegati, oppure incolla i livelli così come appaiono.",
+  "pasteImportConflicts": "Già presenti in questo documento",
+  "pasteImportConflictsHint": "Usa quelli di questo documento o aggiungi quelli copiati con un nuovo nome.",
+  "pasteImportUseExisting": "Usa esistenti",
+  "pasteImportAddRenamed": "Aggiungi rinominati",
+  "pasteImportVariables": {
+    "one": "{count} variabile",
+    "many": "{count} variabili"
+  },
+  "pasteImportFillStyle": "Stile colore",
+  "pasteImportTextStyle": "Stile testo",
+  "pasteImportEffectStyle": "Stile effetto",
+  "pasteImportGridStyle": "Stile griglia",
+  "pasteImportChoiceLabel": "{name}: usa esistente o aggiungi rinominato",
+  "pasteImportAsIs": "Incolla così com’è",
+  "pasteImportConfirm": "Sì, importa"
 }

@@ -151,12 +151,30 @@ export function createTextEditInput(options: TextEditInputOptions) {
     return true
   }
 
+  /** A double-click in image edit mode finishes it, as Enter does. */
+  function finishImageEdit(): boolean {
+    if (!editor.state.imageEdit) return false
+    editor.endImageEdit()
+    return true
+  }
+
+  /** A layer showing an image opens it for cropping; one inside another is selected first. */
+  function openImageEdit(hit: SceneNode, selectedId: string | undefined): boolean {
+    if (!editor.canEditImage(hit.id)) return false
+    const nested = hit.parentId !== editor.state.currentPageId
+    if (nested && selectedId !== hit.id && !wasSelectedBeforeClickSequence(hit.id))
+      editor.select([hit.id])
+    else editor.startImageEdit(hit.id)
+    return true
+  }
+
   function onDblClick(e: MouseEvent) {
     const nodeEditEditor = editor as Editor & NodeEditMethods
     if (editor.state.editingTextId) return
 
     const { cx, cy } = getCoords(e)
     if (handleNodeEditDoubleClick(e, cx, cy, editor)) return
+    if (finishImageEdit()) return
     const readOnly = !resolveEditorProfile(editor.state).edits
     if (!readOnly && startLabelRename(cx, cy)) return
 
@@ -193,6 +211,8 @@ export function createTextEditInput(options: TextEditInputOptions) {
       startGeneratedTextEditing(hit)
       return
     }
+
+    if (openImageEdit(hit, selectedId)) return
 
     editor.select([hit.id])
   }

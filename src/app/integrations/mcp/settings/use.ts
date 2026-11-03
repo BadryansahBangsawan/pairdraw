@@ -11,27 +11,43 @@ import {
   type MCPConnectionDraft
 } from '@/app/integrations/mcp'
 import type { CredentialStatus } from '@/app/settings/credentials/types'
+import type { SettingsSaveResult } from '@/app/settings/save-result'
 
 import { enqueueMCPConnectionMutation } from '../mutations'
+import { signOutOfMCPConnection } from '../oauth/sign-in'
+import { mcpConnectionEnvStatus, writeMCPConnectionEnv } from '../stdio/credentials'
 import type { MCPConnectionID } from '../types'
+import { planMCPCredentials } from './plan'
 
 const connectionServices = {
   status: mcpConnectionCredentialStatus,
   save: saveMCPConnectionDraft,
   setCredential: setMCPConnectionCredential,
-  remove: removeMCPConnection
+  remove: removeMCPConnection,
+  envStatus: mcpConnectionEnvStatus,
+  setEnv: writeMCPConnectionEnv,
+  signOut: (id: MCPConnectionID) => signOutOfMCPConnection(id)
 }
 
-import type { SettingsSaveResult } from '@/app/settings/save-result'
+export type MCPConnectionServices = typeof connectionServices
 
+/**
+ * Edits one MCP connection: its settings, and the credentials kept apart from them (the bearer
+ * token, a local command's variables, and the OAuth sign-in, which switching away discards).
+ */
 export function useMCPConnectionSettings(
   draft: Ref<MCPConnectionDraft>,
   tokenDraft: Ref<string>,
   automation: Readonly<Ref<{ bearerTokenRequired: string }>>,
-  services = connectionServices
+  overrides: Partial<MCPConnectionServices> = {}
 ) {
+  const services: MCPConnectionServices = { ...connectionServices, ...overrides }
   const tokenStatus = ref<CredentialStatus>('missing')
   const credentialCleared = ref(false)
+  /** The variables typed for a local command, `NAME=value` per line; never saved settings. */
+  const envDraft = ref('')
+  const envStatus = ref<CredentialStatus>('missing')
+  const envCleared = ref(false)
   const error = ref('')
   const saveResult = ref<SettingsSaveResult | null>(null)
   const pending = ref(0)
@@ -44,6 +60,7 @@ export function useMCPConnectionSettings(
     disposed = true
     version++
     tokenDraft.value = ''
+    envDraft.value = ''
   })
 
   const savedConnection = computed(() =>
@@ -54,14 +71,21 @@ export function useMCPConnectionSettings(
     return !disposed && request === version
   }
 
+  function resetCredentials(): void {
+    credentialCleared.value = false
+    tokenDraft.value = ''
+    tokenStatus.value = 'missing'
+    envCleared.value = false
+    envDraft.value = ''
+    envStatus.value = 'missing'
+    error.value = ''
+  }
+
   function startAdd(): void {
     version++
     saveResult.value = null
     draft.value = createMCPConnectionDraft()
-    credentialCleared.value = false
-    tokenDraft.value = ''
-    tokenStatus.value = 'missing'
-    error.value = ''
+    resetCredentials()
   }
 
   async function startEdit(id: string): Promise<boolean> {
@@ -72,16 +96,16 @@ export function useMCPConnectionSettings(
     pending.value++
     saveResult.value = null
     draft.value = createMCPConnectionDraft(connection)
-    credentialCleared.value = false
-    tokenDraft.value = ''
-    tokenStatus.value = 'missing'
-    error.value = ''
+    resetCredentials()
 
     try {
       const status = await services.status(connection.id)
+      const env =
+        connection.transport.type === 'stdio' ? await services.envStatus(connection.id) : 'missing'
       if (!current(request)) return false
 
       tokenStatus.value = status
+      envStatus.value = env
       return true
     } catch (cause) {
       if (!current(request)) return false
@@ -101,35 +125,40 @@ export function useMCPConnectionSettings(
     const id: MCPConnectionID = draft.value.id ?? `mcp-${crypto.randomUUID()}`
     draft.value.id = id
     const target = { ...draft.value, id }
+    const previous = savedConnection.value
     const token = tokenDraft.value
     const clearToken = credentialCleared.value
+    const envText = envDraft.value
+    const clearEnv = envCleared.value
     error.value = ''
 
     try {
-      if (
-        target.enabled &&
-        target.authenticationType === 'bearer' &&
-        !token.trim() &&
-        tokenStatus.value !== 'configured'
-      ) {
+      const plan = planMCPCredentials(target, previous, envText, clearEnv)
+      if (plan.bearer && target.enabled && !token.trim() && tokenStatus.value !== 'configured') {
         throw new Error(automation.value.bearerTokenRequired)
       }
 
       await enqueueMCPConnectionMutation(id, async () => {
-        const connection = services.save({ ...target, enabled: false })
+        const connection = services.save({ ...target, enabled: false }, plan.options)
         progress.persisted = true
-        if (target.authenticationType === 'none' || (clearToken && !token.trim())) {
+        if (!plan.bearer || (clearToken && !token.trim())) {
           await services.setCredential(connection.id, '')
         } else if (token.trim()) await services.setCredential(connection.id, token)
         else if (target.enabled && (await services.status(connection.id)) !== 'configured') {
           throw new Error(automation.value.bearerTokenRequired)
         }
-
-        services.save({ ...target, id: connection.id })
+        if (plan.env) await services.setEnv(connection.id, plan.env)
+        else if (plan.clearEnv) await services.setEnv(connection.id, {})
+        if (plan.signOut) await services.signOut(connection.id)
+        services.save({ ...target, id: connection.id }, plan.options)
       })
       if (!current(request)) return 'partial'
 
       if (tokenDraft.value === token) tokenDraft.value = ''
+      if (envDraft.value === envText) envDraft.value = ''
+      if (plan.env) envStatus.value = 'configured'
+      else if (plan.clearEnv || target.transportType !== 'stdio') envStatus.value = 'missing'
+      envCleared.value = false
       saveResult.value = 'saved'
       return 'saved'
     } catch (cause) {
@@ -150,6 +179,15 @@ export function useMCPConnectionSettings(
     draft.value.enabled = false
     tokenDraft.value = ''
     tokenStatus.value = 'missing'
+    error.value = ''
+  }
+
+  /** Discards the saved variables when the connection is next saved. */
+  function clearEnvironment(): void {
+    if (busy.value) return
+    envCleared.value = true
+    envDraft.value = ''
+    envStatus.value = 'missing'
     error.value = ''
   }
 
@@ -176,7 +214,7 @@ export function useMCPConnectionSettings(
   watch(
     () => draft.value.authenticationType,
     (type) => {
-      if (type === 'none') tokenDraft.value = ''
+      if (type !== 'bearer') tokenDraft.value = ''
     }
   )
 
@@ -186,6 +224,9 @@ export function useMCPConnectionSettings(
     cancel: startAdd,
     tokenStatus,
     credentialCleared,
+    envDraft,
+    envStatus,
+    envCleared,
     error,
     saveResult,
     savedConnection,
@@ -193,6 +234,7 @@ export function useMCPConnectionSettings(
     startEdit,
     save,
     clearCredential,
+    clearEnvironment,
     remove
   }
 }

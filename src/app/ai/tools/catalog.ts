@@ -26,7 +26,16 @@ const defaultNames = new Set([
   'list_pages',
   'create_page',
   // Vectorizing runs on the user's own service and key, which only the app holds.
-  'vectorize_image'
+  'vectorize_image',
+  // Curated directions for designs that have none yet.
+  'get_style',
+  // Scaling a design with its text, strokes, and radii, as the Scale tool does.
+  'rescale',
+  // Image AI runs on the user's own services and keys, as vectorizing does.
+  'generate_image',
+  'remove_background',
+  'replace_background',
+  'generate_svg'
 ])
 
 export const aiToolDefinitions = ALL_TOOLS.filter((tool) => isToolExposed(tool, 'ai'))

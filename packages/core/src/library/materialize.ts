@@ -1,4 +1,5 @@
 import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import { libraryDefinitionsPage } from '@open-pencil/scene-graph/components'
 import { cloneNodeProps } from '@open-pencil/scene-graph/copy'
 
 import { remapCopiedReferences } from './copied-references'
@@ -6,23 +7,11 @@ import { findLibraryDefinition } from './definitions'
 import { assertLibraryAssetKey, assertLibraryId, libraryAssetIdentityKey } from './identity'
 import type { ComponentLibraryRevision, LibraryAssetDescriptor } from './types'
 
-const INTERNAL_LIBRARY_PAGE_NAME = 'OpenPencil library definitions'
-
 export interface MaterializedLibraryAsset {
   componentId: string
   componentSetId: string | null
   pageId: string
   created: boolean
-}
-
-function getInternalLibraryPage(graph: SceneGraph): SceneNode {
-  const existing = graph
-    .getPages(true)
-    .find((page) => page.internalOnly && page.name === INTERNAL_LIBRARY_PAGE_NAME)
-  if (existing) return existing
-  const page = graph.addPage(INTERNAL_LIBRARY_PAGE_NAME)
-  graph.updateNode(page.id, { internalOnly: true, visible: false, locked: true })
-  return graph.getNode(page.id) ?? page
 }
 
 export function libraryDependencyRoots(
@@ -157,7 +146,7 @@ export function materializeLibraryAsset(
   const descriptor = revision.manifest.assets.find((asset) => asset.key === assetKey)
   if (!descriptor)
     throw new Error(`Library asset not found: ${libraryAssetIdentityKey(libraryId, assetKey)}`)
-  const page = getInternalLibraryPage(consumer)
+  const page = libraryDefinitionsPage(consumer)
   const mappedIds = new Map<string, string>()
   for (const root of libraryDependencyRoots(revision, descriptor)) {
     copyLibraryTree(revision.graph, consumer, root.id, page.id, mappedIds)

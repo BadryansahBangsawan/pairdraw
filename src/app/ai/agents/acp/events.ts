@@ -5,6 +5,7 @@ import * as v from 'valibot'
 import { OPEN_PENCIL_MCP_SERVER } from '@open-pencil/core/constants'
 import type { JSONObject } from '@open-pencil/scene-graph/primitives'
 
+import { agentContextChunk } from '@/app/ai/chat/context-window/usage'
 import { createReplyStream, type ReplyToolCall } from '@/app/ai/reply/stream'
 
 type ToolCallReport = Extract<SessionUpdate, { sessionUpdate: 'tool_call' | 'tool_call_update' }>
@@ -230,6 +231,9 @@ export function createUpdateMapper(idPrefix: string) {
         chunks.push(...resultChunks(update, identity))
         return chunks
       }
+      // How full the agent's context is, which the chat's context meter shows.
+      case 'usage_update':
+        return [agentContextChunk(update)]
       default:
         return []
     }

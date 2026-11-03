@@ -3,12 +3,15 @@
  * opens a session, connects to the HTTP MCP servers the session names the way a real agent
  * does (so the app sees it reach OpenPencil's tools), and replies to each prompt by streaming
  * the prompt's last line back. The first argument names it, as an adapter names its package.
+ * Like Codex and Claude's adapters, it advertises a model and reasoning effort as session config
+ * options and a session mode; once any differs from its default, each reply names them.
  */
 import {
   AgentSideConnection,
   ndJsonStream,
   PROTOCOL_VERSION,
-  type McpServer
+  type McpServer,
+  type SessionConfigOption
 } from '@agentclientprotocol/sdk'
 
 const name = process.argv[2] ?? 'fake-acp'
@@ -54,6 +57,44 @@ async function connectMCP(servers: McpServer[]): Promise<void> {
   }
 }
 
+const DEFAULTS = { model: 'fake-fast', effort: 'medium', mode: 'ask' }
+const session = { ...DEFAULTS }
+
+function configOptions(): SessionConfigOption[] {
+  return [
+    {
+      type: 'select',
+      id: 'model',
+      name: 'Model',
+      category: 'model',
+      currentValue: session.model,
+      options: [
+        { value: 'fake-fast', name: 'Fake Fast' },
+        { value: 'fake-smart', name: 'Fake Smart' }
+      ]
+    },
+    {
+      type: 'select',
+      id: 'reasoning',
+      name: 'Reasoning',
+      category: 'thought_level',
+      currentValue: session.effort,
+      options: [
+        { value: 'medium', name: 'Medium' },
+        { value: 'high', name: 'High' }
+      ]
+    }
+  ]
+}
+
+/** What the reply adds once the session left its defaults, so a test sees what applied. */
+function sessionNote(): string {
+  const changed = session.model !== DEFAULTS.model || session.effort !== DEFAULTS.effort
+  return changed || session.mode !== DEFAULTS.mode
+    ? ` [${session.model}, ${session.effort}, ${session.mode}]`
+    : ''
+}
+
 const connection: AgentSideConnection = new AgentSideConnection(
   () => ({
     initialize: async () => ({
@@ -63,7 +104,26 @@ const connection: AgentSideConnection = new AgentSideConnection(
     }),
     newSession: async ({ mcpServers }) => {
       await connectMCP(mcpServers)
-      return { sessionId: 'fake-session' }
+      return {
+        sessionId: 'fake-session',
+        configOptions: configOptions(),
+        modes: {
+          currentModeId: session.mode,
+          availableModes: [
+            { id: 'ask', name: 'Ask before edits' },
+            { id: 'auto', name: 'Auto' }
+          ]
+        }
+      }
+    },
+    setSessionConfigOption: async ({ configId, value }) => {
+      if (configId === 'model') session.model = value
+      else if (configId === 'reasoning') session.effort = value
+      return { configOptions: configOptions() }
+    },
+    setSessionMode: async ({ modeId }) => {
+      session.mode = modeId
+      return {}
     },
     authenticate: async () => ({}),
     prompt: async ({ sessionId, prompt }) => {
@@ -72,7 +132,10 @@ const connection: AgentSideConnection = new AgentSideConnection(
         sessionId,
         update: {
           sessionUpdate: 'agent_message_chunk',
-          content: { type: 'text', text: `echo: ${text.split('\n').at(-1) ?? ''}` }
+          content: {
+            type: 'text',
+            text: `echo: ${text.split('\n').at(-1) ?? ''}${sessionNote()}`
+          }
         }
       })
       return { stopReason: 'end_turn' }

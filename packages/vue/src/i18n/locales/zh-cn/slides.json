@@ -1,0 +1,22 @@
+{
+  "title": "幻灯片",
+  "listLabel": "此页面上的幻灯片",
+  "slideLabel": "幻灯片 {number}：{name}",
+  "reorderHint": "拖动以重新排序，或按 Alt 加上下方向键。",
+  "slideMoved": "{name} 现在是第 {number} 张幻灯片。",
+  "present": "演示（{shortcut}）",
+  "presentFromSlide": "从此幻灯片开始演示",
+  "exportPDF": "将幻灯片导出为 PDF",
+  "exportPPTX": "将幻灯片导出为 PowerPoint",
+  "exportPPTXFailed": "无法导出幻灯片：{error}",
+  "emptyTitle": "还没有幻灯片",
+  "emptyDescription": "此页面上的顶层画框会按图层顺序成为幻灯片。",
+  "nothingToPresent": "在此页面添加一个顶层画框即可演示。",
+  "presentation": "演示",
+  "previousSlide": "上一张幻灯片",
+  "nextSlide": "下一张幻灯片",
+  "position": "{number} / {count}",
+  "fitToScreen": "适应屏幕",
+  "actualSize": "实际大小",
+  "exitPresentation": "退出演示（{shortcut}）"
+}

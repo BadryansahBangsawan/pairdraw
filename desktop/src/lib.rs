@@ -60,6 +60,7 @@ pub fn run() {
         .manage(launch::PendingOpen::default())
         .manage(ProxyHttpRequests::default())
         .manage(network::oauth::ChatGPTOAuthLoopback::default())
+        .manage(agents::mcp_stdio::McpStdioProcesses::default())
         .manage(launch::PendingRooms::default())
         .manage(NativeMenuState(Mutex::new(NativeMenuInputs::default())))
         .manage(launch::PendingCloudLinks::default())
@@ -78,6 +79,12 @@ pub fn run() {
             credential_store_availability,
             credential_write,
             agents::mcp::mcp_lookup,
+            agents::mcp_stdio::mcp_stdio_approve,
+            agents::mcp_stdio::mcp_stdio_spawn,
+            agents::mcp_stdio::mcp_stdio_write,
+            agents::mcp_stdio::mcp_stdio_close,
+            agents::mcp_clients::mcp_client_config_read,
+            agents::mcp_clients::mcp_client_config_write,
             agents::skills::skill_folders,
             agents::skills::project_skill_folders,
             agents::skills::skill_folder_file,

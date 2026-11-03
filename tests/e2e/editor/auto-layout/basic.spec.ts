@@ -113,6 +113,34 @@ test('gap menu sets auto space-between alignment', async () => {
   canvas.assertNoErrors()
 })
 
+test('gap menu sets space around, keeping the gap and the alignment grid across', async () => {
+  await selectFrame()
+  const before = expectDefined(await getNodeById(page, frameId), 'before')
+
+  await page.getByTestId('layout-gap-menu').click()
+  await page.getByRole('option', { name: 'Space around' }).click()
+  await canvas.waitForRender()
+  let frame = expectDefined(await getNodeById(page, frameId), 'frame')
+  expect(frame.primaryAxisAlign).toBe('SPACE_AROUND')
+  expect(frame.itemSpacing).toBe(before.itemSpacing)
+  // The gap stays editable: space around shares the free space on top of it.
+  await expect(page.getByTestId('layout-gap-input')).toBeVisible()
+
+  await page.getByTestId('layout-alignment-grid').locator('button').last().click()
+  await canvas.waitForRender()
+  frame = expectDefined(await getNodeById(page, frameId), 'frame')
+  expect(frame.primaryAxisAlign).toBe('SPACE_AROUND')
+  expect(frame.counterAxisAlign).toBe('MAX')
+
+  await canvas.pressKey('Meta+z')
+  await canvas.waitForRender()
+  await canvas.pressKey('Meta+z')
+  await canvas.waitForRender()
+  frame = expectDefined(await getNodeById(page, frameId), 'frame')
+  expect(frame.primaryAxisAlign).toBe(before.primaryAxisAlign)
+  canvas.assertNoErrors()
+})
+
 test('wrap mode exposes cross-axis gap control', async () => {
   await selectFrame()
 

@@ -42,6 +42,10 @@ export function createKeyboardActions({
   }
 
   function confirmOrEditSelection() {
+    if (store.state.imageEdit) {
+      store.endImageEdit()
+      return
+    }
     if (store.state.nodeEditState) {
       store.exitNodeEditMode(true)
       return
@@ -54,6 +58,11 @@ export function createKeyboardActions({
     // Figma opens a selected vector's path, as a double-click does.
     if (node?.type === 'VECTOR') {
       store.enterNodeEditMode(node.id)
+      return
+    }
+    // A layer without children that shows an image opens it for cropping, as a double-click does.
+    if (node?.childIds.length === 0 && store.canEditImage(node.id)) {
+      store.startImageEdit(node.id)
       return
     }
     // A sticky note opens its body and a connector its label, all of it selected, keeping the
@@ -74,6 +83,12 @@ export function createKeyboardActions({
     if (store.leaveCanvasView()) return
     if (store.state.rotationPreview) {
       store.setRotationPreview(null)
+      return
+    }
+    if (store.state.imageEdit) {
+      // Escape during a crop or reframe drag only puts the layer back, which the canvas does;
+      // the image stays open, as in Figma.
+      if (!store.isInteractiveEditing()) store.endImageEdit()
       return
     }
     if (store.state.nodeEditState) {

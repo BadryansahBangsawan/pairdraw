@@ -68,13 +68,13 @@ describe('canvas view profiles', () => {
 })
 
 describe('host restrictions', () => {
-  test('a read-only document offers no edits and keeps Move and Hand in every view', () => {
+  test('a read-only document offers no edits and keeps Move, Hand, and Zoom in every view', () => {
     const editor = createEditor()
     editor.setReadOnly(true)
     const editing = resolveEditorProfile(editor.state)
     expect([editing.edits, editing.tools && [...editing.tools]]).toEqual([
       false,
-      ['SELECT', 'HAND']
+      ['SELECT', 'HAND', 'ZOOM']
     ])
     editor.startPlay()
     const previewing = resolveEditorProfile(editor.state)
@@ -83,7 +83,7 @@ describe('host restrictions', () => {
       'pan',
       { revision: 0 }
     ])
-    expect(previewing.tools && [...previewing.tools]).toEqual(['SELECT', 'HAND'])
+    expect(previewing.tools && [...previewing.tools]).toEqual(['SELECT', 'HAND', 'ZOOM'])
   })
 
   test('going read-only drops a tool it does not offer, and refuses picking one', () => {
@@ -106,7 +106,7 @@ describe('host restrictions', () => {
 })
 
 describe('document kinds', () => {
-  test('a board offers FigJam\'s tools and keys and snaps to its 16-unit grid', () => {
+  test("a board offers FigJam's tools and keys and snaps to its 16-unit grid", () => {
     const editor = createEditor()
     editor.setDocumentKind('board')
     const profile = resolveEditorProfile(editor.state)
@@ -118,7 +118,8 @@ describe('document kinds', () => {
       'CONNECTOR',
       'SECTION',
       'TEXT',
-      'COMMENT'
+      'COMMENT',
+      'ZOOM'
     ])
     expect([profile.toolKeys, profile.snapGrid]).toEqual([BOARD_TOOL_SHORTCUTS, 16])
   })
@@ -154,14 +155,14 @@ describe('document kinds', () => {
     expect(editor.state.activeTool).toBe('SELECT')
   })
 
-  test('a read-only board keeps only Move and Hand of its tools', () => {
+  test('a read-only board keeps only Move, Hand, and Zoom of its tools', () => {
     const editor = createEditor()
     editor.setDocumentKind('board')
     editor.setReadOnly(true)
     const profile = resolveEditorProfile(editor.state)
     expect([profile.edits, profile.tools && [...profile.tools], profile.snapGrid]).toEqual([
       false,
-      ['SELECT', 'HAND'],
+      ['SELECT', 'HAND', 'ZOOM'],
       16
     ])
   })

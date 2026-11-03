@@ -25,18 +25,25 @@ import IconButton from '@/components/ui/button/IconButton.vue'
 import { useImageDrop } from '@/components/ui/drop/useImageDrop'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
 
+import ImageFillPickerAIActions from './ImageFillPickerAIActions.vue'
 import ImageFillPickerURLField from './ImageFillPickerURLField.vue'
 import { useImageFill } from './useImageFill'
 
-const { fill, layerSize = null } = defineProps<{
+const {
+  fill,
+  layerSize = null,
+  fillIndex = null
+} = defineProps<{
   fill: Fill
   /** The layer the fill is on, which a new crop starts by covering, as Fill does. */
   layerSize?: { width: number; height: number } | null
+  /** Where the fill sits in the layer's fills, when it is one; image AI writes into it there. */
+  fillIndex?: number | null
 }>()
 const emit = defineEmits<{ update: [fill: Fill] }>()
 
 const store = useEditorStore()
-const { panels } = useI18n()
+const { panels, commands } = useI18n()
 
 const MODE_LABELS = {
   FILL: 'imageModeFill',
@@ -161,6 +168,22 @@ function setTileScale(percent: number) {
 function rotate() {
   emit('update', { ...fill, imageRotation: ((fill.imageRotation ?? 0) + 90) % 360 })
 }
+
+/**
+ * The one layer the fill is on, while the canvas can crop and reframe this fill's image. A stroke's
+ * image has no fill index, and a hidden fill no image to frame.
+ */
+const croppableLayerId = computed(() => {
+  const ids = store.state.selectedIds
+  if (!layerSize || fillIndex === null || !fill.imageHash || ids.size !== 1) return null
+  const id = [...ids][0]
+  return store.canEditImage(id, fillIndex) ? id : null
+})
+
+function cropOnCanvas() {
+  const id = croppableLayerId.value
+  if (id && fillIndex !== null) store.startImageEdit(id, fillIndex)
+}
 </script>
 
 <template>
@@ -236,6 +259,16 @@ function rotate() {
           @commit="setTileScale"
         />
       </div>
+      <!-- Crops and reframes the image on the canvas, with handles, as Figma's Crop image. -->
+      <IconButton
+        v-if="croppableLayerId"
+        :label="commands.cropImage"
+        data-test-id="fill-picker-crop-image"
+        @click="cropOnCanvas"
+      >
+        <icon-lucide-crop class="size-3.5" />
+      </IconButton>
+      <ImageFillPickerAIActions v-if="fillIndex !== null" :fill="fill" :fill-index="fillIndex" />
       <!-- A crop, and so a stretch, holds its own turn in its transform; the other modes turn it. -->
       <IconButton
         v-if="scaleMode !== 'CROP' && scaleMode !== 'STRETCH'"

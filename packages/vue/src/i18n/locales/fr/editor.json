@@ -16,5 +16,19 @@
   "toggleAIChat": "Chat IA ({shortcut})",
   "startPreview": "Aperçu ({shortcut})",
   "toggleLayersPanel": "Panneau des calques",
-  "togglePropertiesPanel": "Panneau des propriétés"
+  "togglePropertiesPanel": "Panneau des propriétés",
+  "textLink": "Lien",
+  "addTextLink": "Ajouter un lien",
+  "editTextLink": "Modifier le lien",
+  "removeTextLink": "Supprimer le lien",
+  "openTextLink": "Ouvrir le lien",
+  "textLinkAddress": "Adresse du lien",
+  "textLinkPlaceholder": "Collez un lien ou une adresse e-mail",
+  "textLinkInvalid": "Utilisez une adresse web ou une adresse e-mail.",
+  "textLinkMixed": "Plusieurs liens",
+  "textLinkToLayer": "Renvoie vers {name}",
+  "embedWaiting": "En attente de la page hôte",
+  "embedWaitingDescription": "Le design s’ouvrira dès que la page qui l’intègre se connectera.",
+  "embedInvalidOrigin": "Cette intégration ne peut pas se connecter",
+  "embedInvalidOriginDescription": "Son lien doit indiquer l’origine de la page qui l’intègre, par exemple https://example.com."
 }

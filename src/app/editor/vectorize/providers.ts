@@ -171,7 +171,10 @@ async function readBoundedResponse(
   return new TextDecoder().decode(bytes)
 }
 
-async function fetchSVGFromURL(providerID: VectorizeProviderID, rawURL: string): Promise<string> {
+export async function fetchSVGFromURL(
+  providerID: VectorizeProviderID,
+  rawURL: string
+): Promise<string> {
   const url = validateVectorizedAssetURL(providerID, rawURL)
   let response: VectorizeResponse
   try {

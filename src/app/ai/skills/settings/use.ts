@@ -91,7 +91,8 @@ export function useSkillsSettings() {
         },
         (entry) => entry.source === id
       )
-    // Uploads, the document's folders, then the user's: the order a repeated name resolves in.
+    // Uploads, the document's folders, the user's, then the built-in skills: the order a
+    // repeated name resolves in.
     return [
       source('openpencil', null),
       ...projectSkillsFolders.value.map(({ path, location }) =>
@@ -106,7 +107,8 @@ export function useSkillsSettings() {
           (entry) => entry.skillsFolder === path
         )
       ),
-      ...HOME_SOURCES.map(({ source: id, folder }) => source(id, folder))
+      ...HOME_SOURCES.map(({ source: id, folder }) => source(id, folder)),
+      source('builtin', null)
     ]
   })
 

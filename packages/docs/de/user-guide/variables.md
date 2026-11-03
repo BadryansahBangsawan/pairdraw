@@ -80,6 +80,25 @@ Variablen und Stile wandern als [W3C-Design-Tokens](https://www.designtokens.org
 - **Ziel wählen:** Bevor sich etwas ändert, zeigt der Dialog jede gefundene Sammlung und jeden Modus und wohin sie gehen: in eine neue Sammlung oder einen neuen Modus, in einen vorhandenen oder nirgendwohin. Variablen und Stile mit demselben Namen werden aktualisiert, der Rest wird hinzugefügt; nichts wird gelöscht. Er zählt, was hinzugefügt, aktualisiert und übersprungen wird, und nennt für jedes übersprungene Token den Grund
 - Der Import ist ein Schritt: **Rückgängig** nimmt ihn ganz zurück
 
+## Mit einem Stylesheet synchronisieren
+
+Custom Properties in einer CSS-Datei werden zu Variablen, und Variablen gehen zurück in die Datei. Klicke in der Variablen-Werkzeugleiste auf **Mit CSS synchronisieren**:
+
+- **CSS-Variablen importieren…** liest eine `.css`-Datei. `:root`, `html` und Tailwinds `@theme` enthalten die Standardwerte jeder Sammlung; `[data-theme="dark"]`, eine Klasse wie `.dark` und `:root`-Blöcke in `@media`, `@supports` oder `@container` werden zu Modi mit dieser Bedingung. Farben, Längen in `px` oder `rem`, Dauern, Zahlen, Text in Anführungszeichen und Schriftlisten werden zu Variablen, `var(--name)` wird zum Alias, und `calc()` oder `clamp()` behält sein CSS als CSS-Ausdruck. Derselbe Import-Dialog zeigt, wohin jede Sammlung und jeder Modus geht, bevor sich etwas ändert
+- **Aus … übernehmen** liest die verknüpfte Datei erneut und zeigt, was sich geändert hat. Ein aus dem Dokument exportiertes Stylesheet landet wieder auf denselben Variablen und Modi
+- **In … schreiben** schreibt die Variablen direkt in die verknüpfte Datei: geänderte Werte werden in ihrer eigenen Schreibweise ersetzt, fehlende in ihrem Block ergänzt, und Kommentare, andere Regeln und Properties ohne Variable bleiben unverändert. Nichts wird entfernt. Kann der Browser die Datei nicht schreiben, wird stattdessen eine Kopie gespeichert
+- **Übernehmen, wenn sich die Datei ändert** importiert jedes Speichern der verknüpften Datei, auf dem Desktop und in Browsern mit Dateizugriff, jeweils als ein Rückgängig-Schritt
+
+## Zwischen Dokumenten einfügen
+
+Ebenen, die in einem geöffneten Dokument kopiert und in ein anderes eingefügt werden, können die Variablen und Stile mitbringen, die sie verwenden. Vor dem Einfügen fragt ein Dialog, wie:
+
+- **Ja, importieren** — fügt die Variablen und Stile hinzu, sodass die eingefügten Ebenen mit ihnen verknüpft bleiben
+- **Unverändert einfügen** — fügt die Ebenen mit den Werten ein, die sie zeigten, ohne Verknüpfung zu Variablen oder Stilen
+- **Vorhandene verwenden** oder **Umbenannt hinzufügen** — hat dieses Dokument bereits eine Sammlung oder einen Stil mit demselben Namen, wählst du pro Zeile: die vorhandene verwenden, wobei Variablen nach Namen zugeordnet und fehlende ergänzt werden, oder die Kopie unter einem neuen Namen wie „Spacing 2“ hinzufügen
+
+Das Einfügen ist ein Schritt: **Rückgängig** entfernt die Ebenen und alles, was dabei hinzugefügt wurde. **Eigenschaften einfügen** verwendet gleichnamige Sammlungen und Stile auf dieselbe Weise.
+
 ## Variablen an Füllungen binden
 
 Mit der Variablenauswahl im Bereich Füllung des Eigenschaftenbereichs lässt sich eine Farbvariable an die Füllung eines Objekts binden.

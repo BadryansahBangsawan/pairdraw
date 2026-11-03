@@ -20,6 +20,8 @@ export interface DocumentShareTable {
   expiresAt: TimestampColumn | null
   revokedAt: TimestampColumn | null
   lastUsedAt: TimestampColumn | null
+  /** The revision a snapshot link shows; null for a live link (migration 027). */
+  revisionId: ColumnType<string | null, string | null | undefined, string | null>
 }
 
 export interface DocumentGrantTable {
@@ -51,6 +53,19 @@ export interface WorkspaceTable {
   name: string
   slug: string
   createdBy: string
+  createdAt: TimestampColumn
+  updatedAt: TimestampColumn
+  /** When the workspace went public (migration 027). */
+  publicAt: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>
+  /** The administrator who made it public, whose profile alone lists it (migration 027). */
+  publicBy: ColumnType<string | null, string | null | undefined, string | null>
+}
+
+/** A person's public profile, `/u/<handle>` (migration 027). */
+export interface PublicProfileTable {
+  userId: string
+  handle: string
+  bio: string | null
   createdAt: TimestampColumn
   updatedAt: TimestampColumn
 }
@@ -359,6 +374,7 @@ export interface CloudDatabase {
   workspaceImage: WorkspaceImageTable
   documentVersion: DocumentVersionTable
   documentShare: DocumentShareTable
+  publicProfile: PublicProfileTable
   documentGrant: DocumentGrantTable
   documentInvitation: DocumentInvitationTable
   documentCollaborationState: DocumentCollaborationStateTable

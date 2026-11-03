@@ -167,6 +167,11 @@
         "accelerator": "CmdOrCtrl+Shift+R"
       },
       {
+        "id": "replace-in-instance",
+        "label": "Replace inside instance",
+        "accelerator": "Alt+Shift+R"
+      },
+      {
         "id": "selection.duplicate",
         "label": "Duplicate",
         "accelerator": "CmdOrCtrl+D"
@@ -371,6 +376,11 @@
         "id": "toggle-preview",
         "label": "Preview",
         "accelerator": "CmdOrCtrl+Alt+Enter"
+      },
+      {
+        "id": "present",
+        "label": "Present",
+        "accelerator": "CmdOrCtrl+Enter"
       },
       {
         "id": "keyboard-shortcuts",

@@ -21,7 +21,11 @@ import CommentMessage from './CommentMessage.vue'
 import { comments } from './ui'
 
 /** An open thread: the comment, its replies, and a reply box, as in Figma's comment card. */
-const { thread } = defineProps<{ thread: CommentThread }>()
+const { thread, canDeleteReplies = true } = defineProps<{
+  thread: CommentThread
+  /** False for someone who can only comment, who adds replies but deletes none. */
+  canDeleteReplies?: boolean
+}>()
 
 const emit = defineEmits<{
   close: []
@@ -103,7 +107,7 @@ defineExpose({ focus: () => composer.value?.focus() })
         :at="entry.createdAt"
         :text="entry.text"
       >
-        <template #actions>
+        <template v-if="canDeleteReplies" #actions>
           <IconButton
             :label="messages.deleteReply"
             @click="emit('deleteReply', thread.id, entry.id)"

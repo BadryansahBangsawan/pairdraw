@@ -61,11 +61,12 @@ Open **Settings → Skills** to see where skills come from:
 
 - **Uploaded**: upload a ZIP of a skill's folder or a single `SKILL.md`. Uploads stay in OpenPencil and work in the browser too.
 - **Next to this document** (desktop): `.agents/skills` and `.claude/skills` folders from the open document's folder up to its repository. They stay off until you choose **Trust folder**, because a skill gives the AI instructions it follows.
+- **Built-in**: skills that ship with OpenPencil. Guides for landing pages, mobile apps, web apps, dashboards, slides, design systems, and Tailwind CSS v4, and skills that work on an existing design: `layout`, `restyle`, `dark-mode`, and `design-review`. They are on from the start, work in the browser too, and give way to a skill of yours with the same name.
 - **Shared agent skills** and **Claude Code skills** (desktop): `~/.agents/skills` and `~/.claude/skills`, where other coding agents install skills. Most of those are coding workflows, so these folders start off; the review step of the AI setup lists their skills for you to pick the ones that help with design.
 
 Uploads are on as soon as you add them, and any folder or skill can be switched on or off. The page lists them as Tool access lists tools: each source is a group with its own switch, and each skill has a switch beside it. Open a skill to read its instructions, see its files, or check warnings about how it departs from the specification. When two skills share a name, the first in that order is used.
 
-To run a skill yourself, type `/` at the start of a message and pick it, which starts the message with `/skill:name`. Pi gets the enabled skills as its own. ACP agents such as Claude Code and Codex load their own skills.
+To run a skill yourself, type `/` at the start of a message and pick it, or choose it from **Pick a skill**, the book button under the message field; either starts the message with `/skill:name`, replacing a skill picked before. Pi gets the enabled skills as its own. ACP agents such as Claude Code and Codex load their own skills.
 
 ## Saved Conversations
 
@@ -97,16 +98,29 @@ In the Chat settings beside the model overview, choose whether reasoning is **Co
 | **OpenCode Go**          | Kimi K3.1 Pro, MiniMax M3.1 Flash, GLM-5.3, DeepSeek V4.1 Flash        | Go plan API key from [opencode.ai](https://opencode.ai/auth). Desktop app only.                             |
 | **OpenAI-compatible**    | Any endpoint with OpenAI API format                                    | Custom base URL + key. Supports Completions and Responses API toggle.                                       |
 | **Anthropic-compatible** | Any endpoint with Anthropic API format                                 | Custom base URL + key                                                                                       |
+| **Amazon Bedrock**       | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5 | Region plus a Bedrock API key, or AWS access keys in the desktop app                                        |
+| **Google Vertex AI**     | Claude Sonnet 5.5, Claude Opus 5.5, Gemini 3.8 Flash, Gemini 4 Argon   | Project and location plus an access token; an API key reaches Gemini only                                   |
 
 No backend — your key or sign-in talks directly to the provider. Browser requests are subject to each provider's CORS policy, and model deployments vary in how reliably they stream tool calls. See [BYOK provider and model compatibility](./byok-provider-compatibility) for measured results and reproduction steps.
 
 The xAI, Meta, Kimi For Coding, Moonshot AI, Together AI, Fireworks AI, and OpenCode presets use each provider's OpenAI-compatible chat endpoint, so only the base URL and the recommended models differ; the full model list comes from models.dev. OpenCode Zen and Go list only the models they serve through that endpoint, so Claude, GPT, and Gemini models there are left out: use the Anthropic, OpenAI, or Google AI provider for those. Kimi For Coding and both OpenCode presets send no CORS headers, so they work in the desktop app only.
 
+**Amazon Bedrock** reaches Claude through Bedrock's Messages API at `bedrock-mantle.<region>.api.aws`, under Bedrock's `anthropic.` model IDs; a custom model ID can name an inference profile such as `us.anthropic.claude-opus-5-5`. Choose the region, then sign in with a Bedrock API key or, in the desktop app, with an access key ID, secret access key, and optional session token, which sign each request with AWS Signature Version 4. Browsers do not let Bedrock's CORS answer cover the signature header, so the browser app takes API keys only.
+
+**Google Vertex AI** serves Claude through `:rawPredict` and Gemini through `:generateContent` in one Google Cloud project. Enter the project ID and a location (`global`, `us`, `eu`, or a single region; single regions serve only older Claude models), and paste an access token from `gcloud auth print-access-token`. Access tokens expire after an hour, so paste a new one when requests start failing. An API key without a project uses Vertex AI express mode, which serves Gemini models only.
+
 **ChatGPT** uses your ChatGPT plan instead of an API key, through the same backend and sign-in as OpenAI's Codex CLI. Signing in opens the browser and returns to the desktop app on `localhost:1455`, the only address OpenAI accepts for it, so close a running `codex login` first. The sign-in is stored like a key and refreshes itself; the model list comes from your account. The browser app does not offer it.
 
 ## External MCP connections
 
-Desktop ACP agents can also use trusted remote [Model Context Protocol](https://modelcontextprotocol.io/) servers. In **Settings → MCP**, under MCP connections, add a named Streamable HTTP endpoint, optionally save a bearer token, and enable the connection. OpenPencil stores the token in the configured credential backend rather than ordinary settings and resolves it only when starting the ACP session.
+The built-in chat and coding agents can use trusted [Model Context Protocol](https://modelcontextprotocol.io/) servers besides OpenPencil's own. In **Settings → MCP**, under MCP connections, add a named connection and enable it:
+
+- **Remote server**: a Streamable HTTP endpoint with no authentication, a bearer token, or **OAuth sign-in** for hosted servers such as Notion or Linear. Save the connection, then click **Sign in**; the server's sign-in page opens in a popup in the web app or in the system browser on the desktop. The app registers itself with the server's authorization server, uses PKCE, and refreshes the tokens it receives.
+- **Local command** (desktop app only): a program that speaks MCP over stdin and stdout, such as `npx` with `-y`, `@modelcontextprotocol/server-filesystem`, and a folder as arguments, one per line, plus optional `NAME=value` environment variables. The first time a command line runs, the app asks in a system dialog; it asks again when the program, an argument, or a variable name changes. Variables that choose the program or load code into it, such as `PATH`, `NODE_OPTIONS`, or `LD_PRELOAD`, are refused.
+
+The direct API chat lists each enabled server's tools with every message and offers them to the model as `mcp__<server>__<tool>`. A server that does not answer is left out of that message and tried again a minute later, and a local command you declined is not asked about again until you change its connection. All chats share the connections, which stay open while a reply runs and close after a few idle minutes. While the chat asks before actions (**Settings → AI**), a call to an external tool that its server does not mark as read-only asks first too. External tools are turned on and off with their connection, not in the list of OpenPencil's own tools. On the desktop, ACP agents receive the same connections when their session starts; a local command is passed to an agent only after you approve it in the same system dialog, and the web app passes none. Pi receives the remote connections. Bearer tokens, OAuth sign-ins, and variables are kept in the configured credential backend rather than ordinary settings. **Test connection** connects once and reports how many tools the server offers.
+
+In the web app a remote server must allow requests from the app's origin (CORS); the desktop app connects through its own HTTP client.
 
 Remote servers must use HTTPS. Loopback HTTP endpoints are accepted for local development. Review and trust a server before enabling it: its tools may read external data or perform actions with the credentials you provide. OpenPencil's built-in design MCP server remains attached automatically and does not need to be added here.
 
@@ -124,6 +138,19 @@ The configurable tool catalog covers these categories; the tools offered to a mo
 - **Analyze** — color palette, typography audit, spacing consistency, cluster detection.
 - **Export** — PNG, SVG, JSX with Tailwind classes. Vision-based verification via `export_image`.
 - **Vector** — boolean operations, path manipulation.
+
+## Exploring variants
+
+**Let it cook**, the chef's hat under the message field, explores a request instead of answering it once:
+
+- **Variants** asks for two to six designs side by side, each a new top-level frame to the right of everything on the page. Choose whether they explore **Layout** (structure and arrangement, one visual style) or **Style** (colors, type, and imagery, one layout). With a layer selected or mentioned, the variants start from it and leave it as it was.
+- **Don't iterate** asks for one design in a single pass, without the review and rework the assistant otherwise does.
+
+The choice stays on for the next messages, and the button shows it, until you set it back to **Off**.
+
+## Notes for AI
+
+Select a layer and add **Notes for AI** at the bottom of the Design panel. **Context** tells agents what the layer means or does, such as "opens the sign-up dialog"; **Prompt** is a request about the layer that **Run prompt** sends to the chat. A message carries the notes of the layers it concerns: the ones it mentions and the selection, or the whole page when there are none. Agents respect the context and act on a prompt only when asked. Notes are saved in the file with the layer, and the `context` notes and prompt cards of a `.pen` file are read the same way.
 
 ## Visual Verification
 

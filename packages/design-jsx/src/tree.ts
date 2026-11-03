@@ -116,8 +116,8 @@ export type StyleProps = {
   wrap?: boolean
   rowGap?: number | DesignVariable
   columnGap?: number | DesignVariable
-  justify?: 'start' | 'end' | 'center' | 'between'
-  justifyContent?: 'start' | 'end' | 'center' | 'between'
+  justify?: 'start' | 'end' | 'center' | 'between' | 'around'
+  justifyContent?: 'start' | 'end' | 'center' | 'between' | 'around'
   items?: 'start' | 'end' | 'center' | 'stretch' | 'baseline'
   align?: 'start' | 'end' | 'center' | 'stretch' | 'baseline'
   alignItems?: 'start' | 'end' | 'center' | 'stretch' | 'baseline'

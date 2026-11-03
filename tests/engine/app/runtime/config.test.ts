@@ -20,8 +20,31 @@ describe('app runtime configuration', () => {
       maxPixelRatio: undefined,
       reducedEffects: false,
       collaborationTransport: 'test',
-      collaborationRelayURL: 'ws://localhost:4000'
+      collaborationRelayURL: 'ws://localhost:4000',
+      viewportMotion: false,
+      drafts: false,
+      embed: null
     })
+  })
+
+  test('an embed hides chrome unless asked and keeps no drafts', () => {
+    const embed = parseAppRuntimeConfig('?embed&origin=https%3A%2F%2Fhost.example')
+    expect(embed.embed).toEqual({ origin: 'https://host.example', allowEdit: false, chrome: false })
+    expect(embed.showChrome).toBe(false)
+    expect(embed.drafts).toBe(false)
+    expect(parseAppRuntimeConfig('?embed&chrome').showChrome).toBe(true)
+  })
+
+  test('glides the viewport outside test runs, and in one that asks for it', () => {
+    expect(parseAppRuntimeConfig('').viewportMotion).toBe(true)
+    expect(parseAppRuntimeConfig('?test').viewportMotion).toBe(false)
+    expect(parseAppRuntimeConfig('?test&viewport-motion').viewportMotion).toBe(true)
+  })
+
+  test('keeps new documents as drafts outside test runs, and in one that asks for it', () => {
+    expect(parseAppRuntimeConfig('').drafts).toBe(true)
+    expect(parseAppRuntimeConfig('?test').drafts).toBe(false)
+    expect(parseAppRuntimeConfig('?test&drafts').drafts).toBe(true)
   })
 
   test('uses a persisted renderer preference when no URL override is present', () => {
@@ -65,7 +88,10 @@ describe('app runtime configuration', () => {
       maxPixelRatio: undefined,
       reducedEffects: false,
       collaborationTransport: 'default',
-      collaborationRelayURL: null
+      collaborationRelayURL: null,
+      viewportMotion: true,
+      drafts: true,
+      embed: null
     })
   })
 })

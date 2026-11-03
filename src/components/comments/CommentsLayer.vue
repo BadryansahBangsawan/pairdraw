@@ -50,7 +50,7 @@ const menuCls = useMenuUI({ content: 'min-w-40' })
 const ui = commentsTheme()
 const threadCls = usePopoverUI({ content: ui.card() })
 const draftCls = usePopoverUI({ content: ui.draftCard() })
-const { activeThreadId, draft, showOnCanvas, listShowResolved } = comments
+const { activeThreadId, draft, showOnCanvas, listShowResolved, commentsOnly } = comments
 const commenting = computed(() => store.state.activeTool === 'COMMENT')
 
 const draftText = ref('')
@@ -200,7 +200,7 @@ function closeCard() {
             :dragging="pin.dragging"
             :style="{ left: `${pin.left}px`, top: `${pin.top}px` }"
             :aria-label="`${author.name(pin.thread.author)}: ${pin.thread.text}`"
-            @pointerdown.stop="pinDrag.start($event, pin.thread.id, pin.at)"
+            @pointerdown.stop="!commentsOnly && pinDrag.start($event, pin.thread.id, pin.at)"
             @pointermove="pinDrag.move"
             @pointerup="pinDrag.end"
             @pointercancel="pinDrag.end"
@@ -255,6 +255,7 @@ function closeCard() {
             v-else-if="activePin"
             ref="threadCard"
             :thread="activePin.thread"
+            :can-delete-replies="!commentsOnly"
             @close="closeCard"
             @resolve="comments.setResolved"
             @reply="comments.reply"

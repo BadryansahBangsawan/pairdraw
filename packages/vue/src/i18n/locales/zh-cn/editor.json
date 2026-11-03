@@ -16,5 +16,19 @@
   "toggleAIChat": "AI 聊天 ({shortcut})",
   "startPreview": "预览 ({shortcut})",
   "toggleLayersPanel": "图层面板",
-  "togglePropertiesPanel": "属性面板"
+  "togglePropertiesPanel": "属性面板",
+  "textLink": "链接",
+  "addTextLink": "添加链接",
+  "editTextLink": "编辑链接",
+  "removeTextLink": "移除链接",
+  "openTextLink": "打开链接",
+  "textLinkAddress": "链接地址",
+  "textLinkPlaceholder": "粘贴链接或电子邮件地址",
+  "textLinkInvalid": "请使用网址或电子邮件地址。",
+  "textLinkMixed": "多个链接",
+  "textLinkToLayer": "链接到 {name}",
+  "embedWaiting": "正在等待宿主页面",
+  "embedWaitingDescription": "嵌入此设计的页面连接后，设计就会打开。",
+  "embedInvalidOrigin": "此嵌入无法连接",
+  "embedInvalidOriginDescription": "其链接必须指明嵌入页面的源，例如 https://example.com。"
 }

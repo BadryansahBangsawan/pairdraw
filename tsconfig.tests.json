@@ -112,6 +112,15 @@
       "@open-pencil/mermaid": [
         "./packages/mermaid/src/index.ts"
       ],
+      "#web-capture/*": [
+        "./packages/web-capture/src/*"
+      ],
+      "@open-pencil/web-capture": [
+        "./packages/web-capture/src/index.ts"
+      ],
+      "@open-pencil/web-capture/capturer": [
+        "./packages/web-capture/src/capturer/index.ts"
+      ],
       "#emit/*": [
         "./packages/emit/src/*"
       ],

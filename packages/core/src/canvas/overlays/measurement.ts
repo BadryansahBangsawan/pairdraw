@@ -4,7 +4,7 @@ import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
 import { getAxisAlignedWorldBounds, getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
 import { computeBounds } from '@open-pencil/scene-graph/geometry'
 import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import type { Color, Rect } from '@open-pencil/scene-graph/primitives'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import {
@@ -155,7 +155,15 @@ function textWidth(r: SkiaRenderer, text: string): number {
   return width
 }
 
-function drawPill(r: SkiaRenderer, canvas: Canvas, text: string, x: number, y: number) {
+/** A size label: `text` on a rounded plate centred at screen point `x`, `y`. */
+export function drawPill(
+  r: SkiaRenderer,
+  canvas: Canvas,
+  text: string,
+  x: number,
+  y: number,
+  color: Color = MEASUREMENT_COLOR
+) {
   const font = r.sizeFont
   if (!font) return
   const width = textWidth(r, text) + MEASUREMENT_PILL_PADDING_X * 2
@@ -169,7 +177,7 @@ function drawPill(r: SkiaRenderer, canvas: Canvas, text: string, x: number, y: n
     MEASUREMENT_PILL_RADIUS,
     MEASUREMENT_PILL_RADIUS
   )
-  r.auxFill.setColor(r.ck.Color4f(MEASUREMENT_COLOR.r, MEASUREMENT_COLOR.g, MEASUREMENT_COLOR.b, 1))
+  r.auxFill.setColor(r.ck.Color4f(color.r, color.g, color.b, 1))
   canvas.drawRRect(rect, r.auxFill)
   r.auxFill.setColor(r.ck.WHITE)
   canvas.drawText(

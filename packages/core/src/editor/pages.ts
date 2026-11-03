@@ -245,6 +245,9 @@ export function createPageActions(ctx: EditorContext, drawing?: PageDrawing) {
     const page = ctx.graph.getNode(prepared.pageId)
     if (page?.type !== 'CANVAS') return false
 
+    if (ctx.state.currentPageId !== prepared.pageId) {
+      ctx.emitEditorEvent('page:leaving', ctx.state.currentPageId, prepared.pageId)
+    }
     pageViewportStore.saveCurrentPageViewport()
     const previousPageId = ctx.state.currentPageId
     ctx.state.currentPageId = prepared.pageId

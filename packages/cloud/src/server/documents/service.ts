@@ -3,6 +3,7 @@ import type {
   CommitUploadInput,
   CreateDocumentInput,
   CreateUploadInput,
+  DocumentAccess,
   DocumentDownload,
   DocumentSummary,
   ImageUploadOffer,
@@ -186,7 +187,11 @@ export function createDocumentService(
     }
   }
 
-  async function createDownload(documentId: string): Promise<DocumentDownload> {
+  /** A download of the document's current revision, or of `revisionId` for a snapshot link. */
+  async function createDownload(
+    documentId: string,
+    revisionId: string | null = null
+  ): Promise<DocumentDownload> {
     const row = await getDocumentSummaryRow(database, documentId)
     if (!row?.currentRevisionId) throw new DocumentNotFoundError()
     const document: DocumentSummary = documentSummary(row)
@@ -200,7 +205,7 @@ export function createDocumentService(
         'storageObject.checksum',
         'storageObject.contentType'
       ])
-      .where('documentRevision.id', '=', document.currentRevisionId)
+      .where('documentRevision.id', '=', revisionId ?? document.currentRevisionId)
       .where('documentRevision.documentId', '=', documentId)
       .executeTakeFirst()
     if (!revision) throw new DocumentNotFoundError()
@@ -383,14 +388,24 @@ export function createDocumentService(
       }
     },
 
-    async access(userId: string, documentId: string) {
+    /** What the person may do with the document, and the revision it holds now. */
+    async access(userId: string, documentId: string): Promise<DocumentAccess> {
       const access = await resolveDocumentAccess(database, userId, documentId)
       if (!access) throw new DocumentNotFoundError()
-      return access
+      const document = await database
+        .selectFrom('document')
+        .select('currentRevisionId')
+        .where('id', '=', documentId)
+        .executeTakeFirst()
+      return { ...access, currentRevisionId: document?.currentRevisionId ?? null }
     },
 
-    async downloadShared(documentId: string): Promise<DocumentDownload> {
-      return createDownload(documentId)
+    /** For a guest a share or public profile let in: the current revision, or a snapshot's. */
+    async downloadShared(
+      documentId: string,
+      revisionId: string | null = null
+    ): Promise<DocumentDownload> {
+      return createDownload(documentId, revisionId)
     },
 
     /** Links for images a live room names, for someone who may view the document. */

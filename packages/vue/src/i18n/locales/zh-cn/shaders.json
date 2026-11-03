@@ -1,0 +1,17 @@
+{
+  "mode": "着色器模式",
+  "open": "在着色器模式中打开",
+  "region": "着色器模式：{name}",
+  "done": "完成",
+  "leave": "退出着色器模式（{shortcut}）",
+  "play": "播放",
+  "pause": "暂停",
+  "restart": "回到开头",
+  "phase": "动画相位",
+  "position": "{time} / 共 {duration}",
+  "preview": "着色器预览",
+  "settings": "着色器设置",
+  "starting": "正在启动着色器…",
+  "failed": "此着色器无法在这里播放，因此显示其静止帧。",
+  "readOnly": "此文档为只读：着色器可以播放，但无法更改其设置。"
+}

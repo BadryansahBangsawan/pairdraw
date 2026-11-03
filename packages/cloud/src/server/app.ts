@@ -51,6 +51,7 @@ import {
   type CloudPolicy,
   type EntitlementSource
 } from '#cloud/server/policy'
+import { createPublicProfileService } from '#cloud/server/profiles'
 import {
   CLOUD_RATE_LIMITS,
   createActorRateLimiter,
@@ -209,6 +210,13 @@ export function createCloudApp(services: CloudServices) {
     deploymentMode: services.config.deployment,
     workspaceInvitations: workspaceMembers
   })
+  const profiles = createPublicProfileService(services.database, {
+    policy,
+    deploymentMode: services.config.deployment,
+    ...(services.config.enrollmentMode === 'approval'
+      ? { isApproved: (email: string) => enrollment.isApproved(email) }
+      : {})
+  })
   const collaboration = createCollaborationTicketService({
     database: services.database,
     sharing,
@@ -288,6 +296,7 @@ export function createCloudApp(services: CloudServices) {
     sharing,
     workspaces,
     workspaceMembers,
+    profiles,
     resolveSession
   })
   const publicCloudAPI = createPublicCloudAPIRouter({
@@ -298,6 +307,7 @@ export function createCloudApp(services: CloudServices) {
     sharing,
     workspaces,
     workspaceMembers,
+    profiles,
     resolveSession
   })
 

@@ -5,6 +5,7 @@ import { IS_TAURI } from '@open-pencil/core/constants'
 import { getActiveEditorStoreOrNull } from '@/app/editor/active-store'
 
 import { enabledSkillsFrom, skillPreferences } from './preferences'
+import { readBuiltinSkills } from './sources/builtin'
 import { nativeHomeSkillReader, readHomeSkills } from './sources/home'
 import {
   nativeProjectSkillReader,
@@ -26,8 +27,11 @@ export interface SkillLibrary {
   enabled: () => readonly Skill[]
 }
 
-/** Every skill found, and the folders that failed, from the last read. */
-export const foundSkills = shallowRef<SkillScan>({ skills: [], problems: [] })
+/**
+ * Every skill found, and the folders that failed, from the last read. The built-in skills are
+ * there from the start, so the chat offers them before any read.
+ */
+export const foundSkills = shallowRef<SkillScan>(readBuiltinSkills())
 
 /** The skills folders near the open document, from the last read. */
 export const projectSkillsFolders = shallowRef<ProjectSkillsFolder[]>([])
@@ -71,7 +75,8 @@ let requests = 0
 /**
  * Reads uploaded skills and the skill folders again. A repeated name resolves to the first:
  * uploads, then the document's folders, nearest first, then the user's own, as project skills
- * win over personal ones in Claude Code and pi.
+ * win over personal ones in Claude Code and pi, and the built-in skills last, so a user's skill
+ * can stand in for one.
  */
 export function refreshSkills(): Promise<void> {
   // A caller that arrives mid-read, such as one that just saved an upload, gets a read that
@@ -98,9 +103,10 @@ async function readSkills(): Promise<void> {
       uploadedSkillStore().list().then(skillsFromUploads),
       readFolders()
     ])
+    const builtin = readBuiltinSkills()
     foundSkills.value = {
-      skills: [...uploaded.skills, ...project.skills, ...home.skills],
-      problems: [...uploaded.problems, ...project.problems, ...home.problems]
+      skills: [...uploaded.skills, ...project.skills, ...home.skills, ...builtin.skills],
+      problems: [...uploaded.problems, ...project.problems, ...home.problems, ...builtin.problems]
     }
   } catch (error) {
     // The last read stays, so a message never fails over a folder, except the skills next to

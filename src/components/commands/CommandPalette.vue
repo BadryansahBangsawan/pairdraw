@@ -9,6 +9,7 @@ import { shortcutPlatform } from '@open-pencil/vue/editor/commands'
 import { useCommandMessages, useCommonMessages } from '@open-pencil/vue/i18n'
 import { CommandPaletteRoot } from '@open-pencil/vue/primitives/CommandPalette'
 
+import { useImageAIPaletteGroup } from '@/app/editor/image-ai/palette'
 import { usePagePaletteGroup } from '@/app/editor/pages/palette'
 import { shortcutCode } from '@/app/shell/keyboard/layout'
 import { useAppMenu } from '@/app/shell/menu/app-menu'
@@ -20,9 +21,11 @@ import { useCommandPaletteUI } from './ui'
 
 const { commandGroups } = useAppMenu()
 const pageGroup = usePagePaletteGroup()
-const groups = computed(() =>
-  pageGroup.value ? [pageGroup.value, ...commandGroups.value] : commandGroups.value
-)
+const imageAIGroup = useImageAIPaletteGroup()
+const groups = computed(() => {
+  const base = pageGroup.value ? [pageGroup.value, ...commandGroups.value] : commandGroups.value
+  return imageAIGroup.value ? [...base, imageAIGroup.value] : base
+})
 const commands = useCommandMessages()
 const common = useCommonMessages()
 const paletteUI = useCommandPaletteUI()

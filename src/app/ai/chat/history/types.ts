@@ -2,6 +2,7 @@ import type { Chat } from '@ai-sdk/vue'
 import type { UIMessage } from 'ai'
 
 import type { AttachmentPresentation } from '@/app/ai/attachment/presentation/types'
+import type { ConversationPins } from '@/app/ai/chat/pins/types'
 import type { ToolChange } from '@/app/ai/tools/changes/types'
 
 import type { ChatDocumentEditor } from './document'
@@ -47,6 +48,11 @@ export interface ConversationMessage {
 
 export interface Conversation extends ConversationMeta {
   messages: ConversationMessage[]
+  /**
+   * The style kit and reference images pinned to the conversation, stored apart from its list
+   * row since they hold images. Absent when nothing was ever pinned.
+   */
+  pins?: ConversationPins
 }
 
 export interface ConversationStore {
@@ -57,6 +63,8 @@ export interface ConversationStore {
   /** Records the model profile a saved conversation uses, leaving its messages and time alone. */
   setProfile(id: string, profileId: string): Promise<void>
   remove(id: string): Promise<void>
+  /** Forgets a conversation that became empty again, which may still be written later. */
+  discard(id: string): Promise<void>
   resolveFile(handle: FileSystemFileHandle): Promise<string>
   reassignDocument(from: string, to: string, name: string): Promise<void>
   getSelected(documentId: string): Promise<string | null>

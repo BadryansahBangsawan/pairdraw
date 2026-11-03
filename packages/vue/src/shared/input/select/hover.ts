@@ -1,4 +1,4 @@
-import { resolveEditorProfile, type Editor } from '@open-pencil/core'
+import { editedImage, resolveEditorProfile, type Editor } from '@open-pencil/core'
 import { layerResizes, layerRotates } from '@open-pencil/scene-graph/generated'
 
 import { connectorLineCursor } from '#vue/shared/input/connector/line'
@@ -9,6 +9,7 @@ import {
   getHitHandleByMatrix,
   hitTestCornerRotationByMatrix
 } from '#vue/shared/input/geometry'
+import { imageCropCursor } from '#vue/shared/input/image-crop'
 import { lineEndAt } from '#vue/shared/input/line/end'
 import type { HitTestFns } from '#vue/shared/input/select'
 import { hitTestLabel } from '#vue/shared/input/select/hit'
@@ -86,7 +87,15 @@ export function updateHoverCursor(
 ): string | null {
   if (getNodeEditState(editor)) {
     editor.setHoveredNode(null)
-    return nodeEditCursor(editor)
+    // `deep` is ⌘/Ctrl held, which leaves the transform box to segment bends.
+    return nodeEditCursor(editor, cx, cy, deep)
+  }
+
+  // An edited image's handles stand in for the selection's, and the image under it moves.
+  if (editedImage(editor.graph, editor.state.imageEdit)) {
+    editor.setHoveredNode(null)
+    const { zoom, panX, panY } = editor.state
+    return imageCropCursor(editor, cx * zoom + panX, cy * zoom + panY)
   }
 
   // As a press does: a line's ends, a connector's line handles, then resizing, then a label, then

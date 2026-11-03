@@ -21,7 +21,8 @@ import {
 // stays in the document while its path grows, and committing updates it.
 export function createPenActions(editor: Editor, state: PenState) {
   function setTool(tool: Tool) {
-    if (state.penState && tool !== 'PEN' && tool !== 'HAND') {
+    // Panning or zooming mid-path, as Space and Z do, keeps the path open.
+    if (state.penState && tool !== 'PEN' && tool !== 'HAND' && tool !== 'ZOOM') {
       editor.penCommit(false)
     }
     editor.setTool(tool)

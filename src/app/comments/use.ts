@@ -76,6 +76,16 @@ export const useComments = createGlobalState(() => {
     return { name: own?.name.value ?? identity.name.value, color: own?.color ?? identity.color }
   })
 
+  /**
+   * Whether this tab can only comment, as someone a Cloud link lets comment: it starts threads,
+   * replies and resolves them, while deleting, deleting replies and moving pins stay with people
+   * who can edit, since the room would refuse them and this tab's copy would drift from it.
+   */
+  const commentsOnly = computed(() => {
+    const restrictions = storeRef.value?.state.hostRestrictions
+    return restrictions?.readOnly === true && restrictions.comments === true
+  })
+
   function startDraft(at: PagePoint) {
     activeThreadId.value = null
     draft.value = at
@@ -114,7 +124,7 @@ export const useComments = createGlobalState(() => {
   /** A dragged pin lands on whatever is under it now, as in Figma. */
   function movePin(threadId: string, at: Vector) {
     const store = documentComments.store()
-    if (!store) return
+    if (!store || commentsOnly.value) return
     update(threadId, (thread) => ({ ...thread, ...commentAnchor(store.graph, thread.pageId, at) }))
   }
 
@@ -135,15 +145,18 @@ export const useComments = createGlobalState(() => {
 
   /** Ask before deleting; the confirmation dialog answers with `confirmDelete`. */
   function requestDelete(threadId: string) {
+    if (commentsOnly.value) return
     void deleteRequested.trigger(threadId)
   }
 
   function confirmDelete(threadId: string) {
+    if (commentsOnly.value) return
     update(threadId, deleteCommentThread)
     if (activeThreadId.value === threadId) activeThreadId.value = null
   }
 
   function deleteReply(threadId: string, replyId: string) {
+    if (commentsOnly.value) return
     update(threadId, (thread) => deleteCommentReply(thread, replyId))
   }
 
@@ -171,6 +184,7 @@ export const useComments = createGlobalState(() => {
     draft,
     onDeleteRequested: deleteRequested.on,
     author: computed(() => me.value.name),
+    commentsOnly,
     showOnCanvas,
     listQuery,
     listShowResolved,

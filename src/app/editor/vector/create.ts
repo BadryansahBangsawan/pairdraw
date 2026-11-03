@@ -6,6 +6,7 @@ import { createVectorEditLifecycle } from './lifecycle'
 import { createVectorEditNetworkActions, getLiveNetwork, setNodeEditNetwork } from './network'
 import { createVectorEditPathActions } from './path-actions'
 import { createVectorEditSelectionActions } from './selection'
+import { createVectorEditTransformActions } from './transform-actions'
 import type { VectorEditState } from './types'
 
 export function createVectorEditActions(editor: Editor, state: VectorEditState) {
@@ -27,6 +28,7 @@ export function createVectorEditActions(editor: Editor, state: VectorEditState) 
   const { nodeEditConnectEndpoints, nodeEditAddVertex, nodeEditRemoveVertex } =
     createVectorEditNetworkActions(editor, state, getNodeEditState)
   const pathActions = createVectorEditPathActions(editor, state, getNodeEditState)
+  const transformActions = createVectorEditTransformActions(editor, getNodeEditState)
 
   function cancelNodeEditDrag() {
     const editState = getNodeEditState()
@@ -35,6 +37,7 @@ export function createVectorEditActions(editor: Editor, state: VectorEditState) 
     if (!previous) return
     setNodeEditNetwork(editState, previous)
     editState.history.pop()
+    editState.transformBox = null
     // An ⌥/Alt drag selected copies the snapshot does not have; keep only what still exists.
     const below = (indices: Set<number>, length: number) =>
       new Set([...indices].filter((index) => index < length))
@@ -78,6 +81,7 @@ export function createVectorEditActions(editor: Editor, state: VectorEditState) 
     nodeEditPushHistory,
     nodeEditUndo,
     nodeEditRedo,
-    ...pathActions
+    ...pathActions,
+    ...transformActions
   }
 }

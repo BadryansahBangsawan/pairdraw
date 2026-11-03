@@ -48,7 +48,8 @@ const JUSTIFY_LABELS: Record<string, string> = {
   MIN: 'start',
   CENTER: 'center',
   MAX: 'end',
-  SPACE_BETWEEN: 'between'
+  SPACE_BETWEEN: 'between',
+  SPACE_AROUND: 'around'
 }
 
 const ITEMS_LABELS: Record<string, string> = {

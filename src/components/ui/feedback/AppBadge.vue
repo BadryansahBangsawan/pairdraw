@@ -9,7 +9,12 @@ const { ui } = defineProps<{
 }>()
 
 const cls = computed(() =>
-  twMerge('shrink-0 rounded bg-accent/10 px-1 py-px text-[9px] text-primary', ui?.base)
+  // Light theme's primary reads on the panels but not on the accent tint over them, so the ink
+  // that light theme's surface token carries takes over there.
+  twMerge(
+    'shrink-0 rounded bg-accent/10 px-1 py-px text-[9px] text-primary in-data-[theme=light]:text-surface',
+    ui?.base
+  )
 )
 </script>
 

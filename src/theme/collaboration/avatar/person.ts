@@ -1,10 +1,12 @@
 /**
  * A person's initials on their color, in the avatar stack, presence lists, and mobile HUD. The
- * ring that parts overlapping avatars takes the surface they sit on: the panel, or the window
- * backdrop for a stack marked `data-surface="canvas"`, such as the top bar's.
+ * initials themselves take white or black, whichever reads on that color, so the renderers set
+ * their text color beside the background; the ring that parts overlapping avatars takes the
+ * surface they sit on: the panel, or the window backdrop for a stack marked
+ * `data-surface="canvas"`, such as the top bar's.
  */
 export default {
-  base: 'flex shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white',
+  base: 'flex shrink-0 items-center justify-center rounded-full text-[10px] font-semibold',
   variants: {
     size: { sm: 'size-6', md: 'size-7', lg: 'size-12 text-base' },
     bordered: { true: 'border-2 border-panel in-data-[surface=canvas]:border-canvas', false: '' },

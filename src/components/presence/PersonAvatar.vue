@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { colorToCSS } from '@open-pencil/scene-graph/color'
+import { colorToCSS, readableForeground } from '@open-pencil/scene-graph/color'
 import type { Color } from '@open-pencil/scene-graph/primitives'
 import { useCollaborationMessages } from '@open-pencil/vue/i18n'
 
@@ -31,6 +31,11 @@ const {
 
 const messages = useCollaborationMessages()
 const ui = avatarStack()
+/** The initials' colors: the person's color for the chip, white or black for the text on it. */
+const initialsStyle = computed(() => ({
+  background: colorToCSS(color),
+  color: colorToCSS(readableForeground(color))
+}))
 const voiceState = computed(() => {
   if (!voice) return 'none'
   return voice.speaking ? 'speaking' : 'listening'
@@ -41,7 +46,7 @@ const voiceState = computed(() => {
   <span :class="ui.person()" :data-voice="voiceState === 'none' ? undefined : voiceState">
     <span
       :class="avatar({ size, bordered: true, following, interactive, voice: voiceState })"
-      :style="{ background: colorToCSS(color) }"
+      :style="initialsStyle"
     >
       {{ initials(name) }}
     </span>

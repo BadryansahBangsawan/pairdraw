@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { useRafFn, useResizeObserver, useScroll } from '@vueuse/core'
+import { useMutationObserver, useRafFn, useResizeObserver, useScroll } from '@vueuse/core'
 import { ref, useTemplateRef, watch } from 'vue'
 
 import { useMenuUI } from '@/components/ui/menu/menu'
+defineProps<{ ariaLabel?: string }>()
 
 /** Pixels per millisecond while the pointer rests on a chevron, about a row every 50 ms. */
 const SCROLL_SPEED = 0.5
@@ -18,6 +19,18 @@ const cls = useMenuUI()
 const viewport = useTemplateRef<HTMLElement>('viewport')
 const { arrivedState, measure } = useScroll(viewport, { offset: { top: 1, bottom: 1 } })
 useResizeObserver(viewport, () => measure())
+
+/** Whether the menu holds more than the viewport shows, so the wheel, the chevrons, or the
+ * arrow keys scroll it. Then the viewport is a tab stop with the `group` role a menu allows
+ * among its items, so a keyboard user can reach the scrolling and an axe run accepts it. */
+const scrollable = ref(false)
+function updateScrollable() {
+  const element = viewport.value
+  scrollable.value = element !== null && element.scrollHeight > element.clientHeight
+}
+useResizeObserver(viewport, updateScrollable)
+// Items can arrive after the viewport has its size, so watch what is inside it too.
+useMutationObserver(viewport, updateScrollable, { childList: true, subtree: true })
 
 const scrolling = ref<Edge | null>(null)
 const { pause, resume } = useRafFn(
@@ -49,7 +62,15 @@ watch(
 
 <template>
   <div :class="cls.scrollRoot">
-    <div ref="viewport" :class="cls.scrollViewport"><slot /></div>
+    <div
+      ref="viewport"
+      :class="cls.scrollViewport"
+      :role="scrollable ? 'group' : undefined"
+      :tabindex="scrollable ? 0 : undefined"
+      :aria-label="scrollable && ariaLabel ? ariaLabel : undefined"
+    >
+      <slot />
+    </div>
     <div
       v-if="!arrivedState.top"
       data-edge="top"

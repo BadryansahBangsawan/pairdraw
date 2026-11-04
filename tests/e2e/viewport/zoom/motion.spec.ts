@@ -28,7 +28,11 @@ test('zoom to 100% glides there instead of jumping', async () => {
 test('with reduced motion the view jumps', async () => {
   await editor.page.emulateMedia({ reducedMotion: 'reduce' })
   // The media query's change event reaches the app with the next frame.
-  await editor.page.evaluate(() => new Promise((resolve) => requestAnimationFrame(resolve)))
+  await editor.page.evaluate(() => {
+    const { promise, resolve } = Promise.withResolvers()
+    requestAnimationFrame(resolve)
+    return promise
+  })
   await editor.page.evaluate(() => {
     const store = window.openPencil?.getStore?.()
     if (!store) throw new Error('OpenPencil store not initialized')

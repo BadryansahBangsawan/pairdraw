@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { tv } from 'tailwind-variants'
 
-import { colorToCSS } from '@open-pencil/scene-graph/color'
+import { colorToCSS, readableForeground } from '@open-pencil/scene-graph/color'
 import { useInlineRename } from '@open-pencil/vue/editor/inline-rename'
 import { useI18n } from '@open-pencil/vue/i18n'
 
@@ -60,7 +60,13 @@ function followLabel(name: string, target: FollowTarget): string {
   <ul data-test-id="collab-presence-list" :class="ui.root()">
     <li v-for="person in rows" :key="person.clientId ?? 'self'">
       <div data-slot="person" :class="ui.person()">
-        <div :class="avatar()" :style="{ background: colorToCSS(person.color) }">
+        <div
+          :class="avatar()"
+          :style="{
+            background: colorToCSS(person.color),
+            color: colorToCSS(readableForeground(person.color))
+          }"
+        >
           {{ initials(person.name || common.you) }}
         </div>
         <span :class="ui.name()">

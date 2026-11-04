@@ -51,10 +51,12 @@ describe('darkenForContrast', () => {
   test('darkens just enough for white text to reach 4.5:1, keeping the hue', () => {
     const darkened = darkenForContrast(amber)
     expect(contrastRatio(darkened, WHITE)).toBeGreaterThanOrEqual(4.5)
-    expect(contrastRatio(darkened, WHITE)).toBeLessThan(4.51)
-    // Every channel scaled by one factor keeps their proportions, and so the hue.
-    expect(darkened.g / darkened.r).toBeCloseTo(amber.g / amber.r, 6)
-    expect(darkened.b / darkened.r).toBeCloseTo(amber.b / amber.r, 6)
+    // Rounding the channels to 8 bits, as browsers do, may overshoot a little.
+    expect(contrastRatio(darkened, WHITE)).toBeLessThan(4.55)
+    // Every channel is scaled by one factor and then rounded to 8 bits, so the hue holds
+    // within that rounding.
+    expect(darkened.g / darkened.r).toBeCloseTo(amber.g / amber.r, 2)
+    expect(darkened.b / darkened.r).toBeCloseTo(amber.b / amber.r, 2)
     expect(darkened.a).toBe(1)
   })
 
@@ -66,5 +68,19 @@ describe('darkenForContrast', () => {
   test('takes another text color and ratio', () => {
     const darkened = darkenForContrast(amber, GRAY_94, 3)
     expect(contrastRatio(darkened, GRAY_94)).toBeGreaterThanOrEqual(3)
+  })
+
+  test('still reaches the ratio after the browser rounds the channels to 8 bits', () => {
+    // White on this purple is 4.35:1 raw and lands on 4.50:1 unrounded; rounding to
+    // rgb(122, 90, 250) drops to 4.496:1, which is the bug this guard pins.
+    const purple = { r: 0x7c / 255, g: 0x5c / 255, b: 0xff / 255, a: 1 }
+    const darkened = darkenForContrast(purple)
+    const eightBit = {
+      ...darkened,
+      r: Math.round(darkened.r * 255) / 255,
+      g: Math.round(darkened.g * 255) / 255,
+      b: Math.round(darkened.b * 255) / 255
+    }
+    expect(contrastRatio(eightBit, WHITE)).toBeGreaterThanOrEqual(4.5)
   })
 })

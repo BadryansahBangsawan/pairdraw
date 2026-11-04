@@ -7,6 +7,8 @@ interface CompressMessage {
   thumbnailPNG: Uint8Array
   metaJSON: string
   images: Array<{ name: string; data: Uint8Array }>
+  fonts?: Array<{ name: string; data: Uint8Array }>
+  fontsJSON?: string
   figKiwiVersion?: number
   compressionLevel?: number
   kind?: FigFileKind
@@ -26,7 +28,9 @@ self.onmessage = async (e: MessageEvent<CompressMessage>) => {
       images,
       figKiwiVersion,
       await loadFigDataCompressor(e.data.compressionLevel),
-      kind
+      kind,
+      (e.data.fonts ?? []).map((font) => ({ name: font.name, data: font.data })),
+      e.data.fontsJSON
     )
     self.postMessage(result, { transfer: [result.buffer] })
   } catch (error) {

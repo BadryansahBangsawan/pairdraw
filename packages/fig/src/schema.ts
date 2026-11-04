@@ -22,3 +22,13 @@ export const figArchiveMetaSchema = v.strictObject({
   exported_at: v.pipe(v.string(), v.isoTimestamp())
 })
 export type FigArchiveMetaJSON = v.InferOutput<typeof figArchiveMetaSchema>
+
+/** What `fonts.json` records: each document font's archive file, family, and style. */
+export const figFontsManifestSchema = v.array(
+  v.object({
+    file: v.pipe(v.string(), v.regex(/^fonts\/\d+\.(ttf|otf|woff|woff2)$/)),
+    family: v.pipe(v.string(), v.minLength(1), v.maxLength(200)),
+    style: v.pipe(v.string(), v.minLength(1), v.maxLength(200))
+  })
+)
+export type FigFontsManifest = v.InferOutput<typeof figFontsManifestSchema>

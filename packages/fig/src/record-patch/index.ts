@@ -59,6 +59,13 @@ export interface FigPatchedArchiveInput {
   metaJSON: string
   /** Images the archive does not hold yet. */
   images: FigImageEntry[]
+  /** The patched archive's full font list, each named by its `fonts/<index>.<ext>` archive path. */
+  fonts?: FigImageEntry[]
+  /**
+   * `fonts.json` for the patched archive. Fonts replace the archive's wholesale: pass the full
+   * list whenever fonts change, or neither to keep the archive's.
+   */
+  fontsJSON?: string
   /** The zstd level the document data is written at; the archive is read whatever it used. */
   compressionLevel?: number
   /** A design file or a FigJam board; the archive's own kind when omitted. */
@@ -477,6 +484,7 @@ export function patchFigArchive(
   const parts = readFigArchiveParts(bytes)
   const kiwiData = patchFigMessage(parts.schemaDeflated, parts.dataRaw, patch)
   const archiveImages = new Set(parts.images.map(([hash]) => hash))
+  const archived = input.fonts === undefined && input.fontsJSON === undefined
   return writeFigArchive({
     schemaDeflated: parts.schemaDeflated,
     kiwiData,
@@ -486,6 +494,10 @@ export function patchFigArchive(
       ...parts.images.map(([name, data]) => ({ name: `images/${name}`, data })),
       ...input.images.filter((image) => !archiveImages.has(image.name.replace(/^images\//, '')))
     ],
+    fonts: archived
+      ? parts.fonts.map(([name, data]) => ({ name: `fonts/${name}`, data }))
+      : input.fonts,
+    fontsJSON: archived ? (parts.fontsJSON ?? undefined) : input.fontsJSON,
     figKiwiVersion: parts.figKiwiVersion,
     compress,
     kind: input.kind ?? parts.kind

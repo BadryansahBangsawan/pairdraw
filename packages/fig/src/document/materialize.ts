@@ -4,6 +4,7 @@ import { generateId, SceneGraph, type SceneNode } from '@open-pencil/scene-graph
 import { OPEN_PENCIL_PLUGIN_DATA } from '@open-pencil/scene-graph/plugin-data'
 import { remapStyleRunReferences } from '@open-pencil/scene-graph/text'
 
+import { resolveFigFonts } from '../fonts'
 import {
   reconcileLiveComponentEdits,
   syncSourceLayers
@@ -178,6 +179,16 @@ export function createFigDocumentSession(
       } satisfies FigSessionCheckpoint)
     },
     graph: state.graph,
+    /**
+     * The document fonts the archive stores, resolved through its `fonts.json`. Callers register
+     * them for the graph, so its text draws in them.
+     */
+    fonts: archive.fontsJSON
+      ? resolveFigFonts(
+          archive.fontsJSON,
+          new Map(archive.fonts.map(([name, data]) => [`fonts/${name}`, data]))
+        )
+      : [],
     graphPageId(sourcePageId: string): string | undefined {
       return archive.reader.pages.some((page) => page.id === sourcePageId)
         ? state.sources.get(sourcePageId)

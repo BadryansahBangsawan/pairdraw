@@ -2,13 +2,22 @@ import { SceneGraph } from '@open-pencil/scene-graph'
 import type { DocumentKind, EnabledLibraryBinding, SceneNode } from '@open-pencil/scene-graph'
 
 import type { PortableSceneGraphData } from '#core/kiwi/fig/parse/portable-data'
+import { documentFontsOf } from '#core/text/font/document'
 
+/** A document font carried with a graph across a worker boundary, by value. */
+export interface SerializedDocumentFont {
+  family: string
+  style: string
+  data: ArrayBuffer
+}
 export interface SerializedSceneGraph extends PortableSceneGraphData {
   instanceIndex: Array<[string, string[]]>
   figKiwiVersion: number | null
   figSchemaDeflated: Uint8Array | null
   documentKind: DocumentKind
   enabledLibraries?: Array<[string, EnabledLibraryBinding]>
+  /** Document fonts, by value; the receiver registers them for the graph. */
+  documentFonts?: SerializedDocumentFont[]
 }
 
 export function serializeSceneGraph(graph: SceneGraph): SerializedSceneGraph {
@@ -24,9 +33,20 @@ export function serializeSceneGraph(graph: SceneGraph): SerializedSceneGraph {
     figSchemaDeflated: graph.figSchemaDeflated,
     documentColorSpace: graph.documentColorSpace,
     documentKind: graph.documentKind,
-    enabledLibraries: [...graph.enabledLibraries]
+    enabledLibraries: [...graph.enabledLibraries],
+    documentFonts: documentFontsOf(graph).map(({ family, style, data }) => ({
+      family,
+      style,
+      data: data.slice(0)
+    }))
   }
 }
+
+/**
+ * Buffers a serialized graph owns: image and schema bytes, and document font files. Sent as
+ * transferables where they fill their buffer, so a worker opening an archive moves font bytes
+ * instead of copying them.
+ */
 
 export function serializedSceneGraphTransferList(data: SerializedSceneGraph): Transferable[] {
   const buffers = new Set<ArrayBuffer>()
@@ -49,6 +69,7 @@ export function serializedSceneGraphTransferList(data: SerializedSceneGraph): Tr
       buffers.add(data.figSchemaDeflated.buffer)
     }
   }
+  for (const font of data.documentFonts ?? []) buffers.add(font.data)
   return [...buffers]
 }
 

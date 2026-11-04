@@ -27,6 +27,10 @@ export interface WriteFigArchiveInput {
   thumbnailPNG: Uint8Array
   metaJSON: string
   images?: FigImageEntry[]
+  /** Document fonts, each named by its `fonts/<index>.<ext>` archive path. */
+  fonts?: FigImageEntry[]
+  /** `fonts.json` recording each font's family and style; written when fonts are. */
+  fontsJSON?: string
   figKiwiVersion?: number
   /** Compresses the document data; Bun's zstd or deflate when omitted. */
   compress?: FigDataCompressor
@@ -38,6 +42,10 @@ export interface FigParseResult {
   nodeChanges: NodeChange[]
   blobs: Uint8Array[]
   images: Array<[string, Uint8Array]>
+  /** `fonts/` entries, without the prefix, in archive order. */
+  fonts: Array<[string, Uint8Array]>
+  /** The archive's `fonts.json`, when it has one. */
+  fontsJSON: string | null
   figKiwiVersion: number
   /** Deflated Kiwi schema bytes from the original file, retained for round-trip fidelity. */
   figSchemaDeflated: Uint8Array
@@ -78,7 +86,7 @@ function parseRawFigKiwi(
 
   const decoded = decodeFigKiwiCanvas(bytes, onPages, headers)
   const thumbnailPNG = chunks.slice(2).find(isPNG) ?? null
-  return { ...decoded, images: [], thumbnailPNG, metaJSON: null }
+  return { ...decoded, images: [], fonts: [], fontsJSON: null, thumbnailPNG, metaJSON: null }
 }
 
 /**
@@ -111,6 +119,12 @@ export function parseFigBuffer(
     }
     decoded = decodeFigKiwiCanvas(canvasData, onPages, headers)
   }
+  const fontEntries = Object.entries(archive)
+    .filter(([name]) => name.startsWith('fonts/') && name !== 'fonts/')
+    .map(([name, data]) => [name.slice('fonts/'.length), data] as [string, Uint8Array])
+  const fontsJSON = Object.hasOwn(archive, 'fonts.json')
+    ? new TextDecoder().decode(archive['fonts.json'])
+    : null
 
   const metaBytes = archive['meta.json']
   const images = Object.entries(archive)
@@ -120,6 +134,8 @@ export function parseFigBuffer(
   return {
     ...decoded,
     images,
+    fonts: fontEntries,
+    fontsJSON,
     thumbnailPNG: archive['thumbnail.png'] ?? null,
     metaJSON: Object.hasOwn(archive, 'meta.json') ? new TextDecoder().decode(metaBytes) : null
   }
@@ -134,6 +150,10 @@ export interface FigArchiveParts {
   /** A design file or a FigJam board, by the canvas's header. */
   kind: FigFileKind
   images: Array<[string, Uint8Array]>
+  /** `fonts/` entries, without the prefix, in archive order. */
+  fonts: Array<[string, Uint8Array]>
+  /** The archive's `fonts.json`, when it has one. */
+  fontsJSON: string | null
   thumbnailPNG: Uint8Array | null
   metaJSON: string | null
 }
@@ -154,7 +174,14 @@ export function readFigArchiveParts(buffer: ArrayBuffer): FigArchiveParts {
   const chunks = parseFigKiwiChunks(bytes)
   if (chunks) {
     const thumbnailPNG = chunks.slice(2).find(isPNG) ?? null
-    return { ...canvasParts(bytes), images: [], thumbnailPNG, metaJSON: null }
+    return {
+      ...canvasParts(bytes),
+      images: [],
+      fonts: [],
+      fontsJSON: null,
+      thumbnailPNG,
+      metaJSON: null
+    }
   }
   const canvasArchive = unzipSync(bytes, { filter: ({ name }) => isCanonicalCanvasEntry(name) })
   const canonical = findCanvasData(canvasArchive)
@@ -173,6 +200,12 @@ export function readFigArchiveParts(buffer: ArrayBuffer): FigArchiveParts {
   return {
     ...canvasParts(canvasData),
     images,
+    fonts: Object.entries(archive)
+      .filter(([name]) => name.startsWith('fonts/') && name !== 'fonts/')
+      .map(([name, data]) => [name.slice('fonts/'.length), data] as [string, Uint8Array]),
+    fontsJSON: Object.hasOwn(archive, 'fonts.json')
+      ? new TextDecoder().decode(archive['fonts.json'])
+      : null,
     thumbnailPNG: archive['thumbnail.png'] ?? null,
     metaJSON: Object.hasOwn(archive, 'meta.json')
       ? new TextDecoder().decode(archive['meta.json'])
@@ -262,6 +295,9 @@ export function writeFigArchive(input: WriteFigArchiveInput): Uint8Array {
     'meta.json': new TextEncoder().encode(input.metaJSON)
   }
   for (const image of input.images ?? []) entries[image.name] = [image.data, { level: 0 }]
+  for (const font of input.fonts ?? []) entries[font.name] = [font.data, { level: 0 }]
+  if (input.fontsJSON !== undefined)
+    entries['fonts.json'] = new TextEncoder().encode(input.fontsJSON)
   return zipSync(entries)
 }
 
@@ -274,7 +310,9 @@ export function compressFigDataSync(
   imageEntries: FigImageEntry[],
   figKiwiVersion?: number,
   compress?: FigDataCompressor,
-  kind?: FigFileKind
+  kind?: FigFileKind,
+  fonts: FigImageEntry[] = [],
+  fontsJSON?: string
 ): Uint8Array {
   return writeFigArchive({
     schemaDeflated,
@@ -282,6 +320,8 @@ export function compressFigDataSync(
     thumbnailPNG,
     metaJSON,
     images: imageEntries,
+    fonts,
+    fontsJSON,
     figKiwiVersion,
     compress,
     kind

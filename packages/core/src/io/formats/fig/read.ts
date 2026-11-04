@@ -20,6 +20,7 @@ import {
 } from '#core/kiwi/fig/session/document-state'
 import type { FigSessionOpenRequest, FigSessionResponse } from '#core/kiwi/fig/session/protocol'
 import { openReaderSession } from '#core/kiwi/fig/session/reader'
+import { registerDocumentFonts } from '#core/text/font/document'
 
 export interface ParseFigFileOptions {
   populate?: 'all' | 'first-page' | 'none'
@@ -31,10 +32,15 @@ class ReaderSemanticError extends Error {
   override name = 'ReaderSemanticError'
 }
 
-function parseFigFileSync(buffer: ArrayBuffer, options: ParseFigFileOptions = {}): SceneGraph {
+async function parseFigFileMainThread(
+  buffer: ArrayBuffer,
+  options: ParseFigFileOptions = {}
+): Promise<SceneGraph> {
   options.signal?.throwIfAborted()
   const reader = openReaderSession(buffer, options.populate)
   options.onPages?.(reader.pages)
+  options.signal?.throwIfAborted()
+  await reader.registerDocumentFonts()
   options.signal?.throwIfAborted()
   const bytes = buffer.slice(0)
   registerReaderSession(bytes, reader.session, reader.diagnostics)
@@ -81,6 +87,8 @@ export async function parseFigFileViaWorker(
       }
       try {
         const graph = deserializeSceneGraph(e.data.graph)
+        const fonts = e.data.graph.documentFonts ?? []
+        const register = fonts.length > 0 ? registerDocumentFonts(graph, fonts) : null
         if (options.populate === 'first-page' || options.populate === 'none') {
           cleanupAbort()
           const { checkpoint, archiveInfo } = e.data
@@ -99,7 +107,15 @@ export async function parseFigFileViaWorker(
           channel.port1.close()
           worker.terminate()
         }
-        resolve(graph)
+        void Promise.resolve(register).then(
+          () => resolve(graph),
+          (error: unknown) => {
+            cleanupAbort()
+            channel.port1.close()
+            worker.terminate()
+            reject(error instanceof Error ? error : new Error(String(error)))
+          }
+        )
       } catch (error) {
         cleanupAbort()
         channel.port1.close()
@@ -141,11 +157,11 @@ export async function parseFigFile(
     } catch (error) {
       if (options.signal?.aborted || error instanceof ReaderSemanticError) throw error
       console.warn('Worker parsing failed, falling back to main thread:', error)
-      return parseFigFileSync(buffer, options)
+      return parseFigFileMainThread(buffer, options)
     }
   }
   options.signal?.throwIfAborted()
-  return parseFigFileSync(buffer, options)
+  return parseFigFileMainThread(buffer, options)
 }
 
 export async function readFigFile(

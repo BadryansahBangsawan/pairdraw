@@ -1,5 +1,7 @@
 import {
   figCheckpointRecords,
+  figFontEntries,
+  figFontsManifest,
   type FigArchiveRecordInfo,
   type FigRecordPatch
 } from '@open-pencil/fig'
@@ -34,6 +36,7 @@ import {
   populateFigPage,
   readerCheckpoint
 } from '#core/kiwi/fig/session/document-state'
+import { mergeArchiveFonts } from '#core/text/font/document'
 
 import { narrowToChangedFields, type RecordWriter } from './fields'
 
@@ -399,7 +402,16 @@ export function archiveImagesNamedForFigma(graph: SceneGraph): Promise<boolean> 
   }
   return checked
 }
-
+/**
+ * The patched archive's fonts: the archive's merged with the document's fresh ones, or nothing
+ * when the document adds none, so the writer keeps the archive's entries.
+ */
+function patchedFonts(graph: SceneGraph, original: Uint8Array) {
+  const merged = mergeArchiveFonts(graph, original)
+  if (!merged) return {}
+  const fonts = figFontEntries(merged)
+  return { fonts, fontsJSON: figFontsManifest(fonts) }
+}
 /**
  * Write a document opened from a `.fig` as that archive with only its changed records
  * rewritten. The main thread serializes what changed; merging and compressing the rest happen
@@ -436,6 +448,7 @@ export async function writePatchedFigFile(
     thumbnailPNG: extras.thumbnailPNG,
     metaJSON: extras.metaJSON,
     images: extras.images.filter((image) => !archivedImages.has(image.name)),
+    ...patchedFonts(built.graph, await archive.original()),
     compressionLevel: figCompressionLevel(source),
     kind: source.documentKind
   })

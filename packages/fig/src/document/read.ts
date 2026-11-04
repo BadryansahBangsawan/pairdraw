@@ -57,6 +57,10 @@ export function createArchiveDocumentReader(bytes: ArrayBuffer, pageIds?: Readon
     reader: createScopedReader(archiveRecords(parsed.nodeChanges), pageIds),
     blobs: parsed.blobs,
     images: parsed.images,
+    /** `fonts/` entries a session resolves into the document's fonts. */
+    fonts: parsed.fonts,
+    /** The archive's `fonts.json`, naming each font entry's family and style. */
+    fontsJSON: parsed.fontsJSON,
     /** The archive's record headers, which carry the identities patching numbers from. */
     records: parsed.nodeChanges
   }

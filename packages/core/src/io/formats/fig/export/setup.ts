@@ -2,7 +2,7 @@ import type { CanvasKit } from 'canvaskit-wasm'
 import { deflateSync, inflateSync } from 'fflate'
 import { toUint8Array } from 'js-base64'
 
-import { figArchiveMetaJSON } from '@open-pencil/fig'
+import { figArchiveMetaJSON, figFontEntries, figFontsManifest } from '@open-pencil/fig'
 import {
   buildComponentPropIndex,
   exportCanvasGuides,
@@ -33,6 +33,7 @@ import { applyDocumentPluginData } from '#core/io/formats/fig/document-metadata'
 import { figThumbnailPageId } from '#core/io/formats/fig/thumbnail-page'
 import { renderThumbnail, thumbnailFrame } from '#core/io/formats/raster'
 import { settleFontDigestMap } from '#core/kiwi/fig/node-change/serialize'
+import { documentFontsOf } from '#core/text/font/document'
 
 import { assignVariableGuid, assignVariableGuids } from './variables'
 
@@ -528,6 +529,10 @@ export interface FigFileExtras {
   thumbnailPNG: Uint8Array
   metaJSON: string
   images: Array<{ name: string; data: Uint8Array }>
+  /** Document fonts under their `fonts/<index>.<ext>` names. */
+  fonts: Array<{ name: string; data: Uint8Array }>
+  /** `fonts.json` recording each font's family and style. */
+  fontsJSON: string
 }
 
 export interface FigFileExtrasOptions {
@@ -559,9 +564,12 @@ export async function figFileExtras(
     renderCoordinates: thumbnail.region,
     exportedAt: new Date()
   })
+  const fonts = figFontEntries(documentFontsOf(graph))
   return {
     thumbnailPNG: thumbnail.png,
     metaJSON,
-    images: figImageEntries(graph.images, imageNames)
+    images: figImageEntries(graph.images, imageNames),
+    fonts,
+    fontsJSON: figFontsManifest(fonts)
   }
 }

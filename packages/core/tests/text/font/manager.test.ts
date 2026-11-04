@@ -215,3 +215,14 @@ test('keeps the file it has when the same font is read or downloaded again', asy
   expect(manager.renderFamily(family, 'Regular')).toBe(family)
   expect(manager.renderShardFamilies(family, 'Regular')).toEqual([])
 })
+
+test('lists families loaded from font files as document fonts', async () => {
+  const manager = offlineManager()
+  expect(manager.registeredFamilyOptions()).toEqual([])
+  const file = await Bun.file(join(FIXTURES, 'fonts', 'InterVariable-Latin.ttf')).arrayBuffer()
+  await manager.markLoaded('Fonts Test Document', 'Regular', file)
+  await manager.markLoaded('Fonts Test Document', 'Bold', file.slice(0))
+  expect(manager.registeredFamilyOptions()).toEqual([
+    { family: 'Fonts Test Document', source: 'document' }
+  ])
+})

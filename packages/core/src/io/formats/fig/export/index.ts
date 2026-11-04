@@ -206,6 +206,8 @@ async function writeFigFile(
           thumbnailPng: Array.from(extras.thumbnailPNG),
           metaJson: extras.metaJSON,
           images: extras.images.map((e) => ({ name: e.name, data: Array.from(e.data) })),
+          fonts: extras.fonts.map((e) => ({ name: e.name, data: Array.from(e.data) })),
+          fontsJson: extras.fontsJSON,
           figKiwiVersion: version,
           compressionLevel,
           board: graph.documentKind === 'board'
@@ -222,7 +224,9 @@ async function writeFigFile(
     extras.images,
     version,
     compressionLevel,
-    graph.documentKind
+    graph.documentKind,
+    extras.fonts,
+    extras.fontsJSON
   )
 }
 
@@ -241,7 +245,9 @@ function compressViaWorker(
     imageEntries,
     figKiwiVersion,
     compressionLevel,
-    kind
+    kind,
+    fontEntries,
+    fontsJSON
   ]: Parameters<typeof compressFigData>
 ): Promise<Uint8Array> {
   return new Promise((resolve, reject) => {
@@ -271,7 +277,9 @@ function compressViaWorker(
       images: imageEntries,
       figKiwiVersion,
       compressionLevel,
-      kind
+      kind,
+      fonts: fontEntries,
+      fontsJSON
     })
   })
 }
@@ -285,7 +293,9 @@ export async function compressFigData(
   imageEntries: Array<{ name: string; data: Uint8Array }>,
   figKiwiVersion?: number,
   compressionLevel?: number,
-  kind?: FigFileKind
+  kind?: FigFileKind,
+  fontEntries: Array<{ name: string; data: Uint8Array }> = [],
+  fontsJSON?: string
 ): Promise<Uint8Array> {
   if (canUseWorker()) {
     return compressViaWorker(
@@ -296,7 +306,9 @@ export async function compressFigData(
       imageEntries,
       figKiwiVersion,
       compressionLevel,
-      kind
+      kind,
+      fontEntries,
+      fontsJSON
     )
   }
   return compressFigDataSync(
@@ -307,6 +319,8 @@ export async function compressFigData(
     imageEntries,
     figKiwiVersion,
     await loadFigDataCompressor(compressionLevel),
-    kind
+    kind,
+    fontEntries,
+    fontsJSON
   )
 }

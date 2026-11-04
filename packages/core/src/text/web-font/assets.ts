@@ -1,7 +1,9 @@
 import type { RemoteFontSource, ResolveFontResult } from 'unifont'
 
 import type { WebFontFaceAsset, WebFontFaceRequest } from '@open-pencil/dom-css/export'
+import { faceLoadKey } from '@open-pencil/scene-graph/font-style'
 
+import { documentFontData } from '#core/text/font/document'
 import {
   createProviderUnifont,
   isRemoteFontSource,
@@ -13,6 +15,55 @@ import {
   type WebFontProviderId
 } from '#core/text/web-font/resolver'
 
+/**
+ * A document font's file extension and `@font-face` format, read from its signature: TrueType,
+ * OpenType, WOFF, or WOFF2. Null for bytes no document font holds, which registration rejects.
+ */
+function documentFontFile(
+  data: Uint8Array
+): { extension: string; format: WebFontFaceAsset['format'] } | null {
+  if (data.byteLength < 4) return null
+  const signature = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]
+  switch (signature) {
+    case 0x00010000:
+    case 0x74727565:
+      return { extension: 'ttf', format: 'truetype' }
+    case 0x4f54544f:
+      return { extension: 'otf', format: 'opentype' }
+    case 0x774f4646:
+      return { extension: 'woff', format: 'woff' }
+    case 0x774f4632:
+      return { extension: 'woff2', format: 'woff2' }
+    default:
+      return null
+  }
+}
+
+/**
+ * A document font's file as an export asset, when the document carries the requested face: the
+ * bytes it was registered from, rather than a provider's download. A request names a weight, so
+ * the face is looked up by the style key that weight loads as.
+ */
+function documentFontAsset(
+  request: WebFontFaceRequest,
+  assetBasePath: string
+): WebFontFaceAsset | null {
+  const family = request.family
+  const style = faceLoadKey(request.weight, request.style === 'italic')
+  const data = documentFontData(family, style)
+  if (!data) return null
+  const file = documentFontFile(data)
+  if (!file) return null
+  const requestStyle = request.style ?? 'normal'
+  return {
+    family,
+    weight: request.weight,
+    style: requestStyle,
+    format: file.format,
+    path: `${assetBasePath}/${slugFontFamily(family)}-${request.weight}-${requestStyle}.${file.extension}`,
+    content: data
+  }
+}
 export interface ExportWebFontFaceAssetsOptions {
   fonts: WebFontFaceRequest[]
   providers?: WebFontProviderId[]
@@ -95,6 +146,11 @@ export async function exportWebFontFaceAssets({
     const key = `${family}|${request.weight}|${requestStyle}`
     if (seen.has(key)) continue
     seen.add(key)
+    const docFont = documentFontAsset(request, assetBasePath)
+    if (docFont) {
+      assets.push(docFont)
+      continue
+    }
 
     for (const provider of providers) {
       try {

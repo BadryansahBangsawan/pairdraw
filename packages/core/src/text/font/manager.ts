@@ -246,6 +246,24 @@ export class FontManager {
     return options.map((option) => option.family)
   }
 
+  /**
+   * The families loaded from font files, such as a document's fonts, which no catalog lists:
+   * installed, web, and bundled sources name their families without the files. A registered
+   * family keeps its `document` source however it loads next, so the picker shows where the
+   * file it draws from came from.
+   */
+  registeredFamilyOptions(): FontFamilyOption[] {
+    const options: FontFamilyOption[] = []
+    const seen = new Set<string>()
+    for (const key of this.loadedFamilies.keys()) {
+      const family = key.slice(0, key.lastIndexOf('|'))
+      if (seen.has(family) || this.loadedFamilySources.get(key) !== 'registered') continue
+      seen.add(family)
+      options.push({ family, source: 'document' })
+    }
+    return options.sort((a, b) => a.family.localeCompare(b.family))
+  }
+
   async listFamilyOptions(): Promise<FontFamilyOption[]> {
     const fonts = this.localFonts.list() ?? (await this.requestLocalFontAccess())
     const webFontFamilies = await Promise.all(
@@ -262,6 +280,8 @@ export class FontManager {
       }
     }
     for (const font of fonts) byFamily.set(font.family, { family: font.family, source: 'local' })
+    // A family loaded from a font file draws from that file, whatever the catalogs say.
+    for (const option of this.registeredFamilyOptions()) byFamily.set(option.family, option)
     return [...byFamily.values()].sort((a, b) => a.family.localeCompare(b.family))
   }
 

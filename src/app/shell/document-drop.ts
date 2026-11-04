@@ -1,8 +1,10 @@
 import { useEventListener } from '@vueuse/core'
 
+import { isDocumentFontFileName } from '@open-pencil/core/text'
 import { filterCanvasFiles } from '@open-pencil/vue/canvas/drop'
 
 import { getActiveEditorStoreOrNull } from '@/app/editor/active-store'
+import { importDroppedFonts } from '@/app/editor/fonts/document'
 import { isDesignTokenFileName } from '@/app/editor/tokens/design-tokens'
 import { importTokenFiles } from '@/app/editor/tokens/dialog'
 import { openDesignFile, openDesignFileBatch } from '@/app/shell/menu/files'
@@ -96,14 +98,23 @@ export function useDocumentDrop() {
       ({ file }) => filterCanvasFiles([file]).length === 0
     )
     // Token files are imported into the open document's variables, as its Import button does.
+    // Font files are registered for the open document, as its FontPicker offers them.
     const tokens = dropped.filter(({ file }) => isDesignTokenFileName(file.name))
+    const fonts = dropped.filter(({ file }) => isDocumentFontFileName(file.name))
     const store = getActiveEditorStoreOrNull()
     if (tokens.length > 0 && store)
       importTokenFiles(
         store,
         tokens.map(({ file }) => file)
       )
-    const documents = dropped.filter((entry) => !store || !tokens.includes(entry))
+    if (fonts.length > 0 && store)
+      void importDroppedFonts(
+        store,
+        fonts.map(({ file }) => file)
+      )
+    const documents = dropped.filter(
+      (entry) => !store || (!tokens.includes(entry) && !fonts.includes(entry))
+    )
     if (documents.length === 0) return
     void openDesignFileBatch(
       documents,

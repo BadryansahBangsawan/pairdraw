@@ -198,3 +198,26 @@ export function namedInstanceVariations(data: ArrayBuffer, style: string): FontV
   if (!weight) return []
   return [{ axis: 'wght', value: Math.min(weight.max, Math.max(weight.min, styleToWeight(style))) }]
 }
+
+/** Name-table ids for the family and subfamily names. */
+const FAMILY_NAME_IDS = [16, 1]
+const SUBFAMILY_NAME_IDS = [17, 2]
+
+/** The preferred name-table entry for `data`, trying `nameIds` in order, or null. */
+export function sfntFontName(data: ArrayBuffer, nameIds: readonly number[]): string | null {
+  const view = new DataView(data)
+  const name = sfntTable(view, 'name')
+  if (!name) return null
+  for (const nameId of nameIds) {
+    const value = fontName(view, name, nameId)
+    if (value) return value
+  }
+  return null
+}
+
+/** The family and subfamily names a font file gives itself, preferring typographic names. */
+export function sfntFamilyNames(data: ArrayBuffer): { family: string; style: string } | null {
+  const family = sfntFontName(data, FAMILY_NAME_IDS)
+  if (!family) return null
+  return { family, style: sfntFontName(data, SUBFAMILY_NAME_IDS) ?? 'Regular' }
+}

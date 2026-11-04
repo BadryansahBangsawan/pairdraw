@@ -20,6 +20,8 @@ pub struct FigFile {
     thumbnail_png: Vec<u8>,
     meta_json: String,
     images: Option<Vec<ImageEntry>>,
+    fonts: Option<Vec<ImageEntry>>,
+    fonts_json: Option<String>,
     fig_kiwi_version: Option<u32>,
     compression_level: Option<i32>,
     #[serde(default)]
@@ -42,6 +44,8 @@ fn write_fig_file(file: FigFile) -> Result<tauri::ipc::Response, String> {
         thumbnail_png,
         meta_json,
         images,
+        fonts,
+        fonts_json,
         fig_kiwi_version,
         compression_level,
         board,
@@ -98,6 +102,84 @@ fn write_fig_file(file: FigFile) -> Result<tauri::ipc::Response, String> {
         }
     }
 
+    if let Some(font_entries) = fonts {
+        for entry in font_entries {
+            zip.start_file(&entry.name, options)
+                .map_err(|e| e.to_string())?;
+            zip.write_all(&entry.data).map_err(|e| e.to_string())?;
+        }
+    }
+
+    if let Some(manifest) = fonts_json {
+        zip.start_file("fonts.json", options)
+            .map_err(|e| e.to_string())?;
+        zip.write_all(manifest.as_bytes())
+            .map_err(|e| e.to_string())?;
+    }
     let result = zip.finish().map_err(|e| e.to_string())?;
     Ok(tauri::ipc::Response::new(result.into_inner()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The payload `build_fig_file` receives from `packages/core/src/io/formats/fig/export/
+    /// index.ts`, which sends camelCase keys. Renaming the struct fields without renaming the
+    /// wire keys silently failed every save, so pin the exact shape here.
+    fn payload(fonts: bool) -> serde_json::Value {
+        serde_json::json!({
+            "schemaDeflated": [1, 2, 3],
+            "kiwiData": [4, 5, 6],
+            "thumbnailPng": [7, 8, 9],
+            "metaJson": "{}",
+            "images": [{ "name": "a.png", "data": [1] }],
+            "fonts": if fonts { serde_json::json!([{ "name": "b.ttf", "data": [2] }]) } else { serde_json::Value::Null },
+            "fontsJson": if fonts { serde_json::json!("{\"font\":1}") } else { serde_json::Value::Null },
+            "figKiwiVersion": 101,
+            "compressionLevel": 3,
+            "board": true
+        })
+    }
+
+    #[test]
+    fn reads_the_camel_case_payload_with_fonts() {
+        let file: FigFile = serde_json::from_value(payload(true)).unwrap();
+        assert_eq!(file.schema_deflated, vec![1u8, 2, 3]);
+        assert_eq!(file.kiwi_data, vec![4u8, 5, 6]);
+        assert_eq!(file.thumbnail_png, vec![7u8, 8, 9]);
+        assert_eq!(file.meta_json, "{}");
+        assert_eq!(file.fig_kiwi_version, Some(101));
+        assert_eq!(file.compression_level, Some(3));
+        assert!(file.board);
+        assert_eq!(file.images.unwrap().len(), 1);
+        assert_eq!(file.fonts.unwrap().len(), 1);
+        assert_eq!(file.fonts_json.as_deref(), Some("{\"font\":1}"));
+    }
+
+    #[test]
+    fn reads_the_camel_case_payload_without_fonts() {
+        let file: FigFile = serde_json::from_value(payload(false)).unwrap();
+        assert!(file.fonts.is_none());
+        assert!(file.fonts_json.is_none());
+    }
+
+    #[test]
+    fn defaults_the_omitted_board_flag_to_a_design() {
+        let mut json = payload(false);
+        json.as_object_mut().unwrap().remove("board");
+        let file: FigFile = serde_json::from_value(json).unwrap();
+        assert!(!file.board);
+    }
+
+    #[test]
+    fn rejects_snake_case_keys() {
+        let json = serde_json::json!({
+            "schema_deflated": [1],
+            "kiwi_data": [],
+            "thumbnail_png": [],
+            "meta_json": "{}"
+        });
+        assert!(serde_json::from_value::<FigFile>(json).is_err());
+    }
 }

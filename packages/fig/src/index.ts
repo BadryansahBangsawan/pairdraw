@@ -8,19 +8,33 @@ export {
   createFigDocumentSession,
   type DocumentAssemblyOptions
 } from './document/materialize'
-export { figArchiveMetaSchema, type FigArchiveMetaJSON } from './schema'
+export {
+  figArchiveMetaSchema,
+  figFontsManifestSchema,
+  type FigArchiveMetaJSON,
+  type FigFontsManifest
+} from './schema'
 export {
   compressFigDataSync,
   figArchiveMetaJSON,
   parseFigBuffer,
   readFigArchiveMeta,
+  readFigArchiveParts,
   renameFigArchive,
   writeFigArchive,
   type FigArchiveMeta,
+  type FigArchiveParts,
   type FigImageEntry,
   type FigParseResult,
   type WriteFigArchiveInput
 } from './archive'
+export {
+  figFontEntries,
+  figFontsManifest,
+  resolveFigFonts,
+  type FigDocumentFont,
+  type FigFontEntry
+} from './fonts'
 export {
   figArchiveComponentUsePages,
   figArchiveRecordInfo,

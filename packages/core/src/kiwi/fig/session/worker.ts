@@ -1,6 +1,9 @@
 import { loadFigDataDecompressor } from '@open-pencil/kiwi/fig/container'
 
-import { serializeSceneGraph } from '#core/kiwi/fig/parse/transfer'
+import {
+  serializeSceneGraph,
+  serializedSceneGraphTransferList
+} from '#core/kiwi/fig/parse/transfer'
 import { createFigArchiveOperations } from '#core/kiwi/fig/session/archive/access'
 import type {
   FigSessionOpenRequest,
@@ -16,8 +19,8 @@ let port: MessagePort | undefined
 /** How often a page load reports that it is still advancing. */
 const PROGRESS_INTERVAL_MS = 1000
 
-function respond(message: FigSessionResponse): void {
-  port?.postMessage(message)
+function respond(message: FigSessionResponse, transfer: Transferable[] = []): void {
+  port?.postMessage(message, transfer)
 }
 
 function populate(request: Extract<FigSessionRequest, { type: 'populate' }>): void {
@@ -116,16 +119,20 @@ self.onmessage = async (event: MessageEvent<FigSessionOpenRequest>) => {
     const archiveInfo = opened.session.archiveRecordInfo()
     archive = createFigArchiveOperations(archiveBytes, () => archiveInfo)
     respond({ type: 'page-manifest', pages: opened.pages })
+    const graph = serializeSceneGraph(opened.graph)
     session =
       request.options?.populate === 'first-page' || request.options?.populate === 'none'
         ? opened
         : undefined
-    respond({
-      type: 'graph',
-      graph: serializeSceneGraph(opened.graph),
-      checkpoint: opened.checkpoint(),
-      archiveInfo
-    })
+    respond(
+      {
+        type: 'graph',
+        graph,
+        checkpoint: opened.checkpoint(),
+        archiveInfo
+      },
+      serializedSceneGraphTransferList(graph)
+    )
   } catch (error) {
     respond({ type: 'graph', error: error instanceof Error ? error.message : String(error) })
   }

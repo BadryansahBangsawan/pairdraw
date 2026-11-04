@@ -19,6 +19,7 @@ import {
 } from './bindings'
 import {
   BOOLEAN_BINDING_FIELDS,
+  ICON_BINDING_FIELDS,
   paintBindingTarget,
   STRING_BINDING_FIELDS,
   TEXT_CONTENT_VARIABLE_TYPES,
@@ -228,6 +229,43 @@ export function getVariablesByType(graph: SceneGraph, type: VariableType): Varia
   return [...graph.variables.values()].filter((v) => v.type === type)
 }
 
+/**
+ * Throws when a variable of `type` cannot bind to `field`, or for a field no binding takes. A
+ * paint target is checked by its caller, which also validates its index.
+ */
+function checkBindingFieldType(field: string, type: VariableType): void {
+  if (isNumericVariableBindingField(field) && type !== 'FLOAT') {
+    throw new Error(`Cannot bind ${type} variable to scalar field "${field}"`)
+  }
+
+  const textTypes: readonly VariableType[] =
+    field === 'text' ? TEXT_CONTENT_VARIABLE_TYPES : ['STRING']
+  if (STRING_BINDING_FIELDS.has(field) && !textTypes.includes(type)) {
+    throw new Error(`Cannot bind ${type} variable to string field "${field}"`)
+  }
+
+  if (
+    BOOLEAN_BINDING_FIELDS.has(field) &&
+    !VISIBILITY_VARIABLE_TYPES.some((kind) => kind === type)
+  ) {
+    throw new Error(`Cannot bind ${type} variable to boolean field "${field}"`)
+  }
+
+  if (ICON_BINDING_FIELDS.has(field) && type !== 'STRING') {
+    throw new Error(`Cannot bind ${type} variable to icon field "${field}"`)
+  }
+
+  const isKnownField =
+    isNumericVariableBindingField(field) ||
+    STRING_BINDING_FIELDS.has(field) ||
+    BOOLEAN_BINDING_FIELDS.has(field) ||
+    ICON_BINDING_FIELDS.has(field) ||
+    paintBindingTarget(field) !== null
+
+  if (!isKnownField) {
+    throw new Error(`Unknown binding field "${field}"`)
+  }
+}
 export function bindVariable(
   graph: SceneGraph,
   nodeId: string,
@@ -262,33 +300,7 @@ export function bindVariable(
     }
   }
 
-  if (isNumericVariableBindingField(field) && variable.type !== 'FLOAT') {
-    throw new Error(`Cannot bind ${variable.type} variable to scalar field "${field}"`)
-  }
-
-  const textTypes: readonly VariableType[] =
-    field === 'text' ? TEXT_CONTENT_VARIABLE_TYPES : ['STRING']
-  if (STRING_BINDING_FIELDS.has(field) && !textTypes.includes(variable.type)) {
-    throw new Error(`Cannot bind ${variable.type} variable to string field "${field}"`)
-  }
-
-  if (
-    BOOLEAN_BINDING_FIELDS.has(field) &&
-    !VISIBILITY_VARIABLE_TYPES.some((type) => type === variable.type)
-  ) {
-    throw new Error(`Cannot bind ${variable.type} variable to boolean field "${field}"`)
-  }
-
-  const isKnownField =
-    isNumericVariableBindingField(field) ||
-    STRING_BINDING_FIELDS.has(field) ||
-    BOOLEAN_BINDING_FIELDS.has(field) ||
-    paint !== null
-
-  if (!isKnownField) {
-    throw new Error(`Unknown binding field "${field}"`)
-  }
-
+  checkBindingFieldType(field, variable.type)
   graph.willChangeNode(node)
   node.boundVariables = { ...node.boundVariables, [field]: variableId }
   assignVariableBindingUnits(graph, node, field)

@@ -8,6 +8,7 @@ import {
 
 import { reconcileVariableLayouts } from '#core/layout/variables'
 
+import { loadBoundIcons } from './icons'
 import { loadBoundFonts } from './text/bound-fonts'
 import type { EditorContext } from './types'
 
@@ -22,7 +23,14 @@ function restoresValue(path: string): boolean {
 export function createVariableBindingActions(ctx: EditorContext) {
   /** A binding change reaches only the layer it is on and the layers inside it. */
   function refreshBindings(nodeId: string) {
-    loadBoundFonts(ctx, reconcileVariableLayouts(ctx.graph, { subtrees: [nodeId] }))
+    const changed = reconcileVariableLayouts(ctx.graph, { subtrees: [nodeId] })
+    loadBoundFonts(ctx, changed)
+    void loadBoundIcons(ctx, { subtrees: [nodeId] }).catch((error: unknown) => {
+      console.warn(
+        'Loading a bound icon failed:',
+        error instanceof Error ? error.message : String(error)
+      )
+    })
     ctx.requestRender()
   }
 

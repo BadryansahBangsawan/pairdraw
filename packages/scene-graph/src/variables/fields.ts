@@ -55,6 +55,12 @@ export const TEXT_CONTENT_VARIABLE_TYPES = [
 export const BOOLEAN_BINDING_FIELDS: ReadonlySet<string> = new Set(['visible'])
 
 /**
+ * The icon an icon frame draws, bound to a text variable holding its name: a mode change swaps
+ * the icon. Only icon frames resolve it; other layers keep it as an inert binding.
+ */
+export const ICON_BINDING_FIELDS: ReadonlySet<string> = new Set(['iconName'])
+
+/**
  * The variable types visibility binds to: a boolean, or text that shows the layer unless it reads
  * as false, as Figma's layer panel offers. Figma's plugin API takes booleans alone.
  */

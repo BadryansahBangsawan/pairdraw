@@ -3,6 +3,8 @@ import { isEqual } from 'es-toolkit/predicate'
 import type { VariableModeFallback } from '.'
 import { copyFills, copyStrokes } from '../copy'
 import type { SceneGraph } from '../graph'
+import { readIcon } from '../icons/model'
+import { ICON_NAME } from '../icons/schema'
 import { hasInstanceOverride } from '../instances'
 import type { Color } from '../primitives'
 import { pixelLength } from '../text/lengths'
@@ -11,6 +13,7 @@ import { NUMERIC_FIELDS, isNumericVariableBindingField, paintBindingTarget } fro
 import { variableFontFamily, variableText, variableTruthy } from './text'
 import { variableValueReferences } from './value'
 export {
+  ICON_BINDING_FIELDS,
   isNumericVariableBindingField,
   paintBindingTarget,
   TEXT_CONTENT_VARIABLE_TYPES,
@@ -105,6 +108,28 @@ export function resolvedValueBindings(
   const visible = variableTruthy(resolve('visible'))
   if (visible !== undefined && visible !== node.visible) updates.visible = visible
   return updates
+}
+
+/**
+ * The icon an icon frame's `iconName` binding names in its mode, when it differs from the icon
+ * it draws. Only frames that are icons resolve it; other layers keep the binding inert. The
+ * caller redraws the frame, as resolving only names the icon.
+ */
+export function resolvedIconBinding(
+  graph: SceneGraph,
+  node: SceneNode,
+  fallback: VariableModeFallback = 'active'
+): string | undefined {
+  if (node.type !== 'FRAME') return undefined
+  const icon = readIcon(node)
+  if (!icon) return undefined
+  const variableId = node.boundVariables['iconName']
+  if (!variableId || hasInstanceOverride(graph, node.id, 'iconName')) return undefined
+  const resolved = graph.resolveVariableForNode(node.id, variableId, fallback)
+  if (typeof resolved !== 'string') return undefined
+  const name = resolved.trim()
+  if (name === '' || name === icon.name || !ICON_NAME.test(name)) return undefined
+  return name
 }
 
 /** Fields of a range of characters a bound number gives its value. */

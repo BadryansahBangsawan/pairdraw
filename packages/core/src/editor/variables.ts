@@ -13,6 +13,7 @@ import { tokenExpressionForValue, type BindingScope } from '@open-pencil/scene-g
 
 import { reconcileVariableLayouts } from '#core/layout/variables'
 
+import { loadBoundIcons } from './icons'
 import { loadBoundFonts } from './text/bound-fonts'
 import type { EditorContext } from './types'
 
@@ -69,7 +70,14 @@ export function createVariableActions(ctx: EditorContext) {
    * without an editor action, such as a collaborator's, take effect through it.
    */
   function refreshVariables(scope: BindingScope) {
-    loadBoundFonts(ctx, reconcileVariableLayouts(ctx.graph, scope))
+    const changed = reconcileVariableLayouts(ctx.graph, scope)
+    loadBoundFonts(ctx, changed)
+    void loadBoundIcons(ctx, scope).catch((error: unknown) => {
+      console.warn(
+        'Loading a bound icon failed:',
+        error instanceof Error ? error.message : String(error)
+      )
+    })
     ctx.requestRender()
   }
 

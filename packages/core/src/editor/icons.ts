@@ -1,7 +1,12 @@
-import type { SceneNode } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
 import { BLACK } from '@open-pencil/scene-graph/constants'
 import { readIcon, type IconOptions } from '@open-pencil/scene-graph/icons'
 import type { Color } from '@open-pencil/scene-graph/primitives'
+import {
+  layersUsingVariables,
+  resolvedIconBinding,
+  type BindingScope
+} from '@open-pencil/scene-graph/variables'
 
 import { restoreSubtree, snapshotSubtree } from '#core/editor/history/subtree'
 import type { EditorContext } from '#core/editor/types'
@@ -150,4 +155,54 @@ export function createIconActions(ctx: EditorContext) {
     detachIcon: detachIconFrame,
     setIconColor
   }
+}
+
+/**
+ * The icon frames a change to `scope` can reach: those bound through the scope's variables, or
+ * the icon frames in the scope's subtrees.
+ */
+function scopeIconFrames(graph: SceneGraph, scope: BindingScope): SceneNode[] {
+  if ('variables' in scope) {
+    return layersUsingVariables(graph, scope.variables).filter(
+      (node) => node.type === 'FRAME' && readIcon(node) !== null
+    )
+  }
+  const frames: SceneNode[] = []
+  const visit = (id: string) => {
+    const node = graph.getNode(id)
+    if (!node) return
+    if (node.type === 'FRAME' && readIcon(node) !== null) frames.push(node)
+    for (const childId of node.childIds) visit(childId)
+  }
+  for (const id of scope.subtrees) visit(id)
+  return frames
+}
+
+/**
+ * Draws the icons the variables in `scope` name after a change they can reach, such as a mode
+ * switch from one glyph to another. Redrawing is derived work, not another history entry: a
+ * mode switch undoes as one step, the icons following it back. Failures keep the icon the frame
+ * drew, as a font a binding names keeps its fallback until it loads.
+ */
+export async function loadBoundIcons(ctx: EditorContext, scope: BindingScope): Promise<void> {
+  const graph = ctx.graph
+  const redraws: Array<{ frame: SceneNode; name: string }> = []
+  for (const frame of scopeIconFrames(graph, scope)) {
+    const name = resolvedIconBinding(graph, frame)
+    if (name) redraws.push({ frame, name })
+  }
+  if (redraws.length === 0) return
+  await Promise.all(
+    redraws.map(async ({ frame, name }) => {
+      if (graph.getNode(frame.id) !== frame || resolvedIconBinding(graph, frame) !== name) return
+      const size = Math.max(1, Math.min(frame.width, frame.height))
+      const icon = (await ctx.icons.icons([name], size).catch(() => null))?.get(name)
+      // The document or the frame may have been replaced while the icon loaded.
+      if (!icon || icon.paths.length === 0 || ctx.graph !== graph || !graph.getNode(frame.id))
+        return
+      if (resolvedIconBinding(graph, graph.getNode(frame.id) ?? frame) !== name) return
+      swapIcon(graph, frame.id, icon)
+    })
+  )
+  ctx.requestRender()
 }

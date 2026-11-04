@@ -1,11 +1,20 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 
 import { defineCommand } from 'citty'
 
+import {
+  defaultTokenImportOptions,
+  importTokensIntoGraph,
+  planTokenImport,
+  readCSSDesignTokens
+} from '@open-pencil/core/io/formats/design-tokens'
+import type { DesignTokenReadIssue } from '@open-pencil/core/io/formats/design-tokens'
 import type { TokensResult } from '@open-pencil/core/rpc'
 
-import { fmtList } from '#cli/format'
+import { fmtList, ok } from '#cli/format'
+import { loadDocument, populateWholeDocument, writeFigDocument } from '#cli/headless'
+import { requireFile } from '#cli/app/client'
 import { loadRPCData } from '#cli/rpc-data'
 
 import { variableCommandArgs } from './variables'
@@ -23,6 +32,10 @@ export default defineCommand({
         'css (:root and mode scopes), tailwind (@theme, mode scopes and variants), or dtcg (W3C design token files: one per collection mode, styles, and a resolver; needs --out)',
       default: 'css'
     },
+    /** A local stylesheet whose custom properties become the document's variables. */
+    import: { type: 'string', description: 'Import a local CSS file as variables' },
+    write: { type: 'boolean', description: 'Write changes back to the input file' },
+    output: { type: 'string', description: 'Write to a different file', required: false },
     out: {
       type: 'string',
       alias: 'o',
@@ -30,6 +43,10 @@ export default defineCommand({
     }
   },
   async run({ args }) {
+    if (args.import) {
+      await importStylesheet(args.file, args.import, args)
+      return
+    }
     const data = await loadRPCData<TokensResult>(
       args.file,
       'tokens',
@@ -67,3 +84,51 @@ export default defineCommand({
     }
   }
 })
+
+/**
+ * Reads a local stylesheet's custom properties into the document's variables: `:root` is each
+ * collection's default mode and selectors such as `.dark` or Tailwind's `@theme` are modes.
+ * Without `--write` or `--output` it only reports what it would import.
+ */
+async function importStylesheet(
+  file: string | undefined,
+  cssPath: string,
+  args: { write?: boolean; output?: string; json?: boolean }
+): Promise<void> {
+  const css = await readFile(cssPath, 'utf8')
+  const graph = await loadDocument(requireFile(file))
+  populateWholeDocument(graph)
+  const bundle = readCSSDesignTokens(graph, css, { file: cssPath })
+  const plan = planTokenImport(graph, bundle, defaultTokenImportOptions(graph, bundle))
+  const pageId = graph.getPages()[0]?.id ?? graph.rootId
+  const result = importTokensIntoGraph(graph, pageId, plan)
+  if (args.json) {
+    console.log(
+      JSON.stringify(
+        { collections: result.collectionIds, variables: result.variableIds, issues: bundle.issues },
+        null,
+        2
+      )
+    )
+  } else {
+    console.log(
+      ok(
+        `Imported ${result.variableIds.length} variables into ${result.collectionIds.length} collections`
+      )
+    )
+  }
+  if (bundle.issues.length > 0)
+    console.error(
+      fmtList(
+        bundle.issues.map((issue) => ({ header: readIssueMessage(issue) })),
+        { compact: true }
+      )
+    )
+  if (args.write) await writeFigDocument(graph, requireFile(file))
+  else if (args.output) await writeFigDocument(graph, args.output)
+}
+
+/** A skipped stylesheet rule as one line, naming the rule when the issue records one. */
+function readIssueMessage(issue: DesignTokenReadIssue): string {
+  return 'rule' in issue ? `${issue.file}: ${issue.rule}` : issue.file
+}

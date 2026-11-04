@@ -44,6 +44,9 @@
     "provenance": true
   },
   "dependencies": {
+    "@ai-sdk/openai": "^4.0.83",
+    "@ai-sdk/valibot": "^3.0.53",
+    "ai": "^7.0.127",
     "@open-pencil/core": "workspace:*",
     "@open-pencil/dom-css": "workspace:*",
     "@open-pencil/mcp": "workspace:*",

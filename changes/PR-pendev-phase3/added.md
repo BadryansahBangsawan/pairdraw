@@ -1,1 +1,2 @@
 - Exports deterministic, human-readable `.pen` documents from scene graphs through the Core and CLI conversion APIs.
+- Runs a design agent headlessly from the CLI against any [OI]-compatible model, confining its file output to `--root` and withholding `eval` and network tools unless `--allow` names them.

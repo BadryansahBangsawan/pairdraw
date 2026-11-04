@@ -1,3 +1,4 @@
+import agent from './agent'
 import analyze from './analyze'
 import convert from './convert'
 import diff from './diff'
@@ -29,6 +30,7 @@ import variables from './variables'
  * from here, so its numbers follow the CLI.
  */
 export const COMMANDS = {
+  agent,
   analyze,
   convert,
   diff,

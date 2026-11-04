@@ -77,6 +77,7 @@ export const programmableSidebar = (
       { text: labels.git, link: `${prefix}/programmable/cli/git` },
       { text: labels.appControl, link: '/programmable/cli/app-control' },
       { text: labels.scripting, link: `${prefix}/programmable/cli/scripting` },
+      { text: 'Headless agents', link: '/programmable/cli/agents' },
       { text: labels.jsxRenderer, link: `${prefix}/programmable/jsx-renderer` },
       { text: 'Native JavaScript APIs', link: '/programmable/native-api' },
       { text: 'Design authoring reference', link: '/reference/design-authoring' },

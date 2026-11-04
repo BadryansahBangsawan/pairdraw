@@ -37,6 +37,17 @@ export {
 export type { PlannedStyle } from './plan/styles'
 export { countTokenImportChanges } from './plan/changes'
 export { readCSSDesignTokens, type CSSTokenReadOptions } from './css/read'
+export {
+  DESIGN_SYSTEM_MAX_FILE_BYTES,
+  DESIGN_SYSTEM_MAX_FILES,
+  DESIGN_SYSTEM_MAX_TOTAL_BYTES,
+  confinedDesignSystemPath,
+  importDesignSystemFiles,
+  type DesignSystemFolder,
+  type DesignSystemImportResult,
+  type DesignSystemIssue,
+  type DesignSystemSourceFile
+} from './project'
 export { patchTokenStylesheet, syncTokenStylesheet, type TokenStylesheetSync } from './css/sync'
 export {
   applyTokenImport,

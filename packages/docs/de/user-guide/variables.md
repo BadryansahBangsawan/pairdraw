@@ -77,6 +77,8 @@ Variablen und Stile wandern als [W3C-Design-Tokens](https://www.designtokens.org
 
 - **Exportieren:** Wähle im Kopiermenü des Stylesheets **Als Design-Tokens exportieren**. Das ZIP enthält je Modus einer Sammlung eine Datei, die Figma als Modus importiert, Text- und Effektstile als Typografie- und Schatten-Tokens sowie einen Resolver, der alles für Werkzeuge wie Style Dictionary zusammenführt
 - **Importieren:** Klicke in der Werkzeugleiste auf **Design-Tokens importieren** und wähle Token-Dateien oder ein ZIP. Dateien aus Figma, ein Resolver mit den Dateien, die er nennt, und Tokens-Studio-Themes funktionieren
+- **Kommandozeile:** `openpencil tokens app.fig --import theme.css --write` liest die Custom Properties eines lokalen Stylesheets ohne geöffnete App ein; `:root` hält Standardwerte, andere Selektoren werden Modi
+- **Projektordner:** `openpencil tokens app.fig --project ./app --write` importiert CSS-Variablen aus einem lokalen Projekt, einschließlich eines Tailwind-v4-`@theme` und eines shadcn/ui-Paars aus `:root` und `.dark` als Modi Light und Dark. Eine JavaScript-Konfiguration wie `tailwind.config.js` wird gemeldet und nicht ausgeführt
 - **Ziel wählen:** Bevor sich etwas ändert, zeigt der Dialog jede gefundene Sammlung und jeden Modus und wohin sie gehen: in eine neue Sammlung oder einen neuen Modus, in einen vorhandenen oder nirgendwohin. Variablen und Stile mit demselben Namen werden aktualisiert, der Rest wird hinzugefügt; nichts wird gelöscht. Er zählt, was hinzugefügt, aktualisiert und übersprungen wird, und nennt für jedes übersprungene Token den Grund
 - Der Import ist ein Schritt: **Rückgängig** nimmt ihn ganz zurück
 

@@ -1,1 +1,2 @@
 - Pairdraw Basics is in the Assets panel without a catalog: enable it to browse and insert its components, including offline, and it stays available after a reload.
+- A project folder's CSS variables can be imported from the command line, including a Tailwind v4 theme and a shadcn/ui light and dark pair. Unsupported values, JavaScript config, and a folder past 200 files or 8 MiB are reported and left out.

@@ -94,6 +94,8 @@ Variables and styles move between OpenPencil, Figma, and code as [W3C design tok
 - **Import:** click **Import design tokens** in the toolbar and pick token files or a zip. Files from Figma, a resolver with the files it names, and Tokens Studio themes all work
 - **Choose where it goes:** before anything changes, the dialog shows each collection and mode it found and where it goes: a new collection or mode, an existing one, or nowhere. Variables and styles with the same name are updated and the rest is added; nothing is deleted. It counts what will be added, updated, and skipped, and lists why each skipped token was left out
 - The import is one step: **Undo** takes it all back
+- **Command line:** `openpencil tokens app.fig --import theme.css --write` imports a local stylesheet's custom properties without opening the app; `:root` holds default values and other selectors become modes
+- **Project folder:** `openpencil tokens app.fig --project ./app --write` imports CSS variables from a local project folder, including a Tailwind v4 `@theme` and a shadcn/ui `:root` / `.dark` pair as Light and Dark modes. JavaScript config such as `tailwind.config.js` is reported and not run
 
 ## Syncing With a Stylesheet
 

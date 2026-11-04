@@ -169,6 +169,12 @@
       "types": "./dist/node/fs.d.ts",
       "import": "./dist/node/fs.js",
       "default": "./dist/node/fs.js"
+    },
+    "./node/design-system": {
+      "bun": "./src/node/design-system.ts",
+      "types": "./dist/node/design-system.d.ts",
+      "import": "./dist/node/design-system.js",
+      "default": "./dist/node/design-system.js"
     }
   },
   "publishConfig": {

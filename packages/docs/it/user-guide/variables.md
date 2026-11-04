@@ -79,6 +79,8 @@ Variabili e stili passano tra OpenPencil, Figma e il codice come [design token W
 - **Importare:** fai clic su **Importa design token** nella barra degli strumenti e scegli file di token o uno zip. Funzionano i file di Figma, un resolver con i file che nomina e i temi di Tokens Studio
 - **Scegliere la destinazione:** prima che cambi qualcosa, la finestra mostra ogni raccolta e modalità trovata e dove va: in una nuova raccolta o modalità, in una esistente o da nessuna parte. Variabili e stili con lo stesso nome vengono aggiornati e il resto viene aggiunto; nulla viene eliminato. Conta cosa verrà aggiunto, aggiornato e saltato, e spiega perché ogni token saltato è stato escluso
 - L’importazione è un solo passaggio: **Annulla** la ritira tutta
+- **Riga di comando:** `openpencil tokens app.fig --import theme.css --write` importa le proprietà personalizzate di un foglio locale senza aprire l’app; `:root` tiene i valori predefiniti e gli altri selettori diventano modalità
+- **Cartella del progetto:** `openpencil tokens app.fig --project ./app --write` importa le variabili CSS di un progetto locale, compreso un `@theme` di Tailwind v4 e la coppia `:root` / `.dark` di shadcn/ui come modalità Light e Dark. Una configurazione JavaScript come `tailwind.config.js` viene segnalata e non eseguita
 
 ## Sincronizzare con un foglio di stile
 

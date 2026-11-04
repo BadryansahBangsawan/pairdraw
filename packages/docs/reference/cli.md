@@ -104,6 +104,31 @@ openpencil tokens [file] [options]
 | `--type` | Filter by type: `COLOR`, `FLOAT`, `STRING`, `BOOLEAN` |
 | `--json` | Output `{ css, tokenCount, issues }` as JSON |
 
+With `--import`, the command reads a local stylesheet's custom properties into the document's
+variables instead of printing them: `:root` holds each collection's default values, `.dark` and
+other selectors become modes, and Tailwind's `@theme` works too.
+
+```sh
+openpencil tokens app.fig --import theme.css --write
+```
+
+With `--project`, the command reads a local project folder instead of one stylesheet. Tailwind v4
+`@theme` blocks and plain custom properties are imported. A shadcn/ui `:root` and `.dark` pair
+becomes one collection with Light and Dark modes. `tailwind.config.js` and other project
+JavaScript are reported and not run. A path that leaves the folder is refused, and a file over
+1 MiB is skipped. Component source is not imported.
+
+```sh
+openpencil tokens app.fig --project ./app --write
+```
+
+| Option | Description |
+|--------|-------------|
+| `--import` | Local CSS file to import as variables |
+| `--project` | Local project folder whose CSS variables are imported |
+| `--write` | Write the import back to the input file |
+| `--output` | Write to a different file instead |
+
 ## export
 
 Export to PNG, JPG, WEBP, SVG, JSX, HTML, `.fig`, or Storybook stories.
@@ -132,6 +157,22 @@ openpencil export [file] [options]
 | `--thumbnail` | | Export page thumbnail instead of full render |
 | `--width` | | Thumbnail width (default: 1920) |
 | `--height` | | Thumbnail height (default: 1080) |
+
+## libraries
+
+Manage filesystem catalogs of component libraries.
+
+```sh
+openpencil libraries list --root ./catalog
+openpencil libraries publish components.fig --root ./catalog --id my-lib --name "My Library"
+openpencil libraries seed --root ./catalog
+```
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List the catalog's libraries; `--root` is required, `--json` prints machine-readable output |
+| `publish` | Publish a `.fig` document as a revision; `--id` and `--name` name the library, `--write` saves new asset keys back to the source, `--previous` expects a revision |
+| `seed` | Publish the built-in original **Pairdraw Basics** set (button, input, badge, card, avatar) into the catalog; does nothing when it is already there |
 
 ## import
 

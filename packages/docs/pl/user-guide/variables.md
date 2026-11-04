@@ -79,6 +79,8 @@ Zmienne i style przechodzą między OpenPencil, Figmą i kodem jako [tokeny proj
 - **Import:** kliknij **Importuj tokeny projektowe** na pasku narzędzi i wybierz pliki tokenów lub zip. Działają pliki z Figmy, resolver z plikami, które wskazuje, oraz motywy Tokens Studio
 - **Wybór miejsca:** zanim cokolwiek się zmieni, okno pokazuje każdą znalezioną kolekcję i tryb oraz to, dokąd trafią: do nowej kolekcji lub trybu, do istniejącego albo nigdzie. Zmienne i style o tej samej nazwie są aktualizowane, a reszta dodawana; nic nie jest usuwane. Okno podaje, co zostanie dodane, zaktualizowane i pominięte, oraz dlaczego pominięto każdy token
 - Import to jeden krok: **Cofnij** wycofuje go w całości
+- **Wiersz poleceń:** `openpencil tokens app.fig --import theme.css --write` importuje właściwości niestandardowe lokalnego arkusza bez otwierania aplikacji; `:root` przechowuje wartości domyślne, a pozostałe selektory stają się trybami
+- **Folder projektu:** `openpencil tokens app.fig --project ./app --write` importuje zmienne CSS z lokalnego projektu, w tym `@theme` Tailwinda v4 oraz parę `:root` / `.dark` shadcn/ui jako tryby Light i Dark. Konfiguracja JavaScript, taka jak `tailwind.config.js`, jest zgłaszana i nie jest uruchamiana
 
 ## Synchronizacja z arkuszem stylów
 

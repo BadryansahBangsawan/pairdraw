@@ -182,6 +182,7 @@ async function save() {
           <SliderRange class="absolute h-full bg-accent" />
         </SliderTrack>
         <SliderThumb
+          :aria-label="messages.pictureZoom"
           class="block size-3.5 rounded-full border border-accent bg-panel shadow outline-none focus-visible:ring-2 focus-visible:ring-panel-focus"
         />
       </SliderRoot>

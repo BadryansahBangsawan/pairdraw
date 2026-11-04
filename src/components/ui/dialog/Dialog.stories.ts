@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { expect, userEvent, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { ref } from 'vue'
 
 import AppButton from '@/components/ui/button/AppButton.vue'
@@ -41,9 +41,9 @@ export const Standard: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole('button', { name: 'Open dialog' }))
     const body = within(document.body)
-    await expect(body.getByRole('dialog')).toBeVisible()
+    await waitFor(() => expect(body.getByRole('dialog')).toBeVisible())
     await userEvent.click(body.getByRole('button', { name: 'Done' }))
-    await expect(body.queryByRole('dialog')).not.toBeInTheDocument()
+    await waitFor(() => expect(body.queryByRole('dialog')).not.toBeInTheDocument())
   }
 }
 
@@ -63,9 +63,9 @@ export const Confirmation: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole('button', { name: 'Clear diagnostics' }))
     const body = within(document.body)
-    await expect(body.getByRole('alertdialog')).toBeVisible()
+    await waitFor(() => expect(body.getByRole('alertdialog')).toBeVisible())
     await userEvent.click(body.getByRole('button', { name: 'Cancel' }))
-    await expect(body.queryByRole('alertdialog')).not.toBeInTheDocument()
+    await waitFor(() => expect(body.queryByRole('alertdialog')).not.toBeInTheDocument())
   }
 }
 

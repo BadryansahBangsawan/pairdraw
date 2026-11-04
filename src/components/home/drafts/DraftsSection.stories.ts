@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { expect, fn, within } from 'storybook/test'
+import { expect, fn, waitFor, within } from 'storybook/test'
 import { ref } from 'vue'
 
 import type { DocumentWorkspaceSource } from '@open-pencil/vue/document/workspace'
@@ -121,7 +121,9 @@ export const DraftsOff: Story = {
 export const Loading: Story = {
   args: { listing: 'loading' },
   play: async ({ canvasElement }) => {
-    await expect(within(canvasElement).getByLabelText('Loading drafts')).toBeVisible()
+    await waitFor(() =>
+      expect(within(canvasElement).getByLabelText('Loading drafts')).toBeVisible()
+    )
   }
 }
 

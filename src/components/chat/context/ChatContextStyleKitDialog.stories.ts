@@ -65,8 +65,8 @@ export const Editing: Story = {
   play: async ({ args }) => {
     const dialog = within(await within(document.body).findByRole('dialog'))
     await userEvent.click(dialog.getByRole('button', { name: 'Use this document’s styles' }))
-    await expect(dialog.getByText('Ink')).toBeVisible()
-    await expect(dialog.getByText('Primary')).toBeVisible()
+    await waitFor(() => expect(dialog.getByText('Ink')).toBeVisible())
+    await waitFor(() => expect(dialog.getByText('Primary')).toBeVisible())
     await userEvent.click(dialog.getByRole('button', { name: 'Pin style kit' }))
     await waitFor(() =>
       expect(args.onSave).toHaveBeenCalledWith(

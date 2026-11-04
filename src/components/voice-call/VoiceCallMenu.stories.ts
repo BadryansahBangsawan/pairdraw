@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { expect, fn, userEvent, within } from 'storybook/test'
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test'
 
 import type { VoiceCallError } from '@/app/collab/voice/call'
 import { room } from '@/components/presence/examples/room'
@@ -107,7 +107,7 @@ export const MicrophoneBlocked: Story = {
   args: { error: 'denied' },
   play: async ({ canvasElement }) => {
     await userEvent.click(within(canvasElement).getByRole('button', { name: 'Start voice call' }))
-    await expect(await within(document.body).findByRole('alert')).toBeVisible()
+    await waitFor(() => expect(within(document.body).getByRole('alert')).toBeVisible())
   }
 }
 

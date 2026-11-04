@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { expect, userEvent, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { ref } from 'vue'
 
 import {
@@ -49,7 +49,7 @@ export const Regrouping: Story = {
     await userEvent.click(await menu.findByRole('menuitem', { name: 'Group with Hand' }))
     await expect(options()).toHaveFocus()
     await userEvent.click(options())
-    await expect(await menu.findByRole('menuitem', { name: 'Ungroup' })).toBeVisible()
+    await waitFor(() => expect(menu.getByRole('menuitem', { name: 'Ungroup' })).toBeVisible())
     await userEvent.keyboard('{Escape}')
 
     const grip = () => canvas.getByRole('button', { name: 'Reorder Comment' })

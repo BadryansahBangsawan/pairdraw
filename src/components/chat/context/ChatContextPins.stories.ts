@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { toUint8Array } from 'js-base64'
-import { expect, fn, userEvent, within } from 'storybook/test'
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test'
 
 import type { ConversationPins } from '@/app/ai/chat/pins/types'
 import type { PendingReference, PinFailure } from '@/app/ai/chat/pins/use'
@@ -82,7 +82,7 @@ export const Pinned: Story = {
       within(canvasElement).getByRole('button', { name: 'Pinned to this chat (2)' })
     )
     const pins = within(await within(document.body).findByTestId('chat-pins'))
-    await expect(pins.getByText('Warm editorial')).toBeVisible()
+    await waitFor(() => expect(pins.getByText('Warm editorial')).toBeVisible())
     // Each swatch names its colour in text that screen readers announce.
     await expect(pins.getByText('Accent #FF5B2E')).toBeInTheDocument()
     await expect(pins.getByText('Fonts: Fraunces, Inter')).toBeVisible()

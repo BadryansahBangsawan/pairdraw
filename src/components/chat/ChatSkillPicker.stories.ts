@@ -79,7 +79,7 @@ export const NoneTurnedOn: Story = {
   play: async ({ canvasElement, args }) => {
     await userEvent.click(within(canvasElement).getByRole('button', { name: 'Pick a skill' }))
     const page = within(canvasElement.ownerDocument.body)
-    await expect(await page.findByText('No skills are turned on.')).toBeVisible()
+    await waitFor(() => expect(page.getByText('No skills are turned on.')).toBeVisible())
     // The menu itself carries why it is empty, for a screen reader that moves only by item.
     await expect(page.getByRole('menu', { name: 'Pick a skill' })).toHaveAccessibleDescription(
       'No skills are turned on.'

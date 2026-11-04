@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, userEvent, within } from 'storybook/test'
-import { onUnmounted, toRaw } from 'vue'
+import { toRaw } from 'vue'
 
 import {
   appPreferences,
+  DEFAULT_APP_PREFERENCES,
   updateNavigationPreferences,
   updateNudgePreferences,
   updateRenderingPreferences,
@@ -18,13 +19,8 @@ import SnappingSettingsSection from './SnappingSettingsSection.vue'
 
 type Args = { customized: boolean }
 
-/** Changes the stored preferences for one story and puts them back when it closes. */
-function usePreferencesFor(customized: boolean) {
-  const saved = structuredClone(toRaw(appPreferences.value))
-  onUnmounted(() => {
-    appPreferences.value = saved
-  })
-  if (!customized) return
+/** The stored preferences a customized editor has: set before the story renders. */
+function applyCustomizedPreferences() {
   updateSnappingPreferences({ halfPixel: true })
   updateViewPreferences({ pixelGrid: false })
   updateNudgePreferences({ small: 0.5, large: 8 })
@@ -35,14 +31,23 @@ function usePreferencesFor(customized: boolean) {
 const meta = {
   title: 'App/Settings/Editor Sections',
   args: { customized: false },
-  render: (args) => ({
+  /** Every story starts from the preferences it found and puts them back when it closes. */
+  beforeEach: ({ args }) => {
+    const saved = structuredClone(toRaw(appPreferences.value))
+    appPreferences.value = structuredClone(DEFAULT_APP_PREFERENCES)
+    if (args.customized) applyCustomizedPreferences()
+    return () => {
+      appPreferences.value = saved
+    }
+  },
+  render: () => ({
     components: {
       NavigationSettingsSection,
       NudgeSettingsSection,
       RenderingSettingsSection,
       SnappingSettingsSection
     },
-    setup: () => usePreferencesFor(args.customized),
+    setup: () => ({}),
     template: `
       <div class="flex max-w-2xl flex-col gap-6 bg-panel p-4">
         <SnappingSettingsSection />
@@ -66,7 +71,6 @@ export const FractionalNudge: Story = {
   render: () => ({
     components: { NudgeSettingsSection },
     setup: () => {
-      usePreferencesFor(false)
       updateNudgePreferences({ small: 0.25, large: 1.5 })
     },
     template: `

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { expect, userEvent, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 
 import BindingFieldStates from './examples/States.vue'
 
@@ -31,7 +31,7 @@ export const StateMatrix: Story = {
 
     await userEvent.click(detachField)
     const detachInput = canvas.getByRole('spinbutton', { name: 'Detach bound field' })
-    await expect(detachInput).toBeVisible()
+    await waitFor(() => expect(detachInput).toBeVisible())
     await expect(detachField).toHaveAttribute('data-bound')
 
     await userEvent.clear(detachInput)
@@ -44,7 +44,7 @@ export const StateMatrix: Story = {
     const trigger = within(unboundField).getByRole('button', { name: 'Apply variable' })
     await userEvent.click(trigger)
     const search = page.getByPlaceholderText('Search variables')
-    await expect(search).toBeVisible()
+    await waitFor(() => expect(search).toBeVisible())
     await userEvent.type(search, 'lg')
     await userEvent.keyboard('{ArrowDown}{Enter}')
     await expect(canvas.getByLabelText('Unbound field')).toHaveAttribute('data-bound')

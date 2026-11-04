@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { TooltipProvider } from 'reka-ui'
-import { expect, userEvent, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 
 import AppButton from '@/components/ui/button/AppButton.vue'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
@@ -111,7 +111,9 @@ export const Interaction: Story = {
       'Make a dashboard'
     )
     await userEvent.click(canvas.getByRole('button', { name: 'Send message' }))
-    await expect(canvas.getByText(/local preview response/)).toBeVisible()
+    await waitFor(() =>
+      expect(canvas.getByTestId('chat-messages')).toHaveTextContent('local preview response')
+    )
     const title = canvas.getByRole('textbox', { name: 'Title' })
     await expect(title).toHaveValue('Make a dashboard')
     await userEvent.clear(title)

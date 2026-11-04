@@ -72,9 +72,12 @@ export const ApplyShader: Story = {
     const canvas = within(canvasElement)
     const orb = canvas.getByRole('radio', { name: 'Glass orb' })
     await userEvent.click(orb)
-    await expect(orb).toHaveAttribute('aria-checked', 'true')
-    await expect(orb).toHaveFocus()
-    await userEvent.keyboard('{ArrowRight}')
+    await waitFor(() => expect(orb).toHaveAttribute('aria-checked', 'true'))
+    await waitFor(() => expect(orb).toHaveFocus())
+    // A press that outlasts a task turn, as a person's does: the gallery checks the tile the
+    // arrow keys focus once the key is still down when that focus lands.
+    await userEvent.keyboard('[ArrowRight>]')
+    await userEvent.keyboard('[/ArrowRight]')
     const marble = canvas.getByRole('radio', { name: 'Marble' })
     await waitFor(() => expect(marble).toHaveAttribute('aria-checked', 'true'))
     await expect(orb).toHaveAttribute('aria-checked', 'false')

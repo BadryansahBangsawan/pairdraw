@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { expect, userEvent, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 
 import { contextMeter } from '@/app/ai/chat/context-window/meter'
 import type { ContextUsage } from '@/app/ai/chat/context-window/usage'
@@ -38,7 +38,7 @@ export const Measured: Story = {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole('button', { name: 'Context window, 21% used' }))
     const details = within(await within(document.body).findByTestId('chat-context-meter-details'))
-    await expect(details.getByText(/42.3K of 200K tokens/)).toBeVisible()
+    await waitFor(() => expect(details.getByText(/42.3K of 200K tokens/)).toBeVisible())
     await expect(details.getByText('Cached input')).toBeVisible()
   }
 }

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { expect, userEvent, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 
 import {
   aiModelSettings,
@@ -82,7 +82,7 @@ export const Goals: Story = {}
 export const AccessInBrowser: Story = {
   play: async () => {
     await next()
-    await expect(page().getByRole('checkbox', { name: 'OpenRouter' })).toBeVisible()
+    await waitFor(() => expect(page().getByRole('checkbox', { name: 'OpenRouter' })).toBeVisible())
     await expect(page().queryByRole('checkbox', { name: 'Claude Code' })).toBeNull()
   }
 }
@@ -90,7 +90,7 @@ export const AccessOnDesktop: Story = {
   args: { agentsAvailable: true },
   play: async () => {
     await next()
-    await expect(page().getByRole('checkbox', { name: 'Claude Code' })).toBeVisible()
+    await waitFor(() => expect(page().getByRole('checkbox', { name: 'Claude Code' })).toBeVisible())
   }
 }
 /** Kimi For Coding and OpenCode send no CORS headers, so only the desktop app offers them. */
@@ -98,7 +98,7 @@ export const MoreProvidersInBrowser: Story = {
   play: async () => {
     await next()
     await userEvent.click(page().getByRole('button', { name: 'More providers' }))
-    await expect(page().getByRole('checkbox', { name: 'xAI' })).toBeVisible()
+    await waitFor(() => expect(page().getByRole('checkbox', { name: 'xAI' })).toBeVisible())
     await expect(page().queryByRole('checkbox', { name: 'Kimi For Coding' })).toBeNull()
     await expect(page().queryByRole('checkbox', { name: 'OpenCode Zen' })).toBeNull()
     await expect(page().queryByRole('checkbox', { name: 'OpenCode Go' })).toBeNull()
@@ -109,7 +109,9 @@ export const MoreProvidersOnDesktop: Story = {
   play: async () => {
     await next()
     await userEvent.click(page().getByRole('button', { name: 'More providers' }))
-    await expect(page().getByRole('checkbox', { name: 'Kimi For Coding' })).toBeVisible()
+    await waitFor(() =>
+      expect(page().getByRole('checkbox', { name: 'Kimi For Coding' })).toBeVisible()
+    )
     await expect(page().getByRole('checkbox', { name: 'OpenCode Zen' })).toBeVisible()
     await expect(page().getByRole('checkbox', { name: 'OpenCode Go' })).toBeVisible()
   }
@@ -148,9 +150,9 @@ export const NothingCovered: Story = {
     await next()
     await next()
     await expect(page().getByRole('button', { name: 'Continue' })).toBeDisabled()
-    await expect(
-      page().getByRole('button', { name: 'Add OpenRouter (pay as you go)' })
-    ).toBeVisible()
+    await waitFor(() =>
+      expect(page().getByRole('button', { name: 'Add OpenRouter (pay as you go)' })).toBeVisible()
+    )
   }
 }
 

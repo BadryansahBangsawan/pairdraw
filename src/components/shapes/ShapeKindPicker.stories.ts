@@ -53,7 +53,7 @@ async function openPicker(canvasElement: HTMLElement) {
 export const PickKind: Story = {
   play: async ({ canvasElement }) => {
     const { canvas, page } = await openPicker(canvasElement)
-    await expect(await page.findByText('Basic')).toBeVisible()
+    await waitFor(() => expect(page.getByText('Basic')).toBeVisible())
     await expect(page.getByText('Flowchart')).toBeVisible()
     await userEvent.click(page.getByRole('option', { name: 'Cylinder' }))
     await waitFor(() => expect(canvas.getByText('ENG_DATABASE')).toBeVisible())

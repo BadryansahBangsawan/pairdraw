@@ -10,7 +10,10 @@ const dropOverlayTheme = {
   },
   variants: {
     accepts: {
-      true: { root: 'border-accent/60 bg-accent/5', label: 'text-accent' },
+      true: {
+        root: 'border-accent/60 bg-accent/5',
+        label: 'text-accent in-data-[theme=light]:text-primary'
+      },
       false: { root: 'border-border bg-panel/70', label: 'text-muted' }
     },
     // After `accepts`, so a field's own fill replaces the tint.

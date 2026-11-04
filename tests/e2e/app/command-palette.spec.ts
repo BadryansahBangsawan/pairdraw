@@ -36,6 +36,15 @@ test('command palette exposes contextual export labels', async () => {
   await editor.page.keyboard.press('Escape')
 })
 
+test('command palette offers Shader Mode, out of reach without a shader fill', async () => {
+  const palette = await openPalette()
+  await palette.getByRole('searchbox', { name: 'Search commands' }).fill('shader')
+  const option = palette.getByRole('option', { name: 'Shader Mode' })
+  await expect(option).toBeVisible()
+  await expect(option).toHaveAttribute('data-disabled')
+  await editor.page.keyboard.press('Escape')
+})
+
 function openPalette() {
   return editor.page.keyboard
     .press(commandPaletteShortcut())

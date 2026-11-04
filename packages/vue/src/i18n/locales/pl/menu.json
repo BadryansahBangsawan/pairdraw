@@ -99,5 +99,8 @@
   "layersPanel": "Panel warstw",
   "propertiesPanel": "Panel właściwości",
   "keyboardShortcuts": "Skróty klawiszowe",
-  "removeAutoLayout": "Usuń auto-layout"
+  "removeAutoLayout": "Usuń auto-layout",
+  "zoomTool": "Narzędzie powiększania",
+  "shaderMode": "Tryb shadera",
+  "addLink": "Dodaj link"
 }

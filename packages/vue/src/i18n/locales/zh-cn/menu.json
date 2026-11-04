@@ -99,5 +99,8 @@
   "layersPanel": "图层面板",
   "propertiesPanel": "属性面板",
   "keyboardShortcuts": "键盘快捷键",
-  "removeAutoLayout": "移除自动布局"
+  "removeAutoLayout": "移除自动布局",
+  "zoomTool": "缩放工具",
+  "shaderMode": "着色器模式",
+  "addLink": "添加链接"
 }

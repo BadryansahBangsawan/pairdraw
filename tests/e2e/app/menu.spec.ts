@@ -30,7 +30,6 @@ test('File menu opens and shows items', async () => {
 
   const items = await menu.locator('[role="menuitem"]').allTextContents()
   expect(items.some((t) => t.includes('Open'))).toBe(true)
-  expect(items.some((t) => t.includes('Open storage workspace'))).toBe(true)
   expect(items.some((t) => t.includes('Save'))).toBe(true)
   expect(items.some((t) => t.includes('Save as'))).toBe(true)
 
@@ -56,8 +55,81 @@ test('View menu shows zoom options', async () => {
   expect(items.some((t) => t.includes('Zoom to fit'))).toBe(true)
   expect(items.some((t) => t.includes('Zoom in'))).toBe(true)
   expect(items.some((t) => t.includes('Zoom out'))).toBe(true)
+  expect(items.some((t) => t.includes('Zoom tool'))).toBe(true)
 
   await editor.page.keyboard.press('Escape')
+})
+
+test('Shader Mode and Add Link wait for a selection that has them', async () => {
+  await openAppMenu(editor.page, 'View')
+  await expect(editor.page.getByRole('menuitem', { name: 'Shader Mode' })).toHaveAttribute(
+    'data-disabled'
+  )
+  await editor.page.keyboard.press('Escape')
+
+  await openAppMenu(editor.page, 'Text')
+  await expect(editor.page.getByRole('menuitem', { name: 'Add link' })).toHaveAttribute(
+    'data-disabled'
+  )
+  await editor.page.keyboard.press('Escape')
+
+  await editor.canvas.drawRect(200, 200, 100, 100)
+  await openAppMenu(editor.page, 'View')
+  // A plain rectangle has no shader fill, so Shader Mode stays out of reach.
+  await expect(editor.page.getByRole('menuitem', { name: 'Shader Mode' })).toHaveAttribute(
+    'data-disabled'
+  )
+  await editor.page.keyboard.press('Escape')
+
+  await editor.page.evaluate(() => {
+    const store = window.openPencil?.getStore?.()
+    if (!store) throw new Error('OpenPencil store not initialized')
+    for (const id of store.state.selectedIds) store.graph.deleteNode(id)
+    store.clearSelection()
+    store.undo.clear()
+  })
+})
+
+test('the Zoom tool is picked from the View menu', async () => {
+  await openAppMenu(editor.page, 'View')
+  await editor.page.getByRole('menuitem', { name: 'Zoom tool' }).click()
+
+  const tool = await editor.page.evaluate(() => {
+    const store = window.openPencil?.getStore?.()
+    if (!store) throw new Error('OpenPencil store not initialized')
+    return store.state.activeTool
+  })
+  expect(tool).toBe('ZOOM')
+
+  await editor.page.evaluate(() => {
+    const store = window.openPencil?.getStore?.()
+    if (!store) throw new Error('OpenPencil store not initialized')
+    store.setTool('SELECT')
+  })
+})
+
+test('Shader Mode opens from the View menu on a shader fill', async () => {
+  await editor.canvas.drawRect(200, 200, 160, 80)
+  // Choosing the shader tab turns the fill into the default shader.
+  await editor.page.getByTestId('fill-picker-swatch').first().click()
+  await editor.page.getByTestId('fill-picker-tab-shader').click()
+  await editor.page.keyboard.press('Escape')
+
+  await openAppMenu(editor.page, 'View')
+  const shaderMode = editor.page.getByRole('menuitem', { name: 'Shader Mode' })
+  await expect(shaderMode).not.toHaveAttribute('data-disabled')
+  await shaderMode.click()
+
+  await expect(editor.page.getByTestId('shader-mode')).toBeVisible()
+
+  await editor.page.keyboard.press('Escape')
+  await editor.page.evaluate(() => {
+    const store = window.openPencil?.getStore?.()
+    if (!store) throw new Error('OpenPencil store not initialized')
+    for (const id of store.state.selectedIds) store.graph.deleteNode(id)
+    store.clearSelection()
+    store.undo.clear()
+  })
 })
 
 test('Object menu shows Group/Ungroup/Component', async () => {
@@ -165,13 +237,4 @@ test('Zoom to fit via View menu works', async () => {
 
   const zoomAfter = await getStoreStateNumber('zoom')
   expect(zoomAfter).not.toBe(zoomBefore)
-})
-
-test('Open storage workspace navigates from the File menu', async () => {
-  const fileMenu = await openAppMenu(editor.page, 'File')
-  await fileMenu.getByRole('menuitem', { name: 'Open storage workspace…' }).click()
-
-  await expect(editor.page).toHaveURL(/\/$/)
-  await expect(editor.page.getByTestId('recent-files-home')).toBeVisible()
-  await expect(editor.page.getByRole('heading', { name: 'Storage workspace' })).toBeVisible()
 })

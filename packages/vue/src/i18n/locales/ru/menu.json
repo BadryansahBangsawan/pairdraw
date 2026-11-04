@@ -99,5 +99,8 @@
   "layersPanel": "Панель слоёв",
   "propertiesPanel": "Панель свойств",
   "keyboardShortcuts": "Сочетания клавиш",
-  "removeAutoLayout": "Убрать автораскладку"
+  "removeAutoLayout": "Убрать автораскладку",
+  "zoomTool": "Лупа",
+  "shaderMode": "Режим шейдера",
+  "addLink": "Добавить ссылку"
 }

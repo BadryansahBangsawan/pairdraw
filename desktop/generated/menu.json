@@ -230,6 +230,10 @@
         "accelerator": "CmdOrCtrl+-"
       },
       {
+        "id": "view-zoom-tool",
+        "label": "Zoom Tool"
+      },
+      {
         "type": "separator"
       },
       {

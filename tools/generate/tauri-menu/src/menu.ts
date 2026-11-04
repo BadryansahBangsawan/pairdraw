@@ -13,6 +13,13 @@ function isNativeVisible(entry: { target?: string }): boolean {
   return entry.target !== 'browser'
 }
 
+/** A separator the native menu builder understands, as opposed to one the schema declares. */
+function isNativeSeparator(entry: unknown): boolean {
+  return (
+    typeof entry === 'object' && entry !== null && 'type' in entry && entry.type === 'separator'
+  )
+}
+
 function entryAccelerator(entry: AppMenuActionItem): string | undefined {
   const shortcut =
     entry.shortcut ?? (entry.command ? editorCommandMetadata(entry.command).shortcut : undefined)
@@ -28,15 +35,32 @@ function cleanEntry(entry: AppMenuEntry): unknown | null {
     accelerator: entryAccelerator(entry),
     checkbox: entry.checkbox,
     feature: entry.feature,
-    sub: entry.sub ? compact(entry.sub.map(cleanEntry)) : undefined
+    sub: entry.sub ? nativeItems(entry.sub) : undefined
   }
 }
 
-function cleanGroup(group: AppMenuGroupSchema): unknown | null {
+/**
+ * Entries the native menu can show, with the separators a browser-only entry leaves behind
+ * removed: a group never starts or ends with one, and two never sit next to each other.
+ */
+export function nativeItems(entries: readonly AppMenuEntry[]): unknown[] {
+  const items: unknown[] = []
+  for (const item of compact(entries.map(cleanEntry))) {
+    if (!isNativeSeparator(item)) {
+      items.push(item)
+    } else if (items.length > 0 && !isNativeSeparator(items[items.length - 1])) {
+      items.push(item)
+    }
+  }
+  while (items.length > 0 && isNativeSeparator(items[items.length - 1])) items.pop()
+  return items
+}
+
+export function cleanGroup(group: AppMenuGroupSchema): unknown | null {
   if (!isNativeVisible(group)) return null
   return {
     label: group.label,
-    items: compact(group.items.map(cleanEntry))
+    items: nativeItems(group.items)
   }
 }
 

@@ -99,5 +99,8 @@
   "layersPanel": "Ebenenbereich",
   "propertiesPanel": "Eigenschaftenbereich",
   "keyboardShortcuts": "Tastaturkürzel",
-  "removeAutoLayout": "Auto-Layout entfernen"
+  "removeAutoLayout": "Auto-Layout entfernen",
+  "zoomTool": "Zoom-Werkzeug",
+  "shaderMode": "Shader-Modus",
+  "addLink": "Link hinzufügen"
 }

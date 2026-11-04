@@ -99,5 +99,8 @@
   "layersPanel": "レイヤーパネル",
   "propertiesPanel": "プロパティパネル",
   "keyboardShortcuts": "キーボードショートカット",
-  "removeAutoLayout": "オートレイアウトを削除"
+  "removeAutoLayout": "オートレイアウトを削除",
+  "zoomTool": "ズームツール",
+  "shaderMode": "シェーダーモード",
+  "addLink": "リンクを追加"
 }

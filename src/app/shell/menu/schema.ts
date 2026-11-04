@@ -237,6 +237,9 @@ export const APP_MENU_SCHEMA = [
       },
       { id: 'zoom-in', label: 'Zoom In', shortcut: 'MOD+=' },
       { id: 'zoom-out', label: 'Zoom Out', shortcut: 'MOD+-' },
+      // No shortcut here: Z stays with the keymap, where it is spring-loaded and needs the raw
+      // key, and a native accelerator would swallow it on the desktop.
+      { id: 'view-zoom-tool', label: 'Zoom Tool', palette: { keywords: ['magnifier', 'magnify'] } },
       { type: 'separator' },
       {
         id: 'view.zoomPreviousFrame',
@@ -315,6 +318,13 @@ export const APP_MENU_SCHEMA = [
       { id: 'toggle-ui', label: 'Toggle UI', shortcut: 'MOD+\\' },
       { id: 'toggle-preview', label: 'Preview', shortcut: 'MOD+ALT+↩' },
       { id: 'present', label: 'Present', shortcut: 'MOD+↩', palette: { keywords: ['slides'] } },
+      {
+        id: 'view-shader-mode',
+        label: 'Shader Mode',
+        palette: { keywords: ['glsl', 'effect', 'animation', 'play'] },
+        // The selection's shader paints enable it, which the native menu cannot follow.
+        target: 'browser'
+      },
       // The shortcut sheet, which ? also opens; ? is typed differently per layout, so no accelerator.
       { id: 'keyboard-shortcuts', label: 'Keyboard Shortcuts', handler: 'shell' },
       { type: 'separator' },
@@ -479,7 +489,15 @@ export const APP_MENU_SCHEMA = [
     items: [
       { id: 'text.bold', label: 'Bold', shortcut: 'MOD+B' },
       { id: 'text.italic', label: 'Italic', shortcut: 'MOD+I' },
-      { id: 'text.underline', label: 'Underline', shortcut: 'MOD+U' }
+      { id: 'text.underline', label: 'Underline', shortcut: 'MOD+U' },
+      { type: 'separator' },
+      // The selected texts enable it, which the native menu cannot follow.
+      {
+        id: 'text-add-link',
+        label: 'Add Link',
+        palette: { keywords: ['hyperlink', 'url'] },
+        target: 'browser'
+      }
     ]
   },
   {

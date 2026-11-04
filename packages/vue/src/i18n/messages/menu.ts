@@ -103,6 +103,8 @@ export const menuMessageDefaults = {
   arrangeAlignBottom: 'Align bottom',
   zoomIn: 'Zoom in',
   zoomOut: 'Zoom out',
+  /** The magnifier tool the toolbar's Hand flyout also holds. */
+  zoomTool: 'Zoom tool',
   splitRight: 'Split right',
   splitDown: 'Split down',
   closeView: 'Close view',
@@ -110,7 +112,11 @@ export const menuMessageDefaults = {
   layersPanel: 'Layers panel',
   propertiesPanel: 'Properties panel',
   keyboardShortcuts: 'Keyboard shortcuts',
-  removeAutoLayout: 'Remove auto layout'
+  removeAutoLayout: 'Remove auto layout',
+  /** Opens Shader Mode on the selection's shader paint. */
+  shaderMode: 'Shader Mode',
+  /** Opens the link editor for the selected texts. */
+  addLink: 'Add link'
 } as const
 
 export const menuMessages = i18n('menu', menuMessageDefaults)

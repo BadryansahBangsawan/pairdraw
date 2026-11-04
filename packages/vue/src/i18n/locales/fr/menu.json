@@ -99,5 +99,8 @@
   "layersPanel": "Panneau des calques",
   "propertiesPanel": "Panneau des propriétés",
   "keyboardShortcuts": "Raccourcis clavier",
-  "removeAutoLayout": "Retirer l'auto-layout"
+  "removeAutoLayout": "Retirer l'auto-layout",
+  "zoomTool": "Outil Zoom",
+  "shaderMode": "Mode shader",
+  "addLink": "Ajouter un lien"
 }

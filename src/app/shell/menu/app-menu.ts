@@ -26,6 +26,7 @@ import type {
 
 import { openTour } from '@/app/demo/document'
 import { useEditorStore } from '@/app/editor/active-store'
+import { textLinkTargets } from '@/app/editor/links'
 import { openVariablesDialog } from '@/app/editor/tokens/dialog'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import {
@@ -158,17 +159,20 @@ export function useAppMenu() {
     'toggle-ui': 'toggleUI',
     'toggle-preview': 'togglePreview',
     present: 'present',
+    'view-shader-mode': 'shaderMode',
     theme: 'theme',
     'theme-light': 'themeLight',
     'theme-dark': 'themeDark',
     'theme-auto': 'themeAuto',
     'zoom-in': 'zoomIn',
     'zoom-out': 'zoomOut',
+    'view-zoom-tool': 'zoomTool',
     'view-split-right': 'splitRight',
     'view-split-down': 'splitDown',
     'text.bold': 'bold',
     'text.italic': 'italic',
     'text.underline': 'underline',
+    'text-add-link': 'addLink',
     'arrange.align-left': 'arrangeAlignLeft',
     'arrange.align-center': 'arrangeAlignCenter',
     'arrange.align-right': 'arrangeAlignRight',
@@ -319,6 +323,16 @@ export function useAppMenu() {
       case 'view-split-right':
       case 'view-split-down':
         return store.visiblePaneCount.value >= store.panes.maxVisiblePanes
+      case 'view-shader-mode': {
+        // The selection drives it, and the shader paints the graph holds, so read the scene's
+        // version too: the graph's own mutation does not reach this computed otherwise.
+        void store.state.sceneVersion
+        return !store.canStartShaderMode()
+      }
+      case 'text-add-link': {
+        void store.state.sceneVersion
+        return textLinkTargets(store).length === 0
+      }
       default:
         return undefined
     }

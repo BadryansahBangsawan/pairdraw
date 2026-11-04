@@ -99,5 +99,8 @@
   "layersPanel": "Pannello livelli",
   "propertiesPanel": "Pannello proprietà",
   "keyboardShortcuts": "Scorciatoie da tastiera",
-  "removeAutoLayout": "Rimuovi auto-layout"
+  "removeAutoLayout": "Rimuovi auto-layout",
+  "zoomTool": "Strumento Zoom",
+  "shaderMode": "Modalità shader",
+  "addLink": "Aggiungi link"
 }

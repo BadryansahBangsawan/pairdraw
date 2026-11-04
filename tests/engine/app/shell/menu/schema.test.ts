@@ -118,4 +118,62 @@ describe('APP_MENU_SCHEMA', () => {
       expect.objectContaining({ id: 'selection.moveToPage', target: 'browser' })
     ])
   })
+
+  test('picks the zoom tool from the View menu', () => {
+    const viewMenu = APP_MENU_SCHEMA.find((group) => group.label === 'View')
+    const ids = (viewMenu ? actionItems(viewMenu.items) : []).map((entry) =>
+      'type' in entry ? '' : entry.id
+    )
+    const zoomTool = (viewMenu ? actionItems(viewMenu.items) : []).find(
+      (entry) => !('type' in entry) && entry.id === 'view-zoom-tool'
+    )
+
+    // It follows the zoom commands it belongs with, and binds no key: Z is spring-loaded in the
+    // keymap and needs the raw key, which a native accelerator would take.
+    expect(ids.indexOf('view-zoom-tool')).toBe(ids.indexOf('zoom-out') + 1)
+    expect(zoomTool).toEqual({
+      id: 'view-zoom-tool',
+      label: 'Zoom Tool',
+      palette: { keywords: ['magnifier', 'magnify'] }
+    })
+  })
+
+  test('adds a link to the selected texts from the Text menu', () => {
+    const textMenu = APP_MENU_SCHEMA.find((group) => group.label === 'Text')
+    const ids = (textMenu ? actionItems(textMenu.items) : []).map((entry) =>
+      'type' in entry ? '' : entry.id
+    )
+
+    // The selected texts enable it, which the native menu cannot follow, so it is browser-only.
+    expect(ids).toEqual(['text.bold', 'text.italic', 'text.underline', 'text-add-link'])
+    const addLink = (textMenu ? actionItems(textMenu.items) : []).find(
+      (entry) => !('type' in entry) && entry.id === 'text-add-link'
+    )
+    expect(addLink).toEqual({
+      id: 'text-add-link',
+      label: 'Add Link',
+      palette: { keywords: ['hyperlink', 'url'] },
+      target: 'browser'
+    })
+  })
+
+  test('opens Shader Mode from the View menu while the selection has a shader', () => {
+    const viewMenu = APP_MENU_SCHEMA.find((group) => group.label === 'View')
+    const ids = (viewMenu ? actionItems(viewMenu.items) : []).map((entry) =>
+      'type' in entry ? '' : entry.id
+    )
+    const shaderMode = (viewMenu ? actionItems(viewMenu.items) : []).find(
+      (entry) => !('type' in entry) && entry.id === 'view-shader-mode'
+    )
+
+    // It sits with the modes Preview and Present, and the selection's shader paints enable it;
+    // the native menu cannot follow the selection, so the entry is browser-only.
+    expect(ids.indexOf('view-shader-mode')).toBe(ids.indexOf('present') + 1)
+    expect(shaderMode).toEqual({
+      id: 'view-shader-mode',
+      label: 'Shader Mode',
+      palette: { keywords: ['glsl', 'effect', 'animation', 'play'] },
+      target: 'browser'
+    })
+  })
 })

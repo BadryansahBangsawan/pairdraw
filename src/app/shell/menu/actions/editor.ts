@@ -1,6 +1,7 @@
 import type { SceneNode } from '@open-pencil/scene-graph'
 
-import { useEditorStore } from '@/app/editor/active-store'
+import { getActiveEditorStore, useEditorStore } from '@/app/editor/active-store'
+import { openTextLinkEditor } from '@/app/editor/links'
 import { openPlaceImageDialog } from '@/app/editor/place/dialog'
 import {
   setCommentsOnCanvas,
@@ -89,6 +90,13 @@ export function createSharedEditorMenuActions(
     },
     'toggle-preview': () => store.togglePlay(),
     present: () => togglePresentation(store),
+    'view-zoom-tool': () => store.setTool('ZOOM'),
+    'view-shader-mode': () => {
+      store.startShaderMode()
+    },
+    // The shell's menu sits outside the tab, so its `store` is the forwarding proxy; the link
+    // editor matches the store that opened it, which must be the tab's own.
+    'text-add-link': () => openTextLinkEditor(getActiveEditorStore()),
     'insert-icon': () => {
       store.state.iconPickerOpen = true
     },

@@ -1,5 +1,6 @@
 import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
 import { expectDefined } from '#tests/helpers/assert'
+import { openAppMenu } from '#tests/helpers/menu'
 import { getEditingTextId, getNodeById, getSelectedNode } from '#tests/helpers/store'
 
 /** A script address, which links must refuse; the tests never run it. */
@@ -204,4 +205,26 @@ test('adds a link from the canvas menu', async () => {
   ])
   // Opened from the canvas, the editor gives focus back to the canvas.
   await expect(editor.page.getByTestId('canvas-element')).toBeFocused()
+})
+
+test('adds a link from the Text menu', async () => {
+  await editor.page.evaluate((id) => {
+    const store = window.openPencil?.getStore?.()
+    if (!store) throw new Error('OpenPencil store not initialized')
+    store.setTextHyperlink(id, null, [0, 13])
+    store.select([id])
+  }, textId)
+
+  await openAppMenu(editor.page, 'Text')
+  await editor.page.getByRole('menuitem', { name: 'Add link' }).click()
+  await expect(linkEditor()).toBeVisible()
+
+  await linkEditor().getByRole('textbox', { name: 'Link address' }).fill('openpencil.dev/docs')
+  await editor.page.keyboard.press('Enter')
+
+  await expect(linkEditor()).toHaveCount(0)
+  expect(await linksOf(textId)).toEqual([
+    { start: 0, length: 13, link: { type: 'URL', value: 'https://openpencil.dev/docs' } }
+  ])
+  editor.canvas.assertNoErrors()
 })

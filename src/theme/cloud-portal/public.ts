@@ -23,7 +23,7 @@ export default {
   variants: {
     tone: {
       neutral: {},
-      success: { tile: 'bg-success/10 text-success' },
+      success: { tile: 'bg-success/10 text-success-action' },
       waiting: {}
     }
   },

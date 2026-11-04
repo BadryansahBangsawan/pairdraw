@@ -75,7 +75,8 @@
   --color-on-accent: #17171c;
   --color-on-primary: #17171c;
   --color-surface: #ededef;
-  --color-muted: #8e8e96;
+  /* AA 4.5:1 on hover rows, error and warning tints, and surface/5 chips, not just panels. */
+  --color-muted: #98989f;
   --color-input: #141416;
   /* AI agents at work: their cursors, labels, and presence. */
   --color-agent: #7c5cff;
@@ -91,6 +92,8 @@
   --color-warning-border: rgb(245 158 11 / 0.3);
   --color-warning-action: #fcd34d;
   --color-success: #4ade80;
+  /* Success text on the success tint, where AA needs more than the plain color gives. */
+  --color-success-action: #4ade80;
   --color-inverted: #17171c;
   --color-error: #fa8585;
   --color-error-bg: rgb(250 133 133 / 0.1);
@@ -149,7 +152,8 @@ html[data-theme='light'] {
   --color-on-primary: #ffffff;
   --color-inverted: #ffffff;
   --color-surface: #17171c;
-  --color-muted: #6e6e75;
+  /* AA 4.5:1 on error and warning tints, hover rows, and surface/5 chips, not just panels. */
+  --color-muted: #64646b;
   --color-input: #ffffff;
   --color-agent: #7c5cff;
   --color-component: #7c3aed;
@@ -159,6 +163,7 @@ html[data-theme='light'] {
   --color-warning-border: rgb(245 158 11 / 0.32);
   --color-warning-action: #78350f;
   --color-success: #15803d;
+  --color-success-action: #166534;
   --color-error: #b91c1c;
   --color-error-bg: rgb(185 28 28 / 0.08);
   --color-error-border: rgb(185 28 28 / 0.28);

@@ -14,7 +14,7 @@ export default {
       'flex size-7 shrink-0 items-center justify-center rounded-full bg-panel-field text-muted',
     access: 'flex items-center gap-3 rounded-lg border border-border px-3 py-2.5',
     accessIcon:
-      'flex size-8 shrink-0 items-center justify-center rounded-md bg-panel-field text-muted data-[access=link]:bg-success/10 data-[access=link]:text-success',
+      'flex size-8 shrink-0 items-center justify-center rounded-md bg-panel-field text-muted data-[access=link]:bg-success/10 data-[access=link]:text-success-action',
     accessBody: 'min-w-0 flex-1',
     accessLabel: 'text-xs font-medium text-surface',
     accessDetail: 'text-[11px] text-muted',

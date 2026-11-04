@@ -6,8 +6,9 @@ export default {
     trigger:
       'flex w-full min-w-0 cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 text-left hover:bg-hover disabled:cursor-default disabled:hover:bg-transparent',
     // A call still running is the agent at work, in its violet; the accent stays for selection.
+    // The done state uses the success-action tint so the icon reaches AA 4.5:1 on its soft background.
     status:
-      'flex size-4 shrink-0 items-center justify-center rounded-full data-[state=done]:bg-success/20 data-[state=done]:text-success data-[state=error]:bg-error/15 data-[state=error]:text-error data-[state=pending]:bg-agent/15 data-[state=pending]:text-agent',
+      'flex size-4 shrink-0 items-center justify-center rounded-full data-[state=done]:bg-success/20 data-[state=done]:text-success-action data-[state=error]:bg-error/15 data-[state=error]:text-error data-[state=pending]:bg-agent/15 data-[state=pending]:text-agent',
     statusIcon: 'size-3',
     name: 'shrink-0 text-[11px] font-medium text-surface',
     summary: 'min-w-0 flex-1 truncate font-mono text-[10px] text-muted',

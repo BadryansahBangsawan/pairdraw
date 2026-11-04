@@ -53,7 +53,7 @@ export const metricsWaitlistTheme = {
     time: 'shrink-0 text-[11px] text-muted tabular-nums',
     more: 'mt-2',
     status:
-      'shrink-0 rounded px-1.5 py-px text-[10px] font-medium data-[confirmed=false]:bg-panel-field data-[confirmed=false]:text-muted data-[confirmed=true]:bg-success/10 data-[confirmed=true]:text-success'
+      'shrink-0 rounded px-1.5 py-px text-[10px] font-medium data-[confirmed=false]:bg-panel-field data-[confirmed=false]:text-muted data-[confirmed=true]:bg-success/10 data-[confirmed=true]:text-success-action'
   }
 } as const
 

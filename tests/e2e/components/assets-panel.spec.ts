@@ -326,10 +326,10 @@ test('demo exposes component set assets', async ({ page }) => {
   await page.getByRole('button', { name: 'List view' }).click()
   const assetsPanel = page.getByTestId('assets-panel')
 
-  await expect(assetsPanel).toContainText('Button')
-  await expect(assetsPanel).toContainText('2 variants · Variant')
-  await expect(assetsPanel).toContainText('Avatar')
-  await expect(assetsPanel).not.toContainText('Button/Primary')
+  await expect(assetsPanel).toContainText('Option')
+  await expect(assetsPanel).toContainText('4 variants')
+  await expect(assetsPanel).toContainText('Skip')
+  await expect(assetsPanel).not.toContainText('Option/Pressed=Off')
 
   canvas.assertNoErrors()
 })

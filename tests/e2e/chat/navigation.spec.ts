@@ -17,7 +17,7 @@ test('⌘J opens and closes the chat column beside Design', async ({ chat }) => 
 
 test('the chat column directs provider setup to unified settings', async ({ chat }) => {
   await chat.openChat()
-  await expect(chat.page.getByText('Connect an AI provider to start chatting.')).toBeVisible()
+  await expect(chat.page.getByTestId('provider-setup').getByRole('paragraph').last()).toBeVisible()
   await expect(chat.page.getByTestId('provider-setup-open-settings')).toBeVisible()
   await expect(chat.apiKeyInput).toBeHidden()
 })

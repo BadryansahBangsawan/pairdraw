@@ -57,23 +57,29 @@ const NUMBERED_GROUP = /^Group \d+$/
 
 test('demo layers visible in panel', async () => {
   const names = await getLayerNames()
-  expect(names).toContain('Announcement system')
-  expect(names).toContain('Components')
+  // The demo is a tour; its top-level sections number downward to the current chapter.
+  expect(names.some((name) => /^1 · Hello$/.test(name))).toBe(true)
+  expect(names.some((name) => /^8 · Yours$/.test(name))).toBe(true)
 })
 
 test('clicking a node inside a frame does not reparent it', async () => {
   const target = await editor.page.evaluate(() => {
     const store = window.openPencil?.getStore?.()
     if (!store) throw new Error('OpenPencil store not initialized')
-    const nodes = [...store.graph.nodes.values()]
-    const root = nodes.find((node) => node.name === 'Announcement system')
-    const nested = nodes.find((node) => node.name === 'Source components')
-    if (!root || !nested?.parentId) throw new Error('Demo announcement structure not found')
+    const section = [...store.graph.nodes.values()].find((node) => node.name === '2 · Slots')
+    if (!section) throw new Error('Demo tour section "2 · Slots" not found')
+    const players = section.childIds
+      .map((id) => store.graph.getNode(id))
+      .find((n) => n?.name === 'Players')
+    const nested = players?.childIds
+      .map((id) => store.graph.getNode(id))
+      .find((n) => n?.name === 'Player')
+    if (!players || !nested?.parentId) throw new Error('Demo players structure not found')
     const origin = store.graph.getAbsolutePosition(nested.id)
     return {
       id: nested.id,
       parentId: nested.parentId,
-      rootId: root.id,
+      rootId: section.id,
       x: (origin.x + nested.width / 2) * store.state.zoom + store.state.panX,
       y: (origin.y + nested.height / 2) * store.state.zoom + store.state.panY
     }
@@ -104,15 +110,24 @@ test('clicking a node inside a frame does not reparent it', async () => {
 })
 
 test('creating a shape updates layers', async () => {
-  const before = await getLayerNames()
+  // The demo fills most of the viewport, so a drawn rectangle lands inside whichever
+  // section is under the pointer; count graph nodes rather than page children.
+  const nodeCount = () =>
+    editor.page.evaluate(() => {
+      const store = window.openPencil?.getStore?.()
+      if (!store) throw new Error('OpenPencil store not initialized')
+      return store.graph.nodes.size
+    })
+
+  const before = await nodeCount()
   await editor.canvas.drawRect(600, 500, 50, 50)
   const names = await getLayerNames()
   expect(names).toContain('Rectangle 1')
-  expect(names.length).toBe(before.length + 1)
+  expect(await nodeCount()).toBe(before + 1)
 
   await editor.canvas.undo()
   const after = await getLayerNames()
-  expect(after.length).toBe(before.length)
+  expect(await nodeCount()).toBe(before)
   expect(after).not.toContain('Rectangle 1')
 })
 

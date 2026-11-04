@@ -1,5 +1,13 @@
 import type { Page } from '@playwright/test'
 
+import type * as BlendScenes from '#tests/helpers/canvas/blend/scene'
+import type * as MaskScenes from '#tests/helpers/canvas/masks/scene'
+
+/** The page the specimen gets, so the demo's own content never enters the snapshot. */
+const SPECIMEN_PAGE_NAME = 'Paint effects'
+/** The mask rows sit below the blend rows, clear of the blend scene's lowest shadow. */
+const MASK_ROW_OFFSET = 340
+
 /** Exercise the P3 surface negotiation even on an sRGB CI display. */
 export async function emulateWideGamutDisplay(page: Page) {
   await page.addInitScript(() => {
@@ -24,7 +32,10 @@ export async function dismissWideGamutBanner(page: Page) {
   if (await banner.isVisible()) await banner.locator('[data-slot="banner-dismiss"]').click()
 }
 
-/** Focus the demo's paint and effects page, where blends and masks live. */
+/**
+ * Focus a page of blends and masks. The demo used to carry specimen pages for them; the tour that
+ * replaced it does not, so the helper builds the specimen from the canvas test scenes instead.
+ */
 export async function focusPaintEffects(page: Page) {
   // Zooming to a layer uses the viewport size the canvas last measured, so a window resize must
   // reach it first or the zoom fits the old size. The canvas sizes its pixels in the same step.
@@ -39,20 +50,38 @@ export async function focusPaintEffects(page: Page) {
       canvas.height === Math.round(canvas.clientHeight * dpr)
     )
   })
-  await page.evaluate(async () => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('Editor unavailable')
-    const paintPage = store.graph.getPages().find((candidate) => candidate.name.startsWith('03'))
-    if (!paintPage) throw new Error('Demo paint page unavailable')
-    store.setDocumentColorSpace('display-p3')
-    if (store.state.currentPageId !== paintPage.id) await store.switchPage(paintPage.id)
-  })
+  await page.evaluate(
+    async ({ pageName, maskOffset }) => {
+      const store = window.openPencil?.getStore?.()
+      if (!store) throw new Error('Editor unavailable')
+      store.setDocumentColorSpace('display-p3')
+      const existing = store.graph.getPages().find((candidate) => candidate.name === pageName)
+      const page = existing ?? store.graph.addPage(pageName)
+      if (store.state.currentPageId !== page.id) await store.switchPage(page.id)
+      if (store.graph.getChildren(page.id).length > 0) return
+
+      // Test helpers are browser modules here, so their URLs resolve when the page runs them.
+      const blendURL = '/tests/helpers/canvas/blend/scene.ts'
+      const masksURL = '/tests/helpers/canvas/masks/scene.ts'
+      const blend: typeof BlendScenes = await import(blendURL)
+      const masks: typeof MaskScenes = await import(masksURL)
+      blend.createLinearBlendScene(store.graph, page.id)
+      const blended = new Set(store.graph.getChildren(page.id).map((node) => node.id))
+      masks.createMaskEffectsScene(store.graph, page.id)
+      for (const node of store.graph.getChildren(page.id)) {
+        if (blended.has(node.id)) continue
+        store.graph.updateNode(node.id, { y: node.y + maskOffset })
+      }
+      store.requestRender()
+    },
+    { pageName: SPECIMEN_PAGE_NAME, maskOffset: MASK_ROW_OFFSET }
+  )
   await page.evaluate(() => {
     const store = window.openPencil?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
-    const subject = store.graph.getChildren(store.state.currentPageId)[0]
-    if (!subject) throw new Error('Demo paint page is empty')
-    store.select([subject.id])
+    const subject = store.graph.getChildren(store.state.currentPageId)
+    if (subject.length === 0) throw new Error('Paint effects page is empty')
+    store.select(subject.map((node) => node.id))
     store.zoomToSelection()
     store.clearSelection()
   })

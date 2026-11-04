@@ -208,7 +208,10 @@ test('publishes, consumes, saves, and reopens a multidimensional library instanc
     .toBeGreaterThan(0)
   await openAssets(page)
   await openLibraries(page)
-  const libraryRow = page.getByText('E2E design system').locator('..').locator('..')
+  const libraryRow = page
+    .getByTestId('asset-libraries-dialog')
+    .getByTestId('library-entry')
+    .and(page.locator('[data-library-id="e2e-design-system"]'))
   await libraryRow.getByRole('button', { name: 'Enable library' }).click()
   await libraryRow.getByRole('button', { name: 'Prefer this library' }).click()
   await page.keyboard.press('Escape')

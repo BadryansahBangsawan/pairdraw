@@ -63,6 +63,8 @@ Behaviours are saved in `.fig` files and published with library components.
 
 A component library publishes reusable components as an immutable revision. Each published asset has stable library, asset, and revision identity, so different instances can remain on different revisions until you explicitly update them.
 
+**Pairdraw Basics** is the built-in original set: button, input, badge, card, and avatar components, published as `pairdraw-basics`. It is in the Assets panel without a catalog: enable it there to insert its components, including offline, and it stays after a reload. `openpencil libraries seed --root ./catalog` still publishes that same set into a filesystem catalog.
+
 ### Publish a Library
 
 1. Create the components and component sets you want to share.

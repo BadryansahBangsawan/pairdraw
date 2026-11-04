@@ -1,0 +1,1 @@
+- Pairdraw Basics is in the Assets panel without a catalog: enable it to browse and insert its components, including offline, and it stays available after a reload.

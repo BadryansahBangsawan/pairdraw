@@ -353,6 +353,7 @@
   "manageLibraries": "ライブラリを管理する",
   "manageLibrariesDescription": "ライブラリを参照し、このファイルで利用可能な更新を確認します。",
   "reviewLibraryUpdates": "ライブラリの更新を確認する",
+  "builtinLibrary": "組み込み",
   "enableLibrary": "ライブラリを有効にする",
   "disableLibrary": "ライブラリを無効にする",
   "noLibraries": "公開されたライブラリはありません",

@@ -83,4 +83,26 @@ describe('libraries CLI', () => {
     const revision = await new FileSystemLibraryCatalog(catalog).getRevision('ds')
     expect(revision.manifest.assets.map((asset) => asset.key)).toEqual(['primary-button'])
   })
+
+  test('seeds the built-in Pairdraw Basics set, idempotently', async () => {
+    const catalog = await mkdtemp(join(tmpdir(), 'open-pencil-libraries-seed-'))
+    const first = await cli(['libraries', 'seed', '--root', catalog])
+    expect(first.exitCode).toBe(0)
+    expect(first.stdout).toContain('Seeded Pairdraw Basics')
+
+    const listed = await cli(['libraries', 'list', '--root', catalog, '--json'])
+    const [library] = v.parse(
+      v.pipe(
+        v.string(),
+        v.parseJson(),
+        v.array(v.object({ libraryId: v.string(), assetCount: v.number() }))
+      ),
+      listed.stdout
+    )
+    expect(library).toMatchObject({ libraryId: 'pairdraw-basics', assetCount: 5 })
+
+    const second = await cli(['libraries', 'seed', '--root', catalog])
+    expect(second.exitCode).toBe(0)
+    expect(second.stdout).toContain('already in')
+  })
 })

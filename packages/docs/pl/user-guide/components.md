@@ -33,6 +33,8 @@ Powiązanie tworzy przycisk z rombem przy polu: **Typografia** dla treści tekst
 
 Biblioteka publikuje komponenty jako niezmienne wersje. Każdy zasób ma stałe identyfikatory biblioteki, zasobu i wersji, dlatego różne egzemplarze mogą pozostać na różnych wersjach do jawnej aktualizacji.
 
+**Pairdraw Basics** to wbudowany oryginalny zestaw: komponenty przycisku, pola, plakietki, karty i awatara, opublikowane jako `pairdraw-basics`. Jest w panelu zasobów bez katalogu: włącz go tam, aby wstawiać jego komponenty, także offline, i zostaje po ponownym załadowaniu. `openpencil libraries seed --root ./katalog` nadal publikuje ten sam zestaw do katalogu plików.
+
 ### Publikowanie
 
 Otwórz **Assets → Manage libraries → Publish library**, podaj stały identyfikator i nazwę biblioteki, wybierz zmiany i opublikuj. Niewybrane zmiany pozostaną oczekujące.

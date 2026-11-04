@@ -2,7 +2,11 @@ import { extname, resolve } from 'node:path'
 
 import { defineCommand } from 'citty'
 
-import { ensureLibraryAssetKeys } from '@open-pencil/core/library'
+import {
+  BUILTIN_LIBRARY_ID,
+  ensureLibraryAssetKeys,
+  publishBasicsLibrary
+} from '@open-pencil/core/library'
 
 import { bold, dim, fmtList, ok, printError } from '#cli/format'
 import { loadDocument, populateWholeDocument, writeFigDocument } from '#cli/headless'
@@ -94,7 +98,34 @@ const publish = defineCommand({
   }
 })
 
+const seed = defineCommand({
+  meta: { description: 'Publish the built-in Pairdraw Basics set to a filesystem catalog' },
+  args: {
+    root: { type: 'string', description: 'Library catalog directory', required: true },
+    json: { type: 'boolean', description: 'Output as JSON' }
+  },
+  async run({ args }) {
+    const catalog = new FileSystemLibraryCatalog(args.root)
+    const existing = await catalog.listLibraries()
+    if (existing.some((library) => library.libraryId === BUILTIN_LIBRARY_ID)) {
+      const current = existing.find((library) => library.libraryId === BUILTIN_LIBRARY_ID)
+      if (args.json) {
+        console.log(JSON.stringify({ seeded: false, ...current }, null, 2))
+        return
+      }
+      console.log(ok(`Pairdraw Basics already in ${args.root}`))
+      return
+    }
+    const revision = await publishBasicsLibrary(catalog)
+    if (args.json) {
+      console.log(JSON.stringify({ seeded: true, ...revision.manifest }, null, 2))
+      return
+    }
+    console.log(ok(`Seeded Pairdraw Basics @ ${revision.manifest.revisionId}`))
+  }
+})
+
 export default defineCommand({
   meta: { description: 'Manage component library catalogs' },
-  subCommands: { list, publish }
+  subCommands: { list, publish, seed }
 })

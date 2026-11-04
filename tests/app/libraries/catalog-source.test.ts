@@ -27,7 +27,14 @@ describe('the stored library catalog source', () => {
     restoreLibraryCatalogSource(service, 'storage', storageCatalog)
 
     expect(service.catalogSource).toBe('storage')
-    expect(await service.listLibraries()).toEqual([stored])
+    const libraries = await service.listLibraries()
+    expect(libraries.map((library) => library.libraryId)).toEqual(['pairdraw-basics', 'stored-kit'])
+    expect(libraries[1]).toEqual(stored)
+    expect(libraries[0]).toMatchObject({
+      name: 'Pairdraw Basics',
+      assetCount: 5,
+      publishedAt: '2026-11-04T00:00:00.000Z'
+    })
   })
 
   test('keeps the local catalog when it was chosen, without opening storage', () => {

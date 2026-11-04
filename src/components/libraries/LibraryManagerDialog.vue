@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, watch } from 'vue'
 
+import { BUILTIN_LIBRARY_ID } from '@open-pencil/core/library'
 import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
 import { useI18n } from '@open-pencil/vue/i18n'
 
@@ -125,11 +126,22 @@ function reviewUpdate(group: (typeof visibleUpdateGroups.value)[number]) {
           <div
             v-for="library in service.summaries.value"
             :key="library.libraryId"
+            data-test-id="library-entry"
+            :data-library-id="library.libraryId"
             class="flex items-center gap-3 border-b border-border py-3"
           >
             <icon-lucide-library class="size-4 text-component" />
             <div class="min-w-0 flex-1">
-              <p class="truncate text-xs text-surface">{{ library.name }}</p>
+              <p class="flex min-w-0 items-center gap-1 text-xs text-surface">
+                <span class="truncate">{{ library.name }}</span>
+                <span
+                  v-if="library.libraryId === BUILTIN_LIBRARY_ID"
+                  data-test-id="builtin-library-badge"
+                  class="shrink-0 rounded bg-component/15 px-1 py-px text-[9px] font-medium text-component"
+                >
+                  {{ panels.builtinLibrary }}
+                </span>
+              </p>
               <p class="text-[10px] text-muted">
                 {{ panels.libraryAssetCount({ count: library.assetCount }) }}
               </p>

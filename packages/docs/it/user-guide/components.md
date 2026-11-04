@@ -40,3 +40,5 @@ Le modifiche al componente principale vengono mostrate in una revisione prima de
 ## Librerie
 
 Pubblica i componenti locali come libreria e abilita librerie esterne in Risorse. Le revisioni vengono conservate localmente per lavorare offline.
+
+**Pairdraw Basics** è il set originale incluso: componenti di pulsante, input, badge, scheda e avatar, pubblicati come `pairdraw-basics`. È nel pannello Risorse senza catalogo: abilitalo lì per inserirne i componenti, anche offline, e resta dopo un ricaricamento. `openpencil libraries seed --root ./catalogo` pubblica ancora lo stesso set in un catalogo di file.

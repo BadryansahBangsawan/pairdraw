@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { shallowRef } from 'vue'
 
-import type { LibrarySummary } from '@open-pencil/core/library'
+import { BUILTIN_LIBRARY_ID, type LibrarySummary } from '@open-pencil/core/library'
 
 import type { EditorStore } from '@/app/editor/session'
 import {
@@ -22,6 +22,13 @@ function library(name: string, publishedAt: string): LibrarySummary {
 const acme = library('Acme UI', '2026-05-01T00:00:00.000Z')
 const base = library('Base kit', '2026-06-01T00:00:00.000Z')
 const core = library('Core', '2026-05-01T00:00:00.000Z')
+const builtin: LibrarySummary = {
+  libraryId: BUILTIN_LIBRARY_ID,
+  name: 'Pairdraw Basics',
+  latestRevisionId: 'rb',
+  publishedAt: '2026-11-04T00:00:00.000Z',
+  assetCount: 5
+}
 
 describe('design systems on Home', () => {
   test('lists the newest first, then by name', () => {
@@ -57,6 +64,20 @@ describe('design systems on Home', () => {
     expect(designSystems.error.value).toBe('offline')
     expect(designSystems.libraries.value).toEqual([acme])
     expect(designSystems.loading.value).toBe(false)
+  })
+
+  test('does not offer the built-in library the Assets panel owns', async () => {
+    const summaries = shallowRef<LibrarySummary[]>([])
+    const service = asDouble<LibraryService>({
+      summaries,
+      async listLibraries() {
+        summaries.value = [builtin, acme]
+        return summaries.value
+      }
+    })
+    const designSystems = useHomeDesignSystems(service)
+    await designSystems.refresh()
+    expect(designSystems.libraries.value).toEqual([acme])
   })
 
   test('a new design starts with the picked library turned on', async () => {

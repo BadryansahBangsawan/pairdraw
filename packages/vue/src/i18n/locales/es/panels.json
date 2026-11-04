@@ -359,6 +359,7 @@
   "manageLibraries": "Gestionar bibliotecas",
   "manageLibrariesDescription": "Explore bibliotecas y revise las actualizaciones disponibles en este archivo.",
   "reviewLibraryUpdates": "Revisar las actualizaciones de la biblioteca",
+  "builtinLibrary": "Integrada",
   "enableLibrary": "Habilitar biblioteca",
   "disableLibrary": "Deshabilitar biblioteca",
   "noLibraries": "No hay bibliotecas publicadas",

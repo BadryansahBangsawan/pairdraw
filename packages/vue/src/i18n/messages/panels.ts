@@ -21,6 +21,7 @@ export const panelMessageDefaults = {
   manageLibraries: 'Manage libraries',
   manageLibrariesDescription: 'Browse libraries and review updates available in this file.',
   reviewLibraryUpdates: 'Review library updates',
+  builtinLibrary: 'Built-in',
   enableLibrary: 'Enable library',
   disableLibrary: 'Disable library',
   noLibraries: 'No published libraries',

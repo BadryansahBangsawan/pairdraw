@@ -68,7 +68,9 @@ test('library manager scopes populated updates and does not mutate on discovery'
   await page.getByTestId('left-panel-assets-tab').click()
   await page.getByRole('button', { name: 'Manage libraries' }).click()
   const manager = page.getByTestId('asset-libraries-dialog')
-  const libraryRow = manager.getByText('Manager E2E').locator('..').locator('..')
+  const libraryRow = manager
+    .getByTestId('library-entry')
+    .and(page.locator('[data-library-id="manager-e2e"]'))
   await libraryRow.getByRole('button', { name: 'Enable library' }).click()
   await page.keyboard.press('Escape')
   await page.getByRole('button', { name: 'List view' }).click()

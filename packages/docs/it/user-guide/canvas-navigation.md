@@ -39,6 +39,20 @@ Adatta alla vista, alla selezione e al 100%, i livelli del menu di zoom e la cor
 
 I righelli sono nascosti finché non li attivi con **Visualizza → Righelli** o <kbd>Shift</kbd> + <kbd>R</kbd>.
 
+## Aggancio
+
+In **Visualizza → Preferenze**, attiva **Aggancia alla geometria**, **Aggancia agli oggetti** e **Aggancia alla griglia di pixel** in modo indipendente. Le preferenze si conservano tra le sessioni.
+
+L’aggancio alla geometria e agli oggetti aiuta ad allineare i punti vettoriali, i livelli spostati e i bordi ridimensionati con la geometria, gli oggetti, le guide e i bordi dei frame vicini. Per questi obiettivi appaiono linee di allineamento; l’arrotondamento alla griglia di pixel non disegna una linea di allineamento per ogni pixel.
+
+Con **Aggancia agli oggetti** attivo, un livello spostato si aggancia anche allo spaziatura uguale: si centra tra i suoi due vicini, o si colloca alla stessa distanza da un vicino quanto quella tra altri due vicini della stessa riga o colonna. Ogni spazio di quella dimensione mostra un indicatore rosa con la sua misura. Il ridimensionamento non si aggancia allo spaziatura.
+
+Con **Aggancia alla griglia di pixel** attivo, i livelli spostati, i bordi ridimensionati e i livelli disegnati atterrano su pixel interi a qualsiasi zoom, anche se sono partiti tra i pixel. Un aggancio a un oggetto o a una guida vince sulla griglia. I movimenti con le frecce e i valori digitati nel pannello delle proprietà conservano le loro frazioni.
+
+Attiva **Aggancia ai mezzi pixel** in **Impostazioni → Editor** perché l’aggancio alla griglia di pixel possa atterrare anche sui mezzi pixel, così che un tratto di 1 px possa stare centrato sul bordo di un pixel. Una lavagna conserva la sua griglia di 16 unità.
+
+Tieni premuto <kbd>Control</kbd> durante il trascinamento di un livello per aggirare temporaneamente l’aggancio a oggetti e pixel — anche su macOS, dove è Control, non Command.
+
 ## Palette dei comandi
 
 Premi <kbd>⌘</kbd><kbd>K</kbd> su macOS o <kbd>Ctrl</kbd> + <kbd>K</kbd> su Windows/Linux per cercare azioni dell’editor e dell’applicazione. Seleziona un risultato per eseguirlo; le azioni non disponibili restano soggette alla selezione e allo stato del documento.

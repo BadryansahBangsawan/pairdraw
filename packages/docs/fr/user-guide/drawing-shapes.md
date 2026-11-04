@@ -33,9 +33,13 @@ Avec <kbd>Shift</kbd>, un rectangle devient carré, une ellipse devient cercle e
 
 ### Remplissage
 
-Couleur unie, dégradé linéaire, radial, angulaire ou diamant, et image.
+Couleur unie, dégradé linéaire, radial, angulaire ou diamant, image et shader : un shader GLSL animé ; partez de la galerie du sélecteur de remplissage de shader, ajoutez-lui des effets, ou collez un préréglage copié depuis shaders.com.
 
 Pour recadrer une image sur le canevas, double-cliquez sur le calque, appuyez sur <kbd>Entrée</kbd> quand il est sélectionné ou choisissez **Recadrer l'image** dans son menu contextuel ou son remplissage d’image. L’image apparaît en entier, estompée hors du calque. Faites glisser les équerres d’angle ou les barres des bords du calque pour le recadrer sur l’image immobile, faites glisser l’image pour la déplacer derrière le calque et ses points d’angle pour la mettre à l’échelle. <kbd>Maj</kbd> garde les proportions ou un axe et <kbd>Alt</kbd> part du centre. Chaque glissement est une étape annulable ; <kbd>Entrée</kbd>, <kbd>Échap</kbd>, un double-clic ou un clic hors de l’image termine. Les vecteurs, les calques avec enfants et les calques placés par l’auto-layout gardent leurs bords : sur eux, vous pouvez seulement déplacer et redimensionner l’image.
+
+### Mode shader
+
+Le mode shader montre un remplissage de shader seul et en grand, avec lecture et pause, un curseur de phase et les réglages du shader à côté. Ouvrez-le avec **Ouvrir en mode shader** dans le sélecteur de remplissage de shader, ou avec **Affichage → Mode shader** quand la sélection a un remplissage de shader.
 
 ### Contour
 

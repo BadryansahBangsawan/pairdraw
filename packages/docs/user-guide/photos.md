@@ -24,6 +24,10 @@ An Unsplash app has two keys: paste its **Access Key**, not its Secret key. A ne
 
 Pexels has paused issuing new API keys. If you already have a Pexels key, it still works; otherwise use Unsplash.
 
+## Generating Images with AI
+
+With your own key for OpenAI or an OpenAI-compatible service, set up in **Settings → Image services**, you can generate images from a prompt. A generation becomes a new layer, or fills the image fill you are editing. **Settings → Image services** also holds the key for removing or replacing an image layer's background — with your AI image service or with remove.bg — from the canvas menu's **AI image** group, the image fill picker, or the command palette. Removing a background and replacing it with a scene you describe each undo in one step.
+
 ## Credits and Keys
 
 Unsplash and Pexels ask that photos are credited to the people who took them; the picker names the photographer of each photo. OpenPencil tells Unsplash when one of its photos is used, as its API terms require.

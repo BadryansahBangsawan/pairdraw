@@ -37,6 +37,12 @@ You can configure multiple reusable models and separately assign models for desi
 
 The chat composer grows with multiline prompts. Type `@` to mention a layer, page, or skill, or use the selection button to mention the selected layers, and `/` at the start of a message to run a skill, or one of an ACP agent's commands. Mentions show as chips, in replies too, where the assistant names the layers it touched; click one to show the layer on the canvas. Assistant messages show provider reasoning in collapsible sections and provide a per-response copy action. Image attachments remain available for visual references when a Vision model is configured. Streaming responses use a hardened Markdown renderer with Shiki-highlighted code blocks; unsafe link protocols and embedded data images are blocked.
 
+## Agent Sessions
+
+A coding agent runs its sessions with a model, a reasoning effort, and a mode. The composer offers the model, reasoning effort, and mode that Claude Code, Codex, and Gemini CLI advertise for their sessions. A choice applies to the running session at once and to later sessions with that agent, except modes that skip permission requests, which apply to one session only.
+
+On the desktop, each chat can give its coding agent a project folder to work in, chosen from the chat header and confirmed first. Sessions there start in the agent's default mode, and only the chosen model and reasoning effort carry over.
+
 ## Step limit
 
 In **Settings → Models → Chat**, set **Maximum steps per message** to a whole number from 1 to 1,000. The default is 50. Press Enter or leave the field to save a valid value; invalid drafts do not replace the saved preference. Higher limits allow longer tool-driven tasks but can increase latency and provider cost.

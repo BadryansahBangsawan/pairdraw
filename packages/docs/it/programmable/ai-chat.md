@@ -31,6 +31,12 @@ Il token è conservato nell’archivio sicuro delle credenziali, non nelle norma
 
 Anche la chat integrata con API diretta usa le connessioni attive e offre i loro strumenti al modello come `mcp__<server>__<strumento>`. I server ospitati come Notion o Linear usano l’**Accesso OAuth**: salva la connessione, poi fai clic su **Accedi**. Nell’app desktop una connessione può anche essere un **Comando locale**, un programma che parla MCP su stdin e stdout, con un argomento per riga e variabili d’ambiente facoltative `NOME=valore`. Prima di eseguire una riga di comando per la prima volta, l’app chiede conferma in una finestra di sistema; variabili come `PATH` o `NODE_OPTIONS`, che caricano codice, non sono consentite. Finché la chat chiede prima di agire, chiede anche prima di ogni strumento esterno che il suo server non segna come di sola lettura. Nell’app web un server remoto deve accettare richieste dall’origine dell’app (CORS).
 
+## Sessioni degli agenti
+
+Un agente di codice conduce le sue sessioni con un modello, uno sforzo di ragionamento e una modalità. Il campo del messaggio offre il modello, lo sforzo di ragionamento e la modalità che Claude Code, Codex e Gemini CLI pubblicizzano per le loro sessioni. Una scelta si applica subito alla sessione in corso e alle sessioni successive con quell’agente, tranne le modalità che saltano le richieste di permesso, che valgono per una sola sessione.
+
+Sul desktop, ogni chat può dare al suo agente di codice una cartella di progetto in cui lavorare, scelta nell’intestazione della chat e confermata prima. Le sessioni lì partono nella modalità predefinita dell’agente, e solo il modello e lo sforzo di ragionamento scelti vengono portati avanti.
+
 ## Strumenti
 
 Gli strumenti coprono lettura, creazione, modifica, struttura, variabili, vettori, analisi, descrizione, generazione di codice e immagini stock. Ogni chiamata agisce sull’editor attivo e partecipa alla cronologia quando applicabile.

@@ -31,6 +31,12 @@ Le panneau des propriétés modifie famille, style, taille, interligne, approche
 
 Les mises en forme partielles sont conservées sous forme de plages et participent à l’annulation et au rétablissement.
 
+## Liens
+
+Le texte peut pointer vers une page web ou une adresse de courriel, sur tout le texte ou sur les caractères sélectionnés. Le calque étant sélectionné, choisissez **Ajouter un lien** dans la section Typographie du panneau des propriétés, dans **Texte → Ajouter un lien** dans la barre des menus ou dans le menu contextuel du canevas. L’éditeur de liens s’ouvre sous le texte : tapez une adresse — un domaine seul ou `nom@hôte` reçoit son `https://` ou `mailto:` — et appuyez sur <kbd>Entrée</kbd> pour l’appliquer, ou <kbd>Échap</kbd> pour fermer sans changer. L’éditeur sert aussi à modifier le lien plus tard et à le retirer.
+
+⌘-clic (Ctrl-clic sous Windows et Linux) sur un lien du canevas l’ouvre, tout comme un clic dans l’aperçu.
+
 ## Polices
 
 OpenPencil détecte les polices du système lorsque l’environnement le permet. Si une police manque, son état est signalé et une police de remplacement est utilisée jusqu’à sa disponibilité.

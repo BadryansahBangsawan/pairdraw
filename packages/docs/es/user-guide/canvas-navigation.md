@@ -42,3 +42,17 @@ Ajustar a la vista, a la selección y al 100 %, los niveles del menú de zoom y 
 ## Reglas
 
 Las reglas están ocultas hasta que las activas con **Ver → Reglas** o <kbd>Shift</kbd> + <kbd>R</kbd>.
+
+## Ajuste magnético
+
+En **Ver → Preferencias**, activa **Ajustar a la geometría**, **Ajustar a objetos** y **Ajustar a la cuadrícula de píxeles** de forma independiente. Las preferencias se conservan entre sesiones.
+
+El ajuste a la geometría y a objetos ayuda a alinear los puntos vectoriales, las capas movidas y los bordes redimensionados con la geometría, los objetos, las guías y los bordes de los marcos cercanos. Para esos objetivos aparecen líneas de alineación; el redondeo a la cuadrícula de píxeles no dibuja una línea de alineación por cada píxel.
+
+Con **Ajustar a objetos** activado, una capa movida también se ajusta al espaciado igual: se centra entre sus dos vecinos, o queda a la misma distancia de un vecino que la que hay entre otros dos vecinos de la misma fila o columna. Cada hueco de ese tamaño muestra un indicador rosa con su tamaño. Al redimensionar no se ajusta al espaciado.
+
+Con **Ajustar a la cuadrícula de píxeles** activado, las capas movidas, los bordes redimensionados y las capas dibujadas caen en píxeles enteros a cualquier zoom, aunque empezaran entre píxeles. Un ajuste a un objeto o una guía gana a la cuadrícula. Los movimientos con las flechas y los valores escritos en el panel de propiedades conservan sus fracciones.
+
+Activa **Ajustar a medios píxeles** en **Ajustes → Editor** para que el ajuste a la cuadrícula también caiga en medios píxeles, de modo que un trazo de 1 px pueda quedar centrado en el borde de un píxel. Un tablero conserva su cuadrícula de 16 unidades.
+
+Mantén pulsada <kbd>Control</kbd> durante el arrastre de una capa para omitir temporalmente el ajuste a objetos y píxeles, también en macOS, donde es Control y no Command.

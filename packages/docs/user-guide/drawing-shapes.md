@@ -61,10 +61,15 @@ Every shape can have a fill. The fill section supports:
 - **Solid color** — pick via the HSV color picker or type a hex value
 - **Gradient** — Linear, Radial, Angular, or Diamond with editable gradient stops. While the gradient's picker is open, the canvas shows its handles: drag an end or a radius dot to move it, hold <kbd>Shift</kbd> to turn it in 15° steps, and drag a stop's square to slide the stop along the line
 - **Image** — select an image file as the fill, or paste an address in **Image URL** and choose **Load** to fetch a PNG, JPEG, GIF, or WebP image from the web (or a `data:` URL) of up to 64 MB
+- **Shader** — an animated GLSL shader: start from the gallery in the shader fill picker, add effects to it, or paste a preset copied from shaders.com
 
 An image fill is placed in one of five modes: **Fill** covers the layer and crops the image, **Fit** shows the whole image inside the layer, **Stretch** stretches the whole image to the layer's proportions, **Crop** lets you choose the part of the image to show, and **Tile** repeats the image. Stretch is stored as a crop of the whole image, as `.pen` files store it and Figma reads it.
 
 To crop or reframe an image on the canvas, double-click the layer, press <kbd>Enter</kbd> with it selected, or choose **Crop image** from its context menu or its image fill. The whole image shows, faded outside the layer. Drag the layer's corner brackets or edge bars to crop it over the still image, drag the image to move it behind the layer, and drag the image's corner dots to scale it. Hold <kbd>Shift</kbd> to keep proportions or move along one axis and <kbd>Alt</kbd> to work from the centre. Each drag is one undo step and stores the fill as a crop; <kbd>Enter</kbd>, <kbd>Esc</kbd>, a double-click, or a click outside the image finishes. Vectors, layers with children, and layers placed by auto layout keep their edges, so on those you can only move and scale the image.
+
+### Shader Mode
+
+Shader Mode shows a shader fill large on its own, with play and pause, a phase scrubber, and the shader's settings beside it. Open it with **Open in Shader Mode** in the shader fill picker, or with **View → Shader Mode** while the selection has a shader fill.
 
 ### Stroke
 

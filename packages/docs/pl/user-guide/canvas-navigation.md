@@ -43,6 +43,20 @@ Dopasowanie widoku, powiększenie do zaznaczenia i do 100%, poziomy z menu powi�
 
 Linijki są ukryte, dopóki nie włączysz ich poleceniem **Widok → Linijki** lub skrótem <kbd>Shift</kbd> + <kbd>R</kbd>.
 
+## Przyciąganie
+
+W **Widok → Preferencje** włącz niezależnie **Przyciągaj do geometrii**, **Przyciągaj do obiektów** i **Przyciągaj do siatki pikseli**. Preferencje są zachowywane między sesjami.
+
+Przyciąganie do geometrii i do obiektów pomaga wyrównać punkty wektorów, przesuwane warstwy i zmieniane krawędzie z pobliską geometrią, obiektami, prowadnicami i krawędziami ramek. Dla tych celów pojawiają się linie wyrównania; zaokrąglanie do siatki pikseli nie rysuje linii wyrównania dla każdego piksela.
+
+Przy włączonym **Przyciągaj do obiektów** przesuwana warstwa przyciąga się też do równych odstępów: centruje się między dwoma sąsiadami albo staje w takiej odległości od sąsiada, jaka dzieli innych dwóch sąsiadów tego samego wiersza lub kolumny. Każdy odstęp tej wielkości pokazuje różowy wskaźnik ze swoim rozmiarem. Zmiana rozmiaru nie przyciąga się do odstępów.
+
+Przy włączonym **Przyciągaj do siatki pikseli** przesuwane warstwy, zmieniane krawędzie i rysowane warstwy trafiają na całe piksele przy każdym powiększeniu, nawet jeśli zaczęły między pikselami. Przyciągnięcie do obiektu lub prowadnicy wygrywa z siatką. Przesunięcia strzałkami i wartości wpisane w panelu właściwości zachowują swoje ułamki.
+
+Włącz **Przyciągaj do połówek pikseli** w **Ustawienia → Edytor**, aby przyciąganie do siatki pikseli mogło trafiać też na połówki pikseli, dzięki czemu obrys o szerokości 1 px może leżeć wyśrodkowany na krawędzi piksela. Tablica zachowuje własną siatkę 16 jednostek.
+
+Przytrzymaj <kbd>Control</kbd> podczas przeciągania warstwy, aby tymczasowo pominąć przyciąganie do obiektów i pikseli — także na macOS, gdzie jest to Control, a nie Command.
+
 ## Skróty klawiaturowe
 
 | Działanie | macOS | Windows / Linux |

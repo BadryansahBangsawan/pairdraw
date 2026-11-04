@@ -39,6 +39,20 @@ Zoomer pour tout afficher, sur la sélection et à 100 %, les niveaux du menu de
 
 Les règles sont masquées jusqu’à ce que vous les affichiez avec **Affichage → Règles** ou <kbd>Shift</kbd> + <kbd>R</kbd>.
 
+## Magnétisme
+
+Dans **Affichage → Préférences**, activez **Aligner sur la géométrie**, **Aligner sur les objets** et **Aligner sur la grille de pixels** indépendamment. Les préférences sont conservées entre les sessions.
+
+L’alignement sur la géométrie et sur les objets aide à aligner les points vectoriels, les calques déplacés et les bords redimensionnés avec la géométrie, les objets, les repères et les bords de cadres voisins. Des lignes d’alignement apparaissent pour ces cibles ; l’arrondi à la grille de pixels ne dessine pas une ligne d’alignement pour chaque pixel.
+
+Avec **Aligner sur les objets** activé, un calque déplacé s’aligne aussi sur l’espacement égal : il se centre entre ses deux voisins, ou se place à la même distance d’un voisin que celle qui sépare deux autres voisins de la même rangée ou colonne. Chaque écart de cette taille montre un indicateur rose avec sa taille. La mise à l’échelle ne s’aligne pas sur l’espacement.
+
+Avec **Aligner sur la grille de pixels** activé, les calques déplacés, les bords redimensionnés et les calques dessinés tombent sur des pixels entiers à n’importe quel zoom, même s’ils ont commencé entre les pixels. Un alignement sur un objet ou un repère l’emporte sur la grille. Les déplacements aux flèches et les valeurs tapées dans le panneau des propriétés gardent leurs fractions.
+
+Activez **Aligner sur les demi-pixels** dans **Paramètres → Éditeur** pour que l’alignement à la grille de pixels puisse aussi tomber sur des demi-pixels, pour qu’un trait de 1 px puisse rester centré sur un bord de pixel. Un tableau garde sa grille de 16 unités.
+
+Maintenez <kbd>Control</kbd> pendant le glissement d’un calque pour ignorer temporairement l’alignement sur les objets et les pixels — y compris sous macOS, où c’est Control, et non Command.
+
 ## Palette de commandes
 
 Appuyez sur <kbd>⌘</kbd><kbd>K</kbd> sous macOS ou <kbd>Ctrl</kbd><kbd>K</kbd> sous Windows/Linux pour rechercher des actions de l’éditeur et de l’application. Sélectionnez un résultat pour l’exécuter ; les actions indisponibles restent soumises à la sélection et à l’état du document.

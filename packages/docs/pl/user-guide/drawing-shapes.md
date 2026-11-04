@@ -44,9 +44,14 @@ Przytrzymaj <kbd>Shift</kbd> podczas przeciągania:
 
 - kolor jednolity wybierany w HSV lub zapisywany szesnastkowo;
 - gradient liniowy, radialny, kątowy lub diamentowy;
-- obraz jako zalew.
+- obraz jako zalew;
+- shader: animowany shader GLSL — zacznij od galerii w wyborze zalewu shaderem, dodaj do niego efekty albo wklej preset skopiowany z shaders.com.
 
 Aby przyciąć lub przekadrować obraz na płótnie, kliknij dwukrotnie warstwę, naciśnij <kbd>Enter</kbd>, gdy jest zaznaczona, albo wybierz **Przytnij obraz** z menu kontekstowego lub z wypełnienia obrazem. Obraz pojawia się w całości, przygaszony poza warstwą. Przeciągnij narożniki lub paski krawędzi warstwy, aby przyciąć ją nad nieruchomym obrazem, przeciągnij obraz, aby przesunąć go pod warstwą, i przeciągnij jego narożne punkty, aby go przeskalować. <kbd>Shift</kbd> zachowuje proporcje lub jedną oś, a <kbd>Alt</kbd> działa od środka. Każde przeciągnięcie to jeden krok do cofnięcia; <kbd>Enter</kbd>, <kbd>Esc</kbd>, dwuklik lub kliknięcie poza obrazem kończy. Wektory, warstwy z dziećmi i warstwy rozmieszczane przez auto layout zachowują swoje krawędzie; w nich możesz tylko przesuwać i skalować obraz.
+
+### Tryb shadera
+
+Tryb shadera pokazuje zalew shaderem osobno i w dużej skali, z odtwarzaniem i pauzą, suwakiem fazy oraz ustawieniami shadera obok. Otwórz go poleceniem **Otwórz w trybie shadera** w wyborze zalewu shaderem albo przez **Widok → Tryb shadera**, gdy zaznaczenie ma zalew shaderem.
 
 ### Obwiednia
 

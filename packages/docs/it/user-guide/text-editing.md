@@ -31,6 +31,12 @@ Il pannello delle proprietà modifica famiglia, stile, dimensione, interlinea, s
 
 La formattazione parziale viene conservata in intervalli e partecipa ad annulla e ripristina.
 
+## Link
+
+Il testo può contenere un collegamento a una pagina web o a un indirizzo email, su tutto il testo o sui caratteri selezionati. Con il livello selezionato, scegli **Aggiungi link** nella sezione Tipografia del pannello delle proprietà, in **Testo → Aggiungi link** nella barra dei menu o nel menu contestuale della tela. L’editor dei link si apre sotto il testo: digita un indirizzo — un dominio semplice o `nome@host` riceve il suo `https://` o `mailto:` — e premi <kbd>Invio</kbd> per applicarlo, o <kbd>Esc</kbd> per chiudere senza modifiche. L’editor serve anche a modificare il link in seguito e a rimuoverlo.
+
+⌘-clic (Ctrl-clic su Windows e Linux) su un link nella tela lo apre, così come un clic su di esso nell’anteprima.
+
 ## Font
 
 OpenPencil rileva i font di sistema quando l’ambiente lo consente. Se un font manca, ne mostra lo stato e usa un’alternativa finché non è disponibile.

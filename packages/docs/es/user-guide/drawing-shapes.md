@@ -33,9 +33,13 @@ Con <kbd>Shift</kbd>, el rectángulo se convierte en cuadrado, la elipse en cír
 
 ### Relleno
 
-Color sólido, degradado lineal, radial, angular o diamante, e imagen.
+Color sólido, degradado lineal, radial, angular o diamante, imagen y shader: un shader GLSL animado; empieza con la galería del selector de relleno de shader, añade efectos o pega un preajuste copiado de shaders.com.
 
 Para recortar o reencuadrar una imagen en el lienzo, haz doble clic en la capa, pulsa <kbd>Enter</kbd> con ella seleccionada o elige **Recortar imagen** en su menú contextual o en su relleno de imagen. La imagen aparece entera, atenuada fuera de la capa. Arrastra las esquinas o las barras de los bordes de la capa para recortarla sobre la imagen quieta, arrastra la imagen para moverla detrás de la capa y arrastra sus puntos de esquina para escalarla. <kbd>Shift</kbd> mantiene las proporciones o un eje y <kbd>Alt</kbd> trabaja desde el centro. Cada arrastre es un paso que se puede deshacer; <kbd>Enter</kbd>, <kbd>Esc</kbd>, un doble clic o un clic fuera de la imagen termina. Los vectores, las capas con hijos y las capas que coloca el auto layout conservan sus bordes; en ellas solo puedes mover y escalar la imagen.
+
+### Modo shader
+
+El modo shader muestra un relleno de shader solo y en grande, con reproducción y pausa, un deslizador de fase y los ajustes del shader al lado. Ábrelo con **Abrir en modo shader** en el selector de relleno de shader, o con **Ver → Modo shader** mientras la selección tenga un relleno de shader.
 
 ### Contorno
 

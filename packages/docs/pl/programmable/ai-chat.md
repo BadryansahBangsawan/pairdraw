@@ -54,6 +54,12 @@ Wbudowany czat z bezpośrednim API również korzysta z włączonych połączeń
 
 Zdalny serwer musi używać HTTPS. W lokalnym środowisku programistycznym dozwolone są adresy pętli zwrotnej przez HTTP. Włączaj wyłącznie zaufane serwery. Wbudowany serwer MCP OpenPencil jest podłączany automatycznie.
 
+## Sesje agentów
+
+Agent programistyczny prowadzi swoje sesje z modelem, poziomem rozumowania i trybem. Pole wiadomości oferuje model, poziom rozumowania i tryb, które Claude Code, Codex i Gemini CLI reklamują dla swoich sesji. Wybór działa natychmiast w bieżącej sesji oraz w późniejszych sesjach z tym agentem, z wyjątkiem trybów pomijających pytania o uprawnienia, które obowiązują tylko przez jedną sesję.
+
+W wersji komputerowej każdy czat może dać swojemu agentowi programistycznemu folder projektu do pracy, wybrany w nagłówku czatu i najpierw potwierdzony. Sesje tam zaczynają się w domyślnym trybie agenta, a tylko wybrany model i poziom rozumowania są przenoszone.
+
 ## Możliwości
 
 Asystent korzysta z ponad 90 narzędzi do tworzenia, stylizowania, układu, komponentów, zmiennych, wyszukiwania, inspekcji, analizy, eksportu i operacji wektorowych. Do inspekcji należą `get_jsx` (widok JSX w obie strony), `diff_create` i `diff_jsx` (różnice strukturalne), `diff_visual` (różnice pikseli) oraz `describe` (rola semantyczna i wykrywanie problemów projektowych).

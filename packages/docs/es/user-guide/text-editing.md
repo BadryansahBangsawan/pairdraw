@@ -31,6 +31,12 @@ El panel de propiedades permite cambiar familia, estilo, tamaño, interlineado, 
 
 Los estilos parciales se guardan como intervalos y participan en deshacer y rehacer.
 
+## Enlaces
+
+El texto puede enlazar a una página web o a una dirección de correo, en el texto entero o en los caracteres seleccionados. Con la capa seleccionada, elige **Añadir enlace** en la sección Tipografía del panel de propiedades, en **Texto → Añadir enlace** en la barra de menús o en el menú contextual del lienzo. El editor de enlaces se abre bajo el texto: escribe una dirección — un dominio sin más o `nombre@host` gana su `https://` o `mailto:` — y pulsa <kbd>Enter</kbd> para aplicarlo, o <kbd>Escape</kbd> para cerrar sin cambios. El editor también edita el enlace más adelante y lo elimina.
+
+⌘-clic (Ctrl-clic en Windows y Linux) sobre un enlace en el lienzo lo abre, igual que hacer clic en él en la vista previa.
+
 ## Fuentes
 
 OpenPencil detecta fuentes del sistema cuando el entorno lo permite. Si falta una fuente, muestra su estado y usa una alternativa hasta que esté disponible.

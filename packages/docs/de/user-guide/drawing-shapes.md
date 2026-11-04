@@ -33,9 +33,13 @@ Mit <kbd>Shift</kbd> wird ein Rechteck zum Quadrat, eine Ellipse zum Kreis und e
 
 ### Füllung
 
-Volltonfarbe, linearer, radialer, Winkel- oder Diamantverlauf sowie Bildfüllung.
+Volltonfarbe, linearer, radialer, Winkel- oder Diamantverlauf sowie Bildfüllung. Eine Shader-Füllung ist ein animierter GLSL-Shader: Beginnen Sie mit der Galerie in der Shader-Füllungsauswahl, fügen Sie Effekte hinzu oder fügen Sie ein von shaders.com kopiertes Preset ein.
 
 Ein Bild schneiden Sie direkt auf der Arbeitsfläche zu, indem Sie die Ebene doppelt anklicken, sie auswählen und <kbd>Enter</kbd> drücken oder **Bild zuschneiden** im Kontextmenü oder in der Bildfüllung wählen. Das ganze Bild erscheint, außerhalb der Ebene abgeblendet. Ziehen Sie die Eckwinkel oder Kantenbalken der Ebene, um sie über dem stillstehenden Bild zuzuschneiden, ziehen Sie das Bild, um es hinter der Ebene zu verschieben, und ziehen Sie seine Eckpunkte, um es zu skalieren. <kbd>Shift</kbd> hält die Proportionen oder eine Achse, <kbd>Alt</kbd> arbeitet von der Mitte aus. Jedes Ziehen ist ein Schritt zum Rückgängigmachen; <kbd>Enter</kbd>, <kbd>Esc</kbd>, ein Doppelklick oder ein Klick außerhalb des Bildes beendet den Modus. Vektoren, Ebenen mit Inhalt und Ebenen, die Auto-Layout platziert, behalten ihre Kanten; bei ihnen können Sie das Bild nur verschieben und skalieren.
+
+### Shader-Modus
+
+Der Shader-Modus zeigt eine Shader-Füllung einzeln und groß, mit Wiedergabe und Pause, einem Phasenregler und den Einstellungen des Shaders daneben. Öffnen Sie ihn mit **Im Shader-Modus öffnen** in der Shader-Füllungsauswahl oder über **Ansicht → Shader-Modus**, wenn die Auswahl eine Shader-Füllung hat.
 
 ### Kontur
 

@@ -34,6 +34,12 @@ Die Pfeiltasten bewegen den Cursor zeichen- oder zeilenweise. <kbd>Option</kbd>/
 
 Durchgestrichen ist über **S** im Bereich Typografie verfügbar. Die Formatierung wird pro Zeichen gespeichert.
 
+## Links
+
+Text kann auf eine Webseite oder eine E-Mail-Adresse verlinken, für den gesamten Text oder für ausgewählte Zeichen. Wenn die Ebene ausgewählt ist, wählen Sie **Link hinzufügen** im Bereich Typografie des Eigenschaften-Panels, unter **Text → Link hinzufügen** in der Menüleiste oder im Kontextmenü der Arbeitsfläche. Der Link-Editor öffnet sich unter dem Text: Geben Sie eine Adresse ein — eine reine Domain oder `name@host` erhält ihr `https://` bzw. `mailto:` — und drücken Sie <kbd>Enter</kbd>, um sie zu übernehmen, oder <kbd>Escape</kbd>, um ohne Änderungen zu schließen. Der Editor bearbeitet den Link später auch und entfernt ihn.
+
+Ein ⌘-Klick (Strg-Klick unter Windows und Linux) auf einen Link auf der Arbeitsfläche öffnet ihn, ebenso ein Klick in der Vorschau.
+
 ## Schriftauswahl
 
 Die Schriftauswahl unterstützt Suche, Vorschau, virtuelles Scrollen und das Anspringen der aktuellen Schrift.

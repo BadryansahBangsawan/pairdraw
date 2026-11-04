@@ -33,9 +33,13 @@ Con <kbd>Shift</kbd>, un rettangolo diventa quadrato, un’ellisse diventa cerch
 
 ### Riempimento
 
-Colore uniforme, sfumatura lineare, radiale, angolare o a diamante e immagine.
+Colore uniforme, sfumatura lineare, radiale, angolare o a diamante, immagine e shader: uno shader GLSL animato; parti dalla galleria del selettore di riempimento shader, aggiungigli effetti, o incolla un preset copiato da shaders.com.
 
 Per ritagliare o reinquadrare un’immagine sulla tela, fai doppio clic sul livello, premi <kbd>Invio</kbd> con il livello selezionato o scegli **Ritaglia immagine** dal menu contestuale o dal riempimento immagine. L’immagine appare intera, sbiadita fuori dal livello. Trascina gli angoli o le barre dei bordi del livello per ritagliarlo sopra l’immagine ferma, trascina l’immagine per spostarla dietro al livello e trascina i suoi punti d’angolo per ridimensionarla. <kbd>Shift</kbd> mantiene le proporzioni o un asse e <kbd>Alt</kbd> lavora dal centro. Ogni trascinamento è un passaggio annullabile; <kbd>Invio</kbd>, <kbd>Esc</kbd>, un doppio clic o un clic fuori dall’immagine termina. I vettori, i livelli con figli e i livelli posizionati dall’auto layout mantengono i loro bordi: su questi puoi solo spostare e ridimensionare l’immagine.
+
+### Modalità shader
+
+La modalità shader mostra un riempimento shader da solo e in grande, con riproduzione e pausa, un cursore di fase e le impostazioni dello shader accanto. Aprila con **Apri in modalità shader** nel selettore di riempimento shader, o con **Visualizza → Modalità shader** mentre la selezione ha un riempimento shader.
 
 ### Contorno
 

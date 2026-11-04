@@ -41,6 +41,14 @@ The pages panel shows all pages in the document.
 
 Each page has its own canvas and viewport state.
 
+## Slides Panel
+
+The slides panel lists the page's top-level frames as numbered slide thumbnails, in layer order. Click a slide to show its frame on the canvas, and drag a slide — or press <kbd>Alt</kbd> with an up or down arrow — to reorder it. **Export slides** writes every slide, in order, to one PDF or PowerPoint file.
+
+## Present Mode
+
+Present shows the page's slides full screen, one at a time. Start it with <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>Enter</kbd>, **View → Present**, or the Present button in the top bar. The arrow keys, <kbd>Space</kbd>, <kbd>Enter</kbd>, <kbd>Page Up</kbd>/<kbd>Page Down</kbd>, and the scroll wheel step through the slides; <kbd>Escape</kbd> leaves and returns the canvas and keyboard focus to where they were. A slide taller than the screen is shown at 100% and can be scrolled.
+
 ## Documents and Recovery
 
 The Home workspace lists recent local documents and documents from configured storage providers. Use grid or list view, and sort recent files by **Name**, **Last used**, or **Created**. <kbd>⌘</kbd>/<kbd>Ctrl</kbd>-click adds a file to the selection, <kbd>Shift</kbd>-click selects a range, and <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+<kbd>A</kbd> selects every listed file; the selection bar then opens them in separate editor tabs, removes them from Recents, or deletes stored documents. A file's <kbd>⋯</kbd> menu or right-click menu offers **Remove from Recents**, which forgets the file without deleting it, and **Save As…**, which saves a copy elsewhere. **Design systems** lists the component libraries you have published; picking one opens a new design with that library turned on in the Assets panel.

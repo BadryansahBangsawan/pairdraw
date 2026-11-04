@@ -49,6 +49,12 @@ Przekreślenie włącza się przyciskiem **S** w sekcji „Typografia”. Nie ma
 
 Styl jest przechowywany dla każdego znaku. Tekst wpisywany między fragmentami pogrubionymi i zwykłymi dziedziczy styl poprzedniego fragmentu.
 
+## Linki
+
+Tekst może zawierać link do strony internetowej lub adresu e-mail, w całym tekście lub w zaznaczonych znakach. Gdy warstwa jest zaznaczona, wybierz **Dodaj link** w sekcji „Typografia” panelu właściwości, w **Tekst → Dodaj link** w pasku menu lub w menu kontekstowym obszaru roboczego. Edytor linków otwiera się pod tekstem: wpisz adres — sama domena lub `nazwa@host` otrzyma swój `https://` lub `mailto:` — i naciśnij <kbd>Enter</kbd>, aby go zastosować, albo <kbd>Escape</kbd>, aby zamknąć bez zmian. Edytor służy też później do edycji linka i jego usuwania.
+
+⌘-klik (Ctrl-klik na Windows i Linux) na link na obszarze roboczym otwiera go, podobnie jak kliknięcie go w podglądzie.
+
 ## Operacje edycji
 
 | Działanie | macOS | Windows / Linux |

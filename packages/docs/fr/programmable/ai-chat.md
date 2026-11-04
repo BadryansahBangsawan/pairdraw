@@ -31,6 +31,12 @@ Le jeton est conservé dans le stockage sécurisé des identifiants, pas dans le
 
 Le chat intégré avec API directe utilise aussi les connexions activées et propose leurs outils au modèle sous la forme `mcp__<serveur>__<outil>`. Les serveurs hébergés comme Notion ou Linear passent par la **Connexion OAuth** : enregistrez la connexion, puis cliquez sur **Se connecter**. Dans l’application de bureau, une connexion peut aussi être une **Commande locale**, un programme qui parle MCP sur stdin et stdout, avec un argument par ligne et des variables d’environnement facultatives `NOM=valeur`. Avant d’exécuter une ligne de commande pour la première fois, l’application demande l’autorisation dans une boîte de dialogue système ; les variables comme `PATH` ou `NODE_OPTIONS`, qui chargent du code, sont refusées. Tant que le chat demande avant d’agir, il demande aussi avant chaque outil externe que son serveur ne marque pas comme en lecture seule. Dans l’application web, un serveur distant doit accepter les requêtes venant de l’origine de l’application (CORS).
 
+## Sessions d’agents
+
+Un agent de codage mène ses sessions avec un modèle, un effort de raisonnement et un mode. Le champ de message propose le modèle, l’effort de raisonnement et le mode que Claude Code, Codex et Gemini CLI annoncent pour leurs sessions. Un choix s’applique aussitôt à la session en cours et aux sessions suivantes avec cet agent, sauf les modes qui passent les demandes de permission, qui ne s’appliquent qu’à une seule session.
+
+Sur le bureau, chaque discussion peut donner à son agent de codage un dossier de projet où travailler, choisi dans l’en-tête de la discussion et confirmé d’abord. Les sessions y démarrent dans le mode par défaut de l’agent, et seuls le modèle et l’effort de raisonnement choisis sont repris.
+
 ## Outils
 
 Les outils couvrent lecture, création, modification, structure, variables, vecteurs, analyse, description, génération de code et images de stock. L’inspection comprend `get_jsx` pour la vue JSX aller-retour, `diff_create` et `diff_jsx` pour les différences structurelles, `diff_visual` pour les différences de pixels et `describe` pour le rôle sémantique et la détection des problèmes de design. Chaque appel agit sur l’éditeur actif et participe à l’historique d’annulation lorsque cela s’applique.

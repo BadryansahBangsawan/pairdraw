@@ -52,6 +52,12 @@ Token werden im Anmeldedatenspeicher und erst beim Start einer ACP-Sitzung geles
 
 Auch der eingebaute Chat mit direkter API nutzt aktivierte Verbindungen: Er bietet ihre Werkzeuge dem Modell als `mcp__<Server>__<Werkzeug>` an. Gehostete Server wie Notion oder Linear melden dich über **OAuth-Anmeldung** an; speichere die Verbindung und klicke dann auf **Anmelden**. In der Desktop-App kann eine Verbindung außerdem ein **lokaler Befehl** sein, ein Programm, das MCP über stdin und stdout spricht, mit einem Argument pro Zeile und optionalen Umgebungsvariablen `NAME=Wert`. Vor dem ersten Ausführen einer Befehlszeile fragt die App in einem Systemdialog nach; Variablen wie `PATH` oder `NODE_OPTIONS`, die Code laden, sind nicht erlaubt. Solange der Chat vor Aktionen nachfragt, fragt er auch vor jedem externen Werkzeug, das sein Server nicht als nur lesend kennzeichnet. In der Web-App muss ein entfernter Server Anfragen vom Ursprung der App zulassen (CORS).
 
+## Agent-Sitzungen
+
+Ein Coding-Agent führt seine Sitzungen mit einem Modell, einem Überlegungsaufwand und einem Modus aus. Das Nachrichtenfeld bietet das Modell, den Überlegungsaufwand und den Modus an, die Claude Code, Codex und Gemini CLI für ihre Sitzungen ankündigen. Eine Wahl gilt sofort für die laufende Sitzung und für spätere Sitzungen mit diesem Agenten, außer Modi, die Berechtigungsanfragen überspringen; sie gelten nur für eine Sitzung.
+
+Auf dem Desktop kann jeder Chat seinem Coding-Agenten einen Projektordner zum Arbeiten geben, gewählt in der Chat-Kopfzeile und zuerst bestätigt. Sitzungen dort starten im Standardmodus des Agenten, und nur das gewählte Modell und der Überlegungsaufwand werden übernommen.
+
 ## Werkzeuge
 
 Der Assistent verfügt über mehr als 90 Werkzeuge für Erstellung, Gestaltung, Anordnung, Komponenten, Variablen, Suche, Prüfung, Analyse, Export und Vektorbearbeitung.

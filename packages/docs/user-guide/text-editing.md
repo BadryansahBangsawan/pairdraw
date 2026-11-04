@@ -50,6 +50,12 @@ Formatting is applied per character. When you type between a bold and regular se
 
 The **B / I / U / S** toggle buttons in the Typography section of the properties panel also apply formatting.
 
+## Links
+
+Text can link to a web page or an email address, on the whole text or on selected characters. With the layer selected, choose **Add link** in the Typography section of the properties panel, in **Text → Add Link** in the menu bar, or in the canvas menu. The link editor opens under the text: type an address — a bare domain or `name@host` gains its `https://` or `mailto:` — and press <kbd>Enter</kbd> to apply it, or <kbd>Escape</kbd> to close without changes. The editor also edits the link later and removes it.
+
+⌘-click (Ctrl-click on Windows and Linux) a link on the canvas, or click it in Preview, to open it.
+
 ## Editing Operations
 
 | Action | Mac | Windows / Linux |

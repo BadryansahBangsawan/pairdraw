@@ -41,6 +41,20 @@ Zoom auf alles, auf die Auswahl und auf 100 %, die Stufen des Zoommenüs und der
 
 Lineale sind ausgeblendet, bis Sie sie mit **Ansicht → Lineale** oder <kbd>Shift</kbd> + <kbd>R</kbd> einblenden.
 
+## Ausrichten
+
+Unter **Ansicht → Einstellungen** schalten Sie **An Geometrie ausrichten**, **An Objekten ausrichten** und **Am Pixelraster ausrichten** unabhängig voneinander ein. Die Einstellungen bleiben zwischen Sitzungen erhalten.
+
+Geometrie- und Objekt-Ausrichten hilft, Vektorpunkte, verschobene Ebenen und vergrößerte Kanten an naher Geometrie, Objekten, Hilfslinien und Rahmenrändern auszurichten. Für diese Ziele erscheinen Ausrichtungslinien; die Pixel-Raster-Verrundung zeichnet nicht für jedes Pixel eine Ausrichtungslinie.
+
+Mit eingeschaltetem **An Objekten ausrichten** richtet eine verschobene Ebene sich auch am gleichen Abstand aus: Sie zentriert sich zwischen ihren beiden Nachbarn oder landet so weit von einem Nachbarn entfernt, wie zwei andere Nachbarn derselben Reihe oder Spalte auseinanderliegen. Jeder Abstand dieser Größe zeigt einen rosa Indikator mit seiner Größe. Beim Vergrößern wird nicht auf Abstände ausgerichtet.
+
+Mit eingeschaltetem **Am Pixelraster ausrichten** landen verschobene Ebenen, vergrößerte Kanten und gezeichnete Ebenen bei jeder Vergrößerung auf ganzen Pixeln, auch wenn sie zwischen Pixeln begannen. Ein Ausrichten an einem Objekt oder einer Hilfslinie gewinnt gegen das Raster. Pfeiltasten-Verschiebungen und im Eigenschaften-Panel getippte Werte behalten ihre Brüche.
+
+Schalten Sie **An halben Pixeln ausrichten** unter **Einstellungen → Editor** ein, damit die Pixelraster-Ausrichtung auch auf halben Pixeln landen kann, sodass ein Strich von 1 px mittig auf einer Pixelkante sitzen kann. Ein Board behält sein Raster von 16 Einheiten.
+
+Halten Sie während des Ziehens einer Ebene <kbd>Control</kbd> gedrückt, um das Objekt- und Pixel-Ausrichten vorübergehend zu umgehen — auch unter macOS, wo dies Control ist, nicht Command.
+
 ## Tastenkürzel
 
 | Aktion | macOS | Windows / Linux |

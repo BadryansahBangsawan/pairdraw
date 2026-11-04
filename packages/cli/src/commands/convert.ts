@@ -82,7 +82,12 @@ export default defineCommand({
     }
     const output = args.output ? resolve(args.output) : defaultOutput(file, format)
     if (format === 'fig') await writeFigDocument(graph, output)
-    else await writeFile(output, (await io.writeDocument(format, graph)).data as Uint8Array)
+    else {
+      const result = await io.writeDocument(format, graph)
+      const data =
+        result.encoding === 'utf8' ? (result.data as string) : (result.data as Uint8Array)
+      await writeFile(output, data)
+    }
     console.log(ok(`Converted ${file} → ${output}`))
   }
 })

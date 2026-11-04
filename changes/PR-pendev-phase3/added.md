@@ -1,0 +1,1 @@
+- Exports deterministic, human-readable `.pen` documents from scene graphs through the Core and CLI conversion APIs.

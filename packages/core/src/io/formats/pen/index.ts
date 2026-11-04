@@ -7,6 +7,7 @@ import {
   parsePenDocument,
   penAssets,
   withUsedImports,
+  writePenDocument,
   type PenIconRequest,
   type PenIconSource
 } from '@open-pencil/pen'
@@ -95,7 +96,8 @@ export const penFormat: IOFormatAdapter<'pen'> = {
   extensions: ['pen'],
   mimeTypes: ['application/json', 'text/plain'],
   support: {
-    readDocument: true
+    readDocument: true,
+    writeDocument: true
   },
   laysOutOnRead: true,
   matchesFile(fileName, mimeType) {
@@ -128,5 +130,14 @@ export const penFormat: IOFormatAdapter<'pen'> = {
     return warnings.length > 0
       ? { graph, sourceFormat: 'pen', warnings }
       : { graph, sourceFormat: 'pen' }
+  },
+  async writeDocument(graph) {
+    return {
+      format: 'pen',
+      mimeType: 'application/json',
+      extension: 'pen',
+      data: writePenDocument(graph),
+      encoding: 'utf8'
+    }
   }
 }

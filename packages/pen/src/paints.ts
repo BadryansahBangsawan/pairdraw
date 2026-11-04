@@ -66,14 +66,16 @@ export function mapBlendMode(value: string | undefined): BlendMode | undefined {
 const GRADIENT_TYPES: Partial<Record<string, FillType>> = {
   linear: 'GRADIENT_LINEAR',
   radial: 'GRADIENT_RADIAL',
-  angular: 'GRADIENT_ANGULAR'
+  angular: 'GRADIENT_ANGULAR',
+  diamond: 'GRADIENT_DIAMOND'
 }
 
 /**
  * pen.dev places a gradient in the layer's unit square: `center` defaults to the middle, a linear
- * gradient runs `size.height` long from bottom to top, radial and angular ones are ellipses of
- * diameter `size`, and `rotation` turns all of it counter-clockwise in that square. An angular
- * gradient starts at the top and turns clockwise. Measured against pen.dev 2.21 renders.
+ * gradient runs `size.height` long from bottom to top, and radial, diamond, and angular ones are
+ * ellipses of diameter `size`. `rotation` turns all of it counter-clockwise in that square. An
+ * angular gradient starts at the top and turns clockwise. Measured against pen.dev 2.21 renders.
+ * A diamond gradient uses the same ellipse as a radial one.
  */
 function gradientTransform(paint: PenGradientPaint, type: FillType, ctx: VarContext) {
   const center = { x: paint.center?.x ?? 0.5, y: paint.center?.y ?? 0.5 }
@@ -96,6 +98,7 @@ function gradientTransform(paint: PenGradientPaint, type: FillType, ctx: VarCont
   if (type === 'GRADIENT_ANGULAR') {
     return ellipticalGradientTransform(center, along(up, height / 2), along(right, width / 2))
   }
+  // Radial and diamond gradients share this ellipse.
   return ellipticalGradientTransform(center, along(right, width / 2), {
     x: center.x - up.x * (height / 2),
     y: center.y - up.y * (height / 2)
@@ -224,13 +227,24 @@ export function strokeFields(pen: PenOverride, base?: PenStrokeFields): PenStrok
   }
 }
 
-function sideWeights(sides: PenSides, ctx: VarContext) {
-  return {
-    top: resolveNumber(sides.top, ctx),
-    right: resolveNumber(sides.right, ctx),
-    bottom: resolveNumber(sides.bottom, ctx),
-    left: resolveNumber(sides.left, ctx)
+const STROKE_SIDE_FIELDS = [
+  ['top', 'borderTopWeight'],
+  ['right', 'borderRightWeight'],
+  ['bottom', 'borderBottomWeight'],
+  ['left', 'borderLeftWeight']
+] as const
+
+/** A per-side width, with a `$name` on a side kept as that side's binding. */
+function applySideWidths(node: SceneNode, sides: PenSides, ctx: VarContext): number {
+  node.independentStrokeWeights = true
+  let weight = 0
+  for (const [side, field] of STROKE_SIDE_FIELDS) {
+    const value = resolveNumber(sides[side], ctx)
+    node[field] = value
+    bindIfVar(node, field, sides[side], ctx)
+    if (value > weight) weight = value
   }
+  return weight
 }
 
 /**
@@ -249,13 +263,7 @@ export function applyStroke(
 
   let weight: number
   if (typeof fields.width === 'object') {
-    const sides = sideWeights(fields.width, ctx)
-    weight = Math.max(sides.top, sides.right, sides.bottom, sides.left)
-    node.independentStrokeWeights = true
-    node.borderTopWeight = sides.top
-    node.borderRightWeight = sides.right
-    node.borderBottomWeight = sides.bottom
-    node.borderLeftWeight = sides.left
+    weight = applySideWidths(node, fields.width, ctx)
   } else {
     weight = resolveNumber(fields.width, ctx)
     bindIfVar(node, 'strokeWeight', fields.width, ctx)

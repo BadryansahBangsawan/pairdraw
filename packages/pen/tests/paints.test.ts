@@ -86,6 +86,20 @@ describe('parsePenFile — fills', () => {
     expectPoint(gradientPoint(transform, { x: 0.5, y: 1 }), 0.3, 1)
   })
 
+  test('sizes a diamond gradient by its diameters, as a radial one', () => {
+    const { paint: fill, transform } = gradientOf({
+      type: 'gradient',
+      gradientType: 'diamond',
+      center: { x: 0.3, y: 0.6 },
+      size: { width: 0.6, height: 0.8 },
+      colors: stops
+    })
+    expect(fill.type).toBe('GRADIENT_DIAMOND')
+    expectPoint(gradientPoint(transform, { x: 0.5, y: 0.5 }), 0.3, 0.6)
+    expectPoint(gradientPoint(transform, { x: 1, y: 0.5 }), 0.6, 0.6)
+    expectPoint(gradientPoint(transform, { x: 0.5, y: 1 }), 0.3, 1)
+  })
+
   test('starts an angular gradient at the top, turned counter-clockwise', () => {
     const { paint: fill, transform } = gradientOf({
       type: 'gradient',

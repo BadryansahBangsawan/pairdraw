@@ -93,6 +93,22 @@ describe('parsePenFile — strokes (#1324)', () => {
     expect(node.boundVariables.strokeWeight).toBeDefined()
   })
 
+  test('resolves and binds a variable width on each side', () => {
+    const graph = parseDocument(
+      [rectangle({ stroke: '#F00', strokeWidth: { top: '$edge', right: 2, bottom: 1, left: 4 } })],
+      { variables: { edge: { type: 'number', value: 6 } } }
+    )
+    const node = getNodeOrThrow(graph, 'shape')
+    expect([
+      node.borderTopWeight,
+      node.borderRightWeight,
+      node.borderBottomWeight,
+      node.borderLeftWeight
+    ]).toEqual([6, 2, 1, 4])
+    expect(graph.variables.get(node.boundVariables.borderTopWeight ?? '')?.name).toBe('edge')
+    expect(node.boundVariables.borderRightWeight).toBeUndefined()
+  })
+
   test('lets an instance replace its component stroke field by field', () => {
     const graph = parseDocument([
       {

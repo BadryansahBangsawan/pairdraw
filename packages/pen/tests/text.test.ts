@@ -82,6 +82,12 @@ describe('parsePenFile — text', () => {
     expect(node.boundVariables.fontSize).toBeDefined()
   })
 
+  test('resolves and binds font weight variables', () => {
+    const node = textOf({ fontWeight: '$weight' }, { weight: { type: 'number', value: 700 } })
+    expect(node.fontWeight).toBe(700)
+    expect(node.boundVariables.fontWeight).toBeDefined()
+  })
+
   test('links all of a text with an href', () => {
     const node = textOf({ content: 'Docs', href: 'https://pen.dev/docs' })
     expect(node.styleRuns).toEqual([

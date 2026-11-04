@@ -69,7 +69,9 @@ export function applyTextProps(node: SceneNode, pen: PenNode, ctx: VarContext): 
   bindIfVar(node, 'fontFamily', pen.fontFamily, ctx)
   node.fontSize = resolveNumber(pen.fontSize, ctx, 14)
   bindIfVar(node, 'fontSize', pen.fontSize, ctx)
-  node.fontWeight = fontWeight(pen.fontWeight ?? (isIconFont ? pen.weight : undefined), ctx)
+  const weight = pen.fontWeight ?? (isIconFont ? pen.weight : undefined)
+  node.fontWeight = fontWeight(weight, ctx)
+  bindIfVar(node, 'fontWeight', weight, ctx)
   node.italic = resolveString(pen.fontStyle, ctx)?.toLowerCase() === 'italic'
   node.textAlignHorizontal = TEXT_ALIGN[pen.textAlign ?? 'left'] ?? 'LEFT'
   node.textAlignVertical = TEXT_ALIGN_VERTICAL[pen.textAlignVertical ?? 'top'] ?? 'TOP'

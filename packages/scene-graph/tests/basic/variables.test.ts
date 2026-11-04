@@ -1,7 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 
-import { resolvedValueBindings } from '@open-pencil/scene-graph/variables'
 import { SceneGraph } from '@open-pencil/scene-graph'
+import {
+  reconcileVariableBindings,
+  resolvedValueBindings
+} from '@open-pencil/scene-graph/variables'
 
 describe('Variables', () => {
   function pageId(graph: SceneGraph): string {
@@ -298,6 +301,17 @@ describe('Variables', () => {
     expect(() => graph.bindVariable(node.id, 'fontFamily', count.id)).toThrow(
       'Cannot bind FLOAT variable to string field "fontFamily"'
     )
+  })
+
+  test('font weight binds a number and takes the variable value', () => {
+    const graph = new SceneGraph()
+    const collection = graph.createCollection('Type')
+    const weight = graph.createVariable('weight', 'FLOAT', collection.id, 700)
+    const node = graph.createNode('TEXT', graph.getPages()[0].id)
+    graph.bindVariable(node.id, 'fontWeight', weight.id)
+    expect(reconcileVariableBindings(graph)).toEqual([node.id])
+    expect(node.fontWeight).toBe(700)
+    expect(node.boundVariables.fontWeight).toBe(weight.id)
   })
 
   test('removing variable cleans up bindings', () => {

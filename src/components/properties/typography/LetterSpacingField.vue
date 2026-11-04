@@ -40,7 +40,7 @@ function commit(current: number, previous: number, unit?: string) {
     @cancel="emit('cancel')"
   >
     <template #icon>
-      <icon-lucide-a-large-small class="size-3" />
+      <icon-lucide-text class="size-3" />
     </template>
   </VariableNumberField>
 </template>

@@ -112,7 +112,7 @@ const busy = computed(() => save.busy.value || remove.busy.value || publish.busy
 </script>
 
 <template>
-  <SettingsSection v-if="settings" data-test-id="portal-public-profile">
+  <SettingsSection :level="2" v-if="settings" data-test-id="portal-public-profile">
     <template #title>{{ messages.publicProfile }}</template>
     <template #description>{{ messages.publicProfileDescription({ address }) }}</template>
     <form :class="ui.settings()" @submit.prevent="handleValid && save.run()">

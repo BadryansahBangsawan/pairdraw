@@ -117,7 +117,7 @@ const workspaces = usePortalRows(() => detail.workspaces, {
       />
     </div>
 
-    <SettingsSection>
+    <SettingsSection :level="2">
       <template #title>{{ messages.personAccount }}</template>
       <SettingsGroup>
         <SettingsRow
@@ -142,7 +142,7 @@ const workspaces = usePortalRows(() => detail.workspaces, {
       </SettingsGroup>
     </SettingsSection>
 
-    <SettingsSection>
+    <SettingsSection :level="2">
       <template #title>{{ messages.personWorkspaces }}</template>
       <AppDataTable :table="workspaces" :label="messages.personWorkspaces">
         <template #empty>

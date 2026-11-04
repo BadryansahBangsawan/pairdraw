@@ -47,7 +47,7 @@ const email = computed(() => {
 
 <template>
   <div class="flex max-w-2xl flex-col gap-6">
-    <SettingsSection>
+    <SettingsSection :level="2">
       <template #title>{{ messages.needsAttention }}</template>
       <SettingsGroup>
         <SettingsRow
@@ -79,7 +79,7 @@ const email = computed(() => {
         </SettingsRow>
       </SettingsGroup>
     </SettingsSection>
-    <SettingsSection>
+    <SettingsSection :level="2">
       <template #title>{{ messages.usageSection }}</template>
       <SettingsGroup>
         <SettingsRow :label="messages.accounts">
@@ -98,7 +98,7 @@ const email = computed(() => {
         </SettingsRow>
       </SettingsGroup>
     </SettingsSection>
-    <SettingsSection>
+    <SettingsSection :level="2">
       <template #title>{{ messages.serverSection }}</template>
       <template #description>{{ messages.serverSectionDescription }}</template>
       <SettingsGroup>

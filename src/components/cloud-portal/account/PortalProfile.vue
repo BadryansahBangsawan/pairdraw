@@ -76,7 +76,7 @@ onPicture((files) => {
       </div>
     </div>
 
-    <SettingsSection>
+    <SettingsSection :level="2">
       <template #title>{{ messages.detailsSection }}</template>
       <template #description>{{ messages.detailsSectionDescription }}</template>
       <SettingsGroup>
@@ -102,7 +102,7 @@ onPicture((files) => {
       </SettingsGroup>
     </SettingsSection>
 
-    <SettingsSection>
+    <SettingsSection :level="2">
       <template #title>{{ messages.accountId }}</template>
       <template #description>{{ messages.accountIdDescription }}</template>
       <AppCopyField

@@ -98,7 +98,7 @@ function confirm() {
       :description="messages.adminTwoStepDescription"
     />
 
-    <SettingsSection>
+    <SettingsSection :level="2">
       <template #title>{{ messages.waysToSignIn }}</template>
       <template #description>{{ messages.waysToSignInDescription }}</template>
       <SettingsGroup>
@@ -138,7 +138,7 @@ function confirm() {
       </SettingsGroup>
     </SettingsSection>
 
-    <SettingsSection v-if="authenticator.available">
+    <SettingsSection :level="2" v-if="authenticator.available">
       <template #title>{{ messages.twoStepSection }}</template>
       <template #description>{{ messages.twoStepSectionDescription }}</template>
       <SettingsGroup>
@@ -175,7 +175,7 @@ function confirm() {
       </SettingsGroup>
     </SettingsSection>
 
-    <SettingsSection v-if="passkeysAvailable">
+    <SettingsSection :level="2" v-if="passkeysAvailable">
       <template #title>{{ messages.passkeys }}</template>
       <template #description>{{ messages.passkeysDescription }}</template>
       <template #actions>

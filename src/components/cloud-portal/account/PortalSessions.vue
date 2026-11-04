@@ -148,7 +148,7 @@ function confirm() {
 
 <template>
   <div class="flex max-w-3xl flex-col gap-6">
-    <SettingsSection>
+    <SettingsSection :level="2">
       <template #title>{{ messages.activeSessions }}</template>
       <template v-if="manage" #description>{{ messages.activeSessionsDescription }}</template>
       <template v-if="manage && others.length" #actions>
@@ -174,7 +174,7 @@ function confirm() {
       </AppDataTable>
     </SettingsSection>
 
-    <SettingsSection>
+    <SettingsSection :level="2">
       <template #title>{{ messages.recentSignIns }}</template>
       <template v-if="manage" #description>{{ messages.recentSignInsDescription }}</template>
       <AppDataTable

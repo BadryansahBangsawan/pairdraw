@@ -42,3 +42,7 @@ Il testo può contenere un collegamento a una pagina web o a un indirizzo email,
 OpenPencil rileva i font di sistema quando l’ambiente lo consente. Se un font manca, ne mostra lo stato e usa un’alternativa finché non è disponibile.
 
 Quando il font è variabile, come Inter, la sezione Tipografia mostra i suoi assi (peso, dimensione ottica, larghezza e altri) con il valore a cui ciascuno è disegnato; scegliere un peso, un’inclinazione o una famiglia li riporta a quelli dello stile. La dimensione ottica mostra **Auto** finché segue la dimensione del font; un valore o **Fisso** nel suo menu la blocca, e **Auto** la fa seguire di nuovo.
+
+## Font del documento
+
+Trascina un file TTF, OTF, WOFF o WOFF2 sulla tela per aggiungere la sua famiglia al documento stesso: appare nel selettore dei font, viaggia nel file `.fig` ed è inclusa nelle esportazioni web e Storybook. I font portati dal documento non richiedono installazione né fornitore.

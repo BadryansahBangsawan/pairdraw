@@ -100,6 +100,12 @@ When the text's font is variable, such as Inter, the Typography section lists it
 
 Allow system font access and choose online providers in **Settings › Fonts**, which the gear next to the font family opens; in the desktop app it also manages downloaded fonts and fallback packs.
 
+## Document Fonts
+
+Drop a TTF, OTF, WOFF, or WOFF2 file onto the canvas to add its family to the document itself: the
+family appears in the font picker, travels inside the `.fig` file, and ships with web and Storybook
+exports. Fonts the document carries need no install and no provider.
+
 ## Missing Fonts and Substitutions
 
 When a requested family or style cannot be loaded, OpenPencil displays a warning above the editor instead of silently treating fallback rendering as faithful typography.

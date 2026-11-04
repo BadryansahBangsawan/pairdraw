@@ -38,6 +38,8 @@ Material Symbols icons (outlined, rounded, and sharp) also show their font axes:
 
 Each swap or color change is one undo step; dragging in the color picker undoes as a single change.
 
+An icon's glyph can follow a text variable: bind one and switching the variable's mode swaps the drawn icon. The icon redraws on the mode change as one undo step.
+
 An icon is a frame of vector paths, named after the icon, such as `cat`, and marked with a smiley in the layer tree. Unlike other frames on the page, it has no title on the canvas, and resizing it scales its paths. Its layers, constraints, effects, and the rest of the Design panel work as they do for any frame.
 
 ## Editing an Icon's Paths

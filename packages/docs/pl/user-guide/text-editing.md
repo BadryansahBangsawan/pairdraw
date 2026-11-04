@@ -91,6 +91,10 @@ Gdy czcionka jest zmienna, na przykład Inter, sekcja Typografia pokazuje jej os
 
 Dostęp do czcionek systemowych i dostawców online ustawisz w **Ustawienia › Czcionki**, które otwiera koło zębate obok rodziny czcionek; w aplikacji desktopowej strona zarządza też pobranymi czcionkami i pakietami zastępczymi.
 
+## Czcionki dokumentu
+
+Upuść plik TTF, OTF, WOFF lub WOFF2 na płótno, aby dodać jego rodzinę do samego dokumentu: pojawi się w selektorze czcionek, podróżuje w pliku `.fig` i trafia do eksportów webowych i Storybook. Czcionki niesione przez dokument nie wymagają instalacji ani dostawcy.
+
 ## Brakujące czcionki i zamienniki
 
 Jeśli odpowiednia rodzina lub odmiana nie może zostać załadowana, OpenPencil pokazuje ostrzeżenie nad edytorem i nie przedstawia zastępczego wyglądu jako wiernego projektowi.

@@ -116,7 +116,8 @@ With `--project`, the command reads a local project folder instead of one styles
 `@theme` blocks and plain custom properties are imported. A shadcn/ui `:root` and `.dark` pair
 becomes one collection with Light and Dark modes. `tailwind.config.js` and other project
 JavaScript are reported and not run. A path that leaves the folder is refused, and a file over
-1 MiB is skipped. Component source is not imported.
+1 MiB is skipped. Reading also stops, and reports it, after 200 files or 8 MiB in total.
+Component source is not imported.
 
 ```sh
 openpencil tokens app.fig --project ./app --write

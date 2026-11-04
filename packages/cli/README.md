@@ -6,9 +6,11 @@ Headless command line for [OpenPencil](https://openpencil.dev) and `.fig` files:
 npm install -g @open-pencil/cli   # or: bun add -g @open-pencil/cli
 openpencil --help
 openpencil eval design.fig -c "return figma.currentPage.children.length"
+openpencil tokens app.fig --import theme.css --write
+openpencil libraries seed --root ./catalog
 ```
 
-Inspection commands support `--json` for automation. The MCP server ships separately as `@open-pencil/mcp`.
+`tokens --import` reads a local stylesheet's custom properties as document variables, and `libraries seed` publishes the built-in Pairdraw Basics set into a filesystem catalog. Inspection commands support `--json` for automation. The MCP server ships separately as `@open-pencil/mcp`.
 
 - CLI reference: https://openpencil.dev/programmable/cli/inspecting
 - Scripting with the Plugin API: https://openpencil.dev/programmable/cli/scripting

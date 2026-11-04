@@ -60,6 +60,7 @@ Every shape can have a fill. The fill section supports:
 
 - **Solid color** — pick via the HSV color picker or type a hex value
 - **Gradient** — Linear, Radial, Angular, or Diamond with editable gradient stops. While the gradient's picker is open, the canvas shows its handles: drag an end or a radius dot to move it, hold <kbd>Shift</kbd> to turn it in 15° steps, and drag a stop's square to slide the stop along the line
+- **Mesh** — a grid of colored points that blends across the layer. The Mesh tab shows each point: select one to recolor it, or change **Columns** and **Rows** to resample the grid (up to 4 each way). Mesh paints on fills and strokes; `.fig` files keep the grid and show its own color elsewhere, and `.pen` `mesh_gradient` paints import
 - **Image** — select an image file as the fill, or paste an address in **Image URL** and choose **Load** to fetch a PNG, JPEG, GIF, or WebP image from the web (or a `data:` URL) of up to 64 MB
 - **Shader** — an animated GLSL shader: start from the gallery in the shader fill picker, add effects to it, or paste a preset copied from shaders.com
 

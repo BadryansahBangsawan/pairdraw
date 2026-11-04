@@ -42,3 +42,7 @@ Le texte peut pointer vers une page web ou une adresse de courriel, sur tout le 
 OpenPencil détecte les polices du système lorsque l’environnement le permet. Si une police manque, son état est signalé et une police de remplacement est utilisée jusqu’à sa disponibilité.
 
 Quand la police est variable, comme Inter, la section Typographie affiche ses axes (graisse, taille optique, chasse et autres) avec la valeur à laquelle chacun est dessiné ; choisir une graisse, une inclinaison ou une famille les ramène à ceux du style. La taille optique affiche **Auto** tant qu’elle suit la taille de police ; une valeur ou **Fixe** dans son menu la fige, et **Auto** la fait suivre à nouveau.
+
+## Polices du document
+
+Déposez un fichier TTF, OTF, WOFF ou WOFF2 sur le canevas pour ajouter sa famille au document lui-même : elle apparaît dans le sélecteur de polices, voyage dans le fichier `.fig` et accompagne les exports web et Storybook. Les polices portées par le document n’exigent ni installation ni fournisseur.

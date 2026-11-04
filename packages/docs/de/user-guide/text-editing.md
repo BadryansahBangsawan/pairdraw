@@ -57,6 +57,10 @@ Ist die Schrift variabel, etwa Inter, zeigt der Bereich Typografie ihre Achsen (
 
 Zugriff auf Systemschriften und Online-Anbieter verwaltest du unter **Einstellungen › Schriften**, die das Zahnrad neben der Schriftfamilie öffnet; in der Desktop-App verwaltet die Seite auch heruntergeladene Schriften und Fallback-Pakete.
 
+## Dokumentschriften
+
+Ziehe eine TTF-, OTF-, WOFF- oder WOFF2-Datei auf die Arbeitsfläche, um ihre Familie ins Dokument aufzunehmen: Sie erscheint in der Schriftauswahl, reist in der `.fig`-Datei mit und liegt Web- und Storybook-Exporten bei. Mitgebrachte Schriften brauchen keine Installation und keinen Anbieter.
+
 ## Fehlende Schriften
 
 Kann eine Familie oder ein Schnitt nicht geladen werden, zeigt OpenPencil eine Warnung mit den verwendeten Ersatzschriften. Betroffene Ebenen können ausgewählt und die Schriften erneut geladen werden.

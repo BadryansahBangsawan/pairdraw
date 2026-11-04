@@ -44,6 +44,7 @@ Przytrzymaj <kbd>Shift</kbd> podczas przeciągania:
 
 - kolor jednolity wybierany w HSV lub zapisywany szesnastkowo;
 - gradient liniowy, radialny, kątowy lub diamentowy;
+- siatka gradientowa łącząca kolory punktów na warstwie. W zakładce siatki wybierz punkt, aby zmienić jego kolor, albo zmień **Kolumny** i **Wiersze**, aby próbkować siatkę od nowa;
 - obraz jako zalew;
 - shader: animowany shader GLSL — zacznij od galerii w wyborze zalewu shaderem, dodaj do niego efekty albo wklej preset skopiowany z shaders.com.
 

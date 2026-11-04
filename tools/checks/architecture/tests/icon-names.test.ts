@@ -1,29 +1,30 @@
-/**
- * Verifies every `icon-lucide-*` template tag resolves to an icon present in the installed
- * `@iconify-json/lucide` set (either directly, or via an alias).
- *
- * unplugin-vue-components + unplugin-icons turn the PascalCase component name into a kebab icon
- * name before asking `@iconify/utils` to load it. The loader's `getPossibleIconNames` then expands
- * that name with the variants from `node_modules/@iconify/utils/lib/loader/utils.js`. If none of
- * the variants is a direct icon or alias, the runtime fails to render the icon (`Icon <prefix>/<name>`
- * not found`) — this test catches that class of bug ahead of boot.
- */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
+import * as v from 'valibot'
+
 import { repoPath, workspaceRoot } from '#tests/helpers/paths'
 
+/**
+ * unplugin-vue-components turns `icon-lucide-grid-2x2` into the component `IconLucideGrid2x2`, and
+ * unplugin-icons' resolver kebabs that back into `grid2x2`. Neither is an icon or alias in lucide,
+ * so the icon failed to load at runtime. Check every tag against the installed set, deriving the
+ * name the same way the build does.
+ */
 const ICON_TAG_RE = /<icon-lucide-([a-z0-9-]+)/g
 
-const lucide = JSON.parse(
-  readFileSync(repoPath('node_modules', '@iconify-json', 'lucide', 'icons.json'), 'utf8')
-) as { icons: Record<string, unknown>; aliases?: Record<string, unknown> }
-const known = new Set([
-  ...Object.keys(lucide.icons),
-  ...Object.keys(lucide.aliases ?? {})
-])
+const iconSetSchema = v.object({
+  icons: v.record(v.string(), v.unknown()),
+  aliases: v.optional(v.record(v.string(), v.unknown()))
+})
 
-/** Replicate `@iconify/utils` loader: the tag's kebab form plus the two casing variants. */
+const iconSet = v.parse(
+  v.pipe(v.string(), v.parseJson(), iconSetSchema),
+  readFileSync(repoPath('node_modules', '@iconify-json', 'lucide', 'icons.json'), 'utf8')
+)
+const known = new Set([...Object.keys(iconSet.icons), ...Object.keys(iconSet.aliases ?? {})])
+
+/** The variants `@iconify/utils` tries, from `lib/loader/utils.js` `getPossibleIconNames`. */
 function possibleIconNames(icon: string): string[] {
   return [
     icon,
@@ -32,10 +33,7 @@ function possibleIconNames(icon: string): string[] {
   ]
 }
 
-/**
- * Mirror unplugin-vue-components (PascalCase from kebab) → unplugin-icons/resolver (camelToKebab)
- * → icon name (strip prefix).
- */
+/** PascalCase from the tag, then the resolver's kebab form, then the name without `icon-lucide-`. */
 function iconNameOf(tag: string): string {
   const pascal = tag
     .split('-')
@@ -48,7 +46,7 @@ function iconNameOf(tag: string): string {
     .replace(/^icon-lucide-/, '')
 }
 
-function collectVueFiles(): string[] {
+function vueFiles(): string[] {
   const files: string[] = []
   const walk = (dir: string) => {
     for (const entry of readdirSync(dir)) {
@@ -65,7 +63,7 @@ function collectVueFiles(): string[] {
 
 test('every icon-lucide tag names an icon the installed set has', () => {
   const broken: string[] = []
-  for (const file of collectVueFiles()) {
+  for (const file of vueFiles()) {
     for (const match of readFileSync(file, 'utf8').matchAll(ICON_TAG_RE)) {
       const tag = `icon-lucide-${match[1]}`
       const icon = iconNameOf(tag)

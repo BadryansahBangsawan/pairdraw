@@ -12,7 +12,7 @@ import {
 import type { Color, Vector } from '@open-pencil/scene-graph/primitives'
 
 import { setPaintBlendMode } from './blend'
-import { applyGradientFill, applyImageFill } from './fills'
+import { applyGradientFill, applyImageFill, applyMeshFill } from './fills'
 import type { SkiaRenderer } from './renderer'
 import {
   drawOutline,
@@ -282,6 +282,27 @@ export function applyStrokeShader(
     let applied = true
     for (const paint of [r.strokePaint, r.fillPaint]) {
       applied = applyImageFill(r, stroke, node, graph, paint) && applied
+    }
+    return applied
+  }
+  if (stroke.type === 'MESH') {
+    let applied = true
+    for (const paint of [r.strokePaint, r.fillPaint]) {
+      applied =
+        applyMeshFill(
+          r,
+          stroke,
+          node,
+          graph,
+          paint,
+          (color) =>
+            r.resolveStrokeColorInfo(
+              { ...stroke, type: 'SOLID', color, opacity: color.a, visible: true },
+              strokeIndex,
+              node,
+              graph
+            ).color
+        ) && applied
     }
     return applied
   }

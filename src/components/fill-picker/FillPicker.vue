@@ -15,7 +15,7 @@ import { FillRoot } from '@open-pencil/vue/primitives/Fill'
 import ColorPickerPanel from '@/components/color-picker-panel/ColorPickerPanel.vue'
 import GradientEditor from '@/components/fill-picker/GradientEditor.vue'
 import ImageFillPicker from '@/components/fill-picker/ImageFillPicker.vue'
-import ShaderFillPicker from '@/components/fill-picker/shader/ShaderFillPicker.vue'
+import MeshEditor from '@/components/fill-picker/MeshEditor.vue'
 import { usePopoverUI } from '@/components/ui/overlay/popover'
 import Tip from '@/components/ui/overlay/Tip.vue'
 import FillSwatch from '@/components/ui/paint/FillSwatch.vue'
@@ -145,6 +145,17 @@ function cancelFromEscape(event: KeyboardEvent) {
                 <icon-lucide-blend class="size-3.5" />
               </button>
             </Tip>
+            <Tip :label="panels.mesh">
+              <button
+                :data-active="root.category === 'MESH' || undefined"
+                :class="tabClass(root.category === 'MESH')"
+                :aria-label="panels.mesh"
+                data-test-id="fill-picker-tab-mesh"
+                @click="root.actions.toMesh"
+              >
+                <icon-lucide-grid-2-x-2 class="size-3.5" />
+              </button>
+            </Tip>
             <Tip :label="panels.image">
               <button
                 :data-active="(root.category === 'IMAGE' && !shader) || undefined"
@@ -179,6 +190,12 @@ function cancelFromEscape(event: KeyboardEvent) {
           <GradientEditor
             v-if="root.category === 'GRADIENT'"
             v-model:active-stop="activeStop"
+            :fill="root.fill"
+            @update="emit('update', $event)"
+          />
+
+          <MeshEditor
+            v-if="root.category === 'MESH'"
             :fill="root.fill"
             @update="emit('update', $event)"
           />

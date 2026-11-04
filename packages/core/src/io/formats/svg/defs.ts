@@ -279,6 +279,11 @@ export function resolveFill(fill: Fill, node: SceneNode, ctx: SVGExportContext):
     return formatSolidColor(fill.color, fill.opacity, ctx.colorSpace)
   }
 
+  // SVG has no mesh element: a mesh exports its own color, as `.fig` records carry it.
+  if (fill.type === 'MESH') {
+    return formatSolidColor(fill.color, fill.opacity, ctx.colorSpace)
+  }
+
   if (fill.type.startsWith('GRADIENT')) {
     const grad = createGradientDef(fill, node, ctx)
     if (grad) {

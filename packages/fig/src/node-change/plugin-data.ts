@@ -15,7 +15,8 @@ import {
   OPEN_PENCIL_PLUGIN_DATA,
   OPEN_PENCIL_PLUGIN_ID,
   withPluginData,
-  type PluginDataField
+  type PluginDataField,
+  type StoredMeshFill
 } from '@open-pencil/scene-graph/plugin-data'
 import type { Rect } from '@open-pencil/scene-graph/primitives'
 import { paintBindingTarget } from '@open-pencil/scene-graph/variables'
@@ -28,7 +29,8 @@ import {
   referencesVariable
 } from './variable/bindings'
 
-const { boundVariables, exportSettings, librarySource, textPathBox } = OPEN_PENCIL_PLUGIN_DATA
+const { boundVariables, exportSettings, librarySource, meshFills, textPathBox } =
+  OPEN_PENCIL_PLUGIN_DATA
 
 const NATIVE_EXPORT_FORMATS: Record<string, ExportFormatId> = {
   PNG: 'png',
@@ -88,6 +90,11 @@ export function applyTextPathBoxPluginData(
 
 export function extractTextPathBox(nc: NodeChange): Rect | null {
   return readNodeChangePluginData(nc, textPathBox) ?? null
+}
+
+/** Mesh paints a record carries as a solid fallback, with their grids in plugin data. */
+export function extractMeshFills(nc: NodeChange): StoredMeshFill[] {
+  return readNodeChangePluginData(nc, meshFills) ?? []
 }
 
 export function extractBoundVariables(nc: NodeChange): Record<string, string> {

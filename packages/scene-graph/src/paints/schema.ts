@@ -6,6 +6,7 @@ import type { FillType, GradientTransform } from '../types'
 
 export const gradientStopSchema = v.object({ position: finiteNumberSchema, color: colorSchema })
 
+export const meshPointSchema = v.object({ position: vectorSchema, color: colorSchema })
 const transformRowSchema = v.strictTuple([
   finiteNumberSchema,
   finiteNumberSchema,
@@ -43,6 +44,7 @@ const FILL_TYPES = {
   GRADIENT_RADIAL: true,
   GRADIENT_ANGULAR: true,
   GRADIENT_DIAMOND: true,
+  MESH: true,
   IMAGE: true,
   VIDEO: true,
   PATTERN: true,
@@ -61,6 +63,9 @@ export const fillSchema = v.looseObject({
   visible: v.boolean(),
   gradientStops: v.optional(v.array(gradientStopSchema)),
   gradientTransform: v.optional(matrixSchema),
+  meshColumns: v.optional(v.number()),
+  meshRows: v.optional(v.number()),
+  meshPoints: v.optional(v.array(meshPointSchema)),
   imageTransform: v.optional(matrixSchema),
   patternSpacing: v.optional(vectorSchema),
   noiseSize: v.optional(vectorSchema)

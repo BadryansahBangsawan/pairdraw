@@ -1,8 +1,11 @@
+import * as v from 'valibot'
+
 import type {
   BlendMode,
   Fill,
   FillType,
   GradientStop,
+  MeshGradientPoint,
   SceneNode,
   Stroke,
   StrokeCap,
@@ -11,14 +14,18 @@ import type {
 import { TRANSPARENT } from '@open-pencil/scene-graph/constants'
 import {
   ellipticalGradientTransform,
-  linearGradientTransformFromAxes
+  isMeshFill,
+  linearGradientTransformFromAxes,
+  meshPointCount
 } from '@open-pencil/scene-graph/gradient'
 import type { Vector } from '@open-pencil/scene-graph/primitives'
 
 import { imagePaint, type PenImages } from './images'
+import { meshPaintSchema } from './schema'
 import type {
   PenGradientPaint,
   PenImagePaint,
+  PenMeshPaint,
   PenLegacyStroke,
   PenNode,
   PenOverride,
@@ -158,7 +165,71 @@ function convertPaint(
       blendMode: mapBlendMode(source.blendMode)
     }
   }
+  if (paint.type === 'mesh_gradient') return convertMeshPaint(paint, ctx)
   return null
+}
+
+/**
+ * A pen.dev mesh paint as a `MESH` fill. `columns` and `rows` count points per side, so the grid
+ * between them is one smaller each way; a file that counts cells instead still matches when its
+ * grid is one larger. Anything else is not a mesh this reader draws, so it is skipped.
+ */
+function convertMeshPaint(raw: unknown, ctx: VarContext): Fill | null {
+  const parsed = v.safeParse(meshPaintSchema, raw)
+  if (!parsed.success) return null
+  const paint: PenMeshPaint = parsed.output
+  const columns = Math.max(1, Math.floor(resolveNumber(paint.columns, ctx, 1)))
+  const rows = Math.max(1, Math.floor(resolveNumber(paint.rows, ctx, 1)))
+  const points = meshPoints(paint.colors ?? [], paint.points ?? [], ctx)
+  if (!points) return null
+  let meshColumns = columns
+  let meshRows = rows
+  if (points.length !== meshPointCount(meshColumns, meshRows)) {
+    if (columns > 1 && rows > 1 && points.length === columns * rows) {
+      meshColumns = columns - 1
+      meshRows = rows - 1
+    } else {
+      return null
+    }
+  }
+  const fill: Fill = {
+    type: 'MESH',
+    color: { ...TRANSPARENT },
+    opacity: resolveNumber(paint.opacity, ctx, 1),
+    visible: resolveBoolean(paint.enabled, ctx),
+    blendMode: mapBlendMode(paint.blendMode),
+    meshColumns,
+    meshRows,
+    meshPoints: points
+  }
+  return isMeshFill(fill) ? fill : null
+}
+
+/** One mesh point per vertex: a color with the point's position. */
+function meshPoints(
+  colors: readonly unknown[],
+  positions: readonly unknown[],
+  ctx: VarContext
+): MeshGradientPoint[] | null {
+  if (colors.length === 0 || colors.length !== positions.length) return null
+  const points: MeshGradientPoint[] = []
+  for (let index = 0; index < colors.length; index++) {
+    const rawColor = colors[index]
+    const rawPosition = positions[index]
+    if (typeof rawColor !== 'string') return null
+    let position: unknown = rawPosition
+    if (typeof rawPosition === 'object' && rawPosition !== null && 'position' in rawPosition) {
+      position = rawPosition.position
+    }
+    if (!Array.isArray(position) || position.length < 2) return null
+    const [x, y] = position
+    if (typeof x !== 'number' || typeof y !== 'number') return null
+    points.push({
+      position: { x: resolveNumber(x, ctx), y: resolveNumber(y, ctx) },
+      color: resolveColor(rawColor, ctx)
+    })
+  }
+  return points
 }
 
 /** A node's fills, or its strokes' paints, in pen.dev's order: the last one draws on top. */

@@ -52,7 +52,22 @@ const imagePaintSchema = v.looseObject({
   )
 })
 
-/** Shader and mesh gradient paints, and any paint type this reader does not draw. */
+/**
+ * A `mesh_gradient` paint, as the `.pen` reference documents it: one color per vertex and one
+ * point per vertex in [0,1], `columns * rows` of them. Bezier handles ride on the points and do
+ * not change the grid this reader draws, so they pass through as unknowns.
+ */
+export const meshPaintSchema = v.looseObject({
+  type: v.literal('mesh_gradient'),
+  ...paintBase,
+  opacity: v.optional(numSchema),
+  columns: v.optional(numSchema),
+  rows: v.optional(numSchema),
+  colors: v.optional(v.array(v.unknown())),
+  points: v.optional(v.array(v.unknown()))
+})
+
+/** Shader paints, and any paint type this reader does not draw. */
 const otherPaintSchema = v.looseObject({ type: strSchema, ...paintBase })
 
 const paintSchema = v.union([
@@ -60,6 +75,7 @@ const paintSchema = v.union([
   colorPaintSchema,
   gradientPaintSchema,
   imagePaintSchema,
+  meshPaintSchema,
   otherPaintSchema
 ])
 const paintsSchema = v.union([paintSchema, v.array(paintSchema)])
@@ -247,6 +263,7 @@ export type PenPaint = v.InferOutput<typeof paintSchema>
 export type PenPaints = v.InferOutput<typeof paintsSchema>
 export type PenGradientPaint = v.InferOutput<typeof gradientPaintSchema>
 export type PenImagePaint = v.InferOutput<typeof imagePaintSchema>
+export type PenMeshPaint = v.InferOutput<typeof meshPaintSchema>
 export type PenLegacyStroke = v.InferOutput<typeof legacyStrokeSchema>
 export type PenEffect = v.InferOutput<typeof effectSchema>
 export type PenSides = v.InferOutput<typeof sidesSchema>

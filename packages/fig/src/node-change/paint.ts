@@ -19,9 +19,14 @@ export function safeColor(color: Color | Omit<Color, 'a'>): Color {
   return { r: color.r, g: color.g, b: color.b, a: 'a' in color ? color.a : 1 }
 }
 
+/** Figma's format has no mesh type: a mesh paints its own color, and its grid rides in plugin data. */
+function kiwiPaintType(fill: Fill): Paint['type'] {
+  return fill.type === 'MESH' ? 'SOLID' : fill.type
+}
+
 export function fillToKiwiPaint(fill: Fill): Paint {
   const paint: Paint = {
-    type: fill.type,
+    type: kiwiPaintType(fill),
     color: safeColor(fill.color),
     opacity: fill.opacity,
     visible: fill.visible,

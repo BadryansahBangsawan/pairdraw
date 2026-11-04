@@ -53,6 +53,7 @@ import {
   type SceneNodeToKiwiContext
 } from './context'
 import { generatedFrameRecord, writesGeneratedFrame } from './generated'
+import { applyMeshFillsPluginData } from './mesh'
 import { mergeOverrides, serializeRuntimePropertyOverrides } from './override-claims'
 import { applyReplacedLayersPluginData } from './replaced-layers'
 import { exportedNode } from './resolved-bindings'
@@ -957,6 +958,7 @@ export function sceneNodeToKiwiWithContext(
   context: SceneNodeToKiwiContext
 ): KiwiNodeChange[] {
   const node = nodeToSerialize(context, source)
+  applyMeshFillsPluginData(node)
   const guid = getOrCreateNodeGuid(context, node.id, localIdCounter) ?? {
     sessionID: 1,
     localID: localIdCounter.value++

@@ -116,4 +116,66 @@ describe('parsePenFile — fills', () => {
   test('skips paints it cannot draw instead of painting them black', () => {
     expect(fillsOf([{ type: 'mesh_gradient', columns: 2 }, '#FF0000'])).toHaveLength(1)
   })
+
+  test('reads a mesh_gradient as a mesh fill', () => {
+    const [fill] = fillsOf({
+      type: 'mesh_gradient',
+      columns: 2,
+      rows: 2,
+      colors: ['#FF0000', '#00FF00', '#0000FF', '#FFFF00'],
+      points: [
+        [0, 0],
+        [1, 0],
+        [0, 1],
+        [1, 1]
+      ]
+    })
+    expect(fill?.type).toBe('MESH')
+    expect(fill).toMatchObject({ meshColumns: 1, meshRows: 1 })
+    expect(fill?.meshPoints?.map((point) => point.position)).toEqual([
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 }
+    ])
+    expect(fill?.meshPoints?.[0]?.color).toMatchObject({ r: 1, g: 0, b: 0 })
+  })
+
+  test('reads bezier-handle points by their positions', () => {
+    const [fill] = fillsOf({
+      type: 'mesh_gradient',
+      columns: 2,
+      rows: 2,
+      colors: ['#FF0000', '#00FF00', '#0000FF', '#FFFF00'],
+      points: [
+        { position: [0, 0], leftHandle: [-0.1, 0] },
+        { position: [1, 0], rightHandle: [0.1, 0] },
+        { position: [0, 1], topHandle: [0, -0.1] },
+        { position: [1, 1], bottomHandle: [0, 0.1] }
+      ]
+    })
+    expect(fill?.type).toBe('MESH')
+    expect(fill).toMatchObject({ meshColumns: 1, meshRows: 1 })
+    expect(fill?.meshPoints?.[1]?.position).toEqual({ x: 1, y: 0 })
+  })
+
+  test('skips a mesh_gradient whose columns is not a number', () => {
+    // The paint passes document validation through otherPaintSchema, which only requires a
+    // string type. Casting it to PenMeshPaint let `Number(true)` stand in for the column count
+    // and the layer still drew a mesh; the schema check rejects the paint instead.
+    expect(
+      fillsOf({
+        type: 'mesh_gradient',
+        columns: true,
+        rows: true,
+        colors: ['#FF0000', '#00FF00', '#0000FF', '#FFFF00'],
+        points: [
+          [0, 0],
+          [1, 0],
+          [0, 1],
+          [1, 1]
+        ]
+      })
+    ).toEqual([])
+  })
 })

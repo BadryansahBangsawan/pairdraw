@@ -133,6 +133,7 @@ export type FillType =
   | 'GRADIENT_RADIAL'
   | 'GRADIENT_ANGULAR'
   | 'GRADIENT_DIAMOND'
+  | 'MESH'
   | 'IMAGE'
   | 'VIDEO'
   | 'PATTERN'
@@ -168,6 +169,17 @@ export interface GradientStop {
   position: number
 }
 
+/**
+ * One control point of a `MESH` fill: its color, and where it sits in the layer's unit square.
+ * A mesh holds `(rows + 1) * (columns + 1)` points in row-major order: corners and edge points
+ * first, so a 1x1 mesh is the four corners. Positions outside 0..1 are allowed; the renderer
+ * clamps them to the layer.
+ */
+export interface MeshGradientPoint {
+  position: Vector
+  color: Color
+}
+
 export type GradientTransform = Matrix
 
 export interface Fill {
@@ -178,6 +190,10 @@ export interface Fill {
   blendMode?: BlendMode
   gradientStops?: GradientStop[]
   gradientTransform?: GradientTransform
+  /** A `MESH` fill's grid: columns and rows of cells, with one more point than cells each way. */
+  meshColumns?: number
+  meshRows?: number
+  meshPoints?: MeshGradientPoint[]
   imageHash?: string
   imageScaleMode?: ImageScaleMode
   /** A crop's image-space window; Fill, Fit and Tile ignore it. */

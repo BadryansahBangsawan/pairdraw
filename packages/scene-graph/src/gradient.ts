@@ -1,5 +1,5 @@
 import type { Color, Vector } from './primitives'
-import type { Fill, GradientStop, GradientTransform } from './types'
+import type { Fill, GradientStop, GradientTransform, MeshGradientPoint } from './types'
 
 /**
  * Gradient paints in Figma's convention. A paint's `gradientTransform` maps the layer's unit
@@ -13,6 +13,101 @@ export type GradientFillType = Extract<
   Fill['type'],
   'GRADIENT_LINEAR' | 'GRADIENT_RADIAL' | 'GRADIENT_ANGULAR' | 'GRADIENT_DIAMOND'
 >
+
+/** A mesh's point count for its grid: one more point than cells each way, row-major. */
+export function meshPointCount(columns: number, rows: number): number {
+  return (columns + 1) * (rows + 1)
+}
+
+/** Whether a fill draws as a mesh: type `MESH` with a complete grid of points. */
+export function isMeshFill(fill: Fill): boolean {
+  if (fill.type !== 'MESH') return false
+  const { meshColumns, meshRows, meshPoints } = fill
+  if (!meshColumns || !meshRows || !meshPoints) return false
+  if (!Number.isInteger(meshColumns) || !Number.isInteger(meshRows)) return false
+  return meshPoints.length === meshPointCount(meshColumns, meshRows)
+}
+
+/** A new 1x1 mesh over the layer's unit square, tinted with the fill color. */
+export function defaultMeshPoints(color: Color): MeshGradientPoint[] {
+  return defaultMeshGrid(color, 1, 1)
+}
+
+/**
+ * A new mesh grid over the layer's unit square: points evenly spaced, all tinted with the fill
+ * color. Columns and rows count cells, so the grid holds one more point each way.
+ */
+export function defaultMeshGrid(color: Color, columns: number, rows: number): MeshGradientPoint[] {
+  const points: MeshGradientPoint[] = []
+  for (let row = 0; row <= rows; row++) {
+    for (let column = 0; column <= columns; column++) {
+      points.push({
+        position: {
+          x: columns === 0 ? 0 : column / columns,
+          y: rows === 0 ? 0 : row / rows
+        },
+        color: { ...color }
+      })
+    }
+  }
+  return points
+}
+
+/** A channel blended across the grid's corners, bilinearly. */
+function blendChannel(
+  points: readonly MeshGradientPoint[],
+  fromColumns: number,
+  fromRows: number,
+  u: number,
+  v: number,
+  channel: 'r' | 'g' | 'b' | 'a'
+): number {
+  const x = Math.min(fromColumns, Math.max(0, u * fromColumns))
+  const y = Math.min(fromRows, Math.max(0, v * fromRows))
+  const x0 = Math.min(fromColumns - 1, Math.floor(x))
+  const y0 = Math.min(fromRows - 1, Math.floor(y))
+  const fx = x - x0
+  const fy = y - y0
+  const stride = fromColumns + 1
+  const at = (column: number, row: number): number =>
+    points[row * stride + column]?.color[channel] ?? 0
+  return (
+    at(x0, y0) * (1 - fx) * (1 - fy) +
+    at(x0 + 1, y0) * fx * (1 - fy) +
+    at(x0, y0 + 1) * (1 - fx) * fy +
+    at(x0 + 1, y0 + 1) * fx * fy
+  )
+}
+
+/**
+ * A grid of a new size sampled from an old one: positions evenly spaced, colors blended from the
+ * old grid, so resizing keeps the look. Gaps where the old grid is short read as transparent.
+ */
+export function resampleMeshPoints(
+  points: readonly MeshGradientPoint[],
+  fromColumns: number,
+  fromRows: number,
+  toColumns: number,
+  toRows: number
+): MeshGradientPoint[] {
+  const sampled: MeshGradientPoint[] = []
+  for (let row = 0; row <= toRows; row++) {
+    for (let column = 0; column <= toColumns; column++) {
+      const u = toColumns === 0 ? 0 : column / toColumns
+      const v = toRows === 0 ? 0 : row / toRows
+      sampled.push({
+        position: { x: u, y: v },
+        color: {
+          r: blendChannel(points, fromColumns, fromRows, u, v, 'r'),
+          g: blendChannel(points, fromColumns, fromRows, u, v, 'g'),
+          b: blendChannel(points, fromColumns, fromRows, u, v, 'b'),
+          a: blendChannel(points, fromColumns, fromRows, u, v, 'a')
+        }
+      })
+    }
+  }
+  return sampled
+}
 
 export function isGradientFill(type: Fill['type']): type is GradientFillType {
   return (

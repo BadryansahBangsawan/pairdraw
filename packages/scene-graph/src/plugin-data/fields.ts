@@ -8,7 +8,7 @@ import { clampExportQuality, isExportFormatId, type ExportFormatId } from '../ex
 import { clampExportScale } from '../export-scale'
 import { FIG_COMPRESSIONS } from '../fig-compression'
 import { iconSchema, iconTintSchema } from '../icons/schema'
-import type { Rect } from '../primitives'
+import type { Color, Rect, Vector } from '../primitives'
 import { shaderPaintSchema } from '../shaders/schema'
 import { nodeStatusSchema, statusWorkflowSchema } from '../statuses/schema'
 import {
@@ -153,6 +153,43 @@ const okhclSchema: v.GenericSchema<unknown, OkHCLPayload> = v.object({
   })
 })
 
+/** A mesh paint Figma's format has no type for, stored beside its solid fallback paint. */
+export interface StoredMeshFill {
+  kind: 'fill' | 'stroke'
+  index: number
+  columns: number
+  rows: number
+  points: { position: Vector; color: Color }[]
+}
+
+/** Invalid entries are skipped one by one, so one bad mesh keeps the others. */
+const meshFillsSchema: v.GenericSchema<unknown, StoredMeshFill[]> = v.pipe(
+  v.array(v.unknown()),
+  v.transform((items) =>
+    items.flatMap((item) => {
+      const parsed = v.safeParse(
+        v.object({
+          kind: v.picklist(['fill', 'stroke']),
+          index: v.pipe(v.number(), v.integer(), v.minValue(0)),
+          columns: v.pipe(v.number(), v.integer(), v.minValue(1)),
+          rows: v.pipe(v.number(), v.integer(), v.minValue(1)),
+          points: v.array(
+            v.object({
+              position: v.object({ x: v.number(), y: v.number() }),
+              color: v.object({ r: v.number(), g: v.number(), b: v.number(), a: v.number() })
+            })
+          )
+        }),
+        item
+      )
+      if (!parsed.success) return []
+      const { kind, index, columns, rows, points } = parsed.output
+      if (points.length !== (columns + 1) * (rows + 1)) return []
+      return [{ kind, index, columns, rows, points }]
+    })
+  )
+)
+
 const sourceLibraryPublicationSchema: v.GenericSchema<unknown, SourceLibraryPublication> = v.object(
   {
     libraryId: v.string(),
@@ -237,6 +274,8 @@ export const OPEN_PENCIL_PLUGIN_DATA = {
   iconTint: jsonPluginDataField('iconTint', 'content', iconTintSchema),
   /** One entry per paint that draws a shader, matched to its image paint by the frame's hash. */
   shader: jsonPluginDataField('shader', 'content', shaderPaintSchema),
+  /** One entry per mesh paint, beside the solid fallback its record carries. */
+  meshFills: jsonPluginDataField('meshFills', 'format', meshFillsSchema),
   /** Notes a person left on a layer for agents: what it means or does, and a request about it. */
   agentNotes: jsonPluginDataField('agentNotes', 'content', agentNotesSchema)
 } satisfies Record<string, PluginDataKey>

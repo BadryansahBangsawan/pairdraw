@@ -31,8 +31,12 @@ const gradient: Fill = {
 }
 
 /** Draws a rectangle alone on a cleared surface and returns its pixels. */
-function draw(fields: Partial<SceneNode>): Uint8Array | Float32Array {
+function draw(
+  fields: Partial<SceneNode>,
+  seed?: (graph: SceneGraph) => void
+): Uint8Array | Float32Array {
   const graph = new SceneGraph()
+  seed?.(graph)
   const node = graph.createNode('RECTANGLE', graph.getPages()[0].id, fields)
   const canvas = surface.getCanvas()
   canvas.clear(ck.TRANSPARENT)
@@ -56,8 +60,11 @@ function draw(fields: Partial<SceneNode>): Uint8Array | Float32Array {
   }
 }
 
-function paintsAnything(fields: Partial<SceneNode>): boolean {
-  return draw(fields).some((value, index) => index % 4 === 3 && value > 0)
+function paintsAnything(
+  fields: Partial<SceneNode>,
+  seed?: (graph: SceneGraph) => void
+): boolean {
+  return draw(fields, seed).some((value, index) => index % 4 === 3 && value > 0)
 }
 
 function colorAt(pixels: Uint8Array | Float32Array, x: number, y: number): number[] {
@@ -150,5 +157,48 @@ describe('an image paint whose image is not decoded yet', () => {
         strokeWeight: 4
       })
     ).toBe(false)
+  })
+})
+
+// A decoded image paints through the fill pipeline: applyFill routes an IMAGE paint to the image
+// shader. 047723d82 deleted that branch while adding MESH fills, so every image fill drew
+// nothing and the .pen oracle's image frame differed by half its pixels.
+describe('an image paint whose image is decoded', () => {
+  const hash = 'decoded-red'
+  const red = new Uint8Array(4).fill(255)
+  const seed = (graph: SceneGraph) => {
+    const bitmap = expectDefined(
+      ck.MakeImage(
+        {
+          width: 1,
+          height: 1,
+          colorType: ck.ColorType.RGBA_8888,
+          alphaType: ck.AlphaType.Unpremul,
+          colorSpace: ck.ColorSpace.SRGB
+        },
+        red,
+        4
+      ),
+      'bitmap'
+    )
+    try {
+      const png = bitmap.encodeToBytes(ck.ImageFormat.PNG, 100)
+      if (!png) throw new Error('CanvasKit encoded no PNG')
+      graph.images.set(hash, new Uint8Array(png))
+    } finally {
+      bitmap.delete()
+    }
+  }
+  const image: Fill = {
+    type: 'IMAGE',
+    color: { r: 0, g: 0, b: 0, a: 1 },
+    opacity: 1,
+    visible: true,
+    imageHash: hash,
+    imageScaleMode: 'FILL'
+  }
+
+  test('a fill paints the image instead of nothing', () => {
+    expect(paintsAnything({ width: WIDTH, height: HEIGHT, fills: [image] }, seed)).toBe(true)
   })
 })

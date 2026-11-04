@@ -1,7 +1,7 @@
 import type { Canvas, Image, Paint, Shader } from 'canvaskit-wasm'
 
 import type { SceneNode, SceneGraph, Fill } from '@open-pencil/scene-graph'
-import { invertGradientTransform } from '@open-pencil/scene-graph/gradient'
+import { invertGradientTransform, isMeshFill } from '@open-pencil/scene-graph/gradient'
 import Matrix from '@open-pencil/scene-graph/matrix'
 import type { Color, Rect, Vector } from '@open-pencil/scene-graph/primitives'
 
@@ -102,6 +102,8 @@ export function applyFill(
 
   if (fill.type === 'PATTERN' && applyPatternFill(r, fill, node, graph, patternStack)) return true
 
+  if (fill.type === 'MESH') return applyMeshFill(r, fill, node, graph)
+
   if (fill.type === 'PATTERN' || fill.type === 'NOISE' || fill.type === 'CUSTOM') {
     const c = r.resolveFillColor(fill, fillIndex, node, graph)
     r.fillPaint.setColor(r.ck.Color4f(c.r, c.g, c.b, c.a))
@@ -190,6 +192,83 @@ function resolvePatternSource(graph: SceneGraph, sourceId: string): SceneNode | 
     if (node.source.id === sourceId) return node
   }
   return null
+}
+/**
+ * Draws a `MESH` fill: its grid triangulated into vertex colors, recorded as a picture the
+ * layer's outline then draws. A picture keeps this inside `applyFill`'s paint contract, so every
+ * existing call site draws a mesh without changing how other fills draw.
+ */
+export function applyMeshFill(
+  r: SkiaRenderer,
+  fill: Fill,
+  node: SceneNode,
+  graph: SceneGraph,
+  paint: Paint = r.fillPaint,
+  resolvePoint: ResolveGradientStop = (color) =>
+    r.resolveFillColorInfo(
+      { ...fill, type: 'SOLID', color, opacity: color.a, visible: true },
+      -1,
+      node,
+      graph
+    ).color
+): boolean {
+  if (!isMeshFill(fill)) return false
+  const columns = fill.meshColumns ?? 0
+  const rows = fill.meshRows ?? 0
+  const points = fill.meshPoints ?? []
+  const w = node.width
+  const h = node.height
+  if (!(w > 0 && h > 0)) return false
+  const vertexCount = points.length
+  const positions = Array.from({ length: vertexCount * 2 }, () => 0)
+  const colors = new Float32Array(vertexCount * 4)
+  for (const [index, point] of points.entries()) {
+    positions[index * 2] = Math.min(1, Math.max(0, point.position.x)) * w
+    positions[index * 2 + 1] = Math.min(1, Math.max(0, point.position.y)) * h
+    const c = resolvePoint(point.color, index)
+    colors[index * 4] = c.r
+    colors[index * 4 + 1] = c.g
+    colors[index * 4 + 2] = c.b
+    colors[index * 4 + 3] = c.a
+  }
+  const stride = columns + 1
+  const indices: number[] = []
+  for (let row = 0; row < rows; row++) {
+    for (let column = 0; column < columns; column++) {
+      const topLeft = row * stride + column
+      const topRight = topLeft + 1
+      const bottomLeft = topLeft + stride
+      const bottomRight = bottomLeft + 1
+      indices.push(topLeft, bottomLeft, topRight, topRight, bottomLeft, bottomRight)
+    }
+  }
+  const bounds = r.ck.LTRBRect(0, 0, w, h)
+  const recorder = new r.ck.PictureRecorder()
+  const canvas = recorder.beginRecording(bounds)
+  const verts = r.ck.MakeVertices(r.ck.VertexMode.Triangles, positions, null, colors, indices)
+  const vertexPaint = new r.ck.Paint()
+  vertexPaint.setColor(r.ck.Color4f(1, 1, 1, 1))
+  // This CanvasKit build ignores vertex colors under SrcOver and draws the paint instead; Modulate
+  // multiplies them with the white paint, which keeps the colors as resolved.
+  canvas.drawVertices(verts, r.ck.BlendMode.Modulate, vertexPaint)
+  vertexPaint.delete()
+  verts.delete()
+  const picture = recorder.finishRecordingAsPicture()
+  recorder.delete()
+  const shader = picture.makeShader(
+    r.ck.TileMode.Clamp,
+    r.ck.TileMode.Clamp,
+    r.ck.FilterMode.Linear,
+    undefined,
+    bounds
+  )
+  try {
+    paint.setShader(shader)
+  } finally {
+    shader.delete()
+  }
+  picture.delete()
+  return true
 }
 
 function applyPatternFill(

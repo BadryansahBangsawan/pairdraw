@@ -34,7 +34,12 @@ export function copyFill<T extends Fill>(f: T): T {
   const copy: T = { ...f, color: { ...f.color } }
   if (f.gradientStops) copy.gradientStops = f.gradientStops.map(copyGradientStop)
   if (f.gradientTransform) copy.gradientTransform = { ...f.gradientTransform }
-  if (f.imageTransform) copy.imageTransform = { ...f.imageTransform }
+  if (f.meshPoints) {
+    copy.meshPoints = f.meshPoints.map((point) => ({
+      position: { ...point.position },
+      color: { ...point.color }
+    }))
+  }
   if (f.patternSpacing) copy.patternSpacing = { ...f.patternSpacing }
   if (f.noiseSize) copy.noiseSize = { ...f.noiseSize }
   return copy

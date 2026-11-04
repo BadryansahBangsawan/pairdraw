@@ -7,6 +7,7 @@ import {
   DEFAULT_STROKE_WEIGHT
 } from '@open-pencil/scene-graph/constants'
 import { getNodeLocalMatrix } from '@open-pencil/scene-graph/coordinate'
+import { isMeshFill } from '@open-pencil/scene-graph/gradient'
 import { createDefaultSourceMetadata } from '@open-pencil/scene-graph/node-defaults'
 import { OPEN_PENCIL_PLUGIN_DATA } from '@open-pencil/scene-graph/plugin-data'
 import { POINT_COUNT_RANGE } from '@open-pencil/scene-graph/polygon'
@@ -25,6 +26,7 @@ import {
   extractBoundVariables,
   extractExportSettings,
   extractLibrarySource,
+  extractMeshFills,
   extractTextPathBox,
   extractPluginData,
   extractPluginRelaunchData,
@@ -831,7 +833,37 @@ export function nodeChangeToProps(
       height: pluginBox.height
     }
   }
+  applyMeshFills(props, nc)
   return props
+}
+
+/**
+ * Restores mesh paints their record carries as solid fallbacks: the grid in plugin data replaces
+ * the fallback paint. An entry naming no paint, or one whose grid is short, keeps the fallback.
+ */
+function applyMeshFills(
+  props: Partial<SceneNode> & { nodeType: NodeType | 'DOCUMENT' | 'VARIABLE' },
+  nc: NodeChange
+): void {
+  const entries = extractMeshFills(nc)
+  if (entries.length === 0) return
+  for (const entry of entries) {
+    const paints = entry.kind === 'fill' ? props.fills : props.strokes
+    const paint = paints?.[entry.index]
+    if (!paint) continue
+    const mesh: Fill = {
+      ...paint,
+      type: 'MESH',
+      meshColumns: entry.columns,
+      meshRows: entry.rows,
+      meshPoints: entry.points.map((point) => ({
+        position: { ...point.position },
+        color: { ...point.color }
+      }))
+    }
+    if (!isMeshFill(mesh)) continue
+    paints[entry.index] = mesh
+  }
 }
 
 const COMPONENT_PROP_TYPE_MAP: Record<string, ComponentPropertyType> = {

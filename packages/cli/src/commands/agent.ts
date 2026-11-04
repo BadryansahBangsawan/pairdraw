@@ -2,8 +2,10 @@ import { defineCommand } from 'citty'
 import { compact } from 'es-toolkit'
 
 import { ALL_TOOLS } from '@open-pencil/core/tools'
+
 import { resolveAgentRoot } from '#cli/agent/paths'
 import { agentToolDefinitions, parseToolNames } from '#cli/agent/policy'
+import { AGENT_PROFILES } from '#cli/agent/registry'
 import { DEFAULT_MAX_STEPS, MAX_MAX_STEPS, readAgentPrompt, runAgent } from '#cli/agent/run'
 import { bold, dim, fmtList, ok, printError } from '#cli/format'
 
@@ -51,6 +53,11 @@ const run = defineCommand({
       description: 'Comma-separated tools to add to the default set, such as stock_photo'
     },
     deny: { type: 'string', description: 'Comma-separated tools to withhold' },
+    agents: {
+      type: 'string',
+      description:
+        'Comma-separated agents to run in order (default: designer); each one only narrows --allow and --deny'
+    },
     'max-steps': {
       type: 'string',
       description: `Model turns to allow (default: ${DEFAULT_MAX_STEPS}, at most ${MAX_MAX_STEPS})`
@@ -63,19 +70,30 @@ const run = defineCommand({
         prompt: args.prompt,
         promptFile: args['prompt-file']
       })
-      const maxSteps = args['max-steps'] === undefined ? DEFAULT_MAX_STEPS : Number(args['max-steps'])
+      // citty types flags without a default as always present; at runtime they can be missing.
+      const optional: {
+        'max-steps'?: string
+        model?: string
+        'base-url'?: string
+        root?: string
+        output?: string
+        write?: boolean
+      } = args
+      const maxSteps =
+        optional['max-steps'] === undefined ? DEFAULT_MAX_STEPS : Number(optional['max-steps'])
       const result = await runAgent({
         prompt,
         file: args.file,
         provider: args.provider,
-        model: args.model ?? '',
+        model: optional.model ?? '',
         apiKey: apiKey(args['api-key']),
-        baseURL: args['base-url'] ?? '',
-        root: args.root ?? resolveAgentRoot(undefined),
-        ...(args.output === undefined ? {} : { output: args.output }),
-        write: args.write === true,
+        baseURL: optional['base-url'] ?? '',
+        root: optional.root ?? resolveAgentRoot(undefined),
+        ...(optional.output === undefined ? {} : { output: optional.output }),
+        write: optional.write ?? false,
         allow: parseToolNames(args.allow),
         deny: parseToolNames(args.deny),
+        agents: parseToolNames(args.agents),
         maxSteps
       })
       if (args.json) {
@@ -87,7 +105,7 @@ const run = defineCommand({
         console.log(
           fmtList(
             result.tools.map((call) => ({
-              header: `${call.name} ${call.ok ? dim('ok') : call.error ?? 'failed'}`,
+              header: `${call.name} ${call.ok ? dim('ok') : (call.error ?? 'failed')}`,
               details: undefined
             })),
             { compact: true }
@@ -102,7 +120,8 @@ const run = defineCommand({
       ])
       console.log('')
       if (result.output) console.log(ok(`Saved ${result.output}`))
-      else if (notes.length > 0) console.log(dim(`Changes were not saved; pass --write or --output`))
+      else if (notes.length > 0)
+        console.log(dim(`Changes were not saved; pass --write or --output`))
       console.log('')
     } catch (error) {
       printError(error)
@@ -147,9 +166,46 @@ const tools = defineCommand({
   }
 })
 
+const list = defineCommand({
+  meta: { description: 'List the named agents a run can put in a team' },
+  args: { json },
+  async run({ args }) {
+    if (args.json) {
+      console.log(
+        JSON.stringify(
+          AGENT_PROFILES.map((profile) => ({
+            id: profile.id,
+            description: profile.description,
+            readOnly: profile.readOnly,
+            only: profile.only ?? null,
+            deny: profile.deny,
+            maxSteps: profile.maxSteps ?? null
+          })),
+          null,
+          2
+        )
+      )
+      return
+    }
+    console.log('')
+    console.log(bold(`  ${AGENT_PROFILES.length} agents`))
+    console.log('')
+    console.log(
+      fmtList(
+        AGENT_PROFILES.map((profile) => ({
+          header: `${profile.id} ${dim(profile.readOnly ? 'read-only' : 'edits')}`,
+          details: [profile.description]
+        })),
+        { compact: true }
+      )
+    )
+    console.log('')
+  }
+})
+
 export default defineCommand({
   meta: {
     description: 'Drive a document from a model: run, and see which tools it may call'
   },
-  subCommands: { run, tools }
+  subCommands: { run, tools, list }
 })

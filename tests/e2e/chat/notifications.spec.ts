@@ -101,9 +101,9 @@ test('a finished reply notifies only when turned on and away, and its click show
     .toBe('2')
 
   // Another tab is in view, and the chat column closed, when the notification is clicked.
-  // The tab bar starts with Home; the chat's document is the tab after it.
+  // The chat column opens on a lone ?test document; no Home tab is pinned here.
   const tabs = page.getByTestId('tabbar-tab')
-  const chatDocument = tabs.nth(1)
+  const chatDocument = tabs.nth(0)
   await expect(chatDocument).toHaveAttribute('aria-selected', 'true')
   await chat.closeChat()
   await page.getByTestId('tabbar-new').click()

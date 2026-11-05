@@ -58,6 +58,8 @@ test('layout guide live numeric edits form one Undo record', async ({ page }) =>
       id
     )
   const field = page.getByRole('spinbutton', { name: 'Count', exact: true })
+  // Guide settings live behind the expand toggle since the grid rows-only layout (#1101).
+  await page.getByRole('button', { name: 'Layout guide settings', exact: true }).click()
   await field.dblclick()
   await field.fill('12')
   await field.fill('18')

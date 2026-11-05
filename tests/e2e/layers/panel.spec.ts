@@ -262,7 +262,8 @@ test('clearing a layer name keeps the name it had', async () => {
 test('double-click does not toggle tree expand', async () => {
   const rowCountBefore = await layerRows().count()
 
-  const containerRow = layerRows().filter({ hasText: 'Components' }).first()
+  // A numbered tour section with children; renaming must not collapse/expand it.
+  const containerRow = layerRows().filter({ hasText: '1 · Hello' }).first()
   await containerRow.dblclick()
   await editor.canvas.waitForRender()
 

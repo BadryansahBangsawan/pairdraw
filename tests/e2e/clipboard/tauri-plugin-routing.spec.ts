@@ -12,7 +12,6 @@ type PageChildSummary = {
 async function createTauriEditorPage(page: Page) {
   const clipboard = await installTauriClipboardMock(page)
   await page.goto('/?test')
-  await page.getByTestId('home-new-design').click()
   const canvas = new CanvasHelper(page)
   await canvas.waitForInit()
   return { canvas, clipboard }

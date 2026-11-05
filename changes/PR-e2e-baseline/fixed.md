@@ -1,0 +1,1 @@
+- Opening the storage workspace from Settings now opens Home on that workspace, instead of closing the settings dialog onto the page you were on.

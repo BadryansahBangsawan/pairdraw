@@ -54,7 +54,6 @@ const dates = useDateFormat()
 const styles = tv(documentsTheme)()
 const loading = skeleton()
 const previewURL = workspace.previewURL
-const vStoragePreview = workspace.previewDirective
 const allDocuments = workspace.documents
 const workspaceLoading = workspace.loading
 
@@ -192,7 +191,8 @@ function deleteSelected() {
       <DocumentEntry
         v-for="document in documents"
         :key="document.id"
-        v-storage-preview="document.id"
+        :preview-id="document.id"
+        :load-preview="workspace.loadPreview"
         :name="document.name"
         :metadata="formattedDate(document.updatedAt)"
         :previewURL="previewURL(document.id)"

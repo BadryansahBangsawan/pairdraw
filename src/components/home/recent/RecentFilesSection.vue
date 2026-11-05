@@ -42,7 +42,6 @@ const { panels, files, common, locale } = useI18n()
 const { isTouch } = useViewportKind()
 const dates = useDateFormat()
 const previewURL = workspace.previewURL
-const vWorkspacePreview = workspace.previewDirective
 const hasRecentFiles = computed(() => workspace.documents.value.length > 0)
 const styles = tv(documentsTheme)()
 
@@ -155,7 +154,8 @@ function removeSelected() {
       <DocumentEntry
         v-for="document in sorted"
         :key="document.id"
-        v-workspace-preview="document.id"
+        :preview-id="document.id"
+        :load-preview="workspace.loadPreview"
         :name="document.name"
         :metadata="formattedDate(document)"
         :previewURL="previewURL(document.id)"

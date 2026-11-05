@@ -54,7 +54,6 @@ const loading = skeleton()
 
 // Home passes one source for the section's life, so it is read once.
 const workspace = useDocumentWorkspace<DraftMeta>({ source })
-const vDraftPreview = workspace.previewDirective
 const allDrafts = workspace.documents
 const drafts = computed(() =>
   query
@@ -178,7 +177,8 @@ function deleteSelected() {
       <DocumentEntry
         v-for="draft in drafts"
         :key="draft.id"
-        v-draft-preview="draft.id"
+        :preview-id="draft.id"
+        :load-preview="workspace.loadPreview"
         :name="draft.name"
         :metadata="dates.format(draft.updatedAt, 'dateTime')"
         :previewURL="workspace.previewURL(draft.id)"

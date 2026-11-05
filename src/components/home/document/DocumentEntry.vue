@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useIntersectionObserver } from '@vueuse/core'
 import {
   ContextMenuContent,
   ContextMenuItem,
@@ -12,7 +13,7 @@ import {
   DropdownMenuTrigger
 } from 'reka-ui'
 import { tv } from 'tailwind-variants'
-import { computed, normalizeClass, type HTMLAttributes } from 'vue'
+import { computed, normalizeClass, useTemplateRef, type HTMLAttributes } from 'vue'
 
 import { useFileMessages } from '@open-pencil/vue/i18n'
 
@@ -32,6 +33,8 @@ const {
   name,
   metadata,
   previewURL,
+  previewId,
+  loadPreview,
   view = 'grid',
   disabled = false,
   menu,
@@ -45,6 +48,10 @@ const {
   /** What opening the entry does, when that is more than opening the document. */
   label?: string
   previewURL?: string | null
+  /** The document whose preview the entry loads once it nears the viewport. */
+  previewId?: string
+  /** Loads that document's preview; ignored without `previewId`, or in list view. */
+  loadPreview?: (id: string) => void
   view?: 'grid' | 'list'
   disabled?: boolean
   /** The entry's menu, opened from its ⋯ button or by right-clicking; none without it. */
@@ -64,6 +71,25 @@ const emit = defineEmits<{
 const files = useFileMessages()
 const styles = computed(() => documentEntry({ view }))
 const menuUI = useMenuUI({ content: 'min-w-44', item: 'justify-start gap-2' })
+const root = useTemplateRef<HTMLElement>('root')
+
+/** Loads the entry's preview once, the first time it is seen; a directive cannot reach a
+ * fragment-root component, so the entry observes its own root instead. */
+function loadPreviewOnce(): void {
+  if (!previewId || view !== 'grid') return
+  loadPreview?.(previewId)
+}
+
+const { isSupported, stop } = useIntersectionObserver(
+  root,
+  ([entry]) => {
+    if (!entry?.isIntersecting) return
+    stop()
+    loadPreviewOnce()
+  },
+  { rootMargin: '240px' }
+)
+if (!isSupported.value) loadPreviewOnce()
 
 function click(event: MouseEvent) {
   if (selectable && (event.shiftKey || event.metaKey || event.ctrlKey)) {
@@ -81,6 +107,7 @@ function click(event: MouseEvent) {
   <ContextMenuRoot :disabled="!menu">
     <ContextMenuTrigger as-child>
       <div
+        ref="root"
         data-slot="document-entry"
         :data-selected="selected || undefined"
         :class="styles.root({ class: normalizeClass(className) })"

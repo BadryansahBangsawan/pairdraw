@@ -26,6 +26,7 @@ const APP_COMMAND_RESULTS: Record<string, unknown> = {
   list_system_fonts: [],
   take_pending_open: [],
   take_pending_rooms: [],
+  take_pending_cloud_links: [],
   credential_status: 'missing',
   load_system_font: null,
   set_native_menu_checked: null,

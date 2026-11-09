@@ -13,6 +13,7 @@ for (const suppressed of [false, true]) {
       await page.getByRole('button', { name: '100%', exact: true }).click()
       await page.getByRole('menuitem', { name: /Rulers/ }).click()
       await page.keyboard.press('Escape')
+      await page.getByRole('menuitem', { name: /Rulers/ }).waitFor({ state: 'hidden' })
       await page.mouse.move(0, 0)
       await canvas.waitForRender()
     }

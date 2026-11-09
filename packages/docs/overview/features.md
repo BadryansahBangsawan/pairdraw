@@ -2,7 +2,7 @@
 
 ## Figma .fig Files
 
-Open and save native Figma files directly. The import/export pipeline uses the same Kiwi binary codec as Figma — 194 schema definitions, ~390 fields per node. Save with <kbd>⌘</kbd><kbd>S</kbd>, Save As with <kbd>⇧</kbd><kbd>⌘</kbd><kbd>S</kbd>.
+Open and save native Figma files directly. The import/export pipeline uses the same Kiwi binary codec as Figma — 605 schema definitions, ~590 fields per node. Save with <kbd>⌘</kbd><kbd>S</kbd>, Save As with <kbd>⇧</kbd><kbd>⌘</kbd><kbd>S</kbd>.
 
 **Copy & paste with Figma** — select nodes in Figma, <kbd>⌘</kbd><kbd>C</kbd>, switch to Pairdraw, <kbd>⌘</kbd><kbd>V</kbd>. Fills, strokes, auto-layout, text, effects, corner radii, and vector networks are preserved. Works both ways.
 
@@ -24,7 +24,7 @@ Open and save native Figma files directly. The import/export pipeline uses the s
 Context-sensitive Design | Code | AI | Lint tabs:
 
 - **Appearance** — opacity, corner radius (uniform or per-corner), visibility
-- **Fill** — solid, gradient (linear/radial/angular/diamond), image
+- **Fill** — solid, gradient (linear/radial/angular/diamond/mesh), image
 - **Stroke** — color, weight, align (inside/center/outside), per-side weights, cap, join, dash
 - **Effects** — drop shadow, inner shadow, layer blur, background blur, foreground blur
 - **Typography** — font picker with virtual scroll and search, weight, size, alignment, style buttons
@@ -69,7 +69,7 @@ CLI: `openpencil export design.fig -f jsx --style tailwind`
 
 ## AI Chat
 
-Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant. 90+ tools that can create shapes, set styles, manage layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Connect Anthropic, OpenAI, Google AI, OpenRouter, any compatible endpoint, or the AI your [OpenPencil Cloud](/user-guide/openpencil-cloud#ai-on-cloud) plan includes.
+Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant. 138 tools that can create shapes, set styles, manage layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Connect Anthropic, OpenAI, Google AI, OpenRouter, any compatible endpoint, or the AI your [Pairdraw Cloud](/user-guide/openpencil-cloud#ai-on-cloud) plan includes.
 
 Tool calls display as collapsible timeline entries. Visual verification — the assistant renders its work and checks it against your request. Full undo support for all AI mutations.
 
@@ -77,7 +77,7 @@ See [AI Chat](/programmable/ai-chat) for setup and provider details.
 
 ## MCP Server
 
-Connect Claude Code, Cursor, Windsurf, or any MCP client to read and write `.fig` files headlessly. 90+ tools. Two transports: stdio and HTTP.
+Connect Claude Code, Cursor, Windsurf, or any MCP client to read and write `.fig` files headlessly. 138 tools. Two transports: stdio and HTTP.
 
 ```sh
 npm install -g @open-pencil/mcp

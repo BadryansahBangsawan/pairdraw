@@ -47,14 +47,14 @@ Compression uses Zstd at the level the document asks for (see [Compression](#com
 
 ## Kiwi Binary Codec
 
-The codec handles Figma's 194-definition Kiwi schema with `NodeChange` as the central type (~390 fields). Key components:
+The codec handles Figma's 605-definition Kiwi schema with `NodeChange` as the central type (~590 fields). Key components:
 
 | Module | Purpose |
 |--------|---------|
 | `kiwi-schema` | Kiwi parser (from [evanw/kiwi](https://github.com/nicolo-ribaudo/kiwi)), patched for ESM and sparse field IDs |
 | `codec.ts` | Encode/decode messages using the Kiwi schema |
 | `protocol.ts` | Wire format parsing and message type detection |
-| `schema.ts` | 194 message/enum/struct definitions |
+| `schema.ts` | 605 message/enum/struct definitions |
 
 ### Sparse Field IDs
 

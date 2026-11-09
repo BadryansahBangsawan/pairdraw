@@ -1,4 +1,4 @@
-import { shallowReactive } from 'vue'
+import { shallowRef } from 'vue'
 
 import { canHoldImageFill, layerNameFromPrompt } from '@open-pencil/core/tools'
 import { vectorizableImageFill } from '@open-pencil/core/vector'
@@ -34,11 +34,18 @@ import {
 } from './types'
 
 /** Documents with an image request in flight; one at a time, so results never cross. */
-const runningStores = shallowReactive(new Set<EditorStore>())
+const runningStores = new Set<EditorStore>()
+/**
+ * Bumped whenever `runningStores` changes, so callers that read it reactively stay in step
+ * without Vue tracking the documents as object keys in its dependency table, which would keep a
+ * closed document alive.
+ */
+const runningStoresVersion = shallowRef(0)
 const ERROR_MAX_LENGTH = 240
 const GENERATED_IMAGE_NAME = 'Generated image'
 
 export function isImageAIRunning(store: EditorStore): boolean {
+  void runningStoresVersion.value
   return runningStores.has(store)
 }
 
@@ -99,6 +106,7 @@ async function runImageAI<T>(store: EditorStore, run: ImageAIRun<T>): Promise<bo
     return false
   }
   runningStores.add(store)
+  runningStoresVersion.value++
   let service = run.service()
   try {
     const outcome = await run.request(() => toast.info(messages()[run.progress]))
@@ -130,6 +138,7 @@ async function runImageAI<T>(store: EditorStore, run: ImageAIRun<T>): Promise<bo
     return false
   } finally {
     runningStores.delete(store)
+    runningStoresVersion.value++
   }
 }
 

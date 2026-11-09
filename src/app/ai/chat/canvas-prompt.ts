@@ -1,4 +1,4 @@
-import { shallowReactive } from 'vue'
+import { shallowRef } from 'vue'
 
 import { resolveEditorProfile } from '@open-pencil/core'
 
@@ -8,11 +8,18 @@ import type { EditorStore } from '@/app/editor/active-store'
 import { presenceOf } from '@/app/presence/registry'
 
 /** Documents whose canvas prompt was closed or used; it does not come back to them. */
-const closed = shallowReactive(new WeakSet<EditorStore>())
+const closed = new WeakSet<EditorStore>()
+/**
+ * Bumped whenever `closed` changes, so callers that read it reactively stay in step without Vue
+ * tracking the documents as object keys in its dependency table, which would keep a closed
+ * document alive.
+ */
+const closedVersion = shallowRef(0)
 
 /** The canvas prompt stays away from this document for as long as it is open. */
 export function closeCanvasPrompt(store: EditorStore): void {
   closed.add(store)
+  closedVersion.value++
 }
 
 /**
@@ -22,6 +29,7 @@ export function closeCanvasPrompt(store: EditorStore): void {
  * reactive state, so a computed value that calls it hides the prompt once the first layer exists.
  */
 export function offersCanvasPrompt(store: EditorStore): boolean {
+  void closedVersion.value
   const { state } = store
   if (!canvasPrompt.value || closed.has(store) || hasPendingPrompt(store)) return false
   if (state.documentKind !== 'design' || state.preparation) return false

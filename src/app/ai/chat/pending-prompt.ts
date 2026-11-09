@@ -1,4 +1,4 @@
-import { shallowReactive } from 'vue'
+import { shallowRef } from 'vue'
 
 import type { ReferencedNode } from '@/app/ai/chat/context'
 import { showDocumentChat } from '@/app/ai/chat/panel'
@@ -13,7 +13,13 @@ import type { EditorStore } from '@/app/editor/active-store'
  * misdirects it; it waits until its own document's chat is ready. Weak, so a closed document's
  * prompt goes with it.
  */
-const pending = shallowReactive(new WeakMap<EditorStore, ChatSubmission>())
+const pending = new WeakMap<EditorStore, ChatSubmission>()
+/**
+ * Bumped whenever `pending` changes, so callers that read it reactively stay in step without
+ * Vue tracking the documents as object keys in its dependency table, which would keep a closed
+ * document alive.
+ */
+const pendingVersion = shallowRef(0)
 
 /** A text prompt as the chat sends what the composer submits, with the layers it mentions. */
 export function promptSubmission(text: string, nodes: ReferencedNode[] = []): ChatSubmission {
@@ -23,10 +29,12 @@ export function promptSubmission(text: string, nodes: ReferencedNode[] = []): Ch
 /** Leaves `submission` for the chat of `store`'s document, replacing one still waiting there. */
 export function setPendingPrompt(store: EditorStore, submission: ChatSubmission): void {
   pending.set(store, submission)
+  pendingVersion.value++
 }
 
 /** Whether a prompt waits for `store`'s chat. Reactive, so the chat can watch for one. */
 export function hasPendingPrompt(store: EditorStore): boolean {
+  void pendingVersion.value
   return pending.has(store)
 }
 
@@ -35,6 +43,7 @@ export function takePendingPrompt(store: EditorStore): ChatSubmission | null {
   const submission = pending.get(store)
   if (!submission) return null
   pending.delete(store)
+  pendingVersion.value++
   return submission
 }
 

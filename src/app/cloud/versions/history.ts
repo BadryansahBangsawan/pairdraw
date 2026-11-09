@@ -1,4 +1,4 @@
-import { shallowReactive, shallowRef } from 'vue'
+import { shallowRef } from 'vue'
 
 import type { DocumentVersion } from '@open-pencil/cloud/contract'
 
@@ -34,10 +34,17 @@ export type VersionDialog = { store: EditorStore; version: DocumentVersion | nul
 export const versionDialog = shallowRef<VersionDialog | null>(null)
 
 /** Each document's history changes so far, here or anywhere the server says. */
-const listRevisions = shallowReactive(new WeakMap<EditorStore, number>())
+const listRevisions = new WeakMap<EditorStore, number>()
+/**
+ * Bumped whenever `listRevisions` changes, so callers that read it reactively stay in step
+ * without Vue tracking the documents as object keys in its dependency table, which would keep a
+ * closed document alive.
+ */
+const listRevisionsVersion = shallowRef(0)
 
 /** How often the history of the document `store` shows has changed, so its open list reloads. */
 export function versionListRevision(store: EditorStore): number {
+  void listRevisionsVersion.value
   return listRevisions.get(versionHistoryOf(store)?.store ?? store) ?? 0
 }
 
@@ -45,6 +52,7 @@ export function versionListRevision(store: EditorStore): number {
 export function versionsChanged(store: EditorStore): void {
   const document = versionHistoryOf(store)?.store ?? store
   listRevisions.set(document, (listRevisions.get(document) ?? 0) + 1)
+  listRevisionsVersion.value++
 }
 /** Each tab's preview download in flight, keyed by its document. */
 const previewLoads = new Map<EditorStore, AbortController>()

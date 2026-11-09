@@ -2,7 +2,7 @@ import { writeFile } from 'node:fs/promises'
 
 import { expect, test } from '#tests/e2e/fixtures'
 import { CanvasHelper } from '#tests/helpers/canvas'
-import { readScenePixels } from '#tests/helpers/canvas/pixels'
+import { compareScreenshots, readScenePixels } from '#tests/helpers/canvas/pixels'
 
 test('changing only the text paint preserves native glyph pixels', async ({ page }) => {
   await page.goto('/?test&no-chrome&no-rulers')
@@ -60,6 +60,12 @@ test('changing only the text paint preserves native glyph pixels', async ({ page
     await writeFile(test.info().outputPath('gradient.png'), gradient)
     await writeFile(test.info().outputPath('solid.png'), solid)
   }
-  expect(solid.equals(gradient)).toBe(true)
+  // Since Inter is drawn from its variable file (#1453), a glyph edge that falls between pixels is
+  // rounded one level apart for a shader paint and a colour, so a few edge pixels differ by 1.
+  // Drawing the paint through coverage layers, which this test guards against, changes tens of
+  // thousands of pixels by up to 245.
+  const difference = await compareScreenshots(page, gradient, solid)
+  expect(difference.maxDelta).toBeLessThanOrEqual(1)
+  expect(difference.pixels).toBeLessThan(100)
   canvas.assertNoErrors()
 })

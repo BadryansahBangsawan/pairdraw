@@ -1,4 +1,4 @@
-import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
+import { expect, test, useFreshEditor } from '#tests/e2e/fixtures'
 import {
   getCodeNodeSummaries,
   getFirstSelectedNodeId,
@@ -9,12 +9,7 @@ import {
   waitForNodeNamed
 } from '#tests/helpers/code-panel'
 
-const editor = useEditorSetup()
-
-test.beforeEach(async () => {
-  await editor.page.reload()
-  await editor.canvas.waitForInit()
-})
+const editor = useFreshEditor()
 
 function codeTab() {
   return editor.page.getByTestId('properties-tab-code')

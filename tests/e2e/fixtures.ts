@@ -29,6 +29,40 @@ export function useEditorSetup(url = '/?test') {
   }
 }
 
+/**
+ * A fresh page, in its own browser context, for every test. Use it instead of reloading one shared
+ * page before each test: Chromium's renderer process accumulates state across reloads of the same
+ * editor page and crashes after roughly a dozen of them, which a new context per test avoids.
+ */
+export function useFreshEditor(url = '/?test') {
+  let page: Page | undefined
+  let canvas: CanvasHelper | undefined
+
+  test.beforeEach(async ({ browser }) => {
+    page = await browser.newPage()
+    await page.goto(url)
+    canvas = new CanvasHelper(page)
+    await canvas.waitForInit()
+  })
+
+  test.afterEach(async () => {
+    await page?.close()
+    page = undefined
+    canvas = undefined
+  })
+
+  return {
+    get page() {
+      if (!page) throw new Error('useFreshEditor: the page exists only inside a test')
+      return page
+    },
+    get canvas() {
+      if (!canvas) throw new Error('useFreshEditor: the canvas exists only inside a test')
+      return canvas
+    }
+  }
+}
+
 export function useEditorSetupWithClear(url = '/?test') {
   const ctx = useEditorSetup(url)
 

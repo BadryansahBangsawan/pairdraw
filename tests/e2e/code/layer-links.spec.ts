@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test'
 
-import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
+import { expect, test, useFreshEditor } from '#tests/e2e/fixtures'
 
-const editor = useEditorSetup('/?test&no-rulers')
+const editor = useFreshEditor('/?test&no-rulers')
 
 function buildScene(page: Page): Promise<void> {
   return page.evaluate(() => {
@@ -60,11 +60,6 @@ function focusedLayer(page: Page) {
     return id ? (store.graph.getNode(id)?.name ?? null) : null
   })
 }
-
-test.beforeEach(async () => {
-  await editor.page.reload()
-  await editor.canvas.waitForInit()
-})
 
 async function openCode(page: Page) {
   await page.getByTestId('properties-tab-code').click()

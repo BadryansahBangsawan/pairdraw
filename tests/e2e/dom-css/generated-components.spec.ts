@@ -465,6 +465,10 @@ async function serveComponent(
     root: folder,
     configFile: false,
     logLevel: 'silent',
+    // Without its own cache dir this server resolves the repository's `node_modules/.vite` and
+    // replaces the app server's optimized dependencies with this page's, so the app's later
+    // dynamic imports fail to load.
+    cacheDir: join(folder, 'node_modules', '.vite'),
     plugins: [app.plugin()],
     server: { port: 0, host: '127.0.0.1' }
   })

@@ -1,7 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
+import { AUTOMATION_HTTP_PORT } from '@open-pencil/core/constants'
+
 import { createCompanionConnection } from '@/app/automation/companion/connection'
-import { pairedCompanionServer } from '@/app/automation/mcp/spawn'
+import { automationHTTPURL, pairedCompanionServer } from '@/app/automation/mcp/spawn'
 
 const TOKEN = 'f'.repeat(64)
 const AGENT_TOKEN = 'a'.repeat(64)
@@ -14,6 +16,30 @@ function companionFetch(url: string): Promise<Response> {
       : Response.json({ version: '0.16.0', workspace: '/tmp/agents' })
   )
 }
+
+describe('automationHTTPURL', () => {
+  test('uses the local MCP server when no companion is paired', () => {
+    const connection = createCompanionConnection({ fetch: companionFetch })
+    expect(automationHTTPURL(connection)).toBe(`http://127.0.0.1:${AUTOMATION_HTTP_PORT}`)
+  })
+
+  test('uses the paired companion server', async () => {
+    const connection = createCompanionConnection({ fetch: companionFetch })
+    expect(await connection.pair({ code: '0'.repeat(32), port: 7601 })).toBe(true)
+
+    expect(automationHTTPURL(connection)).toBe('http://127.0.0.1:7601')
+    connection.disconnect()
+  })
+
+  test('leaves the `bun run dev` session to the local development server', async () => {
+    // The adopted dev session keeps the bridge on the development server's settings.
+    const connection = createCompanionConnection({ fetch: companionFetch })
+    await connection.adopt({ token: TOKEN, agentToken: AGENT_TOKEN, port: 7600 })
+
+    expect(automationHTTPURL(connection)).toBe(`http://127.0.0.1:${AUTOMATION_HTTP_PORT}`)
+    connection.disconnect()
+  })
+})
 
 describe('pairedCompanionServer', () => {
   test('uses the server of a companion paired through a link as it is', async () => {

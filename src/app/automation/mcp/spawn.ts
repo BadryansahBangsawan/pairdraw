@@ -52,13 +52,22 @@ export interface AutomationServerHandle {
   managed: boolean
 }
 
-const DEV_AUTOMATION_HTTP_URL = import.meta.env.DEV
-  ? __OPENPENCIL_LOCAL_AUTOMATION_HTTP_URL__
-  : `http://127.0.0.1:${AUTOMATION_HTTP_PORT}`
+function localAutomationHTTPURL(): string {
+  if (
+    import.meta.env.DEV &&
+    typeof __OPENPENCIL_LOCAL_AUTOMATION_HTTP_URL__ === 'string' &&
+    __OPENPENCIL_LOCAL_AUTOMATION_HTTP_URL__
+  ) {
+    return __OPENPENCIL_LOCAL_AUTOMATION_HTTP_URL__
+  }
+  return `http://127.0.0.1:${AUTOMATION_HTTP_PORT}`
+}
 
 /** The MCP server the app uses: a paired companion's, or the local one. */
-function automationHTTPURL(): string {
-  return companion.connected() ? companion.url() : DEV_AUTOMATION_HTTP_URL
+export function automationHTTPURL(
+  connection: Pick<CompanionConnection, 'connected' | 'url'> = companion
+): string {
+  return connection.connected() ? connection.url() : localAutomationHTTPURL()
 }
 
 export function getMCPServerURL(): string {
@@ -499,7 +508,7 @@ async function configureDevMCP(): Promise<AutomationServerHandle> {
   if (!health)
     throw new MCPStartupError(
       'Development MCP server did not become healthy',
-      mcpFailure('timeout', `${DEV_AUTOMATION_HTTP_URL}/health`)
+      mcpFailure('timeout', `${localAutomationHTTPURL()}/health`)
     )
   runtimeAutomationAuthToken = authToken
   return { disconnect: noop, authToken, managed: true }

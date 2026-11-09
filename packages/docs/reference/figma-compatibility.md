@@ -22,7 +22,7 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 | Canvas guides | ✅ | Drag guides from rulers onto the canvas or frames; select, move, duplicate, delete, and undo; saved in `.fig` |
 | Actions menu / command palette | ✅ | <kbd>⌘</kbd><kbd>K</kbd> opens a searchable palette of editor and app actions |
 | Context menu | ✅ | Right-click with clipboard, z-order, grouping, component, visibility, lock, move-to-page actions |
-| Keyboard shortcuts | 🟡 | Tools, editing, booleans, flatten, masks, components, align, z-order, navigation, text formatting; no Scale (<kbd>K</kbd>), Arrow, Eyedropper (<kbd>I</kbd>), or zoom tool |
+| Keyboard shortcuts | 🟡 | Tools, editing, booleans, flatten, masks, components, align, z-order, navigation, text formatting; Eyedropper (<kbd>I</kbd>), or zoom tool |
 | Find and replace | 🔲 | Text search/replace across document |
 | Layer outlines view | 🔲 | Wireframe view of all layers |
 | Custom file thumbnails | 🔲 | Saved files preview their first page, as Figma's do without a Cover page; no thumbnail picker |
@@ -44,7 +44,7 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 | Select layers | ✅ | Click, shift-click, marquee selection |
 | Alignment & position | ✅ | Position, rotation, dimensions in properties panel |
 | Copy & paste objects | ✅ | Standard clipboard + Figma Kiwi binary format; Copy as text/SVG/PNG/JSX |
-| Scale layers proportionally | 🟡 | Shift-resize and the aspect ratio lock keep proportions; no Scale tool (<kbd>K</kbd>) that scales strokes, effects, and text |
+| Scale layers proportionally | 🟡 | Shift-resize and the aspect ratio lock keep proportions; Scale tool (<kbd>K</kbd>) scales strokes, effects, and text |
 | Lock & unlock layers | ✅ | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>L</kbd> toggles lock; locked nodes can't be selected/moved from canvas |
 | Toggle layer visibility | ✅ | Eye icon in layers panel + <kbd>⇧</kbd><kbd>⌘</kbd><kbd>H</kbd> keyboard shortcut |
 | Rename layers | ✅ | Double-click inline rename in layers panel; <kbd>Enter</kbd>/<kbd>Escape</kbd>/blur to commit |

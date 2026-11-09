@@ -231,6 +231,8 @@ test('Generate SVG from the command palette places editable layers, undone in on
   await editor.page.keyboard.press('Enter')
   await dialog.getByTestId('image-ai-prompt-input').fill('a flag')
   await dialog.getByTestId('image-ai-prompt-submit').click()
+  // The mock answers before the dialog finishes closing, and undo is ignored while it is open.
+  await expect(dialog).toHaveCount(0)
 
   await expect.poll(count).toBe(before + 1)
   const childTypes = await editor.page.evaluate(() => {

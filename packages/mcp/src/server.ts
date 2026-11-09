@@ -259,8 +259,14 @@ function createHonoApp(options: {
 
 function buildServerContext(options: ServerOptions) {
   const httpPort = options.httpPort ?? 7600
+  const evalRequestedWithAgents = options.agents !== undefined && (options.enableEval ?? false)
+  if (evalRequestedWithAgents) {
+    process.stderr.write(
+      'Warning: enableEval is ignored while the agent bridge is on; eval stays off.\n'
+    )
+  }
   const toolPolicy: ToolPolicy = {
-    allowEval: options.enableEval ?? false,
+    allowEval: (options.enableEval ?? false) && options.agents === undefined,
     disabledTools: [...new Set(options.disabledTools)],
     scope: options.scope ?? 'document'
   }

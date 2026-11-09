@@ -317,6 +317,38 @@ describe('a wildcard CORS origin', () => {
   })
 })
 
+describe('eval with the agent bridge on', () => {
+  test('stays off inside startServer even when enableEval is true', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'op-companion-eval-'))
+    const handle = await startServer({
+      httpPort: 0,
+      withTcp: true,
+      socketPath: join(dir, 'mcp.sock'),
+      authToken: 'master-token',
+      mcpRoot: null,
+      enableEval: true,
+      agents: { registry: [FAKE_AGENT_ENTRY], searchPath: dir, workspace: join(dir, 'ws') }
+    })
+    try {
+      const base = `http://127.0.0.1:${handle.httpPort}`
+      const health = await fetch(`${base}/health`, {
+        headers: { authorization: `Bearer master-token` }
+      })
+      expect(health.status).toBe(200)
+      const body = v.parse(
+        v.object({
+          tools: v.array(v.object({ name: v.string(), enabled: v.boolean() }))
+        }),
+        await health.json()
+      )
+      expect(body.tools.find((tool) => tool.name === 'eval')?.enabled).toBe(false)
+    } finally {
+      await handle.close()
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+})
+
 describe('pairing fingerprint', () => {
   test('is the first six hex digits of the code’s SHA-256, as the app derives it', async () => {
     const { pairingFingerprint } = await import('#mcp/agents/pairing')

@@ -135,7 +135,7 @@ Every command supports `--json`. See the [CLI reference](https://openpencil.dev/
 
 ### Built-in chat
 
-Press <kbd>⌘</kbd><kbd>J</kbd> (<kbd>Ctrl</kbd><kbd>J</kbd> on Windows and Linux) to open the AI assistant. It has 100+ tools that can create shapes, set fills and strokes, manage auto-layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Bring your own API key for OpenRouter, Anthropic, OpenAI, Google AI, DeepSeek, Z.ai, MiniMax, xAI, Meta, Kimi For Coding, Moonshot AI, Together AI, Fireworks AI, OpenCode Zen and Go, or compatible endpoints. No backend, no account.
+Press <kbd>⌘</kbd><kbd>J</kbd> (<kbd>Ctrl</kbd><kbd>J</kbd> on Windows and Linux) to open the AI assistant. It has 138 tools that can create shapes, set fills and strokes, manage auto-layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Bring your own API key for OpenRouter, Anthropic, OpenAI, Google AI, DeepSeek, Z.ai, MiniMax, xAI, Meta, Kimi For Coding, Moonshot AI, Together AI, Fireworks AI, OpenCode Zen and Go, or compatible endpoints. No backend, no account.
 
 Not every provider works in the browser, and not every model streams tool calls correctly. See [BYOK provider & model compatibility](https://openpencil.dev/programmable/byok-provider-compatibility) for measured results — contributions welcome.
 

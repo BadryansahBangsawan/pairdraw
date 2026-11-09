@@ -1,6 +1,6 @@
 # BYOK provider and model compatibility
 
-OpenPencil has no backend. When you bring your own API key, the browser talks to the provider
+Pairdraw has no backend. When you bring your own API key, the browser talks to the provider
 directly — so a provider only works in the **web build** if it sets CORS headers correctly, and a
 model is only useful for the AI chat panel if its **streaming tool calls** are well-formed.
 
@@ -37,19 +37,19 @@ measured with a key yet.
 | Fireworks AI         | `https://api.fireworks.ai/inference/v1`              | ⚠️      | `ACAO: *` on the preflight and on a 404 for an unknown model; success path not yet tested with a key                                                                                                                                 | 2026-11-02 |
 | Kimi For Coding      | `https://api.kimi.ai/coding/v1`                      | ❌      | preflight answers 404 and the 401 has no `ACAO`; desktop only                                                                                                                                                                        | 2026-11-02 |
 | OpenCode Zen         | `https://opencode.ai/inference/openai/v1`            | ❌      | preflight answers 404 and errors have no `ACAO`; desktop only                                                                                                                                                                        | 2026-11-02 |
-| OpenCode Go          | `https://opencode.ai/inference/go/openai/v1`         | ❌      | preflight answers 404 and errors have no `ACAO`; desktop only. Requests need an `x-opencode-session` header, which OpenPencil sends                                                                                                  | 2026-11-02 |
+| OpenCode Go          | `https://opencode.ai/inference/go/openai/v1`         | ❌      | preflight answers 404 and errors have no `ACAO`; desktop only. Requests need an `x-opencode-session` header, which Pairdraw sends                                                                                                  | 2026-11-02 |
 | Nebius AI Studio     | `https://api.studio.nebius.com/v1`                   | ✅      | `ACAO: *`                                                                                                                                                                                                                            | 2026-07-30 |
 | Nebius Token Factory | `https://api.tokenfactory.<region>.nebius.com/v1`    | ✅      | `ACAO: *`; catalog differs per region                                                                                                                                                                                                | 2026-07-30 |
-| Anthropic            | `https://api.anthropic.com`                          | ✅      | Requires `anthropic-dangerous-direct-browser-access: true`; OpenPencil sends it in the web app                                                                                                                                       | 2026-07-30 |
+| Anthropic            | `https://api.anthropic.com`                          | ✅      | Requires `anthropic-dangerous-direct-browser-access: true`; Pairdraw sends it in the web app                                                                                                                                       | 2026-07-30 |
 | Amazon Bedrock       | `https://bedrock-mantle.<region>.api.aws/anthropic`  | ⚠️      | `ACAO: *` on the preflight and on a 401; the wildcard cannot allow `authorization`, so SigV4 signing is desktop only. API keys (`x-api-key`) work                                                                                    | 2026-11-03 |
-| Google Vertex AI     | `https://<host>/v1/projects/<project>/locations/<l>` | ⚠️      | echoes origin on the preflight and on a 401; the preflight rejects `anthropic-version` and `anthropic-beta`; OpenPencil sends the version and any beta flags (`anthropic_beta`) in the body and drops the GA structured-outputs beta | 2026-11-03 |
+| Google Vertex AI     | `https://<host>/v1/projects/<project>/locations/<l>` | ⚠️      | echoes origin on the preflight and on a 401; the preflight rejects `anthropic-version` and `anthropic-beta`; Pairdraw sends the version and any beta flags (`anthropic_beta`) in the body and drops the GA structured-outputs beta | 2026-11-03 |
 | Scaleway             | `https://api.scaleway.ai/<project-id>/v1`            | ⚠️      | `ACAO: *` on success, **absent on errors** — a bad key reads as a network failure                                                                                                                                                    | 2026-07-31 |
 | TensorX              | `https://api.tensorx.ai/v1`                          | ⚠️      | `ACAO: *` on success, **absent on errors** (401/403/500). Reported to their support                                                                                                                                                  | 2026-07-31 |
 
 ### The common failure
 
 A provider that answers the `OPTIONS` preflight correctly but omits `Access-Control-Allow-Origin`
-on the **actual response** will fail in the browser with a generic `Failed to fetch`. OpenPencil
+on the **actual response** will fail in the browser with a generic `Failed to fetch`. Pairdraw
 surfaces that as _"Could not reach this endpoint from the browser"_ — which is indistinguishable
 from a wrong API key. **Always verify with curl before assuming the app is at fault.**
 
@@ -212,7 +212,7 @@ genuinely declined.
 | `"chat_template_kwargs": {"enable_thinking": false}` | 5,133 ch  | ✅ 3       |
 
 Only `"none"` actually eliminated reasoning on Scaleway; `"low"` had no measurable effect.
-OpenPencil cannot send this today — see
+Pairdraw cannot send this today — see
 [#454](https://github.com/open-pencil/open-pencil/issues/454).
 
 ### Known issue: reasoning models and the connection test

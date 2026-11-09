@@ -177,7 +177,7 @@ openpencil libraries seed --root ./catalog
 
 ## import
 
-Import HTML/CSS/Tailwind into an editable OpenPencil document.
+Import HTML/CSS/Tailwind into an editable Pairdraw document.
 
 ```sh
 openpencil import page.html [options]

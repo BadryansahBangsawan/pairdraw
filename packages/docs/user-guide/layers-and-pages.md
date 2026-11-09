@@ -1,6 +1,6 @@
 ---
 title: Layers & Pages
-description: Managing layers, pages, and the properties panel in OpenPencil.
+description: Managing layers, pages, and the properties panel in Pairdraw.
 ---
 
 # Layers & Pages
@@ -55,7 +55,7 @@ The Home workspace lists recent local documents and documents from configured st
 
 A new design is kept as a draft on this device while you work on it: each change is written shortly after you make it, so closing its tab asks nothing. **Drafts** on Home lists them with a preview; open one to continue it, or pick **Delete draft** from its <kbd>⋯</kbd> or right-click menu to remove it for good. Saving a draft to a file or to storage, in the editor or with **Save As…** on Home, takes it out of Drafts. Drafts live in this browser profile or desktop installation only, and need **Automatically preserve unsaved work** turned on and a browser that keeps site data.
 
-In **Settings → General → Recovery**, **Automatically preserve unsaved work** controls drafts and local recovery copies. With recovery enabled, unsaved documents without a file path remain recoverable even after their tabs close. When OpenPencil offers **Recover unsaved work**, choose **Restore** to reopen a document or **Discard** to remove its recovery copy.
+In **Settings → General → Recovery**, **Automatically preserve unsaved work** controls drafts and local recovery copies. With recovery enabled, unsaved documents without a file path remain recoverable even after their tabs close. When Pairdraw offers **Recover unsaved work**, choose **Restore** to reopen a document or **Discard** to remove its recovery copy.
 
 A file you opened also keeps a backup of changes it has not been saved with yet, written while autosave is off, or when the window closes before autosave has written them. The next time that file opens, **Recovered changes** offers **Save** to write them into the file, **Save As…** to open them apart and save them as a new file, or **Don’t Save** to keep the file as it is and drop the backup. Closing the dialog keeps the backup for the next time. Saving the file drops its older backups, and in the browser a backup older than the file's last change is not offered. A backup whose file has not opened for a week, for example because the file moved, is also listed in **Recover unsaved work**.
 
@@ -83,7 +83,7 @@ When no nodes are selected, the Design tab shows page-level properties including
 
 Displays the selected node as code with syntax highlighting, line numbers, and a copy button. A format toggle lets you switch between two output modes:
 
-- **OpenPencil JSX** — custom component tree compatible with `renderJSX()` for programmatic round-trip
+- **Pairdraw JSX** — custom component tree compatible with `renderJSX()` for programmatic round-trip
 - **Tailwind CSS v4** — HTML with utility classes (`<div className="flex gap-4 p-3">`) ready to paste into React/Vue projects
 
 ## AI Chat Column

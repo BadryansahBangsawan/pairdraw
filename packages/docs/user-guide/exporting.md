@@ -1,6 +1,6 @@
 ---
 title: Exporting
-description: Export images, SVG, and .fig subsets, and open .fig or .pen documents in OpenPencil.
+description: Export images, SVG, and .fig subsets, and open .fig or .pen documents in Pairdraw.
 ---
 
 # Exporting
@@ -50,11 +50,11 @@ In addition to file export, you can copy the selection to the clipboard in multi
 - **Copy as text** — copies visible text content from the selection
 - **Copy as SVG** — copies the selection as SVG markup (paste into code editors, Inkscape, etc.)
 - **Copy as PNG** — renders at 2× and copies to the clipboard (ready to paste into Slack, Notion, etc.)
-- **Copy as JSX** — copies the OpenPencil JSX representation (compatible with `renderJsx()`)
+- **Copy as JSX** — copies the Pairdraw JSX representation (compatible with `renderJsx()`)
 
 ## .fig File Operations
 
-OpenPencil uses the .fig format for full documents — the same binary format as Figma.
+Pairdraw uses the .fig format for full documents — the same binary format as Figma.
 
 ### Opening Files
 
@@ -66,7 +66,7 @@ A file picker dialog opens, filtered for `.fig` and `.pen` files. On the desktop
 
 You can also drag a `.fig`, `.pen`, or other supported document onto the window; it opens in a new tab. Images and SVG files dropped on the canvas are placed in the document instead, and any other file reports that it can't be opened.
 
-A `.pen` document that imports `.pen` libraries opens with the library components it uses, read from the files it names relative to itself. In the document they are read-only library components; change them in the library. A browser can't read files beside a document, so there those components show as dashed placeholders and a message names the libraries; open the file in the desktop app or the CLI to load them. The desktop app reads libraries up to two folders above the document but never from your home folder or above it, and not through links; a file dropped onto the window reads none, so open it with File > Open…. The CLI reads libraries inside the working directory. Script and browser nodes, which OpenPencil doesn't run, also open as placeholders that keep their script file or page address.
+A `.pen` document that imports `.pen` libraries opens with the library components it uses, read from the files it names relative to itself. In the document they are read-only library components; change them in the library. A browser can't read files beside a document, so there those components show as dashed placeholders and a message names the libraries; open the file in the desktop app or the CLI to load them. The desktop app reads libraries up to two folders above the document but never from your home folder or above it, and not through links; a file dropped onto the window reads none, so open it with File > Open…. The CLI reads libraries inside the working directory. Script and browser nodes, which Pairdraw doesn't run, also open as placeholders that keep their script file or page address.
 
 ### Saving Files
 
@@ -84,7 +84,7 @@ With nothing selected, the **Document** section of the Design panel sets how tig
 
 ### Round-trip Compatibility
 
-Files exported from OpenPencil can be opened in Figma, and vice versa. The .fig format preserves all node types, properties, fills, strokes, effects, vector data, and layout settings.
+Files exported from Pairdraw can be opened in Figma, and vice versa. The .fig format preserves all node types, properties, fills, strokes, effects, vector data, and layout settings.
 
 ## Keyboard Shortcuts
 

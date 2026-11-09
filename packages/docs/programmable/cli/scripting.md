@@ -5,7 +5,7 @@ description: Execute JavaScript with a Figma-compatible Plugin API to query, bat
 
 # Scripting
 
-`openpencil eval` runs JavaScript against an OpenPencil document with a Figma-compatible `figma` global. Use it for headless batch edits, inspection, fixture setup, and automation without opening the editor UI.
+`openpencil eval` runs JavaScript against a Pairdraw document with a Figma-compatible `figma` global. Use it for headless batch edits, inspection, fixture setup, and automation without opening the editor UI.
 
 ## Basic usage
 
@@ -40,7 +40,7 @@ References use variable names or `{Collection::variable}` and are stored as stab
 
 ## Variable bindings
 
-Figma's `node.setBoundVariable(field, variable)` binds with Figma's field names and type rules. Use `openpencil.bindVariable(node, field, variable)` to bind a layer field to a variable from `figma.variables` the way the layer panel does, and `openpencil.unbindVariable(node, field)` to let it go; the field keeps the value the variable last gave it. Fields use OpenPencil's names, such as `text`, `visible`, `opacity`, `paddingLeft` or `fills/0/color`. Bindings follow the layer panel, which takes more than Figma's `setBoundVariable`: text content takes a text or number variable, a number shown as text, and visibility a boolean or a text variable that shows the layer unless it is empty or reads `false`, `no` or `off`.
+Figma's `node.setBoundVariable(field, variable)` binds with Figma's field names and type rules. Use `openpencil.bindVariable(node, field, variable)` to bind a layer field to a variable from `figma.variables` the way the layer panel does, and `openpencil.unbindVariable(node, field)` to let it go; the field keeps the value the variable last gave it. Fields use Pairdraw's names, such as `text`, `visible`, `opacity`, `paddingLeft` or `fills/0/color`. Bindings follow the layer panel, which takes more than Figma's `setBoundVariable`: text content takes a text or number variable, a number shown as text, and visibility a boolean or a text variable that shows the layer unless it is empty or reads `false`, `no` or `off`.
 
 ```js
 const [price] = figma.variables.getLocalVariables('FLOAT')
@@ -115,7 +115,7 @@ Use `--quiet` / `-q` to suppress output when only writing a file.
 
 ## The `openpencil` API
 
-Next to `figma`, scripts get `openpencil`: what OpenPencil adds to the Figma Plugin API, in the same style. The same global is available to the `eval` tool and the running app's automation.
+Next to `figma`, scripts get `openpencil`: what Pairdraw adds to the Figma Plugin API, in the same style. The same global is available to the `eval` tool and the running app's automation.
 
 A main component or component set can [behave as a Reka UI control](/user-guide/components#behaviours-and-preview). Bind it by its own property and slot names:
 
@@ -176,7 +176,7 @@ Layer features Figma's API has no member for:
 
 ## Supported API surface
 
-The API is intentionally close to Figma's Plugin API, but it maps to OpenPencil's scene graph and file format.
+The API is intentionally close to Figma's Plugin API, but it maps to Pairdraw's scene graph and file format.
 
 ### Document and pages
 
@@ -271,9 +271,9 @@ Common node properties are readable/writable through the proxy, including:
 These Figma APIs are not exposed as compatible helpers yet:
 
 - `node.exportAsync()`
-- `figma.util.normalizeMarkdown()`, which fails because OpenPencil has no rich-text descriptions or annotations to normalize for
+- `figma.util.normalizeMarkdown()`, which fails because Pairdraw has no rich-text descriptions or annotations to normalize for
 - Library variables, extended collections, and variable bindings on effects and layout grids
 - Figma style APIs such as `figma.createPaintStyle()` / `figma.createTextStyle()`
 - Full vector boolean operation parity
 
-Use OpenPencil CLI export commands, core tools, or direct scene-graph helpers where available.
+Use Pairdraw CLI export commands, core tools, or direct scene-graph helpers where available.

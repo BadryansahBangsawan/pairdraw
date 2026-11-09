@@ -1,6 +1,6 @@
 ---
 title: Scene Graph
-description: Technical reference for OpenPencil's flat scene graph, node lookup, tree relationships, mutations, events, and traversal APIs.
+description: Technical reference for Pairdraw's flat scene graph, node lookup, tree relationships, mutations, events, and traversal APIs.
 ---
 
 # Scene Graph
@@ -72,7 +72,7 @@ Figma's auto-layout properties map to Yoga flexbox:
 | `stackSpacing` | `gap` |
 | `stackPadding` | `padding` |
 | `stackJustify: MIN/CENTER/MAX/SPACE_BETWEEN` | `justifyContent` |
-| `primaryAxisAlign: SPACE_AROUND` (OpenPencil only, plugin data in `.fig`) | `justifyContent: space-around` |
+| `primaryAxisAlign: SPACE_AROUND` (Pairdraw only, plugin data in `.fig`) | `justifyContent: space-around` |
 | `stackCounterAlign` | `alignItems` |
 | `stackPrimarySizing: FIXED/HUG/FILL` | width/height + flex-grow |
 | `stackChildPrimaryGrow` | `flexGrow` |

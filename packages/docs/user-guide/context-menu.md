@@ -1,6 +1,6 @@
 ---
 title: Context Menu
-description: Right-click context menu actions in OpenPencil — clipboard, z-order, grouping, components, and more.
+description: Right-click context menu actions in Pairdraw — clipboard, z-order, grouping, components, and more.
 ---
 
 # Context Menu
@@ -21,12 +21,12 @@ The **Copy/Paste as** submenu offers additional clipboard formats for the select
 - **Copy as text** — copies visible text content from the selection
 - **Copy as SVG** — copies the node tree as SVG markup
 - **Copy as PNG** — renders at 2× and places on the system clipboard (paste into Slack, Notion, etc.)
-- **Copy as JSX** — copies the OpenPencil JSX representation for use with `renderJsx()`
+- **Copy as JSX** — copies the Pairdraw JSX representation for use with `renderJsx()`
 - **Copy as HTML** — copies an HTML fragment with inline styles and images inlined, ready to paste into a page or an email; it also works in read-only documents
 
 ## Run sticky as prompt
 
-When only sticky notes are selected and at least one has text, **Run sticky as prompt** sends their text to the document's [AI chat](../programmable/ai-chat), with a reference to each note so the assistant knows which notes it came from. It appears only in documents you can edit. When no model is set up yet, OpenPencil looks for a coding agent on your computer first and opens guided setup when none is found, then sends the prompt.
+When only sticky notes are selected and at least one has text, **Run sticky as prompt** sends their text to the document's [AI chat](../programmable/ai-chat), with a reference to each note so the assistant knows which notes it came from. It appears only in documents you can edit. When no model is set up yet, Pairdraw looks for a coding agent on your computer first and opens guided setup when none is found, then sends the prompt.
 
 ## Clipboard Actions
 

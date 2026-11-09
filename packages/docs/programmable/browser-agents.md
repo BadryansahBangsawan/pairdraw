@@ -1,6 +1,6 @@
 # Coding agents in the browser
 
-The web app at [app.openpencil.dev](https://app.openpencil.dev) can use Claude Code, Codex, or Gemini CLI as its design agent, like the [desktop app](./coding-agents). A web page cannot start programs on your computer, so a small companion program does it: it runs OpenPencil's [MCP server](./mcp-server) and starts the agents the chat asks for.
+The web app at [app.openpencil.dev](https://app.openpencil.dev) can use Claude Code, Codex, or Gemini CLI as its design agent, like the [desktop app](./coding-agents). A web page cannot start programs on your computer, so a small companion program does it: it runs Pairdraw's [MCP server](./mcp-server) and starts the agents the chat asks for.
 
 ## Connect your computer
 
@@ -28,7 +28,7 @@ The link works once and for two minutes. Press <kbd>Enter</kbd> in the companion
 - Only the tab that opened the link and confirmed it gets a session token, and only that token reaches the agent routes. Agents get a separate token that reaches only the MCP server. Both live in the tab's memory and in the companion's; neither writes them anywhere. A tab unused for 30 minutes, or disconnected, is signed out.
 - The terminal says when a tab connects. If you did not open the link, stop the companion with <kbd>Ctrl</kbd>+<kbd>C</kbd>.
 - Pages from other sites are refused, whatever they send, as are requests addressed to any name but this computer. The web app's own origin is allowed; to pair a development server, set `OPENPENCIL_CONNECT_APP_URL`, for example to `http://localhost:1420`.
-- It starts only the agents OpenPencil knows, with fixed command lines, in a folder of its own beside the MCP server's discovery file. The tab names an agent, never a program or its arguments. Every chat runs in that folder, and agents reach only the companion's own MCP server: MCP servers the browser asks for besides it, including your own MCP connections, are left out.
+- It starts only the agents Pairdraw knows, with fixed command lines, in a folder of its own beside the MCP server's discovery file. The tab names an agent, never a program or its arguments. Every chat runs in that folder, and agents reach only the companion's own MCP server: MCP servers the browser asks for besides it, including your own MCP connections, are left out.
 - **Install** runs `npm install --global` for the agent's own ACP package and nothing else.
 - Closing the tab, or the chat, stops its agent. Stopping the companion with <kbd>Ctrl</kbd>+<kbd>C</kbd> stops every agent it started.
 - The MCP server's `eval` tool stays off, and file tools stay inside the folder you started the companion in, or `OPENPENCIL_MCP_ROOT`.

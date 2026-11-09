@@ -4,7 +4,7 @@
 
 Open and save native Figma files directly. The import/export pipeline uses the same Kiwi binary codec as Figma — 194 schema definitions, ~390 fields per node. Save with <kbd>⌘</kbd><kbd>S</kbd>, Save As with <kbd>⇧</kbd><kbd>⌘</kbd><kbd>S</kbd>.
 
-**Copy & paste with Figma** — select nodes in Figma, <kbd>⌘</kbd><kbd>C</kbd>, switch to OpenPencil, <kbd>⌘</kbd><kbd>V</kbd>. Fills, strokes, auto-layout, text, effects, corner radii, and vector networks are preserved. Works both ways.
+**Copy & paste with Figma** — select nodes in Figma, <kbd>⌘</kbd><kbd>C</kbd>, switch to Pairdraw, <kbd>⌘</kbd><kbd>V</kbd>. Fills, strokes, auto-layout, text, effects, corner radii, and vector networks are preserved. Works both ways.
 
 ## Drawing & Editing
 
@@ -142,4 +142,4 @@ brew install --cask openpencil
 
 ## Google Fonts Fallback
 
-When a font isn't available locally, OpenPencil fetches it from Google Fonts automatically. No manual installation needed when opening .fig files with unfamiliar fonts.
+When a font isn't available locally, Pairdraw fetches it from Google Fonts automatically. No manual installation needed when opening .fig files with unfamiliar fonts.

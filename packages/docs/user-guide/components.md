@@ -1,6 +1,6 @@
 ---
 title: Components
-description: Creating reusable components, instances, component sets, overrides, and live sync in OpenPencil.
+description: Creating reusable components, instances, component sets, overrides, and live sync in Pairdraw.
 ---
 
 # Components
@@ -25,7 +25,7 @@ Components display a purple label with a diamond icon above them.
 
 Select two or more components and choose **Create component set** from the context menu to combine them into a component set — a container with a dashed purple border and 20 px padding around its children, as in Figma. Sets made by scripts with `figma.combineAsVariants()` wrap their components exactly, as Figma's plugin API does.
 
-Each component in a set can define values across multiple variant dimensions, such as `Size=Small`, `State=Hover`, and `Theme=Dark`. OpenPencil supports sparse combinations, so a set does not need every possible combination. The top-left variant is the default and is used as the fallback when an update no longer contains an exact combination.
+Each component in a set can define values across multiple variant dimensions, such as `Size=Small`, `State=Hover`, and `Theme=Dark`. Pairdraw supports sparse combinations, so a set does not need every possible combination. The top-left variant is the default and is used as the fallback when an update no longer contains an exact combination.
 
 Select a component and press **Add variant** in the panel header to turn it into a component set, as Figma does: the component becomes `Property 1=Default` and a copy named `Property 1=Variant2` appears below it. On a set, **Add variant** copies its last variant with the next value. The set's variant properties are rows of its **Properties** list; click one to rename it or to add, rename, drag to reorder, or remove its values. Removing a value variants still use moves them to another value first, and variants that share every value are named in a notice that selects them.
 
@@ -92,7 +92,7 @@ Open **Manage libraries → Updates** to discover newer revisions. Discovery doe
 - Instances on the current page
 - Instances across all pages
 
-OpenPencil preserves compatible text, visibility, and instance-swap assignments. If an exact variant no longer exists, the review identifies the top-left fallback before you accept it. Applying an update creates an undo entry.
+Pairdraw preserves compatible text, visibility, and instance-swap assignments. If an exact variant no longer exists, the review identifies the top-left fallback before you accept it. Applying an update creates an undo entry.
 
 ### Local, Storage, and Offline Use
 
@@ -156,7 +156,7 @@ Select an instance, a nested one included, and click the swap button in its head
 
 Copy a layer, select a layer inside an instance, and press <kbd>⌥</kbd><kbd>⇧</kbd><kbd>R</kbd> (<kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>) or choose **Replace inside instance** from the Edit or context menu. The copied layer takes the place and position of the selected one as an override of the instance, without detaching it: the rest of the instance keeps following its component, and the replacement stays when the component changes, until the component deletes the layer it replaced. With several layers selected, each gets its own copy. With nothing inside an instance selected, the keys paste to replace.
 
-Select the replacement and click **Restore component layer** in its header to bring the component's layer back. Replacements are saved in `.fig` files as OpenPencil plugin data on the instance; Figma shows the component's layer instead.
+Select the replacement and click **Restore component layer** in its header to bring the component's layer back. Replacements are saved in `.fig` files as Pairdraw plugin data on the instance; Figma shows the component's layer instead.
 
 ## Hit Testing
 

@@ -1,6 +1,6 @@
 ---
 title: Node Types
-description: Reference for OpenPencil scene graph node types, Figma Kiwi schema mappings, and supported engine node behavior.
+description: Reference for Pairdraw scene graph node types, Figma Kiwi schema mappings, and supported engine node behavior.
 ---
 
 # Node Types

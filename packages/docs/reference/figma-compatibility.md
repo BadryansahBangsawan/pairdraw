@@ -1,6 +1,6 @@
 # Figma Feature Matrix
 
-Feature-by-feature comparison of Figma Design capabilities with Open Pencil's current implementation status.
+Feature-by-feature comparison of Figma Design capabilities with Pairdraw's current implementation status.
 
 ::: tip Status Legend
 ✅ Supported — feature works end-to-end · 🟡 Partial — core behavior exists, some sub-features missing · 🔲 Not yet implemented
@@ -144,7 +144,7 @@ Feature-by-feature comparison of Figma Design capabilities with Open Pencil's cu
 | Toggle auto layout (<kbd>⇧</kbd><kbd>A</kbd>) | ✅ | Toggle on frame or wrap selection |
 | Gap (spacing between children) | ✅ | Configurable in properties panel |
 | Padding (uniform & per-side) | ✅ | All four sides independently |
-| Justify content | ✅ | Start, center, end, space-between; space-around is OpenPencil-only and Figma reads it as space-between |
+| Justify content | ✅ | Start, center, end, space-between; space-around is Pairdraw-only and Figma reads it as space-between |
 | Align items | ✅ | Start, center, end, stretch |
 | Child sizing (fixed, fill, hug) | ✅ | Per-child sizing modes |
 | Wrap | ✅ | Flex wrap for multi-line layout |
@@ -197,7 +197,7 @@ Feature-by-feature comparison of Figma Design capabilities with Open Pencil's cu
 | Figma clipboard (copy) | ✅ | Encode Kiwi binary that Figma can read |
 | Sketch file import | 🔲 | .sketch file parsing |
 | Image/SVG/PDF export | ✅ | PNG, JPG, WEBP, SVG, PDF with embedded fonts where their files can be embedded, PPTX, and draw.io |
-| Version history | 🟡 | OpenPencil Cloud documents (in preview): save named versions, browse, preview, restore, and duplicate; not for local files |
+| Version history | 🟡 | Pairdraw Cloud documents (in preview): save named versions, browse, preview, restore, and duplicate; not for local files |
 | Copy assets between tools | ✅ | Figma clipboard (Kiwi binary), Copy as text/SVG/PNG/JSX |
 
 ## Plugin API & Scripting

@@ -1,11 +1,11 @@
 ---
 title: useEditor
-description: Access the current injected OpenPencil editor instance.
+description: Access the current injected Pairdraw editor instance.
 ---
 
 # useEditor
 
-`useEditor()` returns the current injected OpenPencil editor.
+`useEditor()` returns the current injected Pairdraw editor.
 
 It is the main entry point for SDK composables and headless primitives that need editor access.
 

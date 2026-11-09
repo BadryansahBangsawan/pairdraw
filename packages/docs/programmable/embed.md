@@ -1,6 +1,6 @@
 ---
 title: Embedding the editor
-description: Show and drive the OpenPencil editor inside your own page through an iframe and a MessagePort.
+description: Show and drive the Pairdraw editor inside your own page through an iframe and a MessagePort.
 ---
 
 # Embedding the editor

@@ -9,7 +9,7 @@ Press <kbd>⌘</kbd><kbd>J</kbd> (<kbd>Ctrl</kbd> + <kbd>J</kbd>), or click the 
 
 ## Start from a prompt
 
-Home asks **What do you want to design?** above the search field. Describe a screen, a component, or a page and press <kbd>Enter</kbd> (<kbd>Shift</kbd> + <kbd>Enter</kbd> starts a new line): OpenPencil opens a new design where Home creates one, in your Cloud workspace or storage bucket when one is selected, opens its chat, and sends the prompt. When no model is set up yet, the prompt waits in the new design's chat while OpenPencil looks for a coding agent on your computer (see [Setup](#setup)), and is sent once one is connected. When none is found, guided setup opens first and the prompt is sent once it finishes; closing setup keeps the prompt on Home.
+Home asks **What do you want to design?** above the search field. Describe a screen, a component, or a page and press <kbd>Enter</kbd> (<kbd>Shift</kbd> + <kbd>Enter</kbd> starts a new line): Pairdraw opens a new design where Home creates one, in your Cloud workspace or storage bucket when one is selected, opens its chat, and sends the prompt. When no model is set up yet, the prompt waits in the new design's chat while Pairdraw looks for a coding agent on your computer (see [Setup](#setup)), and is sent once one is connected. When none is found, guided setup opens first and the prompt is sent once it finishes; closing setup keeps the prompt on Home.
 
 An empty page of a design offers the same prompt over the canvas on desktop. It sends into that document's chat and leaves once the page has a layer or an agent starts working, and the canvas around it keeps working as usual. Close it to hide it for that document, or turn off **Prompt on empty pages** in **Settings → Models → Chat**. Boards and read-only documents do not show it.
 
@@ -24,7 +24,7 @@ Both send into the document's chat, are offered only in documents you can edit, 
 
 ## Setup
 
-OpenPencil opens no setup dialog on first launch. While no model is set up, it looks for a [coding agent](./coding-agents) already on your computer: Claude Code, then Codex, then Gemini CLI. One that is installed and signed in becomes the design agent right away, and the chat says **Using Claude Code from this computer** with **Change** to pick another model. An agent that does not report whether it is signed in, such as Gemini CLI, is used too; if it turns out to be signed out, the chat shows the command that signs in to it. An agent that still needs a sign-in, or its ACP program or the MCP server installed, gets one button in the chat column, and nothing is signed in to or installed until you press it. A model you set up yourself is never replaced.
+Pairdraw opens no setup dialog on first launch. While no model is set up, it looks for a [coding agent](./coding-agents) already on your computer: Claude Code, then Codex, then Gemini CLI. One that is installed and signed in becomes the design agent right away, and the chat says **Using Claude Code from this computer** with **Change** to pick another model. An agent that does not report whether it is signed in, such as Gemini CLI, is used too; if it turns out to be signed out, the chat shows the command that signs in to it. An agent that still needs a sign-in, or its ACP program or the MCP server installed, gets one button in the chat column, and nothing is signed in to or installed until you press it. A model you set up yourself is never replaced.
 
 When no agent is found, or agents cannot run here, as in the web app without its [companion](./browser-agents), sending a prompt opens guided setup. It asks what AI should help with and what you already use: a coding agent such as Claude Code, Codex, Gemini CLI, or Pi in the desktop app, an API account, or a local or company server. It connects that access and assigns it to the **Design agent** and **Vision** roles, keeping anything you configured by hand. With OpenRouter you can sign in instead of pasting an API key. Run it any time from **Settings → Models → Run guided setup**. To configure models by hand:
 
@@ -55,7 +55,7 @@ Open **Settings → Tool access** to choose which tools direct AI model connecti
 
 Preferences are saved locally and apply to the next message, including in an existing conversation. They do not change an already-running request. Enabling many tools increases the schemas sent to the model.
 
-The **Local MCP** segment has independent settings for clients connected to OpenPencil's MCP server, including ACP and Pi agents. Restart the server and reconnect stdio clients after changing those settings. Remote MCP connections, WebMCP access, and Pi's shell/filesystem permissions remain separate.
+The **Local MCP** segment has independent settings for clients connected to Pairdraw's MCP server, including ACP and Pi agents. Restart the server and reconnect stdio clients after changing those settings. Remote MCP connections, WebMCP access, and Pi's shell/filesystem permissions remain separate.
 
 Tool toggles control which tools are offered, not which operations scripts may perform. An enabled `eval` or other script-capable tool can perform design operations whose dedicated tools are disabled; these switches are not a sandbox.
 
@@ -65,9 +65,9 @@ Skills are folders with a `SKILL.md` in the [Agent Skills](https://agentskills.i
 
 Open **Settings → Skills** to see where skills come from:
 
-- **Uploaded**: upload a ZIP of a skill's folder or a single `SKILL.md`. Uploads stay in OpenPencil and work in the browser too.
+- **Uploaded**: upload a ZIP of a skill's folder or a single `SKILL.md`. Uploads stay in Pairdraw and work in the browser too.
 - **Next to this document** (desktop): `.agents/skills` and `.claude/skills` folders from the open document's folder up to its repository. They stay off until you choose **Trust folder**, because a skill gives the AI instructions it follows.
-- **Built-in**: skills that ship with OpenPencil. Guides for landing pages, mobile apps, web apps, dashboards, slides, design systems, and Tailwind CSS v4, and skills that work on an existing design: `layout`, `restyle`, `dark-mode`, and `design-review`. They are on from the start, work in the browser too, and give way to a skill of yours with the same name.
+- **Built-in**: skills that ship with Pairdraw. Guides for landing pages, mobile apps, web apps, dashboards, slides, design systems, and Tailwind CSS v4, and skills that work on an existing design: `layout`, `restyle`, `dark-mode`, and `design-review`. They are on from the start, work in the browser too, and give way to a skill of yours with the same name.
 - **Shared agent skills** and **Claude Code skills** (desktop): `~/.agents/skills` and `~/.claude/skills`, where other coding agents install skills. Most of those are coding workflows, so these folders start off; the review step of the AI setup lists their skills for you to pick the ones that help with design.
 
 Uploads are on as soon as you add them, and any folder or skill can be switched on or off. The page lists them as Tool access lists tools: each source is a group with its own switch, and each skill has a switch beside it. Open a skill to read its instructions, see its files, or check warnings about how it departs from the specification. When two skills share a name, the first in that order is used.
@@ -119,16 +119,16 @@ The xAI, Meta, Kimi For Coding, Moonshot AI, Together AI, Fireworks AI, and Open
 
 ## External MCP connections
 
-The built-in chat and coding agents can use trusted [Model Context Protocol](https://modelcontextprotocol.io/) servers besides OpenPencil's own. In **Settings → MCP**, under MCP connections, add a named connection and enable it:
+The built-in chat and coding agents can use trusted [Model Context Protocol](https://modelcontextprotocol.io/) servers besides Pairdraw's own. In **Settings → MCP**, under MCP connections, add a named connection and enable it:
 
 - **Remote server**: a Streamable HTTP endpoint with no authentication, a bearer token, or **OAuth sign-in** for hosted servers such as Notion or Linear. Save the connection, then click **Sign in**; the server's sign-in page opens in a popup in the web app or in the system browser on the desktop. The app registers itself with the server's authorization server, uses PKCE, and refreshes the tokens it receives.
 - **Local command** (desktop app only): a program that speaks MCP over stdin and stdout, such as `npx` with `-y`, `@modelcontextprotocol/server-filesystem`, and a folder as arguments, one per line, plus optional `NAME=value` environment variables. The first time a command line runs, the app asks in a system dialog; it asks again when the program, an argument, or a variable name changes. Variables that choose the program or load code into it, such as `PATH`, `NODE_OPTIONS`, or `LD_PRELOAD`, are refused.
 
-The direct API chat lists each enabled server's tools with every message and offers them to the model as `mcp__<server>__<tool>`. A server that does not answer is left out of that message and tried again a minute later, and a local command you declined is not asked about again until you change its connection. All chats share the connections, which stay open while a reply runs and close after a few idle minutes. While the chat asks before actions (**Settings → AI**), a call to an external tool that its server does not mark as read-only asks first too. External tools are turned on and off with their connection, not in the list of OpenPencil's own tools. On the desktop, ACP agents receive the same connections when their session starts; a local command is passed to an agent only after you approve it in the same system dialog, and the web app passes none. Pi receives the remote connections. Bearer tokens, OAuth sign-ins, and variables are kept in the configured credential backend rather than ordinary settings. **Test connection** connects once and reports how many tools the server offers.
+The direct API chat lists each enabled server's tools with every message and offers them to the model as `mcp__<server>__<tool>`. A server that does not answer is left out of that message and tried again a minute later, and a local command you declined is not asked about again until you change its connection. All chats share the connections, which stay open while a reply runs and close after a few idle minutes. While the chat asks before actions (**Settings → AI**), a call to an external tool that its server does not mark as read-only asks first too. External tools are turned on and off with their connection, not in the list of Pairdraw's own tools. On the desktop, ACP agents receive the same connections when their session starts; a local command is passed to an agent only after you approve it in the same system dialog, and the web app passes none. Pi receives the remote connections. Bearer tokens, OAuth sign-ins, and variables are kept in the configured credential backend rather than ordinary settings. **Test connection** connects once and reports how many tools the server offers.
 
 In the web app a remote server must allow requests from the app's origin (CORS); the desktop app connects through its own HTTP client.
 
-Remote servers must use HTTPS. Loopback HTTP endpoints are accepted for local development. Review and trust a server before enabling it: its tools may read external data or perform actions with the credentials you provide. OpenPencil's built-in design MCP server remains attached automatically and does not need to be added here.
+Remote servers must use HTTPS. Loopback HTTP endpoints are accepted for local development. Review and trust a server before enabling it: its tools may read external data or perform actions with the credentials you provide. Pairdraw's built-in design MCP server remains attached automatically and does not need to be added here.
 
 ## What It Can Do
 
@@ -184,7 +184,7 @@ With **Follow agents** on, the crosshair button at the top of the AI chat, your 
 
 ## Notifications
 
-When an agent asks for permission and you have not answered for a few seconds, OpenPencil sends a system notification, so you can work in another app while it runs. **Settings → Notifications** also turns on notifications when a reply finishes or fails. They are sent only while OpenPencil is in the background or shows another document, and clicking one opens that document's chat. In the browser, click **Allow notifications** there first; the desktop app follows your system's notification settings.
+When an agent asks for permission and you have not answered for a few seconds, Pairdraw sends a system notification, so you can work in another app while it runs. **Settings → Notifications** also turns on notifications when a reply finishes or fails. They are sent only while Pairdraw is in the background or shows another document, and clicking one opens that document's chat. In the browser, click **Allow notifications** there first; the desktop app follows your system's notification settings.
 
 ## Example Prompts
 

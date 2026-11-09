@@ -76,6 +76,46 @@ describe('chat file identity', () => {
     expect('isSameEntry' in stored).toBe(false)
   })
 
+  test('the same file keeps its id in one session after its bytes change on save', async () => {
+    const store = createConversationStore()
+    let size = 3
+    let lastModified = 1_700_000_000_000
+    const handle = asDouble<FileSystemFileHandle>({
+      kind: 'file',
+      name: 'design.fig',
+      isSameEntry: async (other: FileSystemFileHandle) => other === handle,
+      getFile: async () => new File([new Uint8Array(size)], 'design.fig', { lastModified })
+    })
+    const firstId = await store.resolveFile(handle)
+
+    size = 4
+    lastModified = 1_700_000_100_000
+    expect(await store.resolveFile(handle)).toBe(firstId)
+  })
+
+  test('after a restart, a facts match keeps the same id when bytes change in that session', async () => {
+    const first = createConversationStore()
+    const handle = fileWithSize(3)
+    const firstId = await first.resolveFile(handle)
+
+    // Simulate a restart: the in-session entry map is gone, the handle is a new object.
+    const reopened = createConversationStore()
+    let size = 3
+    let lastModified = 1_700_000_000_000
+    const again = asDouble<FileSystemFileHandle>({
+      kind: 'file',
+      name: 'design.fig',
+      isSameEntry: async (other: FileSystemFileHandle) => other === again,
+      getFile: async () => new File([new Uint8Array(size)], 'design.fig', { lastModified })
+    })
+    expect(await reopened.resolveFile(again)).toBe(firstId)
+
+    // A save in that reopened session changes facts; the active handle must still match.
+    size = 4
+    lastModified = 1_700_000_100_000
+    expect(await reopened.resolveFile(again)).toBe(firstId)
+  })
+
   test('after a restart the same facts give the same id, and changed bytes give a new one', async () => {
     const first = createConversationStore()
     const handle = fileWithSize(3)

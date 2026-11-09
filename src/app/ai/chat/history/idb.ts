@@ -77,20 +77,7 @@ async function chatFileFacts(handle: FileSystemFileHandle): Promise<StoredChatFi
   return { name: handle.name, kind: handle.kind, size: file.size, lastModified: file.lastModified }
 }
 
-/**
- * Whether a stored file and a handle are the same file. A handle kept in this session compares
- * exactly by its entry; otherwise the stored name and facts match, which one file entry reports.
- */
-async function sameChatFile(saved: StoredChatFile, handle: FileSystemFileHandle): Promise<boolean> {
-  const live = liveChatHandles.get(saved)
-  if (live) {
-    try {
-      return await live.isSameEntry(handle)
-    } catch {
-      return false
-    }
-  }
-  const facts = await chatFileFacts(handle)
+function factsMatch(saved: StoredChatFile, facts: StoredChatFile): boolean {
   return (
     saved.name === facts.name &&
     saved.kind === facts.kind &&
@@ -99,12 +86,37 @@ async function sameChatFile(saved: StoredChatFile, handle: FileSystemFileHandle)
   )
 }
 
-const liveChatHandles = new WeakMap<StoredChatFile, FileSystemFileHandle>()
+/**
+ * Whether a stored file row and a handle are the same file. A handle kept in this session is
+ * compared by its entry, so a save that changes size or lastModified keeps the same chat id; only
+ * facts match after a restart, when no live handle survives. When they match, returns the handle's
+ * facts so the caller can register the handle and refresh stale stored facts.
+ */
+async function sameChatFile(
+  liveChatHandles: Map<string, FileSystemFileHandle>,
+  id: string,
+  saved: StoredChatFile,
+  handle: FileSystemFileHandle
+): Promise<StoredChatFile | null> {
+  const live = liveChatHandles.get(id)
+  if (live) {
+    try {
+      if (!(await live.isSameEntry(handle))) return null
+      return await chatFileFacts(handle)
+    } catch {
+      return null
+    }
+  }
+  const facts = await chatFileFacts(handle)
+  return factsMatch(saved, facts) ? facts : null
+}
 
 /** Transcript snapshots and Blob previews are committed atomically with their list metadata. */
 export function createConversationStore(): ConversationStore {
   const database = connectAppDatabase(definition)
   const getDatabase = () => database.open()
+  /** Live handles for file rows resolved in this session, keyed by row id. Never stored in IDB. */
+  const liveChatHandles = new Map<string, FileSystemFileHandle>()
   return {
     async list(documentId) {
       const db = await getDatabase()
@@ -213,8 +225,14 @@ export function createConversationStore(): ConversationStore {
         const files = await transaction.store.getAll()
         await transaction.done
         for (const [index, saved] of files.entries()) {
+          const id = String(keys[index])
           try {
-            if (await sameChatFile(saved, handle)) return String(keys[index])
+            const facts = await sameChatFile(liveChatHandles, id, saved, handle)
+            if (facts) {
+              liveChatHandles.set(id, handle)
+              if (!factsMatch(saved, facts)) await db.put('files', facts, id)
+              return id
+            }
           } catch {
             console.warn('[Chat history] Could not compare a saved file handle')
           }
@@ -222,7 +240,7 @@ export function createConversationStore(): ConversationStore {
         const id = `browser-file:${crypto.randomUUID()}`
         const facts = await chatFileFacts(handle)
         await db.put('files', facts, id)
-        liveChatHandles.set(facts, handle)
+        liveChatHandles.set(id, handle)
         return id
       })
     },

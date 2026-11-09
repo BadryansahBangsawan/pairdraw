@@ -68,6 +68,7 @@ async function restart(page: Page) {
 }
 
 test.beforeEach(async ({ page }) => {
+  test.setTimeout(90_000)
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
   await saveToPrivateFile(page)

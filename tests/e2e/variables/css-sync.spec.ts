@@ -114,7 +114,9 @@ test('pull shows what changed in the linked stylesheet, and push writes variable
   await dialog.getByTestId('variables-css-sync').click()
   await editor.page.getByTestId('variables-css-push').click()
   await expect(
-    editor.page.getByText('Variables written to globals.css: 0 changed, 1 new.')
+    editor.page
+      .locator('[data-slot="toast"]')
+      .filter({ hasText: 'Variables written to globals.css: 0 changed, 1 new.' })
   ).toBeVisible()
 
   const written = await writtenStylesheet()

@@ -44,7 +44,9 @@ test('a dropped file that is neither a document nor an image reports that it can
 
   await dropOnCanvas(page, [{ name: 'notes.txt', bytes: [...new TextEncoder().encode('hello')] }])
 
-  await expect(page.getByText('Could not open “notes.txt”', { exact: false })).toBeVisible()
+  await expect(
+    page.locator('[data-slot="toast"]').filter({ hasText: 'Could not open “notes.txt”' })
+  ).toBeVisible()
   await expect(tabs.getByRole('tab')).toHaveCount(1)
 })
 

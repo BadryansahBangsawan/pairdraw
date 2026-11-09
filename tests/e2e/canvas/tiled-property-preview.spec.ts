@@ -1,8 +1,12 @@
+import { readFileSync } from 'node:fs'
+
 import type { Page } from '@playwright/test'
 
 import { expect, test } from '#tests/e2e/fixtures'
 import { expectDefined } from '#tests/helpers/assert'
 import { CanvasHelper } from '#tests/helpers/canvas'
+import { mockFontsource } from '#tests/helpers/fonts/fontsource'
+import { trackFontModuleResources } from '#tests/helpers/fonts/runtime'
 import { propertyField } from '#tests/helpers/properties'
 
 test.use({ viewport: { width: 1400, height: 900 }, deviceScaleFactor: 1 })
@@ -75,7 +79,10 @@ async function directReference(page: Page) {
   }
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page }, testInfo) => {
+  // The font-arrival test fetches an invented family; it creates its own fixture so the
+  // download starts in a clean frame instead of arriving after the Inter fixture settled.
+  if (testInfo.title.includes('font arrival')) return
   await page.goto('/?test&no-rulers&renderer=tiled&navigation-benchmark')
   await new CanvasHelper(page).waitForInit()
   await page.evaluate(() => {
@@ -158,21 +165,66 @@ for (const [property, label] of [
 }
 
 test('font arrival invalidates tiled text and matches a fresh direct render', async ({ page }) => {
+  await trackFontModuleResources(page)
+  // Inter serves every weight from the in-memory variable file, so a weight change never
+  // fetches. Use an unknown family the resolver must download, as the app does for a font
+  // a document names that nothing local or bundled carries. Mock and gate before the first
+  // render, so the Fontsource font list the app loads on boot serves the fixture entries.
+  const fixture = { family: 'OpenPencil Tiled Fixture', subset: 'latin' as const }
+  const fontData = readFileSync('tests/fixtures/fonts/InterVariable-Latin.ttf')
+  await mockFontsource(page, [{ ...fixture, data: fontData }])
   const requested = Promise.withResolvers<undefined>()
   const release = Promise.withResolvers<undefined>()
-  await page.route('**/Inter-Bold*.ttf', async (route) => {
+  let fontRequests = 0
+  await page.route('**/openpencil-fixture-0.ttf', async (route) => {
+    fontRequests++
     requested.resolve(undefined)
     await release.promise
-    await route.continue()
+    await route.fulfill({
+      body: fontData,
+      contentType: 'font/ttf',
+      headers: { 'access-control-allow-origin': '*' }
+    })
+  })
+  await page.goto('/?test&no-rulers&renderer=tiled&navigation-benchmark')
+  await new CanvasHelper(page).waitForInit()
+  // The resolver caches failed demands across tests in the same browser context; reset it
+  // so this test really fetches. Without this the demand is `exhausted` before the route fires.
+  await page.evaluate(async () => {
+    const url = '/packages/core/src/text/index.ts'
+    const { fontResolver } = await import(/* @vite-ignore */ url)
+    fontResolver.reset()
+    const { fontManager } = await import(/* @vite-ignore */ url)
+    fontManager.resetWebFontFailures()
+    fontManager.setOnlineFontProviders({
+      google: false,
+      fontsource: true,
+      bunny: false,
+      fontshare: false
+    })
   })
   try {
     await page.evaluate(() => {
       const store = window.openPencil?.getStore?.()
-      if (!store) throw new Error('Editor unavailable')
-      const frame = store.getSelectedNodes()[0]
-      const textId = frame?.childIds[0]
-      if (!textId) throw new Error('Text fixture missing')
-      store.updateNode(textId, { fontWeight: 700 })
+      const hooks = window.openPencil?.test?.navigation
+      if (!store || !hooks) throw new Error('Editor unavailable')
+      hooks.startRecording('tiled-property-preview')
+      store.setZoomAroundPoint(1, 0, 0)
+      store.pan(-store.state.panX, -store.state.panY)
+      const frame = store.createShape('FRAME', 40, 40, 240, 120)
+      store.graph.createNode('TEXT', frame, {
+        name: 'Preview text',
+        x: 20,
+        y: 30,
+        width: 160,
+        height: 40,
+        text: 'Prepared text',
+        fontFamily: 'OpenPencil Tiled Fixture',
+        fontWeight: 400,
+        fontSize: 20,
+        fills: [{ type: 'SOLID', color: { r: 0, g: 0, b: 0, a: 1 }, opacity: 1, visible: true }]
+      })
+      store.select([frame])
     })
     await requested.promise
     await settle(page)
@@ -188,8 +240,9 @@ test('font arrival invalidates tiled text and matches a fresh direct render', as
     const tiled = await crop(page)
     expectTiledSubmission(await takeRecording(page))
     expect(tiled.equals(await directReference(page))).toBe(true)
+    expect(fontRequests).toBeGreaterThanOrEqual(1)
   } finally {
     release.resolve(undefined)
-    await page.unroute('**/Inter-Bold*.ttf')
+    await page.unroute('**/openpencil-fixture-0.ttf')
   }
 })

@@ -1,7 +1,7 @@
 import type { DocumentSourceIdentity } from '@/app/document/io/types'
 import { getRecoveryStore } from '@/app/document/recovery/store'
 import type { RecoverySnapshotMeta, RecoveryStore } from '@/app/document/recovery/types'
-import { fileIdentitiesMatch } from '@/app/tabs/open/identity'
+import { storedIdentityMatchesFile } from '@/app/tabs/open/identity'
 
 /**
  * How long a file's backup waits for that file to open again before the startup Recover dialog
@@ -16,7 +16,7 @@ export async function findFileBackups(
 ): Promise<RecoverySnapshotMeta[]> {
   const matches: RecoverySnapshotMeta[] = []
   for (const snapshot of await store.list()) {
-    if (snapshot.source && (await fileIdentitiesMatch(snapshot.source, identity))) {
+    if (snapshot.source && storedIdentityMatchesFile(snapshot.source, identity)) {
       matches.push(snapshot)
     }
   }

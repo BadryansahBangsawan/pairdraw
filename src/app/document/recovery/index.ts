@@ -9,5 +9,6 @@ export type {
   RecoverySnapshot,
   RecoverySnapshotInput,
   RecoverySnapshotMeta,
-  RecoveryStore
+  RecoveryStore,
+  StoredSourceIdentity
 } from '@/app/document/recovery/types'

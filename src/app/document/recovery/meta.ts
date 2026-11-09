@@ -2,13 +2,22 @@ import type { RecoverySnapshotInput, RecoverySnapshotMeta } from '@/app/document
 
 /** What a recovery store keeps about a snapshot it writes now, beside its bytes. */
 export function recoverySnapshotMeta(input: RecoverySnapshotInput): RecoverySnapshotMeta {
+  const source = input.source
   return {
     id: input.id,
     documentName: input.documentName || 'Untitled',
     updatedAt: new Date().toISOString(),
     byteLength: input.figBytes.byteLength,
     formatVersion: 1,
-    // A plain copy: storage clones it, and a reactive source would not clone.
-    ...(input.source ? { source: { handle: input.source.handle, path: input.source.path } } : {})
+    // A plain copy of name and path only: a live handle cannot be stored, and a reactive source
+    // would not clone.
+    ...(source
+      ? {
+          source:
+            'handleName' in source
+              ? source
+              : { handleName: source.handle?.name ?? null, path: source.path }
+        }
+      : {})
   }
 }

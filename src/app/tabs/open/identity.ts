@@ -1,4 +1,5 @@
 import type { DocumentSourceIdentity } from '@/app/document/io/types'
+import type { StoredSourceIdentity } from '@/app/document/recovery/types'
 
 type IdentitySource = {
   getSourceIdentity: () => DocumentSourceIdentity
@@ -31,6 +32,18 @@ export async function fileIdentitiesMatch(
 ): Promise<boolean> {
   if (first.path && second.path && first.path === second.path) return true
   return handlesMatch(first.handle, second.handle)
+}
+
+/**
+ * A stored file against a file that just opened. The stored copy keeps only the path and the
+ * browser file's name, so a browser file matches by its name.
+ */
+export function storedIdentityMatchesFile(
+  stored: StoredSourceIdentity,
+  identity: DocumentSourceIdentity
+): boolean {
+  if (stored.path && identity.path) return stored.path === identity.path
+  return stored.handleName !== null && identity.handle?.name === stored.handleName
 }
 
 export async function findTabByFileIdentity<T extends IdentifiedTab>(

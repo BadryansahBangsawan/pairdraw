@@ -15,6 +15,7 @@ import { createDocumentRecovery } from '@/app/document/recovery/controller'
 import { createMemoryRecoveryStore } from '@/app/document/recovery/memory'
 
 const FILE: DocumentSourceIdentity = { handle: null, path: '/designs/landing.fig' }
+const FILE_STORED = { handleName: null, path: '/designs/landing.fig' }
 
 /** An open file; its backups hold the revision they were built at. */
 function setup() {
@@ -45,7 +46,7 @@ describe('file backups', () => {
     version.value = 1
     await recovery.persistNow()
     const backup = await store.read('backup-1')
-    expect(backup?.source).toEqual(FILE)
+    expect(backup?.source).toEqual(FILE_STORED)
     expect(backup?.figBytes[0]).toBe(1)
     recovery.disposeRecovery()
   })
@@ -191,8 +192,8 @@ describe('file backups', () => {
       updatedAt: new Date(now - 1000).toISOString()
     }
     expect(listedAtStartup(meta, now)).toBe(true)
-    expect(listedAtStartup({ ...meta, source: FILE }, now)).toBe(false)
+    expect(listedAtStartup({ ...meta, source: FILE_STORED }, now)).toBe(false)
     const unclaimed = new Date(now - FILE_BACKUP_UNCLAIMED_MS).toISOString()
-    expect(listedAtStartup({ ...meta, source: FILE, updatedAt: unclaimed }, now)).toBe(true)
+    expect(listedAtStartup({ ...meta, source: FILE_STORED, updatedAt: unclaimed }, now)).toBe(true)
   })
 })

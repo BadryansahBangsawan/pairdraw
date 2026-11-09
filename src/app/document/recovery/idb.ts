@@ -18,12 +18,18 @@ import {
 
 const recoveryDatabase = defineAppDatabase<RecoveryDatabase>({
   name: APP_DATABASE_NAMES.recovery,
-  version: 1,
+  version: 2,
   callbacks: {
-    upgrade(database) {
+    upgrade(database, oldVersion, _newVersion, transaction) {
       if (!database.objectStoreNames.contains('meta'))
         database.createObjectStore('meta', { keyPath: 'id' })
       if (!database.objectStoreNames.contains('fig')) database.createObjectStore('fig')
+      // Backups stored from v1 hold a live file handle, which Chromium cannot read back without
+      // crashing the browser, so they go.
+      if (oldVersion >= 1 && oldVersion < 2) {
+        void transaction.objectStore('meta').clear()
+        void transaction.objectStore('fig').clear()
+      }
     }
   }
 })

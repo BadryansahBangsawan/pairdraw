@@ -8,11 +8,22 @@ import { APP_DATABASE_NAMES, defineAppDatabase, connectAppDatabase } from '@/app
 import { fromStorableBlobs, toStorableBlobs } from './blobs'
 import type { Conversation, ConversationMeta, ConversationStore } from './types'
 
+/**
+ * A browser file the chat knows by id, as metadata only. A live handle cannot be stored:
+ * Chromium crashes when deserializing one from IndexedDB, so only name and file facts survive.
+ */
+type StoredChatFile = Readonly<{
+  name: string
+  kind: FileSystemHandleKind
+  size: number
+  lastModified: number
+}>
+
 interface ChatDatabase extends DBSchema {
   conversations: { key: string; value: ConversationMeta; indexes: { document: string } }
   /** `Conversation['messages']` with each Blob stored as bytes (`./blobs`). */
   messages: { key: string; value: unknown }
-  files: { key: string; value: FileSystemFileHandle }
+  files: { key: string; value: StoredChatFile }
   deleted: { key: string; value: true }
   selected: { key: string; value: string }
   /** Each run a conversation sent, removed with the conversation (`@/app/ai/chat/trace`). */
@@ -25,9 +36,9 @@ interface ChatDatabase extends DBSchema {
 
 const definition = defineAppDatabase<ChatDatabase>({
   name: APP_DATABASE_NAMES.chats,
-  version: 5,
+  version: 6,
   callbacks: {
-    upgrade(database, oldVersion) {
+    upgrade(database, oldVersion, _newVersion, transaction) {
       if (oldVersion < 1) {
         database
           .createObjectStore('conversations', { keyPath: 'id' })
@@ -44,6 +55,11 @@ const definition = defineAppDatabase<ChatDatabase>({
         database.createObjectStore('traceAssets')
       }
       if (oldVersion < 5) database.createObjectStore('pins')
+      // The files store kept live handles, which Chromium cannot read back without crashing the
+      // browser, so they go.
+      if (oldVersion >= 1 && oldVersion < 6) {
+        void transaction.objectStore('files').clear()
+      }
     }
   }
 })
@@ -54,6 +70,36 @@ function restorePins(stored: unknown): Conversation['pins'] {
   const parsed = v.safeParse(conversationPinsSchema, fromStorableBlobs(stored))
   return parsed.success ? parsed.output : undefined
 }
+
+/** The facts a stored row keeps about a handle. */
+async function chatFileFacts(handle: FileSystemFileHandle): Promise<StoredChatFile> {
+  const file = await handle.getFile()
+  return { name: handle.name, kind: handle.kind, size: file.size, lastModified: file.lastModified }
+}
+
+/**
+ * Whether a stored file and a handle are the same file. A handle kept in this session compares
+ * exactly by its entry; otherwise the stored name and facts match, which one file entry reports.
+ */
+async function sameChatFile(saved: StoredChatFile, handle: FileSystemFileHandle): Promise<boolean> {
+  const live = liveChatHandles.get(saved)
+  if (live) {
+    try {
+      return await live.isSameEntry(handle)
+    } catch {
+      return false
+    }
+  }
+  const facts = await chatFileFacts(handle)
+  return (
+    saved.name === facts.name &&
+    saved.kind === facts.kind &&
+    saved.size === facts.size &&
+    saved.lastModified === facts.lastModified
+  )
+}
+
+const liveChatHandles = new WeakMap<StoredChatFile, FileSystemFileHandle>()
 
 /** Transcript snapshots and Blob previews are committed atomically with their list metadata. */
 export function createConversationStore(): ConversationStore {
@@ -164,17 +210,19 @@ export function createConversationStore(): ConversationStore {
         // isSameEntry is asynchronous and must run outside an IDB transaction.
         const transaction = db.transaction('files')
         const keys = await transaction.store.getAllKeys()
-        const handles = await transaction.store.getAll()
+        const files = await transaction.store.getAll()
         await transaction.done
-        for (const [index, saved] of handles.entries()) {
+        for (const [index, saved] of files.entries()) {
           try {
-            if (await saved.isSameEntry(handle)) return String(keys[index])
+            if (await sameChatFile(saved, handle)) return String(keys[index])
           } catch {
             console.warn('[Chat history] Could not compare a saved file handle')
           }
         }
         const id = `browser-file:${crypto.randomUUID()}`
-        await db.put('files', handle, id)
+        const facts = await chatFileFacts(handle)
+        await db.put('files', facts, id)
+        liveChatHandles.set(facts, handle)
         return id
       })
     },

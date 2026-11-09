@@ -6,6 +6,7 @@ import type { DocumentSourceIdentity } from '@/app/document/io/types'
 import type { RecoverySnapshot, RecoveryStore } from '@/app/document/recovery'
 import { getRecoveryStore, resetRecoveryStoreForTests } from '@/app/document/recovery'
 import { findFileBackups } from '@/app/document/recovery/backups'
+import { recoverySnapshotMeta } from '@/app/document/recovery/meta'
 import { setRecoveryRuntimeOverride } from '@/app/document/recovery/preferences'
 import {
   discardRecoveredChanges,
@@ -37,13 +38,8 @@ function referenceRecoveryStore(): RecoveryStore {
     },
     async write(input) {
       const snapshot: RecoverySnapshot = {
-        id: input.id,
-        documentName: input.documentName,
-        updatedAt: new Date().toISOString(),
-        byteLength: input.figBytes.byteLength,
-        formatVersion: 1,
-        figBytes: input.figBytes,
-        ...(input.source ? { source: input.source } : {})
+        ...recoverySnapshotMeta(input),
+        figBytes: input.figBytes
       }
       snapshots.set(input.id, snapshot)
       return snapshot

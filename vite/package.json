@@ -4,7 +4,8 @@
   "type": "module",
   "exports": {
     "./app-source": "./app-source.ts",
-    "./pwa": "./pwa.ts"
+    "./pwa": "./pwa/index.ts",
+    "./pwa/routes": "./pwa/routes.ts"
   },
   "dependencies": {
     "@open-pencil/core": "workspace:*",

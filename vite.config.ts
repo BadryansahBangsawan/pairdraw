@@ -114,6 +114,11 @@ export default defineConfig(async ({ command, mode }) => {
               }
       }
     },
+    worker: {
+      // Core's three workers are `type: 'module'`; their bundles must allow top-level await
+      // (harfbuzzjs), which the default `iife` output format rejects.
+      format: 'es'
+    },
     server: createDevServerOptions(
       host,
       __dirname,

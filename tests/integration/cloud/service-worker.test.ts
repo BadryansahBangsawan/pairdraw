@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import { CLOUD_PORTAL_PAGE_ROOTS } from '@open-pencil/cloud/contract'
-import { NOT_EDITOR_PAGES } from '@open-pencil/vite-config/pwa'
+import { NOT_EDITOR_PAGES } from '@open-pencil/vite-config/pwa/routes'
 
 const servedByEditor = (path: string) => !NOT_EDITOR_PAGES.some((pattern) => pattern.test(path))
 

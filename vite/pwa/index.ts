@@ -1,27 +1,26 @@
 import { VitePWA } from 'vite-plugin-pwa'
 
 /**
- * Pages that are not the editor's: OAuth callbacks, which relay a redirect, and, where a Cloud
- * server serves the editor, its API and its own pages, `CLOUD_PORTAL_PAGE_ROOTS` in
- * `@open-pencil/cloud/contract`, which loads only once packages are built. Workbox matches the
- * path with its query, so a page root may be followed by `?` as well as `/`.
+ * The editor service worker. The previous setup generated the SW from Workbox's own template
+ * (`vite-plugin-pwa`'s default `generateSW` strategy). Workbox builds that template's `import`
+ * lines from absolute filesystem paths (`'.../workbox-core/clientsClaim.mjs'`), and a checkout
+ * under a path with an apostrophe (e.g. `/Volumes/Badry's SSD/...`) ends the single-quoted
+ * string early, so the SW build fails to parse. No supported option changes that string form —
+ * `modulePathPrefix` and `inlineWorkboxRuntime` do not affect it. `injectManifest` instead takes
+ * the hand-authored `src/sw.ts` (bare workbox specifiers resolved by Rollup) and injects the
+ * precache manifest into it, so neither path contains a quoted absolute import.
  */
-export const NOT_EDITOR_PAGES = [
-  /^\/oauth\//,
-  /^\/api\//,
-  /^\/\.well-known\//,
-  /^\/(?:welcome|auth|account|admin|u)(?:[/?]|$)/
-]
-
 export function openPencilPwaPlugin() {
   return VitePWA({
     registerType: 'autoUpdate',
     devOptions: { enabled: false },
-    workbox: {
+    strategies: 'injectManifest',
+    srcDir: 'src',
+    filename: 'sw.ts',
+    injectManifest: {
+      // The precache manifest glob is relative to the built `dist/`, same as the generated SW.
       maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
-      globPatterns: ['**/*.{js,css,html,wasm,png,svg,ico,ttf,webmanifest}'],
-      navigateFallback: '/index.html',
-      navigateFallbackDenylist: NOT_EDITOR_PAGES
+      globPatterns: ['**/*.{js,css,html,wasm,png,svg,ico,ttf,webmanifest}']
     },
     manifest: {
       name: 'Pairdraw',

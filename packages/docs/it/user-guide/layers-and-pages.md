@@ -22,7 +22,7 @@ La selezione nell’albero e nell’area di lavoro resta sincronizzata. <kbd>Shi
 
 L’elenco consente di creare, aprire, rinominare ed eliminare pagine. Ogni pagina conserva posizione e livello di zoom della vista.
 
-Il menu contestuale sposta la selezione in un’altra pagina. Al cambio di pagina OpenPencil ripristina vista e selezione.
+Il menu contestuale sposta la selezione in un’altra pagina. Al cambio di pagina Pairdraw ripristina vista e selezione.
 
 ## Slide
 
@@ -38,7 +38,7 @@ L’area di lavoro Home elenca i documenti locali recenti e quelli dei provider 
 
 Un nuovo design resta conservato come bozza su questo dispositivo mentre ci lavori: ogni modifica viene scritta poco dopo averla fatta, quindi chiudere la sua scheda non chiede nulla. **Bozze** in Home le elenca con un’anteprima; aprine una per continuare, o scegli **Elimina bozza** dal suo menu <kbd>⋯</kbd> o contestuale per eliminarla per sempre. Salvare una bozza in un file o in un archivio, nell’editor o con **Salva come…** in Home, la toglie dalle Bozze. Le bozze vivono solo in questo profilo del browser o in questa installazione desktop, e richiedono che **Conserva automaticamente il lavoro non salvato** sia attivo e un browser che conserva i dati del sito.
 
-In **Impostazioni → Generali → Recupero**, **Conserva automaticamente il lavoro non salvato** controlla bozze e copie di recupero locali. Con il recupero attivo, i documenti non salvati senza percorso di file restano recuperabili anche dopo la chiusura delle loro schede. Quando OpenPencil offre **Recupera il lavoro non salvato**, scegli **Ripristina** per riaprire un documento o **Scarta** per eliminare la sua copia di recupero.
+In **Impostazioni → Generali → Recupero**, **Conserva automaticamente il lavoro non salvato** controlla bozze e copie di recupero locali. Con il recupero attivo, i documenti non salvati senza percorso di file restano recuperabili anche dopo la chiusura delle loro schede. Quando Pairdraw offre **Recupera il lavoro non salvato**, scegli **Ripristina** per riaprire un documento o **Scarta** per eliminare la sua copia di recupero.
 
 Un file che hai aperto conserva anche una copia di sicurezza delle modifiche che non sono ancora state salvate con lui, scritta mentre il salvataggio automatico è disattivato o quando la finestra si chiude prima che il salvataggio automatico le abbia scritte. La prossima volta che quel file si apre, **Modifiche recuperate** offre **Salva** per scriverle nel file, **Salva come…** per aprirle a parte e salvarle come un nuovo file, o **Non salvare** per lasciare il file com’è e scartare la copia. Chiudere la finestra di dialogo conserva la copia per la prossima volta. Salvare il file scarta le sue copie più vecchie, e nel browser una copia più vecchia dell’ultima modifica del file non viene offerta. Una copia il cui file non è stato aperto per una settimana, per esempio perché il file è stato spostato, compare anch’essa in **Recupera il lavoro non salvato**.
 

@@ -39,7 +39,7 @@ El texto puede enlazar a una página web o a una dirección de correo, en el tex
 
 ## Fuentes
 
-OpenPencil detecta fuentes del sistema cuando el entorno lo permite. Si falta una fuente, muestra su estado y usa una alternativa hasta que esté disponible.
+Pairdraw detecta fuentes del sistema cuando el entorno lo permite. Si falta una fuente, muestra su estado y usa una alternativa hasta que esté disponible.
 
 Cuando la fuente es variable, como Inter, la sección Tipografía muestra sus ejes (grosor, tamaño óptico, anchura y otros) con el valor con que se dibuja cada uno; elegir un grosor, una inclinación o una familia los devuelve a los del estilo. El tamaño óptico muestra **Auto** mientras sigue al tamaño de fuente; un valor o **Fijo** en su menú lo fija, y **Auto** hace que vuelva a seguirlo.
 

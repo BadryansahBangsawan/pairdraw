@@ -1,6 +1,6 @@
 # Compatibilità con Figma
 
-Confronto tra le funzioni di Figma Design e lo stato attuale di OpenPencil.
+Confronto tra le funzioni di Figma Design e lo stato attuale di Pairdraw.
 
 ::: tip Stato
 ✅ Supportato · 🟡 Parziale · 🔲 Non implementato
@@ -34,7 +34,7 @@ Ombre, sfocature, spessore del contorno, estremità, giunzioni, tratteggio, alli
 
 ## Disposizione automatica
 
-Flexbox, Grid, direzione, spaziatura, margini interni, allineamento, modalità di dimensionamento, ritorno a capo, disposizioni annidate, riordino tramite trascinamento e dimensioni minime e massime sono supportati. Lo spazio attorno esiste solo in OpenPencil; Figma mostra questi frame con spazio tra gli elementi.
+Flexbox, Grid, direzione, spaziatura, margini interni, allineamento, modalità di dimensionamento, ritorno a capo, disposizioni annidate, riordino tramite trascinamento e dimensioni minime e massime sono supportati. Lo spazio attorno esiste solo in Pairdraw; Figma mostra questi frame con spazio tra gli elementi.
 
 ## Componenti e sistemi di design
 
@@ -46,7 +46,7 @@ Collegamenti, trigger, azioni, animazioni, sovrapposizioni, scorrimento, flussi,
 
 ## Importazione ed esportazione
 
-Importazione/esportazione `.fig`, salvataggio, appunti Figma ed esportazione in immagini, SVG, PDF, PPTX e draw.io funzionano. La cronologia delle versioni è parziale: esiste solo per i documenti OpenPencil Cloud (in anteprima), non per i file locali. Manca l’importazione Sketch.
+Importazione/esportazione `.fig`, salvataggio, appunti Figma ed esportazione in immagini, SVG, PDF, PPTX e draw.io funzionano. La cronologia delle versioni è parziale: esiste solo per i documenti Pairdraw Cloud (in anteprima), non per i file locali. Manca l’importazione Sketch.
 
 ## API dei plugin e scripting
 

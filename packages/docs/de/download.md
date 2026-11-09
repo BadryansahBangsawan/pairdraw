@@ -3,8 +3,8 @@ layout: page
 landing: true
 sidebar: false
 aside: false
-title: OpenPencil herunterladen
-description: Die OpenPencil-Desktop-App für macOS, Windows und Linux herunterladen oder mit Homebrew installieren.
+title: Pairdraw herunterladen
+description: Die Pairdraw-Desktop-App für macOS, Windows und Linux herunterladen oder mit Homebrew installieren.
 ---
 
 <script setup>

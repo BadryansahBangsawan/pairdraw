@@ -1,6 +1,6 @@
 # Compatibilité avec Figma
 
-Comparaison entre les fonctions de Figma Design et l’état actuel d’OpenPencil.
+Comparaison entre les fonctions de Figma Design et l’état actuel d’Pairdraw.
 
 ::: tip État
 ✅ Pris en charge — fonctionne de bout en bout · 🟡 Partiel — le comportement principal existe, mais certaines fonctions manquent · 🔲 Non implémenté
@@ -52,7 +52,7 @@ Ombres, flous, épaisseur de contour, extrémités, jointures, tirets, alignemen
 
 ## Disposition automatique
 
-Flexbox, Grid, direction, espacement, marges intérieures, alignement, modes de taille, retour à la ligne, dispositions imbriquées, réordonnancement par glissement et dimensions minimales et maximales sont pris en charge. L’espace autour n’existe que dans OpenPencil ; Figma affiche ces cadres en espace entre les éléments.
+Flexbox, Grid, direction, espacement, marges intérieures, alignement, modes de taille, retour à la ligne, dispositions imbriquées, réordonnancement par glissement et dimensions minimales et maximales sont pris en charge. L’espace autour n’existe que dans Pairdraw ; Figma affiche ces cadres en espace entre les éléments.
 
 ## Composants et systèmes de design
 
@@ -73,7 +73,7 @@ Connexions, déclencheurs, actions, animations, superpositions, défilement, par
 | Copier vers Figma | ✅ | Produit un binaire Kiwi lisible par Figma |
 | Importer Sketch | 🔲 | Pas d’analyseur `.sketch` |
 | Export image/SVG/PDF | ✅ | PNG, JPG, WEBP, SVG, PDF avec polices intégrées lorsque leurs fichiers peuvent l’être, PPTX et draw.io |
-| Historique des versions | 🟡 | Documents OpenPencil Cloud (en préversion) : versions nommées, consultation, aperçu, restauration et duplication ; pas pour les fichiers locaux |
+| Historique des versions | 🟡 | Documents Pairdraw Cloud (en préversion) : versions nommées, consultation, aperçu, restauration et duplication ; pas pour les fichiers locaux |
 | Ressources entre outils | ✅ | Presse-papiers Figma et copie en texte/SVG/PNG/JSX |
 
 ## API de plugins et scripts

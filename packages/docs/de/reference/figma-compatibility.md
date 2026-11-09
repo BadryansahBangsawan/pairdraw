@@ -1,6 +1,6 @@
 # Figma-Kompatibilität
 
-Vergleich der Funktionen von Figma Design mit dem aktuellen Stand von OpenPencil.
+Vergleich der Funktionen von Figma Design mit dem aktuellen Stand von Pairdraw.
 
 ::: tip Status
 ✅ Unterstützt — funktioniert vollständig · 🟡 Teilweise — Grundfunktion vorhanden, einzelne Teile fehlen · 🔲 Nicht umgesetzt
@@ -76,7 +76,7 @@ Schatten, Ebenen-/Hintergrund-/Vordergrundunschärfe, Konturstärke, Enden, Verb
 
 ## Automatische Anordnung
 
-Flexbox, Grid, Richtung, Abstand, Innenabstand, Ausrichtung, Größenmodi, Umbruch, verschachtelte Anordnungen, Neuordnung durch Ziehen sowie Mindest- und Höchstmaße werden unterstützt. „Abstand ringsum“ gibt es nur in OpenPencil; Figma zeigt solche Rahmen als gleichmäßige Verteilung.
+Flexbox, Grid, Richtung, Abstand, Innenabstand, Ausrichtung, Größenmodi, Umbruch, verschachtelte Anordnungen, Neuordnung durch Ziehen sowie Mindest- und Höchstmaße werden unterstützt. „Abstand ringsum“ gibt es nur in Pairdraw; Figma zeigt solche Rahmen als gleichmäßige Verteilung.
 
 ## Komponenten und Designsysteme
 
@@ -88,7 +88,7 @@ Verbindungen, Auslöser, Aktionen, Animationen, Overlays, Scrollverhalten, Ablä
 
 ## Import und Export
 
-`.fig`-Import/-Export, Speichern, Figma-Zwischenablage sowie Export als Bild, SVG, PDF, PPTX und draw.io funktionieren. Der Versionsverlauf ist teilweise umgesetzt und nur für Dokumente in OpenPencil Cloud (Vorschau) verfügbar, nicht für lokale Dateien. Sketch-Import fehlt.
+`.fig`-Import/-Export, Speichern, Figma-Zwischenablage sowie Export als Bild, SVG, PDF, PPTX und draw.io funktionieren. Der Versionsverlauf ist teilweise umgesetzt und nur für Dokumente in Pairdraw Cloud (Vorschau) verfügbar, nicht für lokale Dateien. Sketch-Import fehlt.
 
 ## Plugin API, Zusammenarbeit und Entwicklermodus
 

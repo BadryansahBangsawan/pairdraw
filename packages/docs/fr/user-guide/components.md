@@ -31,7 +31,7 @@ Texte, visibilité booléenne, permutation d’instance et variantes sont pris e
 
 ## Ensembles et variantes
 
-Combinez des composants avec **Créer un jeu de composants** dans le menu contextuel. Chaque dimension — état, taille, par exemple — peut avoir plusieurs valeurs. OpenPencil accepte les combinaisons éparses, empêche les doublons et choisit par défaut la variante située en haut à gauche.
+Combinez des composants avec **Créer un jeu de composants** dans le menu contextuel. Chaque dimension — état, taille, par exemple — peut avoir plusieurs valeurs. Pairdraw accepte les combinaisons éparses, empêche les doublons et choisit par défaut la variante située en haut à gauche.
 
 ## Synchronisation
 

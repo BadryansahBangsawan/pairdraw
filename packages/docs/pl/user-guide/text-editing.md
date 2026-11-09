@@ -1,11 +1,11 @@
 ---
 title: Edycja tekstu
-description: Tworzenie i edytowanie tekstu, formatowanie oraz zarządzanie czcionkami w OpenPencil.
+description: Tworzenie i edytowanie tekstu, formatowanie oraz zarządzanie czcionkami w Pairdraw.
 ---
 
 # Edycja tekstu
 
-OpenPencil pozwala tworzyć obiekty tekstowe i edytować sformatowany tekst bezpośrednio na obszarze roboczym.
+Pairdraw pozwala tworzyć obiekty tekstowe i edytować sformatowany tekst bezpośrednio na obszarze roboczym.
 
 ## Tworzenie tekstu
 
@@ -97,11 +97,11 @@ Upuść plik TTF, OTF, WOFF lub WOFF2 na płótno, aby dodać jego rodzinę do s
 
 ## Brakujące czcionki i zamienniki
 
-Jeśli odpowiednia rodzina lub odmiana nie może zostać załadowana, OpenPencil pokazuje ostrzeżenie nad edytorem i nie przedstawia zastępczego wyglądu jako wiernego projektowi.
+Jeśli odpowiednia rodzina lub odmiana nie może zostać załadowana, Pairdraw pokazuje ostrzeżenie nad edytorem i nie przedstawia zastępczego wyglądu jako wiernego projektowi.
 
 Rozwiń ostrzeżenie, aby zobaczyć wszystkie brakujące odmiany i ich zamienniki. Przycisk **Wybierz warstwy** zaznacza odpowiednie obiekty tekstowe. Po zmianie dostępu do sieci, uprawnień do lokalnych czcionek lub ustawień dostawców naciśnij **Ponów ładowanie czcionek**.
 
-Odmiana może zostać utworzona na podstawie innej załadowanej odmiany tej samej rodziny. Jeśli brakuje całej rodziny, OpenPencil używa Inter, o ile jest dostępny.
+Odmiana może zostać utworzona na podstawie innej załadowanej odmiany tej samej rodziny. Jeśli brakuje całej rodziny, Pairdraw używa Inter, o ile jest dostępny.
 
 ## Wskazówki
 

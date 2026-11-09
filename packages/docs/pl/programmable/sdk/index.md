@@ -1,15 +1,15 @@
 ---
 title: Vue SDK
-description: Twórz edytory oparte na OpenPencil za pomocą komponentów bez narzuconego wyglądu i composables dla Vue.
+description: Twórz edytory oparte na Pairdraw za pomocą komponentów bez narzuconego wyglądu i composables dla Vue.
 ---
 
 # Vue SDK
 
-Pakiet `@open-pencil/vue` pozwala korzystać z OpenPencil nie tylko jako z samodzielnej aplikacji do projektowania.
+Pakiet `@open-pencil/vue` pozwala korzystać z Pairdraw nie tylko jako z samodzielnej aplikacji do projektowania.
 
-OpenPencil można osadzić w innym produkcie, narzędziu wewnętrznym albo edytorze przeznaczonym do konkretnego zadania. Nie trzeba przy tym korzystać z domyślnego interfejsu aplikacji.
+Pairdraw można osadzić w innym produkcie, narzędziu wewnętrznym albo edytorze przeznaczonym do konkretnego zadania. Nie trzeba przy tym korzystać z domyślnego interfejsu aplikacji.
 
-Aplikacja OpenPencil jest tylko jednym z interfejsów zbudowanych za pomocą tego zestawu narzędzi. SDK umożliwia stworzenie własnego.
+Aplikacja Pairdraw jest tylko jednym z interfejsów zbudowanych za pomocą tego zestawu narzędzi. SDK umożliwia stworzenie własnego.
 
 SDK udostępnia:
 

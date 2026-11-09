@@ -9,7 +9,7 @@ Text wird direkt auf der Arbeitsfläche erstellt und bearbeitet. Verschiedene Ze
 
 ## Text erstellen
 
-<kbd>T</kbd> drücken und auf die Arbeitsfläche klicken. OpenPencil erstellt ein leeres Textobjekt und aktiviert den Cursor.
+<kbd>T</kbd> drücken und auf die Arbeitsfläche klicken. Pairdraw erstellt ein leeres Textobjekt und aktiviert den Cursor.
 
 ## Bearbeitungsmodus
 
@@ -63,6 +63,6 @@ Ziehe eine TTF-, OTF-, WOFF- oder WOFF2-Datei auf die Arbeitsfläche, um ihre Fa
 
 ## Fehlende Schriften
 
-Kann eine Familie oder ein Schnitt nicht geladen werden, zeigt OpenPencil eine Warnung mit den verwendeten Ersatzschriften. Betroffene Ebenen können ausgewählt und die Schriften erneut geladen werden.
+Kann eine Familie oder ein Schnitt nicht geladen werden, zeigt Pairdraw eine Warnung mit den verwendeten Ersatzschriften. Betroffene Ebenen können ausgewählt und die Schriften erneut geladen werden.
 
 Fehlt nur ein Schnitt, kann er aus einem anderen Schnitt derselben Familie erzeugt werden. Fehlt die ganze Familie, wird nach Möglichkeit Inter verwendet.

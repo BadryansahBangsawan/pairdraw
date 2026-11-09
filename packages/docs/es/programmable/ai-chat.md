@@ -9,7 +9,7 @@ Pulsa <kbd>⌘</kbd><kbd>J</kbd> o <kbd>Ctrl</kbd><kbd>J</kbd>, o haz clic en el
 
 ## Configurar modelos
 
-La primera vez que abres OpenPencil, la configuración guiada pregunta en qué debe ayudarte la IA y qué usas ya: un agente de programación como Claude Code, Codex o Gemini CLI en la aplicación de escritorio, una cuenta de API o un servidor local o de la empresa. Conecta ese acceso y lo asigna a los roles **Design agent** y **Vision**, sin tocar lo que configuraste a mano. Con OpenRouter puedes iniciar sesión en lugar de pegar una clave de API. Puedes omitirla y volver a ejecutarla desde **Ajustes → IA y agentes → Iniciar la configuración guiada**. Para configurar los modelos a mano:
+La primera vez que abres Pairdraw, la configuración guiada pregunta en qué debe ayudarte la IA y qué usas ya: un agente de programación como Claude Code, Codex o Gemini CLI en la aplicación de escritorio, una cuenta de API o un servidor local o de la empresa. Conecta ese acceso y lo asigna a los roles **Design agent** y **Vision**, sin tocar lo que configuraste a mano. Con OpenRouter puedes iniciar sesión en lugar de pegar una clave de API. Puedes omitirla y volver a ejecutarla desde **Ajustes → IA y agentes → Iniciar la configuración guiada**. Para configurar los modelos a mano:
 
 1. Abre el chat.
 2. Selecciona el icono de ajustes.
@@ -19,9 +19,9 @@ Puedes guardar varios perfiles y asignarlos por separado a diseño, revisiones, 
 
 ## Proveedores
 
-OpenPencil admite conexiones compatibles con OpenAI y Anthropic, además de OpenRouter, Google, Amazon Bedrock, Google Vertex AI, Z.ai y proveedores locales. Amazon Bedrock usa una región y una clave de API de Bedrock, o claves de acceso de AWS en la app de escritorio; Vertex AI usa un proyecto, una ubicación y un token de acceso. Los modelos y capacidades disponibles dependen de cada servicio.
+Pairdraw admite conexiones compatibles con OpenAI y Anthropic, además de OpenRouter, Google, Amazon Bedrock, Google Vertex AI, Z.ai y proveedores locales. Amazon Bedrock usa una región y una clave de API de Bedrock, o claves de acceso de AWS en la app de escritorio; Vertex AI usa un proyecto, una ubicación y un token de acceso. Los modelos y capacidades disponibles dependen de cada servicio.
 
-OpenPencil no usa un servidor intermediario. Las solicitudes se envían directamente al proveedor; en el navegador se aplican sus políticas CORS. La fiabilidad de las llamadas de herramientas en flujo continuo también puede variar entre despliegues. Consulta [Compatibilidad BYOK](/programmable/byok-provider-compatibility) para ver mediciones y pasos de reproducción.
+Pairdraw no usa un servidor intermediario. Las solicitudes se envían directamente al proveedor; en el navegador se aplican sus políticas CORS. La fiabilidad de las llamadas de herramientas en flujo continuo también puede variar entre despliegues. Consulta [Compatibilidad BYOK](/programmable/byok-provider-compatibility) para ver mediciones y pasos de reproducción.
 
 ## Agentes ACP y MCP remoto
 
@@ -45,7 +45,7 @@ Las herramientas cubren lectura, creación, modificación, estructura, variables
 
 Las habilidades son carpetas con un `SKILL.md` en el formato [Agent Skills](https://agentskills.io/specification): instrucciones para un tipo de trabajo, con archivos de referencia opcionales. La IA integrada ve el nombre y la descripción de cada habilidad activa y carga sus instrucciones cuando una solicitud coincide; los scripts de una habilidad no se ejecutan.
 
-En **Ajustes → Habilidades** sube una habilidad como ZIP de su carpeta o como `SKILL.md`. En la app de escritorio también se leen `~/.agents/skills` y `~/.claude/skills`, y las carpetas `.agents/skills` y `.claude/skills` junto al documento abierto, que solo se usan tras **Confiar en la carpeta**. OpenPencil incluye habilidades integradas: guías para landing pages, apps móviles, apps web, paneles, diapositivas, sistemas de diseño y Tailwind CSS v4, además de `layout`, `restyle`, `dark-mode` y `design-review` para diseños existentes; una habilidad tuya con el mismo nombre tiene prioridad. Escribe `/` al principio de un mensaje o usa **Elegir una habilidad** bajo el campo de mensaje para elegir una habilidad, y `@` para mencionar una capa, una página o una habilidad. Las menciones aparecen como chips, también en las respuestas; al hacer clic se muestra la capa en el lienzo.
+En **Ajustes → Habilidades** sube una habilidad como ZIP de su carpeta o como `SKILL.md`. En la app de escritorio también se leen `~/.agents/skills` y `~/.claude/skills`, y las carpetas `.agents/skills` y `.claude/skills` junto al documento abierto, que solo se usan tras **Confiar en la carpeta**. Pairdraw incluye habilidades integradas: guías para landing pages, apps móviles, apps web, paneles, diapositivas, sistemas de diseño y Tailwind CSS v4, además de `layout`, `restyle`, `dark-mode` y `design-review` para diseños existentes; una habilidad tuya con el mismo nombre tiene prioridad. Escribe `/` al principio de un mensaje o usa **Elegir una habilidad** bajo el campo de mensaje para elegir una habilidad, y `@` para mencionar una capa, una página o una habilidad. Las menciones aparecen como chips, también en las respuestas; al hacer clic se muestra la capa en el lienzo.
 
 ## Explorar variantes
 
@@ -72,4 +72,4 @@ Las herramientas de inspección incluyen `get_jsx`, `diff_create` y `diff_jsx` p
 
 ## Privacidad y costes
 
-Las solicitudes se envían al proveedor configurado. Revisa sus condiciones, política de datos y precios antes de enviar documentos sensibles. OpenPencil no incluye créditos de modelos.
+Las solicitudes se envían al proveedor configurado. Revisa sus condiciones, política de datos y precios antes de enviar documentos sensibles. Pairdraw no incluye créditos de modelos.

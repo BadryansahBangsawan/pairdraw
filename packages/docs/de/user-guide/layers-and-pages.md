@@ -1,6 +1,6 @@
 ---
 title: Ebenen und Seiten
-description: Ebenen, Seiten und das Eigenschaften-Panel in OpenPencil verwenden.
+description: Ebenen, Seiten und das Eigenschaften-Panel in Pairdraw verwenden.
 ---
 
 # Ebenen und Seiten
@@ -41,7 +41,7 @@ Der Arbeitsbereich Start listet aktuelle lokale Dokumente und Dokumente aus konf
 
 Ein neues Design bleibt während der Arbeit als Entwurf auf diesem Gerät: Jede Änderung wird kurz nach dem Machen geschrieben, das Schließen seines Tabs fragt also nichts. **Entwürfe** auf Start listet sie mit einer Vorschau; öffnen Sie einen, um weiterzuarbeiten, oder wählen Sie **Entwurf löschen** aus seinem <kbd>⋯</kbd>- oder Rechtsklick-Menü, um ihn endgültig zu entfernen. Sichert man einen Entwurf in eine Datei oder in einen Speicher, im Editor oder mit **Sichern unter…** auf Start, verlässt er die Entwürfe. Entwürfe leben nur in diesem Browser-Profil bzw. dieser Desktop-Installation und setzen **Ungespeicherte Arbeit automatisch sichern** sowie einen Browser voraus, der Websitedaten behält.
 
-Unter **Einstellungen → Allgemein → Wiederherstellung** steuert **Ungespeicherte Arbeit automatisch sichern** Entwürfe und lokale Wiederherstellungskopien. Ist die Wiederherstellung aktiviert, bleiben nicht gesicherte Dokumente ohne Dateipfad wiederherstellbar, auch nachdem ihre Tabs geschlossen wurden. Bietet OpenPencil **Nicht gesicherte Arbeit wiederherstellen** an, wählen Sie **Wiederherstellen**, um ein Dokument erneut zu öffnen, oder **Verwerfen**, um seine Wiederherstellungskopie zu entfernen.
+Unter **Einstellungen → Allgemein → Wiederherstellung** steuert **Ungespeicherte Arbeit automatisch sichern** Entwürfe und lokale Wiederherstellungskopien. Ist die Wiederherstellung aktiviert, bleiben nicht gesicherte Dokumente ohne Dateipfad wiederherstellbar, auch nachdem ihre Tabs geschlossen wurden. Bietet Pairdraw **Nicht gesicherte Arbeit wiederherstellen** an, wählen Sie **Wiederherstellen**, um ein Dokument erneut zu öffnen, oder **Verwerfen**, um seine Wiederherstellungskopie zu entfernen.
 
 Eine geöffnete Datei behält auch ein Backup von Änderungen, die noch nicht mit ihr gesichert wurden — geschrieben, solange Autosave aus ist, oder wenn das Fenster schließt, bevor Autosave sie geschrieben hat. Öffnet sich die Datei das nächste Mal, bietet **Wiederhergestellte Änderungen** **Speichern** an, um sie in die Datei zu schreiben, **Speichern unter…**, um sie getrennt zu öffnen und als neue Datei zu speichern, oder **Nicht speichern**, um die Datei unverändert zu lassen und das Backup fallen zu lassen. Schließen des Dialogs behält das Backup für das nächste Mal. Sichert man die Datei, fallen ihre älteren Backups weg; im Browser wird ein Backup, das älter als die letzte Änderung der Datei ist, nicht angeboten. Ein Backup, dessen Datei eine Woche lang nicht geöffnet wurde, etwa weil die Datei umgezogen ist, steht ebenfalls in **Nicht gesicherte Arbeit wiederherstellen**.
 

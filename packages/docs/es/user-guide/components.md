@@ -31,7 +31,7 @@ Se admiten texto, visibilidad booleana, intercambio de instancia y variantes. La
 
 ## Conjuntos y variantes
 
-Combina componentes con **Crear conjunto de componentes** en el menú contextual. Cada dimensión de variante —por ejemplo, estado o tamaño— puede tener varios valores. OpenPencil admite combinaciones dispersas, impide duplicados y usa como predeterminada la variante situada arriba a la izquierda.
+Combina componentes con **Crear conjunto de componentes** en el menú contextual. Cada dimensión de variante —por ejemplo, estado o tamaño— puede tener varios valores. Pairdraw admite combinaciones dispersas, impide duplicados y usa como predeterminada la variante situada arriba a la izquierda.
 
 ## Sincronización
 

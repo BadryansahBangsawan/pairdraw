@@ -5,7 +5,7 @@ description: Eksport obrazów, SVG i wybranych obiektów do .fig oraz otwieranie
 
 # Eksport i pliki
 
-OpenPencil eksportuje pojedyncze obiekty jako obrazy, SVG albo osobne dokumenty `.fig`. Edytor otwiera pełne dokumenty `.fig` i `.pen`.
+Pairdraw eksportuje pojedyncze obiekty jako obrazy, SVG albo osobne dokumenty `.fig`. Edytor otwiera pełne dokumenty `.fig` i `.pen`.
 
 ## Eksport obrazów
 
@@ -51,7 +51,7 @@ Tekst jest kopiowany z widocznej zawartości, SVG jako znaczniki, PNG w skali 2�
 
 ## Dokumenty .fig i .pen
 
-OpenPencil używa binarnego formatu `.fig` Figmy i otwiera również dokumenty `.pen`.
+Pairdraw używa binarnego formatu `.fig` Figmy i otwiera również dokumenty `.pen`.
 
 ### Otwieranie
 
@@ -59,7 +59,7 @@ OpenPencil używa binarnego formatu `.fig` Figmy i otwiera również dokumenty `
 |-----------|-------|-----------------|
 | Otwórz plik | <kbd>⌘</kbd><kbd>O</kbd> | <kbd>Ctrl</kbd> + <kbd>O</kbd> |
 
-Dokument `.pen`, który importuje biblioteki `.pen`, otwiera się z używanymi komponentami bibliotek, wczytanymi z plików wskazanych względem dokumentu. W dokumencie są to komponenty biblioteki tylko do odczytu; zmieniaj je w bibliotece. Przeglądarka nie może czytać plików obok dokumentu, więc tam te komponenty są przerywanymi symbolami zastępczymi, a komunikat podaje nazwy bibliotek; otwórz plik w aplikacji desktopowej lub w CLI, aby je wczytać. Aplikacja desktopowa czyta biblioteki najwyżej dwa foldery nad dokumentem, ale nigdy z folderu domowego ani wyżej i nie przez dowiązania; plik upuszczony na okno nie wczytuje żadnych, więc otwórz go przez Plik > Otwórz…. CLI czyta biblioteki w katalogu roboczym. Węzły skryptu i przeglądarki, których OpenPencil nie uruchamia, również otwierają się jako symbole zastępcze z zachowanym plikiem skryptu lub adresem strony.
+Dokument `.pen`, który importuje biblioteki `.pen`, otwiera się z używanymi komponentami bibliotek, wczytanymi z plików wskazanych względem dokumentu. W dokumencie są to komponenty biblioteki tylko do odczytu; zmieniaj je w bibliotece. Przeglądarka nie może czytać plików obok dokumentu, więc tam te komponenty są przerywanymi symbolami zastępczymi, a komunikat podaje nazwy bibliotek; otwórz plik w aplikacji desktopowej lub w CLI, aby je wczytać. Aplikacja desktopowa czyta biblioteki najwyżej dwa foldery nad dokumentem, ale nigdy z folderu domowego ani wyżej i nie przez dowiązania; plik upuszczony na okno nie wczytuje żadnych, więc otwórz go przez Plik > Otwórz…. CLI czyta biblioteki w katalogu roboczym. Węzły skryptu i przeglądarki, których Pairdraw nie uruchamia, również otwierają się jako symbole zastępcze z zachowanym plikiem skryptu lub adresem strony.
 
 ### Zapisywanie
 
@@ -68,7 +68,7 @@ Dokument `.pen`, który importuje biblioteki `.pen`, otwiera się z używanymi k
 | Zapisz | <kbd>⌘</kbd><kbd>S</kbd> | <kbd>Ctrl</kbd> + <kbd>S</kbd> |
 | Zapisz jako | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>S</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>S</kbd> |
 
-**Zapisz** nadpisuje bieżący plik, jeśli OpenPencil nadal ma uprawnienia do zapisu. **Zapisz jako** pozwala wybrać nową ścieżkę.
+**Zapisz** nadpisuje bieżący plik, jeśli Pairdraw nadal ma uprawnienia do zapisu. **Zapisz jako** pozwala wybrać nową ścieżkę.
 
 W Chrome i Edge przeglądarka korzysta z File System Access API. Inne przeglądarki, w tym Safari, pobierają plik.
 
@@ -76,7 +76,7 @@ Zapisany plik jest skompresowany i zawiera miniaturę widoczną w menedżerze pl
 
 ### Zgodność z Figmą
 
-Pliki wyeksportowane z OpenPencil można otworzyć w Figmie, a dokumenty Figmy — w OpenPencil. Format `.fig` zachowuje typy obiektów, właściwości, zalewy, obwiednie, efekty, dane wektorowe i parametry układu.
+Pliki wyeksportowane z Pairdraw można otworzyć w Figmie, a dokumenty Figmy — w Pairdraw. Format `.fig` zachowuje typy obiektów, właściwości, zalewy, obwiednie, efekty, dane wektorowe i parametry układu.
 
 ## Wskazówki
 

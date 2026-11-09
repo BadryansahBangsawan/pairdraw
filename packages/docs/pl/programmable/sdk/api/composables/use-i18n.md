@@ -1,6 +1,6 @@
 ---
 title: useI18n
-description: Lokalizowane etykiety OpenPencil i zmiana aktywnego locale SDK.
+description: Lokalizowane etykiety Pairdraw i zmiana aktywnego locale SDK.
 ---
 
 # useI18n

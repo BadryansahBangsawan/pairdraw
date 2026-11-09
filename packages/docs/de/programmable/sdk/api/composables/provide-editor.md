@@ -1,6 +1,6 @@
 ---
 title: provideEditor
-description: Eine OpenPencil-Editor-Instanz über Vue dependency injection bereitstellen.
+description: Eine Pairdraw-Editor-Instanz über Vue dependency injection bereitstellen.
 ---
 
 # provideEditor
@@ -39,7 +39,7 @@ provideEditor(props.editor)
 
 ## Hinweise
 
-Das aktuelle SDK verwendet direkt `provideEditor()` und `useEditor()`. Ältere Beispiele und einzelne Fehlermeldungen erwähnen noch `OpenPencilProvider`; dieser Component gehört jedoch nicht zum aktuellen öffentlichen API.
+Das aktuelle SDK verwendet direkt `provideEditor()` und `useEditor()`. Ältere Beispiele und einzelne Fehlermeldungen erwähnen noch `PairdrawProvider`; dieser Component gehört jedoch nicht zum aktuellen öffentlichen API.
 
 ## Siehe auch
 

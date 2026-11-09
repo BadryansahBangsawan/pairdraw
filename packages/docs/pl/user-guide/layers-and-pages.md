@@ -1,6 +1,6 @@
 ---
 title: Warstwy i strony
-description: Praca z warstwami, stronami i panelem właściwości w OpenPencil.
+description: Praca z warstwami, stronami i panelem właściwości w Pairdraw.
 ---
 
 # Warstwy i strony
@@ -20,7 +20,7 @@ Wybranie warstwy na liście zaznacza odpowiadający jej obiekt na obszarze roboc
 
 ## Strony
 
-- Kliknij stronę, aby do niej przejść. OpenPencil przywróci zapisane położenie i powiększenie.
+- Kliknij stronę, aby do niej przejść. Pairdraw przywróci zapisane położenie i powiększenie.
 - Użyj przycisku dodawania, aby utworzyć stronę.
 - Usuń bieżącą stronę za pomocą odpowiedniego działania.
 - Kliknij nazwę dwukrotnie, aby ją zmienić.
@@ -41,7 +41,7 @@ Obszar roboczy Start wyświetla ostatnie dokumenty lokalne oraz dokumenty z skon
 
 Nowy projekt pozostaje zachowany jako szkic na tym urządzeniu podczas pracy nad nim: każda zmiana jest zapisywana krótko po jej wykonaniu, więc zamknięcie jego karty o nic nie pyta. **Szkice** na Starcie wyświetla je z podglądem; otwórz jeden, aby kontynuować, albo wybierz **Usuń szkic** z jego menu <kbd>⋯</kbd> lub menu kontekstowego, aby usunąć go na stałe. Zapisanie szkicu do pliku lub repozytorium, w edytorze albo przez **Zapisz jako…** na Starcie, usuwa go ze Szkiców. Szkice żyją tylko w tym profilu przeglądarki lub tej instalacji desktopowej i wymagają, aby **Automatycznie zachowuj niezapisaną pracę** było włączone, a przeglądarka zachowywała dane witryny.
 
-W **Ustawienia → Ogólne → Odzyskiwanie**, **Automatycznie zachowuj niezapisaną pracę** steruje szkicami oraz lokalnymi kopiami odzyskiwania. Gdy odzyskiwanie jest włączone, niezapisane dokumenty bez ścieżki pliku pozostają możliwe do odzyskania nawet po zamknięciu ich kart. Gdy OpenPencil oferuje **Odzyskaj niezapisaną pracę**, wybierz **Przywróć**, aby ponownie otworzyć dokument, lub **Odrzuć**, aby usunąć jego kopię odzyskiwania.
+W **Ustawienia → Ogólne → Odzyskiwanie**, **Automatycznie zachowuj niezapisaną pracę** steruje szkicami oraz lokalnymi kopiami odzyskiwania. Gdy odzyskiwanie jest włączone, niezapisane dokumenty bez ścieżki pliku pozostają możliwe do odzyskania nawet po zamknięciu ich kart. Gdy Pairdraw oferuje **Odzyskaj niezapisaną pracę**, wybierz **Przywróć**, aby ponownie otworzyć dokument, lub **Odrzuć**, aby usunąć jego kopię odzyskiwania.
 
 Otwarty plik zachowuje również kopię zapasową zmian, które nie zostały jeszcze zapisane do niego — zapisywaną, gdy autosave jest wyłączony, albo gdy okno zamyka się, zanim autosave je zapisze. Następnym razem, gdy ten plik zostanie otwarty, **Odzyskane zmiany** oferuje **Zapisz**, aby zapisać je do pliku, **Zapisz jako…**, aby otworzyć je osobno i zapisać jako nowy plik, albo **Nie zapisuj**, aby pozostawić plik nietkniętym i odrzucić kopię. Zamknięcie okna dialogowego zachowuje kopię na następny raz. Zapisanie pliku usuwa jego starsze kopie, a w przeglądarce kopia starsza niż ostatnia zmiana pliku nie jest oferowana. Kopia, której plik nie był otwarty przez tydzień, na przykład dlatego, że plik został przeniesiony, pojawia się również w **Odzyskaj niezapisaną pracę**.
 

@@ -19,7 +19,7 @@ Plusieurs profils peuvent être enregistrés et attribués séparément au desig
 
 ## Fournisseurs
 
-OpenPencil prend en charge les connexions compatibles avec OpenAI et Anthropic, ainsi qu’OpenRouter, Google, Amazon Bedrock, Google Vertex AI, Z.ai et des fournisseurs locaux. Amazon Bedrock utilise une région et une clé d’API Bedrock, ou des clés d’accès AWS dans l’application de bureau ; Vertex AI utilise un projet, un emplacement et un jeton d’accès.
+Pairdraw prend en charge les connexions compatibles avec OpenAI et Anthropic, ainsi qu’OpenRouter, Google, Amazon Bedrock, Google Vertex AI, Z.ai et des fournisseurs locaux. Amazon Bedrock utilise une région et une clé d’API Bedrock, ou des clés d’accès AWS dans l’application de bureau ; Vertex AI utilise un projet, un emplacement et un jeton d’accès.
 
 Aucun serveur intermédiaire n’est utilisé. Les requêtes sont envoyées directement au fournisseur ; dans le navigateur, ses règles CORS s’appliquent. La fiabilité des appels d’outils en diffusion continue peut varier selon les déploiements. Consultez la [compatibilité BYOK](/programmable/byok-provider-compatibility).
 
@@ -45,7 +45,7 @@ Les outils couvrent lecture, création, modification, structure, variables, vect
 
 Les compétences sont des dossiers contenant un `SKILL.md` au format [Agent Skills](https://agentskills.io/specification) : des instructions pour un type de travail, avec des fichiers de référence facultatifs. L’IA intégrée voit le nom et la description de chaque compétence active et charge ses instructions quand une demande correspond ; les scripts d’une compétence ne s’exécutent pas.
 
-Dans **Réglages → Compétences**, importez une compétence sous forme de ZIP de son dossier ou de `SKILL.md`. Dans l’application de bureau, `~/.agents/skills` et `~/.claude/skills` sont aussi lus, ainsi que les dossiers `.agents/skills` et `.claude/skills` à côté du document ouvert, utilisés seulement après **Faire confiance au dossier**. OpenPencil fournit des compétences intégrées : des guides pour les landing pages, les apps mobiles, les apps web, les tableaux de bord, les diapositives, les design systems et Tailwind CSS v4, ainsi que `layout`, `restyle`, `dark-mode` et `design-review` pour un design existant ; une compétence à vous du même nom passe avant. Tapez `/` au début d’un message ou utilisez **Choisir une compétence** sous le champ de message pour choisir une compétence, et `@` pour mentionner un calque, une page ou une compétence. Les mentions s’affichent sous forme de puces, y compris dans les réponses ; un clic montre le calque sur le canevas.
+Dans **Réglages → Compétences**, importez une compétence sous forme de ZIP de son dossier ou de `SKILL.md`. Dans l’application de bureau, `~/.agents/skills` et `~/.claude/skills` sont aussi lus, ainsi que les dossiers `.agents/skills` et `.claude/skills` à côté du document ouvert, utilisés seulement après **Faire confiance au dossier**. Pairdraw fournit des compétences intégrées : des guides pour les landing pages, les apps mobiles, les apps web, les tableaux de bord, les diapositives, les design systems et Tailwind CSS v4, ainsi que `layout`, `restyle`, `dark-mode` et `design-review` pour un design existant ; une compétence à vous du même nom passe avant. Tapez `/` au début d’un message ou utilisez **Choisir une compétence** sous le champ de message pour choisir une compétence, et `@` pour mentionner un calque, une page ou une compétence. Les mentions s’affichent sous forme de puces, y compris dans les réponses ; un clic montre le calque sur le canevas.
 
 ## Explorer des variantes
 
@@ -70,4 +70,4 @@ L’assistant peut vérifier visuellement son travail. Lorsque `export_image` es
 
 ## Confidentialité et coût
 
-Les requêtes sont envoyées au fournisseur configuré. Vérifiez ses conditions, sa politique de données et ses tarifs avant d’envoyer des documents sensibles. OpenPencil ne fournit pas de crédits de modèles.
+Les requêtes sont envoyées au fournisseur configuré. Vérifiez ses conditions, sa politique de données et ses tarifs avant d’envoyer des documents sensibles. Pairdraw ne fournit pas de crédits de modèles.

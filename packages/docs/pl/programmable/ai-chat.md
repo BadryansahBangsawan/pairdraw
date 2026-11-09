@@ -42,7 +42,7 @@ Możesz utworzyć kilka modeli i osobno przypisać je do projektowania, przeglą
 | **Amazon Bedrock**     | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5 | Region i klucz API Bedrock albo klucze dostępu AWS w aplikacji desktopowej |
 | **Google Vertex AI**   | Claude Sonnet 5.5, Claude Opus 5.5, Gemini 3.8 Flash, Gemini 4 Argon   | Projekt i lokalizacja z tokenem dostępu; klucz API obsługuje tylko Gemini  |
 
-OpenPencil nie wymaga osobnego serwera ani subskrypcji: żądania są wysyłane bezpośrednio do dostawcy. W przeglądarce podlegają jego zasadom CORS. Poszczególne wdrożenia modeli różnią się niezawodnością przesyłania wywołań narzędzi. Wyniki pomiarów znajdują się na stronie [Zgodność dostawców i modeli BYOK](/programmable/byok-provider-compatibility).
+Pairdraw nie wymaga osobnego serwera ani subskrypcji: żądania są wysyłane bezpośrednio do dostawcy. W przeglądarce podlegają jego zasadom CORS. Poszczególne wdrożenia modeli różnią się niezawodnością przesyłania wywołań narzędzi. Wyniki pomiarów znajdują się na stronie [Zgodność dostawców i modeli BYOK](/programmable/byok-provider-compatibility).
 
 ### Zewnętrzne połączenia MCP
 
@@ -52,7 +52,7 @@ Token jest przechowywany w skonfigurowanym magazynie danych uwierzytelniających
 
 Wbudowany czat z bezpośrednim API również korzysta z włączonych połączeń i udostępnia ich narzędzia modelowi jako `mcp__<serwer>__<narzędzie>`. Hostowane serwery, takie jak Notion czy Linear, używają **Logowania OAuth**: zapisz połączenie, a potem kliknij **Zaloguj się**. W aplikacji desktopowej połączenie może też być **Poleceniem lokalnym**, czyli programem, który mówi MCP przez stdin i stdout, z jednym argumentem w wierszu i opcjonalnymi zmiennymi środowiskowymi `NAZWA=wartość`. Przed pierwszym uruchomieniem danego polecenia aplikacja pyta o zgodę w oknie systemowym; zmienne takie jak `PATH` czy `NODE_OPTIONS`, które ładują kod, są niedozwolone. Dopóki czat pyta przed działaniami, pyta też przed każdym zewnętrznym narzędziem, którego serwer nie oznacza jako tylko do odczytu. W aplikacji webowej zdalny serwer musi akceptować żądania z adresu aplikacji (CORS).
 
-Zdalny serwer musi używać HTTPS. W lokalnym środowisku programistycznym dozwolone są adresy pętli zwrotnej przez HTTP. Włączaj wyłącznie zaufane serwery. Wbudowany serwer MCP OpenPencil jest podłączany automatycznie.
+Zdalny serwer musi używać HTTPS. W lokalnym środowisku programistycznym dozwolone są adresy pętli zwrotnej przez HTTP. Włączaj wyłącznie zaufane serwery. Wbudowany serwer MCP Pairdraw jest podłączany automatycznie.
 
 ## Sesje agentów
 
@@ -68,7 +68,7 @@ Asystent korzysta z ponad 90 narzędzi do tworzenia, stylizowania, układu, komp
 
 Umiejętności to foldery z plikiem `SKILL.md` w formacie [Agent Skills](https://agentskills.io/specification): instrukcje do określonego rodzaju pracy z opcjonalnymi plikami pomocniczymi. Wbudowane AI widzi nazwę i opis każdej włączonej umiejętności i wczytuje jej instrukcje, gdy prośba pasuje; skrypty z umiejętności nie są uruchamiane.
 
-W **Ustawienia → Umiejętności** prześlij umiejętność jako ZIP jej folderu lub jako `SKILL.md`. W aplikacji desktopowej odczytywane są też `~/.agents/skills` i `~/.claude/skills` oraz foldery `.agents/skills` i `.claude/skills` obok otwartego dokumentu, używane dopiero po **Zaufaj folderowi**. OpenPencil ma wbudowane umiejętności: przewodniki po landing page’ach, aplikacjach mobilnych, aplikacjach webowych, pulpitach, slajdach, systemach projektowych i Tailwind CSS v4 oraz `layout`, `restyle`, `dark-mode` i `design-review` do istniejących projektów; twoja umiejętność o tej samej nazwie ma pierwszeństwo. Wpisz `/` na początku wiadomości lub użyj **Wybierz umiejętność** pod polem wiadomości, aby wybrać umiejętność, i `@`, aby wspomnieć warstwę, stronę lub umiejętność. Wzmianki pojawiają się jako chipy, także w odpowiedziach; kliknięcie pokazuje warstwę na płótnie.
+W **Ustawienia → Umiejętności** prześlij umiejętność jako ZIP jej folderu lub jako `SKILL.md`. W aplikacji desktopowej odczytywane są też `~/.agents/skills` i `~/.claude/skills` oraz foldery `.agents/skills` i `.claude/skills` obok otwartego dokumentu, używane dopiero po **Zaufaj folderowi**. Pairdraw ma wbudowane umiejętności: przewodniki po landing page’ach, aplikacjach mobilnych, aplikacjach webowych, pulpitach, slajdach, systemach projektowych i Tailwind CSS v4 oraz `layout`, `restyle`, `dark-mode` i `design-review` do istniejących projektów; twoja umiejętność o tej samej nazwie ma pierwszeństwo. Wpisz `/` na początku wiadomości lub użyj **Wybierz umiejętność** pod polem wiadomości, aby wybrać umiejętność, i `@`, aby wspomnieć warstwę, stronę lub umiejętność. Wzmianki pojawiają się jako chipy, także w odpowiedziach; kliknięcie pokazuje warstwę na płótnie.
 
 ## Badanie wariantów
 

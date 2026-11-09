@@ -1,6 +1,6 @@
 # Zgodność z Figmą
 
-Porównanie funkcji Figma Design z obecnymi możliwościami OpenPencil.
+Porównanie funkcji Figma Design z obecnymi możliwościami Pairdraw.
 
 ::: tip Stan
 ✅ Obsługiwane — działa w pełnym zakresie · 🟡 Częściowo — podstawowe działanie istnieje, ale brakuje części funkcji · 🔲 Brak
@@ -56,7 +56,7 @@ Porównanie funkcji Figma Design z obecnymi możliwościami OpenPencil.
 | Pomiar odległości | ✅ | Przytrzymaj <kbd>⌥</kbd> i najedź kursorem, aby zobaczyć odległości od zaznaczenia |
 | Edycja zbiorcza | ✅ | Położenie, rozmiar, wygląd, zalew, obwiednia i efekty; różne wartości jako `Mixed` |
 | Podobne obiekty | 🔲 | Brak wyszukiwania podobnych warstw |
-| Kopiowanie właściwości | ✅ | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>C</kbd> / <kbd>⌥</kbd><kbd>⌘</kbd><kbd>V</kbd> przez schowek systemowy, także między OpenPencil a Figmą: zalewy, obwiednie, efekty, narożniki, style, zmienne, automatyczny układ między ramkami i styl tekstu między warstwami tekstowymi |
+| Kopiowanie właściwości | ✅ | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>C</kbd> / <kbd>⌥</kbd><kbd>⌘</kbd><kbd>V</kbd> przez schowek systemowy, także między Pairdraw a Figmą: zalewy, obwiednie, efekty, narożniki, style, zmienne, automatyczny układ między ramkami i styl tekstu między warstwami tekstowymi |
 | Relacje rodzic–potomek | ✅ | Pełna hierarchia przez `parentIndex` i zmiana rodzica przeciąganiem |
 
 ## Narzędzia wektorowe
@@ -132,7 +132,7 @@ Porównanie funkcji Figma Design z obecnymi możliwościami OpenPencil.
 | Przepływ poziomy i pionowy | ✅ | Flexbox Yoga WASM |
 | Włączanie | ✅ | <kbd>⇧</kbd><kbd>A</kbd> dla ramki lub zaznaczenia |
 | Odstęp i wypełnienie | ✅ | Wspólne lub osobne wartości |
-| Wyrównanie | ✅ | Początek, środek, koniec, rozciągnięcie i rozdzielenie; odstęp dookoła istnieje tylko w OpenPencil, a Figma pokazuje go jako rozdzielenie |
+| Wyrównanie | ✅ | Początek, środek, koniec, rozciągnięcie i rozdzielenie; odstęp dookoła istnieje tylko w Pairdraw, a Figma pokazuje go jako rozdzielenie |
 | Rozmiary | ✅ | Stały, Wypełnij i Dopasuj |
 | Zawijanie | ✅ | Flex wrap |
 | Grid | ✅ | CSS Grid przez odmianę Yoga |
@@ -167,7 +167,7 @@ Połączenia, wyzwalacze, działania, animacje, nakładki, przewijanie, przepły
 | Schowek Figmy | ✅ | Kopiowanie i wklejanie binarnego Kiwi |
 | Import Sketch | 🔲 | Brak odczytu `.sketch` |
 | Obrazy, SVG i PDF | ✅ | PNG, JPG, WEBP, SVG, PDF z osadzonymi czcionkami, gdy ich pliki da się osadzić, PPTX i draw.io |
-| Historia wersji | 🟡 | Dokumenty OpenPencil Cloud (wersja zapoznawcza): zapisywanie nazwanych wersji, przeglądanie, podgląd, przywracanie i powielanie; niedostępne dla plików lokalnych |
+| Historia wersji | 🟡 | Dokumenty Pairdraw Cloud (wersja zapoznawcza): zapisywanie nazwanych wersji, przeglądanie, podgląd, przywracanie i powielanie; niedostępne dla plików lokalnych |
 | Kopiowanie zasobów | ✅ | Tekst, SVG, PNG, JSX i schowek Figmy |
 
 ## Plugin API, współpraca i tryb programisty

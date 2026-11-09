@@ -22,7 +22,7 @@ La sélection de l’arbre et celle de la zone de travail restent synchronisées
 
 La liste permet de créer, ouvrir, renommer et supprimer des pages. Chacune conserve sa position et son niveau de zoom.
 
-Le menu contextuel déplace la sélection vers une autre page. Lors d’un changement de page, OpenPencil restaure sa vue et sa sélection.
+Le menu contextuel déplace la sélection vers une autre page. Lors d’un changement de page, Pairdraw restaure sa vue et sa sélection.
 
 ## Diapositives
 
@@ -38,7 +38,7 @@ L’espace de travail Accueil liste les documents locaux récents et ceux des fo
 
 Un nouveau design reste conservé comme brouillon sur cet appareil pendant que vous y travaillez : chaque modification est écrite peu après que vous l’avez faite, donc fermer son onglet ne demande rien. **Brouillons** sur Accueil les liste avec un aperçu ; ouvrez-en un pour continuer, ou choisissez **Supprimer le brouillon** dans son menu <kbd>⋯</kbd> ou contextuel pour le supprimer définitivement. Enregistrer un brouillon dans un fichier ou dans un stockage, dans l’éditeur ou avec **Enregistrer sous…** sur Accueil, le sort des Brouillons. Les brouillons ne vivent que dans ce profil de navigateur ou cette installation de bureau, et demandent que **Conserver automatiquement le travail non enregistré** soit activé et un navigateur qui garde les données du site.
 
-Dans **Paramètres → Général → Récupération**, **Conserver automatiquement le travail non enregistré** contrôle les brouillons et les copies de récupération locales. La récupération étant activée, les documents non enregistrés sans chemin de fichier restent récupérables même après la fermeture de leurs onglets. Quand OpenPencil propose **Récupérer le travail non enregistré**, choisissez **Restaurer** pour rouvrir un document ou **Abandonner** pour supprimer sa copie de récupération.
+Dans **Paramètres → Général → Récupération**, **Conserver automatiquement le travail non enregistré** contrôle les brouillons et les copies de récupération locales. La récupération étant activée, les documents non enregistrés sans chemin de fichier restent récupérables même après la fermeture de leurs onglets. Quand Pairdraw propose **Récupérer le travail non enregistré**, choisissez **Restaurer** pour rouvrir un document ou **Abandonner** pour supprimer sa copie de récupération.
 
 Un fichier que vous avez ouvert garde aussi une copie de secours des modifications qui n’ont pas encore été enregistrées avec lui, écrite pendant que l’enregistrement automatique est désactivé, ou quand la fenêtre se ferme avant que l’enregistrement automatique les ait écrites. La prochaine fois que ce fichier s’ouvre, **Modifications récupérées** propose **Enregistrer** pour les écrire dans le fichier, **Enregistrer sous…** pour les ouvrir à part et les enregistrer comme un nouveau fichier, ou **Ne pas enregistrer** pour laisser le fichier en l’état et abandonner la copie. Fermer la boîte de dialogue garde la copie pour la prochaine fois. Enregistrer le fichier abandonne ses copies plus anciennes, et dans le navigateur une copie plus ancienne que le dernier changement du fichier n’est pas proposée. Une copie dont le fichier n’a pas été ouvert pendant une semaine, par exemple parce que le fichier a été déplacé, figure elle aussi dans **Récupérer le travail non enregistré**.
 

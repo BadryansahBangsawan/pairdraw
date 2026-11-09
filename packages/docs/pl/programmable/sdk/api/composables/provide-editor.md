@@ -1,11 +1,11 @@
 ---
 title: provideEditor
-description: Udostępnianie instancji edytora OpenPencil komponentom potomnym przez dependency injection.
+description: Udostępnianie instancji edytora Pairdraw komponentom potomnym przez dependency injection.
 ---
 
 # provideEditor
 
-`provideEditor(editor)` udostępnia edytor OpenPencil funkcjom composable i komponentom bez narzuconych stylów znajdującym się niżej w drzewie Vue.
+`provideEditor(editor)` udostępnia edytor Pairdraw funkcjom composable i komponentom bez narzuconych stylów znajdującym się niżej w drzewie Vue.
 
 Na tej funkcji opiera się `useEditor()`.
 
@@ -39,7 +39,7 @@ provideEditor(props.editor)
 
 ## Uwagi
 
-Aktualne SDK używa bezpośrednio `provideEditor()` i `useEditor()`. Niektóre starsze przykłady i komunikaty błędów wspominają komponent `OpenPencilProvider`, ale nie należy on do obecnego publicznego API.
+Aktualne SDK używa bezpośrednio `provideEditor()` i `useEditor()`. Niektóre starsze przykłady i komunikaty błędów wspominają komponent `PairdrawProvider`, ale nie należy on do obecnego publicznego API.
 
 ## Zobacz też
 

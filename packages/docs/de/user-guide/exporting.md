@@ -5,7 +5,7 @@ description: Auswahl als PNG, JPG, WEBP oder SVG exportieren und `.fig`-Dateien 
 
 # Export
 
-OpenPencil exportiert einzelne Objekte als Bilder oder SVG und speichert vollständige Dokumente als `.fig`.
+Pairdraw exportiert einzelne Objekte als Bilder oder SVG und speichert vollständige Dokumente als `.fig`.
 
 ## Bilder und SVG
 
@@ -38,4 +38,4 @@ Das Kontextmenü kopiert die Auswahl als Text, SVG, PNG oder JSX.
 
 Chrome und Edge verwenden nach Möglichkeit die File System Access API. Andere Browser, darunter Safari, laden die Datei herunter.
 
-Exportierte `.fig`-Dateien können in OpenPencil und Figma geöffnet werden.
+Exportierte `.fig`-Dateien können in Pairdraw und Figma geöffnet werden.

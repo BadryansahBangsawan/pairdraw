@@ -19,7 +19,7 @@ Puoi salvare più profili e assegnarli separatamente a design, revisioni, attivi
 
 ## Provider
 
-OpenPencil supporta connessioni compatibili con OpenAI e Anthropic, oltre a OpenRouter, Google, Amazon Bedrock, Google Vertex AI, Z.ai e provider locali. Amazon Bedrock usa una regione e una chiave API di Bedrock, o chiavi di accesso AWS nell’app desktop; Vertex AI usa un progetto, una posizione e un token di accesso.
+Pairdraw supporta connessioni compatibili con OpenAI e Anthropic, oltre a OpenRouter, Google, Amazon Bedrock, Google Vertex AI, Z.ai e provider locali. Amazon Bedrock usa una regione e una chiave API di Bedrock, o chiavi di accesso AWS nell’app desktop; Vertex AI usa un progetto, una posizione e un token di accesso.
 
 Non usa un server intermedio. Le richieste vengono inviate direttamente al provider; nel browser si applicano le sue regole CORS. L’affidabilità delle chiamate agli strumenti in streaming può variare tra i deployment. Consulta la [compatibilità BYOK](/programmable/byok-provider-compatibility).
 
@@ -47,7 +47,7 @@ Per l’ispezione, `get_jsx` offre la vista JSX di andata e ritorno, `diff_creat
 
 Le skill sono cartelle con un `SKILL.md` nel formato [Agent Skills](https://agentskills.io/specification): istruzioni per un tipo di lavoro, con file di riferimento facoltativi. L’IA integrata vede nome e descrizione di ogni skill attiva e ne carica le istruzioni quando una richiesta corrisponde; gli script di una skill non vengono eseguiti.
 
-In **Impostazioni → Skill** carica una skill come ZIP della sua cartella o come `SKILL.md`. Nell’app desktop vengono lette anche `~/.agents/skills` e `~/.claude/skills`, e le cartelle `.agents/skills` e `.claude/skills` accanto al documento aperto, usate solo dopo **Fidati della cartella**. OpenPencil include skill integrate: guide per landing page, app mobili, app web, dashboard, slide, design system e Tailwind CSS v4, più `layout`, `restyle`, `dark-mode` e `design-review` per un design esistente; una tua skill con lo stesso nome ha la precedenza. Digita `/` all’inizio di un messaggio o usa **Scegli una competenza** sotto il campo del messaggio per scegliere una skill e `@` per menzionare un livello, una pagina o una skill. Le menzioni appaiono come chip, anche nelle risposte; un clic mostra il livello sulla tela.
+In **Impostazioni → Skill** carica una skill come ZIP della sua cartella o come `SKILL.md`. Nell’app desktop vengono lette anche `~/.agents/skills` e `~/.claude/skills`, e le cartelle `.agents/skills` e `.claude/skills` accanto al documento aperto, usate solo dopo **Fidati della cartella**. Pairdraw include skill integrate: guide per landing page, app mobili, app web, dashboard, slide, design system e Tailwind CSS v4, più `layout`, `restyle`, `dark-mode` e `design-review` per un design esistente; una tua skill con lo stesso nome ha la precedenza. Digita `/` all’inizio di un messaggio o usa **Scegli una competenza** sotto il campo del messaggio per scegliere una skill e `@` per menzionare un livello, una pagina o una skill. Le menzioni appaiono come chip, anche nelle risposte; un clic mostra il livello sulla tela.
 
 ## Esplorare varianti
 
@@ -72,4 +72,4 @@ Mentre una risposta è in corso puoi esplorare altre pagine: l’assistente cont
 
 ## Privacy e costi
 
-Le richieste vanno al provider configurato. Verifica condizioni, politica dei dati e prezzi prima di inviare documenti sensibili. OpenPencil non include crediti per i modelli.
+Le richieste vanno al provider configurato. Verifica condizioni, politica dei dati e prezzi prima di inviare documenti sensibili. Pairdraw non include crediti per i modelli.

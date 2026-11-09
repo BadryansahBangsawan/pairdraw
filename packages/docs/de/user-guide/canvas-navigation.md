@@ -1,6 +1,6 @@
 ---
 title: Navigation auf der Arbeitsfläche
-description: Ansicht verschieben, zoomen und das Handwerkzeug in OpenPencil verwenden.
+description: Ansicht verschieben, zoomen und das Handwerkzeug in Pairdraw verwenden.
 ---
 
 # Navigation auf der Arbeitsfläche

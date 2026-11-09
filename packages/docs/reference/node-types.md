@@ -5,11 +5,11 @@ description: Reference for Pairdraw scene graph node types, Figma Kiwi schema ma
 
 # Node Types
 
-The scene graph supports 28 node types from Figma's Kiwi schema. Each node is identified by a GUID (`sessionID:localID`) and has a parent reference via `parentIndex`. The OpenPencil engine's `NodeType` union currently uses 18 of these types.
+The scene graph supports 28 node types from Figma's Kiwi schema. Each node is identified by a GUID (`sessionID:localID`) and has a parent reference via `parentIndex`. The Pairdraw engine's `NodeType` union currently uses 19 of these types.
 
 ## Type Table
 
-28 Figma schema types + 1 synthetic engine type. Types marked ✅ are in the engine's `NodeType` union (18 total).
+28 Figma schema types + 1 synthetic engine type. Types marked ✅ are in the engine's `NodeType` union (19 total).
 
 | Type | ID | Description | Engine |
 |------|----|-------------|--------|
@@ -29,7 +29,7 @@ The scene graph supports 28 node types from Figma's Kiwi schema. Each node is id
 | `SLICE` | 14 | Export region | |
 | `SYMBOL` | 15 | Component (main, engine uses `COMPONENT`) | ✅ |
 | `INSTANCE` | 16 | Component instance | ✅ |
-| `STICKY` | 17 | FigJam sticky note | |
+| `STICKY` | 17 | FigJam sticky note | ✅ |
 | `SHAPE_WITH_TEXT` | 18 | FigJam shape | ✅ |
 | `CONNECTOR` | 19 | Connector line between nodes | ✅ |
 | `CODE_BLOCK` | 20 | FigJam code block | |
@@ -43,7 +43,7 @@ The scene graph supports 28 node types from Figma's Kiwi schema. Each node is id
 | `VARIABLE` | 28 | Variable definition node | |
 | `COMPONENT_SET` | — | Variant group container (synthetic, mapped from `SYMBOL`) | ✅ |
 
-### Engine NodeType Union (18 types)
+### Engine NodeType Union (19 types)
 
 The engine's `NodeType` uses simplified names. Some differ from the Kiwi schema:
 - `COMPONENT` → Kiwi `SYMBOL` (ID 15)
@@ -57,6 +57,7 @@ type NodeType =
   | 'VECTOR' | 'BOOLEAN_OPERATION' | 'GROUP' | 'SECTION'
   | 'COMPONENT' | 'COMPONENT_SET' | 'INSTANCE'
   | 'CONNECTOR' | 'SHAPE_WITH_TEXT'
+| 'STICKY'
 ```
 
 ## Node Hierarchy

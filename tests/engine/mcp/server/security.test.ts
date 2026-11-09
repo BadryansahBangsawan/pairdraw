@@ -11,7 +11,12 @@ import { SceneGraph } from '@open-pencil/scene-graph'
 
 import { startServer } from '#mcp/server'
 import { parseDiscoveryInfo } from '#mcp/transport/discovery'
-import { DESKTOP_APP_ORIGINS, parseCORSOrigins, resolveCORSOrigins } from '#mcp/transport/origins'
+import {
+  admittedOrigins,
+  DESKTOP_APP_ORIGINS,
+  parseCORSOrigins,
+  resolveCORSOrigins
+} from '#mcp/transport/origins'
 
 import { expectDefined } from '#tests/helpers/assert'
 import {
@@ -124,6 +129,16 @@ describe('MCP CORS origin configuration', () => {
       'https://b.example'
     ])
     expect(resolveCORSOrigins('https://one.example')).toEqual(['https://one.example'])
+  })
+
+  test('ignores `*` only when the agent bridge is on', () => {
+    expect(admittedOrigins('*')).toContain('*')
+    expect(admittedOrigins('*', { withAgents: false })).toContain('*')
+    expect(admittedOrigins('*', { withAgents: true })).not.toContain('*')
+    expect(admittedOrigins('*, https://one.example', { withAgents: true })).toEqual([
+      'https://one.example',
+      ...DESKTOP_APP_ORIGINS
+    ])
   })
 })
 

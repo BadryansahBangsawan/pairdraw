@@ -48,10 +48,19 @@ export function isAllowedOrigin(
   return allowed.includes(origin) || allowed.includes('*')
 }
 
-/** The origins the server admits: the configured ones and, always, the desktop app's. */
-export function admittedOrigins(corsOrigin: string | readonly string[] | null): string[] {
-  const configured = typeof corsOrigin === 'string' ? [corsOrigin] : (corsOrigin ?? [])
-  return uniq([...configured, ...DESKTOP_APP_ORIGINS])
+/**
+ * The origins the server admits: the configured ones and, always, the desktop app's.
+ * With the agent bridge on, `*` is dropped: it would let any website drive the bridge, so it
+ * is ignored ("an operator who sets `*` opted out" applies only without the bridge).
+ */
+export function admittedOrigins(
+  corsOrigin: string | readonly string[] | null,
+  options?: { withAgents?: boolean }
+): string[] {
+  const configured =
+    (typeof corsOrigin === 'string' ? parseCORSOrigins(corsOrigin) : corsOrigin) ?? []
+  const usable = options?.withAgents ? configured.filter((origin) => origin !== '*') : configured
+  return uniq([...usable, ...DESKTOP_APP_ORIGINS])
 }
 
 /**

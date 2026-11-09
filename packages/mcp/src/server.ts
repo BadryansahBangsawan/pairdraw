@@ -126,6 +126,8 @@ function createHonoApp(options: {
   corsOrigin: string | readonly string[] | null
   /** Origins whose pages may call the server; requests without an Origin come from programs. */
   origins: readonly string[]
+  /** The filtered list `cors()` answers with; never carries a stray `*` when the bridge is on. */
+  corsAllowed: readonly string[] | null
   agentBridge: AgentBridge | null
   /** The root `/files` reads and writes inside, or null to leave the route out. */
   fileRoot: string | null
@@ -134,7 +136,8 @@ function createHonoApp(options: {
   sendToBrowser: (msg: RPCJSONObject) => Promise<unknown>
   toolDescriptors: ToolDescriptor[]
 }): Hono {
-  const { authToken, corsOrigin, fileRoot, browserRPC, mcpSessions, sendToBrowser } = options
+  const { authToken, corsOrigin, corsAllowed, fileRoot, browserRPC, mcpSessions, sendToBrowser } =
+    options
   const { toolDescriptors, verifyToken, verifyMCPToken, origins, agentBridge } = options
 
   const app = new Hono()
@@ -142,10 +145,12 @@ function createHonoApp(options: {
   app.use('*', originGuard(origins))
 
   if (corsOrigin) {
+    const corsOrigins =
+      corsAllowed ?? (typeof corsOrigin === 'string' ? [corsOrigin] : [...corsOrigin])
     app.use(
       '*',
       cors({
-        origin: typeof corsOrigin === 'string' ? corsOrigin : [...corsOrigin],
+        origin: [...corsOrigins],
         allowMethods: MCP_CORS_METHODS,
         allowHeaders: MCP_CORS_HEADERS,
         exposeHeaders: MCP_EXPOSED_HEADERS
@@ -266,7 +271,7 @@ function buildServerContext(options: ServerOptions) {
     options.authToken === undefined ? randomBytes(16).toString('hex') : options.authToken
   const corsOrigin = options.corsOrigin ?? null
   const withTcp = options.withTcp ?? false
-  const origins = admittedOrigins(corsOrigin)
+  const origins = admittedOrigins(corsOrigin, { withAgents: options.agents !== undefined })
   // The bridge learns the TCP port once the listener is up; agents may reach only that `/mcp`.
   const listening = { port: 0 }
   const bridgeOptions = {
@@ -341,6 +346,7 @@ function buildServerContext(options: ServerOptions) {
     verifyMCPToken,
     corsOrigin,
     origins,
+    corsAllowed: corsOrigin === null ? null : origins,
     agentBridge,
     // A client limited to the selection reaches no files, as the file tools are left out then.
     fileRoot: mcpRoot !== null && toolPolicy.scope !== 'selection' ? resolve(mcpRoot) : null,

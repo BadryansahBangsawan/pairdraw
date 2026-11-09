@@ -7,8 +7,11 @@ import { join } from 'node:path'
 
 import * as v from 'valibot'
 
+import { startServer } from '#mcp/server'
+
 import {
   APP_ORIGIN,
+  FAKE_AGENT_ENTRY,
   MASTER_TOKEN,
   openSocket,
   recordSocket,
@@ -238,6 +241,79 @@ describe('installs', () => {
     })
     expect(response.status).toBe(200)
     expect(companion.installCwds).toEqual([companion.workspace])
+  })
+})
+
+describe('a wildcard CORS origin', () => {
+  test('does not let a foreign origin reach the bridge', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'op-companion-star-'))
+    const handle = await startServer({
+      httpPort: 0,
+      withTcp: true,
+      socketPath: join(dir, 'mcp.sock'),
+      authToken: 'master-token',
+      corsOrigin: '*',
+      mcpRoot: null,
+      agents: { registry: [FAKE_AGENT_ENTRY], searchPath: dir, workspace: join(dir, 'ws') }
+    })
+    try {
+      const base = `http://127.0.0.1:${handle.httpPort}`
+      const pair = await fetch(`${base}/pair`, {
+        method: 'POST',
+        headers: { origin: 'https://evil.example', 'content-type': 'application/json' },
+        body: JSON.stringify({ code: 'x' })
+      })
+      expect(pair.status).toBe(403)
+      const health = await fetch(`${base}/health`, {
+        headers: { origin: 'https://evil.example' }
+      })
+      expect(health.status).toBe(403)
+    } finally {
+      await handle.close()
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  test('answers a preflight from the desktop app origin by default', async () => {
+    const preflight = await fetch(`${companion.base}/mcp`, {
+      method: 'OPTIONS',
+      headers: {
+        origin: 'tauri://localhost',
+        'access-control-request-method': 'POST',
+        'access-control-request-headers': 'authorization,content-type'
+      }
+    })
+    expect(preflight.headers.get('access-control-allow-origin')).toBe('tauri://localhost')
+  })
+
+  test('never sends a wildcard access-control-allow-origin with the bridge on', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'op-companion-star-acao-'))
+    const handle = await startServer({
+      httpPort: 0,
+      withTcp: true,
+      socketPath: join(dir, 'mcp.sock'),
+      authToken: 'master-token',
+      corsOrigin: '*',
+      mcpRoot: null,
+      agents: { registry: [FAKE_AGENT_ENTRY], searchPath: dir, workspace: join(dir, 'ws') }
+    })
+    try {
+      const base = `http://127.0.0.1:${handle.httpPort}`
+      for (const origin of ['https://evil.example', 'tauri://localhost']) {
+        const preflight = await fetch(`${base}/mcp`, {
+          method: 'OPTIONS',
+          headers: {
+            origin,
+            'access-control-request-method': 'POST',
+            'access-control-request-headers': 'authorization,content-type'
+          }
+        })
+        expect(preflight.headers.get('access-control-allow-origin')).not.toBe('*')
+      }
+    } finally {
+      await handle.close()
+      rmSync(dir, { recursive: true, force: true })
+    }
   })
 })
 

@@ -450,3 +450,90 @@ openpencil models [--provider <id>] [--json]
 |--------|-------|-------------|
 | `--provider` | `-p` | Only this provider or ACP agent, by ID (for example `openrouter` or `acp:codex`) |
 | `--json` | | Output as JSON |
+
+## fonts
+
+Report fonts used by a document.
+
+```sh
+openpencil fonts [file] [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--document-id` | Target Pairdraw document/tab ID when connected to the running app |
+| `--page-id` | Target page ID when connected to the running app |
+| `--json` | Output as JSON |
+
+## selection
+
+Get current selection from the running app.
+
+```sh
+openpencil selection [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--document-id` | Target Pairdraw document/tab ID when connected to the running app |
+| `--page-id` | Target page ID when connected to the running app |
+| `--json` | Output as JSON |
+
+## formats
+
+List supported document and export formats.
+
+```sh
+openpencil formats [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Output as JSON |
+
+## convert
+
+Convert a document to another writable format.
+
+```sh
+openpencil convert <file> [options]
+```
+
+| Option | Alias | Description |
+|--------|-------|-------------|
+| `--output` | `-o` | Output file path (default: `<name>.<format>`) |
+| `--format` | `-f` | Output format: `fig` (default), `png`, `jpg`, `webp`, `svg`, `pdf`, `pptx`, `jsx`, `tailwind-jsx`, `html`, `storybook` |
+| `--font-policy` | | When a font of the document is missing: `warn`, `strict` (fail without writing), or `allow` (default: `warn`) |
+
+## agent
+
+Drive a document from a model: run, and see which tools it may call.
+
+```sh
+openpencil agent run [file] [--model <id>] [--json]
+openpencil agent tools [--json]
+openpencil agent list [--json]
+```
+
+| Subcommand | Description |
+|------------|-------------|
+| `run` | Run a design agent on a document through an OpenAI-compatible model |
+| `tools` | List the tools an agent run can call by default |
+| `list` | List the named agents a run can put in a team |
+
+## query
+
+Query nodes using XPath selectors.
+
+```sh
+openpencil query [file] [selector] [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `selector` | XPath selector (e.g. `//FRAME[@width < 300]`, `//TEXT[contains(@name, "Label")]`) |
+| `--page` | Page name (default: all pages) |
+| `--limit` | Max results (default: 1000) |
+| `--document-id` | Target Pairdraw document/tab ID when connected to the running app |
+| `--page-id` | Target page ID when connected to the running app |
+| `--json` | Output as JSON |

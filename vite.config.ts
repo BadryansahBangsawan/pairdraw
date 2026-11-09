@@ -23,6 +23,7 @@ import {
 import { bootSplashPlugin } from './vite/boot-splash'
 import { cloudSitePlugin } from './vite/cloud-site'
 import { aiIconCollection } from './vite/icons'
+import { createImportPathTransform } from './vite/import-path-transform'
 import { inlineScriptPlugin } from './vite/inline-script'
 import { metricsBrandPlugin } from './vite/metrics'
 import { openPencilPwaPlugin } from './vite/pwa'
@@ -78,7 +79,10 @@ export default defineConfig(async ({ command, mode }) => {
       }),
       tailwindcss(),
       Icons({ compiler: 'vue3', customCollections: { ai: aiIconCollection() } }),
-      Components({ resolvers: [IconsResolver({ prefix: 'icon', customCollections: ['ai'] })] }),
+      Components({
+        resolvers: [IconsResolver({ prefix: 'icon', customCollections: ['ai'] })],
+        importPathTransform: createImportPathTransform(__dirname)
+      }),
       automation ? openPencilAutomationPlugin(command, host, mode) : undefined,
       vue(),
       metrics ? metricsBrandPlugin((outDir) => resolve(outDir, '..')) : openPencilPwaPlugin(),

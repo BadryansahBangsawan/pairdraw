@@ -8,6 +8,7 @@ import type { Alias, Plugin, PluginOption } from 'vite'
 
 import rootManifest from '../package.json' with { type: 'json' }
 import { createOpenPencilAliases } from './aliases.ts'
+import { createImportPathTransform } from './import-path-transform.ts'
 import { inlineScriptPlugin } from './inline-script.ts'
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url))
@@ -76,7 +77,12 @@ export function appSourceConfig(): AppSourceConfig {
       appRawText(),
       inlineScriptPlugin(),
       Icons({ compiler: 'vue3' }),
-      Components({ dirs: [], dts: false, resolvers: [IconsResolver({ prefix: 'icon' })] })
+      Components({
+        dirs: [],
+        dts: false,
+        resolvers: [IconsResolver({ prefix: 'icon' })],
+        importPathTransform: createImportPathTransform(REPO_ROOT)
+      })
     ]
   }
 }

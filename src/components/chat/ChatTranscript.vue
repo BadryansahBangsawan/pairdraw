@@ -114,47 +114,58 @@ const { arrivedState, resumeFollowing } = useScrollFollowing(
       </AppPlaceholder>
 
       <!-- Messages -->
-      <div v-else ref="transcriptContent" data-test-id="chat-messages" :class="ui.list()">
-        <ChatMessage
-          v-for="(msg, index) in messages"
-          :key="msg.id"
-          :message="msg"
-          :presentation="presentations?.[msg.id]"
-          :streaming="running && msg.role === 'assistant' && index === messages.length - 1"
-          :can-regenerate="idle && msg.id === lastMessage?.id && msg.role === 'assistant'"
-          :can-retry="idle && msg.id === lastMessage?.id && msg.role === 'user'"
-          :can-edit="idle && msg.id === editableRequestId"
-          :reasoning-display="reasoningDisplay"
-          @regenerate="emit('regenerate')"
-          @revert="emit('revert', msg.id)"
-          @restore="emit('restore', msg.id)"
-          @edit="(text) => emit('edit', msg.id, text)"
-        />
+      <!-- Live region so screen readers announce new assistant replies incrementally.
+           role="log" + aria-live="polite" follows APG chat pattern; aria-busy mirrors the streaming state. -->
+      <div
+        v-else
+        role="log"
+        aria-live="polite"
+        aria-atomic="false"
+        :aria-busy="running"
+        :class="ui.liveRegion()"
+      >
+        <div ref="transcriptContent" data-test-id="chat-messages" :class="ui.list()">
+          <ChatMessage
+            v-for="(msg, index) in messages"
+            :key="msg.id"
+            :message="msg"
+            :presentation="presentations?.[msg.id]"
+            :streaming="running && msg.role === 'assistant' && index === messages.length - 1"
+            :can-regenerate="idle && msg.id === lastMessage?.id && msg.role === 'assistant'"
+            :can-retry="idle && msg.id === lastMessage?.id && msg.role === 'user'"
+            :can-edit="idle && msg.id === editableRequestId"
+            :reasoning-display="reasoningDisplay"
+            @regenerate="emit('regenerate')"
+            @revert="emit('revert', msg.id)"
+            @restore="emit('restore', msg.id)"
+            @edit="(text) => emit('edit', msg.id, text)"
+          />
 
-        <!-- Thinking indicator: shown when AI is working but no visible activity -->
-        <div v-if="isThinking" data-test-id="chat-typing-indicator" :class="ui.typing()">
-          <span :class="ui.typingAvatar()" aria-hidden="true">
-            <icon-lucide-sparkle :class="ui.typingIcon()" />
-          </span>
-          <span :class="ui.dots()">
-            <span v-for="step in DOT_STEPS" :key="step" :class="ui.dot()" :data-step="step" />
-          </span>
-        </div>
+          <!-- Thinking indicator: shown when AI is working but no visible activity -->
+          <div v-if="isThinking" data-test-id="chat-typing-indicator" :class="ui.typing()">
+            <span :class="ui.typingAvatar()" aria-hidden="true">
+              <icon-lucide-sparkle :class="ui.typingIcon()" />
+            </span>
+            <span :class="ui.dots()">
+              <span v-for="step in DOT_STEPS" :key="step" :class="ui.dot()" :data-step="step" />
+            </span>
+          </div>
 
-        <ChatMessageQueued
-          v-for="item in queued"
-          :key="item.id"
-          :message="item"
-          :steers="steers"
-          @remove="emit('removeQueued', item.id)"
-        />
+          <ChatMessageQueued
+            v-for="item in queued"
+            :key="item.id"
+            :message="item"
+            :steers="steers"
+            @remove="emit('removeQueued', item.id)"
+          />
 
-        <!-- Continue button when step limit reached -->
-        <div v-if="showContinue" :class="ui.continue()">
-          <AppButton color="primary" variant="soft" shape="pill" @click="emit('continue')">
-            <template #leading><icon-lucide-play class="size-3" /></template>
-            {{ ai.continueChat }}
-          </AppButton>
+          <!-- Continue button when step limit reached -->
+          <div v-if="showContinue" :class="ui.continue()">
+            <AppButton color="primary" variant="soft" shape="pill" @click="emit('continue')">
+              <template #leading><icon-lucide-play class="size-3" /></template>
+              {{ ai.continueChat }}
+            </AppButton>
+          </div>
         </div>
       </div>
     </ScrollAreaViewport>

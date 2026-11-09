@@ -17,6 +17,7 @@ export default {
     continue: 'flex justify-center py-2',
     scrollbar: 'flex w-1.5 touch-none p-px select-none',
     thumb: 'relative flex-1 rounded-full bg-muted/30',
-    jump: 'absolute right-3 bottom-3 rounded-full border border-border bg-panel elevation-floating'
+    jump: 'absolute right-3 bottom-3 rounded-full border border-border bg-panel elevation-floating',
+    liveRegion: ''
   }
 } as const

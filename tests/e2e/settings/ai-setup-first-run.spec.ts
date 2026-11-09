@@ -1,20 +1,12 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
+import { waitForAppBoot } from '#tests/helpers/boot'
 import { waitForDemo } from '#tests/helpers/demo'
 
 // `?test` suppresses the first-run lookup, so these load the app as a person would, with none
 // of the stored preferences the other browser tests start from. The browser has no companion,
 // so no coding agent can be found either.
 test.use({ storageState: { cookies: [], origins: [] } })
-
-/**
- * The boot splash covers the page until the app draws its first content. A cold dev server
- * transforms the app's module graph on the first request, so wait for that drawing with the
- * allowance `CanvasHelper.waitForInit` uses instead of the default assertion timeout.
- */
-async function waitForAppBoot(page: Page) {
-  await page.locator('#boot-splash').waitFor({ state: 'hidden', timeout: 30_000 })
-}
 
 test('a fresh install opens no setup dialog, then or after a reload', async ({ page }) => {
   await page.goto('/')

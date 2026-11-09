@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 
 import { expect, test, type Page } from '@playwright/test'
 
+import { waitForAppBoot } from '#tests/helpers/boot'
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { openAppMenu } from '#tests/helpers/menu'
 
@@ -159,6 +160,7 @@ test('configured storage lists previews through ranges before opening the docume
 
 test('storage workspace directs unconfigured users to Settings', async ({ page }) => {
   await page.goto('/storage')
+  await waitForAppBoot(page)
 
   await expect(page.getByTestId('recent-files-home')).toBeVisible()
   await expect(page.getByText('Configure storage before using this workspace.')).toBeVisible()
@@ -230,6 +232,7 @@ test('Delete removes a stored document from the bucket, and a document deleted e
   }
 
   await page.goto('/?recent-files')
+  await waitForAppBoot(page)
   await expect(page.getByTestId('recent-files-home')).toBeVisible()
   await page.getByRole('button', { name: 'Settings' }).last().click()
   await page.getByTestId('settings-section-storage').click()
@@ -255,6 +258,7 @@ test('Delete removes a stored document from the bucket, and a document deleted e
   objects.delete('open_pencil_storage/canvases/flyer.fig')
   objects.delete('open_pencil_storage/canvases/flyer.meta.json')
   await page.goto('/?recent-files')
+  await waitForAppBoot(page)
   await page.getByRole('button', { name: /^designs/ }).click()
   await expect(page.getByText('No stored documents yet.')).toBeVisible()
   await expect(page.getByRole('button', { name: /^Poster|^Flyer/ })).toHaveCount(0)

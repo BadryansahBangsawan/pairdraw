@@ -145,7 +145,7 @@ function updateSolidColor(
             :provider="colorProvider"
             :targets="paintBindingTargets(selectedNodeIds, 'fills', index)"
             :value="fill.color"
-            batch-label="Change fill color"
+            :batch-label="panels.changeFillColor"
           >
             <PaintField
               class="w-full flex-none"

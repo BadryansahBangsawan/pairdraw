@@ -741,5 +741,7 @@
   "scaleAnchorRight": "Rechts",
   "scaleAnchorBottomLeft": "Unten links",
   "scaleAnchorBottom": "Unten",
-  "scaleAnchorBottomRight": "Unten rechts"
+  "scaleAnchorBottomRight": "Unten rechts",
+  "changeStrokeColor": "Konturfarbe ändern",
+  "changeFillColor": "Füllfarbe ändern"
 }

@@ -102,5 +102,9 @@
   "removeAutoLayout": "オートレイアウトを削除",
   "zoomTool": "ズームツール",
   "shaderMode": "シェーダーモード",
-  "addLink": "リンクを追加"
+  "addLink": "リンクを追加",
+  "viewContextMenu": "ビューのコンテキストメニュー",
+  "splitMenu": "分割メニュー",
+  "previousToolbarCategory": "前のツールバーカテゴリ",
+  "nextToolbarCategory": "次のツールバーカテゴリ"
 }

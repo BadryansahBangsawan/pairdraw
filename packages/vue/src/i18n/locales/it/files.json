@@ -95,5 +95,6 @@
   "pasteImportGridStyle": "Stile griglia",
   "pasteImportChoiceLabel": "{name}: usa esistente o aggiungi rinominato",
   "pasteImportAsIs": "Incolla così com’è",
-  "pasteImportConfirm": "Sì, importa"
+  "pasteImportConfirm": "Sì, importa",
+  "preparingDocument": "Preparazione del documento"
 }

@@ -99,5 +99,6 @@
   "pasteImportGridStyle": "Стиль сетки",
   "pasteImportChoiceLabel": "{name}: использовать имеющийся или добавить с новым именем",
   "pasteImportAsIs": "Вставить как есть",
-  "pasteImportConfirm": "Да, импортировать"
+  "pasteImportConfirm": "Да, импортировать",
+  "preparingDocument": "Подготовка документа"
 }

@@ -41,5 +41,7 @@
   "dismiss": "关闭",
   "browserSupport": "查看浏览器支持情况",
   "showPassword": "显示密码",
-  "hidePassword": "隐藏密码"
+  "hidePassword": "隐藏密码",
+  "previousMonth": "上个月",
+  "nextMonth": "下个月"
 }

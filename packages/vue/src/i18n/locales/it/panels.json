@@ -741,5 +741,7 @@
   "scaleAnchorRight": "A destra",
   "scaleAnchorBottomLeft": "In basso a sinistra",
   "scaleAnchorBottom": "In basso",
-  "scaleAnchorBottomRight": "In basso a destra"
+  "scaleAnchorBottomRight": "In basso a destra",
+  "changeStrokeColor": "Cambia colore del contorno",
+  "changeFillColor": "Cambia colore del riempimento"
 }

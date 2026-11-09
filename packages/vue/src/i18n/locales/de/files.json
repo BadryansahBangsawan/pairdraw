@@ -95,5 +95,6 @@
   "pasteImportGridStyle": "Rasterstil",
   "pasteImportChoiceLabel": "{name}: vorhandene verwenden oder umbenannt hinzufügen",
   "pasteImportAsIs": "Unverändert einfügen",
-  "pasteImportConfirm": "Ja, importieren"
+  "pasteImportConfirm": "Ja, importieren",
+  "preparingDocument": "Dokument wird vorbereitet"
 }

@@ -82,6 +82,7 @@ export const filesMessageDefaults = {
   newDesignWith: params('New design with {name}'),
   loadingDesignSystems: 'Loading design systems…',
   saveAsPrompt: 'Save as:',
+  preparingDocument: 'Preparing document',
   browserFileAPINotSupported:
     "Your browser doesn't support the local file API. Files will be downloaded instead of saved in place.",
   fileChangedOnDisk: params('“{name}” changed on disk'),

@@ -731,5 +731,7 @@
   "scaleAnchorRight": "右",
   "scaleAnchorBottomLeft": "左下",
   "scaleAnchorBottom": "下",
-  "scaleAnchorBottomRight": "右下"
+  "scaleAnchorBottomRight": "右下",
+  "changeStrokeColor": "線の色を変更",
+  "changeFillColor": "塗りの色を変更"
 }

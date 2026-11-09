@@ -41,5 +41,7 @@
   "dismiss": "Ignorer",
   "browserSupport": "Vérifier la compatibilité",
   "showPassword": "Afficher le mot de passe",
-  "hidePassword": "Masquer le mot de passe"
+  "hidePassword": "Masquer le mot de passe",
+  "previousMonth": "Mois précédent",
+  "nextMonth": "Mois suivant"
 }

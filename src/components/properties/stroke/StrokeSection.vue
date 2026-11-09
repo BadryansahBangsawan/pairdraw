@@ -163,7 +163,7 @@ function onToggleSides(nodes: readonly SceneNode[]) {
           :provider="colorProvider"
           :targets="paintBindingTargets(selectedNodeIds, 'strokes', index)"
           :value="stroke.color"
-          batch-label="Change stroke color"
+          :batch-label="panels.changeStrokeColor"
         >
           <PaintField
             :opacity="stroke.opacity"

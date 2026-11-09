@@ -751,5 +751,7 @@
   "scaleAnchorRight": "Prawo",
   "scaleAnchorBottomLeft": "Lewy dolny róg",
   "scaleAnchorBottom": "Dół",
-  "scaleAnchorBottomRight": "Prawy dolny róg"
+  "scaleAnchorBottomRight": "Prawy dolny róg",
+  "changeStrokeColor": "Zmień kolor obrysu",
+  "changeFillColor": "Zmień kolor wypełnienia"
 }

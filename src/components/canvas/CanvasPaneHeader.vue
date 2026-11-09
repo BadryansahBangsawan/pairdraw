@@ -66,7 +66,7 @@ function split(direction: SplitDirection) {
         </DropdownMenuTrigger>
         <DropdownMenuPortal>
           <DropdownMenuContent side="bottom" align="end" :side-offset="3" :class="menuCls.content">
-            <MenuScrollArea aria-label="Split menu">
+            <MenuScrollArea :aria-label="menuText.splitMenu">
               <DropdownMenuItem
                 :disabled="!canSplit"
                 :class="itemCls"

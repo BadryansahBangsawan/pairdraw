@@ -6,6 +6,7 @@ import IconChevronLeft from '~icons/lucide/chevron-left'
 import IconChevronRight from '~icons/lucide/chevron-right'
 
 import type { EditorToolDef, Tool } from '@open-pencil/core'
+import { useMenuMessages } from '@open-pencil/vue/i18n'
 import { getToolbarToolSelection, ToolbarItem } from '@open-pencil/vue/primitives/Toolbar'
 import { toolbarToolTestId } from '@open-pencil/vue/testing'
 
@@ -55,6 +56,7 @@ const {
 
 const toolbar = tv(toolbarTheme)
 const styles = toolbar()
+const menu = useMenuMessages()
 
 const emit = defineEmits<{
   setTool: [tool: Tool]
@@ -84,6 +86,7 @@ function navigationClass(disabled: boolean) {
   >
     <motion.button
       data-test-id="mobile-toolbar-prev"
+      :aria-label="menu.previousToolbarCategory"
       :disabled="!hasPrev"
       :data-disabled="!hasPrev || undefined"
       :class="navigationClass(!hasPrev)"
@@ -191,6 +194,7 @@ function navigationClass(disabled: boolean) {
 
     <motion.button
       data-test-id="mobile-toolbar-next"
+      :aria-label="menu.nextToolbarCategory"
       :disabled="!hasNext"
       :data-disabled="!hasNext || undefined"
       :class="navigationClass(!hasNext)"

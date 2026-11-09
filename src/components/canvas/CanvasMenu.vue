@@ -82,7 +82,7 @@ function contextCommandTestId(id: EditorCommandId | undefined): string | undefin
   <!-- Closing hands focus back to the canvas; when that lands just after a quick reopen, it
        must not close the new menu. Clicks outside and Escape still close it. -->
   <ContextMenuContent :class="cls.menu" :side-offset="2" align="start" @close-auto-focus.prevent>
-    <MenuScrollArea aria-label="View context menu">
+    <MenuScrollArea :aria-label="t.viewContextMenu">
       <template v-if="selectedGuide">
         <ContextMenuItem data-property="guide" :class="cls.item" @select="removeSelectedGuide">
           <span>{{ t.removeGuide }}</span>

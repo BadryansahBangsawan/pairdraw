@@ -751,5 +751,7 @@
   "scaleAnchorRight": "Справа",
   "scaleAnchorBottomLeft": "Снизу слева",
   "scaleAnchorBottom": "Снизу",
-  "scaleAnchorBottomRight": "Снизу справа"
+  "scaleAnchorBottomRight": "Снизу справа",
+  "changeStrokeColor": "Изменить цвет обводки",
+  "changeFillColor": "Изменить цвет заливки"
 }

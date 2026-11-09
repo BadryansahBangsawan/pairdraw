@@ -41,5 +41,7 @@
   "dismiss": "Schließen",
   "browserSupport": "Browser-Unterstützung prüfen",
   "showPassword": "Passwort anzeigen",
-  "hidePassword": "Passwort verbergen"
+  "hidePassword": "Passwort verbergen",
+  "previousMonth": "Vorheriger Monat",
+  "nextMonth": "Nächster Monat"
 }

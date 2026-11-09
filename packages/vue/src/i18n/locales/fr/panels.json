@@ -741,5 +741,7 @@
   "scaleAnchorRight": "À droite",
   "scaleAnchorBottomLeft": "En bas à gauche",
   "scaleAnchorBottom": "En bas",
-  "scaleAnchorBottomRight": "En bas à droite"
+  "scaleAnchorBottomRight": "En bas à droite",
+  "changeStrokeColor": "Modifier la couleur du contour",
+  "changeFillColor": "Modifier la couleur de remplissage"
 }

@@ -41,5 +41,7 @@
   "dismiss": "Descartar",
   "browserSupport": "Consultar compatibilidad",
   "showPassword": "Mostrar contraseña",
-  "hidePassword": "Ocultar contraseña"
+  "hidePassword": "Ocultar contraseña",
+  "previousMonth": "Mes anterior",
+  "nextMonth": "Mes siguiente"
 }

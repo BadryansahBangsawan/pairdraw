@@ -401,6 +401,8 @@ export const panelMessageDefaults = {
   addExport: 'Add export',
   removeFill: 'Remove fill',
   removeStroke: 'Remove stroke',
+  changeStrokeColor: 'Change stroke color',
+  changeFillColor: 'Change fill color',
   removeEffect: 'Remove effect',
   removeExport: 'Remove export',
   effectSettings: 'Effect settings',

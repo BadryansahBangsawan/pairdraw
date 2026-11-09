@@ -102,5 +102,9 @@
   "removeAutoLayout": "Usuń auto-layout",
   "zoomTool": "Narzędzie powiększania",
   "shaderMode": "Tryb shadera",
-  "addLink": "Dodaj link"
+  "addLink": "Dodaj link",
+  "viewContextMenu": "Menu kontekstowe widoku",
+  "splitMenu": "Menu podziału",
+  "previousToolbarCategory": "Poprzednia kategoria paska narzędzi",
+  "nextToolbarCategory": "Następna kategoria paska narzędzi"
 }

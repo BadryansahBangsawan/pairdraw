@@ -102,5 +102,9 @@
   "removeAutoLayout": "移除自动布局",
   "zoomTool": "缩放工具",
   "shaderMode": "着色器模式",
-  "addLink": "添加链接"
+  "addLink": "添加链接",
+  "viewContextMenu": "视图上下文菜单",
+  "splitMenu": "拆分菜单",
+  "previousToolbarCategory": "上一个工具栏类别",
+  "nextToolbarCategory": "下一个工具栏类别"
 }

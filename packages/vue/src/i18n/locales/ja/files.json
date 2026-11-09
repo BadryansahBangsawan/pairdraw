@@ -91,5 +91,6 @@
   "pasteImportGridStyle": "グリッドスタイル",
   "pasteImportChoiceLabel": "{name}：既存のものを使用するか、名前を変えて追加",
   "pasteImportAsIs": "そのまま貼り付け",
-  "pasteImportConfirm": "読み込む"
+  "pasteImportConfirm": "読み込む",
+  "preparingDocument": "ドキュメントを準備中"
 }

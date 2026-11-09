@@ -741,5 +741,7 @@
   "scaleAnchorRight": "Derecha",
   "scaleAnchorBottomLeft": "Abajo a la izquierda",
   "scaleAnchorBottom": "Abajo",
-  "scaleAnchorBottomRight": "Abajo a la derecha"
+  "scaleAnchorBottomRight": "Abajo a la derecha",
+  "changeStrokeColor": "Cambiar color de trazo",
+  "changeFillColor": "Cambiar color de relleno"
 }

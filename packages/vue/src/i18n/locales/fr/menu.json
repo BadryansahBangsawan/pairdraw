@@ -102,5 +102,9 @@
   "removeAutoLayout": "Retirer l'auto-layout",
   "zoomTool": "Outil Zoom",
   "shaderMode": "Mode shader",
-  "addLink": "Ajouter un lien"
+  "addLink": "Ajouter un lien",
+  "viewContextMenu": "Menu contextuel de la vue",
+  "splitMenu": "Menu de division",
+  "previousToolbarCategory": "Catégorie précédente de la barre d’outils",
+  "nextToolbarCategory": "Catégorie suivante de la barre d’outils"
 }

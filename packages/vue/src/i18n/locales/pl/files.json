@@ -99,5 +99,6 @@
   "pasteImportGridStyle": "Styl siatki",
   "pasteImportChoiceLabel": "{name}: użyj istniejącego lub dodaj pod nową nazwą",
   "pasteImportAsIs": "Wklej bez zmian",
-  "pasteImportConfirm": "Tak, zaimportuj"
+  "pasteImportConfirm": "Tak, zaimportuj",
+  "preparingDocument": "Przygotowywanie dokumentu"
 }

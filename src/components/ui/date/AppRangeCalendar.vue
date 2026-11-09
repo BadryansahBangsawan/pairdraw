@@ -18,12 +18,15 @@ import {
 import { tv } from 'tailwind-variants'
 import { computed, shallowRef, watch } from 'vue'
 
+import { useCommonMessages } from '@open-pencil/vue/i18n'
+
 import IconButton from '@/components/ui/button/IconButton.vue'
 import rangeCalendarTheme from '@/theme/date/range-calendar'
 
 import type { DayRange } from './range'
 
 const rangeCalendar = tv(rangeCalendarTheme)
+const common = useCommonMessages()
 
 /**
  * One month for picking a span of days. The model changes only once both ends are chosen, so a
@@ -67,13 +70,13 @@ function pick(range: DateRange) {
   >
     <RangeCalendarHeader :class="ui.header()">
       <RangeCalendarPrev as-child>
-        <IconButton label="Previous month">
+        <IconButton :label="common.previousMonth">
           <icon-lucide-chevron-left class="size-3.5" />
         </IconButton>
       </RangeCalendarPrev>
       <RangeCalendarHeading :class="ui.heading()" />
       <RangeCalendarNext as-child>
-        <IconButton label="Next month">
+        <IconButton :label="common.nextMonth">
           <icon-lucide-chevron-right class="size-3.5" />
         </IconButton>
       </RangeCalendarNext>

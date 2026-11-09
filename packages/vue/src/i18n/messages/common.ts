@@ -44,7 +44,9 @@ export const commonMessageDefaults = {
   tokens: 'tokens',
   clear: 'Clear',
   dismiss: 'Dismiss',
-  browserSupport: 'Check browser support'
+  browserSupport: 'Check browser support',
+  previousMonth: 'Previous month',
+  nextMonth: 'Next month'
 } as const
 
 export const commonMessages = i18n('common', commonMessageDefaults)

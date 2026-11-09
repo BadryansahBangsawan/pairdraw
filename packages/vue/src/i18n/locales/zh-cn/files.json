@@ -91,5 +91,6 @@
   "pasteImportGridStyle": "网格样式",
   "pasteImportChoiceLabel": "{name}：使用现有或重命名后添加",
   "pasteImportAsIs": "按原样粘贴",
-  "pasteImportConfirm": "是，导入"
+  "pasteImportConfirm": "是，导入",
+  "preparingDocument": "正在准备文档"
 }

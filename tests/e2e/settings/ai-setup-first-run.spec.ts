@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 import { waitForDemo } from '#tests/helpers/demo'
 
@@ -7,8 +7,18 @@ import { waitForDemo } from '#tests/helpers/demo'
 // so no coding agent can be found either.
 test.use({ storageState: { cookies: [], origins: [] } })
 
+/**
+ * The boot splash covers the page until the app draws its first content. A cold dev server
+ * transforms the app's module graph on the first request, so wait for that drawing with the
+ * allowance `CanvasHelper.waitForInit` uses instead of the default assertion timeout.
+ */
+async function waitForAppBoot(page: Page) {
+  await page.locator('#boot-splash').waitFor({ state: 'hidden', timeout: 30_000 })
+}
+
 test('a fresh install opens no setup dialog, then or after a reload', async ({ page }) => {
   await page.goto('/')
+  await waitForAppBoot(page)
   // The lookup starts with the workspace, so anything it opened shows once Home is there.
   const home = page.getByTestId('recent-files-home')
   await expect(home).toBeVisible()
@@ -16,6 +26,7 @@ test('a fresh install opens no setup dialog, then or after a reload', async ({ p
   await expect(setup).toHaveCount(0)
 
   await page.reload()
+  await waitForAppBoot(page)
   await expect(home).toBeVisible()
   await expect(setup).toHaveCount(0)
 })
@@ -73,6 +84,7 @@ test.describe('an install with a configured model', () => {
 
   test('never sees a setup dialog', async ({ page }) => {
     await page.goto('/')
+    await waitForAppBoot(page)
     await expect(page.getByTestId('recent-files-home')).toBeVisible()
     await expect(page.getByTestId('ai-setup-dialog')).toHaveCount(0)
   })

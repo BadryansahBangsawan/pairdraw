@@ -76,7 +76,7 @@ test('every committed menu group keeps separators between entries', async () => 
 
   for (const group of parsed.output) {
     const separators = group.items.flatMap((entry, index) =>
-      entry.type === 'separator' ? [index] : []
+      'type' in entry && entry.type === 'separator' ? [index] : []
     )
     expect(separators, `${group.label} starts with a separator`).not.toContain(0)
     expect(separators, `${group.label} ends with a separator`).not.toContain(group.items.length - 1)

@@ -1,0 +1,1 @@
+- The chat says in your language why more images than a message holds cannot be attached.

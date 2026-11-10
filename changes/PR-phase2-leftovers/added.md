@@ -1,1 +1,1 @@
-Menu entries for Zoom Tool, Shader Mode, and Add link.
+- The app menu has entries for Zoom Tool, Shader Mode, and Add link.

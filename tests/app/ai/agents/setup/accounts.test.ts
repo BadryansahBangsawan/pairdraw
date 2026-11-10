@@ -172,6 +172,34 @@ describe('agent accounts', () => {
     expect(check).toHaveBeenCalledTimes(1)
   })
 
+  test('a cancel pressed while the host starts the sign-in stops it when the login arrives', async () => {
+    const loginReady = createDeferred<AgentSignIn>()
+    const done = createDeferred<AgentAuthStatus | null>()
+    const cancel = mock(async () => undefined)
+    const { accounts, check } = accountsWith(
+      [signedOut(), { ...signedOut(), status: CLAUDE_MAX }],
+      async () => loginReady.promise
+    )
+    await accounts.check(codex)
+    const signingIn = accounts.signIn(codex)
+    await Bun.sleep(0)
+    expect(accounts.account('codex').signingIn).toBe(true)
+
+    // The host is still starting the agent, so it has not handed over a login yet.
+    await accounts.cancelSignIn('codex')
+    loginReady.resolve({ done: done.promise, cancel })
+    done.resolve(CLAUDE_MAX)
+    await signingIn
+
+    expect(cancel).toHaveBeenCalledTimes(1)
+    expect(accounts.account('codex')).toMatchObject({
+      signingIn: false,
+      status: SIGNED_OUT,
+      error: null
+    })
+    expect(check).toHaveBeenCalledTimes(1)
+  })
+
   test('a failed sign-in keeps the last known login', async () => {
     const { accounts } = accountsWith([signedOut()], async () => ({
       done: Promise.reject(new Error('exit 1')),

@@ -108,11 +108,22 @@ export function createAgentAccounts(options: {
     update(agent.id, { signingIn: true, signInURL: null, acceptsCode: false, error: null })
     // A field, so the cancel callback's write is visible to the checks below.
     const run = { cancelled: false, signedIn: false }
+    // The host may take a while to start the agent, so a cancel meanwhile still counts, and the
+    // login is stopped as soon as there is one to stop.
+    signIns.set(agent.id, {
+      cancel: async () => {
+        run.cancelled = true
+      }
+    })
     try {
       const login = await host.signIn(agent, {
         methodId: method.id,
         onURL: (url) => update(agent.id, { signInURL: url })
       })
+      if (run.cancelled) {
+        await login.cancel()
+        return
+      }
       signIns.set(agent.id, {
         cancel: () => {
           run.cancelled = true

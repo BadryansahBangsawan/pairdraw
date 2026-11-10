@@ -116,7 +116,14 @@ export function collectLayerNotes(
     seen.add(node.id)
     const note = notesOf(graph, node)
     if (!note) continue
-    const key = [note.name, note.context ?? '', note.prompt ?? ''].join('\u0000')
+    // Everything a note shows but its id, so a merged note states the same facts for every layer.
+    const key = [
+      note.type,
+      note.name,
+      note.context ?? '',
+      note.prompt ?? '',
+      note.model ?? ''
+    ].join('\u0000')
     const same = byContent.get(key)
     if (same) {
       same.repeats = (same.repeats ?? 0) + 1

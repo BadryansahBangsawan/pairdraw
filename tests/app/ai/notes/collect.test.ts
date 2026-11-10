@@ -63,6 +63,37 @@ describe('notes a request reads', () => {
     ])
   })
 
+  test('notes that differ by the model a prompt names or by their layer kind stay apart', () => {
+    const { graph, pageId } = page()
+    const text = 'Add a dark mode toggle'
+    const promptCard = (model: string) => {
+      const card = createSticky(graph, pageId, { text })
+      graph.updateNode(card.id, {
+        pluginData: [penEntry('type', 'prompt'), penEntry('model', model)]
+      })
+      return card
+    }
+    const claude = promptCard('claude-test')
+    const gpt = promptCard('gpt-test')
+
+    expect(collectLayerNotes(graph, pageId)).toEqual([
+      expect.objectContaining({ id: claude.id, model: 'claude-test' }),
+      expect.objectContaining({ id: gpt.id, model: 'gpt-test' })
+    ])
+
+    const frame = noted(graph, pageId, 'Badge', { context: 'Shows the plan' })
+    const rectangle = graph.createNode('RECTANGLE', pageId, { name: 'Badge' })
+    graph.updateNode(rectangle.id, {
+      pluginData: withAgentNotes(rectangle, { context: 'Shows the plan' })
+    })
+    expect(ids(collectLayerNotes(graph, pageId))).toEqual([
+      claude.id,
+      gpt.id,
+      frame.id,
+      rectangle.id
+    ])
+  })
+
   test('a page of notes is bounded', () => {
     const { graph, pageId } = page()
     for (let index = 0; index < MAX_LAYER_NOTES + 5; index++) {

@@ -362,6 +362,20 @@ function nodeType(node: SceneNode): string {
   }
 }
 
+/** A line height as the multiple of the font size pen.dev stores; undefined when it has none. */
+function lineHeightMultiple(node: SceneNode): number | undefined {
+  const lineHeight = node.lineHeight
+  if (!lineHeight) return undefined
+  if (lineHeight.unit !== 'PIXELS') return rounded(lineHeight.value / 100)
+  return node.fontSize > 0 ? rounded(lineHeight.value / node.fontSize) : undefined
+}
+
+/** Letter spacing in the pixels pen.dev stores, a percent following the font size. */
+function letterSpacingPixels(node: SceneNode): number {
+  const spacing = node.letterSpacing
+  return spacing.unit === 'PIXELS' ? spacing.value : (spacing.value / 100) * node.fontSize
+}
+
 function textFields(state: PenWriteState, node: SceneNode): Partial<PenNode> {
   if (node.type !== 'TEXT') return {}
   const fields: Partial<PenNode> = { content: node.text }
@@ -384,17 +398,9 @@ function textFields(state: PenWriteState, node: SceneNode): Partial<PenNode> {
   if (node.textAlignHorizontal !== 'LEFT') fields.textAlign = textAlign[node.textAlignHorizontal]
   if (node.textAlignVertical !== 'TOP')
     fields.textAlignVertical = textAlignVertical[node.textAlignVertical]
-  if (node.lineHeight) {
-    // pen.dev stores a multiple of the font size, so a pixel line height is measured against it.
-    const multiple =
-      node.lineHeight.unit === 'PIXELS'
-        ? node.fontSize > 0
-          ? node.lineHeight.value / node.fontSize
-          : undefined
-        : node.lineHeight.value / 100
-    if (multiple !== undefined) fields.lineHeight = rounded(multiple)
-  }
-  if (node.letterSpacing.value !== 0) fields.letterSpacing = rounded(node.letterSpacing.value)
+  const lineHeight = lineHeightMultiple(node)
+  if (lineHeight !== undefined) fields.lineHeight = lineHeight
+  if (node.letterSpacing.value !== 0) fields.letterSpacing = rounded(letterSpacingPixels(node))
   if (node.textAutoResize === 'HEIGHT') fields.textGrowth = 'fixed-width'
   if (node.textAutoResize === 'NONE' || node.textAutoResize === 'TRUNCATE')
     fields.textGrowth = 'fixed-width-height'

@@ -5,7 +5,7 @@ import { parsePenDocument, parsePenFile, writePenDocument } from '@open-pencil/p
 import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
 import { gradientPoint } from '@open-pencil/scene-graph/gradient'
 import type { Vector } from '@open-pencil/scene-graph/primitives'
-import { lineHeightPixels, pixelLength } from '@open-pencil/scene-graph/text'
+import { lineHeightPixels, percentLength, pixelLength } from '@open-pencil/scene-graph/text'
 
 import { expectDefined, getNodeOrThrow } from './helpers/assert'
 import { parseDocument } from './helpers/document'
@@ -299,6 +299,16 @@ describe('writePenDocument', () => {
     expect(writtenNode(graph, 'text').lineHeight).toBe(1.5)
     const again = getNodeOrThrow(parsePenFile(writePenDocument(graph)), 'text')
     expect(lineHeightPixels(again.lineHeight, again.fontSize)).toBe(24)
+  })
+
+  test('writes percent letter spacing as the pixels pen.dev stores', () => {
+    const graph = parseDocument([
+      { id: 'text', type: 'text', content: 'Label', fontSize: 16, width: 80, height: 40 }
+    ])
+    getNodeOrThrow(graph, 'text').letterSpacing = percentLength(10)
+    expect(writtenNode(graph, 'text').letterSpacing).toBe(1.6)
+    const again = getNodeOrThrow(parsePenFile(writePenDocument(graph)), 'text')
+    expect(again.letterSpacing).toEqual(pixelLength(1.6))
   })
 
   test('sorts keys by code point, independent of the runtime locale', () => {

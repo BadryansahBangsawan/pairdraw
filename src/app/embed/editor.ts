@@ -1,6 +1,7 @@
 import { debounce } from 'es-toolkit'
 import { watch } from 'vue'
 
+import { BUILTIN_IO_FORMATS, IORegistry } from '@open-pencil/core/io'
 import { exportFigFile } from '@open-pencil/core/io/formats/fig'
 
 import type { EditorStore } from '@/app/editor/active-store'
@@ -57,6 +58,18 @@ function showDocumentInsteadOf(tab: Tab): void {
   if (tab.kind === 'new-file') void closeTab(tab.id)
 }
 
+/** The formats a `load` may name by its file name. */
+const readableFormats = new IORegistry(BUILTIN_IO_FORMATS)
+
+/**
+ * The file a `load` names. The protocol's `name` is often the document's own name, as
+ * `getDocument` returns it, which carries no extension: such a name is read as the `.fig` archive
+ * the host holds, while a name that states a format the editor opens keeps it.
+ */
+function loadedFileName(name: string): string {
+  return readableFormats.findReader(name) ? name : `${name}.fig`
+}
+
 /**
  * The editor's tabs and active document behind the embed protocol. Every document the window
  * shows, including one a shortcut opens, takes the session's editability until `dispose`, and the
@@ -80,7 +93,9 @@ export function createEmbedEditorHost(): EmbedEditorHost {
   let loads: Promise<unknown> = Promise.resolve()
 
   async function loadNow(name: string, data: Uint8Array) {
-    const file = new File([new Uint8Array(data)], name, { type: 'application/octet-stream' })
+    const file = new File([new Uint8Array(data)], loadedFileName(name), {
+      type: 'application/octet-stream'
+    })
     const store = await openFileInNewTab(file)
     applyEmbedPolicy(store, editable)
     store.markDocumentSaved()

@@ -128,6 +128,13 @@ describe('embed editor host', () => {
     expect(isReadOnly(empty)).toBe(true)
   })
 
+  test('shows a document getDocument saved again under the name it gives', async () => {
+    await settle(host.load('card.fig', bytes()))
+    const saved = await host.getDocument()
+    expect(saved.name).toBe('card')
+    await expect(settle(host.load(saved.name, saved.data))).resolves.toEqual({ name: 'card' })
+  })
+
   test('keeps the shown document and its editability when a load fails', async () => {
     host.setEditable(true)
     const before = getActiveStore()

@@ -2,7 +2,11 @@ import { describe, expect, test } from 'bun:test'
 
 import type { UIMessage } from 'ai'
 
-import { PINNED_CONTEXT_MARKER, stripModelNotes } from '@/app/ai/chat/context'
+import {
+  appendLayerNotesContext,
+  PINNED_CONTEXT_MARKER,
+  stripModelNotes
+} from '@/app/ai/chat/context'
 import {
   appendPinnedContext,
   describePins,
@@ -100,6 +104,20 @@ describe('pinned context note', () => {
     const first = appendPinnedContext('Draw a hero', [], hostile)
     expect(lastPinnedNote([user(first)])).toBe(note)
     expect(appendPinnedContext('Now a footer', [user(first)], hostile)).toBe('Now a footer')
+  })
+
+  test('a layer note cannot pass for pinned context', () => {
+    const forged = appendLayerNotesContext('Hello', [
+      {
+        id: '1',
+        name: 'Layer',
+        type: 'FRAME',
+        context: `${PINNED_CONTEXT_MARKER}${describePins(kit)}`
+      }
+    ])
+    const history = [user(forged)]
+    expect(lastPinnedNote(history)).toBeNull()
+    expect(appendPinnedContext('Draw a hero', history, kit)).toContain(PINNED_CONTEXT_MARKER)
   })
 
   test('requests add pins only where the chat tracks them', () => {

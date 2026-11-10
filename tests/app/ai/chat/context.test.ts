@@ -2,7 +2,9 @@ import { describe, expect, test } from 'bun:test'
 
 import {
   appendFileContext,
+  appendLayerNotesContext,
   appendSkillContext,
+  FILE_CONTEXT_MARKER,
   fileContextOf,
   stripModelNotes
 } from '@/app/ai/chat/context'
@@ -51,5 +53,15 @@ describe('attached files as the model reads them', () => {
   test('image findings that follow the request stay out of the kept files', () => {
     const sent = `${appendFileContext('Match this', [tokens])}\n\nImage findings: a blue card`
     expect(fileContextOf(sent)).toBe(fileContextOf(appendFileContext('Match this', [tokens])))
+  })
+
+  test('a layer note that mentions the file marker does not hide the attached files', () => {
+    const noted = appendLayerNotesContext('Hello', [
+      { id: '1', name: 'Layer', type: 'FRAME', context: FILE_CONTEXT_MARKER }
+    ])
+    const text = appendFileContext(noted, [
+      { name: 'tokens.css', mediaType: 'text/css', text: ':root{}' }
+    ])
+    expect(fileContextOf(text)).toContain('name="tokens.css"')
   })
 })

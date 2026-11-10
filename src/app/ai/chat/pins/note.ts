@@ -1,7 +1,6 @@
 import type { UIMessage } from 'ai'
-import { escape } from 'es-toolkit/string'
 
-import { PINNED_CONTEXT_MARKER } from '@/app/ai/chat/context'
+import { inert, PINNED_CONTEXT_MARKER } from '@/app/ai/chat/context'
 
 import type { ConversationPins, StyleKit } from './types'
 
@@ -17,15 +16,6 @@ const PINNED_PREAMBLE =
 /** Said once the user unpinned everything, so earlier pinned context stops applying. */
 export const UNPINNED_NOTE =
   'The user unpinned the style kit and reference images. What was pinned earlier no longer applies.'
-
-/**
- * Pinned text as the note carries it. Vision findings come from text in an image and a kit can
- * come from an imported file's names, so besides tags its square brackets are escaped too: no
- * value can then end the note with `PINNED_CONTEXT_END` or start another model note.
- */
-function inert(value: string): string {
-  return escape(value).replaceAll('[', '&#91;').replaceAll(']', '&#93;')
-}
 
 function describeStyleKit(kit: StyleKit): string {
   const lines: string[] = []

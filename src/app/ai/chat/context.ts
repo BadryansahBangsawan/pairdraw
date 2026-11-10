@@ -17,6 +17,15 @@ function singleLine(value: string): string {
     .trim()
 }
 
+/**
+ * A value as a model note carries it. Notes hold text a person, an imported file, or an image
+ * supplied, so besides tags its square brackets are escaped too: no value can then end its note
+ * or start another model note.
+ */
+export function inert(value: string): string {
+  return escape(value).replaceAll('[', '&#91;').replaceAll(']', '&#93;')
+}
+
 export function resolveReferencedNodes(
   graph: SceneGraph,
   nodeIds: readonly string[]
@@ -193,15 +202,15 @@ export interface LayerNote {
 
 function layerNoteOpening(note: LayerNote): string {
   const repeats = note.repeats ? ` repeats="${note.repeats}"` : ''
-  return `<layer-note id="${escape(note.id)}" name="${escape(singleLine(note.name))}" type="${note.type}"${repeats}`
+  return `<layer-note id="${inert(note.id)}" name="${inert(singleLine(note.name))}" type="${note.type}"${repeats}`
 }
 
 function layerNoteBlock(note: LayerNote): string {
   const lines = [`${layerNoteOpening(note)}>`]
-  if (note.context) lines.push(`<context>${escape(note.context)}</context>`)
+  if (note.context) lines.push(`<context>${inert(note.context)}</context>`)
   if (note.prompt) {
-    const model = note.model ? ` model="${escape(singleLine(note.model))}"` : ''
-    lines.push(`<prompt${model}>${escape(note.prompt)}</prompt>`)
+    const model = note.model ? ` model="${inert(singleLine(note.model))}"` : ''
+    lines.push(`<prompt${model}>${inert(note.prompt)}</prompt>`)
   }
   lines.push('</layer-note>')
   return lines.join('\n')

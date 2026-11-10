@@ -148,6 +148,15 @@ describe('companionAgentHost', () => {
     await expect(spawning).rejects.toThrow(`Program not found: ${claude.command}`)
   })
 
+  test('closes the socket when the companion reports a start error', async () => {
+    const { host, opened } = socketHost()
+    const spawning = host.spawn(claude)
+    const socket = await opened()
+    socket.receive(JSON.stringify({ type: 'error', reason: 'not-found', command: claude.command }))
+    await expect(spawning).rejects.toThrow(`Program not found: ${claude.command}`)
+    expect(socket.readyState).toBe(WebSocket.CLOSED)
+  })
+
   test('runs a terminal sign-in through its socket', async () => {
     const { host, opened } = socketHost()
     const onURL = mock((_url: string) => undefined)

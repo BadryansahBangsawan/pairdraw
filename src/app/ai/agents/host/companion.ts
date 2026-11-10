@@ -130,6 +130,8 @@ export function createCompanionAgentHost(
               : 'The agent could not start.'
           )
         )
+        clearTimeout(timer)
+        socket.close()
       }
     })
     socket.addEventListener('close', (event) => {

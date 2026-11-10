@@ -384,7 +384,16 @@ function textFields(state: PenWriteState, node: SceneNode): Partial<PenNode> {
   if (node.textAlignHorizontal !== 'LEFT') fields.textAlign = textAlign[node.textAlignHorizontal]
   if (node.textAlignVertical !== 'TOP')
     fields.textAlignVertical = textAlignVertical[node.textAlignVertical]
-  if (node.lineHeight) fields.lineHeight = rounded(node.lineHeight.value / 100)
+  if (node.lineHeight) {
+    // pen.dev stores a multiple of the font size, so a pixel line height is measured against it.
+    const multiple =
+      node.lineHeight.unit === 'PIXELS'
+        ? node.fontSize > 0
+          ? node.lineHeight.value / node.fontSize
+          : undefined
+        : node.lineHeight.value / 100
+    if (multiple !== undefined) fields.lineHeight = rounded(multiple)
+  }
   if (node.letterSpacing.value !== 0) fields.letterSpacing = rounded(node.letterSpacing.value)
   if (node.textAutoResize === 'HEIGHT') fields.textGrowth = 'fixed-width'
   if (node.textAutoResize === 'NONE' || node.textAutoResize === 'TRUNCATE')

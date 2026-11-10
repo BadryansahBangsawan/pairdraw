@@ -31,6 +31,8 @@ interface AttachmentDraftOptions {
   reportError: (message: string) => void
   /** Why a text file did not attach, in the person's language. */
   describeFileRefusal: (name: string, refusal: TextAttachmentRefusal | 'limit') => string
+  /** Why more images cannot be attached, in the person's language. */
+  describeImageLimit: (count: number) => string
 }
 
 export function useAttachmentDrafts(options: AttachmentDraftOptions) {
@@ -98,9 +100,8 @@ export function useAttachmentDrafts(options: AttachmentDraftOptions) {
       return
     }
     const draft = draftGeneration
-    const limitMessage = `You can attach up to ${MAX_IMAGE_ATTACHMENTS} images.`
     if (images.value.length >= MAX_IMAGE_ATTACHMENTS) {
-      options.reportError(limitMessage)
+      options.reportError(options.describeImageLimit(MAX_IMAGE_ATTACHMENTS))
       resetFileDialog()
       return
     }
@@ -111,7 +112,7 @@ export function useAttachmentDrafts(options: AttachmentDraftOptions) {
         if (draft !== draftGeneration) return
         // Checked after the await, since another drop may have filled the slots meanwhile.
         if (images.value.length >= MAX_IMAGE_ATTACHMENTS) {
-          options.reportError(limitMessage)
+          options.reportError(options.describeImageLimit(MAX_IMAGE_ATTACHMENTS))
           break
         }
         const validationError = validateImageAttachmentFile(image)

@@ -302,3 +302,14 @@ test('a full message shows why more images cannot be dropped', async ({ configur
   await expect(chat.page.getByRole('button', { name: /Remove image/ })).toHaveCount(4)
   await expect(chat.page.getByText('Up to 4 images per message', { exact: true })).toBeVisible()
 })
+
+test('a full message says why more images chosen cannot be attached, as a drop does', async ({
+  configuredChat: chat
+}) => {
+  const chooser = chat.page.waitForEvent('filechooser')
+  await chat.page.getByRole('button', { name: 'Attach images' }).click()
+  await (await chooser).setFiles([PILOT, PYTHON, PILOT, PYTHON, PILOT])
+
+  await expect(chat.page.getByRole('button', { name: /Remove image/ })).toHaveCount(4)
+  await expect(chat.page.getByText('Up to 4 images per message', { exact: true })).toBeVisible()
+})

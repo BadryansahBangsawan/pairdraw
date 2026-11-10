@@ -83,7 +83,8 @@ const attachments = useAttachmentDrafts({
   editor,
   selectedIds,
   reportError: (message) => emit('error', message),
-  describeFileRefusal
+  describeFileRefusal,
+  describeImageLimit: (count) => ai.value.dropImagesLimit({ count })
 })
 const {
   images,

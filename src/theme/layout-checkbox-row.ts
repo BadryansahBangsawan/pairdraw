@@ -4,5 +4,4 @@ const layoutCheckboxRowTheme = {
   }
 }
 
-export type LayoutCheckboxRowTheme = typeof layoutCheckboxRowTheme
 export default layoutCheckboxRowTheme

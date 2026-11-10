@@ -34,5 +34,4 @@ const slidesRowTheme = {
   }
 }
 
-export type SlidesRowTheme = typeof slidesRowTheme
 export default slidesRowTheme

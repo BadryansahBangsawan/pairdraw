@@ -7,5 +7,4 @@ const scaleAnchorTheme = {
   }
 }
 
-export type ScaleAnchorTheme = typeof scaleAnchorTheme
 export default scaleAnchorTheme

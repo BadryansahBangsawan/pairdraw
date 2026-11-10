@@ -14,5 +14,4 @@ const shaderModeTransportTheme = {
   }
 } as const
 
-export type ShaderModeTransportTheme = typeof shaderModeTransportTheme
 export default shaderModeTransportTheme

@@ -11,5 +11,4 @@ const slidesControlsTheme = {
   }
 } as const
 
-export type SlidesControlsTheme = typeof slidesControlsTheme
 export default slidesControlsTheme

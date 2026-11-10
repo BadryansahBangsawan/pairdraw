@@ -27,5 +27,4 @@ const shaderModeStageTheme = {
   }
 } as const
 
-export type ShaderModeStageTheme = typeof shaderModeStageTheme
 export default shaderModeStageTheme

@@ -6,13 +6,14 @@ import type { SceneGraph } from '@open-pencil/scene-graph'
 import { importTokensIntoGraph } from '#core/io/formats/design-tokens/apply'
 import { readCSSDesignTokens } from '#core/io/formats/design-tokens/css/read'
 import { defaultTokenImportOptions, planTokenImport } from '#core/io/formats/design-tokens/plan'
-import type { DesignTokenBundle, DesignTokenReadIssue } from '#core/io/formats/design-tokens/read'
+import type {
+  DesignTokenBundle,
+  DesignTokenReadIssue,
+  DesignTokenSourceFile
+} from '#core/io/formats/design-tokens/read'
 
 /** A stylesheet or manifest the folder reader already loaded. Paths stay inside the folder. */
-export interface DesignSystemSourceFile {
-  path: string
-  text: string
-}
+export type DesignSystemSourceFile = DesignTokenSourceFile
 
 export type DesignSystemIssue =
   | DesignTokenReadIssue

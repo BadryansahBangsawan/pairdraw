@@ -100,7 +100,8 @@ const EDITED_RAW_FIELDS: Partial<Record<string, readonly string[]>> = {
   componentPropertyDefinitions: ['componentPropDefs'],
   componentPropertyReferences: ['componentPropRefs'],
   componentPropertyAssignments: ['componentPropAssignments'],
-  variantPropSpecs: ['variantPropSpecs']
+  variantPropSpecs: ['variantPropSpecs'],
+  prototypeReactions: ['prototypeInteractions']
 }
 
 export function staleFigmaRawFields(editedFields: readonly string[] = []): ReadonlySet<string> {

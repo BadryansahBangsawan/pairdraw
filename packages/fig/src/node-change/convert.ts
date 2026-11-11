@@ -32,6 +32,7 @@ import {
   extractPluginRelaunchData,
   readNodeChangePluginData
 } from './plugin-data'
+import { extractPrototypeReactions } from './prototype'
 import { extractNodeStatus } from './status'
 import { styleRefId } from './style/refs'
 import { importStyleRuns } from './style/runs'
@@ -799,6 +800,7 @@ export function nodeChangeToProps(
     maskIsOutline: nc.maskIsOutline ?? false,
     expanded: true,
     autoRename: (nc.autoRename ?? true) as boolean,
+    prototypeReactions: extractPrototypeReactions(nc),
     boundVariables: extractBoundVariables(nc),
     variableAssignmentScales: numericVariableAssignmentScales(),
     variableBindingScales: sourceVariableBindingScales(nc),
@@ -1310,6 +1312,11 @@ export const FIGMA_RAW_NODE_FIELD_KEYS = [
   'sectionStatusInfo',
   'prototypeStartNodeID',
   'prototypeInteractions',
+  'navigationType',
+  'overlayPositionType',
+  'overlayRelativePosition',
+  'overlayBackgroundInteraction',
+  'overlayBackgroundAppearance',
   'transitionInfo',
   'codeSyntax',
   'lockMode',

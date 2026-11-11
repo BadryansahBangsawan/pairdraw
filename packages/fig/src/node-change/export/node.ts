@@ -32,6 +32,7 @@ import {
   mergePluginData,
   serializePluginRelaunchData
 } from '../plugin-data'
+import { applyPrototypeDestination, applyPrototypeReactions } from '../prototype'
 import { serializeNodeStatus } from '../status'
 import {
   componentPropAssignment,
@@ -1004,7 +1005,10 @@ export function sceneNodeToKiwiWithContext(
   context.serializeGeometry(nodeForGeometryExport(node), nc, context.blobs)
   context.serializeVariableBindings(node, nc, context.graph, context.varIdToGuid)
   mergeParameterBindings(nc)
+  // Before the raw pass: an explicit record keeps the raw payload from overwriting it.
+  applyPrototypeReactions(context, node, nc, localIdCounter)
   applyRawFigmaNodeFields(context, node, nc)
+  applyPrototypeDestination(context, node, nc)
   applyVariableModes(context, node, nc)
 
   applyExportSettingsPluginData(node)

@@ -93,6 +93,7 @@ export {
   scaleFactorForSize
 } from './scale'
 export type { RescaleSnapshot, ScaleAnchor, ScaleSession } from './scale'
+export { newLayerDefaults } from './shapes/defaults'
 export type { RenameSelectionOptions, RenameSelectionPreview } from './structure/rename'
 export type { EditorToolDef } from './tool-registry'
 export type {

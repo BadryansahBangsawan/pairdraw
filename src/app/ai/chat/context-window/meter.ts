@@ -5,11 +5,11 @@ import type { ContextUsage } from './usage'
 /** Roughly how many characters of English or code one token holds, for estimates only. */
 const CHARACTERS_PER_TOKEN = 4
 /** From here the meter warns that the conversation is filling the model's context. */
-export const CONTEXT_WARNING_FRACTION = 0.7
+const CONTEXT_WARNING_FRACTION = 0.7
 /** From here replies may lose earlier context, so the meter suggests a new chat. */
-export const CONTEXT_FULL_FRACTION = 0.9
+const CONTEXT_FULL_FRACTION = 0.9
 
-export type ContextLevel = 'normal' | 'warning' | 'full'
+type ContextLevel = 'normal' | 'warning' | 'full'
 
 /** What the chat header shows about a conversation's context: tokens only, never a cost. */
 export interface ContextMeter {

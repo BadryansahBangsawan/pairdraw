@@ -286,5 +286,3 @@ export function createAgentConnector({ discovery, accounts, activate }: AgentCon
 
   return { activates: activate !== undefined, state, connect }
 }
-
-export type AgentConnector = ReturnType<typeof createAgentConnector>

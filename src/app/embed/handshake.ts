@@ -11,7 +11,7 @@ export interface EmbedHandshakeEvent {
   ports: readonly MessagePort[]
 }
 
-export interface EmbedParentWindow {
+interface EmbedParentWindow {
   postMessage(message: unknown, targetOrigin: string): void
 }
 
@@ -40,7 +40,7 @@ export interface EmbedHandshake {
  * origin the URL names, is well formed, and carries one port. Anything else is ignored, and a
  * frame that is not the parent cannot connect even from the right origin.
  */
-export function acceptsEmbedConnect(
+function acceptsEmbedConnect(
   event: EmbedHandshakeEvent,
   parent: unknown,
   expectedOrigin: string

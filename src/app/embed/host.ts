@@ -2,9 +2,9 @@ import type { SceneNode } from '@open-pencil/scene-graph'
 
 import type { EmbedEventMessage, EmbedImageFormat } from './protocol'
 
-export type EmbedPage = Pick<SceneNode, 'id' | 'name'>
+type EmbedPage = Pick<SceneNode, 'id' | 'name'>
 
-export interface EmbedImage {
+interface EmbedImage {
   data: Uint8Array
   mimeType: string
 }

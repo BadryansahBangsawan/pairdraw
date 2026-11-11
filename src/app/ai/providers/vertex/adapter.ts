@@ -11,7 +11,7 @@ import { parseVertexCredential, vertexAuthHeaders } from './credential'
 import { parseVertexBaseURL, vertexBaseURL } from './endpoint'
 
 /** The Messages API version Vertex AI takes in the body instead of a header. */
-export const VERTEX_ANTHROPIC_VERSION = 'vertex-2023-10-16'
+const VERTEX_ANTHROPIC_VERSION = 'vertex-2023-10-16'
 
 /**
  * Structured outputs are generally available, so this beta needs no flag at all. Other betas the
@@ -51,7 +51,7 @@ export function vertexAnthropicFetch(fetchImpl?: FetchFunction): FetchFunction {
 }
 
 /** The request body Vertex AI's `:rawPredict` takes: the model is in the URL, the version here. */
-export function vertexAnthropicBody(args: Record<string, unknown>): Record<string, unknown> {
+function vertexAnthropicBody(args: Record<string, unknown>): Record<string, unknown> {
   return { ...omit(args, ['model']), anthropic_version: VERTEX_ANTHROPIC_VERSION }
 }
 

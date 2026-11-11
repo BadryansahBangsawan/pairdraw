@@ -14,7 +14,7 @@ export function selectedVectorizeProvider(): VectorizeProvider {
 }
 
 /** The SVG a service made of an image, or that it has no key to be asked with. */
-export type VectorSVGResult = { status: 'svg'; svg: string } | { status: 'missing-key' }
+type VectorSVGResult = { status: 'svg'; svg: string } | { status: 'missing-key' }
 
 /**
  * Asks `provider` for the SVG of an image with the key saved for it; `onRequest` runs once the

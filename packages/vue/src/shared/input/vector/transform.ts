@@ -79,7 +79,7 @@ function selectedPointsBox(
  * segments of the path win over every part of the box, so both can still be dragged; a band that
  * would stretch a flat side does nothing, so it takes nothing. ⌘/Ctrl leaves the box to bends.
  */
-export function editTransformZoneAt(
+function editTransformZoneAt(
   editor: Editor,
   cx: number,
   cy: number,

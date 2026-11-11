@@ -22,7 +22,7 @@ export const AUTO_AGENT_ORDER: readonly ACPAgentID[] = ONBOARDING_AGENTS.flatMap
  * `unknown-login` is installed but does not say whether it is signed in, `sign-in` needs the
  * person to sign in, and `install` needs its adapter or the MCP server installed.
  */
-export const AGENT_CANDIDATE_STATES = ['ready', 'unknown-login', 'sign-in', 'install'] as const
+const AGENT_CANDIDATE_STATES = ['ready', 'unknown-login', 'sign-in', 'install'] as const
 export type AgentCandidateState = (typeof AGENT_CANDIDATE_STATES)[number]
 
 /** An agent auto-connect can offer, with what it still needs. */

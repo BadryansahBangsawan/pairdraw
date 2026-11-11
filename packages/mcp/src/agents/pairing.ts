@@ -10,7 +10,7 @@ const ATTEMPT_WINDOW_MS = 60_000
 /** Tabs paired at once; the oldest is forgotten when another pairs. */
 const MAX_SESSIONS = 16
 
-export type PairingResult =
+type PairingResult =
   | { ok: true; token: string; agentToken: string }
   | { ok: false; reason: 'rejected' | 'rate-limited' }
 

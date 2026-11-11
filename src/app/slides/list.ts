@@ -21,7 +21,7 @@ export function useSlides(store: EditorStore): ComputedRef<SlideSummary[]> {
  * Moves a slide before or after another, which reorders the page's layers as one undo step;
  * false when the slide order stays as it was.
  */
-export function moveSlide(
+function moveSlide(
   store: EditorStore,
   slideId: string,
   targetId: string,

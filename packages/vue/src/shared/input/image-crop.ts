@@ -13,7 +13,7 @@ import { MOVE_CURSOR, buildResizeCursor } from '#vue/shared/input/geometry'
 import type { DragImageCrop, DragState } from '#vue/shared/input/types'
 
 /** What a press at a screen point takes while an image is edited, if anything. */
-export function imageCropHitAt(editor: Editor, sx: number, sy: number): ImageCropHit | null {
+function imageCropHitAt(editor: Editor, sx: number, sy: number): ImageCropHit | null {
   const layout = editedImageLayout(editor.graph, editor.state.imageEdit, editor.state)
   return layout ? hitTestImageCrop(layout, { x: sx, y: sy }) : null
 }

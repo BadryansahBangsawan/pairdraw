@@ -3,7 +3,7 @@ import { computeBounds } from '@open-pencil/scene-graph/geometry'
 import type { Rect } from '@open-pencil/scene-graph/primitives'
 
 /** Space between variants, and between the variants and what is already on the page. */
-export const VARIANT_GAP = 120
+const VARIANT_GAP = 120
 
 /**
  * Where a row of variants goes: right of everything on the page, at the top of the design they

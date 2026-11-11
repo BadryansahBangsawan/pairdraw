@@ -25,7 +25,7 @@ function devMCPURL(): string {
     : ''
 }
 
-export interface DevCompanionOptions {
+interface DevCompanionOptions {
   connection?: Pick<CompanionConnection, 'adopt' | 'check' | 'connected' | 'state'>
   /** Defaults to the session the development server defined for this tab. */
   session?: Omit<CompanionSession, 'port'> | null

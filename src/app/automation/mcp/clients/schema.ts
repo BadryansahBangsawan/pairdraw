@@ -12,7 +12,6 @@ export type MCPClientConfig = v.InferOutput<typeof mcpClientConfigSchema>
 export const mcpClientWriteSchema = v.object({
   backup: v.nullable(v.string())
 })
-export type MCPClientWrite = v.InferOutput<typeof mcpClientWriteSchema>
 
 /**
  * The reasons the desktop shell gives for not reading or writing a client's file: `invalid` when

@@ -36,7 +36,7 @@ function designsWithAgent(settings: AIModelSettings, agent: ACPAgentDef): boolea
  * adds its connection and profile, clears the roles an agent cannot take, and drops the empty
  * profile a fresh install starts with. The design model it replaces stays among the profiles.
  */
-export function agentActivationSettings(
+function agentActivationSettings(
   settings: AIModelSettings,
   agent: ACPAgentDef,
   createId: () => string

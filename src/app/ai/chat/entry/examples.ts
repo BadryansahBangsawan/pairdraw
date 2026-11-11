@@ -6,7 +6,7 @@ type AIMessages = ReturnType<typeof aiMessages.get>
 export const PROMPT_EXAMPLE_IDS = ['landing', 'signIn', 'dashboard', 'pricing'] as const
 export type PromptExampleId = (typeof PROMPT_EXAMPLE_IDS)[number]
 
-export interface PromptExample {
+interface PromptExample {
   id: PromptExampleId
   /** The chip's short name. */
   label: string

@@ -2,7 +2,7 @@
 export type DocumentEntryAction = 'select' | 'deselect' | 'save-as' | 'remove-recent' | 'delete'
 
 /** One item of a document entry's menu, with its translated label. */
-export type DocumentEntryMenuItem = { action: DocumentEntryAction; label: string }
+type DocumentEntryMenuItem = { action: DocumentEntryAction; label: string }
 
 /** A document entry's menu: the label of its ⋯ button and the items it offers. */
 export type DocumentEntryMenu = { actions: string; items: readonly DocumentEntryMenuItem[] }

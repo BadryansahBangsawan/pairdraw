@@ -7,7 +7,7 @@ import type { ImageAIProviderID } from './types'
 /** The keys image AI uses: one per image service, and remove.bg's for background removal. */
 export type ImageAICredentialID = ImageAIProviderID | 'remove-bg'
 
-export function imageAICredentialRef(id: ImageAICredentialID): CredentialRef {
+function imageAICredentialRef(id: ImageAICredentialID): CredentialRef {
   return credentialRef(id === 'remove-bg' ? 'remove-bg' : `image-ai-${id}`, 'api-key')
 }
 

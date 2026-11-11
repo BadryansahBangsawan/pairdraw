@@ -30,13 +30,12 @@ export const EMBED_METHODS = [
   'exportImage',
   'setEditable'
 ] as const
-export type EmbedMethod = (typeof EMBED_METHODS)[number]
 
 export const EMBED_IMAGE_FORMATS = ['PNG', 'JPG', 'WEBP'] as const
 export type EmbedImageFormat = (typeof EMBED_IMAGE_FORMATS)[number]
 
 /** Why a request failed, stable for hosts to branch on; `message` is for people. */
-export type EmbedErrorCode =
+type EmbedErrorCode =
   | 'invalid-request'
   | 'unknown-method'
   | 'edit-not-allowed'
@@ -56,7 +55,7 @@ export type EmbedResponse =
   | { id: EmbedRequestId; ok: true; result: unknown }
   | { id: EmbedRequestId; ok: false; error: EmbedError }
 
-export interface EmbedEvents {
+interface EmbedEvents {
   /** Sent once, first on the port, when the handshake is accepted. */
   connected: { version: number; editable: boolean; allowEdit: boolean }
   documentload: { name: string }
@@ -66,7 +65,7 @@ export interface EmbedEvents {
   pagechange: { pageId: string }
   editablechange: { editable: boolean }
 }
-export type EmbedEventName = keyof EmbedEvents
+type EmbedEventName = keyof EmbedEvents
 export type EmbedEventMessage = {
   [K in EmbedEventName]: { event: K; data: EmbedEvents[K] }
 }[EmbedEventName]

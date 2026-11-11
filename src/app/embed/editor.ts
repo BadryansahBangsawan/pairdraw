@@ -19,7 +19,7 @@ import type { EmbedEditorHost } from './host'
 import { EmbedRequestError, type EmbedEventMessage, type EmbedImageFormat } from './protocol'
 
 /** How long edits settle before the host hears `documentchange`. */
-export const DOCUMENT_CHANGE_DEBOUNCE_MS = 250
+const DOCUMENT_CHANGE_DEBOUNCE_MS = 250
 
 const IMAGE_MIME_TYPES: Record<EmbedImageFormat, string> = {
   PNG: 'image/png',

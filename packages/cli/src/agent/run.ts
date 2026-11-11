@@ -28,7 +28,7 @@ export const DEFAULT_MAX_STEPS = 25
 export const MAX_MAX_STEPS = 1000
 
 /** What the headless agent is told it is, independent of any locale or UI. */
-export const AGENT_SYSTEM_PROMPT = [
+const AGENT_SYSTEM_PROMPT = [
   'You are Pairdraw, a headless design agent working on one OpenPencil document.',
   'Inspect before editing, keep changes inside the request, and never claim an edit succeeded unless a tool result confirms it.',
   'Node IDs are stable strings like "12:34"; reuse the IDs a tool returns instead of guessing.'
@@ -51,7 +51,7 @@ const optionsSchema = v.strictObject({
 })
 export type AgentRunOptions = v.InferOutput<typeof optionsSchema>
 
-export interface AgentToolRun {
+interface AgentToolRun {
   name: string
   ok: boolean
   error?: string

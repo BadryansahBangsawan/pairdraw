@@ -22,7 +22,7 @@ const HIT_THRESHOLD = 8
 const JOIN_MERGE_DISTANCE = 1
 
 /** The points a selection moves: selected points and the ends of selected segments. */
-export function selectedEditPoints(es: NodeEditState): number[] {
+function selectedEditPoints(es: NodeEditState): number[] {
   return selectedVectorPoints(es, es.selectedVertexIndices, es.selectedSegmentIndices)
 }
 

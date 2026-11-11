@@ -38,7 +38,7 @@ export interface MCPChatToolOptions {
 }
 
 /** Prefix of every external tool's name; the chat's tool rows strip it (`tool-calls/display.ts`). */
-export const MCP_TOOL_PREFIX = 'mcp__'
+const MCP_TOOL_PREFIX = 'mcp__'
 /** The longest tool name every provider accepts. */
 const MAX_TOOL_NAME_LENGTH = 64
 const MAX_SERVER_SLUG_LENGTH = 20
@@ -46,11 +46,11 @@ const MAX_SERVER_SLUG_LENGTH = 20
 const MAX_RESULT_TEXT_LENGTH = 50_000
 
 /** What the model reads when the person declined a call. */
-export const MCP_TOOL_DECLINED =
+const MCP_TOOL_DECLINED =
   'The user declined this action, so nothing was done. Do not retry it; ask what to do instead.'
 
 /** The server's part of a tool name: lowercase letters, digits, and dashes, never underscores. */
-export function mcpServerSlug(name: string): string {
+function mcpServerSlug(name: string): string {
   const slug = name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')

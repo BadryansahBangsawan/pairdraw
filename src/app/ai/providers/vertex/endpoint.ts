@@ -46,7 +46,7 @@ const LOCATION_PATTERN = /^[a-z]+(?:-[a-z]+\d+)?$/
 const PROJECT_PATTERN = /^[a-z0-9][a-z0-9.:-]{0,62}$/
 const PATH_PATTERN = /^\/v1\/projects\/([^/]+)\/locations\/([^/]+)\/?$/
 
-export function isVertexLocation(location: string): boolean {
+function isVertexLocation(location: string): boolean {
   return LOCATION_PATTERN.test(location)
 }
 

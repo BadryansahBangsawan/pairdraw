@@ -6,7 +6,7 @@ export const MCP_CLIENT_COMMAND = 'openpencil-mcp'
 /** The name every client knows the server by, so its tool names match the docs. */
 export const MCP_CLIENT_ENTRY = OPEN_PENCIL_MCP_SERVER
 
-export const MCP_CLIENT_IDS = [
+const MCP_CLIENT_IDS = [
   'claude-code',
   'claude-desktop',
   'codex',
@@ -28,7 +28,7 @@ export interface MCPClientJSONFormat {
 }
 
 /** Codex, which keeps its servers in `[mcp_servers.<name>]` tables of `config.toml`. */
-export interface MCPClientTOMLFormat {
+interface MCPClientTOMLFormat {
   kind: 'toml'
 }
 

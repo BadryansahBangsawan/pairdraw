@@ -4,7 +4,7 @@ export const WHEEL_STEP_DISTANCE = 120
 export const WHEEL_TURN_GAP_MS = 250
 
 /** One wheel event a presentation could not scroll with: how far it turned, and when. */
-export interface WheelTurn {
+interface WheelTurn {
   deltaX: number
   deltaY: number
   /** The event's `timeStamp`, in milliseconds. */

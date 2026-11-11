@@ -4,13 +4,13 @@ export type ExploreAxis = (typeof EXPLORE_AXES)[number]
 
 export const MIN_VARIANTS = 2
 export const MAX_VARIANTS = 6
-export const DEFAULT_VARIANTS = 3
+const DEFAULT_VARIANTS = 3
 
 /**
  * "Let it cook": `off` sends messages as they are; `variants` asks for several designs side by
  * side, each a new top-level frame; `single` ("Don't iterate") asks for one design in one pass.
  */
-export const EXPLORE_MODES = ['off', 'variants', 'single'] as const
+const EXPLORE_MODES = ['off', 'variants', 'single'] as const
 export type ExploreMode = (typeof EXPLORE_MODES)[number]
 
 /** The composer's choice, which keeps the count and axis while the mode is off. */

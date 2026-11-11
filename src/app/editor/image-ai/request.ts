@@ -58,7 +58,7 @@ function serverName(baseURL: string, fallback: string): string {
 }
 
 /** The image service chosen in Settings, with its saved key read for this one request. */
-export async function resolveImageAIConnection(): Promise<ConnectionOutcome> {
+async function resolveImageAIConnection(): Promise<ConnectionOutcome> {
   const { definition: provider, baseURL } = selectedImageService()
   if (!baseURL) return { status: 'missing-base-url', service: provider.name }
   const apiKey = await resolveImageAICredential(provider.id)

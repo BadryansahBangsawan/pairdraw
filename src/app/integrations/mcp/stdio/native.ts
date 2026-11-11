@@ -22,7 +22,7 @@ const stdioEventSchema = v.variant('kind', [
 /** A line the process wrote to stdout, or its exit. */
 export type MCPStdioEvent = v.InferOutput<typeof stdioEventSchema>
 
-export function parseMCPStdioEvent(value: unknown): MCPStdioEvent | null {
+function parseMCPStdioEvent(value: unknown): MCPStdioEvent | null {
   const parsed = v.safeParse(stdioEventSchema, value)
   return parsed.success ? parsed.output : null
 }
@@ -32,7 +32,7 @@ const stdioErrorSchema = v.object({
   message: v.optional(v.string())
 })
 
-export type MCPStdioErrorKind = v.InferOutput<typeof stdioErrorSchema>['kind']
+type MCPStdioErrorKind = v.InferOutput<typeof stdioErrorSchema>['kind']
 
 /** Why the desktop shell did not start the process. */
 export class MCPStdioError extends Error {

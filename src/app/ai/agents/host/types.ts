@@ -21,11 +21,11 @@ export interface AgentSpawnOptions {
 }
 
 /** What a host may install: an agent's ACP adapter or one of OpenPencil's companions. */
-export type AgentInstallTarget =
+type AgentInstallTarget =
   | { kind: 'adapter'; agent: ACPAgentDef }
   | { kind: 'companion'; companion: 'mcp' | 'harness' }
 
-export interface AgentInstallOptions {
+interface AgentInstallOptions {
   /** The search path the last detection reported, so the package manager finds its tools. */
   searchPath: string
   manager: PackageManager
@@ -40,7 +40,7 @@ export interface AgentSignIn {
   cancel(): Promise<void>
 }
 
-export interface AgentSignInRequest {
+interface AgentSignInRequest {
   /** The auth method, advertised by the agent, that setup signs in with. */
   methodId: string
   /** Told the sign-in page to open by hand, when the login prints one. */

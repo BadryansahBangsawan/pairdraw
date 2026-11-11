@@ -39,7 +39,7 @@ function errorText(error: unknown): string {
  * the page, as one step that selects them. Files of other kinds are left out, and a choice with
  * none to place says which kinds can be.
  */
-export async function placeFilesInView(store: EditorStore, files: readonly File[]): Promise<void> {
+async function placeFilesInView(store: EditorStore, files: readonly File[]): Promise<void> {
   const placeable = filterCanvasFiles(files)
   const messages = notificationMessages.get()
   if (placeable.length === 0) {

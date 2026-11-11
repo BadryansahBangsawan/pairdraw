@@ -8,7 +8,7 @@ import type { RecentDocument } from './store'
 export type RecentFilesSort = v.InferOutput<typeof recentFilesSortSchema>
 
 export const RECENT_FILES_SORTS = recentFilesSortSchema.options
-export const DEFAULT_RECENT_FILES_SORT: RecentFilesSort = 'last-used'
+const DEFAULT_RECENT_FILES_SORT: RecentFilesSort = 'last-used'
 
 const RECENT_FILES_SORT_STORAGE_KEY = 'open-pencil:home-files-sort'
 

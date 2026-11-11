@@ -15,9 +15,7 @@ import {
 export const exploreSetting = shallowRef<ExploreSetting>({ ...DEFAULT_EXPLORE_SETTING })
 
 /** What the next message the composer sends asks for, or null while exploring is off. */
-export const exploreRequest = computed<ExploreRequest | null>(() =>
-  exploreRequestOf(exploreSetting.value)
-)
+const exploreRequest = computed<ExploreRequest | null>(() => exploreRequestOf(exploreSetting.value))
 
 /** The submission as the composer sends it now, asking for what "Let it cook" is set to. */
 export function withExploreRequest(submission: ChatSubmission): ChatSubmission {

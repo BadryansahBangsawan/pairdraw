@@ -24,7 +24,7 @@ export interface PinReferenceDependencies {
 }
 
 /** Asks the Vision model to describe a reference once, as it is pinned. */
-export async function describePinnedReference(
+async function describePinnedReference(
   image: PreparedImageAttachment,
   dependencies: VisionModelDependencies = {
     createRuntime: createAIModelRuntime,

@@ -5,7 +5,7 @@ import { useFileMessages, useRecoveryMessages } from '@open-pencil/vue/i18n'
 import type { DocumentEntryMenu } from './types'
 
 /** What a Home list offers for one of its documents, besides selecting it. */
-export type DocumentEntryMenuOptions = {
+type DocumentEntryMenuOptions = {
   /** The document is selected, so the menu offers to deselect it. */
   selected: boolean
   saveAs?: boolean

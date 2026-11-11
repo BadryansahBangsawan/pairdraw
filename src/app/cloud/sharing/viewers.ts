@@ -29,7 +29,7 @@ function forget(store: EditorStore) {
 }
 
 /** Remembers a tab opened from a link until it closes. */
-export function rememberSharedLinkTab(store: EditorStore, tab: SharedLinkTab): void {
+function rememberSharedLinkTab(store: EditorStore, tab: SharedLinkTab): void {
   sharedLinkTabs.value = new Map(sharedLinkTabs.value).set(store, tab)
   const stop = watch(allTabs, () => {
     if (getTabForStore(store)) return

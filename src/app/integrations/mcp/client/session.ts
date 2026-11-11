@@ -34,7 +34,7 @@ interface FailedServer {
   until: number
 }
 
-export interface ExternalMCPToolsOptions {
+interface ExternalMCPToolsOptions {
   connections?: () => MCPConnection[]
   dependencies?: MCPConnectDependencies
   idleCloseMs?: number
@@ -42,7 +42,7 @@ export interface ExternalMCPToolsOptions {
   now?: () => number
 }
 
-export interface ExternalMCPToolsRequest extends MCPChatToolOptions {
+interface ExternalMCPToolsRequest extends MCPChatToolOptions {
   /** Stops waiting for slow servers: the message goes on without their tools. */
   signal?: AbortSignal
 }

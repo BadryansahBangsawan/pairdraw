@@ -43,7 +43,7 @@ export const BEDROCK_SIGNING_SERVICE = 'bedrock-mantle'
 const REGION_PATTERN = /^[a-z]{2}(?:-[a-z]+)+-\d{1,2}$/
 const HOST_PATTERN = /^bedrock-mantle\.([a-z0-9-]+)\.api\.aws$/
 
-export function isBedrockRegion(region: string): boolean {
+function isBedrockRegion(region: string): boolean {
   return REGION_PATTERN.test(region)
 }
 

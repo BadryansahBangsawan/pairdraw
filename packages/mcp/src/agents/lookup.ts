@@ -9,7 +9,7 @@ import type { CompanionAgent } from './registry'
 
 /** The program the app knows OpenPencil's MCP server by; the companion is that server. */
 export const MCP_EXECUTABLE = 'openpencil-mcp-http'
-export const MCP_PACKAGE = '@open-pencil/mcp'
+const MCP_PACKAGE = '@open-pencil/mcp'
 const HARNESS_PACKAGE = '@open-pencil/harness'
 const PACKAGE_MANAGERS = ['npm', 'bun'] as const
 
@@ -60,7 +60,7 @@ async function outputOf(
 }
 
 /** The folder `npm install --global` writes packages into, below the prefix npm reports. */
-export function npmGlobalPackages(prefix: string, runtimePlatform = platform()): string {
+function npmGlobalPackages(prefix: string, runtimePlatform = platform()): string {
   return runtimePlatform === 'win32'
     ? join(prefix, 'node_modules')
     : join(prefix, 'lib', 'node_modules')

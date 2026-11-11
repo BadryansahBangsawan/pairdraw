@@ -12,10 +12,10 @@ import type { MCPConnectionID } from '../types'
 import { credentialMCPOAuthStore, type MCPOAuthStore } from './state'
 
 /** Served from `public/`; it relays the redirect to the editor over this channel. */
-export const MCP_OAUTH_CALLBACK_PATH = '/oauth/mcp.html'
+const MCP_OAUTH_CALLBACK_PATH = '/oauth/mcp.html'
 export const MCP_OAUTH_CALLBACK_CHANNEL = 'open-pencil:mcp-oauth'
 /** Served from `public/` on the web app; it hands the redirect to the desktop app's deep link. */
-export const MCP_OAUTH_DESKTOP_CALLBACK_PATH = '/oauth/mcp-desktop.html'
+const MCP_OAUTH_DESKTOP_CALLBACK_PATH = '/oauth/mcp-desktop.html'
 
 /** Thrown when a server wants the person to sign in again, which only Settings can start. */
 export class MCPSignInRequiredError extends Error {

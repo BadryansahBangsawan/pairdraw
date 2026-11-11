@@ -66,7 +66,7 @@ export async function openHeadlessSession(file: string): Promise<ToolSession> {
 }
 
 /** Sends each call to the document the running app has open, or the one `target` names. */
-export function openAppSession(target: AppTargetCLIArgs = {}): ToolSession {
+function openAppSession(target: AppTargetCLIArgs = {}): ToolSession {
   const targetArgs = appTargetRPCArgs(target)
   return {
     label: 'app',

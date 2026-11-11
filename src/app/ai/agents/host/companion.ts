@@ -22,7 +22,7 @@ export interface CompanionEndpoint {
   token(): string | null
 }
 
-export interface CompanionHostOptions {
+interface CompanionHostOptions {
   fetch?: CompanionFetch
   createSocket?: (url: string) => WebSocket
 }

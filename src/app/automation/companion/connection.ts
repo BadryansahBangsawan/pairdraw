@@ -21,13 +21,13 @@ export const COMPANION_COMMAND = `npx -p @open-pencil/mcp@${APP_VERSION} openpen
  * prints, after the person confirms it, and keeps the tokens only in memory: reloading or closing
  * the tab, or restarting the companion, needs a new link.
  */
-export type CompanionStatus = 'idle' | 'pairing' | 'connected' | 'lost'
+type CompanionStatus = 'idle' | 'pairing' | 'connected' | 'lost'
 
 /** Why the tab is not connected, for the settings card to explain. */
-export type CompanionFailure = 'rejected' | 'rate-limited' | 'unreachable' | 'expired'
+type CompanionFailure = 'rejected' | 'rate-limited' | 'unreachable' | 'expired'
 
 /** A link waiting for the person to confirm it, as the tab shows it; the code stays private. */
-export interface CompanionPendingLink {
+interface CompanionPendingLink {
   port: number
   /** The characters the companion's terminal printed beside the link. */
   fingerprint: string
@@ -90,7 +90,7 @@ export async function companionFingerprint(code: string): Promise<string> {
 /** The slice of `fetch` the connection calls, so tests can stand in for it. */
 export type CompanionFetch = (url: string, init?: RequestInit) => Promise<Response>
 
-export interface CompanionConnectionOptions {
+interface CompanionConnectionOptions {
   fetch?: CompanionFetch
 }
 

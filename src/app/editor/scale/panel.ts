@@ -12,7 +12,7 @@ import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
 import type { EditorStore } from '@/app/editor/active-store'
 
 /** The anchor the Scale panel scales from; it stays picked while the app runs, as in Figma. */
-export const scaleAnchor = ref<ScaleAnchor>(DEFAULT_SCALE_ANCHOR)
+const scaleAnchor = ref<ScaleAnchor>(DEFAULT_SCALE_ANCHOR)
 
 /** Which value of the Scale panel a factor comes from. */
 export type ScaleField = 'width' | 'height' | 'factor'

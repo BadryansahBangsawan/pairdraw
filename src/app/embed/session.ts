@@ -13,7 +13,7 @@ import {
 import { embedRequestEnvelopeSchema, embedRequestSchema, type EmbedRequest } from './schema'
 
 /** The port a session talks over, narrowed so tests can use a `MessageChannel` or a double. */
-export interface EmbedPort {
+interface EmbedPort {
   postMessage(message: unknown): void
   addEventListener(type: 'message', listener: (event: { data: unknown }) => void): void
   removeEventListener(type: 'message', listener: (event: { data: unknown }) => void): void

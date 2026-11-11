@@ -171,7 +171,7 @@ export async function refreshTokenCSSLink(store: EditorStore): Promise<TokenCSSL
  * Imports the stylesheet with the choices an import starts with, as one undo step, unless it
  * would change nothing. Returns how many collections, modes, and variables it changed.
  */
-export async function pullTokenCSS(store: EditorStore, link: TokenCSSLink): Promise<number> {
+async function pullTokenCSS(store: EditorStore, link: TokenCSSLink): Promise<number> {
   const { countTokenImportChanges, defaultTokenImportOptions, planTokenImport } =
     await import('@open-pencil/core/io/formats/design-tokens')
   const bundle = await readTokenCSS(store, link)

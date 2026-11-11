@@ -14,7 +14,7 @@ export const OPENCODE_GO_BASE_URL = 'https://opencode.ai/inference/go/openai/v1'
  * without one; it also asks clients to name themselves rather than their HTTP library. A model
  * is made for one chat, so each model gets its own session.
  */
-export function openCodeHeaders(): Record<string, string> {
+function openCodeHeaders(): Record<string, string> {
   return {
     'x-opencode-session': randomHex(),
     'User-Agent': `${APP_NAME}/${APP_VERSION}`

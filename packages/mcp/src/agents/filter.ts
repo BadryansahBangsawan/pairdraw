@@ -20,7 +20,7 @@ export interface ACPFilterOptions {
  * environment from `_meta`. So every session runs in the companion's workspace, reaches only
  * the companion's own MCP server, and keeps only the `_meta` the app sends.
  */
-export function sanitizeACPMessage(
+function sanitizeACPMessage(
   text: string,
   { workspace, isOwnMCP }: ACPFilterOptions
 ): string | null {

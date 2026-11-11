@@ -9,7 +9,7 @@ import type { JSONMember, JSONObjectNode } from './tree'
 const DEFAULT_INDENT = '  '
 
 /** The indentation of the document's first indented member line, or two spaces. */
-export function indentUnit(text: string): string {
+function indentUnit(text: string): string {
   const match = /^([ \t]+)["}\]]/m.exec(text)
   return match?.[1] ?? DEFAULT_INDENT
 }
@@ -100,7 +100,7 @@ function splice(text: string, start: number, end: number, insert = ''): string {
 }
 
 /** Adds `key` as the last member of `object`. */
-export function insertMember(
+function insertMember(
   text: string,
   object: JSONObjectNode,
   key: string,
@@ -142,7 +142,7 @@ export function insertMember(
 }
 
 /** Replaces the value of `member`, keeping its key and everything around it. */
-export function replaceMemberValue(
+function replaceMemberValue(
   text: string,
   member: JSONMember,
   value: unknown,

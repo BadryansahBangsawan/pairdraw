@@ -37,7 +37,7 @@ const currentRevisionSchema = v.object({
 })
 
 /** A plan that allows links, guests, and rooms, with any of them overridden. */
-export function sharingPlan(overrides: Record<string, boolean> = {}) {
+function sharingPlan(overrides: Record<string, boolean> = {}) {
   return createDefaultCloudPolicy(
     new EntitlementOpenFeatureProvider(
       new StaticEntitlementSource({

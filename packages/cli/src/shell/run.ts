@@ -68,7 +68,7 @@ function toolHelp(name: string): string {
 }
 
 /** How the user asked to leave: the `exit()` command, or Ctrl+C or Ctrl+D on an empty line. */
-export type ShellLeave = 'exit()' | 'Ctrl+C' | 'Ctrl+D'
+type ShellLeave = 'exit()' | 'Ctrl+C' | 'Ctrl+D'
 
 /** One open shell, fed a line at a time by `runShell` or by a terminal. */
 export interface Shell {

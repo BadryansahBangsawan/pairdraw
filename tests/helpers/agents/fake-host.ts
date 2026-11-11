@@ -35,7 +35,7 @@ function toolsOutcome(reachable: boolean): OwnToolsOutcome {
 }
 
 /** Answers a test holds back until it settles them, to act while a lookup or a check runs. */
-export interface FakeHostHolds {
+interface FakeHostHolds {
   detect: Promise<unknown> | null
   check: Promise<unknown> | null
 }

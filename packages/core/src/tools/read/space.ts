@@ -9,8 +9,8 @@ import { flushPendingLayout } from '#core/figma-api'
 import { findPageId } from '#core/io/subgraph'
 import { defineTool, toolNumber } from '#core/tools/schema'
 
-export const SPACE_DIRECTIONS = ['right', 'below', 'left', 'above'] as const
-export type SpaceDirection = (typeof SPACE_DIRECTIONS)[number]
+const SPACE_DIRECTIONS = ['right', 'below', 'left', 'above'] as const
+type SpaceDirection = (typeof SPACE_DIRECTIONS)[number]
 
 /** Room kept between a found space and the layers around it, as `import_mermaid` keeps. */
 export const DEFAULT_SPACE_GAP = 100

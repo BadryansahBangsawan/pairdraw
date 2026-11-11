@@ -80,5 +80,3 @@ export function useDocumentSelection(ordered: () => readonly string[]) {
     }
   }
 }
-
-export type DocumentSelectionState = ReturnType<typeof useDocumentSelection>

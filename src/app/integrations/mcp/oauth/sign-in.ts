@@ -14,7 +14,7 @@ import { createMCPOAuthProvider, mcpOAuthRedirectURL } from './provider'
 import { credentialMCPOAuthStore, type MCPOAuthStore } from './state'
 
 export type MCPSignInFailure = 'cancelled' | 'expired' | 'failed' | 'blocked'
-export type MCPSignInResult = { ok: true } | { ok: false; reason: MCPSignInFailure }
+type MCPSignInResult = { ok: true } | { ok: false; reason: MCPSignInFailure }
 
 export interface MCPSignIn {
   /** Opens the authorization page again for the same attempt. */

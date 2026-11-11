@@ -53,7 +53,7 @@ export function scaleFrame(editor: Editor): ScaleFrame | null {
 }
 
 /** The Scale handle under a canvas point, if any. */
-export function scaleHandleAt(
+function scaleHandleAt(
   frame: ScaleFrame,
   cx: number,
   cy: number,
@@ -65,7 +65,7 @@ export function scaleHandleAt(
 }
 
 /** The resize cursor along a Scale handle's direction on the canvas. */
-export function scaleHandleCursor(frame: ScaleFrame, handle: HandlePosition): string {
+function scaleHandleCursor(frame: ScaleFrame, handle: HandlePosition): string {
   const origin = frame.toWorld({ x: 0, y: 0 })
   const tip = frame.toWorld(HANDLE_DIRECTIONS[handle])
   return buildResizeCursor((Math.atan2(tip.y - origin.y, tip.x - origin.x) * 180) / Math.PI)

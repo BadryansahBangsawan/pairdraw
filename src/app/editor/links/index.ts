@@ -9,7 +9,7 @@ import { openExternalLink } from '@/app/shell/ui'
 import { IS_TAURI } from '@/constants'
 
 /** The texts the link editor is open for, in the editor that holds them. */
-export interface TextLinkEdit {
+interface TextLinkEdit {
   editor: Editor
   nodeIds: string[]
   /** The control that opened the editor, which takes focus back when it closes. */
@@ -38,7 +38,7 @@ export function bindHyperlinkOpening(editor: Editor) {
  * new tab gets no `window.opener` handle back to the editor and no referrer, as the app's own
  * external anchors (`ExternalLink.vue`).
  */
-export function openDocumentLink(url: string) {
+function openDocumentLink(url: string) {
   if (!isOpenableLinkURL(url)) return
   if (IS_TAURI) void openExternalLink(url)
   else window.open(url, '_blank', 'noopener,noreferrer')

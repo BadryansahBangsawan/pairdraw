@@ -5,7 +5,7 @@
  * commas, and a byte order mark.
  */
 
-export type JSONScalar = string | number | boolean | null
+type JSONScalar = string | number | boolean | null
 
 export interface JSONMember {
   key: string

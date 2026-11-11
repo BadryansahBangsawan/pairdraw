@@ -10,7 +10,7 @@ import type {
  * How an agent lets a session change: a session config option (`session/set_config_option`),
  * or the older session modes (`session/set_mode`) and models (`session/set_model`).
  */
-export type AgentSessionControlKind = 'config' | 'mode' | 'model'
+type AgentSessionControlKind = 'config' | 'mode' | 'model'
 
 /** What a control sets, for its label and place in the composer; unknown categories are `other`. */
 export type AgentSessionControlCategory = 'model' | 'thought_level' | 'mode' | 'other'
@@ -22,13 +22,13 @@ export const AGENT_SESSION_CONTROL_CATEGORIES = [
   'other'
 ] as const satisfies readonly AgentSessionControlCategory[]
 
-export interface AgentSessionChoice {
+interface AgentSessionChoice {
   value: string
   name: string
   description: string | null
 }
 
-export interface AgentSessionChoiceGroup {
+interface AgentSessionChoiceGroup {
   /** The heading the agent gave the group; null for an agent's flat list. */
   label: string | null
   choices: AgentSessionChoice[]

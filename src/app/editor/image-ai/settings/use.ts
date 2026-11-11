@@ -19,7 +19,7 @@ export interface ImageAISettingsMessages extends SettingsValidationMessages {
   insecureBaseURL: string
 }
 
-export function isAllowedImageAIBaseURL(value: string): boolean {
+function isAllowedImageAIBaseURL(value: string): boolean {
   try {
     validateImageAIBaseURL(value)
     return true

@@ -46,7 +46,7 @@ export type AutoConnectPhase =
  */
 export type AutoConnectOutcome = 'connected' | 'action' | 'none' | 'unsupported'
 
-export interface AgentAutoConnectState {
+interface AgentAutoConnectState {
   phase: AutoConnectPhase
   /** The agent the chat uses or offers: switched on, waiting for a click, or connecting. */
   candidate: AgentCandidate | null

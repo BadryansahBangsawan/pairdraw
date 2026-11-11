@@ -11,6 +11,31 @@ const manifestSchema = v.looseObject({
   main: v.string(),
   files: v.array(v.string()),
   activationEvents: v.array(v.string()),
+  contributes: v.looseObject({
+    customEditors: v.array(
+      v.looseObject({
+        viewType: v.string(),
+        displayName: v.string(),
+        selector: v.array(v.looseObject({ filenamePattern: v.string() })),
+        priority: v.string()
+      })
+    ),
+    commands: v.optional(
+      v.array(v.looseObject({ command: v.string(), title: v.string(), category: v.optional(v.string()) }))
+    ),
+    menus: v.optional(
+      v.record(
+        v.string(),
+        v.array(v.looseObject({ command: v.string(), when: v.optional(v.string()), group: v.optional(v.string()) }))
+      )
+    ),
+    configuration: v.looseObject({
+      properties: v.record(
+        v.string(),
+        v.looseObject({ type: v.string(), default: v.string(), scope: v.optional(v.string()) })
+      )
+    })
+  }),
   scripts: v.record(v.string(), v.string()),
   devDependencies: v.record(v.string(), v.string())
 })
@@ -45,8 +70,45 @@ describe('VS Code extension manifest', () => {
     expect(manifest.devDependencies['@types/vscode']).toBe('1.90.0')
   })
 
-  test('has no activation event before an editor or command needs one', async () => {
+  test('opens .fig as the default editor and .pen as an option beside the text editor', async () => {
     const manifest = await readJSON('../package.json', manifestSchema)
-    expect(manifest.activationEvents).toEqual([])
+    expect(manifest.activationEvents).toEqual([
+      'onCustomEditor:pairdraw.fig',
+      'onCustomEditor:pairdraw.pen',
+      'onCommand:pairdraw.toggleDesignMode'
+    ])
+    expect(manifest.contributes.customEditors).toEqual([
+      {
+        viewType: 'pairdraw.fig',
+        displayName: 'Pairdraw Design',
+        selector: [{ filenamePattern: '*.fig' }],
+        priority: 'default'
+      },
+      {
+        viewType: 'pairdraw.pen',
+        displayName: 'Pairdraw Design',
+        selector: [{ filenamePattern: '*.pen' }],
+        priority: 'option'
+      }
+    ])
+  })
+
+  test('offers the design mode toggle on .pen title bars', async () => {
+    const manifest = await readJSON('../package.json', manifestSchema)
+    expect(manifest.contributes.commands).toEqual([
+      { command: 'pairdraw.toggleDesignMode', title: 'Toggle Design Mode', category: 'Pairdraw' }
+    ])
+    expect(manifest.contributes.menus?.['editor/title']).toEqual([
+      { command: 'pairdraw.toggleDesignMode', when: 'resourceExtname == .pen', group: 'navigation' }
+    ])
+  })
+
+  test('keeps the editor URL out of workspace settings', async () => {
+    const manifest = await readJSON('../package.json', manifestSchema)
+    expect(manifest.contributes.configuration.properties['pairdraw.editorUrl']).toMatchObject({
+      type: 'string',
+      default: 'http://localhost:1420',
+      scope: 'application'
+    })
   })
 })

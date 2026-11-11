@@ -21,7 +21,62 @@
   "devDependencies": {
     "@types/vscode": "1.90.0"
   },
-  "activationEvents": [],
+  "activationEvents": [
+    "onCustomEditor:pairdraw.fig",
+    "onCustomEditor:pairdraw.pen",
+    "onCommand:pairdraw.toggleDesignMode"
+  ],
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "pairdraw.fig",
+        "displayName": "Pairdraw Design",
+        "selector": [
+          {
+            "filenamePattern": "*.fig"
+          }
+        ],
+        "priority": "default"
+      },
+      {
+        "viewType": "pairdraw.pen",
+        "displayName": "Pairdraw Design",
+        "selector": [
+          {
+            "filenamePattern": "*.pen"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
+    "commands": [
+      {
+        "command": "pairdraw.toggleDesignMode",
+        "title": "Toggle Design Mode",
+        "category": "Pairdraw"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "pairdraw.toggleDesignMode",
+          "when": "resourceExtname == .pen",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Pairdraw",
+      "properties": {
+        "pairdraw.editorUrl": {
+          "type": "string",
+          "default": "http://localhost:1420",
+          "scope": "application",
+          "markdownDescription": "URL of the running Pairdraw web editor that the custom editor loads. Use an `https` URL, or `http` on loopback for a local `bun run dev` server."
+        }
+      }
+    }
+  },
   "engines": {
     "vscode": "^1.90.0"
   }

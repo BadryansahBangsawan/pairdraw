@@ -13,18 +13,39 @@ const outDir = resolve(process.argv[2] ?? join(extensionDir, 'dist'))
 await rm(outDir, { recursive: true, force: true })
 await mkdir(outDir, { recursive: true })
 
-const result = await Bun.build({
-  entrypoints: [join(extensionDir, 'src', 'extension.ts')],
-  outdir: outDir,
-  target: 'node',
-  format: 'cjs',
-  external: ['vscode'],
-  minify: false,
-  sourcemap: 'linked',
-  naming: '[name].js'
-})
+/** The async host: Node, with `vscode` provided by the editor. */
+async function buildHost(): Promise<void> {
+  const result = await Bun.build({
+    entrypoints: [join(extensionDir, 'src', 'extension.ts')],
+    outdir: outDir,
+    target: 'node',
+    format: 'cjs',
+    external: ['vscode'],
+    minify: false,
+    sourcemap: 'linked',
+    naming: '[name].js'
+  })
+  if (!result.success) throw new AggregateError(result.logs, 'The extension host did not build')
+}
 
-if (!result.success) {
-  for (const log of result.logs) console.error(log)
+/** The webview page's script: a browser IIFE, which VS Code loads as a classic script. */
+async function buildWebview(): Promise<void> {
+  const result = await Bun.build({
+    entrypoints: [join(extensionDir, 'src', 'webview', 'main.ts')],
+    outdir: outDir,
+    target: 'browser',
+    format: 'iife',
+    minify: false,
+    sourcemap: 'linked',
+    naming: 'webview.js'
+  })
+  if (!result.success) throw new AggregateError(result.logs, 'The webview script did not build')
+}
+
+try {
+  await buildHost()
+  await buildWebview()
+} catch (error) {
+  console.error(error)
   process.exit(1)
 }

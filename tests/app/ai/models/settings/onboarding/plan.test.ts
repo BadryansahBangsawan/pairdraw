@@ -1,10 +1,15 @@
 import { describe, expect, test } from 'bun:test'
 
 import {
-  uncoveredGoals,
+  accessAvailable,
+  isOnboardingAgent,
+  needsDesktop,
+  ONBOARDING_AGENTS,
+  ONBOARDING_SUBSCRIPTIONS,
   planOnboarding,
   roleChoiceKey,
   roleOptions,
+  uncoveredGoals,
   type OnboardingAnswers,
   type OnboardingPlan
 } from '@/app/ai/models/settings/onboarding/plan'
@@ -13,6 +18,7 @@ import { defaultModel, isFastToolModel } from '#tests/helpers/ai/model-catalog'
 
 const desktop = { agentsAvailable: true }
 const browser = { agentsAvailable: false }
+const companion = { agentsAvailable: true, desktop: false }
 
 function answers(overrides: Partial<OnboardingAnswers>): OnboardingAnswers {
   return { goals: ['design'], access: [], spending: 'existing', ...overrides }
@@ -329,5 +335,54 @@ describe('server vision', () => {
       desktop
     )
     expect(plan.vision).toMatchObject({ providerID: 'openai-compatible' })
+  })
+})
+
+describe('coding agent availability in onboarding', () => {
+  test('treats ACP coding agents as available outside the desktop app but keeps Pi and subscriptions desktop-only', () => {
+    expect(ONBOARDING_AGENTS).toEqual([
+      'acp:claude-code',
+      'acp:codex',
+      'acp:gemini-cli',
+      'harness:pi'
+    ])
+    for (const agent of ['acp:claude-code', 'acp:codex', 'acp:gemini-cli'] as const) {
+      expect(isOnboardingAgent(agent)).toBe(true)
+      expect(needsDesktop(agent)).toBe(false)
+      expect(accessAvailable(agent, companion)).toBe(true)
+      expect(accessAvailable(agent, browser)).toBe(false)
+      expect(accessAvailable(agent, desktop)).toBe(true)
+    }
+    expect(isOnboardingAgent('harness:pi')).toBe(true)
+    expect(needsDesktop('harness:pi')).toBe(true)
+    expect(accessAvailable('harness:pi', companion)).toBe(false)
+    expect(accessAvailable('harness:pi', browser)).toBe(false)
+    expect(accessAvailable('harness:pi', desktop)).toBe(true)
+    for (const subscription of ONBOARDING_SUBSCRIPTIONS) {
+      expect(needsDesktop(subscription)).toBe(true)
+      expect(accessAvailable(subscription, companion)).toBe(false)
+      expect(accessAvailable(subscription, desktop)).toBe(true)
+    }
+  })
+
+  test('offers ACP coding agents in a companion session and ignores Pi there', () => {
+    const plan = planOnboarding(
+      answers({ access: ['acp:claude-code', 'acp:codex', 'acp:gemini-cli', 'harness:pi'] }),
+      companion
+    )
+    expect(plan.design).toMatchObject({ providerID: 'acp:claude-code', modelID: '' })
+    expect(plan.connections).toEqual(['acp:claude-code', 'acp:codex', 'acp:gemini-cli'])
+  })
+
+  test('plans an ACP coding agent selected in a companion session without another access', () => {
+    const plan = planOnboarding(answers({ access: ['acp:gemini-cli'] }), companion)
+    expect(plan.design).toMatchObject({ providerID: 'acp:gemini-cli', modelID: '' })
+    expect(plan.connections).toEqual(['acp:gemini-cli'])
+  })
+
+  test('ignores ACP coding agents when no host can run them', () => {
+    const plan = planOnboarding(answers({ access: ['acp:codex'] }), browser)
+    expect(plan.design).toBeNull()
+    expect(plan.connections).toEqual([])
   })
 })

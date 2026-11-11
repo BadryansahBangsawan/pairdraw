@@ -11,6 +11,7 @@ import {
 import type { SkiaRenderer } from '@open-pencil/core/canvas'
 import type { Rect } from '@open-pencil/scene-graph/primitives'
 import {
+  isShaderPresetPaint,
   readShaderPaints,
   shaderOfPaint,
   type ShaderPreset
@@ -65,7 +66,8 @@ function shadersOnPage(editor: Editor, pageId: string) {
     if (readShaderPaints(node).length === 0 || !editor.graph.isDescendant(node.id, pageId)) continue
     for (const paint of [...node.fills, ...node.strokes]) {
       const shader = shaderOfPaint(node, paint)
-      if (!shader || !paint.visible) continue
+      // Code the user wrote is drawn by the canvas compiler, not by the preset player.
+      if (!shader || !paint.visible || !isShaderPresetPaint(shader)) continue
       const entry = found.get(shader.image) ?? {
         preset: shader.preset,
         nodeIds: new Set<string>(),

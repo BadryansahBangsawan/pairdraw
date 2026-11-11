@@ -6,7 +6,12 @@ import { readAllPluginData, withAllPluginData } from '../plugin-data/field'
 import { OPEN_PENCIL_PLUGIN_DATA } from '../plugin-data/fields'
 import { randomHex } from '../random'
 import type { Fill, SceneNode } from '../types'
-import type { ShaderPaint, ShaderPreset } from './schema'
+import type {
+  ShaderPaint,
+  ShaderPreset,
+  ShaderPresetPaint,
+  ShaderSourcePaint
+} from './schema'
 
 /** What shader paints read of a node. */
 type ShaderNode = Pick<SceneNode, 'fills' | 'strokes' | 'pluginData'>
@@ -82,6 +87,28 @@ export function shaderPresetKey(preset: ShaderPreset): string {
   return bytesToHex(sha1(utf8ToBytes(JSON.stringify(preset))))
 }
 
+/** A short key that tells one shader source from another, which a rendered frame records. */
+export function shaderSourceKey(source: string): string {
+  return bytesToHex(sha1(utf8ToBytes(source)))
+}
+
+/** Whether the shader draws a library preset, so `preset` is present. */
+export function isShaderPresetPaint(shader: ShaderPaint): shader is ShaderPresetPaint {
+  return 'preset' in shader
+}
+
+/** Whether the shader draws code the user wrote, so `source` is present. */
+export function isShaderSourcePaint(shader: ShaderPaint): shader is ShaderSourcePaint {
+  return 'source' in shader
+}
+
+/** The key of what a shader draws, which its still frame records. */
+export function shaderFrameKey(shader: ShaderPaint): string {
+  return isShaderSourcePaint(shader)
+    ? shaderSourceKey(shader.source)
+    : shaderPresetKey(shader.preset)
+}
+
 /**
  * Whether a shader's frame was rendered for its preset at the size `node` has now, so undoing a
  * preset change after reopening the document does not keep a frame of the newer preset.
@@ -93,7 +120,7 @@ export function isShaderFrameCurrent(
   const { frame } = shader
   return (
     frame !== undefined &&
-    frame.preset === shaderPresetKey(shader.preset) &&
+    frame.preset === shaderFrameKey(shader) &&
     Math.round(frame.width) === Math.round(size.width) &&
     Math.round(frame.height) === Math.round(size.height)
   )

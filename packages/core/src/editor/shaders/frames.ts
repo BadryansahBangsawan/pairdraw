@@ -4,12 +4,13 @@ import type { SceneNode } from '@open-pencil/scene-graph'
 import type { Size } from '@open-pencil/scene-graph/primitives'
 import {
   isShaderFrameCurrent,
+  isShaderPresetPaint,
   readShaderPaints,
   shaderFramePixels,
   shaderOfPaint,
   shaderPresetKey,
   withShaderPaints,
-  type ShaderPaint
+  type ShaderPresetPaint
 } from '@open-pencil/scene-graph/shaders'
 
 import type { EditorContext, EditorOptions } from '#core/editor/types'
@@ -29,14 +30,17 @@ export interface ShaderFramesProgress {
 /** Fields whose change can leave a shader's frame out of date. */
 const FRAME_FIELDS = ['fills', 'strokes', 'pluginData', 'width', 'height'] as const
 
-const frameKey = (shader: ShaderPaint, size: Size) =>
+const frameKey = (shader: ShaderPresetPaint, size: Size) =>
   JSON.stringify([shader.preset, Math.round(size.width), Math.round(size.height)])
 
-/** The shaders `node`'s paints show. */
-function shownShaders(node: SceneNode): ShaderPaint[] {
+/**
+ * The shaders `node`'s paints show that core can draw a still frame of. A shader the user wrote
+ * draws live on canvases that compile it, so only presets, which the rasterizer plays, keep a frame.
+ */
+function shownShaders(node: SceneNode): ShaderPresetPaint[] {
   return [...node.fills, ...node.strokes].flatMap((paint) => {
     const shader = shaderOfPaint(node, paint)
-    return shader ? [shader] : []
+    return shader && isShaderPresetPaint(shader) ? [shader] : []
   })
 }
 
@@ -57,7 +61,7 @@ export function createShaderFrames(
   let timer: ReturnType<typeof setTimeout> | null = null
   let drawing: Promise<void> | null = null
 
-  function isCurrent(shader: ShaderPaint, size: Size): boolean {
+  function isCurrent(shader: ShaderPresetPaint, size: Size): boolean {
     const key = drawn.get(shader.image)
     if (key !== undefined) return key === frameKey(shader, size)
     return isShaderFrameCurrent(shader, size) && ctx.graph.images.has(shader.image)
@@ -74,7 +78,7 @@ export function createShaderFrames(
   }
 
   /** The shaders on `pageId` whose frames are missing or out of date. */
-  function staleOnPage(pageId: string): { id: string; shader: ShaderPaint }[] {
+  function staleOnPage(pageId: string): { id: string; shader: ShaderPresetPaint }[] {
     const graph = ctx.graph
     return [...graph.getAllNodes()].flatMap((node) => {
       if (readShaderPaints(node).length === 0 || !graph.isDescendant(node.id, pageId)) return []
@@ -85,7 +89,7 @@ export function createShaderFrames(
     })
   }
 
-  async function drawFrame(id: string, shader: ShaderPaint, active: ShaderRasterizer) {
+  async function drawFrame(id: string, shader: ShaderPresetPaint, active: ShaderRasterizer) {
     const graph = ctx.graph
     const node = graph.getNode(id)
     if (!node) return

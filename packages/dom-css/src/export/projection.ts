@@ -5,7 +5,7 @@ import { BLACK } from '@open-pencil/scene-graph/constants'
 import { readIcon } from '@open-pencil/scene-graph/icons'
 import { imageMimeType } from '@open-pencil/scene-graph/images'
 import { layoutSizingInParent } from '@open-pencil/scene-graph/layout'
-import { shaderOfPaint } from '@open-pencil/scene-graph/shaders'
+import { isShaderPresetPaint, shaderOfPaint } from '@open-pencil/scene-graph/shaders'
 import { resolveNodeTextDirection } from '@open-pencil/scene-graph/text/direction'
 
 import { DesignTokens, type CSSModes } from '../tokens/references'
@@ -256,7 +256,7 @@ function imageDataURL(bytes: Uint8Array): string {
 function layerShader(graph: SceneGraph, node: SceneNode): DesignElement['shader'] {
   const fill = node.fills.at(0)
   const shader = fill?.visible ? shaderOfPaint(node, fill) : null
-  if (!shader) return undefined
+  if (!shader || !isShaderPresetPaint(shader)) return undefined
   const bytes = graph.images.get(shader.image)
   const frame = bytes ? imageDataURL(bytes) : undefined
   return { preset: shader.preset, frame }

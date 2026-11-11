@@ -1,5 +1,9 @@
 import type { SceneGraph } from '@open-pencil/scene-graph'
-import { shaderOfPaint, type ShaderPreset } from '@open-pencil/scene-graph/shaders'
+import {
+  isShaderPresetPaint,
+  shaderOfPaint,
+  type ShaderPreset
+} from '@open-pencil/scene-graph/shaders'
 
 import type { ShaderPaintList } from '#core/editor/shaders/actions'
 import type { EditorContext } from '#core/editor/types'
@@ -54,7 +58,8 @@ export function findShaderModeTarget(
       const paint = paints[index]
       if (image !== undefined && paint.imageHash !== image) continue
       const shader = shaderOfPaint(node, paint)
-      if (!shader) continue
+      // Shader Mode plays a preset; code the user wrote draws on the canvas itself.
+      if (!shader || !isShaderPresetPaint(shader)) continue
       return {
         nodeId,
         image: shader.image,

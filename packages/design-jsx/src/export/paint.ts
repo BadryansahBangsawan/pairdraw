@@ -3,7 +3,7 @@ import {
   gradientTransformRows,
   isIdentityGradientTransform
 } from '@open-pencil/scene-graph/gradient'
-import { shaderOfPaint } from '@open-pencil/scene-graph/shaders'
+import { isShaderPresetPaint, shaderOfPaint } from '@open-pencil/scene-graph/shaders'
 
 import { STROKE_ALIGN, STROKE_CAP, STROKE_JOIN } from '../enums'
 import { formatColor, formatShadow } from './helpers'
@@ -40,7 +40,8 @@ function options(entries: Options): Options | undefined {
 function fillValue(fill: Fill, node: SceneNode): JSXValue {
   const visible = fill.visible ? undefined : false
   const shader = shaderOfPaint(node, fill)
-  if (shader) {
+  // A shader the user wrote has no preset an exported component could play.
+  if (shader && isShaderPresetPaint(shader)) {
     // A preset with nothing but effects is written as just its effects.
     const { components, ...rest } = shader.preset
     return helperCall(

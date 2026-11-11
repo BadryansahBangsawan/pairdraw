@@ -13,8 +13,7 @@ export const SHADER_MAX_UNIFORM_FLOATS = 64
 
 export type ShaderUniformKind = 'number' | 'boolean' | 'color' | 'vector' | 'sampler'
 
-/** A value a shader uniform holds: a number, a boolean, a hex color, or 2–4 numbers. */
-export type ShaderUniformValue = number | boolean | string | readonly number[]
+import type { ShaderUniformValue } from './schema'
 
 export type ShaderAutomaticInput = 'resolution' | 'time' | 'mouse' | 'sdf'
 

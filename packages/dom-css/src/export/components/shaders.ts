@@ -4,9 +4,11 @@ import { es, jsx } from '@open-pencil/emit'
 import type { SceneGraph } from '@open-pencil/scene-graph'
 import { findLayerByPath } from '@open-pencil/scene-graph/behaviours'
 import {
+  isShaderPresetPaint,
   shaderOfPaint,
   type ShaderComponent,
-  type ShaderPreset
+  type ShaderPreset,
+  type ShaderPresetPaint
 } from '@open-pencil/scene-graph/shaders'
 
 import { isPositioned } from '../projection'
@@ -51,7 +53,9 @@ export function shaderLayers(
     const shader = layer.fills
       .filter((fill) => fill.visible)
       .map((fill) => shaderOfPaint(layer, fill))
-      .findLast((found) => found !== null)
+      .findLast(
+        (found): found is ShaderPresetPaint => found !== null && isShaderPresetPaint(found)
+      )
     if (shader) shaders.set(element, shader.preset)
   }
   return shaders

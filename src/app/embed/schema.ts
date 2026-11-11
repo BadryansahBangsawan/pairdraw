@@ -1,6 +1,7 @@
 import * as v from 'valibot'
 
 import {
+  EMBED_DOCUMENT_FORMATS,
   EMBED_IMAGE_FORMATS,
   EMBED_PROTOCOL,
   EMBED_PROTOCOL_VERSION,
@@ -47,7 +48,14 @@ export const embedRequestSchema = v.variant('method', [
       data: v.union([v.instance(Uint8Array), v.instance(ArrayBuffer)])
     })
   }),
-  v.object({ id: requestIdSchema, method: v.literal('getDocument'), params: noParamsSchema }),
+  v.object({
+    id: requestIdSchema,
+    method: v.literal('getDocument'),
+    params: v.optional(
+      v.object({ format: v.optional(v.picklist(EMBED_DOCUMENT_FORMATS), 'fig') }),
+      { format: 'fig' }
+    )
+  }),
   v.object({ id: requestIdSchema, method: v.literal('getPages'), params: noParamsSchema }),
   v.object({
     id: requestIdSchema,

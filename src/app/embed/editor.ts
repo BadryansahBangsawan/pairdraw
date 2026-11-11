@@ -58,8 +58,9 @@ function showDocumentInsteadOf(tab: Tab): void {
   if (tab.kind === 'new-file') void closeTab(tab.id)
 }
 
-/** The formats a `load` may name by its file name. */
+/** The formats a `load` may name by its file name, and the ones `getDocument` can write. */
 const readableFormats = new IORegistry(BUILTIN_IO_FORMATS)
+const writableFormats = new IORegistry(BUILTIN_IO_FORMATS)
 
 /**
  * The file a `load` names. The protocol's `name` is often the document's own name, as
@@ -113,8 +114,13 @@ export function createEmbedEditorHost(): EmbedEditorHost {
       return loading
     },
 
-    async getDocument() {
+    async getDocument(format = 'fig') {
       const store = shownStore()
+      if (format === 'pen') {
+        const written = await writableFormats.writeDocument('pen', store.graph)
+        const text = typeof written.data === 'string' ? written.data : new TextDecoder().decode(written.data)
+        return { name: store.state.documentName, data: new TextEncoder().encode(text) }
+      }
       const renderer = store.renderer
       const data = await exportFigFile(store.graph, {
         ck: renderer?.ck,

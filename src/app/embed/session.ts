@@ -81,7 +81,7 @@ export function startEmbedSession(options: EmbedSessionOptions): EmbedSession {
         return { result: await host.load(request.params.name, data) }
       }
       case 'getDocument':
-        return { result: await host.getDocument() }
+        return { result: await host.getDocument(request.params.format) }
       case 'getPages':
         return { result: host.getPages() }
       case 'setPage':

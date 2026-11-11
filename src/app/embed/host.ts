@@ -1,6 +1,6 @@
 import type { SceneNode } from '@open-pencil/scene-graph'
 
-import type { EmbedEventMessage, EmbedImageFormat } from './protocol'
+import type { EmbedDocumentFormat, EmbedEventMessage, EmbedImageFormat } from './protocol'
 
 type EmbedPage = Pick<SceneNode, 'id' | 'name'>
 
@@ -19,8 +19,8 @@ export interface EmbedEditorHost {
    * editability `setEditable` last gave.
    */
   load(name: string, data: Uint8Array): Promise<{ name: string }>
-  /** The shown document as a `.fig` file. */
-  getDocument(): Promise<{ name: string; data: Uint8Array }>
+  /** The shown document as the format asked for: a `.fig` file unless `pen` names text. */
+  getDocument(format?: EmbedDocumentFormat): Promise<{ name: string; data: Uint8Array }>
   getPages(): { pages: EmbedPage[]; currentPageId: string }
   setPage(pageId: string): Promise<void>
   getSelection(): string[]

@@ -135,6 +135,15 @@ describe('embed editor host', () => {
     await expect(settle(host.load(saved.name, saved.data))).resolves.toEqual({ name: 'card' })
   })
 
+  test('writes pen text when asked for it, and the archive otherwise', async () => {
+    await settle(host.load('card.fig', bytes()))
+    const pen = await host.getDocument('pen')
+    expect(JSON.parse(new TextDecoder().decode(pen.data))).toMatchObject({ version: '2.21' })
+    expect(pen.name).toBe('card')
+    const fig = await host.getDocument()
+    expect(fig.data).not.toEqual(pen.data)
+  })
+
   test('keeps the shown document and its editability when a load fails', async () => {
     host.setEditable(true)
     const before = getActiveStore()

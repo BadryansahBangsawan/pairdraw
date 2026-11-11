@@ -31,6 +31,10 @@ export const EMBED_METHODS = [
   'setEditable'
 ] as const
 
+/** The document formats `getDocument` writes: a `.fig` archive, or `.pen` text. */
+export const EMBED_DOCUMENT_FORMATS = ['fig', 'pen'] as const
+export type EmbedDocumentFormat = (typeof EMBED_DOCUMENT_FORMATS)[number]
+
 export const EMBED_IMAGE_FORMATS = ['PNG', 'JPG', 'WEBP'] as const
 export type EmbedImageFormat = (typeof EMBED_IMAGE_FORMATS)[number]
 

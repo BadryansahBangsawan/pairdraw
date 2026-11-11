@@ -11,7 +11,8 @@ function fakeHost() {
   const calls: {
     editable: boolean[]
     loads: { name: string; bytes: number }[]
-  } = { editable: [], loads: [] }
+    formats: string[]
+  } = { editable: [], loads: [], formats: [] }
   let emit: (event: EmbedEventMessage) => void = () => undefined
   let selection: string[] = []
   const host: EmbedEditorHost = {
@@ -19,7 +20,10 @@ function fakeHost() {
       calls.loads.push({ name, bytes: data.byteLength })
       return { name: name.replace(/\.\w+$/, '') }
     },
-    getDocument: async () => ({ name: 'Doc', data: new Uint8Array([1, 2, 3]) }),
+    getDocument: async (format) => {
+      calls.formats.push(format)
+      return { name: 'Doc', data: new Uint8Array([1, 2, 3]) }
+    },
     getPages: () => ({ pages: [{ id: '0:1', name: 'Page 1' }], currentPageId: '0:1' }),
     setPage: async (pageId) => {
       if (pageId !== '0:1') throw new EmbedRequestError('not-found', 'No such page')
@@ -169,7 +173,7 @@ describe('embed session', () => {
   })
 
   test('answers reads and forwards the editor’s events', async () => {
-    const { page } = connect()
+    const { page, calls } = connect()
     expect((await page.request('getPages')).result).toEqual({
       pages: [{ id: '0:1', name: 'Page 1' }],
       currentPageId: '0:1'
@@ -183,6 +187,8 @@ describe('embed session', () => {
     expect((await page.request('getSelection')).result).toEqual({ nodeIds: ['1:1'] })
     const document = await page.request('getDocument')
     expect(document.result).toEqual({ name: 'Doc', data: new Uint8Array([1, 2, 3]) })
+    expect(await page.request('getDocument', { format: 'pen' })).toMatchObject({ ok: true })
+    expect(calls.formats).toEqual(['fig', 'pen'])
     expect(await page.request('exportImage')).toMatchObject({
       ok: true,
       result: { mimeType: 'image/png' }

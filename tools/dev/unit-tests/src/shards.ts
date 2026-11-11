@@ -49,6 +49,7 @@ export const UNIT_TEST_GROUPS = {
     'packages/mermaid/tests',
     'packages/web-capture/tests',
     'extensions/chrome/tests',
+    'extensions/vscode/tests',
     'packages/design-jsx/tests',
     'packages/dom-css/tests',
     'packages/pen/tests',

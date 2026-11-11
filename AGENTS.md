@@ -26,6 +26,7 @@ This file holds the repository map and the rules that apply everywhere. Rules fo
 | `packages/cloud`       | Optional self-hostable backend: contracts, typed client, Hono server, Node runtime, PostgreSQL migrations, transactional email | `packages/cloud/AGENTS.md` |
 | `packages/docs`        | Published VitePress site                                                                                                                                                                          | `packages/docs/AGENTS.md`         |
 | `extensions/chrome`    | Chrome MV3 extension that copies a page or element as a web capture | `packages/web-capture/AGENTS.md` |
+| `extensions/vscode`    | VS Code extension with a custom editor for `.fig`/`.pen`, commands, and a sidebar | — |
 | `src`                  | Tauri/Vite app: services and state in `src/app/**`, views in `src/views/**`, UI in `src/components/**`                                                                                            | `src/AGENTS.md`                   |
 | `desktop`              | Tauri v2 shell, capabilities, native credentials, menus                                                                                                                                           | `desktop/AGENTS.md`               |
 | `vite`                 | The app's Vite plugins, aliases, and dev server; `appSourceConfig()` lends the aliases, icons, and build constants to the docs landing | —                                 |

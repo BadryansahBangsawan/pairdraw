@@ -40,6 +40,8 @@ export function mapToFigmaType(type: SceneNode['type']): string {
       return 'SHAPE_WITH_TEXT'
     case 'STICKY':
       return 'STICKY'
+    case 'SCRIPT':
+      return 'FRAME'
     default:
       return 'RECTANGLE'
   }

@@ -302,6 +302,12 @@
       "import": "./dist/shaders/index.js",
       "default": "./dist/shaders/index.js"
     },
+    "./script": {
+      "types": "./dist/script/index.d.ts",
+      "bun": "./src/script/index.ts",
+      "import": "./dist/script/index.js",
+      "default": "./dist/script/index.js"
+    },
     "./shape-with-text": {
       "types": "./dist/shape-with-text/index.d.ts",
       "bun": "./src/shape-with-text/index.ts",

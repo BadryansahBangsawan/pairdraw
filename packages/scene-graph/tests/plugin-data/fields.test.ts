@@ -68,6 +68,25 @@ describe('OpenPencil plugin data', () => {
     expect(withPluginData(entries, exportSettings, undefined)).toEqual(entries.slice(0, 2))
   })
 
+  test('reads a script header with its inputs and drops a malformed one', () => {
+    const { script } = OPEN_PENCIL_PLUGIN_DATA
+    const data = {
+      version: 1,
+      source: 'return pencil.rect({ width: 10, height: 10 })',
+      inputs: { title: 'Card', count: 2, enabled: false, accent: { r: 0, g: 0, b: 1, a: 1 } }
+    }
+    const entries = withPluginData([], script, data)
+    expect(readPluginData(entries, script)).toEqual(data)
+    for (const value of [
+      '{"version":2,"source":"x"}',
+      '{"version":1,"source":""}',
+      '{"version":1,"source":"x","inputs":{"card":null}}',
+      '{"version":1,"source":"x","inputs":{"card":{"r":1,"g":0,"b":0}}}'
+    ]) {
+      expect(readPluginData([entry('script', value)], script)).toBeUndefined()
+    }
+  })
+
   test('picking an OkHCL color keeps the node’s other plugin data', () => {
     const graph = new SceneGraph()
     const paint = {

@@ -9,6 +9,7 @@ import { clampExportScale } from '../export-scale'
 import { FIG_COMPRESSIONS } from '../fig-compression'
 import { iconSchema, iconTintSchema } from '../icons/schema'
 import type { Color, Rect, Vector } from '../primitives'
+import { scriptNodeSchema } from '../script/schema'
 import { shaderPaintSchema } from '../shaders/schema'
 import { nodeStatusSchema, statusWorkflowSchema } from '../statuses/schema'
 import {
@@ -215,8 +216,8 @@ export const OPEN_PENCIL_PLUGIN_DATA = {
    * Figma's space between, and a frame whose record says otherwise was changed in Figma.
    */
   primaryAxisAlign: textPluginDataField('primaryAxisAlign', 'format', ['SPACE_AROUND']),
-  /** Marks a component set Figma would read as a plain frame. */
-  nodeType: textPluginDataField('nodeType', 'format', ['COMPONENT_SET']),
+  /** Marks a component set Figma would read as a plain frame, and a script node Figma has no type for. */
+  nodeType: textPluginDataField('nodeType', 'format', ['COMPONENT_SET', 'SCRIPT']),
   /** Variable bindings by field path, including those Figma cannot store natively. */
   boundVariables: jsonPluginDataField('boundVariables', 'format', boundVariablesSchema),
   exportSettings: jsonPluginDataField('exportSettings', 'format', exportSettingsSchema),
@@ -275,6 +276,8 @@ export const OPEN_PENCIL_PLUGIN_DATA = {
   iconTint: jsonPluginDataField('iconTint', 'content', iconTintSchema),
   /** One entry per paint that draws a shader, matched to its image paint by the frame's hash. */
   shader: jsonPluginDataField('shader', 'content', shaderPaintSchema),
+  /** A script node's source and its `@input` values, on the SCRIPT node. */
+  script: jsonPluginDataField('script', 'content', scriptNodeSchema),
   /** One entry per mesh paint, beside the solid fallback its record carries. */
   meshFills: jsonPluginDataField('meshFills', 'format', meshFillsSchema),
   /** Notes a person left on a layer for agents: what it means or does, and a request about it. */

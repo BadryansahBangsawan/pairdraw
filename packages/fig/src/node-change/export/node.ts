@@ -994,7 +994,7 @@ export function sceneNodeToKiwiWithContext(
   applyComponentMetadata(context, node, nc, localIdCounter)
   applyInstancePayload(context, node, nc, localIdCounter)
   applyReplacedLayersPluginData(context, node, localIdCounter)
-  if (node.type === 'COMPONENT_SET')
+  if (node.type === 'COMPONENT_SET' || node.type === 'SCRIPT')
     node.pluginData = withPluginData(node.pluginData, OPEN_PENCIL_PLUGIN_DATA.nodeType, node.type)
   if (nc.type === 'CANVAS') nc.pageType = 'DESIGN'
   if (node.type === 'BOOLEAN_OPERATION')

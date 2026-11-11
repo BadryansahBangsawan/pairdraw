@@ -49,6 +49,7 @@ export default defineConfig({
     resize: './src/resize.ts',
     'scaling/index': './src/scaling/index.ts',
     'shaders/index': './src/shaders/index.ts',
+    'script/index': './src/script/index.ts',
     'shape-with-text/index': './src/shape-with-text/index.ts',
     'shared-styles': './src/shared-styles.ts',
     'slots/index': './src/slots/index.ts',

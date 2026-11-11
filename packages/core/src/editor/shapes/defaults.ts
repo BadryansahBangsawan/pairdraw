@@ -64,6 +64,8 @@ export function newLayerDefaults(
       return { fills: [], strokes: copyStrokes([BLACK_STROKE]) }
     case 'TEXT':
       return { fills: copyFills([BLACK_FILL]) }
+    case 'SCRIPT':
+      return { fills: [], clipsContent: false }
     case 'SHAPE_WITH_TEXT':
       return {
         fills: copyFills([SHAPE_WITH_TEXT_FILL]),

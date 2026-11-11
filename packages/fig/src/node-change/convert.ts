@@ -715,10 +715,9 @@ function convertVectorAndStrokeProps(nc: NodeChange, blobs: Uint8Array[]) {
 
 function resolveNodeType(nc: NodeChange): NodeType | 'DOCUMENT' | 'VARIABLE' {
   const nodeType = mapNodeType(nc.type)
-  if (
-    (nodeType === 'FRAME' && isComponentSet(nc)) ||
-    readNodeChangePluginData(nc, OPEN_PENCIL_PLUGIN_DATA.nodeType) === 'COMPONENT_SET'
-  ) {
+  const storedType = readNodeChangePluginData(nc, OPEN_PENCIL_PLUGIN_DATA.nodeType)
+  if (storedType === 'SCRIPT') return 'SCRIPT'
+  if ((nodeType === 'FRAME' && isComponentSet(nc)) || storedType === 'COMPONENT_SET') {
     return 'COMPONENT_SET'
   }
   // Figma stores plain groups as FRAME node-changes flagged with resizeToFit.

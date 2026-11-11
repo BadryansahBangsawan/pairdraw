@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { guid } from '#fig-tests/helpers/guid'
 import { materializeDocument } from '#fig/document/materialize'
-import { EMPTY_EXPORT_RUNTIME, mapToFigmaType, sceneNodeToKiwi } from '#fig/node-change/index'
+import { mapToFigmaType, sceneNodeToKiwi } from '#fig/node-change/index'
 
 import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
 import { SceneGraph } from '@open-pencil/scene-graph'

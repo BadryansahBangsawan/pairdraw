@@ -643,7 +643,9 @@
         "extensions/vscode/src/webview/main.ts",
         "extensions/vscode/tests/embed/client.test.ts",
         "src/app/code/sandbox/frame.ts",
-        "src/app/code/sandbox/worker/index.ts"
+        "src/app/code/sandbox/worker/index.ts",
+        "src/app/code/script/sandbox/frame.ts",
+        "src/app/code/script/sandbox/worker/index.ts"
       ],
       "rules": {
         "unicorn/require-post-message-target-origin": "off"
@@ -652,7 +654,10 @@
     {
       "files": [
         "src/app/code/sandbox/evaluate.ts",
-        "src/app/code/sandbox/frame.ts"
+        "src/app/code/sandbox/frame.ts",
+        "src/app/code/script/sandbox/evaluate.ts",
+        "src/app/code/script/sandbox/frame.ts",
+        "src/app/code/script/sandbox/iframe.ts"
       ],
       "rules": {
         "import/default": "off"

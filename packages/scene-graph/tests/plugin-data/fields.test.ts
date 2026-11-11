@@ -71,7 +71,7 @@ describe('OpenPencil plugin data', () => {
   test('reads a script header with its inputs and drops a malformed one', () => {
     const { script } = OPEN_PENCIL_PLUGIN_DATA
     const data = {
-      version: 1,
+      version: 1 as const,
       source: 'return pencil.rect({ width: 10, height: 10 })',
       inputs: { title: 'Card', count: 2, enabled: false, accent: { r: 0, g: 0, b: 1, a: 1 } }
     }

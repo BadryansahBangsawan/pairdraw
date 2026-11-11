@@ -630,6 +630,74 @@ export interface CommentThread {
   replies: CommentReply[]
 }
 
+/** How a prototype reaction starts, as `.fig` keeps `PrototypeEvent.interactionType`. */
+export type PrototypeTriggerType = 'ON_CLICK' | 'AFTER_TIMEOUT'
+
+/** What a reaction does, as `.fig` keeps `ConnectionType` on `PrototypeAction`. */
+export type PrototypeActionType = 'NODE' | 'BACK' | 'CLOSE'
+
+/** Whether an action moves to a frame or opens it over the screen, as `NavigationType`. */
+export type PrototypeNavigationType = 'NAVIGATE' | 'OVERLAY'
+
+/** How a reaction animates between frames, as `TransitionType` keeps them. */
+export type PrototypeTransitionType = 'INSTANT' | 'DISSOLVE'
+
+/** Where an overlay sits over the screen, as `OverlayPositionType`. */
+export type PrototypeOverlayPositionType =
+  | 'CENTER'
+  | 'TOP_LEFT'
+  | 'TOP_CENTER'
+  | 'TOP_RIGHT'
+  | 'BOTTOM_LEFT'
+  | 'BOTTOM_CENTER'
+  | 'BOTTOM_RIGHT'
+
+/** How a reaction animates, and how long it takes in seconds. */
+export interface PrototypeTransition {
+  type: PrototypeTransitionType
+  duration: number
+}
+
+/** A reaction's move to another frame, or the overlay it opens. */
+export interface PrototypeNodeAction {
+  type: 'NODE'
+  /** The frame the action shows; `null` keeps the connection when its target is gone. */
+  nodeId: string | null
+  navigation: PrototypeNavigationType
+  transition: PrototypeTransition
+  /** Where an OVERLAY sits over the screen; NAVIGATE keeps CENTER. */
+  overlayPosition: PrototypeOverlayPositionType
+}
+
+/** Goes back to the frame the play came from. */
+export interface PrototypeBackAction {
+  type: 'BACK'
+}
+
+/** Closes the overlay the play is showing. */
+export interface PrototypeCloseAction {
+  type: 'CLOSE'
+}
+
+export type PrototypeAction = PrototypeNodeAction | PrototypeBackAction | PrototypeCloseAction
+
+/** What starts a reaction, and after how long an AFTER_TIMEOUT does. */
+export interface PrototypeTrigger {
+  type: PrototypeTriggerType
+  /** AFTER_TIMEOUT only: the seconds before the reaction runs. */
+  delay: number
+}
+
+/**
+ * One prototype connection on a layer: what starts it and what it does, as `.fig` keeps a
+ * `PrototypeInteraction` on the layer's `prototypeInteractions`.
+ */
+export interface PrototypeReaction {
+  id: string
+  trigger: PrototypeTrigger
+  actions: PrototypeAction[]
+}
+
 export interface SceneNode {
   id: string
   type: NodeType
@@ -873,6 +941,9 @@ export interface SceneNode {
 
   pluginData: PluginDataEntry[]
   pluginRelaunchData: PluginRelaunchDataEntry[]
+
+  /** The prototype reactions this layer starts, as Figma's prototype keeps them. */
+  prototypeReactions: PrototypeReaction[]
 
   internalOnly: boolean
 

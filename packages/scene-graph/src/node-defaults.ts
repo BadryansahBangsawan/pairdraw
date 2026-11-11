@@ -219,6 +219,7 @@ export function createDefaultNode(
     status: null,
     pluginData: [],
     pluginRelaunchData: [],
+    prototypeReactions: [],
     internalOnly: false,
     flipX: false,
     flipY: false,

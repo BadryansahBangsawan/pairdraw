@@ -315,6 +315,7 @@ export function cloneNodeProps(
     variantPropSpecs: copySpread(src.variantPropSpecs),
     pluginData: copySpread(src.pluginData),
     pluginRelaunchData: copySpread(src.pluginRelaunchData),
+    prototypeReactions: src.prototypeReactions.map((reaction) => structuredClone(reaction)),
     exportSettings: copySpread(src.exportSettings),
     // Generated instance descendants have no status of their own.
     status: componentId === null ? src.status : null,

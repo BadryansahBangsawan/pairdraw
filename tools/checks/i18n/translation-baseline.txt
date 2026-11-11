@@ -618,3 +618,8 @@ fr:automation.commandArguments
 fr:cloudPortal.publicProfileBio
 it:cloudPortal.publicProfileBio
 pl:cloudPortal.publicProfileBio
+de:panels.prototypeAnimation
+fr:panels.prototype
+fr:panels.prototypeAction
+fr:panels.prototypeDestination
+fr:panels.prototypeAnimation

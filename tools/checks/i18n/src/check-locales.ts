@@ -3,7 +3,6 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, relative, sep } from 'node:path'
 
 import { compact } from 'es-toolkit/array'
-import * as v from 'valibot'
 
 import type { JSONObject } from '@open-pencil/scene-graph/primitives'
 import {
@@ -49,10 +48,17 @@ function localeFileName(namespace: string) {
   return LOCALE_FILE_NAMES[namespace] ?? namespace
 }
 
-const jsonObjectTextSchema = v.pipe(v.string(), v.parseJson(), v.record(v.string(), v.unknown()))
-
+/**
+ * `JSON.parse` keeps `prototype`, `constructor`, and `__proto__` as own keys; a schema-validated
+ * record drops them, which would silently skip real translation keys such as `panels.prototype`.
+ */
 function readJSONObject(path: string): JSONObject {
-  return v.parse(jsonObjectTextSchema, readFileSync(path, 'utf-8'))
+  const parsed: unknown = JSON.parse(readFileSync(path, 'utf-8'))
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    report(`${path}: expected a JSON object`)
+    return {}
+  }
+  return parsed as JSONObject
 }
 
 function report(message: string) {

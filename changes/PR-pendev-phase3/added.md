@@ -1,3 +1,5 @@
 - Exports deterministic, human-readable `.pen` documents from scene graphs through the Core and CLI conversion APIs.
 - Runs a design agent headlessly from the CLI against any [OI]-compatible model, confining its file output to `--root` and withholding `eval` and network tools unless `--allow` names them.
 - Runs several named agents over one document with `--agents`, where each agent's role can only narrow the run's tools and never grant one it withheld.
+- Adds a Prototype section to the properties panel, where a layer takes click or after-delay interactions that navigate to a frame, open or close an overlay, or go back, with instant or dissolve transitions, all stored as Figma prototype reactions.
+- Reads and writes Figma prototype reactions in `.fig` files, so interactions survive a round trip and keep reaction ids as the file's GUIDs.

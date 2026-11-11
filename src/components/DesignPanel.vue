@@ -47,6 +47,7 @@ import MaskSection from './properties/MaskSection.vue'
 import PageSection from './properties/PageSection.vue'
 import RetainedPanel from './properties/panel/RetainedPanel.vue'
 import PositionSection from './properties/PositionSection.vue'
+import PrototypeSection from './properties/prototype/PrototypeSection.vue'
 import ScaleSection from './properties/scale/ScaleSection.vue'
 import SelectionColorsSection from './properties/selection/SelectionColorsSection.vue'
 import SelectionLayoutSection from './properties/selection/SelectionLayoutSection.vue'
@@ -302,6 +303,8 @@ const { panels } = useI18n()
       </template>
       <SelectionColorsSection />
       <LayoutGridSection v-if="supportsLayoutGuides" />
+      <!-- A connector is placed by its ends; it has no interactions of its own. -->
+      <PrototypeSection v-if="node.type !== 'CONNECTOR'" />
 
       <ExportSection />
       <AgentNotesSection />

@@ -754,7 +754,27 @@ export const panelMessageDefaults = {
   scaleAnchorRight: 'Right',
   scaleAnchorBottomLeft: 'Bottom left',
   scaleAnchorBottom: 'Bottom',
-  scaleAnchorBottomRight: 'Bottom right'
+  scaleAnchorBottomRight: 'Bottom right',
+  /** Interactions from a layer to a frame: the prototype panel. */
+  prototype: 'Prototype',
+  prototypeAddInteraction: 'Add interaction',
+  prototypeRemoveInteraction: 'Remove interaction',
+  prototypeTrigger: 'Trigger',
+  prototypeTriggerOnClick: 'On click',
+  prototypeTriggerAfterDelay: 'After delay',
+  prototypeDelay: 'Delay',
+  prototypeAction: 'Action',
+  prototypeActionNavigate: 'Navigate to',
+  prototypeActionOverlay: 'Open overlay',
+  prototypeActionBack: 'Back',
+  prototypeActionClose: 'Close overlay',
+  prototypeDestination: 'Destination',
+  prototypeDestinationPlaceholder: 'Select a frame',
+  prototypeAnimation: 'Animation',
+  prototypeAnimationInstant: 'Instant',
+  prototypeAnimationDissolve: 'Dissolve',
+  prototypeDuration: 'Duration',
+  prototypeNoFrames: 'Add a frame to this page to link to.'
 } as const
 
 export const panelMessages = i18n('panels', panelMessageDefaults)

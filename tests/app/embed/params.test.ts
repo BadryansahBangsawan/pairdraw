@@ -50,6 +50,24 @@ describe('embed params', () => {
     expect(parseEmbedOrigin('http://host.example')).toBeNull()
   })
 
+  test('accepts a bare VS Code webview origin', () => {
+    expect(parseEmbedOrigin('vscode-webview://0b7c5d8e-1f2a-4c3d-9e8f-1a2b3c4d5e6f')).toBe(
+      'vscode-webview://0b7c5d8e-1f2a-4c3d-9e8f-1a2b3c4d5e6f'
+    )
+    for (const refused of [
+      'vscode-webview:',
+      'vscode-webview://',
+      'vscode-webview://uuid/',
+      'vscode-webview://uuid/index.html',
+      'vscode-webview://uuid?origin=x',
+      'vscode-webview://uuid#frag',
+      'vscode-webview://user@uuid',
+      'vscode-webview://uuid.example'
+    ]) {
+      expect(parseEmbedOrigin(refused)).toBeNull()
+    }
+  })
+
   test('a repeated origin names no host', () => {
     expect(
       parseEmbedParams('?embed&origin=https%3A%2F%2Fa.example&origin=https%3A%2F%2Fb.example')

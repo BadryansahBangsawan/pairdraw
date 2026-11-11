@@ -10,9 +10,11 @@ export interface EmbedParams {
   chrome: boolean
 }
 
-const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]'])
+const LOOPBACK_HOSTS: Record<string, true> = { localhost: true, '127.0.0.1': true, '[::1]': true }
 /** A DNS name or IPv4 address as `URL` normalizes it (IDNs in punycode), or an IPv6 literal. */
 const HOST_NAME = /^(?:[a-z0-9-]+(?:\.[a-z0-9-]+)*|\[[0-9a-f:.]+\])$/
+/** The UUID host Chromium gives a VS Code webview; the scheme has no standard origin form. */
+const VSCODE_WEBVIEW_HOST = /^[a-z0-9-]+$/
 
 /**
  * The host origin a link names, or null. It must be one serialized origin and nothing more: no
@@ -27,10 +29,21 @@ export function parseEmbedOrigin(value: string | null): string | null {
   } catch {
     return null
   }
+  // A VS Code webview reports `vscode-webview://<uuid>` as its origin; URL calls that scheme's
+  // origin `null`, so the URL itself is the origin and nothing may follow the host.
+  if (url.protocol === 'vscode-webview:') {
+    const bare =
+      url.pathname === '' &&
+      url.search === '' &&
+      url.hash === '' &&
+      url.username === '' &&
+      url.password === ''
+    return bare && VSCODE_WEBVIEW_HOST.test(url.hostname) ? value : null
+  }
   // A URL parser takes `*` as a host character; an origin pattern is never a host.
   if (url.origin !== value || !HOST_NAME.test(url.hostname)) return null
   if (url.protocol === 'https:') return value
-  if (url.protocol === 'http:' && LOOPBACK_HOSTS.has(url.hostname)) return value
+  if (url.protocol === 'http:' && LOOPBACK_HOSTS[url.hostname] === true) return value
   return null
 }
 

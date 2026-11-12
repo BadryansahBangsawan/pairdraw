@@ -49,6 +49,7 @@ import RetainedPanel from './properties/panel/RetainedPanel.vue'
 import PositionSection from './properties/PositionSection.vue'
 import PrototypeSection from './properties/prototype/PrototypeSection.vue'
 import ScaleSection from './properties/scale/ScaleSection.vue'
+import ScriptSection from './properties/script/ScriptSection.vue'
 import SelectionColorsSection from './properties/selection/SelectionColorsSection.vue'
 import SelectionLayoutSection from './properties/selection/SelectionLayoutSection.vue'
 import SelectionActionsControl from './properties/SelectionActionsControl.vue'
@@ -262,6 +263,7 @@ const { panels } = useI18n()
 
       <TextContentSection v-if="node.type === 'TEXT'" :node-id="node.id" />
       <StatusSection />
+      <ScriptSection v-if="node.type === 'SCRIPT'" :node-id="node.id" />
       <ComponentPropertiesSection v-if="node.type === 'INSTANCE'" />
       <VariantAuthoringSection
         v-if="

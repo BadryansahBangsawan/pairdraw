@@ -78,6 +78,7 @@
   "settings": "設定…",
   "variables": "変数…",
   "insertIcon": "アイコンを挿入…",
+  "insertScript": "スクリプトを挿入…",
   "placeImage": "画像を配置…",
   "exportFramesToPDF": "フレームを PDF にエクスポート…",
   "imageFiles": "画像",

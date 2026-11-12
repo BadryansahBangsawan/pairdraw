@@ -1,5 +1,6 @@
 import type { SceneNode } from '@open-pencil/scene-graph'
 
+import { insertScriptNode } from '@/app/code/script/create'
 import { getActiveEditorStore, useEditorStore } from '@/app/editor/active-store'
 import { openTextLinkEditor } from '@/app/editor/links'
 import { openPlaceImageDialog } from '@/app/editor/place/dialog'
@@ -99,6 +100,9 @@ export function createSharedEditorMenuActions(
     'text-add-link': () => openTextLinkEditor(getActiveEditorStore()),
     'insert-icon': () => {
       store.state.iconPickerOpen = true
+    },
+    'insert-script': () => {
+      insertScriptNode(store)
     },
     'place-image': () => openPlaceImageDialog(store),
     'export-pdf': () => void exportFramesToPDF(store),

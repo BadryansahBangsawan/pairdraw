@@ -1,4 +1,8 @@
 {
+  "scriptLayer": "Livello script",
+  "scriptRun": "Esegui",
+  "scriptRunning": "Esecuzione…",
+  "scriptCode": "Codice dello script",
   "copyJSXReference": "Copia il riferimento alle props JSX negli appunti",
   "jsxUpToDate": "Aggiornato",
   "source": "Sorgente del codice",

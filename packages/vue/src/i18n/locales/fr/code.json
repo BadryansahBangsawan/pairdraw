@@ -1,4 +1,8 @@
 {
+  "scriptLayer": "Calque de script",
+  "scriptRun": "Exécuter",
+  "scriptRunning": "Exécution…",
+  "scriptCode": "Code du script",
   "copyJSXReference": "Copier la référence des props JSX dans le presse-papiers",
   "jsxUpToDate": "À jour",
   "source": "Source du code",

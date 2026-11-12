@@ -113,6 +113,16 @@ describe('drawing a script run', () => {
     expect(text).toMatchObject({ type: 'TEXT', text: 'Script timed out.' })
     expect(text.fills[0]).toMatchObject({ type: 'SOLID', color: parseColor(ERROR_COLOR) })
   })
+
+  test('replaces the previous output instead of stacking the error on it', () => {
+    const { graph, page, node } = scriptGraph('return []')
+    materializeScriptOutput(graph, node.id, [{ type: 'RECTANGLE', width: 10, height: 10 }], page.id)
+    materializeScriptError(graph, node.id, 'First.')
+    const frameId = materializeScriptError(graph, node.id, 'Second.')
+
+    expect(childTypes(graph, node.id)).toEqual(['FRAME'])
+    expect(nodeOf(graph, nodeOf(graph, frameId).childIds[0]).text).toBe('Second.')
+  })
 })
 
 describe('running a script node', () => {

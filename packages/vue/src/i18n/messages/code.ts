@@ -3,6 +3,10 @@ import { params } from '@nanostores/i18n'
 import { i18n } from '#vue/i18n/create'
 
 export const codeMessageDefaults = {
+  scriptLayer: 'Script layer',
+  scriptRun: 'Run',
+  scriptRunning: 'Running…',
+  scriptCode: 'Script code',
   source: 'Code source',
   sourceDesignJSX: 'Design JSX',
   sourceHTML: 'HTML',

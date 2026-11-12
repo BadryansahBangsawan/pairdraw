@@ -78,6 +78,7 @@
   "settings": "Настройки…",
   "variables": "Переменные…",
   "insertIcon": "Вставить иконку…",
+  "insertScript": "Вставить скрипт…",
   "placeImage": "Поместить изображение…",
   "exportFramesToPDF": "Экспортировать фреймы в PDF…",
   "imageFiles": "Изображения",

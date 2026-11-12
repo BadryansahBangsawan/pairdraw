@@ -1,4 +1,8 @@
 {
+  "scriptLayer": "Capa de script",
+  "scriptRun": "Ejecutar",
+  "scriptRunning": "Ejecutando…",
+  "scriptCode": "Código del script",
   "copyJSXReference": "Copiar referencia de props JSX al portapapeles",
   "jsxUpToDate": "Actualizado",
   "source": "Fuente del código",

@@ -1,4 +1,8 @@
 {
+  "scriptLayer": "スクリプトレイヤー",
+  "scriptRun": "実行",
+  "scriptRunning": "実行中…",
+  "scriptCode": "スクリプトコード",
   "copyJSXReference": "JSXのプロパティ参照をクリップボードにコピー",
   "jsxUpToDate": "最新です",
   "source": "コードソース",

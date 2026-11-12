@@ -1,4 +1,8 @@
 {
+  "scriptLayer": "Warstwa skryptu",
+  "scriptRun": "Uruchom",
+  "scriptRunning": "Uruchamianie…",
+  "scriptCode": "Kod skryptu",
   "copyJSXReference": "Skopiuj referencję propsów JSX do schowka",
   "jsxUpToDate": "Aktualne",
   "source": "Źródło kodu",

@@ -1,4 +1,8 @@
 {
+  "scriptLayer": "Skriptebene",
+  "scriptRun": "Ausführen",
+  "scriptRunning": "Wird ausgeführt…",
+  "scriptCode": "Skriptcode",
   "copyJSXReference": "JSX-Prop-Referenz in die Zwischenablage kopieren",
   "jsxUpToDate": "Aktuell",
   "source": "Codequelle",

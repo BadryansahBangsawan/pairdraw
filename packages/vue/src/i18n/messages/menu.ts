@@ -41,6 +41,7 @@ export const menuMessageDefaults = {
   settings: 'Settings…',
   variables: 'Variables…',
   insertIcon: 'Insert Icon…',
+  insertScript: 'Insert Script…',
   placeImage: 'Place image…',
   exportFramesToPDF: 'Export frames to PDF…',
   /** The kind of file Place image's desktop dialog lists. */

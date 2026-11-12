@@ -1,4 +1,8 @@
 {
+  "scriptLayer": "Слой скрипта",
+  "scriptRun": "Запустить",
+  "scriptRunning": "Выполняется…",
+  "scriptCode": "Код скрипта",
   "copyJSXReference": "Скопировать справку по JSX-свойствам в буфер",
   "jsxUpToDate": "Актуально",
   "source": "Источник кода",

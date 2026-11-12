@@ -99,6 +99,8 @@ export function materializeScriptError(
 ): string {
   const parent = graph.getNode(scriptNodeId)
   if (!parent) throw new Error('The script node is gone.')
+  // A failed run replaces what the last run drew, as a successful one does.
+  while (parent.childIds.length > 0) graph.deleteNode(parent.childIds[0])
   const frame = graph.createNode('FRAME', scriptNodeId, {
     ...newLayerDefaults('FRAME'),
     name: 'Script error',

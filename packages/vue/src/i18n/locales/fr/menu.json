@@ -78,6 +78,7 @@
   "settings": "Paramètres…",
   "variables": "Variables…",
   "insertIcon": "Insérer une icône…",
+  "insertScript": "Insérer un script…",
   "placeImage": "Placer une image…",
   "exportFramesToPDF": "Exporter les cadres en PDF…",
   "imageFiles": "Fichiers image",

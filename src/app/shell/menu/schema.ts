@@ -354,6 +354,11 @@ export const APP_MENU_SCHEMA = [
         label: 'Insert Icon…',
         palette: { keywords: ['iconify', 'symbol', 'glyph', 'lucide'] }
       },
+      {
+        id: 'insert-script',
+        label: 'Insert Script…',
+        palette: { keywords: ['code', 'script', 'javascript', 'canvas'] }
+      },
       { type: 'separator' },
       {
         id: 'selection.toggleMask',

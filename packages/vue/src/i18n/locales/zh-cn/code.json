@@ -1,4 +1,8 @@
 {
+  "scriptLayer": "脚本图层",
+  "scriptRun": "运行",
+  "scriptRunning": "正在运行…",
+  "scriptCode": "脚本代码",
   "copyJSXReference": "复制 JSX 属性参考到剪贴板",
   "jsxUpToDate": "已是最新",
   "source": "代码来源",

@@ -1,5 +1,6 @@
 import type { Component } from 'vue'
 import IconCircle from '~icons/lucide/circle'
+import IconCode from '~icons/lucide/code'
 import IconColumns from '~icons/lucide/columns-3'
 import IconComponentSet from '~icons/lucide/component'
 import IconComponent from '~icons/lucide/diamond'
@@ -72,7 +73,8 @@ export const NODE_ICONS: Partial<Record<string, typeof IconSquare>> = {
   VECTOR: IconPenTool,
   RECTANGLE: IconSquare,
   STICKY: IconStickyNote,
-  CONNECTOR: IconSpline
+  CONNECTOR: IconSpline,
+  SCRIPT: IconCode
 }
 
 export const AUTO_LAYOUT_ICONS: Partial<Record<string, typeof IconSquare>> = {

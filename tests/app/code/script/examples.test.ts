@@ -5,6 +5,7 @@ import * as v from 'valibot'
 import { SCRIPT_EXAMPLES } from '@open-pencil/core/tools'
 
 import { scriptNodeSpecSchema } from '@/app/code/script/sandbox/schema'
+import type { ScriptNodeSpec } from '@/app/code/script/sandbox/spec'
 import { runScript } from '@/app/code/script/sandbox/worker/run'
 
 /** The host parses every drawn layer before it materializes it, so the test does the same. */
@@ -27,6 +28,7 @@ for (const [name, source] of Object.entries(SCRIPT_EXAMPLES)) {
 test('the stat card example shows a label, a figure, and a trend', () => {
   const result = runScript({ id: 'stat', source: SCRIPT_EXAMPLES.stat_card, inputs: {}, seed: 1 })
   if (!result.ok) throw new Error(result.error)
-  const texts = (result.roots[0]?.children ?? []).map((child) => child.text)
+  const card = result.roots[0] as ScriptNodeSpec | undefined
+  const texts = (card?.children ?? []).map((child) => child.text)
   expect(texts).toEqual(['Monthly active', '24,916', '+12.4% vs last month'])
 })

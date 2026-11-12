@@ -25,5 +25,8 @@
   "importPage": "Importar página",
   "importElement": "Importar elemento",
   "importEmpty": "La página no tenía nada que importar.",
-  "pickCancelled": "La selección se canceló."
+  "pickCancelled": "La selección se canceló.",
+  "shotVisible": "Captura de la vista",
+  "shotFull": "Captura de la página",
+  "shotElement": "Captura de un elemento"
 }

@@ -25,5 +25,8 @@
   "importPage": "Seite importieren",
   "importElement": "Element importieren",
   "importEmpty": "Die Seite enthielt nichts zum Importieren.",
-  "pickCancelled": "Die Auswahl wurde abgebrochen."
+  "pickCancelled": "Die Auswahl wurde abgebrochen.",
+  "shotVisible": "Bild der Ansicht",
+  "shotFull": "Bild der ganzen Seite",
+  "shotElement": "Bild eines Elements"
 }

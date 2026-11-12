@@ -5,6 +5,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useBrowserMessages } from '@open-pencil/vue/i18n'
 
 import { importBrowserCapture } from '@/app/browser/import'
+import { placeBrowserScreenshot } from '@/app/browser/shot'
 import {
   browserState,
   BROWSER_ZOOM_MAX,
@@ -23,6 +24,8 @@ import {
   captureBrowserElement,
   captureBrowserPage,
   closeBrowserWindow,
+  screenshotBrowser,
+  type BrowserShotKind,
   goBack,
   goForward,
   openBrowserWindow,
@@ -201,6 +204,19 @@ function importOpenPage() {
 function importPickedElement() {
   void importCapture(captureBrowserElement)
 }
+
+async function placeShot(kind: BrowserShotKind, name: string) {
+  if (!windowReady.value) return
+  try {
+    await placeBrowserScreenshot(editor, await screenshotBrowser(kind), name)
+    refusal.value = null
+  } catch (error) {
+    const failure = browserCaptureFailure(error)
+    refusal.value = failure.cancelled
+      ? messages.value.pickCancelled
+      : messages.value.commandFailed({ error: failure.detail })
+  }
+}
 </script>
 
 <template>
@@ -343,6 +359,35 @@ function importPickedElement() {
           >
             {{ messages.importElement }}
           </AppButton>
+          <div class="flex flex-wrap gap-1">
+            <AppButton
+              type="button"
+              size="sm"
+              :disabled="!windowReady"
+              data-test-id="browser-shot-visible"
+              @click="placeShot('visible', messages.shotVisible)"
+            >
+              {{ messages.shotVisible }}
+            </AppButton>
+            <AppButton
+              type="button"
+              size="sm"
+              :disabled="!windowReady"
+              data-test-id="browser-shot-full"
+              @click="placeShot('full', messages.shotFull)"
+            >
+              {{ messages.shotFull }}
+            </AppButton>
+            <AppButton
+              type="button"
+              size="sm"
+              :disabled="!windowReady"
+              data-test-id="browser-shot-element"
+              @click="placeShot('element', messages.shotElement)"
+            >
+              {{ messages.shotElement }}
+            </AppButton>
+          </div>
           <PanelFieldGroup :label="messages.device">
             <AppSelect
               :model-value="browserState.device"

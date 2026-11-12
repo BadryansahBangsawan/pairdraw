@@ -30,7 +30,10 @@ export const browserMessageDefaults = {
   importPage: 'Import page',
   importElement: 'Import element',
   importEmpty: 'The page had nothing to import.',
-  pickCancelled: 'The pick was cancelled.'
+  pickCancelled: 'The pick was cancelled.',
+  shotVisible: 'Screenshot of the view',
+  shotFull: 'Screenshot of the page',
+  shotElement: 'Screenshot of an element'
 } as const
 
 export const browserMessages = i18n('browser', browserMessageDefaults)

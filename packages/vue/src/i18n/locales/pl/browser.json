@@ -25,5 +25,8 @@
   "importPage": "Importuj stronę",
   "importElement": "Importuj element",
   "importEmpty": "Strona nie miała nic do zaimportowania.",
-  "pickCancelled": "Wybór został anulowany."
+  "pickCancelled": "Wybór został anulowany.",
+  "shotVisible": "Zrzut widoku",
+  "shotFull": "Zrzut całej strony",
+  "shotElement": "Zrzut elementu"
 }

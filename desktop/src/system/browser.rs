@@ -9,7 +9,7 @@
 
 use std::sync::Mutex;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tauri::{
     webview::PageLoadEvent, AppHandle, Emitter, LogicalSize, Manager, Runtime, WebviewUrl,
     WebviewWindow, WebviewWindowBuilder, WindowEvent,
@@ -318,6 +318,103 @@ pub async fn browser_capture_element<R: Runtime>(app: AppHandle<R>) -> Result<St
     let picked = eval_text(&window, PICK_ELEMENT).await?;
     let selector = picked_selector(&picked)?;
     capture_html(eval_text(&window, &element_call(selector)?).await?)
+}
+
+#[derive(Deserialize)]
+struct JsonBox {
+    x: f64,
+    y: f64,
+    width: f64,
+    height: f64,
+}
+
+#[derive(Deserialize)]
+struct JsonSize {
+    width: f64,
+    height: f64,
+}
+
+async fn element_rect<R: Runtime>(
+    window: &WebviewWindow<R>,
+) -> Result<crate::system::browser_shot::ShotRect, String> {
+    let picked = eval_text(window, PICK_ELEMENT).await?;
+    let selector = picked_selector(&picked)?.to_owned();
+    let quoted = serde_json::to_string(&selector).map_err(|error| error.to_string())?;
+    let script = format!(
+        "(() => {{ const el = document.querySelector({quoted}); if (!el) return \"\"; el.scrollIntoView({{block:\"nearest\",inline:\"nearest\"}}); const r = el.getBoundingClientRect(); return JSON.stringify({{x:r.x,y:r.y,width:r.width,height:r.height}}); }})()"
+    );
+    let reported = eval_text(window, &script).await?;
+    if reported.is_empty() {
+        return Err("The element is not on the page".to_owned());
+    }
+    let view: JsonBox =
+        serde_json::from_str(&reported).map_err(|_| "The element has no size".to_owned())?;
+    if !view.width.is_finite()
+        || !view.height.is_finite()
+        || view.width <= 0.0
+        || view.height <= 0.0
+    {
+        return Err("The element has no size".to_owned());
+    }
+    Ok(crate::system::browser_shot::ShotRect {
+        x: view.x.max(0.0),
+        y: view.y.max(0.0),
+        width: view.width,
+        height: view.height,
+    })
+}
+
+async fn grow_to_page<R: Runtime>(window: &WebviewWindow<R>) -> Result<LogicalSize<f64>, String> {
+    let physical = window.inner_size().map_err(|error| error.to_string())?;
+    let scale = window.scale_factor().map_err(|error| error.to_string())?;
+    let previous = physical.to_logical::<f64>(scale);
+    let reported = eval_text(
+        window,
+        "JSON.stringify({width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight})",
+    )
+    .await?;
+    let size: JsonSize =
+        serde_json::from_str(&reported).map_err(|_| "The page has no size".to_owned())?;
+    let (width, height) = crate::system::browser_shot::capped_document(size.width, size.height)?;
+    window
+        .set_size(LogicalSize::new(width, height))
+        .map_err(|error| error.to_string())?;
+    Ok(previous)
+}
+
+/// A PNG of the open page, as base64. `kind` is `visible`, `full`, or `element`.
+#[tauri::command]
+pub async fn browser_screenshot<R: Runtime>(
+    app: AppHandle<R>,
+    kind: String,
+) -> Result<String, String> {
+    use crate::system::browser_shot::{capture_png, shot_kind, ShotKind};
+
+    let window = browser_window(&app)?;
+    let mode = shot_kind(&kind)?;
+    let previous = if mode == ShotKind::Full {
+        Some(grow_to_page(&window).await?)
+    } else {
+        None
+    };
+    let rect = if mode == ShotKind::Element {
+        match element_rect(&window).await {
+            Ok(rect) => Some(rect),
+            Err(error) => {
+                if let Some(size) = previous {
+                    let _ = window.set_size(size);
+                }
+                return Err(error);
+            }
+        }
+    } else {
+        None
+    };
+    let shot = capture_png(&window, rect).await;
+    if let Some(size) = previous {
+        let _ = window.set_size(size);
+    }
+    shot
 }
 
 #[cfg(test)]

@@ -25,5 +25,8 @@
   "importPage": "ページを取り込む",
   "importElement": "要素を取り込む",
   "importEmpty": "取り込む内容がページにありません。",
-  "pickCancelled": "選択を取り消しました。"
+  "pickCancelled": "選択を取り消しました。",
+  "shotVisible": "見えている範囲の画像",
+  "shotFull": "ページ全体の画像",
+  "shotElement": "要素の画像"
 }

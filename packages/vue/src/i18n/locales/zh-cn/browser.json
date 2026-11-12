@@ -25,5 +25,8 @@
   "importPage": "导入页面",
   "importElement": "导入元素",
   "importEmpty": "页面上没有可导入的内容。",
-  "pickCancelled": "已取消选择。"
+  "pickCancelled": "已取消选择。",
+  "shotVisible": "可见区域的图片",
+  "shotFull": "整页图片",
+  "shotElement": "元素图片"
 }

@@ -1,3 +1,5 @@
+import { toUint8Array } from 'js-base64'
+
 import {
   markClosed,
   markLoadFailed,
@@ -92,6 +94,17 @@ export async function captureBrowserPage(): Promise<string> {
   const html = await (await tauri()).invoke('browser_capture_page')
   if (typeof html !== 'string' || html === '') throw new Error('The page returned no capture')
   return html
+}
+
+export type BrowserShotKind = 'visible' | 'full' | 'element'
+
+/** PNG bytes of the open page. `element` waits for a click in that page. */
+export async function screenshotBrowser(kind: BrowserShotKind): Promise<Uint8Array> {
+  const encoded = await (await tauri()).invoke('browser_screenshot', { kind })
+  if (typeof encoded !== 'string' || encoded === '') throw new Error('The page returned no picture')
+  const png = toUint8Array(encoded)
+  if (png.byteLength < 8) throw new Error('The page returned no picture')
+  return png
 }
 
 /** Clipboard HTML of one element the user clicks in the open page. A cancel rejects. */

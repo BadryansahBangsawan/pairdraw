@@ -4,3 +4,4 @@
 - Adds a Prototype section to the properties panel, where a layer takes click or after-delay interactions that navigate to a frame, open or close an overlay, or go back, with instant or dissolve transitions, all stored as Figma prototype reactions.
 - Reads and writes Figma prototype reactions in `.fig` files, so interactions survive a round trip and keep reaction ids as the file's GUIDs.
 - Draws a selected layer's prototype connections on the canvas as dashed arrows to the frames each reaction shows.
+- Plays a prototype from the Prototype section: clicks follow their interactions between frames, overlays open over the frame and close, after-delay interactions run on their own, dissolve transitions crossfade, and Escape returns to editing.

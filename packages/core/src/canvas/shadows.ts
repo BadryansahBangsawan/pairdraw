@@ -1,6 +1,6 @@
 import type { Canvas, ImageFilter } from 'canvaskit-wasm'
 
-import type { BlendMode, Effect, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { BlendMode, ShadowEffect, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
 import Matrix from '@open-pencil/scene-graph/matrix'
 
 import { nodeOrientationMatrix } from '#core/geometry'
@@ -52,14 +52,14 @@ const UNSPREAD_TYPES: ReadonlySet<SceneNode['type']> = new Set<SceneNode['type']
 ])
 
 /** Figma spreads a shadow only where it follows the layer's own outline: shapes and filled frames that clip. */
-function shadowSpread(node: SceneNode, effect: Effect): number {
+function shadowSpread(node: SceneNode, effect: ShadowEffect): number {
   if (UNSPREAD_TYPES.has(node.type)) return 0
   if (!isLayerContainer(node)) return effect.spread
   return node.clipsContent && fillsCastShadow(node) ? effect.spread : 0
 }
 
 /** The spread an inner shadow takes, inside any layer whose type Figma spreads. */
-function innerShadowSpread(node: SceneNode, effect: Effect): number {
+function innerShadowSpread(node: SceneNode, effect: ShadowEffect): number {
   return UNSPREAD_TYPES.has(node.type) ? 0 : effect.spread
 }
 
@@ -67,7 +67,7 @@ function shadowLayerBounds(
   r: SkiaRenderer,
   graph: SceneGraph,
   node: SceneNode,
-  effect: Effect,
+  effect: ShadowEffect,
   spread: number,
   includeChildren: boolean
 ): Float32Array {
@@ -98,7 +98,7 @@ function spreadFilter(r: SkiaRenderer, spread: number): ImageFilter | null {
 function drawSilhouetteDropShadow(
   r: SkiaRenderer,
   canvas: Canvas,
-  effect: Effect,
+  effect: ShadowEffect,
   spread: number,
   bounds: Float32Array,
   blendMode: BlendMode | undefined,
@@ -154,7 +154,7 @@ function drawOwnShapeDropShadow(
   r: SkiaRenderer,
   canvas: Canvas,
   node: SceneNode,
-  effect: Effect,
+  effect: ShadowEffect,
   spread: number,
   blendMode: BlendMode | undefined,
   knockout: boolean
@@ -182,7 +182,7 @@ function drawOwnShapeDropShadow(
  * How far apart a container's children must be for their shadows to reach neither each other nor
  * another child: the blur's reach from both, any spread, and the offset.
  */
-function shadowGap(effect: Effect, spread: number): number {
+function shadowGap(effect: ShadowEffect, spread: number): number {
   const reach = 3 * blurSigma(effect.radius) + Math.abs(spread) + 1
   return 2 * reach + Math.hypot(effect.offset.x, effect.offset.y)
 }
@@ -195,8 +195,8 @@ function shadowGap(effect: Effect, spread: number): number {
 function withChildCoordinates<T>(
   canvas: Canvas,
   child: SceneNode,
-  effect: Effect,
-  draw: (local: Effect) => T
+  effect: ShadowEffect,
+  draw: (local: ShadowEffect) => T
 ): T {
   const orientation = nodeOrientationMatrix(child)
   const inverse = Matrix.invert(orientation) ?? Matrix.identity()
@@ -217,7 +217,7 @@ function renderDropShadow(
   canvas: Canvas,
   graph: SceneGraph,
   node: SceneNode,
-  effect: Effect,
+  effect: ShadowEffect,
   includeChildren: boolean
 ): void {
   if (!includeChildren && !paintsCastShadow(node)) return
@@ -277,7 +277,7 @@ function renderDropShadow(
 function drawSilhouetteInnerShadow(
   r: SkiaRenderer,
   canvas: Canvas,
-  effect: Effect,
+  effect: ShadowEffect,
   bounds: Float32Array,
   draw: () => void
 ): void {
@@ -344,7 +344,7 @@ function renderInnerShadow(
   canvas: Canvas,
   graph: SceneGraph,
   node: SceneNode,
-  effect: Effect,
+  effect: ShadowEffect,
   includeChildren: boolean
 ): void {
   if (!includeChildren && !paintsCastShadow(node)) return
@@ -436,8 +436,10 @@ export function renderLayerShadows(
   pass: 'behind' | 'front'
 ): void {
   if (!isLayerContainer(node)) return
-  const type = pass === 'behind' ? 'DROP_SHADOW' : 'INNER_SHADOW'
-  const effects = node.effects.filter((effect) => effect.visible && effect.type === type)
+  const effects = node.effects.filter(
+    (effect): effect is ShadowEffect =>
+      effect.visible && effect.type === (pass === 'behind' ? 'DROP_SHADOW' : 'INNER_SHADOW')
+  )
   if (effects.length === 0) return
   const includeChildren = shadowIncludesChildren(graph, node)
   for (const effect of effects) {

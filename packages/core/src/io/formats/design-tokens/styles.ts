@@ -1,6 +1,6 @@
 import { isEmptyObject, isPlainObject } from 'es-toolkit/predicate'
 
-import type { Effect, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { Effect, ShadowEffect, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
 import { lineHeightPixels, textLengthPixels } from '@open-pencil/scene-graph/text'
 
 import { toFigmaEffect } from '#core/figma-api/effects'
@@ -80,11 +80,11 @@ function typographyToken(node: SceneNode, references: TokenReferences): DesignTo
   }
 }
 
-export function isShadow(effect: Effect): boolean {
+export function isShadow(effect: Effect): effect is ShadowEffect {
   return effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW'
 }
 
-function shadowValue(effect: Effect) {
+function shadowValue(effect: ShadowEffect) {
   return {
     color: colorTokenValue(effect.color),
     offsetX: dimensionTokenValue(effect.offset.x),
@@ -97,7 +97,9 @@ function shadowValue(effect: Effect) {
 
 /** A shadow token's `$value`: the visible shadows of `effects`, or undefined when there are none. */
 export function shadowTokenValue(effects: readonly Effect[]) {
-  const values = effects.filter((effect) => isShadow(effect) && effect.visible).map(shadowValue)
+  const values = effects
+    .filter((effect): effect is ShadowEffect => isShadow(effect) && effect.visible)
+    .map(shadowValue)
   if (values.length === 0) return undefined
   return values.length === 1 ? values[0] : values
 }
@@ -122,7 +124,15 @@ function shadowToken(node: SceneNode): DesignToken | undefined {
     $value,
     ...(exact
       ? {}
-      : { $extensions: { [OPENPENCIL_EXTENSION]: { effects: node.effects.map(toFigmaEffect) } } })
+      : {
+          $extensions: {
+            [OPENPENCIL_EXTENSION]: {
+              effects: node.effects
+                .filter((effect): effect is ShadowEffect => effect.type !== 'SHADER')
+                .map(toFigmaEffect)
+            }
+          }
+        })
   }
 }
 

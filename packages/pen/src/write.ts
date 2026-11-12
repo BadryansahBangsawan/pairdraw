@@ -1,12 +1,12 @@
 import type {
   BlendMode,
-  Effect,
   Fill,
   GradientTransform,
   LayoutAlign,
   LayoutCounterAlign,
   SceneGraph,
   SceneNode,
+  ShadowEffect,
   Stroke,
   Variable,
   VariableCollection,
@@ -243,7 +243,7 @@ function strokesOf(
   }
 }
 
-function effectOf(effect: Effect): PenEffect {
+function effectOf(effect: ShadowEffect): PenEffect {
   if (effect.type === 'LAYER_BLUR' || effect.type === 'BACKGROUND_BLUR') {
     return {
       type: effect.type === 'LAYER_BLUR' ? 'blur' : 'background_blur',
@@ -516,9 +516,10 @@ function semanticNodeFields(state: PenWriteState, node: SceneNode, result: PenNo
     result.width = 'fit_content'
   if (node.type === 'STICKY') result.content = stickySublayers(state.graph, node)?.body.text ?? ''
   penPluginFields(node, result)
-  if (node.effects.length > 0)
-    result.effect =
-      node.effects.length === 1 ? effectOf(node.effects[0]) : node.effects.map(effectOf)
+  // Shader effects have no pen.dev form yet; dropping them keeps the file loadable.
+  const effects = node.effects.filter((effect): effect is ShadowEffect => effect.type !== 'SHADER')
+  if (effects.length > 0)
+    result.effect = effects.length === 1 ? effectOf(effects[0]) : effects.map(effectOf)
   if (node.type === 'COMPONENT' || node.type === 'COMPONENT_SET') result.reusable = true
   if (node.type === 'INSTANCE' && node.componentId) {
     result.type = 'ref'

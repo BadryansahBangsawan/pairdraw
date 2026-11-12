@@ -1,4 +1,4 @@
-import type { SceneGraph, SceneNode, Stroke } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode, ShadowEffect, Stroke } from '@open-pencil/scene-graph'
 import { newStrokeGeometry } from '@open-pencil/scene-graph/node-defaults'
 import { independentCornerChanges, resolvedPaintBindings } from '@open-pencil/scene-graph/variables'
 
@@ -119,7 +119,12 @@ export function installVisualNodeProxyAccessors(
     },
     effects: {
       get(this: ProxyThis): readonly FigmaEffect[] {
-        return Object.freeze(raw(this, internals).effects.map(toFigmaEffect))
+        // A shader effect has no Figma plugin-API form yet (`UNSUPPORTED_EFFECT_TYPES`).
+        return Object.freeze(
+          raw(this, internals)
+            .effects.filter((effect): effect is ShadowEffect => effect.type !== 'SHADER')
+            .map(toFigmaEffect)
+        )
       },
       set(this: ProxyThis, value: readonly FigmaEffect[]) {
         updateNode(this, internals, { effects: parseFigmaEffects(value) })

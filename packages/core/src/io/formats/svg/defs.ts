@@ -1,6 +1,13 @@
 import { fromUint8Array } from 'js-base64'
 
-import type { Effect, Fill, FontVariation, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type {
+  Effect,
+  Fill,
+  FontVariation,
+  SceneGraph,
+  SceneNode,
+  ShadowEffect
+} from '@open-pencil/scene-graph'
 import {
   colorToHex,
   colorToDisplayCSS,
@@ -213,7 +220,7 @@ export function createFilterDef(
   effects: Effect[],
   ctx: SVGExportContext
 ): { id: string; node: SVGNode } | null {
-  const visible = effects.filter((e) => e.visible)
+  const visible = effects.filter((e): e is ShadowEffect => e.visible)
   if (visible.length === 0) return null
 
   const id = nextDefId(ctx, 'fx')

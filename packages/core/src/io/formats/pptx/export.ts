@@ -1,7 +1,7 @@
 import { fromUint8Array } from 'js-base64'
 import type PptxGenJS from 'pptxgenjs'
 
-import type { Fill, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { Fill, SceneGraph, SceneNode, ShadowEffect } from '@open-pencil/scene-graph'
 import { getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
 import TransformMatrix, { type Mat3 } from '@open-pencil/scene-graph/matrix'
 import { lineHeightPixels, textLengthPixels } from '@open-pencil/scene-graph/text'
@@ -256,7 +256,8 @@ function rootRasterReason(root: SceneNode): string | null {
 
 function getShadowFallbackReason(node: SceneNode): string | null {
   const shadows = node.effects.filter(
-    (effect) => effect.visible && (effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW')
+    (effect): effect is ShadowEffect =>
+      effect.visible && (effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW')
   )
   if (shadows.length > 1) return 'multiple shadows'
   if (shadows.length === 0) return null

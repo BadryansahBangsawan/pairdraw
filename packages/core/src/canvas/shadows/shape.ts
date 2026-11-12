@@ -1,6 +1,6 @@
 import type { Canvas, Path } from 'canvaskit-wasm'
 
-import type { BlendMode, Effect, SceneNode, Stroke } from '@open-pencil/scene-graph'
+import type { BlendMode, ShadowEffect, SceneNode, Stroke } from '@open-pencil/scene-graph'
 
 import { setPaintBlendMode } from '#core/canvas/blend'
 import { blurSigma } from '#core/canvas/effects'
@@ -124,7 +124,7 @@ function strokeOutlinePath(
 function drawMaskShadow(
   r: SkiaRenderer,
   canvas: Canvas,
-  effect: Effect,
+  effect: ShadowEffect,
   blendMode: BlendMode | undefined,
   draw: () => void
 ): void {
@@ -148,7 +148,7 @@ export function drawShapeDropShadow(
   r: SkiaRenderer,
   canvas: Canvas,
   node: SceneNode,
-  effect: Effect,
+  effect: ShadowEffect,
   spread: number,
   blendMode: BlendMode | undefined
 ): void {
@@ -167,7 +167,7 @@ export function drawOutlineDropShadow(
   r: SkiaRenderer,
   canvas: Canvas,
   node: SceneNode,
-  effect: Effect,
+  effect: ShadowEffect,
   outline: StrokeOutline,
   spread: number,
   blendMode: BlendMode | undefined
@@ -185,7 +185,7 @@ export function drawRingDropShadow(
   r: SkiaRenderer,
   canvas: Canvas,
   node: SceneNode,
-  effect: Effect,
+  effect: ShadowEffect,
   outline: StrokeOutline,
   spread: number,
   blendMode: BlendMode | undefined
@@ -236,7 +236,7 @@ export function drawShapeInnerShadow(
   r: SkiaRenderer,
   canvas: Canvas,
   node: SceneNode,
-  effect: Effect,
+  effect: ShadowEffect,
   spread: number,
   isolated = false
 ): void {

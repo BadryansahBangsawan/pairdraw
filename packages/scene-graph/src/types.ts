@@ -4,8 +4,8 @@ import type { ExportFormatId } from './export-format'
 import type { CanvasGuide } from './guides'
 import type { InstanceOverrideState } from './instances/overrides'
 import type { Color, Matrix, Rect, Vector } from './primitives'
-import type { ShapeWithTextType } from './shape-with-text/kinds'
 import type { ShaderUniformValue } from './shaders/schema'
+import type { ShapeWithTextType } from './shape-with-text/kinds'
 
 export interface SceneGraphEvents {
   'node:created': (node: SceneNode) => void

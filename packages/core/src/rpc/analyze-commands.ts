@@ -88,7 +88,7 @@ function collectColors(graph: SceneGraph): { colors: ColorInfo[]; totalNodes: nu
       addColor(stroke.color, null)
     }
     for (const effect of node.effects) {
-      if (!effect.visible) continue
+      if (!effect.visible || effect.type === 'SHADER') continue
       addColor(effect.color, null)
     }
 

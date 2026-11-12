@@ -1,30 +1,23 @@
-import { partition } from "es-toolkit/array";
-import { omit, omitBy } from "es-toolkit/object";
+import { partition } from 'es-toolkit/array'
+import { omit, omitBy } from 'es-toolkit/object'
 
-import { BLACK } from "../constants";
-import type { SceneGraph } from "../graph";
-import { findInstanceAncestor } from "../instances";
-import {
-  bindingOverrideField,
-  setInstanceOverride,
-} from "../instances/overrides";
-import {
-  isShaderSourcePaint,
-  shaderOfPaint,
-  withShaderPaints,
-} from "../shaders/model";
+import { BLACK } from '../constants'
+import type { SceneGraph } from '../graph'
+import { findInstanceAncestor } from '../instances'
+import { bindingOverrideField, setInstanceOverride } from '../instances/overrides'
+import { isShaderSourcePaint, shaderOfPaint, withShaderPaints } from '../shaders/model'
 import type {
   Variable,
   VariableCollection,
   VariableCollectionMode,
   VariableType,
-  VariableValue,
-} from "../types";
+  VariableValue
+} from '../types'
 import {
   isNumericVariableBindingField,
   variableBindingOwner,
-  assignVariableBindingUnits,
-} from "./bindings";
+  assignVariableBindingUnits
+} from './bindings'
 import {
   BOOLEAN_BINDING_FIELDS,
   ICON_BINDING_FIELDS,
@@ -32,66 +25,60 @@ import {
   STRING_BINDING_FIELDS,
   TEXT_CONTENT_VARIABLE_TYPES,
   uniformBindingTarget,
-  VISIBILITY_VARIABLE_TYPES,
-} from "./fields";
+  VISIBILITY_VARIABLE_TYPES
+} from './fields'
 
-export * from "./resolution";
+export * from './resolution'
 
 export function addVariable(graph: SceneGraph, variable: Variable): void {
-  graph.variables.set(variable.id, variable);
-  const collection = graph.variableCollections.get(variable.collectionId);
+  graph.variables.set(variable.id, variable)
+  const collection = graph.variableCollections.get(variable.collectionId)
   if (collection && !collection.variableIds.includes(variable.id)) {
-    collection.variableIds.push(variable.id);
+    collection.variableIds.push(variable.id)
   }
 }
 
 export function removeVariable(graph: SceneGraph, id: string): void {
-  const variable = graph.variables.get(id);
-  if (!variable) return;
-  graph.variables.delete(id);
-  const collection = graph.variableCollections.get(variable.collectionId);
+  const variable = graph.variables.get(id)
+  if (!variable) return
+  graph.variables.delete(id)
+  const collection = graph.variableCollections.get(variable.collectionId)
   if (collection) {
-    collection.variableIds = collection.variableIds.filter((vid) => vid !== id);
+    collection.variableIds = collection.variableIds.filter((vid) => vid !== id)
   }
   for (const node of graph.nodes.values()) {
-    const hadBinding = Object.values(node.boundVariables).includes(id);
-    if (!hadBinding) continue;
-    graph.willChangeNode(node);
-    node.boundVariables = omitBy(
-      node.boundVariables,
-      (varId) => varId === id,
-    ) as Record<string, string>;
+    const hadBinding = Object.values(node.boundVariables).includes(id)
+    if (!hadBinding) continue
+    graph.willChangeNode(node)
+    node.boundVariables = omitBy(node.boundVariables, (varId) => varId === id) as Record<
+      string,
+      string
+    >
     node.variableBindingScales = omitBy(
       node.variableBindingScales,
-      (_, field) => !(field in node.boundVariables),
-    );
-    graph.emitter.emit("node:updated", node.id, {
+      (_, field) => !(field in node.boundVariables)
+    )
+    graph.emitter.emit('node:updated', node.id, {
       boundVariables: { ...node.boundVariables },
-      variableBindingScales: { ...node.variableBindingScales },
-    });
-    markBoundVariablesOverrideOnInstance(graph, node.id);
+      variableBindingScales: { ...node.variableBindingScales }
+    })
+    markBoundVariablesOverrideOnInstance(graph, node.id)
   }
 }
 
-export function addCollection(
-  graph: SceneGraph,
-  collection: VariableCollection,
-): void {
-  graph.variableCollections.set(collection.id, collection);
+export function addCollection(graph: SceneGraph, collection: VariableCollection): void {
+  graph.variableCollections.set(collection.id, collection)
   if (!graph.activeMode.has(collection.id)) {
-    graph.activeMode.set(collection.id, collection.defaultModeId);
+    graph.activeMode.set(collection.id, collection.defaultModeId)
   }
 }
 
-function defaultVariableValue(
-  type: VariableType,
-  value?: VariableValue,
-): VariableValue {
-  if (value !== undefined) return value;
-  if (type === "COLOR") return { ...BLACK };
-  if (type === "FLOAT") return 0;
-  if (type === "BOOLEAN") return false;
-  return "";
+function defaultVariableValue(type: VariableType, value?: VariableValue): VariableValue {
+  if (value !== undefined) return value
+  if (type === 'COLOR') return { ...BLACK }
+  if (type === 'FLOAT') return 0
+  if (type === 'BOOLEAN') return false
+  return ''
 }
 
 export function createVariable(
@@ -100,15 +87,15 @@ export function createVariable(
   name: string,
   type: VariableType,
   collectionId: string,
-  value?: VariableValue,
+  value?: VariableValue
 ): Variable {
-  const collection = graph.variableCollections.get(collectionId);
-  if (!collection) throw new Error(`Collection "${collectionId}" not found`);
-  const id = generateId();
-  const defaultValue = defaultVariableValue(type, value);
-  const valuesByMode: Record<string, VariableValue> = {};
+  const collection = graph.variableCollections.get(collectionId)
+  if (!collection) throw new Error(`Collection "${collectionId}" not found`)
+  const id = generateId()
+  const defaultValue = defaultVariableValue(type, value)
+  const valuesByMode: Record<string, VariableValue> = {}
   for (const mode of collection.modes) {
-    valuesByMode[mode.modeId] = structuredClone(defaultValue);
+    valuesByMode[mode.modeId] = structuredClone(defaultValue)
   }
   const variable: Variable = {
     id,
@@ -116,48 +103,44 @@ export function createVariable(
     type,
     collectionId,
     valuesByMode,
-    description: "",
-    hiddenFromPublishing: false,
-  };
-  addVariable(graph, variable);
-  return variable;
+    description: '',
+    hiddenFromPublishing: false
+  }
+  addVariable(graph, variable)
+  return variable
 }
 
 export function createCollection(
   graph: SceneGraph,
   generateId: () => string,
-  name: string,
+  name: string
 ): VariableCollection {
-  const id = generateId();
-  const modeId = generateId();
+  const id = generateId()
+  const modeId = generateId()
   const collection: VariableCollection = {
     id,
     name,
-    modes: [{ modeId, name: "Mode 1" }],
+    modes: [{ modeId, name: 'Mode 1' }],
     defaultModeId: modeId,
-    variableIds: [],
-  };
-  addCollection(graph, collection);
-  return collection;
+    variableIds: []
+  }
+  addCollection(graph, collection)
+  return collection
 }
 
 export function removeCollection(graph: SceneGraph, id: string): void {
-  const collection = graph.variableCollections.get(id);
+  const collection = graph.variableCollections.get(id)
   if (collection) {
     for (const varId of Array.from(collection.variableIds)) {
-      removeVariable(graph, varId);
+      removeVariable(graph, varId)
     }
   }
-  graph.variableCollections.delete(id);
-  graph.activeMode.delete(id);
+  graph.variableCollections.delete(id)
+  graph.activeMode.delete(id)
 }
 
-export function setActiveMode(
-  graph: SceneGraph,
-  collectionId: string,
-  modeId: string,
-): void {
-  graph.activeMode.set(collectionId, modeId);
+export function setActiveMode(graph: SceneGraph, collectionId: string, modeId: string): void {
+  graph.activeMode.set(collectionId, modeId)
 }
 
 export function addMode(
@@ -165,19 +148,18 @@ export function addMode(
   collectionId: string,
   modeId: string,
   name: string,
-  sourceMode?: string,
+  sourceMode?: string
 ): void {
-  const collection = graph.variableCollections.get(collectionId);
-  if (!collection) return;
-  collection.modes.push({ modeId, name });
-  const sourceModeId = sourceMode ?? collection.defaultModeId;
+  const collection = graph.variableCollections.get(collectionId)
+  if (!collection) return
+  collection.modes.push({ modeId, name })
+  const sourceModeId = sourceMode ?? collection.defaultModeId
   for (const varId of collection.variableIds) {
-    const variable = graph.variables.get(varId);
-    if (!variable) continue;
+    const variable = graph.variables.get(varId)
+    if (!variable) continue
     variable.valuesByMode[modeId] = structuredClone(
-      variable.valuesByMode[sourceModeId] ??
-        Object.values(variable.valuesByMode)[0],
-    );
+      variable.valuesByMode[sourceModeId] ?? Object.values(variable.valuesByMode)[0]
+    )
   }
 }
 
@@ -187,31 +169,27 @@ export function createMode(
   generateId: () => string,
   collectionId: string,
   name: string,
-  sourceMode?: string,
+  sourceMode?: string
 ): string | undefined {
-  if (!graph.variableCollections.has(collectionId)) return undefined;
-  const modeId = generateId();
-  addMode(graph, collectionId, modeId, name, sourceMode);
-  return modeId;
+  if (!graph.variableCollections.has(collectionId)) return undefined
+  const modeId = generateId()
+  addMode(graph, collectionId, modeId, name, sourceMode)
+  return modeId
 }
 
-export function removeMode(
-  graph: SceneGraph,
-  collectionId: string,
-  modeId: string,
-): void {
-  const collection = graph.variableCollections.get(collectionId);
-  if (!collection || collection.modes.length <= 1) return;
-  collection.modes = collection.modes.filter((m) => m.modeId !== modeId);
+export function removeMode(graph: SceneGraph, collectionId: string, modeId: string): void {
+  const collection = graph.variableCollections.get(collectionId)
+  if (!collection || collection.modes.length <= 1) return
+  collection.modes = collection.modes.filter((m) => m.modeId !== modeId)
   if (collection.defaultModeId === modeId) {
-    collection.defaultModeId = collection.modes[0].modeId;
+    collection.defaultModeId = collection.modes[0].modeId
   }
   for (const varId of collection.variableIds) {
-    const variable = graph.variables.get(varId);
-    if (variable) variable.valuesByMode = omit(variable.valuesByMode, [modeId]);
+    const variable = graph.variables.get(varId)
+    if (variable) variable.valuesByMode = omit(variable.valuesByMode, [modeId])
   }
   if (graph.activeMode.get(collectionId) === modeId) {
-    graph.activeMode.set(collectionId, collection.defaultModeId);
+    graph.activeMode.set(collectionId, collection.defaultModeId)
   }
 }
 
@@ -219,53 +197,38 @@ export function renameMode(
   graph: SceneGraph,
   collectionId: string,
   modeId: string,
-  name: string,
+  name: string
 ): void {
-  const collection = graph.variableCollections.get(collectionId);
-  if (!collection) return;
-  const mode = collection.modes.find((m) => m.modeId === modeId);
-  if (mode) mode.name = name;
+  const collection = graph.variableCollections.get(collectionId)
+  if (!collection) return
+  const mode = collection.modes.find((m) => m.modeId === modeId)
+  if (mode) mode.name = name
 }
 
-export function setDefaultMode(
-  graph: SceneGraph,
-  collectionId: string,
-  modeId: string,
-): void {
-  const collection = graph.variableCollections.get(collectionId);
-  if (!collection) return;
-  if (!collection.modes.some((m) => m.modeId === modeId)) return;
-  collection.defaultModeId = modeId;
-  collection.modes = modesDefaultFirst(collection);
+export function setDefaultMode(graph: SceneGraph, collectionId: string, modeId: string): void {
+  const collection = graph.variableCollections.get(collectionId)
+  if (!collection) return
+  if (!collection.modes.some((m) => m.modeId === modeId)) return
+  collection.defaultModeId = modeId
+  collection.modes = modesDefaultFirst(collection)
 }
 
 /** Figma has no default-mode field: the first mode is the default. */
-export function modesDefaultFirst(
-  collection: VariableCollection,
-): VariableCollectionMode[] {
-  const [defaults, rest] = partition(
-    collection.modes,
-    (m) => m.modeId === collection.defaultModeId,
-  );
-  return [...defaults, ...rest];
+export function modesDefaultFirst(collection: VariableCollection): VariableCollectionMode[] {
+  const [defaults, rest] = partition(collection.modes, (m) => m.modeId === collection.defaultModeId)
+  return [...defaults, ...rest]
 }
 
-export function getVariablesForCollection(
-  graph: SceneGraph,
-  collectionId: string,
-): Variable[] {
-  const collection = graph.variableCollections.get(collectionId);
-  if (!collection) return [];
+export function getVariablesForCollection(graph: SceneGraph, collectionId: string): Variable[] {
+  const collection = graph.variableCollections.get(collectionId)
+  if (!collection) return []
   return collection.variableIds
     .map((id) => graph.variables.get(id))
-    .filter((v): v is Variable => v !== undefined);
+    .filter((v): v is Variable => v !== undefined)
 }
 
-export function getVariablesByType(
-  graph: SceneGraph,
-  type: VariableType,
-): Variable[] {
-  return [...graph.variables.values()].filter((v) => v.type === type);
+export function getVariablesByType(graph: SceneGraph, type: VariableType): Variable[] {
+  return [...graph.variables.values()].filter((v) => v.type === type)
 }
 
 /**
@@ -273,31 +236,31 @@ export function getVariablesByType(
  * paint target is checked by its caller, which also validates its index.
  */
 function checkBindingFieldType(field: string, type: VariableType): void {
-  if (isNumericVariableBindingField(field) && type !== "FLOAT") {
-    throw new Error(`Cannot bind ${type} variable to scalar field "${field}"`);
+  if (isNumericVariableBindingField(field) && type !== 'FLOAT') {
+    throw new Error(`Cannot bind ${type} variable to scalar field "${field}"`)
   }
 
   const textTypes: readonly VariableType[] =
-    field === "text" ? TEXT_CONTENT_VARIABLE_TYPES : ["STRING"];
+    field === 'text' ? TEXT_CONTENT_VARIABLE_TYPES : ['STRING']
   if (STRING_BINDING_FIELDS.has(field) && !textTypes.includes(type)) {
-    throw new Error(`Cannot bind ${type} variable to string field "${field}"`);
+    throw new Error(`Cannot bind ${type} variable to string field "${field}"`)
   }
 
   if (
     BOOLEAN_BINDING_FIELDS.has(field) &&
     !VISIBILITY_VARIABLE_TYPES.some((kind) => kind === type)
   ) {
-    throw new Error(`Cannot bind ${type} variable to boolean field "${field}"`);
+    throw new Error(`Cannot bind ${type} variable to boolean field "${field}"`)
   }
 
-  if (ICON_BINDING_FIELDS.has(field) && type !== "STRING") {
-    throw new Error(`Cannot bind ${type} variable to icon field "${field}"`);
+  if (ICON_BINDING_FIELDS.has(field) && type !== 'STRING') {
+    throw new Error(`Cannot bind ${type} variable to icon field "${field}"`)
   }
 
   // A shader uniform takes a number, a colour, or a boolean; its shader declares which.
-  const uniform = uniformBindingTarget(field);
-  if (uniform && type !== "FLOAT" && type !== "COLOR" && type !== "BOOLEAN") {
-    throw new Error(`Cannot bind ${type} variable to shader input "${field}"`);
+  const uniform = uniformBindingTarget(field)
+  if (uniform && type !== 'FLOAT' && type !== 'COLOR' && type !== 'BOOLEAN') {
+    throw new Error(`Cannot bind ${type} variable to shader input "${field}"`)
   }
 
   const isKnownField =
@@ -306,149 +269,132 @@ function checkBindingFieldType(field: string, type: VariableType): void {
     BOOLEAN_BINDING_FIELDS.has(field) ||
     ICON_BINDING_FIELDS.has(field) ||
     paintBindingTarget(field) !== null ||
-    uniform !== null;
+    uniform !== null
 
   if (!isKnownField) {
-    throw new Error(`Unknown binding field "${field}"`);
+    throw new Error(`Unknown binding field "${field}"`)
   }
 }
 export function bindVariable(
   graph: SceneGraph,
   nodeId: string,
   field: string,
-  variableId: string,
+  variableId: string
 ): void {
-  const node = graph.nodes.get(nodeId);
-  if (!node) return;
+  const node = graph.nodes.get(nodeId)
+  if (!node) return
 
   // Validate variable exists
-  const variable = graph.variables.get(variableId);
+  const variable = graph.variables.get(variableId)
   if (!variable) {
-    throw new Error(`Variable "${variableId}" not found`);
+    throw new Error(`Variable "${variableId}" not found`)
   }
 
   // Color fields require COLOR variable type
-  const paint = paintBindingTarget(field);
+  const paint = paintBindingTarget(field)
   if (paint) {
-    if (variable.type !== "COLOR") {
-      throw new Error(
-        `Cannot bind ${variable.type} variable to color field "${field}"`,
-      );
+    if (variable.type !== 'COLOR') {
+      throw new Error(`Cannot bind ${variable.type} variable to color field "${field}"`)
     }
     // Validate index is within current array bounds
-    const currentLength = node[paint.list].length;
+    const currentLength = node[paint.list].length
     if (paint.index >= currentLength) {
       throw new Error(
-        `Index ${paint.index} out of range for ${paint.list} (length ${currentLength})`,
-      );
+        `Index ${paint.index} out of range for ${paint.list} (length ${currentLength})`
+      )
     }
     // Auto-remove top-level dead binding (e.g. 'fills') when setting indexed binding
     if (paint.list in node.boundVariables) {
-      node.boundVariables = omit(node.boundVariables, [paint.list]);
+      node.boundVariables = omit(node.boundVariables, [paint.list])
     }
   }
 
-  checkBindingFieldType(field, variable.type);
+  checkBindingFieldType(field, variable.type)
 
   // A shader input belongs to one paint, so its index must exist on the layer.
-  const uniform = uniformBindingTarget(field);
+  const uniform = uniformBindingTarget(field)
   if (uniform && uniform.index >= node[uniform.list].length) {
     throw new Error(
-      `Index ${uniform.index} out of range for ${uniform.list} (length ${node[uniform.list].length})`,
-    );
+      `Index ${uniform.index} out of range for ${uniform.list} (length ${node[uniform.list].length})`
+    )
   }
   if (uniform) {
     // The binding lives with the shader entry, next to the value it resolves, so any renderer
     // that draws the paint resolves it the same way.
-    const paints = node[uniform.list];
-    const paint = paints.at(uniform.index);
-    const shader = paint ? shaderOfPaint(node, paint) : null;
+    const paints = node[uniform.list]
+    const paint = paints.at(uniform.index)
+    const shader = paint ? shaderOfPaint(node, paint) : null
     if (paint && shader && isShaderSourcePaint(shader)) {
       node.pluginData = withShaderPaints(node, paints, [
         {
           ...shader,
           uniformBindings: {
             ...shader.uniformBindings,
-            [uniform.name]: variableId,
-          },
-        },
-      ]);
+            [uniform.name]: variableId
+          }
+        }
+      ])
     }
-    graph.willChangeNode(node);
-    graph.emitter.emit("node:updated", nodeId, {
+    graph.willChangeNode(node)
+    graph.emitter.emit('node:updated', nodeId, {
       pluginData: node.pluginData,
       boundVariables: { ...node.boundVariables },
-      variableBindingScales: { ...node.variableBindingScales },
-    });
-    return;
+      variableBindingScales: { ...node.variableBindingScales }
+    })
+    return
   }
-  graph.willChangeNode(node);
-  node.boundVariables = { ...node.boundVariables, [field]: variableId };
-  assignVariableBindingUnits(graph, node, field);
-  markBoundVariablesOverrideOnInstance(graph, nodeId, field);
-  graph.emitter.emit("node:updated", nodeId, {
+  graph.willChangeNode(node)
+  node.boundVariables = { ...node.boundVariables, [field]: variableId }
+  assignVariableBindingUnits(graph, node, field)
+  markBoundVariablesOverrideOnInstance(graph, nodeId, field)
+  graph.emitter.emit('node:updated', nodeId, {
     boundVariables: { ...node.boundVariables },
-    variableBindingScales: { ...node.variableBindingScales },
-  });
+    variableBindingScales: { ...node.variableBindingScales }
+  })
 }
 
-export function unbindVariable(
-  graph: SceneGraph,
-  nodeId: string,
-  field: string,
-): void {
-  const node = graph.nodes.get(nodeId);
-  if (!node) return;
-  if (!(field in node.boundVariables)) return;
-  graph.willChangeNode(node);
-  node.boundVariables = omit(node.boundVariables, [field]);
-  node.variableBindingScales = omit(node.variableBindingScales, [field]);
-  markBoundVariablesOverrideOnInstance(graph, nodeId, field);
-  graph.emitter.emit("node:updated", nodeId, {
+export function unbindVariable(graph: SceneGraph, nodeId: string, field: string): void {
+  const node = graph.nodes.get(nodeId)
+  if (!node) return
+  if (!(field in node.boundVariables)) return
+  graph.willChangeNode(node)
+  node.boundVariables = omit(node.boundVariables, [field])
+  node.variableBindingScales = omit(node.variableBindingScales, [field])
+  markBoundVariablesOverrideOnInstance(graph, nodeId, field)
+  graph.emitter.emit('node:updated', nodeId, {
     boundVariables: { ...node.boundVariables },
-    variableBindingScales: { ...node.variableBindingScales },
-  });
+    variableBindingScales: { ...node.variableBindingScales }
+  })
 }
 
 function markBoundVariablesOverrideOnInstance(
   graph: SceneGraph,
   nodeId: string,
-  field?: string,
+  field?: string
 ): void {
-  const node = graph.nodes.get(nodeId);
-  if (!node) return;
+  const node = graph.nodes.get(nodeId)
+  if (!node) return
 
-  const owner = variableBindingOwner(graph, node);
-  if (owner.type !== "INSTANCE") return;
-  const nearest = findInstanceAncestor(graph, nodeId);
-  if (nearest)
-    setInstanceOverride(
-      nearest.instanceOverrides,
-      nearest.id,
-      nodeId,
-      "boundVariables",
-    );
-  setInstanceOverride(
-    owner.instanceOverrides,
-    owner.id,
-    nodeId,
-    "boundVariables",
-  );
+  const owner = variableBindingOwner(graph, node)
+  if (owner.type !== 'INSTANCE') return
+  const nearest = findInstanceAncestor(graph, nodeId)
+  if (nearest) setInstanceOverride(nearest.instanceOverrides, nearest.id, nodeId, 'boundVariables')
+  setInstanceOverride(owner.instanceOverrides, owner.id, nodeId, 'boundVariables')
   if (field)
     setInstanceOverride(
       owner.instanceOverrides,
       owner.id,
       nodeId,
       bindingOverrideField(field),
-      node.boundVariables[field] ?? null,
-    );
+      node.boundVariables[field] ?? null
+    )
 }
 
-export * from "./bindings";
-export * from "./corners";
-export * from "./formula";
-export * from "./formula/schema";
-export * from "./schema";
-export * from "./text";
-export * from "./token";
-export * from "./value";
+export * from './bindings'
+export * from './corners'
+export * from './formula'
+export * from './formula/schema'
+export * from './schema'
+export * from './text'
+export * from './token'
+export * from './value'

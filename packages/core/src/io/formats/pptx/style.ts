@@ -1,7 +1,7 @@
 import { clamp } from 'es-toolkit'
 import type PptxGenJS from 'pptxgenjs'
 
-import type { Fill, SceneNode, Stroke } from '@open-pencil/scene-graph'
+import type { Fill, SceneNode, ShadowEffect, Stroke } from '@open-pencil/scene-graph'
 import { colorToHex } from '@open-pencil/scene-graph/color'
 import type { Color } from '@open-pencil/scene-graph/primitives'
 
@@ -36,7 +36,7 @@ export function effectiveRadius(node: SceneNode): number {
 
 /** DROP_SHADOW without blur (design-system solid offset shadow) — drawn as a separate shape. */
 export function getSolidOffsetShadow(node: SceneNode) {
-  const e = node.effects.find((fx) => fx.visible && fx.type === 'DROP_SHADOW')
+  const e = node.effects.find((fx): fx is ShadowEffect => fx.visible && fx.type === 'DROP_SHADOW')
   if (!e) return null
   if (e.radius > 1) return null
   if (Math.abs(e.offset.x) < 0.5 && Math.abs(e.offset.y) < 0.5 && e.spread <= 0) return null
@@ -45,7 +45,8 @@ export function getSolidOffsetShadow(node: SceneNode) {
 
 export function mapShadow(node: SceneNode, opacity: number): PptxGenJS.ShadowProps | undefined {
   const e = node.effects.find(
-    (fx) => fx.visible && (fx.type === 'DROP_SHADOW' || fx.type === 'INNER_SHADOW')
+    (fx): fx is ShadowEffect =>
+      fx.visible && (fx.type === 'DROP_SHADOW' || fx.type === 'INNER_SHADOW')
   )
   if (!e) return undefined
   const angleRaw = (Math.atan2(e.offset.y, e.offset.x) * 180) / Math.PI

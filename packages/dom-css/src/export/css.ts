@@ -1,4 +1,4 @@
-import type { Effect, Fill, Stroke, TextLength } from '@open-pencil/scene-graph'
+import type { Effect, Fill, ShadowEffect, Stroke, TextLength } from '@open-pencil/scene-graph'
 import { colorToCSS, colorToHex } from '@open-pencil/scene-graph/color'
 import type { Color } from '@open-pencil/scene-graph/primitives'
 
@@ -19,7 +19,7 @@ export function strokeColorToCSS(stroke: Stroke | undefined): string | undefined
   return cssColor({ ...stroke.color, a: stroke.opacity })
 }
 
-function shadowToCSS(effect: Effect): string {
+function shadowToCSS(effect: ShadowEffect): string {
   const inset = effect.type === 'INNER_SHADOW' ? 'inset ' : ''
   return `${inset}${effect.offset.x}px ${effect.offset.y}px ${effect.radius}px ${effect.spread}px ${cssColor(effect.color)}`
 }
@@ -34,7 +34,8 @@ export function effectsToCSS(effects: Effect[]): DesignStyleDeclaration {
   const style: DesignStyleDeclaration = {}
   const visible = effects.filter((effect) => effect.visible)
   const shadows = visible.filter(
-    (effect) => effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW'
+    (effect): effect is ShadowEffect =>
+      effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW'
   )
   if (shadows.length > 0) style['box-shadow'] = shadows.map(shadowToCSS).join(', ')
   for (const effect of visible) {

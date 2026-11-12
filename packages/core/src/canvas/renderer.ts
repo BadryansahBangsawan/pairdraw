@@ -402,7 +402,8 @@ export class SkiaRenderer {
   effectOverflow(node: SceneNode): number {
     let expand = 0
     for (const e of node.effects) {
-      if (!e.visible) continue
+      // A shader effect has no radius, spread, or offset of its own.
+      if (!e.visible || e.type === 'SHADER') continue
       const blur = e.radius
       const spread = e.spread
       const ox = Math.abs(e.offset.x)

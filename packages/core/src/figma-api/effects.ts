@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-import type { BlendMode, Effect } from '@open-pencil/scene-graph'
+import type { BlendMode, Effect, ShadowEffect } from '@open-pencil/scene-graph'
 
 import { TRANSPARENT } from '#core/constants'
 
@@ -144,7 +144,7 @@ function toSceneEffect(effect: FigmaEffect): Effect {
 }
 
 /** A scene effect in the shape Figma's `effects` getter returns. */
-export function toFigmaEffect(effect: Effect): FigmaEffect {
+export function toFigmaEffect(effect: ShadowEffect): FigmaEffect {
   if (
     effect.type === 'LAYER_BLUR' ||
     effect.type === 'FOREGROUND_BLUR' ||

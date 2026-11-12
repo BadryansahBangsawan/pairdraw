@@ -1,23 +1,20 @@
-import type { Canvas, Image, Paint, Shader } from "canvaskit-wasm";
+import type { Canvas, Image, Paint, Shader } from 'canvaskit-wasm'
 
-import type { SceneNode, SceneGraph, Fill } from "@open-pencil/scene-graph";
-import {
-  invertGradientTransform,
-  isMeshFill,
-} from "@open-pencil/scene-graph/gradient";
-import Matrix from "@open-pencil/scene-graph/matrix";
-import type { Color, Rect, Vector } from "@open-pencil/scene-graph/primitives";
+import type { SceneNode, SceneGraph, Fill } from '@open-pencil/scene-graph'
+import { invertGradientTransform, isMeshFill } from '@open-pencil/scene-graph/gradient'
+import Matrix from '@open-pencil/scene-graph/matrix'
+import type { Color, Rect, Vector } from '@open-pencil/scene-graph/primitives'
 
-import { setPaintBlendMode } from "./blend";
-import { makeDiamondGradient } from "./gradients/diamond";
-import { previewEdge } from "./images/previews";
-import type { SkiaRenderer } from "./renderer";
-import { drawUserShaderFill } from "./shaders/draw";
-import { drawOutline, withNodeOutline } from "./shapes";
+import { setPaintBlendMode } from './blend'
+import { makeDiamondGradient } from './gradients/diamond'
+import { previewEdge } from './images/previews'
+import type { SkiaRenderer } from './renderer'
+import { drawUserShaderFill } from './shaders/draw'
+import { drawOutline, withNodeOutline } from './shapes'
 
 interface PaintFillsOptions {
-  readonly bindToNodeFills?: boolean;
-  readonly patternStack?: Set<string>;
+  readonly bindToNodeFills?: boolean
+  readonly patternStack?: Set<string>
 }
 
 export function paintFills(
@@ -26,21 +23,21 @@ export function paintFills(
   node: SceneNode,
   graph: SceneGraph,
   draw: (fill: Fill) => void,
-  options: PaintFillsOptions = {},
+  options: PaintFillsOptions = {}
 ): void {
   for (let index = 0; index < fills.length; index++) {
-    const fill = fills[index];
-    if (!fill.visible) continue;
-    const fillIndex = options.bindToNodeFills === false ? -1 : index;
+    const fill = fills[index]
+    if (!fill.visible) continue
+    const fillIndex = options.bindToNodeFills === false ? -1 : index
     const applied = options.patternStack
       ? applyFill(r, fill, node, graph, fillIndex, options.patternStack)
-      : r.applyFill(fill, node, graph, fillIndex);
-    if (!applied) continue;
-    r.fillPaint.setAlphaf(fill.opacity);
-    setPaintBlendMode(r, r.fillPaint, fill.blendMode);
-    draw(fill);
-    r.fillPaint.setShader(null);
-    r.fillPaint.setBlendMode(r.ck.BlendMode.SrcOver);
+      : r.applyFill(fill, node, graph, fillIndex)
+    if (!applied) continue
+    r.fillPaint.setAlphaf(fill.opacity)
+    setPaintBlendMode(r, r.fillPaint, fill.blendMode)
+    draw(fill)
+    r.fillPaint.setShader(null)
+    r.fillPaint.setBlendMode(r.ck.BlendMode.SrcOver)
   }
 }
 
@@ -49,44 +46,34 @@ export function drawVectorMultiStyleFills(
   canvas: Canvas,
   node: SceneNode,
   graph: SceneGraph,
-  patternStack?: Set<string>,
+  patternStack?: Set<string>
 ): boolean {
-  if (
-    node.type !== "VECTOR" ||
-    !node.fillGeometry.some((geometry) => geometry.fills?.length)
-  ) {
-    return false;
+  if (node.type !== 'VECTOR' || !node.fillGeometry.some((geometry) => geometry.fills?.length)) {
+    return false
   }
-  const paths = r.getFillGeometry(node);
-  if (!paths) return false;
+  const paths = r.getFillGeometry(node)
+  if (!paths) return false
 
   for (let index = 0; index < node.fillGeometry.length; index++) {
-    const geometry = node.fillGeometry[index];
-    const path = paths[index];
-    const usesPathFills = Boolean(geometry.fills?.length);
+    const geometry = node.fillGeometry[index]
+    const path = paths[index]
+    const usesPathFills = Boolean(geometry.fills?.length)
     paintFills(
       r,
       usesPathFills ? (geometry.fills ?? []) : node.fills,
       node,
       graph,
       () => canvas.drawPath(path, r.fillPaint),
-      { bindToNodeFills: !usesPathFills, patternStack },
-    );
+      { bindToNodeFills: !usesPathFills, patternStack }
+    )
   }
-  return true;
+  return true
 }
 
-export function drawNodeFill(
-  r: SkiaRenderer,
-  canvas: Canvas,
-  node: SceneNode,
-  fill?: Fill,
-): void {
-  if (node.type === "TEXT") r.renderText(canvas, node, fill);
-  else if (node.type !== "LINE") {
-    withNodeOutline(r, node, (outline) =>
-      drawOutline(canvas, outline, r.fillPaint),
-    );
+export function drawNodeFill(r: SkiaRenderer, canvas: Canvas, node: SceneNode, fill?: Fill): void {
+  if (node.type === 'TEXT') r.renderText(canvas, node, fill)
+  else if (node.type !== 'LINE') {
+    withNodeOutline(r, node, (outline) => drawOutline(canvas, outline, r.fillPaint))
   }
 }
 
@@ -96,100 +83,75 @@ export function applyFill(
   node: SceneNode,
   graph: SceneGraph,
   fillIndex = 0,
-  patternStack = new Set<string>(),
+  patternStack = new Set<string>()
 ): boolean {
-  r.fillPaint.setShader(null);
+  r.fillPaint.setShader(null)
 
-  if (fill.type === "SOLID") {
-    const c = r.resolveFillColor(fill, fillIndex, node, graph);
-    r.fillPaint.setColor(r.ck.Color4f(c.r, c.g, c.b, c.a));
-    return true;
+  if (fill.type === 'SOLID') {
+    const c = r.resolveFillColor(fill, fillIndex, node, graph)
+    r.fillPaint.setColor(r.ck.Color4f(c.r, c.g, c.b, c.a))
+    return true
   }
 
-  if (
-    fill.type.startsWith("GRADIENT") &&
-    fill.gradientStops &&
-    fill.gradientTransform
-  ) {
-    return r.applyGradientFill(fill, node, graph);
+  if (fill.type.startsWith('GRADIENT') && fill.gradientStops && fill.gradientTransform) {
+    return r.applyGradientFill(fill, node, graph)
   }
 
-  if (fill.type === "IMAGE" && fill.imageHash) {
-    if (drawUserShaderFill(r, fill, node, graph)) return true;
-    return r.applyImageFill(fill, node, graph);
+  if (fill.type === 'IMAGE' && fill.imageHash) {
+    if (drawUserShaderFill(r, fill, node, graph)) return true
+    return r.applyImageFill(fill, node, graph)
   }
 
-  if (
-    fill.type === "PATTERN" &&
-    applyPatternFill(r, fill, node, graph, patternStack)
-  )
-    return true;
+  if (fill.type === 'PATTERN' && applyPatternFill(r, fill, node, graph, patternStack)) return true
 
-  if (fill.type === "MESH") return applyMeshFill(r, fill, node, graph);
+  if (fill.type === 'MESH') return applyMeshFill(r, fill, node, graph)
 
-  if (
-    fill.type === "PATTERN" ||
-    fill.type === "NOISE" ||
-    fill.type === "CUSTOM"
-  ) {
-    const c = r.resolveFillColor(fill, fillIndex, node, graph);
-    r.fillPaint.setColor(r.ck.Color4f(c.r, c.g, c.b, c.a));
-    return true;
+  if (fill.type === 'PATTERN' || fill.type === 'NOISE' || fill.type === 'CUSTOM') {
+    const c = r.resolveFillColor(fill, fillIndex, node, graph)
+    r.fillPaint.setColor(r.ck.Color4f(c.r, c.g, c.b, c.a))
+    return true
   }
 
-  return false;
+  return false
 }
 
 interface PatternTileLayout {
-  rect: Rect;
-  scale: number;
-  positions: Vector[];
+  rect: Rect
+  scale: number
+  positions: Vector[]
 }
 
 function patternAlignmentOffset(
-  alignment: Fill["horizontalAlignment"],
+  alignment: Fill['horizontalAlignment'],
   gap: number,
   sourceSize: number,
-  axis: "x" | "y",
+  axis: 'x' | 'y'
 ): number {
-  if (alignment === "CENTER") return axis === "x" ? -gap / 2 : -sourceSize / 2;
-  if (alignment === "END") return -gap;
-  return 0;
+  if (alignment === 'CENTER') return axis === 'x' ? -gap / 2 : -sourceSize / 2
+  if (alignment === 'END') return -gap
+  return 0
 }
 
-export function patternTileLayout(
-  source: SceneNode,
-  fill: Fill,
-): PatternTileLayout {
-  const scale = fill.scale && fill.scale > 0 ? fill.scale : 1;
-  const spacing = fill.patternSpacing ?? { x: 0, y: 0 };
-  const scaledWidth = source.width * scale;
-  const scaledHeight = source.height * scale;
-  const gapX = scaledWidth * spacing.x;
-  const gapY = scaledHeight * spacing.y;
-  const width = scaledWidth + gapX;
-  const height = scaledHeight + gapY;
-  const x = patternAlignmentOffset(
-    fill.horizontalAlignment,
-    gapX,
-    scaledWidth,
-    "x",
-  );
-  const y = patternAlignmentOffset(
-    fill.verticalAlignment,
-    gapY,
-    scaledHeight,
-    "y",
-  );
-  const positions = [{ x, y }];
+export function patternTileLayout(source: SceneNode, fill: Fill): PatternTileLayout {
+  const scale = fill.scale && fill.scale > 0 ? fill.scale : 1
+  const spacing = fill.patternSpacing ?? { x: 0, y: 0 }
+  const scaledWidth = source.width * scale
+  const scaledHeight = source.height * scale
+  const gapX = scaledWidth * spacing.x
+  const gapY = scaledHeight * spacing.y
+  const width = scaledWidth + gapX
+  const height = scaledHeight + gapY
+  const x = patternAlignmentOffset(fill.horizontalAlignment, gapX, scaledWidth, 'x')
+  const y = patternAlignmentOffset(fill.verticalAlignment, gapY, scaledHeight, 'y')
+  const positions = [{ x, y }]
 
-  if (fill.patternTileType === "HORIZONTAL_HEXAGONAL") {
-    positions.push({ x: x + width / 2, y: y + height / 2 });
-  } else if (fill.patternTileType === "VERTICAL_HEXAGONAL") {
-    positions.push({ x: x + width / 2, y: y - height / 2 });
+  if (fill.patternTileType === 'HORIZONTAL_HEXAGONAL') {
+    positions.push({ x: x + width / 2, y: y + height / 2 })
+  } else if (fill.patternTileType === 'VERTICAL_HEXAGONAL') {
+    positions.push({ x: x + width / 2, y: y - height / 2 })
   }
 
-  return { rect: { x: 0, y: 0, width, height }, scale, positions };
+  return { rect: { x: 0, y: 0, width, height }, scale, positions }
 }
 
 function recordPatternSource(
@@ -197,16 +159,16 @@ function recordPatternSource(
   source: SceneNode,
   graph: SceneGraph,
   layout: PatternTileLayout,
-  patternStack: Set<string>,
+  patternStack: Set<string>
 ) {
-  const bounds = r.ck.LTRBRect(0, 0, layout.rect.width, layout.rect.height);
-  const recorder = new r.ck.PictureRecorder();
-  const canvas = recorder.beginRecording(bounds);
+  const bounds = r.ck.LTRBRect(0, 0, layout.rect.width, layout.rect.height)
+  const recorder = new r.ck.PictureRecorder()
+  const canvas = recorder.beginRecording(bounds)
 
   for (const position of layout.positions) {
-    canvas.save();
-    canvas.translate(position.x, position.y);
-    canvas.scale(layout.scale, layout.scale);
+    canvas.save()
+    canvas.translate(position.x, position.y)
+    canvas.scale(layout.scale, layout.scale)
     if (!drawVectorMultiStyleFills(r, canvas, source, graph, patternStack)) {
       paintFills(
         r,
@@ -214,27 +176,24 @@ function recordPatternSource(
         source,
         graph,
         (sourceFill) => drawNodeFill(r, canvas, source, sourceFill),
-        { patternStack },
-      );
+        { patternStack }
+      )
     }
-    canvas.restore();
+    canvas.restore()
   }
 
-  const picture = recorder.finishRecordingAsPicture();
-  recorder.delete();
-  return picture;
+  const picture = recorder.finishRecordingAsPicture()
+  recorder.delete()
+  return picture
 }
 
-function resolvePatternSource(
-  graph: SceneGraph,
-  sourceId: string,
-): SceneNode | null {
-  const direct = graph.getNode(sourceId);
-  if (direct) return direct;
+function resolvePatternSource(graph: SceneGraph, sourceId: string): SceneNode | null {
+  const direct = graph.getNode(sourceId)
+  if (direct) return direct
   for (const node of graph.getAllNodes()) {
-    if (node.source.id === sourceId) return node;
+    if (node.source.id === sourceId) return node
   }
-  return null;
+  return null
 }
 /**
  * Draws a `MESH` fill: its grid triangulated into vertex colors, recorded as a picture the
@@ -249,82 +208,69 @@ export function applyMeshFill(
   paint: Paint = r.fillPaint,
   resolvePoint: ResolveGradientStop = (color) =>
     r.resolveFillColorInfo(
-      { ...fill, type: "SOLID", color, opacity: color.a, visible: true },
+      { ...fill, type: 'SOLID', color, opacity: color.a, visible: true },
       -1,
       node,
-      graph,
-    ).color,
+      graph
+    ).color
 ): boolean {
-  if (!isMeshFill(fill)) return false;
-  const columns = fill.meshColumns ?? 0;
-  const rows = fill.meshRows ?? 0;
-  const points = fill.meshPoints ?? [];
-  const w = node.width;
-  const h = node.height;
-  if (!(w > 0 && h > 0)) return false;
-  const vertexCount = points.length;
-  const positions = Array.from({ length: vertexCount * 2 }, () => 0);
-  const colors = new Float32Array(vertexCount * 4);
+  if (!isMeshFill(fill)) return false
+  const columns = fill.meshColumns ?? 0
+  const rows = fill.meshRows ?? 0
+  const points = fill.meshPoints ?? []
+  const w = node.width
+  const h = node.height
+  if (!(w > 0 && h > 0)) return false
+  const vertexCount = points.length
+  const positions = Array.from({ length: vertexCount * 2 }, () => 0)
+  const colors = new Float32Array(vertexCount * 4)
   for (const [index, point] of points.entries()) {
-    positions[index * 2] = Math.min(1, Math.max(0, point.position.x)) * w;
-    positions[index * 2 + 1] = Math.min(1, Math.max(0, point.position.y)) * h;
-    const c = resolvePoint(point.color, index);
-    colors[index * 4] = c.r;
-    colors[index * 4 + 1] = c.g;
-    colors[index * 4 + 2] = c.b;
-    colors[index * 4 + 3] = c.a;
+    positions[index * 2] = Math.min(1, Math.max(0, point.position.x)) * w
+    positions[index * 2 + 1] = Math.min(1, Math.max(0, point.position.y)) * h
+    const c = resolvePoint(point.color, index)
+    colors[index * 4] = c.r
+    colors[index * 4 + 1] = c.g
+    colors[index * 4 + 2] = c.b
+    colors[index * 4 + 3] = c.a
   }
-  const stride = columns + 1;
-  const indices: number[] = [];
+  const stride = columns + 1
+  const indices: number[] = []
   for (let row = 0; row < rows; row++) {
     for (let column = 0; column < columns; column++) {
-      const topLeft = row * stride + column;
-      const topRight = topLeft + 1;
-      const bottomLeft = topLeft + stride;
-      const bottomRight = bottomLeft + 1;
-      indices.push(
-        topLeft,
-        bottomLeft,
-        topRight,
-        topRight,
-        bottomLeft,
-        bottomRight,
-      );
+      const topLeft = row * stride + column
+      const topRight = topLeft + 1
+      const bottomLeft = topLeft + stride
+      const bottomRight = bottomLeft + 1
+      indices.push(topLeft, bottomLeft, topRight, topRight, bottomLeft, bottomRight)
     }
   }
-  const bounds = r.ck.LTRBRect(0, 0, w, h);
-  const recorder = new r.ck.PictureRecorder();
-  const canvas = recorder.beginRecording(bounds);
-  const verts = r.ck.MakeVertices(
-    r.ck.VertexMode.Triangles,
-    positions,
-    null,
-    colors,
-    indices,
-  );
-  const vertexPaint = new r.ck.Paint();
-  vertexPaint.setColor(r.ck.Color4f(1, 1, 1, 1));
+  const bounds = r.ck.LTRBRect(0, 0, w, h)
+  const recorder = new r.ck.PictureRecorder()
+  const canvas = recorder.beginRecording(bounds)
+  const verts = r.ck.MakeVertices(r.ck.VertexMode.Triangles, positions, null, colors, indices)
+  const vertexPaint = new r.ck.Paint()
+  vertexPaint.setColor(r.ck.Color4f(1, 1, 1, 1))
   // This CanvasKit build ignores vertex colors under SrcOver and draws the paint instead; Modulate
   // multiplies them with the white paint, which keeps the colors as resolved.
-  canvas.drawVertices(verts, r.ck.BlendMode.Modulate, vertexPaint);
-  vertexPaint.delete();
-  verts.delete();
-  const picture = recorder.finishRecordingAsPicture();
-  recorder.delete();
+  canvas.drawVertices(verts, r.ck.BlendMode.Modulate, vertexPaint)
+  vertexPaint.delete()
+  verts.delete()
+  const picture = recorder.finishRecordingAsPicture()
+  recorder.delete()
   const shader = picture.makeShader(
     r.ck.TileMode.Clamp,
     r.ck.TileMode.Clamp,
     r.ck.FilterMode.Linear,
     undefined,
-    bounds,
-  );
+    bounds
+  )
   try {
-    paint.setShader(shader);
+    paint.setShader(shader)
   } finally {
-    shader.delete();
+    shader.delete()
   }
-  picture.delete();
-  return true;
+  picture.delete()
+  return true
 }
 
 function applyPatternFill(
@@ -332,41 +278,35 @@ function applyPatternFill(
   fill: Fill,
   node: SceneNode,
   graph: SceneGraph,
-  patternStack: Set<string>,
+  patternStack: Set<string>
 ): boolean {
-  const sourceId = fill.sourceNodeId;
-  if (!sourceId || sourceId === node.id || sourceId === node.source.id)
-    return false;
-  const source = resolvePatternSource(graph, sourceId);
-  if (!source || source.width <= 0 || source.height <= 0) return false;
-  if (patternStack.has(source.id)) return false;
+  const sourceId = fill.sourceNodeId
+  if (!sourceId || sourceId === node.id || sourceId === node.source.id) return false
+  const source = resolvePatternSource(graph, sourceId)
+  if (!source || source.width <= 0 || source.height <= 0) return false
+  if (patternStack.has(source.id)) return false
 
-  patternStack.add(source.id);
-  const layout = patternTileLayout(source, fill);
-  let picture;
+  patternStack.add(source.id)
+  const layout = patternTileLayout(source, fill)
+  let picture
   try {
-    picture = recordPatternSource(r, source, graph, layout, patternStack);
+    picture = recordPatternSource(r, source, graph, layout, patternStack)
   } finally {
-    patternStack.delete(source.id);
+    patternStack.delete(source.id)
   }
-  const tile = layout.rect;
-  const tileRect = r.ck.LTRBRect(
-    tile.x,
-    tile.y,
-    tile.x + tile.width,
-    tile.y + tile.height,
-  );
+  const tile = layout.rect
+  const tileRect = r.ck.LTRBRect(tile.x, tile.y, tile.x + tile.width, tile.y + tile.height)
   const shader = picture.makeShader(
     r.ck.TileMode.Repeat,
     r.ck.TileMode.Repeat,
     r.ck.FilterMode.Linear,
     undefined,
-    tileRect,
-  );
-  r.fillPaint.setShader(shader);
-  shader.delete();
-  picture.delete();
-  return true;
+    tileRect
+  )
+  r.fillPaint.setShader(shader)
+  shader.delete()
+  picture.delete()
+  return true
 }
 
 /**
@@ -377,9 +317,9 @@ function makeGradientLocalMatrix(
   r: SkiaRenderer,
   width: number,
   height: number,
-  transform: NonNullable<Fill["gradientTransform"]>,
+  transform: NonNullable<Fill['gradientTransform']>
 ) {
-  const t = invertGradientTransform(transform);
+  const t = invertGradientTransform(transform)
   return r.ck.Matrix.multiply(r.ck.Matrix.scaled(width || 1, height || 1), [
     t.m00,
     t.m01,
@@ -389,12 +329,12 @@ function makeGradientLocalMatrix(
     t.m12,
     0,
     0,
-    1,
-  ]);
+    1
+  ])
 }
 
 /** Resolves one gradient stop's color, so a stroke resolves its own bindings, not a fill's. */
-export type ResolveGradientStop = (color: Color, stopIndex: number) => Color;
+export type ResolveGradientStop = (color: Color, stopIndex: number) => Color
 
 /**
  * Sets `paint`'s shader to `fill`'s gradient on `node` and returns whether it did. CanvasKit
@@ -409,36 +349,36 @@ export function applyGradientFill(
   paint: Paint = r.fillPaint,
   resolveStop: ResolveGradientStop = (color, stopIndex) =>
     r.resolveFillColorInfo(
-      { ...fill, type: "SOLID", color, opacity: color.a, visible: true },
+      { ...fill, type: 'SOLID', color, opacity: color.a, visible: true },
       stopIndex,
       node,
-      graph,
-    ).color,
+      graph
+    ).color
 ): boolean {
-  const stops = fill.gradientStops;
-  const t = fill.gradientTransform;
-  if (!stops || !t) return false;
+  const stops = fill.gradientStops
+  const t = fill.gradientTransform
+  if (!stops || !t) return false
   const colors = stops.map((s, index) => {
-    const c = resolveStop(s.color, index);
-    return r.ck.Color4f(c.r, c.g, c.b, c.a);
-  });
-  const positions = stops.map((s) => s.position);
+    const c = resolveStop(s.color, index)
+    return r.ck.Color4f(c.r, c.g, c.b, c.a)
+  })
+  const positions = stops.map((s) => s.position)
 
-  const w = node.width;
-  const h = node.height;
+  const w = node.width
+  const h = node.height
 
   /** The paint keeps its own reference, so the caller's handle has to go or WASM memory grows. */
   const setShader = (shader: Shader | null): boolean => {
-    if (!shader) return false;
+    if (!shader) return false
     try {
-      paint.setShader(shader);
+      paint.setShader(shader)
     } finally {
-      shader.delete();
+      shader.delete()
     }
-    return true;
-  };
+    return true
+  }
 
-  if (fill.type === "GRADIENT_LINEAR") {
+  if (fill.type === 'GRADIENT_LINEAR') {
     // Drawn in gradient space, so its bands follow the transform's second axis as in Figma
     // rather than running square to the line on a stretched layer.
     const shader = r.ck.Shader.MakeLinearGradient(
@@ -447,44 +387,37 @@ export function applyGradientFill(
       colors,
       positions,
       r.ck.TileMode.Clamp,
-      makeGradientLocalMatrix(r, w, h, t),
-    );
-    return setShader(shader);
-  } else if (fill.type === "GRADIENT_DIAMOND") {
-    return setShader(
-      makeDiamondGradient(
-        r,
-        colors,
-        positions,
-        makeGradientLocalMatrix(r, w, h, t),
-      ),
-    );
-  } else if (fill.type === "GRADIENT_RADIAL") {
+      makeGradientLocalMatrix(r, w, h, t)
+    )
+    return setShader(shader)
+  } else if (fill.type === 'GRADIENT_DIAMOND') {
+    return setShader(makeDiamondGradient(r, colors, positions, makeGradientLocalMatrix(r, w, h, t)))
+  } else if (fill.type === 'GRADIENT_RADIAL') {
     // Gradient space is centred on (0.5, 0.5) with radius 0.5; the local matrix takes it to the
     // layer's pixels.
-    const localMatrix = makeGradientLocalMatrix(r, w, h, t);
+    const localMatrix = makeGradientLocalMatrix(r, w, h, t)
     const shader = r.ck.Shader.MakeRadialGradient(
       [0.5, 0.5],
       0.5,
       colors,
       positions,
       r.ck.TileMode.Clamp,
-      localMatrix,
-    );
-    return setShader(shader);
-  } else if (fill.type === "GRADIENT_ANGULAR") {
-    const localMatrix = makeGradientLocalMatrix(r, w, h, t);
+      localMatrix
+    )
+    return setShader(shader)
+  } else if (fill.type === 'GRADIENT_ANGULAR') {
+    const localMatrix = makeGradientLocalMatrix(r, w, h, t)
     const shader = r.ck.Shader.MakeSweepGradient(
       0.5,
       0.5,
       colors,
       positions,
       r.ck.TileMode.Clamp,
-      localMatrix,
-    );
-    return setShader(shader);
+      localMatrix
+    )
+    return setShader(shader)
   }
-  return false;
+  return false
 }
 
 /**
@@ -497,58 +430,42 @@ export function makeImageFillLocalMatrix(
   node: SceneNode,
   imgW: number,
   imgH: number,
-  size: { width: number; height: number } = { width: imgW, height: imgH },
+  size: { width: number; height: number } = { width: imgW, height: imgH }
 ) {
-  const scaleMode = fill.imageScaleMode ?? "FILL";
-  if (scaleMode === "CROP" && fill.imageTransform) {
-    const t = fill.imageTransform;
-    const inverse = Matrix.invert([
-      t.m00,
-      t.m01,
-      t.m02,
-      t.m10,
-      t.m11,
-      t.m12,
-      0,
-      0,
-      1,
-    ]);
+  const scaleMode = fill.imageScaleMode ?? 'FILL'
+  if (scaleMode === 'CROP' && fill.imageTransform) {
+    const t = fill.imageTransform
+    const inverse = Matrix.invert([t.m00, t.m01, t.m02, t.m10, t.m11, t.m12, 0, 0, 1])
     if (inverse)
       return Matrix.multiply(
         Matrix.scaled(node.width, node.height),
         inverse,
-        Matrix.scaled(1 / imgW, 1 / imgH),
-      );
+        Matrix.scaled(1 / imgW, 1 / imgH)
+      )
   }
 
-  const radians = ((fill.imageRotation ?? 0) * Math.PI) / 180;
-  const cos = Math.abs(Math.cos(radians));
-  const sin = Math.abs(Math.sin(radians));
-  const turnedW = size.width * cos + size.height * sin;
-  const turnedH = size.width * sin + size.height * cos;
+  const radians = ((fill.imageRotation ?? 0) * Math.PI) / 180
+  const cos = Math.abs(Math.cos(radians))
+  const sin = Math.abs(Math.sin(radians))
+  const turnedW = size.width * cos + size.height * sin
+  const turnedH = size.width * sin + size.height * cos
   const turned = Matrix.multiply(
     Matrix.translated(turnedW / 2, turnedH / 2),
     Matrix.rotated(radians),
     Matrix.translated(-size.width / 2, -size.height / 2),
-    Matrix.scaled(size.width / imgW, size.height / imgH),
-  );
-  if (scaleMode === "TILE") {
-    const scale = fill.scale && fill.scale > 0 ? fill.scale : 1;
-    return Matrix.multiply(Matrix.scaled(scale, scale), turned);
+    Matrix.scaled(size.width / imgW, size.height / imgH)
+  )
+  if (scaleMode === 'TILE') {
+    const scale = fill.scale && fill.scale > 0 ? fill.scale : 1
+    return Matrix.multiply(Matrix.scaled(scale, scale), turned)
   }
-  const fit = scaleMode === "FIT";
-  const scale = (fit ? Math.min : Math.max)(
-    node.width / turnedW,
-    node.height / turnedH,
-  );
+  const fit = scaleMode === 'FIT'
+  const scale = (fit ? Math.min : Math.max)(node.width / turnedW, node.height / turnedH)
   return Matrix.multiply(
-    Matrix.translated(
-      (node.width - turnedW * scale) / 2,
-      (node.height - turnedH * scale) / 2,
-    ),
+    Matrix.translated((node.width - turnedW * scale) / 2, (node.height - turnedH * scale) / 2),
     Matrix.scaled(scale, scale),
-    turned,
-  );
+    turned
+  )
 }
 
 /**
@@ -561,42 +478,35 @@ function setImageShader(
   node: SceneNode,
   img: Image,
   paint: Paint,
-  preview?: { originalWidth: number; originalHeight: number },
+  preview?: { originalWidth: number; originalHeight: number }
 ): boolean {
-  const imgW = img.width();
-  const imgH = img.height();
-  const scaleMode = fill.imageScaleMode ?? "FILL";
+  const imgW = img.width()
+  const imgH = img.height()
+  const scaleMode = fill.imageScaleMode ?? 'FILL'
   const localMatrix = makeImageFillLocalMatrix(
     fill,
     node,
     imgW,
     imgH,
-    preview && { width: preview.originalWidth, height: preview.originalHeight },
-  );
-  const tileMode =
-    scaleMode === "FIT" ? r.ck.TileMode.Decal : r.ck.TileMode.Clamp;
+    preview && { width: preview.originalWidth, height: preview.originalHeight }
+  )
+  const tileMode = scaleMode === 'FIT' ? r.ck.TileMode.Decal : r.ck.TileMode.Clamp
   const shader =
-    scaleMode === "TILE"
-      ? img.makeShaderCubic(
-          r.ck.TileMode.Repeat,
-          r.ck.TileMode.Repeat,
-          1 / 3,
-          1 / 3,
-          localMatrix,
-        )
+    scaleMode === 'TILE'
+      ? img.makeShaderCubic(r.ck.TileMode.Repeat, r.ck.TileMode.Repeat, 1 / 3, 1 / 3, localMatrix)
       : img.makeShaderOptions(
           tileMode,
           tileMode,
           r.ck.FilterMode.Linear,
           r.ck.MipmapMode.Linear,
-          localMatrix,
-        );
+          localMatrix
+        )
   try {
-    paint.setShader(shader);
+    paint.setShader(shader)
   } finally {
-    shader.delete();
+    shader.delete()
   }
-  return true;
+  return true
 }
 
 export function applyImageFill(
@@ -604,37 +514,36 @@ export function applyImageFill(
   fill: Fill,
   node: SceneNode,
   graph: SceneGraph,
-  paint: Paint = r.fillPaint,
+  paint: Paint = r.fillPaint
 ): boolean {
-  const hash = fill.imageHash;
-  if (!hash) return false;
-  const live = r.liveImages.get(hash);
-  if (live?.surface === r.surface)
-    return setImageShader(r, fill, node, live.image, paint);
+  const hash = fill.imageHash
+  if (!hash) return false
+  const live = r.liveImages.get(hash)
+  if (live?.surface === r.surface) return setImageShader(r, fill, node, live.image, paint)
   const preview = r.viewportImageRendering
     ? // eslint-disable-next-line open-pencil/no-zoom-in-scene-drawing -- picks the preview resolution, not a size; preview mode draws the scene uncached on every frame.
       r.imagePreviews.get(graph, hash, previewEdge(node, r.zoom, r.dpr))
-    : undefined;
-  if (r.viewportImageRendering && !preview) return false;
-  const key = preview?.key ?? hash;
-  let img = r.imageCache.get(key);
-  let temporary = false;
+    : undefined
+  if (r.viewportImageRendering && !preview) return false
+  const key = preview?.key ?? hash
+  let img = r.imageCache.get(key)
+  let temporary = false
   if (!img) {
-    const data = preview?.preview.bytes ?? graph.images.get(hash);
-    if (!data) return false;
-    const decoded = r.ck.MakeImageFromEncoded(data);
-    if (!decoded) return false;
+    const data = preview?.preview.bytes ?? graph.images.get(hash)
+    if (!data) return false
+    const decoded = r.ck.MakeImageFromEncoded(data)
+    if (!decoded) return false
     try {
-      img = decoded.makeCopyWithDefaultMipmaps();
+      img = decoded.makeCopyWithDefaultMipmaps()
     } finally {
-      decoded.delete();
+      decoded.delete()
     }
-    temporary = !r.imageCache.set(key, img);
+    temporary = !r.imageCache.set(key, img)
   }
 
   try {
-    return setImageShader(r, fill, node, img, paint, preview?.preview);
+    return setImageShader(r, fill, node, img, paint, preview?.preview)
   } finally {
-    if (temporary) img.delete();
+    if (temporary) img.delete()
   }
 }

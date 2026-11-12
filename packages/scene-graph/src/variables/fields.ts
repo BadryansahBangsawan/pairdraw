@@ -1,113 +1,109 @@
-import type { VariableType } from "../types";
+import type { VariableType } from '../types'
 
 export const NUMERIC_FIELDS = new Set([
-  "opacity",
-  "width",
-  "height",
-  "minWidth",
-  "maxWidth",
-  "minHeight",
-  "maxHeight",
-  "x",
-  "y",
-  "rotation",
-  "cornerRadius",
-  "topLeftRadius",
-  "topRightRadius",
-  "bottomLeftRadius",
-  "bottomRightRadius",
-  "strokeWeight",
-  "borderTopWeight",
-  "borderBottomWeight",
-  "borderLeftWeight",
-  "borderRightWeight",
-  "fontSize",
-  "fontWeight",
-  "letterSpacing",
-  "lineHeight",
-  "paddingLeft",
-  "paddingRight",
-  "paddingTop",
-  "paddingBottom",
-  "itemSpacing",
-  "counterAxisSpacing",
-  "gridRowGap",
-  "gridColumnGap",
-]);
+  'opacity',
+  'width',
+  'height',
+  'minWidth',
+  'maxWidth',
+  'minHeight',
+  'maxHeight',
+  'x',
+  'y',
+  'rotation',
+  'cornerRadius',
+  'topLeftRadius',
+  'topRightRadius',
+  'bottomLeftRadius',
+  'bottomRightRadius',
+  'strokeWeight',
+  'borderTopWeight',
+  'borderBottomWeight',
+  'borderLeftWeight',
+  'borderRightWeight',
+  'fontSize',
+  'fontWeight',
+  'letterSpacing',
+  'lineHeight',
+  'paddingLeft',
+  'paddingRight',
+  'paddingTop',
+  'paddingBottom',
+  'itemSpacing',
+  'counterAxisSpacing',
+  'gridRowGap',
+  'gridColumnGap'
+])
 
 export function isNumericVariableBindingField(field: string): boolean {
-  return NUMERIC_FIELDS.has(field);
+  return NUMERIC_FIELDS.has(field)
 }
 
 /** Text content and font family are the string-valued bindings a node accepts. */
-export const STRING_BINDING_FIELDS: ReadonlySet<string> = new Set([
-  "text",
-  "fontFamily",
-]);
+export const STRING_BINDING_FIELDS: ReadonlySet<string> = new Set(['text', 'fontFamily'])
 
 /**
  * The variable types text content binds to: text, or a number shown as text, as Figma's layer
  * panel offers. Figma's plugin API takes text alone; font family stays text-only.
  */
 export const TEXT_CONTENT_VARIABLE_TYPES = [
-  "STRING",
-  "FLOAT",
-] as const satisfies readonly VariableType[];
+  'STRING',
+  'FLOAT'
+] as const satisfies readonly VariableType[]
 
 /** Visibility is the only boolean-valued binding a node accepts. */
-export const BOOLEAN_BINDING_FIELDS: ReadonlySet<string> = new Set(["visible"]);
+export const BOOLEAN_BINDING_FIELDS: ReadonlySet<string> = new Set(['visible'])
 
 /**
  * The icon an icon frame draws, bound to a text variable holding its name: a mode change swaps
  * the icon. Only icon frames resolve it; other layers keep it as an inert binding.
  */
-export const ICON_BINDING_FIELDS: ReadonlySet<string> = new Set(["iconName"]);
+export const ICON_BINDING_FIELDS: ReadonlySet<string> = new Set(['iconName'])
 
 /**
  * The variable types visibility binds to: a boolean, or text that shows the layer unless it reads
  * as false, as Figma's layer panel offers. Figma's plugin API takes booleans alone.
  */
 export const VISIBILITY_VARIABLE_TYPES = [
-  "BOOLEAN",
-  "STRING",
-] as const satisfies readonly VariableType[];
+  'BOOLEAN',
+  'STRING'
+] as const satisfies readonly VariableType[]
 
 /** The paint lists whose colours bind to variables, one binding field per paint. */
-export type PaintBindingList = "fills" | "strokes";
+export type PaintBindingList = 'fills' | 'strokes'
 
-const PAINT_BINDING_FIELD = /^(fills|strokes)\/(\d+)\/color$/;
+const PAINT_BINDING_FIELD = /^(fills|strokes)\/(\d+)\/color$/
 
 /**
  * The paint a binding field names the colour of, such as the second fill for `fills/1/color`, or
  * null for a field that binds anything else.
  */
 export function paintBindingTarget(
-  field: string,
+  field: string
 ): { list: PaintBindingList; index: number } | null {
-  if (!field.endsWith("/color")) return null;
-  const match = PAINT_BINDING_FIELD.exec(field);
-  if (!match) return null;
+  if (!field.endsWith('/color')) return null
+  const match = PAINT_BINDING_FIELD.exec(field)
+  if (!match) return null
   return {
-    list: match[1] === "fills" ? "fills" : "strokes",
-    index: Number(match[2]),
-  };
+    list: match[1] === 'fills' ? 'fills' : 'strokes',
+    index: Number(match[2])
+  }
 }
 
-const UNIFORM_BINDING_FIELD =
-  /^(fills|strokes)\/(\d+)\/uniforms\/([A-Za-z_]\w*)$/;
+const UNIFORM_BINDING_FIELD = /^(fills|strokes)\/(\d+)\/uniforms\/([A-Za-z_]\w*)$/
 
 /**
  * The shader uniform a binding field names, such as `fills/0/uniforms/speed`, or null for a field
  * that binds anything else. The shader on the paint declares the uniform's type.
  */
 export function uniformBindingTarget(
-  field: string,
+  field: string
 ): { list: PaintBindingList; index: number; name: string } | null {
-  const match = UNIFORM_BINDING_FIELD.exec(field);
-  if (!match) return null;
+  const match = UNIFORM_BINDING_FIELD.exec(field)
+  if (!match) return null
   return {
-    list: match[1] === "fills" ? "fills" : "strokes",
+    list: match[1] === 'fills' ? 'fills' : 'strokes',
     index: Number(match[2]),
-    name: match[3],
-  };
+    name: match[3]
+  }
 }

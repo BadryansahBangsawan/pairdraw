@@ -42,10 +42,9 @@ function remapNodeColors(
     return next
   })
 
-  const effects = copyEffects(node.effects).map((effect) => ({
-    ...effect,
-    color: remapColor(effect.color, target)
-  }))
+  const effects = copyEffects(node.effects).map((effect) =>
+    effect.type === 'SHADER' ? effect : { ...effect, color: remapColor(effect.color, target) }
+  )
 
   const styleRuns = copyStyleRuns(node.styleRuns).map((run) => ({
     ...run,

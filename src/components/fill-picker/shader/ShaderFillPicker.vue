@@ -1,21 +1,14 @@
 <script setup lang="ts">
-import { isEqual } from "es-toolkit";
-import {
-  computed,
-  onMounted,
-  ref,
-  shallowRef,
-  watch,
-  type ComponentPublicInstance,
-} from "vue";
+import { isEqual } from 'es-toolkit'
+import { computed, onMounted, ref, shallowRef, watch, type ComponentPublicInstance } from 'vue'
 
-import type { Variable } from "@open-pencil/scene-graph";
+import type { Variable } from '@open-pencil/scene-graph'
 import type {
   ShaderPreset,
   ShaderUniform,
-  ShaderUniformValue,
-} from "@open-pencil/scene-graph/shaders";
-import { canDrawShaders } from "@open-pencil/vue/canvas/surface";
+  ShaderUniformValue
+} from '@open-pencil/scene-graph/shaders'
+import { canDrawShaders } from '@open-pencil/vue/canvas/surface'
 import {
   addShaderEffect,
   DEFAULT_SHADER_EFFECT,
@@ -28,22 +21,22 @@ import {
   setShaderEffectProp,
   shaderEffectLabel,
   shaderPresetJSON,
-  type ShaderEffect,
-} from "@open-pencil/vue/controls/shader";
-import { useI18n, useShaderMessages } from "@open-pencil/vue/i18n";
-import { useFlatReorderDrag } from "@open-pencil/vue/shared/drag";
+  type ShaderEffect
+} from '@open-pencil/vue/controls/shader'
+import { useI18n, useShaderMessages } from '@open-pencil/vue/i18n'
+import { useFlatReorderDrag } from '@open-pencil/vue/shared/drag'
 
-import ShaderEffectControls from "@/components/fill-picker/shader/ShaderEffectControls.vue";
-import ShaderEffectThumb from "@/components/fill-picker/shader/ShaderEffectThumb.vue";
-import ShaderFillPickerGallery from "@/components/fill-picker/shader/ShaderFillPickerGallery.vue";
-import ShaderUniformControls from "@/components/fill-picker/shader/ShaderUniformControls.vue";
-import AppButton from "@/components/ui/button/AppButton.vue";
-import IconButton from "@/components/ui/button/IconButton.vue";
-import AppAlert from "@/components/ui/feedback/AppAlert.vue";
-import AppTextarea from "@/components/ui/input/AppTextarea.vue";
-import Tip from "@/components/ui/overlay/Tip.vue";
-import PanelItemRow from "@/components/ui/panel/PanelItemRow.vue";
-import AppCombobox from "@/components/ui/select/AppCombobox.vue";
+import ShaderEffectControls from '@/components/fill-picker/shader/ShaderEffectControls.vue'
+import ShaderEffectThumb from '@/components/fill-picker/shader/ShaderEffectThumb.vue'
+import ShaderFillPickerGallery from '@/components/fill-picker/shader/ShaderFillPickerGallery.vue'
+import ShaderUniformControls from '@/components/fill-picker/shader/ShaderUniformControls.vue'
+import AppButton from '@/components/ui/button/AppButton.vue'
+import IconButton from '@/components/ui/button/IconButton.vue'
+import AppAlert from '@/components/ui/feedback/AppAlert.vue'
+import AppTextarea from '@/components/ui/input/AppTextarea.vue'
+import Tip from '@/components/ui/overlay/Tip.vue'
+import PanelItemRow from '@/components/ui/panel/PanelItemRow.vue'
+import AppCombobox from '@/components/ui/select/AppCombobox.vue'
 
 /**
  * Edits a shader paint's preset as the properties panel edits effects: a list of the shader's
@@ -60,63 +53,61 @@ const {
   uniforms = [],
   uniformValues = {},
   uniformBindings = {},
-  variables = [],
+  variables = []
 } = defineProps<{
-  preset: ShaderPreset;
+  preset: ShaderPreset
   /** Code the user wrote, when the paint draws that instead of the preset. */
-  source?: string | null;
+  source?: string | null
   /** What stops `source` from compiling, as the canvas reports it. */
-  codeError?: string | null;
+  codeError?: string | null
   /** Whether it offers to open the shader in Shader Mode, which emits `openMode`. */
-  canOpenMode?: boolean;
+  canOpenMode?: boolean
   /** The inputs `source` declares, which the picker edits below the code. */
-  uniforms?: readonly ShaderUniform[];
+  uniforms?: readonly ShaderUniform[]
   /** The value the document stores for each input, by the input's name. */
-  uniformValues?: Readonly<Record<string, ShaderUniformValue>>;
+  uniformValues?: Readonly<Record<string, ShaderUniformValue>>
   /** The variables the inputs follow, by the input's name. */
-  uniformBindings?: Readonly<Record<string, string>>;
+  uniformBindings?: Readonly<Record<string, string>>
   /** Every variable an input may follow. */
-  variables?: readonly Variable[];
-}>();
+  variables?: readonly Variable[]
+}>()
 const emit = defineEmits<{
-  update: [preset: ShaderPreset];
-  updateSource: [source: string];
-  setUniform: [name: string, value: ShaderUniformValue];
-  bindUniform: [name: string, variableId: string | null];
-  openMode: [];
-}>();
+  update: [preset: ShaderPreset]
+  updateSource: [source: string]
+  setUniform: [name: string, value: ShaderUniformValue]
+  bindUniform: [name: string, variableId: string | null]
+  openMode: []
+}>()
 
 /** The code being written, seeded from the paint's own code or the smallest shader that draws. */
-const code = ref(source ?? DEFAULT_SHADER_SOURCE);
+const code = ref(source ?? DEFAULT_SHADER_SOURCE)
 watch(
   () => source,
   (value) => {
-    if (value != null) code.value = value;
-  },
-);
+    if (value != null) code.value = value
+  }
+)
 /** Whether the picker shows the code instead of the preset; a paint that draws code always does. */
-const writing = ref(false);
-const codeView = computed(() => source != null || writing.value);
-const appliedCode = computed(() => source != null && code.value === source);
-const { panels, common } = useI18n();
-const shaderMessages = useShaderMessages();
+const writing = ref(false)
+const codeView = computed(() => source != null || writing.value)
+const appliedCode = computed(() => source != null && code.value === source)
+const { panels, common } = useI18n()
+const shaderMessages = useShaderMessages()
 
-const catalog = shallowRef<ShaderEffect[]>([]);
+const catalog = shallowRef<ShaderEffect[]>([])
 onMounted(async () => {
-  catalog.value = await loadShaderCatalog();
-});
-const effectsByName = computed(
-  () => new Map(catalog.value.map((effect) => [effect.name, effect])),
-);
+  catalog.value = await loadShaderCatalog()
+})
+const effectsByName = computed(() => new Map(catalog.value.map((effect) => [effect.name, effect])))
 
 const effectOptions = computed(() =>
   catalog.value.map((effect) => ({
     value: effect.name,
     label: shaderEffectLabel(effect.name),
     group: effect.category,
-    description: effect.description,
-  })),
-);
+    description: effect.description
+  }))
+)
 
 /** The effects top first, as the panel lists layers: the last one drawn is on top. */
 const rows = computed(() =>
@@ -125,92 +116,82 @@ const rows = computed(() =>
       id: String(index),
       index,
       component,
-      effect: catalog.value.find((effect) => effect.name === component.type),
+      effect: catalog.value.find((effect) => effect.name === component.type)
     }))
-    .reverse(),
-);
+    .reverse()
+)
 
-const expanded = ref<number | null>(null);
+const expanded = ref<number | null>(null)
 
 /** What the picker shows below its header: the effects, the gallery, or the preset's JSON. */
-const view = ref<"effects" | "gallery" | "json">(
-  isEqual(preset, DEFAULT_SHADER_PRESET) ? "gallery" : "effects",
-);
+const view = ref<'effects' | 'gallery' | 'json'>(
+  isEqual(preset, DEFAULT_SHADER_PRESET) ? 'gallery' : 'effects'
+)
 
 function add() {
-  emit("update", addShaderEffect(preset, DEFAULT_SHADER_EFFECT));
-  expanded.value = preset.components.length;
-  view.value = "effects";
+  emit('update', addShaderEffect(preset, DEFAULT_SHADER_EFFECT))
+  expanded.value = preset.components.length
+  view.value = 'effects'
 }
 
 function toggleGallery() {
-  view.value = view.value === "gallery" ? "effects" : "gallery";
+  view.value = view.value === 'gallery' ? 'effects' : 'gallery'
 }
 
 function applyGallery(next: ShaderPreset) {
-  emit("update", next);
-  expanded.value = null;
+  emit('update', next)
+  expanded.value = null
 }
 
 function remove(index: number) {
-  emit("update", removeShaderEffect(preset, index));
-  expanded.value = null;
+  emit('update', removeShaderEffect(preset, index))
+  expanded.value = null
 }
 
 /** Changing an effect's type starts it from the new effect's own defaults. */
 function setType(index: number, type: string) {
-  if (preset.components[index]?.type === type) return;
-  emit("update", {
+  if (preset.components[index]?.type === type) return
+  emit('update', {
     ...preset,
-    components: preset.components.map((component, at) =>
-      at === index ? { type } : component,
-    ),
-  });
+    components: preset.components.map((component, at) => (at === index ? { type } : component))
+  })
 }
 
 const reorder = useFlatReorderDrag({
   items: () => rows.value,
   // Rows run top first, so a row's place counts from the end of the preset's list.
   onMove: (id, target) => {
-    const from = Number(id);
-    emit(
-      "update",
-      moveShaderEffect(preset, from, preset.components.length - 1 - target),
-    );
-    expanded.value = null;
-  },
-});
+    const from = Number(id)
+    emit('update', moveShaderEffect(preset, from, preset.components.length - 1 - target))
+    expanded.value = null
+  }
+})
 
-function setupRow(
-  element: Element | ComponentPublicInstance | null,
-  id: string,
-) {
+function setupRow(element: Element | ComponentPublicInstance | null, id: string) {
   reorder.setupItem(element instanceof HTMLElement ? element : null, () => ({
-    id,
-  }));
+    id
+  }))
 }
 
 function dropPosition(id: string) {
-  if (reorder.instructionTargetId.value !== id) return undefined;
-  return reorder.instruction.value?.operation === "reorder-before"
-    ? "before"
-    : "after";
+  if (reorder.instructionTargetId.value !== id) return undefined
+  return reorder.instruction.value?.operation === 'reorder-before' ? 'before' : 'after'
 }
 
-const json = ref("");
-const invalid = ref(false);
+const json = ref('')
+const invalid = ref(false)
 function toggleJSON() {
-  view.value = view.value === "json" ? "effects" : "json";
-  json.value = shaderPresetJSON(preset);
-  invalid.value = false;
+  view.value = view.value === 'json' ? 'effects' : 'json'
+  json.value = shaderPresetJSON(preset)
+  invalid.value = false
 }
 function applyJSON() {
-  const parsed = parseShaderPreset(json.value);
-  invalid.value = parsed === null;
-  if (!parsed) return;
-  emit("update", parsed);
-  expanded.value = null;
-  view.value = "effects";
+  const parsed = parseShaderPreset(json.value)
+  invalid.value = parsed === null
+  if (!parsed) return
+  emit('update', parsed)
+  expanded.value = null
+  view.value = 'effects'
 }
 </script>
 
@@ -229,7 +210,7 @@ function applyJSON() {
           {{
             codeView
               ? panels.shaderCode
-              : view === "gallery"
+              : view === 'gallery'
                 ? panels.shaderGallery
                 : panels.effects
           }}
@@ -334,20 +315,12 @@ function applyJSON() {
 
       <div v-else-if="view === 'json'" class="flex flex-col gap-1.5">
         <AppTextarea v-model="json" :rows="8" class="font-mono text-[11px]" />
-        <AppAlert
-          v-if="invalid"
-          tone="error"
-          :heading="panels.invalidShaderPreset"
-        />
+        <AppAlert v-if="invalid" tone="error" :heading="panels.invalidShaderPreset" />
         <div class="flex justify-end gap-1.5">
           <AppButton variant="ghost" size="sm" @click="view = 'effects'">
             {{ common.cancel }}
           </AppButton>
-          <AppButton
-            size="sm"
-            data-test-id="shader-preset-apply"
-            @click="applyJSON"
-          >
+          <AppButton size="sm" data-test-id="shader-preset-apply" @click="applyJSON">
             {{ panels.applyShaderPreset }}
           </AppButton>
         </div>
@@ -402,12 +375,8 @@ function applyJSON() {
                   @update:model-value="setType(row.index, $event)"
                 >
                   <template #option="{ option }">
-                    <ShaderEffectThumb
-                      :effect="effectsByName.get(option.value)"
-                    />
-                    <span class="min-w-0 flex-1 truncate text-surface">{{
-                      option.label
-                    }}</span>
+                    <ShaderEffectThumb :effect="effectsByName.get(option.value)" />
+                    <span class="min-w-0 flex-1 truncate text-surface">{{ option.label }}</span>
                   </template>
                 </AppCombobox>
               </div>
@@ -431,11 +400,7 @@ function applyJSON() {
             :effect="row.effect"
             :component="row.component"
             @set="
-              (key, value) =>
-                emit(
-                  'update',
-                  setShaderEffectProp(preset, row.index, key, value),
-                )
+              (key, value) => emit('update', setShaderEffectProp(preset, row.index, key, value))
             "
           />
         </div>

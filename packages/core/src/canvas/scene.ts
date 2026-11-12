@@ -1,7 +1,12 @@
 /* eslint-disable max-lines -- scene dispatch stays together while shape domains live in sibling modules */
 import type { Canvas, Path } from 'canvaskit-wasm'
 
-import { type SceneNode, type SceneGraph, type Fill } from '@open-pencil/scene-graph'
+import {
+  type SceneNode,
+  type SceneGraph,
+  type Fill,
+  type ShadowEffect
+} from '@open-pencil/scene-graph'
 import {
   arrowCapOverflow,
   collectArrowEndpoints,
@@ -167,7 +172,7 @@ function renderMaskNodeContent(
   canvas.translate(node.x, node.y)
   // As in Figma, a mask's opacity and layer blur reach what it masks; its blend mode does not.
   const blur = node.effects.find(
-    (effect) =>
+    (effect): effect is ShadowEffect =>
       effect.visible && (effect.type === 'LAYER_BLUR' || effect.type === 'FOREGROUND_BLUR')
   )
   const layered = node.opacity < 1 || blur !== undefined
@@ -363,7 +368,8 @@ export function renderNode(
   }
 
   const layerBlur = node.effects.find(
-    (e) => e.visible && (e.type === 'LAYER_BLUR' || e.type === 'FOREGROUND_BLUR')
+    (e): e is ShadowEffect =>
+      e.visible && (e.type === 'LAYER_BLUR' || e.type === 'FOREGROUND_BLUR')
   )
   if (layerBlur) {
     // Entry guard: reset shared paint to known state

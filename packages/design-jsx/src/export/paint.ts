@@ -1,4 +1,11 @@
-import type { Effect, Fill, GradientTransform, SceneNode, Stroke } from '@open-pencil/scene-graph'
+import type {
+  Effect,
+  Fill,
+  GradientTransform,
+  SceneNode,
+  ShadowEffect,
+  Stroke
+} from '@open-pencil/scene-graph'
 import {
   gradientTransformRows,
   isIdentityGradientTransform
@@ -196,7 +203,7 @@ export function collectStrokeProps(node: SceneNode, props: JSXProp[]): void {
   }
 }
 
-const EFFECT_HELPERS: Record<Effect['type'], string> = {
+const EFFECT_HELPERS: Record<ShadowEffect['type'], string> = {
   DROP_SHADOW: 'dropShadow',
   INNER_SHADOW: 'innerShadow',
   LAYER_BLUR: 'layerBlur',
@@ -204,7 +211,7 @@ const EFFECT_HELPERS: Record<Effect['type'], string> = {
   FOREGROUND_BLUR: 'foregroundBlur'
 }
 
-function effectValue(effect: Effect): HelperCall {
+function effectValue(effect: ShadowEffect): HelperCall {
   const visible = effect.visible ? undefined : false
   if (effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW') {
     return helperCall(
@@ -240,18 +247,20 @@ function plainDropShadow(effect: Effect): string | null {
  * `shadow` and `blur` describe a plain drop shadow followed by a layer blur, each optional,
  * in the order the renderer appends them; anything else needs `effects`.
  */
-function effectShorthand(effects: Effect[]): JSXProp[] | null {
+function effectShorthand(effects: ShadowEffect[]): JSXProp[] | null {
   if (effects.some((effect) => !effect.visible)) return null
   const shadow = effects.length > 0 ? plainDropShadow(effects[0]) : null
   const rest = shadow ? effects.slice(1) : effects
   if (rest.length > 1 || rest.some((effect) => effect.type !== 'LAYER_BLUR')) return null
   const props: JSXProp[] = []
   if (shadow) props.push(['shadow', shadow])
-  for (const blur of rest) props.push(['blur', blur.radius])
+  for (const blur of rest as ShadowEffect[]) props.push(['blur', blur.radius])
   return props
 }
 
 export function collectEffectProps(node: SceneNode, props: JSXProp[]): void {
-  if (node.effects.length === 0) return
-  props.push(...(effectShorthand(node.effects) ?? [['effects', node.effects.map(effectValue)]]))
+  // A shader effect has no JSX helper yet; leaving it out keeps the source importable.
+  const effects = node.effects.filter((effect): effect is ShadowEffect => effect.type !== 'SHADER')
+  if (effects.length === 0) return
+  props.push(...(effectShorthand(effects) ?? [['effects', effects.map(effectValue)]]))
 }

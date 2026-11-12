@@ -17,7 +17,7 @@ import { compact } from 'es-toolkit'
 
 import type { ShaderUniformValue } from './schema'
 
-export type ShaderAutomaticInput = 'resolution' | 'time' | 'mouse' | 'sdf'
+export type ShaderAutomaticInput = 'resolution' | 'time' | 'mouse' | 'sdf' | 'object'
 
 export interface ShaderUniform {
   name: string
@@ -61,6 +61,9 @@ const COMPONENTS: Readonly<Record<string, number | undefined>> = {
 
 const BOOLEAN_TYPES: ReadonlySet<string> = new Set(['bool', 'bvec2', 'bvec3', 'bvec4'])
 const SAMPLER_TYPES: ReadonlySet<string> = new Set(['sampler2D'])
+/** The directives a sampler uniform may carry: the two textures the canvas supplies itself. */
+const SAMPLER_DIRECTIVES = /@(sdf|object)\b/
+const SAMPLER_AUTOMATIC: ReadonlySet<ShaderAutomaticInput> = new Set(['sdf', 'object'])
 
 const DECLARATION =
   /^\s*uniform\s+(?:(?:highp|mediump|lowp)\s+)?([A-Za-z_]\w*)\s+([A-Za-z_]\w*)\s*(\[[^\]]*\])?\s*;/u
@@ -141,7 +144,8 @@ const AUTOMATIC_TYPES: Readonly<Record<ShaderAutomaticInput, string>> = {
   resolution: 'vec2',
   time: 'float',
   mouse: 'vec2',
-  sdf: 'sampler2D'
+  sdf: 'sampler2D',
+  object: 'sampler2D'
 }
 
 function automaticFor(
@@ -231,8 +235,8 @@ function readUniform(
     fail(`Unsupported uniform type ${type}`)
     return null
   }
-  if (SAMPLER_TYPES.has(type) && !commentAbove.includes('@sdf')) {
-    fail(`Sampler uniform ${name} needs @sdf; other textures are not supported`)
+  if (SAMPLER_TYPES.has(type) && !SAMPLER_DIRECTIVES.test(commentAbove)) {
+    fail(`Sampler uniform ${name} needs @sdf or @object; other textures are not supported`)
     return null
   }
   if (names.has(name)) {
@@ -246,8 +250,12 @@ function readUniform(
     fail(directiveError)
     return null
   }
-  if (uniform.automatic && uniform.kind === 'sampler' && uniform.automatic !== 'sdf') {
-    fail(`Sampler uniform ${name} can only be an SDF`)
+  if (
+    uniform.automatic &&
+    uniform.kind === 'sampler' &&
+    !SAMPLER_AUTOMATIC.has(uniform.automatic)
+  ) {
+    fail(`Sampler uniform ${name} can only be an SDF or an object`)
     return null
   }
   if (uniform.min !== undefined && uniform.max !== undefined && uniform.min > uniform.max) {
@@ -345,6 +353,14 @@ export function parseShaderUniforms(source: string): ShaderUniforms {
   }
   if (uniforms.filter((uniform) => uniform.automatic === 'sdf').length > 1) {
     return { uniforms, error: 'A shader can have only one @sdf uniform' }
+  }
+  const samplers = uniforms.filter((uniform) => uniform.kind === 'sampler')
+  if (samplers.filter((uniform) => uniform.automatic === 'object').length > 1) {
+    return { uniforms, error: 'A shader can have only one @object uniform' }
+  }
+  const objectAt = samplers.findIndex((uniform) => uniform.automatic === 'object')
+  if (objectAt > 0) {
+    return { uniforms, error: 'An @object uniform must be the first sampler a shader declares' }
   }
   return { uniforms, error: null }
 }

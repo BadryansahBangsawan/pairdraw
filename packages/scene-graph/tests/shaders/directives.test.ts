@@ -130,13 +130,26 @@ uniform float u_span;`
     )
     expect(
       parseShaderUniforms('/** @sdf */\nuniform sampler2D u_sdf;\nuniform sampler2D u_map;').error
-    ).toBe('Sampler uniform u_map needs @sdf; other textures are not supported')
+    ).toBe('Sampler uniform u_map needs @sdf or @object; other textures are not supported')
     expect(parseShaderUniforms('/** @resolution */\nuniform vec2 u_resolution;').error).toBeNull()
     expect(
       parseShaderUniforms('uniform float u_x;\nuniform float u_x;').error
     ).toBe('Uniform u_x is declared more than once')
     expect(parseShaderUniforms('uniform vec5 u_x;').error).toBe('Unsupported uniform type vec5')
     expect(parseShaderUniforms('uniform vec3 u_x[2];').error).toBe('Array uniform u_x is not supported')
+    expect(
+      parseShaderUniforms('/** @object */\nuniform sampler2D a;\n/** @object */\nuniform sampler2D b;')
+        .error
+    ).toBe('A shader can have only one @object uniform')
+    expect(
+      parseShaderUniforms(
+        '/** @sdf */\nuniform sampler2D sdf;\n/** @object */\nuniform sampler2D layer;'
+      ).error
+    ).toBe('An @object uniform must be the first sampler a shader declares')
+    expect(
+      parseShaderUniforms('/** @object */\nuniform sampler2D layer;\n/** @sdf */\nuniform sampler2D sdf;')
+        .uniforms.map((uniform) => uniform.automatic)
+    ).toEqual(['object', 'sdf'])
   })
 
   test('wrong defaults are reported', () => {

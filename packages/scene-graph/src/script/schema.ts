@@ -8,15 +8,18 @@ export const SCRIPT_MAX_SOURCE_LENGTH = 256_000
 /** One declared or chosen input value: text, a number, a switch, or a color. */
 export type ScriptInputValue = string | number | boolean | Color
 
+/** A color channel: NaN and an infinite value would poison every fill it reaches. */
+const finiteChannelSchema = v.pipe(v.number(), v.finite())
+
 const scriptInputValueSchema: v.GenericSchema<unknown, ScriptInputValue> = v.union([
   v.string(),
   v.pipe(v.number(), v.finite()),
   v.boolean(),
   v.object({
-    r: v.number(),
-    g: v.number(),
-    b: v.number(),
-    a: v.number()
+    r: finiteChannelSchema,
+    g: finiteChannelSchema,
+    b: finiteChannelSchema,
+    a: finiteChannelSchema
   })
 ])
 

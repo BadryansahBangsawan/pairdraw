@@ -13,6 +13,7 @@ import {
   scriptFrameMessageSchema,
   scriptHostMessageSchema,
   scriptNodeSpecSchema,
+  scriptRunRequestSchema,
   scriptRunResultSchema
 } from '@/app/code/script/sandbox/schema'
 import { countScriptNodes, type ScriptNodeSpec } from '@/app/code/script/sandbox/spec'
@@ -166,6 +167,21 @@ describe('script sandbox messages', () => {
     expect(() => parse(scriptNodeSpecSchema)({ type: 'COMPONENT' })).toThrow()
     expect(() => parse(scriptNodeSpecSchema)({ type: 'RECTANGLE', fill: 'red' })).toThrow()
     expect(parse(scriptNodeSpecSchema)({ type: 'RECTANGLE', fill: '#ff0000ff' })).toBeDefined()
+  })
+
+  test('rejects a color input with a non-finite component', () => {
+    const request = (accent: Record<string, number>) => ({
+      type: SCRIPT_SANDBOX_RUN,
+      id: 'run-1',
+      source: 'return []',
+      inputs: { accent },
+      seed: 1
+    })
+    const accent = { r: 0.1, g: 0.2, b: 0.3, a: 1 }
+    expect(parse(scriptRunRequestSchema)(request(accent)).inputs.accent).toEqual(accent)
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      expect(() => parse(scriptRunRequestSchema)(request({ ...accent, r: bad }))).toThrow()
+    }
   })
 })
 describe('script sandbox host', () => {

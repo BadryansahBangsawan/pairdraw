@@ -41,7 +41,7 @@ const scriptInputValueSchema = v.union([
   v.string(),
   v.pipe(v.number(), v.finite()),
   v.boolean(),
-  v.object({ r: v.number(), g: v.number(), b: v.number(), a: v.number() })
+  v.object({ r: finiteSchema, g: finiteSchema, b: finiteSchema, a: finiteSchema })
 ])
 
 const runRequestEntries = {

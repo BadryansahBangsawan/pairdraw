@@ -1,4 +1,4 @@
-import { exposeAutomationRequests } from '@/app/browser-bridge'
+import { exposeAutomationRequests } from '@/app/browser/bridge'
 
 import { makeFigmaFromStore } from './figma-factory'
 import { createAutomationCommandHandlers } from './handlers'

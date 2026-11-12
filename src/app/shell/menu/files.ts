@@ -5,7 +5,7 @@ import { decode } from 'ufo'
 
 import { BUILTIN_IO_FORMATS, IORegistry } from '@open-pencil/core/io'
 
-import { setOpenPencilOpenFileHandler } from '@/app/browser-bridge'
+import { setOpenPencilOpenFileHandler } from '@/app/browser/bridge'
 import {
   resolveBrowserFileURL,
   MAX_REMOTE_DOCUMENT_BYTES,

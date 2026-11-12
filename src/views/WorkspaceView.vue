@@ -10,7 +10,7 @@ import { detectAgentsOnFirstRun } from '@/app/ai/models/settings/onboarding/dial
 import { exposeAutomationTestRequests } from '@/app/automation/bridge/test-hooks'
 import { startMCPRuntime, stopMCPRuntime } from '@/app/automation/mcp/runtime'
 import { startWebMCP } from '@/app/automation/webmcp/runtime'
-import { exposeCollaborationActions } from '@/app/browser-bridge'
+import { exposeCollaborationActions } from '@/app/browser/bridge'
 import { openingCloudLink, shownEditorStore, versionPreviewKey } from '@/app/cloud/integration'
 import { useJoinRoom } from '@/app/collab/join'
 import { bindDesktopRoomLinks } from '@/app/collab/room/links'

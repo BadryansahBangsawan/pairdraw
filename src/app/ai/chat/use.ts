@@ -28,7 +28,7 @@ import {
   modelConnection,
   setModelRoleAssignment
 } from '@/app/ai/models'
-import { exposeChatTransportOverride } from '@/app/browser-bridge'
+import { exposeChatTransportOverride } from '@/app/browser/bridge'
 import { getActiveEditorStore } from '@/app/editor/active-store'
 import {
   pexelsKeyStatus,

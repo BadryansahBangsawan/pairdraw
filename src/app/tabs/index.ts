@@ -5,7 +5,7 @@ import { createDocumentGraph } from '@open-pencil/core'
 import { BUILTIN_IO_FORMATS, IORegistry } from '@open-pencil/core/io'
 import type { DocumentKind, SceneGraph } from '@open-pencil/scene-graph'
 
-import { setOpenPencilStore } from '@/app/browser-bridge'
+import { setOpenPencilStore } from '@/app/browser/bridge'
 import { describeDiagnosticError, recordStorageFailure } from '@/app/diagnostics'
 import { viewDiagnosticsAction } from '@/app/diagnostics/view'
 import { confirmAllDocuments } from '@/app/document/close/all'

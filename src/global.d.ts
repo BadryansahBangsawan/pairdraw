@@ -1,4 +1,4 @@
-import type { OpenPencilWindowAPI } from './app/browser-bridge'
+import type { OpenPencilWindowAPI } from './app/browser/bridge'
 import type { TurnstileAPI } from './app/cloud/waitlist/turnstile'
 
 export {}

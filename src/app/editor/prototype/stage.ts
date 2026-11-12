@@ -1,8 +1,9 @@
 import { useElementSize, useEventListener } from '@vueuse/core'
-import { computed, ref, watch, type Ref } from 'vue'
+import { computed, onScopeDispose, ref, watch, type Ref } from 'vue'
 
 import { resolveEditorProfile } from '@open-pencil/core'
 import { renderNodesToImage } from '@open-pencil/core/io/formats/raster'
+import type { PrototypeAction } from '@open-pencil/scene-graph'
 import { getAxisAlignedWorldBounds } from '@open-pencil/scene-graph/coordinate'
 
 import type { EditorStore } from '@/app/editor/active-store'
@@ -126,26 +127,46 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     { immediate: true }
   )
 
-  // The shown frame's AFTER_TIMEOUT reactions run once their delay passes; a frame change first
-  // drops the timers it did not get to run.
+  // The shown frame's AFTER_TIMEOUT reactions run once their delay passes. Restart and a new
+  // document drop timers even when the frame id stays, and leaving play or unmounting drops them
+  // too. A callback that still runs after that does not step.
   const timers = new Set<number>()
+  let timerGeneration = 0
+  function clearTimers() {
+    timerGeneration += 1
+    for (const timer of timers) window.clearTimeout(timer)
+    timers.clear()
+  }
+  function armTimers() {
+    clearTimers()
+    const shown = session.value
+    const generation = timerGeneration
+    if (!shown) return
+    const frameId = shownFrame(shown)
+    const schedule = (action: PrototypeAction, delayMs: number) => {
+      const timer = window.setTimeout(() => {
+        timers.delete(timer)
+        if (generation !== timerGeneration) return
+        const current = session.value
+        if (!current || shownFrame(current) !== frameId) return
+        session.value = step(store.graph, current, action)
+      }, delayMs)
+      timers.add(timer)
+    }
+    for (const { action, delayMs } of timeoutReactions(store.graph, shown)) {
+      schedule(action, delayMs)
+    }
+  }
   watch(
-    () => (session.value ? shownFrame(session.value) : null),
     () => {
-      for (const timer of timers) window.clearTimeout(timer)
-      timers.clear()
       const shown = session.value
-      if (!shown) return
-      for (const { action, delayMs } of timeoutReactions(store.graph, shown)) {
-        const timer = window.setTimeout(() => {
-          timers.delete(timer)
-          session.value = step(store.graph, session.value ?? shown, action)
-        }, delayMs)
-        timers.add(timer)
-      }
+      if (!shown || !live.value) return null
+      return `${live.value.revision}:${shownFrame(shown)}`
     },
+    armTimers,
     { immediate: true }
   )
+  onScopeDispose(clearTimers)
 
   // A frame switched to, or a canvas resized, is fitted again: play always shows its whole frame.
   watch([() => (session.value ? shownFrame(session.value) : null), size.width, size.height], () =>

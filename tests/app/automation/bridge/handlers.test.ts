@@ -8,6 +8,7 @@ import * as layoutModule from '@open-pencil/core/layout'
 import { makeFigmaFromStore } from '@/app/automation/bridge/figma-factory'
 import { createAutomationCommandHandlers } from '@/app/automation/bridge/handlers'
 import { automationFiles } from '@/app/automation/bridge/server'
+import { BROWSER_DESKTOP_ONLY } from '@/app/browser/tools'
 import { recentDocuments } from '@/app/recent-files'
 import { recentFilesLimit } from '@/app/recent-files/preferences'
 import { appPreferences } from '@/app/settings/preferences/store'
@@ -481,5 +482,19 @@ describe('list_recent_files', () => {
         { path: '/b.fig', name: 'b.fig', updated_at: updatedAt }
       ]
     })
+  })
+})
+
+describe('browser tools', () => {
+  test.each([
+    'browser_load_page',
+    'browser_screenshot',
+    'browser_element',
+    'browser_screenshot_to_canvas'
+  ])('%s fails in a browser build before it touches the window', async (command) => {
+    createTab()
+    await expect(request(command, { url: 'https://example.com', kind: 'visible' })).rejects.toThrow(
+      BROWSER_DESKTOP_ONLY
+    )
   })
 })

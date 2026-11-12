@@ -59,4 +59,29 @@ describe('MCP exposes the agent tools for code, space, and change review', () =>
     expect(properties('get_style')).toEqual(expect.arrayContaining(['id', 'query', 'appearance']))
     expect(properties('rescale')).toEqual(expect.arrayContaining(['ids', 'factor', 'anchor']))
   })
+
+  test('the built-in browser tools are app commands, and there is no raw CDP tool', () => {
+    expect(descriptors.get('browser_load_page')).toMatchObject({
+      effect: 'read',
+      availability: 'default',
+      capabilities: ['network:access']
+    })
+    expect(descriptors.get('browser_screenshot')).toMatchObject({
+      effect: 'read',
+      availability: 'default',
+      capabilities: []
+    })
+    expect(descriptors.get('browser_element')).toMatchObject({
+      effect: 'write',
+      availability: 'default',
+      capabilities: ['document:write']
+    })
+    expect(descriptors.get('browser_screenshot_to_canvas')).toMatchObject({
+      effect: 'write',
+      availability: 'default',
+      capabilities: ['document:write']
+    })
+    expect(descriptors.has('browser_cdp')).toBe(false)
+    expect(definitions.has('browser_load_page')).toBe(false)
+  })
 })

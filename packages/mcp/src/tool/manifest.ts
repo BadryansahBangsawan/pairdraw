@@ -152,6 +152,42 @@ export function createToolDescriptors(filesystemEnabled: boolean): ToolDescripto
       availability: 'default',
       capabilities: [],
       enabled: true
+    },
+    {
+      name: 'browser_load_page',
+      description:
+        'Load an address in the open built-in browser window. Fails when that window is closed, and does not open one. Only http and https. This is not a raw CDP session.',
+      effect: 'read',
+      availability: 'default',
+      capabilities: ['network:access'],
+      enabled: true
+    },
+    {
+      name: 'browser_screenshot',
+      description:
+        'Return a PNG of the open built-in browser window. kind is visible (the view), full (the page), or element (the element the user clicks). Fails when that window is closed. There is no raw CDP screenshot.',
+      effect: 'read',
+      availability: 'default',
+      capabilities: [],
+      enabled: true
+    },
+    {
+      name: 'browser_element',
+      description:
+        'Import one element the user clicks in the open built-in browser window onto the canvas. Fails when that window is closed. Escape imports nothing. This is not a raw CDP session.',
+      effect: 'write',
+      availability: 'default',
+      capabilities: ['document:write'],
+      enabled: true
+    },
+    {
+      name: 'browser_screenshot_to_canvas',
+      description:
+        'Place a PNG of the open built-in browser window on the canvas. kind is visible, full, or element. Fails when that window is closed. There is no raw CDP screenshot.',
+      effect: 'write',
+      availability: 'default',
+      capabilities: ['document:write'],
+      enabled: true
     }
   )
   return descriptors

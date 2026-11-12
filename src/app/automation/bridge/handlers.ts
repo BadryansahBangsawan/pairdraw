@@ -24,7 +24,20 @@ import {
   type UnknownRecord
 } from '@/app/automation/bridge/target'
 import { createAutomationToolHandler } from '@/app/automation/bridge/tool-handlers'
+import { browserState } from '@/app/browser/state'
+import {
+  browserToolCall,
+  isBrowserToolCommand,
+  runBrowserTool,
+  type BrowserToolActions
+} from '@/app/browser/tools'
+import {
+  captureBrowserElement,
+  navigateBrowserWindow,
+  screenshotBrowser
+} from '@/app/browser/window'
 import type { EditorStore } from '@/app/editor/active-store'
+import { IS_TAURI } from '@/constants'
 
 type FigmaFactory = (store: EditorStore, pageId?: string) => FigmaAPI
 
@@ -35,6 +48,11 @@ export function createAutomationCommandHandlers(makeFigma: FigmaFactory, files?:
   const handleTool = createAutomationToolHandler(makeFigma)
   const { handleSaveFile, handleCloseFile, handleNewDocument, handleOpenFile } =
     createFileHandlers(files)
+  const browserActions: BrowserToolActions = {
+    navigate: navigateBrowserWindow,
+    screenshot: screenshotBrowser,
+    captureElement: captureBrowserElement
+  }
 
   const commandHandlers: Partial<Record<string, CommandHandler>> = {
     eval: handleEval,
@@ -87,6 +105,18 @@ export function createAutomationCommandHandlers(makeFigma: FigmaFactory, files?:
     }
     if (command === 'get_settings') return handleGetSettings()
     if (command === 'update_settings') return handleUpdateSettings(args)
+
+    if (isBrowserToolCommand(command)) {
+      const decided = browserToolCall(command, args, IS_TAURI, browserState.open)
+      if (!decided.ok) throw new Error(decided.error)
+      const call = decided.call
+      if (call.command === 'browser_element' || call.command === 'browser_screenshot_to_canvas') {
+        const target = resolveAutomationTarget(store, isUnknownRecord(args) ? args : undefined)
+        const result = await runBrowserTool(target.store, call, browserActions)
+        return responseWithTarget({ ok: true, result }, target)
+      }
+      return { ok: true, result: await runBrowserTool(store, call, browserActions) }
+    }
 
     if (command === 'open_file' || command === 'new_document') {
       const handler = commandHandlers[command]

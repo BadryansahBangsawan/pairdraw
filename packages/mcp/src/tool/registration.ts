@@ -16,6 +16,7 @@ import { CODEGEN_PROMPT } from '@open-pencil/core/tools'
 import type { RPCJSONObject } from '#mcp/json'
 import { MAX_RESULT_BYTES, fail, ok, resultTooLargeMessage } from '#mcp/result'
 import { SKILL_FILE_PATHS, SKILL_FILES, type SkillFilePath } from '#mcp/skill/content'
+import { registerBrowserTools } from '#mcp/tool/browser'
 import { createToolDescriptors, getMCPToolDefinitions } from '#mcp/tool/manifest'
 import type { ToolDescriptor, ToolEffect, ToolPolicy } from '#mcp/tool/metadata'
 import { resolveSafePath, writeToolOutput, writesFileOutput } from '#mcp/tool/output'
@@ -25,7 +26,7 @@ import { SELECTION_SCOPE_FILE_OUTPUT_ERROR } from '#mcp/tool/scope'
 export type RPCSender = (body: Record<string, unknown>) => Promise<unknown>
 export type MCPToolSettled = (context: ServerContext) => Promise<void>
 
-const automationTargetSchema = {
+export const automationTargetSchema = {
   document_id: v.optional(
     v.pipe(v.string(), v.description('Optional OpenPencil document/tab ID to target'))
   ),
@@ -34,7 +35,7 @@ const automationTargetSchema = {
   )
 }
 
-function splitAutomationTarget(args: Record<string, unknown>): {
+export function splitAutomationTarget(args: Record<string, unknown>): {
   target: { document_id?: string; page_id?: string }
   args: Record<string, unknown>
 } {
@@ -52,7 +53,7 @@ const recentFilesResultSchema = v.object({
   files: v.array(v.object({ path: v.string(), name: v.string(), updated_at: v.string() }))
 })
 
-async function sendCommand(
+export async function sendCommand(
   sendRPC: RPCSender,
   command: string,
   args: Record<string, unknown>
@@ -62,7 +63,7 @@ async function sendCommand(
   return res
 }
 
-function withTarget<T extends object>(body: T, res: RPCResponse): T & { target?: unknown } {
+export function withTarget<T extends object>(body: T, res: RPCResponse): T & { target?: unknown } {
   return res.target ? { ...body, target: res.target } : body
 }
 
@@ -517,4 +518,6 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
       content: [{ type: 'text' as const, text: SKILL_FILES[args.path ?? 'SKILL.md'].text }]
     })
   )
+
+  registerBrowserTools(register, sendRPC)
 }

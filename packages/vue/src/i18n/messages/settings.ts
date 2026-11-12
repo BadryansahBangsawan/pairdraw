@@ -141,7 +141,40 @@ export const settingsMessageDefaults = {
   vertexCredentialHint:
     'An access token from gcloud auth print-access-token lasts one hour. An API key reaches Gemini models only.',
   vertexClaudeAccessToken:
-    'Claude on Vertex AI needs an access token. An API key reaches Gemini models only.'
+    'Claude on Vertex AI needs an access token. An API key reaches Gemini models only.',
+  plugins: 'Plugins',
+  pluginsDescription:
+    'Plugins installed for this app. They are saved with the app, not inside a document.',
+  pluginsNotRunning: 'Plugins do not run yet',
+  pluginsNotRunningDescription:
+    'Installing a plugin only saves it. Running one waits until the app can run plugin scripts.',
+  pluginsEmpty: 'No plugins installed',
+  pluginsEmptyDescription: 'Paste a plugin manifest or choose a file to install one.',
+  pluginsManifest: 'Plugin manifest',
+  pluginsInstall: 'Install',
+  pluginsChooseFile: 'Choose file',
+  pluginsEnable: params('Enable {name}'),
+  pluginsRemove: params('Remove {name}'),
+  pluginsRemoveTitle: 'Remove this plugin?',
+  pluginsRemoveDescription: params(
+    'Remove {name} from this app. The capabilities it was granted go with it.'
+  ),
+  pluginsRemoveAction: 'Remove',
+  pluginsCommand: params('Command: {command}.'),
+  pluginsCapabilityDocumentRead: 'Read the open document.',
+  pluginsCapabilityDocumentWrite: 'Change the open document.',
+  pluginsCapabilityFilesystemRead: 'Read files on this computer.',
+  pluginsCapabilityFilesystemWrite: 'Write files on this computer.',
+  pluginsCapabilityCodeExecute: 'Run code.',
+  pluginsCapabilitySettingsRead: 'Read settings.',
+  pluginsCapabilitySettingsWrite: 'Change settings.',
+  pluginsNoCapabilities: 'Asks for nothing.',
+  pluginsInvalid: 'This plugin manifest is not valid.',
+  pluginsDuplicate: params('A plugin with the id "{id}" is already installed.'),
+  pluginsUnknownCapability: params('Unknown capability "{capability}".'),
+  pluginsNetwork: 'Plugins cannot ask for network access.',
+  pluginsTooLarge: 'This plugin manifest is larger than 64 KB.',
+  pluginsTooMany: params('This app already has {count} plugins, which is the limit.')
 } as const
 
 export const settingsMessages = i18n('settings', settingsMessageDefaults)

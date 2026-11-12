@@ -30,12 +30,24 @@ export type PluginInstallReason = (typeof PLUGIN_INSTALL_REASONS)[number]
 
 export type PluginInstallResult =
   | { ok: true; plugins: InstalledPlugin[] }
-  | { ok: false; reason: PluginInstallReason; message: string }
+  | {
+      ok: false
+      reason: PluginInstallReason
+      message: string
+      /** Set for `duplicate`, so a translated message can name the id. */
+      id?: string
+      /** Set for `unknown-capability`, so a translated message can name it. */
+      capability?: string
+    }
 
 const jsonValueSchema = v.pipe(v.string(), v.parseJson(), v.unknown())
 
-function refusal(reason: PluginInstallReason, message: string): PluginInstallResult {
-  return { ok: false, reason, message }
+function refusal(
+  reason: PluginInstallReason,
+  message: string,
+  detail?: { id: string } | { capability: string }
+): PluginInstallResult {
+  return { ok: false, reason, message, ...detail }
 }
 
 function manifestBytes(text: string): number {
@@ -57,7 +69,7 @@ function refusedCapabilities(value: unknown): PluginInstallResult | null {
   }
   for (const capability of value.capabilities) {
     if (typeof capability !== 'string' || isPluginCapability(capability)) continue
-    return refusal('unknown-capability', unknownCapabilityMessage(capability))
+    return refusal('unknown-capability', unknownCapabilityMessage(capability), { capability })
   }
   return null
 }
@@ -85,7 +97,9 @@ export function installPlugin(
   if (!manifest.success) return refusal('invalid', PLUGIN_MANIFEST_INVALID_MESSAGE)
   if (plugins.length >= MAX_PLUGINS) return refusal('too-many', PLUGIN_TOO_MANY_MESSAGE)
   if (plugins.some((plugin) => plugin.id === manifest.output.id)) {
-    return refusal('duplicate', duplicatePluginMessage(manifest.output.id))
+    return refusal('duplicate', duplicatePluginMessage(manifest.output.id), {
+      id: manifest.output.id
+    })
   }
   return { ok: true, plugins: [...plugins, toInstalled(manifest.output)] }
 }

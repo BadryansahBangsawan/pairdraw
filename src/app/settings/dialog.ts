@@ -4,6 +4,7 @@ import { ref } from 'vue'
 export type SettingsSection =
   | 'general'
   | 'editor'
+  | 'plugins'
   | 'fonts'
   | 'storage'
   | 'notifications'

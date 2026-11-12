@@ -44,3 +44,25 @@ export function grantInstalledPlugin(
   if (result.ok) installedPlugins.value = result.plugins
   return result
 }
+
+function copyInstalledPlugin(plugin: InstalledPlugin): InstalledPlugin {
+  return {
+    id: plugin.id,
+    name: plugin.name,
+    version: plugin.version,
+    source: plugin.source,
+    command: plugin.command,
+    capabilities: [...plugin.capabilities],
+    enabled: plugin.enabled,
+    grants: [...plugin.grants]
+  }
+}
+
+/** A copy the settings story restores after it installs and removes plugins. */
+export function installedPluginsSnapshot(): InstalledPlugin[] {
+  return installedPlugins.value.map(copyInstalledPlugin)
+}
+
+export function replaceInstalledPlugins(plugins: readonly InstalledPlugin[]): void {
+  installedPlugins.value = plugins.map(copyInstalledPlugin)
+}

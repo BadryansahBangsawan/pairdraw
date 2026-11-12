@@ -11,6 +11,7 @@ import IconDatabase from '~icons/lucide/database'
 import IconImage from '~icons/lucide/image'
 import IconPenTool from '~icons/lucide/pen-tool'
 import IconPlug from '~icons/lucide/plug'
+import IconPuzzle from '~icons/lucide/puzzle'
 import IconSettings from '~icons/lucide/settings'
 import IconShield from '~icons/lucide/shield'
 import IconSlidersHorizontal from '~icons/lucide/sliders-horizontal'
@@ -40,6 +41,7 @@ import MCPWorkspacePanel from '@/components/settings/mcp/MCPWorkspacePanel.vue'
 import MediaSettingsPanel from '@/components/settings/media/MediaSettingsPanel.vue'
 import ModelsPanel from '@/components/settings/models/ModelsPanel.vue'
 import NotificationSettingsSection from '@/components/settings/notifications/NotificationSettingsSection.vue'
+import PluginsSettingsPanel from '@/components/settings/plugins/PluginsSettingsPanel.vue'
 import PrivacySettingsPanel from '@/components/settings/privacy/PrivacySettingsPanel.vue'
 import SkillsSettingsPanel from '@/components/settings/skills/SkillsSettingsPanel.vue'
 import StorageSettingsPanel from '@/components/settings/storage/StorageSettingsPanel.vue'
@@ -79,6 +81,7 @@ const groups = computed<{ label: string; sections: SectionItem[] }[]>(() => [
     sections: [
       { value: 'general', label: settings.value.general, icon: IconSettings },
       { value: 'editor', label: settings.value.editor, icon: IconPenTool },
+      { value: 'plugins', label: settings.value.plugins, icon: IconPuzzle },
       { value: 'fonts', label: settings.value.fonts, icon: IconType },
       { value: 'storage', label: settings.value.storage, icon: IconDatabase },
       { value: 'notifications', label: settings.value.notifications, icon: IconBell },
@@ -197,6 +200,9 @@ function onOpenChange(open: boolean): void {
       </AppTabsContent>
       <AppTabsContent value="editor" as-child>
         <EditorSettingsPanel />
+      </AppTabsContent>
+      <AppTabsContent value="plugins" as-child>
+        <PluginsSettingsPanel />
       </AppTabsContent>
       <AppTabsContent value="fonts" as-child>
         <FontSettingsPanel />

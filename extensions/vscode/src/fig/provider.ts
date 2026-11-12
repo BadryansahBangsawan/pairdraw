@@ -17,8 +17,6 @@ export interface FigDocument extends vscode.CustomDocument {
  * save command.
  */
 export class FigEditorProvider implements vscode.CustomEditorProvider<FigDocument> {
-  static readonly viewType = 'pairdraw.fig'
-
   private readonly sessions = new Map<string, EditorSession>()
   private readonly changes = new vscode.EventEmitter<vscode.CustomDocumentEditEvent<FigDocument>>()
 

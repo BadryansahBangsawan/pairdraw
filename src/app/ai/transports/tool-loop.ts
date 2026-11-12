@@ -15,6 +15,7 @@ import type { AIProviderID, ReasoningEffort } from '@open-pencil/core/constants'
 import {
   BROWSER_CHAT_TOOL_NAMES,
   createBrowserChatTools,
+  desktopBrowserActions,
   type BrowserChatActions
 } from '@/app/ai/browser/tools'
 import { stepContextMetadata } from '@/app/ai/chat/context-window/usage'
@@ -123,7 +124,7 @@ export function createToolLoopTransport({
     ...createBrowserChatTools({
       desktop: offerBrowserTools,
       approval,
-      actions: browserActions
+      actions: browserActions ?? desktopBrowserActions(store)
     })
   }
   // Read again for each message, so skills installed or switched off since apply to the next one.

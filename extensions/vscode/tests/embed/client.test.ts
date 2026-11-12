@@ -1,8 +1,8 @@
 import { describe, expect, test, vi } from 'bun:test'
 
-import { EmbedClient, EmbedClientError } from '../../src/embed/client'
-import type { EmbedFrame, EmbedHostWindow, EmbedMessageEvent } from '../../src/embed/client'
-import { EMBED_PROTOCOL, EMBED_PROTOCOL_VERSION } from '../../src/embed/protocol'
+import { EmbedClient, EmbedClientError } from '#vscode/embed/client'
+import type { EmbedFrame, EmbedHostWindow, EmbedMessageEvent } from '#vscode/embed/client'
+import { EMBED_PROTOCOL, EMBED_PROTOCOL_VERSION } from '#vscode/embed/protocol'
 
 const EDITOR_ORIGIN = 'https://editor.example'
 
@@ -78,7 +78,12 @@ async function connectWith(respond: (method: string, params: unknown) => unknown
     serveEmbed(port, respond)
   })
   const window = createHostWindow()
-  const pending = EmbedClient.connect({ window, frame, editorOrigin: EDITOR_ORIGIN, timeoutMs: 100 })
+  const pending = EmbedClient.connect({
+    window,
+    frame,
+    editorOrigin: EDITOR_ORIGIN,
+    timeoutMs: 100
+  })
   window.send(readyEvent(frame))
   const client = await pending
   expect(served).not.toBeNull()
@@ -89,7 +94,12 @@ describe('embed client', () => {
   test('answers the iframe ready with one port addressed to its origin', async () => {
     const frame = createFrame(() => undefined)
     const window = createHostWindow()
-    const pending = EmbedClient.connect({ window, frame, editorOrigin: EDITOR_ORIGIN, timeoutMs: 100 })
+    const pending = EmbedClient.connect({
+      window,
+      frame,
+      editorOrigin: EDITOR_ORIGIN,
+      timeoutMs: 100
+    })
     window.send(readyEvent(frame))
     const client = await pending
     expect(frame.sent).toHaveLength(1)
@@ -110,7 +120,12 @@ describe('embed client', () => {
     try {
       const frame = createFrame(() => undefined)
       const window = createHostWindow()
-      const pending = EmbedClient.connect({ window, frame, editorOrigin: EDITOR_ORIGIN, timeoutMs: 30 })
+      const pending = EmbedClient.connect({
+        window,
+        frame,
+        editorOrigin: EDITOR_ORIGIN,
+        timeoutMs: 30
+      })
       window.send(readyEvent(frame, 'https://elsewhere.example'))
       window.send(readyEvent({}))
       window.send({
@@ -158,14 +173,20 @@ describe('embed client', () => {
   })
 
   test('forwards document events until close', async () => {
-    let editorPort: MessagePort | null = null
+    const editorPorts: MessagePort[] = []
     const frame = createFrame((port) => {
-      editorPort = port
+      editorPorts.push(port)
     })
     const window = createHostWindow()
-    const pending = EmbedClient.connect({ window, frame, editorOrigin: EDITOR_ORIGIN, timeoutMs: 100 })
+    const pending = EmbedClient.connect({
+      window,
+      frame,
+      editorOrigin: EDITOR_ORIGIN,
+      timeoutMs: 100
+    })
     window.send(readyEvent(frame))
     const client = await pending
+    const [editorPort] = editorPorts
     const seen: string[] = []
     let delivered: () => void = () => undefined
     const firstEvent = new Promise<void>((resolve) => {
@@ -175,11 +196,11 @@ describe('embed client', () => {
       seen.push(event.event)
       delivered()
     })
-    editorPort!.postMessage({ event: 'documentchange', data: { name: 'a.fig' } })
+    editorPort.postMessage({ event: 'documentchange', data: { name: 'a.fig' } })
     await firstEvent
     expect(seen).toEqual(['documentchange'])
     client.close()
-    editorPort!.postMessage({ event: 'selectionchange', data: { nodeIds: ['1'] } })
+    editorPort.postMessage({ event: 'selectionchange', data: { nodeIds: ['1'] } })
     await Promise.resolve()
     expect(seen).toEqual(['documentchange'])
   })

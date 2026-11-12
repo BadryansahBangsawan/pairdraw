@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
@@ -11,7 +15,20 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["bun", "node", "vscode"]
+    "types": [
+      "bun",
+      "node",
+      "vscode"
+    ],
+    "paths": {
+      "#vscode/*": [
+        "./src/*"
+      ]
+    }
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "build.ts"]
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "build.ts"
+  ]
 }

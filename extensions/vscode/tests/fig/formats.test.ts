@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { designViewType, documentFormat, toggledViewType } from '../../src/fig/formats'
+import { designViewType, documentFormat, toggledViewType } from '#vscode/fig/formats'
 
 describe('document formats', () => {
   test('reads the format from the destination, case-insensitively', () => {

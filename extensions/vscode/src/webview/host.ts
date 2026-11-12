@@ -2,7 +2,7 @@ import { fromUint8Array, toUint8Array } from 'js-base64'
 import * as v from 'valibot'
 
 import type { EmbedClient } from '../embed/client'
-import { EMBED_DOCUMENT_FORMATS } from '../embed/protocol'
+import { EMBED_DOCUMENT_FORMATS, EMBED_IMAGE_FORMATS } from '../embed/protocol'
 import type { WebviewMessage } from './messages'
 
 /** Messages the extension sends the webview that hosts the editor iframe. */
@@ -13,7 +13,13 @@ export const hostMessageSchema = v.variant('type', [
     id: v.number(),
     format: v.optional(v.picklist(EMBED_DOCUMENT_FORMATS))
   }),
-  v.object({ type: v.literal('setEditable'), editable: v.boolean() })
+  v.object({ type: v.literal('setEditable'), editable: v.boolean() }),
+  v.object({
+    type: v.literal('export'),
+    id: v.number(),
+    format: v.optional(v.picklist(EMBED_IMAGE_FORMATS)),
+    scale: v.optional(v.number())
+  })
 ])
 
 export type HostMessage = v.InferOutput<typeof hostMessageSchema>
@@ -26,7 +32,7 @@ export interface WebviewTransport {
 
 export interface WebviewHostOptions {
   transport: WebviewTransport
-  client: Pick<EmbedClient, 'load' | 'getDocument' | 'setEditable' | 'onEvent'>
+  client: Pick<EmbedClient, 'load' | 'getDocument' | 'setEditable' | 'exportImage' | 'onEvent'>
 }
 
 /**
@@ -51,6 +57,19 @@ export function startWebviewHost(options: WebviewHostOptions): () => void {
           id: message.id,
           name: document.name,
           data: fromUint8Array(document.data)
+        })
+        return
+      }
+      if (message.type === 'export') {
+        const image = await client.exportImage({
+          format: message.format,
+          scale: message.scale
+        })
+        transport.post({
+          type: 'exported',
+          id: message.id,
+          mimeType: image.mimeType,
+          data: fromUint8Array(image.data)
         })
         return
       }

@@ -1,42 +1,25 @@
-import { beforeEach, describe, expect, mock, test } from 'bun:test'
-import { fromUint8Array } from 'js-base64'
+import { beforeEach, describe, expect, test } from 'bun:test'
 
-interface FakeUri {
-  readonly scheme: string
-  readonly path: string
-}
+import { EditorSession, fileName } from '#vscode/fig/session'
+import type { ExtensionHost } from '#vscode/host'
+import { fromUint8Array } from 'js-base64'
 
 const files = new Map<string, Uint8Array>()
 const errors: string[] = []
 
-mock.module('vscode', () => ({
-  Uri: { joinPath: (base: FakeUri) => base },
-  window: {
-    showErrorMessage: (message: string) => {
-      errors.push(message)
-      return Promise.resolve(undefined)
-    }
+const host: ExtensionHost = {
+  readFile: (uri) => Promise.resolve(files.get(uri.path) ?? new Uint8Array()),
+  writeFile: (uri, data) => {
+    files.set(uri.path, data)
+    return Promise.resolve()
   },
-  workspace: {
-    fs: {
-      readFile: (uri: FakeUri) => Promise.resolve(files.get(uri.path) ?? new Uint8Array()),
-      writeFile: (uri: FakeUri, data: Uint8Array) => {
-        files.set(uri.path, data)
-        return Promise.resolve()
-      },
-      delete: (uri: FakeUri) => {
-        files.delete(uri.path)
-        return Promise.resolve()
-      },
-      copy: () => Promise.resolve()
-    }
-  }
-}))
+  showError: (message) => {
+    errors.push(message)
+  },
+  saveDialog: () => Promise.resolve(undefined)
+}
 
-// The mock must be registered before the module reads `vscode` at import time.
-const { EditorSession, fileName } = await import('../../src/fig/session')
-
-const uri: FakeUri = { scheme: 'file', path: '/workspace/drawing.fig' }
+const uri = { scheme: 'file', path: '/workspace/drawing.fig' }
 const document = { uri, dispose: () => undefined }
 
 type MessageHandler = (message: unknown) => void
@@ -67,7 +50,7 @@ function createPanel() {
 /** The panel and document shapes the session reads; the editor types are not loadable here. */
 function openSession(onEdited: (document: unknown) => void = () => undefined) {
   const fake = createPanel()
-  const session = new EditorSession(document as never, fake.panel as never, onEdited)
+  const session = new EditorSession(host, document as never, fake.panel as never, onEdited as never)
   return { ...fake, session }
 }
 
@@ -95,7 +78,7 @@ describe('editor session', () => {
   })
 
   test('asks the editor for its bytes and writes them to the requested destination', async () => {
-    const destination: FakeUri = { scheme: 'file', path: '/workspace/copy.fig' }
+    const destination = { scheme: 'file', path: '/workspace/copy.fig' }
     const { session, send, posted } = openSession()
     const saving = session.save(destination as never)
     expect(messageOfType(posted, 'save')).toEqual({ type: 'save', id: 1, format: 'fig' })
@@ -105,7 +88,7 @@ describe('editor session', () => {
   })
 
   test('asks for pen text when the destination is a .pen file', async () => {
-    const destination: FakeUri = { scheme: 'file', path: '/workspace/Card.PEN' }
+    const destination = { scheme: 'file', path: '/workspace/Card.PEN' }
     const { session, send, posted } = openSession()
     const saving = session.save(destination as never)
     expect(messageOfType(posted, 'save')).toEqual({ type: 'save', id: 1, format: 'pen' })
@@ -159,6 +142,42 @@ describe('editor session', () => {
     const saving = session.save()
     session.dispose()
     await expect(saving).rejects.toThrow('closed before the save finished')
+  })
+
+  test('asks the editor for its selection image and returns the decoded bytes', async () => {
+    const { session, send, posted } = openSession()
+    const exporting = session.exportSelection({ format: 'PNG', scale: 2 })
+    expect(messageOfType(posted, 'export')).toEqual({
+      type: 'export',
+      id: 1,
+      format: 'PNG',
+      scale: 2
+    })
+    send({
+      type: 'exported',
+      id: 1,
+      mimeType: 'image/png',
+      data: fromUint8Array(new Uint8Array([8, 9]))
+    })
+    await expect(exporting).resolves.toEqual({
+      data: new Uint8Array([8, 9]),
+      mimeType: 'image/png'
+    })
+  })
+
+  test('rejects an export the editor refuses and shows its message', async () => {
+    const { session, send } = openSession()
+    const exporting = session.exportSelection()
+    send({ type: 'error', message: 'There are no layers to export' })
+    await expect(exporting).rejects.toThrow('There are no layers to export')
+    expect(errors).toEqual(['Pairdraw: There are no layers to export'])
+  })
+
+  test('rejects a pending export when the editor closes', async () => {
+    const { session } = openSession()
+    const exporting = session.exportSelection()
+    session.dispose()
+    await expect(exporting).rejects.toThrow('closed before the export finished')
   })
 
   test('keeps the file name in the embed, not the path', () => {

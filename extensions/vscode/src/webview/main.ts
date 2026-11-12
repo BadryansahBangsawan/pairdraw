@@ -1,11 +1,11 @@
 import { EmbedClient } from '../embed/client'
 import { startWebviewHost } from './host'
 
-interface VsCodeApi {
+interface WebviewAPI {
   postMessage(message: unknown): void
 }
 
-declare function acquireVsCodeApi(): VsCodeApi
+declare function acquireVsCodeApi(): WebviewAPI
 
 const vscode = acquireVsCodeApi()
 const frameElement = document.querySelector<HTMLIFrameElement>('#editor')
@@ -18,9 +18,9 @@ function fail(error: unknown): void {
 }
 
 async function run(frame: HTMLIFrameElement): Promise<void> {
-  const editorUrl = frame.dataset.editorUrl
-  if (!editorUrl) throw new Error('The editor URL is missing')
-  const url = new URL(editorUrl)
+  const editorURL = frame.dataset.editorUrl
+  if (!editorURL) throw new Error('The editor URL is missing')
+  const url = new URL(editorURL)
   url.searchParams.set('embed', '')
   url.searchParams.set('origin', location.origin)
   url.searchParams.set('allow-edit', '')

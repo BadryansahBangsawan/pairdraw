@@ -21,12 +21,20 @@ const manifestSchema = v.looseObject({
       })
     ),
     commands: v.optional(
-      v.array(v.looseObject({ command: v.string(), title: v.string(), category: v.optional(v.string()) }))
+      v.array(
+        v.looseObject({ command: v.string(), title: v.string(), category: v.optional(v.string()) })
+      )
     ),
     menus: v.optional(
       v.record(
         v.string(),
-        v.array(v.looseObject({ command: v.string(), when: v.optional(v.string()), group: v.optional(v.string()) }))
+        v.array(
+          v.looseObject({
+            command: v.string(),
+            when: v.optional(v.string()),
+            group: v.optional(v.string())
+          })
+        )
       )
     ),
     configuration: v.looseObject({
@@ -75,7 +83,10 @@ describe('VS Code extension manifest', () => {
     expect(manifest.activationEvents).toEqual([
       'onCustomEditor:pairdraw.fig',
       'onCustomEditor:pairdraw.pen',
-      'onCommand:pairdraw.toggleDesignMode'
+      'onCommand:pairdraw.toggleDesignMode',
+      'onCommand:pairdraw.openEditor',
+      'onCommand:pairdraw.exportSelection',
+      'onView:pairdraw.sidebar'
     ])
     expect(manifest.contributes.customEditors).toEqual([
       {
@@ -96,7 +107,13 @@ describe('VS Code extension manifest', () => {
   test('offers the design mode toggle on .pen title bars', async () => {
     const manifest = await readJSON('../package.json', manifestSchema)
     expect(manifest.contributes.commands).toEqual([
-      { command: 'pairdraw.toggleDesignMode', title: 'Toggle Design Mode', category: 'Pairdraw' }
+      { command: 'pairdraw.toggleDesignMode', title: 'Toggle Design Mode', category: 'Pairdraw' },
+      { command: 'pairdraw.openEditor', title: 'Open Pairdraw Editor', category: 'Pairdraw' },
+      {
+        command: 'pairdraw.exportSelection',
+        title: 'Export Selection as PNG',
+        category: 'Pairdraw'
+      }
     ])
     expect(manifest.contributes.menus?.['editor/title']).toEqual([
       { command: 'pairdraw.toggleDesignMode', when: 'resourceExtname == .pen', group: 'navigation' }

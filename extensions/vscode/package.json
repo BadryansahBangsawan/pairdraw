@@ -24,7 +24,10 @@
   "activationEvents": [
     "onCustomEditor:pairdraw.fig",
     "onCustomEditor:pairdraw.pen",
-    "onCommand:pairdraw.toggleDesignMode"
+    "onCommand:pairdraw.toggleDesignMode",
+    "onCommand:pairdraw.openEditor",
+    "onCommand:pairdraw.exportSelection",
+    "onView:pairdraw.sidebar"
   ],
   "contributes": {
     "customEditors": [
@@ -54,6 +57,16 @@
         "command": "pairdraw.toggleDesignMode",
         "title": "Toggle Design Mode",
         "category": "Pairdraw"
+      },
+      {
+        "command": "pairdraw.openEditor",
+        "title": "Open Pairdraw Editor",
+        "category": "Pairdraw"
+      },
+      {
+        "command": "pairdraw.exportSelection",
+        "title": "Export Selection as PNG",
+        "category": "Pairdraw"
       }
     ],
     "menus": {
@@ -75,6 +88,24 @@
           "markdownDescription": "URL of the running Pairdraw web editor that the custom editor loads. Use an `https` URL, or `http` on loopback for a local `bun run dev` server."
         }
       }
+    },
+    "viewContainers": {
+      "activitybar": [
+        {
+          "id": "pairdraw",
+          "title": "Pairdraw",
+          "icon": "media/pairdraw.svg"
+        }
+      ]
+    },
+    "views": {
+      "pairdraw": [
+        {
+          "id": "pairdraw.sidebar",
+          "name": "Actions",
+          "type": "webview"
+        }
+      ]
     }
   },
   "engines": {

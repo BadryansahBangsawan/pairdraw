@@ -2,7 +2,9 @@ import { randomBytes } from 'node:crypto'
 
 import * as vscode from 'vscode'
 
-import { embedWebviewHtml, parseEditorUrl, DEFAULT_EDITOR_URL } from '../webview/html'
+import type { ExtensionHost } from '../host'
+import { vscodeHost } from '../vscode-host'
+import { embedWebviewHTML, parseEditorURL, DEFAULT_EDITOR_URL } from '../webview/html'
 import { EditorSession } from './session'
 
 export interface FigDocument extends vscode.CustomDocument {
@@ -18,13 +20,14 @@ export class FigEditorProvider implements vscode.CustomEditorProvider<FigDocumen
   static readonly viewType = 'pairdraw.fig'
 
   private readonly sessions = new Map<string, EditorSession>()
-  private readonly changes = new vscode.EventEmitter<
-    vscode.CustomDocumentEditEvent<FigDocument>
-  >()
+  private readonly changes = new vscode.EventEmitter<vscode.CustomDocumentEditEvent<FigDocument>>()
 
   readonly onDidChangeCustomDocument = this.changes.event
 
-  constructor(private readonly extensionUri: vscode.Uri) {}
+  constructor(
+    private readonly extensionURI: vscode.Uri,
+    private readonly host: ExtensionHost = vscodeHost
+  ) {}
 
   openCustomDocument(uri: vscode.Uri): FigDocument {
     return { uri, dispose: () => undefined }
@@ -37,27 +40,27 @@ export class FigEditorProvider implements vscode.CustomEditorProvider<FigDocumen
   ): void {
     const configured =
       vscode.workspace.getConfiguration('pairdraw').get<string>('editorUrl') ?? DEFAULT_EDITOR_URL
-    const editorUrl = parseEditorUrl(configured)
+    const editorURL = parseEditorURL(configured)
     panel.webview.options = {
       enableScripts: true,
-      localResourceRoots: [vscode.Uri.joinPath(this.extensionUri, 'dist')]
+      localResourceRoots: [vscode.Uri.joinPath(this.extensionURI, 'dist')]
     }
-    if (!editorUrl) {
-      panel.webview.html = errorHtml(`pairdraw.editorUrl is not an http(s) URL: ${configured}`)
+    if (!editorURL) {
+      panel.webview.html = errorHTML(`pairdraw.editorUrl is not an http(s) URL: ${configured}`)
       return
     }
     const nonce = randomBytes(16).toString('hex')
-    panel.webview.html = embedWebviewHtml({
+    panel.webview.html = embedWebviewHTML({
       cspSource: panel.webview.cspSource,
       scriptUri: panel.webview
-        .asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview.js'))
+        .asWebviewUri(vscode.Uri.joinPath(this.extensionURI, 'dist', 'webview.js'))
         .toString(),
-      editorUrl: editorUrl.toString(),
+      editorUrl: editorURL.toString(),
       nonce
     })
-    const session = new EditorSession(document, panel, (edited) =>
+    const session = new EditorSession(this.host, document, panel, (edited: vscode.CustomDocument) =>
       this.changes.fire({
-        document: edited as FigDocument,
+        document: edited,
         label: 'Edit document',
         undo: () => this.reveal(edited.uri),
         redo: () => this.reveal(edited.uri)
@@ -104,6 +107,11 @@ export class FigEditorProvider implements vscode.CustomEditorProvider<FigDocumen
     }))
   }
 
+  /** The open session for a document, so commands can ask the editor for its selection. */
+  sessionFor(uri: vscode.Uri): EditorSession | undefined {
+    return this.sessions.get(uri.toString())
+  }
+
   dispose(): void {
     this.changes.dispose()
   }
@@ -114,10 +122,7 @@ export class FigEditorProvider implements vscode.CustomEditorProvider<FigDocumen
   }
 }
 
-function errorHtml(message: string): string {
-  const escaped = message
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
+function errorHTML(message: string): string {
+  const escaped = message.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
   return `<!DOCTYPE html><html lang="en"><body><p>Pairdraw: ${escaped}</p></body></html>`
 }

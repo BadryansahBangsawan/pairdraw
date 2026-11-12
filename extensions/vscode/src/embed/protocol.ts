@@ -63,3 +63,14 @@ export const embedDocumentSchema = v.object({
 })
 
 export type EmbedDocument = v.InferOutput<typeof embedDocumentSchema>
+
+/** The image formats `exportImage` rasterizes; the app owns the canonical list. */
+export const EMBED_IMAGE_FORMATS = ['PNG', 'JPG', 'WEBP'] as const
+export type EmbedImageFormat = (typeof EMBED_IMAGE_FORMATS)[number]
+
+export const embedImageSchema = v.object({
+  data: v.union([v.instance(Uint8Array), v.instance(ArrayBuffer)]),
+  mimeType: v.string()
+})
+
+export type EmbedImage = v.InferOutput<typeof embedImageSchema>

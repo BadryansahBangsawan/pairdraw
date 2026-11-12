@@ -1,13 +1,18 @@
 import { describe, expect, test } from 'bun:test'
 
-import { DEFAULT_EDITOR_URL, embedWebviewHtml, parseEditorUrl } from '../../src/webview/html'
+import { DEFAULT_EDITOR_URL, embedWebviewHTML, parseEditorURL } from '#vscode/webview/html'
 
 const NONCE = 'abc123'
 const SCRIPT_URI = 'vscode-webview-resource://abc/dist/webview.js'
 const CSP_SOURCE = 'vscode-webview-resource://abc'
 
-function render(editorUrl = DEFAULT_EDITOR_URL): string {
-  return embedWebviewHtml({ cspSource: CSP_SOURCE, scriptUri: SCRIPT_URI, editorUrl, nonce: NONCE })
+function render(configuredEditorURL = DEFAULT_EDITOR_URL): string {
+  return embedWebviewHTML({
+    cspSource: CSP_SOURCE,
+    scriptUri: SCRIPT_URI,
+    editorUrl: configuredEditorURL,
+    nonce: NONCE
+  })
 }
 
 describe('webview page', () => {
@@ -29,6 +34,7 @@ describe('webview page', () => {
     for (const refused of [
       'http://remote.example',
       'file:///etc/passwd',
+      // eslint-disable-next-line no-script-url -- Reject script URLs at the framing boundary.
       'javascript:alert(1)',
       'vscode-webview://abc',
       'not a url'
@@ -38,10 +44,10 @@ describe('webview page', () => {
   })
 
   test('accepts https anywhere and http only on loopback', () => {
-    expect(parseEditorUrl('https://editor.example/sub')?.origin).toBe('https://editor.example')
-    expect(parseEditorUrl('http://localhost:1420')?.origin).toBe('http://localhost:1420')
-    expect(parseEditorUrl('http://127.0.0.1:1420')?.origin).toBe('http://127.0.0.1:1420')
-    expect(parseEditorUrl('http://[::1]:1420')?.origin).toBe('http://[::1]:1420')
-    expect(parseEditorUrl('http://192.168.1.2:1420')).toBeNull()
+    expect(parseEditorURL('https://editor.example/sub')?.origin).toBe('https://editor.example')
+    expect(parseEditorURL('http://localhost:1420')?.origin).toBe('http://localhost:1420')
+    expect(parseEditorURL('http://127.0.0.1:1420')?.origin).toBe('http://127.0.0.1:1420')
+    expect(parseEditorURL('http://[::1]:1420')?.origin).toBe('http://[::1]:1420')
+    expect(parseEditorURL('http://192.168.1.2:1420')).toBeNull()
   })
 })

@@ -1,7 +1,7 @@
 /** The editor URL the extension loads when the user has not configured another one. */
 export const DEFAULT_EDITOR_URL = 'http://localhost:1420'
 
-export interface WebviewHtmlOptions {
+export interface WebviewHTMLOptions {
   /** `webview.cspSource`, the only resource origin the script may come from. */
   cspSource: string
   /** The built `webview.js`, as a webview URI. */
@@ -11,7 +11,7 @@ export interface WebviewHtmlOptions {
 }
 
 /** A URL the extension may frame: `https`, or plain `http` on loopback for a local dev server. */
-export function parseEditorUrl(value: string): URL | null {
+export function parseEditorURL(value: string): URL | null {
   let url: URL
   try {
     url = new URL(value)
@@ -27,7 +27,7 @@ function isLoopback(hostname: string): boolean {
   return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]'
 }
 
-function escapeHtml(value: string): string {
+function escapeHTML(value: string): string {
   return value
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
@@ -40,8 +40,8 @@ function escapeHtml(value: string): string {
  * The URL travels in a data attribute so the script can add the webview's own origin, which only
  * the page knows.
  */
-export function embedWebviewHtml(options: WebviewHtmlOptions): string {
-  const editor = parseEditorUrl(options.editorUrl)
+export function embedWebviewHTML(options: WebviewHTMLOptions): string {
+  const editor = parseEditorURL(options.editorUrl)
   if (!editor) throw new Error(`pairdraw.editorUrl is not an http(s) URL: ${options.editorUrl}`)
   const csp = [
     "default-src 'none'",
@@ -55,7 +55,7 @@ export function embedWebviewHtml(options: WebviewHtmlOptions): string {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="${escapeHtml(csp)}">
+<meta http-equiv="Content-Security-Policy" content="${escapeHTML(csp)}">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pairdraw</title>
 <style nonce="${options.nonce}">
@@ -64,8 +64,8 @@ iframe { display: block; }
 </style>
 </head>
 <body>
-<iframe id="editor" data-editor-url="${escapeHtml(options.editorUrl)}" allow="clipboard-read; clipboard-write" title="Pairdraw editor"></iframe>
-<script nonce="${options.nonce}" src="${escapeHtml(options.scriptUri)}"></script>
+<iframe id="editor" data-editor-url="${escapeHTML(options.editorUrl)}" allow="clipboard-read; clipboard-write" title="Pairdraw editor"></iframe>
+<script nonce="${options.nonce}" src="${escapeHTML(options.scriptUri)}"></script>
 </body>
 </html>
 `

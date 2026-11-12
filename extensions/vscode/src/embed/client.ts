@@ -6,11 +6,13 @@ import {
   embedConnectedSchema,
   embedDocumentSchema,
   embedEventSchema,
+  embedImageSchema,
   embedLoadResultSchema,
   embedReadySchema,
   embedResponseSchema,
   type EmbedDocumentFormat,
-  type EmbedEvent
+  type EmbedEvent,
+  type EmbedImageFormat
 } from './protocol'
 
 /** The embedding page's window, narrowed so tests need no frames. */
@@ -134,22 +136,32 @@ export class EmbedClient {
     return v.parse(embedLoadResultSchema, await this.request('load', { name, data }))
   }
 
-  async getDocument(format: EmbedDocumentFormat = 'fig'): Promise<{ name: string; data: Uint8Array }> {
-    const document = v.parse(
-      embedDocumentSchema,
-      await this.request('getDocument', { format })
-    )
+  async getDocument(
+    format: EmbedDocumentFormat = 'fig'
+  ): Promise<{ name: string; data: Uint8Array }> {
+    const document = v.parse(embedDocumentSchema, await this.request('getDocument', { format }))
     return {
       name: document.name,
-      data:
-        document.data instanceof Uint8Array
-          ? document.data
-          : new Uint8Array(document.data)
+      data: document.data instanceof Uint8Array ? document.data : new Uint8Array(document.data)
     }
   }
 
   async setEditable(editable: boolean): Promise<void> {
     await this.request('setEditable', { editable })
+  }
+
+  /**
+   * Rasterizes the given layers, or the editor's own selection when none are named, and returns
+   * the bytes with the MIME type the editor reports for them.
+   */
+  async exportImage(
+    options: { nodeIds?: string[]; format?: EmbedImageFormat; scale?: number } = {}
+  ): Promise<{ data: Uint8Array; mimeType: string }> {
+    const image = v.parse(embedImageSchema, await this.request('exportImage', options))
+    return {
+      data: image.data instanceof Uint8Array ? image.data : new Uint8Array(image.data),
+      mimeType: image.mimeType
+    }
   }
 
   /** Listens for the editor's events until the returned function is called. */
@@ -194,6 +206,9 @@ export class EmbedClient {
     this.pending.delete(id)
     clearTimeout(pending.timer)
     if (response.output.ok) pending.resolve(response.output.result)
-    else pending.reject(new EmbedClientError(response.output.error.code, response.output.error.message))
+    else
+      pending.reject(
+        new EmbedClientError(response.output.error.code, response.output.error.message)
+      )
   }
 }

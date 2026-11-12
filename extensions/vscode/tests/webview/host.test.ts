@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
-import { fromUint8Array, toUint8Array } from 'js-base64'
 
-import type { EmbedEvent } from '../../src/embed/protocol'
-import { startWebviewHost, type HostMessage, type WebviewTransport } from '../../src/webview/host'
-import type { WebviewMessage } from '../../src/webview/messages'
+import type { EmbedEvent } from '#vscode/embed/protocol'
+import { startWebviewHost, type HostMessage, type WebviewTransport } from '#vscode/webview/host'
+import type { WebviewMessage } from '#vscode/webview/messages'
+import { fromUint8Array, toUint8Array } from 'js-base64'
 
 function createTransport() {
   let listener: (message: unknown) => void = () => undefined
@@ -29,11 +29,13 @@ function createClient(document: { name: string; data: Uint8Array }) {
   const loaded: { name: string; data: Uint8Array }[] = []
   const editable: boolean[] = []
   const formats: string[] = []
+  const exports: unknown[] = []
   let emit: (event: EmbedEvent) => void = () => undefined
   return {
     loaded,
     editable,
     formats,
+    exports,
     client: {
       load: (name: string, data: Uint8Array) => {
         loaded.push({ name, data })
@@ -46,6 +48,10 @@ function createClient(document: { name: string; data: Uint8Array }) {
       setEditable: (value: boolean) => {
         editable.push(value)
         return Promise.resolve()
+      },
+      exportImage: (options: unknown) => {
+        exports.push(options)
+        return Promise.resolve({ data: new Uint8Array([9, 255]), mimeType: 'image/png' })
       },
       onEvent: (listener: (event: EmbedEvent) => void) => {
         emit = listener
@@ -61,7 +67,8 @@ function createClient(document: { name: string; data: Uint8Array }) {
 const HOST_MESSAGES: HostMessage[] = [
   { type: 'load', name: 'drawing.fig', data: fromUint8Array(new Uint8Array([1, 2, 3])) },
   { type: 'save', id: 4 },
-  { type: 'setEditable', editable: false }
+  { type: 'setEditable', editable: false },
+  { type: 'export', id: 7, format: 'WEBP', scale: 2 }
 ]
 
 describe('webview host bridge', () => {
@@ -98,6 +105,24 @@ describe('webview host bridge', () => {
     await Promise.resolve()
     expect(fakeClient.editable).toEqual([false])
     expect(fake.posted).toEqual([{ type: 'editable', editable: false }])
+  })
+
+  test('answers an export request with the editor image as base64', async () => {
+    const fake = createTransport()
+    const fakeClient = createClient({ name: 'a.fig', data: new Uint8Array() })
+    startWebviewHost({ transport: fake.transport, client: fakeClient.client })
+    fake.send(HOST_MESSAGES[3])
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(fakeClient.exports).toEqual([{ format: 'WEBP', scale: 2 }])
+    expect(fake.posted).toEqual([
+      {
+        type: 'exported',
+        id: 7,
+        mimeType: 'image/png',
+        data: fromUint8Array(new Uint8Array([9, 255]))
+      }
+    ])
   })
 
   test('reports a failed request with its message instead of a result', async () => {

@@ -638,6 +638,10 @@
         "packages/core/src/io/formats/fig/export/index.ts",
         "packages/core/src/io/formats/fig/export/worker.ts",
         "packages/core/src/kiwi/fig/parse/worker.ts",
+        "extensions/vscode/src/embed/client.ts",
+        "extensions/vscode/src/fig/session.ts",
+        "extensions/vscode/src/webview/main.ts",
+        "extensions/vscode/tests/embed/client.test.ts",
         "src/app/code/sandbox/frame.ts",
         "src/app/code/sandbox/worker/index.ts"
       ],

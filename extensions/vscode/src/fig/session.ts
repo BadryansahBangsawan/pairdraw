@@ -1,16 +1,24 @@
 import { fromUint8Array, toUint8Array } from 'js-base64'
 import * as v from 'valibot'
-import * as vscode from 'vscode'
+import type * as vscode from 'vscode'
 
+import type { EmbedImageFormat } from '../embed/protocol'
+import type { ExtensionHost } from '../host'
 import { webviewMessageSchema, type WebviewMessage } from '../webview/messages'
 import { documentFormat } from './formats'
 
 type SavedMessage = Extract<WebviewMessage, { type: 'saved' }>
+type ExportedMessage = Extract<WebviewMessage, { type: 'exported' }>
 
-interface PendingSave {
+interface PendingRequest<T> {
   id: number
-  resolve: (message: SavedMessage) => void
+  resolve: (message: T) => void
   reject: (error: Error) => void
+}
+
+interface ExportOptions {
+  format?: EmbedImageFormat
+  scale?: number
 }
 
 /**
@@ -20,24 +28,26 @@ interface PendingSave {
  */
 export class EditorSession implements vscode.Disposable {
   private readonly disposables: vscode.Disposable[] = []
-  private pendingSave: PendingSave | null = null
-  private nextSaveId = 1
+  private pendingSave: PendingRequest<SavedMessage> | null = null
+  private pendingExport: PendingRequest<ExportedMessage> | null = null
+  private nextRequestId = 1
   private dirty = false
 
   constructor(
+    private readonly host: ExtensionHost,
     private readonly document: vscode.CustomDocument,
     private readonly panel: vscode.WebviewPanel,
     private readonly onEdited: (document: vscode.CustomDocument) => void
   ) {
-    this.disposables.push(
-      panel.webview.onDidReceiveMessage((raw: unknown) => this.onMessage(raw))
-    )
+    this.disposables.push(panel.webview.onDidReceiveMessage((raw: unknown) => this.onMessage(raw)))
   }
 
   dispose(): void {
     for (const disposable of this.disposables) disposable.dispose()
     this.pendingSave?.reject(new Error('The editor closed before the save finished'))
     this.pendingSave = null
+    this.pendingExport?.reject(new Error('The editor closed before the export finished'))
+    this.pendingExport = null
   }
 
   /** Brings the editor panel forward; the embed app keeps its own undo history. */
@@ -47,7 +57,7 @@ export class EditorSession implements vscode.Disposable {
 
   /** Loads the bytes on disk into the editor, replacing whatever it showed. */
   async reload(): Promise<void> {
-    const bytes = await vscode.workspace.fs.readFile(this.document.uri)
+    const bytes = await this.host.readFile(this.document.uri)
     this.panel.webview.postMessage({
       type: 'load',
       name: fileName(this.document.uri),
@@ -62,13 +72,30 @@ export class EditorSession implements vscode.Disposable {
    */
   async save(destination: vscode.Uri = this.document.uri): Promise<void> {
     if (this.pendingSave) throw new Error('A save is already running')
-    const id = this.nextSaveId++
+    const id = this.nextRequestId++
     const message = await new Promise<SavedMessage>((resolve, reject) => {
       this.pendingSave = { id, resolve, reject }
       this.panel.webview.postMessage({ type: 'save', id, format: documentFormat(destination.path) })
     })
-    await vscode.workspace.fs.writeFile(destination, toUint8Array(message.data))
+    await this.host.writeFile(destination, toUint8Array(message.data))
     this.dirty = false
+  }
+
+  /**
+   * Asks the editor for its current selection as an image. The editor writes the bytes, so the
+   * extension never parses a document to export it.
+   */
+  async exportSelection(
+    options: ExportOptions = {}
+  ): Promise<{ data: Uint8Array; mimeType: string }> {
+    if (this.pendingExport) throw new Error('An export is already running')
+    const id = this.nextRequestId++
+    const message = await new Promise<ExportedMessage>((resolve, reject) => {
+      this.pendingExport = { id, resolve, reject }
+      this.panel.webview.postMessage({ type: 'export', id, ...options })
+    })
+    this.pendingExport = null
+    return { data: toUint8Array(message.data), mimeType: message.mimeType }
   }
 
   private onMessage(raw: unknown): void {
@@ -92,11 +119,21 @@ export class EditorSession implements vscode.Disposable {
       pending.resolve(message)
       return
     }
+    if (message.type === 'exported') {
+      const pending = this.pendingExport
+      if (!pending || pending.id !== message.id) return
+      this.pendingExport = null
+      pending.resolve(message)
+      return
+    }
     if (message.type === 'error') {
-      const pending = this.pendingSave
+      const pendingSave = this.pendingSave
+      const pendingExport = this.pendingExport
       this.pendingSave = null
-      pending?.reject(new Error(message.message))
-      void vscode.window.showErrorMessage(`Pairdraw: ${message.message}`)
+      this.pendingExport = null
+      pendingSave?.reject(new Error(message.message))
+      pendingExport?.reject(new Error(message.message))
+      this.host.showError(`Pairdraw: ${message.message}`)
     }
   }
 }

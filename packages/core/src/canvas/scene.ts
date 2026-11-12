@@ -5,7 +5,8 @@ import {
   type SceneNode,
   type SceneGraph,
   type Fill,
-  type ShadowEffect
+  type ShadowEffect,
+  type ShaderEffect
 } from '@open-pencil/scene-graph'
 import {
   arrowCapOverflow,
@@ -42,6 +43,7 @@ import {
   effectRasterScaleMatches
 } from './renderer/effect-raster-cache'
 import { mapVisualBounds, subtreeVisualBounds } from './renderer/visual-bounds'
+import { drawShaderEffectLayer } from './shaders/effect'
 import { isolatesInnerShadows, renderLayerShadows } from './shadows'
 import { isLayerContainer } from './shadows/silhouette'
 import {
@@ -368,8 +370,7 @@ export function renderNode(
   }
 
   const layerBlur = node.effects.find(
-    (e): e is ShadowEffect =>
-      e.visible && (e.type === 'LAYER_BLUR' || e.type === 'FOREGROUND_BLUR')
+    (e): e is ShadowEffect => e.visible && (e.type === 'LAYER_BLUR' || e.type === 'FOREGROUND_BLUR')
   )
   if (layerBlur) {
     // Entry guard: reset shared paint to known state
@@ -393,18 +394,37 @@ export function renderNode(
 
   applyNodeTransforms(canvas, node, overlays)
   renderLayerShadows(r, canvas, graph, node, 'behind')
-  renderNodeContent(r, canvas, graph, node, overlays)
-  drawLayoutGrids(r, canvas, node)
-  renderChildren(
-    r,
-    canvas,
-    graph,
-    node,
-    overlays,
-    absX,
-    absY,
-    hasTransformedAncestor || hasNodeTransform(projectedNode(node, overlays.rotationPreview))
-  )
+  const shaderEffect = node.effects.find((e): e is ShaderEffect => e.visible && e.type === 'SHADER')
+  const drawsShaderEffect =
+    shaderEffect !== undefined &&
+    drawShaderEffectLayer(r, canvas, graph, node, shaderEffect, (offscreen) => {
+      renderNodeContent(r, offscreen, graph, node, overlays)
+      drawLayoutGrids(r, offscreen, node)
+      renderChildren(
+        r,
+        offscreen,
+        graph,
+        node,
+        overlays,
+        absX,
+        absY,
+        hasTransformedAncestor || hasNodeTransform(projectedNode(node, overlays.rotationPreview))
+      )
+    })
+  if (!drawsShaderEffect) {
+    renderNodeContent(r, canvas, graph, node, overlays)
+    drawLayoutGrids(r, canvas, node)
+    renderChildren(
+      r,
+      canvas,
+      graph,
+      node,
+      overlays,
+      absX,
+      absY,
+      hasTransformedAncestor || hasNodeTransform(projectedNode(node, overlays.rotationPreview))
+    )
+  }
   renderLayerShadows(r, canvas, graph, node, 'front')
 
   if (layerBlur) {

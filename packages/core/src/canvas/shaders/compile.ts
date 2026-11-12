@@ -9,11 +9,12 @@ import type { CanvasKit, RuntimeEffect } from 'canvaskit-wasm'
 import type { Vector } from '@open-pencil/scene-graph/primitives'
 import {
   parseShaderUniforms,
+  type ShaderAutomaticInput,
   type ShaderUniform,
   type ShaderUniformValue
 } from '@open-pencil/scene-graph/shaders'
 
-import { FRAME_HEIGHT_UNIFORM, translateShader } from './translate'
+import { FRAME_HEIGHT_UNIFORM, OBJECT_SIZE_UNIFORM, translateShader } from './translate'
 
 /** A shader source with its compiled effect, or why it could not compile. */
 export interface CompiledShader {
@@ -72,9 +73,14 @@ export function packShaderUniforms(
   for (let index = 0; index < effect.getUniformCount(); index++) {
     const name = effect.getUniformName(index)
     const slot = effect.getUniform(index).slot
-    // The translator's own uniform, which the user never declares.
+    // The translator's own uniforms, which the user never declares.
     if (name === FRAME_HEIGHT_UNIFORM) {
       packed[slot] = frame.height
+      continue
+    }
+    if (name === OBJECT_SIZE_UNIFORM) {
+      packed[slot] = frame.width
+      packed[slot + 1] = frame.height
       continue
     }
     const uniform = declared.get(name)
@@ -120,7 +126,11 @@ export function compileShader(ck: CanvasKit, source: string): CompiledShader {
     cache.set(source, failed)
     return failed
   }
-  const translation = translateShader(source)
+  const samplerKinds: Record<string, ShaderAutomaticInput | undefined> = {}
+  for (const uniform of parsed.uniforms) {
+    if (uniform.kind === 'sampler') samplerKinds[uniform.name] = uniform.automatic
+  }
+  const translation = translateShader(source, samplerKinds)
   if (translation.error) {
     const failed: CompiledShader = {
       source,

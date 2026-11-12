@@ -5,6 +5,8 @@
  * and its error reaches the panel.
  */
 
+import type { ShaderAutomaticInput } from '@open-pencil/scene-graph/shaders'
+
 /** One translated shader, or the reason it cannot be translated. */
 export interface ShaderTranslation {
   sksl: string
@@ -16,6 +18,12 @@ const SDF_SIZE = 128
 
 /** The uniform the entry point flips y about, which keeps GLSL's y-up coordinates: frame height. */
 export const FRAME_HEIGHT_UNIFORM = 'u_ompFrameHeight'
+
+/**
+ * The frame size the translator supplies so an `@object` sample maps a uv to the layer's own
+ * pixels, which is what an effect's snapshot texture spans.
+ */
+export const OBJECT_SIZE_UNIFORM = 'u_ompFrameSize'
 
 /**
  * GLSL declarations SkSL spells differently. A `sampler2D` uniform is a child shader, and its
@@ -70,11 +78,11 @@ function splitArguments(body: string): [string, string] | null {
 }
 
 /**
- * Rewrites every `texture2D(sampler, coordinates)` into an SDF sample. SkSL child shaders take
- * coordinates in the child's own pixels, and the frame is `SDF_SIZE` square, so a uv coordinate
- * scales to it.
+ * Rewrites every `texture2D(sampler, coordinates)` into a child-shader sample. SkSL child shaders
+ * take coordinates in the child's own pixels, so a uv coordinate scales to the child texture's
+ * size; `sizes` holds that scale as a SkSL expression per sampler name.
  */
-function rewriteSamples(text: string): string {
+function rewriteSamples(text: string, sizes: Readonly<Record<string, string>>): string {
   let output = ''
   let at = 0
   for (;;) {
@@ -91,7 +99,8 @@ function rewriteSamples(text: string): string {
     } else {
       const sampler = args[0].trim()
       const coordinates = args[1].trim()
-      output += `float4(${sampler}.eval((${coordinates}) * ${SDF_SIZE}.0))`
+      const scale = sizes[sampler] ?? `${SDF_SIZE}.0`
+      output += `float4(${sampler}.eval((${coordinates}) * ${scale}))`
     }
     at = close
   }
@@ -103,20 +112,32 @@ function rewriteSamples(text: string): string {
  * counts y up from the bottom, while the canvas counts it down, so the entry point flips y about
  * the frame height, which the renderer supplies as `u_ompFrameHeight`.
  */
-export function translateShader(source: string): ShaderTranslation {
+export function translateShader(
+  source: string,
+  samplerKinds: Readonly<Record<string, ShaderAutomaticInput | undefined>> = {}
+): ShaderTranslation {
   let text = stripDirectives(source)
   if (!/void\s+main\s*\(\s*\)/.test(text)) {
     return { sksl: '', error: 'A shader must define `void main()`' }
   }
 
+  const sizes: Record<string, string> = {}
+  let object = false
+  for (const [name, kind] of Object.entries(samplerKinds)) {
+    if (kind !== 'object') continue
+    sizes[name] = OBJECT_SIZE_UNIFORM
+    object = true
+  }
+
   text = rewriteTypes(text)
-  text = rewriteSamples(text)
+  text = rewriteSamples(text, sizes)
   text = text.replace(/\bgl_FragCoord\b/g, 'u_fragCoord')
   text = text.replace(/\bgl_FragColor\b/g, 'u_fragColor')
   text = text.replace(/void\s+main\s*\(\s*\)/, 'void userMain(float2 u_fragCoord)')
 
+  const frameSize = object ? `uniform float2 ${OBJECT_SIZE_UNIFORM};\n` : ''
   const sksl = `uniform float ${FRAME_HEIGHT_UNIFORM};
-float4 u_fragColor = float4(0.0);
+${frameSize}float4 u_fragColor = float4(0.0);
 ${text}
 half4 main(float2 u_fragCoord) {
   userMain(float2(u_fragCoord.x, ${FRAME_HEIGHT_UNIFORM} - u_fragCoord.y));

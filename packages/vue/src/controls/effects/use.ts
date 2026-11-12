@@ -8,6 +8,7 @@ import {
   createEffectControlActions,
   createEffectEditActions,
   isShadow,
+  isShadowEffect,
   type EffectEditSnapshot
 } from '#vue/controls/effects/helpers'
 import { useNodeProps } from '#vue/controls/node-props/use'
@@ -33,6 +34,7 @@ export function useEffectsControls() {
     effectOptions: EFFECT_OPTIONS,
     createDefaultEffect,
     isShadow,
+    isShadowEffect,
     /** Previews a change to one effect on every selected layer. */
     scrubEffect: (index: number, changes: Partial<Effect>) =>
       editActions.scrubEffect(nodes.value, index, changes),

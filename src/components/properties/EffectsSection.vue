@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import type { Effect, Fill } from '@open-pencil/scene-graph'
+import type { Effect, Fill, ShadowEffect, ShaderEffect } from '@open-pencil/scene-graph'
 import { useEffectsControls } from '@open-pencil/vue/controls/effects'
 import { useI18n } from '@open-pencil/vue/i18n'
+import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
 
+import { useEditorStore } from '@/app/editor/active-store'
 import ColorInput from '@/components/ColorPicker/ColorInput.vue'
 import NumberField from '@/components/inputs/NumberField.vue'
 import {
@@ -11,6 +13,7 @@ import {
 } from '@/components/properties/blend-mode/use'
 import PropertyItemRow from '@/components/properties/item-list/PropertyItemRow.vue'
 import PropertyListRoot from '@/components/properties/PropertyListRoot.vue'
+import ShaderEffectEditor from '@/components/properties/shader-effect/ShaderEffectEditor.vue'
 import { useSharedStylePicker } from '@/components/properties/shared-style/useSharedStylePicker'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import Tip from '@/components/ui/overlay/Tip.vue'
@@ -22,6 +25,9 @@ import AppSelect from '@/components/ui/select/AppSelect.vue'
 const effectsCtx = useEffectsControls()
 const { panels } = useI18n()
 const blendModeGroups = useBlendModeGroups()
+const store = useEditorStore()
+/** The variables a shader effect's inputs may follow. */
+const shaderVariables = useSceneComputed(() => [...store.graph.variables.values()])
 const {
   visible: stylesVisible,
   hasStyle,
@@ -30,7 +36,7 @@ const {
   update: updateStyle
 } = useSharedStylePicker('effect')
 
-function effectPreview(effect: Effect): Fill {
+function effectPreview(effect: ShadowEffect): Fill {
   return {
     type: 'SOLID',
     color: effect.color,
@@ -115,7 +121,7 @@ function effectPreview(effect: Effect): Fill {
                   @click="effectsCtx.toggleExpand(index)"
                 >
                   <FillSwatch
-                    v-if="effectsCtx.isShadow(effect.type)"
+                    v-if="effectsCtx.isShadowEffect(effect)"
                     :fill="effectPreview(effect)"
                     class="size-full border-0"
                   />
@@ -155,7 +161,17 @@ function effectPreview(effect: Effect): Fill {
               "
             />
           </PanelFieldGroup>
-          <template v-if="effectsCtx.isShadow(effect.type)">
+          <ShaderEffectEditor
+            v-if="effect.type === 'SHADER'"
+            :effect="effect"
+            :variables="shaderVariables"
+            :code-error="store.shaderCodeError(effect.source)"
+            @patch="
+              (changes: Partial<ShaderEffect>) =>
+                commitDiscretePropertyListChange(flush, () => actions.patch(index, changes))
+            "
+          />
+          <template v-else-if="effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW'">
             <div class="flex items-center gap-1.5">
               <Tip :label="panels.xAxis">
                 <NumberField

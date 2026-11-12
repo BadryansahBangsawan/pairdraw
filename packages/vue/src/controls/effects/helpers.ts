@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
 
 import type { Editor } from '@open-pencil/core'
-import type { Effect, SceneNode } from '@open-pencil/scene-graph'
+import type { Effect, SceneNode, ShadowEffect } from '@open-pencil/scene-graph'
 import { copyEffects } from '@open-pencil/scene-graph/copy'
 import type { Color } from '@open-pencil/scene-graph/primitives'
 
@@ -16,8 +16,20 @@ const EFFECT_LABELS: Record<string, string> = {
   INNER_SHADOW: panels.value.innerShadow,
   LAYER_BLUR: panels.value.layerBlur,
   BACKGROUND_BLUR: panels.value.backgroundBlur,
-  FOREGROUND_BLUR: panels.value.foregroundBlur
+  FOREGROUND_BLUR: panels.value.foregroundBlur,
+  SHADER: panels.value.shader
 }
+
+/** The code a new layer shader starts from: it tints the layer it sits on. */
+export const DEFAULT_SHADER_SOURCE = `uniform sampler2D layer; /* @object */
+uniform vec2 resolution; /* @resolution */
+uniform vec4 tint; /* @color @default #ff7a45 */
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / resolution;
+  vec4 color = texture2D(layer, uv);
+  gl_FragColor = vec4(mix(color.rgb, tint.rgb, tint.a), color.a);
+}`
 
 export const EFFECT_TYPES = Object.keys(EFFECT_LABELS) as EffectType[]
 export const EFFECT_OPTIONS = EFFECT_TYPES.map((t) => ({
@@ -25,8 +37,12 @@ export const EFFECT_OPTIONS = EFFECT_TYPES.map((t) => ({
   label: EFFECT_LABELS[t]
 }))
 
-export function isShadow(type: string) {
+export function isShadow(type: Effect['type']): type is ShadowEffect['type'] {
   return type === 'DROP_SHADOW' || type === 'INNER_SHADOW'
+}
+
+export function isShadowEffect(effect: Effect): effect is ShadowEffect {
+  return isShadow(effect.type)
 }
 
 export function createDefaultEffect(): Effect {
@@ -55,7 +71,7 @@ export function createEffectEditActions(
       const effects = [...node.effects]
       const current = effects.at(index)
       if (!current) continue
-      effects[index] = { ...current, ...changes }
+      effects[index] = { ...current, ...changes } as Effect
       editor.updateNode(node.id, { effects })
     }
     editor.requestRender()
@@ -102,15 +118,27 @@ export function createEffectControlActions(expandedIndex: Ref<number | null>) {
     type: EffectType
   ) {
     if (!node) return
-    const changes: Partial<Effect> = { type }
-    if (!isShadow(type)) {
-      changes.offset = { x: 0, y: 0 }
-      changes.spread = 0
-    } else if (!isShadow(node.effects[index].type)) {
-      changes.offset = { x: 0, y: 4 }
-      changes.spread = 0
+    const previous = node.effects[index]
+    if (type === 'SHADER') {
+      patch(
+        index,
+        previous.type === 'SHADER'
+          ? { type }
+          : { type, source: DEFAULT_SHADER_SOURCE, uniforms: {} }
+      )
+      return
     }
-    patch(index, changes)
+    // A shadow blurs away from the layer; a blur is centred on it. Switching between the two
+    // always rewrites the geometry, so the moment the type changes the offsets match it.
+    const shadow = isShadow(type)
+    const wasShadow = previous.type !== 'SHADER' && isShadow(previous.type)
+    let geometry: Partial<ShadowEffect> = {}
+    if (shadow !== wasShadow) {
+      geometry = shadow
+        ? { offset: { x: 0, y: 4 }, spread: 0 }
+        : { offset: { x: 0, y: 0 }, spread: 0 }
+    }
+    patch(index, { ...geometry, type })
   }
 
   function updateColor(

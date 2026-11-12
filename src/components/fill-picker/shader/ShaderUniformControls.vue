@@ -3,6 +3,7 @@ import { computed } from 'vue'
 
 import type { Variable, VariableType } from '@open-pencil/scene-graph'
 import { colorToHex, tryParseColor } from '@open-pencil/scene-graph/color'
+import { BLACK } from '@open-pencil/scene-graph/constants'
 import type { Color } from '@open-pencil/scene-graph/primitives'
 import type { ShaderUniform, ShaderUniformValue } from '@open-pencil/scene-graph/shaders'
 import { useI18n, useShaderMessages } from '@open-pencil/vue/i18n'
@@ -10,6 +11,7 @@ import { useI18n, useShaderMessages } from '@open-pencil/vue/i18n'
 import ColorPicker from '@/components/ColorPicker/ColorPicker.vue'
 import NumberField from '@/components/inputs/NumberField.vue'
 import { VariablePicker, type VariablePickerItem } from '@/components/ui/binding'
+import Tip from '@/components/ui/overlay/Tip.vue'
 import AppSwitch from '@/components/ui/toggle/AppSwitch.vue'
 
 /**
@@ -86,15 +88,7 @@ function booleanValue(uniform: ShaderUniform): boolean {
 function colorValue(uniform: ShaderUniform): Color {
   const value = values[uniform.name]
   const parsed = typeof value === 'string' ? tryParseColor(value) : null
-  return (
-    parsed ??
-    tryParseColor(String(uniform.default ?? '#000000')) ?? {
-      r: 0,
-      g: 0,
-      b: 0,
-      a: 1
-    }
-  )
+  return parsed ?? tryParseColor(String(uniform.default ?? '#000000')) ?? BLACK
 }
 
 function setColor(uniform: ShaderUniform, color: Color) {
@@ -115,11 +109,10 @@ function setVectorComponent(uniform: ShaderUniform, at: number, next: number) {
       v-for="{ uniform, selected, items, type } in pickers"
       :key="uniform.name"
       class="flex items-center gap-1.5"
-      :data-test-id="`shader-uniform-${uniform.name}`"
     >
-      <span class="min-w-0 flex-1 truncate text-xs" :title="uniform.name">
-        {{ uniform.label ?? uniform.name }}
-      </span>
+      <Tip :label="uniform.name" as-child truncated>
+        <span class="min-w-0 flex-1 truncate text-xs">{{ uniform.label ?? uniform.name }}</span>
+      </Tip>
 
       <NumberField
         v-if="uniform.kind === 'number'"

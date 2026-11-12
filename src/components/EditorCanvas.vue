@@ -26,6 +26,7 @@ import {
   SECTION_TITLE_HEIGHT
 } from '@open-pencil/core/constants'
 import type { ViewportTransform } from '@open-pencil/core/geometry'
+import { colorToCSS } from '@open-pencil/scene-graph/color'
 import { PlayIslands, useCanvasInput } from '@open-pencil/vue/canvas'
 import { useCanvasDrop } from '@open-pencil/vue/canvas/drop'
 import { useCanvasIssueMarkers } from '@open-pencil/vue/canvas/issues'
@@ -42,6 +43,7 @@ import { useEditorStore } from '@/app/editor/active-store'
 import { useCanvasCollaborationAwareness } from '@/app/editor/canvas/collaboration-awareness'
 import { createCanvasContextSelection } from '@/app/editor/canvas/context-selection'
 import { canvasOverlayObstacles } from '@/app/editor/canvas/obstacles'
+import { usePrototypeStage } from '@/app/editor/prototype/stage'
 import { useFollowView } from '@/app/presence/follow-view'
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { appPreferences } from '@/app/settings/preferences/store'
@@ -70,6 +72,7 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 
 const isActivePane = computed(() => !paneId || store.activePaneId.value === paneId)
 const followView = useFollowView(useTemplateRef<HTMLElement>('area'))
+const { letterbox } = usePrototypeStage(store, canvasRef)
 
 function activatePane() {
   if (paneId) store.setActivePane(paneId)
@@ -276,6 +279,9 @@ const cursor = computed(() =>
     issueMarkerCursor.value ?? statusLabelCursor.value ?? linkCursor.value ?? cursorOverride.value
   )
 )
+
+/** The page's color, which the parts around the played frame take so they read as the page. */
+const pageBackground = computed(() => ({ backgroundColor: colorToCSS(store.state.pageColor) }))
 </script>
 
 <template>
@@ -308,6 +314,20 @@ const cursor = computed(() =>
           class="absolute inset-0 block size-full touch-none outline-none"
         />
         <PlayIslands :view="paneView" :drawn="drawnView" :canvas="canvasRef" />
+        <div
+          v-for="(rect, index) in letterbox"
+          :key="index"
+          data-test-id="prototype-letterbox"
+          aria-hidden="true"
+          class="absolute z-20"
+          :style="{
+            ...pageBackground,
+            left: `${rect.left}px`,
+            top: `${rect.top}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`
+          }"
+        />
         <AppDropOverlay :visible="isDraggingOver" />
         <IssueMarkerTooltip :marker="hoveredIssueMarker" :canvas="canvasRef" />
         <StatusLabelMenu

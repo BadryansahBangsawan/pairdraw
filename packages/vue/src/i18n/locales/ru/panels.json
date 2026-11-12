@@ -756,6 +756,7 @@
   "changeFillColor": "Изменить цвет заливки",
   "prototype": "Прототип",
   "prototypeAddInteraction": "Добавить взаимодействие",
+  "prototypePlay": "Запустить",
   "prototypeRemoveInteraction": "Удалить взаимодействие",
   "prototypeTrigger": "Триггер",
   "prototypeTriggerOnClick": "По клику",

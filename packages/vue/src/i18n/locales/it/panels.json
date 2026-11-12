@@ -746,6 +746,7 @@
   "changeFillColor": "Cambia colore del riempimento",
   "prototype": "Prototipo",
   "prototypeAddInteraction": "Aggiungi interazione",
+  "prototypePlay": "Riproduci",
   "prototypeRemoveInteraction": "Rimuovi interazione",
   "prototypeTrigger": "Attivatore",
   "prototypeTriggerOnClick": "Al clic",

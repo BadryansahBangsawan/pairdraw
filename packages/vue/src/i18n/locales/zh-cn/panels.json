@@ -736,6 +736,7 @@
   "changeFillColor": "更改填充颜色",
   "prototype": "原型",
   "prototypeAddInteraction": "添加交互",
+  "prototypePlay": "播放",
   "prototypeRemoveInteraction": "移除交互",
   "prototypeTrigger": "触发",
   "prototypeTriggerOnClick": "点击时",

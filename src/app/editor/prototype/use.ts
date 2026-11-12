@@ -56,6 +56,7 @@ export function usePrototype() {
   return {
     reactions,
     targets,
+    play: () => store.startPlay(),
     add: () => commit(withReaction(reactions.value, createReaction()), 'Add interaction'),
     remove: (id: string) => commit(withoutReaction(reactions.value, id), 'Remove interaction'),
     setTriggerType: (id: string, type: PrototypeTriggerType) =>

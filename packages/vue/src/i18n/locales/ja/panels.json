@@ -736,6 +736,7 @@
   "changeFillColor": "塗りの色を変更",
   "prototype": "プロトタイプ",
   "prototypeAddInteraction": "インタラクションを追加",
+  "prototypePlay": "再生",
   "prototypeRemoveInteraction": "インタラクションを削除",
   "prototypeTrigger": "トリガー",
   "prototypeTriggerOnClick": "クリック時",

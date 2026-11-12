@@ -758,6 +758,7 @@ export const panelMessageDefaults = {
   /** Interactions from a layer to a frame: the prototype panel. */
   prototype: 'Prototype',
   prototypeAddInteraction: 'Add interaction',
+  prototypePlay: 'Play',
   prototypeRemoveInteraction: 'Remove interaction',
   prototypeTrigger: 'Trigger',
   prototypeTriggerOnClick: 'On click',

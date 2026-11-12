@@ -20,6 +20,7 @@ const { panels } = useI18n()
 const {
   reactions,
   targets,
+  play,
   add,
   remove,
   setTriggerType,
@@ -61,6 +62,14 @@ function node(reaction: PrototypeReaction): PrototypeNodeAction | null {
 <template>
   <PanelSection :label="panels.prototype" :empty="reactions.length === 0" class="pt-1">
     <template #actions>
+      <IconButton
+        v-if="targets.length > 0"
+        :label="panels.prototypePlay"
+        data-property="prototype-play"
+        @click="play"
+      >
+        <icon-lucide-play class="size-3.5" />
+      </IconButton>
       <IconButton
         :label="panels.prototypeAddInteraction"
         data-property="prototype-add"

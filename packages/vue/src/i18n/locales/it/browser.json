@@ -28,5 +28,6 @@
   "pickCancelled": "La selezione è stata annullata.",
   "shotVisible": "Istantanea della vista",
   "shotFull": "Istantanea della pagina",
-  "shotElement": "Istantanea di un elemento"
+  "shotElement": "Istantanea di un elemento",
+  "elementOnPage": "Elemento su {page}"
 }

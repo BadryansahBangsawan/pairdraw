@@ -28,5 +28,6 @@
   "pickCancelled": "Выбор отменён.",
   "shotVisible": "Снимок видимой области",
   "shotFull": "Снимок всей страницы",
-  "shotElement": "Снимок элемента"
+  "shotElement": "Снимок элемента",
+  "elementOnPage": "Элемент на {page}"
 }

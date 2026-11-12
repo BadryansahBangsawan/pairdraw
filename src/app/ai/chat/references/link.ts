@@ -3,11 +3,11 @@
  * `openpencil:` scheme: `[Hero](openpencil://node/12:34)`. People insert them from the
  * composer and the model cites what it touched with them; the chat shows them as chips.
  */
-export type ChatReferenceKind = 'node' | 'page' | 'skill'
+export type ChatReferenceKind = 'node' | 'page' | 'skill' | 'element'
 
 export interface ChatReference {
   kind: ChatReferenceKind
-  /** A node or page ID, or a skill's name. */
+  /** A node or page ID, a skill's name, or a browser element's stored address and selector. */
   id: string
   /** The name when the reference was written, shown when the target is gone. */
   label: string
@@ -20,7 +20,7 @@ export interface ChatReferenceMatch {
 }
 
 const SCHEME = 'openpencil://'
-const KINDS: ReadonlySet<string> = new Set<ChatReferenceKind>(['node', 'page', 'skill'])
+const KINDS: ReadonlySet<string> = new Set<ChatReferenceKind>(['node', 'page', 'skill', 'element'])
 
 /** A link whose label holds no unescaped `]` or line break and whose URL has no space. */
 const LINK = /\[((?:\\.|[^\]\\\n])*)\]\(openpencil:\/\/([a-z]+)\/([^)\s]+)\)/g

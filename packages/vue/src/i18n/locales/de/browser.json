@@ -28,5 +28,6 @@
   "pickCancelled": "Die Auswahl wurde abgebrochen.",
   "shotVisible": "Bild der Ansicht",
   "shotFull": "Bild der ganzen Seite",
-  "shotElement": "Bild eines Elements"
+  "shotElement": "Bild eines Elements",
+  "elementOnPage": "Element auf {page}"
 }

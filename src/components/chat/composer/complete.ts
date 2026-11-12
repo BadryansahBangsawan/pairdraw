@@ -1,6 +1,7 @@
 import type { Completion, CompletionContext, CompletionSource } from '@codemirror/autocomplete'
 import type { Component } from 'vue'
 import IconBookOpen from '~icons/lucide/book-open'
+import IconCrosshair from '~icons/lucide/crosshair'
 import IconFile from '~icons/lucide/file'
 import IconSquareSlash from '~icons/lucide/square-slash'
 
@@ -28,10 +29,19 @@ export interface ComposerSections {
 const KIND_ICONS: Record<ChatReferenceKind, Component> = {
   node: IconFile,
   page: IconFile,
-  skill: IconBookOpen
+  skill: IconBookOpen,
+  element: IconCrosshair
 }
 
-const SECTION_RANK: Record<ChatReferenceKind, number> = { node: 0, page: 1, skill: 2 }
+const SECTION_RANK: Record<ChatReferenceKind, number> = { node: 0, page: 1, skill: 2, element: 3 }
+
+/** Element marks are not offered from `@`; a page section name keeps the record total. */
+function sectionName(kind: ChatReferenceKind, names: ComposerSections): string {
+  if (kind === 'node') return names.node
+  if (kind === 'page') return names.page
+  if (kind === 'skill') return names.skill
+  return names.page
+}
 
 /** What may stand before an `@` that starts a reference: nothing, a space, or an opening bracket. */
 const REFERENCE_START = /^[\s([]?$/
@@ -56,7 +66,10 @@ export function referenceCompletion(
         icon: node ? sceneNodeIcon(node) : KIND_ICONS[reference.kind],
         label: reference.label || reference.id,
         detail: detail ?? undefined,
-        section: { name: names[reference.kind], rank: SECTION_RANK[reference.kind] },
+        section: {
+          name: sectionName(reference.kind, names),
+          rank: SECTION_RANK[reference.kind]
+        },
         apply: `${referenceLink(reference)} `
       }))
     }

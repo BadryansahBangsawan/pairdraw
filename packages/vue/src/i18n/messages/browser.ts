@@ -33,7 +33,8 @@ export const browserMessageDefaults = {
   pickCancelled: 'The pick was cancelled.',
   shotVisible: 'Screenshot of the view',
   shotFull: 'Screenshot of the page',
-  shotElement: 'Screenshot of an element'
+  shotElement: 'Screenshot of an element',
+  elementOnPage: params('Element on {page}')
 } as const
 
 export const browserMessages = i18n('browser', browserMessageDefaults)

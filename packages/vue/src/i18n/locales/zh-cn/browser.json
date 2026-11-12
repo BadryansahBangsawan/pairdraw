@@ -28,5 +28,6 @@
   "pickCancelled": "已取消选择。",
   "shotVisible": "可见区域的图片",
   "shotFull": "整页图片",
-  "shotElement": "元素图片"
+  "shotElement": "元素图片",
+  "elementOnPage": "{page} 上的元素"
 }

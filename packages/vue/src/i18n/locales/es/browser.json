@@ -28,5 +28,6 @@
   "pickCancelled": "La selección se canceló.",
   "shotVisible": "Captura de la vista",
   "shotFull": "Captura de la página",
-  "shotElement": "Captura de un elemento"
+  "shotElement": "Captura de un elemento",
+  "elementOnPage": "Elemento en {page}"
 }

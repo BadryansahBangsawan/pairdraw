@@ -28,5 +28,6 @@
   "pickCancelled": "Wybór został anulowany.",
   "shotVisible": "Zrzut widoku",
   "shotFull": "Zrzut całej strony",
-  "shotElement": "Zrzut elementu"
+  "shotElement": "Zrzut elementu",
+  "elementOnPage": "Element na stronie {page}"
 }

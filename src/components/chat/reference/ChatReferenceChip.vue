@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, ref } from 'vue'
 
-import { useAIMessages } from '@open-pencil/vue/i18n'
+import { useAIMessages, useBrowserMessages } from '@open-pencil/vue/i18n'
 
+import { elementMarkPage, parseElementMark } from '@/app/ai/chat/references/element'
 import type { ChatReference } from '@/app/ai/chat/references/link'
 import { openReference, resolveReference } from '@/app/ai/chat/references/resolve'
 import { foundSkills } from '@/app/ai/skills/library'
+import { hoverElementMark } from '@/app/browser/mark'
 import { getActiveEditorStoreOrNull, useActiveEditorStoreRef } from '@/app/editor/active-store'
 import { notificationMessages } from '@/app/i18n/notifications'
 import { toast } from '@/app/shell/ui'
@@ -29,6 +31,7 @@ const {
 }>()
 
 const ai = useAIMessages()
+const browser = useBrowserMessages()
 const ui = computed(() => chatReferenceTheme({ tone }))
 const live = inject(CHAT_NODES_LIVE, ref(true))
 const activeStore = useActiveEditorStoreRef()
@@ -41,14 +44,21 @@ const resolved = computed(() => {
   return resolveReference(live.value ? (store ?? null) : null, reference, skillNames)
 })
 
-const label = computed(() =>
-  reference.kind === 'skill'
-    ? ai.value.openSkillSettings({ name: resolved.value.name })
-    : ai.value.showNodeOnCanvas({ name: resolved.value.name })
-)
+const label = computed(() => {
+  if (reference.kind === 'skill') return ai.value.openSkillSettings({ name: resolved.value.name })
+  if (reference.kind === 'element') {
+    const mark = parseElementMark(reference.id)
+    return browser.value.elementOnPage({ page: elementMarkPage(mark?.url ?? reference.label) })
+  }
+  return ai.value.showNodeOnCanvas({ name: resolved.value.name })
+})
 
 /** Pointing at a layer's chip outlines the layer on the canvas, as the layers panel does. */
 function hover(on: boolean) {
+  if (reference.kind === 'element') {
+    void hoverElementMark(parseElementMark(reference.id), on)
+    return
+  }
   const store = getActiveEditorStoreOrNull()
   if (!store || reference.kind !== 'node' || !resolved.value.present) return
   if (on) store.setHoveredNode(reference.id)
@@ -58,6 +68,7 @@ function hover(on: boolean) {
 onBeforeUnmount(() => hover(false))
 
 async function open() {
+  if (reference.kind === 'element') return
   const store = getActiveEditorStoreOrNull()
   if (!store || !resolved.value.present) return
   try {

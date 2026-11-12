@@ -115,6 +115,15 @@ export async function readBrowserElement(selector: string): Promise<string> {
   return value
 }
 
+/**
+ * Draws or removes the hover outline. An empty selector removes it. The caller decides when the
+ * open page is the one the chip stored.
+ */
+export async function markBrowserElement(selector: string): Promise<void> {
+  const value = await (await tauri()).invoke('browser_mark_element', { selector })
+  if (typeof value !== 'string' || value === '') throw new Error('The page did not answer in time.')
+}
+
 /** The page's JSON outline. The caller checks it; this does not import a layer. */
 export async function readBrowserOutline(): Promise<string> {
   const value = await (await tauri()).invoke('browser_read_outline')

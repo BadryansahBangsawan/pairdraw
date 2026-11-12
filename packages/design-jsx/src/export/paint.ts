@@ -47,7 +47,6 @@ function options(entries: Options): Options | undefined {
 function fillValue(fill: Fill, node: SceneNode): JSXValue {
   const visible = fill.visible ? undefined : false
   const shader = shaderOfPaint(node, fill)
-  // A shader the user wrote has no preset an exported component could play.
   if (shader && isShaderPresetPaint(shader)) {
     // A preset with nothing but effects is written as just its effects.
     const { components, ...rest } = shader.preset
@@ -55,6 +54,20 @@ function fillValue(fill: Fill, node: SceneNode): JSXValue {
       'shader',
       plainValue(Object.keys(rest).length === 0 ? components : shader.preset),
       options({
+        opacity: fill.opacity === 1 ? undefined : fill.opacity,
+        visible,
+        blendMode: blendMode(fill.blendMode)
+      })
+    )
+  }
+  // Code the user wrote comes back as the same paint only through its own helper.
+  if (shader) {
+    const uniforms = shader.uniforms ?? {}
+    return helperCall(
+      'shaderSource',
+      shader.source,
+      options({
+        uniforms: Object.keys(uniforms).length === 0 ? undefined : plainValue(uniforms),
         opacity: fill.opacity === 1 ? undefined : fill.opacity,
         visible,
         blendMode: blendMode(fill.blendMode)

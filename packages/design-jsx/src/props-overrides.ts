@@ -100,7 +100,7 @@ function setFills(values: (string | Color | Fill)[], o: Partial<SceneNode>): voi
     const fill = fillFromValue(value)
     if (!isShaderFill(fill)) return fill
     const { shader, ...paint } = fill
-    if (paint.imageHash) shaders.push({ image: paint.imageHash, preset: shader })
+    if (paint.imageHash) shaders.push(shader)
     return paint
   })
   if (fills.length === 0) return

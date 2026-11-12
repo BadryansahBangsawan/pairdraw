@@ -17,9 +17,13 @@ import { paintTransformSchema } from '@open-pencil/scene-graph/paints'
 import type { Color } from '@open-pencil/scene-graph/primitives'
 import {
   createShaderPaint,
+  createShaderSourcePaint,
+  SHADER_SOURCE_MAX_BYTES,
   shaderPresetSchema,
   type ShaderComponent,
-  type ShaderPreset
+  type ShaderPaint,
+  type ShaderPreset,
+  type ShaderUniformValue
 } from '@open-pencil/scene-graph/shaders'
 
 import { parseScriptInput } from './schema'
@@ -118,14 +122,59 @@ export function gradient(
   }
 }
 
-/** A paint that draws a shader, carrying its preset until the layer it fills stores it. */
+/** A paint that draws a shader, carrying its entry until the layer it fills stores it. */
 export interface ShaderFill extends Fill {
-  shader: ShaderPreset
+  shader: ShaderPaint
 }
 
-/** Whether a paint value came from {@link shader}. */
+/** Whether a paint value came from {@link shader} or {@link shaderSource}. */
 export function isShaderFill(value: Fill): value is ShaderFill {
   return 'shader' in value
+}
+
+const shaderSourceSchema = v.pipe(
+  v.string(),
+  v.trim(),
+  v.nonEmpty('Expected the shader code to write'),
+  v.check(
+    (source) => new TextEncoder().encode(source).length <= SHADER_SOURCE_MAX_BYTES,
+    `Expected at most ${SHADER_SOURCE_MAX_BYTES} bytes of shader code`
+  )
+)
+
+/** The inputs a user-written shader was given values for. */
+const shaderUniformsSchema = v.record(v.string(), v.union([v.number(), v.boolean(), v.string()]))
+
+export interface ShaderSourceOptions extends SolidPaintOptions {
+  uniforms?: Record<string, ShaderUniformValue>
+}
+
+/**
+ * A paint that draws shader code written here rather than a preset from the `shaders` library.
+ * Its inputs are the `@directive` ones the code declares.
+ */
+export function shaderSource(source: string, options: ShaderSourceOptions = {}): ShaderFill {
+  const code = parseScriptInput(
+    'shaderSource() expects the shader code as a string',
+    shaderSourceSchema,
+    source
+  )
+  const uniforms =
+    options.uniforms === undefined
+      ? {}
+      : parseScriptInput(
+          'shaderSource() expects its uniforms as { name: value }',
+          shaderUniformsSchema,
+          options.uniforms
+        )
+  const { paint, shader } = createShaderSourcePaint(code)
+  return {
+    ...paint,
+    opacity: options.opacity ?? 1,
+    visible: options.visible ?? true,
+    blendMode: options.blendMode,
+    shader: { ...shader, uniforms }
+  }
 }
 
 const shaderInputSchema = v.union(
@@ -154,13 +203,13 @@ export function shader(
     shaderInputSchema,
     preset
   )
-  const { paint } = createShaderPaint(parsed)
+  const { paint, shader } = createShaderPaint(parsed)
   return {
     ...paint,
     opacity: options.opacity ?? 1,
     visible: options.visible ?? true,
     blendMode: options.blendMode,
-    shader: parsed
+    shader
   }
 }
 

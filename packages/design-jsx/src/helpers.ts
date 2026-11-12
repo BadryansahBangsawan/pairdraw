@@ -19,8 +19,10 @@ import {
   linearGradient,
   radialGradient,
   shader,
+  shaderSource,
   solid,
   type GradientPaintOptions,
+  type ShaderSourceOptions,
   type SolidPaintOptions
 } from './paints'
 import { ref } from './refs'
@@ -51,6 +53,11 @@ const SOLID_OPTIONS = {
   visible: true,
   blendMode: true
 } satisfies OptionKeys<SolidPaintOptions>
+
+const SHADER_SOURCE_OPTIONS = {
+  ...SOLID_OPTIONS,
+  uniforms: true
+} satisfies OptionKeys<ShaderSourceOptions>
 
 const GRADIENT_OPTIONS = {
   ...SOLID_OPTIONS,
@@ -106,6 +113,7 @@ export function designJSXHelpers(warnings: string[]) {
     angularGradient: checked(warnings, 'angularGradient', angularGradient, GRADIENT_OPTIONS, 1),
     diamondGradient: checked(warnings, 'diamondGradient', diamondGradient, GRADIENT_OPTIONS, 1),
     shader: checked(warnings, 'shader', shader, SOLID_OPTIONS, 1),
+    shaderSource: checked(warnings, 'shaderSource', shaderSource, SHADER_SOURCE_OPTIONS, 1),
     dropShadow: checked(warnings, 'dropShadow', dropShadow, SHADOW_OPTIONS, 0),
     innerShadow: checked(warnings, 'innerShadow', innerShadow, SHADOW_OPTIONS, 0),
     layerBlur: checked(warnings, 'layerBlur', layerBlur, BLUR_OPTIONS, 0),

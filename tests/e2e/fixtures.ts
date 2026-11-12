@@ -2,6 +2,14 @@ import { test, expect, type Locator, type Page } from '@playwright/test'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
 
+// `waitForInit` waits 30s for the canvas, 30s for the loading overlay, and 30s for the loader
+// (`tests/helpers/canvas.ts`). Navigation gets the same 30s. The project timeout is 15s, and
+// Playwright applies it to this hook, so a cold server was closed while the canvas wait was
+// still running. The extra second lets that wait fail itself. A boot that never finishes
+// still fails, and the message says so.
+const EDITOR_BOOT_WAIT_MS = 30_000
+const EDITOR_SETUP_HOOK_TIMEOUT_MS = EDITOR_BOOT_WAIT_MS * 4 + 1_000
+
 export function useEditorSetup(url = '/?test') {
   let page: Page
   let canvas: CanvasHelper
@@ -9,10 +17,16 @@ export function useEditorSetup(url = '/?test') {
   test.describe.configure({ mode: 'serial' })
 
   test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage()
-    await page.goto(url)
-    canvas = new CanvasHelper(page)
-    await canvas.waitForInit()
+    test.setTimeout(EDITOR_SETUP_HOOK_TIMEOUT_MS)
+    try {
+      page = await browser.newPage()
+      await page.goto(url, { timeout: EDITOR_BOOT_WAIT_MS })
+      canvas = new CanvasHelper(page)
+      await canvas.waitForInit()
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error)
+      throw new Error(`The editor did not finish booting. ${detail}`, { cause: error })
+    }
   })
 
   test.afterAll(async () => {

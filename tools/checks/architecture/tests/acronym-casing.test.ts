@@ -59,4 +59,14 @@ export const thumbnailPNG = payload.thumbnailPng
 `)
     expect(result.exitCode).toBe(0)
   })
+
+  test('allows acronyms that belong to a qualified external type', () => {
+    const result = lint(`
+import * as vscode from 'vscode'
+export function open(uri: vscode.Uri): vscode.Uri {
+  return uri
+}
+`)
+    expect(result.exitCode).toBe(0)
+  })
 })

@@ -48,6 +48,9 @@ describe('embed params', () => {
     expect(parseEmbedOrigin('http://127.0.0.1:3000')).toBe('http://127.0.0.1:3000')
     expect(parseEmbedOrigin('http://[::1]:3000')).toBe('http://[::1]:3000')
     expect(parseEmbedOrigin('http://host.example')).toBeNull()
+    // An inherited object key is not a host, so a prototype name cannot pass as loopback.
+    expect(parseEmbedOrigin('http://constructor:3000')).toBeNull()
+    expect(parseEmbedOrigin('http://toString:3000')).toBeNull()
   })
 
   test('accepts a bare VS Code webview origin', () => {

@@ -10,7 +10,8 @@ export interface EmbedParams {
   chrome: boolean
 }
 
-const LOOPBACK_HOSTS: Record<string, true> = { localhost: true, '127.0.0.1': true, '[::1]': true }
+/** Hosts an `http:` origin may name. A set, so an inherited object key is never a host. */
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]'])
 /** A DNS name or IPv4 address as `URL` normalizes it (IDNs in punycode), or an IPv6 literal. */
 const HOST_NAME = /^(?:[a-z0-9-]+(?:\.[a-z0-9-]+)*|\[[0-9a-f:.]+\])$/
 /** The UUID host Chromium gives a VS Code webview; the scheme has no standard origin form. */
@@ -43,7 +44,7 @@ export function parseEmbedOrigin(value: string | null): string | null {
   // A URL parser takes `*` as a host character; an origin pattern is never a host.
   if (url.origin !== value || !HOST_NAME.test(url.hostname)) return null
   if (url.protocol === 'https:') return value
-  if (url.protocol === 'http:' && LOOPBACK_HOSTS[url.hostname] === true) return value
+  if (url.protocol === 'http:' && LOOPBACK_HOSTS.has(url.hostname)) return value
   return null
 }
 

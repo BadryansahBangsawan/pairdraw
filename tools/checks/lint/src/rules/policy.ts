@@ -23,6 +23,7 @@ function isObjectKeyIdentifier(node: TSESTree.Identifier): boolean {
 
 function isExternalMemberIdentifier(node: TSESTree.Identifier): boolean {
   const parent = node.parent
+  if (parent?.type === 'TSQualifiedName' && parent.right === node) return true
   return (
     parent?.type === 'MemberExpression' &&
     parent.property === node &&
@@ -66,6 +67,7 @@ const noMixedCaseAcronymIdentifiers = {
       'reka-ui'
     ])
     const upstreamIdentifiers = new Set([
+      'acquireVsCodeApi',
       'convertToHsb',
       'convertToHsl',
       'convertToRgb',

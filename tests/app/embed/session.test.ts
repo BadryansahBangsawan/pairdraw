@@ -20,7 +20,7 @@ function fakeHost() {
       calls.loads.push({ name, bytes: data.byteLength })
       return { name: name.replace(/\.\w+$/, '') }
     },
-    getDocument: async (format) => {
+    getDocument: async (format = 'fig') => {
       calls.formats.push(format)
       return { name: 'Doc', data: new Uint8Array([1, 2, 3]) }
     },

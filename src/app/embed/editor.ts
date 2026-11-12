@@ -118,7 +118,8 @@ export function createEmbedEditorHost(): EmbedEditorHost {
       const store = shownStore()
       if (format === 'pen') {
         const written = await writableFormats.writeDocument('pen', store.graph)
-        const text = typeof written.data === 'string' ? written.data : new TextDecoder().decode(written.data)
+        const text =
+          typeof written.data === 'string' ? written.data : new TextDecoder().decode(written.data)
         return { name: store.state.documentName, data: new TextEncoder().encode(text) }
       }
       const renderer = store.renderer

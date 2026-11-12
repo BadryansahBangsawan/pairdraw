@@ -13,5 +13,7 @@
   "settings": "Impostazioni dello shader",
   "starting": "Avvio dello shader…",
   "failed": "Questo shader non può essere riprodotto qui, quindi viene mostrato il fotogramma fisso.",
-  "readOnly": "Questo documento è di sola lettura: lo shader viene riprodotto, ma le sue impostazioni non si possono modificare."
+  "readOnly": "Questo documento è di sola lettura: lo shader viene riprodotto, ma le sue impostazioni non si possono modificare.",
+  "inputs": "Input",
+  "bindInput": "Collega input"
 }

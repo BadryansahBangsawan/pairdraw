@@ -1,6 +1,6 @@
-import { pick } from 'es-toolkit'
+import { isEmptyObject, omit, pick } from "es-toolkit";
 
-import type { Fill, SceneNode, Stroke } from '@open-pencil/scene-graph'
+import type { Fill, SceneNode, Stroke } from "@open-pencil/scene-graph";
 import {
   createShaderPaint,
   createShaderSourcePaint,
@@ -8,29 +8,34 @@ import {
   shaderOfPaint,
   withShaderPaints,
   type ShaderPaint,
-  type ShaderPreset
-} from '@open-pencil/scene-graph/shaders'
+  type ShaderPreset,
+  type ShaderUniformValue,
+} from "@open-pencil/scene-graph/shaders";
 
-import { compileShader } from '#core/canvas/shaders/compile'
-import type { EditorContext } from '#core/editor/types'
+import { compileShader } from "#core/canvas/shaders/compile";
+import type { EditorContext } from "#core/editor/types";
 
 /** What a stroke has beyond its paint. */
 const STROKE_FIELDS = [
-  'weight',
-  'align',
-  'cap',
-  'join',
-  'dashPattern'
-] as const satisfies readonly (keyof Stroke)[]
+  "weight",
+  "align",
+  "cap",
+  "join",
+  "dashPattern",
+] as const satisfies readonly (keyof Stroke)[];
 
 const replaceAt = <T>(items: readonly T[], index: number, item: T) =>
-  items.map((existing, at) => (at === index ? item : existing))
+  items.map((existing, at) => (at === index ? item : existing));
 
 /** Which of a layer's paint lists a shader is set in. */
-export type ShaderPaintList = 'fills' | 'strokes'
+export type ShaderPaintList = "fills" | "strokes";
 
 interface NodeActions {
-  updateNodeWithUndo(id: string, changes: Partial<SceneNode>, label?: string): void
+  updateNodeWithUndo(
+    id: string,
+    changes: Partial<SceneNode>,
+    label?: string,
+  ): void;
 }
 
 /**
@@ -45,60 +50,68 @@ export function createShaderActions(ctx: EditorContext, nodes: NodeActions) {
     index: number,
     previous: Fill,
     paint: Fill,
-    shader: ShaderPaint
+    shader: ShaderPaint,
   ): void {
-    const node = ctx.graph.getNode(nodeId)
-    if (!node) return
-    const shown = { ...paint, opacity: previous.opacity, visible: previous.visible }
-    const fills = list === 'fills' ? replaceAt(node.fills, index, shown) : node.fills
+    const node = ctx.graph.getNode(nodeId);
+    if (!node) return;
+    const shown = {
+      ...paint,
+      opacity: previous.opacity,
+      visible: previous.visible,
+    };
+    const fills =
+      list === "fills" ? replaceAt(node.fills, index, shown) : node.fills;
     // A stroke keeps its weight and geometry; only its paint changes.
     const strokes =
-      list === 'strokes'
+      list === "strokes"
         ? node.strokes.map((item, at) =>
-            at === index ? { ...pick(item, STROKE_FIELDS), ...shown } : item
+            at === index ? { ...pick(item, STROKE_FIELDS), ...shown } : item,
           )
-        : node.strokes
+        : node.strokes;
     nodes.updateNodeWithUndo(nodeId, {
-      [list]: list === 'fills' ? fills : strokes,
-      pluginData: withShaderPaints(node, [...fills, ...strokes], [shader])
-    })
+      [list]: list === "fills" ? fills : strokes,
+      pluginData: withShaderPaints(node, [...fills, ...strokes], [shader]),
+    });
   }
 
   function setNodeShader(
     nodeId: string,
     list: ShaderPaintList,
     index: number,
-    preset: ShaderPreset
+    preset: ShaderPreset,
   ): void {
-    const node = ctx.graph.getNode(nodeId)
-    const previous = node?.[list].at(index)
-    if (!node || !previous) return
-    const existing = shaderOfPaint(node, previous)
+    const node = ctx.graph.getNode(nodeId);
+    const previous = node?.[list].at(index);
+    if (!node || !previous) return;
+    const existing = shaderOfPaint(node, previous);
     const { paint, shader } = existing
-      ? { paint: previous, shader: { image: existing.image, preset: structuredClone(preset) } }
-      : createShaderPaint(preset)
-    install(nodeId, list, index, previous, paint, shader)
+      ? {
+          paint: previous,
+          shader: { image: existing.image, preset: structuredClone(preset) },
+        }
+      : createShaderPaint(preset);
+    install(nodeId, list, index, previous, paint, shader);
   }
 
   function setNodeSource(
     nodeId: string,
     list: ShaderPaintList,
     index: number,
-    source: string
+    source: string,
   ): void {
-    const node = ctx.graph.getNode(nodeId)
-    const previous = node?.[list].at(index)
-    if (!node || !previous) return
-    const existing = shaderOfPaint(node, previous)
+    const node = ctx.graph.getNode(nodeId);
+    const previous = node?.[list].at(index);
+    if (!node || !previous) return;
+    const existing = shaderOfPaint(node, previous);
     // Code replaces code in place: the paint keeps its frame image, so pixels drawn before and
     // after an edit stay on the same paint and undo swaps only the text.
-    const kept = existing && isShaderSourcePaint(existing)
+    const kept = existing && isShaderSourcePaint(existing);
     if (kept) {
-      install(nodeId, list, index, previous, previous, { ...existing, source })
-      return
+      install(nodeId, list, index, previous, previous, { ...existing, source });
+      return;
     }
-    const { paint, shader } = createShaderSourcePaint(source)
-    install(nodeId, list, index, previous, paint, shader)
+    const { paint, shader } = createShaderSourcePaint(source);
+    install(nodeId, list, index, previous, paint, shader);
   }
 
   /**
@@ -110,13 +123,13 @@ export function createShaderActions(ctx: EditorContext, nodes: NodeActions) {
     nodeIds: readonly string[],
     list: ShaderPaintList,
     index: number,
-    preset: ShaderPreset
+    preset: ShaderPreset,
   ): void {
-    ctx.undo.beginBatch('Set shader')
+    ctx.undo.beginBatch("Set shader");
     try {
-      for (const id of nodeIds) setNodeShader(id, list, index, preset)
+      for (const id of nodeIds) setNodeShader(id, list, index, preset);
     } finally {
-      ctx.undo.commitBatch()
+      ctx.undo.commitBatch();
     }
   }
 
@@ -129,14 +142,14 @@ export function createShaderActions(ctx: EditorContext, nodes: NodeActions) {
     nodeIds: readonly string[],
     list: ShaderPaintList,
     index: number,
-    source: string
+    source: string,
   ): void {
-    if (!source.trim()) return
-    ctx.undo.beginBatch('Set shader code')
+    if (!source.trim()) return;
+    ctx.undo.beginBatch("Set shader code");
     try {
-      for (const id of nodeIds) setNodeSource(id, list, index, source)
+      for (const id of nodeIds) setNodeSource(id, list, index, source);
     } finally {
-      ctx.undo.commitBatch()
+      ctx.undo.commitBatch();
     }
   }
 
@@ -145,10 +158,87 @@ export function createShaderActions(ctx: EditorContext, nodes: NodeActions) {
    * shaders. The panel shows it under the code editor, before the edit is applied.
    */
   function shaderCodeError(source: string): string | null {
-    const ck = ctx.getCk()
-    if (!ck || !source.trim()) return null
-    return compileShader(ck, source).error
+    const ck = ctx.getCk();
+    if (!ck || !source.trim()) return null;
+    return compileShader(ck, source).error;
   }
 
-  return { setShaderPaint, setShaderSource, shaderCodeError }
+  /**
+   * Sets the value of shader input `name` on paint `index` of `list`, as one undo step. Only a
+   * paint that already draws code has inputs to set; a preset or other paint is left alone.
+   */
+  function setShaderUniform(
+    nodeIds: readonly string[],
+    list: ShaderPaintList,
+    index: number,
+    name: string,
+    value: ShaderUniformValue,
+  ): void {
+    ctx.undo.beginBatch("Set shader input");
+    try {
+      for (const id of nodeIds) {
+        const node = ctx.graph.getNode(id);
+        const paint = node?.[list].at(index);
+        const shader = node && paint ? shaderOfPaint(node, paint) : undefined;
+        if (!node || !paint || !shader || !isShaderSourcePaint(shader))
+          continue;
+        install(id, list, index, paint, paint, {
+          ...shader,
+          uniforms: { ...shader.uniforms, [name]: value },
+        });
+      }
+    } finally {
+      ctx.undo.commitBatch();
+    }
+  }
+
+  /**
+   * Makes shader input `name` on paint `index` of `list` follow `variableId`, or stop following a
+   * variable when null, as one undo step. The binding is stored with the shader, next to the value
+   * it replaces, so every renderer that draws the paint resolves it the same way.
+   */
+  function setShaderUniformBinding(
+    nodeIds: readonly string[],
+    list: ShaderPaintList,
+    index: number,
+    name: string,
+    variableId: string | null,
+  ): void {
+    ctx.undo.beginBatch(
+      variableId ? "Bind shader input" : "Unbind shader input",
+    );
+    try {
+      for (const id of nodeIds) {
+        const node = ctx.graph.getNode(id);
+        const paint = node?.[list].at(index);
+        const shader = node && paint ? shaderOfPaint(node, paint) : undefined;
+        if (!node || !paint || !shader || !isShaderSourcePaint(shader))
+          continue;
+        const bindings = omit(shader.uniformBindings ?? {}, [name]);
+        const bound = variableId
+          ? { ...bindings, [name]: variableId }
+          : bindings;
+        install(
+          id,
+          list,
+          index,
+          paint,
+          paint,
+          isEmptyObject(bound)
+            ? omit(shader, ["uniformBindings"])
+            : { ...shader, uniformBindings: bound },
+        );
+      }
+    } finally {
+      ctx.undo.commitBatch();
+    }
+  }
+
+  return {
+    setShaderPaint,
+    setShaderSource,
+    shaderCodeError,
+    setShaderUniform,
+    setShaderUniformBinding,
+  };
 }

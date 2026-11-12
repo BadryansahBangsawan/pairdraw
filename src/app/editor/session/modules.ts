@@ -1,55 +1,60 @@
-import { computed } from 'vue'
+import { computed } from "vue";
 
-import type { Editor } from '@open-pencil/core'
-import type { IORegistry } from '@open-pencil/core/io'
-import { createSelectedNodeState } from '@open-pencil/vue/editor/selection-state'
+import type { Editor } from "@open-pencil/core";
+import type { IORegistry } from "@open-pencil/core/io";
+import { createSelectedNodeState } from "@open-pencil/vue/editor/selection-state";
 
-import { createDocumentExportActions } from '@/app/document/export'
-import { createDocumentIOActions } from '@/app/document/io'
-import type { ViewportSize } from '@/app/document/io/types'
-import { createDesignCheck } from '@/app/editor/design-check/session'
-import { createFlashActions } from '@/app/editor/flash'
-import { createMobileClipboardActions } from '@/app/editor/mobile-clipboard'
-import { createPenActions } from '@/app/editor/pen'
-import type { EditorPreparationController } from '@/app/editor/preparation/controller'
-import { createProfilerActions } from '@/app/editor/profiler'
-import type { AppEditorState } from '@/app/editor/session/types'
-import { createVectorEditActions } from '@/app/editor/vector'
+import { createDocumentExportActions } from "@/app/document/export";
+import { createDocumentIOActions } from "@/app/document/io";
+import type { ViewportSize } from "@/app/document/io/types";
+import { createDesignCheck } from "@/app/editor/design-check/session";
+import { createFlashActions } from "@/app/editor/flash";
+import { createMobileClipboardActions } from "@/app/editor/mobile-clipboard";
+import { createPenActions } from "@/app/editor/pen";
+import type { EditorPreparationController } from "@/app/editor/preparation/controller";
+import { createProfilerActions } from "@/app/editor/profiler";
+import { createShaderClock } from "@/app/editor/shader-clock/create";
+import type { AppEditorState } from "@/app/editor/session/types";
+import { createVectorEditActions } from "@/app/editor/vector";
 
 export function defineEditorStoreAccessors(store: object, editor: Editor) {
   Object.defineProperties(store, {
     graph: {
       enumerable: true,
-      get: () => editor.graph
+      get: () => editor.graph,
     },
     renderer: {
       enumerable: true,
-      get: () => editor.renderer
+      get: () => editor.renderer,
     },
     canvasRenderers: {
       enumerable: true,
-      get: () => editor.canvasRenderers
+      get: () => editor.canvasRenderers,
     },
     textEditor: {
       enumerable: true,
-      get: () => editor.textEditor
-    }
-  })
+      get: () => editor.textEditor,
+    },
+  });
 }
 
-export function createEditorComputedRefs(editor: Editor, state: AppEditorState) {
-  const { nodes: selectedNodes, dispose: disposeSelection } = createSelectedNodeState(editor)
+export function createEditorComputedRefs(
+  editor: Editor,
+  state: AppEditorState,
+) {
+  const { nodes: selectedNodes, dispose: disposeSelection } =
+    createSelectedNodeState(editor);
 
   const selectedNode = computed(() =>
-    selectedNodes.value.length === 1 ? selectedNodes.value[0] : undefined
-  )
+    selectedNodes.value.length === 1 ? selectedNodes.value[0] : undefined,
+  );
 
   const layerTree = computed(() => {
-    void state.sceneVersion
-    return editor.getLayerTree()
-  })
+    void state.sceneVersion;
+    return editor.getLayerTree();
+  });
 
-  return { selectedNodes, selectedNode, layerTree, disposeSelection }
+  return { selectedNodes, selectedNode, layerTree, disposeSelection };
 }
 
 export function createEditorStoreModules(
@@ -57,16 +62,27 @@ export function createEditorStoreModules(
   state: AppEditorState,
   io: IORegistry,
   viewportSize: ViewportSize,
-  preparationController: EditorPreparationController
+  preparationController: EditorPreparationController,
 ) {
-  const flash = createFlashActions(editor, state)
-  const pen = createPenActions(editor, state)
-  const vectorEdit = createVectorEditActions(editor, state)
-  const documentIO = createDocumentIOActions(editor, state, viewportSize, preparationController)
-  const documentExport = createDocumentExportActions(editor, state, io, documentIO.downloadBlob)
-  const mobileClipboard = createMobileClipboardActions(editor)
-  const profiler = createProfilerActions(editor)
-  const designCheck = createDesignCheck(editor, state)
+  const flash = createFlashActions(editor, state);
+  const pen = createPenActions(editor, state);
+  const vectorEdit = createVectorEditActions(editor, state);
+  const documentIO = createDocumentIOActions(
+    editor,
+    state,
+    viewportSize,
+    preparationController,
+  );
+  const documentExport = createDocumentExportActions(
+    editor,
+    state,
+    io,
+    documentIO.downloadBlob,
+  );
+  const mobileClipboard = createMobileClipboardActions(editor);
+  const profiler = createProfilerActions(editor);
+  const designCheck = createDesignCheck(editor, state);
+  const shaderClock = createShaderClock(editor);
 
   return {
     ...flash,
@@ -74,8 +90,8 @@ export function createEditorStoreModules(
     ...vectorEdit,
     /** Going read-only keeps a vector edit in progress, as the editor keeps edited text. */
     setReadOnly(readOnly: boolean, options?: { comments?: boolean }) {
-      if (readOnly) vectorEdit.exitNodeEditMode(true)
-      editor.setReadOnly(readOnly, options)
+      if (readOnly) vectorEdit.exitNodeEditMode(true);
+      editor.setReadOnly(readOnly, options);
     },
     openFigFile: documentIO.openFigFile,
     openDOMFile: documentIO.openDOMFile,
@@ -119,15 +135,16 @@ export function createEditorStoreModules(
     startWatchingCurrentFile: documentIO.startWatchingCurrentFile,
     designCheck,
     dispose: () => {
-      designCheck.dispose()
-      editor.releaseGraphResources()
-      editor.dispose()
-      editor.clearPageViewports()
-      documentIO.disposeDocumentIO()
-      preparationController.dispose()
+      shaderClock.dispose();
+      designCheck.dispose();
+      editor.releaseGraphResources();
+      editor.dispose();
+      editor.clearPageViewports();
+      documentIO.disposeDocumentIO();
+      preparationController.dispose();
     },
     ...documentExport,
     ...mobileClipboard,
-    ...profiler
-  }
+    ...profiler,
+  };
 }

@@ -13,5 +13,7 @@
   "settings": "Ajustes del shader",
   "starting": "Iniciando el shader…",
   "failed": "Este shader no puede reproducirse aquí, así que se muestra su fotograma fijo.",
-  "readOnly": "Este documento es de solo lectura: el shader se reproduce, pero sus ajustes no se pueden cambiar."
+  "readOnly": "Este documento es de solo lectura: el shader se reproduce, pero sus ajustes no se pueden cambiar.",
+  "inputs": "Entradas",
+  "bindInput": "Vincular entrada"
 }

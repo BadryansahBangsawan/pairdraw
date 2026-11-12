@@ -13,5 +13,7 @@
   "settings": "Réglages du shader",
   "starting": "Démarrage du shader…",
   "failed": "Ce shader ne peut pas être lu ici : son image fixe est affichée.",
-  "readOnly": "Ce document est en lecture seule : le shader se lit, mais ses réglages ne peuvent pas changer."
+  "readOnly": "Ce document est en lecture seule : le shader se lit, mais ses réglages ne peuvent pas changer.",
+  "inputs": "Entrées",
+  "bindInput": "Lier une entrée"
 }

@@ -13,5 +13,7 @@
   "settings": "Shader-Einstellungen",
   "starting": "Shader wird gestartet …",
   "failed": "Dieser Shader lässt sich hier nicht abspielen, daher wird sein Standbild gezeigt.",
-  "readOnly": "Dieses Dokument ist schreibgeschützt: Der Shader läuft, seine Einstellungen lassen sich aber nicht ändern."
+  "readOnly": "Dieses Dokument ist schreibgeschützt: Der Shader läuft, seine Einstellungen lassen sich aber nicht ändern.",
+  "inputs": "Eingaben",
+  "bindInput": "Eingabe binden"
 }

@@ -13,5 +13,7 @@
   "settings": "Ustawienia shadera",
   "starting": "Uruchamianie shadera…",
   "failed": "Tego shadera nie da się tu odtworzyć, więc pokazana jest jego nieruchoma klatka.",
-  "readOnly": "Ten dokument jest tylko do odczytu: shader jest odtwarzany, ale jego ustawień nie można zmienić."
+  "readOnly": "Ten dokument jest tylko do odczytu: shader jest odtwarzany, ale jego ustawień nie można zmienić.",
+  "inputs": "Dane wejściowe",
+  "bindInput": "Powiąż dane wejściowe"
 }

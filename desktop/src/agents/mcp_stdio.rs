@@ -254,6 +254,53 @@ fn ensure_approved(
     write_approvals(&path, &approvals)
 }
 
+enum StdoutLine {
+    Eof,
+    Line,
+    Dropped,
+}
+
+/// Reads one stdout line into `buffer`. A line past `limit` is discarded as its
+/// bytes arrive, so the buffer never holds the rest of it.
+fn read_stdout_line(
+    reader: &mut impl BufRead,
+    buffer: &mut Vec<u8>,
+    limit: usize,
+) -> std::io::Result<StdoutLine> {
+    buffer.clear();
+    let mut dropped = false;
+    loop {
+        let available = reader.fill_buf()?;
+        if available.is_empty() {
+            if !dropped && !buffer.is_empty() {
+                return Ok(StdoutLine::Line);
+            }
+            return Ok(if dropped {
+                StdoutLine::Dropped
+            } else {
+                StdoutLine::Eof
+            });
+        }
+        let newline = available.iter().position(|byte| *byte == b'\n');
+        let take = newline.map(|index| index + 1).unwrap_or(available.len());
+        let fits = buffer.len().saturating_add(take) <= limit;
+        if dropped || !fits {
+            dropped = true;
+            buffer.clear();
+            reader.consume(take);
+            if newline.is_some() {
+                return Ok(StdoutLine::Dropped);
+            }
+            continue;
+        }
+        buffer.extend_from_slice(&available[..take]);
+        reader.consume(take);
+        if newline.is_some() {
+            return Ok(StdoutLine::Line);
+        }
+    }
+}
+
 /// Reads stdout line by line into the channel; on its end, reports how the process exited.
 fn pump_stdout(
     app: AppHandle,
@@ -265,11 +312,10 @@ fn pump_stdout(
     let mut reader = BufReader::new(stdout);
     let mut buffer = Vec::new();
     loop {
-        buffer.clear();
-        match reader.read_until(b'\n', &mut buffer) {
-            Ok(0) | Err(_) => break,
-            Ok(_) if buffer.len() > MAX_LINE_BYTES => continue,
-            Ok(_) => {
+        match read_stdout_line(&mut reader, &mut buffer, MAX_LINE_BYTES) {
+            Ok(StdoutLine::Eof) | Err(_) => break,
+            Ok(StdoutLine::Dropped) => continue,
+            Ok(StdoutLine::Line) => {
                 let line = String::from_utf8_lossy(&buffer).trim_end().to_owned();
                 if !line.is_empty() && on_event.send(McpStdioEvent::Message { line }).is_err() {
                     break;
@@ -515,6 +561,24 @@ mod tests {
         assert_eq!(first, other_values);
         assert_eq!(first.env_names, vec!["A".to_owned(), "B".to_owned()]);
         assert_ne!(first, other_args);
+    }
+
+    #[test]
+    fn drops_an_overlong_stdout_line_without_buffering_it() {
+        let limit = 8;
+        let data = b"0123456789abcdef\nok\n";
+        let mut reader = std::io::Cursor::new(&data[..]);
+        let mut buffer = Vec::new();
+        let first = read_stdout_line(&mut reader, &mut buffer, limit).unwrap();
+        assert!(matches!(first, StdoutLine::Dropped));
+        assert!(
+            buffer.capacity() <= limit,
+            "buffered {} bytes of a line past the cap",
+            buffer.capacity()
+        );
+        let second = read_stdout_line(&mut reader, &mut buffer, limit).unwrap();
+        assert!(matches!(second, StdoutLine::Line));
+        assert_eq!(std::str::from_utf8(&buffer).unwrap().trim_end(), "ok");
     }
 
     #[test]

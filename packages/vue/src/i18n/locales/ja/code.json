@@ -16,6 +16,7 @@
   "reset": "リセット",
   "scriptBindInput": "入力を変数にバインド",
   "scriptCode": "スクリプトコード",
+  "scriptConvertToLayers": "レイヤーに変換",
   "scriptDetachInput": "変数を解除",
   "scriptInputs": "スクリプト入力",
   "scriptLayer": "スクリプトレイヤー",

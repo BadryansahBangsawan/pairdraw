@@ -10,6 +10,7 @@ export const codeMessageDefaults = {
   scriptInputs: 'Script inputs',
   scriptBindInput: 'Bind input to variable',
   scriptDetachInput: 'Detach variable',
+  scriptConvertToLayers: 'Convert to layers',
   source: 'Code source',
   sourceDesignJSX: 'Design JSX',
   sourceHTML: 'HTML',

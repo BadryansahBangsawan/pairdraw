@@ -16,6 +16,7 @@
   "reset": "Réinitialiser",
   "scriptBindInput": "Lier l'entrée à une variable",
   "scriptCode": "Code du script",
+  "scriptConvertToLayers": "Convertir en calques",
   "scriptDetachInput": "Détacher la variable",
   "scriptInputs": "Entrées du script",
   "scriptLayer": "Calque de script",

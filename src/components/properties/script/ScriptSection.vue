@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import { useEditor } from '@open-pencil/vue'
 import { useI18n } from '@open-pencil/vue/i18n'
 import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
 
+import { convertScriptToLayers } from '@/app/code/script/convert'
 import { setScriptSource } from '@/app/code/script/create'
 import { parseScriptHeader } from '@/app/code/script/schema-header'
 import { readScriptNodeData, runScriptNode } from '@/app/code/script/run-node'
+import { useEditorStore } from '@/app/editor/active-store'
 import ScriptInputs from '@/components/properties/script/ScriptInputs.vue'
 import PanelSection from '@/components/ui/panel/PanelSection.vue'
 
@@ -17,7 +18,7 @@ import PanelSection from '@/components/ui/panel/PanelSection.vue'
  */
 const { nodeId } = defineProps<{ nodeId: string }>()
 
-const store = useEditor()
+const store = useEditorStore()
 const { code } = useI18n()
 
 const stored = useSceneComputed(() => readScriptNodeData(store.graph, nodeId)?.source ?? '')
@@ -46,6 +47,10 @@ async function run() {
   running.value = false
 }
 
+function convert() {
+  convertScriptToLayers(store, nodeId)
+}
+
 function commit() {
   if (draft.value === stored.value) return
   setScriptSource(store, nodeId, draft.value)
@@ -56,6 +61,14 @@ function commit() {
 <template>
   <PanelSection :label="code.scriptLayer">
     <template #actions>
+      <button
+        type="button"
+        data-test-id="script-convert"
+        class="rounded px-1.5 py-0.5 text-[11px] font-medium hover:bg-hover"
+        @click="convert"
+      >
+        {{ code.scriptConvertToLayers }}
+      </button>
       <button
         type="button"
         data-test-id="script-run"

@@ -16,6 +16,7 @@
   "reset": "Сбросить",
   "scriptBindInput": "Привязать вход к переменной",
   "scriptCode": "Код скрипта",
+  "scriptConvertToLayers": "Преобразовать в слои",
   "scriptDetachInput": "Отвязать переменную",
   "scriptInputs": "Входы скрипта",
   "scriptLayer": "Слой скрипта",

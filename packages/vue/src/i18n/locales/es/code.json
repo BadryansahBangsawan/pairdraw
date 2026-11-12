@@ -16,6 +16,7 @@
   "reset": "Restablecer",
   "scriptBindInput": "Vincular entrada a variable",
   "scriptCode": "Código del script",
+  "scriptConvertToLayers": "Convertir en capas",
   "scriptDetachInput": "Desvincular variable",
   "scriptInputs": "Entradas del script",
   "scriptLayer": "Capa de script",

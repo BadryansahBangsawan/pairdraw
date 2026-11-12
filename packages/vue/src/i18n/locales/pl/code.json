@@ -16,6 +16,7 @@
   "reset": "Resetuj",
   "scriptBindInput": "Powiąż wejście ze zmienną",
   "scriptCode": "Kod skryptu",
+  "scriptConvertToLayers": "Konwertuj na warstwy",
   "scriptDetachInput": "Odłącz zmienną",
   "scriptInputs": "Wejścia skryptu",
   "scriptLayer": "Warstwa skryptu",

@@ -16,6 +16,7 @@
   "reset": "Zurücksetzen",
   "scriptBindInput": "Eingabe an Variable binden",
   "scriptCode": "Skriptcode",
+  "scriptConvertToLayers": "In Ebenen umwandeln",
   "scriptDetachInput": "Variable lösen",
   "scriptInputs": "Skript-Eingaben",
   "scriptLayer": "Skriptebene",

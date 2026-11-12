@@ -5,3 +5,4 @@
 - Reads and writes Figma prototype reactions in `.fig` files, so interactions survive a round trip and keep reaction ids as the file's GUIDs.
 - Draws a selected layer's prototype connections on the canvas as dashed arrows to the frames each reaction shows.
 - Plays a prototype from the Prototype section: clicks follow their interactions between frames, overlays open over the frame and close, after-delay interactions run on their own, dissolve transitions crossfade, and Escape returns to editing.
+- Adds a built-in browser to the desktop app: a separate window that opens `http` and `https` pages with back, forward, reload, zoom, and device-size presets, imports the whole page or one picked element as layers, and places a screenshot of the view, the full page, or one element on the canvas; the page gets no access to the app, and MCP tools can load a page, read an element, and send a screenshot to the canvas while that window is open.

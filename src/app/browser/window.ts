@@ -119,6 +119,20 @@ export async function readBrowserElement(selector: string): Promise<string> {
  * Draws or removes the hover outline. An empty selector removes it. The caller decides when the
  * open page is the one the chip stored.
  */
+/** Runs one page change. The caller checks the JSON; a refused change throws its sentence. */
+export async function actInBrowser(input: {
+  kind: string
+  selector: string
+  text: string
+  key: string
+  dx: number
+  dy: number
+}): Promise<string> {
+  const value = await (await tauri()).invoke('browser_act', { ...input })
+  if (typeof value !== 'string' || value === '') throw new Error('The action timed out.')
+  return value
+}
+
 export async function markBrowserElement(selector: string): Promise<void> {
   const value = await (await tauri()).invoke('browser_mark_element', { selector })
   if (typeof value !== 'string' || value === '') throw new Error('The page did not answer in time.')

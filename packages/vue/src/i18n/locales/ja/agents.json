@@ -19,6 +19,7 @@
   "approveActionsHint": "内蔵 AI は、ドキュメントを変更する操作や、読み取り専用と示されていない MCP サーバーのツールを使う前に毎回確認します。コーディングエージェントは独自の権限リクエストで確認します。",
   "approvalRequest": "AI が{tool}を実行しようとしています。この操作はドキュメントを変更します。",
   "approvalRequestExternal": "AI が MCP サーバー{server}の{tool}を実行しようとしています。",
+  "approvalRequestPage": "{page} で {tool} を実行しようとしています。この操作はそのページを変更します。",
   "approveOnce": "許可",
   "approveAlways": "このチャットでは{tool}を常に許可",
   "approveReject": "拒否"

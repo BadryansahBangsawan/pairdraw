@@ -27,6 +27,7 @@ export const agentMessageDefaults = {
     'The built-in AI asks before each action that changes the document or uses an MCP server tool not marked read-only. Coding agents ask through their own permission requests.',
   approvalRequest: params('The AI wants to run {tool}, which changes the document.'),
   approvalRequestExternal: params('The AI wants to run {tool} from the MCP server {server}.'),
+  approvalRequestPage: params('The AI wants to run {tool} on {page}, which changes that page.'),
   approveOnce: 'Allow',
   approveAlways: params('Always allow {tool} in this chat'),
   approveReject: 'Deny'

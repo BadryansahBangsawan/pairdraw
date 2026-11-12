@@ -132,6 +132,32 @@ describe('approving the built-in chat’s actions', () => {
       jest.useRealTimers()
     }
   })
+
+  test('a page action remembers the site, and another site still asks', async () => {
+    approveActions.value = true
+    const approval = createActionApproval({ chatId: 'chat-1' })
+    const first = approval.approveBrowser(
+      'browser_click',
+      'example.com',
+      { selector: '#go' },
+      'call-1'
+    )
+    const request = expectDefined(currentPermission.value, 'request')
+    expect(request.request.toolCall).toMatchObject({ title: 'browser_click' })
+    expect(request.description).toContain('example.com')
+    await answer('allow-always')
+    expect(await first).toBe('allowed')
+
+    expect(
+      await approval.approveBrowser('browser_type', 'example.com', { text: 'hi' }, 'call-2')
+    ).toBe('allowed')
+    expect(permissionQueue.value).toHaveLength(0)
+
+    const other = approval.approveBrowser('browser_click', 'other.example', {}, 'call-3')
+    expect(permissionQueue.value).toHaveLength(1)
+    await answer('reject')
+    expect(await other).toBe('declined')
+  })
 })
 
 describe('approving an external MCP server’s tools', () => {

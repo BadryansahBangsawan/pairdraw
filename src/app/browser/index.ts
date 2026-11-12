@@ -1,3 +1,4 @@
+export * from './act'
 export * from './import'
 export * from './mark'
 export * from './read'

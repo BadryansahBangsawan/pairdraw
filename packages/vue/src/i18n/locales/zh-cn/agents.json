@@ -19,6 +19,7 @@
   "approveActionsHint": "内置 AI 会在每次更改文档或使用未标记为只读的 MCP 服务器工具的操作前询问。编程代理通过它们自己的权限请求来询问。",
   "approvalRequest": "AI 想要运行 {tool}，这会更改文档。",
   "approvalRequestExternal": "AI 想要运行 MCP 服务器 {server} 中的 {tool}。",
+  "approvalRequestPage": "{page} 上将运行 {tool}。此操作会更改该页面。",
   "approveOnce": "允许",
   "approveAlways": "在此对话中始终允许 {tool}",
   "approveReject": "拒绝"

@@ -19,6 +19,7 @@
   "approveActionsHint": "Die integrierte KI fragt vor jeder Aktion nach, die das Dokument ändert oder ein Tool eines MCP-Servers nutzt, das nicht als nur lesend gekennzeichnet ist. Coding-Agenten fragen über ihre eigenen Berechtigungsanfragen.",
   "approvalRequest": "Die KI möchte {tool} ausführen, was das Dokument ändert.",
   "approvalRequestExternal": "Die KI möchte {tool} vom MCP-Server {server} ausführen.",
+  "approvalRequestPage": "Die KI möchte {tool} auf {page} ausführen. Das ändert diese Seite.",
   "approveOnce": "Erlauben",
   "approveAlways": "{tool} in diesem Chat immer erlauben",
   "approveReject": "Ablehnen"

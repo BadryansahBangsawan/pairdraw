@@ -19,6 +19,7 @@
   "approveActionsHint": "Wbudowana AI pyta przed każdą akcją, która zmienia dokument lub używa narzędzia serwera MCP nieoznaczonego jako tylko do odczytu. Agenci kodujący pytają przez własne prośby o uprawnienia.",
   "approvalRequest": "AI chce uruchomić {tool}, co zmieni dokument.",
   "approvalRequestExternal": "AI chce uruchomić {tool} z serwera MCP {server}.",
+  "approvalRequestPage": "Sztuczna inteligencja chce uruchomić {tool} na {page}. To zmienia tę stronę.",
   "approveOnce": "Zezwól",
   "approveAlways": "Zawsze zezwalaj na {tool} w tym czacie",
   "approveReject": "Odmów"

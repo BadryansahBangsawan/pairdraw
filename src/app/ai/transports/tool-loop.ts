@@ -12,6 +12,11 @@ import { toMerged } from 'es-toolkit'
 
 import type { AIProviderID, ReasoningEffort } from '@open-pencil/core/constants'
 
+import {
+  BROWSER_CHAT_TOOL_NAMES,
+  createBrowserChatTools,
+  type BrowserChatActions
+} from '@/app/ai/browser/tools'
 import { stepContextMetadata } from '@/app/ai/chat/context-window/usage'
 import { resumableTransport } from '@/app/ai/chat/history/continuation'
 import { notifyPermissionWaiting } from '@/app/ai/chat/notifications'
@@ -26,14 +31,7 @@ import { createRunPreview } from '@/app/ai/preview/run'
 import { skillCatalog } from '@/app/ai/skills/catalog'
 import { appSkillLibrary, type SkillLibrary } from '@/app/ai/skills/library'
 import { createSkillTools, SKILL_TOOL_NAMES } from '@/app/ai/skills/tools'
-import {
-  createAITools,
-  currentRun,
-  endRun,
-  recordStep,
-  startRun,
-  type AITools
-} from '@/app/ai/tools'
+import { createAITools, currentRun, endRun, recordStep, startRun } from '@/app/ai/tools'
 import { createActionApproval } from '@/app/ai/tools/approval'
 import { enabledAIToolDefinitions } from '@/app/ai/tools/catalog'
 import { aiToolOverrides } from '@/app/ai/tools/preferences'
@@ -42,6 +40,7 @@ import type { AIDiagnosticContext } from '@/app/diagnostics/events/ai'
 import type { getActiveEditorStore } from '@/app/editor/active-store'
 import { appExternalMCPTools, type ExternalMCPTools } from '@/app/integrations/mcp/client/session'
 import { mcpHistoryTools } from '@/app/integrations/mcp/client/tools'
+import { IS_TAURI } from '@/constants'
 
 type EditorStore = ReturnType<typeof getActiveEditorStore>
 
@@ -66,6 +65,12 @@ export type ToolLoopTransportOptions = {
   yieldWhen?: () => boolean
   /** The external MCP servers' tools; every chat shares the app's by default. */
   externalMCP?: ExternalMCPTools
+  /**
+   * The browser build keeps the page tools but does not offer them. A desktop test can offer
+   * them with stand-in page actions.
+   */
+  offerBrowserTools?: boolean
+  browserActions?: BrowserChatActions
 }
 
 function callSettings(
@@ -100,16 +105,26 @@ export function createToolLoopTransport({
   recorder,
   skills = appSkillLibrary,
   yieldWhen = () => false,
-  externalMCP = appExternalMCPTools()
+  externalMCP = appExternalMCPTools(),
+  offerBrowserTools = IS_TAURI,
+  browserActions
 }: ToolLoopTransportOptions) {
   // Each change waits for the person's approval while Settings → AI asks for it.
+  // A page action remembers the site's host, not the tool name.
   const approval = createActionApproval({
     chatId: diagnosticContext.sessionId ?? 'chat',
     onUnanswered: (tool) => notifyPermissionWaiting(store, modelProviderName(providerID), tool)
   })
-  const tools: AITools = {
-    ...createAITools(store, diagnosticContext, { approve: approval.approve }),
-    ...createSkillTools(() => offeredSkills)
+  const canvasTools = createAITools(store, diagnosticContext, { approve: approval.approve })
+  // ToolSet, not the canvas catalog's type: page tools sit beside it, and a request offers a subset.
+  const tools: ToolSet = {
+    ...canvasTools,
+    ...createSkillTools(() => offeredSkills),
+    ...createBrowserChatTools({
+      desktop: offerBrowserTools,
+      approval,
+      actions: browserActions
+    })
   }
   // Read again for each message, so skills installed or switched off since apply to the next one.
   // Only skills the model may load: one the user runs by name stays out of the listing and tools.
@@ -121,7 +136,7 @@ export function createToolLoopTransport({
   // While JSX streams, the chat's agent moves through the elements as they appear, here and
   // on the screens of everyone else in the room.
   const preview = createRunPreview(store)
-  const renderTool = tools.render
+  const renderTool = canvasTools.render
   renderTool.onInputStart = ({ toolCallId, abortSignal }) => preview.start(toolCallId, abortSignal)
   renderTool.onInputDelta = ({ toolCallId, inputTextDelta }) =>
     preview.delta(toolCallId, inputTextDelta)
@@ -148,6 +163,7 @@ export function createToolLoopTransport({
         enabledAIToolDefinitions(aiToolOverrides.value).map((tool) => tool.name)
       )
       if (offeredSkills.length > 0) for (const name of SKILL_TOOL_NAMES) enabledNames.add(name)
+      if (offerBrowserTools) for (const name of BROWSER_CHAT_TOOL_NAMES) enabledNames.add(name)
       preview.clear()
       // Keep the full catalog for validating history; offer only enabled tools to this request.
       const offered = {

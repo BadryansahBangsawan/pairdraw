@@ -40,8 +40,13 @@ export interface ActionApprovalOptions {
 }
 
 interface ApprovalRequest {
-  /** The name "Always allow" remembers for the rest of the chat. */
+  /** The tool the dialog names. */
   name: string
+  /**
+   * What "Always allow" remembers for the rest of the chat. A browser action remembers the
+   * page's host, so a later action on another host still asks. Other tools remember their name.
+   */
+  remember?: string
   kind: ToolKind
   args: Record<string, unknown>
   toolCallId: string
@@ -60,19 +65,21 @@ export function createActionApproval({ chatId, onUnanswered }: ActionApprovalOpt
 
   async function ask({
     name,
+    remember,
     kind,
     args,
     toolCallId,
     description
   }: ApprovalRequest): Promise<ActionApprovalOutcome> {
-    if (!approveActions.value || alwaysAllowed.has(name)) return 'allowed'
+    const remembered = remember ?? name
+    if (!approveActions.value || alwaysAllowed.has(remembered)) return 'allowed'
     const messages = agentMessages.get()
     const options: PermissionOption[] = [
       { optionId: ALLOW_ONCE, kind: 'allow_once', name: messages.approveOnce },
       {
         optionId: ALLOW_ALWAYS,
         kind: 'allow_always',
-        name: messages.approveAlways({ tool: name })
+        name: messages.approveAlways({ tool: remembered })
       },
       { optionId: REJECT, kind: 'reject_once', name: messages.approveReject }
     ]
@@ -92,7 +99,7 @@ export function createActionApproval({ chatId, onUnanswered }: ActionApprovalOpt
     )
     if (wait.timedOut) return 'unanswered'
     if (outcome.outcome !== 'selected') return 'declined'
-    if (outcome.optionId === ALLOW_ALWAYS) alwaysAllowed.add(name)
+    if (outcome.optionId === ALLOW_ALWAYS) alwaysAllowed.add(remembered)
     return outcome.optionId === ALLOW_ONCE || outcome.optionId === ALLOW_ALWAYS
       ? 'allowed'
       : 'declined'
@@ -111,6 +118,27 @@ export function createActionApproval({ chatId, onUnanswered }: ActionApprovalOpt
       args,
       toolCallId,
       description: agentMessages.get().approvalRequest({ tool: def.name })
+    })
+  }
+
+  /**
+   * Whether a browser action may change the open page. "Always allow" covers that page's host
+   * for the rest of this chat, not the tool, so the same click on another site still asks.
+   * Reading the page does not come through here.
+   */
+  async function approveBrowser(
+    tool: string,
+    host: string,
+    args: Record<string, unknown>,
+    toolCallId: string
+  ): Promise<ActionApprovalOutcome> {
+    return ask({
+      name: tool,
+      remember: host,
+      kind: 'edit',
+      args,
+      toolCallId,
+      description: agentMessages.get().approvalRequestPage({ tool, page: host })
     })
   }
 
@@ -138,7 +166,7 @@ export function createActionApproval({ chatId, onUnanswered }: ActionApprovalOpt
     pending = new AbortController()
   }
 
-  return { approve, approveExternal, cancelPending }
+  return { approve, approveBrowser, approveExternal, cancelPending }
 }
 
 export type ActionApproval = ReturnType<typeof createActionApproval>

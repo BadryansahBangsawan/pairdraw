@@ -19,6 +19,7 @@
   "approveActionsHint": "L’IA intégrée demande avant chaque action qui modifie le document ou utilise un outil de serveur MCP non marqué en lecture seule. Les agents de code demandent via leurs propres demandes d’autorisation.",
   "approvalRequest": "L’IA veut exécuter {tool}, qui modifie le document.",
   "approvalRequestExternal": "L’IA veut exécuter {tool} du serveur MCP {server}.",
+  "approvalRequestPage": "L’IA veut exécuter {tool} sur {page}. Cela modifie cette page.",
   "approveOnce": "Autoriser",
   "approveAlways": "Toujours autoriser {tool} dans ce chat",
   "approveReject": "Refuser"

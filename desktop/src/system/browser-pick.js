@@ -42,7 +42,9 @@
     document.documentElement.appendChild(overlay)
 
     const finish = (value) => {
-      document.removeEventListener('keydown', onKey, true)
+      window.removeEventListener('keydown', onKey, true)
+      window.removeEventListener('mousemove', onMove, true)
+      window.removeEventListener('click', onClick, true)
       overlay.remove()
       resolve(value)
     }
@@ -61,7 +63,7 @@
       event.stopPropagation()
       finish(cancelled)
     }
-    overlay.addEventListener('mousemove', (event) => {
+    const onMove = (event) => {
       const hit = hitAt(event)
       if (!hit) {
         box.style.display = 'none'
@@ -73,13 +75,16 @@
       box.style.top = rect.top + 'px'
       box.style.width = rect.width + 'px'
       box.style.height = rect.height + 'px'
-    })
-    overlay.addEventListener('click', (event) => {
+    }
+    const onClick = (event) => {
       event.preventDefault()
       event.stopPropagation()
       const hit = hitAt(event)
       finish(hit ? selectorOf(hit) : cancelled)
-    })
-    document.addEventListener('keydown', onKey, true)
+    }
+    // Capture phase on window runs before a listener the page put on document.
+    window.addEventListener('keydown', onKey, true)
+    window.addEventListener('mousemove', onMove, true)
+    window.addEventListener('click', onClick, true)
   })
 })()

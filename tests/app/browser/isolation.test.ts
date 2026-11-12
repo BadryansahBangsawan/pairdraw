@@ -80,5 +80,8 @@ describe('browser window isolation', () => {
     expect(source).toContain('__openpencilCapturePage')
     expect(source).toContain('__openpencilCaptureElement')
     expect(source).toContain('include_str!("browser-pick.js")')
+    const pick = readFileSync(repoPath('desktop/src/system/browser-pick.js'), 'utf8')
+    expect(pick).toContain("window.addEventListener('click', onClick, true)")
+    expect(pick).toContain("window.addEventListener('keydown', onKey, true)")
   })
 })

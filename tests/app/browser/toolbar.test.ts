@@ -54,5 +54,9 @@ describe('browser toolbar requests', () => {
       cancelled: false,
       detail: 'The browser window is not open'
     })
+    expect(browserCaptureFailure(new Error('The pick timed out'))).toEqual({
+      cancelled: false,
+      detail: 'The pick timed out'
+    })
   })
 })

@@ -8,6 +8,7 @@
 //! page is reported from here, over events to the `main` window. The window denies every popup.
 
 use std::sync::Mutex;
+use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 use tauri::{
@@ -273,6 +274,21 @@ async fn eval_text<R: Runtime>(window: &WebviewWindow<R>, script: &str) -> Resul
     serde_json::from_str::<String>(&value).map_err(|_| "The page returned nothing".to_owned())
 }
 
+/// Stops waiting when the page never finishes a pick. The toolbar’s promise ends with this error.
+async fn until_deadline<T>(
+    pending: impl std::future::Future<Output = Result<T, String>>,
+    wait: Duration,
+) -> Result<T, String> {
+    match tokio::time::timeout(wait, pending).await {
+        Ok(result) => result,
+        Err(_) => Err("The pick timed out".to_owned()),
+    }
+}
+
+async fn eval_pick<R: Runtime>(window: &WebviewWindow<R>) -> Result<String, String> {
+    until_deadline(eval_text(window, PICK_ELEMENT), Duration::from_secs(30)).await
+}
+
 fn capture_html(html: String) -> Result<String, String> {
     if let Some(error) = html.strip_prefix(CAPTURE_ERROR_PREFIX) {
         return Err(error.to_owned());
@@ -315,7 +331,7 @@ fn element_call(selector: &str) -> Result<String, String> {
 #[tauri::command]
 pub async fn browser_capture_element<R: Runtime>(app: AppHandle<R>) -> Result<String, String> {
     let window = browser_window(&app)?;
-    let picked = eval_text(&window, PICK_ELEMENT).await?;
+    let picked = eval_pick(&window).await?;
     let selector = picked_selector(&picked)?;
     capture_html(eval_text(&window, &element_call(selector)?).await?)
 }
@@ -337,7 +353,7 @@ struct JsonSize {
 async fn element_rect<R: Runtime>(
     window: &WebviewWindow<R>,
 ) -> Result<crate::system::browser_shot::ShotRect, String> {
-    let picked = eval_text(window, PICK_ELEMENT).await?;
+    let picked = eval_pick(window).await?;
     let selector = picked_selector(&picked)?.to_owned();
     let quoted = serde_json::to_string(&selector).map_err(|error| error.to_string())?;
     let script = format!(
@@ -478,6 +494,22 @@ mod tests {
         ] {
             assert!(browser_url(url).is_err(), "{url} was allowed");
         }
+    }
+
+    #[test]
+    fn a_silent_pick_ends_with_a_clear_error() {
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_time()
+            .build()
+            .expect("runtime");
+        runtime.block_on(async {
+            let result = super::until_deadline(
+                std::future::pending::<Result<String, String>>(),
+                std::time::Duration::from_millis(20),
+            )
+            .await;
+            assert_eq!(result, Err("The pick timed out".to_owned()));
+        });
     }
 
     #[test]

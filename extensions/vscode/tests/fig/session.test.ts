@@ -115,6 +115,14 @@ describe('editor session', () => {
     expect(edited).toHaveLength(2)
   })
 
+  test('does not write a save whose bytes are not base64', async () => {
+    const { session, send } = openSession()
+    const saving = session.save()
+    send({ type: 'saved', id: 1, name: 'drawing.fig', data: '****' })
+    await expect(saving).rejects.toThrow('not base64')
+    expect(files.has(uri.path)).toBe(false)
+  })
+
   test('rejects a save with the editor message and shows it once', async () => {
     const { session, send } = openSession()
     const saving = session.save()

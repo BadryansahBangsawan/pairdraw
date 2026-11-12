@@ -1,4 +1,4 @@
-import { fromUint8Array, toUint8Array } from 'js-base64'
+import { fromUint8Array, isValid, toUint8Array } from 'js-base64'
 import * as v from 'valibot'
 import type * as vscode from 'vscode'
 
@@ -77,7 +77,7 @@ export class EditorSession implements vscode.Disposable {
       this.pendingSave = { id, resolve, reject }
       this.panel.webview.postMessage({ type: 'save', id, format: documentFormat(destination.path) })
     })
-    await this.host.writeFile(destination, toUint8Array(message.data))
+    await this.host.writeFile(destination, bytesFromEditor(message.data))
     this.dirty = false
   }
 
@@ -95,7 +95,7 @@ export class EditorSession implements vscode.Disposable {
       this.panel.webview.postMessage({ type: 'export', id, ...options })
     })
     this.pendingExport = null
-    return { data: toUint8Array(message.data), mimeType: message.mimeType }
+    return { data: bytesFromEditor(message.data), mimeType: message.mimeType }
   }
 
   private onMessage(raw: unknown): void {
@@ -136,6 +136,12 @@ export class EditorSession implements vscode.Disposable {
       this.host.showError(`Pairdraw: ${message.message}`)
     }
   }
+}
+
+/** Bytes the editor claimed to return. Invalid base64 decodes as empty and would wipe the file. */
+function bytesFromEditor(data: string): Uint8Array {
+  if (!isValid(data)) throw new Error('The editor returned data that is not base64')
+  return toUint8Array(data)
 }
 
 /** The file's own name, which the editor keeps as the document title. */

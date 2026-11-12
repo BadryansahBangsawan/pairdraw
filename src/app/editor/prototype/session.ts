@@ -102,7 +102,8 @@ export function reactionAt(
 /**
  * The session after an action runs. `NAVIGATE` moves to its frame and remembers this one for
  * Back; `OVERLAY` opens a frame over the screen and `CLOSE` takes the top one away; `BACK`
- * returns to the frame before; an action this version cannot show leaves the session as it is.
+ * returns to the previous screen and drops overlays, which are not history entries; an action
+ * this version cannot show leaves the session as it is.
  */
 export function step(
   graph: SceneGraph,
@@ -112,7 +113,12 @@ export function step(
   if (action.type === 'BACK') {
     const previous = session.history.at(-1)
     if (!previous) return session
-    return { ...session, frameId: previous, history: session.history.slice(0, -1) }
+    return {
+      ...session,
+      frameId: previous,
+      history: session.history.slice(0, -1),
+      overlays: []
+    }
   }
   if (action.type === 'CLOSE') {
     if (session.overlays.length === 0) return session

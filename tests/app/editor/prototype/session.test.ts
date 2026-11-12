@@ -237,6 +237,29 @@ describe('overlays', () => {
     expect(step(graph, session, { type: 'CLOSE' })).toBe(session)
   })
 
+  test('back returns to the previous screen and drops the overlay open on the screen it leaves', () => {
+    const { graph, first, second } = fixture()
+    const overlay = graph.createNode('FRAME', graph.getPages()[0].id, {
+      x: 800,
+      y: 0,
+      width: 100,
+      height: 100
+    })
+    const there = step(graph, startSession(first.id), {
+      type: 'NODE',
+      nodeId: second.id,
+      navigation: 'NAVIGATE',
+      transition: { type: 'INSTANT', duration: 0.3 },
+      overlayPosition: 'CENTER'
+    })
+    const opened = step(graph, there, overlayAction(overlay.id))
+    const back = step(graph, opened, { type: 'BACK' })
+    expect(back.frameId).toBe(first.id)
+    expect(back.history).toEqual([])
+    expect(back.overlays).toEqual([])
+    expect(shownFrame(back)).toBe(first.id)
+  })
+
   test('navigating away closes the open overlays', () => {
     const { graph, first, second } = fixture()
     const opened = step(graph, startSession(first.id), overlayAction(second.id))

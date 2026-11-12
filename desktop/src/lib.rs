@@ -57,6 +57,7 @@ pub fn run() {
     builder = builder.plugin(tauri_plugin_deep_link::init());
 
     builder
+        .manage(system::browser::BrowserWindowState::default())
         .manage(launch::PendingOpen::default())
         .manage(ProxyHttpRequests::default())
         .manage(network::oauth::ChatGPTOAuthLoopback::default())
@@ -113,7 +114,15 @@ pub fn run() {
             launch::take_pending_rooms,
             system::env::sharing_disabled_by_env,
             launch::take_pending_cloud_links,
-            system::env::webview_version
+            system::env::webview_version,
+            system::browser::browser_open,
+            system::browser::browser_navigate,
+            system::browser::browser_back,
+            system::browser::browser_forward,
+            system::browser::browser_reload,
+            system::browser::browser_set_zoom,
+            system::browser::browser_set_device,
+            system::browser::browser_close
         ])
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())

@@ -20,12 +20,7 @@ describe('browser session state', () => {
     expect(browserState.url).toBe('https://example.com/')
     expect(browserState.loading).toBe(true)
 
-    markPageLoaded({
-      url: 'https://example.com/final',
-      title: 'Example',
-      canGoBack: false,
-      canGoForward: false
-    })
+    markPageLoaded({ url: 'https://example.com/final', title: 'Example' })
     expect(browserState.loading).toBe(false)
     expect(browserState.url).toBe('https://example.com/final')
     expect(browserState.title).toBe('Example')
@@ -66,7 +61,7 @@ describe('browser session state', () => {
 
   test('closing forgets the page entirely', () => {
     markNavigating('https://example.com/')
-    markPageLoaded({ url: 'https://example.com/', title: 'x', canGoBack: true, canGoForward: true })
+    markPageLoaded({ url: 'https://example.com/', title: 'x' })
     markClosed()
     expect(browserState).toMatchObject({ open: false, url: null, title: '', loading: false })
   })

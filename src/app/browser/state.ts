@@ -28,8 +28,6 @@ export interface BrowserSessionState {
   url: string | null
   title: string
   loading: boolean
-  canGoBack: boolean
-  canGoForward: boolean
   /** Zoom in percent, as the toolbar shows it. */
   zoom: number
   device: string
@@ -40,8 +38,6 @@ export const browserState = reactive<BrowserSessionState>({
   url: null,
   title: '',
   loading: false,
-  canGoBack: false,
-  canGoForward: false,
   zoom: 100,
   device: 'desktop'
 })
@@ -50,8 +46,6 @@ export const browserState = reactive<BrowserSessionState>({
 export interface BrowserPageReport {
   url: string
   title: string
-  canGoBack: boolean
-  canGoForward: boolean
 }
 
 /** Applies a navigation the window accepted. */
@@ -68,8 +62,6 @@ export function markPageLoaded(report: BrowserPageReport): void {
   browserState.url = report.url
   browserState.title = report.title
   browserState.loading = false
-  browserState.canGoBack = report.canGoBack
-  browserState.canGoForward = report.canGoForward
 }
 
 /** The page failed to load: the address stays, and the toolbar stops showing progress. */
@@ -103,6 +95,4 @@ export function markClosed(): void {
   browserState.url = null
   browserState.title = ''
   browserState.loading = false
-  browserState.canGoBack = false
-  browserState.canGoForward = false
 }

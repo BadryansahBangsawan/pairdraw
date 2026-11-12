@@ -129,7 +129,8 @@ pub fn run() {
             system::browser_read::browser_read_element,
             system::browser_read::browser_read_outline,
             system::browser_mark::browser_mark_element,
-            system::browser_act::browser_act
+            system::browser_act::browser_act,
+            system::browser::browser_page_text
         ])
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())

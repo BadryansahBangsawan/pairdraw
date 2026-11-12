@@ -442,6 +442,19 @@ pub async fn browser_screenshot<R: Runtime>(
     shot
 }
 
+/// The open page's own account of itself: its URL, its title, and the characters `innerText`
+/// shows. The script returns a JSON string. It is not the capturer, and the text is not HTML.
+pub(crate) fn page_text_script() -> &'static str {
+    r#"JSON.stringify({url:location.href,title:document.title,text:(document.body&&document.body.innerText)||""})"#
+}
+
+/// The open page's URL, title, and visible text. The caller treats that text as data.
+#[tauri::command]
+pub async fn browser_page_text<R: Runtime>(app: AppHandle<R>) -> Result<String, String> {
+    let window = browser_window(&app)?;
+    eval_text(&window, page_text_script()).await
+}
+
 #[cfg(test)]
 mod tests {
     use super::{browser_navigation_allowed, browser_url, BROWSER_DATA_STORE};
@@ -544,6 +557,15 @@ mod tests {
             let parsed = Url::parse(url).expect(url);
             assert!(browser_navigation_allowed(&parsed), "{url} was refused");
         }
+    }
+
+    #[test]
+    fn page_text_is_inner_text_not_a_capture() {
+        let script = super::page_text_script();
+        assert!(script.contains("innerText"));
+        assert!(script.contains("JSON.stringify"));
+        assert!(!script.contains("__openpencilCapture"));
+        assert!(!script.contains("innerHTML"));
     }
 
     #[test]

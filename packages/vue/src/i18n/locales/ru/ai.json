@@ -509,5 +509,8 @@
   "skillErrorNoFrontmatter": "SKILL.md не начинается с YAML-frontmatter между строками ---.",
   "skillErrorInvalidFrontmatter": "Frontmatter файла SKILL.md некорректен: {detail}",
   "skillErrorNoDescription": "Во frontmatter файла SKILL.md нет описания.",
-  "skillErrorNoName": "Во frontmatter файла SKILL.md нет имени."
+  "skillErrorNoName": "Во frontmatter файла SKILL.md нет имени.",
+  "chatReferenceCitations": "Цитаты",
+  "researchSource": "Источник",
+  "researchRead": "Прочитано"
 }

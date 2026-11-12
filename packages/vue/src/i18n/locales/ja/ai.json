@@ -509,5 +509,8 @@
   "skillErrorNoFrontmatter": "SKILL.md が --- 行で囲まれた YAML フロントマターで始まっていません。",
   "skillErrorInvalidFrontmatter": "SKILL.md のフロントマターが無効です: {detail}",
   "skillErrorNoDescription": "SKILL.md のフロントマターに説明がありません。",
-  "skillErrorNoName": "SKILL.md のフロントマターに名前がありません。"
+  "skillErrorNoName": "SKILL.md のフロントマターに名前がありません。",
+  "chatReferenceCitations": "引用",
+  "researchSource": "出典",
+  "researchRead": "読んだ時刻"
 }

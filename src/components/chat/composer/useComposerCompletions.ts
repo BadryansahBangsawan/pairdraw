@@ -27,6 +27,7 @@ export function useComposerCompletions() {
     node: ai.value.chatReferenceLayers,
     page: ai.value.chatReferencePages,
     skill: ai.value.chatReferenceSkills,
+    citation: ai.value.chatReferenceCitations,
     command: ai.value.chatReferenceCommands
   })
 

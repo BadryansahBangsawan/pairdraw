@@ -598,7 +598,10 @@ export const aiMessageDefaults = {
   skillErrorNoFrontmatter: 'SKILL.md does not start with YAML frontmatter between --- lines.',
   skillErrorInvalidFrontmatter: params('The SKILL.md frontmatter is invalid: {detail}'),
   skillErrorNoDescription: 'The SKILL.md frontmatter has no description.',
-  skillErrorNoName: 'The SKILL.md frontmatter has no name.'
+  skillErrorNoName: 'The SKILL.md frontmatter has no name.',
+  chatReferenceCitations: 'Citations',
+  researchSource: 'Source',
+  researchRead: 'Read'
 } as const
 
 export const aiMessages = i18n('ai', aiMessageDefaults)

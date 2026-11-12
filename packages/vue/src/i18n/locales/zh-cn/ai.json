@@ -509,5 +509,8 @@
   "skillErrorNoFrontmatter": "SKILL.md 没有以 --- 行之间的 YAML frontmatter 开头。",
   "skillErrorInvalidFrontmatter": "SKILL.md 的 frontmatter 无效：{detail}",
   "skillErrorNoDescription": "SKILL.md 的 frontmatter 中没有描述。",
-  "skillErrorNoName": "SKILL.md 的 frontmatter 中没有名称。"
+  "skillErrorNoName": "SKILL.md 的 frontmatter 中没有名称。",
+  "chatReferenceCitations": "引文",
+  "researchSource": "来源",
+  "researchRead": "阅读时间"
 }

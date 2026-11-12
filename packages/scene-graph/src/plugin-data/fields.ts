@@ -29,6 +29,7 @@ import {
   withoutPluginData,
   type PluginDataKey
 } from './field'
+import { webCitationSchema } from './schema'
 
 const DIRECTIONS = ['AUTO', 'LTR', 'RTL'] as const satisfies readonly (
   | TextDirection
@@ -277,7 +278,9 @@ export const OPEN_PENCIL_PLUGIN_DATA = {
   /** One entry per mesh paint, beside the solid fallback its record carries. */
   meshFills: jsonPluginDataField('meshFills', 'format', meshFillsSchema),
   /** Notes a person left on a layer for agents: what it means or does, and a request about it. */
-  agentNotes: jsonPluginDataField('agentNotes', 'content', agentNotesSchema)
+  agentNotes: jsonPluginDataField('agentNotes', 'content', agentNotesSchema),
+  /** A page a sticky cites: its URL, title, quote, and the time the page was read. */
+  webCitation: jsonPluginDataField('webCitation', 'content', webCitationSchema)
 } satisfies Record<string, PluginDataKey>
 
 const NOT_CONTENT = Object.values(OPEN_PENCIL_PLUGIN_DATA).filter(

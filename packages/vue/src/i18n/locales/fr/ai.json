@@ -509,5 +509,8 @@
   "skillErrorNoFrontmatter": "SKILL.md ne commence pas par un frontmatter YAML entre des lignes ---.",
   "skillErrorInvalidFrontmatter": "Le frontmatter de SKILL.md n’est pas valide : {detail}",
   "skillErrorNoDescription": "Le frontmatter de SKILL.md n’a pas de description.",
-  "skillErrorNoName": "Le frontmatter de SKILL.md n’a pas de nom."
+  "skillErrorNoName": "Le frontmatter de SKILL.md n’a pas de nom.",
+  "chatReferenceCitations": "Sources web",
+  "researchSource": "Origine",
+  "researchRead": "Lecture"
 }

@@ -3,6 +3,7 @@ import type { Component } from 'vue'
 import IconBookOpen from '~icons/lucide/book-open'
 import IconCrosshair from '~icons/lucide/crosshair'
 import IconFile from '~icons/lucide/file'
+import IconQuote from '~icons/lucide/quote'
 import IconSquareSlash from '~icons/lucide/square-slash'
 
 import type { CommandCandidate, ReferenceCandidate } from '@/app/ai/chat/references/candidates'
@@ -22,6 +23,7 @@ export interface ComposerSections {
   node: string
   page: string
   skill: string
+  citation: string
   command: string
 }
 
@@ -30,17 +32,22 @@ const KIND_ICONS: Record<ChatReferenceKind, Component> = {
   node: IconFile,
   page: IconFile,
   skill: IconBookOpen,
-  element: IconCrosshair
+  element: IconCrosshair,
+  citation: IconQuote
 }
 
-const SECTION_RANK: Record<ChatReferenceKind, number> = { node: 0, page: 1, skill: 2, element: 3 }
+const SECTION_RANK: Record<ChatReferenceKind, number> = {
+  node: 0,
+  page: 1,
+  skill: 2,
+  element: 3,
+  citation: 4
+}
 
 /** Element marks are not offered from `@`; a page section name keeps the record total. */
 function sectionName(kind: ChatReferenceKind, names: ComposerSections): string {
-  if (kind === 'node') return names.node
-  if (kind === 'page') return names.page
-  if (kind === 'skill') return names.skill
-  return names.page
+  if (kind === 'element') return names.page
+  return names[kind]
 }
 
 /** What may stand before an `@` that starts a reference: nothing, a space, or an opening bracket. */

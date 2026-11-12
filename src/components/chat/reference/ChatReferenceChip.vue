@@ -111,6 +111,11 @@ async function open() {
       :class="ui.icon()"
       aria-hidden="true"
     />
+    <icon-lucide-quote
+      v-else-if="reference.kind === 'citation'"
+      :class="ui.icon()"
+      aria-hidden="true"
+    />
     <icon-lucide-crosshair v-else :class="ui.icon()" aria-hidden="true" />
     <span :class="ui.label()">{{ resolved.name }}</span>
   </component>

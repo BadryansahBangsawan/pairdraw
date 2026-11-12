@@ -1,5 +1,6 @@
 import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
 import { stickySublayers } from '@open-pencil/scene-graph/generated'
+import { readWebCitation } from '@open-pencil/scene-graph/plugin-data'
 import { aiMessages } from '@open-pencil/vue/i18n'
 
 import { referenceLink } from '@/app/ai/chat/references/link'
@@ -44,7 +45,12 @@ export function stickyPrompt(
   return notes
     .map(({ note, text }) => {
       const link = referenceLink({ kind: 'node', id: note.id, label: note.name || text })
-      return `${text}\n\n${messages.stickyPromptSource({ note: link })}`
+      const lines = [text, '', messages.stickyPromptSource({ note: link })]
+      const citation = readWebCitation(note)
+      if (citation) {
+        lines.push(referenceLink({ kind: 'citation', id: note.id, label: citation.title }))
+      }
+      return lines.join('\n')
     })
     .join('\n\n')
 }

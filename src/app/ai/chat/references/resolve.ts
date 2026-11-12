@@ -1,4 +1,5 @@
 import type { SceneNode } from '@open-pencil/scene-graph'
+import { readWebCitation } from '@open-pencil/scene-graph/plugin-data'
 
 import { requestSkillSettings } from '@/app/ai/skills/settings/request'
 import type { EditorStore } from '@/app/editor/active-store'
@@ -36,6 +37,17 @@ export function resolveReference(
       name: reference.label,
       present: parseElementMark(reference.id) !== null,
       node: null
+    }
+  }
+  if (reference.kind === 'citation') {
+    const node = store?.graph.getNode(reference.id) ?? null
+    const citation = node ? readWebCitation(node) : null
+    const present = Boolean(node && node.type !== 'CANVAS' && citation)
+    return {
+      ...reference,
+      name: citation?.title || reference.label,
+      present,
+      node: present ? node : null
     }
   }
   const node = store?.graph.getNode(reference.id)

@@ -1,5 +1,6 @@
 import { EmbedClient } from '../embed/client'
 import { startWebviewHost } from './host'
+import { extensionHostData } from './inbound'
 
 interface WebviewAPI {
   postMessage(message: unknown): void
@@ -36,7 +37,11 @@ async function run(frame: HTMLIFrameElement): Promise<void> {
     transport: {
       post: (message) => vscode.postMessage(message),
       onMessage: (listener) => {
-        const handler = (event: MessageEvent): void => listener(event.data)
+        const handler = (event: MessageEvent): void => {
+          const data = extensionHostData(event, frame.contentWindow)
+          if (data === null) return
+          listener(data)
+        }
         window.addEventListener('message', handler)
         return () => window.removeEventListener('message', handler)
       }

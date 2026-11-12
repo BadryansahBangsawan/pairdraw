@@ -122,7 +122,8 @@ pub fn run() {
             system::browser::browser_reload,
             system::browser::browser_set_zoom,
             system::browser::browser_set_device,
-            system::browser::browser_close
+            system::browser::browser_close,
+            system::browser::browser_capture_page
         ])
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())

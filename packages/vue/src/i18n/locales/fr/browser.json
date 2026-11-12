@@ -21,5 +21,7 @@
   "schemeRefused": "Le navigateur n’ouvre que les adresses http et https.",
   "invalidAddress": "Cette adresse n’est pas une page que le navigateur peut ouvrir.",
   "commandFailed": "Le navigateur n’a pas pu le faire : {error}",
-  "close": "Fermer"
+  "close": "Fermer",
+  "importPage": "Importer la page",
+  "importEmpty": "La page n’avait rien à importer."
 }

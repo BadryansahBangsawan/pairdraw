@@ -85,6 +85,16 @@ export async function closeBrowserWindow(): Promise<void> {
 }
 
 /**
+ * Clipboard HTML of the open page. Rust reads the page and hands the envelope back; the page
+ * cannot call this, and the editor imports the result with the web paste it already has.
+ */
+export async function captureBrowserPage(): Promise<string> {
+  const html = await (await tauri()).invoke('browser_capture_page')
+  if (typeof html !== 'string' || html === '') throw new Error('The page returned no capture')
+  return html
+}
+
+/**
  * Follows the window for as long as the caller is mounted: the page it shows, and the window
  * going away however the user closed it. Returns the unsubscribe.
  */

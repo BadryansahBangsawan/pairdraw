@@ -26,7 +26,9 @@ export const browserMessageDefaults = {
   schemeRefused: 'The browser opens http and https addresses only.',
   invalidAddress: 'That address is not a page the browser can open.',
   commandFailed: params('The browser could not do that: {error}'),
-  close: 'Close'
+  close: 'Close',
+  importPage: 'Import page',
+  importEmpty: 'The page had nothing to import.'
 } as const
 
 export const browserMessages = i18n('browser', browserMessageDefaults)

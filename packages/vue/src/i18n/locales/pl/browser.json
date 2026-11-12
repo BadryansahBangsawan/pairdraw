@@ -21,5 +21,7 @@
   "schemeRefused": "Przeglądarka otwiera tylko adresy http i https.",
   "invalidAddress": "Ten adres nie jest stroną, którą przeglądarka może otworzyć.",
   "commandFailed": "Przeglądarka nie mogła tego zrobić: {error}",
-  "close": "Zamknij"
+  "close": "Zamknij",
+  "importPage": "Importuj stronę",
+  "importEmpty": "Strona nie miała nic do zaimportowania."
 }

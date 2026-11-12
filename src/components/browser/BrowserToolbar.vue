@@ -4,6 +4,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { useBrowserMessages } from '@open-pencil/vue/i18n'
 
+import { importBrowserCapture } from '@/app/browser/import'
 import {
   browserState,
   BROWSER_ZOOM_MAX,
@@ -18,6 +19,7 @@ import {
   type BrowserToolbarRefusal
 } from '@/app/browser/toolbar'
 import {
+  captureBrowserPage,
   closeBrowserWindow,
   goBack,
   goForward,
@@ -27,6 +29,7 @@ import {
   watchBrowserWindow,
   zoomBrowserWindow
 } from '@/app/browser/window'
+import { useEditorStore } from '@/app/editor/active-store'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import AppAlert from '@/components/ui/feedback/AppAlert.vue'
@@ -42,6 +45,7 @@ import { IS_TAURI } from '@/constants'
  * A browser tab can show the controls and why they do nothing; it never calls the window.
  */
 const messages = useBrowserMessages()
+const editor = useEditorStore()
 const popover = usePopoverUI({ content: 'w-80 p-3' })
 const address = ref(browserState.url ?? '')
 const addressFocused = ref(false)
@@ -174,6 +178,17 @@ async function runWindowCommand(command: () => Promise<void>) {
     refusal.value = commandError(error)
   }
 }
+
+async function importOpenPage() {
+  if (!windowReady.value) return
+  try {
+    const html = await captureBrowserPage()
+    const placed = await importBrowserCapture(editor, html)
+    refusal.value = placed ? null : messages.value.importEmpty
+  } catch (error) {
+    refusal.value = commandError(error)
+  }
+}
 </script>
 
 <template>
@@ -298,6 +313,15 @@ async function runWindowCommand(command: () => Promise<void>) {
               <icon-lucide-plus class="size-4" />
             </IconButton>
           </div>
+          <AppButton
+            type="button"
+            size="sm"
+            :disabled="!windowReady"
+            data-test-id="browser-import-page"
+            @click="importOpenPage"
+          >
+            {{ messages.importPage }}
+          </AppButton>
           <PanelFieldGroup :label="messages.device">
             <AppSelect
               :model-value="browserState.device"

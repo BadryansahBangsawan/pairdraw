@@ -14,6 +14,7 @@ use tauri::{
     webview::PageLoadEvent, AppHandle, Emitter, LogicalSize, Manager, Runtime, WebviewUrl,
     WebviewWindow, WebviewWindowBuilder, WindowEvent,
 };
+use tokio::sync::oneshot;
 use url::Url;
 
 /// The label of the browser window. No capability file lists it, and none may.
@@ -245,6 +246,50 @@ pub fn browser_close<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
+/// The capturer, evaluated in the page. It reads the DOM and returns clipboard HTML. It is not an
+/// initialization script: nothing of the app is stored on the page, and the page cannot call us.
+const CAPTURE_RUNTIME: &str = include_str!("browser-capture.js");
+const CAPTURE_ERROR_PREFIX: &str = "openpencil-capture-error:";
+
+fn capture_call(call: &str) -> String {
+    format!("{CAPTURE_RUNTIME}\n;{call}")
+}
+
+/// The text a script returns. The webview JSON-encodes it, and a thrown script returns nothing.
+/// The callback may run more than once, so the sender is taken on the first reply.
+async fn eval_text<R: Runtime>(window: &WebviewWindow<R>, script: &str) -> Result<String, String> {
+    let (sender, receiver) = oneshot::channel();
+    let slot = Mutex::new(Some(sender));
+    window
+        .eval_with_callback(script, move |value| {
+            if let Some(sender) = slot.lock().ok().and_then(|mut guard| guard.take()) {
+                let _ = sender.send(value);
+            }
+        })
+        .map_err(|error| error.to_string())?;
+    let value = receiver
+        .await
+        .map_err(|_| "The page did not answer".to_owned())?;
+    serde_json::from_str::<String>(&value).map_err(|_| "The page returned nothing".to_owned())
+}
+
+fn capture_html(html: String) -> Result<String, String> {
+    if let Some(error) = html.strip_prefix(CAPTURE_ERROR_PREFIX) {
+        return Err(error.to_owned());
+    }
+    if html.is_empty() {
+        return Err("The page returned no capture".to_owned());
+    }
+    Ok(html)
+}
+
+/// The open page as capture HTML. The editor imports it; the page learns nothing from the call.
+#[tauri::command]
+pub async fn browser_capture_page<R: Runtime>(app: AppHandle<R>) -> Result<String, String> {
+    let window = browser_window(&app)?;
+    capture_html(eval_text(&window, &capture_call("__openpencilCapturePage()")).await?)
+}
+
 #[cfg(test)]
 mod tests {
     use super::{browser_navigation_allowed, browser_url, BROWSER_DATA_STORE};
@@ -259,6 +304,19 @@ mod tests {
         ] {
             assert!(browser_url(url).is_ok(), "{url} was refused");
         }
+    }
+
+    #[test]
+    fn a_capture_error_is_the_text_after_the_prefix() {
+        assert_eq!(
+            super::capture_html("openpencil-capture-error:no document".to_owned()),
+            Err("no document".to_owned())
+        );
+        assert!(super::capture_html(String::new()).is_err());
+        assert_eq!(
+            super::capture_html("<!--capture-->".to_owned()).as_deref(),
+            Ok("<!--capture-->")
+        );
     }
 
     #[test]

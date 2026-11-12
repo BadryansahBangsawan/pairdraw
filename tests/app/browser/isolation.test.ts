@@ -75,5 +75,8 @@ describe('browser window isolation', () => {
     expect(source).not.toContain('.incognito(')
     // A popup it opened would be a window of our app; every one is denied instead.
     expect(source).toContain('NewWindowResponse::Deny')
+    // The capturer is read into the page on demand. It is not stored there at load.
+    expect(source).toContain('include_str!("browser-capture.js")')
+    expect(source).toContain('__openpencilCapturePage')
   })
 })

@@ -21,5 +21,7 @@
   "schemeRefused": "只能打开普通的网页地址。",
   "invalidAddress": "这个地址不是浏览器能打开的页面。",
   "commandFailed": "浏览器没能完成这个操作：{error}",
-  "close": "关闭"
+  "close": "关闭",
+  "importPage": "导入页面",
+  "importEmpty": "页面上没有可导入的内容。"
 }

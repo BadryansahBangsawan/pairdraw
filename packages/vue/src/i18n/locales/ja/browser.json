@@ -21,5 +21,7 @@
   "schemeRefused": "開けるのは通常のウェブ住所だけです。",
   "invalidAddress": "その住所はブラウザが開けるページではありません。",
   "commandFailed": "ブラウザはそれを実行できませんでした：{error}",
-  "close": "閉じる"
+  "close": "閉じる",
+  "importPage": "ページを取り込む",
+  "importEmpty": "取り込む内容がページにありません。"
 }

@@ -5,6 +5,7 @@ import type { CanvasGuide } from './guides'
 import type { InstanceOverrideState } from './instances/overrides'
 import type { Color, Matrix, Rect, Vector } from './primitives'
 import type { ShapeWithTextType } from './shape-with-text/kinds'
+import type { ShaderUniformValue } from './shaders/schema'
 
 export interface SceneGraphEvents {
   'node:created': (node: SceneNode) => void
@@ -260,7 +261,9 @@ export interface Stroke extends Fill {
   dashPattern?: number[]
 }
 
-export interface Effect {
+export type Effect = ShadowEffect | ShaderEffect
+
+export interface ShadowEffect {
   type: 'DROP_SHADOW' | 'INNER_SHADOW' | 'LAYER_BLUR' | 'BACKGROUND_BLUR' | 'FOREGROUND_BLUR'
   color: Color
   offset: Vector
@@ -269,6 +272,16 @@ export interface Effect {
   visible: boolean
   blendMode?: BlendMode
   showShadowBehindNode?: boolean
+}
+
+/** A layer post-processed by shader code the user wrote; the layer is the `pencil:object` sample. */
+export interface ShaderEffect {
+  type: 'SHADER'
+  source: string
+  uniforms?: Record<string, ShaderUniformValue>
+  uniformBindings?: Record<string, string>
+  visible: boolean
+  blendMode?: BlendMode
 }
 
 export type ConstraintType = 'MIN' | 'CENTER' | 'MAX' | 'STRETCH' | 'SCALE'

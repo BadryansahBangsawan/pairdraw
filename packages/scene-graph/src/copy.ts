@@ -54,6 +54,7 @@ export function copyStroke(s: Stroke): Stroke {
 }
 
 export function copyEffect(e: Effect): Effect {
+  if (e.type === 'SHADER') return structuredClone(e)
   return {
     ...e,
     color: { ...e.color },

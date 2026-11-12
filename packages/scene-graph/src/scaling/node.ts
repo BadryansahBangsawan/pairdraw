@@ -26,12 +26,15 @@ function scaledStrokes(strokes: readonly Stroke[], scale: number): Stroke[] {
 }
 
 function scaledEffects(effects: readonly Effect[], scale: number): Effect[] {
-  return effects.map((effect) => ({
-    ...structuredClone(effect),
-    offset: { x: effect.offset.x * scale, y: effect.offset.y * scale },
-    radius: effect.radius * scale,
-    spread: effect.spread * scale
-  }))
+  return effects.map((effect) => {
+    const copy = structuredClone(effect)
+    // A shader effect has no geometry of its own; only a shadow's measures follow the layer.
+    if (copy.type === 'SHADER') return copy
+    copy.offset = { x: copy.offset.x * scale, y: copy.offset.y * scale }
+    copy.radius *= scale
+    copy.spread *= scale
+    return copy
+  })
 }
 
 function scaledFills(fills: readonly Fill[], scale: number): Fill[] {

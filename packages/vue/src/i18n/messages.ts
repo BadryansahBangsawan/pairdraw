@@ -1,6 +1,7 @@
 import { agentMessageDefaults, agentMessages } from '#vue/i18n/messages/agents'
 import { aiMessageDefaults, aiMessages } from '#vue/i18n/messages/ai'
 import { automationMessageDefaults, automationMessages } from '#vue/i18n/messages/automation'
+import { browserMessageDefaults, browserMessages } from '#vue/i18n/messages/browser'
 import { chatContextMessageDefaults, chatContextMessages } from '#vue/i18n/messages/chat-context'
 import { cloudMessageDefaults, cloudMessages } from '#vue/i18n/messages/cloud/editor'
 import { cloudPortalMessageDefaults, cloudPortalMessages } from '#vue/i18n/messages/cloud/portal'
@@ -45,6 +46,7 @@ export {
   agentMessages,
   aiMessages,
   automationMessages,
+  browserMessages,
   chatContextMessages,
   codeMessages,
   collaborationMessages,
@@ -84,6 +86,7 @@ export const messageDefaults = {
   agents: agentMessageDefaults,
   ai: aiMessageDefaults,
   automation: automationMessageDefaults,
+  browser: browserMessageDefaults,
   chatContext: chatContextMessageDefaults,
   code: codeMessageDefaults,
   collaboration: collaborationMessageDefaults,

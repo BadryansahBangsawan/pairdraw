@@ -1,20 +1,21 @@
 import { reactive } from 'vue'
 
-/** A device size the browser can emulate: the window's content size and the pixel density. */
+/**
+ * A device size the browser can emulate: the window's content size. Pixel density is not
+ * emulated; the webview keeps the screen's own scale.
+ */
 export interface BrowserDevice {
   id: string
   width: number
   height: number
-  /** Device pixel ratio the page is told it has. */
-  scale: number
 }
 
 /** The presets the toolbar offers. `desktop` is the browser's own size, so it has no dimensions. */
 export const BROWSER_DEVICES: BrowserDevice[] = [
-  { id: 'desktop', width: 0, height: 0, scale: 0 },
-  { id: 'iphone-14', width: 390, height: 844, scale: 3 },
-  { id: 'pixel-7', width: 412, height: 915, scale: 2.625 },
-  { id: 'ipad-air', width: 820, height: 1180, scale: 2 }
+  { id: 'desktop', width: 0, height: 0 },
+  { id: 'iphone-14', width: 390, height: 844 },
+  { id: 'pixel-7', width: 412, height: 915 },
+  { id: 'ipad-air', width: 820, height: 1180 }
 ]
 
 /** The zoom range the toolbar allows, in percent. */

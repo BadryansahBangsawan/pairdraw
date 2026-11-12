@@ -8,6 +8,7 @@ import {
   agentMessages,
   aiMessages,
   automationMessages,
+  browserMessages,
   chatContextMessages,
   codeMessages,
   collaborationMessages,
@@ -50,6 +51,7 @@ export function useI18nNamespace<MessagesStore extends Store>(messages: Messages
 export const useAgentMessages = () => useI18nNamespace(agentMessages)
 export const useAIMessages = () => useI18nNamespace(aiMessages)
 export const useAutomationMessages = () => useI18nNamespace(automationMessages)
+export const useBrowserMessages = () => useI18nNamespace(browserMessages)
 export const useChatContextMessages = () => useI18nNamespace(chatContextMessages)
 export const useCodeMessages = () => useI18nNamespace(codeMessages)
 export const useCollaborationMessages = () => useI18nNamespace(collaborationMessages)

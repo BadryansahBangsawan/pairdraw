@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import {
+  BROWSER_DEVICES,
   browserState,
   currentDevice,
   markClosed,
@@ -50,6 +51,18 @@ describe('browser session state', () => {
     setZoom(50)
     expect(browserState.zoom).toBe(50)
     markClosed()
+  })
+
+  test('a device preset is a content size, and pixel density is not part of it', () => {
+    expect(BROWSER_DEVICES.map((device) => device.id)).toEqual([
+      'desktop',
+      'iphone-14',
+      'pixel-7',
+      'ipad-air'
+    ])
+    for (const device of BROWSER_DEVICES) {
+      expect(device).not.toHaveProperty('scale')
+    }
   })
 
   test('an unknown device preset falls back to desktop', () => {

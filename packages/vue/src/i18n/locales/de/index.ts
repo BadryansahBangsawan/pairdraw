@@ -3,6 +3,7 @@ import type { ComponentsJSON } from '@nanostores/i18n'
 import agents from './agents.json'
 import ai from './ai.json'
 import automation from './automation.json'
+import browser from './browser.json'
 import chatContext from './chat-context.json'
 import cloud from './cloud/editor.json'
 import cloudPortal from './cloud/portal.json'
@@ -41,6 +42,7 @@ export default {
   agents,
   ai,
   automation,
+  browser,
   chatContext,
   cloud,
   cloudPortal,

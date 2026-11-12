@@ -13,6 +13,7 @@ import {
   togglePropertiesPanel
 } from '@/app/shell/side-panels'
 import { startPresentation } from '@/app/slides/present'
+import BrowserToolbar from '@/components/browser/BrowserToolbar.vue'
 import { CloudDocumentStatusHost } from '@/components/cloud/integration'
 import CollabPanel from '@/components/collab-panel/CollabPanel.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -33,6 +34,7 @@ const slides = useSlidesMessages()
   <div class="flex items-center gap-1">
     <CloudDocumentStatusHost />
     <CollabPanel>
+      <BrowserToolbar />
       <ZoomDropdown />
       <!-- Open, a panel's raised pill takes a ring on the bar's backdrop, like the front tab. -->
       <IconButton

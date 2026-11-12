@@ -4,6 +4,7 @@ export {
   useAgentMessages,
   useAIMessages,
   useAutomationMessages,
+  useBrowserMessages,
   useChatContextMessages,
   useCodeMessages,
   useCollaborationMessages,

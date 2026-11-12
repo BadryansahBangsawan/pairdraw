@@ -78,5 +78,7 @@ describe('browser window isolation', () => {
     // The capturer is read into the page on demand. It is not stored there at load.
     expect(source).toContain('include_str!("browser-capture.js")')
     expect(source).toContain('__openpencilCapturePage')
+    expect(source).toContain('__openpencilCaptureElement')
+    expect(source).toContain('include_str!("browser-pick.js")')
   })
 })

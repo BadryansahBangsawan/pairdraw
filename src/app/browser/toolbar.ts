@@ -31,6 +31,18 @@ export function browserZoomRequest(
   return { ok: true, value: normalizeZoom(percent) }
 }
 
+/** The window says this when the user leaves an element pick without choosing. */
+export const BROWSER_PICK_CANCELLED = 'The pick was cancelled'
+
+/** A capture failure, or a quiet cancel the toolbar should not treat as a crash. */
+export function browserCaptureFailure(
+  error: unknown
+): { cancelled: true } | { cancelled: false; detail: string } {
+  const detail = error instanceof Error ? error.message : String(error)
+  if (detail === BROWSER_PICK_CANCELLED) return { cancelled: true }
+  return { cancelled: false, detail }
+}
+
 /** The device preset the toolbar may apply. An unknown id is the desktop size. */
 export function browserDeviceRequest(
   id: string,

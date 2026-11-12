@@ -23,5 +23,7 @@
   "commandFailed": "El navegador no pudo hacerlo: {error}",
   "close": "Cerrar",
   "importPage": "Importar página",
-  "importEmpty": "La página no tenía nada que importar."
+  "importElement": "Importar elemento",
+  "importEmpty": "La página no tenía nada que importar.",
+  "pickCancelled": "La selección se canceló."
 }

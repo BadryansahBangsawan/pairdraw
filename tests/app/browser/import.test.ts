@@ -47,6 +47,20 @@ describe('importing a browser capture', () => {
     ])
   })
 
+  test('a captured element becomes layers through the same paste', async () => {
+    const editor = createEditor()
+    const element: WebCapture = {
+      ...CAPTURE,
+      scope: 'element',
+      source: { ...CAPTURE.source, title: 'Button' }
+    }
+    const placed = await importBrowserCapture(editor, encodeWebCaptureClipboard(element).html)
+    expect(placed).toBe(true)
+    expect(editor.graph.getChildren(editor.state.currentPageId).map((node) => node.name)).toEqual([
+      'Button'
+    ])
+  })
+
   test('html that is not a capture adds no layers', async () => {
     const editor = createEditor()
     const placed = await importBrowserCapture(editor, '<p>Hello</p>')

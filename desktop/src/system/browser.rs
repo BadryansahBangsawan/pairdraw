@@ -290,6 +290,36 @@ pub async fn browser_capture_page<R: Runtime>(app: AppHandle<R>) -> Result<Strin
     capture_html(eval_text(&window, &capture_call("__openpencilCapturePage()")).await?)
 }
 
+/// What the picker returns when the user does not choose an element. The toolbar shows it as a
+/// cancel, not as a failed capture.
+const PICK_CANCELLED: &str = "The pick was cancelled";
+const PICK_ELEMENT: &str = include_str!("browser-pick.js");
+
+fn picked_selector(picked: &str) -> Result<&str, String> {
+    if picked.is_empty() || picked == PICK_CANCELLED {
+        Err(PICK_CANCELLED.to_owned())
+    } else {
+        Ok(picked)
+    }
+}
+
+fn element_call(selector: &str) -> Result<String, String> {
+    let quoted = serde_json::to_string(selector).map_err(|error| error.to_string())?;
+    Ok(capture_call(&format!(
+        "__openpencilCaptureElement({quoted})"
+    )))
+}
+
+/// One element of the open page, chosen by a click in that page. The overlay is gone before the
+/// capturer runs, and a cancel imports nothing.
+#[tauri::command]
+pub async fn browser_capture_element<R: Runtime>(app: AppHandle<R>) -> Result<String, String> {
+    let window = browser_window(&app)?;
+    let picked = eval_text(&window, PICK_ELEMENT).await?;
+    let selector = picked_selector(&picked)?;
+    capture_html(eval_text(&window, &element_call(selector)?).await?)
+}
+
 #[cfg(test)]
 mod tests {
     use super::{browser_navigation_allowed, browser_url, BROWSER_DATA_STORE};
@@ -317,6 +347,26 @@ mod tests {
             super::capture_html("<!--capture-->".to_owned()).as_deref(),
             Ok("<!--capture-->")
         );
+    }
+
+    #[test]
+    fn a_cancelled_pick_is_not_a_selector() {
+        assert_eq!(
+            super::picked_selector(""),
+            Err("The pick was cancelled".to_owned())
+        );
+        assert_eq!(
+            super::picked_selector("The pick was cancelled"),
+            Err("The pick was cancelled".to_owned())
+        );
+        assert_eq!(super::picked_selector("main > p"), Ok("main > p"));
+    }
+
+    #[test]
+    fn an_element_selector_is_quoted_into_the_capturer_call() {
+        let call = super::element_call("a[href=\"x\"]").expect("quoted");
+        assert!(call.contains("__openpencilCaptureElement"));
+        assert!(call.ends_with("__openpencilCaptureElement(\"a[href=\\\"x\\\"]\")"));
     }
 
     #[test]

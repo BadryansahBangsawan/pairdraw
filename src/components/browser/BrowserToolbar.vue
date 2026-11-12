@@ -14,11 +14,13 @@ import {
 } from '@/app/browser/state'
 import {
   browserAddressRequest,
+  browserCaptureFailure,
   browserDeviceRequest,
   browserZoomRequest,
   type BrowserToolbarRefusal
 } from '@/app/browser/toolbar'
 import {
+  captureBrowserElement,
   captureBrowserPage,
   closeBrowserWindow,
   goBack,
@@ -179,15 +181,25 @@ async function runWindowCommand(command: () => Promise<void>) {
   }
 }
 
-async function importOpenPage() {
+async function importCapture(capture: () => Promise<string>) {
   if (!windowReady.value) return
   try {
-    const html = await captureBrowserPage()
-    const placed = await importBrowserCapture(editor, html)
+    const placed = await importBrowserCapture(editor, await capture())
     refusal.value = placed ? null : messages.value.importEmpty
   } catch (error) {
-    refusal.value = commandError(error)
+    const failure = browserCaptureFailure(error)
+    refusal.value = failure.cancelled
+      ? messages.value.pickCancelled
+      : messages.value.commandFailed({ error: failure.detail })
   }
+}
+
+function importOpenPage() {
+  void importCapture(captureBrowserPage)
+}
+
+function importPickedElement() {
+  void importCapture(captureBrowserElement)
 }
 </script>
 
@@ -321,6 +333,15 @@ async function importOpenPage() {
             @click="importOpenPage"
           >
             {{ messages.importPage }}
+          </AppButton>
+          <AppButton
+            type="button"
+            size="sm"
+            :disabled="!windowReady"
+            data-test-id="browser-import-element"
+            @click="importPickedElement"
+          >
+            {{ messages.importElement }}
           </AppButton>
           <PanelFieldGroup :label="messages.device">
             <AppSelect

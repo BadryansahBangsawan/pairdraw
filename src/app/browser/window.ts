@@ -94,6 +94,13 @@ export async function captureBrowserPage(): Promise<string> {
   return html
 }
 
+/** Clipboard HTML of one element the user clicks in the open page. A cancel rejects. */
+export async function captureBrowserElement(): Promise<string> {
+  const html = await (await tauri()).invoke('browser_capture_element')
+  if (typeof html !== 'string' || html === '') throw new Error('The page returned no capture')
+  return html
+}
+
 /**
  * Follows the window for as long as the caller is mounted: the page it shows, and the window
  * going away however the user closed it. Returns the unsubscribe.

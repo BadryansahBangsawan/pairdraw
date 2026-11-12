@@ -23,5 +23,7 @@
   "commandFailed": "Le navigateur n’a pas pu le faire : {error}",
   "close": "Fermer",
   "importPage": "Importer la page",
-  "importEmpty": "La page n’avait rien à importer."
+  "importElement": "Importer l’élément",
+  "importEmpty": "La page n’avait rien à importer.",
+  "pickCancelled": "La sélection a été annulée."
 }

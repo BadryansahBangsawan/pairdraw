@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import {
   browserAddressRequest,
+  browserCaptureFailure,
   browserDeviceRequest,
   browserZoomRequest
 } from '@/app/browser/toolbar'
@@ -44,5 +45,14 @@ describe('browser toolbar requests', () => {
     if (device.ok) expect(device.value).toMatchObject({ id: 'desktop', width: 0, height: 0 })
     const phone = browserDeviceRequest('iphone-14', true)
     if (phone.ok) expect(phone.value).toMatchObject({ width: 390, height: 844 })
+  })
+
+  test('a cancelled element pick is not a failed capture', () => {
+    expect(browserCaptureFailure(new Error('The pick was cancelled'))).toEqual({ cancelled: true })
+    expect(browserCaptureFailure('The pick was cancelled')).toEqual({ cancelled: true })
+    expect(browserCaptureFailure(new Error('The browser window is not open'))).toEqual({
+      cancelled: false,
+      detail: 'The browser window is not open'
+    })
   })
 })

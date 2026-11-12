@@ -23,5 +23,7 @@
   "commandFailed": "Der Browser konnte das nicht tun: {error}",
   "close": "Schließen",
   "importPage": "Seite importieren",
-  "importEmpty": "Die Seite enthielt nichts zum Importieren."
+  "importElement": "Element importieren",
+  "importEmpty": "Die Seite enthielt nichts zum Importieren.",
+  "pickCancelled": "Die Auswahl wurde abgebrochen."
 }

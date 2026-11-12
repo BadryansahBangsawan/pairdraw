@@ -23,5 +23,7 @@
   "commandFailed": "Przeglądarka nie mogła tego zrobić: {error}",
   "close": "Zamknij",
   "importPage": "Importuj stronę",
-  "importEmpty": "Strona nie miała nic do zaimportowania."
+  "importElement": "Importuj element",
+  "importEmpty": "Strona nie miała nic do zaimportowania.",
+  "pickCancelled": "Wybór został anulowany."
 }

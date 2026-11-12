@@ -23,5 +23,7 @@
   "commandFailed": "浏览器没能完成这个操作：{error}",
   "close": "关闭",
   "importPage": "导入页面",
-  "importEmpty": "页面上没有可导入的内容。"
+  "importElement": "导入元素",
+  "importEmpty": "页面上没有可导入的内容。",
+  "pickCancelled": "已取消选择。"
 }

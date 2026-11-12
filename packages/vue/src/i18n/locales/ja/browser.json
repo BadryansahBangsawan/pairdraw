@@ -23,5 +23,7 @@
   "commandFailed": "ブラウザはそれを実行できませんでした：{error}",
   "close": "閉じる",
   "importPage": "ページを取り込む",
-  "importEmpty": "取り込む内容がページにありません。"
+  "importElement": "要素を取り込む",
+  "importEmpty": "取り込む内容がページにありません。",
+  "pickCancelled": "選択を取り消しました。"
 }

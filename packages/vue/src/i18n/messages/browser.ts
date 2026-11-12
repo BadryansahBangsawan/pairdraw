@@ -28,7 +28,9 @@ export const browserMessageDefaults = {
   commandFailed: params('The browser could not do that: {error}'),
   close: 'Close',
   importPage: 'Import page',
-  importEmpty: 'The page had nothing to import.'
+  importElement: 'Import element',
+  importEmpty: 'The page had nothing to import.',
+  pickCancelled: 'The pick was cancelled.'
 } as const
 
 export const browserMessages = i18n('browser', browserMessageDefaults)

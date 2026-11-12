@@ -1,3 +1,4 @@
+import { uniq } from 'es-toolkit'
 import * as v from 'valibot'
 
 import type { ToolCapability } from '@open-pencil/core/tools'
@@ -19,6 +20,13 @@ export const PLUGIN_CAPABILITIES = [
 ] as const satisfies readonly Exclude<ToolCapability, 'network:access'>[]
 
 export type PluginCapability = (typeof PLUGIN_CAPABILITIES)[number]
+
+export function isPluginCapability(value: string): value is PluginCapability {
+  for (const capability of PLUGIN_CAPABILITIES) {
+    if (capability === value) return true
+  }
+  return false
+}
 
 const pluginCapabilitySchema = v.picklist(PLUGIN_CAPABILITIES)
 
@@ -45,11 +53,26 @@ export const pluginManifestSchema = v.strictObject({
 
 export type PluginManifest = v.InferOutput<typeof pluginManifestSchema>
 
-/** One installed plugin as the app stores it. `enabled` is not part of the manifest. */
-export const installedPluginSchema = v.object({
-  ...pluginManifestSchema.entries,
-  enabled: v.boolean()
-})
+/**
+ * One installed plugin as the app stores it. `enabled` is not part of the manifest.
+ * Grants name only capabilities the manifest asked for. A missing list is none.
+ * A stored grant this version does not know, including `network:access`, is dropped.
+ */
+export const installedPluginSchema = v.pipe(
+  v.object({
+    ...pluginManifestSchema.entries,
+    enabled: v.boolean(),
+    grants: v.optional(v.array(v.string()), [])
+  }),
+  v.transform((plugin) => ({
+    ...plugin,
+    capabilities: uniq(plugin.capabilities),
+    grants: uniq(plugin.grants).filter(
+      (grant): grant is PluginCapability =>
+        isPluginCapability(grant) && plugin.capabilities.includes(grant)
+    )
+  }))
+)
 
 export type InstalledPlugin = v.InferOutput<typeof installedPluginSchema>
 

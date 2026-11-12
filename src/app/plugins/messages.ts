@@ -12,3 +12,13 @@ export function duplicatePluginMessage(id: string): string {
 export function unknownCapabilityMessage(capability: string): string {
   return `Unknown capability "${capability}".`
 }
+
+export const PLUGIN_GRANT_DISABLED_MESSAGE = 'Enable the plugin before granting a capability.'
+
+export function pluginGrantMissingMessage(id: string): string {
+  return `No plugin with the id "${id}" is installed.`
+}
+
+export function pluginGrantNotRequestedMessage(capability: string): string {
+  return `This plugin did not ask for "${capability}".`
+}

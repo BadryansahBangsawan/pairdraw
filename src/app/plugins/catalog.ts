@@ -11,10 +11,9 @@ import {
   unknownCapabilityMessage
 } from './messages'
 import {
-  PLUGIN_CAPABILITIES,
+  isPluginCapability,
   pluginManifestSchema,
   type InstalledPlugin,
-  type PluginCapability,
   type PluginManifest
 } from './schema'
 
@@ -47,13 +46,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-function isPluginCapability(value: string): value is PluginCapability {
-  for (const capability of PLUGIN_CAPABILITIES) {
-    if (capability === value) return true
-  }
-  return false
-}
-
 /**
  * Why a capability list cannot be installed, before the rest of the manifest is judged.
  * `network:access` is named on its own so it is not reported as an unknown capability.
@@ -71,7 +63,7 @@ function refusedCapabilities(value: unknown): PluginInstallResult | null {
 }
 
 function toInstalled(manifest: PluginManifest): InstalledPlugin {
-  return { ...manifest, capabilities: uniq(manifest.capabilities), enabled: true }
+  return { ...manifest, capabilities: uniq(manifest.capabilities), enabled: true, grants: [] }
 }
 
 /**
@@ -113,7 +105,12 @@ export function setPluginEnabled(
   enabled: boolean
 ): readonly InstalledPlugin[] {
   if (!plugins.some((plugin) => plugin.id === id)) return plugins
-  return plugins.map((plugin) => (plugin.id === id ? { ...plugin, enabled } : plugin))
+  return plugins.map((plugin) => {
+    if (plugin.id !== id) return plugin
+    // Disabling drops grants. Enabling again does not bring them back.
+    if (!enabled) return { ...plugin, enabled: false, grants: [] }
+    return { ...plugin, enabled: true }
+  })
 }
 
 export function removePlugin(

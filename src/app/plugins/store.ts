@@ -2,6 +2,7 @@ import { useLocalStorage } from '@vueuse/core'
 
 import { installPlugin, installPluginFile, removePlugin, setPluginEnabled } from './catalog'
 import type { PluginInstallResult } from './catalog'
+import { grantPlugin, type PluginGrantResult } from './grants'
 import type { InstalledPlugin } from './schema'
 import { readStoredPlugins, writeStoredPlugins } from './storage'
 
@@ -33,4 +34,13 @@ export function setInstalledPluginEnabled(id: string, enabled: boolean): void {
 
 export function removeInstalledPlugin(id: string): void {
   installedPlugins.value = [...removePlugin(installedPlugins.value, id)]
+}
+
+export function grantInstalledPlugin(
+  id: string,
+  capabilities: readonly string[]
+): PluginGrantResult {
+  const result = grantPlugin(installedPlugins.value, id, capabilities)
+  if (result.ok) installedPlugins.value = result.plugins
+  return result
 }

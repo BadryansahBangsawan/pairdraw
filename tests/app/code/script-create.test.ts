@@ -1,11 +1,9 @@
 import 'fake-indexeddb/auto'
 import { describe, expect, test } from 'bun:test'
 
-
 import { insertScriptNode, SCRIPT_STARTER_SOURCE, setScriptSource } from '@/app/code/script/create'
 import { readScriptNodeData, scriptChangeNeedsRun } from '@/app/code/script/run-node'
 import { createEditorStore } from '@/app/editor/session/create'
-
 
 /** A page holding one script node, written through the same path the panel uses. */
 function scriptNode() {

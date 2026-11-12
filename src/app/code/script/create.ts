@@ -11,6 +11,8 @@ import { SCRIPT_MAX_SOURCE_LENGTH, type ScriptNodeData } from '@open-pencil/scen
 
 import { runScriptNode } from '@/app/code/script/run-node'
 import type { EditorStore } from '@/app/editor/session'
+/** What writing script data needs of an editor: the document and an undoable node write. */
+export type ScriptWriteTarget = Pick<EditorStore, 'graph' | 'updateNodeWithUndo'>
 
 const { script: SCRIPT_FIELD } = OPEN_PENCIL_PLUGIN_DATA
 
@@ -41,7 +43,7 @@ return pencil.frame({ name: 'Chart', width: 320, height: 200 }, [
 
 /** The script data a node holds, kept while only its source changes. */
 function nextScriptData(
-  store: EditorStore,
+  store: ScriptWriteTarget,
   nodeId: string,
   source: string
 ): ScriptNodeData | undefined {
@@ -55,7 +57,7 @@ function nextScriptData(
  * Writes a script node's source, as an undo step: the source lives in the document, so editing it
  * is an edit like any other. Clearing it removes the program, which draws nothing.
  */
-export function setScriptSource(store: EditorStore, nodeId: string, source: string): void {
+export function setScriptSource(store: ScriptWriteTarget, nodeId: string, source: string): void {
   const node = store.graph.getNode(nodeId)
   if (node?.type !== 'SCRIPT') return
   store.updateNodeWithUndo(

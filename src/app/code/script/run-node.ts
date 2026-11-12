@@ -19,6 +19,11 @@ import {
 } from '@/app/code/script/materialize'
 import { evaluateScript, type ScriptEvaluateOptions } from '@/app/code/script/sandbox/evaluate'
 import { scriptSeed } from '@/app/code/script/sandbox/random'
+import {
+  declarationKinds,
+  inputValue,
+  parseScriptHeader
+} from '@/app/code/script/schema-header'
 import type { ScriptNodeSpec } from '@/app/code/script/sandbox/spec'
 
 const { script: SCRIPT_FIELD } = OPEN_PENCIL_PLUGIN_DATA
@@ -81,13 +86,22 @@ export async function runScriptNode(
   if (node?.type !== 'SCRIPT') return { ok: false, error: 'Not a script node.' }
   const data = readScriptNodeData(graph, nodeId)
   if (!data) return { ok: false, error: 'This script node has no code.' }
+  // A declared input with no value yet runs at its declared default, so the header alone decides
+  // what the first run draws. A bound variable that is gone or of the wrong kind stops the run.
+  const declarations = parseScriptHeader(data.source)
+  const { values, error } = scriptInputValues(graph, nodeId, declarationKinds(declarations))
+  if (error) {
+    materializeScriptError(graph, nodeId, error)
+    return { ok: false, error }
+  }
+  const inputs: Record<string, ScriptInputValue> = { ...values }
+  for (const declaration of declarations) {
+    if (inputs[declaration.name] !== undefined) continue
+    const value = inputValue(declaration, undefined)
+    if (value !== undefined) inputs[declaration.name] = value
+  }
   const evaluate = options.evaluate ?? evaluateScript
-  const result = await evaluate(data.source, {
-    inputs: resolveScriptInputs(data, (variableId) =>
-      graph.resolveVariableForNode(nodeId, variableId)
-    ),
-    seed: scriptSeed(nodeId, data.source)
-  })
+  const result = await evaluate(data.source, { inputs, seed: scriptSeed(nodeId, data.source) })
   if (!graph.getNode(nodeId)) return { ok: false, error: 'The script node is gone.' }
   if (!result.ok) {
     materializeScriptError(graph, nodeId, result.error)

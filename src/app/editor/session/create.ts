@@ -24,6 +24,7 @@ import {
   type EditorPreparationEvents
 } from '@/app/editor/preparation/events'
 import { pageProgressUnit, type EditorPreparationHandle } from '@/app/editor/preparation/types'
+import { installScriptLiveRuns } from '@/app/code/script/live'
 import { bindEditorServices } from '@/app/editor/session/bindings'
 import {
   createEditorComputedRefs,
@@ -85,6 +86,15 @@ function buildEditorStore(initialGraph?: SceneGraph) {
     syncDocumentColorSpace
   )
   editor.onEditorEvent('graph:replaced', syncDocumentColorSpace)
+  // A script node runs again when it is resized or its inputs change, without a Run click. The
+  // sandbox needs a browser frame, so a headless store (a unit test) never starts one.
+  const stopScriptLiveRuns = IS_BROWSER
+    ? installScriptLiveRuns({
+        graph: editor.graph,
+        currentPageId: () => state.currentPageId,
+        onEditorEvent: editor.onEditorEvent
+      })
+    : () => {}
   const recentPages = createRecentPages(editor)
 
   const preparationEvents = createEditorPreparationEvents()
@@ -241,6 +251,7 @@ function buildEditorStore(initialGraph?: SceneGraph) {
     // App-specific overrides and additions
     ...modules,
     dispose() {
+      stopScriptLiveRuns()
       stopColorSpaceSync()
       recentPages.dispose()
       disposeSelection()

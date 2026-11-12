@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { useEditor } from '@open-pencil/vue'
 import { useI18n } from '@open-pencil/vue/i18n'
 import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
 
 import { setScriptSource } from '@/app/code/script/create'
+import { parseScriptHeader } from '@/app/code/script/schema-header'
 import { readScriptNodeData, runScriptNode } from '@/app/code/script/run-node'
+import ScriptInputs from '@/components/properties/script/ScriptInputs.vue'
 import PanelSection from '@/components/ui/panel/PanelSection.vue'
 
 /**
@@ -19,6 +21,8 @@ const store = useEditor()
 const { code } = useI18n()
 
 const stored = useSceneComputed(() => readScriptNodeData(store.graph, nodeId)?.source ?? '')
+/** The controls the header declares; the draft, so they follow the code as it is typed. */
+const declarations = computed(() => parseScriptHeader(draft.value))
 const draft = ref(stored.value)
 const error = ref<string | null>(null)
 const running = ref(false)
@@ -62,6 +66,7 @@ function commit() {
         {{ running ? code.scriptRunning : code.scriptRun }}
       </button>
     </template>
+    <ScriptInputs :node-id="nodeId" :declarations="declarations" />
     <label class="block px-3.5 pb-2.5">
       <span class="sr-only">{{ code.scriptCode }}</span>
       <textarea

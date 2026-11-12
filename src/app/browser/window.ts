@@ -107,6 +107,22 @@ export async function screenshotBrowser(kind: BrowserShotKind): Promise<Uint8Arr
   return png
 }
 
+/** The page's JSON for one selector. The caller checks it; this does not import a layer. */
+export async function readBrowserElement(selector: string): Promise<string> {
+  const value = await (await tauri()).invoke('browser_read_element', { selector })
+  if (typeof value !== 'string' || value === '')
+    throw new Error('The page returned nothing we can read.')
+  return value
+}
+
+/** The page's JSON outline. The caller checks it; this does not import a layer. */
+export async function readBrowserOutline(): Promise<string> {
+  const value = await (await tauri()).invoke('browser_read_outline')
+  if (typeof value !== 'string' || value === '')
+    throw new Error('The page returned nothing we can read.')
+  return value
+}
+
 /** Clipboard HTML of one element the user clicks in the open page. A cancel rejects. */
 export async function captureBrowserElement(): Promise<string> {
   const html = await (await tauri()).invoke('browser_capture_element')

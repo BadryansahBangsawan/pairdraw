@@ -5,8 +5,10 @@ import { toUint8Array } from 'js-base64'
 import { createEditor } from '@open-pencil/core'
 import { encodeWebCaptureClipboard, type WebCapture } from '@open-pencil/web-capture'
 
+import { BROWSER_ELEMENT_TEXT_LIMIT } from '@/app/browser/read'
 import {
   BROWSER_DESKTOP_ONLY,
+  BROWSER_SELECTOR_TOO_LONG,
   BROWSER_SHOT_KIND,
   BROWSER_WINDOW_CLOSED,
   browserToolCall,
@@ -42,6 +44,8 @@ function actions(over: Partial<BrowserToolActions> = {}): BrowserToolActions {
     navigate: () => Promise.reject(new Error('navigate')),
     screenshot: () => Promise.reject(new Error('screenshot')),
     captureElement: () => Promise.reject(new Error('capture')),
+    readElement: () => Promise.reject(new Error('read')),
+    readOutline: () => Promise.reject(new Error('outline')),
     ...over
   }
 }
@@ -177,5 +181,60 @@ describe('running an accepted browser tool', () => {
     )
     expect(result).toEqual({ placed: true })
     expect(files.map((file) => file.name)).toEqual(['Element.png'])
+  })
+
+  test('a reading that is not the schema adds no layers', async () => {
+    const editor = createEditor()
+    await expect(
+      runBrowserTool(
+        editor,
+        { command: 'browser_read_element', selector: 'img' },
+        actions({
+          readElement: () => Promise.resolve('{"html":"<img src=x onerror=alert(1)>"}')
+        })
+      )
+    ).rejects.toThrow('The page returned nothing we can read.')
+    expect(editor.graph.getChildren(editor.state.currentPageId)).toHaveLength(0)
+  })
+
+  test('element text longer than the limit is cut, and the reply stays text', async () => {
+    const editor = createEditor()
+    const result = await runBrowserTool(
+      editor,
+      { command: 'browser_read_element', selector: 'p' },
+      actions({
+        readElement: () =>
+          Promise.resolve(
+            JSON.stringify({
+              tag: 'p',
+              role: 'paragraph',
+              text: `  ${'A'.repeat(BROWSER_ELEMENT_TEXT_LIMIT + 40)}  `,
+              box: { x: 1, y: 2, width: 3, height: 4 }
+            })
+          )
+      })
+    )
+    expect(result.untrustedPageText).toBe(true)
+    expect(result.text).toBe('A'.repeat(BROWSER_ELEMENT_TEXT_LIMIT))
+    expect(result).not.toHaveProperty('html')
+    expect(editor.graph.getChildren(editor.state.currentPageId)).toHaveLength(0)
+  })
+
+  test('a read needs a selector, and a browser build never asks the page', () => {
+    expect(browserToolCall('browser_read_element', { selector: '' }, true, true)).toEqual({
+      ok: false,
+      error: 'The element is not on the page'
+    })
+    expect(
+      browserToolCall('browser_read_element', { selector: 'p'.repeat(501) }, true, true)
+    ).toEqual({ ok: false, error: BROWSER_SELECTOR_TOO_LONG })
+    expect(browserToolCall('browser_read_outline', {}, false, true)).toEqual({
+      ok: false,
+      error: BROWSER_DESKTOP_ONLY
+    })
+    expect(browserToolCall('browser_read_element', { selector: 'h1' }, true, false)).toEqual({
+      ok: false,
+      error: BROWSER_WINDOW_CLOSED
+    })
   })
 })

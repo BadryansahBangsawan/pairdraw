@@ -3,20 +3,29 @@ import { fromUint8Array } from 'js-base64'
 import type { Editor } from '@open-pencil/core'
 
 import { importBrowserCapture } from './import'
+import {
+  acceptElementReading,
+  acceptPageOutline,
+  BROWSER_SELECTOR_LIMIT,
+  BROWSER_SELECTOR_TOO_LONG
+} from './read'
 import { placeBrowserScreenshot } from './shot'
 import { browserURLPolicy, type BrowserURLRejection } from './url'
 
 /**
- * The four MCP commands for the open browser window. They are app commands, like listing
- * documents: the MCP package only forwards them. None of them is a raw CDP session, and none of
- * them opens a window. The toolbar does that. A closed window is an error here, before any call.
+ * Commands for the open browser window. They are app commands, like listing documents: the MCP
+ * package only forwards them. None of them is a raw CDP session, and none of them opens a window.
+ * The toolbar does that. A closed window is an error here, before any call. A reading is text,
+ * not a layer.
  */
 
 export const BROWSER_TOOL_COMMANDS = [
   'browser_load_page',
   'browser_screenshot',
   'browser_element',
-  'browser_screenshot_to_canvas'
+  'browser_screenshot_to_canvas',
+  'browser_read_element',
+  'browser_read_outline'
 ] as const
 
 export type BrowserToolCommand = (typeof BROWSER_TOOL_COMMANDS)[number]
@@ -24,6 +33,8 @@ export type BrowserToolCommand = (typeof BROWSER_TOOL_COMMANDS)[number]
 export const BROWSER_DESKTOP_ONLY = 'The browser window is desktop only.'
 export const BROWSER_WINDOW_CLOSED = 'The browser window is not open.'
 export const BROWSER_SHOT_KIND = 'The screenshot must be the view, the page, or an element.'
+
+export { BROWSER_SELECTOR_TOO_LONG }
 
 const URL_ERRORS: Record<BrowserURLRejection, string> = {
   empty: 'Type an address to open.',
@@ -40,6 +51,8 @@ export type BrowserToolCall =
   | { command: 'browser_screenshot'; kind: BrowserToolShot }
   | { command: 'browser_element' }
   | { command: 'browser_screenshot_to_canvas'; kind: BrowserToolShot }
+  | { command: 'browser_read_element'; selector: string }
+  | { command: 'browser_read_outline' }
 
 export function isBrowserToolCommand(command: string): command is BrowserToolCommand {
   return (BROWSER_TOOL_COMMANDS as readonly string[]).includes(command)
@@ -74,7 +87,17 @@ export function browserToolCall(
     if (!policy.ok) return { ok: false, error: URL_ERRORS[policy.reason] }
     return { ok: true, call: { command, url: policy.url } }
   }
-  if (command === 'browser_element') return { ok: true, call: { command } }
+  if (command === 'browser_element' || command === 'browser_read_outline') {
+    return { ok: true, call: { command } }
+  }
+  if (command === 'browser_read_element') {
+    const selector = typeof record.selector === 'string' ? record.selector : ''
+    if (!selector) return { ok: false, error: 'The element is not on the page' }
+    if (selector.length > BROWSER_SELECTOR_LIMIT) {
+      return { ok: false, error: BROWSER_SELECTOR_TOO_LONG }
+    }
+    return { ok: true, call: { command, selector } }
+  }
   const kind = shotKind(record.kind)
   if (!kind) return { ok: false, error: BROWSER_SHOT_KIND }
   return { ok: true, call: { command, kind } }
@@ -85,6 +108,8 @@ export interface BrowserToolActions {
   navigate(url: string): Promise<void>
   screenshot(kind: BrowserToolShot): Promise<Uint8Array>
   captureElement(): Promise<string>
+  readElement(selector: string): Promise<string>
+  readOutline(): Promise<string>
 }
 
 type BrowserCanvas = Pick<Editor, 'pasteStyledDocument' | 'placeImageFiles'>
@@ -103,6 +128,12 @@ export async function runBrowserTool(
     const png = await actions.screenshot(call.kind)
     if (png.byteLength < 8) throw new Error('The page returned no picture')
     return { base64: fromUint8Array(png), mimeType: 'image/png' }
+  }
+  if (call.command === 'browser_read_element') {
+    return acceptElementReading(await actions.readElement(call.selector))
+  }
+  if (call.command === 'browser_read_outline') {
+    return acceptPageOutline(await actions.readOutline())
   }
   if (call.command === 'browser_element') {
     const html = await actions.captureElement()

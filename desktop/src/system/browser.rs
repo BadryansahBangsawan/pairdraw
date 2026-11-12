@@ -90,7 +90,7 @@ fn separate_browser_store<'a, R: Runtime>(
     }
 }
 
-fn browser_window<R: Runtime>(app: &AppHandle<R>) -> Result<WebviewWindow<R>, String> {
+pub(crate) fn browser_window<R: Runtime>(app: &AppHandle<R>) -> Result<WebviewWindow<R>, String> {
     app.get_webview_window(BROWSER_WINDOW_LABEL)
         .ok_or_else(|| "The browser window is not open".to_owned())
 }
@@ -258,7 +258,10 @@ fn capture_call(call: &str) -> String {
 
 /// The text a script returns. The webview JSON-encodes it, and a thrown script returns nothing.
 /// The callback may run more than once, so the sender is taken on the first reply.
-async fn eval_text<R: Runtime>(window: &WebviewWindow<R>, script: &str) -> Result<String, String> {
+pub(crate) async fn eval_text<R: Runtime>(
+    window: &WebviewWindow<R>,
+    script: &str,
+) -> Result<String, String> {
     let (sender, receiver) = oneshot::channel();
     let slot = Mutex::new(Some(sender));
     window
@@ -274,19 +277,25 @@ async fn eval_text<R: Runtime>(window: &WebviewWindow<R>, script: &str) -> Resul
     serde_json::from_str::<String>(&value).map_err(|_| "The page returned nothing".to_owned())
 }
 
-/// Stops waiting when the page never finishes a pick. The toolbar’s promise ends with this error.
-async fn until_deadline<T>(
+/// Stops waiting when the page never finishes. `expired` is the sentence the caller shows.
+pub(crate) async fn until_deadline<T>(
     pending: impl std::future::Future<Output = Result<T, String>>,
     wait: Duration,
+    expired: &str,
 ) -> Result<T, String> {
     match tokio::time::timeout(wait, pending).await {
         Ok(result) => result,
-        Err(_) => Err("The pick timed out".to_owned()),
+        Err(_) => Err(expired.to_owned()),
     }
 }
 
 async fn eval_pick<R: Runtime>(window: &WebviewWindow<R>) -> Result<String, String> {
-    until_deadline(eval_text(window, PICK_ELEMENT), Duration::from_secs(30)).await
+    until_deadline(
+        eval_text(window, PICK_ELEMENT),
+        Duration::from_secs(30),
+        "The pick timed out",
+    )
+    .await
 }
 
 fn capture_html(html: String) -> Result<String, String> {
@@ -506,6 +515,7 @@ mod tests {
             let result = super::until_deadline(
                 std::future::pending::<Result<String, String>>(),
                 std::time::Duration::from_millis(20),
+                "The pick timed out",
             )
             .await;
             assert_eq!(result, Err("The pick timed out".to_owned()));

@@ -34,6 +34,8 @@ import {
 import {
   captureBrowserElement,
   navigateBrowserWindow,
+  readBrowserElement,
+  readBrowserOutline,
   screenshotBrowser
 } from '@/app/browser/window'
 import type { EditorStore } from '@/app/editor/active-store'
@@ -51,7 +53,9 @@ export function createAutomationCommandHandlers(makeFigma: FigmaFactory, files?:
   const browserActions: BrowserToolActions = {
     navigate: navigateBrowserWindow,
     screenshot: screenshotBrowser,
-    captureElement: captureBrowserElement
+    captureElement: captureBrowserElement,
+    readElement: readBrowserElement,
+    readOutline: readBrowserOutline
   }
 
   const commandHandlers: Partial<Record<string, CommandHandler>> = {

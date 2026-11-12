@@ -220,7 +220,8 @@ export function createFilterDef(
   effects: Effect[],
   ctx: SVGExportContext
 ): { id: string; node: SVGNode } | null {
-  const visible = effects.filter((e): e is ShadowEffect => e.visible)
+  // SVG has no shader effect; a shader is a raster the format cannot carry.
+  const visible = effects.filter((e): e is ShadowEffect => e.visible && e.type !== 'SHADER')
   if (visible.length === 0) return null
 
   const id = nextDefId(ctx, 'fx')

@@ -831,8 +831,10 @@ function applyNodeVisualProps(
   if (node.type === 'POLYGON' || node.type === 'STAR') nc.count = node.pointCount
   if (node.type === 'STAR') nc.starInnerScale = node.starInnerRadius
 
-  if (node.effects.length > 0 && !hasRawUnsupportedEffects(node)) {
-    nc.effects = node.effects.map((effect) => ({
+  // Figma has no shader effect, so exporting one would write a shadow it does not have.
+  const effects = node.effects.filter((effect) => effect.type !== 'SHADER')
+  if (effects.length > 0 && !hasRawUnsupportedEffects(node)) {
+    nc.effects = effects.map((effect) => ({
       type: effect.type === 'LAYER_BLUR' ? 'FOREGROUND_BLUR' : effect.type,
       color: context.safeColor(effect.color),
       offset: effect.offset,

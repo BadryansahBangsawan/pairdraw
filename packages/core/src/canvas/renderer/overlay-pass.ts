@@ -13,6 +13,7 @@ import { drawImageCrop } from '#core/canvas/overlays/image-crop'
 import { drawLayoutOutlines } from '#core/canvas/overlays/layout-outlines'
 import { drawMeasurementSegment } from '#core/canvas/overlays/measurement'
 import { drawPixelGrid } from '#core/canvas/overlays/pixel-grid'
+import { drawPrototypeConnections } from '#core/canvas/overlays/prototype'
 import { drawCodeFocus } from '#core/canvas/overlays/selection'
 import { drawShapeHandles } from '#core/canvas/overlays/shape-handles'
 import { drawSlotOutlines } from '#core/canvas/overlays/slots'
@@ -134,6 +135,7 @@ export function drawOverlayPass(
   if (!measuring)
     drawSlotOutlines(r, canvas, graph, selectedIds, hoveredNodeId, overlays.rotationPreview)
   if (!measuring) drawLayoutOutlines(r, canvas, graph, selectedIds, hoveredNodeId, overlays)
+  if (!measuring) drawPrototypeConnections(r, canvas, graph, selectedIds, overlays.rotationPreview)
   r.drawHoverHighlight(canvas, graph, hoveredNodeId, overlays.rotationPreview)
   drawIssueHighlight(r, canvas, graph, overlays.designIssues?.highlight, overlays.rotationPreview)
   r.drawEnteredContainer(canvas, graph, overlays.enteredContainerId, overlays.rotationPreview)

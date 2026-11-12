@@ -1,12 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 
-import { nodeChangeToProps, sceneNodeToKiwi } from '#fig/node-change/index'
 import type { KiwiNodeChange } from '#fig/node-change/export/node'
+import { nodeChangeToProps, sceneNodeToKiwi } from '#fig/node-change/index'
 import { extractPrototypeReactions } from '#fig/node-change/prototype'
 
 import { getCompiledSchema, initCodec, type NodeChange } from '@open-pencil/kiwi/fig/codec'
 import type { SceneNode } from '@open-pencil/scene-graph'
 import { SceneGraph } from '@open-pencil/scene-graph'
+import { createDefaultSourceMetadata } from '@open-pencil/scene-graph/node-defaults'
 
 const importNode = (nc: NodeChange): Partial<SceneNode> =>
   nodeChangeToProps(nc, []) as Partial<SceneNode>
@@ -38,7 +39,7 @@ function importedGraph(): { graph: SceneGraph; frame: SceneNode; target: SceneNo
   const frame = graph.createNode('FRAME', graph.getPages()[0].id, {
     ...props,
     id: '2:7',
-    source: { ...props.source, id: '2:7' }
+    source: { ...createDefaultSourceMetadata(), ...props.source, id: '2:7' }
   })
   const fig = frame.source.fig ?? {}
   const target = graph.createNode('FRAME', graph.getPages()[0].id, {
@@ -114,9 +115,8 @@ describe('prototype reactions in .fig records', () => {
     const record = write(graph, frame.id)
     // The raw payload, not the model, is what an untouched record writes: the hover reaction and
     // every field this model does not read come back byte-identical.
-    expect(record.prototypeInteractions).toEqual(
-      frame.source.fig?.rawNodeFields?.prototypeInteractions
-    )
+    const raw = frame.source.fig?.rawNodeFields?.prototypeInteractions as unknown[] | undefined
+    expect(record.prototypeInteractions).toEqual(raw)
   })
 
   test('an edited layer writes its reactions and drops the stale raw payload', () => {

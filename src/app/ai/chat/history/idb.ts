@@ -185,11 +185,18 @@ export function createConversationStore(): ConversationStore {
         ['conversations', 'messages', 'selected', 'deleted', 'runs', 'pins'],
         'readwrite'
       )
-      await transaction.objectStore('deleted').put(true, id)
+      // `write` and `putRun` refuse an id in `deleted`, so a late save cannot bring a removed
+      // chat back. An id that was never stored has nothing to bring back, and a tombstone for it
+      // would never be pruned.
+      const stored =
+        (await transaction.objectStore('conversations').get(id)) ??
+        (await transaction.objectStore('messages').get(id)) ??
+        (await transaction.objectStore('pins').get(id))
+      let run = await transaction.objectStore('runs').index('conversation').openCursor(id)
+      if (stored !== undefined || run) await transaction.objectStore('deleted').put(true, id)
       await transaction.objectStore('conversations').delete(id)
       await transaction.objectStore('messages').delete(id)
       await transaction.objectStore('pins').delete(id)
-      let run = await transaction.objectStore('runs').index('conversation').openCursor(id)
       while (run) {
         await run.delete()
         run = await run.continue()

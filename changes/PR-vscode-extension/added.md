@@ -1,0 +1,1 @@
+- Open Pairdraw `.fig` and `.pen` documents in a VS Code custom editor, with toggling between Design Mode and the text editor, PNG selection export, and a Pairdraw activity-bar view.

@@ -1,13 +1,17 @@
 import { pick } from 'es-toolkit'
 
-import type { SceneNode, Stroke } from '@open-pencil/scene-graph'
+import type { Fill, SceneNode, Stroke } from '@open-pencil/scene-graph'
 import {
   createShaderPaint,
+  createShaderSourcePaint,
+  isShaderSourcePaint,
   shaderOfPaint,
   withShaderPaints,
+  type ShaderPaint,
   type ShaderPreset
 } from '@open-pencil/scene-graph/shaders'
 
+import { compileShader } from '#core/canvas/shaders/compile'
 import type { EditorContext } from '#core/editor/types'
 
 /** What a stroke has beyond its paint. */
@@ -34,19 +38,17 @@ interface NodeActions {
  * in plugin data, so each command records both together, as one undo step.
  */
 export function createShaderActions(ctx: EditorContext, nodes: NodeActions) {
-  function setNodeShader(
+  /** Records `shader` as what paint `index` of `list` draws, keeping the paint's look. */
+  function install(
     nodeId: string,
     list: ShaderPaintList,
     index: number,
-    preset: ShaderPreset
+    previous: Fill,
+    paint: Fill,
+    shader: ShaderPaint
   ): void {
     const node = ctx.graph.getNode(nodeId)
-    const previous = node?.[list].at(index)
-    if (!node || !previous) return
-    const existing = shaderOfPaint(node, previous)
-    const { paint, shader } = existing
-      ? { paint: previous, shader: { image: existing.image, preset: structuredClone(preset) } }
-      : createShaderPaint(preset)
+    if (!node) return
     const shown = { ...paint, opacity: previous.opacity, visible: previous.visible }
     const fills = list === 'fills' ? replaceAt(node.fills, index, shown) : node.fills
     // A stroke keeps its weight and geometry; only its paint changes.
@@ -60,6 +62,43 @@ export function createShaderActions(ctx: EditorContext, nodes: NodeActions) {
       [list]: list === 'fills' ? fills : strokes,
       pluginData: withShaderPaints(node, [...fills, ...strokes], [shader])
     })
+  }
+
+  function setNodeShader(
+    nodeId: string,
+    list: ShaderPaintList,
+    index: number,
+    preset: ShaderPreset
+  ): void {
+    const node = ctx.graph.getNode(nodeId)
+    const previous = node?.[list].at(index)
+    if (!node || !previous) return
+    const existing = shaderOfPaint(node, previous)
+    const { paint, shader } = existing
+      ? { paint: previous, shader: { image: existing.image, preset: structuredClone(preset) } }
+      : createShaderPaint(preset)
+    install(nodeId, list, index, previous, paint, shader)
+  }
+
+  function setNodeSource(
+    nodeId: string,
+    list: ShaderPaintList,
+    index: number,
+    source: string
+  ): void {
+    const node = ctx.graph.getNode(nodeId)
+    const previous = node?.[list].at(index)
+    if (!node || !previous) return
+    const existing = shaderOfPaint(node, previous)
+    // Code replaces code in place: the paint keeps its frame image, so pixels drawn before and
+    // after an edit stay on the same paint and undo swaps only the text.
+    const kept = existing && isShaderSourcePaint(existing)
+    if (kept) {
+      install(nodeId, list, index, previous, previous, { ...existing, source })
+      return
+    }
+    const { paint, shader } = createShaderSourcePaint(source)
+    install(nodeId, list, index, previous, paint, shader)
   }
 
   /**
@@ -81,5 +120,35 @@ export function createShaderActions(ctx: EditorContext, nodes: NodeActions) {
     }
   }
 
-  return { setShaderPaint }
+  /**
+   * Makes paint `index` of `list` on each of `nodeIds` draw shader `source`, as one undo step.
+   * A paint that already draws code keeps its image, uniforms, and bindings; a preset paint or any
+   * other paint becomes a new shader paint. A blank source is ignored, as the schema needs code.
+   */
+  function setShaderSource(
+    nodeIds: readonly string[],
+    list: ShaderPaintList,
+    index: number,
+    source: string
+  ): void {
+    if (!source.trim()) return
+    ctx.undo.beginBatch('Set shader code')
+    try {
+      for (const id of nodeIds) setNodeSource(id, list, index, source)
+    } finally {
+      ctx.undo.commitBatch()
+    }
+  }
+
+  /**
+   * What stops `source` from drawing, or null when it compiles or the canvas cannot compile
+   * shaders. The panel shows it under the code editor, before the edit is applied.
+   */
+  function shaderCodeError(source: string): string | null {
+    const ck = ctx.getCk()
+    if (!ck || !source.trim()) return null
+    return compileShader(ck, source).error
+  }
+
+  return { setShaderPaint, setShaderSource, shaderCodeError }
 }

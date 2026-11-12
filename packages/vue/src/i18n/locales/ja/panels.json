@@ -138,6 +138,8 @@
   "shaderPreset": "プリセット JSON",
   "applyShaderPreset": "適用",
   "invalidShaderPreset": "shaders のプリセットではありません",
+  "shaderCode": "シェーダーコード",
+  "invalidShaderCode": "シェーダーコードにエラーがあります",
   "shaderNeedsWebGPU": "このブラウザーは WebGPU に対応していないため、シェーダーは保存されたフレームを表示します。",
   "shaderGallery": "プリセットギャラリー",
   "shaderGallerySunset": "夕焼け",

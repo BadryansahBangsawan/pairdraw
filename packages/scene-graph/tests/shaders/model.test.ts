@@ -1,10 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph, type Fill, type SceneNode } from '@open-pencil/scene-graph'
 import { OPEN_PENCIL_PLUGIN_DATA, pluginDataEntry } from '@open-pencil/scene-graph/plugin-data'
 import {
   createShaderPaint,
   isShaderFrameCurrent,
+  isShaderPresetPaint,
   readShaderPaints,
   shaderOfPaint,
   shaderPresetKey,
@@ -16,6 +17,13 @@ const AURORA: ShaderPreset = {
   components: [{ type: 'Aurora', props: { colorA: '#7c3aed' } }]
 }
 const SWIRL: ShaderPreset = { components: [{ type: 'Swirl' }] }
+
+/** The preset the paint draws, failing when its shader is user code instead. */
+function presetOf(node: Pick<SceneNode, 'pluginData'>, paint: Fill): ShaderPreset {
+  const shader = shaderOfPaint(node, paint)
+  if (!shader || !isShaderPresetPaint(shader)) throw new Error('paint draws no preset')
+  return shader.preset
+}
 
 function rectangle() {
   const graph = new SceneGraph()
@@ -37,7 +45,7 @@ describe('shader paints', () => {
     const stored = graph.getNode(node.id)
     if (!stored) throw new Error('missing node')
 
-    expect(shaderOfPaint(stored, paint)?.preset).toEqual(AURORA)
+    expect(presetOf(stored, paint)).toEqual(AURORA)
     expect(shaderOfPaint(stored, { ...paint, imageHash: 'other' })).toBeNull()
   })
 
@@ -53,8 +61,8 @@ describe('shader paints', () => {
     const stored = graph.getNode(node.id)
     if (!stored) throw new Error('missing node')
 
-    expect(shaderOfPaint(stored, swirl.paint)?.preset).toEqual(SWIRL)
-    expect(shaderOfPaint(stored, aurora.paint)?.preset).toEqual(AURORA)
+    expect(presetOf(stored, swirl.paint)).toEqual(SWIRL)
+    expect(presetOf(stored, aurora.paint)).toEqual(AURORA)
   })
 
   test('drops shaders no paint shows any more', () => {
@@ -68,7 +76,7 @@ describe('shader paints', () => {
 
     const kept = withShaderPaints(both, [swirl.paint])
 
-    expect(readShaderPaints({ pluginData: kept }).map((shader) => shader.preset)).toEqual([SWIRL])
+    expect(readShaderPaints({ pluginData: kept }).map((shader) => ('preset' in shader ? shader.preset : null))).toEqual([SWIRL])
   })
 
   test('ignores an entry that is not a shader', () => {

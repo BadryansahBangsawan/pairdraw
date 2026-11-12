@@ -13,6 +13,8 @@ export const SHADER_MAX_UNIFORM_FLOATS = 64
 
 export type ShaderUniformKind = 'number' | 'boolean' | 'color' | 'vector' | 'sampler'
 
+import { compact } from 'es-toolkit'
+
 import type { ShaderUniformValue } from './schema'
 
 export type ShaderAutomaticInput = 'resolution' | 'time' | 'mouse' | 'sdf'
@@ -38,7 +40,7 @@ export interface ShaderUniforms {
   error: string | null
 }
 
-const COMPONENTS: Readonly<Record<string, number>> = {
+const COMPONENTS: Readonly<Record<string, number | undefined>> = {
   float: 1,
   int: 1,
   bool: 1,
@@ -57,21 +59,17 @@ const COMPONENTS: Readonly<Record<string, number>> = {
   sampler2D: 0
 }
 
-const BOOLEAN_TYPES: Readonly<Record<string, true>> = {
-  bool: true,
-  bvec2: true,
-  bvec3: true,
-  bvec4: true
-}
-const SAMPLER_TYPES: Readonly<Record<string, true>> = { sampler2D: true }
+const BOOLEAN_TYPES: ReadonlySet<string> = new Set(['bool', 'bvec2', 'bvec3', 'bvec4'])
+const SAMPLER_TYPES: ReadonlySet<string> = new Set(['sampler2D'])
 
-const DECLARATION = /^\s*uniform\s+(?:(?:highp|mediump|lowp)\s+)?([A-Za-z_]\w*)\s+([A-Za-z_]\w*)\s*(\[[^\]]*\])?\s*;/u
+const DECLARATION =
+  /^\s*uniform\s+(?:(?:highp|mediump|lowp)\s+)?([A-Za-z_]\w*)\s+([A-Za-z_]\w*)\s*(\[[^\]]*\])?\s*;/u
 const DIRECTIVE = /^@([A-Za-z_]\w*)\b([\s\S]*)$/u
 const NUMBER = /^-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/u
 
 function kindOf(type: string): ShaderUniformKind {
-  if (SAMPLER_TYPES[type] === true) return 'sampler'
-  if (BOOLEAN_TYPES[type] === true) return 'boolean'
+  if (SAMPLER_TYPES.has(type)) return 'sampler'
+  if (BOOLEAN_TYPES.has(type)) return 'boolean'
   if (type.startsWith('vec') || type.startsWith('ivec') || type.startsWith('bvec')) {
     return 'vector'
   }
@@ -130,24 +128,34 @@ function defaultFor(
   }
   if (uniform.components > 1) {
     const value = vectorValue(raw, uniform.components)
-    return value ? { value } : { error: `A ${uniform.type} default needs ${uniform.components} numbers` }
+    return value
+      ? { value }
+      : { error: `A ${uniform.type} default needs ${uniform.components} numbers` }
   }
   const value = numberValue(raw)
   return value === null ? { error: `A ${uniform.type} default must be a number` } : { value }
+}
+
+/** The type each automatic input has to be declared as. */
+const AUTOMATIC_TYPES: Readonly<Record<ShaderAutomaticInput, string>> = {
+  resolution: 'vec2',
+  time: 'float',
+  mouse: 'vec2',
+  sdf: 'sampler2D'
 }
 
 function automaticFor(
   name: string,
   uniform: ShaderUniform
 ): { automatic: ShaderAutomaticInput } | { error: string } {
-  const type = uniform.type
-  if (name === 'resolution' && type === 'vec2') return { automatic: 'resolution' }
-  if (name === 'time' && type === 'float') return { automatic: 'time' }
-  if (name === 'mouse' && type === 'vec2') return { automatic: 'mouse' }
-  if (name === 'sdf' && type === 'sampler2D') return { automatic: 'sdf' }
-  const expected =
-    name === 'time' ? 'float' : name === 'sdf' ? 'sampler2D' : name === 'resolution' ? 'vec2' : 'vec2'
-  return { error: `@${name} requires a ${expected} uniform, not ${type}` }
+  if (!isAutomaticInput(name)) return { error: `@${name} is not a shader input` }
+  const expected = AUTOMATIC_TYPES[name]
+  if (uniform.type === expected) return { automatic: name }
+  return { error: `@${name} requires a ${expected} uniform, not ${uniform.type}` }
+}
+
+function isAutomaticInput(name: string): name is ShaderAutomaticInput {
+  return name in AUTOMATIC_TYPES
 }
 
 function applyDirective(
@@ -156,9 +164,7 @@ function applyDirective(
   rest: string
 ): { automatic: ShaderAutomaticInput } | { error: string } | null {
   const text = rest.trim()
-  if (name === 'resolution' || name === 'time' || name === 'mouse' || name === 'sdf') {
-    return automaticFor(name, uniform)
-  }
+  if (isAutomaticInput(name)) return automaticFor(name, uniform)
   if (name === 'color') {
     uniform.kind = 'color'
     return null
@@ -181,16 +187,74 @@ function applyDirective(
     return null
   }
   if (name === 'range') {
-    const [minimum, maximum, extra] = text.split(/\s*,\s*|\s+/u).filter(Boolean)
-    if (extra !== undefined) return { error: '@range needs a minimum and a maximum' }
-    const low = minimum === undefined ? null : numberValue(minimum)
-    const high = maximum === undefined ? null : numberValue(maximum)
+    const limits = compact(text.split(/\s*,\s*|\s+/u))
+    if (limits.length !== 2) return { error: '@range needs a minimum and a maximum' }
+    const low = numberValue(limits[0] ?? '')
+    const high = numberValue(limits[1] ?? '')
     if (low === null || high === null) return { error: '@range needs a minimum and a maximum' }
     uniform.min = Math.min(low, high)
     uniform.max = Math.max(low, high)
     return null
   }
   return null
+}
+
+/** Applies every directive in `comment` to `uniform`; returns what stopped it, or null. */
+function applyDirectives(uniform: ShaderUniform, comment: string): string | null {
+  for (const line of uniformText(comment)) {
+    for (const chunk of line.split(/(?=@[A-Za-z_])/u)) {
+      const directive = DIRECTIVE.exec(chunk)
+      if (!directive) continue
+      const applied = applyDirective(uniform, directive[1], directive[2])
+      if (applied && 'error' in applied) return applied.error
+      if (applied && 'automatic' in applied) uniform.automatic = applied.automatic
+    }
+  }
+  return null
+}
+
+/** The uniform a declaration line declares, with its directives applied, or null if it cannot. */
+function readUniform(
+  match: RegExpExecArray,
+  commentAbove: string,
+  names: Set<string>,
+  fail: (message: string) => void
+): ShaderUniform | null {
+  const type = match[1]
+  const name = match[2]
+  if (match[3]) {
+    fail(`Array uniform ${name} is not supported`)
+    return null
+  }
+  const components = COMPONENTS[type]
+  if (components === undefined) {
+    fail(`Unsupported uniform type ${type}`)
+    return null
+  }
+  if (SAMPLER_TYPES.has(type) && !commentAbove.includes('@sdf')) {
+    fail(`Sampler uniform ${name} needs @sdf; other textures are not supported`)
+    return null
+  }
+  if (names.has(name)) {
+    fail(`Uniform ${name} is declared more than once`)
+    return null
+  }
+
+  const uniform: ShaderUniform = { name, type, kind: kindOf(type), components }
+  const directiveError = applyDirectives(uniform, commentAbove)
+  if (directiveError) {
+    fail(directiveError)
+    return null
+  }
+  if (uniform.automatic && uniform.kind === 'sampler' && uniform.automatic !== 'sdf') {
+    fail(`Sampler uniform ${name} can only be an SDF`)
+    return null
+  }
+  if (uniform.min !== undefined && uniform.max !== undefined && uniform.min > uniform.max) {
+    ;[uniform.min, uniform.max] = [uniform.max, uniform.min]
+  }
+  names.add(name)
+  return uniform
 }
 
 /**
@@ -209,9 +273,9 @@ export function parseShaderUniforms(source: string): ShaderUniforms {
 
   const uniforms: ShaderUniform[] = []
   const names = new Set<string>()
-  let error: string | null = null
+  const failure: { message: string | null } = { message: null }
   const fail = (message: string) => {
-    error ??= message
+    failure.message ??= message
   }
 
   const lines = source.split('\n')
@@ -257,63 +321,15 @@ export function parseShaderUniforms(source: string): ShaderUniforms {
       continue
     }
 
-    const type = match[1] ?? ''
-    const name = match[2] ?? ''
-    if (match[3]) {
-      fail(`Array uniform ${name} is not supported`)
-      continue
-    }
-    const components = COMPONENTS[type]
-    if (components === undefined) {
-      fail(`Unsupported uniform type ${type}`)
-      continue
-    }
     const commentAbove = comment !== null && commentEnd === index - 1 ? comment : ''
-    if (SAMPLER_TYPES[type] === true && !commentAbove.includes('@sdf')) {
-      fail(`Sampler uniform ${name} needs @sdf; other textures are not supported`)
-      continue
-    }
-    if (names.has(name)) {
-      fail(`Uniform ${name} is declared more than once`)
-      continue
-    }
-
-    const uniform: ShaderUniform = { name, type, kind: kindOf(type), components }
-    const text = commentAbove
-    let blocked = false
-    for (const lineText of uniformText(text)) {
-      for (const chunk of lineText.split(/(?=@[A-Za-z_])/u)) {
-        const directive = DIRECTIVE.exec(chunk)
-        if (!directive) continue
-        const applied = applyDirective(uniform, directive[1] ?? '', directive[2] ?? '')
-        if (applied && 'error' in applied) {
-          fail(applied.error)
-          blocked = true
-          break
-        }
-        if (applied && 'automatic' in applied) uniform.automatic = applied.automatic
-      }
-      if (blocked) break
-    }
-    if (blocked) continue
-    if (uniform.automatic && uniform.kind === 'sampler' && uniform.automatic !== 'sdf') {
-      fail(`Sampler uniform ${name} can only be an SDF`)
-      continue
-    }
-    if (
-      uniform.min !== undefined &&
-      uniform.max !== undefined &&
-      uniform.min > uniform.max
-    ) {
-      [uniform.min, uniform.max] = [uniform.max, uniform.min]
-    }
-    names.add(name)
     comment = null
     commentEnd = -1
-    uniforms.push(uniform)
+
+    const uniform = readUniform(match, commentAbove, names, fail)
+    if (uniform) uniforms.push(uniform)
   }
 
-  if (error) return { uniforms, error }
+  if (failure.message) return { uniforms, error: failure.message }
   if (uniforms.length > SHADER_MAX_UNIFORMS) {
     return {
       uniforms,
@@ -332,4 +348,3 @@ export function parseShaderUniforms(source: string): ShaderUniforms {
   }
   return { uniforms, error: null }
 }
-

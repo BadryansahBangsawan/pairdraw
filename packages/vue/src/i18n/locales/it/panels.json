@@ -123,6 +123,8 @@
   "shaderPreset": "JSON del preset",
   "applyShaderPreset": "Applica",
   "invalidShaderPreset": "Non è un preset di shaders",
+  "shaderCode": "Codice dello shader",
+  "invalidShaderCode": "Il codice dello shader contiene un errore",
   "shaderNeedsWebGPU": "Questo browser non ha WebGPU, quindi gli shader mostrano il fotogramma salvato.",
   "shaderGallery": "Galleria di preset",
   "shaderGallerySunset": "Tramonto",

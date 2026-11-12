@@ -588,6 +588,8 @@ export const panelMessageDefaults = {
   shaderPreset: 'Preset JSON',
   applyShaderPreset: 'Apply',
   invalidShaderPreset: 'Not a shaders preset',
+  shaderCode: 'Shader code',
+  invalidShaderCode: 'The shader code has an error',
   shaderNeedsWebGPU: 'This browser has no WebGPU, so shaders show their saved frame.',
   shaderGallery: 'Preset gallery',
   shaderGallerySunset: 'Sunset',

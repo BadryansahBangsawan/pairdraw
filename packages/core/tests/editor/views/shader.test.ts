@@ -6,9 +6,21 @@ import {
   ReadOnlyDocumentError,
   resolveEditorProfile
 } from '@open-pencil/core'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { expectDefined } from '#core-tests/helpers/assert'
+import { SceneGraph, type Fill, type SceneNode } from '@open-pencil/scene-graph'
 import { colorToFill } from '@open-pencil/scene-graph/color'
-import { shaderOfPaint, type ShaderPreset } from '@open-pencil/scene-graph/shaders'
+import {
+  isShaderPresetPaint,
+  shaderOfPaint,
+  type ShaderPreset
+} from '@open-pencil/scene-graph/shaders'
+
+/** The preset the paint draws, failing when its shader is user code instead. */
+function presetOf(node: Pick<SceneNode, 'pluginData'>, paint: Fill): ShaderPreset {
+  const shader = shaderOfPaint(node, paint)
+  if (!shader || !isShaderPresetPaint(shader)) throw new Error('paint draws no preset')
+  return shader.preset
+}
 
 const AURORA: ShaderPreset = { components: [{ type: 'Aurora' }] }
 const SWIRL: ShaderPreset = { components: [{ type: 'Swirl' }] }
@@ -128,7 +140,7 @@ describe('Shader Mode', () => {
     editor.setShaderPaint([mode.nodeId], mode.list, mode.index, SWIRL)
 
     expect(editor.getShaderMode()).toMatchObject({ image, preset: SWIRL })
-    expect(shaderOfPaint(read(), read().fills[0])?.preset).toEqual(SWIRL)
+    expect(presetOf(read(), expectDefined(read().fills[0]))).toEqual(SWIRL)
   })
 
   test('has nothing to show once its paint is gone', () => {

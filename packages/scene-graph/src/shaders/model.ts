@@ -6,12 +6,7 @@ import { readAllPluginData, withAllPluginData } from '../plugin-data/field'
 import { OPEN_PENCIL_PLUGIN_DATA } from '../plugin-data/fields'
 import { randomHex } from '../random'
 import type { Fill, SceneNode } from '../types'
-import type {
-  ShaderPaint,
-  ShaderPreset,
-  ShaderPresetPaint,
-  ShaderSourcePaint
-} from './schema'
+import type { ShaderPaint, ShaderPreset, ShaderPresetPaint, ShaderSourcePaint } from './schema'
 
 /** What shader paints read of a node. */
 type ShaderNode = Pick<SceneNode, 'fills' | 'strokes' | 'pluginData'>
@@ -79,6 +74,28 @@ export function createShaderPaint(preset: ShaderPreset): {
       imageScaleMode: 'FILL'
     },
     shader: { image, preset: structuredClone(preset) }
+  }
+}
+
+/**
+ * A new paint that draws shader `source`, and the shader entry it shows. It starts as a shader
+ * paint of the same image, so replacing a preset keeps the layer's paint and frame.
+ */
+export function createShaderSourcePaint(source: string): {
+  paint: Fill
+  shader: ShaderSourcePaint
+} {
+  const image = randomHex(20)
+  return {
+    paint: {
+      type: 'IMAGE',
+      color: TRANSPARENT,
+      opacity: 1,
+      visible: true,
+      imageHash: image,
+      imageScaleMode: 'FILL'
+    },
+    shader: { image, source, uniforms: {} }
   }
 }
 

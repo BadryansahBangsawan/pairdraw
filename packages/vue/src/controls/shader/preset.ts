@@ -13,6 +13,26 @@ export const DEFAULT_SHADER_EFFECT = 'Aurora'
 /** The preset a new shader paint starts with. */
 export const DEFAULT_SHADER_PRESET: ShaderPreset = { components: [{ type: DEFAULT_SHADER_EFFECT }] }
 
+/**
+ * The code a shader paint starts from when the user writes one: the smallest shader that draws,
+ * with the frame's size and clock already declared so the panel has two inputs to show.
+ */
+export const DEFAULT_SHADER_SOURCE = `#version 300 es
+precision highp float;
+
+/** @resolution */
+uniform vec2 u_resolution;
+
+/** @time */
+uniform float u_time;
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution;
+  float wave = 0.5 + 0.5 * sin(uv.x * 6.28318 + u_time);
+  gl_FragColor = vec4(uv.x, uv.y * wave, wave, 1.0);
+}
+`
+
 /** `preset` with the effect `type` added on top, drawn with its default props. */
 export function addShaderEffect(preset: ShaderPreset, type: string): ShaderPreset {
   return { ...preset, components: [...preset.components, { type }] }

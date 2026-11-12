@@ -2,7 +2,7 @@
 import type { Fill, SceneNode } from '@open-pencil/scene-graph'
 import { colorToHexRaw } from '@open-pencil/scene-graph/color'
 import type { Color } from '@open-pencil/scene-graph/primitives'
-import { shaderOfPaint } from '@open-pencil/scene-graph/shaders'
+import { isShaderSourcePaint, shaderOfPaint } from '@open-pencil/scene-graph/shaders'
 import { useColorBindingProvider } from '@open-pencil/vue/controls/binding-provider'
 import { useFillControls } from '@open-pencil/vue/controls/fill'
 import { useOkHCL } from '@open-pencil/vue/controls/okhcl'
@@ -67,6 +67,12 @@ const {
 /** The shader a fill of the layer the panel shows draws, if it draws one. */
 function fillShader(node: SceneNode | null, fill: Fill) {
   return node ? shaderOfPaint(node, fill) : null
+}
+
+/** What stops the shader on `fill` from compiling, when the user wrote its code. */
+function fillShaderError(node: SceneNode | null, fill: Fill): string | null {
+  const shader = fillShader(node, fill)
+  return shader && isShaderSourcePaint(shader) ? store.shaderCodeError(shader.source) : null
 }
 
 function displayFill(fill: Fill, resolvedColor: Color | undefined): Fill {
@@ -158,6 +164,7 @@ function updateSolidColor(
                   :fill="displayFill(fill, binding.resolvedValue)"
                   :okhcl="createFillOkhclAdapter(okhcl, activeNode, index)"
                   :shader="fillShader(activeNode, fill)"
+                  :shader-code-error="fillShaderError(activeNode, fill)"
                   :layer-size="selectedNodeIds.length === 1 ? activeNode : null"
                   :fill-index="index"
                   :keep-open="gradients.pressesHandle"
@@ -171,6 +178,9 @@ function updateSolidColor(
                     )
                   "
                   @update-shader="store.setShaderPaint(selectedNodeIds, 'fills', index, $event)"
+                  @update-shader-source="
+                    store.setShaderSource(selectedNodeIds, 'fills', index, $event)
+                  "
                   @open-shader-mode="
                     store.startShaderMode({ nodeId: activeNode?.id, image: $event })
                   "
@@ -196,7 +206,7 @@ function updateSolidColor(
                   "
                 />
                 <span v-else class="min-w-0 flex-1 truncate font-mono text-xs text-surface">
-                  {{ fillLabel(fill, undefined, fillShader(activeNode, fill)) }}
+                  {{ fillLabel(fill, undefined, fillShader(activeNode, fill), panels.shaderCode) }}
                 </span>
               </template>
 

@@ -5,7 +5,11 @@ import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
 import type { Fill } from '@open-pencil/scene-graph'
-import type { ShaderPaint, ShaderPreset } from '@open-pencil/scene-graph/shaders'
+import {
+  isShaderPresetPaint,
+  type ShaderPaint,
+  type ShaderPreset
+} from '@open-pencil/scene-graph/shaders'
 import { applySolidFillColor, type OkHCLControls } from '@open-pencil/vue/controls/color-model'
 import { DEFAULT_SHADER_PRESET } from '@open-pencil/vue/controls/shader'
 import { useI18n } from '@open-pencil/vue/i18n'
@@ -41,6 +45,8 @@ const {
   fill: Fill
   /** The shader the paint draws, when it is a shader's frame; the picker then edits the shader. */
   shader?: ShaderPaint | null
+  /** What stops the shader's own code from compiling, when it draws code. */
+  shaderCodeError?: string | null
   okhcl?: OkHCLControls | null
   swatchBackground?: string
   /** Names the trigger for a paint that is not a fill, such as a stroke. */
@@ -61,6 +67,8 @@ const activeStop = defineModel<number>('activeStop')
 const emit = defineEmits<{
   update: [fill: Fill]
   updateShader: [preset: ShaderPreset]
+  /** Code the user wrote, which replaces the preset the shader drew. */
+  updateShaderSource: [source: string]
   /** Opens the paint's shader in Shader Mode, by the shader's image. */
   openShaderMode: [image: string]
   openChange: [open: boolean]
@@ -202,9 +210,12 @@ function cancelFromEscape(event: KeyboardEvent) {
 
           <ShaderFillPicker
             v-if="shader"
-            :preset="shader.preset"
+            :preset="isShaderPresetPaint(shader) ? shader.preset : DEFAULT_SHADER_PRESET"
+            :source="isShaderPresetPaint(shader) ? null : shader.source"
+            :code-error="shaderCodeError"
             can-open-mode
             @update="emit('updateShader', $event)"
+            @update-source="emit('updateShaderSource', $event)"
             @open-mode="emit('openShaderMode', shader.image)"
           />
 

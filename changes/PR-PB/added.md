@@ -1,0 +1,1 @@
+- Shader fills can now draw code you write. Open a shader fill's picker, press the code button, and edit GLSL: the canvas draws it live, and a mistake leaves the last good version on screen with the error under the editor.

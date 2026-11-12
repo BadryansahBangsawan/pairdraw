@@ -1,14 +1,23 @@
 import { describe, expect, test } from 'bun:test'
 
 import { createEditor } from '@open-pencil/core'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { expectDefined } from '#core-tests/helpers/assert'
+import { SceneGraph, type Fill, type SceneNode } from '@open-pencil/scene-graph'
 import {
   createShaderPaint,
+  isShaderPresetPaint,
   shaderOfPaint,
   shaderPresetKey,
   withShaderPaints,
   type ShaderPreset
 } from '@open-pencil/scene-graph/shaders'
+
+/** The preset the paint draws, failing when its shader is user code instead. */
+function presetOf(node: Pick<SceneNode, 'pluginData'>, paint: Fill): ShaderPreset {
+  const shader = shaderOfPaint(node, paint)
+  if (!shader || !isShaderPresetPaint(shader)) throw new Error('paint draws no preset')
+  return shader.preset
+}
 
 const AURORA: ShaderPreset = { components: [{ type: 'Aurora' }] }
 const SWIRL: ShaderPreset = { components: [{ type: 'Swirl' }] }
@@ -44,7 +53,7 @@ describe('shader paints', () => {
     editor.setShaderPaint([id], 'fills', 0, AURORA)
     const [paint] = read().fills
     expect(paint.type).toBe('IMAGE')
-    expect(shaderOfPaint(read(), paint)?.preset).toEqual(AURORA)
+    expect(presetOf(read(), paint)).toEqual(AURORA)
 
     editor.undoAction()
     expect(read().fills).toEqual(before)
@@ -59,7 +68,7 @@ describe('shader paints', () => {
     editor.setShaderPaint([id], 'fills', 0, SWIRL)
 
     expect(read().fills[0].imageHash).toBe(image)
-    expect(shaderOfPaint(read(), read().fills[0])?.preset).toEqual(SWIRL)
+    expect(presetOf(read(), expectDefined(read().fills[0]))).toEqual(SWIRL)
   })
 
   test('draws the frame at twice the layer’s size under the paint’s image', async () => {

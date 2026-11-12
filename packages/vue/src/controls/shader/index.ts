@@ -7,6 +7,7 @@ export {
   addShaderEffect,
   DEFAULT_SHADER_EFFECT,
   DEFAULT_SHADER_PRESET,
+  DEFAULT_SHADER_SOURCE,
   moveShaderEffect,
   parseShaderPreset,
   removeShaderEffect,

@@ -3,11 +3,19 @@ import { describe, expect, it, test } from 'bun:test'
 import { expectDefined, getNodeOrThrow } from '#core-tests/helpers/assert'
 import { findByName, PROPERTY_CASES } from '#core-tests/helpers/property-cases'
 import { pick } from 'es-toolkit'
+import type { ShaderPreset } from '@open-pencil/scene-graph/shaders'
 
 import { renderJSX } from '@open-pencil/core/design-jsx'
 import { sceneNodeToJSX } from '@open-pencil/design-jsx'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { shaderOfPaint } from '@open-pencil/scene-graph/shaders'
+import { SceneGraph, type Fill, type SceneNode } from '@open-pencil/scene-graph'
+import { isShaderPresetPaint, shaderOfPaint } from '@open-pencil/scene-graph/shaders'
+
+/** The preset the paint draws, failing when its shader is user code instead. */
+function presetOf(node: Pick<SceneNode, 'pluginData'>, paint: Fill): ShaderPreset {
+  const shader = shaderOfPaint(node, paint)
+  if (!shader || !isShaderPresetPaint(shader)) throw new Error('paint draws no preset')
+  return shader.preset
+}
 
 describe('attribute string round-trip', () => {
   it.each([
@@ -86,7 +94,7 @@ describe('shader paints', () => {
     const [paint] = node.fills
     expect(paint).toMatchObject({ type: 'IMAGE', opacity: 0.5 })
     expect(paint).not.toHaveProperty('shader')
-    expect(shaderOfPaint(node, paint)?.preset).toEqual({
+    expect(presetOf(node, paint)).toEqual({
       components: [{ type: 'Aurora', props: { speed: 2 } }]
     })
 
@@ -95,7 +103,7 @@ describe('shader paints', () => {
 
     const [result] = await renderJSX(graph, jsx)
     const copy = getNodeOrThrow(graph, result.id)
-    expect(shaderOfPaint(copy, copy.fills[0])?.preset).toEqual(shaderOfPaint(node, paint)?.preset)
+    expect(presetOf(copy, expectDefined(copy.fills[0]))).toEqual(presetOf(node, paint))
   })
 
   test('a shader takes a preset as shaders.com exports it', async () => {
@@ -105,7 +113,7 @@ describe('shader paints', () => {
       "<Frame w={10} h={10} bg={shader({ components: [{ type: 'Swirl' }], structureVersion: 2 })} />"
     )
     const node = getNodeOrThrow(graph, source.id)
-    expect(shaderOfPaint(node, node.fills[0])?.preset.structureVersion).toBe(2)
+    expect(presetOf(node, expectDefined(node.fills[0])).structureVersion).toBe(2)
   })
 
   test('a shader without effects says what it expects', async () => {

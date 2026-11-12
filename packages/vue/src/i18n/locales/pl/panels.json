@@ -123,6 +123,8 @@
   "shaderPreset": "JSON presetu",
   "applyShaderPreset": "Zastosuj",
   "invalidShaderPreset": "To nie jest preset shaders",
+  "shaderCode": "Kod shadera",
+  "invalidShaderCode": "Kod shadera zawiera błąd",
   "shaderNeedsWebGPU": "Ta przeglądarka nie obsługuje WebGPU, więc shadery pokazują zapisaną klatkę.",
   "shaderGallery": "Galeria presetów",
   "shaderGallerySunset": "Zachód słońca",

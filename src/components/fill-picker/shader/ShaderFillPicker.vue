@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { isEqual } from 'es-toolkit'
-import { computed, onMounted, ref, shallowRef, type ComponentPublicInstance } from 'vue'
+import { computed, onMounted, ref, shallowRef, watch, type ComponentPublicInstance } from 'vue'
 
 import type { ShaderPreset } from '@open-pencil/scene-graph/shaders'
 import { canDrawShaders } from '@open-pencil/vue/canvas/surface'
@@ -8,6 +8,7 @@ import {
   addShaderEffect,
   DEFAULT_SHADER_EFFECT,
   DEFAULT_SHADER_PRESET,
+  DEFAULT_SHADER_SOURCE,
   loadShaderCatalog,
   moveShaderEffect,
   parseShaderPreset,
@@ -38,12 +39,38 @@ import AppCombobox from '@/components/ui/select/AppCombobox.vue'
  * preset as JSON, which also takes a preset copied from shaders.com. Where it can, it opens the
  * shader in Shader Mode, large on its own.
  */
-const { preset, canOpenMode = false } = defineProps<{
+const {
+  preset,
+  source = null,
+  codeError = null,
+  canOpenMode = false
+} = defineProps<{
   preset: ShaderPreset
+  /** Code the user wrote, when the paint draws that instead of the preset. */
+  source?: string | null
+  /** What stops `source` from compiling, as the canvas reports it. */
+  codeError?: string | null
   /** Whether it offers to open the shader in Shader Mode, which emits `openMode`. */
   canOpenMode?: boolean
 }>()
-const emit = defineEmits<{ update: [preset: ShaderPreset]; openMode: [] }>()
+const emit = defineEmits<{
+  update: [preset: ShaderPreset]
+  updateSource: [source: string]
+  openMode: []
+}>()
+
+/** The code being written, seeded from the paint's own code or the smallest shader that draws. */
+const code = ref(source ?? DEFAULT_SHADER_SOURCE)
+watch(
+  () => source,
+  (value) => {
+    if (value != null) code.value = value
+  }
+)
+/** Whether the picker shows the code instead of the preset; a paint that draws code always does. */
+const writing = ref(false)
+const codeView = computed(() => source != null || writing.value)
+const appliedCode = computed(() => source != null && code.value === source)
 const { panels, common } = useI18n()
 const shaderMessages = useShaderMessages()
 
@@ -158,42 +185,102 @@ function applyJSON() {
     <div>
       <div class="mb-1 flex items-center justify-between">
         <span class="text-[11px] text-muted">
-          {{ view === 'gallery' ? panels.shaderGallery : panels.effects }}
+          {{
+            codeView
+              ? panels.shaderCode
+              : view === 'gallery'
+                ? panels.shaderGallery
+                : panels.effects
+          }}
         </span>
         <div class="flex items-center">
           <IconButton
-            v-if="canOpenMode"
+            v-if="canOpenMode && !codeView"
             :label="shaderMessages.open"
             data-test-id="shader-open-mode"
             @click="emit('openMode')"
           >
             <icon-lucide-maximize-2 class="size-3" />
           </IconButton>
+          <template v-if="!codeView">
+            <IconButton
+              :label="panels.shaderGallery"
+              :active="view === 'gallery'"
+              toggle
+              data-test-id="shader-gallery-toggle"
+              @click="toggleGallery"
+            >
+              <icon-lucide-layout-grid class="size-3" />
+            </IconButton>
+            <IconButton
+              :label="panels.shaderPreset"
+              :active="view === 'json'"
+              toggle
+              data-test-id="shader-preset-toggle"
+              @click="toggleJSON"
+            >
+              <icon-lucide-braces class="size-3" />
+            </IconButton>
+            <IconButton
+              :label="panels.addShaderEffect"
+              data-test-id="shader-add-effect"
+              @click="add"
+            >
+              <icon-lucide-plus class="size-3" />
+            </IconButton>
+          </template>
           <IconButton
-            :label="panels.shaderGallery"
-            :active="view === 'gallery'"
+            :label="panels.shaderCode"
+            :active="codeView"
             toggle
-            data-test-id="shader-gallery-toggle"
-            @click="toggleGallery"
+            data-test-id="shader-code-toggle"
+            @click="writing = !writing"
           >
-            <icon-lucide-layout-grid class="size-3" />
-          </IconButton>
-          <IconButton
-            :label="panels.shaderPreset"
-            :active="view === 'json'"
-            toggle
-            data-test-id="shader-preset-toggle"
-            @click="toggleJSON"
-          >
-            <icon-lucide-braces class="size-3" />
-          </IconButton>
-          <IconButton :label="panels.addShaderEffect" data-test-id="shader-add-effect" @click="add">
-            <icon-lucide-plus class="size-3" />
+            <icon-lucide-code class="size-3" />
           </IconButton>
         </div>
       </div>
 
-      <ShaderFillPickerGallery v-if="view === 'gallery'" :preset="preset" @apply="applyGallery" />
+      <div v-if="codeView" class="flex flex-col gap-1.5">
+        <AppTextarea
+          v-model="code"
+          :rows="12"
+          class="font-mono text-[11px]"
+          data-test-id="shader-code"
+        />
+        <AppAlert
+          v-if="codeError"
+          tone="error"
+          :heading="panels.invalidShaderCode"
+          :description="codeError"
+          data-test-id="shader-code-error"
+        />
+        <div class="flex justify-end gap-1.5">
+          <AppButton
+            v-if="source == null"
+            variant="ghost"
+            size="sm"
+            data-test-id="shader-code-cancel"
+            @click="writing = false"
+          >
+            {{ common.cancel }}
+          </AppButton>
+          <AppButton
+            size="sm"
+            :disabled="appliedCode"
+            data-test-id="shader-code-apply"
+            @click="emit('updateSource', code)"
+          >
+            {{ common.apply }}
+          </AppButton>
+        </div>
+      </div>
+
+      <ShaderFillPickerGallery
+        v-else-if="view === 'gallery'"
+        :preset="preset"
+        @apply="applyGallery"
+      />
 
       <div v-else-if="view === 'json'" class="flex flex-col gap-1.5">
         <AppTextarea v-model="json" :rows="8" class="font-mono text-[11px]" />

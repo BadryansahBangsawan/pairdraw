@@ -123,6 +123,8 @@
   "shaderPreset": "Preset-JSON",
   "applyShaderPreset": "Anwenden",
   "invalidShaderPreset": "Kein Shaders-Preset",
+  "shaderCode": "Shader-Code",
+  "invalidShaderCode": "Der Shader-Code enthält einen Fehler",
   "shaderNeedsWebGPU": "Dieser Browser hat kein WebGPU, daher zeigen Shader ihr gespeichertes Bild.",
   "shaderGallery": "Preset-Galerie",
   "shaderGallerySunset": "Sonnenuntergang",

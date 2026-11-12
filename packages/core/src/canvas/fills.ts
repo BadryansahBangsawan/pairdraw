@@ -9,6 +9,7 @@ import { setPaintBlendMode } from './blend'
 import { makeDiamondGradient } from './gradients/diamond'
 import { previewEdge } from './images/previews'
 import type { SkiaRenderer } from './renderer'
+import { drawUserShaderFill } from './shaders/draw'
 import { drawOutline, withNodeOutline } from './shapes'
 
 interface PaintFillsOptions {
@@ -97,6 +98,7 @@ export function applyFill(
   }
 
   if (fill.type === 'IMAGE' && fill.imageHash) {
+    if (drawUserShaderFill(r, fill, node)) return true
     return r.applyImageFill(fill, node, graph)
   }
 

@@ -53,9 +53,7 @@ export function shaderLayers(
     const shader = layer.fills
       .filter((fill) => fill.visible)
       .map((fill) => shaderOfPaint(layer, fill))
-      .findLast(
-        (found): found is ShaderPresetPaint => found !== null && isShaderPresetPaint(found)
-      )
+      .findLast((found): found is ShaderPresetPaint => found !== null && isShaderPresetPaint(found))
     if (shader) shaders.set(element, shader.preset)
   }
   return shaders

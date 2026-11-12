@@ -139,6 +139,8 @@
   "shaderPreset": "JSON пресета",
   "applyShaderPreset": "Применить",
   "invalidShaderPreset": "Это не пресет shaders",
+  "shaderCode": "Код шейдера",
+  "invalidShaderCode": "В коде шейдера есть ошибка",
   "shaderNeedsWebGPU": "В этом браузере нет WebGPU, поэтому шейдеры показывают сохранённый кадр.",
   "shaderGallery": "Галерея пресетов",
   "shaderGallerySunset": "Закат",

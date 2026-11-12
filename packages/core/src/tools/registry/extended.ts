@@ -28,6 +28,7 @@ import {
   importMermaid,
   importSVG,
   insertIcon,
+  script,
   searchIconsTool,
   setBehaviour
 } from '#core/tools/create'
@@ -245,6 +246,8 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   analyzeOverlaps,
   diffShow,
   diffApply,
+  // Code on canvas
+  script,
   // Codegen
   designToTokens,
   importDesignTokens,

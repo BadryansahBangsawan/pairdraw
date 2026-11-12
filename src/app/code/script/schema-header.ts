@@ -3,6 +3,7 @@
  * controls the panel shows. Parsing is pure, so a script's controls are known without running it,
  * and a malformed line is skipped rather than breaking every other input.
  */
+import { BLACK } from '@open-pencil/scene-graph/constants'
 import type { Color } from '@open-pencil/scene-graph/primitives'
 import type { ScriptInputKind, ScriptInputValue } from '@open-pencil/scene-graph/script'
 
@@ -25,7 +26,7 @@ const HEX_COLOR = /^#([0-9a-f]{6}|[0-9a-f]{8})$/iu
 function parseColor(text: string): Color | undefined {
   if (!HEX_COLOR.test(text)) return undefined
   const digits = text.slice(1)
-  const byte = (at: number) => parseInt(digits.slice(at, at + 2), 16) / 255
+  const byte = (at: number) => Number.parseInt(digits.slice(at, at + 2), 16) / 255
   return {
     r: byte(0),
     g: byte(2),
@@ -66,7 +67,7 @@ function parseKind(token: string): { kind: ScriptInputKind; options?: string[] }
   const kind = named[1] as ScriptInputKind
   if (!(KINDS as readonly string[]).includes(kind)) return undefined
   if (kind !== 'enum') return { kind }
-  const options = (named[2] ?? '')
+  const options = (named.at(2) ?? '')
     .split(',')
     .map((option) => option.trim())
     .filter((option) => option !== '')
@@ -85,7 +86,9 @@ export function parseScriptHeader(source: string): ScriptInputDeclaration[] {
   for (const line of comment[1].split('\n')) {
     const match = INPUT_LINE.exec(line)
     if (!match) continue
-    const [, name, kindToken, defaultText] = match
+    const name = match[1]
+    const kindToken = match[2]
+    const defaultText = match.at(3)
     if (seen.has(name)) continue
     const parsedKind = parseKind(kindToken)
     if (!parsedKind) continue
@@ -121,6 +124,6 @@ export function inputValue(
   if (declaration.kind === 'number') return 0
   if (declaration.kind === 'string') return ''
   if (declaration.kind === 'boolean') return false
-  if (declaration.kind === 'color') return { r: 0, g: 0, b: 0, a: 1 }
+  if (declaration.kind === 'color') return BLACK
   return undefined
 }

@@ -8,6 +8,7 @@ import {
 
 import { renderAutomationImage } from '@/app/automation/bridge/export-handlers'
 import { styleHTMLInBrowser } from '@/app/code/html-styler'
+import { bindScriptToolHost } from '@/app/code/script/tool-host'
 import { loadTailwindStylesheet } from '@/app/document/export/html'
 import type { EditorStore } from '@/app/editor/active-store'
 import { listFamilies, listFonts } from '@/app/editor/fonts'
@@ -38,6 +39,8 @@ export function makeFigmaFromStore(
   // The image AI tools run on the image services and keys set up in Settings, as vectorizing does.
   bindAgentImageAIService(store, registerImageAIService)
   registerHTMLToolHost(store.graph, htmlToolHost)
+  // Code layers run in the sandbox, which the app has and a headless host does not.
+  bindScriptToolHost(store)
   api.setRenderer(store.renderer ?? null)
   api.icons = store.iconProvider
   api.theme = store.state.theme ?? 'light'

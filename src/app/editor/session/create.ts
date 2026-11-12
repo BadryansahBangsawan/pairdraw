@@ -24,8 +24,8 @@ import {
   type EditorPreparationEvents
 } from '@/app/editor/preparation/events'
 import { pageProgressUnit, type EditorPreparationHandle } from '@/app/editor/preparation/types'
-import { installScriptLiveRuns } from '@/app/code/script/live'
 import { bindEditorServices } from '@/app/editor/session/bindings'
+import { installDocumentWiring } from '@/app/editor/session/document-wiring'
 import {
   createEditorComputedRefs,
   createEditorStoreModules,
@@ -76,25 +76,8 @@ function buildEditorStore(initialGraph?: SceneGraph) {
     editor,
     state
   )
-  // Mirror the document color space into app state so UI can react to it.
-  const syncDocumentColorSpace = () => {
-    state.documentColorSpace = editor.graph.documentColorSpace
-  }
-  syncDocumentColorSpace()
-  const stopColorSpaceSync = editor.onEditorEvent(
-    'document:color-space-changed',
-    syncDocumentColorSpace
-  )
-  editor.onEditorEvent('graph:replaced', syncDocumentColorSpace)
-  // A script node runs again when it is resized or its inputs change, without a Run click. The
-  // sandbox needs a browser frame, so a headless store (a unit test) never starts one.
-  const stopScriptLiveRuns = IS_BROWSER
-    ? installScriptLiveRuns({
-        graph: editor.graph,
-        currentPageId: () => state.currentPageId,
-        onEditorEvent: editor.onEditorEvent
-      })
-    : () => {}
+  // Follow the document itself: its color space, and the script nodes live runs redraw.
+  const { stopColorSpaceSync, stopScriptLiveRuns } = installDocumentWiring(editor, state)
   const recentPages = createRecentPages(editor)
 
   const preparationEvents = createEditorPreparationEvents()

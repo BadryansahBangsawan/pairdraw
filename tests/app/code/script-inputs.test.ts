@@ -82,7 +82,11 @@ describe('declared script inputs', () => {
     const { variable } = numberVariable(store.graph, 4)
     setScriptBinding(store, nodeId, 'count', variable.id)
 
-    const { values } = scriptInputValues(store.graph, nodeId, declarationKinds(parseScriptHeader(SOURCE)))
+    const { values } = scriptInputValues(
+      store.graph,
+      nodeId,
+      declarationKinds(parseScriptHeader(SOURCE))
+    )
 
     // The control's stored value stays for a later detach; the variable wins while bound.
     expect(values.count).toBe(4)
@@ -90,7 +94,11 @@ describe('declared script inputs', () => {
 
     // The graph holds the variable it was given, so this is the edit a value control makes.
     variable.valuesByMode[Object.keys(variable.valuesByMode)[0]] = 7
-    const after = scriptInputValues(store.graph, nodeId, declarationKinds(parseScriptHeader(SOURCE)))
+    const after = scriptInputValues(
+      store.graph,
+      nodeId,
+      declarationKinds(parseScriptHeader(SOURCE))
+    )
 
     expect(after.values.count).toBe(7)
   })
@@ -102,7 +110,11 @@ describe('declared script inputs', () => {
     setScriptInput(store, nodeId, 'count', 4)
     setScriptBinding(store, nodeId, 'count', null)
 
-    const { values } = scriptInputValues(store.graph, nodeId, declarationKinds(parseScriptHeader(SOURCE)))
+    const { values } = scriptInputValues(
+      store.graph,
+      nodeId,
+      declarationKinds(parseScriptHeader(SOURCE))
+    )
 
     expect(values.count).toBe(4)
     expect(readScriptNodeData(store.graph, nodeId)?.bindings).toEqual({})
@@ -113,7 +125,11 @@ describe('declared script inputs', () => {
     const { variable } = numberVariable(store.graph, 4)
     setScriptBinding(store, nodeId, 'label', variable.id)
 
-    const { error } = scriptInputValues(store.graph, nodeId, declarationKinds(parseScriptHeader(SOURCE)))
+    const { error } = scriptInputValues(
+      store.graph,
+      nodeId,
+      declarationKinds(parseScriptHeader(SOURCE))
+    )
 
     expect(error).toBe('Variable for "label" does not match its string input.')
   })
@@ -122,7 +138,11 @@ describe('declared script inputs', () => {
     const { store, nodeId } = scriptNode()
     setScriptBinding(store, nodeId, 'count', 'gone')
 
-    const { error } = scriptInputValues(store.graph, nodeId, declarationKinds(parseScriptHeader(SOURCE)))
+    const { error } = scriptInputValues(
+      store.graph,
+      nodeId,
+      declarationKinds(parseScriptHeader(SOURCE))
+    )
 
     expect(error).toBe('Variable for "count" has no value.')
   })

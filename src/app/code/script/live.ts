@@ -5,9 +5,12 @@
  */
 import type { SceneGraph } from '@open-pencil/scene-graph'
 
+import {
+  runScriptNode,
+  scriptChangeNeedsRun,
+  type ScriptNodeRunResult
+} from '@/app/code/script/run-node'
 import type { EditorStore } from '@/app/editor/session'
-
-import { runScriptNode, scriptChangeNeedsRun, type ScriptNodeRunResult } from '@/app/code/script/run-node'
 
 /** How long a resize or input edit waits for the next one, so a drag runs once. */
 export const SCRIPT_RUN_DEBOUNCE_MS = 300
@@ -53,9 +56,9 @@ export function scheduleScriptRun(
   clearTimeout(waiting?.timer)
   const timer = setTimeout(() => {
     runs.delete(nodeId)
-    void runScriptNode(store.graph, nodeId, store.currentPageId()).then((result) => {
-      for (const listener of listeners) listener(result)
-    })
+    void runScriptNode(store.graph, nodeId, store.currentPageId()).then((result) =>
+      listeners.forEach((listener) => listener(result))
+    )
   }, options.delayMs ?? SCRIPT_RUN_DEBOUNCE_MS)
   runs.set(nodeId, { timer, listeners })
 }

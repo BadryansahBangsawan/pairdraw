@@ -8,6 +8,7 @@ export {
 } from './create/components'
 export { fetchIconsTool, insertIcon, searchIconsTool } from './create/icons'
 export { render } from './create/render'
+export { script } from './create/script'
 export { importMermaid } from './create/mermaid'
 export { importSVG } from './create/svg'
 export { importHTML } from './create/html'

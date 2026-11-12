@@ -19,12 +19,8 @@ import {
 } from '@/app/code/script/materialize'
 import { evaluateScript, type ScriptEvaluateOptions } from '@/app/code/script/sandbox/evaluate'
 import { scriptSeed } from '@/app/code/script/sandbox/random'
-import {
-  declarationKinds,
-  inputValue,
-  parseScriptHeader
-} from '@/app/code/script/schema-header'
 import type { ScriptNodeSpec } from '@/app/code/script/sandbox/spec'
+import { declarationKinds, inputValue, parseScriptHeader } from '@/app/code/script/schema-header'
 
 const { script: SCRIPT_FIELD } = OPEN_PENCIL_PLUGIN_DATA
 
@@ -96,9 +92,10 @@ export async function runScriptNode(
   }
   const inputs: Record<string, ScriptInputValue> = { ...values }
   for (const declaration of declarations) {
-    if (inputs[declaration.name] !== undefined) continue
-    const value = inputValue(declaration, undefined)
-    if (value !== undefined) inputs[declaration.name] = value
+    if (Object.hasOwn(inputs, declaration.name)) continue
+    // An `enum` or `ref` input declares no value, and the script reads none for it.
+    const declared = inputValue(declaration, undefined)
+    if (declared !== undefined) inputs[declaration.name] = declared
   }
   const evaluate = options.evaluate ?? evaluateScript
   const result = await evaluate(data.source, { inputs, seed: scriptSeed(nodeId, data.source) })

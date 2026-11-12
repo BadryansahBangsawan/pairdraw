@@ -137,7 +137,9 @@ function detach(declaration: ScriptInputDeclaration) {
         <AppInput
           v-else-if="declaration.kind === 'color'"
           :model-value="
-            typeof valueOf(declaration) === 'object' ? colorToHex(valueOf(declaration) as Color) : ''
+            typeof valueOf(declaration) === 'object'
+              ? colorToHex(valueOf(declaration) as Color)
+              : ''
           "
           :aria-label="declaration.name"
           class="min-w-0 flex-1"

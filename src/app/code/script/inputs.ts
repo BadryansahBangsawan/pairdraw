@@ -42,10 +42,10 @@ export function setScriptInput(
     store,
     nodeId,
     (data) => {
-      const inputs = { ...data.inputs }
-      if (value === undefined) delete inputs[name]
-      else inputs[name] = value
-      return { ...data, inputs }
+      const inputs = new Map(Object.entries(data.inputs ?? {}))
+      if (value === undefined) inputs.delete(name)
+      else inputs.set(name, value)
+      return { ...data, inputs: Object.fromEntries(inputs) }
     },
     'Edit script input'
   )
@@ -62,10 +62,10 @@ export function setScriptBinding(
     store,
     nodeId,
     (data) => {
-      const bindings = { ...data.bindings }
-      if (variableId === null) delete bindings[name]
-      else bindings[name] = variableId
-      return { ...data, bindings }
+      const bindings = new Map(Object.entries(data.bindings ?? {}))
+      if (variableId === null) bindings.delete(name)
+      else bindings.set(name, variableId)
+      return { ...data, bindings: Object.fromEntries(bindings) }
     },
     'Bind script input'
   )

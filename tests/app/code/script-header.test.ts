@@ -1,10 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import {
-  declarationKinds,
-  inputValue,
-  parseScriptHeader
-} from '@/app/code/script/schema-header'
+import { declarationKinds, inputValue, parseScriptHeader } from '@/app/code/script/schema-header'
 
 const header = (lines: string) => `/*\n * @schema\n${lines}\n */\nreturn []`
 

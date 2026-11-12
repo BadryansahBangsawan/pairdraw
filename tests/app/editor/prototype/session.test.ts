@@ -5,9 +5,11 @@ import { SceneGraph, type PrototypeReaction } from '@open-pencil/scene-graph'
 import {
   reactionAt,
   restartSession,
+  shownFrame,
   startFrame,
   startSession,
   step,
+  timeoutReactions,
   topFrameOf
 } from '@/app/editor/prototype/session'
 
@@ -187,7 +189,103 @@ describe('restarting', () => {
     expect(restartSession(there)).toEqual({
       frameId: first.id,
       startFrameId: first.id,
-      history: []
+      history: [],
+      overlays: []
     })
+  })
+})
+
+describe('overlays', () => {
+  function overlayAction(nodeId: string) {
+    return {
+      type: 'NODE',
+      nodeId,
+      navigation: 'OVERLAY',
+      transition: { type: 'INSTANT', duration: 0.3 },
+      overlayPosition: 'CENTER'
+    } as const
+  }
+
+  test('open over the base frame and stack, the top one showing', () => {
+    const { graph, first, second, button } = fixture()
+    const third = graph.createNode('FRAME', graph.getPages()[0].id, {
+      x: 800,
+      y: 0,
+      width: 100,
+      height: 100
+    })
+    let session = step(graph, startSession(first.id), overlayAction(second.id))
+    expect(session.frameId).toBe(first.id)
+    expect(session.overlays).toEqual([second.id])
+    expect(shownFrame(session)).toBe(second.id)
+    session = step(graph, session, overlayAction(third.id))
+    expect(shownFrame(session)).toBe(third.id)
+    expect(button).toBeTruthy()
+  })
+
+  test('close takes the top overlay away and leaves the one under it', () => {
+    const { graph, first, second } = fixture()
+    const session = step(graph, startSession(first.id), overlayAction(second.id))
+    const closed = step(graph, session, { type: 'CLOSE' })
+    expect(shownFrame(closed)).toBe(first.id)
+    expect(closed.overlays).toEqual([])
+  })
+
+  test('closing with none open leaves the session alone', () => {
+    const { graph, first } = fixture()
+    const session = startSession(first.id)
+    expect(step(graph, session, { type: 'CLOSE' })).toBe(session)
+  })
+
+  test('navigating away closes the open overlays', () => {
+    const { graph, first, second } = fixture()
+    const opened = step(graph, startSession(first.id), overlayAction(second.id))
+    const moved = step(graph, opened, {
+      type: 'NODE',
+      nodeId: second.id,
+      navigation: 'NAVIGATE',
+      transition: { type: 'INSTANT', duration: 0.3 },
+      overlayPosition: 'CENTER'
+    })
+    expect(moved.frameId).toBe(second.id)
+    expect(moved.overlays).toEqual([])
+    expect(moved.history).toEqual([first.id])
+  })
+
+  test('an overlay over the frame already shown does nothing', () => {
+    const { graph, first } = fixture()
+    const session = step(graph, startSession(first.id), overlayAction(first.id))
+    expect(session.overlays).toEqual([])
+  })
+
+  test('an overlay pointing inside a frame is ignored', () => {
+    const { graph, first, button } = fixture()
+    const session = step(graph, startSession(first.id), overlayAction(button.id))
+    expect(session.overlays).toEqual([])
+  })
+})
+
+describe('timeout reactions', () => {
+  test('come from the shown frame with their delays in milliseconds', () => {
+    const { graph, first, second } = fixture()
+    withReaction(graph, second.id, {
+      id: 'timeout-reaction',
+      trigger: { type: 'AFTER_TIMEOUT', delay: 1.5 },
+      actions: [{ type: 'BACK' }]
+    })
+    const session = step(graph, startSession(first.id), {
+      type: 'NODE',
+      nodeId: second.id,
+      navigation: 'NAVIGATE',
+      transition: { type: 'INSTANT', duration: 0.3 },
+      overlayPosition: 'CENTER'
+    })
+    expect(timeoutReactions(graph, session)).toEqual([{ action: { type: 'BACK' }, delayMs: 1500 }])
+  })
+
+  test('are none while the frame has only click reactions', () => {
+    const { graph, first, button } = fixture()
+    withReaction(graph, button.id, navigatesTo(first.id))
+    expect(timeoutReactions(graph, startSession(first.id))).toEqual([])
   })
 })

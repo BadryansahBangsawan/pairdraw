@@ -2,6 +2,7 @@ import { useElementSize, useEventListener } from '@vueuse/core'
 import { computed, ref, watch, type Ref } from 'vue'
 
 import { resolveEditorProfile } from '@open-pencil/core'
+import { renderNodesToImage } from '@open-pencil/core/io/formats/raster'
 import { getAxisAlignedWorldBounds } from '@open-pencil/scene-graph/coordinate'
 
 import type { EditorStore } from '@/app/editor/active-store'
@@ -10,11 +11,16 @@ import { letterboxRects, type StageRect } from '@/app/slides/letterbox'
 import {
   reactionAt,
   restartSession,
+  shownFrame,
   startFrame,
   startSession,
   step,
+  timeoutReactions,
   type PlaySession
 } from './session'
+
+/** How long a dissolve takes, matching the transition's own duration in seconds. */
+const DISSOLVE_MS = 300
 
 /**
  * Prototype play: the frame being played fitted to the canvas, everything around it blacked out,
@@ -24,14 +30,16 @@ import {
 export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElement | null>) {
   const session = ref<PlaySession | null>(null)
   const size = useElementSize(area)
+  /** The frame before a dissolve started, as the PNG the crossfade fades out over the canvas. */
+  const dissolvingFrom = ref<{ src: string; rect: StageRect } | null>(null)
 
   /** How the canvas is behaving; only the play view goes live, and its revision restarts. */
   const live = computed(() => resolveEditorProfile(store.state).live)
 
-  /** The frame's rectangle on screen, following the canvas's pan and zoom. */
-  const frameRect = computed<StageRect | null>(() => {
+  /** The frame the canvas fits and shows, which is the top overlay when one is open. */
+  const shownRect = computed<StageRect | null>(() => {
     const shown = session.value
-    const node = shown ? store.graph.getNode(shown.frameId) : undefined
+    const node = shown ? store.graph.getNode(shownFrame(shown)) : undefined
     if (!node) return null
     const bounds = getAxisAlignedWorldBounds(node, store.graph)
     const { panX, panY, zoom } = store.state
@@ -44,18 +52,61 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
   })
 
   const letterbox = computed(() =>
-    frameRect.value
-      ? letterboxRects(frameRect.value, { width: size.width.value, height: size.height.value })
+    shownRect.value
+      ? letterboxRects(shownRect.value, { width: size.width.value, height: size.height.value })
       : []
   )
 
-  /** Fits the played frame edge to edge, which is what play shows. */
+  /** Fits the shown frame edge to edge, which is what play shows. */
   function fit() {
+    const rect = shownRect.value
+    if (!rect) return
+    const { panX, panY, zoom } = store.state
+    store.zoomToArea(
+      (rect.left - panX) / zoom,
+      (rect.top - panY) / zoom,
+      (rect.left - panX + rect.width) / zoom,
+      (rect.top - panY + rect.height) / zoom
+    )
+  }
+
+  /** Whether an overlay is open, which dims everything but the overlay frame. */
+  const scrim = computed(() => (session.value?.overlays.length ?? 0) > 0)
+
+  /**
+   * The previous frame drawn to a PNG the canvas crossfades from during a dissolve. A frame that
+   * cannot be drawn leaves none, so the transition falls back to a cut instead of wrong pixels.
+   */
+  function snapshotBefore(): StageRect | null {
     const shown = session.value
-    const node = shown ? store.graph.getNode(shown.frameId) : undefined
-    if (!node) return
+    if (!shown) return null
+    const node = store.graph.getNode(shownFrame(shown))
+    if (!node || !store.renderer) return null
     const bounds = getAxisAlignedWorldBounds(node, store.graph)
-    store.zoomToArea(bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height)
+    const scale = Math.min(1, 640 / Math.max(bounds.width, bounds.height, 1))
+    const bytes = renderNodesToImage(
+      store.renderer.ck,
+      store.renderer,
+      store.graph,
+      store.state.currentPageId,
+      [node.id],
+      { scale, format: 'PNG' }
+    )
+    if (!bytes) return null
+    const blob = new Blob([bytes], { type: 'image/png' })
+    const { panX, panY, zoom } = store.state
+    const rect: StageRect = {
+      left: bounds.x * zoom + panX,
+      top: bounds.y * zoom + panY,
+      width: bounds.width * zoom,
+      height: bounds.height * zoom
+    }
+    dissolvingFrom.value = { src: URL.createObjectURL(blob), rect }
+    window.setTimeout(() => {
+      if (dissolvingFrom.value) URL.revokeObjectURL(dissolvingFrom.value.src)
+      dissolvingFrom.value = null
+    }, DISSOLVE_MS + 100)
+    return rect
   }
 
   watch(
@@ -75,8 +126,31 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     { immediate: true }
   )
 
+  // The shown frame's AFTER_TIMEOUT reactions run once their delay passes; a frame change first
+  // drops the timers it did not get to run.
+  const timers = new Set<number>()
+  watch(
+    () => (session.value ? shownFrame(session.value) : null),
+    () => {
+      for (const timer of timers) window.clearTimeout(timer)
+      timers.clear()
+      const shown = session.value
+      if (!shown) return
+      for (const { action, delayMs } of timeoutReactions(store.graph, shown)) {
+        const timer = window.setTimeout(() => {
+          timers.delete(timer)
+          session.value = step(store.graph, session.value ?? shown, action)
+        }, delayMs)
+        timers.add(timer)
+      }
+    },
+    { immediate: true }
+  )
+
   // A frame switched to, or a canvas resized, is fitted again: play always shows its whole frame.
-  watch([() => session.value?.frameId, size.width, size.height], () => fit())
+  watch([() => (session.value ? shownFrame(session.value) : null), size.width, size.height], () =>
+    fit()
+  )
 
   // A click on the canvas runs the reaction under it, as Figma's presentation does. The listener
   // sits ahead of the canvas's own, which in play neither selects nor pans, and it leaves clicks on
@@ -90,10 +164,13 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
       const bounds = event.target.getBoundingClientRect()
       const point = store.screenToCanvas(event.clientX - bounds.left, event.clientY - bounds.top)
       const click = reactionAt(store.graph, shown, point.x, point.y)
-      if (click) session.value = step(store.graph, shown, click.action)
+      if (click) {
+        if (click.transition?.type === 'DISSOLVE') snapshotBefore()
+        session.value = step(store.graph, shown, click.action)
+      }
     },
     { capture: true }
   )
 
-  return { session, letterbox, frameRect }
+  return { session, letterbox, frameRect: shownRect, scrim, dissolvingFrom }
 }

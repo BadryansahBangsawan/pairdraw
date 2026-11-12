@@ -72,7 +72,7 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 
 const isActivePane = computed(() => !paneId || store.activePaneId.value === paneId)
 const followView = useFollowView(useTemplateRef<HTMLElement>('area'))
-const { letterbox } = usePrototypeStage(store, canvasRef)
+const { letterbox, scrim, dissolvingFrom } = usePrototypeStage(store, canvasRef)
 
 function activatePane() {
   if (paneId) store.setActivePane(paneId)
@@ -326,6 +326,25 @@ const pageBackground = computed(() => ({ backgroundColor: colorToCSS(store.state
             top: `${rect.top}px`,
             width: `${rect.width}px`,
             height: `${rect.height}px`
+          }"
+        />
+        <div
+          v-if="scrim"
+          data-test-id="prototype-scrim"
+          aria-hidden="true"
+          class="pointer-events-none absolute inset-0 z-20 bg-black/40"
+        />
+        <img
+          v-if="dissolvingFrom"
+          data-test-id="prototype-dissolve"
+          aria-hidden="true"
+          class="pointer-events-none absolute z-30 transition-opacity duration-300"
+          :src="dissolvingFrom.src"
+          :style="{
+            left: `${dissolvingFrom.rect.left}px`,
+            top: `${dissolvingFrom.rect.top}px`,
+            width: `${dissolvingFrom.rect.width}px`,
+            height: `${dissolvingFrom.rect.height}px`
           }"
         />
         <AppDropOverlay :visible="isDraggingOver" />

@@ -10,12 +10,14 @@ import { primaryAction } from './reactions'
 
 /** Where play is: the frame it shows, the frame it started from, and the frames it came through. */
 export interface PlaySession {
-  /** The frame the canvas fits and shows. */
+  /** The base frame under any open overlays. */
   frameId: string
   /** The frame play started from, which Restart returns to. */
   startFrameId: string
   /** Frames shown before this one, oldest first; Back returns to the last. */
   history: string[]
+  /** Overlay frames open over the base frame, bottom first; the last is the one shown. */
+  overlays: string[]
 }
 
 /** One click's result: the action it ran, and the transition that action asked for. */
@@ -58,7 +60,12 @@ export function topFrameOf(
 
 /** Starts playing the page from `frameId` with no history behind it. */
 export function startSession(frameId: string): PlaySession {
-  return { frameId, startFrameId: frameId, history: [] }
+  return { frameId, startFrameId: frameId, history: [], overlays: [] }
+}
+
+/** The frame the stage shows: the top overlay when one is open, else the base frame. */
+export function shownFrame(session: PlaySession): string {
+  return session.overlays.at(-1) ?? session.frameId
 }
 
 /** Plays again from where the session started, as Restart does. */
@@ -68,7 +75,7 @@ export function restartSession(session: PlaySession): PlaySession {
 
 /**
  * The reaction a click at a document point runs, as Figma resolves one: the layer under the point
- * or its nearest ancestor inside the played frame that has an `ON_CLICK` reaction, with the
+ * or its nearest ancestor inside the shown frame that has an `ON_CLICK` reaction, with the
  * reaction's first action.
  */
 export function reactionAt(
@@ -77,7 +84,7 @@ export function reactionAt(
   x: number,
   y: number
 ): PlayClick | null {
-  let node = graph.hitTestDeep(x, y, session.frameId)
+  let node = graph.hitTestDeep(x, y, shownFrame(session))
   while (node) {
     const reaction = node.prototypeReactions.find(
       (candidate) => candidate.trigger.type === 'ON_CLICK'
@@ -86,7 +93,7 @@ export function reactionAt(
     if (action) {
       return { action, transition: action.type === 'NODE' ? action.transition : null }
     }
-    if (node.id === session.frameId) return null
+    if (node.id === shownFrame(session)) return null
     node = node.parentId ? (graph.getNode(node.parentId) ?? null) : null
   }
   return null
@@ -94,7 +101,8 @@ export function reactionAt(
 
 /**
  * The session after an action runs. `NAVIGATE` moves to its frame and remembers this one for
- * Back; `BACK` returns there; an action this version cannot show leaves the session as it is.
+ * Back; `OVERLAY` opens a frame over the screen and `CLOSE` takes the top one away; `BACK`
+ * returns to the frame before; an action this version cannot show leaves the session as it is.
  */
 export function step(
   graph: SceneGraph,
@@ -106,8 +114,40 @@ export function step(
     if (!previous) return session
     return { ...session, frameId: previous, history: session.history.slice(0, -1) }
   }
-  if (action.type !== 'NODE' || action.navigation !== 'NAVIGATE' || !action.nodeId) return session
+  if (action.type === 'CLOSE') {
+    if (session.overlays.length === 0) return session
+    return { ...session, overlays: session.overlays.slice(0, -1) }
+  }
+  if (!action.nodeId) return session
   if (topFrameOf(graph, graph.getNode(action.nodeId))?.id !== action.nodeId) return session
+  if (action.navigation === 'OVERLAY') {
+    if (action.nodeId === shownFrame(session)) return session
+    return { ...session, overlays: [...session.overlays, action.nodeId] }
+  }
   if (action.nodeId === session.frameId) return session
-  return { ...session, frameId: action.nodeId, history: [...session.history, session.frameId] }
+  return {
+    ...session,
+    frameId: action.nodeId,
+    history: [...session.history, session.frameId],
+    overlays: []
+  }
+}
+
+/**
+ * The `AFTER_TIMEOUT` reactions of the frame being shown, with their delays in milliseconds:
+ * what the stage schedules whenever the shown frame changes.
+ */
+export function timeoutReactions(
+  graph: SceneGraph,
+  session: PlaySession
+): { action: PrototypeAction; delayMs: number }[] {
+  const node = graph.getNode(shownFrame(session))
+  if (!node) return []
+  return node.prototypeReactions
+    .filter((reaction) => reaction.trigger.type === 'AFTER_TIMEOUT')
+    .map((reaction) => ({
+      action: primaryAction(reaction),
+      delayMs: reaction.trigger.delay * 1000
+    }))
+    .filter((entry): entry is { action: PrototypeAction; delayMs: number } => entry.action !== null)
 }

@@ -96,3 +96,159 @@ test('play follows a click reaction between frames and returns on Escape', async
   expect(await view(ids.details)).toMatchObject({ canvasView: 'edit' })
   editor.canvas.assertNoErrors()
 })
+
+test('play opens an overlay and closes it back to the frame behind', async () => {
+  const ids = await editor.page.evaluate(() => {
+    const store = window.openPencil?.getStore?.()
+    if (!store) throw new Error('OpenPencil store not initialized')
+    const home = store.createShape('FRAME', 0, 0, 400, 300)
+    const modal = store.createShape('FRAME', 600, 0, 200, 150)
+    const open = store.createShape('RECTANGLE', 50, 50, 120, 60)
+    const close = store.createShape('RECTANGLE', 620, 20, 80, 40)
+    store.reparentNodes([open], home)
+    store.reparentNodes([close], modal)
+    store.graph.updateNode(open, {
+      prototypeReactions: [
+        {
+          id: 'open-reaction',
+          trigger: { type: 'ON_CLICK', delay: 0 },
+          actions: [
+            {
+              type: 'NODE',
+              nodeId: modal,
+              navigation: 'OVERLAY',
+              transition: { type: 'INSTANT', duration: 0 },
+              overlayPosition: 'CENTER'
+            }
+          ]
+        }
+      ]
+    })
+    store.graph.updateNode(close, {
+      prototypeReactions: [
+        {
+          id: 'close-reaction',
+          trigger: { type: 'ON_CLICK', delay: 0 },
+          actions: [{ type: 'CLOSE' }]
+        }
+      ]
+    })
+    store.select([home])
+    return { home, modal, open, close }
+  })
+  await editor.canvas.waitForRender()
+
+  const section = editor.page.getByRole('region', { name: 'Prototype', exact: true })
+  await section.getByRole('button', { name: 'Play', exact: true }).click()
+  await editor.canvas.waitForRender()
+  // Overlays dim the frame behind them while one is open.
+  expect(await editor.page.getByTestId('prototype-scrim').count()).toBe(0)
+
+  async function clickCenter(nodeId: string) {
+    const point = await editor.page.evaluate((id) => {
+      const store = window.openPencil?.getStore?.()
+      if (!store) throw new Error('OpenPencil store not initialized')
+      const bounds = store.graph.getAbsoluteBounds(id)
+      const { zoom, panX, panY } = store.state
+      return {
+        x: (bounds.x + bounds.width / 2) * zoom + panX,
+        y: (bounds.y + bounds.height / 2) * zoom + panY
+      }
+    }, nodeId)
+    await editor.canvas.click(point.x, point.y)
+    await editor.canvas.waitForRender()
+  }
+
+  await clickCenter(ids.open)
+  await editor.canvas.waitForRender()
+  expect(await editor.page.getByTestId('prototype-scrim').count()).toBe(1)
+  const overlay = await view(ids.modal)
+  expect(overlay.canvasView).toBe('play')
+  expect(overlay.fitsInside).toBe(true)
+
+  const closePoint = await editor.page.evaluate((id) => {
+    const store = window.openPencil?.getStore?.()
+    if (!store) throw new Error('OpenPencil store not initialized')
+    const bounds = store.graph.getAbsoluteBounds(id)
+    const { zoom, panX, panY } = store.state
+    return {
+      x: (bounds.x + bounds.width / 2) * zoom + panX,
+      y: (bounds.y + bounds.height / 2) * zoom + panY
+    }
+  }, ids.close)
+  await editor.canvas.click(closePoint.x, closePoint.y)
+  await editor.canvas.waitForRender()
+  expect(await editor.page.getByTestId('prototype-scrim').count()).toBe(0)
+  const back = await view(ids.home)
+  expect(back.canvasView).toBe('play')
+  expect(back.fitsInside).toBe(true)
+
+  await editor.page.keyboard.press('Escape')
+  await editor.canvas.waitForRender()
+  editor.canvas.assertNoErrors()
+})
+
+test('a DISSOLVE transition crossfades the frame it leaves instead of cutting', async () => {
+  const ids = await editor.page.evaluate(() => {
+    const store = window.openPencil?.getStore?.()
+    if (!store) throw new Error('OpenPencil store not initialized')
+    const home = store.createShape('FRAME', 0, 0, 400, 300)
+    const details = store.createShape('FRAME', 600, 0, 200, 400)
+    const button = store.createShape('RECTANGLE', 50, 50, 120, 60)
+    store.reparentNodes([button], home)
+    store.graph.updateNode(button, {
+      prototypeReactions: [
+        {
+          id: 'reaction-1',
+          trigger: { type: 'ON_CLICK', delay: 0 },
+          actions: [
+            {
+              type: 'NODE',
+              nodeId: details,
+              navigation: 'NAVIGATE',
+              transition: { type: 'DISSOLVE', duration: 0.3 },
+              overlayPosition: 'CENTER'
+            }
+          ]
+        }
+      ]
+    })
+    store.select([home])
+    return { home, details, button }
+  })
+  await editor.canvas.waitForRender()
+  const section = editor.page.getByRole('region', { name: 'Prototype', exact: true })
+  await section.getByRole('button', { name: 'Play', exact: true }).click()
+  await editor.canvas.waitForRender()
+
+  const point = await editor.page.evaluate((id) => {
+    const store = window.openPencil?.getStore?.()
+    if (!store) throw new Error('OpenPencil store not initialized')
+    const bounds = store.graph.getAbsoluteBounds(id)
+    const { zoom, panX, panY } = store.state
+    return {
+      x: (bounds.x + bounds.width / 2) * zoom + panX,
+      y: (bounds.y + bounds.height / 2) * zoom + panY
+    }
+  }, ids.button)
+  await editor.canvas.click(point.x, point.y)
+
+  // The frame being left is drawn over the canvas while the crossfade runs.
+  const dissolve = editor.page.getByTestId('prototype-dissolve')
+  await expect(dissolve).toHaveCount(1)
+  // The snapshot decodes asynchronously, so the pixels appear a frame after the element does.
+  await expect
+    .poll(() =>
+      dissolve.evaluate((image: HTMLImageElement) => ({
+        loaded: image.complete && image.naturalWidth > 0,
+        width: image.getBoundingClientRect().width
+      }))
+    )
+    .toMatchObject({ loaded: true })
+  expect(await dissolve.evaluate((image) => image.getBoundingClientRect().width)).toBeGreaterThan(0)
+
+  // It leaves once the transition is over and the target frame owns the stage.
+  await expect(dissolve).toHaveCount(0, { timeout: 3000 })
+  expect(await view(ids.details)).toMatchObject({ canvasView: 'play', fitsInside: true })
+  editor.canvas.assertNoErrors()
+})

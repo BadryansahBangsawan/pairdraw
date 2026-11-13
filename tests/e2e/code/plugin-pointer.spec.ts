@@ -161,6 +161,43 @@ test('Escape releases the pointer and the plugin sees a cancelled sequence', asy
   expect(await layerBox(page, 'From the pointer')).toBeNull()
 })
 
+test('only a primary press this layer started ends the sequence', async ({ page }) => {
+  await startPlugin(page)
+  const capture = page.getByTestId('plugin-pointer-layer')
+  await expect(capture).toBeVisible()
+  const box = await capture.boundingBox()
+  if (!box) throw new Error('the pointer layer has no box')
+  const start = { clientX: box.x + 60, clientY: box.y + 60 }
+
+  // A release over the layer with no press on it ends nothing.
+  await capture.dispatchEvent('pointerup', {
+    pointerId: 1,
+    pointerType: 'mouse',
+    button: 0,
+    buttons: 0,
+    ...start
+  })
+  await expect(capture).toBeVisible()
+
+  // Nor does another button's release during a sequence this layer did start.
+  await page.mouse.move(start.clientX, start.clientY)
+  await page.mouse.down()
+  await page.mouse.move(box.x + 120, box.y + 120)
+  await capture.dispatchEvent('pointerup', {
+    pointerId: 1,
+    pointerType: 'mouse',
+    button: 2,
+    buttons: 1,
+    clientX: box.x + 120,
+    clientY: box.y + 120
+  })
+  await expect(capture).toBeVisible()
+
+  await page.mouse.up()
+  await expect(capture).toHaveCount(0)
+  await expect.poll(() => layerBox(page, 'From the pointer')).not.toBeNull()
+})
+
 test.describe('a plugin that asks for the pointer again', () => {
   test.use({
     storageState: async ({ baseURL }, use) => {
@@ -170,9 +207,7 @@ test.describe('a plugin that asks for the pointer again', () => {
         origins: [
           {
             origin: new URL(baseURL).origin,
-            localStorage: [
-              { name: 'open-pencil:plugins', value: pluginCatalog(LOOPING_SOURCE) }
-            ]
+            localStorage: [{ name: 'open-pencil:plugins', value: pluginCatalog(LOOPING_SOURCE) }]
           }
         ]
       })

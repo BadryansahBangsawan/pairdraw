@@ -15,9 +15,9 @@ const pageReportSchema = v.object({
   title: v.string()
 })
 
-export interface BrowserPageListen {
-  (handler: (payload: unknown) => void): (() => void) | Promise<() => void>
-}
+export type BrowserPageListen = (
+  handler: (payload: unknown) => void
+) => (() => void) | Promise<() => void>
 
 /**
  * Waits for the next finished page. Reports are ignored until `begin`, so subscribing before the
@@ -29,32 +29,31 @@ export function waitForBrowserPage(input: {
   deadlineMs: number
   schedule?: (onTime: () => void, ms: number) => () => void
 }): BrowserNodeLoadWait {
-  const armed = createDeferred<void>()
+  const armed = createDeferred<undefined>()
   const done = createDeferred<string>()
   void armed.promise.catch(() => undefined)
   void done.promise.catch(() => undefined)
 
-  let finished = false
-  let accepting = false
-  let unsubscribe = () => {}
-  let clearTimer = () => {}
+  const gate = { finished: false, accepting: false }
+  let unsubscribe: () => void = () => undefined
+  let clearTimer: () => void = () => undefined
 
   function stop() {
     unsubscribe()
     clearTimer()
-    unsubscribe = () => {}
-    clearTimer = () => {}
+    unsubscribe = () => undefined
+    clearTimer = () => undefined
   }
 
   function finish(settle: () => void) {
-    if (finished) return
-    finished = true
+    if (gate.finished) return
+    gate.finished = true
     stop()
     settle()
   }
 
   function onPayload(payload: unknown) {
-    if (!accepting) return
+    if (!gate.accepting) return
     const parsed = v.safeParse(pageReportSchema, payload)
     if (!parsed.success) return
     const url = parsed.output.url.trim()
@@ -68,17 +67,19 @@ export function waitForBrowserPage(input: {
     void Promise.resolve(input.listen(onPayload)).then(
       (stopListen) => {
         unsubscribe = stopListen
-        if (finished) {
+        if (gate.finished) {
           stop()
-          return
+          return undefined
         }
-        armed.resolve()
+        armed.resolve(undefined)
+        return undefined
       },
       (error: unknown) => {
         armed.reject(error)
         finish(() => {
           done.reject(error)
         })
+        return undefined
       }
     )
   } catch (error) {
@@ -91,15 +92,18 @@ export function waitForBrowserPage(input: {
   return {
     armed: armed.promise,
     begin() {
-      if (finished || accepting) return
-      accepting = true
+      if (gate.finished || gate.accepting) return
+      gate.accepting = true
       const schedule = input.schedule ?? defaultSchedule
       const clear = schedule(() => {
         finish(() => {
           done.reject(new Error(BROWSER_NODE_LOAD_TIMEOUT))
         })
       }, input.deadlineMs)
-      if (finished) {
+      // A schedule can run its callback before it returns, which sets the flag. The checker
+      // does not see that write.
+      // eslint-disable-next-line typescript/no-unnecessary-condition -- sync schedule sets the flag
+      if (gate.finished) {
         clear()
         return
       }

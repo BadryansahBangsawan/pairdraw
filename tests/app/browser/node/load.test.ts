@@ -44,6 +44,7 @@ describe('waiting for a snapshot page to load', () => {
     let settled = false
     void wait.done.then(() => {
       settled = true
+      return undefined
     })
     await Promise.resolve()
     expect(settled).toBe(false)
@@ -98,9 +99,11 @@ describe('waiting for a snapshot page to load', () => {
     void wait.done.then(
       () => {
         settled = 'resolved'
+        return undefined
       },
       () => {
         settled = 'rejected'
+        return undefined
       }
     )
     wait.cancel()

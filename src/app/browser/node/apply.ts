@@ -161,7 +161,7 @@ function storePicture(editor: Canvas, png: Uint8Array): string {
 function replaceSnapshotFill(fills: readonly Fill[], hash: string): Fill[] {
   const picture = imageFill(hash)
   const index = fills.findIndex((fill) => fill.type === 'IMAGE')
-  if (index < 0) return [...fills, picture]
+  if (index === -1) return [...fills, picture]
   return fills.map((fill, at) => (at === index ? picture : fill))
 }
 

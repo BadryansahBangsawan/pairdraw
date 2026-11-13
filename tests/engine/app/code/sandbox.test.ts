@@ -60,7 +60,10 @@ describe('Design JSX sandbox output', () => {
 
   test('rejects blocked keys and non-plain prototypes', () => {
     const blocked = Object.fromEntries([['safe', true]])
-    Object.defineProperty(blocked, 'constructor', { value: 'blocked', enumerable: true })
+    Object.defineProperty(blocked, 'constructor', {
+      value: 'blocked',
+      enumerable: true
+    })
     expect(() => validateDesignJSXOutput(frame(blocked), limits)).toThrow('blocked key')
     expect(() => validateDesignJSXOutput(frame({ value: new Date() }), limits)).toThrow(
       'plain structured data only'
@@ -99,12 +102,17 @@ describe('Design JSX sandbox output', () => {
   test('converts every helper the renderer gives JSX, and nothing else', () => {
     const [frameWithShader] = convertDesignJSXRoots(
       validateDesignJSXOutput(
-        frame({ fill: { __openPencilHelper: 'shader', args: [[{ type: 'Aurora', props: {} }]] } }),
+        frame({
+          fill: {
+            __openPencilHelper: 'shader',
+            args: [[{ type: 'Aurora', props: {} }]]
+          }
+        }),
         limits
       )
     )
     expect(frameWithShader.props.fill).toMatchObject({
-      shader: { components: [{ type: 'Aurora' }] }
+      shader: { preset: { components: [{ type: 'Aurora' }] } }
     })
     expect(() =>
       convertDesignJSXRoots([frame({ fill: { __openPencilHelper: 'isVariableInput', args: [] } })])
@@ -122,11 +130,18 @@ describe('Design JSX sandbox output', () => {
   })
 
   test('converts each numbered ref() to one handle across the elements of an evaluation', () => {
-    const marked = (number: number) => ({ __openPencilHelper: 'ref', args: [number] })
+    const marked = (number: number) => ({
+      __openPencilHelper: 'ref',
+      args: [number]
+    })
     const [first, second, connector] = convertDesignJSXRoots([
       frame({ ref: marked(1) }),
       frame({ ref: marked(2) }),
-      { type: 'connector', props: { from: marked(1), to: marked(2) }, children: [] }
+      {
+        type: 'connector',
+        props: { from: marked(1), to: marked(2) },
+        children: []
+      }
     ])
     expect(isLayerRef(first.props.ref)).toBe(true)
     expect(connector.props.from).toBe(first.props.ref)
@@ -135,7 +150,10 @@ describe('Design JSX sandbox output', () => {
   })
 
   test('converts each written collection once, its modes able to alias its own variables', () => {
-    const variable = (name: string) => ({ __openPencilHelper: 'variable', args: [0, name] })
+    const variable = (name: string) => ({
+      __openPencilHelper: 'variable',
+      args: [0, name]
+    })
     const collections = [
       {
         collection: 'Theme',
@@ -146,7 +164,10 @@ describe('Design JSX sandbox output', () => {
     ]
     const roots = validateDesignJSXOutput(
       [
-        frame({ fill: variable('Page'), mode: { __openPencilHelper: 'mode', args: [0, 'Dark'] } }),
+        frame({
+          fill: variable('Page'),
+          mode: { __openPencilHelper: 'mode', args: [0, 'Dark'] }
+        }),
         frame({ fill: variable('Page') })
       ],
       limits,

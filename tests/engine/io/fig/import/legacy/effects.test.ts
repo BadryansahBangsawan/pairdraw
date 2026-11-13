@@ -1,55 +1,55 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from 'bun:test'
 
-import { materializeDocument } from "@open-pencil/fig";
-import type { NodeChange } from "@open-pencil/kiwi/fig/codec";
+import { materializeDocument } from '@open-pencil/fig'
+import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
 
-import { shadowEffectAt } from "#tests/helpers/assert";
+import { shadowEffectAt } from '#tests/helpers/assert'
 
-import { canvas, doc, node } from "./helpers";
+import { canvas, doc, node } from './helpers'
 
-describe("fig-import: effects", () => {
-  test("drop shadow", () => {
+describe('fig-import: effects', () => {
+  test('drop shadow', () => {
     const graph = materializeDocument([
       doc(),
       canvas(),
-      node("RECTANGLE", 10, 1, {
+      node('RECTANGLE', 10, 1, {
         effects: [
           {
-            type: "DROP_SHADOW",
+            type: 'DROP_SHADOW',
             color: { r: 0, g: 0, b: 0, a: 0.25 },
             offset: { x: 4, y: 4 },
             radius: 8,
             spread: 0,
-            visible: true,
-          },
-        ] as NodeChange["effects"],
-      }),
-    ]).graph;
-    const n = graph.getChildren(graph.getPages()[0].id)[0];
-    expect(n.effects).toHaveLength(1);
-    expect(shadowEffectAt(n.effects).type).toBe("DROP_SHADOW");
-    expect(shadowEffectAt(n.effects).radius).toBe(8);
-    expect(shadowEffectAt(n.effects).offset.x).toBe(4);
-  });
+            visible: true
+          }
+        ] as NodeChange['effects']
+      })
+    ]).graph
+    const n = graph.getChildren(graph.getPages()[0].id)[0]
+    expect(n.effects).toHaveLength(1)
+    expect(shadowEffectAt(n.effects).type).toBe('DROP_SHADOW')
+    expect(shadowEffectAt(n.effects).radius).toBe(8)
+    expect(shadowEffectAt(n.effects).offset.x).toBe(4)
+  })
 
-  test("inner shadow", () => {
+  test('inner shadow', () => {
     const graph = materializeDocument([
       doc(),
       canvas(),
-      node("RECTANGLE", 10, 1, {
+      node('RECTANGLE', 10, 1, {
         effects: [
           {
-            type: "INNER_SHADOW",
+            type: 'INNER_SHADOW',
             color: { r: 0, g: 0, b: 0, a: 0.5 },
             offset: { x: 0, y: 2 },
             radius: 4,
             spread: 0,
-            visible: true,
-          },
-        ] as NodeChange["effects"],
-      }),
-    ]).graph;
-    const n = graph.getChildren(graph.getPages()[0].id)[0];
-    expect(n.effects[0].type).toBe("INNER_SHADOW");
-  });
-});
+            visible: true
+          }
+        ] as NodeChange['effects']
+      })
+    ]).graph
+    const n = graph.getChildren(graph.getPages()[0].id)[0]
+    expect(n.effects[0].type).toBe('INNER_SHADOW')
+  })
+})

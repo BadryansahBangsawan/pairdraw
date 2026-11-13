@@ -1,58 +1,56 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from 'bun:test'
 
-import type { PenNode } from "@open-pencil/pen";
+import type { PenNode } from '@open-pencil/pen'
 
-import { expectDefined, getNodeOrThrow } from "./helpers/assert";
-import { parseDocument } from "./helpers/document";
+import { expectDefined, getNodeOrThrow } from './helpers/assert'
+import { parseDocument } from './helpers/document'
 
-function effectsOf(effect: PenNode["effect"]) {
+function effectsOf(effect: PenNode['effect']) {
   return getNodeOrThrow(
-    parseDocument([
-      { id: "shape", type: "rectangle", width: 100, height: 80, effect },
-    ]),
-    "shape",
-  ).effects;
+    parseDocument([{ id: 'shape', type: 'rectangle', width: 100, height: 80, effect }]),
+    'shape'
+  ).effects
 }
 
-describe("parsePenFile — effects", () => {
-  test("reads layer and background blurs", () => {
+describe('parsePenFile — effects', () => {
+  test('reads layer and background blurs', () => {
     expect(
       effectsOf([
-        { type: "blur", radius: 8 },
-        { type: "background_blur", radius: 4 },
-      ]),
+        { type: 'blur', radius: 8 },
+        { type: 'background_blur', radius: 4 }
+      ])
     ).toMatchObject([
-      { type: "LAYER_BLUR", radius: 8 },
-      { type: "BACKGROUND_BLUR", radius: 4 },
-    ]);
-  });
+      { type: 'LAYER_BLUR', radius: 8 },
+      { type: 'BACKGROUND_BLUR', radius: 4 }
+    ])
+  })
 
-  test("reads inner and outer shadows", () => {
+  test('reads inner and outer shadows', () => {
     const [outer, inner] = effectsOf([
-      { type: "shadow", offset: { x: 6, y: 8 }, blur: 10, color: "#00000080" },
+      { type: 'shadow', offset: { x: 6, y: 8 }, blur: 10, color: '#00000080' },
       {
-        type: "shadow",
-        shadowType: "inner",
+        type: 'shadow',
+        shadowType: 'inner',
         offset: { x: 4, y: 4 },
         blur: 6,
-        enabled: false,
-      },
-    ]);
+        enabled: false
+      }
+    ])
     expect(outer).toMatchObject({
-      type: "DROP_SHADOW",
+      type: 'DROP_SHADOW',
       offset: { x: 6, y: 8 },
       radius: 10,
-      visible: true,
-    });
-    expect(expectDefined(outer)).toMatchObject({ color: { a: 128 / 255 } });
+      visible: true
+    })
+    expect(expectDefined(outer)).toMatchObject({ color: { a: 128 / 255 } })
     expect(inner).toMatchObject({
-      type: "INNER_SHADOW",
+      type: 'INNER_SHADOW',
       radius: 6,
-      visible: false,
-    });
-  });
+      visible: false
+    })
+  })
 
-  test("skips shader effects", () => {
-    expect(effectsOf({ type: "shader", url: "./fx.glsl" })).toEqual([]);
-  });
-});
+  test('skips shader effects', () => {
+    expect(effectsOf({ type: 'shader', url: './fx.glsl' })).toEqual([])
+  })
+})

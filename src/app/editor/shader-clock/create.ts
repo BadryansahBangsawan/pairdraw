@@ -72,7 +72,8 @@ export function createShaderClock(editor: Editor) {
   }
 
   function wake() {
-    if (!editor.renderer || frame !== 0) return
+    // Tests run the editor without a DOM, where nothing can be scheduled or drawn anyway.
+    if (!editor.renderer || frame !== 0 || typeof requestAnimationFrame !== 'function') return
     frame = requestAnimationFrame(tick)
   }
 

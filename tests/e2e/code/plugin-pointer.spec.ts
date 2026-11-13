@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
+import { openAppMenu } from '#tests/helpers/menu'
 
 /**
  * A plugin that takes the next pointer sequence and draws the rectangle the drag covered. A
@@ -196,6 +197,81 @@ test('only a primary press this layer started ends the sequence', async ({ page 
   await page.mouse.up()
   await expect(capture).toHaveCount(0)
   await expect.poll(() => layerBox(page, 'From the pointer')).not.toBeNull()
+})
+
+test.describe('a plugin waiting for the pointer when its document goes away', () => {
+  /** Opens a second document in a tab of its own with File › New Design. */
+  async function openSecondDocument(page: Page) {
+    const file = await openAppMenu(page, 'File')
+    await file.getByRole('menuitem', { name: 'New Design' }).click()
+    await expect(page.getByTestId('tabbar-tab')).toHaveCount(2)
+    await new CanvasHelper(page).waitForInit()
+  }
+
+  test('switching to another document cancels the pointer and frees the run slot', async ({
+    page
+  }) => {
+    const canvas = new CanvasHelper(page)
+    await page.goto('/?test')
+    await canvas.waitForInit()
+    await openSecondDocument(page)
+    const tabs = page.getByTestId('tabbar-tab')
+
+    // Back to the first document, where the plugin asks for the pointer.
+    await tabs.first().click()
+    await expect(tabs.first()).toHaveAttribute('aria-selected', 'true')
+    await canvas.waitForInit()
+    await startPlugin(page)
+    const capture = page.getByTestId('plugin-pointer-layer')
+    await expect(capture).toBeVisible()
+
+    await tabs.last().click()
+    await expect(tabs.last()).toHaveAttribute('aria-selected', 'true')
+    await canvas.waitForInit()
+    // The other document's canvas must take its own drags, with no capture layer over it.
+    await expect(capture).toHaveCount(0)
+
+    await canvas.drag(120, 120, 320, 260)
+    await expect.poll(() => layerBox(page, 'From the pointer')).toBeNull()
+
+    // The run ended with a cancelled sequence rather than holding its document's pointer.
+    await tabs.first().click()
+    await expect(tabs.first()).toHaveAttribute('aria-selected', 'true')
+    await canvas.waitForInit()
+    await expect.poll(() => layerBox(page, 'From the pointer')).toBeNull()
+    await expect.poll(() => layerBox(page, 'Cancelled by Escape')).not.toBeNull()
+
+    // The run slot and the pointer are free for the next run.
+    await startPlugin(page)
+    await expect(capture).toBeVisible()
+    await page.keyboard.press('Escape')
+  })
+
+  test('closing the document tab cancels the pointer and frees the run slot', async ({ page }) => {
+    const canvas = new CanvasHelper(page)
+    await page.goto('/?test')
+    await canvas.waitForInit()
+    await openSecondDocument(page)
+    const tabs = page.getByTestId('tabbar-tab')
+
+    await tabs.first().click()
+    await expect(tabs.first()).toHaveAttribute('aria-selected', 'true')
+    await canvas.waitForInit()
+    await startPlugin(page)
+    const capture = page.getByTestId('plugin-pointer-layer')
+    await expect(capture).toBeVisible()
+
+    const pluginTab = page.locator('[data-slot="tab-item"]').first()
+    await pluginTab.hover()
+    await pluginTab.getByRole('button', { name: /Close/ }).click()
+
+    await expect(tabs).toHaveCount(1)
+    // The document that remains is usable: no capture layer, and the run let go of its slot.
+    await expect(capture).toHaveCount(0)
+    await startPlugin(page)
+    await expect(capture).toBeVisible()
+    await page.keyboard.press('Escape')
+  })
 })
 
 test.describe('a plugin that asks for the pointer again', () => {

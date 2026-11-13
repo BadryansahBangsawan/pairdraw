@@ -8,6 +8,7 @@ import {
   addPluginPointerPoint,
   beginPluginPointer,
   cancelPluginPointer,
+  cancelPluginPointerFor,
   endPluginPointer,
   pluginPointerHolder
 } from '@/app/plugins/pointer'
@@ -90,5 +91,21 @@ describe('the plugin pointer', () => {
   test('a point with no holder is ignored', () => {
     addPluginPointerPoint({ x: 1, y: 2 })
     expect(pluginPointerHolder.value).toBeNull()
+  })
+
+  test('cancelling for one document ends only that document’s sequence', async () => {
+    const document = {}
+    const other = {}
+    const run = beginPluginPointer('marks', document)
+    const sequence = run.request()
+    expect(pluginPointerHolder.value).toBe('marks')
+
+    cancelPluginPointerFor(other)
+    expect(pluginPointerHolder.value).toBe('marks')
+
+    cancelPluginPointerFor(document)
+    expect(await sequence).toBeNull()
+    expect(pluginPointerHolder.value).toBeNull()
+    await expect(run.request()).rejects.toThrow(PLUGIN_POINTER_CANCELLED_MESSAGE)
   })
 })

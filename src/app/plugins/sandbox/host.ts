@@ -49,8 +49,9 @@ export function createPluginHost(
 ): PluginHost {
   const figma = figmaFactory.makeFigmaFromStore(store)
   store.undo.beginBatch(`Plugin: ${id}`)
-  // The canvas pointer belongs to this run: a cancelled sequence closes it for the rest of it.
-  const pointer = beginPluginPointer(id)
+  // The canvas pointer belongs to this run and this document: a cancelled sequence closes it
+  // for the rest of the run, and the document leaving the screen cancels it.
+  const pointer = beginPluginPointer(id, store)
   // A call the plugin started without awaiting it can still be running when the run ends, such
   // as when its deadline passes. It must not edit after the run committed or rolled back.
   let finished = false

@@ -2,17 +2,24 @@
  * Delivers the canvas pointer sequence to the plugin that holds the pointer. While a plugin waits,
  * the canvas shows a capture layer that takes the drag, so the editor's own tools never see it and
  * the plugin receives the same points the person moved through, in document coordinates.
+ *
+ * The sequence belongs to the document it was taken on. When that document leaves the screen,
+ * because another tab becomes active or its tab closes, the sequence is cancelled: the next
+ * canvas gets no capture layer, and the run ends instead of holding the pointer and the run slot.
  */
 import { useEventListener } from '@vueuse/core'
-import { watch, type Ref } from 'vue'
+import { computed, onScopeDispose, watch, type Ref } from 'vue'
 
 import type { EditorStore } from '@/app/editor/session/create'
+import { activeTab } from '@/app/tabs'
 
 import {
   addPluginPointerPoint,
   cancelPluginPointer,
+  cancelPluginPointerFor,
   endPluginPointer,
-  pluginPointerHolder
+  pluginPointerHolder,
+  pluginPointerOwner
 } from './index'
 
 export function usePluginPointerInput(
@@ -21,6 +28,18 @@ export function usePluginPointerInput(
 ) {
   // Only a press this layer took starts a sequence; a release from elsewhere is not its end.
   let started = false
+
+  /** Whether this canvas is the document the pointer was taken on, so it shows the layer. */
+  const holding = computed(
+    () => pluginPointerHolder.value !== null && pluginPointerOwner.value === store
+  )
+
+  // Another tab, or Home, means this document is no longer the one being dragged in.
+  watch(activeTab, (tab) => {
+    if (holding.value && tab?.store !== store) cancelPluginPointerFor(store)
+  })
+  // A canvas that goes away cannot finish a sequence; leaving its run waiting forever is worse.
+  onScopeDispose(() => cancelPluginPointerFor(store))
 
   function addPoint(event: PointerEvent): void {
     const canvas = canvasRef.value
@@ -60,10 +79,10 @@ export function usePluginPointerInput(
   })
 
   useEventListener(window, 'keydown', (event: KeyboardEvent) => {
-    if (event.key !== 'Escape' || !pluginPointerHolder.value) return
+    if (event.key !== 'Escape' || !holding.value) return
     event.preventDefault()
     cancelPluginPointer()
   })
 
-  return { holder: pluginPointerHolder, onPointerDown, onPointerMove, onPointerUp, onPointerCancel }
+  return { holder: holding, onPointerDown, onPointerMove, onPointerUp, onPointerCancel }
 }

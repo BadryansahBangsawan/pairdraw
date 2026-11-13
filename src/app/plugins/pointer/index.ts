@@ -4,7 +4,7 @@
  * when the run gives it up or the user presses Escape. One holder at a time, so a second plugin
  * cannot take the drag away from the first.
  */
-import { ref, type Ref } from 'vue'
+import { ref, shallowRef, type Ref } from 'vue'
 
 import { createDeferred } from '@/app/runtime/deferred'
 
@@ -33,6 +33,8 @@ interface HeldSequence {
   points: PluginPointerPoint[]
   settle: (sequence: PluginPointerPoint[] | null) => void
   run: PointerRun
+  /** The document the sequence was taken on; `null` for a caller that names none, as tests do. */
+  owner: object | null
 }
 
 let held: HeldSequence | null = null
@@ -40,9 +42,16 @@ let held: HeldSequence | null = null
 /** The plugin holding the pointer, or `null`; the canvas shows its capture layer while set. */
 export const pluginPointerHolder: Ref<string | null> = ref(null)
 
+/**
+ * The document the pointer was taken on, by identity. Only that document's canvases show the
+ * capture layer and feed the sequence; another document's canvas leaves the drag to the editor.
+ */
+export const pluginPointerOwner = shallowRef<object | null>(null)
+
 function release(): void {
   held = null
   pluginPointerHolder.value = null
+  pluginPointerOwner.value = null
 }
 
 /**
@@ -51,15 +60,16 @@ function release(): void {
  * instead burns its run deadline. Sequences the user completes keep working, and a new run gets
  * its own access.
  */
-export function beginPluginPointer(id: string): PluginPointerAccess {
+export function beginPluginPointer(id: string, owner: object | null = null): PluginPointerAccess {
   const run: PointerRun = { cancelled: false }
   return {
     request() {
       if (run.cancelled) return Promise.reject(new Error(PLUGIN_POINTER_CANCELLED_MESSAGE))
       if (held) return Promise.reject(new Error(PLUGIN_POINTER_BUSY_MESSAGE))
       const { promise, resolve } = createDeferred<PluginPointerPoint[] | null>()
-      held = { id, points: [], settle: resolve, run }
+      held = { id, points: [], settle: resolve, run, owner }
       pluginPointerHolder.value = id
+      pluginPointerOwner.value = owner
       return promise
     },
     release() {
@@ -94,4 +104,14 @@ export function cancelPluginPointer(): void {
   if (!held) return
   held.run.cancelled = true
   drop()
+}
+
+/**
+ * Cancels the sequence a run holds on `owner`, and nothing when the pointer is another
+ * document's or free. A document leaving the screen uses this, so its run ends with a cancelled
+ * sequence instead of keeping the canvas and the one run slot.
+ */
+export function cancelPluginPointerFor(owner: object): void {
+  if (held?.owner !== owner) return
+  cancelPluginPointer()
 }

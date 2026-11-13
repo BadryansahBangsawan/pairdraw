@@ -58,7 +58,9 @@ async function pasteManifest(root: HTMLElement, text: string): Promise<void> {
 export const Empty: Story = {
   play: async () => {
     const root = panel()
-    await expect(within(root).getByRole('status')).toHaveTextContent('Plugins do not run yet')
+    await expect(within(root).getByRole('status')).toHaveTextContent(
+      'Plugins run from the command palette'
+    )
     await expect(within(root).getByText('No plugins installed')).toBeVisible()
     await expect(within(root).getByRole('button', { name: named('Choose file') })).toBeVisible()
   }
@@ -72,7 +74,9 @@ export const InstallsEnablesAndRemoves: Story = {
     await userEvent.click(within(root).getByRole('button', { name: named('Install') }))
     await expect(within(root).getByText('Marks')).toBeVisible()
     await expect(within(root).getByText(/Read the open document/)).toBeVisible()
-    await expect(within(root).getByRole('status')).toHaveTextContent('Plugins do not run yet')
+    await expect(within(root).getByRole('status')).toHaveTextContent(
+      'Plugins run from the command palette'
+    )
     const toggle = within(root).getByRole('switch', { name: named('Enable Marks') })
     await expect(toggle).toBeChecked()
     await userEvent.click(toggle)

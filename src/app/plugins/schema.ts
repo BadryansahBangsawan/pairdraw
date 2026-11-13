@@ -46,7 +46,7 @@ export const pluginManifestSchema = v.strictObject({
   name: pluginLabelSchema(80),
   version: pluginLabelSchema(32),
   source: v.pipe(v.string(), v.minLength(1), v.maxLength(MAX_PLUGIN_MANIFEST_BYTES)),
-  /** The single toolbar command label the host will show once plugins can run. */
+  /** The single command label the plugin offers in the app's command palette. */
   command: pluginLabelSchema(80),
   capabilities: v.pipe(v.array(pluginCapabilitySchema), v.maxLength(PLUGIN_CAPABILITIES.length))
 })

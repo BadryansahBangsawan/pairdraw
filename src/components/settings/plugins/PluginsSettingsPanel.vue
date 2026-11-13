@@ -125,8 +125,8 @@ function confirmRemove(): void {
       <template #description>{{ settings.pluginsDescription }}</template>
       <AppAlert
         tone="info"
-        :heading="settings.pluginsNotRunning"
-        :description="settings.pluginsNotRunningDescription"
+        :heading="settings.pluginsRunFromPalette"
+        :description="settings.pluginsRunFromPaletteDescription"
       />
       <div class="flex flex-col gap-2">
         <label for="plugins-manifest" class="text-sm">{{ settings.pluginsManifest }}</label>

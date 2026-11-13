@@ -145,9 +145,9 @@ export const settingsMessageDefaults = {
   plugins: 'Plugins',
   pluginsDescription:
     'Plugins installed for this app. They are saved with the app, not inside a document.',
-  pluginsNotRunning: 'Plugins do not run yet',
-  pluginsNotRunningDescription:
-    'Installing a plugin only saves it. Running one waits until the app can run plugin scripts.',
+  pluginsRunFromPalette: 'Plugins run from the command palette',
+  pluginsRunFromPaletteDescription:
+    'Choose a plugin’s command there. It runs on the open document and asks before its first run what it may do.',
   pluginsEmpty: 'No plugins installed',
   pluginsEmptyDescription: 'Paste a plugin manifest or choose a file to install one.',
   pluginsManifest: 'Plugin manifest',

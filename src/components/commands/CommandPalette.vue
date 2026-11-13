@@ -11,6 +11,7 @@ import { CommandPaletteRoot } from '@open-pencil/vue/primitives/CommandPalette'
 
 import { useImageAIPaletteGroup } from '@/app/editor/image-ai/palette'
 import { usePagePaletteGroup } from '@/app/editor/pages/palette'
+import { usePluginPaletteGroup } from '@/app/plugins/palette'
 import { shortcutCode } from '@/app/shell/keyboard/layout'
 import { useAppMenu } from '@/app/shell/menu/app-menu'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -22,9 +23,11 @@ import { useCommandPaletteUI } from './ui'
 const { commandGroups } = useAppMenu()
 const pageGroup = usePagePaletteGroup()
 const imageAIGroup = useImageAIPaletteGroup()
+const pluginGroup = usePluginPaletteGroup()
 const groups = computed(() => {
   const base = pageGroup.value ? [pageGroup.value, ...commandGroups.value] : commandGroups.value
-  return imageAIGroup.value ? [...base, imageAIGroup.value] : base
+  const withImage = imageAIGroup.value ? [...base, imageAIGroup.value] : base
+  return pluginGroup.value ? [...withImage, pluginGroup.value] : withImage
 })
 const commands = useCommandMessages()
 const common = useCommonMessages()

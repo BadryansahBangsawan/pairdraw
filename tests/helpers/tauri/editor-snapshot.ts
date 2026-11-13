@@ -13,9 +13,7 @@ async function ensureNativeEditorReady(): Promise<void> {
   await browser.execute(() => {
     const store = window.openPencil?.getStore?.()
     if (document.querySelector('canvas') && store?.textEditor) return
-    const newDesign = [...document.querySelectorAll('button')].find(
-      (button) => button.textContent?.trim() === 'New design'
-    )
+    const newDesign = document.querySelector<HTMLElement>('[data-test-id="home-new-design"]')
     // Setup only: input assertions still use WebDriver after the document is ready.
     newDesign?.click()
   })

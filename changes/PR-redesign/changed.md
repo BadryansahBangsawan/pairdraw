@@ -8,3 +8,4 @@
 - In the AI chat, your messages sit in high-contrast bubbles and replies read as plain text with a copy button under each, the message box is a rounded card with the send button in the accent color, and the agent permission prompt uses the app's standard dialog and buttons.
 - AI agents show in violet everywhere, in shared rooms too: their cursors, labels, page markers, and the chat's typing indicator, tool calls, and reasoning.
 - On phones, the toolbar, HUD buttons, and bottom sheet have a visible edge in both themes, and the bottom sheet's panel tabs show which panel is open and are announced by name to screen readers. Comment pins have a visible edge in dark mode, and the open thread's details stay readable in the comments list.
+- The desktop app is named Pairdraw in the menu bar, the Dock, and its bundle, and the CLI, the MCP server, the agent skill, and exported Storybook and draw.io files say Pairdraw too.

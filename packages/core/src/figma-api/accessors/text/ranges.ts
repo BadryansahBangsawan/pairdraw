@@ -387,7 +387,7 @@ const RANGE_SETTERS: Record<string, RangeSetter> = {
   }),
   setRangeTextCase: (method, _node, _start, _end, value) => {
     if (SMALL_CAPS.has(value as string)) {
-      throw new Error(`in ${method}: OpenPencil does not support the ${String(value)} text case`)
+      throw new Error(`in ${method}: Pairdraw does not support the ${String(value)} text case`)
     }
     if (!TEXT_CASES.has(value as TextCase)) {
       throw invalid(

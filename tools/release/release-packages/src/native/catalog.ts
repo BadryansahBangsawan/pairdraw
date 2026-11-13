@@ -56,11 +56,8 @@ export interface DesktopAsset {
   pack?: ArchiveFormat
 }
 
-/**
- * Tauri names bundles after `productName`, which stays OpenPencil so existing installs keep their
- * application and data directories; only the published names carry the product name.
- */
-export const BUNDLE_NAME = 'OpenPencil'
+/** Tauri names bundles after `productName`; the published names carry the same product name. */
+export const BUNDLE_NAME = 'Pairdraw'
 const RELEASE_NAME = 'Pairdraw'
 
 /** Required Pairdraw release outputs, not a discovery or packaging implementation. */

@@ -36,7 +36,7 @@ export function createToolDescriptors(filesystemEnabled: boolean): ToolDescripto
     {
       name: 'list_documents',
       description:
-        'List open OpenPencil documents/tabs with their IDs, file paths, current pages, and pages.',
+        'List open Pairdraw documents/tabs with their IDs, file paths, current pages, and pages.',
       effect: 'read',
       availability: 'default',
       capabilities: ['document:read'],
@@ -147,7 +147,7 @@ export function createToolDescriptors(filesystemEnabled: boolean): ToolDescripto
     {
       name: 'read_skill',
       description:
-        'Read the OpenPencil agent skill: how to inspect, edit, and export designs with these tools. Returns SKILL.md, or with path "references/design-authoring.md" the JSX reference for render. Read both before designing.',
+        'Read the Pairdraw agent skill: how to inspect, edit, and export designs with these tools. Returns SKILL.md, or with path "references/design-authoring.md" the JSX reference for render. Read both before designing.',
       effect: 'read',
       availability: 'default',
       capabilities: [],

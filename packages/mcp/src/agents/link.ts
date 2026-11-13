@@ -71,8 +71,8 @@ export async function writeConnectPage(
   const href = escapeAttribute(link)
   const html =
     `<!doctype html><meta charset="utf-8"><meta name="referrer" content="no-referrer">` +
-    `<meta http-equiv="refresh" content="0;url=${href}"><title>OpenPencil</title>` +
-    `<a href="${href}">Open OpenPencil</a>\n`
+    `<meta http-equiv="refresh" content="0;url=${href}"><title>Pairdraw</title>` +
+    `<a href="${href}">Open Pairdraw</a>\n`
   await writeFile(path, html, { mode: 0o600, flag: 'wx' })
   return { path, remove: () => rm(path, { force: true }) }
 }

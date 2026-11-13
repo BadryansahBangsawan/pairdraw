@@ -11,7 +11,7 @@ Open-source design editor. Opens `.fig` and `.pen` design files, includes built-
 
 **[Try it online →](https://app.openpencil.dev/demo)** · [Download](https://github.com/open-pencil/open-pencil/releases/latest) · [Documentation](https://openpencil.dev) · [Roadmap](https://openpencil.dev/development/roadmap) · [llms.txt](https://openpencil.dev/llms.txt)
 
-![OpenPencil](packages/docs/public/screenshot.png)
+![Pairdraw](packages/docs/public/screenshot.png)
 
 ## Installation
 
@@ -184,7 +184,7 @@ Set `OPENPENCIL_MCP_ROOT` to limit file access to one directory; it defaults to 
 
 ### [AI agent skill](skills/open-pencil/SKILL.md)
 
-Teach your AI coding agent to use OpenPencil — inspect designs, export assets, analyze tokens, modify .fig files:
+Teach your AI coding agent to use Pairdraw — inspect designs, export assets, analyze tokens, modify .fig files:
 
 ```sh
 npx skills add open-pencil/open-pencil

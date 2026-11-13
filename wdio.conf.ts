@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import type { TauriCapabilities } from '@wdio/tauri-service'
 
 const root = dirname(fileURLToPath(import.meta.url))
-const binaryName = process.platform === 'win32' ? 'OpenPencil.exe' : 'OpenPencil'
+const binaryName = process.platform === 'win32' ? 'Pairdraw.exe' : 'Pairdraw'
 const appBinary = join(root, 'desktop', 'target', 'debug', binaryName)
 
 const capability: TauriCapabilities = {

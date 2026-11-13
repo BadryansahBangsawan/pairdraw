@@ -14,11 +14,12 @@ test('builds Linux on ARM64 as well as x64', () => {
   })
 })
 
-test('publishes every file under the Pairdraw name while reading OpenPencil bundles', () => {
+test('reads and publishes every file under the Pairdraw name', () => {
   for (const asset of published) {
     expect(asset.name).toStartWith('Pairdraw')
     expect(asset.name).not.toContain('OpenPencil')
-    expect(asset.source).toStartWith('OpenPencil')
+    expect(asset.source).toStartWith('Pairdraw')
+    expect(asset.source).not.toContain('OpenPencil')
   }
   expect(new Set(published.map((asset) => asset.name)).size).toBe(published.length)
 })
@@ -32,18 +33,18 @@ test('Linux ARM64 ships an AppImage, Debian and RPM packages, and a tar.gz', () 
     }))
   ).toEqual([
     {
-      source: 'OpenPencil_0.16.0_aarch64.AppImage',
+      source: 'Pairdraw_0.16.0_aarch64.AppImage',
       name: 'Pairdraw_0.16.0_aarch64.AppImage',
       pack: undefined
     },
-    { source: 'OpenPencil_0.16.0_arm64.deb', name: 'Pairdraw_0.16.0_arm64.deb', pack: undefined },
+    { source: 'Pairdraw_0.16.0_arm64.deb', name: 'Pairdraw_0.16.0_arm64.deb', pack: undefined },
     {
-      source: 'OpenPencil-0.16.0-1.aarch64.rpm',
+      source: 'Pairdraw-0.16.0-1.aarch64.rpm',
       name: 'Pairdraw-0.16.0-1.aarch64.rpm',
       pack: undefined
     },
     {
-      source: 'OpenPencil_0.16.0_arm64.deb',
+      source: 'Pairdraw_0.16.0_arm64.deb',
       name: 'Pairdraw_0.16.0_aarch64.tar.gz',
       pack: 'tar.gz'
     }

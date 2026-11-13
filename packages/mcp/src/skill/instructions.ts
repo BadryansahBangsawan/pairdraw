@@ -61,8 +61,8 @@ export function createServerInstructions({
   const enabled = (name: string) => exposed.has(name)
   return compact([
     policy.scope === 'selection'
-      ? 'OpenPencil is a design editor. These tools read only the layers selected in its running app and cannot change the document.'
-      : 'OpenPencil is a design editor. These tools read and edit the documents open in its running app.',
+      ? 'Pairdraw is a design editor. These tools read only the layers selected in its running app and cannot change the document.'
+      : 'Pairdraw is a design editor. These tools read and edit the documents open in its running app.',
     agentKind === 'mcp' && skillParagraph(enabled),
     usageParagraph(enabled, policy)
   ]).join('\n\n')

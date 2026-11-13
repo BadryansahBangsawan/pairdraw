@@ -20,7 +20,7 @@ test('zips the macOS app with ditto, keeping its signature and parent folder', a
   const { requests, commands } = recordingCommands()
 
   const archive = await packAsset(
-    { source: '/bundle/macos/OpenPencil.app', name: 'Pairdraw_0.16.0_aarch64.zip', pack: 'zip' },
+    { source: '/bundle/macos/Pairdraw.app', name: 'Pairdraw_0.16.0_aarch64.zip', pack: 'zip' },
     '/out',
     commands
   )
@@ -34,7 +34,7 @@ test('zips the macOS app with ditto, keeping its signature and parent folder', a
         '-k',
         '--sequesterRsrc',
         '--keepParent',
-        '/bundle/macos/OpenPencil.app',
+        '/bundle/macos/Pairdraw.app',
         join('/out', 'Pairdraw_0.16.0_aarch64.zip')
       ]
     ]
@@ -46,7 +46,7 @@ test('packs the Debian package files under one folder named after the archive', 
 
   await packAsset(
     {
-      source: '/bundle/deb/OpenPencil_0.16.0_arm64.deb',
+      source: '/bundle/deb/Pairdraw_0.16.0_arm64.deb',
       name: 'Pairdraw_0.16.0_aarch64.tar.gz',
       pack: 'tar.gz'
     },
@@ -57,7 +57,7 @@ test('packs the Debian package files under one folder named after the archive', 
   const [extract, tar] = requests
   expect(extract?.command).toBe('dpkg-deb')
   const extracted = extract?.args?.[2] ?? ''
-  expect(extract?.args).toEqual(['-x', '/bundle/deb/OpenPencil_0.16.0_arm64.deb', extracted])
+  expect(extract?.args).toEqual(['-x', '/bundle/deb/Pairdraw_0.16.0_arm64.deb', extracted])
   expect(extracted.endsWith('Pairdraw_0.16.0_aarch64')).toBe(true)
 
   const parent = extracted.slice(0, -'/Pairdraw_0.16.0_aarch64'.length)
@@ -81,7 +81,7 @@ test('packs the resource folder, so a copy run from the archive is not the insta
   const commands = releaseCommands('/checkout', async ({ command, args = [] }) => {
     if (command === 'tar') {
       const [parent, folder] = args.slice(-2)
-      const resources = await stat(join(parent ?? '', folder ?? '', 'usr', 'lib', 'OpenPencil'))
+      const resources = await stat(join(parent ?? '', folder ?? '', 'usr', 'lib', 'Pairdraw'))
       packedResources = resources.isDirectory()
     }
     return { stdout: '', stderr: '' }
@@ -89,7 +89,7 @@ test('packs the resource folder, so a copy run from the archive is not the insta
 
   await packAsset(
     {
-      source: '/bundle/deb/OpenPencil_0.16.0_amd64.deb',
+      source: '/bundle/deb/Pairdraw_0.16.0_amd64.deb',
       name: 'Pairdraw_0.16.0_amd64.tar.gz',
       pack: 'tar.gz'
     },
@@ -104,7 +104,7 @@ test('refuses an asset that is not a packed archive', async () => {
   const { requests, commands } = recordingCommands()
 
   await expect(
-    packAsset({ source: '/bundle/OpenPencil.dmg', name: 'Pairdraw.dmg' }, '/out', commands)
+    packAsset({ source: '/bundle/Pairdraw.dmg', name: 'Pairdraw.dmg' }, '/out', commands)
   ).rejects.toThrow('Not a packed archive')
   expect(requests).toEqual([])
 })

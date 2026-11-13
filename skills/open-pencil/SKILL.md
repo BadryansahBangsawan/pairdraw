@@ -5,7 +5,7 @@ description: Work with Figma .fig design files and the running OpenPencil editor
 
 # OpenPencil
 
-OpenPencil provides a CLI and MCP server for `.fig` design files and the running OpenPencil editor.
+Pairdraw provides a CLI and MCP server for `.fig` design files and the running Pairdraw editor.
 
 Use two modes:
 
@@ -26,7 +26,7 @@ Use `openpencil --help`, per-command help, and the connected MCP server’s tool
 
 Inside `eval`, use `openpencil.setVariableFormula('Spacing', 'large', '{base} * 2')` for numeric formulas or `openpencil.setVariableFormula('State', 'visible', '{viewport} > 1024 and not {loading}')` for Boolean formulas, which use `and`, `or`, `not` and number comparisons. Collections and variables must already exist. An optional fourth argument selects a mode by name; otherwise the default mode is edited. The call validates before mutation and returns the resolved value. Length formulas use stored pixels. The CSS stylesheet writes number formulas as `calc()`; design-token files hold the result with the formula in `$extensions`.
 
-Variables follow Figma's plugin API: `figma.variables.getLocalVariables()`, `createVariable(name, collection, type)`, `variable.setValueForMode(modeId, value)`, and `node.setBoundVariable(field, variable)` with Figma's field names (`characters`, `width`, `paddingLeft`) and types; paint colours bind through `figma.variables.setBoundVariableForPaint`. To bind as the layer panel does, use `openpencil.bindVariable(node, field, variable)` and `openpencil.unbindVariable(node, field)` with OpenPencil names (`text`, `visible`, `opacity`, `fills/0/color`): text content takes a text or number variable, shown as text; visibility a boolean or text one. `openpencil` also sets layout and text direction (`setLayoutDirection`, `setTextDirection`), OkHCL paint colors (`setFillOkHCL`, `setStrokeOkHCL`), exposes instance swaps (`exposeInstanceSwap`), and reports font availability (`getFontStatus()`); booleans and flattening are Figma's `figma.union`, `subtract`, `intersect`, `exclude` and `figma.flatten`.
+Variables follow Figma's plugin API: `figma.variables.getLocalVariables()`, `createVariable(name, collection, type)`, `variable.setValueForMode(modeId, value)`, and `node.setBoundVariable(field, variable)` with Figma's field names (`characters`, `width`, `paddingLeft`) and types; paint colours bind through `figma.variables.setBoundVariableForPaint`. To bind as the layer panel does, use `openpencil.bindVariable(node, field, variable)` and `openpencil.unbindVariable(node, field)` with Pairdraw names (`text`, `visible`, `opacity`, `fills/0/color`): text content takes a text or number variable, shown as text; visibility a boolean or text one. `openpencil` also sets layout and text direction (`setLayoutDirection`, `setTextDirection`), OkHCL paint colors (`setFillOkHCL`, `setStrokeOkHCL`), exposes instance swaps (`exposeInstanceSwap`), and reports font availability (`getFontStatus()`); booleans and flattening are Figma's `figma.union`, `subtract`, `intersect`, `exclude` and `figma.flatten`.
 
 ## Requirements
 
@@ -185,7 +185,7 @@ Text edits follow Figma's font rule: anything that lays text out again (`charact
 
 Text styles follow Figma's per-character model: `getStyledTextSegments(fields)` reads runs, `getRange…`/`setRange…` read and set font, size, fills, letter spacing, line height, decorations, text case, hyperlinks, text and fill style IDs, and bound variables for `[start, end)`, and a text's `fontSize`, `fontName`, `fills`, and similar read `figma.mixed` while characters differ. Check for it before using the value. Paints everywhere take Figma's shape: a solid `color` is `{ r, g, b }` with the alpha in `opacity`, and an image is `{ type: "IMAGE", imageHash, scaleMode: "FILL" | "FIT" | "CROP" | "TILE" }` with optional `rotation` and `scalingFactor`.
 
-Next to `figma`, scripts get `openpencil`: what OpenPencil adds to the Figma API, in its style. A main component can behave as a Reka UI control, by its own property and slot names:
+Next to `figma`, scripts get `openpencil`: what Pairdraw adds to the Figma API, in its style. A main component can behave as a Reka UI control, by its own property and slot names:
 
 ```bash
 openpencil eval design.fig -w -c '
@@ -351,7 +351,7 @@ Discover available tools and their arguments from the connected server or browse
 - **`generate_image` / `remove_background` / `replace_background` / `generate_svg`** — image AI on the user's own image service keys (Settings → Image services); they work only through the running app, take a while, cost the user money, and report a missing key for the user to add. Call them only when asked; `generate_svg` imports editable vector layers.
 - **`vectorize_image`** — turn a layer's image fill into editable vector paths in a new frame beside the image, with the user's own vectorize service; it works only through the running app, takes up to a few minutes, and reports a missing key for the user to add in Settings → Image services.
 - **`viewport_zoom_to_fit` / `viewport_set` / `viewport_get`** — move the user's view only when they ask to be shown something.
-- **`get_codegen_prompt`** — retrieve OpenPencil's current JSX/codegen guidance.
+- **`get_codegen_prompt`** — retrieve Pairdraw's current JSX/codegen guidance.
 - **`read_skill`** — read this skill (`SKILL.md`) or `references/design-authoring.md` from the connected server, for clients that cannot install skills; the same files are the `openpencil://skills/open-pencil/` resources and the `design` prompt.
 - **`undo` / `redo`** — revert or reapply your newest change; they refuse to touch the user's edits.
 - **`list_documents` / `activate_document`** — discover open tabs and show the one you worked on.

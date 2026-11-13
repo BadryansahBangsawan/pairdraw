@@ -20,14 +20,14 @@ export interface SkillFile {
 export const SKILL_FILES: Readonly<Record<SkillFilePath, SkillFile>> = {
   'SKILL.md': {
     path: 'SKILL.md',
-    title: 'OpenPencil agent skill',
+    title: 'Pairdraw agent skill',
     description:
-      'How to inspect, edit, and export designs in the running OpenPencil editor with these tools, the CLI, JSX, and eval. Read it first.',
+      'How to inspect, edit, and export designs in the running Pairdraw editor with these tools, the CLI, JSX, and eval. Read it first.',
     text: skill
   },
   'references/design-authoring.md': {
     path: 'references/design-authoring.md',
-    title: 'OpenPencil design authoring reference',
+    title: 'Pairdraw design authoring reference',
     description:
       'The JSX the render tool accepts: layout, paint, text, variables, components, and controls, with tested examples. Read it before creating or changing designs.',
     text: designAuthoring

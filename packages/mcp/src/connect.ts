@@ -24,9 +24,9 @@ if (process.argv.includes('--version')) {
 if (process.argv.includes('--help') || process.argv.includes('-h')) {
   process.stdout.write(
     `openpencil-connect\n\n` +
-      `Connect OpenPencil in the browser to this computer, so its chat can run\n` +
-      `Claude Code, Codex, or Gemini CLI here and use OpenPencil's tools.\n\n` +
-      `Starts OpenPencil's MCP server with an agent bridge and opens a one-time link\n` +
+      `Connect Pairdraw in the browser to this computer, so its chat can run\n` +
+      `Claude Code, Codex, or Gemini CLI here and use Pairdraw's tools.\n\n` +
+      `Starts Pairdraw's MCP server with an agent bridge and opens a one-time link\n` +
       `that pairs the browser tab. Keep it running while you use agents.\n\n` +
       `Options:\n` +
       `  --help, -h    Show this help message\n` +
@@ -34,7 +34,7 @@ if (process.argv.includes('--help') || process.argv.includes('-h')) {
       `  --no-open     Print the link without opening the browser\n\n` +
       `Environment variables:\n` +
       `  PORT                         TCP port (default: ${DEFAULT_PORT})\n` +
-      `  OPENPENCIL_CONNECT_APP_URL   The OpenPencil web app to pair with\n` +
+      `  OPENPENCIL_CONNECT_APP_URL   The Pairdraw web app to pair with\n` +
       `                               (default: https://app.openpencil.dev). Its origin may\n` +
       `                               call this server; use it for a development server.\n` +
       `  OPENPENCIL_MCP_CORS_ORIGIN   Further origins allowed to call this server, comma-separated.\n` +
@@ -91,7 +91,7 @@ try {
   const code = error instanceof Error && 'code' in error ? error.code : null
   if (code === 'EADDRINUSE') {
     fail(
-      `port ${port} or the MCP socket is already in use. Quit the OpenPencil desktop app or ` +
+      `port ${port} or the MCP socket is already in use. Quit the Pairdraw desktop app or ` +
         `another MCP server, or start this one with PORT=${port + 1}.`
     )
   }
@@ -142,7 +142,7 @@ function announceLink(open: boolean) {
   const code = issueCode()
   const link = connectLink(appURL, code, handle.httpPort, DEFAULT_PORT)
   process.stdout.write(
-    `\nOpen this link to connect OpenPencil to this computer (works once, for 2 minutes):\n` +
+    `\nOpen this link to connect Pairdraw to this computer (works once, for 2 minutes):\n` +
       `  ${link}\n` +
       `The tab asks you to confirm; check that it shows ${pairingFingerprint(code)}.\n\n` +
       `Press Enter for a new link. Press Ctrl+C to stop.\n`
@@ -150,7 +150,7 @@ function announceLink(open: boolean) {
   if (open) void openLink(link)
 }
 
-process.stdout.write(`OpenPencil companion ${MCP_VERSION}\n`)
+process.stdout.write(`Pairdraw companion ${MCP_VERSION}\n`)
 process.stdout.write(`  HTTP:   http://127.0.0.1:${handle.httpPort}\n`)
 if (handle.socketPath) process.stdout.write(`  Socket: ${handle.socketPath}\n`)
 announceLink(shouldOpen)
@@ -160,7 +160,7 @@ process.stdin.on('error', () => undefined)
 process.stdin.resume()
 
 const shutdown = async () => {
-  process.stdout.write('\nStopping the OpenPencil companion...\n')
+  process.stdout.write('\nStopping the Pairdraw companion...\n')
   await handle.close()
   process.exit(0)
 }

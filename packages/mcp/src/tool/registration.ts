@@ -28,7 +28,7 @@ export type MCPToolSettled = (context: ServerContext) => Promise<void>
 
 export const automationTargetSchema = {
   document_id: v.optional(
-    v.pipe(v.string(), v.description('Optional OpenPencil document/tab ID to target'))
+    v.pipe(v.string(), v.description('Optional Pairdraw document/tab ID to target'))
   ),
   page_id: v.optional(
     v.pipe(v.string(), v.description('Optional page ID to target within the document'))
@@ -225,7 +225,7 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
     'list_documents',
     {
       description:
-        'List open OpenPencil documents/tabs with their IDs, file paths, current pages, and pages.',
+        'List open Pairdraw documents/tabs with their IDs, file paths, current pages, and pages.',
       inputSchema: v.strictObject({})
     },
     async () => {

@@ -36,8 +36,8 @@ function taskMessage(task: string | undefined): PromptMessage {
     content: {
       type: 'text',
       text: request
-        ? `Follow the OpenPencil skill above and use the open-pencil tools for this task: ${request}`
-        : 'Follow the OpenPencil skill above whenever you use the open-pencil tools in this conversation.'
+        ? `Follow the Pairdraw skill above and use the open-pencil tools for this task: ${request}`
+        : 'Follow the Pairdraw skill above whenever you use the open-pencil tools in this conversation.'
     }
   }
 }
@@ -61,9 +61,9 @@ export function registerSkill(mcpServer: McpServer): void {
   mcpServer.registerPrompt(
     SKILL_PROMPT_NAME,
     {
-      title: 'Design with OpenPencil',
+      title: 'Design with Pairdraw',
       description:
-        'Load the OpenPencil skill and design authoring reference, optionally with a design task.',
+        'Load the Pairdraw skill and design authoring reference, optionally with a design task.',
       argsSchema: toStandardJSONSchema(skillPromptArgsSchema)
     },
     ({ task }) => ({

@@ -52,7 +52,7 @@ test('uses reported paths and packs the reported macOS app as a zip', () =>
     ])
     const zip = assets.find((asset) => asset.name.endsWith('.zip'))
     expect(zip?.pack).toBe('zip')
-    expect(zip?.source.endsWith('OpenPencil.app')).toBe(true)
+    expect(zip?.source.endsWith('Pairdraw.app')).toBe(true)
     expect(assets.filter((asset) => asset.pack)).toHaveLength(1)
   }))
 
@@ -93,7 +93,7 @@ test('ignores a reported app directory no archive is packed from', async () => {
   const windows = desktopAssets('x86_64-pc-windows-msvc', '0.15.0')
 
   await withArtifacts(async (root, reported) => {
-    const app = join(root, 'OpenPencil.app')
+    const app = join(root, 'Pairdraw.app')
     await mkdir(app)
 
     const assets = await resolveReportedAssets([...reported, app], windows, root)

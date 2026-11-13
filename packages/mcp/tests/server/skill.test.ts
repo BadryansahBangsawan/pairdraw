@@ -189,7 +189,7 @@ describe('MCP agent skill', () => {
     for (const kind of ['acp', 'harness'] as const) {
       const client = await connect({}, kind)
       const instructions = expectDefined(client.getInstructions(), 'server instructions')
-      expect(instructions).toContain('OpenPencil is a design editor')
+      expect(instructions).toContain('Pairdraw is a design editor')
       expect(instructions).not.toContain('read_skill')
       expect(instructions).not.toContain(skillResourceURI('SKILL.md'))
     }

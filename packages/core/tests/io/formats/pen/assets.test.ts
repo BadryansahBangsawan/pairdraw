@@ -7,6 +7,7 @@ import type { IconData, IconProvider } from '@open-pencil/core/icons'
 import { IORegistry, penFormat } from '@open-pencil/core/io'
 import { readIcon, type IconOptions } from '@open-pencil/scene-graph/icons'
 import { parseSVGPath } from '@open-pencil/scene-graph/parse-path'
+import { readShaderPaints } from '@open-pencil/scene-graph/shaders'
 
 // A 2 × 1 PNG.
 const PNG = toUint8Array(
@@ -69,7 +70,14 @@ describe('penFormat.readDocument — assets', () => {
       {
         name: 'icons.pen',
         data: penBytes([
-          { id: 'house', type: 'icon', library: 'lucide', icon: 'house', width: 48, height: 48 },
+          {
+            id: 'house',
+            type: 'icon',
+            library: 'lucide',
+            icon: 'house',
+            width: 48,
+            height: 48
+          },
           {
             id: 'symbol',
             type: 'icon',
@@ -89,7 +97,9 @@ describe('penFormat.readDocument — assets', () => {
         { names: ['material-symbols-outlined:home'], options: { wght: 650 } }
       ])
     )
-    expect(readIcon(getNodeOrThrow(graph, 'house'))).toMatchObject({ name: 'lucide:house' })
+    expect(readIcon(getNodeOrThrow(graph, 'house'))).toMatchObject({
+      name: 'lucide:house'
+    })
     expect(readIcon(getNodeOrThrow(graph, 'symbol'))).toMatchObject({
       name: 'material-symbols-outlined:home',
       options: { wght: 650 }
@@ -144,7 +154,10 @@ describe('penFormat.readDocument — assets', () => {
           {
             id: 'named',
             type: 'rectangle',
-            fill: { type: 'image', url: `DATA:image/png;name=a.png;base64,${encoded}` }
+            fill: {
+              type: 'image',
+              url: `DATA:image/png;name=a.png;base64,${encoded}`
+            }
           },
           {
             id: 'broken',
@@ -158,5 +171,54 @@ describe('penFormat.readDocument — assets', () => {
     expect(graph.getNode('plain')?.fills[0]?.type).toBe('IMAGE')
     expect(graph.getNode('named')?.fills[0]?.type).toBe('IMAGE')
     expect(graph.getNode('broken')?.fills).toEqual([])
+  })
+})
+
+describe('penFormat.readDocument — shader files', () => {
+  const SOURCE = '@param color fill #FF0000\nhalf4 main(float2 uv) { return half4(1.0); }\n'
+
+  test('reads a shader paint from the file beside the document', async () => {
+    const asked: string[] = []
+    const { graph } = await io.readDocument(
+      {
+        name: 'shader.pen',
+        data: penBytes([
+          {
+            id: 'shaded',
+            type: 'rectangle',
+            width: 40,
+            height: 20,
+            fill: { type: 'shader', url: './fx.sksl' }
+          }
+        ]),
+        readAsset: async (path) => {
+          asked.push(path)
+          return path === './fx.sksl' ? new TextEncoder().encode(SOURCE) : null
+        }
+      },
+      { icons: iconProvider([], []) }
+    )
+    expect(asked).toEqual(['./fx.sksl'])
+    const node = getNodeOrThrow(graph, 'shaded')
+    expect(node.fills[0]?.type).toBe('IMAGE')
+    expect(readShaderPaints(node)[0]?.source).toBe(SOURCE)
+  })
+
+  test('leaves a shader paint unpainted when its file is missing', async () => {
+    const { graph } = await io.readDocument(
+      {
+        name: 'shader.pen',
+        data: penBytes([
+          {
+            id: 'shaded',
+            type: 'rectangle',
+            fill: { type: 'shader', url: './gone.sksl' }
+          }
+        ]),
+        readAsset: async () => null
+      },
+      { icons: iconProvider([], []) }
+    )
+    expect(graph.getNode('shaded')?.fills).toEqual([])
   })
 })

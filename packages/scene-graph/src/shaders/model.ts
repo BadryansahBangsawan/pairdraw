@@ -79,13 +79,16 @@ export function createShaderPaint(preset: ShaderPreset): {
 
 /**
  * A new paint that draws shader `source`, and the shader entry it shows. It starts as a shader
- * paint of the same image, so replacing a preset keeps the layer's paint and frame.
+ * paint of the same image, so replacing a preset keeps the layer's paint and frame. A caller
+ * reading one back from a file passes the `image` it recorded, so reading it again keeps it.
  */
-export function createShaderSourcePaint(source: string): {
+export function createShaderSourcePaint(
+  source: string,
+  image: string = randomHex(20)
+): {
   paint: Fill
   shader: ShaderSourcePaint
 } {
-  const image = randomHex(20)
   return {
     paint: {
       type: 'IMAGE',

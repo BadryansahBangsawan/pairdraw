@@ -1,12 +1,27 @@
 import type { Effect } from '@open-pencil/scene-graph'
 
-import { mapBlendMode } from './paints'
+import { mapBlendMode, type PenShaderSources } from './paints'
 import type { PenEffect, PenNode } from './schema'
 import { resolveBoolean, resolveColor, resolveNumber, type VarContext } from './variables'
 
 const DEFAULT_SHADOW_COLOR = { r: 0, g: 0, b: 0, a: 0.25 }
 
-function convertEffect(effect: PenEffect, ctx: VarContext): Effect | null {
+function convertEffect(
+  effect: PenEffect,
+  ctx: VarContext,
+  shaders: PenShaderSources | undefined
+): Effect | null {
+  if (effect.type === 'shader') {
+    const source = effect.url ? shaders?.get(effect.url) : undefined
+    if (!source) return null
+    return {
+      type: 'SHADER',
+      source,
+      uniforms: {},
+      visible: resolveBoolean(effect.enabled, ctx),
+      blendMode: mapBlendMode(effect.blendMode) ?? 'NORMAL'
+    }
+  }
   const base = {
     visible: resolveBoolean(effect.enabled, ctx),
     color: { ...DEFAULT_SHADOW_COLOR },
@@ -35,9 +50,13 @@ function convertEffect(effect: PenEffect, ctx: VarContext): Effect | null {
   }
 }
 
-/** A node's effects; shader effects are not drawn. */
-export function convertEffects(effect: PenNode['effect'], ctx: VarContext): Effect[] {
+/** A node's effects, including the shader effects their files give source. */
+export function convertEffects(
+  effect: PenNode['effect'],
+  ctx: VarContext,
+  shaders?: PenShaderSources
+): Effect[] {
   if (!effect) return []
   const effects = Array.isArray(effect) ? effect : [effect]
-  return effects.flatMap((item) => convertEffect(item, ctx) ?? [])
+  return effects.flatMap((item) => convertEffect(item, ctx, shaders) ?? [])
 }

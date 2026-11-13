@@ -22,6 +22,11 @@ export interface PenReadOptions {
   layout?(graph: SceneGraph): void
   /** The image files the document's paints name, by their URL in it; see `penAssets`. */
   images?: ReadonlyMap<string, Uint8Array>
+  /**
+   * The shader files the document's paints and effects name, by their URL in it, as their source
+   * text; see `penAssets`. A shader whose file is missing draws nothing.
+   */
+  shaders?: ReadonlyMap<string, string>
   /** Where icon glyphs come from; icons are empty frames without it. */
   icons?: PenIconSource
   /**
@@ -99,6 +104,7 @@ export function buildPenGraph(doc: PenDocument, options: PenReadOptions = {}): S
     graph,
     ctx: buildVarContext(graph, withImports(doc, imports)),
     images: createImageStore(graph, options.images),
+    shaders: options.shaders,
     icons: options.icons,
     components: new Map(),
     effective: new Map(),

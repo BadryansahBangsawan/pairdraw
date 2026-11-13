@@ -36,7 +36,12 @@ const gradientPaintSchema = v.looseObject({
   gradientType: v.optional(strSchema),
   opacity: v.optional(numSchema),
   center: v.optional(v.looseObject({ x: v.optional(v.number()), y: v.optional(v.number()) })),
-  size: v.optional(v.looseObject({ width: v.optional(numSchema), height: v.optional(numSchema) })),
+  size: v.optional(
+    v.looseObject({
+      width: v.optional(numSchema),
+      height: v.optional(numSchema)
+    })
+  ),
   rotation: v.optional(numSchema),
   colors: v.optional(v.array(v.looseObject({ color: strSchema, position: numSchema })))
 })
@@ -67,7 +72,19 @@ export const meshPaintSchema = v.looseObject({
   points: v.optional(v.array(v.unknown()))
 })
 
-/** Shader paints, and any paint type this reader does not draw. */
+/**
+ * A `shader` paint: `url` names the shader file beside the document, whose source `PenReadOptions`
+ * gives by that URL. One whose source the host did not read draws nothing, as pen.dev shows a
+ * shader it cannot compile.
+ */
+export const shaderPaintSchema = v.looseObject({
+  type: v.literal('shader'),
+  ...paintBase,
+  opacity: v.optional(numSchema),
+  url: v.optional(strSchema)
+})
+
+/** Paint types this reader does not draw. */
 const otherPaintSchema = v.looseObject({ type: strSchema, ...paintBase })
 
 const paintSchema = v.union([
@@ -76,6 +93,7 @@ const paintSchema = v.union([
   gradientPaintSchema,
   imagePaintSchema,
   meshPaintSchema,
+  shaderPaintSchema,
   otherPaintSchema
 ])
 const paintsSchema = v.union([paintSchema, v.array(paintSchema)])
@@ -99,7 +117,9 @@ const effectSchema = v.looseObject({
   /** Written by older files; current pen.dev shadows have no spread. */
   spread: v.optional(numSchema),
   color: v.optional(strSchema),
-  blendMode: v.optional(strSchema)
+  blendMode: v.optional(strSchema),
+  /** The shader file a `shader` effect names, read by `PenReadOptions.shaders`. */
+  url: v.optional(strSchema)
 })
 
 const sizeSchema = numSchema
@@ -263,6 +283,7 @@ export type PenPaint = v.InferOutput<typeof paintSchema>
 export type PenPaints = v.InferOutput<typeof paintsSchema>
 export type PenGradientPaint = v.InferOutput<typeof gradientPaintSchema>
 export type PenImagePaint = v.InferOutput<typeof imagePaintSchema>
+export type PenShaderPaint = v.InferOutput<typeof shaderPaintSchema>
 export type PenMeshPaint = v.InferOutput<typeof meshPaintSchema>
 export type PenLegacyStroke = v.InferOutput<typeof legacyStrokeSchema>
 export type PenEffect = v.InferOutput<typeof effectSchema>

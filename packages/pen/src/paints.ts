@@ -19,6 +19,11 @@ import {
   meshPointCount
 } from '@open-pencil/scene-graph/gradient'
 import type { Vector } from '@open-pencil/scene-graph/primitives'
+import {
+  createShaderSourcePaint,
+  withShaderPaints,
+  type ShaderPaint
+} from '@open-pencil/scene-graph/shaders'
 
 import { imagePaint, type PenImages } from './images'
 import { meshPaintSchema } from './schema'
@@ -31,6 +36,7 @@ import type {
   PenOverride,
   PenPaint,
   PenPaints,
+  PenShaderPaint,
   PenSides
 } from './schema'
 import {
@@ -42,6 +48,16 @@ import {
 } from './variables'
 
 type PaintField = 'fills' | 'strokes'
+
+/** Shader files a document's paints and effects name, by URL, as their source text. */
+export type PenShaderSources = ReadonlyMap<string, string>
+
+/** Where a shader file's source comes from, and the shader entries converted so far. */
+export interface PenShaderRead {
+  sources: PenShaderSources | undefined
+  /** Each shader paint converted, for the node's plugin data. */
+  out: ShaderPaint[]
+}
 
 /**
  * pen.dev blend modes by name. Linear burn and linear dodge have no counterpart in the scene
@@ -125,7 +141,8 @@ function convertPaint(
   field: PaintField,
   ctx: VarContext,
   node: SceneNode | undefined,
-  images: PenImages | undefined
+  images: PenImages | undefined,
+  shaders?: PenShaderRead
 ): Fill | null {
   if (typeof paint === 'string' || paint.type === 'color') {
     const raw = typeof paint === 'string' ? paint : paint.color
@@ -154,19 +171,49 @@ function convertPaint(
       gradientTransform: gradientTransform(gradient, type, ctx)
     }
   }
-  if (paint.type === 'image') {
-    const source = paint as PenImagePaint
-    const image = source.url ? images?.get(source.url) : undefined
-    if (!image) return null
-    const box = { width: node?.width ?? 0, height: node?.height ?? 0 }
-    return {
-      ...imagePaint(source, image, box, resolveNumber(source.opacity, ctx, 1)),
-      visible: resolveBoolean(source.enabled, ctx),
-      blendMode: mapBlendMode(source.blendMode)
-    }
-  }
+  if (paint.type === 'image') return convertImagePaint(paint as PenImagePaint, ctx, node, images)
   if (paint.type === 'mesh_gradient') return convertMeshPaint(paint, ctx)
+  if (paint.type === 'shader') return convertShaderPaint(paint as PenShaderPaint, ctx, shaders)
   return null
+}
+
+/** A pen.dev image paint as the `IMAGE` fill that draws the image its URL names. */
+function convertImagePaint(
+  paint: PenImagePaint,
+  ctx: VarContext,
+  node: SceneNode | undefined,
+  images: PenImages | undefined
+): Fill | null {
+  const image = paint.url ? images?.get(paint.url) : undefined
+  if (!image) return null
+  const box = { width: node?.width ?? 0, height: node?.height ?? 0 }
+  return {
+    ...imagePaint(paint, image, box, resolveNumber(paint.opacity, ctx, 1)),
+    visible: resolveBoolean(paint.enabled, ctx),
+    blendMode: mapBlendMode(paint.blendMode)
+  }
+}
+
+/**
+ * A pen.dev shader paint as the shader paint it draws: its source comes from the file `url` names,
+ * which the host read as `PenReadOptions.shaders`. One whose source is missing draws nothing, as a
+ * shader pen.dev cannot compile shows an empty frame.
+ */
+function convertShaderPaint(
+  paint: PenShaderPaint,
+  ctx: VarContext,
+  shaders: PenShaderRead | undefined
+): Fill | null {
+  const source = paint.url === undefined ? undefined : shaders?.sources?.get(paint.url)
+  if (!source || !shaders) return null
+  const { paint: fill, shader } = createShaderSourcePaint(source)
+  shaders.out.push(shader)
+  return {
+    ...fill,
+    opacity: resolveNumber(paint.opacity, ctx, 1),
+    visible: resolveBoolean(paint.enabled, ctx),
+    blendMode: mapBlendMode(paint.blendMode)
+  }
 }
 
 /**
@@ -238,14 +285,20 @@ export function convertPaints(
   field: PaintField,
   ctx: VarContext,
   node?: SceneNode,
-  images?: PenImages
+  images?: PenImages,
+  shaders?: PenShaderSources
 ): Fill[] {
   if (paints === undefined) return []
   const list = Array.isArray(paints) ? paints : [paints]
   const result: Fill[] = []
+  const read: PenShaderRead = { sources: shaders, out: [] }
   for (const paint of list) {
-    const converted = convertPaint(paint, result.length, field, ctx, node, images)
+    const converted = convertPaint(paint, result.length, field, ctx, node, images, read)
     if (converted) result.push(converted)
+  }
+  if (node && read.out.length > 0) {
+    const other = field === 'fills' ? node.strokes : node.fills
+    node.pluginData = withShaderPaints(node, [...result, ...other], read.out)
   }
   return result
 }
@@ -263,7 +316,11 @@ const JOINS: Partial<Record<string, StrokeJoin>> = {
   bevel: 'BEVEL',
   round: 'ROUND'
 }
-const CAPS: Partial<Record<string, StrokeCap>> = { butt: 'NONE', round: 'ROUND', square: 'SQUARE' }
+const CAPS: Partial<Record<string, StrokeCap>> = {
+  butt: 'NONE',
+  round: 'ROUND',
+  square: 'SQUARE'
+}
 
 /** The stroke fields of a node, with the 2.8 object form spread into the current ones. */
 export interface PenStrokeFields {
@@ -326,7 +383,8 @@ export function applyStroke(
   node: SceneNode,
   fields: PenStrokeFields,
   ctx: VarContext,
-  images?: PenImages
+  images?: PenImages,
+  shaders?: PenShaderSources
 ): void {
   node.strokes = []
   node.independentStrokeWeights = false
@@ -346,12 +404,14 @@ export function applyStroke(
   const join = JOINS[fields.join ?? 'miter'] ?? 'MITER'
   node.strokeCap = cap
   node.strokeJoin = join
-  node.strokes = convertPaints(fields.paints, 'strokes', ctx, node, images).map((paint) => ({
-    ...paint,
-    weight,
-    align,
-    cap,
-    join,
-    dashPattern: []
-  }))
+  node.strokes = convertPaints(fields.paints, 'strokes', ctx, node, images, shaders).map(
+    (paint) => ({
+      ...paint,
+      weight,
+      align,
+      cap,
+      join,
+      dashPattern: []
+    })
+  )
 }

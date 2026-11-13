@@ -40,6 +40,25 @@ async function loadPenImage(
   }
 }
 
+/**
+ * The shader files the document's paints and effects name, as their source text. One whose file the
+ * host cannot read is left out, so its shader draws nothing rather than an empty frame.
+ */
+async function loadPenShaders(
+  urls: readonly string[],
+  input: ReadDocumentInput,
+  opened: ReadonlyMap<string, OpenedImport>
+): Promise<Map<string, string>> {
+  const shaders = new Map<string, string>()
+  await Promise.all(
+    urls.map(async (url) => {
+      const bytes = await loadPenImage(url, input, opened)
+      if (bytes) shaders.set(url, new TextDecoder().decode(bytes))
+    })
+  )
+  return shaders
+}
+
 async function loadPenImages(
   urls: readonly string[],
   input: ReadDocumentInput,
@@ -110,14 +129,16 @@ export const penFormat: IOFormatAdapter<'pen'> = {
     const unresolved = new UnresolvedImports()
     const { imports, opened } = await loadPenImports(doc, input, unresolved)
     const assets = penAssets(withUsedImports(doc, imports))
-    const [images, icons] = await Promise.all([
+    const [images, shaders, icons] = await Promise.all([
       loadPenImages(assets.images, input, opened),
+      loadPenShaders(assets.shaders, input, opened),
       loadPenIcons(assets.icons, context?.icons ?? defaultIcons)
     ])
     // A .pen file stores its layout intent, not the sizes and positions it implies; the hidden
     // library page's components are laid out too, as instances of them copy their layers.
     const graph = buildPenGraph(doc, {
       images,
+      shaders,
       icons,
       imports,
       layout: (target) =>

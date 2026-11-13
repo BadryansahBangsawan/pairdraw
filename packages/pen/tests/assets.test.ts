@@ -34,11 +34,32 @@ describe('penAssets', () => {
             icon: 'settings',
             weight: 300
           },
-          { id: 'c', type: 'rectangle', fill: { type: 'image', url: './photo.png' } },
-          { id: 'd', type: 'rectangle', fill: [{ type: 'image', url: '../secret.png' }] },
-          { id: 'e', type: 'rectangle', fill: { type: 'image', url: 'https://example.com/a.png' } },
-          { id: 'f', type: 'rectangle', fill: { type: 'image', url: '/etc/a.png' } },
-          { id: 'g', type: 'ref', ref: 'x', descendants: { inner: { icon: 'star' } } },
+          {
+            id: 'c',
+            type: 'rectangle',
+            fill: { type: 'image', url: './photo.png' }
+          },
+          {
+            id: 'd',
+            type: 'rectangle',
+            fill: [{ type: 'image', url: '../secret.png' }]
+          },
+          {
+            id: 'e',
+            type: 'rectangle',
+            fill: { type: 'image', url: 'https://example.com/a.png' }
+          },
+          {
+            id: 'f',
+            type: 'rectangle',
+            fill: { type: 'image', url: '/etc/a.png' }
+          },
+          {
+            id: 'g',
+            type: 'ref',
+            ref: 'x',
+            descendants: { inner: { icon: 'star' } }
+          },
           { id: 'i', type: 'icon', library: 'phosphor', icon: 'house' },
           {
             id: 'h',
@@ -59,7 +80,8 @@ describe('penAssets', () => {
         { name: 'material-symbols-rounded:star', options: { wght: 300 } },
         { name: 'ph:star' }
       ],
-      images: ['./photo.png', `data:image/png;base64,${PNG}`]
+      images: ['./photo.png', `data:image/png;base64,${PNG}`],
+      shaders: []
     })
   })
 
@@ -68,7 +90,13 @@ describe('penAssets', () => {
       JSON.stringify({
         version: '2.21',
         children: [
-          { id: 'a', type: 'icon', library: 'lucide', icon: 'heart', weight: '$missing' },
+          {
+            id: 'a',
+            type: 'icon',
+            library: 'lucide',
+            icon: 'heart',
+            weight: '$missing'
+          },
           {
             id: 'b',
             type: 'icon',
@@ -110,8 +138,14 @@ describe('penAssets', () => {
         version: '2.21',
         themes: { mode: ['light', 'dark'] },
         variables: {
-          thin: { type: 'number', value: [{ value: 300, theme: { mode: 'dark' } }] },
-          glyph: { type: 'string', value: [{ value: 'moon', theme: { mode: 'dark' } }] }
+          thin: {
+            type: 'number',
+            value: [{ value: 300, theme: { mode: 'dark' } }]
+          },
+          glyph: {
+            type: 'string',
+            value: [{ value: 'moon', theme: { mode: 'dark' } }]
+          }
         },
         children: [
           {
@@ -140,7 +174,9 @@ describe('penAssets', () => {
       'material-symbols-outlined:dark_mode'
     )
     expect(iconName('unknown', 'home')).toBeNull()
-    expect(iconOptions('Material Symbols Sharp', undefined)).toEqual({ wght: 200 })
+    expect(iconOptions('Material Symbols Sharp', undefined)).toEqual({
+      wght: 200
+    })
     expect(iconOptions('Material Symbols Sharp', 650)).toEqual({ wght: 650 })
     expect(iconOptions('lucide', 650)).toBeUndefined()
   })
@@ -162,7 +198,11 @@ describe('parsePenFile — images', () => {
     ['contain', 'FIT'],
     ['stretch', 'CROP']
   ] as const)('draws mode %s as %s', (mode, expected) => {
-    const { graph, fill } = fillWith({ type: 'image', url: './image.png', mode })
+    const { graph, fill } = fillWith({
+      type: 'image',
+      url: './image.png',
+      mode
+    })
     expect(fill).toMatchObject({ type: 'IMAGE', imageScaleMode: expected })
     expect(graph.images.has(expectDefined(fill.imageHash))).toBe(true)
   })
@@ -201,20 +241,31 @@ describe('parsePenFile — images', () => {
           type: 'rectangle',
           fill: [{ type: 'image', url: './a.png', opacity: 0.5 }]
         },
-        { id: 'missing', type: 'rectangle', fill: [{ type: 'image', url: './b.png' }, '#FF0000'] }
+        {
+          id: 'missing',
+          type: 'rectangle',
+          fill: [{ type: 'image', url: './b.png' }, '#FF0000']
+        }
       ],
       {},
       { images: new Map([['./a.png', toUint8Array(PNG)]]) }
     )
     expect(getNodeOrThrow(graph, 'missing').fills.map((fill) => fill.type)).toEqual(['SOLID'])
-    expect(getNodeOrThrow(graph, 'loaded').fills[0]).toMatchObject({ type: 'IMAGE', opacity: 0.5 })
+    expect(getNodeOrThrow(graph, 'loaded').fills[0]).toMatchObject({
+      type: 'IMAGE',
+      opacity: 0.5
+    })
   })
 })
 
 describe('parsePenFile — icons', () => {
   function drawn(fields: Partial<PenNode>, doc: Partial<PenDocument> = {}) {
-    const calls: { name: string; size: number; color: Color; options?: Record<string, number> }[] =
-      []
+    const calls: {
+      name: string
+      size: number
+      color: Color
+      options?: Record<string, number>
+    }[] = []
     const icons = {
       draw(
         graph: SceneGraph,
@@ -262,7 +313,11 @@ describe('parsePenFile — icons', () => {
       [650, 650],
       ['$missing', 200]
     ] as const) {
-      const { calls } = drawn({ library: 'Material Symbols Rounded', icon: 'home', weight })
+      const { calls } = drawn({
+        library: 'Material Symbols Rounded',
+        icon: 'home',
+        weight
+      })
       expect(calls).toEqual([
         {
           name: 'material-symbols-rounded:home',
@@ -296,7 +351,12 @@ describe('parsePenFile — icons', () => {
       { library: 'Material Symbols Rounded', icon: 'home', weight: '$thin' },
       {
         themes: { mode: ['light', 'dark'] },
-        variables: { thin: { type: 'number', value: [{ value: 300, theme: { mode: 'dark' } }] } }
+        variables: {
+          thin: {
+            type: 'number',
+            value: [{ value: 300, theme: { mode: 'dark' } }]
+          }
+        }
       }
     )
     expect(calls.map((call) => call.options)).toEqual([{ wght: 0 }])

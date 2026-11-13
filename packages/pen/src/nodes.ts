@@ -23,7 +23,7 @@ import {
   mapLayoutMode,
   parseSize
 } from './layout'
-import { applyStroke, convertPaints, strokeFields } from './paints'
+import { applyStroke, convertPaints, strokeFields, type PenShaderSources } from './paints'
 import { applyPlaceholderLook, isPlaceholder, placeholderLabel } from './placeholders'
 import { isPlain, type PenPlacement } from './placement'
 import { applyPenPluginData, UNRESOLVED_REF } from './plugin-data'
@@ -54,6 +54,8 @@ export interface Build {
   graph: SceneGraph
   ctx: VarContext
   images: PenImages
+  /** Shader files the document's paints and effects name, by URL, as their source. */
+  shaders: PenShaderSources | undefined
   icons: PenIconSource | undefined
   /** Reusable nodes by their pen.dev ID. */
   components: Map<string, PenNode>
@@ -256,7 +258,7 @@ function drawIconLayer(node: SceneNode, pen: PenNode, build: Build): void {
 export function redrawIconAtLaidOutSize(node: SceneNode, pen: PenNode, build: Build): void {
   const { w, h } = resolveSizing(pen, build.ctx)
   if (w.sizing === 'FIXED' && h.sizing === 'FIXED') return
-  node.fills = convertPaints(pen.fill, 'fills', build.ctx, node, build.images)
+  node.fills = convertPaints(pen.fill, 'fills', build.ctx, node, build.images, build.shaders)
   drawIconLayer(node, pen, build)
 }
 
@@ -316,12 +318,12 @@ export function applyPenProperties(node: SceneNode, pen: PenNode, build: Build):
   if (pen.type === 'group' || !isPlain(placement)) build.placements.set(node.id, placement)
   else build.placements.delete(node.id)
 
-  node.fills = convertPaints(pen.fill, 'fills', ctx, node, build.images)
-  applyStroke(node, strokeFields(pen), ctx, build.images)
+  node.fills = convertPaints(pen.fill, 'fills', ctx, node, build.images, build.shaders)
+  applyStroke(node, strokeFields(pen), ctx, build.images, build.shaders)
   // A line layer has no inside or outside; its stroke is centred on it.
   if (node.type === 'LINE')
     node.strokes = node.strokes.map((paint) => ({ ...paint, align: 'CENTER' }))
-  node.effects = convertEffects(pen.effect, ctx)
+  node.effects = convertEffects(pen.effect, ctx, build.shaders)
   applyCornerRadius(node, pen.cornerRadius, ctx)
   applyPadding(node, pen.padding, ctx)
 

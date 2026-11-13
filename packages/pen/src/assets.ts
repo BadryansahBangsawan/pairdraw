@@ -82,11 +82,36 @@ export interface PenAssets {
    * imports, by the names `importedImageURL` gives them.
    */
   images: string[]
+  /**
+   * Shader files to read as text: files beside the document that a `shader` paint or effect names.
+   * `PenReadOptions.shaders` gives them back by these URLs.
+   */
+  shaders: string[]
 }
 
 function paintList(paints: PenPaints | undefined): PenPaint[] {
   if (paints === undefined) return []
   return Array.isArray(paints) ? paints : [paints]
+}
+
+/** Adds a shader file a paint or effect names, if it is one beside the document. */
+function addShaderFile(url: string, shaders: Set<string>) {
+  if (isDocumentAssetPath(url)) shaders.add(url)
+}
+
+function paintShaders(paints: PenPaints | undefined, shaders: Set<string>) {
+  for (const paint of paintList(paints)) {
+    if (typeof paint === 'object' && paint.type === 'shader' && typeof paint.url === 'string') {
+      addShaderFile(paint.url, shaders)
+    }
+  }
+}
+
+function effectShaders(effect: PenOverride['effect'], shaders: Set<string>) {
+  const effects = effect === undefined ? [] : [effect].flat()
+  for (const item of effects) {
+    if (item.type === 'shader' && typeof item.url === 'string') addShaderFile(item.url, shaders)
+  }
 }
 
 function paintImages(paints: PenPaints | undefined, images: Set<string>) {
@@ -103,6 +128,7 @@ interface Found {
   /** Requests by their name and options, so each is listed once. */
   icons: Map<string, PenIconRequest>
   images: Set<string>
+  shaders: Set<string>
   libraries: Set<string>
   /** Icons an override names without its library, which comes from the layer it overrides. */
   bareIcons: Set<string>
@@ -137,28 +163,38 @@ function addIcons(
       if (!name) continue
       for (const weight of weights) {
         const options = iconOptions(library, weight)
-        found.icons.set(`${name}\0${JSON.stringify(options ?? null)}`, { name, options })
+        found.icons.set(`${name}\0${JSON.stringify(options ?? null)}`, {
+          name,
+          options
+        })
       }
     }
   }
 }
 
-function collect(node: PenOverride, assets: Found) {
-  if (node.icon && (node.type === 'icon' || node.type === undefined)) {
-    const icons = possibleValues(node.icon, assets.doc)
-    const weights = possibleWeights(node.weight, assets.doc)
-    for (const weight of weights) assets.weights.add(weight)
-    if (node.library) {
-      const libraries = possibleValues(node.library, assets.doc)
-      for (const library of libraries) assets.libraries.add(library)
-      addIcons(libraries, icons, weights, assets)
-    } else {
-      for (const icon of icons) assets.bareIcons.add(icon)
-    }
+/** Adds the icon a layer draws, if it draws one, and the libraries and weights it needs. */
+function collectIcon(node: PenOverride, assets: Found) {
+  if (!node.icon || (node.type !== 'icon' && node.type !== undefined)) return
+  const icons = possibleValues(node.icon, assets.doc)
+  const weights = possibleWeights(node.weight, assets.doc)
+  for (const weight of weights) assets.weights.add(weight)
+  if (!node.library) {
+    for (const icon of icons) assets.bareIcons.add(icon)
+    return
   }
+  const libraries = possibleValues(node.library, assets.doc)
+  for (const library of libraries) assets.libraries.add(library)
+  addIcons(libraries, icons, weights, assets)
+}
+
+function collect(node: PenOverride, assets: Found) {
+  collectIcon(node, assets)
   paintImages(node.fill, assets.images)
+  paintShaders(node.fill, assets.shaders)
+  effectShaders(node.effect, assets.shaders)
   if (!(typeof node.stroke === 'object' && 'thickness' in node.stroke)) {
     paintImages(node.stroke, assets.images)
+    paintShaders(node.stroke, assets.shaders)
   }
   for (const child of node.children ?? []) collect(child, assets)
   for (const override of Object.values(node.descendants ?? {})) collect(override, assets)
@@ -173,11 +209,16 @@ export function penAssets(doc: PenDocument): PenAssets {
     doc,
     icons: new Map(),
     images: new Set(),
+    shaders: new Set(),
     libraries: new Set(),
     bareIcons: new Set(),
     weights: new Set()
   }
   for (const node of doc.children) collect(node satisfies PenNode, assets)
   addIcons([...assets.libraries], [...assets.bareIcons], [...assets.weights], assets)
-  return { icons: [...assets.icons.values()], images: [...assets.images] }
+  return {
+    icons: [...assets.icons.values()],
+    images: [...assets.images],
+    shaders: [...assets.shaders]
+  }
 }

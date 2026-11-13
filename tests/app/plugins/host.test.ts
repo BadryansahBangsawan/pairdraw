@@ -124,13 +124,15 @@ test('a call the plugin was not granted fails and edits nothing', async () => {
 
 test('disabling or removing the plugin during its run takes its grants away', async () => {
   const store = openDocument()
-  const live = { plugins: plugin(['document:write'], ['document:write']) }
+  const live: { plugins: readonly InstalledPlugin[] } = {
+    plugins: plugin(['document:write'])
+  }
   const host = createPluginHost(store, live.plugins, 'marks', () => live.plugins)
 
   live.plugins = [...setPluginEnabled(live.plugins, 'marks', false)]
   await expect(host.call('create_shape', shape)).rejects.toThrow('was not granted')
 
-  live.plugins = plugin(['document:write'], ['document:write'])
+  live.plugins = plugin(['document:write'])
   live.plugins = removePlugin(live.plugins, 'marks')
   await expect(host.call('create_shape', shape)).rejects.toThrow('was not granted')
 
@@ -140,14 +142,14 @@ test('disabling or removing the plugin during its run takes its grants away', as
 
 test('a call still in flight when the run ends edits nothing', async () => {
   const store = openDocument()
-  const host = createPluginHost(store, plugin(['document:write'], ['document:write']), 'marks')
+  const host = createPluginHost(store, plugin(['document:write']), 'marks')
   const pending = host.call('create_shape', shape)
   host.finish(true)
   await expect(pending).rejects.toThrow('The plugin run has ended.')
   expect(store.graph.getChildren(store.state.currentPageId)).toHaveLength(0)
 
   // A successful run closes its step the same way: an unawaited write must not land after it.
-  const later = createPluginHost(store, plugin(['document:write'], ['document:write']), 'marks')
+  const later = createPluginHost(store, plugin(['document:write']), 'marks')
   const unawaited = later.call('create_shape', shape)
   later.finish(false)
   await expect(unawaited).rejects.toThrow('The plugin run has ended.')

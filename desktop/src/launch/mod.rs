@@ -117,6 +117,36 @@ fn destination<R: tauri::Runtime>(app: &tauri::AppHandle<R>, path: &str) -> Opti
     windows.keys().next().cloned()
 }
 
+/// Whether an open belongs to another window that already shows the file. The caller then focuses
+/// that window instead of opening a second copy.
+fn should_redirect(owner: Option<&str>, window: &str) -> bool {
+    owner.is_some_and(|owner| owner != window)
+}
+
+/// Sends an open to the window that already shows the document, through the same queue a file
+/// association uses. True when the caller must not open it; false when this window owns the file
+/// or no window does, so the open proceeds here.
+#[tauri::command]
+pub fn focus_document_window<R: tauri::Runtime>(
+    app: tauri::AppHandle<R>,
+    window: tauri::WebviewWindow<R>,
+    path: String,
+) -> bool {
+    let owner = documents::document_window(&app, &path);
+    if !should_redirect(owner.as_deref(), window.label()) {
+        return false;
+    }
+    queue_pending(
+        &app,
+        vec![PendingOpenFile {
+            path,
+            node: None,
+            deep_link: false,
+        }],
+    );
+    true
+}
+
 fn queue_pending<R: tauri::Runtime>(app: &tauri::AppHandle<R>, files: Vec<PendingOpenFile>) {
     if files.is_empty() {
         return;
@@ -229,5 +259,21 @@ fn queue_rooms<R: tauri::Runtime>(app: &tauri::AppHandle<R>, rooms: Vec<String>)
     let _ = app.emit("open-room-links", ());
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.set_focus();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::should_redirect;
+
+    #[test]
+    fn an_open_goes_to_the_window_that_already_shows_the_file() {
+        assert!(should_redirect(Some("editor-2"), "main"));
+    }
+
+    #[test]
+    fn the_owner_and_a_free_document_open_in_the_calling_window() {
+        assert!(!should_redirect(Some("main"), "main"));
+        assert!(!should_redirect(None, "main"));
     }
 }

@@ -114,6 +114,7 @@ pub fn run() {
             #[cfg(feature = "native-test")]
             menu::native_test_menu_outline,
             launch::take_pending_open,
+            launch::focus_document_window,
             launch::documents::claim_document,
             launch::documents::release_document,
             launch::take_pending_rooms,

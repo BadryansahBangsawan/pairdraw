@@ -10,6 +10,16 @@ function openDocumentPaths(): string[] {
     .filter((path): path is string => path !== null)
 }
 
+/**
+ * Sends `path` to the window that already shows it. True when this window must not open it: the
+ * shell focused the owner and asked it to show the tab.
+ */
+export async function focusDocumentWindow(path: string): Promise<boolean> {
+  if (!isTauri()) return false
+  const { invoke } = await import('@tauri-apps/api/core')
+  return invoke<boolean>('focus_document_window', { path })
+}
+
 /** The claims to add and release when the window's open paths change from `claimed` to `paths`. */
 export function claimChanges(
   claimed: ReadonlySet<string>,

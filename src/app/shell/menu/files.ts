@@ -17,6 +17,7 @@ import { toast } from '@/app/shell/ui'
 import { getTabsSnapshot, openFileInNewTab, switchTab } from '@/app/tabs'
 import { findTabByFileIdentity } from '@/app/tabs/open/identity'
 import { isTauri } from '@/app/tauri/env'
+import { focusDocumentWindow } from '@/app/window/documents'
 import { IS_BROWSER } from '@/constants'
 
 const io = new IORegistry(BUILTIN_IO_FORMATS)
@@ -140,6 +141,8 @@ export async function chooseTauriOpenPaths(): Promise<string[]> {
 
 export async function openFileFromPath(path: string) {
   if (!isTauri()) return
+  // A document another window already shows is focused there, never opened twice.
+  if (await focusDocumentWindow(path)) return
   const file = await readTauriDesignFile(path)
   await openFileInNewTab(file, undefined, path)
   rememberRecentFile(path)

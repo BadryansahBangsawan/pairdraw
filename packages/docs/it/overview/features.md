@@ -14,6 +14,8 @@ Pairdraw apre e salva direttamente i file `.fig`. Import ed export usano lo stes
 - **Testo formattato:** grassetto, corsivo, sottolineato e barrato su intervalli di caratteri.
 - **Disposizione automatica:** Flexbox e CSS Grid tramite Yoga WASM, con direzione, intervallo, rientri, allineamento, dimensionamento e tracce della griglia.
 - **Componenti:** creazione di componenti e set, istanze, override e sincronizzazione automatica.
+- **Livelli script:** Il contenuto di un livello è disegnato da un programma JavaScript salvato nel documento. I controlli `@input` si possono collegare alle variabili; le modifiche al codice, agli input o alla dimensione avviano una nuova esecuzione e il risultato si converte in livelli normali con un passaggio ([Livelli script](/user-guide/script-layers)).
+- **Prototipi:** Le interazioni al clic o dopo un ritardo portano a un frame, aprono o chiudono una sovrapposizione o tornano indietro; si riproducono nell’area di lavoro con una transizione istantanea o in dissolvenza ([Riprodurre un prototipo](/user-guide/playing-a-prototype)).
 - **Variabili:** token di design con collezioni, modalità Light/Dark, tipi Color/Float/String/Boolean e collegamenti.
 - **Sezioni:** contenitori di primo livello che integrano gli oggetti sovrapposti.
 
@@ -69,6 +71,12 @@ Premi <kbd>⌘</kbd><kbd>J</kbd>. Più di 90 strumenti creano forme, cambiano st
 
 Le chiamate degli strumenti appaiono in una sequenza comprimibile. Per la verifica visiva, l’assistente renderizza il risultato e lo confronta con la richiesta. Tutte le modifiche AI possono essere annullate.
 
+## Browser integrato
+
+Le pagine `http` e `https` si aprono in una finestra propria dell’app desktop, che non condivide nulla con l’editor, e si possono portare nell’area di lavoro: importa l’intera pagina o un elemento scelto come livelli, oppure inserisci uno screenshot della vista, della pagina o di un elemento. Il chat può leggere la pagina, contrassegnare un elemento nella risposta e fare clic, digitare, premere un tasto, scorrere o attendere su di essa, chiedendo prima conferma quando le impostazioni la chiedono per le modifiche.
+
+Su una board lo stesso browser diventa ricerca: il chat cita la pagina in una nota adesiva che conserva indirizzo, titolo, citazione e ora di lettura ([Ricerca su una board](/user-guide/research)).
+
 ## Server MCP
 
 Claude Code, Cursor, Windsurf e altri client MCP possono leggere e modificare `.fig` senza interfaccia. Sono disponibili più di 90 strumenti e i trasporti stdio e HTTP.
@@ -99,6 +107,12 @@ La connessione peer-to-peer WebRTC non richiede un server centrale. Condividi un
 **Desktop:** Tauri v2, circa 7 MB, per macOS, Windows e Linux, con menu nativi, uso senza rete e salvataggio automatico.
 
 **Web:** [app.openpencil.dev](https://app.openpencil.dev), installabile come PWA e adattato agli schermi touch.
+
+**VS Code:** Un editor dedicato ai documenti `.fig` e `.pen` che esegue l’editor web in una webview e salva ciò che mostra. Non è pubblicato in alcun marketplace, quindi si compila dal repository ([Estensione VS Code](/programmable/vscode)).
+
+## Plugin
+
+In **Impostazioni → App → Estensioni** si installano i manifest dei plugin e si vedono le capacità richieste da ciascuno. L’accesso alla rete viene rifiutato e le estensioni non vengono ancora eseguite ([Plugin](/user-guide/plugins)).
 
 ## Caricamento alternativo da Google Fonts
 

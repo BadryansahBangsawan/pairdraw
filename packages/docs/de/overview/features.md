@@ -14,6 +14,8 @@ Pairdraw öffnet und speichert `.fig`-Dateien direkt. Import und Export verwende
 - **Formatierter Text:** Fett, Kursiv, Unterstrichen und Durchgestrichen für einzelne Zeichenbereiche.
 - **Automatische Anordnung:** Flexbox und CSS Grid über Yoga WASM mit Richtung, Abstand, Innenabstand, Verteilung, Ausrichtung, Größenmodi und Rasterspuren.
 - **Komponenten:** Komponenten und Komponentensätze, Instanzen mit Überschreibungen und automatische Synchronisierung.
+- **Skript-Ebenen:** Der Inhalt einer Ebene wird von einem im Dokument gespeicherten JavaScript-Programm gezeichnet. `@input`-Steuerelemente lassen sich an Variablen binden; Änderungen am Code, an den Eingaben oder an der Größe lösen einen neuen Lauf aus, und das Ergebnis lässt sich mit einem Schritt in gewöhnliche Ebenen umwandeln ([Skript-Ebenen](/user-guide/script-layers)).
+- **Prototypen:** Klick- oder Verzögerungsinteraktionen führen zu einem Frame, öffnen oder schließen eine Überlagerung oder gehen zurück; abspielbar auf der Arbeitsfläche mit sofortigem oder aufgelöstem Übergang ([Prototyp abspielen](/user-guide/playing-a-prototype)).
 - **Variablen:** Designtoken mit Sammlungen, Modi wie Hell und Dunkel, den Typen Color, Float, String und Boolean sowie Variablenbindungen.
 - **Sektionen:** Container zur Organisation mit automatischer Übernahme überlappender Objekte.
 
@@ -69,6 +71,12 @@ openpencil export design.fig -f jsx --style tailwind
 
 Werkzeugaufrufe erscheinen als einklappbare Einträge auf einer Zeitleiste. Zur visuellen Prüfung stellt der Assistent seine Änderungen dar und vergleicht das Ergebnis mit der Anfrage. Sämtliche Änderungen durch AI können rückgängig gemacht werden.
 
+## Integrierter Browser
+
+`http`- und `https`-Seiten öffnen sich in einem eigenen Fenster der Desktop-App, das nichts mit dem Editor teilt, und lassen sich auf die Arbeitsfläche holen: die ganze Seite oder ein ausgewähltes Element als Ebenen importieren oder einen Screenshot der Ansicht, der Seite oder eines Elements ablegen. Der Chat kann die Seite lesen, ein Element in der Antwort markieren und darauf klicken, tippen, eine Taste drücken, scrollen oder warten; gefragt wird vorher, wenn die Einstellungen vor Änderungen fragen.
+
+Auf einem Board wird derselbe Browser zur Recherche: Der Chat zitiert die Seite in eine Haftnotiz mit Adresse, Titel, Zitat und Lesezeit ([Recherche auf einem Board](/user-guide/research)).
+
 ## MCP-Server
 
 Claude Code, Cursor, Windsurf und andere MCP-Clients können `.fig`-Dateien mit mehr als 90 Werkzeugen ohne grafische Oberfläche lesen und verändern. Als Übertragung stehen stdio und HTTP zur Verfügung.
@@ -101,6 +109,12 @@ Die Zusammenarbeit erfolgt direkt zwischen den Teilnehmern über WebRTC und ben�
 **Desktop:** Tauri v2, rund 7 MB, für macOS, Windows und Linux, mit nativen Menüs, Offlinebetrieb und automatischem Speichern.
 
 **Web:** [app.openpencil.dev](https://app.openpencil.dev), als PWA installierbar und für Touch-Bedienung optimiert.
+
+**VS Code:** Ein eigener Editor für `.fig`- und `.pen`-Dokumente, der den Web-Editor in einer Webview ausführt und speichert, was dieser zeigt. Er ist in keinem Marktplatz veröffentlicht und wird deshalb aus dem Repository gebaut ([VS Code-Erweiterung](/programmable/vscode)).
+
+## Plugins
+
+Unter **Einstellungen → App → Erweiterungen** lassen sich Plugin-Manifeste installieren, und jedes zeigt an, welche Berechtigungen es anfragt. Netzwerkzugriff wird abgelehnt; Erweiterungen laufen noch nicht ([Plugins](/user-guide/plugins)).
 
 ## Ersatzweise Google Fonts laden
 

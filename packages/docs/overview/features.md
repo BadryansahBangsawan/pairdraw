@@ -16,6 +16,8 @@ Open and save native Figma files directly. The import/export pipeline uses the s
 - **Auto-layout** — flexbox and CSS Grid via Yoga WASM: direction, gap, padding, justify, align, child sizing, grid tracks. <kbd>⇧</kbd><kbd>A</kbd> to toggle
 - **Components** — create (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd>), component sets, instances with override support, slots, live sync
 - **Behaviours and preview** — make components work as Reka UI controls (switch, slider, tabs, text field, accordion, …) and try them live over the canvas with <kbd>⌥</kbd><kbd>⌘</kbd><kbd>↩</kbd> ([Components](/user-guide/components#behaviours-and-preview))
+- **Script layers** — a layer's contents drawn by a JavaScript program stored in the document, with `@input` controls you can bind to variables, a live re-run when the code, inputs, or size change, and one step to convert the result into ordinary layers ([Script layers](/user-guide/script-layers))
+- **Prototypes** — click or after-delay interactions on a layer that navigate to a frame, open or close an overlay, or go back, played on the canvas with instant or dissolve transitions ([Playing a prototype](/user-guide/playing-a-prototype))
 - **Variables** — design tokens with collections, modes (Light/Dark), color/float/string/boolean types, variable binding
 - **Sections** — organizational containers with auto-adopting children and title pills
 
@@ -74,6 +76,12 @@ Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant. 138 tools that can cr
 Tool calls display as collapsible timeline entries. Visual verification — the assistant renders its work and checks it against your request. Full undo support for all AI mutations.
 
 See [AI Chat](/programmable/ai-chat) for setup and provider details.
+
+## Built-in Browser
+
+Open `http` and `https` pages in their own desktop window, which shares nothing with the editor, and bring them onto the canvas: import the whole page or one picked element as layers, or place a screenshot of the view, the page, or an element. The chat can read the page, mark an element in its reply, and click, type, press a key, scroll, or wait on it, asking first when Settings asks before changes.
+
+On a board, the same browser becomes research: the chat quotes the page into a sticky note that keeps its address, title, quote, and read time ([Research on a board](/user-guide/research)).
 
 ## MCP Server
 
@@ -139,6 +147,12 @@ P2P via WebRTC — no server required. Share a link and edit together.
 ```sh
 brew install --cask openpencil
 ```
+
+**VS Code** — a custom editor for `.fig` and `.pen` documents that runs the web editor in a webview and saves what it shows; it is not published to a marketplace, so build it from the repository ([VS Code extension](/programmable/vscode)).
+
+## Plugins
+
+Install plugin manifests in **Settings → App → Plugins** and see the capabilities each asks for. Network access is refused, and plugins do not run yet ([Plugins](/user-guide/plugins)).
 
 ## Google Fonts Fallback
 

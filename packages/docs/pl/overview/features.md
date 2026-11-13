@@ -14,6 +14,8 @@ Pairdraw otwiera i zapisuje pliki `.fig` bez wcześniejszej konwersji. Import i 
 - **Formatowanie tekstu:** pogrubienie, kursywa, podkreślenie i przekreślenie wybranych zakresów.
 - **Automatyczny układ:** Flexbox i CSS Grid przez Yoga WASM; kierunek, odstępy, wypełnienie, wyrównanie, rozmiary i ścieżki siatki.
 - **Komponenty:** tworzenie komponentów i zestawów, egzemplarze, nadpisania oraz automatyczna synchronizacja.
+- **Warstwy skryptów:** Zawartość warstwy rysuje program JavaScript zapisany w dokumencie. Kontrolki `@input` można wiązać ze zmiennymi; zmiana kodu, danych wejściowych lub rozmiaru uruchamia ponownie skrypt, a wynik jednym krokiem zamienia się w zwykłe warstwy ([Warstwy skryptów](/user-guide/script-layers)).
+- **Prototypy:** Interakcje po kliknięciu lub po opóźnieniu prowadzą do ramki, otwierają lub zamykają nakładkę albo wracają; można je odtwarzać na obszarze roboczym z natychmiastowym przejściem lub przenikaniem ([Odtwarzanie prototypu](/user-guide/playing-a-prototype)).
 - **Zmienne:** tokeny projektu z kolekcjami, trybami Light i Dark, typami Color, Float, String i Boolean oraz powiązaniami.
 - **Sekcje:** kontenery najwyższego poziomu przejmujące przecinające się obiekty.
 
@@ -69,6 +71,12 @@ Naciśnij <kbd>⌘</kbd><kbd>J</kbd>. Ponad 90 narzędzi tworzy figury, zmienia 
 
 Wywołania narzędzi pojawiają się na zwijanej osi czasu. Do kontroli wizualnej asystent eksportuje wynik i porównuje go z poleceniem. Wszystkie zmiany AI można cofnąć.
 
+## Wbudowana przeglądarka
+
+Strony `http` i `https` otwierają się we własnym oknie aplikacji komputerowej, które nie dzieli niczego z edytorem, i można je przenieść na obszar roboczy: zaimportować całą stronę lub wybrany element jako warstwy albo umieścić zrzut widoku, strony lub elementu. Czat może odczytać stronę, oznaczyć element w odpowiedzi i klikać, wpisywać tekst, naciskać klawisze, przewijać lub czekać na stronie, pytając najpierw o zgodę, gdy ustawienia tego wymagają.
+
+Na tablicy ta sama przeglądarka staje się badaniem: czat cytuje stronę w karteczce, która zachowuje adres, tytuł, cytat i czas odczytu ([Badanie na tablicy](/user-guide/research)).
+
 ## Serwer MCP
 
 Claude Code, Cursor, Windsurf i inni klienci MCP mogą odczytywać i zmieniać `.fig` bez interfejsu. Dostępnych jest ponad 90 narzędzi oraz transporty stdio i HTTP.
@@ -99,6 +107,12 @@ Połączenie równorzędne WebRTC nie wymaga centralnego serwera. Udostępnij od
 **Komputer:** Tauri v2, około 7 MB, dla macOS, Windows i Linux, z menu systemowymi, pracą bez sieci i automatycznym zapisem.
 
 **Internet:** [app.openpencil.dev](https://app.openpencil.dev), możliwość instalacji jako PWA i interfejs dotykowy.
+
+**VS Code:** Osobny edytor dokumentów `.fig` i `.pen`, który uruchamia edytor internetowy w webview i zapisuje to, co on pokazuje. Nie jest publikowany w żadnym sklepie, więc buduje się go z repozytorium ([Rozszerzenie VS Code](/programmable/vscode)).
+
+## Wtyczki
+
+W **Ustawienia → Aplikacja → Wtyczki** można instalować manifesty wtyczek i zobaczyć, o jakie uprawnienia prosi każda z nich. Dostęp do sieci jest odrzucany, a wtyczki jeszcze nie działają ([Wtyczki](/user-guide/plugins)).
 
 ## Zastępcze ładowanie Google Fonts
 

@@ -14,6 +14,8 @@ Pairdraw ouvre et enregistre directement les fichiers `.fig`. L’import et l’
 - **Texte enrichi :** gras, italique, souligné et barré sur des plages de caractères.
 - **Disposition automatique :** Flexbox et CSS Grid via Yoga WASM, avec direction, espacement, marges internes, distribution, alignement, dimensionnement et pistes de grille.
 - **Composants :** création de composants et d’ensembles, instances, substitutions et synchronisation.
+- **Calques de script :** Le contenu d’un calque est dessiné par un programme JavaScript enregistré dans le document. Les contrôles `@input` se lient à des variables ; un changement du code, des entrées ou de la taille relance l’exécution, et le résultat se convertit en calques ordinaires en une étape ([Calques de script](/user-guide/script-layers)).
+- **Prototypes :** Des interactions au clic ou après un délai mènent à un cadre, ouvrent ou ferment une superposition ou reviennent en arrière ; elles se lisent sur la zone de travail avec une transition instantanée ou en fondu ([Lire un prototype](/user-guide/playing-a-prototype)).
 - **Variables :** jetons de design organisés en collections et modes, avec les types Color, Float, String et Boolean et des liaisons.
 - **Sections :** conteneurs d’organisation qui intègrent automatiquement les objets superposés.
 
@@ -69,6 +71,12 @@ openpencil export design.fig -f jsx --style tailwind
 
 Les appels d’outils apparaissent sur une chronologie repliable. Pour vérifier les modifications, l’assistant rend le résultat et le compare à la demande. Toutes les modifications réalisées par l’AI peuvent être annulées.
 
+## Navigateur intégré
+
+Les pages `http` et `https` s’ouvrent dans une fenêtre propre à l’application de bureau, qui ne partage rien avec l’éditeur, et peuvent être amenées sur la zone de travail : importez la page entière ou un élément choisi sous forme de calques, ou placez une capture de la vue, de la page ou d’un élément. Le chat peut lire la page, marquer un élément dans sa réponse et cliquer, saisir du texte, appuyer sur une touche, faire défiler ou attendre dessus ; il demande d’abord quand les paramètres demandent une confirmation avant les modifications.
+
+Sur un tableau, le même navigateur devient de la recherche : le chat cite la page dans une note autocollante qui conserve son adresse, son titre, sa citation et l’heure de lecture ([Recherche sur un tableau](/user-guide/research)).
+
 ## Serveur MCP
 
 Claude Code, Cursor, Windsurf et les autres clients MCP peuvent lire et modifier des fichiers `.fig` grâce à plus de 90 outils. stdio et HTTP sont disponibles.
@@ -101,6 +109,12 @@ La collaboration fonctionne directement entre participants via WebRTC et ne néc
 **Bureau :** Tauri v2, environ 7 Mo, pour macOS, Windows et Linux, avec menus natifs, fonctionnement hors ligne et enregistrement automatique.
 
 **Web :** [app.openpencil.dev](https://app.openpencil.dev), installable comme PWA et adapté aux écrans tactiles.
+
+**VS Code :** Un éditeur dédié aux documents `.fig` et `.pen` qui exécute l’éditeur web dans une webview et enregistre ce qu’il affiche. Il n’est publié sur aucune place de marché et se compile donc depuis le dépôt ([Extension VS Code](/programmable/vscode)).
+
+## Extensions
+
+Dans **Paramètres → Application → Extensions**, installez des manifestes d’extension et voyez les capacités que chacune demande. L’accès réseau est refusé et les extensions ne s’exécutent pas encore ([Extensions](/user-guide/plugins)).
 
 ## Chargement de secours depuis Google Fonts
 

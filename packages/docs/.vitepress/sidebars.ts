@@ -93,6 +93,7 @@ export const programmableSidebar = (
             { text: 'Coding agents in the browser', link: '/programmable/browser-agents' },
             { text: 'Embedding the editor', link: '/programmable/embed' },
             { text: 'Web capture', link: '/programmable/web-capture' },
+            { text: 'VS Code extension', link: '/programmable/vscode' },
             {
               text: 'BYOK Compatibility',
               link: '/programmable/byok-provider-compatibility',

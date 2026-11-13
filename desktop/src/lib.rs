@@ -222,6 +222,7 @@ pub fn run() {
             } => {
                 launch::documents::release_window(_app, &label);
                 menu::forget_window(_app, &label);
+                system::quit::note_window_destroyed(_app, &label);
             }
             #[cfg(target_os = "macos")]
             tauri::RunEvent::Opened { urls } => {

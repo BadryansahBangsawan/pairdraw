@@ -12,6 +12,22 @@ use super::window::is_editor_label;
 #[derive(Default)]
 pub struct PendingQuit(Mutex<Option<HashSet<String>>>);
 
+/// Drops a window that closed before it answered. True when it was the last one still asked,
+/// so the quit can finish; a window that was not asked, or a close with nothing pending, does not.
+pub(crate) fn drop_closed_window(waiting: &mut Option<HashSet<String>>, window: &str) -> bool {
+    let Some(labels) = waiting.as_mut() else {
+        return false;
+    };
+    if !labels.remove(window) {
+        return false;
+    }
+    if labels.is_empty() {
+        *waiting = None;
+        return true;
+    }
+    false
+}
+
 fn record_answer(waiting: &mut Option<HashSet<String>>, window: &str, approved: bool) -> bool {
     let Some(labels) = waiting.as_mut() else {
         return false;
@@ -61,6 +77,19 @@ pub fn answer_quit<R: tauri::Runtime>(
     let state = app.state::<PendingQuit>();
     let exit = match state.0.lock() {
         Ok(mut pending) => record_answer(&mut pending, window.label(), approved),
+        Err(_) => false,
+    };
+    if exit {
+        app.exit(0);
+    }
+}
+
+/// A window that closed can no longer answer a quit. If it was the last one still asked, the
+/// app exits; closing a window while nothing is pending does not.
+pub fn note_window_destroyed<R: tauri::Runtime>(app: &tauri::AppHandle<R>, window: &str) {
+    let state = app.state::<PendingQuit>();
+    let exit = match state.0.lock() {
+        Ok(mut pending) => drop_closed_window(&mut pending, window),
         Err(_) => false,
     };
     if exit {

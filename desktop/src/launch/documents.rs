@@ -205,6 +205,32 @@ mod tests {
     }
 
     #[test]
+    fn a_window_that_closes_during_quit_does_not_hold_the_others() {
+        use std::collections::HashSet;
+
+        let mut pending = Some(
+            ["main", "editor-2"]
+                .into_iter()
+                .map(str::to_owned)
+                .collect::<HashSet<_>>(),
+        );
+        assert!(!crate::system::quit::drop_closed_window(
+            &mut pending,
+            "browser"
+        ));
+        assert!(!crate::system::quit::drop_closed_window(
+            &mut pending,
+            "editor-2"
+        ));
+        assert_eq!(pending.as_ref().map(HashSet::len), Some(1));
+        assert!(crate::system::quit::drop_closed_window(&mut pending, "main"));
+        assert_eq!(pending, None);
+
+        let mut idle = None;
+        assert!(!crate::system::quit::drop_closed_window(&mut idle, "main"));
+    }
+
+    #[test]
     fn browser_reports_reach_every_editor_and_not_the_page() {
         let labels = vec![
             "browser".to_owned(),

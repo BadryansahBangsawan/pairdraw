@@ -32,6 +32,63 @@ export function claimChanges(
   }
 }
 
+/** The shell calls that record which window shows which file. */
+export interface DocumentRegistry {
+  claim: (path: string) => Promise<void>
+  release: (path: string) => Promise<void>
+}
+
+const nativeRegistry: DocumentRegistry = {
+  claim: async (path) => {
+    const { invoke } = await import('@tauri-apps/api/core')
+    await invoke('claim_document', { path })
+  },
+  release: async (path) => {
+    const { invoke } = await import('@tauri-apps/api/core')
+    await invoke('release_document', { path })
+  }
+}
+
+async function sendChange(action: (path: string) => Promise<void>, path: string): Promise<boolean> {
+  try {
+    await action(path)
+    return true
+  } catch (error) {
+    // One path failing must not stop the paths after it or the next update, which retries it.
+    console.warn('[Window] Failed to update the open-document registry:', error)
+    return false
+  }
+}
+
+/**
+ * Applies claim and release changes in order, one path at a time. A change takes effect locally
+ * only once the shell accepted it, so a rejected claim is retried by the next update instead of
+ * staying unclaimed for the window's lifetime.
+ */
+export function createDocumentClaimQueue(registry: DocumentRegistry) {
+  const claimed = new Set<string>()
+  let tail: Promise<void> = Promise.resolve()
+
+  return {
+    update(paths: readonly string[]): Promise<void> {
+      const next = new Set(paths)
+      const step = tail.then(async () => {
+        const { added, removed } = claimChanges(claimed, [...next])
+        for (const path of added) {
+          if (await sendChange(registry.claim, path)) claimed.add(path)
+        }
+        for (const path of removed) {
+          if (await sendChange(registry.release, path)) claimed.delete(path)
+        }
+        return undefined
+      })
+      // A failed step must not stall later updates for this window.
+      tail = step.catch(noop)
+      return step
+    }
+  }
+}
+
 /**
  * Keeps the shell's document registry in step with this window's tabs: a file open in a tab is
  * claimed by this window, so a file association or link for it focuses this window instead of
@@ -41,27 +98,11 @@ export function claimChanges(
 export function watchOpenDocuments(): () => void {
   if (!isTauri()) return noop
 
-  let claimed = new Set<string>()
-  let sync: Promise<void> = Promise.resolve()
-
-  function update(paths: string[]): Promise<void> {
-    const { added, removed } = claimChanges(claimed, paths)
-    claimed = new Set(paths)
-    sync = sync.then(async () => {
-      const { invoke } = await import('@tauri-apps/api/core')
-      for (const path of added) await invoke('claim_document', { path })
-      for (const path of removed) await invoke('release_document', { path })
-      return undefined
-    })
-    return sync
-  }
-
+  const queue = createDocumentClaimQueue(nativeRegistry)
   return watch(
     allTabs,
     () => {
-      void update(openDocumentPaths()).catch((error: unknown) => {
-        console.warn('[Window] Failed to update the open-document registry:', error)
-      })
+      void queue.update(openDocumentPaths())
     },
     { immediate: true }
   )

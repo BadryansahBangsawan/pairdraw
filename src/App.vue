@@ -27,6 +27,7 @@ import DiskChangeDialogHost from '@/components/document/DiskChangeDialogHost.vue
 import UnsavedChangesDialog from '@/components/document/UnsavedChangesDialog.vue'
 import PublishLibraryDialog from '@/components/libraries/PublishLibraryDialog.vue'
 import LibraryUpdateReviewDialog from '@/components/libraries/review/LibraryUpdateReviewDialog.vue'
+import PluginPermissionDialog from '@/components/plugins/PluginPermissionDialog.vue'
 import RecoveredChangesDialogHost from '@/components/recovery/RecoveredChangesDialogHost.vue'
 import RecoveryDialog from '@/components/recovery/RecoveryDialog.vue'
 import SaveToHost from '@/components/save-to/SaveToHost.vue'
@@ -78,6 +79,7 @@ onMounted(() => {
       <SettingsDialog />
       <AISetupDialog />
       <CompanionPairDialog />
+      <PluginPermissionDialog />
       <SaveToHost />
       <CloudHosts />
       <RecoveryDialog />

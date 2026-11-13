@@ -153,5 +153,12 @@
   "pluginsUnknownCapability": "Unbekannte Fähigkeit „{capability}“.",
   "pluginsNetwork": "Erweiterungen dürfen keinen Netzzugriff verlangen.",
   "pluginsTooLarge": "Dieses Erweiterungsmanifest überschreitet die Größengrenze.",
-  "pluginsTooMany": "Diese App hat bereits {count} Erweiterungen, das ist die Obergrenze."
+  "pluginsTooMany": "Diese App hat bereits {count} Erweiterungen, das ist die Obergrenze.",
+  "pluginsPermissions": "Berechtigungen",
+  "pluginsGrant": "Berechtigung „{capability}“ für {name}",
+  "pluginsRunTitle": "„{name}“ ausführen?",
+  "pluginsRunDescription": "Diese Erweiterung bittet um diese Berechtigungen. Eine abgelehnte lässt diesen Aufruf in der Erweiterung scheitern. Du kannst sie später in den Erweiterungs-Einstellungen ändern.",
+  "pluginsRunAllow": "Ausführen",
+  "pluginsRunRefuse": "Ablehnen",
+  "pluginsUnavailable": "Noch nicht"
 }

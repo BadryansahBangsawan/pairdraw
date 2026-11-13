@@ -6,10 +6,12 @@ import IconPuzzle from '~icons/lucide/puzzle'
 
 import { useCommonMessages, useSettingsMessages } from '@open-pencil/vue/i18n'
 
+import { PLUGIN_AVAILABLE_CAPABILITIES, pluginCapabilityKeys } from '@/app/plugins/capability-text'
 import type { PluginInstallResult } from '@/app/plugins/catalog'
 import { MAX_PLUGINS } from '@/app/plugins/limits'
 import type { InstalledPlugin, PluginCapability } from '@/app/plugins/schema'
 import {
+  grantInstalledPlugin,
   installChosenPluginFile,
   installPastedPlugin,
   installedPlugins,
@@ -43,15 +45,21 @@ const removeOpen = computed({
   }
 })
 
-const capabilityText = {
-  'document:read': () => settings.value.pluginsCapabilityDocumentRead,
-  'document:write': () => settings.value.pluginsCapabilityDocumentWrite,
-  'filesystem:read': () => settings.value.pluginsCapabilityFilesystemRead,
-  'filesystem:write': () => settings.value.pluginsCapabilityFilesystemWrite,
-  'code:execute': () => settings.value.pluginsCapabilityCodeExecute,
-  'settings:read': () => settings.value.pluginsCapabilitySettingsRead,
-  'settings:write': () => settings.value.pluginsCapabilitySettingsWrite
-} as const satisfies Record<PluginCapability, () => string>
+function capabilityText(capability: PluginCapability): string {
+  return settings.value[pluginCapabilityKeys[capability]]
+}
+
+function isAvailable(capability: PluginCapability): boolean {
+  return PLUGIN_AVAILABLE_CAPABILITIES.some((available) => available === capability)
+}
+
+/** Adds or drops one grant; the rest of the plugin's grants stay as they were. */
+function setGrant(plugin: InstalledPlugin, capability: PluginCapability, on: boolean): void {
+  const next = on
+    ? [...plugin.grants, capability]
+    : plugin.grants.filter((grant) => grant !== capability)
+  grantInstalledPlugin(plugin.id, next)
+}
 
 const fileDialog = useFileDialog({ accept: 'application/json,.json', multiple: false, reset: true })
 fileDialog.onChange((files) => {
@@ -63,7 +71,7 @@ function describePlugin(plugin: InstalledPlugin): string {
   const asked =
     plugin.capabilities.length === 0
       ? settings.value.pluginsNoCapabilities
-      : plugin.capabilities.map((capability) => capabilityText[capability]()).join(' ')
+      : settings.value.pluginsPermissions
   return `${settings.value.pluginsCommand({ command: plugin.command })} ${asked}`
 }
 
@@ -132,28 +140,41 @@ function confirmRemove(): void {
         <AppAlert v-if="failure" tone="error" :heading="failure" />
       </div>
       <SettingsGroup v-if="installedPlugins.length > 0">
-        <SettingsRow
-          v-for="plugin in installedPlugins"
-          :key="plugin.id"
-          :label="plugin.name"
-          :description="describePlugin(plugin)"
-        >
-          <span class="flex items-center gap-2">
-            <AppButton
-              color="error"
-              variant="ghost"
-              :aria-label="settings.pluginsRemove({ name: plugin.name })"
-              @click="removingId = plugin.id"
-            >
-              {{ settings.pluginsRemoveAction }}
-            </AppButton>
+        <template v-for="plugin in installedPlugins" :key="plugin.id">
+          <SettingsRow :label="plugin.name" :description="describePlugin(plugin)">
+            <span class="flex items-center gap-2">
+              <AppButton
+                color="error"
+                variant="ghost"
+                :aria-label="settings.pluginsRemove({ name: plugin.name })"
+                @click="removingId = plugin.id"
+              >
+                {{ settings.pluginsRemoveAction }}
+              </AppButton>
+              <AppSwitch
+                :model-value="plugin.enabled"
+                :label="settings.pluginsEnable({ name: plugin.name })"
+                @update:model-value="setInstalledPluginEnabled(plugin.id, $event)"
+              />
+            </span>
+          </SettingsRow>
+          <SettingsRow
+            v-for="capability in plugin.capabilities"
+            :key="`${plugin.id}-${capability}`"
+            as="label"
+            :label="capabilityText(capability)"
+            :description="isAvailable(capability) ? undefined : settings.pluginsUnavailable"
+          >
             <AppSwitch
-              :model-value="plugin.enabled"
-              :label="settings.pluginsEnable({ name: plugin.name })"
-              @update:model-value="setInstalledPluginEnabled(plugin.id, $event)"
+              :model-value="plugin.grants.includes(capability)"
+              :label="
+                settings.pluginsGrant({ name: plugin.name, capability: capabilityText(capability) })
+              "
+              :disabled="!plugin.enabled || !isAvailable(capability)"
+              @update:model-value="setGrant(plugin, capability, $event)"
             />
-          </span>
-        </SettingsRow>
+          </SettingsRow>
+        </template>
       </SettingsGroup>
       <AppPlaceholder
         v-else

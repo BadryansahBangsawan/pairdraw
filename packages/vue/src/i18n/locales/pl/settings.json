@@ -153,5 +153,12 @@
   "pluginsUnknownCapability": "Nieznana zdolność „{capability}”.",
   "pluginsNetwork": "Wtyczki nie mogą prosić o dostęp do sieci.",
   "pluginsTooLarge": "Ten manifest wtyczki przekracza limit rozmiaru.",
-  "pluginsTooMany": "Ta aplikacja ma już {count} wtyczek, czyli limit."
+  "pluginsTooMany": "Ta aplikacja ma już {count} wtyczek, czyli limit.",
+  "pluginsPermissions": "Uprawnienia",
+  "pluginsGrant": "Uprawnienie „{capability}” dla {name}",
+  "pluginsRunTitle": "Uruchomić {name}?",
+  "pluginsRunDescription": "Ta wtyczka prosi o te uprawnienia. Odmówione uprawnienie sprawia, że to wywołanie kończy się błędem we wtyczce. Możesz je później zmienić w ustawieniach Wtyczek.",
+  "pluginsRunAllow": "Uruchom",
+  "pluginsRunRefuse": "Odmów",
+  "pluginsUnavailable": "Jeszcze nie"
 }

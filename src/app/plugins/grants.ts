@@ -46,7 +46,7 @@ export function grantPlugin(
   const next = uniq(grants)
   return {
     ok: true,
-    plugins: plugins.map((item) => (item.id === id ? { ...item, grants: next } : item))
+    plugins: plugins.map((item) => (item.id === id ? { ...item, grants: next, asked: true } : item))
   }
 }
 

@@ -153,5 +153,12 @@
   "pluginsUnknownCapability": "Capacità sconosciuta «{capability}».",
   "pluginsNetwork": "Le estensioni non possono chiedere l’accesso alla rete.",
   "pluginsTooLarge": "Questo manifesto di estensione supera la dimensione limite.",
-  "pluginsTooMany": "Questa app ha già {count} estensioni, che è il limite."
+  "pluginsTooMany": "Questa app ha già {count} estensioni, che è il limite.",
+  "pluginsPermissions": "Autorizzazioni",
+  "pluginsGrant": "Autorizzazione «{capability}» per {name}",
+  "pluginsRunTitle": "Eseguire {name}?",
+  "pluginsRunDescription": "Questa estensione chiede queste autorizzazioni. Una rifiutata fa fallire quella chiamata dentro l'estensione. Puoi cambiarle più tardi nelle impostazioni Estensioni.",
+  "pluginsRunAllow": "Esegui",
+  "pluginsRunRefuse": "Rifiuta",
+  "pluginsUnavailable": "Non ancora"
 }

@@ -153,5 +153,12 @@
   "pluginsUnknownCapability": "不明な権限「{capability}」です。",
   "pluginsNetwork": "プラグインは通信を要求できません。",
   "pluginsTooLarge": "このプラグインの定義は大きさの上限を超えています。",
-  "pluginsTooMany": "このアプリには既に{count}個のプラグインがあり、それが上限です。"
+  "pluginsTooMany": "このアプリには既に{count}個のプラグインがあり、それが上限です。",
+  "pluginsPermissions": "権限",
+  "pluginsGrant": "{name} の権限「{capability}」",
+  "pluginsRunTitle": "{name} を実行しますか?",
+  "pluginsRunDescription": "このプラグインは次の権限を要求します。拒否した権限の呼び出しはプラグイン内で失敗します。後からプラグイン設定で変更できます。",
+  "pluginsRunAllow": "実行",
+  "pluginsRunRefuse": "拒否",
+  "pluginsUnavailable": "未対応"
 }

@@ -153,5 +153,12 @@
   "pluginsUnknownCapability": "Capacité inconnue « {capability} ».",
   "pluginsNetwork": "Les extensions ne peuvent pas demander l’accès au réseau.",
   "pluginsTooLarge": "Ce manifeste d’extension dépasse la taille limite.",
-  "pluginsTooMany": "Cette application a déjà {count} extensions, ce qui est la limite."
+  "pluginsTooMany": "Cette application a déjà {count} extensions, ce qui est la limite.",
+  "pluginsPermissions": "Autorisations",
+  "pluginsGrant": "Autorisation « {capability} » pour {name}",
+  "pluginsRunTitle": "Exécuter {name} ?",
+  "pluginsRunDescription": "Cette extension demande ces autorisations. Une autorisation refusée fait échouer cet appel dans l'extension. Vous pourrez les modifier plus tard dans les réglages Extensions.",
+  "pluginsRunAllow": "Exécuter",
+  "pluginsRunRefuse": "Refuser",
+  "pluginsUnavailable": "Pas encore"
 }

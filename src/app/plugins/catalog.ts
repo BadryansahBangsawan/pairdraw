@@ -75,7 +75,13 @@ function refusedCapabilities(value: unknown): PluginInstallResult | null {
 }
 
 function toInstalled(manifest: PluginManifest): InstalledPlugin {
-  return { ...manifest, capabilities: uniq(manifest.capabilities), enabled: true, grants: [] }
+  return {
+    ...manifest,
+    capabilities: uniq(manifest.capabilities),
+    enabled: true,
+    grants: [],
+    asked: false
+  }
 }
 
 /**
@@ -121,8 +127,9 @@ export function setPluginEnabled(
   if (!plugins.some((plugin) => plugin.id === id)) return plugins
   return plugins.map((plugin) => {
     if (plugin.id !== id) return plugin
-    // Disabling drops grants. Enabling again does not bring them back.
-    if (!enabled) return { ...plugin, enabled: false, grants: [] }
+    // Disabling drops grants. Enabling again does not bring them back, so the
+    // permission prompt comes back with them.
+    if (!enabled) return { ...plugin, enabled: false, grants: [], asked: false }
     return { ...plugin, enabled: true }
   })
 }

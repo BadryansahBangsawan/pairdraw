@@ -153,5 +153,12 @@
   "pluginsUnknownCapability": "Capacidad desconocida «{capability}».",
   "pluginsNetwork": "Los complementos no pueden pedir acceso a la red.",
   "pluginsTooLarge": "Este manifiesto de complemento supera el tamaño límite.",
-  "pluginsTooMany": "Esta aplicación ya tiene {count} complementos, que es el límite."
+  "pluginsTooMany": "Esta aplicación ya tiene {count} complementos, que es el límite.",
+  "pluginsPermissions": "Permisos",
+  "pluginsGrant": "Permiso «{capability}» para {name}",
+  "pluginsRunTitle": "¿Ejecutar {name}?",
+  "pluginsRunDescription": "Este complemento pide estos permisos. Si rechazas uno, esa llamada falla dentro del complemento. Puedes cambiarlos más tarde en los ajustes de Complementos.",
+  "pluginsRunAllow": "Ejecutar",
+  "pluginsRunRefuse": "Rechazar",
+  "pluginsUnavailable": "Aún no"
 }

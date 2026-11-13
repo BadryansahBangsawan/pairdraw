@@ -54,7 +54,8 @@ function copyInstalledPlugin(plugin: InstalledPlugin): InstalledPlugin {
     command: plugin.command,
     capabilities: [...plugin.capabilities],
     enabled: plugin.enabled,
-    grants: [...plugin.grants]
+    grants: [...plugin.grants],
+    asked: plugin.asked
   }
 }
 

@@ -153,5 +153,12 @@
   "pluginsUnknownCapability": "Неизвестная возможность «{capability}».",
   "pluginsNetwork": "Плагины не могут запрашивать доступ к сети.",
   "pluginsTooLarge": "Этот манифест плагина превышает предел размера.",
-  "pluginsTooMany": "В этом приложении уже {count} плагинов, это предел."
+  "pluginsTooMany": "В этом приложении уже {count} плагинов, это предел.",
+  "pluginsPermissions": "Разрешения",
+  "pluginsGrant": "Разрешение «{capability}» для {name}",
+  "pluginsRunTitle": "Запустить {name}?",
+  "pluginsRunDescription": "Этот плагин просит такие разрешения. Отклонённое разрешение вызовет ошибку этого вызова внутри плагина. Их можно изменить позже в настройках плагинов.",
+  "pluginsRunAllow": "Запустить",
+  "pluginsRunRefuse": "Отклонить",
+  "pluginsUnavailable": "Пока нет"
 }

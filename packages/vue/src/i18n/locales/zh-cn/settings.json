@@ -153,5 +153,12 @@
   "pluginsUnknownCapability": "未知权限「{capability}」。",
   "pluginsNetwork": "插件不能请求联网。",
   "pluginsTooLarge": "这个插件定义超过了大小上限。",
-  "pluginsTooMany": "此应用已有{count}个插件，已达上限。"
+  "pluginsTooMany": "此应用已有{count}个插件，已达上限。",
+  "pluginsPermissions": "权限",
+  "pluginsGrant": "{name} 的权限“{capability}”",
+  "pluginsRunTitle": "运行 {name}？",
+  "pluginsRunDescription": "此插件请求以下权限。被拒绝的权限会让对应的调用在插件内部失败。之后可以在插件设置中修改。",
+  "pluginsRunAllow": "运行",
+  "pluginsRunRefuse": "拒绝",
+  "pluginsUnavailable": "暂不支持"
 }

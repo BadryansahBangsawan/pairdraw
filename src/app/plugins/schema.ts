@@ -57,12 +57,14 @@ export type PluginManifest = v.InferOutput<typeof pluginManifestSchema>
  * One installed plugin as the app stores it. `enabled` is not part of the manifest.
  * Grants name only capabilities the manifest asked for. A missing list is none.
  * A stored grant this version does not know, including `network:access`, is dropped.
+ * `asked` records that the person answered the permission prompt, so it is shown once.
  */
 export const installedPluginSchema = v.pipe(
   v.object({
     ...pluginManifestSchema.entries,
     enabled: v.boolean(),
-    grants: v.optional(v.array(v.string()), [])
+    grants: v.optional(v.array(v.string()), []),
+    asked: v.optional(v.boolean(), false)
   }),
   v.transform((plugin) => ({
     ...plugin,

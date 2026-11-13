@@ -174,7 +174,15 @@ export const settingsMessageDefaults = {
   pluginsUnknownCapability: params('Unknown capability "{capability}".'),
   pluginsNetwork: 'Plugins cannot ask for network access.',
   pluginsTooLarge: 'This plugin manifest is larger than 64 KB.',
-  pluginsTooMany: params('This app already has {count} plugins, which is the limit.')
+  pluginsTooMany: params('This app already has {count} plugins, which is the limit.'),
+  pluginsPermissions: 'Permissions',
+  pluginsGrant: params('{capability} for {name}'),
+  pluginsRunTitle: params('Run {name}?'),
+  pluginsRunDescription:
+    'This plugin asks for these permissions. A refused one makes that call fail inside the plugin. You can change them later in Plugins settings.',
+  pluginsRunAllow: 'Run',
+  pluginsRunRefuse: 'Refuse',
+  pluginsUnavailable: 'Not yet'
 } as const
 
 export const settingsMessages = i18n('settings', settingsMessageDefaults)

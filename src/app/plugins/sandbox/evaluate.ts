@@ -12,6 +12,7 @@ import type { EditorStore } from '@/app/editor/session/create'
 import {
   PLUGIN_CALL_UNAVAILABLE_MESSAGE,
   PLUGIN_DISABLED_MESSAGE,
+  PLUGIN_RUN_RUNNING_MESSAGE,
   pluginRunMissingMessage
 } from '@/app/plugins/messages'
 import { createPluginHost, type PluginHost } from '@/app/plugins/sandbox/host'
@@ -35,6 +36,25 @@ import {
 
 /** What a plugin run produced: the value the plugin returned, already parsed, or an error. */
 export type PluginRunOutcome = { ok: true; result: unknown } | { ok: false; error: string }
+
+/** Whether a plugin run is open; `runInstalledPlugin` refuses a second one while it is. */
+let activeRun = false
+
+/**
+ * Opens the one plugin run this app allows at a time. Returns the function that ends it, or
+ * `null` when a run is already open: the run owns an undo batch and may hold the canvas
+ * pointer, and a second batch would nest inside the first's.
+ */
+export function beginPluginRun(): (() => void) | null {
+  if (activeRun) return null
+  activeRun = true
+  let open = true
+  return () => {
+    if (!open) return
+    open = false
+    activeRun = false
+  }
+}
 
 export interface PluginRunOptions {
   timeoutMs?: number
@@ -139,6 +159,9 @@ export function runPluginInFrame(
  * Run one installed plugin by id. A missing or disabled plugin runs nothing, and the frame module
  * loads here rather than at import time, so this module stays usable outside a browser. The host
  * closes the run's one undo step whether the plugin returned or failed.
+ *
+ * One run at a time: each run opens an undo batch and may take the canvas pointer, and a second
+ * run's batch would nest inside the first's, so a rollback in one could take the other's edits.
  */
 export async function runInstalledPlugin(
   plugins: readonly InstalledPlugin[],
@@ -148,12 +171,13 @@ export async function runInstalledPlugin(
   const plugin = plugins.find((item) => item.id === id)
   if (!plugin) return { ok: false, error: pluginRunMissingMessage(id) }
   if (!plugin.enabled) return { ok: false, error: PLUGIN_DISABLED_MESSAGE }
-  if (!IS_BROWSER) return { ok: false, error: 'Plugins require a browser.' }
-  const host = options.store
-    ? createPluginHost(options.store, plugins, id, options.readPlugins)
-    : null
+  const endRun = beginPluginRun()
+  if (!endRun) return { ok: false, error: PLUGIN_RUN_RUNNING_MESSAGE }
+  let host: PluginHost | null = null
   let failed = true
   try {
+    if (!IS_BROWSER) return { ok: false, error: 'Plugins require a browser.' }
+    host = options.store ? createPluginHost(options.store, plugins, id, options.readPlugins) : null
     const frame = options.frame
       ? options.frame()
       : await import('@/app/plugins/sandbox/iframe').then(({ createPluginFrame }) =>
@@ -165,5 +189,6 @@ export async function runInstalledPlugin(
   } finally {
     // The host also gives the canvas pointer back when the run ends.
     host?.finish(failed)
+    endRun()
   }
 }

@@ -4,7 +4,7 @@ import * as v from 'valibot'
 
 import { installPlugin, setPluginEnabled } from '@/app/plugins/catalog'
 import { PLUGIN_CALL_UNAVAILABLE_MESSAGE } from '@/app/plugins/messages'
-import { runInstalledPlugin, runPluginInFrame } from '@/app/plugins/sandbox/evaluate'
+import { beginPluginRun, runInstalledPlugin, runPluginInFrame } from '@/app/plugins/sandbox/evaluate'
 import type { PluginHost } from '@/app/plugins/sandbox/host'
 import { blockPluginNetwork, PLUGIN_NETWORK_UNAVAILABLE_ERROR } from '@/app/plugins/sandbox/network'
 import {
@@ -280,6 +280,42 @@ describe('plugin run session', () => {
     const result = await runInstalledPlugin(disabled, 'marks', { frame })
     expect(result).toEqual({ ok: false, error: 'Enable this plugin before running it.' })
     expect(frames).toBe(0)
+  })
+
+  test('one plugin run is open at a time, and the slot frees when it ends', () => {
+    const first = beginPluginRun()
+    expect(first).not.toBeNull()
+    expect(beginPluginRun()).toBeNull()
+    first?.()
+    const second = beginPluginRun()
+    expect(second).not.toBeNull()
+    second?.()
+    // Ending it twice is a no-op, and does not free a run opened since.
+    const third = beginPluginRun()
+    second?.()
+    expect(beginPluginRun()).toBeNull()
+    third?.()
+  })
+
+  test('a run is refused while another holds the run slot', async () => {
+    const installed = installPlugin(
+      [],
+      JSON.stringify({
+        id: 'marks',
+        name: 'Marks',
+        version: '1.0.0',
+        source: 'return 1',
+        command: 'Mark',
+        capabilities: []
+      })
+    )
+    if (!installed.ok) throw new Error('install refused')
+    const end = beginPluginRun()
+    expect(await runInstalledPlugin(installed.plugins, 'marks')).toEqual({
+      ok: false,
+      error: 'A plugin is already running.'
+    })
+    end?.()
   })
 
   test('a call from the frame is answered by the host and the answer goes back', async () => {

@@ -31,6 +31,8 @@ export const PLUGIN_DISABLED_MESSAGE = 'Enable this plugin before running it.'
 
 export const PLUGIN_RUN_ENDED_MESSAGE = 'The plugin run has ended.'
 
+export const PLUGIN_RUN_RUNNING_MESSAGE = 'A plugin is already running.'
+
 export function pluginRunMissingMessage(id: string): string {
   return `No plugin with the id "${id}" is installed.`
 }

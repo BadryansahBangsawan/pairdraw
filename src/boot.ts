@@ -12,8 +12,8 @@ import { installCanvasKitBinary, preloadCanvasKit } from '@/app/editor/canvas/ca
 import { preloadFonts } from '@/app/editor/fonts'
 import { installBundledFonts } from '@/app/editor/fonts/bundled'
 import { observeBootErrors } from '@/app/shell/support/boot'
-import { installWindowIdentity } from '@/app/window/identity'
 import { reportBootFailure } from '@/app/shell/support/gate'
+import { installWindowIdentity } from '@/app/window/identity'
 import { IS_TAURI } from '@/constants'
 
 import App from './App.vue'

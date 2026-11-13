@@ -13,7 +13,7 @@ use std::sync::Mutex;
 use tauri::{Emitter, Manager};
 use tauri_plugin_fs::FsExt;
 
-use crate::system::window::MAIN_WINDOW_LABEL;
+use crate::system::window::{focus, focused_window, MAIN_WINDOW_LABEL};
 
 #[derive(Clone, serde::Serialize)]
 pub struct PendingOpenFile {
@@ -169,11 +169,23 @@ fn queue_pending<R: tauri::Runtime>(app: &tauri::AppHandle<R>, files: Vec<Pendin
         }
         let _ = app.emit_to(window.as_str(), "open-associated-files", ());
         if let Some(target) = app.get_webview_window(&window) {
-            let _ = target.unminimize();
-            let _ = target.show();
-            let _ = target.set_focus();
+            focus(&target);
         }
     }
+}
+
+/// Tells the window an incoming link belongs to, and brings it forward: a join or cloud link must
+/// not be followed once per open window.
+fn notify_link<R: tauri::Runtime, S: serde::Serialize + Clone>(
+    app: &tauri::AppHandle<R>,
+    event: &str,
+    payload: S,
+) {
+    let Some(window) = focused_window(app) else {
+        return;
+    };
+    let _ = app.emit_to(window.label(), event, payload);
+    focus(&window);
 }
 
 pub fn queue_open_paths<R: tauri::Runtime>(app: &tauri::AppHandle<R>, paths: Vec<PathBuf>) {
@@ -214,10 +226,7 @@ pub fn queue_deep_links<R: tauri::Runtime>(app: &tauri::AppHandle<R>, urls: Vec<
             Ok(links::DeepLink::Cloud(link)) => cloud_links.push(link),
             // The sign-in that opened the browser is waiting; it checks the state itself.
             Ok(links::DeepLink::OAuth(callback)) => {
-                let _ = app.emit("oauth-callback", callback);
-                if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.set_focus();
-                }
+                notify_link(app, "oauth-callback", callback);
             }
             // Cloud links carry a secret in the fragment, so a refused link is not echoed.
             Err(error) => eprintln!(
@@ -241,10 +250,7 @@ fn queue_cloud_links<R: tauri::Runtime>(app: &tauri::AppHandle<R>, links: Vec<li
         pending.extend(links);
     }
 
-    let _ = app.emit("open-cloud-links", ());
-    if let Some(window) = app.get_webview_window("main") {
-        let _ = window.set_focus();
-    }
+    notify_link(app, "open-cloud-links", ());
 }
 
 fn queue_rooms<R: tauri::Runtime>(app: &tauri::AppHandle<R>, rooms: Vec<String>) {
@@ -256,10 +262,7 @@ fn queue_rooms<R: tauri::Runtime>(app: &tauri::AppHandle<R>, rooms: Vec<String>)
         pending.extend(rooms);
     }
 
-    let _ = app.emit("open-room-links", ());
-    if let Some(window) = app.get_webview_window("main") {
-        let _ = window.set_focus();
-    }
+    notify_link(app, "open-room-links", ());
 }
 
 #[cfg(test)]

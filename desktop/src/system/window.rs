@@ -64,6 +64,13 @@ pub async fn open_window<R: tauri::Runtime>(
     Ok(label)
 }
 
+/// Brings a window forward for something that arrived for it.
+pub fn focus<R: tauri::Runtime>(window: &WebviewWindow<R>) {
+    let _ = window.unminimize();
+    let _ = window.show();
+    let _ = window.set_focus();
+}
+
 /// Whether a label names one of the app's editor windows rather than the updater's webview.
 pub fn is_editor_label(label: &str) -> bool {
     label == MAIN_WINDOW_LABEL || label.starts_with(EDITOR_LABEL_PREFIX)

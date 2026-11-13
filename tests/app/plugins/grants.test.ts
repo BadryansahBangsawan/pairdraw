@@ -87,6 +87,19 @@ describe('plugin grants', () => {
     expect(authorizePluginCall(removed, 'guide.marks', 'document:write')).toBe('denied')
   })
 
+  test('a capability this version cannot perform is refused and never allowed', () => {
+    const plugins = installed('guide.files', ['filesystem:write', 'document:read'])
+    const refused = grantPlugin(plugins, 'guide.files', ['filesystem:write'])
+    expect(refused.ok).toBe(false)
+    if (!refused.ok) expect(refused.reason).toBe('unavailable')
+
+    // A record that carries the grant anyway, as a tampered stored file could, is still refused.
+    const [plugin] = plugins
+    if (!plugin) throw new Error('plugin was not installed')
+    const tampered: InstalledPlugin[] = [{ ...plugin, grants: ['filesystem:write'] }]
+    expect(authorizePluginCall(tampered, 'guide.files', 'filesystem:write')).toBe('denied')
+  })
+
   test('reads a saved plugin with no grants, and drops a grant it did not ask for', () => {
     const [plugin] = installed()
     if (!plugin) throw new Error('plugin was not installed')

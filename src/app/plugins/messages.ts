@@ -15,6 +15,10 @@ export function unknownCapabilityMessage(capability: string): string {
 
 export const PLUGIN_GRANT_DISABLED_MESSAGE = 'Enable the plugin before granting a capability.'
 
+export function pluginGrantUnavailableMessage(capability: string): string {
+  return `This version cannot perform "${capability}".`
+}
+
 export function pluginGrantMissingMessage(id: string): string {
   return `No plugin with the id "${id}" is installed.`
 }

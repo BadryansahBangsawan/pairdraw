@@ -3,6 +3,7 @@ import * as v from 'valibot'
 
 import type { ToolCapability } from '@open-pencil/core/tools'
 
+import { PLUGIN_AVAILABLE_CAPABILITIES } from './capability-text'
 import { MAX_PLUGIN_MANIFEST_BYTES } from './limits'
 
 /**
@@ -55,8 +56,9 @@ export type PluginManifest = v.InferOutput<typeof pluginManifestSchema>
 
 /**
  * One installed plugin as the app stores it. `enabled` is not part of the manifest.
- * Grants name only capabilities the manifest asked for. A missing list is none.
- * A stored grant this version does not know, including `network:access`, is dropped.
+ * Grants name only capabilities the manifest asked for and this host can perform. A missing
+ * list is none. A stored grant this version does not know, including `network:access` and the
+ * capabilities the prompt lists as unavailable, is dropped.
  * `asked` records that the person answered the permission prompt, so it is shown once.
  */
 export const installedPluginSchema = v.pipe(
@@ -71,7 +73,9 @@ export const installedPluginSchema = v.pipe(
     capabilities: uniq(plugin.capabilities),
     grants: uniq(plugin.grants).filter(
       (grant): grant is PluginCapability =>
-        isPluginCapability(grant) && plugin.capabilities.includes(grant)
+        isPluginCapability(grant) &&
+        plugin.capabilities.includes(grant) &&
+        PLUGIN_AVAILABLE_CAPABILITIES.some((available) => available === grant)
     )
   }))
 )

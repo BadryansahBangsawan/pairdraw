@@ -20,6 +20,7 @@ export interface SidebarLabels {
   components: string
   variables: string
   checkingDesigns: string
+  research: string
   designSystem: string
   openPencilCloud: string
   cloudStorage: string
@@ -183,6 +184,7 @@ export const EN: SidebarLabels = {
   components: 'Components',
   variables: 'Variables',
   checkingDesigns: 'Checking Designs',
+  research: 'Research on a Board',
   designSystem: 'Building a Design System',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Cloud Storage',
@@ -217,6 +219,7 @@ export const DE: SidebarLabels = {
   components: 'Komponenten',
   variables: 'Variablen',
   checkingDesigns: 'Designs prüfen',
+  research: 'Recherche auf einem Board',
   designSystem: 'Ein Designsystem aufbauen',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Cloud-Speicher',
@@ -251,6 +254,7 @@ export const IT: SidebarLabels = {
   components: 'Componenti',
   variables: 'Variabili',
   checkingDesigns: 'Verificare i design',
+  research: 'Ricerca su una board',
   designSystem: 'Creare un design system',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Archiviazione cloud',
@@ -285,6 +289,7 @@ export const FR: SidebarLabels = {
   components: 'Composants',
   variables: 'Variables',
   checkingDesigns: 'Vérifier les designs',
+  research: 'Recherche sur un tableau',
   designSystem: 'Créer un design system',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Stockage cloud',
@@ -319,6 +324,7 @@ export const ES: SidebarLabels = {
   components: 'Componentes',
   variables: 'Variables',
   checkingDesigns: 'Revisar diseños',
+  research: 'Investigación en un tablero',
   designSystem: 'Crear un sistema de diseño',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Almacenamiento en la nube',
@@ -353,6 +359,7 @@ export const PL: SidebarLabels = {
   components: 'Komponenty',
   variables: 'Zmienne',
   checkingDesigns: 'Sprawdzanie projektów',
+  research: 'Badanie na tablicy',
   designSystem: 'Budowanie design systemu',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Przechowywanie w chmurze',
@@ -387,6 +394,7 @@ export const RU: SidebarLabels = {
   components: 'Компоненты',
   variables: 'Переменные',
   checkingDesigns: 'Проверка дизайна',
+  research: 'Исследование на доске',
   designSystem: 'Создание дизайн-системы',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Облачное хранилище',

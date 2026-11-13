@@ -60,6 +60,7 @@ pub fn run() {
     builder
         .manage(system::browser::BrowserWindowState::default())
         .manage(launch::PendingOpen::default())
+        .manage(launch::documents::OpenDocuments::default())
         .manage(ProxyHttpRequests::default())
         .manage(network::oauth::ChatGPTOAuthLoopback::default())
         .manage(agents::mcp_stdio::McpStdioProcesses::default())
@@ -113,6 +114,8 @@ pub fn run() {
             #[cfg(feature = "native-test")]
             menu::native_test_menu_outline,
             launch::take_pending_open,
+            launch::documents::claim_document,
+            launch::documents::release_document,
             launch::take_pending_rooms,
             system::env::sharing_disabled_by_env,
             launch::take_pending_cloud_links,
@@ -202,6 +205,11 @@ pub fn run() {
                 // The frontend asks about unsaved documents and exits when they agree.
                 let _ = _app.emit("menu-event", "quit");
             }
+            tauri::RunEvent::WindowEvent {
+                label,
+                event: tauri::WindowEvent::Destroyed,
+                ..
+            } => launch::documents::release_window(_app, &label),
             #[cfg(target_os = "macos")]
             tauri::RunEvent::Opened { urls } => {
                 let paths = urls

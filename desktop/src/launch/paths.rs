@@ -46,7 +46,7 @@ fn segment_eq(left: &str, right: &str) -> bool {
 /// or `..`-bearing `file`, but this is the comparison every caller funnels through, so it
 /// refuses them again rather than trusting its caller: an absolute suffix would otherwise
 /// match on its segments alone, turning `/etc/hikyo.pen` into a relative lookup.
-fn path_ends_with_segments(candidate: &Path, suffix: &str) -> bool {
+pub(crate) fn path_ends_with_segments(candidate: &Path, suffix: &str) -> bool {
     if suffix.starts_with('/') || suffix.starts_with('\\') || Path::new(suffix).is_absolute() {
         return false;
     }

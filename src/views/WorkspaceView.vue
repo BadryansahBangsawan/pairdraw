@@ -41,6 +41,7 @@ import {
 import { syncTabAddress } from '@/app/tabs/address'
 import { isTauri } from '@/app/tauri/env'
 import { offerUsageStatsPrompt, startSharing } from '@/app/telemetry'
+import { watchOpenDocuments } from '@/app/window/documents'
 import ColorSpaceBanner from '@/components/canvas/ColorSpaceBanner.vue'
 import { CloudVersionDialog } from '@/components/cloud/integration'
 import CommandPalette from '@/components/commands/CommandPalette.vue'
@@ -174,6 +175,7 @@ useEventListener(
 
 const fileAssociationCleanup = ref<(() => void) | null>(null)
 const roomLinksCleanup = ref<(() => void) | null>(null)
+const documentClaimsCleanup = ref<(() => void) | null>(null)
 
 /**
  * A drain that fails wholesale — the `take_pending_open` invoke, the event binding —
@@ -258,6 +260,8 @@ onMounted(async () => {
     reportOpenFailure(error)
   }
 
+  documentClaimsCleanup.value = watchOpenDocuments()
+
   try {
     roomLinksCleanup.value = await bindDesktopRoomLinks((roomId) => {
       if (!joinRoomFromInput(roomId)) toast.error(collaboration.value.invalidRoomLink)
@@ -286,6 +290,7 @@ onUnmounted(() => {
   stopEmbed?.()
   fileAssociationCleanup.value?.()
   roomLinksCleanup.value?.()
+  documentClaimsCleanup.value?.()
 })
 </script>
 

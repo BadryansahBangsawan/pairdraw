@@ -2,14 +2,18 @@
 //! `openpencil://` links, queued until the frontend takes them.
 
 pub mod args;
+pub mod documents;
 pub mod links;
 pub mod paths;
 
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Mutex;
 
 use tauri::{Emitter, Manager};
 use tauri_plugin_fs::FsExt;
+
+use crate::system::window::MAIN_WINDOW_LABEL;
 
 #[derive(Clone, serde::Serialize)]
 pub struct PendingOpenFile {
@@ -23,8 +27,14 @@ pub struct PendingOpenFile {
     deep_link: bool,
 }
 
+/// A file waiting for the window that will open it.
+struct PendingOpenEntry {
+    window: String,
+    file: PendingOpenFile,
+}
+
 #[derive(Default)]
-pub struct PendingOpen(Mutex<Vec<PendingOpenFile>>);
+pub struct PendingOpen(Mutex<Vec<PendingOpenEntry>>);
 
 /// Rooms from `openpencil://join` links, waiting for the frontend to open them.
 #[derive(Default)]
@@ -61,13 +71,50 @@ pub fn take_pending_rooms(state: tauri::State<PendingRooms>) -> Vec<String> {
         .unwrap_or_default()
 }
 
+/// Drains the files queued for the calling window. Another window's entries stay, so the file a
+/// person opened from Finder lands in the window that was in front, not in whichever window
+/// drains first.
 #[tauri::command]
-pub fn take_pending_open(state: tauri::State<PendingOpen>) -> Vec<PendingOpenFile> {
-    state
-        .0
-        .lock()
-        .map(|mut pending| pending.drain(..).collect())
-        .unwrap_or_default()
+pub fn take_pending_open<R: tauri::Runtime>(
+    state: tauri::State<PendingOpen>,
+    window: tauri::WebviewWindow<R>,
+) -> Vec<PendingOpenFile> {
+    let label = window.label();
+    let Ok(mut pending) = state.0.lock() else {
+        return Vec::new();
+    };
+    let mut mine = Vec::new();
+    let mut theirs = Vec::new();
+    for entry in pending.drain(..) {
+        if entry.window == label {
+            mine.push(entry.file);
+        } else {
+            theirs.push(entry);
+        }
+    }
+    *pending = theirs;
+    mine
+}
+
+/// The window an arriving file belongs to: the one already showing it, else the focused one,
+/// else the main window before any window has focus, as at launch.
+fn destination<R: tauri::Runtime>(app: &tauri::AppHandle<R>, path: &str) -> Option<String> {
+    let windows = app.webview_windows();
+    if let Some(owner) = documents::document_window(app, path) {
+        if windows.contains_key(&owner) {
+            return Some(owner);
+        }
+    }
+    if let Some((label, _)) = windows
+        .iter()
+        .find(|(_, window)| window.is_focused().unwrap_or(false))
+    {
+        return Some(label.clone());
+    }
+    if windows.contains_key(MAIN_WINDOW_LABEL) {
+        return Some(MAIN_WINDOW_LABEL.to_owned());
+    }
+    windows.keys().next().cloned()
 }
 
 fn queue_pending<R: tauri::Runtime>(app: &tauri::AppHandle<R>, files: Vec<PendingOpenFile>) {
@@ -75,13 +122,27 @@ fn queue_pending<R: tauri::Runtime>(app: &tauri::AppHandle<R>, files: Vec<Pendin
         return;
     }
 
-    if let Ok(mut pending) = app.state::<PendingOpen>().0.lock() {
-        pending.extend(files);
+    let mut by_window: HashMap<String, Vec<PendingOpenFile>> = HashMap::new();
+    for file in files {
+        if let Some(window) = destination(app, &file.path) {
+            by_window.entry(window).or_default().push(file);
+        }
     }
 
-    let _ = app.emit("open-associated-files", ());
-    if let Some(window) = app.get_webview_window("main") {
-        let _ = window.set_focus();
+    for (window, files) in by_window {
+        if let Ok(mut pending) = app.state::<PendingOpen>().0.lock() {
+            pending.extend(
+                files
+                    .into_iter()
+                    .map(|file| PendingOpenEntry { window: window.clone(), file }),
+            );
+        }
+        let _ = app.emit_to(window.as_str(), "open-associated-files", ());
+        if let Some(target) = app.get_webview_window(&window) {
+            let _ = target.unminimize();
+            let _ = target.show();
+            let _ = target.set_focus();
+        }
     }
 }
 

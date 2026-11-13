@@ -48,7 +48,9 @@ export async function runPluginFromPalette(id: string): Promise<PluginRunOutcome
   replaceInstalledPlugins(answered)
   const tab = activeTab.value
   const outcome = await runInstalledPlugin(answered, id, {
-    store: tab?.kind === 'document' ? tab.store : undefined
+    store: tab?.kind === 'document' ? tab.store : undefined,
+    // A grant taken away during the run applies to the next call, not the next run.
+    readPlugins: () => installedPlugins.value
   })
   if (!outcome.ok) toast.error(outcome.error)
   return outcome

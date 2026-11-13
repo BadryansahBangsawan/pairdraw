@@ -43,6 +43,11 @@ export interface PluginRunOptions {
   frame?: SandboxFrameFactory
   /** The document the plugin's calls reach; without it every call it makes fails. */
   store?: EditorStore
+  /**
+   * The installed list as it is now, read for every call. The app passes the store's live list,
+   * so disabling or removing the plugin during its run takes its grants away.
+   */
+  readPlugins?: () => readonly InstalledPlugin[]
 }
 
 function parseResultText(text: string): unknown {
@@ -144,7 +149,9 @@ export async function runInstalledPlugin(
   if (!plugin) return { ok: false, error: pluginRunMissingMessage(id) }
   if (!plugin.enabled) return { ok: false, error: PLUGIN_DISABLED_MESSAGE }
   if (!IS_BROWSER) return { ok: false, error: 'Plugins require a browser.' }
-  const host = options.store ? createPluginHost(options.store, plugins, id) : null
+  const host = options.store
+    ? createPluginHost(options.store, plugins, id, options.readPlugins)
+    : null
   let failed = true
   try {
     const frame = options.frame

@@ -34,11 +34,14 @@ function refusal(error: unknown): never {
 /**
  * Opens one plugin run against the document: a plugin's reads answer at once, its writes join a
  * single undo step closed by `finish`, and a call it was not granted fails without editing.
+ * `readPlugins` is read for every call, so disabling or removing the plugin during its run
+ * takes its grants away at once instead of letting the run keep what it started with.
  */
 export function createPluginHost(
   store: EditorStore,
   plugins: readonly InstalledPlugin[],
-  id: string
+  id: string,
+  readPlugins: () => readonly InstalledPlugin[] = () => plugins
 ): PluginHost {
   const figma = figmaFactory.makeFigmaFromStore(store)
   store.undo.beginBatch(`Plugin: ${id}`)
@@ -51,7 +54,7 @@ export function createPluginHost(
     const def = ALL_TOOLS.find((tool) => tool.name === name)
     if (!def) refusal(new Error(pluginCallUnknownMessage(name)))
     for (const capability of uniq(def.capabilities)) {
-      if (authorizePluginCall(plugins, id, capability) !== 'allowed') {
+      if (authorizePluginCall(readPlugins(), id, capability) !== 'allowed') {
         refusal(new Error(pluginCallDeniedMessage(capability)))
       }
     }

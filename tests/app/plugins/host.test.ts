@@ -5,7 +5,7 @@ import { FigmaAPI } from '@open-pencil/core/figma-api'
 
 import * as figmaFactory from '@/app/automation/bridge/figma-factory'
 import { createEditorStore } from '@/app/editor/session/create'
-import { installPlugin, setPluginEnabled } from '@/app/plugins/catalog'
+import { installPlugin, removePlugin, setPluginEnabled } from '@/app/plugins/catalog'
 import { grantPlugin } from '@/app/plugins/grants'
 import { PLUGIN_POINTER_CANCELLED_MESSAGE } from '@/app/plugins/messages'
 import {
@@ -120,6 +120,22 @@ test('a call the plugin was not granted fails and edits nothing', async () => {
   )
   expect(store.graph.getChildren(store.state.currentPageId)).toHaveLength(0)
   host.finish(false)
+})
+
+test('disabling or removing the plugin during its run takes its grants away', async () => {
+  const store = openDocument()
+  const live = { plugins: plugin(['document:write'], ['document:write']) }
+  const host = createPluginHost(store, live.plugins, 'marks', () => live.plugins)
+
+  live.plugins = [...setPluginEnabled(live.plugins, 'marks', false)]
+  await expect(host.call('create_shape', shape)).rejects.toThrow('was not granted')
+
+  live.plugins = plugin(['document:write'], ['document:write'])
+  live.plugins = removePlugin(live.plugins, 'marks')
+  await expect(host.call('create_shape', shape)).rejects.toThrow('was not granted')
+
+  expect(store.graph.getChildren(store.state.currentPageId)).toHaveLength(0)
+  host.finish(true)
 })
 
 test('an unknown tool fails by name', async () => {

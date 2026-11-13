@@ -430,6 +430,10 @@
         "label": "Insert Icon…"
       },
       {
+        "id": "insert-script",
+        "label": "Insert Script…"
+      },
+      {
         "type": "separator"
       },
       {

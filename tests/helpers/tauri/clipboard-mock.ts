@@ -33,7 +33,11 @@ const APP_COMMAND_RESULTS: Record<string, unknown> = {
   'plugin:event|listen': null,
   'plugin:event|unlisten': null,
   'plugin:process|exit': null,
-  'plugin:process|restart': null
+  'plugin:process|restart': null,
+  // The automation bridge asks whether this window is focused when it connects, and listens for
+  // focus changes, so the stand-in has to answer as one window that is focused.
+  'plugin:window|is_focused': true,
+  'plugin:window|on_focus_changed': null
 }
 
 export async function installTauriClipboardMock(page: Page): Promise<TauriClipboardMock> {

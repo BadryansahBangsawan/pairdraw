@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 
-import { createExitApproval } from '@/app/document/close/exit'
+import { createExitApproval, requestAppExit } from '@/app/document/close/exit'
 
 test('concurrent confirmations share one prompt run', async () => {
   let prompts = 0
@@ -46,4 +46,21 @@ test('a failed confirmation retries instead of caching the rejection', async () 
   expect(approval.isApproved()).toBe(false)
   expect(await approval.confirm()).toBe(true)
   expect(attempts).toBe(2)
+})
+
+// Quit is the app's: a window only reports its own documents, so one clean window cannot end the
+// process while another window still has unsaved work.
+test('a quit reports this window decision to the shell instead of exiting', async () => {
+  const answers: boolean[] = []
+  const io = (approved: boolean) => ({
+    confirmDocuments: async () => approved,
+    answerQuit: async (decision: boolean) => {
+      answers.push(decision)
+    }
+  })
+
+  await requestAppExit(io(true))
+  await requestAppExit(io(false))
+
+  expect(answers).toEqual([true, false])
 })

@@ -47,13 +47,26 @@ function confirmQuitDocuments(): Promise<boolean> {
   return quitConfirmation
 }
 
+export interface ExitIo {
+  /** This window's documents: drafts persisted, then each decided. */
+  confirmDocuments: () => Promise<boolean>
+  /** Tells the shell this window's answer; the shell owns the decision to exit. */
+  answerQuit: (approved: boolean) => Promise<void>
+}
+
+const nativeExitIo: ExitIo = {
+  confirmDocuments: confirmQuitDocuments,
+  answerQuit: async (approved) => {
+    const { invoke } = await import('@tauri-apps/api/core')
+    await invoke('answer_quit', { approved })
+  }
+}
+
 /**
  * Quit across every window. This window confirms only its own documents and reports the answer;
  * the shell exits once the last window agrees, or cancels the quit when one declines. The native
  * Quit item and the platform's exit request both arrive here as a `quit` menu event.
  */
-export async function requestAppExit(): Promise<void> {
-  const approved = await confirmQuitDocuments()
-  const { invoke } = await import('@tauri-apps/api/core')
-  await invoke('answer_quit', { approved })
+export async function requestAppExit(io: ExitIo = nativeExitIo): Promise<void> {
+  await io.answerQuit(await io.confirmDocuments())
 }

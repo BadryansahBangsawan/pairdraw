@@ -13,6 +13,7 @@ import { recentDocuments } from '@/app/recent-files'
 import { recentFilesLimit } from '@/app/recent-files/preferences'
 import { appPreferences } from '@/app/settings/preferences/store'
 import { createTab, getActiveStore, getActiveTabId, getTabById, getTabsSnapshot } from '@/app/tabs'
+import { windowDocumentId } from '@/app/window/identity'
 
 import { asDouble } from '#tests/helpers/doubles'
 import { testPath } from '#tests/helpers/paths'
@@ -89,7 +90,8 @@ describe('activate_document', () => {
     )
 
     expect(response.result).toEqual({ activated: true })
-    expect(response.target).toMatchObject({ documentId: background.id, pageId })
+    // The reply leaves this window, so its document id names the window.
+    expect(response.target).toMatchObject({ documentId: windowDocumentId(background.id), pageId })
     expect(getActiveTabId()).toBe(background.id)
     expect(background.store.state.currentPageId).toBe(pageId)
   })

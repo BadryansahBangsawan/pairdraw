@@ -12,6 +12,7 @@ import { installCanvasKitBinary, preloadCanvasKit } from '@/app/editor/canvas/ca
 import { preloadFonts } from '@/app/editor/fonts'
 import { installBundledFonts } from '@/app/editor/fonts/bundled'
 import { observeBootErrors } from '@/app/shell/support/boot'
+import { installWindowIdentity } from '@/app/window/identity'
 import { reportBootFailure } from '@/app/shell/support/gate'
 import { IS_TAURI } from '@/constants'
 
@@ -31,6 +32,8 @@ export async function boot(): Promise<void> {
   installCanvasKitBinary()
   preloadCanvasKit()
   preloadFonts()
+  // Before the UI mounts: every tab and every document id must already know which window it is in.
+  await installWindowIdentity()
   const head = createHead()
   const app = createApp(App)
   const bootErrors = observeBootErrors(app)

@@ -2,6 +2,7 @@ import type { AutomationDocumentSummary } from '@open-pencil/core/rpc'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { getTabById, getTabForStore, getTabsSnapshot } from '@/app/tabs'
+import { localDocumentId, windowDocumentId } from '@/app/window/identity'
 import { APP_NAME } from '@/constants'
 
 export type UnknownRecord = { [key: string]: unknown }
@@ -33,7 +34,8 @@ export function stripAutomationTargetArgs(args: UnknownRecord): UnknownRecord {
 
 export function targetToResult(target: AutomationTarget): AutomationTargetResult {
   return {
-    documentId: target.documentId,
+    // Replies leave the realm, so the id they carry names its window.
+    documentId: windowDocumentId(target.documentId),
     documentName: target.documentName,
     ...(target.path ? { path: target.path } : {}),
     pageId: target.pageId,
@@ -59,7 +61,7 @@ export function listAutomationDocuments(activeStore: EditorStore): AutomationDoc
     const currentPage = tab.store.graph.getNode(tab.store.state.currentPageId)
     const path = tab.store.getDocumentFilePath()
     return {
-      id: tab.id,
+      id: windowDocumentId(tab.id),
       name: tab.store.state.documentName,
       ...(path ? { path } : {}),
       active: tab.id === activeTab?.id,
@@ -79,7 +81,12 @@ export function resolveAutomationTarget(
   args: AutomationTargetArgs | undefined
 ): AutomationTarget {
   const requestedDocumentId = readString(args?.document_id)
-  const tab = requestedDocumentId ? getTabById(requestedDocumentId) : getTabForStore(activeStore)
+  // An id from outside may name another window; that window's document is not ours to answer for.
+  const localId = requestedDocumentId ? localDocumentId(requestedDocumentId) : null
+  if (requestedDocumentId && !localId) {
+    throw new Error(`Document "${requestedDocumentId}" is not open in this window`)
+  }
+  const tab = localId ? getTabById(localId) : getTabForStore(activeStore)
   if (!tab) {
     throw new Error(
       requestedDocumentId

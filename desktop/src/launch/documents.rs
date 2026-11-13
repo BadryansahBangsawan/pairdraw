@@ -203,4 +203,30 @@ mod tests {
         documents.claim("", "main");
         assert_eq!(documents.owner(""), None);
     }
+
+    #[test]
+    fn an_unowned_file_opened_while_the_browser_is_focused_goes_to_an_editor() {
+        let labels = vec![
+            "main".to_owned(),
+            "browser".to_owned(),
+            "editor-2".to_owned(),
+        ];
+        assert_eq!(
+            crate::system::window::unowned_file_window(Some("browser"), &labels).as_deref(),
+            Some("main")
+        );
+        assert_eq!(
+            crate::system::window::unowned_file_window(Some("updater"), &labels).as_deref(),
+            Some("main")
+        );
+        assert_eq!(
+            crate::system::window::unowned_file_window(Some("editor-2"), &labels).as_deref(),
+            Some("editor-2")
+        );
+        let no_main = vec!["browser".to_owned(), "editor-2".to_owned()];
+        assert_eq!(
+            crate::system::window::unowned_file_window(Some("browser"), &no_main).as_deref(),
+            Some("editor-2")
+        );
+    }
 }

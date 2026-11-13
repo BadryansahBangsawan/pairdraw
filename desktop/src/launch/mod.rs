@@ -13,7 +13,7 @@ use std::sync::Mutex;
 use tauri::{Emitter, Manager};
 use tauri_plugin_fs::FsExt;
 
-use crate::system::window::{focus, focused_window, MAIN_WINDOW_LABEL};
+use crate::system::window::{focus, focused_window};
 
 #[derive(Clone, serde::Serialize)]
 pub struct PendingOpenFile {
@@ -96,8 +96,8 @@ pub fn take_pending_open<R: tauri::Runtime>(
     mine
 }
 
-/// The window an arriving file belongs to: the one already showing it, else the focused one,
-/// else the main window before any window has focus, as at launch.
+/// The window an arriving file belongs to: the one already showing it, else the focused editor,
+/// else the main window. The browser and the updater are never a destination.
 fn destination<R: tauri::Runtime>(app: &tauri::AppHandle<R>, path: &str) -> Option<String> {
     let windows = app.webview_windows();
     if let Some(owner) = documents::document_window(app, path) {
@@ -105,16 +105,14 @@ fn destination<R: tauri::Runtime>(app: &tauri::AppHandle<R>, path: &str) -> Opti
             return Some(owner);
         }
     }
-    if let Some((label, _)) = windows
-        .iter()
-        .find(|(_, window)| window.is_focused().unwrap_or(false))
-    {
-        return Some(label.clone());
-    }
-    if windows.contains_key(MAIN_WINDOW_LABEL) {
-        return Some(MAIN_WINDOW_LABEL.to_owned());
-    }
-    windows.keys().next().cloned()
+    let focused = windows.iter().find_map(|(label, window)| {
+        window
+            .is_focused()
+            .unwrap_or(false)
+            .then(|| label.clone())
+    });
+    let labels = windows.keys().cloned().collect::<Vec<_>>();
+    crate::system::window::unowned_file_window(focused.as_deref(), &labels)
 }
 
 /// Whether an open belongs to another window that already shows the file. The caller then focuses

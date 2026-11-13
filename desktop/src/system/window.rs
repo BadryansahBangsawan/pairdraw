@@ -76,6 +76,23 @@ pub fn is_editor_label(label: &str) -> bool {
     label == MAIN_WINDOW_LABEL || label.starts_with(EDITOR_LABEL_PREFIX)
 }
 
+/// The window an unowned arriving file is delivered to. The browser and the updater are not
+/// editors: a file queued to either label is never opened, so a focused one falls through to
+/// `main`, then to any editor.
+pub fn unowned_file_window(focused: Option<&str>, labels: &[String]) -> Option<String> {
+    if focused.is_some_and(is_editor_label) {
+        return focused.map(str::to_owned);
+    }
+    if labels.iter().any(|label| label == MAIN_WINDOW_LABEL) {
+        return Some(MAIN_WINDOW_LABEL.to_owned());
+    }
+    labels
+        .iter()
+        .filter(|label| is_editor_label(label))
+        .min()
+        .cloned()
+}
+
 /// The window a command belongs to: the one with focus among the editor windows. Before any
 /// window has focus, as during startup, the main window stands in; with several and none focused,
 /// any editor window does.

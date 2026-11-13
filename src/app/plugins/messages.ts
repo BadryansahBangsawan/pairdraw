@@ -22,3 +22,9 @@ export function pluginGrantMissingMessage(id: string): string {
 export function pluginGrantNotRequestedMessage(capability: string): string {
   return `This plugin did not ask for "${capability}".`
 }
+
+export const PLUGIN_DISABLED_MESSAGE = 'Enable this plugin before running it.'
+
+export function pluginRunMissingMessage(id: string): string {
+  return `No plugin with the id "${id}" is installed.`
+}

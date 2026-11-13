@@ -645,7 +645,9 @@
         "src/app/code/sandbox/frame.ts",
         "src/app/code/sandbox/worker/index.ts",
         "src/app/code/script/sandbox/frame.ts",
-        "src/app/code/script/sandbox/worker/index.ts"
+        "src/app/code/script/sandbox/worker/index.ts",
+        "src/app/plugins/sandbox/frame.ts",
+        "src/app/plugins/sandbox/worker/index.ts"
       ],
       "rules": {
         "unicorn/require-post-message-target-origin": "off"
@@ -657,7 +659,10 @@
         "src/app/code/sandbox/frame.ts",
         "src/app/code/script/sandbox/evaluate.ts",
         "src/app/code/script/sandbox/frame.ts",
-        "src/app/code/script/sandbox/iframe.ts"
+        "src/app/code/script/sandbox/iframe.ts",
+        "src/app/plugins/sandbox/frame.ts",
+        "src/app/plugins/sandbox/iframe.ts",
+        "src/app/runtime/sandbox-iframe.ts"
       ],
       "rules": {
         "import/default": "off"

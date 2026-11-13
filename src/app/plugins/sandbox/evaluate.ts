@@ -188,7 +188,11 @@ export async function runInstalledPlugin(
     return outcome
   } finally {
     // The host also gives the canvas pointer back when the run ends.
-    host?.finish(failed)
-    endRun()
+    try {
+      host?.finish(failed)
+    } finally {
+      // Closing the undo step can throw; the next run must still be able to start.
+      endRun()
+    }
   }
 }

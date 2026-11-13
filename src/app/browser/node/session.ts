@@ -19,9 +19,24 @@ export interface BrowserNodeActions {
   screenshot(): Promise<Uint8Array>
 }
 
+/**
+ * The page-load wait a refresh arms before it moves the window. `begin` is called in the same
+ * turn the navigation was requested: a report that arrived earlier is the previous page.
+ */
+export interface BrowserNodeLoadWait {
+  /** Resolves once the page-report listener is attached. */
+  armed: Promise<void>
+  begin(): void
+  /** Resolves with the address the page finished on. Rejects when the deadline passes. */
+  done: Promise<string>
+  /** Drops the listener and the deadline. A later report does nothing. */
+  cancel(): void
+}
+
 /** A refresh may also move the window that is already open. It never opens a closed one. */
 export interface BrowserNodeRefreshActions extends BrowserNodeActions {
   navigate(url: string): Promise<void>
+  waitForLoad(): BrowserNodeLoadWait
 }
 
 export type BrowserNodeOutcome = { ok: true; id: string } | { ok: false; error: string }

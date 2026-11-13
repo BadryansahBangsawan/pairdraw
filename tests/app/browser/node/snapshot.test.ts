@@ -11,7 +11,11 @@ import {
   createBrowserNode,
   refreshBrowserNode
 } from '@/app/browser/node/command'
-import type { BrowserNodeOutcome, BrowserNodeSession } from '@/app/browser/node/session'
+import type {
+  BrowserNodeOutcome,
+  BrowserNodeRefreshActions,
+  BrowserNodeSession
+} from '@/app/browser/node/session'
 import { markClosed, markNavigating, setDevice } from '@/app/browser/state'
 import { BROWSER_DESKTOP_ONLY, BROWSER_WINDOW_CLOSED, browserToolCall } from '@/app/browser/tools'
 import { browserURLPolicy } from '@/app/browser/url'
@@ -49,6 +53,35 @@ function address(input: string): string {
   const policy = browserURLPolicy(input)
   if (!policy.ok) throw new Error(input)
   return policy.url
+}
+
+/** Resolves the load in the same turn the refresh asks the window to move. */
+function loadWhenMoved(order?: string[]): BrowserNodeRefreshActions['waitForLoad'] {
+  return () => {
+    order?.push('arm')
+    let resolveDone: (url: string) => void = () => undefined
+    const done = new Promise<string>((resolve) => {
+      resolveDone = resolve
+    })
+    return {
+      armed: Promise.resolve(),
+      begin() {
+        order?.push('begin')
+        resolveDone(address(PAGE))
+      },
+      done,
+      cancel() {
+        order?.push('cancel')
+      }
+    }
+  }
+}
+
+/** A refresh that is already on the stored page must not arm a load wait. */
+function loadNotArmed(): BrowserNodeRefreshActions['waitForLoad'] {
+  return () => {
+    throw new Error('refresh waited for a load without moving the page')
+  }
 }
 
 function idOf(result: BrowserNodeOutcome): string {
@@ -199,7 +232,8 @@ describe('refreshing a browser snapshot', () => {
         navigate: () => {
           moved += 1
           return Promise.resolve()
-        }
+        },
+        waitForLoad: loadNotArmed()
       },
       LATER
     )
@@ -246,11 +280,12 @@ describe('refreshing a browser snapshot', () => {
         screenshot: () => {
           order.push('shot')
           return Promise.resolve(WIDE)
-        }
+        },
+        waitForLoad: loadWhenMoved(order)
       },
       LATER
     )
-    expect(order).toEqual([address(PAGE), 'shot'])
+    expect(order).toEqual(['arm', address(PAGE), 'begin', 'shot'])
 
     const kept = await refreshBrowserNodeFromPage(
       graph,
@@ -261,7 +296,8 @@ describe('refreshing a browser snapshot', () => {
         screenshot: () => {
           order.push('late')
           return Promise.resolve(PNG)
-        }
+        },
+        waitForLoad: loadWhenMoved(order)
       },
       WHEN
     )
@@ -271,6 +307,96 @@ describe('refreshing a browser snapshot', () => {
       width: 2,
       refreshedAt: LATER
     })
+  })
+
+  test('a refresh pictures the page only after that page has loaded', async () => {
+    const graph = editor()
+    const id = await snapshot(graph)
+    const before = structuredClone(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] }))
+    const order: string[] = []
+    let release: (url: string) => void = () => undefined
+    const pending = refreshBrowserNodeFromPage(
+      graph,
+      id,
+      session({ url: 'https://other.example/' }),
+      {
+        waitForLoad: () => {
+          order.push('arm')
+          return {
+            armed: Promise.resolve(),
+            begin: () => {
+              order.push('begin')
+            },
+            done: new Promise<string>((resolve) => {
+              release = resolve
+            }),
+            cancel: () => {
+              order.push('cancel')
+            }
+          }
+        },
+        navigate: (url) => {
+          order.push(url)
+          return Promise.resolve()
+        },
+        screenshot: () => {
+          order.push('shot')
+          return Promise.resolve(WIDE)
+        }
+      },
+      LATER
+    )
+    for (let step = 0; step < 8; step += 1) await Promise.resolve()
+    expect(order[0]).toBe('arm')
+    expect(order).not.toContain('shot')
+    expect(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] })).toEqual(before)
+
+    release(address(PAGE))
+    expect(await pending).toEqual({ ok: true, id })
+    expect(order.indexOf('arm')).toBeLessThan(order.indexOf(address(PAGE)))
+    expect(order.indexOf(address(PAGE))).toBeLessThan(order.indexOf('begin'))
+    expect(order.indexOf('begin')).toBeLessThan(order.indexOf('shot'))
+    expect(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] })).toMatchObject({
+      width: 2,
+      refreshedAt: LATER
+    })
+  })
+
+  test('a page that does not finish loading leaves the snapshot unchanged', async () => {
+    const graph = editor()
+    const id = await snapshot(graph)
+    const before = structuredClone(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] }))
+    const missed = Promise.reject(new Error('The page did not finish loading.'))
+    missed.catch(() => undefined)
+    let shots = 0
+    let cancelled = false
+    const result = await refreshBrowserNodeFromPage(
+      graph,
+      id,
+      session({ url: 'https://other.example/' }),
+      {
+        waitForLoad: () => ({
+          armed: Promise.resolve(),
+          begin: () => undefined,
+          done: missed,
+          cancel: () => {
+            cancelled = true
+          }
+        }),
+        navigate: () => Promise.resolve(),
+        screenshot: () => {
+          shots += 1
+          return Promise.resolve(WIDE)
+        }
+      },
+      LATER
+    )
+    expect(result.ok).toBe(false)
+    expect(shots).toBe(0)
+    expect(cancelled).toBe(true)
+    expect(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] })).toEqual(before)
+    graph.undoAction()
+    expect(graph.graph.getNode(id)).toBeUndefined()
   })
 
   test('a closed window and the browser build leave the layer alone', async () => {
@@ -291,7 +417,8 @@ describe('refreshing a browser snapshot', () => {
           screenshot: () => {
             calls += 1
             return Promise.resolve(WIDE)
-          }
+          },
+          waitForLoad: loadNotArmed()
         },
         LATER
       )
@@ -316,7 +443,8 @@ describe('refreshing a browser snapshot', () => {
       screenshot: () => {
         calls += 1
         return Promise.resolve(PNG)
-      }
+      },
+      waitForLoad: loadNotArmed()
     }
     expect(await refreshBrowserNodeFromPage(graph, plain, session(), actions, LATER)).toEqual({
       ok: false,

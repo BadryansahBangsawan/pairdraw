@@ -153,6 +153,16 @@ export async function captureBrowserElement(): Promise<string> {
   return html
 }
 
+/** The next `browser:page` report. The caller unsubscribes; this does not change session state. */
+export async function listenForBrowserPage(
+  handler: (payload: unknown) => void
+): Promise<() => void> {
+  const { listen } = await tauri()
+  return listen('browser:page', (event) => {
+    handler(event.payload)
+  })
+}
+
 /**
  * Follows the window for as long as the caller is mounted: the page it shows, and the window
  * going away however the user closed it. Returns the unsubscribe.

@@ -3,8 +3,9 @@ import type { Editor } from '@open-pencil/core'
 import { IS_TAURI } from '@/constants'
 
 import { browserState } from '../state'
-import { navigateBrowserWindow, screenshotBrowser } from '../window'
+import { listenForBrowserPage, navigateBrowserWindow, screenshotBrowser } from '../window'
 import { createBrowserNodeFromPage, refreshBrowserNodeFromPage } from './apply'
+import { BROWSER_SNAPSHOT_LOAD_MS, waitForBrowserPage } from './load'
 import type { BrowserNodeSession } from './session'
 
 /** The window session this build has now. A browser tab reports that it is not the desktop app. */
@@ -41,7 +42,12 @@ export function refreshBrowserNode(editor: Editor, nodeId: string) {
     browserNodeSession(),
     {
       screenshot: () => screenshotBrowser('visible'),
-      navigate: (url) => navigateBrowserWindow(url)
+      navigate: (url) => navigateBrowserWindow(url),
+      waitForLoad: () =>
+        waitForBrowserPage({
+          listen: listenForBrowserPage,
+          deadlineMs: BROWSER_SNAPSHOT_LOAD_MS
+        })
     },
     new Date().toISOString()
   )

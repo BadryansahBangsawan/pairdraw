@@ -16,6 +16,7 @@ import {
 } from './picture'
 import type {
   BrowserNodeActions,
+  BrowserNodeLoadWait,
   BrowserNodeOutcome,
   BrowserNodeRefreshActions,
   BrowserNodeSession
@@ -53,8 +54,9 @@ export async function createBrowserNodeFromPage(
 
 /**
  * Replaces a snapshot's picture and the time it was taken, in one undo step. When the open page
- * is a different address, the already-open window is moved to the stored address first. A closed
- * window is not opened. A failed move or a failed picture leaves the layer as it was.
+ * is a different address, the already-open window is moved to the stored address and the picture
+ * is taken only after that page has loaded. A closed window is not opened. A missed load or a
+ * failed picture leaves the layer as it was.
  */
 export async function refreshBrowserNodeFromPage(
   editor: Canvas,
@@ -96,9 +98,18 @@ async function showStoredPage(
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const open = browserNodeAddress(session.url ?? '')
   if (open.ok && open.url === url) return { ok: true }
+  // Subscribe before the move, then accept a report only once the move has been requested.
+  // Otherwise a fast load is missed, or the previous page is stored with the new address.
+  let wait: BrowserNodeLoadWait | null = null
   try {
-    await actions.navigate(url)
+    wait = actions.waitForLoad()
+    await wait.armed
+    const moving = actions.navigate(url)
+    wait.begin()
+    await moving
+    await wait.done
   } catch (error) {
+    wait?.cancel()
     return { ok: false, error: browserNodeActionError(error) }
   }
   return { ok: true }

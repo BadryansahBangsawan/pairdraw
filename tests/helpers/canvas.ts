@@ -10,6 +10,9 @@ import { OFFICIAL_CLOUD_URL } from '@/constants'
  */
 const OFFICIAL_CLOUD_ORIGIN = new URL(OFFICIAL_CLOUD_URL).origin
 
+/** The app binds `$mod` to Meta on macOS and to Control elsewhere. */
+const PRIMARY_MODIFIER = process.platform === 'darwin' ? 'Meta' : 'Control'
+
 export class CanvasHelper {
   readonly page: Page
   readonly canvas: Locator
@@ -139,7 +142,7 @@ export class CanvasHelper {
   }
 
   async pressKey(key: string) {
-    await this.page.keyboard.press(key)
+    await this.page.keyboard.press(key.replace(/^Meta\+/, `${PRIMARY_MODIFIER}+`))
   }
 
   async drawRect(x: number, y: number, width: number, height: number) {

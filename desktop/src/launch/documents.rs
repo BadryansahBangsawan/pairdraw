@@ -58,14 +58,33 @@ impl OpenDocuments {
             .and_then(|documents| documents.get(&document_key(path)).cloned())
     }
 
-    /// A link's path is relative to the repository the user works in, so it is matched by its
-    /// trailing segments, the way `path_matches_suffix` resolves it against open tabs.
-    fn owner_by_suffix(&self, suffix: &str) -> Option<String> {
-        let documents = self.0.lock().ok()?;
-        documents
+    /// The windows whose files end with a relative link's path, sorted so the list never follows
+    /// map iteration order.
+    fn owners_by_suffix(&self, suffix: &str) -> Vec<String> {
+        let Ok(documents) = self.0.lock() else {
+            return Vec::new();
+        };
+        let mut owners: Vec<String> = documents
             .iter()
-            .find(|(candidate, _)| super::paths::path_ends_with_segments(candidate, suffix))
+            .filter(|(candidate, _)| super::paths::path_ends_with_segments(candidate, suffix))
             .map(|(_, owner)| owner.clone())
+            .collect();
+        owners.sort();
+        owners.dedup();
+        owners
+    }
+}
+
+/// Picks among windows whose files match a relative link. One match is the answer. Several are
+/// ambiguous, so the focused window decides only if it is one of them; otherwise the caller keeps
+/// its usual routing rather than following a map's order.
+fn choose_owner(owners: &[String], focused: Option<&str>) -> Option<String> {
+    match owners {
+        [] => None,
+        [only] => Some(only.clone()),
+        _ => focused
+            .filter(|focused| owners.iter().any(|owner| owner == focused))
+            .map(str::to_owned),
     }
 }
 
@@ -92,9 +111,13 @@ pub fn release_document<R: tauri::Runtime>(
 pub fn document_window<R: tauri::Runtime>(app: &tauri::AppHandle<R>, path: &str) -> Option<String> {
     use tauri::Manager;
     let documents = app.state::<OpenDocuments>();
-    documents
-        .owner(path)
-        .or_else(|| documents.owner_by_suffix(path))
+    if let Some(owner) = documents.owner(path) {
+        return Some(owner);
+    }
+    let owners = documents.owners_by_suffix(path);
+    let focused = crate::system::window::focused_window(app)
+        .map(|window| window.label().to_owned());
+    choose_owner(&owners, focused.as_deref())
 }
 
 /// Forgets the documents of a window that closed; a claim to a window that is gone would send
@@ -106,7 +129,7 @@ pub fn release_window<R: tauri::Runtime>(app: &tauri::AppHandle<R>, window: &str
 
 #[cfg(test)]
 mod tests {
-    use super::OpenDocuments;
+    use super::{choose_owner, OpenDocuments};
 
     #[test]
     fn a_claim_names_the_window_until_it_releases_it() {
@@ -140,13 +163,38 @@ mod tests {
         let documents = OpenDocuments::default();
         documents.claim("/repo/web/design/hikyo.pen", "editor-2");
         assert_eq!(
-            documents
-                .owner_by_suffix("web/design/hikyo.pen")
-                .as_deref(),
-            Some("editor-2")
+            documents.owners_by_suffix("web/design/hikyo.pen"),
+            vec!["editor-2"]
         );
-        assert_eq!(documents.owner_by_suffix("design/other.pen"), None);
-        assert_eq!(documents.owner_by_suffix("/repo/web/design/hikyo.pen"), None);
+        assert!(documents.owners_by_suffix("design/other.pen").is_empty());
+        assert!(documents
+            .owners_by_suffix("/repo/web/design/hikyo.pen")
+            .is_empty());
+        assert_eq!(
+            choose_owner(&["editor-2".to_owned()], None),
+            Some("editor-2".to_owned())
+        );
+    }
+
+    #[test]
+    fn a_suffix_shared_by_two_windows_does_not_follow_map_order() {
+        let documents = OpenDocuments::default();
+        documents.claim("/repo/a/web/design/hikyo.pen", "editor-2");
+        documents.claim("/repo/b/web/design/hikyo.pen", "main");
+
+        let owners = documents.owners_by_suffix("web/design/hikyo.pen");
+        assert_eq!(owners, vec!["editor-2", "main"]);
+
+        assert_eq!(choose_owner(&owners, None), None);
+        assert_eq!(
+            choose_owner(&owners, Some("main")),
+            Some("main".to_owned())
+        );
+        assert_eq!(
+            choose_owner(&owners, Some("editor-2")),
+            Some("editor-2".to_owned())
+        );
+        assert_eq!(choose_owner(&owners, Some("updater")), None);
     }
 
     #[test]

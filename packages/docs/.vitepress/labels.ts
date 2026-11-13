@@ -22,6 +22,7 @@ export interface SidebarLabels {
   checkingDesigns: string
   research: string
   prototype: string
+  plugins: string
   designSystem: string
   openPencilCloud: string
   cloudStorage: string
@@ -187,6 +188,7 @@ export const EN: SidebarLabels = {
   checkingDesigns: 'Checking Designs',
   research: 'Research on a Board',
   prototype: 'Playing a Prototype',
+  plugins: 'Plugins',
   designSystem: 'Building a Design System',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Cloud Storage',
@@ -223,6 +225,7 @@ export const DE: SidebarLabels = {
   checkingDesigns: 'Designs prüfen',
   research: 'Recherche auf einem Board',
   prototype: 'Prototyp abspielen',
+  plugins: 'Plugins',
   designSystem: 'Ein Designsystem aufbauen',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Cloud-Speicher',
@@ -259,6 +262,7 @@ export const IT: SidebarLabels = {
   checkingDesigns: 'Verificare i design',
   research: 'Ricerca su una board',
   prototype: 'Riprodurre un prototipo',
+  plugins: 'Plugin',
   designSystem: 'Creare un design system',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Archiviazione cloud',
@@ -295,6 +299,7 @@ export const FR: SidebarLabels = {
   checkingDesigns: 'Vérifier les designs',
   research: 'Recherche sur un tableau',
   prototype: 'Lire un prototype',
+  plugins: 'Extensions',
   designSystem: 'Créer un design system',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Stockage cloud',
@@ -331,6 +336,7 @@ export const ES: SidebarLabels = {
   checkingDesigns: 'Revisar diseños',
   research: 'Investigación en un tablero',
   prototype: 'Reproducir un prototipo',
+  plugins: 'Complementos',
   designSystem: 'Crear un sistema de diseño',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Almacenamiento en la nube',
@@ -367,6 +373,7 @@ export const PL: SidebarLabels = {
   checkingDesigns: 'Sprawdzanie projektów',
   research: 'Badanie na tablicy',
   prototype: 'Odtwarzanie prototypu',
+  plugins: 'Wtyczki',
   designSystem: 'Budowanie design systemu',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Przechowywanie w chmurze',
@@ -403,6 +410,7 @@ export const RU: SidebarLabels = {
   checkingDesigns: 'Проверка дизайна',
   research: 'Исследование на доске',
   prototype: 'Воспроизведение прототипа',
+  plugins: 'Плагины',
   designSystem: 'Создание дизайн-системы',
   openPencilCloud: 'Pairdraw Cloud',
   cloudStorage: 'Облачное хранилище',

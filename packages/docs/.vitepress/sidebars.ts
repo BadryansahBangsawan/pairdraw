@@ -61,6 +61,7 @@ export const userGuideSidebar = (
       { text: labels.checkingDesigns, link: '/user-guide/checking-designs' },
       { text: labels.research, link: '/user-guide/research' },
       { text: labels.prototype, link: '/user-guide/playing-a-prototype' },
+      { text: labels.plugins, link: '/user-guide/plugins' },
     ],
   },
 ]

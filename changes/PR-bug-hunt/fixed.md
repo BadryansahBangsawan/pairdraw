@@ -1,1 +1,11 @@
 - The chat says in your language why more images than a message holds cannot be attached.
+- Reopening a document the app recovered no longer crashes the window, and the chat still finds the files it was given.
+- Screen readers announce an assistant reply as it streams in, instead of only reading it when you move to it.
+- Labels for calendar months, the canvas and split menus, the mobile toolbar, document preparation, and fill and stroke history follow the app's language, and the mobile toolbar's previous and next buttons are named for screen readers.
+- The image drop overlay's label stays readable in the light theme instead of blending into its background.
+- Canvas menus have names screen readers can read, and the initials on a person's avatar use a text colour that stays readable on their colour.
+- The follow frame darkens a person's colour enough for its text to stay readable once the colour is rounded.
+- Dropping a document and some files on the chat opens the document and attaches the files, instead of also reporting the files as documents it cannot open.
+- Home lists the libraries from storage when storage is the chosen catalog, before the library manager is opened.
+- A picker opened from the app menu, such as Insert Icon…, stays open instead of closing with the menu.
+- Muted and success text on tinted backgrounds meets WCAG AA, so helper text, chips, and a tool call's done icon are easier to read.

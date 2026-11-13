@@ -8,6 +8,21 @@ import { waitForDemo } from '#tests/helpers/demo'
 // so no coding agent can be found either.
 test.use({ storageState: { cookies: [], origins: [] } })
 
+// `waitForAppBoot` allows a cold dev server thirty seconds for the first load, but a test here has
+// fifteen, and the first one spent them on that load. Booting once beforehand, under the boot
+// allowance, leaves each test its own time.
+const BOOT_HOOK_TIMEOUT_MS = 61_000
+test.beforeAll(async ({ browser }) => {
+  test.setTimeout(BOOT_HOOK_TIMEOUT_MS)
+  const page = await browser.newPage()
+  try {
+    await page.goto('/', { timeout: 30_000 })
+    await waitForAppBoot(page)
+  } finally {
+    await page.close()
+  }
+})
+
 test('a fresh install opens no setup dialog, then or after a reload', async ({ page }) => {
   await page.goto('/')
   await waitForAppBoot(page)

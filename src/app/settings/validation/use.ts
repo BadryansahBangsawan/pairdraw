@@ -1,3 +1,4 @@
+import { isEqual } from 'es-toolkit'
 import type { GenericSchema } from 'valibot'
 import { useForm } from 'vee-validate'
 import { watch, type Ref } from 'vue'
@@ -43,7 +44,15 @@ export function useSettingsValidation(
   return {
     errors: form.errors,
     blur: (field: string) => form.validateField(field),
-    validate: async () => (await form.validate()).valid,
+    /**
+     * Whether the values it was asked about are valid. The check is asynchronous, and a field
+     * edited while it runs makes it answer for values nobody submitted, so that answer is no.
+     */
+    validate: async () => {
+      const submitted = { ...values.value }
+      const result = await form.validate()
+      return result.valid && isEqual(submitted, values.value)
+    },
     reset: () => form.resetForm({ values: { ...values.value } }, { force: true })
   }
 }

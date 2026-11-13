@@ -41,7 +41,7 @@ Both read the browser's own capture. Only that capture is accepted; other HTML i
 
 ## Screenshots onto the Canvas
 
-The three screenshot buttons put a PNG on the canvas as an image layer, named **View**, **Page**, or **Element**:
+The three screenshot buttons put a PNG on the canvas as an image layer, named after the button — **Screenshot of the view**, **Screenshot of the page**, or **Screenshot of an element**:
 
 - **Screenshot of the view** is the part of the page the window shows.
 - **Screenshot of the page** grows the window to the document's size first — up to 2048 by 4096 — and restores the size afterwards. A longer page is cut there.

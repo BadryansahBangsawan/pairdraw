@@ -93,6 +93,11 @@ describe('MCP exposes the agent tools for code, space, and change review', () =>
     })
     expect(descriptors.get('browser_read_element')?.description).toContain('untrusted')
     expect(descriptors.get('browser_read_outline')?.description).toContain('untrusted')
+    expect(descriptors.get('browser_snapshot')).toMatchObject({
+      effect: 'write',
+      availability: 'default',
+      capabilities: ['document:write']
+    })
     expect(descriptors.has('browser_cdp')).toBe(false)
     expect(definitions.has('browser_load_page')).toBe(false)
   })

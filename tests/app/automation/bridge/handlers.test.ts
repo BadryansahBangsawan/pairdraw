@@ -492,7 +492,8 @@ describe('browser tools', () => {
     'browser_element',
     'browser_screenshot_to_canvas',
     'browser_read_element',
-    'browser_read_outline'
+    'browser_read_outline',
+    'browser_snapshot'
   ])('%s fails in a browser build before it touches the window', async (command) => {
     createTab()
     await expect(request(command, { url: 'https://example.com', kind: 'visible' })).rejects.toThrow(

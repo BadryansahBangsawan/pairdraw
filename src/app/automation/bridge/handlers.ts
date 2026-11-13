@@ -9,6 +9,7 @@ import {
   handleUndo,
   handleUpdateSettings
 } from '@/app/automation/bridge/app-handlers'
+import { handleBrowserSnapshot } from '@/app/automation/bridge/browser-snapshot'
 import { createAutomationEvalHandler } from '@/app/automation/bridge/eval-handler'
 import { handleExport, handleExportJSX } from '@/app/automation/bridge/export-handlers'
 import { createFileHandlers, type AutomationFiles } from '@/app/automation/bridge/file-handlers'
@@ -109,6 +110,9 @@ export function createAutomationCommandHandlers(makeFigma: FigmaFactory, files?:
     }
     if (command === 'get_settings') return handleGetSettings()
     if (command === 'update_settings') return handleUpdateSettings(args)
+
+    // A snapshot is a layer in the open document. A browser tab is refused before the window.
+    if (command === 'browser_snapshot') return handleBrowserSnapshot(store, args)
 
     if (isBrowserToolCommand(command)) {
       const decided = browserToolCall(command, args, IS_TAURI, browserState.open)

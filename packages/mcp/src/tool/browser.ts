@@ -124,6 +124,38 @@ export function registerBrowserTools(register: RegisterBrowserTool, sendRPC: RPC
       }
     }
   )
+
+  register(
+    'browser_snapshot',
+    {
+      inputSchema: v.strictObject({
+        id: v.optional(
+          v.pipe(
+            v.string(),
+            v.description('Layer to refresh. Leave this out to store the open page as a new layer.')
+          )
+        ),
+        ...automationTargetSchema
+      })
+    },
+    async (args) => {
+      try {
+        const { target, args: rest } = splitAutomationTarget(args)
+        const payload: Record<string, unknown> = { ...target }
+        if (typeof rest.id === 'string' && rest.id !== '') payload.id = rest.id
+        const res = await sendCommand(sendRPC, 'browser_snapshot', payload)
+        return ok(withTarget(snapshotLayer(res.result), res))
+      } catch (e) {
+        return fail(e)
+      }
+    }
+  )
+}
+
+/** The layer the app stored, when the reply names one. */
+function snapshotLayer(result: unknown): { id?: string } {
+  if (!result || typeof result !== 'object' || !('id' in result)) return {}
+  return typeof result.id === 'string' && result.id !== '' ? { id: result.id } : {}
 }
 
 /** A browser screenshot is an image. Anything else is the same failure the window reports. */

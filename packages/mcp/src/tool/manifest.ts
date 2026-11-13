@@ -206,6 +206,15 @@ export function createToolDescriptors(filesystemEnabled: boolean): ToolDescripto
       availability: 'default',
       capabilities: ['document:write'],
       enabled: true
+    },
+    {
+      name: 'browser_snapshot',
+      description:
+        'Store a picture of the open built-in browser page as a new layer, or replace that layer when id is set. An export draws the stored picture. Fails outside the desktop app and when the window is closed. A closed window is not opened. This is not a raw CDP session.',
+      effect: 'write',
+      availability: 'default',
+      capabilities: ['document:write'],
+      enabled: true
     }
   )
   return descriptors

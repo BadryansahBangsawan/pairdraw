@@ -31,15 +31,21 @@ Official builds send one anonymous ping a day and share usage stats only if you 
 
 - **Opens `.fig` and `.pen` files** — read and write native Figma files, open supported Pencil documents from the app or OS file browser, copy & paste nodes between apps
 - **AI builds designs** — describe what you want in chat, 100+ tools create and modify nodes. Bring your own key for the major providers or any compatible endpoint
+- **Built-in browser** — open `http` and `https` pages in a separate desktop window that shares nothing with the editor, import the whole page or one picked element as layers, place a screenshot on the canvas, and let the chat read the page, mark an element, and click, type, or scroll on it with approval
+- **Research on a board** — quote the page open in the built-in browser onto a board as a sticky note that keeps its address, title, quote, and read time ([Research on a board](https://openpencil.dev/user-guide/research))
 - **Fully programmable** — headless CLI, XPath queries, Figma Plugin API plus an `openpencil` API via `eval`, MCP server for AI agents, and agent integrations for Claude Code, Codex, Gemini CLI, and Pi in the desktop app and, through a local companion, the browser
 - **Lint, convert, and extract tokens** — inspect documents, lint naming/layout/accessibility, convert between supported formats, analyze colors/typography/spacing/clusters, and extract design tokens
 - **Components and variants** — create reusable components, group variants into component sets, insert local assets as instances, and switch variants from the inspector
 - **Working controls** — give a component a Reka UI behaviour (switch, slider, tabs, text field, …) and preview it live over the canvas, with real inputs, focus, and keyboard
+- **Script layers** — draw a layer's contents from a JavaScript program stored in the document, with `@input` controls bindable to variables, live re-runs, and one step to convert the result into ordinary layers ([Script layers](https://openpencil.dev/user-guide/script-layers))
+- **Prototypes** — link frames with click or after-delay interactions that navigate, open or close an overlay, or go back, then play them on the canvas with instant or dissolve transitions ([Playing a prototype](https://openpencil.dev/user-guide/playing-a-prototype))
 - **Image vectorization** — convert image layers into editable vector layers with Recraft or fal.ai
 - **Design-to-code export** — export selections as JSX/Tailwind, generate token outputs, and map designs into component-oriented code workflows
+- **VS Code extension** — open and save `.fig` and `.pen` files in a VS Code custom editor that runs the web editor; it is not published to a marketplace, so build it from the repository ([VS Code extension](https://openpencil.dev/programmable/vscode))
 - **Vue SDK for custom editors** — headless components and composables for embedding Pairdraw into other apps or building workflow-specific editing surfaces. [Read the SDK docs →](https://openpencil.dev/programmable/sdk/)
 - **Real-time collaboration** — share a peer-to-peer room over WebRTC with no server or account, or edit Cloud documents together. Cursors, presence, follow mode, voice calls
 - **Optional Cloud** — keep documents on your team's own [Pairdraw Cloud](https://openpencil.dev/user-guide/openpencil-cloud) server, or on the hosted service once it opens, and share them by invitation
+- **Plugins** — install plugin manifests for the app and see the capabilities each asks for, in Settings → App → Plugins; network access is refused, and plugins do not run yet ([Plugins](https://openpencil.dev/user-guide/plugins))
 - **Auto layout & CSS Grid** — flex and grid layout via Yoga WASM, with gap, padding, alignment, track sizing
 - **~15 MB desktop app** — Tauri v2 for macOS, Windows, Linux. Also runs in the browser as a PWA
 

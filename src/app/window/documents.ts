@@ -1,3 +1,4 @@
+import { noop } from 'es-toolkit/function'
 import { watch } from 'vue'
 
 import { allTabs, getTabsSnapshot } from '@/app/tabs'
@@ -28,7 +29,7 @@ export function claimChanges(
  * fills the registry (`desktop/src/launch/documents.rs`).
  */
 export function watchOpenDocuments(): () => void {
-  if (!isTauri()) return () => {}
+  if (!isTauri()) return noop
 
   let claimed = new Set<string>()
   let sync: Promise<void> = Promise.resolve()
@@ -40,6 +41,7 @@ export function watchOpenDocuments(): () => void {
       const { invoke } = await import('@tauri-apps/api/core')
       for (const path of added) await invoke('claim_document', { path })
       for (const path of removed) await invoke('release_document', { path })
+      return undefined
     })
     return sync
   }

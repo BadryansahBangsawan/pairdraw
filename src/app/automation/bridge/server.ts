@@ -92,6 +92,7 @@ export function connectAutomation(
       }).then((stop) => {
         if (ws === socket) stopFocus = stop
         else stop()
+        return undefined
       })
     }
 

@@ -133,7 +133,7 @@ export function createBrowserRPCBridge({
     }
     if (browsers.size === 1) {
       const [only] = browsers.keys()
-      return only && isOpen(only) ? only : null
+      return isOpen(only) ? only : null
     }
     let latest: WebSocket | null = null
     for (const ws of browsers.keys()) if (isOpen(ws)) latest = ws

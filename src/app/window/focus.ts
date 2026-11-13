@@ -1,3 +1,5 @@
+import { noop } from 'es-toolkit/function'
+
 import { IS_TAURI } from '@/constants'
 
 /**
@@ -6,7 +8,7 @@ import { IS_TAURI } from '@/constants'
  * one window and no shell to ask, so nothing is reported there.
  */
 export async function watchWindowFocus(handler: () => void): Promise<() => void> {
-  if (!IS_TAURI) return () => {}
+  if (!IS_TAURI) return noop
   const { getCurrentWindow } = await import('@tauri-apps/api/window')
   const window = getCurrentWindow()
   if (await window.isFocused()) handler()

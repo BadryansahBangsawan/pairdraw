@@ -8,4 +8,5 @@ pub mod browser_read;
 pub mod browser_shot;
 pub mod env;
 pub mod opener;
+pub mod quit;
 pub mod window;

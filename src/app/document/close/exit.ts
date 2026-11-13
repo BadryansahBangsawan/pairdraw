@@ -33,9 +33,27 @@ export function confirmAppExit(): Promise<boolean> {
   return approval.confirm()
 }
 
-/** Shared by the native Quit item and the platform exit request. */
+let quitConfirmation: Promise<boolean> | null = null
+
+/**
+ * This window's documents, asked once while a quit is pending. A quit is the app's, not the
+ * window's, so it does not set the window-close approval: another window may still decline, and
+ * this window must ask again before it closes.
+ */
+function confirmQuitDocuments(): Promise<boolean> {
+  quitConfirmation ??= prepareForClose().finally(() => {
+    quitConfirmation = null
+  })
+  return quitConfirmation
+}
+
+/**
+ * Quit across every window. This window confirms only its own documents and reports the answer;
+ * the shell exits once the last window agrees, or cancels the quit when one declines. The native
+ * Quit item and the platform's exit request both arrive here as a `quit` menu event.
+ */
 export async function requestAppExit(): Promise<void> {
-  if (!(await confirmAppExit())) return
-  const { exit } = await import('@tauri-apps/plugin-process')
-  await exit(0)
+  const approved = await confirmQuitDocuments()
+  const { invoke } = await import('@tauri-apps/api/core')
+  await invoke('answer_quit', { approved })
 }

@@ -105,7 +105,11 @@ export function useShellMenu() {
     'theme-dark': () => setTheme('dark'),
     'theme-auto': () => setTheme('auto'),
     'check-updates': () => void checkForAppUpdate({ messages: updates }),
-    quit: () => void requestAppExit()
+    quit: () => {
+      void requestAppExit().catch((error: unknown) => {
+        console.error('[Quit] Failed to confirm the exit:', error)
+      })
+    }
   }
 
   useNativeMenuEvents((id) => actions[id]?.())

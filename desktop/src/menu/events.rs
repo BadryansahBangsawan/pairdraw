@@ -1,8 +1,14 @@
 use tauri::Emitter;
 
+use crate::system::quit::request_quit;
 use crate::system::window::focused_window;
 
 pub fn handle_menu_event<R: tauri::Runtime>(app: &tauri::AppHandle<R>, event_id: &str) {
+    // Quit is the app's, not the window's: every window confirms its own documents.
+    if event_id == "quit" {
+        request_quit(app);
+        return;
+    }
     let focused = focused_window(app);
     #[cfg(debug_assertions)]
     if event_id == "dev-tools" {

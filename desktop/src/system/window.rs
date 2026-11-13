@@ -64,18 +64,31 @@ pub async fn open_window<R: tauri::Runtime>(
     Ok(label)
 }
 
-/// The window a command belongs to: the one with focus. Before any window has focus, as during
-/// startup, the main window stands in; with several and none focused, any open window does.
+/// Whether a label names one of the app's editor windows rather than the updater's webview.
+pub fn is_editor_label(label: &str) -> bool {
+    label == MAIN_WINDOW_LABEL || label.starts_with(EDITOR_LABEL_PREFIX)
+}
+
+/// The window a command belongs to: the one with focus among the editor windows. Before any
+/// window has focus, as during startup, the main window stands in; with several and none focused,
+/// any editor window does.
 pub fn focused_window<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
 ) -> Option<WebviewWindow<R>> {
     let windows = app.webview_windows();
-    windows
-        .values()
-        .find(|window| window.is_focused().unwrap_or(false))
-        .cloned()
+    let focused = windows
+        .iter()
+        .filter(|(label, _)| is_editor_label(label))
+        .find(|(_, window)| window.is_focused().unwrap_or(false))
+        .map(|(_, window)| (*window).clone());
+    focused
         .or_else(|| windows.get(MAIN_WINDOW_LABEL).cloned())
-        .or_else(|| windows.values().next().cloned())
+        .or_else(|| {
+            windows
+                .iter()
+                .find(|(label, _)| is_editor_label(label))
+                .map(|(_, window)| (*window).clone())
+        })
 }
 
 #[cfg(target_os = "macos")]
@@ -84,15 +97,28 @@ pub fn show_main_window<R: tauri::Runtime>(app: &tauri::AppHandle<R>) {
         let _ = window.unminimize();
         let _ = window.show();
         let _ = window.set_focus();
+        return;
+    }
+    // macOS keeps the app running with no windows; the dock icon opens one again.
+    if let Ok(window) = build_editor_window(app, MAIN_WINDOW_LABEL) {
+        let _ = window.set_focus();
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::next_editor_label;
+    use super::{is_editor_label, next_editor_label};
 
     fn labels(values: &[&str]) -> Vec<String> {
         values.iter().map(|value| value.to_string()).collect()
+    }
+
+    #[test]
+    fn only_editor_windows_count_for_commands() {
+        assert!(is_editor_label("main"));
+        assert!(is_editor_label("editor-2"));
+        assert!(!is_editor_label("updater"));
+        assert!(!is_editor_label("editor"));
     }
 
     #[test]

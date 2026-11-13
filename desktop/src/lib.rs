@@ -23,7 +23,7 @@ use network::http::{cancel_http_request, proxy_http_request, ProxyHttpRequests};
 use system::window::build_main_window;
 #[cfg(target_os = "macos")]
 use system::window::show_main_window;
-use tauri::{Emitter, Manager};
+use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -66,6 +66,7 @@ pub fn run() {
         .manage(launch::PendingRooms::default())
         .manage(NativeMenuState::default())
         .manage(launch::PendingCloudLinks::default())
+        .manage(system::quit::PendingQuit::default())
         .invoke_handler(tauri::generate_handler![
             agents::lookup::agent_lookup,
             agents::lookup::agent_workspace,
@@ -118,6 +119,7 @@ pub fn run() {
             launch::take_pending_rooms,
             system::env::sharing_disabled_by_env,
             launch::take_pending_cloud_links,
+            system::quit::answer_quit,
             system::env::webview_version,
             system::browser::browser_open,
             system::browser::browser_navigate,
@@ -202,14 +204,16 @@ pub fn run() {
                 api, code: None, ..
             } if !_app.webview_windows().is_empty() => {
                 api.prevent_exit();
-                // The frontend asks about unsaved documents and exits when they agree.
-                let _ = _app.emit("menu-event", "quit");
+                // Every window confirms its own documents; the app exits when the last agrees.
+                system::quit::request_quit(_app);
             }
             tauri::RunEvent::WindowEvent {
                 label,
                 event: tauri::WindowEvent::Focused(true),
                 ..
-            } => menu::handle_window_focus(_app, &label),
+            } if system::window::is_editor_label(&label) => {
+                menu::handle_window_focus(_app, &label)
+            }
             tauri::RunEvent::WindowEvent {
                 label,
                 event: tauri::WindowEvent::Destroyed,

@@ -6,8 +6,9 @@ import { installedPluginSchema, storedPluginCatalogSchema, type InstalledPlugin 
 const storedJSONSchema = v.pipe(v.string(), v.parseJson(), v.unknown())
 
 /**
- * Plugins saved for this app. One entry this version cannot read is dropped.
- * A list longer than the install limit is cut down to that limit.
+ * Plugins saved for this app. One entry this version cannot read is dropped, and so is a later
+ * entry with an id already kept: install refuses a duplicate, so a stored file that holds one
+ * did not come from it. A list longer than the install limit is cut down to that limit.
  */
 export function readStoredPlugins(raw: string): InstalledPlugin[] {
   const json = v.safeParse(storedJSONSchema, raw)
@@ -18,6 +19,7 @@ export function readStoredPlugins(raw: string): InstalledPlugin[] {
   for (const entry of catalog.output.plugins) {
     const plugin = v.safeParse(installedPluginSchema, entry)
     if (!plugin.success) continue
+    if (plugins.some((kept) => kept.id === plugin.output.id)) continue
     plugins.push(plugin.output)
     if (plugins.length === MAX_PLUGINS) break
   }

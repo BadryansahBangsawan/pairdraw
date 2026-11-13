@@ -4,8 +4,8 @@
  * outside a browser.
  */
 import frameScript from '@/app/plugins/sandbox/frame.ts?script'
-import { createIframeFrame } from '@/app/runtime/sandbox-iframe'
 import type { SandboxFrame } from '@/app/runtime/sandbox-frame'
+import { createIframeFrame } from '@/app/runtime/sandbox-iframe'
 
 export function createPluginFrame(): SandboxFrame {
   return createIframeFrame(frameScript)

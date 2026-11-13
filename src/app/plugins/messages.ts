@@ -28,3 +28,16 @@ export const PLUGIN_DISABLED_MESSAGE = 'Enable this plugin before running it.'
 export function pluginRunMissingMessage(id: string): string {
   return `No plugin with the id "${id}" is installed.`
 }
+
+export function pluginCallDeniedMessage(capability: string): string {
+  return `This plugin was not granted "${capability}".`
+}
+
+export function pluginCallUnknownMessage(name: string): string {
+  return `No tool named "${name}".`
+}
+
+export const PLUGIN_CALL_INVALID_ARGS_MESSAGE = 'This call has arguments the tool does not accept.'
+
+export const PLUGIN_CALL_UNAVAILABLE_MESSAGE =
+  'This run has no document to call; a plugin can only reach tools in the app.'

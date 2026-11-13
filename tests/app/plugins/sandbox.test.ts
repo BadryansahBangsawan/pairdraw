@@ -3,9 +3,13 @@ import { describe, expect, test } from 'bun:test'
 import * as v from 'valibot'
 
 import { installPlugin, setPluginEnabled } from '@/app/plugins/catalog'
-import { blockPluginNetwork, PLUGIN_NETWORK_UNAVAILABLE_ERROR } from '@/app/plugins/sandbox/network'
+import { PLUGIN_CALL_UNAVAILABLE_MESSAGE } from '@/app/plugins/messages'
 import { runInstalledPlugin, runPluginInFrame } from '@/app/plugins/sandbox/evaluate'
+import type { PluginHost } from '@/app/plugins/sandbox/host'
+import { blockPluginNetwork, PLUGIN_NETWORK_UNAVAILABLE_ERROR } from '@/app/plugins/sandbox/network'
 import {
+  PLUGIN_SANDBOX_CALL,
+  PLUGIN_SANDBOX_CALL_RESULT,
   PLUGIN_SANDBOX_READY,
   PLUGIN_SANDBOX_RESULT,
   PLUGIN_SANDBOX_RUN,
@@ -15,13 +19,12 @@ import {
   pluginRunRequestSchema,
   pluginRunResultSchema
 } from '@/app/plugins/sandbox/schema'
-import {
-  PLUGIN_RESULT_INVALID_ERROR,
-  runPluginProgram
-} from '@/app/plugins/sandbox/worker/run'
+import { PLUGIN_RESULT_INVALID_ERROR, runPluginProgram } from '@/app/plugins/sandbox/worker/run'
 import type { SandboxFrame } from '@/app/runtime/sandbox-frame'
 
-function parse<T>(schema: v.BaseSchema<unknown, T, v.BaseIssue<unknown>>): (input: unknown) => unknown {
+function parse<T>(
+  schema: v.BaseSchema<unknown, T, v.BaseIssue<unknown>>
+): (input: unknown) => unknown {
   return (input) => v.parse(schema, input)
 }
 
@@ -60,9 +63,9 @@ describe('plugin sandbox messages', () => {
     })
     expect(() => parse(pluginRunRequestSchema)({ id: 'a' })).toThrow()
     expect(() => parse(pluginHostMessageSchema)({ type: PLUGIN_SANDBOX_READY })).toThrow()
-    expect(parse(pluginHostMessageSchema)({ type: PLUGIN_SANDBOX_RUN, id: 'a', source: '' })).toEqual(
-      { type: PLUGIN_SANDBOX_RUN, id: 'a', source: '' }
-    )
+    expect(
+      parse(pluginHostMessageSchema)({ type: PLUGIN_SANDBOX_RUN, id: 'a', source: '' })
+    ).toEqual({ type: PLUGIN_SANDBOX_RUN, id: 'a', source: '' })
   })
 
   test('accepts both plugin results and refuses a payload that is not JSON text', () => {
@@ -71,7 +74,11 @@ describe('plugin sandbox messages', () => {
     expect(parse(pluginFrameMessageSchema)(succeeded)).toEqual(succeeded)
     expect(parse(pluginFrameMessageSchema)(failed)).toEqual(failed)
     expect(
-      parse(pluginRunResultSchema)({ id: 'a', ok: true, result: 'x'.repeat(PLUGIN_RESULT_MAX_CHARS) })
+      parse(pluginRunResultSchema)({
+        id: 'a',
+        ok: true,
+        result: 'x'.repeat(PLUGIN_RESULT_MAX_CHARS)
+      })
     ).toMatchObject({ ok: true })
     expect(() =>
       parse(pluginRunResultSchema)({
@@ -86,37 +93,42 @@ describe('plugin sandbox messages', () => {
 })
 
 describe('plugin worker', () => {
-  test('returns what the program returned as JSON text', () => {
-    const result = runPluginProgram(request('return { marks: [1, 2, 3] }'))
+  test('returns what the program returned as JSON text', async () => {
+    const result = await runPluginProgram(request('return { marks: [1, 2, 3] }'))
     if (!result.ok) throw new Error(result.error)
     expect(JSON.parse(result.result)).toEqual({ marks: [1, 2, 3] })
   })
 
-  test('a program that returns nothing succeeds with no result text', () => {
-    expect(runPluginProgram(request('const unused = 1'))).toMatchObject({ ok: true, result: '' })
+  test('a program that returns nothing succeeds with no result text', async () => {
+    expect(await runPluginProgram(request('const unused = 1'))).toMatchObject({
+      ok: true,
+      result: ''
+    })
   })
 
-  test('hands the program an empty, frozen API', () => {
+  test('hands the program a frozen API with one call into the host', async () => {
     expect(
-      runPluginProgram(
+      await runPluginProgram(
         request(`
         const keys = Object.keys(plugin)
         const sealed = Object.isFrozen(plugin)
         return { keys, sealed }
       `)
       )
-    ).toMatchObject({ ok: true, result: '{"keys":[],"sealed":true}' })
+    ).toMatchObject({ ok: true, result: '{"keys":["call"],"sealed":true}' })
   })
 
-  test('reports a thrown error and a value that cannot cross as JSON text', () => {
-    expect(runPluginProgram(request('throw new Error("no marks")'))).toEqual({
+  test('reports a thrown error and a value that cannot cross as JSON text', async () => {
+    expect(await runPluginProgram(request('throw new Error("no marks")'))).toEqual({
       id: 'run-1',
       ok: false,
       error: 'no marks'
     })
-    const circular = runPluginProgram(request('const a = {}; a.self = a; return a'))
+    const circular = await runPluginProgram(request('const a = {}; a.self = a; return a'))
     expect(circular).toEqual({ id: 'run-1', ok: false, error: PLUGIN_RESULT_INVALID_ERROR })
-    const huge = runPluginProgram(request(`return "x".repeat(${PLUGIN_RESULT_MAX_CHARS + 1})`))
+    const huge = await runPluginProgram(
+      request(`return "x".repeat(${PLUGIN_RESULT_MAX_CHARS + 1})`)
+    )
     expect(huge).toEqual({ id: 'run-1', ok: false, error: PLUGIN_RESULT_INVALID_ERROR })
   })
 
@@ -178,9 +190,10 @@ describe('plugin run session', () => {
 
   test('an endless loop ends in the host error, and a later run still works', async () => {
     const looping = frameDouble(() => undefined)
-    expect(
-      await runPluginInFrame(looping.frame, 'while (true) {}', { timeoutMs: 20 })
-    ).toEqual({ ok: false, error: 'Plugin timed out.' })
+    expect(await runPluginInFrame(looping.frame, 'while (true) {}', { timeoutMs: 20 })).toEqual({
+      ok: false,
+      error: 'Plugin timed out.'
+    })
     expect(looping.disposals()).toBe(1)
     const later = frameDouble((_source, id) => ({
       type: PLUGIN_SANDBOX_RESULT,
@@ -188,9 +201,9 @@ describe('plugin run session', () => {
       ok: false,
       error: 'no marks'
     }))
-    expect(await runPluginInFrame(later.frame, 'throw new Error("no marks")', { timeoutMs: 20 })).toEqual(
-      { ok: false, error: 'no marks' }
-    )
+    expect(
+      await runPluginInFrame(later.frame, 'throw new Error("no marks")', { timeoutMs: 20 })
+    ).toEqual({ ok: false, error: 'no marks' })
   })
 
   test('gives up when the frame never becomes ready', async () => {
@@ -229,5 +242,100 @@ describe('plugin run session', () => {
     const result = await runInstalledPlugin(disabled, 'marks', { frame })
     expect(result).toEqual({ ok: false, error: 'Enable this plugin before running it.' })
     expect(frames).toBe(0)
+  })
+
+  test('a call from the frame is answered by the host and the answer goes back', async () => {
+    const calls: { name: string; args: unknown }[] = []
+    const sent: unknown[] = []
+    let handler: ((data: unknown) => void) | undefined
+    const frame: SandboxFrame = {
+      postMessage(message) {
+        sent.push(message)
+      },
+      listen(callback) {
+        handler = callback
+        queueMicrotask(() => callback({ type: PLUGIN_SANDBOX_READY }))
+        return () => undefined
+      },
+      dispose: () => undefined
+    }
+    const host: PluginHost = {
+      call: async (name, args) => {
+        calls.push({ name, args })
+        return { shapes: 1 }
+      },
+      finish: () => undefined
+    }
+    const run = runPluginInFrame(frame, 'return 1', { timeoutMs: 20, host })
+    await Promise.resolve()
+    handler?.({
+      type: PLUGIN_SANDBOX_CALL,
+      callId: 'c1',
+      name: 'get_selection',
+      args: { depth: 0 }
+    })
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(calls).toEqual([{ name: 'get_selection', args: { depth: 0 } }])
+    expect(sent).toContainEqual({
+      type: PLUGIN_SANDBOX_CALL_RESULT,
+      callId: 'c1',
+      ok: true,
+      result: '{"shapes":1}'
+    })
+    handler?.({
+      type: PLUGIN_SANDBOX_RESULT,
+      id: (sent[0] as { id: string }).id,
+      ok: true,
+      result: '"done"'
+    })
+    expect(await run).toEqual({ ok: true, result: 'done' })
+  })
+
+  test('a call with no host is refused, and a call that fails carries the reason', async () => {
+    const sent: unknown[] = []
+    let handler: ((data: unknown) => void) | undefined
+    const frame: SandboxFrame = {
+      postMessage: (message) => {
+        sent.push(message)
+      },
+      listen(callback) {
+        handler = callback
+        queueMicrotask(() => callback({ type: PLUGIN_SANDBOX_READY }))
+        return () => undefined
+      },
+      dispose: () => undefined
+    }
+    const run = runPluginInFrame(frame, 'return 1', { timeoutMs: 20 })
+    await Promise.resolve()
+    handler?.({ type: PLUGIN_SANDBOX_CALL, callId: 'c1', name: 'get_selection', args: {} })
+    expect(sent).toContainEqual({
+      type: PLUGIN_SANDBOX_CALL_RESULT,
+      callId: 'c1',
+      ok: false,
+      error: PLUGIN_CALL_UNAVAILABLE_MESSAGE
+    })
+    handler?.({
+      type: PLUGIN_SANDBOX_RESULT,
+      id: (sent[0] as { id: string }).id,
+      ok: false,
+      error: 'no marks'
+    })
+    expect(await run).toEqual({ ok: false, error: 'no marks' })
+  })
+
+  test('a plugin program awaits what its host call returns', async () => {
+    const result = await runPluginProgram(
+      request('const found = await plugin.call("get_selection", { depth: 0 }); return found.marks'),
+      async (name, args) => ({ name, args, marks: 7 })
+    )
+    expect(result).toMatchObject({ ok: true, result: '7' })
+    const failed = await runPluginProgram(
+      request('const value = await plugin.call("make_coffee"); return value'),
+      async () => {
+        throw new Error('No tool named "make_coffee".')
+      }
+    )
+    expect(failed).toEqual({ id: 'run-1', ok: false, error: 'No tool named "make_coffee".' })
   })
 })

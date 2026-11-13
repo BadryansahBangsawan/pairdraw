@@ -22,6 +22,11 @@ export interface SandboxRun<T> {
   request: unknown
   /** Whether one message is the frame's ready message. */
   ready(data: unknown): boolean
+  /**
+   * Takes a message the run itself answers, such as a host call the frame relays; returning true
+   * keeps it from being read as the run's answer. `reply` posts back to the frame.
+   */
+  handle?(data: unknown, reply: (message: unknown) => void): boolean
   /** The result one message carries, or `null` for a message that does not answer this run. */
   read(data: unknown): T | null
   timeoutMs: number
@@ -52,6 +57,7 @@ export function runInSandboxFrame<T>(frame: SandboxFrame, run: SandboxRun<T>): P
       frame.postMessage(run.request, '*')
       return
     }
+    if (run.handle?.(data, (message) => frame.postMessage(message, '*'))) return
     const result = run.read(data)
     if (result !== null) finish(result)
   })

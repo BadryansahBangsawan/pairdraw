@@ -11,6 +11,7 @@ import { currentPermission, respondToPermission } from '@/app/ai/agents/acp/perm
 import {
   BROWSER_CANNOT_MARK,
   BROWSER_CHAT_TOOL_NAMES,
+  BROWSER_PAGE_MOVED,
   createBrowserChatTools,
   runBrowserAction,
   runBrowserLoad,
@@ -191,6 +192,73 @@ describe('page actions in the chat', () => {
     respondToPermission('reject')
     expect(await pending).toEqual({ error: ACTION_DECLINED })
     expect(calls).toBe(0)
+  })
+
+  test('an approved click or screenshot does not run after the page moves, and a load does not run after the window closes', async () => {
+    approveActions.value = true
+    const approval = createActionApproval({ chatId: 'chat-1' })
+    const open = { open: true, url: 'https://example.com/docs' as string | null }
+    let clicks = 0
+    let shots = 0
+    let placed = 0
+    let navigations = 0
+    const moving = standIn({
+      page: () => ({ open: open.open, url: open.url }),
+      act: async () => {
+        clicks += 1
+        return '{"code":"ok"}'
+      },
+      screenshot: async () => {
+        shots += 1
+        return new Uint8Array(8)
+      },
+      placeScreenshot: async () => {
+        placed += 1
+      },
+      navigate: async () => {
+        navigations += 1
+      }
+    })
+
+    const clickPending = runBrowserAction(
+      true,
+      approval,
+      moving,
+      'browser_click',
+      'call-move',
+      { selector: '#go' },
+      click
+    )
+    await Promise.resolve()
+    expect(currentPermission.value).not.toBeNull()
+    open.url = 'https://other.example/stolen'
+    respondToPermission('allow')
+    expect(await clickPending).toEqual({ error: BROWSER_PAGE_MOVED })
+    expect(clicks).toBe(0)
+
+    open.url = 'https://example.com/docs'
+    const shotPending = runBrowserScreenshot(true, approval, moving, 'call-shot', 'visible')
+    await Promise.resolve()
+    open.url = 'https://other.example/stolen'
+    respondToPermission('allow')
+    expect(await shotPending).toEqual({ error: BROWSER_PAGE_MOVED })
+    expect(shots).toBe(0)
+    expect(placed).toBe(0)
+
+    open.url = 'https://example.com/docs'
+    const loadPending = runBrowserLoad(
+      true,
+      approval,
+      moving,
+      'call-load',
+      'https://other.example/path'
+    )
+    await Promise.resolve()
+    open.open = false
+    open.url = null
+    respondToPermission('allow')
+    expect(await loadPending).toEqual({ error: BROWSER_WINDOW_CLOSED })
+    expect(navigations).toBe(0)
   })
 
   test('a timeout ends that call, and the next one still runs', async () => {

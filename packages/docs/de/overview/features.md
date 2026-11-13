@@ -114,7 +114,7 @@ Die Zusammenarbeit erfolgt direkt zwischen den Teilnehmern über WebRTC und ben�
 
 ## Plugins
 
-Unter **Einstellungen → App → Erweiterungen** lassen sich Plugin-Manifeste installieren, und jedes zeigt an, welche Berechtigungen es anfragt. Netzwerkzugriff wird abgelehnt; Erweiterungen laufen noch nicht ([Plugins](/user-guide/plugins)).
+Unter **Einstellungen → App → Erweiterungen** lassen sich Plugin-Manifeste installieren, und der Befehl eines Plugins läuft aus der Befehlspalette auf dem geöffneten Dokument, nachdem es gefragt hat, was es darf. Es läuft immer nur ein Plugin; Netzwerkzugriff wird abgelehnt ([Plugins](/user-guide/plugins)).
 
 ## Ersatzweise Google Fonts laden
 

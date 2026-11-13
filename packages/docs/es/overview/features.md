@@ -114,7 +114,7 @@ La colaboración funciona directamente entre participantes mediante WebRTC y no 
 
 ## Complementos
 
-En **Ajustes → Aplicación → Complementos** se instalan manifiestos de complementos y se ven las capacidades que pide cada uno. El acceso a la red se rechaza y los complementos aún no se ejecutan ([Complementos](/user-guide/plugins)).
+En **Ajustes → Aplicación → Complementos** se instalan manifiestos de complementos, y el comando de un complemento se ejecuta desde la paleta de comandos sobre el documento abierto, después de preguntar qué puede hacer. Solo se ejecuta un complemento a la vez y el acceso a la red se rechaza ([Complementos](/user-guide/plugins)).
 
 ## Carga alternativa desde Google Fonts
 

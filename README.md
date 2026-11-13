@@ -45,7 +45,7 @@ Official builds send one anonymous ping a day and share usage stats only if you 
 - **Vue SDK for custom editors** — headless components and composables for embedding Pairdraw into other apps or building workflow-specific editing surfaces. [Read the SDK docs →](https://openpencil.dev/programmable/sdk/)
 - **Real-time collaboration** — share a peer-to-peer room over WebRTC with no server or account, or edit Cloud documents together. Cursors, presence, follow mode, voice calls
 - **Optional Cloud** — keep documents on your team's own [Pairdraw Cloud](https://openpencil.dev/user-guide/openpencil-cloud) server, or on the hosted service once it opens, and share them by invitation
-- **Plugins** — install plugin manifests for the app and see the capabilities each asks for, in Settings → App → Plugins; network access is refused, and plugins do not run yet ([Plugins](https://openpencil.dev/user-guide/plugins))
+- **Plugins** — install plugin manifests, run a plugin's command from the command palette on the open document, and grant only the permissions it needs; one plugin runs at a time, and network access is refused ([Plugins](https://openpencil.dev/user-guide/plugins))
 - **Auto layout & CSS Grid** — flex and grid layout via Yoga WASM, with gap, padding, alignment, track sizing
 - **~15 MB desktop app** — Tauri v2 for macOS, Windows, Linux. Also runs in the browser as a PWA
 

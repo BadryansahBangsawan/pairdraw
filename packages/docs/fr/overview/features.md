@@ -114,7 +114,7 @@ La collaboration fonctionne directement entre participants via WebRTC et ne néc
 
 ## Extensions
 
-Dans **Paramètres → Application → Extensions**, installez des manifestes d’extension et voyez les capacités que chacune demande. L’accès réseau est refusé et les extensions ne s’exécutent pas encore ([Extensions](/user-guide/plugins)).
+Dans **Paramètres → Application → Extensions**, installez des manifestes d’extension ; la commande d’une extension s’exécute depuis la palette de commandes sur le document ouvert, après avoir demandé ce qu’elle peut faire. Une seule extension s’exécute à la fois et l’accès réseau est refusé ([Extensions](/user-guide/plugins)).
 
 ## Chargement de secours depuis Google Fonts
 

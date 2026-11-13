@@ -112,7 +112,7 @@ La connessione peer-to-peer WebRTC non richiede un server centrale. Condividi un
 
 ## Plugin
 
-In **Impostazioni → App → Estensioni** si installano i manifest dei plugin e si vedono le capacità richieste da ciascuno. L’accesso alla rete viene rifiutato e le estensioni non vengono ancora eseguite ([Plugin](/user-guide/plugins)).
+In **Impostazioni → App → Estensioni** si installano i manifest dei plugin, e il comando di un plugin si esegue dalla palette dei comandi sul documento aperto, dopo aver chiesto cosa può fare. Un solo plugin viene eseguito alla volta e l’accesso alla rete viene rifiutato ([Plugin](/user-guide/plugins)).
 
 ## Caricamento alternativo da Google Fonts
 

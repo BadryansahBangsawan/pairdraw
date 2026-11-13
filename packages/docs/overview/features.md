@@ -152,7 +152,7 @@ brew install --cask openpencil
 
 ## Plugins
 
-Install plugin manifests in **Settings → App → Plugins** and see the capabilities each asks for. Network access is refused, and plugins do not run yet ([Plugins](/user-guide/plugins)).
+Install plugin manifests in **Settings → App → Plugins** and run a plugin's command from the command palette, where it works on the open document after asking what it may do. One plugin runs at a time, and network access is refused ([Plugins](/user-guide/plugins)).
 
 ## Google Fonts Fallback
 

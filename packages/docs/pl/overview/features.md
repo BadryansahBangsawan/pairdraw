@@ -112,7 +112,7 @@ Połączenie równorzędne WebRTC nie wymaga centralnego serwera. Udostępnij od
 
 ## Wtyczki
 
-W **Ustawienia → Aplikacja → Wtyczki** można instalować manifesty wtyczek i zobaczyć, o jakie uprawnienia prosi każda z nich. Dostęp do sieci jest odrzucany, a wtyczki jeszcze nie działają ([Wtyczki](/user-guide/plugins)).
+W **Ustawienia → Aplikacja → Wtyczki** można instalować manifesty wtyczek, a polecenie wtyczki uruchamia się z palety poleceń na otwartym dokumencie, po pytaniu, co może robić. Jednocześnie działa jedna wtyczka, a dostęp do sieci jest odrzucany ([Wtyczki](/user-guide/plugins)).
 
 ## Zastępcze ładowanie Google Fonts
 

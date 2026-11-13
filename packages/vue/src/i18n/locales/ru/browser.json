@@ -29,5 +29,10 @@
   "shotVisible": "Снимок видимой области",
   "shotFull": "Снимок всей страницы",
   "shotElement": "Снимок элемента",
-  "elementOnPage": "Элемент на {page}"
+  "elementOnPage": "Элемент на {page}",
+  "snapshot": "Снимок страницы",
+  "snapshotRefresh": "Обновить",
+  "snapshotOpen": "Открыть в браузере",
+  "snapshotRefreshed": "Обновлено {time}",
+  "snapshotCannotRefresh": "Это изображение обновляется в приложении для компьютера. Здесь оно остаётся таким, каким было сохранено."
 }

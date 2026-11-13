@@ -34,7 +34,13 @@ export const browserMessageDefaults = {
   shotVisible: 'Screenshot of the view',
   shotFull: 'Screenshot of the page',
   shotElement: 'Screenshot of an element',
-  elementOnPage: params('Element on {page}')
+  elementOnPage: params('Element on {page}'),
+  snapshot: 'Page snapshot',
+  snapshotRefresh: 'Refresh',
+  snapshotOpen: 'Open in browser',
+  snapshotRefreshed: params('Last refreshed {time}'),
+  snapshotCannotRefresh:
+    'This picture can be refreshed in the desktop app. Here it stays as it was saved.'
 } as const
 
 export const browserMessages = i18n('browser', browserMessageDefaults)

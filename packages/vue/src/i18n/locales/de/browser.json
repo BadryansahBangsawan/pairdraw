@@ -29,5 +29,10 @@
   "shotVisible": "Bild der Ansicht",
   "shotFull": "Bild der ganzen Seite",
   "shotElement": "Bild eines Elements",
-  "elementOnPage": "Element auf {page}"
+  "elementOnPage": "Element auf {page}",
+  "snapshot": "Seitenabbild",
+  "snapshotRefresh": "Aktualisieren",
+  "snapshotOpen": "Im Browser öffnen",
+  "snapshotRefreshed": "Zuletzt aktualisiert {time}",
+  "snapshotCannotRefresh": "Dieses Bild lässt sich in der Desktop-App aktualisieren. Hier bleibt es, wie es gespeichert wurde."
 }

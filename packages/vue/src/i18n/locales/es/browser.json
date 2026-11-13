@@ -29,5 +29,10 @@
   "shotVisible": "Captura de la vista",
   "shotFull": "Captura de la página",
   "shotElement": "Captura de un elemento",
-  "elementOnPage": "Elemento en {page}"
+  "elementOnPage": "Elemento en {page}",
+  "snapshot": "Captura de la página",
+  "snapshotRefresh": "Actualizar",
+  "snapshotOpen": "Abrir en el navegador",
+  "snapshotRefreshed": "Última actualización {time}",
+  "snapshotCannotRefresh": "Esta imagen se puede actualizar en la aplicación de escritorio. Aquí se queda como se guardó."
 }

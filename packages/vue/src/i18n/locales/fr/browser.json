@@ -29,5 +29,10 @@
   "shotVisible": "Capture de la vue",
   "shotFull": "Capture de la page",
   "shotElement": "Capture d’un élément",
-  "elementOnPage": "Élément sur {page}"
+  "elementOnPage": "Élément sur {page}",
+  "snapshot": "Instantané de la page",
+  "snapshotRefresh": "Actualiser",
+  "snapshotOpen": "Ouvrir dans le navigateur",
+  "snapshotRefreshed": "Dernière actualisation {time}",
+  "snapshotCannotRefresh": "Cette image se rafraîchit dans l’application de bureau. Ici, elle reste telle qu’elle a été enregistrée."
 }

@@ -29,5 +29,10 @@
   "shotVisible": "可见区域的图片",
   "shotFull": "整页图片",
   "shotElement": "元素图片",
-  "elementOnPage": "{page} 上的元素"
+  "elementOnPage": "{page} 上的元素",
+  "snapshot": "页面快照",
+  "snapshotRefresh": "刷新",
+  "snapshotOpen": "在浏览器中打开",
+  "snapshotRefreshed": "上次刷新 {time}",
+  "snapshotCannotRefresh": "这张图片只能在桌面应用里刷新。在这里它保持保存时的样子。"
 }

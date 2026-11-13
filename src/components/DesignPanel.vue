@@ -20,6 +20,7 @@ import PanelHeader from '@/components/ui/panel/PanelHeader.vue'
 
 import AgentNotesSection from './properties/agent-notes/AgentNotesSection.vue'
 import AppearanceSection from './properties/AppearanceSection.vue'
+import BrowserNodeSection from './properties/browser-node/BrowserNodeSection.vue'
 import BehaviourPanel from './properties/component-properties/behaviour/BehaviourPanel.vue'
 import ComponentPropertiesSection from './properties/component-properties/ComponentPropertiesSection.vue'
 import ComponentPropertyListSection from './properties/component-properties/ComponentPropertyListSection.vue'
@@ -310,6 +311,7 @@ const { panels } = useI18n()
 
       <ExportSection />
       <AgentNotesSection />
+      <BrowserNodeSection />
     </div>
   </RetainedPanel>
 

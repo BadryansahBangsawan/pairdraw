@@ -29,5 +29,10 @@
   "shotVisible": "Istantanea della vista",
   "shotFull": "Istantanea della pagina",
   "shotElement": "Istantanea di un elemento",
-  "elementOnPage": "Elemento su {page}"
+  "elementOnPage": "Elemento su {page}",
+  "snapshot": "Istantanea della pagina",
+  "snapshotRefresh": "Aggiorna",
+  "snapshotOpen": "Apri nel browser",
+  "snapshotRefreshed": "Ultimo aggiornamento {time}",
+  "snapshotCannotRefresh": "Questa immagine si aggiorna nell'app desktop. Qui resta com'è stata salvata."
 }

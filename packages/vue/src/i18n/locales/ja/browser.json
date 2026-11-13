@@ -29,5 +29,10 @@
   "shotVisible": "見えている範囲の画像",
   "shotFull": "ページ全体の画像",
   "shotElement": "要素の画像",
-  "elementOnPage": "{page} の要素"
+  "elementOnPage": "{page} の要素",
+  "snapshot": "ページの画像",
+  "snapshotRefresh": "更新",
+  "snapshotOpen": "ブラウザで開く",
+  "snapshotRefreshed": "最終更新 {time}",
+  "snapshotCannotRefresh": "この画像を更新できるのはデスクトップアプリだけです。ここでは保存されたままです。"
 }

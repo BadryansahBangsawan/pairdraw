@@ -29,5 +29,10 @@
   "shotVisible": "Zrzut widoku",
   "shotFull": "Zrzut całej strony",
   "shotElement": "Zrzut elementu",
-  "elementOnPage": "Element na stronie {page}"
+  "elementOnPage": "Element na stronie {page}",
+  "snapshot": "Migawka strony",
+  "snapshotRefresh": "Odśwież",
+  "snapshotOpen": "Otwórz w przeglądarce",
+  "snapshotRefreshed": "Ostatnie odświeżenie {time}",
+  "snapshotCannotRefresh": "Ten obraz można odświeżyć w aplikacji komputerowej. Tutaj zostaje taki, jaki został zapisany."
 }

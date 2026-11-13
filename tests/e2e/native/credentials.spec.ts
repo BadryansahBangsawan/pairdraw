@@ -36,9 +36,7 @@ describe('native test credential isolation', () => {
     const view = (await browser.executeAsync((done) => {
       const started = Date.now()
       const tick = () => {
-        const panel = document.querySelector<HTMLElement>(
-          '[data-test-id="settings-general-panel"]'
-        )
+        const panel = document.querySelector<HTMLElement>('[data-test-id="settings-general-panel"]')
         if (panel) {
           done({
             displayed: panel.offsetParent !== null,
@@ -59,10 +57,7 @@ describe('native test credential isolation', () => {
     })) as { displayed: boolean; text?: string; retry?: boolean }
 
     assert.equal(view.displayed, true)
-    assert.doesNotMatch(
-      view.text ?? '',
-      /system credential store|Saved passwords and API keys/
-    )
+    assert.doesNotMatch(view.text ?? '', /system credential store|Saved passwords and API keys/)
     assert.equal(view.retry, false)
   })
 
@@ -79,9 +74,7 @@ describe('native test credential isolation', () => {
         done({ error: 'native test requires app.withGlobalTauri' })
         return
       }
-      const panel = document.querySelector<HTMLElement>(
-        '[data-test-id="settings-general-panel"]'
-      )
+      const panel = document.querySelector<HTMLElement>('[data-test-id="settings-general-panel"]')
       if (!panel) {
         done({ error: 'General settings panel is not open' })
         return

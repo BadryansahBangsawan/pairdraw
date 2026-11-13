@@ -5,6 +5,11 @@ import { fromUint8Array } from 'js-base64'
 
 import { buildOpenPencilClipboardHTML, parseOpenPencilClipboard } from '@open-pencil/core/clipboard'
 import { SceneGraph } from '@open-pencil/scene-graph'
+import {
+  OPEN_PENCIL_PLUGIN_DATA,
+  readPluginData,
+  withPluginData
+} from '@open-pencil/scene-graph/plugin-data'
 
 function clipboardHTML(payload: string): string {
   const compressed = deflateSync(new TextEncoder().encode(payload))
@@ -74,5 +79,25 @@ describe('OpenPencil clipboard parsing', () => {
     ]
   ])('ignores %s', (_label, payload) => {
     expect(parseOpenPencilClipboard(clipboardHTML(payload))).toBeNull()
+  })
+})
+
+describe('OpenPencil clipboard and script nodes', () => {
+  test('carries a script node source through copy and paste', () => {
+    const graph = new SceneGraph()
+    const source = 'return pencil.frame({ width: 100 }, [])'
+    const node = graph.createNode('SCRIPT', graph.getPages()[0].id, {
+      name: 'Chart',
+      pluginData: withPluginData([], OPEN_PENCIL_PLUGIN_DATA.script, { version: 1, source })
+    })
+
+    const parsed = parseOpenPencilClipboard(buildOpenPencilClipboardHTML([node], graph))
+    const pasted = parsed?.nodes[0]
+
+    expect(pasted).toMatchObject({ type: 'SCRIPT', name: 'Chart' })
+    expect(pasted && readPluginData(pasted.pluginData, OPEN_PENCIL_PLUGIN_DATA.script)).toEqual({
+      version: 1,
+      source
+    })
   })
 })

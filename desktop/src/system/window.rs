@@ -64,6 +64,20 @@ pub async fn open_window<R: tauri::Runtime>(
     Ok(label)
 }
 
+/// The window a command belongs to: the one with focus. Before any window has focus, as during
+/// startup, the main window stands in; with several and none focused, any open window does.
+pub fn focused_window<R: tauri::Runtime>(
+    app: &tauri::AppHandle<R>,
+) -> Option<WebviewWindow<R>> {
+    let windows = app.webview_windows();
+    windows
+        .values()
+        .find(|window| window.is_focused().unwrap_or(false))
+        .cloned()
+        .or_else(|| windows.get(MAIN_WINDOW_LABEL).cloned())
+        .or_else(|| windows.values().next().cloned())
+}
+
 #[cfg(target_os = "macos")]
 pub fn show_main_window<R: tauri::Runtime>(app: &tauri::AppHandle<R>) {
     if let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) {

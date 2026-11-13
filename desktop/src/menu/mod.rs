@@ -33,19 +33,57 @@ struct MenuEntry {
     sub: Vec<MenuEntry>,
 }
 
-/// What the schema menu is built from besides the schema: recent files and enabled features.
-#[derive(Default)]
+/// What the schema menu is built from for one window: the features its document enables and the
+/// check states its menu had. Recent files are the app's, not a window's.
+#[derive(Clone, Default)]
 pub struct NativeMenuInputs {
-    pub recent_files: Vec<String>,
     pub features: Vec<String>,
+    pub checked: HashMap<String, bool>,
 }
 
-pub struct NativeMenuState(pub Mutex<NativeMenuInputs>);
+/// Everything the menu is built from: the app's recent files and each window's inputs. The live
+/// menu follows the window that last had focus.
+#[derive(Default)]
+pub struct NativeMenuState(Mutex<NativeMenuStateInner>);
+
+#[derive(Default)]
+struct NativeMenuStateInner {
+    recent_files: Vec<String>,
+    /// The window the live menu was last built for.
+    focused: Option<String>,
+    windows: HashMap<String, NativeMenuInputs>,
+}
+
+impl NativeMenuStateInner {
+    fn focused_inputs(&self) -> NativeMenuInputs {
+        self.focused
+            .as_deref()
+            .and_then(|label| self.windows.get(label))
+            .cloned()
+            .unwrap_or_default()
+    }
+
+    /// Makes `label` the window the menu follows. The live menu still shows the outgoing window's
+    /// checks, so `live_checked` reads them before they are replaced.
+    fn focus(&mut self, label: &str, live_checked: impl FnOnce() -> HashMap<String, bool>) {
+        if self.focused.as_deref() == Some(label) {
+            return;
+        }
+        if let Some(previous) = self.focused.clone() {
+            let checked = live_checked();
+            if let Some(inputs) = self.windows.get_mut(&previous) {
+                inputs.checked = checked;
+            }
+        }
+        self.focused = Some(label.to_owned());
+    }
+}
 
 /// What one build reads: the inputs, and the check states the menu being replaced had.
 struct MenuBuild<'a> {
-    inputs: &'a NativeMenuInputs,
-    checked: HashMap<String, bool>,
+    features: &'a [String],
+    recent_files: &'a [String],
+    checked: &'a HashMap<String, bool>,
 }
 
 #[cfg(target_os = "macos")]
@@ -141,7 +179,7 @@ fn build_submenu<R: tauri::Runtime>(
 ) -> tauri::Result<Submenu<R>> {
     let mut builder = SubmenuBuilder::new(app, label);
 
-    for entry in platform_entries(items, &build.inputs.features) {
+    for entry in platform_entries(items, build.features) {
         if entry.r#type.as_deref() == Some("separator") {
             builder = builder.separator();
             continue;
@@ -157,7 +195,7 @@ fn build_submenu<R: tauri::Runtime>(
             continue;
         }
         if entry.id.as_deref() == Some("open-recent") {
-            let submenu = build_recent_files_submenu(app, label, &build.inputs.recent_files)?;
+            let submenu = build_recent_files_submenu(app, label, build.recent_files)?;
             builder = builder.item(&submenu);
             continue;
         }
@@ -270,7 +308,7 @@ fn build_schema_menus<R: tauri::Runtime>(
     groups
         .iter()
         .filter(|group| {
-            platform_entries(&group.items, &build.inputs.features)
+            platform_entries(&group.items, build.features)
                 .iter()
                 .any(|entry| !is_separator(entry))
         })
@@ -345,9 +383,29 @@ pub fn native_menu_checked<R: tauri::Runtime>(
 #[tauri::command]
 pub fn set_native_menu_checked<R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
+    window: tauri::WebviewWindow<R>,
     id: String,
     checked: bool,
 ) -> Result<(), String> {
+    let label = window.label().to_owned();
+    let live = {
+        let state = tauri::Manager::state::<NativeMenuState>(&app);
+        let mut inner = state
+            .0
+            .lock()
+            .map_err(|_| "Menu state is unavailable".to_string())?;
+        inner
+            .windows
+            .entry(label.clone())
+            .or_default()
+            .checked
+            .insert(id.clone(), checked);
+        inner.focused.get_or_insert(label.clone());
+        inner.focused.as_deref() == Some(label.as_str())
+    };
+    if !live {
+        return Ok(());
+    }
     let menu = app
         .menu()
         .ok_or_else(|| "Application menu is unavailable".to_string())?;
@@ -410,11 +468,13 @@ pub fn native_test_menu_outline<R: tauri::Runtime>(
 
 pub fn install_app_menu<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
+    recent_files: &[String],
     inputs: &NativeMenuInputs,
 ) -> tauri::Result<()> {
     let build = MenuBuild {
-        inputs,
-        checked: current_checked(app),
+        features: &inputs.features,
+        recent_files,
+        checked: &inputs.checked,
     };
     #[cfg(target_os = "macos")]
     let app_menu = {
@@ -468,31 +528,97 @@ pub fn install_app_menu<R: tauri::Runtime>(
     Ok(())
 }
 
-/// Rebuilds the menu after one of its inputs changed.
-pub fn update_app_menu<R: tauri::Runtime>(
+/// Rebuilds the live menu from the focused window's inputs and the app's recent files.
+fn refresh_app_menu<R: tauri::Runtime>(app: &tauri::AppHandle<R>) -> Result<(), String> {
+    let state = tauri::Manager::state::<NativeMenuState>(app);
+    let (inputs, recent_files) = {
+        let inner = state
+            .0
+            .lock()
+            .map_err(|_| "Menu state is unavailable".to_string())?;
+        (inner.focused_inputs(), inner.recent_files.clone())
+    };
+    install_app_menu(app, &recent_files, &inputs).map_err(|error| error.to_string())
+}
+
+/// The menu follows the focused window: it shows that window's features and check states, while
+/// recent files stay the app's. Called when a window gains focus.
+pub fn handle_window_focus<R: tauri::Runtime>(app: &tauri::AppHandle<R>, label: &str) {
+    let state = tauri::Manager::state::<NativeMenuState>(app);
+    let Ok(mut inner) = state.0.lock() else {
+        return;
+    };
+    let changed = inner.focused.as_deref() != Some(label);
+    inner.focus(label, || current_checked(app));
+    drop(inner);
+    if changed {
+        let _ = refresh_app_menu(app);
+    }
+}
+
+/// Forgets a closed window's menu inputs, so a later window under the same label starts clean.
+pub fn forget_window<R: tauri::Runtime>(app: &tauri::AppHandle<R>, label: &str) {
+    let state = tauri::Manager::state::<NativeMenuState>(app);
+    let Ok(mut inner) = state.0.lock() else {
+        return;
+    };
+    inner.windows.remove(label);
+    if inner.focused.as_deref() == Some(label) {
+        inner.focused = None;
+    }
+}
+
+/// The app's recent files, which every window's File › Open Recent lists.
+pub fn set_recent_files<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
-    change: impl FnOnce(&mut NativeMenuInputs),
+    files: Vec<String>,
 ) -> Result<(), String> {
     let state = tauri::Manager::state::<NativeMenuState>(app);
-    let mut inputs = state
-        .0
-        .lock()
-        .map_err(|_| "Menu state is unavailable".to_string())?;
-    change(&mut inputs);
-    install_app_menu(app, &inputs).map_err(|error| error.to_string())
+    {
+        let mut inner = state
+            .0
+            .lock()
+            .map_err(|_| "Menu state is unavailable".to_string())?;
+        inner.recent_files = files;
+    }
+    refresh_app_menu(app)
 }
 
 #[tauri::command]
 pub fn set_native_menu_features<R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
+    window: tauri::WebviewWindow<R>,
     features: Vec<String>,
 ) -> Result<(), String> {
-    update_app_menu(&app, |inputs| inputs.features = features)
+    let label = window.label().to_owned();
+    let live = {
+        let state = tauri::Manager::state::<NativeMenuState>(&app);
+        let mut inner = state
+            .0
+            .lock()
+            .map_err(|_| "Menu state is unavailable".to_string())?;
+        inner
+            .windows
+            .entry(label.clone())
+            .or_default()
+            .features = features;
+        inner.focused.get_or_insert(label.clone());
+        inner.focused.as_deref() == Some(label.as_str())
+    };
+    // A window that is not in front stores its items for when it is; rebuilding now would put
+    // them in a menu that shows another window's document.
+    if live {
+        refresh_app_menu(&app)
+    } else {
+        Ok(())
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{entries_for, MenuGroup};
+    use std::collections::HashMap;
+
+    use super::{entries_for, MenuGroup, NativeMenuInputs, NativeMenuStateInner};
 
     fn help_menu() -> MenuGroup {
         let menus: Vec<MenuGroup> =
@@ -533,5 +659,45 @@ mod tests {
             .iter()
             .all(|entry| entry.id.as_deref() != Some("settings")));
         assert!(entries.last().is_some_and(|entry| entry.r#type.is_none()));
+    }
+
+    fn inputs(features: &[&str]) -> NativeMenuInputs {
+        NativeMenuInputs {
+            features: features.iter().map(|feature| feature.to_string()).collect(),
+            ..NativeMenuInputs::default()
+        }
+    }
+
+    #[test]
+    fn the_menu_reads_the_focused_windows_inputs() {
+        let mut state = NativeMenuStateInner::default();
+        assert!(state.focused_inputs().features.is_empty());
+
+        state.windows.insert("main".to_owned(), inputs(&["local-file"]));
+        state
+            .windows
+            .insert("editor-2".to_owned(), inputs(&["cloud-document"]));
+        state.focused = Some("editor-2".to_owned());
+
+        assert_eq!(state.focused_inputs().features, vec!["cloud-document"]);
+    }
+
+    #[test]
+    fn switching_windows_keeps_the_outgoing_windows_checks() {
+        let mut state = NativeMenuStateInner::default();
+        state.windows.insert("main".to_owned(), inputs(&["local-file"]));
+        state.focused = Some("main".to_owned());
+
+        state.focus("editor-2", || {
+            HashMap::from([("autosave".to_owned(), false)])
+        });
+
+        assert_eq!(state.focused.as_deref(), Some("editor-2"));
+        assert_eq!(
+            state.windows["main"].checked.get("autosave"),
+            Some(&false)
+        );
+        // Focusing the same window again does not read the live menu.
+        state.focus("editor-2", || panic!("the live menu was read for an unchanged focus"));
     }
 }

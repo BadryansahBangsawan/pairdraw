@@ -20,7 +20,6 @@ use menu::{
     NativeMenuInputs, NativeMenuState,
 };
 use network::http::{cancel_http_request, proxy_http_request, ProxyHttpRequests};
-use std::sync::Mutex;
 use system::window::build_main_window;
 #[cfg(target_os = "macos")]
 use system::window::show_main_window;
@@ -65,7 +64,7 @@ pub fn run() {
         .manage(network::oauth::ChatGPTOAuthLoopback::default())
         .manage(agents::mcp_stdio::McpStdioProcesses::default())
         .manage(launch::PendingRooms::default())
-        .manage(NativeMenuState(Mutex::new(NativeMenuInputs::default())))
+        .manage(NativeMenuState::default())
         .manage(launch::PendingCloudLinks::default())
         .invoke_handler(tauri::generate_handler![
             agents::lookup::agent_lookup,
@@ -192,6 +191,7 @@ pub fn run() {
 
             Ok(install_app_menu(
                 app.handle(),
+                &[],
                 &NativeMenuInputs::default(),
             )?)
         })
@@ -207,9 +207,17 @@ pub fn run() {
             }
             tauri::RunEvent::WindowEvent {
                 label,
+                event: tauri::WindowEvent::Focused(true),
+                ..
+            } => menu::handle_window_focus(_app, &label),
+            tauri::RunEvent::WindowEvent {
+                label,
                 event: tauri::WindowEvent::Destroyed,
                 ..
-            } => launch::documents::release_window(_app, &label),
+            } => {
+                launch::documents::release_window(_app, &label);
+                menu::forget_window(_app, &label);
+            }
             #[cfg(target_os = "macos")]
             tauri::RunEvent::Opened { urls } => {
                 let paths = urls

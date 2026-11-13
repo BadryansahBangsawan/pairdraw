@@ -126,18 +126,19 @@ function reactionsAreEdited(node: SceneNode): boolean {
 }
 
 /**
- * Where each frame sits when a reaction opens it as an overlay, by node ID. One pass per export:
- * a context object is one tree's write.
+ * Where each frame sits when a reaction opens it as an overlay, by node ID. One pass per export.
+ * The serializer hands a fresh context to every root it writes and to every copy it makes of
+ * one, so the pass is kept under the property GUID map, which all of one export's contexts share.
  */
 const placementsByExport = new WeakMap<
-  SceneNodeToKiwiContext,
+  SceneNodeToKiwiContext['propertyIdToGuid'],
   ReadonlyMap<string, PrototypeOverlayPositionType>
 >()
 
 function overlayPlacements(
   context: SceneNodeToKiwiContext
 ): ReadonlyMap<string, PrototypeOverlayPositionType> {
-  const known = placementsByExport.get(context)
+  const known = placementsByExport.get(context.propertyIdToGuid)
   if (known) return known
   const placements = new Map<string, PrototypeOverlayPositionType>()
   for (const layer of context.graph.getAllNodes()) {
@@ -148,7 +149,7 @@ function overlayPlacements(
       }
     }
   }
-  placementsByExport.set(context, placements)
+  placementsByExport.set(context.propertyIdToGuid, placements)
   return placements
 }
 

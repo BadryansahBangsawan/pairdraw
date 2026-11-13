@@ -189,6 +189,27 @@ describe('prototype reactions in .fig records', () => {
     expect(targetRecord.overlayPositionType).toBe('BOTTOM_LEFT')
   })
 
+  test('one export reads the overlay placements once, however many roots it writes', () => {
+    const { graph, frame, target } = importedGraph()
+    const scans = { count: 0 }
+    const getAllNodes = graph.getAllNodes.bind(graph)
+    graph.getAllNodes = (...args) => {
+      scans.count += 1
+      return getAllNodes(...args)
+    }
+    const writeRoots = (roots: number): number => {
+      scans.count = 0
+      // An export writes each root through its own call and shares these maps between them.
+      const shared = { propertyIdToGuid: new Map(), componentPropertyDefinitionsById: new Map() }
+      for (let index = 0; index < roots; index++) {
+        const node = index % 2 === 0 ? frame : target
+        sceneNodeToKiwi(node, { sessionID: 1, localID: 1 }, index, { value: 2 }, graph, [], shared)
+      }
+      return scans.count
+    }
+    expect(writeRoots(40)).toBe(writeRoots(1))
+  })
+
   test('an emptied reaction list writes no field, so an edited layer stops carrying reactions', () => {
     const { graph, frame } = importedGraph()
     graph.updateNode(frame.id, {

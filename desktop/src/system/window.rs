@@ -76,6 +76,17 @@ pub fn is_editor_label(label: &str) -> bool {
     label == MAIN_WINDOW_LABEL || label.starts_with(EDITOR_LABEL_PREFIX)
 }
 
+/// Windows that hear a browser page or closed report. Every editor keeps its own copy of the
+/// session, so a second window that opened the browser has to hear the page too. The browser
+/// page itself is not an editor and is not told.
+pub fn editor_report_labels(labels: &[String]) -> Vec<String> {
+    labels
+        .iter()
+        .filter(|label| is_editor_label(label))
+        .cloned()
+        .collect()
+}
+
 /// The window an unowned arriving file is delivered to. The browser and the updater are not
 /// editors: a file queued to either label is never opened, so a focused one falls through to
 /// `main`, then to any editor.

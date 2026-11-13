@@ -5,7 +5,7 @@
 //! commands are granted to it. Tauri still installs its own IPC script in every webview; a page
 //! can call that bridge, and the capability check rejects the call. This module adds no
 //! initialization script and hands the page no app value. Everything the editor learns about the
-//! page is reported from here, over events to the `main` window. The window denies every popup.
+//! page is reported from here, over events to every editor window. The window denies every popup.
 
 use std::sync::Mutex;
 use std::time::Duration;
@@ -113,8 +113,8 @@ fn report_page<R: Runtime>(app: &AppHandle<R>, window: &WebviewWindow<R>, url: &
     let reported = url.to_string();
     let _ = window.eval_with_callback("document.title", move |title| {
         let title = serde_json::from_str::<String>(&title).unwrap_or_default();
-        let _ = handle.emit_to(
-            "main",
+        emit_to_editors(
+            &handle,
             "browser:page",
             BrowserPageReport {
                 url: reported.clone(),
@@ -122,6 +122,15 @@ fn report_page<R: Runtime>(app: &AppHandle<R>, window: &WebviewWindow<R>, url: &
             },
         );
     });
+}
+
+/// Tells every editor window. Each one keeps its own session, and the page that was shown is
+/// not an editor, so it is not a target.
+fn emit_to_editors<R: Runtime, S: Serialize + Clone>(app: &AppHandle<R>, event: &str, payload: S) {
+    let labels = app.webview_windows().keys().cloned().collect::<Vec<_>>();
+    for label in super::window::editor_report_labels(&labels) {
+        let _ = app.emit_to(label.as_str(), event, payload.clone());
+    }
 }
 
 /// Opens the browser on `url`, or navigates the window that is already open. A refusal reaches the
@@ -155,7 +164,7 @@ pub fn browser_open<R: Runtime>(app: AppHandle<R>, url: String) -> Result<(), St
             if let Ok(mut state) = closed.state::<BrowserWindowState>().0.lock() {
                 *state = BrowserWindowStateFields::default();
             }
-            let _ = closed.emit_to("main", "browser:closed", ());
+            emit_to_editors(&closed, "browser:closed", ());
         }
     });
     Ok(())

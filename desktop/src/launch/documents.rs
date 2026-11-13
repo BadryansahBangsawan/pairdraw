@@ -205,6 +205,22 @@ mod tests {
     }
 
     #[test]
+    fn browser_reports_reach_every_editor_and_not_the_page() {
+        let labels = vec![
+            "browser".to_owned(),
+            "editor-2".to_owned(),
+            "main".to_owned(),
+            "updater".to_owned(),
+        ];
+        let mut targets = crate::system::window::editor_report_labels(&labels);
+        targets.sort();
+        assert_eq!(
+            targets,
+            vec!["editor-2".to_owned(), "main".to_owned()]
+        );
+    }
+
+    #[test]
     fn an_unowned_file_opened_while_the_browser_is_focused_goes_to_an_editor() {
         let labels = vec![
             "main".to_owned(),

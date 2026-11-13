@@ -15,6 +15,7 @@ export interface SidebarLabels {
   script: string
   layers: string
   contextMenu: string
+  windows: string
   exporting: string
   autoLayout: string
   components: string
@@ -182,6 +183,7 @@ export const EN: SidebarLabels = {
   vectorEditing: 'Vector Editing',
   layers: 'Layers & Pages',
   contextMenu: 'Context Menu',
+  windows: 'More Than One Window',
   exporting: 'Exporting',
   autoLayout: 'Auto Layout',
   components: 'Components',
@@ -220,6 +222,7 @@ export const DE: SidebarLabels = {
   vectorEditing: 'Vektorbearbeitung',
   layers: 'Ebenen & Seiten',
   contextMenu: 'Kontextmenü',
+  windows: 'Mehrere Fenster',
   exporting: 'Exportieren',
   autoLayout: 'Auto-Layout',
   components: 'Komponenten',
@@ -258,6 +261,7 @@ export const IT: SidebarLabels = {
   vectorEditing: 'Modifica vettoriale',
   layers: 'Livelli e pagine',
   contextMenu: 'Menu contestuale',
+  windows: 'Più finestre',
   exporting: 'Esportazione',
   autoLayout: 'Auto-layout',
   components: 'Componenti',
@@ -296,6 +300,7 @@ export const FR: SidebarLabels = {
   vectorEditing: 'Édition vectorielle',
   layers: 'Calques et pages',
   contextMenu: 'Menu contextuel',
+  windows: 'Plusieurs fenêtres',
   exporting: 'Exportation',
   autoLayout: 'Mise en page auto',
   components: 'Composants',
@@ -334,6 +339,7 @@ export const ES: SidebarLabels = {
   vectorEditing: 'Edición vectorial',
   layers: 'Capas y páginas',
   contextMenu: 'Menú contextual',
+  windows: 'Varias ventanas',
   exporting: 'Exportar',
   autoLayout: 'Auto-layout',
   components: 'Componentes',
@@ -372,6 +378,7 @@ export const PL: SidebarLabels = {
   vectorEditing: 'Edycja wektorów',
   layers: 'Warstwy i strony',
   contextMenu: 'Menu kontekstowe',
+  windows: 'Więcej niż jedno okno',
   exporting: 'Eksportowanie',
   autoLayout: 'Auto-layout',
   components: 'Komponenty',
@@ -410,6 +417,7 @@ export const RU: SidebarLabels = {
   vectorEditing: 'Редактирование векторов',
   layers: 'Слои и страницы',
   contextMenu: 'Контекстное меню',
+  windows: 'Несколько окон',
   exporting: 'Экспорт',
   autoLayout: 'Авто-раскладка',
   components: 'Компоненты',

@@ -24,6 +24,7 @@ export const userGuideSidebar = (
       { text: labels.canvasNav, link: `${prefix}/user-guide/canvas-navigation` },
       { text: labels.selection, link: `${prefix}/user-guide/selection-and-manipulation` },
       { text: labels.contextMenu, link: `${prefix}/user-guide/context-menu` },
+      { text: labels.windows, link: '/user-guide/windows' },
     ],
   },
   {

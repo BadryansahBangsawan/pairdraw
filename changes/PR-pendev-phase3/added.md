@@ -9,3 +9,4 @@
 - Lets the chat work on the page in that browser: it reads one element or a short outline of the page, marks an element as a chip that outlines it in the window while the pointer is over the chip, clicks, types, presses a key, scrolls, or waits for the page to change, opens another `http` or `https` address, and places a screenshot of the view or the page on the canvas, with each change, screenshot, and new address allowed for that site when Settings asks before changes.
 - Reads the open page, keeps a web citation on a sticky, and cites that page on a board. Web search is not included.
 - Settings lists installed plugins and the capabilities each one was granted. Saving a manifest does not run it. Plugins do not run yet.
+- Adds a page snapshot layer that keeps a page's address and shows its latest screenshot, refreshed on request in the desktop app. The picture is a snapshot, not a live page.

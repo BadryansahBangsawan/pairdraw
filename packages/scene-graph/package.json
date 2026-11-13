@@ -50,6 +50,12 @@
       "import": "./dist/behaviours/index.js",
       "default": "./dist/behaviours/index.js"
     },
+    "./browser-node": {
+      "types": "./dist/browser-node/index.d.ts",
+      "bun": "./src/browser-node/index.ts",
+      "import": "./dist/browser-node/index.js",
+      "default": "./dist/browser-node/index.js"
+    },
     "./checkpoint": {
       "types": "./dist/checkpoint.d.ts",
       "bun": "./src/checkpoint.ts",

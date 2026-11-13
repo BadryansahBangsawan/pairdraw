@@ -2,6 +2,7 @@ import * as v from 'valibot'
 
 import { agentNotesSchema } from '../agent-notes/schema'
 import { behaviourSchema } from '../behaviours/schema'
+import { browserNodeSchema } from '../browser-node/schema'
 import type { OkHCLPayload } from '../color/okhcl'
 import { commentThreadsSchema } from '../comments/schema'
 import { clampExportQuality, isExportFormatId, type ExportFormatId } from '../export-format'
@@ -283,7 +284,12 @@ export const OPEN_PENCIL_PLUGIN_DATA = {
   /** Notes a person left on a layer for agents: what it means or does, and a request about it. */
   agentNotes: jsonPluginDataField('agentNotes', 'content', agentNotesSchema),
   /** A page a sticky cites: its URL, title, quote, and the time the page was read. */
-  webCitation: jsonPluginDataField('webCitation', 'content', webCitationSchema)
+  webCitation: jsonPluginDataField('webCitation', 'content', webCitationSchema),
+  /**
+   * A snapshot of one page: its address, viewport, and when it was refreshed. The picture is
+   * the layer's image fill. An address that is not an http or https page does not decode.
+   */
+  browserNode: jsonPluginDataField('browserNode', 'content', browserNodeSchema)
 } satisfies Record<string, PluginDataKey>
 
 const NOT_CONTENT = Object.values(OPEN_PENCIL_PLUGIN_DATA).filter(

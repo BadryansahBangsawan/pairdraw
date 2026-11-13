@@ -1,6 +1,7 @@
 import { clamp } from 'es-toolkit'
 
 import { guidToString, isUnsetGuid } from '@open-pencil/kiwi/fig/guid'
+import { settleBrowserNodeData } from '@open-pencil/scene-graph/browser-node'
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_STROKE_MITER_LIMIT,
@@ -806,7 +807,7 @@ export function nodeChangeToProps(
     variableModes: extractVariableModes(nc),
     exportSettings: extractExportSettings(nc),
     status: extractNodeStatus(nc),
-    pluginData: extractPluginData(nc),
+    pluginData: settleBrowserNodeData(extractPluginData(nc)),
     librarySource: extractLibrarySource(nc),
     pluginRelaunchData: extractPluginRelaunchData(nc),
     clipsContent: nc.frameMaskDisabled === false && nc.resizeToFit !== true,

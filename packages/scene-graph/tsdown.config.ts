@@ -7,6 +7,7 @@ export default defineConfig({
     'arrow-caps': './src/arrow-caps.ts',
     'asset-keys': './src/asset-keys.ts',
     'behaviours/index': './src/behaviours/index.ts',
+    'browser-node/index': './src/browser-node/index.ts',
     checkpoint: './src/checkpoint.ts',
     'color/index': './src/color/index.ts',
     'comments/index': './src/comments/index.ts',

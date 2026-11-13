@@ -33,7 +33,13 @@ const browserEnvelopeSchema = v.pipe(
   )
 )
 
-const handshakeMessageSchema = v.looseObject({ token: v.optional(v.nullable(v.string())) })
+const handshakeMessageSchema = v.looseObject({
+  token: v.optional(v.nullable(v.string())),
+  /** The editor window's label; a register without one is the legacy single-window app. */
+  window: v.optional(v.nullable(v.string()))
+})
+
+const focusMessageSchema = v.looseObject({ type: v.literal('focus') })
 
 const requestMessageSchema = v.looseObject({
   type: v.literal('request'),
@@ -90,7 +96,7 @@ export function createBrowserRPCBridge({
   onConnectionChange,
   appWaitTimeoutMs = APP_WAIT_TIMEOUT
 }: BrowserRPCBridgeOptions) {
-  const pending = new Map<string, PendingRequest>()
+  const pending = new Map<string, PendingRequest & { ws: WebSocket }>()
   const clients = new Set<WebSocket>()
   const connectionWaiters = new Set<PendingRequest>()
   // Track which WebSocket clients have authenticated via a valid
@@ -98,12 +104,40 @@ export function createBrowserRPCBridge({
   // all other message types (request, response) are rejected.
   const authenticatedClients = new Set<WebSocket>()
   const connectionListeners = new Set<ConnectionListener>()
-  let browserWs: WebSocket | null = null
-  let browserRegistered = false
+  /**
+   * The editor windows, by socket, in registration order. Every window registers its own
+   * connection, so a second window must not displace the first; a reconnect of the same window
+   * does replace its old socket.
+   */
+  const browsers = new Map<WebSocket, string>()
+  /** The window that last gained focus; tool calls go there until another window takes focus. */
+  let focusedBrowser: WebSocket | null = null
   let bridgeClosed = false
 
+  function isOpen(ws: WebSocket): boolean {
+    return ws.readyState === ws.OPEN
+  }
+
   function isConnected(): boolean {
-    return Boolean(browserWs && browserRegistered)
+    return [...browsers.keys()].some(isOpen)
+  }
+
+  /**
+   * The window a tool call goes to: the last focused one. Before any window reports focus, the
+   * only connected window answers; with several, the most recently registered does, so a call
+   * never waits for a focus event that may not come.
+   */
+  function targetBrowser(): WebSocket | null {
+    if (focusedBrowser && browsers.has(focusedBrowser) && isOpen(focusedBrowser)) {
+      return focusedBrowser
+    }
+    if (browsers.size === 1) {
+      const [only] = browsers.keys()
+      return only && isOpen(only) ? only : null
+    }
+    let latest: WebSocket | null = null
+    for (const ws of browsers.keys()) if (isOpen(ws)) latest = ws
+    return latest
   }
 
   function notifyConnectionChange() {
@@ -160,7 +194,7 @@ export function createBrowserRPCBridge({
       // cleared the set. Without this re-check, the waiter would stall for
       // appWaitTimeoutMs even though the browser is connected.
       connectionWaiters.add(waiter)
-      if (browserWs && browserWs.readyState === browserWs.OPEN && browserRegistered) {
+      if (isConnected()) {
         waiter.resolve(undefined)
         connectionWaiters.delete(waiter)
       }
@@ -173,6 +207,16 @@ export function createBrowserRPCBridge({
       req.reject(new Error(reason))
     }
     pending.clear()
+  }
+
+  /** A closed window's requests cannot answer any more; other windows' calls keep waiting. */
+  function rejectPendingFor(ws: WebSocket, reason: string) {
+    for (const [id, req] of pending) {
+      if (req.ws !== ws) continue
+      clearTimeout(req.timer)
+      req.reject(new Error(reason))
+      pending.delete(id)
+    }
   }
 
   function sendRegisterPrompt(ws: WebSocket) {
@@ -196,8 +240,8 @@ export function createBrowserRPCBridge({
     if (bridgeClosed) return Promise.reject(new Error('Server shutting down'))
     return new Promise((resolve, reject) => {
       const doSend = () => {
-        const ws = browserWs
-        if (!ws || ws.readyState !== ws.OPEN || !browserRegistered) {
+        const ws = targetBrowser()
+        if (!ws) {
           reject(new Error(APP_NOT_CONNECTED_MESSAGE))
           return
         }
@@ -207,7 +251,7 @@ export function createBrowserRPCBridge({
           pending.delete(id)
           settle.reject(new Error(`RPC timeout (${Math.round(RPC_TIMEOUT / 1000)}s)`))
         }, RPC_TIMEOUT)
-        pending.set(id, { resolve: settle.resolve, reject: settle.reject, timer })
+        pending.set(id, { resolve: settle.resolve, reject: settle.reject, timer, ws })
         try {
           ws.send(JSON.stringify({ ...body, type: 'request', id }))
         } catch (e) {
@@ -219,7 +263,7 @@ export function createBrowserRPCBridge({
         }
       }
 
-      if (browserWs && browserWs.readyState === browserWs.OPEN && browserRegistered) {
+      if (targetBrowser()) {
         doSend()
       } else {
         void waitForConnection().then(doSend).catch(reject)
@@ -244,7 +288,12 @@ export function createBrowserRPCBridge({
     }
   }
 
-  function registerBrowser(ws: WebSocket, token: string | null) {
+  /**
+   * Registers an editor window. A window is identified by its label: the same window reconnecting
+   * replaces its old socket and rejects only its own in-flight calls, while a second window keeps
+   * the first connected.
+   */
+  function registerBrowser(ws: WebSocket, token: string | null, window: string) {
     if (bridgeClosed) return
     if (!authorize(token)) {
       ws.close()
@@ -252,28 +301,27 @@ export function createBrowserRPCBridge({
     }
     // Mark this client as authenticated — it can now send requests.
     authenticatedClients.add(ws)
-    const previousBrowserWs = browserWs
-    browserWs = ws
-    browserRegistered = true
-    if (previousBrowserWs && previousBrowserWs !== ws) {
-      // Reject in-flight requests to the old browser. Without this, pending
-      // requests sit in the pending map until RPC_TIMEOUT (20s), because
-      // handleClose for the old socket returns early (browserWs is already
-      // set to the new socket, so browserWs !== previousBrowserWs).
-      rejectAllPending('Browser reconnected')
-      if (previousBrowserWs.readyState === ws.OPEN) {
-        previousBrowserWs.close()
-      }
+    for (const [previous, label] of browsers) {
+      if (label !== window || previous === ws) continue
+      // Reject in-flight requests to this window's old socket. Without this, pending requests
+      // sit in the pending map until RPC_TIMEOUT (20s), because handleClose for the old socket
+      // no longer finds its label once this connection takes it.
+      rejectPendingFor(previous, 'Browser reconnected')
+      browsers.delete(previous)
+      authenticatedClients.delete(previous)
+      if (focusedBrowser === previous) focusedBrowser = ws
+      if (isOpen(previous)) previous.close()
     }
+    browsers.set(ws, window)
     notifyConnectionWaiters()
     notifyConnectionChange()
     broadcastRegisterPrompt()
   }
 
   function handleBrowserResponse(msg: v.InferOutput<typeof responseMessageSchema>, ws: WebSocket) {
-    if (!browserRegistered || browserWs !== ws) return
     const req = pending.get(msg.id)
-    if (!req) return
+    // Only the window a call was sent to may answer it.
+    if (!req || req.ws !== ws) return
     pending.delete(msg.id)
     clearTimeout(req.timer)
     if (msg.ok === false) {
@@ -308,10 +356,10 @@ export function createBrowserRPCBridge({
         ws.close()
         return
       }
-      const { token } = handshake.output
+      const { token, window } = handshake.output
       if (token === undefined) return
       if (msg.type === 'register') {
-        registerBrowser(ws, token)
+        registerBrowser(ws, token, window ?? '')
       } else if (authorize(token)) {
         authenticatedClients.add(ws)
       } else {
@@ -327,6 +375,12 @@ export function createBrowserRPCBridge({
       ws.close()
       return
     }
+    if (msg.type === 'focus') {
+      // Focus is the routing signal: a tool call goes to the window that last had it, and a
+      // report from anything but a registered editor window cannot move that.
+      if (v.safeParse(focusMessageSchema, msg).success && browsers.has(ws)) focusedBrowser = ws
+      return
+    }
     const request = v.safeParse(requestMessageSchema, msg)
     if (request.success) {
       void handleClientRequest(ws, request.output)
@@ -339,10 +393,9 @@ export function createBrowserRPCBridge({
   function handleClose(ws: WebSocket) {
     clients.delete(ws)
     authenticatedClients.delete(ws)
-    if (browserWs !== ws) return
-    browserWs = null
-    browserRegistered = false
-    rejectAllPending('Browser disconnected')
+    if (!browsers.delete(ws)) return
+    if (focusedBrowser === ws) focusedBrowser = null
+    rejectPendingFor(ws, 'Browser disconnected')
     // Intentionally NOT rejecting connectionWaiters here. If a request
     // entered waitForConnection() before the close event (e.g. during a
     // CLOSING→CLOSED transition), the waiter should keep waiting the full
@@ -368,8 +421,8 @@ export function createBrowserRPCBridge({
     bridgeClosed = true
     rejectAllPending('Server shutting down')
     rejectConnectionWaiters('Server shutting down')
-    browserWs = null
-    browserRegistered = false
+    browsers.clear()
+    focusedBrowser = null
     clients.clear()
     authenticatedClients.clear()
     connectionListeners.clear()

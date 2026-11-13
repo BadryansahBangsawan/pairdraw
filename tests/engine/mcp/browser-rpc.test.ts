@@ -85,7 +85,8 @@ async function setupWsPair(): Promise<{
 async function registerBrowser(
   serverWs: WebSocket,
   clientWs: WebSocket,
-  bridge: ReturnType<typeof createBrowserRPCBridge>
+  bridge: ReturnType<typeof createBrowserRPCBridge>,
+  window?: string
 ): Promise<void> {
   // Wire message + close handlers the same way server.ts does
   serverWs.on('message', (raw: Buffer) => {
@@ -104,9 +105,17 @@ async function registerBrowser(
   const msg = JSON.parse(raw.toString())
   expect(msg.type).toBe('register')
 
+  // The bridge prompts every client again once it accepts a register, which marks the moment the
+  // registration was processed — a second window is accepted while `isConnected` is already true.
+  const accepted = new Promise<Buffer>((resolve) => {
+    clientWs.once('message', resolve)
+  })
+
   // The browser app sends the register message with the known token.
   // It gets the token from the discovery file or Vite env, not from the prompt.
-  clientWs.send(JSON.stringify({ type: 'register', token: AUTH_TOKEN }))
+  clientWs.send(
+    JSON.stringify({ type: 'register', token: AUTH_TOKEN, ...(window ? { window } : {}) })
+  )
 
   // Wait for the bridge to process the register message by observing
   // the onConnectionChange callback (isConnected becomes true).
@@ -119,6 +128,7 @@ async function registerBrowser(
     })
   }
   expect(bridge.isConnected()).toBe(true)
+  await accepted
 }
 
 describe('BrowserRpcBridge reconnection', () => {
@@ -150,13 +160,13 @@ describe('BrowserRpcBridge reconnection', () => {
     // Register the old browser
     await registerBrowser(pairA.serverWs, pairA.clientWs, bridge)
 
-    // Send an RPC — goes to old browser (no response, sits in pending map).
     // Attach .catch() immediately to prevent unhandled rejection when
     // rejectAllPending fires during registerBrowser below.
     const rpcPromise = bridge.sendRPC(RPC_BODY)
+    void rpcPromise.catch(() => undefined)
 
-    // A new browser reconnects on a different WS connection.
-    // This triggers rejectAllPending() inside registerBrowser.
+    // A new browser reconnects on a different WS connection, under the same
+    // (unnamed) window. This rejects the old socket's pending request.
     const start = Date.now()
     await registerBrowser(pairB.serverWs, pairB.clientWs, bridge)
 
@@ -437,6 +447,85 @@ describe('BrowserRpcBridge reconnection', () => {
     const result = (await rpcPromise) as { legitimate?: boolean; injected?: boolean }
     expect(result.legitimate).toBe(true)
     expect(result.injected).toBeUndefined()
+  })
+
+  test('routes calls to the window that last had focus', async () => {
+    const pairA = await setupWsPair()
+    track(pairA)
+    const pairB = await setupWsPair()
+    track(pairB)
+
+    const bridge = createBrowserRPCBridge({
+      authToken: AUTH_TOKEN,
+      onConnectionChange: () => undefined
+    })
+    await registerBrowser(pairA.serverWs, pairA.clientWs, bridge, 'main')
+    await registerBrowser(pairB.serverWs, pairB.clientWs, bridge, 'editor-2')
+
+    const answer = (clientWs: WebSocket, from: string) => {
+      clientWs.on('message', (raw: Buffer) => {
+        const msg = JSON.parse(raw.toString())
+        if (msg.type !== 'request') return
+        clientWs.send(JSON.stringify({ type: 'response', id: msg.id, ok: true, from }))
+      })
+    }
+    answer(pairA.clientWs, 'main')
+    answer(pairB.clientWs, 'editor-2')
+
+    // Opening the second window must not disconnect the first.
+    expect(pairA.clientWs.readyState).toBe(WebSocket.OPEN)
+
+    // Before any focus report, the most recently registered window answers.
+    expect(await bridge.sendRPC(RPC_BODY)).toMatchObject({ from: 'editor-2' })
+
+    pairA.clientWs.send(JSON.stringify({ type: 'focus' }))
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 20)
+    })
+    expect(await bridge.sendRPC(RPC_BODY)).toMatchObject({ from: 'main' })
+
+    pairB.clientWs.send(JSON.stringify({ type: 'focus' }))
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 20)
+    })
+    expect(await bridge.sendRPC(RPC_BODY)).toMatchObject({ from: 'editor-2' })
+  })
+
+  test('closing one window leaves a call answered by another window pending', async () => {
+    const pairA = await setupWsPair()
+    track(pairA)
+    const pairB = await setupWsPair()
+    track(pairB)
+
+    const bridge = createBrowserRPCBridge({
+      authToken: AUTH_TOKEN,
+      onConnectionChange: () => undefined
+    })
+    await registerBrowser(pairA.serverWs, pairA.clientWs, bridge, 'main')
+    await registerBrowser(pairB.serverWs, pairB.clientWs, bridge, 'editor-2')
+
+    pairA.clientWs.send(JSON.stringify({ type: 'focus' }))
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 20)
+    })
+
+    const asked = new Promise<string>((resolve) => {
+      pairA.clientWs.on('message', (raw: Buffer) => {
+        const msg = JSON.parse(raw.toString())
+        if (msg.type === 'request') resolve(msg.id)
+      })
+    })
+    const rpc = bridge.sendRPC(RPC_BODY)
+    const id = await asked
+
+    // A window that is not answering the call closes; the call must survive.
+    pairB.clientWs.close()
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 50)
+    })
+
+    pairA.clientWs.send(JSON.stringify({ type: 'response', id, ok: true, from: 'main' }))
+    expect(await rpc).toMatchObject({ from: 'main' })
   })
 
   test('ignores malformed JSON but closes sockets that send malformed messages', async () => {

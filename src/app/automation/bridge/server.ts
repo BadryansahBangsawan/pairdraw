@@ -14,6 +14,8 @@ import type { AutomationFiles } from '@/app/automation/bridge/file-handlers'
 import { createAutomationCommandHandlers } from '@/app/automation/bridge/handlers'
 import { isUnknownRecord } from '@/app/automation/bridge/target'
 import type { EditorStore } from '@/app/editor/active-store'
+import { watchWindowFocus } from '@/app/window/focus'
+import { windowLabel } from '@/app/window/identity'
 
 /** Requests from the MCP bridge; other message types (such as the register prompt) are ignored. */
 const automationRequestSchema = v.pipe(
@@ -68,6 +70,7 @@ export function connectAutomation(
 
   function connect() {
     let socket: WebSocket
+    let stopFocus: (() => void) | undefined
     try {
       socket = new WebSocket(automationURL)
       ws = socket
@@ -82,7 +85,14 @@ export function connectAutomation(
 
     socket.onopen = () => {
       console.debug('[Automation] WebSocket connected to MCP server')
-      socket.send(JSON.stringify({ type: 'register', token }))
+      socket.send(JSON.stringify({ type: 'register', token, window: windowLabel() }))
+      // Which window a tool call belongs to is decided by focus, so the server hears every change.
+      void watchWindowFocus(() => {
+        if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: 'focus' }))
+      }).then((stop) => {
+        if (ws === socket) stopFocus = stop
+        else stop()
+      })
     }
 
     socket.onmessage = async (event) => {
@@ -121,6 +131,8 @@ export function connectAutomation(
     }
 
     socket.onclose = (event) => {
+      stopFocus?.()
+      stopFocus = undefined
       if (ws === socket) ws = null
       // Sessions that reached the app only over this connection cannot any more, so their agents
       // leave; ones that also came another way, such as over a newer connection, stay.

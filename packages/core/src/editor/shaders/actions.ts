@@ -9,6 +9,7 @@ import {
   withShaderPaints,
   type ShaderPaint,
   type ShaderPreset,
+  type ShaderSourcePaint,
   type ShaderUniformValue
 } from '@open-pencil/scene-graph/shaders'
 
@@ -169,21 +170,12 @@ export function createShaderActions(ctx: EditorContext, nodes: NodeActions) {
     name: string,
     value: ShaderUniformValue
   ): void {
-    ctx.undo.beginBatch('Set shader input')
-    try {
-      for (const id of nodeIds) {
-        const node = ctx.graph.getNode(id)
-        const paint = node?.[list].at(index)
-        const shader = node && paint ? shaderOfPaint(node, paint) : undefined
-        if (!node || !paint || !shader || !isShaderSourcePaint(shader)) continue
-        install(id, list, index, paint, paint, {
-          ...shader,
-          uniforms: { ...shader.uniforms, [name]: value }
-        })
-      }
-    } finally {
-      ctx.undo.commitBatch()
-    }
+    editSourcePaints('Set shader input', nodeIds, list, index, (id, paint, shader) => {
+      install(id, list, index, paint, paint, {
+        ...shader,
+        uniforms: { ...shader.uniforms, [name]: value }
+      })
+    })
   }
 
   /**
@@ -198,13 +190,12 @@ export function createShaderActions(ctx: EditorContext, nodes: NodeActions) {
     name: string,
     variableId: string | null
   ): void {
-    ctx.undo.beginBatch(variableId ? 'Bind shader input' : 'Unbind shader input')
-    try {
-      for (const id of nodeIds) {
-        const node = ctx.graph.getNode(id)
-        const paint = node?.[list].at(index)
-        const shader = node && paint ? shaderOfPaint(node, paint) : undefined
-        if (!node || !paint || !shader || !isShaderSourcePaint(shader)) continue
+    editSourcePaints(
+      variableId ? 'Bind shader input' : 'Unbind shader input',
+      nodeIds,
+      list,
+      index,
+      (id, paint, shader) => {
         const bindings = omit(shader.uniformBindings ?? {}, [name])
         const bound = variableId ? { ...bindings, [name]: variableId } : bindings
         install(
@@ -217,6 +208,29 @@ export function createShaderActions(ctx: EditorContext, nodes: NodeActions) {
             ? omit(shader, ['uniformBindings'])
             : { ...shader, uniformBindings: bound }
         )
+      }
+    )
+  }
+
+  /**
+   * Runs `write` for each node whose paint `index` of `list` draws code, as one undo step: the
+   * inputs and bindings of a shader are edited the same way, and only a code paint has any.
+   */
+  function editSourcePaints(
+    label: string,
+    nodeIds: readonly string[],
+    list: ShaderPaintList,
+    index: number,
+    write: (nodeId: string, paint: Fill, shader: ShaderSourcePaint) => void
+  ): void {
+    ctx.undo.beginBatch(label)
+    try {
+      for (const id of nodeIds) {
+        const node = ctx.graph.getNode(id)
+        const paint = node?.[list].at(index)
+        const shader = node && paint ? shaderOfPaint(node, paint) : undefined
+        if (!node || !paint || !shader || !isShaderSourcePaint(shader)) continue
+        write(id, paint, shader)
       }
     } finally {
       ctx.undo.commitBatch()

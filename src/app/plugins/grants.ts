@@ -2,13 +2,13 @@ import { uniq } from 'es-toolkit'
 
 import type { ToolCapability } from '@open-pencil/core/tools'
 
+import { PLUGIN_AVAILABLE_CAPABILITIES } from './capability-text'
 import {
   PLUGIN_GRANT_DISABLED_MESSAGE,
   pluginGrantMissingMessage,
   pluginGrantNotRequestedMessage,
   pluginGrantUnavailableMessage
 } from './messages'
-import { PLUGIN_AVAILABLE_CAPABILITIES } from './capability-text'
 import { isPluginCapability, type InstalledPlugin, type PluginCapability } from './schema'
 
 export const PLUGIN_GRANT_REASONS = ['missing', 'disabled', 'not-requested', 'unavailable'] as const

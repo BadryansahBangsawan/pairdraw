@@ -4,7 +4,11 @@ import * as v from 'valibot'
 
 import { installPlugin, setPluginEnabled } from '@/app/plugins/catalog'
 import { PLUGIN_CALL_UNAVAILABLE_MESSAGE } from '@/app/plugins/messages'
-import { beginPluginRun, runInstalledPlugin, runPluginInFrame } from '@/app/plugins/sandbox/evaluate'
+import {
+  beginPluginRun,
+  runInstalledPlugin,
+  runPluginInFrame
+} from '@/app/plugins/sandbox/evaluate'
 import type { PluginHost } from '@/app/plugins/sandbox/host'
 import { blockPluginNetwork, PLUGIN_NETWORK_UNAVAILABLE_ERROR } from '@/app/plugins/sandbox/network'
 import {

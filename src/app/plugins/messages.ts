@@ -29,6 +29,8 @@ export function pluginGrantNotRequestedMessage(capability: string): string {
 
 export const PLUGIN_DISABLED_MESSAGE = 'Enable this plugin before running it.'
 
+export const PLUGIN_RUN_ENDED_MESSAGE = 'The plugin run has ended.'
+
 export function pluginRunMissingMessage(id: string): string {
   return `No plugin with the id "${id}" is installed.`
 }

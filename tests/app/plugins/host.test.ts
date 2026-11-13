@@ -138,6 +138,23 @@ test('disabling or removing the plugin during its run takes its grants away', as
   host.finish(true)
 })
 
+test('a call still in flight when the run ends edits nothing', async () => {
+  const store = openDocument()
+  const host = createPluginHost(store, plugin(['document:write'], ['document:write']), 'marks')
+  const pending = host.call('create_shape', shape)
+  host.finish(true)
+  await expect(pending).rejects.toThrow('The plugin run has ended.')
+  expect(store.graph.getChildren(store.state.currentPageId)).toHaveLength(0)
+
+  // A successful run closes its step the same way: an unawaited write must not land after it.
+  const later = createPluginHost(store, plugin(['document:write'], ['document:write']), 'marks')
+  const unawaited = later.call('create_shape', shape)
+  later.finish(false)
+  await expect(unawaited).rejects.toThrow('The plugin run has ended.')
+  expect(store.graph.getChildren(store.state.currentPageId)).toHaveLength(0)
+  expect(store.undo.undo()).toBeNull()
+})
+
 test('an unknown tool fails by name', async () => {
   const host = createPluginHost(openDocument(), plugin(['document:read']), 'marks')
   await expect(host.call('make_coffee', {})).rejects.toThrow('No tool named "make_coffee".')

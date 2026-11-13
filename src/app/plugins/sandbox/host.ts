@@ -11,7 +11,11 @@ import * as figmaFactory from '@/app/automation/bridge/figma-factory'
 import type { EditorStore } from '@/app/editor/session/create'
 
 import { authorizePluginCall } from '../grants'
-import { pluginCallDeniedMessage, pluginCallUnknownMessage } from '../messages'
+import {
+  pluginCallDeniedMessage,
+  pluginCallUnknownMessage,
+  PLUGIN_RUN_ENDED_MESSAGE
+} from '../messages'
 import { beginPluginPointer } from '../pointer'
 import type { InstalledPlugin } from '../schema'
 import { PLUGIN_POINTER_CALL } from './schema'
@@ -47,10 +51,14 @@ export function createPluginHost(
   store.undo.beginBatch(`Plugin: ${id}`)
   // The canvas pointer belongs to this run: a cancelled sequence closes it for the rest of it.
   const pointer = beginPluginPointer(id)
+  // A call the plugin started without awaiting it can still be running when the run ends, such
+  // as when its deadline passes. It must not edit after the run committed or rolled back.
+  let finished = false
 
   async function call(name: string, args: unknown): Promise<unknown> {
     // The pointer is not a document tool: it resolves when the canvas sequence ends.
     if (name === PLUGIN_POINTER_CALL) return pointer.request()
+    if (finished) refusal(new Error(PLUGIN_RUN_ENDED_MESSAGE))
     const def = ALL_TOOLS.find((tool) => tool.name === name)
     if (!def) refusal(new Error(pluginCallUnknownMessage(name)))
     for (const capability of uniq(def.capabilities)) {
@@ -71,6 +79,7 @@ export function createPluginHost(
     if (!def.mutates) return def.execute(figma, values)
     if (def.execution.kind !== 'sync') refusal(new Error(PLUGIN_ASYNC_TOOL_MESSAGE))
     await def.loadFonts(figma, values)
+    if (finished) refusal(new Error(PLUGIN_RUN_ENDED_MESSAGE))
     const pageId = store.state.currentPageId
     return store.recordEdit({ label: `Plugin: ${def.name}`, pageId }, () =>
       store.runMutationWithLayout(() => def.execute(figma, values), pageId)
@@ -80,6 +89,8 @@ export function createPluginHost(
   return {
     call,
     finish(failed) {
+      if (finished) return
+      finished = true
       pointer.release()
       if (failed) store.undo.rollbackBatch()
       else store.undo.commitBatch()

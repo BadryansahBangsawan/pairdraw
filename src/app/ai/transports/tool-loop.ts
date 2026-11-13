@@ -11,6 +11,7 @@ import type {
 import { toMerged } from 'es-toolkit'
 
 import type { AIProviderID, ReasoningEffort } from '@open-pencil/core/constants'
+import { aiMessages } from '@open-pencil/vue/i18n'
 
 import {
   BROWSER_CHAT_TOOL_NAMES,
@@ -41,6 +42,8 @@ import type { AIDiagnosticContext } from '@/app/diagnostics/events/ai'
 import type { getActiveEditorStore } from '@/app/editor/active-store'
 import { appExternalMCPTools, type ExternalMCPTools } from '@/app/integrations/mcp/client/session'
 import { mcpHistoryTools } from '@/app/integrations/mcp/client/tools'
+import { createResearchTools, RESEARCH_TOOL_NAMES, type ResearchWindow } from '@/app/research/tools'
+import { desktopResearchWindow } from '@/app/research/window'
 import { IS_TAURI } from '@/constants'
 
 type EditorStore = ReturnType<typeof getActiveEditorStore>
@@ -72,6 +75,8 @@ export type ToolLoopTransportOptions = {
    */
   offerBrowserTools?: boolean
   browserActions?: BrowserChatActions
+  /** The built-in browser window. Tests pass a fake; the desktop app uses its own. */
+  researchWindow?: ResearchWindow
 }
 
 function callSettings(
@@ -108,13 +113,33 @@ export function createToolLoopTransport({
   yieldWhen = () => false,
   externalMCP = appExternalMCPTools(),
   offerBrowserTools = IS_TAURI,
-  browserActions
+  browserActions,
+  researchWindow = desktopResearchWindow()
 }: ToolLoopTransportOptions) {
   // Each change waits for the person's approval while Settings → AI asks for it.
   // A page action remembers the site's host, not the tool name.
   const approval = createActionApproval({
     chatId: diagnosticContext.sessionId ?? 'chat',
     onUnanswered: (tool) => notifyPermissionWaiting(store, modelProviderName(providerID), tool)
+  })
+  const researchTools = createResearchTools({
+    board: store,
+    window: researchWindow,
+    labels: {
+      get source() {
+        return aiMessages.get().researchSource
+      },
+      get read() {
+        return aiMessages.get().researchRead
+      }
+    },
+    now: () => new Date().toISOString(),
+    askingStickyId() {
+      if (store.state.selectedIds.size !== 1) return null
+      const [id] = store.state.selectedIds
+      if (!id) return null
+      return store.graph.getNode(id)?.type === 'STICKY' ? id : null
+    }
   })
   const canvasTools = createAITools(store, diagnosticContext, { approve: approval.approve })
   // ToolSet, not the canvas catalog's type: page tools sit beside it, and a request offers a subset.
@@ -125,7 +150,8 @@ export function createToolLoopTransport({
       desktop: offerBrowserTools,
       approval,
       actions: browserActions ?? desktopBrowserActions(store)
-    })
+    }),
+    ...researchTools
   }
   // Read again for each message, so skills installed or switched off since apply to the next one.
   // Only skills the model may load: one the user runs by name stays out of the listing and tools.
@@ -165,6 +191,10 @@ export function createToolLoopTransport({
       )
       if (offeredSkills.length > 0) for (const name of SKILL_TOOL_NAMES) enabledNames.add(name)
       if (offerBrowserTools) for (const name of BROWSER_CHAT_TOOL_NAMES) enabledNames.add(name)
+      // A research board is the only document that quotes a page onto stickies.
+      if (store.state.documentKind === 'board') {
+        for (const name of RESEARCH_TOOL_NAMES) enabledNames.add(name)
+      }
       preview.clear()
       // Keep the full catalog for validating history; offer only enabled tools to this request.
       const offered = {

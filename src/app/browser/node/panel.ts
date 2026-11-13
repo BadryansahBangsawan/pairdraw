@@ -4,14 +4,11 @@ import { readBrowserNode, withBrowserNode } from '@open-pencil/scene-graph/brows
 import { IS_TAURI } from '@/constants'
 
 import { currentDevice, setDevice } from '../state'
-import { BROWSER_DESKTOP_ONLY } from '../tools'
 import { openBrowserWindow, sizeBrowserWindow } from '../window'
 import { browserNodeSession } from './command'
+import { BROWSER_NODE_FAILURE } from './failure'
 import { browserNodeActionError, browserNodeAddress, browserNodePreset } from './picture'
 
-const MISSING_LAYER = 'That layer is not on the canvas.'
-const NOT_SNAPSHOT = 'That layer is not a browser snapshot.'
-const ADDRESS_REFUSED = 'That address is not a page the browser can open.'
 const UNDO_LABEL = 'Edit browser snapshot'
 
 type SnapshotStore = Pick<Editor, 'graph' | 'updateNodeWithUndo'>
@@ -26,14 +23,15 @@ export function saveBrowserNodeAddress(
   draft: string
 ): { ok: true } | { ok: false; error: string } {
   const node = store.graph.getNode(nodeId)
-  if (!node) return { ok: false, error: MISSING_LAYER }
+  if (!node) return { ok: false, error: BROWSER_NODE_FAILURE.missingLayer }
   const stored = readBrowserNode(node)
-  if (!stored) return { ok: false, error: NOT_SNAPSHOT }
+  if (!stored) return { ok: false, error: BROWSER_NODE_FAILURE.notSnapshot }
   const address = browserNodeAddress(draft)
   if (!address.ok) return address
   if (address.url === stored.url) return { ok: true }
   const pluginData = withBrowserNode(node, { ...stored, url: address.url })
-  if (!readBrowserNode({ pluginData })) return { ok: false, error: ADDRESS_REFUSED }
+  if (!readBrowserNode({ pluginData }))
+    return { ok: false, error: BROWSER_NODE_FAILURE.invalidAddress }
   store.updateNodeWithUndo(nodeId, { pluginData }, UNDO_LABEL)
   return { ok: true }
 }
@@ -50,13 +48,14 @@ export function saveBrowserNodePreset(
   resize: (width: number, height: number) => Promise<void> = sizeBrowserWindow
 ): { ok: true } | { ok: false; error: string } {
   const node = store.graph.getNode(nodeId)
-  if (!node) return { ok: false, error: MISSING_LAYER }
+  if (!node) return { ok: false, error: BROWSER_NODE_FAILURE.missingLayer }
   const stored = readBrowserNode(node)
-  if (!stored) return { ok: false, error: NOT_SNAPSHOT }
+  if (!stored) return { ok: false, error: BROWSER_NODE_FAILURE.notSnapshot }
   const next = browserNodePreset(preset)
   if (next !== stored.preset) {
     const pluginData = withBrowserNode(node, { ...stored, preset: next })
-    if (!readBrowserNode({ pluginData })) return { ok: false, error: NOT_SNAPSHOT }
+    if (!readBrowserNode({ pluginData }))
+      return { ok: false, error: BROWSER_NODE_FAILURE.notSnapshot }
     store.updateNodeWithUndo(nodeId, { pluginData }, UNDO_LABEL)
   }
   setDevice(next)
@@ -82,7 +81,7 @@ export async function openBrowserNodePage(
   url: string,
   open: (url: string) => Promise<void> = openBrowserWindow
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  if (!IS_TAURI) return { ok: false, error: BROWSER_DESKTOP_ONLY }
+  if (!IS_TAURI) return { ok: false, error: BROWSER_NODE_FAILURE.desktopOnly }
   const address = browserNodeAddress(url)
   if (!address.ok) return address
   try {

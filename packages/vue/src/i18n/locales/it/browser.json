@@ -34,5 +34,12 @@
   "snapshotRefresh": "Aggiorna",
   "snapshotOpen": "Apri nel browser",
   "snapshotRefreshed": "Ultimo aggiornamento {time}",
-  "snapshotCannotRefresh": "Questa immagine si aggiorna nell'app desktop. Qui resta com'è stata salvata."
+  "snapshotCannotRefresh": "Questa immagine si aggiorna nell'app desktop. Qui resta com'è stata salvata.",
+  "snapshotWindowClosed": "La finestra del browser non è aperta.",
+  "snapshotMissingLayer": "Quel livello non è sul foglio.",
+  "snapshotNotSnapshot": "Quel livello non è un'istantanea della pagina.",
+  "snapshotNoPicture": "La pagina non ha restituito un'immagine.",
+  "snapshotLoadTimeout": "La pagina non ha finito di caricarsi.",
+  "snapshotAddressUncaptured": "L'immagine non era la pagina che ha finito di caricarsi.",
+  "snapshotFailed": "L'istantanea della pagina non è stata aggiornata."
 }

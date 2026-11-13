@@ -8,8 +8,8 @@ import {
 } from '@open-pencil/scene-graph/browser-node'
 import { computeImageHash } from '@open-pencil/scene-graph/images'
 
+import { BROWSER_NODE_FAILURE } from './failure'
 import {
-  BROWSER_NODE_ADDRESS_UNCAPTURED,
   browserNodeActionError,
   browserNodeAddress,
   browserNodeGate,
@@ -22,9 +22,6 @@ import type {
   BrowserNodeRefreshActions,
   BrowserNodeSession
 } from './session'
-
-const MISSING_LAYER = 'That layer is not on the canvas.'
-const NOT_SNAPSHOT = 'That layer is not a browser snapshot.'
 
 type Canvas = Pick<Editor, 'graph' | 'state' | 'recordEdit' | 'select'>
 
@@ -74,9 +71,9 @@ export async function refreshBrowserNodeFromPage(
   refreshedAt: string
 ): Promise<BrowserNodeOutcome> {
   const node = editor.graph.getNode(nodeId)
-  if (!node) return { ok: false, error: MISSING_LAYER }
+  if (!node) return { ok: false, error: BROWSER_NODE_FAILURE.missingLayer }
   const stored = readBrowserNode(node)
-  if (!stored) return { ok: false, error: NOT_SNAPSHOT }
+  if (!stored) return { ok: false, error: BROWSER_NODE_FAILURE.notSnapshot }
   const blocked = browserNodeGate(session)
   if (blocked) return { ok: false, error: blocked }
   const address = browserNodeAddress(stored.url)
@@ -88,7 +85,7 @@ export async function refreshBrowserNodeFromPage(
   const captured = browserNodeAddress(actions.capturedAddress() ?? '')
   if (!captured.ok) return captured
   if (moved.loaded !== null && captured.url !== moved.loaded) {
-    return { ok: false, error: BROWSER_NODE_ADDRESS_UNCAPTURED }
+    return { ok: false, error: BROWSER_NODE_FAILURE.addressUncaptured }
   }
   const page = moved.loaded ?? captured.url
   const picture = browserNodePicture(shot.png, page, session.preset, refreshedAt)

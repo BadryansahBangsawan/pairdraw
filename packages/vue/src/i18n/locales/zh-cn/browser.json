@@ -34,5 +34,12 @@
   "snapshotRefresh": "刷新",
   "snapshotOpen": "在浏览器中打开",
   "snapshotRefreshed": "上次刷新 {time}",
-  "snapshotCannotRefresh": "这张图片只能在桌面应用里刷新。在这里它保持保存时的样子。"
+  "snapshotCannotRefresh": "这张图片只能在桌面应用里刷新。在这里它保持保存时的样子。",
+  "snapshotWindowClosed": "浏览器窗口没有打开。",
+  "snapshotMissingLayer": "这个图层不在画布上。",
+  "snapshotNotSnapshot": "这个图层不是页面快照。",
+  "snapshotNoPicture": "页面没有返回图片。",
+  "snapshotLoadTimeout": "页面没有加载完成。",
+  "snapshotAddressUncaptured": "这张图片不是加载完成的那个页面。",
+  "snapshotFailed": "页面快照没能更新。"
 }

@@ -34,5 +34,12 @@
   "snapshotRefresh": "Aktualisieren",
   "snapshotOpen": "Im Browser öffnen",
   "snapshotRefreshed": "Zuletzt aktualisiert {time}",
-  "snapshotCannotRefresh": "Dieses Bild lässt sich in der Desktop-App aktualisieren. Hier bleibt es, wie es gespeichert wurde."
+  "snapshotCannotRefresh": "Dieses Bild lässt sich in der Desktop-App aktualisieren. Hier bleibt es, wie es gespeichert wurde.",
+  "snapshotWindowClosed": "Das Browserfenster ist nicht geöffnet.",
+  "snapshotMissingLayer": "Diese Ebene liegt nicht auf der Zeichenfläche.",
+  "snapshotNotSnapshot": "Diese Ebene ist kein Seitenabbild.",
+  "snapshotNoPicture": "Die Seite hat kein Bild geliefert.",
+  "snapshotLoadTimeout": "Die Seite wurde nicht fertig geladen.",
+  "snapshotAddressUncaptured": "Das Bild war nicht die Seite, deren Laden fertig wurde.",
+  "snapshotFailed": "Das Seitenabbild konnte nicht aktualisiert werden."
 }

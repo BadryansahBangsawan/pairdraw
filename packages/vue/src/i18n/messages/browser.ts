@@ -40,7 +40,14 @@ export const browserMessageDefaults = {
   snapshotOpen: 'Open in browser',
   snapshotRefreshed: params('Last refreshed {time}'),
   snapshotCannotRefresh:
-    'This picture can be refreshed in the desktop app. Here it stays as it was saved.'
+    'This picture can be refreshed in the desktop app. Here it stays as it was saved.',
+  snapshotWindowClosed: 'The browser window is not open.',
+  snapshotMissingLayer: 'That layer is not on the canvas.',
+  snapshotNotSnapshot: 'That layer is not a browser snapshot.',
+  snapshotNoPicture: 'The page returned no picture',
+  snapshotLoadTimeout: 'The page did not finish loading.',
+  snapshotAddressUncaptured: 'The picture was not of the page that finished loading.',
+  snapshotFailed: 'The snapshot could not be updated.'
 } as const
 
 export const browserMessages = i18n('browser', browserMessageDefaults)

@@ -34,5 +34,12 @@
   "snapshotRefresh": "Actualiser",
   "snapshotOpen": "Ouvrir dans le navigateur",
   "snapshotRefreshed": "Dernière actualisation {time}",
-  "snapshotCannotRefresh": "Cette image se rafraîchit dans l’application de bureau. Ici, elle reste telle qu’elle a été enregistrée."
+  "snapshotCannotRefresh": "Cette image se rafraîchit dans l’application de bureau. Ici, elle reste telle qu’elle a été enregistrée.",
+  "snapshotWindowClosed": "La fenêtre du navigateur n’est pas ouverte.",
+  "snapshotMissingLayer": "Ce calque n’est pas sur le canevas.",
+  "snapshotNotSnapshot": "Ce calque n’est pas un instantané de page.",
+  "snapshotNoPicture": "La page n’a renvoyé aucune image.",
+  "snapshotLoadTimeout": "La page n’a pas fini de se charger.",
+  "snapshotAddressUncaptured": "L’image n’était pas la page dont le chargement s’est terminé.",
+  "snapshotFailed": "L’instantané de la page n’a pas pu être actualisé."
 }

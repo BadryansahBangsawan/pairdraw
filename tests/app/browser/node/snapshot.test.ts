@@ -12,13 +12,13 @@ import {
   createBrowserNode,
   refreshBrowserNode
 } from '@/app/browser/node/command'
+import { browserNodeFailureEnglish, browserNodeFailureHeading } from '@/app/browser/node/failure'
 import type {
   BrowserNodeOutcome,
   BrowserNodeRefreshActions,
   BrowserNodeSession
 } from '@/app/browser/node/session'
 import { markClosed, markNavigating, setDevice } from '@/app/browser/state'
-import { BROWSER_DESKTOP_ONLY, BROWSER_WINDOW_CLOSED, browserToolCall } from '@/app/browser/tools'
 import { browserURLPolicy } from '@/app/browser/url'
 import { IS_TAURI } from '@/constants'
 
@@ -159,12 +159,11 @@ describe('creating a browser snapshot', () => {
       )
       expect(shots).toBe(0)
       expect(childCount(graph)).toBe(before)
-      if (index === 0) expect(result).toEqual({ ok: false, error: BROWSER_DESKTOP_ONLY })
-      else if (index === 1) expect(result).toEqual({ ok: false, error: BROWSER_WINDOW_CLOSED })
+      if (index === 0) expect(result).toEqual({ ok: false, error: 'desktop-only' })
+      else if (index === 1) expect(result).toEqual({ ok: false, error: 'window-closed' })
       else {
-        const tool = browserToolCall('browser_load_page', { url: one.url ?? '' }, true, true)
-        expect(tool.ok).toBe(false)
-        if (!tool.ok) expect(result).toEqual({ ok: false, error: tool.error })
+        const codes = ['empty-address', 'scheme-refused', 'scheme-refused', 'invalid-address']
+        expect(result).toEqual({ ok: false, error: codes[index - 2] })
       }
     }
   })
@@ -186,8 +185,8 @@ describe('creating a browser snapshot', () => {
       },
       WHEN
     )
-    expect(empty).toEqual({ ok: false, error: 'The page returned no picture' })
-    expect(failed).toEqual({ ok: false, error: 'The page returned no picture' })
+    expect(empty).toEqual({ ok: false, error: 'no-picture' })
+    expect(failed).toEqual({ ok: false, error: 'no-picture' })
     expect(childCount(graph)).toBe(0)
   })
 
@@ -459,7 +458,7 @@ describe('refreshing a browser snapshot', () => {
       LATER
     )
     expect(moved).toBe(1)
-    expect(result).toEqual({ ok: false, error: 'The page returned no picture' })
+    expect(result).toEqual({ ok: false, error: 'no-picture' })
     expect(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] })).toEqual(before)
     graph.undoAction()
     expect(graph.graph.getNode(id)).toBeUndefined()
@@ -529,7 +528,7 @@ describe('refreshing a browser snapshot', () => {
       },
       WHEN
     )
-    expect(kept).toEqual({ ok: false, error: 'The browser window is not open.' })
+    expect(kept).toEqual({ ok: false, error: 'window-closed' })
     expect(order).not.toContain('late')
     expect(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] })).toMatchObject({
       width: 2,
@@ -680,13 +679,42 @@ describe('refreshing a browser snapshot', () => {
     }
     expect(await refreshBrowserNodeFromPage(graph, plain, session(), actions, LATER)).toEqual({
       ok: false,
-      error: 'That layer is not a browser snapshot.'
+      error: 'not-snapshot'
     })
     expect(await refreshBrowserNodeFromPage(graph, 'missing', session(), actions, LATER)).toEqual({
       ok: false,
-      error: 'That layer is not on the canvas.'
+      error: 'missing-layer'
     })
     expect(calls).toBe(0)
+  })
+
+  test('a refusal the panel shows is a message code', async () => {
+    const graph = editor()
+    const result = await createBrowserNodeFromPage(
+      graph,
+      session({ desktop: false }),
+      { screenshot: () => Promise.resolve(PNG), capturedAddress: () => PAGE },
+      WHEN
+    )
+    expect(result).toEqual({ ok: false, error: 'desktop-only' })
+    expect(childCount(graph)).toBe(0)
+  })
+
+  test('a failure code becomes the catalog sentence, and an unknown code does not', () => {
+    const copy = {
+      ...browserNodeFailureEnglish,
+      desktopOnly: 'Desktop sentence.',
+      snapshotFailed: 'Could not update.'
+    }
+    expect(browserNodeFailureHeading('desktop-only', copy)).toBe('Desktop sentence.')
+    expect(browserNodeFailureHeading('not-a-code', copy)).toBe('Could not update.')
+    expect(browserNodeFailureHeading('desktop-only', copy)).not.toBe('desktop-only')
+    expect(browserNodeFailureHeading('window-closed', browserNodeFailureEnglish)).toBe(
+      'The browser window is not open.'
+    )
+    expect(browserNodeFailureHeading('no-picture', browserNodeFailureEnglish)).toBe(
+      'The page returned no picture'
+    )
   })
 })
 
@@ -703,7 +731,7 @@ describe('the desktop command', () => {
     })
     const graph = editor()
     const created = await createBrowserNode(graph)
-    expect(created).toEqual({ ok: false, error: BROWSER_DESKTOP_ONLY })
+    expect(created).toEqual({ ok: false, error: 'desktop-only' })
     expect(childCount(graph)).toBe(0)
     const id = idOf(
       await createBrowserNodeFromPage(
@@ -714,7 +742,7 @@ describe('the desktop command', () => {
       )
     )
     const before = readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] })
-    expect(await refreshBrowserNode(graph, id)).toEqual({ ok: false, error: BROWSER_DESKTOP_ONLY })
+    expect(await refreshBrowserNode(graph, id)).toEqual({ ok: false, error: 'desktop-only' })
     expect(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] })).toEqual(before)
   })
 })

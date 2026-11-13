@@ -4,6 +4,7 @@ import {
   responseWithTarget
 } from '@/app/automation/bridge/target'
 import { createBrowserNode, refreshBrowserNode } from '@/app/browser/node/command'
+import { browserNodeFailureEnglish, browserNodeFailureHeading } from '@/app/browser/node/failure'
 import { BROWSER_DESKTOP_ONLY } from '@/app/browser/tools'
 import type { EditorStore } from '@/app/editor/active-store'
 import { IS_TAURI } from '@/constants'
@@ -20,7 +21,9 @@ export async function handleBrowserSnapshot(store: EditorStore, args: unknown): 
   const outcome = id
     ? await refreshBrowserNode(target.store, id)
     : await createBrowserNode(target.store)
-  if (!outcome.ok) throw new Error(outcome.error)
+  if (!outcome.ok) {
+    throw new Error(browserNodeFailureHeading(outcome.error, browserNodeFailureEnglish))
+  }
   return responseWithTarget({ ok: true, result: { id: outcome.id } }, target)
 }
 

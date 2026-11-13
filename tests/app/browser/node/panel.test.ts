@@ -14,7 +14,6 @@ import {
 } from '@/app/browser/node/panel'
 import type { BrowserNodeOutcome, BrowserNodeSession } from '@/app/browser/node/session'
 import { browserState, markClosed, markNavigating, setDevice } from '@/app/browser/state'
-import { BROWSER_DESKTOP_ONLY, browserToolCall } from '@/app/browser/tools'
 import { IS_TAURI } from '@/constants'
 
 const PNG = toUint8Array(
@@ -79,8 +78,7 @@ describe('editing a browser snapshot from the panel', () => {
     const { graph, id } = await snapshot()
     const input = 'file:///etc/passwd'
     const saved = saveBrowserNodeAddress(graph, id, input)
-    const tool = browserToolCall('browser_load_page', { url: input }, true, true)
-    expect(saved).toEqual(tool)
+    expect(saved).toEqual({ ok: false, error: 'scheme-refused' })
     expect(storedURL(graph, id)).toBe(PAGE)
     graph.undoAction()
     expect(graph.graph.getNode(id)).toBeUndefined()
@@ -89,7 +87,7 @@ describe('editing a browser snapshot from the panel', () => {
   test('an address the snapshot cannot store is not written', async () => {
     const { graph, id } = await snapshot()
     const saved = saveBrowserNodeAddress(graph, id, `https://example.com/${'a'.repeat(2000)}`)
-    expect(saved).toEqual({ ok: false, error: 'That address is not a page the browser can open.' })
+    expect(saved).toEqual({ ok: false, error: 'invalid-address' })
     expect(storedURL(graph, id)).toBe(PAGE)
   })
 
@@ -120,7 +118,7 @@ describe('editing a browser snapshot from the panel', () => {
       return Promise.resolve()
     })
     expect(IS_TAURI).toBe(false)
-    expect(result).toEqual({ ok: false, error: BROWSER_DESKTOP_ONLY })
+    expect(result).toEqual({ ok: false, error: 'desktop-only' })
     expect(opened).toEqual([])
   })
 

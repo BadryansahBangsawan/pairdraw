@@ -34,5 +34,12 @@
   "snapshotRefresh": "Actualizar",
   "snapshotOpen": "Abrir en el navegador",
   "snapshotRefreshed": "Última actualización {time}",
-  "snapshotCannotRefresh": "Esta imagen se puede actualizar en la aplicación de escritorio. Aquí se queda como se guardó."
+  "snapshotCannotRefresh": "Esta imagen se puede actualizar en la aplicación de escritorio. Aquí se queda como se guardó.",
+  "snapshotWindowClosed": "La ventana del navegador no está abierta.",
+  "snapshotMissingLayer": "Esa capa no está en el lienzo.",
+  "snapshotNotSnapshot": "Esa capa no es una captura de página.",
+  "snapshotNoPicture": "La página no devolvió ninguna imagen.",
+  "snapshotLoadTimeout": "La página no terminó de cargar.",
+  "snapshotAddressUncaptured": "La imagen no era la página que terminó de cargar.",
+  "snapshotFailed": "No se pudo actualizar la captura de la página."
 }

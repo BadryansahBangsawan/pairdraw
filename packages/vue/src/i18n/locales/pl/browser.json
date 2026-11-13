@@ -34,5 +34,12 @@
   "snapshotRefresh": "Odśwież",
   "snapshotOpen": "Otwórz w przeglądarce",
   "snapshotRefreshed": "Ostatnie odświeżenie {time}",
-  "snapshotCannotRefresh": "Ten obraz można odświeżyć w aplikacji komputerowej. Tutaj zostaje taki, jaki został zapisany."
+  "snapshotCannotRefresh": "Ten obraz można odświeżyć w aplikacji komputerowej. Tutaj zostaje taki, jaki został zapisany.",
+  "snapshotWindowClosed": "Okno przeglądarki nie jest otwarte.",
+  "snapshotMissingLayer": "Tej warstwy nie ma na płótnie.",
+  "snapshotNotSnapshot": "Ta warstwa nie jest migawką strony.",
+  "snapshotNoPicture": "Strona nie zwróciła obrazu.",
+  "snapshotLoadTimeout": "Strona nie skończyła się wczytywać.",
+  "snapshotAddressUncaptured": "Obraz nie był stroną, która skończyła się wczytywać.",
+  "snapshotFailed": "Migawki strony nie udało się odświeżyć."
 }

@@ -34,5 +34,12 @@
   "snapshotRefresh": "更新",
   "snapshotOpen": "ブラウザで開く",
   "snapshotRefreshed": "最終更新 {time}",
-  "snapshotCannotRefresh": "この画像を更新できるのはデスクトップアプリだけです。ここでは保存されたままです。"
+  "snapshotCannotRefresh": "この画像を更新できるのはデスクトップアプリだけです。ここでは保存されたままです。",
+  "snapshotWindowClosed": "ブラウザの窓は開いていません。",
+  "snapshotMissingLayer": "そのレイヤーはキャンバスにありません。",
+  "snapshotNotSnapshot": "そのレイヤーはページの画像ではありません。",
+  "snapshotNoPicture": "ページから画像が返りませんでした。",
+  "snapshotLoadTimeout": "ページの読み込みが終わりませんでした。",
+  "snapshotAddressUncaptured": "その画像は、読み込みが終わったページのものではありません。",
+  "snapshotFailed": "ページの画像を更新できませんでした。"
 }

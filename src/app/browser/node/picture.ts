@@ -10,29 +10,27 @@ import { imageSize } from '@open-pencil/scene-graph/images'
 
 import { BROWSER_DESKTOP_ONLY, BROWSER_WINDOW_CLOSED } from '../tools'
 import { browserURLPolicy, type BrowserURLRejection } from '../url'
+import { BROWSER_NODE_FAILURE } from './failure'
+import { BROWSER_NODE_LOAD_TIMEOUT } from './load'
 import type { BrowserNodeSession } from './session'
 
 /** The same sentence the screenshot command uses when the window returns no PNG. */
 export const BROWSER_NODE_NO_PICTURE = 'The page returned no picture'
 
-/** The picture and the address read after it are not the same page, so nothing is stored. */
-export const BROWSER_NODE_ADDRESS_UNCAPTURED =
-  'The picture was not of the page that finished loading.'
-
 const URL_ERRORS: Record<BrowserURLRejection, string> = {
-  empty: 'Type an address to open.',
-  scheme: 'The browser opens http and https addresses only.',
-  invalid: 'That address is not a page the browser can open.'
+  empty: BROWSER_NODE_FAILURE.emptyAddress,
+  scheme: BROWSER_NODE_FAILURE.schemeRefused,
+  invalid: BROWSER_NODE_FAILURE.invalidAddress
 }
 
 /** Why this build cannot take a picture, or null when the window is open on the desktop. */
 export function browserNodeGate(session: BrowserNodeSession): string | null {
-  if (!session.desktop) return BROWSER_DESKTOP_ONLY
-  if (!session.open) return BROWSER_WINDOW_CLOSED
+  if (!session.desktop) return BROWSER_NODE_FAILURE.desktopOnly
+  if (!session.open) return BROWSER_NODE_FAILURE.windowClosed
   return null
 }
 
-/** The address the window's own policy would open, or the sentence that policy already uses. */
+/** The address the window's own policy would open, or the panel code for a refusal. */
 export function browserNodeAddress(
   input: string
 ): { ok: true; url: string } | { ok: false; error: string } {
@@ -62,7 +60,7 @@ export function browserNodePicture(
   refreshedAt: string
 ): { ok: true; record: BrowserNodeRecord; png: Uint8Array } | { ok: false; error: string } {
   const size = png.byteLength < 8 ? null : imageSize(png)
-  if (!storedSize(size)) return { ok: false, error: BROWSER_NODE_NO_PICTURE }
+  if (!storedSize(size)) return { ok: false, error: BROWSER_NODE_FAILURE.noPicture }
   const parsed = v.safeParse(browserNodeSchema, {
     url,
     width: size.width,
@@ -70,7 +68,7 @@ export function browserNodePicture(
     preset: browserNodePreset(preset),
     refreshedAt
   })
-  if (!parsed.success) return { ok: false, error: BROWSER_NODE_NO_PICTURE }
+  if (!parsed.success) return { ok: false, error: BROWSER_NODE_FAILURE.noPicture }
   return { ok: true, record: parsed.output, png }
 }
 
@@ -83,7 +81,15 @@ function storedSize(
   )
 }
 
-/** The sentence an action rejected with, or the no-picture sentence when it said nothing. */
+const ACTION_CODES: Record<string, string> = {
+  [BROWSER_DESKTOP_ONLY]: BROWSER_NODE_FAILURE.desktopOnly,
+  [BROWSER_WINDOW_CLOSED]: BROWSER_NODE_FAILURE.windowClosed,
+  [BROWSER_NODE_NO_PICTURE]: BROWSER_NODE_FAILURE.noPicture,
+  [BROWSER_NODE_LOAD_TIMEOUT]: BROWSER_NODE_FAILURE.loadTimeout
+}
+
+/** The panel code for a rejected action. An unknown message is the generic failure. */
 export function browserNodeActionError(error: unknown): string {
-  return error instanceof Error && error.message !== '' ? error.message : BROWSER_NODE_NO_PICTURE
+  if (!(error instanceof Error) || error.message === '') return BROWSER_NODE_FAILURE.noPicture
+  return ACTION_CODES[error.message] ?? BROWSER_NODE_FAILURE.failed
 }

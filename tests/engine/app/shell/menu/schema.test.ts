@@ -49,6 +49,7 @@ describe('APP_MENU_SCHEMA', () => {
     ).filter((entry) => !('type' in entry) && entry.handler === 'shell')
 
     expect(shellEntries.map((entry) => ('type' in entry ? '' : entry.id))).toEqual([
+      'new-window',
       'open-tour',
       'diagnostics',
       'settings',
@@ -92,10 +93,20 @@ describe('APP_MENU_SCHEMA', () => {
       'type' in entry ? '' : entry.id
     )
 
-    expect(ids.slice(0, 3)).toEqual(['new', 'new-tab', 'open'])
+    expect(ids.slice(0, 4)).toEqual(['new', 'new-tab', 'new-window', 'open'])
     expect(ids).not.toContain('browse-files')
     expect(ids).toContain('save-to')
     expect(ids).not.toContain('save-to-cloud')
+  })
+
+  // A window is the shell's, not a document's: only the desktop app can open one.
+  test('opens a second editor window from the native File menu', () => {
+    const fileMenu = APP_MENU_SCHEMA.find((group) => group.label === 'File')
+    const entries = fileMenu ? actionItems(fileMenu.items) : []
+
+    expect(entries).toContainEqual(
+      expect.objectContaining({ id: 'new-window', label: 'New Window', target: 'native' })
+    )
   })
 
   test('exposes recent files through the native File menu', () => {

@@ -25,6 +25,7 @@ import {
 import { useAppTheme } from '@/app/shell/theme'
 import { checkForAppUpdate } from '@/app/shell/updater/check'
 import { isTauri } from '@/app/tauri/env'
+import { openEditorWindow } from '@/app/window/open'
 
 function shellMenuIds(entries: readonly AppMenuEntry[]): string[] {
   return entries.flatMap((entry) => {
@@ -73,6 +74,11 @@ export function useShellMenu() {
   const { setTheme } = useAppTheme()
   const { updates } = useI18n()
   const actions: Partial<Record<string, () => void>> = {
+    'new-window': () => {
+      void openEditorWindow().catch((error: unknown) => {
+        console.error('[Window] Failed to open a new window:', error)
+      })
+    },
     'open-tour': () => {
       openTour().catch((error: unknown) => console.error('[Tour] Could not open the tour:', error))
     },

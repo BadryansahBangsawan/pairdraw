@@ -8,5 +8,4 @@ pub mod browser_read;
 pub mod browser_shot;
 pub mod env;
 pub mod opener;
-#[cfg(target_os = "macos")]
 pub mod window;

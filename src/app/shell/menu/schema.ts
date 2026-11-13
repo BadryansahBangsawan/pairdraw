@@ -94,6 +94,8 @@ export const APP_MENU_SCHEMA = [
     items: [
       { id: 'new', label: 'New Design', shortcut: 'MOD+N' },
       { id: 'new-tab', label: 'New Tab', shortcut: 'MOD+T' },
+      // A second editor window, which only the desktop shell can open.
+      { id: 'new-window', label: 'New Window', target: 'native', handler: 'shell' },
       { id: 'open', label: 'Open…', shortcut: 'MOD+O' },
       { id: 'open-recent', label: 'Open Recent', target: 'native' },
       // Figma's File › Place image…, which places images and SVG files in the middle of the view.

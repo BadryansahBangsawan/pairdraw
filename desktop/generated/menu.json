@@ -13,6 +13,10 @@
         "accelerator": "CmdOrCtrl+T"
       },
       {
+        "id": "new-window",
+        "label": "New Window"
+      },
+      {
         "id": "open",
         "label": "Open…",
         "accelerator": "CmdOrCtrl+O"

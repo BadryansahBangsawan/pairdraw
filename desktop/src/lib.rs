@@ -21,6 +21,7 @@ use menu::{
 };
 use network::http::{cancel_http_request, proxy_http_request, ProxyHttpRequests};
 use std::sync::Mutex;
+use system::window::build_main_window;
 #[cfg(target_os = "macos")]
 use system::window::show_main_window;
 use tauri::{Emitter, Manager};
@@ -97,6 +98,7 @@ pub fn run() {
             system::opener::reveal_local_file,
             #[cfg(feature = "native-test")]
             system::opener::take_native_test_revealed_files,
+            system::window::open_window,
             launch::paths::path_matches_suffix,
             list_system_fonts,
             load_system_font,
@@ -147,18 +149,7 @@ pub fn run() {
         .setup(|app| {
             // The main window is built here rather than from the config alone, so that pages it
             // opens with `window.open` reach the system browser.
-            let main = app
-                .config()
-                .app
-                .windows
-                .first()
-                .cloned()
-                .ok_or("the main window is not configured")?;
-            tauri::WebviewWindowBuilder::from_config(app.handle(), &main)?
-                .on_new_window(system::opener::open_new_window_externally(
-                    app.handle().clone(),
-                ))
-                .build()?;
+            build_main_window(app.handle())?;
 
             launch::queue_open_paths(app.handle(), args::startup_open_paths());
 

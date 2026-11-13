@@ -12,6 +12,7 @@ export interface SidebarLabels {
   icons: string
   photos: string
   browser: string
+  script: string
   layers: string
   contextMenu: string
   exporting: string
@@ -188,6 +189,7 @@ export const EN: SidebarLabels = {
   icons: 'Icons',
   photos: 'Photos',
   browser: 'Built-in Browser',
+  script: 'Script Layers',
   overview: 'Overview',
   gettingStarted: 'Getting Started',
   features: 'Features',
@@ -221,6 +223,7 @@ export const DE: SidebarLabels = {
   icons: 'Symbole',
   photos: 'Fotos',
   browser: 'Integrierter Browser',
+  script: 'Skript-Ebenen',
   overview: 'Überblick',
   gettingStarted: 'Erste Schritte',
   features: 'Funktionen',
@@ -254,6 +257,7 @@ export const IT: SidebarLabels = {
   icons: 'Icone',
   photos: 'Foto',
   browser: 'Browser integrato',
+  script: 'Livelli script',
   overview: 'Panoramica',
   gettingStarted: 'Per iniziare',
   features: 'Funzionalità',
@@ -287,6 +291,7 @@ export const FR: SidebarLabels = {
   icons: 'Icônes',
   photos: 'Photos',
   browser: 'Navigateur intégré',
+  script: 'Calques de script',
   overview: 'Vue d’ensemble',
   gettingStarted: 'Premiers pas',
   features: 'Fonctionnalités',
@@ -320,6 +325,7 @@ export const ES: SidebarLabels = {
   icons: 'Iconos',
   photos: 'Fotos',
   browser: 'Navegador integrado',
+  script: 'Capas de script',
   overview: 'Resumen',
   gettingStarted: 'Primeros pasos',
   features: 'Características',
@@ -353,6 +359,7 @@ export const PL: SidebarLabels = {
   icons: 'Ikony',
   photos: 'Zdjęcia',
   browser: 'Wbudowana przeglądarka',
+  script: 'Warstwy skryptów',
   overview: 'Przegląd',
   gettingStarted: 'Rozpoczęcie pracy',
   features: 'Funkcje',
@@ -386,6 +393,7 @@ export const RU: SidebarLabels = {
   icons: 'Иконки',
   photos: 'Фото',
   browser: 'Встроенный браузер',
+  script: 'Слои скриптов',
   overview: 'Обзор',
   gettingStarted: 'Начало работы',
   features: 'Возможности',

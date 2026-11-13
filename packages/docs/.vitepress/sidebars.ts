@@ -37,6 +37,7 @@ export const userGuideSidebar = (
       { text: labels.icons, link: '/user-guide/icons' },
       { text: labels.photos, link: '/user-guide/photos' },
       { text: labels.browser, link: '/user-guide/browser' },
+      { text: labels.script, link: '/user-guide/script-layers' },
     ],
   },
   {

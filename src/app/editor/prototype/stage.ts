@@ -34,8 +34,13 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
   /** The frame before a dissolve started, as the PNG the crossfade fades out over the canvas. */
   const dissolvingFrom = ref<{ src: string; rect: StageRect } | null>(null)
 
-  /** How the canvas is behaving; only the play view goes live, and its revision restarts. */
-  const live = computed(() => resolveEditorProfile(store.state).live)
+  /**
+   * How the canvas is behaving while a prototype plays. A slide presentation is live too, and it
+   * keeps its own zoom and scroll, so only the play view starts a session and fits its frame.
+   */
+  const live = computed(() =>
+    store.getPresentation() ? null : resolveEditorProfile(store.state).live
+  )
 
   /** The frame the canvas fits and shows, which is the top overlay when one is open. */
   const shownRect = computed<StageRect | null>(() => {

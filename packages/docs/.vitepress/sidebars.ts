@@ -60,6 +60,7 @@ export const userGuideSidebar = (
       // English only until translated; locales link to the canonical page.
       { text: labels.checkingDesigns, link: '/user-guide/checking-designs' },
       { text: labels.research, link: '/user-guide/research' },
+      { text: labels.prototype, link: '/user-guide/playing-a-prototype' },
     ],
   },
 ]

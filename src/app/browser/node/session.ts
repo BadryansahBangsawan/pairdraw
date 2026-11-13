@@ -14,9 +14,10 @@ export interface BrowserNodeSession {
   preset: string
 }
 
-/** A picture of the open page. */
+/** A picture of the open page. The address is read after the picture returns, with the pixels. */
 export interface BrowserNodeActions {
   screenshot(): Promise<Uint8Array>
+  capturedAddress(): string | null
 }
 
 /**

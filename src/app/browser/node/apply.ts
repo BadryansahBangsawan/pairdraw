@@ -9,6 +9,7 @@ import {
 import { computeImageHash } from '@open-pencil/scene-graph/images'
 
 import {
+  BROWSER_NODE_ADDRESS_UNCAPTURED,
   browserNodeActionError,
   browserNodeAddress,
   browserNodeGate,
@@ -28,9 +29,9 @@ const NOT_SNAPSHOT = 'That layer is not a browser snapshot.'
 type Canvas = Pick<Editor, 'graph' | 'state' | 'recordEdit' | 'select'>
 
 /**
- * Makes a snapshot of the open page: its address, the picture's pixel size, and the picture as
- * the layer's image. A refusal or a failed picture creates nothing. This does not open a window
- * and does not run when a file is opened.
+ * Makes a snapshot of the open page: the address captured with the picture, the picture's pixel
+ * size, and the picture as the layer's image. A refusal or a failed picture creates nothing.
+ * This does not open a window and does not run when a file is opened.
  */
 export async function createBrowserNodeFromPage(
   editor: Canvas,
@@ -40,10 +41,12 @@ export async function createBrowserNodeFromPage(
 ): Promise<BrowserNodeOutcome> {
   const blocked = browserNodeGate(session)
   if (blocked) return { ok: false, error: blocked }
-  const address = browserNodeAddress(session.url ?? '')
-  if (!address.ok) return address
+  const opening = browserNodeAddress(session.url ?? '')
+  if (!opening.ok) return opening
   const shot = await takePicture(actions)
   if (!shot.ok) return shot
+  const address = browserNodeAddress(actions.capturedAddress() ?? '')
+  if (!address.ok) return address
   const picture = browserNodePicture(shot.png, address.url, session.preset, refreshedAt)
   if (!picture.ok) return picture
   const id = editor.recordEdit({ label: 'Create browser snapshot' }, () =>
@@ -53,10 +56,15 @@ export async function createBrowserNodeFromPage(
 }
 
 /**
- * Replaces a snapshot's picture and the time it was taken, in one undo step. When the open page
- * is a different address, the already-open window is moved to the stored address and the picture
- * is taken only after that page has loaded. A closed window is not opened. A missed load or a
- * failed picture leaves the layer as it was.
+ * Replaces a snapshot's picture and the time it was taken, in one undo step. Undo covers that
+ * layer write only: the picture, its pixel size, the preset, the time, and the address of the
+ * page the picture is of. Moving the window is not an undo step.
+ *
+ * When the open page is a different address, the window is moved and the picture is taken only
+ * after that load finishes. The stored address is the one captured with the picture. A refresh
+ * that moved the window also requires that address to be the page the load finished on. A missed
+ * load, a failed picture, or an address that was not captured leaves the layer as it was. A
+ * closed window is not opened.
  */
 export async function refreshBrowserNodeFromPage(
   editor: Canvas,
@@ -77,7 +85,13 @@ export async function refreshBrowserNodeFromPage(
   if (!moved.ok) return moved
   const shot = await takePicture(actions)
   if (!shot.ok) return shot
-  const picture = browserNodePicture(shot.png, address.url, session.preset, refreshedAt)
+  const captured = browserNodeAddress(actions.capturedAddress() ?? '')
+  if (!captured.ok) return captured
+  if (moved.loaded !== null && captured.url !== moved.loaded) {
+    return { ok: false, error: BROWSER_NODE_ADDRESS_UNCAPTURED }
+  }
+  const page = moved.loaded ?? captured.url
+  const picture = browserNodePicture(shot.png, page, session.preset, refreshedAt)
   if (!picture.ok) return picture
   editor.recordEdit({ label: 'Refresh browser snapshot' }, () => {
     const hash = storePicture(editor, picture.png)
@@ -95,9 +109,9 @@ async function showStoredPage(
   session: BrowserNodeSession,
   actions: BrowserNodeRefreshActions,
   url: string
-): Promise<{ ok: true } | { ok: false; error: string }> {
+): Promise<{ ok: true; loaded: string | null } | { ok: false; error: string }> {
   const open = browserNodeAddress(session.url ?? '')
-  if (open.ok && open.url === url) return { ok: true }
+  if (open.ok && open.url === url) return { ok: true, loaded: null }
   // Subscribe before the move, then accept a report only once the move has been requested.
   // Otherwise a fast load is missed, or the previous page is stored with the new address.
   let wait: BrowserNodeLoadWait | null = null
@@ -107,12 +121,13 @@ async function showStoredPage(
     const moving = actions.navigate(url)
     wait.begin()
     await moving
-    await wait.done
+    const loaded = browserNodeAddress(await wait.done)
+    if (!loaded.ok) return loaded
+    return { ok: true, loaded: loaded.url }
   } catch (error) {
     wait?.cancel()
     return { ok: false, error: browserNodeActionError(error) }
   }
-  return { ok: true }
 }
 
 async function takePicture(

@@ -26,7 +26,10 @@ export function createBrowserNode(editor: Editor) {
   return createBrowserNodeFromPage(
     editor,
     browserNodeSession(),
-    { screenshot: () => screenshotBrowser('visible') },
+    {
+      screenshot: () => screenshotBrowser('visible'),
+      capturedAddress: () => browserState.url
+    },
     new Date().toISOString()
   )
 }
@@ -42,6 +45,7 @@ export function refreshBrowserNode(editor: Editor, nodeId: string) {
     browserNodeSession(),
     {
       screenshot: () => screenshotBrowser('visible'),
+      capturedAddress: () => browserState.url,
       navigate: (url) => navigateBrowserWindow(url),
       waitForLoad: () =>
         waitForBrowserPage({

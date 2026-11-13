@@ -15,6 +15,10 @@ import type { BrowserNodeSession } from './session'
 /** The same sentence the screenshot command uses when the window returns no PNG. */
 export const BROWSER_NODE_NO_PICTURE = 'The page returned no picture'
 
+/** The picture and the address read after it are not the same page, so nothing is stored. */
+export const BROWSER_NODE_ADDRESS_UNCAPTURED =
+  'The picture was not of the page that finished loading.'
+
 const URL_ERRORS: Record<BrowserURLRejection, string> = {
   empty: 'Type an address to open.',
   scheme: 'The browser opens http and https addresses only.',

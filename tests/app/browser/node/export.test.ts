@@ -44,7 +44,7 @@ async function snapshot(): Promise<{ graph: Editor; id: string }> {
   const result = await createBrowserNodeFromPage(
     graph,
     session(),
-    { screenshot: () => Promise.resolve(PNG) },
+    { screenshot: () => Promise.resolve(PNG), capturedAddress: () => PAGE },
     WHEN
   )
   const id = idOf(result)

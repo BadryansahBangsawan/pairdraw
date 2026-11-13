@@ -31,6 +31,7 @@ const WIDE = toUint8Array(
 const WHEN = '2026-11-13T00:00:00.000Z'
 const LATER = '2026-11-13T01:00:00.000Z'
 const PAGE = 'https://example.com/docs'
+const LANDED = 'https://example.com/landed'
 
 const editors: Editor[] = []
 
@@ -105,7 +106,8 @@ describe('creating a browser snapshot', () => {
         screenshot: () => {
           shots.push('shot')
           return Promise.resolve(PNG)
-        }
+        },
+        capturedAddress: () => PAGE
       },
       WHEN
     )
@@ -150,7 +152,8 @@ describe('creating a browser snapshot', () => {
           screenshot: () => {
             shots += 1
             return Promise.resolve(PNG)
-          }
+          },
+          capturedAddress: () => one.url
         },
         WHEN
       )
@@ -171,13 +174,16 @@ describe('creating a browser snapshot', () => {
     const empty = await createBrowserNodeFromPage(
       graph,
       session(),
-      { screenshot: () => Promise.resolve(new Uint8Array()) },
+      { screenshot: () => Promise.resolve(new Uint8Array()), capturedAddress: () => PAGE },
       WHEN
     )
     const failed = await createBrowserNodeFromPage(
       graph,
       session(),
-      { screenshot: () => Promise.reject(new Error('The page returned no picture')) },
+      {
+        screenshot: () => Promise.reject(new Error('The page returned no picture')),
+        capturedAddress: () => PAGE
+      },
       WHEN
     )
     expect(empty).toEqual({ ok: false, error: 'The page returned no picture' })
@@ -191,7 +197,7 @@ describe('creating a browser snapshot', () => {
       await createBrowserNodeFromPage(
         graph,
         session({ preset: 'desktop' }),
-        { screenshot: () => Promise.resolve(WIDE) },
+        { screenshot: () => Promise.resolve(WIDE), capturedAddress: () => PAGE },
         WHEN
       )
     )
@@ -201,6 +207,48 @@ describe('creating a browser snapshot', () => {
       height: 1
     })
   })
+
+  test('the stored address is the page captured with the picture', async () => {
+    const graph = editor()
+    let seen = PAGE
+    const id = idOf(
+      await createBrowserNodeFromPage(
+        graph,
+        session(),
+        {
+          screenshot: () => {
+            seen = LANDED
+            return Promise.resolve(PNG)
+          },
+          capturedAddress: () => seen
+        },
+        WHEN
+      )
+    )
+    expect(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] })?.url).toBe(
+      address(LANDED)
+    )
+  })
+
+  test('a picture whose address is refused does not become a layer', async () => {
+    const graph = editor()
+    let shots = 0
+    const result = await createBrowserNodeFromPage(
+      graph,
+      session(),
+      {
+        screenshot: () => {
+          shots += 1
+          return Promise.resolve(PNG)
+        },
+        capturedAddress: () => 'file:///etc/passwd'
+      },
+      WHEN
+    )
+    expect(shots).toBe(1)
+    expect(result.ok).toBe(false)
+    expect(childCount(graph)).toBe(0)
+  })
 })
 
 describe('refreshing a browser snapshot', () => {
@@ -209,7 +257,7 @@ describe('refreshing a browser snapshot', () => {
       await createBrowserNodeFromPage(
         graph,
         session(),
-        { screenshot: () => Promise.resolve(PNG) },
+        { screenshot: () => Promise.resolve(PNG), capturedAddress: () => PAGE },
         WHEN
       )
     )
@@ -230,6 +278,7 @@ describe('refreshing a browser snapshot', () => {
       session({ preset: 'pixel-7' }),
       {
         screenshot: () => Promise.resolve(WIDE),
+        capturedAddress: () => PAGE,
         navigate: () => {
           moved += 1
           return Promise.resolve()
@@ -282,6 +331,7 @@ describe('refreshing a browser snapshot', () => {
       session({ preset: 'pixel-7' }),
       {
         screenshot: () => Promise.resolve(WIDE),
+        capturedAddress: () => PAGE,
         navigate: () => Promise.resolve(),
         waitForLoad: loadNotArmed()
       },
@@ -312,6 +362,7 @@ describe('refreshing a browser snapshot', () => {
       session(),
       {
         screenshot: () => Promise.resolve(WIDE),
+        capturedAddress: () => PAGE,
         navigate: () => Promise.resolve(),
         waitForLoad: loadNotArmed()
       },
@@ -325,6 +376,118 @@ describe('refreshing a browser snapshot', () => {
       WIDE
     )
     expect(fills).toHaveLength(2)
+  })
+
+  test('a refresh stores the address the load finished on', async () => {
+    const graph = editor()
+    const id = await snapshot(graph)
+    const result = await refreshBrowserNodeFromPage(
+      graph,
+      id,
+      session({ url: 'https://other.example/' }),
+      {
+        navigate: () => Promise.resolve(),
+        screenshot: () => Promise.resolve(WIDE),
+        waitForLoad: () => ({
+          armed: Promise.resolve(),
+          begin: () => undefined,
+          done: Promise.resolve(LANDED),
+          cancel: () => undefined
+        }),
+        capturedAddress: () => LANDED
+      },
+      LATER
+    )
+    expect(result).toEqual({ ok: true, id })
+    expect(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] })).toMatchObject({
+      url: address(LANDED),
+      width: 2,
+      refreshedAt: LATER
+    })
+  })
+
+  test('a refresh does not store an address the picture did not capture', async () => {
+    const graph = editor()
+    const id = await snapshot(graph)
+    const before = structuredClone(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] }))
+    const result = await refreshBrowserNodeFromPage(
+      graph,
+      id,
+      session({ url: 'https://other.example/' }),
+      {
+        navigate: () => Promise.resolve(),
+        screenshot: () => Promise.resolve(WIDE),
+        waitForLoad: () => ({
+          armed: Promise.resolve(),
+          begin: () => undefined,
+          done: Promise.resolve(LANDED),
+          cancel: () => undefined
+        }),
+        capturedAddress: () => 'https://example.com/elsewhere'
+      },
+      LATER
+    )
+    expect(result.ok).toBe(false)
+    expect(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] })).toEqual(before)
+    graph.undoAction()
+    expect(graph.graph.getNode(id)).toBeUndefined()
+  })
+
+  test('a failed picture after a move leaves the layer and adds no undo step', async () => {
+    const graph = editor()
+    const id = await snapshot(graph)
+    const before = structuredClone(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] }))
+    let moved = 0
+    const result = await refreshBrowserNodeFromPage(
+      graph,
+      id,
+      session({ url: 'https://other.example/' }),
+      {
+        navigate: () => {
+          moved += 1
+          return Promise.resolve()
+        },
+        waitForLoad: () => ({
+          armed: Promise.resolve(),
+          begin: () => undefined,
+          done: Promise.resolve(PAGE),
+          cancel: () => undefined
+        }),
+        screenshot: () => Promise.reject(new Error('The page returned no picture')),
+        capturedAddress: () => PAGE
+      },
+      LATER
+    )
+    expect(moved).toBe(1)
+    expect(result).toEqual({ ok: false, error: 'The page returned no picture' })
+    expect(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] })).toEqual(before)
+    graph.undoAction()
+    expect(graph.graph.getNode(id)).toBeUndefined()
+  })
+
+  test('a refresh on the open page stores the address captured with the picture', async () => {
+    const graph = editor()
+    const id = await snapshot(graph)
+    let seen = PAGE
+    const result = await refreshBrowserNodeFromPage(
+      graph,
+      id,
+      session(),
+      {
+        navigate: () => Promise.reject(new Error('already on the page')),
+        waitForLoad: loadNotArmed(),
+        screenshot: () => {
+          seen = LANDED
+          return Promise.resolve(WIDE)
+        },
+        capturedAddress: () => seen
+      },
+      LATER
+    )
+    expect(result).toEqual({ ok: true, id })
+    expect(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] })?.url).toBe(
+      address(LANDED)
+    )
   })
 
   test('a different open page is loaded first, and a failed load keeps the layer', async () => {
@@ -344,6 +507,7 @@ describe('refreshing a browser snapshot', () => {
           order.push('shot')
           return Promise.resolve(WIDE)
         },
+        capturedAddress: () => PAGE,
         waitForLoad: loadWhenMoved(order)
       },
       LATER
@@ -360,6 +524,7 @@ describe('refreshing a browser snapshot', () => {
           order.push('late')
           return Promise.resolve(PNG)
         },
+        capturedAddress: () => PAGE,
         waitForLoad: loadWhenMoved(order)
       },
       WHEN
@@ -405,7 +570,8 @@ describe('refreshing a browser snapshot', () => {
         screenshot: () => {
           order.push('shot')
           return Promise.resolve(WIDE)
-        }
+        },
+        capturedAddress: () => address(PAGE)
       },
       LATER
     )
@@ -450,7 +616,8 @@ describe('refreshing a browser snapshot', () => {
         screenshot: () => {
           shots += 1
           return Promise.resolve(WIDE)
-        }
+        },
+        capturedAddress: () => PAGE
       },
       LATER
     )
@@ -481,6 +648,7 @@ describe('refreshing a browser snapshot', () => {
             calls += 1
             return Promise.resolve(WIDE)
           },
+          capturedAddress: () => PAGE,
           waitForLoad: loadNotArmed()
         },
         LATER
@@ -507,6 +675,7 @@ describe('refreshing a browser snapshot', () => {
         calls += 1
         return Promise.resolve(PNG)
       },
+      capturedAddress: () => PAGE,
       waitForLoad: loadNotArmed()
     }
     expect(await refreshBrowserNodeFromPage(graph, plain, session(), actions, LATER)).toEqual({
@@ -540,7 +709,7 @@ describe('the desktop command', () => {
       await createBrowserNodeFromPage(
         graph,
         session(),
-        { screenshot: () => Promise.resolve(PNG) },
+        { screenshot: () => Promise.resolve(PNG), capturedAddress: () => PAGE },
         WHEN
       )
     )

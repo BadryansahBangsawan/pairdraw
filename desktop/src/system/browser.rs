@@ -148,7 +148,7 @@ pub fn browser_open<R: Runtime>(app: AppHandle<R>, url: String) -> Result<(), St
     let builder = WebviewWindowBuilder::new(&app, BROWSER_WINDOW_LABEL, WebviewUrl::External(url))
         .title("Browser")
         .inner_size(DEFAULT_WIDTH, DEFAULT_HEIGHT)
-        .on_navigation(|url| browser_navigation_allowed(url))
+        .on_navigation(browser_navigation_allowed)
         .on_new_window(|_, _| tauri::webview::NewWindowResponse::Deny)
         .on_page_load(move |window, payload| {
             if payload.event() == PageLoadEvent::Finished {

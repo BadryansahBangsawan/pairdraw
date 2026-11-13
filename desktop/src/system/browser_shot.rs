@@ -71,6 +71,10 @@ mod macos {
 
     use super::ShotRect;
 
+    /// The channel one snapshot answers on: bytes, or why the page could not be read.
+    type ShotSender = oneshot::Sender<Result<Vec<u8>, String>>;
+    type ShotSlot = Mutex<Option<ShotSender>>;
+
     pub async fn capture<R: Runtime>(
         window: &WebviewWindow<R>,
         rect: Option<ShotRect>,
@@ -86,21 +90,14 @@ mod macos {
         Ok(base64::engine::general_purpose::STANDARD.encode(bytes))
     }
 
-    fn reply(
-        slot: &Mutex<Option<oneshot::Sender<Result<Vec<u8>, String>>>>,
-        outcome: Result<Vec<u8>, String>,
-    ) {
+    fn reply(slot: &ShotSlot, outcome: Result<Vec<u8>, String>) {
         if let Some(sender) = slot.lock().ok().and_then(|mut guard| guard.take()) {
             let _ = sender.send(outcome);
         }
     }
 
     /// Starts the snapshot and returns. The webview calls back later, on its own queue.
-    fn schedule(
-        view: *mut c_void,
-        rect: Option<ShotRect>,
-        slot: Mutex<Option<oneshot::Sender<Result<Vec<u8>, String>>>>,
-    ) {
+    fn schedule(view: *mut c_void, rect: Option<ShotRect>, slot: ShotSlot) {
         let Some(marker) = MainThreadMarker::new() else {
             reply(&slot, Err("The snapshot left the main thread".to_owned()));
             return;
@@ -163,7 +160,7 @@ mod macos {
     }
 
     fn data_bytes(data: &NSData) -> Vec<u8> {
-        let length = data.length() as usize;
+        let length = data.length();
         let mut bytes = vec![0u8; length];
         if length > 0 {
             if let Some(pointer) = NonNull::new(bytes.as_mut_ptr().cast()) {

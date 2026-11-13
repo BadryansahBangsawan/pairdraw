@@ -89,30 +89,32 @@ describe('native preferences', () => {
         (snap) => {
           press(snap)
           const started = Date.now()
-          const poll = () => {
+          const poll = async () => {
             const core = window.__TAURI__?.core
             if (!core) {
               done({ error: 'native test requires app.withGlobalTauri' })
               return
             }
-            void core
-              .invoke<boolean>('native_menu_checked', { id: 'snap-objects' })
-              .then((checked) => {
-                if (checked === false) {
-                  done({ synced: true })
-                  return
-                }
-                if (Date.now() - started > 5_000) {
-                  done({ synced: false })
-                  return
-                }
-                setTimeout(poll, 100)
+            try {
+              const checked = await core.invoke<boolean>('native_menu_checked', {
+                id: 'snap-objects'
               })
-              .catch((error: unknown) => {
-                done({ error: String(error) })
-              })
+              if (checked === false) {
+                done({ synced: true })
+                return
+              }
+              if (Date.now() - started > 5_000) {
+                done({ synced: false })
+                return
+              }
+              setTimeout(() => {
+                void poll()
+              }, 100)
+            } catch (error) {
+              done({ error: String(error) })
+            }
           }
-          poll()
+          void poll()
         }
       )
     })) as { synced?: boolean; error?: string }

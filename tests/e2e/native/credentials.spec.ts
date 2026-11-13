@@ -97,23 +97,25 @@ describe('native test credential isolation', () => {
           button.scrollIntoView()
           button.click()
           const clicked = Date.now()
-          const poll = () => {
-            void core
-              .invoke<boolean>('credential_access_paused')
-              .then((paused) => {
-                if (paused === false) {
-                  done({ retried: true, panelShown: panel.offsetParent !== null })
-                  return
-                }
-                if (Date.now() - clicked > 5_000) {
-                  done({ retried: false, panelShown: panel.offsetParent !== null })
-                  return
-                }
-                setTimeout(poll, 100)
-              })
-              .catch((error: unknown) => done({ error: String(error) }))
+          const poll = async () => {
+            try {
+              const paused = await core.invoke<boolean>('credential_access_paused')
+              if (paused === false) {
+                done({ retried: true, panelShown: panel.offsetParent !== null })
+                return
+              }
+              if (Date.now() - clicked > 5_000) {
+                done({ retried: false, panelShown: panel.offsetParent !== null })
+                return
+              }
+              setTimeout(() => {
+                void poll()
+              }, 100)
+            } catch (error) {
+              done({ error: String(error) })
+            }
           }
-          poll()
+          void poll()
           return
         }
         if (Date.now() - started > 10_000) {

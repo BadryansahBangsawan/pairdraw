@@ -1,7 +1,17 @@
 import { strict as assert } from 'node:assert'
 import { createServer, type Server } from 'node:http'
 
+import * as v from 'valibot'
+
 import { invokeNative } from '#tests/helpers/tauri/invoke'
+
+const pageReportSchema = v.pipe(
+  v.string(),
+  v.parseJson(),
+  v.object({ url: v.string(), title: v.string(), text: v.string() })
+)
+
+const pageTextSchema = v.pipe(v.string(), v.parseJson(), v.object({ text: v.string() }))
 
 const PAGE = `<!doctype html>
 <html><head><title>Native Browser Probe</title></head>
@@ -35,7 +45,11 @@ describe('native built-in browser', () => {
 
   after(async () => {
     await invokeNative('browser_close').catch(() => undefined)
-    await new Promise<void>((resolve) => server.close(() => resolve()))
+    await new Promise<void>((resolve) => {
+      server.close(() => {
+        resolve()
+      })
+    })
   })
 
   it('loads a page the separate WebView shows and acts on it', async function () {
@@ -56,36 +70,39 @@ describe('native built-in browser', () => {
         return
       }
       const started = Date.now()
-      const read = () => {
-        void core
-          .invoke<string>('browser_page_text')
-          .then((raw) => {
-            const value = JSON.parse(raw) as { url: string; title: string; text: string }
-            if (value.title === 'Native Browser Probe' && value.text.includes('ready')) {
-              done(value)
-              return
-            }
-            if (Date.now() - started > 20_000) {
-              done({ error: `page did not load: ${raw}` })
-              return
-            }
-            setTimeout(read, 100)
-          })
-          .catch((error: unknown) => {
-            if (Date.now() - started > 20_000) {
-              done({ error: String(error) })
-              return
-            }
-            setTimeout(read, 100)
-          })
+      const read = async () => {
+        try {
+          const raw = await core.invoke<string>('browser_page_text')
+          if (raw.includes('"title":"Native Browser Probe"') && raw.includes('"text":"ready')) {
+            done({ raw })
+            return
+          }
+          if (Date.now() - started > 20_000) {
+            done({ error: `page did not load: ${raw}` })
+            return
+          }
+          setTimeout(() => {
+            void read()
+          }, 100)
+        } catch (error) {
+          if (Date.now() - started > 20_000) {
+            done({ error: String(error) })
+            return
+          }
+          setTimeout(() => {
+            void read()
+          }, 100)
+        }
       }
-      read()
-    })) as { url?: string; title?: string; text?: string; error?: string }
+      void read()
+    })) as { raw?: string; error?: string }
 
     assert.equal(page.error, undefined)
-    assert.equal(page.url, pageURL)
-    assert.equal(page.title, 'Native Browser Probe')
-    assert.match(page.text ?? '', /ready/)
+    assert.ok(page.raw)
+    const report = v.parse(pageReportSchema, page.raw)
+    assert.equal(report.url, pageURL)
+    assert.equal(report.title, 'Native Browser Probe')
+    assert.match(report.text, /ready/)
 
     const result = await invokeNative<string>('browser_act', {
       kind: 'click',
@@ -104,28 +121,30 @@ describe('native built-in browser', () => {
         return
       }
       const started = Date.now()
-      const read = () => {
-        void core
-          .invoke<string>('browser_page_text')
-          .then((raw) => {
-            const value = JSON.parse(raw) as { text: string }
-            if (value.text.includes('clicked')) {
-              done({ text: value.text })
-              return
-            }
-            if (Date.now() - started > 10_000) {
-              done({ error: `click did not land: ${raw}` })
-              return
-            }
-            setTimeout(read, 100)
-          })
-          .catch((error: unknown) => done({ error: String(error) }))
+      const read = async () => {
+        try {
+          const raw = await core.invoke<string>('browser_page_text')
+          if (raw.includes('"text":"clicked')) {
+            done({ raw })
+            return
+          }
+          if (Date.now() - started > 10_000) {
+            done({ error: `click did not land: ${raw}` })
+            return
+          }
+          setTimeout(() => {
+            void read()
+          }, 100)
+        } catch (error) {
+          done({ error: String(error) })
+        }
       }
-      read()
-    })) as { text?: string; error?: string }
+      void read()
+    })) as { raw?: string; error?: string }
 
     assert.equal(after.error, undefined)
-    assert.match(after.text ?? '', /clicked/)
+    assert.ok(after.raw)
+    assert.match(v.parse(pageTextSchema, after.raw).text, /clicked/)
   })
 
   it('refuses an address the window does not open', async () => {

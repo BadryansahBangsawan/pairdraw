@@ -6,11 +6,12 @@ import { toUint8Array } from 'js-base64'
 import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
 import {
   isShaderFrameCurrent,
+  isShaderPresetPaint,
   shaderFramePixels,
   shaderOfPaint,
   shaderPresetKey,
   withShaderPaints,
-  type ShaderPaint
+  type ShaderPresetPaint
 } from '@open-pencil/scene-graph/shaders'
 
 import type { ShaderStillPage } from './page'
@@ -31,15 +32,16 @@ const BROWSER_ARGS = [
 
 interface Job {
   node: SceneNode
-  shader: ShaderPaint
+  shader: ShaderPresetPaint
 }
 
 /** The shaders of `node`'s paints whose frame is missing or drawn for another size or preset. */
-function staleShaders(graph: SceneGraph, node: SceneNode): ShaderPaint[] {
+function staleShaders(graph: SceneGraph, node: SceneNode): ShaderPresetPaint[] {
   const size = { width: node.width, height: node.height }
   return [...node.fills, ...node.strokes].flatMap((paint) => {
     const shader = shaderOfPaint(node, paint)
-    if (!shader) return []
+    // Only presets render on the still page; the editor draws user-written code itself.
+    if (!shader || !isShaderPresetPaint(shader)) return []
     return isShaderFrameCurrent(shader, size) && graph.images.has(shader.image) ? [] : [shader]
   })
 }

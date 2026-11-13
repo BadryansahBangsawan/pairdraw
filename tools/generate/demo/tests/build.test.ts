@@ -6,7 +6,7 @@ import { CHAPTERS, sectionName } from '#demo/document/chapters/names'
 import { exportFigFile, readFigFile, populateAllFigPages } from '@open-pencil/core/io/formats/fig'
 import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
 import { missingBindings, readBehaviour } from '@open-pencil/scene-graph/behaviours'
-import { readShaderPaints } from '@open-pencil/scene-graph/shaders'
+import { isShaderPresetPaint, readShaderPaints } from '@open-pencil/scene-graph/shaders'
 import { instanceSlotFrames, ownsSlotContent } from '@open-pencil/scene-graph/slots'
 
 let graph: SceneGraph
@@ -108,6 +108,9 @@ describe('the demo document', () => {
   test('keeps a shader preset on every shader fill', () => {
     const shaders = [...graph.getAllNodes()].flatMap((node) => readShaderPaints(node))
     expect(shaders.length).toBeGreaterThanOrEqual(5)
-    for (const shader of shaders) expect(shader.preset.components.length).toBeGreaterThan(0)
+    for (const shader of shaders) {
+      if (!isShaderPresetPaint(shader)) continue
+      expect(shader.preset.components.length).toBeGreaterThan(0)
+    }
   })
 })

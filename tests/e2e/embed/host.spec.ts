@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 
 import type { JSHandle, Page } from '@playwright/test'
 
-import { expect, test } from '#tests/e2e/fixtures'
+import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
 
 /**
  * A host page embeds the editor in an iframe and drives it over the embed protocol. The host is
@@ -124,6 +124,11 @@ function events(client: JSHandle<EmbedClient>, name: string): Promise<Reply[]> {
 const embeddedFrame = (page: Page) => page.frameLocator('iframe[title="Embedded editor"]')
 
 test.describe('embed mode', () => {
+  // The first frame of the app a cold dev server serves takes most of a test's 15 s, which the
+  // first test here used up before its own steps began. The shared setup boots the app once under
+  // the boot budget, so each embed below loads an app the server has already built.
+  useEditorSetup()
+
   test('the host shows its document read-only and drives the editor over the port', async ({
     page
   }) => {

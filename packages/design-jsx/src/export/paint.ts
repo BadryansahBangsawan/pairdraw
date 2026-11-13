@@ -267,7 +267,7 @@ function effectShorthand(effects: ShadowEffect[]): JSXProp[] | null {
   if (rest.length > 1 || rest.some((effect) => effect.type !== 'LAYER_BLUR')) return null
   const props: JSXProp[] = []
   if (shadow) props.push(['shadow', shadow])
-  for (const blur of rest as ShadowEffect[]) props.push(['blur', blur.radius])
+  for (const blur of rest) props.push(['blur', blur.radius])
   return props
 }
 

@@ -39,6 +39,19 @@ void main() {
   gl_FragColor = vec4(0.0, texture2D(u_layer, uv).r, 0.0, 1.0);
 }`
 
+/** Paints the blue channel with what it samples, so a blue pixel proves it read the pass before it. */
+const SAMPLES_GREEN = `#version 300 es
+precision highp float;
+/** @resolution */
+uniform vec2 u_resolution;
+/** @object */
+uniform sampler2D u_layer;
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution;
+  gl_FragColor = vec4(0.0, 0.0, texture2D(u_layer, uv).g, 1.0);
+}`
+
 function shaderEffect(source: string): Effect {
   return { type: 'SHADER', source, uniforms: {}, visible: true }
 }
@@ -89,5 +102,17 @@ describe('a layer shader effect', () => {
   test('is left out while it is hidden', () => {
     const hidden = { ...shaderEffect(SAMPLES_LAYER), visible: false }
     expect(drawCentre([hidden])).toEqual([255, 0, 0, 255])
+  })
+
+  test('draws a second effect over what the first one drew', () => {
+    expect(drawCentre([shaderEffect(SAMPLES_LAYER), shaderEffect(SAMPLES_GREEN)])).toEqual([
+      0, 0, 255, 255
+    ])
+  })
+
+  test('draws the next effect when an earlier one does not compile', () => {
+    expect(
+      drawCentre([shaderEffect('void main(){ gl_FragColor = nope; }'), shaderEffect(SAMPLES_LAYER)])
+    ).toEqual([0, 255, 0, 255])
   })
 })

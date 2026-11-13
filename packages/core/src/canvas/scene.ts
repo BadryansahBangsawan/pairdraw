@@ -43,7 +43,7 @@ import {
   effectRasterScaleMatches
 } from './renderer/effect-raster-cache'
 import { mapVisualBounds, subtreeVisualBounds } from './renderer/visual-bounds'
-import { drawShaderEffectLayer } from './shaders/effect'
+import { drawShaderEffectChain } from './shaders/effect'
 import { isolatesInnerShadows, renderLayerShadows } from './shadows'
 import { isLayerContainer } from './shadows/silhouette'
 import {
@@ -394,15 +394,16 @@ export function renderNode(
 
   applyNodeTransforms(canvas, node, overlays)
   renderLayerShadows(r, canvas, graph, node, 'behind')
-  const shaderEffect = node.effects.find((e): e is ShaderEffect => e.visible && e.type === 'SHADER')
-  const drawsShaderEffect =
-    shaderEffect !== undefined &&
-    drawShaderEffectLayer(r, canvas, graph, node, shaderEffect, (offscreen) => {
-      renderNodeContent(r, offscreen, graph, node, overlays)
-      drawLayoutGrids(r, offscreen, node)
+  const shaderEffects = node.effects.filter(
+    (e): e is ShaderEffect => e.visible && e.type === 'SHADER'
+  )
+  if (shaderEffects.length > 0) {
+    drawShaderEffectChain(r, canvas, graph, node, shaderEffects, (target) => {
+      renderNodeContent(r, target, graph, node, overlays)
+      drawLayoutGrids(r, target, node)
       renderChildren(
         r,
-        offscreen,
+        target,
         graph,
         node,
         overlays,
@@ -411,7 +412,7 @@ export function renderNode(
         hasTransformedAncestor || hasNodeTransform(projectedNode(node, overlays.rotationPreview))
       )
     })
-  if (!drawsShaderEffect) {
+  } else {
     renderNodeContent(r, canvas, graph, node, overlays)
     drawLayoutGrids(r, canvas, node)
     renderChildren(

@@ -63,6 +63,31 @@ function objectShader(r: SkiaRenderer, image: Image, scale: number): Shader {
 }
 
 /**
+ * Draws `node`'s content into `canvas` with `effects` applied in document order, each sampling what
+ * the one before it drew. The content is drawn exactly once: an effect that cannot compile or is too
+ * large to snapshot is skipped, and the rest of the chain still draws.
+ */
+export function drawShaderEffectChain(
+  r: SkiaRenderer,
+  canvas: Canvas,
+  graph: SceneGraph,
+  node: SceneNode,
+  effects: readonly ShaderEffect[],
+  renderContent: (canvas: Canvas) => void
+): void {
+  const effect = effects.at(-1)
+  const below = effects.slice(0, -1)
+  if (!effect) {
+    renderContent(canvas)
+    return
+  }
+  const drawn = drawShaderEffectLayer(r, canvas, graph, node, effect, (offscreen) =>
+    drawShaderEffectChain(r, offscreen, graph, node, below, renderContent)
+  )
+  if (!drawn) drawShaderEffectChain(r, canvas, graph, node, below, renderContent)
+}
+
+/**
  * Draws `effect` over `node`'s bounds, calling `renderContent` with an offscreen canvas to paint
  * the layer into. Returns false when nothing compiled or the layer is too large to snapshot, so
  * the caller draws the layer as it would without the effect.
@@ -85,6 +110,7 @@ export function drawShaderEffectLayer(
   if (width > MAX_SIDE || height > MAX_SIDE) return false
 
   let surface: Surface | null = null
+  let image: Image | null = null
   const children: Shader[] = []
   let drawn: Shader | null = null
   try {
@@ -101,7 +127,7 @@ export function drawShaderEffectLayer(
     renderContent(offscreen)
     surface.flush()
 
-    const image = surface.makeImageSnapshot()
+    image = surface.makeImageSnapshot()
     const samplers = compiled.uniforms.filter((uniform) => uniform.kind === 'sampler')
     for (const sampler of samplers) {
       if (sampler.automatic === 'object') {
@@ -112,7 +138,6 @@ export function drawShaderEffectLayer(
       if (!child) return false
       children.push(child)
     }
-    image.delete()
 
     const frame: ShaderFrame = {
       width: node.width,
@@ -137,6 +162,7 @@ export function drawShaderEffectLayer(
   } finally {
     drawn?.delete()
     for (const child of children) child.delete()
+    image?.delete()
     surface?.delete()
   }
 }

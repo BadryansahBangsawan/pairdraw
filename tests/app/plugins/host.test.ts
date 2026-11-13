@@ -7,6 +7,7 @@ import * as figmaFactory from '@/app/automation/bridge/figma-factory'
 import { createEditorStore } from '@/app/editor/session/create'
 import { installPlugin, setPluginEnabled } from '@/app/plugins/catalog'
 import { grantPlugin } from '@/app/plugins/grants'
+import { PLUGIN_POINTER_CANCELLED_MESSAGE } from '@/app/plugins/messages'
 import {
   addPluginPointerPoint,
   cancelPluginPointer,
@@ -66,6 +67,26 @@ function plugin(grants: string[]): InstalledPlugin[] {
 
 const shape = { type: 'RECTANGLE', x: 0, y: 0, width: 40, height: 20 }
 
+/** How long a refused pointer request may take before it is treated as still holding the canvas. */
+const REFUSAL_WAIT_MS = 200
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
+
+/** What a pointer request did: its rejection, `resolved`, or `pending` when it still holds on. */
+function pointerRequestOutcome(request: Promise<unknown>): Promise<unknown> {
+  return Promise.race([
+    request.then(
+      () => 'resolved',
+      (error: unknown) => error
+    ),
+    wait(REFUSAL_WAIT_MS).then(() => 'pending')
+  ])
+}
+
 test('a granted read answers with the tool result', async () => {
   const plugins = plugin(['document:read'])
   const host = createPluginHost(openDocument(), plugins, 'marks')
@@ -122,4 +143,48 @@ test('the pointer call takes the canvas pointer without a tool lookup or a grant
   endPluginPointer()
   expect(await sequence).toEqual([{ x: 4, y: 5 }])
   host.finish(false)
+})
+
+test('a sequence that ends by release keeps the run able to ask again', async () => {
+  const host = createPluginHost(openDocument(), plugin([]), 'marks')
+  const first = host.call(PLUGIN_POINTER_CALL, {})
+  addPluginPointerPoint({ x: 1, y: 2 })
+  endPluginPointer()
+  expect(await first).toEqual([{ x: 1, y: 2 }])
+
+  const second = host.call(PLUGIN_POINTER_CALL, {})
+  expect(pluginPointerHolder.value).toBe('marks')
+  endPluginPointer()
+  expect(await second).toEqual([])
+  host.finish(false)
+})
+
+test('a run whose sequence the user cancelled cannot take the pointer again', async () => {
+  const host = createPluginHost(openDocument(), plugin([]), 'marks')
+  const first = host.call(PLUGIN_POINTER_CALL, {})
+  expect(pluginPointerHolder.value).toBe('marks')
+  cancelPluginPointer()
+  expect(await first).toBeNull()
+
+  const outcome = await pointerRequestOutcome(host.call(PLUGIN_POINTER_CALL, {}))
+  expect(outcome).toBeInstanceOf(Error)
+  expect(outcome instanceof Error ? outcome.message : '').toBe(PLUGIN_POINTER_CANCELLED_MESSAGE)
+  expect(pluginPointerHolder.value).toBeNull()
+  host.finish(false)
+})
+
+test('a new run of the same plugin may take the pointer after a cancel', async () => {
+  const store = openDocument()
+  const first = createPluginHost(store, plugin([]), 'marks')
+  const cancelled = first.call(PLUGIN_POINTER_CALL, {})
+  cancelPluginPointer()
+  expect(await cancelled).toBeNull()
+  first.finish(false)
+
+  const second = createPluginHost(store, plugin([]), 'marks')
+  const next = second.call(PLUGIN_POINTER_CALL, {})
+  expect(pluginPointerHolder.value).toBe('marks')
+  endPluginPointer()
+  expect(await next).toEqual([])
+  second.finish(false)
 })

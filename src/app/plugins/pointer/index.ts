@@ -8,7 +8,7 @@ import { ref, type Ref } from 'vue'
 
 import { createDeferred } from '@/app/runtime/deferred'
 
-import { PLUGIN_POINTER_BUSY_MESSAGE } from '../messages'
+import { PLUGIN_POINTER_BUSY_MESSAGE, PLUGIN_POINTER_CANCELLED_MESSAGE } from '../messages'
 
 /** One point a pointer sequence reached, in document coordinates. */
 export interface PluginPointerPoint {
@@ -16,10 +16,23 @@ export interface PluginPointerPoint {
   y: number
 }
 
+/** What one run may ask of the canvas: its sequences end together when the user cancels one. */
+export interface PluginPointerAccess {
+  /** The next sequence, or `null` when the user cancelled this one. */
+  request(): Promise<PluginPointerPoint[] | null>
+  /** Frees the pointer if this run still holds it; the run is over. */
+  release(): void
+}
+
+interface PointerRun {
+  cancelled: boolean
+}
+
 interface HeldSequence {
   id: string
   points: PluginPointerPoint[]
   settle: (sequence: PluginPointerPoint[] | null) => void
+  run: PointerRun
 }
 
 let held: HeldSequence | null = null
@@ -33,15 +46,26 @@ function release(): void {
 }
 
 /**
- * Asks for the next pointer sequence for one plugin run. A second plugin asking while the first
- * holds it is refused rather than queued: the canvas has one pointer.
+ * Opens the pointer for one run. A sequence the user cancels closes the pointer for that run:
+ * every later request is refused, so a plugin that asks again cannot take the canvas back and
+ * instead burns its run deadline. Sequences the user completes keep working, and a new run gets
+ * its own access.
  */
-export function requestPluginPointer(id: string): Promise<PluginPointerPoint[] | null> {
-  if (held) return Promise.reject(new Error(PLUGIN_POINTER_BUSY_MESSAGE))
-  const { promise, resolve } = createDeferred<PluginPointerPoint[] | null>()
-  held = { id, points: [], settle: resolve }
-  pluginPointerHolder.value = id
-  return promise
+export function beginPluginPointer(id: string): PluginPointerAccess {
+  const run: PointerRun = { cancelled: false }
+  return {
+    request() {
+      if (run.cancelled) return Promise.reject(new Error(PLUGIN_POINTER_CANCELLED_MESSAGE))
+      if (held) return Promise.reject(new Error(PLUGIN_POINTER_BUSY_MESSAGE))
+      const { promise, resolve } = createDeferred<PluginPointerPoint[] | null>()
+      held = { id, points: [], settle: resolve, run }
+      pluginPointerHolder.value = id
+      return promise
+    },
+    release() {
+      if (held?.run === run) drop()
+    }
+  }
 }
 
 /** Adds one document point to the sequence in progress; with no holder the point is ignored. */
@@ -58,15 +82,16 @@ export function endPluginPointer(): void {
   settle(points)
 }
 
-/** Drops the sequence: Escape, a cancelled pointer, or a run that ended while it held the pointer. */
-export function cancelPluginPointer(): void {
+function drop(): void {
   if (!held) return
   const settle = held.settle
   release()
   settle(null)
 }
 
-/** Frees the pointer only when `id` is the holder, so a later holder keeps its sequence. */
-export function releasePluginPointer(id: string): void {
-  if (held?.id === id) cancelPluginPointer()
+/** Drops the sequence the user cancelled, and closes the pointer for the run that asked. */
+export function cancelPluginPointer(): void {
+  if (!held) return
+  held.run.cancelled = true
+  drop()
 }

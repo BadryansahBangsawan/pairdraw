@@ -43,3 +43,6 @@ export const PLUGIN_CALL_UNAVAILABLE_MESSAGE =
   'This run has no document to call; a plugin can only reach tools in the app.'
 
 export const PLUGIN_POINTER_BUSY_MESSAGE = 'Another plugin is using the canvas pointer.'
+
+export const PLUGIN_POINTER_CANCELLED_MESSAGE =
+  'The canvas pointer was cancelled; this run cannot ask for it again.'

@@ -14,7 +14,6 @@ import {
   PLUGIN_DISABLED_MESSAGE,
   pluginRunMissingMessage
 } from '@/app/plugins/messages'
-import { releasePluginPointer } from '@/app/plugins/pointer'
 import { createPluginHost, type PluginHost } from '@/app/plugins/sandbox/host'
 import {
   PLUGIN_SANDBOX_CALL,
@@ -157,8 +156,7 @@ export async function runInstalledPlugin(
     failed = !outcome.ok
     return outcome
   } finally {
-    // A run that ends while it waits for the pointer gives the canvas back.
-    releasePluginPointer(id)
+    // The host also gives the canvas pointer back when the run ends.
     host?.finish(failed)
   }
 }

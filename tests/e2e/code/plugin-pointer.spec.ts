@@ -34,7 +34,21 @@ const PLUGIN_SOURCE = `
   return points.length
 `
 
-function pluginCatalog(): string {
+/**
+ * A plugin that asks for the pointer again as soon as a sequence ends, so only cancelling the
+ * sequence can stop it; it swallows the refusal and keeps looping until the run's deadline ends it.
+ */
+const LOOPING_SOURCE = `
+  while (true) {
+    try {
+      await plugin.pointer()
+    } catch (error) {
+      if (!String(error.message).includes('cancelled')) throw error
+    }
+  }
+`
+
+function pluginCatalog(source = PLUGIN_SOURCE): string {
   return JSON.stringify({
     version: 1,
     plugins: [
@@ -47,7 +61,7 @@ function pluginCatalog(): string {
         grants: ['document:write'],
         asked: true,
         enabled: true,
-        source: PLUGIN_SOURCE
+        source
       }
     ]
   })
@@ -145,4 +159,36 @@ test('Escape releases the pointer and the plugin sees a cancelled sequence', asy
 
   await expect.poll(() => layerBox(page, 'Cancelled by Escape')).not.toBeNull()
   expect(await layerBox(page, 'From the pointer')).toBeNull()
+})
+
+test.describe('a plugin that asks for the pointer again', () => {
+  test.use({
+    storageState: async ({ baseURL }, use) => {
+      if (!baseURL) throw new Error('Browser test baseURL is required')
+      await use({
+        cookies: [],
+        origins: [
+          {
+            origin: new URL(baseURL).origin,
+            localStorage: [
+              { name: 'open-pencil:plugins', value: pluginCatalog(LOOPING_SOURCE) }
+            ]
+          }
+        ]
+      })
+    }
+  })
+
+  test('a cancelled sequence ends the run instead of taking the canvas again', async ({ page }) => {
+    await startPlugin(page)
+    const capture = page.getByTestId('plugin-pointer-layer')
+    await expect(capture).toBeVisible()
+
+    await page.keyboard.press('Escape')
+    await expect(capture).toHaveCount(0)
+
+    const timedOut = page.locator('[data-slot="toast"]').filter({ hasText: 'Plugin timed out.' })
+    await expect(timedOut).toBeVisible()
+    await expect(capture).toHaveCount(0)
+  })
 })

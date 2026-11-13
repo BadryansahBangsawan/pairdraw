@@ -36,6 +36,7 @@ export const userGuideSidebar = (
       // English only until translated; locales link to the canonical page.
       { text: labels.icons, link: '/user-guide/icons' },
       { text: labels.photos, link: '/user-guide/photos' },
+      { text: labels.browser, link: '/user-guide/browser' },
     ],
   },
   {

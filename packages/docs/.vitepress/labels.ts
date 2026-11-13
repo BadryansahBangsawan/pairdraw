@@ -11,6 +11,7 @@ export interface SidebarLabels {
   vectorEditing: string
   icons: string
   photos: string
+  browser: string
   layers: string
   contextMenu: string
   exporting: string
@@ -186,6 +187,7 @@ export const EN: SidebarLabels = {
   cloudStorage: 'Cloud Storage',
   icons: 'Icons',
   photos: 'Photos',
+  browser: 'Built-in Browser',
   overview: 'Overview',
   gettingStarted: 'Getting Started',
   features: 'Features',
@@ -218,6 +220,7 @@ export const DE: SidebarLabels = {
   cloudStorage: 'Cloud-Speicher',
   icons: 'Symbole',
   photos: 'Fotos',
+  browser: 'Integrierter Browser',
   overview: 'Überblick',
   gettingStarted: 'Erste Schritte',
   features: 'Funktionen',
@@ -250,6 +253,7 @@ export const IT: SidebarLabels = {
   cloudStorage: 'Archiviazione cloud',
   icons: 'Icone',
   photos: 'Foto',
+  browser: 'Browser integrato',
   overview: 'Panoramica',
   gettingStarted: 'Per iniziare',
   features: 'Funzionalità',
@@ -282,6 +286,7 @@ export const FR: SidebarLabels = {
   cloudStorage: 'Stockage cloud',
   icons: 'Icônes',
   photos: 'Photos',
+  browser: 'Navigateur intégré',
   overview: 'Vue d’ensemble',
   gettingStarted: 'Premiers pas',
   features: 'Fonctionnalités',
@@ -314,6 +319,7 @@ export const ES: SidebarLabels = {
   cloudStorage: 'Almacenamiento en la nube',
   icons: 'Iconos',
   photos: 'Fotos',
+  browser: 'Navegador integrado',
   overview: 'Resumen',
   gettingStarted: 'Primeros pasos',
   features: 'Características',
@@ -346,6 +352,7 @@ export const PL: SidebarLabels = {
   cloudStorage: 'Przechowywanie w chmurze',
   icons: 'Ikony',
   photos: 'Zdjęcia',
+  browser: 'Wbudowana przeglądarka',
   overview: 'Przegląd',
   gettingStarted: 'Rozpoczęcie pracy',
   features: 'Funkcje',
@@ -378,6 +385,7 @@ export const RU: SidebarLabels = {
   cloudStorage: 'Облачное хранилище',
   icons: 'Иконки',
   photos: 'Фото',
+  browser: 'Встроенный браузер',
   overview: 'Обзор',
   gettingStarted: 'Начало работы',
   features: 'Возможности',

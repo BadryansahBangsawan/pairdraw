@@ -31,13 +31,39 @@ describe('native test credential isolation', () => {
 
   it('hides credential controls when native access is healthy', async () => {
     await browser.keys([process.platform === 'darwin' ? 'Meta' : 'Control', ','])
-    const section = await $('[data-test-id="settings-general-panel"]')
-    await section.waitForDisplayed()
+    // One page round trip, for the same reason as the paused check below: the driver's
+    // per-command focus hook makes a polled WebDriver display check outlast the test.
+    const view = (await browser.executeAsync((done) => {
+      const started = Date.now()
+      const tick = () => {
+        const panel = document.querySelector<HTMLElement>(
+          '[data-test-id="settings-general-panel"]'
+        )
+        if (panel) {
+          done({
+            displayed: panel.offsetParent !== null,
+            text: panel.innerText,
+            retry: [...document.querySelectorAll('button')].some(
+              (button) => button.textContent?.trim() === 'Retry access'
+            )
+          })
+          return
+        }
+        if (Date.now() - started > 20_000) {
+          done({ displayed: false })
+          return
+        }
+        requestAnimationFrame(tick)
+      }
+      tick()
+    })) as { displayed: boolean; text?: string; retry?: boolean }
+
+    assert.equal(view.displayed, true)
     assert.doesNotMatch(
-      await section.getText(),
+      view.text ?? '',
       /system credential store|Saved passwords and API keys/
     )
-    assert.equal(await $('button=Retry access').isExisting(), false)
+    assert.equal(view.retry, false)
   })
 
   it('shows a paused section after denial and hides it after retry', async function () {
@@ -45,17 +71,63 @@ describe('native test credential isolation', () => {
     await assert.rejects(
       invokeNative('credential_write', { reference, value: 'open-pencil-native-test-denied' })
     )
-    assert.equal(await $('[data-test-id="settings-general-panel"]').isDisplayed(), true)
-    const retry = await $('button=Retry access')
-    await retry.waitForExist()
-    await retry.scrollIntoView()
-    await browser.execute(() => {
-      const panel = document.querySelector('[data-test-id="settings-general-panel"]')
-      if (panel?.parentElement) panel.parentElement.scrollTop = panel.parentElement.scrollHeight
-    })
-    await retry.click()
-    await browser.waitUntil(async () => !(await $('button=Retry access').isExisting()))
-    assert.equal(await invokeNative('credential_access_paused'), false)
+    // One page round trip: the embedded driver spends five seconds in each command's
+    // window-focus hook here, so separate WebDriver lookups outlast this test's limit.
+    const outcome = (await browser.executeAsync((done) => {
+      const core = window.__TAURI__?.core
+      if (!core) {
+        done({ error: 'native test requires app.withGlobalTauri' })
+        return
+      }
+      const panel = document.querySelector<HTMLElement>(
+        '[data-test-id="settings-general-panel"]'
+      )
+      if (!panel) {
+        done({ error: 'General settings panel is not open' })
+        return
+      }
+      const retryButton = () =>
+        [...document.querySelectorAll<HTMLButtonElement>('button')].find(
+          (button) => button.textContent?.trim() === 'Retry access'
+        ) ?? null
+      const started = Date.now()
+      const act = () => {
+        const button = retryButton()
+        if (button) {
+          button.scrollIntoView()
+          button.click()
+          const clicked = Date.now()
+          const poll = () => {
+            void core
+              .invoke<boolean>('credential_access_paused')
+              .then((paused) => {
+                if (paused === false) {
+                  done({ retried: true, panelShown: panel.offsetParent !== null })
+                  return
+                }
+                if (Date.now() - clicked > 5_000) {
+                  done({ retried: false, panelShown: panel.offsetParent !== null })
+                  return
+                }
+                setTimeout(poll, 100)
+              })
+              .catch((error: unknown) => done({ error: String(error) }))
+          }
+          poll()
+          return
+        }
+        if (Date.now() - started > 10_000) {
+          done({ error: 'Retry access did not show' })
+          return
+        }
+        requestAnimationFrame(act)
+      }
+      act()
+    })) as { retried?: boolean; panelShown?: boolean; error?: string }
+
+    assert.equal(outcome.error, undefined)
+    assert.equal(outcome.panelShown, true)
+    assert.equal(outcome.retried, true)
     await invokeNative('credential_write', { reference, value: 'disposable' })
     await invokeNative('credential_remove', { reference })
   })

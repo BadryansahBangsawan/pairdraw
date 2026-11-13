@@ -84,7 +84,7 @@ export async function refreshBrowserNodeFromPage(
     editor.graph.updateNode(nodeId, {
       width: picture.record.width,
       height: picture.record.height,
-      fills: [imageFill(hash)],
+      fills: replaceSnapshotFill(node.fills, hash),
       pluginData: withBrowserNode(node, picture.record)
     })
   })
@@ -143,6 +143,14 @@ function storePicture(editor: Canvas, png: Uint8Array): string {
   const hash = computeImageHash(png)
   editor.graph.images.set(hash, png.slice())
   return hash
+}
+
+/** The snapshot's own image fill. A fill the person added beside it stays, including a later image. */
+function replaceSnapshotFill(fills: readonly Fill[], hash: string): Fill[] {
+  const picture = imageFill(hash)
+  const index = fills.findIndex((fill) => fill.type === 'IMAGE')
+  if (index < 0) return [...fills, picture]
+  return fills.map((fill, at) => (at === index ? picture : fill))
 }
 
 function imageFill(hash: string): Fill {

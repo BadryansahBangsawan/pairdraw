@@ -4,6 +4,7 @@ import { toUint8Array } from 'js-base64'
 
 import { createEditor, type Editor } from '@open-pencil/core'
 import { readBrowserNode } from '@open-pencil/scene-graph/browser-node'
+import { colorToFill } from '@open-pencil/scene-graph/color'
 
 import { createBrowserNodeFromPage, refreshBrowserNodeFromPage } from '@/app/browser/node/apply'
 import {
@@ -262,6 +263,68 @@ describe('refreshing a browser snapshot', () => {
     })
     graph.redoAction()
     expect(readBrowserNode(graph.graph.getNode(id) ?? { pluginData: [] })?.refreshedAt).toBe(LATER)
+  })
+
+  test('a refresh replaces the snapshot picture and keeps the other fills', async () => {
+    const graph = editor()
+    const id = await snapshot(graph)
+    const node = graph.graph.getNode(id)
+    if (!node) throw new Error('missing')
+    const picture = node.fills[0]
+    if (!picture) throw new Error('missing picture')
+    const solid = colorToFill('#336699')
+    const laterImage = { ...picture }
+    graph.graph.updateNode(id, { fills: [solid, picture, laterImage] })
+
+    const result = await refreshBrowserNodeFromPage(
+      graph,
+      id,
+      session({ preset: 'pixel-7' }),
+      {
+        screenshot: () => Promise.resolve(WIDE),
+        navigate: () => Promise.resolve(),
+        waitForLoad: loadNotArmed()
+      },
+      LATER
+    )
+    expect(result).toEqual({ ok: true, id })
+    const fills = graph.graph.getNode(id)?.fills ?? []
+    expect(fills[0]).toEqual(solid)
+    expect(fills[1]?.imageHash).not.toBe(picture.imageHash)
+    expect(fills[1]?.imageHash ? graph.graph.images.get(fills[1].imageHash) : undefined).toEqual(
+      WIDE
+    )
+    expect(fills[2]).toEqual(laterImage)
+    expect(fills).toHaveLength(3)
+
+    graph.undoAction()
+    expect(graph.graph.getNode(id)?.fills).toEqual([solid, picture, laterImage])
+  })
+
+  test('a refresh appends a picture when the snapshot fill was removed', async () => {
+    const graph = editor()
+    const id = await snapshot(graph)
+    const solid = colorToFill('#336699')
+    graph.graph.updateNode(id, { fills: [solid] })
+    const result = await refreshBrowserNodeFromPage(
+      graph,
+      id,
+      session(),
+      {
+        screenshot: () => Promise.resolve(WIDE),
+        navigate: () => Promise.resolve(),
+        waitForLoad: loadNotArmed()
+      },
+      LATER
+    )
+    expect(result).toEqual({ ok: true, id })
+    const fills = graph.graph.getNode(id)?.fills ?? []
+    expect(fills[0]).toEqual(solid)
+    expect(fills[1]?.type).toBe('IMAGE')
+    expect(fills[1]?.imageHash ? graph.graph.images.get(fills[1].imageHash) : undefined).toEqual(
+      WIDE
+    )
+    expect(fills).toHaveLength(2)
   })
 
   test('a different open page is loaded first, and a failed load keeps the layer', async () => {

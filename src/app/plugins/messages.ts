@@ -41,3 +41,5 @@ export const PLUGIN_CALL_INVALID_ARGS_MESSAGE = 'This call has arguments the too
 
 export const PLUGIN_CALL_UNAVAILABLE_MESSAGE =
   'This run has no document to call; a plugin can only reach tools in the app.'
+
+export const PLUGIN_POINTER_BUSY_MESSAGE = 'Another plugin is using the canvas pointer.'

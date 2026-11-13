@@ -7,7 +7,14 @@ import * as figmaFactory from '@/app/automation/bridge/figma-factory'
 import { createEditorStore } from '@/app/editor/session/create'
 import { installPlugin, setPluginEnabled } from '@/app/plugins/catalog'
 import { grantPlugin } from '@/app/plugins/grants'
+import {
+  addPluginPointerPoint,
+  cancelPluginPointer,
+  endPluginPointer,
+  pluginPointerHolder
+} from '@/app/plugins/pointer'
 import { createPluginHost } from '@/app/plugins/sandbox/host'
+import { PLUGIN_POINTER_CALL } from '@/app/plugins/sandbox/schema'
 import type { InstalledPlugin } from '@/app/plugins/schema'
 
 const stores: ReturnType<typeof createEditorStore>[] = []
@@ -23,6 +30,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  cancelPluginPointer()
   factory.mockRestore()
   for (const store of stores.splice(0)) store.dispose()
 })
@@ -103,5 +111,15 @@ test('a disabled plugin is refused every call', async () => {
   const plugins = setPluginEnabled(plugin(['document:read']), 'marks', false)
   const host = createPluginHost(openDocument(), plugins, 'marks')
   await expect(host.call('get_selection', {})).rejects.toThrow('was not granted')
+  host.finish(false)
+})
+
+test('the pointer call takes the canvas pointer without a tool lookup or a grant', async () => {
+  const host = createPluginHost(openDocument(), plugin([]), 'marks')
+  const sequence = host.call(PLUGIN_POINTER_CALL, {})
+  expect(pluginPointerHolder.value).toBe('marks')
+  addPluginPointerPoint({ x: 4, y: 5 })
+  endPluginPointer()
+  expect(await sequence).toEqual([{ x: 4, y: 5 }])
   host.finish(false)
 })

@@ -3,7 +3,14 @@
  * No DOM, so the runner is unit-tested directly; `plugin` is the only way it can reach the
  * document, and its one method asks the host, which decides whether the plugin may run the tool.
  */
-import { PLUGIN_RESULT_MAX_CHARS, type PluginRunRequest, type PluginRunResult } from '../schema'
+import type { PluginPointerPoint } from '@/app/plugins/pointer'
+
+import {
+  PLUGIN_POINTER_CALL,
+  PLUGIN_RESULT_MAX_CHARS,
+  type PluginRunRequest,
+  type PluginRunResult
+} from '../schema'
 
 export const PLUGIN_RESULT_INVALID_ERROR = 'Plugin result is not valid.'
 export const PLUGIN_CALL_UNAVAILABLE_ERROR = 'This plugin cannot call tools.'
@@ -17,9 +24,19 @@ const AsyncFunction = Object.getPrototypeOf(async () => undefined).constructor a
   ...args: string[]
 ) => (...values: unknown[]) => Promise<unknown>
 
-/** The global a plugin is handed: one call into the host's tools, and nothing else. */
-export function createPluginAPI(call: PluginToolCall): Readonly<{ call: PluginToolCall }> {
-  return Object.freeze({ call })
+/**
+ * The global a plugin is handed: the host's tools, and the canvas pointer. `pointer` resolves with
+ * the sequence's points in order once the user releases, or `null` when it was cancelled.
+ */
+export function createPluginAPI(call: PluginToolCall): Readonly<{
+  call: PluginToolCall
+  /** The next pointer sequence in document coordinates, or `null` when the user cancelled it. */
+  pointer: () => Promise<PluginPointerPoint[] | null>
+}> {
+  return Object.freeze({
+    call,
+    pointer: () => call(PLUGIN_POINTER_CALL, {}) as Promise<PluginPointerPoint[] | null>
+  })
 }
 
 /** Serialize a program's return value, or throw when it cannot cross as JSON text. */

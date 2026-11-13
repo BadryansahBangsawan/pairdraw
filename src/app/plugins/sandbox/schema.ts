@@ -10,6 +10,9 @@ export const PLUGIN_SANDBOX_RESULT = 'open-pencil-plugin-result'
 export const PLUGIN_SANDBOX_CALL = 'open-pencil-plugin-call'
 export const PLUGIN_SANDBOX_CALL_RESULT = 'open-pencil-plugin-call-result'
 
+/** The reserved call that takes the next pointer sequence; it is not a document tool. */
+export const PLUGIN_POINTER_CALL = 'plugin.pointer'
+
 /** The longest JSON text a plugin result may be; a larger one is refused on both sides. */
 export const PLUGIN_RESULT_MAX_CHARS = 64 * 1024
 

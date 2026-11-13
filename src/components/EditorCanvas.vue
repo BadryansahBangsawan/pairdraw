@@ -44,6 +44,7 @@ import { useCanvasCollaborationAwareness } from '@/app/editor/canvas/collaborati
 import { createCanvasContextSelection } from '@/app/editor/canvas/context-selection'
 import { canvasOverlayObstacles } from '@/app/editor/canvas/obstacles'
 import { usePrototypeStage } from '@/app/editor/prototype/stage'
+import { usePluginPointerInput } from '@/app/plugins/pointer/input'
 import { useFollowView } from '@/app/presence/follow-view'
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { appPreferences } from '@/app/settings/preferences/store'
@@ -186,6 +187,14 @@ watch(isActivePane, (active) => {
 })
 onUnmounted(cleanupInteractions)
 
+const {
+  holder: pluginPointerHolder,
+  onPointerDown: onPluginPointerDown,
+  onPointerMove: onPluginPointerMove,
+  onPointerUp: onPluginPointerUp,
+  onPointerCancel: onPluginPointerCancel
+} = usePluginPointerInput(canvasRef, store)
+
 const { activeTab: propertiesTab } = useAIChat()
 const openStatusLabel = shallowRef<PlacedStatusLabel | null>(null)
 const { cursor: statusLabelCursor } = useCanvasStatusLabels(canvasRef, store, {
@@ -312,6 +321,16 @@ const pageBackground = computed(() => ({ backgroundColor: colorToCSS(store.state
           tabindex="-1"
           :style="{ cursor }"
           class="absolute inset-0 block size-full touch-none outline-none"
+        />
+        <div
+          v-if="pluginPointerHolder && isActivePane"
+          data-test-id="plugin-pointer-layer"
+          aria-hidden="true"
+          class="absolute inset-0 z-40 cursor-crosshair touch-none"
+          @pointerdown="onPluginPointerDown"
+          @pointermove="onPluginPointerMove"
+          @pointerup="onPluginPointerUp"
+          @pointercancel="onPluginPointerCancel"
         />
         <PlayIslands :view="paneView" :drawn="drawnView" :canvas="canvasRef" />
         <div

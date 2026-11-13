@@ -13,6 +13,7 @@ import {
   PLUGIN_SANDBOX_READY,
   PLUGIN_SANDBOX_RESULT,
   PLUGIN_SANDBOX_RUN,
+  PLUGIN_POINTER_CALL,
   PLUGIN_RESULT_MAX_CHARS,
   pluginFrameMessageSchema,
   pluginHostMessageSchema,
@@ -53,6 +54,30 @@ function frameDouble(answer: (source: string, id: string) => unknown) {
     }
   }
   return { frame, sent, disposals: () => disposals }
+}
+
+/** A frame that stays open, so a test sends the call and result messages itself. */
+function openFrame() {
+  const sent: unknown[] = []
+  let handler: ((data: unknown) => void) | undefined
+  const frame: SandboxFrame = {
+    postMessage(message) {
+      sent.push(message)
+    },
+    listen(callback) {
+      handler = callback
+      queueMicrotask(() => callback({ type: PLUGIN_SANDBOX_READY }))
+      return () => undefined
+    },
+    dispose: () => undefined
+  }
+  return { frame, sent, send: (data: unknown) => handler?.(data) }
+}
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
 }
 
 describe('plugin sandbox messages', () => {
@@ -106,7 +131,7 @@ describe('plugin worker', () => {
     })
   })
 
-  test('hands the program a frozen API with one call into the host', async () => {
+  test('hands the program a frozen API with its call and pointer', async () => {
     expect(
       await runPluginProgram(
         request(`
@@ -115,7 +140,20 @@ describe('plugin worker', () => {
         return { keys, sealed }
       `)
       )
-    ).toMatchObject({ ok: true, result: '{"keys":["call"],"sealed":true}' })
+    ).toMatchObject({ ok: true, result: '{"keys":["call","pointer"],"sealed":true}' })
+  })
+
+  test('the pointer method asks the host for the canvas sequence', async () => {
+    const calls: { name: string; args: unknown }[] = []
+    const result = await runPluginProgram(
+      request('const points = await plugin.pointer(); return points'),
+      async (name, args) => {
+        calls.push({ name, args })
+        return [{ x: 2, y: 3 }]
+      }
+    )
+    expect(calls).toEqual([{ name: PLUGIN_POINTER_CALL, args: {} }])
+    expect(result).toMatchObject({ ok: true, result: '[{"x":2,"y":3}]' })
   })
 
   test('reports a thrown error and a value that cannot cross as JSON text', async () => {
@@ -322,6 +360,60 @@ describe('plugin run session', () => {
       error: 'no marks'
     })
     expect(await run).toEqual({ ok: false, error: 'no marks' })
+  })
+
+  test('a pointer wait does not use up the run deadline', async () => {
+    const { frame, sent, send } = openFrame()
+    let release: (points: unknown) => void = () => undefined
+    const host: PluginHost = {
+      call: (name) =>
+        name === PLUGIN_POINTER_CALL
+          ? new Promise((resolve) => {
+              release = resolve
+            })
+          : Promise.resolve(undefined),
+      finish: () => undefined
+    }
+    const run = runPluginInFrame(frame, 'return 1', { timeoutMs: 20, host })
+    await Promise.resolve()
+    send({ type: PLUGIN_SANDBOX_CALL, callId: 'c1', name: PLUGIN_POINTER_CALL, args: {} })
+    await wait(40)
+    release([{ x: 1, y: 2 }])
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(sent).toContainEqual({
+      type: PLUGIN_SANDBOX_CALL_RESULT,
+      callId: 'c1',
+      ok: true,
+      result: '[{"x":1,"y":2}]'
+    })
+    send({
+      type: PLUGIN_SANDBOX_RESULT,
+      id: (sent[0] as { id: string }).id,
+      ok: true,
+      result: '"done"'
+    })
+    expect(await run).toEqual({ ok: true, result: 'done' })
+  })
+
+  test('the deadline runs again once the pointer is answered', async () => {
+    const { frame, send } = openFrame()
+    let release: () => void = () => undefined
+    const host: PluginHost = {
+      call: () =>
+        new Promise<void>((resolve) => {
+          release = resolve
+        }),
+      finish: () => undefined
+    }
+    const run = runPluginInFrame(frame, 'return 1', { timeoutMs: 30, host })
+    await Promise.resolve()
+    send({ type: PLUGIN_SANDBOX_CALL, callId: 'c1', name: PLUGIN_POINTER_CALL, args: {} })
+    await wait(45)
+    release()
+    const started = Date.now()
+    expect(await run).toEqual({ ok: false, error: 'Plugin timed out.' })
+    expect(Date.now() - started).toBeGreaterThanOrEqual(20)
   })
 
   test('a plugin program awaits what its host call returns', async () => {

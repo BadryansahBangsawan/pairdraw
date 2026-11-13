@@ -14,10 +14,12 @@ import {
   PLUGIN_DISABLED_MESSAGE,
   pluginRunMissingMessage
 } from '@/app/plugins/messages'
+import { releasePluginPointer } from '@/app/plugins/pointer'
 import { createPluginHost, type PluginHost } from '@/app/plugins/sandbox/host'
 import {
   PLUGIN_SANDBOX_CALL,
   PLUGIN_SANDBOX_CALL_RESULT,
+  PLUGIN_POINTER_CALL,
   PLUGIN_SANDBOX_READY,
   PLUGIN_SANDBOX_RUN,
   pluginFrameMessageSchema,
@@ -27,6 +29,7 @@ import { PLUGIN_RUN_READY_TIMEOUT_MS, PLUGIN_RUN_TIMEOUT_MS } from '@/app/plugin
 import type { InstalledPlugin } from '@/app/plugins/schema'
 import {
   runInSandboxFrame,
+  type SandboxDeadline,
   type SandboxFrame,
   type SandboxFrameFactory
 } from '@/app/runtime/sandbox-frame'
@@ -55,9 +58,12 @@ export function runPluginInFrame(
 ): Promise<PluginRunOutcome> {
   const request = { id: crypto.randomUUID(), source }
   const host = options.host ?? null
+  // The user can hold the pointer for longer than a run may compute, so that wait is not timed.
+  let deadline: SandboxDeadline | null = null
   return runInSandboxFrame<PluginRunOutcome>(frame, {
     request: { type: PLUGIN_SANDBOX_RUN, ...request },
-    ready(data) {
+    ready(data, runDeadline) {
+      deadline = runDeadline
       const parsed = v.safeParse(pluginFrameMessageSchema, data)
       return parsed.success && parsed.output.type === PLUGIN_SANDBOX_READY
     },
@@ -75,6 +81,8 @@ export function runPluginInFrame(
         answer({ callId: call.callId, ok: false, error: PLUGIN_CALL_UNAVAILABLE_MESSAGE })
         return true
       }
+      const waiting = call.name === PLUGIN_POINTER_CALL
+      if (waiting) deadline?.pause()
       void (async () => {
         try {
           const result = await host.call(call.name, call.args)
@@ -98,6 +106,8 @@ export function runPluginInFrame(
             ok: false,
             error: error instanceof Error ? error.message : String(error)
           })
+        } finally {
+          if (waiting) deadline?.resume()
         }
       })()
       return true
@@ -147,6 +157,8 @@ export async function runInstalledPlugin(
     failed = !outcome.ok
     return outcome
   } finally {
+    // A run that ends while it waits for the pointer gives the canvas back.
+    releasePluginPointer(id)
     host?.finish(failed)
   }
 }

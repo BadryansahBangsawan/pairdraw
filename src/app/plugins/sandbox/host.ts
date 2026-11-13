@@ -12,7 +12,9 @@ import type { EditorStore } from '@/app/editor/session/create'
 
 import { authorizePluginCall } from '../grants'
 import { pluginCallDeniedMessage, pluginCallUnknownMessage } from '../messages'
+import { requestPluginPointer } from '../pointer'
 import type { InstalledPlugin } from '../schema'
+import { PLUGIN_POINTER_CALL } from './schema'
 
 export const PLUGIN_ASYNC_TOOL_MESSAGE = 'Plugins cannot call a tool that runs asynchronously.'
 
@@ -42,6 +44,8 @@ export function createPluginHost(
   store.undo.beginBatch(`Plugin: ${id}`)
 
   async function call(name: string, args: unknown): Promise<unknown> {
+    // The pointer is not a document tool: it resolves when the canvas sequence ends.
+    if (name === PLUGIN_POINTER_CALL) return requestPluginPointer(id)
     const def = ALL_TOOLS.find((tool) => tool.name === name)
     if (!def) refusal(new Error(pluginCallUnknownMessage(name)))
     for (const capability of uniq(def.capabilities)) {

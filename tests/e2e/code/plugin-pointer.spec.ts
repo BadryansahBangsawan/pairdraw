@@ -1,7 +1,8 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type JSHandle, type Page } from '@playwright/test'
+
+import type { EditorStore } from '@/app/editor/session/create'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
-import { openAppMenu } from '#tests/helpers/menu'
 
 /**
  * A plugin that takes the next pointer sequence and draws the rectangle the drag covered. A
@@ -88,6 +89,16 @@ function layerBox(page: Page, name: string): Promise<LayerBox | null> {
   }, name)
 }
 
+/** The layer names on the active document's page, in order. */
+function layerNames(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const store = window.openPencil?.getStore?.()
+    if (!store) throw new Error('OpenPencil store not initialized')
+    const current = store.graph.getNode(store.state.currentPageId)
+    return current ? current.childIds.map((id) => store.graph.getNode(id)?.name ?? '') : []
+  })
+}
+
 /** The document point a canvas pointer lands on, from the canvas area's origin. */
 async function documentPoint(page: Page, canvasX: number, canvasY: number) {
   const canvas = await page.getByTestId('canvas-element').boundingBox()
@@ -103,11 +114,13 @@ async function documentPoint(page: Page, canvasX: number, canvasY: number) {
   )
 }
 
+/** Picks the plugin's command from the palette and waits for the palette to leave the canvas. */
 async function startPlugin(page: Page): Promise<void> {
   await page.keyboard.press(process.platform === 'darwin' ? 'Meta+KeyK' : 'Control+KeyK')
   const palette = page.getByRole('dialog', { name: 'Command palette' })
   await palette.getByRole('searchbox', { name: 'Search commands' }).fill('Take pointer')
   await palette.getByRole('option', { name: /Take pointer/ }).click()
+  // The closing dialog still takes the next press while its exit animation runs.
   await expect(palette).not.toBeVisible()
 }
 
@@ -200,77 +213,124 @@ test('only a primary press this layer started ends the sequence', async ({ page 
 })
 
 test.describe('a plugin waiting for the pointer when its document goes away', () => {
-  /** Opens a second document in a tab of its own with File › New Design. */
-  async function openSecondDocument(page: Page) {
-    const file = await openAppMenu(page, 'File')
-    await file.getByRole('menuitem', { name: 'New Design' }).click()
+  /** Opens a second document in a tab of its own and makes it the one in front. */
+  async function newDocument(page: Page) {
+    await page.keyboard.press(process.platform === 'darwin' ? 'Meta+KeyN' : 'Control+KeyN')
     await expect(page.getByTestId('tabbar-tab')).toHaveCount(2)
-    await new CanvasHelper(page).waitForInit()
   }
 
-  test('switching to another document cancels the pointer and frees the run slot', async ({
-    page
-  }) => {
+  /** Waits for the document in front to draw; a switch already booted the app. */
+  function waitForCanvas(page: Page) {
+    return page.getByTestId('canvas-element').and(page.locator('[data-ready="1"]')).waitFor()
+  }
+
+  /** The active document's store, kept so its layers can be read after another tab takes over. */
+  function documentStore(page: Page) {
+    return page.evaluateHandle(() => {
+      const store = window.openPencil?.getStore?.()
+      if (!store) throw new Error('OpenPencil store not initialized')
+      return store
+    })
+  }
+
+  /** The layer names on the page of a document read through its store, wherever it is now. */
+  function namesIn(page: Page, store: JSHandle<EditorStore>): Promise<string[]> {
+    return page.evaluate((document) => {
+      const current = document.graph.getNode(document.state.currentPageId)
+      return current ? current.childIds.map((id) => document.graph.getNode(id)?.name ?? '') : []
+    }, store)
+  }
+
+  /** Starts the plugin on the document in front and waits for it to hold the pointer. */
+  async function waitForPointer(page: Page) {
+    await startPlugin(page)
+    await expect(page.getByTestId('plugin-pointer-layer')).toBeVisible()
+  }
+
+  /** Draws a rectangle with the editor's own tool, which a capture layer would swallow. */
+  async function drawRectangle(canvas: CanvasHelper) {
+    await canvas.selectTool('rectangle')
+    await canvas.drag(120, 120, 320, 260, 3)
+  }
+
+  test('switching to another document leaves its canvas to the editor', async ({ page }) => {
     const canvas = new CanvasHelper(page)
-    await page.goto('/?test')
-    await canvas.waitForInit()
-    await openSecondDocument(page)
-    const tabs = page.getByTestId('tabbar-tab')
+    const first = await documentStore(page)
+    try {
+      await waitForPointer(page)
+      await newDocument(page)
+      await expect(page.getByTestId('tabbar-tab').last()).toHaveAttribute('aria-selected', 'true')
+      await waitForCanvas(page)
 
-    // Back to the first document, where the plugin asks for the pointer.
-    await tabs.first().click()
-    await expect(tabs.first()).toHaveAttribute('aria-selected', 'true')
-    await canvas.waitForInit()
-    await startPlugin(page)
-    const capture = page.getByTestId('plugin-pointer-layer')
-    await expect(capture).toBeVisible()
-
-    await tabs.last().click()
-    await expect(tabs.last()).toHaveAttribute('aria-selected', 'true')
-    await canvas.waitForInit()
-    // The other document's canvas must take its own drags, with no capture layer over it.
-    await expect(capture).toHaveCount(0)
-
-    await canvas.drag(120, 120, 320, 260)
-    await expect.poll(() => layerBox(page, 'From the pointer')).toBeNull()
-
-    // The run ended with a cancelled sequence rather than holding its document's pointer.
-    await tabs.first().click()
-    await expect(tabs.first()).toHaveAttribute('aria-selected', 'true')
-    await canvas.waitForInit()
-    await expect.poll(() => layerBox(page, 'From the pointer')).toBeNull()
-    await expect.poll(() => layerBox(page, 'Cancelled by Escape')).not.toBeNull()
-
-    // The run slot and the pointer are free for the next run.
-    await startPlugin(page)
-    await expect(capture).toBeVisible()
-    await page.keyboard.press('Escape')
+      // The other document takes its own drags, with no capture layer over it.
+      await expect(page.getByTestId('plugin-pointer-layer')).toHaveCount(0)
+      await drawRectangle(canvas)
+      expect(await layerNames(page)).toHaveLength(1)
+      // The drag went to this document, not to the one the plugin waits on.
+      expect(await namesIn(page, first)).not.toContain('From the pointer')
+    } finally {
+      await first.dispose()
+    }
   })
 
-  test('closing the document tab cancels the pointer and frees the run slot', async ({ page }) => {
+  test('switching to another document frees the run slot', async ({ page }) => {
+    const first = await documentStore(page)
+    try {
+      await waitForPointer(page)
+      await newDocument(page)
+      await expect(page.getByTestId('tabbar-tab').last()).toHaveAttribute('aria-selected', 'true')
+
+      // The run ended with a cancelled sequence instead of holding its document's pointer.
+      await expect.poll(() => namesIn(page, first)).toContain('Cancelled by Escape')
+      // A second run starts: the slot the first one held is free.
+      await waitForPointer(page)
+      await page.keyboard.press('Escape')
+    } finally {
+      await first.dispose()
+    }
+  })
+
+  test('closing the document tab leaves the remaining canvas to the editor', async ({ page }) => {
     const canvas = new CanvasHelper(page)
-    await page.goto('/?test')
-    await canvas.waitForInit()
-    await openSecondDocument(page)
-    const tabs = page.getByTestId('tabbar-tab')
+    await newDocument(page)
+    const closed = await documentStore(page)
+    try {
+      await waitForPointer(page)
 
-    await tabs.first().click()
-    await expect(tabs.first()).toHaveAttribute('aria-selected', 'true')
-    await canvas.waitForInit()
-    await startPlugin(page)
-    const capture = page.getByTestId('plugin-pointer-layer')
-    await expect(capture).toBeVisible()
+      const pluginTab = page.locator('[data-slot="tab-item"]').last()
+      await pluginTab.hover()
+      await pluginTab.getByRole('button', { name: /Close/ }).click()
+      await expect(page.getByTestId('tabbar-tab')).toHaveCount(1)
+      await waitForCanvas(page)
 
-    const pluginTab = page.locator('[data-slot="tab-item"]').first()
-    await pluginTab.hover()
-    await pluginTab.getByRole('button', { name: /Close/ }).click()
+      // The document that remains draws with the editor, not through a capture layer.
+      await expect(page.getByTestId('plugin-pointer-layer')).toHaveCount(0)
+      await drawRectangle(canvas)
+      expect(await layerNames(page)).toHaveLength(1)
+    } finally {
+      await closed.dispose()
+    }
+  })
 
-    await expect(tabs).toHaveCount(1)
-    // The document that remains is usable: no capture layer, and the run let go of its slot.
-    await expect(capture).toHaveCount(0)
-    await startPlugin(page)
-    await expect(capture).toBeVisible()
-    await page.keyboard.press('Escape')
+  test('closing the document tab frees the run slot', async ({ page }) => {
+    await newDocument(page)
+    const closed = await documentStore(page)
+    try {
+      await waitForPointer(page)
+
+      const pluginTab = page.locator('[data-slot="tab-item"]').last()
+      await pluginTab.hover()
+      await pluginTab.getByRole('button', { name: /Close/ }).click()
+      await expect(page.getByTestId('tabbar-tab')).toHaveCount(1)
+
+      // The closed document's run ended with a cancelled sequence.
+      await expect.poll(() => namesIn(page, closed)).toContain('Cancelled by Escape')
+      // A second run starts: the slot the first one held is free.
+      await waitForPointer(page)
+      await page.keyboard.press('Escape')
+    } finally {
+      await closed.dispose()
+    }
   })
 })
 

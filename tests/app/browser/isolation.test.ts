@@ -68,7 +68,7 @@ describe('browser window isolation', () => {
     const source = readFileSync(repoPath('desktop/src/system/browser.rs'), 'utf8')
     expect(source).not.toContain('initialization_script')
     // A navigation the page starts is cancelled unless it is an http or https site.
-    expect(source).toContain('.on_navigation(|url| browser_navigation_allowed(url))')
+    expect(source).toContain('.on_navigation(browser_navigation_allowed)')
     // The page gets its own persistent store, not the editor's and not an incognito session.
     expect(source).toContain('data_store_identifier(BROWSER_DATA_STORE)')
     expect(source).toContain('data_directory(directory)')
@@ -95,7 +95,7 @@ describe('browser window isolation', () => {
     expect(act).not.toContain('sessionStorage')
     expect(act).not.toContain('location.assign')
     expect(act).not.toContain('location.href =')
-    expect(source).toContain('.on_navigation(|url| browser_navigation_allowed(url))')
+    expect(source).toContain('.on_navigation(browser_navigation_allowed)')
     const pick = readFileSync(repoPath('desktop/src/system/browser-pick.js'), 'utf8')
     expect(pick).toContain("window.addEventListener('click', onClick, true)")
     expect(pick).toContain("window.addEventListener('keydown', onKey, true)")

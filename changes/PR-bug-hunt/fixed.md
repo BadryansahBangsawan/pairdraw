@@ -15,3 +15,4 @@
 - The phone File menu names its items in the app's language, and its export item says it exports the selection as PNG.
 - On a phone, Share no longer puts a document into a live room in Pairdraw, where shared rooms are switched off; a Cloud document still shares through its server.
 - On a phone, Home's Design button spans the row under Open… instead of filling half of it.
+- Settings' Plugins and Skills panels are announced as the tab panels of their tabs, as every other settings panel is.

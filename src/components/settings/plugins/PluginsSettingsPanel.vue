@@ -188,22 +188,23 @@ function confirmRemove(): void {
         </template>
       </AppPlaceholder>
     </SettingsSection>
+    <!-- Inside the page, so the page stays the one root a settings tab gives its panel to. -->
+    <AppAlertDialogRoot v-model:open="removeOpen">
+      <AppDialogHeader
+        :heading="settings.pluginsRemoveTitle"
+        :description="removing ? settings.pluginsRemoveDescription({ name: removing.name }) : ''"
+        :show-close="false"
+      />
+      <AppDialogFooter>
+        <AlertDialogCancel as-child>
+          <AppButton>{{ common.cancel }}</AppButton>
+        </AlertDialogCancel>
+        <AlertDialogAction as-child>
+          <AppButton color="error" variant="solid" @click="confirmRemove">
+            {{ settings.pluginsRemoveAction }}
+          </AppButton>
+        </AlertDialogAction>
+      </AppDialogFooter>
+    </AppAlertDialogRoot>
   </SettingsPage>
-  <AppAlertDialogRoot v-model:open="removeOpen">
-    <AppDialogHeader
-      :heading="settings.pluginsRemoveTitle"
-      :description="removing ? settings.pluginsRemoveDescription({ name: removing.name }) : ''"
-      :show-close="false"
-    />
-    <AppDialogFooter>
-      <AlertDialogCancel as-child>
-        <AppButton>{{ common.cancel }}</AppButton>
-      </AlertDialogCancel>
-      <AlertDialogAction as-child>
-        <AppButton color="error" variant="solid" @click="confirmRemove">
-          {{ settings.pluginsRemoveAction }}
-        </AppButton>
-      </AlertDialogAction>
-    </AppDialogFooter>
-  </AppAlertDialogRoot>
 </template>

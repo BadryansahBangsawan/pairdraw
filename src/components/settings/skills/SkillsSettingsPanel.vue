@@ -257,39 +257,40 @@ async function remove() {
         </template>
       </CapabilityList>
     </CapabilityPage>
+    <!-- Inside the drill-in, so it stays the one root a settings tab gives its panel to. -->
+    <AppAlertDialogRoot v-model:open="trustOpen">
+      <AppDialogHeader
+        :heading="ai.skillsTrustTitle"
+        :description="trustDescription"
+        :show-close="false"
+      />
+      <AppDialogFooter>
+        <AlertDialogCancel as-child>
+          <AppButton>{{ common.cancel }}</AppButton>
+        </AlertDialogCancel>
+        <AlertDialogAction as-child>
+          <AppButton color="primary" variant="solid" @click="trust">
+            {{ ai.skillsTrustFolder }}
+          </AppButton>
+        </AlertDialogAction>
+      </AppDialogFooter>
+    </AppAlertDialogRoot>
+    <AppAlertDialogRoot v-model:open="deleteOpen">
+      <AppDialogHeader
+        :heading="ai.skillsDelete"
+        :description="deleteDescription"
+        :show-close="false"
+      />
+      <AppDialogFooter>
+        <AlertDialogCancel as-child>
+          <AppButton>{{ common.cancel }}</AppButton>
+        </AlertDialogCancel>
+        <AlertDialogAction as-child>
+          <AppButton color="error" variant="solid" :loading="removing" @click="remove">
+            {{ ai.skillsDelete }}
+          </AppButton>
+        </AlertDialogAction>
+      </AppDialogFooter>
+    </AppAlertDialogRoot>
   </PanelDrillIn>
-  <AppAlertDialogRoot v-model:open="trustOpen">
-    <AppDialogHeader
-      :heading="ai.skillsTrustTitle"
-      :description="trustDescription"
-      :show-close="false"
-    />
-    <AppDialogFooter>
-      <AlertDialogCancel as-child>
-        <AppButton>{{ common.cancel }}</AppButton>
-      </AlertDialogCancel>
-      <AlertDialogAction as-child>
-        <AppButton color="primary" variant="solid" @click="trust">
-          {{ ai.skillsTrustFolder }}
-        </AppButton>
-      </AlertDialogAction>
-    </AppDialogFooter>
-  </AppAlertDialogRoot>
-  <AppAlertDialogRoot v-model:open="deleteOpen">
-    <AppDialogHeader
-      :heading="ai.skillsDelete"
-      :description="deleteDescription"
-      :show-close="false"
-    />
-    <AppDialogFooter>
-      <AlertDialogCancel as-child>
-        <AppButton>{{ common.cancel }}</AppButton>
-      </AlertDialogCancel>
-      <AlertDialogAction as-child>
-        <AppButton color="error" variant="solid" :loading="removing" @click="remove">
-          {{ ai.skillsDelete }}
-        </AppButton>
-      </AlertDialogAction>
-    </AppDialogFooter>
-  </AppAlertDialogRoot>
 </template>

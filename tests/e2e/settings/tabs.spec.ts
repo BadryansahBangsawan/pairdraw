@@ -42,3 +42,18 @@ test('settings tabs associate panels and support vertical keyboard navigation', 
   await page.getByTestId('app-settings-done').click()
   await expect(dialog).not.toBeVisible()
 })
+
+test('every settings tab shows its panel as a tab panel named by the tab', async ({ page }) => {
+  await page.goto('/?test')
+  await new CanvasHelper(page).waitForInit()
+  await page.getByTestId('app-settings-trigger').click()
+  const dialog = page.getByTestId('app-settings-dialog')
+  for (const tab of await dialog.getByRole('tab').all()) {
+    await tab.click()
+    await expect(tab).toHaveAttribute('aria-selected', 'true')
+    await expect(dialog.getByRole('tabpanel')).toHaveAttribute(
+      'aria-labelledby',
+      (await tab.getAttribute('id')) ?? ''
+    )
+  }
+})

@@ -173,6 +173,8 @@ test('Move to page is disabled without a selection', async () => {
     'data-disabled'
   )
   await editor.page.keyboard.press('Escape')
+  // A menu still closing takes the next press, so the following test's drag would draw nothing.
+  await expect(editor.page.getByRole('menu')).toHaveCount(0)
   await editor.page.evaluate(() => {
     const store = window.openPencil?.getStore?.()
     if (!store) throw new Error('OpenPencil store not initialized')

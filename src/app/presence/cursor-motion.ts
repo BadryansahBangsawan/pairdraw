@@ -50,13 +50,15 @@ function schedule(store: EditorStore, motion: Motion): void {
 /** Draws every cursor where its glide is now, moves a following view, and asks for the next frame. */
 function step(store: EditorStore, motion: Motion, now: number): void {
   let moving = false
-  store.state.presenceCursors = motion.targets.map((cursor) => {
+  const cursors = motion.targets.map((cursor) => {
     const glide = motion.glides.get(cursor.id)
     if (!glide) return cursor
     const { point, done } = glideAt(glide, now)
     if (!done) moving = true
     return { ...cursor, x: point.x, y: point.y }
   })
+  // View → Multiplayer cursors hides people's and agents' cursors; they keep moving underneath.
+  store.state.presenceCursors = store.state.showRemoteCursors ? cursors : []
   store.requestRepaint()
   const view = motion.view
   if (view) {
@@ -88,6 +90,12 @@ export function showCursors(store: EditorStore, targets: TrackedCursor[]): void 
   }
   motion.targets = targets
   step(store, motion, now)
+}
+
+/** Show or hide people's and agents' cursors (View → Multiplayer cursors). */
+export function toggleRemoteCursors(store: EditorStore): void {
+  store.state.showRemoteCursors = !store.state.showRemoteCursors
+  step(store, motionOf(store), performance.now())
 }
 
 /** The world point at the center of the view. */

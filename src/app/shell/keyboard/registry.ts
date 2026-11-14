@@ -25,6 +25,7 @@ import { openFindLayers } from '@/app/editor/layers/find'
 import { openPlaceImageDialog } from '@/app/editor/place/dialog'
 import { requestRenameSelection } from '@/app/editor/selection/rename-dialog'
 import { TOOL_SHORTCUTS } from '@/app/editor/session'
+import { toggleRemoteCursors } from '@/app/presence/cursor-motion'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { setSnappingPreference, togglePixelGrid } from '@/app/settings/preferences/apply'
 import { removeSelectionAutoLayout } from '@/app/shell/keyboard/auto-layout'
@@ -355,10 +356,7 @@ export function registerKeyboardShortcuts(options: KeyboardShortcutOptions) {
     {
       id: 'toggle-multiplayer-cursors',
       keys: '$mod+Alt+Backslash',
-      run: ({ store }) => {
-        store.state.showRemoteCursors = !store.state.showRemoteCursors
-        store.requestRepaint()
-      }
+      run: ({ store }) => toggleRemoteCursors(store)
     },
     // Figma's keys, matched by key position since Shift turns ' into ".
     {

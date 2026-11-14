@@ -6,6 +6,7 @@ import { openFindLayers } from '@/app/editor/layers/find'
 import { openTextLinkEditor } from '@/app/editor/links'
 import { openPlaceImageDialog } from '@/app/editor/place/dialog'
 import { openGoodies } from '@/app/goodies/actions'
+import { toggleRemoteCursors } from '@/app/presence/cursor-motion'
 import {
   setCommentsOnCanvas,
   setDesignIssuesOnCanvas,
@@ -72,10 +73,7 @@ export function createSharedEditorMenuActions(
       store.requestRepaint()
     },
     'view-pixel-grid': () => togglePixelGrid(store),
-    'view-multiplayer-cursors': () => {
-      store.state.showRemoteCursors = !store.state.showRemoteCursors
-      store.requestRepaint()
-    },
+    'view-multiplayer-cursors': () => toggleRemoteCursors(store),
     'view-design-issues': () =>
       setDesignIssuesOnCanvas(!appPreferences.value.designCheck.showOnCanvas),
     'view-comments': () => setCommentsOnCanvas(!appPreferences.value.comments.showOnCanvas),

@@ -15,6 +15,7 @@ import { useEditorCommands } from '@pairdraw/vue/editor/commands'
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
+import { toggleRemoteCursors } from '@/app/presence/cursor-motion'
 import {
   setCommentsOnCanvas,
   setDesignIssuesOnCanvas,
@@ -65,11 +66,6 @@ function cancelInput() {
 
 function toggleRulers() {
   store.state.showRulers = !store.state.showRulers
-  store.requestRepaint()
-}
-
-function toggleRemoteCursors() {
-  store.state.showRemoteCursors = !store.state.showRemoteCursors
   store.requestRepaint()
 }
 
@@ -202,7 +198,7 @@ watch(open, (v) => {
             <span class="flex-1">{{ panels.rulers }}</span>
             <AppShortcutText>{{ appMenuShortcutLabel('view-rulers') }}</AppShortcutText>
           </DropdownMenuItem>
-          <DropdownMenuItem :class="itemCls" @select.prevent="toggleRemoteCursors">
+          <DropdownMenuItem :class="itemCls" @select.prevent="toggleRemoteCursors(store)">
             <icon-lucide-check
               v-if="store.state.showRemoteCursors"
               class="absolute left-2 size-3.5"

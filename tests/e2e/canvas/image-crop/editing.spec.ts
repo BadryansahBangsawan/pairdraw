@@ -112,7 +112,7 @@ test('a press outside the image leaves the mode', async () => {
   const nodeId = await crop.show()
   await editor.canvas.waitForRender()
   await enterByDoubleClick(nodeId)
-  const outside = crop.point(-50, 140)
+  const outside = crop.point(260, 140)
   await editor.canvas.click(outside.x, outside.y)
   await expect.poll(() => crop.editing()).toBeNull()
 })

@@ -104,7 +104,8 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('⌘-drag from empty canvas selects the nested layers it touches', async ({ page }) => {
-  await modDrag(page, [-30, -30], [460, 260])
+  // From the far corner, since the toolbar stands over the canvas's left edge.
+  await modDrag(page, [460, 260], [-30, -30])
   await expect.poll(() => selection(page)).toEqual(['Badge', 'Icon', 'Title'])
   canvas.assertNoErrors()
 })

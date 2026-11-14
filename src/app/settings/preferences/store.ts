@@ -99,7 +99,7 @@ export interface AppPreferences {
     followAgents: boolean
     /** Whether the chat column beside the properties panel is open. */
     columnOpen: boolean
-    /** Whether an empty page offers a prompt that starts the AI chat over the canvas. */
+    /** Whether the canvas offers a prompt for the AI chat while the chat column is closed. */
     canvasPrompt: boolean
     /** Whether the built-in chat asks before each tool call that changes the document. */
     approveActions: boolean
@@ -156,8 +156,8 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
     changePreviewSize: 'medium',
     followAgents: true,
     columnOpen: false,
-    // The prompt over an empty page is opt-in; Home and the chat column start a design by default.
-    canvasPrompt: false,
+    // The canvas carries a prompt while the chat column is closed; Settings → AI turns it off.
+    canvasPrompt: true,
     // Edits are undoable and reviewable per reply, so asking before each one is opt-in.
     approveActions: false
   },
@@ -171,7 +171,8 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
   navigation: { zoomSpeed: 1, wheelZoom: false, invertZoom: false },
   rendering: { canvasMode: 'retained', ultralight: false },
   view: { pixelGrid: true },
-  workspace: { layersOpen: true, propertiesOpen: true },
+  // The canvas starts on its own: the layers open from their toggle, the properties for a selection.
+  workspace: { layersOpen: false, propertiesOpen: false },
   designCheck: { showOnCanvas: true, preset: 'recommended', disabledRules: [] },
   comments: {
     showOnCanvas: true,

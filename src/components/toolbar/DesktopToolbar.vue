@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ToolbarRoot } from 'reka-ui'
 import { tv } from 'tailwind-variants'
+import { computed } from 'vue'
 
 import type { EditorToolDef, Tool } from '@open-pencil/core'
 import {
@@ -19,7 +20,7 @@ import type { ToolbarUI, ToolIconMap, ToolLabels } from '@/components/toolbar/ty
 import Tip from '@/components/ui/overlay/Tip.vue'
 import toolbarTheme from '@/theme/toolbar'
 
-const { items, activeTool, flyoutSelections, toolIcons, toolLabels, toolShortcuts, ui } =
+const { items, activeTool, flyoutSelections, toolIcons, toolLabels, toolShortcuts, rulers, ui } =
   defineProps<{
     items: ToolbarLayoutItem[]
     activeTool: Tool
@@ -27,6 +28,8 @@ const { items, activeTool, flyoutSelections, toolIcons, toolLabels, toolShortcut
     toolIcons: ToolIconMap
     toolLabels: ToolLabels
     toolShortcuts: Readonly<Record<Tool, string>>
+    /** The canvas shows its rulers along its top and left edges. */
+    rulers?: boolean
     ui?: ToolbarUI
   }>()
 
@@ -34,7 +37,8 @@ const emit = defineEmits<{
   setTool: [tool: Tool]
 }>()
 
-const styles = tv(toolbarTheme)()
+const toolbar = tv(toolbarTheme)
+const styles = computed(() => toolbar({ rulers }))
 
 /** The tool a flyout's button shows: the active one if it is in the flyout, else the last used. */
 function selectedTool(tool: EditorToolDef) {
@@ -42,6 +46,8 @@ function selectedTool(tool: EditorToolDef) {
 }
 
 defineSlots<{
+  /** A control above the tools, in a pill of its own. */
+  start?(): unknown
   /** A button that runs a command, such as placing an icon, rather than picking a tool. */
   action(props: { action: ToolbarAction }): unknown
   /** Pickers whose buttons are hidden, anchored to the toolbar's top edge. */
@@ -53,6 +59,9 @@ defineSlots<{
 
 <template>
   <div data-canvas-obstacle :class="styles.dock({ class: ui?.dock })">
+    <div v-if="$slots.start" :class="styles.start()">
+      <slot name="start" />
+    </div>
     <ToolbarRoot data-test-id="toolbar" :class="styles.bar({ class: ui?.bar })">
       <template v-for="item in items" :key="item.kind === 'tool' ? item.tool.key : item.action">
         <slot v-if="item.kind === 'action'" name="action" :action="item.action" />
@@ -61,6 +70,7 @@ defineSlots<{
 
         <Tip
           v-else-if="item.tool.flyout"
+          side="right"
           :label="
             toolTip(toolLabels[selectedTool(item.tool)], toolShortcuts[selectedTool(item.tool)])
           "
@@ -78,7 +88,10 @@ defineSlots<{
         </Tip>
 
         <ToolbarItem v-else v-slot="{ active, actions }" :tool="item.tool.key">
-          <Tip :label="toolTip(toolLabels[item.tool.key], toolShortcuts[item.tool.key])">
+          <Tip
+            side="right"
+            :label="toolTip(toolLabels[item.tool.key], toolShortcuts[item.tool.key])"
+          >
             <ToolButton
               :data-test-id="toolbarToolTestId(item.tool.key)"
               :icon="toolIcons[item.tool.key]"

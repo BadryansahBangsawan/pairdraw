@@ -21,7 +21,7 @@ const styles = tv(toolbarTheme)({ active: false })
 </script>
 
 <template>
-  <Tip :label="toolTip(commands.shortcutSheet, SHORTCUT_SHEET_SHORTCUT)">
+  <Tip side="right" :label="toolTip(commands.shortcutSheet, SHORTCUT_SHEET_SHORTCUT)">
     <ToolbarButton
       aria-haspopup="dialog"
       :aria-label="commands.shortcutSheet"

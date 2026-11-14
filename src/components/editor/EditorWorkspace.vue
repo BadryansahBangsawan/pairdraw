@@ -44,6 +44,7 @@ import EditorCanvasPrompt from './EditorCanvasPrompt.vue'
 import EditorWorkspaceTopBarActions from './EditorWorkspaceTopBarActions.vue'
 import { useEditorWorkspaceLayout } from './useEditorWorkspaceLayout'
 import WorkspacePill from './WorkspacePill.vue'
+import ZoomDropdown from './ZoomDropdown.vue'
 
 const showChrome = appRuntimeConfig.showChrome
 /** An embed has no top bar: its host page owns the document's actions. */
@@ -71,8 +72,14 @@ const {
   propertiesOpen: propertiesPanelOpen,
   chatOpen: chatColumnOpen
 })
-// The comments list and version history take the properties panel's place, so they open it.
-openPropertiesPanelWhile(() => store.state.activeTool === 'COMMENT' || isVersionHistoryOpen(store))
+// The panel comes for a selection to edit, and for the comments list and version history, which
+// take its place.
+openPropertiesPanelWhile(
+  () =>
+    store.state.selectedIds.size > 0 ||
+    store.state.activeTool === 'COMMENT' ||
+    isVersionHistoryOpen(store)
+)
 // The handles sit on the cards' edges, which draw their own borders.
 const horizontalSplitterStyles = tv(splitterTheme)({ direction: 'horizontal', seam: true })
 const workspace = tv(workspaceTheme)
@@ -150,6 +157,9 @@ const { pending: roomPending } = useRoomActions()
           <EditorCanvasPrompt />
           <ActiveRoomOverlay />
           <EditorToolbar />
+          <div data-canvas-obstacle :class="workspaceStyles.zoom()">
+            <ZoomDropdown />
+          </div>
         </div>
       </SplitterPanel>
       <SplitterResizeHandle

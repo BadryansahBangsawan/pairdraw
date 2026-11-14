@@ -18,6 +18,7 @@ const {
   placeholder,
   busy = false,
   rows = 3,
+  inline = false,
   ui
 } = defineProps<{
   /** The field's accessible name. */
@@ -26,12 +27,14 @@ const {
   /** A send is under way, such as the AI setup it waits for; another cannot start. */
   busy?: boolean
   rows?: number
+  /** One line with the send button beside the field, as on the canvas. */
+  inline?: boolean
   /** Per-instance classes merged over the theme, such as a taller field for a page's first ask. */
   ui?: { field?: string }
 }>()
 const emit = defineEmits<{ submit: [text: string] }>()
 const { ai } = useI18n()
-const styles = chatInputTheme()
+const styles = computed(() => chatInputTheme({ inline }))
 const prompt = computed(() => text.value.trim())
 const field = useTemplateRef<HTMLTextAreaElement>('field')
 /**
@@ -65,7 +68,10 @@ function onKeydown(event: KeyboardEvent) {
 
 <template>
   <form @submit.prevent="submit">
-    <InputGroup size="md" :ui="{ root: styles.group() }">
+    <InputGroup
+      size="md"
+      :ui="{ root: styles.group(), control: styles.control(), toolbar: styles.toolbar() }"
+    >
       <textarea
         ref="field"
         v-model="text"

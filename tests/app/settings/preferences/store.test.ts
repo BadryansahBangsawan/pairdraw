@@ -152,11 +152,13 @@ describe('parseAppPreferences', () => {
     const preferences = parseAppPreferences({
       view: { pixelGrid: false },
       rendering: { ultralight: true },
-      workspace: { layersOpen: false, propertiesOpen: 'no' }
+      workspace: { layersOpen: true, propertiesOpen: 'no' }
     })
     expect(preferences.view).toEqual({ pixelGrid: false })
     expect(preferences.rendering).toEqual({ canvasMode: 'retained', ultralight: true })
-    expect(preferences.workspace).toEqual({ layersOpen: false, propertiesOpen: true })
+    // An unreadable choice falls back to the default: the canvas starts without its side panels.
+    expect(preferences.workspace).toEqual({ layersOpen: true, propertiesOpen: false })
+    expect(parseAppPreferences({}).workspace).toEqual({ layersOpen: false, propertiesOpen: false })
     expect(parseAppPreferences({}).view.pixelGrid).toBe(true)
     expect(parseAppPreferences({}).rendering.ultralight).toBe(false)
   })

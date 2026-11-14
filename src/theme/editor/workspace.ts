@@ -13,7 +13,9 @@ export default {
     group: 'flex-1 overflow-hidden bg-canvas',
     dock: 'flex min-w-0 overflow-visible!',
     card: 'relative z-10 mb-2.5 flex min-w-0 flex-1 flex-col overflow-hidden rounded-card border border-border bg-panel elevation-card',
-    canvas: 'relative flex min-w-0 flex-1'
+    canvas: 'relative flex min-w-0 flex-1',
+    /** The zoom control, a pill in the canvas's bottom right corner. */
+    zoom: 'absolute right-3 bottom-3 z-10 flex items-center rounded-xl border border-border bg-panel p-0.5 elevation-card'
   },
   variants: {
     side: {

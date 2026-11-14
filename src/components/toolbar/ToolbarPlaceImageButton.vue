@@ -18,7 +18,10 @@ const menu = useMenuMessages()
 </script>
 
 <template>
-  <Tip :label="toolTip(menu.placeImage, appMenuShortcutLabel('place-image') ?? '')">
+  <Tip
+    :side="mobile ? 'top' : 'right'"
+    :label="toolTip(menu.placeImage, appMenuShortcutLabel('place-image') ?? '')"
+  >
     <ToolButton
       :icon="IconImagePlus"
       :label="menu.placeImage"

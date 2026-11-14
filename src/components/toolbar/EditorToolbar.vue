@@ -10,7 +10,9 @@ import { ToolbarRoot, useToolbarState } from '@open-pencil/vue/primitives/Toolba
 import { useEditorStore } from '@/app/editor/active-store'
 import { TOOLBAR_ACTIONS, toolbarItems, toolbarLayoutFor } from '@/app/editor/toolbar/layout'
 import { toolShortcutLabels } from '@/app/editor/toolbar/shortcuts'
+import { appRuntimeConfig } from '@/app/runtime/config'
 import { appPreferences } from '@/app/settings/preferences/store'
+import { layersPanelOpen, toggleLayersPanel } from '@/app/shell/side-panels'
 import { useActionToast } from '@/app/shell/toast/action'
 import InsertIconButton from '@/components/icon-picker/InsertIconButton.vue'
 import { toolIcons } from '@/components/icons'
@@ -22,13 +24,14 @@ import MobileToolbar from '@/components/toolbar/MobileToolbar.vue'
 import ToolbarContextMenu from '@/components/toolbar/ToolbarContextMenu.vue'
 import ToolbarPlaceImageButton from '@/components/toolbar/ToolbarPlaceImageButton.vue'
 import type { ToolbarActionItem } from '@/components/toolbar/types'
+import IconButton from '@/components/ui/button/IconButton.vue'
 import { useMenuUI } from '@/components/ui/menu/menu'
 
 const store = useEditorStore()
 const { isMobile } = useViewportKind()
 const { getCommand } = useEditorCommands()
 const { showActionToast } = useActionToast()
-const { menu } = useI18n()
+const { menu, editor } = useI18n()
 
 const toolLabels = useToolLabels()
 
@@ -81,9 +84,23 @@ function onActionTap(item: ToolbarActionItem) {
         :tool-icons="toolIcons"
         :tool-labels="toolLabels"
         :tool-shortcuts="toolShortcuts"
+        :rulers="appRuntimeConfig.showRulers && store.state.showRulers"
         :ui="toolbarUI"
         @set-tool="actions.setTool"
       >
+        <template #start>
+          <IconButton
+            :label="editor.toggleLayersPanel"
+            side="right"
+            toggle
+            :active="layersPanelOpen"
+            aria-controls="editor-layers-panel"
+            data-test-id="editor-toggle-layers-panel"
+            @click="toggleLayersPanel"
+          >
+            <icon-lucide-panel-left class="size-4" />
+          </IconButton>
+        </template>
         <template #action="{ action }">
           <InsertIconButton v-if="action === 'insert-icon'" :ui="toolbarUI" />
           <ToolbarPlaceImageButton v-else-if="action === 'place-image'" :ui="toolbarUI" />

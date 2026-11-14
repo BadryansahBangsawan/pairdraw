@@ -512,8 +512,8 @@ test('bound NumberField detach edit is one undo step', async () => {
 
 test('alignment buttons align nodes to same X', async () => {
   await editor.canvas.clearCanvas()
-  await editor.canvas.drawRect(50, 200, 60, 60)
-  await editor.canvas.drawRect(250, 200, 60, 60)
+  await editor.canvas.drawRect(150, 200, 60, 60)
+  await editor.canvas.drawRect(350, 200, 60, 60)
   await editor.canvas.pressKey('Meta+a')
   await editor.canvas.waitForRender()
 

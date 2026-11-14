@@ -97,7 +97,8 @@ test('the comment tool opens a closed properties panel for its list and closes i
   await toggle.click()
   await expect(page.getByTestId('properties-panel')).toBeHidden()
 
-  await page.getByTestId('canvas-area').click({ position: { x: 20, y: 20 } })
+  // Clear of the toolbar at the canvas's left.
+  await page.getByTestId('canvas-area').click({ position: { x: 200, y: 20 } })
   await page.keyboard.press('KeyC')
   await expect(page.getByTestId('properties-panel')).toBeVisible()
   await expect(toggle).toHaveAttribute('aria-pressed', 'true')

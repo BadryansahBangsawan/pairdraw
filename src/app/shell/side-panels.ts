@@ -1,4 +1,4 @@
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { appPreferences, updateWorkspacePreferences } from '@/app/settings/preferences/store'
 
@@ -14,10 +14,21 @@ export const layersPanelOpen = computed({
   }
 })
 
-/** Whether the desktop editor shows its properties panel, kept like {@link layersPanelOpen}. */
+/**
+ * The properties panel showing for what needs it rather than by the person's choice. It is not
+ * kept, so the panel a selection opened is closed again the next time the app starts.
+ */
+const propertiesPanelHeld = ref(false)
+
+/**
+ * Whether the desktop editor shows its properties panel: kept open by the person, like
+ * {@link layersPanelOpen}, or held open by {@link openPropertiesPanelWhile}. Setting it is the
+ * person's choice, which ends a hold.
+ */
 export const propertiesPanelOpen = computed({
-  get: () => appPreferences.value.workspace.propertiesOpen,
+  get: () => appPreferences.value.workspace.propertiesOpen || propertiesPanelHeld.value,
   set: (propertiesOpen: boolean) => {
+    propertiesPanelHeld.value = false
     if (appPreferences.value.workspace.propertiesOpen === propertiesOpen) return
     updateWorkspacePreferences({ propertiesOpen })
   }
@@ -32,26 +43,17 @@ export function togglePropertiesPanel(): void {
 }
 
 /**
- * Opens the properties panel while `needed` holds, for what shows in its place, such as the
- * comments list or version history, and closes it again afterwards when it was opened only for
- * that. Closing it by hand meanwhile is left alone. Call it from a component's setup.
+ * Opens the properties panel while `needed` holds, for a selection to edit or what shows in the
+ * panel's place, such as the comments list or version history, and closes it again afterwards when
+ * it was opened only for that. Closing it by hand meanwhile is left alone until the next need. One
+ * caller owns the hold, so call it once from the workspace's setup.
  */
 export function openPropertiesPanelWhile(needed: () => boolean): void {
-  let openedForIt = false
   watch(
     needed,
     (now) => {
-      if (now && !propertiesPanelOpen.value) {
-        openedForIt = true
-        propertiesPanelOpen.value = true
-      } else if (!now && openedForIt) {
-        openedForIt = false
-        propertiesPanelOpen.value = false
-      }
+      propertiesPanelHeld.value = now && !appPreferences.value.workspace.propertiesOpen
     },
     { immediate: true }
   )
-  watch(propertiesPanelOpen, (open) => {
-    if (!open) openedForIt = false
-  })
 }

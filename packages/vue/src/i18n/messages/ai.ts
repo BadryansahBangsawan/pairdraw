@@ -220,9 +220,9 @@ export const aiMessageDefaults = {
     'Apply the feedback in these comment threads, then reply to each with what you changed and resolve it.',
   commentPromptThread: params('Thread {id}'),
   commentPromptThreadOnLayer: params('Thread {id} on {layer}'),
-  canvasPrompt: 'Prompt on empty pages',
+  canvasPrompt: 'Prompt on the canvas',
   canvasPromptHint:
-    'Offer a prompt over an empty page that starts the chat with a description of what to design.',
+    'Show a prompt at the bottom of the canvas while the chat is closed. What you write there goes to the chat.',
   changePreviewSmall: 'Small (240 px)',
   changePreviewMedium: 'Medium (480 px)',
   changePreviewLarge: 'Large (960 px)',

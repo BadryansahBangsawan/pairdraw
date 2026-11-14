@@ -2,12 +2,13 @@ import { shallowRef } from 'vue'
 
 import { resolveEditorProfile } from '@open-pencil/core'
 
+import { chatColumnOpen } from '@/app/ai/chat/panel'
 import { hasPendingPrompt } from '@/app/ai/chat/pending-prompt'
 import { canvasPrompt } from '@/app/ai/chat/preferences'
 import type { EditorStore } from '@/app/editor/active-store'
 import { presenceOf } from '@/app/presence/registry'
 
-/** Documents whose canvas prompt was closed or used; it does not come back to them. */
+/** Documents whose canvas prompt was closed; it does not come back to them. */
 const closed = new WeakSet<EditorStore>()
 /**
  * Bumped whenever `closed` changes, so callers that read it reactively stay in step without Vue
@@ -23,20 +24,27 @@ export function closeCanvasPrompt(store: EditorStore): void {
 }
 
 /**
- * Whether the page `store` shows offers to start the AI chat from a prompt over the canvas: an
- * editable design whose page has nothing on it, while no agent works on it and no prompt waits for
- * its chat. Boards keep their canvas to themselves, since the chat's agent designs layouts. Reads
- * reactive state, so a computed value that calls it hides the prompt once the first layer exists.
+ * Whether `store`'s canvas offers a prompt that goes into the AI chat: an editable design, while
+ * the chat column is closed, no agent works on it and no prompt waits for its chat. Boards keep
+ * their canvas to themselves, since the chat's agent designs layouts. Reads reactive state, so a
+ * computed value that calls it follows the chat column and the agents.
  */
 export function offersCanvasPrompt(store: EditorStore): boolean {
   void closedVersion.value
   const { state } = store
-  if (!canvasPrompt.value || closed.has(store) || hasPendingPrompt(store)) return false
+  if (!canvasPrompt.value || chatColumnOpen.value) return false
+  if (closed.has(store) || hasPendingPrompt(store)) return false
   if (state.documentKind !== 'design' || state.preparation) return false
   const profile = resolveEditorProfile(state)
   if (!profile.edits || !profile.editChrome) return false
-  void state.sceneVersion
-  const page = store.graph.getNode(state.currentPageId)
-  if (!page || page.childIds.length > 0) return false
   return presenceOf(store).agents.value.every((agent) => agent.status === 'idle')
+}
+
+/**
+ * Whether the page `store` shows has nothing on it, which is when the canvas prompt suggests what
+ * to ask for. Reads reactive state, like {@link offersCanvasPrompt}.
+ */
+export function isShownPageEmpty(store: EditorStore): boolean {
+  void store.state.sceneVersion
+  return store.graph.getNode(store.state.currentPageId)?.childIds.length === 0
 }

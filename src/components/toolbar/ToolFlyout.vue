@@ -99,7 +99,7 @@ function flyoutItemClass() {
 
       <DropdownMenuPortal>
         <DropdownMenuContent
-          side="top"
+          :side="mobile ? 'top' : 'right'"
           :side-offset="8"
           align="start"
           :class="styles.flyoutContent({ class: ui?.flyoutContent })"

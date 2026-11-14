@@ -35,7 +35,7 @@ const pageLayerCount = (page: Page) =>
     return store.graph.getNode(store.state.currentPageId)?.childIds.length ?? -1
   })
 
-test('a prompt over an empty page goes into its chat, which opens', async ({ page }) => {
+test('a prompt on the canvas goes into the chat, which opens in its place', async ({ page }) => {
   const chat = await openChatEditor(page)
   await chat.configureOpenRouter('sk-or-test-key-12345')
   await chat.closeChat()
@@ -50,27 +50,34 @@ test('a prompt over an empty page goes into its chat, which opens', async ({ pag
   await expect(chat.chatColumn).toBeVisible()
   await expect(chat.userMessage()).toHaveText('A landing page for a coffee shop')
   await expect(chat.assistantMessage()).not.toBeEmpty()
-  // Once used, it does not come back to this document while its page stays empty.
-  expect(await pageLayerCount(page)).toBe(0)
-  await expect(offer).toBeHidden()
+  // The canvas carries it again once the chat column closes, with nothing left in its field.
+  await chat.closeChat()
+  await expect(offer).toBeVisible()
+  await expect(prompt).toHaveValue('')
 })
 
-test('the canvas around the prompt still draws, and the first layer hides it', async ({ page }) => {
+test('the canvas around the prompt still draws, and the first layer takes the examples away', async ({
+  page
+}) => {
   await openChatEditor(page)
   const canvas = new CanvasHelper(page)
   const offer = page.getByRole('region', { name: 'Start with a prompt' })
+  const examples = page.getByRole('list', { name: 'Examples' })
   await expect(offer).toBeVisible()
+  await expect(examples).toBeVisible()
 
-  // The top left corner of the canvas is outside the prompt's card.
-  await canvas.drawRect(40, 40, 80, 60)
+  // Clear of the toolbar at the canvas's left and of the prompt at its bottom.
+  await canvas.drawRect(200, 100, 80, 60)
   expect(await pageLayerCount(page)).toBe(1)
-  await expect(offer).toBeHidden()
-
-  // An empty page offers it again; closing it keeps it away from the document.
-  await canvas.undo()
   await expect(offer).toBeVisible()
+  await expect(examples).toBeHidden()
+
+  // An empty page suggests what to ask for again; closing the prompt keeps it away from the document.
+  await canvas.undo()
+  await expect(examples).toBeVisible()
   await offer.getByRole('button', { name: 'Hide prompt' }).click()
   await expect(offer).toBeHidden()
+  await expect(examples).toBeHidden()
 })
 
 test('an example fills the prompt to read and edit, and sends nothing yet', async ({ page }) => {
@@ -79,7 +86,7 @@ test('an example fills the prompt to read and edit, and sends nothing yet', asyn
   await expect(offer).toBeVisible()
   const prompt = offer.getByRole('textbox', { name: 'Describe a design' })
 
-  await offer
+  await page
     .getByRole('list', { name: 'Examples' })
     .getByRole('button', { name: 'Dashboard' })
     .click()

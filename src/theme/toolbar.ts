@@ -1,8 +1,10 @@
 const toolbarTheme = {
   slots: {
-    // The desktop toolbar floats at the bottom center of the canvas, a card-like pill.
-    dock: 'absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center',
-    bar: 'flex gap-0.5 rounded-xl border border-border bg-panel p-1 elevation-card',
+    // The desktop toolbar stands at the left edge of the canvas, a card-like pill read top down.
+    dock: 'absolute top-3 left-3 z-10 flex flex-col items-center gap-2',
+    // What stands above the tools on the desktop bar, a pill of its own: the layers panel's toggle.
+    start: 'flex rounded-xl border border-border bg-panel p-1 elevation-card',
+    bar: 'flex flex-col gap-0.5 rounded-xl border border-border bg-panel p-1 elevation-card',
     // Above the mobile drawer's header, clear of the home indicator.
     mobileDock:
       'fixed bottom-[calc(56px+env(safe-area-inset-bottom)+0.75rem)] left-1/2 z-20 flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-1.5',
@@ -12,6 +14,7 @@ const toolbarTheme = {
     button:
       'flex size-8 cursor-pointer items-center justify-center rounded-lg border-none bg-transparent text-muted transition-colors outline-none focus-visible:ring-1 focus-visible:ring-panel-focus',
     icon: 'size-4',
+    // A tool with more behind it carries its chevron under the icon on the upright desktop bar.
     flyoutGroup: 'flex items-center',
     flyoutTrigger:
       'flex h-8 w-3 cursor-pointer items-center justify-center rounded-lg border-none bg-transparent text-muted transition-colors outline-none data-[state=open]:bg-hover data-[state=open]:text-surface focus-visible:ring-1 focus-visible:ring-panel-focus',
@@ -29,6 +32,10 @@ const toolbarTheme = {
     actionIcon: 'size-4'
   },
   variants: {
+    /** The canvas shows its rulers, which the desktop bar stands clear of. */
+    rulers: {
+      true: { dock: 'top-8 left-8' }
+    },
     active: {
       // The armed tool is ink-filled; other toggles (IconButton active, segments) use the raised pill.
       true: {
@@ -42,7 +49,8 @@ const toolbarTheme = {
         flyoutTrigger: 'select-none active:bg-hover active:text-surface'
       },
       false: {
-        flyoutTrigger: 'hover:bg-hover hover:text-surface'
+        flyoutGroup: 'flex-col',
+        flyoutTrigger: 'h-3 w-8 hover:bg-hover hover:text-surface'
       }
     },
     disabled: {

@@ -305,16 +305,22 @@ test('Issues off screen are pinned to the canvas edge and lead to the nearest mo
   await openLint(editor.page)
   const canvas = await editor.canvas.canvas.boundingBox()
   if (!canvas) throw new Error('Canvas has no bounding box')
-  // Pan the card off the left edge; the caption's contrast error is the most severe issue.
+  // Pan the card off the left edge, low enough that its pin sits under the toolbar standing there;
+  // the caption's contrast error is the most severe issue.
   const panX = -1000
-  await editor.page.evaluate((x) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
-    store.state.panX = x
-    store.requestRender()
-  }, panX)
+  const panY = 1080
+  await editor.page.evaluate(
+    ([x, y]) => {
+      const store = window.openPencil?.getStore?.()
+      if (!store) throw new Error('OpenPencil store not initialized')
+      store.state.panX = x
+      store.state.panY = y
+      store.requestRender()
+    },
+    [panX, panY]
+  )
   await waitForMarkers(editor.page)
-  const caption = { x: CARD.x + 24 + 100 + panX, y: CARD.y + 24 + 12 }
+  const caption = { x: CARD.x + 24 + 100 + panX, y: CARD.y + 24 + 12 + panY }
   const pin = edgePinCenter(canvas.width, canvas.height, caption)
 
   await hoverMarker(pin)

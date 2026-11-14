@@ -93,8 +93,8 @@ describe('monitorPRReviewGuidance', () => {
       env: {
         GITHUB_API_URL: 'https://example.test',
         GITHUB_EVENT_PATH: eventPath,
-        GITHUB_REPOSITORY: 'pairdraw/pairdraw',
-        GITHUB_REPOSITORY_OWNER: 'pairdraw',
+        GITHUB_REPOSITORY: 'BadryansahBangsawan/pairdraw',
+        GITHUB_REPOSITORY_OWNER: 'BadryansahBangsawan',
         GITHUB_TOKEN: 'token'
       },
       fetchImpl: async (input, init) => {
@@ -109,7 +109,9 @@ describe('monitorPRReviewGuidance', () => {
       log: (message) => messages.push(message)
     })
 
-    expect(requests).toEqual(['GET https://example.test/repos/pairdraw/pairdraw/pulls/294'])
+    expect(requests).toEqual([
+      'GET https://example.test/repos/BadryansahBangsawan/pairdraw/pulls/294'
+    ])
     expect(messages.join('\n')).toContain('No automatic label, comment, or close was applied')
   })
 
@@ -127,8 +129,8 @@ describe('monitorPRReviewGuidance', () => {
       env: {
         GITHUB_API_URL: 'https://example.test',
         GITHUB_EVENT_PATH: eventPath,
-        GITHUB_REPOSITORY: 'pairdraw/pairdraw',
-        GITHUB_REPOSITORY_OWNER: 'pairdraw',
+        GITHUB_REPOSITORY: 'BadryansahBangsawan/pairdraw',
+        GITHUB_REPOSITORY_OWNER: 'BadryansahBangsawan',
         GITHUB_TOKEN: 'token'
       },
       fetchImpl: async () => response({}),
@@ -151,8 +153,8 @@ describe('monitorPRReviewGuidance', () => {
       env: {
         GITHUB_API_URL: 'https://example.test',
         GITHUB_EVENT_PATH: eventPath,
-        GITHUB_REPOSITORY: 'pairdraw/pairdraw',
-        GITHUB_REPOSITORY_OWNER: 'pairdraw',
+        GITHUB_REPOSITORY: 'BadryansahBangsawan/pairdraw',
+        GITHUB_REPOSITORY_OWNER: 'BadryansahBangsawan',
         GITHUB_TOKEN: 'token'
       },
       fetchImpl: async (input, init) => {

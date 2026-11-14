@@ -18,7 +18,7 @@ Workflow tooling is checked out separately in `.pipeline` and installed from its
 The checked-in `desktop/tauri.conf.json` names no update feed: its updater `endpoints` and `pubkey` are empty and `createUpdaterArtifacts` is off, so local and fork builds never check for updates and never offer Pairdraw releases. Only the release config adds a feed, from two repository variables read by `native/updater.ts`:
 
 - `UPDATER_PUBLIC_KEY` (required): the base64 minisign public key, the same text `tauri signer generate` writes to its `.pub` file. It must pair with the `TAURI_SIGNING_PRIVATE_KEY` secret; the publish job verifies every updater signature against it. Pairdraw's keys are refused.
-- `UPDATER_ENDPOINT` (optional): where installed apps fetch `latest.json`; an `https` URL. It defaults to `https://github.com/<repository>/releases/latest/download/latest.json`, where this workflow publishes it. A feed serving `pairdraw/pairdraw` is refused.
+- `UPDATER_ENDPOINT` (optional): where installed apps fetch `latest.json`; an `https` URL. It defaults to `https://github.com/<repository>/releases/latest/download/latest.json`, where this workflow publishes it. A feed serving `BadryansahBangsawan/pairdraw` is refused.
 
 Changing either after a release strands installed apps on the old feed or key, so generate the key once and keep the private half safe.
 
@@ -39,8 +39,8 @@ GitHub's default provenance identifies the **workflow execution revision**, whic
 Verify downloaded release files with:
 
 ```sh
-gh attestation verify release-manifest.json --repo pairdraw/pairdraw \
-  --signer-workflow pairdraw/pairdraw/.github/workflows/build.yml \
+gh attestation verify release-manifest.json --repo BadryansahBangsawan/pairdraw \
+  --signer-workflow BadryansahBangsawan/pairdraw/.github/workflows/build.yml \
   --deny-self-hosted-runners
 sha256sum --check SHA256SUMS
 ```

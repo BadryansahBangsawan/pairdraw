@@ -187,7 +187,7 @@ Set `PAIRDRAW_MCP_ROOT` to limit file access to one directory; it defaults to th
 Teach your AI coding agent to use Pairdraw — inspect designs, export assets, analyze tokens, modify .fig files:
 
 ```sh
-npx skills add pairdraw/pairdraw
+npx skills add BadryansahBangsawan/pairdraw
 ```
 
 Works with Claude Code, Cursor, Windsurf, Codex, and any agent that supports [skills](https://skills.sh).

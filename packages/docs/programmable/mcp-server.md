@@ -258,7 +258,7 @@ Most tools accept optional `document_id` and `page_id` fields. Pass them explici
 Teach your AI coding agent to use Pairdraw tools:
 
 ```sh
-npx skills add pairdraw/pairdraw
+npx skills add BadryansahBangsawan/pairdraw
 ```
 
 Works with Claude Code, Cursor, Windsurf, Codex, and any agent that supports [skills](https://skills.sh). The skill covers the CLI, MCP tools, JSX rendering, eval, and the running app's automation bridge.

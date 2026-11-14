@@ -1,8 +1,10 @@
 import { expect, test } from '@playwright/test'
 
-import { CanvasHelper } from '#tests/helpers/canvas'
+import type * as Locale from '@pairdraw/vue/i18n'
 
 import { COLLABORATION_INCLUDED } from '@/constants'
+
+import { CanvasHelper } from '#tests/helpers/canvas'
 
 test('mobile file menu opens with the keyboard and returns focus on Escape', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
@@ -33,9 +35,11 @@ test('mobile file menu names its items in the app language', async ({ page }) =>
   await page.goto('/?test')
   await canvas.waitForInit()
   const english = await itemNames('File')
-  await page.evaluate(() => localStorage.setItem('pairdraw-locale', 'de'))
-  await page.reload()
-  await canvas.waitForInit()
+  await page.evaluate(async () => {
+    const localeModulePath = '/packages/vue/src/i18n/locale.ts'
+    const localeModule: typeof Locale = await import(localeModulePath)
+    localeModule.setLocale('de')
+  })
   const german = await itemNames('Datei')
   expect(german).toHaveLength(english.length)
   expect(german.filter((name) => english.includes(name))).toEqual([])

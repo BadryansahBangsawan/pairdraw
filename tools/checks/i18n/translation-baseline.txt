@@ -1,5 +1,6 @@
 de:ai.chatSettings
 de:ai.completions
+de:ai.creationDashboard
 de:ai.modelAgentConnection
 de:ai.modelCapabilityVisionShort
 de:ai.modelName

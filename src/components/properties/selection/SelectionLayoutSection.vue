@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useSelectionLayout } from '@open-pencil/vue/controls/selection-layout'
-import { useEditorCommands } from '@open-pencil/vue/editor/commands'
-import { useI18n } from '@open-pencil/vue/i18n'
-import { PositionControlsRoot } from '@open-pencil/vue/primitives/PositionControls'
+import { useSelectionLayout } from '@pairdraw/vue/controls/selection-layout'
+import { useEditorCommands } from '@pairdraw/vue/editor/commands'
+import { useI18n } from '@pairdraw/vue/i18n'
+import { PositionControlsRoot } from '@pairdraw/vue/primitives/PositionControls'
 
 import NumberField from '@/components/inputs/NumberField.vue'
 import ClipContentControl from '@/components/properties/layout/ClipContentControl.vue'

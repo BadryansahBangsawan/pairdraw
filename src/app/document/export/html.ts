@@ -2,9 +2,9 @@ import { StorageSerializers, useLocalStorage } from '@vueuse/core'
 import * as v from 'valibot'
 import { computed, ref } from 'vue'
 
-import { IS_BROWSER } from '@open-pencil/core/constants'
-import type { HTMLExportOptions } from '@open-pencil/core/io'
-import type { TailwindStylesheetId } from '@open-pencil/dom-css/export'
+import { IS_BROWSER } from '@pairdraw/core/constants'
+import type { HTMLExportOptions } from '@pairdraw/core/io'
+import type { TailwindStylesheetId } from '@pairdraw/dom-css/export'
 
 import type { HTMLExportSettings } from '@/app/document/export/types'
 
@@ -30,7 +30,7 @@ export const DEFAULT_HTML_EXPORT_SETTINGS: HTMLExportSettings = {
 
 const stored = !IS_BROWSER
   ? ref<unknown>(null)
-  : useLocalStorage<unknown>('open-pencil:html-export', null, {
+  : useLocalStorage<unknown>('pairdraw:html-export', null, {
       serializer: StorageSerializers.object,
       writeDefaults: false
     })

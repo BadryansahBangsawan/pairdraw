@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import type { ShaderEffect, Variable } from '@open-pencil/scene-graph'
-import { parseShaderUniforms, type ShaderUniformValue } from '@open-pencil/scene-graph/shaders'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { ShaderEffect, Variable } from '@pairdraw/scene-graph'
+import { parseShaderUniforms, type ShaderUniformValue } from '@pairdraw/scene-graph/shaders'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import ShaderUniformControls from '@/components/fill-picker/shader/ShaderUniformControls.vue'
 import AppAlert from '@/components/ui/feedback/AppAlert.vue'

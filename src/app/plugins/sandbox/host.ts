@@ -5,7 +5,7 @@
  */
 import { uniq } from 'es-toolkit'
 
-import { ALL_TOOLS, toolFailure, type ToolDef } from '@open-pencil/core/tools'
+import { ALL_TOOLS, toolFailure, type ToolDef } from '@pairdraw/core/tools'
 
 import * as figmaFactory from '@/app/automation/bridge/figma-factory'
 import type { EditorStore } from '@/app/editor/session/create'

@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 
-import { computeAllLayouts, getTextMeasurer, setTextMeasurer } from '@open-pencil/core/layout'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { computeAllLayouts, getTextMeasurer, setTextMeasurer } from '@pairdraw/core/layout'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 test('saved glyph height wins over a different font measurer at unchanged width', () => {
   const graph = new SceneGraph()

@@ -1,4 +1,4 @@
-import type { DrawIOCell, DrawIOStyle } from '@open-pencil/drawio'
+import type { DrawIOCell, DrawIOStyle } from '@pairdraw/drawio'
 import type {
   ConnectorEndpoint,
   ConnectorLabelPosition,
@@ -7,16 +7,16 @@ import type {
   SceneGraph,
   SceneNode,
   StrokeCap
-} from '@open-pencil/scene-graph'
+} from '@pairdraw/scene-graph'
 import {
   boundEndpoint,
   connectorSublayers,
   createConnector,
   freeEndpoint,
   layoutConnector
-} from '@open-pencil/scene-graph/connectors'
-import { getAxisAlignedBoundsInParent } from '@open-pencil/scene-graph/coordinate'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/connectors'
+import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { bendConnectorThrough } from '#core/layout/arrange/routes'
 

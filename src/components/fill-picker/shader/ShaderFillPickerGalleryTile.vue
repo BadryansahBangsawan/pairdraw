@@ -4,12 +4,12 @@ import { RadioGroupItem } from 'reka-ui'
 import { tv } from 'tailwind-variants'
 import { computed, ref, useTemplateRef, type ComponentPublicInstance } from 'vue'
 
-import { canDrawShaders } from '@open-pencil/vue/canvas/surface'
+import { canDrawShaders } from '@pairdraw/vue/canvas/surface'
 import {
   shaderGalleryPreview,
   shaderPresetColors,
   type ShaderGalleryEntry
-} from '@open-pencil/vue/controls/shader'
+} from '@pairdraw/vue/controls/shader'
 
 import Tip from '@/components/ui/overlay/Tip.vue'
 import theme from '@/theme/shader-gallery'

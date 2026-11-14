@@ -1,4 +1,4 @@
-import { SceneGraph, type SceneNode } from '@open-pencil/scene-graph'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
 
 import type { ComponentLibraryRevision, LibraryCatalog } from '#core/library/types'
 

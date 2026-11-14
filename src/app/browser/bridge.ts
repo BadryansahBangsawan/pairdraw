@@ -8,7 +8,7 @@ import type { NavigationBenchmarkHooks } from '@/app/performance/navigation/hook
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { IS_BROWSER } from '@/constants'
 
-export interface OpenPencilTestHooks {
+export interface PairdrawTestHooks {
   writeCount?: () => number
   mockHandle?: FileSystemFileHandle
   savedOpen?: Window['open']
@@ -29,25 +29,25 @@ export interface OpenPencilTestHooks {
   automation?: (command: string, args: unknown) => Promise<unknown>
 }
 
-export interface OpenPencilWindowAPI {
+export interface PairdrawWindowAPI {
   getStore?: () => EditorStore
   setChatTransport?: (factory: () => ChatTransport<UIMessage>) => void
   openFile?: (path: string) => Promise<void>
-  test?: OpenPencilTestHooks
+  test?: PairdrawTestHooks
 }
 
 let activeStore: EditorStore | null = null
 
-function windowAPI(): OpenPencilWindowAPI {
-  window.openPencil ??= {}
-  window.openPencil.getStore ??= () => {
+function windowAPI(): PairdrawWindowAPI {
+  window.pairdraw ??= {}
+  window.pairdraw.getStore ??= () => {
     if (!activeStore) throw new Error('Pairdraw store not initialized')
     return activeStore
   }
-  return window.openPencil
+  return window.pairdraw
 }
 
-export function setOpenPencilStore(store: EditorStore) {
+export function setPairdrawStore(store: EditorStore) {
   activeStore = store
   if (!IS_BROWSER) return
   const api = windowAPI()
@@ -99,6 +99,6 @@ export function exposeChatTransportOverride(
   windowAPI().setChatTransport = setChatTransport
 }
 
-export function setOpenPencilOpenFileHandler(openFile: (path: string) => Promise<void>) {
+export function setPairdrawOpenFileHandler(openFile: (path: string) => Promise<void>) {
   windowAPI().openFile = openFile
 }

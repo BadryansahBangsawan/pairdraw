@@ -5,7 +5,7 @@ description: Eigenschaften-Panels mit Composables und Komponenten ohne vorgegebe
 
 # Eigenschaften-Panels
 
-`@open-pencil/vue` stellt für Eigenschaften-Panels vor allem Composables bereit.
+`@pairdraw/vue` stellt für Eigenschaften-Panels vor allem Composables bereit.
 
 Benötigt ein Panel aus der Auswahl berechnete Werte und Aktionen zur Aktualisierung, ist ein Composable die passende Grundlage. Für wiederverwendbare Listen- oder Tabellenstrukturen eignet sich eine Komponente ohne vorgegebenes Erscheinungsbild wie `PropertyListRoot`.
 
@@ -41,7 +41,7 @@ Die Pairdraw-App zeigt den Variablennamen im Ruhezustand violett an. Sobald die 
 
 ```vue
 <script setup lang="ts">
-import { usePosition } from '@open-pencil/vue/controls/position'
+import { usePosition } from '@pairdraw/vue/controls/position'
 
 const { x, y, width, height, updateProp, commitProp } = usePosition()
 </script>
@@ -60,9 +60,9 @@ const { x, y, width, height, updateProp, commitProp } = usePosition()
 
 ```vue
 <script setup lang="ts">
-import { PropertyListRoot } from '@open-pencil/vue/primitives/PropertyList'
-import { useEditorPropertyList } from '@open-pencil/vue/controls/property-list'
-import { useFillControls } from '@open-pencil/vue/controls/fill'
+import { PropertyListRoot } from '@pairdraw/vue/primitives/PropertyList'
+import { useEditorPropertyList } from '@pairdraw/vue/controls/property-list'
+import { useFillControls } from '@pairdraw/vue/controls/fill'
 
 const fillControls = useFillControls()
 const fills = useEditorPropertyList('fills')

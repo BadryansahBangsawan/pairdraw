@@ -1,6 +1,6 @@
 ---
 title: Composables
-description: Zentrale Composable-APIs aus @open-pencil/vue.
+description: Zentrale Composable-APIs aus @pairdraw/vue.
 ---
 
 # Composables

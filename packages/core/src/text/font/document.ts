@@ -1,7 +1,7 @@
 import * as v from 'valibot'
 
-import { readFigArchiveParts, resolveFigFonts, type FigArchiveParts } from '@open-pencil/fig'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import { readFigArchiveParts, resolveFigFonts, type FigArchiveParts } from '@pairdraw/fig'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { fontManager } from '#core/text/font/manager'
 import { sfntFamilyNames } from '#core/text/font/variation'

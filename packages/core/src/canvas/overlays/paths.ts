@@ -1,6 +1,6 @@
 import type { Path } from 'canvaskit-wasm'
 
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
 

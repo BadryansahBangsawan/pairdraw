@@ -1,1 +1,1 @@
-- Self-hosted OpenPencil Cloud installs from npm: `npm install -g @open-pencil/cloud` provides the `openpencil-cloud` server and the `openpencil-ai-relay` AI relay commands.
+- Self-hosted Pairdraw Cloud installs from npm: `npm install -g @pairdraw/cloud` provides the `pairdraw-cloud` server and the `pairdraw-ai-relay` AI relay commands.

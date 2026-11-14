@@ -57,7 +57,7 @@ describe('built-in skills', () => {
   })
 
   test('give way to a user’s skill of the same name, which comes first', () => {
-    const own = skillFixture({ name: 'dark-mode', source: 'openpencil', location: 'dark-mode' })
+    const own = skillFixture({ name: 'dark-mode', source: 'pairdraw', location: 'dark-mode' })
     const offered = enabledSkillsFrom([own, ...skills], none)
     expect(offered.filter((skill) => skill.name === 'dark-mode')).toEqual([own])
     expect(builtinSkillName(own)).toBeNull()

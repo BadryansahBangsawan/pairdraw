@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { nextTick, watch } from 'vue'
 
-import { BUILTIN_LIBRARY_ID } from '@open-pencil/core/library'
-import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { BUILTIN_LIBRARY_ID } from '@pairdraw/core/library'
+import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { openLibraryReview, openPublishLibraryDialog, useLibraryService } from '@/app/libraries'

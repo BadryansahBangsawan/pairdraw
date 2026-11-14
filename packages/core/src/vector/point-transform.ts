@@ -1,7 +1,7 @@
-import type { VectorNetwork, VectorSegment } from '@open-pencil/scene-graph'
-import Matrix, { type Mat3 } from '@open-pencil/scene-graph/matrix'
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
-import { cloneVectorNetwork } from '@open-pencil/scene-graph/vector-network'
+import type { VectorNetwork, VectorSegment } from '@pairdraw/scene-graph'
+import Matrix, { type Mat3 } from '@pairdraw/scene-graph/matrix'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
+import { cloneVectorNetwork } from '@pairdraw/scene-graph/vector-network'
 
 import type { HandlePosition } from '#core/geometry/transform-zones'
 

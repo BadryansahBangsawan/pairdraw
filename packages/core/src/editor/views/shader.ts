@@ -1,9 +1,9 @@
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 import {
   isShaderPresetPaint,
   shaderOfPaint,
   type ShaderPreset
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 import type { ShaderPaintList } from '#core/editor/shaders/actions'
 import type { EditorContext } from '#core/editor/types'

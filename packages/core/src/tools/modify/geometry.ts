@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-import { MIN_RESCALE } from '@open-pencil/scene-graph/scaling'
+import { MIN_RESCALE } from '@pairdraw/scene-graph/scaling'
 
 import { assertNodeEditable } from '#core/editor/capabilities'
 import { rescaleNodes, SCALE_ANCHORS } from '#core/editor/scale'

@@ -29,7 +29,7 @@ Verknüpft wird mit der Raute-Schaltfläche dort, wo das Feld steht: **Typografi
 
 Bibliotheken veröffentlichen Komponenten als unveränderliche Versionen. In **Assets → Manage libraries → Publish library** werden eine dauerhafte Kennung und ein Name festgelegt und die zu veröffentlichenden Änderungen ausgewählt.
 
-**Pairdraw Basics** ist der mitgelieferte Originalsatz: Button, Input, Badge, Card und Avatar als `pairdraw-basics`. Er steht im Assets-Panel ohne Katalog: dort aktivieren, um seine Komponenten einzufügen, auch offline, und er bleibt nach einem Neuladen. `openpencil libraries seed --root ./katalog` legt denselben Satz weiterhin in einen Dateikatalog.
+**Pairdraw Basics** ist der mitgelieferte Originalsatz: Button, Input, Badge, Card und Avatar als `pairdraw-basics`. Er steht im Assets-Panel ohne Katalog: dort aktivieren, um seine Komponenten einzufügen, auch offline, und er bleibt nach einem Neuladen. `pairdraw libraries seed --root ./katalog` legt denselben Satz weiterhin in einen Dateikatalog.
 
 Aktivierte Bibliotheken erscheinen bei den lokalen Komponenten. Veröffentlichte Definitionen sind schreibgeschützt; Instanzen und Überschreibungen bleiben bearbeitbar.
 

@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createShapeWithText, shapeWithTextLabel } from '@open-pencil/scene-graph/generated'
-import { figJamColor, figJamColorName, figJamLineColorFields, figJamLineStyle, figJamLineStyleFields, figJamShapePaint } from '@open-pencil/scene-graph/figjam'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { colorToHex } from '@open-pencil/scene-graph/color'
+import { createShapeWithText, shapeWithTextLabel } from '@pairdraw/scene-graph/generated'
+import { figJamColor, figJamColorName, figJamLineColorFields, figJamLineStyle, figJamLineStyleFields, figJamShapePaint } from '@pairdraw/scene-graph/figjam'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { colorToHex } from '@pairdraw/scene-graph/color'
 
 /** A shape as FigJam's tool places it: white, with its #757575 outline and a dark label. */
 function placedShape() {

@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 
-import { BUILTIN_LIBRARY_ID, type LibrarySummary } from '@open-pencil/core/library'
+import { BUILTIN_LIBRARY_ID, type LibrarySummary } from '@pairdraw/core/library'
 
 import type { EditorStore } from '@/app/editor/session'
 import { useLibraryService, type LibraryService } from '@/app/libraries'

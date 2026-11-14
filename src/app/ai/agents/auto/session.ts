@@ -1,6 +1,6 @@
 import { shallowReactive, shallowReadonly } from 'vue'
 
-import { ACP_AGENTS, type ACPAgentDef, type ACPAgentID } from '@open-pencil/core/constants'
+import { ACP_AGENTS, type ACPAgentDef, type ACPAgentID } from '@pairdraw/core/constants'
 
 import { agentHostAvailable } from '@/app/ai/agents/host/current'
 import { agentAccounts } from '@/app/ai/agents/setup/accounts'

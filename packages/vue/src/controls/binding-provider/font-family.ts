@@ -1,7 +1,7 @@
-import type { Editor } from '@open-pencil/core'
-import { variableFontFamily } from '@open-pencil/scene-graph/variables'
+import type { Editor } from '@pairdraw/core'
+import { variableFontFamily } from '@pairdraw/scene-graph/variables'
 
-import { useOpenPencilBindingProvider } from '#vue/controls/binding-provider/open-pencil'
+import { usePairdrawBindingProvider } from '#vue/controls/binding-provider/pairdraw'
 import type { BindingTarget } from '#vue/controls/binding-provider/types'
 
 /** The family a variable names for a text layer: its text, trimmed; empty text names none. */
@@ -18,7 +18,7 @@ function resolveFontFamily(editor: Editor, id: string, target?: BindingTarget) {
  * editor loads the family a variable names whenever the variable or its mode changes it.
  */
 export function useFontFamilyBindingProvider() {
-  return useOpenPencilBindingProvider<string>({
+  return usePairdrawBindingProvider<string>({
     types: ['STRING'],
     resolve: resolveFontFamily
   })

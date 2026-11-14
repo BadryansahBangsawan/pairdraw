@@ -1,11 +1,11 @@
 import type { Path } from 'canvaskit-wasm'
 
-import type { SceneGraph, SceneNode, VectorNetwork } from '@open-pencil/scene-graph'
-import { getNodeLocalMatrix } from '@open-pencil/scene-graph/coordinate'
-import { copyFills } from '@open-pencil/scene-graph/copy'
-import { parseSVGPath } from '@open-pencil/scene-graph/parse-path'
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
-import { mergeVectorNetworks } from '@open-pencil/scene-graph/vector-network'
+import type { SceneGraph, SceneNode, VectorNetwork } from '@pairdraw/scene-graph'
+import { getNodeLocalMatrix } from '@pairdraw/scene-graph/coordinate'
+import { copyFills } from '@pairdraw/scene-graph/copy'
+import { parseSVGPath } from '@pairdraw/scene-graph/parse-path'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
+import { mergeVectorNetworks } from '@pairdraw/scene-graph/vector-network'
 
 import { makeBooleanSourcePath, placedPath, windingRuleOf } from './boolean'
 import type { SkiaRenderer } from './renderer'

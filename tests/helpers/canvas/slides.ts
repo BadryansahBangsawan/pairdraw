@@ -6,8 +6,8 @@ export function slidesDriver(page: Page) {
     /** Replaces the page's layers with frames named `names`, left to right, in layer order. */
     async createDeck(names: string[]): Promise<string[]> {
       return page.evaluate((frameNames) => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         const pageId = store.state.currentPageId
         // Deleting changes the page's child list, so delete from a copy of it.
         const existing = store.graph.getNode(pageId)?.childIds.slice() ?? []
@@ -31,8 +31,8 @@ export function slidesDriver(page: Page) {
     /** The page's slides by name, in slide order. */
     async slideNames(): Promise<string[]> {
       return page.evaluate(() => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         return store.getSlides().map((slide) => slide.name)
       })
     },
@@ -40,8 +40,8 @@ export function slidesDriver(page: Page) {
     /** The slide being presented, by name, or null when nothing is presented. */
     async presentedSlide(): Promise<string | null> {
       return page.evaluate(() => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         const shown = store.getPresentation()
         return shown ? (store.graph.getNode(shown.slideId)?.name ?? null) : null
       })
@@ -50,8 +50,8 @@ export function slidesDriver(page: Page) {
     /** The canvas's pan and zoom. */
     async viewport() {
       return page.evaluate(() => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         const { panX, panY, zoom } = store.state
         return { panX, panY, zoom }
       })

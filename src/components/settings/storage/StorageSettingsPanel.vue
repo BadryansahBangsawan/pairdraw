@@ -7,7 +7,7 @@ import {
   useCredentialMessages,
   useSettingsMessages,
   useStorageMessages
-} from '@open-pencil/vue/i18n'
+} from '@pairdraw/vue/i18n'
 
 import { useNotificationMessages } from '@/app/i18n/notifications'
 import { useStorageSettingsFeedback } from '@/app/integrations/storage/settings/feedback'

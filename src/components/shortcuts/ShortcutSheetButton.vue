@@ -3,7 +3,7 @@ import { ToolbarButton } from 'reka-ui'
 import { tv } from 'tailwind-variants'
 import IconKeyboard from '~icons/lucide/keyboard'
 
-import { useCommandMessages } from '@open-pencil/vue/i18n'
+import { useCommandMessages } from '@pairdraw/vue/i18n'
 
 import { toolTip } from '@/app/editor/toolbar/shortcuts'
 import { openShortcutSheet, SHORTCUT_SHEET_SHORTCUT } from '@/app/shell/keyboard/sheet'

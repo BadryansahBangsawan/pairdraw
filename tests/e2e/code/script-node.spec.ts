@@ -1,10 +1,10 @@
-import type { exportFigFile as ExportFigFile } from '@open-pencil/core/io/formats/fig'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import type { exportFigFile as ExportFigFile } from '@pairdraw/core/io/formats/fig'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 import type {
-  OPEN_PENCIL_PLUGIN_DATA as PluginDataFields,
+  PAIRDRAW_PLUGIN_DATA as PluginDataFields,
   readPluginData as ReadPluginData,
   withPluginData as WithPluginData
-} from '@open-pencil/scene-graph/plugin-data'
+} from '@pairdraw/scene-graph/plugin-data'
 
 import { expect, test, useFreshEditor } from '#tests/e2e/fixtures'
 import { openAppMenu } from '#tests/helpers/menu'
@@ -12,7 +12,7 @@ import { openAppMenu } from '#tests/helpers/menu'
 type PluginDataModule = {
   readPluginData: typeof ReadPluginData
   withPluginData: typeof WithPluginData
-  OPEN_PENCIL_PLUGIN_DATA: typeof PluginDataFields
+  PAIRDRAW_PLUGIN_DATA: typeof PluginDataFields
 }
 
 const editor = useFreshEditor()
@@ -20,8 +20,8 @@ const editor = useFreshEditor()
 /** Types of the selected script layer's children, as the canvas graph holds them. */
 function scriptOutputTypes(): Promise<string[]> {
   return editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const node = store.graph.getNode([...store.state.selectedIds][0] ?? '')
     if (!node) return []
     return node.childIds.map((id) => store.graph.getNode(id)?.type ?? 'MISSING')
@@ -31,8 +31,8 @@ function scriptOutputTypes(): Promise<string[]> {
 /** Names of the selected script layer's children. */
 function scriptChildNames(): Promise<string[]> {
   return editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const node = store.graph.getNode([...store.state.selectedIds][0] ?? '')
     if (!node) return []
     return node.childIds.map((id) => store.graph.getNode(id)?.name ?? 'MISSING')
@@ -91,8 +91,8 @@ const APP_CACHE_BODY = 'APP_CACHE_GV'
 /** Every layer name in the open document. */
 function layerNames(): Promise<string[]> {
   return editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return [...store.graph.nodes.values()].map((node) => node.name)
   })
 }
@@ -100,8 +100,8 @@ function layerNames(): Promise<string[]> {
 /** Text a script drew, which is how a run reports what it managed to reach. */
 function drawnText(): Promise<string[]> {
   return editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return [...store.graph.nodes.values()].flatMap((node) => (node.text ? [node.text] : []))
   })
 }
@@ -112,8 +112,8 @@ function drawnText(): Promise<string[]> {
  */
 async function placeScript(source: string) {
   await editor.page.evaluate(async (nextSource) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const pluginDataURL = '/packages/scene-graph/src/plugin-data/index.ts'
     const pluginData = (await import(/* @vite-ignore */ pluginDataURL)) as PluginDataModule
     const node = store.graph.createNode('SCRIPT', store.state.currentPageId, {
@@ -122,7 +122,7 @@ async function placeScript(source: string) {
       y: 40,
       width: 320,
       height: 200,
-      pluginData: pluginData.withPluginData([], pluginData.OPEN_PENCIL_PLUGIN_DATA.script, {
+      pluginData: pluginData.withPluginData([], pluginData.PAIRDRAW_PLUGIN_DATA.script, {
         version: 1,
         source: nextSource
       })
@@ -153,7 +153,7 @@ test('opening a document that already holds a script does not run it', async () 
       y: 40,
       width: 200,
       height: 120,
-      pluginData: pluginData.withPluginData([], pluginData.OPEN_PENCIL_PLUGIN_DATA.script, {
+      pluginData: pluginData.withPluginData([], pluginData.PAIRDRAW_PLUGIN_DATA.script, {
         version: 1,
         source:
           "return pencil.rect({ name: 'GVOpenMarker', width: 32, height: 32, fill: '#ff00aa' })"
@@ -163,14 +163,14 @@ test('opening a document that already holds a script does not run it', async () 
   })
 
   const opened = await editor.page.evaluate(async (saved) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     await store.openFigFile(new File([new Uint8Array(saved)], 'dormant-script.fig'))
     const pluginDataURL = '/packages/scene-graph/src/plugin-data/index.ts'
     const pluginData = (await import(/* @vite-ignore */ pluginDataURL)) as PluginDataModule
     const script = [...store.graph.nodes.values()].find((node) => node.type === 'SCRIPT')
     const data = script
-      ? pluginData.readPluginData(script.pluginData, pluginData.OPEN_PENCIL_PLUGIN_DATA.script)
+      ? pluginData.readPluginData(script.pluginData, pluginData.PAIRDRAW_PLUGIN_DATA.script)
       : undefined
     return {
       source: data?.source ?? '',
@@ -183,16 +183,16 @@ test('opening a document that already holds a script does not run it', async () 
   await editor.page.waitForTimeout(SCRIPT_LIVE_DEBOUNCE_MS + 2_000)
   expect(await layerNames()).not.toContain(OPEN_MARKER)
   const stillIdle = await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const script = [...store.graph.nodes.values()].find((node) => node.type === 'SCRIPT')
     return script?.childIds.map((id) => store.graph.getNode(id)?.name ?? 'MISSING') ?? ['NO SCRIPT']
   })
   expect(stillIdle).toEqual([])
 
   await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const script = [...store.graph.nodes.values()].find((node) => node.type === 'SCRIPT')
     if (!script) throw new Error('Opened document has no script node')
     store.select([script.id])

@@ -7,9 +7,9 @@ import { checkpointComponent, restoreComponentCheckpoint } from '#fig/document/c
 import { interpretComponent } from '#fig/instance-overrides/interpret'
 import { materializeInstance } from '#fig/instance-overrides/materialize-instance'
 
-import { createFigDocumentSession } from '@open-pencil/fig'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { createFigDocumentSession } from '@pairdraw/fig'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 test('checkpoint recovery keeps the effective fill of a swapped instance on a lazy page', async () => {
   const paint = (r: number): NonNullable<NodeChange['fillPaints']> => [

@@ -1,4 +1,4 @@
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 
 import { selectedTopLevelGuideFrameId, type createGuideInput } from '#vue/canvas/guides/input'
 import { handlePenDragMove } from '#vue/canvas/pen/input'

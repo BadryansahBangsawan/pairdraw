@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 
-import { FigmaAPI, type FigmaNodeProxy } from '@open-pencil/core/figma-api'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { replaceInstanceLayer } from '@open-pencil/scene-graph/instances'
+import { FigmaAPI, type FigmaNodeProxy } from '@pairdraw/core/figma-api'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { replaceInstanceLayer } from '@pairdraw/scene-graph/instances'
 
 import { registerTestFont } from '#core-tests/helpers/figma-api'
 

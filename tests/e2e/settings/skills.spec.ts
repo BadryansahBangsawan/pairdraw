@@ -55,7 +55,7 @@ test('a file that holds no skill is refused', async ({ page }) => {
   await openSkills(page)
   await upload(page, 'notes.zip', Buffer.from(zipSync({ 'README.md': strToU8('# Notes') })))
   await expect(page.getByRole('alert')).toBeVisible()
-  await expect(page.locator('[data-group="openpencil"] [data-item]')).toHaveCount(0)
+  await expect(page.locator('[data-group="pairdraw"] [data-item]')).toHaveCount(0)
 })
 
 test('the built-in skills are listed, read in their details, and turned off together', async ({

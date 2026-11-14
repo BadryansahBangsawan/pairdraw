@@ -4,10 +4,10 @@ import { expectDefined } from '#core-tests/helpers/assert'
 import { findByName, PROPERTY_CASES } from '#core-tests/helpers/property-cases'
 import { pick } from 'es-toolkit'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { ALL_TOOLS } from '@open-pencil/core/tools'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { createDefaultNode } from '@open-pencil/scene-graph/node-defaults'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { ALL_TOOLS } from '@pairdraw/core/tools'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
 
 function tool(name: string) {
   return expectDefined(

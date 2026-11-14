@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { parseIconName, type IconProvider } from '@open-pencil/core/icons'
-import { ALL_TOOLS } from '@open-pencil/core/tools'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { readIcon, type IconOptions } from '@open-pencil/scene-graph/icons'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { parseIconName, type IconProvider } from '@pairdraw/core/icons'
+import { ALL_TOOLS } from '@pairdraw/core/tools'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { readIcon, type IconOptions } from '@pairdraw/scene-graph/icons'
 
 import { buildIconData } from '#core/icons/svg'
 

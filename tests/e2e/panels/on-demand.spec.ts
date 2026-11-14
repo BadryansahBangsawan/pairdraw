@@ -13,7 +13,7 @@ test.use({
           origin: new URL(baseURL).origin,
           localStorage: [
             {
-              name: 'open-pencil:preferences:v1',
+              name: 'pairdraw:preferences:v1',
               value: JSON.stringify({
                 version: 1,
                 onboarding: { aiSetup: 'done' },

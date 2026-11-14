@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { IS_TAURI } from '@open-pencil/core/constants'
+import { IS_TAURI } from '@pairdraw/core/constants'
 
 import { fileLinkComponents } from '@/app/ai/chat/references/files'
 import { referenceComponents } from '@/app/ai/chat/references/link'

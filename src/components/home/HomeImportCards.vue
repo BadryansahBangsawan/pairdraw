@@ -2,7 +2,7 @@
 import { useFileDialog } from '@vueuse/core'
 import { tv } from 'tailwind-variants'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { IMAGE_ATTACHMENT_MEDIA_TYPES } from '@/app/ai/attachment/image/types'
 import theme from '@/theme/home/creation'

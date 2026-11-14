@@ -6,13 +6,13 @@ import type {
   LibrarySummary,
   PublishLibraryInput,
   SerializedComponentLibraryRevision
-} from '@open-pencil/core/library'
+} from '@pairdraw/core/library'
 import {
   createLibraryRevision,
   deserializeLibraryRevision,
   LibraryRevisionNotFoundError,
   serializeLibraryRevision
-} from '@open-pencil/core/library'
+} from '@pairdraw/core/library'
 
 import {
   APP_DATABASE_NAMES,

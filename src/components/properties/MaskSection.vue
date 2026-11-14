@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { MaskType } from '@open-pencil/scene-graph'
-import { useMask } from '@open-pencil/vue/controls/mask'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { MaskType } from '@pairdraw/scene-graph'
+import { useMask } from '@pairdraw/vue/controls/mask'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import PanelFieldGroup from '@/components/ui/panel/PanelFieldGroup.vue'
 import PanelSection from '@/components/ui/panel/PanelSection.vue'

@@ -1,12 +1,8 @@
 import { expect, test } from 'bun:test'
 
-import {
-  EMPTY_EXPORT_RUNTIME,
-  nodeChangeToProps,
-  sceneNodeToKiwi
-} from '@open-pencil/fig/node-change'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph, type SceneNode } from '@open-pencil/scene-graph'
+import { EMPTY_EXPORT_RUNTIME, nodeChangeToProps, sceneNodeToKiwi } from '@pairdraw/fig/node-change'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
 
 function write(fields: Partial<SceneNode>, runtime = EMPTY_EXPORT_RUNTIME): NodeChange {
   const graph = new SceneGraph()

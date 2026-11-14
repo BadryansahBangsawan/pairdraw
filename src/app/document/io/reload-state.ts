@@ -1,5 +1,5 @@
-import type { Editor, EditorState } from '@open-pencil/core'
-import type { ViewportTransform } from '@open-pencil/core/geometry'
+import type { Editor, EditorState } from '@pairdraw/core'
+import type { ViewportTransform } from '@pairdraw/core/geometry'
 
 export type ReloadStateSnapshot = {
   viewport: ViewportTransform

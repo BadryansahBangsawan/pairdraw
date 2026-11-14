@@ -1,11 +1,11 @@
 import { computed } from 'vue'
 
-import type { SceneNode, SharedStyleKind } from '@open-pencil/scene-graph'
+import type { SceneNode, SharedStyleKind } from '@pairdraw/scene-graph'
 import {
   getSharedStyles,
   sharedStyleRefKey,
   sharedStyleTypeForKind
-} from '@open-pencil/scene-graph/shared-styles'
+} from '@pairdraw/scene-graph/shared-styles'
 
 import { useNodeProps } from '#vue/controls/node-props/use'
 import { sharedStyleDetachPatch, sharedStylePatch } from '#vue/controls/shared-style/model'

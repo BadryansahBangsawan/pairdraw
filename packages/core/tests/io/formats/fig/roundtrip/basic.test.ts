@@ -10,9 +10,9 @@ import {
   exportFigFile,
   parseFigFile,
   populateFigPage,
-} from "@open-pencil/core/io/formats/fig";
-import { initCodec } from "@open-pencil/kiwi/fig/codec";
-import { SceneGraph, type SceneNode } from "@open-pencil/scene-graph";
+} from "@pairdraw/core/io/formats/fig";
+import { initCodec } from "@pairdraw/kiwi/fig/codec";
+import { SceneGraph, type SceneNode } from "@pairdraw/scene-graph";
 
 setDefaultTimeout(60_000);
 

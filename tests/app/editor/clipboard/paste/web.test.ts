@@ -5,14 +5,14 @@ import { deflateSync, strToU8 } from 'fflate'
 import { Window } from 'happy-dom'
 import { fromUint8Array } from 'js-base64'
 
-import type { DesignDocument } from '@open-pencil/dom-css'
-import { filesMessages } from '@open-pencil/vue/i18n'
+import type { DesignDocument } from '@pairdraw/dom-css'
+import { filesMessages } from '@pairdraw/vue/i18n'
 import {
   WEB_CAPTURE_CLIPBOARD_END,
   WEB_CAPTURE_CLIPBOARD_START,
   encodeWebCaptureClipboard,
   type WebCapture
-} from '@open-pencil/web-capture'
+} from '@pairdraw/web-capture'
 
 import { pasteClipboardHTML } from '@/app/editor/clipboard/paste/content'
 import { pasteWebClipboardHTML } from '@/app/editor/clipboard/paste/web'
@@ -21,7 +21,7 @@ import { createEditorStore } from '@/app/editor/session/create'
 import { toast } from '@/app/shell/ui'
 
 const CAPTURE: WebCapture = {
-  format: 'openpencil/web-capture',
+  format: 'pairdraw/web-capture',
   version: 1,
   scope: 'element',
   source: { url: 'https://example.com/pricing/', title: 'Pricing' },

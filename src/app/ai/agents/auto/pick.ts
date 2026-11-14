@@ -1,6 +1,6 @@
 import { sortBy } from 'es-toolkit'
 
-import { ACP_AGENTS, type ACPAgentDef, type ACPAgentID } from '@open-pencil/core/constants'
+import { ACP_AGENTS, type ACPAgentDef, type ACPAgentID } from '@pairdraw/core/constants'
 
 import { isSignedIn } from '@/app/ai/agents/acp/auth/status'
 import type { AgentAccount } from '@/app/ai/agents/setup/accounts'

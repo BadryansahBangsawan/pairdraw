@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { useMediaMessages, useSettingsMessages } from '@open-pencil/vue/i18n'
+import { useMediaMessages, useSettingsMessages } from '@pairdraw/vue/i18n'
 
 import {
   backgroundServiceID,

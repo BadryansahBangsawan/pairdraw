@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { computeLayout } from '@open-pencil/core/layout'
+import { createEditor } from '@pairdraw/core'
+import { computeLayout } from '@pairdraw/core/layout'
 
 import { getNodeOrThrow } from '../helpers/assert'
 

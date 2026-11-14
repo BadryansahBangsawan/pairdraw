@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import { CloudAPIError } from '@open-pencil/cloud/client'
+import { CloudAPIError } from '@pairdraw/cloud/client'
 import {
   cloudPublicProfilePath,
   isPublicProfileHandle,
   PUBLIC_PROFILE_BIO_MAX_LENGTH
-} from '@open-pencil/cloud/contract'
-import { useCloudPortalMessages } from '@open-pencil/vue/i18n'
+} from '@pairdraw/cloud/contract'
+import { useCloudPortalMessages } from '@pairdraw/vue/i18n'
 
 import { portalURL } from '@/app/cloud-portal/navigation'
 import { usePublicProfileAPI } from '@/app/cloud-portal/profiles'

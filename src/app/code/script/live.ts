@@ -3,7 +3,7 @@
  * follows the code without a Run click. Every run goes through one scheduler, so the panel and the
  * resize watcher cannot start two runs for the same node.
  */
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import {
   runScriptNode,

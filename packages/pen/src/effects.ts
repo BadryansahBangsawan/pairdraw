@@ -1,4 +1,4 @@
-import type { Effect } from '@open-pencil/scene-graph'
+import type { Effect } from '@pairdraw/scene-graph'
 
 import { mapBlendMode, type PenShaderSources } from './paints'
 import type { PenEffect, PenNode } from './schema'

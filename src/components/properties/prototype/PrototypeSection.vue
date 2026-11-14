@@ -6,8 +6,8 @@ import type {
   PrototypeReaction,
   PrototypeTransitionType,
   PrototypeTriggerType
-} from '@open-pencil/scene-graph'
-import { useI18n } from '@open-pencil/vue/i18n'
+} from '@pairdraw/scene-graph'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { actionChoice, primaryAction, type ActionChoice } from '@/app/editor/prototype/reactions'
 import { usePrototype } from '@/app/editor/prototype/use'

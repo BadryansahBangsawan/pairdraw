@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { ref } from 'vue'
 
-import { createEditor, type Editor } from '@open-pencil/core'
-import type { SceneNode, Stroke } from '@open-pencil/scene-graph'
-import { getAxisAlignedWorldBounds } from '@open-pencil/scene-graph/coordinate'
+import { createEditor, type Editor } from '@pairdraw/core'
+import type { SceneNode, Stroke } from '@pairdraw/scene-graph'
+import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 
 import {
   onSelectionHandle,

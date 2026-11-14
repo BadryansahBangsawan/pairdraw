@@ -8,8 +8,8 @@ const editor = useEditorSetupWithClear('/?test')
 /** The view the canvas holds, and where the frame's button sits on it. */
 async function view(id: string) {
   return editor.page.evaluate((nodeId) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const node = store.graph.getNode(nodeId)
     if (!node) throw new Error(`No node ${nodeId}`)
     const { zoom, panX, panY, canvasView } = store.state
@@ -27,8 +27,8 @@ async function view(id: string) {
 
 test('play follows a click reaction between frames and returns on Escape', async () => {
   const ids = await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const home = store.createShape('FRAME', 0, 0, 400, 300)
     const details = store.createShape('FRAME', 600, 0, 200, 400)
     const button = store.createShape('RECTANGLE', 50, 50, 120, 60)
@@ -67,8 +67,8 @@ test('play follows a click reaction between frames and returns on Escape', async
   expect(await editor.page.getByTestId('prototype-letterbox').count()).toBeGreaterThan(0)
 
   const point = await editor.page.evaluate((nodeId) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const node = store.graph.getNode(nodeId)
     if (!node) throw new Error(`No node ${nodeId}`)
     const bounds = store.graph.getAbsoluteBounds(nodeId)
@@ -99,8 +99,8 @@ test('play follows a click reaction between frames and returns on Escape', async
 
 test('play opens an overlay and closes it back to the frame behind', async () => {
   const ids = await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const home = store.createShape('FRAME', 0, 0, 400, 300)
     const modal = store.createShape('FRAME', 600, 0, 200, 150)
     const open = store.createShape('RECTANGLE', 50, 50, 120, 60)
@@ -146,8 +146,8 @@ test('play opens an overlay and closes it back to the frame behind', async () =>
 
   async function clickCenter(nodeId: string) {
     const point = await editor.page.evaluate((id) => {
-      const store = window.openPencil?.getStore?.()
-      if (!store) throw new Error('OpenPencil store not initialized')
+      const store = window.pairdraw?.getStore?.()
+      if (!store) throw new Error('Pairdraw store not initialized')
       const bounds = store.graph.getAbsoluteBounds(id)
       const { zoom, panX, panY } = store.state
       return {
@@ -167,8 +167,8 @@ test('play opens an overlay and closes it back to the frame behind', async () =>
   expect(overlay.fitsInside).toBe(true)
 
   const closePoint = await editor.page.evaluate((id) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const bounds = store.graph.getAbsoluteBounds(id)
     const { zoom, panX, panY } = store.state
     return {
@@ -190,8 +190,8 @@ test('play opens an overlay and closes it back to the frame behind', async () =>
 
 test('a DISSOLVE transition crossfades the frame it leaves instead of cutting', async () => {
   const ids = await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const home = store.createShape('FRAME', 0, 0, 400, 300)
     const details = store.createShape('FRAME', 600, 0, 200, 400)
     const button = store.createShape('RECTANGLE', 50, 50, 120, 60)
@@ -222,8 +222,8 @@ test('a DISSOLVE transition crossfades the frame it leaves instead of cutting', 
   await editor.canvas.waitForRender()
 
   const point = await editor.page.evaluate((id) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const bounds = store.graph.getAbsoluteBounds(id)
     const { zoom, panX, panY } = store.state
     return {

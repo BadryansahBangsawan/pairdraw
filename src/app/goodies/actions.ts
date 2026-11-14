@@ -1,4 +1,4 @@
-import type { ShaderPreset } from '@open-pencil/scene-graph/shaders'
+import type { ShaderPreset } from '@pairdraw/scene-graph/shaders'
 
 import { offerStyleKit } from '@/app/ai/chat/pins/pending'
 import { insertScriptNode } from '@/app/code/script/create'

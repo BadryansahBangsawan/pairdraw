@@ -1,11 +1,11 @@
 import { filename } from 'pathe/utils'
 import { shallowRef, computed, triggerRef } from 'vue'
 
-import { createDocumentGraph } from '@open-pencil/core'
-import { BUILTIN_IO_FORMATS, IORegistry } from '@open-pencil/core/io'
-import type { DocumentKind, SceneGraph } from '@open-pencil/scene-graph'
+import { createDocumentGraph } from '@pairdraw/core'
+import { BUILTIN_IO_FORMATS, IORegistry } from '@pairdraw/core/io'
+import type { DocumentKind, SceneGraph } from '@pairdraw/scene-graph'
 
-import { setOpenPencilStore } from '@/app/browser/bridge'
+import { setPairdrawStore } from '@/app/browser/bridge'
 import { describeDiagnosticError, recordStorageFailure } from '@/app/diagnostics'
 import { viewDiagnosticsAction } from '@/app/diagnostics/view'
 import { confirmAllDocuments } from '@/app/document/close/all'
@@ -188,7 +188,7 @@ function activateTab(tab: Tab) {
   activeTabId.value = tab.id
   setActiveEditorStore(tab.store)
   triggerRef(tabsRef)
-  setOpenPencilStore(tab.store)
+  setPairdrawStore(tab.store)
 }
 
 /** Activates the tab. False when no tab carries that id, so callers can tell a no-op apart. */

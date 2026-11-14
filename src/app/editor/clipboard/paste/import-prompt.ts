@@ -6,8 +6,8 @@ import {
   type ClipboardImportChoice,
   type ClipboardImportPlan,
   type ClipboardSnapshot
-} from '@open-pencil/core'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 /** The question the paste import dialog shows, or null while nothing is asked. */
 export const clipboardImportPrompt = shallowRef<{ id: number; plan: ClipboardImportPlan } | null>(

@@ -1,6 +1,6 @@
-import { CloudAPIError, type CloudAPIClient } from '@open-pencil/cloud/client'
-import { CLOUD_DOCUMENT_NAME_MAX_LENGTH } from '@open-pencil/cloud/contract'
-import { extractFigThumbnailFromReader } from '@open-pencil/fig'
+import { CloudAPIError, type CloudAPIClient } from '@pairdraw/cloud/client'
+import { CLOUD_DOCUMENT_NAME_MAX_LENGTH } from '@pairdraw/cloud/contract'
+import { extractFigThumbnailFromReader } from '@pairdraw/fig'
 
 import { cloudServerHost } from '@/app/cloud/servers/address'
 import { findCloudServer } from '@/app/cloud/servers/store'

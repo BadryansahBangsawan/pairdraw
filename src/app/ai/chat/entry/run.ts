@@ -1,4 +1,4 @@
-import { resolveEditorProfile } from '@open-pencil/core'
+import { resolveEditorProfile } from '@pairdraw/core'
 
 import { sendPromptToDocument } from '@/app/ai/chat/pending-prompt'
 import { ensureChatConfigured } from '@/app/ai/chat/setup'

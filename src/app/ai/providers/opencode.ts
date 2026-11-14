@@ -1,4 +1,4 @@
-import { randomHex } from '@open-pencil/scene-graph/random'
+import { randomHex } from '@pairdraw/scene-graph/random'
 
 import { createOpenAICompatibleAdapter } from '@/app/ai/providers/compatible'
 import type { ModelProviderAdapter } from '@/app/ai/providers/types'

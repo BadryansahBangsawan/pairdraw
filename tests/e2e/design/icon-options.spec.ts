@@ -37,8 +37,8 @@ test.beforeAll(async () => {
 /** Inserts Material Symbols' rounded home icon, selected, and returns its layer. */
 async function insertHome(page: Page) {
   const id = await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return store.insertIcon('material-symbols-rounded:home')
   })
   if (!id) throw new Error('The icon was not inserted')
@@ -48,9 +48,9 @@ async function insertHome(page: Page) {
 /** The options the icon was last drawn with. */
 function drawnOptions(page: Page, id: string) {
   return page.evaluate((frameId) => {
-    const node = window.openPencil?.getStore?.().graph.getNode(frameId)
+    const node = window.pairdraw?.getStore?.().graph.getNode(frameId)
     const data = node?.pluginData.find(
-      (entry) => entry.pluginId === 'open-pencil' && entry.key === 'icon'
+      (entry) => entry.pluginId === 'pairdraw' && entry.key === 'icon'
     )?.value
     if (!data) return null
     const icon: unknown = JSON.parse(data)

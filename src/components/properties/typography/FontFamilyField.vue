@@ -4,9 +4,9 @@ import { computed } from 'vue'
 import {
   useFontFamilyBindingProvider,
   type BindingTarget
-} from '@open-pencil/vue/controls/binding-provider'
-import { useCommonMessages, usePanelMessages } from '@open-pencil/vue/i18n'
-import { BindableValueRoot } from '@open-pencil/vue/primitives/BindableValue'
+} from '@pairdraw/vue/controls/binding-provider'
+import { useCommonMessages, usePanelMessages } from '@pairdraw/vue/i18n'
+import { BindableValueRoot } from '@pairdraw/vue/primitives/BindableValue'
 
 import FontPicker from '@/components/font-picker/FontPicker.vue'
 import VariableBindingPicker from '@/components/properties/binding/VariableBindingPicker.vue'

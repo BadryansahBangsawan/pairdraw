@@ -3,7 +3,7 @@ import { describe, expect, setDefaultTimeout, test } from 'bun:test'
 import { CLI_ENTRY } from '#cli-tests/helpers/paths'
 import * as v from 'valibot'
 
-import { ACP_AGENTS, AI_PROVIDERS } from '@open-pencil/core/constants'
+import { ACP_AGENTS, AI_PROVIDERS } from '@pairdraw/core/constants'
 
 import { modelCatalog } from '#cli/commands/models'
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { tv } from 'tailwind-variants'
 
-import { useCollaborationMessages } from '@open-pencil/vue/i18n'
+import { useCollaborationMessages } from '@pairdraw/vue/i18n'
 
 import IconButton from '@/components/ui/button/IconButton.vue'
 import { roomNoticeTheme } from '@/theme/collaboration/room-screen'

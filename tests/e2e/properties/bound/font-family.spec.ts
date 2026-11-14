@@ -18,8 +18,8 @@ interface Scene {
 /** A text layer in Inter and a Brand collection whose `type/family` names Inter, or Lora in Serif. */
 function build(page: Page): Promise<Scene> {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const graph = store.graph
     // The page is cleared between tests; the variables an earlier test made are not.
     for (const id of graph.variableCollections.keys()) graph.removeCollection(id)
@@ -43,7 +43,7 @@ function build(page: Page): Promise<Scene> {
 /** The layer's family and the variable it follows, if any. */
 function fontFamily(page: Page, id: string) {
   return page.evaluate((nodeId) => {
-    const node = window.openPencil?.getStore?.().graph.getNode(nodeId)
+    const node = window.pairdraw?.getStore?.().graph.getNode(nodeId)
     return { family: node?.fontFamily, variable: node?.boundVariables.fontFamily }
   }, id)
 }
@@ -64,7 +64,7 @@ test('a font family binds to a text variable and follows its mode', async () => 
   await expect(bound).toContainText('type/family')
 
   await page.evaluate(
-    ({ collection, serif }) => window.openPencil?.getStore?.().setActiveMode(collection, serif),
+    ({ collection, serif }) => window.pairdraw?.getStore?.().setActiveMode(collection, serif),
     scene
   )
   await expect.poll(async () => (await fontFamily(page, scene.text)).family).toBe('Lora')
@@ -82,7 +82,7 @@ test('undo takes a font family binding back to the family the layer had', async 
   const page = editor.page
   const scene = await build(page)
   await page.evaluate(
-    ({ collection, serif }) => window.openPencil?.getStore?.().setActiveMode(collection, serif),
+    ({ collection, serif }) => window.pairdraw?.getStore?.().setActiveMode(collection, serif),
     scene
   )
   const typography = propertySection(page, 'Typography')
@@ -104,8 +104,8 @@ test('a font picked for bound and unbound layers detaches the binding from both'
   const page = editor.page
   const scene = await build(page)
   const other = await page.evaluate(({ text, family }) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.bindVariable(text, 'fontFamily', family)
     const plain = store.graph.createNode('TEXT', store.state.currentPageId, {
       name: 'Caption',
@@ -134,7 +134,7 @@ test('a font picked for bound and unbound layers detaches the binding from both'
     await expect.poll(() => fontFamily(page, id)).toEqual({ family: 'Inter', variable: undefined })
   // The variable no longer reaches the layer it was bound to.
   await page.evaluate(
-    ({ collection, serif }) => window.openPencil?.getStore?.().setActiveMode(collection, serif),
+    ({ collection, serif }) => window.pairdraw?.getStore?.().setActiveMode(collection, serif),
     scene
   )
   await expect

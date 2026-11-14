@@ -1,4 +1,4 @@
-import { SCRIPT_EXAMPLES } from '@open-pencil/core/tools'
+import { SCRIPT_EXAMPLES } from '@pairdraw/core/tools'
 
 /** A program Goodies places on the canvas as a code layer, ready to edit. */
 export interface GoodieScript {

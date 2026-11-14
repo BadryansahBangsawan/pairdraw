@@ -1,4 +1,4 @@
-import type { HyperlinkTarget, SceneNode } from '@open-pencil/scene-graph'
+import type { HyperlinkTarget, SceneNode } from '@pairdraw/scene-graph'
 
 import { textVerticalOffset, withTextParagraph } from '#core/canvas/text'
 import { LAYER_HIT_PAD } from '#core/constants'

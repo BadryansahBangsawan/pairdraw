@@ -13,7 +13,7 @@ const MOCK_SVG = readFileSync(
 async function rightClickSelected(): Promise<void> {
   const box = expectDefined(await editor.canvas.canvas.boundingBox(), 'canvas bounds')
   const point = await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store || store.state.selectedIds.size !== 1) return null
     const node = store.graph.getNode([...store.state.selectedIds][0])
     if (!node) return null
@@ -32,8 +32,8 @@ type ImageLayerType = 'RECTANGLE' | 'ELLIPSE' | 'FRAME'
 
 async function createImageNode(type: ImageLayerType = 'RECTANGLE'): Promise<string> {
   return editor.page.evaluate(async (layerType) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
 
     const imageCanvas = document.createElement('canvas')
     imageCanvas.width = 120
@@ -79,7 +79,7 @@ async function createImageNode(type: ImageLayerType = 'RECTANGLE'): Promise<stri
 
 function pageChildIds(): Promise<string[]> {
   return editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) return []
     return store.graph.getChildren(store.state.currentPageId).map((node) => node.id)
   })
@@ -106,7 +106,7 @@ test('Convert to vector appears for any single layer showing an image', async ()
     await expect(editor.page.getByTestId('context-vectorize')).toBeVisible()
     await editor.page.keyboard.press('Escape')
     await editor.page.evaluate(() => {
-      const store = window.openPencil?.getStore?.()
+      const store = window.pairdraw?.getStore?.()
       if (store) store.graph.deleteNode([...store.state.selectedIds][0])
     })
   }
@@ -136,7 +136,7 @@ test('missing key opens Media settings and saves through the credential manager'
   await expect(editor.page.getByTestId('app-settings-dialog')).toHaveCount(0)
   expect(
     await editor.page.evaluate(
-      (id) => window.openPencil?.getStore?.().graph.getNode(id)?.type,
+      (id) => window.pairdraw?.getStore?.().graph.getNode(id)?.type,
       nodeId
     )
   ).toBe('RECTANGLE')
@@ -152,7 +152,7 @@ test('vectorize keeps the image and adds editable vectors beside it, undone in o
   await expect.poll(pageChildIds).toHaveLength(before.length + 1)
 
   const result = await editor.page.evaluate((sourceId) => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store || store.state.selectedIds.size !== 1) return null
     const frameId = [...store.state.selectedIds][0]
     const frame = store.graph.getNode(frameId)
@@ -184,7 +184,7 @@ test('an agent vectorizes an image through the app bridge with the saved key', a
   // A tool call as the MCP bridge delivers it; the key saved above stays in the app.
   const response = await editor.page.evaluate(
     (id) =>
-      window.openPencil?.test?.automation?.('tool', {
+      window.pairdraw?.test?.automation?.('tool', {
         name: 'vectorize_image',
         args: { id },
         agent: { session: 'vectorize-session', kind: 'mcp', client: 'claude-code' }
@@ -195,7 +195,7 @@ test('an agent vectorizes an image through the app bridge with the saved key', a
   expect(await pageChildIds()).toEqual([...before, expect.any(String)])
   expect(
     await editor.page.evaluate(
-      (id) => window.openPencil?.getStore?.().graph.getNode(id)?.type,
+      (id) => window.pairdraw?.getStore?.().graph.getNode(id)?.type,
       nodeId
     )
   ).toBe('ELLIPSE')

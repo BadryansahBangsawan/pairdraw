@@ -1,11 +1,7 @@
-import { resolveEditorProfile, type Editor } from '@open-pencil/core'
-import {
-  createSceneGeometry,
-  transformZoneAt,
-  type HandlePosition
-} from '@open-pencil/core/geometry'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
+import { resolveEditorProfile, type Editor } from '@pairdraw/core'
+import { createSceneGeometry, transformZoneAt, type HandlePosition } from '@pairdraw/core/geometry'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
 import { buildResizeCursor, getHitHandleByMatrix } from '#vue/shared/input/geometry'
 import { calculateResizeRect } from '#vue/shared/input/resize/rect'

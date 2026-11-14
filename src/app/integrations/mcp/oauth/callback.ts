@@ -1,4 +1,4 @@
-import { IS_TAURI } from '@open-pencil/core/constants'
+import { IS_TAURI } from '@pairdraw/core/constants'
 
 import type { SignInCallback } from '@/app/ai/providers/sign-in/attempt'
 import {
@@ -10,7 +10,7 @@ import {
 import { MCP_OAUTH_CALLBACK_CHANNEL } from './provider'
 
 const DEEP_LINK_PROVIDER = 'mcp'
-const POPUP_NAME = 'open-pencil-mcp'
+const POPUP_NAME = 'pairdraw-mcp'
 /** Authorization codes live minutes; an attempt left open longer has to start again. */
 const CALLBACK_LIFETIME_MS = 10 * 60_000
 

@@ -1,8 +1,8 @@
 import type { StateElement } from '#dom-css/behaviours/states/types'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { behaviourOwner, findLayerByPath } from '@open-pencil/scene-graph/behaviours'
-import { instanceMainComponent } from '@open-pencil/scene-graph/instances'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { behaviourOwner, findLayerByPath } from '@pairdraw/scene-graph/behaviours'
+import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 
 import type { ComponentModel } from './model'
 import { placementOnly, referenceValues, shownText, type UsedLayer } from './references'

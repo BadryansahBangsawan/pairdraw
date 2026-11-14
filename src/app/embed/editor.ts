@@ -1,8 +1,8 @@
 import { debounce } from 'es-toolkit'
 import { watch } from 'vue'
 
-import { BUILTIN_IO_FORMATS, IORegistry } from '@open-pencil/core/io'
-import { exportFigFile } from '@open-pencil/core/io/formats/fig'
+import { BUILTIN_IO_FORMATS, IORegistry } from '@pairdraw/core/io'
+import { exportFigFile } from '@pairdraw/core/io/formats/fig'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import {

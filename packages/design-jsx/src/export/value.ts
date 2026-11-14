@@ -1,4 +1,4 @@
-import { es, jsx, type SyntaxNode } from '@open-pencil/emit'
+import { es, jsx, type SyntaxNode } from '@pairdraw/emit'
 
 /** A paint, effect, or variable helper call inside a prop value, such as `solid("#FF0000")`. */
 export class HelperCall {

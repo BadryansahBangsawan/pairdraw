@@ -1,7 +1,7 @@
 import { watch, type WatchSource } from 'vue'
 
-import type { Editor } from '@open-pencil/core'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import type { Editor } from '@pairdraw/core'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 type AppTheme = 'dark' | 'light'
 type TourThemeEditor = Pick<

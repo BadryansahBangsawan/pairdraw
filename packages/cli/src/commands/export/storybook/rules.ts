@@ -4,10 +4,10 @@ import { matchesGlob } from 'node:path'
 
 import * as v from 'valibot'
 
-import { STORY_MODES, type StoryPlan, type StoryTarget } from '@open-pencil/dom-css'
+import { STORY_MODES, type StoryPlan, type StoryTarget } from '@pairdraw/dom-css'
 
 /** The rules file a Storybook export reads from the working directory when it is there. */
-export const RULES_FILE = 'openpencil.stories.json'
+export const RULES_FILE = 'pairdraw.stories.json'
 
 /**
  * A rule for the story files whose `<page>/<name>` path matches its glob: which stories they

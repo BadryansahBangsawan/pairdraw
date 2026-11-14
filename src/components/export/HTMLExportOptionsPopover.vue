@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka-ui'
 
-import { usePanelMessages } from '@open-pencil/vue/i18n'
-import { useRetainedPopup } from '@open-pencil/vue/lifecycle/retention'
+import { usePanelMessages } from '@pairdraw/vue/i18n'
+import { useRetainedPopup } from '@pairdraw/vue/lifecycle/retention'
 
 import { htmlExportSettings } from '@/app/document/export/html'
 import type { HTMLExportSettings } from '@/app/document/export/types'

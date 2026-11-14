@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { useEditorEvent } from '@open-pencil/vue/editor/events'
-import { useCommandMessages, useCommonMessages, usePanelMessages } from '@open-pencil/vue/i18n'
+import { useEditorEvent } from '@pairdraw/vue/editor/events'
+import { useCommandMessages, useCommonMessages, usePanelMessages } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { AppConfirmationDialog } from '@/components/ui/dialog'

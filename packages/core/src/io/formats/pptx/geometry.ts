@@ -1,7 +1,7 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import TransformMatrix, { type Mat3 } from '@open-pencil/scene-graph/matrix'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import TransformMatrix, { type Mat3 } from '@pairdraw/scene-graph/matrix'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { clampRot, round2 } from './style'
 

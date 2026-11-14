@@ -1,11 +1,11 @@
 ---
 title: Versionar diseños con Git
-description: Configura Git para mostrar diffs legibles de archivos .fig con openpencil diff files, un esquema textconv y git difftool.
+description: Configura Git para mostrar diffs legibles de archivos .fig con pairdraw diff files, un esquema textconv y git difftool.
 ---
 
 # Versionar diseños con Git
 
-Un archivo `.fig` es binario, así que `git diff` y `git log -p` solo indican que ha cambiado. Con la CLI `openpencil` instalada, Git puede mostrar qué ha cambiado: [`openpencil diff files`](/programmable/cli/comparing#comparing-documents) compara dos versiones página por página e imprime los cambios como un parche.
+Un archivo `.fig` es binario, así que `git diff` y `git log -p` solo indican que ha cambiado. Con la CLI `pairdraw` instalada, Git puede mostrar qué ha cambiado: [`pairdraw diff files`](/programmable/cli/comparing#comparing-documents) compara dos versiones página por página e imprime los cambios como un parche.
 
 Hay tres formas de conectarlo. Los comandos de abajo configuran el repositorio actual; añade `--global` a `git config` para configurar todos los repositorios.
 
@@ -32,7 +32,7 @@ path=$1
 old=$2
 new=$5
 
-echo "diff --openpencil a/$path b/$path"
+echo "diff --pairdraw a/$path b/$path"
 if [ "$old" = /dev/null ]; then
   echo "new file"
   exit 0
@@ -42,7 +42,7 @@ if [ "$new" = /dev/null ]; then
   exit 0
 fi
 
-openpencil diff files "$old" "$new"
+pairdraw diff files "$old" "$new"
 status=$?
 # 1 means the documents differ; only 2, trouble, is passed on to Git.
 if [ "$status" -eq 1 ]; then
@@ -59,7 +59,7 @@ git config diff.fig.command git-diff-fig
 Ahora `git diff` imprime el parche de cada archivo `.fig` modificado. Tras agrandar el título y cambiar el texto de la Card del [tutorial de sistema de diseño](/es/user-guide/design-system), empieza así:
 
 ```diff
-diff --openpencil a/design-system.fig b/design-system.fig
+diff --pairdraw a/design-system.fig b/design-system.fig
 @@ /Components/Card/Title #387261504:30
 -size={18}
 +size={20}
@@ -71,16 +71,16 @@ diff --openpencil a/design-system.fig b/design-system.fig
 +size={20}
 ```
 
-`git log` y `git show` solo usan un controlador de diff si se les pide, como en `git log -p --ext-diff -- design.fig`. El parche es el que describe [Comparar diseños](/programmable/cli/comparing#patches): cada bloque nombra una capa por su ruta y por su ID en la versión anterior, así que `openpencil diff apply` puede aplicar el parche a esa versión. Una página que solo tiene una de las versiones se indica en stderr.
+`git log` y `git show` solo usan un controlador de diff si se les pide, como en `git log -p --ext-diff -- design.fig`. El parche es el que describe [Comparar diseños](/programmable/cli/comparing#patches): cada bloque nombra una capa por su ruta y por su ID en la versión anterior, así que `pairdraw diff apply` puede aplicar el parche a esa versión. Una página que solo tiene una de las versiones se indica en stderr.
 
 ## Textconv {#textconv}
 
-Un comando textconv convierte una versión de un archivo en texto, y Git compara ese texto línea por línea. Es lo que usan `git log -p` y `git show` de forma predeterminada, y Git puede guardarlo en caché para cada versión. Este script imprime un esquema de cada página, una capa por línea, con su tipo, nombre, tamaño y texto. Usa [`openpencil eval`](./scripting) y [`jq`](https://jqlang.org); guárdalo como `fig-textconv` en tu `PATH`:
+Un comando textconv convierte una versión de un archivo en texto, y Git compara ese texto línea por línea. Es lo que usan `git log -p` y `git show` de forma predeterminada, y Git puede guardarlo en caché para cada versión. Este script imprime un esquema de cada página, una capa por línea, con su tipo, nombre, tamaño y texto. Usa [`pairdraw eval`](./scripting) y [`jq`](https://jqlang.org); guárdalo como `fig-textconv` en tu `PATH`:
 
 ```sh
 #!/bin/sh
 # Print a document as an outline of its layers, one per line, for Git's textconv.
-openpencil eval "$1" --json --code '
+pairdraw eval "$1" --json --code '
   const lines = []
   const walk = (node, depth) => {
     const size = depth > 0 && "width" in node ? ` ${Math.round(node.width)}×${Math.round(node.height)}` : ""
@@ -123,12 +123,12 @@ Si además está definido el `command` del controlador de diff, `git diff` usa e
 `git difftool` ejecuta una herramienta una vez por archivo modificado y deja `git diff` como está. Define una herramienta que ejecute `diff files` sobre las dos versiones:
 
 ```sh
-git config difftool.openpencil.cmd 'openpencil diff files "$LOCAL" "$REMOTE"'
+git config difftool.pairdraw.cmd 'pairdraw diff files "$LOCAL" "$REMOTE"'
 ```
 
 ```sh
-git difftool --no-prompt --tool=openpencil HEAD~1 -- '*.fig'
-git difftool -y -t openpencil main...my-branch -- design.fig
+git difftool --no-prompt --tool=pairdraw HEAD~1 -- '*.fig'
+git difftool -y -t pairdraw main...my-branch -- design.fig
 ```
 
 La especificación de rutas deja fuera los demás archivos. Un controlador de diff definido con `diff.fig.command` tiene prioridad sobre un difftool para los archivos `.fig`, así que usa uno u otro. No uses `--trust-exit-code`: `diff files` termina con 1 siempre que las versiones son distintas.

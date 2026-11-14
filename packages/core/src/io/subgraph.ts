@@ -1,6 +1,6 @@
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { styleRunReferences } from '@open-pencil/scene-graph/text'
-import { variableValueReferences } from '@open-pencil/scene-graph/variables'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { styleRunReferences } from '@pairdraw/scene-graph/text'
+import { variableValueReferences } from '@pairdraw/scene-graph/variables'
 
 import type { ExportTarget } from './types'
 

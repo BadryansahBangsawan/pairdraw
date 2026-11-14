@@ -1,6 +1,6 @@
-import type { SceneGraph, SceneNode, ShadowEffect, Stroke } from '@open-pencil/scene-graph'
-import { newStrokeGeometry } from '@open-pencil/scene-graph/node-defaults'
-import { independentCornerChanges, resolvedPaintBindings } from '@open-pencil/scene-graph/variables'
+import type { SceneGraph, SceneNode, ShadowEffect, Stroke } from '@pairdraw/scene-graph'
+import { newStrokeGeometry } from '@pairdraw/scene-graph/node-defaults'
+import { independentCornerChanges, resolvedPaintBindings } from '@pairdraw/scene-graph/variables'
 
 import {
   graph,

@@ -136,7 +136,7 @@ async function seed(database: ReturnType<typeof createPostgresCloudDatabase>) {
   return documentId
 }
 
-for (const path of ['/health', '/ready', '/.well-known/openpencil']) {
+for (const path of ['/health', '/ready', '/.well-known/pairdraw']) {
   const response = await fetch(`${base}${path}`)
   check(response.ok, `${path} answered HTTP ${response.status}`)
 }

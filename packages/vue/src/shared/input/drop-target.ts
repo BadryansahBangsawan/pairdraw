@@ -1,9 +1,9 @@
-import type { Editor } from '@open-pencil/core'
-import type { NodeType, SceneNode } from '@open-pencil/scene-graph'
-import { getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import { cycleSafeParent } from '@open-pencil/scene-graph/instances'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { Editor } from '@pairdraw/core'
+import type { NodeType, SceneNode } from '@pairdraw/scene-graph'
+import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import { cycleSafeParent } from '@pairdraw/scene-graph/instances'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 /** Parents a layer stays in while dragged until it lands on another frame. */
 const ENCLOSING_TYPES = new Set<NodeType>(['GROUP', 'BOOLEAN_OPERATION'])

@@ -5,7 +5,7 @@ description: Tworzenie paneli właściwości za pomocą composables i komponent�
 
 # Panele właściwości
 
-Panele właściwości w `@open-pencil/vue` są budowane przede wszystkim za pomocą composables.
+Panele właściwości w `@pairdraw/vue` są budowane przede wszystkim za pomocą composables.
 
 Jeśli panel potrzebuje wartości obliczonych z zaznaczenia i działań do ich zmiany, użyj composable. Jeśli ważna jest wielokrotnego użytku struktura tablicy lub listy, wybierz komponent bez narzuconego wyglądu, na przykład `PropertyListRoot`.
 
@@ -41,7 +41,7 @@ Aplikacja Pairdraw pokazuje nazwę zmiennej na fioletowym tle, gdy pole nie jest
 
 ```vue
 <script setup lang="ts">
-import { usePosition } from '@open-pencil/vue/controls/position'
+import { usePosition } from '@pairdraw/vue/controls/position'
 
 const { x, y, width, height, updateProp, commitProp } = usePosition()
 </script>
@@ -60,9 +60,9 @@ const { x, y, width, height, updateProp, commitProp } = usePosition()
 
 ```vue
 <script setup lang="ts">
-import { PropertyListRoot } from '@open-pencil/vue/primitives/PropertyList'
-import { useEditorPropertyList } from '@open-pencil/vue/controls/property-list'
-import { useFillControls } from '@open-pencil/vue/controls/fill'
+import { PropertyListRoot } from '@pairdraw/vue/primitives/PropertyList'
+import { useEditorPropertyList } from '@pairdraw/vue/controls/property-list'
+import { useFillControls } from '@pairdraw/vue/controls/fill'
 
 const fillControls = useFillControls()
 const fills = useEditorPropertyList('fills')

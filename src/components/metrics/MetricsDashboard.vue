@@ -4,7 +4,7 @@ import { tv } from 'tailwind-variants'
 import { BarList } from 'vccs'
 import { computed } from 'vue'
 
-import type { MetricsSnapshot } from '@open-pencil/feedback/contract'
+import type { MetricsSnapshot } from '@pairdraw/feedback/contract'
 
 import { portalAppearance } from '@/app/cloud-portal/theme'
 import { utcDayOfTimestamp } from '@/app/metrics/days'

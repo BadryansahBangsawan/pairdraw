@@ -36,16 +36,16 @@ Pairdraw отрисовывает графику через CanvasKit на WebGL
 ## Установка в macOS через Homebrew
 
 ```sh
-brew install --cask openpencil
+brew install --cask pairdraw
 ```
 
-Команда устанавливает подписанное приложение для Mac с Apple Silicon или Intel из [официального каталога Homebrew](https://formulae.brew.sh/cask/openpencil). Обновления проходят проверку в Homebrew и могут появляться позже релизов на GitHub. До обновления каталога используйте [прямую загрузку](https://github.com/open-pencil/open-pencil/releases/latest). CLI устанавливается отдельно: `npm install -g @open-pencil/cli`.
+Команда устанавливает подписанное приложение для Mac с Apple Silicon или Intel из [официального каталога Homebrew](https://formulae.brew.sh/cask/pairdraw). Обновления проходят проверку в Homebrew и могут появляться позже релизов на GitHub. До обновления каталога используйте [прямую загрузку](https://github.com/BadryansahBangsawan/pairdraw/releases/latest). CLI устанавливается отдельно: `npm install -g @pairdraw/cli`.
 
 Если вы использовали архивный собственный tap, перейдите так:
 
 ```sh
-brew uninstall open-pencil/tap/open-pencil
-brew install --cask openpencil
+brew uninstall pairdraw/tap/pairdraw
+brew install --cask pairdraw
 ```
 
 ## Сборка из исходного кода {#building-from-source}
@@ -58,8 +58,8 @@ brew install --cask openpencil
 ### Установка
 
 ```sh
-git clone https://github.com/open-pencil/open-pencil.git
-cd open-pencil
+git clone https://github.com/BadryansahBangsawan/pairdraw.git
+cd pairdraw
 bun install
 ```
 

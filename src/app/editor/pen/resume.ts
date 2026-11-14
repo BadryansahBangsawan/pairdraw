@@ -1,12 +1,7 @@
-import type { EditorState, ResumedPath } from '@open-pencil/core'
-import type {
-  SceneNode,
-  VectorNetwork,
-  VectorSegment,
-  VectorVertex
-} from '@open-pencil/scene-graph'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
-import { cloneVectorNetwork } from '@open-pencil/scene-graph/vector-network'
+import type { EditorState, ResumedPath } from '@pairdraw/core'
+import type { SceneNode, VectorNetwork, VectorSegment, VectorVertex } from '@pairdraw/scene-graph'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
+import { cloneVectorNetwork } from '@pairdraw/scene-graph/vector-network'
 
 export type PenState = EditorState
 type PenStateInit = NonNullable<EditorState['penState']>

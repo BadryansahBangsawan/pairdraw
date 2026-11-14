@@ -34,12 +34,12 @@ export const rootThemeConfig = (): DefaultTheme.Config => ({
   },
 
   socialLinks: [
-    { icon: 'github', link: 'https://github.com/open-pencil/open-pencil' },
+    { icon: 'github', link: 'https://github.com/BadryansahBangsawan/pairdraw' },
     { icon: 'discord', link: 'https://discord.gg/4wXc9fuZfm', ariaLabel: 'Discord' }
   ],
 
   editLink: {
-    pattern: 'https://github.com/open-pencil/open-pencil/edit/master/packages/docs/:path'
+    pattern: 'https://github.com/BadryansahBangsawan/pairdraw/edit/master/packages/docs/:path'
   },
 
   footer: {

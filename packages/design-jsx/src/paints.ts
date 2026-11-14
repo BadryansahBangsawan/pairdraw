@@ -6,15 +6,15 @@ import type {
   FillType,
   GradientStop,
   GradientTransform
-} from '@open-pencil/scene-graph'
-import { colorToFill, parseColor } from '@open-pencil/scene-graph/color'
-import { TRANSPARENT } from '@open-pencil/scene-graph/constants'
+} from '@pairdraw/scene-graph'
+import { colorToFill, parseColor } from '@pairdraw/scene-graph/color'
+import { TRANSPARENT } from '@pairdraw/scene-graph/constants'
 import {
   IDENTITY_GRADIENT_TRANSFORM,
   type GradientTransformRows
-} from '@open-pencil/scene-graph/gradient'
-import { paintTransformSchema } from '@open-pencil/scene-graph/paints'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/gradient'
+import { paintTransformSchema } from '@pairdraw/scene-graph/paints'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 import {
   createShaderPaint,
   createShaderSourcePaint,
@@ -24,7 +24,7 @@ import {
   type ShaderPaint,
   type ShaderPreset,
   type ShaderUniformValue
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 import { parseScriptInput } from './schema'
 

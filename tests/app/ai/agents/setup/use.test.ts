@@ -2,7 +2,7 @@ import { describe, expect, mock, test } from 'bun:test'
 
 import { nextTick, ref } from 'vue'
 
-import { ACP_AGENTS, type ACPAgentDef } from '@open-pencil/core/constants'
+import { ACP_AGENTS, type ACPAgentDef } from '@pairdraw/core/constants'
 
 import { createAgentAccounts, type AgentAccount } from '@/app/ai/agents/setup/accounts'
 import { createAgentDiscovery, type DetectedAgent } from '@/app/ai/agents/setup/discovery'
@@ -34,7 +34,7 @@ describe('useAgentSetup', () => {
     })
     const discovery = createAgentDiscovery({
       enabled: true,
-      lookup: async () => lookup('npm', ...(installed ? ['openpencil-harness'] : [])),
+      lookup: async () => lookup('npm', ...(installed ? ['pairdraw-harness'] : [])),
       install: async () => undefined,
       installHarness
     })
@@ -172,7 +172,7 @@ function agentState(overrides: Partial<AgentSetupState> = {}): AgentSetupState {
     detected: null,
     bridge: true,
     bridgeOutdated: false,
-    bridgeCommand: 'npm i -g @open-pencil/mcp@1.0.0',
+    bridgeCommand: 'npm i -g @pairdraw/mcp@1.0.0',
     npm: true,
     installingAgent: false,
     installingBridge: false,
@@ -188,10 +188,10 @@ function piState(overrides: Partial<PiSetupState> = {}): PiSetupState {
     scanning: false,
     companion: true,
     companionOutdated: false,
-    companionCommand: 'npm i -g @open-pencil/harness@1.0.0',
+    companionCommand: 'npm i -g @pairdraw/harness@1.0.0',
     bridge: true,
     bridgeOutdated: false,
-    bridgeCommand: 'npm i -g @open-pencil/mcp@1.0.0',
+    bridgeCommand: 'npm i -g @pairdraw/mcp@1.0.0',
     npm: true,
     installingCompanion: false,
     installingBridge: false,
@@ -230,7 +230,7 @@ describe('agentSetupView', () => {
     expect(view.bridge.action).toBeNull()
     expect(view.problem).toBe('needs-npm')
     expect(view.manualAgentCommand).toBe(claude.installCommand ?? null)
-    expect(view.manualBridgeCommand).toBe('npm i -g @open-pencil/mcp@1.0.0')
+    expect(view.manualBridgeCommand).toBe('npm i -g @pairdraw/mcp@1.0.0')
   })
 
   test('offers the command of an agent without an adapter package to install by hand', () => {
@@ -250,13 +250,13 @@ describe('agentSetupView', () => {
       agentState({ detected: needsAdapter, bridge: false, error: 'canvas-install' })
     )
     expect(view.problem).toBe('install-failed')
-    expect(view.manualBridgeCommand).toBe('npm i -g @open-pencil/mcp@1.0.0')
+    expect(view.manualBridgeCommand).toBe('npm i -g @pairdraw/mcp@1.0.0')
   })
 
   test('gives only instructions where agents cannot run', () => {
     const view = agentSetupView(claude, agentState({ supported: false, bridge: false }))
     expect(view.manualAgentCommand).toBe(claude.installCommand ?? null)
-    expect(view.manualBridgeCommand).toMatch(/@open-pencil\/mcp/)
+    expect(view.manualBridgeCommand).toMatch(/@pairdraw\/mcp/)
   })
 })
 
@@ -282,7 +282,7 @@ describe('agent account in setup', () => {
     ...overrides
   })
 
-  test("shows whether a signed-in agent reached OpenPencil's tools", () => {
+  test("shows whether a signed-in agent reached Pairdraw's tools", () => {
     const signedIn = { kind: 'account' as const, label: 'Claude Max' }
     const toolsOf = (overrides: Partial<AgentAccount>) =>
       agentSetupView(
@@ -408,7 +408,7 @@ describe('piSetupView', () => {
     expect(piSetupView(piState({ ...missing, checked: false })).problem).toBeNull()
     const view = piSetupView(piState(missing))
     expect(view.problem).toBe('needs-npm')
-    expect(view.manualCommands).toEqual(['npm i -g @open-pencil/harness@1.0.0'])
+    expect(view.manualCommands).toEqual(['npm i -g @pairdraw/harness@1.0.0'])
   })
 
   test('reports a failed companion installation, which the agent panel ignores', () => {
@@ -420,7 +420,7 @@ describe('piSetupView', () => {
 
 describe('usePiSetup', () => {
   test('checks Pi each time the editor switches to it', async () => {
-    const scan = mock(async () => lookup('npm', 'openpencil-harness'))
+    const scan = mock(async () => lookup('npm', 'pairdraw-harness'))
     const discovery = createAgentDiscovery({
       enabled: true,
       lookup: scan,
@@ -463,7 +463,7 @@ function mcpServerState(overrides: Partial<MCPServerSetupState> = {}): MCPServer
     checked: true,
     bridge: false,
     bridgeOutdated: false,
-    bridgeCommand: 'bun add -g @open-pencil/mcp@0.0.0-test',
+    bridgeCommand: 'bun add -g @pairdraw/mcp@0.0.0-test',
     npm: true,
     installingBridge: false,
     error: null,
@@ -488,7 +488,7 @@ describe('mcpServerSetupView', () => {
     const view = mcpServerSetupView(mcpServerState({ npm: false }))
     expect(view.bridge.action).toBeNull()
     expect(view.problem).toBe('needs-npm')
-    expect(view.manualCommand).toBe('bun add -g @open-pencil/mcp@0.0.0-test')
+    expect(view.manualCommand).toBe('bun add -g @pairdraw/mcp@0.0.0-test')
   })
 
   test('keeps the retry and adds the command by hand after a failed installation', () => {

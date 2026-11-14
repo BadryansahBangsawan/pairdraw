@@ -4,13 +4,13 @@ import { join, relative, sep } from 'node:path'
 
 import { compact } from 'es-toolkit/array'
 
-import type { JSONObject } from '@open-pencil/scene-graph/primitives'
+import type { JSONObject } from '@pairdraw/scene-graph/primitives'
 import {
   LOCALE_DIR_NAMES,
   TRANSLATED_LOCALES,
   type TranslatedLocale,
   messageDefaults
-} from '@open-pencil/vue/i18n'
+} from '@pairdraw/vue/i18n'
 
 import { hasMixedLatinAndCjk, placeholders } from './quality'
 

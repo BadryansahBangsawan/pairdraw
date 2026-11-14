@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { capture, element } from '#web-capture-tests/fixtures'
 
-import { webCaptureDesignDocument } from '@open-pencil/web-capture'
+import { webCaptureDesignDocument } from '@pairdraw/web-capture'
 
 describe('capture as a styled DOM', () => {
   test('keeps the root at its drawn size and drops its position and margins', () => {

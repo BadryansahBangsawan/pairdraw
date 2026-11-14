@@ -1,14 +1,9 @@
 import type { Canvas, CanvasKit, Paint } from 'canvaskit-wasm'
 import { isEqual } from 'es-toolkit/predicate'
 
-import type {
-  DerivedTextGlyph,
-  Fill,
-  SceneNode,
-  TextDecorationStyle
-} from '@open-pencil/scene-graph'
-import { resolveRGBAForPreview } from '@open-pencil/scene-graph/color'
-import { faceStyleKey } from '@open-pencil/scene-graph/font-style'
+import type { DerivedTextGlyph, Fill, SceneNode, TextDecorationStyle } from '@pairdraw/scene-graph'
+import { resolveRGBAForPreview } from '@pairdraw/scene-graph/color'
+import { faceStyleKey } from '@pairdraw/scene-graph/font-style'
 
 import { outlineInk, savedGlyphInk, type InkSpan } from '#core/canvas/text/ink'
 import { COMBINING_KEYCAP, drawKeycapFrame } from '#core/canvas/text/keycap'

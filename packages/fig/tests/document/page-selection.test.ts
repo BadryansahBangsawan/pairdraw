@@ -3,9 +3,9 @@ import { expect, test } from 'bun:test'
 import { figArchiveOf } from '#fig-tests/helpers/fig-fixtures'
 import { guid } from '#fig-tests/helpers/guid'
 
-import { createFigDocumentSession, materializeDocument } from '@open-pencil/fig'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import { createFigDocumentSession, materializeDocument } from '@pairdraw/fig'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 test('selected-page assembly excludes unrelated content but keeps cross-page components', () => {
   const changes: NodeChange[] = [

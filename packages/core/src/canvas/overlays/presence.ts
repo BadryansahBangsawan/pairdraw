@@ -1,8 +1,8 @@
 import type { Canvas } from 'canvaskit-wasm'
 
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import { getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import Matrix from '@open-pencil/scene-graph/matrix'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import Matrix from '@pairdraw/scene-graph/matrix'
 
 import type { PresenceCursor, SkiaRenderer } from '#core/canvas/renderer'
 

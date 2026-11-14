@@ -30,7 +30,7 @@ export function resolveCORSOrigins(raw: string | undefined): readonly string[] {
   return parseCORSOrigins(raw) ?? DESKTOP_APP_ORIGINS
 }
 
-/** The web app, which pairs with a companion started by `openpencil-connect`. */
+/** The web app, which pairs with a companion started by `pairdraw-connect`. */
 export const WEB_APP_URL = 'https://app.openpencil.dev'
 
 /**

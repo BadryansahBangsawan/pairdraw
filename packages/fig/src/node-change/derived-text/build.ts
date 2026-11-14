@@ -1,15 +1,15 @@
 import { groupBy } from 'es-toolkit/array'
 
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import type { CharacterStyleOverride, DerivedTextGlyph, SceneNode } from '@open-pencil/scene-graph'
-import { faceStyleKey, normalizeFontFamily } from '@open-pencil/scene-graph/font-style'
-import { rangeFontStyle } from '@open-pencil/scene-graph/shared-styles'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import type { CharacterStyleOverride, DerivedTextGlyph, SceneNode } from '@pairdraw/scene-graph'
+import { faceStyleKey, normalizeFontFamily } from '@pairdraw/scene-graph/font-style'
+import { rangeFontStyle } from '@pairdraw/scene-graph/shared-styles'
 import {
   hasTextList,
   lineHeightPixels,
   paragraphIndexAt,
   textParagraphRanges
-} from '@open-pencil/scene-graph/text'
+} from '@pairdraw/scene-graph/text'
 
 import { bytesToHex } from '../bytes'
 import type { PlacedTextGlyph, TextDecorationRecord } from '../export/runtime'

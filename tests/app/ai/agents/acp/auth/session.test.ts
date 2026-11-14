@@ -9,7 +9,7 @@ import {
   type NewSessionRequest
 } from '@agentclientprotocol/sdk'
 
-import { ACP_AGENTS } from '@open-pencil/core/constants'
+import { ACP_AGENTS } from '@pairdraw/core/constants'
 
 import { checkAgentAuth, signInWithAgent, type ToolsProbe } from '@/app/ai/agents/acp/auth/session'
 import { AUTH_STATUS_UPDATE_METHOD, type AgentAuthStatus } from '@/app/ai/agents/acp/auth/status'
@@ -171,7 +171,7 @@ describe('signInWithAgent', () => {
   })
 })
 
-/** A link to OpenPencil's tools that reports the given outcome once the session exists. */
+/** A link to Pairdraw's tools that reports the given outcome once the session exists. */
 function toolsProbe(outcome: OwnToolsOutcome) {
   const linked: string[] = []
   const probe: ToolsProbe = {
@@ -181,9 +181,9 @@ function toolsProbe(outcome: OwnToolsOutcome) {
       return {
         chat: '0123456789abcdef',
         mcpServers: [
-          { type: 'http', name: 'open-pencil', url: 'http://127.0.0.1:7600/mcp', headers: [] }
+          { type: 'http', name: 'pairdraw', url: 'http://127.0.0.1:7600/mcp', headers: [] }
         ],
-        meta: { claudeCode: { options: { allowedTools: ['mcp__open-pencil'] } } },
+        meta: { claudeCode: { options: { allowedTools: ['mcp__pairdraw'] } } },
         noteUpdate: () => undefined,
         outcome: async () => outcome,
         stop: () => undefined
@@ -193,7 +193,7 @@ function toolsProbe(outcome: OwnToolsOutcome) {
   return { probe, linked }
 }
 
-describe("checking a signed-in agent reaches OpenPencil's tools", () => {
+describe("checking a signed-in agent reaches Pairdraw's tools", () => {
   test('starts a session as a chat does, sends no prompt, and reports the outcome', async () => {
     const agent = fakeAgent({ status: SIGNED_IN, startsSessions: true })
     const { probe } = toolsProbe({ connected: true })
@@ -202,8 +202,8 @@ describe("checking a signed-in agent reaches OpenPencil's tools", () => {
     expect(agent.sessions).toHaveLength(1)
     expect(agent.sessions[0]).toMatchObject({
       cwd: '/workspace',
-      mcpServers: [{ name: 'open-pencil' }],
-      _meta: { claudeCode: { options: { allowedTools: ['mcp__open-pencil'] } } }
+      mcpServers: [{ name: 'pairdraw' }],
+      _meta: { claudeCode: { options: { allowedTools: ['mcp__pairdraw'] } } }
     })
     await agent.closed
   })

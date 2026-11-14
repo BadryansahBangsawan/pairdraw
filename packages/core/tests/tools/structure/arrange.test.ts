@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { arrangeNodes } from '@open-pencil/core/tools'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { arrangeNodes } from '@pairdraw/core/tools'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 function overlaps(nodes: Rect[]): boolean {
   return nodes.some((a, i) =>

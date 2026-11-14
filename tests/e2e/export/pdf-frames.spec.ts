@@ -11,8 +11,8 @@ const editor = useEditorSetupWithClear('/?test&no-rulers')
  */
 async function createSlides() {
   await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     for (const [index, width] of [320, 480, 640].entries()) {
       const id = store.createShape('FRAME', index * 700, 0, width, 180)
       store.graph.updateNode(id, { name: `Slide ${index + 1}` })
@@ -59,8 +59,8 @@ test('File › Export frames to PDF saves one page per frame, each its frame’s
 test('with frames selected, only those are exported, in layer order', async () => {
   await createSlides()
   await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const [first, , third] = store.graph.getChildren(store.state.currentPageId)
     store.select([third.id, first.id])
   })

@@ -7,12 +7,12 @@
 
 import type { Shader } from 'canvaskit-wasm'
 
-import type { Fill, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { Fill, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   isShaderSourcePaint,
   shaderOfPaint,
   type ShaderSourcePaint
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
 

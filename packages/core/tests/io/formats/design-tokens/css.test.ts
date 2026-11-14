@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { tokenStylesheet } from '@open-pencil/dom-css/export'
-import { SceneGraph, type Variable } from '@open-pencil/scene-graph'
+import { tokenStylesheet } from '@pairdraw/dom-css/export'
+import { SceneGraph, type Variable } from '@pairdraw/scene-graph'
 
 import {
   countTokenImportChanges,

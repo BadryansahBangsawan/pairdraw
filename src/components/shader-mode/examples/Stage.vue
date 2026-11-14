@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { colorToFill } from '@open-pencil/scene-graph/color'
-import type { ShaderPreset } from '@open-pencil/scene-graph/shaders'
+import { colorToFill } from '@pairdraw/scene-graph/color'
+import type { ShaderPreset } from '@pairdraw/scene-graph/shaders'
 
 import { provideTabEditorStore } from '@/app/editor/active-store'
 import { createEditorStore } from '@/app/editor/session/create'

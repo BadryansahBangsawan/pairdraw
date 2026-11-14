@@ -2,10 +2,10 @@
 import { tv } from 'tailwind-variants'
 import { computed, ref, watch } from 'vue'
 
-import type { Fill, MeshGradientPoint } from '@open-pencil/scene-graph'
-import { colorToCSS } from '@open-pencil/scene-graph/color'
-import { isMeshFill, resampleMeshPoints } from '@open-pencil/scene-graph/gradient'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { Fill, MeshGradientPoint } from '@pairdraw/scene-graph'
+import { colorToCSS } from '@pairdraw/scene-graph/color'
+import { isMeshFill, resampleMeshPoints } from '@pairdraw/scene-graph/gradient'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import ColorPickerPanel from '@/components/color-picker-panel/ColorPickerPanel.vue'
 import NumberField from '@/components/inputs/NumberField.vue'

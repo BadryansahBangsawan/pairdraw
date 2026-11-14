@@ -1,9 +1,9 @@
 import type { Canvas } from 'canvaskit-wasm'
 
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import { CONNECTOR_LABEL_PADDING, labelledConnector } from '@open-pencil/scene-graph/connectors'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
-import type { SnapGuide } from '@open-pencil/scene-graph/snap'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { CONNECTOR_LABEL_PADDING, labelledConnector } from '@pairdraw/scene-graph/connectors'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
+import type { SnapGuide } from '@pairdraw/scene-graph/snap'
 
 import { paintFills } from '#core/canvas/fills'
 import { drawNodeHighlightRect } from '#core/canvas/highlight-rect'

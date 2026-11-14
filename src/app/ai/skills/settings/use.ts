@@ -1,6 +1,6 @@
 import { computed, ref, shallowRef, watch } from 'vue'
 
-import { IS_TAURI } from '@open-pencil/core/constants'
+import { IS_TAURI } from '@pairdraw/core/constants'
 
 import {
   enabledSkills,
@@ -94,7 +94,7 @@ export function useSkillsSettings() {
     // Uploads, the document's folders, the user's, then the built-in skills: the order a
     // repeated name resolves in.
     return [
-      source('openpencil', null),
+      source('pairdraw', null),
       ...projectSkillsFolders.value.map(({ path, location }) =>
         group(
           {

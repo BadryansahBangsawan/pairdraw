@@ -101,8 +101,8 @@ describe('pairing over HTTP', () => {
       await response.text()
     )
     expect(lookup.executables['fake-acp']).toEndWith('fake-acp')
-    expect(lookup.executables['openpencil-mcp-http']).toBeTruthy()
-    expect(lookup.versions['@open-pencil/mcp']).toBeTruthy()
+    expect(lookup.executables['pairdraw-mcp-http']).toBeTruthy()
+    expect(lookup.versions['@pairdraw/mcp']).toBeTruthy()
   })
 })
 
@@ -227,9 +227,9 @@ describe('the tab session a development server hands the MCP server', () => {
   const ENTRY = Bun.resolveSync('#mcp/index', import.meta.dir)
   const session = { token: 'd'.repeat(64), agentToken: 'e'.repeat(64) }
   const sessionEnv = {
-    OPENPENCIL_MCP_AGENTS: '1',
-    OPENPENCIL_MCP_AGENT_SESSION: session.token,
-    OPENPENCIL_MCP_AGENT_TOKEN: session.agentToken
+    PAIRDRAW_MCP_AGENTS: '1',
+    PAIRDRAW_MCP_AGENT_SESSION: session.token,
+    PAIRDRAW_MCP_AGENT_TOKEN: session.agentToken
   }
   const servers: Array<() => void> = []
 
@@ -246,7 +246,7 @@ describe('the tab session a development server hands the MCP server', () => {
   }
 
   /**
-   * Starts `openpencil-mcp-http` as `bun run dev` does, and waits until it listens. Its runtime
+   * Starts `pairdraw-mcp-http` as `bun run dev` does, and waits until it listens. Its runtime
    * folder, where the bridge keeps the agents' workspace, is the test's own, never the person's.
    */
   async function startHTTPServer(env: Record<string, string>) {
@@ -263,10 +263,10 @@ describe('the tab session a development server hands the MCP server', () => {
         XDG_RUNTIME_DIR: directory,
         LOCALAPPDATA: directory,
         PORT: String(port),
-        OPENPENCIL_MCP_SOCKET: join(directory, 'mcp.sock'),
-        OPENPENCIL_MCP_DISCOVERY_PATH: discoveryPath,
-        OPENPENCIL_MCP_AUTH_TOKEN: MASTER_TOKEN,
-        OPENPENCIL_MCP_CORS_ORIGIN: APP_ORIGIN,
+        PAIRDRAW_MCP_SOCKET: join(directory, 'mcp.sock'),
+        PAIRDRAW_MCP_DISCOVERY_PATH: discoveryPath,
+        PAIRDRAW_MCP_AUTH_TOKEN: MASTER_TOKEN,
+        PAIRDRAW_MCP_CORS_ORIGIN: APP_ORIGIN,
         ...env
       }
     })
@@ -325,10 +325,10 @@ describe('the tab session a development server hands the MCP server', () => {
   })
 
   test('keeps eval off while the bridge is on, as the companion does', async () => {
-    const bridged = await startHTTPServer({ ...sessionEnv, OPENPENCIL_MCP_EVAL: '1' })
-    expect(bridged.output).toContain('OPENPENCIL_MCP_EVAL=1 is ignored')
+    const bridged = await startHTTPServer({ ...sessionEnv, PAIRDRAW_MCP_EVAL: '1' })
+    expect(bridged.output).toContain('PAIRDRAW_MCP_EVAL=1 is ignored')
     expect(await evalEnabled(bridged.base)).toBe(false)
-    const plain = await startHTTPServer({ OPENPENCIL_MCP_AGENTS: '', OPENPENCIL_MCP_EVAL: '1' })
+    const plain = await startHTTPServer({ PAIRDRAW_MCP_AGENTS: '', PAIRDRAW_MCP_EVAL: '1' })
     expect(await evalEnabled(plain.base)).toBe(true)
   })
 
@@ -342,25 +342,25 @@ describe('the tab session a development server hands the MCP server', () => {
 
   test('starts no bridge without the switch, or with a malformed session', async () => {
     const unset = await startHTTPServer({
-      OPENPENCIL_MCP_AGENTS: '',
-      OPENPENCIL_MCP_AGENT_SESSION: session.token,
-      OPENPENCIL_MCP_AGENT_TOKEN: session.agentToken
+      PAIRDRAW_MCP_AGENTS: '',
+      PAIRDRAW_MCP_AGENT_SESSION: session.token,
+      PAIRDRAW_MCP_AGENT_TOKEN: session.agentToken
     })
     // Without the bridge its routes do not exist.
     expect((await request(unset.base, '/companion', session.token)).status).toBe(404)
     const malformed = await startHTTPServer({
       ...sessionEnv,
-      OPENPENCIL_MCP_AGENT_TOKEN: session.token
+      PAIRDRAW_MCP_AGENT_TOKEN: session.token
     })
     expect((await request(malformed.base, '/companion', session.token)).status).toBe(404)
   })
 
   test.each([
-    ['no switch', { ...sessionEnv, OPENPENCIL_MCP_AGENTS: '0' }],
-    ['a short token', { ...sessionEnv, OPENPENCIL_MCP_AGENT_SESSION: 'd'.repeat(32) }],
-    ['uppercase hex', { ...sessionEnv, OPENPENCIL_MCP_AGENT_TOKEN: 'E'.repeat(64) }],
-    ['the same token twice', { ...sessionEnv, OPENPENCIL_MCP_AGENT_TOKEN: session.token }],
-    ['a missing agent token', { ...sessionEnv, OPENPENCIL_MCP_AGENT_TOKEN: undefined }]
+    ['no switch', { ...sessionEnv, PAIRDRAW_MCP_AGENTS: '0' }],
+    ['a short token', { ...sessionEnv, PAIRDRAW_MCP_AGENT_SESSION: 'd'.repeat(32) }],
+    ['uppercase hex', { ...sessionEnv, PAIRDRAW_MCP_AGENT_TOKEN: 'E'.repeat(64) }],
+    ['the same token twice', { ...sessionEnv, PAIRDRAW_MCP_AGENT_TOKEN: session.token }],
+    ['a missing agent token', { ...sessionEnv, PAIRDRAW_MCP_AGENT_TOKEN: undefined }]
   ])('reads no session from %s', (_label, env) => {
     expect(devAgentBridgeFromEnv(env)).toBeNull()
   })

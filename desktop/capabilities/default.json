@@ -73,10 +73,10 @@
       "identifier": "fs:allow-open",
       "allow": [{ "path": "**" }],
       "deny": [
-        { "path": "$HOME/Library/Application Support/OpenPencil/mcp.json" },
-        { "path": "$LOCALDATA/OpenPencil/mcp.json" },
-        { "path": "$RUNTIME/openpencil/mcp.json" },
-        { "path": "$HOME/.openpencil/mcp.json" }
+        { "path": "$HOME/Library/Application Support/Pairdraw/mcp.json" },
+        { "path": "$LOCALDATA/Pairdraw/mcp.json" },
+        { "path": "$RUNTIME/pairdraw/mcp.json" },
+        { "path": "$HOME/.pairdraw/mcp.json" }
       ]
     },
     "fs:allow-fstat",
@@ -86,30 +86,30 @@
       "identifier": "fs:allow-read-text-file",
       "allow": [
         { "path": "$HOME/.pi/agent/settings.json" },
-        { "path": "$HOME/Library/Application Support/OpenPencil/mcp.json" },
-        { "path": "$LOCALDATA/OpenPencil/mcp.json" },
-        { "path": "$RUNTIME/openpencil/mcp.json" },
-        { "path": "$HOME/.openpencil/mcp.json" }
+        { "path": "$HOME/Library/Application Support/Pairdraw/mcp.json" },
+        { "path": "$LOCALDATA/Pairdraw/mcp.json" },
+        { "path": "$RUNTIME/pairdraw/mcp.json" },
+        { "path": "$HOME/.pairdraw/mcp.json" }
       ]
     },
     {
       "identifier": "fs:allow-write-file",
       "allow": [{ "path": "**" }],
       "deny": [
-        { "path": "$HOME/Library/Application Support/OpenPencil/mcp.json" },
-        { "path": "$LOCALDATA/OpenPencil/mcp.json" },
-        { "path": "$RUNTIME/openpencil/mcp.json" },
-        { "path": "$HOME/.openpencil/mcp.json" }
+        { "path": "$HOME/Library/Application Support/Pairdraw/mcp.json" },
+        { "path": "$LOCALDATA/Pairdraw/mcp.json" },
+        { "path": "$RUNTIME/pairdraw/mcp.json" },
+        { "path": "$HOME/.pairdraw/mcp.json" }
       ]
     },
     {
       "identifier": "fs:allow-exists",
       "allow": [
         { "path": "$HOME/.pi/agent/auth.json" },
-        { "path": "$HOME/Library/Application Support/OpenPencil/mcp.json" },
-        { "path": "$LOCALDATA/OpenPencil/mcp.json" },
-        { "path": "$RUNTIME/openpencil/mcp.json" },
-        { "path": "$HOME/.openpencil/mcp.json" }
+        { "path": "$HOME/Library/Application Support/Pairdraw/mcp.json" },
+        { "path": "$LOCALDATA/Pairdraw/mcp.json" },
+        { "path": "$RUNTIME/pairdraw/mcp.json" },
+        { "path": "$HOME/.pairdraw/mcp.json" }
       ]
     },
     {
@@ -120,10 +120,10 @@
       "identifier": "fs:allow-remove",
       "allow": [{ "path": "**" }],
       "deny": [
-        { "path": "$HOME/Library/Application Support/OpenPencil/mcp.json" },
-        { "path": "$LOCALDATA/OpenPencil/mcp.json" },
-        { "path": "$RUNTIME/openpencil/mcp.json" },
-        { "path": "$HOME/.openpencil/mcp.json" }
+        { "path": "$HOME/Library/Application Support/Pairdraw/mcp.json" },
+        { "path": "$LOCALDATA/Pairdraw/mcp.json" },
+        { "path": "$RUNTIME/pairdraw/mcp.json" },
+        { "path": "$HOME/.pairdraw/mcp.json" }
       ]
     },
     {
@@ -149,7 +149,7 @@
             "install",
             "--global",
             {
-              "validator": "^(@agentclientprotocol/(claude-agent-acp|codex-acp)|@open-pencil/(mcp|harness)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?)$"
+              "validator": "^(@agentclientprotocol/(claude-agent-acp|codex-acp)|@pairdraw/(mcp|harness)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?)$"
             },
             "--registry=https://registry.npmjs.org"
           ]
@@ -161,13 +161,13 @@
             "add",
             "--global",
             {
-              "validator": "^@open-pencil/(mcp|harness)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?$"
+              "validator": "^@pairdraw/(mcp|harness)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?$"
             },
             "--registry=https://registry.npmjs.org"
           ]
         },
-        { "name": "openpencil-mcp-http", "cmd": "openpencil-mcp-http", "args": false },
-        { "name": "openpencil-harness", "cmd": "openpencil-harness", "args": false },
+        { "name": "pairdraw-mcp-http", "cmd": "pairdraw-mcp-http", "args": false },
+        { "name": "pairdraw-harness", "cmd": "pairdraw-harness", "args": false },
         { "name": "cmd-claude-agent-acp", "cmd": "cmd", "args": ["/c", "claude-agent-acp"] },
         {
           "name": "cmd-claude-agent-acp-sign-in",
@@ -185,7 +185,7 @@
             "install",
             "--global",
             {
-              "validator": "^(@agentclientprotocol/(claude-agent-acp|codex-acp)|@open-pencil/(mcp|harness)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?)$"
+              "validator": "^(@agentclientprotocol/(claude-agent-acp|codex-acp)|@pairdraw/(mcp|harness)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?)$"
             },
             "--registry=https://registry.npmjs.org"
           ]
@@ -199,13 +199,13 @@
             "add",
             "--global",
             {
-              "validator": "^@open-pencil/(mcp|harness)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?$"
+              "validator": "^@pairdraw/(mcp|harness)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?$"
             },
             "--registry=https://registry.npmjs.org"
           ]
         },
-        { "name": "cmd-openpencil-mcp-http", "cmd": "cmd", "args": ["/c", "openpencil-mcp-http"] },
-        { "name": "cmd-openpencil-harness", "cmd": "cmd", "args": ["/c", "openpencil-harness"] }
+        { "name": "cmd-pairdraw-mcp-http", "cmd": "cmd", "args": ["/c", "pairdraw-mcp-http"] },
+        { "name": "cmd-pairdraw-harness", "cmd": "cmd", "args": ["/c", "pairdraw-harness"] }
       ]
     },
     "shell:allow-stdin-write",

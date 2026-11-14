@@ -10,8 +10,8 @@ export function componentToFrameDriver(page: () => Page) {
   return {
     async build() {
       ids = await page().evaluate(() => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         const frame = store.createShape('FRAME', 100, 100, 200, 150)
         store.createShape('RECTANGLE', 20, 20, 40, 40, frame)
         store.select([frame])
@@ -26,7 +26,7 @@ export function componentToFrameDriver(page: () => Page) {
     types() {
       if (!ids) throw new Error('Build the scene first')
       return page().evaluate(({ component, instance }) => {
-        const graph = window.openPencil?.getStore?.().graph
+        const graph = window.pairdraw?.getStore?.().graph
         return {
           component: graph?.getNode(component)?.type,
           instance: graph?.getNode(instance)?.type

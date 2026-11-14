@@ -1,6 +1,6 @@
-import type { Fill, Stroke } from '@open-pencil/scene-graph'
-import { WHITE } from '@open-pencil/scene-graph/constants'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import type { Fill, Stroke } from '@pairdraw/scene-graph'
+import { WHITE } from '@pairdraw/scene-graph/constants'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { SelectionTheme } from '#core/canvas/renderer/types'
 
@@ -118,7 +118,7 @@ export const SECTION_TITLE_FONT_SIZE = 11
  * canvas and in the page, so renaming a title shows the same glyphs and document fonts named
  * Inter cannot replace them.
  */
-export const SECTION_TITLE_FONT_FAMILY = 'OpenPencil Section Title'
+export const SECTION_TITLE_FONT_FAMILY = 'Pairdraw Section Title'
 export const SECTION_TITLE_FONT_URL = '/Inter-SemiBold.ttf'
 export const SECTION_TITLE_GAP = 6
 export const SECTION_HOVER_STROKE_WIDTH = 2
@@ -181,16 +181,16 @@ export const AUTOMATION_HTTP_PORT = 7600
  * Request header the app's own ACP and Pi harness chats send to the MCP server, so their sessions
  * show as those agents rather than as an outside MCP client.
  */
-export const MCP_AGENT_HEADER = 'x-openpencil-agent'
+export const MCP_AGENT_HEADER = 'x-pairdraw-agent'
 
-/** The name the app's chats give OpenPencil's MCP server in an agent's session. */
-export const OPEN_PENCIL_MCP_SERVER = 'open-pencil'
+/** The name the app's chats give Pairdraw's MCP server in an agent's session. */
+export const PAIRDRAW_MCP_SERVER = 'pairdraw'
 
 /**
  * Request header naming the app chat whose agent opens an MCP session, so the app can tell that
  * this chat's agent reached its tools before it sends the prompt.
  */
-export const MCP_CHAT_HEADER = 'x-openpencil-chat'
+export const MCP_CHAT_HEADER = 'x-pairdraw-chat'
 
 export const GOOGLE_FONTS_API_KEY = 'AIzaSyD1tYDR_dUEiV-Tw1vksEhZbUytgKW5pc8'
 

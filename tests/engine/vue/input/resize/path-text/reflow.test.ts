@@ -1,16 +1,16 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { Editor } from '@open-pencil/core'
-import { parseFigBuffer } from '@open-pencil/fig'
+import type { Editor } from '@pairdraw/core'
+import { parseFigBuffer } from '@pairdraw/fig'
 import {
   SceneGraph,
   type Fill,
   type SceneNode,
   type Stroke,
   type VectorNetwork
-} from '@open-pencil/scene-graph'
-import { copyGeometryPaths, copyStrokes } from '@open-pencil/scene-graph/copy'
-import type { ResizeSnapshot } from '@open-pencil/scene-graph/resize'
+} from '@pairdraw/scene-graph'
+import { copyGeometryPaths, copyStrokes } from '@pairdraw/scene-graph/copy'
+import type { ResizeSnapshot } from '@pairdraw/scene-graph/resize'
 
 import { exportFigFile } from '#core/io/formats/fig/export'
 import { getTextPathData, layoutPathTextFromAdvances } from '#core/text/path'
@@ -378,14 +378,14 @@ describe('resize + export integration: real commit path clears stale raw payload
       ...text.source.fig.rawNodeFields,
       derivedTextData: {
         glyphs: seeds.map((g) => ({
-          commandsBlob: { __openPencilFigmaBlob: new Uint8Array(g.commandsBlob) },
+          commandsBlob: { __pairdrawFigmaBlob: new Uint8Array(g.commandsBlob) },
           position: { x: g.x, y: g.y },
           fontSize: g.fontSize,
           rotation: g.rotation ?? 0
         }))
       },
       strokeGeometry: [
-        { windingRule: 'NONZERO', commandsBlob: { __openPencilFigmaBlob: squareGeometryBlob(256) } }
+        { windingRule: 'NONZERO', commandsBlob: { __pairdrawFigmaBlob: squareGeometryBlob(256) } }
       ]
     }
 

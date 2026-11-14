@@ -1,9 +1,9 @@
 import type { Ref } from 'vue'
 
-import type { Editor } from '@open-pencil/core'
-import { BLACK } from '@open-pencil/core/constants'
-import type { VariableCollection, VariableType, VariableValue } from '@open-pencil/scene-graph'
-import { randomHex } from '@open-pencil/scene-graph/random'
+import type { Editor } from '@pairdraw/core'
+import { BLACK } from '@pairdraw/core/constants'
+import type { VariableCollection, VariableType, VariableValue } from '@pairdraw/scene-graph'
+import { randomHex } from '@pairdraw/scene-graph/random'
 
 export function createVariableCollectionActions(editor: Editor, activeCollectionId: Ref<string>) {
   function setActiveCollection(id: string) {

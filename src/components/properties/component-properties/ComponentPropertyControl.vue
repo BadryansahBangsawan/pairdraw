@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { ComponentPropertyControl } from '@open-pencil/vue/controls/component-props'
-import { MIXED } from '@open-pencil/vue/controls/node-props'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { ComponentPropertyControl } from '@pairdraw/vue/controls/component-props'
+import { MIXED } from '@pairdraw/vue/controls/node-props'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import type { AppPickerItem } from '@/components/ui/select/AppPicker.vue'
 import AppPickerField from '@/components/ui/select/AppPickerField.vue'

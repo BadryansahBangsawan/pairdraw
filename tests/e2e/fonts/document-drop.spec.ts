@@ -11,8 +11,8 @@ async function openTypographyForText(page: Page) {
   await canvas.waitForInit()
 
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const id = store.createShape('TEXT', 120, 120, 240, 40)
     store.updateNode(id, { text: 'Dropped font smoke' })
     store.select([id])

@@ -3,8 +3,8 @@ import { mkdtemp, readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import type { ToolDef } from '@open-pencil/core/tools'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import type { ToolDef } from '@pairdraw/core/tools'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import type { ToolSession } from '#cli/session/open'
 import { createShell, runShell, type ShellOptions } from '#cli/shell/run'
@@ -52,7 +52,7 @@ async function shell(session: ToolSession, lines: string[], options: Partial<She
   return { result, out: out.join('\n'), err: err.join('\n') }
 }
 
-describe('openpencil shell', () => {
+describe('pairdraw shell', () => {
   test('runs every tool on the same session and stops at exit()', async () => {
     const { session, calls, saves } = recordingSession()
     const { result, out } = await shell(session, [
@@ -93,7 +93,7 @@ describe('openpencil shell', () => {
   })
 
   test('writes a preview PNG after each change, and only after a change', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-shell-preview-'))
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-shell-preview-'))
     const previewPath = join(dir, 'preview.png')
     const { session, previews } = recordingSession()
     const { err } = await shell(session, ['list_pages', 'create_page {"name": "A"}'], {
@@ -105,7 +105,7 @@ describe('openpencil shell', () => {
   })
 
   test('keeps the change when its preview cannot be drawn', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-shell-preview-'))
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-shell-preview-'))
     const { session } = recordingSession({
       preview: () => Promise.reject(new Error('No visible nodes to export'))
     })
@@ -117,7 +117,7 @@ describe('openpencil shell', () => {
   })
 
   test('preview() writes on demand and needs a path when none was given at start', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-shell-preview-'))
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-shell-preview-'))
     const target = join(dir, 'now.png')
     const { session } = recordingSession()
     const { result, err } = await shell(session, [

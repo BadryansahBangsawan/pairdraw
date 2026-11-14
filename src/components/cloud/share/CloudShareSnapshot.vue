@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { tv } from 'tailwind-variants'
 
-import { useCloudMessages } from '@open-pencil/vue/i18n'
+import { useCloudMessages } from '@pairdraw/vue/i18n'
 
 import AppButton from '@/components/ui/button/AppButton.vue'
 import Tip from '@/components/ui/overlay/Tip.vue'

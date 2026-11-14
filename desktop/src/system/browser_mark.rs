@@ -15,7 +15,7 @@ const MARK_EXPIRED: &str = "The page did not answer in time.";
 const SELECTOR_LIMIT: usize = 500;
 
 pub(crate) fn mark_script(request: &str) -> String {
-    format!("(() => {{\nconst __openpencilMarkRequest = {request};\n{MARK_PAGE}\n}})()")
+    format!("(() => {{\nconst __pairdrawMarkRequest = {request};\n{MARK_PAGE}\n}})()")
 }
 
 fn mark_request(selector: &str) -> String {

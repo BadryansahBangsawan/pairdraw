@@ -1,6 +1,6 @@
 import { isEqual } from 'es-toolkit'
 
-import type { Fill, GradientTransform, ImageScaleMode } from '@open-pencil/scene-graph'
+import type { Fill, GradientTransform, ImageScaleMode } from '@pairdraw/scene-graph'
 
 /**
  * How the image fill picker offers to place an image. Stretch is no mode of its own in Figma or

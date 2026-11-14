@@ -2,8 +2,14 @@ import * as v from 'valibot'
 
 import type { PluginDataEntry } from '../types'
 
-/** The plugin id OpenPencil keeps its own state under, on nodes and in `.fig` files. */
-export const OPEN_PENCIL_PLUGIN_ID = 'open-pencil'
+/** The plugin id Pairdraw keeps its own state under, on nodes and in `.fig` files. */
+export const PAIRDRAW_PLUGIN_ID = 'pairdraw'
+/**
+ * The plugin id documents saved before the rename used. Its entries are read as Pairdraw's own,
+ * and writing a field replaces them with one under {@link PAIRDRAW_PLUGIN_ID}, so a document
+ * moves to the new id the first time each field is saved.
+ */
+const LEGACY_PLUGIN_ID = 'open-pencil'
 
 /**
  * What a field holds:
@@ -15,7 +21,7 @@ export const OPEN_PENCIL_PLUGIN_ID = 'open-pencil'
  */
 export type PluginDataRole = 'content' | 'format' | 'bookkeeping'
 
-/** One OpenPencil plugin-data key. */
+/** One Pairdraw plugin-data key. */
 export interface PluginDataKey {
   readonly key: string
   readonly role: PluginDataRole
@@ -68,7 +74,10 @@ export function textPluginDataField<const T extends string>(
 }
 
 export function isPluginDataEntry(entry: PluginDataEntry, field: PluginDataKey): boolean {
-  return entry.pluginId === OPEN_PENCIL_PLUGIN_ID && entry.key === field.key
+  return (
+    (entry.pluginId === PAIRDRAW_PLUGIN_ID || entry.pluginId === LEGACY_PLUGIN_ID) &&
+    entry.key === field.key
+  )
 }
 
 export function hasPluginData(
@@ -98,7 +107,7 @@ export function readAllPluginData<T>(
 }
 
 export function pluginDataEntry<T>(field: PluginDataField<T>, value: T): PluginDataEntry {
-  return { pluginId: OPEN_PENCIL_PLUGIN_ID, key: field.key, value: field.encode(value) }
+  return { pluginId: PAIRDRAW_PLUGIN_ID, key: field.key, value: field.encode(value) }
 }
 
 /** Entries other than those of `fields`; other plugins' entries are always kept. */

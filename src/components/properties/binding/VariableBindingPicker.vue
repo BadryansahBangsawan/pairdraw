@@ -20,8 +20,8 @@ export interface VariableBindingPickerProps {
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { Color } from '@open-pencil/scene-graph/primitives'
-import { useBindableValue } from '@open-pencil/vue/primitives/BindableValue'
+import type { Color } from '@pairdraw/scene-graph/primitives'
+import { useBindableValue } from '@pairdraw/vue/primitives/BindableValue'
 
 import { VariablePicker, type VariablePickerItem } from '@/components/ui/binding'
 

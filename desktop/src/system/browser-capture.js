@@ -662,7 +662,7 @@
   }
 
   // src/limits.ts
-  var WEB_CAPTURE_FORMAT = "openpencil/web-capture";
+  var WEB_CAPTURE_FORMAT = "pairdraw/web-capture";
   var WEB_CAPTURE_VERSION = 1;
   var MAX_CAPTURE_ELEMENTS = 20000;
   var MAX_CAPTURE_DEPTH = 256;
@@ -1126,8 +1126,8 @@
   }
 
   // src/clipboard.ts
-  var WEB_CAPTURE_CLIPBOARD_START = "<!--(openpencil-web-capture)";
-  var WEB_CAPTURE_CLIPBOARD_END = "(/openpencil-web-capture)-->";
+  var WEB_CAPTURE_CLIPBOARD_START = "<!--(pairdraw-web-capture)";
+  var WEB_CAPTURE_CLIPBOARD_END = "(/pairdraw-web-capture)-->";
   var INFLATE_STEP = 16 * 1024;
   function encodeWebCaptureClipboard(captured) {
     const capture = normalizeWebCapture(captured);
@@ -1682,17 +1682,17 @@
   }
   function captureFailure(error) {
     const message = error instanceof Error ? error.message : String(error);
-    return `openpencil-capture-error:${message}`;
+    return `pairdraw-capture-error:${message}`;
   }
   var pageWindow = globalThis;
-  pageWindow.__openpencilCapturePage = async () => {
+  pageWindow.__pairdrawCapturePage = async () => {
     try {
       return await capturePageHTML(document);
     } catch (error) {
       return captureFailure(error);
     }
   };
-  pageWindow.__openpencilCaptureElement = async (selector) => {
+  pageWindow.__pairdrawCaptureElement = async (selector) => {
     try {
       return await captureElementHTML(document.querySelector(selector), document);
     } catch (error) {

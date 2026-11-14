@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph, type NodeType, type SceneNode } from '@open-pencil/scene-graph'
-import { getAxisAlignedWorldBounds } from '@open-pencil/scene-graph/coordinate'
-import { hitTestDeepInRect } from '@open-pencil/scene-graph/hit-test'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import { SceneGraph, type NodeType, type SceneNode } from '@pairdraw/scene-graph'
+import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
+import { hitTestDeepInRect } from '@pairdraw/scene-graph/hit-test'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 import { expectDefined } from '../helpers/assert'
 import { pageId } from './helpers'

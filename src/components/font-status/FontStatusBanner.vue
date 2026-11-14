@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useDocumentFontStatus } from '@/app/editor/fonts/status'
 import { banner } from '@/components/ui/feedback/banner'

@@ -1,6 +1,6 @@
-import { figThumbnailPageId, populateFigPage } from '@open-pencil/core/io/formats/fig'
-import { computeAllLayouts } from '@open-pencil/core/layout'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import { figThumbnailPageId, populateFigPage } from '@pairdraw/core/io/formats/fig'
+import { computeAllLayouts } from '@pairdraw/core/layout'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { readFigDocument } from '@/app/document/io/fig'
 

@@ -17,8 +17,8 @@ import {
 } from 'reka-ui'
 import { computed, ref } from 'vue'
 
-import { AI_PROVIDERS, type ACPAgentDef } from '@open-pencil/core/constants'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { AI_PROVIDERS, type ACPAgentDef } from '@pairdraw/core/constants'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { connectsWithoutClick } from '@/app/ai/agents/auto/pick'
 import { agentAutoConnect } from '@/app/ai/agents/auto/session'

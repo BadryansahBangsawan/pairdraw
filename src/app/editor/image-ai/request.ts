@@ -1,6 +1,6 @@
 import type { CanvasKit } from 'canvaskit-wasm'
 
-import { getCanvasKit } from '@open-pencil/core/canvaskit'
+import { getCanvasKit } from '@pairdraw/core/canvaskit'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { resolveVectorizeCredential } from '@/app/editor/vectorize/credentials'

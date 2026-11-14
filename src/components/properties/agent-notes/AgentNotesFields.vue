@@ -7,7 +7,7 @@ export type AgentNoteField = 'context' | 'prompt'
 import { tv } from 'tailwind-variants'
 import { ref, useId, watch } from 'vue'
 
-import { useExploreMessages } from '@open-pencil/vue/i18n'
+import { useExploreMessages } from '@pairdraw/vue/i18n'
 
 import AppButton from '@/components/ui/button/AppButton.vue'
 import AppTextarea from '@/components/ui/input/AppTextarea.vue'

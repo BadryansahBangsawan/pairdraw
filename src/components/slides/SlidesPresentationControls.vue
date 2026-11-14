@@ -2,8 +2,8 @@
 import { tv } from 'tailwind-variants'
 import { nextTick, useTemplateRef, watch } from 'vue'
 
-import type { PresentationScale } from '@open-pencil/core'
-import { useSlidesMessages } from '@open-pencil/vue/i18n'
+import type { PresentationScale } from '@pairdraw/core'
+import { useSlidesMessages } from '@pairdraw/vue/i18n'
 
 import IconButton from '@/components/ui/button/IconButton.vue'
 import theme from '@/theme/slides/controls'

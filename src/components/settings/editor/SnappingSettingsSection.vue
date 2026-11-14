@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { DEFAULT_SNAPPING_PREFERENCES } from '@open-pencil/core'
-import { useSettingsMessages } from '@open-pencil/vue/i18n'
+import { DEFAULT_SNAPPING_PREFERENCES } from '@pairdraw/core'
+import { useSettingsMessages } from '@pairdraw/vue/i18n'
 
 import { setPixelGridShown, setSnappingPreference } from '@/app/settings/preferences/apply'
 import { appPreferences, DEFAULT_APP_PREFERENCES } from '@/app/settings/preferences/store'

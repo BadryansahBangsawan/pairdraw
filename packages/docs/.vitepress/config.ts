@@ -7,10 +7,10 @@ import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vitepress'
 import llmstxt from 'vitepress-plugin-llms'
 
-import { ensureBrandAssets } from '@open-pencil/brand-tools'
-import { ensureDemoDocument } from '@open-pencil/demo-tools'
-import { landingPosterFingerprint } from '@open-pencil/landing-posters-tools/fingerprint'
-import { appSourceConfig } from '@open-pencil/vite-config/app-source'
+import { ensureBrandAssets } from '@pairdraw/brand-tools'
+import { ensureDemoDocument } from '@pairdraw/demo-tools'
+import { landingPosterFingerprint } from '@pairdraw/landing-posters-tools/fingerprint'
+import { appSourceConfig } from '@pairdraw/vite-config/app-source'
 
 import { landingPreloads } from './landing-head.ts'
 import { docsLocales } from './locales.ts'
@@ -25,11 +25,11 @@ const packagesRoot = dirname(docsRoot)
 const repoRoot = dirname(packagesRoot)
 // The landing page mounts the app's own components, compiled from source.
 const appSource = appSourceConfig()
-const fastBuild = process.env.OPENPENCIL_DOCS_FAST_BUILD === '1'
+const fastBuild = process.env.PAIRDRAW_DOCS_FAST_BUILD === '1'
 // Production builds show stills of the landing's stages until they are live. The build names
 // the stills by this fingerprint, and `tools/generate/landing-posters` captures them afterwards.
 const posterFingerprint =
-  process.env.OPENPENCIL_LANDING_POSTERS === '1' ? await landingPosterFingerprint(repoRoot) : null
+  process.env.PAIRDRAW_LANDING_POSTERS === '1' ? await landingPosterFingerprint(repoRoot) : null
 
 const llmsPlugin = llmstxt({
   domain: BASE,
@@ -80,11 +80,11 @@ export default defineConfig({
           compilerOptions: {
             baseUrl: repoRoot,
             paths: {
-              '@open-pencil/vue': ['packages/vue/src/index.ts'],
-              '@open-pencil/vue/*': ['packages/vue/src/*'],
+              '@pairdraw/vue': ['packages/vue/src/index.ts'],
+              '@pairdraw/vue/*': ['packages/vue/src/*'],
               '#vue/*': ['packages/vue/src/*'],
-              '@open-pencil/scene-graph': ['packages/scene-graph/src/index.ts'],
-              '@open-pencil/scene-graph/*': ['packages/scene-graph/src/*'],
+              '@pairdraw/scene-graph': ['packages/scene-graph/src/index.ts'],
+              '@pairdraw/scene-graph/*': ['packages/scene-graph/src/*'],
               '#scene-graph/*': ['packages/scene-graph/src/*']
             }
           }

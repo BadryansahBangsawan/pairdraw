@@ -2,7 +2,7 @@
 import { tv } from 'tailwind-variants'
 import { computed, ref, useId, watch } from 'vue'
 
-import { useBrowserMessages } from '@open-pencil/vue/i18n'
+import { useBrowserMessages } from '@pairdraw/vue/i18n'
 
 import { browserNodeFailureHeading } from '@/app/browser/node/failure'
 import { browserNodeRefreshedTime } from '@/app/browser/node/panel'

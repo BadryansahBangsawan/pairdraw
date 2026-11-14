@@ -1,9 +1,9 @@
 import { computed, ref, type Ref } from 'vue'
 
-import type { Fill, GradientStop, GradientTransform } from '@open-pencil/scene-graph'
-import { colorToCSS } from '@open-pencil/scene-graph/color'
-import { DEFAULT_GRADIENT_TRANSFORM } from '@open-pencil/scene-graph/gradient'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import type { Fill, GradientStop, GradientTransform } from '@pairdraw/scene-graph'
+import { colorToCSS } from '@pairdraw/scene-graph/color'
+import { DEFAULT_GRADIENT_TRANSFORM } from '@pairdraw/scene-graph/gradient'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { useColorModel } from '#vue/controls/color-model/use'
 

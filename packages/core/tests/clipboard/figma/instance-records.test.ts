@@ -3,12 +3,12 @@ import { beforeAll, expect, setDefaultTimeout, test } from 'bun:test'
 import { expectDefined } from '#core-tests/helpers/assert'
 import { readFixtureArrayBuffer } from '#core-tests/helpers/fig/fixtures'
 
-import { createEditor } from '@open-pencil/core'
-import { buildFigmaClipboardHTML } from '@open-pencil/core/clipboard'
-import { parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { parseFigmaClipboard } from '@open-pencil/fig/clipboard'
-import { symbolOverridesOf } from '@open-pencil/fig/instance-overrides'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
+import { createEditor } from '@pairdraw/core'
+import { buildFigmaClipboardHTML } from '@pairdraw/core/clipboard'
+import { parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { parseFigmaClipboard } from '@pairdraw/fig/clipboard'
+import { symbolOverridesOf } from '@pairdraw/fig/instance-overrides'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
 
 setDefaultTimeout(120_000)
 

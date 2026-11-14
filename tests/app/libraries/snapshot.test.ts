@@ -8,8 +8,8 @@ import {
   extractLibrarySnapshot,
   MemoryLibraryCatalog,
   serializeLibraryRevision
-} from '@open-pencil/core/library'
-import { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/library'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 function setupLibraryGraph() {
   const graph = new SceneGraph()

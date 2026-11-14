@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { PenNode } from '@open-pencil/pen'
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { syncInstance } from '@open-pencil/scene-graph/instances'
-import { ownsSlotContent, slotPropertyId } from '@open-pencil/scene-graph/slots'
+import type { PenNode } from '@pairdraw/pen'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { syncInstance } from '@pairdraw/scene-graph/instances'
+import { ownsSlotContent, slotPropertyId } from '@pairdraw/scene-graph/slots'
 
 import { expectDefined, getNodeOrThrow } from './helpers/assert'
 import { parseDocument } from './helpers/document'

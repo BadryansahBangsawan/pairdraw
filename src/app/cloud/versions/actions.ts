@@ -3,7 +3,7 @@ import type {
   DocumentVersions,
   SaveDocumentVersionInput,
   UpdateDocumentVersionInput
-} from '@open-pencil/cloud/contract'
+} from '@pairdraw/cloud/contract'
 
 import type { EditorStore } from '@/app/editor/session'
 import { openStorageDocumentInNewTab } from '@/app/tabs'

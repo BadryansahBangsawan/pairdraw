@@ -2,8 +2,8 @@
 import { tv } from 'tailwind-variants'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { IS_TAURI } from '@open-pencil/core/constants'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { IS_TAURI } from '@pairdraw/core/constants'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { agentHostAvailable } from '@/app/ai/agents/host/current'
 import type { OnboardingAccess } from '@/app/ai/models/settings/onboarding/plan'

@@ -42,12 +42,12 @@ describe('setting a nested member', () => {
           "theme": "dark"
       }
     `
-    expect(setNestedMember(text, 'mcpServers', 'open-pencil', ENTRY)).toBe(dedent`
+    expect(setNestedMember(text, 'mcpServers', 'pairdraw', ENTRY)).toBe(dedent`
       {
           // my servers
           "mcpServers": {
               "other": { "command": "x" }, // keep me
-              "open-pencil": {
+              "pairdraw": {
                   "command": "server"
               }
           },
@@ -58,9 +58,9 @@ describe('setting a nested member', () => {
 
   test('adds the servers object when the file has none', () => {
     const text = '{\n\t"theme": "dark"\n}\n'
-    const edited = setNestedMember(text, 'servers', 'open-pencil', ENTRY)
+    const edited = setNestedMember(text, 'servers', 'pairdraw', ENTRY)
     expect(edited).toBe(
-      '{\n\t"theme": "dark",\n\t"servers": {\n\t\t"open-pencil": {\n\t\t\t"command": "server"\n\t\t}\n\t}\n}\n'
+      '{\n\t"theme": "dark",\n\t"servers": {\n\t\t"pairdraw": {\n\t\t\t"command": "server"\n\t\t}\n\t}\n}\n'
     )
   })
 
@@ -102,8 +102,8 @@ describe('removing a nested member', () => {
     {
       "mcpServers": {
         "first": { "command": "a" },
-        "open-pencil": {
-          "command": "openpencil-mcp"
+        "pairdraw": {
+          "command": "pairdraw-mcp"
         },
         // about last
         "last": { "command": "b" }
@@ -112,7 +112,7 @@ describe('removing a nested member', () => {
   `
 
   test('removes a middle member with its lines and keeps the next comment', () => {
-    expect(removeNestedMember(servers, 'mcpServers', 'open-pencil')).toBe(dedent`
+    expect(removeNestedMember(servers, 'mcpServers', 'pairdraw')).toBe(dedent`
       {
         "mcpServers": {
           "first": { "command": "a" },
@@ -141,14 +141,14 @@ describe('removing a nested member', () => {
       {
         "mcpServers": {
           // keep me
-          "open-pencil": {
-            "command": "openpencil-mcp"
+          "pairdraw": {
+            "command": "pairdraw-mcp"
           } // ours
           /* and me */
         }
       }
     `
-    expect(removeNestedMember(text, 'mcpServers', 'open-pencil')).toBe(dedent`
+    expect(removeNestedMember(text, 'mcpServers', 'pairdraw')).toBe(dedent`
       {
         "mcpServers": {
           // keep me

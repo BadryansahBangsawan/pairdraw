@@ -9,8 +9,8 @@ import {
   type CloudAPIClient,
   type CloudDiscoveryFailure,
   type CloudFetch
-} from '@open-pencil/cloud/client'
-import type { CloudDiscovery, WorkspaceSummary } from '@open-pencil/cloud/contract'
+} from '@pairdraw/cloud/client'
+import type { CloudDiscovery, WorkspaceSummary } from '@pairdraw/cloud/contract'
 
 import { tauriFetch } from '@/app/tauri/http'
 import { IS_TAURI } from '@/constants'

@@ -18,7 +18,7 @@ async function cli(args: string[]) {
 
 describe('tokens CLI', () => {
   test('imports a local stylesheet as variables', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-tokens-import-'))
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-tokens-import-'))
     const authored = join(dir, 'tokens.pen')
     const source = join(dir, 'tokens.fig')
     const css = join(dir, 'theme.css')
@@ -46,7 +46,7 @@ describe('tokens CLI', () => {
 
 describe('tokens --project', () => {
   test('imports a project folder and reports JavaScript config', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-tokens-project-'))
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-tokens-project-'))
     const project = join(dir, 'app')
     const authored = join(dir, 'tokens.pen')
     const source = join(dir, 'tokens.fig')

@@ -82,7 +82,7 @@ export type AIProviderID =
   | 'anthropic-compatible'
   | 'amazon-bedrock'
   | 'google-vertex'
-  | 'openpencil'
+  | 'pairdraw'
   | 'harness:pi'
   | `acp:${ACPAgentID}`
 
@@ -447,8 +447,8 @@ export const AI_PROVIDERS: AIProviderDef[] = [
     ]
   },
   {
-    id: 'openpencil',
-    name: 'OpenPencil Cloud',
+    id: 'pairdraw',
+    name: 'Pairdraw Cloud',
     keyPlaceholder: '',
     keyURL: '',
     defaultModel: '',

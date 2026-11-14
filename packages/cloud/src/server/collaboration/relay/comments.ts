@@ -5,7 +5,7 @@ import {
 } from '#cloud/contract'
 import type * as Y from 'yjs'
 
-import type { CommentReply, CommentThread } from '@open-pencil/scene-graph'
+import type { CommentReply, CommentThread } from '@pairdraw/scene-graph'
 
 function fits(thread: CommentThread): boolean {
   return (

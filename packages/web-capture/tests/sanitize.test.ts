@@ -2,7 +2,7 @@ import { afterAll, describe, expect, test } from 'bun:test'
 
 import { createPage } from '#web-capture-tests/dom'
 
-import { hasWebContent, MAX_WEB_HTML_LENGTH, sanitizeWebHTML } from '@open-pencil/web-capture'
+import { hasWebContent, MAX_WEB_HTML_LENGTH, sanitizeWebHTML } from '@pairdraw/web-capture'
 
 const page = createPage('<!doctype html><html><body></body></html>')
 const { parser } = page

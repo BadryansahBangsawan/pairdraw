@@ -4,7 +4,7 @@ description: What Pairdraw sends over the network, why it sends anonymous usage 
 ---
 
 <script setup>
-import { describeBuildFields, describePingFields, describeUsageEvents } from '@open-pencil/feedback/contract'
+import { describeBuildFields, describePingFields, describeUsageEvents } from '@pairdraw/feedback/contract'
 
 const columns = [
   { key: 'name', label: 'Field', kind: 'code' },
@@ -71,7 +71,7 @@ Accepted events go to [PostHog](https://posthog.com), a product analytics servic
 ## Turning it all off
 
 - **Settings → Privacy** has a switch for the ping and one for usage stats.
-- In the desktop app, starting Pairdraw with `OPENPENCIL_TELEMETRY=0` or `DO_NOT_TRACK=1` in its environment turns off both.
+- In the desktop app, starting Pairdraw with `PAIRDRAW_TELEMETRY=0` or `DO_NOT_TRACK=1` in its environment turns off both.
 - Only official releases send anything. Development servers, self-built apps, and forks send nothing, because the switch that enables sending is set only when we build a release.
 
 ## Cloud waitlist
@@ -92,4 +92,4 @@ Pairdraw is local-first, but some features reach the network. The desktop app ch
 | Icons                   | The Iconify API, when you search or insert icons                                                                                                                                                        |
 | Stock photos            | Unsplash or Pexels, with your own key, when you search them or place one of their photos                                                                                                                |
 
-The app, the feedback service, and this page are open source. The event list lives in [`packages/feedback/src/contract`](https://github.com/open-pencil/open-pencil/tree/master/packages/feedback/src/contract), and the tables above are generated from it.
+The app, the feedback service, and this page are open source. The event list lives in [`packages/feedback/src/contract`](https://github.com/BadryansahBangsawan/pairdraw/tree/master/packages/feedback/src/contract), and the tables above are generated from it.

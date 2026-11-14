@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { AUTOMATION_HTTP_PORT } from '@open-pencil/core/constants'
+import { AUTOMATION_HTTP_PORT } from '@pairdraw/core/constants'
 
 import { createCompanionConnection } from '@/app/automation/companion/connection'
 import { automationHTTPURL, pairedCompanionServer } from '@/app/automation/mcp/spawn'

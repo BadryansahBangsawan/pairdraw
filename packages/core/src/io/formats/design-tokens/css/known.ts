@@ -3,14 +3,14 @@ import {
   defaultModeCondition,
   modeConditionKey,
   variableCSSNames
-} from '@open-pencil/dom-css/export'
+} from '@pairdraw/dom-css/export'
 import {
   isLibraryCollection,
   type SceneGraph,
   type Variable,
   type VariableCollection,
   type VariableCollectionMode
-} from '@open-pencil/scene-graph'
+} from '@pairdraw/scene-graph'
 
 /** A variable the stylesheet names, with the collection that holds it. */
 export interface KnownVariable {

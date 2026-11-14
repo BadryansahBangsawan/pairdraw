@@ -1,10 +1,10 @@
 {
-  "name": "@open-pencil/core",
+  "name": "@pairdraw/core",
   "version": "0.16.0",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/open-pencil/open-pencil.git",
+    "url": "git+https://github.com/BadryansahBangsawan/pairdraw.git",
     "directory": "packages/core"
   },
   "files": [
@@ -48,10 +48,10 @@
       "import": "./dist/vector/index.js",
       "default": "./dist/vector/index.js"
     },
-    "./openpencil-api": {
-      "types": "./dist/openpencil-api/index.d.ts",
-      "import": "./dist/openpencil-api/index.js",
-      "default": "./dist/openpencil-api/index.js"
+    "./pairdraw-api": {
+      "types": "./dist/pairdraw-api/index.d.ts",
+      "import": "./dist/pairdraw-api/index.js",
+      "default": "./dist/pairdraw-api/index.js"
     },
     "./figma-api": {
       "types": "./dist/figma-api/index.d.ts",
@@ -190,14 +190,14 @@
   "dependencies": {
     "@chenglou/pretext": "^0.0.7",
     "@iconify/utils": "^3.1.4",
-    "@open-pencil/design-jsx": "workspace:*",
-    "@open-pencil/dom-css": "workspace:*",
-    "@open-pencil/drawio": "workspace:*",
-    "@open-pencil/fig": "workspace:*",
-    "@open-pencil/kiwi": "workspace:*",
-    "@open-pencil/mermaid": "workspace:*",
-    "@open-pencil/pen": "workspace:*",
-    "@open-pencil/scene-graph": "workspace:*",
+    "@pairdraw/design-jsx": "workspace:*",
+    "@pairdraw/dom-css": "workspace:*",
+    "@pairdraw/drawio": "workspace:*",
+    "@pairdraw/fig": "workspace:*",
+    "@pairdraw/kiwi": "workspace:*",
+    "@pairdraw/mermaid": "workspace:*",
+    "@pairdraw/pen": "workspace:*",
+    "@pairdraw/scene-graph": "workspace:*",
     "@tauri-apps/api": "^2.12.1",
     "@valibot/to-json-schema": "^1.8.0",
     "@xmldom/xmldom": "^0.9.12",

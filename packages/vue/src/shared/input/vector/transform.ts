@@ -1,20 +1,20 @@
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 import {
   transformZoneAt,
   type CornerPosition,
   type HandlePosition,
   type TransformZone
-} from '@open-pencil/core/geometry'
+} from '@pairdraw/core/geometry'
 import {
   nearestPointOnNetwork,
   scalesBox,
   transformBoxPoints,
   vectorPointsBox,
   type ScaleBoxOptions
-} from '@open-pencil/core/vector'
-import type { VectorNetwork } from '@open-pencil/scene-graph'
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
-import { cloneVectorNetwork } from '@open-pencil/scene-graph/vector-network'
+} from '@pairdraw/core/vector'
+import type { VectorNetwork } from '@pairdraw/scene-graph'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
+import { cloneVectorNetwork } from '@pairdraw/scene-graph/vector-network'
 
 import { buildResizeCursor, buildRotationCursor } from '#vue/shared/input/geometry'
 import type { DragBendSegment, DragEditTransform, DragState } from '#vue/shared/input/types'

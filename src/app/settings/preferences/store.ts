@@ -2,8 +2,8 @@ import { useLocalStorage } from '@vueuse/core'
 import { uniq } from 'es-toolkit'
 import * as v from 'valibot'
 
-import { DEFAULT_SNAPPING_PREFERENCES, type SnappingPreferences } from '@open-pencil/core'
-import { COMMENT_SORTS, type CommentSort } from '@open-pencil/scene-graph/comments'
+import { DEFAULT_SNAPPING_PREFERENCES, type SnappingPreferences } from '@pairdraw/core'
+import { COMMENT_SORTS, type CommentSort } from '@pairdraw/scene-graph/comments'
 
 import { DEFAULT_AGENT_STEPS, resolveAgentStepLimit } from '@/app/ai/reply/step-limit'
 import {
@@ -79,7 +79,7 @@ export interface SharingPreferences {
 export const AI_SETUP_STATES = ['pending', 'done'] as const
 export type AISetupState = (typeof AI_SETUP_STATES)[number]
 
-/** Which events send a system notification while OpenPencil is out of view. */
+/** Which events send a system notification while Pairdraw is out of view. */
 export interface NotificationPreferences {
   /** An agent waits on a permission request. */
   agentNeedsInput: boolean
@@ -187,7 +187,7 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
   notifications: { agentNeedsInput: true, agentFinished: false, agentFailed: false }
 }
 
-const STORAGE_KEY = 'open-pencil:preferences:v1'
+const STORAGE_KEY = 'pairdraw:preferences:v1'
 
 /** An object whose fields each fall back to their default, and that is all defaults when absent. */
 function section<TEntries extends v.ObjectEntries>(entries: TEntries) {

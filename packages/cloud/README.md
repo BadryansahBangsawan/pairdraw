@@ -1,27 +1,27 @@
-# @open-pencil/cloud
+# @pairdraw/cloud
 
-Optional, self-hostable OpenPencil Cloud: accounts, workspaces, immutable document revisions in
+Optional, self-hostable Pairdraw Cloud: accounts, workspaces, immutable document revisions in
 S3-compatible storage, sharing, enrollment, quotas, and transactional email. The editor stays
 local-first and works without it.
 
 ## Subpaths
 
-- `@open-pencil/cloud/contract` — Valibot network contracts and public types.
-- `@open-pencil/cloud/client` — discovery, authentication, device authorization, and the typed client.
-- `@open-pencil/cloud/email` — Vue Email rendering.
-- `@open-pencil/cloud/server` — runtime-neutral Hono routes and services with injected dependencies.
-- `@open-pencil/cloud/runtime/node` — PostgreSQL, S3, SMTP, the HTTP listener, and workers.
+- `@pairdraw/cloud/contract` — Valibot network contracts and public types.
+- `@pairdraw/cloud/client` — discovery, authentication, device authorization, and the typed client.
+- `@pairdraw/cloud/email` — Vue Email rendering.
+- `@pairdraw/cloud/server` — runtime-neutral Hono routes and services with injected dependencies.
+- `@pairdraw/cloud/runtime/node` — PostgreSQL, S3, SMTP, the HTTP listener, and workers.
 
 ## Running
 
-The Node runtime reads one deployment TOML file named by `OPENPENCIL_CLOUD_CONFIG` and resolves
+The Node runtime reads one deployment TOML file named by `PAIRDRAW_CLOUD_CONFIG` and resolves
 secrets from the environment. Start from
-[`deploy/openpencil-cloud.example.toml`](./deploy/openpencil-cloud.example.toml), then build and run
+[`deploy/pairdraw-cloud.example.toml`](./deploy/pairdraw-cloud.example.toml), then build and run
 the server on Node 22 or later, installed from npm or built from a checkout:
 
 ```sh
-npx -p @open-pencil/cloud openpencil-cloud   # openpencil-ai-relay runs the AI relay
-bun --filter @open-pencil/cloud build:standalone && bun --filter @open-pencil/cloud start
+npx -p @pairdraw/cloud pairdraw-cloud   # pairdraw-ai-relay runs the AI relay
+bun --filter @pairdraw/cloud build:standalone && bun --filter @pairdraw/cloud start
 ```
 
 The server migrates the database before it accepts requests. The
@@ -34,5 +34,5 @@ portal, configuration, the editor address, operator commands, and upgrades;
 ## Tests
 
 `bun run test:cloud` from the repository root type-checks the package and runs unit and PGlite
-integration tests. `bun --filter @open-pencil/cloud test:e2e` runs the Docker Compose end-to-end
+integration tests. `bun --filter @pairdraw/cloud test:e2e` runs the Docker Compose end-to-end
 suite against PostgreSQL and SeaweedFS.

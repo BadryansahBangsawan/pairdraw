@@ -1,10 +1,10 @@
 import { expect, test } from 'bun:test'
 import { join } from 'node:path'
 
-import { exportFigFile } from '@open-pencil/core/io/formats/fig'
-import { parseFigBuffer, resolveFigFonts } from '@open-pencil/fig'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { exportFigFile } from '@pairdraw/core/io/formats/fig'
+import { parseFigBuffer, resolveFigFonts } from '@pairdraw/fig'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { FIXTURES } from '#core-tests/helpers/paths'
 import {

@@ -3,14 +3,14 @@ import { readFileSync } from 'node:fs'
 
 import {
   buildFigmaClipboardHTML,
-  buildOpenPencilClipboardHTML,
+  buildPairdrawClipboardHTML,
   importClipboardNodes,
-  parseOpenPencilClipboard
-} from '@open-pencil/core/clipboard'
-import { readFigFile } from '@open-pencil/core/io/formats/fig'
-import { parseFigmaClipboard } from '@open-pencil/fig/clipboard'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { type SceneNode, SceneGraph } from '@open-pencil/scene-graph'
+  parsePairdrawClipboard
+} from '@pairdraw/core/clipboard'
+import { readFigFile } from '@pairdraw/core/io/formats/fig'
+import { parseFigmaClipboard } from '@pairdraw/fig/clipboard'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { type SceneNode, SceneGraph } from '@pairdraw/scene-graph'
 
 import { expectDefined } from '#tests/helpers/assert'
 import { heavy, HEAVY_TEST_TIMEOUT_MS } from '#tests/helpers/test-utils'
@@ -42,10 +42,10 @@ heavy('gold-preview.fig clipboard roundtrip', () => {
     { timeout: HEAVY_TEST_TIMEOUT_MS }
   )
 
-  it('OpenPencil format: zero property differences', () => {
-    const html = buildOpenPencilClipboardHTML(topLevelNodes, graph)
-    const parsed = parseOpenPencilClipboard(html)
-    const clipboard = expectDefined(parsed, 'OpenPencil clipboard')
+  it('Pairdraw format: zero property differences', () => {
+    const html = buildPairdrawClipboardHTML(topLevelNodes, graph)
+    const parsed = parsePairdrawClipboard(html)
+    const clipboard = expectDefined(parsed, 'Pairdraw clipboard')
 
     const origAll = flatten(graph, pageId)
 
@@ -76,8 +76,8 @@ heavy('gold-preview.fig clipboard roundtrip', () => {
     expect(diffs).toBe(0)
   })
 
-  it('OpenPencil format: compressed data is under 1MB', () => {
-    const html = buildOpenPencilClipboardHTML(topLevelNodes, graph)
+  it('Pairdraw format: compressed data is under 1MB', () => {
+    const html = buildPairdrawClipboardHTML(topLevelNodes, graph)
     expect(html.length).toBeLessThan(5 * 1024 * 1024)
   })
 

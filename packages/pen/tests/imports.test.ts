@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { importedDocument, type PenDocument, type PenImports, type PenNode } from '@open-pencil/pen'
+import { importedDocument, type PenDocument, type PenImports, type PenNode } from '@pairdraw/pen'
 
 import { expectDefined, getNodeOrThrow } from './helpers/assert'
 import { parseDocument } from './helpers/document'
@@ -166,7 +166,7 @@ describe('buildPenGraph with imports', () => {
       graph.getPages(true).find((page) => page.internalOnly),
       'library page'
     )
-    expect(libraryPage.name).toBe('OpenPencil library definitions')
+    expect(libraryPage.name).toBe('Pairdraw library definitions')
     expect(libraryPage.visible).toBe(false)
     expect(graph.getChildren(libraryPage.id).map((node) => node.id)).toEqual([
       'ui:button',

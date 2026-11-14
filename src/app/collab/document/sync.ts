@@ -2,28 +2,28 @@ import { isEqual, isPlainObject, keyBy } from 'es-toolkit'
 import * as v from 'valibot'
 import type * as Y from 'yjs'
 
-import { packCommentRelayMessages, ROOM_COMMENT_THREADS } from '@open-pencil/cloud/contract'
+import { packCommentRelayMessages, ROOM_COMMENT_THREADS } from '@pairdraw/cloud/contract'
 import type {
   CommentReply,
   CommentThread,
   DocumentColorSpace,
   EnabledLibraryBinding,
   PluginDataEntry
-} from '@open-pencil/scene-graph'
-import { commentThreadsSchema } from '@open-pencil/scene-graph/comments'
+} from '@pairdraw/scene-graph'
+import { commentThreadsSchema } from '@pairdraw/scene-graph/comments'
 import {
   isPluginDataEntry,
-  OPEN_PENCIL_PLUGIN_DATA,
+  PAIRDRAW_PLUGIN_DATA,
   readPluginData,
   withPluginData
-} from '@open-pencil/scene-graph/plugin-data'
+} from '@pairdraw/scene-graph/plugin-data'
 
 import type { EditorStore } from '@/app/editor/active-store'
 
 import { changedIds, writeChanges, type YRecords } from '../records'
 import { readRoot, type YMeta } from '../shared-tree/fields'
 
-const { comments } = OPEN_PENCIL_PLUGIN_DATA
+const { comments } = PAIRDRAW_PLUGIN_DATA
 const COLOR_SPACE_KEY = 'colorSpace'
 /** A thread's replies are a map of their own by id, so replies written at once all stay. */
 const BY_REPLY = new Set(['replies'])

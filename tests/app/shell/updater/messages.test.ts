@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { isMissingUpdateFeed } from '@/app/shell/updater/feed'
 import { updateFailureNotice, updateFailureText } from '@/app/shell/updater/messages'

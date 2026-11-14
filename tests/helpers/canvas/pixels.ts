@@ -1,12 +1,12 @@
 import type { Page } from '@playwright/test'
 import { fromUint8Array } from 'js-base64'
 
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 /** Read freshly painted scene pixels in sRGB, before WebGL discards its drawing buffer. */
 export async function readScenePixels(page: Page, points: readonly Vector[]): Promise<number[][]> {
   return page.evaluate((points) => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     const renderer = store?.canvasRenderers.find((candidate) => candidate.tracksSceneSettlement)
     const source = document.querySelector<HTMLCanvasElement>(
       '[data-test-id="scene-canvas-element"]'

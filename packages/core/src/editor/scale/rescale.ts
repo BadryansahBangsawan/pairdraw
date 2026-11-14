@@ -1,20 +1,20 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   getAxisAlignedWorldBounds,
   getParentWorldMatrix,
   getWorldMatrix,
   localTransformFromWorld
-} from '@open-pencil/scene-graph/coordinate'
-import { computeBounds } from '@open-pencil/scene-graph/geometry'
-import { findInstanceAncestor } from '@open-pencil/scene-graph/instances'
-import type { Mat3 } from '@open-pencil/scene-graph/matrix'
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/coordinate'
+import { computeBounds } from '@pairdraw/scene-graph/geometry'
+import { findInstanceAncestor } from '@pairdraw/scene-graph/instances'
+import type { Mat3 } from '@pairdraw/scene-graph/matrix'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 import {
   assertRescaleFactor,
   isRescalable,
   rescaleNodeTreeChanges,
   rescaleSubtree
-} from '@open-pencil/scene-graph/scaling'
+} from '@pairdraw/scene-graph/scaling'
 
 import { scaleAnchorPoint, scaleAroundPoint, type ScaleAnchor } from './anchor'
 

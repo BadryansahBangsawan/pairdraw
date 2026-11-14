@@ -1,6 +1,6 @@
-import { parseFigBuffer } from '@open-pencil/fig'
-import { imageSize } from '@open-pencil/scene-graph/images'
-import type { Size } from '@open-pencil/scene-graph/primitives'
+import { parseFigBuffer } from '@pairdraw/fig'
+import { imageSize } from '@pairdraw/scene-graph/images'
+import type { Size } from '@pairdraw/scene-graph/primitives'
 
 /** The size of the `thumbnail.png` a `.fig` carries. */
 export function figThumbnailSize(fig: Uint8Array): Size {

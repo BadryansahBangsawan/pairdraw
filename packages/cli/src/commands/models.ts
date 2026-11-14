@@ -1,7 +1,7 @@
 import { defineCommand } from 'citty'
 import { compact, isEmptyObject } from 'es-toolkit'
 
-import { ACP_AGENTS, AI_PROVIDERS, type ModelOption } from '@open-pencil/core/constants'
+import { ACP_AGENTS, AI_PROVIDERS, type ModelOption } from '@pairdraw/core/constants'
 
 import { bold, dim, entity, fmtList, printError } from '#cli/format'
 

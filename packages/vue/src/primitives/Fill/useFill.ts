@@ -1,14 +1,14 @@
 import { computed } from 'vue'
 import type { Ref } from 'vue'
 
-import type { Fill, GradientStop } from '@open-pencil/scene-graph'
-import { colorToCSS } from '@open-pencil/scene-graph/color'
+import type { Fill, GradientStop } from '@pairdraw/scene-graph'
+import { colorToCSS } from '@pairdraw/scene-graph/color'
 import {
   DEFAULT_GRADIENT_TRANSFORM,
   defaultGradientStops,
   defaultMeshPoints
-} from '@open-pencil/scene-graph/gradient'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/gradient'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { FillCategory } from './types'
 

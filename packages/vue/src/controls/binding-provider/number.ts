@@ -1,8 +1,8 @@
-import type { Editor } from '@open-pencil/core'
-import type { VariableCollection } from '@open-pencil/scene-graph'
-import { randomHex } from '@open-pencil/scene-graph/random'
+import type { Editor } from '@pairdraw/core'
+import type { VariableCollection } from '@pairdraw/scene-graph'
+import { randomHex } from '@pairdraw/scene-graph/random'
 
-import { useOpenPencilBindingProvider } from '#vue/controls/binding-provider/open-pencil'
+import { usePairdrawBindingProvider } from '#vue/controls/binding-provider/pairdraw'
 import type { BindingTarget } from '#vue/controls/binding-provider/types'
 
 import { prepareModeEdit } from './mode-edit'
@@ -57,7 +57,7 @@ function resolveNumber(editor: Editor, id: string, target?: BindingTarget) {
 }
 
 export function useNumberBindingProvider() {
-  return useOpenPencilBindingProvider<number>({
+  return usePairdrawBindingProvider<number>({
     types: ['FLOAT'],
     resolve: resolveNumber,
     prepareEdit: (editor, id, target) =>

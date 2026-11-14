@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import IconImagePlus from '~icons/lucide/image-plus'
 
-import { useMenuMessages } from '@open-pencil/vue/i18n'
+import { useMenuMessages } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { openPlaceImageDialog } from '@/app/editor/place/dialog'

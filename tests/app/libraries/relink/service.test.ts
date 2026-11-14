@@ -6,8 +6,8 @@ import {
   materializeLibraryAsset,
   MemoryLibraryCatalog,
   type ComponentLibraryRevision
-} from '@open-pencil/core/library'
-import { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/library'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { createEditorStore } from '@/app/editor/session'
 import { LibraryService } from '@/app/libraries/service'

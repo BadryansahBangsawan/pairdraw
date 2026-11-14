@@ -1,8 +1,8 @@
 import * as v from 'valibot'
 
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import { getAxisAlignedBoundsInParent } from '@open-pencil/scene-graph/coordinate'
-import { applyGraphTransfer, prepareGraphTransfer } from '@open-pencil/scene-graph/transfer'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
+import { applyGraphTransfer, prepareGraphTransfer } from '@pairdraw/scene-graph/transfer'
 
 import { flushPendingLayout } from '#core/figma-api'
 import { sceneGraphFromStyledHTML } from '#core/io/formats/html/layers'

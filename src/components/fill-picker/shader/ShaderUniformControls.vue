@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { Variable, VariableType } from '@open-pencil/scene-graph'
-import { colorToHex, tryParseColor } from '@open-pencil/scene-graph/color'
-import { BLACK } from '@open-pencil/scene-graph/constants'
-import type { Color } from '@open-pencil/scene-graph/primitives'
-import type { ShaderUniform, ShaderUniformValue } from '@open-pencil/scene-graph/shaders'
-import { useI18n, useShaderMessages } from '@open-pencil/vue/i18n'
+import type { Variable, VariableType } from '@pairdraw/scene-graph'
+import { colorToHex, tryParseColor } from '@pairdraw/scene-graph/color'
+import { BLACK } from '@pairdraw/scene-graph/constants'
+import type { Color } from '@pairdraw/scene-graph/primitives'
+import type { ShaderUniform, ShaderUniformValue } from '@pairdraw/scene-graph/shaders'
+import { useI18n, useShaderMessages } from '@pairdraw/vue/i18n'
 
 import ColorPicker from '@/components/ColorPicker/ColorPicker.vue'
 import NumberField from '@/components/inputs/NumberField.vue'

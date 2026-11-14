@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'bun:test'
 
-import { SceneGraph, type SceneNode } from '@open-pencil/scene-graph'
-import { UndoManager } from '@open-pencil/scene-graph/undo'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
+import { UndoManager } from '@pairdraw/scene-graph/undo'
 
 import { getNodeOrThrow } from '../helpers/assert'
 

@@ -3,7 +3,7 @@ import type { Chat } from '@ai-sdk/vue'
 import type { UIMessage } from 'ai'
 import { computed, nextTick, shallowRef, useTemplateRef, watch } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { agentAutoConnect } from '@/app/ai/agents/auto/session'
 import { carriesAttachableFile, isAttachableFile } from '@/app/ai/attachment/accept'

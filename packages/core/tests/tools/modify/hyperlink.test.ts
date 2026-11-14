@@ -3,7 +3,7 @@ import { describe, expect, test } from 'bun:test'
 import { expectDefined, getNodeOrThrow } from '#core-tests/helpers/assert'
 import { runTool, setupToolTest } from '#core-tests/helpers/tools'
 
-import { hyperlinkSpans } from '@open-pencil/core/text'
+import { hyperlinkSpans } from '@pairdraw/core/text'
 
 /** Script addresses, which links must refuse; the tests never run them. */
 // eslint-disable-next-line no-script-url -- Rejection fixture; this URL is never executed.

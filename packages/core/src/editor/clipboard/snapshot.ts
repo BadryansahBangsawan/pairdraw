@@ -1,5 +1,5 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { styleRunReferences } from '@open-pencil/scene-graph/text'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { styleRunReferences } from '@pairdraw/scene-graph/text'
 
 import { resolvedClipboardBindings } from './detach'
 import { clipboardPlacement, type ClipboardPlacement } from './placement'

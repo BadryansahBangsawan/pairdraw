@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from 'bun:test'
 
-import { createEditor, type Editor } from '@open-pencil/core'
-import type { VectorNetwork } from '@open-pencil/scene-graph'
+import { createEditor, type Editor } from '@pairdraw/core'
+import type { VectorNetwork } from '@pairdraw/scene-graph'
 
 import { createPenActions } from '@/app/editor/pen'
 

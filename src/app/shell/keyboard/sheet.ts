@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-import type { MenuEntry } from '@open-pencil/vue/editor/menu-model'
+import type { MenuEntry } from '@pairdraw/vue/editor/menu-model'
 
 /** The key that opens the sheet, as the sheet and tooltips print it. */
 export const SHORTCUT_SHEET_SHORTCUT = '?'

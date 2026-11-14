@@ -2,10 +2,10 @@ import { expect, test } from 'bun:test'
 
 import { inertPopulationWorker } from '#core-tests/helpers/fig/population-worker'
 
-import { createEditor } from '@open-pencil/core'
-import { exportFigFile } from '@open-pencil/core/io/formats/fig'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { createEditor } from '@pairdraw/core'
+import { exportFigFile } from '@pairdraw/core/io/formats/fig'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { serializeSceneGraph, deserializeSceneGraph } from '#core/kiwi/fig/parse/transfer'
 import {

@@ -4,8 +4,8 @@ import { expect, test } from 'bun:test'
 import { simulateReadableStream } from 'ai'
 import { MockLanguageModelV4 } from 'ai/test'
 
-import { stickySublayers } from '@open-pencil/scene-graph/generated'
-import { readWebCitation } from '@open-pencil/scene-graph/plugin-data'
+import { stickySublayers } from '@pairdraw/scene-graph/generated'
+import { readWebCitation } from '@pairdraw/scene-graph/plugin-data'
 
 import { createToolLoopTransport } from '@/app/ai/transports/tool-loop'
 import { createEditorStore } from '@/app/editor/session/create'

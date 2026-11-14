@@ -18,19 +18,19 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && git lfs install --system \
     && install -d -o bun -g bun \
-        /workspace/open-pencil/node_modules \
-        /workspace/open-pencil/packages/scene-graph/node_modules \
-        /workspace/open-pencil/packages/pen/node_modules \
-        /workspace/open-pencil/packages/kiwi/node_modules \
-        /workspace/open-pencil/packages/fig/node_modules \
-        /workspace/open-pencil/packages/core/node_modules \
-        /workspace/open-pencil/packages/dom-css/node_modules \
-        /workspace/open-pencil/packages/design-jsx/node_modules \
-        /workspace/open-pencil/packages/emit/node_modules \
-        /workspace/open-pencil/packages/vue/node_modules \
-        /workspace/open-pencil/packages/cli/node_modules \
-        /workspace/open-pencil/packages/mcp/node_modules \
-        /workspace/open-pencil/packages/docs/node_modules \
-        /workspace/open-pencil/tools/docs/node_modules
+        /workspace/pairdraw/node_modules \
+        /workspace/pairdraw/packages/scene-graph/node_modules \
+        /workspace/pairdraw/packages/pen/node_modules \
+        /workspace/pairdraw/packages/kiwi/node_modules \
+        /workspace/pairdraw/packages/fig/node_modules \
+        /workspace/pairdraw/packages/core/node_modules \
+        /workspace/pairdraw/packages/dom-css/node_modules \
+        /workspace/pairdraw/packages/design-jsx/node_modules \
+        /workspace/pairdraw/packages/emit/node_modules \
+        /workspace/pairdraw/packages/vue/node_modules \
+        /workspace/pairdraw/packages/cli/node_modules \
+        /workspace/pairdraw/packages/mcp/node_modules \
+        /workspace/pairdraw/packages/docs/node_modules \
+        /workspace/pairdraw/tools/docs/node_modules
 
 USER bun

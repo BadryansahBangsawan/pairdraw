@@ -5,8 +5,8 @@
  */
 import * as v from 'valibot'
 
-import { IS_BROWSER } from '@open-pencil/core/constants'
-import type { ScriptInputValue } from '@open-pencil/scene-graph/script'
+import { IS_BROWSER } from '@pairdraw/core/constants'
+import type { ScriptInputValue } from '@pairdraw/scene-graph/script'
 
 import {
   SCRIPT_SANDBOX_READY,

@@ -6,8 +6,8 @@ describe('native multi-window', () => {
   it('builds a real second editor window and gives it the next label', async function () {
     this.timeout(180_000)
     await browser.waitUntil(
-      async () => browser.execute(() => Boolean(window.openPencil?.getStore?.())),
-      { timeout: 30_000, timeoutMsg: 'OpenPencil editor did not initialize' }
+      async () => browser.execute(() => Boolean(window.pairdraw?.getStore?.())),
+      { timeout: 30_000, timeoutMsg: 'Pairdraw editor did not initialize' }
     )
 
     const original = await browser.getWindowHandle()
@@ -29,7 +29,7 @@ describe('native multi-window', () => {
     try {
       await browser.switchToWindow(created)
       await browser.waitUntil(
-        async () => browser.execute(() => Boolean(window.openPencil?.getStore?.())),
+        async () => browser.execute(() => Boolean(window.pairdraw?.getStore?.())),
         { timeout: 30_000, timeoutMsg: 'the second editor window did not boot' }
       )
     } finally {

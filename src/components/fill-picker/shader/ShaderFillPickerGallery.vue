@@ -3,13 +3,13 @@ import { RadioGroupRoot } from 'reka-ui'
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import type { ShaderPreset } from '@open-pencil/scene-graph/shaders'
+import type { ShaderPreset } from '@pairdraw/scene-graph/shaders'
 import {
   SHADER_GALLERY,
   shaderGalleryEntryOf,
   type ShaderGalleryId
-} from '@open-pencil/vue/controls/shader'
-import { usePanelMessages } from '@open-pencil/vue/i18n'
+} from '@pairdraw/vue/controls/shader'
+import { usePanelMessages } from '@pairdraw/vue/i18n'
 
 import ShaderFillPickerGalleryTile from '@/components/fill-picker/shader/ShaderFillPickerGalleryTile.vue'
 import theme from '@/theme/shader-gallery'

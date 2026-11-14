@@ -60,7 +60,7 @@ describe('JSON clients', () => {
   })
 
   test('an entry that starts another command stays on and is removed when turned off', () => {
-    const text = '{"mcpServers": {"open-pencil": {"command": "bun", "args": ["stdio.ts"]}}}'
+    const text = '{"mcpServers": {"pairdraw": {"command": "bun", "args": ["stdio.ts"]}}}'
     expect(inspectEntry(client('cursor'), text)).toBe('custom')
     expect(edited('cursor', text, true)).toBe(text)
     expect(inspectEntry(client('cursor'), edited('cursor', text, false))).toBe('absent')
@@ -103,10 +103,10 @@ describe('Codex config.toml', () => {
 
   test('removes the table and its sub-tables but keeps comments of the next table', () => {
     const text = dedent`
-      [mcp_servers."open-pencil"]
-      command = "openpencil-mcp"
+      [mcp_servers."pairdraw"]
+      command = "pairdraw-mcp"
 
-      [mcp_servers.open-pencil.env]
+      [mcp_servers.pairdraw.env]
       A = "1"
 
       # profiles below
@@ -118,15 +118,15 @@ describe('Codex config.toml', () => {
   })
 
   test('ignores headers inside multi-line strings', () => {
-    const text = 'notes = """\n[mcp_servers.open-pencil]\n"""\n'
+    const text = 'notes = """\n[mcp_servers.pairdraw]\n"""\n'
     expect(inspectEntry(codex, text)).toBe('absent')
   })
 
   test('reports an entry it does not rewrite and refuses to change it', () => {
     for (const text of [
-      'mcp_servers = { open-pencil = { command = "x" } }\n',
-      '[mcp_servers]\nopen-pencil = { command = "x" }\n',
-      'mcp_servers.open-pencil.command = "x"\n'
+      'mcp_servers = { pairdraw = { command = "x" } }\n',
+      '[mcp_servers]\npairdraw = { command = "x" }\n',
+      'mcp_servers.pairdraw.command = "x"\n'
     ]) {
       expect(inspectEntry(codex, text)).toBe('manual')
       expect(editEntry(codex, text, false)).toEqual({ ok: false, reason: 'manual' })
@@ -141,9 +141,7 @@ describe('Codex config.toml', () => {
   })
 
   test('creates the file and tells an entry with another command apart', () => {
-    expect(edited('codex', null, true)).toBe(
-      '[mcp_servers.open-pencil]\ncommand = "openpencil-mcp"\n'
-    )
-    expect(inspectEntry(codex, "[mcp_servers.'open-pencil']\ncommand = 'bun'\n")).toBe('custom')
+    expect(edited('codex', null, true)).toBe('[mcp_servers.pairdraw]\ncommand = "pairdraw-mcp"\n')
+    expect(inspectEntry(codex, "[mcp_servers.'pairdraw']\ncommand = 'bun'\n")).toBe('custom')
   })
 })

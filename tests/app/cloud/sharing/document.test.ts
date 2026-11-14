@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { CloudAPIClient } from '@open-pencil/cloud/client'
+import type { CloudAPIClient } from '@pairdraw/cloud/client'
 
 import {
   readCloudSharing,

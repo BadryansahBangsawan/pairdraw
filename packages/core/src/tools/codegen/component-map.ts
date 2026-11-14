@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 
 import type { FigmaAPI } from '#core/figma-api'
 import { defineTool } from '#core/tools/schema'

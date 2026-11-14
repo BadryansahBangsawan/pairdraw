@@ -1,5 +1,5 @@
-import { IS_BROWSER } from '@open-pencil/core/constants'
-import type { DocumentColorSpace } from '@open-pencil/scene-graph'
+import { IS_BROWSER } from '@pairdraw/core/constants'
+import type { DocumentColorSpace } from '@pairdraw/scene-graph'
 
 export type PresentationColorSpace = 'srgb' | 'display-p3'
 

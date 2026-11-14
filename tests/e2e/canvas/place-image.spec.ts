@@ -40,8 +40,8 @@ async function pickFiles(open: () => Promise<void>, files: FilePayload[]) {
 
 function placed() {
   return editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return {
       nodes: store.graph
         .getChildren(store.state.currentPageId)

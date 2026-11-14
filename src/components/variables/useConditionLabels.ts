@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 
-import type { VariableCollection } from '@open-pencil/scene-graph'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { VariableCollection } from '@pairdraw/scene-graph'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import {
   CONDITION_KINDS,

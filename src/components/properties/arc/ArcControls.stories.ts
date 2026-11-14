@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, within } from 'storybook/test'
 import { ref } from 'vue'
 
-import type { ArcField } from '@open-pencil/core/geometry'
-import { MIXED } from '@open-pencil/vue/controls/node-props'
+import type { ArcField } from '@pairdraw/core/geometry'
+import { MIXED } from '@pairdraw/vue/controls/node-props'
 
 import ArcControls from './ArcControls.vue'
 

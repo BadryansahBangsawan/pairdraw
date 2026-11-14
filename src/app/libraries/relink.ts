@@ -1,14 +1,14 @@
 import { countBy, isEqual, uniq, uniqBy } from 'es-toolkit'
 
-import { reapplyInstanceComponentProperties } from '@open-pencil/core'
+import { reapplyInstanceComponentProperties } from '@pairdraw/core'
 import {
   findLibraryDefinition,
   isLibraryRevisionNotFoundError,
   type ComponentLibraryManifest,
   type ComponentLibraryRevision,
   type LibraryInstanceUpdate
-} from '@open-pencil/core/library'
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/library'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 
 import type { EditorStore } from '@/app/editor/session'
 

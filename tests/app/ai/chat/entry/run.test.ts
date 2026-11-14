@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import { afterEach, expect, test } from 'bun:test'
 
-import { createDocumentGraph } from '@open-pencil/core'
+import { createDocumentGraph } from '@pairdraw/core'
 
 import { acceptsDocumentPrompts } from '@/app/ai/chat/entry/run'
 import { createEditorStore } from '@/app/editor/session/create'

@@ -5,18 +5,18 @@ description: Выполнение JavaScript через совместимый �
 
 # Сценарии
 
-`openpencil eval` выполняет JavaScript для документа Pairdraw и предоставляет глобальный объект `figma`, совместимый с Figma Plugin API. Команда подходит для пакетных изменений, проверки документов, подготовки тестовых данных и другой автоматизации без интерфейса редактора.
+`pairdraw eval` выполняет JavaScript для документа Pairdraw и предоставляет глобальный объект `figma`, совместимый с Figma Plugin API. Команда подходит для пакетных изменений, проверки документов, подготовки тестовых данных и другой автоматизации без интерфейса редактора.
 
 ## Первый вызов
 
 ```sh
-openpencil eval design.fig -c "return figma.currentPage.children.length"
+pairdraw eval design.fig -c "return figma.currentPage.children.length"
 ```
 
 Параметр `-c` принимает JavaScript. Если код не начинается с `return`, Pairdraw помещает его в асинхронную функцию и возвращает её результат, когда он есть.
 
 ```sh
-openpencil eval design.fig -c "
+pairdraw eval design.fig -c "
   const frame = figma.createFrame()
   frame.name = 'Card'
   frame.resize(300, 200)
@@ -29,7 +29,7 @@ openpencil eval design.fig -c "
 ## Поиск объектов
 
 ```sh
-openpencil eval design.fig -c "
+pairdraw eval design.fig -c "
   return figma.currentPage
     .findAll((node) => node.type === 'FRAME' && node.name.includes('Button'))
     .map((button) => ({
@@ -48,7 +48,7 @@ openpencil eval design.fig -c "
 ## Сценарий из стандартного ввода
 
 ```sh
-cat transform.js | openpencil eval design.fig --stdin --write
+cat transform.js | pairdraw eval design.fig --stdin --write
 ```
 
 ## Открытое приложение
@@ -56,7 +56,7 @@ cat transform.js | openpencil eval design.fig --stdin --write
 Не указывайте файл, чтобы выполнить сценарий для текущего документа в настольном приложении:
 
 ```sh
-openpencil eval -c "return figma.currentPage.name"
+pairdraw eval -c "return figma.currentPage.name"
 ```
 
 ## Вывод
@@ -118,11 +118,11 @@ API намеренно близок к Figma Plugin API, но работает �
 - `variable.setValueForMode(modeId, value)`, `valuesByMode`, `resolveForConsumer(node)`, `name`, `description`, `scopes`, `codeSyntax` и `remove()`
 - `collection.addMode(name)`, `renameMode(modeId, name)`, `removeMode(modeId)`, `modes`, `defaultModeId`, `variableIds` и `remove()`
 - `node.boundVariables`, `node.setBoundVariable(field, variable)` — поля и типы как в Figma, `node.setExplicitVariableModeForCollection(collection, modeId)` и `node.clearExplicitVariableModeForCollection(collection)`
-- `openpencil.bindVariable(node, field, variable)` — привязки как в панели слоя: текст принимает текстовую или числовую переменную, видимость — логическую или текстовую
-- `openpencil.unbindVariable(node, field)`
-- `openpencil.getLayoutDirection(node)` / `setLayoutDirection(node, direction)` и `getTextDirection(node)` / `setTextDirection(node, direction)` — направление автолейаута и текста: `AUTO`, `LTR` или `RTL`
-- `openpencil.getFillOkHCL(node, index?)` / `setFillOkHCL(node, color, index?)` и пара для обводки — цвет заливки или обводки в OkHCL
-- `openpencil.exposeInstanceSwap(instances, candidates, name?)` и `openpencil.getFontStatus()`
+- `pairdraw.bindVariable(node, field, variable)` — привязки как в панели слоя: текст принимает текстовую или числовую переменную, видимость — логическую или текстовую
+- `pairdraw.unbindVariable(node, field)`
+- `pairdraw.getLayoutDirection(node)` / `setLayoutDirection(node, direction)` и `getTextDirection(node)` / `setTextDirection(node, direction)` — направление автолейаута и текста: `AUTO`, `LTR` или `RTL`
+- `pairdraw.getFillOkHCL(node, index?)` / `setFillOkHCL(node, color, index?)` и пара для обводки — цвет заливки или обводки в OkHCL
+- `pairdraw.exposeInstanceSwap(instances, candidates, name?)` и `pairdraw.getFontStatus()`
 
 ### Свойства
 

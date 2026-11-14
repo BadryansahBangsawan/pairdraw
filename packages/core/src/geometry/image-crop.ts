@@ -1,9 +1,9 @@
 import { clamp } from 'es-toolkit'
 
-import type { GradientTransform } from '@open-pencil/scene-graph'
-import { computeBounds } from '@open-pencil/scene-graph/geometry'
-import Matrix, { type Mat3 } from '@open-pencil/scene-graph/matrix'
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
+import type { GradientTransform } from '@pairdraw/scene-graph'
+import { computeBounds } from '@pairdraw/scene-graph/geometry'
+import Matrix, { type Mat3 } from '@pairdraw/scene-graph/matrix'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { HandlePosition } from './transform-zones'
 

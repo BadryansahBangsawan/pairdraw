@@ -1,8 +1,8 @@
-// eslint-disable-next-line open-pencil/no-mixed-case-acronym-identifiers -- Upstream export spelling.
+// eslint-disable-next-line pairdraw/no-mixed-case-acronym-identifiers -- Upstream export spelling.
 import { toJsonSchema as toJSONSchema } from '@valibot/to-json-schema'
 import { defineCommand } from 'citty'
 
-import { toolChangesDocument } from '@open-pencil/core/tools'
+import { toolChangesDocument } from '@pairdraw/core/tools'
 
 import { appTargetOptions } from '#cli/app/target'
 import { bold, dim, entity, fmtList, printError, warn } from '#cli/format'
@@ -112,7 +112,7 @@ const call = defineCommand({
     try {
       if (!args.file && (args.write || args.output)) {
         throw new Error(
-          '--write and --output need a document file; in the running app, use `openpencil documents save`'
+          '--write and --output need a document file; in the running app, use `pairdraw documents save`'
         )
       }
       const scale = previewScale(args['preview-scale'])

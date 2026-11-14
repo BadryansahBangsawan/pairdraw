@@ -67,7 +67,7 @@ export const pl: LandingMessages = {
     script: {
       title: 'Wszystko da się oskryptować',
       detail:
-        'CLI openpencil pracuje na pliku bez uruchomionej aplikacji albo steruje otwartą aplikacją. Przejrzyj dokument, odpytaj go przez XPath, sprawdź linterem, wyeksportuj albo uruchom na nim kod wtyczek Figmy przez eval. Serwer MCP daje agentom te same możliwości przez stdio lub HTTP.',
+        'CLI pairdraw pracuje na pliku bez uruchomionej aplikacji albo steruje otwartą aplikacją. Przejrzyj dokument, odpytaj go przez XPath, sprawdź linterem, wyeksportuj albo uruchom na nim kod wtyczek Figmy przez eval. Serwer MCP daje agentom te same możliwości przez stdio lub HTTP.',
       hint: 'Uruchom polecenie i obserwuj obszar roboczy.'
     },
     sdk: {

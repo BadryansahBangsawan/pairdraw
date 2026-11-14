@@ -1,6 +1,6 @@
-import { getNodeEditCapability, resolveEditorProfile, type Editor } from '@open-pencil/core'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { generatedFrameOwner, generatedFrameText } from '@open-pencil/scene-graph/generated'
+import { getNodeEditCapability, resolveEditorProfile, type Editor } from '@pairdraw/core'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { generatedFrameOwner, generatedFrameText } from '@pairdraw/scene-graph/generated'
 
 import type { CanvasLabelKind } from '#vue/canvas/labels/edit'
 import { handleNodeEditDoubleClick } from '#vue/canvas/vector-input/double-click'

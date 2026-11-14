@@ -1,7 +1,7 @@
 import { shallowRef } from 'vue'
 
-import { canHoldImageFill, layerNameFromPrompt } from '@open-pencil/core/tools'
-import { vectorizableImageFill } from '@open-pencil/core/vector'
+import { canHoldImageFill, layerNameFromPrompt } from '@pairdraw/core/tools'
+import { vectorizableImageFill } from '@pairdraw/core/vector'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { notificationMessages } from '@/app/i18n/notifications'

@@ -1,8 +1,8 @@
 import type { Canvas, CanvasKit, Font, Paragraph, TypefaceFontProvider } from 'canvaskit-wasm'
 
-import { faceLoadKey } from '@open-pencil/scene-graph/font-style'
-import type { Size } from '@open-pencil/scene-graph/primitives'
-import { detectTextDirection } from '@open-pencil/scene-graph/text/direction'
+import { faceLoadKey } from '@pairdraw/scene-graph/font-style'
+import type { Size } from '@pairdraw/scene-graph/primitives'
+import { detectTextDirection } from '@pairdraw/scene-graph/text/direction'
 
 import { ResourceCache } from '#core/cache/resource'
 import { resolveParagraphFontFamilies } from '#core/canvas/text/font-families'

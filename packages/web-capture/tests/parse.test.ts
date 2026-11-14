@@ -7,7 +7,7 @@ import {
   MAX_CAPTURE_ELEMENTS,
   parseWebCapture,
   readWebCapture
-} from '@open-pencil/web-capture'
+} from '@pairdraw/web-capture'
 
 /** A script address, which no layer may keep as a link. */
 const SCRIPT_URL = ['javascript', 'alert(1)'].join(':')
@@ -21,7 +21,7 @@ describe('reading a capture', () => {
   test('tells a newer capture from a damaged one', () => {
     const newer = { ...capture(element('div')), version: 2 }
     expect(readWebCapture(newer)).toEqual({ ok: false, error: 'unsupported-version' })
-    expect(parseWebCapture('{"format":"openpencil/web-capture"')).toEqual({
+    expect(parseWebCapture('{"format":"pairdraw/web-capture"')).toEqual({
       ok: false,
       error: 'invalid'
     })

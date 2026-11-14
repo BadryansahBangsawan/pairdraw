@@ -12,7 +12,7 @@ import {
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import { useCloudMessages, useFileMessages, useRecoveryMessages } from '@open-pencil/vue/i18n'
+import { useCloudMessages, useFileMessages, useRecoveryMessages } from '@pairdraw/vue/i18n'
 
 import { menu } from '@/components/ui/menu/menu'
 import homeLocationMenuTheme from '@/theme/home/location-menu'

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor, pageSlides, slideMoveTarget } from '@open-pencil/core'
+import { createEditor, pageSlides, slideMoveTarget } from '@pairdraw/core'
 
 const VIEWPORT = { width: 800, height: 600 }
 

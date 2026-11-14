@@ -1,5 +1,5 @@
-import { getAxisAlignedWorldBounds } from '@open-pencil/scene-graph/coordinate'
-import type { Rect, Size } from '@open-pencil/scene-graph/primitives'
+import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
+import type { Rect, Size } from '@pairdraw/scene-graph/primitives'
 
 import { pageSlides } from '#core/editor/bridges/frames'
 import type { EditorContext } from '#core/editor/types'

@@ -1,4 +1,4 @@
-import { getCanvasKit } from '@open-pencil/core/canvaskit'
+import { getCanvasKit } from '@pairdraw/core/canvaskit'
 
 import { installCanvasKitBinary } from '@/app/editor/canvas/canvaskit'
 import { installBundledFonts } from '@/app/editor/fonts/bundled'

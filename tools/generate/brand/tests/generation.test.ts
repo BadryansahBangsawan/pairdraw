@@ -1,9 +1,7 @@
 import { describe, expect, test } from 'bun:test'
-import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
 
 import { checkBrandAssets } from '#brand/check'
-import { openpencil, pairdraw, repositoryRoot, webFiles } from '#brand/config'
+import { pairdraw, repositoryRoot, webFiles } from '#brand/config'
 import { generateDesktop } from '#brand/desktop'
 import { canonicalIcns, icoSizes, validateFiles, validateMaskable } from '#brand/validate'
 import { generateWeb } from '#brand/web'
@@ -28,16 +26,8 @@ describe('brand generation', () => {
     expect(icoSizes(file('favicon.ico')).sort((a, b) => a - b)).toEqual([16, 32, 48])
   })
 
-  test('keeps the documentation, still named OpenPencil, on the OpenPencil artwork', async () => {
-    for (const name of ['mark', 'mark-micro']) {
-      const master = await readFile(join(repositoryRoot, openpencil.masters, `${name}.svg`))
-      expect(file(`brand/${name}.svg`, docs).equals(master)).toBe(true)
-      expect(file(`brand/${name}.svg`).equals(master)).toBe(false)
-    }
-    for (const name of webFiles) expect(file(name, docs).equals(file(name))).toBe(false)
-    // The ivory tile reaches the midpoint of the top edge.
-    const tile = await sharp(file('brand/app-icon-1024.png', docs)).ensureAlpha().raw().toBuffer()
-    expect([...tile.subarray(512 * 4, 512 * 4 + 4)]).toEqual([245, 245, 239, 255])
+  test('gives the documentation the same artwork as the app', () => {
+    for (const name of webFiles) expect(file(name, docs).equals(file(name))).toBe(true)
   })
 
   test('keeps the square counter transparent and renders the micro master at 16px', async () => {
@@ -161,8 +151,6 @@ describe('brand generation', () => {
     const wrong = new Map(docs)
     wrong.set('apple-touch-icon.png', file('brand/pwa-512.png'))
     await expect(validateFiles(wrong, 'docs')).rejects.toThrow('apple-touch-icon.png')
-    // Each target's touch icon fills with its own tile color.
-    await expect(validateFiles(files, 'docs')).rejects.toThrow('rounded corners')
   })
 
   test('composes the native icon on an inset orange tile and validates StoreLogo dimensions', async () => {

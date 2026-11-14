@@ -1,4 +1,4 @@
-import { recoveryMessages } from '@open-pencil/vue/i18n'
+import { recoveryMessages } from '@pairdraw/vue/i18n'
 
 import { deleteDraft, readDraft, touchDraft } from '@/app/document/drafts'
 import type { EditorStore } from '@/app/editor/session'

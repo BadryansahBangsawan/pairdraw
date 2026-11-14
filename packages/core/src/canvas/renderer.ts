@@ -1,10 +1,10 @@
 import { isEqual } from 'es-toolkit'
 import { toUint8Array } from 'js-base64'
 
-import type { SceneNode, SceneGraph, Fill, Stroke } from '@open-pencil/scene-graph'
-import type { RenderColorSpace, ResolvedRenderColor } from '@open-pencil/scene-graph/color'
-import type { Color, Rect, Vector } from '@open-pencil/scene-graph/primitives'
-import { slotPropertyId } from '@open-pencil/scene-graph/slots'
+import type { SceneNode, SceneGraph, Fill, Stroke } from '@pairdraw/scene-graph'
+import type { RenderColorSpace, ResolvedRenderColor } from '@pairdraw/scene-graph/color'
+import type { Color, Rect, Vector } from '@pairdraw/scene-graph/primitives'
+import { slotPropertyId } from '@pairdraw/scene-graph/slots'
 
 /* eslint-disable max-lines -- SkiaRenderer facade owns CanvasKit state and delegates domain drawing */
 import {

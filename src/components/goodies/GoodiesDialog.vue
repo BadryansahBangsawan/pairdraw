@@ -2,9 +2,9 @@
 import { tv } from 'tailwind-variants'
 import { computed, ref, watch } from 'vue'
 
-import { BUILTIN_LIBRARY_ID } from '@open-pencil/core/library'
-import { SHADER_GALLERY, type ShaderGalleryId } from '@open-pencil/vue/controls/shader'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { BUILTIN_LIBRARY_ID } from '@pairdraw/core/library'
+import { SHADER_GALLERY, type ShaderGalleryId } from '@pairdraw/vue/controls/shader'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { getActiveEditorStore, useEditorStore } from '@/app/editor/active-store'
 import { applyGoodieShader, insertGoodieScript, pinGoodieStyle } from '@/app/goodies/actions'

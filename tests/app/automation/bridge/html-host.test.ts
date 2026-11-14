@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import { afterEach, beforeEach, expect, test } from 'bun:test'
 
-import { getHTMLToolHost } from '@open-pencil/core/tools'
+import { getHTMLToolHost } from '@pairdraw/core/tools'
 
 import { makeFigmaFromStore } from '@/app/automation/bridge/figma-factory'
 import { styleHTMLInBrowser } from '@/app/code/html-styler'

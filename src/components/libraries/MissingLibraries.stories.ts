@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test'
 
-import type { LibrarySummary } from '@open-pencil/core/library'
+import type { LibrarySummary } from '@pairdraw/core/library'
 
 import type { MissingLibrary } from '@/app/libraries/relink'
 

@@ -62,7 +62,7 @@ Puedes crear, eliminar y renombrar páginas; cada una conserva su posición y es
 - **Copiar como:** texto, SVG, PNG o JSX desde el menú contextual.
 
 ```sh
-openpencil export design.fig -f jsx --style tailwind
+pairdraw export design.fig -f jsx --style tailwind
 ```
 
 ## Chat con AI
@@ -82,7 +82,7 @@ En un tablero, el mismo navegador se vuelve investigación: el chat cita la pág
 Claude Code, Cursor, Windsurf y otros clientes MCP pueden leer y modificar archivos `.fig` con más de 90 herramientas. Están disponibles stdio y HTTP.
 
 ```sh
-npm install -g @open-pencil/mcp
+npm install -g @pairdraw/mcp
 ```
 
 ## CLI
@@ -90,15 +90,15 @@ npm install -g @open-pencil/mcp
 La CLI examina, exporta y analiza archivos `.fig`:
 
 ```sh
-openpencil tree design.fig              # Árbol del documento
-openpencil find design.fig --type TEXT  # Búsqueda
-openpencil export design.fig -f png     # Exportación
-openpencil analyze colors design.fig    # Análisis de colores
-openpencil analyze clusters design.fig  # Estructuras repetidas
-openpencil eval design.fig -c "..."     # Figma Plugin API
+pairdraw tree design.fig              # Árbol del documento
+pairdraw find design.fig --type TEXT  # Búsqueda
+pairdraw export design.fig -f png     # Exportación
+pairdraw analyze colors design.fig    # Análisis de colores
+pairdraw analyze clusters design.fig  # Estructuras repetidas
+pairdraw eval design.fig -c "..."     # Figma Plugin API
 ```
 
-Todos los comandos admiten `--json`. Instalación: `npm install -g @open-pencil/cli` o `bun add -g @open-pencil/cli`.
+Todos los comandos admiten `--json`. Instalación: `npm install -g @pairdraw/cli` o `bun add -g @pairdraw/cli`.
 
 ## Colaboración en tiempo real
 

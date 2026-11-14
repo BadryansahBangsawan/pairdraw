@@ -20,7 +20,7 @@ export interface SupportLink {
 
 export const SYSTEM_REQUIREMENTS_URL = 'https://openpencil.dev/getting-started#system-requirements'
 export const WEBVIEW2_DOWNLOAD_URL = 'https://developer.microsoft.com/microsoft-edge/webview2/'
-const ISSUE_URL = 'https://github.com/open-pencil/open-pencil/issues/new'
+const ISSUE_URL = 'https://github.com/BadryansahBangsawan/pairdraw/issues/new'
 
 export const MINIMUM_MACOS_VERSION = 13
 export const MINIMUM_WEBKITGTK_VERSION = '2.40'
@@ -82,7 +82,7 @@ function issueLink(
     title,
     platform: issuePlatform(env),
     'affected-area': 'App UI',
-    version: typeof __OPENPENCIL_APP_VERSION__ === 'string' ? __OPENPENCIL_APP_VERSION__ : '',
+    version: typeof __PAIRDRAW_APP_VERSION__ === 'string' ? __PAIRDRAW_APP_VERSION__ : '',
     browser: env.userAgent,
     logs: details.join('\n')
   })

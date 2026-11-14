@@ -2,8 +2,8 @@
 import { tv } from 'tailwind-variants'
 import { computed, onMounted, onUnmounted, useTemplateRef, watch } from 'vue'
 
-import type { ShaderStageBackend } from '@open-pencil/vue/canvas/surface'
-import { useI18n, useShaderMessages } from '@open-pencil/vue/i18n'
+import type { ShaderStageBackend } from '@pairdraw/vue/canvas/surface'
+import { useI18n, useShaderMessages } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { restoreShaderModeFocus } from '@/app/editor/shader-mode/focus'

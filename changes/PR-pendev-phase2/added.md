@@ -51,7 +51,7 @@
 - `.pen` script and browser nodes open as labelled placeholder frames that keep their script file, inputs, page address and view.
 - Paste HTML copied from a web page onto the canvas as styled, editable layers; scripts, event handlers, frames and MathML in it are removed first.
 - A Chrome extension (built from `extensions/chrome` and loaded unpacked) copies a whole page or a picked element with its computed styles and images, and Cmd/Ctrl+V pastes it as editable layers in one frame named after the page. You can pick the element with the keyboard alone.
-- `@open-pencil/web-capture` defines the web capture format and provides a capturer for pages and Electron apps that copies a page or element for pasting into the canvas.
+- `@pairdraw/web-capture` defines the web capture format and provides a capturer for pages and Electron apps that copies a page or element for pasting into the canvas.
 - Embed mode: a web page can show the editor in an iframe with `?embed&origin=<page origin>` and, after an origin-checked handshake, drive it over a MessagePort to load documents, read selection and pages, export images, and get the document back as `.fig`.
 - Embedded documents are read-only unless the embed URL has `allow-edit` and the host page asks to edit; the host page is told about every change, and `chrome` keeps the toolbar and panels.
 - Shader Mode shows a shader fill large on its own, with play and pause, a phase scrubber, and the shader's settings beside it; open it from the shader fill picker.

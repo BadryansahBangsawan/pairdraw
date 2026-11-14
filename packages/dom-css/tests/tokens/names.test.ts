@@ -7,8 +7,8 @@ import {
   tokenNumberToCSS,
   variableCSSNames,
   variableUnit
-} from '@open-pencil/dom-css/export'
-import type { Variable } from '@open-pencil/scene-graph'
+} from '@pairdraw/dom-css/export'
+import type { Variable } from '@pairdraw/scene-graph'
 
 function token(name: string, overrides: Partial<Variable> = {}): Variable {
   return {

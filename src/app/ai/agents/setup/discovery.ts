@@ -1,6 +1,6 @@
 import { computed, ref, shallowRef } from 'vue'
 
-import { ACP_AGENTS, type ACPAgentDef, type ACPAgentID } from '@open-pencil/core/constants'
+import { ACP_AGENTS, type ACPAgentDef, type ACPAgentID } from '@pairdraw/core/constants'
 
 import { agentHost, agentHostAvailable, piHostAvailable } from '@/app/ai/agents/host/current'
 import type { AgentHost } from '@/app/ai/agents/host/types'

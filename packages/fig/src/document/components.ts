@@ -1,5 +1,5 @@
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { guidToString } from '@open-pencil/kiwi/fig/guid'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { guidToString } from '@pairdraw/kiwi/fig/guid'
 
 import { occurrences } from '../instance-overrides/occurrence/path'
 import type { InstanceOccurrence } from '../instance-overrides/occurrence/types'

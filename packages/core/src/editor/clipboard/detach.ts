@@ -1,11 +1,11 @@
-import type { SceneGraph, SceneNode, StyleRun } from '@open-pencil/scene-graph'
-import { STYLE_LINK_FIELDS } from '@open-pencil/scene-graph/shared-styles'
+import type { SceneGraph, SceneNode, StyleRun } from '@pairdraw/scene-graph'
+import { STYLE_LINK_FIELDS } from '@pairdraw/scene-graph/shared-styles'
 import {
   resolvedNumericBindings,
   resolvedPaintBindings,
   resolvedRunBindings,
   resolvedValueBindings
-} from '@open-pencil/scene-graph/variables'
+} from '@pairdraw/scene-graph/variables'
 
 /**
  * The values a layer's variable bindings show in the document it is copied from, for the fields

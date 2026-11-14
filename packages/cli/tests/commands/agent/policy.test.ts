@@ -3,7 +3,7 @@ import { mkdtemp, symlink } from 'node:fs/promises'
 import { homedir, tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 
-import { ALL_TOOLS } from '@open-pencil/core/tools'
+import { ALL_TOOLS } from '@pairdraw/core/tools'
 import { resolveAgentRoot, safeOutputPath } from '#cli/agent/paths'
 import { agentToolDefinitions, parseToolNames } from '#cli/agent/policy'
 
@@ -15,8 +15,8 @@ describe('headless agent paths', () => {
     expect(resolveAgentRoot(' docs ', '/project', 'darwin')).toBe('docs')
   })
   test('keeps writes inside root through dot paths and symlinks', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'open-pencil-agent-root-'))
-    const outside = await mkdtemp(join(tmpdir(), 'open-pencil-agent-outside-'))
+    const root = await mkdtemp(join(tmpdir(), 'pairdraw-agent-root-'))
+    const outside = await mkdtemp(join(tmpdir(), 'pairdraw-agent-outside-'))
     await symlink(outside, join(root, 'linked'))
     expect(await safeOutputPath('result.fig', root)).toBe(resolve(root, 'result.fig'))
     await expect(safeOutputPath('../outside.fig', root)).rejects.toThrow('outside the allowed root')

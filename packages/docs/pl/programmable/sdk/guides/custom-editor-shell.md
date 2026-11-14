@@ -7,8 +7,8 @@ description: Tworzenie własnego interfejsu edytora za pomocą provideEditor, Ca
 
 Typowa aplikacja Pairdraw oparta na Vue składa się z trzech warstw:
 
-1. `@open-pencil/core` tworzy edytor;
-2. `@open-pencil/vue` łączy go z composables i komponentami Vue bez narzuconego wyglądu;
+1. `@pairdraw/core` tworzy edytor;
+2. `@pairdraw/vue` łączy go z composables i komponentami Vue bez narzuconego wyglądu;
 3. aplikacja określa układ, wygląd i zachowanie właściwe dla produktu.
 
 ## Dlaczego warto rozdzielić te warstwy
@@ -31,12 +31,12 @@ Wygodny interfejs zwykle:
 
 ```vue
 <script setup lang="ts">
-import { createEditor } from '@open-pencil/core'
-import { provideEditor } from '@open-pencil/vue'
-import { CanvasRoot, CanvasSurface } from '@open-pencil/vue/canvas'
-import { ToolbarRoot } from '@open-pencil/vue/primitives/Toolbar'
-import { PageListRoot } from '@open-pencil/vue/primitives/PageList'
-import { LayerTreeRoot } from '@open-pencil/vue/primitives/LayerTree'
+import { createEditor } from '@pairdraw/core'
+import { provideEditor } from '@pairdraw/vue'
+import { CanvasRoot, CanvasSurface } from '@pairdraw/vue/canvas'
+import { ToolbarRoot } from '@pairdraw/vue/primitives/Toolbar'
+import { PageListRoot } from '@pairdraw/vue/primitives/PageList'
+import { LayerTreeRoot } from '@pairdraw/vue/primitives/LayerTree'
 
 const editor = createEditor({ width: 1440, height: 900 })
 provideEditor(editor)

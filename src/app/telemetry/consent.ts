@@ -1,8 +1,8 @@
 import { computed, ref } from 'vue'
 
-import type { ConsentSource } from '@open-pencil/feedback/contract'
-import { randomHex } from '@open-pencil/scene-graph/random'
-import { locale } from '@open-pencil/vue/i18n'
+import type { ConsentSource } from '@pairdraw/feedback/contract'
+import { randomHex } from '@pairdraw/scene-graph/random'
+import { locale } from '@pairdraw/vue/i18n'
 
 import { appPreferences, updateSharingPreferences } from '@/app/settings/preferences/store'
 

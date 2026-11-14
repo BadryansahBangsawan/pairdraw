@@ -6,7 +6,7 @@
  */
 import * as v from 'valibot'
 
-import { IS_BROWSER } from '@open-pencil/core/constants'
+import { IS_BROWSER } from '@pairdraw/core/constants'
 
 import type { EditorStore } from '@/app/editor/session/create'
 import {

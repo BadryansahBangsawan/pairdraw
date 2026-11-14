@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { tv } from 'tailwind-variants'
 
-import { useCloudMessages, useFileMessages, useRecoveryMessages } from '@open-pencil/vue/i18n'
+import { useCloudMessages, useFileMessages, useRecoveryMessages } from '@pairdraw/vue/i18n'
 
 import theme from '@/theme/home/location-tabs'
 

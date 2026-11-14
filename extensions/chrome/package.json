@@ -1,5 +1,5 @@
 {
-  "name": "@open-pencil/chrome-extension",
+  "name": "@pairdraw/chrome-extension",
   "version": "0.16.0",
   "private": true,
   "license": "MIT",

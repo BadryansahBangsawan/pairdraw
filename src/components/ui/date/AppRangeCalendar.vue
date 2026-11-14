@@ -18,7 +18,7 @@ import {
 import { tv } from 'tailwind-variants'
 import { computed, shallowRef, watch } from 'vue'
 
-import { useCommonMessages } from '@open-pencil/vue/i18n'
+import { useCommonMessages } from '@pairdraw/vue/i18n'
 
 import IconButton from '@/components/ui/button/IconButton.vue'
 import rangeCalendarTheme from '@/theme/date/range-calendar'

@@ -14,8 +14,8 @@ const SOLID = `void main() {
 /** The layer's shader effect, as the document stores it. */
 function shaderEffect(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const id = [...store.state.selectedIds][0]
     const effect = id ? store.graph.getNode(id)?.effects[0] : undefined
     if (!effect || effect.type !== 'SHADER') return null

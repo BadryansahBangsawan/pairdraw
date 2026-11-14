@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { colorToCSS } from '@open-pencil/scene-graph/color'
-import { fromPercent, toPercent } from '@open-pencil/vue/controls/color-model'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { colorToCSS } from '@pairdraw/scene-graph/color'
+import { fromPercent, toPercent } from '@pairdraw/vue/controls/color-model'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useColorPickerPanelContext } from '@/components/color-picker-panel/context'
 import OkhclChannelSlider from '@/components/color-picker-panel/OkhclChannelSlider.vue'

@@ -1,5 +1,5 @@
-import type { LintFix, LintFixRequest } from '@open-pencil/core/lint'
-import type { useDesignCheckMessages } from '@open-pencil/vue/i18n'
+import type { LintFix, LintFixRequest } from '@pairdraw/core/lint'
+import type { useDesignCheckMessages } from '@pairdraw/vue/i18n'
 
 import { formatNumber } from '@/app/i18n/number'
 

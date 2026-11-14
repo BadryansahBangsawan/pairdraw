@@ -1,7 +1,7 @@
-import { BLACK } from '@open-pencil/core/constants'
-import type { SceneNode, SharedStyleKind } from '@open-pencil/scene-graph'
-import { copyEffects, copyFills, copyLayoutGrids } from '@open-pencil/scene-graph/copy'
-import { sharedStyleRefKey } from '@open-pencil/scene-graph/shared-styles'
+import { BLACK } from '@pairdraw/core/constants'
+import type { SceneNode, SharedStyleKind } from '@pairdraw/scene-graph'
+import { copyEffects, copyFills, copyLayoutGrids } from '@pairdraw/scene-graph/copy'
+import { sharedStyleRefKey } from '@pairdraw/scene-graph/shared-styles'
 
 function strokePaintsFromStyle(target: SceneNode, style: SceneNode): SceneNode['strokes'] {
   const fills = style.fills.filter((fill) => fill.type === 'SOLID')

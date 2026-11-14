@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { ALL_TOOLS } from '@open-pencil/core/tools'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { ALL_TOOLS } from '@pairdraw/core/tools'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 function tool(name: string) {
   const found = ALL_TOOLS.find((item) => item.name === name)

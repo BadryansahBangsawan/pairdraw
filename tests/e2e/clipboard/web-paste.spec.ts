@@ -1,11 +1,11 @@
-import { encodeWebCaptureClipboard, type WebCapture } from '@open-pencil/web-capture'
+import { encodeWebCaptureClipboard, type WebCapture } from '@pairdraw/web-capture'
 
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
 
 const editor = useEditorSetupWithClear('/?test')
 
 const CAPTURE: WebCapture = {
-  format: 'openpencil/web-capture',
+  format: 'pairdraw/web-capture',
   version: 1,
   scope: 'element',
   source: { url: 'https://example.com/pricing/', title: 'Pricing' },
@@ -56,8 +56,8 @@ function paste(html: string, text = '') {
 
 function topLevelLayers() {
   return editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return store.graph.getChildren(store.state.currentPageId).map((node) => ({
       name: node.name,
       type: node.type,

@@ -1,13 +1,13 @@
 import { describe, expect, test } from 'bun:test'
 
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { parseColor } from '@open-pencil/scene-graph/color'
-import { isIconModified, readIcon, readIconTint, withIcon } from '@open-pencil/scene-graph/icons'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { parseColor } from '@pairdraw/scene-graph/color'
+import { isIconModified, readIcon, readIconTint, withIcon } from '@pairdraw/scene-graph/icons'
 import {
   collectResizeDescendants,
   computeConstrainedResizeChanges
-} from '@open-pencil/scene-graph/resize'
+} from '@pairdraw/scene-graph/resize'
 
 import { detachIcon, placeIcon, recolorIcon, swapIcon } from '#core/icons/render'
 import { buildIconData } from '#core/icons/svg'

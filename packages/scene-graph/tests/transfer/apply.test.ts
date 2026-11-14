@@ -1,8 +1,8 @@
 import { expect, test } from 'bun:test'
 
-import { SceneGraph, CommittedGraphEventError } from '@open-pencil/scene-graph'
-import { getSharedStyles } from '@open-pencil/scene-graph/shared-styles'
-import { applyGraphTransfer, prepareGraphTransfer } from '@open-pencil/scene-graph/transfer'
+import { SceneGraph, CommittedGraphEventError } from '@pairdraw/scene-graph'
+import { getSharedStyles } from '@pairdraw/scene-graph/shared-styles'
+import { applyGraphTransfer, prepareGraphTransfer } from '@pairdraw/scene-graph/transfer'
 
 function setup() {
   const source = new SceneGraph(),

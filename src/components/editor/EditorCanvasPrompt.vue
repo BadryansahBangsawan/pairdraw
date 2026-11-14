@@ -2,7 +2,7 @@
 import { tv } from 'tailwind-variants'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import {
   closeCanvasPrompt,

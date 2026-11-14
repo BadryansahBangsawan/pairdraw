@@ -33,7 +33,7 @@ The exported file is saved via a native dialog (desktop) or browser download.
 - **JPG and WEBP** rows have a quality field from 1 to 100 (90 when left alone), saved with the layer.
 - **PDF** with several layers selected makes one PDF with a page per layer, in the order you selected them, each the size of its layer.
 - **File › Export Frames to PDF…** saves the page's frames as one PDF, a page per frame in layer order, each the size of its frame. Frames inside sections count; loose shapes, text, and groups do not. With layers selected, only those are exported.
-- **HTML** writes the layer as a web page. The options button next to the format chooses whether to include the HTML scaffold (a whole page, or a fragment to paste into one), CSS or Tailwind styling, embedded images or separate files (saved together in a `.zip`), and whether layer names (`data-name`, on by default) and layer IDs (`data-open-pencil-node-id`, off by default) are written as attributes. The Code panel's HTML view exports the same way, with the styling it shows.
+- **HTML** writes the layer as a web page. The options button next to the format chooses whether to include the HTML scaffold (a whole page, or a fragment to paste into one), CSS or Tailwind styling, embedded images or separate files (saved together in a `.zip`), and whether layer names (`data-name`, on by default) and layer IDs (`data-pairdraw-node-id`, off by default) are written as attributes. The Code panel's HTML view exports the same way, with the styling it shows.
 - In the Code panel, Vue and React components can take icons from Lucide, Heroicons, or Font Awesome instead of Iconify, and React components also from React Icons; an icon the package lacks stays with Iconify.
 
 ## Copy/Paste as

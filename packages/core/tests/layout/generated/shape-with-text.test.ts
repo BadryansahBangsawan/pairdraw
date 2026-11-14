@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import { getNodeOrThrow } from '#core-tests/helpers/assert'
 
-import { computeAllLayouts, setTextMeasurer } from '@open-pencil/core/layout'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { createShapeWithText, shapeWithTextLabel } from '@open-pencil/scene-graph/generated'
+import { computeAllLayouts, setTextMeasurer } from '@pairdraw/core/layout'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { createShapeWithText, shapeWithTextLabel } from '@pairdraw/scene-graph/generated'
 
 /** One 36 px line per line break, 12 px a character, never wrapping. */
 beforeEach(() =>

@@ -1,16 +1,16 @@
-import { compressFigDataSync, renameFigArchive } from '@open-pencil/fig'
+import { compressFigDataSync, renameFigArchive } from '@pairdraw/fig'
 import {
   nameImagesForFigma,
   placeSlotContent,
   type FigNodeChangeExportRuntime,
   sceneNodeToKiwi
-} from '@open-pencil/fig/node-change'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { loadFigDataCompressor, type FigFileKind } from '@open-pencil/kiwi/fig/container'
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import { fractionalPosition } from '@open-pencil/scene-graph/order-keys'
-import type { GUID } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/fig/node-change'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { loadFigDataCompressor, type FigFileKind } from '@pairdraw/kiwi/fig/container'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { fractionalPosition } from '@pairdraw/scene-graph/order-keys'
+import type { GUID } from '@pairdraw/scene-graph/primitives'
 
 import { withFigExportRuntime } from '#core/canvas/text/shape'
 import { IS_BROWSER, IS_TAURI } from '#core/constants'

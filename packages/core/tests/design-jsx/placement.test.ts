@@ -5,11 +5,11 @@ import {
   renderTree,
   stageJSXPreview,
   type RenderPlacementInput
-} from '@open-pencil/core/design-jsx'
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { ALL_TOOLS } from '@open-pencil/core/tools'
-import { createStreamingJSXParser } from '@open-pencil/design-jsx'
-import { SceneGraph, type SceneNode } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/design-jsx'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { ALL_TOOLS } from '@pairdraw/core/tools'
+import { createStreamingJSXParser } from '@pairdraw/design-jsx'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
 
 import { expectDefined, getNodeOrThrow } from '../helpers/assert'
 

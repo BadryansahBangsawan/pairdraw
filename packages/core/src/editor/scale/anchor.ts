@@ -1,4 +1,4 @@
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
 /**
  * The nine points of the Scale tool's anchor grid, row by row from the top left: the point of the

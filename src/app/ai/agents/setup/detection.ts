@@ -1,4 +1,4 @@
-import type { ACPAgentDef } from '@open-pencil/core/constants'
+import type { ACPAgentDef } from '@pairdraw/core/constants'
 
 import { externalConfigCloud, type ClaudeCodeCloud } from './external'
 import { agentSetupView, type AgentSetupState, type PiSetupState } from './view'

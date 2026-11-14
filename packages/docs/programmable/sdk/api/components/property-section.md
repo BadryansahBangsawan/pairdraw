@@ -26,7 +26,7 @@ attributes without imposing presentation.
 
 ```vue twoslash
 <script setup lang="ts">
-import { PropertySectionContent, PropertySectionHeader, PropertySectionRoot, PropertySectionTitle } from '@open-pencil/vue/primitives/PropertySection'
+import { PropertySectionContent, PropertySectionHeader, PropertySectionRoot, PropertySectionTitle } from '@pairdraw/vue/primitives/PropertySection'
 </script>
 
 <template>

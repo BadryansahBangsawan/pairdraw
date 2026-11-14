@@ -1,4 +1,4 @@
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 
 /** Figma's Remove auto layout key, which acts on every selected frame at once. */
 export const REMOVE_AUTO_LAYOUT_SHORTCUT = 'SHIFT+ALT+A'

@@ -17,8 +17,8 @@ test('tool-created CJK text requests fallback through app font loading', async (
   await canvas.waitForInit()
 
   const result = await page.evaluate(async () => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
 
     const appFontsURL = '/src/app/editor/fonts/index.ts'
     const { ensureGraphFonts, loadFont }: typeof AppFonts = await import(appFontsURL)
@@ -80,12 +80,12 @@ test('CJK text waits for fallback fonts and repaints after they load', async ({ 
   await canvas.waitForInit()
 
   const result = await page.evaluate(async () => {
-    const store = window.openPencil?.getStore?.()
-    if (!store?.renderer) throw new Error('OpenPencil renderer not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store?.renderer) throw new Error('Pairdraw renderer not initialized')
     // The scene surface draws document text. The overlay surface registers last and owns
     // store.renderer, but it only draws editor chrome.
     const renderer = store.canvasRenderers.find((item) => item.tracksSceneSettlement)
-    if (!renderer?.fontsLoaded) throw new Error('OpenPencil scene renderer not ready')
+    if (!renderer?.fontsLoaded) throw new Error('Pairdraw scene renderer not ready')
     const response = await fetch('/tests/fixtures/fonts/NotoSansCJK-Test.otf')
     const fallbackData = await response.arrayBuffer()
     const fontModuleURL = performance

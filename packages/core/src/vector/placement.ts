@@ -1,7 +1,7 @@
-import type { SceneGraph, SceneNode, VectorNetwork } from '@open-pencil/scene-graph'
-import { getNodeLocalMatrix, getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import { transformVectorNetwork } from '@open-pencil/scene-graph/vector-network'
+import type { SceneGraph, SceneNode, VectorNetwork } from '@pairdraw/scene-graph'
+import { getNodeLocalMatrix, getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import { transformVectorNetwork } from '@pairdraw/scene-graph/vector-network'
 
 import { computeAccurateBounds } from './curve-math'
 import { regenerateFillGeometry } from './fill-geometry'

@@ -1,5 +1,5 @@
 /**
- * The curated visual directions `get_style` serves, by id. Each one is OpenPencil's own: tokens
+ * The curated visual directions `get_style` serves, by id. Each one is Pairdraw's own: tokens
  * here and its written direction in `guides/<id>.md`.
  */
 export const STYLE_ARCHETYPE_IDS = [

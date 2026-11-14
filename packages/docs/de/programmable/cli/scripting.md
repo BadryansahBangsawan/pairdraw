@@ -5,12 +5,12 @@ description: JavaScript mit einer Figma-kompatiblen Plugin API ausführen, um De
 
 # Skripte
 
-`openpencil eval` führt JavaScript für ein Pairdraw-Dokument aus und stellt das globale Objekt `figma` bereit. Der Befehl eignet sich für Massenänderungen, Prüfungen, Testdaten und Automatisierung ohne Editoroberfläche.
+`pairdraw eval` führt JavaScript für ein Pairdraw-Dokument aus und stellt das globale Objekt `figma` bereit. Der Befehl eignet sich für Massenänderungen, Prüfungen, Testdaten und Automatisierung ohne Editoroberfläche.
 
 ## Grundlagen
 
 ```sh
-openpencil eval design.fig -c "return figma.currentPage.children.length"
+pairdraw eval design.fig -c "return figma.currentPage.children.length"
 ```
 
 Beginnt der Code nicht mit `return`, führt Pairdraw ihn in einer asynchronen Funktion aus.

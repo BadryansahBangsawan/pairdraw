@@ -13,7 +13,7 @@ Every process picks a random session at startup, outside sessions 0 and 1, which
 
 ## Imported layers
 
-Reading a `.fig` file creates each layer under the GUID its record was saved with, and the document root under the ID Pairdraw saved it with, so a layer has the same ID in every process that opens the file and after every save and reopen. `openpencil tree` prints an ID that a later `openpencil node` or `diff apply` finds, and a Cloud room matches the layers of a tab that reopened the stored file. The saved GUID is also the layer's `source.id`.
+Reading a `.fig` file creates each layer under the GUID its record was saved with, and the document root under the ID Pairdraw saved it with, so a layer has the same ID in every process that opens the file and after every save and reopen. `pairdraw tree` prints an ID that a later `pairdraw node` or `diff apply` finds, and a Cloud room matches the layers of a tab that reopened the stored file. The saved GUID is also the layer's `source.id`.
 
 Layers inside instances have no records of their own and get IDs from a counter, `0:1`, `0:2`, and so on, in the order the reader builds them. The counter skips every GUID in the archive, including records on pages not loaded yet, so a page loaded later still finds its GUIDs free. The same file gets the same counter IDs on every run; pages loaded later continue the counter, and a resumed session carries it in its checkpoint. A record whose GUID another layer already has, such as a repeated record, takes a counter ID too.
 

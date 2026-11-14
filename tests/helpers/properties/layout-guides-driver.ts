@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-import type { LayoutGrid } from '@open-pencil/scene-graph'
+import type { LayoutGrid } from '@pairdraw/scene-graph'
 
 /** Builds frames with layout guides and a rectangle, selects them, and reads their guides back. */
 export function layoutGuidesDriver(page: () => Page) {
@@ -8,8 +8,8 @@ export function layoutGuidesDriver(page: () => Page) {
     /** One frame per guide list, side by side, and a rectangle below them. */
     build(guides: LayoutGrid[][]) {
       return page().evaluate((guides) => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         const frames = guides.map((layoutGrids, index) => {
           const id = store.createShape('FRAME', 100 + index * 260, 100, 200, 150)
           store.updateNode(id, { layoutGrids })
@@ -21,7 +21,7 @@ export function layoutGuidesDriver(page: () => Page) {
     },
 
     select(ids: string[]) {
-      return page().evaluate((ids) => window.openPencil?.getStore?.().select(ids), ids)
+      return page().evaluate((ids) => window.pairdraw?.getStore?.().select(ids), ids)
     },
 
     /** Each layer's guides, as "PATTERN count sectionSize". */
@@ -29,7 +29,7 @@ export function layoutGuidesDriver(page: () => Page) {
       return page().evaluate(
         (ids) =>
           ids.map((id) =>
-            window.openPencil
+            window.pairdraw
               ?.getStore?.()
               .graph.getNode(id)
               ?.layoutGrids.map((grid) =>

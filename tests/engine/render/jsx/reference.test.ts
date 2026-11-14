@@ -1,9 +1,9 @@
 import { expect, test } from 'bun:test'
 
-import { renderJSX } from '@open-pencil/core/design-jsx'
-import { CODEGEN_PROMPT as BARREL_CODEGEN, CODEGEN_PROMPT } from '@open-pencil/core/tools'
-import { AUTHORING_EXAMPLES, JSX_REFERENCE } from '@open-pencil/design-jsx'
-import { pixelLength } from '@open-pencil/scene-graph/text'
+import { renderJSX } from '@pairdraw/core/design-jsx'
+import { CODEGEN_PROMPT as BARREL_CODEGEN, CODEGEN_PROMPT } from '@pairdraw/core/tools'
+import { AUTHORING_EXAMPLES, JSX_REFERENCE } from '@pairdraw/design-jsx'
+import { pixelLength } from '@pairdraw/scene-graph/text'
 
 import SYSTEM_PROMPT from '@/app/ai/chat/system-prompt'
 

@@ -10,8 +10,8 @@ import type {
 } from 'ai'
 import { toMerged } from 'es-toolkit'
 
-import type { AIProviderID, ReasoningEffort } from '@open-pencil/core/constants'
-import { aiMessages } from '@open-pencil/vue/i18n'
+import type { AIProviderID, ReasoningEffort } from '@pairdraw/core/constants'
+import { aiMessages } from '@pairdraw/vue/i18n'
 
 import {
   BROWSER_CHAT_TOOL_NAMES,

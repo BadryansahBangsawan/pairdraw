@@ -1,17 +1,17 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 import {
   canReplaceInstanceLayer,
   isReplacedLayer,
   replaceInstanceLayer,
   replacedComponentLayerId,
   restoreReplacedLayer
-} from '@open-pencil/scene-graph/instances'
+} from '@pairdraw/scene-graph/instances'
 import {
   deserializeInstanceOverrideState,
   serializeInstanceOverrideState
-} from '@open-pencil/scene-graph/instances/overrides'
+} from '@pairdraw/scene-graph/instances/overrides'
 
 /** A button component with an icon and a label, and an instance of it on the page. */
 function buttonWithInstance() {

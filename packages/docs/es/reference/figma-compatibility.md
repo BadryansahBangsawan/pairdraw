@@ -206,7 +206,7 @@ Conexiones, activadores, acciones, animaciones, transiciones, superposiciones, d
 | Fragmentos de código | 🟡 | Design JSX, HTML, Vue y React con CSS o Tailwind y valores basados en tokens; sin Swift, Kotlin ni Compose |
 | Tailwind CSS v4 | ✅ | HTML con clases de utilidad desde el panel Código, CLI o API |
 | Figma para VS Code | 🔲 | Sin integración con extensión del editor |
-| Servidor MCP | ✅ | `@open-pencil/mcp` con stdio y HTTP; 138 herramientas principales más herramientas de documento, historial y ajustes |
+| Servidor MCP | ✅ | `@pairdraw/mcp` con stdio y HTTP; 138 herramientas principales más herramientas de documento, historial y ajustes |
 | CLI | ✅ | 24 comandos, entre ellos `info`, `tree`, `find`, `query`, `node`, `pages`, `variables`, `tokens`, `fonts`, `lint`, `analyze`, `export`, `import`, `convert`, `diff`, `eval` y `tool` |
 
 ## Figma Draw

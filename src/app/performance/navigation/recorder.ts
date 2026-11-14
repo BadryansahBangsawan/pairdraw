@@ -1,5 +1,5 @@
-import type { NavigationTraceEvent, RecordedWheelSample } from '@open-pencil/core/profiler'
-import { subscribeNavigationTrace } from '@open-pencil/core/profiler'
+import type { NavigationTraceEvent, RecordedWheelSample } from '@pairdraw/core/profiler'
+import { subscribeNavigationTrace } from '@pairdraw/core/profiler'
 
 export interface NavigationRecording {
   schemaVersion: 1

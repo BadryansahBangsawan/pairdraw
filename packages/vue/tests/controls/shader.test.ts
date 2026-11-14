@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import * as v from 'valibot'
 
-import { shaderPresetSchema } from '@open-pencil/scene-graph/shaders'
+import { shaderPresetSchema } from '@pairdraw/scene-graph/shaders'
 
 import {
   addShaderEffect,

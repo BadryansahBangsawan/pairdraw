@@ -2,7 +2,7 @@
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import { stickyTopLevelRow, useLayerTree } from '@open-pencil/vue/primitives/LayerTree'
+import { stickyTopLevelRow, useLayerTree } from '@pairdraw/vue/primitives/LayerTree'
 
 import type { LayerIssueMark } from '@/app/editor/design-check/layers'
 import layerTreeTheme from '@/theme/layer-tree'

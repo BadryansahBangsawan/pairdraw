@@ -1,16 +1,16 @@
 import * as v from 'valibot'
 
-import type { SceneGraph, SceneNode, SlotSettings } from '@open-pencil/scene-graph'
-import { behaviourSpecSchema } from '@open-pencil/scene-graph/behaviours'
+import type { SceneGraph, SceneNode, SlotSettings } from '@pairdraw/scene-graph'
+import { behaviourSpecSchema } from '@pairdraw/scene-graph/behaviours'
 import {
   slotOwner,
   slotPropertyId,
   updateSlotProperty,
   type SlotPropertyPatch
-} from '@open-pencil/scene-graph/slots'
+} from '@pairdraw/scene-graph/slots'
 
 import { mergeSlotSettings, type FigmaSlotSettings } from '#core/figma-api/slots'
-import { OpenPencilAPI } from '#core/openpencil-api'
+import { PairdrawAPI } from '#core/pairdraw-api'
 import { defineTool, toolFailure, toolNumber } from '#core/tools/schema'
 
 export const setBehaviour = defineTool({
@@ -35,9 +35,9 @@ export const setBehaviour = defineTool({
   }),
   execute: (figma, { id, behaviour }) => {
     try {
-      const openpencil = new OpenPencilAPI(figma)
-      if (behaviour) return openpencil.setBehaviour(id, behaviour).toJSON()
-      openpencil.getBehaviour(id)?.remove()
+      const pairdraw = new PairdrawAPI(figma)
+      if (behaviour) return pairdraw.setBehaviour(id, behaviour).toJSON()
+      pairdraw.getBehaviour(id)?.remove()
       return { ok: true }
     } catch (error) {
       return toolFailure(error)
@@ -119,7 +119,7 @@ export const createSlot = defineTool({
           `min_children (${settings.minChildren}) must not be more than max_children (${settings.maxChildren})`
         )
       }
-      const slot = new OpenPencilAPI(figma).createSlot(args.id)
+      const slot = new PairdrawAPI(figma).createSlot(args.id)
       const frame = graph.getNode(args.id)
       const owner = frame && slotOwner(graph, frame)
       const propertyId = frame && slotPropertyId(frame)
@@ -152,10 +152,10 @@ export const getBehaviour = defineTool({
     id: v.optional(v.pipe(v.string(), v.description('Component, set, or variant ID')))
   }),
   execute: (figma, { id }) => {
-    const openpencil = new OpenPencilAPI(figma)
-    if (!id) return { kinds: openpencil.behaviourKinds }
+    const pairdraw = new PairdrawAPI(figma)
+    if (!id) return { kinds: pairdraw.behaviourKinds }
     try {
-      return openpencil.getBehaviour(id)?.toJSON() ?? { behaviour: null }
+      return pairdraw.getBehaviour(id)?.toJSON() ?? { behaviour: null }
     } catch (error) {
       return toolFailure(error)
     }

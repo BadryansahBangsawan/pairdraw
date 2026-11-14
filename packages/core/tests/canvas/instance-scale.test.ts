@@ -1,12 +1,12 @@
 import { expect, test } from 'bun:test'
 import { resolve } from 'node:path'
 
-import { createEditor } from '@open-pencil/core'
-import { SkiaRenderer } from '@open-pencil/core/canvas'
-import { initCanvasKit, renderNodesToImage } from '@open-pencil/core/io/formats/raster'
-import { materializeDocument } from '@open-pencil/fig'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { rescaleNodeTree } from '@open-pencil/scene-graph/scaling'
+import { createEditor } from '@pairdraw/core'
+import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { initCanvasKit, renderNodesToImage } from '@pairdraw/core/io/formats/raster'
+import { materializeDocument } from '@pairdraw/fig'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { rescaleNodeTree } from '@pairdraw/scene-graph/scaling'
 
 import { expectDefined } from '../helpers/assert'
 import {

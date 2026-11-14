@@ -3,17 +3,17 @@ import { readFileSync } from 'node:fs'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { parseDrawIOFile } from '@open-pencil/drawio'
-import { SceneGraph, type SceneNode } from '@open-pencil/scene-graph'
+import { parseDrawIOFile } from '@pairdraw/drawio'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
 import {
   boundEndpoint,
   connectorSublayers,
   createConnector,
   freeEndpoint
-} from '@open-pencil/scene-graph/connectors'
-import { getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import { createShapeWithText } from '@open-pencil/scene-graph/generated'
-import Matrix from '@open-pencil/scene-graph/matrix'
+} from '@pairdraw/scene-graph/connectors'
+import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import { createShapeWithText } from '@pairdraw/scene-graph/generated'
+import Matrix from '@pairdraw/scene-graph/matrix'
 
 import { BUILTIN_IO_FORMATS, IORegistry } from '#core/io'
 import type { ExportTarget } from '#core/io'

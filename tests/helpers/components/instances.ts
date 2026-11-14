@@ -13,8 +13,8 @@ export interface InstanceLayerScene {
 /** Builds the scene the instance override specs edit, nothing selected. */
 export function createInstanceLayerScene(page: Page): Promise<InstanceLayerScene> {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const pageId = store.state.currentPageId
     const { graph } = store
     const button = graph.createNode('COMPONENT', pageId, { name: 'Button', width: 120, height: 40 })
@@ -43,7 +43,7 @@ export function createInstanceLayerScene(page: Page): Promise<InstanceLayerScene
 /** Each layer of a node as `TYPE:name`, in order. */
 export function layerSummary(page: Page, nodeId: string): Promise<string[]> {
   return page.evaluate((id) => {
-    const graph = window.openPencil?.getStore?.().graph
+    const graph = window.pairdraw?.getStore?.().graph
     return (graph?.getChildren(id) ?? []).map((node) => `${node.type}:${node.name}`)
   }, nodeId)
 }
@@ -51,27 +51,24 @@ export function layerSummary(page: Page, nodeId: string): Promise<string[]> {
 /** The ID of a node's first layer. */
 export function firstLayerId(page: Page, nodeId: string): Promise<string> {
   return page.evaluate((id) => {
-    const first = window.openPencil?.getStore?.().graph.getChildren(id)[0]
+    const first = window.pairdraw?.getStore?.().graph.getChildren(id)[0]
     if (!first) throw new Error(`No layers in ${id}`)
     return first.id
   }, nodeId)
 }
 
 export function componentOf(page: Page, nodeId: string): Promise<string | null | undefined> {
-  return page.evaluate(
-    (id) => window.openPencil?.getStore?.().graph.getNode(id)?.componentId,
-    nodeId
-  )
+  return page.evaluate((id) => window.pairdraw?.getStore?.().graph.getNode(id)?.componentId, nodeId)
 }
 
 export async function selectNodes(page: Page, ids: string[]): Promise<void> {
   await page.evaluate((nodeIds) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.select(nodeIds)
   }, ids)
 }
 
 export function selectedIds(page: Page): Promise<string[]> {
-  return page.evaluate(() => [...(window.openPencil?.getStore?.().state.selectedIds ?? [])])
+  return page.evaluate(() => [...(window.pairdraw?.getStore?.().state.selectedIds ?? [])])
 }

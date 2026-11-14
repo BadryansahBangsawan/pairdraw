@@ -81,7 +81,7 @@ describe('adoptDevCompanion', () => {
     expect(connection.check).not.toHaveBeenCalled()
   })
 
-  test('does nothing without a session, as in builds and with OPENPENCIL_DEV_AGENTS=0', async () => {
+  test('does nothing without a session, as in builds and with PAIRDRAW_DEV_AGENTS=0', async () => {
     const connection = fakeConnection()
     expect(
       await adoptDevCompanion({ connection, session: null, serverURL: 'http://127.0.0.1:7600' })
@@ -90,7 +90,7 @@ describe('adoptDevCompanion', () => {
   })
 
   test.each([
-    ['a Portless address', 'https://mcp.open-pencil.localhost'],
+    ['a Portless address', 'https://mcp.pairdraw.localhost'],
     ['another host', 'http://192.168.1.2:7600'],
     ['no address', ''],
     ['a port out of range', 'http://127.0.0.1:70000']

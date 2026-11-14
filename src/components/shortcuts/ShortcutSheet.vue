@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef, watch } from 'vue'
 
-import { useCommandMessages, useCommonMessages } from '@open-pencil/vue/i18n'
+import { useCommandMessages, useCommonMessages } from '@pairdraw/vue/i18n'
 
 import type { ShortcutSheetSection } from '@/app/shell/keyboard/sheet'
 import { AppDialog } from '@/components/ui/dialog'

@@ -7,9 +7,9 @@ import { parseJSONTree, treeValue } from './json/tree'
 import { appendServerTable, removeServerTables, scanServer } from './toml'
 
 /**
- * Where a client's config stands on the `open-pencil` entry:
+ * Where a client's config stands on the `pairdraw` entry:
  * - `absent`: no entry; turning it on adds one.
- * - `added`: the entry starts `openpencil-mcp`.
+ * - `added`: the entry starts `pairdraw-mcp`.
  * - `custom`: the entry starts something else, such as a source checkout; turning it off removes it.
  * - `manual`: an entry written in a form Pairdraw does not rewrite, or Codex servers kept in an
  *   inline table, which no entry table can join.

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
-import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
+import { useI18n } from '@pairdraw/vue/i18n'
+import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
 
 import { convertScriptToLayers } from '@/app/code/script/convert'
 import { setScriptSource } from '@/app/code/script/create'

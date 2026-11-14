@@ -8,7 +8,7 @@ import IconLayoutTemplate from '~icons/lucide/layout-template'
 import IconPresentation from '~icons/lucide/presentation'
 import IconSmartphone from '~icons/lucide/smartphone'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { creationKinds, type CreationKindId } from '@/app/home/creation'
 import AppButton from '@/components/ui/button/AppButton.vue'

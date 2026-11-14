@@ -9,8 +9,8 @@ import {
 } from '#dom-css/export/index'
 import { toUint8Array } from 'js-base64'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { TRANSPARENT } from '@open-pencil/scene-graph/constants'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { TRANSPARENT } from '@pairdraw/scene-graph/constants'
 
 function element(node: DesignNode | undefined): DesignElement {
   if (node?.type !== 'element') throw new Error('Expected an element')
@@ -37,7 +37,7 @@ describe('layer attributes', () => {
       sceneNodeToDesignDocument(graph, card.id, { includeSourceIds: false }).children[0]
     )
     expect(plain.attrs['data-name']).toBeUndefined()
-    expect(plain.attrs['data-open-pencil-node-id']).toBeUndefined()
+    expect(plain.attrs['data-pairdraw-node-id']).toBeUndefined()
 
     const both = element(
       sceneNodeToDesignDocument(graph, card.id, {
@@ -46,7 +46,7 @@ describe('layer attributes', () => {
       }).children[0]
     )
     expect(both.attrs['data-name']).toBe('Pricing card')
-    expect(both.attrs['data-open-pencil-node-id']).toBe(card.id)
+    expect(both.attrs['data-pairdraw-node-id']).toBe(card.id)
   })
 
   test('a layer whose name only repeats its type has no name attribute', () => {
@@ -55,7 +55,7 @@ describe('layer attributes', () => {
       sceneNodeToDesignDocument(graph, card.id, { includeLayerNames: true }).children[0]
     )
     const child = element(root.children[0])
-    expect(child.attrs['data-open-pencil-node-id']).toBe(box.id)
+    expect(child.attrs['data-pairdraw-node-id']).toBe(box.id)
     expect(child.attrs['data-name']).toBeUndefined()
   })
 })
@@ -127,10 +127,10 @@ describe('HTML asset URLs', () => {
     })
     const page = String(bundle.files.find((file) => file.path === 'index.html')?.content)
     const css = String(
-      bundle.files.find((file) => file.path === 'Title #1.assets/openpencil.css')?.content
+      bundle.files.find((file) => file.path === 'Title #1.assets/pairdraw.css')?.content
     )
 
-    expect(page).toContain('href="Title%20%231.assets/openpencil.css"')
+    expect(page).toContain('href="Title%20%231.assets/pairdraw.css"')
     expect(bundle.files.map((file) => file.path)).toContain('Title #1.assets/fonts/inter-400.woff2')
     // Relative to the stylesheet, which sits in the same asset folder.
     expect(css).toContain('url("fonts/inter-400.woff2")')

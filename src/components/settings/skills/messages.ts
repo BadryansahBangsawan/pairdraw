@@ -1,4 +1,4 @@
-import { useAIMessages } from '@open-pencil/vue/i18n'
+import { useAIMessages } from '@pairdraw/vue/i18n'
 
 import { MAX_SKILL_DESCRIPTION_LENGTH, MAX_SKILL_NAME_LENGTH } from '@/app/ai/skills/parse'
 import { builtinSkillName, type BuiltinSkillName } from '@/app/ai/skills/sources/builtin'

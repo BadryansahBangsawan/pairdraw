@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-import type { ACPAgentDef, ACPAgentID } from '@open-pencil/core/constants'
+import type { ACPAgentDef, ACPAgentID } from '@pairdraw/core/constants'
 
 import { isSignedIn } from '@/app/ai/agents/acp/auth/status'
 
@@ -28,7 +28,7 @@ export type AgentConnectProblem =
   | 'sign-in'
   /** The sign-in ended, or was cancelled, without a login. */
   | 'signed-out'
-  /** A signed-in session did not reach OpenPencil's tools. */
+  /** A signed-in session did not reach Pairdraw's tools. */
   | 'tools'
   /** Making the agent the chat's provider failed. */
   | 'activate'
@@ -118,8 +118,8 @@ export function isOtherAdapter(
 }
 
 /**
- * Connects a coding agent in one action: finds it, installs its adapter and OpenPencil's MCP
- * server when missing, signs in when needed, checks that a session reaches OpenPencil's tools,
+ * Connects a coding agent in one action: finds it, installs its adapter and Pairdraw's MCP
+ * server when missing, signs in when needed, checks that a session reaches Pairdraw's tools,
  * and makes it the chat's provider. It stops at the first step that fails, and connecting again
  * resumes from that step; steps already satisfied finish without doing anything. An attempt that
  * may not install stops before installing anything, so a later one the person asks for can.

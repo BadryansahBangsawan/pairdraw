@@ -4,19 +4,19 @@ import { expectDefined } from '#core-tests/helpers/assert'
 import { collectAllNodes } from '#core-tests/helpers/fig/traversal'
 import { toUint8Array } from 'js-base64'
 
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph, type PluginDataEntry } from '@open-pencil/scene-graph'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph, type PluginDataEntry } from '@pairdraw/scene-graph'
 import {
   readBrowserNode,
   withBrowserNode,
   type BrowserNodeRecord
-} from '@open-pencil/scene-graph/browser-node'
-import { computeImageHash } from '@open-pencil/scene-graph/images'
+} from '@pairdraw/scene-graph/browser-node'
+import { computeImageHash } from '@pairdraw/scene-graph/images'
 import {
-  OPEN_PENCIL_PLUGIN_DATA,
-  OPEN_PENCIL_PLUGIN_ID
-} from '@open-pencil/scene-graph/plugin-data'
+  PAIRDRAW_PLUGIN_DATA,
+  PAIRDRAW_PLUGIN_ID
+} from '@pairdraw/scene-graph/plugin-data'
 
 setDefaultTimeout(60_000)
 
@@ -77,8 +77,8 @@ test('a file address is dropped on open and the picture stays', async () => {
   const graph = new SceneGraph()
   pageLayer(graph, 'Leaked', [
     {
-      pluginId: OPEN_PENCIL_PLUGIN_ID,
-      key: OPEN_PENCIL_PLUGIN_DATA.browserNode.key,
+      pluginId: PAIRDRAW_PLUGIN_ID,
+      key: PAIRDRAW_PLUGIN_DATA.browserNode.key,
       value: JSON.stringify({ ...RECORD, url: 'file:///etc/passwd' })
     }
   ])
@@ -91,7 +91,7 @@ test('a file address is dropped on open and the picture stays', async () => {
 
   expect(readBrowserNode(copy)).toBeNull()
   expect(
-    copy.pluginData.some((entry) => entry.key === OPEN_PENCIL_PLUGIN_DATA.browserNode.key)
+    copy.pluginData.some((entry) => entry.key === PAIRDRAW_PLUGIN_DATA.browserNode.key)
   ).toBe(false)
   expect(copy.fills[0]).toMatchObject({ type: 'IMAGE', imageHash: computeImageHash(PNG) })
   expect(JSON.stringify(copy.pluginData)).not.toContain('file:')

@@ -1,10 +1,10 @@
 import { converter, formatHex, formatHex8 } from 'culori'
 
-import { cssTokenProperty, cssValueTokens } from '@open-pencil/dom-css/export'
-import type { TokenUnit } from '@open-pencil/scene-graph'
-import { colorToCSS, parseDisplayableColor } from '@open-pencil/scene-graph/color'
-import type { Color } from '@open-pencil/scene-graph/primitives'
-import { tokenNumberFromUnit, tokenNumberInUnit } from '@open-pencil/scene-graph/variables'
+import { cssTokenProperty, cssValueTokens } from '@pairdraw/dom-css/export'
+import type { TokenUnit } from '@pairdraw/scene-graph'
+import { colorToCSS, parseDisplayableColor } from '@pairdraw/scene-graph/color'
+import type { Color } from '@pairdraw/scene-graph/primitives'
+import { tokenNumberFromUnit, tokenNumberInUnit } from '@pairdraw/scene-graph/variables'
 
 /** How a stylesheet writes a color, so a value written back keeps its notation. */
 export type ColorNotation =

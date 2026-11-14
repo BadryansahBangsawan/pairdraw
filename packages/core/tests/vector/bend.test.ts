@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { VectorNetwork, VectorSegment } from '@open-pencil/scene-graph'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { VectorNetwork, VectorSegment } from '@pairdraw/scene-graph'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { bendSegment } from '#core/vector/bend'
 import { evalCubic, segmentToAbsolute } from '#core/vector/curve-math'

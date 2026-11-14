@@ -6,10 +6,10 @@ import type {
   SharedStyleKind,
   StyleRun,
   Stroke
-} from '@open-pencil/scene-graph'
-import { copyFills } from '@open-pencil/scene-graph/copy'
-import { newStrokeGeometry } from '@open-pencil/scene-graph/node-defaults'
-import { SHARED_STYLE_FIELDS, sharedStyleRefKey } from '@open-pencil/scene-graph/shared-styles'
+} from '@pairdraw/scene-graph'
+import { copyFills } from '@pairdraw/scene-graph/copy'
+import { newStrokeGeometry } from '@pairdraw/scene-graph/node-defaults'
+import { SHARED_STYLE_FIELDS, sharedStyleRefKey } from '@pairdraw/scene-graph/shared-styles'
 
 import { rangeSharedStylePatch } from '#core/figma-api/text/bindings'
 

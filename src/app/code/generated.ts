@@ -1,13 +1,13 @@
-import { vectorElement } from '@open-pencil/core/io'
-import { selectionToJSXWithLayers } from '@open-pencil/design-jsx'
+import { vectorElement } from '@pairdraw/core/io'
+import { selectionToJSXWithLayers } from '@pairdraw/design-jsx'
 import {
   layerComponents,
   layerMarkup,
   type ComponentStyling,
   type IconPackage,
   type LayerComponent
-} from '@open-pencil/dom-css/export'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/dom-css/export'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { starterSourceFor, type CodeSource } from '@/app/code/templates'
 

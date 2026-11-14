@@ -1,8 +1,8 @@
 import { uniq } from 'es-toolkit/array'
 import * as v from 'valibot'
 
-import { AI_PROVIDERS } from '@open-pencil/core/constants'
-import type { AIProviderID, ModelOption } from '@open-pencil/core/constants'
+import { AI_PROVIDERS } from '@pairdraw/core/constants'
+import type { AIProviderID, ModelOption } from '@pairdraw/core/constants'
 
 import { cachedRemoteJSON } from '@/app/cache/remote'
 

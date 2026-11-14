@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { canHoldImageFill } from '@open-pencil/core/tools'
-import { vectorizableImageFill } from '@open-pencil/core/vector'
-import type { Fill } from '@open-pencil/scene-graph'
-import { useMediaMessages } from '@open-pencil/vue/i18n'
+import { canHoldImageFill } from '@pairdraw/core/tools'
+import { vectorizableImageFill } from '@pairdraw/core/vector'
+import type { Fill } from '@pairdraw/scene-graph'
+import { useMediaMessages } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { isImageAIRunning, openImageAIPrompt, removeImageBackground } from '@/app/editor/image-ai'

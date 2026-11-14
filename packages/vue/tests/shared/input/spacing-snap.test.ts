@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { createDefaultNode } from '@open-pencil/scene-graph/node-defaults'
+import { createEditor } from '@pairdraw/core'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
 
 import { resolveObjectPixelSnap, type ExplicitSnapTarget } from '#vue/shared/input/snap'
 

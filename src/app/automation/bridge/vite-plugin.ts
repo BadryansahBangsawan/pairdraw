@@ -8,9 +8,9 @@ import { join } from 'node:path'
 import { delay } from 'es-toolkit'
 import type { Plugin } from 'vite'
 
-import { serializeDisabledTools } from '@open-pencil/mcp/tools'
-import { platformHasUnixSockets } from '@open-pencil/mcp/transport'
-import { randomHex } from '@open-pencil/scene-graph/random'
+import { serializeDisabledTools } from '@pairdraw/mcp/tools'
+import { platformHasUnixSockets } from '@pairdraw/mcp/transport'
+import { randomHex } from '@pairdraw/scene-graph/random'
 
 import type { CompanionSession } from '../companion/connection'
 import {
@@ -22,7 +22,7 @@ import { waitForChildReady } from './child-ready'
 
 /**
  * The tab session the development server gives the MCP server it starts and, through
- * `__OPENPENCIL_LOCAL_AGENT_SESSION__`, its own tab, so the tab reaches the agent bridge without
+ * `__PAIRDRAW_LOCAL_AGENT_SESSION__`, its own tab, so the tab reaches the agent bridge without
  * a pairing link (`src/app/automation/companion/dev.ts`). It is the companion session the tab
  * adopts, without the port the tab already knows.
  */
@@ -51,28 +51,28 @@ export function createAutomationEnvironment(
   const { authToken, baseEnv, configuration, corsOrigin, discoveryPath, httpPort, socketPath } =
     options
   const childEnv = { ...baseEnv }
-  delete childEnv.OPENPENCIL_MCP_SOCKET
-  delete childEnv.OPENPENCIL_MCP_AUTH_TOKEN
+  delete childEnv.PAIRDRAW_MCP_SOCKET
+  delete childEnv.PAIRDRAW_MCP_AUTH_TOKEN
   // Only a session this server made, and handed its own tab, may start the agent bridge.
-  delete childEnv.OPENPENCIL_MCP_AGENTS
-  delete childEnv.OPENPENCIL_MCP_AGENT_SESSION
-  delete childEnv.OPENPENCIL_MCP_AGENT_TOKEN
+  delete childEnv.PAIRDRAW_MCP_AGENTS
+  delete childEnv.PAIRDRAW_MCP_AGENT_SESSION
+  delete childEnv.PAIRDRAW_MCP_AGENT_TOKEN
   const environment: NodeJS.ProcessEnv = {
     ...childEnv,
     PORT: String(httpPort),
-    OPENPENCIL_MCP_TCP: '1',
-    OPENPENCIL_MCP_AUTH_TOKEN: configuration.authenticationEnabled ? (authToken ?? '') : '',
-    OPENPENCIL_MCP_CORS_ORIGIN: corsOrigin,
-    OPENPENCIL_MCP_ROOT: configuration.rootDirectory.trim() || process.cwd(),
-    OPENPENCIL_MCP_DISABLED_TOOLS: serializeDisabledTools(configuration.disabledTools),
-    OPENPENCIL_MCP_SCOPE: configuration.scope
+    PAIRDRAW_MCP_TCP: '1',
+    PAIRDRAW_MCP_AUTH_TOKEN: configuration.authenticationEnabled ? (authToken ?? '') : '',
+    PAIRDRAW_MCP_CORS_ORIGIN: corsOrigin,
+    PAIRDRAW_MCP_ROOT: configuration.rootDirectory.trim() || process.cwd(),
+    PAIRDRAW_MCP_DISABLED_TOOLS: serializeDisabledTools(configuration.disabledTools),
+    PAIRDRAW_MCP_SCOPE: configuration.scope
   }
-  if (socketPath) environment.OPENPENCIL_MCP_SOCKET = socketPath
-  if (discoveryPath) environment.OPENPENCIL_MCP_DISCOVERY_PATH = discoveryPath
+  if (socketPath) environment.PAIRDRAW_MCP_SOCKET = socketPath
+  if (discoveryPath) environment.PAIRDRAW_MCP_DISCOVERY_PATH = discoveryPath
   if (options.agentSession) {
-    environment.OPENPENCIL_MCP_AGENTS = '1'
-    environment.OPENPENCIL_MCP_AGENT_SESSION = options.agentSession.token
-    environment.OPENPENCIL_MCP_AGENT_TOKEN = options.agentSession.agentToken
+    environment.PAIRDRAW_MCP_AGENTS = '1'
+    environment.PAIRDRAW_MCP_AGENT_SESSION = options.agentSession.token
+    environment.PAIRDRAW_MCP_AGENT_TOKEN = options.agentSession.agentToken
   }
   return environment
 }
@@ -221,7 +221,7 @@ export function automationPlugin(
   }
 
   async function startChild(): Promise<void> {
-    const runtimeDir = join(tmpdir(), 'open-pencil-mcp', safeRuntimeId(options.runtimeId))
+    const runtimeDir = join(tmpdir(), 'pairdraw-mcp', safeRuntimeId(options.runtimeId))
     await mkdir(runtimeDir, { recursive: true, mode: 0o700 })
     const socketPath = platformHasUnixSockets() ? join(runtimeDir, 'mcp.sock') : null
     const discoveryPath = join(runtimeDir, 'mcp.json')
@@ -230,7 +230,7 @@ export function automationPlugin(
     const spawnArgs = options.portlessServiceName
       ? ['run', '--name', options.portlessServiceName, ...command]
       : command.slice(1)
-    const readyMarker = `open-pencil-ready:${randomUUID()}`
+    const readyMarker = `pairdraw-ready:${randomUUID()}`
     const spawned = spawn(spawnCommand, spawnArgs, {
       stdio: ['ignore', 'inherit', 'pipe'],
       env: {
@@ -244,7 +244,7 @@ export function automationPlugin(
           httpPort: options.httpPort,
           socketPath
         }),
-        OPENPENCIL_MCP_READY_MARKER: readyMarker
+        PAIRDRAW_MCP_READY_MARKER: readyMarker
       }
     })
     const ready = waitForChildReady(spawned, readyMarker)
@@ -296,7 +296,7 @@ export function automationPlugin(
   }
 
   return {
-    name: 'open-pencil-automation',
+    name: 'pairdraw-automation',
     async configureServer(server) {
       server.middlewares.use(DEV_MCP_RESTART_PATH, (request, response, next) => {
         if (request.method !== 'POST') {

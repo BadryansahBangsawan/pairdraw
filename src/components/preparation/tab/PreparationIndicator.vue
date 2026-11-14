@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useFileMessages } from '@open-pencil/vue/i18n'
+import { useFileMessages } from '@pairdraw/vue/i18n'
 
 import type { EditorPreparationProgress } from '@/app/editor/preparation/types'
 import { preparationPercent } from '@/components/preparation/presentation'

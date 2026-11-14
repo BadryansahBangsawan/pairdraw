@@ -3,7 +3,7 @@ import { join } from 'node:path'
 
 import { FIXTURES } from '#cli-tests/helpers/paths'
 
-import { imageSize } from '@open-pencil/scene-graph/images'
+import { imageSize } from '@pairdraw/scene-graph/images'
 
 import { openHeadlessSession } from '#cli/session/open'
 import { findCLITool } from '#cli/session/tools'

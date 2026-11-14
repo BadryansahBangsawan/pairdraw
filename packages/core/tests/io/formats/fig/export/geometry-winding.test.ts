@@ -1,9 +1,9 @@
 import { expect, test } from 'bun:test'
 
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { resolveGeometryPaths } from '@open-pencil/fig/node-change'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { resolveGeometryPaths } from '@pairdraw/fig/node-change'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 test('decodes Kiwi ODD geometry as scene even-odd', () => {
   const paths = resolveGeometryPaths(

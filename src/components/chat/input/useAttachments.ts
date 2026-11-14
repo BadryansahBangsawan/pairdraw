@@ -2,8 +2,8 @@ import { useFileDialog } from '@vueuse/core'
 import { partition } from 'es-toolkit/array'
 import { computed, onBeforeUnmount, ref, type Ref } from 'vue'
 
-import type { Editor } from '@open-pencil/core'
-import { isSVGFile } from '@open-pencil/scene-graph/images'
+import type { Editor } from '@pairdraw/core'
+import { isSVGFile } from '@pairdraw/scene-graph/images'
 
 import { isAttachableFile } from '@/app/ai/attachment/accept'
 import {

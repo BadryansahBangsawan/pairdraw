@@ -1,4 +1,4 @@
-import type { Fill, SceneGraph, Stroke } from '@open-pencil/scene-graph'
+import type { Fill, SceneGraph, Stroke } from '@pairdraw/scene-graph'
 
 const solid = (r: number, g: number, b: number): Fill[] => [
   { type: 'SOLID', color: { r, g, b, a: 1 }, opacity: 1, visible: true }

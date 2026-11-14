@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import { useExploreMessages } from '@open-pencil/vue/i18n'
+import { useExploreMessages } from '@pairdraw/vue/i18n'
 
 import { useSelectedAgentNotes } from '@/app/ai/notes/selection'
 import IconButton from '@/components/ui/button/IconButton.vue'

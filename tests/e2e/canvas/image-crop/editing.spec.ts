@@ -27,7 +27,7 @@ test('a double-click opens the image without changing it, and Escape leaves', as
   await expect.poll(() => crop.editing()).toBeNull()
   // Escape leaves the mode before it clears the selection.
   expect(
-    await editor.page.evaluate(() => window.openPencil?.getStore?.().state.selectedIds.size)
+    await editor.page.evaluate(() => window.pairdraw?.getStore?.().state.selectedIds.size)
   ).toBe(1)
   expect(await crop.layer(nodeId)).toMatchObject({ mode: 'FILL', width: 200, height: 100 })
   editor.canvas.assertNoErrors()

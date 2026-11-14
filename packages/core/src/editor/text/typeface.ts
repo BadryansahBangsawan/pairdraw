@@ -2,9 +2,9 @@ import {
   FIGJAM_TYPEFACES,
   figJamTypefaceFields,
   type FigJamTypeface
-} from '@open-pencil/scene-graph/figjam'
-import { faceLoadKey } from '@open-pencil/scene-graph/font-style'
-import { generatedFrameText } from '@open-pencil/scene-graph/generated'
+} from '@pairdraw/scene-graph/figjam'
+import { faceLoadKey } from '@pairdraw/scene-graph/font-style'
+import { generatedFrameText } from '@pairdraw/scene-graph/generated'
 
 import { recordSubtreeEdit } from '#core/editor/components/slots/history'
 import type { NodeActions } from '#core/editor/nodes'

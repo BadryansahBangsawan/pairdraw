@@ -5,12 +5,9 @@ import type {
   SceneNode,
   ShadowEffect,
   Stroke
-} from '@open-pencil/scene-graph'
-import {
-  gradientTransformRows,
-  isIdentityGradientTransform
-} from '@open-pencil/scene-graph/gradient'
-import { isShaderPresetPaint, shaderOfPaint } from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph'
+import { gradientTransformRows, isIdentityGradientTransform } from '@pairdraw/scene-graph/gradient'
+import { isShaderPresetPaint, shaderOfPaint } from '@pairdraw/scene-graph/shaders'
 
 import { STROKE_ALIGN, STROKE_CAP, STROKE_JOIN } from '../enums'
 import { formatColor, formatShadow } from './helpers'

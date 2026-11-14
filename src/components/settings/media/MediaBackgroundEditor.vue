@@ -6,7 +6,7 @@ import {
   useCredentialMessages,
   useMediaMessages,
   useSettingsMessages
-} from '@open-pencil/vue/i18n'
+} from '@pairdraw/vue/i18n'
 
 import { REMOVE_BG_KEY_URL, REMOVE_BG_NAME } from '@/app/editor/image-ai'
 import { useBackgroundSettingsEditor } from '@/app/editor/image-ai/settings/background'

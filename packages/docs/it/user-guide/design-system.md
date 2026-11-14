@@ -66,17 +66,17 @@ Ora modifica un token o un componente principale, per esempio `radius/card` o il
 ## 5. Andare oltre
 
 - **Pubblicalo come libreria.** Apri **Risorse → Gestire le librerie → Pubblica libreria** perché altri file possano usare Button e Card e accettare gli aggiornamenti quando li modifichi ([Librerie di componenti](/user-guide/components#component-libraries)).
-- **Porta i token nel codice.** `openpencil tokens design-system.fig` stampa le variabili come proprietà personalizzate CSS, `--format tailwind` come tema Tailwind v4 e `--format dtcg --out tokens/` come file di design token W3C. L'esportazione HTML scrive i valori collegati come riferimenti `var()` alle stesse proprietà ([Esportare](./exporting)).
-- **Verificalo.** [Verificare i design](/user-guide/checking-designs) e `openpencil lint design-system.fig --fix -o fixed.fig` trovano i colori che corrispondono a un token ma non vi sono collegati, e li collegano.
-- **Tieni traccia delle modifiche.** Conserva il file in Git e rivedi le modifiche con [`openpencil diff files`](/it/programmable/cli/git).
+- **Porta i token nel codice.** `pairdraw tokens design-system.fig` stampa le variabili come proprietà personalizzate CSS, `--format tailwind` come tema Tailwind v4 e `--format dtcg --out tokens/` come file di design token W3C. L'esportazione HTML scrive i valori collegati come riferimenti `var()` alle stesse proprietà ([Esportare](./exporting)).
+- **Verificalo.** [Verificare i design](/user-guide/checking-designs) e `pairdraw lint design-system.fig --fix -o fixed.fig` trovano i colori che corrispondono a un token ma non vi sono collegati, e li collegano.
+- **Tieni traccia delle modifiche.** Conserva il file in Git e rivedi le modifiche con [`pairdraw diff files`](/it/programmable/cli/git).
 
 ## Generare l'esempio con uno script
 
-Il file di esempio è generato da questo script, che usa la stessa [API dei plugin compatibile con Figma](/it/programmable/cli/scripting) di `openpencil eval`. Eseguilo per creare il file da solo, oppure modificalo per provare i tuoi token:
+Il file di esempio è generato da questo script, che usa la stessa [API dei plugin compatibile con Figma](/it/programmable/cli/scripting) di `pairdraw eval`. Eseguilo per creare il file da solo, oppure modificalo per provare i tuoi token:
 
 ```sh
 echo '{"children":[]}' > empty.pen
-openpencil eval empty.pen --stdin -o design-system.fig < design-system.js
+pairdraw eval empty.pen --stdin -o design-system.fig < design-system.js
 ```
 
 <<< @/public/examples/design-system.js

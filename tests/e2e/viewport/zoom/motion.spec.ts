@@ -5,16 +5,16 @@ const editor = useEditorSetup('/?test&no-rulers&viewport-motion')
 
 async function zoom() {
   return editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return store.state.zoom
   })
 }
 
 test('zoom to 100% glides there instead of jumping', async () => {
   await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.state.zoom = 4
     store.requestRepaint()
   })
@@ -34,8 +34,8 @@ test('with reduced motion the view jumps', async () => {
     return promise
   })
   await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.state.zoom = 4
     store.requestRepaint()
   })

@@ -2,10 +2,10 @@ import { afterEach, describe, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { createEditor } from '@open-pencil/core'
-import { SkiaRenderer } from '@open-pencil/core/canvas'
-import { initCanvasKit } from '@open-pencil/core/io/formats/raster'
-import type { HyperlinkTarget } from '@open-pencil/scene-graph'
+import { createEditor } from '@pairdraw/core'
+import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
+import type { HyperlinkTarget } from '@pairdraw/scene-graph'
 
 /** A script address, which links must refuse; the tests never run it. */
 // eslint-disable-next-line no-script-url -- Rejection fixture; this URL is never executed.

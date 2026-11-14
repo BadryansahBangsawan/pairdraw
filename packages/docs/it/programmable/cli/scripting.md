@@ -5,12 +5,12 @@ description: Eseguire JavaScript con un’API compatibile con i plugin Figma per
 
 # Scripting
 
-`openpencil eval` esegue JavaScript su un documento e fornisce un oggetto globale `figma`. È utile per modifiche in serie, ispezione, dati di test e automazione senza aprire l’interfaccia dell’editor.
+`pairdraw eval` esegue JavaScript su un documento e fornisce un oggetto globale `figma`. È utile per modifiche in serie, ispezione, dati di test e automazione senza aprire l’interfaccia dell’editor.
 
 ## Uso di base
 
 ```sh
-openpencil eval design.fig -c "return figma.currentPage.children.length"
+pairdraw eval design.fig -c "return figma.currentPage.children.length"
 ```
 
 `-c` accetta JavaScript. Se il codice non inizia con `return`, Pairdraw lo esegue in una funzione asincrona e restituisce l’eventuale risultato.
@@ -18,7 +18,7 @@ openpencil eval design.fig -c "return figma.currentPage.children.length"
 ## Interrogare oggetti
 
 ```sh
-openpencil eval design.fig -c "return figma.currentPage.findAll((n) => n.type === 'FRAME')"
+pairdraw eval design.fig -c "return figma.currentPage.findAll((n) => n.type === 'FRAME')"
 ```
 
 ## Modificare e salvare
@@ -28,7 +28,7 @@ openpencil eval design.fig -c "return figma.currentPage.findAll((n) => n.type ==
 ## Script da stdin
 
 ```sh
-cat transform.js | openpencil eval design.fig --stdin --write
+cat transform.js | pairdraw eval design.fig --stdin --write
 ```
 
 ## Documento aperto

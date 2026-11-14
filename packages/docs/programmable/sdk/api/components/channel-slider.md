@@ -29,7 +29,7 @@ provides first-class OkHCL support.
 ```vue twoslash
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ChannelSliderRoot, ChannelSliderThumb, ChannelSliderTrack } from '@open-pencil/vue/primitives/ChannelSlider'
+import { ChannelSliderRoot, ChannelSliderThumb, ChannelSliderTrack } from '@pairdraw/vue/primitives/ChannelSlider'
 
 const chroma = ref(0.16)
 </script>

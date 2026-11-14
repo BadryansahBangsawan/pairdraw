@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { hasInstanceOverride } from '@open-pencil/scene-graph/instances'
-import { createResizeSnapshot } from '@open-pencil/scene-graph/resize'
+import { createEditor } from '@pairdraw/core'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { hasInstanceOverride } from '@pairdraw/scene-graph/instances'
+import { createResizeSnapshot } from '@pairdraw/scene-graph/resize'
 
 import { applyResize, cancelResizePreview, commitResizePreview } from '#vue/shared/input/resize'
 import type { DragResize } from '#vue/shared/input/types'

@@ -1,6 +1,6 @@
 import { generateText } from 'ai'
 
-import { isSVGFile } from '@open-pencil/scene-graph/images'
+import { isSVGFile } from '@pairdraw/scene-graph/images'
 
 import { VisionModelUnavailableError } from '@/app/ai/attachment/image/analyze'
 import { prepareImageAttachment, rasterizeSVGAttachment } from '@/app/ai/attachment/image/prepare'

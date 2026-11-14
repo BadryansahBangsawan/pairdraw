@@ -5,7 +5,7 @@ import * as v from 'valibot'
  * (`src/app/embed/protocol.ts`); the extension restates only what it sends and accepts, so a
  * protocol change fails the bridge tests instead of silently reaching the editor.
  */
-export const EMBED_PROTOCOL = 'openpencil-embed'
+export const EMBED_PROTOCOL = 'pairdraw-embed'
 export const EMBED_PROTOCOL_VERSION = 1
 
 export const embedReadySchema = v.object({

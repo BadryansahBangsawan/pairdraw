@@ -15,8 +15,8 @@ import {
 import { tv } from 'tailwind-variants'
 import IconChevronRight from '~icons/lucide/chevron-right'
 
-import type { MenuEntry } from '@open-pencil/vue/editor/menu-model'
-import { vTestId } from '@open-pencil/vue/testing'
+import type { MenuEntry } from '@pairdraw/vue/editor/menu-model'
+import { vTestId } from '@pairdraw/vue/testing'
 
 import { useAppMenu } from '@/app/shell/menu/app-menu'
 import {

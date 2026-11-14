@@ -2,7 +2,7 @@
  * The `script` tool's app side: code layers run in the sandbox, which only the app has, so the app
  * registers this host for its document. A headless host registers nothing and the tool says so.
  */
-import { registerScriptToolHost, type ScriptToolHost } from '@open-pencil/core/tools'
+import { registerScriptToolHost, type ScriptToolHost } from '@pairdraw/core/tools'
 
 import { setScriptSource } from '@/app/code/script/create'
 import { runScriptNode } from '@/app/code/script/run-node'

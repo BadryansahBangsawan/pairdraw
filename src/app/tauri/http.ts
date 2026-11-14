@@ -1,4 +1,4 @@
-import { randomHex } from '@open-pencil/scene-graph/random'
+import { randomHex } from '@pairdraw/scene-graph/random'
 
 import type { FetchFunction } from '@/app/http/types'
 

@@ -1,5 +1,5 @@
-import { editedGradientLayout, type GradientEdit } from '@open-pencil/core'
-import { hitTestGradientHandles } from '@open-pencil/core/geometry'
+import { editedGradientLayout, type GradientEdit } from '@pairdraw/core'
+import { hitTestGradientHandles } from '@pairdraw/core/geometry'
 
 import { useEditorStore } from '@/app/editor/active-store'
 

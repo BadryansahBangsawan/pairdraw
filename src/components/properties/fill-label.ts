@@ -1,7 +1,7 @@
-import type { Fill, Variable } from '@open-pencil/scene-graph'
-import { colorToHexRaw } from '@open-pencil/scene-graph/color'
-import { isShaderPresetPaint, type ShaderPaint } from '@open-pencil/scene-graph/shaders'
-import { shaderEffectLabel } from '@open-pencil/vue/controls/shader'
+import type { Fill, Variable } from '@pairdraw/scene-graph'
+import { colorToHexRaw } from '@pairdraw/scene-graph/color'
+import { isShaderPresetPaint, type ShaderPaint } from '@pairdraw/scene-graph/shaders'
+import { shaderEffectLabel } from '@pairdraw/vue/controls/shader'
 
 export function fillLabel(
   fill: Fill,

@@ -1,5 +1,5 @@
 {
-  "name": "@open-pencil/drawio",
+  "name": "@pairdraw/drawio",
   "version": "0.16.0",
   "license": "MIT",
   "type": "module",
@@ -27,7 +27,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/open-pencil/open-pencil.git",
+    "url": "git+https://github.com/BadryansahBangsawan/pairdraw.git",
     "directory": "packages/drawio"
   },
   "publishConfig": {

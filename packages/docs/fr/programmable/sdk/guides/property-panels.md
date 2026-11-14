@@ -5,7 +5,7 @@ description: Créer des panneaux de propriétés avec des composables et des com
 
 # Panneaux de propriétés
 
-`@open-pencil/vue` fournit principalement des composables pour les panneaux de propriétés.
+`@pairdraw/vue` fournit principalement des composables pour les panneaux de propriétés.
 
 Si un panneau utilise des valeurs calculées depuis la sélection et des actions pour les modifier, choisissez un composable. Pour une structure réutilisable de tableau ou de liste, utilisez un composant sans apparence imposée comme `PropertyListRoot`.
 
@@ -41,7 +41,7 @@ L’application Pairdraw affiche le nom de la variable en violet lorsque le cham
 
 ```vue
 <script setup lang="ts">
-import { usePosition } from '@open-pencil/vue/controls/position'
+import { usePosition } from '@pairdraw/vue/controls/position'
 
 const { x, y, width, height, updateProp, commitProp } = usePosition()
 </script>
@@ -60,9 +60,9 @@ const { x, y, width, height, updateProp, commitProp } = usePosition()
 
 ```vue
 <script setup lang="ts">
-import { PropertyListRoot } from '@open-pencil/vue/primitives/PropertyList'
-import { useEditorPropertyList } from '@open-pencil/vue/controls/property-list'
-import { useFillControls } from '@open-pencil/vue/controls/fill'
+import { PropertyListRoot } from '@pairdraw/vue/primitives/PropertyList'
+import { useEditorPropertyList } from '@pairdraw/vue/controls/property-list'
+import { useFillControls } from '@pairdraw/vue/controls/fill'
 
 const fillControls = useFillControls()
 const fills = useEditorPropertyList('fills')

@@ -1,6 +1,6 @@
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { layerRotates } from '@open-pencil/scene-graph/generated'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { layerRotates } from '@pairdraw/scene-graph/generated'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { NodePreview } from '#core/editor/node-preview'
 import type { EditorContext } from '#core/editor/types'

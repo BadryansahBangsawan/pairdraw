@@ -20,7 +20,7 @@ export type SkillPreferences = v.InferOutput<typeof skillPreferencesSchema>
 const storedPreferencesSchema = v.pipe(v.string(), v.parseJson(), skillPreferencesSchema)
 
 export const skillPreferences = useLocalStorage<SkillPreferences>(
-  'open-pencil:ai:skills',
+  'pairdraw:ai:skills',
   { sources: {}, skills: {}, trustedFolders: {}, pickedSources: {} },
   {
     serializer: {
@@ -53,7 +53,7 @@ export function isSkillsFolderTrusted(path: string, preferences: SkillPreference
  * off until picked.
  */
 const SOURCES_ON_BY_DEFAULT: Record<SkillSourceID, boolean> = {
-  openpencil: true,
+  pairdraw: true,
   project: true,
   agents: false,
   claude: false,

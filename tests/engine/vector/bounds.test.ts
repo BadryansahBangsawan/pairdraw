@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'bun:test'
 
-import { computeAccurateBounds } from '@open-pencil/core/vector'
+import { computeAccurateBounds } from '@pairdraw/core/vector'
 
 describe('computeAccurateBounds', () => {
   test('empty network', () => {

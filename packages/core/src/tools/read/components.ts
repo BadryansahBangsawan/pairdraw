@@ -1,7 +1,7 @@
 import * as v from 'valibot'
 
-import type { ComponentPropertyDefinition, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { isPreferredComponent } from '@open-pencil/scene-graph/slots'
+import type { ComponentPropertyDefinition, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { isPreferredComponent } from '@pairdraw/scene-graph/slots'
 
 import { getComponentCatalog } from '#core/tools/component-catalog'
 import { toolNumber, defineTool } from '#core/tools/schema'

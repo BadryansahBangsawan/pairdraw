@@ -2,8 +2,8 @@ import { afterEach, describe, expect, test } from 'bun:test'
 
 import { createPage } from '#web-capture-tests/dom'
 
-import type { WebCaptureElement, WebCaptureNode } from '@open-pencil/web-capture'
-import { captureElement, capturePage } from '@open-pencil/web-capture/capturer'
+import type { WebCaptureElement, WebCaptureNode } from '@pairdraw/web-capture'
+import { captureElement, capturePage } from '@pairdraw/web-capture/capturer'
 
 const STYLE = `
   .card { display: flex; flex-direction: column; gap: 8px; padding: 16px; color: #111111;
@@ -42,7 +42,7 @@ describe('capturing an element', () => {
     const capture = await captureElement(card, { inlineImages: false })
 
     expect(capture).toMatchObject({
-      format: 'openpencil/web-capture',
+      format: 'pairdraw/web-capture',
       version: 1,
       scope: 'element',
       source: { url: 'https://example.com/pricing/', title: 'Pricing' },

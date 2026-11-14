@@ -1,4 +1,4 @@
-import { figmaClipboardPayload } from '@open-pencil/fig/clipboard'
+import { figmaClipboardPayload } from '@pairdraw/fig/clipboard'
 
 import type { ClipboardPayload } from '@/app/editor/clipboard/system/types'
 

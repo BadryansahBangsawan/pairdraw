@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { parsePenDocument, penAssets, type PenNode } from '@open-pencil/pen'
-import { readShaderPaints } from '@open-pencil/scene-graph/shaders'
+import { parsePenDocument, penAssets, type PenNode } from '@pairdraw/pen'
+import { readShaderPaints } from '@pairdraw/scene-graph/shaders'
 
 import { getNodeOrThrow } from './helpers/assert'
 import { parseDocument } from './helpers/document'

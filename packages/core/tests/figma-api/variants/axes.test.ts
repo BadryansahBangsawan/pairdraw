@@ -4,8 +4,8 @@ import {
   FigmaAPI,
   type FigmaComponentSetNode,
   type FigmaNodeProxy
-} from '@open-pencil/core/figma-api'
-import { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/figma-api'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 // Recorded by running the same script in Figma desktop: variant edits through the Plugin API
 // rename the variants, instances follow, and the value lists follow the variants' names.

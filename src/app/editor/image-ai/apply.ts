@@ -1,8 +1,8 @@
-import { canHoldImageFill } from '@open-pencil/core/tools'
-import { vectorizableImageFill } from '@open-pencil/core/vector'
-import type { Fill, SceneNode } from '@open-pencil/scene-graph'
-import { TRANSPARENT } from '@open-pencil/scene-graph/constants'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import { canHoldImageFill } from '@pairdraw/core/tools'
+import { vectorizableImageFill } from '@pairdraw/core/vector'
+import type { Fill, SceneNode } from '@pairdraw/scene-graph'
+import { TRANSPARENT } from '@pairdraw/scene-graph/constants'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { EditorStore } from '@/app/editor/active-store'
 

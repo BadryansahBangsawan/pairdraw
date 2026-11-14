@@ -1,7 +1,7 @@
 import { ownValue } from './record'
 
 /**
- * The computed properties a capture keeps for each element: those `@open-pencil/dom-css` builds
+ * The computed properties a capture keeps for each element: those `@pairdraw/dom-css` builds
  * layers from, plus margins, which a capture turns into spacing when it is imported.
  */
 export const CAPTURED_STYLE_PROPERTIES = [

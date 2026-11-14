@@ -6,7 +6,7 @@ import { join } from 'node:path'
 import { CLI_ENTRY, FIXTURES } from '#cli-tests/helpers/paths'
 import * as v from 'valibot'
 
-import { imageSize } from '@open-pencil/scene-graph/images'
+import { imageSize } from '@pairdraw/scene-graph/images'
 
 setDefaultTimeout(120_000)
 
@@ -35,7 +35,7 @@ async function pageNames(file: string): Promise<string[]> {
 
 describe('shell CLI', () => {
   test('keeps one document loaded across piped lines and saves it with save()', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-shell-'))
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-shell-'))
     const output = join(dir, 'out.fig')
     const script = [
       'create_page {"name": "First"}',
@@ -54,7 +54,7 @@ describe('shell CLI', () => {
   })
 
   test('writes a preview PNG of the current page after each change', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-shell-preview-'))
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-shell-preview-'))
     const preview = join(dir, 'preview.png')
     const script = [
       'create_shape {"type": "RECTANGLE", "x": 0, "y": 0, "width": 120, "height": 80}',
@@ -70,7 +70,7 @@ describe('shell CLI', () => {
   })
 
   test('fails a piped script whose line failed, after running the rest', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-shell-fail-'))
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-shell-fail-'))
     const output = join(dir, 'out.fig')
     const script = ['not_a_tool', 'create_page {"name": "After"}', 'save()'].join('\n')
 

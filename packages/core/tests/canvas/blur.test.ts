@@ -1,15 +1,15 @@
 import { afterAll, describe, expect, test } from "bun:test";
 
-import { SkiaRenderer } from "@open-pencil/core/canvas";
+import { SkiaRenderer } from "@pairdraw/core/canvas";
 import {
   initCanvasKit,
   renderNodesToImage,
-} from "@open-pencil/core/io/formats/raster";
+} from "@pairdraw/core/io/formats/raster";
 import {
   SceneGraph,
   type ShadowEffect,
   type SceneNode,
-} from "@open-pencil/scene-graph";
+} from "@pairdraw/scene-graph";
 
 import { expectDefined } from "../helpers/assert";
 

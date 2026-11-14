@@ -1,8 +1,8 @@
 import type { CanvasKit } from 'canvaskit-wasm'
 
-import type { TailwindStylesheetLoader } from '@open-pencil/dom-css/export'
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import type { RenderColorSpace } from '@open-pencil/scene-graph/color'
+import type { TailwindStylesheetLoader } from '@pairdraw/dom-css/export'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import type { RenderColorSpace } from '@pairdraw/scene-graph/color'
 
 import type { SkiaRenderer } from '#core/canvas'
 import type { IconProvider } from '#core/icons'
@@ -143,7 +143,7 @@ export interface HTMLExportOptions {
   fonts?: 'assets' | 'none'
   /** Write each layer's name as a `data-name` attribute. Default true. */
   layerNames?: boolean
-  /** Write each layer's ID as a `data-open-pencil-node-id` attribute. Default false. */
+  /** Write each layer's ID as a `data-pairdraw-node-id` attribute. Default false. */
   layerIds?: boolean
   /** Reads Tailwind's stylesheets for a standalone Tailwind page where Node cannot, in browsers. */
   loadTailwindStylesheet?: TailwindStylesheetLoader

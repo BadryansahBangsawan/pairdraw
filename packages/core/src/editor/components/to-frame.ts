@@ -1,5 +1,5 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { removeComponentProperty } from '@open-pencil/scene-graph/components'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { removeComponentProperty } from '@pairdraw/scene-graph/components'
 
 import { getNodeEditCapability } from '#core/editor/capabilities'
 import { recordEdit } from '#core/editor/history/edit'

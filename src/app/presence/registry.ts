@@ -1,9 +1,9 @@
 import { shallowRef, type ShallowRef } from 'vue'
 
-import { computeContentBounds } from '@open-pencil/core/io/formats/raster'
-import { parseColor } from '@open-pencil/scene-graph/color'
-import type { Color } from '@open-pencil/scene-graph/primitives'
-import { randomHex } from '@open-pencil/scene-graph/random'
+import { computeContentBounds } from '@pairdraw/core/io/formats/raster'
+import { parseColor } from '@pairdraw/scene-graph/color'
+import type { Color } from '@pairdraw/scene-graph/primitives'
+import { randomHex } from '@pairdraw/scene-graph/random'
 
 import type { RemotePeer } from '@/app/collab/types'
 import type { EditorStore } from '@/app/editor/active-store'

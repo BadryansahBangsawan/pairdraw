@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import { materializeDocument } from '@open-pencil/fig'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import { materializeDocument } from '@pairdraw/fig'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { getNodeOrThrow } from '#tests/helpers/assert'
 

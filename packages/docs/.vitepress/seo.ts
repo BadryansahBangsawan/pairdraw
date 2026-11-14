@@ -73,7 +73,7 @@ export const siteHead: [string, Record<string, string>][] = [
   ['meta', { property: 'og:image:height', content: '1260' }],
   ['meta', { property: 'og:image:alt', content: 'Pairdraw — Open-Source Design Editor' }],
   ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-  ['meta', { name: 'twitter:site', content: '@openpencildev' }],
+  ['meta', { name: 'twitter:site', content: '@pairdrawdev' }],
   ['meta', { name: 'twitter:image', content: `${BASE}/social.png` }]
 ]
 

@@ -1,4 +1,4 @@
-import { extractFigThumbnailFromReader } from '@open-pencil/fig'
+import { extractFigThumbnailFromReader } from '@pairdraw/fig'
 
 import { readCacheBytes, removeCachePrefix, writeCacheBytes } from '@/app/cache'
 import { isFigArchiveName } from '@/app/document/io/names'

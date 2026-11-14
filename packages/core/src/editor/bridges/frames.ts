@@ -1,4 +1,4 @@
-import type { SceneGraph, SceneNode, NodeType } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode, NodeType } from '@pairdraw/scene-graph'
 
 import type { createSelectionActions } from '#core/editor/selection'
 import type { EditorContext } from '#core/editor/types'

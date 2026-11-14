@@ -1,8 +1,8 @@
 import { computed, ref, type Ref } from 'vue'
 
-import type { ComponentPropertyDefinition, SceneNode } from '@open-pencil/scene-graph'
-import { canCreateInstance, instanceMainComponent } from '@open-pencil/scene-graph/instances'
-import { instanceSwapOptions } from '@open-pencil/vue/controls/component-props'
+import type { ComponentPropertyDefinition, SceneNode } from '@pairdraw/scene-graph'
+import { canCreateInstance, instanceMainComponent } from '@pairdraw/scene-graph/instances'
+import { instanceSwapOptions } from '@pairdraw/vue/controls/component-props'
 
 import type { EditorStore } from '@/app/editor/session'
 

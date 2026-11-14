@@ -9,10 +9,10 @@ import {
   RECORD_HEADER_FIELDS
 } from '#fig/document/read'
 
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { deduplicateNodeChangePluginData } from '@open-pencil/kiwi/fig/parse'
-import { decodeWhole } from '@open-pencil/kiwi/schema-runtime'
-import { setIdSession, type SceneGraph } from '@open-pencil/scene-graph'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { deduplicateNodeChangePluginData } from '@pairdraw/kiwi/fig/parse'
+import { decodeWhole } from '@pairdraw/kiwi/schema-runtime'
+import { setIdSession, type SceneGraph } from '@pairdraw/scene-graph'
 
 const FIXTURE = 'gold-preview.fig'
 

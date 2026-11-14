@@ -1,11 +1,6 @@
-import { executeAtomicTool, isEmptyDocumentChange, type DocumentChange } from '@open-pencil/core'
-import type { FigmaAPI } from '@open-pencil/core/figma-api'
-import {
-  isAtomicTool,
-  toolChangesDocument,
-  toolFailure,
-  type ToolDef
-} from '@open-pencil/core/tools'
+import { executeAtomicTool, isEmptyDocumentChange, type DocumentChange } from '@pairdraw/core'
+import type { FigmaAPI } from '@pairdraw/core/figma-api'
+import { isAtomicTool, toolChangesDocument, toolFailure, type ToolDef } from '@pairdraw/core/tools'
 
 import {
   AI_UNDO_PREFIX,
@@ -32,7 +27,7 @@ export interface ReplyCall {
   toolCallId: string
 }
 
-/** One call of an OpenPencil tool, from the built-in chat, a coding agent, or another client. */
+/** One call of an Pairdraw tool, from the built-in chat, a coding agent, or another client. */
 export interface EditorToolCall {
   store: EditorStore
   figma: FigmaAPI
@@ -149,7 +144,7 @@ async function editAndRecord(call: EditorToolCall, reply: ReplyCall | null): Pro
 }
 
 /**
- * Runs one call of an OpenPencil tool. An edit runs alone in its document, is recorded as one
+ * Runs one call of an Pairdraw tool. An edit runs alone in its document, is recorded as one
  * undo entry, and, for a call that belongs to a chat reply, joins the reply's run so the reply
  * can revert it and the transcript shows what it changed.
  */

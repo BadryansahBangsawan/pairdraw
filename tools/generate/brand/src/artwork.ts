@@ -28,14 +28,10 @@ export function recolor(
     for (const [part, color] of Object.entries(artwork.darkPalette)) {
       for (const path of svg.find(`[data-part="${part}"]`)) path.fill(color)
     }
-    if (artwork.darkGridOpacity !== undefined) {
-      for (const grid of svg.find('[data-detail="grid"]')) grid.opacity(artwork.darkGridOpacity)
-    }
     return svg.svg()
   }
   const color = { mono: artwork.ink, 'mono-dark': artwork.paper, tile: artwork.tileMark }[mode]
   if (color === undefined) return source
-  for (const detail of svg.find('[data-detail]')) detail.remove()
   for (const path of svg.find('[data-part]')) path.fill(color)
   return svg.svg()
 }

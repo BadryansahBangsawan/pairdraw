@@ -1,10 +1,10 @@
-import { OPEN_PENCIL_MCP_SERVER } from '@open-pencil/core/constants'
+import { PAIRDRAW_MCP_SERVER } from '@pairdraw/core/constants'
 
-/** The command `npm install -g @open-pencil/mcp` puts on the PATH, which clients start. */
-export const MCP_CLIENT_COMMAND = 'openpencil-mcp'
+/** The command `npm install -g @pairdraw/mcp` puts on the PATH, which clients start. */
+export const MCP_CLIENT_COMMAND = 'pairdraw-mcp'
 
 /** The name every client knows the server by, so its tool names match the docs. */
-export const MCP_CLIENT_ENTRY = OPEN_PENCIL_MCP_SERVER
+export const MCP_CLIENT_ENTRY = PAIRDRAW_MCP_SERVER
 
 const MCP_CLIENT_IDS = [
   'claude-code',

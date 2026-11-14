@@ -6,7 +6,7 @@ import { join } from 'node:path'
 import { CLI_ENTRY, FIXTURES } from '#cli-tests/helpers/paths'
 import * as v from 'valibot'
 
-import { imageSize } from '@open-pencil/scene-graph/images'
+import { imageSize } from '@pairdraw/scene-graph/images'
 
 setDefaultTimeout(60_000)
 
@@ -46,7 +46,7 @@ describe('tool CLI', () => {
   })
 
   test('calls a write tool headlessly and saves the result with --output', async () => {
-    const outPath = join(await mkdtemp(join(tmpdir(), 'open-pencil-tool-')), 'out.fig')
+    const outPath = join(await mkdtemp(join(tmpdir(), 'pairdraw-tool-')), 'out.fig')
     const created = await cli([
       'tool',
       'call',
@@ -84,7 +84,7 @@ describe('tool CLI', () => {
   })
 
   test('--preview-output writes a PNG of the current page after a change', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-tool-preview-'))
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-tool-preview-'))
     const preview = join(dir, 'preview.png')
     const shape = '{"type":"RECTANGLE","x":0,"y":0,"width":120,"height":80}'
     const created = await cli([

@@ -7,7 +7,7 @@ import type {
   ComponentPropertyReference,
   SceneGraph,
   SceneNode
-} from '@open-pencil/scene-graph'
+} from '@pairdraw/scene-graph'
 import {
   applyComponentPropertyValue,
   componentPropertyDefinitions,
@@ -15,13 +15,13 @@ import {
   exposableInstances,
   exposedInstances,
   instanceExposureIssue
-} from '@open-pencil/scene-graph/components'
-import { instanceMainComponent } from '@open-pencil/scene-graph/instances'
+} from '@pairdraw/scene-graph/components'
+import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 
 import { DESIGN_JSX_SUPPORTED_PROPERTIES } from './definitions'
 import { parseScriptInput } from './schema'
 
-const PROPERTY_SYMBOL = Symbol.for('open-pencil.component-property')
+const PROPERTY_SYMBOL = Symbol.for('pairdraw.component-property')
 
 /**
  * A component property, by its name in the component that holds it. Where it is placed picks

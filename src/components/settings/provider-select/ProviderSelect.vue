@@ -2,11 +2,11 @@
 import { promiseTimeout } from '@vueuse/core'
 import { computed, onMounted, ref } from 'vue'
 
-import { ACP_AGENTS, AI_PROVIDERS, IS_TAURI, type AIProviderID } from '@open-pencil/core/constants'
-import { useAIMessages } from '@open-pencil/vue/i18n'
+import { ACP_AGENTS, AI_PROVIDERS, IS_TAURI, type AIProviderID } from '@pairdraw/core/constants'
+import { useAIMessages } from '@pairdraw/vue/i18n'
 
 import { modelProviderName } from '@/app/ai/models/provider-name'
-import { OPENPENCIL_AI_PROVIDER } from '@/app/ai/providers/openpencil/provider'
+import { PAIRDRAW_AI_PROVIDER } from '@/app/ai/providers/pairdraw/provider'
 import { automationHTTPURL } from '@/app/automation/mcp/spawn'
 import { cloudAIAvailable } from '@/app/cloud/integration'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
@@ -92,9 +92,9 @@ const groups = computed(() => {
         // Signing in returns to a port on this computer, which only the desktop app can open.
         (IS_TAURI || !provider.signInOnly) &&
         // Cloud's AI service is offered while the Home server has one, and kept when chosen.
-        (provider.id !== OPENPENCIL_AI_PROVIDER ||
+        (provider.id !== PAIRDRAW_AI_PROVIDER ||
           cloudAIAvailable.value ||
-          providerID.value === OPENPENCIL_AI_PROVIDER)
+          providerID.value === PAIRDRAW_AI_PROVIDER)
     )
       .map((provider) => ({
         value: provider.id,

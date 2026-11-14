@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { createDefaultNode } from '@open-pencil/scene-graph/node-defaults'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
 
 import { drawLayoutGrids } from '#core/canvas/layout-grids'
 

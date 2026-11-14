@@ -3,9 +3,9 @@
  * controls the panel shows. Parsing is pure, so a script's controls are known without running it,
  * and a malformed line is skipped rather than breaking every other input.
  */
-import { BLACK } from '@open-pencil/scene-graph/constants'
-import type { Color } from '@open-pencil/scene-graph/primitives'
-import type { ScriptInputKind, ScriptInputValue } from '@open-pencil/scene-graph/script'
+import { BLACK } from '@pairdraw/scene-graph/constants'
+import type { Color } from '@pairdraw/scene-graph/primitives'
+import type { ScriptInputKind, ScriptInputValue } from '@pairdraw/scene-graph/script'
 
 /** One declared input, as the panel builds a control from it. */
 export interface ScriptInputDeclaration {

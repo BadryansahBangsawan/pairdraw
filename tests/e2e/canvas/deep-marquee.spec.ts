@@ -13,8 +13,8 @@ let canvas: CanvasHelper
 /** A board holding a filled card with a title and an icon, and a badge beside the card. */
 function buildScene(page: Page) {
   return page.evaluate((pan) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const pageId = store.state.currentPageId
     const white = {
       type: 'SOLID' as const,
@@ -70,7 +70,7 @@ function buildScene(page: Page) {
 
 function selection(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     return [...(store?.state.selectedIds ?? [])]
       .map((id) => store?.graph.getNode(id)?.name ?? '')
       .toSorted()
@@ -80,7 +80,7 @@ function selection(page: Page) {
 /** Where the named layer sits in its parent. */
 function position(page: Page, name: string) {
   return page.evaluate((layerName) => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     const node = [...(store?.graph.nodes.values() ?? [])].find((n) => n.name === layerName)
     return node ? { x: node.x, y: node.y } : null
   }, name)

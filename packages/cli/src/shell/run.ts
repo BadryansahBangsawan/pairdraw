@@ -1,6 +1,6 @@
 import { basename, extname } from 'node:path'
 
-import { toolChangesDocument, type ToolDef } from '@open-pencil/core/tools'
+import { toolChangesDocument, type ToolDef } from '@pairdraw/core/tools'
 
 import { bold, dim, fail, fmtList, ok, warn } from '#cli/format'
 import type { ToolSession } from '#cli/session/open'

@@ -1,16 +1,16 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 import {
   readBrowserNode,
   settleBrowserNodeData,
   withBrowserNode,
   type BrowserNodeRecord
-} from '@open-pencil/scene-graph/browser-node'
+} from '@pairdraw/scene-graph/browser-node'
 import {
-  OPEN_PENCIL_PLUGIN_DATA,
-  OPEN_PENCIL_PLUGIN_ID
-} from '@open-pencil/scene-graph/plugin-data'
+  PAIRDRAW_PLUGIN_DATA,
+  PAIRDRAW_PLUGIN_ID
+} from '@pairdraw/scene-graph/plugin-data'
 
 const RECORD: BrowserNodeRecord = {
   url: 'https://example.com/docs',
@@ -49,8 +49,8 @@ describe('browser node data', () => {
   test('opening drops a snapshot whose address is not a page and keeps every other entry', () => {
     const other = { pluginId: 'pen', key: 'pen/url', value: '"file:///etc/passwd"' }
     const bad = {
-      pluginId: OPEN_PENCIL_PLUGIN_ID,
-      key: OPEN_PENCIL_PLUGIN_DATA.browserNode.key,
+      pluginId: PAIRDRAW_PLUGIN_ID,
+      key: PAIRDRAW_PLUGIN_DATA.browserNode.key,
       value: JSON.stringify({ ...RECORD, url: 'file:///etc/passwd' })
     }
     const settled = settleBrowserNodeData([other, bad])

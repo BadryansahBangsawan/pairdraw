@@ -1,6 +1,6 @@
 ---
 title: Низкоуровневые API
-description: Специализированные публичные API пакета @open-pencil/vue.
+description: Специализированные публичные API пакета @pairdraw/vue.
 ---
 
 # Низкоуровневые API

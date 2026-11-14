@@ -1,6 +1,6 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { resolveComponentPropertyValue } from '@open-pencil/scene-graph/components'
-import { canCreateInstance } from '@open-pencil/scene-graph/instances'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { resolveComponentPropertyValue } from '@pairdraw/scene-graph/components'
+import { canCreateInstance } from '@pairdraw/scene-graph/instances'
 
 import { pathTextEditChanges } from '#core/editor/text/path-edit'
 import type { EditorContext } from '#core/editor/types'

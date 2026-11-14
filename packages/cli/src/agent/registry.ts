@@ -1,4 +1,4 @@
-import type { ToolDef } from '@open-pencil/core/tools'
+import type { ToolDef } from '@pairdraw/core/tools'
 
 /**
  * A named agent a run can put in a team. Each one works the same prompt from its own role, over
@@ -10,7 +10,7 @@ import type { ToolDef } from '@open-pencil/core/tools'
  */
 export interface AgentProfile {
   id: string
-  /** One line for `openpencil agent list`. */
+  /** One line for `pairdraw agent list`. */
   description: string
   /** What this agent is told it is, appended to the run's system prompt. */
   systemPrompt: string

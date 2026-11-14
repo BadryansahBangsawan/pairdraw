@@ -4,7 +4,7 @@ Pairdraw Cloud is an optional, self-hostable backend for storing, sharing, and c
 documents. The editor stays local-first: opening, editing, and saving local files never needs this
 package, a network connection, or an account.
 
-`@open-pencil/cloud` holds the network contracts, a typed client, a runtime-neutral Hono server, and
+`@pairdraw/cloud` holds the network contracts, a typed client, a runtime-neutral Hono server, and
 two runtimes that wire PostgreSQL, S3-compatible storage, email, and background work into it: a Node
 process, and Cloudflare Workers.
 
@@ -25,16 +25,16 @@ flowchart LR
 
 | Subpath                           | Contents                                                                   |
 | --------------------------------- | -------------------------------------------------------------------------- |
-| `@open-pencil/cloud/contract`     | Valibot schemas and types shared by every side of the network              |
-| `@open-pencil/cloud/client`       | Discovery, authentication, device authorization, and the typed Hono client |
-| `@open-pencil/cloud/email`        | Vue Email rendering for transactional mail                                 |
-| `@open-pencil/cloud/server`       | Hono routes and services; every dependency is injected                     |
-| `@open-pencil/cloud/runtime/node` | PostgreSQL, S3, SMTP, the HTTP listener, workers, and operator commands    |
+| `@pairdraw/cloud/contract`     | Valibot schemas and types shared by every side of the network              |
+| `@pairdraw/cloud/client`       | Discovery, authentication, device authorization, and the typed Hono client |
+| `@pairdraw/cloud/email`        | Vue Email rendering for transactional mail                                 |
+| `@pairdraw/cloud/server`       | Hono routes and services; every dependency is injected                     |
+| `@pairdraw/cloud/runtime/node` | PostgreSQL, S3, SMTP, the HTTP listener, workers, and operator commands    |
 
 The Cloudflare runtime, `src/runtime/cloudflare`, isn't a subpath: Wrangler bundles it from
 a deployment folder, type-checked against the Workers types by its own `tsconfig.json`.
 `deploy/cloudflare` is the folder self-hosters copy; the official deployments are filled-in copies
-under `deploy/openpencil/<target>`, which the Deploy Cloud workflow deploys with the secrets of the
+under `deploy/pairdraw/<target>`, which the Deploy Cloud workflow deploys with the secrets of the
 `cloud-<target>` GitHub environment. A new target needs its folder, that environment, and an option
 in the workflow.
 
@@ -285,14 +285,14 @@ back to the editor.
 framed. Both runtimes put the API behind the same Hono router, `createCloudServer` in
 `src/runtime/site`, which answers portal pages before the API, and only where the API returns 404
 the site's files, then the editor's `index.html` for any other page, so the editor's router keeps
-its own addresses. Node reads the build named by `OPENPENCIL_CLOUD_SITE_DIR`, and the Worker reads
+its own addresses. Node reads the build named by `PAIRDRAW_CLOUD_SITE_DIR`, and the Worker reads
 its static assets. `bun run cloud:dev` builds nothing: it runs Vite's development server for the
 site under its own portless name and points the Node server at it with
-`OPENPENCIL_CLOUD_DEV_SITE_URL`, so the server takes each file from source, uncached, and pages
+`PAIRDRAW_CLOUD_DEV_SITE_URL`, so the server takes each file from source, uncached, and pages
 update in place. Vite's update socket connects to its own address, since the server accepts
 WebSockets only for collaboration.
 
-The editor a server serves knows it from the build (`__OPENPENCIL_CLOUD_SITE__`). Before it boots,
+The editor a server serves knows it from the build (`__PAIRDRAW_CLOUD_SITE__`). Before it boots,
 it asks who is signed in: an account that may use the server gets the editor, and anyone else at
 the root goes to `/welcome`, which signs them in, sends an account waiting for review to its
 standing page, or opens the editor without an account; this browser then keeps that choice.
@@ -301,11 +301,11 @@ Links to documents, shared files, and invitations always open the editor, which 
 and an unreachable server does too, since the editor works without it. The editor adds its server at startup and reaches it with the
 server's own sign-in session, and the portal leaves for the editor as a page load, never through
 its router. An official deployment builds the editor with its own address as
-`VITE_OPENPENCIL_OFFICIAL_CLOUD_URL`, so staging is the official server in its own editor.
+`VITE_PAIRDRAW_OFFICIAL_CLOUD_URL`, so staging is the official server in its own editor.
 
 ## Editor client
 
-The editor treats each Cloud server as a profile of the `openpencil-cloud` storage provider, with a
+The editor treats each Cloud server as a profile of the `pairdraw-cloud` storage provider, with a
 workspace as the container, so the sync engine, recent files, and tabs handle Cloud documents the
 way they handle a bucket. A server's id is hex from its address, which also names its credentials.
 Email and password sign in inside the connect dialog wherever the server accepts the editor's
@@ -501,9 +501,9 @@ says whether it is for a document or a workspace, so one link format, one email 
 editor dialog cover both, and the desktop app's link handling needs no new kind. Invitation
 continuations through OAuth stay document-only; the editor keeps a pending invitation itself.
 
-**2026-10 · Cloud links hand off to the desktop app through `openpencil://cloud`.** Links stay web
+**2026-10 · Cloud links hand off to the desktop app through `pairdraw://cloud`.** Links stay web
 addresses on the server's editor, so they work for anyone; the web editor on a computer offers the
-desktop app, which gets the web link as `openpencil://cloud?url=<link>#<secret>`. The native side
+desktop app, which gets the web link as `pairdraw://cloud?url=<link>#<secret>`. The native side
 checks the link, ID, and secret before the editor sees it. The secret is
 visible in the launch arguments to other processes on the same computer; pasting links into the
 app would avoid that at the cost of a manual step for everyone.
@@ -512,7 +512,7 @@ app would avoid that at the cost of a manual step for everyone.
 administration, and the pages the server serves are Apache-2.0 for its patent grant; the protocol
 in `contract` and `client` stays MIT, so the editor and other clients stay MIT. `REUSE.toml` maps
 the paths rather than a separate package, which would have moved the protocol out of
-`packages/cloud` for no legal gain. `VITE_OPENPENCIL_CLOUD=off` swaps Cloud's two entry points for
+`packages/cloud` for no legal gain. `VITE_PAIRDRAW_CLOUD=off` swaps Cloud's two entry points for
 stand-ins, and `check:cloud-off` proves that build bundles none of Cloud.
 
 **2026-10 · History is versions over revisions, compacted on the server.** Every save stays a
@@ -549,7 +549,7 @@ shared link `/share/:id`, and an invitation `/invitations/:id` on the server tha
 no `server` parameter and no `/cloud` prefix, and the server has no separate editor address to
 send them to. Peer-to-peer rooms move to `/rooms/:id` so "share" names a shared document. The
 cost is that a browser editor at any other address cannot keep a Cloud document in its address
-bar; every server serves its own editor, and the desktop app gets links through `openpencil://`.
+bar; every server serves its own editor, and the desktop app gets links through `pairdraw://`.
 
 **2026-10 · A link shows nothing until its document does.** A document link asks someone signed
 out to sign in on the server's page before the editor loads, and comes back to the document. A

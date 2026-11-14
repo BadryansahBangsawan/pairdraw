@@ -7,16 +7,16 @@ import {
   type Fill,
   type ShadowEffect,
   type ShaderEffect
-} from '@open-pencil/scene-graph'
+} from '@pairdraw/scene-graph'
 import {
   arrowCapOverflow,
   collectArrowEndpoints,
   hasTrimmedShaft,
   trimArrowShafts
-} from '@open-pencil/scene-graph/arrow-caps'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Color } from '@open-pencil/scene-graph/primitives'
-import { textLinesOverflow } from '@open-pencil/scene-graph/text'
+} from '@pairdraw/scene-graph/arrow-caps'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Color } from '@pairdraw/scene-graph/primitives'
+import { textLinesOverflow } from '@pairdraw/scene-graph/text'
 
 import { createSceneGeometry, nodeOrientationMatrix, projectedNode } from '#core/geometry'
 import { shownText } from '#core/text/case'

@@ -1,5 +1,5 @@
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { createComponentPropertyId } from '@open-pencil/scene-graph/components'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { createComponentPropertyId } from '@pairdraw/scene-graph/components'
 import {
   canCreateSlot,
   claimSlotContent,
@@ -7,7 +7,7 @@ import {
   slotOwner,
   slotScope,
   updateSlotProperty
-} from '@open-pencil/scene-graph/slots'
+} from '@pairdraw/scene-graph/slots'
 
 import type { Build } from './nodes'
 import type { PenNode } from './schema'

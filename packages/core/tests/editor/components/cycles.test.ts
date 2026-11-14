@@ -2,8 +2,8 @@ import { expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { createEditor } from '@open-pencil/core'
-import { FigmaAPI } from '@open-pencil/core/figma-api'
+import { createEditor } from '@pairdraw/core'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
 
 /** Button holds an Inner frame; Card shows a Button. */
 function setup() {

@@ -8,23 +8,23 @@ import type {
   DrawIOPage,
   DrawIOPoint,
   DrawIOStyle
-} from '@open-pencil/drawio'
-import type { ConnectorEndpoint, SceneGraph, SceneNode, StrokeCap } from '@open-pencil/scene-graph'
-import { colorToHex } from '@open-pencil/scene-graph/color'
+} from '@pairdraw/drawio'
+import type { ConnectorEndpoint, SceneGraph, SceneNode, StrokeCap } from '@pairdraw/scene-graph'
+import { colorToHex } from '@pairdraw/scene-graph/color'
 import {
   connectorRoute,
   connectorRouteEnds,
   connectorSublayers,
   curveMidpoint
-} from '@open-pencil/scene-graph/connectors'
-import { getParentWorldMatrix, getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
+} from '@pairdraw/scene-graph/connectors'
+import { getParentWorldMatrix, getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
 import {
   isGeneratedFrame,
   shapeWithTextLabel,
   stickySublayers
-} from '@open-pencil/scene-graph/generated'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/generated'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { computeContentBounds } from '#core/io/formats/raster'
 import { renderNodesToSVG } from '#core/io/formats/svg'

@@ -1,12 +1,12 @@
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { headlessHTMLStyler } from '@open-pencil/core/io/formats/html/import'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { headlessHTMLStyler } from '@pairdraw/core/io/formats/html/import'
 import {
   createCanvasKitRasterCodec,
   headlessRenderNodes,
   initCanvasKit
-} from '@open-pencil/core/io/formats/raster'
-import { ALL_TOOLS, registerHTMLToolHost, type ToolDef } from '@open-pencil/core/tools'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/io/formats/raster'
+import { ALL_TOOLS, registerHTMLToolHost, type ToolDef } from '@pairdraw/core/tools'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
 import { appTargetRPCArgs, type AppTargetCLIArgs } from '#cli/app/target'

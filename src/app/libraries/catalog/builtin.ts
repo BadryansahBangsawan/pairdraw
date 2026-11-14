@@ -10,7 +10,7 @@ import {
   type LibraryCatalog,
   type LibrarySummary,
   type PublishLibraryInput
-} from '@open-pencil/core/library'
+} from '@pairdraw/core/library'
 
 interface PromiseSlot<T> {
   current?: Promise<T>

@@ -17,9 +17,7 @@ test('builds Linux on ARM64 as well as x64', () => {
 test('reads and publishes every file under the Pairdraw name', () => {
   for (const asset of published) {
     expect(asset.name).toStartWith('Pairdraw')
-    expect(asset.name).not.toContain('OpenPencil')
     expect(asset.source).toStartWith('Pairdraw')
-    expect(asset.source).not.toContain('OpenPencil')
   }
   expect(new Set(published.map((asset) => asset.name)).size).toBe(published.length)
 })

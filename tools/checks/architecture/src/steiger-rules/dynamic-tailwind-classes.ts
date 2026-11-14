@@ -157,11 +157,11 @@ export function vueTemplateGuardrailDiagnostics(sourceRel: string, content: stri
 }
 
 export const noVueTemplateUIHooksOrSVG = createTextRule(
-  'open-pencil/no-vue-template-ui-hooks-or-svg',
+  'pairdraw/no-vue-template-ui-hooks-or-svg',
   vueTemplateGuardrailDiagnostics
 )
 
 export const noDynamicTailwindStateClasses = createTextRule(
-  'open-pencil/no-dynamic-tailwind-state-classes',
+  'pairdraw/no-dynamic-tailwind-state-classes',
   dynamicClassDiagnostics
 )

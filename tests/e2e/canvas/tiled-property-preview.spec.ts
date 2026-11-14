@@ -13,7 +13,7 @@ test.use({ viewport: { width: 1400, height: 900 }, deviceScaleFactor: 1 })
 
 async function settle(page: Page) {
   await page.evaluate(async () => {
-    const hooks = window.openPencil?.test?.navigation
+    const hooks = window.pairdraw?.test?.navigation
     if (!hooks) throw new Error('Navigation hooks unavailable')
     await hooks.waitForSettlement()
   })
@@ -21,7 +21,7 @@ async function settle(page: Page) {
 
 async function takeRecording(page: Page) {
   return page.evaluate(() => {
-    const hooks = window.openPencil?.test?.navigation
+    const hooks = window.pairdraw?.test?.navigation
     if (!hooks) throw new Error('Navigation hooks unavailable')
     const recording = hooks.stopRecording()
     hooks.startRecording('next-phase')
@@ -48,7 +48,7 @@ function expectTiledSubmission(
 
 async function sceneVersion(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
     return store.state.sceneVersion
   })
@@ -61,7 +61,7 @@ async function crop(page: Page) {
 
 async function directReference(page: Page) {
   const probe = await page.evaluateHandle(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
     const renderer = store.canvasRenderers.find((r) => r.tracksSceneSettlement)
     if (!renderer) throw new Error('Scene renderer unavailable')
@@ -86,8 +86,8 @@ test.beforeEach(async ({ page }, testInfo) => {
   await page.goto('/?test&no-rulers&renderer=tiled&navigation-benchmark')
   await new CanvasHelper(page).waitForInit()
   await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    const hooks = window.openPencil?.test?.navigation
+    const store = window.pairdraw?.getStore?.()
+    const hooks = window.pairdraw?.test?.navigation
     if (!store || !hooks) throw new Error('Editor unavailable')
     hooks.startRecording('tiled-property-preview')
     store.setZoomAroundPoint(1, 0, 0)
@@ -111,7 +111,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 })
 
 test.afterEach(async ({ page }) => {
-  await page.evaluate(() => window.openPencil?.test?.navigation?.stopRecording())
+  await page.evaluate(() => window.pairdraw?.test?.navigation?.stopRecording())
 })
 
 for (const [property, label] of [
@@ -132,9 +132,9 @@ for (const [property, label] of [
       await page.mouse.move(x + 24, y, { steps: 4 })
       await expect(field).not.toHaveAttribute('aria-valuenow', String(before))
       expect(await sceneVersion(page)).toBe(version)
-      expect(
-        await page.evaluate(() => window.openPencil?.getStore?.().isInteractiveEditing())
-      ).toBe(true)
+      expect(await page.evaluate(() => window.pairdraw?.getStore?.().isInteractiveEditing())).toBe(
+        true
+      )
     } finally {
       await page.mouse.up()
     }
@@ -155,7 +155,7 @@ for (const [property, label] of [
     await settle(page)
     expect((await crop(page)).equals(committedPixels)).toBe(true)
     const cancelledVersion = await sceneVersion(page)
-    expect(await page.evaluate(() => window.openPencil?.getStore?.().isInteractiveEditing())).toBe(
+    expect(await page.evaluate(() => window.pairdraw?.getStore?.().isInteractiveEditing())).toBe(
       false
     )
 
@@ -170,13 +170,13 @@ test('font arrival invalidates tiled text and matches a fresh direct render', as
   // fetches. Use an unknown family the resolver must download, as the app does for a font
   // a document names that nothing local or bundled carries. Mock and gate before the first
   // render, so the Fontsource font list the app loads on boot serves the fixture entries.
-  const fixture = { family: 'OpenPencil Tiled Fixture', subset: 'latin' as const }
+  const fixture = { family: 'Pairdraw Tiled Fixture', subset: 'latin' as const }
   const fontData = readFileSync('tests/fixtures/fonts/InterVariable-Latin.ttf')
   await mockFontsource(page, [{ ...fixture, data: fontData }])
   const requested = Promise.withResolvers<undefined>()
   const release = Promise.withResolvers<undefined>()
   let fontRequests = 0
-  await page.route('**/openpencil-fixture-0.ttf', async (route) => {
+  await page.route('**/pairdraw-fixture-0.ttf', async (route) => {
     fontRequests++
     requested.resolve(undefined)
     await release.promise
@@ -205,8 +205,8 @@ test('font arrival invalidates tiled text and matches a fresh direct render', as
   })
   try {
     await page.evaluate(() => {
-      const store = window.openPencil?.getStore?.()
-      const hooks = window.openPencil?.test?.navigation
+      const store = window.pairdraw?.getStore?.()
+      const hooks = window.pairdraw?.test?.navigation
       if (!store || !hooks) throw new Error('Editor unavailable')
       hooks.startRecording('tiled-property-preview')
       store.setZoomAroundPoint(1, 0, 0)
@@ -219,7 +219,7 @@ test('font arrival invalidates tiled text and matches a fresh direct render', as
         width: 160,
         height: 40,
         text: 'Prepared text',
-        fontFamily: 'OpenPencil Tiled Fixture',
+        fontFamily: 'Pairdraw Tiled Fixture',
         fontWeight: 400,
         fontSize: 20,
         fills: [{ type: 'SOLID', color: { r: 0, g: 0, b: 0, a: 1 }, opacity: 1, visible: true }]
@@ -243,6 +243,6 @@ test('font arrival invalidates tiled text and matches a fresh direct render', as
     expect(fontRequests).toBeGreaterThanOrEqual(1)
   } finally {
     release.resolve(undefined)
-    await page.unroute('**/openpencil-fixture-0.ttf')
+    await page.unroute('**/pairdraw-fixture-0.ttf')
   }
 })

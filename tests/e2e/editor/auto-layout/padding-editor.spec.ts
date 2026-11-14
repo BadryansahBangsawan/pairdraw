@@ -23,8 +23,8 @@ async function dblclickCanvas(page: Page, x: number, y: number) {
 
 async function setupAutoLayoutFrame(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
 
     store.state.panX = 0
     store.state.panY = 0
@@ -67,15 +67,15 @@ async function setupAutoLayoutFrame(page: Page) {
 
 async function framePaddingTop(page: Page, frameId: string) {
   return page.evaluate((id) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return store.graph.getNode(id)?.paddingTop ?? null
   }, frameId)
 }
 
 async function frameGap(page: Page, frameId: string) {
   return page.evaluate(
-    (id) => window.openPencil?.getStore?.().graph.getNode(id)?.itemSpacing ?? null,
+    (id) => window.pairdraw?.getStore?.().graph.getNode(id)?.itemSpacing ?? null,
     frameId
   )
 }
@@ -143,8 +143,8 @@ test('auto-layout padding editor follows canvas pan while open', async ({ page }
   if (!before) throw new Error('Padding editor has no bounding box')
 
   await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.pan(40, 0)
   })
   await canvas.waitForRender()
@@ -203,7 +203,7 @@ test('selecting another layer closes the value editor and keeps the value it had
   await expect(editor).toBeVisible()
   const committed = await framePaddingTop(page, frameId)
 
-  await page.evaluate(() => window.openPencil?.getStore?.().clearSelection())
+  await page.evaluate(() => window.pairdraw?.getStore?.().clearSelection())
   await expect(editor).toHaveCount(0)
   expect(await framePaddingTop(page, frameId)).toBe(committed)
   canvas.assertNoErrors()
@@ -223,7 +223,7 @@ test('deleting the frame closes its value editor', async ({ page }) => {
   const editor = page.getByTestId('auto-layout-value-editor')
   await expect(editor).toBeVisible()
 
-  await page.evaluate((id) => window.openPencil?.getStore?.().graph.deleteNode(id), frameId)
+  await page.evaluate((id) => window.pairdraw?.getStore?.().graph.deleteNode(id), frameId)
   await expect(editor).toHaveCount(0)
   canvas.assertNoErrors()
 })

@@ -77,7 +77,7 @@
   "sharingUsageStatsDescription": "Qué funciones y formatos de archivo se usan, con un ID aleatorio que no identifica a nadie. Desactivado salvo que aceptes.",
   "sharingDetails": "Qué se envía",
   "sharingUnofficialBuild": "Esta compilación no envía nada. Solo las versiones oficiales de Pairdraw envían pings o estadísticas de uso.",
-  "sharingDisabledByEnvironment": "Desactivado por OPENPENCIL_TELEMETRY o DO_NOT_TRACK en tu entorno.",
+  "sharingDisabledByEnvironment": "Desactivado por PAIRDRAW_TELEMETRY o DO_NOT_TRACK en tu entorno.",
   "sharingQuestionTitle": "¿Nos ayudas a mejorar Pairdraw?",
   "sharingQuestionDescription": "Comparte estadísticas de uso anónimas: inicios de la app, formatos de archivo y funciones usadas. Nunca tus diseños, nombres de archivo ni prompts. Nos muestran qué construir a continuación y que Pairdraw se usa, lo que ayuda a financiarlo.",
   "sharingQuestionDecline": "No, gracias",

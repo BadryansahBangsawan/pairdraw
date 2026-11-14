@@ -11,8 +11,8 @@ const editor = useEditorSetup('/?test&no-rulers')
 
 async function view(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const { panX, panY, zoom, activeTool } = store.state
     return { panX, panY, zoom, activeTool }
   })
@@ -20,8 +20,8 @@ async function view(page: Page) {
 
 async function resetView(page: Page) {
   await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.setTool('SELECT')
     store.state.panX = 0
     store.state.panY = 0

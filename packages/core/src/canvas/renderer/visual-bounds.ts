@@ -1,5 +1,5 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { getNodeLocalMatrix, getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { getNodeLocalMatrix, getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
 import {
   effectOverflow,
   geometryBlobBounds,
@@ -7,9 +7,9 @@ import {
   textDecorationOverflow,
   unionVisualBounds,
   type VisualBounds
-} from '@open-pencil/scene-graph/geometry'
-import Matrix, { type Mat3 } from '@open-pencil/scene-graph/matrix'
-import { textLinesOverflow } from '@open-pencil/scene-graph/text'
+} from '@pairdraw/scene-graph/geometry'
+import Matrix, { type Mat3 } from '@pairdraw/scene-graph/matrix'
+import { textLinesOverflow } from '@pairdraw/scene-graph/text'
 
 import { projectedNode, type RotationPreview } from '#core/geometry'
 

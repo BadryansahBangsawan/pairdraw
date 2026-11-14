@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 
-import type { NodeType, SceneNode, VectorNetwork } from '@open-pencil/scene-graph'
-import { createDefaultNode } from '@open-pencil/scene-graph/node-defaults'
+import type { NodeType, SceneNode, VectorNetwork } from '@pairdraw/scene-graph'
+import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
 
 import { nodeOutlinePath } from '#core/io/formats/svg/paths'
 

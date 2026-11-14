@@ -7,7 +7,7 @@ interface LibraryPreferences {
   priorities: Record<string, number>
 }
 
-const preferences = useLocalStorage<LibraryPreferences>('open-pencil:library-preferences', {
+const preferences = useLocalStorage<LibraryPreferences>('pairdraw:library-preferences', {
   catalogSource: 'local',
   priorities: {}
 })

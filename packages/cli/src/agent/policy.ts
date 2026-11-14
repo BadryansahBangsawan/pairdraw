@@ -1,4 +1,4 @@
-import { CORE_TOOLS, isToolExposed, type ToolDef } from '@open-pencil/core/tools'
+import { CORE_TOOLS, isToolExposed, type ToolDef } from '@pairdraw/core/tools'
 
 /**
  * Tools the headless agent starts with, as the app's built-in chat does: the curated Core set

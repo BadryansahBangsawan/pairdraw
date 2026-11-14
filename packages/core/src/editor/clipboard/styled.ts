@@ -1,11 +1,11 @@
-import type { DesignDocument } from '@open-pencil/dom-css'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { DesignDocument } from '@pairdraw/dom-css'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 import {
   applyGraphTransfer,
   captureTransferredState,
   prepareGraphTransfer,
   removeGraphTransfer
-} from '@open-pencil/scene-graph/transfer'
+} from '@pairdraw/scene-graph/transfer'
 
 import { resolvePasteTarget } from '#core/editor/clipboard/paste/target'
 import { prepareSlotEdits } from '#core/editor/components/slots'

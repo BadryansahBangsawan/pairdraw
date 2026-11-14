@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SELECTION_COLOR } from '@open-pencil/core/constants'
-import { contrastRatio, parseColor, rgbaToOkHCL } from '@open-pencil/scene-graph/color'
+import { SELECTION_COLOR } from '@pairdraw/core/constants'
+import { contrastRatio, parseColor, rgbaToOkHCL } from '@pairdraw/scene-graph/color'
 
 import {
   ACCENT_LIGHTNESS_RANGE,

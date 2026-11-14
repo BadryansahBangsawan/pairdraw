@@ -1,7 +1,7 @@
 import { useEventListener } from '@vueuse/core'
 import type { ComputedRef } from 'vue'
 
-import type { Tool } from '@open-pencil/core'
+import type { Tool } from '@pairdraw/core'
 
 import type { EditorStore } from '@/app/editor/active-store'
 

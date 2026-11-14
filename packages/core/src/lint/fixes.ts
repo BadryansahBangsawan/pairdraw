@@ -1,8 +1,8 @@
 import { isEmptyObject } from 'es-toolkit'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { colorToHex } from '@open-pencil/scene-graph/color'
-import { paintBindingTarget } from '@open-pencil/scene-graph/variables'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { colorToHex } from '@pairdraw/scene-graph/color'
+import { paintBindingTarget } from '@pairdraw/scene-graph/variables'
 
 import type { LintFix, LintMessage } from './types'
 import { ownsComponentTree } from './utils'

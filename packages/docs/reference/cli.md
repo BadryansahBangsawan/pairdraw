@@ -1,6 +1,6 @@
 ---
 title: CLI Reference
-description: Complete reference for all openpencil commands, options, and flags.
+description: Complete reference for all pairdraw commands, options, and flags.
 ---
 
 # CLI Reference
@@ -12,7 +12,7 @@ Document commands accept a `.fig` file as a positional argument. When omitted, t
 Show document info — pages, node counts, fonts, file size.
 
 ```sh
-openpencil info [file] [--json]
+pairdraw info [file] [--json]
 ```
 
 | Option | Description |
@@ -24,7 +24,7 @@ openpencil info [file] [--json]
 Print the node hierarchy.
 
 ```sh
-openpencil tree [file] [options]
+pairdraw tree [file] [options]
 ```
 
 | Option | Description |
@@ -38,7 +38,7 @@ openpencil tree [file] [options]
 Search nodes by name or type.
 
 ```sh
-openpencil find [file] [options]
+pairdraw find [file] [options]
 ```
 
 | Option | Description |
@@ -54,7 +54,7 @@ openpencil find [file] [options]
 Show detailed properties of a node.
 
 ```sh
-openpencil node [file] --id <id> [--json]
+pairdraw node [file] --id <id> [--json]
 ```
 
 | Option | Description |
@@ -67,7 +67,7 @@ openpencil node [file] --id <id> [--json]
 List all pages in the document.
 
 ```sh
-openpencil pages [file] [--json]
+pairdraw pages [file] [--json]
 ```
 
 | Option | Description |
@@ -79,7 +79,7 @@ openpencil pages [file] [--json]
 List design variables and collections.
 
 ```sh
-openpencil variables [file] [options]
+pairdraw variables [file] [options]
 ```
 
 | Option | Description |
@@ -93,7 +93,7 @@ openpencil variables [file] [options]
 Print design variables as a stylesheet of CSS custom properties. Default mode values go in `:root`; every other mode overrides them under its condition, `[data-<collection>="<mode>"]` unless the mode names a selector or `@media` query. Aliases stay `var()` references. Tokens or modes that cannot be written are listed on stderr.
 
 ```sh
-openpencil tokens [file] [options]
+pairdraw tokens [file] [options]
 ```
 
 | Option | Description |
@@ -109,7 +109,7 @@ variables instead of printing them: `:root` holds each collection's default valu
 other selectors become modes, and Tailwind's `@theme` works too.
 
 ```sh
-openpencil tokens app.fig --import theme.css --write
+pairdraw tokens app.fig --import theme.css --write
 ```
 
 With `--project`, the command reads a local project folder instead of one stylesheet. Tailwind v4
@@ -120,7 +120,7 @@ JavaScript are reported and not run. A path that leaves the folder is refused, a
 Component source is not imported.
 
 ```sh
-openpencil tokens app.fig --project ./app --write
+pairdraw tokens app.fig --project ./app --write
 ```
 
 | Option | Description |
@@ -135,7 +135,7 @@ openpencil tokens app.fig --project ./app --write
 Export to PNG, JPG, WEBP, SVG, JSX, HTML, `.fig`, or Storybook stories.
 
 ```sh
-openpencil export [file] [options]
+pairdraw export [file] [options]
 ```
 
 | Option | Alias | Description |
@@ -146,7 +146,7 @@ openpencil export [file] [options]
 | `--quality` | `-q` | Quality 0–100, JPG/WEBP only (default: 90) |
 | `--page` | | Page name (default: first page; `fig`, `pptx`, and `storybook` default to every page) |
 | `--node` | | Node ID to export (default: all top-level nodes) |
-| `--style` | | JSX style: `openpencil` (default), `tailwind` (same as `-f tailwind-jsx`) |
+| `--style` | | JSX style: `pairdraw` (default), `tailwind` (same as `-f tailwind-jsx`) |
 | `--html` | | HTML mode: `fragment` (default), `standalone` |
 | `--css` | | HTML CSS output: `inline` (default), `tailwind` |
 | `--assets` | | Standalone HTML assets: `inline` (default), `external` |
@@ -164,9 +164,9 @@ openpencil export [file] [options]
 Manage filesystem catalogs of component libraries.
 
 ```sh
-openpencil libraries list --root ./catalog
-openpencil libraries publish components.fig --root ./catalog --id my-lib --name "My Library"
-openpencil libraries seed --root ./catalog
+pairdraw libraries list --root ./catalog
+pairdraw libraries publish components.fig --root ./catalog --id my-lib --name "My Library"
+pairdraw libraries seed --root ./catalog
 ```
 
 | Subcommand | Description |
@@ -180,7 +180,7 @@ openpencil libraries seed --root ./catalog
 Import HTML/CSS/Tailwind into an editable Pairdraw document.
 
 ```sh
-openpencil import page.html [options]
+pairdraw import page.html [options]
 ```
 
 | Option | Alias | Description |
@@ -197,8 +197,8 @@ openpencil import page.html [options]
 Examples:
 
 ```sh
-openpencil import card.html --css card.css -o card.fig
-openpencil import card.html --tailwind "flex flex-col gap-3 w-80 p-6 rounded-xl bg-white" -o card.fig
+pairdraw import card.html --css card.css -o card.fig
+pairdraw import card.html --tailwind "flex flex-col gap-3 w-80 p-6 rounded-xl bg-white" -o card.fig
 ```
 
 ## eval
@@ -206,7 +206,7 @@ openpencil import card.html --tailwind "flex flex-col gap-3 w-80 p-6 rounded-xl 
 Execute JavaScript with the Figma Plugin API.
 
 ```sh
-openpencil eval [file] [options]
+pairdraw eval [file] [options]
 ```
 
 | Option | Alias | Description |
@@ -225,7 +225,7 @@ openpencil eval [file] [options]
 Analyze color palette usage across the document.
 
 ```sh
-openpencil analyze colors [file] [options]
+pairdraw analyze colors [file] [options]
 ```
 
 | Option | Description |
@@ -240,7 +240,7 @@ openpencil analyze colors [file] [options]
 Analyze font family, size, and weight distribution.
 
 ```sh
-openpencil analyze typography [file] [options]
+pairdraw analyze typography [file] [options]
 ```
 
 | Option | Description |
@@ -254,7 +254,7 @@ openpencil analyze typography [file] [options]
 Analyze gap and padding values across auto-layout frames.
 
 ```sh
-openpencil analyze spacing [file] [options]
+pairdraw analyze spacing [file] [options]
 ```
 
 | Option | Description |
@@ -267,7 +267,7 @@ openpencil analyze spacing [file] [options]
 Find repeated node patterns — potential components.
 
 ```sh
-openpencil analyze clusters [file] [options]
+pairdraw analyze clusters [file] [options]
 ```
 
 | Option | Description |
@@ -282,7 +282,7 @@ openpencil analyze clusters [file] [options]
 Patch that turns one node tree into another, as JSX attribute changes plus moved, added, and removed children. Children match by name; see [Comparing designs](/programmable/cli/comparing) for the format.
 
 ```sh
-openpencil diff create [file] --from <id> --to <id> [options]
+pairdraw diff create [file] --from <id> --to <id> [options]
 ```
 
 | Option | Description |
@@ -297,7 +297,7 @@ openpencil diff create [file] --from <id> --to <id> [options]
 Structural diff between two nodes as design JSX.
 
 ```sh
-openpencil diff jsx [file] --from <id> --to <id> [--json]
+pairdraw diff jsx [file] --from <id> --to <id> [--json]
 ```
 
 ## diff show
@@ -305,7 +305,7 @@ openpencil diff jsx [file] --from <id> --to <id> [--json]
 Preview the patch that setting JSX attributes on a node would produce, without changing it.
 
 ```sh
-openpencil diff show <id> [file] --attributes '<jsx attributes>' [--json]
+pairdraw diff show <id> [file] --attributes '<jsx attributes>' [--json]
 ```
 
 `--attributes` takes attributes as the JSX export writes them, such as `'w={200} bg="#FF0000"'`.
@@ -315,7 +315,7 @@ openpencil diff show <id> [file] --attributes '<jsx attributes>' [--json]
 Apply a patch from `diff create`, `diff show`, or `diff files`. Every node must still match the patch's old values unless `--force` is set, and nothing changes unless every hunk applies.
 
 ```sh
-openpencil diff apply <patch> [file] [options]
+pairdraw diff apply <patch> [file] [options]
 ```
 
 | Option | Alias | Description |
@@ -333,7 +333,7 @@ Pass `-` as the patch path to read it from stdin.
 Pixel diff between two rendered nodes, written as a PNG with changed pixels in red.
 
 ```sh
-openpencil diff visual [file] --from <id> --to <id> --output <png> [options]
+pairdraw diff visual [file] --from <id> --to <id> --output <png> [options]
 ```
 
 | Option | Alias | Description |
@@ -349,7 +349,7 @@ openpencil diff visual [file] --from <id> --to <id> --output <png> [options]
 Structural diff of two documents, page by page. Pages match by name and nodes by name path, so two versions of a file compare even though their node IDs differ. Exits with status 1 when the documents differ and 2 when the options are invalid, such as a `--page` neither document has.
 
 ```sh
-openpencil diff files <before> <after> [options]
+pairdraw diff files <before> <after> [options]
 ```
 
 | Option | Description |
@@ -363,12 +363,12 @@ openpencil diff files <before> <after> [options]
 Manage documents (tabs) in the running app. See [Controlling the App](/programmable/cli/app-control).
 
 ```sh
-openpencil documents list [--json]
-openpencil documents open <file> [--json]
-openpencil documents new [--path <file>] [--json]
-openpencil documents save [--path <file>] [--document-id <id>] [--json]
-openpencil documents close [--save | --discard] [--path <file>] [--document-id <id>] [--json]
-openpencil documents activate <document-id> [--page-id <id>] [--json]
+pairdraw documents list [--json]
+pairdraw documents open <file> [--json]
+pairdraw documents new [--path <file>] [--json]
+pairdraw documents save [--path <file>] [--document-id <id>] [--json]
+pairdraw documents close [--save | --discard] [--path <file>] [--document-id <id>] [--json]
+pairdraw documents activate <document-id> [--page-id <id>] [--json]
 ```
 
 | Option | Description |
@@ -385,8 +385,8 @@ openpencil documents activate <document-id> [--page-id <id>] [--json]
 Undo or redo the newest change made through the CLI or MCP in the running app. Fails when the newest change was made in the editor; see [Controlling the App](/programmable/cli/app-control#undo-and-redo).
 
 ```sh
-openpencil undo [--document-id <id>] [--json]
-openpencil redo [--document-id <id>] [--json]
+pairdraw undo [--document-id <id>] [--json]
+pairdraw redo [--document-id <id>] [--json]
 ```
 
 ## settings
@@ -394,8 +394,8 @@ openpencil redo [--document-id <id>] [--json]
 Read and change editor settings in the running app by dotted key. Values parse as JSON, falling back to plain strings.
 
 ```sh
-openpencil settings get [key] [--json]
-openpencil settings set <key> <value> [--json]
+pairdraw settings get [key] [--json]
+pairdraw settings set <key> <value> [--json]
 ```
 
 See [Controlling the App](/programmable/cli/app-control#settings) for the available keys.
@@ -405,9 +405,9 @@ See [Controlling the App](/programmable/cli/app-control#settings) for the availa
 List, describe, and call the editor tools that the MCP server exposes.
 
 ```sh
-openpencil tool list [--json]
-openpencil tool describe <name> [--json]
-openpencil tool call <name> [file] [options]
+pairdraw tool list [--json]
+pairdraw tool describe <name> [--json]
+pairdraw tool call <name> [file] [options]
 ```
 
 | Option | Alias | Description |
@@ -427,7 +427,7 @@ openpencil tool call <name> [file] [options]
 Open a document once and run tools on it line by line, with `save()` and `exit()`. Reads lines from stdin when it is not a terminal and exits with status 1 if any line failed. See [Controlling the App](/programmable/cli/app-control#interactive-shell).
 
 ```sh
-openpencil shell [file] [options]
+pairdraw shell [file] [options]
 ```
 
 | Option | Alias | Description |
@@ -443,7 +443,7 @@ openpencil shell [file] [options]
 List the AI providers and models the chat can use, and the ACP agents.
 
 ```sh
-openpencil models [--provider <id>] [--json]
+pairdraw models [--provider <id>] [--json]
 ```
 
 | Option | Alias | Description |
@@ -456,7 +456,7 @@ openpencil models [--provider <id>] [--json]
 Report fonts used by a document.
 
 ```sh
-openpencil fonts [file] [options]
+pairdraw fonts [file] [options]
 ```
 
 | Option | Description |
@@ -470,7 +470,7 @@ openpencil fonts [file] [options]
 Get current selection from the running app.
 
 ```sh
-openpencil selection [options]
+pairdraw selection [options]
 ```
 
 | Option | Description |
@@ -484,7 +484,7 @@ openpencil selection [options]
 List supported document and export formats.
 
 ```sh
-openpencil formats [options]
+pairdraw formats [options]
 ```
 
 | Option | Description |
@@ -496,7 +496,7 @@ openpencil formats [options]
 Convert a document to another writable format.
 
 ```sh
-openpencil convert <file> [options]
+pairdraw convert <file> [options]
 ```
 
 | Option | Alias | Description |
@@ -510,9 +510,9 @@ openpencil convert <file> [options]
 Drive a document from a model: run, and see which tools it may call.
 
 ```sh
-openpencil agent run [file] [--model <id>] [--json]
-openpencil agent tools [--json]
-openpencil agent list [--json]
+pairdraw agent run [file] [--model <id>] [--json]
+pairdraw agent tools [--json]
+pairdraw agent list [--json]
 ```
 
 | Subcommand | Description |
@@ -526,7 +526,7 @@ openpencil agent list [--json]
 Query nodes using XPath selectors.
 
 ```sh
-openpencil query [file] [selector] [options]
+pairdraw query [file] [selector] [options]
 ```
 
 | Option | Description |

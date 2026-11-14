@@ -1,6 +1,6 @@
 import type { Canvas } from 'canvaskit-wasm'
 
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { NodeEditOverlayState } from '#core/canvas/node-edit-overlay'
 import type { SkiaRenderer } from '#core/canvas/renderer'

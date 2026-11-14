@@ -9,7 +9,7 @@ description: Apply and detach local fill, stroke, text, effect, and grid styles.
 style definitions, and undo-aware bind/detach actions.
 
 ```ts
-import { useSharedStyleBinding } from '@open-pencil/vue/controls/shared-style'
+import { useSharedStyleBinding } from '@pairdraw/vue/controls/shared-style'
 
 const fillStyle = useSharedStyleBinding('fill')
 

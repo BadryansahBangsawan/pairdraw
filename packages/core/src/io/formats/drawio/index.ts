@@ -1,8 +1,8 @@
-import type { DrawIOCell, DrawIOFile, DrawIOPage, DrawIOStyle } from '@open-pencil/drawio'
-import { SceneGraph, type SceneNode } from '@open-pencil/scene-graph'
-import { connectorRoute, placeConnectorLabel } from '@open-pencil/scene-graph/connectors'
-import { createShapeWithText } from '@open-pencil/scene-graph/generated'
-import { fitEnclosingGroups } from '@open-pencil/scene-graph/group-bounds'
+import type { DrawIOCell, DrawIOFile, DrawIOPage, DrawIOStyle } from '@pairdraw/drawio'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
+import { connectorRoute, placeConnectorLabel } from '@pairdraw/scene-graph/connectors'
+import { createShapeWithText } from '@pairdraw/scene-graph/generated'
+import { fitEnclosingGroups } from '@pairdraw/scene-graph/group-bounds'
 
 import { bindEdge, createEdge, labelPositionOf, type PendingEdge } from './edges'
 import { readLabel } from './label'

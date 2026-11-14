@@ -1,7 +1,7 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { compositeOver } from '@open-pencil/scene-graph/color'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Color, Vector } from '@open-pencil/scene-graph/primitives'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { compositeOver } from '@pairdraw/scene-graph/color'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import { createSceneGeometry, type RotationPreview } from '#core/geometry'

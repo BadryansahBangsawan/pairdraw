@@ -1,13 +1,13 @@
 import * as v from 'valibot'
 
-import { PEN_PLUGIN_DATA_NAMESPACE } from '@open-pencil/pen'
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import { PEN_PLUGIN_DATA_NAMESPACE } from '@pairdraw/pen'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   clampAgentNote,
   readAgentNotes,
   type AgentNotesDraft
-} from '@open-pencil/scene-graph/agent-notes'
-import { generatedFrameText } from '@open-pencil/scene-graph/generated'
+} from '@pairdraw/scene-graph/agent-notes'
+import { generatedFrameText } from '@pairdraw/scene-graph/generated'
 
 import type { LayerNote } from '@/app/ai/chat/context'
 

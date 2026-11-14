@@ -1,4 +1,4 @@
-import type { SceneGraph, ShadowEffect } from '@open-pencil/scene-graph'
+import type { SceneGraph, ShadowEffect } from '@pairdraw/scene-graph'
 
 const solid = (r: number, g: number, b: number, opacity = 1) => ({
   type: 'SOLID' as const,

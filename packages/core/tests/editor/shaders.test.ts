@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
+import { createEditor } from '@pairdraw/core'
 import { expectDefined } from '#core-tests/helpers/assert'
-import { SceneGraph, type Fill, type SceneNode } from '@open-pencil/scene-graph'
+import { SceneGraph, type Fill, type SceneNode } from '@pairdraw/scene-graph'
 import {
   createShaderPaint,
   isShaderPresetPaint,
@@ -10,7 +10,7 @@ import {
   shaderPresetKey,
   withShaderPaints,
   type ShaderPreset
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 /** The preset the paint draws, failing when its shader is user code instead. */
 function presetOf(node: Pick<SceneNode, 'pluginData'>, paint: Fill): ShaderPreset {

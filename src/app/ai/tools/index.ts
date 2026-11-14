@@ -1,8 +1,8 @@
 import { tool } from 'ai'
 import { isPlainObject } from 'es-toolkit'
 
-import { graphFromPageSnapshot } from '@open-pencil/core'
-import { registerComponentCatalog, isAtomicTool, toolsToAI } from '@open-pencil/core/tools'
+import { graphFromPageSnapshot } from '@pairdraw/core'
+import { registerComponentCatalog, isAtomicTool, toolsToAI } from '@pairdraw/core/tools'
 
 import {
   currentRun,

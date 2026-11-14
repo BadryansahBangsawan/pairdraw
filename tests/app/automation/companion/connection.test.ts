@@ -1,7 +1,7 @@
 import { describe, expect, mock, test } from 'bun:test'
 import { createHash } from 'node:crypto'
 
-import { AUTOMATION_HTTP_PORT } from '@open-pencil/core/constants'
+import { AUTOMATION_HTTP_PORT } from '@pairdraw/core/constants'
 
 import {
   companionFingerprint,

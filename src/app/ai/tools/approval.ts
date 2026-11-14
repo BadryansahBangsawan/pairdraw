@@ -1,7 +1,7 @@
 import type { PermissionOption, ToolKind } from '@agentclientprotocol/sdk'
 
-import { toolChangesDocument, type ToolDef } from '@open-pencil/core/tools'
-import { agentMessages } from '@open-pencil/vue/i18n'
+import { toolChangesDocument, type ToolDef } from '@pairdraw/core/tools'
+import { agentMessages } from '@pairdraw/vue/i18n'
 
 import { requestPermissionFromUser } from '@/app/ai/agents/acp/permission'
 import { approveActions } from '@/app/ai/chat/preferences'

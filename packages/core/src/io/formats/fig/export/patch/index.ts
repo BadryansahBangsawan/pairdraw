@@ -4,20 +4,20 @@ import {
   figFontsManifest,
   type FigArchiveRecordInfo,
   type FigRecordPatch
-} from '@open-pencil/fig'
+} from '@pairdraw/fig'
 import {
   nameImagesForFigma,
   type FigNodeChangeExportRuntime,
   sceneNodeToKiwi
-} from '@open-pencil/fig/node-change'
-import { stringToGuid } from '@open-pencil/kiwi/fig/guid'
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { isGeneratedFrame } from '@open-pencil/scene-graph/generated'
-import { computeImageHash } from '@open-pencil/scene-graph/images'
-import { siblingOrderKeys } from '@open-pencil/scene-graph/order-keys'
-import type { GUID } from '@open-pencil/scene-graph/primitives'
-import { ownsSlotContent } from '@open-pencil/scene-graph/slots'
-import { layersUsingVariables } from '@open-pencil/scene-graph/variables'
+} from '@pairdraw/fig/node-change'
+import { stringToGuid } from '@pairdraw/kiwi/fig/guid'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { isGeneratedFrame } from '@pairdraw/scene-graph/generated'
+import { computeImageHash } from '@pairdraw/scene-graph/images'
+import { siblingOrderKeys } from '@pairdraw/scene-graph/order-keys'
+import type { GUID } from '@pairdraw/scene-graph/primitives'
+import { ownsSlotContent } from '@pairdraw/scene-graph/slots'
+import { layersUsingVariables } from '@pairdraw/scene-graph/variables'
 
 import { figCompressionLevel } from '#core/io/formats/fig/compression'
 import {
@@ -382,7 +382,7 @@ const archiveImagesChecked = new WeakMap<FigArchiveAccess, Promise<boolean>>()
 
 /**
  * Whether every image the archive `graph` was opened from holds is stored under the SHA-1 of its
- * bytes, the only name Figma reads. Archives OpenPencil wrote before image names were SHA-1 are
+ * bytes, the only name Figma reads. Archives Pairdraw wrote before image names were SHA-1 are
  * not, and records a save leaves untouched point at those names, so such a document is written
  * whole, which names every image as Figma needs, instead of reusing its archive. The archive
  * does not change, so it is checked once; a document with no archive has nothing to check.

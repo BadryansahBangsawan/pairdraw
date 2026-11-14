@@ -12,7 +12,7 @@ import {
   type LayerRef,
   type TreeNode,
   type VariableInput
-} from '@open-pencil/design-jsx'
+} from '@pairdraw/design-jsx'
 
 import type { DesignJSXHelperDescriptor } from '@/app/code/sandbox/types'
 import { DESIGN_JSX_EMPTY_OUTPUT_ERROR } from '@/app/code/sandbox/validate'
@@ -49,9 +49,7 @@ function isSerializedElement(value: unknown): value is SerializedDesignJSXElemen
 }
 
 function isHelper(value: unknown): value is DesignJSXHelperDescriptor {
-  return (
-    isRecord(value) && typeof value.__openPencilHelper === 'string' && Array.isArray(value.args)
-  )
+  return isRecord(value) && typeof value.__pairdrawHelper === 'string' && Array.isArray(value.args)
 }
 
 /** A collection as the sandbox's `defineVars` writes it, with the modes `defineMode` added. */
@@ -108,7 +106,7 @@ function collection(index: unknown, handles: Handles): Collection {
 
 function convertValue(value: unknown, handles: Handles): unknown {
   if (isHelper(value)) {
-    const helperName = value.__openPencilHelper
+    const helperName = value.__pairdrawHelper
     const [first, second] = value.args
     if (helperName === 'ref') {
       const handle = handles.refs.get(first) ?? layerRef()

@@ -2,7 +2,7 @@ import { afterEach, expect, test } from 'bun:test'
 
 import { toRaw } from 'vue'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { chatColumnOpen } from '@/app/ai/chat/panel'
 import {
@@ -73,7 +73,7 @@ test('a prompt sent to a document carries the layers it references, as from the 
   const graph = new SceneGraph()
   const hero = graph.createNode('FRAME', graph.getPages()[0].id, { name: 'Hero' })
   const store = documentStore(graph)
-  const text = `Make [Hero](openpencil://node/${encodeURIComponent(hero.id)}) taller, and [Gone](openpencil://node/0:404) too`
+  const text = `Make [Hero](pairdraw://node/${encodeURIComponent(hero.id)}) taller, and [Gone](pairdraw://node/0:404) too`
   sendPromptToDocument(store, text)
 
   const prompt = takePendingPrompt(store)

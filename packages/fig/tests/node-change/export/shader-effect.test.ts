@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { sceneNodeToKiwi } from '#fig/node-change/index'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 describe('shader effects in .fig export', () => {
   test('a node whose only effect is a visible shader effect exports without throwing', () => {

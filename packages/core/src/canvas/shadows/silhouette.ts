@@ -1,9 +1,9 @@
 import type { Canvas } from 'canvaskit-wasm'
 
-import type { Fill, NodeType, SceneGraph, SceneNode, Stroke } from '@open-pencil/scene-graph'
-import { strokeOverflow as strokeReach } from '@open-pencil/scene-graph/geometry'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import type { Fill, NodeType, SceneGraph, SceneNode, Stroke } from '@pairdraw/scene-graph'
+import { strokeOverflow as strokeReach } from '@pairdraw/scene-graph/geometry'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 import { paintBooleanOperation } from '#core/canvas/boolean'
 import { renderMaskedChildIds } from '#core/canvas/masks'

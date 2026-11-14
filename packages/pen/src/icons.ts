@@ -1,9 +1,9 @@
 import { pick } from 'es-toolkit/object'
 import { isEqual } from 'es-toolkit/predicate'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { BLACK } from '@open-pencil/scene-graph/constants'
-import { readIconTint } from '@open-pencil/scene-graph/icons'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { BLACK } from '@pairdraw/scene-graph/constants'
+import { readIconTint } from '@pairdraw/scene-graph/icons'
 import {
   getInstances,
   INSTANCE_SYNC_PROPS,
@@ -11,8 +11,8 @@ import {
   populateInstanceChildren,
   recordInstanceOverride,
   swapInstanceComponent
-} from '@open-pencil/scene-graph/instances'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/instances'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { iconName, iconOptions } from './assets'
 import type { Build } from './nodes'

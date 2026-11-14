@@ -1,1 +1,1 @@
-- `clipPolygon` and `clipBoundsToPolygon` move from `@open-pencil/scene-graph/geometry` to `@open-pencil/scene-graph/clipping`.
+- `clipPolygon` and `clipBoundsToPolygon` move from `@pairdraw/scene-graph/geometry` to `@pairdraw/scene-graph/clipping`.

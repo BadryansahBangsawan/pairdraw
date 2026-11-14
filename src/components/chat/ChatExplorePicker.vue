@@ -2,7 +2,7 @@
 import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka-ui'
 import { computed } from 'vue'
 
-import { useExploreMessages } from '@open-pencil/vue/i18n'
+import { useExploreMessages } from '@pairdraw/vue/i18n'
 
 import {
   EXPLORE_AXES,

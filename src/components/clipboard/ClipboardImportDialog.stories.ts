@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test'
 
-import type { ClipboardImportPlan } from '@open-pencil/core'
+import type { ClipboardImportPlan } from '@pairdraw/core'
 
 import ClipboardImportDialog from './ClipboardImportDialog.vue'
 

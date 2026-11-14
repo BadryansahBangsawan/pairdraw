@@ -6,7 +6,7 @@ import { createHostedAgentDiscovery } from '@/app/ai/agents/setup/discovery'
 import { APP_VERSION } from '@/app/runtime/version'
 
 /** The MCP server agents reach the canvas through, as the lookup names it. */
-export const MCP = 'openpencil-mcp-http'
+export const MCP = 'pairdraw-mcp-http'
 export const SIGNED_OUT: AgentAuthStatus = { kind: 'none', label: 'Not logged in' }
 export const SIGNED_IN: AgentAuthStatus = { kind: 'account', label: 'Claude Max' }
 
@@ -59,7 +59,7 @@ export function fakeAgentHost(initial: FakeComputer) {
       if (holds.detect) await holds.detect
       const executables = [...computer.executables]
       const versions: Record<string, string> = computer.executables.has(MCP)
-        ? { '@open-pencil/mcp': APP_VERSION }
+        ? { '@pairdraw/mcp': APP_VERSION }
         : {}
       return {
         searchPath: '/test/bin',

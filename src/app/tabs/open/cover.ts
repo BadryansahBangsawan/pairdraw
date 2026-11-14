@@ -1,7 +1,7 @@
 import { promiseTimeout } from '@vueuse/core'
 
-import { figThumbnailPageId } from '@open-pencil/core/io/formats/fig'
-import { renderThumbnail } from '@open-pencil/core/io/formats/raster'
+import { figThumbnailPageId } from '@pairdraw/core/io/formats/fig'
+import { renderThumbnail } from '@pairdraw/core/io/formats/raster'
 
 import type { EditorStore } from '@/app/editor/session'
 import { cacheRecentFileThumbnail, loadCachedRecentFileThumbnail } from '@/app/recent-files'

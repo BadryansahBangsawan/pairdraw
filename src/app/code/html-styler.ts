@@ -1,8 +1,8 @@
-import type { HTMLStyler } from '@open-pencil/core/io/formats/html/layers'
+import type { HTMLStyler } from '@pairdraw/core/io/formats/html/layers'
 import {
   browserHTMLToDesignDocument,
   browserTailwindHTMLToDesignDocument
-} from '@open-pencil/dom-css/browser'
+} from '@pairdraw/dom-css/browser'
 
 /** Every class the markup names, which Tailwind builds its utilities for. */
 function classNames(html: string): string[] {

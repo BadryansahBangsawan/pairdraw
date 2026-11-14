@@ -1,6 +1,6 @@
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import { computeBounds } from '@open-pencil/scene-graph/geometry'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { computeBounds } from '@pairdraw/scene-graph/geometry'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 /** Space between variants, and between the variants and what is already on the page. */
 const VARIANT_GAP = 120

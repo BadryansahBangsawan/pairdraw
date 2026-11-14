@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { AUTOMATION_HTTP_PORT } from '@open-pencil/core/constants'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { AUTOMATION_HTTP_PORT } from '@pairdraw/core/constants'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { companion } from '@/app/automation/companion/connection'
 import AppConfirmationDialog from '@/components/ui/dialog/AppConfirmationDialog.vue'

@@ -1,7 +1,7 @@
 import { promiseTimeout } from '@vueuse/core'
 import * as v from 'valibot'
 
-import type { ACPAgentDef } from '@open-pencil/core/constants'
+import type { ACPAgentDef } from '@pairdraw/core/constants'
 
 import { checkAgentAuth } from '@/app/ai/agents/acp/auth/session'
 import { agentLookupSchema } from '@/app/ai/agents/setup/schema'
@@ -56,7 +56,7 @@ function parseMessage(data: unknown): SocketMessage | null {
 }
 
 /**
- * Runs coding agents through the companion (`openpencil-connect`) on the person's computer, for
+ * Runs coding agents through the companion (`pairdraw-connect`) on the person's computer, for
  * the web app. Detection and installs are HTTP calls; an agent's stdio and a terminal sign-in
  * each travel over a WebSocket that stops the program when it closes. The companion starts only
  * agents it knows, with their fixed command lines, so the tab names an agent and nothing else.
@@ -230,7 +230,7 @@ export function createCompanionAgentHost(
       return v.parse(v.pipe(v.string(), v.parseJson(), agentLookupSchema), await call('/agents'))
     },
     async install(target) {
-      // The companion is OpenPencil's MCP server, and the browser offers no Pi.
+      // The companion is Pairdraw's MCP server, and the browser offers no Pi.
       if (target.kind !== 'adapter') {
         throw new Error('The companion installs only agent adapters.')
       }

@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { PenDocument, PenNode } from '@open-pencil/pen'
-import { percentLength } from '@open-pencil/scene-graph/text'
+import type { PenDocument, PenNode } from '@pairdraw/pen'
+import { percentLength } from '@pairdraw/scene-graph/text'
 
 import { getNodeOrThrow } from './helpers/assert'
 import { parseDocument } from './helpers/document'

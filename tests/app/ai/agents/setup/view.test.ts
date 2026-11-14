@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { ACP_AGENTS, type ACPAgentDef } from '@open-pencil/core/constants'
+import { ACP_AGENTS, type ACPAgentDef } from '@pairdraw/core/constants'
 
 import type { AgentAccount } from '@/app/ai/agents/setup/accounts'
 import type { AgentConnectState } from '@/app/ai/agents/setup/connect'
@@ -24,7 +24,7 @@ function agentState(overrides: Partial<AgentSetupState> = {}): AgentSetupState {
     detected: null,
     bridge: true,
     bridgeOutdated: false,
-    bridgeCommand: 'npm i -g @open-pencil/mcp@1.0.0',
+    bridgeCommand: 'npm i -g @pairdraw/mcp@1.0.0',
     npm: true,
     installingAgent: false,
     installingBridge: false,

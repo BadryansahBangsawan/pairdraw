@@ -156,7 +156,7 @@ function solidPaint(color: string | RGB | RGBA, overrides?: Partial<SolidPaint>)
   return { ...overrides, type: 'SOLID', color: { r, g, b }, opacity: a }
 }
 
-/** Figma normalizes for its rich-text editors, which OpenPencil does not have. */
+/** Figma normalizes for its rich-text editors, which Pairdraw does not have. */
 function normalizeMarkdown(): string {
   throw new Error('in normalizeMarkdown: Pairdraw does not support rich-text Markdown')
 }

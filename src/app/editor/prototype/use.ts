@@ -5,9 +5,9 @@ import type {
   PrototypeReaction,
   PrototypeTransitionType,
   PrototypeTriggerType
-} from '@open-pencil/scene-graph'
-import { useSelectionState } from '@open-pencil/vue/editor/selection-state'
-import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
+} from '@pairdraw/scene-graph'
+import { useSelectionState } from '@pairdraw/vue/editor/selection-state'
+import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
 
 import { useEditorStore } from '@/app/editor/active-store'
 

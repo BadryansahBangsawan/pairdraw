@@ -1,6 +1,6 @@
 import { isEmptyObject, omit, pick } from 'es-toolkit'
 
-import type { Fill, SceneNode, Stroke } from '@open-pencil/scene-graph'
+import type { Fill, SceneNode, Stroke } from '@pairdraw/scene-graph'
 import {
   createShaderPaint,
   createShaderSourcePaint,
@@ -11,7 +11,7 @@ import {
   type ShaderPreset,
   type ShaderSourcePaint,
   type ShaderUniformValue
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 import { compileShader } from '#core/canvas/shaders/compile'
 import type { EditorContext } from '#core/editor/types'

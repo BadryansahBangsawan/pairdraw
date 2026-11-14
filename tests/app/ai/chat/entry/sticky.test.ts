@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { createSticky } from '@open-pencil/scene-graph/generated'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { createSticky } from '@pairdraw/scene-graph/generated'
 
 import { selectedStickyNotes, stickyPrompt } from '@/app/ai/chat/entry/sticky'
 import { findReferences } from '@/app/ai/chat/references/link'

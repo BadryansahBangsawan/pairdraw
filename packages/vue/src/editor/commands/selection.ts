@@ -1,5 +1,5 @@
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { readIcon } from '@open-pencil/scene-graph/icons'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { readIcon } from '@pairdraw/scene-graph/icons'
 
 import type { EditorCommandMapOptions } from './context'
 import type { EditorCommand, EditorCommandId } from './types'

@@ -2,9 +2,9 @@
 import { tv } from 'tailwind-variants'
 import { computed, shallowRef } from 'vue'
 
-import type { useDocumentWorkspace } from '@open-pencil/vue/document/workspace'
-import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { useDocumentWorkspace } from '@pairdraw/vue/document/workspace'
+import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useDocumentSelection } from '@/app/home/selection'
 import { useDateFormat } from '@/app/i18n/date'

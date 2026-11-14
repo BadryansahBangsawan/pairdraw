@@ -1,7 +1,7 @@
 /**
  * Pages that are not the editor's: OAuth callbacks, which relay a redirect, and, where a Cloud
  * server serves the editor, its API and its own pages, `CLOUD_PORTAL_PAGE_ROOTS` in
- * `@open-pencil/cloud/contract`, which loads only once packages are built. Workbox matches the
+ * `@pairdraw/cloud/contract`, which loads only once packages are built. Workbox matches the
  * path with its query, so a page root may be followed by `?` as well as `/`.
  *
  * Single source of truth shared by the Vite PWA config, the hand-authored service worker

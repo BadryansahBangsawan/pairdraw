@@ -4,8 +4,8 @@ import { IndexeddbPersistence } from 'y-indexeddb'
 import * as awarenessProtocol from 'y-protocols/awareness'
 import * as Y from 'yjs'
 
-import { RELAY_SERVER_PEER } from '@open-pencil/cloud/contract'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import { RELAY_SERVER_PEER } from '@pairdraw/cloud/contract'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { shareAgentPreviews } from '@/app/collab/agent-preview'
 import { buildRemotePeers } from '@/app/collab/awareness'

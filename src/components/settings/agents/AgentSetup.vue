@@ -3,8 +3,8 @@ import { useClipboard } from '@vueuse/core'
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import { IS_TAURI, type ACPAgentDef } from '@open-pencil/core/constants'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { IS_TAURI, type ACPAgentDef } from '@pairdraw/core/constants'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { CLAUDE_CODE_CLOUD_NAMES } from '@/app/ai/agents/setup/external'
 import { codingAgentGuideURL, codingAgentSetupPrompt } from '@/app/ai/agents/setup/prompt'

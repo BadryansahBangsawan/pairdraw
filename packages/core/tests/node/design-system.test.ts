@@ -6,8 +6,8 @@ import { join } from 'node:path'
 import {
   importDesignSystemFolder,
   readDesignSystemFolder
-} from '@open-pencil/core/node/design-system'
-import { SceneGraph, type Variable } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/node/design-system'
+import { SceneGraph, type Variable } from '@pairdraw/scene-graph'
 
 import {
   DESIGN_SYSTEM_MAX_FILE_BYTES,
@@ -17,7 +17,7 @@ import {
 } from '#core/io/formats/design-tokens'
 
 async function project(files: Record<string, string | Uint8Array>): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), 'open-pencil-design-system-'))
+  const root = await mkdtemp(join(tmpdir(), 'pairdraw-design-system-'))
   for (const [path, text] of Object.entries(files)) {
     const full = join(root, path)
     await mkdir(join(full, '..'), { recursive: true })
@@ -124,7 +124,7 @@ describe('importing a project folder as variables', () => {
 
   test('does not read a stylesheet a symlink points at outside the folder', async () => {
     const root = await project({ 'src/theme.css': ':root { --brand: #2947ff; }\n' })
-    const outside = await mkdtemp(join(tmpdir(), 'open-pencil-design-system-outside-'))
+    const outside = await mkdtemp(join(tmpdir(), 'pairdraw-design-system-outside-'))
     await writeFile(join(outside, 'secret.css'), ':root { --secret: #fff; }\n')
     await symlink(join(outside, 'secret.css'), join(root, 'secret.css'))
     await symlink(root, join(root, 'loop'))

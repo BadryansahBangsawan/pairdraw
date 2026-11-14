@@ -4,15 +4,15 @@
  * follows from the `node:updated` event these writes send, so a caller never runs the script.
  */
 import {
-  OPEN_PENCIL_PLUGIN_DATA,
+  PAIRDRAW_PLUGIN_DATA,
   readPluginData,
   withPluginData
-} from '@open-pencil/scene-graph/plugin-data'
-import type { ScriptInputValue, ScriptNodeData } from '@open-pencil/scene-graph/script'
+} from '@pairdraw/scene-graph/plugin-data'
+import type { ScriptInputValue, ScriptNodeData } from '@pairdraw/scene-graph/script'
 
 import type { ScriptWriteTarget } from '@/app/code/script/create'
 
-const { script: SCRIPT_FIELD } = OPEN_PENCIL_PLUGIN_DATA
+const { script: SCRIPT_FIELD } = PAIRDRAW_PLUGIN_DATA
 
 function writeScriptData(
   store: ScriptWriteTarget,

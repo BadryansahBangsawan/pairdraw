@@ -195,7 +195,7 @@ mod tests {
         assert!(external_url("mailto:team@example.com").is_ok());
         for url in [
             "file:///etc/passwd",
-            "openpencil://open?file=a.pen",
+            "pairdraw://open?file=a.pen",
             "javascript:alert(1)",
             "not a link",
         ] {

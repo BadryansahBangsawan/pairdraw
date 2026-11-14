@@ -77,8 +77,8 @@ Las variables y los estilos pasan entre Pairdraw, Figma y el código como [desig
 
 - **Exportar:** en el menú de copia de la hoja de estilos, elige **Exportar como design tokens**. El zip contiene un archivo por cada modo de colección, que Figma importa como modo; los estilos de texto y de efecto como tokens de tipografía y de sombra; y un resolver que lo combina todo para herramientas como Style Dictionary
 - **Importar:** haz clic en **Importar design tokens** en la barra de herramientas y elige archivos de tokens o un zip. Funcionan los archivos de Figma, un resolver con los archivos que nombra y los temas de Tokens Studio
-- **Línea de comandos:** `openpencil tokens app.fig --import theme.css --write` importa las propiedades personalizadas de una hoja local sin abrir la app; `:root` guarda los valores por defecto y los demás selectores se convierten en modos
-- **Carpeta del proyecto:** `openpencil tokens app.fig --project ./app --write` importa variables CSS de un proyecto local, incluido un `@theme` de Tailwind v4 y el par `:root` / `.dark` de shadcn/ui como modos Light y Dark. Una configuración JavaScript como `tailwind.config.js` se informa y no se ejecuta
+- **Línea de comandos:** `pairdraw tokens app.fig --import theme.css --write` importa las propiedades personalizadas de una hoja local sin abrir la app; `:root` guarda los valores por defecto y los demás selectores se convierten en modos
+- **Carpeta del proyecto:** `pairdraw tokens app.fig --project ./app --write` importa variables CSS de un proyecto local, incluido un `@theme` de Tailwind v4 y el par `:root` / `.dark` de shadcn/ui como modos Light y Dark. Una configuración JavaScript como `tailwind.config.js` se informa y no se ejecuta
 - **Elegir el destino:** antes de cambiar nada, el diálogo muestra cada colección y modo que encontró y adónde va: a una colección o un modo nuevos, a uno existente o a ninguna parte. Las variables y los estilos con el mismo nombre se actualizan y el resto se añade; no se elimina nada. Cuenta lo que se añadirá, actualizará y omitirá, y explica por qué se omitió cada token
 - La importación es un solo paso: **Deshacer** la revierte entera
 

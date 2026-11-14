@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
-import { createEditor, type Editor } from '@open-pencil/core'
+import { createEditor, type Editor } from '@pairdraw/core'
 
 import { startZoomDrag, ZOOM_TOOL_STEP, zoomToolCursor } from '#vue/canvas/zoom/input'
 

@@ -1,13 +1,13 @@
 import { expect, test } from 'bun:test'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
 import {
   ALL_TOOLS,
   getScriptToolHost,
   registerScriptToolHost,
   type ScriptToolHost
-} from '@open-pencil/core/tools'
-import { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/tools'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { expectDefined } from '#tests/helpers/assert'
 

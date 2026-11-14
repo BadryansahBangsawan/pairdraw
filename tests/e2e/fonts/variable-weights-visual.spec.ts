@@ -2,7 +2,7 @@ import { Buffer } from 'node:buffer'
 
 import type { Page } from '@playwright/test'
 
-import type { SceneNode } from '@open-pencil/scene-graph'
+import type { SceneNode } from '@pairdraw/scene-graph'
 
 import type { FontManager } from '#core/text/font/manager'
 
@@ -43,8 +43,8 @@ async function exportLines(
 ) {
   return page.evaluate(
     async ({ lines, font }) => {
-      const store = window.openPencil?.getStore?.()
-      if (!store?.renderer) throw new Error('OpenPencil renderer not initialized')
+      const store = window.pairdraw?.getStore?.()
+      if (!store?.renderer) throw new Error('Pairdraw renderer not initialized')
       const fontModuleURL = performance
         .getEntriesByType('resource')
         .map((entry) => entry.name)

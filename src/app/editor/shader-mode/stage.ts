@@ -1,13 +1,13 @@
 import { useElementSize, useEventListener } from '@vueuse/core'
 import { computed, watch, type Ref } from 'vue'
 
-import { resolveEditorProfile, type ShaderModeState } from '@open-pencil/core'
-import type { ShaderPreset } from '@open-pencil/scene-graph/shaders'
+import { resolveEditorProfile, type ShaderModeState } from '@pairdraw/core'
+import type { ShaderPreset } from '@pairdraw/scene-graph/shaders'
 import {
   fitShaderPreview,
   useShaderStage,
   type ShaderStageBackend
-} from '@open-pencil/vue/canvas/surface'
+} from '@pairdraw/vue/canvas/surface'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { isButtonActivation, isEditing } from '@/app/shell/keyboard/focus'

@@ -16,8 +16,8 @@ import {
 } from 'reka-ui'
 import { computed } from 'vue'
 
-import { commentThreadNumbers, listCommentThreads } from '@open-pencil/scene-graph/comments'
-import { useCommentMessages } from '@open-pencil/vue/i18n'
+import { commentThreadNumbers, listCommentThreads } from '@pairdraw/scene-graph/comments'
+import { useCommentMessages } from '@pairdraw/vue/i18n'
 
 import { commentThreadsPrompt, openCommentThreads } from '@/app/ai/chat/entry/comments'
 import { acceptsDocumentPrompts, runPromptInDocument } from '@/app/ai/chat/entry/run'

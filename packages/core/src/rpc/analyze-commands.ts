@@ -1,9 +1,9 @@
 import { orderBy, sortBy } from 'es-toolkit/array'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { colorToHex, colorDistance as colorDist } from '@open-pencil/scene-graph/color'
-import type { Color } from '@open-pencil/scene-graph/primitives'
-import { formatTextLength } from '@open-pencil/scene-graph/text'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { colorToHex, colorDistance as colorDist } from '@pairdraw/scene-graph/color'
+import type { Color } from '@pairdraw/scene-graph/primitives'
+import { formatTextLength } from '@pairdraw/scene-graph/text'
 
 import type { ColorUsageEntry } from '#core/tools/analyze/colors'
 import {

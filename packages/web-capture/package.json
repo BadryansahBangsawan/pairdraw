@@ -1,10 +1,10 @@
 {
-  "name": "@open-pencil/web-capture",
+  "name": "@pairdraw/web-capture",
   "version": "0.16.0",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/open-pencil/open-pencil.git",
+    "url": "git+https://github.com/BadryansahBangsawan/pairdraw.git",
     "directory": "packages/web-capture"
   },
   "files": [

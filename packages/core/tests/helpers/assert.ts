@@ -3,7 +3,7 @@ import type {
   SceneGraph,
   SceneNode,
   ShadowEffect,
-} from "@open-pencil/scene-graph";
+} from "@pairdraw/scene-graph";
 
 export function expectDefined<T>(
   value: T | null | undefined,

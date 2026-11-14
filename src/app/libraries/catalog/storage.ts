@@ -9,18 +9,18 @@ import {
   storedLibraryLatestManifestSchema,
   storedLibraryRevisionSchema,
   validateLibraryRevision
-} from '@open-pencil/core/library'
+} from '@pairdraw/core/library'
 import type {
   ComponentLibraryRevision,
   LibraryCatalog,
   LibrarySummary,
   PublishLibraryInput,
   StoredLibraryLatestManifest
-} from '@open-pencil/core/library'
+} from '@pairdraw/core/library'
 
 import type { LibraryObjectStore } from '@/app/integrations/storage'
 
-const PREFIX = 'open-pencil/libraries'
+const PREFIX = 'pairdraw/libraries'
 const textDecoder = new TextDecoder()
 const textEncoder = new TextEncoder()
 

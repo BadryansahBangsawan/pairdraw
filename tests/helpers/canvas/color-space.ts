@@ -52,7 +52,7 @@ export async function focusPaintEffects(page: Page) {
   })
   await page.evaluate(
     async ({ pageName, maskOffset }) => {
-      const store = window.openPencil?.getStore?.()
+      const store = window.pairdraw?.getStore?.()
       if (!store) throw new Error('Editor unavailable')
       store.setDocumentColorSpace('display-p3')
       const existing = store.graph.getPages().find((candidate) => candidate.name === pageName)
@@ -77,7 +77,7 @@ export async function focusPaintEffects(page: Page) {
     { pageName: SPECIMEN_PAGE_NAME, maskOffset: MASK_ROW_OFFSET }
   )
   await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
     const subject = store.graph.getChildren(store.state.currentPageId)
     if (subject.length === 0) throw new Error('Paint effects page is empty')
@@ -89,7 +89,7 @@ export async function focusPaintEffects(page: Page) {
 
 export async function waitForSettledScene(page: Page) {
   await page.waitForFunction(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     const renderer = store?.canvasRenderers.find((r) => r.tracksSceneSettlement)
     return (
       store?.state.navigation.phase === 'idle' &&
@@ -109,7 +109,7 @@ export async function sceneBufferState(page: Page) {
     if (!gl) throw new Error('Scene WebGL context unavailable')
     return {
       colorSpace: gl.drawingBufferColorSpace,
-      documentColorSpace: window.openPencil?.getStore?.().graph.documentColorSpace,
+      documentColorSpace: window.pairdraw?.getStore?.().graph.documentColorSpace,
       error: gl.getError()
     }
   })

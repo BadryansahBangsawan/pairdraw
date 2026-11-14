@@ -1,4 +1,4 @@
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
 
@@ -8,8 +8,8 @@ const editor = useEditorSetupWithClear()
 async function placeRects(rects: Vector[], objects = true) {
   await editor.page.evaluate(
     ({ rects, objects }) => {
-      const store = window.openPencil?.getStore?.()
-      if (!store) throw new Error('OpenPencil store not initialized')
+      const store = window.pairdraw?.getStore?.()
+      if (!store) throw new Error('Pairdraw store not initialized')
       store.state.snappingPreferences = { geometry: true, objects, pixelGrid: false }
       const ids = rects.map((rect) => store.createShape('RECTANGLE', rect.x, rect.y, 80, 80))
       const last = ids.at(-1)
@@ -22,8 +22,8 @@ async function placeRects(rects: Vector[], objects = true) {
 
 async function selectedPosition(): Promise<Vector> {
   return editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const id = store.state.selectedIds.values().next().value
     const node = id ? store.graph.getNode(id) : undefined
     if (!node) throw new Error('Selected node not found')
@@ -32,7 +32,7 @@ async function selectedPosition(): Promise<Vector> {
 }
 
 async function snapGuides() {
-  return editor.page.evaluate(() => window.openPencil?.getStore?.().state.snapGuides ?? [])
+  return editor.page.evaluate(() => window.pairdraw?.getStore?.().state.snapGuides ?? [])
 }
 
 async function canvasBox() {

@@ -10,8 +10,8 @@ export function sectionClicksDriver(page: () => Page) {
   return {
     build() {
       return page().evaluate(async (pan) => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         const fixtureURL = '/tests/helpers/canvas/section-clicks/scene.ts'
         const scene: typeof SectionScene = await import(fixtureURL)
         scene.createSectionClickScene(store.graph, store.state.currentPageId)
@@ -24,13 +24,13 @@ export function sectionClicksDriver(page: () => Page) {
     },
 
     clearSelection() {
-      return page().evaluate(() => window.openPencil?.getStore?.().clearSelection())
+      return page().evaluate(() => window.pairdraw?.getStore?.().clearSelection())
     },
 
     /** The selected layers' names. */
     selection() {
       return page().evaluate(() => {
-        const store = window.openPencil?.getStore?.()
+        const store = window.pairdraw?.getStore?.()
         return [...(store?.state.selectedIds ?? [])].map((id) => store?.graph.getNode(id)?.name)
       })
     },

@@ -1,13 +1,13 @@
 import { uniq } from 'es-toolkit'
 
-import { parseFigmaClipboard } from '@open-pencil/fig/clipboard'
-import { CommittedGraphEventError, type SceneNode } from '@open-pencil/scene-graph'
-import { attachedConnectors } from '@open-pencil/scene-graph/connectors'
-import { getAxisAlignedBoundsInParent } from '@open-pencil/scene-graph/coordinate'
-import { cycleSafeParent } from '@open-pencil/scene-graph/instances'
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
+import { parseFigmaClipboard } from '@pairdraw/fig/clipboard'
+import { CommittedGraphEventError, type SceneNode } from '@pairdraw/scene-graph'
+import { attachedConnectors } from '@pairdraw/scene-graph/connectors'
+import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
+import { cycleSafeParent } from '@pairdraw/scene-graph/instances'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
-import { parseOpenPencilClipboard } from '#core/clipboard'
+import { parsePairdrawClipboard } from '#core/clipboard'
 import { prepareClipboardImport } from '#core/clipboard/fig-import'
 import { computeAllLayouts } from '#core/layout'
 import { reconcileVariableLayouts } from '#core/layout/variables'
@@ -186,7 +186,7 @@ export function createClipboardActions(ctx: EditorContext) {
     let created: string[] = []
     ctx.undo.runBatch('Paste', () => {
       const dependencies = importClipboardDependenciesWithUndo(ctx, snapshot, options.dependencies)
-      created = pasteOpenPencilNodes(
+      created = pastePairdrawNodes(
         dependencies.nodes,
         snapshot.placement,
         snapshot.images,
@@ -199,14 +199,14 @@ export function createClipboardActions(ctx: EditorContext) {
   }
 
   async function pasteFromHTML(html: string, cursorPos?: Vector, options: PasteOptions = {}) {
-    const openPencil = parseOpenPencilClipboard(html)
-    if (openPencil) {
+    const pairdraw = parsePairdrawClipboard(html)
+    if (pairdraw) {
       // One undo step for the paste and any slot it claims.
       const created = ctx.undo.runBatch('Paste', () =>
-        pasteOpenPencilNodes(
-          openPencil.nodes,
-          clipboardPlacement(ctx.graph, openPencil.nodes),
-          openPencil.images,
+        pastePairdrawNodes(
+          pairdraw.nodes,
+          clipboardPlacement(ctx.graph, pairdraw.nodes),
+          pairdraw.images,
           [],
           cursorPos,
           options
@@ -260,7 +260,7 @@ export function createClipboardActions(ctx: EditorContext) {
     }
   }
 
-  function pasteOpenPencilNodes(
+  function pastePairdrawNodes(
     nodes: Array<SceneNode & { children?: SceneNode[] }>,
     placement: ClipboardPlacement,
     images: Map<string, Uint8Array>,

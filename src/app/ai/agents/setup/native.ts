@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-import type { ACPAgentDef } from '@open-pencil/core/constants'
+import type { ACPAgentDef } from '@pairdraw/core/constants'
 
 import { HARNESS_INSTALL_TARGET } from '@/app/ai/agents/pi/companion'
 import { MCP_INSTALL_TARGET } from '@/app/automation/mcp/failure'

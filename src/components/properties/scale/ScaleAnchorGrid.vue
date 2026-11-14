@@ -3,8 +3,8 @@ import { RadioGroupItem, RadioGroupRoot } from 'reka-ui'
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import { isScaleAnchor, SCALE_ANCHORS, type ScaleAnchor } from '@open-pencil/core'
-import { usePanelMessages } from '@open-pencil/vue/i18n'
+import { isScaleAnchor, SCALE_ANCHORS, type ScaleAnchor } from '@pairdraw/core'
+import { usePanelMessages } from '@pairdraw/vue/i18n'
 
 import Tip from '@/components/ui/overlay/Tip.vue'
 import theme from '@/theme/scale-anchor'

@@ -1,4 +1,4 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 
 /**
  * The frames a navigation can point at: the page's top-level frames, in page order. Figma links to

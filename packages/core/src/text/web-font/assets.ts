@@ -1,7 +1,7 @@
 import type { RemoteFontSource, ResolveFontResult } from 'unifont'
 
-import type { WebFontFaceAsset, WebFontFaceRequest } from '@open-pencil/dom-css/export'
-import { faceLoadKey } from '@open-pencil/scene-graph/font-style'
+import type { WebFontFaceAsset, WebFontFaceRequest } from '@pairdraw/dom-css/export'
+import { faceLoadKey } from '@pairdraw/scene-graph/font-style'
 
 import { documentFontData } from '#core/text/font/document'
 import {

@@ -1,6 +1,6 @@
 import { uniq } from 'es-toolkit'
 
-import type { ToolCapability } from '@open-pencil/core/tools'
+import type { ToolCapability } from '@pairdraw/core/tools'
 
 import { PLUGIN_AVAILABLE_CAPABILITIES } from './capability-text'
 import {

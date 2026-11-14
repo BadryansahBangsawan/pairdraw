@@ -5,9 +5,9 @@ import { computed } from 'vue'
 import Search from '~icons/lucide/search'
 import X from '~icons/lucide/x'
 
-import { shortcutPlatform } from '@open-pencil/vue/editor/commands'
-import { useCommandMessages, useCommonMessages } from '@open-pencil/vue/i18n'
-import { CommandPaletteRoot } from '@open-pencil/vue/primitives/CommandPalette'
+import { shortcutPlatform } from '@pairdraw/vue/editor/commands'
+import { useCommandMessages, useCommonMessages } from '@pairdraw/vue/i18n'
+import { CommandPaletteRoot } from '@pairdraw/vue/primitives/CommandPalette'
 
 import { useImageAIPaletteGroup } from '@/app/editor/image-ai/palette'
 import { usePagePaletteGroup } from '@/app/editor/pages/palette'

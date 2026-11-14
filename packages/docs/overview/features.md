@@ -67,11 +67,11 @@ Open multiple documents in tabs. <kbd>⌘</kbd><kbd>T</kbd> new tab, <kbd>⌘</k
 - **Tailwind JSX** — HTML with Tailwind v4 utility classes, ready for React or Vue
 - **Copy as** — text, SVG, PNG (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>C</kbd>), or JSX via context menu
 
-CLI: `openpencil export design.fig -f jsx --style tailwind`
+CLI: `pairdraw export design.fig -f jsx --style tailwind`
 
 ## AI Chat
 
-Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant. 138 tools that can create shapes, set styles, manage layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Connect Anthropic, OpenAI, Google AI, OpenRouter, any compatible endpoint, or the AI your [Pairdraw Cloud](/user-guide/openpencil-cloud#ai-on-cloud) plan includes.
+Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant. 138 tools that can create shapes, set styles, manage layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Connect Anthropic, OpenAI, Google AI, OpenRouter, any compatible endpoint, or the AI your [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud) plan includes.
 
 Tool calls display as collapsible timeline entries. Visual verification — the assistant renders its work and checks it against your request. Full undo support for all AI mutations.
 
@@ -88,14 +88,14 @@ On a board, the same browser becomes research: the chat quotes the page into a s
 Connect Claude Code, Cursor, Windsurf, or any MCP client to read and write `.fig` files headlessly. 138 tools. Two transports: stdio and HTTP.
 
 ```sh
-npm install -g @open-pencil/mcp
+npm install -g @pairdraw/mcp
 ```
 
 ```json
 {
   "mcpServers": {
-    "open-pencil": {
-      "command": "openpencil-mcp"
+    "pairdraw": {
+      "command": "pairdraw-mcp"
     }
   }
 }
@@ -108,22 +108,22 @@ See [MCP Tools reference](/programmable/mcp-server) for the full tool list.
 Inspect, export, and analyze `.fig` files from the terminal:
 
 ```sh
-openpencil tree design.fig          # Node tree
-openpencil find design.fig --type TEXT  # Search
-openpencil export design.fig -f png     # Render
-openpencil analyze colors design.fig    # Color audit
-openpencil analyze clusters design.fig  # Repeated patterns
-openpencil eval design.fig -c "..."     # Figma Plugin API
+pairdraw tree design.fig          # Node tree
+pairdraw find design.fig --type TEXT  # Search
+pairdraw export design.fig -f png     # Render
+pairdraw analyze colors design.fig    # Color audit
+pairdraw analyze clusters design.fig  # Repeated patterns
+pairdraw eval design.fig -c "..."     # Figma Plugin API
 ```
 
 When the desktop app is running, omit the file to control the live editor via RPC:
 
 ```sh
-openpencil tree                     # Live document
-openpencil export -f png            # Screenshot canvas
+pairdraw tree                     # Live document
+pairdraw export -f png            # Screenshot canvas
 ```
 
-All commands support `--json`. Install: `npm install -g @open-pencil/cli` (or `bun add -g @open-pencil/cli`).
+All commands support `--json`. Install: `npm install -g @pairdraw/cli` (or `bun add -g @pairdraw/cli`).
 
 ## Real-Time Collaboration
 
@@ -145,7 +145,7 @@ P2P via WebRTC — no server required. Share a link and edit together.
 **Homebrew:**
 
 ```sh
-brew install --cask openpencil
+brew install --cask pairdraw
 ```
 
 **VS Code** — a custom editor for `.fig` and `.pen` documents that runs the web editor in a webview and saves what it shows; it is not published to a marketplace, so build it from the repository ([VS Code extension](/programmable/vscode)).

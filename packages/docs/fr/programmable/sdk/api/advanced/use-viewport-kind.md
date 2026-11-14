@@ -12,7 +12,7 @@ Utilisez le composable lorsqu’il suffit de distinguer Mobile et Desktop sans c
 ## Utilisation
 
 ```ts
-import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
+import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
 
 const { isMobile, isDesktop } = useViewportKind()
 ```

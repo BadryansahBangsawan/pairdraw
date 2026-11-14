@@ -1,29 +1,29 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph, type PluginDataEntry } from '@open-pencil/scene-graph'
+import { SceneGraph, type PluginDataEntry } from '@pairdraw/scene-graph'
 import {
   clearNodeFillOkHCL,
   getNodeOkHCLPayloads,
   setNodeFillOkHCL,
   setNodeStrokeOkHCL
-} from '@open-pencil/scene-graph/color'
+} from '@pairdraw/scene-graph/color'
 import {
   contentPluginData,
-  OPEN_PENCIL_PLUGIN_DATA,
-  OPEN_PENCIL_PLUGIN_ID,
+  PAIRDRAW_PLUGIN_DATA,
+  PAIRDRAW_PLUGIN_ID,
   readAllPluginData,
   readPluginData,
   withPluginData
-} from '@open-pencil/scene-graph/plugin-data'
+} from '@pairdraw/scene-graph/plugin-data'
 
-const { exportSettings, okhcl, textDirection } = OPEN_PENCIL_PLUGIN_DATA
+const { exportSettings, okhcl, textDirection } = PAIRDRAW_PLUGIN_DATA
 const OTHER_PLUGIN: PluginDataEntry = { pluginId: 'other-plugin', key: 'okhcl', value: 'theirs' }
 
 function entry(key: string, value: string): PluginDataEntry {
-  return { pluginId: OPEN_PENCIL_PLUGIN_ID, key, value }
+  return { pluginId: PAIRDRAW_PLUGIN_ID, key, value }
 }
 
-describe('OpenPencil plugin data', () => {
+describe('Pairdraw plugin data', () => {
   test('keeps content and other plugins’ entries as a node’s content', () => {
     const entries = [
       OTHER_PLUGIN,
@@ -31,11 +31,19 @@ describe('OpenPencil plugin data', () => {
       entry('librarySource', '{}'),
       entry('okhcl', '[]')
     ]
-    expect(contentPluginData(entries)).toEqual([entry('okhcl', '[]'), OTHER_PLUGIN])
+    expect(contentPluginData(entries)).toEqual([OTHER_PLUGIN, entry('okhcl', '[]')])
+  })
+
+  test('reads entries saved under the plugin id used before the rename', () => {
+    const saved = [{ pluginId: 'open-pencil', key: 'textDirection', value: 'RTL' }]
+    expect(readPluginData(saved, PAIRDRAW_PLUGIN_DATA.textDirection)).toBe('RTL')
+    expect(withPluginData(saved, PAIRDRAW_PLUGIN_DATA.textDirection, 'LTR')).toEqual([
+      entry('textDirection', 'LTR')
+    ])
   })
 
   test('gives every field its own key', () => {
-    const keys = Object.values(OPEN_PENCIL_PLUGIN_DATA).map((field) => field.key)
+    const keys = Object.values(PAIRDRAW_PLUGIN_DATA).map((field) => field.key)
     expect(new Set(keys).size).toBe(keys.length)
   })
 
@@ -69,7 +77,7 @@ describe('OpenPencil plugin data', () => {
   })
 
   test('reads a script header with its inputs and drops a malformed one', () => {
-    const { script } = OPEN_PENCIL_PLUGIN_DATA
+    const { script } = PAIRDRAW_PLUGIN_DATA
     const data = {
       version: 1 as const,
       source: 'return pencil.rect({ width: 10, height: 10 })',

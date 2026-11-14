@@ -1,15 +1,15 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createDocumentGraph } from '@open-pencil/core'
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { createSticky, stickySublayers } from '@open-pencil/scene-graph/generated'
+import { createDocumentGraph } from '@pairdraw/core'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { createSticky, stickySublayers } from '@pairdraw/scene-graph/generated'
 import {
   contentPluginData,
   readWebCitation,
   withWebCitation,
   type WebCitation
-} from '@open-pencil/scene-graph/plugin-data'
-import { aiMessages } from '@open-pencil/vue/i18n'
+} from '@pairdraw/scene-graph/plugin-data'
+import { aiMessages } from '@pairdraw/vue/i18n'
 
 import { stickyPrompt } from '@/app/ai/chat/entry/sticky'
 import { findReferences, referenceComponents } from '@/app/ai/chat/references/link'

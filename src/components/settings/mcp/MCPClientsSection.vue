@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useAutomationMessages, useCommonMessages } from '@open-pencil/vue/i18n'
+import { useAutomationMessages, useCommonMessages } from '@pairdraw/vue/i18n'
 
 import {
   MCP_CLIENT_COMMAND,

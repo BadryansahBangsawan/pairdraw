@@ -1,10 +1,10 @@
 import { mapValues, pick } from 'es-toolkit'
 import * as v from 'valibot'
 
-import type { Fill, NodeType, SceneNode } from '@open-pencil/scene-graph'
-import { tryParseColor } from '@open-pencil/scene-graph/color'
-import { copyStroke } from '@open-pencil/scene-graph/copy'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import type { Fill, NodeType, SceneNode } from '@pairdraw/scene-graph'
+import { tryParseColor } from '@pairdraw/scene-graph/color'
+import { copyStroke } from '@pairdraw/scene-graph/copy'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { getNodeEditCapability } from '#core/editor/capabilities'
 import type { FigmaAPI } from '#core/figma-api'

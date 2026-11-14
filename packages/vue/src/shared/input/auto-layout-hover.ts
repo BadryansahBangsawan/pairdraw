@@ -1,12 +1,12 @@
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 import {
   AUTO_LAYOUT_HOVER_GAP_REGION_TOLERANCE,
   AUTO_LAYOUT_HOVER_PADDING_REGION_TOLERANCE,
   AUTO_LAYOUT_HOVER_TICK_HIT_TOLERANCE
-} from '@open-pencil/core/constants'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { isGeneratedFrame } from '@open-pencil/scene-graph/generated'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/core/constants'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { isGeneratedFrame } from '@pairdraw/scene-graph/generated'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 type AutoLayoutHover = NonNullable<Editor['state']['autoLayoutHover']>
 

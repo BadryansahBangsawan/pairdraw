@@ -7,20 +7,20 @@ import type {
   SceneGraph,
   SceneNode,
   ShadowEffect
-} from '@open-pencil/scene-graph'
+} from '@pairdraw/scene-graph'
 import {
   colorToHex,
   colorToDisplayCSS,
   getDefaultRenderColorSpace,
   type RenderColorSpace
-} from '@open-pencil/scene-graph/color'
+} from '@pairdraw/scene-graph/color'
 import {
   gradientPoint,
   invertGradientTransform,
   isIdentityGradientTransform
-} from '@open-pencil/scene-graph/gradient'
-import { imageMimeType } from '@open-pencil/scene-graph/images'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/gradient'
+import { imageMimeType } from '@pairdraw/scene-graph/images'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { FontFaceRef } from '#core/text/font/faces'
 

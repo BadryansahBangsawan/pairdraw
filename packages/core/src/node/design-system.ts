@@ -1,7 +1,7 @@
 import { lstat, readdir, readFile, realpath } from 'node:fs/promises'
 import { isAbsolute, join, relative, sep } from 'node:path'
 
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import {
   DESIGN_SYSTEM_MAX_FILE_BYTES,

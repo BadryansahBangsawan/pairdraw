@@ -1,10 +1,10 @@
 import { dirname } from 'pathe'
 import * as v from 'valibot'
 
-import { IS_TAURI } from '@open-pencil/core/constants'
+import { IS_TAURI } from '@pairdraw/core/constants'
 
 const APP_CACHE_DIR = 'cache/v1'
-const STORAGE_PREFIX = 'open-pencil:cache:v1:'
+const STORAGE_PREFIX = 'pairdraw:cache:v1:'
 
 const textEncoder = new TextEncoder()
 const textDecoder = new TextDecoder()

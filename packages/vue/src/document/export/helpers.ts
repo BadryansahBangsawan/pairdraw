@@ -1,9 +1,9 @@
 import { computed } from 'vue'
 import type { ComputedRef } from 'vue'
 
-import type { Editor } from '@open-pencil/core'
-import { BUILTIN_IO_FORMATS, IORegistry, type BuiltinIOFormatId } from '@open-pencil/core/io'
-import type { ExportSetting, PluginDataEntry } from '@open-pencil/scene-graph'
+import type { Editor } from '@pairdraw/core'
+import { BUILTIN_IO_FORMATS, IORegistry, type BuiltinIOFormatId } from '@pairdraw/core/io'
+import type { ExportSetting, PluginDataEntry } from '@pairdraw/scene-graph'
 import {
   DEFAULT_EXPORT_QUALITY,
   EXPORT_FORMAT_IDS,
@@ -11,13 +11,13 @@ import {
   MIN_EXPORT_QUALITY,
   clampExportQuality,
   type ExportFormatId
-} from '@open-pencil/scene-graph/export-format'
+} from '@pairdraw/scene-graph/export-format'
 import {
   MAX_EXPORT_SCALE,
   MIN_EXPORT_SCALE,
   clampExportScale
-} from '@open-pencil/scene-graph/export-scale'
-import { OPEN_PENCIL_PLUGIN_DATA, withPluginData } from '@open-pencil/scene-graph/plugin-data'
+} from '@pairdraw/scene-graph/export-scale'
+import { PAIRDRAW_PLUGIN_DATA, withPluginData } from '@pairdraw/scene-graph/plugin-data'
 
 import { useSceneComputed } from '#vue/internal/scene-computed/use'
 
@@ -145,7 +145,7 @@ function syncExportSettingsPluginData(
 ): PluginDataEntry[] {
   return withPluginData(
     pluginData,
-    OPEN_PENCIL_PLUGIN_DATA.exportSettings,
+    PAIRDRAW_PLUGIN_DATA.exportSettings,
     settings.length > 0 ? settings : undefined
   )
 }

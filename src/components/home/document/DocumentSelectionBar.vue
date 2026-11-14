@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { tv } from 'tailwind-variants'
 
-import { useFileMessages } from '@open-pencil/vue/i18n'
+import { useFileMessages } from '@pairdraw/vue/i18n'
 
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'

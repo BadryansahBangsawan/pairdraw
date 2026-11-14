@@ -2,8 +2,8 @@ import {
   ImageTooLargeError,
   MAX_IMAGE_FETCH_BYTES,
   readBoundedImage
-} from '@open-pencil/core/figma-api'
-import { imageHeader } from '@open-pencil/scene-graph/images'
+} from '@pairdraw/core/figma-api'
+import { imageHeader } from '@pairdraw/scene-graph/images'
 
 import type { FetchFunction } from '@/app/http/types'
 import { createTauriFetch } from '@/app/tauri/http'

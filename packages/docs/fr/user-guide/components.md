@@ -41,4 +41,4 @@ Les changements du composant principal sont présentés dans une revue avant app
 
 Publiez les composants locaux comme bibliothèque et activez des bibliothèques externes dans Ressources. Les révisions sont conservées localement pour le travail hors ligne.
 
-**Pairdraw Basics** est le jeu original inclus : des composants bouton, champ, badge, carte et avatar, publiés comme `pairdraw-basics`. Il est dans le panneau Ressources sans catalogue : activez-le pour insérer ses composants, y compris hors ligne, et il reste après un rechargement. `openpencil libraries seed --root ./catalogue` publie toujours ce même jeu dans un catalogue de fichiers.
+**Pairdraw Basics** est le jeu original inclus : des composants bouton, champ, badge, carte et avatar, publiés comme `pairdraw-basics`. Il est dans le panneau Ressources sans catalogue : activez-le pour insérer ses composants, y compris hors ligne, et il reste après un rechargement. `pairdraw libraries seed --root ./catalogue` publie toujours ce même jeu dans un catalogue de fichiers.

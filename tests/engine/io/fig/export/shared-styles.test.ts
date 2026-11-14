@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 
-import { exportFigFile } from '@open-pencil/core/io/formats/fig'
-import { parseFigBuffer } from '@open-pencil/fig'
-import { sceneNodeToKiwi } from '@open-pencil/fig/node-change'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { exportFigFile } from '@pairdraw/core/io/formats/fig'
+import { parseFigBuffer } from '@pairdraw/fig'
+import { sceneNodeToKiwi } from '@pairdraw/fig/node-change'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { uint8ArrayToArrayBuffer } from '#tests/helpers/fig/fixtures'
 

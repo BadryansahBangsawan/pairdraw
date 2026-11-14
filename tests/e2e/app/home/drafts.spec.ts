@@ -8,7 +8,7 @@ const DRAFTS_URL = '/?test&drafts'
 
 async function addRectangle(page: Page, name: string) {
   await page.evaluate((layerName) => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
     const id = store.createShape('RECTANGLE', 100, 100, 120, 80)
     store.updateNode(id, { name: layerName })
@@ -18,7 +18,7 @@ async function addRectangle(page: Page, name: string) {
 /** Writes the draft now rather than after the edit settles. */
 async function keepDraft(page: Page) {
   await page.evaluate(async () => {
-    await window.openPencil?.getStore?.().persistDraftNow()
+    await window.pairdraw?.getStore?.().persistDraftNow()
   })
 }
 
@@ -94,7 +94,7 @@ test('saving a draft to a file takes it out of Drafts', async ({ page }) => {
     const root = await navigator.storage.getDirectory()
     const handle = await root.getFileHandle('promoted.fig', { create: true })
     window.showSaveFilePicker = async () => handle
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!(await store?.saveFigFileAs())) throw new Error('Save As did not write the file')
   })
 

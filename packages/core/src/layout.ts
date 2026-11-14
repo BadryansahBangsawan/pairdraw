@@ -10,7 +10,7 @@ import {
   type Node as YogaNode
 } from 'yoga-layout'
 
-import { resolveNodeLayoutDirection } from '@open-pencil/scene-graph/text/direction'
+import { resolveNodeLayoutDirection } from '@pairdraw/scene-graph/text/direction'
 
 import { applyYogaLayout } from './layout/apply'
 import {
@@ -34,10 +34,10 @@ export {
   setTextMeasurer,
   type TextMeasurer
 } from './layout/text-measurement'
-import type { LayoutSizing, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { connectorSublayers, layoutConnector } from '@open-pencil/scene-graph/connectors'
-import { isGeneratedFrame } from '@open-pencil/scene-graph/generated'
-import { layoutSizing } from '@open-pencil/scene-graph/layout'
+import type { LayoutSizing, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { connectorSublayers, layoutConnector } from '@pairdraw/scene-graph/connectors'
+import { isGeneratedFrame } from '@pairdraw/scene-graph/generated'
+import { layoutSizing } from '@pairdraw/scene-graph/layout'
 
 import { fitShapeWithTextFrame } from './layout/shape-with-text'
 import { applyContentInsets, applyStrokeMargins, strokeRoom } from './layout/strokes'

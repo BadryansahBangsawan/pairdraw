@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { stickySublayers } from '@open-pencil/scene-graph/generated'
-import { readWebCitation } from '@open-pencil/scene-graph/plugin-data'
+import { createEditor } from '@pairdraw/core'
+import { stickySublayers } from '@pairdraw/scene-graph/generated'
+import { readWebCitation } from '@pairdraw/scene-graph/plugin-data'
 
 import { citeOnBoard } from '@/app/research/place'
 import { createResearchTools, type ResearchWindow } from '@/app/research/tools'

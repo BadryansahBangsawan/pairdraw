@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { resolveEditorProfile } from '@open-pencil/core'
-import { useEditorCommands } from '@open-pencil/vue/editor/commands'
-import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
-import { useI18n } from '@open-pencil/vue/i18n'
-import { ToolbarRoot, useToolbarState } from '@open-pencil/vue/primitives/Toolbar'
+import { resolveEditorProfile } from '@pairdraw/core'
+import { useEditorCommands } from '@pairdraw/vue/editor/commands'
+import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
+import { useI18n } from '@pairdraw/vue/i18n'
+import { ToolbarRoot, useToolbarState } from '@pairdraw/vue/primitives/Toolbar'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { TOOLBAR_ACTIONS, toolbarItems, toolbarLayoutFor } from '@/app/editor/toolbar/layout'

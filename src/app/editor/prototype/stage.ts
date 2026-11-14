@@ -1,10 +1,10 @@
 import { useElementSize, useEventListener } from '@vueuse/core'
 import { computed, onScopeDispose, ref, watch, type Ref } from 'vue'
 
-import { resolveEditorProfile } from '@open-pencil/core'
-import { renderNodesToImage } from '@open-pencil/core/io/formats/raster'
-import type { PrototypeAction } from '@open-pencil/scene-graph'
-import { getAxisAlignedWorldBounds } from '@open-pencil/scene-graph/coordinate'
+import { resolveEditorProfile } from '@pairdraw/core'
+import { renderNodesToImage } from '@pairdraw/core/io/formats/raster'
+import type { PrototypeAction } from '@pairdraw/scene-graph'
+import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { letterboxRects, type StageRect } from '@/app/slides/letterbox'

@@ -3,11 +3,11 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { guid } from '#core-tests/helpers/fig/guid'
 import * as v from 'valibot'
 
-import { exportFigFile } from '@open-pencil/core/io/formats/fig'
-import { materializeDocument, parseFigBuffer } from '@open-pencil/fig'
-import { initCodec, type NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { setInstanceOverride } from '@open-pencil/scene-graph/instances/overrides'
+import { exportFigFile } from '@pairdraw/core/io/formats/fig'
+import { materializeDocument, parseFigBuffer } from '@pairdraw/fig'
+import { initCodec, type NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 
 // Figma stores fill on the child and keeps that axis fixed in the frame's own sizing; a hugging
 // value there wins over the fill, so a filled row or button opened in Figma shrank to its content.

@@ -1,8 +1,8 @@
 import { afterAll, describe, expect, test } from 'bun:test'
 
-import { initCanvasKit } from '@open-pencil/core/io/formats/raster'
-import { SceneGraph, type Fill } from '@open-pencil/scene-graph'
-import { createShaderSourcePaint, withShaderPaints } from '@open-pencil/scene-graph/shaders'
+import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
+import { SceneGraph, type Fill } from '@pairdraw/scene-graph'
+import { createShaderSourcePaint, withShaderPaints } from '@pairdraw/scene-graph/shaders'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 import { SkiaRenderer } from '#core/canvas'

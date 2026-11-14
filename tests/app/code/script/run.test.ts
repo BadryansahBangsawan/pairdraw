@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import * as v from 'valibot'
 
-import type { ScriptInputValue } from '@open-pencil/scene-graph/script'
+import type { ScriptInputValue } from '@pairdraw/scene-graph/script'
 
 import { runInFrame, type ScriptFrame } from '@/app/code/script/sandbox/evaluate'
 import { mulberry32, scriptSeed } from '@/app/code/script/sandbox/random'

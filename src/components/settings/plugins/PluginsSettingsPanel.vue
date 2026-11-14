@@ -4,7 +4,7 @@ import { AlertDialogAction, AlertDialogCancel } from 'reka-ui'
 import { computed, ref } from 'vue'
 import IconPuzzle from '~icons/lucide/puzzle'
 
-import { useCommonMessages, useSettingsMessages } from '@open-pencil/vue/i18n'
+import { useCommonMessages, useSettingsMessages } from '@pairdraw/vue/i18n'
 
 import { PLUGIN_AVAILABLE_CAPABILITIES, pluginCapabilityKeys } from '@/app/plugins/capability-text'
 import type { PluginInstallResult } from '@/app/plugins/catalog'

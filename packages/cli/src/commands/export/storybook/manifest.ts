@@ -3,21 +3,20 @@ import { isAbsolute, join, posix } from 'node:path'
 
 import * as v from 'valibot'
 
-import { writeFileAtomic } from '@open-pencil/core/node/fs'
+import { writeFileAtomic } from '@pairdraw/core/node/fs'
 
 /**
  * Records which document and page generated each file in a Storybook output folder, so a
  * re-export replaces its own stories and leaves every other file alone.
  */
-export const MANIFEST_FILE = '.openpencil-stories.json'
+export const MANIFEST_FILE = '.pairdraw-stories.json'
 
 /** Files the export writes directly in the output folder: stories and generated components. */
 const OWN_FILE = /^[^/]+\.(stories\.ts|vue|tsx|module\.css)$/
 /** A variant's design image, in its story's `<Name>.design/` folder. */
 const DESIGN_IMAGE = /^[^/]+\.design\/[^/]+\.png$/
-/** A document's shared files in `openpencil/<document>/`: its fonts and design tokens. */
-const SHARED_FILE =
-  /^openpencil\/[^/]+\/(fonts\.css|tokens\.css|fonts\/[^/]+\.(woff2|woff|otf|ttf))$/
+/** A document's shared files in `pairdraw/<document>/`: its fonts and design tokens. */
+const SHARED_FILE = /^pairdraw\/[^/]+\/(fonts\.css|tokens\.css|fonts\/[^/]+\.(woff2|woff|otf|ttf))$/
 
 /**
  * A file the export writes: a story, a generated component and its stylesheet, a design image,

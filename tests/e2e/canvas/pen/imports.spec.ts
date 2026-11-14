@@ -3,7 +3,7 @@ import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
 const editor = useEditorSetup('/?test&no-chrome&no-rulers')
 
 test('opens a .pen document whose libraries the browser cannot read with placeholders and a warning', async () => {
-  await editor.page.evaluate(() => window.openPencil?.openFile?.('/tests/fixtures/pen-imports.pen'))
+  await editor.page.evaluate(() => window.pairdraw?.openFile?.('/tests/fixtures/pen-imports.pen'))
   await editor.canvas.waitForInit()
 
   // The warning names the library as the document writes its path.
@@ -13,7 +13,7 @@ test('opens a .pen document whose libraries the browser cannot read with placeho
 
   expect(
     await editor.page.evaluate(() => {
-      const graph = window.openPencil?.getStore?.().graph
+      const graph = window.pairdraw?.getStore?.().graph
       const pen = (id: string, key: string) =>
         graph
           ?.getNode(id)
@@ -36,8 +36,8 @@ test('opens a .pen document whose libraries the browser cannot read with placeho
   })
 
   await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.state.zoom = 1
     store.state.panX = 0
     store.state.panY = 0

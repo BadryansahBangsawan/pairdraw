@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import process from 'node:process'
 
-import { AUTOMATION_HTTP_PORT } from '@open-pencil/core/constants'
+import { AUTOMATION_HTTP_PORT } from '@pairdraw/core/constants'
 
 import { devAutomationRoute } from '../src/app/automation/bridge/portless-route'
 import {
@@ -10,7 +10,7 @@ import {
   type DevAgentSession
 } from '../src/app/automation/bridge/vite-plugin'
 
-const devAutomationAuthToken = process.env.OPENPENCIL_DEV_TOKEN ?? randomUUID()
+const devAutomationAuthToken = process.env.PAIRDRAW_DEV_TOKEN ?? randomUUID()
 let devAgentSession: DevAgentSession | null = null
 
 export function localAutomationToken(command: string): string | null {
@@ -20,9 +20,9 @@ export function localAutomationToken(command: string): string | null {
 /**
  * The tab session that lets the development server's own tab start coding agents through its MCP
  * server without a pairing link, made once per Vite process and never derived from
- * `OPENPENCIL_DEV_TOKEN`. Null for builds, the Cloud and metrics modes, Tauri development (the
+ * `PAIRDRAW_DEV_TOKEN`. Null for builds, the Cloud and metrics modes, Tauri development (the
  * desktop app runs agents itself, and `TAURI_DEV_HOST` exposes the server beyond this machine),
- * Portless (its MCP server is not on the port the tab knows), and `OPENPENCIL_DEV_AGENTS=0`.
+ * Portless (its MCP server is not on the port the tab knows), and `PAIRDRAW_DEV_AGENTS=0`.
  */
 export function localAgentSession(
   command: string,
@@ -32,7 +32,7 @@ export function localAgentSession(
   if (command !== 'serve' || mode === 'cloud' || mode === 'metrics') return null
   if (env.TAURI_DEV_HOST || env.TAURI_ENV_PLATFORM) return null
   if (env.PORTLESS_URL) return null
-  if (env.OPENPENCIL_DEV_AGENTS === '0') return null
+  if (env.PAIRDRAW_DEV_AGENTS === '0') return null
   devAgentSession ??= createDevAgentSession()
   return devAgentSession
 }
@@ -42,23 +42,19 @@ export function automationCORSOrigin(host: string | undefined): string {
 }
 
 export function localAutomationRoute(host: string | undefined) {
-  const port = Number(process.env.OPENPENCIL_DEV_MCP_PORT ?? AUTOMATION_HTTP_PORT)
+  const port = Number(process.env.PAIRDRAW_DEV_MCP_PORT ?? AUTOMATION_HTTP_PORT)
   if (!Number.isInteger(port) || port < 1024 || port > 65535) {
-    throw new Error('OPENPENCIL_DEV_MCP_PORT must be an integer between 1024 and 65535')
+    throw new Error('PAIRDRAW_DEV_MCP_PORT must be an integer between 1024 and 65535')
   }
-  const origin = process.env.OPENPENCIL_DEV_ORIGIN ?? automationCORSOrigin(host)
+  const origin = process.env.PAIRDRAW_DEV_ORIGIN ?? automationCORSOrigin(host)
   const url = new URL(origin)
   if (!['http:', 'https:'].includes(url.protocol) || url.origin !== origin) {
-    throw new Error('OPENPENCIL_DEV_ORIGIN must be an HTTP(S) origin')
+    throw new Error('PAIRDRAW_DEV_ORIGIN must be an HTTP(S) origin')
   }
   return { ...devAutomationRoute(process.env.PORTLESS_URL, port, origin), httpPort: port }
 }
 
-export function openPencilAutomationPlugin(
-  command: string,
-  host: string | undefined,
-  mode: string
-) {
+export function pairdrawAutomationPlugin(command: string, host: string | undefined, mode: string) {
   return automationPlugin(localAutomationToken(command), {
     ...localAutomationRoute(host),
     agentSession: localAgentSession(command, mode)

@@ -1,5 +1,5 @@
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import type { SceneNode } from '@open-pencil/scene-graph'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import type { SceneNode } from '@pairdraw/scene-graph'
 
 import { cloneRecord } from '../clone'
 import { createFillPaints } from '../export/context'

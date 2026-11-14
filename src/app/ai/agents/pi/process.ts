@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-import type { HarnessSidecarMessage, JSONValue } from '@open-pencil/harness'
+import type { HarnessSidecarMessage, JSONValue } from '@pairdraw/harness'
 
 import { tokenUsageSchema } from '@/app/diagnostics/events/schema'
 import { resolvePlatformCommand } from '@/app/tauri/command'
@@ -62,7 +62,7 @@ export async function spawnHarnessProcess(options: {
   onUnexpectedClose: () => void
 }): Promise<HarnessProcess> {
   const { Command } = await import('@tauri-apps/plugin-shell')
-  const resolved = resolvePlatformCommand('openpencil-harness')
+  const resolved = resolvePlatformCommand('pairdraw-harness')
   const command = Command.create(resolved.command, resolved.args, {
     encoding: 'raw',
     env: options.environment

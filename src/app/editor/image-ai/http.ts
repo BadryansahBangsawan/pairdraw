@@ -1,4 +1,4 @@
-import { IS_TAURI } from '@open-pencil/core/constants'
+import { IS_TAURI } from '@pairdraw/core/constants'
 
 import { readBoundedBody } from '@/app/document/io/browser'
 import { tauriFetch } from '@/app/tauri/http'

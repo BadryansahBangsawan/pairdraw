@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { recordInstanceOverride } from '@open-pencil/scene-graph/instances'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 
 import { expectDefined, getNodeOrThrow } from '../helpers/assert'
 

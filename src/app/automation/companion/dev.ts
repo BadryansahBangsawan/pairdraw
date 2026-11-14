@@ -15,13 +15,13 @@ const RETRY_DELAY_MS = 1_000
 /** The tokens `bun run dev` gave its MCP server for this tab, or null outside that server. */
 function devAgentSession(): Omit<CompanionSession, 'port'> | null {
   if (!import.meta.env.DEV || IS_TAURI) return null
-  if (typeof __OPENPENCIL_LOCAL_AGENT_SESSION__ === 'undefined') return null
-  return __OPENPENCIL_LOCAL_AGENT_SESSION__
+  if (typeof __PAIRDRAW_LOCAL_AGENT_SESSION__ === 'undefined') return null
+  return __PAIRDRAW_LOCAL_AGENT_SESSION__
 }
 
 function devMCPURL(): string {
-  return typeof __OPENPENCIL_LOCAL_AUTOMATION_HTTP_URL__ === 'string'
-    ? __OPENPENCIL_LOCAL_AUTOMATION_HTTP_URL__
+  return typeof __PAIRDRAW_LOCAL_AUTOMATION_HTTP_URL__ === 'string'
+    ? __PAIRDRAW_LOCAL_AUTOMATION_HTTP_URL__
     : ''
 }
 
@@ -38,8 +38,8 @@ interface DevCompanionOptions {
 /**
  * In `bun run dev`, connects this tab to the agent bridge of the MCP server the development
  * server started, with the session both were given, so coding agents work without
- * `openpencil-connect` or a pairing link. Does nothing in builds, in Tauri, under Portless, or
- * with `OPENPENCIL_DEV_AGENTS=0`. Resolves to whether the companion answered.
+ * `pairdraw-connect` or a pairing link. Does nothing in builds, in Tauri, under Portless, or
+ * with `PAIRDRAW_DEV_AGENTS=0`. Resolves to whether the companion answered.
  */
 export async function adoptDevCompanion({
   connection = companion,

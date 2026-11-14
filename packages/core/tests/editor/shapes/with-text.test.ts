@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { createEditor } from '@open-pencil/core'
-import { setTextMeasurer } from '@open-pencil/core/layout'
-import { colorToHex } from '@open-pencil/scene-graph/color'
-import { shapeWithTextLabel } from '@open-pencil/scene-graph/generated'
-import { lineHeightPixels } from '@open-pencil/scene-graph/text'
+import { createEditor } from '@pairdraw/core'
+import { setTextMeasurer } from '@pairdraw/core/layout'
+import { colorToHex } from '@pairdraw/scene-graph/color'
+import { shapeWithTextLabel } from '@pairdraw/scene-graph/generated'
+import { lineHeightPixels } from '@pairdraw/scene-graph/text'
 
 import { applyGeneratedTextNameEdit } from '#core/editor/text/name'
 

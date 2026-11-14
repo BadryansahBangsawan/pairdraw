@@ -1,11 +1,6 @@
 import * as v from 'valibot'
 
-import {
-  ALL_TOOLS,
-  isToolExposed,
-  toolChangesDocument,
-  type ToolDef
-} from '@open-pencil/core/tools'
+import { ALL_TOOLS, isToolExposed, toolChangesDocument, type ToolDef } from '@pairdraw/core/tools'
 
 import { dim, fmtList, kv } from '#cli/format'
 
@@ -15,7 +10,7 @@ export const CLI_TOOLS = ALL_TOOLS.filter((def) => isToolExposed(def, 'mcp'))
 /** The tool called `name`; `hint` tells the user how to list the tools where they are. */
 export function findCLITool(
   name: string,
-  hint = 'Run `openpencil tool list` to see tools.'
+  hint = 'Run `pairdraw tool list` to see tools.'
 ): ToolDef {
   const def = CLI_TOOLS.find((candidate) => candidate.name === name)
   if (!def) throw new Error(`Unknown tool "${name}". ${hint}`)
@@ -72,7 +67,7 @@ export function formatToolResult(result: unknown): string {
   const binary = v.safeParse(binaryResultSchema, result)
   if (binary.success) {
     const bytes = Math.floor((binary.output.base64.length * 3) / 4)
-    return kv(binary.output.mimeType, `${bytes} bytes; use openpencil export to write files`)
+    return kv(binary.output.mimeType, `${bytes} bytes; use pairdraw export to write files`)
   }
   return JSON.stringify(result, null, 2)
 }

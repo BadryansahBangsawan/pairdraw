@@ -18,11 +18,11 @@
     "paths": {
       "#cloud/*": ["./src/*"],
       "#cloud-tests/*": ["./tests/*"],
-      "@open-pencil/cloud/contract": ["./src/contract/index.ts"],
-      "@open-pencil/cloud/client": ["./src/client/index.ts"],
-      "@open-pencil/cloud/email": ["./src/email/index.ts"],
-      "@open-pencil/cloud/runtime/node": ["./src/runtime/node/index.ts"],
-      "@open-pencil/cloud/server": ["./src/server/index.ts"]
+      "@pairdraw/cloud/contract": ["./src/contract/index.ts"],
+      "@pairdraw/cloud/client": ["./src/client/index.ts"],
+      "@pairdraw/cloud/email": ["./src/email/index.ts"],
+      "@pairdraw/cloud/runtime/node": ["./src/runtime/node/index.ts"],
+      "@pairdraw/cloud/server": ["./src/server/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "tests/**/*.ts", "deploy/**/*.ts"],
@@ -31,7 +31,7 @@
     "dist",
     "src/runtime/cloudflare",
     "deploy/cloudflare",
-    "deploy/openpencil",
+    "deploy/pairdraw",
     "deploy/generated"
   ]
 }

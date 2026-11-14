@@ -1,5 +1,5 @@
 {
-  "name": "@open-pencil/ci-images-tools",
+  "name": "@pairdraw/ci-images-tools",
   "private": true,
   "type": "module"
 }

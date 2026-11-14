@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 import { isValid, toUint8Array } from 'js-base64'
 import * as v from 'valibot'
 
-import { writeFileAtomic } from '@open-pencil/core/node/fs'
+import { writeFileAtomic } from '@pairdraw/core/node/fs'
 
 import { rpc } from '#cli/app/client'
 import { dim, warn } from '#cli/format'

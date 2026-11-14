@@ -2,8 +2,8 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { cloudPublicDocumentURL } from '@open-pencil/cloud/contract'
-import { useCloudPortalMessages } from '@open-pencil/vue/i18n'
+import { cloudPublicDocumentURL } from '@pairdraw/cloud/contract'
+import { useCloudPortalMessages } from '@pairdraw/vue/i18n'
 
 import { usePortal } from '@/app/cloud-portal/context'
 import { usePublicProfileAPI } from '@/app/cloud-portal/profiles'

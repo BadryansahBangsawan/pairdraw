@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { numberedName } from '@open-pencil/scene-graph/naming'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { numberedName } from '@pairdraw/scene-graph/naming'
 
 describe('numberedName', () => {
   test('keeps a free name', () => {

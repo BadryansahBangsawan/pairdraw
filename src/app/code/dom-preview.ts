@@ -1,6 +1,6 @@
-import { sceneGraphFromStyledHTML } from '@open-pencil/core/io/formats/html/layers'
-import type { ComponentStyling } from '@open-pencil/dom-css/export'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import { sceneGraphFromStyledHTML } from '@pairdraw/core/io/formats/html/layers'
+import type { ComponentStyling } from '@pairdraw/dom-css/export'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { styleHTMLInBrowser } from '@/app/code/html-styler'
 import type { EditorStore } from '@/app/editor/active-store'

@@ -54,7 +54,7 @@ test('an image address fills the layer with the image it serves', async () => {
   await expect.poll(async () => (await imageFill(page))?.imageHash).toBeTruthy()
   const hash = (await imageFill(page))?.imageHash ?? ''
   const stored = await page.evaluate(
-    (name) => window.openPencil?.getStore?.().graph.images.get(name)?.byteLength,
+    (name) => window.pairdraw?.getStore?.().graph.images.get(name)?.byteLength,
     hash
   )
   expect(stored).toBe(PNG.byteLength)

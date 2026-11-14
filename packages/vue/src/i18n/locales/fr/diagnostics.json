@@ -77,7 +77,7 @@
   "sharingUsageStatsDescription": "Les fonctionnalités et formats de fichier utilisés, sous un identifiant aléatoire qui ne désigne personne. Désactivé sauf accord de votre part.",
   "sharingDetails": "Ce qui est envoyé",
   "sharingUnofficialBuild": "Cette version n'envoie rien. Seules les versions officielles de Pairdraw envoient des pings ou des statistiques d'utilisation.",
-  "sharingDisabledByEnvironment": "Désactivé par OPENPENCIL_TELEMETRY ou DO_NOT_TRACK dans votre environnement.",
+  "sharingDisabledByEnvironment": "Désactivé par PAIRDRAW_TELEMETRY ou DO_NOT_TRACK dans votre environnement.",
   "sharingQuestionTitle": "Aider à améliorer Pairdraw ?",
   "sharingQuestionDescription": "Partagez des statistiques d'utilisation anonymes : lancements de l'application, formats de fichier et fonctionnalités utilisées. Jamais vos designs, noms de fichiers ou prompts. Elles nous montrent quoi construire ensuite et que Pairdraw est utilisé, ce qui contribue à son financement.",
   "sharingQuestionDecline": "Non merci",

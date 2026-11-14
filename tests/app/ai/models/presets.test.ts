@@ -2,8 +2,8 @@ import { describe, expect, test } from 'bun:test'
 
 import type { LanguageModel } from 'ai'
 
-import { AI_PROVIDERS } from '@open-pencil/core/constants'
-import type { AIProviderID } from '@open-pencil/core/constants'
+import { AI_PROVIDERS } from '@pairdraw/core/constants'
+import type { AIProviderID } from '@pairdraw/core/constants'
 
 import { resolveProviderModel } from '@/app/ai/models/reasoning/floors'
 import { reasoningCallSettings } from '@/app/ai/models/reasoning/settings'

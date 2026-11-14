@@ -5,12 +5,12 @@ import IconPaintbrush from '~icons/lucide/paintbrush'
 import IconPenTool from '~icons/lucide/pen-tool'
 import IconWandSparkles from '~icons/lucide/wand-sparkles'
 
-import { resolveEditorProfile } from '@open-pencil/core'
-import { useMediaMessages } from '@open-pencil/vue/i18n'
+import { resolveEditorProfile } from '@pairdraw/core'
+import { useMediaMessages } from '@pairdraw/vue/i18n'
 import type {
   CommandPaletteGroup,
   CommandPaletteItem
-} from '@open-pencil/vue/primitives/CommandPalette'
+} from '@pairdraw/vue/primitives/CommandPalette'
 
 import { activeTab } from '@/app/tabs'
 

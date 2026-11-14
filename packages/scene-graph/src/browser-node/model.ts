@@ -1,11 +1,11 @@
 import * as v from 'valibot'
 
 import { hasPluginData, readPluginData, withPluginData } from '../plugin-data/field'
-import { OPEN_PENCIL_PLUGIN_DATA } from '../plugin-data/fields'
+import { PAIRDRAW_PLUGIN_DATA } from '../plugin-data/fields'
 import type { PluginDataEntry, SceneNode } from '../types'
 import { browserNodeSchema, type BrowserNodeRecord } from './schema'
 
-const field = OPEN_PENCIL_PLUGIN_DATA.browserNode
+const field = PAIRDRAW_PLUGIN_DATA.browserNode
 
 /** The snapshot a layer stores, or null when it has none or the address is not a page. */
 export function readBrowserNode(node: Pick<SceneNode, 'pluginData'>): BrowserNodeRecord | null {

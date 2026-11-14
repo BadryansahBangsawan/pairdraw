@@ -3,8 +3,8 @@ import { dirname } from 'node:path'
 
 import { toUint8Array } from 'js-base64'
 
-import { writeFileAtomic } from '@open-pencil/core/node/fs'
-import type { ToolDef } from '@open-pencil/core/tools'
+import { writeFileAtomic } from '@pairdraw/core/node/fs'
+import type { ToolDef } from '@pairdraw/core/tools'
 
 import { safeOutputPath } from '#cli/agent/paths'
 

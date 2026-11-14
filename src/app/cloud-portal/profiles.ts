@@ -1,4 +1,4 @@
-import { createCloudAPIClient, type CloudAPIClient } from '@open-pencil/cloud/client'
+import { createCloudAPIClient, type CloudAPIClient } from '@pairdraw/cloud/client'
 
 import { usePortal } from './context'
 

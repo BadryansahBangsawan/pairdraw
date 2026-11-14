@@ -17,7 +17,7 @@ description: Управление видимостью, прозрачность
 ## Использование
 
 ```ts
-import { useAppearance } from '@open-pencil/vue/controls/appearance'
+import { useAppearance } from '@pairdraw/vue/controls/appearance'
 
 const appearance = useAppearance()
 ```

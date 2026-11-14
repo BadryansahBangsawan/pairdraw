@@ -1,8 +1,8 @@
 import type { Node as YogaNode } from 'yoga-layout'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { enforcedAspectRatio } from '@open-pencil/scene-graph/layout'
-import { layoutConstrainedChildRect } from '@open-pencil/scene-graph/resize'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { enforcedAspectRatio } from '@pairdraw/scene-graph/layout'
+import { layoutConstrainedChildRect } from '@pairdraw/scene-graph/resize'
 
 import { keepsSavedLayout, usesDetachedDerivedLayout } from './derived'
 

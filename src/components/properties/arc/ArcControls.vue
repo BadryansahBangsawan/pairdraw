@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { ArcField } from '@open-pencil/core/geometry'
-import { useEditorMessages, usePanelMessages } from '@open-pencil/vue/i18n'
+import type { ArcField } from '@pairdraw/core/geometry'
+import { useEditorMessages, usePanelMessages } from '@pairdraw/vue/i18n'
 
 import NumberField from '@/components/inputs/NumberField.vue'
 import PanelFieldGroup from '@/components/ui/panel/PanelFieldGroup.vue'

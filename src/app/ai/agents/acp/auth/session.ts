@@ -2,7 +2,7 @@ import { ClientSideConnection, ndJsonStream, PROTOCOL_VERSION } from '@agentclie
 import type { InitializeResponse, SessionUpdate } from '@agentclientprotocol/sdk'
 import { promiseTimeout } from '@vueuse/core'
 
-import type { ACPAgentDef } from '@open-pencil/core/constants'
+import type { ACPAgentDef } from '@pairdraw/core/constants'
 
 import type { OwnToolsLink, OwnToolsOutcome } from '@/app/ai/agents/acp/tools'
 import type { AgentHost } from '@/app/ai/agents/host/types'
@@ -23,7 +23,7 @@ export interface AuthSessionOptions {
   statusTimeoutMs?: number
   /** How long an agent may take to answer `initialize` before it counts as stuck. */
   initializeTimeoutMs?: number
-  /** Also checks, for a signed-in agent, that a session reaches OpenPencil's tools. */
+  /** Also checks, for a signed-in agent, that a session reaches Pairdraw's tools. */
   tools?: ToolsProbe
 }
 
@@ -44,7 +44,7 @@ export interface AgentAuthCheck {
   methods: AgentAuthMethod[]
   /** The ACP program that answered, to tell a supported adapter from another with its name. */
   adapter: { name: string; version: string } | null
-  /** Whether a session reached OpenPencil's tools; null when not checked or not signed in. */
+  /** Whether a session reached Pairdraw's tools; null when not checked or not signed in. */
   tools: OwnToolsOutcome | null
 }
 

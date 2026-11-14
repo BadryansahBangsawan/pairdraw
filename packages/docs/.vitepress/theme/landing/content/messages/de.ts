@@ -67,7 +67,7 @@ export const de: LandingMessages = {
     script: {
       title: 'Alles per Skript',
       detail:
-        'Die openpencil-CLI arbeitet mit einer Datei, ohne dass die App läuft, oder steuert die geöffnete App. Untersuche ein Dokument, frage es mit XPath ab, prüfe es mit dem Linter, exportiere es oder führe mit eval Figma-Plugin-Code darauf aus. Der MCP-Server gibt Agenten dieselben Möglichkeiten über stdio oder HTTP.',
+        'Die pairdraw-CLI arbeitet mit einer Datei, ohne dass die App läuft, oder steuert die geöffnete App. Untersuche ein Dokument, frage es mit XPath ab, prüfe es mit dem Linter, exportiere es oder führe mit eval Figma-Plugin-Code darauf aus. Der MCP-Server gibt Agenten dieselben Möglichkeiten über stdio oder HTTP.',
       hint: 'Führe einen Befehl aus und beobachte die Arbeitsfläche.'
     },
     sdk: {

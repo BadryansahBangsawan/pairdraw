@@ -3,7 +3,7 @@ import { afterEach, expect, test } from 'bun:test'
 
 import { toRaw } from 'vue'
 
-import { createDocumentGraph } from '@open-pencil/core'
+import { createDocumentGraph } from '@pairdraw/core'
 
 import { chatColumnOpen } from '@/app/ai/chat/panel'
 import { hasPendingStyleKit, offerStyleKit, takePendingStyleKit } from '@/app/ai/chat/pins/pending'

@@ -1,6 +1,6 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { getAxisAlignedWorldBounds } from '@open-pencil/scene-graph/coordinate'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 import type { GuideRedline } from './types'
 

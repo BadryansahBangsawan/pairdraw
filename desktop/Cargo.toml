@@ -1,5 +1,5 @@
 [package]
-name = "open_pencil"
+name = "pairdraw"
 version = "0.16.0"
 description = "Pairdraw desktop app"
 authors = ["Danila Poyarkov"]
@@ -16,7 +16,7 @@ name = "Pairdraw"
 path = "src/main.rs"
 
 [lib]
-name = "open_pencil_lib"
+name = "pairdraw_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

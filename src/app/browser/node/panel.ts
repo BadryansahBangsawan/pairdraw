@@ -1,5 +1,5 @@
-import type { Editor } from '@open-pencil/core'
-import { readBrowserNode, withBrowserNode } from '@open-pencil/scene-graph/browser-node'
+import type { Editor } from '@pairdraw/core'
+import { readBrowserNode, withBrowserNode } from '@pairdraw/scene-graph/browser-node'
 
 import { IS_TAURI } from '@/constants'
 

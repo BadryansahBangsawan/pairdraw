@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises'
 
 import { expect, test, type Page } from '@playwright/test'
 
-import { CLOUD_DISCOVERY_PATH, type DocumentPermission } from '@open-pencil/cloud/contract'
+import { CLOUD_DISCOVERY_PATH, type DocumentPermission } from '@pairdraw/cloud/contract'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { cloudDiscoveryFixture } from '#tests/helpers/cloud/discovery'

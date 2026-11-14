@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import * as v from 'valibot'
 
-import { browserNodeSchema, type BrowserNodeRecord } from '@open-pencil/scene-graph/browser-node'
+import { browserNodeSchema, type BrowserNodeRecord } from '@pairdraw/scene-graph/browser-node'
 
 import { browserURLPolicy } from '@/app/browser/url'
 

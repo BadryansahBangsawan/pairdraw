@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from 'bun:test'
 
-import { createEditor, type Editor } from '@open-pencil/core'
-import { boundEndpoint, createConnector, freeEndpoint } from '@open-pencil/scene-graph/connectors'
+import { createEditor, type Editor } from '@pairdraw/core'
+import { boundEndpoint, createConnector, freeEndpoint } from '@pairdraw/scene-graph/connectors'
 
 import { refreshConnectorDrag, startConnectorDraw } from '#vue/shared/input/connector/draw'
 import type { DragState } from '#vue/shared/input/types'

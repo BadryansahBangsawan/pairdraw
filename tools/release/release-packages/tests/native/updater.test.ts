@@ -6,17 +6,18 @@ import { desktopReleasePaths } from '#release/native/context'
 import { minisignKeyLine, updaterFeed } from '#release/native/updater'
 import * as v from 'valibot'
 
-import { resolveWorkspaceRoot } from '@open-pencil/package-artifacts-tools'
+import { resolveWorkspaceRoot } from '@pairdraw/package-artifacts-tools'
 
 import { minisignPublicKey, UPSTREAM_PUBLIC_KEY } from '../helpers/minisign.ts'
 
-const REPOSITORY = 'pairdraw/pairdraw'
+const REPOSITORY = 'BadryansahBangsawan/pairdraw'
 
 test('defaults the feed to the latest release of the publishing repository', () => {
   const pubkey = minisignPublicKey()
 
   expect(updaterFeed({ UPDATER_PUBLIC_KEY: pubkey }, REPOSITORY)).toEqual({
-    endpoint: 'https://github.com/pairdraw/pairdraw/releases/latest/download/latest.json',
+    endpoint:
+      'https://github.com/BadryansahBangsawan/pairdraw/releases/latest/download/latest.json',
     pubkey
   })
   expect(
@@ -34,7 +35,7 @@ test('refuses a release without its own updater key', () => {
   expect(() => updaterFeed({}, REPOSITORY)).toThrow('UPDATER_PUBLIC_KEY')
   expect(() => updaterFeed({ UPDATER_PUBLIC_KEY: '  ' }, REPOSITORY)).toThrow('UPDATER_PUBLIC_KEY')
   expect(() => updaterFeed({ UPDATER_PUBLIC_KEY: UPSTREAM_PUBLIC_KEY }, REPOSITORY)).toThrow(
-    'OpenPencil updater key'
+    'upstream'
   )
   expect(() => updaterFeed({ UPDATER_PUBLIC_KEY: 'not base64!' }, REPOSITORY)).toThrow('not base64')
   expect(() =>
@@ -42,22 +43,20 @@ test('refuses a release without its own updater key', () => {
   ).toThrow('not a minisign public key')
 })
 
-test('refuses an insecure feed or one that serves OpenPencil releases', () => {
+test('refuses an insecure feed or one that serves upstream releases', () => {
   const UPDATER_PUBLIC_KEY = minisignPublicKey()
 
   expect(() =>
     updaterFeed({ UPDATER_PUBLIC_KEY, UPDATER_ENDPOINT: 'http://updates.example.com' }, REPOSITORY)
   ).toThrow('https')
-  expect(() => updaterFeed({ UPDATER_PUBLIC_KEY }, 'open-pencil/open-pencil')).toThrow(
-    'OpenPencil releases'
-  )
+  expect(() => updaterFeed({ UPDATER_PUBLIC_KEY }, 'open-pencil/open-pencil')).toThrow('upstream')
   // GitHub ignores case in owner and repository names and also serves www.github.com.
   for (const UPDATER_ENDPOINT of [
     'https://github.com/Open-Pencil/open-pencil/releases/latest/download/latest.json',
     'https://www.github.com/open-pencil/OPEN-PENCIL/releases/latest/download/latest.json'
   ]) {
     expect(() => updaterFeed({ UPDATER_PUBLIC_KEY, UPDATER_ENDPOINT }, REPOSITORY)).toThrow(
-      'OpenPencil releases'
+      'upstream'
     )
   }
   // Another repository whose name only starts the same is a different feed.

@@ -1,4 +1,4 @@
-import type { SceneGraph, VariableType } from '@open-pencil/scene-graph'
+import type { SceneGraph, VariableType } from '@pairdraw/scene-graph'
 
 import { FIGMA_DEFAULT_VALUES, variableAlias, type FigmaVariableAlias } from './values'
 import { FigmaVariable, FigmaVariableCollection, assertVariableName } from './variable'
@@ -13,7 +13,7 @@ export {
   type FigmaBindableField
 } from './bindings'
 
-/** Figma's variable types, including the motion types OpenPencil does not model. */
+/** Figma's variable types, including the motion types Pairdraw does not model. */
 const FIGMA_TYPES = ['BOOLEAN', 'COLOR', 'FLOAT', 'STRING', 'EASING', 'TIMING'] as const
 export type FigmaVariableResolvedType = (typeof FIGMA_TYPES)[number]
 

@@ -11,7 +11,7 @@ In the web app, a companion program on your computer starts them instead; see [C
 3. Pairdraw's MCP server, installed globally. Use the version that matches your app:
 
    ```sh
-   npm install -g @open-pencil/mcp
+   npm install -g @pairdraw/mcp
    ```
 
 4. The agent signed in to your account. Pi can use an AI Gateway key instead (see [Pi](#pi)).
@@ -63,7 +63,7 @@ Gemini CLI speaks ACP itself, so there is no separate program, and guided setup 
 Pi runs through Pairdraw's Harness companion instead of ACP. It needs Node.js 22.15 or later, or Bun. Guided setup installs the companion with one click; to install it yourself, use the version that matches your app:
 
 ```sh
-npm install -g @open-pencil/harness
+npm install -g @pairdraw/harness
 ```
 
 Pairdraw uses the providers you signed in to in Pi and Pi's default model, so there is no key to paste. Sign in by running `pi` and using `/login`, and pick a default model with `/model`. To use another model in Pairdraw, enter it as `provider/model` in the Pi model's settings. An [AI Gateway](https://vercel.com/ai-gateway) key is optional; when you save one, Pi uses the gateway instead of your Pi sign-ins.
@@ -74,7 +74,7 @@ Pairdraw reads only Pi's `settings.json` for the default model; your credentials
 
 - **Shown as not found after installing.** Apps started from the Dock or Start menu do not see every folder your terminal adds to `PATH`. Pairdraw also looks in common global folders for npm, Bun, Volta, mise, and Homebrew; if your package manager installs elsewhere, add that folder to your login shell's `PATH` and restart Pairdraw.
 - **Shown as update needed.** The MCP server or Pi's companion does not match the app version. Press **Connect** to update it, or run the command guided setup shows with the package manager that installed it, then press **Retry**. A chat that needs it says so and offers **Run guided setup**.
-- **The agent couldn't reach Pairdraw's tools.** Before sending your message, Pairdraw waits for the agent to connect to its MCP server and stops if it does not, quoting the agent's reason when it gives one. Check that the MCP server shows as installed in guided setup and is running in **Settings → MCP**. Codex skips Pairdraw's server when its own `config.toml` defines a server named `open-pencil`; remove that entry.
-- **The agent starts but cannot edit the canvas.** The MCP server is missing or not running. Install the matching `@open-pencil/mcp` version and restart Pairdraw.
+- **The agent couldn't reach Pairdraw's tools.** Before sending your message, Pairdraw waits for the agent to connect to its MCP server and stops if it does not, quoting the agent's reason when it gives one. Check that the MCP server shows as installed in guided setup and is running in **Settings → MCP**. Codex skips Pairdraw's server when its own `config.toml` defines a server named `pairdraw`; remove that entry.
+- **The agent starts but cannot edit the canvas.** The MCP server is missing or not running. Install the matching `@pairdraw/mcp` version and restart Pairdraw.
 - **Where the agent works.** Chats start the agent in a folder of its own inside Pairdraw's app data, not your home folder, so it does not pick up project settings kept there. The agent still uses its own configuration, such as the MCP servers and rules in `~/.codex` or `~/.claude`.
 - **The agent asks you to sign in.** Press **Connect** in guided setup, or sign in with the agent's own command-line tool as described above, then send your message again.

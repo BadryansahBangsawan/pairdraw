@@ -1,14 +1,14 @@
 import * as v from 'valibot'
 
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { guidToString } from '@open-pencil/kiwi/fig/guid'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { guidToString } from '@pairdraw/kiwi/fig/guid'
 import type {
   PrototypeAction,
   PrototypeOverlayPositionType,
   PrototypeReaction,
   SceneNode
-} from '@open-pencil/scene-graph'
-import type { GUID } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph'
+import type { GUID } from '@pairdraw/scene-graph/primitives'
 
 import type { KiwiNodeChange, SceneNodeToKiwiContext } from './export/context'
 import { getOrCreateNodeGuid } from './export/context'

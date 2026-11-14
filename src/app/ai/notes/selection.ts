@@ -7,8 +7,8 @@ import {
   withAgentNotes,
   type AgentNotes,
   type AgentNotesDraft
-} from '@open-pencil/scene-graph/agent-notes'
-import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
+} from '@pairdraw/scene-graph/agent-notes'
+import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
 
 import { sendPromptToDocument } from '@/app/ai/chat/pending-prompt'
 import { referenceLink } from '@/app/ai/chat/references/link'

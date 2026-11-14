@@ -1,6 +1,6 @@
-import type { Effect, Fill, ShadowEffect, Stroke, TextLength } from '@open-pencil/scene-graph'
-import { colorToCSS, colorToHex } from '@open-pencil/scene-graph/color'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import type { Effect, Fill, ShadowEffect, Stroke, TextLength } from '@pairdraw/scene-graph'
+import { colorToCSS, colorToHex } from '@pairdraw/scene-graph/color'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { DesignStyleDeclaration } from '../types'
 

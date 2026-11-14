@@ -1,13 +1,13 @@
 import { useLocalStorage } from '@vueuse/core'
 import { ref } from 'vue'
 
-import { type MCPToolScope, type ToolDescriptor } from '@open-pencil/mcp/tools'
-import { createToolDescriptors } from '@open-pencil/mcp/tools'
+import { type MCPToolScope, type ToolDescriptor } from '@pairdraw/mcp/tools'
+import { createToolDescriptors } from '@pairdraw/mcp/tools'
 
-const DISABLED_TOOLS_STORAGE_KEY = 'open-pencil:mcp:disabled-tools'
-const ROOT_DIRECTORY_STORAGE_KEY = 'open-pencil:mcp:root-directory'
-const AUTHENTICATION_ENABLED_STORAGE_KEY = 'open-pencil:mcp:authentication-enabled'
-const SELECTION_ONLY_STORAGE_KEY = 'open-pencil:mcp:selection-only'
+const DISABLED_TOOLS_STORAGE_KEY = 'pairdraw:mcp:disabled-tools'
+const ROOT_DIRECTORY_STORAGE_KEY = 'pairdraw:mcp:root-directory'
+const AUTHENTICATION_ENABLED_STORAGE_KEY = 'pairdraw:mcp:authentication-enabled'
+const SELECTION_ONLY_STORAGE_KEY = 'pairdraw:mcp:selection-only'
 
 function configurable(tools: ToolDescriptor[]): ToolDescriptor[] {
   return tools.filter((tool) => tool.availability !== 'eval')

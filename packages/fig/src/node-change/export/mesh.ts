@@ -1,10 +1,10 @@
-import type { Fill, SceneNode, Stroke } from '@open-pencil/scene-graph'
-import { isMeshFill } from '@open-pencil/scene-graph/gradient'
+import type { Fill, SceneNode, Stroke } from '@pairdraw/scene-graph'
+import { isMeshFill } from '@pairdraw/scene-graph/gradient'
 import {
-  OPEN_PENCIL_PLUGIN_DATA,
+  PAIRDRAW_PLUGIN_DATA,
   withPluginData,
   type StoredMeshFill
-} from '@open-pencil/scene-graph/plugin-data'
+} from '@pairdraw/scene-graph/plugin-data'
 
 function meshEntries(paints: readonly (Fill | Stroke)[], kind: StoredMeshFill['kind']) {
   return paints.flatMap((paint, index): StoredMeshFill[] => {
@@ -34,7 +34,7 @@ function meshEntries(paints: readonly (Fill | Stroke)[], kind: StoredMeshFill['k
 export function applyMeshFillsPluginData(node: SceneNode): void {
   const entries = [...meshEntries(node.fills, 'fill'), ...meshEntries(node.strokes, 'stroke')]
   if (entries.length === 0) return
-  node.pluginData = withPluginData(node.pluginData, OPEN_PENCIL_PLUGIN_DATA.meshFills, entries)
+  node.pluginData = withPluginData(node.pluginData, PAIRDRAW_PLUGIN_DATA.meshFills, entries)
   const fallback = (paint: Fill | Stroke): Fill | Stroke =>
     paint.type === 'MESH' && isMeshFill(paint)
       ? {

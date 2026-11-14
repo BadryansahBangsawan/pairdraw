@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, mock, test } from 'bun:test'
 
-import { createEditor, type Editor } from '@open-pencil/core'
+import { createEditor, type Editor } from '@pairdraw/core'
 
 import { updateHoverCursor } from '#vue/shared/input/select'
 import type { DragState } from '#vue/shared/input/types'

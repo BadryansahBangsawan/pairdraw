@@ -11,8 +11,8 @@ function menuBar(): Promise<NativeMenu[]> {
 
 async function waitForEditor() {
   await browser.waitUntil(
-    async () => browser.execute(() => Boolean(window.openPencil?.getStore?.())),
-    { timeout: 30_000, timeoutMsg: 'OpenPencil editor did not initialize' }
+    async () => browser.execute(() => Boolean(window.pairdraw?.getStore?.())),
+    { timeout: 30_000, timeoutMsg: 'Pairdraw editor did not initialize' }
   )
 }
 

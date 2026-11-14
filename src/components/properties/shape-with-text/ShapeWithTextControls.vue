@@ -8,9 +8,9 @@ import type {
   FigJamLineStyle,
   FigJamTextSize,
   FigJamTypeface
-} from '@open-pencil/scene-graph/figjam'
-import type { ShapeWithTextType } from '@open-pencil/scene-graph/shape-with-text'
-import { useFigJamMessages, useShapeMessages } from '@open-pencil/vue/i18n'
+} from '@pairdraw/scene-graph/figjam'
+import type { ShapeWithTextType } from '@pairdraw/scene-graph/shape-with-text'
+import { useFigJamMessages, useShapeMessages } from '@pairdraw/vue/i18n'
 
 import FigJamPalette from '@/components/figjam/FigJamPalette.vue'
 import { typefaceModel, useFigJamTextOptions } from '@/components/figjam/text-options'

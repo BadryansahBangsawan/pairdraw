@@ -52,10 +52,10 @@ Claude Code, Cursor, Windsurf и другие клиенты MCP могут ис
 
 ## Схема URL {#url-scheme}
 
-Настольное приложение регистрирует схему `openpencil://`, поэтому опубликованная страница — история Storybook, обзор дизайна, README — может ссылаться прямо на слой:
+Настольное приложение регистрирует схему `pairdraw://`, поэтому опубликованная страница — история Storybook, обзор дизайна, README — может ссылаться прямо на слой:
 
 ```
-openpencil://open?file=web/design/hikyo.pen&node=Button/Large/Default
+pairdraw://open?file=web/design/hikyo.pen&node=Button/Large/Default
 ```
 
 `file` — путь относительно репозитория, оканчивающийся на `.pen` или `.fig`; абсолютные пути и сегменты `.` или `..` отклоняются. `node` необязателен. Оба значения кодируются как URL: разделители пути можно оставить как есть, но символ `+` нужно передавать как `%2B`; если ключ повторяется, используется последнее значение.
@@ -67,7 +67,7 @@ openpencil://open?file=web/design/hikyo.pen&node=Button/Large/Default
 Веб-версия принимает такую же ссылку в адресной строке:
 
 ```
-https://app.openpencil.dev/?file=https://raw.githubusercontent.com/open-pencil/open-pencil/master/tests/fixtures/pencil_button.pen&node=Button/Large/Default
+https://app.openpencil.dev/?file=https://raw.githubusercontent.com/pairdraw/pairdraw/master/tests/fixtures/pencil_button.pen&node=Button/Large/Default
 ```
 
 Здесь `file` — абсолютный URL с `https:`, оканчивающийся на `.pen` или `.fig`. В веб-версии нет файловой системы, поэтому относительный путь, URL с `http:` и любое другое расширение отклоняются с предупреждением в консоли и больше ничего не происходит. Расширение определяется по пути URL, так что строка запроса у файла ничего не меняет. Фрагмент отбрасывается до загрузки: на сервер он не попадает, поэтому `…/hikyo.pen#a` и `…/hikyo.pen#b` открывают одну вкладку, а не две. `node` работает точно так же, как выше: то же выделение по точному имени и тот же масштаб, то же уведомление, если слоя с таким именем нет. Оба значения кодируются как URL, символ `+` нужно передавать как `%2B`, а при повторе ключа берётся последнее значение, как и в настольной версии. Ссылка обрабатывается на любом маршруте, поэтому `/share/<room>?file=…` и `/demo?file=…` работают так же, как `/?file=…`.

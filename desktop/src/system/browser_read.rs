@@ -15,7 +15,7 @@ const READ_EXPIRED: &str = "The page did not answer in time.";
 const SELECTOR_LIMIT: usize = 500;
 
 pub(crate) fn read_script(request: &str) -> String {
-    format!("(() => {{\nconst __openpencilReadRequest = {request};\n{READ_PAGE}\n}})()")
+    format!("(() => {{\nconst __pairdrawReadRequest = {request};\n{READ_PAGE}\n}})()")
 }
 
 fn read_request(kind: &str, selector: Option<&str>) -> String {

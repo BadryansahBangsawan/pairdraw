@@ -6,8 +6,8 @@
 import 'fake-indexeddb/auto'
 import { describe, expect, test } from 'bun:test'
 
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import { createCollection, createVariable } from '@open-pencil/scene-graph/variables'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { createCollection, createVariable } from '@pairdraw/scene-graph/variables'
 
 import { insertScriptNode } from '@/app/code/script/create'
 import { setScriptBinding, setScriptInput } from '@/app/code/script/inputs'

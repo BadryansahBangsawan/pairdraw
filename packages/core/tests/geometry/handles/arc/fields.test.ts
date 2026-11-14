@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { ArcData } from '@open-pencil/scene-graph'
+import type { ArcData } from '@pairdraw/scene-graph'
 
 import { arcFieldValue, arcWithField } from '#core/geometry'
 

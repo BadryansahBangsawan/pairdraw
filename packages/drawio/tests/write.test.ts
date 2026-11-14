@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 
-import { parseDrawIOFile, writeDrawIOFile } from '@open-pencil/drawio'
+import { parseDrawIOFile, writeDrawIOFile } from '@pairdraw/drawio'
 
 const MODEL = `<mxGraphModel grid="1"><root>
   <mxCell id="0"/><mxCell id="1" parent="0"/>

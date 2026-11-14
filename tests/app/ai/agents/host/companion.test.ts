@@ -1,6 +1,6 @@
 import { describe, expect, mock, test } from 'bun:test'
 
-import { ACP_AGENTS } from '@open-pencil/core/constants'
+import { ACP_AGENTS } from '@pairdraw/core/constants'
 
 import {
   CompanionNotConnectedError,

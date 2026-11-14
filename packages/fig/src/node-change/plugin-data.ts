@@ -1,25 +1,25 @@
 import { omit } from 'es-toolkit/object'
 
-import type { NodeChange, PluginData, PluginRelaunchData } from '@open-pencil/kiwi/fig/codec'
-import { guidToString } from '@open-pencil/kiwi/fig/guid'
+import type { NodeChange, PluginData, PluginRelaunchData } from '@pairdraw/kiwi/fig/codec'
+import { guidToString } from '@pairdraw/kiwi/fig/guid'
 import type {
   ExportSetting,
   PluginDataEntry,
   PluginRelaunchDataEntry,
   SceneNode
-} from '@open-pencil/scene-graph'
-import type { ExportFormatId } from '@open-pencil/scene-graph/export-format'
-import { clampExportScale } from '@open-pencil/scene-graph/export-scale'
+} from '@pairdraw/scene-graph'
+import type { ExportFormatId } from '@pairdraw/scene-graph/export-format'
+import { clampExportScale } from '@pairdraw/scene-graph/export-scale'
 import {
   hasPluginData,
-  OPEN_PENCIL_PLUGIN_DATA,
-  OPEN_PENCIL_PLUGIN_ID,
+  PAIRDRAW_PLUGIN_DATA,
+  PAIRDRAW_PLUGIN_ID,
   withPluginData,
   type PluginDataField,
   type StoredMeshFill
-} from '@open-pencil/scene-graph/plugin-data'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
-import { paintBindingTarget } from '@open-pencil/scene-graph/variables'
+} from '@pairdraw/scene-graph/plugin-data'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
+import { paintBindingTarget } from '@pairdraw/scene-graph/variables'
 
 import { readEffectiveFigmaRawField } from '../source-metadata'
 import {
@@ -30,7 +30,7 @@ import {
 } from './variable/bindings'
 
 const { boundVariables, exportSettings, librarySource, meshFills, textPathBox } =
-  OPEN_PENCIL_PLUGIN_DATA
+  PAIRDRAW_PLUGIN_DATA
 
 const NATIVE_EXPORT_FORMATS: Record<string, ExportFormatId> = {
   PNG: 'png',
@@ -39,15 +39,14 @@ const NATIVE_EXPORT_FORMATS: Record<string, ExportFormatId> = {
   PDF: 'pdf'
 }
 
-/** An OpenPencil plugin-data value on a record read from a `.fig` file. */
+/** An Pairdraw plugin-data value on a record read from a `.fig` file. */
 export function readNodeChangePluginData<T>(
   nc: Pick<NodeChange, 'pluginData'>,
   field: PluginDataField<T>
 ): T | undefined {
   return field.decode(
-    nc.pluginData?.find(
-      (entry) => entry.pluginID === OPEN_PENCIL_PLUGIN_ID && entry.key === field.key
-    )?.value
+    nc.pluginData?.find((entry) => entry.pluginID === PAIRDRAW_PLUGIN_ID && entry.key === field.key)
+      ?.value
   )
 }
 
@@ -65,7 +64,7 @@ export function applyExportSettingsPluginData(
 }
 
 /**
- * textPathBox is OpenPencil-only state (the node-local rect the TEXT_PATH
+ * textPathBox is Pairdraw-only state (the node-local rect the TEXT_PATH
  * layout path maps onto, after import-time box expansion and resize scaling).
  * The Kiwi schema has no home for it, and reconstructing it from an expanded,
  * resized node is ambiguous — persist it as plugin data so save/reopen keeps

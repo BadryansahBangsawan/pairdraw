@@ -5,11 +5,11 @@ import { openExternalLink } from '@/app/shell/ui'
 
 import type { SignInCallback } from './attempt'
 
-/** Emitted by the desktop shell for an `openpencil://oauth/<provider>?…` link. */
+/** Emitted by the desktop shell for an `pairdraw://oauth/<provider>?…` link. */
 const OAUTH_CALLBACK_EVENT = 'oauth-callback'
 const POPUP_FEATURES = 'popup,width=520,height=720'
 
-/** What the desktop shell forwards from an `openpencil://oauth/<provider>?…` link. */
+/** What the desktop shell forwards from an `pairdraw://oauth/<provider>?…` link. */
 const oauthCallbackSchema = v.object({ provider: v.string(), query: v.string() })
 
 /** How one attempt reads the redirect that comes back to it. */
@@ -62,7 +62,7 @@ export function popupRedirect<Outcome>(
 }
 
 /**
- * The system browser, whose hosted callback page opens an `openpencil://oauth/<provider>` link;
+ * The system browser, whose hosted callback page opens an `pairdraw://oauth/<provider>` link;
  * the desktop shell forwards its query as an `oauth-callback` event.
  */
 export async function deepLinkRedirect<Outcome>(

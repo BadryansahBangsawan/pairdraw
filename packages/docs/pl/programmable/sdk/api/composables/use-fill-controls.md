@@ -10,7 +10,7 @@ description: Domyślna wartość nowego fill w panelu właściwości.
 ## Użycie
 
 ```ts
-import { useFillControls } from '@open-pencil/vue/controls/fill'
+import { useFillControls } from '@pairdraw/vue/controls/fill'
 
 const fills = useFillControls()
 ```

@@ -1,5 +1,5 @@
-import { IS_TAURI } from '@open-pencil/core/constants'
-import type { ReadDocumentInput } from '@open-pencil/core/io'
+import { IS_TAURI } from '@pairdraw/core/constants'
+import type { ReadDocumentInput } from '@pairdraw/core/io'
 
 /**
  * Reads the files a document opened from `path` names relative to itself, such as a `.pen`

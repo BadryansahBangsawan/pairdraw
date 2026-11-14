@@ -1,9 +1,9 @@
-import type { Editor } from '@open-pencil/core'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import { layoutGuideLines } from '@open-pencil/scene-graph/layout'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { Editor } from '@pairdraw/core'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import { layoutGuideLines } from '@pairdraw/scene-graph/layout'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { ExplicitSnapTarget } from '#vue/shared/input/snap'
 

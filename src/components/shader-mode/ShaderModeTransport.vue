@@ -3,7 +3,7 @@ import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from 'reka-ui'
 import { tv } from 'tailwind-variants'
 import { computed, onBeforeUnmount } from 'vue'
 
-import { useShaderMessages } from '@open-pencil/vue/i18n'
+import { useShaderMessages } from '@pairdraw/vue/i18n'
 
 import { formatShaderTime } from '@/app/editor/shader-mode/time'
 import IconButton from '@/components/ui/button/IconButton.vue'

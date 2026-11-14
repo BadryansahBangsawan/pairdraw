@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { SceneGraph as Graph } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { SceneGraph as Graph } from '@pairdraw/scene-graph'
 
 import { edgePoint, prototypeConnections } from '#core/canvas/overlays/prototype'
 import type { ViewportTransform } from '#core/geometry'

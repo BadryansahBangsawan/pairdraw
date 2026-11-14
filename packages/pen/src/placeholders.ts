@@ -1,5 +1,5 @@
-import type { SceneNode } from '@open-pencil/scene-graph'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { unresolvedRef } from './plugin-data'
 import type { PenNode } from './schema'

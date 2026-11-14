@@ -8,7 +8,7 @@ import {
 } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
 
-import { NOT_EDITOR_PAGES } from '@open-pencil/vite-config/pwa/routes'
+import { NOT_EDITOR_PAGES } from '@pairdraw/vite-config/pwa/routes'
 
 declare let self: ServiceWorkerGlobalScope
 

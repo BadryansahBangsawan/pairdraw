@@ -10,7 +10,7 @@ import {
   type SessionNotification
 } from '@agentclientprotocol/sdk'
 
-import { ACP_AGENTS } from '@open-pencil/core/constants'
+import { ACP_AGENTS } from '@pairdraw/core/constants'
 
 import { createCompanionAgentHost } from '@/app/ai/agents/host/companion'
 import { createCompanionConnection } from '@/app/automation/companion/connection'

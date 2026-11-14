@@ -2,7 +2,7 @@
  * probe that only reads. Nothing here assigns the address; a click may navigate, and the
  * window's own rule still decides whether that navigation stands. This does not read cookies,
  * storage, or request headers. */
-const request = __openpencilActRequest
+const request = __pairdrawActRequest
 
 function find(selector) {
   try {

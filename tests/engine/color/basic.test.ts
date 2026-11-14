@@ -12,7 +12,7 @@ import {
   rgba255ToColor,
   colorToFill,
   colorDistance
-} from '@open-pencil/scene-graph/color'
+} from '@pairdraw/scene-graph/color'
 
 describe('parseColor', () => {
   test('hex 6-digit', () => {

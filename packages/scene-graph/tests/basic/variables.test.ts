@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 import {
   reconcileVariableBindings,
   resolvedValueBindings
-} from '@open-pencil/scene-graph/variables'
+} from '@pairdraw/scene-graph/variables'
 
 describe('Variables', () => {
   function pageId(graph: SceneGraph): string {

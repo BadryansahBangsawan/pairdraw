@@ -1,13 +1,9 @@
 import { diffLines, type ChangeObject } from 'diff'
 import { compact, uniq } from 'es-toolkit/array'
 
-import {
-  graphFromDocumentChange,
-  isEmptyDocumentChange,
-  type DocumentChange
-} from '@open-pencil/core'
-import { diffPageLayersJSX } from '@open-pencil/core/tools'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import { graphFromDocumentChange, isEmptyDocumentChange, type DocumentChange } from '@pairdraw/core'
+import { diffPageLayersJSX } from '@pairdraw/core/tools'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { changePreviewSize } from '@/app/ai/chat/preferences'
 import type { EditorStore } from '@/app/editor/active-store'

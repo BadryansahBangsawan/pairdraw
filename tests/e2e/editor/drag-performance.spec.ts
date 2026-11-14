@@ -11,8 +11,8 @@ test('dragging a nested card uses repaint-only position previews', async ({ page
   await canvas.clearCanvas()
 
   await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.state.zoom = 1
     store.state.panX = 0
     store.state.panY = 0

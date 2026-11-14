@@ -5,8 +5,8 @@ import { simulateReadableStream } from 'ai'
 import { MockLanguageModelV4 } from 'ai/test'
 import { toRaw } from 'vue'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import type { SceneNode } from '@open-pencil/scene-graph'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import type { SceneNode } from '@pairdraw/scene-graph'
 
 import { appendCanvasNotes } from '@/app/ai/chat/submission/notes'
 import { aiToolOverrides } from '@/app/ai/tools/preferences'

@@ -85,7 +85,7 @@ Tools are defined once in `packages/core/src/tools/`, split by domain: read, cre
 
 - **AI chat** — valibot schemas, multi-provider (Anthropic, OpenAI, Google AI, OpenRouter, compatible endpoints)
 - **MCP server** — zod schemas, stdio + HTTP transports
-- **CLI** — available via the `eval` command, whose scripts get the `figma` Plugin API and the `openpencil` API
+- **CLI** — available via the `eval` command, whose scripts get the `figma` Plugin API and the `pairdraw` API
 
 90+ core tools + 3 MCP file management tools. Includes XPath query (`query_nodes`), JSX inspection (`get_jsx`, `diff_jsx`), semantic description (`describe`), and vision-based verification (`export_image` returns images to the model).
 

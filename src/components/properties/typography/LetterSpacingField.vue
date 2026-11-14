@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { SceneNode, TextLength } from '@open-pencil/scene-graph'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { SceneNode, TextLength } from '@pairdraw/scene-graph'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import VariableNumberField from '@/components/properties/VariableNumberField.vue'
 

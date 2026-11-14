@@ -6,19 +6,19 @@ import { $ } from 'bun'
 import { toUint8Array } from 'js-base64'
 import * as v from 'valibot'
 
-import { SkiaRenderer } from '@open-pencil/core/canvas'
-import { initCanvasKit, renderNodesToImage } from '@open-pencil/core/io/formats/raster'
-import { prepareGraphFonts } from '@open-pencil/core/text'
-import { parseFigBuffer } from '@open-pencil/fig'
+import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { initCanvasKit, renderNodesToImage } from '@pairdraw/core/io/formats/raster'
+import { prepareGraphFonts } from '@pairdraw/core/text'
+import { parseFigBuffer } from '@pairdraw/fig'
 import {
   interpretInstance,
   materializeInstance,
   type InstanceOccurrence,
   type InstancePathDiagnostic
-} from '@open-pencil/fig/instance-overrides'
-import { nodeChangeToProps } from '@open-pencil/fig/node-change'
-import { guidToString } from '@open-pencil/kiwi/fig/guid'
-import { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/fig/instance-overrides'
+import { nodeChangeToProps } from '@pairdraw/fig/node-change'
+import { guidToString } from '@pairdraw/kiwi/fig/guid'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 // Render the interpreter output directly. No legacy import, export/reimport, or layout pass.
 const { values } = parseArgs({

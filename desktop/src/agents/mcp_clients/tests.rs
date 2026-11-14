@@ -9,7 +9,7 @@ impl Scratch {
     fn new() -> Self {
         let id = NEXT.fetch_add(1, Ordering::Relaxed);
         let base = std::env::temp_dir().join(format!(
-            "openpencil-mcp-clients-{}-{id}",
+            "pairdraw-mcp-clients-{}-{id}",
             std::process::id()
         ));
         let _ = fs::remove_dir_all(&base);
@@ -110,10 +110,10 @@ fn reads_a_missing_file_as_none_and_reports_whether_the_client_is_set_up() {
 }
 
 const KIRO_ADDED: &str =
-    "{\"mcpServers\":{\"open-pencil\":{\"command\":\"openpencil-mcp\",\"args\":[]}}}\n";
-const ONE_SERVER: &str = "{\"mcpServers\":{\"open-pencil\":{\"command\":\"openpencil-mcp\"}}}";
+    "{\"mcpServers\":{\"pairdraw\":{\"command\":\"pairdraw-mcp\",\"args\":[]}}}\n";
+const ONE_SERVER: &str = "{\"mcpServers\":{\"pairdraw\":{\"command\":\"pairdraw-mcp\"}}}";
 const NO_SERVER: &str = "{\"mcpServers\":{}}";
-const CODEX_ADDED: &str = "a = 1\n\n[mcp_servers.open-pencil]\ncommand = \"openpencil-mcp\"\n";
+const CODEX_ADDED: &str = "a = 1\n\n[mcp_servers.pairdraw]\ncommand = \"pairdraw-mcp\"\n";
 
 #[test]
 fn refuses_a_client_that_is_not_set_up() {
@@ -181,7 +181,7 @@ fn refuses_text_that_changes_more_than_the_entry() {
         Err("refused".to_owned())
     );
     assert_eq!(fs::read_to_string(&path).unwrap(), mine);
-    assert!(!scratch.0.join(".cursor/mcp.json.open-pencil.bak").exists());
+    assert!(!scratch.0.join(".cursor/mcp.json.pairdraw.bak").exists());
 
     fs::write(&path, "{ not json").unwrap();
     assert_eq!(
@@ -199,7 +199,7 @@ fn keeps_the_original_file_once_before_the_first_change() {
     let at = scratch.at();
 
     let first = write_client_config(McpClient::GeminiCli, &at, true, ONE_SERVER, Some(NO_SERVER));
-    let backup = scratch.0.join(".gemini/settings.json.open-pencil.bak");
+    let backup = scratch.0.join(".gemini/settings.json.pairdraw.bak");
     assert_eq!(
         first,
         Ok(McpClientWrite {

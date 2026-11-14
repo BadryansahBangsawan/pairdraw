@@ -9,7 +9,7 @@ import {
   type Transport
 } from '@modelcontextprotocol/client'
 
-import { OPEN_PENCIL_MCP_SERVER } from '@open-pencil/core/constants'
+import { PAIRDRAW_MCP_SERVER } from '@pairdraw/core/constants'
 
 import { APP_VERSION } from '@/app/runtime/version'
 import { appCredentialServices } from '@/app/settings/credentials/app'
@@ -120,8 +120,8 @@ export async function connectMCPClient(
   connection: MCPConnection,
   dependencies: MCPConnectDependencies = defaultMCPConnectDependencies
 ): Promise<MCPClientSession> {
-  // The identifier stays OpenPencil's; servers show the title.
-  const client = new Client({ name: OPEN_PENCIL_MCP_SERVER, title: APP_NAME, version: APP_VERSION })
+  // The identifier stays Pairdraw's; servers show the title.
+  const client = new Client({ name: PAIRDRAW_MCP_SERVER, title: APP_NAME, version: APP_VERSION })
   try {
     const transport = await connectionTransport(connection, dependencies)
     await client.connect(transport)

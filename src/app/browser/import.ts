@@ -1,5 +1,5 @@
-import type { Editor } from '@open-pencil/core'
-import { readWebCaptureClipboard } from '@open-pencil/web-capture'
+import type { Editor } from '@pairdraw/core'
+import { readWebCaptureClipboard } from '@pairdraw/web-capture'
 
 import { pasteWebClipboardHTML } from '@/app/editor/clipboard/paste/web'
 

@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'bun:test'
 
-import { createDocumentGraph } from '@open-pencil/core'
-import * as figModule from '@open-pencil/core/io/formats/fig'
-import * as layoutModule from '@open-pencil/core/layout'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { createDocumentGraph } from '@pairdraw/core'
+import * as figModule from '@pairdraw/core/io/formats/fig'
+import * as layoutModule from '@pairdraw/core/layout'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { readDraft, writeDraft } from '@/app/document/drafts/store'
 import { getRecoveryStore, resetRecoveryStoreForTests } from '@/app/document/recovery'

@@ -2,7 +2,7 @@ import { useIntervalFn } from '@vueuse/core'
 import * as v from 'valibot'
 import { reactive } from 'vue'
 
-import { AUTOMATION_HTTP_PORT } from '@open-pencil/core/constants'
+import { AUTOMATION_HTTP_PORT } from '@pairdraw/core/constants'
 
 import { APP_VERSION } from '@/app/runtime/version'
 
@@ -13,10 +13,10 @@ import { companionInfoSchema, companionPairingSchema } from './schema'
  * the package's own name, so it is named with `-p` rather than adding a generic `mcp` command to
  * the PATH of everyone who installs the package.
  */
-export const COMPANION_COMMAND = `npx -p @open-pencil/mcp@${APP_VERSION} openpencil-connect`
+export const COMPANION_COMMAND = `npx -p @pairdraw/mcp@${APP_VERSION} pairdraw-connect`
 
 /**
- * The companion (`openpencil-connect`) runs OpenPencil's MCP server and the coding agents on the
+ * The companion (`pairdraw-connect`) runs Pairdraw's MCP server and the coding agents on the
  * person's computer for the web app. A tab pairs with it through the one-time link the companion
  * prints, after the person confirms it, and keeps the tokens only in memory: reloading or closing
  * the tab, or restarting the companion, needs a new link.
@@ -131,7 +131,7 @@ export function createCompanionConnection({
     return state.status === 'connected' ? (session?.token ?? null) : null
   }
 
-  /** The token agents reach OpenPencil's MCP server with, which starts no programs. */
+  /** The token agents reach Pairdraw's MCP server with, which starts no programs. */
   function agentToken(): string | null {
     return state.status === 'connected' ? (session?.agentToken ?? null) : null
   }

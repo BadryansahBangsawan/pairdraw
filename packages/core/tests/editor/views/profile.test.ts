@@ -7,8 +7,8 @@ import {
   createEditor,
   resolveEditorProfile,
   TOOL_SHORTCUTS
-} from '@open-pencil/core'
-import { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 describe('canvas view profiles', () => {
   test('an editing canvas takes every tool and shortcut and draws its chrome', () => {

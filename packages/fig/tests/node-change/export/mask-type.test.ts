@@ -2,8 +2,8 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 
 import { nodeChangeToProps, sceneNodeToKiwi } from '#fig/node-change/index'
 
-import { getCompiledSchema, initCodec, type NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { getCompiledSchema, initCodec, type NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 function vectorMaskRecord() {
   const graph = new SceneGraph()

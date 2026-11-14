@@ -1,17 +1,17 @@
 import { describe, expect, test } from "bun:test";
 
-import { createEditor } from "@open-pencil/core";
+import { createEditor } from "@pairdraw/core";
 import { expectDefined } from "#core-tests/helpers/assert";
 import {
   SceneGraph,
   type Fill,
   type SceneNode,
-} from "@open-pencil/scene-graph";
+} from "@pairdraw/scene-graph";
 import {
   isShaderSourcePaint,
   shaderOfPaint,
   type ShaderSourcePaint,
-} from "@open-pencil/scene-graph/shaders";
+} from "@pairdraw/scene-graph/shaders";
 
 /** The code the paint draws, failing when its shader is a preset instead. */
 function sourceOf(

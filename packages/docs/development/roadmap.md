@@ -24,7 +24,7 @@ v0.15.0 and v0.15.1 shipped work that earlier versions of this roadmap listed as
 - Multidimensional component variants and published component libraries with revision review and linked-instance updates.
 - Local recovery of unsaved documents, saved AI conversations, and CLI font diagnostics.
 - Opt-in browser WebMCP access, separate controls for the local MCP server and remote connections, and per-tool permissions.
-- `openpencil://` and web links that open a document and select a layer.
+- `pairdraw://` and web links that open a document and select a layer.
 
 ### Current development version
 
@@ -35,7 +35,7 @@ Since v0.15.1, the development branch adds:
 - Live design checks: a Lint panel with canvas markers and one-click fixes.
 - AI agents shown on the canvas and to collaborators, with follow mode for people and agents, per-page presence, and MCP agents in rooms.
 - AI chat turns that can be reverted, regenerated, and edited, with tool calls summarised by what they changed and a thinking level per message.
-- The Code tab linked to canvas layers both ways, and visual diff and patch tools, including `openpencil diff`.
+- The Code tab linked to canvas layers both ways, and visual diff and patch tools, including `pairdraw diff`.
 - Collaboration rooms that sync layer trees as a CRDT and open in their own tab.
 - Slots, progressive canvas previews while an AI provider streams JSX, Storybook export, HTML and Tailwind JSX export, and a faster occurrence-scoped `.fig` reader with wider override and variable export.
 - Comments pinned to layers and voice calls in shared rooms, with collaborators watching the AI chat's streamed JSX as it builds.
@@ -79,7 +79,7 @@ Work with open pull requests. It may change before it merges:
 - Surface provider, model-budget, renderer, and automation failures with actionable recovery paths instead of silent stalls.
 - Make desktop automation recover from orphaned processes and renderer crashes without manual cleanup.
 - Prevent non-Latin font discovery and rendering crashes across platforms; add Arabic/Persian shaping and RTL layout, then broaden CJK and mixed-script visual fixtures.
-- Build a portable-font strategy for reproducible documents across machines on top of existing substitution visibility and agent-readable font status, including curated redistributable fonts, embedded or linked document fonts, and licensing metadata ([#502](https://github.com/open-pencil/open-pencil/issues/502), [#503](https://github.com/open-pencil/open-pencil/issues/503)).
+- Build a portable-font strategy for reproducible documents across machines on top of existing substitution visibility and agent-readable font status, including curated redistributable fonts, embedded or linked document fonts, and licensing metadata ([#502](https://github.com/BadryansahBangsawan/pairdraw/issues/502), [#503](https://github.com/BadryansahBangsawan/pairdraw/issues/503)).
 
 ### Cloud and self-hosting
 
@@ -140,7 +140,7 @@ Work with open pull requests. It may change before it merges:
 
 - Expand the documented Vue SDK and core package platform with complete example applications for custom editor shells, embedded design surfaces, and automation-specific UIs.
 - Provide maintained examples for read-only previews, editable canvases, design review surfaces, and agent-controlled editors.
-- Ship an official VS Code/Cursor extension ([#81](https://github.com/open-pencil/open-pencil/issues/81)) for previewing and opening `.fig`/`.pen` documents, connecting to the running editor, invoking CLI/MCP workflows, handing selections between code and canvas, and navigating between generated code and design nodes. Reuse the app, SDK, and automation bridge rather than implementing a second editor inside the extension.
+- Ship an official VS Code/Cursor extension ([#81](https://github.com/BadryansahBangsawan/pairdraw/issues/81)) for previewing and opening `.fig`/`.pen` documents, connecting to the running editor, invoking CLI/MCP workflows, handing selections between code and canvas, and navigating between generated code and design nodes. Reuse the app, SDK, and automation bridge rather than implementing a second editor inside the extension.
 - Define public API stability and migration expectations across the reusable npm packages.
 - Keep the renderer, editor core, and tool registry framework-agnostic enough for headless and embedded use.
 

@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { strFromU8, unzipSync } from 'fflate'
 
-import { BUILTIN_IO_FORMATS, IORegistry } from '@open-pencil/core/io'
+import { BUILTIN_IO_FORMATS, IORegistry } from '@pairdraw/core/io'
 
 import {
   bundleExportFiles,

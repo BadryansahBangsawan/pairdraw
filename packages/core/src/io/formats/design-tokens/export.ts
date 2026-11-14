@@ -7,14 +7,14 @@ import type {
   Variable,
   VariableCollection,
   VariableCollectionMode
-} from '@open-pencil/scene-graph'
-import { numberedName } from '@open-pencil/scene-graph/naming'
-import { printFormula, variableValueReferences } from '@open-pencil/scene-graph/variables'
+} from '@pairdraw/scene-graph'
+import { numberedName } from '@pairdraw/scene-graph/naming'
+import { printFormula, variableValueReferences } from '@pairdraw/scene-graph/variables'
 
 import { fileSegment, placeTokens, tokenPath, tokenReference, tokenTree } from './paths'
 import { styleTokens, withOriginalName, type TokenReferences } from './styles'
 import {
-  OPENPENCIL_EXTENSION,
+  PAIRDRAW_EXTENSION,
   RESOLVER_VERSION,
   type DesignToken,
   type DesignTokenFile,
@@ -57,8 +57,8 @@ interface ExportContext {
   issues: DesignTokenIssue[]
 }
 
-/** OpenPencil's own token fields, which DTCG has no place for. */
-function openPencilFields(variable: Variable, modeId: string, formula?: string) {
+/** Pairdraw's own token fields, which DTCG has no place for. */
+function pairdrawFields(variable: Variable, modeId: string, formula?: string) {
   const fields = omitBy(
     {
       unit: variable.unit,
@@ -70,7 +70,7 @@ function openPencilFields(variable: Variable, modeId: string, formula?: string) 
     },
     (value) => value === undefined
   )
-  return isEmptyObject(fields) ? {} : { [OPENPENCIL_EXTENSION]: fields }
+  return isEmptyObject(fields) ? {} : { [PAIRDRAW_EXTENSION]: fields }
 }
 
 /**
@@ -125,17 +125,17 @@ function variableToken(
     $value = literalTokenValue(variable, value)
   }
   if (variable.type === 'BOOLEAN') figma['com.figma.type'] = 'boolean'
-  const $extensions = { ...figma, ...openPencilFields(variable, mode.modeId, formula) }
+  const $extensions = { ...figma, ...pairdrawFields(variable, mode.modeId, formula) }
   const token: DesignToken = { $type: variableTokenType(variable), $value }
   if (variable.description) token.$description = variable.description
   if (!isEmptyObject($extensions)) token.$extensions = $extensions
   return token
 }
 
-/** What a mode file says about its collection and mode, for OpenPencil to read back. */
+/** What a mode file says about its collection and mode, for Pairdraw to read back. */
 function modeExtension(collection: VariableCollection, mode: VariableCollectionMode) {
   return {
-    [OPENPENCIL_EXTENSION]: omitBy(
+    [PAIRDRAW_EXTENSION]: omitBy(
       {
         collection: collection.name,
         mode: mode.name,
@@ -185,8 +185,8 @@ function resolverDocument(collections: readonly CollectionFiles[], stylesPath: s
 /**
  * The document's variables and styles as W3C design tokens: one file per collection mode, which
  * Figma imports as a mode, a file of typography and shadow tokens from text and effect styles,
- * and a resolver document that combines them. OpenPencil's own fields ride in
- * `$extensions["dev.openpencil"]`, so reading the export back loses nothing.
+ * and a resolver document that combines them. Pairdraw's own fields ride in
+ * `$extensions["dev.pairdraw"]`, so reading the export back loses nothing.
  */
 export function exportDesignTokens(graph: SceneGraph): DesignTokenExport {
   const issues: DesignTokenIssue[] = []

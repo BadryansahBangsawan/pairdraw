@@ -1,4 +1,4 @@
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 
 import cutCursorSVG from '#vue/shared/assets/cursors/cut.svg?raw'
 import { getNodeEditState } from '#vue/shared/input/vector/hit-test'

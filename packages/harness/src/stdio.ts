@@ -25,9 +25,9 @@ const writeProtocol = reserveProtocolOutput()
 loadTypeScriptDependencies()
 
 const stateRoot =
-  process.env.OPENPENCIL_HARNESS_STATE_DIR ?? join(homedir(), '.open-pencil', 'harness-sessions')
-const agentDir = process.env.OPENPENCIL_HARNESS_AGENT_DIR
-const apiKey = process.env.OPENPENCIL_HARNESS_API_KEY
+  process.env.PAIRDRAW_HARNESS_STATE_DIR ?? join(homedir(), '.pairdraw', 'harness-sessions')
+const agentDir = process.env.PAIRDRAW_HARNESS_AGENT_DIR
+const apiKey = process.env.PAIRDRAW_HARNESS_API_KEY
 const backendOptions: PiHarnessBackendOptions = {}
 if (agentDir) backendOptions.agentDir = agentDir
 if (apiKey) backendOptions.apiKey = apiKey

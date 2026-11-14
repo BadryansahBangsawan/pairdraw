@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test'
 
 import * as v from 'valibot'
 
-import { SCRIPT_EXAMPLES } from '@open-pencil/core/tools'
+import { SCRIPT_EXAMPLES } from '@pairdraw/core/tools'
 
 import { scriptNodeSpecSchema } from '@/app/code/script/sandbox/schema'
 import type { ScriptNodeSpec } from '@/app/code/script/sandbox/spec'

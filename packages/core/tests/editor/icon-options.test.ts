@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { parseIconName, type IconData, type IconProvider } from '@open-pencil/core/icons'
-import { readIcon, type IconOptions } from '@open-pencil/scene-graph/icons'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import { createEditor } from '@pairdraw/core'
+import { parseIconName, type IconData, type IconProvider } from '@pairdraw/core/icons'
+import { readIcon, type IconOptions } from '@pairdraw/scene-graph/icons'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { buildIconData } from '#core/icons/svg'
 

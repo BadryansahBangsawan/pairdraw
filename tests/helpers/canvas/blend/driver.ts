@@ -6,9 +6,9 @@ export function linearBlendDriver(page: () => Page) {
   return {
     show() {
       return page().evaluate(async () => {
-        const store = window.openPencil?.getStore?.()
+        const store = window.pairdraw?.getStore?.()
         if (!store) {
-          throw new Error('OpenPencil store not initialized')
+          throw new Error('Pairdraw store not initialized')
         }
         const sceneURL = '/tests/helpers/canvas/blend/scene.ts'
         const scenes: typeof BlendScenes = await import(sceneURL)

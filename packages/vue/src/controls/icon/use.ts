@@ -1,9 +1,9 @@
 import { watchImmediate } from '@vueuse/core'
 import { computed, ref, shallowRef } from 'vue'
 
-import { iconColor, type IconOption } from '@open-pencil/core/icons'
-import { isIconModified, readIcon, type IconOptions } from '@open-pencil/scene-graph/icons'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import { iconColor, type IconOption } from '@pairdraw/core/icons'
+import { isIconModified, readIcon, type IconOptions } from '@pairdraw/scene-graph/icons'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { useUndoBatch } from '#vue/controls/undo-batch/use'
 import { useEditor } from '#vue/editor/context'

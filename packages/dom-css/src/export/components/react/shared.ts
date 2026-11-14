@@ -1,4 +1,4 @@
-import { es, jsx } from '@open-pencil/emit'
+import { es, jsx } from '@pairdraw/emit'
 
 import type { IconDrawing, IconImport, IconPackage } from '../icons'
 import type { ComponentModel, GeneratedKind } from '../model'

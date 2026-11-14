@@ -1,14 +1,14 @@
 import type { FunctionalComponent } from 'vue'
 
-import type { ConnectorLineType, StrokeCap } from '@open-pencil/scene-graph'
+import type { ConnectorLineType, StrokeCap } from '@pairdraw/scene-graph'
 import {
   arrowLinesSegments,
   circleCapRadius,
   diamondCapPoints,
   equilateralArrowPoints,
   triangleCapPoints
-} from '@open-pencil/scene-graph/arrow-caps'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/arrow-caps'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { maskIcon } from './mask'
 

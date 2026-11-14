@@ -24,8 +24,8 @@ mutation and undo behavior stay in `useEditorPropertyList()` or an application a
 ```vue twoslash
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { Fill } from '@open-pencil/scene-graph'
-import { PropertyListItem, PropertyListRemove, PropertyListRoot } from '@open-pencil/vue/primitives/PropertyList'
+import type { Fill } from '@pairdraw/scene-graph'
+import { PropertyListItem, PropertyListRemove, PropertyListRoot } from '@pairdraw/vue/primitives/PropertyList'
 
 const fills = ref<Fill[]>([])
 </script>

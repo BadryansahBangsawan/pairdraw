@@ -3,25 +3,25 @@ export { tryStartResize } from '#vue/shared/input/resize/start'
 import { isEqual } from 'es-toolkit'
 import { toRaw } from 'vue'
 
-import { resizedPathTextGlyphs, type Editor } from '@open-pencil/core'
-import { computeAllLayouts } from '@open-pencil/core/layout'
-import { calibratePathTextLayout, reflowPathTextGlyphs } from '@open-pencil/core/text'
-import type { SceneNode, DerivedTextGlyph, TextPathData } from '@open-pencil/scene-graph'
-import { copyDerivedGlyphs, copyGeometryPaths, copyStrokes } from '@open-pencil/scene-graph/copy'
-import { findInstanceAncestor, recordInstanceOverride } from '@open-pencil/scene-graph/instances'
+import { resizedPathTextGlyphs, type Editor } from '@pairdraw/core'
+import { computeAllLayouts } from '@pairdraw/core/layout'
+import { calibratePathTextLayout, reflowPathTextGlyphs } from '@pairdraw/core/text'
+import type { SceneNode, DerivedTextGlyph, TextPathData } from '@pairdraw/scene-graph'
+import { copyDerivedGlyphs, copyGeometryPaths, copyStrokes } from '@pairdraw/scene-graph/copy'
+import { findInstanceAncestor, recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 import {
   cloneInstanceOverrideState,
   type InstanceOverrideState
-} from '@open-pencil/scene-graph/instances/overrides'
-import { recapturedAspectRatio } from '@open-pencil/scene-graph/layout'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/instances/overrides'
+import { recapturedAspectRatio } from '@pairdraw/scene-graph/layout'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 import {
   computeConstrainedResizeChanges,
   scaledGeometryChanges,
   type ResizeSnapshot
-} from '@open-pencil/scene-graph/resize'
-import { markSourceFieldsEdited } from '@open-pencil/scene-graph/source-metadata'
-import { cloneVectorNetwork } from '@open-pencil/scene-graph/vector-network'
+} from '@pairdraw/scene-graph/resize'
+import { markSourceFieldsEdited } from '@pairdraw/scene-graph/source-metadata'
+import { cloneVectorNetwork } from '@pairdraw/scene-graph/vector-network'
 
 import { calculateResizeRect } from '#vue/shared/input/resize/rect'
 import { draggedSizing, layerSizing } from '#vue/shared/input/resize/sizing'

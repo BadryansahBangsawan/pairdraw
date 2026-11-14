@@ -1,6 +1,6 @@
 import { omit } from 'es-toolkit'
 
-import type { WebCapture, WebCaptureElement } from '@open-pencil/web-capture'
+import type { WebCapture, WebCaptureElement } from '@pairdraw/web-capture'
 
 export function element(
   tagName: string,
@@ -13,7 +13,7 @@ export function element(
 
 export function capture(root: WebCaptureElement, overrides: Partial<WebCapture> = {}): WebCapture {
   return {
-    format: 'openpencil/web-capture',
+    format: 'pairdraw/web-capture',
     version: 1,
     scope: 'element',
     source: { url: 'https://example.com/pricing/', title: 'Pricing' },

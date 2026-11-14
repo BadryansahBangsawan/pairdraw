@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from 'bun:test'
 
 import { effectScope, nextTick, ref } from 'vue'
 
-import { SceneGraph, type PrototypeReaction } from '@open-pencil/scene-graph'
+import { SceneGraph, type PrototypeReaction } from '@pairdraw/scene-graph'
 
 import { shownFrame, type PlaySession } from '@/app/editor/prototype/session'
 import { usePrototypeStage } from '@/app/editor/prototype/stage'

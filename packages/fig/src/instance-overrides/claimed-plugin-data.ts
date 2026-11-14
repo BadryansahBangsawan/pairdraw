@@ -1,10 +1,7 @@
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import {
-  OPEN_PENCIL_PLUGIN_DATA,
-  OPEN_PENCIL_PLUGIN_ID
-} from '@open-pencil/scene-graph/plugin-data'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { PAIRDRAW_PLUGIN_DATA, PAIRDRAW_PLUGIN_ID } from '@pairdraw/scene-graph/plugin-data'
 
-const { primaryAxisAlign } = OPEN_PENCIL_PLUGIN_DATA
+const { primaryAxisAlign } = PAIRDRAW_PLUGIN_DATA
 
 /**
  * Drop the space-around plugin data a layer inherited from its component when a claim sets
@@ -17,6 +14,6 @@ export function invalidateInheritedPluginData(
   if ('pluginData' in patch || !source.pluginData) return
   if (!('stackPrimaryAlignItems' in patch) && !('stackJustify' in patch)) return
   source.pluginData = source.pluginData.filter(
-    (entry) => entry.pluginID !== OPEN_PENCIL_PLUGIN_ID || entry.key !== primaryAxisAlign.key
+    (entry) => entry.pluginID !== PAIRDRAW_PLUGIN_ID || entry.key !== primaryAxisAlign.key
   )
 }

@@ -27,7 +27,7 @@ and actions like:
 ## Usage
 
 ```ts
-import { usePosition } from '@open-pencil/vue/controls/position'
+import { usePosition } from '@pairdraw/vue/controls/position'
 
 const position = usePosition()
 ```

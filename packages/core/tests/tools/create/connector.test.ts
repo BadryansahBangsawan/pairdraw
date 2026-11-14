@@ -2,9 +2,9 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 
 import { registerTestFont } from '#core-tests/helpers/figma-api'
 
-import { FigmaAPI, type FigmaConnectorNode } from '@open-pencil/core/figma-api'
-import { ALL_TOOLS } from '@open-pencil/core/tools'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { FigmaAPI, type FigmaConnectorNode } from '@pairdraw/core/figma-api'
+import { ALL_TOOLS } from '@pairdraw/core/tools'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 beforeAll(() => registerTestFont())
 

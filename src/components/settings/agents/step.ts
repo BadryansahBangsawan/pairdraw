@@ -1,5 +1,5 @@
-import type { ACPAgentDef } from '@open-pencil/core/constants'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { ACPAgentDef } from '@pairdraw/core/constants'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import type { AgentConnectStep } from '@/app/ai/agents/setup/connect'
 

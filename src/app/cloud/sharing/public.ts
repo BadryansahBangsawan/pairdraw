@@ -1,6 +1,6 @@
-import { CloudAPIError, createCloudAPIClient } from '@open-pencil/cloud/client'
-import { parseCloudLinkPath, type DocumentDownload } from '@open-pencil/cloud/contract'
-import { cloudMessages } from '@open-pencil/vue/i18n'
+import { CloudAPIError, createCloudAPIClient } from '@pairdraw/cloud/client'
+import { parseCloudLinkPath, type DocumentDownload } from '@pairdraw/cloud/contract'
+import { cloudMessages } from '@pairdraw/vue/i18n'
 
 import { downloadCloudDocument } from '@/app/integrations/storage/cloud/download'
 import { storageFetch } from '@/app/integrations/storage/s3/fetch'

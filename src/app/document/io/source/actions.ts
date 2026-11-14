@@ -1,7 +1,7 @@
 import { createEventHook } from '@vueuse/core'
 
-import type { Editor, EditorState } from '@open-pencil/core'
-import { exportFigFile } from '@open-pencil/core/io/formats/fig'
+import type { Editor, EditorState } from '@pairdraw/core'
+import { exportFigFile } from '@pairdraw/core/io/formats/fig'
 
 import { createAutosave } from '@/app/document/autosave'
 import { createDocumentDraft, draftsAvailable } from '@/app/document/drafts'

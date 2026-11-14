@@ -1,7 +1,7 @@
 import { defineCommand } from 'citty'
 import { compact } from 'es-toolkit'
 
-import { ALL_TOOLS } from '@open-pencil/core/tools'
+import { ALL_TOOLS } from '@pairdraw/core/tools'
 
 import { resolveAgentRoot } from '#cli/agent/paths'
 import { agentToolDefinitions, parseToolNames } from '#cli/agent/policy'
@@ -13,7 +13,7 @@ const json = { type: 'boolean', description: 'Output as JSON' } as const
 
 /** The API key from `--api-key` or the environment, so a shell history holds no secret. */
 function apiKey(flag: string | undefined): string {
-  return flag?.trim() || process.env.OPENPENCIL_API_KEY?.trim() || ''
+  return flag?.trim() || process.env.PAIRDRAW_API_KEY?.trim() || ''
 }
 
 const run = defineCommand({
@@ -37,7 +37,7 @@ const run = defineCommand({
       default: 'openai-compatible'
     },
     model: { type: 'string', description: 'Model ID the endpoint serves', required: false },
-    'api-key': { type: 'string', description: 'API key (default: OPENPENCIL_API_KEY)' },
+    'api-key': { type: 'string', description: 'API key (default: PAIRDRAW_API_KEY)' },
     'base-url': {
       type: 'string',
       description: 'OpenAI-compatible endpoint, for example https://api.openai.com/v1'

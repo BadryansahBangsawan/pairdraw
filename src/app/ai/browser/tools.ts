@@ -2,7 +2,7 @@ import { valibotSchema } from '@ai-sdk/valibot'
 import { tool, type ToolExecutionOptions, type ToolSet } from 'ai'
 import * as v from 'valibot'
 
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 
 import { elementReference } from '@/app/ai/chat/references/element'
 import { referenceLink } from '@/app/ai/chat/references/link'

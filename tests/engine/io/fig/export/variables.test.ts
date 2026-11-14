@@ -1,9 +1,9 @@
 import { describe, test, expect, beforeAll } from 'bun:test'
 
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { expectDefined } from '#tests/helpers/assert'
 

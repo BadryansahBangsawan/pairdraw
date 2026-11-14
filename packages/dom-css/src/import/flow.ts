@@ -1,18 +1,18 @@
 import { pick } from 'es-toolkit'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   parseCSSAlignItems,
   parseCSSFlexDirection,
   parseCSSJustifyContent,
   parseCSSNumber
-} from '@open-pencil/scene-graph/css'
+} from '@pairdraw/scene-graph/css'
 import {
   autoLayoutSizingFields,
   fillSizingFields,
   layoutSizing,
   textAutoResizeFor
-} from '@open-pencil/scene-graph/layout'
+} from '@pairdraw/scene-graph/layout'
 
 import type { DesignElement, DesignStyleDeclaration } from '../types'
 import { pickStyle } from './css-values'

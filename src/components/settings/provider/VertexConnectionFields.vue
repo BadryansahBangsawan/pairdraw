@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 
-import { useCredentialMessages, useSettingsMessages } from '@open-pencil/vue/i18n'
+import { useCredentialMessages, useSettingsMessages } from '@pairdraw/vue/i18n'
 
 import type { AIModelProfileDraft } from '@/app/ai/models'
 import { vertexNeedsProject } from '@/app/ai/models/settings/profile-editor/platform'

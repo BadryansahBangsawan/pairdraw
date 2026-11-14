@@ -2,14 +2,14 @@ import { describe, expect, test } from 'bun:test'
 
 import { ref } from 'vue'
 
-import type { Fill } from '@open-pencil/scene-graph'
+import type { Fill } from '@pairdraw/scene-graph'
 import {
   fillCategory,
   fillIsTransparent,
   fillSwatchBackground,
   useFill
-} from '@open-pencil/vue/primitives/Fill'
-import { useGradientStops } from '@open-pencil/vue/primitives/GradientEditor'
+} from '@pairdraw/vue/primitives/Fill'
+import { useGradientStops } from '@pairdraw/vue/primitives/GradientEditor'
 
 const solid: Fill = {
   type: 'SOLID',

@@ -1,10 +1,10 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { createShapeWithText, shapeWithTextFrameFields } from '@open-pencil/scene-graph/generated'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { createShapeWithText, shapeWithTextFrameFields } from '@pairdraw/scene-graph/generated'
 import {
   isShapeWithTextType,
   SHAPE_WITH_TEXT_TYPES,
   type ShapeWithTextType
-} from '@open-pencil/scene-graph/shape-with-text'
+} from '@pairdraw/scene-graph/shape-with-text'
 
 import type { InterfaceTheme } from '#core/constants'
 import { newLayerDefaults } from '#core/editor/shapes/defaults'

@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 
-import { useComponentPropertyAuthoring } from '@open-pencil/vue/controls/component-props'
-import { usePanelMessages } from '@open-pencil/vue/i18n'
+import { useComponentPropertyAuthoring } from '@pairdraw/vue/controls/component-props'
+import { usePanelMessages } from '@pairdraw/vue/i18n'
 
 export type BindableField = 'TEXT' | 'VISIBLE' | 'INSTANCE_SWAP'
 

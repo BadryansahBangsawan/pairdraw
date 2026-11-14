@@ -2,19 +2,19 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { parseFigBuffer } from '@open-pencil/fig'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph, type SceneNode } from '@open-pencil/scene-graph'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { parseFigBuffer } from '@pairdraw/fig'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
 import {
   isReplacedLayer,
   replaceInstanceLayer,
   replacedComponentLayerId
-} from '@open-pencil/scene-graph/instances'
+} from '@pairdraw/scene-graph/instances'
 import {
-  OPEN_PENCIL_PLUGIN_DATA,
-  OPEN_PENCIL_PLUGIN_ID
-} from '@open-pencil/scene-graph/plugin-data'
+  PAIRDRAW_PLUGIN_DATA,
+  PAIRDRAW_PLUGIN_ID
+} from '@pairdraw/scene-graph/plugin-data'
 
 import { releaseFigPopulationWorker } from '#core/kiwi/fig/population/client'
 
@@ -131,11 +131,11 @@ describe('a layer replaced inside an instance, saved as .fig', () => {
     const entry = expectDefined(
       saved.pluginData?.find(
         (data) =>
-          data.pluginID === OPEN_PENCIL_PLUGIN_ID &&
-          data.key === OPEN_PENCIL_PLUGIN_DATA.replacedLayers.key
+          data.pluginID === PAIRDRAW_PLUGIN_ID &&
+          data.key === PAIRDRAW_PLUGIN_DATA.replacedLayers.key
       )
     )
-    expect(OPEN_PENCIL_PLUGIN_DATA.replacedLayers.decode(entry.value)).toHaveLength(1)
+    expect(PAIRDRAW_PLUGIN_DATA.replacedLayers.decode(entry.value)).toHaveLength(1)
     // The replacement is no record of the file: Figma's instance shows its component.
     expect(records.some((record) => record.name === 'Star')).toBe(false)
   })

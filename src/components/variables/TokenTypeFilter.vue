@@ -9,8 +9,8 @@ import {
 } from 'reka-ui'
 import { computed } from 'vue'
 
-import type { VariableType } from '@open-pencil/scene-graph'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { VariableType } from '@pairdraw/scene-graph'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import IconButton from '@/components/ui/button/IconButton.vue'
 import { useMenuUI } from '@/components/ui/menu/menu'

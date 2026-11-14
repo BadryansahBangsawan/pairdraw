@@ -8,9 +8,9 @@ import {
   encodeStoredLibraryRevision,
   materializeLibraryAsset,
   storedLibraryRevisionSchema
-} from '@open-pencil/core/library'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { recordInstanceOverride } from '@open-pencil/scene-graph/instances'
+} from '@pairdraw/core/library'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 
 /** A library whose button holds an icon instance that overrides its glyph's opacity. */
 function libraryWithOverride(opacity: number) {

@@ -2,7 +2,7 @@
 import { tv } from 'tailwind-variants'
 import { computed, ref, useId, watch } from 'vue'
 
-import { useChatContextMessages, useCommonMessages } from '@open-pencil/vue/i18n'
+import { useChatContextMessages, useCommonMessages } from '@pairdraw/vue/i18n'
 
 import {
   draftHasContent,

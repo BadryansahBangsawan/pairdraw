@@ -1,6 +1,6 @@
 import dedent from 'dedent'
 
-import { ACP_AGENTS, type ACPAgentID } from '@open-pencil/core/constants'
+import { ACP_AGENTS, type ACPAgentID } from '@pairdraw/core/constants'
 
 import { MCP_INSTALL_COMMAND } from '@/app/automation/mcp/failure'
 import { APP_NAME, CODING_AGENTS_GUIDE_URL } from '@/constants'
@@ -18,7 +18,7 @@ export function codingAgentGuideURL(agentID: ACPAgentID): string {
 
 /**
  * Markdown to paste into a coding agent the person already uses, asking it to install what
- * OpenPencil needs to start it. Written for the agent, so it stays in English.
+ * Pairdraw needs to start it. Written for the agent, so it stays in English.
  */
 export function codingAgentSetupPrompt(agentID: ACPAgentID): string {
   const agent = ACP_AGENTS.find((candidate) => candidate.id === agentID)
@@ -30,9 +30,9 @@ export function codingAgentSetupPrompt(agentID: ACPAgentID): string {
     Please do this for me:
 
     1. If \`${agent.command}\` is not on my PATH, install it: \`${install}\`
-    2. If \`openpencil-mcp-http\` is not on my PATH, install ${APP_NAME}'s MCP server: \`${MCP_INSTALL_COMMAND}\`
+    2. If \`pairdraw-mcp-http\` is not on my PATH, install ${APP_NAME}'s MCP server: \`${MCP_INSTALL_COMMAND}\`
     3. If npm fails with a permission error (EACCES), set up a global npm folder in my home directory (for example \`npm config set prefix ~/.npm-global\` and add \`~/.npm-global/bin\` to my PATH) and install again; use sudo only if I agree.
-    4. Confirm both commands are found, for example with \`which ${agent.command}\` and \`which openpencil-mcp-http\` (\`where\` on Windows). If a global npm folder is missing from my PATH, tell me how to add it.
+    4. Confirm both commands are found, for example with \`which ${agent.command}\` and \`which pairdraw-mcp-http\` (\`where\` on Windows). If a global npm folder is missing from my PATH, tell me how to add it.
     5. ${SIGN_IN[agentID]}
 
     Then tell me what you installed and anything I still need to do myself. I will press "Connect ${agent.name}" or "Retry" in ${APP_NAME}'s AI setup afterwards.

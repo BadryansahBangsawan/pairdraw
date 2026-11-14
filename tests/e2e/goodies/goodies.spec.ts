@@ -6,7 +6,7 @@ import { expect, test } from '#tests/helpers/chat/fixture'
 /** The selected layers: their type, and whether a shader paint is recorded on them. */
 function selectedLayers(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
     return [...store.state.selectedIds].map((id) => {
       const node = store.graph.getNode(id)
@@ -20,7 +20,7 @@ function selectedLayers(page: Page) {
 
 const layerCount = (page: Page) =>
   page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
     return store.graph.getNode(store.state.currentPageId)?.childIds.length ?? -1
   })

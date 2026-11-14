@@ -1,4 +1,4 @@
-import { readFigFile } from '@open-pencil/core/io/formats/fig'
+import { readFigFile } from '@pairdraw/core/io/formats/fig'
 
 import { isTauri } from '@/app/tauri/env'
 

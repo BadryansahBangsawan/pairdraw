@@ -1,5 +1,5 @@
-import type { RenderResult } from '@open-pencil/design-jsx'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import type { RenderResult } from '@pairdraw/design-jsx'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { findPageId } from '#core/io/subgraph'
 import { layoutAuthoredNodes } from '#core/layout'

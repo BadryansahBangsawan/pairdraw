@@ -1,6 +1,6 @@
-import { jsx, type SyntaxNode } from '@open-pencil/emit'
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import type { ShaderComponent, ShaderPreset } from '@open-pencil/scene-graph/shaders'
+import { jsx, type SyntaxNode } from '@pairdraw/emit'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import type { ShaderComponent, ShaderPreset } from '@pairdraw/scene-graph/shaders'
 
 import type { DesignDocument, DesignElement, DesignNode } from '../types'
 import { shaderEffectAttributes } from './components/shaders'
@@ -52,7 +52,7 @@ function attributes(node: DesignElement, themeVariables: readonly string[]): Syn
 
 /**
  * A layer's shader as the `shaders` library's `<Shader>`, each effect a child with the preset's
- * props, with telemetry off as every OpenPencil export has it.
+ * props, with telemetry off as every Pairdraw export has it.
  */
 function shaderElement(preset: ShaderPreset, depth: number): SyntaxNode {
   const effect =

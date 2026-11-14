@@ -7,7 +7,7 @@ const { version } = await import('../package.json')
 
 const main = defineCommand({
   meta: {
-    name: 'openpencil',
+    name: 'pairdraw',
     description:
       'Pairdraw CLI — inspect, export, and lint design documents, and drive the running app',
     version

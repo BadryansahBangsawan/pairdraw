@@ -1,4 +1,4 @@
-import { AI_PROVIDERS } from '@open-pencil/core/constants'
+import { AI_PROVIDERS } from '@pairdraw/core/constants'
 
 import { aiModelSettings, modelConnectionCredentialRef } from '@/app/ai/models'
 import { IMAGE_AI_CREDENTIAL_REFS } from '@/app/editor/image-ai/credentials'

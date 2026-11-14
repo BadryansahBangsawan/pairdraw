@@ -5,9 +5,9 @@ import { computed, shallowRef } from 'vue'
 import {
   useDocumentWorkspace,
   type DocumentWorkspaceSource
-} from '@open-pencil/vue/document/workspace'
-import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
-import { useI18n } from '@open-pencil/vue/i18n'
+} from '@pairdraw/vue/document/workspace'
+import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import type { DraftMeta } from '@/app/document/drafts'
 import { useDocumentSelection } from '@/app/home/selection'

@@ -1,9 +1,9 @@
 import { clamp, mapValues } from 'es-toolkit'
 import * as v from 'valibot'
 
-import { IS_BROWSER } from '@open-pencil/core/constants'
+import { IS_BROWSER } from '@pairdraw/core/constants'
 
-const EDITOR_LAYOUT_KEY = 'open-pencil:editor-layout'
+const EDITOR_LAYOUT_KEY = 'pairdraw:editor-layout'
 
 /**
  * How wide each side panel is, in pixels, with the inset that keeps its card off the window's edge;

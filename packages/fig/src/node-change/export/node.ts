@@ -2,24 +2,21 @@ import type { DerivedSymbolOverride } from '#fig/instance-overrides/types'
 import { effectiveFigmaRawNodeFields, effectiveFigmaSourcePayload } from '#fig/source-metadata'
 import { compact } from 'es-toolkit/array'
 
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { stringToGuid } from '@open-pencil/kiwi/fig/guid'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { stringToGuid } from '@pairdraw/kiwi/fig/guid'
 import type {
   ComponentPropertyDefinition,
   ComponentPropertyReferenceField,
   LayoutGrid,
   SceneGraph,
   SceneNode
-} from '@open-pencil/scene-graph'
-import {
-  DEFAULT_STROKE_MITER_LIMIT,
-  DEFAULT_STROKE_WEIGHT
-} from '@open-pencil/scene-graph/constants'
-import { isGeneratedFrame } from '@open-pencil/scene-graph/generated'
-import { layoutGridCount } from '@open-pencil/scene-graph/layout'
-import { siblingOrderKeys } from '@open-pencil/scene-graph/order-keys'
-import { OPEN_PENCIL_PLUGIN_DATA, withPluginData } from '@open-pencil/scene-graph/plugin-data'
-import type { GUID, Matrix, Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph'
+import { DEFAULT_STROKE_MITER_LIMIT, DEFAULT_STROKE_WEIGHT } from '@pairdraw/scene-graph/constants'
+import { isGeneratedFrame } from '@pairdraw/scene-graph/generated'
+import { layoutGridCount } from '@pairdraw/scene-graph/layout'
+import { siblingOrderKeys } from '@pairdraw/scene-graph/order-keys'
+import { PAIRDRAW_PLUGIN_DATA, withPluginData } from '@pairdraw/scene-graph/plugin-data'
+import type { GUID, Matrix, Vector } from '@pairdraw/scene-graph/primitives'
 
 /* eslint-disable max-lines */
 import { bytesToHex } from '../bytes'
@@ -229,11 +226,11 @@ interface MaterializeFigmaPayloadOptions {
 }
 
 function materializeFigmaBlob(
-  value: { __openPencilFigmaBlob?: Uint8Array | Record<string, number> },
+  value: { __pairdrawFigmaBlob?: Uint8Array | Record<string, number> },
   blobs: Uint8Array[],
   options: MaterializeFigmaPayloadOptions
 ): number {
-  const blob = value.__openPencilFigmaBlob
+  const blob = value.__pairdrawFigmaBlob
   const bytes = blob instanceof Uint8Array ? blob : new Uint8Array(Object.values(blob ?? {}))
   const key = bytesToHex(bytes)
   const existing = options.blobIndexByHex?.get(key)
@@ -267,9 +264,9 @@ function materializeFigmaPayload(
   if (Array.isArray(value))
     return value.map((item) => materializeFigmaPayload(item, blobs, options))
   if (!value || typeof value !== 'object') return value
-  if ('__openPencilFigmaBlob' in value) {
+  if ('__pairdrawFigmaBlob' in value) {
     return materializeFigmaBlob(
-      value as { __openPencilFigmaBlob?: Uint8Array | Record<string, number> },
+      value as { __pairdrawFigmaBlob?: Uint8Array | Record<string, number> },
       blobs,
       options
     )
@@ -997,7 +994,7 @@ export function sceneNodeToKiwiWithContext(
   applyInstancePayload(context, node, nc, localIdCounter)
   applyReplacedLayersPluginData(context, node, localIdCounter)
   if (node.type === 'COMPONENT_SET' || node.type === 'SCRIPT')
-    node.pluginData = withPluginData(node.pluginData, OPEN_PENCIL_PLUGIN_DATA.nodeType, node.type)
+    node.pluginData = withPluginData(node.pluginData, PAIRDRAW_PLUGIN_DATA.nodeType, node.type)
   if (nc.type === 'CANVAS') nc.pageType = 'DESIGN'
   if (node.type === 'BOOLEAN_OPERATION')
     nc.booleanOperation = toKiwiBooleanOperation(node.booleanOperation)

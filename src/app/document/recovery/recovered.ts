@@ -1,6 +1,6 @@
 import { computed, shallowRef } from 'vue'
 
-import { recoveryMessages } from '@open-pencil/vue/i18n'
+import { recoveryMessages } from '@pairdraw/vue/i18n'
 
 import { applyImportedDocument } from '@/app/document/io/imported-document'
 import { takeFileBackup } from '@/app/document/recovery/backups'

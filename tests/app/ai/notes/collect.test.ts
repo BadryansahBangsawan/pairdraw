@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import { PEN_PLUGIN_DATA_NAMESPACE } from '@open-pencil/pen'
-import { SceneGraph, type SceneNode } from '@open-pencil/scene-graph'
-import { withAgentNotes, type AgentNotesDraft } from '@open-pencil/scene-graph/agent-notes'
-import { createSticky } from '@open-pencil/scene-graph/generated'
+import { PEN_PLUGIN_DATA_NAMESPACE } from '@pairdraw/pen'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
+import { withAgentNotes, type AgentNotesDraft } from '@pairdraw/scene-graph/agent-notes'
+import { createSticky } from '@pairdraw/scene-graph/generated'
 
 import { collectLayerNotes, MAX_LAYER_NOTES } from '@/app/ai/notes/collect'
 

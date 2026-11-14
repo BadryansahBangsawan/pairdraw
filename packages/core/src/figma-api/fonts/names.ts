@@ -1,6 +1,6 @@
-import type { FontVariation } from '@open-pencil/scene-graph'
-import type { FontFamilyStyle } from '@open-pencil/scene-graph/font-style'
-import { parseFontStyle } from '@open-pencil/scene-graph/font-style'
+import type { FontVariation } from '@pairdraw/scene-graph'
+import type { FontFamilyStyle } from '@pairdraw/scene-graph/font-style'
+import { parseFontStyle } from '@pairdraw/scene-graph/font-style'
 
 import {
   checkedVariation,

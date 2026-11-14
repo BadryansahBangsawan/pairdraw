@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 
-import { arcFieldValue, arcOf, arcWithField, type ArcField } from '@open-pencil/core/geometry'
-import type { ArcData, SceneNode } from '@open-pencil/scene-graph'
+import { arcFieldValue, arcOf, arcWithField, type ArcField } from '@pairdraw/core/geometry'
+import type { ArcData, SceneNode } from '@pairdraw/scene-graph'
 
 import { MIXED, type MixedValue } from '#vue/controls/node-props/use'
 import { useEditor } from '#vue/editor/context'

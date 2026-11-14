@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 
-import { createEditor, type Editor } from '@open-pencil/core'
-import type { MenuEntry } from '@open-pencil/vue/editor/menu-model'
+import { createEditor, type Editor } from '@pairdraw/core'
+import type { MenuEntry } from '@pairdraw/vue/editor/menu-model'
 
 import { textLinkMenuEntries } from '@/app/editor/canvas/menu/links'
 import { applyTextLink, closeTextLinkEditor, textLinkEdit } from '@/app/editor/links'

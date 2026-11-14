@@ -16,8 +16,8 @@
     "types": ["bun"],
     "paths": {
       "#web-capture/*": ["./src/*"],
-      "@open-pencil/web-capture": ["./src/index.ts"],
-      "@open-pencil/web-capture/capturer": ["./src/capturer/index.ts"]
+      "@pairdraw/web-capture": ["./src/index.ts"],
+      "@pairdraw/web-capture/capturer": ["./src/capturer/index.ts"]
     }
   },
   "include": ["src/**/*.ts"],

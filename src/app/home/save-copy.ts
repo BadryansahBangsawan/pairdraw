@@ -1,6 +1,6 @@
 import { basename, extname } from 'pathe'
 
-import { recoveryMessages } from '@open-pencil/vue/i18n'
+import { recoveryMessages } from '@pairdraw/vue/i18n'
 
 import { readDraft } from '@/app/document/drafts'
 import { downloadBlob } from '@/app/document/io/browser'

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import { toRaw } from 'vue'
 
-import { ACP_AGENTS } from '@open-pencil/core/constants'
+import { ACP_AGENTS } from '@pairdraw/core/constants'
 
 import { activateAgent } from '@/app/ai/agents/auto/activate'
 import {

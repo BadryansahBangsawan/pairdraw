@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { LibrarySummary } from '@open-pencil/core/library'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { LibrarySummary } from '@pairdraw/core/library'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import type { MissingLibrary } from '@/app/libraries/relink'
 import AppAlert from '@/components/ui/feedback/AppAlert.vue'

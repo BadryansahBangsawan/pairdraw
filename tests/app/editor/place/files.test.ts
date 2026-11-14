@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { IMPORTABLE_RASTER_TYPES, isSVGFile } from '@open-pencil/scene-graph/images'
+import { IMPORTABLE_RASTER_TYPES, isSVGFile } from '@pairdraw/scene-graph/images'
 
 import {
   PLACE_IMAGE_ACCEPT,

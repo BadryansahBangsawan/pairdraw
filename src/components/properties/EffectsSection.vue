@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Effect, Fill, ShadowEffect, ShaderEffect } from '@open-pencil/scene-graph'
-import { useEffectsControls } from '@open-pencil/vue/controls/effects'
-import { useI18n } from '@open-pencil/vue/i18n'
-import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
+import type { Effect, Fill, ShadowEffect, ShaderEffect } from '@pairdraw/scene-graph'
+import { useEffectsControls } from '@pairdraw/vue/controls/effects'
+import { useI18n } from '@pairdraw/vue/i18n'
+import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import ColorInput from '@/components/ColorPicker/ColorInput.vue'

@@ -1,14 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { sceneGraphFromStyledHTML } from '@open-pencil/core/io/formats/html/layers'
+import { createEditor } from '@pairdraw/core'
+import { sceneGraphFromStyledHTML } from '@pairdraw/core/io/formats/html/layers'
 import {
   encodeWebCaptureClipboard,
   readWebCaptureClipboard,
   webCaptureDesignDocument,
   type WebCapture,
   type WebCaptureElement
-} from '@open-pencil/web-capture'
+} from '@pairdraw/web-capture'
 
 // A 1×1 transparent PNG.
 const PIXEL =
@@ -24,7 +24,7 @@ function element(
 }
 
 const CAPTURE: WebCapture = {
-  format: 'openpencil/web-capture',
+  format: 'pairdraw/web-capture',
   version: 1,
   scope: 'element',
   source: { url: 'https://example.com/pricing/', title: 'Pricing' },

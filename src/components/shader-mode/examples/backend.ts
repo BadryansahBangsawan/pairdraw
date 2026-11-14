@@ -1,4 +1,4 @@
-import type { ShaderStageBackend, ShaderStageRenderer } from '@open-pencil/vue/canvas/surface'
+import type { ShaderStageBackend, ShaderStageRenderer } from '@pairdraw/vue/canvas/surface'
 
 /** What the stories' shader does: play, stay starting, fail, or find no WebGPU. */
 export type StoryShaderState = 'ready' | 'starting' | 'failed' | 'unsupported'

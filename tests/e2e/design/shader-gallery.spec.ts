@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test'
 
-import { shaderPresetKey } from '@open-pencil/scene-graph/shaders'
-import { DEFAULT_SHADER_PRESET, SHADER_GALLERY } from '@open-pencil/vue/controls/shader'
+import { shaderPresetKey } from '@pairdraw/scene-graph/shaders'
+import { DEFAULT_SHADER_PRESET, SHADER_GALLERY } from '@pairdraw/vue/controls/shader'
 
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
 
@@ -37,8 +37,8 @@ function galleryPreset(id: string) {
 /** The preset each shader paint of the selected layer draws, and whether its frame is drawn. */
 function selectedShaders(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const id = [...store.state.selectedIds][0]
     const node = id ? store.graph.getNode(id) : undefined
     return (node?.pluginData ?? [])
@@ -116,8 +116,8 @@ test('the canvas draws the saved frame of an applied gallery shader', async () =
   })
   await page.evaluate(
     ({ frame, presetKey }) => {
-      const store = window.openPencil?.getStore?.()
-      if (!store) throw new Error('OpenPencil store not initialized')
+      const store = window.pairdraw?.getStore?.()
+      if (!store) throw new Error('Pairdraw store not initialized')
       const id = [...store.state.selectedIds][0]
       const node = id ? store.graph.getNode(id) : undefined
       const hash = node?.fills[0]?.imageHash

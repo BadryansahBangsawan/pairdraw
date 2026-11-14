@@ -1,9 +1,9 @@
 import { isValid, toUint8Array } from 'js-base64'
 import * as v from 'valibot'
 
-import { parseColor } from '@open-pencil/scene-graph/color'
-import { gradientTransformRows, linearGradientTransform } from '@open-pencil/scene-graph/gradient'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import { parseColor } from '@pairdraw/scene-graph/color'
+import { gradientTransformRows, linearGradientTransform } from '@pairdraw/scene-graph/gradient'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { storeImage } from '#core/figma-api/images'
 import { defineTool, nodeIdInputSchema, toolFailure, toolNumber } from '#core/tools/schema'

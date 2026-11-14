@@ -2,9 +2,9 @@ import { describe, expect, test } from 'bun:test'
 
 import { toUint8Array } from 'js-base64'
 
-import { BUILTIN_IO_FORMATS, IORegistry } from '@open-pencil/core/io'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { TRANSPARENT } from '@open-pencil/scene-graph/constants'
+import { BUILTIN_IO_FORMATS, IORegistry } from '@pairdraw/core/io'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { TRANSPARENT } from '@pairdraw/scene-graph/constants'
 
 const io = new IORegistry(BUILTIN_IO_FORMATS)
 
@@ -101,13 +101,13 @@ describe('HTML export asset URLs', () => {
       expect(markup).toContain('src="Card%20%231%3F.assets/images/image-1.png"')
       expect(markup).not.toContain('Card #1')
       if (html === 'standalone')
-        expect(markup).toContain('href="Card%20%231%3F.assets/openpencil.css"')
+        expect(markup).toContain('href="Card%20%231%3F.assets/pairdraw.css"')
     }
   })
 })
 
 describe('Tailwind JSX export format', () => {
-  test('is a registered export next to OpenPencil JSX', async () => {
+  test('is a registered export next to Pairdraw JSX', async () => {
     const { graph, card } = cardGraph()
     const result = await io.exportContent('tailwind-jsx', {
       graph,

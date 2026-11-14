@@ -1,5 +1,5 @@
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
-import { MIN_RESCALE } from '@open-pencil/scene-graph/scaling'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
+import { MIN_RESCALE } from '@pairdraw/scene-graph/scaling'
 
 import type { NodePreview } from '#core/editor/node-preview'
 import type { EditorContext } from '#core/editor/types'

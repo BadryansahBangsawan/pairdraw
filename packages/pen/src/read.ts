@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { lineNetwork, pathNetwork } from './geometry'
 import { removeUnusedIconComponents } from './icons'

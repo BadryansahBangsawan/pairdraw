@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { IS_TAURI, type AIProviderID } from '@open-pencil/core/constants'
-import { useAIMessages, useSettingsMessages } from '@open-pencil/vue/i18n'
+import { IS_TAURI, type AIProviderID } from '@pairdraw/core/constants'
+import { useAIMessages, useSettingsMessages } from '@pairdraw/vue/i18n'
 
 import { aiModelSettings, modelConnection } from '@/app/ai/models'
 import { modelProviderName } from '@/app/ai/models/provider-name'
@@ -14,7 +14,7 @@ import {
   ONBOARDING_SUBSCRIPTIONS,
   needsDesktop
 } from '@/app/ai/models/settings/onboarding/plan'
-import { OPENPENCIL_AI_PROVIDER } from '@/app/ai/providers/openpencil/provider'
+import { PAIRDRAW_AI_PROVIDER } from '@/app/ai/providers/pairdraw/provider'
 import { cloudAIAvailable } from '@/app/cloud/integration'
 import SettingsSection from '@/components/settings/layout/SettingsSection.vue'
 import ProviderLogo from '@/components/settings/provider/ProviderLogo.vue'
@@ -92,8 +92,8 @@ const groups = computed(() => {
   if (cloudAIAvailable.value) {
     groups.push({
       key: 'cloud',
-      title: modelProviderName(OPENPENCIL_AI_PROVIDER),
-      choices: [{ id: OPENPENCIL_AI_PROVIDER }]
+      title: modelProviderName(PAIRDRAW_AI_PROVIDER),
+      choices: [{ id: PAIRDRAW_AI_PROVIDER }]
     })
   }
   return groups

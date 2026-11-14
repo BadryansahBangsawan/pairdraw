@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { Fill, GradientTransform } from '@open-pencil/scene-graph'
+import type { Fill, GradientTransform } from '@pairdraw/scene-graph'
 
 import { imageFillMode, withImageFillMode } from '@/app/editor/images/scale-mode'
 

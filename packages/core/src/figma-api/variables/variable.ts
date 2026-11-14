@@ -9,8 +9,8 @@ import {
   type VariableScope,
   type VariableType,
   type VariableValue
-} from '@open-pencil/scene-graph'
-import { updateTokenExpression } from '@open-pencil/scene-graph/variables'
+} from '@pairdraw/scene-graph'
+import { updateTokenExpression } from '@pairdraw/scene-graph/variables'
 
 import { reconcileVariableLayouts } from '#core/layout/variables'
 

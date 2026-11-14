@@ -1,4 +1,4 @@
-import { ACP_AGENTS } from '@open-pencil/core/constants'
+import { ACP_AGENTS } from '@pairdraw/core/constants'
 
 /**
  * An agent the companion may start. Every command line is fixed here: a client names an agent

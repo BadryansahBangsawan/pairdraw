@@ -1,5 +1,5 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { LAYOUT_AFFECTING_KEYS } from '@open-pencil/scene-graph/fields'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { LAYOUT_AFFECTING_KEYS } from '@pairdraw/scene-graph/fields'
 
 /** Edits that make saved geometry stale: layout fields, visibility, and text laid out again. */
 const LAYOUT_EDIT_FIELDS: ReadonlySet<string> = new Set([

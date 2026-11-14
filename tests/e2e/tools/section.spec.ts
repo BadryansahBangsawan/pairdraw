@@ -10,8 +10,8 @@ test('draw section in full editor without browser errors', async () => {
   await expect
     .poll(async () => {
       return editor.page.evaluate(() => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         const selectedId = [...store.state.selectedIds][0]
         return selectedId ? store.graph.getNode(selectedId)?.type : null
       })

@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { SkiaRenderer } from '@open-pencil/core/canvas'
-import { initCanvasKit } from '@open-pencil/core/io/formats/raster'
-import { fontManager } from '@open-pencil/core/text'
-import { vectorNetworkToPath } from '@open-pencil/core/vector'
-import type { Effect, SceneNode, Stroke } from '@open-pencil/scene-graph'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import { createEditor } from '@pairdraw/core'
+import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
+import { fontManager } from '@pairdraw/core/text'
+import { vectorNetworkToPath } from '@pairdraw/core/vector'
+import type { Effect, SceneNode, Stroke } from '@pairdraw/scene-graph'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 // Figma's Outline stroke (⇧⌘O), measured live: each stroked layer becomes its fill, "<name>", under
 // "<name> (Stroke)", painted with the stroke where it is drawn; both keep the layer's turn,

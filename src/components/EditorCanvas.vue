@@ -15,8 +15,8 @@ import IconLucidePanelLeft from '~icons/lucide/panel-left'
 import IconLucidePanelRight from '~icons/lucide/panel-right'
 import IconLucidePanelTop from '~icons/lucide/panel-top'
 
-import { resolveEditorProfile } from '@open-pencil/core'
-import type { PlacedStatusLabel } from '@open-pencil/core/canvas'
+import { resolveEditorProfile } from '@pairdraw/core'
+import type { PlacedStatusLabel } from '@pairdraw/core/canvas'
 import {
   AUTO_LAYOUT_PADDING_EDITOR_OFFSET_X,
   AUTO_LAYOUT_PADDING_EDITOR_OFFSET_Y,
@@ -24,19 +24,19 @@ import {
   COMPONENT_LABEL_ICON_SIZE,
   SECTION_TITLE_GAP,
   SECTION_TITLE_HEIGHT
-} from '@open-pencil/core/constants'
-import type { ViewportTransform } from '@open-pencil/core/geometry'
-import { colorToCSS } from '@open-pencil/scene-graph/color'
-import { PlayIslands, useCanvasInput } from '@open-pencil/vue/canvas'
-import { useCanvasDrop } from '@open-pencil/vue/canvas/drop'
-import { useCanvasIssueMarkers } from '@open-pencil/vue/canvas/issues'
-import { useCanvasLinks } from '@open-pencil/vue/canvas/links'
-import { useCanvasVirtualReference } from '@open-pencil/vue/canvas/overlays'
-import { useCanvasStatusLabels } from '@open-pencil/vue/canvas/statuses'
-import { useCanvas } from '@open-pencil/vue/canvas/surface'
-import { useTextEdit } from '@open-pencil/vue/canvas/text-edit'
-import { toolCursor } from '@open-pencil/vue/editor/tool-cursor'
-import { autoLayoutValueAnchor, type AutoLayoutValueField } from '@open-pencil/vue/shared/input'
+} from '@pairdraw/core/constants'
+import type { ViewportTransform } from '@pairdraw/core/geometry'
+import { colorToCSS } from '@pairdraw/scene-graph/color'
+import { PlayIslands, useCanvasInput } from '@pairdraw/vue/canvas'
+import { useCanvasDrop } from '@pairdraw/vue/canvas/drop'
+import { useCanvasIssueMarkers } from '@pairdraw/vue/canvas/issues'
+import { useCanvasLinks } from '@pairdraw/vue/canvas/links'
+import { useCanvasVirtualReference } from '@pairdraw/vue/canvas/overlays'
+import { useCanvasStatusLabels } from '@pairdraw/vue/canvas/statuses'
+import { useCanvas } from '@pairdraw/vue/canvas/surface'
+import { useTextEdit } from '@pairdraw/vue/canvas/text-edit'
+import { toolCursor } from '@pairdraw/vue/editor/tool-cursor'
+import { autoLayoutValueAnchor, type AutoLayoutValueField } from '@pairdraw/vue/shared/input'
 
 import { useAIChat } from '@/app/ai/chat/use'
 import { useEditorStore } from '@/app/editor/active-store'

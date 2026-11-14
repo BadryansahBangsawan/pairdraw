@@ -1,4 +1,4 @@
-import type { Effect, SceneGraph, SceneNode, ShadowEffect } from '@open-pencil/scene-graph'
+import type { Effect, SceneGraph, SceneNode, ShadowEffect } from '@pairdraw/scene-graph'
 
 export function expectDefined<T>(value: T | null | undefined, label = 'value'): NonNullable<T> {
   if (value == null) {

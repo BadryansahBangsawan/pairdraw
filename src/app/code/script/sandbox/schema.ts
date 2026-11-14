@@ -33,9 +33,9 @@ export const scriptNodeSpecSchema: v.GenericSchema<unknown, ScriptNodeSpec> = v.
   children: v.optional(v.pipe(v.array(v.lazy(() => scriptNodeSpecSchema)), v.maxLength(1_000)))
 })
 
-export const SCRIPT_SANDBOX_READY = 'open-pencil-script-ready'
-export const SCRIPT_SANDBOX_RUN = 'open-pencil-script-run'
-export const SCRIPT_SANDBOX_RESULT = 'open-pencil-script-result'
+export const SCRIPT_SANDBOX_READY = 'pairdraw-script-ready'
+export const SCRIPT_SANDBOX_RUN = 'pairdraw-script-run'
+export const SCRIPT_SANDBOX_RESULT = 'pairdraw-script-result'
 
 const scriptInputValueSchema = v.union([
   v.string(),

@@ -1,7 +1,7 @@
-import type { Fill, ImageScaleMode, SceneGraph } from '@open-pencil/scene-graph'
-import { BLACK } from '@open-pencil/scene-graph/constants'
-import { coverImageTransform, computeImageHash, imageSize } from '@open-pencil/scene-graph/images'
-import type { Matrix, Size } from '@open-pencil/scene-graph/primitives'
+import type { Fill, ImageScaleMode, SceneGraph } from '@pairdraw/scene-graph'
+import { BLACK } from '@pairdraw/scene-graph/constants'
+import { coverImageTransform, computeImageHash, imageSize } from '@pairdraw/scene-graph/images'
+import type { Matrix, Size } from '@pairdraw/scene-graph/primitives'
 
 import type { PenImagePaint } from './schema'
 

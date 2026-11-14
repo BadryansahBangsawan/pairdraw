@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import { afterEach, beforeEach, expect, spyOn, test } from 'bun:test'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
 
 import * as figmaFactory from '@/app/automation/bridge/figma-factory'
 import { createEditorStore } from '@/app/editor/session/create'

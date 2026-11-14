@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { aiMessages } from '@open-pencil/vue/i18n'
+import { aiMessages } from '@pairdraw/vue/i18n'
 
 import { CREATION_KIND_IDS, creationKinds, promptForCreationKind } from '@/app/home/creation'
 

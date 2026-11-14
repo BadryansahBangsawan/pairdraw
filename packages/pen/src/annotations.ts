@@ -1,4 +1,4 @@
-import type { SceneNode } from '@open-pencil/scene-graph'
+import type { SceneNode } from '@pairdraw/scene-graph'
 import {
   createSticky,
   DEFAULT_STICKY_COLOR,
@@ -8,10 +8,10 @@ import {
   stickyScale,
   stickySublayers,
   stickyWidth
-} from '@open-pencil/scene-graph/generated'
-import { recordInstanceOverride } from '@open-pencil/scene-graph/instances'
-import { fillSizingFields } from '@open-pencil/scene-graph/layout'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/generated'
+import { recordInstanceOverride } from '@pairdraw/scene-graph/instances'
+import { fillSizingFields } from '@pairdraw/scene-graph/layout'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { parseSize } from './layout'
 import type { Build } from './nodes'

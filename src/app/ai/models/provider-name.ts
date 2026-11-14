@@ -1,6 +1,6 @@
-import { ACP_AGENTS, AI_PROVIDERS, HARNESS_PROVIDER_ID } from '@open-pencil/core/constants'
+import { ACP_AGENTS, AI_PROVIDERS, HARNESS_PROVIDER_ID } from '@pairdraw/core/constants'
 
-import { OPENPENCIL_AI_PROVIDER } from '@/app/ai/providers/openpencil/provider'
+import { PAIRDRAW_AI_PROVIDER } from '@/app/ai/providers/pairdraw/provider'
 import { APP_NAME } from '@/constants'
 
 /**
@@ -9,7 +9,7 @@ import { APP_NAME } from '@/constants'
  */
 export function modelProviderName(providerID: string): string {
   if (providerID === HARNESS_PROVIDER_ID) return 'Pi'
-  if (providerID === OPENPENCIL_AI_PROVIDER) return `${APP_NAME} Cloud`
+  if (providerID === PAIRDRAW_AI_PROVIDER) return `${APP_NAME} Cloud`
   if (providerID.startsWith('acp:')) {
     const agentID = providerID.slice('acp:'.length)
     return ACP_AGENTS.find((agent) => agent.id === agentID)?.name ?? providerID

@@ -11,10 +11,10 @@ import {
 } from 'reka-ui'
 import { computed, onMounted, ref, shallowRef, watch } from 'vue'
 
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { cycleSafeParent } from '@open-pencil/scene-graph/instances'
-import { createDefaultNode } from '@open-pencil/scene-graph/node-defaults'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { cycleSafeParent } from '@pairdraw/scene-graph/instances'
+import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { useLibraryService } from '@/app/libraries'
@@ -314,7 +314,7 @@ async function insertAsset(asset: LocalAsset) {
 
 function onDragStart(event: DragEvent, asset: LocalAsset) {
   if (!event.dataTransfer || !asset.componentId) return
-  event.dataTransfer.setData('application/x-openpencil-component', asset.componentId)
+  event.dataTransfer.setData('application/x-pairdraw-component', asset.componentId)
   event.dataTransfer.effectAllowed = 'copy'
 }
 

@@ -12,7 +12,7 @@ description: Передача экземпляра редактора Pairdraw �
 ## Использование
 
 ```ts
-import { provideEditor } from '@open-pencil/vue'
+import { provideEditor } from '@pairdraw/vue'
 
 provideEditor(editor)
 ```
@@ -21,9 +21,9 @@ provideEditor(editor)
 
 ```vue
 <script setup lang="ts">
-import { provideEditor } from '@open-pencil/vue'
+import { provideEditor } from '@pairdraw/vue'
 
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 
 const props = defineProps<{
   editor: Editor

@@ -7,7 +7,7 @@ import {
   RELAY_SERVER_PEER,
   type CollaborationTicket,
   type DocumentPermission
-} from '@open-pencil/cloud/contract'
+} from '@pairdraw/cloud/contract'
 
 import type { RoomImageStore } from '@/app/collab/images'
 import { leaveRoom, openDocumentRoom, roomForStore } from '@/app/collab/rooms'

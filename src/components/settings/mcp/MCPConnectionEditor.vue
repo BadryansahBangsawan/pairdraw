@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue'
 
-import { IS_TAURI } from '@open-pencil/core/constants'
-import { useAutomationMessages, useCommonMessages } from '@open-pencil/vue/i18n'
+import { IS_TAURI } from '@pairdraw/core/constants'
+import { useAutomationMessages, useCommonMessages } from '@pairdraw/vue/i18n'
 
 import type { MCPConnectionDraft } from '@/app/integrations/mcp'
 import type { MCPConnectionTestResult } from '@/app/integrations/mcp/client/test'

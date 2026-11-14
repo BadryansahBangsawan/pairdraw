@@ -3,8 +3,8 @@ import { describe, expect, test } from 'bun:test'
 import { scriptResult } from '#core-tests/helpers/script'
 import { toUint8Array } from 'js-base64'
 
-import { FigmaAPI, MAX_IMAGE_FETCH_BYTES } from '@open-pencil/core/figma-api'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { FigmaAPI, MAX_IMAGE_FETCH_BYTES } from '@pairdraw/core/figma-api'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 // Expected values were recorded by running the same scripts in Figma, except where noted.
 

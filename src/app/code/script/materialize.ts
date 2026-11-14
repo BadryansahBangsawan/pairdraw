@@ -3,10 +3,10 @@
  * script and its output are never out of step, and the graph calls are direct: a run is the
  * script node's render, not a document edit of its own, so it adds no undo step.
  */
-import { newLayerDefaults } from '@open-pencil/core'
-import { computeAllLayouts } from '@open-pencil/core/layout'
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { parseColor } from '@open-pencil/scene-graph/color'
+import { newLayerDefaults } from '@pairdraw/core'
+import { computeAllLayouts } from '@pairdraw/core/layout'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { parseColor } from '@pairdraw/scene-graph/color'
 
 import { countScriptNodes, type ScriptNodeSpec } from '@/app/code/script/sandbox/spec'
 

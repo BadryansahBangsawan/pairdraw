@@ -1,4 +1,4 @@
-import { registerImageVectorizer, type ImageVectorizer } from '@open-pencil/core/tools'
+import { registerImageVectorizer, type ImageVectorizer } from '@pairdraw/core/tools'
 
 import type { EditorStore } from '@/app/editor/active-store'
 

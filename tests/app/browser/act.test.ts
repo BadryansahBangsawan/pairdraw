@@ -16,7 +16,7 @@ import { repoPath } from '#tests/helpers/paths'
 const BODY = readFileSync(repoPath('desktop/src/system/browser-act.js'), 'utf8')
 
 function runAct(window: Window, request: Record<string, unknown>): string {
-  const source = `(() => {\nconst __openpencilActRequest = ${JSON.stringify(request)};\n${BODY}\n})()`
+  const source = `(() => {\nconst __pairdrawActRequest = ${JSON.stringify(request)};\n${BODY}\n})()`
   const reported = window.eval(source)
   if (typeof reported !== 'string') throw new Error('The action timed out.')
   return reported

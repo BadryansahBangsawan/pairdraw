@@ -4,7 +4,7 @@ import { join } from 'node:path'
 
 import * as v from 'valibot'
 
-import { resolveWorkspaceRoot } from '@open-pencil/package-artifacts-tools'
+import { resolveWorkspaceRoot } from '@pairdraw/package-artifacts-tools'
 
 import { MENU_PATH, cleanGroup, nativeItems } from '../src/menu'
 

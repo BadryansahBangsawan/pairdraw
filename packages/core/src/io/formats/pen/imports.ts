@@ -6,7 +6,7 @@ import {
   parsePenDocument,
   type PenDocument,
   type PenImport
-} from '@open-pencil/pen'
+} from '@pairdraw/pen'
 
 import type { ReadDocumentInput, ReadDocumentWarning } from '#core/io/types'
 

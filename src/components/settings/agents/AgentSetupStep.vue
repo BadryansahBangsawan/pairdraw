@@ -2,7 +2,7 @@
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import type { AgentConnectStepStatus } from '@/app/ai/agents/setup/view'
 import theme from '@/theme/settings/agents'

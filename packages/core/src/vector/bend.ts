@@ -1,8 +1,8 @@
 import { clamp } from 'es-toolkit'
 
-import type { HandleMirroring, VectorNetwork } from '@open-pencil/scene-graph'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
-import { cloneVectorNetwork } from '@open-pencil/scene-graph/vector-network'
+import type { HandleMirroring, VectorNetwork } from '@pairdraw/scene-graph'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
+import { cloneVectorNetwork } from '@pairdraw/scene-graph/vector-network'
 
 import { findOppositeHandle, mirrorHandle } from './bezier'
 

@@ -10,8 +10,8 @@ export function strokesInLayoutDriver(page: () => Page) {
   return {
     build() {
       return page().evaluate(async (view) => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         const fixtureURL = '/tests/helpers/canvas/strokes-in-layout/scene.ts'
         const scene: typeof StrokeScene = await import(fixtureURL)
         const rows = scene.createStrokesInLayoutScene(store.graph, store.state.currentPageId)

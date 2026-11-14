@@ -5,7 +5,7 @@ import { uniq } from 'es-toolkit/array'
 import { toUint8Array } from 'js-base64'
 import { dirname, join } from 'pathe'
 
-import { IORegistry, penFormat, type ReadDocumentInput } from '@open-pencil/core/io'
+import { IORegistry, penFormat, type ReadDocumentInput } from '@pairdraw/core/io'
 
 const io = new IORegistry([penFormat])
 

@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { parseIconName, type IconProvider } from '@open-pencil/core/icons'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { readIcon } from '@open-pencil/scene-graph/icons'
+import { createEditor } from '@pairdraw/core'
+import { parseIconName, type IconProvider } from '@pairdraw/core/icons'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { readIcon } from '@pairdraw/scene-graph/icons'
 
 import { buildIconData } from '#core/icons/svg'
 

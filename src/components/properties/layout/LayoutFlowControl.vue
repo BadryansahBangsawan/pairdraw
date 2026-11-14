@@ -2,10 +2,10 @@
 import { computed } from 'vue'
 import type { VNode } from 'vue'
 
-import type { LayoutMode } from '@open-pencil/scene-graph'
-import { MIXED } from '@open-pencil/vue/controls/node-props'
-import { useSelectionLayout } from '@open-pencil/vue/controls/selection-layout'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { LayoutMode } from '@pairdraw/scene-graph'
+import { MIXED } from '@pairdraw/vue/controls/node-props'
+import { useSelectionLayout } from '@pairdraw/vue/controls/selection-layout'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import Tip from '@/components/ui/overlay/Tip.vue'
 import SegmentedControl from '@/components/ui/select/SegmentedControl.vue'

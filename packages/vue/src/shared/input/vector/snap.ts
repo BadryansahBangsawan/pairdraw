@@ -1,6 +1,6 @@
-import type { Editor } from '@open-pencil/core'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
+import type { Editor } from '@pairdraw/core'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
 import { explicitSnapTargets } from '#vue/shared/input/explicit-snap-targets'
 import {

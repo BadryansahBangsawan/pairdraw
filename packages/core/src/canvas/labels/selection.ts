@@ -1,7 +1,7 @@
 import type { Canvas } from 'canvaskit-wasm'
 
-import type { SceneNode, SceneGraph } from '@open-pencil/scene-graph'
-import { computeBounds } from '@open-pencil/scene-graph/geometry'
+import type { SceneNode, SceneGraph } from '@pairdraw/scene-graph'
+import { computeBounds } from '@pairdraw/scene-graph/geometry'
 
 import type { SkiaRenderer, RenderOverlays } from '#core/canvas/renderer'
 import {

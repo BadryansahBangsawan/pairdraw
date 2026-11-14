@@ -15,7 +15,7 @@ import {
 import type { CollaborationRelay } from '#cloud/server'
 import * as Y from 'yjs'
 
-import type { CommentThread } from '@open-pencil/scene-graph'
+import type { CommentThread } from '@pairdraw/scene-graph'
 
 const documentId = crypto.randomUUID()
 

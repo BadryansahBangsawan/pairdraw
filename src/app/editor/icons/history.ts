@@ -2,11 +2,11 @@ import { useLocalStorage } from '@vueuse/core'
 import { uniq } from 'es-toolkit'
 import * as v from 'valibot'
 
-import { ICON_NAME } from '@open-pencil/scene-graph/icons'
+import { ICON_NAME } from '@pairdraw/scene-graph/icons'
 
 const MAX_RECENT_ICONS = 24
-const RECENT_ICONS_STORAGE_KEY = 'open-pencil:recent-icons'
-const ICON_SET_STORAGE_KEY = 'open-pencil:icon-set'
+const RECENT_ICONS_STORAGE_KEY = 'pairdraw:recent-icons'
+const ICON_SET_STORAGE_KEY = 'pairdraw:icon-set'
 
 /** Stored icon names; anything unreadable reads as none rather than failing the picker. */
 const recentIconsSchema = v.pipe(

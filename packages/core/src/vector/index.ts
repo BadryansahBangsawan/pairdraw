@@ -41,7 +41,7 @@ export {
 
 import type { CanvasKit, Path } from 'canvaskit-wasm'
 
-import type { VectorNetwork, WindingRule } from '@open-pencil/scene-graph'
+import type { VectorNetwork, WindingRule } from '@pairdraw/scene-graph'
 
 import { addLoopToPath, addOpenSegmentsToPath } from './path-helpers'
 export { vectorNetworkToCenterlinePath, fitCircleArc, isClosedThinCrescent } from './centerline'

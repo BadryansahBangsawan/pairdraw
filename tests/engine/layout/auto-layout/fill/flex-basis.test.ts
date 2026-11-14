@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { computeLayout } from '@open-pencil/core/layout'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { computeLayout } from '@pairdraw/core/layout'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { autoFrame, pageId, rect } from '#tests/helpers/layout'
 

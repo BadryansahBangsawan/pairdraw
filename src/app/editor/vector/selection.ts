@@ -1,5 +1,5 @@
-import type { Editor } from '@open-pencil/core'
-import { breakAtVertex, deleteVectorParts, vectorHandleParts } from '@open-pencil/core/vector'
+import type { Editor } from '@pairdraw/core'
+import { breakAtVertex, deleteVectorParts, vectorHandleParts } from '@pairdraw/core/vector'
 
 import { pushNodeEditHistory } from './history'
 import { getLiveNetwork, setNodeEditNetwork } from './network'

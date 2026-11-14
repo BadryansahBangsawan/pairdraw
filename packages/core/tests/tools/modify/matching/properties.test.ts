@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { ALL_TOOLS } from '@open-pencil/core/tools'
-import { SceneGraph, type Fill } from '@open-pencil/scene-graph'
-import { hasInstanceOverride } from '@open-pencil/scene-graph/instances'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { ALL_TOOLS } from '@pairdraw/core/tools'
+import { SceneGraph, type Fill } from '@pairdraw/scene-graph'
+import { hasInstanceOverride } from '@pairdraw/scene-graph/instances'
 
 const replace = ALL_TOOLS.find((tool) => tool.name === 'replace_matching_properties')
 if (!replace) throw new Error('replace_matching_properties tool missing')

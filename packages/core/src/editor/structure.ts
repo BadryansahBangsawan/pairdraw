@@ -1,9 +1,9 @@
 import { pick } from 'es-toolkit'
 
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { TRANSFORM_FIELDS } from '@open-pencil/scene-graph/fields'
-import { generatedFrameKind } from '@open-pencil/scene-graph/generated'
-import { createsComponentCycle } from '@open-pencil/scene-graph/instances'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { TRANSFORM_FIELDS } from '@pairdraw/scene-graph/fields'
+import { generatedFrameKind } from '@pairdraw/scene-graph/generated'
+import { createsComponentCycle } from '@pairdraw/scene-graph/instances'
 
 import { acceptingParent, acceptsChildren, prepareSlotEdits } from '#core/editor/components/slots'
 import { fitEnclosingGroupsWithUndo } from '#core/editor/structure/group/bounds'

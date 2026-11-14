@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useObjectUrl } from '@vueuse/core'
 
-import { useChatContextMessages } from '@open-pencil/vue/i18n'
+import { useChatContextMessages } from '@pairdraw/vue/i18n'
 
 import type { PinnedReference } from '@/app/ai/chat/pins/types'
 import IconButton from '@/components/ui/button/IconButton.vue'

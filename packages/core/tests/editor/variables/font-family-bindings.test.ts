@@ -2,10 +2,10 @@ import { expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { createEditor } from '@open-pencil/core'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { setInstanceOverride } from '@open-pencil/scene-graph/instances/overrides'
-import { variableFontFamily } from '@open-pencil/scene-graph/variables'
+import { createEditor } from '@pairdraw/core'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { variableFontFamily } from '@pairdraw/scene-graph/variables'
 
 import { fontManager } from '#core/text/font/manager'
 

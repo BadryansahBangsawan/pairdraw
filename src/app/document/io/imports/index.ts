@@ -1,5 +1,5 @@
-import { IS_TAURI } from '@open-pencil/core/constants'
-import type { ReadDocumentInput, ReadDocumentWarning } from '@open-pencil/core/io'
+import { IS_TAURI } from '@pairdraw/core/constants'
+import type { ReadDocumentInput, ReadDocumentWarning } from '@pairdraw/core/io'
 
 import { documentAssetReader } from '@/app/document/io/assets'
 import { notificationMessages } from '@/app/i18n/notifications'

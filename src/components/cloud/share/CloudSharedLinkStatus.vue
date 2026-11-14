@@ -2,7 +2,7 @@
 import { tv } from 'tailwind-variants'
 import { computed, ref, useId } from 'vue'
 
-import { useCloudMessages } from '@open-pencil/vue/i18n'
+import { useCloudMessages } from '@pairdraw/vue/i18n'
 
 import { downloadSharedLinkTab, sharedLinkTabs } from '@/app/cloud/sharing/viewers'
 import { useEditorStore } from '@/app/editor/active-store'

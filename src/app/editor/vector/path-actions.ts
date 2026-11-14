@@ -1,4 +1,4 @@
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 import {
   cutAtVertex,
   cutSegmentAt,
@@ -9,8 +9,8 @@ import {
   straightenSegment,
   toggleVertexSmooth,
   type VectorEditResult
-} from '@open-pencil/core/vector'
-import type { VectorNetwork } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/vector'
+import type { VectorNetwork } from '@pairdraw/scene-graph'
 
 import { pushNodeEditHistory } from './history'
 import { getLiveNetwork, setNodeEditNetwork } from './network'

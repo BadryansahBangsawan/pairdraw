@@ -1,8 +1,8 @@
 import 'fake-indexeddb/auto'
 import { afterEach, expect, test } from 'bun:test'
 
-import type { CommentThread } from '@open-pencil/scene-graph'
-import { readComments, writeComments } from '@open-pencil/scene-graph/comments'
+import type { CommentThread } from '@pairdraw/scene-graph'
+import { readComments, writeComments } from '@pairdraw/scene-graph/comments'
 
 import { useComments } from '@/app/comments/use'
 import { setActiveEditorStore } from '@/app/editor/active-store'

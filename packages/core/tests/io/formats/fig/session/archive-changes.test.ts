@@ -1,12 +1,12 @@
 import { expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { computeAllLayouts } from '@open-pencil/core/layout'
-import { parseFigBuffer } from '@open-pencil/fig'
-import { derivedSymbolDataOf, symbolOverridesOf } from '@open-pencil/fig/instance-overrides'
-import { initCodec, type NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { createEditor } from '@pairdraw/core'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { computeAllLayouts } from '@pairdraw/core/layout'
+import { parseFigBuffer } from '@pairdraw/fig'
+import { derivedSymbolDataOf, symbolOverridesOf } from '@pairdraw/fig/instance-overrides'
+import { initCodec, type NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { archiveChanges } from '#core/kiwi/fig/session/archive/changes'
 

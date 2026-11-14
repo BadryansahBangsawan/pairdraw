@@ -1,4 +1,4 @@
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
 import { openAppMenu } from '#tests/helpers/menu'
@@ -18,8 +18,8 @@ test.beforeAll(async () => {
 function placeRects(first: Rect, second: Rect) {
   return editor.page.evaluate(
     ([a, b]) => {
-      const store = window.openPencil?.getStore?.()
-      if (!store) throw new Error('OpenPencil store not initialized')
+      const store = window.pairdraw?.getStore?.()
+      if (!store) throw new Error('Pairdraw store not initialized')
       const pageId = store.state.currentPageId
       const ids = [a, b].map((box) => store.graph.createNode('RECTANGLE', pageId, box).id)
       store.select(ids)
@@ -31,8 +31,8 @@ function placeRects(first: Rect, second: Rect) {
 
 function boxes(ids: string[]) {
   return editor.page.evaluate((nodeIds) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return nodeIds.map((id) => {
       const node = store.graph.getNode(id)
       return node ? { x: node.x, y: node.y, width: node.width, height: node.height } : null
@@ -42,8 +42,8 @@ function boxes(ids: string[]) {
 
 function pageChildren() {
   return editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return store.graph
       .getChildren(store.state.currentPageId)
       .map((node) => ({ id: node.id, type: node.type, childIds: [...node.childIds] }))
@@ -173,8 +173,8 @@ test('⇧⌘C copies the selection as a PNG image', async () => {
 
 test('⌥⇧A removes auto layout from every selected frame in one undo step', async () => {
   const ids = await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const pageId = store.state.currentPageId
     const frames = [
       store.graph.createNode('FRAME', pageId, { x: 100, y: 100, width: 120, height: 120 }),
@@ -186,8 +186,8 @@ test('⌥⇧A removes auto layout from every selected frame in one undo step', a
   })
   const layoutModes = () =>
     editor.page.evaluate((nodeIds) => {
-      const store = window.openPencil?.getStore?.()
-      if (!store) throw new Error('OpenPencil store not initialized')
+      const store = window.pairdraw?.getStore?.()
+      if (!store) throw new Error('Pairdraw store not initialized')
       return nodeIds.map((id) => store.graph.getNode(id)?.layoutMode)
     }, ids)
 

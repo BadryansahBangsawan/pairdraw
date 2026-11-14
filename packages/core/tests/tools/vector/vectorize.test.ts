@@ -2,15 +2,15 @@ import { describe, expect, test } from 'bun:test'
 
 import { expectDefined, getNodeOrThrow } from '#core-tests/helpers/assert'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
 import {
   ALL_TOOLS,
   getImageVectorizer,
   registerImageVectorizer,
   type ImageVectorizeRequest
-} from '@open-pencil/core/tools'
-import { VECTORIZE_RESULT_GAP } from '@open-pencil/core/vector'
-import { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/tools'
+import { VECTORIZE_RESULT_GAP } from '@pairdraw/core/vector'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 const tool = expectDefined(
   ALL_TOOLS.find((candidate) => candidate.name === 'vectorize_image'),

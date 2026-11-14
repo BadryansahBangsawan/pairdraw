@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { layoutAuthoredNodes } from '@open-pencil/core/layout'
-import { parsePenFile, type PenNode } from '@open-pencil/pen'
+import { layoutAuthoredNodes } from '@pairdraw/core/layout'
+import { parsePenFile, type PenNode } from '@pairdraw/pen'
 
 function parseLaidOut(children: PenNode[]) {
   // As Core's .pen reader lays out what it reads.

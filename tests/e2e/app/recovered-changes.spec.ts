@@ -11,7 +11,7 @@ const FILE_NAME = 'recovered-changes.fig'
  */
 async function saveToPrivateFile(page: Page) {
   await page.evaluate(async (name) => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
     const root = await navigator.storage.getDirectory()
     const handle = await root.getFileHandle(name, { create: true })
@@ -24,7 +24,7 @@ async function saveToPrivateFile(page: Page) {
 /** Edits the file and backs the unsaved edit up, as a crash or a closed window would leave it. */
 async function leaveUnsavedEdit(page: Page) {
   await page.evaluate(async () => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
     const id = store.createShape('RECTANGLE', 100, 100, 120, 80)
     store.updateNode(id, { name: 'Recovered rectangle' })
@@ -44,14 +44,14 @@ async function reopenFile(page: Page) {
 
 function layerCount(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
     return store.graph.getPages().reduce((total, page) => total + page.childIds.length, 0)
   })
 }
 
 function documentName(page: Page) {
-  return page.evaluate(() => window.openPencil?.getStore?.()?.state.documentName ?? null)
+  return page.evaluate(() => window.pairdraw?.getStore?.()?.state.documentName ?? null)
 }
 
 function fileSize(page: Page) {

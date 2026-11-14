@@ -66,17 +66,17 @@ description: Пошаговое руководство, в котором соз
 ## 5. Что дальше
 
 - **Опубликуйте библиотеку.** Откройте **Ассеты → Управление библиотеками → Опубликовать библиотеку**, чтобы другие файлы могли использовать Button и Card и принимать обновления, когда вы их меняете ([Библиотеки компонентов](/user-guide/components#component-libraries)).
-- **Передайте токены в код.** `openpencil tokens design-system.fig` выводит переменные как пользовательские свойства CSS, `--format tailwind` — как тему Tailwind v4, а `--format dtcg --out tokens/` — как файлы дизайн-токенов W3C. Экспорт в HTML записывает привязанные значения как ссылки `var()` на эти же свойства ([Экспорт](./exporting)).
-- **Проверьте её.** [Проверка дизайна](/user-guide/checking-designs) и `openpencil lint design-system.fig --fix -o fixed.fig` находят цвета, которые совпадают с токеном, но не привязаны к нему, и привязывают их.
-- **Отслеживайте изменения.** Храните файл в Git и просматривайте изменения с помощью [`openpencil diff files`](/ru/programmable/cli/git).
+- **Передайте токены в код.** `pairdraw tokens design-system.fig` выводит переменные как пользовательские свойства CSS, `--format tailwind` — как тему Tailwind v4, а `--format dtcg --out tokens/` — как файлы дизайн-токенов W3C. Экспорт в HTML записывает привязанные значения как ссылки `var()` на эти же свойства ([Экспорт](./exporting)).
+- **Проверьте её.** [Проверка дизайна](/user-guide/checking-designs) и `pairdraw lint design-system.fig --fix -o fixed.fig` находят цвета, которые совпадают с токеном, но не привязаны к нему, и привязывают их.
+- **Отслеживайте изменения.** Храните файл в Git и просматривайте изменения с помощью [`pairdraw diff files`](/ru/programmable/cli/git).
 
 ## Сборка примера скриптом
 
-Файл примера создаётся этим скриптом, который использует тот же [совместимый с Figma API плагинов](/ru/programmable/cli/scripting), что и `openpencil eval`. Запустите его, чтобы собрать файл самостоятельно, или измените, чтобы попробовать свои токены:
+Файл примера создаётся этим скриптом, который использует тот же [совместимый с Figma API плагинов](/ru/programmable/cli/scripting), что и `pairdraw eval`. Запустите его, чтобы собрать файл самостоятельно, или измените, чтобы попробовать свои токены:
 
 ```sh
 echo '{"children":[]}' > empty.pen
-openpencil eval empty.pen --stdin -o design-system.fig < design-system.js
+pairdraw eval empty.pen --stdin -o design-system.fig < design-system.js
 ```
 
 <<< @/public/examples/design-system.js

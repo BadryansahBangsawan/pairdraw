@@ -1,5 +1,5 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { isGradientFill } from '@open-pencil/scene-graph/gradient'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { isGradientFill } from '@pairdraw/scene-graph/gradient'
 
 import {
   createSceneGeometry,

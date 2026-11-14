@@ -1,7 +1,7 @@
 import type { TypefaceFontProvider } from 'canvaskit-wasm'
 
-import type { SceneNode } from '@open-pencil/scene-graph'
-import type { Size } from '@open-pencil/scene-graph/primitives'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import type { Size } from '@pairdraw/scene-graph/primitives'
 
 import { ResourceCache } from '#core/cache/resource'
 import type { missingGlyphOccurrences } from '#core/text/resolver'

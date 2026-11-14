@@ -10,4 +10,4 @@ export const DEFAULT_STROKE_WEIGHT = 1
  * The hidden page a document keeps the components of libraries it uses on, which it shows
  * instances of but never edits: a component library's definitions, and a `.pen` library's.
  */
-export const LIBRARY_DEFINITIONS_PAGE_NAME = 'OpenPencil library definitions'
+export const LIBRARY_DEFINITIONS_PAGE_NAME = 'Pairdraw library definitions'

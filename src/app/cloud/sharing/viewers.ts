@@ -1,6 +1,6 @@
 import { shallowRef, watch } from 'vue'
 
-import type { DocumentPermission } from '@open-pencil/cloud/contract'
+import type { DocumentPermission } from '@pairdraw/cloud/contract'
 
 import { saveExportedFile } from '@/app/document/export/files'
 import { downloadBlob } from '@/app/document/io/browser'

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { MenuEntry } from '@open-pencil/vue/editor/menu-model'
+import type { MenuEntry } from '@pairdraw/vue/editor/menu-model'
 
 import {
   filterShortcutSheet,

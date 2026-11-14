@@ -2,11 +2,11 @@ import { describe, expect, it } from 'bun:test'
 
 import { getNodeOrThrow } from '#core-tests/helpers/assert'
 
-import { renderJSX } from '@open-pencil/core/design-jsx'
-import { computeAllLayouts } from '@open-pencil/core/layout'
-import { sceneNodeToJSX } from '@open-pencil/design-jsx'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { layoutSizing } from '@open-pencil/scene-graph/layout'
+import { renderJSX } from '@pairdraw/core/design-jsx'
+import { computeAllLayouts } from '@pairdraw/core/layout'
+import { sceneNodeToJSX } from '@pairdraw/design-jsx'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { layoutSizing } from '@pairdraw/scene-graph/layout'
 
 const makeSceneGraph = () => new SceneGraph()
 

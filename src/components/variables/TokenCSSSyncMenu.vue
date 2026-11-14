@@ -14,8 +14,8 @@ import {
 } from 'reka-ui'
 import { computed } from 'vue'
 
-import type { DesignTokenBundle } from '@open-pencil/core/io/formats/design-tokens'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { DesignTokenBundle } from '@pairdraw/core/io/formats/design-tokens'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { issueSubject } from '@/app/editor/tokens/copy'

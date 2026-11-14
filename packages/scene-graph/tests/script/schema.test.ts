@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import * as v from 'valibot'
 
-import { scriptNodeSchema } from '@open-pencil/scene-graph/script'
+import { scriptNodeSchema } from '@pairdraw/scene-graph/script'
 
 const parse = (inputs: Record<string, unknown>) =>
   v.safeParse(scriptNodeSchema, { version: 1, source: 'return []', inputs })

@@ -1,13 +1,13 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { createDefaultNode } from '@open-pencil/scene-graph/node-defaults'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 import {
   computeSpacingGuides,
   computeSpacingSnap,
   spacingTargets
-} from '@open-pencil/scene-graph/snap'
+} from '@pairdraw/scene-graph/snap'
 
 const MOVING = new Set(['moving'])
 const THRESHOLD = 5

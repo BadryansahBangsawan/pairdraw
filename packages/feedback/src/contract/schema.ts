@@ -1,7 +1,7 @@
 import { type CalendarDate, parseDate } from '@internationalized/date'
 import * as v from 'valibot'
 
-/** Where official OpenPencil builds send pings, usage stats, and waitlist sign-ups. */
+/** Where official Pairdraw builds send pings, usage stats, and waitlist sign-ups. */
 export const FEEDBACK_ORIGIN = 'https://feedback.openpencil.dev'
 
 export const PLATFORMS = ['macos', 'windows', 'linux', 'ios', 'android', 'unknown'] as const
@@ -45,7 +45,7 @@ export const AI_PROVIDERS = [
   'anthropic-compatible',
   'amazon-bedrock',
   'google-vertex',
-  'openpencil',
+  'pairdraw',
   'harness:pi',
   'acp:claude-code',
   'acp:codex',

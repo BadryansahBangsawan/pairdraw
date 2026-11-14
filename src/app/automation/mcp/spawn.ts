@@ -2,14 +2,14 @@ import { promiseTimeout } from '@vueuse/core'
 import { compact } from 'es-toolkit/array'
 import * as v from 'valibot'
 
-import { AUTOMATION_HTTP_PORT } from '@open-pencil/core/constants'
-import type { DiscoveryInfo } from '@open-pencil/mcp/discovery'
+import { AUTOMATION_HTTP_PORT } from '@pairdraw/core/constants'
+import type { DiscoveryInfo } from '@pairdraw/mcp/discovery'
 import {
   parseToolDescriptor,
   serializeDisabledTools,
   type ToolDescriptor
-} from '@open-pencil/mcp/tools'
-import { randomHex } from '@open-pencil/scene-graph/random'
+} from '@pairdraw/mcp/tools'
+import { randomHex } from '@pairdraw/scene-graph/random'
 
 import { companion, type CompanionConnection } from '@/app/automation/companion/connection'
 import { APP_VERSION } from '@/app/runtime/version'
@@ -55,10 +55,10 @@ export interface AutomationServerHandle {
 function localAutomationHTTPURL(): string {
   if (
     import.meta.env.DEV &&
-    typeof __OPENPENCIL_LOCAL_AUTOMATION_HTTP_URL__ === 'string' &&
-    __OPENPENCIL_LOCAL_AUTOMATION_HTTP_URL__
+    typeof __PAIRDRAW_LOCAL_AUTOMATION_HTTP_URL__ === 'string' &&
+    __PAIRDRAW_LOCAL_AUTOMATION_HTTP_URL__
   ) {
-    return __OPENPENCIL_LOCAL_AUTOMATION_HTTP_URL__
+    return __PAIRDRAW_LOCAL_AUTOMATION_HTTP_URL__
   }
   return `http://127.0.0.1:${AUTOMATION_HTTP_PORT}`
 }
@@ -78,12 +78,12 @@ export function getMCPServerURL(): string {
 export function getAutomationSocketURL(): string {
   return companion.connected()
     ? companion.url().replace(/^http/, 'ws')
-    : __OPENPENCIL_LOCAL_AUTOMATION_URL__
+    : __PAIRDRAW_LOCAL_AUTOMATION_URL__
 }
 
 const DEV_AUTOMATION_AUTH_TOKEN =
-  import.meta.env.DEV && typeof __OPENPENCIL_LOCAL_AUTOMATION_TOKEN__ === 'string'
-    ? __OPENPENCIL_LOCAL_AUTOMATION_TOKEN__
+  import.meta.env.DEV && typeof __PAIRDRAW_LOCAL_AUTOMATION_TOKEN__ === 'string'
+    ? __PAIRDRAW_LOCAL_AUTOMATION_TOKEN__
     : null
 const noop = () => undefined
 const MAX_STARTUP_STDERR_LENGTH = 8_192
@@ -207,16 +207,16 @@ async function computeExpectedDiscoveryPath(): Promise<string> {
   // matches the server's path in the common case. When it doesn't (custom
   // LOCALAPPDATA), resolveDiscoveryPath() falls back to the /health endpoint.
   if (isMac) {
-    return join(home, 'Library', 'Application Support', 'OpenPencil', 'mcp.json')
+    return join(home, 'Library', 'Application Support', 'Pairdraw', 'mcp.json')
   }
   if (isWindows) {
-    return join(home, 'AppData', 'Local', 'OpenPencil', 'mcp.json')
+    return join(home, 'AppData', 'Local', 'Pairdraw', 'mcp.json')
   }
-  // Linux: $XDG_RUNTIME_DIR/openpencil/mcp.json or ~/.openpencil/mcp.json.
+  // Linux: $XDG_RUNTIME_DIR/pairdraw/mcp.json or ~/.pairdraw/mcp.json.
   // In Tauri we don't have direct env access, so we use the home-directory
   // fallback. The server may use XDG_RUNTIME_DIR if set — when the paths
   // differ, resolveDiscoveryPath() falls back to the /health endpoint.
-  return join(home, '.openpencil', 'mcp.json')
+  return join(home, '.pairdraw', 'mcp.json')
 }
 
 /**
@@ -231,8 +231,8 @@ async function computeExpectedDiscoveryPath(): Promise<string> {
  * compromised server could redirect us to a malicious path. This is mitigated
  * by the fact that the server is on localhost and was spawned by us. The
  * fallback exists because local computation can be wrong (e.g., XDG_RUNTIME_DIR
- * mismatches on Linux where the server uses `$XDG_RUNTIME_DIR/openpencil` but
- * the local computation falls back to `~/.openpencil`).
+ * mismatches on Linux where the server uses `$XDG_RUNTIME_DIR/pairdraw` but
+ * the local computation falls back to `~/.pairdraw`).
  */
 async function resolveDiscoveryPath(healthDiscoveryPath?: string): Promise<string> {
   const expected = await computeExpectedDiscoveryPath()
@@ -573,16 +573,16 @@ async function startMCPIfNeeded(timing: MCPStartupTiming): Promise<AutomationSer
   const command = Command.create(resolved.command, resolved.args, {
     env: {
       PORT: String(AUTOMATION_HTTP_PORT),
-      OPENPENCIL_MCP_AUTH_TOKEN: authToken ?? '',
-      OPENPENCIL_MCP_CORS_ORIGIN: window.location.origin,
-      OPENPENCIL_MCP_TCP: '1',
-      OPENPENCIL_MCP_ROOT: mcpRoot,
-      OPENPENCIL_MCP_APP_TIMEOUT_MS: String(MCP_APP_ATTACH_TIMEOUT_MS),
+      PAIRDRAW_MCP_AUTH_TOKEN: authToken ?? '',
+      PAIRDRAW_MCP_CORS_ORIGIN: window.location.origin,
+      PAIRDRAW_MCP_TCP: '1',
+      PAIRDRAW_MCP_ROOT: mcpRoot,
+      PAIRDRAW_MCP_APP_TIMEOUT_MS: String(MCP_APP_ATTACH_TIMEOUT_MS),
       // Killing the shell wrapper on Windows leaves the server it started running; the app's end
       // of the pipe closes with it, and the server exits on that.
-      OPENPENCIL_MCP_EXIT_ON_STDIN_CLOSE: '1',
-      OPENPENCIL_MCP_DISABLED_TOOLS: serializeDisabledTools(disabledMCPTools.value),
-      OPENPENCIL_MCP_SCOPE: mcpScope()
+      PAIRDRAW_MCP_EXIT_ON_STDIN_CLOSE: '1',
+      PAIRDRAW_MCP_DISABLED_TOOLS: serializeDisabledTools(disabledMCPTools.value),
+      PAIRDRAW_MCP_SCOPE: mcpScope()
     }
   })
 
@@ -687,7 +687,7 @@ export async function spawnMCPIfNeeded(
 }
 
 /**
- * Returns the user's home directory. Used as the default OPENPENCIL_MCP_ROOT
+ * Returns the user's home directory. Used as the default PAIRDRAW_MCP_ROOT
  * so file-scoped tools operate on paths inside ~, which is writable and
  * matches user expectations. Throws if the Tauri path plugin is unavailable
  * — this function is only invoked under !import.meta.env.DEV && isTauri(),

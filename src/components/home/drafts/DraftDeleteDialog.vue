@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, shallowRef, watch } from 'vue'
 
-import { useCommonMessages, useRecoveryMessages } from '@open-pencil/vue/i18n'
+import { useCommonMessages, useRecoveryMessages } from '@pairdraw/vue/i18n'
 
 import type { DraftMeta } from '@/app/document/drafts'
 import { toast } from '@/app/shell/ui'

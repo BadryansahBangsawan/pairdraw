@@ -7,8 +7,8 @@ description: Создание собственного интерфейса ре
 
 Типичное приложение Pairdraw на Vue состоит из трёх уровней:
 
-1. `@open-pencil/core` создаёт редактор;
-2. `@open-pencil/vue` связывает его с composables и компонентами Vue без встроенного оформления;
+1. `@pairdraw/core` создаёт редактор;
+2. `@pairdraw/vue` связывает его с composables и компонентами Vue без встроенного оформления;
 3. приложение определяет компоновку, оформление и характерное для продукта поведение.
 
 ## Зачем разделять эти уровни
@@ -31,12 +31,12 @@ description: Создание собственного интерфейса ре
 
 ```vue
 <script setup lang="ts">
-import { createEditor } from '@open-pencil/core'
-import { provideEditor } from '@open-pencil/vue'
-import { CanvasRoot, CanvasSurface } from '@open-pencil/vue/canvas'
-import { ToolbarRoot } from '@open-pencil/vue/primitives/Toolbar'
-import { PageListRoot } from '@open-pencil/vue/primitives/PageList'
-import { LayerTreeRoot } from '@open-pencil/vue/primitives/LayerTree'
+import { createEditor } from '@pairdraw/core'
+import { provideEditor } from '@pairdraw/vue'
+import { CanvasRoot, CanvasSurface } from '@pairdraw/vue/canvas'
+import { ToolbarRoot } from '@pairdraw/vue/primitives/Toolbar'
+import { PageListRoot } from '@pairdraw/vue/primitives/PageList'
+import { LayerTreeRoot } from '@pairdraw/vue/primitives/LayerTree'
 
 const editor = createEditor({ width: 1440, height: 900 })
 provideEditor(editor)

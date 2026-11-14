@@ -15,7 +15,7 @@ type SavedFile = { handle: FileSystemFileHandle; bytes: ArrayBuffer }
  */
 async function saveToPrivateFile(page: Page, name: string): Promise<JSHandle<SavedFile>> {
   return page.evaluateHandle(async (fileName) => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
     const root = await navigator.storage.getDirectory()
     const handle = await root.getFileHandle(fileName, { create: true })
@@ -38,19 +38,19 @@ async function writeFromOutside(file: JSHandle<SavedFile>) {
 
 function layerCount(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
     return store.graph.getPages().reduce((total, page) => total + page.childIds.length, 0)
   })
 }
 
 function hasUnsavedChanges(page: Page) {
-  return page.evaluate(() => window.openPencil?.getStore?.().hasUnsavedChanges())
+  return page.evaluate(() => window.pairdraw?.getStore?.().hasUnsavedChanges())
 }
 
 async function addRectangle(page: Page) {
   await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
     store.createShape('RECTANGLE', 100, 100, 100, 100)
   })
@@ -65,7 +65,7 @@ test('a change on disk reloads a document without unsaved edits', async ({ page 
   const original = await saveToPrivateFile(page, 'disk-change-clean.fig')
   await addRectangle(page)
   await page.evaluate(async () => {
-    await window.openPencil?.getStore?.().saveFigFile()
+    await window.pairdraw?.getStore?.().saveFigFile()
   })
   expect(await layerCount(page)).toBe(1)
   await page.waitForTimeout(AFTER_OWN_WRITE_MS)

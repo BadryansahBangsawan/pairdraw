@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { materializeDocument } from '@open-pencil/fig'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
+import { materializeDocument } from '@pairdraw/fig'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 
 import { shadowEffectAt } from '#tests/helpers/assert'
 

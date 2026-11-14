@@ -1,4 +1,4 @@
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
 
@@ -10,8 +10,8 @@ const editor = useEditorSetupWithClear('/?test&no-chrome&no-rulers')
  */
 async function editOpenPath() {
   await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const line = (start: number, end: number) => ({
       start,
       end,
@@ -45,7 +45,7 @@ async function editOpenPath() {
 
 function editState() {
   return editor.page.evaluate(() => {
-    const es = window.openPencil?.getStore?.().getNodeEditState()
+    const es = window.pairdraw?.getStore?.().getNodeEditState()
     if (!es) return null
     return {
       vertices: es.vertices.map(({ x, y }) => ({ x, y })),

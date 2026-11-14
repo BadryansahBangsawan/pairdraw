@@ -1,5 +1,5 @@
-import { editedImage, resolveEditorProfile, type Editor } from '@open-pencil/core'
-import { layerResizes, layerRotates } from '@open-pencil/scene-graph/generated'
+import { editedImage, resolveEditorProfile, type Editor } from '@pairdraw/core'
+import { layerResizes, layerRotates } from '@pairdraw/scene-graph/generated'
 
 import { connectorLineCursor } from '#vue/shared/input/connector/line'
 import {

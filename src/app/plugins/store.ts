@@ -10,7 +10,7 @@ import { readStoredPlugins, writeStoredPlugins } from './storage'
  * App-level plugin list. Desktop and the browser both keep it in `localStorage`
  * under this key, the same way as other app preferences. It is not stored in a document.
  */
-const STORAGE_KEY = 'open-pencil:plugins'
+const STORAGE_KEY = 'pairdraw:plugins'
 
 export const installedPlugins = useLocalStorage<InstalledPlugin[]>(STORAGE_KEY, [], {
   serializer: { read: readStoredPlugins, write: writeStoredPlugins }

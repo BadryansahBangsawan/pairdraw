@@ -6,14 +6,14 @@ import type {
   SceneNode,
   StyleRun,
   TextParagraphStyle
-} from '@open-pencil/scene-graph'
-import { createDefaultNode } from '@open-pencil/scene-graph/node-defaults'
+} from '@pairdraw/scene-graph'
+import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
 import {
   MAX_LIST_INDENTATION,
   paragraphCount,
   PLAIN_PARAGRAPH,
   trimParagraphStyles
-} from '@open-pencil/scene-graph/text'
+} from '@pairdraw/scene-graph/text'
 
 import { parseScriptInput } from './schema'
 import { isTreeNode, type TreeNode } from './tree'

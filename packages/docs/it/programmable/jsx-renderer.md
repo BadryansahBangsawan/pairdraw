@@ -14,7 +14,7 @@ Pairdraw converte JSX dichiarativo in un albero di design. Lo stesso sistema è 
 </Frame>
 ```
 
-Nel codice dell’applicazione o nelle librerie headless, importa `Frame`, `Text` e gli altri export di scrittura da `@open-pencil/design-jsx`, poi crea i nodi con `renderTree` o `renderJSX` da `@open-pencil/core/design-jsx`, che aggiungono icone, conversione SVG e disposizione. Per scrivere gli alberi come TSX, imposta `"jsxImportSource": "@open-pencil/design-jsx"` con `"jsx": "react-jsx"` in `tsconfig.json`, oppure aggiungi al file il commento `/** @jsxImportSource @open-pencil/design-jsx */`. L’ambiente di scripting determina quali API sono esposte a `eval`: gli export dei pacchetti non diventano automaticamente globali.
+Nel codice dell’applicazione o nelle librerie headless, importa `Frame`, `Text` e gli altri export di scrittura da `@pairdraw/design-jsx`, poi crea i nodi con `renderTree` o `renderJSX` da `@pairdraw/core/design-jsx`, che aggiungono icone, conversione SVG e disposizione. Per scrivere gli alberi come TSX, imposta `"jsxImportSource": "@pairdraw/design-jsx"` con `"jsx": "react-jsx"` in `tsconfig.json`, oppure aggiungi al file il commento `/** @jsxImportSource @pairdraw/design-jsx */`. L’ambiente di scripting determina quali API sono esposte a `eval`: gli export dei pacchetti non diventano automaticamente globali.
 
 ## Elementi
 

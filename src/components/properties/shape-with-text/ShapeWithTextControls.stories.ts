@@ -8,8 +8,8 @@ import type {
   FigJamLineStyle,
   FigJamTextSize,
   FigJamTypeface
-} from '@open-pencil/scene-graph/figjam'
-import type { ShapeWithTextType } from '@open-pencil/scene-graph/shape-with-text'
+} from '@pairdraw/scene-graph/figjam'
+import type { ShapeWithTextType } from '@pairdraw/scene-graph/shape-with-text'
 
 import ShapeWithTextControls from './ShapeWithTextControls.vue'
 

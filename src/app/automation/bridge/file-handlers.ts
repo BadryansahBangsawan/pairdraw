@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-import { parseToolArgs } from '@open-pencil/core/tools'
+import { parseToolArgs } from '@pairdraw/core/tools'
 
 import {
   resolveAutomationTarget,

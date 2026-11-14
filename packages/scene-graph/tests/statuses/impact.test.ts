@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 import {
   statusWorkflowImpact,
   STATUS_WORKFLOW_PRESETS,
   type StatusWorkflow
-} from '@open-pencil/scene-graph/statuses'
+} from '@pairdraw/scene-graph/statuses'
 
 const { review } = STATUS_WORKFLOW_PRESETS
 

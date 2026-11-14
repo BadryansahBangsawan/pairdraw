@@ -1,7 +1,7 @@
 import {
   parse,
   toPlainObject,
-  // eslint-disable-next-line open-pencil/no-mixed-case-acronym-identifiers -- Upstream export spelling.
+  // eslint-disable-next-line pairdraw/no-mixed-case-acronym-identifiers -- Upstream export spelling.
   type CssNodePlain as CSSNodePlain,
   type SelectorPlain
 } from 'css-tree'

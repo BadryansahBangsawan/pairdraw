@@ -4,9 +4,9 @@ import {
   COLLAB_ACTIONS,
   decodeCommentRelayMessage,
   RELAY_SERVER_PEER
-} from '@open-pencil/cloud/contract'
-import { SceneGraph, type CommentThread } from '@open-pencil/scene-graph'
-import { readComments, writeComments } from '@open-pencil/scene-graph/comments'
+} from '@pairdraw/cloud/contract'
+import { SceneGraph, type CommentThread } from '@pairdraw/scene-graph'
+import { readComments, writeComments } from '@pairdraw/scene-graph/comments'
 
 import { openRoomSession, type RoomSession } from '@/app/collab/session'
 import type { JoinCollabRoom } from '@/app/collab/transport'

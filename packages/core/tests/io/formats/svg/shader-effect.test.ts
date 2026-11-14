@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { renderNodesToSVG } from '@open-pencil/core/io/formats/svg'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { renderNodesToSVG } from '@pairdraw/core/io/formats/svg'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 describe('shader effects in SVG export', () => {
   test('a node whose only effect is a visible shader effect does not emit NaN', () => {

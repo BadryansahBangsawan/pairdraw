@@ -2,8 +2,8 @@ import { isEqual, omitBy } from 'es-toolkit'
 import * as v from 'valibot'
 import * as Y from 'yjs'
 
-import type { CommentReply, CommentThread } from '@open-pencil/scene-graph'
-import { commentThreadsSchema } from '@open-pencil/scene-graph/comments'
+import type { CommentReply, CommentThread } from '@pairdraw/scene-graph'
+import { commentThreadsSchema } from '@pairdraw/scene-graph/comments'
 
 import { RELAY_MINIMUM_MESSAGE_BYTES } from './relay'
 

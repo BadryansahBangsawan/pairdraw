@@ -1,16 +1,16 @@
 import { fromUint8Array } from 'js-base64'
 
-import { getCompiledSchema, isCodecReady } from '@open-pencil/kiwi/fig/codec'
-import { guidToString } from '@open-pencil/kiwi/fig/guid'
-import type { SceneNode } from '@open-pencil/scene-graph'
+import { getCompiledSchema, isCodecReady } from '@pairdraw/kiwi/fig/codec'
+import { guidToString } from '@pairdraw/kiwi/fig/guid'
+import type { SceneNode } from '@pairdraw/scene-graph'
 import {
   isReplacedLayer,
   owningInstance,
   replacedComponentLayerId,
   showsReplacedLayer
-} from '@open-pencil/scene-graph/instances'
-import { OPEN_PENCIL_PLUGIN_DATA, withPluginData } from '@open-pencil/scene-graph/plugin-data'
-import type { StoredReplacedLayer } from '@open-pencil/scene-graph/plugin-data'
+} from '@pairdraw/scene-graph/instances'
+import { PAIRDRAW_PLUGIN_DATA, withPluginData } from '@pairdraw/scene-graph/plugin-data'
+import type { StoredReplacedLayer } from '@pairdraw/scene-graph/plugin-data'
 
 import { nameImagesForFigma } from '../images'
 import { definitionSource, instanceExportAddress } from '../instance/geometry'
@@ -87,7 +87,7 @@ export function applyReplacedLayersPluginData(
   }
   node.pluginData = withPluginData(
     node.pluginData,
-    OPEN_PENCIL_PLUGIN_DATA.replacedLayers,
+    PAIRDRAW_PLUGIN_DATA.replacedLayers,
     stored.length > 0 ? stored : undefined
   )
 }

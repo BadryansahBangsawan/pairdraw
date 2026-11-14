@@ -2,8 +2,8 @@ import { format } from 'node:util'
 
 import { defineCommand } from 'citty'
 
-import { FigmaAPI, flushPendingLayout } from '@open-pencil/core/figma-api'
-import { compileScript } from '@open-pencil/core/tools'
+import { FigmaAPI, flushPendingLayout } from '@pairdraw/core/figma-api'
+import { compileScript } from '@pairdraw/core/tools'
 
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
 import { appTargetOptions, appTargetRPCArgs } from '#cli/app/target'

@@ -12,12 +12,9 @@ import {
   readPackageManifest,
   runCommand,
   type WorkspacePackage
-} from '@open-pencil/package-artifacts-tools'
-import {
-  inspectTarball,
-  validatePackedTarballs
-} from '@open-pencil/package-artifacts-tools/tarball'
-import { verifyArtifactConsumers } from '@open-pencil/package-quality-tools/consumer'
+} from '@pairdraw/package-artifacts-tools'
+import { inspectTarball, validatePackedTarballs } from '@pairdraw/package-artifacts-tools/tarball'
+import { verifyArtifactConsumers } from '@pairdraw/package-quality-tools/consumer'
 
 import { NPM_RELEASE_POLICY } from './policy'
 import {

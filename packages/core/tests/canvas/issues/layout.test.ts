@@ -5,8 +5,8 @@ import {
   layoutIssueMarkers,
   type DesignIssueMarker,
   type IssueMarkerLayoutOptions
-} from '@open-pencil/core/canvas'
-import { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/canvas'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 /** Every label is one 6px glyph wide, so marker widths stay independent of fonts. */
 const measureText = (text: string) => text.length * 6

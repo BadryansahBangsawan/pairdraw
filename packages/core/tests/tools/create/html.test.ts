@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { headlessHTMLStyler } from '@open-pencil/core/io/formats/html/import'
-import { htmlClassNames } from '@open-pencil/core/io/formats/html/layers'
-import { ALL_TOOLS, registerHTMLToolHost } from '@open-pencil/core/tools'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { headlessHTMLStyler } from '@pairdraw/core/io/formats/html/import'
+import { htmlClassNames } from '@pairdraw/core/io/formats/html/layers'
+import { ALL_TOOLS, registerHTMLToolHost } from '@pairdraw/core/tools'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 const importHTML = ALL_TOOLS.find((tool) => tool.name === 'import_html')
 if (!importHTML) throw new Error('import_html tool missing')

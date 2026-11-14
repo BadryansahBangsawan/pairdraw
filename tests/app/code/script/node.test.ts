@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { parseColor } from '@open-pencil/scene-graph/color'
-import { OPEN_PENCIL_PLUGIN_DATA, withPluginData } from '@open-pencil/scene-graph/plugin-data'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { parseColor } from '@pairdraw/scene-graph/color'
+import { PAIRDRAW_PLUGIN_DATA, withPluginData } from '@pairdraw/scene-graph/plugin-data'
 
 import { materializeScriptError, materializeScriptOutput } from '@/app/code/script/materialize'
 import {
@@ -13,7 +13,7 @@ import {
 } from '@/app/code/script/run-node'
 import type { ScriptNodeSpec } from '@/app/code/script/sandbox/spec'
 
-const { script: SCRIPT_FIELD } = OPEN_PENCIL_PLUGIN_DATA
+const { script: SCRIPT_FIELD } = PAIRDRAW_PLUGIN_DATA
 /** The error placeholder's text color, as the materializer draws it. */
 const ERROR_COLOR = '#d93036'
 

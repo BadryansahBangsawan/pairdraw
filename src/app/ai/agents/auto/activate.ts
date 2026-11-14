@@ -1,4 +1,4 @@
-import type { ACPAgentDef } from '@open-pencil/core/constants'
+import type { ACPAgentDef } from '@pairdraw/core/constants'
 
 import { refreshAIProviderStatus } from '@/app/ai/chat/storage'
 import { applyOnboardingPlan } from '@/app/ai/models/settings/onboarding/apply'

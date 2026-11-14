@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { CommentThread } from '@open-pencil/scene-graph'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import type { CommentThread } from '@pairdraw/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { commentThreadsPrompt, openCommentThreads } from '@/app/ai/chat/entry/comments'
 import { findReferences } from '@/app/ai/chat/references/link'
@@ -52,7 +52,7 @@ describe('comment threads as prompts', () => {
     expect(prompt).toStartWith(
       'Apply the feedback in this comment thread, then reply to it with what you changed and resolve it.'
     )
-    expect(prompt).toContain('Thread c-1 on [Card](openpencil://node/')
+    expect(prompt).toContain('Thread c-1 on [Card](pairdraw://node/')
     expect(prompt).toContain('> **Ana:** Make the title bigger\n> and bolder\n>\n> **Ben:** Agreed')
     // Deleted replies stay out.
     expect(prompt).not.toContain('Never mind')

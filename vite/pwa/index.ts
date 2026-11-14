@@ -10,7 +10,7 @@ import { VitePWA } from 'vite-plugin-pwa'
  * the hand-authored `src/sw.ts` (bare workbox specifiers resolved by Rollup) and injects the
  * precache manifest into it, so neither path contains a quoted absolute import.
  */
-export function openPencilPwaPlugin() {
+export function pairdrawPwaPlugin() {
   return VitePWA({
     registerType: 'autoUpdate',
     devOptions: { enabled: false },

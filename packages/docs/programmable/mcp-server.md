@@ -21,7 +21,7 @@ Restart the MCP server, then reconnect stdio clients, to apply changes. For an e
 
 Turn on **Share only the selection** in **Settings → MCP → Local server** to let MCP clients read only the layers you select. Clients then get `get_selection`, `get_node`, `get_page_tree`, `describe`, and `export_image`, and no tools that edit, open files, list documents, or change settings. Every node a call names must be a selected layer or inside one; `describe` and `export_image` read the selection when given no IDs, and `get_page_tree` needs a `root_id` from the selection. `export_image` returns the image but cannot write it to a file. With nothing selected, calls fail and ask the user to select layers.
 
-The server enforces this on every call it sends to the app, including `POST /rpc` and stdio clients, so a client cannot widen it. Restart the MCP server to apply the change. For a server you start yourself, set `OPENPENCIL_MCP_SCOPE=selection`; a stdio client can also set it to limit itself while the server shares the whole document.
+The server enforces this on every call it sends to the app, including `POST /rpc` and stdio clients, so a client cannot widen it. Restart the MCP server to apply the change. For a server you start yourself, set `PAIRDRAW_MCP_SCOPE=selection`; a stdio client can also set it to limit itself while the server shares the whole document.
 
 ## Browser-native WebMCP (experimental) {#webmcp}
 
@@ -40,18 +40,18 @@ This surface does **not** expose structural creation/deletion, arbitrary JavaScr
 ## Install
 
 ```sh
-npm install -g @open-pencil/mcp
+npm install -g @pairdraw/mcp
 ```
 
 ## Stdio (Claude Code, Codex, VS Code, etc.)
 
 The stdio server discovers the running Pairdraw app automatically. It prefers the app's Unix domain socket on macOS and Linux and falls back to localhost TCP when needed. Make sure the desktop app is open with a document loaded.
 
-Every client below starts the same command, `openpencil-mcp`, from `npm install -g @open-pencil/mcp`. Name the server `open-pencil` so tool names and the examples here match.
+Every client below starts the same command, `pairdraw-mcp`, from `npm install -g @pairdraw/mcp`. Name the server `pairdraw` so tool names and the examples here match.
 
 ### Set up from the desktop app {#client-setup}
 
-The desktop app can write the entry for you. Open **Settings → MCP → Other apps** and turn on each app you use: Claude Code, Claude Desktop, Codex, Gemini CLI, OpenCode, Kiro, Cursor, or VS Code. Turning a switch on adds an `open-pencil` entry that starts `openpencil-mcp` to that app's own config file, the file this page names for it; turning it off removes the entry again. Everything else in the file, including comments and formatting, stays as it was, and before its first change the app keeps a copy of the file next to it with `.open-pencil.bak` appended to the name.
+The desktop app can write the entry for you. Open **Settings → MCP → Other apps** and turn on each app you use: Claude Code, Claude Desktop, Codex, Gemini CLI, OpenCode, Kiro, Cursor, or VS Code. Turning a switch on adds an `pairdraw` entry that starts `pairdraw-mcp` to that app's own config file, the file this page names for it; turning it off removes the entry again. Everything else in the file, including comments and formatting, stays as it was, and before its first change the app keeps a copy of the file next to it with `.pairdraw.bak` appended to the name.
 
 | App | File |
 |-----|------|
@@ -64,15 +64,15 @@ The desktop app can write the entry for you. Open **Settings → MCP → Other a
 | Cursor | `~/.cursor/mcp.json` |
 | VS Code | `mcp.json` in your user profile |
 
-An app shows as not found until its settings folder exists, so run it once first. A switch stays locked when the file has syntax errors, or when the entry was written by hand in a form the app does not rewrite, such as a Codex inline table, or Codex keeps all its servers in one inline `mcp_servers = { … }` table; edit the file yourself in those cases. The desktop shell checks each write itself and refuses one that would change anything in the file beyond that entry. Restart the app, or reload its MCP servers, after a change. Apps started from the Dock or Start menu may not see the folder npm installs global commands into; if one cannot start `openpencil-mcp`, set the entry's `command` to the full path that `which openpencil-mcp` (or `where openpencil-mcp` on Windows) prints.
+An app shows as not found until its settings folder exists, so run it once first. A switch stays locked when the file has syntax errors, or when the entry was written by hand in a form the app does not rewrite, such as a Codex inline table, or Codex keeps all its servers in one inline `mcp_servers = { … }` table; edit the file yourself in those cases. The desktop shell checks each write itself and refuses one that would change anything in the file beyond that entry. Restart the app, or reload its MCP servers, after a change. Apps started from the Dock or Start menu may not see the folder npm installs global commands into; if one cannot start `pairdraw-mcp`, set the entry's `command` to the full path that `which pairdraw-mcp` (or `where pairdraw-mcp` on Windows) prints.
 
 ### Claude Code
 
 Install the MCP package and register it with Claude Code:
 
 ```sh
-npm install -g @open-pencil/mcp
-claude mcp add --scope user open-pencil -- openpencil-mcp
+npm install -g @pairdraw/mcp
+claude mcp add --scope user pairdraw -- pairdraw-mcp
 ```
 
 Check the connection:
@@ -86,7 +86,7 @@ Claude Code asks before using each MCP tool unless you allow the server's tools.
 ```json
 {
   "permissions": {
-    "allow": ["mcp__open-pencil__*"]
+    "allow": ["mcp__pairdraw__*"]
   }
 }
 ```
@@ -96,24 +96,24 @@ This is narrower than `--permission-mode bypassPermissions`, which skips prompts
 Example prompt:
 
 ```text
-Use the open-pencil MCP server to inspect the current page and create a small hero section on the canvas.
+Use the pairdraw MCP server to inspect the current page and create a small hero section on the canvas.
 ```
 
-Type `/mcp__open-pencil__design` to load the [design skill](#design-skill) into the conversation, or mention `@open-pencil:openpencil://skills/open-pencil/SKILL.md` to attach it.
+Type `/mcp__pairdraw__design` to load the [design skill](#design-skill) into the conversation, or mention `@pairdraw:pairdraw://skills/pairdraw/SKILL.md` to attach it.
 
 ### Codex
 
 Register the server with the Codex CLI:
 
 ```sh
-codex mcp add open-pencil -- openpencil-mcp
+codex mcp add pairdraw -- pairdraw-mcp
 ```
 
 This writes the entry to `~/.codex/config.toml`, where you can also add it by hand:
 
 ```toml
-[mcp_servers.open-pencil]
-command = "openpencil-mcp"
+[mcp_servers.pairdraw]
+command = "pairdraw-mcp"
 ```
 
 Run `/mcp` in Codex to check the connection. The Codex IDE extension reads the same file. Codex follows the server's instructions, which tell it to call `read_skill` before designing.
@@ -125,9 +125,9 @@ Add the server to the workspace's `.vscode/mcp.json`. VS Code uses a `servers` k
 ```json
 {
   "servers": {
-    "open-pencil": {
+    "pairdraw": {
       "type": "stdio",
-      "command": "openpencil-mcp"
+      "command": "pairdraw-mcp"
     }
   }
 }
@@ -136,10 +136,10 @@ Add the server to the workspace's `.vscode/mcp.json`. VS Code uses a `servers` k
 To add it to your user profile instead, run:
 
 ```sh
-code --add-mcp '{"name":"open-pencil","type":"stdio","command":"openpencil-mcp"}'
+code --add-mcp '{"name":"pairdraw","type":"stdio","command":"pairdraw-mcp"}'
 ```
 
-Start the server from the `mcp.json` editor or with **MCP: List Servers**, then use the tools from Copilot Chat in agent mode. Type `/open-pencil.design` to load the [design skill](#design-skill), or attach its files from **Add Context** → **MCP Resources**.
+Start the server from the `mcp.json` editor or with **MCP: List Servers**, then use the tools from Copilot Chat in agent mode. Type `/pairdraw.design` to load the [design skill](#design-skill), or attach its files from **Add Context** → **MCP Resources**.
 
 ### Antigravity
 
@@ -148,8 +148,8 @@ In the Agent panel, open the **…** menu and choose **MCP Servers** → **Manag
 ```json
 {
   "mcpServers": {
-    "open-pencil": {
-      "command": "openpencil-mcp"
+    "pairdraw": {
+      "command": "pairdraw-mcp"
     }
   }
 }
@@ -163,8 +163,8 @@ Add the server under `mcp_servers` in `~/.hermes/config.yaml`:
 
 ```yaml
 mcp_servers:
-  open-pencil:
-    command: "openpencil-mcp"
+  pairdraw:
+    command: "pairdraw-mcp"
 ```
 
 Run `/reload-mcp` in a running session, or start a new one. Hermes also offers the server's resources and prompts as tools, so the agent can read the [design skill](#design-skill) through `read_skill` or the resources.
@@ -176,8 +176,8 @@ Add to your MCP config (for example `.cursor/mcp.json`):
 ```json
 {
   "mcpServers": {
-    "open-pencil": {
-      "command": "openpencil-mcp"
+    "pairdraw": {
+      "command": "pairdraw-mcp"
     }
   }
 }
@@ -189,9 +189,9 @@ Or run from source without installing:
 ```json [Bun]
 {
   "mcpServers": {
-    "open-pencil": {
+    "pairdraw": {
       "command": "bun",
-      "args": ["/path/to/open-pencil/packages/mcp/src/stdio.ts"]
+      "args": ["/path/to/pairdraw/packages/mcp/src/stdio.ts"]
     }
   }
 }
@@ -199,9 +199,9 @@ Or run from source without installing:
 ```json [Node.js]
 {
   "mcpServers": {
-    "open-pencil": {
+    "pairdraw": {
       "command": "npx",
-      "args": ["tsx", "/path/to/open-pencil/packages/mcp/src/stdio.ts"]
+      "args": ["tsx", "/path/to/pairdraw/packages/mcp/src/stdio.ts"]
     }
   }
 }
@@ -213,7 +213,7 @@ Or run from source without installing:
 For browser extensions, scripts, CI, or any HTTP client:
 
 ```sh
-openpencil-mcp-http
+pairdraw-mcp-http
 ```
 
 Or from source: `bun packages/mcp/src/index.ts` / `npx tsx packages/mcp/src/index.ts`
@@ -224,11 +224,11 @@ Security defaults:
 - TCP binds to `127.0.0.1` and uses port 7600 by default.
 - Authentication is enabled by default with a generated token stored in the private discovery file.
 - `eval` is disabled.
-- File operations are limited to `OPENPENCIL_MCP_ROOT` (defaults to the current working directory) and reject symlink escapes.
+- File operations are limited to `PAIRDRAW_MCP_ROOT` (defaults to the current working directory) and reject symlink escapes.
 - The browser app reaches those files through the server: `open_file` reads one, and `save_file` or `new_document` with a path writes a copy, so a document opened in the browser keeps saving where it did before.
-- Only the desktop app's own origin (`tauri://localhost` and its `http(s)://tauri.localhost` variants) is allowed by default, so a server you start yourself works from the app without extra configuration. Set `OPENPENCIL_MCP_CORS_ORIGIN` to a comma-separated list to allow other origins, such as a worktree dev server.
+- Only the desktop app's own origin (`tauri://localhost` and its `http(s)://tauri.localhost` variants) is allowed by default, so a server you start yourself works from the app without extra configuration. Set `PAIRDRAW_MCP_CORS_ORIGIN` to a comma-separated list to allow other origins, such as a worktree dev server.
 
-Set `PORT=0` to disable TCP on macOS and Linux. Windows requires TCP. Set `OPENPENCIL_MCP_SOCKET` to override the Unix socket path, or `OPENPENCIL_MCP_DISCOVERY_PATH` to override the discovery file location. To provide a stable token, set `OPENPENCIL_MCP_AUTH_TOKEN`; an explicitly empty value disables authentication and should only be used with a trusted local socket.
+Set `PORT=0` to disable TCP on macOS and Linux. Windows requires TCP. Set `PAIRDRAW_MCP_SOCKET` to override the Unix socket path, or `PAIRDRAW_MCP_DISCOVERY_PATH` to override the discovery file location. To provide a stable token, set `PAIRDRAW_MCP_AUTH_TOKEN`; an explicitly empty value disables authentication and should only be used with a trusted local socket.
 
 Endpoints are available over both active transports:
 
@@ -258,7 +258,7 @@ Most tools accept optional `document_id` and `page_id` fields. Pass them explici
 Teach your AI coding agent to use Pairdraw tools:
 
 ```sh
-npx skills add open-pencil/open-pencil
+npx skills add pairdraw/pairdraw
 ```
 
 Works with Claude Code, Cursor, Windsurf, Codex, and any agent that supports [skills](https://skills.sh). The skill covers the CLI, MCP tools, JSX rendering, eval, and the running app's automation bridge.
@@ -269,7 +269,7 @@ Clients that cannot install skills read the same skill from the server, which em
 
 - **Instructions** — when a client connects, the server tells it to read the skill before designing, naming only the tools that Tool access and the shared scope leave on. Codex, Claude Code, and other clients that support server instructions pass this to the model. Agents in the app's own chat skip this step, because their prompt already includes the design reference.
 - **`read_skill` tool** — returns `SKILL.md`, or with `path: "references/design-authoring.md"` the JSX reference for `render`. It works in every client that supports tools.
-- **Resources** — `openpencil://skills/open-pencil/SKILL.md` and `openpencil://skills/open-pencil/references/design-authoring.md`, as Markdown.
+- **Resources** — `pairdraw://skills/pairdraw/SKILL.md` and `pairdraw://skills/pairdraw/references/design-authoring.md`, as Markdown.
 - **`design` prompt** — loads both files into the conversation, with an optional `task` such as `a pricing page`. Clients show it as a slash command.
 
 The resources and the prompt stay available when `read_skill` is turned off in **Tool access** or the server [shares only the selection](#selection-scope).

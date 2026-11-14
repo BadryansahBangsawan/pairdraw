@@ -80,7 +80,7 @@ function linkPrograms(bin: string, programs: Record<string, string | null>): voi
 }
 
 /**
- * Starts the companion as a person does, `openpencil-connect` with the app's address, and
+ * Starts the companion as a person does, `pairdraw-connect` with the app's address, and
  * resolves with the link and fingerprint it prints. Its files, and its home when isolated, stay
  * in `dir`, which the caller removes.
  */
@@ -111,10 +111,10 @@ export async function startCompanion(
       ...(isolated ? { HOME: dir } : {}),
       PATH: searchPath,
       PORT: String(port),
-      OPENPENCIL_CONNECT_APP_URL: appURL,
-      OPENPENCIL_MCP_SOCKET: join(dir, 'mcp.sock'),
-      OPENPENCIL_MCP_DISCOVERY_PATH: join(dir, 'mcp.json'),
-      OPENPENCIL_MCP_ROOT: dir
+      PAIRDRAW_CONNECT_APP_URL: appURL,
+      PAIRDRAW_MCP_SOCKET: join(dir, 'mcp.sock'),
+      PAIRDRAW_MCP_DISCOVERY_PATH: join(dir, 'mcp.json'),
+      PAIRDRAW_MCP_ROOT: dir
     }
   })
   const printed = await new Promise<{ link: string; fingerprint: string }>((resolve, reject) => {

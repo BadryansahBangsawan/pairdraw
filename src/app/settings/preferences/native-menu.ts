@@ -1,4 +1,4 @@
-import type { SnappingPreferences } from '@open-pencil/core'
+import type { SnappingPreferences } from '@pairdraw/core'
 
 import { isTauri } from '@/app/tauri/env'
 

@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import { noop } from 'es-toolkit/function'
 
-import { createEditor, isEmptyDocumentChange, type DocumentChange } from '@open-pencil/core'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { createEditor, isEmptyDocumentChange, type DocumentChange } from '@pairdraw/core'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 type Editor = ReturnType<typeof createEditor>
 

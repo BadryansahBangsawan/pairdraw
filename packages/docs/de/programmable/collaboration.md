@@ -17,7 +17,7 @@ Nur „Teilen“ bringt ein Dokument in einen Raum: Der Tab, aus dem Sie teilen,
 
 ## Raum beitreten
 
-Öffnen Sie den Link oder fügen Sie ihn (oder nur die Raumkennung) unter **Beitreten** im Teilen-Panel oder unter **Raum beitreten…** auf der Startseite ein. Der Raum öffnet sich in einem eigenen Tab, sodass bereits geöffnete Dokumente unverändert bleiben. Auf einem Computer bietet der Browser außerdem **In der Desktop-App öffnen** an; der Raum öffnet sich dann über einen `openpencil://join`-Link in Pairdraw.
+Öffnen Sie den Link oder fügen Sie ihn (oder nur die Raumkennung) unter **Beitreten** im Teilen-Panel oder unter **Raum beitreten…** auf der Startseite ein. Der Raum öffnet sich in einem eigenen Tab, sodass bereits geöffnete Dokumente unverändert bleiben. Auf einem Computer bietet der Browser außerdem **In der Desktop-App öffnen** an; der Raum öffnet sich dann über einen `pairdraw://join`-Link in Pairdraw.
 
 Sie treten sofort unter einem erzeugten Namen wie *Teal Fox* bei. Ihren eigenen Namen legen Sie im Teilen-Panel oder in den Einstellungen fest; er gilt in jedem Raum.
 

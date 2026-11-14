@@ -1,12 +1,12 @@
 import { isEqual } from 'es-toolkit/predicate'
 
-import type { Paint } from '@open-pencil/kiwi/fig/codec'
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { Paint } from '@pairdraw/kiwi/fig/codec'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   bindingOverrideField,
   setInstanceOverride
-} from '@open-pencil/scene-graph/instances/overrides'
-import { createDefaultSourceMetadata } from '@open-pencil/scene-graph/node-defaults'
+} from '@pairdraw/scene-graph/instances/overrides'
+import { createDefaultSourceMetadata } from '@pairdraw/scene-graph/node-defaults'
 
 import { nodeChangeToProps } from '../node-change'
 import { numericVariableBindingScales } from '../node-change/variable/bindings'

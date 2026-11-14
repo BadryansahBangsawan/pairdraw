@@ -3,7 +3,7 @@ import { afterEach, describe, expect, test } from 'bun:test'
 
 import { computed, ref } from 'vue'
 
-import type { AIProviderID } from '@open-pencil/core/constants'
+import type { AIProviderID } from '@pairdraw/core/constants'
 
 import { setChatProjectFolder } from '@/app/ai/chat/project-folder'
 import { createChatSessionManager } from '@/app/ai/chat/session'

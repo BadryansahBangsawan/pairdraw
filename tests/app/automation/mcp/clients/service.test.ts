@@ -40,7 +40,7 @@ function fakeStore(files: Partial<Record<MCPClientID, FakeFile>>) {
       interfere?.(file)
       interfere = undefined
       if (file.content !== expected) throw new Error('changed')
-      const backup = file.content === null ? null : `~/${id}.open-pencil.bak`
+      const backup = file.content === null ? null : `~/${id}.pairdraw.bak`
       file.content = content
       writes.push({ client: id, content })
       return { backup }
@@ -60,7 +60,7 @@ describe('MCP client setup', () => {
     const { store } = fakeStore({
       cursor: {
         installed: true,
-        content: '{"mcpServers":{"open-pencil":{"command":"openpencil-mcp"}}}'
+        content: '{"mcpServers":{"pairdraw":{"command":"pairdraw-mcp"}}}'
       },
       kiro: { installed: false, content: null }
     })
@@ -81,7 +81,7 @@ describe('MCP client setup', () => {
     const change = await setClientEntry(store, client('gemini-cli'), true)
     expect(change).toMatchObject({
       outcome: 'saved',
-      backup: '~/gemini-cli.open-pencil.bak',
+      backup: '~/gemini-cli.pairdraw.bak',
       status: { state: 'added' }
     })
     expect(writes).toHaveLength(1)
@@ -96,7 +96,7 @@ describe('MCP client setup', () => {
     const change = await setClientEntry(store, client('cursor'), true)
     expect(change).toMatchObject({ outcome: 'saved', status: { state: 'added' } })
     const saved = v.parse(serversFileSchema, files.cursor.content)
-    expect(Object.keys(saved.mcpServers)).toEqual(['mine', 'open-pencil'])
+    expect(Object.keys(saved.mcpServers)).toEqual(['mine', 'pairdraw'])
   })
 
   test('does not write when nothing changes, the client is missing, or the file is broken', async () => {

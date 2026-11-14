@@ -2,13 +2,13 @@ import { describe, expect, test } from 'bun:test'
 
 import { createDesignJSXRenderer, sceneNodeToJSX } from '#design-jsx/index'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 import {
   createShaderSourcePaint,
   isShaderSourcePaint,
   readShaderPaints,
   withShaderPaints
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 const SOURCE = `#version 300 es
 precision highp float;

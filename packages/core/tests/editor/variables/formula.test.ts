@@ -1,8 +1,8 @@
 import { expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { parseVariableFormula } from '@open-pencil/scene-graph/variables'
+import { createEditor } from '@pairdraw/core'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { parseVariableFormula } from '@pairdraw/scene-graph/variables'
 
 import {
   captureClipboardVariables,

@@ -6,13 +6,13 @@
  */
 import { ref } from 'vue'
 
-import { colorToHex, parseColor } from '@open-pencil/scene-graph/color'
-import type { Color } from '@open-pencil/scene-graph/primitives'
-import type { ScriptInputValue } from '@open-pencil/scene-graph/script'
-import type { VariableType } from '@open-pencil/scene-graph/types'
-import { useEditor } from '@open-pencil/vue'
-import { useI18n } from '@open-pencil/vue/i18n'
-import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
+import { colorToHex, parseColor } from '@pairdraw/scene-graph/color'
+import type { Color } from '@pairdraw/scene-graph/primitives'
+import type { ScriptInputValue } from '@pairdraw/scene-graph/script'
+import type { VariableType } from '@pairdraw/scene-graph/types'
+import { useEditor } from '@pairdraw/vue'
+import { useI18n } from '@pairdraw/vue/i18n'
+import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
 
 import { setScriptBinding, setScriptInput } from '@/app/code/script/inputs'
 import { readScriptNodeData } from '@/app/code/script/run-node'

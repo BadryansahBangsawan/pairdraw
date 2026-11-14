@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import { materializeDocument } from '@open-pencil/fig'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { pixelLength } from '@open-pencil/scene-graph/text'
+import { materializeDocument } from '@pairdraw/fig'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { pixelLength } from '@pairdraw/scene-graph/text'
 
 import { canvas, doc, node } from './helpers'
 

@@ -6,12 +6,12 @@ import type {
   SceneGraph,
   SceneNode,
   Stroke
-} from '@open-pencil/scene-graph'
-import { findInstanceAncestor, isReplacedLayer } from '@open-pencil/scene-graph/instances'
+} from '@pairdraw/scene-graph'
+import { findInstanceAncestor, isReplacedLayer } from '@pairdraw/scene-graph/instances'
 import {
   overriddenVariableModeCollection,
   type InstanceOverrideState
-} from '@open-pencil/scene-graph/instances/overrides'
+} from '@pairdraw/scene-graph/instances/overrides'
 
 import type { NodeProxyInternals, ProxyThis } from './accessor-utils'
 import { assertProxyEditable, graph, raw } from './accessor-utils'

@@ -1,15 +1,10 @@
 import type { Canvas, Paint } from 'canvaskit-wasm'
 
-import type {
-  VectorVertex,
-  VectorSegment,
-  VectorRegion,
-  SceneGraph
-} from '@open-pencil/scene-graph'
-import { getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
-import { transformVectorNetwork } from '@open-pencil/scene-graph/vector-network'
+import type { VectorVertex, VectorSegment, VectorRegion, SceneGraph } from '@pairdraw/scene-graph'
+import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
+import { transformVectorNetwork } from '@pairdraw/scene-graph/vector-network'
 
 import { PEN_HANDLE_RADIUS, PEN_VERTEX_RADIUS } from '#core/constants'
 import {

@@ -1,12 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 
-import { IS_TAURI } from '@open-pencil/core/constants'
-import {
-  useCommonMessages,
-  useCredentialMessages,
-  useSettingsMessages
-} from '@open-pencil/vue/i18n'
+import { IS_TAURI } from '@pairdraw/core/constants'
+import { useCommonMessages, useCredentialMessages, useSettingsMessages } from '@pairdraw/vue/i18n'
 
 import type { AIModelProfileDraft } from '@/app/ai/models'
 import { savedBedrockAuthKind } from '@/app/ai/models/settings/profile-editor/platform'

@@ -6,10 +6,10 @@ import { interpretInstance } from '#fig/instance-overrides/interpret'
 import { materializeInstance } from '#fig/instance-overrides/materialize-instance'
 import { mapInstanceSourceChildren } from '#fig/instance-overrides/source-children'
 
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { copyStyleRuns } from '@open-pencil/scene-graph/copy'
-import { pixelLength } from '@open-pencil/scene-graph/text'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { copyStyleRuns } from '@pairdraw/scene-graph/copy'
+import { pixelLength } from '@pairdraw/scene-graph/text'
 
 test('style claims read from a file survive edits to the component, as in Figma', () => {
   const changes: NodeChange[] = [

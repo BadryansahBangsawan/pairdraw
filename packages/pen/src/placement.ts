@@ -1,8 +1,8 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { localTransformFromWorld } from '@open-pencil/scene-graph/coordinate'
-import { fitEnclosingGroups } from '@open-pencil/scene-graph/group-bounds'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { localTransformFromWorld } from '@pairdraw/scene-graph/coordinate'
+import { fitEnclosingGroups } from '@pairdraw/scene-graph/group-bounds'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 /**
  * Where pen.dev puts a layer: at `x`, `y` in its parent, turned `rotation` degrees

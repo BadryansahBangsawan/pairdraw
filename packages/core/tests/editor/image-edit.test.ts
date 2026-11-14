@@ -2,13 +2,13 @@ import { describe, expect, test } from 'bun:test'
 
 import { expectDefined, getNodeOrThrow } from '#core-tests/helpers/assert'
 
-import { createEditor, editedImage, imageEditChanges, type Editor } from '@open-pencil/core'
-import { imageCropQuad } from '@open-pencil/core/geometry'
-import type { Fill, SceneNode } from '@open-pencil/scene-graph'
-import { getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import { coverImageTransform } from '@open-pencil/scene-graph/images'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import { createEditor, editedImage, imageEditChanges, type Editor } from '@pairdraw/core'
+import { imageCropQuad } from '@pairdraw/core/geometry'
+import type { Fill, SceneNode } from '@pairdraw/scene-graph'
+import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import { coverImageTransform } from '@pairdraw/scene-graph/images'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 /** A PNG header declaring a `width` × `height` image, which is all the crop reads of it. */
 function pngHeader(width: number, height: number): Uint8Array {

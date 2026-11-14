@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, within } from 'storybook/test'
 
-import { ACP_AGENTS, type ACPAgentID } from '@open-pencil/core/constants'
+import { ACP_AGENTS, type ACPAgentID } from '@pairdraw/core/constants'
 
 import type {
   AgentConnectProblem,
@@ -44,7 +44,7 @@ function agentSetup(overrides: Partial<AgentSetupState>): AgentSetupState {
     detected: null,
     bridge: false,
     bridgeOutdated: false,
-    bridgeCommand: 'npm i -g @open-pencil/mcp@0.15.1',
+    bridgeCommand: 'npm i -g @pairdraw/mcp@0.15.1',
     npm: true,
     installingAgent: false,
     installingBridge: false,
@@ -88,10 +88,10 @@ function piSetup(overrides: Partial<PiSetupState>): PiSetupState {
     scanning: false,
     companion: false,
     companionOutdated: false,
-    companionCommand: 'npm i -g @open-pencil/harness@0.15.1',
+    companionCommand: 'npm i -g @pairdraw/harness@0.15.1',
     bridge: false,
     bridgeOutdated: false,
-    bridgeCommand: 'npm i -g @open-pencil/mcp@0.15.1',
+    bridgeCommand: 'npm i -g @pairdraw/mcp@0.15.1',
     npm: true,
     installingCompanion: false,
     installingBridge: false,
@@ -148,7 +148,7 @@ export const OpenRouterWaiting: Story = {
 }
 export const OpenRouterVerifying: Story = { args: { signInStatus: 'verifying' } }
 export const OpenRouterSignedIn: Story = {
-  args: { account: { label: 'OpenPencil', freeTier: false } },
+  args: { account: { label: 'Pairdraw', freeTier: false } },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole('status')).toHaveTextContent('Signed in to OpenRouter')
@@ -157,7 +157,7 @@ export const OpenRouterSignedIn: Story = {
   }
 }
 export const OpenRouterSignedInWithoutCredits: Story = {
-  args: { account: { label: 'OpenPencil', freeTier: true } }
+  args: { account: { label: 'Pairdraw', freeTier: true } }
 }
 export const OpenRouterPopupBlocked: Story = { args: { signInStatus: 'blocked' } }
 export const OpenRouterFailed: Story = { args: { signInStatus: 'failed' } }
@@ -243,7 +243,7 @@ export const CodingAgentNeedsNpm: Story = {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole('link', { name: 'Node.js' })).toBeVisible()
     await expect(canvas.getByText('npm i -g @agentclientprotocol/claude-agent-acp')).toBeVisible()
-    await expect(canvas.getByText(/npm i -g @open-pencil\/mcp@/)).toBeVisible()
+    await expect(canvas.getByText(/npm i -g @pairdraw\/mcp@/)).toBeVisible()
     await expect(canvas.getByRole('button', { name: 'Retry' })).toBeEnabled()
   }
 }
@@ -255,7 +255,7 @@ export const CodingAgentNeedsAdmin: Story = {
       detected: detected('claude-code', 'needs-adapter'),
       adapterNeedsAdmin: true,
       bridgeNeedsAdmin: true,
-      bridgeCommand: 'sudo npm i -g @open-pencil/mcp@0.15.1',
+      bridgeCommand: 'sudo npm i -g @pairdraw/mcp@0.15.1',
       error: 'npm-admin',
       connection: failedAt('install', 'npm-admin')
     })
@@ -263,7 +263,7 @@ export const CodingAgentNeedsAdmin: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText(/needs administrator rights/)).toBeVisible()
-    await expect(canvas.getByText(/^sudo npm i -g @open-pencil\/mcp@/)).toBeVisible()
+    await expect(canvas.getByText(/^sudo npm i -g @pairdraw\/mcp@/)).toBeVisible()
   }
 }
 export const CodingAgentSignedIn: Story = {
@@ -298,7 +298,7 @@ export const CodingAgentToolsUnreachable: Story = {
         tools: {
           connected: false,
           reason:
-            '[codex-acp] MCP server `open-pencil` was not started, because the Codex config already defines an MCP server with this name.'
+            '[codex-acp] MCP server `pairdraw` was not started, because the Codex config already defines an MCP server with this name.'
         }
       }),
       connection: failedAt('tools', 'tools')
@@ -445,7 +445,7 @@ export const PiNeedsNpm: Story = {
   args: { providerID: 'harness:pi', recommended: false, piSetup: piSetup({ npm: false }) },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText(/npm i -g @open-pencil\/harness@/)).toBeVisible()
+    await expect(canvas.getByText(/npm i -g @pairdraw\/harness@/)).toBeVisible()
   }
 }
 export const PiOutdatedMCPFromBun: Story = {
@@ -456,7 +456,7 @@ export const PiOutdatedMCPFromBun: Story = {
       companion: true,
       bridge: true,
       bridgeOutdated: true,
-      bridgeCommand: 'bun add -g @open-pencil/mcp@0.15.1',
+      bridgeCommand: 'bun add -g @pairdraw/mcp@0.15.1',
       defaultModel: 'openai-codex/gpt-5.6',
       error: 'canvas-install'
     })
@@ -465,6 +465,6 @@ export const PiOutdatedMCPFromBun: Story = {
     const canvas = within(canvasElement)
     await expect(canvas.getByText(/Pairdraw MCP server · update needed/)).toBeVisible()
     await expect(canvas.getByRole('button', { name: 'Update MCP server' })).toBeVisible()
-    await expect(canvas.getByText('bun add -g @open-pencil/mcp@0.15.1')).toBeVisible()
+    await expect(canvas.getByText('bun add -g @pairdraw/mcp@0.15.1')).toBeVisible()
   }
 }

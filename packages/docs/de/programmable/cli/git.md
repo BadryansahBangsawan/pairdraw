@@ -1,11 +1,11 @@
 ---
 title: Designs mit Git versionieren
-description: Git so einrichten, dass es lesbare Diffs von .fig-Dateien zeigt, mit openpencil diff files, einer Textconv-Gliederung und git difftool.
+description: Git so einrichten, dass es lesbare Diffs von .fig-Dateien zeigt, mit pairdraw diff files, einer Textconv-Gliederung und git difftool.
 ---
 
 # Designs mit Git versionieren
 
-Eine `.fig`-Datei ist binär, daher melden `git diff` und `git log -p` nur, dass sie sich geändert hat. Ist die `openpencil`-CLI installiert, zeigt Git stattdessen, was sich geändert hat: [`openpencil diff files`](/programmable/cli/comparing#comparing-documents) vergleicht zwei Versionen Seite für Seite und gibt die Änderungen als Patch aus.
+Eine `.fig`-Datei ist binär, daher melden `git diff` und `git log -p` nur, dass sie sich geändert hat. Ist die `pairdraw`-CLI installiert, zeigt Git stattdessen, was sich geändert hat: [`pairdraw diff files`](/programmable/cli/comparing#comparing-documents) vergleicht zwei Versionen Seite für Seite und gibt die Änderungen als Patch aus.
 
 Es gibt drei Wege, das einzubinden. Die folgenden Befehle richten das aktuelle Repository ein; mit `--global` bei `git config` gilt die Einstellung für jedes Repository.
 
@@ -32,7 +32,7 @@ path=$1
 old=$2
 new=$5
 
-echo "diff --openpencil a/$path b/$path"
+echo "diff --pairdraw a/$path b/$path"
 if [ "$old" = /dev/null ]; then
   echo "new file"
   exit 0
@@ -42,7 +42,7 @@ if [ "$new" = /dev/null ]; then
   exit 0
 fi
 
-openpencil diff files "$old" "$new"
+pairdraw diff files "$old" "$new"
 status=$?
 # 1 means the documents differ; only 2, trouble, is passed on to Git.
 if [ "$status" -eq 1 ]; then
@@ -59,7 +59,7 @@ git config diff.fig.command git-diff-fig
 `git diff` gibt nun für jede geänderte `.fig`-Datei den Patch aus. Nach einem größeren Titel und neuem Fließtext in der Card aus dem [Designsystem-Tutorial](/de/user-guide/design-system) beginnt er so:
 
 ```diff
-diff --openpencil a/design-system.fig b/design-system.fig
+diff --pairdraw a/design-system.fig b/design-system.fig
 @@ /Components/Card/Title #387261504:30
 -size={18}
 +size={20}
@@ -71,16 +71,16 @@ diff --openpencil a/design-system.fig b/design-system.fig
 +size={20}
 ```
 
-`git log` und `git show` verwenden einen Diff-Treiber nur auf Anfrage, etwa `git log -p --ext-diff -- design.fig`. Der Patch ist der unter [Designs vergleichen](/programmable/cli/comparing#patches) beschriebene: Jeder Hunk nennt eine Ebene über ihren Pfad und ihre ID in der älteren Version, sodass `openpencil diff apply` den Patch auf diese Version anwenden kann. Eine Seite, die nur eine Version hat, wird stattdessen auf stderr gemeldet.
+`git log` und `git show` verwenden einen Diff-Treiber nur auf Anfrage, etwa `git log -p --ext-diff -- design.fig`. Der Patch ist der unter [Designs vergleichen](/programmable/cli/comparing#patches) beschriebene: Jeder Hunk nennt eine Ebene über ihren Pfad und ihre ID in der älteren Version, sodass `pairdraw diff apply` den Patch auf diese Version anwenden kann. Eine Seite, die nur eine Version hat, wird stattdessen auf stderr gemeldet.
 
 ## Textconv {#textconv}
 
-Ein Textconv-Befehl wandelt eine Version einer Datei in Text um, und Git vergleicht diesen Text Zeile für Zeile. `git log -p` und `git show` verwenden ihn standardmäßig, und Git kann ihn pro Version zwischenspeichern. Dieses Skript gibt eine Gliederung jeder Seite aus, eine Ebene pro Zeile, mit Typ, Name, Größe und Text. Es verwendet [`openpencil eval`](./scripting) und [`jq`](https://jqlang.org); speichern Sie es als `fig-textconv` in Ihrem `PATH`:
+Ein Textconv-Befehl wandelt eine Version einer Datei in Text um, und Git vergleicht diesen Text Zeile für Zeile. `git log -p` und `git show` verwenden ihn standardmäßig, und Git kann ihn pro Version zwischenspeichern. Dieses Skript gibt eine Gliederung jeder Seite aus, eine Ebene pro Zeile, mit Typ, Name, Größe und Text. Es verwendet [`pairdraw eval`](./scripting) und [`jq`](https://jqlang.org); speichern Sie es als `fig-textconv` in Ihrem `PATH`:
 
 ```sh
 #!/bin/sh
 # Print a document as an outline of its layers, one per line, for Git's textconv.
-openpencil eval "$1" --json --code '
+pairdraw eval "$1" --json --code '
   const lines = []
   const walk = (node, depth) => {
     const size = depth > 0 && "width" in node ? ` ${Math.round(node.width)}×${Math.round(node.height)}` : ""
@@ -123,12 +123,12 @@ Ist zusätzlich der `command` des Diff-Treibers gesetzt, verwendet `git diff` de
 `git difftool` startet ein Werkzeug einmal pro geänderter Datei und lässt `git diff` unverändert. Definieren Sie ein Werkzeug, das `diff files` auf beide Versionen anwendet:
 
 ```sh
-git config difftool.openpencil.cmd 'openpencil diff files "$LOCAL" "$REMOTE"'
+git config difftool.pairdraw.cmd 'pairdraw diff files "$LOCAL" "$REMOTE"'
 ```
 
 ```sh
-git difftool --no-prompt --tool=openpencil HEAD~1 -- '*.fig'
-git difftool -y -t openpencil main...my-branch -- design.fig
+git difftool --no-prompt --tool=pairdraw HEAD~1 -- '*.fig'
+git difftool -y -t pairdraw main...my-branch -- design.fig
 ```
 
 Die Pfadangabe hält andere Dateien heraus. Ein mit `diff.fig.command` gesetzter Diff-Treiber hat für `.fig`-Dateien Vorrang vor einem Difftool, verwenden Sie also das eine oder das andere. Lassen Sie `--trust-exit-code` weg: `diff files` endet mit 1, sobald sich die Versionen unterscheiden.

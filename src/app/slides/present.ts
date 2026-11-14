@@ -1,4 +1,4 @@
-import { slidesMessages } from '@open-pencil/vue/i18n'
+import { slidesMessages } from '@pairdraw/vue/i18n'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { exportLayersToPDF } from '@/app/shell/menu/actions/pdf'

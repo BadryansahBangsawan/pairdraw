@@ -66,7 +66,7 @@ Pairdraw использует Skia через CanvasKit WASM — тот же г�
 - **Копировать как:** текст, SVG, PNG или JSX через контекстное меню.
 
 ```sh
-openpencil export design.fig -f jsx --style tailwind
+pairdraw export design.fig -f jsx --style tailwind
 ```
 
 ## Чат с ИИ
@@ -88,7 +88,7 @@ openpencil export design.fig -f jsx --style tailwind
 Claude Code, Cursor, Windsurf и другие клиенты MCP могут читать и изменять `.fig` без интерфейса. Доступно более 90 инструментов и два транспорта: stdio и HTTP.
 
 ```sh
-npm install -g @open-pencil/mcp
+npm install -g @pairdraw/mcp
 ```
 
 Полный список находится в [справочнике инструментов MCP](/programmable/mcp-server).
@@ -96,17 +96,17 @@ npm install -g @open-pencil/mcp
 ## CLI
 
 ```sh
-openpencil tree design.fig              # Дерево объектов
-openpencil find design.fig --type TEXT  # Поиск
-openpencil export design.fig -f png     # Экспорт
-openpencil analyze colors design.fig    # Анализ цветов
-openpencil analyze clusters design.fig  # Повторяющиеся структуры
-openpencil eval design.fig -c "..."     # Figma Plugin API
+pairdraw tree design.fig              # Дерево объектов
+pairdraw find design.fig --type TEXT  # Поиск
+pairdraw export design.fig -f png     # Экспорт
+pairdraw analyze colors design.fig    # Анализ цветов
+pairdraw analyze clusters design.fig  # Повторяющиеся структуры
+pairdraw eval design.fig -c "..."     # Figma Plugin API
 ```
 
 Если настольное приложение запущено, файл можно не указывать: CLI подключится по RPC к открытому документу.
 
-Все команды поддерживают `--json`. Установка: `npm install -g @open-pencil/cli` или `bun add -g @open-pencil/cli`.
+Все команды поддерживают `--json`. Установка: `npm install -g @pairdraw/cli` или `bun add -g @pairdraw/cli`.
 
 ## Совместная работа
 
@@ -126,7 +126,7 @@ openpencil eval design.fig -c "..."     # Figma Plugin API
 **Веб-приложение:** [app.openpencil.dev](https://app.openpencil.dev), установка как PWA и интерфейс для сенсорных экранов.
 
 ```sh
-brew install --cask openpencil
+brew install --cask pairdraw
 ```
 
 **VS Code:** Отдельный редактор документов `.fig` и `.pen`, который запускает веб-редактор в webview и сохраняет то, что он показывает. Он не публикуется ни в одном магазине, поэтому собирается из репозитория ([Расширение VS Code](/programmable/vscode)).

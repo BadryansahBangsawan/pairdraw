@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import { promiseTimeout } from '@vueuse/core'
 
-import { createDocumentGraph } from '@open-pencil/core'
-import { exportFigFile } from '@open-pencil/core/io/formats/fig'
+import { createDocumentGraph } from '@pairdraw/core'
+import { exportFigFile } from '@pairdraw/core/io/formats/fig'
 
 import {
   DRAFT_PROVIDER_ID,
@@ -94,7 +94,7 @@ describe('draft store', () => {
 
   test('other windows hear of drafts written and deleted, and this one of theirs', async () => {
     // Another window's end of the drafts channel.
-    const port = new BroadcastChannel('open-pencil:drafts')
+    const port = new BroadcastChannel('pairdraw:drafts')
     const heard: unknown[] = []
     port.addEventListener('message', (event: MessageEvent<unknown>) => {
       heard.push(event.data)

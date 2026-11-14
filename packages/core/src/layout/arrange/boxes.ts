@@ -1,8 +1,8 @@
 import type { ElkExtendedEdge, ElkNode, ElkPort } from 'elkjs/lib/elk-api'
 import { groupBy } from 'es-toolkit'
 
-import type { ConnectorSide } from '@open-pencil/scene-graph/connectors'
-import type { Rect, Size, Vector } from '@open-pencil/scene-graph/primitives'
+import type { ConnectorSide } from '@pairdraw/scene-graph/connectors'
+import type { Rect, Size, Vector } from '@pairdraw/scene-graph/primitives'
 
 import { layoutWithElk } from './elk'
 

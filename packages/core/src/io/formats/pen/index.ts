@@ -10,7 +10,7 @@ import {
   writePenDocument,
   type PenIconRequest,
   type PenIconSource
-} from '@open-pencil/pen'
+} from '@pairdraw/pen'
 
 import { defaultIcons, drawIcon, type IconData, type IconProvider } from '#core/icons'
 import type { IOFormatAdapter, ReadDocumentInput } from '#core/io/types'

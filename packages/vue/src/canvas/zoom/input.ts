@@ -1,5 +1,5 @@
-import type { Editor } from '@open-pencil/core'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import type { Editor } from '@pairdraw/core'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 import { animateViewport } from '#vue/canvas/viewport/tween'
 import { isPastPointerDragThreshold } from '#vue/shared/input/drag-threshold'

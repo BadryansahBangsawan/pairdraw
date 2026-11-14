@@ -2,9 +2,9 @@ import { expect } from 'bun:test'
 
 import type { CanvasKit } from 'canvaskit-wasm'
 
-import type { SkiaRenderer } from '@open-pencil/core/canvas'
-import { renderNodesToImage } from '@open-pencil/core/io/formats/raster'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import type { SkiaRenderer } from '@pairdraw/core/canvas'
+import { renderNodesToImage } from '@pairdraw/core/io/formats/raster'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { expectDefined } from './assert'
 

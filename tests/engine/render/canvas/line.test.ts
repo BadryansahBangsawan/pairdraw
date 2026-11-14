@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 
-import { SkiaRenderer } from '@open-pencil/core/canvas'
-import { renderNodesToImage } from '@open-pencil/core/io/formats/raster'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { renderNodesToImage } from '@pairdraw/core/io/formats/raster'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { initCanvasKit } from '#cli/headless'
 

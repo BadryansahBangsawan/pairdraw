@@ -1,16 +1,16 @@
-import type { GradientStop, GradientTransform } from '@open-pencil/scene-graph'
+import type { GradientStop, GradientTransform } from '@pairdraw/scene-graph'
 import {
   applyGradientTransform,
   ellipticalGradientTransform,
   invertGradientTransform,
   linearGradientTransform,
   type GradientFillType
-} from '@open-pencil/scene-graph/gradient'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/gradient'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 /**
  * On-canvas gradient handles, as Figma desktop 126 draws and drags them, built on the paint
- * convention in `@open-pencil/scene-graph/gradient`.
+ * convention in `@pairdraw/scene-graph/gradient`.
  */
 
 export type GradientHandle = 'start' | 'end' | 'center' | 'radius-x' | 'radius-y'

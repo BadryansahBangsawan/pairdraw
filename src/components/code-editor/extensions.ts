@@ -10,7 +10,7 @@ import {
   DESIGN_JSX_HELPERS,
   DESIGN_JSX_PROPERTIES,
   elementPropsByName
-} from '@open-pencil/design-jsx'
+} from '@pairdraw/design-jsx'
 
 import { APP_NAME } from '@/constants'
 

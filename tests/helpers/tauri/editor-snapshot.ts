@@ -7,11 +7,11 @@ export type NativeLayerFixture = {
 // Home has an editor store too, but no mounted canvas or text-input session.
 async function ensureNativeEditorReady(): Promise<void> {
   await browser.waitUntil(
-    async () => browser.execute(() => Boolean(window.openPencil?.getStore?.())),
-    { timeout: 30_000, timeoutMsg: 'OpenPencil store did not initialize' }
+    async () => browser.execute(() => Boolean(window.pairdraw?.getStore?.())),
+    { timeout: 30_000, timeoutMsg: 'Pairdraw store did not initialize' }
   )
   await browser.execute(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (document.querySelector('canvas') && store?.textEditor) return
     const newDesign = document.querySelector<HTMLElement>('[data-test-id="home-new-design"]')
     // Setup only: input assertions still use WebDriver after the document is ready.
@@ -20,7 +20,7 @@ async function ensureNativeEditorReady(): Promise<void> {
   await browser.waitUntil(
     async () =>
       browser.execute(() => {
-        const store = window.openPencil?.getStore?.()
+        const store = window.pairdraw?.getStore?.()
         return Boolean(document.querySelector('canvas') && store?.textEditor)
       }),
     { timeout: 30_000, timeoutMsg: 'Native canvas and text editor did not initialize' }
@@ -30,8 +30,8 @@ async function ensureNativeEditorReady(): Promise<void> {
 export async function createNativeLayerFixture(): Promise<NativeLayerFixture> {
   await ensureNativeEditorReady()
   return browser.execute(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil editor is not ready')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw editor is not ready')
     const pageId = store.state.currentPageId
     for (const node of store.graph.getChildren(pageId)) store.graph.deleteNode(node.id)
     const first = store.graph.createNode('RECTANGLE', pageId, { name: 'Native Layer A' })
@@ -44,8 +44,8 @@ export async function createNativeLayerFixture(): Promise<NativeLayerFixture> {
 
 export async function readNativeLayerOrder(parentId?: string): Promise<string[]> {
   return browser.execute((id) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil editor is not ready')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw editor is not ready')
     return store.graph.getNode(id ?? store.state.currentPageId)?.childIds ?? []
   }, parentId)
 }
@@ -62,8 +62,8 @@ export type NativeEditorSnapshot = {
 
 export async function readNativeEditorSnapshot(): Promise<NativeEditorSnapshot> {
   return browser.execute(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil editor is not ready')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw editor is not ready')
     const editingTextId = store.state.editingTextId
     const node = editingTextId ? store.graph.getNode(editingTextId) : null
     let textNodeCount = 0
@@ -85,8 +85,8 @@ export async function readNativeEditorSnapshot(): Promise<NativeEditorSnapshot> 
 export async function createNativeTextFixture(text = ''): Promise<string> {
   await ensureNativeEditorReady()
   return browser.execute((initialText) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil editor is not ready')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw editor is not ready')
     for (const node of store.graph.getChildren(store.state.currentPageId)) {
       store.graph.deleteNode(node.id)
     }

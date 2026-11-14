@@ -2,7 +2,7 @@ import { omitBy } from 'es-toolkit/object'
 import * as v from 'valibot'
 
 import { readPluginData, withPluginData } from '../plugin-data/field'
-import { OPEN_PENCIL_PLUGIN_DATA } from '../plugin-data/fields'
+import { PAIRDRAW_PLUGIN_DATA } from '../plugin-data/fields'
 import type { SceneNode } from '../types'
 import { AGENT_NOTE_MAX_LENGTH, agentNotesSchema, type AgentNotes } from './schema'
 
@@ -14,7 +14,7 @@ export interface AgentNotesDraft {
 
 /** The notes a layer carries for agents, or null when it has none or they are unreadable. */
 export function readAgentNotes(node: Pick<SceneNode, 'pluginData'>): AgentNotes | null {
-  return readPluginData(node.pluginData, OPEN_PENCIL_PLUGIN_DATA.agentNotes) ?? null
+  return readPluginData(node.pluginData, PAIRDRAW_PLUGIN_DATA.agentNotes) ?? null
 }
 
 /** `text` cut to the length an agent reads, so a long paste is kept rather than refused. */
@@ -42,5 +42,5 @@ export function withAgentNotes(
   draft: AgentNotesDraft | null
 ): SceneNode['pluginData'] {
   const notes = draft ? agentNotesFromDraft(draft) : null
-  return withPluginData(node.pluginData, OPEN_PENCIL_PLUGIN_DATA.agentNotes, notes ?? undefined)
+  return withPluginData(node.pluginData, PAIRDRAW_PLUGIN_DATA.agentNotes, notes ?? undefined)
 }

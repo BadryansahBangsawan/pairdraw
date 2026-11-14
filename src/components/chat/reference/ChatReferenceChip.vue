@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, ref } from 'vue'
 
-import { useAIMessages, useBrowserMessages } from '@open-pencil/vue/i18n'
+import { useAIMessages, useBrowserMessages } from '@pairdraw/vue/i18n'
 
 import { elementMarkPage, parseElementMark } from '@/app/ai/chat/references/element'
 import type { ChatReference } from '@/app/ai/chat/references/link'

@@ -1,6 +1,6 @@
 ---
 title: Premiers pas avec le SDK
-description: Connectez @open-pencil/vue, créez un éditeur et configurez la zone de travail.
+description: Connectez @pairdraw/vue, créez un éditeur et configurez la zone de travail.
 ---
 
 # Premiers pas avec le SDK
@@ -8,23 +8,23 @@ description: Connectez @open-pencil/vue, créez un éditeur et configurez la zon
 ## Installation
 
 ```bash
-bun add @open-pencil/core @open-pencil/vue canvaskit-wasm
+bun add @pairdraw/core @pairdraw/vue canvaskit-wasm
 ```
 
-Le SDK se trouve dans le monorepo Pairdraw et est publié sous forme de package `@open-pencil/vue`.
+Le SDK se trouve dans le monorepo Pairdraw et est publié sous forme de package `@pairdraw/vue`.
 
 ```ts
-import { createEditor } from '@open-pencil/core'
-import { provideEditor } from '@open-pencil/vue'
-import { useCanvas } from '@open-pencil/vue/canvas/surface'
+import { createEditor } from '@pairdraw/core'
+import { provideEditor } from '@pairdraw/vue'
+import { useCanvas } from '@pairdraw/vue/canvas/surface'
 ```
 
 ## Couches de l'application
 
 Une application basée sur le SDK se compose de trois couches :
 
-1. `@open-pencil/core` — le moteur de l'éditeur, indépendant du framework ;
-2. `@open-pencil/vue` — les composables et composants sans styles pour Vue ;
+1. `@pairdraw/core` — le moteur de l'éditeur, indépendant du framework ;
+2. `@pairdraw/vue` — les composables et composants sans styles pour Vue ;
 3. l'application — la présentation, le routage, la gestion des fichiers et l'interface propre au produit.
 
 ## Configuration minimale
@@ -32,7 +32,7 @@ Une application basée sur le SDK se compose de trois couches :
 ### 1. Créez un éditeur
 
 ```ts
-import { createEditor } from '@open-pencil/core'
+import { createEditor } from '@pairdraw/core'
 
 const editor = createEditor({
   width: 1200,
@@ -44,9 +44,9 @@ const editor = createEditor({
 
 ```vue
 <script setup lang="ts">
-import { provideEditor } from '@open-pencil/vue'
+import { provideEditor } from '@pairdraw/vue'
 
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 
 const props = defineProps<{
   editor: Editor
@@ -68,8 +68,8 @@ provideEditor(props.editor)
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { useCanvas } from '@open-pencil/vue/canvas/surface'
-import { useEditor } from '@open-pencil/vue'
+import { useCanvas } from '@pairdraw/vue/canvas/surface'
+import { useEditor } from '@pairdraw/vue'
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const editor = useEditor()
@@ -87,8 +87,8 @@ useCanvas(canvasRef, editor)
 Après l'appel à `provideEditor()`, les composants descendants peuvent consulter la sélection et exécuter des commandes de l'éditeur :
 
 ```ts
-import { useEditorCommands } from '@open-pencil/vue/editor/commands'
-import { useSelectionState } from '@open-pencil/vue/editor/selection-state'
+import { useEditorCommands } from '@pairdraw/vue/editor/commands'
+import { useSelectionState } from '@pairdraw/vue/editor/selection-state'
 
 const selection = useSelectionState()
 const commands = useEditorCommands()
@@ -100,9 +100,9 @@ const commands = useEditorCommands()
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { useCanvas } from '@open-pencil/vue/canvas/surface'
-import { useEditor } from '@open-pencil/vue'
-import { useSelectionState } from '@open-pencil/vue/editor/selection-state'
+import { useCanvas } from '@pairdraw/vue/canvas/surface'
+import { useEditor } from '@pairdraw/vue'
+import { useSelectionState } from '@pairdraw/vue/editor/selection-state'
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const editor = useEditor()

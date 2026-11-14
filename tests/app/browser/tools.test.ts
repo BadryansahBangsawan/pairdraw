@@ -2,8 +2,8 @@ import { describe, expect, test } from 'bun:test'
 
 import { toUint8Array } from 'js-base64'
 
-import { createEditor } from '@open-pencil/core'
-import { encodeWebCaptureClipboard, type WebCapture } from '@open-pencil/web-capture'
+import { createEditor } from '@pairdraw/core'
+import { encodeWebCaptureClipboard, type WebCapture } from '@pairdraw/web-capture'
 
 import { BROWSER_ELEMENT_TEXT_LIMIT } from '@/app/browser/read'
 import {
@@ -21,7 +21,7 @@ const PNG = toUint8Array(
 )
 
 const CAPTURE: WebCapture = {
-  format: 'openpencil/web-capture',
+  format: 'pairdraw/web-capture',
   version: 1,
   scope: 'element',
   source: { url: 'https://example.com/', title: 'Button' },

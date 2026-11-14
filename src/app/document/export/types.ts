@@ -1,4 +1,4 @@
-import type { HTMLExportOptions, PDFFormatExportOptions } from '@open-pencil/core/io'
+import type { HTMLExportOptions, PDFFormatExportOptions } from '@pairdraw/core/io'
 
 /** How an HTML export is written, as the Export panel and the Code panel offer it. */
 export type HTMLExportSettings = Required<

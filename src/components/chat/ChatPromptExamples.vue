@@ -6,7 +6,7 @@ import IconLayoutTemplate from '~icons/lucide/layout-template'
 import IconLogIn from '~icons/lucide/log-in'
 import IconTag from '~icons/lucide/tag'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { promptExamples, type PromptExampleId } from '@/app/ai/chat/entry/examples'
 import AppButton from '@/components/ui/button/AppButton.vue'

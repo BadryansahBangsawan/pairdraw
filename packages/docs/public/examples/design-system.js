@@ -1,7 +1,7 @@
 // Builds design-system.fig, the example file of the design system tutorial.
 // Start from an empty document and write the result to a new file:
 //   echo '{"children":[]}' > empty.pen
-//   openpencil eval empty.pen --stdin -o design-system.fig < design-system.js
+//   pairdraw eval empty.pen --stdin -o design-system.fig < design-system.js
 
 await figma.loadFontAsync({ family: 'Inter', style: 'Regular' })
 await figma.loadFontAsync({ family: 'Inter', style: 'Medium' })
@@ -115,7 +115,7 @@ for (const variant of [primary, secondary]) {
     characters: labelKey
   }
 }
-openpencil.setBehaviour(buttonSet, 'button')
+pairdraw.setBehaviour(buttonSet, 'button')
 
 // 3. Card: a title property and two slots, Content and Actions.
 const card = figma.createComponent()
@@ -162,12 +162,12 @@ const body = text(
 )
 content.appendChild(body)
 body.layoutSizingHorizontal = 'FILL'
-openpencil.createSlot(content)
+pairdraw.createSlot(content)
 
 const actions = slotFrame('Actions', 'HORIZONTAL')
 const action = primary.createInstance()
 actions.appendChild(action)
-openpencil.createSlot(actions)
+pairdraw.createSlot(actions)
 
 // 4. Examples: the same cards in each mode, with their own slot content.
 const examplesPage = figma.createPage()

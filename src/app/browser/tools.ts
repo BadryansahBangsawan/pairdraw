@@ -1,6 +1,6 @@
 import { fromUint8Array } from 'js-base64'
 
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 
 import { importBrowserCapture } from './import'
 import {

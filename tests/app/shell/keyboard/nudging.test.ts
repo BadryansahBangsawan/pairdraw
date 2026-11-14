@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, test } from 'bun:test'
 
 import { toRaw } from 'vue'
 
-import { createDefaultEditorState, type CanvasView } from '@open-pencil/core'
+import { createDefaultEditorState, type CanvasView } from '@pairdraw/core'
 
 import { appPreferences, updateNudgePreferences } from '@/app/settings/preferences/store'
 import { nudgeDistance, nudgeForKey } from '@/app/shell/keyboard/nudging'

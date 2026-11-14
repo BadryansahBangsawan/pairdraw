@@ -1,15 +1,15 @@
-import type { Fill, SceneNode, ArcData, NodeType } from '@open-pencil/scene-graph'
-import { colorToFill } from '@open-pencil/scene-graph/color'
-import { parseCSSGridTracks, parseCSSNumber } from '@open-pencil/scene-graph/css'
+import type { Fill, SceneNode, ArcData, NodeType } from '@pairdraw/scene-graph'
+import { colorToFill } from '@pairdraw/scene-graph/color'
+import { parseCSSGridTracks, parseCSSNumber } from '@pairdraw/scene-graph/css'
 import {
   autoLayoutSizingFields,
   fillSizingFields,
   parseAutoLayoutDirection,
   parseCounterAxisAlign,
   parsePrimaryAxisAlign
-} from '@open-pencil/scene-graph/layout'
-import type { Color, JSONObject } from '@open-pencil/scene-graph/primitives'
-import { withShaderPaints, type ShaderPaint } from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/layout'
+import type { Color, JSONObject } from '@pairdraw/scene-graph/primitives'
+import { withShaderPaints, type ShaderPaint } from '@pairdraw/scene-graph/shaders'
 
 import { DESIGN_JSX_STYLE_KEYS, designJSXProp } from './definitions'
 import {

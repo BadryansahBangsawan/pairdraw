@@ -1,6 +1,6 @@
 import { isEqual, uniq } from 'es-toolkit'
 
-import type { ShaderPreset } from '@open-pencil/scene-graph/shaders'
+import type { ShaderPreset } from '@pairdraw/scene-graph/shaders'
 
 /**
  * Complete shaders a shader paint can start from in one click: each stacks a texture with the

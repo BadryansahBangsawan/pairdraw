@@ -2,7 +2,7 @@
 import { refAutoReset, useClipboard } from '@vueuse/core'
 import { computed } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { turnEdits } from '@/app/ai/reply/turns'
 import { chatMessageTheme } from '@/components/chat/ui'

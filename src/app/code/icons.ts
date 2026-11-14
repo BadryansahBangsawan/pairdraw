@@ -6,9 +6,9 @@ import {
   isIconPackage,
   type IconFramework,
   type IconPackage
-} from '@open-pencil/dom-css/export'
+} from '@pairdraw/dom-css/export'
 
-const stored = useLocalStorage<string>('open-pencil:code-icon-package', 'iconify')
+const stored = useLocalStorage<string>('pairdraw:code-icon-package', 'iconify')
 
 /** Where generated Vue and React components take icons from, remembered across sessions. */
 export const codeIconPackage = computed<IconPackage>({

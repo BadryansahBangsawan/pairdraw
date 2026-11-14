@@ -29,21 +29,21 @@ async function problem(agent: 'acp' | 'pi', lookup: () => Promise<AgentLookup>) 
 describe('assertAgentReady', () => {
   test('lets a chat start when its companions match the app', async () => {
     const lookup = installed(
-      { '@open-pencil/harness': '0.0.2', '@open-pencil/mcp': '0.0.2' },
-      'openpencil-harness',
-      'openpencil-mcp-http'
+      { '@pairdraw/harness': '0.0.2', '@pairdraw/mcp': '0.0.2' },
+      'pairdraw-harness',
+      'pairdraw-mcp-http'
     )
     expect(await problem('pi', lookup)).toBeNull()
     expect(await problem('acp', lookup)).toBeNull()
   })
 
   test('names the missing or mismatched companion', async () => {
-    expect(await problem('pi', installed({}, 'openpencil-mcp-http'))).toBe('companion-missing')
+    expect(await problem('pi', installed({}, 'pairdraw-mcp-http'))).toBe('companion-missing')
     expect(
-      await problem('pi', installed({ '@open-pencil/harness': '0.12.0' }, 'openpencil-harness'))
+      await problem('pi', installed({ '@pairdraw/harness': '0.12.0' }, 'pairdraw-harness'))
     ).toBe('companion-outdated')
     expect(
-      await problem('acp', installed({ '@open-pencil/mcp': '0.12.0' }, 'openpencil-mcp-http'))
+      await problem('acp', installed({ '@pairdraw/mcp': '0.12.0' }, 'pairdraw-mcp-http'))
     ).toBe('mcp-outdated')
   })
 

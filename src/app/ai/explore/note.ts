@@ -1,6 +1,6 @@
 import dedent from 'dedent'
 
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import type { ExploreNote, ReferencedNode } from '@/app/ai/chat/context'
 import { referenceLink } from '@/app/ai/chat/references/link'

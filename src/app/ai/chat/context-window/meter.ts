@@ -1,4 +1,4 @@
-import { locale } from '@open-pencil/vue/i18n'
+import { locale } from '@pairdraw/vue/i18n'
 
 import type { ContextUsage } from './usage'
 

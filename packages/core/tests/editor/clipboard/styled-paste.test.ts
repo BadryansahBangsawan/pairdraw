@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import type { DesignDocument } from '@open-pencil/dom-css'
-import { getAxisAlignedBoundsInParent } from '@open-pencil/scene-graph/coordinate'
+import { createEditor } from '@pairdraw/core'
+import type { DesignDocument } from '@pairdraw/dom-css'
+import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
 
 const CARD: DesignDocument = {
   type: 'document',

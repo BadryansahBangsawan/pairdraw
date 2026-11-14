@@ -16,8 +16,8 @@ test('autosave triggers after scene changes with a file handle', async () => {
       createWritable: async () => mockWritable
     } as FileSystemFileHandle
 
-    window.openPencil ??= {}
-    window.openPencil.test = { writeCount: () => writes, mockHandle }
+    window.pairdraw ??= {}
+    window.pairdraw.test = { writeCount: () => writes, mockHandle }
 
     return writes
   })
@@ -52,8 +52,8 @@ test('autosave triggers after scene changes with a file handle', async () => {
 
   // Check that the scene version changed
   const versionAfterDraw = await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return store.state.sceneVersion
   })
   expect(versionAfterDraw).toBeGreaterThan(0)

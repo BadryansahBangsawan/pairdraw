@@ -4,7 +4,7 @@ import { useEventListener, whenever } from '@vueuse/core'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { detectAgentsOnFirstRun } from '@/app/ai/models/settings/onboarding/dialog'
 import { exposeAutomationTestRequests } from '@/app/automation/bridge/test-hooks'

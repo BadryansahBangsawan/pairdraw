@@ -1,4 +1,4 @@
-import type { ACPAgentDef } from '@open-pencil/core/constants'
+import type { ACPAgentDef } from '@pairdraw/core/constants'
 
 import type { AgentAuthCheck } from '@/app/ai/agents/acp/auth/session'
 import type { AgentAuthStatus } from '@/app/ai/agents/acp/auth/status'
@@ -20,7 +20,7 @@ export interface AgentSpawnOptions {
   onExit?: () => void
 }
 
-/** What a host may install: an agent's ACP adapter or one of OpenPencil's companions. */
+/** What a host may install: an agent's ACP adapter or one of Pairdraw's companions. */
 type AgentInstallTarget =
   | { kind: 'adapter'; agent: ACPAgentDef }
   | { kind: 'companion'; companion: 'mcp' | 'harness' }
@@ -53,13 +53,13 @@ interface AgentSignInRequest {
  * its own way to find, install, sign in to, check, and start them.
  */
 export interface AgentHost {
-  /** Looks up agents, OpenPencil's companions, and package managers on the agents' computer. */
+  /** Looks up agents, Pairdraw's companions, and package managers on the agents' computer. */
   detect(): Promise<AgentLookup>
   /** Installs an adapter or companion globally; rejects when it did not finish. */
   install(target: AgentInstallTarget, options: AgentInstallOptions): Promise<void>
   /** Starts the agent's own sign-in through the method it advertised. */
   signIn(agent: ACPAgentDef, request: AgentSignInRequest): Promise<AgentSignIn>
-  /** Starts the agent, reads its login, and checks that a session reaches OpenPencil's tools. */
+  /** Starts the agent, reads its login, and checks that a session reaches Pairdraw's tools. */
   check(agent: ACPAgentDef): Promise<AgentAuthCheck>
   /** Starts the agent and returns its stdio for an ACP connection. */
   spawn(agent: ACPAgentDef, options?: AgentSpawnOptions): Promise<AgentStreams>

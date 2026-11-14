@@ -7,9 +7,9 @@ import {
   resolveEditorProfile,
   type EditorProfileInputs,
   type EditorState
-} from '@open-pencil/core'
-import type { ViewportTransform } from '@open-pencil/core/geometry'
-import { tokenStylesheet } from '@open-pencil/dom-css/export'
+} from '@pairdraw/core'
+import type { ViewportTransform } from '@pairdraw/core/geometry'
+import { tokenStylesheet } from '@pairdraw/dom-css/export'
 
 import { useEditor } from '#vue/editor/context'
 

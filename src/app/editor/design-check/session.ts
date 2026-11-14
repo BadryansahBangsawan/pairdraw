@@ -1,9 +1,9 @@
 import { useTimeoutFn } from '@vueuse/core'
 import { computed, effectScope, ref, shallowRef, watch } from 'vue'
 
-import type { Editor } from '@open-pencil/core'
-import { isFigPagePending } from '@open-pencil/core/io/formats/fig'
-import { createLinter, type LintConfig, type LintFixRequest } from '@open-pencil/core/lint'
+import type { Editor } from '@pairdraw/core'
+import { isFigPagePending } from '@pairdraw/core/io/formats/fig'
+import { createLinter, type LintConfig, type LintFixRequest } from '@pairdraw/core/lint'
 
 import type { AppEditorState } from '@/app/editor/session/types'
 import { appPreferences, type DesignCheckPreset } from '@/app/settings/preferences/store'

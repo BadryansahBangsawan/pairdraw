@@ -1,5 +1,5 @@
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { numberedName } from '@open-pencil/scene-graph/naming'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { numberedName } from '@pairdraw/scene-graph/naming'
 
 import type { EditorContext } from '#core/editor/types'
 

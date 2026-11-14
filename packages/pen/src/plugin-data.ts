@@ -1,4 +1,4 @@
-import type { PluginDataEntry, SceneNode } from '@open-pencil/scene-graph'
+import type { PluginDataEntry, SceneNode } from '@pairdraw/scene-graph'
 
 import type { PenNode, PenOverride } from './schema'
 

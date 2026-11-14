@@ -1,4 +1,4 @@
-import { automationMessages } from '@open-pencil/vue/i18n'
+import { automationMessages } from '@pairdraw/vue/i18n'
 
 import { parseMCPEnvironment, type MCPEnvironment } from '../stdio/env'
 import type { SaveMCPConnectionOptions } from '../store'

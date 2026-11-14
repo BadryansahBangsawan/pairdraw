@@ -3,13 +3,13 @@ import { type RequestOptions, request as httpRequest } from 'node:http'
 import * as v from 'valibot'
 import { WebSocket } from 'ws'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { computeAllLayouts } from '@open-pencil/core/layout'
-import { executeRPCCommand } from '@open-pencil/core/rpc'
-import { ALL_TOOLS } from '@open-pencil/core/tools'
-import type { ToolDescriptor } from '@open-pencil/mcp/tools'
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import { randomHex } from '@open-pencil/scene-graph/random'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { computeAllLayouts } from '@pairdraw/core/layout'
+import { executeRPCCommand } from '@pairdraw/core/rpc'
+import { ALL_TOOLS } from '@pairdraw/core/tools'
+import type { ToolDescriptor } from '@pairdraw/mcp/tools'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { randomHex } from '@pairdraw/scene-graph/random'
 
 const toolDescriptorSchema = v.looseObject({ name: v.string(), enabled: v.boolean() })
 

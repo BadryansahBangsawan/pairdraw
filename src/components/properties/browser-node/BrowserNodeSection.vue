@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onDeactivated, onUnmounted, ref, watch } from 'vue'
 
-import { readBrowserNode } from '@open-pencil/scene-graph/browser-node'
-import { useBrowserMessages } from '@open-pencil/vue/i18n'
-import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
-import { useRetainedActivity } from '@open-pencil/vue/lifecycle/retention'
+import { readBrowserNode } from '@pairdraw/scene-graph/browser-node'
+import { useBrowserMessages } from '@pairdraw/vue/i18n'
+import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
+import { useRetainedActivity } from '@pairdraw/vue/lifecycle/retention'
 
 import { refreshBrowserNode } from '@/app/browser/node/command'
 import {

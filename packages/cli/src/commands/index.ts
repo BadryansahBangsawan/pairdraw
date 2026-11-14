@@ -26,7 +26,7 @@ import tree from './tree'
 import variables from './variables'
 
 /**
- * The top-level `openpencil` commands by name, as `--help` lists them. The docs site counts them
+ * The top-level `pairdraw` commands by name, as `--help` lists them. The docs site counts them
  * from here, so its numbers follow the CLI.
  */
 export const COMMANDS = {

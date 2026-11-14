@@ -1,10 +1,10 @@
 import { computed } from 'vue'
 
-import { settingsMessages } from '@open-pencil/vue/i18n'
+import { settingsMessages } from '@pairdraw/vue/i18n'
 import type {
   CommandPaletteGroup,
   CommandPaletteItem
-} from '@open-pencil/vue/primitives/CommandPalette'
+} from '@pairdraw/vue/primitives/CommandPalette'
 
 import { toast } from '@/app/shell/ui'
 import { activeTab } from '@/app/tabs'

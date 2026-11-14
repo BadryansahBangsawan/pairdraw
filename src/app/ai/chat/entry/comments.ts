@@ -1,6 +1,6 @@
-import type { CommentThread, SceneGraph } from '@open-pencil/scene-graph'
-import { byCreatedAt, liveReplies } from '@open-pencil/scene-graph/comments'
-import { aiMessages } from '@open-pencil/vue/i18n'
+import type { CommentThread, SceneGraph } from '@pairdraw/scene-graph'
+import { byCreatedAt, liveReplies } from '@pairdraw/scene-graph/comments'
+import { aiMessages } from '@pairdraw/vue/i18n'
 
 import { referenceLink } from '@/app/ai/chat/references/link'
 

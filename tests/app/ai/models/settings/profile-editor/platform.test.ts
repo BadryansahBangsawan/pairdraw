@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import { effectScope, ref } from 'vue'
 
-import type { AIProviderID } from '@open-pencil/core/constants'
+import type { AIProviderID } from '@pairdraw/core/constants'
 
 import { setModelConnectionAPIKey } from '@/app/ai/models/runtime'
 import {

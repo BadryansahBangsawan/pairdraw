@@ -42,10 +42,10 @@ test.describe.serial('large-document performance', () => {
       })
 
       const result = await page.evaluate((profile): TimingSummary => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         const renderer = store.renderer
-        if (!renderer) throw new Error('OpenPencil renderer not initialized')
+        if (!renderer) throw new Error('Pairdraw renderer not initialized')
         const graph = store.graph
         const iterations = 50
 

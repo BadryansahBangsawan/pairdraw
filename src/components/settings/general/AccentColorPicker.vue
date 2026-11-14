@@ -3,9 +3,9 @@ import { RadioGroupItem, RadioGroupRoot } from 'reka-ui'
 import { tv } from 'tailwind-variants'
 import { computed, shallowRef } from 'vue'
 
-import { colorToHex } from '@open-pencil/scene-graph/color'
-import type { Color } from '@open-pencil/scene-graph/primitives'
-import { useSettingsMessages } from '@open-pencil/vue/i18n'
+import { colorToHex } from '@pairdraw/scene-graph/color'
+import type { Color } from '@pairdraw/scene-graph/primitives'
+import { useSettingsMessages } from '@pairdraw/vue/i18n'
 
 import { accentPreference } from '@/app/shell/accent'
 import { ACCENT_PRESET_COLORS, accentBaseColor } from '@/app/shell/accent/palette'

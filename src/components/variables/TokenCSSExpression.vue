@@ -7,9 +7,9 @@ import {
   cssExpressionProblem,
   loadTokenValidator,
   tokenNumberToCSS
-} from '@open-pencil/dom-css/export'
-import type { TokenUnit } from '@open-pencil/scene-graph'
-import { useI18n } from '@open-pencil/vue/i18n'
+} from '@pairdraw/dom-css/export'
+import type { TokenUnit } from '@pairdraw/scene-graph'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { cssExpressionPreview } from '@/app/editor/tokens/css-expression'
 import type { CSSReferenceCandidate } from '@/app/editor/tokens/model'

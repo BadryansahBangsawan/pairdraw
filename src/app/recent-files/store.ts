@@ -14,7 +14,7 @@ import { recentFilesLimit } from './preferences'
 import { recentDocumentSchema } from './schema'
 import { clearRecentFileThumbnails } from './thumbnails'
 
-const RECENT_DOCUMENTS_STORAGE_KEY = 'open-pencil:recent-documents'
+const RECENT_DOCUMENTS_STORAGE_KEY = 'pairdraw:recent-documents'
 
 export type RecentDocument = v.InferOutput<typeof recentDocumentSchema>
 export type RecentLocalDocument = Extract<RecentDocument, { kind: 'local' }>

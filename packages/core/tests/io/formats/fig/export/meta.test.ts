@@ -5,11 +5,11 @@ import { omit } from 'es-toolkit'
 import { unzipSync } from 'fflate'
 import * as v from 'valibot'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { parseFigBuffer, readFigArchiveMeta } from '@open-pencil/fig'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { imageSize } from '@open-pencil/scene-graph/images'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { parseFigBuffer, readFigArchiveMeta } from '@pairdraw/fig'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { imageSize } from '@pairdraw/scene-graph/images'
 
 setDefaultTimeout(60_000)
 

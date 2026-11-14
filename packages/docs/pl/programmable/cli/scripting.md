@@ -5,12 +5,12 @@ description: Wykonywanie JavaScript przez API zgodne z Figma Plugin API do wyszu
 
 # Skrypty
 
-`openpencil eval` wykonuje JavaScript dla dokumentu Pairdraw i udostępnia globalny obiekt `figma` zgodny z Figma Plugin API. Polecenie nadaje się do zmian zbiorczych, sprawdzania dokumentów, przygotowywania danych testowych i automatyzacji bez interfejsu edytora.
+`pairdraw eval` wykonuje JavaScript dla dokumentu Pairdraw i udostępnia globalny obiekt `figma` zgodny z Figma Plugin API. Polecenie nadaje się do zmian zbiorczych, sprawdzania dokumentów, przygotowywania danych testowych i automatyzacji bez interfejsu edytora.
 
 ## Pierwsze wywołanie
 
 ```sh
-openpencil eval design.fig -c "return figma.currentPage.children.length"
+pairdraw eval design.fig -c "return figma.currentPage.children.length"
 ```
 
 Opcja `-c` przyjmuje JavaScript. Jeśli kod nie zaczyna się od `return`, Pairdraw umieszcza go w funkcji asynchronicznej i zwraca jej wynik, jeśli istnieje.
@@ -18,7 +18,7 @@ Opcja `-c` przyjmuje JavaScript. Jeśli kod nie zaczyna się od `return`, Pairdr
 ## Wyszukiwanie obiektów
 
 ```sh
-openpencil eval design.fig -c "
+pairdraw eval design.fig -c "
   return figma.currentPage
     .findAll((node) => node.type === 'FRAME' && node.name.includes('Button'))
     .map((button) => ({ id: button.id, name: button.name }))
@@ -32,7 +32,7 @@ openpencil eval design.fig -c "
 ## Skrypt ze standardowego wejścia
 
 ```sh
-cat transform.js | openpencil eval design.fig --stdin --write
+cat transform.js | pairdraw eval design.fig --stdin --write
 ```
 
 ## Otwarta aplikacja
@@ -84,7 +84,7 @@ API jest celowo zbliżone do Figma Plugin API, ale pracuje z SceneGraph i format
 
 ### Komponenty i zmienne
 
-Nazwy metod, takie jak `component.createInstance()`, `figma.variables.getLocalVariables()` i `node.setBoundVariable()`, pozostają zgodne z Figma Plugin API. Tak jak panel warstwy zmienne wiąże się z polami przez `openpencil.bindVariable(node, field, variable)` i `openpencil.unbindVariable(node, field)`. Kierunek automatycznego układu i tekstu (`AUTO`, `LTR`, `RTL`) ustawiają `openpencil.setLayoutDirection(node, direction)` i `openpencil.setTextDirection(node, direction)`, kolor w OkHCL `openpencil.setFillOkHCL(node, color)` i `setStrokeOkHCL`, a `openpencil.exposeInstanceSwap` i `openpencil.getFontStatus()` udostępniają zamianę instancji i stan czcionek.
+Nazwy metod, takie jak `component.createInstance()`, `figma.variables.getLocalVariables()` i `node.setBoundVariable()`, pozostają zgodne z Figma Plugin API. Tak jak panel warstwy zmienne wiąże się z polami przez `pairdraw.bindVariable(node, field, variable)` i `pairdraw.unbindVariable(node, field)`. Kierunek automatycznego układu i tekstu (`AUTO`, `LTR`, `RTL`) ustawiają `pairdraw.setLayoutDirection(node, direction)` i `pairdraw.setTextDirection(node, direction)`, kolor w OkHCL `pairdraw.setFillOkHCL(node, color)` i `setStrokeOkHCL`, a `pairdraw.exposeInstanceSwap` i `pairdraw.getFontStatus()` udostępniają zamianę instancji i stan czcionek.
 
 ### Właściwości
 

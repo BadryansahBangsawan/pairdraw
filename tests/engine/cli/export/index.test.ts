@@ -5,9 +5,9 @@ import { join } from 'node:path'
 
 import { unzipSync } from 'fflate'
 
-import { BUILTIN_IO_FORMATS, IORegistry } from '@open-pencil/core/io'
+import { BUILTIN_IO_FORMATS, IORegistry } from '@pairdraw/core/io'
 
-import { runOpenPencilCLI } from '#tests/helpers/cli'
+import { runPairdrawCLI } from '#tests/helpers/cli'
 import { createRect, firstPageId, makeSceneGraph } from '#tests/helpers/scene'
 
 setDefaultTimeout(30_000)
@@ -15,7 +15,7 @@ setDefaultTimeout(30_000)
 const io = new IORegistry(BUILTIN_IO_FORMATS)
 
 async function createFigFixture() {
-  const dir = await mkdtemp(join(tmpdir(), 'open-pencil-export-cli-'))
+  const dir = await mkdtemp(join(tmpdir(), 'pairdraw-export-cli-'))
   const figPath = join(dir, 'card.fig')
   const graph = makeSceneGraph('Export Page')
   const firstFrame = graph.createNode('FRAME', firstPageId(graph), {
@@ -61,7 +61,7 @@ test('FIG export preserves the whole document by default', async () => {
   const { dir, figPath } = await createFigFixture()
   const output = join(dir, 'whole.fig')
 
-  const { stdout, stderr, exitCode } = await runOpenPencilCLI([
+  const { stdout, stderr, exitCode } = await runPairdrawCLI([
     'export',
     figPath,
     '--format',
@@ -86,7 +86,7 @@ test('PPTX export includes slides from every page by default', async () => {
   const { dir, figPath } = await createFigFixture()
   const output = join(dir, 'whole.pptx')
 
-  const { stdout, stderr, exitCode } = await runOpenPencilCLI([
+  const { stdout, stderr, exitCode } = await runPairdrawCLI([
     'export',
     figPath,
     '--format',
@@ -109,7 +109,7 @@ test('FIG export requires an explicit page for a partial archive', async () => {
   const { dir, figPath } = await createFigFixture()
   const output = join(dir, 'page.fig')
 
-  const { stderr, exitCode } = await runOpenPencilCLI([
+  const { stderr, exitCode } = await runPairdrawCLI([
     'export',
     figPath,
     '--format',
@@ -134,7 +134,7 @@ test('export CLI writes HTML with inline styles by default', async () => {
   const { dir, figPath } = await createFigFixture()
   const output = join(dir, 'card.html')
 
-  const { stderr, exitCode } = await runOpenPencilCLI([
+  const { stderr, exitCode } = await runPairdrawCLI([
     'export',
     figPath,
     '--format',
@@ -149,7 +149,7 @@ test('export CLI writes HTML with inline styles by default', async () => {
   const html = await Bun.file(output).text()
   // Layer names are written by default, layer IDs only when asked for.
   expect(html).toContain('data-name="Export Card"')
-  expect(html).not.toContain('data-open-pencil-node-id')
+  expect(html).not.toContain('data-pairdraw-node-id')
   expect(html).toContain('style=')
   expect(html).toContain('display: flex')
 })
@@ -158,7 +158,7 @@ test('export CLI writes layer IDs and leaves names out when asked', async () => 
   const { dir, figPath } = await createFigFixture()
   const output = join(dir, 'card-ids.html')
 
-  const { stderr, exitCode } = await runOpenPencilCLI([
+  const { stderr, exitCode } = await runPairdrawCLI([
     'export',
     figPath,
     '--format',
@@ -173,7 +173,7 @@ test('export CLI writes layer IDs and leaves names out when asked', async () => 
   expect(exitCode).toBe(0)
 
   const html = await Bun.file(output).text()
-  expect(html).toContain('data-open-pencil-node-id')
+  expect(html).toContain('data-pairdraw-node-id')
   expect(html).not.toContain('data-name=')
 })
 
@@ -181,7 +181,7 @@ test('export CLI can write HTML styles as Tailwind classes', async () => {
   const { dir, figPath } = await createFigFixture()
   const output = join(dir, 'card-tailwind.html')
 
-  const { stderr, exitCode } = await runOpenPencilCLI([
+  const { stderr, exitCode } = await runPairdrawCLI([
     'export',
     figPath,
     '--format',
@@ -206,7 +206,7 @@ test('export CLI writes Tailwind JSX for a page', async () => {
   const { dir, figPath } = await createFigFixture()
   const output = join(dir, 'card.jsx')
 
-  const { stderr, exitCode } = await runOpenPencilCLI([
+  const { stderr, exitCode } = await runPairdrawCLI([
     'export',
     figPath,
     '--format',
@@ -231,7 +231,7 @@ test('export CLI can write standalone HTML', async () => {
   const { dir, figPath } = await createFigFixture()
   const output = join(dir, 'card-standalone.html')
 
-  const { stderr, exitCode } = await runOpenPencilCLI([
+  const { stderr, exitCode } = await runPairdrawCLI([
     'export',
     figPath,
     '--format',
@@ -247,7 +247,7 @@ test('export CLI can write standalone HTML', async () => {
 
   const html = await Bun.file(output).text()
   expect(html).toContain('<!doctype html>')
-  expect(html).toContain('data-open-pencil-html="standalone"')
+  expect(html).toContain('data-pairdraw-html="standalone"')
   expect(html).toContain('position:relative')
   expect(html).toContain('position: absolute')
   expect(html).not.toContain('@tailwindcss/browser@4')
@@ -257,7 +257,7 @@ test('export CLI precompiles Tailwind CSS for standalone Tailwind HTML', async (
   const { dir, figPath } = await createFigFixture()
   const output = join(dir, 'card-standalone-tailwind.html')
 
-  const { stderr, exitCode } = await runOpenPencilCLI([
+  const { stderr, exitCode } = await runPairdrawCLI([
     'export',
     figPath,
     '--format',
@@ -285,7 +285,7 @@ test('export CLI can write external standalone HTML assets', async () => {
   const { dir, figPath } = await createFigFixture()
   const output = join(dir, 'card-external.html')
 
-  const { stderr, exitCode } = await runOpenPencilCLI([
+  const { stderr, exitCode } = await runPairdrawCLI([
     'export',
     figPath,
     '--format',
@@ -304,9 +304,9 @@ test('export CLI can write external standalone HTML assets', async () => {
   expect(exitCode).toBe(0)
 
   const html = await Bun.file(output).text()
-  const cssPath = join(dir, 'card-external.assets', 'openpencil.css')
+  const cssPath = join(dir, 'card-external.assets', 'pairdraw.css')
   const css = await Bun.file(cssPath).text()
-  expect(html).toContain('<link rel="stylesheet" href="card-external.assets/openpencil.css">')
+  expect(html).toContain('<link rel="stylesheet" href="card-external.assets/pairdraw.css">')
   expect(html).not.toContain('<style>')
   expect(css).toContain('.flex')
   expect(css).toContain('.op-stage')

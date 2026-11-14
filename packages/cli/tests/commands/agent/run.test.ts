@@ -139,7 +139,7 @@ describe('headless agent CLI', () => {
   let provider: ProviderState | undefined
 
   beforeAll(async () => {
-    dir = await mkdtemp(join(tmpdir(), 'open-pencil-agent-'))
+    dir = await mkdtemp(join(tmpdir(), 'pairdraw-agent-'))
   })
 
   afterAll(() => provider?.stop())
@@ -251,7 +251,7 @@ describe('headless agent CLI', () => {
       'mock'
     ])
     expect(missingKey.exitCode).toBe(1)
-    expect(missingKey.stderr).toContain('OPENPENCIL_API_KEY')
+    expect(missingKey.stderr).toContain('PAIRDRAW_API_KEY')
 
     const missingURL = await cli([
       'agent',

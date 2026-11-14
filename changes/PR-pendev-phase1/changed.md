@@ -1,5 +1,5 @@
-- Desktop builds check for updates only when their release configures a Pairdraw update feed; other builds say updates aren't set up instead of offering OpenPencil releases.
-- Release downloads are named Pairdraw_* instead of OpenPencil_*.
+- Desktop builds check for updates only when their release configures a Pairdraw update feed; other builds say updates aren't set up instead of offering upstream releases.
+- Release downloads are named Pairdraw_*.
 - The sticky note tool shows in the design toolbar by default, without a key, so N still zooms to the next frame.
 - ⇧⌘K (Ctrl+Shift+K) now places an image, as in Figma; Create Component Set no longer has a shortcut and is in the context menu.
 - The pixel grid stays shown or hidden across documents and sessions, and Settings → Editor has a Show pixel grid switch.

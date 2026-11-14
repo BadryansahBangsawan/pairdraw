@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 
-import { createEditor, type Editor } from '@open-pencil/core'
-import type { HyperlinkTarget } from '@open-pencil/scene-graph'
+import { createEditor, type Editor } from '@pairdraw/core'
+import type { HyperlinkTarget } from '@pairdraw/scene-graph'
 
 import {
   applyTextLink,

@@ -96,7 +96,7 @@ const SUMMARY = `
     themeModes: theme.modes.map((mode) => mode.name),
     theme: values(theme),
     size: values(size),
-    buttonBehaviour: openpencil.getBehaviour(button)?.kind ?? null,
+    buttonBehaviour: pairdraw.getBehaviour(button)?.kind ?? null,
     buttonVariants: button.children.map((variant) => variant.name),
     cardSlots: card.children.filter((node) => node.type === 'SLOT').map((node) => node.name),
     cardHeight: card.height,
@@ -119,7 +119,7 @@ async function summarize(file: string) {
 }
 
 async function buildFromScript() {
-  const dir = await mkdtemp(join(tmpdir(), 'open-pencil-design-system-'))
+  const dir = await mkdtemp(join(tmpdir(), 'pairdraw-design-system-'))
   const empty = join(dir, 'empty.pen')
   const output = join(dir, 'design-system.fig')
   await Bun.write(empty, JSON.stringify({ children: [] }))

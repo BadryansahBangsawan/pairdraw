@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { parsePenFile, type PenNode } from '@open-pencil/pen'
+import { parsePenFile, type PenNode } from '@pairdraw/pen'
 
 import { getNodeOrThrow } from './helpers/assert'
 import { parseDocument } from './helpers/document'

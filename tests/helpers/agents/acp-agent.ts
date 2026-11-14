@@ -1,7 +1,7 @@
 /**
  * A stand-in ACP agent for tests that run one through the companion. It answers `initialize`,
  * opens a session, connects to the HTTP MCP servers the session names the way a real agent
- * does (so the app sees it reach OpenPencil's tools), and replies to each prompt by streaming
+ * does (so the app sees it reach Pairdraw's tools), and replies to each prompt by streaming
  * the prompt's last line back. The first argument names it, as an adapter names its package.
  * Like Codex and Claude's adapters, it advertises a model and reasoning effort as session config
  * options and a session mode; once any differs from its default, each reply names them.

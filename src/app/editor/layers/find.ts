@@ -1,4 +1,4 @@
-import type { SceneNode } from '@open-pencil/scene-graph'
+import type { SceneNode } from '@pairdraw/scene-graph'
 
 import type { EditorStore } from '@/app/editor/active-store'
 

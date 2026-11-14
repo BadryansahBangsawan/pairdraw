@@ -28,10 +28,10 @@ export function resolveDiagnosticsRetention(value: unknown): DiagnosticsRetentio
   return clamp(whole, DIAGNOSTICS_RETENTION_MIN, DIAGNOSTICS_RETENTION_MAX)
 }
 
-const diagnosticsEnabled = useLocalStorage('open-pencil:diagnostics-enabled', true)
-const usageEnabled = useLocalStorage('open-pencil:usage-enabled', true)
+const diagnosticsEnabled = useLocalStorage('pairdraw:diagnostics-enabled', true)
+const usageEnabled = useLocalStorage('pairdraw:usage-enabled', true)
 const diagnosticsRetention = useLocalStorage<DiagnosticsRetention>(
-  'open-pencil:diagnostics-retention',
+  'pairdraw:diagnostics-retention',
   500,
   { serializer: { read: (value) => resolveDiagnosticsRetention(value), write: String } }
 )

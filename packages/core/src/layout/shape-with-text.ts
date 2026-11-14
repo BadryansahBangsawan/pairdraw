@@ -1,13 +1,13 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   SHAPE_WITH_TEXT_LABEL_LAYOUT,
   shapeWithTextFrameFields,
   shapeWithTextLabel
-} from '@open-pencil/scene-graph/generated'
+} from '@pairdraw/scene-graph/generated'
 import {
   fitShapeWithTextHeight,
   shapeWithTextLabelBox
-} from '@open-pencil/scene-graph/shape-with-text'
+} from '@pairdraw/scene-graph/shape-with-text'
 
 import { measureTextForLayout } from './text-measurement'
 

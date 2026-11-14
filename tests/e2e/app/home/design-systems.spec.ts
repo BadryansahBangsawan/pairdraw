@@ -5,8 +5,8 @@ import { CanvasHelper } from '#tests/helpers/canvas'
 
 async function publishLibrary(page: Page, id: string, name: string) {
   await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const pageNode = store.graph.getNode(store.state.currentPageId)
     if (!pageNode) throw new Error('Current page missing')
     store.graph.createNode('COMPONENT', pageNode.id, {
@@ -57,7 +57,7 @@ test('a design system on Home starts a new design with its library turned on', a
   await expect(home).toBeHidden()
   await expect(page.getByTestId('tabbar-tab')).toHaveCount(2)
   const enabled = await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     return store?.graph.enabledLibraries.get('home-design-system')?.enabled ?? false
   })
   expect(enabled).toBe(true)

@@ -1,5 +1,5 @@
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { guidToString } from '@open-pencil/kiwi/fig/guid'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { guidToString } from '@pairdraw/kiwi/fig/guid'
 
 /** Exact versioned lookup; explicit unversioned records win, otherwise ambiguous keys reject. */
 export function createResourceResolver(resources: readonly NodeChange[]) {

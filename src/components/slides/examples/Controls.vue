@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import type { PresentationScale } from '@open-pencil/core'
+import type { PresentationScale } from '@pairdraw/core'
 
 import SlidesPresentationControls from '../SlidesPresentationControls.vue'
 

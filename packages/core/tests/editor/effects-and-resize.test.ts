@@ -1,7 +1,7 @@
 import { describe, test, expect } from "bun:test";
 
-import { SceneGraph, type ShadowEffect } from "@open-pencil/scene-graph";
-import type { Rect } from "@open-pencil/scene-graph/primitives";
+import { SceneGraph, type ShadowEffect } from "@pairdraw/scene-graph";
+import type { Rect } from "@pairdraw/scene-graph/primitives";
 
 import { getNodeOrThrow, shadowEffectAt } from "../helpers/assert";
 

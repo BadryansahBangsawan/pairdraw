@@ -5,17 +5,17 @@ import {
 } from '#fig/instance-overrides/fields'
 import { compact } from 'es-toolkit'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { isInShownReplacedLayer, showsReplacedLayer } from '@open-pencil/scene-graph/instances'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { isInShownReplacedLayer, showsReplacedLayer } from '@pairdraw/scene-graph/instances'
 import {
   forEachInstanceOverride,
   overriddenBindingField,
   overriddenVariableModeCollection
-} from '@open-pencil/scene-graph/instances/overrides'
-import type { GUID, Vector } from '@open-pencil/scene-graph/primitives'
-import { scaleNodeChanges } from '@open-pencil/scene-graph/scaling'
-import { ownsSlotContent } from '@open-pencil/scene-graph/slots'
-import { paintBindingTarget } from '@open-pencil/scene-graph/variables'
+} from '@pairdraw/scene-graph/instances/overrides'
+import type { GUID, Vector } from '@pairdraw/scene-graph/primitives'
+import { scaleNodeChanges } from '@pairdraw/scene-graph/scaling'
+import { ownsSlotContent } from '@pairdraw/scene-graph/slots'
+import { paintBindingTarget } from '@pairdraw/scene-graph/variables'
 
 import { instanceExportAddress } from '../instance/geometry'
 import { mergeVariableConsumptionMaps, overrideVariableBindingEntry } from '../variable/bindings'

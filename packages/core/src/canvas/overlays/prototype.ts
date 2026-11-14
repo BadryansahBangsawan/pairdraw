@@ -1,8 +1,8 @@
 import type { Canvas } from 'canvaskit-wasm'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import { createSceneGeometry, type RotationPreview } from '#core/geometry'

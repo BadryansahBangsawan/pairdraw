@@ -1,5 +1,5 @@
-import type { Editor } from '@open-pencil/core'
-import { HANDLE_HIT_RADIUS, LAYER_HIT_PAD } from '@open-pencil/core/constants'
+import type { Editor } from '@pairdraw/core'
+import { HANDLE_HIT_RADIUS, LAYER_HIT_PAD } from '@pairdraw/core/constants'
 import {
   createSceneGeometry,
   isLineLike,
@@ -12,9 +12,9 @@ import {
   type SceneGeometry,
   type RotationPreview,
   type TransformZone
-} from '@open-pencil/core/geometry'
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/core/geometry'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import moveCursorSVG from '#vue/shared/assets/cursors/move.svg?raw'
 import resizeCursorSVG from '#vue/shared/assets/cursors/resize.svg?raw'

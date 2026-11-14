@@ -2,14 +2,14 @@ import { describe, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { createEditor } from '@open-pencil/core'
-import type { SceneNode } from '@open-pencil/scene-graph'
+import { createEditor } from '@pairdraw/core'
+import type { SceneNode } from '@pairdraw/scene-graph'
 import {
   boundEndpoint,
   buildConnectorSublayers,
   connectorSublayers,
   layoutConnector
-} from '@open-pencil/scene-graph/connectors'
+} from '@pairdraw/scene-graph/connectors'
 
 type Editor = ReturnType<typeof createEditor>
 

@@ -1,6 +1,6 @@
-import type { DocumentChange, PageSnapshot } from '@open-pencil/core'
-import type { StepBudget } from '@open-pencil/core/tools'
-import type { UndoEntry } from '@open-pencil/scene-graph/undo'
+import type { DocumentChange, PageSnapshot } from '@pairdraw/core'
+import type { StepBudget } from '@pairdraw/core/tools'
+import type { UndoEntry } from '@pairdraw/scene-graph/undo'
 
 import { describeUndoneCalls, type CallRef } from '@/app/ai/chat/context'
 import type { PreviewFocus } from '@/app/ai/preview/canvas'

@@ -23,7 +23,7 @@ const foldersSchema = v.pipe(
  * session in its own workspace (`packages/mcp/src/agents/filter.ts`).
  */
 const folders = useLocalStorage<Record<string, string>>(
-  'open-pencil:ai:chat-project-folders',
+  'pairdraw:ai:chat-project-folders',
   {},
   {
     serializer: {

@@ -1,15 +1,10 @@
 import { isEqual } from 'es-toolkit/predicate'
 
-import type {
-  CharacterStyleOverride,
-  SceneGraph,
-  SceneNode,
-  StyleRun
-} from '@open-pencil/scene-graph'
-import { localTransformFromWorld } from '@open-pencil/scene-graph/coordinate'
-import { faceLoadKey } from '@open-pencil/scene-graph/font-style'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import { pixelLength } from '@open-pencil/scene-graph/text'
+import type { CharacterStyleOverride, SceneGraph, SceneNode, StyleRun } from '@pairdraw/scene-graph'
+import { localTransformFromWorld } from '@pairdraw/scene-graph/coordinate'
+import { faceLoadKey } from '@pairdraw/scene-graph/font-style'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import { pixelLength } from '@pairdraw/scene-graph/text'
 
 import type { SVGElementLayer } from '#core/icons/types'
 import { measureTextForLayout } from '#core/layout/text-measurement'

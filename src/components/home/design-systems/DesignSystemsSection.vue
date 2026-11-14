@@ -2,9 +2,9 @@
 import { tv } from 'tailwind-variants'
 import { computed, onMounted } from 'vue'
 
-import type { LibrarySummary } from '@open-pencil/core/library'
-import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { LibrarySummary } from '@pairdraw/core/library'
+import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import {
   matchingDesignSystems,

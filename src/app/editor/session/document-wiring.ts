@@ -2,7 +2,7 @@
  * The document-level wiring an editor store installs once: the color space mirrored into app
  * state, and script nodes run again when they change. Both are taken down with the store.
  */
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 
 import { installScriptLiveRuns } from '@/app/code/script/live'
 import type { AppEditorState } from '@/app/editor/session/types'

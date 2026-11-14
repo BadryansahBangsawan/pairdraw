@@ -7,7 +7,7 @@
 
 import type { Canvas, Image, Shader, Surface } from 'canvaskit-wasm'
 
-import type { SceneGraph, SceneNode, ShaderEffect } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode, ShaderEffect } from '@pairdraw/scene-graph'
 
 import { setPaintBlendMode } from '#core/canvas/blend'
 import type { SkiaRenderer } from '#core/canvas/renderer'

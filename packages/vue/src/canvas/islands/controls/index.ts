@@ -28,8 +28,8 @@ import {
 } from 'reka-ui'
 import { h, type Component, type VNode } from 'vue'
 
-import { groupOf, type ControlRole, type DesignElement } from '@open-pencil/dom-css/export'
-import { numberSettings } from '@open-pencil/scene-graph/behaviours'
+import { groupOf, type ControlRole, type DesignElement } from '@pairdraw/dom-css/export'
+import { numberSettings } from '@pairdraw/scene-graph/behaviours'
 
 import type { ElementOverride, IslandRenderContext } from '#vue/canvas/islands/render'
 

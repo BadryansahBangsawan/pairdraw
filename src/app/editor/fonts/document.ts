@@ -1,4 +1,4 @@
-import { registerDocumentFonts } from '@open-pencil/core/text'
+import { registerDocumentFonts } from '@pairdraw/core/text'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { notificationMessages } from '@/app/i18n/notifications'

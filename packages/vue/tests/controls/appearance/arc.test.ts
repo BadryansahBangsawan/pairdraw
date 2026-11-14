@@ -2,9 +2,9 @@ import { describe, expect, test } from 'bun:test'
 
 import { createApp, shallowReactive } from 'vue'
 
-import { createDefaultEditorState, createEditor } from '@open-pencil/core'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { MIXED } from '@open-pencil/vue/controls/node-props'
+import { createDefaultEditorState, createEditor } from '@pairdraw/core'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { MIXED } from '@pairdraw/vue/controls/node-props'
 
 import { useArc } from '#vue/controls/appearance/arc'
 import { EDITOR_KEY } from '#vue/editor/context'

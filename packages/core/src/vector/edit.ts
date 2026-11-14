@@ -3,9 +3,9 @@ import type {
   VectorRegion,
   VectorSegment,
   VectorVertex
-} from '@open-pencil/scene-graph'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
-import { cloneVectorNetwork } from '@open-pencil/scene-graph/vector-network'
+} from '@pairdraw/scene-graph'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
+import { cloneVectorNetwork } from '@pairdraw/scene-graph/vector-network'
 
 import { splitSegmentAt } from './bezier'
 

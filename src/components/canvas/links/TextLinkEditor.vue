@@ -2,8 +2,8 @@
 import { PopoverContent, PopoverPortal, PopoverRoot } from 'reka-ui'
 import { computed, watch } from 'vue'
 
-import { createSceneGeometry } from '@open-pencil/core/geometry'
-import { useEditorMessages } from '@open-pencil/vue/i18n'
+import { createSceneGeometry } from '@pairdraw/core/geometry'
+import { useEditorMessages } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import {

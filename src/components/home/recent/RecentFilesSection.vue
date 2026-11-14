@@ -2,8 +2,8 @@
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { canSaveDocumentCopy, recentCopySource } from '@/app/home/save-copy'
 import { useDocumentSelection } from '@/app/home/selection'

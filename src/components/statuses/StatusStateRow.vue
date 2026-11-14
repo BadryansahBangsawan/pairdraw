@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { colorToHex } from '@open-pencil/scene-graph/color'
-import { figmaDevStatusOf, type StatusState } from '@open-pencil/scene-graph/statuses'
-import { useStatusMessages } from '@open-pencil/vue/i18n'
+import { colorToHex } from '@pairdraw/scene-graph/color'
+import { figmaDevStatusOf, type StatusState } from '@pairdraw/scene-graph/statuses'
+import { useStatusMessages } from '@pairdraw/vue/i18n'
 
 import { STATUS_COLORS } from '@/app/editor/statuses/workflow'
 import StatusDot from '@/components/statuses/StatusDot.vue'

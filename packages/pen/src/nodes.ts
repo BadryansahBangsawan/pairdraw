@@ -5,10 +5,10 @@ import type {
   NodeType,
   SceneGraph,
   SceneNode
-} from '@open-pencil/scene-graph'
-import { CORNER_FIELDS } from '@open-pencil/scene-graph/fields'
-import { fillSizingFields } from '@open-pencil/scene-graph/layout'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph'
+import { CORNER_FIELDS } from '@pairdraw/scene-graph/fields'
+import { fillSizingFields } from '@pairdraw/scene-graph/layout'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { applyAnnotation, createAnnotation, isAnnotation } from './annotations'
 import { convertEffects } from './effects'

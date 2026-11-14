@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { until } from '@vueuse/core'
 
-import { ACP_AGENTS, type ACPAgentDef } from '@open-pencil/core/constants'
+import { ACP_AGENTS, type ACPAgentDef } from '@pairdraw/core/constants'
 
 import { createAgentAutoConnect } from '@/app/ai/agents/auto/session'
 

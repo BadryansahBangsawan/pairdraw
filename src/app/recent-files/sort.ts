@@ -10,7 +10,7 @@ export type RecentFilesSort = v.InferOutput<typeof recentFilesSortSchema>
 export const RECENT_FILES_SORTS = recentFilesSortSchema.options
 const DEFAULT_RECENT_FILES_SORT: RecentFilesSort = 'last-used'
 
-const RECENT_FILES_SORT_STORAGE_KEY = 'open-pencil:home-files-sort'
+const RECENT_FILES_SORT_STORAGE_KEY = 'pairdraw:home-files-sort'
 
 function readSort(raw: string): RecentFilesSort {
   const parsed = v.safeParse(recentFilesSortSchema, raw)

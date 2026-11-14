@@ -1,15 +1,15 @@
 import { zipSync, type Zippable } from 'fflate'
 import { extname } from 'pathe'
 
-import type { Editor, EditorState } from '@open-pencil/core'
+import type { Editor, EditorState } from '@pairdraw/core'
 import {
   findPageId,
   type ExportRequest,
   type IOFormatAdapter,
   type IORegistry
-} from '@open-pencil/core/io'
-import { type RasterExportFormat, renderNodesToImage } from '@open-pencil/core/io/formats/raster'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/io'
+import { type RasterExportFormat, renderNodesToImage } from '@pairdraw/core/io/formats/raster'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { htmlExportOptions } from '@/app/document/export/html'
 import type { ExportOptions } from '@/app/document/export/types'

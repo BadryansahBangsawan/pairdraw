@@ -14,15 +14,15 @@ async function openFresh(page: Page) {
 }
 
 function currentPageColor(page: Page) {
-  return page.evaluate(() => window.openPencil?.getStore?.()?.state.pageColor.r)
+  return page.evaluate(() => window.pairdraw?.getStore?.()?.state.pageColor.r)
 }
 
 test('a new document and its new pages take the dark page in the dark theme', async ({ page }) => {
   await openFresh(page)
   expect(await currentPageColor(page)).toBeCloseTo(DARK, 3)
-  const pageId = await page.evaluate(() => window.openPencil?.getStore?.()?.addPage())
+  const pageId = await page.evaluate(() => window.pairdraw?.getStore?.()?.addPage())
   await expect
-    .poll(() => page.evaluate(() => window.openPencil?.getStore?.()?.state.currentPageId))
+    .poll(() => page.evaluate(() => window.pairdraw?.getStore?.()?.state.currentPageId))
     .toBe(pageId)
   expect(await currentPageColor(page)).toBeCloseTo(DARK, 3)
 })

@@ -1,14 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { Fill } from '@open-pencil/scene-graph'
-import { copyFill } from '@open-pencil/scene-graph/copy'
+import type { Fill } from '@pairdraw/scene-graph'
+import { copyFill } from '@pairdraw/scene-graph/copy'
 import {
   defaultMeshGrid,
   defaultMeshPoints,
   isMeshFill,
   meshPointCount,
   resampleMeshPoints
-} from '@open-pencil/scene-graph/gradient'
+} from '@pairdraw/scene-graph/gradient'
 
 const RED = { r: 1, g: 0, b: 0, a: 1 }
 const WHITE = { r: 1, g: 1, b: 1, a: 1 }

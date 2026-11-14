@@ -4,8 +4,8 @@ import type {
   LayoutMode,
   LayoutSizing,
   SceneNode
-} from '@open-pencil/scene-graph'
-import { parseAutoLayoutDirection } from '@open-pencil/scene-graph/layout'
+} from '@pairdraw/scene-graph'
+import { parseAutoLayoutDirection } from '@pairdraw/scene-graph/layout'
 
 import type { PenNode, PenNumber } from './schema'
 import { bindIfVar, isVarRef, resolveNumber, type VarContext } from './variables'

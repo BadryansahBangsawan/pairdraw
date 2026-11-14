@@ -2,8 +2,8 @@ import { afterAll, describe, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { initCanvasKit } from '@open-pencil/core/io/formats/raster'
-import { SceneGraph, type Effect, type Fill } from '@open-pencil/scene-graph'
+import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
+import { SceneGraph, type Effect, type Fill } from '@pairdraw/scene-graph'
 
 import { SkiaRenderer } from '#core/canvas'
 

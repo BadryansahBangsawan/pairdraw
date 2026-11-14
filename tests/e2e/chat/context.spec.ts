@@ -15,7 +15,7 @@ test('the context meter shows how full the model’s context is, in tokens', asy
   page
 }) => {
   await page.evaluate(() => {
-    const setTransport = window.openPencil?.setChatTransport
+    const setTransport = window.pairdraw?.setChatTransport
     if (!setTransport) throw new Error('Transport override unavailable')
     setTransport(() => ({
       async sendMessages() {

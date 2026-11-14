@@ -1,7 +1,7 @@
 import { computed, type ComputedRef } from 'vue'
 
-import { slideMoveTarget } from '@open-pencil/core'
-import type { SceneNode } from '@open-pencil/scene-graph'
+import { slideMoveTarget } from '@pairdraw/core'
+import type { SceneNode } from '@pairdraw/scene-graph'
 
 import type { EditorStore } from '@/app/editor/active-store'
 

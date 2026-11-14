@@ -31,7 +31,7 @@
 - Agents can read and set the components suggested for a slot through get_components and create_slot, including preferred-only slots and child limits that can be cleared.
 - The insert_icon tool sets weight, fill, grade, and optical size for Material Symbols icons.
 - The set_image_fill tool can fill a layer with an image from a URL.
-- The MCP server serves the OpenPencil agent skill to clients that cannot install skills: a `read_skill` tool, Markdown resources at `openpencil://skills/open-pencil/`, a `design` prompt, and server instructions that tell agents to read the skill before designing and name only the tools Tool access and the shared scope leave on.
+- The MCP server serves the Pairdraw agent skill to clients that cannot install skills: a `read_skill` tool, Markdown resources at `pairdraw://skills/pairdraw/`, a `design` prompt, and server instructions that tell agents to read the skill before designing and name only the tools Tool access and the shared scope leave on.
 - The MCP server documentation covers setup for Codex, GitHub Copilot in VS Code, Antigravity, and Hermes Agent.
 - Up and Down in the chat composer bring back the prompts sent earlier in the conversation.
 - Chat messages can carry Markdown, CSS, code, and other text files, chosen with the attach button, pasted, or dropped on the chat.
@@ -60,12 +60,12 @@
 - Claude Code set up for Amazon Bedrock, Google Vertex AI, or Microsoft Foundry with its CLAUDE_CODE_USE_* switches shows as External config, and setup offers a sign-in only if Claude Code reports it is signed out.
 - Convert to vector works on any layer showing an image fill, including frames with content and ellipses.
 - AI chat and MCP agents can vectorize images with the `vectorize_image` tool, using the vectorize service and key set up in Settings → Image services.
-- `openpencil shell` opens a document once and runs editor tools on it line by line, with `save()`, `preview()`, and `exit()`. Leaving with `exit()`, Ctrl+C, or Ctrl+D asks again before discarding unsaved changes. It also reads a script of lines from stdin or drives the running app.
+- `pairdraw shell` opens a document once and runs editor tools on it line by line, with `save()`, `preview()`, and `exit()`. Leaving with `exit()`, Ctrl+C, or Ctrl+D asks again before discarding unsaved changes. It also reads a script of lines from stdin or drives the running app.
 - `--preview-output` on `shell`, `tool call`, and `eval` writes a PNG of the current page after each change, with its longest edge at most 1280 pixels.
-- `openpencil models` lists the AI providers, their models and default model, and the ACP agents, as text or JSON.
+- `pairdraw models` lists the AI providers, their models and default model, and the ACP agents, as text or JSON.
 - The shader fill picker offers a gallery of ready-made shaders, each built from several effects, that apply in one click or with the arrow keys and stay editable effect by effect.
 - The documentation has a design system tutorial that builds a themed Button and Card library with variables, variants, component properties, and slots, with a downloadable example file and the script that builds it.
-- The documentation explains how to show readable diffs of `.fig` files in Git with `openpencil diff files` as a diff driver, a textconv outline, or `git difftool`.
+- The documentation explains how to show readable diffs of `.fig` files in Git with `pairdraw diff files` as a diff driver, a textconv outline, or `git difftool`.
 - The Arrange menu has Remove Auto Layout (⇧⌥A), the Object menu has Convert to Frame, and the View menu has Layers Panel and Properties Panel switches and Keyboard Shortcuts.
 - The keyboard shortcut sheet lists the keys and pointer actions of vector edit mode.
 - The set_image_fill tool's STRETCH scale mode stretches the whole image to the layer, as the image fill panel's Stretch does.

@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-import type { ACPAgentDef, ACPAgentID } from '@open-pencil/core/constants'
+import type { ACPAgentDef, ACPAgentID } from '@pairdraw/core/constants'
 
 import type { AgentAuthCheck } from '@/app/ai/agents/acp/auth/session'
 import type { AgentAuthMethod, AgentAuthStatus } from '@/app/ai/agents/acp/auth/status'
@@ -21,7 +21,7 @@ export interface AgentAccount {
   signInURL: string | null
   /** The sign-in reads a code pasted from its page. */
   acceptsCode: boolean
-  /** Whether a session reached OpenPencil's tools; null until a signed-in check says. */
+  /** Whether a session reached Pairdraw's tools; null until a signed-in check says. */
   tools: AgentAuthCheck['tools']
   error: 'check' | 'sign-in' | null
 }

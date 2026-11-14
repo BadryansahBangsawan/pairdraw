@@ -79,7 +79,7 @@ test.describe('an install with a configured model', () => {
             origin: new URL(baseURL).origin,
             localStorage: [
               {
-                name: 'open-pencil:ai-model-settings',
+                name: 'pairdraw:ai-model-settings',
                 value: JSON.stringify(CONFIGURED_MODEL_SETTINGS)
               }
             ]

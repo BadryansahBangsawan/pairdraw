@@ -1,6 +1,6 @@
 import { Edge, type Node as YogaNode } from 'yoga-layout'
 
-import type { SceneNode, Stroke } from '@open-pencil/scene-graph'
+import type { SceneNode, Stroke } from '@pairdraw/scene-graph'
 
 /** Widths on each side of a layer, in Yoga's edge order: top, right, bottom, left. */
 type Sides = [number, number, number, number]

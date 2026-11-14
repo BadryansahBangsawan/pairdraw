@@ -2,7 +2,7 @@
 import type { UIMessage } from 'ai'
 import { computed, ref, watch } from 'vue'
 
-import { useChatContextMessages } from '@open-pencil/vue/i18n'
+import { useChatContextMessages } from '@pairdraw/vue/i18n'
 
 import { contextMeter, estimateTokens } from '@/app/ai/chat/context-window/meter'
 import { latestContextUsage } from '@/app/ai/chat/context-window/usage'

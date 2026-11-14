@@ -18,7 +18,7 @@ const exportInputs = {
     v.pipe(
       v.string(),
       v.description(
-        'Write exported data to this path instead of returning it (requires OPENPENCIL_MCP_ROOT)'
+        'Write exported data to this path instead of returning it (requires PAIRDRAW_MCP_ROOT)'
       )
     )
   )
@@ -243,7 +243,7 @@ const HTML_STYLES = { css: 'inline', tailwind: 'tailwind' } as const
 export const exportHTML = defineTool({
   name: 'export_html',
   description:
-    'Export nodes as HTML code. style "css" (default) writes plain CSS: style attributes in a fragment, a stylesheet in a standalone document; "tailwind" writes Tailwind utility classes. html "fragment" (default) returns markup to paste into a page; "standalone" returns a whole document. assets "inline" (default) embeds images as data URLs; "external", for a standalone document, returns its stylesheet, images, and web fonts as separate files, listed in assets. layer_names writes each layer name as data-name; layer_ids writes each layer ID as data-open-pencil-node-id.',
+    'Export nodes as HTML code. style "css" (default) writes plain CSS: style attributes in a fragment, a stylesheet in a standalone document; "tailwind" writes Tailwind utility classes. html "fragment" (default) returns markup to paste into a page; "standalone" returns a whole document. assets "inline" (default) embeds images as data URLs; "external", for a standalone document, returns its stylesheet, images, and web fonts as separate files, listed in assets. layer_names writes each layer name as data-name; layer_ids writes each layer ID as data-pairdraw-node-id.',
   execution: { kind: 'async', mutation: 'none' },
   exposure: { webmcp: false },
   // A standalone page with separate files downloads the web fonts it ships.
@@ -284,7 +284,7 @@ export const exportHTML = defineTool({
       v.pipe(
         v.boolean(),
         v.description(
-          'Write each layer ID as a data-open-pencil-node-id attribute, to map markup back to layers (default: false)'
+          'Write each layer ID as a data-pairdraw-node-id attribute, to map markup back to layers (default: false)'
         )
       ),
       false

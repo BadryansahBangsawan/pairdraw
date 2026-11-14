@@ -1,4 +1,4 @@
-import type { ComponentStyling } from '@open-pencil/dom-css/export'
+import type { ComponentStyling } from '@pairdraw/dom-css/export'
 
 export type CodeSource = 'design-jsx' | 'html-css' | 'vue' | 'react'
 

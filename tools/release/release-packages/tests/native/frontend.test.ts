@@ -12,7 +12,9 @@ import { minisignPublicKey, UPSTREAM_PUBLIC_KEY } from '../helpers/minisign.ts'
 
 const pubkey = minisignPublicKey()
 const updater = {
-  endpoints: ['https://github.com/pairdraw/pairdraw/releases/latest/download/latest.json'],
+  endpoints: [
+    'https://github.com/BadryansahBangsawan/pairdraw/releases/latest/download/latest.json'
+  ],
   pubkey
 }
 
@@ -40,7 +42,7 @@ test.each([
     await writeFile(
       join(root, 'package.json'),
       JSON.stringify({
-        name: 'open-pencil',
+        name: 'pairdraw',
         version: scenario === 'version' ? '0.14.0' : version
       })
     )
@@ -56,7 +58,7 @@ test.each([
     }
     const context = {
       identity,
-      repository: 'pairdraw/pairdraw',
+      repository: 'BadryansahBangsawan/pairdraw',
       version,
       paths: desktopReleasePaths(root)
     }

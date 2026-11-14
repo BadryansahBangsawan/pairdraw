@@ -26,8 +26,8 @@ mockIPC((cmd, args) => {
 })
 
 const [{ exportFigFile }, { SceneGraph }] = await Promise.all([
-  import('@open-pencil/core/io/formats/fig/export'),
-  import('@open-pencil/scene-graph')
+  import('@pairdraw/core/io/formats/fig/export'),
+  import('@pairdraw/scene-graph')
 ])
 const bytes = await exportFigFile(new SceneGraph())
 if (bytes.length !== 3 || bytes[0] !== 7 || bytes[1] !== 8 || bytes[2] !== 9) {

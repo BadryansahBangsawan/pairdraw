@@ -1,4 +1,4 @@
-import type { WebCitation } from '@open-pencil/scene-graph/plugin-data'
+import type { WebCitation } from '@pairdraw/scene-graph/plugin-data'
 
 import { referenceLink, type ChatReference } from '@/app/ai/chat/references/link'
 

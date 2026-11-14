@@ -3,15 +3,15 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { expectDefined } from '#core-tests/helpers/assert'
 import { guid } from '#core-tests/helpers/fig/guid'
 
-import { exportFigFile, parseFigFile, populateFigPage } from '@open-pencil/core/io/formats/fig'
-import { materializeDocument, parseFigBuffer } from '@open-pencil/fig'
-import { initCodec, type NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { hasInstanceOverride, recordInstanceOverride } from '@open-pencil/scene-graph/instances'
-import { OPEN_PENCIL_PLUGIN_ID } from '@open-pencil/scene-graph/plugin-data'
+import { exportFigFile, parseFigFile, populateFigPage } from '@pairdraw/core/io/formats/fig'
+import { materializeDocument, parseFigBuffer } from '@pairdraw/fig'
+import { initCodec, type NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { hasInstanceOverride, recordInstanceOverride } from '@pairdraw/scene-graph/instances'
+import { PAIRDRAW_PLUGIN_ID } from '@pairdraw/scene-graph/plugin-data'
 
 const AROUND_ENTRY = {
-  pluginID: OPEN_PENCIL_PLUGIN_ID,
+  pluginID: PAIRDRAW_PLUGIN_ID,
   key: 'primaryAxisAlign',
   value: 'SPACE_AROUND'
 }

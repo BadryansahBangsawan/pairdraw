@@ -1,6 +1,6 @@
 import { isEqual } from 'es-toolkit/predicate'
 
-import type { SceneGraph, VariableValue } from '@open-pencil/scene-graph'
+import type { SceneGraph, VariableValue } from '@pairdraw/scene-graph'
 
 import type { PlannedCollection, PlannedValue, TokenImportPlan } from './index'
 

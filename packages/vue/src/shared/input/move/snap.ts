@@ -1,7 +1,7 @@
-import type { Editor } from '@open-pencil/core'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { getAxisAlignedWorldBounds } from '@open-pencil/scene-graph/coordinate'
-import { computeSelectionBounds } from '@open-pencil/scene-graph/snap'
+import type { Editor } from '@pairdraw/core'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
+import { computeSelectionBounds } from '@pairdraw/scene-graph/snap'
 
 import { explicitSnapTargets } from '#vue/shared/input/explicit-snap-targets'
 import {

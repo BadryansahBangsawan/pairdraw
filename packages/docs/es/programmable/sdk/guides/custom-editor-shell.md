@@ -7,8 +7,8 @@ description: Crear una interfaz con provideEditor, CanvasRoot, Menús, Paneles y
 
 Una aplicación de Pairdraw basada en Vue suele tener tres capas:
 
-1. `@open-pencil/core` crea el Editor;
-2. `@open-pencil/vue` lo conecta con composables y componentes sin estilos de Vue;
+1. `@pairdraw/core` crea el Editor;
+2. `@pairdraw/vue` lo conecta con composables y componentes sin estilos de Vue;
 3. la aplicación define disposición, estilos y comportamiento específico del producto.
 
 ## Casos de uso
@@ -29,12 +29,12 @@ Una interfaz habitual:
 
 ```vue
 <script setup lang="ts">
-import { createEditor } from '@open-pencil/core'
-import { provideEditor } from '@open-pencil/vue'
-import { CanvasRoot, CanvasSurface } from '@open-pencil/vue/canvas'
-import { ToolbarRoot } from '@open-pencil/vue/primitives/Toolbar'
-import { PageListRoot } from '@open-pencil/vue/primitives/PageList'
-import { LayerTreeRoot } from '@open-pencil/vue/primitives/LayerTree'
+import { createEditor } from '@pairdraw/core'
+import { provideEditor } from '@pairdraw/vue'
+import { CanvasRoot, CanvasSurface } from '@pairdraw/vue/canvas'
+import { ToolbarRoot } from '@pairdraw/vue/primitives/Toolbar'
+import { PageListRoot } from '@pairdraw/vue/primitives/PageList'
+import { LayerTreeRoot } from '@pairdraw/vue/primitives/LayerTree'
 
 const editor = createEditor({ width: 1440, height: 900 })
 provideEditor(editor)

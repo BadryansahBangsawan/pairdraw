@@ -8,7 +8,7 @@
  * transferring one port. Requests on the port are `{ id, method, params }` and get exactly one
  * `{ id, ok: true, result }` or `{ id, ok: false, error }`; events are `{ event, data }`.
  */
-export const EMBED_PROTOCOL = 'openpencil-embed'
+export const EMBED_PROTOCOL = 'pairdraw-embed'
 export const EMBED_PROTOCOL_VERSION = 1
 
 /** Longest request ID the embed echoes back, so a host cannot make it copy large strings. */

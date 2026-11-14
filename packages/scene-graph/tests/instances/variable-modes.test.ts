@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { recordInstanceOverride } from '@open-pencil/scene-graph/instances'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 import {
   overriddenVariableModeCollection,
   variableModeOverrideField
-} from '@open-pencil/scene-graph/instances/overrides'
+} from '@pairdraw/scene-graph/instances/overrides'
 
 /** A component that sets a theme and a density mode, with a layer that sets a brand mode. */
 function componentWithModes() {

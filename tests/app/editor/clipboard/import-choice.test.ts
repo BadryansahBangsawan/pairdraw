@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { planClipboardImport, type ClipboardSnapshot } from '@open-pencil/core'
+import { planClipboardImport, type ClipboardSnapshot } from '@pairdraw/core'
 
 import { createEditorStore } from '@/app/editor/session/create'
 

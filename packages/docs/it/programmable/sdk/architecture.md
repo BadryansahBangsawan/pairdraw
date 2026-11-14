@@ -1,11 +1,11 @@
 ---
 title: Architettura dell'SDK
-description: Struttura del pacchetto, confini dell'API pubblica e principi di progettazione di @open-pencil/vue.
+description: Struttura del pacchetto, confini dell'API pubblica e principi di progettazione di @pairdraw/vue.
 ---
 
 # Architettura dell'SDK
 
-`@open-pencil/vue` collega `@open-pencil/core` a Vue.
+`@pairdraw/vue` collega `@pairdraw/core` a Vue.
 
 Il modello dell’editor rimane nel nucleo. Questo pacchetto aggiunge:
 
@@ -113,7 +113,7 @@ Passa allo spazio soltanto le proprietà necessarie oppure usa direttamente il c
 
 ## Regola generale
 
-Se del codice può essere riutilizzato in un altro editor basato su Pairdraw senza trascinare con sé lo stile dell'applicazione, probabilmente dovrebbe far parte di `@open-pencil/vue`.
+Se del codice può essere riutilizzato in un altro editor basato su Pairdraw senza trascinare con sé lo stile dell'applicazione, probabilmente dovrebbe far parte di `@pairdraw/vue`.
 
 ## Vedi anche
 

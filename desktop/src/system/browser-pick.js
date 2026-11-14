@@ -32,7 +32,7 @@
 
   return new Promise((resolve) => {
     const overlay = document.createElement('div')
-    overlay.setAttribute('data-openpencil-pick', '')
+    overlay.setAttribute('data-pairdraw-pick', '')
     overlay.style.cssText =
       'position:fixed;inset:0;z-index:2147483647;cursor:crosshair;background:transparent'
     const box = document.createElement('div')

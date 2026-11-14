@@ -1,9 +1,9 @@
 import * as v from 'valibot'
 
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import { getAxisAlignedBoundsInParent } from '@open-pencil/scene-graph/coordinate'
-import { computeBounds } from '@open-pencil/scene-graph/geometry'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
+import { computeBounds } from '@pairdraw/scene-graph/geometry'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 import { flushPendingLayout } from '#core/figma-api'
 import { findPageId } from '#core/io/subgraph'

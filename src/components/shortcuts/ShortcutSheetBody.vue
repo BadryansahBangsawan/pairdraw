@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants'
 import { computed, useTemplateRef } from 'vue'
 import IconSearch from '~icons/lucide/search'
 
-import { useCommandMessages } from '@open-pencil/vue/i18n'
+import { useCommandMessages } from '@pairdraw/vue/i18n'
 
 import {
   filterShortcutSheet,

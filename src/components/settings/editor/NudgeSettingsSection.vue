@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useSettingsMessages } from '@open-pencil/vue/i18n'
+import { useSettingsMessages } from '@pairdraw/vue/i18n'
 
 import { NUDGE_DISTANCE_MAX, NUDGE_DISTANCE_MIN } from '@/app/settings/preferences/schema'
 import {

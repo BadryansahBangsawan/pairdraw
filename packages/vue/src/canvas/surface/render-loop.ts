@@ -1,4 +1,4 @@
-import type { Editor, EditorState } from '@open-pencil/core'
+import type { Editor, EditorState } from '@pairdraw/core'
 
 import type { CanvasRenderLayer } from './types'
 

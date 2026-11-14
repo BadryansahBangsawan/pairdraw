@@ -2,7 +2,7 @@ import { createDeepSeek } from '@ai-sdk/deepseek'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 
-import type { AIProviderID } from '@open-pencil/core/constants'
+import type { AIProviderID } from '@pairdraw/core/constants'
 
 import { bedrockAdapter } from '@/app/ai/providers/bedrock/adapter'
 import { chatGPTAdapter } from '@/app/ai/providers/chatgpt/adapter'
@@ -28,7 +28,7 @@ const MODEL_PROVIDER_ADAPTERS = {
         fetch: runtime.fetch,
         headers: {
           'X-OpenRouter-Title': 'Pairdraw',
-          'HTTP-Referer': 'https://github.com/open-pencil/open-pencil'
+          'HTTP-Referer': 'https://github.com/BadryansahBangsawan/pairdraw'
         }
       })
       return provider(config.customModelID.trim() || config.modelID)
@@ -76,7 +76,7 @@ const MODEL_PROVIDER_ADAPTERS = {
   'amazon-bedrock': bedrockAdapter,
   'google-vertex': vertexAdapter,
   // The base URL and the token-carrying fetch come from Cloud's AI service, not from settings.
-  openpencil: createOpenAICompatibleAdapter({
+  pairdraw: createOpenAICompatibleAdapter({
     baseURL: (config) => config.customBaseURL,
     mode: 'chat'
   })

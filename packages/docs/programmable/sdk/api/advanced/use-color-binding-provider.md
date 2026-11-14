@@ -14,8 +14,8 @@ Use it with `BindableValueRoot` and explicit targets such as `fills/0/color` or
 actual color mutation begins and commits.
 
 ```ts twoslash
-import type { Color } from '@open-pencil/scene-graph/primitives'
-import { type BindingTarget, useColorBindingProvider } from '@open-pencil/vue/controls/binding-provider'
+import type { Color } from '@pairdraw/scene-graph/primitives'
+import { type BindingTarget, useColorBindingProvider } from '@pairdraw/vue/controls/binding-provider'
 
 const provider = useColorBindingProvider()
 const targets: BindingTarget[] = [

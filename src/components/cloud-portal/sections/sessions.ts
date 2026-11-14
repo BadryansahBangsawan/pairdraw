@@ -1,4 +1,4 @@
-import type { CloudAccountSession, CloudSignIn } from '@open-pencil/cloud/contract'
+import type { CloudAccountSession, CloudSignIn } from '@pairdraw/cloud/contract'
 
 import type { useDateFormat } from '@/app/i18n/date'
 

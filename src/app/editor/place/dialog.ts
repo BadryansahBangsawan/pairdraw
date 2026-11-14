@@ -1,8 +1,8 @@
 import { useFileDialog } from '@vueuse/core'
 
-import { resolveEditorProfile } from '@open-pencil/core'
-import { filterCanvasFiles } from '@open-pencil/vue/canvas/drop'
-import { menuMessages } from '@open-pencil/vue/i18n'
+import { resolveEditorProfile } from '@pairdraw/core'
+import { filterCanvasFiles } from '@pairdraw/vue/canvas/drop'
+import { menuMessages } from '@pairdraw/vue/i18n'
 
 import { useEditorStore, type EditorStore } from '@/app/editor/active-store'
 import { notificationMessages } from '@/app/i18n/notifications'

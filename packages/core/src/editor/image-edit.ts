@@ -4,11 +4,11 @@ import type {
   NodeType,
   SceneGraph,
   SceneNode
-} from '@open-pencil/scene-graph'
-import { getNodeLocalMatrix } from '@open-pencil/scene-graph/coordinate'
-import { coverImageTransform, imageSize } from '@open-pencil/scene-graph/images'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Size, Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph'
+import { getNodeLocalMatrix } from '@pairdraw/scene-graph/coordinate'
+import { coverImageTransform, imageSize } from '@pairdraw/scene-graph/images'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Size, Vector } from '@pairdraw/scene-graph/primitives'
 
 import { makeImageFillLocalMatrix } from '#core/canvas/fills'
 import {

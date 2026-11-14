@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { getAbsolutePositionFull } from '@open-pencil/scene-graph/coordinate'
+import { createEditor } from '@pairdraw/core'
+import { getAbsolutePositionFull } from '@pairdraw/scene-graph/coordinate'
 
 function positions(editor: ReturnType<typeof createEditor>, ids: string[], axis: 'x' | 'y') {
   return ids.map((id) => editor.graph.getNode(id)?.[axis])

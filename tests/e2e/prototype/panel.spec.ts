@@ -5,8 +5,8 @@ import { CanvasHelper } from '#tests/helpers/canvas'
 /** The stored interactions of the node, read through the test bridge. */
 async function reactions(page: Page, id: string) {
   return page.evaluate((nodeId) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return store.graph.getNode(nodeId)?.prototypeReactions ?? []
   }, id)
 }
@@ -17,8 +17,8 @@ test('edits a layer interaction from the prototype section', async ({ page }) =>
   await canvas.waitForInit()
 
   const ids = await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const source = store.createShape('FRAME', 0, 0, 320, 240)
     const target = store.createShape('FRAME', 400, 0, 320, 240)
     store.select([source])
@@ -81,8 +81,8 @@ test('keeps one undo step per interaction edit', async ({ page }) => {
   await canvas.waitForInit()
 
   const id = await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const frame = store.createShape('FRAME', 0, 0, 320, 240)
     store.select([frame])
     return frame
@@ -103,8 +103,8 @@ test('hides the section for a connector', async ({ page }) => {
   await canvas.waitForInit()
 
   await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const id = store.createShape('CONNECTOR', 0, 0, 40, 40)
     store.select([id])
   })

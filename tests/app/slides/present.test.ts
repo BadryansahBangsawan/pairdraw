@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, mock, spyOn, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
+import { createEditor } from '@pairdraw/core'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { toast } from '@/app/shell/ui'

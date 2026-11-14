@@ -1,6 +1,6 @@
-import type { DesignElement, DesignNode, VectorElementRenderer } from '@open-pencil/dom-css/export'
-import { colorToHex } from '@open-pencil/scene-graph/color'
-import { isIconModified, readIcon, readIconTint } from '@open-pencil/scene-graph/icons'
+import type { DesignElement, DesignNode, VectorElementRenderer } from '@pairdraw/dom-css/export'
+import { colorToHex } from '@pairdraw/scene-graph/color'
+import { isIconModified, readIcon, readIconTint } from '@pairdraw/scene-graph/icons'
 
 import { iconColor } from '#core/icons/render'
 import { renderNodeSVGElement } from '#core/io/formats/svg/export'

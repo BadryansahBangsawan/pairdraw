@@ -1,7 +1,7 @@
 import type { Canvas, Color } from 'canvaskit-wasm'
 
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { applyImageFill } from '#core/canvas/fills'
 import { inNodeSpace } from '#core/canvas/overlays/outline'

@@ -38,11 +38,11 @@ const editorOrigin = 'https://app.openpencil.dev'
 
 window.addEventListener('message', (event) => {
   if (event.origin !== editorOrigin || event.source !== frame.contentWindow) return
-  if (event.data?.protocol !== 'openpencil-embed' || event.data.type !== 'ready') return
+  if (event.data?.protocol !== 'pairdraw-embed' || event.data.type !== 'ready') return
   const channel = new MessageChannel()
   channel.port1.onmessage = (message) => handle(message.data)
   frame.contentWindow?.postMessage(
-    { protocol: 'openpencil-embed', type: 'connect', version: 1, editable: false },
+    { protocol: 'pairdraw-embed', type: 'connect', version: 1, editable: false },
     editorOrigin,
     [channel.port2]
   )

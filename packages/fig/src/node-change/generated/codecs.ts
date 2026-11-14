@@ -1,4 +1,4 @@
-import type { NodeType } from '@open-pencil/scene-graph'
+import type { NodeType } from '@pairdraw/scene-graph'
 
 import type { GeneratedFrameCodec } from './codec'
 import { CONNECTOR_CODEC } from './connector'

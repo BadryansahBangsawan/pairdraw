@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createDefaultEditorState, createEditor } from '@open-pencil/core'
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import { createDefaultEditorState, createEditor } from '@pairdraw/core'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 // Exact float32 backgroundColor from the reported finance FIG canvas 0:4.
 const navy: Color = {

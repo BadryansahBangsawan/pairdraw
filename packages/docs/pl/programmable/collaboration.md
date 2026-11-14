@@ -17,7 +17,7 @@ Tylko udostępnienie umieszcza dokument w pokoju: karta, z której udostępniasz
 
 ## Dołączanie do pokoju
 
-Otwórz odnośnik albo wklej go (lub sam identyfikator pokoju) w polu **Dołącz** w panelu udostępniania lub w **Dołącz do pokoju…** na ekranie startowym. Pokój otwiera się we własnej karcie, więc dokumenty, które masz już otwarte, się nie zmieniają. Na komputerze przeglądarka oferuje też **Otwórz w aplikacji na komputer**, co otwiera pokój w Pairdraw przez odnośnik `openpencil://join`.
+Otwórz odnośnik albo wklej go (lub sam identyfikator pokoju) w polu **Dołącz** w panelu udostępniania lub w **Dołącz do pokoju…** na ekranie startowym. Pokój otwiera się we własnej karcie, więc dokumenty, które masz już otwarte, się nie zmieniają. Na komputerze przeglądarka oferuje też **Otwórz w aplikacji na komputer**, co otwiera pokój w Pairdraw przez odnośnik `pairdraw://join`.
 
 Dołączasz od razu pod wygenerowaną nazwą, na przykład *Teal Fox*. Własną nazwę ustawisz w panelu udostępniania lub w ustawieniach; będzie używana w każdym pokoju.
 

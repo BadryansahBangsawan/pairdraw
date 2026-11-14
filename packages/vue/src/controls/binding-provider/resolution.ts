@@ -1,5 +1,5 @@
-import type { Editor } from '@open-pencil/core'
-import type { VariableValue } from '@open-pencil/scene-graph'
+import type { Editor } from '@pairdraw/core'
+import type { VariableValue } from '@pairdraw/scene-graph'
 
 import type { BindingTarget } from './types'
 

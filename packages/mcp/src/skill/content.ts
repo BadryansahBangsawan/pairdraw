@@ -1,10 +1,10 @@
-import designAuthoring from '#skills/open-pencil/references/design-authoring.md?raw'
-// The installable skill in `skills/open-pencil`, embedded at build time so the published server
+import designAuthoring from '#skills/pairdraw/references/design-authoring.md?raw'
+// The installable skill in `skills/pairdraw`, embedded at build time so the published server
 // serves the copy it shipped with and never reads the repository at runtime.
-import skill from '#skills/open-pencil/SKILL.md?raw'
+import skill from '#skills/pairdraw/SKILL.md?raw'
 
 /** The skill's name, as its frontmatter and `npx skills add` know it. */
-export const SKILL_NAME = 'open-pencil'
+export const SKILL_NAME = 'pairdraw'
 
 /** Every file of the skill, by its path inside the skill folder, as `SKILL.md` links them. */
 export const SKILL_FILE_PATHS = ['SKILL.md', 'references/design-authoring.md'] as const
@@ -36,5 +36,5 @@ export const SKILL_FILES: Readonly<Record<SkillFilePath, SkillFile>> = {
 
 /** Where a skill file is served as an MCP resource. */
 export function skillResourceURI(path: SkillFilePath): string {
-  return `openpencil://skills/${SKILL_NAME}/${path}`
+  return `pairdraw://skills/${SKILL_NAME}/${path}`
 }

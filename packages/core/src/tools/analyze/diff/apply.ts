@@ -9,9 +9,9 @@ import {
   resolveToTree,
   sceneNodeAttributes,
   type JSXAttributeSource
-} from '@open-pencil/design-jsx'
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { recordInstanceOverride } from '@open-pencil/scene-graph/instances'
+} from '@pairdraw/design-jsx'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 
 import { assertNodeEditable } from '#core/editor/capabilities'
 import type { FigmaAPI } from '#core/figma-api'

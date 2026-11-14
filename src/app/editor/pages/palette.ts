@@ -3,13 +3,13 @@ import { computed } from 'vue'
 import IconFile from '~icons/lucide/file'
 import IconFiles from '~icons/lucide/files'
 
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { usePageMessages } from '@open-pencil/vue/i18n'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { usePageMessages } from '@pairdraw/vue/i18n'
 import type {
   CommandPaletteGroup,
   CommandPaletteItem
-} from '@open-pencil/vue/primitives/CommandPalette'
-import { isPageDivider } from '@open-pencil/vue/primitives/PageList'
+} from '@pairdraw/vue/primitives/CommandPalette'
+import { isPageDivider } from '@pairdraw/vue/primitives/PageList'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { presenceByPage, type PagePresenceEntry } from '@/app/presence/registry'

@@ -6,8 +6,8 @@ import {
   materializeLibraryAsset,
   MemoryLibraryCatalog,
   publishBasicsLibrary
-} from '@open-pencil/core/library'
-import { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/library'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 describe('builtin basics library', () => {
   test('builds five original components', () => {

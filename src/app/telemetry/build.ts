@@ -1,4 +1,4 @@
-import type { Architecture, Build } from '@open-pencil/feedback/contract'
+import type { Architecture, Build } from '@pairdraw/feedback/contract'
 
 import { APP_VERSION } from '@/app/runtime/version'
 import { describeEnvironment } from '@/app/shell/support/detect'

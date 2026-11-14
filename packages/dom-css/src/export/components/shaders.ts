@@ -1,15 +1,15 @@
 import type { StateElement } from '#dom-css/behaviours/states/types'
 
-import { es, jsx } from '@open-pencil/emit'
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import { findLayerByPath } from '@open-pencil/scene-graph/behaviours'
+import { es, jsx } from '@pairdraw/emit'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { findLayerByPath } from '@pairdraw/scene-graph/behaviours'
 import {
   isShaderPresetPaint,
   shaderOfPaint,
   type ShaderComponent,
   type ShaderPreset,
   type ShaderPresetPaint
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 import { isPositioned } from '../projection'
 import type { ComponentElement, ComponentNode } from './model'

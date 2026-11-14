@@ -26,7 +26,7 @@ export interface SidebarLabels {
   plugins: string
   snapshot: string
   designSystem: string
-  openPencilCloud: string
+  pairdrawCloud: string
   cloudStorage: string
   overview: string
   gettingStarted: string
@@ -194,7 +194,7 @@ export const EN: SidebarLabels = {
   plugins: 'Plugins',
   snapshot: 'Page Snapshots',
   designSystem: 'Building a Design System',
-  openPencilCloud: 'Pairdraw Cloud',
+  pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Cloud Storage',
   icons: 'Icons',
   photos: 'Photos',
@@ -233,7 +233,7 @@ export const DE: SidebarLabels = {
   plugins: 'Plugins',
   snapshot: 'Seiten-Snapshots',
   designSystem: 'Ein Designsystem aufbauen',
-  openPencilCloud: 'Pairdraw Cloud',
+  pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Cloud-Speicher',
   icons: 'Symbole',
   photos: 'Fotos',
@@ -272,7 +272,7 @@ export const IT: SidebarLabels = {
   plugins: 'Plugin',
   snapshot: 'Istantanee di pagina',
   designSystem: 'Creare un design system',
-  openPencilCloud: 'Pairdraw Cloud',
+  pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Archiviazione cloud',
   icons: 'Icone',
   photos: 'Foto',
@@ -311,7 +311,7 @@ export const FR: SidebarLabels = {
   plugins: 'Extensions',
   snapshot: 'Captures de page',
   designSystem: 'Créer un design system',
-  openPencilCloud: 'Pairdraw Cloud',
+  pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Stockage cloud',
   icons: 'Icônes',
   photos: 'Photos',
@@ -350,7 +350,7 @@ export const ES: SidebarLabels = {
   plugins: 'Complementos',
   snapshot: 'Capturas de página',
   designSystem: 'Crear un sistema de diseño',
-  openPencilCloud: 'Pairdraw Cloud',
+  pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Almacenamiento en la nube',
   icons: 'Iconos',
   photos: 'Fotos',
@@ -389,7 +389,7 @@ export const PL: SidebarLabels = {
   plugins: 'Wtyczki',
   snapshot: 'Zrzuty stron',
   designSystem: 'Budowanie design systemu',
-  openPencilCloud: 'Pairdraw Cloud',
+  pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Przechowywanie w chmurze',
   icons: 'Ikony',
   photos: 'Zdjęcia',
@@ -428,7 +428,7 @@ export const RU: SidebarLabels = {
   plugins: 'Плагины',
   snapshot: 'Снимки страниц',
   designSystem: 'Создание дизайн-системы',
-  openPencilCloud: 'Pairdraw Cloud',
+  pairdrawCloud: 'Pairdraw Cloud',
   cloudStorage: 'Облачное хранилище',
   icons: 'Иконки',
   photos: 'Фото',

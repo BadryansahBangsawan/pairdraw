@@ -1,11 +1,11 @@
-import type { SceneGraph, SceneNode, Variable, VariableCollection } from '@open-pencil/scene-graph'
-import { numberedName } from '@open-pencil/scene-graph/naming'
-import { remapStyleRunReferences, styleRunReferences } from '@open-pencil/scene-graph/text'
+import type { SceneGraph, SceneNode, Variable, VariableCollection } from '@pairdraw/scene-graph'
+import { numberedName } from '@pairdraw/scene-graph/naming'
+import { remapStyleRunReferences, styleRunReferences } from '@pairdraw/scene-graph/text'
 import {
   isUnsupportedVariableValue,
   mapVariableValueReferences,
   variableValueReferences
-} from '@open-pencil/scene-graph/variables'
+} from '@pairdraw/scene-graph/variables'
 
 import type { ClipboardCollectionMerge } from './conflicts'
 

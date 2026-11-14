@@ -10,7 +10,7 @@ import {
   encodeWebCaptureClipboard,
   hasWebCaptureClipboardMarker,
   readWebCaptureClipboard
-} from '@open-pencil/web-capture'
+} from '@pairdraw/web-capture'
 
 const CARD = capture(
   element('div', { display: 'block', 'background-color': 'rgb(255, 255, 255)' }, [

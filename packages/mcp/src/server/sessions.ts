@@ -166,7 +166,7 @@ export function createMCPSessionManager({
     const promise = (async () => {
       const agent: MCPAgentSession = { id, ...opener }
       const server = new McpServer(
-        { name: 'open-pencil', version: serverVersion },
+        { name: 'pairdraw', version: serverVersion },
         { instructions: instructions?.(agent) }
       )
 

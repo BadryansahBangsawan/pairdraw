@@ -47,7 +47,7 @@ test('clicking a slide selects it and brings it into view', async ({ page }) => 
     'true'
   )
   const selected = await page.evaluate(() => [
-    ...(window.openPencil?.getStore?.()?.state.selectedIds ?? [])
+    ...(window.pairdraw?.getStore?.()?.state.selectedIds ?? [])
   ])
   expect(selected).toEqual([agenda])
   canvas.assertNoErrors()

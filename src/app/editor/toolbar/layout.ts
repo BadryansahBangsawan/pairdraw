@@ -1,6 +1,6 @@
 import { uniq } from 'es-toolkit'
 
-import { EDITOR_TOOLS, type EditorToolDef, type Tool } from '@open-pencil/core'
+import { EDITOR_TOOLS, type EditorToolDef, type Tool } from '@pairdraw/core'
 
 /** Toolbar buttons that run a command instead of switching the tool. */
 export const TOOLBAR_ACTIONS = ['place-image', 'insert-icon'] as const

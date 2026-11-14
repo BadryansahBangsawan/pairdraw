@@ -4,14 +4,14 @@ import { isEmptyObject, omit } from 'es-toolkit'
 import { tv } from 'tailwind-variants'
 import { computed, nextTick, reactive, ref, useId, watch } from 'vue'
 
-import type { VariableTokenFields } from '@open-pencil/core'
+import type { VariableTokenFields } from '@pairdraw/core'
 import {
   cssNameCodeSyntax,
   explicitCSSName,
   loadTokenValidator,
   parseCSSName,
   variableUnit
-} from '@open-pencil/dom-css/export'
+} from '@pairdraw/dom-css/export'
 import {
   TOKEN_UNITS,
   type TokenExpression,
@@ -19,11 +19,11 @@ import {
   type VariableCollection,
   type VariableScope,
   type VariableValue
-} from '@open-pencil/scene-graph'
-import type { Color } from '@open-pencil/scene-graph/primitives'
-import { randomHex } from '@open-pencil/scene-graph/random'
-import { tokenNumberFromUnit, tokenNumberInUnit } from '@open-pencil/scene-graph/variables'
-import { useI18n } from '@open-pencil/vue/i18n'
+} from '@pairdraw/scene-graph'
+import type { Color } from '@pairdraw/scene-graph/primitives'
+import { randomHex } from '@pairdraw/scene-graph/random'
+import { tokenNumberFromUnit, tokenNumberInUnit } from '@pairdraw/scene-graph/variables'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import type {
   AliasCandidate,
@@ -283,7 +283,7 @@ function alias(modeId: string) {
   return row.values.find((value) => value.modeId === modeId)?.alias
 }
 
-/** A function from the file OpenPencil cannot evaluate; that mode's value is read-only. */
+/** A function from the file Pairdraw cannot evaluate; that mode's value is read-only. */
 function unsupported(modeId: string) {
   return row.values.find((value) => value.modeId === modeId)?.unsupported
 }

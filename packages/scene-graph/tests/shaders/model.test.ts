@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph, type Fill, type SceneNode } from '@open-pencil/scene-graph'
-import { OPEN_PENCIL_PLUGIN_DATA, pluginDataEntry } from '@open-pencil/scene-graph/plugin-data'
+import { SceneGraph, type Fill, type SceneNode } from '@pairdraw/scene-graph'
+import { PAIRDRAW_PLUGIN_DATA, pluginDataEntry } from '@pairdraw/scene-graph/plugin-data'
 import {
   createShaderPaint,
   isShaderFrameCurrent,
@@ -11,7 +11,7 @@ import {
   shaderPresetKey,
   withShaderPaints,
   type ShaderPreset
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 const AURORA: ShaderPreset = {
   components: [{ type: 'Aurora', props: { colorA: '#7c3aed' } }]
@@ -80,7 +80,7 @@ describe('shader paints', () => {
   })
 
   test('ignores an entry that is not a shader', () => {
-    const entry = pluginDataEntry(OPEN_PENCIL_PLUGIN_DATA.shader, {
+    const entry = pluginDataEntry(PAIRDRAW_PLUGIN_DATA.shader, {
       image: 'abc',
       preset: AURORA
     })

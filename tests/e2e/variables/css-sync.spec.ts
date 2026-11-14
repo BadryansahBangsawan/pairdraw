@@ -104,8 +104,8 @@ test('pull shows what changed in the linked stylesheet, and push writes variable
 
   // A variable the designer adds is written into the file's own :root block.
   await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const [collection] = store.graph.variableCollections.values()
     if (!collection) throw new Error('No collection')
     store.graph.createVariable('Radius', 'FLOAT', collection.id, 8)

@@ -1,7 +1,7 @@
 import { afterEach, expect, mock, test } from 'bun:test'
 
-import { createEditor, type Editor } from '@open-pencil/core'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { createEditor, type Editor } from '@pairdraw/core'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { createVectorEditActions } from '@/app/editor/vector/create'
 import type { VectorEditState } from '@/app/editor/vector/types'

@@ -2,8 +2,8 @@ import type { SceneGraphToDesignOptions } from '#dom-css/export/projection'
 import type { DesignStyleDeclaration } from '#dom-css/types'
 import { isEmptyObject, isEqual } from 'es-toolkit/predicate'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { findLayerByPath } from '@open-pencil/scene-graph/behaviours'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { findLayerByPath } from '@pairdraw/scene-graph/behaviours'
 
 import { variantConditions } from './conditions'
 import {

@@ -65,7 +65,7 @@ test('configured storage lists previews through ranges before opening the docume
         body: `<ListBucketResult>
           <IsTruncated>false</IsTruncated>
           <Contents>
-            <Key>open_pencil_storage/canvases/remote-1.fig</Key>
+            <Key>pairdraw_storage/canvases/remote-1.fig</Key>
             <LastModified>2026-01-02T03:04:05.000Z</LastModified>
             <Size>${fixture.byteLength}</Size>
           </Contents>
@@ -199,8 +199,8 @@ test('Save to storage uploads the open document and lists it in the workspace', 
   await expect
     .poll(() => [...objects.keys()].filter((key) => key.includes('/canvases/')).sort())
     .toEqual([
-      expect.stringMatching(/^open_pencil_storage\/canvases\/[^/]+\.fig$/),
-      expect.stringMatching(/^open_pencil_storage\/canvases\/[^/]+\.meta\.json$/)
+      expect.stringMatching(/^pairdraw_storage\/canvases\/[^/]+\.fig$/),
+      expect.stringMatching(/^pairdraw_storage\/canvases\/[^/]+\.meta\.json$/)
     ])
   const uploaded = [...objects].find(([key]) => key.endsWith('.fig'))?.[1]
   // An exported .fig is a zip archive holding the document and its thumbnail.
@@ -222,11 +222,11 @@ test('Delete removes a stored document from the bucket, and a document deleted e
     ['flyer', 'Flyer']
   ]) {
     objects.set(
-      `open_pencil_storage/canvases/${id}.fig`,
+      `pairdraw_storage/canvases/${id}.fig`,
       readFileSync('tests/fixtures/gold-preview.fig')
     )
     objects.set(
-      `open_pencil_storage/canvases/${id}.meta.json`,
+      `pairdraw_storage/canvases/${id}.meta.json`,
       Buffer.from(JSON.stringify({ name, updatedAt: '2026-01-02T03:04:05.000Z' }))
     )
   }
@@ -255,8 +255,8 @@ test('Delete removes a stored document from the bucket, and a document deleted e
   await expect(poster).toBeHidden()
   await expect.poll(() => [...objects.keys()].filter((key) => key.includes('/poster.'))).toEqual([])
 
-  objects.delete('open_pencil_storage/canvases/flyer.fig')
-  objects.delete('open_pencil_storage/canvases/flyer.meta.json')
+  objects.delete('pairdraw_storage/canvases/flyer.fig')
+  objects.delete('pairdraw_storage/canvases/flyer.meta.json')
   await page.goto('/?recent-files')
   await waitForAppBoot(page)
   await page.getByRole('button', { name: /^designs/ }).click()

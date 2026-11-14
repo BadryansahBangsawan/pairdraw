@@ -1,13 +1,13 @@
-import { editedImage, editedImageLayout, imageEditChanges, type Editor } from '@open-pencil/core'
+import { editedImage, editedImageLayout, imageEditChanges, type Editor } from '@pairdraw/core'
 import {
   createSceneGeometry,
   hitTestImageCrop,
   imageCropHitDirection,
   viewportMatrix,
   type ImageCropHit
-} from '@open-pencil/core/geometry'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/core/geometry'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { MOVE_CURSOR, buildResizeCursor } from '#vue/shared/input/geometry'
 import type { DragImageCrop, DragState } from '#vue/shared/input/types'

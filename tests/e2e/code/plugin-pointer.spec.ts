@@ -79,8 +79,8 @@ interface LayerBox {
 /** The page layer with this name, or `null` while the run that makes it has not finished. */
 function layerBox(page: Page, name: string): Promise<LayerBox | null> {
   return page.evaluate((wanted) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const current = store.graph.getNode(store.state.currentPageId)
     const node = current?.childIds
       .map((id) => store.graph.getNode(id))
@@ -92,8 +92,8 @@ function layerBox(page: Page, name: string): Promise<LayerBox | null> {
 /** The layer names on the active document's page, in order. */
 function layerNames(page: Page): Promise<string[]> {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const current = store.graph.getNode(store.state.currentPageId)
     return current ? current.childIds.map((id) => store.graph.getNode(id)?.name ?? '') : []
   })
@@ -106,8 +106,8 @@ async function documentPoint(page: Page, canvasX: number, canvasY: number) {
   const origin = await new CanvasHelper(page).pointerOrigin()
   return page.evaluate(
     ({ sx, sy }) => {
-      const store = window.openPencil?.getStore?.()
-      if (!store) throw new Error('OpenPencil store not initialized')
+      const store = window.pairdraw?.getStore?.()
+      if (!store) throw new Error('Pairdraw store not initialized')
       return store.screenToCanvas(sx, sy)
     },
     { sx: origin.x + canvasX - canvas.x, sy: origin.y + canvasY - canvas.y }
@@ -132,7 +132,7 @@ test.use({
       origins: [
         {
           origin: new URL(baseURL).origin,
-          localStorage: [{ name: 'open-pencil:plugins', value: pluginCatalog() }]
+          localStorage: [{ name: 'pairdraw:plugins', value: pluginCatalog() }]
         }
       ]
     })
@@ -227,8 +227,8 @@ test.describe('a plugin waiting for the pointer when its document goes away', ()
   /** The active document's store, kept so its layers can be read after another tab takes over. */
   function documentStore(page: Page) {
     return page.evaluateHandle(() => {
-      const store = window.openPencil?.getStore?.()
-      if (!store) throw new Error('OpenPencil store not initialized')
+      const store = window.pairdraw?.getStore?.()
+      if (!store) throw new Error('Pairdraw store not initialized')
       return store
     })
   }
@@ -343,7 +343,7 @@ test.describe('a plugin that asks for the pointer again', () => {
         origins: [
           {
             origin: new URL(baseURL).origin,
-            localStorage: [{ name: 'open-pencil:plugins', value: pluginCatalog(LOOPING_SOURCE) }]
+            localStorage: [{ name: 'pairdraw:plugins', value: pluginCatalog(LOOPING_SOURCE) }]
           }
         ]
       })

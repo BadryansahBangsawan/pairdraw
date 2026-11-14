@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor, presentationViewport, resolveEditorProfile } from '@open-pencil/core'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { createEditor, presentationViewport, resolveEditorProfile } from '@pairdraw/core'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 const SCREEN = { width: 1000, height: 500 }
 

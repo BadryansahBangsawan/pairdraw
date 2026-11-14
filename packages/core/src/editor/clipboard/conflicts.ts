@@ -3,7 +3,7 @@ import type {
   SceneNode,
   SharedStyleType,
   VariableCollection
-} from '@open-pencil/scene-graph'
+} from '@pairdraw/scene-graph'
 
 import { defaultTokenImportOptions } from '#core/io/formats/design-tokens/plan'
 import type { DesignTokenBundle } from '#core/io/formats/design-tokens/read'

@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { fontManager } from '@open-pencil/core/text'
+import { createEditor } from '@pairdraw/core'
+import { fontManager } from '@pairdraw/core/text'
 
 test('tells listeners each face that loads, however it was asked for', async () => {
   const editor = createEditor()

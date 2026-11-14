@@ -3,9 +3,9 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test'
 
 import { fromUint8Array, toUint8Array } from 'js-base64'
 
-import { SkiaRenderer } from '@open-pencil/core/canvas'
-import { initCanvasKit } from '@open-pencil/core/io/formats/raster'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { makeFigmaFromStore } from '@/app/automation/bridge/figma-factory'
 import { createAutomationCommandHandlers } from '@/app/automation/bridge/handlers'

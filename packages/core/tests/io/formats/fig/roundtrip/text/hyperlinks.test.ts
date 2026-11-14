@@ -2,9 +2,9 @@ import { beforeAll, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { createEditor } from '@open-pencil/core'
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
+import { createEditor } from '@pairdraw/core'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
 
 beforeAll(async () => {
   await initCodec()

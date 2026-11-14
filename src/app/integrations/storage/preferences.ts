@@ -6,11 +6,11 @@ import type { StorageFieldID, StorageProviderID } from './types'
 export type StoragePreferences = Record<StorageProviderID, Record<StorageFieldID, string>>
 
 export const activeStorageProviderID = useLocalStorage<StorageProviderID>(
-  'open-pencil:storage:provider',
+  'pairdraw:storage:provider',
   's3-compatible'
 )
 
-const storedPreferences = useLocalStorage<StoragePreferences>('open-pencil:storage:preferences', {})
+const storedPreferences = useLocalStorage<StoragePreferences>('pairdraw:storage:preferences', {})
 
 export function readStoragePreferences(
   providerID: StorageProviderID

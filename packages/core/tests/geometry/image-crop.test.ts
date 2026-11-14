@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import { coverImageTransform } from '@open-pencil/scene-graph/images'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
+import { coverImageTransform } from '@pairdraw/scene-graph/images'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
 import {
   coveringImageBounds,

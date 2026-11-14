@@ -1,6 +1,6 @@
 import { basename, extname } from 'pathe'
 
-import { imageHeader, IMPORTABLE_RASTER_TYPES } from '@open-pencil/scene-graph/images'
+import { imageHeader, IMPORTABLE_RASTER_TYPES } from '@pairdraw/scene-graph/images'
 
 /**
  * What Place image offers to open: the raster images a layer can show, and SVG, which becomes

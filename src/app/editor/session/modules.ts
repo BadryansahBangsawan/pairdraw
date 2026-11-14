@@ -1,8 +1,8 @@
 import { computed } from 'vue'
 
-import type { Editor } from '@open-pencil/core'
-import type { IORegistry } from '@open-pencil/core/io'
-import { createSelectedNodeState } from '@open-pencil/vue/editor/selection-state'
+import type { Editor } from '@pairdraw/core'
+import type { IORegistry } from '@pairdraw/core/io'
+import { createSelectedNodeState } from '@pairdraw/vue/editor/selection-state'
 
 import { createDocumentExportActions } from '@/app/document/export'
 import { createDocumentIOActions } from '@/app/document/io'

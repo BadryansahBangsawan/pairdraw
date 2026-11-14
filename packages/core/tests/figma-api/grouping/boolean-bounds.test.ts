@@ -2,12 +2,12 @@ import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
 
 import type { Surface } from 'canvaskit-wasm'
 
-import { createEditor } from '@open-pencil/core'
-import { SkiaRenderer } from '@open-pencil/core/canvas'
-import { FigmaAPI, type FigmaNodeProxy } from '@open-pencil/core/figma-api'
-import { initCanvasKit } from '@open-pencil/core/io/formats/raster'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import { createEditor } from '@pairdraw/core'
+import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { FigmaAPI, type FigmaNodeProxy } from '@pairdraw/core/figma-api'
+import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 // Recorded with the same script in Figma desktop 126: a boolean operation takes the box of its
 // result, and an empty result keeps its operands' box. Measuring needs a renderer.

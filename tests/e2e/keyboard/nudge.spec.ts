@@ -4,7 +4,7 @@ import { CanvasHelper } from '#tests/helpers/canvas'
 
 async function selectedPosition(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     const id = store ? [...store.state.selectedIds][0] : undefined
     const node = id ? store?.graph.getNode(id) : undefined
     return node ? { x: node.x, y: node.y } : null

@@ -1,6 +1,6 @@
 import type * as v from 'valibot'
 
-import type { ACPAgentID } from '@open-pencil/core/constants'
+import type { ACPAgentID } from '@pairdraw/core/constants'
 
 import { isSignedIn, type AgentAuthStatus } from '@/app/ai/agents/acp/auth/status'
 

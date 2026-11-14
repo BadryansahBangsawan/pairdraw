@@ -1,7 +1,7 @@
 import { isAbsolute, normalize, posix } from 'pathe'
 import * as v from 'valibot'
 
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { importTokensIntoGraph } from '#core/io/formats/design-tokens/apply'
 import { readCSSDesignTokens } from '#core/io/formats/design-tokens/css/read'

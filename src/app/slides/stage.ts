@@ -1,8 +1,8 @@
 import { useElementSize, useEventListener, useSwipe } from '@vueuse/core'
 import { computed, onMounted, watch, type Ref } from 'vue'
 
-import type { PresentationState } from '@open-pencil/core'
-import { getAxisAlignedWorldBounds } from '@open-pencil/scene-graph/coordinate'
+import type { PresentationState } from '@pairdraw/core'
+import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { isButtonActivation, isEditing } from '@/app/shell/keyboard/focus'

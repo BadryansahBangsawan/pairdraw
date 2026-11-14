@@ -9,8 +9,8 @@ import {
   getImageAIService,
   registerImageAIService,
   type ImageAIService
-} from '@open-pencil/core/tools'
-import type { Fill, SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/tools'
+import type { Fill, SceneGraph } from '@pairdraw/scene-graph'
 
 const SQUARE_SVG = `<svg viewBox="0 0 100 100"><path d="M0 0 H100 V100 H0 Z" fill="#336699"/></svg>`
 const IMAGE_AI_TOOLS = ['generate_image', 'remove_background', 'replace_background', 'generate_svg']

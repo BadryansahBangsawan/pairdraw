@@ -1,6 +1,6 @@
-import type { Effect, SceneNode } from '@open-pencil/scene-graph'
-import { TRANSPARENT } from '@open-pencil/scene-graph/constants'
-import { parseCSSShadows } from '@open-pencil/scene-graph/css'
+import type { Effect, SceneNode } from '@pairdraw/scene-graph'
+import { TRANSPARENT } from '@pairdraw/scene-graph/constants'
+import { parseCSSShadows } from '@pairdraw/scene-graph/css'
 
 function isEffect(value: unknown): value is Effect {
   return (

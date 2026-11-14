@@ -95,7 +95,7 @@ Connexions, déclencheurs, actions, animations, superpositions, défilement, par
 | Extraits de code | 🟡 | Design JSX, HTML, Vue et React avec CSS ou Tailwind et valeurs liées aux tokens ; pas de Swift, Kotlin ni Compose |
 | Tailwind CSS v4 | ✅ | HTML avec classes utilitaires depuis Code, la CLI ou l’API |
 | Figma pour VS Code | 🔲 | Pas d’intégration à l’extension de l’éditeur |
-| Serveur MCP | ✅ | `@open-pencil/mcp` avec stdio et HTTP ; 138 outils du cœur plus des outils de document, d’historique et de réglages |
+| Serveur MCP | ✅ | `@pairdraw/mcp` avec stdio et HTTP ; 138 outils du cœur plus des outils de document, d’historique et de réglages |
 | CLI | ✅ | 24 commandes, dont `info`, `tree`, `find`, `query`, `node`, `pages`, `variables`, `tokens`, `fonts`, `lint`, `analyze`, `export`, `import`, `convert`, `diff`, `eval` et `tool` |
 
 ## Figma Draw

@@ -4,7 +4,7 @@ import { CanvasHelper } from '#tests/helpers/canvas'
 
 async function buildScene(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Editor unavailable')
     const pageId = store.state.currentPageId
     const card = store.graph.createNode('FRAME', pageId, {
@@ -28,11 +28,11 @@ async function buildScene(page: Page) {
 }
 
 const selection = (page: Page) =>
-  page.evaluate(() => [...(window.openPencil?.getStore?.().state.selectedIds ?? [])])
+  page.evaluate(() => [...(window.pairdraw?.getStore?.().state.selectedIds ?? [])])
 
 const pan = (page: Page) =>
   page.evaluate(() => {
-    const state = window.openPencil?.getStore?.().state
+    const state = window.pairdraw?.getStore?.().state
     return state ? [state.panX, state.panY] : []
   })
 

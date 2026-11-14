@@ -2,12 +2,8 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, userEvent, within } from 'storybook/test'
 import { ref } from 'vue'
 
-import {
-  MATERIAL_SYMBOLS_OPTIONS,
-  SF_SYMBOLS_OPTIONS,
-  type IconOption
-} from '@open-pencil/core/icons'
-import type { IconOptions } from '@open-pencil/scene-graph/icons'
+import { MATERIAL_SYMBOLS_OPTIONS, SF_SYMBOLS_OPTIONS, type IconOption } from '@pairdraw/core/icons'
+import type { IconOptions } from '@pairdraw/scene-graph/icons'
 
 import IconOptionControls from './IconOptionControls.vue'
 

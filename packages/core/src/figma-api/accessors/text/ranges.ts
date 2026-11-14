@@ -11,8 +11,8 @@ import type {
   TextDecoration,
   TextDecorationStyle,
   TextLength
-} from '@open-pencil/scene-graph'
-import { textLengthPixels } from '@open-pencil/scene-graph/text'
+} from '@pairdraw/scene-graph'
+import { textLengthPixels } from '@pairdraw/scene-graph/text'
 
 import {
   assertProxyEditable,
@@ -70,7 +70,7 @@ const DECORATIONS = new Set<TextDecoration>(['NONE', 'UNDERLINE', 'STRIKETHROUGH
 const DECORATION_STYLES = new Set<TextDecorationStyle>(['SOLID', 'DOTTED', 'WAVY'])
 const LENGTH_UNITS = new Set(['PIXELS', 'PERCENT'])
 const TEXT_CASES = new Set<TextCase>(['ORIGINAL', 'UPPER', 'LOWER', 'TITLE'])
-/** Text cases Figma takes that OpenPencil cannot draw yet. */
+/** Text cases Figma takes that Pairdraw cannot draw yet. */
 const SMALL_CAPS = new Set(['SMALL_CAPS', 'SMALL_CAPS_FORCED'])
 const PAINT_TYPES = new Set([
   'SOLID',

@@ -1,11 +1,11 @@
 import { uniq } from 'es-toolkit'
 
-import { resolveEditorProfile, type Editor } from '@open-pencil/core'
-import { SNAP_THRESHOLD_SCREEN_PX } from '@open-pencil/core/constants'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { getAxisAlignedWorldBounds, getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
+import { resolveEditorProfile, type Editor } from '@pairdraw/core'
+import { SNAP_THRESHOLD_SCREEN_PX } from '@pairdraw/core/constants'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { getAxisAlignedWorldBounds, getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 import {
   computeSnap,
   computeSpacingGuides,
@@ -13,7 +13,7 @@ import {
   spacingTargets,
   type SnapGuide,
   type SpacingTargets
-} from '@open-pencil/scene-graph/snap'
+} from '@pairdraw/scene-graph/snap'
 
 export interface PixelSnapResult {
   delta: Vector

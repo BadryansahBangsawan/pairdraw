@@ -5,18 +5,18 @@ description: Run a design agent, or a team of them, on a document file through a
 
 # Headless agents
 
-`openpencil agent run` drives a document from a model without opening the editor. The model calls the same Core tools the app and MCP server expose, against a document loaded from disk, and saves the result when asked.
+`pairdraw agent run` drives a document from a model without opening the editor. The model calls the same Core tools the app and MCP server expose, against a document loaded from disk, and saves the result when asked.
 
 ## Basic usage
 
 ```sh
-openpencil agent run "Add a pricing section under the hero" design.fig \
+pairdraw agent run "Add a pricing section under the hero" design.fig \
   --base-url https://api.openai.com/v1 \
   --model gpt-4.1 \
   --output design.agent.fig
 ```
 
-The API key comes from `--api-key` or `OPENPENCIL_API_KEY`. Passing it by environment keeps it out of shell history and process listings.
+The API key comes from `--api-key` or `PAIRDRAW_API_KEY`. Passing it by environment keeps it out of shell history and process listings.
 
 Without `--output` or `--write` the run is a dry run: the model works on the document in memory and nothing is written. `--write` saves over the input file; `--output` writes a new one.
 
@@ -31,26 +31,26 @@ A run offers the document tools a design session needs and nothing more:
 - `--deny` withholds a tool the run would otherwise offer.
 
 ```sh
-openpencil agent run "Replace the hero photo" design.fig \
+pairdraw agent run "Replace the hero photo" design.fig \
   --base-url http://127.0.0.1:11434/v1 --model qwen3 \
   --allow stock_photo --deny delete_node --write
 ```
 
 Every file a tool writes, and the `--output` path, must stay inside `--root` — the working directory by default, the home directory on Windows. A path that leaves it, directly or through a symlink, is refused, and the model is told why instead of the run failing.
 
-`openpencil agent tools --json` lists the tools a run offers by default.
+`pairdraw agent tools --json` lists the tools a run offers by default.
 
 ## Teams
 
 `--agents` runs several named agents over the same document, in order, and each one sees what the agents before it reported:
 
 ```sh
-openpencil agent run "Fix the checkout page" design.fig \
+pairdraw agent run "Fix the checkout page" design.fig \
   --base-url https://api.openai.com/v1 --model gpt-4.1 \
   --agents designer,reviewer --output design.agent.fig
 ```
 
-`openpencil agent list --json` lists them:
+`pairdraw agent list --json` lists them:
 
 |Agent|What it does|
 |---|---|

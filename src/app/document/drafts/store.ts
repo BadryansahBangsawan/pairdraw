@@ -1,7 +1,7 @@
 import { createEventHook } from '@vueuse/core'
 import * as v from 'valibot'
 
-import type { DocumentWorkspaceSource } from '@open-pencil/vue/document/workspace'
+import type { DocumentWorkspaceSource } from '@pairdraw/vue/document/workspace'
 
 import { appRuntimeConfig } from '@/app/runtime/config'
 import {
@@ -26,7 +26,7 @@ export type DraftMeta = Pick<LocalCanvasMeta, 'id' | 'name' | 'updatedAt' | 'has
 export type DraftWriteInput = { id: string; name: string; figBytes: Uint8Array }
 
 /** Other windows of the app on this device, which hear of each draft written or deleted. */
-const DRAFTS_CHANNEL = 'open-pencil:drafts'
+const DRAFTS_CHANNEL = 'pairdraw:drafts'
 
 const draftChangeSchema = v.object({ id: v.string() })
 

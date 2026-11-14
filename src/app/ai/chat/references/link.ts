@@ -1,6 +1,6 @@
 /**
- * References to things in OpenPencil, written in chat text as Markdown links with the
- * `openpencil:` scheme: `[Hero](openpencil://node/12:34)`. People insert them from the
+ * References to things in Pairdraw, written in chat text as Markdown links with the
+ * `pairdraw:` scheme: `[Hero](pairdraw://node/12:34)`. People insert them from the
  * composer and the model cites what it touched with them; the chat shows them as chips.
  */
 export type ChatReferenceKind = 'node' | 'page' | 'skill' | 'element' | 'citation'
@@ -19,7 +19,7 @@ export interface ChatReferenceMatch {
   end: number
 }
 
-const SCHEME = 'openpencil://'
+const SCHEME = 'pairdraw://'
 const KINDS: ReadonlySet<string> = new Set<ChatReferenceKind>([
   'node',
   'page',
@@ -29,7 +29,7 @@ const KINDS: ReadonlySet<string> = new Set<ChatReferenceKind>([
 ])
 
 /** A link whose label holds no unescaped `]` or line break and whose URL has no space. */
-const LINK = /\[((?:\\.|[^\]\\\n])*)\]\(openpencil:\/\/([a-z]+)\/([^)\s]+)\)/g
+const LINK = /\[((?:\\.|[^\]\\\n])*)\]\(pairdraw:\/\/([a-z]+)\/([^)\s]+)\)/g
 
 function isKind(kind: string): kind is ChatReferenceKind {
   return KINDS.has(kind)

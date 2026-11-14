@@ -1,10 +1,10 @@
 import type { Canvas, Paint } from 'canvaskit-wasm'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { connectorSublayers } from '@open-pencil/scene-graph/connectors'
-import { getAxisAlignedBoundsInParent } from '@open-pencil/scene-graph/coordinate'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { connectorSublayers } from '@pairdraw/scene-graph/connectors'
+import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import type { ConnectorTarget } from '#core/editor/connectors/attach'

@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path'
 
 import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/client'
 
-import { MCP_AGENT_HEADER } from '@open-pencil/core/constants'
+import { MCP_AGENT_HEADER } from '@pairdraw/core/constants'
 
 import { startServer, type ServerHandle } from '#mcp/server'
 import { SKILL_FILE_PATHS, skillResourceURI } from '#mcp/skill/content'
@@ -17,7 +17,7 @@ import type { MCPToolScope } from '#mcp/tool/scope'
 
 const AUTH_TOKEN = 'skill-test-token'
 // A socket of its own, never the running app's default one.
-const SOCKET_DIR = join(tmpdir(), `openpencil-test-skill-${process.pid}`)
+const SOCKET_DIR = join(tmpdir(), `pairdraw-test-skill-${process.pid}`)
 let socketCount = 0
 
 async function testSocketPath(): Promise<string | null> {
@@ -79,7 +79,7 @@ function workspaceRoot(): string {
 
 /** The installable skill's file in the repository, which the server must serve unchanged. */
 function skillSource(path: string): Promise<string> {
-  return readFile(join(workspaceRoot(), 'skills/open-pencil', path), 'utf8')
+  return readFile(join(workspaceRoot(), 'skills/pairdraw', path), 'utf8')
 }
 
 function text(content: readonly { type: string; text?: string }[]): string {

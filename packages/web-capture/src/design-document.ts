@@ -5,7 +5,7 @@ import { ownValue } from './record'
 import type { WebCaptureBox, WebCaptureElement, WebCaptureNode, WebCaptureText } from './types'
 
 /**
- * An element of the styled DOM `@open-pencil/dom-css` builds layers from. The shape matches its
+ * An element of the styled DOM `@pairdraw/dom-css` builds layers from. The shape matches its
  * `DesignElement`, so a capture imports through `sceneGraphFromStyledHTML` without a CSS runtime.
  */
 export interface WebCaptureDesignElement {
@@ -18,7 +18,7 @@ export interface WebCaptureDesignElement {
 
 export type WebCaptureDesignNode = WebCaptureDesignElement | WebCaptureText
 
-/** The styled DOM of a capture, matching `@open-pencil/dom-css`'s `DesignDocument`. */
+/** The styled DOM of a capture, matching `@pairdraw/dom-css`'s `DesignDocument`. */
 export interface WebCaptureDesignDocument {
   type: 'document'
   children: WebCaptureDesignNode[]

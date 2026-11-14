@@ -1,8 +1,8 @@
 import { filename } from 'pathe/utils'
 
-import { sceneNodeToJSX, selectionToJSX } from '@open-pencil/design-jsx'
-import { isDrawIOExportFileName } from '@open-pencil/drawio'
-import type { DocumentKind, SceneGraph } from '@open-pencil/scene-graph'
+import { sceneNodeToJSX, selectionToJSX } from '@pairdraw/design-jsx'
+import { isDrawIOExportFileName } from '@pairdraw/drawio'
+import type { DocumentKind, SceneGraph } from '@pairdraw/scene-graph'
 
 import { layoutAuthoredNodes } from '#core/layout'
 
@@ -254,7 +254,7 @@ export const drawioFormat: IOFormatAdapter<'drawio'> = {
     )
   },
   async readDocument(input) {
-    const { readDrawIOBytes } = await import('@open-pencil/drawio')
+    const { readDrawIOBytes } = await import('@pairdraw/drawio')
     const { drawioToSceneGraph } = await import('./formats/drawio')
     const file = readDrawIOBytes(input.data)
     if (!file) throw new Error('This file holds no draw.io diagram')
@@ -301,7 +301,7 @@ export const mermaidFormat: IOFormatAdapter<'mermaid'> = {
     return ext === 'mmd' || ext === 'mermaid' || mimeType === 'text/vnd.mermaid'
   },
   async readDocument(input) {
-    const { detectMermaidDiagram } = await import('@open-pencil/mermaid')
+    const { detectMermaidDiagram } = await import('@pairdraw/mermaid')
     const text = new TextDecoder().decode(input.data)
     if (!detectMermaidDiagram(text)) throw new Error('This file holds no Mermaid flowchart')
     // Mermaid stores a diagram's structure, which reading lays out with its text measured.
@@ -312,7 +312,7 @@ export const mermaidFormat: IOFormatAdapter<'mermaid'> = {
 
 /** Pages or layers as a draw.io file, loading the writer only when one is saved. */
 async function writeDrawIO(graph: SceneGraph, target: DrawIOExportTarget): Promise<ExportResult> {
-  const { writeDrawIOFile } = await import('@open-pencil/drawio')
+  const { writeDrawIOFile } = await import('@pairdraw/drawio')
   const { sceneGraphToDrawIO } = await import('./formats/drawio')
   return {
     format: 'drawio',
@@ -524,7 +524,7 @@ export const tailwindJSXFormat: IOFormatAdapter<'tailwind-jsx'> = {
   async exportContent(request) {
     const target = resolveExportNodes(request)
     if (!target) throw new Error('Nothing to export')
-    const { sceneNodesToTailwindJSX } = await import('@open-pencil/dom-css/export')
+    const { sceneNodesToTailwindJSX } = await import('@pairdraw/dom-css/export')
     const { vectorElement } = await import('#core/io/formats/html/vectors')
     const data = sceneNodesToTailwindJSX(request.graph, target.nodeIds, { vectorElement })
     if (!data) throw new Error('Nothing to export')

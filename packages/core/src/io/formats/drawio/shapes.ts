@@ -1,5 +1,5 @@
-import type { DrawIOStyle } from '@open-pencil/drawio'
-import type { ShapeWithTextType } from '@open-pencil/scene-graph/shape-with-text'
+import type { DrawIOStyle } from '@pairdraw/drawio'
+import type { ShapeWithTextType } from '@pairdraw/scene-graph/shape-with-text'
 
 /** What a draw.io vertex becomes: a FigJam shape, text, a section around its cells, or a group. */
 export type VertexKind =

@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { PenNode } from '@open-pencil/pen'
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { STICKY_COLORS, stickySublayers } from '@open-pencil/scene-graph/generated'
-import { hasInstanceOverride, syncInstance } from '@open-pencil/scene-graph/instances'
+import type { PenNode } from '@pairdraw/pen'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { STICKY_COLORS, stickySublayers } from '@pairdraw/scene-graph/generated'
+import { hasInstanceOverride, syncInstance } from '@pairdraw/scene-graph/instances'
 
 import { expectDefined, getNodeOrThrow } from './helpers/assert'
 import { parseDocument } from './helpers/document'

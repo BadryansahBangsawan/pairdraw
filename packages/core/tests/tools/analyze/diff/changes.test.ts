@@ -2,10 +2,10 @@ import { expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { createEditor, graphFromPageSnapshot } from '@open-pencil/core'
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { ALL_TOOLS } from '@open-pencil/core/tools'
-import { sceneNodeToJSX } from '@open-pencil/design-jsx'
+import { createEditor, graphFromPageSnapshot } from '@pairdraw/core'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { ALL_TOOLS } from '@pairdraw/core/tools'
+import { sceneNodeToJSX } from '@pairdraw/design-jsx'
 
 type ChangesResult = { diff?: string | null; message?: string; error?: string; marked?: string }
 

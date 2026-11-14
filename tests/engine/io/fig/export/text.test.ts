@@ -1,10 +1,10 @@
 import { describe, expect, setDefaultTimeout, test } from 'bun:test'
 
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { decompressFigKiwiDataAsync } from '@open-pencil/kiwi/fig/container'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import type { JSONObject } from '@open-pencil/scene-graph/primitives'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { decompressFigKiwiDataAsync } from '@pairdraw/kiwi/fig/container'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import type { JSONObject } from '@pairdraw/scene-graph/primitives'
 
 import { expectDefined } from '#tests/helpers/assert'
 import { parseFixture } from '#tests/helpers/fig/fixtures'
@@ -70,7 +70,7 @@ describe('text node export', () => {
     expect(textNode?.fontFeatures).toContainEqual({ tag: 'LIGA', enabled: false })
   })
 
-  test('keeps OpenPencil text language hints out of the .fig schema', async () => {
+  test('keeps Pairdraw text language hints out of the .fig schema', async () => {
     await initCodec()
 
     const graph = new SceneGraph()
@@ -117,8 +117,8 @@ describe('text node export', () => {
 
     const { unzipSync, inflateSync } = await import('fflate')
     const { decodeBinarySchema, compileSchema, ByteBuffer } =
-      await import('@open-pencil/kiwi/schema-runtime')
-    const { parseFigKiwiChunks } = await import('@open-pencil/kiwi/fig/container')
+      await import('@pairdraw/kiwi/schema-runtime')
+    const { parseFigKiwiChunks } = await import('@pairdraw/kiwi/fig/container')
 
     const graph = new SceneGraph()
     const page = graph.getPages()[0]
@@ -185,8 +185,8 @@ describe('text node export', () => {
 
     const { unzipSync, inflateSync } = await import('fflate')
     const { decodeBinarySchema, compileSchema, ByteBuffer } =
-      await import('@open-pencil/kiwi/schema-runtime')
-    const { parseFigKiwiChunks } = await import('@open-pencil/kiwi/fig/container')
+      await import('@pairdraw/kiwi/schema-runtime')
+    const { parseFigKiwiChunks } = await import('@pairdraw/kiwi/fig/container')
 
     const graph = new SceneGraph()
     const page = graph.getPages()[0]
@@ -231,8 +231,8 @@ describe('text node export', () => {
 
     const { unzipSync, inflateSync } = await import('fflate')
     const { decodeBinarySchema, compileSchema, ByteBuffer } =
-      await import('@open-pencil/kiwi/schema-runtime')
-    const { parseFigKiwiChunks } = await import('@open-pencil/kiwi/fig/container')
+      await import('@pairdraw/kiwi/schema-runtime')
+    const { parseFigKiwiChunks } = await import('@pairdraw/kiwi/fig/container')
 
     const graph = new SceneGraph()
     const page = graph.getPages()[0]
@@ -308,8 +308,8 @@ describe('text node export', () => {
 
     const { unzipSync, inflateSync } = await import('fflate')
     const { decodeBinarySchema, compileSchema, ByteBuffer } =
-      await import('@open-pencil/kiwi/schema-runtime')
-    const { parseFigKiwiChunks } = await import('@open-pencil/kiwi/fig/container')
+      await import('@pairdraw/kiwi/schema-runtime')
+    const { parseFigKiwiChunks } = await import('@pairdraw/kiwi/fig/container')
 
     const graph = new SceneGraph()
     const page = graph.getPages()[0]

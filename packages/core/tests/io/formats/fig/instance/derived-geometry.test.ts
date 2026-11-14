@@ -2,10 +2,10 @@ import { beforeAll, expect, test } from 'bun:test'
 
 import { guid } from '#core-tests/helpers/fig/guid'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { interpretInstance, materializeInstance } from '@open-pencil/fig/instance-overrides'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { interpretInstance, materializeInstance } from '@pairdraw/fig/instance-overrides'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { registerTestFont } from '#core-tests/helpers/figma-api'
 

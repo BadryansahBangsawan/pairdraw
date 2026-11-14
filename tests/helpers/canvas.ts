@@ -1,6 +1,6 @@
 import type { Page, Locator } from '@playwright/test'
 
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { OFFICIAL_CLOUD_URL } from '@/constants'
 
@@ -60,7 +60,7 @@ export class CanvasHelper {
    */
   async useLightPage() {
     await this.page.evaluate(() => {
-      const store = window.openPencil?.getStore?.()
+      const store = window.pairdraw?.getStore?.()
       if (!store) return
       const pages = store.graph.getPages()
       const [first] = pages
@@ -87,8 +87,8 @@ export class CanvasHelper {
   async pasteSVG(markup: string, x: number, y: number) {
     return this.page.evaluate(
       async ({ markup, x, y }) => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         const pasted = await store.pasteSVG(markup, x, y)
         store.clearSelection()
         store.requestRender()

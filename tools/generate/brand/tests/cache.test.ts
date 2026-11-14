@@ -9,7 +9,7 @@ import { ensureBrandAssets } from '#brand/generate'
 
 let root: string
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), 'open-pencil-brand-test-'))
+  root = await mkdtemp(join(tmpdir(), 'pairdraw-brand-test-'))
   for (const path of [
     'assets/brand',
     'tools/generate/brand/src',
@@ -74,10 +74,10 @@ describe('brand asset preparation', () => {
     const key = await fingerprint(root)
     expect(await isCached(root, 'web', key)).toBe(true)
     expect(await isCached(root, 'docs', key)).toBe(true)
-    // Each target publishes its own artwork: the app Pairdraw's, the docs OpenPencil's.
+    // The app and the documentation site publish the same artwork.
     for (const [output, master] of [
       ['public/brand/mark.svg', 'assets/brand/mark.svg'],
-      ['packages/docs/public/brand/mark.svg', 'assets/brand/openpencil/mark.svg']
+      ['packages/docs/public/brand/mark.svg', 'assets/brand/mark.svg']
     ])
       expect(await readFile(join(root, output))).toEqual(await readFile(join(root, master)))
   })

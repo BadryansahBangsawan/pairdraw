@@ -2,8 +2,8 @@ import { decode, isValid } from 'js-base64'
 import * as v from 'valibot'
 
 /**
- * Minisign key lines of OpenPencil's updater keys. A Pairdraw release must never be verified
- * against them, or a Pairdraw build would accept OpenPencil releases as its own updates.
+ * Minisign key lines of the upstream updater keys. A Pairdraw release must never be verified
+ * against them, or a Pairdraw build would accept upstream releases as its own updates.
  */
 const UPSTREAM_PUBLIC_KEYS = new Set([
   'RWQB7eR4Dr/AWHKhBOxnmEwlZHPXWDkEqpKMGZ5KeIxiJSUCNWPN/pbw',
@@ -37,7 +37,7 @@ export function updaterFeed(env: NodeJS.ProcessEnv, repository: string): Updater
     throw new Error('Set the UPDATER_PUBLIC_KEY repository variable to the updater public key')
   }
   if (UPSTREAM_PUBLIC_KEYS.has(minisignKeyLine(pubkey))) {
-    throw new Error('UPDATER_PUBLIC_KEY is an OpenPencil updater key; generate a Pairdraw key')
+    throw new Error('UPDATER_PUBLIC_KEY is an upstream updater key; generate a Pairdraw key')
   }
 
   const endpoint =
@@ -46,7 +46,7 @@ export function updaterFeed(env: NodeJS.ProcessEnv, repository: string): Updater
   const parsed = v.safeParse(endpointSchema, endpoint)
   if (!parsed.success) throw new Error('UPDATER_ENDPOINT must be an https URL')
   if (isUpstreamFeed(new URL(parsed.output))) {
-    throw new Error('The update feed points at OpenPencil releases')
+    throw new Error('The update feed points at upstream releases')
   }
 
   return { endpoint: parsed.output, pubkey }

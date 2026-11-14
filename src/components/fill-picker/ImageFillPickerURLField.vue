@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, useId } from 'vue'
 
-import { usePanelMessages } from '@open-pencil/vue/i18n'
+import { usePanelMessages } from '@pairdraw/vue/i18n'
 
 import AppButton from '@/components/ui/button/AppButton.vue'
 import AppInput from '@/components/ui/input/AppInput.vue'

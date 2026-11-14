@@ -14,7 +14,7 @@ export interface WebCaptureText {
 
 /**
  * An element with the styles the page computed for it. The shape is the styled DOM that
- * `@open-pencil/dom-css` builds layers from, so a capture needs no CSS runtime to import.
+ * `@pairdraw/dom-css` builds layers from, so a capture needs no CSS runtime to import.
  */
 export interface WebCaptureElement {
   type: 'element'

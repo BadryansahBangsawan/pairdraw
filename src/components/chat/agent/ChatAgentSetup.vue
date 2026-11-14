@@ -3,7 +3,7 @@ import { useElementVisibility } from '@vueuse/core'
 import { compact } from 'es-toolkit/array'
 import { computed, nextTick, onBeforeUnmount, useId, useTemplateRef, watch } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import type { AgentCandidate } from '@/app/ai/agents/auto/pick'
 import type { AutoConnectPhase } from '@/app/ai/agents/auto/session'

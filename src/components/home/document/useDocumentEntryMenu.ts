@@ -1,6 +1,6 @@
 import { compact } from 'es-toolkit'
 
-import { useFileMessages, useRecoveryMessages } from '@open-pencil/vue/i18n'
+import { useFileMessages, useRecoveryMessages } from '@pairdraw/vue/i18n'
 
 import type { DocumentEntryMenu } from './types'
 

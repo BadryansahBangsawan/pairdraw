@@ -1,12 +1,12 @@
 /// <reference types="@figma/plugin-typings" />
 
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 import {
   computeImageHash,
   imageHeader,
   imageSize,
   type ImageMimeType
-} from '@open-pencil/scene-graph/images'
+} from '@pairdraw/scene-graph/images'
 
 import { invalid, received } from './accessors/text/messages'
 

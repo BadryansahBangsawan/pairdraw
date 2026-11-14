@@ -1,6 +1,6 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { getAxisAlignedBoundsInParent } from '@open-pencil/scene-graph/coordinate'
-import { groupBounds } from '@open-pencil/scene-graph/group-bounds'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
+import { groupBounds } from '@pairdraw/scene-graph/group-bounds'
 
 import { prepareSlotEdits } from '#core/editor/components/slots'
 import { nextNumberedName } from '#core/editor/structure/rename'

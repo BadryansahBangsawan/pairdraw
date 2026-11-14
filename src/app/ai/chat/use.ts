@@ -1,4 +1,4 @@
-import { IS_BROWSER } from '@open-pencil/core/constants'
+import { IS_BROWSER } from '@pairdraw/core/constants'
 
 import { providerBackend } from '@/app/ai/chat/history/backend'
 import { createConversationHistory } from '@/app/ai/chat/history/controller'

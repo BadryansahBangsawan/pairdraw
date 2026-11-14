@@ -1,5 +1,5 @@
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { readWebCitation } from '@open-pencil/scene-graph/plugin-data'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { readWebCitation } from '@pairdraw/scene-graph/plugin-data'
 
 import { requestSkillSettings } from '@/app/ai/skills/settings/request'
 import type { EditorStore } from '@/app/editor/active-store'

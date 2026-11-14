@@ -1,6 +1,6 @@
-import { createFigDocumentSession, type FigDocumentFont } from '@open-pencil/fig'
-import type { FigPageManifestEntry } from '@open-pencil/kiwi/fig'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import { createFigDocumentSession, type FigDocumentFont } from '@pairdraw/fig'
+import type { FigPageManifestEntry } from '@pairdraw/kiwi/fig'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { buildFigPopulationDelta, installFigMutationJournal } from '#core/kiwi/fig/population/delta'
 import { readerSessionOptions, type FigReaderDiagnostic } from '#core/kiwi/fig/session/options'

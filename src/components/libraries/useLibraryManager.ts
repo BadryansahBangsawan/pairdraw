@@ -1,6 +1,6 @@
 import { computed, onScopeDispose, ref, watch, type Ref } from 'vue'
 
-import { panelMessages } from '@open-pencil/vue/i18n'
+import { panelMessages } from '@pairdraw/vue/i18n'
 
 import type { EditorStore } from '@/app/editor/session'
 import { notificationMessages } from '@/app/i18n/notifications'

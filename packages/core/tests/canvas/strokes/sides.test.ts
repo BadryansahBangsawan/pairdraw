@@ -1,9 +1,9 @@
 import { afterAll, describe, expect, test } from 'bun:test'
 
-import { SkiaRenderer } from '@open-pencil/core/canvas'
-import { initCanvasKit } from '@open-pencil/core/io/formats/raster'
-import type { SceneGraph, SceneNode, Stroke } from '@open-pencil/scene-graph'
-import { createDefaultNode } from '@open-pencil/scene-graph/node-defaults'
+import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
+import type { SceneGraph, SceneNode, Stroke } from '@pairdraw/scene-graph'
+import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
 
 import { sideDashSpans, sideStrokeRRects } from '#core/canvas/strokes/sides'
 

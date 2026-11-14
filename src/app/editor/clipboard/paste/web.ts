@@ -1,14 +1,14 @@
-import type { Editor } from '@open-pencil/core'
-import type { HTMLStyler } from '@open-pencil/core/io/formats/html/layers'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
-import { filesMessages } from '@open-pencil/vue/i18n'
+import type { Editor } from '@pairdraw/core'
+import type { HTMLStyler } from '@pairdraw/core/io/formats/html/layers'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
+import { filesMessages } from '@pairdraw/vue/i18n'
 import {
   hasWebContent,
   readWebCaptureClipboard,
   sanitizeWebHTML,
   webCaptureDesignDocument,
   type WebCaptureReadError
-} from '@open-pencil/web-capture'
+} from '@pairdraw/web-capture'
 
 import { styleHTMLInBrowser } from '@/app/code/html-styler'
 import { toast } from '@/app/shell/ui'

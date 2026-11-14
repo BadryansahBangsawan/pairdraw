@@ -66,17 +66,17 @@ Die Slot-Einstellungen beschreiben einen Slot, begrenzen, wie viele Ebenen er au
 ## 5. Wie es weitergeht
 
 - **Als Bibliothek veröffentlichen.** Öffnen Sie **Elemente → Bibliotheken verwalten → Bibliothek veröffentlichen**, damit andere Dateien Button und Card verwenden und Aktualisierungen übernehmen können, wenn Sie sie ändern ([Komponentenbibliotheken](/user-guide/components#component-libraries)).
-- **Die Token an den Code übergeben.** `openpencil tokens design-system.fig` gibt die Variablen als CSS Custom Properties aus, `--format tailwind` als Tailwind-v4-Theme und `--format dtcg --out tokens/` als W3C-Design-Token-Dateien. Der HTML-Export schreibt gebundene Werte als `var()`-Verweise auf dieselben Properties ([Exportieren](./exporting)).
-- **Prüfen.** [Designs prüfen](/user-guide/checking-designs) und `openpencil lint design-system.fig --fix -o fixed.fig` finden Farben, die einem Token entsprechen, aber nicht daran gebunden sind, und binden sie.
-- **Änderungen verfolgen.** Legen Sie die Datei in Git ab und prüfen Sie Änderungen mit [`openpencil diff files`](/de/programmable/cli/git).
+- **Die Token an den Code übergeben.** `pairdraw tokens design-system.fig` gibt die Variablen als CSS Custom Properties aus, `--format tailwind` als Tailwind-v4-Theme und `--format dtcg --out tokens/` als W3C-Design-Token-Dateien. Der HTML-Export schreibt gebundene Werte als `var()`-Verweise auf dieselben Properties ([Exportieren](./exporting)).
+- **Prüfen.** [Designs prüfen](/user-guide/checking-designs) und `pairdraw lint design-system.fig --fix -o fixed.fig` finden Farben, die einem Token entsprechen, aber nicht daran gebunden sind, und binden sie.
+- **Änderungen verfolgen.** Legen Sie die Datei in Git ab und prüfen Sie Änderungen mit [`pairdraw diff files`](/de/programmable/cli/git).
 
 ## Das Beispiel per Skript erstellen
 
-Die Beispieldatei wird von diesem Skript erzeugt, das dieselbe [Figma-kompatible Plugin-API](/de/programmable/cli/scripting) wie `openpencil eval` verwendet. Führen Sie es aus, um die Datei selbst zu erstellen, oder ändern Sie es, um eigene Token auszuprobieren:
+Die Beispieldatei wird von diesem Skript erzeugt, das dieselbe [Figma-kompatible Plugin-API](/de/programmable/cli/scripting) wie `pairdraw eval` verwendet. Führen Sie es aus, um die Datei selbst zu erstellen, oder ändern Sie es, um eigene Token auszuprobieren:
 
 ```sh
 echo '{"children":[]}' > empty.pen
-openpencil eval empty.pen --stdin -o design-system.fig < design-system.js
+pairdraw eval empty.pen --stdin -o design-system.fig < design-system.js
 ```
 
 <<< @/public/examples/design-system.js

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { formatShortcut } from '@open-pencil/vue/editor/commands'
-import { useI18n, useSlidesMessages } from '@open-pencil/vue/i18n'
+import { formatShortcut } from '@pairdraw/vue/editor/commands'
+import { useI18n, useSlidesMessages } from '@pairdraw/vue/i18n'
 
 import { CHAT_COLUMN_SHORTCUT, chatColumnOpen, toggleChatColumn } from '@/app/ai/chat/panel'
 import { useEditorStore } from '@/app/editor/active-store'

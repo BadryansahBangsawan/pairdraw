@@ -4,7 +4,7 @@ import {
   EDITOR_COMMAND_METADATA,
   editorCommandMetadata,
   type EditorCommandMetadata
-} from '@open-pencil/vue/editor/commands'
+} from '@pairdraw/vue/editor/commands'
 
 import { APP_MENU_SCHEMA, type AppMenuEntry } from '@/app/shell/menu/schema'
 import { shortcutTokenToTinykeys } from '@/app/shell/menu/shortcut'

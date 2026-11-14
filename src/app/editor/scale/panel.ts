@@ -5,9 +5,9 @@ import {
   scaleFactorForSize,
   type ScaleAnchor,
   type ScaleSession
-} from '@open-pencil/core'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
-import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
+} from '@pairdraw/core'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
+import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
 
 import type { EditorStore } from '@/app/editor/active-store'
 

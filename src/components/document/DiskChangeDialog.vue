@@ -3,7 +3,7 @@ import { useStore } from '@nanostores/vue'
 import { useFocus } from '@vueuse/core'
 import { useTemplateRef, watch } from 'vue'
 
-import { filesMessages } from '@open-pencil/vue/i18n'
+import { filesMessages } from '@pairdraw/vue/i18n'
 
 import AppButton from '@/components/ui/button/AppButton.vue'
 import AppAlertDialogRoot from '@/components/ui/dialog/AppAlertDialogRoot.vue'

@@ -1,7 +1,7 @@
 import * as v from 'valibot'
 
 import type { FigmaComponentNode, FigmaNodeProxy } from '#core/figma-api'
-import { OpenPencilAPI } from '#core/openpencil-api'
+import { PairdrawAPI } from '#core/pairdraw-api'
 import { toolNumber, defineTool, nodeSummary, requireNodes } from '#core/tools/schema'
 
 export const createComponent = defineTool({
@@ -98,7 +98,7 @@ export const exposeInstanceSwap = defineTool({
       return { error: 'One or more candidate IDs were not found' }
     try {
       return nodeSummary(
-        new OpenPencilAPI(figma).exposeInstanceSwap(slots, candidates, property_name)
+        new PairdrawAPI(figma).exposeInstanceSwap(slots, candidates, property_name)
       )
     } catch (error) {
       return { error: error instanceof Error ? error.message : String(error) }

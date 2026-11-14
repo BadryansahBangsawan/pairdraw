@@ -52,7 +52,7 @@ export function pairingFingerprint(code: string): string {
 
 interface Session {
   lastUsed: number
-  /** The digest of the token this tab hands its agents for OpenPencil's MCP server. */
+  /** The digest of the token this tab hands its agents for Pairdraw's MCP server. */
   agentKey: string
 }
 

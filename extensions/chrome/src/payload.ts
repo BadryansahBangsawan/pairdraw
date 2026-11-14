@@ -2,8 +2,8 @@ import {
   encodeWebCaptureClipboard,
   type WebCapture,
   type WebCaptureClipboardPayload
-} from '@open-pencil/web-capture'
-import type { CaptureOptions } from '@open-pencil/web-capture/capturer'
+} from '@pairdraw/web-capture'
+import type { CaptureOptions } from '@pairdraw/web-capture/capturer'
 
 /**
  * Image bytes a page capture inlines at most. The popup receives the clipboard payload in one

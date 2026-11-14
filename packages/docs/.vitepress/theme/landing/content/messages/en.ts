@@ -67,7 +67,7 @@ export const en: LandingMessages = {
     script: {
       title: 'Script everything',
       detail:
-        'The openpencil CLI works on a file with no app running, or drives the app you have open. Inspect a document, query it with XPath, lint it, export it, or run Figma plugin code against it with eval. The MCP server gives agents the same reach over stdio or HTTP.',
+        'The pairdraw CLI works on a file with no app running, or drives the app you have open. Inspect a document, query it with XPath, lint it, export it, or run Figma plugin code against it with eval. The MCP server gives agents the same reach over stdio or HTTP.',
       hint: 'Run a command and watch the canvas.'
     },
     sdk: {

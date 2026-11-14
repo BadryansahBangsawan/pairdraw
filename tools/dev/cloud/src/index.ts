@@ -2,21 +2,21 @@ import { existsSync } from 'node:fs'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-import { resolveWorkspaceRoot } from '@open-pencil/package-artifacts-tools'
-import { randomHex } from '@open-pencil/scene-graph/random'
+import { resolveWorkspaceRoot } from '@pairdraw/package-artifacts-tools'
+import { randomHex } from '@pairdraw/scene-graph/random'
 
 import { composeProjectName, localCloudDeploymentTOML } from './config'
 
 const root = await resolveWorkspaceRoot(import.meta.dir)
 const composeFile = join(root, 'packages/cloud/deploy/compose.yml')
 const generatedDirectory = join(root, 'packages/cloud/deploy/generated')
-const generatedConfig = join(generatedDirectory, 'openpencil-cloud.local.toml')
+const generatedConfig = join(generatedDirectory, 'pairdraw-cloud.local.toml')
 const generatedSecret = join(generatedDirectory, 'auth-secret')
 
 // Development-only credentials shared with compose.yml defaults.
-const POSTGRES_PASSWORD = 'openpencil-development-password'
-const S3_ACCESS_KEY_ID = 'openpencil'
-const S3_SECRET_ACCESS_KEY = 'openpencil-development-secret'
+const POSTGRES_PASSWORD = 'pairdraw-development-password'
+const S3_ACCESS_KEY_ID = 'pairdraw'
+const S3_SECRET_ACCESS_KEY = 'pairdraw-development-secret'
 
 async function output(command: string[]): Promise<string> {
   const child = Bun.spawn(command, { cwd: root, stdout: 'pipe', stderr: 'pipe' })
@@ -77,11 +77,11 @@ async function authSecret(): Promise<string> {
 
 async function start(project: string): Promise<void> {
   const [cloudURL, siteURL, mailURL, objectStorageURL, editorURL] = await Promise.all([
-    portlessURL('cloud.open-pencil'),
-    portlessURL('cloud-site.open-pencil'),
-    portlessURL('mail.open-pencil'),
-    portlessURL('s3.open-pencil'),
-    portlessURL('open-pencil')
+    portlessURL('cloud.pairdraw'),
+    portlessURL('cloud-site.pairdraw'),
+    portlessURL('mail.pairdraw'),
+    portlessURL('s3.pairdraw'),
+    portlessURL('pairdraw')
   ])
 
   // Port 0 lets Docker pick free loopback ports, so worktrees never collide.
@@ -130,11 +130,11 @@ async function start(project: string): Promise<void> {
   // The server serves the editor and its own pages from Vite's development server, so an edit
   // shows at once, through hot updates, with no build.
   const site = Bun.spawn(
-    ['bunx', 'portless', 'run', '--name', 'cloud-site.open-pencil', 'vite', '--mode', 'cloud'],
+    ['bunx', 'portless', 'run', '--name', 'cloud-site.pairdraw', 'vite', '--mode', 'cloud'],
     { cwd: root, stdout: 'inherit', stderr: 'inherit' }
   )
 
-  console.warn(`OpenPencil Cloud: ${cloudURL}`)
+  console.warn(`Pairdraw Cloud: ${cloudURL}`)
   console.warn(`Captured email:  ${mailURL}`)
   console.warn('Stop the services with `bun run cloud:dev:down`; their data is kept.')
 
@@ -145,7 +145,7 @@ async function start(project: string): Promise<void> {
         'portless',
         'run',
         '--name',
-        'cloud.open-pencil',
+        'cloud.pairdraw',
         'bun',
         '--watch',
         'packages/cloud/src/runtime/node/main.ts'
@@ -155,9 +155,9 @@ async function start(project: string): Promise<void> {
         environment: {
           ...process.env,
           HOST: '127.0.0.1',
-          OPENPENCIL_CLOUD_CONFIG: generatedConfig,
-          OPENPENCIL_CLOUD_DEV_SITE_URL: siteURL,
-          DATABASE_URL: `postgresql://openpencil:${POSTGRES_PASSWORD}@127.0.0.1:${postgresPort}/openpencil`,
+          PAIRDRAW_CLOUD_CONFIG: generatedConfig,
+          PAIRDRAW_CLOUD_DEV_SITE_URL: siteURL,
+          DATABASE_URL: `postgresql://pairdraw:${POSTGRES_PASSWORD}@127.0.0.1:${postgresPort}/pairdraw`,
           BETTER_AUTH_SECRET: betterAuthSecret,
           S3_ACCESS_KEY_ID,
           S3_SECRET_ACCESS_KEY
@@ -172,7 +172,7 @@ async function start(project: string): Promise<void> {
 
 async function stop(project: string): Promise<void> {
   await execute(compose(project, 'down'), { allowFailure: true })
-  for (const name of ['mail.open-pencil', 's3.open-pencil']) {
+  for (const name of ['mail.pairdraw', 's3.pairdraw']) {
     const url = await portlessURL(name)
     await execute(['bunx', 'portless', 'alias', '--remove', aliasName(url)], {
       allowFailure: true

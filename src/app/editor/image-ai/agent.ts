@@ -77,7 +77,7 @@ export function createAgentImageAIService(store: EditorStore): AgentImageAIServi
 
 /**
  * Lets agent tool calls on `store`'s document use the app's image services. `register` is Core's
- * registry for them, `registerImageAIService` from `@open-pencil/core/tools`, keyed by the graph
+ * registry for them, `registerImageAIService` from `@pairdraw/core/tools`, keyed by the graph
  * as `registerImageVectorizer` is.
  */
 export function bindAgentImageAIService(

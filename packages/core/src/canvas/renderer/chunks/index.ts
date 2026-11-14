@@ -1,10 +1,10 @@
 import RBush from 'rbush'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import { computeDescendantVisualBounds } from '@open-pencil/scene-graph/geometry'
-import type { Mat3 } from '@open-pencil/scene-graph/matrix'
-import Matrix from '@open-pencil/scene-graph/matrix'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import { computeDescendantVisualBounds } from '@pairdraw/scene-graph/geometry'
+import type { Mat3 } from '@pairdraw/scene-graph/matrix'
+import Matrix from '@pairdraw/scene-graph/matrix'
 
 import { worldNodeVisualBounds } from '#core/canvas/renderer/visual-bounds'
 

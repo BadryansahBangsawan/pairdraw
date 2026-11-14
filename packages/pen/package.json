@@ -1,10 +1,10 @@
 {
-  "name": "@open-pencil/pen",
+  "name": "@pairdraw/pen",
   "version": "0.16.0",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/open-pencil/open-pencil.git",
+    "url": "git+https://github.com/BadryansahBangsawan/pairdraw.git",
     "directory": "packages/pen"
   },
   "files": [
@@ -45,6 +45,6 @@
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "peerDependencies": {
-    "@open-pencil/scene-graph": "workspace:*"
+    "@pairdraw/scene-graph": "workspace:*"
   }
 }

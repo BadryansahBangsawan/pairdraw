@@ -5,7 +5,7 @@
  * and its error reaches the panel.
  */
 
-import type { ShaderAutomaticInput } from '@open-pencil/scene-graph/shaders'
+import type { ShaderAutomaticInput } from '@pairdraw/scene-graph/shaders'
 
 /** One translated shader, or the reason it cannot be translated. */
 export interface ShaderTranslation {

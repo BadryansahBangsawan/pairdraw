@@ -1,5 +1,5 @@
-import { resolveEditorProfile, type Editor } from '@open-pencil/core'
-import type { MenuEntry } from '@open-pencil/vue/editor/menu-model'
+import { resolveEditorProfile, type Editor } from '@pairdraw/core'
+import type { MenuEntry } from '@pairdraw/vue/editor/menu-model'
 
 import {
   followTextLink,

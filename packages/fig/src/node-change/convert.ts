@@ -1,20 +1,20 @@
 import { clamp } from 'es-toolkit'
 
-import { guidToString, isUnsetGuid } from '@open-pencil/kiwi/fig/guid'
-import { settleBrowserNodeData } from '@open-pencil/scene-graph/browser-node'
+import { guidToString, isUnsetGuid } from '@pairdraw/kiwi/fig/guid'
+import { settleBrowserNodeData } from '@pairdraw/scene-graph/browser-node'
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_STROKE_MITER_LIMIT,
   DEFAULT_STROKE_WEIGHT
-} from '@open-pencil/scene-graph/constants'
-import { getNodeLocalMatrix } from '@open-pencil/scene-graph/coordinate'
-import { isMeshFill } from '@open-pencil/scene-graph/gradient'
-import { createDefaultSourceMetadata } from '@open-pencil/scene-graph/node-defaults'
-import { OPEN_PENCIL_PLUGIN_DATA } from '@open-pencil/scene-graph/plugin-data'
-import { POINT_COUNT_RANGE } from '@open-pencil/scene-graph/polygon'
-import { isShapeWithTextType } from '@open-pencil/scene-graph/shape-with-text'
-import { pixelLength } from '@open-pencil/scene-graph/text'
-import { parseVariantName } from '@open-pencil/scene-graph/variant-name'
+} from '@pairdraw/scene-graph/constants'
+import { getNodeLocalMatrix } from '@pairdraw/scene-graph/coordinate'
+import { isMeshFill } from '@pairdraw/scene-graph/gradient'
+import { createDefaultSourceMetadata } from '@pairdraw/scene-graph/node-defaults'
+import { PAIRDRAW_PLUGIN_DATA } from '@pairdraw/scene-graph/plugin-data'
+import { POINT_COUNT_RANGE } from '@pairdraw/scene-graph/polygon'
+import { isShapeWithTextType } from '@pairdraw/scene-graph/shape-with-text'
+import { pixelLength } from '@pairdraw/scene-graph/text'
+import { parseVariantName } from '@pairdraw/scene-graph/variant-name'
 /* eslint-disable max-lines -- kiwi↔scene conversion helpers are tightly coupled */
 
 import { importCanvasGuides } from './canvas-guides'
@@ -63,7 +63,7 @@ export {
 } from './text/values'
 export { resolveGeometryPaths } from './vector/geometry'
 
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 import type {
   SceneNode,
   TextLength,
@@ -91,8 +91,8 @@ import type {
   SymbolLink,
   VariantPropSpec,
   VariableModeMap
-} from '@open-pencil/scene-graph'
-import type { Vector, GUID } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph'
+import type { Vector, GUID } from '@pairdraw/scene-graph/primitives'
 
 import { savedFace } from './font/style'
 import { numericVariableAssignmentScales, sourceVariableBindingScales } from './variable/bindings'
@@ -333,7 +333,7 @@ function convertPolygonProps(
 }
 
 /**
- * A text's line height. Figma writes auto as 100 percent, and OpenPencil once wrote none for
+ * A text's line height. Figma writes auto as 100 percent, and Pairdraw once wrote none for
  * it; a text in auto lines up each line at its own font's height. Figma saves each line at the
  * larger of its line height and its tallest font's height, so a first line shorter than the
  * text's height in pixels was laid out at another one, which a style the text uses set. A first
@@ -486,7 +486,7 @@ function convertTextProps(nc: NodeChange, blobs: Uint8Array[]): TextProps {
     opticalSizeFromFontSize: nc.detachOpticalSizeFromFontSize !== true,
     fontFeatures: convertFontFeatures(nc),
     textTruncation: (nc.textTruncation as string) === 'ENDING' ? 'ENDING' : 'DISABLED',
-    textDirection: readNodeChangePluginData(nc, OPEN_PENCIL_PLUGIN_DATA.textDirection) ?? 'AUTO',
+    textDirection: readNodeChangePluginData(nc, PAIRDRAW_PLUGIN_DATA.textDirection) ?? 'AUTO',
     ...convertDerivedText(nc, blobs)
   }
 }
@@ -563,13 +563,13 @@ function targetAspectRatio(nc: NodeChange): SceneNode['targetAspectRatio'] {
 }
 
 /**
- * Figma's alignment, or space around where OpenPencil kept it as plugin data over Figma's space
+ * Figma's alignment, or space around where Pairdraw kept it as plugin data over Figma's space
  * between. A record that no longer says space between was changed in Figma, which wins.
  */
 function convertPrimaryAxisAlign(nc: NodeChange): LayoutAlign {
   const align = mapStackJustify(nc.stackPrimaryAlignItems ?? nc.stackJustify)
   if (align !== 'SPACE_BETWEEN') return align
-  return readNodeChangePluginData(nc, OPEN_PENCIL_PLUGIN_DATA.primaryAxisAlign) ?? align
+  return readNodeChangePluginData(nc, PAIRDRAW_PLUGIN_DATA.primaryAxisAlign) ?? align
 }
 
 function convertLayoutProps(
@@ -628,8 +628,7 @@ function convertLayoutProps(
       (nc.stackCounterAlignContent as string) === 'SPACE_BETWEEN' ? 'SPACE_BETWEEN' : 'AUTO',
     itemReverseZIndex: (nc.stackReverseZIndex ?? false) as boolean,
     strokesIncludedInLayout: (nc.strokesIncludedInLayout ?? false) as boolean,
-    layoutDirection:
-      readNodeChangePluginData(nc, OPEN_PENCIL_PLUGIN_DATA.layoutDirection) ?? 'AUTO',
+    layoutDirection: readNodeChangePluginData(nc, PAIRDRAW_PLUGIN_DATA.layoutDirection) ?? 'AUTO',
     ...(derivedLayout ? { derivedLayout } : {})
   }
 }
@@ -716,7 +715,7 @@ function convertVectorAndStrokeProps(nc: NodeChange, blobs: Uint8Array[]) {
 
 function resolveNodeType(nc: NodeChange): NodeType | 'DOCUMENT' | 'VARIABLE' {
   const nodeType = mapNodeType(nc.type)
-  const storedType = readNodeChangePluginData(nc, OPEN_PENCIL_PLUGIN_DATA.nodeType)
+  const storedType = readNodeChangePluginData(nc, PAIRDRAW_PLUGIN_DATA.nodeType)
   if (storedType === 'SCRIPT') return 'SCRIPT'
   if ((nodeType === 'FRAME' && isComponentSet(nc)) || storedType === 'COMPONENT_SET') {
     return 'COMPONENT_SET'
@@ -822,7 +821,7 @@ export function nodeChangeToProps(
   // See path/text-layout.ts — expand the layout box before node creation so
   // clipsContent parents don't shave overflowing path lettering at first paint.
   expandPathTextLayoutBox(props, textPathData)
-  // A saved OpenPencil doc carries the true textPathBox (reflow may have
+  // A saved Pairdraw doc carries the true textPathBox (reflow may have
   // scaled it); the expand-time reconstruction is only right for pristine
   // Figma exports. Plugin box is in pre-expansion local coords — expand's
   // shift is textPathBox.x/y by construction, so re-home it.
@@ -1193,7 +1192,7 @@ export function sortChildren(
 }
 
 interface PreservedFigmaBlob {
-  __openPencilFigmaBlob: Uint8Array
+  __pairdrawFigmaBlob: Uint8Array
 }
 
 function preserveFigmaPayloadBlobs(value: unknown, blobs: Uint8Array[]): unknown {
@@ -1208,7 +1207,7 @@ function preserveFigmaPayloadBlobs(value: unknown, blobs: Uint8Array[]): unknown
         result[key] = child
       } else {
         result[key] = {
-          __openPencilFigmaBlob:
+          __pairdrawFigmaBlob:
             blob instanceof Uint8Array
               ? blob
               : new Uint8Array(Object.values(blob as Record<string, number>))

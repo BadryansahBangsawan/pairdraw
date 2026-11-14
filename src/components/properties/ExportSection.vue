@@ -2,10 +2,10 @@
 import { tryOnScopeDispose, useObjectUrl } from '@vueuse/core'
 import { computed, onActivated, onDeactivated, ref, shallowRef, watch } from 'vue'
 
-import type { ExportSetting } from '@open-pencil/scene-graph'
-import { useExport } from '@open-pencil/vue/document/export'
-import { useI18n } from '@open-pencil/vue/i18n'
-import { useRetainedActivity } from '@open-pencil/vue/lifecycle/retention'
+import type { ExportSetting } from '@pairdraw/scene-graph'
+import { useExport } from '@pairdraw/vue/document/export'
+import { useI18n } from '@pairdraw/vue/i18n'
+import { useRetainedActivity } from '@pairdraw/vue/lifecycle/retention'
 
 import type { ExportTargetRequest } from '@/app/document/export/create'
 import { htmlExportSettings } from '@/app/document/export/html'

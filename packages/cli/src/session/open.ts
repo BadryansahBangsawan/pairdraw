@@ -1,8 +1,8 @@
 import { basename, resolve } from 'node:path'
 
-import { flushPendingLayout } from '@open-pencil/core/figma-api'
-import type { ToolDef } from '@open-pencil/core/tools'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import { flushPendingLayout } from '@pairdraw/core/figma-api'
+import type { ToolDef } from '@pairdraw/core/tools'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { rpc } from '#cli/app/client'
 import { appTargetRPCArgs, type AppTargetCLIArgs } from '#cli/app/target'

@@ -4,7 +4,7 @@ import type { DesignDocument, DesignNode, DesignStyleDeclaration } from '#dom-cs
 import { compact } from 'es-toolkit/array'
 import { omit } from 'es-toolkit/object'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 
 import {
   designFontRequests,
@@ -52,7 +52,7 @@ export interface ExportStorybookOptions {
    * page's name between when it has several. Without it, stories are titled by page.
    */
   document?: string
-  /** Repository-relative `.fig`/`.pen` path; adds an `openpencil://` design link to stories. */
+  /** Repository-relative `.fig`/`.pen` path; adds an `pairdraw://` design link to stories. */
   linkPath?: string
   /** Renders a variant to PNG; each story then shows it next to the link as its design. */
   renderDesignImage?: (nodeId: string) => Promise<Uint8Array>
@@ -71,7 +71,7 @@ export interface ExportStorybookOptions {
   fonts?: WebFontFaceResolver
   /**
    * The folder a document's shared files go in, its fonts and design tokens, which must differ
-   * for each document exported into the same place; `openpencil/<document>` by default.
+   * for each document exported into the same place; `pairdraw/<document>` by default.
    */
   folder?: string
 }
@@ -135,7 +135,7 @@ function designLink(
 ): StoryDesign[] {
   const node = candidates.find((name) => name !== undefined && context.uniqueNames.has(name))
   if (!context.linkPath || !node) return []
-  const url = `openpencil://open?file=${encodeURIComponent(context.linkPath)}&node=${encodeURIComponent(node)}`
+  const url = `pairdraw://open?file=${encodeURIComponent(context.linkPath)}&node=${encodeURIComponent(node)}`
   return [{ type: 'link', url }]
 }
 
@@ -315,7 +315,7 @@ function documentFolder(graph: SceneGraph, options: ExportStorybookOptions): str
   if (options.folder) return options.folder
   const page = options.pageId ? graph.getNode(options.pageId)?.name : undefined
   const named = compact([options.document ?? 'document', page]).map((name) => storyId(name))
-  return `openpencil/${named.join('-')}`
+  return `pairdraw/${named.join('-')}`
 }
 
 /**

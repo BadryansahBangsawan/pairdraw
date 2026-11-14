@@ -43,8 +43,8 @@ async function modifierClick(x: number, y: number) {
 test.beforeAll(async () => {
   await editor.canvas.clearCanvas()
   textId = await editor.page.evaluate((box) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.state.zoom = 1
     store.state.panX = 0
     store.state.panY = 0
@@ -112,8 +112,8 @@ test('opens the link with a modifier click and selects without one', async () =>
 test('links only the selected word while the text is edited', async () => {
   await editor.canvas.click(TEXT.x + 300, TEXT.y + 200)
   await editor.page.evaluate((id) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.setTextHyperlink(id, null, [0, 13])
   }, textId)
   await editor.canvas.dblclick(READ.x, READ.y)
@@ -158,8 +158,8 @@ test('shows a hand over a link only while the modifier is held', async () => {
 
 test('opens a link with a plain click in Preview', async () => {
   await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.togglePlay()
   })
   await editor.canvas.waitForRender()
@@ -177,8 +177,8 @@ test('opens a link with a plain click in Preview', async () => {
   await opened.close()
 
   await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.togglePlay()
   })
   await editor.canvas.waitForRender()
@@ -186,8 +186,8 @@ test('opens a link with a plain click in Preview', async () => {
 
 test('adds a link from the canvas menu', async () => {
   await editor.page.evaluate((id) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.setTextHyperlink(id, null, [0, 13])
     store.select([id])
   }, textId)
@@ -209,8 +209,8 @@ test('adds a link from the canvas menu', async () => {
 
 test('adds a link from the Text menu', async () => {
   await editor.page.evaluate((id) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.setTextHyperlink(id, null, [0, 13])
     store.select([id])
   }, textId)

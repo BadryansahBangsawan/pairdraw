@@ -5,7 +5,7 @@ import {
   selectionColors,
   selectionColorsShown,
   type SelectionColor
-} from '@open-pencil/core'
+} from '@pairdraw/core'
 
 import { useUndoBatch } from '#vue/controls/undo-batch/use'
 import { useEditor } from '#vue/editor/context'

@@ -1,4 +1,4 @@
-import type { ACPAgentDef } from '@open-pencil/core/constants'
+import type { ACPAgentDef } from '@pairdraw/core/constants'
 
 import { checkAgentAuth } from '@/app/ai/agents/acp/auth/session'
 import { startTerminalSignIn } from '@/app/ai/agents/acp/auth/terminal'

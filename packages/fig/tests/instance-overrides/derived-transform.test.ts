@@ -1,9 +1,9 @@
 import { expect, test } from 'bun:test'
 
-import { interpretInstance, materializeInstance } from '@open-pencil/fig/instance-overrides'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { getNodeLocalMatrix } from '@open-pencil/scene-graph/coordinate'
+import { interpretInstance, materializeInstance } from '@pairdraw/fig/instance-overrides'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { getNodeLocalMatrix } from '@pairdraw/scene-graph/coordinate'
 
 for (const reflected of [false, true]) {
   test(`derived size keeps the original local matrix (reflected=${reflected})`, () => {

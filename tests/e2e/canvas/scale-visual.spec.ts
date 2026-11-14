@@ -10,8 +10,8 @@ const BLACK = { r: 0, g: 0, b: 0, a: 1 }
  */
 test('the Scale tool scales strokes, radii, effects, and text with the layer', async () => {
   await editor.page.evaluate((black) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.state.panX = 0
     store.state.panY = 0
     store.state.zoom = 1

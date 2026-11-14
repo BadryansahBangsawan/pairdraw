@@ -5,12 +5,12 @@ description: Exécuter JavaScript avec une API compatible avec les plugins Figma
 
 # Scripting
 
-`openpencil eval` exécute JavaScript sur un document et fournit un objet global `figma`. Cette commande convient aux modifications par lots, à l’inspection, aux données de test et à l’automatisation sans ouvrir l’interface de l’éditeur.
+`pairdraw eval` exécute JavaScript sur un document et fournit un objet global `figma`. Cette commande convient aux modifications par lots, à l’inspection, aux données de test et à l’automatisation sans ouvrir l’interface de l’éditeur.
 
 ## Utilisation de base
 
 ```sh
-openpencil eval design.fig -c "return figma.currentPage.children.length"
+pairdraw eval design.fig -c "return figma.currentPage.children.length"
 ```
 
 `-c` accepte JavaScript. Si le code ne commence pas par `return`, Pairdraw l’exécute dans une fonction asynchrone et renvoie le résultat éventuel.
@@ -18,7 +18,7 @@ openpencil eval design.fig -c "return figma.currentPage.children.length"
 ## Interroger des objets
 
 ```sh
-openpencil eval design.fig -c "
+pairdraw eval design.fig -c "
   return figma.currentPage
     .findAll((node) => node.type === 'FRAME')
     .map((node) => ({ id: node.id, name: node.name }))
@@ -30,13 +30,13 @@ openpencil eval design.fig -c "
 `--write` ou `-w` remplace le fichier d’entrée. `--output` ou `-o` crée un autre fichier. `--preview-output preview.png` écrit, après le script, un PNG de la page qu’il laisse courante.
 
 ```sh
-openpencil eval design.fig -c "figma.currentPage.name = 'Updated'" -o updated.fig
+pairdraw eval design.fig -c "figma.currentPage.name = 'Updated'" -o updated.fig
 ```
 
 ## Lire le script depuis stdin
 
 ```sh
-cat transform.js | openpencil eval design.fig --stdin --write
+cat transform.js | pairdraw eval design.fig --stdin --write
 ```
 
 ## Document ouvert

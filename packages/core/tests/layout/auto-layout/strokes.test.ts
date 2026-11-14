@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph, type SceneNode, type Stroke } from '@open-pencil/scene-graph'
+import { SceneGraph, type SceneNode, type Stroke } from '@pairdraw/scene-graph'
 
 import { computeAllLayouts } from '#core/layout'
 

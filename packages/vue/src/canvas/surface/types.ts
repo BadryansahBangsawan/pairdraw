@@ -1,6 +1,6 @@
-import type { EditorState } from '@open-pencil/core'
-import type { ViewportTransform } from '@open-pencil/core/geometry'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import type { EditorState } from '@pairdraw/core'
+import type { ViewportTransform } from '@pairdraw/core/geometry'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 import type { PresentationColorSpace } from '#vue/canvas/surface/color-space'
 

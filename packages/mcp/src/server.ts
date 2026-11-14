@@ -7,7 +7,7 @@ import { Hono, type Context, type Next } from 'hono'
 import { cors } from 'hono/cors'
 import { WebSocketServer } from 'ws'
 
-import { MCP_AGENT_HEADER, MCP_CHAT_HEADER } from '@open-pencil/core/constants'
+import { MCP_AGENT_HEADER, MCP_CHAT_HEADER } from '@pairdraw/core/constants'
 
 import { createAgentBridge, type AgentBridge, type AgentBridgeOptions } from '#mcp/agents/index'
 import { bearerToken, isAuthorized, mcpRequestToken } from '#mcp/auth'
@@ -94,7 +94,7 @@ export interface ServerOptions {
    */
   appWaitTimeoutMs?: number
   /**
-   * Turns on the companion's agent bridge (`openpencil-connect`): pairing with the web app, and
+   * Turns on the companion's agent bridge (`pairdraw-connect`): pairing with the web app, and
    * finding, installing, signing in to, and starting the coding agents in `ACP_AGENTS` for a
    * paired tab. Off unless set.
    */
@@ -271,7 +271,7 @@ function buildServerContext(options: ServerOptions) {
     scope: options.scope ?? 'document'
   }
   const mcpRoot = options.mcpRoot ?? null
-  // Auto-generated so all transports require auth by default. Override via OPENPENCIL_MCP_AUTH_TOKEN or authToken option.
+  // Auto-generated so all transports require auth by default. Override via PAIRDRAW_MCP_AUTH_TOKEN or authToken option.
   // Pass authToken: null explicitly to disable auth entirely.
   const authToken =
     options.authToken === undefined ? randomBytes(16).toString('hex') : options.authToken
@@ -303,7 +303,7 @@ function buildServerContext(options: ServerOptions) {
     process.stderr.write(
       `WARNING: MCP server is running without authentication on TCP port ${httpPort}. ` +
         'Any local process can interact with the server. ' +
-        'Set OPENPENCIL_MCP_AUTH_TOKEN to enable auth, or use PORT=0 for socket-only transport.\n'
+        'Set PAIRDRAW_MCP_AUTH_TOKEN to enable auth, or use PORT=0 for socket-only transport.\n'
     )
   }
 

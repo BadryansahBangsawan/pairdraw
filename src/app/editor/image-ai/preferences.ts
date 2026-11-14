@@ -11,11 +11,11 @@ import {
 /** The model asked when none is set: OpenAI's image model, which edits as well as generates. */
 export const DEFAULT_IMAGE_AI_MODEL = 'gpt-image-1'
 
-const storedProvider = useLocalStorage<string>('open-pencil:image-ai:provider', 'openai')
-const storedBaseURL = useLocalStorage<string>('open-pencil:image-ai:base-url', '')
-const storedModel = useLocalStorage<string>('open-pencil:image-ai:model', '')
+const storedProvider = useLocalStorage<string>('pairdraw:image-ai:provider', 'openai')
+const storedBaseURL = useLocalStorage<string>('pairdraw:image-ai:base-url', '')
+const storedModel = useLocalStorage<string>('pairdraw:image-ai:model', '')
 const storedBackgroundService = useLocalStorage<string>(
-  'open-pencil:image-ai:background-service',
+  'pairdraw:image-ai:background-service',
   'image-ai'
 )
 

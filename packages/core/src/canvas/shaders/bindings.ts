@@ -1,7 +1,7 @@
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import { colorToHexRaw } from '@open-pencil/scene-graph/color'
-import type { ShaderUniformValue } from '@open-pencil/scene-graph/shaders'
-import { resolveVariableForNode } from '@open-pencil/scene-graph/variables'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { colorToHexRaw } from '@pairdraw/scene-graph/color'
+import type { ShaderUniformValue } from '@pairdraw/scene-graph/shaders'
+import { resolveVariableForNode } from '@pairdraw/scene-graph/variables'
 
 /**
  * The uniform values a shader paint or effect draws with: the values the document stores, each

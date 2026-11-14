@@ -1,10 +1,10 @@
 import { beforeAll, expect, test } from 'bun:test'
 
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { parseFigBuffer } from '@open-pencil/fig'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { reconcileVariableBindings } from '@open-pencil/scene-graph/variables'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { parseFigBuffer } from '@pairdraw/fig'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { reconcileVariableBindings } from '@pairdraw/scene-graph/variables'
 
 beforeAll(async () => {
   await initCodec()

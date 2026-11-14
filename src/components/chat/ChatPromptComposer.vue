@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, useTemplateRef } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { chatInputTheme } from '@/components/chat/ui'
 import IconButton from '@/components/ui/button/IconButton.vue'

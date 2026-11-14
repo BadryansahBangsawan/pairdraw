@@ -7,8 +7,8 @@ const editor = useEditorSetupWithClear('/?test&no-chrome&no-rulers')
 
 test('a selected frame draws its reactions to the frames they show', async () => {
   await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const graph = store.graph
     const pageId = store.state.currentPageId
     const fill = [

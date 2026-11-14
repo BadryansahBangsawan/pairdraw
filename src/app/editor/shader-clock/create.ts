@@ -1,11 +1,11 @@
 import { watch } from 'vue'
 
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 import {
   isShaderSourcePaint,
   parseShaderUniforms,
   readShaderPaints
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 import { animationsEnabled } from '@/app/shell/motion'
 

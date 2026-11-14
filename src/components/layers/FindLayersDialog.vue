@@ -4,11 +4,11 @@ import { computed } from 'vue'
 import Search from '~icons/lucide/search'
 import X from '~icons/lucide/x'
 
-import { useCommandMessages, useCommonMessages } from '@open-pencil/vue/i18n'
+import { useCommandMessages, useCommonMessages } from '@pairdraw/vue/i18n'
 import {
   CommandPaletteRoot,
   type CommandPaletteGroup
-} from '@open-pencil/vue/primitives/CommandPalette'
+} from '@pairdraw/vue/primitives/CommandPalette'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { findableLayers, goToLayer } from '@/app/editor/layers/find'

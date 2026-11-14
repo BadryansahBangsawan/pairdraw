@@ -2,7 +2,7 @@
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import { useAgentMessages } from '@open-pencil/vue/i18n'
+import { useAgentMessages } from '@pairdraw/vue/i18n'
 
 import {
   choiceName,

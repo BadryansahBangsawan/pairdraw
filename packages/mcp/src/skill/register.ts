@@ -1,5 +1,5 @@
 import type { McpServer, PromptMessage } from '@modelcontextprotocol/server'
-// eslint-disable-next-line open-pencil/no-mixed-case-acronym-identifiers -- Upstream export spelling.
+// eslint-disable-next-line pairdraw/no-mixed-case-acronym-identifiers -- Upstream export spelling.
 import { toStandardJsonSchema as toStandardJSONSchema } from '@valibot/to-json-schema'
 import * as v from 'valibot'
 
@@ -36,8 +36,8 @@ function taskMessage(task: string | undefined): PromptMessage {
     content: {
       type: 'text',
       text: request
-        ? `Follow the Pairdraw skill above and use the open-pencil tools for this task: ${request}`
-        : 'Follow the Pairdraw skill above whenever you use the open-pencil tools in this conversation.'
+        ? `Follow the Pairdraw skill above and use the pairdraw tools for this task: ${request}`
+        : 'Follow the Pairdraw skill above whenever you use the pairdraw tools in this conversation.'
     }
   }
 }

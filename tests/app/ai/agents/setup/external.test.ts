@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import * as v from 'valibot'
 
-import { ACP_AGENTS } from '@open-pencil/core/constants'
+import { ACP_AGENTS } from '@pairdraw/core/constants'
 
 import type { AgentAuthStatus } from '@/app/ai/agents/acp/auth/status'
 import { rankAgentCandidates } from '@/app/ai/agents/auto/pick'

@@ -1,5 +1,5 @@
-import type { Effect, Fill } from '@open-pencil/scene-graph'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import type { Effect, Fill } from '@pairdraw/scene-graph'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { ComponentProperty } from './component-properties'
 import type { DesignMode, DesignVariable } from './variables'

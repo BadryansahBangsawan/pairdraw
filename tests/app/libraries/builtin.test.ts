@@ -4,8 +4,8 @@ import {
   BUILTIN_LIBRARY_ID,
   MemoryLibraryCatalog,
   publishBasicsLibrary
-} from '@open-pencil/core/library'
-import { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/library'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { createEditorStore } from '@/app/editor/session'
 import { cacheUntilRejection } from '@/app/libraries/catalog/builtin'

@@ -1,4 +1,4 @@
-import type { LibraryCatalog } from '@open-pencil/core/library'
+import type { LibraryCatalog } from '@pairdraw/core/library'
 
 import { createActiveStorageAdapter, storagePreferencesComplete } from '@/app/integrations/storage'
 import { activeStorageProviderID } from '@/app/integrations/storage/preferences'

@@ -1,7 +1,7 @@
 import { useEventListener } from '@vueuse/core'
 
-import { isDocumentFontFileName } from '@open-pencil/core/text'
-import { filterCanvasFiles } from '@open-pencil/vue/canvas/drop'
+import { isDocumentFontFileName } from '@pairdraw/core/text'
+import { filterCanvasFiles } from '@pairdraw/vue/canvas/drop'
 
 import { getActiveEditorStoreOrNull } from '@/app/editor/active-store'
 import { importDroppedFonts } from '@/app/editor/fonts/document'

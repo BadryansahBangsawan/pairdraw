@@ -2,7 +2,7 @@ import {
   createIconProvider,
   createSFSymbolsProvider,
   SF_SYMBOLS_PREFIX
-} from '@open-pencil/core/icons'
+} from '@pairdraw/core/icons'
 
 import { browserWebFontFetch } from '@/app/editor/fonts/browser-fetch'
 import { tauriFetch } from '@/app/tauri/http'

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { isLayerRef, isMode, isVariable } from '@open-pencil/design-jsx'
+import { isLayerRef, isMode, isVariable } from '@pairdraw/design-jsx'
 
 import { convertDesignJSXRoots } from '@/app/code/sandbox/convert'
 import { sandboxDocument } from '@/app/code/sandbox/document'
@@ -36,7 +36,7 @@ describe('Design JSX sandbox output', () => {
 
   test('validates and converts the same serialized element contract', () => {
     const roots = validateDesignJSXOutput(
-      frame({ fill: { __openPencilHelper: 'solid', args: ['#ff0000'] } }, [
+      frame({ fill: { __pairdrawHelper: 'solid', args: ['#ff0000'] } }, [
         { type: 'text', props: {}, children: ['Hello ', 2] }
       ]),
       limits
@@ -104,7 +104,7 @@ describe('Design JSX sandbox output', () => {
       validateDesignJSXOutput(
         frame({
           fill: {
-            __openPencilHelper: 'shader',
+            __pairdrawHelper: 'shader',
             args: [[{ type: 'Aurora', props: {} }]]
           }
         }),
@@ -115,14 +115,14 @@ describe('Design JSX sandbox output', () => {
       shader: { preset: { components: [{ type: 'Aurora' }] } }
     })
     expect(() =>
-      convertDesignJSXRoots([frame({ fill: { __openPencilHelper: 'isVariableInput', args: [] } })])
+      convertDesignJSXRoots([frame({ fill: { __pairdrawHelper: 'isVariableInput', args: [] } })])
     ).toThrow('Unknown Design JSX helper "isVariableInput"')
   })
 
   test('rejects unknown helper descriptors during trusted conversion', () => {
     for (const helperName of ['unknown', 'toString', 'constructor', 'valueOf']) {
       const roots = validateDesignJSXOutput(
-        frame({ fill: { __openPencilHelper: helperName, args: [] } }),
+        frame({ fill: { __pairdrawHelper: helperName, args: [] } }),
         limits
       )
       expect(() => convertDesignJSXRoots(roots)).toThrow('Unknown Design JSX helper')
@@ -131,7 +131,7 @@ describe('Design JSX sandbox output', () => {
 
   test('converts each numbered ref() to one handle across the elements of an evaluation', () => {
     const marked = (number: number) => ({
-      __openPencilHelper: 'ref',
+      __pairdrawHelper: 'ref',
       args: [number]
     })
     const [first, second, connector] = convertDesignJSXRoots([
@@ -151,7 +151,7 @@ describe('Design JSX sandbox output', () => {
 
   test('converts each written collection once, its modes able to alias its own variables', () => {
     const variable = (name: string) => ({
-      __openPencilHelper: 'variable',
+      __pairdrawHelper: 'variable',
       args: [0, name]
     })
     const collections = [
@@ -166,7 +166,7 @@ describe('Design JSX sandbox output', () => {
       [
         frame({
           fill: variable('Page'),
-          mode: { __openPencilHelper: 'mode', args: [0, 'Dark'] }
+          mode: { __pairdrawHelper: 'mode', args: [0, 'Dark'] }
         }),
         frame({ fill: variable('Page') })
       ],
@@ -184,7 +184,7 @@ describe('Design JSX sandbox output', () => {
       { name: 'Dark', values: { Page: '#111111', Text: page } }
     ])
     expect(() =>
-      convertDesignJSXRoots([frame({ fill: { __openPencilHelper: 'variable', args: [3, 'X'] } })])
+      convertDesignJSXRoots([frame({ fill: { __pairdrawHelper: 'variable', args: [3, 'X'] } })])
     ).toThrow('Unknown variable collection')
   })
 
@@ -209,8 +209,8 @@ return __h(Frame, { fill: t.Page, mode: dark }, __h(Button.Root, null), 'Hi', fa
       value: {
         type: 'frame',
         props: {
-          fill: { __openPencilHelper: 'variable', args: [0, 'Page'] },
-          mode: { __openPencilHelper: 'mode', args: [0, 'Dark'] }
+          fill: { __pairdrawHelper: 'variable', args: [0, 'Page'] },
+          mode: { __pairdrawHelper: 'mode', args: [0, 'Dark'] }
         },
         children: [{ type: 'Button.Root', props: {}, children: [] }, 'Hi']
       },

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { FigCompression } from '@open-pencil/scene-graph/fig-compression'
-import { useI18n } from '@open-pencil/vue/i18n'
-import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
+import type { FigCompression } from '@pairdraw/scene-graph/fig-compression'
+import { useI18n } from '@pairdraw/vue/i18n'
+import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import PanelFieldGroup from '@/components/ui/panel/PanelFieldGroup.vue'

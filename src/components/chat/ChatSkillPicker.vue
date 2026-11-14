@@ -12,7 +12,7 @@ import {
 } from 'reka-ui'
 import { computed, ref, useId } from 'vue'
 
-import { useAIMessages } from '@open-pencil/vue/i18n'
+import { useAIMessages } from '@pairdraw/vue/i18n'
 
 import type { Skill } from '@/app/ai/skills/types'
 import { chatSkillPickerTheme } from '@/components/chat/ui'

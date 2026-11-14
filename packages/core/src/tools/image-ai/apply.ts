@@ -1,6 +1,6 @@
-import type { Fill, NodeType, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { getAxisAlignedBoundsInParent } from '@open-pencil/scene-graph/coordinate'
-import { computeBounds } from '@open-pencil/scene-graph/geometry'
+import type { Fill, NodeType, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
+import { computeBounds } from '@pairdraw/scene-graph/geometry'
 
 import { TRANSPARENT } from '#core/constants'
 import { flushPendingLayout } from '#core/figma-api'

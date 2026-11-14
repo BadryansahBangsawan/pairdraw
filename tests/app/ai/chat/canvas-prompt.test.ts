@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, test } from 'bun:test'
 
 import { toRaw } from 'vue'
 
-import { createDocumentGraph } from '@open-pencil/core'
+import { createDocumentGraph } from '@pairdraw/core'
 
 import {
   closeCanvasPrompt,

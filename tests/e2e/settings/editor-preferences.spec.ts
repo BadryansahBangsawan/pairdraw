@@ -24,8 +24,8 @@ async function closeSettings(page: Page) {
 
 function editorState(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return {
       zoom: store.state.zoom,
       panY: store.state.panY,

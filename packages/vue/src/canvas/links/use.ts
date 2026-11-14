@@ -1,7 +1,7 @@
 import { useEventListener } from '@vueuse/core'
 import { computed, onScopeDispose, shallowRef, type Ref } from 'vue'
 
-import { resolveEditorProfile, type Editor, type HyperlinkHit } from '@open-pencil/core'
+import { resolveEditorProfile, type Editor, type HyperlinkHit } from '@pairdraw/core'
 
 export interface CanvasLinkOptions {
   /** Whether this canvas takes the pointer, such as the active pane of a split view. */

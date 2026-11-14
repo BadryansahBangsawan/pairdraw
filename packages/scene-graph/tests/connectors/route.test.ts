@@ -8,7 +8,7 @@ import {
   placeConnectorLabel,
   routeConnector,
   type ConnectorRouteEnd
-} from '@open-pencil/scene-graph/connectors'
+} from '@pairdraw/scene-graph/connectors'
 
 const MAGNETS = [
   'NONE',

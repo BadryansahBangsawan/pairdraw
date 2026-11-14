@@ -1,4 +1,4 @@
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { EditorState, Tool } from '#core/editor/types'
 import type { ViewportTransform } from '#core/geometry/types'

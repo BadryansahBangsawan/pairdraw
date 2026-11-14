@@ -3,18 +3,18 @@
  * layer draws something at once. The node is one undo step, as any other created layer is.
  */
 import {
-  OPEN_PENCIL_PLUGIN_DATA,
+  PAIRDRAW_PLUGIN_DATA,
   readPluginData,
   withPluginData
-} from '@open-pencil/scene-graph/plugin-data'
-import { SCRIPT_MAX_SOURCE_LENGTH, type ScriptNodeData } from '@open-pencil/scene-graph/script'
+} from '@pairdraw/scene-graph/plugin-data'
+import { SCRIPT_MAX_SOURCE_LENGTH, type ScriptNodeData } from '@pairdraw/scene-graph/script'
 
 import { runScriptNode } from '@/app/code/script/run-node'
 import type { EditorStore } from '@/app/editor/session'
 /** What writing script data needs of an editor: the document and an undoable node write. */
 export type ScriptWriteTarget = Pick<EditorStore, 'graph' | 'updateNodeWithUndo'>
 
-const { script: SCRIPT_FIELD } = OPEN_PENCIL_PLUGIN_DATA
+const { script: SCRIPT_FIELD } = PAIRDRAW_PLUGIN_DATA
 
 /** The size a new script node takes, as a small artboard of its own. */
 const SCRIPT_WIDTH = 320

@@ -1,7 +1,7 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import type { CanvasGuide } from '@open-pencil/scene-graph/guides'
-import Matrix from '@open-pencil/scene-graph/matrix'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import type { CanvasGuide } from '@pairdraw/scene-graph/guides'
+import Matrix from '@pairdraw/scene-graph/matrix'
 
 export interface GuideViewport {
   panX: number

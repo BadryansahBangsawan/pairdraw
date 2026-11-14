@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, userEvent, within } from 'storybook/test'
 import { ref } from 'vue'
 
-import { DEFAULT_SCALE_ANCHOR, type ScaleAnchor } from '@open-pencil/core'
+import { DEFAULT_SCALE_ANCHOR, type ScaleAnchor } from '@pairdraw/core'
 
 import ScaleAnchorGrid from './ScaleAnchorGrid.vue'
 

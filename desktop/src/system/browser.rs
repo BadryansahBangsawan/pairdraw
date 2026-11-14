@@ -22,7 +22,7 @@ use url::Url;
 pub const BROWSER_WINDOW_LABEL: &str = "browser";
 
 /// The browser window's own website data store. Sixteen bytes, persistent, and not the editor's.
-const BROWSER_DATA_STORE: [u8; 16] = *b"openpencilbrowse";
+const BROWSER_DATA_STORE: [u8; 16] = *b"pairdrawbrowse";
 
 /// The size a session starts at, and the size it comes back to after a device preset.
 const DEFAULT_WIDTH: f64 = 1024.0;
@@ -259,7 +259,7 @@ pub fn browser_close<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
 /// The capturer, evaluated in the page. It reads the DOM and returns clipboard HTML. It is not an
 /// initialization script: nothing of the app is stored on the page, and the page cannot call us.
 const CAPTURE_RUNTIME: &str = include_str!("browser-capture.js");
-const CAPTURE_ERROR_PREFIX: &str = "openpencil-capture-error:";
+const CAPTURE_ERROR_PREFIX: &str = "pairdraw-capture-error:";
 
 fn capture_call(call: &str) -> String {
     format!("{CAPTURE_RUNTIME}\n;{call}")
@@ -321,7 +321,7 @@ fn capture_html(html: String) -> Result<String, String> {
 #[tauri::command]
 pub async fn browser_capture_page<R: Runtime>(app: AppHandle<R>) -> Result<String, String> {
     let window = browser_window(&app)?;
-    capture_html(eval_text(&window, &capture_call("__openpencilCapturePage()")).await?)
+    capture_html(eval_text(&window, &capture_call("__pairdrawCapturePage()")).await?)
 }
 
 /// What the picker returns when the user does not choose an element. The toolbar shows it as a
@@ -340,7 +340,7 @@ fn picked_selector(picked: &str) -> Result<&str, String> {
 fn element_call(selector: &str) -> Result<String, String> {
     let quoted = serde_json::to_string(selector).map_err(|error| error.to_string())?;
     Ok(capture_call(&format!(
-        "__openpencilCaptureElement({quoted})"
+        "__pairdrawCaptureElement({quoted})"
     )))
 }
 
@@ -483,7 +483,7 @@ mod tests {
     #[test]
     fn a_capture_error_is_the_text_after_the_prefix() {
         assert_eq!(
-            super::capture_html("openpencil-capture-error:no document".to_owned()),
+            super::capture_html("pairdraw-capture-error:no document".to_owned()),
             Err("no document".to_owned())
         );
         assert!(super::capture_html(String::new()).is_err());
@@ -509,8 +509,8 @@ mod tests {
     #[test]
     fn an_element_selector_is_quoted_into_the_capturer_call() {
         let call = super::element_call("a[href=\"x\"]").expect("quoted");
-        assert!(call.contains("__openpencilCaptureElement"));
-        assert!(call.ends_with("__openpencilCaptureElement(\"a[href=\\\"x\\\"]\")"));
+        assert!(call.contains("__pairdrawCaptureElement"));
+        assert!(call.ends_with("__pairdrawCaptureElement(\"a[href=\\\"x\\\"]\")"));
     }
 
     #[test]
@@ -520,7 +520,7 @@ mod tests {
             "javascript:alert(1)",
             "data:text/html,<h1>x</h1>",
             "blob:https://example.com/1",
-            "openpencil://room/1",
+            "pairdraw://room/1",
             "about:blank",
         ] {
             assert!(browser_url(url).is_err(), "{url} was allowed");
@@ -573,7 +573,7 @@ mod tests {
         let script = super::page_text_script();
         assert!(script.contains("innerText"));
         assert!(script.contains("JSON.stringify"));
-        assert!(!script.contains("__openpencilCapture"));
+        assert!(!script.contains("__pairdrawCapture"));
         assert!(!script.contains("innerHTML"));
     }
 

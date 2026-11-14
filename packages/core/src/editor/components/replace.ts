@@ -6,7 +6,7 @@ import {
   isReplacedLayer,
   replaceInstanceLayer,
   restoreReplacedLayer
-} from '@open-pencil/scene-graph/instances'
+} from '@pairdraw/scene-graph/instances'
 
 import { assertNodeEditable, getNodeEditCapability } from '#core/editor/capabilities'
 import { recordEdit } from '#core/editor/history/edit'

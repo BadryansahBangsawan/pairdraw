@@ -8,6 +8,6 @@ export function minisignPublicKey(fill = 7): string {
   return encode(`untrusted comment: minisign public key: ${'07'.repeat(8)}\n${key}\n`)
 }
 
-/** The updater key OpenPencil's checked-in Tauri config carried. */
+/** The updater key the upstream project's checked-in Tauri config carried. */
 export const UPSTREAM_PUBLIC_KEY =
   'dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDU4QzBCRjBFNzhFNEVEMDEKUldRQjdlUjREci9BV0hLaEJPeG5tRXdsWkhQWFdEa0VxcEtNR1o1S2VJeGlKU1VDTldQTi9wYncK'

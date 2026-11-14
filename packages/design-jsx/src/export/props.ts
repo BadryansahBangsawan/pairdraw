@@ -1,11 +1,11 @@
 import { isEqual, omitBy, pick } from 'es-toolkit'
 
-import type { ArcData, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { DEFAULT_FONT_FAMILY } from '@open-pencil/scene-graph/constants'
-import { layoutSizing } from '@open-pencil/scene-graph/layout'
-import { createDefaultNode } from '@open-pencil/scene-graph/node-defaults'
-import { resolveNodeTextDirection } from '@open-pencil/scene-graph/text/direction'
-import { vectorNetworkPaths } from '@open-pencil/scene-graph/vector-network'
+import type { ArcData, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { DEFAULT_FONT_FAMILY } from '@pairdraw/scene-graph/constants'
+import { layoutSizing } from '@pairdraw/scene-graph/layout'
+import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
+import { resolveNodeTextDirection } from '@pairdraw/scene-graph/text/direction'
+import { vectorNetworkPaths } from '@pairdraw/scene-graph/vector-network'
 
 import { BLEND_MODE, TEXT_ALIGN, TEXT_ALIGN_VERTICAL, TEXT_CASE, TEXT_DECORATION } from '../enums'
 import { textLengthJSX } from '../overrides/text'

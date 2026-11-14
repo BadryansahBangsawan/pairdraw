@@ -5,8 +5,8 @@ import {
   encodeVectorNetworkBlob,
   decodeVectorNetworkBlob,
   textPathStartSegment
-} from '@open-pencil/fig/node-change'
-import type { VectorNetwork } from '@open-pencil/scene-graph'
+} from '@pairdraw/fig/node-change'
+import type { VectorNetwork } from '@pairdraw/scene-graph'
 
 import {
   lineNetwork,

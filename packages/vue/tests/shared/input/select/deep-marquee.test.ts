@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 
-import { createEditor, type Editor } from '@open-pencil/core'
-import type { SceneNode } from '@open-pencil/scene-graph'
+import { createEditor, type Editor } from '@pairdraw/core'
+import type { SceneNode } from '@pairdraw/scene-graph'
 
 import { handleSelectDown, type HitTestFns } from '#vue/shared/input/select'
 import type { DragState } from '#vue/shared/input/types'

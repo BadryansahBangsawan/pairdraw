@@ -2,9 +2,9 @@ import { afterEach, describe, expect, test } from 'bun:test'
 
 import { toUint8Array } from 'js-base64'
 
-import { createEditor, type Editor } from '@open-pencil/core'
-import { readBrowserNode } from '@open-pencil/scene-graph/browser-node'
-import { colorToFill } from '@open-pencil/scene-graph/color'
+import { createEditor, type Editor } from '@pairdraw/core'
+import { readBrowserNode } from '@pairdraw/scene-graph/browser-node'
+import { colorToFill } from '@pairdraw/scene-graph/color'
 
 import { createBrowserNodeFromPage, refreshBrowserNodeFromPage } from '@/app/browser/node/apply'
 import {

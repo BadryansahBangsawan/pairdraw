@@ -1,7 +1,7 @@
-import { FigmaAPI, type FigmaNodeProxy } from '@open-pencil/core/figma-api'
-import { fontManager } from '@open-pencil/core/text'
-import { SceneGraph, type Fill } from '@open-pencil/scene-graph'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import { FigmaAPI, type FigmaNodeProxy } from '@pairdraw/core/figma-api'
+import { fontManager } from '@pairdraw/core/text'
+import { SceneGraph, type Fill } from '@pairdraw/scene-graph'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 export function createAPI(): FigmaAPI {
   return new FigmaAPI(new SceneGraph())
@@ -43,7 +43,7 @@ export function asPageNode(
 }
 
 /**
- * A solid paint that satisfies both the OpenPencil `Fill` and the Figma `SolidPaint` shape, as the
+ * A solid paint that satisfies both the Pairdraw `Fill` and the Figma `SolidPaint` shape, as the
  * node proxies expose the intersection of the two.
  */
 /** A solid paint both the scene graph and the plugin API take: it carries no transform. */

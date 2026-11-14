@@ -1,7 +1,7 @@
 import { isNotNil } from 'es-toolkit/predicate'
 
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { getAxisAlignedBoundsInParent } from '@open-pencil/scene-graph/coordinate'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
 
 import { getNodeEditCapability } from '#core/editor/capabilities'
 import {

@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-import type { ImageScaleMode } from '@open-pencil/scene-graph'
+import type { ImageScaleMode } from '@pairdraw/scene-graph'
 
 /** Where the scene sits: 200% zoom with the layer's top-left 150 px into the canvas. */
 const ZOOM = 2
@@ -16,8 +16,8 @@ export function imageCropDriver(page: () => Page) {
     async show(mode: ImageScaleMode = 'FILL') {
       return page().evaluate(
         async ({ mode, zoom, origin }) => {
-          const store = window.openPencil?.getStore?.()
-          if (!store) throw new Error('OpenPencil store not initialized')
+          const store = window.pairdraw?.getStore?.()
+          if (!store) throw new Error('Pairdraw store not initialized')
           const canvas = document.createElement('canvas')
           canvas.width = 400
           canvas.height = 300
@@ -68,7 +68,7 @@ export function imageCropDriver(page: () => Page) {
     /** The layer's place and size, and how its image is framed. */
     layer(nodeId: string) {
       return page().evaluate((id) => {
-        const node = window.openPencil?.getStore?.().graph.getNode(id)
+        const node = window.pairdraw?.getStore?.().graph.getNode(id)
         const fill = node?.fills[0]
         if (!node || !fill) return null
         return {
@@ -84,18 +84,18 @@ export function imageCropDriver(page: () => Page) {
 
     /** The layer whose image is being edited, if any. */
     editing() {
-      return page().evaluate(() => window.openPencil?.getStore?.().state.imageEdit?.nodeId ?? null)
+      return page().evaluate(() => window.pairdraw?.getStore?.().state.imageEdit?.nodeId ?? null)
     },
 
     canUndo() {
-      return page().evaluate(() => window.openPencil?.getStore?.().undo.canUndo ?? false)
+      return page().evaluate(() => window.pairdraw?.getStore?.().undo.canUndo ?? false)
     },
 
     /** Enters image edit mode on a layer as the context menu does. */
     edit(nodeId: string) {
       return page().evaluate((id) => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         store.startImageEdit(id)
         store.requestRender()
       }, nodeId)

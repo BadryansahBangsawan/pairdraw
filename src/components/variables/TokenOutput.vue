@@ -11,10 +11,10 @@ import {
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import type { TokenStylesheetFormat } from '@open-pencil/dom-css/export'
-import { useEditor } from '@open-pencil/vue'
-import { useI18n } from '@open-pencil/vue/i18n'
-import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
+import type { TokenStylesheetFormat } from '@pairdraw/dom-css/export'
+import { useEditor } from '@pairdraw/vue'
+import { useI18n } from '@pairdraw/vue/i18n'
+import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
 
 import CodeViewer from '@/components/code-editor/CodeViewer.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -45,7 +45,7 @@ const collectionVariables = useSceneComputed(() => [
  */
 const stylesheet = computedAsync(async () => {
   const ids = new Set(collectionVariables.value.map((variable) => variable.id))
-  const { tokenStylesheet } = await import('@open-pencil/dom-css/export')
+  const { tokenStylesheet } = await import('@pairdraw/dom-css/export')
   const { css } = await tokenStylesheet(editor.graph, {
     format: 'css',
     include: (variable) => ids.has(variable.id)

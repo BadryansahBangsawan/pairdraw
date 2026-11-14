@@ -1,8 +1,8 @@
 import { afterEach, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { setTextMeasurer } from '@open-pencil/core/layout'
-import type { SceneNode } from '@open-pencil/scene-graph'
+import { createEditor } from '@pairdraw/core'
+import { setTextMeasurer } from '@pairdraw/core/layout'
+import type { SceneNode } from '@pairdraw/scene-graph'
 
 import {
   createPendingTextLayout,

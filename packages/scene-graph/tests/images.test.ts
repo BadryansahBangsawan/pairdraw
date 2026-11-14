@@ -9,7 +9,7 @@ import {
   imageMimeType,
   imageSize,
   isSVGFile
-} from '@open-pencil/scene-graph/images'
+} from '@pairdraw/scene-graph/images'
 
 describe('computeImageHash', () => {
   test('names bytes by their SHA-1, as Figma names images', () => {

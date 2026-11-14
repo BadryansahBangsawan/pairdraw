@@ -1,5 +1,5 @@
 /** The capture format identifier that clipboard payloads and files carry. */
-export const WEB_CAPTURE_FORMAT = 'openpencil/web-capture'
+export const WEB_CAPTURE_FORMAT = 'pairdraw/web-capture'
 
 /** The capture format version this package writes and reads. */
 export const WEB_CAPTURE_VERSION = 1

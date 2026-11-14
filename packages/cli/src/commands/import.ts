@@ -3,7 +3,7 @@ import { basename, dirname, extname, resolve } from 'node:path'
 
 import { defineCommand } from 'citty'
 
-import { readHTMLDocument, type ReadHTMLResult } from '@open-pencil/core/io/formats/html/import'
+import { readHTMLDocument, type ReadHTMLResult } from '@pairdraw/core/io/formats/html/import'
 
 import { requireFile } from '#cli/app/client'
 import { fmtList, ok, printError } from '#cli/format'

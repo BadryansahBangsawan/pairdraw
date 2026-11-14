@@ -74,7 +74,7 @@ const added: MCPClientChangeNotice = {
     outcome: 'saved',
     enabled: true,
     status: claudeDesktop,
-    backup: '~/Library/Application Support/Claude/claude_desktop_config.json.open-pencil.bak'
+    backup: '~/Library/Application Support/Claude/claude_desktop_config.json.pairdraw.bak'
   }
 }
 

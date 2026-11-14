@@ -10,7 +10,7 @@ import {
 } from 'reka-ui'
 import { computed } from 'vue'
 
-import { useCloudMessages, useFileMessages, useRecoveryMessages } from '@open-pencil/vue/i18n'
+import { useCloudMessages, useFileMessages, useRecoveryMessages } from '@pairdraw/vue/i18n'
 
 import AccountAvatar from '@/components/presence/AccountAvatar.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'

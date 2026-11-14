@@ -1,10 +1,10 @@
-import type { ACPAgentDef } from '@open-pencil/core/constants'
+import type { ACPAgentDef } from '@pairdraw/core/constants'
 
 import { signInWithAgent, type ToolsProbe } from '@/app/ai/agents/acp/auth/session'
 
 import type { AgentHost, AgentSignIn } from './types'
 
-/** Starts a session as a chat does: in the host's agent workspace, linked to OpenPencil's tools. */
+/** Starts a session as a chat does: in the host's agent workspace, linked to Pairdraw's tools. */
 export function chatToolsProbe(cwd: () => Promise<string>): ToolsProbe {
   return {
     cwd,

@@ -7,8 +7,8 @@ import { figThumbnailSize } from '#cli-tests/helpers/fig'
 import { CLI_ENTRY, FIXTURES } from '#cli-tests/helpers/paths'
 import * as v from 'valibot'
 
-import { getTextMeasurer } from '@open-pencil/core/layout'
-import { imageSize } from '@open-pencil/scene-graph/images'
+import { getTextMeasurer } from '@pairdraw/core/layout'
+import { imageSize } from '@pairdraw/scene-graph/images'
 
 import { loadDocument, measureDocumentText } from '#cli/headless'
 
@@ -29,7 +29,7 @@ async function cli(args: string[], stdin?: string) {
 
 describe('eval CLI', () => {
   test('measures the text a script edits in the font the document sets for it', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-eval-fonts-'))
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-eval-fonts-'))
     const source = join(dir, 'tag.pen')
     const output = join(dir, 'tag.fig')
     // Inter at 600 is not among the faces the measurer starts with.
@@ -102,7 +102,7 @@ describe('eval CLI', () => {
   })
 
   test('saves a script’s edits laid out, though the script never read them back', async () => {
-    const out = join(await mkdtemp(join(tmpdir(), 'open-pencil-eval-')), 'badge.fig')
+    const out = join(await mkdtemp(join(tmpdir(), 'pairdraw-eval-')), 'badge.fig')
     // A hugging badge whose label a property shortens: its saved width fits the new label.
     const script = `
       const badge = figma.createComponent()
@@ -141,7 +141,7 @@ describe('eval CLI', () => {
   })
 
   test('--write saves a thumbnail of the Cover page', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-eval-'))
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-eval-'))
     const html = join(dir, 'tall.html')
     const file = join(dir, 'cover.fig')
     await writeFile(html, '<div style="width:100px;height:400px;background:#000"></div>')
@@ -163,7 +163,7 @@ describe('eval CLI', () => {
   })
 
   test('--preview-output draws the page the script left current', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'open-pencil-eval-preview-'))
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-eval-preview-'))
     const html = join(dir, 'tall.html')
     const file = join(dir, 'doc.fig')
     const preview = join(dir, 'preview.png')
@@ -187,7 +187,7 @@ describe('eval CLI', () => {
   test.skipIf(process.platform === 'win32')(
     'pipes output larger than the pipe takes at once without losing its end',
     async () => {
-      const dir = await mkdtemp(join(tmpdir(), 'open-pencil-eval-pipe-'))
+      const dir = await mkdtemp(join(tmpdir(), 'pairdraw-eval-pipe-'))
       const stderr = join(dir, 'stderr.txt')
       const script = `
         console.log('a'.repeat(100_000))
@@ -221,7 +221,7 @@ describe('eval CLI', () => {
   )
 
   test('--write saves the instances of a component the script changed at its new size', async () => {
-    const file = join(await mkdtemp(join(tmpdir(), 'open-pencil-eval-sync-')), 'badge.fig')
+    const file = join(await mkdtemp(join(tmpdir(), 'pairdraw-eval-sync-')), 'badge.fig')
     const create = `
       const badge = figma.createComponent()
       badge.name = 'Sync Badge'

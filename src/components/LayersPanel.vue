@@ -3,8 +3,8 @@ import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui'
 import { tv } from 'tailwind-variants'
 import { computed, ref } from 'vue'
 
-import { useI18n, useSlidesMessages } from '@open-pencil/vue/i18n'
-import { vTestId } from '@open-pencil/vue/testing'
+import { useI18n, useSlidesMessages } from '@pairdraw/vue/i18n'
+import { vTestId } from '@pairdraw/vue/testing'
 
 import SegmentedControl from '@/components/ui/select/SegmentedControl.vue'
 import sidePanelTheme from '@/theme/panel/side'

@@ -9,9 +9,9 @@ import {
   planTokenImport,
   readCSSDesignTokens,
   type DesignSystemIssue
-} from '@open-pencil/core/io/formats/design-tokens'
-import { importDesignSystemFolder } from '@open-pencil/core/node/design-system'
-import type { TokensResult } from '@open-pencil/core/rpc'
+} from '@pairdraw/core/io/formats/design-tokens'
+import { importDesignSystemFolder } from '@pairdraw/core/node/design-system'
+import type { TokensResult } from '@pairdraw/core/rpc'
 
 import { requireFile } from '#cli/app/client'
 import { fmtList, ok } from '#cli/format'

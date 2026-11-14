@@ -8,10 +8,10 @@ import {
   COMPONENT_LABEL_GAP,
   LABEL_FONT_SIZE,
   LABEL_OFFSET_Y
-} from '@open-pencil/core/constants'
-import { colorToCSS } from '@open-pencil/scene-graph/color'
-import type { CanvasLabelEdit } from '@open-pencil/vue/canvas/labels'
-import { useRenameMessages } from '@open-pencil/vue/i18n'
+} from '@pairdraw/core/constants'
+import { colorToCSS } from '@pairdraw/scene-graph/color'
+import type { CanvasLabelEdit } from '@pairdraw/vue/canvas/labels'
+import { useRenameMessages } from '@pairdraw/vue/i18n'
 
 import type { CanvasLabelPresentation } from '@/components/canvas/labels/presentation'
 import InlineLabelEditor from '@/components/ui/input/InlineLabelEditor.vue'

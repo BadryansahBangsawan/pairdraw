@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-import { SHADER_GALLERY } from '@open-pencil/vue/controls/shader'
+import { SHADER_GALLERY } from '@pairdraw/vue/controls/shader'
 
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
 
@@ -43,8 +43,8 @@ function afterFrames(page: Page, count: number) {
 /** The preset Shader Mode shows, or null while it is closed. */
 function shownPreset(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return store.getShaderMode()?.preset ?? null
   })
 }
@@ -52,8 +52,8 @@ function shownPreset(page: Page) {
 /** The selected layer and where it sits. */
 function selectedLayer(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const [id] = store.state.selectedIds
     const node = id ? store.graph.getNode(id) : undefined
     return { id: id ?? null, x: node?.x ?? null, y: node?.y ?? null }
@@ -159,14 +159,14 @@ test('a read-only document plays its shader but keeps its settings', async () =>
   const page = ctx.page
   const stage = await openShaderMode(page)
   await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.setReadOnly(true)
   })
   const settings = stage.getByRole('complementary', { name: 'Shader settings' })
   await expect(settings.getByRole('status')).toBeVisible()
   await expect(settings.getByRole('radio', { name: 'Sunset' })).toBeHidden()
-  await page.evaluate(() => window.openPencil?.getStore?.()?.setReadOnly(false))
+  await page.evaluate(() => window.pairdraw?.getStore?.()?.setReadOnly(false))
 })
 
 test('its keys move the animation, never the layer', async () => {

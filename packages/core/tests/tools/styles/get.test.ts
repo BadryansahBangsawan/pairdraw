@@ -9,7 +9,7 @@ import {
   searchStyleArchetypes,
   STYLE_ARCHETYPE_IDS,
   STYLE_ARCHETYPES
-} from '@open-pencil/core/tools'
+} from '@pairdraw/core/tools'
 
 const HEX = /^#[0-9A-F]{6}([0-9A-F]{2})?$/
 const AA = 4.5

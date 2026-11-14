@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { createEditor } from '@open-pencil/core'
-import { computeAllLayouts, setTextMeasurer } from '@open-pencil/core/layout'
-import { SceneGraph, type SceneNode } from '@open-pencil/scene-graph'
+import { createEditor } from '@pairdraw/core'
+import { computeAllLayouts, setTextMeasurer } from '@pairdraw/core/layout'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
 import {
   boundEndpoint,
   buildConnectorSublayers,
   connectorSublayers,
   freeEndpoint
-} from '@open-pencil/scene-graph/connectors'
+} from '@pairdraw/scene-graph/connectors'
 
 /** Two boxes 300 apart with an elbow from the first's right side to the second's left. */
 function setup() {

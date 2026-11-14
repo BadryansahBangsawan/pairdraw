@@ -1,6 +1,6 @@
-import type { Fill, SceneGraph, Stroke } from '@open-pencil/scene-graph'
-import { getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import type { Fill, SceneGraph, Stroke } from '@pairdraw/scene-graph'
+import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { SceneOracleNode } from '../scene-oracle'
 

@@ -8,17 +8,17 @@ import Icons from 'unplugin-icons/vite'
 import Components from 'unplugin-vue-components/vite'
 import { defineConfig, loadEnv } from 'vite'
 
-import { ensureBrandAssets } from '@open-pencil/brand-tools'
-import { ensureDemoDocument } from '@open-pencil/demo-tools'
+import { ensureBrandAssets } from '@pairdraw/brand-tools'
+import { ensureDemoDocument } from '@pairdraw/demo-tools'
 
 import packageJson from './package.json'
 import { viteBuildTarget } from './src/app/shell/support/baseline'
-import { createOpenPencilAliases } from './vite/aliases'
+import { createPairdrawAliases } from './vite/aliases'
 import {
   localAgentSession,
   localAutomationRoute,
   localAutomationToken,
-  openPencilAutomationPlugin
+  pairdrawAutomationPlugin
 } from './vite/automation'
 import { bootSplashPlugin } from './vite/boot-splash'
 import { cloudSitePlugin } from './vite/cloud-site'
@@ -26,7 +26,7 @@ import { aiIconCollection } from './vite/icons'
 import { createImportPathTransform } from './vite/import-path-transform'
 import { inlineScriptPlugin } from './vite/inline-script'
 import { metricsBrandPlugin } from './vite/metrics'
-import { openPencilPwaPlugin } from './vite/pwa'
+import { pairdrawPwaPlugin } from './vite/pwa'
 import { rawMarkdownPlugin } from './vite/raw-markdown'
 import { createDevServerOptions } from './vite/server'
 
@@ -41,30 +41,28 @@ export default defineConfig(async ({ command, mode }) => {
   // which serves it under /admin behind Cloudflare Access.
   const metrics = mode === 'metrics'
   const env = loadEnv(mode, __dirname, 'VITE_')
-  // `VITE_OPENPENCIL_CLOUD=off` builds the editor without OpenPencil Cloud.
-  const cloud = env.VITE_OPENPENCIL_CLOUD !== 'off'
+  // `VITE_PAIRDRAW_CLOUD=off` builds the editor without Pairdraw Cloud.
+  const cloud = env.VITE_PAIRDRAW_CLOUD !== 'off'
   // Agents automate the editor's own development server; a Cloud site, built or served, has none.
   const automation = !metrics && !cloudSite
   await Promise.all([ensureBrandAssets(['web']), metrics ? undefined : ensureDemoDocument()])
   return {
     resolve: {
-      alias: createOpenPencilAliases(__dirname, { cloud })
+      alias: createPairdrawAliases(__dirname, { cloud })
     },
     define: {
-      __OPENPENCIL_APP_VERSION__: JSON.stringify(packageJson.version),
-      __OPENPENCIL_CLOUD_SITE__: JSON.stringify(cloudSite),
-      __OPENPENCIL_OFFICIAL_CLOUD_URL__: JSON.stringify(
-        env.VITE_OPENPENCIL_OFFICIAL_CLOUD_URL ?? null
-      ),
-      __OPENPENCIL_LOCAL_AUTOMATION_TOKEN__: JSON.stringify(
+      __PAIRDRAW_APP_VERSION__: JSON.stringify(packageJson.version),
+      __PAIRDRAW_CLOUD_SITE__: JSON.stringify(cloudSite),
+      __PAIRDRAW_OFFICIAL_CLOUD_URL__: JSON.stringify(env.VITE_PAIRDRAW_OFFICIAL_CLOUD_URL ?? null),
+      __PAIRDRAW_LOCAL_AUTOMATION_TOKEN__: JSON.stringify(
         automation ? localAutomationToken(command) : null
       ),
-      __OPENPENCIL_LOCAL_AUTOMATION_URL__: JSON.stringify(automationRoute.browserURL),
-      __OPENPENCIL_LOCAL_AUTOMATION_HTTP_URL__: JSON.stringify(
+      __PAIRDRAW_LOCAL_AUTOMATION_URL__: JSON.stringify(automationRoute.browserURL),
+      __PAIRDRAW_LOCAL_AUTOMATION_HTTP_URL__: JSON.stringify(
         automationRoute.browserURL.replace(/^ws/, 'http')
       ),
       // The development server's own tab reaches its agent bridge with this; null in every build.
-      __OPENPENCIL_LOCAL_AGENT_SESSION__: JSON.stringify(
+      __PAIRDRAW_LOCAL_AGENT_SESSION__: JSON.stringify(
         automation ? localAgentSession(command, mode) : null
       )
     },
@@ -83,9 +81,9 @@ export default defineConfig(async ({ command, mode }) => {
         resolvers: [IconsResolver({ prefix: 'icon', customCollections: ['ai'] })],
         importPathTransform: createImportPathTransform(__dirname)
       }),
-      automation ? openPencilAutomationPlugin(command, host, mode) : undefined,
+      automation ? pairdrawAutomationPlugin(command, host, mode) : undefined,
       vue(),
-      metrics ? metricsBrandPlugin((outDir) => resolve(outDir, '..')) : openPencilPwaPlugin(),
+      metrics ? metricsBrandPlugin((outDir) => resolve(outDir, '..')) : pairdrawPwaPlugin(),
       cloudSite ? cloudSitePlugin() : undefined
     ],
     clearScreen: false,

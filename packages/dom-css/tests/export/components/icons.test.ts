@@ -4,8 +4,8 @@ import { fileText } from '#dom-css-tests/helpers'
 import { layerComponents } from '#dom-css/export'
 import { iconDrawing, iconPackagesFor } from '#dom-css/export/components/icons'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { withIcon } from '@open-pencil/scene-graph/icons'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { withIcon } from '@pairdraw/scene-graph/icons'
 
 /** A frame named `name` holding icon layers of `icons`. */
 function iconFrame(name: string, icons: readonly string[]) {

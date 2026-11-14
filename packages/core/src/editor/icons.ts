@@ -1,12 +1,12 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { BLACK } from '@open-pencil/scene-graph/constants'
-import { readIcon, type IconOptions } from '@open-pencil/scene-graph/icons'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { BLACK } from '@pairdraw/scene-graph/constants'
+import { readIcon, type IconOptions } from '@pairdraw/scene-graph/icons'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 import {
   layersUsingVariables,
   resolvedIconBinding,
   type BindingScope
-} from '@open-pencil/scene-graph/variables'
+} from '@pairdraw/scene-graph/variables'
 
 import { restoreSubtree, snapshotSubtree } from '#core/editor/history/subtree'
 import type { EditorContext } from '#core/editor/types'

@@ -3,9 +3,9 @@ import { describe, expect, it } from 'bun:test'
 import { getNodeOrThrow } from '#core-tests/helpers/assert'
 import { createClipboardGraph } from '#core-tests/helpers/clipboard'
 
-import { importClipboardNodes } from '@open-pencil/core/clipboard'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { percentLength, pixelLength } from '@open-pencil/scene-graph/text'
+import { importClipboardNodes } from '@pairdraw/core/clipboard'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { percentLength, pixelLength } from '@pairdraw/scene-graph/text'
 
 describe('importClipboardNodes: text metrics', () => {
   it('imports fontWeight from fontName.style via styleToWeight', () => {

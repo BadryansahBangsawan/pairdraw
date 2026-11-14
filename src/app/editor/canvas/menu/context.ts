@@ -1,9 +1,9 @@
 import { computed, type Ref } from 'vue'
 
-import type { Editor } from '@open-pencil/core'
-import { formatShortcut } from '@open-pencil/vue/editor/commands'
-import type { MenuEntry } from '@open-pencil/vue/editor/menu-model'
-import { useMediaMessages } from '@open-pencil/vue/i18n'
+import type { Editor } from '@pairdraw/core'
+import { formatShortcut } from '@pairdraw/vue/editor/commands'
+import type { MenuEntry } from '@pairdraw/vue/editor/menu-model'
+import { useMediaMessages } from '@pairdraw/vue/i18n'
 
 import type { createCanvasMenuActions } from '@/app/editor/canvas/menu/actions'
 import { textLinkMenuEntries, type TextLinkMenuLabels } from '@/app/editor/canvas/menu/links'

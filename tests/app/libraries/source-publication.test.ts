@@ -1,12 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import {
-  readSourceLibraryPublication,
-  writeSourceLibraryPublication
-} from '@open-pencil/core/library'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { readSourceLibraryPublication, writeSourceLibraryPublication } from '@pairdraw/core/library'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 describe('source library publication identity', () => {
   test('survives a FIG export and reimport', async () => {
@@ -60,7 +57,7 @@ describe('source library publication identity', () => {
       })
     ]) {
       graph.updateNode(root.id, {
-        pluginData: [{ pluginId: 'open-pencil', key: 'sourceLibraryPublication', value }]
+        pluginData: [{ pluginId: 'pairdraw', key: 'sourceLibraryPublication', value }]
       })
       expect(readSourceLibraryPublication(graph)).toBeNull()
     }

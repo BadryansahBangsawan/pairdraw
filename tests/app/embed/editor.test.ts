@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'bun:test'
 
 import { nextTick } from 'vue'
 
-import * as figModule from '@open-pencil/core/io/formats/fig'
-import * as layoutModule from '@open-pencil/core/layout'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import * as figModule from '@pairdraw/core/io/formats/fig'
+import * as layoutModule from '@pairdraw/core/layout'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { createEmbedEditorHost } from '@/app/embed/editor'
@@ -32,7 +32,7 @@ function installBrowserGlobals(): void {
       innerHeight: 768,
       requestAnimationFrame: frame,
       cancelAnimationFrame: vi.fn(),
-      openPencil: {},
+      pairdraw: {},
       location: { href: 'http://localhost/' },
       addEventListener: vi.fn(),
       removeEventListener: vi.fn()

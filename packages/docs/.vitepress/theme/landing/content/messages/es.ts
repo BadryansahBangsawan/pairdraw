@@ -67,7 +67,7 @@ export const es: LandingMessages = {
     script: {
       title: 'Automatízalo todo',
       detail:
-        'La CLI openpencil trabaja sobre un archivo sin que la aplicación esté abierta, o controla la aplicación que tienes en marcha. Inspecciona un documento, consúltalo con XPath, revísalo con el linter, expórtalo o ejecuta código de plugins de Figma con eval. El servidor MCP da a los agentes el mismo alcance por stdio o HTTP.',
+        'La CLI pairdraw trabaja sobre un archivo sin que la aplicación esté abierta, o controla la aplicación que tienes en marcha. Inspecciona un documento, consúltalo con XPath, revísalo con el linter, expórtalo o ejecuta código de plugins de Figma con eval. El servidor MCP da a los agentes el mismo alcance por stdio o HTTP.',
       hint: 'Ejecuta un comando y observa el lienzo.'
     },
     sdk: {

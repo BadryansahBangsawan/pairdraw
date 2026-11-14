@@ -10,9 +10,9 @@ import {
 import { tv } from 'tailwind-variants'
 import { nextTick, ref, watch } from 'vue'
 
-import { animateViewport } from '@open-pencil/vue/canvas'
-import { useEditorCommands } from '@open-pencil/vue/editor/commands'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { animateViewport } from '@pairdraw/vue/canvas'
+import { useEditorCommands } from '@pairdraw/vue/editor/commands'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import {

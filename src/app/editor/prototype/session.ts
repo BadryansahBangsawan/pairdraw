@@ -3,7 +3,7 @@ import type {
   PrototypeTransition,
   SceneGraph,
   SceneNode
-} from '@open-pencil/scene-graph'
+} from '@pairdraw/scene-graph'
 
 import { framesOnPage } from './frames'
 import { primaryAction } from './reactions'

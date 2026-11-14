@@ -1,4 +1,4 @@
-import type { SceneNode } from '@open-pencil/scene-graph'
+import type { SceneNode } from '@pairdraw/scene-graph'
 
 import { createClipboardFontActions } from '#core/editor/clipboard/fonts'
 import type { EditorContext } from '#core/editor/types'

@@ -6,8 +6,8 @@ import type { LanguageModel, ToolSet } from 'ai'
 import { generateText, stepCountIs, tool } from 'ai'
 import * as v from 'valibot'
 
-import type { FigmaAPI } from '@open-pencil/core/figma-api'
-import { ALL_TOOLS, toolsToAI, type ToolDef } from '@open-pencil/core/tools'
+import type { FigmaAPI } from '@pairdraw/core/figma-api'
+import { ALL_TOOLS, toolsToAI, type ToolDef } from '@pairdraw/core/tools'
 
 import { executeAgentTool } from '#cli/agent/file-output'
 import { resolveAgentRoot, safeOutputPath } from '#cli/agent/paths'
@@ -75,8 +75,7 @@ function agentModel(options: AgentRunOptions): LanguageModel {
       `Unsupported agent provider "${options.provider}"; the headless agent runs an [OI]-compatible endpoint. Pass --base-url and --model.`
     )
   }
-  if (!options.apiKey.trim())
-    throw new Error('Set the API key with --api-key or OPENPENCIL_API_KEY')
+  if (!options.apiKey.trim()) throw new Error('Set the API key with --api-key or PAIRDRAW_API_KEY')
   if (!options.model.trim()) throw new Error('Set the model with --model')
   if (!options.baseURL.trim())
     throw new Error('--base-url is required for an [OI]-compatible agent')

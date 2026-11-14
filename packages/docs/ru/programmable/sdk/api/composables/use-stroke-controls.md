@@ -15,7 +15,7 @@ description: Настройка расположения и толщины об�
 ## Использование
 
 ```ts
-import { useStrokeControls } from '@open-pencil/vue/controls/stroke'
+import { useStrokeControls } from '@pairdraw/vue/controls/stroke'
 
 const strokes = useStrokeControls()
 ```

@@ -1,14 +1,14 @@
 import harfBuzzSubset from 'harfbuzzjs/dist/harfbuzz-subset.wasm?url'
 
-import interSemiBold from '@open-pencil/core/assets/Inter-SemiBold.ttf?url'
-import interVariableItalic from '@open-pencil/core/assets/InterVariable-Italic.ttf?url'
-import interVariable from '@open-pencil/core/assets/InterVariable.ttf?url'
-import notoNaskhArabic from '@open-pencil/core/assets/NotoNaskhArabic-Regular.ttf?url'
-import emojiMetrics from '@open-pencil/core/assets/OpenPencilEmojiMetrics-Regular.ttf?url'
-import { fontManager, setHarfBuzzSubsetLocator } from '@open-pencil/core/text'
+import interSemiBold from '@pairdraw/core/assets/Inter-SemiBold.ttf?url'
+import interVariableItalic from '@pairdraw/core/assets/InterVariable-Italic.ttf?url'
+import interVariable from '@pairdraw/core/assets/InterVariable.ttf?url'
+import notoNaskhArabic from '@pairdraw/core/assets/NotoNaskhArabic-Regular.ttf?url'
+import emojiMetrics from '@pairdraw/core/assets/PairdrawEmojiMetrics-Regular.ttf?url'
+import { fontManager, setHarfBuzzSubsetLocator } from '@pairdraw/core/text'
 
 /**
- * Core ships its bundled fonts in `@open-pencil/core/assets`. Importing them as assets lets
+ * Core ships its bundled fonts in `@pairdraw/core/assets`. Importing them as assets lets
  * Vite serve them in development and emit hashed copies with the build, so no host keeps a
  * second copy in `public/`. Kept apart from `index.ts` because `?url` imports only resolve
  * in a Vite build, not in the Bun test runner.
@@ -18,7 +18,7 @@ const BUNDLED_FONT_URLS: Record<string, string> = {
   'InterVariable-Italic.ttf': interVariableItalic,
   'Inter-SemiBold.ttf': interSemiBold,
   'NotoNaskhArabic-Regular.ttf': notoNaskhArabic,
-  'OpenPencilEmojiMetrics-Regular.ttf': emojiMetrics
+  'PairdrawEmojiMetrics-Regular.ttf': emojiMetrics
 }
 
 /**

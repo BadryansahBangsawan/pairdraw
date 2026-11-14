@@ -13,15 +13,15 @@ import {
   variableUnit,
   type CustomPropertyScope,
   type CustomPropertySheet
-} from '@open-pencil/dom-css/export'
+} from '@pairdraw/dom-css/export'
 import {
   isLibraryCollection,
   type SceneGraph,
   type TokenUnit,
   type Variable,
   type VariableCollection
-} from '@open-pencil/scene-graph'
-import { tokenNumberInUnit } from '@open-pencil/scene-graph/variables'
+} from '@pairdraw/scene-graph'
+import { tokenNumberInUnit } from '@pairdraw/scene-graph/variables'
 
 import { tokenPath } from '#core/io/formats/design-tokens/paths'
 import type {
@@ -30,7 +30,7 @@ import type {
   ReadCollection,
   ReadToken
 } from '#core/io/formats/design-tokens/read'
-import { OPENPENCIL_EXTENSION } from '#core/io/formats/design-tokens/types'
+import { PAIRDRAW_EXTENSION } from '#core/io/formats/design-tokens/types'
 import { colorTokenValue, trimNumber } from '#core/io/formats/design-tokens/values'
 
 import { knownTokens, type KnownTokens } from './known'
@@ -316,7 +316,7 @@ class CSSTokenReader {
       value: fields.value,
       description: undefined,
       extensions: {
-        [OPENPENCIL_EXTENSION]: own,
+        [PAIRDRAW_EXTENSION]: own,
         ...(fields.aliasData ? { 'com.figma.aliasData': fields.aliasData } : {})
       }
     }

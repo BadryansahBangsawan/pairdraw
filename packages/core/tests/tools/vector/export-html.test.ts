@@ -3,10 +3,10 @@ import { readFile } from 'node:fs/promises'
 
 import * as v from 'valibot'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { headlessHTMLStyler } from '@open-pencil/core/io/formats/html/import'
-import { ALL_TOOLS, registerHTMLToolHost } from '@open-pencil/core/tools'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { headlessHTMLStyler } from '@pairdraw/core/io/formats/html/import'
+import { ALL_TOOLS, registerHTMLToolHost } from '@pairdraw/core/tools'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 const exportHTML = ALL_TOOLS.find((tool) => tool.name === 'export_html')
 if (!exportHTML) throw new Error('export_html tool missing')
@@ -66,7 +66,7 @@ describe('export_html', () => {
       html: 'standalone',
       assets: 'external'
     })
-    expect(external.html).toContain('openpencil.css')
+    expect(external.html).toContain('pairdraw.css')
     expect(external.assets?.some((asset) => asset.path.endsWith('.css') && asset.text)).toBe(true)
   })
 
@@ -75,9 +75,9 @@ describe('export_html', () => {
     expect((await run(figma, { ids: [frame.id] })).html).toContain('data-name="Card"')
     const bare = await run(figma, { ids: [frame.id], layer_names: false })
     expect(bare.html).not.toContain('data-name')
-    expect(bare.html).not.toContain('data-open-pencil-node-id')
+    expect(bare.html).not.toContain('data-pairdraw-node-id')
     const linked = await run(figma, { ids: [frame.id], layer_ids: true })
-    expect(linked.html).toContain(`data-open-pencil-node-id="${frame.id}"`)
+    expect(linked.html).toContain(`data-pairdraw-node-id="${frame.id}"`)
   })
 
   test('reads Tailwind stylesheets through the host for a standalone Tailwind page', async () => {

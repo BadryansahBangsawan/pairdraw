@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, shallowRef, watch } from 'vue'
 
-import { useCommonMessages, useFileMessages } from '@open-pencil/vue/i18n'
+import { useCommonMessages, useFileMessages } from '@pairdraw/vue/i18n'
 
 import type { StorageDocument, StorageLocation } from '@/app/integrations/storage'
 import { toast } from '@/app/shell/ui'

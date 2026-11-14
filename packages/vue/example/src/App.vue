@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { createEditor, type Tool } from '@open-pencil/core'
-import { OpenPencilProvider, LayerTree, NodeProperties } from '@open-pencil/vue'
-import { CanvasRoot, CanvasSurface } from '@open-pencil/vue/canvas'
-import { ToolbarRoot, ToolbarItem } from '@open-pencil/vue/primitives/Toolbar'
+import { createEditor, type Tool } from '@pairdraw/core'
+import { PairdrawProvider, LayerTree, NodeProperties } from '@pairdraw/vue'
+import { CanvasRoot, CanvasSurface } from '@pairdraw/vue/canvas'
+import { ToolbarRoot, ToolbarItem } from '@pairdraw/vue/primitives/Toolbar'
 
 const editor = createEditor()
 const pages = () => editor.graph.getPages()
@@ -29,7 +29,7 @@ const TOOL_LIST: Tool[] = [
 </script>
 
 <template>
-  <OpenPencilProvider :editor="editor">
+  <PairdrawProvider :editor="editor">
     <div class="layout">
       <ToolbarRoot>
         <div class="toolbar">
@@ -124,7 +124,7 @@ const TOOL_LIST: Tool[] = [
         </div>
       </div>
     </div>
-  </OpenPencilProvider>
+  </PairdrawProvider>
 </template>
 
 <style>

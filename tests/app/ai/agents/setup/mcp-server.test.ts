@@ -25,8 +25,8 @@ describe('useMCPServerSetup', () => {
     const discovery = createAgentDiscovery({
       enabled: true,
       lookup: async (): Promise<AgentLookup> => ({
-        ...lookup('npm', ...(installed ? ['openpencil-mcp-http'] : [])),
-        versions: installed ? { '@open-pencil/mcp': '0.0.0-test' } : {}
+        ...lookup('npm', ...(installed ? ['pairdraw-mcp-http'] : [])),
+        versions: installed ? { '@pairdraw/mcp': '0.0.0-test' } : {}
       }),
       install: async () => undefined,
       installBridge,

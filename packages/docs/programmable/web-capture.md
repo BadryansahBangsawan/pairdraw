@@ -7,7 +7,7 @@ description: Copy a live web page or one of its elements, with the styles the br
 
 A web capture is a page, or one element of it, recorded with the styles the browser computed for every box: colors, borders, radii, shadows, fonts, spacing, and flex layout, plus its images. Pasting a capture into the canvas builds editable layers from it, in one undo step, in a frame named after the page.
 
-Captures come from the Chrome extension in `extensions/chrome` or from your own code through `@open-pencil/web-capture`. Plain HTML copied from any page pastes as styled layers too, without a capture: the editor styles the fragment the clipboard holds, after removing scripts, event handlers, frames, and script links.
+Captures come from the Chrome extension in `extensions/chrome` or from your own code through `@pairdraw/web-capture`. Plain HTML copied from any page pastes as styled layers too, without a capture: the editor styles the fragment the clipboard holds, after removing scripts, event handlers, frames, and script links.
 
 ## The Chrome extension
 
@@ -27,10 +27,10 @@ The extension asks only for `activeTab` and `scripting`: the capture script runs
 
 ## Capturing from your own code
 
-`@open-pencil/web-capture/capturer` runs inside a page: a browser extension's content script, a test, or the renderer of an Electron app. It reads the DOM synchronously, then waits for images, and never changes the page.
+`@pairdraw/web-capture/capturer` runs inside a page: a browser extension's content script, a test, or the renderer of an Electron app. It reads the DOM synchronously, then waits for images, and never changes the page.
 
 ```ts
-import { captureElement, writeWebCaptureClipboard } from '@open-pencil/web-capture/capturer'
+import { captureElement, writeWebCaptureClipboard } from '@pairdraw/web-capture/capturer'
 
 button.addEventListener('click', () => {
   const pricing = document.querySelector('#pricing')
@@ -50,8 +50,8 @@ The capturer belongs in the renderer, where the page's DOM is. Expose it from a 
 // preload.ts
 import { contextBridge } from 'electron'
 
-import { encodeWebCaptureClipboard } from '@open-pencil/web-capture'
-import { capturePage } from '@open-pencil/web-capture/capturer'
+import { encodeWebCaptureClipboard } from '@pairdraw/web-capture'
+import { capturePage } from '@pairdraw/web-capture/capturer'
 
 contextBridge.exposeInMainWorld('webCapture', {
   copyPage: async () => encodeWebCaptureClipboard(await capturePage(document))
@@ -72,9 +72,9 @@ export async function copyPage(appWindow: BrowserWindow) {
 
 ## The format
 
-A capture is JSON: `format: "openpencil/web-capture"`, `version`, whether a `page` or an `element` was captured, the page's address and title, the viewport, the fonts its text uses, and a `root` element. Each element has its `tagName`, a few attributes (`id`, `class`, links, image sources, and accessible labels), its `computedStyle`, its `box` on the page, and its `children`. On the clipboard it travels as HTML, compressed inside a comment, followed by the same content as plain styled HTML for other applications.
+A capture is JSON: `format: "pairdraw/web-capture"`, `version`, whether a `page` or an `element` was captured, the page's address and title, the viewport, the fonts its text uses, and a `root` element. Each element has its `tagName`, a few attributes (`id`, `class`, links, image sources, and accessible labels), its `computedStyle`, its `box` on the page, and its `children`. On the clipboard it travels as HTML, compressed inside a comment, followed by the same content as plain styled HTML for other applications.
 
-Captures are read as untrusted input: the editor checks the shape and size, keeps only the attributes and style properties layers use, links only to `http`, `https`, and `mailto` addresses, and images only as raster data or `http(s)` addresses. A capture from a newer format version is refused with a message instead of being guessed at. `readWebCapture`, `parseWebCapture`, and `readWebCaptureClipboard` in `@open-pencil/web-capture` do the same checks for your own readers.
+Captures are read as untrusted input: the editor checks the shape and size, keeps only the attributes and style properties layers use, links only to `http`, `https`, and `mailto` addresses, and images only as raster data or `http(s)` addresses. A capture from a newer format version is refused with a message instead of being guessed at. `readWebCapture`, `parseWebCapture`, and `readWebCaptureClipboard` in `@pairdraw/web-capture` do the same checks for your own readers.
 
 ## Limits
 

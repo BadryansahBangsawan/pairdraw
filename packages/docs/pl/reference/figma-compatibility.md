@@ -179,7 +179,7 @@ Połączenia, wyzwalacze, działania, animacje, nakładki, przewijanie, przepły
 | Współpraca | ✅ | Pokoje P2P (Trystero i Yjs) z kursorami, trybem śledzenia, rozmowami głosowymi i kursorami agentów; bez serwera |
 | Tryb programisty | 🟡 | Karta Kod pokazuje zaznaczenie jako design JSX, HTML, Vue lub React z CSS albo Tailwind; statusy Ready for dev; brak trybu inspekcji z wymiarami |
 | Tailwind CSS v4 | ✅ | HTML z klasami przez panel Kod, CLI lub API |
-| Serwer MCP | ✅ | `@open-pencil/mcp` ze stdio i HTTP; 138 podstawowych narzędzi oraz narzędzia dokumentu, historii i ustawień |
+| Serwer MCP | ✅ | `@pairdraw/mcp` ze stdio i HTTP; 138 podstawowych narzędzi oraz narzędzia dokumentu, historii i ustawień |
 | CLI | ✅ | 24 polecenia, m.in. `info`, `tree`, `find`, `query`, `node`, `pages`, `variables`, `tokens`, `fonts`, `lint`, `analyze`, `export`, `import`, `convert`, `diff`, `eval` i `tool` |
 
 ## Figma Draw

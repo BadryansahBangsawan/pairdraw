@@ -8,8 +8,8 @@ import {
 } from 'reka-ui'
 import { computed } from 'vue'
 
-import type { CommentThread } from '@open-pencil/scene-graph'
-import { useCommentMessages, useCommonMessages } from '@open-pencil/vue/i18n'
+import type { CommentThread } from '@pairdraw/scene-graph'
+import { useCommentMessages, useCommonMessages } from '@pairdraw/vue/i18n'
 
 import { commentThreadsPrompt } from '@/app/ai/chat/entry/comments'
 import { acceptsDocumentPrompts, runPromptInDocument } from '@/app/ai/chat/entry/run'

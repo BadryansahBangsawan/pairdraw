@@ -1,9 +1,9 @@
 import { computed, shallowRef } from 'vue'
 
-import type { Editor, TextHyperlinkState } from '@open-pencil/core'
-import { isOpenableLinkURL, normalizeLinkURL } from '@open-pencil/core/text'
-import type { HyperlinkTarget } from '@open-pencil/scene-graph'
-import { isCanvasTextInput } from '@open-pencil/vue/canvas/text-edit'
+import type { Editor, TextHyperlinkState } from '@pairdraw/core'
+import { isOpenableLinkURL, normalizeLinkURL } from '@pairdraw/core/text'
+import type { HyperlinkTarget } from '@pairdraw/scene-graph'
+import { isCanvasTextInput } from '@pairdraw/vue/canvas/text-edit'
 
 import { openExternalLink } from '@/app/shell/ui'
 import { IS_TAURI } from '@/constants'

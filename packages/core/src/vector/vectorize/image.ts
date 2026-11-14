@@ -1,4 +1,4 @@
-import type { Fill, SceneNode } from '@open-pencil/scene-graph'
+import type { Fill, SceneNode } from '@pairdraw/scene-graph'
 
 /** An image paint that has image data to vectorize. */
 export type VectorizableImageFill = Fill & { type: 'IMAGE'; imageHash: string }

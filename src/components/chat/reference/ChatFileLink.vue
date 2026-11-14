@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useAIMessages } from '@open-pencil/vue/i18n'
+import { useAIMessages } from '@pairdraw/vue/i18n'
 
 import { revealLocalFile } from '@/app/ai/chat/references/files'
 import { toast } from '@/app/shell/ui'

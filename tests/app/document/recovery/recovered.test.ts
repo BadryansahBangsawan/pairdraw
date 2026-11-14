@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'bun:test'
 
-import * as layoutModule from '@open-pencil/core/layout'
+import * as layoutModule from '@pairdraw/core/layout'
 
 import type { DocumentSourceIdentity } from '@/app/document/io/types'
 import type { RecoverySnapshot, RecoveryStore } from '@/app/document/recovery'

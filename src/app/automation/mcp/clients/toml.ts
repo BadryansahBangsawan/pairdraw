@@ -21,7 +21,7 @@ const BASIC_ESCAPES: Record<string, string> = {
   t: '\t'
 }
 
-/** A dotted TOML key, such as `mcp_servers."open-pencil".env`, as its parts. */
+/** A dotted TOML key, such as `mcp_servers."pairdraw".env`, as its parts. */
 function parseKeyPath(source: string): string[] | null {
   const parts: string[] = []
   let index = 0

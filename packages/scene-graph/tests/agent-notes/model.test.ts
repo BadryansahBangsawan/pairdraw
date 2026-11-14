@@ -1,13 +1,13 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 import {
   AGENT_NOTE_MAX_LENGTH,
   agentNotesFromDraft,
   readAgentNotes,
   withAgentNotes
-} from '@open-pencil/scene-graph/agent-notes'
-import { OPEN_PENCIL_PLUGIN_ID } from '@open-pencil/scene-graph/plugin-data'
+} from '@pairdraw/scene-graph/agent-notes'
+import { PAIRDRAW_PLUGIN_ID } from '@pairdraw/scene-graph/plugin-data'
 
 function frame() {
   const graph = new SceneGraph()
@@ -59,7 +59,7 @@ describe('agent notes', () => {
 
   test('unreadable stored notes read as none', () => {
     const { node } = frame()
-    const pluginData = [{ pluginId: OPEN_PENCIL_PLUGIN_ID, key: 'agentNotes', value: '{"bad":' }]
+    const pluginData = [{ pluginId: PAIRDRAW_PLUGIN_ID, key: 'agentNotes', value: '{"bad":' }]
     expect(readAgentNotes({ pluginData })).toBeNull()
     expect(readAgentNotes({ pluginData: [{ ...pluginData[0], value: '{}' }] })).toBeNull()
     expect(readAgentNotes(node)).toBeNull()

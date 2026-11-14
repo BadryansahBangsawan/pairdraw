@@ -1,5 +1,5 @@
-import type { GUID } from '@open-pencil/kiwi/fig'
-import { guidToString } from '@open-pencil/kiwi/fig/guid'
+import type { GUID } from '@pairdraw/kiwi/fig'
+import { guidToString } from '@pairdraw/kiwi/fig/guid'
 
 import { sameGuid } from '../source-index'
 import { descendants, findWithinBoundary, type TreeShape } from '../tree'

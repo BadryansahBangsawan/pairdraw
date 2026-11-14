@@ -23,7 +23,7 @@ if (process.argv.includes('--version')) {
 
 if (process.argv.includes('--help') || process.argv.includes('-h')) {
   process.stdout.write(
-    `openpencil-connect\n\n` +
+    `pairdraw-connect\n\n` +
       `Connect Pairdraw in the browser to this computer, so its chat can run\n` +
       `Claude Code, Codex, or Gemini CLI here and use Pairdraw's tools.\n\n` +
       `Starts Pairdraw's MCP server with an agent bridge and opens a one-time link\n` +
@@ -34,15 +34,15 @@ if (process.argv.includes('--help') || process.argv.includes('-h')) {
       `  --no-open     Print the link without opening the browser\n\n` +
       `Environment variables:\n` +
       `  PORT                         TCP port (default: ${DEFAULT_PORT})\n` +
-      `  OPENPENCIL_CONNECT_APP_URL   The Pairdraw web app to pair with\n` +
+      `  PAIRDRAW_CONNECT_APP_URL   The Pairdraw web app to pair with\n` +
       `                               (default: https://app.openpencil.dev). Its origin may\n` +
       `                               call this server; use it for a development server.\n` +
-      `  OPENPENCIL_MCP_CORS_ORIGIN   Further origins allowed to call this server, comma-separated.\n` +
-      `  OPENPENCIL_MCP_ROOT          Allowed directory for file-scoped tools (default: home\n` +
+      `  PAIRDRAW_MCP_CORS_ORIGIN   Further origins allowed to call this server, comma-separated.\n` +
+      `  PAIRDRAW_MCP_ROOT          Allowed directory for file-scoped tools (default: home\n` +
       `                               directory on Windows, current working directory elsewhere)\n` +
-      `  OPENPENCIL_MCP_SOCKET        Override the Unix socket path\n` +
-      `  OPENPENCIL_MCP_DISABLED_TOOLS Comma-separated tool names to omit\n` +
-      `  OPENPENCIL_MCP_SCOPE         "selection" to let clients read only the selected layers\n\n` +
+      `  PAIRDRAW_MCP_SOCKET        Override the Unix socket path\n` +
+      `  PAIRDRAW_MCP_DISABLED_TOOLS Comma-separated tool names to omit\n` +
+      `  PAIRDRAW_MCP_SCOPE         "selection" to let clients read only the selected layers\n\n` +
       `The eval tool is always off here, and authentication cannot be disabled.\n`
   )
   process.exit(0)
@@ -58,12 +58,12 @@ if (!/^\d+$/.test(portText)) fail(`PORT must be an integer in 1–65535, got "${
 const port = Number.parseInt(portText, 10)
 if (port < 1 || port > 65535) fail(`PORT must be an integer in 1–65535, got "${portText}"`)
 
-const appURL = resolveConnectAppURL(process.env.OPENPENCIL_CONNECT_APP_URL)
+const appURL = resolveConnectAppURL(process.env.PAIRDRAW_CONNECT_APP_URL)
 if (!appURL) {
-  fail('OPENPENCIL_CONNECT_APP_URL must be an https URL, or http on localhost')
+  fail('PAIRDRAW_CONNECT_APP_URL must be an https URL, or http on localhost')
 }
 
-const explicitToken = process.env.OPENPENCIL_MCP_AUTH_TOKEN?.trim()
+const explicitToken = process.env.PAIRDRAW_MCP_AUTH_TOKEN?.trim()
 const toolPolicy = readToolPolicyFromEnv()
 
 let handle: Awaited<ReturnType<typeof startServer>>
@@ -71,15 +71,15 @@ try {
   handle = await startServer({
     httpPort: port,
     withTcp: true,
-    socketPath: process.env.OPENPENCIL_MCP_SOCKET?.trim() || null,
+    socketPath: process.env.PAIRDRAW_MCP_SOCKET?.trim() || null,
     // The browser runs agents that can edit files; eval would let a page run code here too.
     enableEval: false,
     disabledTools: toolPolicy.disabledTools,
     scope: toolPolicy.scope,
-    mcpRoot: resolveMCPRoot(process.env.OPENPENCIL_MCP_ROOT),
+    mcpRoot: resolveMCPRoot(process.env.PAIRDRAW_MCP_ROOT),
     // Auth always stays on: a paired tab and local MCP clients each bring their own token.
     authToken: explicitToken || undefined,
-    corsOrigin: connectCORSOrigins(process.env.OPENPENCIL_MCP_CORS_ORIGIN, appURL),
+    corsOrigin: connectCORSOrigins(process.env.PAIRDRAW_MCP_CORS_ORIGIN, appURL),
     agents: {
       onPaired: () =>
         process.stdout.write(

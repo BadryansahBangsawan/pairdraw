@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import { renderNodesToPPTX, type PPTXExportStats } from '@open-pencil/core/io'
-import type { ShadowEffect } from '@open-pencil/scene-graph'
-import TransformMatrix from '@open-pencil/scene-graph/matrix'
+import { renderNodesToPPTX, type PPTXExportStats } from '@pairdraw/core/io'
+import type { ShadowEffect } from '@pairdraw/scene-graph'
+import TransformMatrix from '@pairdraw/scene-graph/matrix'
 
 import { hasUnsupportedTransform, nodeBox } from '#core/io/formats/pptx/geometry'
 

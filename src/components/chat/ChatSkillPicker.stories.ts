@@ -23,7 +23,7 @@ const brandReview: Skill = {
   instructions: 'Compare every screen with the brand book.',
   modelInvocable: true,
   userInvocable: true,
-  source: 'openpencil',
+  source: 'pairdraw',
   location: 'brand-review',
   files: [],
   readFile: () => Promise.reject(new Error('No files')),

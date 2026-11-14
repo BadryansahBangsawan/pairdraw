@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useCloudPortalMessages } from '@open-pencil/vue/i18n'
+import { useCloudPortalMessages } from '@pairdraw/vue/i18n'
 
 import BrandMark from '@/components/brand/BrandMark.vue'
 import { portalPublic } from '@/components/cloud-portal/ui'

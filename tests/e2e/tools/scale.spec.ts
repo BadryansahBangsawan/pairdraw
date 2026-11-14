@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
 import { toolbarFlyoutItemTestId, toolbarFlyoutTestId } from '#tests/helpers/test-ids'
@@ -19,8 +19,8 @@ interface Placed {
 /** Places rectangles with a 2px stroke at 100% zoom with no pan, and selects them. */
 async function place(page: Page, rects: Vector[]) {
   return page.evaluate((list) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.state.panX = 0
     store.state.panY = 0
     store.state.zoom = 1
@@ -51,8 +51,8 @@ async function place(page: Page, rects: Vector[]) {
 
 async function layers(page: Page, ids: string[]): Promise<Placed[]> {
   return page.evaluate((list) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     return list.map((id) => {
       const node = store.graph.getNode(id)
       if (!node) throw new Error(`missing ${id}`)
@@ -63,7 +63,7 @@ async function layers(page: Page, ids: string[]): Promise<Placed[]> {
 }
 
 async function activeTool(page: Page) {
-  return page.evaluate(() => window.openPencil?.getStore?.().state.activeTool)
+  return page.evaluate(() => window.pairdraw?.getStore?.().state.activeTool)
 }
 
 test('K picks the Scale tool, also offered in the Move flyout', async () => {

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import {
   appendExploreContext,
@@ -102,7 +102,7 @@ describe('the exploration note', () => {
       { kind: 'variants', count: 2, axis: 'style' },
       { id: base.id, name: base.name, type: base.type }
     )
-    expect(note.instructions).toContain(`openpencil://node/${encodeURIComponent(base.id)}`)
+    expect(note.instructions).toContain(`pairdraw://node/${encodeURIComponent(base.id)}`)
     // A top-level copy is already on the page.
     expect(note.instructions).toContain(`figma.getNodeById(${JSON.stringify(base.id)}).clone()`)
     expect(note.instructions).not.toContain('reparent_node')

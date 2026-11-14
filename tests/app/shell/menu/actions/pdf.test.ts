@@ -1,6 +1,6 @@
 import { describe, expect, mock, spyOn, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { exportFramesToPDF, pdfFrameIds } from '@/app/shell/menu/actions/pdf'

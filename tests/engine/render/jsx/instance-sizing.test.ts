@@ -1,8 +1,8 @@
 import { expect, test } from 'bun:test'
 
-import { renderTree } from '@open-pencil/core/design-jsx'
-import { computeAllLayouts } from '@open-pencil/core/layout'
-import { Component, Frame, Instance, Rectangle } from '@open-pencil/design-jsx'
+import { renderTree } from '@pairdraw/core/design-jsx'
+import { computeAllLayouts } from '@pairdraw/core/layout'
+import { Component, Frame, Instance, Rectangle } from '@pairdraw/design-jsx'
 
 import { getNodeOrThrow } from '#tests/helpers/assert'
 import { makeSceneGraph } from '#tests/helpers/scene'

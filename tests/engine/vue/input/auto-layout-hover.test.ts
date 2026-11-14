@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { Editor } from '@open-pencil/core'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { createDefaultNode } from '@open-pencil/scene-graph/node-defaults'
+import type { Editor } from '@pairdraw/core'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
 
 import { autoLayoutValueAnchor, resolveAutoLayoutHover } from '#vue/shared/input/auto-layout-hover'
 

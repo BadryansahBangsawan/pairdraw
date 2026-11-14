@@ -1,5 +1,5 @@
-import type { Editor } from '@open-pencil/core'
-import type { ViewportTransform } from '@open-pencil/core/geometry'
+import type { Editor } from '@pairdraw/core'
+import type { ViewportTransform } from '@pairdraw/core/geometry'
 
 /** How long a viewport change glides, in milliseconds. */
 export const VIEWPORT_TWEEN_MS = 220

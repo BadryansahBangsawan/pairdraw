@@ -2,9 +2,9 @@ import { describe, test, expect } from 'bun:test'
 
 import type { CanvasKit, LineMetrics, Paragraph, RectWithDirection } from 'canvaskit-wasm'
 
-import { TextEditor } from '@open-pencil/core/text'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { createDefaultNode } from '@open-pencil/scene-graph/node-defaults'
+import { TextEditor } from '@pairdraw/core/text'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
 
 import { TextLayout } from '#core/canvas/text/layout'
 

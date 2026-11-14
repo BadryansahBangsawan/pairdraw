@@ -2,7 +2,7 @@
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import { useSlidesMessages } from '@open-pencil/vue/i18n'
+import { useSlidesMessages } from '@pairdraw/vue/i18n'
 
 import IconButton from '@/components/ui/button/IconButton.vue'
 import theme from '@/theme/slides/row'

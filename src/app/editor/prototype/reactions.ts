@@ -6,8 +6,8 @@ import type {
   PrototypeReaction,
   PrototypeTransitionType,
   PrototypeTriggerType
-} from '@open-pencil/scene-graph'
-import { generateId } from '@open-pencil/scene-graph'
+} from '@pairdraw/scene-graph'
+import { generateId } from '@pairdraw/scene-graph'
 
 /** Figma's transition length for a new interaction, and its default delay, in seconds. */
 export const DEFAULT_TRANSITION_DURATION = 0.3

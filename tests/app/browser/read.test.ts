@@ -12,7 +12,7 @@ const BODY = readFileSync(repoPath('desktop/src/system/browser-read.js'), 'utf8'
 function readPage(html: string, request: { kind: string; selector?: string }): string {
   const window = new Window()
   window.document.body.innerHTML = html
-  const source = `(() => {\nconst __openpencilReadRequest = ${JSON.stringify(request)};\n${BODY}\n})()`
+  const source = `(() => {\nconst __pairdrawReadRequest = ${JSON.stringify(request)};\n${BODY}\n})()`
   const reported = window.eval(source)
   window.happyDOM.abort()
   if (typeof reported !== 'string') throw new Error('The page returned nothing we can read.')

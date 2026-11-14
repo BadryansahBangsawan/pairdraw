@@ -1,12 +1,12 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   getParentWorldMatrix,
   getWorldMatrix,
   localTransformFromWorld
-} from '@open-pencil/scene-graph/coordinate'
-import Matrix, { type Mat3 } from '@open-pencil/scene-graph/matrix'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
-import { scaleVectorNetworkForResize } from '@open-pencil/scene-graph/resize'
+} from '@pairdraw/scene-graph/coordinate'
+import Matrix, { type Mat3 } from '@pairdraw/scene-graph/matrix'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
+import { scaleVectorNetworkForResize } from '@pairdraw/scene-graph/resize'
 
 /** Which end of a line a handle drags: its origin or the far end along its length. */
 export type LineEnd = 'start' | 'end'

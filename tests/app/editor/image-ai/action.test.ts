@@ -3,9 +3,9 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test'
 
 import { fromUint8Array } from 'js-base64'
 
-import { SkiaRenderer } from '@open-pencil/core/canvas'
-import { getCanvasKit } from '@open-pencil/core/canvaskit'
-import type { Fill } from '@open-pencil/scene-graph'
+import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { getCanvasKit } from '@pairdraw/core/canvaskit'
+import type { Fill } from '@pairdraw/scene-graph'
 
 import {
   generateImageFill,

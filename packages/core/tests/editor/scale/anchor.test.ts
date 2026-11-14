@@ -7,7 +7,7 @@ import {
   scaledBounds,
   scaleFactorForSize,
   type ScaleAnchor
-} from '@open-pencil/core'
+} from '@pairdraw/core'
 
 const BOUNDS = { x: 10, y: 20, width: 100, height: 40 }
 

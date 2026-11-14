@@ -6,7 +6,7 @@ import {
   useCommonMessages,
   useCredentialMessages,
   useSettingsMessages
-} from '@open-pencil/vue/i18n'
+} from '@pairdraw/vue/i18n'
 
 import type { MCPConnectionDraft } from '@/app/integrations/mcp'
 import type { MCPSignInStatus } from '@/app/integrations/mcp/settings/access'

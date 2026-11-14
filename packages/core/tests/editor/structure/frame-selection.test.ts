@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
+import { createEditor } from '@pairdraw/core'
 
 describe('frameSelection', () => {
   test('wraps selected nodes in a frame and preserves visual positions', () => {

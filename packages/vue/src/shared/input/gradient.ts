@@ -1,11 +1,11 @@
-import { editedGradient, editedGradientLayout, type Editor } from '@open-pencil/core'
+import { editedGradient, editedGradientLayout, type Editor } from '@pairdraw/core'
 import {
   createSceneGeometry,
   gradientStopPosition,
   hitTestGradientHandles,
   moveGradientHandle
-} from '@open-pencil/core/geometry'
-import type { Fill } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/geometry'
+import type { Fill } from '@pairdraw/scene-graph'
 
 import type { DragGradient, DragState } from '#vue/shared/input/types'
 

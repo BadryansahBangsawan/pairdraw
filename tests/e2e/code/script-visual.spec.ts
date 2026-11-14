@@ -41,8 +41,8 @@ async function openEditor(browser: Browser): Promise<{ page: Page; canvas: Canva
  */
 async function runScript(page: Page, source: string): Promise<string[]> {
   return page.evaluate(async (nextSource: string) => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const createURL = '/src/app/code/script/create.ts'
     const runURL = '/src/app/code/script/run-node.ts'
     const { setScriptSource } = (await import(/* @vite-ignore */ createURL)) as {

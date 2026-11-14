@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { colorToCSS } from '@open-pencil/scene-graph/color'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { colorToCSS } from '@pairdraw/scene-graph/color'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useColorPickerPanelContext } from '@/components/color-picker-panel/context'
 import StandardColorSlider from '@/components/color-picker-panel/StandardColorSlider.vue'

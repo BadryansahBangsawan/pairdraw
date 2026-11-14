@@ -2,8 +2,8 @@ import { useRafFn, watchDebounced } from '@vueuse/core'
 import type { createRendererFromJSON } from 'shaders/core'
 import { onScopeDispose, readonly, ref, shallowRef, watch, type Ref } from 'vue'
 
-import type { Size } from '@open-pencil/scene-graph/primitives'
-import type { ShaderPreset } from '@open-pencil/scene-graph/shaders'
+import type { Size } from '@pairdraw/scene-graph/primitives'
+import type { ShaderPreset } from '@pairdraw/scene-graph/shaders'
 
 import {
   advanceShaderClock,

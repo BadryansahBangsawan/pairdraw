@@ -36,16 +36,16 @@ Gdy silnik jest zbyt stary, Pairdraw zamiast pustego okna pokazuje, co należy z
 ## Instalacja w macOS przez Homebrew
 
 ```sh
-brew install --cask openpencil
+brew install --cask pairdraw
 ```
 
-Polecenie instaluje podpisaną aplikację dla komputerów Mac z Apple Silicon lub procesorem Intel z [oficjalnego katalogu Homebrew](https://formulae.brew.sh/cask/openpencil). Aktualizacje są weryfikowane przez Homebrew i mogą pojawiać się później niż wydania na GitHubie. W tym czasie skorzystaj z [bezpośredniego pobierania](https://github.com/open-pencil/open-pencil/releases/latest). CLI instaluje się osobno: `npm install -g @open-pencil/cli`.
+Polecenie instaluje podpisaną aplikację dla komputerów Mac z Apple Silicon lub procesorem Intel z [oficjalnego katalogu Homebrew](https://formulae.brew.sh/cask/pairdraw). Aktualizacje są weryfikowane przez Homebrew i mogą pojawiać się później niż wydania na GitHubie. W tym czasie skorzystaj z [bezpośredniego pobierania](https://github.com/BadryansahBangsawan/pairdraw/releases/latest). CLI instaluje się osobno: `npm install -g @pairdraw/cli`.
 
 Jeśli używałeś zarchiwizowanego własnego tapa, przeprowadź migrację:
 
 ```sh
-brew uninstall open-pencil/tap/open-pencil
-brew install --cask openpencil
+brew uninstall pairdraw/tap/pairdraw
+brew install --cask pairdraw
 ```
 
 ## Budowanie ze źródeł {#building-from-source}
@@ -58,8 +58,8 @@ brew install --cask openpencil
 ### Instalacja
 
 ```sh
-git clone https://github.com/open-pencil/open-pencil.git
-cd open-pencil
+git clone https://github.com/BadryansahBangsawan/pairdraw.git
+cd pairdraw
 bun install
 ```
 

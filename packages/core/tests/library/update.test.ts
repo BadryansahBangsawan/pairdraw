@@ -6,8 +6,8 @@ import {
   materializeLibraryAsset,
   planLibraryInstanceUpdates,
   summarizeLibraryUpdate
-} from '@open-pencil/core/library'
-import { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/library'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 function revisionGraph(label: string, includeLarge = true) {
   const graph = new SceneGraph()

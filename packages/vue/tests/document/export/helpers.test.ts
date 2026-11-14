@@ -2,9 +2,9 @@ import { describe, expect, test } from 'bun:test'
 
 import { computed } from 'vue'
 
-import { createEditor } from '@open-pencil/core'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { OPEN_PENCIL_PLUGIN_DATA, readPluginData } from '@open-pencil/scene-graph/plugin-data'
+import { createEditor } from '@pairdraw/core'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { PAIRDRAW_PLUGIN_DATA, readPluginData } from '@pairdraw/scene-graph/plugin-data'
 
 import { createExportSettingActions, formatSupportsQuality } from '#vue/document/export/helpers'
 
@@ -37,7 +37,7 @@ describe('export quality', () => {
     expect(settings()).toEqual([{ scale: 1, format: 'jpg', quality: 100 }])
     const node = graph.getNode(frame.id)
     if (!node) throw new Error('Expected the frame')
-    expect(readPluginData(node.pluginData, OPEN_PENCIL_PLUGIN_DATA.exportSettings)).toEqual([
+    expect(readPluginData(node.pluginData, PAIRDRAW_PLUGIN_DATA.exportSettings)).toEqual([
       { scale: 1, format: 'jpg', quality: 100 }
     ])
 

@@ -10,20 +10,20 @@ import type {
   Stroke,
   StrokeCap,
   StrokeJoin
-} from '@open-pencil/scene-graph'
-import { TRANSPARENT } from '@open-pencil/scene-graph/constants'
+} from '@pairdraw/scene-graph'
+import { TRANSPARENT } from '@pairdraw/scene-graph/constants'
 import {
   ellipticalGradientTransform,
   isMeshFill,
   linearGradientTransformFromAxes,
   meshPointCount
-} from '@open-pencil/scene-graph/gradient'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/gradient'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 import {
   createShaderSourcePaint,
   withShaderPaints,
   type ShaderPaint
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 import { imagePaint, type PenImages } from './images'
 import { meshPaintSchema } from './schema'

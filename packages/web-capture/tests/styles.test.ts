@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { withoutImpliedValues } from '@open-pencil/web-capture'
+import { withoutImpliedValues } from '@pairdraw/web-capture'
 
 describe('captured styles', () => {
   test('leaves out values the importer reads as missing', () => {

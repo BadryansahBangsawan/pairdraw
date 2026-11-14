@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { effectiveFigmaRawNodeFields } from '@open-pencil/fig'
-import type { Effect, Fill, SceneNode } from '@open-pencil/scene-graph'
-import { getSharedStyles } from '@open-pencil/scene-graph/shared-styles'
-import { pixelLength } from '@open-pencil/scene-graph/text'
+import { createEditor } from '@pairdraw/core'
+import { effectiveFigmaRawNodeFields } from '@pairdraw/fig'
+import type { Effect, Fill, SceneNode } from '@pairdraw/scene-graph'
+import { getSharedStyles } from '@pairdraw/scene-graph/shared-styles'
+import { pixelLength } from '@pairdraw/scene-graph/text'
 
 import { sharedStyleDetachPatch, sharedStylePatch } from '#vue/controls/shared-style/model'
 

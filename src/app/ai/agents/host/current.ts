@@ -1,4 +1,4 @@
-import { IS_TAURI } from '@open-pencil/core/constants'
+import { IS_TAURI } from '@pairdraw/core/constants'
 
 import { companion } from '@/app/automation/companion/connection'
 import { isTauri } from '@/app/tauri/env'

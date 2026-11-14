@@ -6,7 +6,7 @@ import {
   BUILTIN_LIBRARY_ID,
   ensureLibraryAssetKeys,
   publishBasicsLibrary
-} from '@open-pencil/core/library'
+} from '@pairdraw/core/library'
 
 import { bold, dim, fmtList, ok, printError } from '#cli/format'
 import { loadDocument, populateWholeDocument, writeFigDocument } from '#cli/headless'

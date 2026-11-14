@@ -33,7 +33,7 @@ Group findings by priority:
 2. **Should fix**: inconsistency or weak hierarchy that makes the design harder to use or maintain.
 3. **Could improve**: polish.
 
-For each finding, link the layer as `[Layer name](openpencil://node/<id>)` with the ID from a tool result, say what is wrong and why, and propose the fix in one sentence. Lead with two or three sentences on what works well and the overall impression. Keep the list to the findings that matter; ten sharp findings beat thirty minor ones.
+For each finding, link the layer as `[Layer name](pairdraw://node/<id>)` with the ID from a tool result, say what is wrong and why, and propose the fix in one sentence. Lead with two or three sentences on what works well and the overall impression. Keep the list to the findings that matter; ten sharp findings beat thirty minor ones.
 
 When the user wants comments on the canvas, add each must-fix and should-fix finding with `add_comment` on its layer.
 

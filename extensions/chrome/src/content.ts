@@ -8,7 +8,7 @@ import {
   writeWebCaptureClipboard,
   type CaptureImageFetcher,
   type CaptureOptions
-} from '@open-pencil/web-capture/capturer'
+} from '@pairdraw/web-capture/capturer'
 
 import { t } from './i18n'
 import type { CaptureResponse } from './messages'

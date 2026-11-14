@@ -15,8 +15,8 @@ export function textOverflowDriver(page: () => Page) {
   return {
     show(): Promise<TextOverflowState[]> {
       return page().evaluate(() => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         const pageId = store.state.currentPageId
         const boxFill = [
           {

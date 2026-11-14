@@ -5,13 +5,13 @@ import { sceneNodeToDesignDocument } from '#dom-css/export/projection'
 import { designDocumentToSceneGraph } from '#dom-css/import/scene-graph'
 import { createHeadlessCSSRuntime, htmlToDesignDocument } from '#dom-css/index'
 
-import { SceneGraph, type SceneNode, type TextParagraphStyle } from '@open-pencil/scene-graph'
+import { SceneGraph, type SceneNode, type TextParagraphStyle } from '@pairdraw/scene-graph'
 import {
   paragraphSpacingAt,
   percentLength,
   pixelLength,
   textParagraphRanges
-} from '@open-pencil/scene-graph/text'
+} from '@pairdraw/scene-graph/text'
 
 async function texts(html: string): Promise<SceneNode[]> {
   const document = await htmlToDesignDocument(html, { runtime: createHeadlessCSSRuntime() })

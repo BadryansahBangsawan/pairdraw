@@ -7,8 +7,8 @@ import {
   isOpenableLinkURL,
   normalizeLinkURL,
   styleRunsWithHyperlink
-} from '@open-pencil/core/text'
-import { SceneGraph, type HyperlinkTarget, type StyleRun } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/text'
+import { SceneGraph, type HyperlinkTarget, type StyleRun } from '@pairdraw/scene-graph'
 
 /** A script address, which links must refuse; the tests never run it. */
 // eslint-disable-next-line no-script-url -- Rejection fixture; this URL is never executed.

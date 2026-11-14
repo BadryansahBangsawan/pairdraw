@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { resolveEditorProfile } from '@open-pencil/core'
-import { MIXED, type MixedValue } from '@open-pencil/vue/controls/node-props'
-import { useEditorMessages, useI18n } from '@open-pencil/vue/i18n'
-import { TypographyControlsRoot } from '@open-pencil/vue/primitives/TypographyControls'
+import { resolveEditorProfile } from '@pairdraw/core'
+import { MIXED, type MixedValue } from '@pairdraw/vue/controls/node-props'
+import { useEditorMessages, useI18n } from '@pairdraw/vue/i18n'
+import { TypographyControlsRoot } from '@pairdraw/vue/primitives/TypographyControls'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { loadFont } from '@/app/editor/fonts'

@@ -1,7 +1,7 @@
-import { hasWebCaptureClipboardMarker } from '@open-pencil/web-capture'
+import { hasWebCaptureClipboardMarker } from '@pairdraw/web-capture'
 
-const OPENPENCIL_START = '<!--(openpencil)'
-const OPENPENCIL_END = '(/openpencil)-->'
+const PAIRDRAW_START = '<!--(pairdraw)'
+const PAIRDRAW_END = '(/pairdraw)-->'
 const FIGMA_START = '<!--(figma)'
 const FIGMA_END = '(/figma)-->'
 const ESCAPED_FIGMA_START = '&lt;!--(figma)'
@@ -12,10 +12,10 @@ function hasCompleteMarker(html: string, start: string, end: string): boolean {
   return startIndex !== -1 && html.includes(end, startIndex + start.length)
 }
 
-/** Whether clipboard HTML holds OpenPencil or Figma layers. */
+/** Whether clipboard HTML holds Pairdraw or Figma layers. */
 export function isLayerClipboardHTML(html: string): boolean {
   return (
-    hasCompleteMarker(html, OPENPENCIL_START, OPENPENCIL_END) ||
+    hasCompleteMarker(html, PAIRDRAW_START, PAIRDRAW_END) ||
     hasCompleteMarker(html, FIGMA_START, FIGMA_END) ||
     hasCompleteMarker(html, ESCAPED_FIGMA_START, ESCAPED_FIGMA_END)
   )

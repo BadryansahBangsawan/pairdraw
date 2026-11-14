@@ -6,13 +6,13 @@
 
 import type { CanvasKit, RuntimeEffect } from 'canvaskit-wasm'
 
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 import {
   parseShaderUniforms,
   type ShaderAutomaticInput,
   type ShaderUniform,
   type ShaderUniformValue
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 import { FRAME_HEIGHT_UNIFORM, OBJECT_SIZE_UNIFORM, translateShader } from './translate'
 

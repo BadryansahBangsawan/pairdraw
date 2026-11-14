@@ -4,10 +4,10 @@ import type { KiwiNodeChange } from '#fig/node-change/export/node'
 import { nodeChangeToProps, sceneNodeToKiwi } from '#fig/node-change/index'
 import { extractPrototypeReactions } from '#fig/node-change/prototype'
 
-import { getCompiledSchema, initCodec, type NodeChange } from '@open-pencil/kiwi/fig/codec'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { createDefaultSourceMetadata } from '@open-pencil/scene-graph/node-defaults'
+import { getCompiledSchema, initCodec, type NodeChange } from '@pairdraw/kiwi/fig/codec'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { createDefaultSourceMetadata } from '@pairdraw/scene-graph/node-defaults'
 
 const importNode = (nc: NodeChange): Partial<SceneNode> =>
   nodeChangeToProps(nc, []) as Partial<SceneNode>

@@ -5,7 +5,7 @@
  */
 import * as v from 'valibot'
 
-import type { ScriptInputValue } from '@open-pencil/scene-graph/script'
+import type { ScriptInputValue } from '@pairdraw/scene-graph/script'
 
 import { mulberry32 } from '@/app/code/script/sandbox/random'
 import {

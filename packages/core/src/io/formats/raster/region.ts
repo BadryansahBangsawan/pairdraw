@@ -1,8 +1,8 @@
 import type { CanvasKit } from 'canvaskit-wasm'
 
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import type { VisualBounds } from '@open-pencil/scene-graph/geometry'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import type { VisualBounds } from '@pairdraw/scene-graph/geometry'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { SkiaRenderer } from '#core/canvas'
 

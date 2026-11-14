@@ -1,11 +1,11 @@
 {
   "identities": [
     {
-      "name": "openpencil-cloud",
+      "name": "pairdraw-cloud",
       "credentials": [
         {
-          "accessKey": "openpencil",
-          "secretKey": "openpencil-development-secret"
+          "accessKey": "pairdraw",
+          "secretKey": "pairdraw-development-secret"
         }
       ],
       "actions": ["Admin", "Read", "List", "Write"]

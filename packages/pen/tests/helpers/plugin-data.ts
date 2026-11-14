@@ -1,7 +1,7 @@
 import * as v from 'valibot'
 
-import { PEN_PLUGIN_DATA_NAMESPACE } from '@open-pencil/pen'
-import type { SceneNode } from '@open-pencil/scene-graph'
+import { PEN_PLUGIN_DATA_NAMESPACE } from '@pairdraw/pen'
+import type { SceneNode } from '@pairdraw/scene-graph'
 
 const storedSchema = v.pipe(v.string(), v.parseJson())
 

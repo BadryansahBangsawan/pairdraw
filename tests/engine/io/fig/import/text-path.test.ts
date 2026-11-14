@@ -1,14 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 
-import { parseFigBuffer } from '@open-pencil/fig'
+import { parseFigBuffer } from '@pairdraw/fig'
 import {
   convertFigmaDerivedTextGlyphs,
   nodeChangeToProps,
   encodeVectorNetworkBlob
-} from '@open-pencil/fig/node-change'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/fig/node-change'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { importClipboardNodes } from '#core/clipboard'
 import { exportFigFile } from '#core/io/formats/fig/export'
@@ -239,7 +239,7 @@ describe('TEXT_PATH raw payload round-trip (synthetic)', () => {
     })
     node.source.fig.rawNodeFields = {
       vectorData: {
-        vectorNetworkBlob: { __openPencilFigmaBlob: networkBlob },
+        vectorNetworkBlob: { __pairdrawFigmaBlob: networkBlob },
         normalizedSize: { x: 100, y: 100 }
       },
       textPathStart: { tValue: 0.3, forward: false }

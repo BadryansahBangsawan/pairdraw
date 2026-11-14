@@ -1,4 +1,4 @@
-//! The one change a write may make to a client's config file: the `open-pencil` server entry
+//! The one change a write may make to a client's config file: the `pairdraw` server entry
 //! added in its fixed form, or removed. The webview proposes the edited text, which keeps the
 //! person's comments and formatting; this module checks that the old and new text read as the
 //! same values apart from that entry, so nothing the webview sends can add another server or
@@ -8,10 +8,10 @@ use serde_json::{json, Value};
 
 use super::{jsonc, McpClient};
 
-/// The name every client knows the server by (`OPEN_PENCIL_MCP_SERVER`).
-pub const ENTRY_NAME: &str = "open-pencil";
-/// The command `npm install -g @open-pencil/mcp` puts on the PATH.
-pub const ENTRY_COMMAND: &str = "openpencil-mcp";
+/// The name every client knows the server by (`PAIRDRAW_MCP_SERVER`).
+pub const ENTRY_NAME: &str = "pairdraw";
+/// The command `npm install -g @pairdraw/mcp` puts on the PATH.
+pub const ENTRY_COMMAND: &str = "pairdraw-mcp";
 /// Codex's servers table in `config.toml`.
 const TOML_SERVERS: &str = "mcp_servers";
 
@@ -164,7 +164,7 @@ mod tests {
 
     #[test]
     fn allows_adding_and_removing_only_the_entry() {
-        let added = "{\n  // mine\n  \"mcpServers\": {\n    \"other\": { \"command\": \"o\" },\n    \"open-pencil\": { \"command\": \"openpencil-mcp\" },\n  },\n  \"theme\": 1\n}\n";
+        let added = "{\n  // mine\n  \"mcpServers\": {\n    \"other\": { \"command\": \"o\" },\n    \"pairdraw\": { \"command\": \"pairdraw-mcp\" },\n  },\n  \"theme\": 1\n}\n";
         assert_eq!(
             check_edit(McpClient::Cursor, true, Some(CURSOR), added),
             Ok(())
@@ -173,7 +173,7 @@ mod tests {
             check_edit(McpClient::Cursor, false, Some(added), CURSOR),
             Ok(())
         );
-        let fresh = "{\n  \"servers\": {\n    \"open-pencil\": {\"type\": \"stdio\", \"command\": \"openpencil-mcp\"}\n  }\n}\n";
+        let fresh = "{\n  \"servers\": {\n    \"pairdraw\": {\"type\": \"stdio\", \"command\": \"pairdraw-mcp\"}\n  }\n}\n";
         assert_eq!(check_edit(McpClient::VsCode, true, None, fresh), Ok(()));
         assert_eq!(
             check_edit(
@@ -193,12 +193,12 @@ mod tests {
             check_edit(McpClient::Cursor, true, Some(CURSOR), other_server),
             Err(EntryCheck::Refused)
         );
-        let other_command = "{\"mcpServers\": {\"other\": {\"command\": \"o\"}, \"open-pencil\": {\"command\": \"sh\"}}, \"theme\": 1}";
+        let other_command = "{\"mcpServers\": {\"other\": {\"command\": \"o\"}, \"pairdraw\": {\"command\": \"sh\"}}, \"theme\": 1}";
         assert_eq!(
             check_edit(McpClient::Cursor, true, Some(CURSOR), other_command),
             Err(EntryCheck::Refused)
         );
-        let changed_setting = "{\"mcpServers\": {\"other\": {\"command\": \"o\"}, \"open-pencil\": {\"command\": \"openpencil-mcp\"}}, \"theme\": 2}";
+        let changed_setting = "{\"mcpServers\": {\"other\": {\"command\": \"o\"}, \"pairdraw\": {\"command\": \"pairdraw-mcp\"}}, \"theme\": 2}";
         assert_eq!(
             check_edit(McpClient::Cursor, true, Some(CURSOR), changed_setting),
             Err(EntryCheck::Refused)
@@ -207,13 +207,13 @@ mod tests {
             check_edit(McpClient::Cursor, false, Some(CURSOR), "{}"),
             Err(EntryCheck::Refused)
         );
-        let repeated = "{\"mcpServers\": {\"other\": {\"command\": \"o\"}}, \"mcpServers\": {\"other\": {\"command\": \"o\"}, \"open-pencil\": {\"command\": \"openpencil-mcp\"}}, \"theme\": 1}";
+        let repeated = "{\"mcpServers\": {\"other\": {\"command\": \"o\"}}, \"mcpServers\": {\"other\": {\"command\": \"o\"}, \"pairdraw\": {\"command\": \"pairdraw-mcp\"}}, \"theme\": 1}";
         assert_eq!(
             check_edit(McpClient::Cursor, true, Some(CURSOR), repeated),
             Err(EntryCheck::Refused)
         );
         // Another client's form of the entry is not this client's.
-        let claude_form = "{\"mcpServers\": {\"other\": {\"command\": \"o\"}, \"open-pencil\": {\"type\": \"stdio\", \"command\": \"openpencil-mcp\", \"args\": []}}, \"theme\": 1}";
+        let claude_form = "{\"mcpServers\": {\"other\": {\"command\": \"o\"}, \"pairdraw\": {\"type\": \"stdio\", \"command\": \"pairdraw-mcp\", \"args\": []}}, \"theme\": 1}";
         assert_eq!(
             check_edit(McpClient::Cursor, true, Some(CURSOR), claude_form),
             Err(EntryCheck::Refused)
@@ -239,7 +239,7 @@ mod tests {
     #[test]
     fn checks_codex_tables() {
         let before = "# mine\nmodel = \"o3\"\n\n[mcp_servers.other]\ncommand = \"o\"\n";
-        let added = format!("{before}\n[mcp_servers.open-pencil]\ncommand = \"openpencil-mcp\"\n");
+        let added = format!("{before}\n[mcp_servers.pairdraw]\ncommand = \"pairdraw-mcp\"\n");
         assert_eq!(
             check_edit(McpClient::Codex, true, Some(before), &added),
             Ok(())
@@ -253,18 +253,18 @@ mod tests {
             Err(EntryCheck::Refused)
         );
         let with_args = format!(
-            "{before}\n[mcp_servers.open-pencil]\ncommand = \"openpencil-mcp\"\nargs = [\"--x\"]\n"
+            "{before}\n[mcp_servers.pairdraw]\ncommand = \"pairdraw-mcp\"\nargs = [\"--x\"]\n"
         );
         assert_eq!(
             check_edit(McpClient::Codex, true, Some(before), &with_args),
             Err(EntryCheck::Refused)
         );
-        let other = format!("{before}\n[mcp_servers.x]\ncommand = \"sh\"\n[mcp_servers.open-pencil]\ncommand = \"openpencil-mcp\"\n");
+        let other = format!("{before}\n[mcp_servers.x]\ncommand = \"sh\"\n[mcp_servers.pairdraw]\ncommand = \"pairdraw-mcp\"\n");
         assert_eq!(
             check_edit(McpClient::Codex, true, Some(before), &other),
             Err(EntryCheck::Refused)
         );
-        let fresh = "[mcp_servers.open-pencil]\ncommand = \"openpencil-mcp\"\n";
+        let fresh = "[mcp_servers.pairdraw]\ncommand = \"pairdraw-mcp\"\n";
         assert_eq!(check_edit(McpClient::Codex, true, None, fresh), Ok(()));
         assert_eq!(check_edit(McpClient::Codex, false, Some(fresh), ""), Ok(()));
         assert_eq!(

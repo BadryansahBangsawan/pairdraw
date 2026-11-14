@@ -5,9 +5,9 @@ import {
   computeContentBounds,
   createCanvasKitRasterCodec,
   renderRegionToImage
-} from '@open-pencil/core/io/formats/raster'
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import type { VisualBounds } from '@open-pencil/scene-graph/geometry'
+} from '@pairdraw/core/io/formats/raster'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import type { VisualBounds } from '@pairdraw/scene-graph/geometry'
 
 import { boundedImageScale } from '@/app/ai/tools/vision/inspect'
 import type { EditorStore } from '@/app/editor/active-store'

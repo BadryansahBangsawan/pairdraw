@@ -10,8 +10,8 @@ import {
   toggleBoldInRange,
   toggleDecorationInRange,
   toggleItalicInRange
-} from '@open-pencil/core/text'
-import type { StyleRun } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/text'
+import type { StyleRun } from '@pairdraw/scene-graph'
 
 describe('getStyleAt', () => {
   test('returns style within run', () => {

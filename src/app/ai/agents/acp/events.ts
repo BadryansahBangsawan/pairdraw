@@ -2,8 +2,8 @@ import type { SessionUpdate } from '@agentclientprotocol/sdk'
 import type { UIMessageChunk } from 'ai'
 import * as v from 'valibot'
 
-import { OPEN_PENCIL_MCP_SERVER } from '@open-pencil/core/constants'
-import type { JSONObject } from '@open-pencil/scene-graph/primitives'
+import { PAIRDRAW_MCP_SERVER } from '@pairdraw/core/constants'
+import type { JSONObject } from '@pairdraw/scene-graph/primitives'
 
 import { agentContextChunk } from '@/app/ai/chat/context-window/usage'
 import { createReplyStream, type ReplyToolCall } from '@/app/ai/reply/stream'
@@ -11,7 +11,7 @@ import { createReplyStream, type ReplyToolCall } from '@/app/ai/reply/stream'
 type ToolCallReport = Extract<SessionUpdate, { sessionUpdate: 'tool_call' | 'tool_call_update' }>
 
 /**
- * How a tool call shows in the chat. OpenPencil's own MCP tools take their plain names, input,
+ * How a tool call shows in the chat. Pairdraw's own MCP tools take their plain names, input,
  * and result, as the built-in chat's do; another server's tools keep the MCP `mcp__server__tool`
  * form and result.
  */
@@ -24,7 +24,7 @@ interface ToolIdentity {
   input?: unknown
 }
 
-const OWN_PREFIX = `mcp__${OPEN_PENCIL_MCP_SERVER}__`
+const OWN_PREFIX = `mcp__${PAIRDRAW_MCP_SERVER}__`
 
 const codexMCPInputSchema = v.object({
   server: v.string(),
@@ -64,7 +64,7 @@ function codexIdentity(update: ToolCallReport): ToolIdentity | null {
     return null
   }
   const { server, tool } = input.output
-  return server === OPEN_PENCIL_MCP_SERVER
+  return server === PAIRDRAW_MCP_SERVER
     ? { name: tool, kind: 'own', input: input.output.arguments ?? {} }
     : { name: `mcp__${server}__${tool}`, kind: 'mcp', input: input.output.arguments ?? {} }
 }
@@ -103,7 +103,7 @@ function blockText(blocks: unknown[]): string | undefined {
 }
 
 /**
- * An OpenPencil tool's result as the built-in chat holds it: the JSON object the tool returned,
+ * An Pairdraw tool's result as the built-in chat holds it: the JSON object the tool returned,
  * with an exported image as `base64` and `mimeType`.
  */
 function ownToolOutput(blocks: unknown[]): unknown {
@@ -123,7 +123,7 @@ function ownToolOutput(blocks: unknown[]): unknown {
   return output
 }
 
-/** An OpenPencil tool reports a failure as `{ "error": … }` text. */
+/** An Pairdraw tool reports a failure as `{ "error": … }` text. */
 function ownToolError(blocks: unknown[]): string | undefined {
   const text = blockText(blocks)
   if (text === undefined) return undefined
@@ -186,7 +186,7 @@ export function createUpdateMapper(idPrefix: string) {
   const tools = new Map<string, ToolIdentity>()
 
   function callOf(id: string, identity: ToolIdentity, title: string | undefined): ReplyToolCall {
-    // The agent's own tools keep its title; OpenPencil's are named by the tool.
+    // The agent's own tools keep its title; Pairdraw's are named by the tool.
     return { id, name: identity.name, title: identity.kind === 'agent' ? title : undefined }
   }
 

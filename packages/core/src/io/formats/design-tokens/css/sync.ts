@@ -3,8 +3,8 @@ import {
   tokenStylesheet,
   type CustomPropertyScope,
   type TokenStylesheetIssue
-} from '@open-pencil/dom-css/export'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/dom-css/export'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { knownTokens } from './known'
 import { namesFont, readCSSTokenValue, rewriteCSSTokenValue, sameCSSTokenValue } from './values'

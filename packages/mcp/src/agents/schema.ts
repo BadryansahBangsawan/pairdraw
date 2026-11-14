@@ -63,15 +63,15 @@ const devTokenSchema = v.pipe(v.string(), v.regex(/^[0-9a-f]{64}$/))
  */
 export const devAgentSessionEnvSchema = v.pipe(
   v.object({
-    OPENPENCIL_MCP_AGENT_SESSION: devTokenSchema,
-    OPENPENCIL_MCP_AGENT_TOKEN: devTokenSchema
+    PAIRDRAW_MCP_AGENT_SESSION: devTokenSchema,
+    PAIRDRAW_MCP_AGENT_TOKEN: devTokenSchema
   }),
   v.check(
-    (env) => env.OPENPENCIL_MCP_AGENT_SESSION !== env.OPENPENCIL_MCP_AGENT_TOKEN,
+    (env) => env.PAIRDRAW_MCP_AGENT_SESSION !== env.PAIRDRAW_MCP_AGENT_TOKEN,
     'The session and agent tokens must differ'
   ),
   v.transform((env) => ({
-    token: env.OPENPENCIL_MCP_AGENT_SESSION,
-    agentToken: env.OPENPENCIL_MCP_AGENT_TOKEN
+    token: env.PAIRDRAW_MCP_AGENT_SESSION,
+    agentToken: env.PAIRDRAW_MCP_AGENT_TOKEN
   }))
 )

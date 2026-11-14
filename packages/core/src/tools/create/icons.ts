@@ -1,7 +1,7 @@
 import * as v from 'valibot'
 
-import { parseColor } from '@open-pencil/scene-graph/color'
-import { iconOptionsSchema, type IconOptions } from '@open-pencil/scene-graph/icons'
+import { parseColor } from '@pairdraw/scene-graph/color'
+import { iconOptionsSchema, type IconOptions } from '@pairdraw/scene-graph/icons'
 
 import { placeIcon } from '#core/icons'
 import { toolNumber, defineTool } from '#core/tools/schema'

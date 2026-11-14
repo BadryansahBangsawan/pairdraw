@@ -1,5 +1,5 @@
-import type { Editor } from '@open-pencil/core'
-import type { NumericNodeProperty, SceneNode } from '@open-pencil/scene-graph'
+import type { Editor } from '@pairdraw/core'
+import type { NumericNodeProperty, SceneNode } from '@pairdraw/scene-graph'
 
 import { useNodePreview } from '#vue/controls/node-preview/use'
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useCodeMessages, usePanelMessages } from '@open-pencil/vue/i18n'
+import { useCodeMessages, usePanelMessages } from '@pairdraw/vue/i18n'
 
 import type { HTMLExportSettings } from '@/app/document/export/types'
 import SegmentedControl from '@/components/ui/select/SegmentedControl.vue'

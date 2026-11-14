@@ -15,7 +15,7 @@ beforeEach(() => {
 
 describe('toast progress', () => {
   test('keeps a reported-progress toast open until progress clears', () => {
-    const handle = toast.startProgress('Downloading OpenPencil 0.15.1')
+    const handle = toast.startProgress('Downloading Pairdraw 0.15.1')
 
     expect(entryAt().progress).toEqual({})
     expect(toastDuration(entryAt())).toBe(0)
@@ -31,9 +31,9 @@ describe('toast progress', () => {
   })
 
   test('updates one toast in place instead of stacking every chunk', () => {
-    const handle = toast.startProgress('Downloading OpenPencil 0.15.1')
+    const handle = toast.startProgress('Downloading Pairdraw 0.15.1')
 
-    handle.update({ message: 'Downloading OpenPencil 0.15.1' })
+    handle.update({ message: 'Downloading Pairdraw 0.15.1' })
     handle.update({ progressLabel: '42% · 9.6 MiB of 22.9 MiB' })
 
     expect(toast.toasts.value).toHaveLength(1)
@@ -41,9 +41,9 @@ describe('toast progress', () => {
   })
 
   test('does not merge a repeated message into a progress toast', () => {
-    const handle = toast.startProgress('Downloading OpenPencil 0.15.1')
+    const handle = toast.startProgress('Downloading Pairdraw 0.15.1')
 
-    toast.info('Downloading OpenPencil 0.15.1')
+    toast.info('Downloading Pairdraw 0.15.1')
 
     expect(toast.toasts.value).toHaveLength(2)
     expect(entryAt().progress).toEqual({})

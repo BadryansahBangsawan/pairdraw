@@ -1,7 +1,7 @@
 import { groupBy } from 'es-toolkit/array'
 import { upperFirst } from 'es-toolkit/string'
 
-import { es } from '@open-pencil/emit'
+import { es } from '@pairdraw/emit'
 
 import { claimName } from '../storybook/names'
 import type { ComponentModel, ComponentNode } from './model'

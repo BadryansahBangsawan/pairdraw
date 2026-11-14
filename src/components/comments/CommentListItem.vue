@@ -2,9 +2,9 @@
 import { uniqBy } from 'es-toolkit'
 import { computed } from 'vue'
 
-import type { CommentThread } from '@open-pencil/scene-graph'
-import { liveReplies } from '@open-pencil/scene-graph/comments'
-import { useCommentMessages } from '@open-pencil/vue/i18n'
+import type { CommentThread } from '@pairdraw/scene-graph'
+import { liveReplies } from '@pairdraw/scene-graph/comments'
+import { useCommentMessages } from '@pairdraw/vue/i18n'
 
 import { commentPreview } from '@/app/comments/format'
 import AvatarStack from '@/components/presence/AvatarStack.vue'

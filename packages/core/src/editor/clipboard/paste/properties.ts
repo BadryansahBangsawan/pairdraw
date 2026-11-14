@@ -1,19 +1,19 @@
 import { noop } from 'es-toolkit/function'
 import { omitBy, pick } from 'es-toolkit/object'
 
-import { materializeFigFragment } from '@open-pencil/fig'
-import { parseFigmaClipboard } from '@open-pencil/fig/clipboard'
-import type { SceneGraph, SceneNode, StyleRun } from '@open-pencil/scene-graph'
+import { materializeFigFragment } from '@pairdraw/fig'
+import { parseFigmaClipboard } from '@pairdraw/fig/clipboard'
+import type { SceneGraph, SceneNode, StyleRun } from '@pairdraw/scene-graph'
 import {
   AUTO_LAYOUT_FIELDS,
   CORNER_FIELDS,
   PAINT_FIELDS,
   STROKE_FIELDS,
   TEXT_STYLE_FIELDS
-} from '@open-pencil/scene-graph/fields'
-import { STYLE_LINK_FIELDS, sharedStyleRefKey } from '@open-pencil/scene-graph/shared-styles'
+} from '@pairdraw/scene-graph/fields'
+import { STYLE_LINK_FIELDS, sharedStyleRefKey } from '@pairdraw/scene-graph/shared-styles'
 
-import { parseOpenPencilClipboard } from '#core/clipboard'
+import { parsePairdrawClipboard } from '#core/clipboard'
 import { importClipboardDependenciesWithUndo } from '#core/editor/clipboard/dependencies'
 import type { ClipboardSnapshot } from '#core/editor/clipboard/snapshot'
 import { loadBoundFonts } from '#core/editor/text/bound-fonts'
@@ -150,9 +150,9 @@ interface PastedSource {
 
 /** The one layer a clipboard payload from another app or tab holds, or null. */
 async function sourceFromHTML(html: string): Promise<PastedSource | null> {
-  const openPencil = parseOpenPencilClipboard(html)
-  if (openPencil) {
-    const { nodes, images } = openPencil
+  const pairdraw = parsePairdrawClipboard(html)
+  if (pairdraw) {
+    const { nodes, images } = pairdraw
     return nodes.length === 1 ? { node: nodes[0], images } : null
   }
   const figma = await parseFigmaClipboard(html)

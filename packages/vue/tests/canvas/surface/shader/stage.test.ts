@@ -2,8 +2,8 @@ import { describe, expect, test } from 'bun:test'
 
 import { effectScope, nextTick, shallowRef } from 'vue'
 
-import type { Size } from '@open-pencil/scene-graph/primitives'
-import type { ShaderPreset } from '@open-pencil/scene-graph/shaders'
+import type { Size } from '@pairdraw/scene-graph/primitives'
+import type { ShaderPreset } from '@pairdraw/scene-graph/shaders'
 
 import {
   advanceShaderClock,

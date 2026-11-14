@@ -3,13 +3,13 @@ import { ToolbarRoot } from 'reka-ui'
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import type { EditorToolDef, Tool } from '@open-pencil/core'
+import type { EditorToolDef, Tool } from '@pairdraw/core'
 import {
   getToolbarToolSelection,
   isToolbarToolActive,
   ToolbarItem
-} from '@open-pencil/vue/primitives/Toolbar'
-import { toolbarToolTestId } from '@open-pencil/vue/testing'
+} from '@pairdraw/vue/primitives/Toolbar'
+import { toolbarToolTestId } from '@pairdraw/vue/testing'
 
 import type { ToolbarAction, ToolbarItem as ToolbarLayoutItem } from '@/app/editor/toolbar/layout'
 import { toolTip } from '@/app/editor/toolbar/shortcuts'

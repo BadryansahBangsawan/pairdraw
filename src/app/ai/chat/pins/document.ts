@@ -1,8 +1,8 @@
 import { countBy, uniq } from 'es-toolkit/array'
 
-import { collectGraphFontKeys } from '@open-pencil/core/text'
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import { colorToHex, colorToHex8 } from '@open-pencil/scene-graph/color'
+import { collectGraphFontKeys } from '@pairdraw/core/text'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { colorToHex, colorToHex8 } from '@pairdraw/scene-graph/color'
 
 import { MAX_STYLE_KIT_COLORS, MAX_STYLE_KIT_FONTS, MAX_STYLE_KIT_NAME } from './limits'
 import type { StyleKit, StyleKitColor } from './types'

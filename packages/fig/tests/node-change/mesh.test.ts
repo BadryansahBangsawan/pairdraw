@@ -3,10 +3,10 @@ import { describe, expect, test } from 'bun:test'
 import { nodeChangeToProps, sceneNodeToKiwi } from '#fig/node-change/index'
 import { readNodeChangePluginData } from '#fig/node-change/plugin-data'
 
-import type { Fill } from '@open-pencil/scene-graph'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { defaultMeshPoints } from '@open-pencil/scene-graph/gradient'
-import { OPEN_PENCIL_PLUGIN_DATA } from '@open-pencil/scene-graph/plugin-data'
+import type { Fill } from '@pairdraw/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { defaultMeshPoints } from '@pairdraw/scene-graph/gradient'
+import { PAIRDRAW_PLUGIN_DATA } from '@pairdraw/scene-graph/plugin-data'
 
 const RED = { r: 1, g: 0, b: 0, a: 1 }
 
@@ -36,7 +36,7 @@ describe('mesh gradient .fig round trip', () => {
     const [change] = sceneNodeToKiwi(node, { sessionID: 1, localID: 1 }, 0, { value: 2 }, graph, [])
     if (!change) throw new Error('no change')
     expect(change.fillPaints?.[0]?.type).toBe('SOLID')
-    const entries = readNodeChangePluginData(change, OPEN_PENCIL_PLUGIN_DATA.meshFills)
+    const entries = readNodeChangePluginData(change, PAIRDRAW_PLUGIN_DATA.meshFills)
     expect(entries?.length).toBe(1)
     expect(entries?.[0]).toMatchObject({ kind: 'fill', index: 0, columns: 1, rows: 1 })
     expect(entries?.[0]?.points.length).toBe(4)

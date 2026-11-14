@@ -3,8 +3,8 @@ import { describe, expect, it } from 'bun:test'
 import { getNodeOrThrow } from '#core-tests/helpers/assert'
 import { createClipboardGraph } from '#core-tests/helpers/clipboard'
 
-import { importClipboardNodes } from '@open-pencil/core/clipboard'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
+import { importClipboardNodes } from '@pairdraw/core/clipboard'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 
 describe('importClipboardNodes: filtering', () => {
   it('skips VARIABLE_SET and VARIABLE nodes', () => {

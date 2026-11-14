@@ -1,21 +1,21 @@
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { guidToString, stringToGuid } from '@open-pencil/kiwi/fig/guid'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { guidToString, stringToGuid } from '@pairdraw/kiwi/fig/guid'
 import type {
   ComponentPropertyDefinition,
   PluginDataEntry,
   SceneGraph,
   SceneNode
-} from '@open-pencil/scene-graph'
-import { DEFAULT_STROKE_WEIGHT } from '@open-pencil/scene-graph/constants'
-import { normalizeFontFamily } from '@open-pencil/scene-graph/font-style'
-import { fractionalPosition } from '@open-pencil/scene-graph/order-keys'
+} from '@pairdraw/scene-graph'
+import { DEFAULT_STROKE_WEIGHT } from '@pairdraw/scene-graph/constants'
+import { normalizeFontFamily } from '@pairdraw/scene-graph/font-style'
+import { fractionalPosition } from '@pairdraw/scene-graph/order-keys'
 import {
   hasPluginData,
-  OPEN_PENCIL_PLUGIN_DATA,
+  PAIRDRAW_PLUGIN_DATA,
   readPluginData,
   withPluginData
-} from '@open-pencil/scene-graph/plugin-data'
-import type { GUID, JSONObject } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/plugin-data'
+import type { GUID, JSONObject } from '@pairdraw/scene-graph/primitives'
 
 import { effectiveFigmaRawNodeFields } from '../source-metadata'
 import { computeExportTransform, mapToFigmaType } from './basics'
@@ -93,7 +93,7 @@ function serializeTextProps(
 ): void {
   node.pluginData = withPluginData(
     node.pluginData,
-    OPEN_PENCIL_PLUGIN_DATA.textDirection,
+    PAIRDRAW_PLUGIN_DATA.textDirection,
     node.textDirection
   )
   nc.fontSize = node.fontSize
@@ -287,7 +287,7 @@ function applyEditedLayoutFields(node: SceneNode, nc: KiwiNodeChange): void {
 function writeLayoutDirection(node: SceneNode): void {
   node.pluginData = withPluginData(
     node.pluginData,
-    OPEN_PENCIL_PLUGIN_DATA.layoutDirection,
+    PAIRDRAW_PLUGIN_DATA.layoutDirection,
     node.layoutDirection
   )
 }
@@ -297,7 +297,7 @@ function writeLayoutDirection(node: SceneNode): void {
  * an entry left from an earlier alignment goes. Unchanged entries stay where they are.
  */
 function writePrimaryAxisAlign(node: SceneNode): void {
-  const field = OPEN_PENCIL_PLUGIN_DATA.primaryAxisAlign
+  const field = PAIRDRAW_PLUGIN_DATA.primaryAxisAlign
   const value = node.primaryAxisAlign === 'SPACE_AROUND' ? node.primaryAxisAlign : undefined
   const stored = readPluginData(node.pluginData, field)
   if (stored === value && (value !== undefined || !hasPluginData(node.pluginData, field))) return
@@ -449,7 +449,7 @@ function serializeVariableBindings(
   // empty map, and writing one leaves the record in every file the node is exported to.
   node.pluginData = withPluginData(
     node.pluginData,
-    OPEN_PENCIL_PLUGIN_DATA.boundVariables,
+    PAIRDRAW_PLUGIN_DATA.boundVariables,
     Object.keys(roundtripBindings).length > 0 ? roundtripBindings : undefined
   )
   if (entries.length > 0) {

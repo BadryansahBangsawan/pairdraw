@@ -2,9 +2,9 @@ import { describe, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { createEditor, type Editor } from '@open-pencil/core'
-import { buildOpenPencilClipboardHTML } from '@open-pencil/core/clipboard'
-import { isReplacedLayer } from '@open-pencil/scene-graph/instances'
+import { createEditor, type Editor } from '@pairdraw/core'
+import { buildPairdrawClipboardHTML } from '@pairdraw/core/clipboard'
+import { isReplacedLayer } from '@pairdraw/scene-graph/instances'
 
 function copiedStarHTML() {
   const source = createEditor()
@@ -13,7 +13,7 @@ function copiedStarHTML() {
     width: 20,
     height: 20
   })
-  return buildOpenPencilClipboardHTML([star], source.graph)
+  return buildPairdrawClipboardHTML([star], source.graph)
 }
 
 /** A button component with an icon and a label, and an instance of it. */

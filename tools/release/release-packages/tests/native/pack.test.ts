@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { releaseCommands } from '#release/native/commands'
 import { packAsset } from '#release/native/pack'
 
-import type { CommandRequest } from '@open-pencil/package-artifacts-tools'
+import type { CommandRequest } from '@pairdraw/package-artifacts-tools'
 
 function recordingCommands() {
   const requests: CommandRequest[] = []

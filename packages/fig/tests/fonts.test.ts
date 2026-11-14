@@ -10,7 +10,7 @@ import {
   readFigArchiveParts,
   resolveFigFonts,
   writeFigArchive
-} from '@open-pencil/fig'
+} from '@pairdraw/fig'
 
 async function fixture(name: string): Promise<Uint8Array> {
   return new Uint8Array(await Bun.file(join(FIXTURES, 'fonts', name)).arrayBuffer())

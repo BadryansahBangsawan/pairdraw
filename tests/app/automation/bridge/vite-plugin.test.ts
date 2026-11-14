@@ -46,7 +46,7 @@ describe('the development agent session', () => {
     const session = localAgentSession('serve', 'development', {})
     expect(session).not.toBeNull()
     expect(localAgentSession('serve', 'development', {})).toBe(session)
-    // `OPENPENCIL_DEV_TOKEN` or a random UUID; neither tab token is, or contains, it.
+    // `PAIRDRAW_DEV_TOKEN` or a random UUID; neither tab token is, or contains, it.
     const automationToken = localAutomationToken('serve') ?? ''
     expect(automationToken).not.toBe('')
     for (const token of [session?.token, session?.agentToken]) {
@@ -61,8 +61,8 @@ describe('the development agent session', () => {
     ['the metrics dashboard', 'serve', 'metrics', {}],
     ['Tauri development', 'serve', 'development', { TAURI_ENV_PLATFORM: 'darwin' }],
     ['a dev host on the network', 'serve', 'development', { TAURI_DEV_HOST: '0.0.0.0' }],
-    ['Portless', 'serve', 'development', { PORTLESS_URL: 'https://open-pencil.localhost' }],
-    ['OPENPENCIL_DEV_AGENTS=0', 'serve', 'development', { OPENPENCIL_DEV_AGENTS: '0' }]
+    ['Portless', 'serve', 'development', { PORTLESS_URL: 'https://pairdraw.localhost' }],
+    ['PAIRDRAW_DEV_AGENTS=0', 'serve', 'development', { PAIRDRAW_DEV_AGENTS: '0' }]
   ])('is absent for %s', (_label, command, mode, env) => {
     expect(localAgentSession(command, mode, env)).toBeNull()
   })
@@ -70,27 +70,27 @@ describe('the development agent session', () => {
   test('reaches the MCP server the development server starts', () => {
     const session = { token: 'd'.repeat(64), agentToken: 'e'.repeat(64) }
     expect(environment({ agentSession: session })).toMatchObject({
-      OPENPENCIL_MCP_AGENTS: '1',
-      OPENPENCIL_MCP_AGENT_SESSION: session.token,
-      OPENPENCIL_MCP_AGENT_TOKEN: session.agentToken
+      PAIRDRAW_MCP_AGENTS: '1',
+      PAIRDRAW_MCP_AGENT_SESSION: session.token,
+      PAIRDRAW_MCP_AGENT_TOKEN: session.agentToken
     })
   })
 
   test('replaces, or removes, a session the shell passed down', () => {
     const inherited = {
-      OPENPENCIL_MCP_AGENTS: '1',
-      OPENPENCIL_MCP_AGENT_SESSION: 'a'.repeat(64),
-      OPENPENCIL_MCP_AGENT_TOKEN: 'b'.repeat(64)
+      PAIRDRAW_MCP_AGENTS: '1',
+      PAIRDRAW_MCP_AGENT_SESSION: 'a'.repeat(64),
+      PAIRDRAW_MCP_AGENT_TOKEN: 'b'.repeat(64)
     }
     const without = environment({ agentSession: null, baseEnv: inherited })
-    expect(without.OPENPENCIL_MCP_AGENTS).toBeUndefined()
-    expect(without.OPENPENCIL_MCP_AGENT_SESSION).toBeUndefined()
-    expect(without.OPENPENCIL_MCP_AGENT_TOKEN).toBeUndefined()
+    expect(without.PAIRDRAW_MCP_AGENTS).toBeUndefined()
+    expect(without.PAIRDRAW_MCP_AGENT_SESSION).toBeUndefined()
+    expect(without.PAIRDRAW_MCP_AGENT_TOKEN).toBeUndefined()
 
     const session = { token: 'd'.repeat(64), agentToken: 'e'.repeat(64) }
     expect(environment({ agentSession: session, baseEnv: inherited })).toMatchObject({
-      OPENPENCIL_MCP_AGENT_SESSION: session.token,
-      OPENPENCIL_MCP_AGENT_TOKEN: session.agentToken
+      PAIRDRAW_MCP_AGENT_SESSION: session.token,
+      PAIRDRAW_MCP_AGENT_TOKEN: session.agentToken
     })
   })
 })

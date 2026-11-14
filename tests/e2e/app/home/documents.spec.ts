@@ -42,10 +42,10 @@ test.use({
           origin: new URL(baseURL).origin,
           localStorage: [
             {
-              name: 'open-pencil:preferences:v1',
+              name: 'pairdraw:preferences:v1',
               value: JSON.stringify({ version: 1, onboarding: { aiSetup: 'done' } })
             },
-            { name: 'open-pencil:recent-documents', value: JSON.stringify(RECENT) }
+            { name: 'pairdraw:recent-documents', value: JSON.stringify(RECENT) }
           ]
         }
       ]
@@ -174,7 +174,7 @@ test('Save As downloads a copy of a stored recent file without opening it', asyn
   // This device keeps changes to Catalog that its provider has not got, so the copy needs no
   // provider and carries them.
   await page.evaluate(async () => {
-    const request = indexedDB.open('open-pencil-cloud-local', 1)
+    const request = indexedDB.open('pairdraw-cloud-local', 1)
     request.onupgradeneeded = () => {
       const database = request.result
       if (!database.objectStoreNames.contains('meta')) {

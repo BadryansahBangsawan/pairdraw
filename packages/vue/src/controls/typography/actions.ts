@@ -1,16 +1,16 @@
 import { computed } from 'vue'
 import type { ComputedRef } from 'vue'
 
-import type { Editor } from '@open-pencil/core'
-import { faceForStyle, fontManager, nearestFamilyFace } from '@open-pencil/core/text'
+import type { Editor } from '@pairdraw/core'
+import { faceForStyle, fontManager, nearestFamilyFace } from '@pairdraw/core/text'
 import type {
   SceneNode,
   TextLength,
   TextListType,
   TextParagraphSpacingField
-} from '@open-pencil/scene-graph'
-import { faceLoadKey, faceStyleKey } from '@open-pencil/scene-graph/font-style'
-import { shapeWithTextLabel } from '@open-pencil/scene-graph/generated'
+} from '@pairdraw/scene-graph'
+import { faceLoadKey, faceStyleKey } from '@pairdraw/scene-graph/font-style'
+import { shapeWithTextLabel } from '@pairdraw/scene-graph/generated'
 
 import {
   createTextListActions,

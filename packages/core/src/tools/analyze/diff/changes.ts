@@ -1,7 +1,7 @@
 import * as v from 'valibot'
 
-import { sceneNodeToJSX } from '@open-pencil/design-jsx'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import { sceneNodeToJSX } from '@pairdraw/design-jsx'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { graphFromPageSnapshot } from '#core/editor/history/snapshot/graph'
 import { snapshotPage, type PageSnapshot } from '#core/editor/history/snapshot/page'

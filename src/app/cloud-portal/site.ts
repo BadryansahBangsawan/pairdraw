@@ -5,8 +5,8 @@ import {
   createCloudPortalClient,
   discoverCloud,
   type CloudPortalClient
-} from '@open-pencil/cloud/client'
-import { parseCloudLinkPath, type CloudAccountStatus } from '@open-pencil/cloud/contract'
+} from '@pairdraw/cloud/client'
+import { parseCloudLinkPath, type CloudAccountStatus } from '@pairdraw/cloud/contract'
 
 /**
  * A Cloud server serves the editor to signed-in people and, where the server allows the local
@@ -30,7 +30,7 @@ export function isSecretCloudLink(url: URL): boolean {
 }
 
 /** Whether this browser chose to use the server's editor without an account. */
-const localEditor = useLocalStorage('open-pencil:cloud-site-local', false, {
+const localEditor = useLocalStorage('pairdraw:cloud-site-local', false, {
   // Written before the page leaves for the editor.
   flush: 'sync',
   writeDefaults: false

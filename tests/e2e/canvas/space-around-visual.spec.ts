@@ -7,8 +7,8 @@ const editor = useEditorSetupWithClear('/?test&no-chrome&no-rulers')
 
 test('space around spreads children with half a share at each end', async () => {
   const positions = await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const pageId = store.state.currentPageId
     const fill = (r: number, g: number, b: number) => [
       { type: 'SOLID' as const, color: { r, g, b, a: 1 }, visible: true, opacity: 1 }

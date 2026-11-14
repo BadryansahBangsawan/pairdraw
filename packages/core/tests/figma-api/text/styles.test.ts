@@ -2,12 +2,12 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 
 import { expectDefined, expectFills } from '#core-tests/helpers/assert'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { fontManager } from '@open-pencil/core/text'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { fontManager } from '@pairdraw/core/text'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
-// Results recorded from the same scripts run in live Figma (2026-10-11). OpenPencil reports
+// Results recorded from the same scripts run in live Figma (2026-10-11). Pairdraw reports
 // lengths in pixels, as its node getters do, and paints in the shape `fills` returns.
 function styledText(characters = 'Hello world\nSecond') {
   const api = new FigmaAPI(new SceneGraph())

@@ -13,10 +13,10 @@ import {
 } from 'reka-ui'
 import { computed, ref, type ComponentPublicInstance } from 'vue'
 
-import type { ComponentPropertyType } from '@open-pencil/scene-graph'
-import { useComponentPropertyAuthoring } from '@open-pencil/vue/controls/component-props'
-import { useI18n } from '@open-pencil/vue/i18n'
-import { useFlatReorderDrag } from '@open-pencil/vue/shared/drag'
+import type { ComponentPropertyType } from '@pairdraw/scene-graph'
+import { useComponentPropertyAuthoring } from '@pairdraw/vue/controls/component-props'
+import { useI18n } from '@pairdraw/vue/i18n'
+import { useFlatReorderDrag } from '@pairdraw/vue/shared/drag'
 
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'

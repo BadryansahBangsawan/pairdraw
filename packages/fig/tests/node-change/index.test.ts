@@ -19,18 +19,13 @@ import {
 } from '#fig/node-change/index'
 import { fillToKiwiPaint } from '#fig/node-change/paint'
 
-import {
-  getCompiledSchema,
-  initCodec,
-  type NodeChange,
-  type Paint
-} from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import TransformMatrix from '@open-pencil/scene-graph/matrix'
-import { percentLength, pixelLength } from '@open-pencil/scene-graph/text'
+import { getCompiledSchema, initCodec, type NodeChange, type Paint } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import TransformMatrix from '@pairdraw/scene-graph/matrix'
+import { percentLength, pixelLength } from '@pairdraw/scene-graph/text'
 
-describe('@open-pencil/fig NodeChange policy', () => {
+describe('@pairdraw/fig NodeChange policy', () => {
   test('keeps raw LINE endpoints through reflected parents and exports authored origin pivots', () => {
     const graph = new SceneGraph()
     const parent = graph.createNode('FRAME', graph.getPages()[0].id, {

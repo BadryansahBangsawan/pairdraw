@@ -1,8 +1,8 @@
-import { COMMANDS } from '@open-pencil/cli/commands'
-import { ALL_TOOLS, isToolExposed } from '@open-pencil/core/tools'
+import { COMMANDS } from '@pairdraw/cli/commands'
+import { ALL_TOOLS, isToolExposed } from '@pairdraw/core/tools'
 
 export interface LandingStats {
-  /** Top-level `openpencil` commands, in alphabetical order. */
+  /** Top-level `pairdraw` commands, in alphabetical order. */
   cliCommands: string[]
   /** Tools the MCP server exposes. */
   mcpTools: number

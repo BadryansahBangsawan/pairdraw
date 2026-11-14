@@ -1,19 +1,19 @@
 import * as v from 'valibot'
 
-import type { NodeChange, VariableDataEntry } from '@open-pencil/kiwi/fig/codec'
-import { guidToString } from '@open-pencil/kiwi/fig/guid'
+import type { NodeChange, VariableDataEntry } from '@pairdraw/kiwi/fig/codec'
+import { guidToString } from '@pairdraw/kiwi/fig/guid'
 import type {
   SceneGraph,
   VariableFormulaNode,
   VariableValue,
   VariableColorExpression
-} from '@open-pencil/scene-graph'
+} from '@pairdraw/scene-graph'
 import {
   variableFormulaSchema,
   variableColorExpressionSchema,
   inferFormulaType,
   MAX_FORMULA_DEPTH
-} from '@open-pencil/scene-graph/variables'
+} from '@pairdraw/scene-graph/variables'
 
 import { extractPluginData } from '../node-change/plugin-data'
 import { formulaOperatorOfFigmaFunction } from '../node-change/variable/formula'

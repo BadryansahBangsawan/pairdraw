@@ -2,7 +2,7 @@
 import { tv } from 'tailwind-variants'
 import { useId, useTemplateRef } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import type { CreationKindId } from '@/app/home/creation'
 import ChatPromptComposer from '@/components/chat/ChatPromptComposer.vue'

@@ -3,7 +3,7 @@ import { useIdle } from '@vueuse/core'
 import { tv } from 'tailwind-variants'
 import { computed, onMounted, onUnmounted, useTemplateRef } from 'vue'
 
-import { useSlidesMessages } from '@open-pencil/vue/i18n'
+import { useSlidesMessages } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { restorePresentationOrigin } from '@/app/slides/focus'

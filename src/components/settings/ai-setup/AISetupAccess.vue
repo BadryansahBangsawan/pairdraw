@@ -2,7 +2,7 @@
 import { tv } from 'tailwind-variants'
 import { computed, ref } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import type { AgentDetection } from '@/app/ai/agents/setup/detection'
 import { CLAUDE_CODE_CLOUD_NAMES } from '@/app/ai/agents/setup/external'

@@ -2,9 +2,9 @@ import { afterEach, describe, expect, test } from 'bun:test'
 
 import { getNodeOrThrow } from '#core-tests/helpers/assert'
 
-import { createEditor } from '@open-pencil/core'
-import { setTextMeasurer } from '@open-pencil/core/layout'
-import { lineHeightPixels, pixelLength } from '@open-pencil/scene-graph/text'
+import { createEditor } from '@pairdraw/core'
+import { setTextMeasurer } from '@pairdraw/core/layout'
+import { lineHeightPixels, pixelLength } from '@pairdraw/scene-graph/text'
 
 afterEach(() => {
   setTextMeasurer(null)

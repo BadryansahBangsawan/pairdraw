@@ -1,4 +1,4 @@
-import type { CharacterStyleOverride, SceneNode } from '@open-pencil/scene-graph'
+import type { CharacterStyleOverride, SceneNode } from '@pairdraw/scene-graph'
 
 import { TEXT_DECORATION_STYLE } from '../enums'
 import { AUTO, CURRENT_COLOR } from '../overrides/text'

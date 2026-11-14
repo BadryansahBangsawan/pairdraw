@@ -19,7 +19,7 @@ function stage(page: Page) {
 }
 
 function selectionSize(page: Page) {
-  return page.evaluate(() => window.openPencil?.getStore?.()?.state.selectedIds.size)
+  return page.evaluate(() => window.pairdraw?.getStore?.()?.state.selectedIds.size)
 }
 
 test('⌘↩ presents the slides full window; arrows, Space, and Enter step; Escape leaves', async ({
@@ -57,7 +57,7 @@ test('the Present button starts from the selected slide and its controls step an
   page
 }) => {
   const { canvas, slides, ids } = await openDeck(page, ['Cover', 'Agenda', 'Thanks'])
-  await page.evaluate((id) => window.openPencil?.getStore?.()?.select([id]), ids[1])
+  await page.evaluate((id) => window.pairdraw?.getStore?.()?.select([id]), ids[1])
 
   await page.getByTestId('editor-start-presentation').click()
   await expect(stage(page)).toBeVisible()
@@ -81,8 +81,8 @@ test('the area around the slide is blacked out and a click there does not select
   // right of the slide, under the right-hand bar.
   await page.setViewportSize({ width: 1600, height: 800 })
   await page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     store.graph.createNode('RECTANGLE', store.state.currentPageId, {
       name: 'Beside the slide',
       x: 965,
@@ -133,7 +133,7 @@ test('neither a middle-button drag nor the Hand tool moves the slide', async ({ 
   await page.mouse.up({ button: 'middle' })
   expect(await slides.viewport()).toEqual(fitted)
 
-  await page.evaluate(() => window.openPencil?.getStore?.()?.setTool('HAND'))
+  await page.evaluate(() => window.pairdraw?.getStore?.()?.setTool('HAND'))
   await page.mouse.move(x, y)
   await page.mouse.down()
   await page.mouse.move(x - 200, y - 120, { steps: 5 })
@@ -197,7 +197,7 @@ test('a long page at 100% scrolls with the keys before stepping to the next slid
 }) => {
   const { canvas, slides, ids } = await openDeck(page, ['Landing', 'Pricing'])
   await page.evaluate((id) => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     store?.graph.updateNode(id, { width: 1280, height: 4000 })
     store?.requestRender()
   }, ids[0])

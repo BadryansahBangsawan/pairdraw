@@ -1,6 +1,6 @@
 import { computed, ref, watch, type Ref } from 'vue'
 
-import type { AIProviderID } from '@open-pencil/core/constants'
+import type { AIProviderID } from '@pairdraw/core/constants'
 
 import { designModelConnection, designModelProfile } from '@/app/ai/models'
 import { resolveModelContextWindow } from '@/app/ai/models/catalog'

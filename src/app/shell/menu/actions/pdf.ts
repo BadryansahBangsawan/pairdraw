@@ -1,5 +1,5 @@
-import { pageSlides } from '@open-pencil/core'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import { pageSlides } from '@pairdraw/core'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { notificationMessages } from '@/app/i18n/notifications'

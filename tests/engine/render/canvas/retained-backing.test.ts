@@ -2,8 +2,8 @@ import { expect, mock, spyOn, test } from 'bun:test'
 
 import type { Canvas, Image as CKImage, ImageInfo, Paint, Surface } from 'canvaskit-wasm'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { getAbsolutePositionFull } from '@open-pencil/scene-graph/coordinate'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { getAbsolutePositionFull } from '@pairdraw/scene-graph/coordinate'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import {

@@ -79,7 +79,7 @@ function embed(
           })
           channel.port1.start()
           frame.contentWindow?.postMessage(
-            { protocol: 'openpencil-embed', type: 'connect', version: 1, editable },
+            { protocol: 'pairdraw-embed', type: 'connect', version: 1, editable },
             embedOrigin,
             [channel.port2]
           )
@@ -295,7 +295,7 @@ test.describe('embed mode', () => {
           channel.port1.addEventListener('message', () => resolve(true))
           channel.port1.start()
           frame?.contentWindow?.postMessage(
-            { protocol: 'openpencil-embed', type: 'connect', version: 1 },
+            { protocol: 'pairdraw-embed', type: 'connect', version: 1 },
             embedOrigin,
             [channel.port2]
           )

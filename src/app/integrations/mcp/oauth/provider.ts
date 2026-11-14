@@ -4,7 +4,7 @@ import type {
   OAuthDiscoveryState
 } from '@modelcontextprotocol/client'
 
-import { IS_BROWSER, IS_TAURI } from '@open-pencil/core/constants'
+import { IS_BROWSER, IS_TAURI } from '@pairdraw/core/constants'
 
 import { APP_NAME, WEB_APP_ORIGIN } from '@/constants'
 
@@ -13,7 +13,7 @@ import { credentialMCPOAuthStore, type MCPOAuthStore } from './state'
 
 /** Served from `public/`; it relays the redirect to the editor over this channel. */
 const MCP_OAUTH_CALLBACK_PATH = '/oauth/mcp.html'
-export const MCP_OAUTH_CALLBACK_CHANNEL = 'open-pencil:mcp-oauth'
+export const MCP_OAUTH_CALLBACK_CHANNEL = 'pairdraw:mcp-oauth'
 /** Served from `public/` on the web app; it hands the redirect to the desktop app's deep link. */
 const MCP_OAUTH_DESKTOP_CALLBACK_PATH = '/oauth/mcp-desktop.html'
 
@@ -27,7 +27,7 @@ export class MCPSignInRequiredError extends Error {
 
 /**
  * Where the authorization server sends the browser back: a page on this origin in the web app,
- * and the hosted page that opens an `openpencil://oauth/mcp` link for the desktop app.
+ * and the hosted page that opens an `pairdraw://oauth/mcp` link for the desktop app.
  */
 export function mcpOAuthRedirectURL(): string {
   if (IS_TAURI || !IS_BROWSER) {
@@ -65,7 +65,7 @@ export function createMCPOAuthProvider(
     token_endpoint_auth_method: 'none'
   }
   const provider: OAuthClientProvider = {
-    // eslint-disable-next-line open-pencil/no-mixed-case-acronym-identifiers -- MCP SDK interface name.
+    // eslint-disable-next-line pairdraw/no-mixed-case-acronym-identifiers -- MCP SDK interface name.
     get redirectUrl() {
       return redirectURL
     },

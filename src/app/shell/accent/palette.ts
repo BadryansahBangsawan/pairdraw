@@ -1,7 +1,7 @@
 import { maxBy } from 'es-toolkit'
 
-import type { SelectionTheme } from '@open-pencil/core/canvas'
-import { SELECTION_COLOR } from '@open-pencil/core/constants'
+import type { SelectionTheme } from '@pairdraw/core/canvas'
+import { SELECTION_COLOR } from '@pairdraw/core/constants'
 import {
   colorToHex,
   compositeOver,
@@ -9,9 +9,9 @@ import {
   okhclToRGBA,
   parseColor,
   rgbaToOkHCL
-} from '@open-pencil/scene-graph/color'
-import { WHITE } from '@open-pencil/scene-graph/constants'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/color'
+import { WHITE } from '@pairdraw/scene-graph/constants'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { AccentPreference, AccentPreset } from './schema'
 

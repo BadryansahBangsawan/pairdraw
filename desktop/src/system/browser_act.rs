@@ -24,7 +24,7 @@ const SCROLL_LIMIT: f64 = 10_000.0;
 const OK: &str = "{\"code\":\"ok\"}";
 
 pub(crate) fn act_script(request: &str) -> String {
-    format!("(() => {{\nconst __openpencilActRequest = {request};\n{ACT_PAGE}\n}})()")
+    format!("(() => {{\nconst __pairdrawActRequest = {request};\n{ACT_PAGE}\n}})()")
 }
 
 /// Polls until `probe` is ready, the deadline passes, or one read never answers.

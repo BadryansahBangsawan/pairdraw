@@ -4,11 +4,11 @@
  */
 import * as v from 'valibot'
 
-export const PLUGIN_SANDBOX_READY = 'open-pencil-plugin-ready'
-export const PLUGIN_SANDBOX_RUN = 'open-pencil-plugin-run'
-export const PLUGIN_SANDBOX_RESULT = 'open-pencil-plugin-result'
-export const PLUGIN_SANDBOX_CALL = 'open-pencil-plugin-call'
-export const PLUGIN_SANDBOX_CALL_RESULT = 'open-pencil-plugin-call-result'
+export const PLUGIN_SANDBOX_READY = 'pairdraw-plugin-ready'
+export const PLUGIN_SANDBOX_RUN = 'pairdraw-plugin-run'
+export const PLUGIN_SANDBOX_RESULT = 'pairdraw-plugin-result'
+export const PLUGIN_SANDBOX_CALL = 'pairdraw-plugin-call'
+export const PLUGIN_SANDBOX_CALL_RESULT = 'pairdraw-plugin-call-result'
 
 /** The reserved call that takes the next pointer sequence; it is not a document tool. */
 export const PLUGIN_POINTER_CALL = 'plugin.pointer'

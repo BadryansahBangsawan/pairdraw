@@ -4,9 +4,9 @@ import { nextTick, watch } from 'vue'
 import IconLucidePenTool from '~icons/lucide/pen-tool'
 import IconLucideStickyNote from '~icons/lucide/sticky-note'
 
-import type { DocumentKind } from '@open-pencil/scene-graph'
-import { useViewportKind } from '@open-pencil/vue/editor/viewport-kind'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { DocumentKind } from '@pairdraw/scene-graph'
+import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { openFileDialog } from '@/app/shell/menu/use'
 import { activeTab } from '@/app/tabs'

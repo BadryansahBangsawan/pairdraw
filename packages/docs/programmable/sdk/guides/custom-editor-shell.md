@@ -7,8 +7,8 @@ description: Build your own editor shell with provideEditor, CanvasRoot, menus, 
 
 A typical Pairdraw Vue app has three layers:
 
-1. `@open-pencil/core` creates the editor
-2. `@open-pencil/vue` adapts it into Vue composables and headless primitives
+1. `@pairdraw/core` creates the editor
+2. `@pairdraw/vue` adapts it into Vue composables and headless primitives
 3. your app renders the shell, styling, and product UX
 
 ## Why this matters
@@ -34,12 +34,12 @@ A practical shell often looks like this:
 ```vue
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { createDefaultEditorState, createEditor } from '@open-pencil/core'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { provideEditor } from '@open-pencil/vue'
-import { CanvasRoot, CanvasSurface } from '@open-pencil/vue/canvas'
-import { ToolbarRoot } from '@open-pencil/vue/primitives/Toolbar'
-import { PageListRoot } from '@open-pencil/vue/primitives/PageList'
+import { createDefaultEditorState, createEditor } from '@pairdraw/core'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { provideEditor } from '@pairdraw/vue'
+import { CanvasRoot, CanvasSurface } from '@pairdraw/vue/canvas'
+import { ToolbarRoot } from '@pairdraw/vue/primitives/Toolbar'
+import { PageListRoot } from '@pairdraw/vue/primitives/PageList'
 
 const graph = new SceneGraph()
 const page = graph.getPages()[0]

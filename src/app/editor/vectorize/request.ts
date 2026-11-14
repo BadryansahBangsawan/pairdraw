@@ -1,5 +1,5 @@
-import { getCanvasKit } from '@open-pencil/core/canvaskit'
-import { preprocessForVectorize } from '@open-pencil/core/vector'
+import { getCanvasKit } from '@pairdraw/core/canvaskit'
+import { preprocessForVectorize } from '@pairdraw/core/vector'
 
 import type { EditorStore } from '@/app/editor/active-store'
 

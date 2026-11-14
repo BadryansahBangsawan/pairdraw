@@ -1,9 +1,9 @@
 import type { Ref } from 'vue'
 
-import type { Editor } from '@open-pencil/core'
-import type { Effect, SceneNode, ShadowEffect } from '@open-pencil/scene-graph'
-import { copyEffects } from '@open-pencil/scene-graph/copy'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import type { Editor } from '@pairdraw/core'
+import type { Effect, SceneNode, ShadowEffect } from '@pairdraw/scene-graph'
+import { copyEffects } from '@pairdraw/scene-graph/copy'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { useI18n } from '#vue/i18n/useI18n.js'
 

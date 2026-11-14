@@ -12,9 +12,9 @@ import type {
   ClipboardConflictResolution,
   ClipboardImportChoice,
   ClipboardImportPlan
-} from '@open-pencil/core'
-import type { SharedStyleType } from '@open-pencil/scene-graph'
-import { useCommonMessages, useFileMessages } from '@open-pencil/vue/i18n'
+} from '@pairdraw/core'
+import type { SharedStyleType } from '@pairdraw/scene-graph'
+import { useCommonMessages, useFileMessages } from '@pairdraw/vue/i18n'
 
 import AppButton from '@/components/ui/button/AppButton.vue'
 import AppDialogBody from '@/components/ui/dialog/AppDialogBody.vue'

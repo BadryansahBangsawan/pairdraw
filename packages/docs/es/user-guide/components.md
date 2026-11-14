@@ -41,4 +41,4 @@ Los cambios del componente principal se muestran en una revisión antes de aplic
 
 Publica componentes locales como biblioteca y habilita bibliotecas externas en Recursos. Las revisiones se almacenan localmente para trabajar sin conexión.
 
-**Pairdraw Basics** es el conjunto original incluido: componentes de botón, entrada, insignia, tarjeta y avatar, publicado como `pairdraw-basics`. Está en el panel de recursos sin catálogo: actívalo ahí para insertar sus componentes, también sin conexión, y sigue ahí después de recargar. `openpencil libraries seed --root ./catalogo` sigue publicando ese mismo conjunto en un catálogo de archivos.
+**Pairdraw Basics** es el conjunto original incluido: componentes de botón, entrada, insignia, tarjeta y avatar, publicado como `pairdraw-basics`. Está en el panel de recursos sin catálogo: actívalo ahí para insertar sus componentes, también sin conexión, y sigue ahí después de recargar. `pairdraw libraries seed --root ./catalogo` sigue publicando ese mismo conjunto en un catálogo de archivos.

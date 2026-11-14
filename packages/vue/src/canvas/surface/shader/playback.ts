@@ -7,15 +7,15 @@ import {
   type Editor,
   type EditorProfileInputs,
   type EditorState
-} from '@open-pencil/core'
-import type { SkiaRenderer } from '@open-pencil/core/canvas'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/core'
+import type { SkiaRenderer } from '@pairdraw/core/canvas'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 import {
   isShaderPresetPaint,
   readShaderPaints,
   shaderOfPaint,
   type ShaderPreset
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 import { shaderFrames } from '#vue/canvas/surface/shader/frames'
 import { canDrawShaders } from '#vue/canvas/surface/shader/rasterizer'

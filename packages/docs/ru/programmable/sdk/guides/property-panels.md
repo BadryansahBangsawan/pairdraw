@@ -5,7 +5,7 @@ description: Создание панелей свойств с помощью co
 
 # Панели свойств
 
-Панели свойств в `@open-pencil/vue` строятся прежде всего с помощью composables.
+Панели свойств в `@pairdraw/vue` строятся прежде всего с помощью composables.
 
 Если панели нужны вычисленные из выделения значения и действия для их изменения, используйте composable. Если важна переиспользуемая структура массива или списка, используйте компонент без встроенного оформления, например `PropertyListRoot`.
 
@@ -41,7 +41,7 @@ description: Создание панелей свойств с помощью co
 
 ```vue
 <script setup lang="ts">
-import { usePosition } from '@open-pencil/vue/controls/position'
+import { usePosition } from '@pairdraw/vue/controls/position'
 
 const { x, y, width, height, updateProp, commitProp } = usePosition()
 </script>
@@ -60,9 +60,9 @@ const { x, y, width, height, updateProp, commitProp } = usePosition()
 
 ```vue
 <script setup lang="ts">
-import { PropertyListRoot } from '@open-pencil/vue/primitives/PropertyList'
-import { useEditorPropertyList } from '@open-pencil/vue/controls/property-list'
-import { useFillControls } from '@open-pencil/vue/controls/fill'
+import { PropertyListRoot } from '@pairdraw/vue/primitives/PropertyList'
+import { useEditorPropertyList } from '@pairdraw/vue/controls/property-list'
+import { useFillControls } from '@pairdraw/vue/controls/fill'
 
 const fillControls = useFillControls()
 const fills = useEditorPropertyList('fills')

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test'
 import { ref } from 'vue'
 
-import { ACP_AGENTS, type ACPAgentDef } from '@open-pencil/core/constants'
+import { ACP_AGENTS, type ACPAgentDef } from '@pairdraw/core/constants'
 
 import type { AgentCandidate, AgentCandidateState } from '@/app/ai/agents/auto/pick'
 import type { AutoConnectPhase } from '@/app/ai/agents/auto/session'
@@ -81,7 +81,7 @@ function setup(overrides: Partial<AgentSetupState> = {}): AgentSetupState {
     detected: detected('available'),
     bridge: true,
     bridgeOutdated: false,
-    bridgeCommand: 'npm i -g @open-pencil/mcp@0.15.1',
+    bridgeCommand: 'npm i -g @pairdraw/mcp@0.15.1',
     npm: true,
     installingAgent: false,
     installingBridge: false,

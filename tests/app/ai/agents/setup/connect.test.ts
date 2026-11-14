@@ -1,6 +1,6 @@
 import { describe, expect, mock, test } from 'bun:test'
 
-import { ACP_AGENTS, type ACPAgentDef } from '@open-pencil/core/constants'
+import { ACP_AGENTS, type ACPAgentDef } from '@pairdraw/core/constants'
 
 import type { AgentHost } from '@/app/ai/agents/host/types'
 import { createAgentConnector } from '@/app/ai/agents/setup/connect'
@@ -36,7 +36,7 @@ describe('connecting a coding agent', () => {
       'detect',
       'install claude-agent-acp',
       'detect',
-      'install openpencil-mcp-http',
+      'install pairdraw-mcp-http',
       'detect',
       'check',
       'sign-in claude-ai-login',
@@ -205,7 +205,7 @@ describe('connecting a coding agent', () => {
       'detect',
       'install claude-agent-acp',
       'detect',
-      'install openpencil-mcp-http',
+      'install pairdraw-mcp-http',
       'detect',
       'check'
     ])

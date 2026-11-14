@@ -5,8 +5,8 @@ import {
   BROWSER_NODE_SIZE_LIMIT,
   browserNodeSchema,
   type BrowserNodeRecord
-} from '@open-pencil/scene-graph/browser-node'
-import { imageSize } from '@open-pencil/scene-graph/images'
+} from '@pairdraw/scene-graph/browser-node'
+import { imageSize } from '@pairdraw/scene-graph/images'
 
 import { BROWSER_DESKTOP_ONLY, BROWSER_WINDOW_CLOSED } from '../tools'
 import { browserURLPolicy, type BrowserURLRejection } from '../url'

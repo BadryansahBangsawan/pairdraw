@@ -3,9 +3,9 @@ import { describe, expect, test } from 'bun:test'
 import { sceneNodeToKiwi } from '#fig/node-change/index'
 import { importStyleRuns } from '#fig/node-change/style/runs'
 
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { UNSET_GUID } from '@open-pencil/kiwi/fig/guid'
-import { SceneGraph, type StyleRun } from '@open-pencil/scene-graph'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { UNSET_GUID } from '@pairdraw/kiwi/fig/guid'
+import { SceneGraph, type StyleRun } from '@pairdraw/scene-graph'
 
 // Field names and shapes from the Kiwi schema (`packages/kiwi/src/fig/schema/fig.kiwi`): a style
 // override is a NodeChange, which holds `textCase`, `hyperlink`, `styleIdForText`,

@@ -1,9 +1,9 @@
 import type { Canvas, Image, Paint, Shader } from 'canvaskit-wasm'
 
-import type { SceneNode, SceneGraph, Fill } from '@open-pencil/scene-graph'
-import { invertGradientTransform, isMeshFill } from '@open-pencil/scene-graph/gradient'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Color, Rect, Vector } from '@open-pencil/scene-graph/primitives'
+import type { SceneNode, SceneGraph, Fill } from '@pairdraw/scene-graph'
+import { invertGradientTransform, isMeshFill } from '@pairdraw/scene-graph/gradient'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Color, Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
 import { setPaintBlendMode } from './blend'
 import { makeDiamondGradient } from './gradients/diamond'
@@ -521,7 +521,7 @@ export function applyImageFill(
   const live = r.liveImages.get(hash)
   if (live?.surface === r.surface) return setImageShader(r, fill, node, live.image, paint)
   const preview = r.viewportImageRendering
-    ? // eslint-disable-next-line open-pencil/no-zoom-in-scene-drawing -- picks the preview resolution, not a size; preview mode draws the scene uncached on every frame.
+    ? // eslint-disable-next-line pairdraw/no-zoom-in-scene-drawing -- picks the preview resolution, not a size; preview mode draws the scene uncached on every frame.
       r.imagePreviews.get(graph, hash, previewEdge(node, r.zoom, r.dpr))
     : undefined
   if (r.viewportImageRendering && !preview) return false

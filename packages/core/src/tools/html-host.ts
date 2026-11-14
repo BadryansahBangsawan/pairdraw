@@ -1,4 +1,4 @@
-import type { TailwindStylesheetLoader } from '@open-pencil/dom-css/export'
+import type { TailwindStylesheetLoader } from '@pairdraw/dom-css/export'
 
 import type { HTMLStyler } from '#core/io/formats/html/layers'
 

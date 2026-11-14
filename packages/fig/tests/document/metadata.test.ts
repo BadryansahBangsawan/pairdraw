@@ -2,17 +2,14 @@ import { describe, expect, test } from 'bun:test'
 
 import { applyDocumentMetadata } from '#fig/document/metadata'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
-import {
-  OPEN_PENCIL_PLUGIN_DATA,
-  OPEN_PENCIL_PLUGIN_ID
-} from '@open-pencil/scene-graph/plugin-data'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { PAIRDRAW_PLUGIN_DATA, PAIRDRAW_PLUGIN_ID } from '@pairdraw/scene-graph/plugin-data'
 
 function enabledLibraries(value: string) {
   const graph = new SceneGraph()
   applyDocumentMetadata(graph, {
     pluginData: [
-      { pluginID: OPEN_PENCIL_PLUGIN_ID, key: OPEN_PENCIL_PLUGIN_DATA.enabledLibraries.key, value }
+      { pluginID: PAIRDRAW_PLUGIN_ID, key: PAIRDRAW_PLUGIN_DATA.enabledLibraries.key, value }
     ]
   })
   return [...graph.enabledLibraries.values()]

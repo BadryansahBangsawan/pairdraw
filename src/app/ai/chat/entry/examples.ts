@@ -1,4 +1,4 @@
-import { aiMessages } from '@open-pencil/vue/i18n'
+import { aiMessages } from '@pairdraw/vue/i18n'
 
 type AIMessages = ReturnType<typeof aiMessages.get>
 

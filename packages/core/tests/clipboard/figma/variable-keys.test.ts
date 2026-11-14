@@ -2,10 +2,10 @@ import { beforeAll, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { buildFigmaClipboardHTML } from '@open-pencil/core/clipboard'
-import { parseFigmaClipboard } from '@open-pencil/fig/clipboard'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { buildFigmaClipboardHTML } from '@pairdraw/core/clipboard'
+import { parseFigmaClipboard } from '@pairdraw/fig/clipboard'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 beforeAll(async () => {
   await initCodec()
@@ -42,7 +42,7 @@ async function copied(graph: SceneGraph, rect: ReturnType<typeof boundRectangle>
   }
 }
 
-test('copies a variable made in OpenPencil by key, as Figma copies its own', async () => {
+test('copies a variable made in Pairdraw by key, as Figma copies its own', async () => {
   const { graph, rect } = boundRectangle()
   const { swatch, variable, collection } = await copied(graph, rect)
 

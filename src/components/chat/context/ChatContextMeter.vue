@@ -3,7 +3,7 @@ import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import { useChatContextMessages } from '@open-pencil/vue/i18n'
+import { useChatContextMessages } from '@pairdraw/vue/i18n'
 
 import {
   formatContextShare,

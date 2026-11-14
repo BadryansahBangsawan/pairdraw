@@ -5,7 +5,7 @@ description: Build property panels with control composables and headless list pr
 
 # Property Panels
 
-Property panels in `@open-pencil/vue` are intentionally composable-first.
+Property panels in `@pairdraw/vue` are intentionally composable-first.
 
 If a panel mostly needs selection-derived values and update actions, prefer composables.
 If a panel needs reusable array/list structure, use a headless primitive like `PropertyListRoot`.
@@ -48,7 +48,7 @@ state differently.
 
 ```vue
 <script setup lang="ts">
-import { usePosition } from '@open-pencil/vue/controls/position'
+import { usePosition } from '@pairdraw/vue/controls/position'
 
 const { x, y, width, height, updateProp, commitProp } = usePosition()
 </script>
@@ -67,9 +67,9 @@ const { x, y, width, height, updateProp, commitProp } = usePosition()
 
 ```vue
 <script setup lang="ts">
-import { PropertyListRoot } from '@open-pencil/vue/primitives/PropertyList'
-import { useEditorPropertyList } from '@open-pencil/vue/controls/property-list'
-import { useFillControls } from '@open-pencil/vue/controls/fill'
+import { PropertyListRoot } from '@pairdraw/vue/primitives/PropertyList'
+import { useEditorPropertyList } from '@pairdraw/vue/controls/property-list'
+import { useFillControls } from '@pairdraw/vue/controls/fill'
 
 const fillControls = useFillControls()
 const fills = useEditorPropertyList('fills')

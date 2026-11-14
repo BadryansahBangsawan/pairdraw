@@ -3,12 +3,12 @@ import { describe, expect, it, test } from 'bun:test'
 import { expectDefined, getNodeOrThrow } from '#core-tests/helpers/assert'
 import { findByName, PROPERTY_CASES } from '#core-tests/helpers/property-cases'
 import { pick } from 'es-toolkit'
-import type { ShaderPreset } from '@open-pencil/scene-graph/shaders'
+import type { ShaderPreset } from '@pairdraw/scene-graph/shaders'
 
-import { renderJSX } from '@open-pencil/core/design-jsx'
-import { sceneNodeToJSX } from '@open-pencil/design-jsx'
-import { SceneGraph, type Fill, type SceneNode } from '@open-pencil/scene-graph'
-import { isShaderPresetPaint, shaderOfPaint } from '@open-pencil/scene-graph/shaders'
+import { renderJSX } from '@pairdraw/core/design-jsx'
+import { sceneNodeToJSX } from '@pairdraw/design-jsx'
+import { SceneGraph, type Fill, type SceneNode } from '@pairdraw/scene-graph'
+import { isShaderPresetPaint, shaderOfPaint } from '@pairdraw/scene-graph/shaders'
 
 /** The preset the paint draws, failing when its shader is user code instead. */
 function presetOf(node: Pick<SceneNode, 'pluginData'>, paint: Fill): ShaderPreset {

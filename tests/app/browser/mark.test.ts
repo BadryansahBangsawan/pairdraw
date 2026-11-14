@@ -13,9 +13,9 @@ import { repoPath } from '#tests/helpers/paths'
 const BODY = readFileSync(repoPath('desktop/src/system/browser-mark.js'), 'utf8')
 
 function runMark(window: Window, request: { action: string; selector?: string }): string {
-  const source = `(() => {\nconst __openpencilMarkRequest = ${JSON.stringify(request)};\n${BODY}\n})()`
+  const source = `(() => {\nconst __pairdrawMarkRequest = ${JSON.stringify(request)};\n${BODY}\n})()`
   const reported = window.eval(source)
-  const outlined = window.document.querySelector('[data-openpencil-mark]') !== null
+  const outlined = window.document.querySelector('[data-pairdraw-mark]') !== null
   if (typeof reported !== 'string') throw new Error('The page did not answer in time.')
   return `${reported}:${outlined ? 'box' : 'none'}`
 }

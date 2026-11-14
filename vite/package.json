@@ -1,5 +1,5 @@
 {
-  "name": "@open-pencil/vite-config",
+  "name": "@pairdraw/vite-config",
   "private": true,
   "type": "module",
   "exports": {
@@ -8,7 +8,7 @@
     "./pwa/routes": "./pwa/routes.ts"
   },
   "dependencies": {
-    "@open-pencil/core": "workspace:*",
+    "@pairdraw/core": "workspace:*",
     "unplugin-icons": "^23.0.1",
     "unplugin-vue-components": "^31.1.0",
     "vite": "8.1.4",

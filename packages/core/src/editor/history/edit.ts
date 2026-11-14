@@ -1,5 +1,5 @@
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import type { UndoManager } from '@open-pencil/scene-graph/undo'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import type { UndoManager } from '@pairdraw/scene-graph/undo'
 
 import {
   applyDocumentChange,

@@ -4,10 +4,10 @@ import {
   assertNodeEditable,
   getNodeEditCapability,
   ReadOnlyLibraryDefinitionError
-} from '@open-pencil/core'
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { updateNode } from '@open-pencil/core/tools/modify'
-import { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { updateNode } from '@pairdraw/core/tools/modify'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 describe('library definition capabilities', () => {
   test('protects materialized definitions and descendants but not their instances', async () => {

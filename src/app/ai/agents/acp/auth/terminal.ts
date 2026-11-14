@@ -1,4 +1,4 @@
-import type { ACPAgentDef } from '@open-pencil/core/constants'
+import type { ACPAgentDef } from '@pairdraw/core/constants'
 
 import { createDeferred } from '@/app/runtime/deferred'
 import { resolveScopedCommand } from '@/app/tauri/command'

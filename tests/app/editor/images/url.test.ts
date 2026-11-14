@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { fromUint8Array, toUint8Array } from 'js-base64'
 
-import { MAX_IMAGE_FETCH_BYTES } from '@open-pencil/core/figma-api'
+import { MAX_IMAGE_FETCH_BYTES } from '@pairdraw/core/figma-api'
 
 import { downloadImageURL, parseImageURL } from '@/app/editor/images/url'
 

@@ -1,7 +1,7 @@
-import type { Editor } from '@open-pencil/core'
-import { getAxisAlignedWorldBounds } from '@open-pencil/scene-graph/coordinate'
-import { hitTestDeepInRect } from '@open-pencil/scene-graph/hit-test'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import type { Editor } from '@pairdraw/core'
+import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
+import { hitTestDeepInRect } from '@pairdraw/scene-graph/hit-test'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 import { isPastPointerDragThreshold } from '#vue/shared/input/drag-threshold'
 import type { DragMarquee } from '#vue/shared/input/types'

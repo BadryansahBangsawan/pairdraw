@@ -1,5 +1,5 @@
-import { DOCUMENT_EXTENSIONS } from '@open-pencil/core/io'
-import type { DocumentKind } from '@open-pencil/scene-graph'
+import { DOCUMENT_EXTENSIONS } from '@pairdraw/core/io'
+import type { DocumentKind } from '@pairdraw/scene-graph'
 
 import { pickBrowserSaveFile } from '@/app/document/io/capability'
 import { documentFileName } from '@/app/document/io/names'

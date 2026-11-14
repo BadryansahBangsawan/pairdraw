@@ -1,13 +1,13 @@
-import { mergePluginData, type KiwiNodeChange } from '@open-pencil/fig/node-change'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import { mergePluginData, type KiwiNodeChange } from '@pairdraw/fig/node-change'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 import {
   isPluginDataEntry,
-  OPEN_PENCIL_PLUGIN_DATA,
+  PAIRDRAW_PLUGIN_DATA,
   withoutPluginData,
   withPluginData
-} from '@open-pencil/scene-graph/plugin-data'
+} from '@pairdraw/scene-graph/plugin-data'
 
-const { documentId, enabledLibraries } = OPEN_PENCIL_PLUGIN_DATA
+const { documentId, enabledLibraries } = PAIRDRAW_PLUGIN_DATA
 
 /** The DOCUMENT record's plugin data: the root's own, the libraries it enables, and its id. */
 export function applyDocumentPluginData(

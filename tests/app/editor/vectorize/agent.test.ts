@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test'
 
 import { toUint8Array } from 'js-base64'
 
-import { initCanvasKit } from '@open-pencil/core/io/formats/raster'
+import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { setVectorizeCredential, vectorizeProviderID } from '@/app/editor/vectorize'

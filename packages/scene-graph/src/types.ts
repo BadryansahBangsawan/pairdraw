@@ -463,7 +463,7 @@ export interface GridPosition {
   rowSpan: number
 }
 /**
- * Primary axis alignment of an auto layout's children. `SPACE_AROUND` is OpenPencil's own:
+ * Primary axis alignment of an auto layout's children. `SPACE_AROUND` is Pairdraw's own:
  * Figma has no such mode, so `.fig` files keep it as plugin data over Figma's space between.
  */
 export type LayoutAlign = 'MIN' | 'CENTER' | 'MAX' | 'SPACE_BETWEEN' | 'SPACE_AROUND'
@@ -493,7 +493,7 @@ export interface PluginRelaunchDataEntry {
 
 /**
  * One derived glyph outline for display (path text / missing-font fidelity).
- * Figma import is one producer; OpenPencil editing and reflow can regenerate it.
+ * Figma import is one producer; Pairdraw editing and reflow can regenerate it.
  * commandsBlob is in font units; paint multiplies by fontSize (and scaleX/Y).
  */
 export interface TextPathData {
@@ -1058,7 +1058,7 @@ export interface VariableFormula {
   value: VariableFormulaNode
 }
 /**
- * An imported expression OpenPencil cannot evaluate, kept as the file wrote it so saving writes it
+ * An imported expression Pairdraw cannot evaluate, kept as the file wrote it so saving writes it
  * back. `references` holds one entry per alias in `value`, in the order the format walks them, and
  * `null` where the alias names a variable this document does not have. `modes` holds the mode id of
  * each mode key in `value`, in the same walk order.

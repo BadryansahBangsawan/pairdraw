@@ -1,10 +1,10 @@
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 import type {
   SceneNode,
   TextListType,
   TextParagraphSpacingField,
   TextParagraphStyle
-} from '@open-pencil/scene-graph'
+} from '@pairdraw/scene-graph'
 import {
   paragraphIndexAt,
   paragraphStyleAt,
@@ -14,7 +14,7 @@ import {
   withIndentation,
   withListType,
   withParagraphSpacing
-} from '@open-pencil/scene-graph/text'
+} from '@pairdraw/scene-graph/text'
 
 /**
  * The characters paragraph changes apply to: the selection or the caret's paragraph while the

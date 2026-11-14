@@ -5,7 +5,7 @@ description: Créez des éditeurs basés sur Pairdraw avec des composants sans s
 
 # Vue SDK
 
-`@open-pencil/vue` permet d'utiliser Pairdraw autrement que comme une application de design autonome.
+`@pairdraw/vue` permet d'utiliser Pairdraw autrement que comme une application de design autonome.
 
 Vous pouvez intégrer Pairdraw à un autre produit, à un outil interne ou à un éditeur spécialisé, sans reprendre l'interface par défaut de l'application.
 
@@ -39,7 +39,7 @@ Il peut s'agir d'un éditeur de design complet, d'une zone de travail intégrée
 - **Sans styles par conception :** le SDK fournit la logique et la structure sans imposer l’apparence de l’application.
 - **Un composable plutôt qu'un wrapper inutile :** si aucune structure d'interface ne doit être coordonnée, un composable suffit.
 - **Une API publique maîtrisée :** les fonctionnalités stables sont exportées depuis `packages/vue/src/index.ts`.
-- **Une intégration étroite avec Vue :** le SDK relie Vue aux fonctionnalités de `@open-pencil/core`.
+- **Une intégration étroite avec Vue :** le SDK relie Vue aux fonctionnalités de `@pairdraw/core`.
 
 ## Deux niveaux d'API
 

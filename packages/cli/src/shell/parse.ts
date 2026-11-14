@@ -2,7 +2,7 @@ import * as v from 'valibot'
 
 import { parseToolArgsJSON } from '#cli/session/tools'
 
-/** One line typed into `openpencil shell`. */
+/** One line typed into `pairdraw shell`. */
 export type ShellCommand =
   | { kind: 'empty' }
   | { kind: 'help'; topic?: string }

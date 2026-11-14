@@ -49,7 +49,7 @@ export function takePendingPrompt(store: EditorStore): ChatSubmission | null {
 
 /**
  * Sends `text` from outside the chat to `store`'s document's chat, and shows that chat. Layers it
- * references (`[Hero](openpencil://node/1:2)`) go with it as previews, as from the composer.
+ * references (`[Hero](pairdraw://node/1:2)`) go with it as previews, as from the composer.
  */
 export function sendPromptToDocument(store: EditorStore, text: string): void {
   setPendingPrompt(store, promptSubmission(text, mentionedNodes(store.graph, text)))

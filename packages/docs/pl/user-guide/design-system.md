@@ -66,17 +66,17 @@ Teraz zmień token lub komponent główny, na przykład `radius/card` albo margi
 ## 5. Co dalej
 
 - **Opublikuj go jako bibliotekę.** Otwórz **Zasoby → Zarządzaj bibliotekami → Publikuj bibliotekę**, aby inne pliki mogły używać Button i Card oraz przyjmować aktualizacje, gdy je zmienisz ([Biblioteki komponentów](/user-guide/components#component-libraries)).
-- **Przekaż tokeny do kodu.** `openpencil tokens design-system.fig` wypisuje zmienne jako niestandardowe właściwości CSS, `--format tailwind` jako motyw Tailwind v4, a `--format dtcg --out tokens/` jako pliki tokenów projektowych W3C. Eksport HTML zapisuje powiązane wartości jako odwołania `var()` do tych samych właściwości ([Eksport](./exporting)).
-- **Sprawdź go.** [Sprawdzanie projektów](/user-guide/checking-designs) i `openpencil lint design-system.fig --fix -o fixed.fig` znajdują kolory, które odpowiadają tokenowi, ale nie są z nim powiązane, i je wiążą.
-- **Śledź zmiany.** Trzymaj plik w Git i przeglądaj zmiany za pomocą [`openpencil diff files`](/pl/programmable/cli/git).
+- **Przekaż tokeny do kodu.** `pairdraw tokens design-system.fig` wypisuje zmienne jako niestandardowe właściwości CSS, `--format tailwind` jako motyw Tailwind v4, a `--format dtcg --out tokens/` jako pliki tokenów projektowych W3C. Eksport HTML zapisuje powiązane wartości jako odwołania `var()` do tych samych właściwości ([Eksport](./exporting)).
+- **Sprawdź go.** [Sprawdzanie projektów](/user-guide/checking-designs) i `pairdraw lint design-system.fig --fix -o fixed.fig` znajdują kolory, które odpowiadają tokenowi, ale nie są z nim powiązane, i je wiążą.
+- **Śledź zmiany.** Trzymaj plik w Git i przeglądaj zmiany za pomocą [`pairdraw diff files`](/pl/programmable/cli/git).
 
 ## Zbuduj przykład skryptem
 
-Plik przykładowy jest generowany przez ten skrypt, który korzysta z tego samego [API wtyczek zgodnego z Figmą](/pl/programmable/cli/scripting) co `openpencil eval`. Uruchom go, aby samodzielnie zbudować plik, albo zmień go, aby wypróbować własne tokeny:
+Plik przykładowy jest generowany przez ten skrypt, który korzysta z tego samego [API wtyczek zgodnego z Figmą](/pl/programmable/cli/scripting) co `pairdraw eval`. Uruchom go, aby samodzielnie zbudować plik, albo zmień go, aby wypróbować własne tokeny:
 
 ```sh
 echo '{"children":[]}' > empty.pen
-openpencil eval empty.pen --stdin -o design-system.fig < design-system.js
+pairdraw eval empty.pen --stdin -o design-system.fig < design-system.js
 ```
 
 <<< @/public/examples/design-system.js

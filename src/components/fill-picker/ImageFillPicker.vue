@@ -2,10 +2,10 @@
 import { useFileDialog } from '@vueuse/core'
 import { computed, shallowRef, useTemplateRef } from 'vue'
 
-import type { StockPhotoResult } from '@open-pencil/core/tools'
-import type { Fill } from '@open-pencil/scene-graph'
-import { coverImageTransform } from '@open-pencil/scene-graph/images'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { StockPhotoResult } from '@pairdraw/core/tools'
+import type { Fill } from '@pairdraw/scene-graph'
+import { coverImageTransform } from '@pairdraw/scene-graph/images'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import {

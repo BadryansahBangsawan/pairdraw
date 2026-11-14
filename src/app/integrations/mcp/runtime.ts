@@ -1,11 +1,7 @@
 import type { McpServer } from '@agentclientprotocol/sdk'
 import { compact } from 'es-toolkit'
 
-import {
-  MCP_AGENT_HEADER,
-  MCP_CHAT_HEADER,
-  OPEN_PENCIL_MCP_SERVER
-} from '@open-pencil/core/constants'
+import { MCP_AGENT_HEADER, MCP_CHAT_HEADER, PAIRDRAW_MCP_SERVER } from '@pairdraw/core/constants'
 
 import { getMCPServerURL } from '@/app/automation/mcp/spawn'
 import { describeDiagnosticError, recordMCPConnectionFailure } from '@/app/diagnostics'
@@ -27,7 +23,7 @@ export type BuiltInMCPServerOptions = {
 export function builtInMCPServer(options: BuiltInMCPServerOptions): McpServer {
   return {
     type: 'http',
-    name: OPEN_PENCIL_MCP_SERVER,
+    name: PAIRDRAW_MCP_SERVER,
     url: getMCPServerURL(),
     // An ACP chat's tool calls show as an ACP agent rather than an outside MCP client.
     headers: [

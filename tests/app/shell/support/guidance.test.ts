@@ -142,7 +142,9 @@ describe('unsupported engine guidance', () => {
       MISSING
     )
     const url = reportLink(notice)
-    expect(url.origin + url.pathname).toBe('https://github.com/open-pencil/open-pencil/issues/new')
+    expect(url.origin + url.pathname).toBe(
+      'https://github.com/BadryansahBangsawan/pairdraw/issues/new'
+    )
     expect(url.searchParams.get('template')).toBe('bug_report.yml')
     expect(url.searchParams.get('platform')).toBe('Web (app.openpencil.dev)')
     expect(url.searchParams.get('browser')).toBe('test-agent')

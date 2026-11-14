@@ -2,11 +2,11 @@ import { describe, expect, test } from 'bun:test'
 
 import { getNodeOrThrow } from '#core-tests/helpers/assert'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { nodeProxyToJSON } from '@open-pencil/core/figma-api/serialization'
-import { OpenPencilAPI } from '@open-pencil/core/openpencil-api'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { setInstanceOverride } from '@open-pencil/scene-graph/instances/overrides'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { nodeProxyToJSON } from '@pairdraw/core/figma-api/serialization'
+import { PairdrawAPI } from '@pairdraw/core/pairdraw-api'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 
 function pageId(graph: SceneGraph): string {
   return graph.getPages()[0].id
@@ -554,7 +554,7 @@ test('Figma API edits reconcile existing scaled bindings without an editor', () 
   expect(frame.paddingLeft).toBe(5)
   expect(frame.width).toBe(10)
   expect(child.x).toBe(5)
-  new OpenPencilAPI(api).unbindVariable(frame.id, 'paddingLeft')
+  new PairdrawAPI(api).unbindVariable(frame.id, 'paddingLeft')
   first.setValueForMode(collection.defaultModeId, 80)
   expect(frame.paddingLeft).toBe(5)
 })

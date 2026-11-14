@@ -24,7 +24,7 @@ describe('Cloud portal pages', () => {
       '/documents/abc',
       '/share/abc',
       '/api/auth/sign-in/email',
-      '/.well-known/openpencil-cloud',
+      '/.well-known/pairdraw-cloud',
       '/accounts',
       '/administrator',
       '/authors',

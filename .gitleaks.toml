@@ -1,4 +1,4 @@
-title = "OpenPencil Gitleaks configuration"
+title = "Pairdraw Gitleaks configuration"
 
 [extend]
 useDefault = true

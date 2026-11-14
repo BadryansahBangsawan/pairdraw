@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 import {
   behaviourOwner,
   emptyBehaviour,
@@ -8,7 +8,7 @@ import {
   missingBindings,
   readBehaviour,
   withBehaviour
-} from '@open-pencil/scene-graph/behaviours'
+} from '@pairdraw/scene-graph/behaviours'
 
 /** A Switch set with a State variant property and a Thumb slot. */
 function switchSet() {
@@ -86,7 +86,7 @@ describe('behaviour model', () => {
   test('unreadable plugin data reads as no behaviour', () => {
     const { graph, set } = switchSet()
     graph.updateNode(set.id, {
-      pluginData: [{ pluginId: 'open-pencil', key: 'behaviour', value: '{"kind":"dial"}' }]
+      pluginData: [{ pluginId: 'pairdraw', key: 'behaviour', value: '{"kind":"dial"}' }]
     })
     expect(readBehaviour(set)).toBeNull()
   })

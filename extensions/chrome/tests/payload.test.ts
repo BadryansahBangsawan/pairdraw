@@ -4,8 +4,8 @@ import {
   readWebCaptureClipboard,
   type WebCapture,
   type WebCaptureElement
-} from '@open-pencil/web-capture'
-import type { CaptureOptions } from '@open-pencil/web-capture/capturer'
+} from '@pairdraw/web-capture'
+import type { CaptureOptions } from '@pairdraw/web-capture/capturer'
 
 import { MAX_PAGE_IMAGE_BYTES, messageBytes, pageCapturePayload } from '../src/payload'
 
@@ -17,7 +17,7 @@ function image(): WebCaptureElement {
 
 function page(images: boolean): WebCapture {
   return {
-    format: 'openpencil/web-capture',
+    format: 'pairdraw/web-capture',
     version: 1,
     scope: 'page',
     source: { url: 'https://example.com/', title: 'Gallery' },

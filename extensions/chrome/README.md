@@ -1,6 +1,6 @@
 # Pairdraw Web Capture for Chrome
 
-A Manifest V3 extension that copies a web page, or one element of it, with the styles the browser computed, so it pastes into a Pairdraw canvas as editable layers. It bundles the capturer from `@open-pencil/web-capture`.
+A Manifest V3 extension that copies a web page, or one element of it, with the styles the browser computed, so it pastes into a Pairdraw canvas as editable layers. It bundles the capturer from `@pairdraw/web-capture`.
 
 ## Build and load
 

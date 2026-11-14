@@ -7,7 +7,7 @@ import {
   tokenNumberToCSS,
   variableCSSNames,
   variableUnit
-} from '@open-pencil/dom-css/export'
+} from '@pairdraw/dom-css/export'
 import type {
   SceneGraph,
   Variable,
@@ -16,16 +16,16 @@ import type {
   VariableValue,
   VariableFormula,
   VariableLiteral
-} from '@open-pencil/scene-graph'
-import { colorToHex } from '@open-pencil/scene-graph/color'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph'
+import { colorToHex } from '@pairdraw/scene-graph/color'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 import {
   tokenNumberFromUnit,
   tokenNumberInUnit,
   variableValueReferences,
   printFormula
-} from '@open-pencil/scene-graph/variables'
-import { fuzzyFilter } from '@open-pencil/vue/shared/search'
+} from '@pairdraw/scene-graph/variables'
+import { fuzzyFilter } from '@pairdraw/vue/shared/search'
 
 /** One mode's value as the stylesheet writes it, with what the panel previews beside it. */
 export interface TokenModeValue {
@@ -40,7 +40,7 @@ export interface TokenModeValue {
   result?: string
   /** A CSS expression written instead of the stored number, such as `clamp(…)`. */
   expression?: string
-  /** A function from the file OpenPencil cannot evaluate, such as `VAR_MODE_LOOKUP`. */
+  /** A function from the file Pairdraw cannot evaluate, such as `VAR_MODE_LOOKUP`. */
   unsupported?: string
 }
 

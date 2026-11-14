@@ -1,10 +1,10 @@
 import { useIntervalFn } from '@vueuse/core'
 import type { ShallowRef } from 'vue'
 
-import type { Editor } from '@open-pencil/core'
-import { adjustRunsForDelete, adjustRunsForInsert } from '@open-pencil/core/text'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { paragraphStylesAfterTextChange } from '@open-pencil/scene-graph/text'
+import type { Editor } from '@pairdraw/core'
+import { adjustRunsForDelete, adjustRunsForInsert } from '@pairdraw/core/text'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { paragraphStylesAfterTextChange } from '@pairdraw/scene-graph/text'
 
 const CARET_BLINK_MS = 530
 

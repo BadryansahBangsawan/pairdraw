@@ -1,5 +1,5 @@
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { generatedFrameKind } from '@open-pencil/scene-graph/generated'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { generatedFrameKind } from '@pairdraw/scene-graph/generated'
 
 import { generatedFrameCodec } from '../generated/codecs'
 import type { KiwiNodeChange, SceneNodeToKiwiContext } from './context'

@@ -2,7 +2,7 @@
 import { useHead } from '@unhead/vue'
 import { computed, onMounted, onScopeDispose } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { APP_VERSION } from '@/app/runtime/version'
 import { animationsEnabled } from '@/app/shell/motion'

@@ -1,6 +1,6 @@
 import { markRaw, shallowRef } from 'vue'
 
-import { reapplyInstanceComponentProperties } from '@open-pencil/core'
+import { reapplyInstanceComponentProperties } from '@pairdraw/core'
 import {
   materializeLibraryAsset,
   ensureLibraryAssetKeys,
@@ -20,12 +20,12 @@ import {
   type LibraryUpdateSummary,
   type PublishLibraryInput,
   type LibraryAssetChange
-} from '@open-pencil/core/library'
+} from '@pairdraw/core/library'
 import type {
   ComponentCatalog,
   ComponentCatalogInsertInput,
   ComponentCatalogLibraryAsset
-} from '@open-pencil/core/tools'
+} from '@pairdraw/core/tools'
 
 import type { EditorStore } from '@/app/editor/session'
 import { restoreLibraryCatalogSource } from '@/app/libraries/catalog/active-storage'

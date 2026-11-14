@@ -1,9 +1,9 @@
 import { basename } from 'pathe'
 import { shallowRef, triggerRef, type ShallowRef } from 'vue'
 
-import type { DesignTokenBundle } from '@open-pencil/core/io/formats/design-tokens'
-import { TOKEN_UNIT_PROPERTY, type TokenStylesheetIssue } from '@open-pencil/dom-css/export'
-import type { TokenUnit } from '@open-pencil/scene-graph'
+import type { DesignTokenBundle } from '@pairdraw/core/io/formats/design-tokens'
+import { TOKEN_UNIT_PROPERTY, type TokenStylesheetIssue } from '@pairdraw/dom-css/export'
+import type { TokenUnit } from '@pairdraw/scene-graph'
 
 import { downloadBlob } from '@/app/document/io/browser'
 import { isFileWriteRefused } from '@/app/document/io/capability'
@@ -153,7 +153,7 @@ export async function readTokenCSS(
   store: EditorStore,
   link: TokenCSSLink
 ): Promise<DesignTokenBundle> {
-  const { readCSSDesignTokens } = await import('@open-pencil/core/io/formats/design-tokens')
+  const { readCSSDesignTokens } = await import('@pairdraw/core/io/formats/design-tokens')
   return readCSSDesignTokens(store.graph, link.text, { file: link.name, resolveExpression })
 }
 
@@ -173,7 +173,7 @@ export async function refreshTokenCSSLink(store: EditorStore): Promise<TokenCSSL
  */
 async function pullTokenCSS(store: EditorStore, link: TokenCSSLink): Promise<number> {
   const { countTokenImportChanges, defaultTokenImportOptions, planTokenImport } =
-    await import('@open-pencil/core/io/formats/design-tokens')
+    await import('@pairdraw/core/io/formats/design-tokens')
   const bundle = await readTokenCSS(store, link)
   const plan = planTokenImport(store.graph, bundle, defaultTokenImportOptions(store.graph, bundle))
   const changes = countTokenImportChanges(store.graph, plan)
@@ -219,7 +219,7 @@ export async function pushTokenCSS(store: EditorStore): Promise<TokenCSSPush | n
   const state = stateOf(store)
   const link = state.link.value
   if (!link) return null
-  const { syncTokenStylesheet } = await import('@open-pencil/core/io/formats/design-tokens')
+  const { syncTokenStylesheet } = await import('@pairdraw/core/io/formats/design-tokens')
   const source = await readLink(link)
   const result = await syncTokenStylesheet(store.graph, source)
   const { issues } = result

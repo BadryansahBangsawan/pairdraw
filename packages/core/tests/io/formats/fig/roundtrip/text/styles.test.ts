@@ -2,11 +2,11 @@ import { beforeAll, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { fontManager } from '@open-pencil/core/text'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { pixelLength } from '@open-pencil/scene-graph/text'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { fontManager } from '@pairdraw/core/text'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { pixelLength } from '@pairdraw/scene-graph/text'
 
 beforeAll(async () => {
   await initCodec()

@@ -2,7 +2,7 @@
 import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka-ui'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
-import { useBrowserMessages } from '@open-pencil/vue/i18n'
+import { useBrowserMessages } from '@pairdraw/vue/i18n'
 
 import { importBrowserCapture } from '@/app/browser/import'
 import { placeBrowserScreenshot } from '@/app/browser/shot'

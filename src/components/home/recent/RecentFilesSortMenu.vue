@@ -10,7 +10,7 @@ import {
 } from 'reka-ui'
 import { computed } from 'vue'
 
-import { useFileMessages } from '@open-pencil/vue/i18n'
+import { useFileMessages } from '@pairdraw/vue/i18n'
 
 import {
   isRecentFilesSort,

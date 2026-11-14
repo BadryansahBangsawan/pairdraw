@@ -1,12 +1,12 @@
-import type { Editor } from '@open-pencil/core'
-import { TRANSPARENT } from '@open-pencil/core/constants'
-import type { Fill } from '@open-pencil/scene-graph'
+import type { Editor } from '@pairdraw/core'
+import { TRANSPARENT } from '@pairdraw/core/constants'
+import type { Fill } from '@pairdraw/scene-graph'
 import {
   readBrowserNode,
   withBrowserNode,
   type BrowserNodeRecord
-} from '@open-pencil/scene-graph/browser-node'
-import { computeImageHash } from '@open-pencil/scene-graph/images'
+} from '@pairdraw/scene-graph/browser-node'
+import { computeImageHash } from '@pairdraw/scene-graph/images'
 
 import { BROWSER_NODE_FAILURE } from './failure'
 import {

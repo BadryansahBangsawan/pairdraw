@@ -1,6 +1,6 @@
 import { compact, uniq, uniqBy } from 'es-toolkit/array'
 
-import { colorToHex8, tryParseColor } from '@open-pencil/scene-graph/color'
+import { colorToHex8, tryParseColor } from '@pairdraw/scene-graph/color'
 
 import {
   MAX_STYLE_KIT_COLORS,

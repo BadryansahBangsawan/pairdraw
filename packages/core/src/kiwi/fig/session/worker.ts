@@ -1,4 +1,4 @@
-import { loadFigDataDecompressor } from '@open-pencil/kiwi/fig/container'
+import { loadFigDataDecompressor } from '@pairdraw/kiwi/fig/container'
 
 import {
   serializeSceneGraph,

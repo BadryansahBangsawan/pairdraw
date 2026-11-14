@@ -7,7 +7,7 @@ import {
 } from 'reka-ui'
 import { computed, ref, watch } from 'vue'
 
-import { useSettingsMessages } from '@open-pencil/vue/i18n'
+import { useSettingsMessages } from '@pairdraw/vue/i18n'
 
 import { pluginCapabilityKeys } from '@/app/plugins/capability-text'
 import {

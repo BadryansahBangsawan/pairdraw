@@ -6,12 +6,12 @@ import {
   renderNodesToSVG,
   renderSVGNode,
   type SVGExportOptions
-} from '@open-pencil/core/io/formats/svg'
-import { parsePenFile } from '@open-pencil/pen'
-import { SceneGraph, type Fill, type SceneNode, type Stroke } from '@open-pencil/scene-graph'
-import { createShapeWithText } from '@open-pencil/scene-graph/generated'
-import { outlineSVGPath } from '@open-pencil/scene-graph/polygon'
-import { shapeWithTextGeometry } from '@open-pencil/scene-graph/shape-with-text'
+} from '@pairdraw/core/io/formats/svg'
+import { parsePenFile } from '@pairdraw/pen'
+import { SceneGraph, type Fill, type SceneNode, type Stroke } from '@pairdraw/scene-graph'
+import { createShapeWithText } from '@pairdraw/scene-graph/generated'
+import { outlineSVGPath } from '@pairdraw/scene-graph/polygon'
+import { shapeWithTextGeometry } from '@pairdraw/scene-graph/shape-with-text'
 
 import { renderNodeSVGElement } from '#core/io/formats/svg/export'
 

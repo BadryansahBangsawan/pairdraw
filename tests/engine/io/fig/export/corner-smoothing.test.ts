@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { sceneNodeToKiwi } from '@open-pencil/fig/node-change'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { sceneNodeToKiwi } from '@pairdraw/fig/node-change'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 function serializeCornerSmoothing(value: number, importedValue?: number) {
   const graph = new SceneGraph()

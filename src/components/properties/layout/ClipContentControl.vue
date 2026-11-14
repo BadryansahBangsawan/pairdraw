@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { MIXED } from '@open-pencil/vue/controls/node-props'
-import { useSelectionLayout } from '@open-pencil/vue/controls/selection-layout'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { MIXED } from '@pairdraw/vue/controls/node-props'
+import { useSelectionLayout } from '@pairdraw/vue/controls/selection-layout'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import LayoutCheckboxRow from './LayoutCheckboxRow.vue'
 

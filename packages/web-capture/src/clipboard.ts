@@ -9,10 +9,10 @@ import { normalizeWebCapture, parseWebCapture } from './parse'
 
 /**
  * Clipboard HTML carries a capture between these markers, as Base64 of the DEFLATE-compressed
- * JSON, the way Figma and OpenPencil carry their layers in an HTML comment.
+ * JSON, the way Figma and Pairdraw carry their layers in an HTML comment.
  */
-export const WEB_CAPTURE_CLIPBOARD_START = '<!--(openpencil-web-capture)'
-export const WEB_CAPTURE_CLIPBOARD_END = '(/openpencil-web-capture)-->'
+export const WEB_CAPTURE_CLIPBOARD_START = '<!--(pairdraw-web-capture)'
+export const WEB_CAPTURE_CLIPBOARD_END = '(/pairdraw-web-capture)-->'
 
 /** Compressed bytes inflated per step, so an oversized payload stops early. */
 const INFLATE_STEP = 16 * 1024

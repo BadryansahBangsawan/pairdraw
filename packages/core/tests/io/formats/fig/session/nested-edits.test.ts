@@ -1,9 +1,9 @@
 import { expect, test } from 'bun:test'
 
-import { exportFigFile } from '@open-pencil/core/io/formats/fig'
-import { createFigDocumentSession } from '@open-pencil/fig'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { exportFigFile } from '@pairdraw/core/io/formats/fig'
+import { createFigDocumentSession } from '@pairdraw/fig'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 test('outer component edits win over inner defaults for later-loaded nested instance roots', async () => {
   await initCodec()

@@ -1,13 +1,13 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   getAxisAlignedWorldBounds,
   getNodeLocalMatrix,
   getNodeRotationOrigin,
   getWorldHandles,
   getWorldMatrix
-} from '@open-pencil/scene-graph/coordinate'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Vector, Rect } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/coordinate'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Vector, Rect } from '@pairdraw/scene-graph/primitives'
 
 import type { RotationPreview, ViewportTransform } from './types'
 

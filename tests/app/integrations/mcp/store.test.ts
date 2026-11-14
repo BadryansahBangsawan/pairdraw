@@ -189,7 +189,7 @@ describe('external servers handed to coding agents', () => {
         }
       ])
       const pi = await buildPiMCPServers({ authorizationToken: null })
-      expect(Object.keys(pi).filter((name) => name !== 'open-pencil')).toEqual(['Notion'])
+      expect(Object.keys(pi).filter((name) => name !== 'pairdraw')).toEqual(['Notion'])
     } finally {
       await removeMCPConnection(local.id)
       await removeMCPConnection(notion.id)

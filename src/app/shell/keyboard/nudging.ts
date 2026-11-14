@@ -1,6 +1,6 @@
 import { useEventListener } from '@vueuse/core'
 
-import { resolveEditorProfile, type EditorProfileInputs, type EditorState } from '@open-pencil/core'
+import { resolveEditorProfile, type EditorProfileInputs, type EditorState } from '@pairdraw/core'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { appPreferences, type NudgePreferences } from '@/app/settings/preferences/store'

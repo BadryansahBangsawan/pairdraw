@@ -2,10 +2,10 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { exportFigFile, parseFigFile } from '@open-pencil/core/io/formats/fig'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph, type SceneNode } from '@open-pencil/scene-graph'
-import { recordInstanceOverride } from '@open-pencil/scene-graph/instances'
+import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
+import { recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 
 import { releaseFigPopulationWorker } from '#core/kiwi/fig/population/client'
 

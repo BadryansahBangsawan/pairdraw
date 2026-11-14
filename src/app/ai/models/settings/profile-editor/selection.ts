@@ -5,7 +5,7 @@ import {
   AI_PROVIDERS,
   type AIProviderID,
   type ModelOption
-} from '@open-pencil/core/constants'
+} from '@pairdraw/core/constants'
 
 import type { AIModelProfileDraft, AIModelCapability } from '@/app/ai/models'
 import { resolveModelsDevModel } from '@/app/ai/models/catalog'
@@ -13,7 +13,7 @@ import { useProviderModelCatalog } from '@/app/ai/models/catalog/use'
 import { modelPickerOptions, type ModelPickerLabels } from '@/app/ai/models/picker/options'
 import { modelProviderName } from '@/app/ai/models/provider-name'
 import { supportsThinkingLevel } from '@/app/ai/models/thinking'
-import { OPENPENCIL_AI_PROVIDER } from '@/app/ai/providers/openpencil/provider'
+import { PAIRDRAW_AI_PROVIDER } from '@/app/ai/providers/pairdraw/provider'
 
 import { useCloudModelSelection } from './cloud'
 
@@ -137,7 +137,7 @@ export function useProfileModelSelection(
     customModelSelected.value = providerID === 'harness:pi'
     draft.customBaseURL = ''
     draft.customAPIType = 'completions'
-    if (providerID !== OPENPENCIL_AI_PROVIDER) draft.cloudWorkspaceId = undefined
+    if (providerID !== PAIRDRAW_AI_PROVIDER) draft.cloudWorkspaceId = undefined
     if (providerID.startsWith('acp:')) {
       draft.capabilities = ['tools']
       if (!draft.name.trim()) draft.name = providerDisplayName.value

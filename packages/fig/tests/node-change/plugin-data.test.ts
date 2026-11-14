@@ -7,24 +7,19 @@ import {
   extractTextPathBox
 } from '#fig/node-change/plugin-data'
 
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { clampExportScale } from '@open-pencil/scene-graph/export-scale'
-import {
-  OPEN_PENCIL_PLUGIN_DATA,
-  OPEN_PENCIL_PLUGIN_ID
-} from '@open-pencil/scene-graph/plugin-data'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { clampExportScale } from '@pairdraw/scene-graph/export-scale'
+import { PAIRDRAW_PLUGIN_DATA, PAIRDRAW_PLUGIN_ID } from '@pairdraw/scene-graph/plugin-data'
 
 function withPluginValue(key: string, value: string, extra: NodeChange = {}): NodeChange {
-  return { ...extra, pluginData: [{ pluginID: OPEN_PENCIL_PLUGIN_ID, key, value }] }
+  return { ...extra, pluginData: [{ pluginID: PAIRDRAW_PLUGIN_ID, key, value }] }
 }
 
-describe('OpenPencil plugin data readers', () => {
+describe('Pairdraw plugin data readers', () => {
   test('textPathBox requires finite numbers and a positive size', () => {
     const box = { x: 1, y: 2, width: 30, height: 40 }
     expect(
-      extractTextPathBox(
-        withPluginValue(OPEN_PENCIL_PLUGIN_DATA.textPathBox.key, JSON.stringify(box))
-      )
+      extractTextPathBox(withPluginValue(PAIRDRAW_PLUGIN_DATA.textPathBox.key, JSON.stringify(box)))
     ).toEqual(box)
     for (const value of [
       '{not json',
@@ -33,7 +28,7 @@ describe('OpenPencil plugin data readers', () => {
       JSON.stringify({ ...box, x: '1' })
     ]) {
       expect(
-        extractTextPathBox(withPluginValue(OPEN_PENCIL_PLUGIN_DATA.textPathBox.key, value))
+        extractTextPathBox(withPluginValue(PAIRDRAW_PLUGIN_DATA.textPathBox.key, value))
       ).toBeNull()
     }
   })
@@ -41,15 +36,13 @@ describe('OpenPencil plugin data readers', () => {
   test('bound variables keep string entries and drop the rest', () => {
     const value = JSON.stringify({ opacity: 'VariableID:1:2', width: 3 })
     expect(
-      extractBoundVariables(withPluginValue(OPEN_PENCIL_PLUGIN_DATA.boundVariables.key, value))
+      extractBoundVariables(withPluginValue(PAIRDRAW_PLUGIN_DATA.boundVariables.key, value))
     ).toEqual({
       opacity: 'VariableID:1:2'
     })
     for (const malformed of ['{not json', '["VariableID:1:2"]', '"VariableID:1:2"']) {
       expect(
-        extractBoundVariables(
-          withPluginValue(OPEN_PENCIL_PLUGIN_DATA.boundVariables.key, malformed)
-        )
+        extractBoundVariables(withPluginValue(PAIRDRAW_PLUGIN_DATA.boundVariables.key, malformed))
       ).toEqual({})
     }
   })
@@ -61,7 +54,7 @@ describe('OpenPencil plugin data readers', () => {
     expect(
       extractExportSettings(
         withPluginValue(
-          OPEN_PENCIL_PLUGIN_DATA.exportSettings.key,
+          PAIRDRAW_PLUGIN_DATA.exportSettings.key,
           JSON.stringify([{ scale: 1000, format: 'png' }])
         )
       )
@@ -76,7 +69,7 @@ describe('OpenPencil plugin data readers', () => {
     ]) {
       expect(
         extractExportSettings(
-          withPluginValue(OPEN_PENCIL_PLUGIN_DATA.exportSettings.key, value, native)
+          withPluginValue(PAIRDRAW_PLUGIN_DATA.exportSettings.key, value, native)
         )
       ).toEqual([{ scale: 1, format: 'svg' }])
     }
@@ -87,7 +80,7 @@ describe('OpenPencil plugin data readers', () => {
     expect(
       extractLibrarySource(
         withPluginValue(
-          OPEN_PENCIL_PLUGIN_DATA.librarySource.key,
+          PAIRDRAW_PLUGIN_DATA.librarySource.key,
           JSON.stringify({ identity, readOnly: 'yes' })
         )
       )
@@ -95,7 +88,7 @@ describe('OpenPencil plugin data readers', () => {
     expect(
       extractLibrarySource(
         withPluginValue(
-          OPEN_PENCIL_PLUGIN_DATA.librarySource.key,
+          PAIRDRAW_PLUGIN_DATA.librarySource.key,
           JSON.stringify({ identity, sourceNodeId: '1:2', readOnly: true })
         )
       )
@@ -105,7 +98,7 @@ describe('OpenPencil plugin data readers', () => {
       JSON.stringify({ identity: { ...identity, revisionId: 1 } })
     ]) {
       expect(
-        extractLibrarySource(withPluginValue(OPEN_PENCIL_PLUGIN_DATA.librarySource.key, value))
+        extractLibrarySource(withPluginValue(PAIRDRAW_PLUGIN_DATA.librarySource.key, value))
       ).toBeNull()
     }
   })

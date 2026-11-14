@@ -1,6 +1,6 @@
 import { computed, ref, watch } from 'vue'
 
-import { orientationFor } from '@open-pencil/core/tools'
+import { orientationFor } from '@pairdraw/core/tools'
 
 import {
   generateImageFill,

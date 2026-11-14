@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph, type PrototypeReaction } from '@open-pencil/scene-graph'
+import { SceneGraph, type PrototypeReaction } from '@pairdraw/scene-graph'
 
 import { expectDefined, getNodeOrThrow } from './helpers/assert'
 

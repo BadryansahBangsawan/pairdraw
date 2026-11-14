@@ -1,10 +1,10 @@
-import { FigmaAPI, MAX_IMAGE_FETCH_BYTES } from '@open-pencil/core/figma-api'
-import { createCanvasKitRasterCodec } from '@open-pencil/core/io/formats/raster'
+import { FigmaAPI, MAX_IMAGE_FETCH_BYTES } from '@pairdraw/core/figma-api'
+import { createCanvasKitRasterCodec } from '@pairdraw/core/io/formats/raster'
 import {
   registerHTMLToolHost,
   registerImageAIService,
   type HTMLToolHost
-} from '@open-pencil/core/tools'
+} from '@pairdraw/core/tools'
 
 import { renderAutomationImage } from '@/app/automation/bridge/export-handlers'
 import { styleHTMLInBrowser } from '@/app/code/html-styler'

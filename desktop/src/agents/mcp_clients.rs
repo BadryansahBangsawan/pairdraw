@@ -1,5 +1,5 @@
-//! The MCP configuration files of agents people run outside OpenPencil, which Settings → MCP
-//! adds the `open-pencil` server to or removes it from. The webview names a client, never a path:
+//! The MCP configuration files of agents people run outside Pairdraw, which Settings → MCP
+//! adds the `pairdraw` server to or removes it from. The webview names a client, never a path:
 //! each client's file is resolved here, so these commands reach only those files, which the fs
 //! scope keeps out of the webview's reach as places where a written file would run.
 //!
@@ -7,7 +7,7 @@
 //! applies only while the file still holds the text that edit started from, and only when the
 //! edit adds this server's fixed entry or removes it and changes nothing else (`entry`), so the
 //! webview cannot make a client start any other program. It keeps a copy of the file as it was
-//! before OpenPencil first changed it, and replaces the file in one rename.
+//! before Pairdraw first changed it, and replaces the file in one rename.
 
 mod entry;
 mod jsonc;
@@ -21,7 +21,7 @@ use entry::{check_edit, EntryCheck};
 /// Claude Code keeps its whole state in `.claude.json`, which grows with every project.
 const MAX_CONFIG_BYTES: u64 = 16 * 1024 * 1024;
 /// Appended to the file's name for the copy made before the first change.
-const BACKUP_SUFFIX: &str = ".open-pencil.bak";
+const BACKUP_SUFFIX: &str = ".pairdraw.bak";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -249,7 +249,7 @@ fn create_private(path: &Path) -> std::io::Result<fs::File> {
 /// Replaces `target` with `content` in one rename, keeping the permissions the file had; a new
 /// file is readable by its owner only.
 fn replace_file(target: &Path, content: &str) -> std::io::Result<()> {
-    let temporary = sibling(target, &format!(".open-pencil-{}.tmp", std::process::id()))
+    let temporary = sibling(target, &format!(".pairdraw-{}.tmp", std::process::id()))
         .ok_or_else(|| std::io::Error::other("the file has no name"))?;
     let permissions = fs::metadata(target)
         .ok()

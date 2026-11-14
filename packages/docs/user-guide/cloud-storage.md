@@ -72,8 +72,8 @@ The bucket can also hold component libraries. In **Assets → Manage libraries**
 
 Pairdraw writes only under two prefixes and leaves everything else in the bucket alone:
 
-- `open_pencil_storage/canvases/` — each document as `<id>.fig`, with its name and modification time in `<id>.meta.json`.
-- `open-pencil/libraries/` — each library's `manifest.json` and its published revisions.
+- `pairdraw_storage/canvases/` — each document as `<id>.fig`, with its name and modification time in `<id>.meta.json`.
+- `pairdraw/libraries/` — each library's `manifest.json` and its published revisions.
 
 ## Provider Notes
 

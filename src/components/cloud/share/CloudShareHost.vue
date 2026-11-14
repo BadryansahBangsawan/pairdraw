@@ -2,8 +2,8 @@
 import { useClipboard } from '@vueuse/core'
 import { computed, watch } from 'vue'
 
-import type { DocumentPermission } from '@open-pencil/cloud/contract'
-import { useCloudMessages } from '@open-pencil/vue/i18n'
+import type { DocumentPermission } from '@pairdraw/cloud/contract'
+import { useCloudMessages } from '@pairdraw/vue/i18n'
 
 import { cloudConnection } from '@/app/cloud/sessions/connection'
 import { cloudShareOpen } from '@/app/cloud/sharing/dialog'

@@ -3,7 +3,7 @@ import { afterEach, expect, test } from 'bun:test'
 
 import { toRaw } from 'vue'
 
-import { readAgentNotes } from '@open-pencil/scene-graph/agent-notes'
+import { readAgentNotes } from '@pairdraw/scene-graph/agent-notes'
 
 import { stripModelNotes } from '@/app/ai/chat/context'
 import { takePendingPrompt } from '@/app/ai/chat/pending-prompt'

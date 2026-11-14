@@ -1,6 +1,6 @@
 import { computed, ref, watch, type Ref } from 'vue'
 
-import type { ACPAgentID } from '@open-pencil/core/constants'
+import type { ACPAgentID } from '@pairdraw/core/constants'
 
 import { agentAutoConnect, type AutoConnectPhase } from '@/app/ai/agents/auto/session'
 import { agentHostAvailable } from '@/app/ai/agents/host/current'

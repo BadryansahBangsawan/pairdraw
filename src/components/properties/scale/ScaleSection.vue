@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { MIN_RESCALE } from '@open-pencil/scene-graph/scaling'
-import { usePanelMessages } from '@open-pencil/vue/i18n'
+import { MIN_RESCALE } from '@pairdraw/scene-graph/scaling'
+import { usePanelMessages } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { useScalePanel } from '@/app/editor/scale/panel'

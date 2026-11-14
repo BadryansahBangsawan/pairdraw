@@ -7,11 +7,11 @@ import type {
   ToolAnnotations,
   ServerContext
 } from '@modelcontextprotocol/server'
-// eslint-disable-next-line open-pencil/no-mixed-case-acronym-identifiers -- Upstream export spelling.
+// eslint-disable-next-line pairdraw/no-mixed-case-acronym-identifiers -- Upstream export spelling.
 import { toStandardJsonSchema as toStandardJSONSchema } from '@valibot/to-json-schema'
 import * as v from 'valibot'
 
-import { CODEGEN_PROMPT } from '@open-pencil/core/tools'
+import { CODEGEN_PROMPT } from '@pairdraw/core/tools'
 
 import type { RPCJSONObject } from '#mcp/json'
 import { MAX_RESULT_BYTES, fail, ok, resultTooLargeMessage } from '#mcp/result'
@@ -75,7 +75,7 @@ export type MCPAgentKind = (typeof MCP_AGENT_KINDS)[number]
 export interface MCPAgentSession {
   id: string
   kind: MCPAgentKind
-  /** The app chat the session belongs to, from its `x-openpencil-chat` header. */
+  /** The app chat the session belongs to, from its `x-pairdraw-chat` header. */
   chat?: string
 }
 
@@ -138,7 +138,7 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
         description: toolOptions.description ?? descriptor.description,
         inputSchema: toStandardJSONSchema(toolOptions.inputSchema),
         annotations: toolAnnotations(descriptor.effect),
-        _meta: { 'openpencil/capabilities': descriptor.capabilities }
+        _meta: { 'pairdraw/capabilities': descriptor.capabilities }
       },
       async (args, context) => {
         try {

@@ -4,7 +4,7 @@ import type { ChatStatus } from 'ai'
 import { TooltipProvider } from 'reka-ui'
 import { computed, useTemplateRef } from 'vue'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { createPromptRecall } from '@/app/ai/chat/history/prompts'
 import { useChatEditor } from '@/components/chat/composer/useChatEditor'

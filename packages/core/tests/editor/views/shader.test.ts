@@ -5,15 +5,15 @@ import {
   findShaderModeTarget,
   ReadOnlyDocumentError,
   resolveEditorProfile
-} from '@open-pencil/core'
+} from '@pairdraw/core'
 import { expectDefined } from '#core-tests/helpers/assert'
-import { SceneGraph, type Fill, type SceneNode } from '@open-pencil/scene-graph'
-import { colorToFill } from '@open-pencil/scene-graph/color'
+import { SceneGraph, type Fill, type SceneNode } from '@pairdraw/scene-graph'
+import { colorToFill } from '@pairdraw/scene-graph/color'
 import {
   isShaderPresetPaint,
   shaderOfPaint,
   type ShaderPreset
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 /** The preset the paint draws, failing when its shader is user code instead. */
 function presetOf(node: Pick<SceneNode, 'pluginData'>, paint: Fill): ShaderPreset {

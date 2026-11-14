@@ -1,4 +1,4 @@
-# @open-pencil/vue architecture
+# @pairdraw/vue architecture
 
 ## Folder conventions
 

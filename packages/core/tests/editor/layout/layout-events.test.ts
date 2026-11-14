@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { computeLayout } from '@open-pencil/core/layout'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { createEditor } from '@pairdraw/core'
+import { computeLayout } from '@pairdraw/core/layout'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 function hugRow(graph: SceneGraph, children: number) {
   const row = graph.createNode('FRAME', graph.getPages()[0].id, {

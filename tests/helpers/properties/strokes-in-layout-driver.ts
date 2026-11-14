@@ -10,8 +10,8 @@ export function strokesInLayoutDriver(page: () => Page) {
   return {
     async build() {
       ids = await page().evaluate(() => {
-        const store = window.openPencil?.getStore?.()
-        if (!store) throw new Error('OpenPencil store not initialized')
+        const store = window.pairdraw?.getStore?.()
+        if (!store) throw new Error('Pairdraw store not initialized')
         const frame = store.createShape('FRAME', 100, 100, 200, 150)
         const child = store.createShape('RECTANGLE', 0, 0, 40, 40, frame)
         store.graph.updateNode(frame, {
@@ -40,7 +40,7 @@ export function strokesInLayoutDriver(page: () => Page) {
     state() {
       if (!ids) throw new Error('Build the scene first')
       return page().evaluate(({ frame, child }) => {
-        const graph = window.openPencil?.getStore?.().graph
+        const graph = window.pairdraw?.getStore?.().graph
         const node = graph?.getNode(child)
         return {
           included: graph?.getNode(frame)?.strokesIncludedInLayout,

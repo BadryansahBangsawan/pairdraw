@@ -1,5 +1,5 @@
-import type { TextDecoration, TextLength } from '@open-pencil/scene-graph'
-import { NO_LETTER_SPACING, percentLength, pixelLength } from '@open-pencil/scene-graph/text'
+import type { TextDecoration, TextLength } from '@pairdraw/scene-graph'
+import { NO_LETTER_SPACING, percentLength, pixelLength } from '@pairdraw/scene-graph/text'
 
 export function mapTextDecoration(d?: string): TextDecoration {
   switch (d) {

@@ -6,7 +6,7 @@
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import { useEditorMessages } from '@open-pencil/vue/i18n'
+import { useEditorMessages } from '@pairdraw/vue/i18n'
 
 import type { EmbedStatus } from '@/app/embed'
 import AppPlaceholder from '@/components/ui/feedback/AppPlaceholder.vue'

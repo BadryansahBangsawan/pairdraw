@@ -107,7 +107,7 @@ function storable(controls: readonly AgentSessionControl[]): AgentSessionControl
  * offers them before the next session starts.
  */
 const catalog = useLocalStorage<Record<string, AgentSessionControl[]>>(
-  'open-pencil:ai:agent-session-controls',
+  'pairdraw:ai:agent-session-controls',
   {},
   {
     serializer: {
@@ -122,7 +122,7 @@ const catalog = useLocalStorage<Record<string, AgentSessionControl[]>>(
 
 /** What the person chose for each agent, by agent id and control id; every session starts so. */
 const choices = useLocalStorage<Record<string, Record<string, string>>>(
-  'open-pencil:ai:agent-session-choices',
+  'pairdraw:ai:agent-session-choices',
   {},
   {
     serializer: {

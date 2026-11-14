@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { type FigmaNodeProxy, FigmaAPI } from '@open-pencil/core/figma-api'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { type FigmaNodeProxy, FigmaAPI } from '@pairdraw/core/figma-api'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 const createAPI = () => new FigmaAPI(new SceneGraph())
 

@@ -2,14 +2,14 @@
 import { uniq } from 'es-toolkit'
 import { computed } from 'vue'
 
-import { EDITOR_TOOLS, resolveEditorProfile, type Tool } from '@open-pencil/core'
+import { EDITOR_TOOLS, resolveEditorProfile, type Tool } from '@pairdraw/core'
 import {
   editorCommandMetadata,
   formatShortcut,
   useEditorCommands,
   type EditorCommandId
-} from '@open-pencil/vue/editor/commands'
-import { useCommandMessages, useMenuMessages } from '@open-pencil/vue/i18n'
+} from '@pairdraw/vue/editor/commands'
+import { useCommandMessages, useMenuMessages } from '@pairdraw/vue/i18n'
 
 import { CHAT_COLUMN_SHORTCUT } from '@/app/ai/chat/panel'
 import { useEditorStore } from '@/app/editor/active-store'

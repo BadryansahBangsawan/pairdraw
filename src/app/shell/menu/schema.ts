@@ -1,4 +1,4 @@
-import type { EditorCommandId } from '@open-pencil/vue/editor/commands'
+import type { EditorCommandId } from '@pairdraw/vue/editor/commands'
 
 import { REMOVE_AUTO_LAYOUT_SHORTCUT } from '@/app/shell/keyboard/auto-layout'
 import { EXTRA_EXPORT_FORMATS_INCLUDED } from '@/constants'

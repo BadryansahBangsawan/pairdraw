@@ -1,6 +1,6 @@
 import { shallowRef } from 'vue'
 
-import { resolveEditorProfile } from '@open-pencil/core'
+import { resolveEditorProfile } from '@pairdraw/core'
 
 import { chatColumnOpen } from '@/app/ai/chat/panel'
 import { hasPendingPrompt } from '@/app/ai/chat/pending-prompt'

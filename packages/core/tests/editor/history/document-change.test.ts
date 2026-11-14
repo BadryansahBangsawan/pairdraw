@@ -3,9 +3,9 @@ import { describe, expect, test } from 'bun:test'
 import { captureDocumentChange } from '#core/editor/history/document-change'
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { createEditor, graphFromDocumentChange, isEmptyDocumentChange } from '@open-pencil/core'
-import type { CommentThread } from '@open-pencil/scene-graph'
-import { readComments, writeComments } from '@open-pencil/scene-graph/comments'
+import { createEditor, graphFromDocumentChange, isEmptyDocumentChange } from '@pairdraw/core'
+import type { CommentThread } from '@pairdraw/scene-graph'
+import { readComments, writeComments } from '@pairdraw/scene-graph/comments'
 
 function setup() {
   const editor = createEditor()

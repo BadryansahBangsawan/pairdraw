@@ -1,11 +1,11 @@
 ---
 title: Componenti
-description: Riferimento dei componenti senza stile di @open-pencil/vue.
+description: Riferimento dei componenti senza stile di @pairdraw/vue.
 ---
 
 # Componenti
 
-`@open-pencil/vue` fornisce componenti senza stile per area di lavoro, navigazione, pannelli delle proprietà e campi specializzati.
+`@pairdraw/vue` fornisce componenti senza stile per area di lavoro, navigazione, pannelli delle proprietà e campi specializzati.
 
 ## Area di lavoro
 

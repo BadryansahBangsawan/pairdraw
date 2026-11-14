@@ -1,6 +1,6 @@
 import { computed, ref, toValue, watch, type MaybeRefOrGetter } from 'vue'
 
-import { ACP_AGENTS, type ACPAgentDef, type ACPAgentID } from '@open-pencil/core/constants'
+import { ACP_AGENTS, type ACPAgentDef, type ACPAgentID } from '@pairdraw/core/constants'
 
 import { readPiAccount } from '@/app/ai/agents/pi/settings'
 
@@ -145,7 +145,7 @@ export function useAgentSetup(
     await Promise.all(unchecked.map((agent) => accounts.check(agent.definition)))
   }
 
-  /** Looks the agent up again and restarts it to read its login and reach OpenPencil's tools. */
+  /** Looks the agent up again and restarts it to read its login and reach Pairdraw's tools. */
   async function checkAgent(providerID: string): Promise<void> {
     if (!discovery.supported) return
     await discovery.refresh(true)
@@ -188,7 +188,7 @@ export function useAgentSetup(
 
 /**
  * A coding agent's setup while `providerID` names one, checked each time it does, so its model
- * settings show whether it is installed, signed in, and reaches OpenPencil's tools. Undefined
+ * settings show whether it is installed, signed in, and reaches Pairdraw's tools. Undefined
  * outside the desktop app, where agents cannot run.
  */
 export function useCodingAgentSetup(

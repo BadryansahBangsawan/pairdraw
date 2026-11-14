@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 
-import { useCommonMessages, useMediaMessages } from '@open-pencil/vue/i18n'
+import { useCommonMessages, useMediaMessages } from '@pairdraw/vue/i18n'
 
 import { closeImageAIPrompt, imageAIPrompt, type ImageAIPromptMode } from '@/app/editor/image-ai'
 import { useImageAIPromptForm } from '@/app/editor/image-ai/prompt'

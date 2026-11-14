@@ -1,6 +1,6 @@
 import type { Ref } from 'vue'
 
-import { nodeToXPath } from '@open-pencil/core/xpath'
+import { nodeToXPath } from '@pairdraw/core/xpath'
 
 import { acceptsDocumentPrompts, runPromptInDocument } from '@/app/ai/chat/entry/run'
 import { stickyPrompt } from '@/app/ai/chat/entry/sticky'

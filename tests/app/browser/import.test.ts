@@ -1,12 +1,12 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { encodeWebCaptureClipboard, type WebCapture } from '@open-pencil/web-capture'
+import { createEditor } from '@pairdraw/core'
+import { encodeWebCaptureClipboard, type WebCapture } from '@pairdraw/web-capture'
 
 import { importBrowserCapture } from '@/app/browser/import'
 
 const CAPTURE: WebCapture = {
-  format: 'openpencil/web-capture',
+  format: 'pairdraw/web-capture',
   version: 1,
   scope: 'page',
   source: { url: 'https://example.com/', title: 'Example' },

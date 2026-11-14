@@ -14,7 +14,7 @@ export function setupTabGlobals(): void {
       return 0
     },
     cancelAnimationFrame: vi.fn(),
-    openPencil: {},
+    pairdraw: {},
     location: asDouble<Location>({ href: 'http://localhost/' }),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn()

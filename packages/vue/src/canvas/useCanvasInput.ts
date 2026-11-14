@@ -1,8 +1,8 @@
 import { useEventListener } from '@vueuse/core'
 import { onScopeDispose, ref, watch, type Ref } from 'vue'
 
-import { resolveEditorProfile, type Editor } from '@open-pencil/core'
-import type { SceneNode } from '@open-pencil/scene-graph'
+import { resolveEditorProfile, type Editor } from '@pairdraw/core'
+import type { SceneNode } from '@pairdraw/scene-graph'
 
 import { createAutoLayoutValueEdit } from '#vue/canvas/auto-layout/value-edit'
 import { createGuideInput } from '#vue/canvas/guides/input'
@@ -34,7 +34,7 @@ import type { DragState } from '#vue/shared/input/types'
 import { DEFAULT_WHEEL_ZOOM_OPTIONS, type WheelZoomOptions } from '#vue/shared/input/wheel'
 
 /**
- * Wires pointer and mouse interaction to an OpenPencil canvas.
+ * Wires pointer and mouse interaction to an Pairdraw canvas.
  *
  * This composable coordinates selection, dragging, resizing, rotation,
  * panning, drawing tools, scoped hit testing, and text-edit interaction.

@@ -7,10 +7,10 @@ import { which } from './path'
 import { spawnFixed, terminate } from './process'
 import type { CompanionAgent } from './registry'
 
-/** The program the app knows OpenPencil's MCP server by; the companion is that server. */
-export const MCP_EXECUTABLE = 'openpencil-mcp-http'
-const MCP_PACKAGE = '@open-pencil/mcp'
-const HARNESS_PACKAGE = '@open-pencil/harness'
+/** The program the app knows Pairdraw's MCP server by; the companion is that server. */
+export const MCP_EXECUTABLE = 'pairdraw-mcp-http'
+const MCP_PACKAGE = '@pairdraw/mcp'
+const HARNESS_PACKAGE = '@pairdraw/harness'
 const PACKAGE_MANAGERS = ['npm', 'bun'] as const
 
 /** What the app's setup reads, in the shape the desktop shell's `agent_lookup` reports. */
@@ -82,7 +82,7 @@ async function nearestExisting(path: string): Promise<string | null> {
 
 /** Whether this process can create files in `dir`, checked by creating and removing one. */
 async function canWrite(dir: string): Promise<boolean> {
-  const probe = join(dir, `.openpencil-write-check-${process.pid}`)
+  const probe = join(dir, `.pairdraw-write-check-${process.pid}`)
   try {
     await writeFile(probe, '', { flag: 'wx' })
     await rm(probe, { force: true })
@@ -101,7 +101,7 @@ async function npmGlobalWritable(searchPath: string): Promise<boolean | null> {
 }
 
 /**
- * Looks up the agents in `registry`, the package managers, and OpenPencil's companions, as the
+ * Looks up the agents in `registry`, the package managers, and Pairdraw's companions, as the
  * desktop shell's `agent_lookup` does. It never starts an agent: only `npm prefix` runs, and of
  * Claude Code's settings only the switches that pick a cloud are read. The MCP server is this
  * program itself, so it reports its own entry and version.

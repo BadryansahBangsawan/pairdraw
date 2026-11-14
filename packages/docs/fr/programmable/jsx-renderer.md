@@ -17,7 +17,7 @@ Pairdraw convertit du JSX déclaratif en arbre de design. Le même système est 
 
 ## Créer des designs
 
-L’outil `render` accepte des chaînes JSX dans le chat AI et MCP. Dans le code d’une application ou d’une bibliothèque sans interface, importez `Frame`, `Text` et les autres exports d’écriture depuis `@open-pencil/design-jsx`, puis créez les objets avec `renderTree` ou `renderJSX` depuis `@open-pencil/core/design-jsx`, qui ajoutent les icônes, la conversion SVG et la disposition. Pour écrire les arbres en TSX, définissez `"jsxImportSource": "@open-pencil/design-jsx"` avec `"jsx": "react-jsx"` dans `tsconfig.json`, ou ajoutez au fichier un commentaire `/** @jsxImportSource @open-pencil/design-jsx */`. L’environnement de script détermine les API exposées à `eval` ; les exports des paquets n’y sont pas automatiquement des variables globales.
+L’outil `render` accepte des chaînes JSX dans le chat AI et MCP. Dans le code d’une application ou d’une bibliothèque sans interface, importez `Frame`, `Text` et les autres exports d’écriture depuis `@pairdraw/design-jsx`, puis créez les objets avec `renderTree` ou `renderJSX` depuis `@pairdraw/core/design-jsx`, qui ajoutent les icônes, la conversion SVG et la disposition. Pour écrire les arbres en TSX, définissez `"jsxImportSource": "@pairdraw/design-jsx"` avec `"jsx": "react-jsx"` dans `tsconfig.json`, ou ajoutez au fichier un commentaire `/** @jsxImportSource @pairdraw/design-jsx */`. L’environnement de script détermine les API exposées à `eval` ; les exports des paquets n’y sont pas automatiquement des variables globales.
 
 ## Éléments
 

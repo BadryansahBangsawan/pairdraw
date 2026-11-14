@@ -56,15 +56,15 @@ export interface AgentBridgeOptions {
 const AGENT_SOCKET_PATH = /^\/agents\/([\w-]{1,64})\/(acp|sign-in)$/
 
 /**
- * The bridge `bun run dev` asks the MCP server it starts for: `OPENPENCIL_MCP_AGENTS=1`, with its
- * tab's session in `OPENPENCIL_MCP_AGENT_SESSION` and `OPENPENCIL_MCP_AGENT_TOKEN`. Null without
+ * The bridge `bun run dev` asks the MCP server it starts for: `PAIRDRAW_MCP_AGENTS=1`, with its
+ * tab's session in `PAIRDRAW_MCP_AGENT_SESSION` and `PAIRDRAW_MCP_AGENT_TOKEN`. Null without
  * them or when they are malformed, and the server then has no bridge. The tokens stay in this
  * process: the discovery file never holds them.
  */
 export function devAgentBridgeFromEnv(
   env: NodeJS.ProcessEnv = process.env
 ): AgentBridgeOptions | null {
-  if (env.OPENPENCIL_MCP_AGENTS !== '1') return null
+  if (env.PAIRDRAW_MCP_AGENTS !== '1') return null
   const session = v.safeParse(devAgentSessionEnvSchema, env)
   return session.success ? { trustedSessions: [session.output] } : null
 }

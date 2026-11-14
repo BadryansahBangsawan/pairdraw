@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test'
 
 export async function injectMockChatTransport(page: Page): Promise<void> {
   await page.evaluate(() => {
-    const setChatTransport = window.openPencil?.setChatTransport
+    const setChatTransport = window.pairdraw?.setChatTransport
     if (!setChatTransport) throw new Error('Transport override not available')
     let messageCounter = 0
     let flakyFailed = false

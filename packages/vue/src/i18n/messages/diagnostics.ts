@@ -87,7 +87,7 @@ export const diagnosticsMessageDefaults = {
   sharingUnofficialBuild:
     'This build sends nothing. Only official Pairdraw releases send pings or usage stats.',
   sharingDisabledByEnvironment:
-    'Turned off by OPENPENCIL_TELEMETRY or DO_NOT_TRACK in your environment.',
+    'Turned off by PAIRDRAW_TELEMETRY or DO_NOT_TRACK in your environment.',
   sharingQuestionTitle: 'Help improve Pairdraw?',
   sharingQuestionDescription:
     'Share anonymous usage stats: app launches, file formats, and features used. Never your designs, file names, or prompts. They show us what to build next and that Pairdraw is used, which keeps it funded.',

@@ -32,7 +32,7 @@ if (notes !== sourceNotes) throw new Error('Release notes do not match the sourc
 // The same key the native builds were configured with (`frontend.ts`), never the checked-in one.
 const { pubkey } = updaterFeed(process.env, repository)
 
-const temporary = await mkdtemp(join(tmpdir(), 'open-pencil-signatures-'))
+const temporary = await mkdtemp(join(tmpdir(), 'pairdraw-signatures-'))
 const output = paths.output
 await rm(output, { recursive: true, force: true })
 await mkdir(output, { recursive: true })

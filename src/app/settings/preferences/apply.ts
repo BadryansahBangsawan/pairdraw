@@ -1,4 +1,4 @@
-import type { SnappingPreferences } from '@open-pencil/core'
+import type { SnappingPreferences } from '@pairdraw/core'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { getTabsSnapshot } from '@/app/tabs'

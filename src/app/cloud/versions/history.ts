@@ -1,6 +1,6 @@
 import { shallowRef } from 'vue'
 
-import type { DocumentVersion } from '@open-pencil/cloud/contract'
+import type { DocumentVersion } from '@pairdraw/cloud/contract'
 
 import { createEditorStore, type EditorStore } from '@/app/editor/session'
 import { downloadCloudDocument } from '@/app/integrations/storage/cloud/download'

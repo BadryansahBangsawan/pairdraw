@@ -15,7 +15,7 @@ import {
 import { tv } from 'tailwind-variants'
 import { computed, normalizeClass, useTemplateRef, type HTMLAttributes } from 'vue'
 
-import { useFileMessages } from '@open-pencil/vue/i18n'
+import { useFileMessages } from '@pairdraw/vue/i18n'
 
 import type { DocumentSelectMode } from '@/app/home/selection'
 import { useMenuUI } from '@/components/ui/menu/menu'

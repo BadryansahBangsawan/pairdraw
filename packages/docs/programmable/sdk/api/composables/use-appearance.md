@@ -19,7 +19,7 @@ It exposes selection-derived UI state for:
 ## Usage
 
 ```ts
-import { useAppearance } from '@open-pencil/vue/controls/appearance'
+import { useAppearance } from '@pairdraw/vue/controls/appearance'
 
 const appearance = useAppearance()
 ```

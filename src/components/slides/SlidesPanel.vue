@@ -2,11 +2,11 @@
 import { tv } from 'tailwind-variants'
 import { computed, nextTick, ref, useId, useTemplateRef, type ComponentPublicInstance } from 'vue'
 
-import { resolveEditorProfile } from '@open-pencil/core'
-import { animateViewport } from '@open-pencil/vue/canvas'
-import { formatShortcut } from '@open-pencil/vue/editor/commands'
-import { useSlidesMessages } from '@open-pencil/vue/i18n'
-import { useFlatReorderDrag } from '@open-pencil/vue/shared/drag'
+import { resolveEditorProfile } from '@pairdraw/core'
+import { animateViewport } from '@pairdraw/vue/canvas'
+import { formatShortcut } from '@pairdraw/vue/editor/commands'
+import { useSlidesMessages } from '@pairdraw/vue/i18n'
+import { useFlatReorderDrag } from '@pairdraw/vue/shared/drag'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { appMenuShortcut } from '@/app/shell/menu/shortcut'

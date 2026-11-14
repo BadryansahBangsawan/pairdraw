@@ -10,7 +10,7 @@ import { CanvasHelper } from '#tests/helpers/canvas'
 import { ChatHarness } from '#tests/helpers/chat/harness'
 
 /**
- * The web app with the companion, as a person runs it: `openpencil-connect` prints a link, the
+ * The web app with the companion, as a person runs it: `pairdraw-connect` prints a link, the
  * tab opens it and pairs, and the chat runs Claude Code on this computer. A stand-in agent named
  * `claude-agent-acp` comes first on the companion's PATH.
  */

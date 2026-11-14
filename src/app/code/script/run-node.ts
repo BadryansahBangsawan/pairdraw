@@ -3,14 +3,14 @@
  * the sandbox for layers, and draws them under the node. A run adds no undo step; the script
  * node's own render is not a document edit, and its output is not something a person moves.
  */
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { OPEN_PENCIL_PLUGIN_DATA, readPluginData } from '@open-pencil/scene-graph/plugin-data'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { PAIRDRAW_PLUGIN_DATA, readPluginData } from '@pairdraw/scene-graph/plugin-data'
 import {
   resolveScriptInputs,
   scriptInputAccepts,
   type ScriptInputKind,
   type ScriptInputValue
-} from '@open-pencil/scene-graph/script'
+} from '@pairdraw/scene-graph/script'
 
 import {
   materializeScriptError,
@@ -22,7 +22,7 @@ import { scriptSeed } from '@/app/code/script/sandbox/random'
 import type { ScriptNodeSpec } from '@/app/code/script/sandbox/spec'
 import { declarationKinds, inputValue, parseScriptHeader } from '@/app/code/script/schema-header'
 
-const { script: SCRIPT_FIELD } = OPEN_PENCIL_PLUGIN_DATA
+const { script: SCRIPT_FIELD } = PAIRDRAW_PLUGIN_DATA
 
 export type ScriptNodeRunResult =
   | ({ ok: true } & MaterializeScriptResult)

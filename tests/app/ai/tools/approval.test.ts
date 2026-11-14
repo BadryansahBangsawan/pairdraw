@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, jest, spyOn, test } from 'bun:
 
 import { toRaw } from 'vue'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
 
 import {
   currentPermission,

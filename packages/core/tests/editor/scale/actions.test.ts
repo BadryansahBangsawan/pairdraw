@@ -2,9 +2,9 @@ import { describe, expect, test } from 'bun:test'
 
 import { getNodeOrThrow } from '#core-tests/helpers/assert'
 
-import { createEditor, ReadOnlyDocumentError, rescaleNodes } from '@open-pencil/core'
-import type { SceneGraph, SceneNode, Stroke } from '@open-pencil/scene-graph'
-import { getAxisAlignedWorldBounds } from '@open-pencil/scene-graph/coordinate'
+import { createEditor, ReadOnlyDocumentError, rescaleNodes } from '@pairdraw/core'
+import type { SceneGraph, SceneNode, Stroke } from '@pairdraw/scene-graph'
+import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 
 const STROKE: Stroke = {
   type: 'SOLID',

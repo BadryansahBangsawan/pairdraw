@@ -2,9 +2,9 @@ import type { Paragraph } from 'canvaskit-wasm'
 import { uniq } from 'es-toolkit/array'
 import { isEqual } from 'es-toolkit/predicate'
 
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { textLengthPixels } from '@open-pencil/scene-graph/text'
-import { resolveNodeTextDirection } from '@open-pencil/scene-graph/text/direction'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { textLengthPixels } from '@pairdraw/scene-graph/text'
+import { resolveNodeTextDirection } from '@pairdraw/scene-graph/text/direction'
 
 import {
   drawnFontVariations,

@@ -135,7 +135,7 @@ function outline() {
   }
 }
 
-const request = __openpencilReadRequest
+const request = __pairdrawReadRequest
 if (!request || request.kind === 'element') {
   return JSON.stringify(readOne(request && request.selector ? String(request.selector) : ''))
 }

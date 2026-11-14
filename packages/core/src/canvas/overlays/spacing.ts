@@ -1,6 +1,6 @@
 import type { Canvas } from 'canvaskit-wasm'
 
-import type { SnapGuide } from '@open-pencil/scene-graph/snap'
+import type { SnapGuide } from '@pairdraw/scene-graph/snap'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import { SNAP_COLOR, SPACING_GUIDE_CAP } from '#core/constants'

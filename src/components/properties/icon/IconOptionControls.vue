@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import type { IconOption } from '@open-pencil/core/icons'
-import type { IconOptions } from '@open-pencil/scene-graph/icons'
-import { usePanelMessages } from '@open-pencil/vue/i18n'
+import type { IconOption } from '@pairdraw/core/icons'
+import type { IconOptions } from '@pairdraw/scene-graph/icons'
+import { usePanelMessages } from '@pairdraw/vue/i18n'
 
 import NumberField from '@/components/inputs/NumberField.vue'
 import PanelFieldGroup from '@/components/ui/panel/PanelFieldGroup.vue'

@@ -5,7 +5,7 @@ import {
   type LibraryCatalog,
   type LibrarySummary,
   type PublishLibraryInput
-} from '@open-pencil/core/library'
+} from '@pairdraw/core/library'
 
 import type { LocalLibraryCatalog } from './local'
 

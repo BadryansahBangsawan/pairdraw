@@ -38,7 +38,7 @@ function createElement(
 
 function helper(name: string) {
   return (...args: unknown[]): DesignJSXHelperDescriptor => ({
-    __openPencilHelper: name,
+    __pairdrawHelper: name,
     args
   })
 }

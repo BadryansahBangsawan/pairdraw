@@ -3,7 +3,7 @@ import * as v from 'valibot'
 import {
   CaptureClipboardUnavailableError,
   writeWebCaptureClipboard
-} from '@open-pencil/web-capture/capturer'
+} from '@pairdraw/web-capture/capturer'
 
 import { isMessageKey, t } from './i18n'
 import { ALL_SITES } from './messages'

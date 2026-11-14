@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 
-import { createEditor, editedImageLayout, type Editor } from '@open-pencil/core'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import { getWorldMatrix } from '@open-pencil/scene-graph/coordinate'
-import Matrix from '@open-pencil/scene-graph/matrix'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import { createEditor, editedImageLayout, type Editor } from '@pairdraw/core'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import Matrix from '@pairdraw/scene-graph/matrix'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { MOVE_CURSOR } from '#vue/shared/input/geometry'
 import { imageCropCursor } from '#vue/shared/input/image-crop'

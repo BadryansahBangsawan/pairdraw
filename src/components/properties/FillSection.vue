@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { Fill, SceneNode } from '@open-pencil/scene-graph'
-import { colorToHexRaw } from '@open-pencil/scene-graph/color'
-import type { Color } from '@open-pencil/scene-graph/primitives'
-import { isShaderSourcePaint, shaderOfPaint } from '@open-pencil/scene-graph/shaders'
-import { useColorBindingProvider } from '@open-pencil/vue/controls/binding-provider'
-import { useFillControls } from '@open-pencil/vue/controls/fill'
-import { useOkHCL } from '@open-pencil/vue/controls/okhcl'
-import { useI18n } from '@open-pencil/vue/i18n'
-import { useSceneComputed } from '@open-pencil/vue/internal/scene-computed'
+import type { Fill, SceneNode } from '@pairdraw/scene-graph'
+import { colorToHexRaw } from '@pairdraw/scene-graph/color'
+import type { Color } from '@pairdraw/scene-graph/primitives'
+import { isShaderSourcePaint, shaderOfPaint } from '@pairdraw/scene-graph/shaders'
+import { useColorBindingProvider } from '@pairdraw/vue/controls/binding-provider'
+import { useFillControls } from '@pairdraw/vue/controls/fill'
+import { useOkHCL } from '@pairdraw/vue/controls/okhcl'
+import { useI18n } from '@pairdraw/vue/i18n'
+import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
 import {
   BindableValueRoot,
   type BindableValueActions
-} from '@open-pencil/vue/primitives/BindableValue'
+} from '@pairdraw/vue/primitives/BindableValue'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import FillPicker from '@/components/fill-picker/FillPicker.vue'

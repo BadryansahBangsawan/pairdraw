@@ -1,14 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 
-import { BUILTIN_IO_FORMATS, IORegistry } from '@open-pencil/core/io'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { BUILTIN_IO_FORMATS, IORegistry } from '@pairdraw/core/io'
+import { SceneGraph } from '@pairdraw/scene-graph'
 import {
   DEFAULT_EXPORT_QUALITY,
   EXPORT_FORMAT_IDS,
   clampExportQuality,
   isExportFormatId
-} from '@open-pencil/scene-graph/export-format'
-import { OPEN_PENCIL_PLUGIN_DATA, readPluginData } from '@open-pencil/scene-graph/plugin-data'
+} from '@pairdraw/scene-graph/export-format'
+import { PAIRDRAW_PLUGIN_DATA, readPluginData } from '@pairdraw/scene-graph/plugin-data'
 
 const io = new IORegistry(BUILTIN_IO_FORMATS)
 
@@ -45,7 +45,7 @@ describe('export setting formats', () => {
     const frame = graph.createNode('FRAME', graph.getPages()[0].id, { name: 'Card' })
     const pluginData = [
       {
-        pluginId: 'open-pencil',
+        pluginId: 'pairdraw',
         key: 'exportSettings',
         value: JSON.stringify([
           { scale: 1, format: 'jpg', quality: 300 },
@@ -56,7 +56,7 @@ describe('export setting formats', () => {
     graph.updateNode(frame.id, { pluginData })
     const node = graph.getNode(frame.id)
     if (!node) throw new Error('Expected the frame')
-    expect(readPluginData(node.pluginData, OPEN_PENCIL_PLUGIN_DATA.exportSettings)).toEqual([
+    expect(readPluginData(node.pluginData, PAIRDRAW_PLUGIN_DATA.exportSettings)).toEqual([
       { scale: 1, format: 'jpg', quality: 100 },
       { scale: 2, format: 'png' }
     ])
@@ -145,7 +145,7 @@ describe('HTML export layer attributes', () => {
       target: { scope: 'node', nodeId: card.id }
     })
     expect(String(result.data)).toContain('data-name="Pricing card"')
-    expect(String(result.data)).not.toContain('data-open-pencil-node-id')
+    expect(String(result.data)).not.toContain('data-pairdraw-node-id')
   })
 
   test('either attribute can be turned around', async () => {
@@ -156,6 +156,6 @@ describe('HTML export layer attributes', () => {
       { layerNames: false, layerIds: true }
     )
     expect(String(result.data)).not.toContain('data-name=')
-    expect(String(result.data)).toContain(`data-open-pencil-node-id="${card.id}"`)
+    expect(String(result.data)).toContain(`data-pairdraw-node-id="${card.id}"`)
   })
 })

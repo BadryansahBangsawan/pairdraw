@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import { layoutAuthoredNodes } from '@open-pencil/core/layout'
-import { parsePenFile, type PenDocument, type PenIconSource, type PenNode } from '@open-pencil/pen'
-import { getNodeLocalMatrix } from '@open-pencil/scene-graph/coordinate'
-import Matrix from '@open-pencil/scene-graph/matrix'
+import { layoutAuthoredNodes } from '@pairdraw/core/layout'
+import { parsePenFile, type PenDocument, type PenIconSource, type PenNode } from '@pairdraw/pen'
+import { getNodeLocalMatrix } from '@pairdraw/scene-graph/coordinate'
+import Matrix from '@pairdraw/scene-graph/matrix'
 
 function parseLayoutDocument(
   children: PenNode[],

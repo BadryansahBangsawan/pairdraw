@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
-import type { SceneNode, TextPathData, VectorNetwork } from '@open-pencil/scene-graph'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import type { SceneNode, TextPathData, VectorNetwork } from '@pairdraw/scene-graph'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import {
   calibratePathTextLayout,

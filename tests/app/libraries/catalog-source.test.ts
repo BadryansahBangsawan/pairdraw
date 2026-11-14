@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import 'fake-indexeddb/auto'
 
-import type { LibraryCatalog, LibrarySummary } from '@open-pencil/core/library'
+import type { LibraryCatalog, LibrarySummary } from '@pairdraw/core/library'
 
 import { restoreLibraryCatalogSource } from '@/app/libraries/catalog/active-storage'
 import { LibraryService } from '@/app/libraries/service'

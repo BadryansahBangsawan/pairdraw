@@ -1,12 +1,12 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
+import { createEditor } from '@pairdraw/core'
 import {
   svgToVectorPaths,
   VECTORIZE_RESULT_GAP,
   vectorizableImageFill
-} from '@open-pencil/core/vector'
-import type { Fill } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/vector'
+import type { Fill } from '@pairdraw/scene-graph'
 
 import { expectDefined, getNodeOrThrow } from '../helpers/assert'
 

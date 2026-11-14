@@ -1,5 +1,5 @@
-import type { Editor } from '@open-pencil/core'
-import type { SceneNode, TextListType } from '@open-pencil/scene-graph'
+import type { Editor } from '@pairdraw/core'
+import type { SceneNode, TextListType } from '@pairdraw/scene-graph'
 
 import { extendSelectionForDeletion, handleNavigationKey } from './navigation'
 

@@ -7,12 +7,12 @@ import {
   htmlToDesignDocument,
   htmlToSceneGraph,
   tailwindHTMLToSceneGraph
-} from '@open-pencil/dom-css'
-import { sceneGraphToDesignDocument, serializeHTML } from '@open-pencil/dom-css/export'
-import { designDocumentToSceneGraph } from '@open-pencil/dom-css/scene-graph'
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { parseColor } from '@open-pencil/scene-graph/color'
-import { pixelLength } from '@open-pencil/scene-graph/text'
+} from '@pairdraw/dom-css'
+import { sceneGraphToDesignDocument, serializeHTML } from '@pairdraw/dom-css/export'
+import { designDocumentToSceneGraph } from '@pairdraw/dom-css/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { parseColor } from '@pairdraw/scene-graph/color'
+import { pixelLength } from '@pairdraw/scene-graph/text'
 
 import { shadowEffectAt } from '#tests/helpers/assert'
 import {
@@ -143,7 +143,7 @@ function expectStyleRoundTripHTML(graph: SceneGraph) {
   expectRoundTripHeadingStyle(roundTripHeading)
 }
 
-describe('@open-pencil/dom-css conversion', () => {
+describe('@pairdraw/dom-css conversion', () => {
   it('converts HTML and CSS to DesignDOM with one API call', async () => {
     const document = await htmlToDesignDocument(cssCardHTML, {
       cssText: cssCardCSS,
@@ -173,7 +173,7 @@ describe('@open-pencil/dom-css conversion', () => {
   it('converts Tailwind HTML through generated CSS to a scene graph', async () => {
     const classes = [...tailwindCardClasses]
     const graph = await tailwindHTMLToSceneGraph(
-      `<article class="${classes.join(' ')}"><h1>OpenPencil</h1></article>`,
+      `<article class="${classes.join(' ')}"><h1>Pairdraw</h1></article>`,
       classes,
       { runtime: createHeadlessCSSRuntime() }
     )
@@ -204,7 +204,7 @@ describe('@open-pencil/dom-css conversion', () => {
 
     const title = card ? graph.getChildren(card.id)[0] : undefined
     expect(title?.type).toBe('TEXT')
-    expect(title?.text).toBe('OpenPencil')
+    expect(title?.text).toBe('Pairdraw')
     expect(title?.fontSize).toBe(24)
     expect(title?.fontWeight).toBe(700)
   })
@@ -240,7 +240,7 @@ describe('@open-pencil/dom-css conversion', () => {
 
     const roundTrip = sceneGraphToDesignDocument(graph)
     const html = serializeHTML(roundTrip)
-    expect(html).toContain('OpenPencil')
+    expect(html).toContain('Pairdraw')
     expect(html).toContain('Design with code-shaped CSS.')
     expect(html).toContain('box-shadow')
   })
@@ -522,7 +522,7 @@ describe('@open-pencil/dom-css conversion', () => {
     const document = await runtime.computeStyles(
       runtime.parseHTML(`
         <nav class="${navClasses.join(' ')}">
-          <span>OpenPencil</span>
+          <span>Pairdraw</span>
           <span class="${badgeClasses.join(' ')}">Beta</span>
         </nav>
         <input class="${inputClasses.join(' ')}" value="https://openpencil.dev" />
@@ -562,7 +562,7 @@ describe('@open-pencil/dom-css conversion', () => {
     const runtime = createHeadlessCSSRuntime()
     const classes = [...tailwindCardClasses]
     const document = await runtime.computeStyles(
-      runtime.parseHTML(`<article class="${classes.join(' ')}"><h1>OpenPencil</h1></article>`),
+      runtime.parseHTML(`<article class="${classes.join(' ')}"><h1>Pairdraw</h1></article>`),
       await compileTailwindCSS(classes)
     )
     const graph = designDocumentToSceneGraph(document)
@@ -598,7 +598,7 @@ describe('@open-pencil/dom-css conversion', () => {
     })
     expect(card.inlineStyle?.display).toBe('flex')
     expect(card.inlineStyle?.['flex-direction']).toBe('column')
-    expect(card.attrs['data-open-pencil-node-id']).toBeTruthy()
+    expect(card.attrs['data-pairdraw-node-id']).toBeTruthy()
 
     const title = card.children[0]
     expect(title?.type).toBe('element')

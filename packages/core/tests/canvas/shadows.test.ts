@@ -1,13 +1,13 @@
 import { afterAll, describe, expect, test } from "bun:test";
 
-import { SkiaRenderer } from "@open-pencil/core/canvas";
-import { initCanvasKit } from "@open-pencil/core/io/formats/raster";
+import { SkiaRenderer } from "@pairdraw/core/canvas";
+import { initCanvasKit } from "@pairdraw/core/io/formats/raster";
 import {
   SceneGraph,
   type Effect,
   type ShadowEffect,
   type SceneNode,
-} from "@open-pencil/scene-graph";
+} from "@pairdraw/scene-graph";
 
 import { separateShadowChildren } from "#core/canvas/shadows/silhouette";
 

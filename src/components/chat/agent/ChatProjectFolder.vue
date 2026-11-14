@@ -9,7 +9,7 @@ import {
 import { tv } from 'tailwind-variants'
 import { computed, ref } from 'vue'
 
-import { useAgentMessages } from '@open-pencil/vue/i18n'
+import { useAgentMessages } from '@pairdraw/vue/i18n'
 
 import { projectFolderStartMode } from '@/app/ai/agents/acp/session/store'
 import {

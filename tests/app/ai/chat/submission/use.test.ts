@@ -4,8 +4,8 @@ import type { Chat } from '@ai-sdk/vue'
 import type { UIMessage } from 'ai'
 import { ref, shallowRef } from 'vue'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
-import { withAgentNotes } from '@open-pencil/scene-graph/agent-notes'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import { withAgentNotes } from '@pairdraw/scene-graph/agent-notes'
 
 import { AgentSetupError } from '@/app/ai/agents/setup/readiness'
 import { attachmentsForMessage } from '@/app/ai/attachment/presentation/store'

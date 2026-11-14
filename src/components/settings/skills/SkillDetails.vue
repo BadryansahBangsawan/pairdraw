@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useAIMessages, useCommonMessages } from '@open-pencil/vue/i18n'
+import { useAIMessages, useCommonMessages } from '@pairdraw/vue/i18n'
 
 import type { SelectedSkill } from '@/app/ai/skills/settings/use'
 import MarkdownContent from '@/components/markdown/MarkdownContent.vue'
@@ -24,7 +24,7 @@ const common = useCommonMessages()
 const messages = useSkillMessages()
 
 const skill = computed(() => entry.skill)
-const uploaded = computed(() => skill.value.source === 'openpencil')
+const uploaded = computed(() => skill.value.source === 'pairdraw')
 /** Uploads and built-in skills have no place on disk to show. */
 const located = computed(() => !uploaded.value && skill.value.source !== 'builtin')
 const useDescription = computed(() => {

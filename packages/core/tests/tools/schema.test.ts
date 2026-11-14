@@ -2,9 +2,9 @@ import { describe, expect, test } from 'bun:test'
 
 import * as v from 'valibot'
 
-import { FigmaAPI } from '@open-pencil/core/figma-api'
-import { ALL_TOOLS, defineTool } from '@open-pencil/core/tools'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { ALL_TOOLS, defineTool } from '@pairdraw/core/tools'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 const tool = defineTool({
   name: 'place_box',

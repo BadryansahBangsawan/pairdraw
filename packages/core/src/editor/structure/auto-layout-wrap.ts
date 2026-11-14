@@ -1,6 +1,6 @@
-import type { LayoutMode, SceneNode } from '@open-pencil/scene-graph'
-import { getAxisAlignedBoundsInParent } from '@open-pencil/scene-graph/coordinate'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import type { LayoutMode, SceneNode } from '@pairdraw/scene-graph'
+import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 import { wrapParentId } from '#core/editor/structure/container-wrap'
 import type { EditorContext } from '#core/editor/types'

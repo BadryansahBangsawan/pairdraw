@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { tv } from 'tailwind-variants'
 
-import { colorToCSS, readableForeground } from '@open-pencil/scene-graph/color'
-import { useInlineRename } from '@open-pencil/vue/editor/inline-rename'
-import { useI18n } from '@open-pencil/vue/i18n'
+import { colorToCSS, readableForeground } from '@pairdraw/scene-graph/color'
+import { useInlineRename } from '@pairdraw/vue/editor/inline-rename'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { initials } from '@/app/presence/initials'
 import type { FollowTarget } from '@/app/presence/types'

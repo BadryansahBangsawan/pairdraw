@@ -3,10 +3,10 @@ import { useLocalStorage } from '@vueuse/core'
 import { tv } from 'tailwind-variants'
 import { computed, ref } from 'vue'
 
-import type { LibrarySummary } from '@open-pencil/core/library'
-import type { DocumentKind } from '@open-pencil/scene-graph'
-import { useDocumentWorkspace } from '@open-pencil/vue/document/workspace'
-import { useI18n } from '@open-pencil/vue/i18n'
+import type { LibrarySummary } from '@pairdraw/core/library'
+import type { DocumentKind } from '@pairdraw/scene-graph'
+import { useDocumentWorkspace } from '@pairdraw/vue/document/workspace'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { agentAutoConnect } from '@/app/ai/agents/auto/session'
 import { createImagePreviewURL } from '@/app/ai/attachment/image/prepare'
@@ -65,7 +65,7 @@ import { IS_TAURI } from '@/constants'
 import documentsTheme from '@/theme/home/documents'
 
 const { ai, locale, storage, files, settings } = useI18n()
-const view = useLocalStorage<'grid' | 'list'>('open-pencil:home-files-view', 'grid')
+const view = useLocalStorage<'grid' | 'list'>('pairdraw:home-files-view', 'grid')
 const query = ref('')
 const openError = ref<string | null>(null)
 const storageConfigured = ref(storagePreferencesComplete(activeStorageProviderID.value))
@@ -80,7 +80,7 @@ function newDocument(kind: DocumentKind): Tab {
 
 const prompt = ref('')
 /** What Home's prompt is going to make, kept between visits. */
-const creationKind = useLocalStorage<CreationKindId>('open-pencil:home-creation-kind', 'landing')
+const creationKind = useLocalStorage<CreationKindId>('pairdraw:home-creation-kind', 'landing')
 const startingFromPrompt = ref(false)
 /** Says why the prompt has not gone yet while it looks for a coding agent on this computer. */
 const promptStatus = computed(() =>

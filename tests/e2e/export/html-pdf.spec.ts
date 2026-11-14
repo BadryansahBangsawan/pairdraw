@@ -2,7 +2,7 @@ import type { Download } from '@playwright/test'
 import { strFromU8, unzipSync } from 'fflate'
 import { toUint8Array } from 'js-base64'
 
-import type { ExportSetting } from '@open-pencil/scene-graph'
+import type { ExportSetting } from '@pairdraw/scene-graph'
 
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
 import { propertyItems } from '#tests/helpers/properties'
@@ -43,8 +43,8 @@ async function downloadedBytes(download: Download): Promise<Uint8Array> {
 async function createCard(settings: ExportSetting[]) {
   await editor.page.evaluate(
     ({ nodeSettings, png }) => {
-      const store = window.openPencil?.getStore?.()
-      if (!store) throw new Error('OpenPencil store not initialized')
+      const store = window.pairdraw?.getStore?.()
+      if (!store) throw new Error('Pairdraw store not initialized')
       const id = store.createShape('FRAME', 100, 100, 200, 120)
       store.graph.updateNode(id, { name: 'Pricing card', exportSettings: nodeSettings })
       store.graph.images.set('pixel', new Uint8Array(png))
@@ -86,7 +86,7 @@ test('HTML export writes layer names and leaves layer IDs out by default', async
   const html = strFromU8(await downloadedBytes(download))
   expect(html).toContain('<!doctype html>')
   expect(html).toContain('data-name="Pricing card"')
-  expect(html).not.toContain('data-open-pencil-node-id')
+  expect(html).not.toContain('data-pairdraw-node-id')
   expect(html).toContain('data:image/png;base64,')
   editor.canvas.assertNoErrors()
 })
@@ -104,7 +104,7 @@ test('a JPG row takes a quality, saved with the layer', async () => {
   await expect
     .poll(() =>
       editor.page.evaluate(() => {
-        const store = window.openPencil?.getStore?.()
+        const store = window.pairdraw?.getStore?.()
         const id = [...(store?.state.selectedIds ?? [])][0]
         return id ? store?.graph.getNode(id)?.exportSettings : undefined
       })
@@ -130,8 +130,8 @@ function pageWidths(bytes: Uint8Array): number[] {
 
 test('a PDF row exports several selected layers as one PDF in selection order', async () => {
   await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const ids = [320, 480, 640].map((width, index) => {
       const id = store.createShape('FRAME', index * 700, 0, width, 180)
       store.graph.updateNode(id, {
@@ -174,14 +174,14 @@ test('the Code panel exports the selection as HTML', async () => {
 
 test('Vue components draw icons from the chosen package', async () => {
   await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const card = store.createShape('FRAME', 100, 100, 120, 40)
     store.graph.updateNode(card, { name: 'Card', layoutMode: 'HORIZONTAL' })
     const icon = store.graph.createNode('FRAME', card, { name: 'bell', width: 16, height: 16 })
     store.graph.updateNode(icon.id, {
       pluginData: [
-        { pluginId: 'open-pencil', key: 'icon', value: JSON.stringify({ name: 'lucide:bell' }) }
+        { pluginId: 'pairdraw', key: 'icon', value: JSON.stringify({ name: 'lucide:bell' }) }
       ]
     })
     store.graph.createNode('VECTOR', icon.id, { name: 'path', width: 16, height: 16 })
@@ -229,6 +229,6 @@ test('HTML export options make a fragment with separate image files in a zip', a
   expect(html).not.toContain('<!doctype html>')
   // The image is linked by URL, so the space in the file's folder name is percent-encoded.
   expect(html).toContain('src="Pricing%20card.assets/images/image-1.png"')
-  expect(html).toContain('data-open-pencil-node-id')
+  expect(html).toContain('data-pairdraw-node-id')
   editor.canvas.assertNoErrors()
 })

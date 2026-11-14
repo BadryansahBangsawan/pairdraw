@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 
 import { createEditor } from '#core/editor'
 

@@ -1,12 +1,12 @@
 import { fromUint8Array } from 'js-base64'
 
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { BLACK } from '@open-pencil/scene-graph/constants'
-import { readIcon } from '@open-pencil/scene-graph/icons'
-import { imageMimeType } from '@open-pencil/scene-graph/images'
-import { layoutSizingInParent } from '@open-pencil/scene-graph/layout'
-import { isShaderPresetPaint, shaderOfPaint } from '@open-pencil/scene-graph/shaders'
-import { resolveNodeTextDirection } from '@open-pencil/scene-graph/text/direction'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { BLACK } from '@pairdraw/scene-graph/constants'
+import { readIcon } from '@pairdraw/scene-graph/icons'
+import { imageMimeType } from '@pairdraw/scene-graph/images'
+import { layoutSizingInParent } from '@pairdraw/scene-graph/layout'
+import { isShaderPresetPaint, shaderOfPaint } from '@pairdraw/scene-graph/shaders'
+import { resolveNodeTextDirection } from '@pairdraw/scene-graph/text/direction'
 
 import { DesignTokens, type CSSModes } from '../tokens/references'
 import type { DesignDocument, DesignElement, DesignNode, DesignStyleDeclaration } from '../types'
@@ -22,7 +22,7 @@ import {
 import { addGridContainer, addGridPlacement } from './grid'
 import { textCaseToCSS, textElementContent } from './text'
 
-const DOM_CSS_PLUGIN_ID = 'open-pencil-dom-css'
+const DOM_CSS_PLUGIN_ID = 'pairdraw-dom-css'
 const IMAGE_SOURCE_URL_KEY = 'image-source-url'
 
 /**
@@ -33,7 +33,7 @@ export type VectorElementRenderer = (graph: SceneGraph, node: SceneNode) => Desi
 
 export interface SceneGraphToDesignOptions {
   rootId?: string
-  /** Write each layer's ID as `data-open-pencil-node-id`. Default true. */
+  /** Write each layer's ID as `data-pairdraw-node-id`. Default true. */
   includeSourceIds?: boolean
   /** Write each layer's own name as `data-name`, as the Tailwind JSX export does. Default false. */
   includeLayerNames?: boolean
@@ -412,7 +412,7 @@ function attrsForNode(
   const attrs: Record<string, string> = {}
   const name = includeLayerNames ? ownLayerName(node) : undefined
   if (name) attrs['data-name'] = name
-  if (includeSourceIds) attrs['data-open-pencil-node-id'] = node.id
+  if (includeSourceIds) attrs['data-pairdraw-node-id'] = node.id
   const sourceURL = imageSourceURL(node)
   if (sourceURL) attrs.src = sourceURL
   const fill = node.fills.at(0)

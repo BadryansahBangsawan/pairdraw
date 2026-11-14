@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { chatAgentTheme } from '@/components/chat/ui'
 import AppButton from '@/components/ui/button/AppButton.vue'

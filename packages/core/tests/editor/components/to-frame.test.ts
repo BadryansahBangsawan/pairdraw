@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { createComponentPropertyId } from '@open-pencil/scene-graph/components'
+import { createEditor } from '@pairdraw/core'
+import { createComponentPropertyId } from '@pairdraw/scene-graph/components'
 
 function setup() {
   const editor = createEditor()

@@ -1,6 +1,6 @@
-import type { Editor, EditorState } from '@open-pencil/core'
-import { sceneGraphFromStyledHTML } from '@open-pencil/core/io/formats/html/layers'
-import { browserHTMLToDesignDocument } from '@open-pencil/dom-css/browser'
+import type { Editor, EditorState } from '@pairdraw/core'
+import { sceneGraphFromStyledHTML } from '@pairdraw/core/io/formats/html/layers'
+import { browserHTMLToDesignDocument } from '@pairdraw/dom-css/browser'
 
 import { describeDiagnosticError, recordDocumentFailure } from '@/app/diagnostics'
 import { yieldToUI } from '@/app/document/io/browser'

@@ -5,9 +5,9 @@ import {
   parseFigFile,
   populateAllFigPages,
   populateFigPage
-} from '@open-pencil/core/io/formats/fig'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/io/formats/fig'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 async function createLazyGraph() {
   await initCodec()

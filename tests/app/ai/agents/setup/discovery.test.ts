@@ -1,6 +1,6 @@
 import { describe, expect, test, mock } from 'bun:test'
 
-import type { ACPAgentDef } from '@open-pencil/core/constants'
+import type { ACPAgentDef } from '@pairdraw/core/constants'
 
 import { createAgentDiscovery, detectedAgents } from '@/app/ai/agents/setup/discovery'
 import type { AgentLookup } from '@/app/ai/agents/setup/native'
@@ -8,8 +8,8 @@ import { createDeferred } from '@/app/runtime/deferred'
 
 // Installed companions report the version of the app under test, as matching ones do.
 const COMPANION_PACKAGES: Record<string, string> = {
-  'openpencil-mcp-http': '@open-pencil/mcp',
-  'openpencil-harness': '@open-pencil/harness'
+  'pairdraw-mcp-http': '@pairdraw/mcp',
+  'pairdraw-harness': '@pairdraw/harness'
 }
 
 function lookup(...commands: string[]): AgentLookup {
@@ -36,7 +36,7 @@ describe('local agent discovery', () => {
     const restartBridge = mock(async () => undefined)
     const discovery = createAgentDiscovery({
       enabled: true,
-      lookup: async () => lookup('gemini', 'npm', ...(installed ? ['openpencil-mcp-http'] : [])),
+      lookup: async () => lookup('gemini', 'npm', ...(installed ? ['pairdraw-mcp-http'] : [])),
       install: async () => undefined,
       installBridge,
       restartBridge
@@ -62,10 +62,10 @@ describe('local agent discovery', () => {
       enabled: true,
       lookup: async () => ({
         searchPath: '/home/test/.bun/bin',
-        versions: { '@open-pencil/mcp': version },
+        versions: { '@pairdraw/mcp': version },
         executables: {
           bun: '/home/test/.bun/bin/bun',
-          'openpencil-mcp-http': '/home/test/.bun/bin/openpencil-mcp-http'
+          'pairdraw-mcp-http': '/home/test/.bun/bin/pairdraw-mcp-http'
         }
       }),
       install: async () => undefined,
@@ -111,7 +111,7 @@ describe('local agent discovery', () => {
     await discovery.refresh()
     expect(discovery.canvasBridgeNeedsAdmin.value).toBe(true)
     // Outside Windows the command an administrator runs goes through sudo.
-    expect(discovery.canvasBridgeCommand.value).toStartWith('sudo npm i -g @open-pencil/mcp@')
+    expect(discovery.canvasBridgeCommand.value).toStartWith('sudo npm i -g @pairdraw/mcp@')
     await discovery.setupCanvasBridge()
     expect(installBridge).not.toHaveBeenCalled()
     expect(discovery.error.value).toBe('npm-admin')
@@ -127,7 +127,7 @@ describe('local agent discovery', () => {
     })
     const discovery = createAgentDiscovery({
       enabled: true,
-      lookup: async () => lookup('gemini', 'openpencil-mcp-http'),
+      lookup: async () => lookup('gemini', 'pairdraw-mcp-http'),
       install: async () => undefined,
       installBridge,
       restartBridge
@@ -275,7 +275,7 @@ describe('Harness companion setup', () => {
     })
     const discovery = createAgentDiscovery({
       enabled: true,
-      lookup: async () => lookup('npm', ...(installed ? ['openpencil-harness'] : [])),
+      lookup: async () => lookup('npm', ...(installed ? ['pairdraw-harness'] : [])),
       install: async () => undefined,
       installHarness
     })
@@ -295,8 +295,8 @@ describe('Harness companion setup', () => {
     const discovery = createAgentDiscovery({
       enabled: true,
       lookup: async () => ({
-        ...lookup('npm', 'openpencil-harness'),
-        versions: { '@open-pencil/harness': version }
+        ...lookup('npm', 'pairdraw-harness'),
+        versions: { '@pairdraw/harness': version }
       }),
       install: async () => undefined,
       installHarness
@@ -316,8 +316,8 @@ describe('Harness companion setup', () => {
       enabled: true,
       lookup: async () => ({
         searchPath: '/test/bin',
-        executables: { npm: '/test/bin/npm', 'openpencil-mcp-http': '/home/me/.bun/bin/mcp' },
-        versions: { '@open-pencil/mcp': '0.12.0' }
+        executables: { npm: '/test/bin/npm', 'pairdraw-mcp-http': '/home/me/.bun/bin/mcp' },
+        versions: { '@pairdraw/mcp': '0.12.0' }
       }),
       install: async () => undefined,
       installBridge,
@@ -325,7 +325,7 @@ describe('Harness companion setup', () => {
     })
     await discovery.refresh()
     // The app cannot find Bun, but the person's terminal may; the command keeps Bun.
-    expect(discovery.canvasBridgeCommand.value).toStartWith('bun add -g @open-pencil/mcp@')
+    expect(discovery.canvasBridgeCommand.value).toStartWith('bun add -g @pairdraw/mcp@')
     expect(discovery.canvasBridgeInstallable.value).toBe(false)
     await discovery.setupCanvasBridge()
     expect(installBridge).not.toHaveBeenCalled()

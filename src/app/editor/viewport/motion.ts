@@ -1,5 +1,5 @@
-import type { Editor } from '@open-pencil/core'
-import { setViewportMotion } from '@open-pencil/vue/canvas'
+import type { Editor } from '@pairdraw/core'
+import { setViewportMotion } from '@pairdraw/vue/canvas'
 
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { animationsEnabled } from '@/app/shell/motion'

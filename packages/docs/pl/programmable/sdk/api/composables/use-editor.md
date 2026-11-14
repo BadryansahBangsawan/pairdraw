@@ -14,7 +14,7 @@ To główny punkt wejścia dla composables i komponentów bez narzuconego wyglą
 Wywołaj `useEditor()` wewnątrz drzewa komponentów, w którym wcześniej wykonano `provideEditor(editor)`.
 
 ```ts
-import { useEditor } from '@open-pencil/vue'
+import { useEditor } from '@pairdraw/vue'
 
 const editor = useEditor()
 ```
@@ -25,7 +25,7 @@ const editor = useEditor()
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useEditor } from '@open-pencil/vue'
+import { useEditor } from '@pairdraw/vue'
 
 const editor = useEditor()
 const pageId = computed(() => editor.state.currentPageId)

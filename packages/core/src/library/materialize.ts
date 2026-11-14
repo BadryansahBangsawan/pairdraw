@@ -1,6 +1,6 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { libraryDefinitionsPage } from '@open-pencil/scene-graph/components'
-import { cloneNodeProps } from '@open-pencil/scene-graph/copy'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { libraryDefinitionsPage } from '@pairdraw/scene-graph/components'
+import { cloneNodeProps } from '@pairdraw/scene-graph/copy'
 
 import { remapCopiedReferences } from './copied-references'
 import { findLibraryDefinition } from './definitions'

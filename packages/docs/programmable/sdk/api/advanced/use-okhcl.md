@@ -16,7 +16,7 @@ Pairdraw editor.
 ## Usage
 
 ```ts
-import { useOkHCL } from '@open-pencil/vue/controls/okhcl'
+import { useOkHCL } from '@pairdraw/vue/controls/okhcl'
 
 const okhcl = useOkHCL()
 

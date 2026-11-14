@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 import { ref } from 'vue'
 
-import { DEFAULT_SHADER_PRESET, SHADER_GALLERY } from '@open-pencil/vue/controls/shader'
+import { DEFAULT_SHADER_PRESET, SHADER_GALLERY } from '@pairdraw/vue/controls/shader'
 
 import ShaderFillPickerGallery from './ShaderFillPickerGallery.vue'
 

@@ -11,11 +11,11 @@ test.describe('a populated recent files list', () => {
             origin: new URL(baseURL).origin,
             localStorage: [
               {
-                name: 'open-pencil:preferences:v1',
+                name: 'pairdraw:preferences:v1',
                 value: JSON.stringify({ version: 1, onboarding: { aiSetup: 'done' } })
               },
               {
-                name: 'open-pencil:recent-documents',
+                name: 'pairdraw:recent-documents',
                 value: JSON.stringify(
                   Array.from({ length: 12 }, (_, index) => ({
                     id: `local:/design-${index}.fig`,

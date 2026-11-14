@@ -1,4 +1,4 @@
-import { svgToVectorPaths, vectorizableImageFill } from '@open-pencil/core/vector'
+import { svgToVectorPaths, vectorizableImageFill } from '@pairdraw/core/vector'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { notificationMessages } from '@/app/i18n/notifications'

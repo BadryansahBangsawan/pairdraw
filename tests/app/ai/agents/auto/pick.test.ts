@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { ACPAgentID } from '@open-pencil/core/constants'
+import type { ACPAgentID } from '@pairdraw/core/constants'
 
 import { rankAgentCandidates } from '@/app/ai/agents/auto/pick'
 import type { AgentAccount } from '@/app/ai/agents/setup/accounts'

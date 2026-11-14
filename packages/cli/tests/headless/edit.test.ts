@@ -3,9 +3,9 @@ import { join } from 'node:path'
 
 import { FIXTURES } from '#cli-tests/helpers/paths'
 
-import { computeAllLayouts, getTextMeasurer } from '@open-pencil/core/layout'
-import { fontManager } from '@open-pencil/core/text'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { computeAllLayouts, getTextMeasurer } from '@pairdraw/core/layout'
+import { fontManager } from '@pairdraw/core/text'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { editDocument, measureTextHeadlessly } from '#cli/headless'
 

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 
-import { useI18n } from '@open-pencil/vue/i18n'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import { toast } from '@/app/shell/ui'
 import { checkForAppUpdate } from '@/app/shell/updater/check'
@@ -132,7 +132,7 @@ describe('checkForAppUpdate', () => {
     await mockTauriIPC((cmd) => {
       calls.push(cmd)
       if (cmd === 'plugin:app|bundle_type') return 'deb'
-      if (cmd === 'plugin:path|resolve_directory') return '/usr/lib/OpenPencil'
+      if (cmd === 'plugin:path|resolve_directory') return '/usr/lib/Pairdraw'
       return null
     })
 
@@ -149,7 +149,7 @@ describe('checkForAppUpdate', () => {
       calls.push(cmd)
       if (cmd === 'plugin:app|bundle_type') return 'deb'
       if (cmd === 'plugin:path|resolve_directory') {
-        return '/home/ana/Apps/Pairdraw_0.16.0_amd64/usr/lib/OpenPencil'
+        return '/home/ana/Apps/Pairdraw_0.16.0_amd64/usr/lib/Pairdraw'
       }
       if (cmd === 'plugin:updater|check') return AVAILABLE_UPDATE
       return null

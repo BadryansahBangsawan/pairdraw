@@ -2,9 +2,9 @@ import { afterEach, describe, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
-import { createEditor, type Editor } from '@open-pencil/core'
-import { buildFigmaClipboardHTML } from '@open-pencil/core/clipboard'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
+import { createEditor, type Editor } from '@pairdraw/core'
+import { buildFigmaClipboardHTML } from '@pairdraw/core/clipboard'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
 
 let editor: Editor
 

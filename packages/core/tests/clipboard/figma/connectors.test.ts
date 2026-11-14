@@ -6,18 +6,18 @@ import * as v from 'valibot'
 import { expectDefined } from '#core-tests/helpers/assert'
 import { FIXTURES } from '#core-tests/helpers/paths'
 
-import { buildFigmaClipboardHTML, importClipboardNodes } from '@open-pencil/core/clipboard'
-import { parseFigmaClipboard } from '@open-pencil/fig/clipboard'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import { SceneGraph, type SceneNode } from '@open-pencil/scene-graph'
+import { buildFigmaClipboardHTML, importClipboardNodes } from '@pairdraw/core/clipboard'
+import { parseFigmaClipboard } from '@pairdraw/fig/clipboard'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
 import {
   boundEndpoint,
   connectorSublayers,
   createConnector,
   freeEndpoint,
   layoutConnector
-} from '@open-pencil/scene-graph/connectors'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/scene-graph/connectors'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 /** Two FigJam stickies joined by four connectors, as FigJam copies them. */
 const FIXTURE = join(FIXTURES, 'clipboard/figjam-connectors.html')

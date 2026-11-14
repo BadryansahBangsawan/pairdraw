@@ -1,7 +1,7 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { stickySublayers } from '@open-pencil/scene-graph/generated'
-import { readWebCitation } from '@open-pencil/scene-graph/plugin-data'
-import { aiMessages } from '@open-pencil/vue/i18n'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { stickySublayers } from '@pairdraw/scene-graph/generated'
+import { readWebCitation } from '@pairdraw/scene-graph/plugin-data'
+import { aiMessages } from '@pairdraw/vue/i18n'
 
 import { referenceLink } from '@/app/ai/chat/references/link'
 

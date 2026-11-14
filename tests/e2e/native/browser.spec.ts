@@ -55,8 +55,8 @@ describe('native built-in browser', () => {
   it('loads a page the separate WebView shows and acts on it', async function () {
     this.timeout(120_000)
     await browser.waitUntil(
-      async () => browser.execute(() => Boolean(window.openPencil?.getStore?.())),
-      { timeout: 30_000, timeoutMsg: 'OpenPencil editor did not initialize' }
+      async () => browser.execute(() => Boolean(window.pairdraw?.getStore?.())),
+      { timeout: 30_000, timeoutMsg: 'Pairdraw editor did not initialize' }
     )
 
     await invokeNative('browser_open', { url: pageURL })

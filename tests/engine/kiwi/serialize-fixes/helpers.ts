@@ -1,8 +1,8 @@
 import { beforeAll } from 'bun:test'
 
-import { sceneNodeToKiwi } from '@open-pencil/fig/node-change'
-import { initCodec } from '@open-pencil/kiwi/fig/codec'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+import { sceneNodeToKiwi } from '@pairdraw/fig/node-change'
+import { initCodec } from '@pairdraw/kiwi/fig/codec'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 
 beforeAll(async () => {
   await initCodec()

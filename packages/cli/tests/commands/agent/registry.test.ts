@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { ALL_TOOLS } from '@open-pencil/core/tools'
+import { ALL_TOOLS } from '@pairdraw/core/tools'
 import { agentToolDefinitions } from '#cli/agent/policy'
 import {
   AGENT_PROFILES,

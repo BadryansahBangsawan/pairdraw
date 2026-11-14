@@ -1,8 +1,8 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { getAxisAlignedBoundsInParent } from '@open-pencil/scene-graph/coordinate'
-import { copyEffects, copyStrokes } from '@open-pencil/scene-graph/copy'
-import { FITTED_CONTAINER_TYPES } from '@open-pencil/scene-graph/node-defaults'
-import type { Rect } from '@open-pencil/scene-graph/primitives'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
+import { copyEffects, copyStrokes } from '@pairdraw/scene-graph/copy'
+import { FITTED_CONTAINER_TYPES } from '@pairdraw/scene-graph/node-defaults'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 import {
   createVectorFrameChildren,

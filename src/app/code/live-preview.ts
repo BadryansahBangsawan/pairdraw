@@ -1,8 +1,8 @@
-import { renderTree } from '@open-pencil/core/design-jsx'
-import { computeAllLayouts } from '@open-pencil/core/layout'
-import { reconcileRenderedLayers, type TreeNode } from '@open-pencil/design-jsx'
-import type { SceneNode } from '@open-pencil/scene-graph'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
+import { renderTree } from '@pairdraw/core/design-jsx'
+import { computeAllLayouts } from '@pairdraw/core/layout'
+import { reconcileRenderedLayers, type TreeNode } from '@pairdraw/design-jsx'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { convertDesignJSXRoots } from '@/app/code/sandbox/convert'
 import { evaluateDesignJSX } from '@/app/code/sandbox/evaluate'

@@ -12,7 +12,7 @@ import {
 } from '#cloud/contract'
 import * as Y from 'yjs'
 
-import type { CommentThread } from '@open-pencil/scene-graph'
+import type { CommentThread } from '@pairdraw/scene-graph'
 
 const thread: CommentThread = {
   id: 't1',

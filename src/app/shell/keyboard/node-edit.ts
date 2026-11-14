@@ -1,7 +1,7 @@
 import { useEventListener } from '@vueuse/core'
 import type { Ref } from 'vue'
 
-import { resolveEditorProfile } from '@open-pencil/core'
+import { resolveEditorProfile } from '@pairdraw/core'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import type { VectorEditState } from '@/app/editor/vector/types'

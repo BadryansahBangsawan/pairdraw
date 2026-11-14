@@ -1,6 +1,6 @@
-import type { GUID } from '@open-pencil/kiwi/fig'
-import type { NodeChange } from '@open-pencil/kiwi/fig/codec'
-import { guidToString } from '@open-pencil/kiwi/fig/guid'
+import type { GUID } from '@pairdraw/kiwi/fig'
+import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import { guidToString } from '@pairdraw/kiwi/fig/guid'
 
 import { derivedSymbolDataOf, symbolDataOf, type SymbolData } from '../instance-overrides/types'
 
@@ -21,7 +21,7 @@ export interface FigEntryListPatch {
 
 /**
  * Fields an edit changed in a record the archive holds. The rest of the record stays as the
- * archive saved it, fields OpenPencil does not model included.
+ * archive saved it, fields Pairdraw does not model included.
  */
 export interface FigRecordFieldPatch {
   guid: GUID

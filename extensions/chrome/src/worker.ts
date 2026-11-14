@@ -1,7 +1,7 @@
 import { fromUint8Array } from 'js-base64'
 import * as v from 'valibot'
 
-import { MAX_CAPTURE_IMAGE_BYTES } from '@open-pencil/web-capture'
+import { MAX_CAPTURE_IMAGE_BYTES } from '@pairdraw/web-capture'
 
 import type { ImageResponse } from './messages'
 import { imageRequestSchema } from './schema'

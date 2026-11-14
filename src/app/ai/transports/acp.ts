@@ -10,7 +10,7 @@ import type {
 import type { ChatTransport, UIMessage, UIMessageChunk } from 'ai'
 import * as v from 'valibot'
 
-import type { ACPAgentDef } from '@open-pencil/core/constants'
+import type { ACPAgentDef } from '@pairdraw/core/constants'
 
 import { AgentSignInRequiredError } from '@/app/ai/agents/acp/auth/required'
 import { parseAuthStatusUpdate } from '@/app/ai/agents/acp/auth/status'
@@ -113,7 +113,7 @@ function isAuthRequiredError(e: unknown): boolean {
   return typeof e === 'object' && e !== null && 'code' in e && e.code === -32000
 }
 
-/** The agent never opened its session with OpenPencil's MCP server, so it has no design tools. */
+/** The agent never opened its session with Pairdraw's MCP server, so it has no design tools. */
 function toolsUnreachableError(agentDef: ACPAgentDef, reason: string | null): Error {
   return new Error(
     `${agentDef.name} couldn't reach ${APP_NAME}'s tools, so your message wasn't sent.` +
@@ -383,7 +383,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
       throw startupError(e, this.agentDef)
     }
 
-    // The agent must reach OpenPencil's tools before it gets a prompt.
+    // The agent must reach Pairdraw's tools before it gets a prompt.
     let tools: Awaited<ReturnType<typeof linkOwnTools>>
     try {
       tools = await linkOwnTools(automationAuthToken)

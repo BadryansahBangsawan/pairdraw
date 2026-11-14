@@ -5,7 +5,7 @@ import {
   SHADER_MAX_UNIFORM_FLOATS,
   SHADER_MAX_UNIFORMS,
   SHADER_SOURCE_MAX_BYTES
-} from '@open-pencil/scene-graph/shaders'
+} from '@pairdraw/scene-graph/shaders'
 
 const PEN_EXAMPLE = `/**
  * @color

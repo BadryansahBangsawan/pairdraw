@@ -1,9 +1,9 @@
 import type { CanvasKit } from 'canvaskit-wasm'
 
-import type { DerivedTextGlyph, SceneNode } from '@open-pencil/scene-graph'
-import { faceStyleKey } from '@open-pencil/scene-graph/font-style'
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
-import { resolveNodeTextDirection } from '@open-pencil/scene-graph/text/direction'
+import type { DerivedTextGlyph, SceneNode } from '@pairdraw/scene-graph'
+import { faceStyleKey } from '@pairdraw/scene-graph/font-style'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
+import { resolveNodeTextDirection } from '@pairdraw/scene-graph/text/direction'
 
 import type { SkiaRenderer } from '#core/canvas'
 import type { TextLayout } from '#core/canvas/text/layout'

@@ -10,9 +10,9 @@ Die CLI liest `.fig`-Dateien, ohne den Editor zu öffnen. Läuft die Desktop-App
 ::: tip Installation
 
 ```sh
-npm install -g @open-pencil/cli
+npm install -g @pairdraw/cli
 # oder
-bun add -g @open-pencil/cli
+bun add -g @pairdraw/cli
 ```
 
 :::
@@ -20,7 +20,7 @@ bun add -g @open-pencil/cli
 ## Dokumentinformationen
 
 ```sh
-openpencil info design.fig
+pairdraw info design.fig
 ```
 
 Zeigt Seiten, Objektanzahl, verwendete Schriften und Dateigröße.
@@ -28,17 +28,17 @@ Zeigt Seiten, Objektanzahl, verwendete Schriften und Dateigröße.
 ## Dokumentbaum und Suche
 
 ```sh
-openpencil tree design.fig
-openpencil find design.fig --type TEXT
-openpencil find design.fig --name "Button"
+pairdraw tree design.fig
+pairdraw find design.fig --type TEXT
+pairdraw find design.fig --name "Button"
 ```
 
 ## XPath-Abfragen
 
 ```sh
-openpencil query design.fig "//FRAME"
-openpencil query design.fig "//TEXT[@fontSize >= 24]"
-openpencil query design.fig "//*[@visible = false]"
+pairdraw query design.fig "//FRAME"
+pairdraw query design.fig "//TEXT[@fontSize >= 24]"
+pairdraw query design.fig "//*[@visible = false]"
 ```
 
 Attributnamen wie `fontSize`, `layoutMode` und `strokeWeight` entsprechen der API und bleiben unverändert.
@@ -46,27 +46,27 @@ Attributnamen wie `fontSize`, `layoutMode` und `strokeWeight` entsprechen der AP
 ## Objekte, Seiten und Variablen
 
 ```sh
-openpencil node design.fig --id 1:23
-openpencil pages design.fig
-openpencil variables design.fig
+pairdraw node design.fig --id 1:23
+pairdraw pages design.fig
+pairdraw variables design.fig
 ```
 
 ## Geöffnetes Dokument
 
 ```sh
-openpencil documents list
-openpencil tree --document-id tab-123 --page-id 0:1
+pairdraw documents list
+pairdraw tree --document-id tab-123 --page-id 0:1
 ```
 
-Für automatisierte Abläufe zuerst `openpencil documents list --json` aufrufen und anschließend `--document-id` und `--page-id` ausdrücklich übergeben. Dokumente öffnen, speichern, wechseln und schließen, Rückgängig machen, Einstellungen ändern und beliebige Editor-Werkzeuge aufrufen: siehe [Controlling the App](/programmable/cli/app-control).
+Für automatisierte Abläufe zuerst `pairdraw documents list --json` aufrufen und anschließend `--document-id` und `--page-id` ausdrücklich übergeben. Dokumente öffnen, speichern, wechseln und schließen, Rückgängig machen, Einstellungen ändern und beliebige Editor-Werkzeuge aufrufen: siehe [Controlling the App](/programmable/cli/app-control).
 
 ## Qualitätsprüfung
 
 ```sh
-openpencil lint design.fig
-openpencil lint design.pen --preset strict
-openpencil lint design.fig --rule color-contrast
-openpencil lint design.fig --fix -o fixed.fig
+pairdraw lint design.fig
+pairdraw lint design.pen --preset strict
+pairdraw lint design.fig --rule color-contrast
+pairdraw lint design.fig --fix -o fixed.fig
 ```
 
 Alle Befehle unterstützen `--json`; jede Meldung enthält ihre `fix`- und `suggestions`-Angaben als Daten. `--fix` wendet die sicheren Korrekturen an – Farben werden an die passende Farbvariable gebunden und die Geometrie auf ganze Pixel gerundet – und schreibt das Ergebnis in die mit `-o` angegebene `.fig`-Datei.

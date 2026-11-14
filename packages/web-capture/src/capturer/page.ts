@@ -26,15 +26,15 @@ export async function captureElementHTML(
 /** A failed read comes back as text. The window command turns the prefix into its error. */
 function captureFailure(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error)
-  return `openpencil-capture-error:${message}`
+  return `pairdraw-capture-error:${message}`
 }
 
 const pageWindow = globalThis as typeof globalThis & {
-  __openpencilCapturePage?: () => Promise<string>
-  __openpencilCaptureElement?: (selector: string) => Promise<string>
+  __pairdrawCapturePage?: () => Promise<string>
+  __pairdrawCaptureElement?: (selector: string) => Promise<string>
 }
 
-pageWindow.__openpencilCapturePage = async () => {
+pageWindow.__pairdrawCapturePage = async () => {
   try {
     return await capturePageHTML(document)
   } catch (error) {
@@ -42,7 +42,7 @@ pageWindow.__openpencilCapturePage = async () => {
   }
 }
 
-pageWindow.__openpencilCaptureElement = async (selector: string) => {
+pageWindow.__pairdrawCaptureElement = async (selector: string) => {
   try {
     return await captureElementHTML(document.querySelector(selector), document)
   } catch (error) {

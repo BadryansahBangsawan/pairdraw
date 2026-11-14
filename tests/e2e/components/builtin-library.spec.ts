@@ -27,7 +27,7 @@ test('enables the built-in Pairdraw Basics library, inserts Button, and keeps bo
   await expect
     .poll(() =>
       page.evaluate(() => {
-        const store = window.openPencil?.getStore?.()
+        const store = window.pairdraw?.getStore?.()
         if (!store) return []
         return [...store.graph.getAllNodes()]
           .filter((node) => node.type === 'INSTANCE')
@@ -59,8 +59,8 @@ test('enables the built-in Pairdraw Basics library, inserts Button, and keeps bo
           close: async () => undefined
         })
       }) as FileSystemFileHandle
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     await store.saveFigFileAs()
     return Array.from(writes[0] ?? [])
   })
@@ -75,7 +75,7 @@ test('enables the built-in Pairdraw Basics library, inserts Button, and keeps bo
   await expect
     .poll(() =>
       page.evaluate(() => {
-        const store = window.openPencil?.getStore?.()
+        const store = window.pairdraw?.getStore?.()
         if (!store) return null
         const instances = [...store.graph.getAllNodes()]
           .filter((node) => node.type === 'INSTANCE')

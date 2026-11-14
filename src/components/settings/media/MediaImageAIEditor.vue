@@ -6,7 +6,7 @@ import {
   useCredentialMessages,
   useMediaMessages,
   useSettingsMessages
-} from '@open-pencil/vue/i18n'
+} from '@pairdraw/vue/i18n'
 
 import { DEFAULT_IMAGE_AI_MODEL, IMAGE_AI_PROVIDER_DEFINITIONS } from '@/app/editor/image-ai'
 import type { ImageAIProviderID } from '@/app/editor/image-ai'

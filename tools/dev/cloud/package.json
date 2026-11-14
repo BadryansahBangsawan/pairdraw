@@ -1,5 +1,5 @@
 {
-  "name": "@open-pencil/cloud-tools",
+  "name": "@pairdraw/cloud-tools",
   "private": true,
   "type": "module",
   "imports": {
@@ -9,9 +9,9 @@
     "test": "bun test tests"
   },
   "dependencies": {
-    "@open-pencil/cloud": "workspace:*",
-    "@open-pencil/package-artifacts-tools": "workspace:*",
-    "@open-pencil/scene-graph": "workspace:*",
+    "@pairdraw/cloud": "workspace:*",
+    "@pairdraw/package-artifacts-tools": "workspace:*",
+    "@pairdraw/scene-graph": "workspace:*",
     "smol-toml": "^1.8.0"
   }
 }

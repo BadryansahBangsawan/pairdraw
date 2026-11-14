@@ -37,8 +37,8 @@ function pluginCatalog(command: string, enabled: boolean): string {
 /** Layer names in the active page, as the canvas graph holds them. */
 function layerNames(page: Page): Promise<string[]> {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const page = store.graph.getNode(store.state.currentPageId)
     if (!page) return []
     return page.childIds.map((id) => store.graph.getNode(id)?.name ?? 'MISSING')
@@ -58,9 +58,7 @@ test.describe('an enabled plugin', () => {
         origins: [
           {
             origin: new URL(baseURL).origin,
-            localStorage: [
-              { name: 'open-pencil:plugins', value: pluginCatalog('Leave a mark', true) }
-            ]
+            localStorage: [{ name: 'pairdraw:plugins', value: pluginCatalog('Leave a mark', true) }]
           }
         ]
       })
@@ -101,7 +99,7 @@ test.describe('a disabled plugin', () => {
           {
             origin: new URL(baseURL).origin,
             localStorage: [
-              { name: 'open-pencil:plugins', value: pluginCatalog('Leave a mark', false) }
+              { name: 'pairdraw:plugins', value: pluginCatalog('Leave a mark', false) }
             ]
           }
         ]

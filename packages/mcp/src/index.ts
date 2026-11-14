@@ -12,7 +12,7 @@ if (process.argv.includes('--version')) {
 
 if (process.argv.includes('--help') || process.argv.includes('-h')) {
   process.stdout.write(
-    `openpencil-mcp-http\n\n` +
+    `pairdraw-mcp-http\n\n` +
       `Start the Pairdraw MCP server.\n\n` +
       `On macOS/Linux, the server listens on a Unix domain socket by default\n` +
       `with optional TCP for browser clients. On Windows, only TCP is available.\n\n` +
@@ -21,37 +21,37 @@ if (process.argv.includes('--help') || process.argv.includes('-h')) {
       `  --version     Print the version\n\n` +
       `Environment variables:\n` +
       `  PORT                         TCP port (default: 7600, set to 0 to disable TCP)\n` +
-      `  OPENPENCIL_MCP_SOCKET        Override Unix socket path (recorded in the discovery file)\n` +
-      `  OPENPENCIL_MCP_DISCOVERY_PATH Override discovery file (mcp.json) location; defaults to the\n` +
+      `  PAIRDRAW_MCP_SOCKET        Override Unix socket path (recorded in the discovery file)\n` +
+      `  PAIRDRAW_MCP_DISCOVERY_PATH Override discovery file (mcp.json) location; defaults to the\n` +
       `                               platform path. Parent dir created 0o700. Mainly for test isolation.\n` +
-      `  OPENPENCIL_MCP_TCP           Deprecated — TCP is controlled by PORT (>0 = on, 0 = off)\n` +
-      `  OPENPENCIL_MCP_AUTH_TOKEN    Bearer token for MCP and RPC auth\n` +
-      `  OPENPENCIL_MCP_ROOT          Allowed directory for file-scoped tools (default: home directory on Windows, current working directory elsewhere)\n` +
-      `  OPENPENCIL_MCP_EVAL           Set to 1 to enable the eval tool\n` +
-      `  OPENPENCIL_MCP_SESSION_IDLE_TIMEOUT_MS\n` +
+      `  PAIRDRAW_MCP_TCP           Deprecated — TCP is controlled by PORT (>0 = on, 0 = off)\n` +
+      `  PAIRDRAW_MCP_AUTH_TOKEN    Bearer token for MCP and RPC auth\n` +
+      `  PAIRDRAW_MCP_ROOT          Allowed directory for file-scoped tools (default: home directory on Windows, current working directory elsewhere)\n` +
+      `  PAIRDRAW_MCP_EVAL           Set to 1 to enable the eval tool\n` +
+      `  PAIRDRAW_MCP_SESSION_IDLE_TIMEOUT_MS\n` +
       `                               Close sessions idle this long, in ms (default: 900000;\n` +
       `                               0 disables). An open GET/SSE stream is not activity.\n` +
-      `  OPENPENCIL_MCP_DISABLED_TOOLS Comma-separated tool names to omit\n` +
-      `  OPENPENCIL_MCP_SCOPE         "selection" to let clients read only the selected layers\n` +
+      `  PAIRDRAW_MCP_DISABLED_TOOLS Comma-separated tool names to omit\n` +
+      `  PAIRDRAW_MCP_SCOPE         "selection" to let clients read only the selected layers\n` +
       `                               (default: "document")\n` +
-      `  OPENPENCIL_MCP_CORS_ORIGIN   Allowed CORS origins, comma-separated.\n` +
+      `  PAIRDRAW_MCP_CORS_ORIGIN   Allowed CORS origins, comma-separated.\n` +
       `                               Defaults to the desktop app origin, since the app\n` +
       `                               webview is the only view that calls this server.\n` +
-      `  OPENPENCIL_MCP_APP_TIMEOUT_MS  If set, close the server and remove its discovery\n` +
+      `  PAIRDRAW_MCP_APP_TIMEOUT_MS  If set, close the server and remove its discovery\n` +
       `                               file after no app is attached for this many ms. The\n` +
       `                               grace period starts at startup and after disconnects.\n` +
       `                               Unset/0 disables it (default) — do not set this for\n` +
       `                               manual/CLI use, since nothing may ever register.\n` +
-      `  OPENPENCIL_MCP_EXIT_ON_STDIN_CLOSE  Set to 1 to shut down when stdin closes, so a\n` +
+      `  PAIRDRAW_MCP_EXIT_ON_STDIN_CLOSE  Set to 1 to shut down when stdin closes, so a\n` +
       `                               parent that starts the server through a shell wrapper\n` +
       `                               can stop it by closing the pipe. Unset for manual/CLI use.\n` +
-      `  OPENPENCIL_MCP_AGENTS        Set to 1, with the two variables below, to start the agent\n` +
+      `  PAIRDRAW_MCP_AGENTS        Set to 1, with the two variables below, to start the agent\n` +
       `                               bridge for one browser tab that the parent process gave\n` +
       `                               the same tokens, as \`bun run dev\` does; no pairing link.\n` +
       `                               The tokens are never written to the discovery file,\n` +
       `                               and the eval tool stays off.\n` +
-      `  OPENPENCIL_MCP_AGENT_SESSION The tab's session token: 64 lowercase hex characters.\n` +
-      `  OPENPENCIL_MCP_AGENT_TOKEN   The token the tab hands its agents, which reaches only\n` +
+      `  PAIRDRAW_MCP_AGENT_SESSION The tab's session token: 64 lowercase hex characters.\n` +
+      `  PAIRDRAW_MCP_AGENT_TOKEN   The token the tab hands its agents, which reaches only\n` +
       `                               /mcp: 64 lowercase hex characters, not the session token.\n`
   )
   process.exit(0)
@@ -71,7 +71,7 @@ if (rawPort < 0 || rawPort > 65535) {
   process.exit(1)
 }
 const port = rawPort
-// OPENPENCIL_MCP_TCP is accepted for backward compat but has no effect —
+// PAIRDRAW_MCP_TCP is accepted for backward compat but has no effect —
 // the PORT value alone determines whether TCP is enabled (PORT=0 is the kill switch).
 const withTcp = port > 0
 
@@ -91,61 +91,61 @@ function readTimeoutEnv(name: string): number | undefined {
   return timeoutMs
 }
 
-const appAttachTimeoutMs = readTimeoutEnv('OPENPENCIL_MCP_APP_TIMEOUT_MS')
-const sessionIdleTimeoutMs = readTimeoutEnv('OPENPENCIL_MCP_SESSION_IDLE_TIMEOUT_MS')
+const appAttachTimeoutMs = readTimeoutEnv('PAIRDRAW_MCP_APP_TIMEOUT_MS')
+const sessionIdleTimeoutMs = readTimeoutEnv('PAIRDRAW_MCP_SESSION_IDLE_TIMEOUT_MS')
 
 const toolPolicy = readToolPolicyFromEnv()
 
 // The agent bridge starts programs, so a malformed session leaves it off rather than guessing.
 const agents = devAgentBridgeFromEnv()
-if (process.env.OPENPENCIL_MCP_AGENTS === '1' && !agents) {
+if (process.env.PAIRDRAW_MCP_AGENTS === '1' && !agents) {
   process.stderr.write(
-    'Warning: OPENPENCIL_MCP_AGENTS=1 needs OPENPENCIL_MCP_AGENT_SESSION and ' +
-      'OPENPENCIL_MCP_AGENT_TOKEN as two different 64-character lowercase hex tokens. ' +
+    'Warning: PAIRDRAW_MCP_AGENTS=1 needs PAIRDRAW_MCP_AGENT_SESSION and ' +
+      'PAIRDRAW_MCP_AGENT_TOKEN as two different 64-character lowercase hex tokens. ' +
       'Starting without the agent bridge.\n'
   )
 }
-// As in `openpencil-connect`: agents reach `/mcp`, where eval would run any script they send.
+// As in `pairdraw-connect`: agents reach `/mcp`, where eval would run any script they send.
 if (agents && toolPolicy.allowEval) {
   process.stderr.write(
-    'Warning: OPENPENCIL_MCP_EVAL=1 is ignored while the agent bridge is on ' +
-      '(OPENPENCIL_MCP_AGENTS=1). Starting without the eval tool.\n'
+    'Warning: PAIRDRAW_MCP_EVAL=1 is ignored while the agent bridge is on ' +
+      '(PAIRDRAW_MCP_AGENTS=1). Starting without the eval tool.\n'
   )
 }
 
 const handle = await startServer({
   httpPort: withTcp ? port : 0,
   withTcp,
-  socketPath: process.env.OPENPENCIL_MCP_SOCKET?.trim() || null,
+  socketPath: process.env.PAIRDRAW_MCP_SOCKET?.trim() || null,
   enableEval: toolPolicy.allowEval && !agents,
   disabledTools: toolPolicy.disabledTools,
   scope: toolPolicy.scope,
-  mcpRoot: resolveMCPRoot(process.env.OPENPENCIL_MCP_ROOT),
+  mcpRoot: resolveMCPRoot(process.env.PAIRDRAW_MCP_ROOT),
   // Auth token: undefined → auto-generate, empty string → disable auth,
   // non-empty → use trimmed value. Whitespace-only is rejected to prevent a
   // silent fallback to an auto-generated token when the operator intended to
   // set an explicit one.
   authToken: (() => {
-    const raw = process.env.OPENPENCIL_MCP_AUTH_TOKEN
+    const raw = process.env.PAIRDRAW_MCP_AUTH_TOKEN
     if (raw === undefined) return undefined
     if (raw === '') return null
     const trimmed = raw.trim()
     if (!trimmed) {
       process.stderr.write(
-        'Error: OPENPENCIL_MCP_AUTH_TOKEN is whitespace-only. Set a real token, or use an empty string to disable auth.\n'
+        'Error: PAIRDRAW_MCP_AUTH_TOKEN is whitespace-only. Set a real token, or use an empty string to disable auth.\n'
       )
       process.exit(1)
     }
     return trimmed
   })(),
-  corsOrigin: resolveCORSOrigins(process.env.OPENPENCIL_MCP_CORS_ORIGIN),
+  corsOrigin: resolveCORSOrigins(process.env.PAIRDRAW_MCP_CORS_ORIGIN),
   appAttachTimeoutMs,
   sessionIdleTimeoutMs,
   agents: agents ?? undefined
 })
 
-const readyMarker = process.env.OPENPENCIL_MCP_READY_MARKER
-if (readyMarker && /^open-pencil-ready:[a-f0-9-]{36}$/.test(readyMarker)) {
+const readyMarker = process.env.PAIRDRAW_MCP_READY_MARKER
+if (readyMarker && /^pairdraw-ready:[a-f0-9-]{36}$/.test(readyMarker)) {
   process.stderr.write(`${readyMarker}\n`)
 }
 
@@ -166,7 +166,7 @@ process.on('SIGTERM', () => void shutdown().catch(() => process.exit(1)))
 // A parent that started this server through a shell wrapper cannot always kill it directly
 // (on Windows, ending `cmd /c` leaves the process it started running), but its end of the
 // stdin pipe closes with it.
-if (process.env.OPENPENCIL_MCP_EXIT_ON_STDIN_CLOSE === '1') {
+if (process.env.PAIRDRAW_MCP_EXIT_ON_STDIN_CLOSE === '1') {
   let stdinClosed = false
   const onStdinClosed = () => {
     if (stdinClosed) return

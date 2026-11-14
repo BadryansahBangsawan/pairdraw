@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, fn, waitFor, within } from 'storybook/test'
 import { ref } from 'vue'
 
-import type { DocumentWorkspaceSource } from '@open-pencil/vue/document/workspace'
+import type { DocumentWorkspaceSource } from '@pairdraw/vue/document/workspace'
 
 import type { DraftMeta } from '@/app/document/drafts'
 import { createDeferred } from '@/app/runtime/deferred'

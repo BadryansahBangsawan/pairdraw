@@ -1,5 +1,5 @@
-import type { ToolCapability, ToolDef } from '@open-pencil/core/tools'
-import { ALL_TOOLS, toolChangesDocument, isToolExposed } from '@open-pencil/core/tools'
+import type { ToolCapability, ToolDef } from '@pairdraw/core/tools'
+import { ALL_TOOLS, toolChangesDocument, isToolExposed } from '@pairdraw/core/tools'
 
 import type { ToolAvailability, ToolDescriptor, ToolEffect } from '#mcp/tool/metadata'
 

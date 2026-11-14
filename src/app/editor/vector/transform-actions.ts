@@ -1,6 +1,6 @@
-import type { Editor } from '@open-pencil/core'
-import { ROTATION_SNAP_DEGREES } from '@open-pencil/core/constants'
-import type { HandlePosition } from '@open-pencil/core/geometry'
+import type { Editor } from '@pairdraw/core'
+import { ROTATION_SNAP_DEGREES } from '@pairdraw/core/constants'
+import type { HandlePosition } from '@pairdraw/core/geometry'
 import {
   bendSegment,
   boxCorners,
@@ -9,9 +9,9 @@ import {
   scaleBoxMatrix,
   transformVectorPoints,
   type ScaleBoxOptions
-} from '@open-pencil/core/vector'
-import type { VectorNetwork } from '@open-pencil/scene-graph'
-import type { Rect, Vector } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/core/vector'
+import type { VectorNetwork } from '@pairdraw/scene-graph'
+import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
 import { setNodeEditNetwork } from './network'
 import type { NodeEditState } from './types'

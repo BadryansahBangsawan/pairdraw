@@ -1,16 +1,16 @@
 import { isEqual, pick } from 'es-toolkit'
 
-import type { ConnectorEndpoint, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
+import type { ConnectorEndpoint, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   connectorRouteEnds,
   connectorsAffectedBy,
   freeEndpoint,
   layoutConnector
-} from '@open-pencil/scene-graph/connectors'
-import { SIZE_FIELDS, TRANSFORM_FIELDS } from '@open-pencil/scene-graph/fields'
-import { generatedFrameOwner } from '@open-pencil/scene-graph/generated'
-import type { Vector } from '@open-pencil/scene-graph/primitives'
-import type { UndoEntry } from '@open-pencil/scene-graph/undo'
+} from '@pairdraw/scene-graph/connectors'
+import { SIZE_FIELDS, TRANSFORM_FIELDS } from '@pairdraw/scene-graph/fields'
+import { generatedFrameOwner } from '@pairdraw/scene-graph/generated'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
+import type { UndoEntry } from '@pairdraw/scene-graph/undo'
 
 import type { EditorContext } from '#core/editor/types'
 import { routeUnroutedConnectors } from '#core/layout'

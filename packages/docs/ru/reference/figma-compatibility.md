@@ -218,7 +218,7 @@
 | Фрагменты кода | 🟡 | Design JSX, HTML, Vue и React с CSS или Tailwind и значениями из токенов; нет Swift, Kotlin и Compose |
 | Tailwind CSS v4 | ✅ | HTML с классами из вкладки «Код», CLI или программного API |
 | Figma for VS Code | 🔲 | Нет интеграции с редактором кода |
-| Сервер MCP | ✅ | `@open-pencil/mcp`, stdio и HTTP; 138 основных инструментов, а также инструменты документов, истории и настроек |
+| Сервер MCP | ✅ | `@pairdraw/mcp`, stdio и HTTP; 138 основных инструментов, а также инструменты документов, истории и настроек |
 | CLI | ✅ | 24 команды, среди них `info`, `tree`, `find`, `query`, `node`, `pages`, `variables`, `tokens`, `fonts`, `lint`, `analyze`, `export`, `import`, `convert`, `diff`, `eval` и `tool` |
 
 ## Figma Draw

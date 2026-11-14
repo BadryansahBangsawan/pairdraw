@@ -1,5 +1,5 @@
-import type { SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { setInstanceOverride } from '@open-pencil/scene-graph/instances/overrides'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 
 function linkSubtree(
   graph: SceneGraph,

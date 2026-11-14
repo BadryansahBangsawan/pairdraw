@@ -1,9 +1,9 @@
-import { styleNumber, type DrawIOStyle } from '@open-pencil/drawio'
-import type { Fill, SceneNode, Stroke } from '@open-pencil/scene-graph'
-import { tryParseColor } from '@open-pencil/scene-graph/color'
-import { BLACK, WHITE } from '@open-pencil/scene-graph/constants'
-import { parseCSSFontFamily } from '@open-pencil/scene-graph/css'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+import { styleNumber, type DrawIOStyle } from '@pairdraw/drawio'
+import type { Fill, SceneNode, Stroke } from '@pairdraw/scene-graph'
+import { tryParseColor } from '@pairdraw/scene-graph/color'
+import { BLACK, WHITE } from '@pairdraw/scene-graph/constants'
+import { parseCSSFontFamily } from '@pairdraw/scene-graph/css'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { LabelFormat } from './label'
 

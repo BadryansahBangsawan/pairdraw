@@ -60,7 +60,7 @@ describe('chat file identity', () => {
     expect(await store.resolveFile(first)).toBe(firstId)
 
     const db: IDBDatabase = await new Promise((resolve, reject) => {
-      const request = indexedDB.open('open-pencil-chats')
+      const request = indexedDB.open('pairdraw-chats')
       request.onsuccess = () => resolve(request.result)
       request.onerror = () => reject(request.error)
     })

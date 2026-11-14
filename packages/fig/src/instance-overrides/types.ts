@@ -1,7 +1,7 @@
-import type { GUID } from '@open-pencil/kiwi/fig'
-import type { NodeChange, VariableConsumptionEntry } from '@open-pencil/kiwi/fig/codec'
-import { isUnsetGuid, UNSET_GUID } from '@open-pencil/kiwi/fig/guid'
-import type { Matrix, Vector } from '@open-pencil/scene-graph/primitives'
+import type { GUID } from '@pairdraw/kiwi/fig'
+import type { NodeChange, VariableConsumptionEntry } from '@pairdraw/kiwi/fig/codec'
+import { isUnsetGuid, UNSET_GUID } from '@pairdraw/kiwi/fig/guid'
+import type { Matrix, Vector } from '@pairdraw/scene-graph/primitives'
 
 export interface VariableConsumptionMapFields {
   variableConsumptionMap?: { entries?: VariableConsumptionEntry[] }

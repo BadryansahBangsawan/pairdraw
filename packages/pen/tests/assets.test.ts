@@ -9,9 +9,9 @@ import {
   parsePenDocument,
   type PenDocument,
   type PenNode
-} from '@open-pencil/pen'
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import type { Color } from '@open-pencil/scene-graph/primitives'
+} from '@pairdraw/pen'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { expectDefined, getNodeOrThrow } from './helpers/assert'
 import { parseDocument } from './helpers/document'

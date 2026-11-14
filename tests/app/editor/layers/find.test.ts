@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import { afterEach, expect, test } from 'bun:test'
 
-import { createDocumentGraph } from '@open-pencil/core'
+import { createDocumentGraph } from '@pairdraw/core'
 
 import { findableLayers, goToLayer, openFindLayers } from '@/app/editor/layers/find'
 import { createEditorStore } from '@/app/editor/session/create'

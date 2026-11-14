@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createEditor } from '@open-pencil/core'
-import { computeAllLayouts, computeLayout } from '@open-pencil/core/layout'
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { createEditor } from '@pairdraw/core'
+import { computeAllLayouts, computeLayout } from '@pairdraw/core/layout'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { autoFrame, pageId, rect } from '#tests/helpers/layout'
 

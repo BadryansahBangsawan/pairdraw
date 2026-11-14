@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import type { ShapeWithTextType } from '@open-pencil/scene-graph/shape-with-text'
-import { useShapeWithText } from '@open-pencil/vue/controls/shape-with-text'
-import { useToolMessages } from '@open-pencil/vue/i18n'
-import { toolbarToolTestId } from '@open-pencil/vue/testing'
+import type { ShapeWithTextType } from '@pairdraw/scene-graph/shape-with-text'
+import { useShapeWithText } from '@pairdraw/vue/controls/shape-with-text'
+import { useToolMessages } from '@pairdraw/vue/i18n'
+import { toolbarToolTestId } from '@pairdraw/vue/testing'
 
 import { SHAPE_KIND_ICONS } from '@/components/icons/shapes'
 import ShapeKindPicker from '@/components/shapes/ShapeKindPicker.vue'

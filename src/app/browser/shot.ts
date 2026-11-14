@@ -1,4 +1,4 @@
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 
 /**
  * Puts a browser screenshot on the canvas. The bytes are a PNG the window captured; placing them

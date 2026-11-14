@@ -22,8 +22,8 @@ function solidPNG(color: string): Promise<string> {
 
 async function createImageNode(): Promise<{ id: string; hash: string }> {
   return editor.page.evaluate(async () => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const canvas = document.createElement('canvas')
     canvas.width = 120
     canvas.height = 80
@@ -64,7 +64,7 @@ async function createImageNode(): Promise<{ id: string; hash: string }> {
 
 function imageHashOf(id: string): Promise<string | undefined> {
   return editor.page.evaluate(
-    (nodeId) => window.openPencil?.getStore?.().graph.getNode(nodeId)?.fills[0]?.imageHash,
+    (nodeId) => window.pairdraw?.getStore?.().graph.getNode(nodeId)?.fills[0]?.imageHash,
     id
   )
 }
@@ -72,7 +72,7 @@ function imageHashOf(id: string): Promise<string | undefined> {
 async function rightClickSelected(): Promise<void> {
   const box = expectDefined(await editor.canvas.canvas.boundingBox(), 'canvas bounds')
   const point = await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     const id = store ? [...store.state.selectedIds][0] : undefined
     const node = id ? store?.graph.getNode(id) : undefined
     if (!store || !node) return null
@@ -172,10 +172,10 @@ test('Generate image from the command palette places a selected image layer, und
   // The OpenAI key saved by the first test is still set up in this page.
   const layers = () =>
     editor.page.evaluate(() => {
-      const store = window.openPencil?.getStore?.()
+      const store = window.pairdraw?.getStore?.()
       return store ? store.graph.getChildren(store.state.currentPageId).length : 0
     })
-  await editor.page.evaluate(() => window.openPencil?.getStore?.().select([]))
+  await editor.page.evaluate(() => window.pairdraw?.getStore?.().select([]))
   const before = await layers()
 
   await editor.page.keyboard.press(`${MOD}+KeyK`)
@@ -189,7 +189,7 @@ test('Generate image from the command palette places a selected image layer, und
 
   await expect.poll(layers).toBe(before + 1)
   const placed = await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     const id = store ? [...store.state.selectedIds][0] : undefined
     const node = id ? store?.graph.getNode(id) : undefined
     return node ? { type: node.type, fills: node.fills.map((fill) => fill.type) } : null
@@ -204,7 +204,7 @@ test('Generate image from the command palette places a selected image layer, und
 test('Generate SVG from the command palette places editable layers, undone in one step', async () => {
   const count = () =>
     editor.page.evaluate(() => {
-      const store = window.openPencil?.getStore?.()
+      const store = window.pairdraw?.getStore?.()
       return store ? store.graph.getChildren(store.state.currentPageId).length : 0
     })
   const before = await count()
@@ -236,7 +236,7 @@ test('Generate SVG from the command palette places editable layers, undone in on
 
   await expect.poll(count).toBe(before + 1)
   const childTypes = await editor.page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
+    const store = window.pairdraw?.getStore?.()
     const id = store ? [...store.state.selectedIds][0] : undefined
     const frame = id ? store?.graph.getNode(id) : undefined
     return frame?.childIds.map((child) => store?.graph.getNode(child)?.type) ?? []

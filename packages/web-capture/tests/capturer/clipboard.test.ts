@@ -2,12 +2,12 @@ import { describe, expect, test } from 'bun:test'
 
 import { capture, element } from '#web-capture-tests/fixtures'
 
-import { encodeWebCaptureClipboard, readWebCaptureClipboard } from '@open-pencil/web-capture'
+import { encodeWebCaptureClipboard, readWebCaptureClipboard } from '@pairdraw/web-capture'
 import {
   CaptureClipboardUnavailableError,
   writeWebCaptureClipboard,
   type WriteCaptureClipboardOptions
-} from '@open-pencil/web-capture/capturer'
+} from '@pairdraw/web-capture/capturer'
 
 /** A clipboard that keeps what was written, as text per type. */
 function memoryClipboard() {

@@ -25,8 +25,8 @@ void main() {
 /** The shader a layer's first fill draws, as the document stores it. */
 function firstShader(page: Page) {
   return page.evaluate(() => {
-    const store = window.openPencil?.getStore?.()
-    if (!store) throw new Error('OpenPencil store not initialized')
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
     const id = [...store.state.selectedIds][0]
     const node = id ? store.graph.getNode(id) : undefined
     const item = (node?.pluginData ?? []).find((entry) => entry.key === 'shader')

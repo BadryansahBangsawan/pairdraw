@@ -1,4 +1,4 @@
-import type { HarnessSkill } from '@open-pencil/harness'
+import type { HarnessSkill } from '@pairdraw/harness'
 
 import { appSkillLibrary, type SkillLibrary } from './library'
 import type { Skill } from './types'

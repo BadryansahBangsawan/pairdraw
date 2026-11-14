@@ -1,7 +1,7 @@
 import dedent from 'dedent'
 import { compact } from 'es-toolkit/array'
 
-import { es } from '@open-pencil/emit'
+import { es } from '@pairdraw/emit'
 
 import type {
   ComponentModel,

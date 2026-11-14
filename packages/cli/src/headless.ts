@@ -1,30 +1,26 @@
 import { readFile, realpath } from 'node:fs/promises'
 import { dirname, resolve, sep } from 'node:path'
 
-import { syncEditedComponents } from '@open-pencil/core'
-import { SkiaRenderer } from '@open-pencil/core/canvas'
+import { syncEditedComponents } from '@pairdraw/core'
+import { SkiaRenderer } from '@pairdraw/core/canvas'
 import {
   BUILTIN_IO_FORMATS,
   IORegistry,
   type ReadDocumentInput,
   type ReadDocumentWarning
-} from '@open-pencil/core/io'
-import { populateAllFigPages, populateFigPage } from '@open-pencil/core/io/formats/fig'
-import { headlessHTMLReader } from '@open-pencil/core/io/formats/html/import'
-import { initCanvasKit } from '@open-pencil/core/io/formats/raster'
-import {
-  computeAllLayouts,
-  installTextMeasurer,
-  sizeAutoResizingText
-} from '@open-pencil/core/layout'
-import { writeFileAtomic } from '@open-pencil/core/node/fs'
-import { prepareGraphFonts, type DocumentFontStatus } from '@open-pencil/core/text'
-import type { SceneGraph } from '@open-pencil/scene-graph'
+} from '@pairdraw/core/io'
+import { populateAllFigPages, populateFigPage } from '@pairdraw/core/io/formats/fig'
+import { headlessHTMLReader } from '@pairdraw/core/io/formats/html/import'
+import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
+import { computeAllLayouts, installTextMeasurer, sizeAutoResizingText } from '@pairdraw/core/layout'
+import { writeFileAtomic } from '@pairdraw/core/node/fs'
+import { prepareGraphFonts, type DocumentFontStatus } from '@pairdraw/core/text'
+import type { SceneGraph } from '@pairdraw/scene-graph'
 import {
   collectSceneMutation,
   createSceneMutationImpact,
   recordSceneMutations
-} from '@open-pencil/scene-graph/mutation-impact'
+} from '@pairdraw/scene-graph/mutation-impact'
 
 import { printError, warn } from '#cli/format'
 

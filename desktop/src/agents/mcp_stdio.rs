@@ -584,7 +584,7 @@ mod tests {
     #[test]
     fn remembers_approvals_across_reads() {
         let path = std::env::temp_dir()
-            .join(format!("openpencil-mcp-approvals-{}", std::process::id()))
+            .join(format!("pairdraw-mcp-approvals-{}", std::process::id()))
             .join(APPROVALS_FILE);
         let approval = approval_for(Path::new("/bin/npx"), &request("npx", &["x"], &[]));
         assert!(read_approvals(&path).is_empty());

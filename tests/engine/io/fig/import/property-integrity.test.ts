@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, setDefaultTimeout, test } from 'bun:test'
 
-import type { Fill, SceneNode } from '@open-pencil/scene-graph'
+import type { Fill, SceneNode } from '@pairdraw/scene-graph'
 
 import { shadowEffectAt } from '#tests/helpers/assert'
 import { sharedGoldPreviewFixture } from '#tests/helpers/fig/fixtures'

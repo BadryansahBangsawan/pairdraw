@@ -1,4 +1,4 @@
-import type { SceneNode } from '@open-pencil/scene-graph'
+import type { SceneNode } from '@pairdraw/scene-graph'
 
 import { insertScriptNode } from '@/app/code/script/create'
 import { getActiveEditorStore, useEditorStore } from '@/app/editor/active-store'

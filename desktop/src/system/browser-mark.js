@@ -1,10 +1,10 @@
 /* Outlines one element while a chat chip points at it. The box is removed when the pointer
  * leaves the chip, or when the selector matches nothing. It is not the capturer and it does not
  * read cookies, storage, or request headers. */
-const request = __openpencilMarkRequest
+const request = __pairdrawMarkRequest
 
 function clearMark() {
-  const existing = document.querySelector('[data-openpencil-mark]')
+  const existing = document.querySelector('[data-pairdraw-mark]')
   if (existing) existing.remove()
 }
 
@@ -19,7 +19,7 @@ function showMark(selector) {
   if (!element) return { shown: false }
   const rect = element.getBoundingClientRect()
   const box = document.createElement('div')
-  box.setAttribute('data-openpencil-mark', '')
+  box.setAttribute('data-pairdraw-mark', '')
   box.style.position = 'fixed'
   box.style.pointerEvents = 'none'
   box.style.zIndex = '2147483646'

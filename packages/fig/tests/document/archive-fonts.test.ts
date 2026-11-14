@@ -9,13 +9,13 @@ import {
   figFontEntries,
   figFontsManifest,
   writeFigArchive
-} from '@open-pencil/fig'
+} from '@pairdraw/fig'
 import {
   createNodeChangesMessage,
   encodeMessage,
   getSchemaBytes,
   initCodec
-} from '@open-pencil/kiwi/fig/codec'
+} from '@pairdraw/kiwi/fig/codec'
 
 /** A one-page archive with no layers, storing one document font when `withFonts`. */
 async function archiveOf(withFonts: boolean): Promise<{ bytes: ArrayBuffer; file: string }> {

@@ -2,7 +2,7 @@
 import { tryOnScopeDispose } from '@vueuse/core'
 import { computed, shallowRef } from 'vue'
 
-import { useRecoveryMessages } from '@open-pencil/vue/i18n'
+import { useRecoveryMessages } from '@pairdraw/vue/i18n'
 
 import {
   discardRecoveredChanges,

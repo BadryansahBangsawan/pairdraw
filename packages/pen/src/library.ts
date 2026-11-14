@@ -1,5 +1,5 @@
-import type { SceneGraph } from '@open-pencil/scene-graph'
-import { libraryDefinitionsPage } from '@open-pencil/scene-graph/components'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { libraryDefinitionsPage } from '@pairdraw/scene-graph/components'
 
 import { withImports, type PenImports } from './imports'
 import type { Build } from './nodes'

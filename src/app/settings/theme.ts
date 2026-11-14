@@ -6,7 +6,7 @@
 export const APP_THEMES = ['dark', 'light', 'auto'] as const
 export type AppTheme = (typeof APP_THEMES)[number]
 
-export const THEME_STORAGE_KEY = 'open-pencil:theme'
+export const THEME_STORAGE_KEY = 'pairdraw:theme'
 /** Pairdraw starts dark; following the system is a choice in Settings. */
 export const DEFAULT_THEME: AppTheme = 'dark'
 

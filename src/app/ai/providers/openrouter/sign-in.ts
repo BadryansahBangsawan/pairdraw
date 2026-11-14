@@ -1,4 +1,4 @@
-import { IS_TAURI } from '@open-pencil/core/constants'
+import { IS_TAURI } from '@pairdraw/core/constants'
 
 import { WEB_APP_ORIGIN } from '@/constants'
 
@@ -19,10 +19,10 @@ import {
 
 /** Served from `public/`; it relays the redirect to the editor over this channel. */
 export const OPENROUTER_CALLBACK_PATH = '/oauth/openrouter.html'
-export const OPENROUTER_CALLBACK_CHANNEL = 'open-pencil:openrouter-oauth'
+export const OPENROUTER_CALLBACK_CHANNEL = 'pairdraw:openrouter-oauth'
 /** Served from `public/` on the web app; it hands the redirect to the desktop app's deep link. */
 export const OPENROUTER_DESKTOP_CALLBACK_PATH = '/oauth/openrouter-desktop.html'
-const POPUP_NAME = 'open-pencil-openrouter'
+const POPUP_NAME = 'pairdraw-openrouter'
 
 export type OpenRouterSignInFailure = SignInFailure | 'blocked'
 export type OpenRouterSignIn = SignIn<string, 'blocked'>
@@ -48,7 +48,7 @@ function popupCallback(state: string): Promise<SignInCallback | { failure: 'bloc
   return Promise.resolve(callback ?? { failure: 'blocked' })
 }
 
-/** The system browser, which returns through an `openpencil://oauth/openrouter` link. */
+/** The system browser, which returns through an `pairdraw://oauth/openrouter` link. */
 function deepLinkCallback(state: string): Promise<SignInCallback> {
   return deepLinkRedirect('openrouter', redirectReader(state))
 }

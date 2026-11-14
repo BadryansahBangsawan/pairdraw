@@ -156,7 +156,7 @@ mod tests {
 
     #[test]
     fn reads_only_the_switches_from_a_settings_file() {
-        let dir = std::env::temp_dir().join(format!("openpencil-claude-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("pairdraw-claude-{}", std::process::id()));
         std::fs::create_dir_all(&dir).expect("create folder");
         let path = dir.join("settings.json");
         std::fs::write(

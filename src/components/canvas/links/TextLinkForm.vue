@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue'
 
-import { normalizeLinkURL } from '@open-pencil/core/text'
-import { useCommonMessages, useEditorMessages } from '@open-pencil/vue/i18n'
+import { normalizeLinkURL } from '@pairdraw/core/text'
+import { useCommonMessages, useEditorMessages } from '@pairdraw/vue/i18n'
 
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'

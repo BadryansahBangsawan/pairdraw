@@ -19,7 +19,7 @@ export class ProgramNotFoundError extends Error {
 function childEnvironment(searchPath: string): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = {}
   for (const [name, value] of Object.entries(process.env)) {
-    if (name.startsWith('OPENPENCIL_')) continue
+    if (name.startsWith('PAIRDRAW_')) continue
     env[name] = value
   }
   env.PATH = searchPath

@@ -1,13 +1,13 @@
-import type { DocumentKind, SceneGraph, SceneNode } from '@open-pencil/scene-graph'
-import { createConnector } from '@open-pencil/scene-graph/connectors'
-import { createSticky, STICKY_SIZE, stickySublayers } from '@open-pencil/scene-graph/generated'
+import type { DocumentKind, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { createConnector } from '@pairdraw/scene-graph/connectors'
+import { createSticky, STICKY_SIZE, stickySublayers } from '@pairdraw/scene-graph/generated'
 import {
   CITATION_QUOTE_LIMIT,
   readWebCitation,
   withWebCitation,
   type WebCitation
-} from '@open-pencil/scene-graph/plugin-data'
-import type { UndoEntry } from '@open-pencil/scene-graph/undo'
+} from '@pairdraw/scene-graph/plugin-data'
+import type { UndoEntry } from '@pairdraw/scene-graph/undo'
 
 import { readOpenPageText, type OpenPageRead } from './page'
 import { citationStickyText, type CitationLabels } from './text'

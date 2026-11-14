@@ -1,6 +1,6 @@
-import type { SceneGraph, SceneNode, Stroke } from '@open-pencil/scene-graph'
-import { copyStroke } from '@open-pencil/scene-graph/copy'
-import { recordInstanceOverride } from '@open-pencil/scene-graph/instances'
+import type { SceneGraph, SceneNode, Stroke } from '@pairdraw/scene-graph'
+import { copyStroke } from '@pairdraw/scene-graph/copy'
+import { recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 
 /**
  * Sets the weight of all of a node's strokes and the weight it keeps with none, as Figma's

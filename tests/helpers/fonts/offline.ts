@@ -1,4 +1,4 @@
-import { fontManager } from '@open-pencil/core/text'
+import { fontManager } from '@pairdraw/core/text'
 
 /**
  * Test preload: no web font provider is on, so no test waits on Google or Fontsource, whose

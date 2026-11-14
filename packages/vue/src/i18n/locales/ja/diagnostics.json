@@ -77,7 +77,7 @@
   "sharingUsageStatsDescription": "使われた機能とファイル形式を、個人を特定しないランダムな ID で送信します。同意しない限りオフです。",
   "sharingDetails": "送信される内容",
   "sharingUnofficialBuild": "このビルドは何も送信しません。ping や利用統計を送信するのは Pairdraw の公式リリースだけです。",
-  "sharingDisabledByEnvironment": "環境変数 OPENPENCIL_TELEMETRY または DO_NOT_TRACK によりオフになっています。",
+  "sharingDisabledByEnvironment": "環境変数 PAIRDRAW_TELEMETRY または DO_NOT_TRACK によりオフになっています。",
   "sharingQuestionTitle": "Pairdraw の改善に協力しませんか？",
   "sharingQuestionDescription": "匿名の利用統計（アプリの起動、ファイル形式、使った機能）を共有します。デザイン、ファイル名、プロンプトは送信されません。次に作るべきものと Pairdraw が使われていることを示し、開発資金の確保に役立ちます。",
   "sharingQuestionDecline": "共有しない",

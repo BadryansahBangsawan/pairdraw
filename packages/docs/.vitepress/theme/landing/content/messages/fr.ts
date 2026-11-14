@@ -67,7 +67,7 @@ export const fr: LandingMessages = {
     script: {
       title: 'Tout piloter par script',
       detail:
-        'La CLI openpencil travaille sur un fichier sans que l’application soit lancée, ou pilote l’application ouverte. Inspectez un document, interrogez-le en XPath, vérifiez-le avec le linter, exportez-le ou exécutez du code de plugin Figma avec eval. Le serveur MCP donne aux agents la même portée via stdio ou HTTP.',
+        'La CLI pairdraw travaille sur un fichier sans que l’application soit lancée, ou pilote l’application ouverte. Inspectez un document, interrogez-le en XPath, vérifiez-le avec le linter, exportez-le ou exécutez du code de plugin Figma avec eval. Le serveur MCP donne aux agents la même portée via stdio ou HTTP.',
       hint: 'Lancez une commande et observez le canevas.'
     },
     sdk: {

@@ -5,15 +5,15 @@ import { parseCloudServerConfig } from '#cloud/server'
 import { CreateBucketCommand, S3Client } from '@aws-sdk/client-s3'
 
 const endpoint = process.env.S3_ENDPOINT ?? 'http://localhost:8333'
-const bucket = process.env.S3_BUCKET ?? 'openpencil-smoke'
-const accessKeyId = process.env.S3_ACCESS_KEY_ID ?? 'openpencil'
-const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY ?? 'openpencil-development-secret'
+const bucket = process.env.S3_BUCKET ?? 'pairdraw-smoke'
+const accessKeyId = process.env.S3_ACCESS_KEY_ID ?? 'pairdraw'
+const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY ?? 'pairdraw-development-secret'
 const provider = process.env.S3_COMPAT_PROVIDER ?? 'S3-compatible storage'
 
 const config = parseCloudServerConfig({
   deployment: 'self-hosted',
   publicURL: 'http://localhost:8787',
-  databaseURL: 'postgresql://openpencil:openpencil-development-password@localhost/openpencil',
+  databaseURL: 'postgresql://pairdraw:pairdraw-development-password@localhost/pairdraw',
   authSecret: 'object-store-smoke-secret-at-least-32-characters',
   s3Endpoint: endpoint,
   s3Region: process.env.S3_REGION ?? 'us-east-1',
@@ -43,7 +43,7 @@ if (!readiness.ok || readiness.checksumVerification !== 'metadata') {
   throw new Error(`Unexpected object-store readiness: ${JSON.stringify(readiness)}`)
 }
 
-const singleBytes = new TextEncoder().encode(`OpenPencil Cloud ${provider} smoke`)
+const singleBytes = new TextEncoder().encode(`Pairdraw Cloud ${provider} smoke`)
 const singleChecksum = createHash('sha256').update(singleBytes).digest('base64')
 const singleKey = `smoke/${crypto.randomUUID()}-single.fig`
 const singleUpload = await store.createUpload({

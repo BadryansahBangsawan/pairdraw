@@ -5,8 +5,8 @@ import { compact } from 'es-toolkit/array'
 import { omit } from 'es-toolkit/object'
 import { camelCase, upperFirst } from 'es-toolkit/string'
 
-import { es, jsx } from '@open-pencil/emit'
-import type { ShaderComponent } from '@open-pencil/scene-graph/shaders'
+import { es, jsx } from '@pairdraw/emit'
+import type { ShaderComponent } from '@pairdraw/scene-graph/shaders'
 
 import { drawingImports, iconDrawing, iconImportDeclarations, iconNamer } from '../icons'
 import type {

@@ -1,4 +1,4 @@
-import type { Editor } from '@open-pencil/core'
+import type { Editor } from '@pairdraw/core'
 
 import { bindClipboardNotifications } from '@/app/editor/clipboard/notifications'
 import { bindHyperlinkOpening } from '@/app/editor/links'

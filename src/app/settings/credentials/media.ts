@@ -5,7 +5,7 @@ import {
   setPexelsAPIKey,
   setUnsplashAccessKey,
   type StockPhotoKeyCheck
-} from '@open-pencil/core/tools'
+} from '@pairdraw/core/tools'
 
 import { appCredentialServices } from './app'
 import {

@@ -1,6 +1,6 @@
 import { isEqual } from 'es-toolkit/predicate'
 
-import type { HyperlinkTarget, SceneNode, StyleRun } from '@open-pencil/scene-graph'
+import type { HyperlinkTarget, SceneNode, StyleRun } from '@pairdraw/scene-graph'
 
 import { styleRunsWithPatch } from '#core/text/character-style'
 

@@ -1,6 +1,6 @@
-import { imageMimeType } from '@open-pencil/scene-graph/images'
-import type { Size } from '@open-pencil/scene-graph/primitives'
-import type { ShaderPreset } from '@open-pencil/scene-graph/shaders'
+import { imageMimeType } from '@pairdraw/scene-graph/images'
+import type { Size } from '@pairdraw/scene-graph/primitives'
+import type { ShaderPreset } from '@pairdraw/scene-graph/shaders'
 
 import { createShaderRasterizer } from '#vue/canvas/surface/shader/rasterizer'
 

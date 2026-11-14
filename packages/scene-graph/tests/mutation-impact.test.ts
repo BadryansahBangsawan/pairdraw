@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 
-import { SceneGraph } from '@open-pencil/scene-graph'
+import { SceneGraph } from '@pairdraw/scene-graph'
 import {
   collectSceneMutation,
   mutationLayoutScopeIds
-} from '@open-pencil/scene-graph/mutation-impact'
+} from '@pairdraw/scene-graph/mutation-impact'
 
 function pageId(graph: SceneGraph): string {
   return graph.getPages()[0].id

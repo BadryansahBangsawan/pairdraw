@@ -10,13 +10,13 @@ import {
 import { tv } from 'tailwind-variants'
 import { computed, reactive, useId, watch } from 'vue'
 
-import { defaultModeAttributeName } from '@open-pencil/dom-css/export'
+import { defaultModeAttributeName } from '@pairdraw/dom-css/export'
 import {
   isLibraryCollection,
   isModeAttributeName,
   type VariableCollection
-} from '@open-pencil/scene-graph'
-import { useI18n } from '@open-pencil/vue/i18n'
+} from '@pairdraw/scene-graph'
+import { useI18n } from '@pairdraw/vue/i18n'
 
 import {
   changeConditionKind,

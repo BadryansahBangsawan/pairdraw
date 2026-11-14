@@ -78,7 +78,7 @@ export const DEFAULT_WHEEL_ZOOM_OPTIONS: Readonly<WheelZoomOptions> = {
   invert: false
 }
 
-export function currentWheelPlatform(): WheelPlatform {
+function currentWheelPlatform(): WheelPlatform {
   if (typeof navigator === 'undefined') return 'other'
   if (/Mac|iPhone|iPad|iPod/.test(navigator.platform)) return 'mac'
   return /Win/.test(navigator.platform) ? 'windows' : 'other'

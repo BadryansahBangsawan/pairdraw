@@ -68,7 +68,7 @@ const newSignInPayloadSchema = v.object({
 })
 
 /** What changed about how an account proves it is its owner's. */
-export const twoStepChangeSchema = v.picklist([
+const twoStepChangeSchema = v.picklist([
   'authenticator-on',
   'authenticator-off',
   'passkey-added',

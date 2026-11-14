@@ -12,7 +12,7 @@ import { uniq, uniqBy } from 'es-toolkit'
 import type { Kysely, Transaction } from 'kysely'
 
 /** Images are stored as the bytes their file holds, whatever format those are. */
-export const IMAGE_CONTENT_TYPE = 'application/octet-stream'
+const IMAGE_CONTENT_TYPE = 'application/octet-stream'
 
 type Executor = Kysely<CloudDatabase> | Transaction<CloudDatabase>
 
@@ -234,8 +234,6 @@ export function createDocumentImages(
     }
   }
 }
-
-export type DocumentImages = ReturnType<typeof createDocumentImages>
 
 /** Gives a revision made from another, by a restore or a duplicate, the same images. */
 export async function copyRevisionImages(

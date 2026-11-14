@@ -22,7 +22,7 @@ export interface KiwiSymbolOverridePayload {
 }
 
 /** Library styles by source id, built once with the rest of the context. */
-export function buildStyleReferences(graph: SceneGraph): ReadonlyMap<string, StyleReference> {
+function buildStyleReferences(graph: SceneGraph): ReadonlyMap<string, StyleReference> {
   const references = new Map<string, StyleReference>()
   for (const node of graph.getAllNodes()) {
     if (node.sharedStyleType === null || !node.source.id) continue
@@ -43,7 +43,7 @@ export function buildStyleReferences(graph: SceneGraph): ReadonlyMap<string, Sty
  * the GUID the ID spells. Styles made in Pairdraw, by token import or by pasting from another
  * document, have IDs that spell no GUID, so only their records can name them.
  */
-export function styleReferenceGuid(
+function styleReferenceGuid(
   context: Pick<SceneNodeToKiwiContext, 'graph' | 'nodeIdToGuid' | 'styleNodeIds'>,
   id: string
 ): GUID {

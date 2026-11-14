@@ -41,7 +41,7 @@ export function createColorModelValue(color: Color, okhcl?: OkHCLColor | null): 
   }
 }
 
-export function sceneToRekaColor(color: Color): RGBColor {
+function sceneToRekaColor(color: Color): RGBColor {
   return {
     space: 'rgb',
     r: color.r * 255,

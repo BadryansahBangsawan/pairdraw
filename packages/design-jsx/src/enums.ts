@@ -40,7 +40,7 @@ export interface JSXEnum<T extends string> {
  * `spellings` names every value of the enum, which the type checks, and is what the export writes;
  * `aliases` are further spellings it only reads.
  */
-export function jsxEnum<T extends string>(
+function jsxEnum<T extends string>(
   spellings: Readonly<Record<T, string>>,
   aliases: Readonly<Record<string, T>> = {}
 ): JSXEnum<T> {

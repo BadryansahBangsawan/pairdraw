@@ -26,7 +26,7 @@ import { useNodePreview } from '#vue/controls/node-preview/use'
 import { useSelectedNodeState } from '#vue/editor/selection-state/nodes'
 import type { useI18n } from '#vue/i18n'
 
-export type AlignCell = { primary: LayoutAlign; counter: LayoutCounterAlign }
+type AlignCell = { primary: LayoutAlign; counter: LayoutCounterAlign }
 
 type GridTrackProp = 'gridTemplateColumns' | 'gridTemplateRows'
 
@@ -41,7 +41,7 @@ export type SizeLimitProp = 'minWidth' | 'maxWidth' | 'minHeight' | 'maxHeight'
 
 type ValueRef<T> = { readonly value: T }
 
-export const ALIGN_HORIZONTAL: AlignCell[] = [
+const ALIGN_HORIZONTAL: AlignCell[] = [
   { primary: 'MIN', counter: 'MIN' },
   { primary: 'CENTER', counter: 'MIN' },
   { primary: 'MAX', counter: 'MIN' },
@@ -53,7 +53,7 @@ export const ALIGN_HORIZONTAL: AlignCell[] = [
   { primary: 'MAX', counter: 'MAX' }
 ]
 
-export const ALIGN_VERTICAL: AlignCell[] = [
+const ALIGN_VERTICAL: AlignCell[] = [
   { primary: 'MIN', counter: 'MIN' },
   { primary: 'MIN', counter: 'CENTER' },
   { primary: 'MIN', counter: 'MAX' },
@@ -354,7 +354,7 @@ export function sizingOptionsForNode(
   return values.map((value) => ({ value, label: labels[value] ?? fallback[value] }))
 }
 
-export function createLayoutSizingState(
+function createLayoutSizingState(
   editor: Editor,
   node: ComputedRef<SceneNode | null>,
   panels: ValueRef<LayoutPanelStrings>

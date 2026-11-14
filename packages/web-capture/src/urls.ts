@@ -25,8 +25,3 @@ export function safeImageSource(value: string, base?: string): string | null {
   const url = resolve(trimmed, base)
   return url && IMAGE_PROTOCOLS.has(url.protocol) ? url.href : null
 }
-
-/** Whether an image source is already inlined as a raster data URL. */
-export function isInlinedImage(value: string): boolean {
-  return DATA_IMAGE.test(value)
-}

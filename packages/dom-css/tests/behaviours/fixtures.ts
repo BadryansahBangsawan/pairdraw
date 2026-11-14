@@ -6,7 +6,7 @@ const solid = (r: number, g: number, b: number) => [
   { type: 'SOLID' as const, color: { r, g, b, a: 1 }, opacity: 1, visible: true }
 ]
 
-export const COLORS = {
+const COLORS = {
   off: solid(0.8, 0.84, 0.88),
   on: solid(0.31, 0.27, 0.9),
   hover: solid(0.72, 0.77, 0.84),

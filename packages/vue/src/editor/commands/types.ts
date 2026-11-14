@@ -81,9 +81,3 @@ export interface EditorCommandMenuItem {
   onCheckedChange?: (checked: boolean) => void
   icon?: Component
 }
-
-export interface EditorCommandMenuSeparator {
-  separator: true
-}
-
-export type EditorCommandMenuEntry = EditorCommandMenuItem | EditorCommandMenuSeparator

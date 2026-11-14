@@ -8,8 +8,6 @@ import { capabilityHashMatches, decryptContinuationToken, encryptContinuationTok
 
 const CONTINUATION_LIFETIME_MS = 10 * 60_000
 
-export type InvitationContinuationService = ReturnType<typeof createInvitationContinuationService>
-
 export function createInvitationContinuationService(
   database: Kysely<CloudDatabase>,
   secret: string,

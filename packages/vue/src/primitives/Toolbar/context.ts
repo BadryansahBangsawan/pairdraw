@@ -13,7 +13,7 @@ export interface ToolbarContext {
   closeFlyout: () => void
 }
 
-export const TOOLBAR_KEY: InjectionKey<ToolbarContext> = Symbol('toolbar')
+const TOOLBAR_KEY: InjectionKey<ToolbarContext> = Symbol('toolbar')
 
 export function provideToolbar(ctx: ToolbarContext) {
   provide(TOOLBAR_KEY, ctx)

@@ -4,7 +4,7 @@ import { clamp, zipObject } from 'es-toolkit'
 import type { Expression, ExpressionBuilder, SelectQueryBuilder, SqlBool } from 'kysely'
 
 /** The rows an admin list returns when the request does not say. */
-export const ADMIN_PAGE_SIZE = 50
+const ADMIN_PAGE_SIZE = 50
 
 /** What every admin list takes: words to search for, one of its filters, and a page. */
 export type AdminListQuery<Filter extends string> = {

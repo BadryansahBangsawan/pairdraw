@@ -82,7 +82,7 @@ export interface StaticMatch {
 }
 
 /** Source records as a tree: children by saved order, instances as boundaries. */
-export function recordTree({ children }: SourceIndex): TreeShape<NodeChange> {
+function recordTree({ children }: SourceIndex): TreeShape<NodeChange> {
   return {
     childrenOf: (record) => children.get(idOf(record) ?? '') ?? [],
     isInstance: (record) => record.symbolData?.symbolID !== undefined

@@ -1,3 +1,4 @@
+import type { Editor } from '@pairdraw/core'
 import type { SceneNode } from '@pairdraw/scene-graph'
 
 import {
@@ -11,9 +12,6 @@ import {
   POINTER_DRAG_START_THRESHOLD_PX
 } from '#vue/shared/input/drag-threshold'
 import { findMoveDropTarget, reparentDroppedNodes } from '#vue/shared/input/drop-target'
-export { duplicateAndDrag } from '#vue/shared/input/duplicate-drag'
-import type { Editor } from '@pairdraw/core'
-
 import { flowBlockBounds, flowOrder, flowSlot, type FlowDrag } from '#vue/shared/input/flow-reorder'
 import { applyMoveSnap } from '#vue/shared/input/move/snap'
 import type { DragMove } from '#vue/shared/input/types'
@@ -100,18 +98,6 @@ function dropAlongFlows(d: DragMove, flows: FlowDrag[], editor: Editor) {
       editor.setChildOrder(flow.parentId, flowOrder(flow, slot, editor))
     }
   })
-}
-
-export function detectAutoLayoutParent(editor: Editor): string | undefined {
-  if (editor.state.selectedIds.size !== 1) return undefined
-  const selectedId = [...editor.state.selectedIds][0]
-  const selectedNode = editor.graph.getNode(selectedId)
-  if (!selectedNode?.parentId) return undefined
-  const parent = editor.graph.getNode(selectedNode.parentId)
-  if (parent && parent.layoutMode !== 'NONE' && selectedNode.layoutPositioning !== 'ABSOLUTE') {
-    return parent.id
-  }
-  return undefined
 }
 
 /** Keys held during a move. Figma maps Control to both, Shift to an axis lock. */

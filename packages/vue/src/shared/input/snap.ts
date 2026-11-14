@@ -289,7 +289,7 @@ export function optionalEditorState(editor: Editor): Editor['state'] | undefined
   return (editor as EditorWithOptionalState).state
 }
 
-export function snappingThreshold(editor: Editor): number {
+function snappingThreshold(editor: Editor): number {
   return SNAP_THRESHOLD_SCREEN_PX / Math.max(editor.state.zoom, Number.EPSILON)
 }
 

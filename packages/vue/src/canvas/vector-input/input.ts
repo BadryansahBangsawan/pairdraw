@@ -5,7 +5,6 @@ import type { Editor } from '@pairdraw/core'
 import {
   getCanvasNodeEditState,
   handleBendHandleMove,
-  resolveBendTargetHandle,
   type CanvasNodeEditMethods
 } from '#vue/canvas/vector-input/bend'
 import type { DragState } from '#vue/shared/input/types'
@@ -47,7 +46,7 @@ export function updateNodeEditHover(editor: Editor, cx: number, cy: number): boo
   return true
 }
 
-export { handleBendHandleMove, resolveBendTargetHandle }
+export { handleBendHandleMove }
 
 /** An end point dragged alone and dropped on another end point joins it. */
 function joinDroppedEndpoint(

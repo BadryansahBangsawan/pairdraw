@@ -55,7 +55,7 @@ export const placedOwnLayerPropsSchema = v.object({
 })
 
 /** A colour as a string, or as the colour a `designVar()` resolves to. */
-export const colorPropSchema = v.union(
+const colorPropSchema = v.union(
   [
     v.pipe(
       v.string(),

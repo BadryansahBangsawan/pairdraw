@@ -7,14 +7,14 @@ const finiteSchema = v.pipe(v.number(), v.finite())
 const sizeSchema = v.pipe(v.number(), v.finite(), v.minValue(0))
 const shortStringSchema = v.pipe(v.string(), v.maxLength(4096))
 
-export const webCaptureBoxSchema = v.object({
+const webCaptureBoxSchema = v.object({
   x: finiteSchema,
   y: finiteSchema,
   width: sizeSchema,
   height: sizeSchema
 })
 
-export const webCaptureTextSchema = v.object({
+const webCaptureTextSchema = v.object({
   type: v.literal('text'),
   text: v.pipe(v.string(), v.maxLength(1_000_000))
 })
@@ -27,7 +27,7 @@ const attributeNameSchema = v.pipe(v.string(), v.regex(/^[a-z][a-z0-9:_-]{0,63}$
 const attributeValueSchema = v.pipe(v.string(), v.maxLength(MAX_CAPTURE_JSON_LENGTH))
 const propertyNameSchema = v.pipe(v.string(), v.regex(/^-?[a-z][a-z-]{0,63}$/))
 
-export const webCaptureElementSchema: v.GenericSchema<unknown, WebCaptureElement> = v.object({
+const webCaptureElementSchema: v.GenericSchema<unknown, WebCaptureElement> = v.object({
   type: v.literal('element'),
   tagName: tagNameSchema,
   attrs: v.record(attributeNameSchema, attributeValueSchema),
@@ -36,7 +36,7 @@ export const webCaptureElementSchema: v.GenericSchema<unknown, WebCaptureElement
   children: v.array(v.lazy(() => webCaptureNodeSchema))
 })
 
-export const webCaptureNodeSchema: v.GenericSchema<unknown, WebCaptureNode> = v.union([
+const webCaptureNodeSchema: v.GenericSchema<unknown, WebCaptureNode> = v.union([
   webCaptureTextSchema,
   webCaptureElementSchema
 ])
@@ -53,7 +53,7 @@ export const webCaptureViewportSchema = v.object({
   devicePixelRatio: v.pipe(v.number(), v.finite(), v.minValue(0))
 })
 
-export const webCaptureSourceSchema = v.object({
+const webCaptureSourceSchema = v.object({
   url: v.optional(shortStringSchema),
   title: v.optional(shortStringSchema)
 })

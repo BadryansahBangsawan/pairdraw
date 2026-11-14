@@ -53,7 +53,7 @@ const SOFTWARE_APPLICATION = {
 
 export const LOCALE_PREFIXES = ['de', 'fr', 'es', 'it', 'pl', 'ru'] as const
 
-export const LOCALES: Record<string, { hreflang: string; ogLocale: string; prefix: string }> = {
+const LOCALES: Record<string, { hreflang: string; ogLocale: string; prefix: string }> = {
   en: { hreflang: 'en', ogLocale: 'en_US', prefix: '' },
   de: { hreflang: 'de', ogLocale: 'de_DE', prefix: '/de' },
   fr: { hreflang: 'fr', ogLocale: 'fr_FR', prefix: '/fr' },

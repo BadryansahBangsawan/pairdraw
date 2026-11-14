@@ -6,7 +6,7 @@ const INSTALL_TIMEOUT_MS = 120_000
 const PUBLIC_REGISTRY = '--registry=https://registry.npmjs.org'
 
 /** The npm arguments that install a package globally, the same the desktop shell scope pins. */
-export function npmInstallArgs(packageName: string): string[] {
+function npmInstallArgs(packageName: string): string[] {
   return ['install', '--global', packageName, PUBLIC_REGISTRY]
 }
 

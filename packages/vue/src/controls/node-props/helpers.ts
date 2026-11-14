@@ -9,9 +9,9 @@ import { useSelectedNodeState } from '#vue/editor/selection-state/nodes'
 export const MIXED = Symbol('mixed')
 export type MixedValue<T> = T | typeof MIXED
 
-export type ArrayItem = Fill | Stroke | Effect | Record<string, unknown>
+type ArrayItem = Fill | Stroke | Effect | Record<string, unknown>
 
-export function areArrayItemsEqual(a: ArrayItem, b: ArrayItem): boolean {
+function areArrayItemsEqual(a: ArrayItem, b: ArrayItem): boolean {
   if (a === b) return true
   const aKeys = Object.keys(a)
   const bKeys = Object.keys(b)

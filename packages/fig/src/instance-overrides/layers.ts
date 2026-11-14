@@ -15,7 +15,7 @@ export interface Owner {
 }
 
 /** The last instance boundary a layer crossed whose component was replaced. */
-export interface ReplacedBoundary {
+interface ReplacedBoundary {
   readonly replaced: readonly GUID[]
   /** The layer's path relative to that boundary. */
   readonly path: readonly GUID[]

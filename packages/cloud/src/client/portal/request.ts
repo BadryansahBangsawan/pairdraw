@@ -42,7 +42,7 @@ export type CloudPortalClientOptions = {
 type PortalResponse = Pick<Response, 'ok' | 'status' | 'json'>
 
 /** Sends one request with the call's `init` (its signal); the typed Hono clients fit this shape. */
-export type CloudSend = (options: { init: RequestInit }) => Promise<PortalResponse>
+type CloudSend = (options: { init: RequestInit }) => Promise<PortalResponse>
 
 export type CloudCall = <Output>(
   send: CloudSend,

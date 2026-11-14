@@ -6,7 +6,7 @@ import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
  * virtual GUID in this session, numbered in template order. `nodeGenerationData` holds what a
  * user set on each, `derivedImmutableFrameData` the layout Figma computed from it.
  */
-export const GENERATED_SESSION_ID = 40_000_000
+const GENERATED_SESSION_ID = 40_000_000
 
 export interface GeneratedEntry extends NodeChange {
   guidPath?: { guids?: GUID[] }

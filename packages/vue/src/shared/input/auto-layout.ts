@@ -64,7 +64,7 @@ export function computeIndicatorPosition(
   return (prevAbs.y + prev.height + nextAbs.y) / 2
 }
 
-export function filteredToRealIndex(
+function filteredToRealIndex(
   parentId: string,
   insertIndex: number,
   editor: Editor,

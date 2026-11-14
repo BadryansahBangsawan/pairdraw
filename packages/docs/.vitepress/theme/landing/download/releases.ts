@@ -4,16 +4,7 @@ export const PLATFORMS = ['mac', 'windows', 'linux'] as const
 export type Platform = (typeof PLATFORMS)[number]
 export type Arch = 'arm64' | 'x64'
 /** Installer and archive formats, in the order a platform's list shows them. */
-export const FILE_FORMATS = [
-  'dmg',
-  'zip',
-  'exe',
-  'msi',
-  'appimage',
-  'deb',
-  'rpm',
-  'tar.gz'
-] as const
+const FILE_FORMATS = ['dmg', 'zip', 'exe', 'msi', 'appimage', 'deb', 'rpm', 'tar.gz'] as const
 export type FileFormat = (typeof FILE_FORMATS)[number]
 
 /** A file someone downloads to install the app; updater payloads and signatures are left out. */

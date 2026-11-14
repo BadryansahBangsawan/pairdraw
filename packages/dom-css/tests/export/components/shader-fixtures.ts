@@ -2,7 +2,7 @@ import { SceneGraph } from '@pairdraw/scene-graph'
 import { createShaderPaint, withShaderPaints } from '@pairdraw/scene-graph/shaders'
 
 /** The preset the hero plays: an aurora with a few props, and film grain over it. */
-export const HERO_PRESET = {
+const HERO_PRESET = {
   components: [
     { type: 'Aurora', props: { colorA: '#ff3300', curtainCount: 2, center: { x: 0.5, y: 0 } } },
     { type: 'FilmGrain' }

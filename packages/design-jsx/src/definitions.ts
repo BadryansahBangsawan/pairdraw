@@ -1,4 +1,4 @@
-export type DesignJSXNamedDefinition = {
+type DesignJSXNamedDefinition = {
   name: string
   description: string
 }

@@ -134,7 +134,7 @@ export async function startSocketListener(
 }
 
 /** Start TCP listener; returns the server and actual port, or null if skipped. */
-export async function startTcpListener(
+async function startTcpListener(
   app: Hono,
   upgrade: UpgradeHandler,
   httpPort: number
@@ -164,7 +164,7 @@ export async function startTcpListener(
   return { server, port: actualPort }
 }
 
-export async function writeDiscovery(
+async function writeDiscovery(
   resolvedSocketPath: string | null,
   actualHttpPort: number,
   authToken: string | null,
@@ -187,7 +187,7 @@ export async function writeDiscovery(
   return startedAt
 }
 
-export async function closeServer(srv: HttpServer | null): Promise<void> {
+async function closeServer(srv: HttpServer | null): Promise<void> {
   if (!srv) return
   // The WebSocket grace period has already elapsed by the time listener
   // teardown begins. Close HTTP connections and explicitly destroy upgraded
@@ -213,7 +213,7 @@ export async function closeServer(srv: HttpServer | null): Promise<void> {
   }
 }
 
-export async function cleanupSocket(socketPath: string | null): Promise<void> {
+async function cleanupSocket(socketPath: string | null): Promise<void> {
   if (!socketPath || !platformHasUnixSockets()) return
   // Only remove the socket if no other server is listening on it.
   // A replacement server that won the restart race may have already

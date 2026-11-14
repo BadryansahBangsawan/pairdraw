@@ -8,7 +8,7 @@ const isWindows = platform() === 'win32'
  * Folders that commonly hold a globally installed Node or Bun CLI, which a terminal started
  * without the person's shell profile may not have on PATH. Mirrors `desktop/src/agents/path.rs`.
  */
-export function candidateDirs(home = homedir(), runtimePlatform = platform()): string[] {
+function candidateDirs(home = homedir(), runtimePlatform = platform()): string[] {
   const dirs = [
     join(home, '.bun', 'bin'),
     join(home, '.local', 'bin'),

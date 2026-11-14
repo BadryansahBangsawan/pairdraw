@@ -1,6 +1,6 @@
 import type { EnrollmentStatus } from '#cloud/admin/enrollment/service'
 import type { CloudSignInMethod, DocumentPermission, WorkspaceRole } from '#cloud/contract'
-import type { TransactionalEmailKind, TransactionalEmailPayloadByKind } from '#cloud/email'
+import type { TransactionalEmailKind } from '#cloud/email'
 import type { Account, Session } from 'better-auth'
 import type { ColumnType, Generated, Insertable, Selectable, Updateable } from 'kysely'
 
@@ -8,7 +8,7 @@ export type TimestampColumn = ColumnType<Date, Date | string | undefined, Date |
 
 export type UploadStatus = 'pending' | 'finalizing' | 'cleaning' | 'committed' | 'abandoned'
 
-export interface DocumentShareTable {
+interface DocumentShareTable {
   id: string
   documentId: string
   permission: DocumentPermission
@@ -24,7 +24,7 @@ export interface DocumentShareTable {
   revisionId: ColumnType<string | null, string | null | undefined, string | null>
 }
 
-export interface DocumentGrantTable {
+interface DocumentGrantTable {
   id: string
   documentId: string
   userId: string
@@ -35,7 +35,7 @@ export interface DocumentGrantTable {
   revokedAt: TimestampColumn | null
 }
 
-export interface DocumentInvitationTable {
+interface DocumentInvitationTable {
   id: string
   documentId: string
   emailNormalized: string
@@ -48,7 +48,7 @@ export interface DocumentInvitationTable {
   revokedAt: TimestampColumn | null
 }
 
-export interface WorkspaceTable {
+interface WorkspaceTable {
   id: string
   name: string
   slug: string
@@ -62,7 +62,7 @@ export interface WorkspaceTable {
 }
 
 /** A person's public profile, `/u/<handle>` (migration 027). */
-export interface PublicProfileTable {
+interface PublicProfileTable {
   userId: string
   handle: string
   bio: string | null
@@ -70,14 +70,14 @@ export interface PublicProfileTable {
   updatedAt: TimestampColumn
 }
 
-export interface WorkspaceMemberTable {
+interface WorkspaceMemberTable {
   workspaceId: string
   userId: string
   role: WorkspaceRole
   createdAt: TimestampColumn
 }
 
-export interface WorkspaceInvitationTable {
+interface WorkspaceInvitationTable {
   id: string
   workspaceId: string
   emailNormalized: string
@@ -90,7 +90,7 @@ export interface WorkspaceInvitationTable {
   revokedAt: TimestampColumn | null
 }
 
-export interface DocumentTable {
+interface DocumentTable {
   id: string
   workspaceId: string
   name: string
@@ -105,7 +105,7 @@ export interface DocumentTable {
   cleanupClaimedAt: TimestampColumn | null
 }
 
-export interface StorageObjectTable {
+interface StorageObjectTable {
   id: string
   objectKey: string
   checksum: string
@@ -114,7 +114,7 @@ export interface StorageObjectTable {
   createdAt: TimestampColumn
 }
 
-export interface DocumentRevisionTable {
+interface DocumentRevisionTable {
   id: string
   documentId: string
   parentRevisionId: string | null
@@ -124,7 +124,7 @@ export interface DocumentRevisionTable {
 }
 
 /** An image a workspace's documents use, stored once; see migration 023. */
-export interface WorkspaceImageTable {
+interface WorkspaceImageTable {
   workspaceId: string
   /** The SHA-256 of the bytes, which the object store verified. */
   checksum: string
@@ -134,7 +134,7 @@ export interface WorkspaceImageTable {
 }
 
 /** An image a stored revision uses, under the name its file gives it. */
-export interface RevisionImageTable {
+interface RevisionImageTable {
   revisionId: string
   name: string
   workspaceId: string
@@ -142,7 +142,7 @@ export interface RevisionImageTable {
 }
 
 /** A revision kept in the document's history; see migration 021. */
-export interface DocumentVersionTable {
+interface DocumentVersionTable {
   id: string
   documentId: string
   revisionId: string
@@ -154,9 +154,9 @@ export interface DocumentVersionTable {
   createdAt: TimestampColumn
 }
 
-export type UploadKind = 'revision' | 'image'
+type UploadKind = 'revision' | 'image'
 
-export interface UploadTable {
+interface UploadTable {
   id: string
   /** An image upload names the document it was asked for, which decides who may make it. */
   documentId: string
@@ -176,7 +176,7 @@ export interface UploadTable {
   expiresAt: TimestampColumn
 }
 
-export interface AuthUserTable {
+interface AuthUserTable {
   id: string
   name: string
   email: string
@@ -192,7 +192,7 @@ export interface AuthUserTable {
   updatedAt: TimestampColumn
 }
 
-export interface TwoFactorTable {
+interface TwoFactorTable {
   id: string
   secret: string
   backupCodes: string
@@ -202,7 +202,7 @@ export interface TwoFactorTable {
   lockedUntil: TimestampColumn | null
 }
 
-export interface PasskeyTable {
+interface PasskeyTable {
   id: string
   name: string | null
   publicKey: string
@@ -216,14 +216,14 @@ export interface PasskeyTable {
   aaguid: string | null
 }
 
-export interface MFAAssuranceTable {
+interface MFAAssuranceTable {
   sessionId: string
   userId: string
   method: 'totp' | 'recovery-code' | 'passkey'
   verifiedAt: TimestampColumn
 }
 
-export interface SignInTable {
+interface SignInTable {
   id: string
   userId: string
   sessionId: string | null
@@ -236,7 +236,7 @@ export interface SignInTable {
 export type UserPictureFormat = 'png' | 'jpeg'
 
 /** The picture an account shows: uploaded by its owner, or copied from a linked account. */
-export interface UserPictureTable {
+interface UserPictureTable {
   userId: string
   bytes: Uint8Array
   format: UserPictureFormat
@@ -246,7 +246,7 @@ export interface UserPictureTable {
   createdAt: TimestampColumn
 }
 
-export interface DocumentCollaborationStateTable {
+interface DocumentCollaborationStateTable {
   documentId: string
   roomEpoch: number
   state: Uint8Array
@@ -255,7 +255,7 @@ export interface DocumentCollaborationStateTable {
   updatedAt: TimestampColumn
 }
 
-export interface InvitationContinuationTable {
+interface InvitationContinuationTable {
   id: string
   invitationId: string
   tokenEncrypted: string
@@ -264,7 +264,7 @@ export interface InvitationContinuationTable {
   createdAt: TimestampColumn
 }
 
-export interface WorkspaceEntitlementTable {
+interface WorkspaceEntitlementTable {
   workspaceId: string
   values: unknown
   source: string
@@ -274,13 +274,13 @@ export interface WorkspaceEntitlementTable {
   updatedAt: TimestampColumn
 }
 
-export interface WorkspaceStorageUsageTable {
+interface WorkspaceStorageUsageTable {
   workspaceId: string
   committedBytes: number
   updatedAt: TimestampColumn
 }
 
-export interface UploadStorageReservationTable {
+interface UploadStorageReservationTable {
   id: string
   workspaceId: string
   uploadId: string
@@ -293,7 +293,7 @@ export interface UploadStorageReservationTable {
 
 export type TransactionalEmailStatus = 'pending' | 'sending' | 'accepted' | 'failed' | 'suppressed'
 
-export interface TransactionalEmailTable {
+interface TransactionalEmailTable {
   id: string
   idempotencyKey: string
   kind: TransactionalEmailKind
@@ -312,9 +312,7 @@ export interface TransactionalEmailTable {
   acceptedAt: TimestampColumn | null
 }
 
-export type TransactionalEmailPayload = TransactionalEmailPayloadByKind[TransactionalEmailKind]
-
-export interface EnrollmentTable {
+interface EnrollmentTable {
   id: string
   emailNormalized: string
   name: string | null
@@ -328,14 +326,14 @@ export interface EnrollmentTable {
   approvedUserId: string | null
 }
 
-export interface APIRateLimitTable {
+interface APIRateLimitTable {
   keyHash: string
   windowStartedAt: TimestampColumn
   requestCount: Generated<number>
   updatedAt: TimestampColumn
 }
 
-export interface AdminAuditEventTable {
+interface AdminAuditEventTable {
   id: string
   actorUserId: string
   action: string
@@ -394,14 +392,7 @@ export type WorkspaceUpdate = Updateable<WorkspaceTable>
 export type Document = Selectable<DocumentTable>
 export type NewDocument = Insertable<DocumentTable>
 export type DocumentRevision = Selectable<DocumentRevisionTable>
-export type DocumentVersion = Selectable<DocumentVersionTable>
 export type NewDocumentRevision = Insertable<DocumentRevisionTable>
-export type DocumentShare = Selectable<DocumentShareTable>
-export type NewDocumentShare = Insertable<DocumentShareTable>
-export type DocumentGrant = Selectable<DocumentGrantTable>
-export type NewDocumentGrant = Insertable<DocumentGrantTable>
-export type DocumentInvitation = Selectable<DocumentInvitationTable>
-export type NewDocumentInvitation = Insertable<DocumentInvitationTable>
 export type StorageObject = Selectable<StorageObjectTable>
 export type NewStorageObject = Insertable<StorageObjectTable>
 export type Upload = Selectable<UploadTable>

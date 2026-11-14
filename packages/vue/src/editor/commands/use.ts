@@ -9,13 +9,7 @@ import { useSelectionState } from '#vue/editor/selection-state/use'
 import { commandMessages } from '#vue/i18n'
 import { usePageList } from '#vue/primitives/PageList/usePageList'
 
-export type {
-  EditorCommand,
-  EditorCommandId,
-  EditorCommandMenuEntry,
-  EditorCommandMenuItem,
-  EditorCommandMenuSeparator
-} from './types'
+export type { EditorCommand, EditorCommandId } from './types'
 
 /**
  * Builds a command-oriented interface on top of the current editor.

@@ -42,7 +42,7 @@ function shaderImage(element: DesignElement): string | undefined {
 }
 
 /** Render an element as the design draws it, with a role's changes applied. */
-export function renderElement(
+function renderElement(
   context: IslandRenderContext,
   element: DesignElement,
   path: string,

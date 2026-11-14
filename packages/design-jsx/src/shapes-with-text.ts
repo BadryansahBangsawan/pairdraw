@@ -14,12 +14,6 @@ import { readElementProps, shapePropsSchema } from './schema'
 import { plainTextOf, type TreeNode } from './tree'
 
 /**
- * `<Shape kind="diamond" bg="#FFC943">Decide</Shape>`: a FigJam shape with text, made from the
- * same template as the shape tool's. Its text is the label.
- */
-export const SHAPE_ELEMENT = 'shape'
-
-/**
  * The shape an element describes, with `layer`'s fields; it is named by its label, as FigJam
  * names a shape, until given a name.
  */

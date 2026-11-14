@@ -154,7 +154,7 @@ export function bindProperties(
 }
 
 /** Match the nearest component scope, including definitions inherited from its set. */
-export function componentPropertyScope(
+function componentPropertyScope(
   graph: SceneGraph,
   parentId: string
 ): readonly ComponentPropertyDefinition[] | undefined {

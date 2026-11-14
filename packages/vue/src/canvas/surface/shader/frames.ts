@@ -4,7 +4,7 @@ import type { Editor } from '@pairdraw/core'
  * Draws one fresh frame of a shader. The source is a WebGPU canvas that keeps the frame only
  * until the current task ends, so it is drawn from at once, never kept.
  */
-export type ShaderFrameListener = (source: CanvasImageSource) => void
+type ShaderFrameListener = (source: CanvasImageSource) => void
 
 /**
  * Where the canvas's shader playback hands each frame it draws, by the image its paint shows,

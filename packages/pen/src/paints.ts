@@ -53,7 +53,7 @@ type PaintField = 'fills' | 'strokes'
 export type PenShaderSources = ReadonlyMap<string, string>
 
 /** Where a shader file's source comes from, and the shader entries converted so far. */
-export interface PenShaderRead {
+interface PenShaderRead {
   sources: PenShaderSources | undefined
   /** Each shader paint converted, for the node's plugin data. */
   out: ShaderPaint[]

@@ -35,7 +35,7 @@ export type ExportPanelTarget = 'selection' | 'page'
 // Re-exported from core so the UI and the .fig file-format boundary share one
 // definition of the export-scale bounds (see scene-graph/export-scale).
 export { MIN_EXPORT_SCALE, MAX_EXPORT_SCALE, clampExportScale }
-export { MIN_EXPORT_QUALITY, MAX_EXPORT_QUALITY, DEFAULT_EXPORT_QUALITY, clampExportQuality }
+export { MIN_EXPORT_QUALITY, MAX_EXPORT_QUALITY, DEFAULT_EXPORT_QUALITY }
 
 const io = new IORegistry(BUILTIN_IO_FORMATS)
 
@@ -48,7 +48,7 @@ export const EXPORT_FORMAT_OPTIONS: ExportFormatOption[] = EXPORT_FORMATS.map((i
   label: PRODUCT_LABELS[id] ?? (io.getFormat(id)?.extensions[0] ?? id).toUpperCase()
 }))
 
-export function createDefaultExportSetting(): ExportSetting {
+function createDefaultExportSetting(): ExportSetting {
   return { scale: 1, format: 'png' }
 }
 

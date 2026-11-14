@@ -91,7 +91,7 @@ function normalizeChild(child: JSXChild, nodes: DesignNode[]): void {
   nodes.push(child)
 }
 
-export function normalizeJSXChildren(children: JSXChild): DesignNode[] {
+function normalizeJSXChildren(children: JSXChild): DesignNode[] {
   const nodes: DesignNode[] = []
   normalizeChild(children, nodes)
   return nodes

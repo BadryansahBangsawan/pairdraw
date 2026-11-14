@@ -181,4 +181,4 @@ export function createPairing({
   return { issueCode, exchange, isSession, isAgentToken, revoke }
 }
 
-export type Pairing = ReturnType<typeof createPairing>
+type Pairing = ReturnType<typeof createPairing>

@@ -8,7 +8,7 @@ import { deriveSlashVariantProperties } from '@pairdraw/scene-graph/variant-prop
 import type { StoryProp } from './module'
 import { claimName } from './names'
 
-export interface StoryVariant {
+interface StoryVariant {
   values: string[]
   node: SceneNode
 }

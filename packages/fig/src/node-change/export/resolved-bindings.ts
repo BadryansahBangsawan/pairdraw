@@ -13,7 +13,7 @@ import {
  * A node without an explicit mode takes its collection's default: the mode the editor happens
  * to show is not saved, and Figma opens the file in the default.
  */
-export function nodeWithResolvedBindings(graph: SceneGraph, node: SceneNode): SceneNode {
+function nodeWithResolvedBindings(graph: SceneGraph, node: SceneNode): SceneNode {
   const changes = {
     ...resolvedNumericBindings(graph, node, 'default'),
     ...resolvedPaintBindings(graph, node, 'default'),

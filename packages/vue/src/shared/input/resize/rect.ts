@@ -12,7 +12,7 @@ function atLeast(value: number, min: number): number {
  * keeps the opposite corner in place. The side that drives stays long enough for the other to
  * keep a whole pixel, so the box keeps its ratio at its smallest.
  */
-export function constrainToAspectRatio(
+function constrainToAspectRatio(
   handle: HandlePosition,
   origRect: Rect,
   width: number,

@@ -14,12 +14,6 @@ import { readElementProps, stickyPropsSchema } from './schema'
 import { plainTextOf, type TreeNode } from './tree'
 
 /**
- * `<Sticky color="yellow" author="Ada">Body</Sticky>`: a FigJam sticky note, made from the same
- * template as the sticky tool's.
- */
-export const STICKY_ELEMENT = 'sticky'
-
-/**
  * The note an element describes, with `layer`'s fields; it is named by its body, as FigJam names
  * a note, until given a name.
  */

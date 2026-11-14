@@ -35,7 +35,7 @@ export function getCanvasNodeEditState(editor: Editor): CanvasNodeEditState | nu
   return editor.state.nodeEditState as CanvasNodeEditState | null | undefined
 }
 
-export function resolveBendTargetHandle(
+function resolveBendTargetHandle(
   es: CanvasNodeEditState | null | undefined,
   vertexIndex: number,
   samples: Vector[]

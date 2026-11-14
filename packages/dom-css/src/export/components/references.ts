@@ -13,7 +13,7 @@ import { drawsAsMain } from './drawn'
 import type { ComponentModel } from './model'
 
 /** A prop a reference sets on the component it uses: a variant or text value, or `disabled`. */
-export interface ReferenceProp {
+interface ReferenceProp {
   name: string
   value: string | boolean
 }

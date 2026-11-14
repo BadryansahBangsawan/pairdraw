@@ -77,7 +77,7 @@ export const meshPaintSchema = v.looseObject({
  * gives by that URL. One whose source the host did not read draws nothing, as pen.dev shows a
  * shader it cannot compile.
  */
-export const shaderPaintSchema = v.looseObject({
+const shaderPaintSchema = v.looseObject({
   type: v.literal('shader'),
   ...paintBase,
   opacity: v.optional(numSchema),
@@ -268,7 +268,7 @@ const variableSchema = v.looseObject({
   ])
 })
 
-export const penDocumentSchema = v.looseObject({
+const penDocumentSchema = v.looseObject({
   version: v.optional(strSchema),
   themes: v.optional(v.record(strSchema, v.array(strSchema))),
   imports: v.optional(v.record(strSchema, strSchema)),

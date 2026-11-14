@@ -5,9 +5,9 @@ import type { Editor } from '@pairdraw/core'
 import type { useSelectionCapabilities } from '#vue/editor/selection-capabilities/use'
 import type { useSelectionState } from '#vue/editor/selection-state/use'
 
-export type CommandMessagesStore = { value: Record<string, string> }
-export type SelectionState = ReturnType<typeof useSelectionState>
-export type SelectionCapabilities = ReturnType<typeof useSelectionCapabilities>
+type CommandMessagesStore = { value: Record<string, string> }
+type SelectionState = ReturnType<typeof useSelectionState>
+type SelectionCapabilities = ReturnType<typeof useSelectionCapabilities>
 
 export type EditorCommandMapOptions = {
   editor: Editor

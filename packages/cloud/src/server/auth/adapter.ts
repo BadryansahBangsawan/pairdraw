@@ -20,7 +20,7 @@ export type CloudIdentity = {
   deploymentRole?: 'user' | 'admin'
 }
 
-export type CloudAccountProfile = {
+type CloudAccountProfile = {
   id: string
   name: string
   email: string
@@ -28,7 +28,7 @@ export type CloudAccountProfile = {
   createdAt: Date
 }
 
-export type CloudAuthenticationMethodRecord = {
+type CloudAuthenticationMethodRecord = {
   id: string
   providerId: string
   createdAt: Date

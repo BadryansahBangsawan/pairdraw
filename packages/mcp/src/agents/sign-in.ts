@@ -18,7 +18,7 @@ const MAX_LINE_BUFFER = 16_384
 const TERMINAL_CODES = /\u001B\]8;[^\u0007\u001B]*(?:\u0007|\u001B\\)|\u001B\[[0-9;?]*[A-Za-z]/g
 
 /** The first https address in the login's output, without terminal codes, or null. */
-export function findSignInURL(text: string): string | null {
+function findSignInURL(text: string): string | null {
   const candidate = /https:\/\/\S+/.exec(text.replace(TERMINAL_CODES, ''))?.[0]
   if (!candidate || candidate.length > MAX_URL_LENGTH) return null
   try {

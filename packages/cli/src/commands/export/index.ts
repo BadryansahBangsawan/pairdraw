@@ -35,7 +35,7 @@ const HTML_MODES = new Set(['fragment', 'standalone'])
 const HTML_ASSETS = new Set(['inline', 'external'])
 const HTML_FONTS = new Set(['assets', 'none'])
 
-export interface ExportArgs {
+interface ExportArgs {
   file?: string
   output?: string
   format: string

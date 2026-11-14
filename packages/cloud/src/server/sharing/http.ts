@@ -8,7 +8,7 @@ import {
 import { WorkspaceInvitationInvalidError } from '#cloud/server/workspaces/members'
 import type { Context } from 'hono'
 
-export function sharingDomainError(context: Context, error: unknown): Response | null {
+function sharingDomainError(context: Context, error: unknown): Response | null {
   if (
     error instanceof DocumentNotFoundError ||
     error instanceof DocumentShareInvalidError ||

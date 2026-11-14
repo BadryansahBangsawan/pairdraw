@@ -40,5 +40,3 @@ export function createSharingPolicy(
 
   return { requireCapabilityLink }
 }
-
-export type SharingPolicy = ReturnType<typeof createSharingPolicy>

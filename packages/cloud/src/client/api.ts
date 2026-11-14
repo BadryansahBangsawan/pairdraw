@@ -63,7 +63,7 @@ import { createProfileRequests } from './profiles'
 import { CloudAPIError, parseResponse, responseBody, type CloudClientDiagnostic } from './response'
 import { createWorkspaceRequests } from './workspaces'
 
-export { CloudAPIError, type CloudClientDiagnostic } from './response'
+export { CloudAPIError } from './response'
 
 const documentsResponseSchema = v.object({ documents: v.array(documentSummarySchema) })
 const sharedDocumentsResponseSchema = v.object({ documents: v.array(sharedDocumentSchema) })

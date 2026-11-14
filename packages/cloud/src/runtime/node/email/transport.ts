@@ -4,7 +4,7 @@ import type { DocumentInvitationMessage, InvitationDelivery } from '#cloud/serve
 import nodemailer, { type Transporter } from 'nodemailer'
 import type Mail from 'nodemailer/lib/mailer/index.js'
 
-export type NodemailerTransporter = {
+type NodemailerTransporter = {
   sendMail(mail: Mail.Options): Promise<unknown>
 }
 

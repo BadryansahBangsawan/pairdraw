@@ -64,7 +64,7 @@ export function collectCornerRadii(node: SceneNode): CornerRadii | null {
   return { tl: r, tr: r, br: r, bl: r }
 }
 
-export function formatTrack(t: GridTrack): string {
+function formatTrack(t: GridTrack): string {
   if (t.sizing === 'FR') return `${t.value}fr`
   if (t.sizing === 'FIXED') return `${t.value}px`
   return 'auto'

@@ -7,8 +7,6 @@ export type ReactElement = {
 
 export type ReactNode = ReactElement | string | number | null | undefined | ReactNode[]
 
-export type FC<P = Record<string, unknown>> = (props: P) => ReactElement
-
 export function createElement(
   type: string | ComponentType,
   props: Record<string, unknown> | null,
@@ -23,5 +21,3 @@ export function createElement(
     }
   }
 }
-
-export default { createElement }

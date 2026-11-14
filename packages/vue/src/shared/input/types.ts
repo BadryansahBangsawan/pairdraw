@@ -51,21 +51,21 @@ export interface DragConnectorDraw {
 }
 
 /** An end of a selected connector dragged to another layer or point. */
-export interface DragConnectorEnd {
+interface DragConnectorEnd {
   type: 'connector-end'
   commit: () => void
   cancel: () => void
 }
 
 /** An elbow segment or the curve of a selected connector dragged into place. */
-export interface DragConnectorLine {
+interface DragConnectorLine {
   type: 'connector-line'
   commit: () => void
   cancel: () => void
 }
 
 /** An end of a selected line or arrow dragged to aim it. */
-export interface DragLineEnd {
+interface DragLineEnd {
   type: 'line-end'
   commit: () => void
   cancel: () => void
@@ -190,7 +190,7 @@ export interface DragRotate {
   rotationDirection: 1 | -1
 }
 
-export interface DragPen {
+interface DragPen {
   type: 'pen-drag'
   startX: number
   startY: number
@@ -203,11 +203,11 @@ export interface DragPen {
   knotStartY: number
 }
 
-export interface DragPencil {
+interface DragPencil {
   type: 'pencil-drag'
 }
 
-export interface DragTextSelect {
+interface DragTextSelect {
   type: 'text-select'
   startX: number
   startY: number
@@ -251,7 +251,7 @@ export interface DragEditMarquee {
   baseSegments: Set<number>
 }
 
-export interface DragBendHandle {
+interface DragBendHandle {
   type: 'bend-handle'
   vertexIndex: number
   startX: number

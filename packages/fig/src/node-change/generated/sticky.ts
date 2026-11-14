@@ -23,7 +23,7 @@ import {
   type GeneratedEntry
 } from './records'
 
-export const STICKY_SLOTS = { background: 0, body: 1, author: 2 } as const
+const STICKY_SLOTS = { background: 0, body: 1, author: 2 } as const
 
 /**
  * The fields a STICKY's own record keeps, as Figma writes it. Its colour, text and layout live in

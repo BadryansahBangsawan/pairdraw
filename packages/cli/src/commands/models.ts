@@ -8,7 +8,7 @@ import { bold, dim, entity, fmtList, printError } from '#cli/format'
 const json = { type: 'boolean', description: 'Output as JSON' } as const
 
 /** A provider the AI chat can use, with the models it recommends. */
-export interface ModelCatalogProvider {
+interface ModelCatalogProvider {
   id: string
   name: string
   defaultModel: string
@@ -20,7 +20,7 @@ export interface ModelCatalogProvider {
 }
 
 /** An ACP agent; it runs its own models and lists none here. */
-export interface ModelCatalogAgent {
+interface ModelCatalogAgent {
   id: string
   name: string
   command: string

@@ -7,7 +7,7 @@ export interface FontCollector {
 }
 
 /** The family a browser tries first, without the quotes CSS may put around it. */
-export function primaryFontFamily(fontFamily: string): string {
+function primaryFontFamily(fontFamily: string): string {
   const first = fontFamily.split(',')[0] ?? ''
   return first.trim().replace(/^(['"])(.*)\1$/, '$2')
 }

@@ -2,7 +2,7 @@
 import { parse, type CssNodePlain as CSSNodePlain, type FeaturePlain } from 'css-tree'
 
 /** What a feature is tested against: a keyword such as `dark`, or a length such as `640px`. */
-export type FeatureValue =
+type FeatureValue =
   | { type: 'keyword'; name: string }
   | { type: 'dimension'; value: number; unit: string }
 

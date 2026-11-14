@@ -18,7 +18,7 @@ export interface FragmentMaterializationOptions extends FragmentOptions {
   images?: DocumentAssemblyOptions['images']
 }
 
-export interface MaterializedFigFragment extends AssemblyState {
+interface MaterializedFigFragment extends AssemblyState {
   rootIds: string[]
   dependencyPageIds: string[]
 }

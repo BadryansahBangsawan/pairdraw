@@ -96,7 +96,7 @@ export interface LayerTreeContext {
   setRowRef: (id: string, el: HTMLElement | null) => void
 }
 
-export const LAYER_TREE_KEY: InjectionKey<LayerTreeContext> = Symbol('layer-tree')
+const LAYER_TREE_KEY: InjectionKey<LayerTreeContext> = Symbol('layer-tree')
 
 export function provideLayerTree(ctx: LayerTreeContext) {
   provide(LAYER_TREE_KEY, ctx)

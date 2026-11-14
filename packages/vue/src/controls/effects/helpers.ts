@@ -21,7 +21,7 @@ const EFFECT_LABELS: Record<string, string> = {
 }
 
 /** The code a new layer shader starts from: it tints the layer it sits on. */
-export const DEFAULT_SHADER_SOURCE = `uniform sampler2D layer; /* @object */
+const DEFAULT_SHADER_SOURCE = `uniform sampler2D layer; /* @object */
 uniform vec2 resolution; /* @resolution */
 uniform vec4 tint; /* @color @default #ff7a45 */
 
@@ -31,7 +31,7 @@ void main() {
   gl_FragColor = vec4(mix(color.rgb, tint.rgb, tint.a), color.a);
 }`
 
-export const EFFECT_TYPES = Object.keys(EFFECT_LABELS) as EffectType[]
+const EFFECT_TYPES = Object.keys(EFFECT_LABELS) as EffectType[]
 export const EFFECT_OPTIONS = EFFECT_TYPES.map((t) => ({
   value: t,
   label: EFFECT_LABELS[t]

@@ -8,7 +8,7 @@ import type { DragState } from '#vue/shared/input/types'
 const CONNECTOR_HANDLE_HIT_RADIUS = 8
 
 /** The end handle of the only selected connector under a screen point, if any. */
-export function connectorEndAt(
+function connectorEndAt(
   editor: Editor,
   sx: number,
   sy: number

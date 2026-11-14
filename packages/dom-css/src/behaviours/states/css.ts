@@ -20,7 +20,7 @@ export interface StateStylesheet {
 const quoted = (value: string) => cssesc(value, { quotes: 'double', wrap: true })
 
 /** A field whose input or textarea shows text rather than its placeholder. */
-export const FILLED = ':has(:is(input, textarea):not(:placeholder-shown))'
+const FILLED = ':has(:is(input, textarea):not(:placeholder-shown))'
 
 /** The selector part a condition adds to the control's root. */
 export function conditionSelector(condition: StateCondition): string {

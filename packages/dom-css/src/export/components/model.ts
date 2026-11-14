@@ -60,7 +60,7 @@ import type { ComponentStyling } from './styling'
 import { componentTree } from './tree'
 
 /** Kinds generated as components so far; the rest keep static stories. */
-export const GENERATED_KINDS = [
+const GENERATED_KINDS = [
   'button',
   'switch',
   'checkbox',
@@ -85,7 +85,7 @@ export const GENERATED_KINDS = [
 export type GeneratedKind = (typeof GENERATED_KINDS)[number] | ItemKind | 'plain'
 
 /** A variant property the component takes as a prop and sets on its root as `data-*`. */
-export interface VariantProp {
+interface VariantProp {
   /** The prop's identifier. */
   name: string
   /** The variant property it draws, which state styles name the condition after. */

@@ -16,7 +16,7 @@ import {
 import { useEditor } from '#vue/editor/context'
 import { useSceneComputed } from '#vue/internal/scene-computed/use'
 
-export type { ExportFormatOption, ExportPanelTarget } from '#vue/document/export/helpers'
+export type { ExportFormatOption } from '#vue/document/export/helpers'
 
 export function useExport() {
   const editor = useEditor()

@@ -6,7 +6,7 @@ import type { BoundPropertyClaim } from '../bindings/properties'
 import type { ComponentPropAssignment } from '../types'
 
 /** An explicit claim keeps the complete path relative to its owning occurrence. */
-export interface InstancePropertyClaim {
+interface InstancePropertyClaim {
   /** Source record declaring the claim; preserved when inherited by another occurrence. */
   declaredBy: string
   path: readonly GUID[]
@@ -60,7 +60,7 @@ export interface MissingComponentDiagnostic {
 }
 
 /** A slot assignment naming a content frame the archive no longer contains. */
-export interface MissingSlotContentDiagnostic {
+interface MissingSlotContentDiagnostic {
   /** The slot frame being expanded, as the source record that declares it. */
   slotId: string
   slotContentId: string

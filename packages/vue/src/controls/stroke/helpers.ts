@@ -22,7 +22,7 @@ export const SIDE_OPTIONS: { value: StrokeSides; label: string }[] = [
 
 export const BORDER_SIDES = ['top', 'right', 'bottom', 'left'] as const
 
-export const STROKE_CAP_VALUES: StrokeCap[] = [
+const STROKE_CAP_VALUES: StrokeCap[] = [
   'NONE',
   'ROUND',
   'SQUARE',

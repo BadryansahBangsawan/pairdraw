@@ -8,7 +8,7 @@ import type { TextStreamPart, ToolSet } from 'ai'
 import type { HarnessSessionConfiguration, JSONValue } from '../protocol'
 import type { BackendEvent, BackendSession, HarnessBackend, HarnessResumeState } from './types'
 
-export type PiThinkingLevel = NonNullable<PiHarnessSettings['thinkingLevel']>
+type PiThinkingLevel = NonNullable<PiHarnessSettings['thinkingLevel']>
 
 export interface PiHarnessBackendOptions {
   auth?: PiAuthenticationMode

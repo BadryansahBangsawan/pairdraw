@@ -14,7 +14,6 @@ import {
   type TransformZone
 } from '@pairdraw/core/geometry'
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
-import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import moveCursorSVG from '#vue/shared/assets/cursors/move.svg?raw'
 import resizeCursorSVG from '#vue/shared/assets/cursors/resize.svg?raw'
@@ -77,67 +76,6 @@ export function isInsideEditorContainerBounds(
   if (!container) return false
   const { lx, ly } = canvasToLocal(cx, cy, containerId)
   return lx >= 0 && lx <= container.width && ly >= 0 && ly <= container.height
-}
-
-export function getScreenRect(
-  absX: number,
-  absY: number,
-  w: number,
-  h: number,
-  zoom: number,
-  panX: number,
-  panY: number
-) {
-  return {
-    x1: absX * zoom + panX,
-    y1: absY * zoom + panY,
-    x2: (absX + w) * zoom + panX,
-    y2: (absY + h) * zoom + panY
-  }
-}
-
-export function getHandlePositions(
-  absX: number,
-  absY: number,
-  w: number,
-  h: number,
-  zoom: number,
-  panX: number,
-  panY: number
-) {
-  const { x1, y1, x2, y2 } = getScreenRect(absX, absY, w, h, zoom, panX, panY)
-  const mx = (x1 + x2) / 2
-  const my = (y1 + y2) / 2
-
-  return {
-    nw: { x: x1, y: y1 },
-    n: { x: mx, y: y1 },
-    ne: { x: x2, y: y1 },
-    e: { x: x2, y: my },
-    se: { x: x2, y: y2 },
-    s: { x: mx, y: y2 },
-    sw: { x: x1, y: y2 },
-    w: { x: x1, y: my }
-  } satisfies Record<HandlePosition, Vector>
-}
-
-export function unrotate(
-  sx: number,
-  sy: number,
-  centerX: number,
-  centerY: number,
-  rotation: number
-): { sx: number; sy: number } {
-  if (rotation === 0) return { sx, sy }
-  const rad = (-rotation * Math.PI) / 180
-  const cos = Math.cos(rad)
-  const sin = Math.sin(rad)
-  const dx = sx - centerX
-  const dy = sy - centerY
-  return {
-    sx: centerX + dx * cos - dy * sin,
-    sy: centerY + dx * sin + dy * cos
-  }
 }
 
 function getCursorAngleFromHandle(

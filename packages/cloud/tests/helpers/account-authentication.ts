@@ -58,7 +58,7 @@ export function authenticationCookie(response: Response): string {
   return value
 }
 
-export function accountAuthenticationObjects() {
+function accountAuthenticationObjects() {
   return {
     capabilities: { nativeSHA256: true, multipartUpload: false, conditionalWrites: false },
     async checkReadiness() {
@@ -111,7 +111,7 @@ export async function createAccountAuthenticationFixture(
   }
 }
 
-export async function approveAccount(
+async function approveAccount(
   database: Awaited<ReturnType<typeof createAccountAuthenticationFixture>>['database'],
   input: { email: string; name: string; userId: string }
 ): Promise<void> {

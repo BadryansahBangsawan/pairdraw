@@ -14,8 +14,6 @@ import {
 
 import { FIXTURES } from './paths'
 
-export { FIXTURES }
-
 export function readFixtureBytes(name: string): Uint8Array {
   return readFileSync(resolve(FIXTURES, name))
 }

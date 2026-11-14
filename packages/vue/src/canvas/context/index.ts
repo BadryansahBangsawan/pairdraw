@@ -11,7 +11,7 @@ export interface CanvasContext {
   hitTestFrameTitle: (cx: number, cy: number) => SceneNode | null
 }
 
-export const CANVAS_KEY: InjectionKey<CanvasContext> = Symbol('canvas')
+const CANVAS_KEY: InjectionKey<CanvasContext> = Symbol('canvas')
 
 export function provideCanvas(ctx: CanvasContext) {
   provide(CANVAS_KEY, ctx)

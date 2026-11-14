@@ -32,7 +32,7 @@ import {
   type GeneratedEntry
 } from './records'
 
-export const CONNECTOR_SLOTS = { line: 0, label: 1, labelBackground: 2 } as const
+const CONNECTOR_SLOTS = { line: 0, label: 1, labelBackground: 2 } as const
 
 /** The fields a CONNECTOR's own record keeps besides its ends, as Figma writes it. */
 const CONNECTOR_RECORD_FIELDS = [
@@ -124,7 +124,7 @@ interface KiwiConnectorEndpoint {
 }
 
 /** A connector end as its record names it: the record of the layer it is bound to, if any. */
-export interface ConnectorEndpointRecord {
+interface ConnectorEndpointRecord {
   sourceId: string | null
   magnet: ConnectorMagnet
   position: Vector

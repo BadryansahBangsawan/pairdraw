@@ -9,7 +9,7 @@ import { writeFileAtomic } from '@pairdraw/core/node/fs'
  * Records which document and page generated each file in a Storybook output folder, so a
  * re-export replaces its own stories and leaves every other file alone.
  */
-export const MANIFEST_FILE = '.pairdraw-stories.json'
+const MANIFEST_FILE = '.pairdraw-stories.json'
 
 /** Files the export writes directly in the output folder: stories and generated components. */
 const OWN_FILE = /^[^/]+\.(stories\.ts|vue|tsx|module\.css)$/

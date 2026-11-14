@@ -102,7 +102,7 @@ export function flowOf(display: string): FlowKind {
 }
 
 /** Whether the element sits in a line rather than on its own row, so it hugs its content. */
-export function isInlineLevel(display: string): boolean {
+function isInlineLevel(display: string): boolean {
   return display.startsWith('inline')
 }
 

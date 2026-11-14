@@ -8,7 +8,7 @@ import { spawnFixed, terminate } from './process'
 import type { CompanionAgent } from './registry'
 
 /** The program the app knows Pairdraw's MCP server by; the companion is that server. */
-export const MCP_EXECUTABLE = 'pairdraw-mcp-http'
+const MCP_EXECUTABLE = 'pairdraw-mcp-http'
 const MCP_PACKAGE = '@pairdraw/mcp'
 const HARNESS_PACKAGE = '@pairdraw/harness'
 const PACKAGE_MANAGERS = ['npm', 'bun'] as const

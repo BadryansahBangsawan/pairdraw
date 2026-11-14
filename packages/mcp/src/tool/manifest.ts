@@ -3,15 +3,15 @@ import { ALL_TOOLS, toolChangesDocument, isToolExposed } from '@pairdraw/core/to
 
 import type { ToolAvailability, ToolDescriptor, ToolEffect } from '#mcp/tool/metadata'
 
-export function coreToolEffect(def: ToolDef): ToolEffect {
+function coreToolEffect(def: ToolDef): ToolEffect {
   return toolChangesDocument(def) ? 'write' : 'read'
 }
 
-export function coreToolCapabilities(def: ToolDef): ToolCapability[] {
+function coreToolCapabilities(def: ToolDef): ToolCapability[] {
   return [...def.capabilities]
 }
 
-export function coreToolAvailability(def: ToolDef): ToolAvailability {
+function coreToolAvailability(def: ToolDef): ToolAvailability {
   return def.availability
 }
 

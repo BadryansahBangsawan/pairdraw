@@ -22,7 +22,7 @@ import {
 } from './records'
 
 /** Where FigJam keeps a shape with text's parts: its paint on the background, its text on the label. */
-export const SHAPE_WITH_TEXT_SLOTS = { background: 0, label: 1 } as const
+const SHAPE_WITH_TEXT_SLOTS = { background: 0, label: 1 } as const
 
 /**
  * The fields a SHAPE_WITH_TEXT's own record keeps, as FigJam writes it. Its paint, corners and

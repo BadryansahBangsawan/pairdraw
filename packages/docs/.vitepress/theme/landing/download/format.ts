@@ -32,7 +32,7 @@ export function formatSize(bytes: number, lang: string): string {
   }).format(megabytes)
 }
 
-export function formatDate(iso: string, lang: string): string {
+function formatDate(iso: string, lang: string): string {
   return new Intl.DateTimeFormat(lang, { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(iso))
 }
 

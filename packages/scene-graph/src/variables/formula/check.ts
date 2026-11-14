@@ -15,7 +15,7 @@ import {
 import { foldFormula, VariableFormulaError } from './tree'
 
 /** The types an operator can give when some operand types are unknown, written as `undefined`. */
-export function formulaResultTypes(
+function formulaResultTypes(
   operator: VariableFormulaOperator,
   types: readonly (FormulaValueType | undefined)[]
 ): FormulaValueType[] {

@@ -66,7 +66,7 @@ class CloudMigrationProvider implements MigrationProvider {
   }
 }
 
-export type CloudAuthMigration = {
+type CloudAuthMigration = {
   run(): Promise<void>
   schemaVersion: string
 }

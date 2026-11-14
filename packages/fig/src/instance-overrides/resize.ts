@@ -37,11 +37,7 @@ function constrainedAxis(
 }
 
 /** Apply freeform resize constraints in occurrence coordinates before saved derived bounds. */
-export function resizeFreeformOccurrence(
-  root: InstanceOccurrence,
-  before: Vector,
-  after: Vector
-): void {
+function resizeFreeformOccurrence(root: InstanceOccurrence, before: Vector, after: Vector): void {
   if (before.x === after.x && before.y === after.y) return
   const autoLayout = root.properties.stackMode && root.properties.stackMode !== 'NONE'
   for (const child of root.children) {

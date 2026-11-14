@@ -39,7 +39,7 @@ export interface ShaderStageRenderer<Source> {
 }
 
 /** The 2D context the stage copies frames with. */
-export interface ShaderStageContext<Source> {
+interface ShaderStageContext<Source> {
   clearRect(x: number, y: number, width: number, height: number): void
   drawImage(image: Source, dx: number, dy: number, dw: number, dh: number): void
 }

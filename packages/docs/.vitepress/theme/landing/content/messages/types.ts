@@ -7,7 +7,7 @@ export interface TitledDetail {
   detail: string
 }
 
-export interface RoadmapEntryMessages {
+interface RoadmapEntryMessages {
   title: string
   detail?: string
 }

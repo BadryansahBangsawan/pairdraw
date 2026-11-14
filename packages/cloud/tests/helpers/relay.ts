@@ -59,7 +59,7 @@ export function guest(guestId: string, name = guestId): CollaborationPrincipal {
 }
 
 /** An in-memory socket that records what the relay sends and how it closed. */
-export type TestRelayClient = {
+type TestRelayClient = {
   frames: RelayServerFrame[]
   closed: { code: number; reason: string } | null
   connection: RelayConnection

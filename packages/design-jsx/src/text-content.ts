@@ -19,9 +19,9 @@ import { parseScriptInput } from './schema'
 import { isTreeNode, type TreeNode } from './tree'
 
 /** `<Span>`: characters of a text styled apart from the rest of it. */
-export const SPAN = 'text-span'
+const SPAN = 'text-span'
 /** `<Paragraph>`: one paragraph of a text, with its list and spacing. */
-export const PARAGRAPH = 'text-paragraph'
+const PARAGRAPH = 'text-paragraph'
 
 /** The names `<Span>` and `<Paragraph>` are written under, for messages about them. */
 export const TEXT_CONTENT_NAMES: Readonly<Partial<Record<string, string>>> = {

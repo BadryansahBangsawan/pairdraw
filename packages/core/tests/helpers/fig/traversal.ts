@@ -25,28 +25,3 @@ export function countByType(nodes: SceneNode[]): Map<NodeType, number> {
   }
   return counts
 }
-
-export function childNamed(
-  graph: SceneGraph,
-  parent: SceneNode | undefined,
-  name: string
-): SceneNode | undefined {
-  return parent ? graph.getChildren(parent.id).find((node) => node.name === name) : undefined
-}
-
-export function childMatching(
-  graph: SceneGraph,
-  parent: SceneNode | undefined,
-  predicate: (node: SceneNode) => boolean
-): SceneNode | undefined {
-  return parent ? graph.getChildren(parent.id).find(predicate) : undefined
-}
-
-export function previewChild(
-  graph: SceneGraph,
-  nodes: SceneNode[],
-  name: string
-): SceneNode | undefined {
-  const preview = nodes.find((node) => node.name === 'Preview Thumbnail')
-  return childNamed(graph, preview, name)
-}

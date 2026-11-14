@@ -3,7 +3,7 @@ import { withIndexingPolicy } from '#cloud/server'
 import { Hono } from 'hono'
 
 /** A file of the Cloud site (`bun run build:cloud`): the editor and the portal. */
-export type SiteFile = {
+type SiteFile = {
   body: ReadableStream | Uint8Array<ArrayBuffer>
   type: string
   /** Overrides the cache policy built files get, for a site whose files change in place. */

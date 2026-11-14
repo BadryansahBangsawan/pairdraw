@@ -14,7 +14,7 @@ export function isCanvasTextInput(element: Element | null): boolean {
   return element?.hasAttribute(CANVAS_TEXT_INPUT) ?? false
 }
 
-export function createHiddenTextArea() {
+function createHiddenTextArea() {
   const textarea = document.createElement('textarea')
   textarea.setAttribute(CANVAS_TEXT_INPUT, '')
   textarea.setAttribute('aria-hidden', 'true')

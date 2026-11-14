@@ -5,7 +5,7 @@ import { sameGuid } from '../source-index'
 import { descendants, findWithinBoundary, type TreeShape } from '../tree'
 import type { InstanceOccurrence, InstancePathDiagnostic } from './types'
 
-export const OCCURRENCE_TREE: TreeShape<InstanceOccurrence> = {
+const OCCURRENCE_TREE: TreeShape<InstanceOccurrence> = {
   childrenOf: (node) => node.children,
   isInstance: (node) => node.mainComponentId !== null
 }

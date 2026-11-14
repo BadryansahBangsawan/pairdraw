@@ -1,6 +1,5 @@
-import { getNodeEditState, handleNodeEditDown } from '#vue/shared/input/vector'
-export { resolveHit } from '#vue/shared/input/select/hit'
 import { hitTestLabel, resolveHit, tinySelectionAt } from '#vue/shared/input/select/hit'
+import { getNodeEditState, handleNodeEditDown } from '#vue/shared/input/vector'
 export { updateHoverCursor } from '#vue/shared/input/select/hover'
 import { editedGradient, editedImage, resolveEditorProfile, type Editor } from '@pairdraw/core'
 import type { SceneNode } from '@pairdraw/scene-graph'

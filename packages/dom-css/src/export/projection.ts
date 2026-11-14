@@ -579,5 +579,3 @@ export function sceneNodeToDesignDocument(
     children: projected ? [projected] : []
   }
 }
-
-export type { SceneGraphToDesignOptions as ToDesignDocumentOptions }

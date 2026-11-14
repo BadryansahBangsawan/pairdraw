@@ -73,7 +73,7 @@ export const INSTANCE_SYNC_PROPS: (keyof SceneNode)[] = difference(
 )
 
 /** How a layer inside an instance sits in its parent and whether it is locked, which its overrides may change. */
-export const INSTANCE_SYNC_CHILD_PROPS = ['layoutGrow', 'layoutAlignSelf', 'locked'] as const
+const INSTANCE_SYNC_CHILD_PROPS = ['layoutGrow', 'layoutAlignSelf', 'locked'] as const
 
 /** Fields an edit to a layer inside an instance records as that instance's override. */
 export const INSTANCE_OVERRIDE_FIELDS = [

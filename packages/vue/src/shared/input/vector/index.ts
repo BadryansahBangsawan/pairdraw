@@ -22,7 +22,6 @@ export {
   getNodeEditState,
   hitTestEditHandle,
   hitTestEditRegion,
-  hitTestEditSegment,
   isEndpoint,
   NODE_HIT_THRESHOLD
 } from '#vue/shared/input/vector/hit-test'

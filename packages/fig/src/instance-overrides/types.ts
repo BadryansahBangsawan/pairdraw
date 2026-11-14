@@ -3,7 +3,7 @@ import type { NodeChange, VariableConsumptionEntry } from '@pairdraw/kiwi/fig/co
 import { isUnsetGuid, UNSET_GUID } from '@pairdraw/kiwi/fig/guid'
 import type { Matrix, Vector } from '@pairdraw/scene-graph/primitives'
 
-export interface VariableConsumptionMapFields {
+interface VariableConsumptionMapFields {
   variableConsumptionMap?: { entries?: VariableConsumptionEntry[] }
   [key: string]: unknown
 }
@@ -53,7 +53,7 @@ export interface ComponentPropRef {
   componentPropNodeField: string
 }
 
-export type ComponentPropTextValue = string | { characters?: string }
+type ComponentPropTextValue = string | { characters?: string }
 
 export type ComponentPropValue = {
   boolValue?: boolean

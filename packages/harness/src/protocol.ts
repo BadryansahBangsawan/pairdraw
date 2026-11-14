@@ -1,8 +1,8 @@
-export type JSONPrimitive = null | boolean | number | string
+type JSONPrimitive = null | boolean | number | string
 export type JSONValue = JSONPrimitive | JSONValue[] | { [key: string]: JSONValue }
 
-export const HARNESS_ADAPTER_IDS = ['pi'] as const
-export const HARNESS_SANDBOX_IDS = ['just-bash'] as const
+const HARNESS_ADAPTER_IDS = ['pi'] as const
+const HARNESS_SANDBOX_IDS = ['just-bash'] as const
 
 export type HarnessAdapterID = (typeof HARNESS_ADAPTER_IDS)[number]
 export type HarnessSandboxID = (typeof HARNESS_SANDBOX_IDS)[number]
@@ -33,7 +33,7 @@ export interface HarnessProviderCapability {
   turnContinuation: boolean
 }
 
-export interface HarnessTurnInput {
+interface HarnessTurnInput {
   sessionId: string
   prompt: string
 }

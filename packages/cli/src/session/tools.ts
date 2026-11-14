@@ -22,7 +22,7 @@ export function toolEffect(def: ToolDef): 'read' | 'write' {
 }
 
 /** The first sentence of a tool's description. */
-export function toolSummary(def: ToolDef): string {
+function toolSummary(def: ToolDef): string {
   return def.description.split(/(?<=\.)\s/)[0] ?? def.description
 }
 

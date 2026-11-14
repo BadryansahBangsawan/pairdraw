@@ -194,7 +194,7 @@ export const requestImageUploadsSchema = v.object({
 })
 export type RequestImageUploadsInput = v.InferOutput<typeof requestImageUploadsSchema>
 
-export const completedUploadPartSchema = v.object({
+const completedUploadPartSchema = v.object({
   partNumber: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(10_000)),
   etag: v.pipe(v.string(), v.minLength(1), v.maxLength(255))
 })

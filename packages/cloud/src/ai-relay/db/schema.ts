@@ -1,7 +1,7 @@
 import type { TimestampColumn } from '#cloud/server/db/tables'
 import type { Insertable, Selectable } from 'kysely'
 
-export interface AIRelayUsageTable {
+interface AIRelayUsageTable {
   id: string
   workspaceId: string
   userId: string

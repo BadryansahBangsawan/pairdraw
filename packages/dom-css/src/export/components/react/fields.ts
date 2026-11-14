@@ -38,7 +38,7 @@ export function partAttributes(node: ComponentElement, uses: MarkupUses): es.Syn
   ]
 }
 
-export const NUMBER_INPUT = [
+const NUMBER_INPUT = [
   ['type', jsx.stringValue('number')],
   ['value', jsx.container(es.parseExpression("Number.isNaN(value) ? '' : value"))],
   [

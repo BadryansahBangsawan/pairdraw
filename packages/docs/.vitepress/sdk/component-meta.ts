@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import type { Loader } from 'vitepress'
 import { createChecker } from 'vue-component-meta'
 
-export interface SdkComponentPropMeta {
+interface SdkComponentPropMeta {
   name: string
   type: string
   description: string
@@ -13,19 +13,19 @@ export interface SdkComponentPropMeta {
   default?: string
 }
 
-export interface SdkComponentEventMeta {
+interface SdkComponentEventMeta {
   name: string
   payload: string
   description: string
 }
 
-export interface SdkComponentSlotMeta {
+interface SdkComponentSlotMeta {
   name: string
   props: string
   description: string
 }
 
-export interface SdkComponentExposeMeta {
+interface SdkComponentExposeMeta {
   name: string
   type: string
   description: string
@@ -87,7 +87,7 @@ export function defineComponentMetaLoader(sources: string[]): Loader<SdkComponen
   }
 }
 
-export function readComponentMeta(source: string): SdkComponentMeta {
+function readComponentMeta(source: string): SdkComponentMeta {
   const absoluteSource = resolve(repoRoot, source)
   const checker = sharedChecker()
   // The checker outlives a loader's reruns in development, so it reads the edited file again.

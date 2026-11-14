@@ -83,14 +83,6 @@
             "label": "SVG"
           },
           {
-            "id": "export-pptx",
-            "label": "PPTX"
-          },
-          {
-            "id": "export-drawio",
-            "label": "draw.io"
-          },
-          {
             "id": "export-fig",
             "label": ".fig"
           }

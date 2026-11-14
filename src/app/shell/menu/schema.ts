@@ -1,6 +1,7 @@
 import type { EditorCommandId } from '@open-pencil/vue/editor/commands'
 
 import { REMOVE_AUTO_LAYOUT_SHORTCUT } from '@/app/shell/keyboard/auto-layout'
+import { EXTRA_EXPORT_FORMATS_INCLUDED } from '@/constants'
 
 export type AppMenuTarget = 'all' | 'browser' | 'native'
 
@@ -87,6 +88,20 @@ const CHECK_UPDATES_MENU_ITEM = {
   label: 'Check for Updates…'
 } satisfies AppMenuActionItem
 
+/** The export formats a build can leave out; see `EXTRA_EXPORT_FORMATS_INCLUDED`. */
+const EXTRA_EXPORT_ITEMS = [
+  {
+    id: 'export-pptx',
+    label: 'PPTX',
+    palette: { icon: 'download', label: 'exportSelectionAsPPTX' }
+  },
+  {
+    id: 'export-drawio',
+    label: 'draw.io',
+    palette: { icon: 'download', label: 'exportSelectionAsDrawIO' }
+  }
+] as const satisfies readonly AppMenuActionItem[]
+
 export const APP_MENU_SCHEMA = [
   {
     label: 'File',
@@ -140,16 +155,7 @@ export const APP_MENU_SCHEMA = [
             label: 'SVG',
             palette: { icon: 'download', label: 'exportSelectionAsSVG' }
           },
-          {
-            id: 'export-pptx',
-            label: 'PPTX',
-            palette: { icon: 'download', label: 'exportSelectionAsPPTX' }
-          },
-          {
-            id: 'export-drawio',
-            label: 'draw.io',
-            palette: { icon: 'download', label: 'exportSelectionAsDrawIO' }
-          },
+          ...(EXTRA_EXPORT_FORMATS_INCLUDED ? EXTRA_EXPORT_ITEMS : []),
           {
             id: 'export-fig',
             label: '.fig',

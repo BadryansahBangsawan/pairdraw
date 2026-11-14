@@ -14,6 +14,7 @@ import { moveSlideBy, moveSlideTo, useSlides, type SlideSummary } from '@/app/sl
 import { exportSlidesToPDF, exportSlidesToPPTX, startPresentation } from '@/app/slides/present'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import AppPlaceholder from '@/components/ui/feedback/AppPlaceholder.vue'
+import { EXTRA_EXPORT_FORMATS_INCLUDED } from '@/constants'
 import theme from '@/theme/slides/panel'
 
 import SlidesPanelItem from './SlidesPanelItem.vue'
@@ -105,6 +106,7 @@ function isSelected(slideId: string) {
           <icon-lucide-file-down class="size-3.5" />
         </IconButton>
         <IconButton
+          v-if="EXTRA_EXPORT_FORMATS_INCLUDED"
           :label="messages.exportPPTX"
           :disabled="slides.length === 0"
           data-test-id="slides-export-pptx"

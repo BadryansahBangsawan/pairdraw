@@ -74,6 +74,15 @@ export const APP_NAME = 'Pairdraw'
  */
 export const COLLABORATION_INCLUDED: boolean = false
 
+/** Whether Home offers a new board, the sticky-note canvas. Off in Pairdraw; boards still open. */
+export const BOARD_INCLUDED: boolean = false
+
+/**
+ * Whether the app offers the PowerPoint and draw.io exports. Off in Pairdraw, which exports
+ * images, PDF, SVG, HTML, and its own documents.
+ */
+export const EXTRA_EXPORT_FORMATS_INCLUDED: boolean = false
+
 /**
  * The collaboration namespace. It names the shared document format and how peers send it, so
  * builds that sync the layer tree or variables differently, or encode what they send

@@ -14,7 +14,7 @@ import AppButton from '@/components/ui/button/AppButton.vue'
 import type { AppButtonColor, AppButtonVariant } from '@/components/ui/button/button'
 import AppInput from '@/components/ui/input/AppInput.vue'
 import Tip from '@/components/ui/overlay/Tip.vue'
-import { COLLABORATION_INCLUDED } from '@/constants'
+import { BOARD_INCLUDED, COLLABORATION_INCLUDED } from '@/constants'
 
 import HomeJoinRoom from './HomeJoinRoom.vue'
 
@@ -49,6 +49,8 @@ const CREATE_CHOICES = [
   color: AppButtonColor
   variant: AppButtonVariant
 }>
+/** A build without boards offers a new design alone. */
+const createChoices = CREATE_CHOICES.filter((choice) => BOARD_INCLUDED || choice.kind !== 'board')
 const query = defineModel<string>({ required: true })
 const { menu, files } = useI18n()
 const { isMobile, isTouch } = useViewportKind()
@@ -111,7 +113,7 @@ watch(
         {{ menu.open }}
       </AppButton>
       <Tip
-        v-for="choice in CREATE_CHOICES"
+        v-for="choice in createChoices"
         :key="choice.kind"
         :label="destination ? files.createIn({ place: destination }) : ''"
         :disabled="!destination"

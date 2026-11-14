@@ -96,3 +96,23 @@ test('an example fills the prompt to read and edit, and sends nothing yet', asyn
   await expect(chat.chatColumn).toBeHidden()
   await expect(page.getByTestId('ai-setup-dialog')).toHaveCount(0)
 })
+
+test('Escape leaves the prompt for the canvas, whose shortcuts work again', async ({ page }) => {
+  await openChatEditor(page)
+  const offer = page.getByRole('region', { name: 'Start with a prompt' })
+  await expect(offer).toBeVisible()
+  const prompt = offer.getByRole('textbox', { name: 'Describe a design' })
+  await prompt.fill('A pricing page')
+  await expect(prompt).toBeFocused()
+
+  await prompt.press('Escape')
+  await expect(prompt).not.toBeFocused()
+  await expect(page.getByTestId('canvas-element')).toBeFocused()
+  await expect(prompt).toHaveValue('A pricing page')
+
+  // R picks the Rectangle tool only from the canvas, not while typing.
+  await page.keyboard.press('r')
+  await expect
+    .poll(() => page.evaluate(() => window.pairdraw?.getStore?.()?.state.activeTool))
+    .toBe('RECTANGLE')
+})

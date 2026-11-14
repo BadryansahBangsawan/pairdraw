@@ -19,3 +19,4 @@
 - An export from the Export section that fails, such as one of an empty page, says why in a notice in the app's language instead of doing nothing.
 - The Code panel's HTML export and Export frames to PDF say why an export failed in the app's language when the reason is one Pairdraw knows, such as nothing to export.
 - The Text menu's Bold, Italic, and Underline are unavailable until a text is selected, as Add Link is.
+- Escape in the prompt at the bottom of the canvas returns to the canvas, so its shortcuts work again.

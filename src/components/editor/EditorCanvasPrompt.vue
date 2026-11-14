@@ -12,6 +12,7 @@ import {
 import { sendPromptToDocument } from '@/app/ai/chat/pending-prompt'
 import { ensureChatConfigured } from '@/app/ai/chat/setup'
 import { useEditorStore } from '@/app/editor/active-store'
+import { activeCanvasElement } from '@/app/editor/canvas/focus'
 import ChatPromptComposer from '@/components/chat/ChatPromptComposer.vue'
 import ChatPromptExamples from '@/components/chat/ChatPromptExamples.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
@@ -38,6 +39,18 @@ function pickExample(example: string) {
 }
 
 /**
+ * Escape leaves the prompt for the canvas, so its shortcuts work again; what was typed stays. An
+ * input method's Escape cancels its composition instead.
+ */
+function returnToCanvas(event: KeyboardEvent) {
+  if (event.isComposing) return
+  event.preventDefault()
+  const canvas = activeCanvasElement()
+  if (canvas) canvas.focus({ preventScroll: true })
+  else if (event.target instanceof HTMLElement) event.target.blur()
+}
+
+/**
  * Sends the prompt into this document's chat, which opens in its column. Without a model, the chat looks for a coding agent
  * on this computer first, and guided setup opens only when it finds none.
  */
@@ -56,7 +69,12 @@ async function start(text: string): Promise<void> {
 
 <template>
   <div v-if="offered" :class="styles.root()">
-    <section data-canvas-obstacle :aria-label="ai.canvasPromptTitle" :class="styles.card()">
+    <section
+      data-canvas-obstacle
+      :aria-label="ai.canvasPromptTitle"
+      :class="styles.card()"
+      @keydown.escape="returnToCanvas"
+    >
       <ChatPromptComposer
         ref="composer"
         v-model="prompt"

@@ -1,16 +1,10 @@
 import type { Editor } from '@pairdraw/core'
 
-export function createProfilerActions(editor: Editor) {
-  function activeCanvas() {
-    return (
-      document.querySelector<HTMLCanvasElement>(
-        '[data-active-pane="true"] [data-test-id="canvas-element"]'
-      ) ?? document.querySelector<HTMLCanvasElement>('[data-test-id="canvas-element"]')
-    )
-  }
+import { activeCanvasElement } from '@/app/editor/canvas/focus'
 
+export function createProfilerActions(editor: Editor) {
   function viewportScreenCenter() {
-    const canvas = activeCanvas()
+    const canvas = activeCanvasElement()
     if (canvas) {
       const rect = canvas.getBoundingClientRect()
       return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
@@ -19,7 +13,7 @@ export function createProfilerActions(editor: Editor) {
   }
 
   function viewportCanvasCenter() {
-    const canvas = activeCanvas()
+    const canvas = activeCanvasElement()
     if (canvas) {
       const rect = canvas.getBoundingClientRect()
       return { x: rect.width / 2, y: rect.height / 2 }

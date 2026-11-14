@@ -10,6 +10,7 @@ import { useEditorCommands } from '@pairdraw/vue/editor/commands'
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import { isCloudBinding, openCloudShare } from '@/app/cloud/integration'
+import { getShareURL } from '@/app/collab/room/links'
 import { DEFAULT_COLLAB_STATE, useCollabInjected } from '@/app/collab/use'
 import { useActiveEditorStoreRef, useEditorStore } from '@/app/editor/active-store'
 import { useNotificationMessages } from '@/app/i18n/notifications'
@@ -22,7 +23,6 @@ import { roomStatusText } from '@/components/collab-room/statusText'
 import { toolIcons } from '@/components/icons'
 import { presenceRows } from '@/components/presence/rows'
 import type { ToolbarActionItem } from '@/components/toolbar/types'
-import { getShareURL } from '@/constants'
 
 type MenuAction = ToolbarActionItem
 

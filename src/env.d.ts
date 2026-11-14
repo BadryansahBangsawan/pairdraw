@@ -12,6 +12,8 @@ declare const __PAIRDRAW_APP_VERSION__: string
 declare const __PAIRDRAW_CLOUD_SITE__: boolean
 /** `VITE_PAIRDRAW_OFFICIAL_CLOUD_URL`: the hosted Cloud server a build offers, or null for none. */
 declare const __PAIRDRAW_OFFICIAL_CLOUD_URL__: string | null
+/** `VITE_PAIRDRAW_WEB_APP_URL`: a hosted web app a build names, or null for none. */
+declare const __PAIRDRAW_WEB_APP_URL__: string | null
 declare const __PAIRDRAW_LOCAL_AUTOMATION_TOKEN__: string | null
 declare const __PAIRDRAW_LOCAL_AUTOMATION_URL__: string
 declare const __PAIRDRAW_LOCAL_AUTOMATION_HTTP_URL__: string

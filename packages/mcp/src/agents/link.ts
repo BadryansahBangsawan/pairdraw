@@ -4,7 +4,7 @@ import { join } from 'node:path'
 
 import { uniq } from 'es-toolkit'
 
-import { resolveCORSOrigins, WEB_APP_URL } from '#mcp/transport/origins'
+import { DEFAULT_CONNECT_APP_URL, resolveCORSOrigins } from '#mcp/transport/origins'
 
 /** Hosts a development server may run the app on with plain HTTP. */
 function isLocalHost(hostname: string): boolean {
@@ -17,11 +17,12 @@ function isLocalHost(hostname: string): boolean {
 }
 
 /**
- * The web app the companion pairs with: the official one, or a development server named by the
- * operator. Plain HTTP is accepted only on this machine. Returns null for anything else.
+ * The web app the companion pairs with: the editor on this computer, or one the operator names,
+ * such as a Cloud server's. Plain HTTP is accepted only on this machine. Returns null for anything
+ * else.
  */
 export function resolveConnectAppURL(raw: string | undefined): URL | null {
-  const text = raw?.trim() || WEB_APP_URL
+  const text = raw?.trim() || DEFAULT_CONNECT_APP_URL
   let url: URL
   try {
     url = new URL(text)

@@ -6,7 +6,8 @@ import type {
 
 import { IS_BROWSER, IS_TAURI } from '@pairdraw/core/constants'
 
-import { APP_NAME, WEB_APP_ORIGIN } from '@/constants'
+import { desktopRedirectURL } from '@/app/ai/providers/sign-in/redirect'
+import { APP_NAME } from '@/constants'
 
 import type { MCPConnectionID } from '../types'
 import { credentialMCPOAuthStore, type MCPOAuthStore } from './state'
@@ -14,7 +15,12 @@ import { credentialMCPOAuthStore, type MCPOAuthStore } from './state'
 /** Served from `public/`; it relays the redirect to the editor over this channel. */
 const MCP_OAUTH_CALLBACK_PATH = '/oauth/mcp.html'
 export const MCP_OAUTH_CALLBACK_CHANNEL = 'pairdraw:mcp-oauth'
-/** Served from `public/` on the web app; it hands the redirect to the desktop app's deep link. */
+/** The desktop app's sign-in link for MCP servers, `pairdraw://oauth/mcp`. */
+export const MCP_OAUTH_DEEP_LINK_PROVIDER = 'mcp'
+/**
+ * Served from `public/` on a hosted web app, when a build names one; it hands the redirect to the
+ * desktop app's deep link.
+ */
 const MCP_OAUTH_DESKTOP_CALLBACK_PATH = '/oauth/mcp-desktop.html'
 
 /** Thrown when a server wants the person to sign in again, which only Settings can start. */
@@ -27,11 +33,11 @@ export class MCPSignInRequiredError extends Error {
 
 /**
  * Where the authorization server sends the browser back: a page on this origin in the web app,
- * and the hosted page that opens an `pairdraw://oauth/mcp` link for the desktop app.
+ * and for the desktop app its `pairdraw://oauth/mcp` link, directly or through a hosted page.
  */
 export function mcpOAuthRedirectURL(): string {
   if (IS_TAURI || !IS_BROWSER) {
-    return new URL(MCP_OAUTH_DESKTOP_CALLBACK_PATH, WEB_APP_ORIGIN).href
+    return desktopRedirectURL(MCP_OAUTH_DEEP_LINK_PROVIDER, MCP_OAUTH_DESKTOP_CALLBACK_PATH)
   }
   return new URL(MCP_OAUTH_CALLBACK_PATH, window.location.origin).href
 }

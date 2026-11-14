@@ -1,5 +1,3 @@
-import { IS_BROWSER, IS_TAURI } from '@pairdraw/core/constants'
-
 export {
   IS_BROWSER,
   IS_TAURI,
@@ -99,7 +97,24 @@ export const ROOM_UNREACHABLE_MS = 20_000
 /** How often a room tab rechecks its connection while it waits for the file. */
 export const ROOM_STATUS_TICK_MS = 500
 
-export const WEB_APP_ORIGIN = 'https://app.openpencil.dev'
+/** The origin of a configured address, or null when it is unset or not a URL. */
+function configuredOrigin(value: unknown): string | null {
+  if (typeof value !== 'string' || !value) return null
+  try {
+    return new URL(value).origin
+  } catch {
+    return null
+  }
+}
+
+/**
+ * The origin of a hosted Pairdraw web app, named at build time by `VITE_PAIRDRAW_WEB_APP_URL`.
+ * Null when the build names none, the default: desktop sign-ins then return through `pairdraw://`
+ * links, and room links shared from the desktop app open in the desktop app.
+ */
+export const WEB_APP_ORIGIN = configuredOrigin(
+  typeof __PAIRDRAW_WEB_APP_URL__ === 'string' ? __PAIRDRAW_WEB_APP_URL__ : null
+)
 /** The privacy page: every request the app makes, and every usage event and field. */
 export const PRIVACY_URL = 'https://openpencil.dev/overview/privacy'
 /** The Pairdraw Cloud section of the website, with its waitlist form. */
@@ -135,11 +150,6 @@ export const PI_GUIDE_URL = `${CODING_AGENTS_GUIDE_URL}#pi`
 /** The published release page, with its full notes, for a desktop version. */
 export function releaseNotesURL(version: string): string {
   return `https://github.com/BadryansahBangsawan/pairdraw/releases/tag/v${version}`
-}
-
-export function getShareURL(roomId: string): string {
-  const base = IS_TAURI || !IS_BROWSER ? WEB_APP_ORIGIN : window.location.origin
-  return `${base}/rooms/${roomId}`
 }
 
 export const PEER_COLORS: Color[] = [

@@ -1,4 +1,4 @@
-// https://app.openpencil.dev/?file=<https url>&node=<name> — the browser twin of the
+// <web app>/?file=<https url>&node=<name> — the browser twin of the
 // desktop `pairdraw://open` link. The desktop variant resolves a repo-relative path
 // against open tabs; the web app has no filesystem, so `file` is an absolute `https:`
 // URL the browser fetches cross-origin, without credentials and without following a

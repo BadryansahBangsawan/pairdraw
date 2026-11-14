@@ -68,7 +68,7 @@ const DESKTOP_ISSUE_PLATFORMS: Partial<Record<SupportEnvironment['os'], string>>
 }
 
 function issuePlatform(env: SupportEnvironment): string {
-  if (env.host === 'browser') return 'Web (app.openpencil.dev)'
+  if (env.host === 'browser') return 'Web browser'
   return DESKTOP_ISSUE_PLATFORMS[env.os] ?? 'Not sure'
 }
 

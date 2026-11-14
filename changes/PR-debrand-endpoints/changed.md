@@ -1,2 +1,4 @@
 - Pairdraw Cloud offers a hosted server only in a build that names one with `VITE_PAIRDRAW_OFFICIAL_CLOUD_URL`; otherwise the connect dialog, Settings → Cloud, and invitations ask for a self-hosted server's address and the app contacts no server at startup.
 - Cloud emails show the logo from the sending server and link their footer to it, and carry no logo or link when the server's address is unknown.
+- The desktop app returns from OpenRouter and MCP server sign-ins through its `pairdraw://oauth` link, and shares rooms as `pairdraw://join` links, unless a build names a hosted web app with `VITE_PAIRDRAW_WEB_APP_URL`; pasting a `pairdraw://join` link joins its room.
+- `pairdraw-connect` pairs with the editor at `http://localhost:1420` unless `PAIRDRAW_CONNECT_APP_URL` names another.

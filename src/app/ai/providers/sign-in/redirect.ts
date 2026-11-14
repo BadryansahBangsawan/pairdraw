@@ -2,6 +2,7 @@ import * as v from 'valibot'
 
 import { createDeferred } from '@/app/runtime/deferred'
 import { openExternalLink } from '@/app/shell/ui'
+import { WEB_APP_ORIGIN } from '@/constants'
 
 import type { SignInCallback } from './attempt'
 
@@ -62,8 +63,19 @@ export function popupRedirect<Outcome>(
 }
 
 /**
- * The system browser, whose hosted callback page opens an `pairdraw://oauth/<provider>` link;
- * the desktop shell forwards its query as an `oauth-callback` event.
+ * Where an authorization server sends the desktop app's system browser back: the hosted web app's
+ * page at `relayPath`, which opens the `pairdraw://oauth/<provider>` link, when the build names a
+ * web app; otherwise that link itself, a private-use scheme as native apps register (RFC 8252).
+ */
+export function desktopRedirectURL(provider: string, relayPath: string): string {
+  return WEB_APP_ORIGIN
+    ? new URL(relayPath, WEB_APP_ORIGIN).href
+    : `pairdraw://oauth/${encodeURIComponent(provider)}`
+}
+
+/**
+ * The system browser, which returns through an `pairdraw://oauth/<provider>` link, directly or
+ * from the hosted relay page; the desktop shell forwards its query as an `oauth-callback` event.
  */
 export async function deepLinkRedirect<Outcome>(
   provider: string,

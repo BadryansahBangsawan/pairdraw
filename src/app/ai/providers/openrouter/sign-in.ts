@@ -1,7 +1,5 @@
 import { IS_TAURI } from '@pairdraw/core/constants'
 
-import { WEB_APP_ORIGIN } from '@/constants'
-
 import {
   callbackOutcome,
   startSignIn,
@@ -10,7 +8,12 @@ import {
   type SignInCallback,
   type SignInFailure
 } from '../sign-in/attempt'
-import { deepLinkRedirect, popupRedirect, type RedirectReader } from '../sign-in/redirect'
+import {
+  deepLinkRedirect,
+  desktopRedirectURL,
+  popupRedirect,
+  type RedirectReader
+} from '../sign-in/redirect'
 import {
   exchangeOpenRouterCode,
   openRouterAuthorizationURL,
@@ -20,7 +23,10 @@ import {
 /** Served from `public/`; it relays the redirect to the editor over this channel. */
 export const OPENROUTER_CALLBACK_PATH = '/oauth/openrouter.html'
 export const OPENROUTER_CALLBACK_CHANNEL = 'pairdraw:openrouter-oauth'
-/** Served from `public/` on the web app; it hands the redirect to the desktop app's deep link. */
+/**
+ * Served from `public/` on a hosted web app, when a build names one; it hands the redirect to the
+ * desktop app's deep link.
+ */
 export const OPENROUTER_DESKTOP_CALLBACK_PATH = '/oauth/openrouter-desktop.html'
 const POPUP_NAME = 'pairdraw-openrouter'
 
@@ -59,7 +65,7 @@ export function signInWithOpenRouter({
   keyLabel
 }: OpenRouterSignInOptions): OpenRouterSignIn {
   const callbackURL = IS_TAURI
-    ? new URL(OPENROUTER_DESKTOP_CALLBACK_PATH, WEB_APP_ORIGIN).href
+    ? desktopRedirectURL('openrouter', OPENROUTER_DESKTOP_CALLBACK_PATH)
     : new URL(OPENROUTER_CALLBACK_PATH, window.location.origin).href
   return startSignIn({
     signal,

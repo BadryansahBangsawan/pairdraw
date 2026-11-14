@@ -3,19 +3,40 @@ import { mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { delimiter, join } from 'node:path'
 
-import { connectCORSOrigins, writeConnectPage } from '#mcp/agents/link'
+import { connectCORSOrigins, resolveConnectAppURL, writeConnectPage } from '#mcp/agents/link'
 import { augmentPath, which } from '#mcp/agents/path'
+import { DESKTOP_APP_ORIGINS } from '#mcp/transport/origins'
 
 const isWindows = process.platform === 'win32'
 
 describe('companion origins', () => {
   test('drop `*`, which would let any site drive the agent bridge', () => {
-    const app = new URL('https://app.openpencil.dev/')
+    const app = new URL('https://app.example.com/')
     expect(connectCORSOrigins('*, http://localhost:1420', app)).toEqual([
       'http://localhost:1420',
-      'https://app.openpencil.dev'
+      'https://app.example.com'
     ])
-    expect(connectCORSOrigins('*', app)).toEqual(['https://app.openpencil.dev'])
+    expect(connectCORSOrigins('*', app)).toEqual(['https://app.example.com'])
+  })
+})
+
+describe('the app a companion pairs with', () => {
+  test('is the editor on this computer unless the operator names another', () => {
+    expect(resolveConnectAppURL(undefined)?.href).toBe('http://localhost:1420/')
+    expect(resolveConnectAppURL(' ')?.href).toBe('http://localhost:1420/')
+    // Only the desktop app and that editor may call the companion.
+    expect(connectCORSOrigins(undefined, new URL('http://localhost:1420/'))).toEqual([
+      ...DESKTOP_APP_ORIGINS,
+      'http://localhost:1420'
+    ])
+    expect(resolveConnectAppURL('https://cloud.example.com')?.origin).toBe(
+      'https://cloud.example.com'
+    )
+  })
+
+  test('refuses plain HTTP anywhere but this computer', () => {
+    expect(resolveConnectAppURL('http://cloud.example.com')).toBeNull()
+    expect(resolveConnectAppURL('https://user:secret@cloud.example.com')).toBeNull()
   })
 })
 
@@ -23,11 +44,11 @@ describe('the page that opens a link', () => {
   test.skipIf(isWindows)('is readable only by this user and forwards to the link', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'op-connect-page-'))
     try {
-      const link = 'https://app.openpencil.dev/#connect=abc&port=7601'
+      const link = 'https://app.example.com/#connect=abc&port=7601'
       const page = await writeConnectPage(dir, link)
       expect(statSync(page.path).mode & 0o777).toBe(0o600)
       const html = readFileSync(page.path, 'utf8')
-      expect(html).toContain('url=https://app.openpencil.dev/#connect=abc&amp;port=7601')
+      expect(html).toContain('url=https://app.example.com/#connect=abc&amp;port=7601')
       await page.remove()
       expect(() => statSync(page.path)).toThrow()
     } finally {

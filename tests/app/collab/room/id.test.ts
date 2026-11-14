@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import { parseRoomInput } from '@/app/collab/room/id'
+import { getShareURL } from '@/app/collab/room/links'
 
 const ROOM = 'abcdefghijklmnopqrstuvwxyz012345'
 
@@ -9,10 +10,11 @@ describe('room links and IDs', () => {
     for (const input of [
       ROOM,
       `  ${ROOM}  `,
-      `https://app.openpencil.dev/rooms/${ROOM}`,
-      `https://app.openpencil.dev/rooms/${ROOM}/`,
-      `https://app.openpencil.dev/rooms/${ROOM}?test#layers`,
-      `pairdraw.localhost/rooms/${ROOM}#x`
+      `https://app.example.com/rooms/${ROOM}`,
+      `https://app.example.com/rooms/${ROOM}/`,
+      `https://app.example.com/rooms/${ROOM}?test#layers`,
+      `pairdraw.localhost/rooms/${ROOM}#x`,
+      `pairdraw://join?room=${ROOM}`
     ]) {
       expect(parseRoomInput(input)).toBe(ROOM)
     }
@@ -25,10 +27,17 @@ describe('room links and IDs', () => {
       ROOM.slice(1),
       `${ROOM}0`,
       ROOM.toUpperCase(),
-      `https://app.openpencil.dev/rooms/${ROOM.slice(0, 31)}!`,
-      `https://app.openpencil.dev/demo`
+      `https://app.example.com/rooms/${ROOM.slice(0, 31)}!`,
+      `https://app.example.com/demo`,
+      `pairdraw://join?room=${ROOM.slice(1)}`,
+      `pairdraw://join?room=${ROOM}x`
     ]) {
       expect(parseRoomInput(input)).toBeNull()
     }
+  })
+
+  test('a link shared outside a browser opens the desktop app when no web app is hosted', () => {
+    expect(getShareURL(ROOM)).toBe(`pairdraw://join?room=${ROOM}`)
+    expect(parseRoomInput(getShareURL(ROOM))).toBe(ROOM)
   })
 })

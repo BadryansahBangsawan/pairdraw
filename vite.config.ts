@@ -54,6 +54,7 @@ export default defineConfig(async ({ command, mode }) => {
       __PAIRDRAW_APP_VERSION__: JSON.stringify(packageJson.version),
       __PAIRDRAW_CLOUD_SITE__: JSON.stringify(cloudSite),
       __PAIRDRAW_OFFICIAL_CLOUD_URL__: JSON.stringify(env.VITE_PAIRDRAW_OFFICIAL_CLOUD_URL ?? null),
+      __PAIRDRAW_WEB_APP_URL__: JSON.stringify(env.VITE_PAIRDRAW_WEB_APP_URL ?? null),
       __PAIRDRAW_LOCAL_AUTOMATION_TOKEN__: JSON.stringify(
         automation ? localAutomationToken(command) : null
       ),

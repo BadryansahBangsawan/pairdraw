@@ -7,9 +7,8 @@ import {
   type RedirectReader
 } from '@/app/ai/providers/sign-in/redirect'
 
-import { MCP_OAUTH_CALLBACK_CHANNEL } from './provider'
+import { MCP_OAUTH_CALLBACK_CHANNEL, MCP_OAUTH_DEEP_LINK_PROVIDER } from './provider'
 
-const DEEP_LINK_PROVIDER = 'mcp'
 const POPUP_NAME = 'pairdraw-mcp'
 /** Authorization codes live minutes; an attempt left open longer has to start again. */
 const CALLBACK_LIFETIME_MS = 10 * 60_000
@@ -46,7 +45,7 @@ function redirectReader(state: string): RedirectReader<MCPCallbackOutcome> {
  * click that starts sign-in, so the web app's popup is not blocked; null when it was.
  */
 export function prepareMCPOAuthCallback(state: string): Promise<MCPOAuthCallback | null> {
-  if (IS_TAURI) return deepLinkRedirect(DEEP_LINK_PROVIDER, redirectReader(state))
+  if (IS_TAURI) return deepLinkRedirect(MCP_OAUTH_DEEP_LINK_PROVIDER, redirectReader(state))
   return Promise.resolve(
     popupRedirect(POPUP_NAME, MCP_OAUTH_CALLBACK_CHANNEL, redirectReader(state))
   )

@@ -12,12 +12,25 @@ export function isRoomId(value: string): boolean {
   return v.is(roomIdSchema, value)
 }
 
+/** The room a desktop `pairdraw://join?room=<id>` link names, or null for any other text. */
+function desktopRoomLink(text: string): string | null {
+  if (!text.startsWith('pairdraw://join')) return null
+  try {
+    return new URL(text).searchParams.get('room')
+  } catch {
+    return null
+  }
+}
+
 /**
- * The room ID in what someone pasted: a bare ID or a room link, with any query, hash, or
- * trailing slash. Null when it is not a room ID, so a mistyped link never joins another room.
+ * The room ID in what someone pasted: a bare ID, a room link, with any query, hash, or trailing
+ * slash, or a desktop `pairdraw://join` link. Null when it is not a room ID, so a mistyped link
+ * never joins another room.
  */
 export function parseRoomInput(text: string): string | null {
   let candidate = text.trim()
+  const desktop = desktopRoomLink(candidate)
+  if (desktop !== null) return isRoomId(desktop) ? desktop : null
   const roomIndex = candidate.lastIndexOf('/rooms/')
   if (roomIndex !== -1) candidate = candidate.slice(roomIndex + '/rooms/'.length)
   candidate = candidate.split(/[?#]/)[0] ?? ''

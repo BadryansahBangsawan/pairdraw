@@ -3,12 +3,12 @@ import { computed } from 'vue'
 
 import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
 
-import { roomLinkURL } from '@/app/collab/room/links'
+import { getShareURL, roomLinkURL } from '@/app/collab/room/links'
 import { showsRoomDocument, type PendingRoomStatus } from '@/app/collab/room/status'
 import { DEFAULT_COLLAB_STATE, useCollabInjected } from '@/app/collab/use'
 import { useNotificationMessages } from '@/app/i18n/notifications'
 import { toast } from '@/app/shell/ui'
-import { DESKTOP_DOWNLOAD_URL, getShareURL, IS_BROWSER, IS_TAURI } from '@/constants'
+import { DESKTOP_DOWNLOAD_URL, IS_BROWSER, IS_TAURI } from '@/constants'
 
 /** What the room screens offer for the active tab's room: its link, a desktop handoff, Leave. */
 export function useRoomActions() {

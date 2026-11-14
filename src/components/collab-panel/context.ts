@@ -5,6 +5,7 @@ import type { InjectionKey, ShallowUnwrapRef } from 'vue'
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useJoinRoom } from '@/app/collab/join'
+import { getShareURL } from '@/app/collab/room/links'
 import { activeRoom } from '@/app/collab/rooms'
 import { DEFAULT_COLLAB_STATE, useCollabInjected } from '@/app/collab/use'
 import { useActiveEditorStoreRef } from '@/app/editor/active-store'
@@ -13,7 +14,6 @@ import { presenceOf, renameAgent } from '@/app/presence/registry'
 import type { FollowTarget } from '@/app/presence/types'
 import { toast } from '@/app/shell/ui'
 import { presenceRows as buildPresenceRows } from '@/components/presence/rows'
-import { getShareURL } from '@/constants'
 
 function createCollabPanelContext() {
   const collab = useCollabInjected()

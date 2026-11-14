@@ -5,7 +5,7 @@ import { fromUint8Array } from 'js-base64'
 import { mcpOAuthAccessToken, type MCPHTTPConnection } from '@/app/integrations/mcp/auth'
 import { connectMCPClient, defaultMCPConnectDependencies } from '@/app/integrations/mcp/client'
 import { mcpCallbackOutcome, type MCPOAuthCallback } from '@/app/integrations/mcp/oauth/callback'
-import { createMCPOAuthProvider } from '@/app/integrations/mcp/oauth/provider'
+import { createMCPOAuthProvider, mcpOAuthRedirectURL } from '@/app/integrations/mcp/oauth/provider'
 import { signInToMCPConnection } from '@/app/integrations/mcp/oauth/sign-in'
 import {
   mcpOAuthTokensFresh,
@@ -260,5 +260,12 @@ describe('MCP OAuth sign-in', () => {
       true
     )
     expect(mcpOAuthTokensFresh({ tokens: { access_token: 'a', token_type: 'Bearer' } })).toBeTrue()
+  })
+})
+
+describe('the desktop redirect', () => {
+  test('returns straight to the desktop app when the build hosts no web app', () => {
+    // Tests run outside a browser, as the desktop app's redirect does, with no web app named.
+    expect(mcpOAuthRedirectURL()).toBe('pairdraw://oauth/mcp')
   })
 })

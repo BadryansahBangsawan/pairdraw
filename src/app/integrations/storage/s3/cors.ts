@@ -3,21 +3,18 @@ import { compact } from 'es-toolkit/array'
 
 import { IS_BROWSER, WEB_APP_ORIGIN } from '@/constants'
 
-/** Origins Pairdraw may run from when calling S3 from the browser. */
-export const CLOUD_CORS_STATIC_ORIGINS = [
-  // Exact production origin — providers without partial-wildcard support
-  // (e.g. R2) need it verbatim even when CORS is configured from dev.
+/**
+ * Origins Pairdraw may run from when calling S3 from the browser: the hosted web app a build
+ * names, verbatim for providers without partial wildcards such as R2, and any local development
+ * port (S3 and B2 allow one '*' per origin). collectCloudCORSOrigins() also adds the current
+ * origin, so wherever the app runs when CORS is applied gets an exact match. Never a wildcard over
+ * a domain the owner of the bucket does not control: any site there could use the bucket.
+ */
+export const CLOUD_CORS_STATIC_ORIGINS: readonly string[] = compact([
   WEB_APP_ORIGIN,
-  // Wildcards: any openpencil.dev subdomain (staging, demo, …), Cloudflare
-  // Pages PR previews, and any local dev port. S3/B2 allow one '*' per origin.
-  // collectCloudCORSOrigins() also appends the current origin, so strict
-  // providers still get an exact match for wherever the app is running when
-  // CORS is applied.
-  'https://*.openpencil.dev',
-  'https://*.pairdraw-app.pages.dev',
   'http://localhost:*',
   'http://127.0.0.1:*'
-] as const
+])
 
 export function collectCloudCORSOrigins(extra?: string | null): string[] {
   const set = new Set<string>(CLOUD_CORS_STATIC_ORIGINS)
@@ -105,7 +102,7 @@ export function isLikelyCORSOrNetworkError(error: unknown): boolean {
 }
 
 export function formatBrowserCORSHelpMessage(): string {
-  const origin = IS_BROWSER ? window.location.origin : WEB_APP_ORIGIN
+  const origin = IS_BROWSER ? window.location.origin : (WEB_APP_ORIGIN ?? 'this app')
   return (
     `The browser could not reach this bucket from ${origin}. ` +
     'Your bucket may not allow requests from this site, or the endpoint may be unavailable. ' +

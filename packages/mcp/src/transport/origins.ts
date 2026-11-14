@@ -30,8 +30,12 @@ export function resolveCORSOrigins(raw: string | undefined): readonly string[] {
   return parseCORSOrigins(raw) ?? DESKTOP_APP_ORIGINS
 }
 
-/** The web app, which pairs with a companion started by `pairdraw-connect`. */
-export const WEB_APP_URL = 'https://app.openpencil.dev'
+/**
+ * The web app a companion started by `pairdraw-connect` pairs with unless the operator names
+ * another: the editor `bun run dev` serves on this computer. Pairdraw hosts no web app, so no
+ * site elsewhere is trusted by default.
+ */
+export const DEFAULT_CONNECT_APP_URL = 'http://localhost:1420'
 
 /**
  * Whether a request may reach the server from where it came. Browsers send `Origin` on every

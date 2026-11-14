@@ -12,6 +12,7 @@ import { pairingFingerprint } from '#mcp/agents/pairing'
 import { resolveMCPRoot } from '#mcp/root'
 import { MCP_VERSION, startServer } from '#mcp/server'
 import { readToolPolicyFromEnv } from '#mcp/tool/policy'
+import { DEFAULT_CONNECT_APP_URL } from '#mcp/transport/origins'
 import { getCompanionDir } from '#mcp/transport/paths'
 
 const DEFAULT_PORT = 7600
@@ -34,9 +35,9 @@ if (process.argv.includes('--help') || process.argv.includes('-h')) {
       `  --no-open     Print the link without opening the browser\n\n` +
       `Environment variables:\n` +
       `  PORT                         TCP port (default: ${DEFAULT_PORT})\n` +
-      `  PAIRDRAW_CONNECT_APP_URL   The Pairdraw web app to pair with\n` +
-      `                               (default: https://app.openpencil.dev). Its origin may\n` +
-      `                               call this server; use it for a development server.\n` +
+      `  PAIRDRAW_CONNECT_APP_URL   The Pairdraw web app to pair with (default:\n` +
+      `                               ${DEFAULT_CONNECT_APP_URL}, the editor \`bun run dev\` serves).\n` +
+      `                               Its origin may call this server.\n` +
       `  PAIRDRAW_MCP_CORS_ORIGIN   Further origins allowed to call this server, comma-separated.\n` +
       `  PAIRDRAW_MCP_ROOT          Allowed directory for file-scoped tools (default: home\n` +
       `                               directory on Windows, current working directory elsewhere)\n` +

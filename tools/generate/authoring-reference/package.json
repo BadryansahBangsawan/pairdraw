@@ -9,7 +9,6 @@
     "test": "bun test tests"
   },
   "dependencies": {
-    "@pairdraw/core": "workspace:*",
     "@pairdraw/design-jsx": "workspace:*",
     "@pairdraw/package-artifacts-tools": "workspace:*",
     "dedent": "^1.7.2"

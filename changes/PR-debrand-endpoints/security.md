@@ -1,2 +1,2 @@
-- The CORS rules Pairdraw writes to an S3 bucket allow only local development origins, the current origin, and a hosted web app the build names, no longer any `*.openpencil.dev` or `*.pairdraw-app.pages.dev` site.
-- `pairdraw-connect` no longer lets `https://app.openpencil.dev` call the companion by default.
+- The CORS rules Pairdraw writes to an S3 bucket allow only local development origins, the current origin, and a hosted web app the build names, no longer every subdomain of upstream's website or of a Cloudflare Pages project nobody here owns.
+- `pairdraw-connect` no longer lets upstream's hosted web app call the companion by default.

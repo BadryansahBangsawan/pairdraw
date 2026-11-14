@@ -1,0 +1,1 @@
+- `@pairdraw/cloud/email` no longer exports `emailLayout` or `EmailLayoutProps`, which only the removed waitlist Worker used; transactional mail still renders through `renderTransactionalEmail`.

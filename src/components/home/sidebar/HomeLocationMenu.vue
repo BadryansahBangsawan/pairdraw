@@ -80,7 +80,7 @@ const isActive = (location: HomeLocation) =>
     <DropdownMenuPortal>
       <DropdownMenuContent
         side="bottom"
-        align="start"
+        align="end"
         :side-offset="4"
         :class="[menuUI.content(), ui.content()]"
       >

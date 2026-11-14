@@ -88,5 +88,5 @@ Events arrive on the port as `{ event, data }`.
 
 - Only the parent frame at the exact `origin` can connect, and only once per load; a page that frames the editor with another origin in the URL cannot talk to it.
 - Every message on the port is validated; malformed requests are answered with `invalid-request` and never reach the editor.
-- The embed starts none of the app's own services: no coding agents, MCP server, usage statistics or daily ping, Cloud sign-in, or collaboration rooms. It opens no file, Cloud document, or room link from its own address.
+- The embed starts none of the app's own services: no coding agents, MCP server, Cloud sign-in, or collaboration rooms. It opens no file, Cloud document, or room link from its own address.
 - Serve the editor with a `Content-Security-Policy: frame-ancestors` that lists the sites allowed to frame it if your deployment should not be embeddable everywhere.

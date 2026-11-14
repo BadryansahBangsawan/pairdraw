@@ -25,7 +25,7 @@ Or download from the [releases page](https://github.com/BadryansahBangsawan/pair
 
 Requires macOS 13 or later with current Safari updates, Windows 10 or later, or Linux with WebKitGTK 2.40+; the web app needs Chrome 111, Edge 111, Firefox 128, or Safari 16.4 or later. See [system requirements](packages/docs/getting-started.md#system-requirements).
 
-Official builds send one anonymous ping a day and share usage stats only if you agree. The [privacy page](packages/docs/overview/privacy.md) lists every field, everything else the app sends, and how to turn it off.
+Pairdraw sends no usage data: no daily ping, analytics, or usage statistics. The [privacy page](packages/docs/overview/privacy.md) lists what the app connects to and when.
 
 ## What it does
 

@@ -55,7 +55,7 @@ import RenameSelectionDialog from '@/components/selection/RenameSelectionDialog.
 import LoadingScreen from '@/components/shell/LoadingScreen.vue'
 import ShellTopBar from '@/components/shell/ShellTopBar.vue'
 import ShortcutSheetHost from '@/components/shortcuts/ShortcutSheetHost.vue'
-import { IS_BROWSER } from '@/constants'
+import { COLLABORATION_INCLUDED, IS_BROWSER } from '@/constants'
 
 const route = useRoute()
 /**
@@ -109,7 +109,9 @@ const joinRoomFromInput = useJoinRoom()
  */
 function openFirstTab(): Tab {
   if (embed) return createTab()
-  const roomId = typeof route.params.roomId === 'string' ? route.params.roomId : null
+  // Without shared rooms a room link opens what any other address does.
+  const roomId =
+    COLLABORATION_INCLUDED && typeof route.params.roomId === 'string' ? route.params.roomId : null
   if (pinHome) createHomeTab()
   if (roomId) {
     if (joinRoomFromInput(roomId) && activeTab.value) return activeTab.value
@@ -263,9 +265,10 @@ onMounted(async () => {
   documentClaimsCleanup.value = watchOpenDocuments()
 
   try {
-    roomLinksCleanup.value = await bindDesktopRoomLinks((roomId) => {
-      if (!joinRoomFromInput(roomId)) toast.error(collaboration.value.invalidRoomLink)
-    })
+    if (COLLABORATION_INCLUDED)
+      roomLinksCleanup.value = await bindDesktopRoomLinks((roomId) => {
+        if (!joinRoomFromInput(roomId)) toast.error(collaboration.value.invalidRoomLink)
+      })
   } catch (error) {
     console.error('[Room link]', error)
   }

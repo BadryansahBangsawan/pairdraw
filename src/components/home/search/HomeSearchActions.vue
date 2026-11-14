@@ -14,6 +14,7 @@ import AppButton from '@/components/ui/button/AppButton.vue'
 import type { AppButtonColor, AppButtonVariant } from '@/components/ui/button/button'
 import AppInput from '@/components/ui/input/AppInput.vue'
 import Tip from '@/components/ui/overlay/Tip.vue'
+import { COLLABORATION_INCLUDED } from '@/constants'
 
 import HomeJoinRoom from './HomeJoinRoom.vue'
 
@@ -96,7 +97,7 @@ watch(
       <template #leading><icon-lucide-search class="size-4" /></template>
     </AppInput>
     <div class="grid grid-cols-2 gap-2 @2xl/home:contents">
-      <div class="col-span-2 grid @2xl/home:contents">
+      <div v-if="COLLABORATION_INCLUDED" class="col-span-2 grid @2xl/home:contents">
         <HomeJoinRoom :size="isTouch ? 'lg' : 'md'" />
       </div>
       <AppButton

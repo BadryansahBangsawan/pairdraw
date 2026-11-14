@@ -1,7 +1,12 @@
 import { expect, test } from '@playwright/test'
 
+import { COLLABORATION_INCLUDED } from '@/constants'
+
 import { createPeer, share, startRelay, type Peer } from '#tests/helpers/collab/room'
 import { FAKE_MICROPHONE_ARGS, muteButton, voicePopover } from '#tests/helpers/collab/voice'
+
+// Sharing a room and its call are not part of Pairdraw; these run for a build that includes them.
+test.skip(!COLLABORATION_INCLUDED, 'shared rooms are not included in this build')
 
 // No fake prompt here: it would answer even a microphone the test blocked.
 test.use({ launchOptions: { args: FAKE_MICROPHONE_ARGS } })

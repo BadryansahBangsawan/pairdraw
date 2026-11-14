@@ -8,6 +8,7 @@ import CollabAvatarStack from '@/components/collab-panel/CollabAvatarStack.vue'
 import CollabSharePopover from '@/components/collab-panel/CollabSharePopover.vue'
 import { provideCollabPanel } from '@/components/collab-panel/context'
 import VoiceCallControl from '@/components/voice-call/VoiceCallControl.vue'
+import { COLLABORATION_INCLUDED } from '@/constants'
 
 /**
  * Who is in the document, its call, and Share, which comes last. The slot goes between them, so
@@ -22,9 +23,12 @@ const cloud = computed(() => isCloudBinding(store.getStorageBinding()))
 <template>
   <div class="flex items-center gap-1.5">
     <CollabAvatarStack />
-    <VoiceCallControl v-if="collab.state.inRoom" :people="collab.callRows" />
+    <VoiceCallControl
+      v-if="COLLABORATION_INCLUDED && collab.state.inRoom"
+      :people="collab.callRows"
+    />
     <slot />
     <CloudShareButton v-if="cloud" />
-    <CollabSharePopover v-else />
+    <CollabSharePopover v-else-if="COLLABORATION_INCLUDED" />
   </div>
 </template>

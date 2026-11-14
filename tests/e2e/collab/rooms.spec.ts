@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
+import { COLLABORATION_INCLUDED } from '@/constants'
+
 import {
   collaborationErrors,
   connect,
@@ -12,6 +14,9 @@ import {
   startRelay,
   type Peer
 } from '#tests/helpers/collab/room'
+
+// Sharing a room and its call are not part of Pairdraw; these run for a build that includes them.
+test.skip(!COLLABORATION_INCLUDED, 'shared rooms are not included in this build')
 
 /** Adds a named rectangle to the active tab's first page and returns its ID. */
 function addRectangle(page: Page, name: string) {

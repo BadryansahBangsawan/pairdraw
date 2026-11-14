@@ -9,3 +9,4 @@
 - AI agents show in violet everywhere, in shared rooms too: their cursors, labels, page markers, and the chat's typing indicator, tool calls, and reasoning.
 - On phones, the toolbar, HUD buttons, and bottom sheet have a visible edge in both themes, and the bottom sheet's panel tabs show which panel is open and are announced by name to screen readers. Comment pins have a visible edge in dark mode, and the open thread's details stay readable in the comments list.
 - The desktop app is named Pairdraw in the menu bar, the Dock, and its bundle, and the CLI, the MCP server, the agent skill, and exported Storybook and draw.io files say Pairdraw too.
+- Sharing a document in a live room is no longer part of Pairdraw: the Share popover, joining a room by link, the room's voice call, and the name shown to others are gone. AI agents still show their cursors on the canvas.

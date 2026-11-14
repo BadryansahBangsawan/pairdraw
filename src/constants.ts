@@ -68,6 +68,13 @@ import type { Color } from '@open-pencil/scene-graph/primitives'
 export const APP_NAME = 'Pairdraw'
 
 /**
+ * Whether people can share a document in a live room: the Share popover, joining by link, the
+ * room's call, and the name shown to others. Off in Pairdraw. The presence layer itself stays,
+ * because AI agents show their cursors through it.
+ */
+export const COLLABORATION_INCLUDED: boolean = false
+
+/**
  * The collaboration namespace. It names the shared document format and how peers send it, so
  * builds that sync the layer tree or variables differently, or encode what they send
  * differently, never join each other's rooms; change it with either.

@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
+import { COLLABORATION_INCLUDED } from '@/constants'
+
 import {
   collaborationErrors,
   connect,
@@ -9,6 +11,9 @@ import {
   type Peer
 } from '#tests/helpers/collab/room'
 import { FAKE_MICROPHONE_ARGS, muteButton, voicePopover } from '#tests/helpers/collab/voice'
+
+// Sharing a room and its call are not part of Pairdraw; these run for a build that includes them.
+test.skip(!COLLABORATION_INCLUDED, 'shared rooms are not included in this build')
 
 // The fake prompt answers itself, so every context may use the microphone.
 test.use({ launchOptions: { args: [...FAKE_MICROPHONE_ARGS, '--use-fake-ui-for-media-stream'] } })

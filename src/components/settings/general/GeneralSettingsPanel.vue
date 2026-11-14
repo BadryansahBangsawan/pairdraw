@@ -27,6 +27,7 @@ import SettingsSection from '@/components/settings/layout/SettingsSection.vue'
 import PresetNumberField from '@/components/ui/input/PresetNumberField.vue'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
 import AppSwitch from '@/components/ui/toggle/AppSwitch.vue'
+import { COLLABORATION_INCLUDED } from '@/constants'
 
 const { availableLocales, locale, localeLabels, menu, recovery, setLocale, settings } = useI18n()
 
@@ -128,7 +129,7 @@ const preserveUnsavedWork = computed({
       </SettingsGroup>
     </SettingsSection>
 
-    <CollaborationNameSection />
+    <CollaborationNameSection v-if="COLLABORATION_INCLUDED" />
 
     <SettingsSection>
       <template #title>{{ recovery.settingsTitle }}</template>

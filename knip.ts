@@ -71,7 +71,9 @@ const config: KnipConfig = {
     '**/*.md',
     // A UI family exports its parts from `index.ts` whether or not a caller uses them
     // (`src/AGENTS.md`, UI).
-    'src/components/ui/*/index.ts'
+    'src/components/ui/*/index.ts',
+    // Cargo's build output; `desktop/target` is ignored by git.
+    'desktop/target/**'
   ],
   ignoreIssues: {
     // The design system's families export all their parts and helpers, as above.

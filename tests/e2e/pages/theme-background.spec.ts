@@ -27,6 +27,13 @@ test('a new document and its new pages take the dark page in the dark theme', as
   expect(await currentPageColor(page)).toBeCloseTo(DARK, 3)
 })
 
+test('a design started from Home takes the dark page in the dark theme', async ({ page }) => {
+  await page.goto('/')
+  await page.getByTestId('home-new-design').click()
+  await page.getByTestId('canvas-element').and(page.locator('[data-ready="1"]')).waitFor()
+  expect(await currentPageColor(page)).toBeCloseTo(DARK, 3)
+})
+
 test('the light theme starts documents on the light page', async ({ page }) => {
   await openFresh(page)
   await page.evaluate(async () => {

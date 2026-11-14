@@ -10,3 +10,4 @@
 - A picker opened from the app menu, such as Insert Icon…, stays open instead of closing with the menu.
 - Muted and success text on tinted backgrounds meets WCAG AA, so helper text, chips, and a tool call's done icon are easier to read.
 - `pairdraw <command> --help` shows the command on its usage line, such as `pairdraw export [OPTIONS] [FILE]`, instead of the path of the script that runs the CLI.
+- A design started from Home or a New file tab starts on the dark page in the dark theme, as other new documents do, instead of the light one.

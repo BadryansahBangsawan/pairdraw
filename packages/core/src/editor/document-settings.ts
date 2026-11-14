@@ -2,14 +2,17 @@ import { isEqual } from 'es-toolkit'
 
 import { SceneGraph, type DocumentKind, type EnabledLibraryBinding } from '@pairdraw/scene-graph'
 
-import { BOARD_PAGE_BACKGROUND } from '#core/constants'
+import { BOARD_PAGE_BACKGROUND, type InterfaceTheme } from '#core/constants'
 import { offeredTool } from '#core/editor/views'
-import { setPageBackgrounds } from '#core/figma-api/page-backgrounds'
+import { setDefaultPageBackground, setPageBackgrounds } from '#core/figma-api/page-backgrounds'
 
 import type { EditorContext } from './types'
 
-/** An empty document of this kind: a board starts on FigJam's light page. */
-export function createDocumentGraph(kind: DocumentKind): SceneGraph {
+/**
+ * An empty document of this kind: a board starts on FigJam's light page, and a design on the page
+ * Figma gives the interface theme it is made in.
+ */
+export function createDocumentGraph(kind: DocumentKind, theme?: InterfaceTheme): SceneGraph {
   const graph = new SceneGraph()
   graph.documentKind = kind
   if (kind === 'board') {
@@ -22,6 +25,8 @@ export function createDocumentGraph(kind: DocumentKind): SceneGraph {
         blendMode: 'NORMAL'
       }
     ])
+  } else if (theme) {
+    setDefaultPageBackground(graph, graph.getPages()[0], theme)
   }
   return graph
 }

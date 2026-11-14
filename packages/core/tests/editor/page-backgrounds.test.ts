@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { createDefaultEditorState, createEditor } from '@pairdraw/core'
+import { createDefaultEditorState, createDocumentGraph, createEditor } from '@pairdraw/core'
 import { FigmaAPI } from '@pairdraw/core/figma-api'
 import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
 import { SceneGraph } from '@pairdraw/scene-graph'
@@ -133,6 +133,16 @@ describe('new page backgrounds follow the interface theme', () => {
     const editor = createEditor({ graph, state })
     try {
       expect(editor.state.pageColor).toEqual(navy)
+    } finally {
+      editor.dispose()
+    }
+  })
+
+  test('an empty design made for a theme, which the editor opens as a supplied document', () => {
+    const graph = createDocumentGraph('design', 'dark')
+    const editor = createEditor({ graph, state: createDefaultEditorState(graph.getPages()[0].id) })
+    try {
+      expect(editor.state.pageColor).toEqual(dark)
     } finally {
       editor.dispose()
     }

@@ -253,7 +253,7 @@ test('a file that is not text does not attach', async ({ configuredChat: chat })
     mimeType: 'text/plain',
     buffer: Buffer.from([0xff, 0xfe, 0x00, 0x80])
   })
-  await expect(chat.page.getByText(/notes\.txt/)).toBeVisible()
+  await expect(chat.page.getByRole('listitem').getByText(/notes\.txt/)).toBeVisible()
   await expect(chat.page.getByRole('button', { name: 'Remove file notes.txt' })).toHaveCount(0)
 })
 

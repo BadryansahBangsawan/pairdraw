@@ -20,8 +20,7 @@ export const rootThemeConfig = (): DefaultTheme.Config => ({
     { text: 'Automation', link: '/programmable/' },
     { text: 'SDK', link: '/programmable/sdk/' },
     { text: 'Reference', link: '/reference/keyboard-shortcuts' },
-    { text: 'Development', link: '/development/contributing' },
-    { text: 'Open App', link: 'https://app.openpencil.dev' }
+    { text: 'Development', link: '/development/contributing' }
   ],
 
   sidebar: {

@@ -41,7 +41,7 @@ Add a rule like this one, with the origins you open Pairdraw from:
   {
     "AllowedHeaders": ["*"],
     "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
-    "AllowedOrigins": ["https://app.openpencil.dev"],
+    "AllowedOrigins": ["https://app.example.com"],
     "ExposeHeaders": ["ETag", "Content-Range", "x-amz-request-id", "x-amz-id-2", "x-amz-version-id"],
     "MaxAgeSeconds": 3600
   }

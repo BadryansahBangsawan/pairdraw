@@ -1,6 +1,6 @@
 # @pairdraw/core
 
-Editor engine for [Pairdraw](https://openpencil.dev): the CanvasKit (Skia WASM) renderer, Yoga layout, the framework-agnostic editor with undo and selection, the Figma Plugin API compatibility layer, the AI/MCP tool definitions, clipboard and vector conversion, and format-neutral document I/O.
+Editor engine for [Pairdraw](https://github.com/BadryansahBangsawan/pairdraw): the CanvasKit (Skia WASM) renderer, Yoga layout, the framework-agnostic editor with undo and selection, the Figma Plugin API compatibility layer, the AI/MCP tool definitions, clipboard and vector conversion, and format-neutral document I/O.
 
 It depends on `@pairdraw/scene-graph`, `@pairdraw/pen`, `@pairdraw/kiwi`, and `@pairdraw/fig`, and keeps browser DOM out so it runs in the app, the CLI, the MCP server, and headless scripts alike.
 
@@ -18,7 +18,7 @@ await compileScript(`
 `)(new FigmaAPI(graph))
 ```
 
-- Programmable overview and SDK docs: https://openpencil.dev/programmable/
+- Programmable overview and SDK docs: https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/programmable/index.md
 - Source and issues: https://github.com/BadryansahBangsawan/pairdraw
 
 MIT License.

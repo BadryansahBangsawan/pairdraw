@@ -2,7 +2,7 @@
 
 ## Wersja internetowa
 
-Pairdraw działa bezpośrednio w przeglądarce i nie wymaga instalacji. Otwórz [app.openpencil.dev](https://app.openpencil.dev), aby rozpocząć pracę.
+Pairdraw działa też w przeglądarce, ale nie ma wersji hostowanej: uruchom aplikację internetową z kopii repozytorium, jak opisano w sekcji [Budowanie ze źródeł](#building-from-source), albo [pobierz aplikację na komputer](/pl/download).
 
 Jeśli chcesz zbudować własny produkt na bazie Pairdraw, a nie tylko korzystać z gotowej aplikacji, przejdź do sekcji [Automatyzacja](/programmable/) lub dokumentacji [Vue SDK](/programmable/sdk/).
 

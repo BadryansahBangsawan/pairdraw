@@ -67,7 +67,7 @@ pairdraw://open?file=web/design/hikyo.pen&node=Button/Large/Default
 Веб-версия принимает такую же ссылку в адресной строке:
 
 ```
-https://app.openpencil.dev/?file=https://raw.githubusercontent.com/pairdraw/pairdraw/master/tests/fixtures/pencil_button.pen&node=Button/Large/Default
+http://localhost:1420/?file=https://raw.githubusercontent.com/BadryansahBangsawan/pairdraw/master/tests/fixtures/pencil_button.pen&node=Button/Large/Default
 ```
 
 Здесь `file` — абсолютный URL с `https:`, оканчивающийся на `.pen` или `.fig`. В веб-версии нет файловой системы, поэтому относительный путь, URL с `http:` и любое другое расширение отклоняются с предупреждением в консоли и больше ничего не происходит. Расширение определяется по пути URL, так что строка запроса у файла ничего не меняет. Фрагмент отбрасывается до загрузки: на сервер он не попадает, поэтому `…/hikyo.pen#a` и `…/hikyo.pen#b` открывают одну вкладку, а не две. `node` работает точно так же, как выше: то же выделение по точному имени и тот же масштаб, то же уведомление, если слоя с таким именем нет. Оба значения кодируются как URL, символ `+` нужно передавать как `%2B`, а при повторе ключа берётся последнее значение, как и в настольной версии. Ссылка обрабатывается на любом маршруте, поэтому `/share/<room>?file=…` и `/demo?file=…` работают так же, как `/?file=…`.

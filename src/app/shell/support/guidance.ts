@@ -18,7 +18,9 @@ export interface SupportLink {
   readonly url: string
 }
 
-export const SYSTEM_REQUIREMENTS_URL = 'https://openpencil.dev/getting-started#system-requirements'
+// Written out rather than built with `docsURL`, so the notice imports nothing from the app.
+export const SYSTEM_REQUIREMENTS_URL =
+  'https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/getting-started.md#system-requirements'
 export const WEBVIEW2_DOWNLOAD_URL = 'https://developer.microsoft.com/microsoft-edge/webview2/'
 const ISSUE_URL = 'https://github.com/BadryansahBangsawan/pairdraw/issues/new'
 

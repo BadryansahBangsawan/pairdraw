@@ -1,6 +1,6 @@
 # @pairdraw/cli
 
-Headless command line for [Pairdraw](https://openpencil.dev) and `.fig` files: inspect documents and layers, query with XPath, export to PNG, JPG, WEBP, SVG, PDF, PPTX, JSX, HTML, or `.fig`, import HTML/CSS/Tailwind, lint design files, analyze and extract design tokens, and script documents through `eval` with a Figma Plugin API-compatible `figma` global and an `pairdraw` global for what Pairdraw adds, such as component behaviours and slots.
+Headless command line for [Pairdraw](https://github.com/BadryansahBangsawan/pairdraw) and `.fig` files: inspect documents and layers, query with XPath, export to PNG, JPG, WEBP, SVG, PDF, PPTX, JSX, HTML, or `.fig`, import HTML/CSS/Tailwind, lint design files, analyze and extract design tokens, and script documents through `eval` with a Figma Plugin API-compatible `figma` global and an `pairdraw` global for what Pairdraw adds, such as component behaviours and slots.
 
 ```sh
 npm install -g @pairdraw/cli   # or: bun add -g @pairdraw/cli
@@ -12,8 +12,8 @@ pairdraw libraries seed --root ./catalog
 
 `tokens --import` reads a local stylesheet's custom properties as document variables, and `libraries seed` publishes the built-in Pairdraw Basics set into a filesystem catalog. Inspection commands support `--json` for automation. The MCP server ships separately as `@pairdraw/mcp`.
 
-- CLI reference: https://openpencil.dev/programmable/cli/inspecting
-- Scripting with the Plugin API: https://openpencil.dev/programmable/cli/scripting
+- CLI reference: https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/programmable/cli/inspecting.md
+- Scripting with the Plugin API: https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/programmable/cli/scripting.md
 - Source and issues: https://github.com/BadryansahBangsawan/pairdraw
 
 MIT License.

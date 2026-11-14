@@ -5,11 +5,11 @@ description: Keep documents on Pairdraw Cloud or your team's own server, share t
 
 # Pairdraw Cloud
 
-Pairdraw Cloud keeps documents on a server so they follow you across devices and several people can edit them at once. Use the hosted service at `cloud.openpencil.dev` or a server your team runs itself ([self-hosting guide](/reference/self-hosting-cloud)). Cloud is optional: documents on your device and in your own [storage bucket](./cloud-storage) work the same with or without it.
+Pairdraw Cloud keeps documents on a server so they follow you across devices and several people can edit them at once. Use a server your team runs itself ([self-hosting guide](/reference/self-hosting-cloud)), or a hosted one when your build offers it. Cloud is optional: documents on your device and in your own [storage bucket](./cloud-storage) work the same with or without it.
 
 ## Connect a Server
 
-Open **Settings → Cloud**. Until the hosted service opens, its card there takes your email for the waitlist; **Your team's server** asks for the address your team uses. Pairdraw checks that the address answers as a Pairdraw Cloud server before asking you to sign in, and says when nothing answers, when the address belongs to something else, or when the server runs a version this app doesn't support.
+Open **Settings → Cloud**. **Your team's server** asks for the address your team uses; a build that names a hosted server with `VITE_PAIRDRAW_OFFICIAL_CLOUD_URL` offers it there too. Pairdraw checks that the address answers as a Pairdraw Cloud server before asking you to sign in, and says when nothing answers, when the address belongs to something else, or when the server runs a version this app doesn't support.
 
 The ways to sign in come from the server: Google, Apple, or email and password.
 

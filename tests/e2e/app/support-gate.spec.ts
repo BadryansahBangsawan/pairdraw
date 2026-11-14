@@ -18,7 +18,7 @@ test.describe('browser support gate', () => {
     await expect(notice).toContainText('String.prototype.isWellFormed')
     await expect(notice.getByRole('link', { name: 'System requirements' })).toHaveAttribute(
       'href',
-      'https://openpencil.dev/getting-started#system-requirements'
+      'https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/getting-started.md#system-requirements'
     )
 
     const report = notice.getByRole('link', { name: 'Report a problem' })

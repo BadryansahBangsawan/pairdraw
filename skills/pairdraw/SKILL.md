@@ -20,7 +20,7 @@ pairdraw tree
 pairdraw tree design.fig
 ```
 
-Use `pairdraw --help`, per-command help, and the connected MCP server’s tool schemas to check the installed version’s capabilities. See the [CLI reference](https://openpencil.dev/reference/cli) and [MCP guide](https://openpencil.dev/programmable/mcp-server) for current documentation.
+Use `pairdraw --help`, per-command help, and the connected MCP server’s tool schemas to check the installed version’s capabilities. See the [CLI reference](https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/reference/cli.md) and [MCP guide](https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/programmable/mcp-server.md) for current documentation.
 
 ## Variable formulas
 
@@ -322,7 +322,7 @@ Use `undo` / `redo { document_id }` to step back your own changes. They refuse w
 
 WebMCP is off by default. In **Settings → MCP → WebMCP**, choose **Inspect** for read-only tools or **Edit** for scoped changes. These controls are independent of local MCP settings. Supporting browsers expose inspection and undoable existing-layer/property and variable edits directly from the Pairdraw workspace through `document.modelContext`, without an MCP server connection. Discover this browser surface separately: it excludes structural creation/deletion, arbitrary JS/JSX execution, external assets, filesystem operations, and credentials.
 
-Calls capture the active document/page. Cancellation prevents an edit from starting but does not reverse an already committed edit; use editor undo instead. Atomic edits require at most 10,000 nodes and variables combined, including when these same tools run through app AI/MCP. See the [WebMCP guide](https://openpencil.dev/programmable/mcp-server#webmcp) for scope and browser requirements.
+Calls capture the active document/page. Cancellation prevents an edit from starting but does not reverse an already committed edit; use editor undo instead. Atomic edits require at most 10,000 nodes and variables combined, including when these same tools run through app AI/MCP. See the [WebMCP guide](https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/programmable/mcp-server.md#browser-native-webmcp-experimental-webmcp) for scope and browser requirements.
 
 ## Tool discovery
 

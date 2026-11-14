@@ -11,11 +11,13 @@ Any web page can show the editor in an iframe and drive it from JavaScript. The 
 
 ## The iframe
 
+Point the iframe at a Pairdraw web app you serve, such as your own build or a Pairdraw Cloud server's editor; `pairdraw.example.com` stands for it below.
+
 ```html
 <iframe
   id="editor"
   title="Design"
-  src="https://app.openpencil.dev/?embed&origin=https%3A%2F%2Fyour-site.example"
+  src="https://pairdraw.example.com/?embed&origin=https%3A%2F%2Fyour-site.example"
 ></iframe>
 ```
 
@@ -34,7 +36,7 @@ The editor announces itself to its parent, addressed only to `origin`, so a page
 
 ```ts
 const frame = document.getElementById('editor') as HTMLIFrameElement
-const editorOrigin = 'https://app.openpencil.dev'
+const editorOrigin = 'https://pairdraw.example.com'
 
 window.addEventListener('message', (event) => {
   if (event.origin !== editorOrigin || event.source !== frame.contentWindow) return

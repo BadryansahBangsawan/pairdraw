@@ -15,7 +15,13 @@ import { appSourceConfig } from '@pairdraw/vite-config/app-source'
 import { landingPreloads } from './landing-head.ts'
 import { docsLocales } from './locales.ts'
 import { rootThemeConfig } from './root-theme.ts'
-import { BASE, LOCALE_PREFIXES, applyPageSeo, siteHead, withAlternateSitemapLinks } from './seo.ts'
+import {
+  LOCALE_PREFIXES,
+  SITE_URL,
+  applyPageSeo,
+  siteHead,
+  withAlternateSitemapLinks
+} from './seo.ts'
 
 await Promise.all([ensureBrandAssets(['docs']), ensureDemoDocument()])
 
@@ -32,7 +38,7 @@ const posterFingerprint =
   process.env.PAIRDRAW_LANDING_POSTERS === '1' ? await landingPosterFingerprint(repoRoot) : null
 
 const llmsPlugin = llmstxt({
-  domain: BASE,
+  ...(SITE_URL ? { domain: SITE_URL } : {}),
   ignoreFiles: LOCALE_PREFIXES.map((locale) => `${locale}/**`),
   generateLLMsTxt: !fastBuild,
   generateLLMsFullTxt: !fastBuild,
@@ -43,7 +49,7 @@ const llmsPlugin = llmstxt({
     description:
       'Open-source, AI-native design editor and toolkit. Opens Figma .fig files, provides a programmable scene graph, CLI, MCP server, and Vue SDK for custom editor shells.',
     details:
-      'Use this file as the compact map for agents. For complete Markdown content, fetch https://openpencil.dev/llms-full.txt.'
+      'Use this file as the compact map for agents. For complete Markdown content, fetch llms-full.txt beside it.'
   }
 })
 
@@ -55,10 +61,10 @@ export default defineConfig({
   lastUpdated: true,
   appearance: 'dark',
 
-  sitemap: {
-    hostname: BASE,
-    transformItems: withAlternateSitemapLinks
-  },
+  // A sitemap names absolute addresses, so only a site published at `SITE_URL` has one.
+  ...(SITE_URL
+    ? { sitemap: { hostname: SITE_URL, transformItems: withAlternateSitemapLinks } }
+    : {}),
 
   head: siteHead,
 

@@ -4,7 +4,6 @@ export const fr: LandingMessages = {
   hero: {
     title: 'Le design sans verrouillage.',
     lede: 'Un éditeur de design open source qui ouvre vos fichiers Figma, tourne sur votre machine et vous laisse, vous ou votre agent AI, piloter chaque calque.',
-    open: 'Faire la visite',
     download: 'Télécharger',
     github: 'GitHub'
   },
@@ -312,11 +311,6 @@ export const fr: LandingMessages = {
         title: 'Homebrew',
         detail:
           'L’app macOS signée, depuis le cask officiel. Homebrew vérifie chaque mise à jour, qui peut donc arriver un peu plus tard qu’ici.'
-      },
-      web: {
-        title: 'Dans le navigateur',
-        detail: 'Le même éditeur sur app.openpencil.dev, sans rien installer.',
-        action: 'Ouvrir l’app web'
       },
       cli: {
         title: 'Ligne de commande',

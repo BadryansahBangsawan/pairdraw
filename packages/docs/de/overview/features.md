@@ -108,7 +108,7 @@ Die Zusammenarbeit erfolgt direkt zwischen den Teilnehmern über WebRTC und ben�
 
 **Desktop:** Tauri v2, rund 7 MB, für macOS, Windows und Linux, mit nativen Menüs, Offlinebetrieb und automatischem Speichern.
 
-**Web:** [app.openpencil.dev](https://app.openpencil.dev), als PWA installierbar und für Touch-Bedienung optimiert.
+**Web:** im Browser aus einem eigenen Build oder von einem Pairdraw-Cloud-Server, als PWA installierbar und für Touch-Bedienung optimiert.
 
 **VS Code:** Ein eigener Editor für `.fig`- und `.pen`-Dokumente, der den Web-Editor in einer Webview ausführt und speichert, was dieser zeigt. Er ist in keinem Marktplatz veröffentlicht und wird deshalb aus dem Repository gebaut ([VS Code-Erweiterung](/programmable/vscode)).
 

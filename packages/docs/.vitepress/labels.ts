@@ -61,7 +61,6 @@ export interface NavLabels {
   sdk: string
   reference: string
   development: string
-  openApp: string
 }
 
 export const EN_PROG: ProgrammableLabels = {

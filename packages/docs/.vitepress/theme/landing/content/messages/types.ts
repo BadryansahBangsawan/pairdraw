@@ -20,7 +20,6 @@ export interface LandingMessages {
   hero: {
     title: string
     lede: string
-    open: string
     download: string
     github: string
   }
@@ -149,7 +148,6 @@ export interface LandingMessages {
     others: {
       title: string
       homebrew: TitledDetail
-      web: TitledDetail & { action: string }
       cli: TitledDetail
       source: TitledDetail & { action: string }
     }

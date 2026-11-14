@@ -2,11 +2,8 @@
 import IconBeer from '~icons/lucide/beer'
 import IconBookOpen from '~icons/lucide/book-open'
 import IconCode from '~icons/lucide/code'
-import IconGlobe from '~icons/lucide/globe'
-import IconPenTool from '~icons/lucide/pen-tool'
 import IconTerminal from '~icons/lucide/square-terminal'
 
-import { LINKS } from '../content/links'
 import { useLandingMessages, useLocalePath } from '../content/messages'
 import ActionButton from '../ui/ActionButton.vue'
 import CopyCommand from './CopyCommand.vue'
@@ -24,16 +21,6 @@ const localePath = useLocalePath()
         <dt>{{ messages.download.others.homebrew.title }}</dt>
         <dd>{{ messages.download.others.homebrew.detail }}</dd>
         <dd class="action"><CopyCommand command="brew install --cask pairdraw" /></dd>
-      </div>
-      <div class="way">
-        <IconGlobe class="icon" aria-hidden="true" />
-        <dt>{{ messages.download.others.web.title }}</dt>
-        <dd>{{ messages.download.others.web.detail }}</dd>
-        <dd class="action">
-          <ActionButton :href="LINKS.app" :icon="IconPenTool" small>
-            {{ messages.download.others.web.action }}
-          </ActionButton>
-        </dd>
       </div>
       <div class="way">
         <IconTerminal class="icon" aria-hidden="true" />

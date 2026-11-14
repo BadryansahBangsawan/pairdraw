@@ -247,7 +247,7 @@ configuration is owner-readable only and is removed on exit.
 set -euo pipefail
 BASE="https://api.example.com/v1"
 MODEL="MODEL"
-ORIGIN="https://openpencil.dev"
+ORIGIN="https://app.example.com" # where your web app runs
 read -rsp "API key: " API_KEY; printf '\n'
 CURL_CONFIG="$(mktemp)"
 PREFLIGHT_HEADERS="$(mktemp)"

@@ -134,18 +134,33 @@ export const DESKTOP_DOWNLOAD_URL =
 export const NODE_DOWNLOAD_URL = 'https://nodejs.org/en/download'
 
 /**
- * Published guides. Settings links each integration section to its guide with one "Learn more"
- * at the end of the section description; alerts link only to the fix, never to docs.
+ * A guide in the repository's `packages/docs`, read on GitHub, since Pairdraw has no website of
+ * its own: `path` without `.md`, and `anchor` as GitHub derives it from the heading's text, which
+ * includes a VitePress `{#id}`.
  */
-const DOCS_ORIGIN = 'https://openpencil.dev'
-export const MCP_SERVER_DOCS_URL = `${DOCS_ORIGIN}/programmable/mcp-server`
+export function docsURL(path: string, anchor?: string): string {
+  const page = `https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/${path}.md`
+  return anchor ? `${page}#${anchor}` : page
+}
+
+/**
+ * Guides. Settings links each integration section to its guide with one "Learn more" at the end
+ * of the section description; alerts link only to the fix, never to docs.
+ */
+export const MCP_SERVER_DOCS_URL = docsURL('programmable/mcp-server')
 /** The guide to Pairdraw Cloud, linked from the Cloud server's own pages. */
-export const CLOUD_DOCS_URL = `${DOCS_ORIGIN}/user-guide/pairdraw-cloud`
-export const WEBMCP_DOCS_URL = `${MCP_SERVER_DOCS_URL}#webmcp`
-export const MCP_CLIENT_SETUP_DOCS_URL = `${MCP_SERVER_DOCS_URL}#client-setup`
-export const MCP_CONNECTIONS_DOCS_URL = `${DOCS_ORIGIN}/programmable/ai-chat#external-mcp-connections`
-export const CODING_AGENTS_GUIDE_URL = `${DOCS_ORIGIN}/programmable/coding-agents`
-export const PI_GUIDE_URL = `${CODING_AGENTS_GUIDE_URL}#pi`
+export const CLOUD_DOCS_URL = docsURL('user-guide/pairdraw-cloud')
+export const WEBMCP_DOCS_URL = docsURL(
+  'programmable/mcp-server',
+  'browser-native-webmcp-experimental-webmcp'
+)
+export const MCP_CLIENT_SETUP_DOCS_URL = docsURL(
+  'programmable/mcp-server',
+  'set-up-from-the-desktop-app-client-setup'
+)
+export const MCP_CONNECTIONS_DOCS_URL = docsURL('programmable/ai-chat', 'external-mcp-connections')
+export const CODING_AGENTS_GUIDE_URL = docsURL('programmable/coding-agents')
+export const PI_GUIDE_URL = docsURL('programmable/coding-agents', 'pi')
 
 /** The published release page, with its full notes, for a desktop version. */
 export function releaseNotesURL(version: string): string {

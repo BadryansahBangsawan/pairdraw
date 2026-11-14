@@ -4,7 +4,6 @@ export const pl: LandingMessages = {
   hero: {
     title: 'Projektuj bez uzależnienia od dostawcy.',
     lede: 'Edytor graficzny open source, który otwiera pliki Figmy, działa na Twoim komputerze i pozwala Tobie lub Twojemu agentowi AI sterować każdą warstwą.',
-    open: 'Rozpocznij przewodnik',
     download: 'Pobierz',
     github: 'GitHub'
   },
@@ -311,11 +310,6 @@ export const pl: LandingMessages = {
         title: 'Homebrew',
         detail:
           'Podpisana aplikacja na macOS z oficjalnego casku. Homebrew sprawdza każdą aktualizację, więc może trafić tam nieco później niż tutaj.'
-      },
-      web: {
-        title: 'W przeglądarce',
-        detail: 'Ten sam edytor na app.openpencil.dev, bez instalacji.',
-        action: 'Otwórz aplikację webową'
       },
       cli: {
         title: 'Wiersz poleceń',

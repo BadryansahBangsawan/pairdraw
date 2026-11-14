@@ -5,7 +5,14 @@ import { fileURLToPath } from 'node:url'
 import * as v from 'valibot'
 import type { HeadConfig } from 'vitepress'
 
-export const BASE = 'https://openpencil.dev'
+/**
+ * Where the site is published, from `PAIRDRAW_DOCS_SITE_URL`. Pairdraw has no website of its own,
+ * so by default the site claims no address: it has no sitemap, canonical or alternate links, or
+ * social image, which all need one.
+ */
+export const SITE_URL = process.env.PAIRDRAW_DOCS_SITE_URL?.trim().replace(/\/+$/, '') || null
+
+const REPOSITORY_URL = 'https://github.com/BadryansahBangsawan/pairdraw'
 
 const docsRoot = fileURLToPath(new URL('..', import.meta.url))
 
@@ -26,13 +33,13 @@ const SOFTWARE_APPLICATION = {
   applicationCategory: 'DesignApplication',
   operatingSystem: 'Windows, macOS, Linux, Web',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-  url: 'https://app.openpencil.dev',
+  url: REPOSITORY_URL,
   description:
     'Open-source design editor that opens Figma .fig files, runs locally, and is programmable by you or your AI agent.',
   softwareVersion: version,
   license: 'https://opensource.org/licenses/MIT',
-  screenshot: `${BASE}/screenshot.png`,
-  downloadUrl: `${BASE}/download`,
+  ...(SITE_URL ? { screenshot: `${SITE_URL}/screenshot.png` } : {}),
+  downloadUrl: `${REPOSITORY_URL}/releases/latest`,
   featureList: [
     'Opens and saves Figma .fig files',
     'AI agents that design on the canvas with your own provider keys',
@@ -68,13 +75,17 @@ export const siteHead: [string, Record<string, string>][] = [
   ],
   ['meta', { property: 'og:type', content: 'website' }],
   ['meta', { property: 'og:site_name', content: 'Pairdraw' }],
-  ['meta', { property: 'og:image', content: `${BASE}/social.png` }],
-  ['meta', { property: 'og:image:width', content: '2400' }],
-  ['meta', { property: 'og:image:height', content: '1260' }],
-  ['meta', { property: 'og:image:alt', content: 'Pairdraw — Open-Source Design Editor' }],
-  ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-  ['meta', { name: 'twitter:site', content: '@pairdrawdev' }],
-  ['meta', { name: 'twitter:image', content: `${BASE}/social.png` }]
+  // Social images must be absolute, so only a published site has them.
+  ...(SITE_URL
+    ? ([
+        ['meta', { property: 'og:image', content: `${SITE_URL}/social.png` }],
+        ['meta', { property: 'og:image:width', content: '2400' }],
+        ['meta', { property: 'og:image:height', content: '1260' }],
+        ['meta', { property: 'og:image:alt', content: 'Pairdraw — Open-Source Design Editor' }],
+        ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+        ['meta', { name: 'twitter:image', content: `${SITE_URL}/social.png` }]
+      ] satisfies [string, Record<string, string>][])
+    : [])
 ]
 
 type SitemapItem = {
@@ -107,9 +118,9 @@ function slugForPath(path: string): string {
     .replace(/\/$/, '')
 }
 
-function localizedUrl(slug: string, prefix: string): string {
-  if (slug) return `${BASE}${prefix}/${slug}`
-  return `${BASE}${prefix || ''}`
+function localizedUrl(base: string, slug: string, prefix: string): string {
+  if (slug) return `${base}${prefix}/${slug}`
+  return `${base}${prefix || ''}`
 }
 
 function availableLocalesForPage(relativePath: string) {
@@ -121,21 +132,24 @@ function availableLocalesForPage(relativePath: string) {
   })
 }
 
+/** Adds each page's translations to its sitemap entry; the sitemap exists only with `SITE_URL`. */
 export function withAlternateSitemapLinks<T extends SitemapItem>(items: T[]): T[] {
+  const base = SITE_URL
+  if (!base) return items
   const linksBySlug = new Map<string, Array<{ lang: string; url: string }>>()
 
   for (const item of items) {
-    const path = new URL(item.url, BASE).pathname.replace(/^\//, '')
+    const path = new URL(item.url, base).pathname.replace(/^\//, '')
     const slug = slugForPath(path)
     const localeKey = localeKeyForPath(path)
     const locale = LOCALES[localeKey]
     const links = linksBySlug.get(slug) ?? []
-    links.push({ lang: locale.hreflang, url: new URL(item.url, BASE).href })
+    links.push({ lang: locale.hreflang, url: new URL(item.url, base).href })
     linksBySlug.set(slug, links)
   }
 
   return items.map((item) => {
-    const path = new URL(item.url, BASE).pathname.replace(/^\//, '')
+    const path = new URL(item.url, base).pathname.replace(/^\//, '')
     return { ...item, links: linksBySlug.get(slugForPath(path)) }
   })
 }
@@ -144,34 +158,40 @@ export function applyPageSeo(pageData: PageDataLike): void {
   const localeKey = localeKeyForPath(pageData.relativePath)
   const locale = LOCALES[localeKey]
   const slug = slugForPath(pageData.relativePath)
-  const pageUrl = localizedUrl(slug, locale.prefix)
-  const enSlug = slug ? `${BASE}/${slug}` : BASE
 
   pageData.frontmatter.head ??= []
   const head = pageData.frontmatter.head
 
-  head.push(['link', { rel: 'canonical', href: pageUrl }])
-  head.push(['meta', { property: 'og:url', content: pageUrl }])
   head.push(['meta', { property: 'og:locale', content: locale.ogLocale }])
   if (pageData.relativePath === 'index.md') {
     head.push(['script', { type: 'application/ld+json' }, JSON.stringify(SOFTWARE_APPLICATION)])
   }
 
-  for (const localeOption of availableLocalesForPage(pageData.relativePath)) {
+  const locales = availableLocalesForPage(pageData.relativePath)
+  for (const localeOption of locales) {
     if (localeOption.prefix !== locale.prefix) {
       head.push(['meta', { property: 'og:locale:alternate', content: localeOption.ogLocale }])
     }
-
-    head.push([
-      'link',
-      {
-        rel: 'alternate',
-        hreflang: localeOption.hreflang,
-        href: localizedUrl(slug, localeOption.prefix)
-      }
-    ])
   }
-  head.push(['link', { rel: 'alternate', hreflang: 'x-default', href: enSlug }])
+
+  // Canonical and alternate links must be absolute, so only a published site has them.
+  if (SITE_URL) {
+    const pageUrl = localizedUrl(SITE_URL, slug, locale.prefix)
+    head.push(['link', { rel: 'canonical', href: pageUrl }])
+    head.push(['meta', { property: 'og:url', content: pageUrl }])
+    for (const localeOption of locales) {
+      head.push([
+        'link',
+        {
+          rel: 'alternate',
+          hreflang: localeOption.hreflang,
+          href: localizedUrl(SITE_URL, slug, localeOption.prefix)
+        }
+      ])
+    }
+    const enSlug = slug ? `${SITE_URL}/${slug}` : SITE_URL
+    head.push(['link', { rel: 'alternate', hreflang: 'x-default', href: enSlug }])
+  }
 
   if (pageData.title) {
     const ogTitle = `${pageData.title} — Pairdraw`

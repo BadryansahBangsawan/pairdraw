@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import IconDownload from '~icons/lucide/download'
 import IconGithub from '~icons/lucide/github'
-import IconPenTool from '~icons/lucide/pen-tool'
 
 import { LINKS } from '../content/links'
 import { useLandingMessages, useLocalePath } from '../content/messages'
@@ -16,10 +15,7 @@ const localePath = useLocalePath()
     <h1>{{ messages.hero.title }}</h1>
     <p class="lede">{{ messages.hero.lede }}</p>
     <div class="landing-actions">
-      <ActionButton :href="LINKS.app" :icon="IconPenTool" primary>
-        {{ messages.hero.open }}
-      </ActionButton>
-      <ActionButton :href="localePath(LINKS.downloadPage)" :icon="IconDownload">
+      <ActionButton :href="localePath(LINKS.downloadPage)" :icon="IconDownload" primary>
         {{ messages.hero.download }}
       </ActionButton>
       <ActionButton :href="LINKS.github" :icon="IconGithub">{{

@@ -106,7 +106,7 @@ La connessione peer-to-peer WebRTC non richiede un server centrale. Condividi un
 
 **Desktop:** Tauri v2, circa 7 MB, per macOS, Windows e Linux, con menu nativi, uso senza rete e salvataggio automatico.
 
-**Web:** [app.openpencil.dev](https://app.openpencil.dev), installabile come PWA e adattato agli schermi touch.
+**Web:** nel browser, da una tua build o da un server Pairdraw Cloud, installabile come PWA e adattato agli schermi touch.
 
 **VS Code:** Un editor dedicato ai documenti `.fig` e `.pen` che esegue l’editor web in una webview e salva ciò che mostra. Non è pubblicato in alcun marketplace, quindi si compila dal repository ([Estensione VS Code](/programmable/vscode)).
 

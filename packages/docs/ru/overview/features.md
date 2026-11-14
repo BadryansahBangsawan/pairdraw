@@ -123,7 +123,7 @@ pairdraw eval design.fig -c "..."     # Figma Plugin API
 
 **Настольное приложение:** Tauri v2, около 7 МБ, версии для macOS, Windows и Linux, системные меню, работа без сети и автосохранение.
 
-**Веб-приложение:** [app.openpencil.dev](https://app.openpencil.dev), установка как PWA и интерфейс для сенсорных экранов.
+**Веб-приложение:** в браузере из собственной сборки или с сервера Pairdraw Cloud, установка как PWA и интерфейс для сенсорных экранов.
 
 ```sh
 brew install --cask pairdraw

@@ -24,7 +24,7 @@ Please give us a reasonable opportunity to investigate and release a fix before 
 
 ## MCP server
 
-The MCP HTTP transport (`pairdraw-mcp-http`) binds to `127.0.0.1` by default with `eval` disabled, CORS disabled, and file access restricted to the working directory. See [MCP docs](https://openpencil.dev/reference/mcp-tools) for configuration.
+The MCP HTTP transport (`pairdraw-mcp-http`) binds to `127.0.0.1` by default with `eval` disabled, CORS disabled, and file access restricted to the working directory. See [MCP docs](packages/docs/programmable/mcp-server.md#http) for configuration.
 
 Every HTTP request and WebSocket upgrade that carries an `Origin` header must come from an allowed origin: the desktop app, the origins in `PAIRDRAW_MCP_CORS_ORIGIN`, and, for the companion, the web app it pairs with. Every request must also be addressed to this machine (`127.0.0.1`, `localhost`, `[::1]`, or a `*.localhost` name), so a page that rebinds its DNS name to `127.0.0.1` is refused. Local programs, which send no `Origin`, still need the bearer token.
 

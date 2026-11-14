@@ -4,7 +4,6 @@ export const es: LandingMessages = {
   hero: {
     title: 'Diseña sin ataduras.',
     lede: 'Un editor de diseño de código abierto que abre tus archivos de Figma, funciona en tu equipo y permite que tú o tu agente de IA controléis cada capa.',
-    open: 'Hacer el recorrido',
     download: 'Descargar',
     github: 'GitHub'
   },
@@ -312,11 +311,6 @@ export const es: LandingMessages = {
         title: 'Homebrew',
         detail:
           'La app de macOS firmada, desde el cask oficial. Homebrew revisa cada actualización, así que puede llegar un poco más tarde que aquí.'
-      },
-      web: {
-        title: 'En el navegador',
-        detail: 'El mismo editor en app.openpencil.dev, sin instalar nada.',
-        action: 'Abrir la app web'
       },
       cli: {
         title: 'Línea de comandos',

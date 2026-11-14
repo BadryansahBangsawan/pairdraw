@@ -2,7 +2,7 @@
 
 ## Webversion
 
-Pairdraw läuft direkt im Browser und muss nicht installiert werden. Öffnen Sie [app.openpencil.dev](https://app.openpencil.dev), um mit der Gestaltung zu beginnen.
+Pairdraw läuft auch im Browser, eine gehostete Version gibt es aber nicht: Starten Sie die Web-App aus einem Checkout, wie unter [Aus dem Quellcode erstellen](#building-from-source) beschrieben, oder [laden Sie die Desktop-Anwendung herunter](/de/download).
 
 Wenn Sie ein eigenes Produkt auf Pairdraw aufbauen möchten, lesen Sie den Bereich [Automatisierung](/programmable/) und die Dokumentation zum [Vue SDK](/programmable/sdk/).
 

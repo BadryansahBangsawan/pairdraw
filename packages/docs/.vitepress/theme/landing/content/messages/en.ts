@@ -4,7 +4,6 @@ export const en: LandingMessages = {
   hero: {
     title: 'Design without the lock‑in.',
     lede: 'An open-source design editor that opens your Figma files, runs on your machine, and lets you or your AI agent drive every layer.',
-    open: 'Take the tour',
     download: 'Download',
     github: 'GitHub'
   },
@@ -301,11 +300,6 @@ export const en: LandingMessages = {
         title: 'Homebrew',
         detail:
           'The signed macOS app from the official cask. Homebrew reviews each update, so it can arrive a little later than here.'
-      },
-      web: {
-        title: 'In the browser',
-        detail: 'The same editor at app.openpencil.dev, with nothing to install.',
-        action: 'Open the web app'
       },
       cli: {
         title: 'Command line',

@@ -66,7 +66,7 @@ describe('design systems on Home', () => {
     expect(designSystems.loading.value).toBe(false)
   })
 
-  test('does not offer the built-in library the Assets panel owns', async () => {
+  test('offers the built-in library, as Goodies does', async () => {
     const summaries = shallowRef<LibrarySummary[]>([])
     const service = asDouble<LibraryService>({
       summaries,
@@ -77,7 +77,7 @@ describe('design systems on Home', () => {
     })
     const designSystems = useHomeDesignSystems(service)
     await designSystems.refresh()
-    expect(designSystems.libraries.value).toEqual([acme])
+    expect(designSystems.libraries.value).toEqual([builtin, acme])
   })
 
   test('a new design starts with the picked library turned on', async () => {

@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 
-import { BUILTIN_LIBRARY_ID, type LibrarySummary } from '@pairdraw/core/library'
+import type { LibrarySummary } from '@pairdraw/core/library'
 
 import type { EditorStore } from '@/app/editor/session'
 import { useLibraryService, type LibraryService } from '@/app/libraries'
@@ -42,9 +42,8 @@ export function startDesignWith(
 
 /**
  * The design systems Home offers: the component libraries of the catalog the editor uses, which
- * keeps the ones published on this device or those read from storage. The built-in Pairdraw
- * Basics is not one of them: the Assets panel offers it, so it is not a design system you
- * published and Home does not list it.
+ * keeps the ones published on this device or those read from storage, and the built-in Pairdraw
+ * Basics, as Goodies lists them.
  */
 export function useHomeDesignSystems(service: LibraryService = useLibraryService()) {
   const loading = ref(false)
@@ -69,9 +68,7 @@ export function useHomeDesignSystems(service: LibraryService = useLibraryService
   }
 
   return {
-    libraries: computed(() =>
-      service.summaries.value.filter((library) => library.libraryId !== BUILTIN_LIBRARY_ID)
-    ),
+    libraries: computed(() => service.summaries.value),
     loading,
     /** Whether a read finished, so an empty list means there are none rather than not yet read. */
     loaded,

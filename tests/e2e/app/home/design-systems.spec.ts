@@ -28,12 +28,29 @@ async function publishLibrary(page: Page, id: string, name: string) {
   await expect(page.getByTestId('asset-libraries-dialog')).toBeHidden()
 }
 
-test('Home lists no design systems until a library is published', async ({ page }) => {
-  await page.goto('/?recent-files')
+test('Home offers the built-in design system Goodies lists, and starts a design with it', async ({
+  page
+}) => {
+  const canvas = new CanvasHelper(page)
+  await page.goto('/?test')
+  await canvas.waitForInit()
+
+  await page.getByTestId('tabbar-new').click()
   const home = page.getByTestId('recent-files-home')
   await home.getByRole('navigation').getByRole('button', { name: 'Design systems' }).click()
   await expect(home.getByRole('heading', { name: 'Design systems', exact: true })).toBeVisible()
-  await expect(home.getByRole('heading', { name: 'No design systems yet' })).toBeVisible()
+  // Nothing is published on a fresh profile, so the built-in library is the one design system.
+  const library = home.getByRole('button', { name: /^New design with / })
+  await expect(library).toHaveCount(1)
+  await library.click()
+
+  await expect(home).toBeHidden()
+  await expect(page.getByTestId('tabbar-tab')).toHaveCount(2)
+  const enabled = await page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    return store?.graph.enabledLibraries.get('pairdraw-basics')?.enabled ?? false
+  })
+  expect(enabled).toBe(true)
 })
 
 test('a design system on Home starts a new design with its library turned on', async ({ page }) => {

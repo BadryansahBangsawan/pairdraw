@@ -20,3 +20,4 @@
 - The Code panel's HTML export and Export frames to PDF say why an export failed in the app's language when the reason is one Pairdraw knows, such as nothing to export.
 - The Text menu's Bold, Italic, and Underline are unavailable until a text is selected, as Add Link is.
 - Escape in the prompt at the bottom of the canvas returns to the canvas, so its shortcuts work again.
+- Home's Design systems lists the built-in Pairdraw Basics, as Goodies does, to start a new design with it turned on.

@@ -7,7 +7,7 @@ import { bold, kv, fmtHistogram, fmtSummary } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
-  meta: { description: 'Analyze spacing values (gap, padding)' },
+  meta: { name: 'spacing', description: 'Analyze spacing values (gap, padding)' },
   args: {
     file: {
       type: 'positional',

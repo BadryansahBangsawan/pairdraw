@@ -98,7 +98,7 @@ function printProvider(provider: ModelCatalogProvider): void {
 }
 
 export default defineCommand({
-  meta: { description: 'List the AI providers and models the chat can use' },
+  meta: { name: 'models', description: 'List the AI providers and models the chat can use' },
   args: {
     provider: {
       type: 'string',

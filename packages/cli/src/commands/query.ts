@@ -8,6 +8,7 @@ import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
   meta: {
+    name: 'query',
     description: 'Query nodes using XPath selectors'
   },
   args: {

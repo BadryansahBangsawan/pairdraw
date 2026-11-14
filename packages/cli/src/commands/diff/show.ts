@@ -6,7 +6,10 @@ import { runToolData } from '#cli/tool-data'
 import { printDiffResult, type DiffResult } from './output'
 
 export default defineCommand({
-  meta: { description: 'Preview the patch that setting JSX attributes on a node would produce' },
+  meta: {
+    name: 'show',
+    description: 'Preview the patch that setting JSX attributes on a node would produce'
+  },
   args: {
     id: { type: 'positional', description: 'Node ID', required: true },
     file: {

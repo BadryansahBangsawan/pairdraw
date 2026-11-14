@@ -6,7 +6,7 @@ import { nodePairArgs } from './args'
 import { printDiffResult, type DiffResult } from './output'
 
 export default defineCommand({
-  meta: { description: 'Structural diff between two nodes as design JSX' },
+  meta: { name: 'jsx', description: 'Structural diff between two nodes as design JSX' },
   args: {
     ...nodePairArgs
   },

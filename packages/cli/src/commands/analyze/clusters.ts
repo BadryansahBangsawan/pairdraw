@@ -26,7 +26,7 @@ function formatSignature(sig: string): string {
 }
 
 export default defineCommand({
-  meta: { description: 'Find repeated design patterns (potential components)' },
+  meta: { name: 'clusters', description: 'Find repeated design patterns (potential components)' },
   args: {
     file: {
       type: 'positional',

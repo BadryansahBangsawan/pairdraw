@@ -126,7 +126,7 @@ function buildRPCArgs(args: {
 }
 
 export default defineCommand({
-  meta: { description: 'Detect visual overlaps and layout overflows' },
+  meta: { name: 'overlaps', description: 'Detect visual overlaps and layout overflows' },
   args: {
     file: {
       type: 'positional',

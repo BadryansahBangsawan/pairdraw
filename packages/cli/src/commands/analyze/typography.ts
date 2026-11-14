@@ -19,7 +19,7 @@ function weightName(w: number): string {
 }
 
 export default defineCommand({
-  meta: { description: 'Analyze typography usage' },
+  meta: { name: 'typography', description: 'Analyze typography usage' },
   args: {
     file: {
       type: 'positional',

@@ -7,7 +7,7 @@ import { bold, fmtHistogram, fmtSummary, kv } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
-  meta: { description: 'Show document info (pages, node counts, fonts)' },
+  meta: { name: 'info', description: 'Show document info (pages, node counts, fonts)' },
   args: {
     file: {
       type: 'positional',

@@ -77,6 +77,7 @@ async function runTerminal(shell: Shell, prompt: string): Promise<void> {
 
 export default defineCommand({
   meta: {
+    name: 'shell',
     description:
       'Open a document once and run tools on it line by line, with save() and exit(); reads commands from stdin when it is not a terminal'
   },

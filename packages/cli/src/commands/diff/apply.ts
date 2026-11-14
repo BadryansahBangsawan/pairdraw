@@ -48,7 +48,7 @@ function printApplyResult(result: ApplyResult, dryRun: boolean): void {
 }
 
 export default defineCommand({
-  meta: { description: 'Apply a patch from diff create or diff show' },
+  meta: { name: 'apply', description: 'Apply a patch from diff create or diff show' },
   args: {
     patch: { type: 'positional', description: 'Patch file path, or - for stdin', required: true },
     file: {

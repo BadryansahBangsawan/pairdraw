@@ -42,7 +42,7 @@ function printSettings(settings: Settings): void {
 }
 
 const get = defineCommand({
-  meta: { description: 'Show editor settings, or one setting by dotted key' },
+  meta: { name: 'get', description: 'Show editor settings, or one setting by dotted key' },
   args: {
     key: { type: 'positional', description: 'Dotted key, e.g. appearance.theme', required: false },
     json
@@ -66,7 +66,7 @@ const get = defineCommand({
 })
 
 const set = defineCommand({
-  meta: { description: 'Change one editor setting by dotted key' },
+  meta: { name: 'set', description: 'Change one editor setting by dotted key' },
   args: {
     key: {
       type: 'positional',
@@ -98,6 +98,6 @@ const set = defineCommand({
 })
 
 export default defineCommand({
-  meta: { description: 'Read and change editor settings in the running app' },
+  meta: { name: 'settings', description: 'Read and change editor settings in the running app' },
   subCommands: { get, set }
 })

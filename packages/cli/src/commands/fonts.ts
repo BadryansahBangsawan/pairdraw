@@ -28,7 +28,7 @@ async function prepareFontStatus(
 }
 
 export default defineCommand({
-  meta: { description: 'Report fonts used by a document' },
+  meta: { name: 'fonts', description: 'Report fonts used by a document' },
   args: {
     file: {
       type: 'positional',

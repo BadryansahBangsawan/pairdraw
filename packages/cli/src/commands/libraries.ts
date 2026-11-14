@@ -13,7 +13,7 @@ import { loadDocument, populateWholeDocument, writeFigDocument } from '#cli/head
 import { FileSystemLibraryCatalog } from '#cli/library/catalog'
 
 const list = defineCommand({
-  meta: { description: 'List component libraries in a filesystem catalog' },
+  meta: { name: 'list', description: 'List component libraries in a filesystem catalog' },
   args: {
     root: { type: 'string', description: 'Library catalog directory', required: true },
     json: { type: 'boolean', description: 'Output as JSON' }
@@ -45,7 +45,7 @@ const list = defineCommand({
 })
 
 const publish = defineCommand({
-  meta: { description: 'Publish a document as a component library revision' },
+  meta: { name: 'publish', description: 'Publish a document as a component library revision' },
   args: {
     file: { type: 'positional', description: 'Source .fig file', required: true },
     root: { type: 'string', description: 'Library catalog directory', required: true },
@@ -99,7 +99,10 @@ const publish = defineCommand({
 })
 
 const seed = defineCommand({
-  meta: { description: 'Publish the built-in Pairdraw Basics set to a filesystem catalog' },
+  meta: {
+    name: 'seed',
+    description: 'Publish the built-in Pairdraw Basics set to a filesystem catalog'
+  },
   args: {
     root: { type: 'string', description: 'Library catalog directory', required: true },
     json: { type: 'boolean', description: 'Output as JSON' }
@@ -126,6 +129,6 @@ const seed = defineCommand({
 })
 
 export default defineCommand({
-  meta: { description: 'Manage component library catalogs' },
+  meta: { name: 'libraries', description: 'Manage component library catalogs' },
   subCommands: { list, publish, seed }
 })

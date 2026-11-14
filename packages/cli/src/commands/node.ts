@@ -9,7 +9,7 @@ import { fmtNode, printError, formatType } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
-  meta: { description: 'Show detailed node properties by ID' },
+  meta: { name: 'node', description: 'Show detailed node properties by ID' },
   args: {
     file: {
       type: 'positional',

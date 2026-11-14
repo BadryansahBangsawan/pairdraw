@@ -18,6 +18,7 @@ function apiKey(flag: string | undefined): string {
 
 const run = defineCommand({
   meta: {
+    name: 'run',
     description: 'Run a design agent on a document through an OpenAI-compatible model'
   },
   args: {
@@ -131,7 +132,7 @@ const run = defineCommand({
 })
 
 const tools = defineCommand({
-  meta: { description: 'List the tools an agent run can call by default' },
+  meta: { name: 'tools', description: 'List the tools an agent run can call by default' },
   args: { json },
   async run({ args }) {
     const definitions = agentToolDefinitions({ catalog: ALL_TOOLS })
@@ -167,7 +168,7 @@ const tools = defineCommand({
 })
 
 const list = defineCommand({
-  meta: { description: 'List the named agents a run can put in a team' },
+  meta: { name: 'list', description: 'List the named agents a run can put in a team' },
   args: { json },
   async run({ args }) {
     if (args.json) {
@@ -205,6 +206,7 @@ const list = defineCommand({
 
 export default defineCommand({
   meta: {
+    name: 'agent',
     description: 'Drive a document from a model: run, and see which tools it may call'
   },
   subCommands: { run, tools, list }

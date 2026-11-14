@@ -8,7 +8,7 @@ import { loadDocument, populateWholeDocument } from '#cli/headless'
 import { printUnifiedDiff } from './output'
 
 export default defineCommand({
-  meta: { description: 'Structural diff of two documents, page by page' },
+  meta: { name: 'files', description: 'Structural diff of two documents, page by page' },
   args: {
     before: { type: 'positional', description: 'Original document path', required: true },
     after: { type: 'positional', description: 'Changed document path', required: true },

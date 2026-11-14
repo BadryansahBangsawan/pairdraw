@@ -6,7 +6,7 @@ import { nodePairArgs } from './args'
 import { printDiffResult, type DiffResult } from './output'
 
 export default defineCommand({
-  meta: { description: 'Property diff between two node trees as a unified patch' },
+  meta: { name: 'create', description: 'Property diff between two node trees as a unified patch' },
   args: {
     ...nodePairArgs,
     depth: { type: 'string', description: 'Max tree depth (default: 10)' }

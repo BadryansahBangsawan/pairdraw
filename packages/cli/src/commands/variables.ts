@@ -20,7 +20,7 @@ export const variableCommandArgs = {
 } as const
 
 export default defineCommand({
-  meta: { description: 'List design variables and collections' },
+  meta: { name: 'variables', description: 'List design variables and collections' },
   args: variableCommandArgs,
   async run({ args }) {
     const data = await loadRPCData<VariablesResult>(

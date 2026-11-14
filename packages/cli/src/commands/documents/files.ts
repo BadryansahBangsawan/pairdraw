@@ -14,7 +14,7 @@ function absolutePath(path: string | undefined): { path?: string } {
 }
 
 export const open = defineCommand({
-  meta: { description: 'Open a .fig or .pen file in a new tab of the running app' },
+  meta: { name: 'open', description: 'Open a .fig or .pen file in a new tab of the running app' },
   args: {
     file: { type: 'positional', description: 'Design file to open', required: true },
     json
@@ -27,7 +27,7 @@ export const open = defineCommand({
 })
 
 export const create = defineCommand({
-  meta: { description: 'Create an empty document in a new tab of the running app' },
+  meta: { name: 'new', description: 'Create an empty document in a new tab of the running app' },
   args: {
     path: { type: 'string', description: 'Save the new document to this .fig path' },
     json
@@ -40,7 +40,7 @@ export const create = defineCommand({
 })
 
 export const save = defineCommand({
-  meta: { description: 'Save a document open in the running app' },
+  meta: { name: 'save', description: 'Save a document open in the running app' },
   args: {
     path: { type: 'string', description: 'Save to this .fig path instead of the current one' },
     ...appTargetOptions,
@@ -59,6 +59,7 @@ export const save = defineCommand({
 
 export const close = defineCommand({
   meta: {
+    name: 'close',
     description:
       'Close a document tab; with unsaved changes, pass --save or --discard (it never prompts in the app)'
   },
@@ -89,7 +90,10 @@ export const close = defineCommand({
 })
 
 export const activate = defineCommand({
-  meta: { description: 'Bring a document tab to the front, optionally on a given page' },
+  meta: {
+    name: 'activate',
+    description: 'Bring a document tab to the front, optionally on a given page'
+  },
   args: {
     id: { type: 'positional', description: 'Document ID from `documents list`', required: true },
     'page-id': appTargetOptions['page-id'],

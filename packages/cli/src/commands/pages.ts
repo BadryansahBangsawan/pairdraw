@@ -7,7 +7,7 @@ import { bold, fmtList, entity } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
-  meta: { description: 'List pages in a document' },
+  meta: { name: 'pages', description: 'List pages in a document' },
   args: {
     file: {
       type: 'positional',

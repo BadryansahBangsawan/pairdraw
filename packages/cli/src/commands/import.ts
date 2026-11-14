@@ -73,7 +73,7 @@ async function writeOutput(args: ImportArgs, { styled, graph }: ReadHTMLResult) 
 }
 
 export default defineCommand({
-  meta: { description: 'Import HTML/CSS/Tailwind into a Pairdraw document' },
+  meta: { name: 'import', description: 'Import HTML/CSS/Tailwind into a Pairdraw document' },
   args: {
     file: {
       type: 'positional',

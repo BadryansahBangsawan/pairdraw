@@ -7,7 +7,7 @@ import { bold, fmtHistogram, fmtList, fmtSummary } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
-  meta: { description: 'Analyze color palette usage' },
+  meta: { name: 'colors', description: 'Analyze color palette usage' },
   args: {
     file: {
       type: 'positional',

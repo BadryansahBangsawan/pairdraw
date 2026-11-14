@@ -29,7 +29,7 @@ function optionalNumber(value: string | undefined): number | undefined {
 }
 
 export default defineCommand({
-  meta: { description: 'Pixel diff between two rendered nodes, written as a PNG' },
+  meta: { name: 'visual', description: 'Pixel diff between two rendered nodes, written as a PNG' },
   args: {
     ...nodePairArgs,
     output: { type: 'string', alias: 'o', description: 'Diff PNG path', required: true },

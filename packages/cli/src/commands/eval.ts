@@ -59,7 +59,7 @@ function reportPreview(notice: string, args: { quiet?: boolean; json?: boolean }
 }
 
 export default defineCommand({
-  meta: { description: 'Execute JavaScript with Figma plugin API' },
+  meta: { name: 'eval', description: 'Execute JavaScript with Figma plugin API' },
   args: {
     file: {
       type: 'positional',

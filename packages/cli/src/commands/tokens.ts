@@ -22,6 +22,7 @@ import { variableCommandArgs } from './variables'
 
 export default defineCommand({
   meta: {
+    name: 'tokens',
     description:
       'Print design variables as a stylesheet of CSS custom properties or a Tailwind v4 theme, or write them as W3C design token files'
   },

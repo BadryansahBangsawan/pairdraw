@@ -6,7 +6,7 @@ import { rpc } from '#cli/app/client'
 import { bold, entity, fmtList, kv, printError } from '#cli/format'
 
 export default defineCommand({
-  meta: { description: 'List open documents (tabs) in the running app' },
+  meta: { name: 'list', description: 'List open documents (tabs) in the running app' },
   args: {
     json: { type: 'boolean', description: 'Output as JSON' }
   },

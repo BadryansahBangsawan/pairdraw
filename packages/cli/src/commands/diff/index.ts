@@ -8,7 +8,7 @@ import show from './show'
 import visual from './visual'
 
 export default defineCommand({
-  meta: { description: 'Compare nodes and documents, and apply property patches' },
+  meta: { name: 'diff', description: 'Compare nodes and documents, and apply property patches' },
   subCommands: {
     create,
     jsx,

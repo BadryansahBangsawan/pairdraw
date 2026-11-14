@@ -12,6 +12,7 @@ interface HistoryResult {
 function historyCommand(command: 'undo' | 'redo', verb: string) {
   return defineCommand({
     meta: {
+      name: command,
       description: `${verb} the last change made through automation in a document open in the running app`
     },
     args: {

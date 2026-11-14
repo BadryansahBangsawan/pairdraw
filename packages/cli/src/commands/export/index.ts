@@ -274,7 +274,7 @@ async function exportFromFile(format: string, args: ExportArgs) {
 }
 
 export default defineCommand({
-  meta: { description: `Export a document to ${FORMAT_LIST}` },
+  meta: { name: 'export', description: `Export a document to ${FORMAT_LIST}` },
   args: {
     file: {
       type: 'positional',

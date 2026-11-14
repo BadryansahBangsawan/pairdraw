@@ -18,7 +18,7 @@ function toAgentfmtTree(node: TreeNodeResult, maxDepth: number, depth = 0): Tree
 }
 
 export default defineCommand({
-  meta: { description: 'Print the node tree' },
+  meta: { name: 'tree', description: 'Print the node tree' },
   args: {
     file: {
       type: 'positional',

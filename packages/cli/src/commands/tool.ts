@@ -23,7 +23,7 @@ import {
 const json = { type: 'boolean', description: 'Output as JSON' } as const
 
 const list = defineCommand({
-  meta: { description: 'List the tools available to `tool call`' },
+  meta: { name: 'list', description: 'List the tools available to `tool call`' },
   args: { json },
   run({ args }) {
     if (args.json) {
@@ -44,7 +44,10 @@ const list = defineCommand({
 })
 
 const describe = defineCommand({
-  meta: { description: "Show a tool's description and JSON Schema for its arguments" },
+  meta: {
+    name: 'describe',
+    description: "Show a tool's description and JSON Schema for its arguments"
+  },
   args: {
     name: { type: 'positional', description: 'Tool name', required: true },
     json
@@ -89,6 +92,7 @@ async function readToolArgs(args: {
 
 const call = defineCommand({
   meta: {
+    name: 'call',
     description: 'Run one tool against the running app, or headlessly against a document file'
   },
   args: {
@@ -143,6 +147,9 @@ const call = defineCommand({
 })
 
 export default defineCommand({
-  meta: { description: 'List, describe, and call editor tools (the same set MCP exposes)' },
+  meta: {
+    name: 'tool',
+    description: 'List, describe, and call editor tools (the same set MCP exposes)'
+  },
   subCommands: { list, describe, call }
 })

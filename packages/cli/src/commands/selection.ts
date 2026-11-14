@@ -14,7 +14,7 @@ interface SelectionNode {
 }
 
 export default defineCommand({
-  meta: { description: 'Get current selection from the running app' },
+  meta: { name: 'selection', description: 'Get current selection from the running app' },
   args: {
     ...appTargetOptions,
     json: { type: 'boolean', description: 'Output as JSON' }

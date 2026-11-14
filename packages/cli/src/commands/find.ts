@@ -7,7 +7,7 @@ import { printNodeResults } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
-  meta: { description: 'Find nodes by name or type' },
+  meta: { name: 'find', description: 'Find nodes by name or type' },
   args: {
     file: {
       type: 'positional',

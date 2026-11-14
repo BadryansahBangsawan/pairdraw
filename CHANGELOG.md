@@ -62,12 +62,12 @@ Pairdraw 0.16 adds comments, shared rooms with voice calls and agents you can fo
 - Control the running app from the CLI and MCP: `pairdraw documents`, `undo`, `redo`, and `settings`, the matching MCP tools, `pairdraw tool list`, `describe`, and `call` to run any MCP tool from the shell, and `pairdraw diff` with the `diff_visual` and `diff_apply` tools to compare and replay changes. Share only the selected layers with MCP clients from **Settings → MCP → Local server** or `PAIRDRAW_MCP_SCOPE=selection`.
 - Diagnose failures from **Settings → Diagnostics**: errors, failed AI chats, and broken tool calls are recorded with scrubbed messages and stacks, filterable, copyable with the app version, and saved as a JSON file.
 - Choose an accent color in **Settings → General → Appearance**, and customize the toolbar in **Settings → Toolbar** or from its right-click menu: hide, reorder, and regroup tools on desktop and mobile.
-- Official builds send one anonymous ping a day, with the app version, operating system, architecture, desktop or web, and whether usage stats are shared, and no ID; turn it off in Settings → Privacy or with `PAIRDRAW_TELEMETRY=0` or `DO_NOT_TRACK=1` in the desktop app's environment. Usage stats (launches, file formats opened and exported, and which AI provider answered) are sent only after you agree in a one-time prompt after the welcome screen. The [privacy page](https://openpencil.dev/overview/privacy) lists every field.
+- Official builds send one anonymous ping a day, with the app version, operating system, architecture, desktop or web, and whether usage stats are shared, and no ID; turn it off in Settings → Privacy or with `PAIRDRAW_TELEMETRY=0` or `DO_NOT_TRACK=1` in the desktop app's environment. Usage stats (launches, file formats opened and exported, and which AI provider answered) are sent only after you agree in a one-time prompt after the welcome screen. The privacy page lists every field.
 - Use more of the Figma plugin API: `instance.swapComponent()`, `detachInstance()`, `figma.getNodeByIdAsync()`, `getMainComponentAsync()`, and an instance's `overrides` with `resetOverrides()`. Pairdraw's own `pairdraw` script global adds comments and controls.
 - Write design JSX with more of the document: `visible`, `locked`, `constraints`, `italic`, full stroke props, and component properties set by name on `<Instance>` (#750). JSX export writes them back with every fill, effect, mask, and variable binding, and TSX can use `@pairdraw/design-jsx` as its JSX import source.
 - New SDK entry points: pass an ID generator to `new SceneGraph()`, place pasted content with `resolvePasteTarget` from `@pairdraw/core/editor`, compute Flatten and Outline stroke with `flattenNodesToVectorProps` and `outlineStrokeNodesToVectorProps` from `@pairdraw/core/canvas`, import `designDocumentToSceneGraph` from `@pairdraw/dom-css/scene-graph` in browser builds, and tell `FontManager.setBundledFontLocator()` where a bundler put the fonts from the new `@pairdraw/core/assets` export.
 - New npm packages: `@pairdraw/design-jsx` for writing and exporting design JSX, and `@pairdraw/emit`, which it and the exporters use to print source code.
-- openpencil.dev opens on live editor demos of design, AI, code export, the CLI, the SDK, and collaboration, in every docs language, with a short roadmap, and a download page offers the installer for the visitor's system and lists every installer with Homebrew and the web app.
+- The docs site opens on live editor demos of design, AI, code export, the CLI, the SDK, and collaboration, in every docs language, with a short roadmap, and a download page offers the installer for the visitor's system and lists every installer.
 
 ### Changed
 
@@ -177,7 +177,7 @@ Pairdraw 0.16 adds comments, shared rooms with voice calls and agents you can fo
 - Defer AI provider connections and system credential reads until you send a message or use a connected feature, so opening documents and browsing chat history no longer trigger unexpected credential prompts.
 - Save and recover documents whose text uses disabled numeric, fraction, or small-caps OpenType features, which previously failed to write a `.fig` file.
 - Update instance text properties on the canvas while typing, with grouped undo for rapid edits.
-- Point Homebrew installation instructions to the official `pairdraw` cask and document separate CLI installation.
+- Point Homebrew installation instructions to the official cask and document separate CLI installation.
 - Reach the custom model option in the model picker for providers with large model catalogs instead of requiring a search for it.
 
 ### Performance
@@ -419,7 +419,7 @@ Pairdraw 0.16 adds comments, shared rooms with voice calls and agents you can fo
 
 ### Changed
 
-- Update the Homebrew install command to use the published `pairdraw` cask.
+- Update the Homebrew install command to use the published cask.
 
 ### Fixed
 
@@ -865,11 +865,11 @@ Pairdraw 0.16 adds comments, shared rooms with voice calls and agents you can fo
 - Mobile layout & PWA — responsive editor with touch-optimized toolbar, swipeable bottom drawer (layers/properties/design/code), HUD overlay, and installable PWA with icons and service worker.
 - Tailwind CSS v4 JSX export — export selections as HTML with Tailwind utility classes (`<div className="flex gap-4 p-3">`) from the Code panel, CLI (`bun pairdraw export --format jsx --style tailwind`), or programmatically via `sceneNodeToJSX(id, graph, 'tailwind')`. Supports layout, sizing, colors, border radius, opacity, rotation, overflow, shadows, blur, and typography. Uses v4 spacing semantics (px/4 multiplier) with automatic fallback to arbitrary values.
 - Code panel format toggle — switch between Pairdraw (custom components) and Tailwind (HTML + utility classes) output.
-- Homebrew tap — `brew install pairdraw/tap/pairdraw` for macOS (arm64 + x64), auto-updated on each release.
+- Homebrew tap for macOS (arm64 + x64), auto-updated on each release.
 - Double-click to rename layers — inline rename in layer panel, shared `useInlineRename` composable.
 - New AI/MCP tools: `analyze_colors`, `analyze_typography`, `analyze_spacing`, `analyze_clusters`, `diff_create`, `diff_show`, `get_components`, `get_current_page`, `arrange`, `node_to_component`.
 - CLI-to-app RPC bridge — all CLI commands work against the running app when no file is specified. Start the app, then run `bun pairdraw tree` to inspect the live document.
-- VitePress docs site — user guide, reference, architecture, and development docs at openpencil.dev with 6 locales (en, de, fr, es, it, pl), SEO (OG tags, hreflang, JSON-LD, sitemap), and dark theme.
+- VitePress docs site — user guide, reference, architecture, and development docs with 6 locales (en, de, fr, es, it, pl), SEO (OG tags, hreflang, JSON-LD, sitemap), and dark theme.
 
 ### Changed
 
@@ -1255,9 +1255,9 @@ First public alpha. The editor is functional but not production-ready.
 - Zstd compression in Rust.
 - macOS and Windows builds via GitHub Actions.
 
-- Runs at [app.openpencil.dev](https://app.openpencil.dev).
+- Runs in the browser.
 - No installation required.
 - File System Access API for save/open (Chrome/Edge), download fallback elsewhere.
 
-- [openpencil.dev](https://openpencil.dev) — VitePress site with user guide, reference, and development docs.
+- Docs site — VitePress site with user guide, reference, and development docs.
 - Deployed via Cloudflare Pages.

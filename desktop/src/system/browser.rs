@@ -22,7 +22,7 @@ use url::Url;
 pub const BROWSER_WINDOW_LABEL: &str = "browser";
 
 /// The browser window's own website data store. Sixteen bytes, persistent, and not the editor's.
-const BROWSER_DATA_STORE: [u8; 16] = *b"pairdrawbrowse";
+const BROWSER_DATA_STORE: [u8; 16] = *b"pairdraw-browser";
 
 /// The size a session starts at, and the size it comes back to after a device preset.
 const DEFAULT_WIDTH: f64 = 1024.0;

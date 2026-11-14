@@ -3308,52 +3308,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pairdraw"
-version = "0.16.0"
-dependencies = [
- "base64 0.22.1",
- "block2",
- "fix-path-env",
- "fontique",
- "httparse",
- "keyring",
- "objc2",
- "objc2-app-kit",
- "objc2-core-foundation",
- "objc2-core-text",
- "objc2-foundation",
- "objc2-web-kit",
- "read-fonts",
- "reqwest 0.12.28",
- "security-framework",
- "semver",
- "serde",
- "serde_json",
- "swift-rs",
- "tauri",
- "tauri-build",
- "tauri-plugin-clipboard-manager",
- "tauri-plugin-deep-link",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-notification",
- "tauri-plugin-opener",
- "tauri-plugin-os",
- "tauri-plugin-process",
- "tauri-plugin-shell",
- "tauri-plugin-single-instance",
- "tauri-plugin-updater",
- "tauri-plugin-wdio-webdriver",
- "tokio",
- "toml 1.1.4+spec-1.1.0",
- "url",
- "which",
- "write-fonts",
- "zip 2.4.2",
- "zstd",
-]
-
-[[package]]
 name = "openssl-probe"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3423,6 +3377,52 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.20",
+]
+
+[[package]]
+name = "pairdraw"
+version = "0.16.0"
+dependencies = [
+ "base64 0.22.1",
+ "block2",
+ "fix-path-env",
+ "fontique",
+ "httparse",
+ "keyring",
+ "objc2",
+ "objc2-app-kit",
+ "objc2-core-foundation",
+ "objc2-core-text",
+ "objc2-foundation",
+ "objc2-web-kit",
+ "read-fonts",
+ "reqwest 0.12.28",
+ "security-framework",
+ "semver",
+ "serde",
+ "serde_json",
+ "swift-rs",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-clipboard-manager",
+ "tauri-plugin-deep-link",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-notification",
+ "tauri-plugin-opener",
+ "tauri-plugin-os",
+ "tauri-plugin-process",
+ "tauri-plugin-shell",
+ "tauri-plugin-single-instance",
+ "tauri-plugin-updater",
+ "tauri-plugin-wdio-webdriver",
+ "tokio",
+ "toml 1.1.4+spec-1.1.0",
+ "url",
+ "which",
+ "write-fonts",
+ "zip 2.4.2",
+ "zstd",
 ]
 
 [[package]]

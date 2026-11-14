@@ -6,6 +6,8 @@
   "editorHTMLCSSLabel": "HTML и CSS",
   "exportFailed": "Не удалось экспортировать: {error}",
   "exportHTML": "Экспортировать HTML",
+  "exportNothing": "Нечего экспортировать",
+  "exportSinglePage": "Экспортируемое выделение должно находиться на одной странице",
   "generatedReadOnly": "Сгенерировано, только чтение",
   "iconPackage": "Значки",
   "jsxUpToDate": "Актуально",

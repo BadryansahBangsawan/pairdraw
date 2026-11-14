@@ -6,6 +6,8 @@
   "editorHTMLCSSLabel": "HTML et CSS",
   "exportFailed": "Export impossible : {error}",
   "exportHTML": "Exporter en HTML",
+  "exportNothing": "Rien à exporter",
+  "exportSinglePage": "La sélection à exporter doit se trouver sur une seule page",
   "generatedReadOnly": "Généré, lecture seule",
   "iconPackage": "Icônes",
   "jsxUpToDate": "À jour",

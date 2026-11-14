@@ -1,6 +1,7 @@
 import { pageSlides } from '@pairdraw/core'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
+import { exportErrorDetail } from '@/app/document/export/errors'
 import type { EditorStore } from '@/app/editor/active-store'
 import { notificationMessages } from '@/app/i18n/notifications'
 import { toast } from '@/app/shell/ui'
@@ -52,7 +53,6 @@ export async function exportLayersToPDF(store: EditorStore, ids: string[]): Prom
     await store.exportTarget({ scope: 'selection', nodeIds: ids }, 'pdf')
   } catch (error) {
     console.error('[Export] Could not export the PDF:', error)
-    const detail = error instanceof Error ? error.message : String(error)
-    toast.error(messages.exportPDFFailed({ error: detail }))
+    toast.error(messages.exportPDFFailed({ error: exportErrorDetail(error) }))
   }
 }

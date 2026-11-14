@@ -8,6 +8,7 @@ import { useI18n } from '@pairdraw/vue/i18n'
 import { useRetainedActivity } from '@pairdraw/vue/lifecycle/retention'
 
 import type { ExportTargetRequest } from '@/app/document/export/create'
+import { exportErrorDetail } from '@/app/document/export/errors'
 import { htmlExportSettings } from '@/app/document/export/html'
 import type { ExportOptions } from '@/app/document/export/types'
 import { useEditorStore } from '@/app/editor/active-store'
@@ -107,8 +108,7 @@ async function doExport() {
   } catch (exportError) {
     // Said where the person clicked, as the Code panel does, rather than only in the console.
     console.error('[Export] Could not export:', exportError)
-    const detail = exportError instanceof Error ? exportError.message : String(exportError)
-    toast.error(code.value.exportFailed({ error: detail }))
+    toast.error(code.value.exportFailed({ error: exportErrorDetail(exportError, code.value) }))
   } finally {
     exporting.value = false
   }

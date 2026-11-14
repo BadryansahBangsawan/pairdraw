@@ -6,6 +6,8 @@
   "editorHTMLCSSLabel": "HTML と CSS",
   "exportFailed": "エクスポートできませんでした: {error}",
   "exportHTML": "HTML をエクスポート",
+  "exportNothing": "エクスポートするものがありません",
+  "exportSinglePage": "エクスポートする選択範囲は1つのページ内に収める必要があります",
   "generatedReadOnly": "生成済み、読み取り専用",
   "iconPackage": "アイコン",
   "jsxUpToDate": "最新です",

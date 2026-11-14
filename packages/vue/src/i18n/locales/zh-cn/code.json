@@ -6,6 +6,8 @@
   "editorHTMLCSSLabel": "HTML 和 CSS",
   "exportFailed": "无法导出：{error}",
   "exportHTML": "导出 HTML",
+  "exportNothing": "没有可导出的内容",
+  "exportSinglePage": "导出的选区必须位于同一页面",
   "generatedReadOnly": "已生成，只读",
   "iconPackage": "图标",
   "jsxUpToDate": "已是最新",

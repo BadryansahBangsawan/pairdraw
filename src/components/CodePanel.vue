@@ -39,6 +39,7 @@ import {
 } from '@/app/code/live-preview'
 import { codeStyling } from '@/app/code/styling'
 import { starterSourceFor, type CodeSource } from '@/app/code/templates'
+import { exportErrorDetail } from '@/app/document/export/errors'
 import { htmlExportSettings } from '@/app/document/export/html'
 import { useEditorStore } from '@/app/editor/active-store'
 import HTMLExportOptionsPopover from '@/components/export/HTMLExportOptionsPopover.vue'
@@ -352,8 +353,7 @@ async function exportHTML(): Promise<void> {
     })
   } catch (exportError) {
     console.error('[Code] Could not export HTML:', exportError)
-    const detail = exportError instanceof Error ? exportError.message : String(exportError)
-    error.value = code.value.exportFailed({ error: detail })
+    error.value = code.value.exportFailed({ error: exportErrorDetail(exportError, code.value) })
   } finally {
     exportingHTML.value = false
   }

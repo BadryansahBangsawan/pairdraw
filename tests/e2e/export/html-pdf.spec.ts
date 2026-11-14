@@ -3,6 +3,7 @@ import { strFromU8, unzipSync } from 'fflate'
 import { toUint8Array } from 'js-base64'
 
 import type { ExportSetting } from '@pairdraw/scene-graph'
+import type * as Locale from '@pairdraw/vue/i18n'
 
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
 import { propertyItems } from '#tests/helpers/properties'
@@ -240,4 +241,28 @@ test('exporting an empty page says why nothing was saved', async () => {
   // The toast viewport is the region named for its F8 hotkey.
   await expect(page.getByRole('region', { name: /F8/ }).getByRole('listitem')).toHaveCount(1)
   await expect(exportButton()).toBeEnabled()
+})
+
+test("an export that fails says why in the app's language", async () => {
+  const { page } = editor
+  const addExport = page.getByRole('button', { name: 'Add export', exact: true })
+  await addExport.click()
+  const setLocale = (locale: Locale.Locale) =>
+    page.evaluate(async (next) => {
+      const localeModulePath = '/packages/vue/src/i18n/locale.ts'
+      const localeModule: typeof Locale = await import(localeModulePath)
+      localeModule.setLocale(next)
+    }, locale)
+  await setLocale('de')
+  try {
+    // The panel follows once the language's messages have loaded.
+    await expect(addExport).toBeHidden()
+    await exportButton().click()
+    const notice = page.getByRole('region', { name: /F8/ }).getByRole('listitem').last()
+    await expect(notice).toBeVisible()
+    // Core's own words for an empty export stay out of a notice in another language.
+    await expect(notice).not.toContainText('Nothing to export')
+  } finally {
+    await setLocale('en')
+  }
 })

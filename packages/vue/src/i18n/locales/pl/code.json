@@ -6,6 +6,8 @@
   "editorHTMLCSSLabel": "HTML i CSS",
   "exportFailed": "Nie udało się wyeksportować: {error}",
   "exportHTML": "Eksportuj HTML",
+  "exportNothing": "Nie ma nic do wyeksportowania",
+  "exportSinglePage": "Eksportowane zaznaczenie musi znajdować się na jednej stronie",
   "generatedReadOnly": "Wygenerowany, tylko do odczytu",
   "iconPackage": "Ikony",
   "jsxUpToDate": "Aktualne",

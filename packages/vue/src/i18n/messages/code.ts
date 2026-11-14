@@ -36,7 +36,9 @@ export const codeMessageDefaults = {
   writeJSX: 'Write JSX',
   iconPackage: 'Icons',
   exportHTML: 'Export HTML',
-  exportFailed: params('Could not export: {error}')
+  exportFailed: params('Could not export: {error}'),
+  exportNothing: 'Nothing to export',
+  exportSinglePage: 'Export selection must stay on a single page'
 } as const
 
 export const codeMessages = i18n('code', codeMessageDefaults)

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import IconBeer from '~icons/lucide/beer'
 import IconBookOpen from '~icons/lucide/book-open'
 import IconCode from '~icons/lucide/code'
 import IconTerminal from '~icons/lucide/square-terminal'
@@ -16,12 +15,6 @@ const localePath = useLocalePath()
   <section class="landing-section">
     <h2>{{ messages.download.others.title }}</h2>
     <dl class="landing-facts ways">
-      <div class="way">
-        <IconBeer class="icon" aria-hidden="true" />
-        <dt>{{ messages.download.others.homebrew.title }}</dt>
-        <dd>{{ messages.download.others.homebrew.detail }}</dd>
-        <dd class="action"><CopyCommand command="brew install --cask pairdraw" /></dd>
-      </div>
       <div class="way">
         <IconTerminal class="icon" aria-hidden="true" />
         <dt>{{ messages.download.others.cli.title }}</dt>

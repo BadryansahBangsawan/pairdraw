@@ -291,11 +291,6 @@ export const pl: LandingMessages = {
       'Nie udało się wczytać listy plików. Wszystkie pliki są na stronie wydań na GitHubie.',
     others: {
       title: 'Inne sposoby',
-      homebrew: {
-        title: 'Homebrew',
-        detail:
-          'Podpisana aplikacja na macOS z oficjalnego casku. Homebrew sprawdza każdą aktualizację, więc może trafić tam nieco później niż tutaj.'
-      },
       cli: {
         title: 'Wiersz poleceń',
         detail: 'Przeglądaj, eksportuj, sprawdzaj i skryptuj pliki .fig bez otwierania aplikacji.'

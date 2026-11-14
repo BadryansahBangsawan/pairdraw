@@ -33,21 +33,6 @@ Pairdraw dibuja con CanvasKit sobre WebGL y usa funciones recientes de la plataf
 
 Si el motor es demasiado antiguo, Pairdraw muestra qué debes actualizar en lugar de una ventana en blanco. Si ves ese aviso en un sistema que cumple los requisitos, usa su enlace «Report a problem», que rellena de antemano los datos del navegador y del motor.
 
-## Instalación en macOS con Homebrew
-
-```sh
-brew install --cask pairdraw
-```
-
-El comando instala la aplicación firmada para Mac con Apple Silicon o procesador Intel desde el [catálogo oficial de Homebrew](https://formulae.brew.sh/cask/pairdraw). Homebrew revisa las actualizaciones, que pueden aparecer después de las versiones en GitHub. Mientras tanto, utiliza la [descarga directa](https://github.com/BadryansahBangsawan/pairdraw/releases/latest). La CLI se instala por separado: `npm install -g @pairdraw/cli`.
-
-Si usabas el tap propio archivado, migra con:
-
-```sh
-brew uninstall pairdraw/tap/pairdraw
-brew install --cask pairdraw
-```
-
 ## Compilación desde el código fuente {#building-from-source}
 
 ### Requisitos

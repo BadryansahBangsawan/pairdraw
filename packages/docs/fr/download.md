@@ -4,7 +4,7 @@ landing: true
 sidebar: false
 aside: false
 title: Télécharger Pairdraw
-description: Téléchargez l’app de bureau Pairdraw pour macOS, Windows et Linux, ou installez-la avec Homebrew.
+description: Téléchargez l’app de bureau Pairdraw pour macOS, Windows et Linux.
 ---
 
 <script setup>

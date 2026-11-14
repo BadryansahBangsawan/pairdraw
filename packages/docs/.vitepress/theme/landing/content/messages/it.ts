@@ -292,11 +292,6 @@ export const it: LandingMessages = {
       'Non è stato possibile caricare l’elenco dei download. Tutti i file sono nella pagina delle versioni su GitHub.',
     others: {
       title: 'Altri modi per averla',
-      homebrew: {
-        title: 'Homebrew',
-        detail:
-          'L’app macOS firmata, dal cask ufficiale. Homebrew controlla ogni aggiornamento, quindi può arrivare un po’ più tardi che qui.'
-      },
       cli: {
         title: 'Riga di comando',
         detail: 'Ispeziona, esporta, controlla e automatizza file .fig senza aprire l’app.'

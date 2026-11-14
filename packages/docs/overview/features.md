@@ -142,12 +142,6 @@ P2P via WebRTC — no server required. Share a link and edit together.
 
 **Web** — runs in the browser from your own build or a Pairdraw Cloud server, installable as a PWA on mobile with touch-optimized UI.
 
-**Homebrew:**
-
-```sh
-brew install --cask pairdraw
-```
-
 **VS Code** — a custom editor for `.fig` and `.pen` documents that runs the web editor in a webview and saves what it shows; it is not published to a marketplace, so build it from the repository ([VS Code extension](/programmable/vscode)).
 
 ## Plugins

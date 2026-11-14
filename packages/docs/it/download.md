@@ -4,7 +4,7 @@ landing: true
 sidebar: false
 aside: false
 title: Scarica Pairdraw
-description: Scarica l’app desktop di Pairdraw per macOS, Windows e Linux, o installala con Homebrew.
+description: Scarica l’app desktop di Pairdraw per macOS, Windows e Linux.
 ---
 
 <script setup>

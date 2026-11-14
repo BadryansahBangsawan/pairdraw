@@ -291,11 +291,6 @@ export const de: LandingMessages = {
       'Die Liste der Downloads konnte nicht geladen werden. Alle Dateien finden Sie auf der Release-Seite auf GitHub.',
     others: {
       title: 'Weitere Wege',
-      homebrew: {
-        title: 'Homebrew',
-        detail:
-          'Die signierte macOS-App aus dem offiziellen Cask. Homebrew prüft jedes Update, daher kann es etwas später ankommen als hier.'
-      },
       cli: {
         title: 'Kommandozeile',
         detail:

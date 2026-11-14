@@ -124,7 +124,6 @@ export interface LandingMessages {
     unavailable: string
     others: {
       title: string
-      homebrew: TitledDetail
       cli: TitledDetail
       source: TitledDetail & { action: string }
     }

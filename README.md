@@ -2,8 +2,7 @@
 
 [![MIT license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![npm](https://img.shields.io/npm/v/@pairdraw/cli?label=%40pairdraw%2Fcli)](https://www.npmjs.com/package/@pairdraw/cli)
-[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/4wXc9fuZfm)
-[![GitHub Discussions](https://img.shields.io/github/discussions/pairdraw/pairdraw?logo=github&label=Discussions)](https://github.com/BadryansahBangsawan/pairdraw/discussions)
+[![GitHub Discussions](https://img.shields.io/github/discussions/BadryansahBangsawan/pairdraw?logo=github&label=Discussions)](https://github.com/BadryansahBangsawan/pairdraw/discussions)
 
 Open-source design editor. Opens `.fig` and `.pen` design files, includes built-in AI, and ships as a programmable toolkit with a headless Vue SDK for building custom editors.
 
@@ -15,13 +14,7 @@ Open-source design editor. Opens `.fig` and `.pen` design files, includes built-
 
 ## Installation
 
-**macOS (Homebrew):**
-
-```sh
-brew install --cask pairdraw
-```
-
-Or download from the [releases page](https://github.com/BadryansahBangsawan/pairdraw/releases/latest), or run the web app from a checkout of this repository with `bun install` and `bun run dev` (see [CONTRIBUTING.md](CONTRIBUTING.md)).
+Download the desktop app for macOS, Windows, or Linux from the [releases page](https://github.com/BadryansahBangsawan/pairdraw/releases/latest), or run the web app from a checkout of this repository with `bun install` and `bun run dev` (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 
 Requires macOS 13 or later with current Safari updates, Windows 10 or later, or Linux with WebKitGTK 2.40+; the web app needs Chrome 111, Edge 111, Firefox 128, or Safari 16.4 or later. See [system requirements](packages/docs/getting-started.md#system-requirements).
 
@@ -214,7 +207,6 @@ See the [roadmap](packages/docs/development/roadmap.md) for product direction an
 
 ## Community
 
-- **[Discord](https://discord.gg/4wXc9fuZfm)** — chat, quick questions, and showing a problem live
 - **[GitHub Discussions](https://github.com/BadryansahBangsawan/pairdraw/discussions)** — [Q&A](https://github.com/BadryansahBangsawan/pairdraw/discussions/categories/q-a) for help, [Ideas](https://github.com/BadryansahBangsawan/pairdraw/discussions/categories/ideas) for feature proposals, [Show and tell](https://github.com/BadryansahBangsawan/pairdraw/discussions/categories/show-and-tell) for what you built; maintainers post [Announcements](https://github.com/BadryansahBangsawan/pairdraw/discussions/categories/announcements) there
 - **[Issues](https://github.com/BadryansahBangsawan/pairdraw/issues)** — reproducible bugs; report security problems through a [private advisory](https://github.com/BadryansahBangsawan/pairdraw/security/advisories/new)
 

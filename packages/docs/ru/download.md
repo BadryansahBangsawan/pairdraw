@@ -4,7 +4,7 @@ landing: true
 sidebar: false
 aside: false
 title: Скачать Pairdraw
-description: Скачайте настольное приложение Pairdraw для macOS, Windows и Linux или установите его через Homebrew.
+description: Скачайте настольное приложение Pairdraw для macOS, Windows и Linux.
 ---
 
 <script setup>

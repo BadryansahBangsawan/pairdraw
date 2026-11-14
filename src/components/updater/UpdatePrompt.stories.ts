@@ -25,7 +25,7 @@ const release: ReleaseInfo = {
 - Let the desktop app use an MCP server you started yourself by allowing the app's own origin by default, instead of requiring \`PAIRDRAW_MCP_CORS_ORIGIN\`.
 - Mark unsaved documents and ask whether to save before closing a tab, the desktop window, or the application.
 - Update instance text properties on the canvas while typing, with grouped undo for rapid edits.
-- Point Homebrew installation instructions to the official [\`pairdraw\` cask](https://formulae.brew.sh/cask/pairdraw).
+- Link the installation instructions to the [releases page](https://github.com/BadryansahBangsawan/pairdraw/releases/latest).
 
 ### Performance
 

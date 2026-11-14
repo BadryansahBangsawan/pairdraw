@@ -4,7 +4,7 @@ landing: true
 sidebar: false
 aside: false
 title: Download Pairdraw
-description: Download the Pairdraw desktop app for macOS, Windows, and Linux, or install it with Homebrew.
+description: Download the Pairdraw desktop app for macOS, Windows, and Linux.
 ---
 
 <script setup>

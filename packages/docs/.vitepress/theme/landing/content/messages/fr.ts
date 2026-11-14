@@ -292,11 +292,6 @@ export const fr: LandingMessages = {
       'La liste des téléchargements n’a pas pu être chargée. Tous les fichiers sont sur la page des versions sur GitHub.',
     others: {
       title: 'Autres façons de l’obtenir',
-      homebrew: {
-        title: 'Homebrew',
-        detail:
-          'L’app macOS signée, depuis le cask officiel. Homebrew vérifie chaque mise à jour, qui peut donc arriver un peu plus tard qu’ici.'
-      },
       cli: {
         title: 'Ligne de commande',
         detail: 'Inspectez, exportez, vérifiez et scriptez des fichiers .fig sans ouvrir l’app.'

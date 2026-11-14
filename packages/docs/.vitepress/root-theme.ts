@@ -32,10 +32,7 @@ export const rootThemeConfig = (): DefaultTheme.Config => ({
     '/': guideSidebar('', EN)
   },
 
-  socialLinks: [
-    { icon: 'github', link: 'https://github.com/BadryansahBangsawan/pairdraw' },
-    { icon: 'discord', link: 'https://discord.gg/4wXc9fuZfm', ariaLabel: 'Discord' }
-  ],
+  socialLinks: [{ icon: 'github', link: 'https://github.com/BadryansahBangsawan/pairdraw' }],
 
   editLink: {
     pattern: 'https://github.com/BadryansahBangsawan/pairdraw/edit/master/packages/docs/:path'

@@ -37,7 +37,6 @@ Private tooling lives under `tools/<role>/<domain>/{src,tests}`; Steiger enforce
 - Pre-releases are only `vX.Y.Z-beta.N`: they publish to npm's `next` dist-tag, draft as a GitHub pre-release that is never latest, and install on Windows as MSI `X.Y.Z.N` (`tools/release/release-packages/src/version.ts`).
 - A beta's changelog section opens with the pre-release note and lists changes since the previous beta. The final `X.Y.Z` replaces its beta sections with one section written against the previous stable release, opened by a short highlights paragraph, with fixes to new features folded into their bullets; the GitHub pre-releases keep the beta notes (`CHANGELOG.md`).
 - Ensure Tauri and Apple signing/notarization secrets and the `UPDATER_PUBLIC_KEY` repository variable that pairs with the Tauri signing key are configured; releases refuse to start without it (`tools/release/release-packages/README.md`, Update feed). Verify the draft title, body, and artifacts, then publish. Release titles are exactly the tag (`vX.Y.Z`) without a product-name prefix.
-- Homebrew's `pairdraw` cask is managed upstream: BrewTestBot proposes bumps and Homebrew merges them. Check the upstream cask PR after publication; do not push to the archived custom tap or add bump automation. Users install the app with `brew install --cask pairdraw` and the CLI through npm or Bun.
 
 ## Demo document
 

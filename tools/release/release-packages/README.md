@@ -24,7 +24,7 @@ Changing either after a release strands installed apps on the old feed or key, s
 
 ## Pre-releases
 
-A `vX.Y.Z-beta.N` tag runs the same workflow. npm packages publish under the `next` dist-tag, so `latest` stays on the last stable release, and the draft is marked pre-release and never latest. The desktop updater and download links follow GitHub's latest release, and the Homebrew cask only matches stable tags, so neither picks up a beta. The changelog section is headed `## X.Y.Z-beta.N — YYYY-MM-DD` like any release.
+A `vX.Y.Z-beta.N` tag runs the same workflow. npm packages publish under the `next` dist-tag, so `latest` stays on the last stable release, and the draft is marked pre-release and never latest. The desktop updater and download links follow GitHub's latest release, so neither picks up a beta. The changelog section is headed `## X.Y.Z-beta.N — YYYY-MM-DD` like any release.
 
 ## Draft publication
 
@@ -46,20 +46,6 @@ sha256sum --check SHA256SUMS
 ```
 
 Each release asset, including `SHA256SUMS`, also has its own attestation. For a pinned audit, pass the independently obtained workflow commit to `--signer-digest`; compare the attested manifest's source commit with the immutable tag. Do not treat an unverified manifest as trusted configuration.
-
-## Homebrew distribution
-
-The macOS app is distributed through the [official `pairdraw` cask](https://formulae.brew.sh/cask/pairdraw): `brew install --cask pairdraw`. This installs the desktop app, not the separately published npm CLI.
-
-Homebrew's BrewTestBot automatically proposes version bumps for this cask (its tooling currently reports a roughly three-hour cadence). Homebrew owns review and merge timing; publishing our GitHub release does not immediately update the cask. Do not add parallel bump-PR automation or push to the archived `pairdraw/homebrew-tap` repository.
-
-After each release:
-
-1. Check the official cask version and search `Homebrew/homebrew-cask` for an existing `pairdraw` bump PR.
-2. Check that both architecture hashes match the attested release manifest. Follow the bot's PR through upstream review; do not report the cask as updated until it merges.
-3. If an update is delayed or fails, investigate the upstream bot/PR and follow Homebrew's current contribution policy rather than bypassing autobump restrictions. Direct GitHub downloads and the app updater remain available in the meantime.
-
-The old `HOMEBREW_TAP_TOKEN` workflow secret is no longer used and can be removed after the obsolete workflow is retired. Revoking the underlying token is a separate credential-owner action if it is shared elsewhere.
 
 ## Failure and recovery
 

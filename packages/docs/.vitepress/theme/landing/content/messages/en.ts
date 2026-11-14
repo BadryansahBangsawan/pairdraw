@@ -281,11 +281,6 @@ export const en: LandingMessages = {
       'The list of downloads could not be loaded. Every file is on the releases page on GitHub.',
     others: {
       title: 'Other ways to get it',
-      homebrew: {
-        title: 'Homebrew',
-        detail:
-          'The signed macOS app from the official cask. Homebrew reviews each update, so it can arrive a little later than here.'
-      },
       cli: {
         title: 'Command line',
         detail: 'Inspect, export, lint, and script .fig files without opening the app.'

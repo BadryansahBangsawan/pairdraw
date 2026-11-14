@@ -16,3 +16,4 @@
 - On a phone, Share no longer puts a document into a live room in Pairdraw, where shared rooms are switched off; a Cloud document still shares through its server.
 - On a phone, Home's Design button spans the row under Open… instead of filling half of it.
 - Settings' Plugins and Skills panels are announced as the tab panels of their tabs, as every other settings panel is.
+- An export from the Export section that fails, such as one of an empty page, says why in a notice instead of doing nothing.

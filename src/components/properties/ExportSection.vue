@@ -11,6 +11,7 @@ import type { ExportTargetRequest } from '@/app/document/export/create'
 import { htmlExportSettings } from '@/app/document/export/html'
 import type { ExportOptions } from '@/app/document/export/types'
 import { useEditorStore } from '@/app/editor/active-store'
+import { toast } from '@/app/shell/ui'
 import HTMLExportOptionsPopover from '@/components/export/HTMLExportOptionsPopover.vue'
 import NumberField from '@/components/inputs/NumberField.vue'
 import ExportScaleInput from '@/components/properties/ExportScaleInput.vue'
@@ -23,7 +24,7 @@ import AppSelect from '@/components/ui/select/AppSelect.vue'
 import { CHECKERBOARD_BACKGROUND } from '@/theme/paint/checkerboard'
 
 const editorStore = useEditorStore()
-const { panels } = useI18n()
+const { panels, code } = useI18n()
 const {
   activeTarget,
   activeName,
@@ -103,6 +104,11 @@ async function doExport() {
     }
     // A single file downloads directly; multiple files bundle into one zip.
     await editorStore.exportTargets(requests)
+  } catch (exportError) {
+    // Said where the person clicked, as the Code panel does, rather than only in the console.
+    console.error('[Export] Could not export:', exportError)
+    const detail = exportError instanceof Error ? exportError.message : String(exportError)
+    toast.error(code.value.exportFailed({ error: detail }))
   } finally {
     exporting.value = false
   }

@@ -232,3 +232,12 @@ test('HTML export options make a fragment with separate image files in a zip', a
   expect(html).toContain('data-pairdraw-node-id')
   editor.canvas.assertNoErrors()
 })
+
+test('exporting an empty page says why nothing was saved', async () => {
+  const { page } = editor
+  await page.getByRole('button', { name: 'Add export', exact: true }).click()
+  await exportButton().click()
+  // The toast viewport is the region named for its F8 hotkey.
+  await expect(page.getByRole('region', { name: /F8/ }).getByRole('listitem')).toHaveCount(1)
+  await expect(exportButton()).toBeEnabled()
+})

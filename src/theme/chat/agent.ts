@@ -14,7 +14,8 @@ export default {
     announcement: 'sr-only',
     card: 'flex flex-col gap-3 rounded-card border border-border bg-panel-secondary p-4',
     header: 'flex items-start gap-3',
-    tile: 'flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent/12 text-accent',
+    /** Tinted while looking; the offered agent's logo sits on a neutral tile, true to its colors. */
+    tile: 'flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent/12 text-accent data-[logo]:border data-[logo]:border-border data-[logo]:bg-panel data-[logo]:text-surface',
     tileIcon: 'size-4',
     tileSpinner: `size-4 ${motionStyles.spinner}`,
     /** Takes focus when the button that had it goes, so the keyboard stays in the card. */
@@ -29,6 +30,8 @@ export default {
     waitingIcon: 'mt-0.5 size-3 shrink-0',
     notice: 'flex items-center gap-2 px-3.5 py-1.5 text-xs text-muted',
     noticeIcon: 'size-3.5 shrink-0 text-agent',
+    /** The agent's own logo, in its colors or the text color, in place of the generic icon. */
+    noticeLogo: 'size-3.5 text-surface',
     noticeText: 'min-w-0 flex-1 leading-4 text-pretty',
     /** The agent refused a message because nobody is signed in to it. */
     failure: 'px-3.5 pb-2'

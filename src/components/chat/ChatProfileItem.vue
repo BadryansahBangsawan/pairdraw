@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { AIModelProfile } from '@/app/ai/models'
+import { profileLogoSource } from '@/app/ai/models/provider-logo'
+import ProviderLogo from '@/components/settings/provider/ProviderLogo.vue'
 
 import { chatProfileTheme } from './ui'
 
@@ -13,6 +15,7 @@ const ui = chatProfileTheme()
 
 <template>
   <span class="contents">
+    <ProviderLogo v-bind="profileLogoSource(profile)" />
     <span :class="ui.text()">
       <span :class="ui.name()">{{ profile.name }}</span>
       <span :class="ui.metadata()">{{ metadata }}</span>

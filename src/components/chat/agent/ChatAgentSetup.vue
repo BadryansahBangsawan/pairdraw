@@ -16,6 +16,7 @@ import AgentSignInProgress from '@/components/settings/agents/AgentSignInProgres
 import { useSetupProblemMessage } from '@/components/settings/agents/problem'
 import { useConnectStepLabel } from '@/components/settings/agents/step'
 import SettingsLink from '@/components/settings/layout/SettingsLink.vue'
+import ProviderLogo from '@/components/settings/provider/ProviderLogo.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import AppAlert from '@/components/ui/feedback/AppAlert.vue'
 import AppPlaceholder from '@/components/ui/feedback/AppPlaceholder.vue'
@@ -193,8 +194,17 @@ onBeforeUnmount(() => {
 
     <section v-else :class="styles.card()" :aria-labelledby="titleId">
       <div :class="styles.header()">
-        <span :class="styles.tile()" aria-hidden="true">
+        <span
+          :class="styles.tile()"
+          :data-logo="state !== 'detecting' && agent ? '' : undefined"
+          aria-hidden="true"
+        >
           <icon-lucide-loader-2 v-if="state === 'detecting'" :class="styles.tileSpinner()" />
+          <ProviderLogo
+            v-else-if="agent"
+            :provider="`acp:${agent.id}`"
+            :class="styles.tileIcon()"
+          />
           <icon-lucide-bot v-else :class="styles.tileIcon()" />
         </span>
         <div ref="heading" tabindex="-1" :class="styles.heading()">

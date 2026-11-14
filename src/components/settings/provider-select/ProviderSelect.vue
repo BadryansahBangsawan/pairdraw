@@ -9,6 +9,7 @@ import { modelProviderName } from '@/app/ai/models/provider-name'
 import { PAIRDRAW_AI_PROVIDER } from '@/app/ai/providers/pairdraw/provider'
 import { automationHTTPURL } from '@/app/automation/mcp/spawn'
 import { cloudAIAvailable } from '@/app/cloud/integration'
+import ProviderLogo from '@/components/settings/provider/ProviderLogo.vue'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
 import type { AppSelectGroup } from '@/components/ui/select/select'
 
@@ -108,5 +109,13 @@ const groups = computed(() => {
 </script>
 
 <template>
-  <AppSelect v-model="providerID" :groups="groups" :placeholder="displayName" :ui="ui" />
+  <AppSelect v-model="providerID" :groups="groups" :placeholder="displayName" :ui="ui">
+    <template #leading><ProviderLogo :provider="providerID" class="mr-2 size-3.5" /></template>
+    <template #option="{ option }">
+      <span class="flex min-w-0 items-center gap-2">
+        <ProviderLogo :provider="option.value" class="size-3.5" />
+        <span class="truncate">{{ option.label }}</span>
+      </span>
+    </template>
+  </AppSelect>
 </template>

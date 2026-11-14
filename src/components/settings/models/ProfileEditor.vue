@@ -5,6 +5,7 @@ import type { AIProviderID } from '@pairdraw/core/constants'
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useCodingAgentSetup, usePiSetup } from '@/app/ai/agents/setup/use'
+import { servesOtherMakers } from '@/app/ai/models/provider-logo'
 import { useModelProfileFeedback } from '@/app/ai/models/settings/profile-editor/feedback'
 import { useProfileSignIn } from '@/app/ai/models/settings/profile-editor/sign-in'
 import { useModelProfileEditor } from '@/app/ai/models/settings/profile-editor/use'
@@ -21,6 +22,7 @@ import ProviderSelect from '@/components/settings/provider-select/ProviderSelect
 import BedrockConnectionFields from '@/components/settings/provider/BedrockConnectionFields.vue'
 import ChatGPTSignInField from '@/components/settings/provider/ChatGPTSignInField.vue'
 import ProviderConnectionTestButton from '@/components/settings/provider/ProviderConnectionTestButton.vue'
+import ProviderLogo from '@/components/settings/provider/ProviderLogo.vue'
 import ProviderSettingsField from '@/components/settings/provider/ProviderSettingsField.vue'
 import ProviderSettingsInput from '@/components/settings/provider/ProviderSettingsInput.vue'
 import ProviderSettingsKeyField from '@/components/settings/provider/ProviderSettingsKeyField.vue'
@@ -267,7 +269,23 @@ async function remove() {
                 :search-placeholder="ai.searchModels"
                 :empty-label="common.noResults"
                 @update:model-value="profile.updateModel(String($event))"
-              />
+              >
+                <!-- A router's models come from many makers; each wears its maker's logo. -->
+                <template v-if="servesOtherMakers(draft.providerID)" #leading>
+                  <ProviderLogo
+                    :provider="draft.providerID"
+                    :model="selectedModelValue"
+                    class="mr-2 size-3.5"
+                  />
+                </template>
+                <template v-if="servesOtherMakers(draft.providerID)" #option-leading="{ option }">
+                  <ProviderLogo
+                    :provider="draft.providerID"
+                    :model="option.value"
+                    class="size-3.5"
+                  />
+                </template>
+              </AppCombobox>
             </ProviderSettingsField>
 
             <ProviderSettingsField

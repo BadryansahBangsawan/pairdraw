@@ -455,6 +455,7 @@ function handleStop() {
       <ChatAgentNotice
         v-if="autoAgent && (isConfigured || messages.length)"
         :agent="autoAgent.name"
+        :provider="`acp:${autoAgent.id}`"
         @change="chatInput?.openModels()"
         @dismiss="agentAutoConnect.dismissNotice()"
       />

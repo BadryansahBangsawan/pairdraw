@@ -1,37 +1,60 @@
 <script setup lang="ts">
+import { tv } from 'tailwind-variants'
 import type { Component } from 'vue'
 import { computed } from 'vue'
-import IconAnthropic from '~icons/ai/anthropic'
-import IconBedrock from '~icons/ai/bedrock'
-import IconClaudeCode from '~icons/ai/claudecode'
-import IconCodex from '~icons/ai/codex'
-import IconDeepSeek from '~icons/ai/deepseek'
-import IconFireworks from '~icons/ai/fireworks'
-import IconGemini from '~icons/ai/gemini'
-import IconGeminiCLI from '~icons/ai/geminicli'
+import IconBedrock from '~icons/ai/bedrock-color'
+import IconClaude from '~icons/ai/claude-color'
+import IconClaudeCode from '~icons/ai/claudecode-color'
+import IconCodex from '~icons/ai/codex-color'
+import IconDeepSeek from '~icons/ai/deepseek-color'
+import IconFireworks from '~icons/ai/fireworks-color'
+import IconGemini from '~icons/ai/gemini-color'
+import IconGeminiCLI from '~icons/ai/geminicli-color'
 import IconKimi from '~icons/ai/kimi'
 import IconLMStudio from '~icons/ai/lmstudio'
-import IconMeta from '~icons/ai/meta'
-import IconMiniMax from '~icons/ai/minimax'
+import IconMeta from '~icons/ai/meta-color'
+import IconMiniMax from '~icons/ai/minimax-color'
+import IconMistral from '~icons/ai/mistral-color'
 import IconMoonshot from '~icons/ai/moonshot'
 import IconOllama from '~icons/ai/ollama'
 import IconOpenAI from '~icons/ai/openai'
 import IconOpenCode from '~icons/ai/opencode'
 import IconOpenRouter from '~icons/ai/openrouter'
-import IconTogether from '~icons/ai/together'
-import IconVertexAI from '~icons/ai/vertexai'
+import IconPi from '~icons/ai/pi'
+import IconQwen from '~icons/ai/qwen-color'
+import IconTogether from '~icons/ai/together-color'
+import IconVertexAI from '~icons/ai/vertexai-color'
 import IconXAI from '~icons/ai/xai'
 import IconZai from '~icons/ai/zai'
-import IconBot from '~icons/lucide/bot'
 import IconServer from '~icons/lucide/server'
 
-/** A provider, agent, or server preset such as `ollama`. */
-const { provider } = defineProps<{ provider: string }>()
+import { providerLogo, type ProviderLogoID } from '@/app/ai/models/provider-logo'
+import BrandMark from '@/components/brand/BrandMark.vue'
+import providerLogoTheme from '@/theme/settings/provider-logo'
 
-const LOGOS: Record<string, Component> = {
-  anthropic: IconAnthropic,
+const {
+  provider,
+  model,
+  class: className
+} = defineProps<{
+  /** A provider, coding agent, or server preset such as `ollama`. */
+  provider: string
+  /** The model a profile runs: a router such as OpenRouter then shows the model's maker. */
+  model?: string
+  class?: string
+}>()
+
+const styles = tv(providerLogoTheme)
+
+/**
+ * The brand's colour mark where LobeHub has one that reads on both themes, otherwise its
+ * monochrome mark, which draws in the text color. Anthropic shows Claude's mark: its own has no
+ * colour version. OpenRouter's lime and Kimi's white letter vanish on a light panel, so they stay
+ * monochrome.
+ */
+const ICONS: Record<Exclude<ProviderLogoID, 'pairdraw'>, Component> = {
+  anthropic: IconClaude,
   openai: IconOpenAI,
-  chatgpt: IconOpenAI,
   google: IconGemini,
   openrouter: IconOpenRouter,
   deepseek: IconDeepSeek,
@@ -39,25 +62,46 @@ const LOGOS: Record<string, Component> = {
   minimax: IconMiniMax,
   xai: IconXAI,
   meta: IconMeta,
-  'kimi-for-coding': IconKimi,
+  kimi: IconKimi,
   moonshot: IconMoonshot,
+  mistral: IconMistral,
+  qwen: IconQwen,
   together: IconTogether,
   fireworks: IconFireworks,
-  'opencode-zen': IconOpenCode,
-  'opencode-go': IconOpenCode,
+  opencode: IconOpenCode,
   'amazon-bedrock': IconBedrock,
   'google-vertex': IconVertexAI,
   ollama: IconOllama,
   lmstudio: IconLMStudio,
-  'acp:claude-code': IconClaudeCode,
-  'acp:codex': IconCodex,
-  'acp:gemini-cli': IconGeminiCLI,
-  'harness:pi': IconBot
+  'claude-code': IconClaudeCode,
+  codex: IconCodex,
+  'gemini-cli': IconGeminiCLI,
+  pi: IconPi
 }
 
-const logo = computed(() => LOGOS[provider] ?? IconServer)
+const logo = computed(() => providerLogo(provider, model))
+const icon = computed(() => {
+  const id = logo.value
+  if (id === 'pairdraw') return null
+  return id ? ICONS[id] : IconServer
+})
 </script>
 
 <template>
-  <component :is="logo" class="size-4 shrink-0" aria-hidden="true" data-slot="provider-logo" />
+  <component
+    :is="icon"
+    v-if="icon"
+    :class="styles({ class: className })"
+    :data-logo="logo ?? 'server'"
+    aria-hidden="true"
+    data-slot="provider-logo"
+  />
+  <BrandMark
+    v-else
+    variant="app-icon"
+    decorative
+    :class="styles({ class: className })"
+    data-logo="pairdraw"
+    data-slot="provider-logo"
+  />
 </template>

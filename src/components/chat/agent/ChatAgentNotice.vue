@@ -2,6 +2,7 @@
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import { chatAgentTheme } from '@/components/chat/ui'
+import ProviderLogo from '@/components/settings/provider/ProviderLogo.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import AppAlert from '@/components/ui/feedback/AppAlert.vue'
@@ -16,10 +17,13 @@ import AppCopyField from '@/components/ui/input/AppCopyField.vue'
  */
 const {
   agent,
+  provider,
   signedOut = false,
   signInCommand = null
 } = defineProps<{
   agent: string
+  /** The agent's provider ID, such as `acp:codex`, whose logo the notice shows. */
+  provider?: string
   /** The agent refused the last message: nobody is signed in to it. */
   signedOut?: boolean
   /** What to run in a terminal to sign in to the agent. */
@@ -55,7 +59,8 @@ const styles = chatAgentTheme()
     </AppAlert>
   </div>
   <div v-else :class="styles.notice()" data-test-id="chat-agent-notice">
-    <icon-lucide-bot :class="styles.noticeIcon()" aria-hidden="true" />
+    <ProviderLogo v-if="provider" :provider="provider" :class="styles.noticeLogo()" />
+    <icon-lucide-bot v-else :class="styles.noticeIcon()" aria-hidden="true" />
     <span :class="styles.noticeText()">{{ ai.chatAgentUsing({ agent }) }}</span>
     <AppButton size="xs" color="primary" variant="link" @click="emit('change')">
       {{ ai.chatAgentChange }}

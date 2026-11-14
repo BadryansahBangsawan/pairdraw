@@ -13,6 +13,7 @@ import SettingsPage from '@/components/settings/layout/SettingsPage.vue'
 import SettingsSection from '@/components/settings/layout/SettingsSection.vue'
 import ProfileEditor from '@/components/settings/models/ProfileEditor.vue'
 import RoleAssignments from '@/components/settings/models/RoleAssignments.vue'
+import ProviderLogo from '@/components/settings/provider/ProviderLogo.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import AppActionRow from '@/components/ui/list/AppActionRow.vue'
 import PanelDrillIn from '@/components/ui/panel/PanelDrillIn.vue'
@@ -130,9 +131,12 @@ const { connectionState, refresh: refreshAgents } = useModelConnectionStates(sta
               @click="editModel(profile.id)"
             >
               <template #leading>
-                <span class="flex size-8 items-center justify-center rounded bg-panel"
-                  ><icon-lucide-bot class="size-4"
-                /></span>
+                <span class="flex size-8 items-center justify-center rounded bg-panel">
+                  <ProviderLogo
+                    :provider="profile.providerID"
+                    :model="profile.customModelID || profile.modelID"
+                  />
+                </span>
               </template>
               {{ profile.name }}
               <template #description>

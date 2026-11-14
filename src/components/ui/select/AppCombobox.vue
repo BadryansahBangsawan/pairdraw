@@ -116,6 +116,8 @@ function updateOpen(value: boolean): void {
         :aria-label="label"
         :class="styles.trigger({ size, class: ui?.trigger })"
       >
+        <!-- An icon before the chosen option, such as the logo its menu row shows. -->
+        <slot name="leading" :option="selectedOption" />
         <slot name="value" :option="selectedOption">
           <span :class="styles.value({ size, class: ui?.value })">
             {{ selectedOption?.label ?? (modelValue || placeholder) }}
@@ -169,6 +171,7 @@ function updateOpen(value: boolean): void {
               <ComboboxItemIndicator :class="styles.indicator({ class: ui?.indicator })">
                 <icon-lucide-check class="size-3 text-primary" />
               </ComboboxItemIndicator>
+              <slot name="option-leading" :option="option" />
               <slot name="option" :option="option">
                 <div class="min-w-0 flex-1">
                   <div class="truncate text-surface">{{ option.label }}</div>

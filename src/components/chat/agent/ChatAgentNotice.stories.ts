@@ -5,6 +5,7 @@ import ChatAgentNotice from './ChatAgentNotice.vue'
 
 interface Args {
   agent: string
+  provider?: string
   signedOut?: boolean
   signInCommand?: string | null
   onChange: () => void
@@ -16,6 +17,7 @@ const meta = {
   title: 'App/Chat/Agent Notice',
   args: {
     agent: 'Claude Code',
+    provider: 'acp:claude-code',
     signedOut: false,
     signInCommand: null,
     onChange: fn(),

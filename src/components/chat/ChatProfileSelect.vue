@@ -38,10 +38,12 @@ import {
   setModelRoleAssignment
 } from '@/app/ai/models'
 import type { AIModelProfile, AIModelProfileId } from '@/app/ai/models'
+import { profileLogoSource } from '@/app/ai/models/provider-logo'
 import { modelProviderName } from '@/app/ai/models/provider-name'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { toast } from '@/app/shell/ui'
 import ChatProfileItem from '@/components/chat/ChatProfileItem.vue'
+import ProviderLogo from '@/components/settings/provider/ProviderLogo.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import AppConfirmationDialog from '@/components/ui/dialog/AppConfirmationDialog.vue'
 import { useHeldContent } from '@/components/ui/overlay/held'
@@ -53,6 +55,10 @@ const { ai, common } = useI18n()
 const { history } = useAIChat()
 const open = ref(false)
 const profiles = computed(designModelProfiles)
+/** The trigger wears the logo of the model the chat runs on, as its menu row does. */
+const currentLogo = computed(() =>
+  designModelProfile.value ? profileLogoSource(designModelProfile.value) : null
+)
 const ui = chatProfileTheme()
 const selectCls = useSelectUI({
   trigger: ui.trigger(),
@@ -180,7 +186,8 @@ defineExpose({
       :aria-label="ai.selectDesignModel"
       :class="selectCls.trigger"
     >
-      <icon-lucide-bot :class="ui.triggerIcon()" />
+      <ProviderLogo v-if="currentLogo" v-bind="currentLogo" :class="ui.triggerIcon()" />
+      <icon-lucide-bot v-else :class="ui.triggerIcon()" />
       <span :class="ui.triggerValue()"><slot name="value" /></span>
       <icon-lucide-chevron-down :class="ui.triggerChevron()" />
     </SelectTrigger>
@@ -232,6 +239,7 @@ defineExpose({
                 @select="void chooseAgent($event, agent)"
               >
                 <span :class="ui.indicator()" />
+                <ProviderLogo :provider="`acp:${agent.id}`" />
                 <SelectItemText as-child>
                   <span :class="ui.text()">
                     <span :class="ui.name()">{{ agent.name }}</span>

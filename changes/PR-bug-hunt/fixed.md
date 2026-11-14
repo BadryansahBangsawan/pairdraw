@@ -13,3 +13,4 @@
 - A design started from Home or a New file tab starts on the dark page in the dark theme, as other new documents do, instead of the light one.
 - Home's places menu is wide enough for each place's name, such as Design systems and Storage workspace, instead of cutting them short.
 - The phone File menu names its items in the app's language, and its export item says it exports the selection as PNG.
+- On a phone, Share no longer puts a document into a live room in Pairdraw, where shared rooms are switched off; a Cloud document still shares through its server.

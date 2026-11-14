@@ -95,6 +95,11 @@ function createMobileHudContext() {
       : ''
   )
 
+  /** A Cloud document shares through its server; anything else needs a build with live rooms. */
+  const canShare = computed(
+    () => COLLABORATION_INCLUDED || isCloudBinding(store.getStorageBinding())
+  )
+
   /**
    * Shares the document. A Cloud document opens its share dialog, where its server decides who
    * may open it. Anything else goes into a room, shared first if it is not in one, never a room it
@@ -106,7 +111,7 @@ function createMobileHudContext() {
       openCloudShare(store)
       return
     }
-    if (!collab) return
+    if (!collab || !COLLABORATION_INCLUDED) return
     const roomId = collabState.value.roomId ?? collab.shareCurrentDoc()
     if (!roomId) return
     const sent = await send(getShareURL(roomId), store.state.documentName)
@@ -137,6 +142,7 @@ function createMobileHudContext() {
     activeToolIcon,
     actionToast,
     menuItems,
+    canShare,
     undo,
     redo,
     share,

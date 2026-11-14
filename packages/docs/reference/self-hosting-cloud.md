@@ -9,17 +9,17 @@ Pairdraw Cloud is one Node 22+ process in front of PostgreSQL 15 or later and an
 
 ## Install
 
-Each release publishes an image, `ghcr.io/pairdraw/cloud`, with the server and the editor and pages it serves, for `linux/amd64` and `linux/arm64`. It is tagged with the version (`0.16.0`), the minor version (`0.16`), and `latest`; prereleases are tagged with their version and `next`. Give it the [configuration](#configure) through a mounted TOML file and the environment:
+Each release publishes an image, `ghcr.io/badryansahbangsawan/cloud`, with the server and the editor and pages it serves, for `linux/amd64` and `linux/arm64`. It is tagged with the version (`0.16.0`), the minor version (`0.16`), and `latest`; prereleases are tagged with their version and `next`. Give it the [configuration](#configure) through a mounted TOML file and the environment:
 
 ```sh
 docker run -p 8787:8787 \
   -v ./pairdraw-cloud.toml:/etc/pairdraw/pairdraw-cloud.toml:ro \
   -e PAIRDRAW_CLOUD_CONFIG=/etc/pairdraw/pairdraw-cloud.toml \
   --env-file .env \
-  ghcr.io/pairdraw/cloud:0.16
+  ghcr.io/badryansahbangsawan/cloud:0.16
 ```
 
-The image serves its own editor and pages from `/app/site`, so leave `PAIRDRAW_CLOUD_SITE_DIR` out of the `.env` it is given, or the variable points the server somewhere the container does not have. It listens on port 8787, and reports health from `GET /ready`. `docker run … ghcr.io/pairdraw/cloud node ai-relay.mjs` runs the [AI relay](#ai) instead.
+The image serves its own editor and pages from `/app/site`, so leave `PAIRDRAW_CLOUD_SITE_DIR` out of the `.env` it is given, or the variable points the server somewhere the container does not have. It listens on port 8787, and reports health from `GET /ready`. `docker run … ghcr.io/badryansahbangsawan/cloud node ai-relay.mjs` runs the [AI relay](#ai) instead.
 
 To try it on one machine, [`compose.self-hosted.yml`](https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/cloud/deploy/compose.self-hosted.yml) runs the image with PostgreSQL, SeaweedFS for storage, and Mailpit for email, configured by [`self-hosted/pairdraw-cloud.toml`](https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/cloud/deploy/self-hosted/pairdraw-cloud.toml):
 

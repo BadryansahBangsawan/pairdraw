@@ -8,7 +8,7 @@ name: pairdraw-cloud
 
 services:
   pairdraw:
-    image: ghcr.io/pairdraw/cloud:${PAIRDRAW_CLOUD_VERSION:-latest}
+    image: ghcr.io/badryansahbangsawan/cloud:${PAIRDRAW_CLOUD_VERSION:-latest}
     depends_on:
       postgres:
         condition: service_healthy

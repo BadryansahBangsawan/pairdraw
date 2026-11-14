@@ -223,7 +223,8 @@ jobs:
     timeout-minutes: 8
     runs-on: ubuntu-24.04
     container:
-      image: ghcr.io/pairdraw/native-contracts-ci@sha256:64e6b1b50a988c1cefe2b69ac9d58076fd743b18391fa2dbd1d153eba2be9521
+      # Published by native-contracts-image.yml; pin it by digest once that workflow has run.
+      image: ghcr.io/badryansahbangsawan/native-contracts-ci:ubuntu-24.04
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}

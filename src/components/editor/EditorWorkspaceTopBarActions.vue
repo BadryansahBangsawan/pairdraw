@@ -4,6 +4,7 @@ import { useI18n, useSlidesMessages } from '@open-pencil/vue/i18n'
 
 import { CHAT_COLUMN_SHORTCUT, chatColumnOpen, toggleChatColumn } from '@/app/ai/chat/panel'
 import { useEditorStore } from '@/app/editor/active-store'
+import { openGoodies } from '@/app/goodies/actions'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { appMenuShortcut } from '@/app/shell/menu/shortcut'
 import { propertiesPanelOpen, togglePropertiesPanel } from '@/app/shell/side-panels'
@@ -54,6 +55,15 @@ const slides = useSlidesMessages()
         @click="toggleChatColumn"
       >
         <icon-lucide-sparkles class="size-4" />
+      </IconButton>
+      <IconButton
+        :label="editor.goodies"
+        size="sm"
+        side="bottom"
+        data-test-id="editor-open-goodies"
+        @click="openGoodies(store)"
+      >
+        <icon-lucide-gift class="size-4" />
       </IconButton>
       <IconButton
         :label="

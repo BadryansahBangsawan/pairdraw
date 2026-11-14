@@ -596,6 +596,8 @@ de:explore.prompt
 es:media.imagePrompt
 es:explore.activeVariants
 es:explore.prompt
+es:editor.goodiesScripts
+es:editor.goodiesShaders
 fr:media.imagePrompt
 fr:media.imageOrientationPortrait
 it:media.imagePrompt
@@ -609,6 +611,9 @@ fr:explore.mode
 fr:explore.axisStyle
 fr:explore.activeVariants
 fr:explore.prompt
+fr:editor.goodiesStyles
+fr:editor.goodiesScripts
+fr:editor.goodiesShaders
 pl:agents.sessionModel
 pl:explore.activeVariants
 pl:explore.prompt

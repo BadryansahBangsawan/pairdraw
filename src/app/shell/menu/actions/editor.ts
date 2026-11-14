@@ -5,6 +5,7 @@ import { getActiveEditorStore, useEditorStore } from '@/app/editor/active-store'
 import { openFindLayers } from '@/app/editor/layers/find'
 import { openTextLinkEditor } from '@/app/editor/links'
 import { openPlaceImageDialog } from '@/app/editor/place/dialog'
+import { openGoodies } from '@/app/goodies/actions'
 import {
   setCommentsOnCanvas,
   setDesignIssuesOnCanvas,
@@ -106,6 +107,7 @@ export function createSharedEditorMenuActions(
       insertScriptNode(store)
     },
     'place-image': () => openPlaceImageDialog(store),
+    goodies: () => openGoodies(store),
     'find-layers': () => openFindLayers(store),
     'export-pdf': () => void exportFramesToPDF(store),
     'theme-light': () => setTheme('light'),

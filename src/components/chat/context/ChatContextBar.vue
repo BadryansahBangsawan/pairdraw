@@ -9,6 +9,7 @@ import { latestContextUsage } from '@/app/ai/chat/context-window/usage'
 import { useDesignContextWindow } from '@/app/ai/chat/context-window/window'
 import { styleKitFromDocument } from '@/app/ai/chat/pins/document'
 import { describePins } from '@/app/ai/chat/pins/note'
+import { hasPendingStyleKit, takePendingStyleKit } from '@/app/ai/chat/pins/pending'
 import { useConversationPins } from '@/app/ai/chat/pins/use'
 import { useAIChat } from '@/app/ai/chat/use'
 import { getActiveEditorStore } from '@/app/editor/active-store'
@@ -37,6 +38,18 @@ const meter = computed(() =>
     catalogWindow.value,
     estimateTokens(describePins(pins.pins.value))
   )
+)
+
+// A kit chosen outside the chat, such as in Goodies, is pinned once a conversation can take it.
+watch(
+  () => pins.editable.value && hasPendingStyleKit(getActiveEditorStore()),
+  (ready) => {
+    if (!ready) return
+    const kit = takePendingStyleKit(getActiveEditorStore())
+    if (!kit) return
+    void pins.setStyleKit(kit)
+  },
+  { immediate: true }
 )
 
 // A failure explains the last attempt; reopening the popover starts fresh.

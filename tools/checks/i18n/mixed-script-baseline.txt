@@ -173,6 +173,7 @@ ja:diagnostics.sharingQuestionTitle
 ja:diagnostics.sharingQuestionDescription
 ja:editor.showUI
 ja:editor.toggleAIChat
+ja:editor.goodiesStylesHint
 ja:files.browserFileAPINotSupported
 ja:files.clipboardImageFetchFailed
 ja:files.clipboardImagesFetchFailed
@@ -667,6 +668,7 @@ zh-cn:ai.notificationsSystemHint
 zh-cn:ai.notifyReplyFinished
 zh-cn:ai.notifyReplyFailed
 zh-cn:editor.toggleAIChat
+zh-cn:editor.goodiesStylesHint
 ja:ai.aiSetupCompanionDescription
 ja:ai.aiSetupCompanionRejected
 ja:ai.aiSetupCompanionSafari

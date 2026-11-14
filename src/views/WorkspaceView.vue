@@ -49,6 +49,7 @@ import EditorWorkspace from '@/components/editor/EditorWorkspace.vue'
 import EmbedStatusOverlay from '@/components/embed/EmbedStatusOverlay.vue'
 import FileApiBanner from '@/components/FileApiBanner.vue'
 import FontStatusBanner from '@/components/font-status/FontStatusBanner.vue'
+import GoodiesDialog from '@/components/goodies/GoodiesDialog.vue'
 import HomeWorkspace from '@/components/home/HomeWorkspace.vue'
 import ImageAIPromptDialog from '@/components/image-ai/ImageAIPromptDialog.vue'
 import FindLayersDialog from '@/components/layers/FindLayersDialog.vue'
@@ -306,6 +307,7 @@ onUnmounted(() => {
     <RenameSelectionDialog />
     <CommandPalette v-if="!embed" />
     <FindLayersDialog v-if="!embed" />
+    <GoodiesDialog v-if="!embed" />
     <ImageAIPromptDialog />
     <ShortcutSheetHost />
     <ShellTopBar v-if="!embed" />

@@ -373,6 +373,11 @@ export const APP_MENU_SCHEMA = [
         label: 'Insert Script…',
         palette: { keywords: ['code', 'script', 'javascript', 'canvas'] }
       },
+      {
+        id: 'goodies',
+        label: 'Goodies…',
+        palette: { keywords: ['styles', 'design systems', 'scripts', 'shaders', 'gallery'] }
+      },
       { type: 'separator' },
       {
         id: 'selection.toggleMask',

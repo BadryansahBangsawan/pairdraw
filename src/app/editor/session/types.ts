@@ -32,6 +32,7 @@ export function createInitialAppEditorState(pageId: string): AppEditorState {
     statusesOpen: false,
     iconPickerOpen: false,
     findLayersOpen: false,
+    goodiesOpen: false,
     renameNodeId: null,
     numberFieldFocused: false,
     preparation: null,
@@ -61,6 +62,8 @@ export type AppEditorState = EditorState & {
   iconPickerOpen: boolean
   /** Find layers, opened from the Edit menu, its key, or the palette. */
   findLayersOpen: boolean
+  /** Goodies, opened from the top bar, the Object menu, or the palette. */
+  goodiesOpen: boolean
   renameNodeId: string | null
   numberFieldFocused: boolean
   preparation: EditorPreparation | null

@@ -431,6 +431,10 @@
         "label": "Insert Script…"
       },
       {
+        "id": "goodies",
+        "label": "Goodies…"
+      },
+      {
         "type": "separator"
       },
       {

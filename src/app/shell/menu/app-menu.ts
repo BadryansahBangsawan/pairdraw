@@ -145,6 +145,7 @@ export function useAppMenu() {
     variables: 'variables',
     'insert-icon': 'insertIcon',
     'insert-script': 'insertScript',
+    goodies: 'goodies',
     'view-rulers': 'rulers',
     'view-pixel-grid': 'pixelGrid',
     'view-multiplayer-cursors': 'multiplayerCursors',

@@ -98,8 +98,9 @@ export class CanvasHelper {
     )
   }
 
+  /** The canvas with what floats over it, such as the toolbar, once its transitions have ended. */
   async screenshotCanvas() {
-    return this.canvas.screenshot()
+    return this.canvas.screenshot({ animations: 'disabled' })
   }
 
   async screenshotCanvasRegion(width = 900, height = 700) {
@@ -108,6 +109,8 @@ export class CanvasHelper {
     const viewport = this.page.viewportSize()
     if (!viewport) throw new Error('Viewport unavailable')
     return this.page.screenshot({
+      // The toolbar over the canvas fades between tools; a snapshot shows where it settles.
+      animations: 'disabled',
       clip: {
         x: box.x,
         y: box.y,

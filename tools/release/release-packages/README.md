@@ -24,7 +24,7 @@ Changing either after a release strands installed apps on the old feed or key, s
 
 ## Pre-releases
 
-A `vX.Y.Z-beta.N` tag runs the same workflow. npm packages publish under the `next` dist-tag, so `latest` stays on the last stable release, and the draft is marked pre-release and never latest. The desktop updater and download links follow GitHub's latest release, and the Homebrew cask only matches stable tags, so neither picks up a beta. The app and docs deploy workflows skip pre-release tags. The changelog section is headed `## X.Y.Z-beta.N — YYYY-MM-DD` like any release.
+A `vX.Y.Z-beta.N` tag runs the same workflow. npm packages publish under the `next` dist-tag, so `latest` stays on the last stable release, and the draft is marked pre-release and never latest. The desktop updater and download links follow GitHub's latest release, and the Homebrew cask only matches stable tags, so neither picks up a beta. The changelog section is headed `## X.Y.Z-beta.N — YYYY-MM-DD` like any release.
 
 ## Draft publication
 

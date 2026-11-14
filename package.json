@@ -73,7 +73,7 @@
     "check:commits": "commitlint",
     "check:changelog": "bun tools/release/release-packages/src/changelog/check.ts",
     "changelog:assemble": "bun tools/release/release-packages/src/changelog/assemble.ts",
-    "check:deps": "knip --include unlisted,unresolved,binaries",
+    "check:deps": "knip --include files,dependencies,unlisted,unresolved,binaries",
     "check:docs": "bun --filter @pairdraw/docs check && bun run check:authoring-reference",
     "check:authoring-reference": "bun tools/generate/authoring-reference/src/check.ts",
     "generate:authoring-reference": "bun tools/generate/authoring-reference/src/generate.ts",

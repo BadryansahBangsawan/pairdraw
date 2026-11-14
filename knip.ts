@@ -169,6 +169,11 @@ const config: KnipConfig = {
     'packages/*': {
       entry: [...tests]
     },
+    'packages/core': {
+      entry: [...tests],
+      // An optional peer: only the AI SDK adapter (`src/tools/ai-adapter.ts`) imports it.
+      ignoreDependencies: ['ai']
+    },
     'packages/cloud': {
       // `tests/e2e/cloudflare/run.ts` runs the Worker under `wrangler dev`; deployments run it too.
       ignoreDependencies: ['wrangler'],
@@ -216,7 +221,9 @@ const config: KnipConfig = {
     },
     'packages/vue': {
       // The example app in the package README.
-      entry: [...tests, 'example/src/main.ts', 'example/vite.config.ts']
+      entry: [...tests, 'example/src/main.ts', 'example/vite.config.ts'],
+      // An optional peer: only the canvas surface imports it, for apps that draw a canvas.
+      ignoreDependencies: ['canvaskit-wasm']
     },
     'packages/web-capture': {
       // Bundled into `desktop/src/system/browser-capture.js`.

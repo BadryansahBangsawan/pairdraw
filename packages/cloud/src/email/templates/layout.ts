@@ -13,7 +13,7 @@ export type TransactionalEmailLayout = {
   site?: string
 }
 
-/** Cloud's mail in the same branded layout as the waitlist's, so people know who wrote. */
+/** Cloud's mail in its branded layout, so people know who wrote. */
 export function transactionalEmailLayout(props: TransactionalEmailLayout): VNode {
   const { footer, ...content } = props
   return emailLayout({ ...content, note: footer ? { text: footer } : undefined })

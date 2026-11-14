@@ -58,7 +58,6 @@ describe('the development agent session', () => {
   test.each([
     ['a build', 'build', 'production', {}],
     ['the Cloud site', 'serve', 'cloud', {}],
-    ['the metrics dashboard', 'serve', 'metrics', {}],
     ['Tauri development', 'serve', 'development', { TAURI_ENV_PLATFORM: 'darwin' }],
     ['a dev host on the network', 'serve', 'development', { TAURI_DEV_HOST: '0.0.0.0' }],
     ['Portless', 'serve', 'development', { PORTLESS_URL: 'https://pairdraw.localhost' }],

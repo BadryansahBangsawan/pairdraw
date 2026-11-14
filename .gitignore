@@ -90,15 +90,10 @@ scratch/
 # OpenCode
 .opencode/
 
-# Feedback Worker local state and secrets
-packages/feedback/.wrangler/
-packages/feedback/.dev.vars
-
 # Pairdraw Cloud local and build outputs
 packages/cloud/deploy/generated/
 packages/cloud/dist-standalone/
 dist-cloud/
-dist-metrics/
 
 # SwiftPM output of desktop Swift packages built by hand
 desktop/swift/*/.build/

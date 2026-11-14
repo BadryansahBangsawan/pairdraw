@@ -472,12 +472,6 @@
       }
     },
     {
-      "files": ["packages/feedback/src/**/*.ts"],
-      "rules": {
-        "pairdraw/no-raw-sql": "error"
-      }
-    },
-    {
       "files": [
         "packages/cloud/src/server/db/expressions.ts",
         "packages/cloud/src/server/db/migrate.ts",

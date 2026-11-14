@@ -48,8 +48,7 @@ export const CODE_JOBS = [
   'repository-quality',
   'storybook',
   'native-test-contracts',
-  'unit-tests',
-  'feedback-tests'
+  'unit-tests'
 ] as const
 export const CLOUD_JOBS = ['cloud-tests', 'cloud-storage'] as const
 export const DOCS_JOB = 'documentation'

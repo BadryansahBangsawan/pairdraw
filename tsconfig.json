@@ -46,9 +46,6 @@
       "@pairdraw/harness": [
         "./packages/harness/src/index.ts"
       ],
-      "#feedback/*": [
-        "./packages/feedback/src/*"
-      ],
       "@pairdraw/cloud/*": [
         "./packages/cloud/src/*"
       ],

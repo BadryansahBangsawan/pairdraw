@@ -20,7 +20,6 @@
     "@pairdraw/brand-tools": "workspace:*",
     "@pairdraw/cli": "workspace:*",
     "@pairdraw/demo-tools": "workspace:*",
-    "@pairdraw/feedback": "workspace:*",
     "@pairdraw/landing-posters-tools": "workspace:*",
     "@pairdraw/vite-config": "workspace:*",
     "@shikijs/vitepress-twoslash": "^4.4.3",

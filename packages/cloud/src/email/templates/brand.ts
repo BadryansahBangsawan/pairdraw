@@ -87,7 +87,7 @@ function noteContent(note: NonNullable<EmailLayoutProps['note']>) {
   return [`${note.text} `, h(Link, { href: url, style: styles.link }, () => label), '.']
 }
 
-/** The branded email every Pairdraw service sends: the waitlist and Cloud alike. */
+/** The branded email Pairdraw Cloud sends. */
 export function emailLayout(props: EmailLayoutProps): VNode {
   const { note } = props
   const site = props.site ? new URL(props.site) : null

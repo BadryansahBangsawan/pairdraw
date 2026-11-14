@@ -2,7 +2,7 @@ import { defineRule } from '@oxlint/plugins'
 
 /**
  * Kysely's typed builder everywhere; raw `sql` templates only in migrations and reviewed helpers.
- * Applied to the Cloud server and the feedback Worker in oxlint.json.
+ * Applied to the Cloud server in oxlint.json.
  */
 export const noRawSQLRule = defineRule({
   meta: {

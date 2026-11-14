@@ -14,8 +14,8 @@ declare const __PAIRDRAW_LOCAL_AUTOMATION_URL__: string
 declare const __PAIRDRAW_LOCAL_AUTOMATION_HTTP_URL__: string
 /**
  * The session `bun run dev` gave its MCP server's agent bridge, so this tab starts coding agents
- * without a pairing link (`src/app/automation/companion/dev.ts`). Null in builds, Cloud and
- * metrics modes, Tauri and Portless development, and with `PAIRDRAW_DEV_AGENTS=0`.
+ * without a pairing link (`src/app/automation/companion/dev.ts`). Null in builds, Cloud mode,
+ * Tauri and Portless development, and with `PAIRDRAW_DEV_AGENTS=0`.
  */
 declare const __PAIRDRAW_LOCAL_AGENT_SESSION__: { token: string; agentToken: string } | null
 

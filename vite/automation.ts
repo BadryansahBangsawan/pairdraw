@@ -20,7 +20,7 @@ export function localAutomationToken(command: string): string | null {
 /**
  * The tab session that lets the development server's own tab start coding agents through its MCP
  * server without a pairing link, made once per Vite process and never derived from
- * `PAIRDRAW_DEV_TOKEN`. Null for builds, the Cloud and metrics modes, Tauri development (the
+ * `PAIRDRAW_DEV_TOKEN`. Null for builds, the Cloud mode, Tauri development (the
  * desktop app runs agents itself, and `TAURI_DEV_HOST` exposes the server beyond this machine),
  * Portless (its MCP server is not on the port the tab knows), and `PAIRDRAW_DEV_AGENTS=0`.
  */
@@ -29,7 +29,7 @@ export function localAgentSession(
   mode: string,
   env: NodeJS.ProcessEnv = process.env
 ): DevAgentSession | null {
-  if (command !== 'serve' || mode === 'cloud' || mode === 'metrics') return null
+  if (command !== 'serve' || mode === 'cloud') return null
   if (env.TAURI_DEV_HOST || env.TAURI_ENV_PLATFORM) return null
   if (env.PORTLESS_URL) return null
   if (env.PAIRDRAW_DEV_AGENTS === '0') return null

@@ -25,7 +25,6 @@ import { cloudSitePlugin } from './vite/cloud-site'
 import { aiIconCollection } from './vite/icons'
 import { createImportPathTransform } from './vite/import-path-transform'
 import { inlineScriptPlugin } from './vite/inline-script'
-import { metricsBrandPlugin } from './vite/metrics'
 import { pairdrawPwaPlugin } from './vite/pwa'
 import { rawMarkdownPlugin } from './vite/raw-markdown'
 import { createDevServerOptions } from './vite/server'
@@ -37,15 +36,12 @@ export default defineConfig(async ({ command, mode }) => {
   // `--mode cloud` builds what a Cloud server serves on its own address: the editor and the
   // server's own pages (`cloud.html`).
   const cloudSite = mode === 'cloud'
-  // `--mode metrics` builds only the metrics dashboard (`metrics.html`) for the feedback Worker,
-  // which serves it under /admin behind Cloudflare Access.
-  const metrics = mode === 'metrics'
   const env = loadEnv(mode, __dirname, 'VITE_')
   // `VITE_PAIRDRAW_CLOUD=off` builds the editor without Pairdraw Cloud.
   const cloud = env.VITE_PAIRDRAW_CLOUD !== 'off'
   // Agents automate the editor's own development server; a Cloud site, built or served, has none.
-  const automation = !metrics && !cloudSite
-  await Promise.all([ensureBrandAssets(['web']), metrics ? undefined : ensureDemoDocument()])
+  const automation = !cloudSite
+  await Promise.all([ensureBrandAssets(['web']), ensureDemoDocument()])
   return {
     resolve: {
       alias: createPairdrawAliases(__dirname, { cloud })
@@ -74,7 +70,7 @@ export default defineConfig(async ({ command, mode }) => {
       inlineScriptPlugin(),
       bootSplashPlugin({
         entry: resolve(__dirname, 'src/splash/theme.ts'),
-        pages: ['index.html', 'cloud.html', 'metrics.html']
+        pages: ['index.html', 'cloud.html']
       }),
       tailwindcss(),
       Icons({ compiler: 'vue3', customCollections: { ai: aiIconCollection() } }),
@@ -84,7 +80,7 @@ export default defineConfig(async ({ command, mode }) => {
       }),
       automation ? pairdrawAutomationPlugin(command, host, mode) : undefined,
       vue(),
-      metrics ? metricsBrandPlugin((outDir) => resolve(outDir, '..')) : pairdrawPwaPlugin(),
+      pairdrawPwaPlugin(),
       cloudSite ? cloudSitePlugin() : undefined
     ],
     clearScreen: false,
@@ -93,24 +89,20 @@ export default defineConfig(async ({ command, mode }) => {
     // so it runs beside the editor's development server in the same checkout.
     appType: cloudSite ? 'mpa' : 'spa',
     cacheDir: cloudSite ? 'node_modules/.vite-cloud' : undefined,
-    publicDir: metrics ? false : 'public',
-    base: metrics ? '/admin/' : '/',
     build: {
       // Syntax is lowered to the supported browser baseline; APIs are not polyfilled.
       target: viteBuildTarget(),
       chunkSizeWarningLimit: 2500,
-      outDir: metrics ? 'dist-metrics/admin' : cloudSite ? 'dist-cloud' : 'dist',
+      outDir: cloudSite ? 'dist-cloud' : 'dist',
       rolldownOptions: {
         // The desktop Software Update window is its own page; a Cloud server adds its own
-        // pages beside the editor, and the metrics dashboard builds alone.
-        input: metrics
-          ? { metrics: resolve(__dirname, 'metrics.html') }
-          : cloudSite
-            ? { main: resolve(__dirname, 'index.html'), cloud: resolve(__dirname, 'cloud.html') }
-            : {
-                main: resolve(__dirname, 'index.html'),
-                updater: resolve(__dirname, 'updater.html')
-              }
+        // pages beside the editor.
+        input: cloudSite
+          ? { main: resolve(__dirname, 'index.html'), cloud: resolve(__dirname, 'cloud.html') }
+          : {
+              main: resolve(__dirname, 'index.html'),
+              updater: resolve(__dirname, 'updater.html')
+            }
       }
     },
     worker: {

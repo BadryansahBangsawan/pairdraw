@@ -21,8 +21,8 @@ export const portalAppearance = computed(() => resolveAppTheme(setting.value, pr
 
 /**
  * Takes the editor's theme, which a Cloud server's pages share with the editor it serves from the
- * same address, so the boot splash and the page keep the editor's colours. Elsewhere, as for the
- * metrics dashboard, no theme is stored and the editor's default applies. The editor's accent
+ * same address, so the boot splash and the page keep the editor's colours. Where no theme is
+ * stored, the editor's default applies. The editor's accent
  * stays the editor's; the stylesheet's default accent applies.
  */
 export function usePortalTheme(): void {

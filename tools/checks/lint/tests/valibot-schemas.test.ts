@@ -29,7 +29,7 @@ describe(rule, () => {
 
   test('rejects a schema exported from a contract folder outside Cloud', async () => {
     const source = `${valibot}export const metricsSchema = v.object({})`
-    const path = 'packages/feedback/src/contract/metrics.ts'
+    const path = 'packages/mcp/src/contract/metrics.ts'
     expect(ruleDiagnostics(await lint(source, rules, path), rule)).toHaveLength(1)
   })
 

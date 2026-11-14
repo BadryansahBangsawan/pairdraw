@@ -1,4 +1,8 @@
+import { execFileSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
+
 import type { KnipConfig } from 'knip'
+import * as v from 'valibot'
 
 /** VitePress pages import their components and data loaders from `<script setup>` blocks. */
 const scriptBlock = /<script\b[^>]*>([\s\S]*?)<\/script>/g
@@ -7,6 +11,57 @@ const scriptBlock = /<script\b[^>]*>([\s\S]*?)<\/script>/g
 // `tools/dev/unit-tests` or a package's own `test` script.
 const tests = ['tests/**/*.test.ts']
 
+const manifestSchema = v.object({ exports: v.optional(v.unknown()) })
+
+/** Every file a package's `exports` names, which knip already takes as an entry. */
+function exportedFiles(workspace: string): Set<string> {
+  const files = new Set<string>()
+  const visit = (value: unknown): void => {
+    if (typeof value !== 'string') {
+      if (value && typeof value === 'object') Object.values(value).forEach(visit)
+      return
+    }
+    // `exports` names the build; knip maps `dist/x.js` back to `src/x.ts`.
+    files.add(value.replace(/^\.\/dist\//, 'src/').replace(/(\.d)?\.m?[jt]s$/, '.ts'))
+    files.add(value.replace(/^\.\//, ''))
+  }
+  const manifest = v.parse(
+    v.pipe(v.string(), v.parseJson(), manifestSchema),
+    readFileSync(`${workspace}/package.json`, 'utf8')
+  )
+  visit(manifest.exports)
+  return files
+}
+
+/**
+ * Modules the end-to-end specs import into the page by their dev-server URL, such as
+ * `await import('/src/app/shell/theme.ts')` inside `page.evaluate`, grouped by workspace.
+ */
+const pageModules = (() => {
+  const urls = execFileSync(
+    'git',
+    [
+      'grep',
+      '-h',
+      '-o',
+      '-E',
+      '[\'"`]/(src|packages|tests)/[A-Za-z0-9_./-]+\\.(ts|vue)[\'"`]',
+      'tests'
+    ],
+    { encoding: 'utf8' }
+  )
+  const byWorkspace = new Map<string, string[]>()
+  for (const url of new Set(urls.split('\n').filter(Boolean))) {
+    const path = url.slice(2, -1)
+    const [, packageName] = /^packages\/([^/]+)\//.exec(path) ?? []
+    const workspace = packageName ? `packages/${packageName}` : '.'
+    const entry = packageName ? path.slice(workspace.length + 1) : path
+    if (packageName && exportedFiles(workspace).has(entry)) continue
+    byWorkspace.set(workspace, [...(byWorkspace.get(workspace) ?? []), entry])
+  }
+  return byWorkspace
+})()
+
 const config: KnipConfig = {
   compilers: {
     md: (text: string) => [...text.matchAll(scriptBlock)].map((match) => match[1]).join('\n')
@@ -14,9 +69,20 @@ const config: KnipConfig = {
   ignoreFiles: [
     // Only the docs site's pages are code; other Markdown is prose.
     '**/*.md',
-    // A UI family exports its parts from `index.ts` whether or not a caller uses it (`src/AGENTS.md`, UI).
+    // A UI family exports its parts from `index.ts` whether or not a caller uses them
+    // (`src/AGENTS.md`, UI).
     'src/components/ui/*/index.ts'
   ],
+  ignoreIssues: {
+    // The design system's families export all their parts and helpers, as above.
+    'src/components/ui/**': ['exports', 'types'],
+    // `migrate.ts` registers each migration module whole, through a namespace import.
+    'packages/cloud/src/**/db/migrations/*.ts': ['exports'],
+    // Kiwi's schema runtime keeps the module surface of the library it was ported from.
+    'packages/kiwi/src/schema-runtime/**': ['exports', 'types'],
+    // Copied from mermaid by `generate:mermaid-sources`; never edited by hand.
+    'packages/mermaid/src/upstream/**': ['exports', 'types']
+  },
   ignoreDependencies: [
     // Modules the host provides: Cloudflare Workers' `cloudflare:*` and the VS Code API.
     'cloudflare',
@@ -80,6 +146,8 @@ const config: KnipConfig = {
         'extensions/*/tests/**/*.test.ts',
         'extensions/*/src/**/*.d.ts',
         'steiger.config.ts',
+        // The repository's oxlint rules, which `oxlint.json` loads as a JS plugin.
+        'lint/plugin.js',
         ...tests,
         // Ambient declarations that tsconfig includes.
         'tests/**/*.d.ts',
@@ -109,11 +177,14 @@ const config: KnipConfig = {
         // Run by `tests/e2e/*` scripts as separate processes.
         'tests/e2e/*.ts',
         'tests/e2e/cloudflare/*.ts',
-        'deploy/cloudflare/*.ts'
+        'deploy/cloudflare/*.ts',
+        // `build:standalone` passes it to tsdown with `--config`.
+        'tsdown.standalone.config.ts'
       ]
     },
     'packages/docs': {
-      entry: ['**/*.md', 'public/**/*.js'],
+      // Pages, their VitePress data loaders, and scripts the pages include as code samples.
+      entry: ['**/*.md', '**/*.data.ts', 'public/**/*.js'],
       ignoreDependencies: [
         // unplugin-icons reads this set for the landing's `~icons/simple-icons/*`.
         '@iconify-json/simple-icons',
@@ -164,6 +235,13 @@ const config: KnipConfig = {
       entry: [...tests, 'src/changelog/*.ts', 'src/extract-release-notes.ts', 'src/native/*.ts']
     }
   }
+}
+
+// Each workspace's page modules join its entries.
+for (const [name, modules] of pageModules) {
+  const workspaces = (config.workspaces ??= {})
+  const workspace = (workspaces[name] ??= { entry: [...tests] })
+  workspace.entry = [workspace.entry ?? [], modules].flat()
 }
 
 export default config

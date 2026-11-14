@@ -136,6 +136,7 @@ export function useAppMenu() {
     'paste-to-replace': 'pasteToReplace',
     'replace-in-instance': 'replaceInInstance',
     'selection.rename': 'renameSelection',
+    'find-layers': 'findLayers',
     'selection.moveToPage': 'moveToPage',
     'arrange-layout': 'autoArrange',
     language: 'language',

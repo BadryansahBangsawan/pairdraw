@@ -2,6 +2,7 @@ import type { SceneNode } from '@open-pencil/scene-graph'
 
 import { insertScriptNode } from '@/app/code/script/create'
 import { getActiveEditorStore, useEditorStore } from '@/app/editor/active-store'
+import { openFindLayers } from '@/app/editor/layers/find'
 import { openTextLinkEditor } from '@/app/editor/links'
 import { openPlaceImageDialog } from '@/app/editor/place/dialog'
 import {
@@ -105,6 +106,7 @@ export function createSharedEditorMenuActions(
       insertScriptNode(store)
     },
     'place-image': () => openPlaceImageDialog(store),
+    'find-layers': () => openFindLayers(store),
     'export-pdf': () => void exportFramesToPDF(store),
     'theme-light': () => setTheme('light'),
     'theme-dark': () => setTheme('dark'),

@@ -12,6 +12,7 @@ const RESERVED_MOD_CODES = new Set([
   'KeyB',
   'KeyD',
   'KeyE',
+  'KeyF',
   'KeyG',
   'KeyH',
   'KeyJ',

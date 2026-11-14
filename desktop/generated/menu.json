@@ -194,6 +194,11 @@
         "id": "selection.selectInverse",
         "label": "Select Inverse",
         "accelerator": "CmdOrCtrl+Shift+A"
+      },
+      {
+        "id": "find-layers",
+        "label": "Find Layers…",
+        "accelerator": "CmdOrCtrl+F"
       }
     ]
   },

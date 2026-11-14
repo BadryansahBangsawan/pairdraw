@@ -221,6 +221,12 @@ export const APP_MENU_SCHEMA = [
         id: 'selection.selectInverse',
         label: 'Select Inverse',
         command: 'selection.selectInverse'
+      },
+      {
+        id: 'find-layers',
+        label: 'Find Layers…',
+        shortcut: 'MOD+F',
+        palette: { keywords: ['search', 'layer', 'name', 'go to'] }
       }
     ]
   },

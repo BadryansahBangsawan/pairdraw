@@ -21,6 +21,7 @@ import {
   copySelectionProperties,
   pasteClipboardProperties
 } from '@/app/editor/clipboard/properties'
+import { openFindLayers } from '@/app/editor/layers/find'
 import { openPlaceImageDialog } from '@/app/editor/place/dialog'
 import { requestRenameSelection } from '@/app/editor/selection/rename-dialog'
 import { TOOL_SHORTCUTS } from '@/app/editor/session'
@@ -97,12 +98,22 @@ function alignShortcuts(): ShortcutDefinition[] {
   })
 }
 
+/** Find layers searches a document's page, so Home leaves the key alone. */
+function findLayersInDocument({ store }: KeyboardShortcutRunOptions): void {
+  if (showsDocument()) openFindLayers(store)
+}
+
 /**
  * Menu and canvas-menu keys the browser build binds itself; the desktop app's native menu binds
  * them too, and Copy as PNG and the ? key of the shortcut sheet are not in a menu.
  */
 function browserMenuShortcuts(): ShortcutDefinition[] {
   return [
+    {
+      id: 'find-layers',
+      keys: appMenuTinykeysShortcut('find-layers') ?? '$mod+KeyF',
+      run: findLayersInDocument
+    },
     ...commandShortcuts(
       'selection.frameSelection',
       'selection.booleanUnion',

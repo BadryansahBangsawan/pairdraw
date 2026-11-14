@@ -51,6 +51,7 @@ import FileApiBanner from '@/components/FileApiBanner.vue'
 import FontStatusBanner from '@/components/font-status/FontStatusBanner.vue'
 import HomeWorkspace from '@/components/home/HomeWorkspace.vue'
 import ImageAIPromptDialog from '@/components/image-ai/ImageAIPromptDialog.vue'
+import FindLayersDialog from '@/components/layers/FindLayersDialog.vue'
 import RenameSelectionDialog from '@/components/selection/RenameSelectionDialog.vue'
 import LoadingScreen from '@/components/shell/LoadingScreen.vue'
 import ShellTopBar from '@/components/shell/ShellTopBar.vue'
@@ -304,6 +305,7 @@ onUnmounted(() => {
     <FontStatusBanner />
     <RenameSelectionDialog />
     <CommandPalette v-if="!embed" />
+    <FindLayersDialog v-if="!embed" />
     <ImageAIPromptDialog />
     <ShortcutSheetHost />
     <ShellTopBar v-if="!embed" />

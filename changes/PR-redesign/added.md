@@ -1,0 +1,1 @@
+- Find layers (Ctrl/Cmd+F, Edit → Find Layers…, or the command palette) searches the shown page's layers by name, selects the one you pick, and brings it into view.

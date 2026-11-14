@@ -512,5 +512,17 @@
   "skillErrorNoName": "Во frontmatter файла SKILL.md нет имени.",
   "chatReferenceCitations": "Цитаты",
   "researchSource": "Источник",
-  "researchRead": "Прочитано"
+  "researchRead": "Прочитано",
+  "creationKinds": "Что создать",
+  "creationLanding": "Лендинг",
+  "creationMobile": "Мобильное приложение",
+  "creationWeb": "Веб-приложение",
+  "creationSlides": "Слайды",
+  "creationDashboard": "Дашборд",
+  "creationOther": "Что-то другое…",
+  "creationGuide": "Руководство по созданию — {kind}:",
+  "importFromFigma": "Импорт из Figma",
+  "importFromBrowser": "Импорт из браузера",
+  "recreateScreenshot": "Воссоздать скриншот",
+  "recreateScreenshotPrompt": "Воссоздай этот скриншот как редактируемый дизайн."
 }

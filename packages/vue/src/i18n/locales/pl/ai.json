@@ -512,5 +512,17 @@
   "skillErrorNoName": "Frontmatter pliku SKILL.md nie ma nazwy.",
   "chatReferenceCitations": "Cytaty",
   "researchSource": "Źródło",
-  "researchRead": "Odczyt"
+  "researchRead": "Odczyt",
+  "creationKinds": "Co utworzyć",
+  "creationLanding": "Strona docelowa",
+  "creationMobile": "Aplikacja mobilna",
+  "creationWeb": "Aplikacja internetowa",
+  "creationSlides": "Slajdy",
+  "creationDashboard": "Panel",
+  "creationOther": "Coś innego…",
+  "creationGuide": "Przewodnik tworzenia — {kind}:",
+  "importFromFigma": "Importuj z Figmy",
+  "importFromBrowser": "Importuj z przeglądarki",
+  "recreateScreenshot": "Odtwórz zrzut ekranu",
+  "recreateScreenshotPrompt": "Odtwórz ten zrzut ekranu jako edytowalny projekt."
 }

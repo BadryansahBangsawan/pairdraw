@@ -37,7 +37,9 @@ test('a prompt on Home opens a new design whose chat sends it', async ({ page })
   await expect(home).toBeHidden()
   await expect(page.getByTestId('tabbar-tab')).toHaveCount(2)
   await expect(chat.chatColumn).toBeVisible()
-  await expect(chat.userMessage()).toHaveText('A pricing page with three plans')
+  // Landing page is chosen until the person picks another kind, so its guide goes along.
+  await expect(chat.userMessage()).toContainText('A pricing page with three plans')
+  await expect(chat.userMessage()).toContainText('Creation guide — Landing page:')
   await expect(chat.assistantMessage()).not.toBeEmpty()
 
   // The first document's chat never received it.

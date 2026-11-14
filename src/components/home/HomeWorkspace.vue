@@ -9,11 +9,15 @@ import { useDocumentWorkspace } from '@open-pencil/vue/document/workspace'
 import { useI18n } from '@open-pencil/vue/i18n'
 
 import { agentAutoConnect } from '@/app/ai/agents/auto/session'
-import { sendPromptToDocument } from '@/app/ai/chat/pending-prompt'
+import { createImagePreviewURL } from '@/app/ai/attachment/image/prepare'
+import { showDocumentChat } from '@/app/ai/chat/panel'
+import { sendPromptToDocument, setPendingPrompt } from '@/app/ai/chat/pending-prompt'
 import { ensureChatConfigured } from '@/app/ai/chat/setup'
+import { browserToolbarOpen } from '@/app/browser/state'
 import { CLOUD_INCLUDED, CLOUD_STORAGE_PROVIDER_ID } from '@/app/cloud/integration'
 import { draftsAvailable, draftsWorkspaceSource, type DraftMeta } from '@/app/document/drafts'
 import { recoveryEnabled } from '@/app/document/recovery/preferences'
+import { promptForCreationKind, type CreationKindId } from '@/app/home/creation'
 import { startDesignWith } from '@/app/home/design-systems'
 import { useHomeLocations } from '@/app/home/locations'
 import {
@@ -38,6 +42,8 @@ import {
   openRecentDocument,
   useRecentFilesWorkspace
 } from '@/app/recent-files/workspace'
+import { openSettingsDialog } from '@/app/settings/dialog'
+import { openFileDialog } from '@/app/shell/menu/use'
 import { toast } from '@/app/shell/ui'
 import { createStoredDocument } from '@/app/storage/workspace/create'
 import { activeStorageLocation, createStorageWorkspaceSource } from '@/app/storage/workspace/source'
@@ -46,13 +52,16 @@ import { openDraftInTab, saveDraftAs } from '@/app/tabs/open/draft'
 import { CloudSharedSection, CloudWorkspaceSection } from '@/components/cloud/integration'
 import DesignSystemsSection from '@/components/home/design-systems/DesignSystemsSection.vue'
 import DraftsSection from '@/components/home/drafts/DraftsSection.vue'
+import HomeImportCards from '@/components/home/HomeImportCards.vue'
 import HomeLayout from '@/components/home/HomeLayout.vue'
+import HomeLocationTabs from '@/components/home/HomeLocationTabs.vue'
 import HomePromptComposer from '@/components/home/HomePromptComposer.vue'
 import RecentFilesSection from '@/components/home/recent/RecentFilesSection.vue'
 import HomeSearchActions from '@/components/home/search/HomeSearchActions.vue'
 import HomeLocationMenu from '@/components/home/sidebar/HomeLocationMenu.vue'
-import HomeSidebar from '@/components/home/sidebar/HomeSidebar.vue'
 import StorageWorkspaceSection from '@/components/home/storage/StorageWorkspaceSection.vue'
+import IconButton from '@/components/ui/button/IconButton.vue'
+import { IS_TAURI } from '@/constants'
 import documentsTheme from '@/theme/home/documents'
 
 const { ai, locale, storage, files, settings } = useI18n()
@@ -70,6 +79,8 @@ function newDocument(kind: DocumentKind): Tab {
 }
 
 const prompt = ref('')
+/** What Home's prompt is going to make, kept between visits. */
+const creationKind = useLocalStorage<CreationKindId>('open-pencil:home-creation-kind', 'landing')
 const startingFromPrompt = ref(false)
 /** Says why the prompt has not gone yet while it looks for a coding agent on this computer. */
 const promptStatus = computed(() =>
@@ -88,8 +99,40 @@ async function startFromPrompt(text: string): Promise<void> {
   startingFromPrompt.value = true
   try {
     if (!(await ensureChatConfigured())) return
-    sendPromptToDocument(newDocument('design').store, text)
+    sendPromptToDocument(
+      newDocument('design').store,
+      promptForCreationKind(text, creationKind.value, ai.value)
+    )
     prompt.value = ''
+  } finally {
+    startingFromPrompt.value = false
+  }
+}
+
+/** Opens a new design with the browser's address field up, to bring a page onto the canvas. */
+function startFromBrowser(): void {
+  newDocument('design')
+  browserToolbarOpen.value = true
+}
+
+/**
+ * Opens a new design whose chat rebuilds `file`, a screenshot. Like a typed prompt, it needs a
+ * model to go to; without one, guided setup opens and nothing is created.
+ */
+async function startFromScreenshot(file: File): Promise<void> {
+  if (startingFromPrompt.value) return
+  startingFromPrompt.value = true
+  try {
+    if (!(await ensureChatConfigured())) return
+    const text = ai.value.recreateScreenshotPrompt
+    const store = newDocument('design').store
+    setPendingPrompt(store, {
+      modelText: text,
+      displayText: text,
+      images: [{ file, previewURL: createImagePreviewURL(file) }],
+      nodes: []
+    })
+    showDocumentChat(store)
   } finally {
     startingFromPrompt.value = false
   }
@@ -268,23 +311,28 @@ async function startWithDesignSystem(library: LibrarySummary): Promise<void> {
 
 <template>
   <HomeLayout data-test-id="recent-files-home">
-    <template #sidebar>
-      <HomeSidebar
-        :cloud="CLOUD_INCLUDED"
-        :active="places.active.value"
-        :account="places.account.value"
-        :workspaces="places.workspaces.value"
-        :storage="sidebarStorage"
-        @select="places.select"
-        @connect="places.connect"
-        @open-account="places.openAccount"
-        @storage-settings="places.storageSettings"
-        @switch-server="places.connect"
-        @new-workspace="places.newWorkspace"
-        @sign-out="places.signOut"
-      />
-    </template>
-    <template #locations>
+    <HomePromptComposer
+      v-model="prompt"
+      v-model:kind="creationKind"
+      :busy="startingFromPrompt"
+      :status="promptStatus"
+      @submit="startFromPrompt"
+    />
+    <HomeImportCards
+      :browser="IS_TAURI"
+      :disabled="startingFromPrompt"
+      @figma="openFileDialog"
+      @browser="startFromBrowser"
+      @screenshot="startFromScreenshot"
+    />
+    <HomeLocationTabs :active="places.active.value" @select="places.select">
+      <IconButton
+        :label="settings.title"
+        data-test-id="home-settings"
+        @click="openSettingsDialog()"
+      >
+        <icon-lucide-settings class="size-4" />
+      </IconButton>
       <HomeLocationMenu
         :cloud="CLOUD_INCLUDED"
         :active="places.active.value"
@@ -295,13 +343,7 @@ async function startWithDesignSystem(library: LibrarySummary): Promise<void> {
         @connect="places.connect"
         @new-workspace="places.newWorkspace"
       />
-    </template>
-    <HomePromptComposer
-      v-model="prompt"
-      :busy="startingFromPrompt"
-      :status="promptStatus"
-      @submit="startFromPrompt"
-    />
+    </HomeLocationTabs>
     <HomeSearchActions
       v-model="query"
       :destination="newDesignTarget?.label ?? null"

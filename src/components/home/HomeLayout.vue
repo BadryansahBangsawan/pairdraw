@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * The home tab: where documents come from on the side, what is there in the middle. Phones get
- * the locations as a menu above the documents instead of the sidebar.
+ * The home tab: one column with the prompt first, then the ways to start from something that
+ * exists, then the documents under the tabs that say where they come from.
  */
 import { tv } from 'tailwind-variants'
 
@@ -12,12 +12,8 @@ const styles = tv(theme)()
 
 <template>
   <div :class="styles.root()">
-    <div :class="styles.sidebar()">
-      <slot name="sidebar" />
-    </div>
     <main :class="styles.main()">
       <div :class="styles.content()">
-        <div v-if="$slots.locations" :class="styles.locations()"><slot name="locations" /></div>
         <slot />
       </div>
     </main>

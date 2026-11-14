@@ -7,9 +7,10 @@ import { useBrowserMessages } from '@open-pencil/vue/i18n'
 import { importBrowserCapture } from '@/app/browser/import'
 import { placeBrowserScreenshot } from '@/app/browser/shot'
 import {
-  browserState,
   BROWSER_ZOOM_MAX,
   BROWSER_ZOOM_MIN,
+  browserState,
+  browserToolbarOpen,
   setDevice,
   setZoom
 } from '@/app/browser/state'
@@ -220,7 +221,7 @@ async function placeShot(kind: BrowserShotKind, name: string) {
 </script>
 
 <template>
-  <PopoverRoot>
+  <PopoverRoot v-model:open="browserToolbarOpen">
     <PopoverTrigger as-child>
       <IconButton
         :label="messages.openBrowser"

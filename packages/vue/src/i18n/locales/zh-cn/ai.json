@@ -512,5 +512,17 @@
   "skillErrorNoName": "SKILL.md 的 frontmatter 中没有名称。",
   "chatReferenceCitations": "引文",
   "researchSource": "来源",
-  "researchRead": "阅读时间"
+  "researchRead": "阅读时间",
+  "creationKinds": "要创建的内容",
+  "creationLanding": "落地页",
+  "creationMobile": "移动应用",
+  "creationWeb": "网页应用",
+  "creationSlides": "幻灯片",
+  "creationDashboard": "仪表盘",
+  "creationOther": "其他…",
+  "creationGuide": "创建指南 — {kind}：",
+  "importFromFigma": "从 Figma 导入",
+  "importFromBrowser": "从浏览器导入",
+  "recreateScreenshot": "重现截图",
+  "recreateScreenshotPrompt": "将这张截图重现为可编辑的设计。"
 }

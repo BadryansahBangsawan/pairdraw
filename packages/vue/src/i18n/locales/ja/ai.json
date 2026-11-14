@@ -512,5 +512,17 @@
   "skillErrorNoName": "SKILL.md のフロントマターに名前がありません。",
   "chatReferenceCitations": "引用",
   "researchSource": "出典",
-  "researchRead": "読んだ時刻"
+  "researchRead": "読んだ時刻",
+  "creationKinds": "作成するもの",
+  "creationLanding": "ランディングページ",
+  "creationMobile": "モバイルアプリ",
+  "creationWeb": "ウェブアプリ",
+  "creationSlides": "スライド",
+  "creationDashboard": "ダッシュボード",
+  "creationOther": "その他…",
+  "creationGuide": "作成ガイド — {kind}:",
+  "importFromFigma": "Figma から読み込む",
+  "importFromBrowser": "ブラウザから読み込む",
+  "recreateScreenshot": "スクリーンショットを再現",
+  "recreateScreenshotPrompt": "このスクリーンショットを編集可能なデザインとして再現してください。"
 }

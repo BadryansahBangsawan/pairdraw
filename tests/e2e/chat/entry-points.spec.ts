@@ -102,20 +102,48 @@ test.describe('Apply with AI', () => {
   })
 })
 
-test.describe('Example prompts', () => {
-  test('on Home, an example fills the prompt to edit and sends nothing yet', async ({ page }) => {
+test.describe('What to create', () => {
+  test('on Home, choosing a kind marks it and moves to the prompt, and sends nothing yet', async ({
+    page
+  }) => {
     await openChatEditor(page)
     await page.getByTestId('tabbar-new').click()
     const home = page.getByTestId('recent-files-home')
     const prompt = home.getByRole('textbox', { name: 'Describe a design' })
-    const examples = home.getByRole('list', { name: 'Examples' })
+    const kinds = home.getByRole('list', { name: 'What to create' })
+    const mobile = kinds.getByRole('button', { name: 'Mobile app' })
 
-    await examples.getByRole('button', { name: 'Pricing' }).click()
-    await expect(prompt).toHaveValue(/pricing/i)
+    await expect(kinds.getByRole('button', { name: 'Landing page' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
+    await mobile.click()
+    await expect(mobile).toHaveAttribute('aria-pressed', 'true')
+    await expect(kinds.getByRole('button', { name: 'Landing page' })).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    )
     await expect(prompt).toBeFocused()
     // Nothing went: Home stays, with no new design and no AI setup.
     await expect(home).toBeVisible()
     await expect(page.getByTestId('ai-setup-dialog')).toHaveCount(0)
     await expect(page.getByTestId('tabbar-tab')).toHaveCount(2)
+  })
+
+  test('Home offers its places as tabs and its ways to start from something that exists', async ({
+    page
+  }) => {
+    await openChatEditor(page)
+    await page.getByTestId('tabbar-new').click()
+    const home = page.getByTestId('recent-files-home')
+    await expect(home.getByTestId('home-import-figma')).toBeVisible()
+    await expect(home.getByTestId('home-recreate-screenshot')).toBeVisible()
+
+    const drafts = home.getByTestId('home-tab-drafts')
+    await expect(home.getByTestId('home-tab-recent')).toHaveAttribute('aria-current', 'page')
+    await drafts.click()
+    await expect(drafts).toHaveAttribute('aria-current', 'page')
+    await expect(home.getByTestId('home-tab-recent')).not.toHaveAttribute('aria-current', 'page')
+    await home.getByTestId('home-tab-recent').click()
   })
 })

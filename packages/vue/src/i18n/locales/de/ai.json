@@ -512,5 +512,17 @@
   "skillErrorNoName": "Das Frontmatter der SKILL.md hat keinen Namen.",
   "chatReferenceCitations": "Zitate",
   "researchSource": "Quelle",
-  "researchRead": "Gelesen"
+  "researchRead": "Gelesen",
+  "creationKinds": "Was soll entstehen",
+  "creationLanding": "Landingpage",
+  "creationMobile": "Mobile App",
+  "creationWeb": "Web-App",
+  "creationSlides": "Folien",
+  "creationDashboard": "Dashboard",
+  "creationOther": "Etwas anderes…",
+  "creationGuide": "Erstellungsleitfaden – {kind}:",
+  "importFromFigma": "Aus Figma importieren",
+  "importFromBrowser": "Aus dem Browser importieren",
+  "recreateScreenshot": "Screenshot nachbauen",
+  "recreateScreenshotPrompt": "Baue diesen Screenshot als bearbeitbares Design nach."
 }

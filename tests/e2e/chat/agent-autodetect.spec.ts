@@ -52,6 +52,8 @@ test('a prompt on Home runs the coding agent on this computer without setup', as
 }) => {
   test.setTimeout(120_000)
   const { prompt } = await openPaired(page, baseURL, { agent: true })
+  // "Something else" sends the words alone, which is what the echoing agent answers with.
+  await page.getByRole('button', { name: 'Something else…' }).click()
   await prompt.fill('A pricing page with three plans')
   await prompt.press('Enter')
 

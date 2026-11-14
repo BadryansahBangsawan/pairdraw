@@ -196,6 +196,21 @@ export const aiMessageDefaults = {
   promptExamplePricing: 'Pricing',
   promptExamplePricingPrompt:
     'A pricing section with three plans, a monthly and yearly switch, and the recommended plan highlighted',
+  /** What Home offers to create, as chips above its prompt; the choice guides the agent. */
+  creationKinds: 'What to create',
+  creationLanding: 'Landing page',
+  creationMobile: 'Mobile app',
+  creationWeb: 'Web app',
+  creationSlides: 'Slides',
+  creationDashboard: 'Dashboard',
+  creationOther: 'Something else…',
+  /** Heads the guide a chosen kind adds to the prompt; `kind` is the chip's name. */
+  creationGuide: params('Creation guide — {kind}:'),
+  /** Home's ways to start from something that exists. */
+  importFromFigma: 'Import from Figma',
+  importFromBrowser: 'Import from browser',
+  recreateScreenshot: 'Recreate a screenshot',
+  recreateScreenshotPrompt: 'Recreate this screenshot as an editable design.',
   /** After a sticky note's text sent as a prompt; `note` is a reference to the note. */
   stickyPromptSource: params('From the sticky note {note}'),
   /** What the chat is asked when comment threads are applied with AI; the threads follow. */

@@ -1,4 +1,4 @@
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 
 /**
  * A device size the browser can emulate: the window's content size. Pixel density is not
@@ -44,6 +44,12 @@ export const browserState = reactive<BrowserSessionState>({
 })
 
 /** What the browser window reports after it loads a page. Every field is the window's own account. */
+/**
+ * Whether the toolbar's browser popover is open. Home opens it for a new design when the person
+ * starts from a page in the browser.
+ */
+export const browserToolbarOpen = ref(false)
+
 export interface BrowserPageReport {
   url: string
   title: string

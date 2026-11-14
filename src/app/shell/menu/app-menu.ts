@@ -336,6 +336,11 @@ export function useAppMenu() {
         void store.state.sceneVersion
         return textLinkTargets(store).length === 0
       }
+      // They format the selected texts, so they wait for one, as Add Link does.
+      case 'text.bold':
+      case 'text.italic':
+      case 'text.underline':
+        return !store.selectedNodes.value.some((node) => node.type === 'TEXT')
       default:
         return undefined
     }

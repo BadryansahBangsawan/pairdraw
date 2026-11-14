@@ -90,6 +90,50 @@ test('Shader Mode and Add Link wait for a selection that has them', async () => 
   })
 })
 
+test('Bold, Italic and Underline wait for a selected text', async () => {
+  const formats = ['Bold', 'Italic', 'Underline']
+  async function expectFormats(disabled: boolean) {
+    await openAppMenu(editor.page, 'Text')
+    for (const name of formats) {
+      const item = editor.page.getByRole('menuitem', { name })
+      if (disabled) await expect(item).toHaveAttribute('data-disabled')
+      else await expect(item).not.toHaveAttribute('data-disabled')
+    }
+    await editor.page.keyboard.press('Escape')
+  }
+
+  await expectFormats(true)
+
+  // A rectangle has no text to format.
+  await editor.canvas.drawRect(200, 200, 100, 100)
+  await expectFormats(true)
+
+  await editor.page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
+    const text = store.graph.createNode('TEXT', store.state.currentPageId, {
+      name: 'Label',
+      text: 'Label',
+      x: 400,
+      y: 200,
+      width: 80,
+      height: 20
+    })
+    store.select([text.id])
+  })
+  await expectFormats(false)
+
+  await editor.page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
+    const page = store.graph.getNode(store.state.currentPageId)
+    // A copy, since each deletion takes the layer out of the page's own list.
+    for (const id of page?.childIds.slice() ?? []) store.graph.deleteNode(id)
+    store.clearSelection()
+    store.undo.clear()
+  })
+})
+
 test('the Zoom tool is picked from the View menu', async () => {
   await openAppMenu(editor.page, 'View')
   await editor.page.getByRole('menuitem', { name: 'Zoom tool' }).click()

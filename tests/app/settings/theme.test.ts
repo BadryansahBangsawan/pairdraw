@@ -13,10 +13,10 @@ describe('stored theme', () => {
     expect(resolveAppTheme('auto', false)).toBe('light')
   })
 
-  test('follow the system when nothing usable was chosen', () => {
+  test('is dark when nothing usable was chosen, whatever the system prefers', () => {
     for (const setting of [null, undefined, 'sepia', 1]) {
       expect(resolveAppTheme(setting, true)).toBe('dark')
-      expect(resolveAppTheme(setting, false)).toBe('light')
+      expect(resolveAppTheme(setting, false)).toBe('dark')
     }
   })
 })

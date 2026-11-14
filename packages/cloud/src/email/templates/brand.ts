@@ -14,9 +14,11 @@ import {
 } from '@vue-email/components'
 import { h, type VNode } from 'vue'
 
-/** The ivory app-icon tile, served as PNG because mail clients do not draw SVG. */
-const LOGO_URL = 'https://openpencil.dev/brand/app-icon-1024.png'
-const SITE_URL = 'https://openpencil.dev'
+/**
+ * The ivory app-icon tile on the server's own site, which serves it beside the editor; PNG because
+ * mail clients do not draw SVG.
+ */
+const LOGO_PATH = '/brand/app-icon-1024.png'
 
 const FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
 const INK = '#171717'
@@ -72,6 +74,11 @@ export type EmailLayoutProps = {
   actionURL: string
   /** Small print under the button, with an optional link at its end. */
   note?: { text: string; link?: { label: string; url: string } }
+  /**
+   * The public address of the server that sends the email, whose site serves the logo and which
+   * the footer links to. Without it the email shows neither, so it never points anywhere else.
+   */
+  site?: string
 }
 
 function noteContent(note: NonNullable<EmailLayoutProps['note']>) {
@@ -83,12 +90,21 @@ function noteContent(note: NonNullable<EmailLayoutProps['note']>) {
 /** The branded email every Pairdraw service sends: the waitlist and Cloud alike. */
 export function emailLayout(props: EmailLayoutProps): VNode {
   const { note } = props
+  const site = props.site ? new URL(props.site) : null
   return h(HTML, { lang: 'en' }, () => [
     h(Head),
     h(Preview, () => props.preview),
     h(Body, { style: styles.body }, () => [
       h(Container, { style: styles.card }, () => [
-        h(Img, { src: LOGO_URL, width: 44, height: 44, alt: 'Pairdraw', style: styles.logo }),
+        site
+          ? h(Img, {
+              src: new URL(LOGO_PATH, site).href,
+              width: 44,
+              height: 44,
+              alt: 'Pairdraw',
+              style: styles.logo
+            })
+          : null,
         h(Heading, { as: 'h1', style: styles.heading }, () => props.heading),
         h(Text, { style: styles.text }, () => props.message),
         h(Section, () =>
@@ -96,10 +112,14 @@ export function emailLayout(props: EmailLayoutProps): VNode {
         ),
         note ? h(Text, { style: styles.note }, () => noteContent(note)) : null
       ]),
-      h(Text, { style: styles.footer }, () => [
-        'Pairdraw, the open-source design editor · ',
-        h(Link, { href: SITE_URL, style: { color: MUTED } }, () => 'openpencil.dev')
-      ])
+      h(Text, { style: styles.footer }, () =>
+        site
+          ? [
+              'Pairdraw, the open-source design editor · ',
+              h(Link, { href: site.href, style: { color: MUTED } }, () => site.host)
+            ]
+          : 'Pairdraw, the open-source design editor'
+      )
     ])
   ])
 }

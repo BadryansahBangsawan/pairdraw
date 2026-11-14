@@ -10,7 +10,7 @@ interface ImportMetaEnv {
 declare const __PAIRDRAW_APP_VERSION__: string
 /** Whether this is the editor a Cloud server serves on its own address (`bun run build:cloud`). */
 declare const __PAIRDRAW_CLOUD_SITE__: boolean
-/** `VITE_PAIRDRAW_OFFICIAL_CLOUD_URL`: the official Cloud server an official deployment's build names. */
+/** `VITE_PAIRDRAW_OFFICIAL_CLOUD_URL`: the hosted Cloud server a build offers, or null for none. */
 declare const __PAIRDRAW_OFFICIAL_CLOUD_URL__: string | null
 declare const __PAIRDRAW_LOCAL_AUTOMATION_TOKEN__: string | null
 declare const __PAIRDRAW_LOCAL_AUTOMATION_URL__: string

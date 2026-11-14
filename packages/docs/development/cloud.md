@@ -33,10 +33,7 @@ flowchart LR
 
 The Cloudflare runtime, `src/runtime/cloudflare`, isn't a subpath: Wrangler bundles it from
 a deployment folder, type-checked against the Workers types by its own `tsconfig.json`.
-`deploy/cloudflare` is the folder self-hosters copy; the official deployments are filled-in copies
-under `deploy/pairdraw/<target>`, which the Deploy Cloud workflow deploys with the secrets of the
-`cloud-<target>` GitHub environment. A new target needs its folder, that environment, and an option
-in the workflow.
+`deploy/cloudflare` is the folder to copy and fill in for a deployment on Cloudflare.
 
 The server never imports `pg`, opens a listener, runs migrations, or starts timers; runtimes do.
 Browser code imports only `contract` and `client`, so it never pulls in server dependencies.
@@ -300,8 +297,9 @@ standing page, or opens the editor without an account; this browser then keeps t
 Links to documents, shared files, and invitations always open the editor, which signs in for them,
 and an unreachable server does too, since the editor works without it. The editor adds its server at startup and reaches it with the
 server's own sign-in session, and the portal leaves for the editor as a page load, never through
-its router. An official deployment builds the editor with its own address as
-`VITE_PAIRDRAW_OFFICIAL_CLOUD_URL`, so staging is the official server in its own editor.
+its router. A build may name a hosted server as `VITE_PAIRDRAW_OFFICIAL_CLOUD_URL`, which the
+connect dialog, Settings, and invitations then offer first; a build that names none, the default,
+offers only self-hosted servers and asks no server whether Cloud is listed.
 
 ## Editor client
 
@@ -471,7 +469,7 @@ with the person, and the storage bucket are separate places in a sidebar, so Clo
 the local file list and one server's workspaces show at a time.
 
 **2026-10 · Cloud entry points wait for the official server's listing.** Settings → Pairdraw Cloud
-and Save to Cloud stay hidden until `cloud.openpencil.dev` answers discovery with a `listing` whose
+and Save to Cloud stay hidden until the official server answers discovery with a `listing` whose
 minimum editor version this editor meets, a server is already connected on the device, or someone
 opened the editor with `?cloud=preview`. Launching, or pulling back, is a change to that server's
 config rather than an editor release, and a launch that needs a client change sets the minimum to the
@@ -537,11 +535,11 @@ sockets without hibernation, so the relay runs unchanged; hibernating would need
 rebuild rooms and peers on every wake.
 
 **2026-10 · Every Cloud server serves the editor at its root.** The official web editor moves from
-app.openpencil.dev to the official server's own address, so one site holds the editor, sign-in,
+a separate static host to the official server's own address, so one site holds the editor, sign-in,
 and documents, and a self-hosted server is a complete product too. On its own origin the editor
 signs in through the server's pages and its session, with no device code and no CORS. A welcome
 page meets visitors who are not signed in, and the editor stays usable without an account, as it
-is on app.openpencil.dev, which can then redirect there. Keeping the editor only on a separate
+is on a static host, which can then redirect there. Keeping the editor only on a separate
 static host left a signed-in person on account settings with no way to their files.
 
 **2026-10 · Links name their server by their own address.** A document is `/documents/:id`, a

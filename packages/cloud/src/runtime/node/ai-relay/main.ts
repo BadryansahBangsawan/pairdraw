@@ -11,7 +11,7 @@ if (process.argv.includes('--help') || process.argv.includes('-h')) {
     environment:
       PAIRDRAW_AI_RELAY_CONFIG  the relay TOML file (required)
       PORT, HOST                  where to listen (default 8788 on 0.0.0.0)
-    plus the secrets the TOML names. See https://openpencil.dev/reference/self-hosting-cloud
+    plus the secrets the TOML names. See https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/reference/self-hosting-cloud.md
   `)
   process.exit(0)
 }

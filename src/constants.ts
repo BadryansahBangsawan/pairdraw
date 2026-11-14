@@ -105,12 +105,12 @@ export const PRIVACY_URL = 'https://openpencil.dev/overview/privacy'
 /** The Pairdraw Cloud section of the website, with its waitlist form. */
 export const CLOUD_WAITLIST_URL = 'https://openpencil.dev/#cloud'
 /**
- * The hosted Pairdraw Cloud server, offered first when connecting. An official deployment's own
- * editor build names that deployment, such as staging.
+ * The hosted Pairdraw Cloud server a build offers first when connecting, named at build time by
+ * `VITE_PAIRDRAW_OFFICIAL_CLOUD_URL`. Null when the build names none: then the app offers only
+ * self-hosted servers, by the address someone types or a link from that server.
  */
-export const OFFICIAL_CLOUD_URL =
-  (typeof __PAIRDRAW_OFFICIAL_CLOUD_URL__ === 'string' && __PAIRDRAW_OFFICIAL_CLOUD_URL__) ||
-  'https://cloud.openpencil.dev'
+export const OFFICIAL_CLOUD_URL: string | null =
+  (typeof __PAIRDRAW_OFFICIAL_CLOUD_URL__ === 'string' && __PAIRDRAW_OFFICIAL_CLOUD_URL__) || null
 /** Whether this is the editor a Cloud server serves on its own address (`bun run build:cloud`). */
 export const IS_CLOUD_SITE = typeof __PAIRDRAW_CLOUD_SITE__ === 'boolean' && __PAIRDRAW_CLOUD_SITE__
 /** Where the desktop app's installers are published. */

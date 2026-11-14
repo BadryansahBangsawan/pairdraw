@@ -44,7 +44,7 @@ import CloudConnectDialog from './CloudConnectDialog.vue'
 const { locale } = useI18n()
 const t = useCloudMessages()
 const now = useNow({ interval: 1000 })
-const official = new URL(OFFICIAL_CLOUD_URL).host
+const official = OFFICIAL_CLOUD_URL ? new URL(OFFICIAL_CLOUD_URL).host : null
 
 const device = computed(() => {
   const state = cloudDeviceSignIn.value

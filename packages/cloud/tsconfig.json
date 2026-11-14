@@ -31,7 +31,6 @@
     "dist",
     "src/runtime/cloudflare",
     "deploy/cloudflare",
-    "deploy/pairdraw",
     "deploy/generated"
   ]
 }

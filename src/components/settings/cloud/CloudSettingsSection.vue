@@ -20,6 +20,7 @@ import { clearCloudSessionToken } from '@/app/cloud/sessions/token'
 import { openExternalLink, toast } from '@/app/shell/ui'
 import AppConfirmationDialog from '@/components/ui/dialog/AppConfirmationDialog.vue'
 import { useHeldContent } from '@/components/ui/overlay/held'
+import { OFFICIAL_CLOUD_URL } from '@/constants'
 
 import CloudSettingsPanel from './CloudSettingsPanel.vue'
 import CloudWaitlist from './CloudWaitlist.vue'
@@ -95,6 +96,7 @@ async function remove() {
   <div class="flex min-h-0 min-w-0 flex-1 flex-col">
     <CloudSettingsPanel
       :servers="entries"
+      :official="OFFICIAL_CLOUD_URL !== null"
       :listed="cloudOfficialListed"
       @connect="(kind) => openCloudConnect({ kind })"
       @sign-in="(id) => openCloudConnect({ serverId: id })"

@@ -5,12 +5,13 @@ import {
   checkCloudAvailability,
   isVersionAtLeast
 } from '@/app/cloud/availability'
-import { OFFICIAL_CLOUD_URL } from '@/constants'
 
 import { cloudDiscoveryFixture } from '#tests/helpers/cloud/discovery'
 import { fetchStub } from '#tests/helpers/fetch'
 
 const EDITOR = 'https://app.example.com/'
+/** A build that names an official server; the default build names none. */
+const OFFICIAL = 'https://cloud.example.com'
 
 function officialServer(answer: () => Response) {
   spyOn(globalThis, 'fetch').mockImplementation(fetchStub(async () => answer()))
@@ -33,32 +34,41 @@ describe('Cloud availability', () => {
     expect(isVersionAtLeast('next', '1.0.0')).toBe(false)
   })
 
+  test('asks no server when the build names no official one', async () => {
+    const fetch = spyOn(globalThis, 'fetch').mockImplementation(
+      fetchStub(async () => Response.json(cloudDiscoveryFixture(OFFICIAL)))
+    )
+    await checkCloudAvailability(EDITOR)
+    expect(fetch).not.toHaveBeenCalled()
+    expect(cloudOfficialListed.value).toBe(false)
+  })
+
   test('stays hidden while the official server is unreachable or unlisted', async () => {
     officialServer(() => Response.error())
-    await checkCloudAvailability(EDITOR)
+    await checkCloudAvailability(EDITOR, OFFICIAL)
     expect(cloudOfficialListed.value).toBe(false)
   })
 
   test('a preview link shows Cloud on this device until it is turned off', async () => {
     officialServer(() => Response.error())
-    await checkCloudAvailability(`${EDITOR}?cloud=preview`)
+    await checkCloudAvailability(`${EDITOR}?cloud=preview`, OFFICIAL)
     expect(cloudOfficialListed.value).toBe(true)
-    await checkCloudAvailability(EDITOR)
+    await checkCloudAvailability(EDITOR, OFFICIAL)
     expect(cloudOfficialListed.value).toBe(true)
-    await checkCloudAvailability(`${EDITOR}?cloud=off`)
+    await checkCloudAvailability(`${EDITOR}?cloud=off`, OFFICIAL)
     expect(cloudOfficialListed.value).toBe(false)
   })
 
   test('shows Cloud once the official server lists itself for this editor version', async () => {
     officialServer(() =>
       Response.json({
-        ...cloudDiscoveryFixture(OFFICIAL_CLOUD_URL),
+        ...cloudDiscoveryFixture(OFFICIAL),
         deployment: 'official',
         // Tests run as editor version 0.0.0.
         listing: { minimumEditorVersion: '0.0.0' }
       })
     )
-    await checkCloudAvailability(EDITOR)
+    await checkCloudAvailability(EDITOR, OFFICIAL)
     expect(cloudOfficialListed.value).toBe(true)
   })
 })

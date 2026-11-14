@@ -18,16 +18,19 @@ import type {
 import { DocumentInvitationEmail } from './templates/document-invitation'
 import { EnrollmentEmail } from './templates/enrollment'
 
-async function rendered(
-  component: Parameters<typeof render>[0],
-  props: Record<string, string | undefined>,
+/** An email's template, its props, and its subject, before rendering. */
+type EmailDraft = {
+  component: Parameters<typeof render>[0]
+  props: Record<string, string | undefined>
   subject: string
-): Promise<RenderedTransactionalEmail> {
-  const [html, text] = await Promise.all([
-    render(component, props),
-    render(component, props, { plainText: true })
-  ])
-  return { subject, html, text }
+}
+
+function toDraft(
+  component: EmailDraft['component'],
+  props: EmailDraft['props'],
+  subject: string
+): EmailDraft {
+  return { component, props, subject }
 }
 
 const DOCUMENT_PERMISSION_LABELS = {
@@ -36,9 +39,9 @@ const DOCUMENT_PERMISSION_LABELS = {
   view: 'view'
 } as const
 
-async function renderDocumentInvitation(payload: DocumentInvitationEmailPayload) {
+function draftDocumentInvitation(payload: DocumentInvitationEmailPayload) {
   const permissionLabel = DOCUMENT_PERMISSION_LABELS[payload.permission]
-  return rendered(
+  return toDraft(
     DocumentInvitationEmail,
     {
       inviterName: payload.inviterName,
@@ -53,9 +56,9 @@ async function renderDocumentInvitation(payload: DocumentInvitationEmailPayload)
 
 const WORKSPACE_ROLE_LABELS = { admin: 'manage', editor: 'edit in', viewer: 'view' } as const
 
-async function renderWorkspaceInvitation(payload: WorkspaceInvitationEmailPayload) {
+function draftWorkspaceInvitation(payload: WorkspaceInvitationEmailPayload) {
   const action = WORKSPACE_ROLE_LABELS[payload.role]
-  return rendered(
+  return toDraft(
     EnrollmentEmail,
     {
       heading: `Join ${payload.workspaceName}`,
@@ -128,13 +131,13 @@ function enrollmentCopy(kind: EnrollmentMessageKind, name: string): EnrollmentCo
   return { ...copy, message: messages[kind] }
 }
 
-async function renderEnrollment(kind: EnrollmentMessageKind, payload: EnrollmentEmailPayload) {
+function draftEnrollment(kind: EnrollmentMessageKind, payload: EnrollmentEmailPayload) {
   const copy = enrollmentCopy(kind, payload.name)
-  return rendered(EnrollmentEmail, { ...copy, actionURL: payload.actionURL }, copy.subject)
+  return toDraft(EnrollmentEmail, { ...copy, actionURL: payload.actionURL }, copy.subject)
 }
 
-async function renderAdminNotification(payload: AdminEnrollmentNotificationPayload) {
-  return rendered(
+function draftAdminNotification(payload: AdminEnrollmentNotificationPayload) {
+  return toDraft(
     EnrollmentEmail,
     {
       heading: 'New Cloud access request',
@@ -147,7 +150,7 @@ async function renderAdminNotification(payload: AdminEnrollmentNotificationPaylo
   )
 }
 
-async function renderAuthentication(
+function draftAuthentication(
   kind: 'email-verification' | 'password-reset' | 'password-changed',
   payload: AuthenticationEmailPayload
 ) {
@@ -186,11 +189,11 @@ async function renderAuthentication(
       actionLabel: 'Open Pairdraw Cloud'
     }
   }[kind]
-  return rendered(EnrollmentEmail, { ...copy, actionURL: payload.actionURL ?? '#' }, copy.subject)
+  return toDraft(EnrollmentEmail, { ...copy, actionURL: payload.actionURL ?? '#' }, copy.subject)
 }
 
-async function renderEmailChangeRequested(payload: EmailChangeRequestedPayload) {
-  return rendered(
+function draftEmailChangeRequested(payload: EmailChangeRequestedPayload) {
+  return toDraft(
     EnrollmentEmail,
     {
       heading: 'Your email is changing',
@@ -203,12 +206,12 @@ async function renderEmailChangeRequested(payload: EmailChangeRequestedPayload) 
   )
 }
 
-async function renderNewSignIn(payload: NewSignInPayload) {
+function draftNewSignIn(payload: NewSignInPayload) {
   const device = payload.desktop
     ? 'the Pairdraw app'
     : compact([payload.browser, payload.system]).join(' on ') || 'an unknown browser'
   const place = payload.ipAddress ? ` from ${payload.ipAddress}` : ''
-  return rendered(
+  return toDraft(
     EnrollmentEmail,
     {
       heading: 'New sign-in to your account',
@@ -245,9 +248,9 @@ const TWO_STEP_COPY: Record<TwoStepChange, { heading: string; message: string }>
   }
 }
 
-async function renderTwoStepChanged(payload: TwoStepChangedPayload) {
+function draftTwoStepChanged(payload: TwoStepChangedPayload) {
   const copy = TWO_STEP_COPY[payload.change]
-  return rendered(
+  return toDraft(
     EnrollmentEmail,
     {
       heading: copy.heading,
@@ -260,23 +263,42 @@ async function renderTwoStepChanged(payload: TwoStepChangedPayload) {
   )
 }
 
-export async function renderTransactionalEmail(
-  content: TransactionalEmailContent
-): Promise<RenderedTransactionalEmail> {
-  if (content.kind === 'document-invitation') return renderDocumentInvitation(content.payload)
-  if (content.kind === 'workspace-invitation') return renderWorkspaceInvitation(content.payload)
+function draft(content: TransactionalEmailContent): EmailDraft {
+  if (content.kind === 'document-invitation') return draftDocumentInvitation(content.payload)
+  if (content.kind === 'workspace-invitation') return draftWorkspaceInvitation(content.payload)
   if (content.kind === 'admin-enrollment-notification') {
-    return renderAdminNotification(content.payload)
+    return draftAdminNotification(content.payload)
   }
   if (
     content.kind === 'email-verification' ||
     content.kind === 'password-reset' ||
     content.kind === 'password-changed'
   ) {
-    return renderAuthentication(content.kind, content.payload)
+    return draftAuthentication(content.kind, content.payload)
   }
-  if (content.kind === 'email-change-requested') return renderEmailChangeRequested(content.payload)
-  if (content.kind === 'new-sign-in') return renderNewSignIn(content.payload)
-  if (content.kind === 'two-step-changed') return renderTwoStepChanged(content.payload)
-  return renderEnrollment(content.kind, content.payload)
+  if (content.kind === 'email-change-requested') return draftEmailChangeRequested(content.payload)
+  if (content.kind === 'new-sign-in') return draftNewSignIn(content.payload)
+  if (content.kind === 'two-step-changed') return draftTwoStepChanged(content.payload)
+  return draftEnrollment(content.kind, content.payload)
+}
+
+export type TransactionalEmailOptions = {
+  /**
+   * The sending server's public address: its site serves the logo, and the footer links to it.
+   * Without it the email carries neither.
+   */
+  site?: string
+}
+
+export async function renderTransactionalEmail(
+  content: TransactionalEmailContent,
+  options: TransactionalEmailOptions = {}
+): Promise<RenderedTransactionalEmail> {
+  const { component, props, subject } = draft(content)
+  const withSite = { ...props, site: options.site }
+  const [html, text] = await Promise.all([
+    render(component, withSite),
+    render(component, withSite, { plainText: true })
+  ])
+  return { subject, html, text }
 }

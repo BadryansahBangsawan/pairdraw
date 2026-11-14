@@ -26,8 +26,14 @@ import { cloudServers } from './ui'
  * The Cloud servers this app syncs with: who is signed in to each, which one Home shows, and
  * what can be done with it. Account settings live on the server's own pages, opened in a browser.
  */
-const { servers, listed = true } = defineProps<{
+const {
+  servers,
+  official = true,
+  listed = true
+} = defineProps<{
   servers: CloudServerEntry[]
+  /** Whether this build offers a hosted service at all; without one only self-hosted remains. */
+  official?: boolean
   /** Whether the hosted service takes sign-ins yet; until then the `hosted` slot stands in. */
   listed?: boolean
 }>()
@@ -61,7 +67,7 @@ const title = (server: CloudServerEntry) =>
         <AppButton
           size="sm"
           variant="outline"
-          @click="emit('connect', listed ? undefined : 'self-hosted')"
+          @click="emit('connect', official && listed ? undefined : 'self-hosted')"
         >
           <template #leading><icon-lucide-plus class="size-3.5" /></template>
           {{ t.settingsConnectServer }}
@@ -69,15 +75,17 @@ const title = (server: CloudServerEntry) =>
       </template>
 
       <div v-if="!servers.length" :class="ui.choices()">
-        <slot v-if="!listed" name="hosted" />
-        <AppActionRow v-else @click="emit('connect', 'official')">
-          <template #leading>
-            <span :class="ui.choiceIcon()"><icon-lucide-cloud class="size-4" /></span>
-          </template>
-          {{ t.productName }}
-          <template #description>{{ t.settingsOfficialDescription }}</template>
-          <template #trailing><icon-lucide-chevron-right class="size-3.5" /></template>
-        </AppActionRow>
+        <template v-if="official">
+          <slot v-if="!listed" name="hosted" />
+          <AppActionRow v-else @click="emit('connect', 'official')">
+            <template #leading>
+              <span :class="ui.choiceIcon()"><icon-lucide-cloud class="size-4" /></span>
+            </template>
+            {{ t.productName }}
+            <template #description>{{ t.settingsOfficialDescription }}</template>
+            <template #trailing><icon-lucide-chevron-right class="size-3.5" /></template>
+          </AppActionRow>
+        </template>
         <AppActionRow @click="emit('connect', 'self-hosted')">
           <template #leading>
             <span :class="ui.choiceIcon()"><icon-lucide-server class="size-4" /></span>

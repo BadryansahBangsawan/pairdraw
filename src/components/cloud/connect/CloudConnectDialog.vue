@@ -39,8 +39,8 @@ const cloudConnect = tv(cloudConnectTheme)
  */
 const {
   step,
-  official,
-  choosing = true,
+  official = null,
+  choosing: choosingProp = true,
   server = null,
   error = null,
   failure = null,
@@ -52,8 +52,8 @@ const {
   canGoBack = false
 } = defineProps<{
   step: CloudConnectStep
-  /** The hosted service's address, offered as the first choice. */
-  official: string
+  /** The hosted service's address, offered as the first choice; null when there is none. */
+  official?: string | null
   /** Whether to ask which server; false when the person already chose one. */
   choosing?: boolean
   /** The server that answered, once checked. */
@@ -89,6 +89,8 @@ const emit = defineEmits<{
 }>()
 
 const FORM_ID = 'cloud-connect-account'
+/** Whether the dialog asks which server: only when there is an official one to offer. */
+const choosing = computed(() => choosingProp && official !== null)
 const ui = cloudConnect()
 const t = useCloudMessages()
 const portal = useCloudPortalMessages()
@@ -137,7 +139,7 @@ const heading = computed(() => {
     case 'verify':
       return portal.value.checkEmailTitle
     default:
-      return choosing ? t.value.connectHeading : t.value.connectServerHeading
+      return choosing.value ? t.value.connectHeading : t.value.connectServerHeading
   }
 })
 const description = computed(() => {
@@ -154,7 +156,7 @@ const description = computed(() => {
     case 'verify':
       return t.value.verifyDescription({ email })
     default:
-      return choosing ? t.value.connectDescription : t.value.connectServerDescription
+      return choosing.value ? t.value.connectDescription : t.value.connectServerDescription
   }
 })
 const failureMessage = computed(() =>
@@ -179,7 +181,7 @@ function submitAccount(credentials: CloudAccountCredentials) {
           <span :class="ui.choiceBody()">
             <span :class="ui.choiceLabel()">{{ t.productName }}</span>
             <span :class="ui.choiceDescription()">{{
-              t.officialDescription({ host: official })
+              t.officialDescription({ host: official ?? '' })
             }}</span>
           </span>
           <span :class="ui.choiceMark()" aria-hidden="true" />

@@ -348,15 +348,10 @@ jobs:
         if: matrix.worker
         uses: ./.github/actions/setup-playwright
 
-      # The Worker serves the editor and the portal as static assets, and every official
-      # deployment bundles them.
-      - name: Build the Cloud site and bundle the official Workers
+      # The Worker serves the editor and the portal as static assets.
+      - name: Build the Cloud site
         if: matrix.worker
-        run: |
-          bun run build:cloud
-          for deployment in packages/cloud/deploy/pairdraw/*/; do
-            (cd "$deployment" && bunx wrangler deploy --dry-run --assets "$GITHUB_WORKSPACE/dist-cloud")
-          done
+        run: bun run build:cloud
 
       - name: Run Cloud end-to-end tests against ${{ matrix.store }}
         env:

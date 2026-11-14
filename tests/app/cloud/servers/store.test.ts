@@ -3,12 +3,13 @@ import { afterEach, describe, expect, test } from 'bun:test'
 import { normalizeCloudServerURL } from '@/app/cloud/servers/address'
 import {
   addCloudServer,
+  cloudServerForLink,
   cloudServers,
   homeCloudServer,
+  isOfficialCloudURL,
   removeCloudServer,
   showCloudServerOnHome
 } from '@/app/cloud/servers/store'
-import { OFFICIAL_CLOUD_URL } from '@/constants'
 
 afterEach(() => {
   for (const server of cloudServers.value) removeCloudServer(server.id)
@@ -56,14 +57,21 @@ describe('Cloud servers', () => {
   })
 
   test('put the first server on Home and move Home on when it is removed', async () => {
-    const official = await addCloudServer({ kind: 'official' })
+    const first = await addCloudServer({ kind: 'self-hosted', url: 'cloud.example.com' })
     const team = await addCloudServer({ kind: 'self-hosted', url: 'design.acme.example' })
-    expect(official.url).toBe(OFFICIAL_CLOUD_URL)
-    expect(homeCloudServer.value?.id).toBe(official.id)
+    expect(homeCloudServer.value?.id).toBe(first.id)
     showCloudServerOnHome(team.id)
     expect(homeCloudServer.value?.id).toBe(team.id)
     removeCloudServer(team.id)
-    expect(homeCloudServer.value?.id).toBe(official.id)
+    expect(homeCloudServer.value?.id).toBe(first.id)
+  })
+
+  test('know no official server in a build that names none', async () => {
+    await expect(addCloudServer({ kind: 'official' })).rejects.toThrow()
+    expect(isOfficialCloudURL('https://cloud.example.com')).toBe(false)
+    // A link alone never connects the app to a server it does not know.
+    expect(await cloudServerForLink('https://cloud.example.com')).toBeNull()
+    expect(cloudServers.value).toHaveLength(0)
   })
 
   test('reject an address that cannot be a server', async () => {

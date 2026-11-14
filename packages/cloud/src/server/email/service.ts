@@ -77,6 +77,8 @@ export function createTransactionalEmailService(
   options: {
     encryptionSecret: string
     from: string
+    /** The server's public address, which its emails show their logo from and link to. */
+    site?: string
     transport?: TransactionalEmailTransport
   }
 ): TransactionalEmailService {
@@ -186,7 +188,7 @@ export function createTransactionalEmailService(
             message.kind,
             message.payloadEncrypted
           )
-          const rendered = await renderTransactionalEmail(content)
+          const rendered = await renderTransactionalEmail(content, { site: options.site })
           const sent = await options.transport.send({
             deliveryId: message.id,
             from: options.from,

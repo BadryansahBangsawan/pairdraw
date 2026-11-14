@@ -46,3 +46,22 @@ describe('security notices', () => {
     expect((await renderTransactionalEmail(content)).text).toContain('203.0.113.9')
   })
 })
+
+describe('the branded layout', () => {
+  const notice = notices[0]
+
+  test('shows the logo from the sending server and links its footer there', async () => {
+    if (!notice) throw new Error('missing notice')
+    const { html } = await renderTransactionalEmail(notice, { site: 'https://cloud.example.com' })
+    expect(html).toContain('src="https://cloud.example.com/brand/app-icon-1024.png"')
+    expect(html).toContain('href="https://cloud.example.com/"')
+  })
+
+  test('without a server address, loads no image and links nowhere else', async () => {
+    if (!notice) throw new Error('missing notice')
+    const { html } = await renderTransactionalEmail(notice)
+    expect(html).not.toContain('<img')
+    const links = [...html.matchAll(/href="([^"]+)"/g)].map((match) => match[1])
+    expect(links.every((link) => link === ACCOUNT_URL)).toBe(true)
+  })
+})

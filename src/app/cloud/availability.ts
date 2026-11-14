@@ -46,12 +46,19 @@ export const cloudOfficialListed = computed(
     (listedFrom.value !== null && isVersionAtLeast(APP_VERSION, listedFrom.value))
 )
 
-/** Reads the preview switch from the address and asks the official server whether it is listed. */
-export async function checkCloudAvailability(address: string): Promise<void> {
+/**
+ * Reads the preview switch from the address and asks the official server whether it is listed. A
+ * build without an official server asks nothing.
+ */
+export async function checkCloudAvailability(
+  address: string,
+  official: string | null = OFFICIAL_CLOUD_URL
+): Promise<void> {
   const choice = new URL(address).searchParams.get(PREVIEW_PARAM)
   if (choice === 'preview') preview.value = true
   else if (choice === 'off') preview.value = false
+  if (!official) return
   // Unreachable, or not public yet: the last answer stands.
-  const discovery = await discoverCloudServer(OFFICIAL_CLOUD_URL).catch(() => null)
+  const discovery = await discoverCloudServer(official).catch(() => null)
   if (discovery) listedFrom.value = discovery.listing?.minimumEditorVersion ?? null
 }

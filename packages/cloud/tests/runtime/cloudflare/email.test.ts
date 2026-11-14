@@ -8,7 +8,7 @@ import { TransactionalEmailTransportError } from '#cloud/server'
 
 const envelope = {
   deliveryId: 'delivery-id',
-  from: 'notifications@openpencil.dev',
+  from: 'notifications@example.com',
   to: 'person@example.com',
   subject: 'Welcome',
   html: '<p>Welcome</p>',

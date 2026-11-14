@@ -83,8 +83,9 @@ export async function addCloudServer(input: {
   kind: CloudServer['kind']
   url?: string
 }): Promise<CloudServer> {
+  // A build without an official server has no address for one.
   const url = normalizeCloudServerURL(
-    input.kind === 'official' ? OFFICIAL_CLOUD_URL : (input.url ?? '')
+    input.kind === 'official' ? (OFFICIAL_CLOUD_URL ?? '') : (input.url ?? '')
   )
   if (!url) throw new TypeError('Cloud server address is invalid')
   const existing = state.value.servers.find((server) => server.url === url)
@@ -112,8 +113,7 @@ export async function addCloudServer(input: {
 export async function addCloudSiteServer(
   origin = globalThis.location.origin
 ): Promise<CloudServer> {
-  const official = normalizeCloudServerURL(OFFICIAL_CLOUD_URL)
-  return normalizeCloudServerURL(origin) === official
+  return isOfficialCloudURL(origin)
     ? addCloudServer({ kind: 'official' })
     : addCloudServer({ kind: 'self-hosted', url: origin })
 }
@@ -123,6 +123,12 @@ export function isCloudSiteServer(id: string, origin = globalThis.location.origi
   return findCloudServer(id)?.url === normalizeCloudServerURL(origin)
 }
 
+/** Whether an address is this build's official server; false in a build that names none. */
+export function isOfficialCloudURL(url: string): boolean {
+  const official = OFFICIAL_CLOUD_URL ? normalizeCloudServerURL(OFFICIAL_CLOUD_URL) : null
+  return official !== null && normalizeCloudServerURL(url) === official
+}
+
 /**
  * The server a link names: one this app knows, or the official one, which a link may add. Null
  * for any other, so a link alone never connects the app anywhere new.
@@ -130,9 +136,7 @@ export function isCloudSiteServer(id: string, origin = globalThis.location.origi
 export async function cloudServerForLink(url: string): Promise<CloudServer | null> {
   const known = state.value.servers.find((server) => server.url === url)
   if (known) return known
-  return url === normalizeCloudServerURL(OFFICIAL_CLOUD_URL)
-    ? addCloudServer({ kind: 'official' })
-    : null
+  return isOfficialCloudURL(url) ? addCloudServer({ kind: 'official' }) : null
 }
 
 /** Forgets a server; Home moves to the next one. */

@@ -9,6 +9,8 @@ export type TransactionalEmailLayout = {
   actionLabel: string
   actionURL: string
   footer?: string
+  /** The sending server's public address (`EmailLayoutProps.site`). */
+  site?: string
 }
 
 /** Cloud's mail in the same branded layout as the waitlist's, so people know who wrote. */

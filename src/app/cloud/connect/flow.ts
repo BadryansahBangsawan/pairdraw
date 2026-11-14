@@ -31,7 +31,10 @@ type CheckedServer = { url: string; kind: CloudServer['kind']; discovery: CloudD
 
 export const cloudConnectOpen = ref(false)
 export const cloudConnectStep = ref<CloudConnectStep>('server')
-export const cloudConnectKind = ref<CloudServer['kind']>('official')
+/** The kind of server the dialog is on; it starts on the official one when this build names one. */
+export const cloudConnectKind = ref<CloudServer['kind']>(
+  OFFICIAL_CLOUD_URL ? 'official' : 'self-hosted'
+)
 /** Whether the dialog asks which server to use; Settings already asked when it names one. */
 export const cloudConnectChoosing = ref(true)
 export const cloudConnectAddress = ref('')
@@ -124,10 +127,12 @@ export function openCloudConnect(options: { kind?: CloudServer['kind']; serverId
     void check(known.url, known.kind)
     return
   }
-  cloudConnectChoosing.value = !options.kind
-  cloudConnectKind.value = options.kind ?? 'official'
+  // Without an official server there is nothing to choose: the dialog asks for an address.
+  const kind = OFFICIAL_CLOUD_URL ? (options.kind ?? 'official') : 'self-hosted'
+  cloudConnectChoosing.value = !options.kind && OFFICIAL_CLOUD_URL !== null
+  cloudConnectKind.value = kind
   cloudConnectAddress.value = ''
-  if (options.kind === 'official') {
+  if (options.kind === 'official' && OFFICIAL_CLOUD_URL) {
     void check(OFFICIAL_CLOUD_URL, 'official')
     return
   }

@@ -11,11 +11,16 @@ import {
 
 import { openHomeLocation } from '@/app/shell/menu/navigation'
 import { openStorageDocumentInNewTab } from '@/app/tabs'
-import { IS_BROWSER, OFFICIAL_CLOUD_URL } from '@/constants'
+import { IS_BROWSER } from '@/constants'
 
 import { openCloudConnect } from '../connect/flow'
 import { cloudServerHost, normalizeCloudServerURL } from '../servers/address'
-import { addCloudServer, cloudServers, showCloudServerOnHome } from '../servers/store'
+import {
+  addCloudServer,
+  cloudServers,
+  isOfficialCloudURL,
+  showCloudServerOnHome
+} from '../servers/store'
 import {
   cloudAPIClient,
   cloudConnection,
@@ -66,7 +71,7 @@ export const cloudInvitation = computed(() => {
   return {
     ...preview,
     host: cloudServerHost(url),
-    unknownServer: !knownServer() && url !== OFFICIAL_CLOUD_URL
+    unknownServer: !knownServer() && !isOfficialCloudURL(url)
   }
 })
 
@@ -138,7 +143,7 @@ export async function signInForCloudInvitation(): Promise<void> {
   const url = pending.value ? normalizeCloudServerURL(pending.value.server) : null
   if (!url) return
   const server = await addCloudServer({
-    kind: url === OFFICIAL_CLOUD_URL ? 'official' : 'self-hosted',
+    kind: isOfficialCloudURL(url) ? 'official' : 'self-hosted',
     url
   })
   openCloudConnect({ serverId: server.id })

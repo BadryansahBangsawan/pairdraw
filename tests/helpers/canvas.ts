@@ -5,10 +5,10 @@ import type { Vector } from '@pairdraw/scene-graph/primitives'
 import { OFFICIAL_CLOUD_URL } from '@/constants'
 
 /**
- * The app asks the official Cloud server whether Cloud is open yet and carries on without an
- * answer, so a request to it that fails is the network's, not the app's.
+ * A build that names an official Cloud server asks it whether Cloud is open yet and carries on
+ * without an answer, so a request to it that fails is the network's, not the app's.
  */
-const OFFICIAL_CLOUD_ORIGIN = new URL(OFFICIAL_CLOUD_URL).origin
+const OFFICIAL_CLOUD_ORIGIN = OFFICIAL_CLOUD_URL ? new URL(OFFICIAL_CLOUD_URL).origin : null
 
 /** The app binds `$mod` to Meta on macOS and to Control elsewhere. */
 const PRIMARY_MODIFIER = process.platform === 'darwin' ? 'Meta' : 'Control'
@@ -24,7 +24,7 @@ export class CanvasHelper {
     page.on('pageerror', (err) => this.errors.push(err.message))
     page.on('console', (msg) => {
       if (msg.type() !== 'error') return
-      if (msg.location().url.startsWith(OFFICIAL_CLOUD_ORIGIN)) return
+      if (OFFICIAL_CLOUD_ORIGIN && msg.location().url.startsWith(OFFICIAL_CLOUD_ORIGIN)) return
       this.errors.push(msg.text())
     })
   }

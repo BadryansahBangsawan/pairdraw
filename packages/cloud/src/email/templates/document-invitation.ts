@@ -8,6 +8,8 @@ export type DocumentInvitationEmailProps = {
   permissionLabel: string
   expiresAt: string
   acceptanceURL: string
+  /** The sending server's public address, for the logo and footer link. */
+  site?: string
 }
 
 export const DocumentInvitationEmail = defineComponent({
@@ -16,10 +18,11 @@ export const DocumentInvitationEmail = defineComponent({
     documentName: { type: String, required: true },
     permissionLabel: { type: String, required: true },
     expiresAt: { type: String, required: true },
-    acceptanceURL: { type: String, required: true }
+    acceptanceURL: { type: String, required: true },
+    site: { type: String, required: false }
   } satisfies Record<
     keyof DocumentInvitationEmailProps,
-    { type: PropType<string>; required: true }
+    { type: PropType<string>; required: boolean }
   >,
   setup(props) {
     return () =>
@@ -29,7 +32,8 @@ export const DocumentInvitationEmail = defineComponent({
         message: `${props.inviterName} invited you to ${props.permissionLabel} “${props.documentName}”.`,
         actionLabel: 'Open document',
         actionURL: props.acceptanceURL,
-        footer: `This invitation expires ${props.expiresAt}.`
+        footer: `This invitation expires ${props.expiresAt}.`,
+        site: props.site
       })
   }
 })

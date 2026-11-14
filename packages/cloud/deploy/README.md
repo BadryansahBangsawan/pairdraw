@@ -30,7 +30,7 @@ are kept.
 
 Building, configuring, and running a server, the editor address, the first administrator, operator
 commands, email, storage, backups, and upgrades are covered in the
-[self-hosting guide](https://openpencil.dev/reference/self-hosting-cloud)
+[self-hosting guide](https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/reference/self-hosting-cloud.md)
 (`packages/docs/reference/self-hosting-cloud.md`). The example files it refers to are here:
 [`pairdraw-cloud.example.toml`](./pairdraw-cloud.example.toml) and [`.env.example`](./.env.example).
 [`Dockerfile`](./Dockerfile) builds the published image, `ghcr.io/pairdraw/cloud`, from the

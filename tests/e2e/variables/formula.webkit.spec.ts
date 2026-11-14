@@ -11,8 +11,8 @@ import {
 } from '#tests/helpers/variables/formula'
 
 test.beforeEach(async ({ page }) => {
-  await page.route('https://cloud.openpencil.dev/.well-known/pairdraw', (route) =>
-    route.fulfill({ json: cloudDiscoveryFixture('https://cloud.openpencil.dev') })
+  await page.route('https://cloud.example.com/.well-known/pairdraw', (route) =>
+    route.fulfill({ json: cloudDiscoveryFixture('https://cloud.example.com') })
   )
 })
 

@@ -14,8 +14,8 @@ import { SceneGraph, type HyperlinkTarget, type StyleRun } from '@pairdraw/scene
 // eslint-disable-next-line no-script-url -- Rejection fixture; this URL is never executed.
 const SCRIPT_URL = 'javascript:alert(1)'
 
-const SITE: HyperlinkTarget = { type: 'URL', value: 'https://openpencil.dev' }
-const MAIL: HyperlinkTarget = { type: 'URL', value: 'mailto:hello@openpencil.dev' }
+const SITE: HyperlinkTarget = { type: 'URL', value: 'https://example.com' }
+const MAIL: HyperlinkTarget = { type: 'URL', value: 'mailto:hello@example.com' }
 
 function textNode(text: string, styleRuns: StyleRun[] = []) {
   const graph = new SceneGraph()
@@ -24,18 +24,18 @@ function textNode(text: string, styleRuns: StyleRun[] = []) {
 
 describe('normalizeLinkURL', () => {
   test('keeps web and mail addresses as typed', () => {
-    expect(normalizeLinkURL('https://openpencil.dev/docs?a=1#b')).toBe(
-      'https://openpencil.dev/docs?a=1#b'
+    expect(normalizeLinkURL('https://example.com/docs?a=1#b')).toBe(
+      'https://example.com/docs?a=1#b'
     )
     expect(normalizeLinkURL('  http://localhost:1420  ')).toBe('http://localhost:1420')
-    expect(normalizeLinkURL('mailto:hello@openpencil.dev')).toBe('mailto:hello@openpencil.dev')
+    expect(normalizeLinkURL('mailto:hello@example.com')).toBe('mailto:hello@example.com')
   })
 
   test('adds the scheme an address was typed without', () => {
-    expect(normalizeLinkURL('openpencil.dev')).toBe('https://openpencil.dev')
+    expect(normalizeLinkURL('example.com')).toBe('https://example.com')
     expect(normalizeLinkURL('localhost:3000/app')).toBe('https://localhost:3000/app')
-    expect(normalizeLinkURL('//openpencil.dev')).toBe('https://openpencil.dev')
-    expect(normalizeLinkURL('hello@openpencil.dev')).toBe('mailto:hello@openpencil.dev')
+    expect(normalizeLinkURL('//example.com')).toBe('https://example.com')
+    expect(normalizeLinkURL('hello@example.com')).toBe('mailto:hello@example.com')
   })
 
   test('refuses schemes that run code or reach local files', () => {
@@ -46,7 +46,7 @@ describe('normalizeLinkURL', () => {
       'file:///etc/passwd',
       'vbscript:msgbox',
       'tel:+123',
-      'ftp://openpencil.dev'
+      'ftp://example.com'
     ]) {
       expect(normalizeLinkURL(typed)).toBeNull()
     }
@@ -60,11 +60,11 @@ describe('normalizeLinkURL', () => {
 })
 
 test('isOpenableLinkURL opens only web and mail addresses', () => {
-  expect(isOpenableLinkURL('https://openpencil.dev')).toBe(true)
-  expect(isOpenableLinkURL('mailto:hello@openpencil.dev')).toBe(true)
+  expect(isOpenableLinkURL('https://example.com')).toBe(true)
+  expect(isOpenableLinkURL('mailto:hello@example.com')).toBe(true)
   expect(isOpenableLinkURL('tel:+123')).toBe(false)
   expect(isOpenableLinkURL(SCRIPT_URL)).toBe(false)
-  expect(isOpenableLinkURL('openpencil.dev')).toBe(false)
+  expect(isOpenableLinkURL('example.com')).toBe(false)
 })
 
 describe('link stretches', () => {

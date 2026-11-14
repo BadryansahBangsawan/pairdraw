@@ -91,7 +91,7 @@ export async function injectMockChatTransport(page: Page): Promise<void> {
             let response = `I'll help you with: "${text}". Here's a mock response.`
             if (tool) response = 'Created a frame called "Card".'
             else if (unsafeMarkdown) {
-              response = `[unsafe](javascript:alert(1)) ![embedded](data:image/svg+xml,<svg onload=alert(1)></svg>) ![approved](${window.location.origin}/assets/approved.png) ![unapproved](https://example.com/unapproved.png) ![insecure](http://example.com/insecure.png) [safe](https://openpencil.dev)`
+              response = `[unsafe](javascript:alert(1)) ![embedded](data:image/svg+xml,<svg onload=alert(1)></svg>) ![approved](${window.location.origin}/assets/approved.png) ![unapproved](https://example.com/unapproved.png) ![insecure](http://example.com/insecure.png) [safe](https://example.com)`
             } else if (table) {
               response = [
                 'The button now has these states:',
@@ -105,7 +105,7 @@ export async function injectMockChatTransport(page: Page): Promise<void> {
                 '- [x] Variants created',
                 '- [ ] Checked in preview',
                 '',
-                'See [the guide](https://openpencil.dev/guide).'
+                'See [the guide](https://example.com/guide).'
               ].join('\n')
             } else if (code) response = '```typescript\nconst greeting = "Hello"\n```'
             enqueueText(controller, response)

@@ -15,6 +15,8 @@ import type {
 type Args = {
   step: CloudConnectStep
   kind: CloudServerKind
+  /** The hosted server's host; null in a build that names none. */
+  official: string | null
   choosing: boolean
   address: string
   server: CloudConnectServer | null
@@ -42,6 +44,7 @@ const meta = {
   args: {
     step: 'server',
     kind: 'official',
+    official: 'cloud.example.com',
     choosing: true,
     address: '',
     server: null,
@@ -63,7 +66,7 @@ const meta = {
           :open="true"
           v-model:kind="kind"
           v-model:address="address"
-          official="cloud.openpencil.dev"
+          :official="args.official"
           :step="args.step"
           :choosing="args.choosing"
           :server="args.server"
@@ -85,6 +88,9 @@ type Story = StoryObj<typeof meta>
 
 export const ChooseServer: Story = {}
 
+/** A build without a hosted server asks only for the address of the team's own. */
+export const NoHostedServer: Story = { args: { official: null, kind: 'self-hosted' } }
+
 export const TeamServerAddress: Story = {
   args: { kind: 'self-hosted', choosing: false, address: 'https://cloud.studio.example' }
 }
@@ -102,7 +108,7 @@ export const SignIn: Story = {
     step: 'sign-in',
     choosing: false,
     server: {
-      host: 'cloud.openpencil.dev',
+      host: 'cloud.example.com',
       methods: ['google', 'apple'],
       emailPassword: EMAIL_PASSWORD,
       approvalRequired: false

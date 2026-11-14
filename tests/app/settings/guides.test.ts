@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 import { existsSync, readFileSync } from 'node:fs'
 
+import { ACP_AGENTS } from '@pairdraw/core/constants'
+
+import { codingAgentGuideURL } from '@/app/ai/agents/setup/prompt'
 import { SYSTEM_REQUIREMENTS_URL } from '@/app/shell/support/guidance'
 import {
   CLOUD_DOCS_URL,
@@ -51,7 +54,8 @@ describe('guide links', () => {
     MCP_SERVER_DOCS_URL,
     PI_GUIDE_URL,
     WEBMCP_DOCS_URL,
-    SYSTEM_REQUIREMENTS_URL
+    SYSTEM_REQUIREMENTS_URL,
+    ...ACP_AGENTS.map((agent) => codingAgentGuideURL(agent.id))
   ])('%s names a guide and a heading in it', (url) => {
     expect(url.startsWith(DOCS_ON_GITHUB)).toBe(true)
     const [path = '', anchor] = url.slice(DOCS_ON_GITHUB.length).split('#')

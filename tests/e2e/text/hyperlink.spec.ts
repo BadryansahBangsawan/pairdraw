@@ -57,7 +57,7 @@ test.beforeAll(async () => {
   // Sites a followed link opens answer locally, so the spec never leaves the machine.
   await editor.page
     .context()
-    .route('https://openpencil.dev/**', (route) =>
+    .route('https://example.com/**', (route) =>
       route.fulfill({ status: 200, contentType: 'text/html', body: '<title>Docs</title>' })
     )
 })
@@ -66,12 +66,12 @@ test('adds a link to the selected text from the typography panel', async () => {
   await typography().getByRole('button', { name: 'Add link' }).click()
   await expect(linkEditor()).toBeVisible()
 
-  await linkEditor().getByRole('textbox', { name: 'Link address' }).fill('openpencil.dev/docs')
+  await linkEditor().getByRole('textbox', { name: 'Link address' }).fill('example.com/docs')
   await editor.page.keyboard.press('Enter')
 
   await expect(linkEditor()).toHaveCount(0)
   expect(await linksOf(textId)).toEqual([
-    { start: 0, length: 13, link: { type: 'URL', value: 'https://openpencil.dev/docs' } }
+    { start: 0, length: 13, link: { type: 'URL', value: 'https://example.com/docs' } }
   ])
   // Focus goes back to the button that opened the editor, which says the text now links.
   const edit = typography().getByRole('button', { name: 'Edit link' })
@@ -89,7 +89,7 @@ test('refuses a script address and keeps the editor open', async () => {
   await editor.page.keyboard.press('Enter')
 
   await expect(field).toHaveAttribute('aria-invalid', 'true')
-  expect((await linksOf(textId))[0]?.link.value).toBe('https://openpencil.dev/docs')
+  expect((await linksOf(textId))[0]?.link.value).toBe('https://example.com/docs')
   await editor.page.keyboard.press('Escape')
   await expect(linkEditor()).toHaveCount(0)
 })
@@ -98,7 +98,7 @@ test('opens the link with a modifier click and selects without one', async () =>
   const popup = editor.page.waitForEvent('popup')
   await modifierClick(DOCS.x, DOCS.y)
   const opened = await popup
-  expect(opened.url()).toBe('https://openpencil.dev/docs')
+  expect(opened.url()).toBe('https://example.com/docs')
   await opened.close()
 
   let popups = 0
@@ -120,11 +120,11 @@ test('links only the selected word while the text is edited', async () => {
   await expect.poll(() => getEditingTextId(editor.page)).toBe(textId)
 
   await typography().getByRole('button', { name: 'Add link' }).click()
-  await linkEditor().getByRole('textbox', { name: 'Link address' }).fill('https://openpencil.dev')
+  await linkEditor().getByRole('textbox', { name: 'Link address' }).fill('https://example.com')
   await linkEditor().getByRole('button', { name: 'Apply' }).click()
 
   expect(await linksOf(textId)).toEqual([
-    { start: 0, length: 4, link: { type: 'URL', value: 'https://openpencil.dev' } }
+    { start: 0, length: 4, link: { type: 'URL', value: 'https://example.com' } }
   ])
   // Focus went back to the panel's link button; a click on empty canvas ends the edit.
   await editor.canvas.click(TEXT.x + 300, TEXT.y + 200)
@@ -171,7 +171,7 @@ test('opens a link with a plain click in Preview', async () => {
   const popup = editor.page.waitForEvent('popup')
   await editor.page.mouse.click(origin.x + READ.x, origin.y + READ.y)
   const opened = await popup
-  expect(opened.url()).toBe('https://openpencil.dev/')
+  expect(opened.url()).toBe('https://example.com/')
   // A document's link gets no handle back to the editor.
   expect(await opened.evaluate(() => window.opener)).toBeNull()
   await opened.close()
@@ -196,12 +196,12 @@ test('adds a link from the canvas menu', async () => {
   await editor.page.getByRole('menuitem', { name: 'Add link' }).click()
 
   await expect(linkEditor()).toBeVisible()
-  await linkEditor().getByRole('textbox', { name: 'Link address' }).fill('hello@openpencil.dev')
+  await linkEditor().getByRole('textbox', { name: 'Link address' }).fill('hello@example.com')
   await editor.page.keyboard.press('Enter')
 
   await expect(linkEditor()).toHaveCount(0)
   expect(await linksOf(textId)).toEqual([
-    { start: 0, length: 13, link: { type: 'URL', value: 'mailto:hello@openpencil.dev' } }
+    { start: 0, length: 13, link: { type: 'URL', value: 'mailto:hello@example.com' } }
   ])
   // Opened from the canvas, the editor gives focus back to the canvas.
   await expect(editor.page.getByTestId('canvas-element')).toBeFocused()
@@ -219,12 +219,12 @@ test('adds a link from the Text menu', async () => {
   await editor.page.getByRole('menuitem', { name: 'Add link' }).click()
   await expect(linkEditor()).toBeVisible()
 
-  await linkEditor().getByRole('textbox', { name: 'Link address' }).fill('openpencil.dev/docs')
+  await linkEditor().getByRole('textbox', { name: 'Link address' }).fill('example.com/docs')
   await editor.page.keyboard.press('Enter')
 
   await expect(linkEditor()).toHaveCount(0)
   expect(await linksOf(textId)).toEqual([
-    { start: 0, length: 13, link: { type: 'URL', value: 'https://openpencil.dev/docs' } }
+    { start: 0, length: 13, link: { type: 'URL', value: 'https://example.com/docs' } }
   ])
   editor.canvas.assertNoErrors()
 })

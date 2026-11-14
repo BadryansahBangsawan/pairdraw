@@ -8,6 +8,7 @@ import type { CloudServerEntry } from './types'
 
 type Args = {
   servers: CloudServerEntry[]
+  official: boolean
   listed: boolean
   confirmRemove: boolean
   onConnect: () => void
@@ -15,7 +16,7 @@ type Args = {
 
 const official: CloudServerEntry = {
   id: 'official',
-  host: 'cloud.openpencil.dev',
+  host: 'cloud.example.com',
   kind: 'official',
   account: { id: 'user-ana', name: 'Ana Duarte', email: 'ana@studio.example' },
   session: 'signed-in',
@@ -34,14 +35,20 @@ const meta = {
   title: 'App/Settings/Cloud',
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
-  args: { servers: [official, team], listed: true, confirmRemove: false, onConnect: fn() },
+  args: {
+    servers: [official, team],
+    official: true,
+    listed: true,
+    confirmRemove: false,
+    onConnect: fn()
+  },
   render: (args) => ({
     components: { CloudSettingsPanel, AppConfirmationDialog },
     setup: () => ({ args }),
     template: `
       <div class="flex h-[560px] bg-panel p-6">
         <div class="flex w-full max-w-2xl flex-col">
-          <CloudSettingsPanel :servers="args.servers" :listed="args.listed" @connect="args.onConnect">
+          <CloudSettingsPanel :servers="args.servers" :official="args.official" :listed="args.listed" @connect="args.onConnect">
             <template #hosted>
               <div class="rounded-xl border border-dashed border-border p-3 text-[11px] text-muted">
                 The Pairdraw Cloud waitlist
@@ -71,4 +78,6 @@ export const SignInExpired: Story = {
 export const NoServers: Story = { args: { servers: [] } }
 /** Before the hosted service opens, its waitlist takes the place of connecting to it. */
 export const BeforeLaunch: Story = { args: { servers: [], listed: false } }
+/** A build without a hosted server offers only the team's own. */
+export const NoHostedServer: Story = { args: { servers: [], official: false } }
 export const RemoveWithUnsavedChanges: Story = { args: { confirmRemove: true } }

@@ -34,7 +34,7 @@ const account: HomeCloudAccount = {
   id: 'user-ana',
   name: 'Ana Duarte',
   email: 'ana@studio.example',
-  host: 'cloud.openpencil.dev'
+  host: 'cloud.example.com'
 }
 const workspaces = [
   { id: 'design', name: 'Design team', documentCount: 6, attention: true },

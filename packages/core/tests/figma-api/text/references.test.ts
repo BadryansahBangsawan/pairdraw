@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 
+import { registerTestFont } from '#core-tests/helpers/figma-api'
+
 import { FigmaAPI } from '@pairdraw/core/figma-api'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import type { Color } from '@pairdraw/scene-graph/primitives'
-
-import { registerTestFont } from '#core-tests/helpers/figma-api'
 
 beforeAll(async () => {
   await registerTestFont()
@@ -21,7 +21,7 @@ function styledText(characters = 'Hello world') {
 }
 
 const RED: Color = { r: 1, g: 0, b: 0, a: 1 }
-const LINK = { type: 'URL' as const, value: 'https://openpencil.dev' }
+const LINK = { type: 'URL' as const, value: 'https://example.com' }
 
 function textStyle(api: FigmaAPI, id: string, fields: Record<string, unknown>) {
   const page = api.graph.getPages()[0]

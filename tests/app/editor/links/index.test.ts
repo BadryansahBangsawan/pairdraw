@@ -18,8 +18,8 @@ import {
 // eslint-disable-next-line no-script-url -- Rejection fixture; this URL is never executed.
 const SCRIPT_URL = 'javascript:alert(1)'
 
-const SITE: HyperlinkTarget = { type: 'URL', value: 'https://openpencil.dev' }
-const DOCS: HyperlinkTarget = { type: 'URL', value: 'https://openpencil.dev/docs' }
+const SITE: HyperlinkTarget = { type: 'URL', value: 'https://example.com' }
+const DOCS: HyperlinkTarget = { type: 'URL', value: 'https://example.com/docs' }
 
 const editors: Editor[] = []
 
@@ -71,7 +71,7 @@ describe('applying and removing links', () => {
   test('links several texts as one undo step', () => {
     const { editor, ids } = editorWithTexts('One', 'Two')
 
-    expect(applyTextLink(editor, ids, 'openpencil.dev')).toBe(true)
+    expect(applyTextLink(editor, ids, 'example.com')).toBe(true)
     expect(ids.map((id) => linkOf(editor, id))).toEqual([SITE, SITE])
 
     editor.undoAction()

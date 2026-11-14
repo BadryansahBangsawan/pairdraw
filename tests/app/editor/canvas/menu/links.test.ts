@@ -49,7 +49,7 @@ describe('canvas menu link entries', () => {
 
   test('offer editing, opening, and removing a link', () => {
     const { editor, id } = editorWithText()
-    applyTextLink(editor, [id], 'https://openpencil.dev')
+    applyTextLink(editor, [id], 'https://example.com')
 
     expect(labels(textLinkMenuEntries(editor, LABELS))).toEqual([
       'Edit link',
@@ -60,7 +60,7 @@ describe('canvas menu link entries', () => {
 
   test('only open links in a read-only document', () => {
     const { editor, id } = editorWithText()
-    applyTextLink(editor, [id], 'https://openpencil.dev')
+    applyTextLink(editor, [id], 'https://example.com')
     editor.setReadOnly(true)
 
     expect(labels(textLinkMenuEntries(editor, LABELS))).toEqual(['Open link'])

@@ -525,7 +525,7 @@ describe('@pairdraw/dom-css conversion', () => {
           <span>Pairdraw</span>
           <span class="${badgeClasses.join(' ')}">Beta</span>
         </nav>
-        <input class="${inputClasses.join(' ')}" value="https://openpencil.dev" />
+        <input class="${inputClasses.join(' ')}" value="https://example.com" />
       `),
       await compileTailwindCSS(classes)
     )

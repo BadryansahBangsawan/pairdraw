@@ -9,6 +9,7 @@ import type {
   AgentConnectStep
 } from '@/app/ai/agents/setup/connect'
 import type { DetectedAgent } from '@/app/ai/agents/setup/discovery'
+import { codingAgentGuideURL } from '@/app/ai/agents/setup/prompt'
 import type { AgentSetupState, PiSetupState } from '@/app/ai/agents/setup/view'
 import { agentAccount as account } from '@/components/settings/agents/stories/fixtures'
 
@@ -206,7 +207,7 @@ export const CodingAgentNeedsAdapter: Story = {
     ).toBeVisible()
     await expect(canvas.getByRole('link', { name: 'Learn more' })).toHaveAttribute(
       'href',
-      'https://openpencil.dev/programmable/coding-agents#codex'
+      codingAgentGuideURL('codex')
     )
   }
 }

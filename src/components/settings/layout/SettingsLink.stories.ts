@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
+import { WEBMCP_DOCS_URL } from '@/constants'
+
 import SettingsLink from './SettingsLink.vue'
 
 interface Args {
@@ -11,7 +13,7 @@ const meta = {
   title: 'App/Settings/Layout/Link',
   component: SettingsLink,
   args: {
-    href: 'https://openpencil.dev/programmable/mcp-server#webmcp',
+    href: WEBMCP_DOCS_URL,
     label: 'WebMCP setup guide'
   },
   render: (args) => ({

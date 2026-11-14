@@ -97,7 +97,7 @@ describe('text in a font that is not loaded', () => {
     const { node, raw } = unloadedText()
     node.fills = [solidFill({ r: 1, g: 0, b: 0, a: 1 })]
     node.setRangeFills(0, 2, [solidFill({ r: 0, g: 1, b: 0, a: 1 })])
-    node.setRangeHyperlink(0, 2, { type: 'URL', value: 'https://openpencil.dev' })
+    node.setRangeHyperlink(0, 2, { type: 'URL', value: 'https://example.com' })
     node.resize(100, 40)
     node.name = 'Renamed'
     expect(raw()).toMatchObject({ name: 'Renamed', width: 100, height: 40 })

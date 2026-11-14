@@ -179,7 +179,7 @@ test.describe('@pairdraw/dom-css browser CSS runtime oracle', () => {
           <span>Pairdraw</span>
           <span class="${badgeClasses.join(' ')}">Beta</span>
         </nav>
-        <input class="${inputClasses.join(' ')}" value="https://openpencil.dev" />
+        <input class="${inputClasses.join(' ')}" value="https://example.com" />
       `
     )
 

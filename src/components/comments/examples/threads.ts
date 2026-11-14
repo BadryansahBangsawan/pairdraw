@@ -18,7 +18,7 @@ export const discussed: CommentThread = {
   y: 80,
   author: 'Dana Scully',
   authorColor: red,
-  text: 'The **total** gets lost here. Could we:\n- make it *bigger*\n- drop the ~~divider~~\n\nSee [the brief](https://openpencil.dev).',
+  text: 'The **total** gets lost here. Could we:\n- make it *bigger*\n- drop the ~~divider~~\n\nSee [the brief](https://example.com).',
   createdAt: ago(5),
   updatedAt: ago(1),
   resolved: false,

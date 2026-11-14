@@ -272,12 +272,12 @@ describe('connectCompanionFromLocation', () => {
     )
     const offer = mock(async () => undefined)
     const offered = await connectCompanionFromLocation(
-      { hash: `#connect=${CODE}`, href: `https://app.openpencil.dev/?test#connect=${CODE}` },
+      { hash: `#connect=${CODE}`, href: `https://app.example.com/?test#connect=${CODE}` },
       { replaceState, state: null },
       { offer }
     )
     expect(offered).toBe(true)
-    expect(replaceState.mock.calls[0]?.[2]).toBe('https://app.openpencil.dev/?test')
+    expect(replaceState.mock.calls[0]?.[2]).toBe('https://app.example.com/?test')
     expect(offer).toHaveBeenCalledWith({ code: CODE, port: AUTOMATION_HTTP_PORT })
   })
 
@@ -285,7 +285,7 @@ describe('connectCompanionFromLocation', () => {
     const replaceState = mock(() => undefined)
     const offer = mock(async () => undefined)
     await connectCompanionFromLocation(
-      { hash: '#section', href: 'https://app.openpencil.dev/#section' },
+      { hash: '#section', href: 'https://app.example.com/#section' },
       { replaceState, state: null },
       { offer }
     )

@@ -105,15 +105,15 @@ describe('set_font_range hyperlink', () => {
       id: text.id,
       start: 9,
       end: 13,
-      hyperlink: 'https://openpencil.dev/docs'
+      hyperlink: 'https://example.com/docs'
     })
     expect(result).toEqual({
       id: text.id,
       range: { start: 9, end: 13 },
-      hyperlink: 'https://openpencil.dev/docs'
+      hyperlink: 'https://example.com/docs'
     })
     expect(hyperlinkSpans(getNodeOrThrow(graph, text.id))).toEqual([
-      { start: 9, end: 13, link: { type: 'URL', value: 'https://openpencil.dev/docs' } }
+      { start: 9, end: 13, link: { type: 'URL', value: 'https://example.com/docs' } }
     ])
     await runTool(figma, 'set_font_range', { id: text.id, start: 9, end: 13, hyperlink: null })
     expect(hyperlinkSpans(getNodeOrThrow(graph, text.id))).toEqual([])

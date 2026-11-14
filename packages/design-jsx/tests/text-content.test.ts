@@ -31,7 +31,7 @@ async function renderText(source: string): Promise<{ node: SceneNode; warnings: 
 describe('Span', () => {
   test('cases and links its characters', async () => {
     const { node, warnings } = await renderText(
-      '<Text textCase="upper">Read <Span textCase="original" href="https://openpencil.dev">the docs</Span></Text>'
+      '<Text textCase="upper">Read <Span textCase="original" href="https://example.com">the docs</Span></Text>'
     )
     expect(warnings).toEqual([])
     expect(node.textCase).toBe('UPPER')
@@ -39,7 +39,7 @@ describe('Span', () => {
       {
         start: 5,
         length: 8,
-        style: { textCase: 'ORIGINAL', hyperlink: { type: 'URL', value: 'https://openpencil.dev' } }
+        style: { textCase: 'ORIGINAL', hyperlink: { type: 'URL', value: 'https://example.com' } }
       }
     ])
   })

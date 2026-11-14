@@ -152,24 +152,24 @@ describe('rich text import', () => {
 
   test('reads links in text as linked ranges, and a link of text alone as linked text', async () => {
     const [text] = await texts(
-      '<p>Read <a href="https://openpencil.dev/docs">the <b>docs</b></a> now</p>'
+      '<p>Read <a href="https://example.com/docs">the <b>docs</b></a> now</p>'
     )
-    const link = { type: 'URL' as const, value: 'https://openpencil.dev/docs' }
+    const link = { type: 'URL' as const, value: 'https://example.com/docs' }
     expect(text?.styleRuns).toEqual([
       { start: 5, length: 4, style: { hyperlink: link } },
       { start: 9, length: 4, style: { hyperlink: link, fontWeight: 700 } }
     ])
-    const [alone] = await texts('<a href="https://openpencil.dev">Home</a>')
+    const [alone] = await texts('<a href="https://example.com">Home</a>')
     expect(alone?.styleRuns).toEqual([
       {
         start: 0,
         length: 4,
-        style: { hyperlink: { type: 'URL', value: 'https://openpencil.dev' } }
+        style: { hyperlink: { type: 'URL', value: 'https://example.com' } }
       }
     ])
-    const [rich] = await texts('<a href="https://openpencil.dev">Go <b>home</b></a>')
+    const [rich] = await texts('<a href="https://example.com">Go <b>home</b></a>')
     expect(
-      rich?.styleRuns.every((run) => run.style.hyperlink?.value === 'https://openpencil.dev')
+      rich?.styleRuns.every((run) => run.style.hyperlink?.value === 'https://example.com')
     ).toBe(true)
     expect(rich?.styleRuns.reduce((sum, run) => sum + run.length, 0)).toBe(rich?.text.length)
   })
@@ -195,7 +195,7 @@ describe('rich text import', () => {
       {
         start: 0,
         length: 4,
-        style: { hyperlink: { type: 'URL' as const, value: 'https://openpencil.dev/' } }
+        style: { hyperlink: { type: 'URL' as const, value: 'https://example.com/' } }
       },
       { start: 5, length: 4, style: { textCase: 'UPPER' as const } }
     ]

@@ -47,7 +47,7 @@ export const NoLink: Story = {
 }
 
 export const WebLink: Story = {
-  args: { link: 'url', url: 'https://openpencil.dev/docs' }
+  args: { link: 'url', url: 'https://example.com/docs' }
 }
 
 /** Characters that link to different places; Open has no single place to go. */
@@ -64,9 +64,9 @@ export const AppliesTypedAddress: Story = {
   args: { link: 'none' },
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.type(canvas.getByRole('textbox', { name: 'Link address' }), 'openpencil.dev')
+    await userEvent.type(canvas.getByRole('textbox', { name: 'Link address' }), 'example.com')
     await userEvent.click(canvas.getByRole('button', { name: 'Apply' }))
-    await expect(args.onApply).toHaveBeenCalledWith('openpencil.dev')
+    await expect(args.onApply).toHaveBeenCalledWith('example.com')
   }
 }
 

@@ -11,7 +11,7 @@ import type { HyperlinkTarget } from '@pairdraw/scene-graph'
 // eslint-disable-next-line no-script-url -- Rejection fixture; this URL is never executed.
 const SCRIPT_URL = 'javascript:alert(1)'
 
-const SITE: HyperlinkTarget = { type: 'URL', value: 'https://openpencil.dev' }
+const SITE: HyperlinkTarget = { type: 'URL', value: 'https://example.com' }
 
 const cleanups: (() => void)[] = []
 
@@ -46,7 +46,7 @@ describe('setTextHyperlink', () => {
   test('links the whole text of a selected layer as one undo step', async () => {
     const { editor, id, node } = await editorWithText()
 
-    expect(editor.setTextHyperlink(id, 'openpencil.dev')).toBe(true)
+    expect(editor.setTextHyperlink(id, 'example.com')).toBe(true)
 
     expect(node().styleRuns).toEqual([
       { start: 0, length: 11, style: { hyperlink: SITE, textDecoration: 'UNDERLINE' } }
@@ -64,7 +64,7 @@ describe('setTextHyperlink', () => {
     state.selectionAnchor = 6
     state.cursor = 11
 
-    expect(editor.setTextHyperlink(id, 'https://openpencil.dev')).toBe(true)
+    expect(editor.setTextHyperlink(id, 'https://example.com')).toBe(true)
 
     expect(node().styleRuns).toEqual([
       { start: 6, length: 5, style: { hyperlink: SITE, textDecoration: 'UNDERLINE' } }
@@ -92,7 +92,7 @@ describe('setTextHyperlink', () => {
 
   test('is refused in a read-only document, which still reads links', async () => {
     const { editor, id, node } = await editorWithText()
-    editor.setTextHyperlink(id, 'https://openpencil.dev')
+    editor.setTextHyperlink(id, 'https://example.com')
     editor.setReadOnly(true)
 
     expect(() => editor.setTextHyperlink(id, null)).toThrow()
@@ -104,7 +104,7 @@ describe('setTextHyperlink', () => {
 describe('following links from the canvas', () => {
   test('finds the link under a point on its glyphs only', async () => {
     const { editor, id } = await editorWithText()
-    editor.setTextHyperlink(id, 'https://openpencil.dev', [6, 11])
+    editor.setTextHyperlink(id, 'https://example.com', [6, 11])
 
     const onWorld = editor.hyperlinkAtPoint(80, 15)
     expect(onWorld).toEqual({ nodeId: id, span: { start: 6, end: 11, link: SITE } })
@@ -120,7 +120,7 @@ describe('following links from the canvas', () => {
     expect(await editor.followHyperlink(SITE)).toBe(true)
     expect(await editor.followHyperlink({ type: 'URL', value: SCRIPT_URL })).toBe(false)
     expect(await editor.followHyperlink({ type: 'URL', value: 'tel:+123' })).toBe(false)
-    expect(opened).toEqual(['https://openpencil.dev'])
+    expect(opened).toEqual(['https://example.com'])
   })
 
   test('shows and selects a linked layer on another page', async () => {

@@ -8,7 +8,7 @@ export type HomeCloudAccount = {
   name: string
   email: string
   image?: string | null
-  /** The Cloud server's host, such as `cloud.openpencil.dev`. */
+  /** The Cloud server's host, such as `cloud.example.com`. */
   host: string
 }
 

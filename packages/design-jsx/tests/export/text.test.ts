@@ -24,12 +24,12 @@ describe('rich text export', () => {
         {
           start: 5,
           length: 4,
-          style: { textCase: 'UPPER', hyperlink: { type: 'URL', value: 'https://openpencil.dev' } }
+          style: { textCase: 'UPPER', hyperlink: { type: 'URL', value: 'https://example.com' } }
         },
         { start: 0, length: 4, style: { hyperlink: { type: 'NODE', value: '1:2' } } }
       ]
     })
-    expect(code).toContain('Read <Span textCase="upper" href="https://openpencil.dev">docs</Span>')
+    expect(code).toContain('Read <Span textCase="upper" href="https://example.com">docs</Span>')
   })
 
   test('writes styled characters as spans with only what differs', () => {

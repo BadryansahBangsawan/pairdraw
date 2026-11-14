@@ -28,7 +28,7 @@ function workspace(
   }
 }
 
-const officialServer = { id: 'official', label: 'cloud.openpencil.dev' }
+const officialServer = { id: 'official', label: 'cloud.example.com' }
 const official = [
   workspace(officialServer, 'design', 'Design team', 'editor'),
   workspace(officialServer, 'personal', 'Personal', 'admin'),

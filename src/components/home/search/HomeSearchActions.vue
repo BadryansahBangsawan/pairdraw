@@ -123,6 +123,7 @@ watch(
           :size="isTouch ? 'lg' : 'md'"
           :color="choice.color"
           :variant="choice.variant"
+          :class="{ 'col-span-2 @2xl/home:col-span-1': createChoices.length === 1 }"
           :data-test-id="`home-new-${choice.kind}`"
           @click="emit('new-document', choice.kind)"
         >

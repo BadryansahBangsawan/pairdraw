@@ -34,7 +34,7 @@ const {
   servers: CloudServerEntry[]
   /** Whether this build offers a hosted service at all; without one only self-hosted remains. */
   official?: boolean
-  /** Whether the hosted service takes sign-ins yet; until then the `hosted` slot stands in. */
+  /** Whether the hosted service takes sign-ins yet; until then it is not offered. */
   listed?: boolean
 }>()
 const emit = defineEmits<{
@@ -75,17 +75,14 @@ const title = (server: CloudServerEntry) =>
       </template>
 
       <div v-if="!servers.length" :class="ui.choices()">
-        <template v-if="official">
-          <slot v-if="!listed" name="hosted" />
-          <AppActionRow v-else @click="emit('connect', 'official')">
-            <template #leading>
-              <span :class="ui.choiceIcon()"><icon-lucide-cloud class="size-4" /></span>
-            </template>
-            {{ t.productName }}
-            <template #description>{{ t.settingsOfficialDescription }}</template>
-            <template #trailing><icon-lucide-chevron-right class="size-3.5" /></template>
-          </AppActionRow>
-        </template>
+        <AppActionRow v-if="official && listed" @click="emit('connect', 'official')">
+          <template #leading>
+            <span :class="ui.choiceIcon()"><icon-lucide-cloud class="size-4" /></span>
+          </template>
+          {{ t.productName }}
+          <template #description>{{ t.settingsOfficialDescription }}</template>
+          <template #trailing><icon-lucide-chevron-right class="size-3.5" /></template>
+        </AppActionRow>
         <AppActionRow @click="emit('connect', 'self-hosted')">
           <template #leading>
             <span :class="ui.choiceIcon()"><icon-lucide-server class="size-4" /></span>

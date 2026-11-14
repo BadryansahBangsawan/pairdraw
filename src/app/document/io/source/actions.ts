@@ -22,7 +22,6 @@ import { storageLocationOf } from '@/app/integrations/storage/location'
 import type { StorageDocumentBinding, StorageLocation } from '@/app/integrations/storage/types'
 import { createCanvasId } from '@/app/storage/id'
 import { isTauri } from '@/app/tauri/env'
-import { trackDocumentFormat } from '@/app/telemetry'
 
 type DocumentSourceState = EditorState & {
   documentName: string
@@ -202,7 +201,6 @@ export function createDocumentSourceActions({
     setSourceIdentity({ handle: handle ?? null, path: path ?? null })
     markDocumentSaved()
     void recovery.markProtectedVersion(changes.capture())
-    trackDocumentFormat('document_opened', sourceFormat)
     if (isFig && (handle || path)) {
       void startWatchingFile()
     }

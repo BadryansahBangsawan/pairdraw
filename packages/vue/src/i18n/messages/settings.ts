@@ -79,7 +79,6 @@ export const settingsMessageDefaults = {
   invertZoomDescription:
     'Scrolling down zooms in and scrolling up zooms out. Trackpad pinches keep their direction.',
   usage: 'Usage',
-  privacy: 'Privacy',
   diagnostics: 'Diagnostics',
   fonts: 'Fonts',
   media: 'Media',

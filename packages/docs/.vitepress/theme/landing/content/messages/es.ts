@@ -221,26 +221,10 @@ export const es: LandingMessages = {
       }
     ]
   },
-  waitlist: {
-    label: 'Correo electrónico',
-    placeholder: 'tu@ejemplo.com',
-    submit: 'Unirme a la lista',
-    confirmHuman: 'Confirma que eres humano',
-    invalid: 'Introduce un correo electrónico válido.',
-    joined: 'Revisa tu bandeja de entrada',
-    joinedDetail: 'Abre el enlace que te enviamos para confirmar tu dirección.',
-    failed:
-      'No se pudo contactar con la lista de espera. Comprueba tu conexión e inténtalo de nuevo.',
-    privacy: 'Solo te escribiremos sobre Pairdraw Cloud.',
-    refused: 'No pudimos confirmar que no eres un bot. Inténtalo de nuevo.',
-    limited: 'Demasiados intentos. Inténtalo de nuevo en un minuto.',
-    unavailable: 'No puedes unirte desde aquí. Únete en openpencil.dev.'
-  },
   closing: {
     title: 'Llévate tus diseños contigo.',
     download: 'Descargar Pairdraw',
-    docs: 'Leer la documentación',
-    cloud: 'Unirme a la lista de Cloud'
+    docs: 'Leer la documentación'
   },
   clipboard: {
     copy: 'Copiar',

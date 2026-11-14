@@ -37,7 +37,7 @@ export function isVersionAtLeast(version: string, minimum: string): boolean {
 
 /**
  * Whether the official server is open to this editor, being previewed here, or serving this
- * editor itself; until then Settings offers its waitlist.
+ * editor itself; until then Settings offers only a team's own server.
  */
 export const cloudOfficialListed = computed(
   () =>

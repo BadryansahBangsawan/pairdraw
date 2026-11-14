@@ -2,11 +2,6 @@
 /// <reference types="vite-plugin-pwa/vanillajs" />
 /// <reference types="unplugin-icons/types/vue" />
 
-interface ImportMetaEnv {
-  /** `on` only in official release builds; without it the app sends no pings or usage stats. */
-  readonly VITE_PAIRDRAW_FEEDBACK?: string
-}
-
 declare const __PAIRDRAW_APP_VERSION__: string
 /** Whether this is the editor a Cloud server serves on its own address (`bun run build:cloud`). */
 declare const __PAIRDRAW_CLOUD_SITE__: boolean

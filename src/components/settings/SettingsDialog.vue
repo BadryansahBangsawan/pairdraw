@@ -13,7 +13,6 @@ import IconPenTool from '~icons/lucide/pen-tool'
 import IconPlug from '~icons/lucide/plug'
 import IconPuzzle from '~icons/lucide/puzzle'
 import IconSettings from '~icons/lucide/settings'
-import IconShield from '~icons/lucide/shield'
 import IconSlidersHorizontal from '~icons/lucide/sliders-horizontal'
 import IconSparkles from '~icons/lucide/sparkles'
 import IconType from '~icons/lucide/type'
@@ -42,7 +41,6 @@ import MediaSettingsPanel from '@/components/settings/media/MediaSettingsPanel.v
 import ModelsPanel from '@/components/settings/models/ModelsPanel.vue'
 import NotificationSettingsSection from '@/components/settings/notifications/NotificationSettingsSection.vue'
 import PluginsSettingsPanel from '@/components/settings/plugins/PluginsSettingsPanel.vue'
-import PrivacySettingsPanel from '@/components/settings/privacy/PrivacySettingsPanel.vue'
 import SkillsSettingsPanel from '@/components/settings/skills/SkillsSettingsPanel.vue'
 import StorageSettingsPanel from '@/components/settings/storage/StorageSettingsPanel.vue'
 import ToolAccessSettingsPanel from '@/components/settings/tool-access/ToolAccessSettingsPanel.vue'
@@ -103,10 +101,7 @@ const groups = computed<{ label: string; sections: SectionItem[] }[]>(() => [
   },
   {
     label: settings.value.groupDataAndPrivacy,
-    sections: [
-      { value: 'privacy', label: settings.value.privacy, icon: IconShield },
-      { value: 'diagnostics', label: settings.value.diagnostics, icon: IconActivity }
-    ]
+    sections: [{ value: 'diagnostics', label: settings.value.diagnostics, icon: IconActivity }]
   }
 ])
 const sections = computed(() => groups.value.flatMap((group) => group.sections))
@@ -237,9 +232,6 @@ function onOpenChange(open: boolean): void {
       </AppTabsContent>
       <AppTabsContent value="usage" as-child>
         <SettingsPage><UsageSettingsPanel /></SettingsPage>
-      </AppTabsContent>
-      <AppTabsContent value="privacy" as-child>
-        <SettingsPage><PrivacySettingsPanel /></SettingsPage>
       </AppTabsContent>
       <AppTabsContent value="diagnostics" as-child>
         <SettingsPage><DiagnosticsSettingsPanel /></SettingsPage>

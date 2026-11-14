@@ -68,21 +68,5 @@
   "categoryRuntime": "Ejecución",
   "noMatchingEvents": "Ningún evento coincide con estos filtros.",
   "showMore": "Mostrar más",
-  "showingEvents": "{shown} de {total}",
-  "sharingTitle": "Compartir con Pairdraw",
-  "sharingDescription": "Lo que esta app envía al equipo de Pairdraw. Tus diseños, nombres de archivo, prompts y claves nunca se envían.",
-  "sharingPing": "Ping anónimo diario",
-  "sharingPingDescription": "Una vez al día: la versión de la app, el sistema operativo y si se ejecuta en escritorio o en la web. Sin ID.",
-  "sharingUsageStats": "Estadísticas de uso",
-  "sharingUsageStatsDescription": "Qué funciones y formatos de archivo se usan, con un ID aleatorio que no identifica a nadie. Desactivado salvo que aceptes.",
-  "sharingDetails": "Qué se envía",
-  "sharingUnofficialBuild": "Esta compilación no envía nada. Solo las versiones oficiales de Pairdraw envían pings o estadísticas de uso.",
-  "sharingDisabledByEnvironment": "Desactivado por PAIRDRAW_TELEMETRY o DO_NOT_TRACK en tu entorno.",
-  "sharingQuestionTitle": "¿Nos ayudas a mejorar Pairdraw?",
-  "sharingQuestionDescription": "Comparte estadísticas de uso anónimas: inicios de la app, formatos de archivo y funciones usadas. Nunca tus diseños, nombres de archivo ni prompts. Nos muestran qué construir a continuación y que Pairdraw se usa, lo que ayuda a financiarlo.",
-  "sharingQuestionDecline": "No, gracias",
-  "sharingQuestionAccept": "Compartir estadísticas",
-  "sharingQuestionAccepted": "Gracias. Puedes cambiarlo en los ajustes de Privacidad.",
-  "sharingQuestionDeclined": "Las estadísticas de uso seguirán desactivadas. Puedes cambiarlo en los ajustes de Privacidad.",
-  "sharingLocalData": "Uso y Diagnóstico guardan sus registros en este dispositivo y nunca los envían."
+  "showingEvents": "{shown} de {total}"
 }

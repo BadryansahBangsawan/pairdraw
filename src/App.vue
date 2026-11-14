@@ -33,7 +33,6 @@ import RecoveryDialog from '@/components/recovery/RecoveryDialog.vue'
 import SaveToHost from '@/components/save-to/SaveToHost.vue'
 import AISetupDialog from '@/components/settings/ai-setup/AISetupDialog.vue'
 import SettingsDialog from '@/components/settings/SettingsDialog.vue'
-import UsageStatsPrompt from '@/components/sharing/UsageStatsPrompt.vue'
 import AppShell from '@/components/shell/AppShell.vue'
 import AppToaster from '@/components/shell/AppToaster.vue'
 import VoiceCallAudio from '@/components/voice-call/VoiceCallAudio.vue'
@@ -89,7 +88,6 @@ onMounted(() => {
       <ClipboardImportDialogHost />
       <PublishLibraryDialog />
       <LibraryUpdateReviewDialog />
-      <UsageStatsPrompt />
       <AppToaster />
       <VoiceCallAudio />
     </TooltipProvider>

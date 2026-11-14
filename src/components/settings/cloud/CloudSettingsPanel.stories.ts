@@ -48,13 +48,7 @@ const meta = {
     template: `
       <div class="flex h-[560px] bg-panel p-6">
         <div class="flex w-full max-w-2xl flex-col">
-          <CloudSettingsPanel :servers="args.servers" :official="args.official" :listed="args.listed" @connect="args.onConnect">
-            <template #hosted>
-              <div class="rounded-xl border border-dashed border-border p-3 text-[11px] text-muted">
-                The Pairdraw Cloud waitlist
-              </div>
-            </template>
-          </CloudSettingsPanel>
+          <CloudSettingsPanel :servers="args.servers" :official="args.official" :listed="args.listed" @connect="args.onConnect" />
         </div>
         <AppConfirmationDialog
           :open="args.confirmRemove"
@@ -76,7 +70,7 @@ export const SignInExpired: Story = {
   args: { servers: [official, { ...team, session: 'expired' }] }
 }
 export const NoServers: Story = { args: { servers: [] } }
-/** Before the hosted service opens, its waitlist takes the place of connecting to it. */
+/** Before the hosted service opens, only a team's own server can be connected. */
 export const BeforeLaunch: Story = { args: { servers: [], listed: false } }
 /** A build without a hosted server offers only the team's own. */
 export const NoHostedServer: Story = { args: { servers: [], official: false } }

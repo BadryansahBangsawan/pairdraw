@@ -115,10 +115,6 @@ function configuredOrigin(value: unknown): string | null {
 export const WEB_APP_ORIGIN = configuredOrigin(
   typeof __PAIRDRAW_WEB_APP_URL__ === 'string' ? __PAIRDRAW_WEB_APP_URL__ : null
 )
-/** The privacy page: every request the app makes, and every usage event and field. */
-export const PRIVACY_URL = 'https://openpencil.dev/overview/privacy'
-/** The Pairdraw Cloud section of the website, with its waitlist form. */
-export const CLOUD_WAITLIST_URL = 'https://openpencil.dev/#cloud'
 /**
  * The hosted Pairdraw Cloud server a build offers first when connecting, named at build time by
  * `VITE_PAIRDRAW_OFFICIAL_CLOUD_URL`. Null when the build names none: then the app offers only

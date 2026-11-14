@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import IconBookOpen from '~icons/lucide/book-open'
-import IconCloud from '~icons/lucide/cloud'
 import IconDownload from '~icons/lucide/download'
 
 import { LINKS } from '../content/links'
@@ -21,7 +20,6 @@ const localePath = useLocalePath()
       <ActionButton :href="localePath(LINKS.docs)" :icon="IconBookOpen">
         {{ messages.closing.docs }}
       </ActionButton>
-      <ActionButton href="#cloud" :icon="IconCloud">{{ messages.closing.cloud }}</ActionButton>
     </div>
   </section>
 </template>

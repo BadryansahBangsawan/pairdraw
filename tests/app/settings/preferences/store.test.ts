@@ -27,14 +27,9 @@ describe('parseAppPreferences', () => {
     }
   })
 
-  test('pings by default and treats an unreadable usage stats answer as never asked', () => {
-    expect(DEFAULT_APP_PREFERENCES.sharing).toEqual({ dailyPing: true, usageStats: 'unset' })
-    expect(
-      parseAppPreferences({ sharing: { dailyPing: false, usageStats: 'maybe' } }).sharing
-    ).toEqual({
-      dailyPing: false,
-      usageStats: 'unset'
-    })
+  test('drops the sharing answers that earlier versions stored', () => {
+    const stored = { sharing: { dailyPing: true, usageStats: 'granted' } }
+    expect(parseAppPreferences(stored)).toEqual(DEFAULT_APP_PREFERENCES)
   })
 
   test('keeps valid choices and defaults only the fields that are not', () => {

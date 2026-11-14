@@ -73,29 +73,7 @@ export const diagnosticsMessageDefaults = {
   clearDescription: 'This removes locally stored diagnostic events from this device.',
   cleared: 'Diagnostics cleared.',
   copyFailed: 'Could not copy diagnostics to the clipboard.',
-  saveFailed: 'Could not save diagnostics.',
-  sharingTitle: 'Sharing with Pairdraw',
-  sharingDescription:
-    'What this app sends to the Pairdraw team. Your designs, file names, prompts, and keys are never sent.',
-  sharingPing: 'Daily anonymous ping',
-  sharingPingDescription:
-    'Once a day: the app version, operating system, and whether it runs on desktop or the web. No ID.',
-  sharingUsageStats: 'Usage stats',
-  sharingUsageStatsDescription:
-    'Which features and file formats are used, under a random ID that names no person. Off unless you agree.',
-  sharingDetails: 'What is sent',
-  sharingUnofficialBuild:
-    'This build sends nothing. Only official Pairdraw releases send pings or usage stats.',
-  sharingDisabledByEnvironment:
-    'Turned off by PAIRDRAW_TELEMETRY or DO_NOT_TRACK in your environment.',
-  sharingQuestionTitle: 'Help improve Pairdraw?',
-  sharingQuestionDescription:
-    'Share anonymous usage stats: app launches, file formats, and features used. Never your designs, file names, or prompts. They show us what to build next and that Pairdraw is used, which keeps it funded.',
-  sharingQuestionDecline: 'No thanks',
-  sharingQuestionAccept: 'Share stats',
-  sharingQuestionAccepted: 'Thank you. You can change this in Privacy settings.',
-  sharingQuestionDeclined: 'Usage stats stay off. You can change this in Privacy settings.',
-  sharingLocalData: 'Usage and Diagnostics keep their records on this device and never send them.'
+  saveFailed: 'Could not save diagnostics.'
 } as const
 
 export const diagnosticsMessages = i18n('diagnostics', diagnosticsMessageDefaults)

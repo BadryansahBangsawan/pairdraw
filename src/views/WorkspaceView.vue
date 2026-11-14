@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHead } from '@unhead/vue'
-import { useEventListener, whenever } from '@vueuse/core'
+import { useEventListener } from '@vueuse/core'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -40,7 +40,6 @@ import {
 } from '@/app/tabs'
 import { syncTabAddress } from '@/app/tabs/address'
 import { isTauri } from '@/app/tauri/env'
-import { offerUsageStatsPrompt, startSharing } from '@/app/telemetry'
 import { watchOpenDocuments } from '@/app/window/documents'
 import ColorSpaceBanner from '@/components/canvas/ColorSpaceBanner.vue'
 import { CloudVersionDialog } from '@/components/cloud/integration'
@@ -84,7 +83,7 @@ const createdInitialTab = tabCount() === 0
 // Home is pinned first everywhere but tests and the demo, and opens in front, as Figma's does:
 // it is where a design or a board is started, with or without recent files to list.
 // An embed shows the one document its host page hands it, with no Home and none of the app's
-// own services: no agents, MCP, usage stats, rooms, or links read off its address.
+// own services: no agents, MCP, rooms, or links read off its address.
 const embed = appRuntimeConfig.embed
 const pinHome = !appRuntimeConfig.test && !route.meta.demo && !embed
 const showHomeFirst = route.path === '/' && pinHome
@@ -143,16 +142,6 @@ function openFirstTab(): Tab {
 if (!embed) {
   // A fresh install looks for a coding agent in the background; it opens nothing.
   void detectAgentsOnFirstRun()
-  const sharingStarted = startSharing()
-  // Asked once the window shows what it opened, not over the loading screen.
-  whenever(
-    () => !openingCloudLink.value,
-    async () => {
-      await sharingStarted
-      offerUsageStatsPrompt('prompt')
-    },
-    { once: true, immediate: true }
-  )
 }
 
 useHead({ title: route.meta.demo ? 'Demo' : undefined })

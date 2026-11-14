@@ -118,7 +118,6 @@ pub fn run() {
             launch::documents::claim_document,
             launch::documents::release_document,
             launch::take_pending_rooms,
-            system::env::sharing_disabled_by_env,
             launch::take_pending_cloud_links,
             system::quit::answer_quit,
             system::env::webview_version,

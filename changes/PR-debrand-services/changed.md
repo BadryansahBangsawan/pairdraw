@@ -1,0 +1,1 @@
+- Pairdraw no longer sends a daily ping or usage statistics, so Settings has no Privacy page and the app no longer asks to share stats; the Cloud waitlist is gone from Settings and the website.

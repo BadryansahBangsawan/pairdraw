@@ -23,7 +23,6 @@ import { useHeldContent } from '@/components/ui/overlay/held'
 import { OFFICIAL_CLOUD_URL } from '@/constants'
 
 import CloudSettingsPanel from './CloudSettingsPanel.vue'
-import CloudWaitlist from './CloudWaitlist.vue'
 import type { CloudServerEntry } from './types'
 
 /** The Cloud section of Settings: the saved servers with their live sessions, and their actions. */
@@ -104,9 +103,7 @@ async function remove() {
       @show-on-home="showCloudServerOnHome"
       @sign-out="signOut"
       @remove="askToRemove"
-    >
-      <template #hosted><CloudWaitlist /></template>
-    </CloudSettingsPanel>
+    />
     <AppConfirmationDialog
       :open="removing !== null"
       tone="danger"

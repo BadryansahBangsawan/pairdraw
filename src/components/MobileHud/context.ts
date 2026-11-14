@@ -7,7 +7,7 @@ import IconSave from '~icons/lucide/save'
 import IconZoomIn from '~icons/lucide/zoom-in'
 
 import { useEditorCommands } from '@pairdraw/vue/editor/commands'
-import { useI18n } from '@pairdraw/vue/i18n'
+import { useI18n, useMenuMessages } from '@pairdraw/vue/i18n'
 
 import { isCloudBinding, openCloudShare } from '@/app/cloud/integration'
 import { getShareURL } from '@/app/collab/room/links'
@@ -23,6 +23,7 @@ import { roomStatusText } from '@/components/collab-room/statusText'
 import { toolIcons } from '@/components/icons'
 import { presenceRows } from '@/components/presence/rows'
 import type { ToolbarActionItem } from '@/components/toolbar/types'
+import { COLLABORATION_INCLUDED } from '@/constants'
 
 type MenuAction = ToolbarActionItem
 
@@ -32,6 +33,7 @@ function createMobileHudContext() {
   const { send } = useSendLink()
   const { common, collaboration } = useI18n()
   const notifications = useNotificationMessages()
+  const menu = useMenuMessages()
   const { getCommand } = useEditorCommands()
 
   const collabState = computed(() => collab?.state.value ?? DEFAULT_COLLAB_STATE)
@@ -59,17 +61,25 @@ function createMobileHudContext() {
   const activeToolIcon = computed(() => toolIcons[store.state.activeTool])
   const actionToast = computed(() => store.state.actionToast)
 
-  const menuItems: MenuAction[] = [
+  const menuItems = computed<MenuAction[]>(() => [
     {
       icon: IconFilePlus,
-      label: 'New',
+      label: menu.value.new,
       action: () => void import('@/app/tabs').then((m) => m.createTab())
     },
-    { icon: IconFolderOpen, label: 'Open…', action: () => void openFileDialog() },
-    { icon: IconSave, label: 'Save', action: () => void store.saveFigFile() },
-    { icon: IconImageDown, label: 'Export…', action: () => void store.exportSelection(1, 'png') },
-    { icon: IconZoomIn, label: 'Zoom to fit', action: () => getCommand('view.zoomFit').run() }
-  ]
+    { icon: IconFolderOpen, label: menu.value.open, action: () => void openFileDialog() },
+    { icon: IconSave, label: menu.value.save, action: () => void store.saveFigFile() },
+    {
+      icon: IconImageDown,
+      label: menu.value.exportSelectionAsPNG,
+      action: () => void store.exportSelection(1, 'png')
+    },
+    {
+      icon: IconZoomIn,
+      label: getCommand('view.zoomFit').label,
+      action: () => getCommand('view.zoomFit').run()
+    }
+  ])
 
   function undo() {
     getCommand('edit.undo').run()

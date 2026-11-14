@@ -12,3 +12,4 @@
 - `pairdraw <command> --help` shows the command on its usage line, such as `pairdraw export [OPTIONS] [FILE]`, instead of the path of the script that runs the CLI.
 - A design started from Home or a New file tab starts on the dark page in the dark theme, as other new documents do, instead of the light one.
 - Home's places menu is wide enough for each place's name, such as Design systems and Storage workspace, instead of cutting them short.
+- The phone File menu names its items in the app's language, and its export item says it exports the selection as PNG.

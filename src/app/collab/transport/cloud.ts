@@ -55,7 +55,7 @@ function defaultReconnectDelay(attempt: number): number {
 }
 
 /**
- * Joins rooms through an Pairdraw Cloud relay. The relay is a peer too: it holds the room's
+ * Joins rooms through a Pairdraw Cloud relay. The relay is a peer too: it holds the room's
  * document, so a newcomer gets it without anyone else online, and it drops writes from viewers.
  */
 export function createCloudRelayJoin(options: CloudRelayOptions): JoinCollabRoom {

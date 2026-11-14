@@ -4,7 +4,7 @@ import { bytesToHex } from '../node-change/bytes'
 import { forEachImageReference, nameImagesForFigma } from '../node-change/images'
 
 /**
- * Clipboard recipients cannot fetch images from an Pairdraw source file, so the images the
+ * Clipboard recipients cannot fetch images from a Pairdraw source file, so the images the
  * pasted records use travel with them as blobs, each once, under the name Figma reads them by.
  */
 export function embedClipboardImages(

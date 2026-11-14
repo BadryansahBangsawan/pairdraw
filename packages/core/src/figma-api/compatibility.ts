@@ -277,7 +277,7 @@ const _nodeBindingMatch: NodeBindingMatch = true
 
 // --- Surface: nothing beyond Figma's Plugin API except what `surface.ts` lists ---
 // Each check is a `Record` of the offending names, so a failure names them: "Property 'x' is
-// missing". Add a Figma member as Figma types it; put an Pairdraw feature on `pairdraw`.
+// missing". Add a Figma member as Figma types it; put a Pairdraw feature on `pairdraw`.
 
 type HostMembers = (typeof FIGMA_API_HOST_MEMBERS)[number]
 type IncompleteMembers = (typeof FIGMA_API_INCOMPLETE_MEMBERS)[number]

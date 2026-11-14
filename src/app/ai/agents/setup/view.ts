@@ -92,7 +92,7 @@ export type MCPServerSetupState = Pick<
   | 'error'
 >
 
-/** An Pairdraw companion as setup presents it, with the one-click fix that applies. */
+/** A Pairdraw companion as setup presents it, with the one-click fix that applies. */
 export interface CompanionCheck {
   /** Installed and matching this app. */
   ready: boolean

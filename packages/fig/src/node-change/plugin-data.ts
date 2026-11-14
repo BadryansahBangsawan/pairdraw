@@ -39,7 +39,7 @@ const NATIVE_EXPORT_FORMATS: Record<string, ExportFormatId> = {
   PDF: 'pdf'
 }
 
-/** An Pairdraw plugin-data value on a record read from a `.fig` file. */
+/** A Pairdraw plugin-data value on a record read from a `.fig` file. */
 export function readNodeChangePluginData<T>(
   nc: Pick<NodeChange, 'pluginData'>,
   field: PluginDataField<T>

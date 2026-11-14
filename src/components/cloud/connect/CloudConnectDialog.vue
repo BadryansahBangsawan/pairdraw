@@ -33,7 +33,7 @@ import type {
 const cloudConnect = tv(cloudConnectTheme)
 
 /**
- * Connecting the editor to an Pairdraw Cloud server and signing in: the server's address when
+ * Connecting the editor to a Pairdraw Cloud server and signing in: the server's address when
  * none was chosen yet, then email and password right here, or a provider in the browser. The
  * desktop app and other editors approve a one-time code in the browser for providers.
  */

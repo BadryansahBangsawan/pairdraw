@@ -14,7 +14,7 @@ pub struct DeepLinkJoin {
     pub room: String,
 }
 
-/// An Pairdraw Cloud invitation or a document shared by link, from
+/// A Pairdraw Cloud invitation or a document shared by link, from
 /// `pairdraw://cloud?url=<link>#<secret>`: the web link on its server, `/<invitations|share>/<id>`,
 /// with its secret in the deep link's fragment. The server is the web link's origin.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]

@@ -103,7 +103,7 @@ function blockText(blocks: unknown[]): string | undefined {
 }
 
 /**
- * An Pairdraw tool's result as the built-in chat holds it: the JSON object the tool returned,
+ * A Pairdraw tool's result as the built-in chat holds it: the JSON object the tool returned,
  * with an exported image as `base64` and `mimeType`.
  */
 function ownToolOutput(blocks: unknown[]): unknown {
@@ -123,7 +123,7 @@ function ownToolOutput(blocks: unknown[]): unknown {
   return output
 }
 
-/** An Pairdraw tool reports a failure as `{ "error": … }` text. */
+/** A Pairdraw tool reports a failure as `{ "error": … }` text. */
 function ownToolError(blocks: unknown[]): string | undefined {
   const text = blockText(blocks)
   if (text === undefined) return undefined

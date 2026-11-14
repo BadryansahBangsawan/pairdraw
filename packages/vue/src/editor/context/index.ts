@@ -12,7 +12,7 @@ import type { Editor } from '@pairdraw/core'
 export const EDITOR_KEY: InjectionKey<Editor> = Symbol('pairdraw-editor')
 
 /**
- * Provides an Pairdraw editor instance to the current Vue subtree.
+ * Provides a Pairdraw editor instance to the current Vue subtree.
  *
  * Call this once near the top of your editor shell so descendant composables
  * and headless primitives can access the editor with {@link useEditor}.

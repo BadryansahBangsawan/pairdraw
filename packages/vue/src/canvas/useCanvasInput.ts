@@ -34,7 +34,7 @@ import type { DragState } from '#vue/shared/input/types'
 import { DEFAULT_WHEEL_ZOOM_OPTIONS, type WheelZoomOptions } from '#vue/shared/input/wheel'
 
 /**
- * Wires pointer and mouse interaction to an Pairdraw canvas.
+ * Wires pointer and mouse interaction to a Pairdraw canvas.
  *
  * This composable coordinates selection, dragging, resizing, rotation,
  * panning, drawing tools, scoped hit testing, and text-edit interaction.

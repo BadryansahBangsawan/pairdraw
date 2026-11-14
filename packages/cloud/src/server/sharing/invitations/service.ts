@@ -82,7 +82,7 @@ export function createInvitationService(
     return {
       kind: 'document',
       documentName: invitation.documentName,
-      inviterName: inviter?.name ?? 'An Pairdraw user',
+      inviterName: inviter?.name ?? 'A Pairdraw user',
       permission: invitation.permission,
       expiresAt: dateString(invitation.expiresAt) ?? '',
       recipientHint: recipientHint(invitation.emailNormalized)
@@ -153,7 +153,7 @@ export function createInvitationService(
           ? {
               deliveryId: id,
               recipientEmail: input.email,
-              inviterName: deliveryContext[0]?.name ?? 'An Pairdraw user',
+              inviterName: deliveryContext[0]?.name ?? 'A Pairdraw user',
               documentName: deliveryContext[1].name,
               permission: input.permission,
               expiresAt: expiresAt.toISOString(),

@@ -16,7 +16,7 @@ import type { UseCanvasOptions } from '#vue/canvas/surface/types'
 export type { UseCanvasOptions } from '#vue/canvas/surface/types'
 
 /**
- * Connects an Pairdraw editor to a real canvas element using CanvasKit.
+ * Connects a Pairdraw editor to a real canvas element using CanvasKit.
  *
  * This composable owns renderer creation, surface recreation on resize,
  * render scheduling, and renderer-backed hit testing helpers used by higher-

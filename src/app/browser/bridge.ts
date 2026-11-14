@@ -8,7 +8,7 @@ import type { NavigationBenchmarkHooks } from '@/app/performance/navigation/hook
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { IS_BROWSER } from '@/constants'
 
-export interface PairdrawTestHooks {
+interface PairdrawTestHooks {
   writeCount?: () => number
   mockHandle?: FileSystemFileHandle
   savedOpen?: Window['open']

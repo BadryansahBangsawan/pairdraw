@@ -2,7 +2,6 @@ import type {
   PrototypeAction,
   PrototypeActionType,
   PrototypeNodeAction,
-  PrototypeOverlayPositionType,
   PrototypeReaction,
   PrototypeTransitionType,
   PrototypeTriggerType
@@ -150,13 +149,4 @@ export function setActionChoice(
 ): PrototypeReaction {
   if (choice === 'BACK' || choice === 'CLOSE') return setActionType(reaction, choice)
   return setNavigation(setActionType(reaction, 'NODE'), choice)
-}
-
-export function setOverlayPosition(
-  reaction: PrototypeReaction,
-  overlayPosition: PrototypeOverlayPositionType
-): PrototypeReaction {
-  const current = primaryAction(reaction)
-  if (current?.type !== 'NODE') return reaction
-  return replaceAction(reaction, { ...current, overlayPosition })
 }

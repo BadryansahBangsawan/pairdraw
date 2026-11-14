@@ -11,8 +11,6 @@ export const pluginCapabilityKeys = {
   'settings:write': 'pluginsCapabilitySettingsWrite'
 } as const satisfies Record<PluginCapability, string>
 
-export type PluginCapabilityKey = (typeof pluginCapabilityKeys)[PluginCapability]
-
 /**
  * The capabilities this version's host can actually perform. The rest stay ungranted: a plugin
  * may ask for them, and the prompt says they are not available yet.

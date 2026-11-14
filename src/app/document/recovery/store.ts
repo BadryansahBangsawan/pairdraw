@@ -93,10 +93,6 @@ export function getRecoveryStore(): RecoveryStore {
   return singleton
 }
 
-export function isRecoveryStoreMemoryFallback(): boolean {
-  return memoryFallback
-}
-
 export function resetRecoveryStoreForTests(store?: RecoveryStore): void {
   singleton = store ?? null
   memoryFallback = false

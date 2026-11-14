@@ -25,7 +25,7 @@ export type SyncedStoreOptions = {
   bindGraphEvents?: boolean
 }
 
-export function createSyncedStores(options: SyncedStoreOptions = {}) {
+function createSyncedStores(options: SyncedStoreOptions = {}) {
   const hostStore = createEditorStore(new SceneGraph())
   const peerStore = createEditorStore(new SceneGraph())
   const hostDoc = options.hostDoc ?? new Y.Doc()

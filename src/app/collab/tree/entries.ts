@@ -11,7 +11,7 @@ export interface ParentEdge {
 }
 
 /** Newer placements first; equal counters from concurrent moves fall back to the parent id. */
-export function compareEdges(a: ParentEdge, b: ParentEdge): number {
+function compareEdges(a: ParentEdge, b: ParentEdge): number {
   if (a.counter !== b.counter) return b.counter - a.counter
   if (a.parentId === b.parentId) return 0
   return a.parentId < b.parentId ? 1 : -1

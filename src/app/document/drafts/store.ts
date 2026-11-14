@@ -101,7 +101,7 @@ export async function readDraft(
   return figBytes ? { ...toDraftMeta(meta), figBytes } : null
 }
 
-export async function readDraftThumbnail(id: string): Promise<Uint8Array | null> {
+async function readDraftThumbnail(id: string): Promise<Uint8Array | null> {
   const store = getLocalCanvasStore()
   return isDraft(await store.getMeta(id)) ? store.readThumb(id) : null
 }

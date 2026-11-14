@@ -18,7 +18,7 @@ export const BROWSER_NODE_FAILURE = {
   failed: 'failed'
 } as const
 
-export type BrowserNodeFailure = (typeof BROWSER_NODE_FAILURE)[keyof typeof BROWSER_NODE_FAILURE]
+type BrowserNodeFailure = (typeof BROWSER_NODE_FAILURE)[keyof typeof BROWSER_NODE_FAILURE]
 
 /** The catalog strings a heading is chosen from. Each one is a sentence, already translated. */
 export interface BrowserNodeFailureCopy {

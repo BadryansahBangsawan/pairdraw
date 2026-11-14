@@ -23,7 +23,7 @@ export interface RunUndoCall extends CallRef {
 export const AI_UNDO_PREFIX = 'AI'
 
 /** The label of an AI tool call's undo entry, which Edit → Undo shows. */
-export function aiUndoLabel(tool: string): string {
+function aiUndoLabel(tool: string): string {
   return `${AI_UNDO_PREFIX}: ${tool}`
 }
 

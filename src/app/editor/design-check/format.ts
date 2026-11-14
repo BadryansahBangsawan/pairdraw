@@ -68,7 +68,7 @@ function stringAt(issue: DesignIssue, key: string): string | undefined {
  * The last two segments of a grouped variable name: `Colors/Blue/600` reads as `Blue/600`,
  * which is enough next to its swatch in a narrow row.
  */
-export function shortVariableName(name: string): string {
+function shortVariableName(name: string): string {
   const segments = name.split('/')
   return segments.length > 2 ? segments.slice(-2).join('/') : name
 }

@@ -26,12 +26,12 @@ export type DirectAIModelRuntime = {
   minReasoningEffort?: ReasoningEffort
 }
 
-export type ACPModelRuntime = {
+type ACPModelRuntime = {
   kind: 'acp'
   role: ResolvedAIModelRole
 }
 
-export type HarnessModelRuntime = {
+type HarnessModelRuntime = {
   kind: 'harness'
   role: ResolvedAIModelRole
 }

@@ -22,8 +22,8 @@ export const PLAYER_PROPERTIES = {
   artist: property('Artist', 'Lumen')
 }
 
-export const PLAYER_WIDTH = 360
-export const ARTWORK_SIZE = 320
+const PLAYER_WIDTH = 360
+const ARTWORK_SIZE = 320
 export const ARTWORK_NAME = 'Artwork'
 
 /** The cover the component draws unless an instance puts something else in the slot. */
@@ -46,7 +46,7 @@ export const COVER_PRESET: ShaderPreset = {
 }
 
 /** A cover that fills the artwork slot with a shader. */
-export function shaderCover(preset: ShaderPreset, name = 'Cover'): TreeNode {
+function shaderCover(preset: ShaderPreset, name = 'Cover'): TreeNode {
   return <Rectangle name={name} w="fill" h="fill" bg={shader(preset)} />
 }
 

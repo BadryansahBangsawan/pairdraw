@@ -120,5 +120,3 @@ export function createCanvasPaneRegistry(state: EditorState) {
     maxVisiblePanes: MAX_VISIBLE_CANVAS_PANES
   }
 }
-
-export type CanvasPaneRegistry = ReturnType<typeof createCanvasPaneRegistry>

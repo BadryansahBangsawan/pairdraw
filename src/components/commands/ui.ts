@@ -2,7 +2,7 @@ import { tv } from 'tailwind-variants'
 
 import commandPaletteTheme from '@/theme/command-palette'
 
-export const commandPalette = tv(commandPaletteTheme)
+const commandPalette = tv(commandPaletteTheme)
 
 export function useCommandPaletteUI() {
   const ui = commandPalette()

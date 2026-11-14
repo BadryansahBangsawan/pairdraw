@@ -9,7 +9,7 @@ import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { testPath } from '../paths'
 import { collectAllNodes } from './traversal'
 
-export const FIXTURES = testPath('fixtures')
+const FIXTURES = testPath('fixtures')
 
 export const VALID_NODE_TYPES = new Set<string>([
   'CANVAS',

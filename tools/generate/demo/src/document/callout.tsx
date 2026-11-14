@@ -13,7 +13,7 @@ import { previewButton } from './chrome'
 import { renderTree } from './icons'
 import type { Theme } from './theme'
 
-export const TIP_PROPERTIES = {
+const TIP_PROPERTIES = {
   step: property('Step', '1'),
   title: property('Title', 'Try this'),
   body: property('Body', 'Select something on the canvas and look at the panel on the right.'),
@@ -21,9 +21,9 @@ export const TIP_PROPERTIES = {
   showKeys: property('Show shortcut', true)
 }
 
-export const TIP_WIDTH = 320
+const TIP_WIDTH = 320
 /** The slot a tip shows where to click in: a piece of the app's chrome with the target ringed. */
-export const WHERE_SLOT_NAME = 'Where'
+const WHERE_SLOT_NAME = 'Where'
 
 /** The Tip main component on the page, with its Where slot defined. */
 export async function createTipComponent(

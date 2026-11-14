@@ -13,7 +13,7 @@ export interface SupportNotice {
   readonly links: readonly SupportLink[]
 }
 
-export interface SupportLink {
+interface SupportLink {
   readonly label: string
   readonly url: string
 }
@@ -24,8 +24,8 @@ export const SYSTEM_REQUIREMENTS_URL =
 export const WEBVIEW2_DOWNLOAD_URL = 'https://developer.microsoft.com/microsoft-edge/webview2/'
 const ISSUE_URL = 'https://github.com/BadryansahBangsawan/pairdraw/issues/new'
 
-export const MINIMUM_MACOS_VERSION = 13
-export const MINIMUM_WEBKITGTK_VERSION = '2.40'
+const MINIMUM_MACOS_VERSION = 13
+const MINIMUM_WEBKITGTK_VERSION = '2.40'
 
 const BROWSER_LABELS = {
   chrome: 'Chrome',
@@ -36,7 +36,7 @@ const BROWSER_LABELS = {
   unknown: 'this browser'
 } as const
 
-export function requirementsSentence(): string {
+function requirementsSentence(): string {
   const { chrome, edge, firefox, safari } = BROWSER_BASELINE
   return `Pairdraw needs Chrome ${chrome}, Edge ${edge}, Firefox ${firefox}, or Safari ${safari} or later.`
 }

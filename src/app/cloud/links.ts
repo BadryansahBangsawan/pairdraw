@@ -48,7 +48,7 @@ export function readCloudLink(url: URL): CloudLink | null {
 }
 
 /** Hands a Cloud link to the desktop app; the browser asks before it opens the app. */
-export function openCloudLinkInDesktop(link: CloudLink): void {
+function openCloudLinkInDesktop(link: CloudLink): void {
   globalThis.location.assign(cloudDesktopLinkURL(link.kind, link.id, link.server, link.secret))
 }
 

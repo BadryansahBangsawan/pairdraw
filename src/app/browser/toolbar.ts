@@ -32,7 +32,7 @@ export function browserZoomRequest(
 }
 
 /** The window says this when the user leaves an element pick without choosing. */
-export const BROWSER_PICK_CANCELLED = 'The pick was cancelled'
+const BROWSER_PICK_CANCELLED = 'The pick was cancelled'
 
 /** A capture failure, or a quiet cancel the toolbar should not treat as a crash. */
 export function browserCaptureFailure(

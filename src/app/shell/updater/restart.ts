@@ -10,7 +10,7 @@ import { restartReplySchema } from './schema'
 // to run the same unsaved-changes approval as Quit before the app restarts.
 export const RESTART_REQUEST_EVENT = 'updater:restart-request'
 export const RESTART_REPLY_EVENT = 'updater:restart-reply'
-export const EDITOR_WINDOW_LABEL = 'main'
+const EDITOR_WINDOW_LABEL = 'main'
 
 /** Called from the Software Update window; resolves true once the editor's documents may close. */
 export async function requestRestartApproval(): Promise<boolean> {

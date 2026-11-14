@@ -41,7 +41,7 @@ type YjsNodeLike = {
  * overrides, kept in maps, are written as their serialized entries; written as maps they arrived
  * as empty objects, and the other peers lost every override.
  */
-export function encodeNodeForYjs(node: SceneNode): Record<string, unknown> {
+function encodeNodeForYjs(node: SceneNode): Record<string, unknown> {
   const encoded: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(node)) {
     if (DERIVED_NODE_FIELDS.has(key as keyof SceneNode) || TREE_FIELDS.has(key)) continue
@@ -87,7 +87,7 @@ export function decodeNodeFromYjs(ynode: YjsNodeLike): Partial<SceneNode> {
   return props
 }
 
-export function normalizeSourceMetadata(source: unknown): SourceMetadata {
+function normalizeSourceMetadata(source: unknown): SourceMetadata {
   const defaults = createDefaultSourceMetadata()
   if (!isPlainObject(source)) return defaults
 

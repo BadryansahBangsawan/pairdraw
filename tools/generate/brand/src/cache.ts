@@ -9,7 +9,7 @@ import { targetDirectory, targetFiles } from './config.ts'
 import type { BrandTarget } from './config.ts'
 import type { BrandFiles } from './web.ts'
 
-export const digest = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex')
+const digest = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex')
 
 const cacheSchema = v.object({ fingerprint: v.string(), outputs: v.record(v.string(), v.string()) })
 

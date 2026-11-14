@@ -7,7 +7,7 @@ import type { EditorStore } from '@/app/editor/session'
 import { followUpload, kickSyncEngine } from '@/app/storage/sync'
 
 /** How long a tab waits for the room's saver to say the document is on its server. */
-export const ROOM_UPLOAD_TIMEOUT_MS = 60_000
+const ROOM_UPLOAD_TIMEOUT_MS = 60_000
 
 const idSchema = v.pipe(v.string(), v.minLength(1), v.maxLength(64))
 const uploadMessageSchema = v.pipe(

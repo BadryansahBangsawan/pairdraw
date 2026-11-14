@@ -18,6 +18,4 @@ const canvasPaneHeaderTheme = {
     active: false
   }
 }
-
-export type CanvasPaneHeaderTheme = typeof canvasPaneHeaderTheme
 export default canvasPaneHeaderTheme

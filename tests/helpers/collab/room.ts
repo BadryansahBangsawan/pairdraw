@@ -104,7 +104,7 @@ export type Peer = {
 }
 
 /** The app URL for a path, on the test transport through the given relay. */
-export function relayURLFor(path: string, relayURL: string): string {
+function relayURLFor(path: string, relayURL: string): string {
   return `${path}?test&collabTransport=test&collabRelay=${encodeURIComponent(relayURL)}`
 }
 

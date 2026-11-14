@@ -65,7 +65,7 @@ export interface CommentPreferences {
 }
 
 /** Whether guided AI setup was offered and finished or skipped. */
-export const AI_SETUP_STATES = ['pending', 'done'] as const
+const AI_SETUP_STATES = ['pending', 'done'] as const
 export type AISetupState = (typeof AI_SETUP_STATES)[number]
 
 /** Which events send a system notification while Pairdraw is out of view. */

@@ -16,7 +16,7 @@ import type { ChangePreviewSize } from '@/app/settings/preferences/store'
 import type { ToolChangeImages } from './types'
 
 /** Longest stored image edge, in pixels, for each preview size. */
-export const CHANGE_PREVIEW_MAX_EDGE: Record<Exclude<ChangePreviewSize, 'off'>, number> = {
+const CHANGE_PREVIEW_MAX_EDGE: Record<Exclude<ChangePreviewSize, 'off'>, number> = {
   small: 240,
   medium: 480,
   large: 960

@@ -25,7 +25,3 @@ export function setAgentCommands(agentId: string, commands: readonly AvailableCo
     }))
   }
 }
-
-export function agentCommand(name: string): string {
-  return `/${name} `
-}

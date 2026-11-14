@@ -52,6 +52,4 @@ const tabBarTheme = {
     home: false
   }
 }
-
-export type TabBarTheme = typeof tabBarTheme
 export default tabBarTheme

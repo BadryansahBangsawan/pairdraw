@@ -1,8 +1,7 @@
 import type { Page } from '@playwright/test'
 
 /** Dialogs, alert dialogs, and popovers as Reka renders their content. */
-export const OVERLAY_SELECTOR =
-  '[role="dialog"], [role="alertdialog"], [data-slot="popover-content"]'
+const OVERLAY_SELECTOR = '[role="dialog"], [role="alertdialog"], [data-slot="popover-content"]'
 
 /** What the overlay showed on one animation frame: its text, or null when none was in the page. */
 export type OverlayFrame = string | null

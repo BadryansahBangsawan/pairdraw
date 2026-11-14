@@ -10,14 +10,14 @@ import {
   shareDocument,
   type JoinRoomOptions
 } from '@/app/collab/rooms'
-import { DEFAULT_COLLAB_STATE, type CollabState, type RemotePeer } from '@/app/collab/types'
+import { DEFAULT_COLLAB_STATE, type CollabState } from '@/app/collab/types'
 import { follow, presenceOf } from '@/app/presence/registry'
 import type { FollowTarget } from '@/app/presence/types'
 import { activeTab } from '@/app/tabs'
 
 export { COLLAB_KEY, useCollabInjected } from '@/app/collab/context'
 export { DEFAULT_COLLAB_STATE }
-export type { CollabState, RemotePeer }
+export type { CollabState }
 
 /**
  * The collaboration UI's view of the active tab: its room, if it is in one, and the app-wide

@@ -70,5 +70,3 @@ export async function pruneDiagnostics(retention: DiagnosticsRetention): Promise
   const { diagnostics } = await import('./recorder')
   await diagnostics.prune(retention)
 }
-
-export const diagnosticsRetentionOptions = computed(() => diagnosticsRetentionPresets)

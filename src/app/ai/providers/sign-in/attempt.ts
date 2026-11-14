@@ -5,7 +5,7 @@ import { createDeferred } from '@/app/runtime/deferred'
 import { pkceChallenge, pkceSecrets, type PKCE } from './pkce'
 
 export type SignInFailure = 'cancelled' | 'expired' | 'failed'
-export type SignInResult<T, F extends string = never> =
+type SignInResult<T, F extends string = never> =
   | { ok: true; value: T }
   | { ok: false; reason: SignInFailure | F }
 

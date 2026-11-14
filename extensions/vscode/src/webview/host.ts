@@ -6,7 +6,7 @@ import { EMBED_DOCUMENT_FORMATS, EMBED_IMAGE_FORMATS } from '../embed/protocol'
 import type { WebviewMessage } from './messages'
 
 /** Messages the extension sends the webview that hosts the editor iframe. */
-export const hostMessageSchema = v.variant('type', [
+const hostMessageSchema = v.variant('type', [
   v.object({ type: v.literal('load'), name: v.string(), data: v.string() }),
   v.object({
     type: v.literal('save'),

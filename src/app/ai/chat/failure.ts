@@ -2,7 +2,7 @@ import { APICallError, StreamProviderError } from 'ai'
 
 import { AgentSignInRequiredError } from '@/app/ai/agents/acp/auth/required'
 
-export type AIChatFailureReason =
+type AIChatFailureReason =
   | 'authentication'
   | 'forbidden'
   | 'insufficient-credit'
@@ -24,7 +24,7 @@ export type AIChatFailure = {
   resetsAt?: string
 }
 
-export type ProviderErrorShape = {
+type ProviderErrorShape = {
   statusCode?: unknown
   status?: unknown
   responseStatusCode?: unknown

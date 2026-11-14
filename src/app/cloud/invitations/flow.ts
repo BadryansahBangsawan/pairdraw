@@ -55,7 +55,7 @@ const pending = computed<PendingInvitation | null>(() => {
 
 export const cloudInvitationOpen = ref(false)
 export const cloudInvitationState = ref<CloudInvitationState>('loading')
-export const cloudInvitationPreview = shallowRef<InvitationPreview | null>(null)
+const cloudInvitationPreview = shallowRef<InvitationPreview | null>(null)
 
 const knownServer = () => {
   const url = pending.value ? normalizeCloudServerURL(pending.value.server) : null

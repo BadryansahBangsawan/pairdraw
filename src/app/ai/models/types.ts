@@ -1,7 +1,7 @@
 import type { AIProviderID } from '@pairdraw/core/constants'
 
 export const AI_MODEL_ROLES = ['design', 'review', 'fast', 'vision'] as const
-export const AI_MODEL_CAPABILITIES = ['tools', 'vision'] as const
+const AI_MODEL_CAPABILITIES = ['tools', 'vision'] as const
 /** `default` leaves the effort to the provider; the rest follow the AI SDK reasoning levels. */
 export const THINKING_LEVELS = [
   'default',
@@ -45,7 +45,7 @@ export type AIModelProfile = {
   capabilities: AIModelCapability[]
 }
 
-export type AIModelAssignments = {
+type AIModelAssignments = {
   design: AIModelProfileId
   review: AIModelRoleAssignment
   fast: AIModelRoleAssignment

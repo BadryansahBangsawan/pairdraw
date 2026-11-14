@@ -21,17 +21,10 @@ import {
   SCRIPT_MAX_NODES,
   type ScriptSandboxResult
 } from '@/app/code/script/sandbox/types'
-import {
-  runInSandboxFrame,
-  type SandboxFrame,
-  type SandboxFrameFactory
-} from '@/app/runtime/sandbox-frame'
+import { runInSandboxFrame, type SandboxFrame } from '@/app/runtime/sandbox-frame'
 
 /** One sandbox frame, as the host drives it; the app supplies the iframe, a test a double. */
 export type ScriptFrame = SandboxFrame
-
-/** The frame to run in; the app's iframe when missing. */
-export type ScriptFrameFactory = SandboxFrameFactory
 
 export interface ScriptEvaluateOptions {
   inputs?: Record<string, ScriptInputValue>

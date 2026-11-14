@@ -7,7 +7,7 @@ import type { AppMenuActionItem, AppMenuEntry, AppMenuGroupSchema } from '@/app/
 import { shortcutTokenToAccelerator } from '@/app/shell/menu/shortcut'
 
 export const MENU_PATH = 'desktop/generated/menu.json'
-export const APP_MENU_PATH = 'desktop/generated/app-menu.json'
+const APP_MENU_PATH = 'desktop/generated/app-menu.json'
 
 function isNativeVisible(entry: { target?: string }): boolean {
   return entry.target !== 'browser'
@@ -64,7 +64,7 @@ export function cleanGroup(group: AppMenuGroupSchema): unknown | null {
   }
 }
 
-export function renderMenu(): string {
+function renderMenu(): string {
   const menu = compact(APP_MENU_SCHEMA.map(cleanGroup))
   return `${JSON.stringify(menu, null, 2)}\n`
 }

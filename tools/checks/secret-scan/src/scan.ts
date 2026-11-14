@@ -1,4 +1,4 @@
-export const GITLEAKS_VERSION = 'v8.30.1'
+const GITLEAKS_VERSION = 'v8.30.1'
 export const GITLEAKS_MODULE = `github.com/zricethezav/gitleaks/v8@${GITLEAKS_VERSION}`
 export const GITLEAKS_ARGS = ['dir', '--config', '.gitleaks.toml', '--redact', '--no-banner', '.']
 

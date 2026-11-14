@@ -1,6 +1,6 @@
 import type { EditorPreparation, EditorPreparationProgress } from '@/app/editor/preparation/types'
 
-export const preparationPhaseLabels = {
+const preparationPhaseLabels = {
   reading: 'Reading document',
   decoding: 'Decoding Figma document',
   materializing: 'Preparing layers',

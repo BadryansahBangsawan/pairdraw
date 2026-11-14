@@ -19,6 +19,4 @@ const layoutAlignmentTheme = {
     disabled: false
   }
 }
-
-export type LayoutAlignmentTheme = typeof layoutAlignmentTheme
 export default layoutAlignmentTheme

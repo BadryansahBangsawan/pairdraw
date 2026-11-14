@@ -236,7 +236,7 @@ export const linkedElements = StateField.define<LinkedElement[]>({
 })
 
 /** The innermost linked element around a document position. */
-export function linkedElementAt(state: EditorState, pos: number): LinkedElement | null {
+function linkedElementAt(state: EditorState, pos: number): LinkedElement | null {
   let best: LinkedElement | null = null
   for (const element of state.field(linkedElements)) {
     if (pos < element.from || pos >= element.to) continue

@@ -6,7 +6,7 @@ import * as v from 'valibot'
  */
 const RELEASE_VERSION = String.raw`(\d+)\.(\d+)\.(\d+)(?:-beta\.([1-9]\d{0,3}))?`
 
-export const releaseVersionSchema = v.pipe(v.string(), v.regex(new RegExp(`^${RELEASE_VERSION}$`)))
+const releaseVersionSchema = v.pipe(v.string(), v.regex(new RegExp(`^${RELEASE_VERSION}$`)))
 export const releaseTagSchema = v.pipe(v.string(), v.regex(new RegExp(`^v${RELEASE_VERSION}$`)))
 
 /** npm dist-tag for pre-releases; stable releases keep npm's default `latest`. */

@@ -167,7 +167,6 @@ export {
   isVueBindDirective,
   isVueSourceFile,
   sourceLineCount,
-  vueComponentSource,
   vueSfcDescriptor,
   vueTemplateAst,
   walkExpressionAst,

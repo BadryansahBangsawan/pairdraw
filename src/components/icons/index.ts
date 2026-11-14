@@ -77,7 +77,7 @@ export const NODE_ICONS: Partial<Record<string, typeof IconSquare>> = {
   SCRIPT: IconCode
 }
 
-export const AUTO_LAYOUT_ICONS: Partial<Record<string, typeof IconSquare>> = {
+const AUTO_LAYOUT_ICONS: Partial<Record<string, typeof IconSquare>> = {
   VERTICAL: IconRows,
   HORIZONTAL: IconColumns,
   GRID: IconGrid

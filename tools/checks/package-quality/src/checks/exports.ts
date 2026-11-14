@@ -34,7 +34,7 @@ function sourceOf(directory: string, target: unknown): string | null {
 }
 
 /** Every name each public package's entries export, resolved through re-exports. */
-export async function collectEntryExports(root: string): Promise<EntryExport[]> {
+async function collectEntryExports(root: string): Promise<EntryExport[]> {
   const packages = await discoverPublicPackages(root)
   const entries = packages.flatMap(({ directory, manifest }) =>
     Object.entries(isPlainObject(manifest.exports) ? manifest.exports : {}).flatMap(

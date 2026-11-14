@@ -8,7 +8,7 @@ import { layoutChapter, type ChapterContext } from './chapter'
 import { CHAPTERS } from './names'
 
 /** The variant of the set `setId` named `name`. */
-export function variantOf(graph: SceneGraph, setId: string, name: string): string {
+function variantOf(graph: SceneGraph, setId: string, name: string): string {
   const variant = graph.getChildren(setId).find((child) => child.name === name)
   if (!variant) throw new Error(`The set has no variant "${name}"`)
   return variant.id

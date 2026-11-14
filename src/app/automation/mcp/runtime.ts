@@ -18,7 +18,7 @@ import {
   spawnMCPIfNeeded
 } from './spawn'
 
-export type MCPRuntimeStatus = 'idle' | 'starting' | 'running' | 'stopped' | 'error'
+type MCPRuntimeStatus = 'idle' | 'starting' | 'running' | 'stopped' | 'error'
 
 export interface MCPRuntimeState {
   status: MCPRuntimeStatus

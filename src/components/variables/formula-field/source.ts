@@ -12,7 +12,7 @@ export interface FormulaSelection {
   end: number
 }
 
-export interface FormulaSegment extends FormulaSelection {
+interface FormulaSegment extends FormulaSelection {
   source: string
   pill?: FormulaPill
 }

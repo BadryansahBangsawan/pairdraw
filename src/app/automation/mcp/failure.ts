@@ -42,7 +42,7 @@ export interface MCPFailure {
 }
 
 /** Maximum diagnostic detail length retained for display. */
-export const MCP_FAILURE_DETAIL_LIMIT = 400
+const MCP_FAILURE_DETAIL_LIMIT = 400
 
 /**
  * Reasons a restart fixes. A missing or outdated server is fixed by installing it, which restarts
@@ -85,9 +85,4 @@ export function classifySpawnFailure(error: unknown): MCPFailure {
   if (error instanceof MCPStartupError) return error.failure
   if (PERMISSION_PATTERN.test(message)) return mcpFailure('permission-denied', message)
   return mcpFailure('unknown', message)
-}
-
-export function failureFromError(error: unknown): MCPFailure {
-  if (error instanceof MCPStartupError) return error.failure
-  return classifySpawnFailure(error)
 }

@@ -40,7 +40,7 @@ import { setPeers } from '@/app/presence/registry'
 import { ROOM_STATUS_TICK_MS, ROOM_UNREACHABLE_MS } from '@/constants'
 
 /** How a tab came to be in a room: by sharing its own document, or by joining someone's. */
-export type RoomOrigin = 'shared' | 'joined'
+type RoomOrigin = 'shared' | 'joined'
 
 /** Who this tab is in a room: the name and color everyone sees, this tab included. */
 export type RoomIdentity = { name: Readonly<Ref<string>>; color: Color }
@@ -84,7 +84,7 @@ export interface RoomSession {
 }
 
 /** This device's saved copy of a room, so it opens before anyone else is online. */
-export interface RoomSavedCopy {
+interface RoomSavedCopy {
   whenSynced: Promise<unknown>
   destroy(): unknown
 }

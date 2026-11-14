@@ -15,7 +15,7 @@ export interface GuideMapResult {
   listed: string[]
 }
 
-export const ROOT_GUIDE = 'AGENTS.md'
+const ROOT_GUIDE = 'AGENTS.md'
 const DEFAULT_IGNORED_DIRECTORIES = ['dist', 'node_modules', 'scratch', 'target']
 const GUIDE_REFERENCE = /`((?:[\w.-]+\/)+AGENTS\.md)`/g
 

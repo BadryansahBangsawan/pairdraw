@@ -7,7 +7,7 @@ import { randomIndex } from '@pairdraw/scene-graph/random'
 import { generateGuestName } from '@/app/collab/guest-name'
 import { PEER_COLORS } from '@/constants'
 
-export const COLLAB_NAME_STORAGE_KEY = 'op-collab-name'
+const COLLAB_NAME_STORAGE_KEY = 'op-collab-name'
 
 /**
  * Who this person is in every room: one name for the whole app, kept across sessions, and one

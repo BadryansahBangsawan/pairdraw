@@ -42,7 +42,7 @@ export interface EditorToolCall {
   isLive?: () => boolean
 }
 
-export const STOPPED_BEFORE_CALL = 'Stopped before this call ran; nothing was changed.'
+const STOPPED_BEFORE_CALL = 'Stopped before this call ran; nothing was changed.'
 
 /**
  * The page a call writes to: a parent or a replaced layer on another page puts the new layers

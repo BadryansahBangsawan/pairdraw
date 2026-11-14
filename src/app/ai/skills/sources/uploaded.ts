@@ -17,7 +17,7 @@ const MAX_FILES = 200
 const MAX_UNPACKED_BYTES = 20 * 1024 * 1024
 
 /** A text file in an uploaded skill, by its path inside the skill's folder. */
-export interface StoredSkillFile {
+interface StoredSkillFile {
   path: string
   content: string
 }

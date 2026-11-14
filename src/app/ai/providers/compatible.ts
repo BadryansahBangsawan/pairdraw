@@ -9,7 +9,7 @@ import type { ModelConfig, ModelProviderAdapter } from '@/app/ai/providers/types
 // opaque "failed to fetch". The desktop build goes through tauriFetch and is not subject to CORS.
 const BROWSER_ACCESS_HEADERS = { 'anthropic-dangerous-direct-browser-access': 'true' }
 
-export type CompatibleEndpoint = string | ((config: ModelConfig) => string)
+type CompatibleEndpoint = string | ((config: ModelConfig) => string)
 
 type OpenAICompatibleOptions = {
   baseURL?: CompatibleEndpoint

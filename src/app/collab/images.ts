@@ -20,7 +20,7 @@ export interface RoomImageStore {
 }
 
 /** How long a peer waits before asking again for an image it could not load, by attempt. */
-export function imageRetryDelayMs(attempt: number): number {
+function imageRetryDelayMs(attempt: number): number {
   return Math.min(1000 * 2 ** attempt, 60_000)
 }
 

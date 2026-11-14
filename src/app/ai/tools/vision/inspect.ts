@@ -1,6 +1,4 @@
-import { valibotSchema } from '@ai-sdk/valibot'
-import { generateText, tool } from 'ai'
-import * as v from 'valibot'
+import { generateText } from 'ai'
 
 import { computeContentBounds } from '@pairdraw/core/io/formats/raster'
 
@@ -11,7 +9,6 @@ import type { VisionModelDependencies } from '@/app/ai/tools/vision/runtime'
 import type { EditorStore } from '@/app/editor/active-store'
 
 const DEFAULT_VISION_MAX_EDGE = 1280
-const MAX_VISION_MAX_EDGE = 4096
 const MAX_VISION_OUTPUT_TOKENS = 1200
 
 export type VisualInspectionRequest = {
@@ -97,19 +94,4 @@ export async function inspectRenderedDesign(
       height: Math.ceil(height * scale)
     }
   }
-}
-
-export function createVisualInspectionTool(store: EditorStore) {
-  return tool({
-    description:
-      'Render the current selection or specified nodes and ask the isolated Vision model to inspect their visual appearance. Returns text findings only; the image is not added to the Design chat history. Use only for explicit visual review or rendering diagnosis.',
-    inputSchema: valibotSchema(
-      v.object({
-        ids: v.optional(v.array(v.string())),
-        question: v.optional(v.string()),
-        maxEdge: v.optional(v.pipe(v.number(), v.minValue(64), v.maxValue(MAX_VISION_MAX_EDGE)))
-      })
-    ),
-    execute: (request) => inspectRenderedDesign(store, request)
-  })
 }

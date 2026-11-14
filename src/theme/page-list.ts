@@ -41,6 +41,4 @@ const pageListTheme = {
     dragging: false
   }
 }
-
-export type PageListTheme = typeof pageListTheme
 export default pageListTheme

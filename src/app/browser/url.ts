@@ -16,7 +16,7 @@ export type BrowserURLPolicy =
   | { ok: false; reason: BrowserURLRejection; input: string }
 
 /** The schemes the browser opens. Exported so a test can prove the list holds no others. */
-export const BROWSER_URL_SCHEMES = ['http:', 'https:'] as const
+const BROWSER_URL_SCHEMES = ['http:', 'https:'] as const
 
 /** `scheme:` as RFC 3986 spells it. */
 const SCHEME = /^([a-z][a-z0-9+.-]*):/i

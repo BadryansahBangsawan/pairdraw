@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 
 import { UNIT_TEST_GROUPS } from '@pairdraw/unit-tests-tools/shards'
 
-export const ENGINE_TESTS_ROOT = 'tests/engine'
+const ENGINE_TESTS_ROOT = 'tests/engine'
 export const ENGINE_BASELINE_PATH = 'tools/checks/test-homes/engine-baseline.txt'
 
 export interface TestHomesOptions {

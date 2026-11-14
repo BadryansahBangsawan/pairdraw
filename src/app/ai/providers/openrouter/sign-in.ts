@@ -21,13 +21,13 @@ import {
 } from './oauth'
 
 /** Served from `public/`; it relays the redirect to the editor over this channel. */
-export const OPENROUTER_CALLBACK_PATH = '/oauth/openrouter.html'
-export const OPENROUTER_CALLBACK_CHANNEL = 'pairdraw:openrouter-oauth'
+const OPENROUTER_CALLBACK_PATH = '/oauth/openrouter.html'
+const OPENROUTER_CALLBACK_CHANNEL = 'pairdraw:openrouter-oauth'
 /**
  * Served from `public/` on a hosted web app, when a build names one; it hands the redirect to the
  * desktop app's deep link.
  */
-export const OPENROUTER_DESKTOP_CALLBACK_PATH = '/oauth/openrouter-desktop.html'
+const OPENROUTER_DESKTOP_CALLBACK_PATH = '/oauth/openrouter-desktop.html'
 const POPUP_NAME = 'pairdraw-openrouter'
 
 export type OpenRouterSignInFailure = SignInFailure | 'blocked'

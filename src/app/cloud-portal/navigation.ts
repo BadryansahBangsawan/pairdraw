@@ -7,7 +7,7 @@ import type { CloudAccountStatus } from '@pairdraw/cloud/contract'
 export const PORTAL_HOME = '/'
 
 /** The signed-in person's own settings, where a page they may not open sends them. */
-export const ACCOUNT_PAGE = '/account'
+const ACCOUNT_PAGE = '/account'
 
 /** A same-origin path to continue to after a sign-in step, from a `redirect` query value. */
 export function continuationPath(value: unknown): string {
@@ -36,7 +36,7 @@ const STANDING_PATHS: Record<CloudAccountStatus['state'], string | null> = {
 const STANDING_PAGES = new Set(Object.values(STANDING_PATHS))
 
 /** The page an account in this standing belongs on, or null when it may go anywhere. */
-export function standingPath(account: CloudAccountStatus | null): string | null {
+function standingPath(account: CloudAccountStatus | null): string | null {
   if (!account) return null
   return STANDING_PATHS[account.state]
 }

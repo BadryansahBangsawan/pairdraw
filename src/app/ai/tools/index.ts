@@ -29,7 +29,6 @@ export {
   recordStep,
   runAgentId,
   runPageId,
-  runUndoEntries,
   startRun
 } from '@/app/ai/reply/run'
 
@@ -104,5 +103,3 @@ export function createAITools(
     { tool }
   )
 }
-
-export type AITools = ReturnType<typeof createAITools>

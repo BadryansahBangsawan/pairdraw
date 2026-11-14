@@ -43,7 +43,6 @@ const credentialRevision = ref(0)
 
 export const isACPProvider = computed(() => providerID.value.startsWith('acp:'))
 export const isHarnessProvider = computed(() => providerID.value === 'harness:pi')
-export const isAgentProvider = computed(() => isACPProvider.value || isHarnessProvider.value)
 
 export const isConfigured = computed(() => {
   // The desktop app runs agents itself; the web app through a paired companion.

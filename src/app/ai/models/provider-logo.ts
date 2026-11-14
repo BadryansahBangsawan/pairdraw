@@ -6,7 +6,7 @@ import { modelConnection } from './store'
 import type { AIModelProfile } from './types'
 
 /** The brands `ProviderLogo` draws: AI companies, platforms, local servers, and coding agents. */
-export const PROVIDER_LOGOS = [
+const PROVIDER_LOGOS = [
   'anthropic',
   'openai',
   'google',

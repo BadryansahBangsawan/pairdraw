@@ -56,7 +56,7 @@ export function chatReference(kind: string, id: string, label: string): ChatRefe
   return isKind(kind) && id ? { kind, id, label } : null
 }
 
-export function referenceURL({ kind, id }: Pick<ChatReference, 'kind' | 'id'>): string {
+function referenceURL({ kind, id }: Pick<ChatReference, 'kind' | 'id'>): string {
   return `${SCHEME}${kind}/${encodeURIComponent(id)}`
 }
 

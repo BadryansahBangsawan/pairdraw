@@ -31,6 +31,4 @@ const placeholderTheme = {
     size: 'panel' as const
   }
 } as const
-
-export type PlaceholderTheme = typeof placeholderTheme
 export default placeholderTheme

@@ -7,11 +7,6 @@ import { createShaderRasterizer } from '@pairdraw/vue/canvas/surface'
 
 import { useCollabIdentity } from '@/app/collab/identity'
 import { recordPreparationOutcome } from '@/app/diagnostics'
-import {
-  getActiveEditorStore,
-  setActiveEditorStore,
-  useEditorStore
-} from '@/app/editor/active-store'
 import { resolveFigmaClipboardImages } from '@/app/editor/clipboard/figma-images'
 import { loadFont } from '@/app/editor/fonts'
 import { appIcons } from '@/app/editor/icons/provider'
@@ -38,8 +33,7 @@ import { createDeferred } from '@/app/runtime/deferred'
 import { toast } from '@/app/shell/ui'
 import { IS_BROWSER, IS_TAURI } from '@/constants'
 
-export { EDITOR_TOOLS as TOOLS, TOOL_SHORTCUTS } from '@pairdraw/core'
-export type { EditorToolDef as ToolDef, Tool } from '@pairdraw/core'
+export { TOOL_SHORTCUTS } from '@pairdraw/core'
 
 function buildEditorStore(initialGraph?: SceneGraph) {
   const graph = initialGraph ?? new SceneGraph()
@@ -250,5 +244,3 @@ function buildEditorStore(initialGraph?: SceneGraph) {
 export const createEditorStore = scopedStoreFactory(buildEditorStore)
 
 export type EditorStore = ReturnType<typeof createEditorStore>
-
-export { getActiveEditorStore, setActiveEditorStore, useEditorStore }

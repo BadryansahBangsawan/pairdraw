@@ -8,6 +8,4 @@ const figJamControlsTheme = {
     optionIcon: 'size-4 shrink-0 text-muted'
   }
 }
-
-export type FigJamControlsTheme = typeof figJamControlsTheme
 export default figJamControlsTheme

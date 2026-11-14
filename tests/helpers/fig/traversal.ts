@@ -1,4 +1,4 @@
-import type { NodeType, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 
 export function collectAllNodes(graph: SceneGraph): SceneNode[] {
   const all: SceneNode[] = []
@@ -16,14 +16,6 @@ export function collectAllNodes(graph: SceneGraph): SceneNode[] {
     }
   }
   return all
-}
-
-export function countByType(nodes: SceneNode[]): Map<NodeType, number> {
-  const counts = new Map<NodeType, number>()
-  for (const node of nodes) {
-    counts.set(node.type, (counts.get(node.type) ?? 0) + 1)
-  }
-  return counts
 }
 
 export function childNamed(

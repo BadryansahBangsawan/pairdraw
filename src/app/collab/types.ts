@@ -20,7 +20,7 @@ export interface RemotePeer {
 }
 
 /** What a person in a room's voice call publishes about it. */
-export interface VoiceMembership {
+interface VoiceMembership {
   muted: boolean
 }
 

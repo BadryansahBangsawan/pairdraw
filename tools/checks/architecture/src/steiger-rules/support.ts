@@ -12,7 +12,7 @@ export type Diagnostic = {
   location: { path: string; line?: number; column?: number }
 }
 
-export type RuleResult = { diagnostics: Diagnostic[] }
+type RuleResult = { diagnostics: Diagnostic[] }
 export type Rule = { name: string; check: (root: TreeEntry) => RuleResult }
 
 type FileRuleCheck = (sourceRel: string) => string | null

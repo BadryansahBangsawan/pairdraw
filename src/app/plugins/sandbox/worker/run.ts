@@ -13,7 +13,7 @@ import {
 } from '../schema'
 
 export const PLUGIN_RESULT_INVALID_ERROR = 'Plugin result is not valid.'
-export const PLUGIN_CALL_UNAVAILABLE_ERROR = 'This plugin cannot call tools.'
+const PLUGIN_CALL_UNAVAILABLE_ERROR = 'This plugin cannot call tools.'
 
 /** What a program's `plugin.call` reaches: the host, which answers with the tool's result. */
 export type PluginToolCall = (name: string, args: unknown) => Promise<unknown>
@@ -28,7 +28,7 @@ const AsyncFunction = Object.getPrototypeOf(async () => undefined).constructor a
  * The global a plugin is handed: the host's tools, and the canvas pointer. `pointer` resolves with
  * the sequence's points in order once the user releases, or `null` when it was cancelled.
  */
-export function createPluginAPI(call: PluginToolCall): Readonly<{
+function createPluginAPI(call: PluginToolCall): Readonly<{
   call: PluginToolCall
   /** The next pointer sequence in document coordinates, or `null` when the user cancelled it. */
   pointer: () => Promise<PluginPointerPoint[] | null>
@@ -40,7 +40,7 @@ export function createPluginAPI(call: PluginToolCall): Readonly<{
 }
 
 /** Serialize a program's return value, or throw when it cannot cross as JSON text. */
-export function pluginResultText(value: unknown): string {
+function pluginResultText(value: unknown): string {
   if (value === undefined) return ''
   let text: string | undefined
   try {

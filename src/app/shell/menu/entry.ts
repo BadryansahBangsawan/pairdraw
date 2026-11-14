@@ -4,7 +4,7 @@ export function isMenuSeparator(entry: MenuEntry) {
   return 'separator' in entry && entry.separator
 }
 
-export function isMenuAction(entry: MenuEntry): entry is MenuActionNode {
+function isMenuAction(entry: MenuEntry): entry is MenuActionNode {
   return !isMenuSeparator(entry)
 }
 

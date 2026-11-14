@@ -7,12 +7,12 @@ import type {
   LocalCanvasWriteInput
 } from '@/app/storage/local-store/types'
 
-export type UpdateLocalCanvasMetaOptions = {
+type UpdateLocalCanvasMetaOptions = {
   /** Apply only if the row still has this revision. */
   expectedRevision?: number
 }
 
-export type RemoveLocalCanvasOptions = {
+type RemoveLocalCanvasOptions = {
   /** Remove only if the row is still in this state, checked in the same transaction. */
   unchangedFrom?: LocalCanvasState
 }

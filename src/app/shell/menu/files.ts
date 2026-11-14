@@ -203,7 +203,3 @@ export async function openFileDialog() {
 
   fileDialog.open()
 }
-
-export async function importFileDialog() {
-  await openFileDialog()
-}

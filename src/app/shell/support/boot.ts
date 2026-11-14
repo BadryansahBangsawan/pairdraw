@@ -34,7 +34,7 @@ export function isFatalBootErrorInfo(info: string): boolean {
   return match !== null && FATAL_BOOT_ERROR_CODES.has(Number(match[1]))
 }
 
-export interface BootFailure {
+interface BootFailure {
   readonly error: unknown
 }
 

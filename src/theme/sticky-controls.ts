@@ -4,6 +4,4 @@ const stickyControlsTheme = {
     option: 'flex items-center justify-between gap-1.5 text-[11px] text-muted'
   }
 }
-
-export type StickyControlsTheme = typeof stickyControlsTheme
 export default stickyControlsTheme

@@ -21,7 +21,7 @@ const DEFAULT_MAX_OUTPUT_TOKENS = 16_384
 const PLACEHOLDER_PROFILE_ID = 'model-default'
 
 /** Details entered while connecting; only a server needs an address and its own model ID. */
-export interface OnboardingConnectionDetails {
+interface OnboardingConnectionDetails {
   customBaseURL: string
   customModelID: string
 }

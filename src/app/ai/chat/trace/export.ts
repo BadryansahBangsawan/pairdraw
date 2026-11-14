@@ -11,8 +11,8 @@ import { downloadBlob } from '@/app/document/io/browser'
 
 import type { TraceAsset, TraceStore } from './types'
 
-export const CHAT_TRACE_FORMAT = 'pairdraw-chat-trace'
-export const CHAT_TRACE_VERSION = 2
+const CHAT_TRACE_FORMAT = 'pairdraw-chat-trace'
+const CHAT_TRACE_VERSION = 2
 
 /**
  * A conversation as it ran, to reproduce what the agent did: every message part (text,

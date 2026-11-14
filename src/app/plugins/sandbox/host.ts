@@ -20,10 +20,10 @@ import { beginPluginPointer } from '../pointer'
 import type { InstalledPlugin } from '../schema'
 import { PLUGIN_POINTER_CALL } from './schema'
 
-export const PLUGIN_ASYNC_TOOL_MESSAGE = 'Plugins cannot call a tool that runs asynchronously.'
+const PLUGIN_ASYNC_TOOL_MESSAGE = 'Plugins cannot call a tool that runs asynchronously.'
 
 /** What a plugin's `plugin.call` reaches: the tool it named, or why the host refused. */
-export type PluginHostCall = (name: string, args: unknown) => Promise<unknown>
+type PluginHostCall = (name: string, args: unknown) => Promise<unknown>
 
 export interface PluginHost {
   call: PluginHostCall

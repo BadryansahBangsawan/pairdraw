@@ -16,11 +16,11 @@ import type { Theme } from '../theme'
 import { sectionName, type TourChapter } from './names'
 
 /** Where the first chapter sits on the page. */
-export const PAGE_ORIGIN = 0
+const PAGE_ORIGIN = 0
 /** The air inside a chapter's section. */
 export const CHAPTER_PADDING = 96
 /** The gap between chapters along the strip. */
-export const CHAPTER_GAP = 240
+const CHAPTER_GAP = 240
 const HEADING_GAP = 72
 const TIP_GAP = 64
 const HEADING_WIDTH = 720
@@ -48,7 +48,7 @@ export interface Chapter {
 }
 
 /** Render `tree` under `parentId` at (`x`, `y`) and return the layer, with its size laid out. */
-export async function place(
+async function place(
   { graph }: ChapterContext,
   tree: TreeNode,
   parentId: string,

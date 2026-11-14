@@ -25,14 +25,14 @@ export type AutomationTarget = {
   pageName: string
 }
 
-export type AutomationTargetResult = Omit<AutomationTarget, 'store'>
+type AutomationTargetResult = Omit<AutomationTarget, 'store'>
 
 export function stripAutomationTargetArgs(args: UnknownRecord): UnknownRecord {
   const { document_id: _documentId, page_id: _pageId, ...rest } = args
   return rest
 }
 
-export function targetToResult(target: AutomationTarget): AutomationTargetResult {
+function targetToResult(target: AutomationTarget): AutomationTargetResult {
   return {
     // Replies leave the realm, so the id they carry names its window.
     documentId: windowDocumentId(target.documentId),

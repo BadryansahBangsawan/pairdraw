@@ -2,10 +2,10 @@ import type { SnappingPreferences } from '@pairdraw/core'
 
 import { isTauri } from '@/app/tauri/env'
 
-export const DESIGN_ISSUES_MENU_ID = 'view-design-issues'
-export const COMMENTS_MENU_ID = 'view-comments'
-export const LAYERS_PANEL_MENU_ID = 'view-layers-panel'
-export const PROPERTIES_PANEL_MENU_ID = 'view-properties-panel'
+const DESIGN_ISSUES_MENU_ID = 'view-design-issues'
+const COMMENTS_MENU_ID = 'view-comments'
+const LAYERS_PANEL_MENU_ID = 'view-layers-panel'
+const PROPERTIES_PANEL_MENU_ID = 'view-properties-panel'
 
 /** The snapping choices the native View menu checks; half-pixel snapping lives in Settings. */
 type NativeSnappingPreference = Exclude<keyof SnappingPreferences, 'halfPixel'>

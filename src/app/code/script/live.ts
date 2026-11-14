@@ -13,7 +13,7 @@ import {
 import type { EditorStore } from '@/app/editor/session'
 
 /** How long a resize or input edit waits for the next one, so a drag runs once. */
-export const SCRIPT_RUN_DEBOUNCE_MS = 300
+const SCRIPT_RUN_DEBOUNCE_MS = 300
 
 type RunListener = (result: ScriptNodeRunResult) => void
 
@@ -44,7 +44,7 @@ function runsOf(store: ScriptRunHost): Map<string, PendingRun> {
  * Runs `nodeId` after `delayMs`, replacing a run already waiting for that node and carrying its
  * listeners over to the one that happens. A listener hears the result of the run it waited on.
  */
-export function scheduleScriptRun(
+function scheduleScriptRun(
   store: ScriptRunHost,
   nodeId: string,
   options: { delayMs?: number; listener?: RunListener } = {}

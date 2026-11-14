@@ -19,7 +19,7 @@ const MINIMUM_REFRESH_MS = 5_000
 const MAXIMUM_RECONNECT_MS = 30_000
 
 /** A collaboration ticket the relay accepts, as the Cloud API issues it. */
-export type CloudRelayTicket = { token: string; expiresAt: string }
+type CloudRelayTicket = { token: string; expiresAt: string }
 
 export type CloudRelayOptions = {
   /** The relay's WebSocket URL from the ticket. */

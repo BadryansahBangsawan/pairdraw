@@ -23,7 +23,7 @@ import { drawShaderStills } from './shaders/stills'
 const INTER_STYLES = ['Regular', 'Medium', 'SemiBold', 'Bold', 'ExtraBold']
 
 /** The one page the tour is on. */
-export const PAGE_NAME = 'Tour'
+const PAGE_NAME = 'Tour'
 
 /** A renderer on a 1×1 surface, for measuring text while laying the document out. */
 export async function measuringRenderer() {
@@ -36,10 +36,7 @@ export async function measuringRenderer() {
 }
 
 /** Runs `build` with Inter loaded and text measured by `renderer`, as demo layout needs. */
-export async function withMeasuredText<T>(
-  renderer: SkiaRenderer,
-  build: () => Promise<T>
-): Promise<T> {
+async function withMeasuredText<T>(renderer: SkiaRenderer, build: () => Promise<T>): Promise<T> {
   const uninstall = installTextMeasurer((node, maxWidth) =>
     renderer.measureTextNode(node, maxWidth)
   )

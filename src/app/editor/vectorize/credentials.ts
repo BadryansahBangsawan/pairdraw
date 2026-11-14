@@ -4,7 +4,7 @@ import type { CredentialRef, CredentialStatus } from '@/app/settings/credentials
 
 import type { VectorizeProviderID } from './types'
 
-export function vectorizeCredentialRef(providerID: VectorizeProviderID): CredentialRef {
+function vectorizeCredentialRef(providerID: VectorizeProviderID): CredentialRef {
   return credentialRef(`vectorize-${providerID}`, 'api-key')
 }
 

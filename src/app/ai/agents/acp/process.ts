@@ -1,11 +1,6 @@
 import { decodeTauriStderr } from '@/app/shell/ui'
 import { resolvePlatformCommand } from '@/app/tauri/command'
 
-export type TauriChild = {
-  write(data: number[]): Promise<void>
-  kill(): Promise<void>
-}
-
 type ACPProcessOptions = {
   command: string
   args: string[]

@@ -119,15 +119,6 @@ let runtimeAutomationStartupError: Error | null = null
 let runtimeAutomationStartupFailure: MCPFailure | null = null
 let runtimeAutomationHealthFailure: MCPFailure | null = null
 
-/**
- * The startup failure recorded by the most recent spawn attempt. Settings uses
- * this so a missing install, a rejected shell command, or a server that exited
- * is reported instead of a single generic health message.
- */
-export function getAutomationStartupError(): Error | null {
-  return runtimeAutomationStartupError
-}
-
 export function getAutomationStartupFailure(): MCPFailure | null {
   return runtimeAutomationStartupFailure
 }

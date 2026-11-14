@@ -15,6 +15,4 @@ const swatchesTheme = {
     active: false
   }
 }
-
-export type SwatchesTheme = typeof swatchesTheme
 export default swatchesTheme

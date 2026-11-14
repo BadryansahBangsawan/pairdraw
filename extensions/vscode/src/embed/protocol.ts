@@ -14,8 +14,6 @@ export const embedReadySchema = v.object({
   version: v.literal(EMBED_PROTOCOL_VERSION)
 })
 
-export type EmbedReady = v.InferOutput<typeof embedReadySchema>
-
 const requestIdSchema = v.union([v.string(), v.number()])
 
 export const embedResponseSchema = v.variant('ok', [
@@ -27,9 +25,7 @@ export const embedResponseSchema = v.variant('ok', [
   })
 ])
 
-export type EmbedResponse = v.InferOutput<typeof embedResponseSchema>
-
-export const EMBED_EVENT_NAMES = [
+const EMBED_EVENT_NAMES = [
   'connected',
   'documentload',
   'documentchange',
@@ -62,8 +58,6 @@ export const embedDocumentSchema = v.object({
   data: v.union([v.instance(Uint8Array), v.instance(ArrayBuffer)])
 })
 
-export type EmbedDocument = v.InferOutput<typeof embedDocumentSchema>
-
 /** The image formats `exportImage` rasterizes; the app owns the canonical list. */
 export const EMBED_IMAGE_FORMATS = ['PNG', 'JPG', 'WEBP'] as const
 export type EmbedImageFormat = (typeof EMBED_IMAGE_FORMATS)[number]
@@ -72,5 +66,3 @@ export const embedImageSchema = v.object({
   data: v.union([v.instance(Uint8Array), v.instance(ArrayBuffer)]),
   mimeType: v.string()
 })
-
-export type EmbedImage = v.InferOutput<typeof embedImageSchema>

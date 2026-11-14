@@ -13,7 +13,7 @@ import { cloudAPIClient, cloudConnection } from '../sessions/connection'
 import { clearShareSecret, readShareSecret, saveShareSecret } from './secrets'
 
 /** Someone with access: a person granted it, or an invitation not accepted yet. */
-export type CloudShareMember = {
+type CloudShareMember = {
   id: string
   name: string
   email: string
@@ -32,7 +32,7 @@ export type CloudShareLink =
  * or where the server does not say which revision it holds, as servers before snapshot links do,
  * or one that shows the revision it pins, possibly behind what the document holds now.
  */
-export type CloudSnapshotLink =
+type CloudSnapshotLink =
   | { state: 'none' }
   | { state: 'unsaved' }
   | { state: 'unavailable' }

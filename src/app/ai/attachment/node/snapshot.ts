@@ -4,7 +4,7 @@ import type { NodePresentation } from '@/app/ai/attachment/presentation/types'
 import type { ReferencedNode } from '@/app/ai/chat/context'
 import type { EditorStore } from '@/app/editor/active-store'
 
-export function snapshotNode(
+function snapshotNode(
   store: EditorStore,
   messageId: string,
   node: ReferencedNode

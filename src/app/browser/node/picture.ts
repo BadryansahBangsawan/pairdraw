@@ -15,7 +15,7 @@ import { BROWSER_NODE_LOAD_TIMEOUT } from './load'
 import type { BrowserNodeSession } from './session'
 
 /** The same sentence the screenshot command uses when the window returns no PNG. */
-export const BROWSER_NODE_NO_PICTURE = 'The page returned no picture'
+const BROWSER_NODE_NO_PICTURE = 'The page returned no picture'
 
 const URL_ERRORS: Record<BrowserURLRejection, string> = {
   empty: BROWSER_NODE_FAILURE.emptyAddress,

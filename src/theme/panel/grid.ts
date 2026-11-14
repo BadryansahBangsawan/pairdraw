@@ -21,6 +21,4 @@ const panelGridTheme = {
     distribution: 'equal' as const
   }
 }
-
-export type PanelGridTheme = typeof panelGridTheme
 export default panelGridTheme

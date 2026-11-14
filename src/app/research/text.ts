@@ -23,7 +23,7 @@ export function citationStickyText(citation: WebCitation, labels: CitationLabels
 }
 
 /** A chat reference to the sticky that holds this citation, beside the usual node links. */
-export function citationReference(stickyId: string, citation: WebCitation): ChatReference {
+function citationReference(stickyId: string, citation: WebCitation): ChatReference {
   return { kind: 'citation', id: stickyId, label: citation.title }
 }
 

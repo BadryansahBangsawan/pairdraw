@@ -13,7 +13,7 @@ import { randomHex } from '@pairdraw/scene-graph/random'
 
 const toolDescriptorSchema = v.looseObject({ name: v.string(), enabled: v.boolean() })
 
-export const healthResponseSchema = v.object({
+const healthResponseSchema = v.object({
   status: v.string(),
   version: v.string(),
   authRequired: v.boolean(),
@@ -26,7 +26,7 @@ export const healthResponseSchema = v.object({
 export type HealthResponse = v.InferOutput<typeof healthResponseSchema>
 
 /** Read a JSON response body or file, checked against `schema`. */
-export async function readJSON<T>(
+async function readJSON<T>(
   source: { text(): Promise<string> },
   schema: v.GenericSchema<unknown, T>
 ): Promise<T> {
@@ -37,7 +37,7 @@ export function readHealth(response: Response): Promise<HealthResponse> {
   return readJSON(response, healthResponseSchema)
 }
 
-export interface MockBrowserRequest {
+interface MockBrowserRequest {
   command: string
   args?: unknown
 }
@@ -132,7 +132,7 @@ export async function readNextResponse<T>(
 }
 
 /** Low-level HTTP request via Node's http module, with timeout. */
-export function nodeHttpRequest(
+function nodeHttpRequest(
   opts: RequestOptions,
   bodyJSON?: string,
   timeoutMs = 5_000

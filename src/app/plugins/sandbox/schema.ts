@@ -75,7 +75,6 @@ export const pluginCallResultSchema = v.variant('ok', [
     error: v.string()
   })
 ])
-export type PluginCallResult = v.InferOutput<typeof pluginCallResultSchema>
 
 /** A message the host sends the frame: a run to start, or the answer to a call it made. */
 export const pluginHostMessageSchema = v.variant('type', [

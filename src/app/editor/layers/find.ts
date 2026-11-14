@@ -3,7 +3,7 @@ import type { SceneNode } from '@pairdraw/scene-graph'
 import type { EditorStore } from '@/app/editor/active-store'
 
 /** How many layers Find layers lists from one page; a page with more is searched up to here. */
-export const FIND_LAYERS_LIMIT = 2000
+const FIND_LAYERS_LIMIT = 2000
 
 /** A layer Find layers can go to, with the names of the layers it sits in, outermost first. */
 export interface FoundLayer {

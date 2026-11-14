@@ -13,8 +13,8 @@ import {
  * collection and mode names, and paints the page in the Theme's Page color
  * (`src/app/demo/theme.ts`).
  */
-export const COLLECTION_NAMES = { theme: 'Theme', chrome: 'App chrome' } as const
-export const MODE_NAMES = { dark: 'Dark', light: 'Light' } as const
+const COLLECTION_NAMES = { theme: 'Theme', chrome: 'App chrome' } as const
+const MODE_NAMES = { dark: 'Dark', light: 'Light' } as const
 
 type Mode = keyof typeof MODE_NAMES
 type Entry = readonly [key: string, name: string, dark: string | number, light: string | number]

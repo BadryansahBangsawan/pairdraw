@@ -1,4 +1,4 @@
-export const TYPE_SHAPE_ROOTS = [
+const TYPE_SHAPE_ROOTS = [
   'src',
   'packages/core/src',
   'packages/vue/src',

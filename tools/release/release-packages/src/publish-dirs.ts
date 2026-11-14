@@ -88,7 +88,7 @@ export function publishPackageJSON(source: PackageManifest, coreVersion: string)
   return json
 }
 
-export function packagePublishConfig(pkg: WorkspacePackage): PackagePublishConfig {
+function packagePublishConfig(pkg: WorkspacePackage): PackagePublishConfig {
   return { directory: pkg.directory }
 }
 

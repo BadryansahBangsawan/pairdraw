@@ -23,7 +23,7 @@ export interface EmbedHandshakeWindow extends EmbedParentWindow {
   removeEventListener(type: 'message', listener: (event: EmbedHandshakeEvent) => void): void
 }
 
-export interface EmbedConnection {
+interface EmbedConnection {
   port: MessagePort
   request: EmbedConnectMessage
 }

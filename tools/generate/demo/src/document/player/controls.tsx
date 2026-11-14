@@ -8,9 +8,9 @@ import { Button, Component, Slider, Toggle, type TreeNode } from '@pairdraw/desi
 import { Icon } from '../elements'
 import type { Theme } from '../theme'
 
-export const TRACK_LENGTH = 230
-export const TRACK_POSITION = 84
-export const SLIDER_WIDTH = 320
+const TRACK_LENGTH = 230
+const TRACK_POSITION = 84
+const SLIDER_WIDTH = 320
 
 /** The progress bar: a slider over the track's seconds. */
 export function progressSlider({ vars }: Theme): TreeNode {
@@ -56,7 +56,7 @@ export function playToggle({ vars }: Theme): TreeNode {
   )
 }
 
-export const OPTIONS = [
+const OPTIONS = [
   ['Shuffle', 'lucide:shuffle'],
   ['Repeat', 'lucide:repeat']
 ] as const
@@ -85,7 +85,7 @@ export function optionToggle({ vars }: Theme): TreeNode {
   )
 }
 
-export const DIRECTIONS = [
+const DIRECTIONS = [
   ['Back', 'lucide:skip-back'],
   ['Forward', 'lucide:skip-forward']
 ] as const

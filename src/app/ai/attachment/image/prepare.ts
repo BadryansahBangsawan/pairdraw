@@ -13,7 +13,7 @@ const MAX_IMAGE_FILE_BYTES = 20 * 1024 * 1024
 const MAX_IMAGE_PIXELS = 40_000_000
 export const IMAGE_ATTACHMENT_MAX_EDGE = 1280
 
-export function isImageAttachmentMediaType(value: string): value is ImageAttachmentMediaType {
+function isImageAttachmentMediaType(value: string): value is ImageAttachmentMediaType {
   return IMAGE_ATTACHMENT_MEDIA_TYPES.some((mediaType) => mediaType === value)
 }
 

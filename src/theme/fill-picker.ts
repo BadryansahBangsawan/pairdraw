@@ -29,6 +29,4 @@ const fillPickerTheme = {
     dragging: false
   }
 }
-
-export type FillPickerTheme = typeof fillPickerTheme
 export default fillPickerTheme

@@ -40,12 +40,12 @@ export type StorageDocument = StorageDocumentMetadata & {
 }
 
 /** Stored bytes and the revision they are, when the provider tracks revisions. */
-export type StorageDocumentContent = {
+type StorageDocumentContent = {
   bytes: Uint8Array
   revision: string | null
 }
 
-export type StoragePutOptions = {
+type StoragePutOptions = {
   /**
    * The revision the local bytes were edited from. A provider that tracks revisions refuses
    * the write with `StorageRevisionConflictError` when the stored revision has moved on.
@@ -53,29 +53,29 @@ export type StoragePutOptions = {
   baseRevision?: string | null
 }
 
-export type StoragePutResult = {
+type StoragePutResult = {
   /** The revision the write created, or null when the provider does not track revisions. */
   revision: string | null
 }
 
-export type StorageUsage = {
+type StorageUsage = {
   bytesUsed: number
   objectCount: number
   documentCount: number
 }
 
-export type StorageConnectionResult = {
+type StorageConnectionResult = {
   ok: boolean
   message: string
 }
 
-export interface LibraryObjectSummary {
+interface LibraryObjectSummary {
   key: string
   size: number | null
   etag: string | null
 }
 
-export interface LibraryObjectValue {
+interface LibraryObjectValue {
   bytes: Uint8Array | null
   etag: string | null
 }
@@ -127,7 +127,7 @@ export type StoragePreferenceField = {
   placeholder?: string
 }
 
-export type StorageCredentialField = {
+type StorageCredentialField = {
   id: StorageFieldID
   label: string
   required?: boolean

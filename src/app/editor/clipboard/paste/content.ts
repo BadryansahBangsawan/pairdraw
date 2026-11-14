@@ -50,11 +50,7 @@ export function pastePoint(editor: Editor, cursorPos?: Vector): Vector {
 }
 
 /** Paste SVG markup, such as Figma's Copy as SVG, as layers; false when the text is not SVG. */
-export async function pasteSVGText(
-  editor: Editor,
-  text: string,
-  cursorPos?: Vector
-): Promise<boolean> {
+async function pasteSVGText(editor: Editor, text: string, cursorPos?: Vector): Promise<boolean> {
   if (!isSVGMarkup(text)) return false
   const { x, y } = pastePoint(editor, cursorPos)
   return editor.pasteSVG(text, x, y)
@@ -69,7 +65,7 @@ export function isLayerText(text: string): boolean {
  * Paste a Mermaid flowchart as FigJam layers laid out around the point; false when the text is
  * not one. A flowchart Mermaid cannot read reports why, its first line being Mermaid's summary.
  */
-export async function pasteMermaidText(
+async function pasteMermaidText(
   editor: Editor,
   text: string,
   cursorPos?: Vector

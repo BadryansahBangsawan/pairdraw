@@ -3,10 +3,10 @@ import { appPreferences, type CanvasRenderingMode } from '@/app/settings/prefere
 import { IS_BROWSER } from '@/constants'
 
 export type SceneRendererMode = CanvasRenderingMode
-export type CollaborationTransportMode = 'default' | 'test'
+type CollaborationTransportMode = 'default' | 'test'
 
 /** Ultralight mode draws at most one device pixel per CSS pixel. */
-export const ULTRALIGHT_MAX_PIXEL_RATIO = 1
+const ULTRALIGHT_MAX_PIXEL_RATIO = 1
 
 export interface AppRuntimeConfig {
   test: boolean

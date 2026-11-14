@@ -14,7 +14,7 @@ async function waitUntil(startedAt: number, timeMs: number): Promise<void> {
   }
 }
 
-export async function replayDOM(page: Page, recording: NavigationRecordingFile): Promise<void> {
+async function replayDOM(page: Page, recording: NavigationRecordingFile): Promise<void> {
   await page.evaluate(async (samples: WheelSample[]) => {
     const canvas = document.querySelector<HTMLCanvasElement>('[data-test-id="canvas-element"]')
     if (!canvas) throw new Error('Canvas element not found')
@@ -44,7 +44,7 @@ export async function replayDOM(page: Page, recording: NavigationRecordingFile):
   }, recording.wheel)
 }
 
-export async function replayCDP(page: Page, recording: NavigationRecordingFile): Promise<void> {
+async function replayCDP(page: Page, recording: NavigationRecordingFile): Promise<void> {
   const session = await page.context().newCDPSession(page)
   const startedAt = performance.now()
   const pending: Array<Promise<unknown>> = []

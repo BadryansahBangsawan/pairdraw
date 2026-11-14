@@ -6,7 +6,7 @@ import { watchChatAgent } from '@/app/automation/agents'
 import { mcpRuntime } from '@/app/automation/mcp/runtime'
 
 /** How long an agent may take to reach Pairdraw's tools once its session starts. */
-export const AGENT_CONNECT_TIMEOUT_MS = 20_000
+const AGENT_CONNECT_TIMEOUT_MS = 20_000
 
 /** A chat's agent, linked to Pairdraw's MCP server by the chat id its session carries. */
 export interface ChatAgentLink<Servers> {

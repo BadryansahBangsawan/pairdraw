@@ -26,7 +26,7 @@ export const CONDITION_KINDS = [
 export type ConditionKind = (typeof CONDITION_KINDS)[number]
 
 /** Presets that take a width in pixels. */
-export const WIDTH_CONDITION_KINDS = [
+const WIDTH_CONDITION_KINDS = [
   'screen-narrower',
   'screen-wider',
   'container-narrower',
@@ -40,7 +40,7 @@ export type ModeCondition =
   | { kind: 'custom'; css: string }
 
 /** The width a new width preset starts at. */
-export const DEFAULT_CONDITION_WIDTH = 640
+const DEFAULT_CONDITION_WIDTH = 640
 
 type FixedConditionKind = 'dark' | 'light' | 'contrast' | 'reduced-motion'
 

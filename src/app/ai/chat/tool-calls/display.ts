@@ -19,7 +19,7 @@ function truncate(text: string): string {
   return line.length > SUMMARY_LENGTH ? `${line.slice(0, SUMMARY_LENGTH - 1)}…` : line
 }
 
-export function toolName(part: ToolCallPart): string {
+function toolName(part: ToolCallPart): string {
   return getToolName(part).replace(MCP_PREFIX, '')
 }
 

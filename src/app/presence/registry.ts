@@ -136,7 +136,7 @@ function agentCursor(agent: AgentPresence, pageId: string): TrackedCursor[] {
 }
 
 /** Draw everyone working on the page on screen: people, their agents, and ours. */
-export function refreshCursors(store: EditorStore): void {
+function refreshCursors(store: EditorStore): void {
   const { agents, peers } = presenceOf(store)
   const pageId = store.state.currentPageId
   showCursors(store, [

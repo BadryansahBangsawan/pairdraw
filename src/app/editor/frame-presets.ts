@@ -1,4 +1,4 @@
-export type FramePresetCategoryId =
+type FramePresetCategoryId =
   | 'phone'
   | 'tablet'
   | 'desktop'
@@ -9,7 +9,7 @@ export type FramePresetCategoryId =
   | 'figma-community'
   | 'archive'
 
-export type FramePresetCategoryLabelKey =
+type FramePresetCategoryLabelKey =
   | 'framePresetCategoryPhone'
   | 'framePresetCategoryTablet'
   | 'framePresetCategoryDesktop'
@@ -179,8 +179,6 @@ export const FRAME_PRESET_CATEGORIES: readonly FramePresetCategory[] = [
     ]
   }
 ]
-
-export const FRAME_PRESETS = FRAME_PRESET_CATEGORIES.flatMap((category) => category.presets)
 
 function uniquePresetCategoriesBySize(
   categories: readonly FramePresetCategory[]

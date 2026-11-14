@@ -55,7 +55,7 @@ export function slideXML(files: Record<string, Uint8Array>, index: number): stri
   return new TextDecoder().decode(entry)
 }
 
-export const EMU_PER_INCH = 914400
+const EMU_PER_INCH = 914400
 export const SLIDE_WIDTH_IN = 13.333
 
 /** Slide frames in these tests are 1280px wide, so px → in uses that scale. */

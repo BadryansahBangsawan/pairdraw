@@ -10,7 +10,7 @@ import { MAX_PLUGIN_MANIFEST_BYTES } from './limits'
  * Capabilities a plugin may ask for. `network:access` is a tool capability and is left out:
  * this version refuses it at install instead of granting a host proxy.
  */
-export const PLUGIN_CAPABILITIES = [
+const PLUGIN_CAPABILITIES = [
   'document:read',
   'document:write',
   'filesystem:read',

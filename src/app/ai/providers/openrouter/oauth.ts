@@ -3,7 +3,7 @@ import * as v from 'valibot'
 import type { PKCE } from '../sign-in/pkce'
 
 /** OpenRouter's OAuth PKCE flow: https://openrouter.ai/docs/guides/overview/auth/oauth */
-export const OPENROUTER_AUTH_URL = 'https://openrouter.ai/auth'
+const OPENROUTER_AUTH_URL = 'https://openrouter.ai/auth'
 export const OPENROUTER_KEYS_URL = 'https://openrouter.ai/api/v1/auth/keys'
 /** Authorization codes expire after ten minutes. */
 export const OPENROUTER_CODE_LIFETIME_MS = 10 * 60 * 1000

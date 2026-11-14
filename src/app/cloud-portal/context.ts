@@ -1,4 +1,4 @@
-import { inject, provide, shallowRef, type InjectionKey, type ShallowRef } from 'vue'
+import { inject, shallowRef, type InjectionKey, type ShallowRef } from 'vue'
 
 import {
   CloudPortalAPIError,
@@ -50,10 +50,6 @@ export async function loadPortalContext(
     account,
     refreshAccount
   }
-}
-
-export function providePortal(context: PortalContext): void {
-  provide(PORTAL_CONTEXT, context)
 }
 
 export function usePortal(): PortalContext {

@@ -4,7 +4,7 @@ import { bindDesktopLinkQueue } from '@/app/tauri/link-queue'
 import { IS_BROWSER, IS_TAURI, WEB_APP_ORIGIN } from '@/constants'
 
 /** Desktop events and commands for `pairdraw://join?room=<id>` links (`desktop/src/launch/mod.rs`). */
-export const ROOM_LINKS_EVENT = 'open-room-links'
+const ROOM_LINKS_EVENT = 'open-room-links'
 const TAKE_PENDING_ROOMS = 'take_pending_rooms'
 
 export function roomLinkURL(roomId: string): string {

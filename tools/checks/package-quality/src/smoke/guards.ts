@@ -11,9 +11,9 @@ import { installPackedPackages } from './install'
 import { evaluateRuntime, type RuntimeName } from './runtime'
 
 /** A runtime must import the fixture, or fail with output matching the pattern. */
-export type RuntimeExpectation = 'imports' | { failsWith: RegExp }
+type RuntimeExpectation = 'imports' | { failsWith: RegExp }
 /** What a runtime did: imported, or failed with this output. */
-export type RuntimeObservation = 'imports' | { failed: string }
+type RuntimeObservation = 'imports' | { failed: string }
 
 export interface PackagingGuard {
   /** The `exports["."].bun` target of the fixture manifest. */

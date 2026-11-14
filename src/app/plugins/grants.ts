@@ -11,9 +11,9 @@ import {
 } from './messages'
 import { isPluginCapability, type InstalledPlugin, type PluginCapability } from './schema'
 
-export const PLUGIN_GRANT_REASONS = ['missing', 'disabled', 'not-requested', 'unavailable'] as const
+const PLUGIN_GRANT_REASONS = ['missing', 'disabled', 'not-requested', 'unavailable'] as const
 
-export type PluginGrantReason = (typeof PLUGIN_GRANT_REASONS)[number]
+type PluginGrantReason = (typeof PLUGIN_GRANT_REASONS)[number]
 
 export type PluginGrantResult =
   | { ok: true; plugins: InstalledPlugin[] }

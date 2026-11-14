@@ -22,7 +22,7 @@ import type { SkillUploadFailure } from '../sources/uploaded'
 import type { Skill, SkillProblem, SkillSourceID } from '../types'
 import { requestedSkill } from './request'
 
-export interface SkillListEntry {
+interface SkillListEntry {
   skill: Skill
   enabled: boolean
   /** On, but another source's skill with the same name is offered instead. */

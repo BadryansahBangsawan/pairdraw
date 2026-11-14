@@ -1,6 +1,6 @@
 const COMPONENT_MENU_LABEL_PARTS = ['component', 'instance']
 
-export function isComponentMenuItem(label: string) {
+function isComponentMenuItem(label: string) {
   const normalized = label.toLowerCase()
   return COMPONENT_MENU_LABEL_PARTS.some((part) => normalized.includes(part))
 }

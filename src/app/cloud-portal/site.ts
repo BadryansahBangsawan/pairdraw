@@ -13,7 +13,7 @@ import { parseCloudLinkPath, type CloudAccountStatus } from '@pairdraw/cloud/con
  * editor, to visitors who chose to use it without an account; everyone else gets the welcome
  * page first.
  */
-export const WELCOME_PATH = '/welcome'
+const WELCOME_PATH = '/welcome'
 
 /** The server's sign-in page, which goes on to its `redirect` afterwards. */
 const SIGN_IN_PATH = '/auth/sign-in'

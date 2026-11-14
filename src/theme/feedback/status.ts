@@ -34,7 +34,5 @@ const statusTheme = {
     tone: 'neutral' as const
   }
 }
-
-export type StatusTheme = typeof statusTheme
 export type StatusTone = keyof typeof statusTheme.variants.tone
 export default statusTheme

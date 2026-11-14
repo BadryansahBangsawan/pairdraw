@@ -105,7 +105,3 @@ export async function fetchChatGPTModels(
   await writeCacheJSON(CHATGPT_MODELS_CACHE_KEY, models).catch(() => undefined)
   return models
 }
-
-export function resetChatGPTCatalogForTests(): void {
-  codexRelease.reset()
-}

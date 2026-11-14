@@ -72,11 +72,7 @@ export function onTurnUndoChanged(
   return () => undoListeners.delete(listener)
 }
 
-export function recordTurn(
-  messageId: string,
-  store: EditorStore,
-  calls: readonly RunUndoCall[]
-): void {
+function recordTurn(messageId: string, store: EditorStore, calls: readonly RunUndoCall[]): void {
   if (calls.length === 0) {
     turns.delete(messageId)
     return

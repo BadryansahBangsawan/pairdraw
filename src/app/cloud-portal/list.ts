@@ -16,12 +16,12 @@ import { useCloudPortalMessages } from '@pairdraw/vue/i18n'
 import { usePortalLoad } from './state'
 
 /** The rows a console list shows at a time. */
-export const PORTAL_PAGE_SIZE = 50
+const PORTAL_PAGE_SIZE = 50
 /** How long typing pauses before a search asks the server. */
 const SEARCH_DELAY_MS = 250
 
 /** What console tables can do: the server pages them, and columns carry their own classes. */
-export const portalTableFeatures = tableFeatures({
+const portalTableFeatures = tableFeatures({
   rowPaginationFeature,
   // A type-only slot: TanStack reads the columns' `meta` type from it.
   columnMeta: {}

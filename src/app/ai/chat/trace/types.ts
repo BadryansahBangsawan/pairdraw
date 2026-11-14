@@ -3,7 +3,7 @@ import type { CallWarning, FinishReason } from 'ai'
 import type { ThinkingLevel } from '@/app/ai/models/types'
 
 /** A tool as the model was offered it. */
-export interface TraceTool {
+interface TraceTool {
   name: string
   description?: string
   inputSchema: unknown

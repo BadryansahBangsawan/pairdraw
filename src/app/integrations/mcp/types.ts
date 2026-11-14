@@ -19,7 +19,7 @@ export type MCPStdioTransport = {
 }
 
 export type MCPConnectionTransport = MCPHTTPTransport | MCPStdioTransport
-export type MCPTransportType = MCPConnectionTransport['type']
+type MCPTransportType = MCPConnectionTransport['type']
 
 /** OAuth tokens and the client registration live in the credential store, never in settings. */
 export type MCPAuthentication =
@@ -27,7 +27,7 @@ export type MCPAuthentication =
   | { type: 'bearer'; credentialRef: CredentialRef }
   | { type: 'oauth'; credentialRef: CredentialRef }
 
-export type MCPAuthenticationType = MCPAuthentication['type']
+type MCPAuthenticationType = MCPAuthentication['type']
 
 export type MCPConnection = {
   id: MCPConnectionID

@@ -26,6 +26,4 @@ const splitterTheme = {
     seam: false
   }
 }
-
-export type SplitterTheme = typeof splitterTheme
 export default splitterTheme

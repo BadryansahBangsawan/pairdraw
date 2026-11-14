@@ -24,10 +24,7 @@ interface OutboxDatabase extends DBSchema {
   }
 }
 
-export type OutboxEnqueueInput = Omit<
-  OutboxJob,
-  'id' | 'createdAt' | 'attempts' | 'nextAttemptAt'
-> & {
+type OutboxEnqueueInput = Omit<OutboxJob, 'id' | 'createdAt' | 'attempts' | 'nextAttemptAt'> & {
   id?: string
   attempts?: number
   nextAttemptAt?: number
@@ -97,7 +94,7 @@ export function createMemoryOutbox(): Outbox {
   }
 }
 
-export function createIdbOutbox(): Outbox {
+function createIdbOutbox(): Outbox {
   const database = connectDatabase()
 
   return {

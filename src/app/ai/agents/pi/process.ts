@@ -46,7 +46,7 @@ const harnessSidecarMessageSchema = v.pipe(
   ])
 ) satisfies v.GenericSchema<string, HarnessSidecarMessage>
 
-export type HarnessChild = {
+type HarnessChild = {
   write(data: number[]): Promise<void>
   kill(): Promise<void>
 }

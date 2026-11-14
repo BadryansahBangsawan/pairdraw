@@ -13,7 +13,7 @@ import type { CaptureOptions } from '@pairdraw/web-capture/capturer'
 export const MAX_PAGE_IMAGE_BYTES = 32 * 1024 * 1024
 
 /** Bytes of one message to the popup, below Chrome's 64 MiB limit on extension messages. */
-export const MAX_MESSAGE_BYTES = 63 * 1024 * 1024
+const MAX_MESSAGE_BYTES = 63 * 1024 * 1024
 
 /** The bytes Chrome counts for a message: its JSON in UTF-8. */
 export function messageBytes(message: unknown): number {

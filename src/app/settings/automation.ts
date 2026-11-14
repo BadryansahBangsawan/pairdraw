@@ -93,8 +93,6 @@ const automationSettingsPatchSchema = v.strictObject({
   )
 })
 
-export type AutomationSettingsPatch = v.InferOutput<typeof automationSettingsPatchSchema>
-
 export function readAutomationSettings(): AutomationSettings {
   // Copy leaf groups: stored preferences can hold reactive proxies that cannot be cloned.
   const preferences = appPreferences.value

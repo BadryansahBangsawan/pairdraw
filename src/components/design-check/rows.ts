@@ -31,7 +31,7 @@ function isHidden(graph: SceneGraph, nodeId: string): boolean {
 }
 
 /** An issue's row, with its layer as it is now; a layer deleted since the check shows as missing. */
-export function issueRowView(issue: DesignIssue, context: RowContext): IssueRowView {
+function issueRowView(issue: DesignIssue, context: RowContext): IssueRowView {
   const { graph, messages } = context
   const node = graph.getNode(issue.nodeId)
   const onOtherPage = issue.pageId !== context.currentPageId

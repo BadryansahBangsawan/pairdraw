@@ -1,5 +1,3 @@
-import type { AIProviderID } from '@pairdraw/core/constants'
-
 export type DiagnosticCategory =
   | 'ai'
   | 'document'
@@ -45,14 +43,4 @@ export type DiagnosticEvent = {
 export type DiagnosticEventInput = Omit<DiagnosticEvent, 'id' | 'timestamp' | 'name'> & {
   name: DiagnosticEventName
   timestamp?: number
-}
-
-export type AIDiagnosticUsage = {
-  providerID: AIProviderID
-  modelID: string
-  inputTokens?: number
-  outputTokens?: number
-  cacheReadTokens?: number
-  cacheWriteTokens?: number
-  finishReason?: string
 }

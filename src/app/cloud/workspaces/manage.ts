@@ -39,7 +39,7 @@ function serverClient(serverId: string) {
 // New workspace
 
 export const newWorkspaceOpen = ref(false)
-export const newWorkspaceServerId = ref<string | null>(null)
+const newWorkspaceServerId = ref<string | null>(null)
 export const newWorkspaceBusy = ref(false)
 export const newWorkspaceFailure = ref<WorkspaceFailure | null>(null)
 

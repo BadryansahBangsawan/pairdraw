@@ -3,7 +3,7 @@ import type { EditorCommandId } from '@pairdraw/vue/editor/commands'
 import { REMOVE_AUTO_LAYOUT_SHORTCUT } from '@/app/shell/keyboard/auto-layout'
 import { EXTRA_EXPORT_FORMATS_INCLUDED } from '@/constants'
 
-export type AppMenuTarget = 'all' | 'browser' | 'native'
+type AppMenuTarget = 'all' | 'browser' | 'native'
 
 export type AppMenuIcon =
   | 'download'
@@ -21,21 +21,21 @@ export type AppMenuIcon =
   | 'zoom-in'
   | 'zoom-out'
 
-export type AppMenuPaletteLabel =
+type AppMenuPaletteLabel =
   | 'exportSelectionAsPNG'
   | 'exportSelectionAsSVG'
   | 'exportSelectionAsPPTX'
   | 'exportSelectionAsDrawIO'
   | 'exportSelectionAsFig'
 
-export interface AppMenuPaletteMetadata {
+interface AppMenuPaletteMetadata {
   icon?: AppMenuIcon
   label?: AppMenuPaletteLabel
   description?: string
   keywords?: string[]
 }
 
-export type AppMenuHandler = 'editor' | 'shell'
+type AppMenuHandler = 'editor' | 'shell'
 
 /** A feature an item waits for: it shows only while the feature is available (`./features`). */
 /** Items shown only for a document backed by a file on disk. */
@@ -56,7 +56,7 @@ export interface AppMenuActionItem {
   sub?: AppMenuEntry[]
 }
 
-export interface AppMenuSeparatorItem {
+interface AppMenuSeparatorItem {
   type: 'separator'
   target?: AppMenuTarget
 }

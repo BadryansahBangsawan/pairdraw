@@ -31,7 +31,7 @@ function drawsVector(outline: LayerOutline): boolean {
  * (`generateObjectsPanelIcon`): turned and reflected as the layer is, with the layer's box
  * fitted to the icon and centred, and never filled. Null when Figma keeps the generic glyph.
  */
-export function outlineIconSVG(outline: LayerOutline): string | null {
+function outlineIconSVG(outline: LayerOutline): string | null {
   if (outline.type === 'VECTOR' && !drawsVector(outline)) return null
   const path = nodeOutlinePath(outline)
   if (!path) return null

@@ -10,6 +10,4 @@ const skeletonTheme = {
     bar: 'block h-2.5 animate-pulse rounded bg-panel-field motion-reduce:animate-none'
   }
 } as const
-
-export type SkeletonTheme = typeof skeletonTheme
 export default skeletonTheme

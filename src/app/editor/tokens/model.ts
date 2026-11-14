@@ -28,7 +28,7 @@ import {
 import { fuzzyFilter } from '@pairdraw/vue/shared/search'
 
 /** One mode's value as the stylesheet writes it, with what the panel previews beside it. */
-export interface TokenModeValue {
+interface TokenModeValue {
   modeId: string
   css: string
   color?: Color
@@ -212,11 +212,6 @@ export function tokenValueText(variable: Variable, value: VariableValue | undefi
   if (typeof value === 'number')
     return String(Number(tokenNumberInUnit(value, variableUnit(variable)).toFixed(6)))
   return typeof value === 'object' ? '' : String(value ?? '')
-}
-
-/** The group paths a collection's tokens use, in list order, for "Move to group". */
-export function groupPaths(groups: readonly TokenGroup[]): string[] {
-  return groups.flatMap((group) => (group.path ? [group.path] : []))
 }
 
 /** What a token is found by: its name, its CSS name with `--`, its description, and its values. */

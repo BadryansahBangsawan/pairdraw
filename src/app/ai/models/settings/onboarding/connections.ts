@@ -22,7 +22,7 @@ import {
   type PlannedModel
 } from './plan'
 
-export type ConnectionTestStatus = 'idle' | 'testing' | 'success' | 'error'
+type ConnectionTestStatus = 'idle' | 'testing' | 'success' | 'error'
 
 export interface OnboardingConnectionState {
   /** A newly entered key; kept only until it is saved or setup closes. */

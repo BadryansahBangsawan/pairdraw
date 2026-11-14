@@ -1,6 +1,6 @@
 import type { TSESTree } from '@typescript-eslint/utils'
 
-export function normalizedPath(path: string): string {
+function normalizedPath(path: string): string {
   return path.replaceAll('\\', '/')
 }
 

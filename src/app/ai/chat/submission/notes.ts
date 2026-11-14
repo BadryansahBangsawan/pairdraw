@@ -24,7 +24,7 @@ export interface CanvasNoteSource {
 }
 
 /** The text a message was sent with, notes for the model included. */
-export function messageText(message: UIMessage): string {
+function messageText(message: UIMessage): string {
   return message.parts
     .filter((part) => part.type === 'text')
     .map((part) => part.text)

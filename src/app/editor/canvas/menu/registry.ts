@@ -11,7 +11,7 @@ export type CanvasContextActionId =
   | 'copy-properties'
   | 'paste-properties'
 
-export type CanvasContextLabelKey =
+type CanvasContextLabelKey =
   | 'copyAsText'
   | 'copyAsSVG'
   | 'copyAsPNG'

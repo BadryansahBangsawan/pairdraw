@@ -52,7 +52,7 @@ export async function readMetrics(path: string): Promise<NavigationMetrics> {
   return v.parse(v.pipe(v.string(), v.parseJson(), metricsSchema), await readFile(path, 'utf8'))
 }
 
-export interface MetricComparison {
+interface MetricComparison {
   baseline: number | null
   candidate: number | null
   delta: number | null

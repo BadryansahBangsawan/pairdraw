@@ -26,36 +26,33 @@ type TextFormatUpdates = {
 
 const store = useEditorStore()
 
-export function alignSelected(
-  axis: 'horizontal' | 'vertical',
-  align: 'min' | 'center' | 'max'
-): void {
+function alignSelected(axis: 'horizontal' | 'vertical', align: 'min' | 'center' | 'max'): void {
   store.alignNodes([...store.state.selectedIds], axis, align)
 }
 
-export function updateSelectedText(updates: TextFormatUpdates): void {
+function updateSelectedText(updates: TextFormatUpdates): void {
   for (const node of store.selectedNodes.value) {
     if (node.type === 'TEXT') store.updateNodeWithUndo(node.id, updates, 'Format text')
   }
 }
 
-export function selectedTextNode(): SceneNode | undefined {
+function selectedTextNode(): SceneNode | undefined {
   return store.selectedNodes.value.find((item) => item.type === 'TEXT')
 }
 
-export function toggleSelectedTextBold(): void {
+function toggleSelectedTextBold(): void {
   const node = selectedTextNode()
   updateSelectedText({
     fontWeight: node && node.fontWeight >= 700 ? 400 : 700
   })
 }
 
-export function toggleSelectedTextItalic(): void {
+function toggleSelectedTextItalic(): void {
   const node = selectedTextNode()
   updateSelectedText({ italic: node ? !node.italic : true })
 }
 
-export function toggleSelectedTextUnderline(): void {
+function toggleSelectedTextUnderline(): void {
   const node = selectedTextNode()
   updateSelectedText({
     textDecoration: node?.textDecoration === 'UNDERLINE' ? 'NONE' : 'UNDERLINE'

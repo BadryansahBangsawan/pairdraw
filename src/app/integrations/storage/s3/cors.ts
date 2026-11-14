@@ -10,7 +10,7 @@ import { IS_BROWSER, WEB_APP_ORIGIN } from '@/constants'
  * origin, so wherever the app runs when CORS is applied gets an exact match. Never a wildcard over
  * a domain the owner of the bucket does not control: any site there could use the bucket.
  */
-export const CLOUD_CORS_STATIC_ORIGINS: readonly string[] = compact([
+const CLOUD_CORS_STATIC_ORIGINS: readonly string[] = compact([
   WEB_APP_ORIGIN,
   'http://localhost:*',
   'http://127.0.0.1:*'

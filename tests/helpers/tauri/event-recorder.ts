@@ -1,4 +1,4 @@
-export type NativeEventTarget = {
+type NativeEventTarget = {
   tag: string
   testId: string | null
   slot: string | null
@@ -6,7 +6,7 @@ export type NativeEventTarget = {
   editable: boolean
 }
 
-export type NativeEventRecord = {
+type NativeEventRecord = {
   sequence: number
   type: string
   timeStamp: number
@@ -159,7 +159,7 @@ async function installRecorder(): Promise<void> {
   )
 }
 
-export async function startNativeEventRecorder(): Promise<NativeEventRecorder> {
+async function startNativeEventRecorder(): Promise<NativeEventRecorder> {
   await installRecorder()
   return {
     async clear() {

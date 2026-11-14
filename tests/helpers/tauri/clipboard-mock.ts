@@ -5,7 +5,7 @@ type ClipboardWrite = {
   cmd: string
 }
 
-export type TauriClipboardSnapshot = {
+type TauriClipboardSnapshot = {
   html: string
   text: string
   writes: ClipboardWrite[]

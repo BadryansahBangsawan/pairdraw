@@ -101,7 +101,7 @@ const openRouterModels = cachedRemoteJSON<ModelOption[]>({
   }
 })
 
-export async function listProviderModels(
+async function listProviderModels(
   providerID: AIProviderID,
   fetcher?: typeof fetch
 ): Promise<ModelOption[]> {

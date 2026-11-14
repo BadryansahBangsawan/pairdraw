@@ -155,5 +155,3 @@ export function createPageChecks(options: PageChecksOptions) {
     stop
   }
 }
-
-export type PageChecks = ReturnType<typeof createPageChecks>

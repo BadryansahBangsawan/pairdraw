@@ -3,7 +3,7 @@ import { useLocalStorage } from '@vueuse/core'
 import { storageProviderRegistry } from './providers'
 import type { StorageFieldID, StorageProviderID } from './types'
 
-export type StoragePreferences = Record<StorageProviderID, Record<StorageFieldID, string>>
+type StoragePreferences = Record<StorageProviderID, Record<StorageFieldID, string>>
 
 export const activeStorageProviderID = useLocalStorage<StorageProviderID>(
   'pairdraw:storage:provider',

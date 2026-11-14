@@ -20,8 +20,6 @@ const WORKSPACE_ID = '6f1c2d3e-4f50-4d7e-9a52-0b6f4f9e3c1a'
 const ACCOUNT = { id: 'user-1', name: 'Ada', email: 'ada@example.com' }
 export const CLOUD_AI_MODEL = 'Cloud Test Model'
 export const CLOUD_AI_REPLY = 'Hello from Cloud'
-/** What each reply costs: 100,000 input tokens at 3,000 credits per million. */
-export const CLOUD_AI_REPLY_CREDITS = 300
 
 interface CloudAIOptions {
   /** Credits the workspace's plan grants each month. */

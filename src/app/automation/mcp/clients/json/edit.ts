@@ -176,7 +176,7 @@ function removeOnlyMember(text: string, object: JSONObjectNode, member: JSONMemb
 }
 
 /** Removes `member` from `object` with its separating comma and, on its own lines, its lines. */
-export function removeMember(text: string, object: JSONObjectNode, member: JSONMember): string {
+function removeMember(text: string, object: JSONObjectNode, member: JSONMember): string {
   const index = object.members.indexOf(member)
   if (index === -1) return text
   if (object.members.length === 1) return removeOnlyMember(text, object, member)
@@ -212,7 +212,7 @@ export function removeMember(text: string, object: JSONObjectNode, member: JSONM
 }
 
 /** A new document holding only `container.key`. */
-export function newDocument(container: string, key: string, value: unknown): string {
+function newDocument(container: string, key: string, value: unknown): string {
   return `${JSON.stringify({ [container]: { [key]: value } }, null, DEFAULT_INDENT)}\n`
 }
 

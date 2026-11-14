@@ -37,7 +37,7 @@ export function localAgentSession(
   return devAgentSession
 }
 
-export function automationCORSOrigin(host: string | undefined): string {
+function automationCORSOrigin(host: string | undefined): string {
   return host ? `http://${host}:1420` : 'http://localhost:1420'
 }
 

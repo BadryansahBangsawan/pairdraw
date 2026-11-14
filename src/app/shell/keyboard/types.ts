@@ -4,7 +4,7 @@ import type { useEditorCommands } from '@pairdraw/vue/editor/commands'
 
 import type { EditorStore } from '@/app/editor/active-store'
 
-export type KeyboardShortcutActions = {
+type KeyboardShortcutActions = {
   smartDelete: (altKey: boolean) => void
   confirmOrEditSelection: () => void
   escapeOrDeselect: () => void

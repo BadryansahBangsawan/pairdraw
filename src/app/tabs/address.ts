@@ -8,14 +8,14 @@ import { activeRoom } from '@/app/collab/rooms'
 
 import { activeTab } from './index'
 
-export const ROOM_ROUTE_PREFIX = '/rooms/'
+const ROOM_ROUTE_PREFIX = '/rooms/'
 const CLOUD_DOCUMENT_PREFIX = '/documents/'
 /** The query a Cloud document's address adds, and leaving it takes away. */
 const CLOUD_DOCUMENT_QUERY = ['version']
 
 export type TabAddress = { path: string; query: LocationQuery }
 
-export function roomRoutePath(roomId: string): string {
+function roomRoutePath(roomId: string): string {
   return `${ROOM_ROUTE_PREFIX}${roomId}`
 }
 

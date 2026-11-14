@@ -43,8 +43,8 @@ export interface ConnectEmbedOptions {
   timeoutMs?: number
 }
 
-export const EMBED_CONNECT_TIMEOUT_MS = 30_000
-export const EMBED_REQUEST_TIMEOUT_MS = 60_000
+const EMBED_CONNECT_TIMEOUT_MS = 30_000
+const EMBED_REQUEST_TIMEOUT_MS = 60_000
 
 export class EmbedClientError extends Error {
   readonly code: string

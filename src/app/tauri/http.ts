@@ -2,7 +2,7 @@ import { randomHex } from '@pairdraw/scene-graph/random'
 
 import type { FetchFunction } from '@/app/http/types'
 
-export interface ProxyHttpHeader {
+interface ProxyHttpHeader {
   name: string
   value: string
 }

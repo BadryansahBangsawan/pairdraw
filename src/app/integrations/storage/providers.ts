@@ -3,7 +3,7 @@ import { CLOUD_STORAGE_PROVIDERS } from '@/app/cloud/integration/storage'
 import { defineStorageProvider, StorageProviderRegistry } from './registry'
 import { createS3StorageAdapter } from './s3/adapter'
 
-export const S3_STORAGE_PROVIDER = defineStorageProvider({
+const S3_STORAGE_PROVIDER = defineStorageProvider({
   id: 's3-compatible',
   label: 'S3 storage',
   description: 'AWS S3, Backblaze B2, Cloudflare R2, MinIO, and compatible storage',

@@ -17,7 +17,7 @@ import {
   type PluginManifest
 } from './schema'
 
-export const PLUGIN_INSTALL_REASONS = [
+const PLUGIN_INSTALL_REASONS = [
   'invalid',
   'duplicate',
   'unknown-capability',
@@ -26,7 +26,7 @@ export const PLUGIN_INSTALL_REASONS = [
   'too-many'
 ] as const
 
-export type PluginInstallReason = (typeof PLUGIN_INSTALL_REASONS)[number]
+type PluginInstallReason = (typeof PLUGIN_INSTALL_REASONS)[number]
 
 export type PluginInstallResult =
   | { ok: true; plugins: InstalledPlugin[] }

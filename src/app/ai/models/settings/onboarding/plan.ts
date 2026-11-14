@@ -35,15 +35,15 @@ export const ONBOARDING_MORE_API_PROVIDERS = [
   'opencode-go'
 ] as const
 /** API accounts whose endpoints send no CORS headers, so only the desktop app can reach them. */
-export const ONBOARDING_DESKTOP_API_PROVIDERS: readonly string[] = [
+const ONBOARDING_DESKTOP_API_PROVIDERS: ReadonlySet<string> = new Set([
   'kimi-for-coding',
   'opencode-zen',
   'opencode-go'
-]
+])
 /** A local model server or a company proxy that speaks the OpenAI API. */
 export const ONBOARDING_SERVER_PROVIDER = 'openai-compatible'
 /** One account for models from several vendors, recommended when no API account exists yet. */
-export const ONBOARDING_METERED_PROVIDER = 'openrouter'
+const ONBOARDING_METERED_PROVIDER = 'openrouter'
 
 export type OnboardingAccess =
   | (typeof ONBOARDING_AGENTS)[number]
@@ -64,7 +64,7 @@ export function isOnboardingAccess(providerID: string): providerID is Onboarding
   return ONBOARDING_ACCESS.has(providerID)
 }
 
-export type OnboardingSpending = 'existing' | 'metered'
+type OnboardingSpending = 'existing' | 'metered'
 
 export interface OnboardingAnswers {
   goals: OnboardingGoal[]
@@ -140,7 +140,7 @@ export function needsDesktop(providerID: string): boolean {
   return (
     providerID === 'harness:pi' ||
     (ONBOARDING_SUBSCRIPTIONS as readonly string[]).includes(providerID) ||
-    ONBOARDING_DESKTOP_API_PROVIDERS.includes(providerID)
+    ONBOARDING_DESKTOP_API_PROVIDERS.has(providerID)
   )
 }
 
@@ -209,7 +209,7 @@ function keepable(model: PlannedModel | null, access: OnboardingAccess[]): model
 }
 
 /** Whether a role may follow the design model: agents cannot, and vision needs image input. */
-export function canFollowDesign(role: AIModelRole, design: PlannedModel | null): boolean {
+function canFollowDesign(role: AIModelRole, design: PlannedModel | null): boolean {
   if (!design || isAgentModel(design)) return false
   return role !== 'vision' || hasVision(design)
 }
@@ -351,19 +351,14 @@ export function planConnections(roles: Omit<OnboardingPlan, 'connections'>): Onb
   return uniq(providers)
 }
 
-/** Whether every role the person asked about has a model. */
-export function coversGoals(plan: OnboardingPlan, goals: OnboardingGoal[]): boolean {
-  return goals.every((goal) => plan[goal] !== null)
-}
-
 /** Requested goals that the access the person selected cannot cover without OpenRouter. */
 export function uncoveredGoals(answers: OnboardingAnswers, options: PlanOptions): OnboardingGoal[] {
   const plan = planOnboarding({ ...answers, spending: 'existing' }, options)
   return answers.goals.filter((goal) => plan[goal] === null)
 }
 
-export const SAME_AS_DESIGN = '__design__'
-export const NO_MODEL = '__none__'
+const SAME_AS_DESIGN = '__design__'
+const NO_MODEL = '__none__'
 
 /** A stable key for a role choice, used as the value of the role's picker. */
 export function roleChoiceKey(choice: PlannedRole): string {

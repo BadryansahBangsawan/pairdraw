@@ -12,7 +12,7 @@ import { textFromContent } from './events'
  * and stay in the document the chat works on. Claude's adapter passes these options to the
  * Claude Agent SDK, where a bare server name allows every tool on it; other agents ignore it.
  */
-export const OWN_TOOLS_ALLOWED = {
+const OWN_TOOLS_ALLOWED = {
   claudeCode: { options: { allowedTools: [`mcp__${PAIRDRAW_MCP_SERVER}`] } }
 }
 

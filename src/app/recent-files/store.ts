@@ -17,8 +17,6 @@ import { clearRecentFileThumbnails } from './thumbnails'
 const RECENT_DOCUMENTS_STORAGE_KEY = 'pairdraw:recent-documents'
 
 export type RecentDocument = v.InferOutput<typeof recentDocumentSchema>
-export type RecentLocalDocument = Extract<RecentDocument, { kind: 'local' }>
-export type RecentStorageDocument = Extract<RecentDocument, { kind: 'storage' }>
 
 const storedRecentDocumentsSchema = v.pipe(v.string(), v.parseJson(), v.array(v.unknown()))
 

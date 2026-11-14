@@ -8,8 +8,6 @@ import { isTauri } from '@/app/tauri/env'
 import type { ProgressAmount } from '@/components/ui/feedback/progress'
 import type { ToastVariant } from '@/components/ui/feedback/toast'
 
-export type { ToastVariant } from '@/components/ui/feedback/toast'
-
 export interface ToastAction {
   label: string
   run: () => void
@@ -28,7 +26,7 @@ export interface Toast {
   progressLabel?: string
 }
 
-export interface ToastPatch {
+interface ToastPatch {
   message?: string
   /** `null` clears the bar, which resumes the toast's normal auto-dismissal. */
   progress?: ProgressAmount | null
@@ -37,7 +35,7 @@ export interface ToastPatch {
 }
 
 /** Handle for a toast that a long-running operation updates until it finishes. */
-export interface ToastHandle {
+interface ToastHandle {
   update(patch: ToastPatch): void
   dismiss(): void
 }

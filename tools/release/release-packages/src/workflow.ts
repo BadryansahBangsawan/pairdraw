@@ -36,7 +36,7 @@ export interface PrepareReleaseOptions {
 }
 
 /** Packs a prepared package directory into `destination` and returns the tarball filename. */
-export type PackDirectory = (directory: string, destination: string) => Promise<string>
+type PackDirectory = (directory: string, destination: string) => Promise<string>
 
 export interface PackReleaseOptions {
   /** Defaults to a real `npm pack`; tests inject an in-process packer to stay out of npm. */

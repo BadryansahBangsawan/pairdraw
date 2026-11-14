@@ -71,11 +71,7 @@ export const webFiles = [
   'brand/mark-mono-dark.svg'
 ] as const
 
-export const pwaFiles = [
-  'brand/pwa-192.png',
-  'brand/pwa-512.png',
-  'brand/pwa-maskable-512.png'
-] as const
+const pwaFiles = ['brand/pwa-192.png', 'brand/pwa-512.png', 'brand/pwa-maskable-512.png'] as const
 
 export const desktopFiles = [
   '32x32.png',

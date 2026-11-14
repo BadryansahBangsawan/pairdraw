@@ -7,13 +7,6 @@ export const controlHeight = {
   lg: 'h-9'
 } satisfies Record<ControlSize, string>
 
-export const squareControlSize = {
-  xs: 'size-6',
-  sm: 'size-7',
-  md: 'size-8',
-  lg: 'size-9'
-} satisfies Record<ControlSize, string>
-
 /**
  * A property field: one step taller than the `xs` control, with the field radius and the UI's
  * 12px type. Selects, inputs, and number fields that override the panel field's size use it, so

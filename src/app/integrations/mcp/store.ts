@@ -286,11 +286,6 @@ export function saveMCPConnectionDraft(
   return connection
 }
 
-export function findMCPConnection(id: MCPConnectionID | null): MCPConnection | undefined {
-  if (!id) return undefined
-  return mcpConnectionSettings.value.connections.find((connection) => connection.id === id)
-}
-
 export function setMCPConnectionCredential(id: MCPConnectionID, value: string): Promise<void> {
   const token = value.trim()
   const reference = mcpConnectionCredentialRef(id)

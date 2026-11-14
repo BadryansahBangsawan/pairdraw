@@ -6,8 +6,8 @@ import * as v from 'valibot'
  */
 
 export const BROWSER_ELEMENT_TEXT_LIMIT = 240
-export const BROWSER_OUTLINE_TEXT_LIMIT = 80
-export const BROWSER_OUTLINE_LIMIT = 24
+const BROWSER_OUTLINE_TEXT_LIMIT = 80
+const BROWSER_OUTLINE_LIMIT = 24
 export const BROWSER_SELECTOR_LIMIT = 500
 
 export const BROWSER_READ_UNREADABLE = 'The page returned nothing we can read.'

@@ -6,7 +6,7 @@ import { delimiter, isAbsolute, join } from 'node:path'
 import { repoPath, testPath } from '#tests/helpers/paths'
 
 /** A port nothing listens on yet, for a companion of the test's own. */
-export function freePort(): Promise<number> {
+function freePort(): Promise<number> {
   return new Promise((resolve, reject) => {
     const server = createServer()
     server.once('error', reject)

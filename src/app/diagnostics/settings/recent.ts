@@ -10,7 +10,7 @@ import {
 } from '@/app/diagnostics'
 
 /** Rows shown at first and added by each "Show more". */
-export const DIAGNOSTICS_PAGE_SIZE = 20
+const DIAGNOSTICS_PAGE_SIZE = 20
 
 /** `problems` keeps warnings and errors. */
 export type DiagnosticsLevelFilter = 'all' | 'problems'

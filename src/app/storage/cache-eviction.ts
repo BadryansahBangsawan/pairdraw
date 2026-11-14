@@ -1,7 +1,7 @@
 import { getLocalCanvasStore } from '@/app/storage/local-store'
 
 /** Keep at most this much cached fig data on device (metas/thumbs are tiny and stay). */
-export const FIG_CACHE_BUDGET_BYTES = 500 * 1024 * 1024
+const FIG_CACHE_BUDGET_BYTES = 500 * 1024 * 1024
 
 /**
  * Evict least-recently-opened fig blobs until the cache fits the budget.

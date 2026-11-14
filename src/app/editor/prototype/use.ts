@@ -1,7 +1,6 @@
 import { computed } from 'vue'
 
 import type {
-  PrototypeNodeAction,
   PrototypeReaction,
   PrototypeTransitionType,
   PrototypeTriggerType
@@ -73,4 +72,4 @@ export function usePrototype() {
   }
 }
 
-export type { PrototypeNodeAction, PrototypeReaction }
+export type { PrototypeReaction }

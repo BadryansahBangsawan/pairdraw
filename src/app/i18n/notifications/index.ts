@@ -4,7 +4,7 @@ import { useStore } from '@nanostores/vue'
 
 import { locale, type Locale, type TranslatedLocale } from '@pairdraw/vue/i18n'
 
-export const notificationMessageDefaults = {
+const notificationMessageDefaults = {
   chatInitializationFailed: params('Could not initialize chat: {error}'),
   linkCopied: 'Link copied to clipboard.',
   clipboardMissingDesignData: 'Clipboard does not contain design data.',

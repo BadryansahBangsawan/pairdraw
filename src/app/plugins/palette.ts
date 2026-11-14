@@ -38,7 +38,7 @@ export function pluginPaletteItems(
  * run, runs it against the active document, and reports a failure without changing the document.
  * A cancelled prompt or a refusal to store the answer runs nothing.
  */
-export async function runPluginFromPalette(id: string): Promise<PluginRunOutcome | null> {
+async function runPluginFromPalette(id: string): Promise<PluginRunOutcome | null> {
   const answered = await ensurePluginsAnswered(
     installedPlugins.value,
     id,

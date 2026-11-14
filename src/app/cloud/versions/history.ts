@@ -10,7 +10,7 @@ import { readFigBytes } from '@/app/tabs'
 import { cloudShareTarget } from '../sharing/document'
 
 /** An earlier version shown in place of the document, in an editor of its own. */
-export type VersionPreview = { version: DocumentVersion; store: EditorStore }
+type VersionPreview = { version: DocumentVersion; store: EditorStore }
 
 /**
  * A tab's open version history. The document is read-only while it is open, as in Figma; a

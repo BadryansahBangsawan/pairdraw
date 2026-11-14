@@ -1,7 +1,7 @@
 import type { BaselineBrowser } from './baseline'
 
-export type BrowserFamily = 'chrome' | 'edge' | 'opera' | 'firefox' | 'safari' | 'unknown'
-export type OperatingSystem = 'macos' | 'ios' | 'windows' | 'linux' | 'android' | 'unknown'
+type BrowserFamily = 'chrome' | 'edge' | 'opera' | 'firefox' | 'safari' | 'unknown'
+type OperatingSystem = 'macos' | 'ios' | 'windows' | 'linux' | 'android' | 'unknown'
 
 export interface SupportEnvironment {
   /** Whether the page runs inside the Tauri desktop shell or a browser tab. */

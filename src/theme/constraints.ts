@@ -31,6 +31,4 @@ const constraintsTheme = {
     scale: false
   }
 }
-
-export type ConstraintsTheme = typeof constraintsTheme
 export default constraintsTheme

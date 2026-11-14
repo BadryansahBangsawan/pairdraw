@@ -3,7 +3,7 @@ import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { ImageAttachmentMediaType } from '@/app/ai/attachment/image/types'
 
-export interface AttachmentBase {
+interface AttachmentBase {
   id: string
   messageId: string
   kind: 'image' | 'node' | 'file'

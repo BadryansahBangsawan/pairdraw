@@ -13,7 +13,7 @@ import { seedStorageCanvasFromRemote } from '@/app/storage/sync/persist'
  * conflict to resolve, or it is based on the revision the provider lists. Providers without
  * revisions fall back to comparing modification times.
  */
-export function localCopyIsCurrent(local: LocalCanvasMeta, document: StorageDocument): boolean {
+function localCopyIsCurrent(local: LocalCanvasMeta, document: StorageDocument): boolean {
   if (local.syncStatus !== 'synced') return true
   if (document.revision != null) return local.remoteRevision === document.revision
   return !document.metadataAuthoritative || local.updatedAt >= document.updatedAt

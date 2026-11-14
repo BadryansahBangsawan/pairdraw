@@ -32,13 +32,13 @@ const PHOTO_SERVICE_STORAGE_KEY = 'pairdraw:photo-service'
 /** Results a page; a multiple of the picker's three columns. */
 const PHOTOS_PER_PAGE = 24
 /** The width a placed photo is downloaded at; the services' regular size. */
-export const PLACED_PHOTO_SIZE = 1080
+const PLACED_PHOTO_SIZE = 1080
 const SEARCH_DEBOUNCE_MS = 300
 
 /** The service the picker searched last. */
-export const lastPhotoService = useLocalStorage<PhotoService>(PHOTO_SERVICE_STORAGE_KEY, 'unsplash')
+const lastPhotoService = useLocalStorage<PhotoService>(PHOTO_SERVICE_STORAGE_KEY, 'unsplash')
 
-export function photoServiceHasKey(service: PhotoService): boolean {
+function photoServiceHasKey(service: PhotoService): boolean {
   const status = service === 'pexels' ? pexelsKeyStatus.value : unsplashKeyStatus.value
   return status === 'configured'
 }

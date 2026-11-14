@@ -22,7 +22,7 @@ export function windowDocumentId(tabId: string): string {
 }
 
 /** Splits `windowLabel:tabId`; null when the id carries no window, as a bare tab id does. */
-export function parseWindowDocumentId(id: string): { window: string; tabId: string } | null {
+function parseWindowDocumentId(id: string): { window: string; tabId: string } | null {
   const separator = id.indexOf(':')
   if (separator <= 0 || separator === id.length - 1) return null
   return { window: id.slice(0, separator), tabId: id.slice(separator + 1) }

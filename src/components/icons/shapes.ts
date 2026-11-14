@@ -33,7 +33,7 @@ function inset(commands: PolygonOutlineCommand[]): PolygonOutlineCommand[] {
 }
 
 /** A kind's outline as icon markup, drawn from the same geometry the canvas draws it from. */
-export function shapeKindIconSVG(kind: ShapeWithTextType): string {
+function shapeKindIconSVG(kind: ShapeWithTextType): string {
   const size = BOX - INSET * 2
   const { outline, details } = shapeWithTextGeometry(kind, size, size, 1)
   const paths = [outline, details]

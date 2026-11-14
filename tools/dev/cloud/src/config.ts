@@ -10,7 +10,7 @@ export type LocalCloudEndpoints = {
 }
 
 /** Deployment settings for one worktree's local Cloud, with open sign-up and captured mail. */
-export function localCloudDeployment(endpoints: LocalCloudEndpoints): CloudDeploymentInput {
+function localCloudDeployment(endpoints: LocalCloudEndpoints): CloudDeploymentInput {
   return {
     schema_version: 2,
     deployment: {

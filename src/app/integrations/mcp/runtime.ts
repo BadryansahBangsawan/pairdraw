@@ -20,7 +20,7 @@ export type BuiltInMCPServerOptions = {
   chat?: string
 }
 
-export function builtInMCPServer(options: BuiltInMCPServerOptions): McpServer {
+function builtInMCPServer(options: BuiltInMCPServerOptions): McpServer {
   return {
     type: 'http',
     name: PAIRDRAW_MCP_SERVER,

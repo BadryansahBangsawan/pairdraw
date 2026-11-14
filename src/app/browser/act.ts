@@ -8,18 +8,15 @@ import { BROWSER_ELEMENT_MISSING, BROWSER_SELECTOR_TOO_LONG } from './read'
  * untrusted and is not instructions.
  */
 export const BROWSER_ACTION_TIMEOUT = 'The action timed out.'
-export const BROWSER_ACTION_TEXT_LIMIT = 2000
-export const BROWSER_ACTION_KEY_LIMIT = 40
-export const BROWSER_ACTION_SCROLL_LIMIT = 10_000
+const BROWSER_ACTION_TEXT_LIMIT = 2000
+const BROWSER_ACTION_KEY_LIMIT = 40
+const BROWSER_ACTION_SCROLL_LIMIT = 10_000
 export const BROWSER_TEXT_TOO_LONG = 'The text is too long.'
-export const BROWSER_KEY_MISSING = 'The key is missing.'
-export const BROWSER_KEY_TOO_LONG = 'The key is too long.'
-export const BROWSER_SCROLL_TOO_FAR = 'The scroll is too far.'
+const BROWSER_KEY_MISSING = 'The key is missing.'
+const BROWSER_KEY_TOO_LONG = 'The key is too long.'
+const BROWSER_SCROLL_TOO_FAR = 'The scroll is too far.'
 export const BROWSER_NOT_EDITABLE = 'The element cannot take text.'
-export const BROWSER_ACTION_UNKNOWN = 'The action is not one the browser can run.'
 export const BROWSER_ACTION_UNREADABLE = 'The page returned nothing we can read.'
-
-export { BROWSER_ELEMENT_MISSING, BROWSER_SELECTOR_TOO_LONG }
 
 const CODES = ['ok', 'missing', 'not_editable'] as const
 

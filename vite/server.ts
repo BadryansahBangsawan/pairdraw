@@ -10,7 +10,7 @@ function ignoreMarkdownOutsideSource(path: string): boolean {
   return !WATCHED_MARKDOWN_ROOTS.some((root) => normalized.includes(root))
 }
 
-export const WATCH_IGNORED = [
+const WATCH_IGNORED = [
   '**/desktop/**',
   '**/packages/cli/**',
   '**/packages/mcp/**',

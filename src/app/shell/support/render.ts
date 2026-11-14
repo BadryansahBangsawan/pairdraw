@@ -7,7 +7,7 @@ import type { SupportNotice } from './guidance'
  * takes over whatever a half-mounted app left behind, and the splash beside it hides.
  */
 const APP_ROOT_SELECTOR = '#app'
-export const BOOT_NOTICE_ID = 'boot-notice'
+const BOOT_NOTICE_ID = 'boot-notice'
 
 function openExternally(event: MouseEvent, href: string): void {
   // The desktop WebView must not navigate away from the app; hand links to the OS.

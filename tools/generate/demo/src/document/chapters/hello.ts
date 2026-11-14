@@ -6,11 +6,11 @@ import { layoutChapter, type Chapter, type ChapterContext } from './chapter'
 import { CHAPTERS } from './names'
 import type { Player } from './slots'
 
-export const HERO_WIDTH = 880
-export const HERO_HEIGHT = 640
+const HERO_WIDTH = 880
+const HERO_HEIGHT = 640
 
 /** The hero's background: a slow mesh of the theme's violets. */
-export const HERO_PRESET: ShaderPreset = {
+const HERO_PRESET: ShaderPreset = {
   components: [
     {
       type: 'MeshGradient',

@@ -9,7 +9,6 @@ import type { EmbedParams } from './params'
 import { startEmbedSession, type EmbedSession } from './session'
 
 export type { EmbedParams } from './params'
-export { parseEmbedParams } from './params'
 
 /** Where an embed stands: waiting for its host, connected to it, or refused by its own URL. */
 export type EmbedStatus = 'waiting' | 'connected' | 'invalid-origin'

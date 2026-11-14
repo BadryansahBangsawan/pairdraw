@@ -19,7 +19,7 @@ export function downloadProgressLabel(
   })
 }
 
-export function formatBytes(bytes: number): string {
+function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
   const kib = bytes / 1024
   if (kib < 1024) return `${kib.toFixed(1)} KiB`

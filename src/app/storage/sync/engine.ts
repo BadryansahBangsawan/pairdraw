@@ -308,11 +308,3 @@ export async function resumeStorageSync(): Promise<void> {
   if (jobs.length > 0) setSyncUI('syncing')
   void kickSyncEngine()
 }
-
-/** After credentials cleared — drop local mirror + outbox (optional safety). */
-export async function clearStorageLocalMirror(): Promise<void> {
-  await getLocalCanvasStore().clearAll()
-  await getOutbox().clear()
-  setPendingSyncCount(0)
-  setSyncUI('idle')
-}

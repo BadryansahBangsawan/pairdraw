@@ -2,7 +2,7 @@ import * as v from 'valibot'
 
 export type PackageTarget = string | null | PackageTarget[] | { [condition: string]: PackageTarget }
 
-export const packageTargetSchema: v.GenericSchema<PackageTarget> = v.lazy(() =>
+const packageTargetSchema: v.GenericSchema<PackageTarget> = v.lazy(() =>
   v.union([
     v.string(),
     v.null(),

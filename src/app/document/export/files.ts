@@ -21,7 +21,7 @@ type ExportData = string | ArrayBuffer | Uint8Array
 type DownloadBlob = (data: Uint8Array, filename: string, mime: string) => void
 
 /** A file an export writes beside its main file, such as an HTML page's images. */
-export interface ExportedAsset {
+interface ExportedAsset {
   /** Relative to the main file, as the main file refers to it. */
   path: string
   bytes: Uint8Array
@@ -168,7 +168,7 @@ export function createExportTargetActions(editor: Editor, state: EditorState, io
   return { renderExportImage, getSelectionExportTarget, listSelectionExportFormats }
 }
 
-export async function chooseTauriExportPath(fileName: string, format: string, ext: string) {
+async function chooseTauriExportPath(fileName: string, format: string, ext: string) {
   const { save } = await import('@tauri-apps/plugin-dialog')
   return save({
     defaultPath: fileName,
@@ -176,7 +176,7 @@ export async function chooseTauriExportPath(fileName: string, format: string, ex
   })
 }
 
-export async function writeTauriExportFile(path: string, data: Uint8Array) {
+async function writeTauriExportFile(path: string, data: Uint8Array) {
   const { writeFile: tauriWrite } = await import('@tauri-apps/plugin-fs')
   await tauriWrite(path, data)
 }

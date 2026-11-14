@@ -2,7 +2,7 @@ import { groupBy, sum } from 'es-toolkit'
 
 import type { DiagnosticEvent } from '@/app/diagnostics/types'
 
-export type UsageModelSummary = {
+type UsageModelSummary = {
   provider: string
   model: string
   /** Model calls: a built-in chat reply makes one per step, an agent reply one per turn. */

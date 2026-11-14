@@ -19,7 +19,7 @@ import { browserURLPolicy, type BrowserURLRejection } from './url'
  * not a layer.
  */
 
-export const BROWSER_TOOL_COMMANDS = [
+const BROWSER_TOOL_COMMANDS = [
   'browser_load_page',
   'browser_screenshot',
   'browser_element',
@@ -44,7 +44,7 @@ const URL_ERRORS: Record<BrowserURLRejection, string> = {
 
 const SHOT_NAMES = { visible: 'View', full: 'Page', element: 'Element' } as const
 
-export type BrowserToolShot = keyof typeof SHOT_NAMES
+type BrowserToolShot = keyof typeof SHOT_NAMES
 
 export type BrowserToolCall =
   | { command: 'browser_load_page'; url: string }

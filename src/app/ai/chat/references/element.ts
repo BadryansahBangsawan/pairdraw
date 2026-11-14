@@ -6,8 +6,8 @@ import type { ChatReference } from './link'
  * A chat chip that names one element of the built-in browser. The id is one JSON object so the
  * link stays a single path segment, and the conversation stores that link in the message text.
  */
-export const ELEMENT_MARK_URL_LIMIT = 2000
-export const ELEMENT_MARK_SELECTOR_LIMIT = 500
+const ELEMENT_MARK_URL_LIMIT = 2000
+const ELEMENT_MARK_SELECTOR_LIMIT = 500
 
 const elementMarkSchema = v.strictObject({
   url: v.pipe(v.string(), v.minLength(1), v.maxLength(ELEMENT_MARK_URL_LIMIT)),
@@ -20,7 +20,7 @@ export interface ElementMark {
 }
 
 /** The reference id for a chip. Null when the address or the selector cannot be stored. */
-export function elementMarkId(url: string, selector: string): string | null {
+function elementMarkId(url: string, selector: string): string | null {
   const parsed = v.safeParse(elementMarkSchema, { url, selector })
   if (!parsed.success) return null
   return JSON.stringify(parsed.output)

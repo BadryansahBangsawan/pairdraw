@@ -10,12 +10,12 @@ import type { ChatGPTCredential } from './credential'
  * ChatGPT sign-in is the OAuth PKCE flow the Codex CLI uses. OpenAI registers its client with
  * one redirect, a loopback listener on port 1455, so only the desktop app can receive it.
  */
-export const CHATGPT_CLIENT_ID = 'app_EMoamEEZ73f0CkXaXp7hrann'
-export const CHATGPT_AUTHORIZE_URL = 'https://auth.openai.com/oauth/authorize'
+const CHATGPT_CLIENT_ID = 'app_EMoamEEZ73f0CkXaXp7hrann'
+const CHATGPT_AUTHORIZE_URL = 'https://auth.openai.com/oauth/authorize'
 export const CHATGPT_TOKEN_URL = 'https://auth.openai.com/oauth/token'
-export const CHATGPT_CALLBACK_PORT = 1455
-export const CHATGPT_CALLBACK_PATH = '/auth/callback'
-export const CHATGPT_REDIRECT_URI = `http://localhost:${CHATGPT_CALLBACK_PORT}${CHATGPT_CALLBACK_PATH}`
+const CHATGPT_CALLBACK_PORT = 1455
+const CHATGPT_CALLBACK_PATH = '/auth/callback'
+const CHATGPT_REDIRECT_URI = `http://localhost:${CHATGPT_CALLBACK_PORT}${CHATGPT_CALLBACK_PATH}`
 /** Names this app to the backend in its `originator` header and on the consent screen. */
 export const CHATGPT_ORIGINATOR = 'pairdraw'
 const SCOPE = 'openid profile email offline_access'

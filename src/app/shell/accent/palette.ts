@@ -50,7 +50,7 @@ export const ACCENT_TOKENS = [
   '--color-on-accent',
   '--color-on-primary'
 ] as const
-export type AccentToken = (typeof ACCENT_TOKENS)[number]
+type AccentToken = (typeof ACCENT_TOKENS)[number]
 
 type RelatedToken = Exclude<
   AccentToken,
@@ -87,13 +87,13 @@ export const ACCENT_PANEL_COLORS: Readonly<Record<AccentTheme, readonly [string,
 }
 
 /** How much of the accent the unfocused selection tint mixes over the panel. */
-export const ACCENT_TINT_AMOUNT = 0.12
+const ACCENT_TINT_AMOUNT = 0.12
 
 /** Lightness band a base is held in, so a near-black or near-white pick still shows its controls. */
 export const ACCENT_LIGHTNESS_RANGE = { min: 0.4, max: 0.75 } as const
 
 /** WCAG AA contrast for normal text, which every accent's text keeps against its surface. */
-export const ACCENT_TEXT_CONTRAST = 4.5
+const ACCENT_TEXT_CONTRAST = 4.5
 
 /** Lightness steps tried, nearest first, when a color's text would fall short of that contrast. */
 const LIGHTNESS_SHIFTS = Array.from({ length: 61 }, (_, index) =>
@@ -120,7 +120,7 @@ export function accentBaseColor(preference: AccentPreference): Color {
 }
 
 /** The canvas selection color a preset pins, or undefined when it follows the derived family. */
-export function accentSelectionColor(preference: AccentPreference): Color | undefined {
+function accentSelectionColor(preference: AccentPreference): Color | undefined {
   if (preference.kind !== 'preset') return undefined
   const pinned = ACCENT_PRESET_SELECTIONS[preference.preset]
   return pinned === undefined ? undefined : parseColor(pinned)

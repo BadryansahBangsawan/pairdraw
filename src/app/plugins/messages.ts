@@ -45,8 +45,6 @@ export function pluginCallUnknownMessage(name: string): string {
   return `No tool named "${name}".`
 }
 
-export const PLUGIN_CALL_INVALID_ARGS_MESSAGE = 'This call has arguments the tool does not accept.'
-
 export const PLUGIN_CALL_UNAVAILABLE_MESSAGE =
   'This run has no document to call; a plugin can only reach tools in the app.'
 

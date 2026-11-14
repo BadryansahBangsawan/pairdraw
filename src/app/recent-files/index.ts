@@ -1,6 +1,5 @@
 export {
   clearRecentFiles,
-  forgetRecentDocument,
   forgetRecentDocuments,
   forgetRecentFile,
   forgetRecentStorageDocument,
@@ -11,12 +10,6 @@ export {
   recentLocalFilePaths,
   rememberRecentFile,
   rememberRecentStorageDocument,
-  type RecentDocument,
-  type RecentLocalDocument,
-  type RecentStorageDocument
+  type RecentDocument
 } from './store'
-export {
-  cacheRecentFileThumbnail,
-  loadCachedRecentFileThumbnail,
-  loadRecentFileThumbnail
-} from './thumbnails'
+export { cacheRecentFileThumbnail, loadCachedRecentFileThumbnail } from './thumbnails'

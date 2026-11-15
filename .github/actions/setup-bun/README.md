@@ -12,7 +12,7 @@ Rust release caching uses `desktop -> target`: `target` is relative to the Cargo
 
 ## Limits
 
-GitHub isolates caches by ref. One release tag cannot restore another tag's caches. The corrected Rust path benefits retries and compatible caches from the default branch, but does not alone make every future release warm. To seed caches for later tags, manually run the existing Build workflow on `master` with the same toolchain/targets. That dispatch does not publish npm packages or create a tagged release; it does run the full desktop build matrix. This change does not schedule or launch such a warm-up automatically.
+GitHub isolates caches by ref. One release tag cannot restore another tag's caches. The corrected Rust path benefits retries and compatible caches from the default branch, but does not alone make every future release warm. To seed caches for later tags, manually run the existing Build workflow on `main` with the same toolchain/targets. That dispatch does not publish npm packages or create a tagged release; it does run the full desktop build matrix. This change does not schedule or launch such a warm-up automatically.
 
 Other callers retain the default writer behavior. Concurrent writers in the general `workspace` scope may still race; the single-writer policy here is specifically for the desktop release matrix, not a repository-wide cache scheduler.
 

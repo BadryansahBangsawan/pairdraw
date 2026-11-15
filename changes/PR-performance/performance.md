@@ -1,1 +1,1 @@
-- The editor loads about 400 KB less JavaScript at startup, since the peer-to-peer room client now loads only when a room is joined.
+- The editor loads about 2.6 MB less JavaScript at startup, since the peer-to-peer room client, Settings, guided AI setup, the variables window, the code panel, the Markdown renderer, the AI providers' SDKs, and the web font catalog client now load when first used.

@@ -204,7 +204,7 @@ Penpot besitzt isoliert ausgeführte Plugins, aber keine vergleichbare Skript-AP
 | Development setup | Pairdraw | TypeScript und Vue statt Clojure, Rust und Docker |
 | Desktop app | Pairdraw | Native Tauri application |
 | Layout | Pairdraw | Yoga statt zwei eigener Implementations |
-| Collaboration | Unterschiedliche Stärken | Penpot: Server und Access control; Pairdraw: P2P ohne Hosting |
+| Collaboration | Unterschiedliche Stärken | Penpot: Server und Access control; Pairdraw: selbst gehosteter Cloud-Server und KI-Agenten auf der Arbeitsfläche |
 | Selbsthosting | Penpot | Docker-Bereitstellung |
 | Ökosystemreife | Penpot | Mehrjährige Produktionserfahrung |
 

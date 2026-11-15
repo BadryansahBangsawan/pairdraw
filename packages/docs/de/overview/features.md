@@ -21,7 +21,7 @@ Pairdraw öffnet und speichert `.fig`-Dateien direkt. Import und Export verwende
 
 ## Eigenschaften
 
-Die Registerkarten Design, Code, KI und Prüfen passen sich der aktuellen Auswahl an:
+Die Registerkarten Design, Code und Prüfen passen sich der aktuellen Auswahl an; der AI-Chat hat eine eigene Spalte:
 
 - **Darstellung:** Deckkraft, einheitlicher oder separater Eckenradius und Sichtbarkeit.
 - **Füllung:** Volltonfarbe, lineare, radiale, Winkel- und Diamantverläufe sowie Bilder.
@@ -75,7 +75,7 @@ Werkzeugaufrufe erscheinen als einklappbare Einträge auf einer Zeitleiste. Zur 
 
 `http`- und `https`-Seiten öffnen sich in einem eigenen Fenster der Desktop-App, das nichts mit dem Editor teilt, und lassen sich auf die Arbeitsfläche holen: die ganze Seite oder ein ausgewähltes Element als Ebenen importieren oder einen Screenshot der Ansicht, der Seite oder eines Elements ablegen. Der Chat kann die Seite lesen, ein Element in der Antwort markieren und darauf klicken, tippen, eine Taste drücken, scrollen oder warten; gefragt wird vorher, wenn die Einstellungen vor Änderungen fragen.
 
-Auf einem Board wird derselbe Browser zur Recherche: Der Chat zitiert die Seite in eine Haftnotiz mit Adresse, Titel, Zitat und Lesezeit ([Recherche auf einem Board](/user-guide/research)).
+In einem vorhandenen Board wird derselbe Browser zur Recherche (neue Boards bietet Pairdraw nicht an): Der Chat zitiert die Seite in eine Haftnotiz mit Adresse, Titel, Zitat und Lesezeit ([Recherche auf einem Board](/user-guide/research)).
 
 ## MCP-Server
 
@@ -100,9 +100,9 @@ pairdraw eval design.fig -c "..."     # Figma Plugin API
 
 Alle Befehle unterstützen `--json`. Installation: `npm install -g @pairdraw/cli` oder `bun add -g @pairdraw/cli`.
 
-## Zusammenarbeit in Echtzeit
+## Zusammenarbeit
 
-Die Zusammenarbeit erfolgt direkt zwischen den Teilnehmern über WebRTC und benötigt keinen zentralen Server. Ein Link genügt. Verfügbar sind Zeiger der Teilnehmer, Anwesenheitsanzeigen, das Folgen der Ansicht eines anderen Teilnehmers und Sprachanrufe mit anderen Teilnehmern im Raum.
+KI-Agenten zeigen ihre Zeiger und die Ebenen, die sie bearbeiten, auf der Arbeitsfläche, und die Ansicht folgt ihnen, während sie arbeiten. Cloud-Dokumente bearbeiten mehrere Personen gemeinsam über einen selbst gehosteten [Pairdraw-Cloud](/user-guide/pairdraw-cloud)-Server, mit Zeigern, Anwesenheitsanzeigen und dem Folgen der Ansicht einer Person. Live-Räume für lokale Dokumente, der Beitritt per Link und Sprachanrufe gehören nicht zu Pairdraw ([Zusammenarbeit](/de/programmable/collaboration)).
 
 ## Desktop und Web
 

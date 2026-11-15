@@ -84,7 +84,7 @@ Komponenten, Sätze, Instanzen, Varianten, Eigenschaften einschließlich Slots, 
 
 ## Prototypen
 
-Verbindungen, Auslöser, Aktionen, Animationen, Overlays, Scrollverhalten, Abläufe und Präsentationsmodus sind noch nicht umgesetzt.
+Im Bereich Prototyp erhalten Ebenen Klick- und Verzögerungsinteraktionen, die zu einem Frame führen, eine Überlagerung öffnen oder schließen oder zurückgehen, mit sofortigem oder aufgelöstem Übergang; sie werden als Figma-Prototypreaktionen in `.fig` gespeichert und lassen sich auf der Arbeitsfläche abspielen ([Prototyp abspielen](/user-guide/playing-a-prototype)). Präsentieren zeigt die Folien einer Seite im Vollbild. Scrollverhalten, Abläufe, Variablen in Prototypen und weitere Animationen fehlen noch.
 
 ## Import und Export
 
@@ -92,7 +92,7 @@ Verbindungen, Auslöser, Aktionen, Animationen, Overlays, Scrollverhalten, Ablä
 
 ## Plugin API, Zusammenarbeit und Entwicklermodus
 
-`eval`, Kommentare, P2P-Zusammenarbeit mit Sprachanrufen, Tailwind-Export, MCP-Server und CLI sind verfügbar. Teilweise umgesetzt sind Entwicklermodus und Code-Snippets: Der Code-Tab zeigt Design-JSX, HTML, Vue oder React mit CSS oder Tailwind, dazu Ready-for-dev-Status; ein Inspektionsmodus mit Maßlinien sowie Swift, Kotlin und Compose fehlen. Cursor-Chat, Code Connect, Verzweigung und Figma for VS Code fehlen.
+`eval`, Kommentare, gemeinsames Bearbeiten von Cloud-Dokumenten über einen Pairdraw-Cloud-Server, Tailwind-Export, MCP-Server und CLI sind verfügbar. Teilweise umgesetzt sind Entwicklermodus und Code-Snippets: Der Code-Tab zeigt Design-JSX, HTML, Vue oder React mit CSS oder Tailwind, dazu Ready-for-dev-Status; ein Inspektionsmodus mit Maßlinien sowie Swift, Kotlin und Compose fehlen. Cursor-Chat, Code Connect, Verzweigung und Figma for VS Code fehlen.
 
 ## Figma Draw
 

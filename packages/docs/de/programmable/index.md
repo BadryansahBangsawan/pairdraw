@@ -18,7 +18,7 @@ Der integrierte Assistent kann mehr als 90 Werkzeuge ausführen. Eine Anweisung 
 
 ## Zusammenarbeit
 
-Pairdraw synchronisiert Dokumente direkt zwischen Teilnehmern über WebRTC. Ein geteilter Raumlink genügt; ein zentraler Server und ein Konto sind nicht erforderlich. Teilnehmerzeiger und Ansichtsverfolgung zeigen die anderen Personen. Yjs CRDT führt gleichzeitige Änderungen zusammen.
+KI-Agenten zeigen ihre Zeiger auf der Arbeitsfläche, und die Ansicht folgt ihnen, während sie arbeiten. Gemeinsam bearbeitet werden Cloud-Dokumente über den Cloud-Server Ihres Teams, wo Yjs CRDT gleichzeitige Änderungen zusammenführt. Live-Räume für lokale Dokumente gehören nicht zu Pairdraw.
 
 [Zusammenarbeit →](./collaboration)
 

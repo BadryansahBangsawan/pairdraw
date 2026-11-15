@@ -9,7 +9,9 @@ description: Integrierter AI-Assistent mit mehr als 90 Werkzeugen zum Erstellen 
 
 ## Einrichtung
 
-Beim ersten Start fragt die geführte Einrichtung, wobei die KI helfen soll und was bereits vorhanden ist: ein Coding-Agent wie Claude Code, Codex oder Gemini CLI in der Desktop-App, ein API-Konto oder ein lokaler bzw. Firmenserver. Sie verbindet diesen Zugang und weist ihn den Rollen **Design agent** und **Vision** zu; manuell Eingerichtetes bleibt erhalten. Bei OpenRouter genügt eine Anmeldung statt eines eingefügten API-Schlüssels. Sie lässt sich überspringen und jederzeit über **Einstellungen → KI und Agenten → Geführte Einrichtung starten** erneut ausführen. Modelle manuell einrichten:
+Beim ersten Start öffnet Pairdraw keinen Einrichtungsdialog. Solange kein Modell eingerichtet ist, sucht es einen [Coding-Agenten](/programmable/coding-agents), der bereits auf diesem Computer installiert ist: Claude Code, dann Codex, dann Gemini CLI. Der Chat sagt, welchen er verwendet, und bietet **Ändern** für ein anderes Modell an. Braucht ein Agent noch eine Anmeldung, sein ACP-Programm oder den MCP-Server, zeigt die Chat-Spalte dafür eine Schaltfläche; ohne diesen Klick wird nichts angemeldet oder installiert. Ein selbst eingerichtetes Modell wird nie ersetzt.
+
+Findet Pairdraw keinen Agenten, öffnet das Senden eines Prompts die geführte Einrichtung. Sie fragt, wobei die KI helfen soll und was bereits vorhanden ist: ein Coding-Agent wie Claude Code, Codex oder Gemini CLI in der Desktop-App, ein API-Konto oder ein lokaler bzw. Firmenserver. Sie verbindet diesen Zugang und weist ihn den Rollen **Design agent** und **Vision** zu; manuell Eingerichtetes bleibt erhalten. Bei OpenRouter genügt eine Anmeldung statt eines eingefügten API-Schlüssels: Die Desktop-App kehrt dafür über einen Port auf diesem Computer zurück, die Web-App meldet sich in einem Pop-up an. Jederzeit erneut ausführen lässt sie sich über **Einstellungen → Modelle → Geführte Einrichtung starten**. Modelle manuell einrichten:
 
 1. AI-Chat öffnen.
 2. Einstellungssymbol wählen.

@@ -29,7 +29,7 @@ Jede Seite besitzt einen eigenen Hintergrund sowie eine eigene Ansichtsposition 
 
 ## Folien
 
-Das Folien-Panel listet die Rahmen der obersten Ebene der Seite als nummerierte Folienminiaturen in Ebenenreihenfolge. Ein Klick auf eine Folie zeigt ihren Rahmen auf der Arbeitsfläche; ziehen Sie eine Folie — oder drücken Sie <kbd>Alt</kbd> mit Pfeil nach oben oder unten —, um sie umzuordnen. **Folien exportieren** schreibt alle Folien in dieser Reihenfolge in eine PDF- oder PowerPoint-Datei.
+Das Folien-Panel listet die Rahmen der obersten Ebene der Seite als nummerierte Folienminiaturen in Ebenenreihenfolge. Ein Klick auf eine Folie zeigt ihren Rahmen auf der Arbeitsfläche; ziehen Sie eine Folie — oder drücken Sie <kbd>Alt</kbd> mit Pfeil nach oben oder unten —, um sie umzuordnen. **Folien als PDF exportieren** schreibt alle Folien in dieser Reihenfolge in eine PDF-Datei.
 
 ## Präsentieren
 

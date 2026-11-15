@@ -9,7 +9,7 @@ import { createStdioRPCBridge } from '#mcp/stdio/bridge'
 import { getDiscoveryPath } from '#mcp/transport/paths'
 
 const isUnix = process.platform !== 'win32'
-const TEST_DIR = join(tmpdir(), `op-mcp-reconnect-${process.pid}`)
+const TEST_DIR = join(tmpdir(), `pairdraw-mcp-reconnect-${process.pid}`)
 const SOCKET_PATH = join(TEST_DIR, 'mcp-test.sock')
 const SOCKET_PATH_2 = join(TEST_DIR, 'mcp-test-v2.sock')
 const AUTH_TOKEN = 'test-reconnect-token'

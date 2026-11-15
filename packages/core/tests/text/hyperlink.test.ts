@@ -53,7 +53,7 @@ describe('normalizeLinkURL', () => {
   })
 
   test('refuses empty, spaced, and hostless addresses', () => {
-    for (const typed of ['', '   ', 'open pencil.dev', 'https://', 'mailto:']) {
+    for (const typed of ['', '   ', 'pair draw.dev', 'https://', 'mailto:']) {
       expect(normalizeLinkURL(typed)).toBeNull()
     }
   })

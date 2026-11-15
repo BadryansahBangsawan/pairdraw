@@ -39,7 +39,7 @@ export interface TestCompanion {
 }
 
 export async function startCompanion(): Promise<TestCompanion> {
-  const dir = mkdtempSync(join(tmpdir(), 'op-companion-'))
+  const dir = mkdtempSync(join(tmpdir(), 'pairdraw-companion-'))
   const bin = join(dir, 'bin')
   const workspace = join(dir, 'workspace')
   mkdirSync(bin)

@@ -42,7 +42,7 @@ describe('the app a companion pairs with', () => {
 
 describe('the page that opens a link', () => {
   test.skipIf(isWindows)('is readable only by this user and forwards to the link', async () => {
-    const dir = mkdtempSync(join(tmpdir(), 'op-connect-page-'))
+    const dir = mkdtempSync(join(tmpdir(), 'pairdraw-connect-page-'))
     try {
       const link = 'https://app.example.com/#connect=abc&port=7601'
       const page = await writeConnectPage(dir, link)

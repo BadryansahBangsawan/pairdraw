@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "open-pencil-app",
+      "name": "pairdraw-app",
       "dependencies": {
         "@ai-sdk/anthropic": "^4.0.71",
         "@ai-sdk/deepseek": "^3.0.58",

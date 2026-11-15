@@ -23,7 +23,7 @@ function freePort(): number {
 
 /** Starts the server and waits until it reports that it is listening. */
 async function startServer(env: Record<string, string>) {
-  const directory = mkdtempSync(join(tmpdir(), 'op-mcp-stdin-'))
+  const directory = mkdtempSync(join(tmpdir(), 'pairdraw-mcp-stdin-'))
   const child = Bun.spawn(['bun', ENTRY], {
     stdin: 'pipe',
     stdout: 'ignore',

@@ -30,7 +30,7 @@ test.afterEach(() => {
 
 /** Opens Home from the companion's link and confirms the pairing, as a person does. */
 async function openPaired(page: Page, baseURL: string | undefined, options: CompanionOptions) {
-  const dir = mkdtempSync(join(tmpdir(), 'op-autodetect-e2e-'))
+  const dir = mkdtempSync(join(tmpdir(), 'pairdraw-autodetect-e2e-'))
   const companion = await startCompanion(new URL('/', baseURL).href, dir, {
     isolated: true,
     ...options

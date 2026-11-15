@@ -32,7 +32,7 @@ interface ToolResult {
 
 /** An MCP server over a fresh root whose app answers each tool with `results[name]`. */
 async function server(results: Record<string, unknown>) {
-  const root = await mkdtemp(join(tmpdir(), 'op-mcp-root-'))
+  const root = await mkdtemp(join(tmpdir(), 'pairdraw-mcp-root-'))
   const manager = createMCPSessionManager({
     serverVersion: '0.0.0',
     registerTools: (mcpServer, agentSession, onToolSettled) =>

@@ -35,7 +35,7 @@ let dir: string
 let server: ServerHandle
 
 beforeEach(async () => {
-  dir = mkdtempSync(join(tmpdir(), 'op-companion-chat-'))
+  dir = mkdtempSync(join(tmpdir(), 'pairdraw-companion-chat-'))
   const bin = join(dir, 'bin')
   mkdirSync(bin)
   const wrapper = join(bin, 'fake-acp')

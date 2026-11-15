@@ -44,7 +44,7 @@ test('the composer offers the agent’s model, reasoning, and mode, and keeps th
   baseURL
 }) => {
   test.setTimeout(120_000)
-  const dir = mkdtempSync(join(tmpdir(), 'op-session-controls-e2e-'))
+  const dir = mkdtempSync(join(tmpdir(), 'pairdraw-session-controls-e2e-'))
   const companion = await startCompanion(new URL('/?test', baseURL).href, dir)
   try {
     await connectClaudeCode(page, companion.link, companion.fingerprint)

@@ -23,7 +23,7 @@ test('a tab opened from the companion’s link pairs and chats with an agent on 
   baseURL
 }) => {
   test.setTimeout(120_000)
-  const dir = mkdtempSync(join(tmpdir(), 'op-companion-e2e-'))
+  const dir = mkdtempSync(join(tmpdir(), 'pairdraw-companion-e2e-'))
   const companion = await startCompanion(new URL('/?test', baseURL).href, dir)
   try {
     await page.goto(companion.link)

@@ -250,7 +250,7 @@ describe('the tab session a development server hands the MCP server', () => {
    * folder, where the bridge keeps the agents' workspace, is the test's own, never the person's.
    */
   async function startHTTPServer(env: Record<string, string>) {
-    const directory = mkdtempSync(join(tmpdir(), 'op-mcp-dev-agents-'))
+    const directory = mkdtempSync(join(tmpdir(), 'pairdraw-mcp-dev-agents-'))
     const port = freePort()
     const discoveryPath = join(directory, 'mcp.json')
     const child = Bun.spawn(['bun', ENTRY], {

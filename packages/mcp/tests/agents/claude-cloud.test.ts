@@ -17,7 +17,7 @@ function source(values: Record<string, string>): SwitchSource {
 const folders: string[] = []
 
 function settingsFolder(settings: string): string {
-  const dir = mkdtempSync(join(tmpdir(), 'op-claude-'))
+  const dir = mkdtempSync(join(tmpdir(), 'pairdraw-claude-'))
   folders.push(dir)
   mkdirSync(dir, { recursive: true })
   writeFileSync(join(dir, 'settings.json'), settings)

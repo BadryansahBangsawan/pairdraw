@@ -24,7 +24,7 @@ let companion: TestCompanion
 let pidDir: string
 
 beforeEach(async () => {
-  pidDir = mkdtempSync(join(tmpdir(), 'op-agent-pids-'))
+  pidDir = mkdtempSync(join(tmpdir(), 'pairdraw-agent-pids-'))
   process.env.FAKE_AGENT_PID_DIR = pidDir
   companion = await startCompanion()
 })
@@ -246,7 +246,7 @@ describe('installs', () => {
 
 describe('a wildcard CORS origin', () => {
   test('does not let a foreign origin reach the bridge', async () => {
-    const dir = mkdtempSync(join(tmpdir(), 'op-companion-star-'))
+    const dir = mkdtempSync(join(tmpdir(), 'pairdraw-companion-star-'))
     const handle = await startServer({
       httpPort: 0,
       withTcp: true,
@@ -287,7 +287,7 @@ describe('a wildcard CORS origin', () => {
   })
 
   test('never sends a wildcard access-control-allow-origin with the bridge on', async () => {
-    const dir = mkdtempSync(join(tmpdir(), 'op-companion-star-acao-'))
+    const dir = mkdtempSync(join(tmpdir(), 'pairdraw-companion-star-acao-'))
     const handle = await startServer({
       httpPort: 0,
       withTcp: true,
@@ -319,7 +319,7 @@ describe('a wildcard CORS origin', () => {
 
 describe('eval with the agent bridge on', () => {
   test('stays off inside startServer even when enableEval is true', async () => {
-    const dir = mkdtempSync(join(tmpdir(), 'op-companion-eval-'))
+    const dir = mkdtempSync(join(tmpdir(), 'pairdraw-companion-eval-'))
     const handle = await startServer({
       httpPort: 0,
       withTcp: true,

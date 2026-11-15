@@ -67,21 +67,6 @@ export async function writeCacheText(key: string, value: string): Promise<void> 
   window.localStorage.setItem(storageKey(key), value)
 }
 
-export async function removeCacheEntry(key: string): Promise<void> {
-  if (isTauriRuntime()) {
-    try {
-      const { BaseDirectory, remove } = await import('@tauri-apps/plugin-fs')
-      await remove(cachePath(key), { baseDir: BaseDirectory.AppLocalData })
-    } catch (error) {
-      console.warn(`Cache delete skipped for "${key}":`, error)
-    }
-    return
-  }
-
-  if (!isStorageAvailable()) return
-  window.localStorage.removeItem(storageKey(key))
-}
-
 export async function readCacheBytes(key: string): Promise<ArrayBuffer | null> {
   if (!isTauriRuntime()) return null
 

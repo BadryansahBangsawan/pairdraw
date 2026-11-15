@@ -30,7 +30,7 @@ export const AI_EDIT_IDLE_MS = 2500
 /** After a reply's last edit, how long before its run of edits ends once the reply has. */
 export const AI_EDIT_REPLY_SETTLE_MS = 600
 /** A summary this recent is folded into the next one, so a long task keeps one notice. */
-export const AI_EDIT_SUMMARY_MERGE_MS = 20_000
+const AI_EDIT_SUMMARY_MERGE_MS = 20_000
 /** More layers than this in one edit trace in only the first, parents first. */
 const MAX_ENTRANCES = 150
 
@@ -69,7 +69,7 @@ function shown(graph: AIEditMotionStore['graph'], nodeId: string): boolean {
 }
 
 /** Whether edits are animated: Settings → AI asks for it and the app's motion allows it. */
-export function aiEditsAnimate(): boolean {
+function aiEditsAnimate(): boolean {
   return animateAIEdits.value && animationsEnabled.value
 }
 

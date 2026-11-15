@@ -8,18 +8,14 @@ import IconUsers from '~icons/lucide/users'
 
 import HomeLayout from '@/components/home/HomeLayout.vue'
 import HomeSearchActions from '@/components/home/search/HomeSearchActions.vue'
-import HomeLocationMenu from '@/components/home/sidebar/HomeLocationMenu.vue'
-import HomeSidebar from '@/components/home/sidebar/HomeSidebar.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import AppInput from '@/components/ui/input/AppInput.vue'
 
 import CloudWorkspaceView from './CloudWorkspaceView.vue'
 import { previewDocuments } from './preview-data'
-import type { CloudDocumentRow, HomeCloudAccount, HomeLocation } from './types'
+import type { CloudDocumentRow } from './types'
 
 type Args = {
-  account: HomeCloudAccount | null
-  active: HomeLocation
   title: string
   subtitle?: string
   role?: string | null
@@ -30,16 +26,6 @@ type Args = {
   realActions?: boolean
 }
 
-const account: HomeCloudAccount = {
-  id: 'user-ana',
-  name: 'Ana Duarte',
-  email: 'ana@studio.example',
-  host: 'cloud.example.com'
-}
-const workspaces = [
-  { id: 'design', name: 'Design team', documentCount: 6, attention: true },
-  { id: 'personal', name: 'Personal', documentCount: 12 }
-]
 const synced = previewDocuments.map((document) =>
   document.sync === 'conflict' ? { ...document, sync: 'synced' as const } : document
 )
@@ -49,8 +35,6 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   args: {
-    account,
-    active: { kind: 'workspace', id: 'design' },
     title: 'Design team',
     subtitle: '6 files',
     role: 'Editor',
@@ -63,8 +47,6 @@ const meta = {
     components: {
       HomeLayout,
       HomeSearchActions,
-      HomeLocationMenu,
-      HomeSidebar,
       CloudWorkspaceView,
       AppButton,
       AppInput,
@@ -73,28 +55,10 @@ const meta = {
       IconSearch,
       IconUsers
     },
-    setup: () => ({ args, workspaces, query: ref(''), view: ref<'grid' | 'list'>('grid') }),
+    setup: () => ({ args, query: ref(''), view: ref<'grid' | 'list'>('grid') }),
     template: `
       <div :class="['flex h-dvh max-h-[760px] flex-col bg-canvas pt-2.5', args.realActions && '-m-8 max-h-none']">
         <HomeLayout>
-          <template #sidebar>
-            <HomeSidebar
-              :active="args.active"
-              :account="args.account"
-              :workspaces="args.account ? workspaces : []"
-              :shared-count="3"
-              :storage="{ label: 'Studio bucket', detail: 'R2' }"
-            />
-          </template>
-          <template #locations>
-            <HomeLocationMenu
-              :active="args.active"
-              :account="args.account"
-              :workspaces="args.account ? workspaces : []"
-              :shared-count="3"
-              :storage="{ label: 'Studio bucket', detail: 'R2' }"
-            />
-          </template>
           <HomeSearchActions v-if="args.realActions" v-model="query" />
           <div v-else class="mb-6 flex items-center gap-3">
             <AppInput v-model="query" type="search" density="compact" class="flex-1" placeholder="Search files…" aria-label="Search files">
@@ -146,7 +110,6 @@ export const Loading: Story = {
 
 export const EmptyWorkspace: Story = {
   args: {
-    active: { kind: 'workspace', id: 'personal' },
     title: 'Personal',
     subtitle: undefined,
     role: 'Owner',
@@ -157,7 +120,6 @@ export const EmptyWorkspace: Story = {
 
 export const SharedWithYou: Story = {
   args: {
-    active: { kind: 'shared', id: 'shared' },
     title: 'Shared with you',
     subtitle: 'Files people invited you to',
     role: null,
@@ -171,8 +133,6 @@ export const SharedWithYou: Story = {
 
 export const SignedOut: Story = {
   args: {
-    account: null,
-    active: { kind: 'storage', id: 'storage' },
     title: 'Studio bucket',
     subtitle: 'Cloudflare R2 · studio-designs',
     role: null,

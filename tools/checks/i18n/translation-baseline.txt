@@ -505,7 +505,6 @@ es:panels.connectorColor
 it:cloud.productName
 it:cloud.server
 it:cloud.roleEditor
-it:cloud.homeAccount
 it:cloud.homeCloudOnHost
 it:cloud.settingsTitle
 it:shapes.engFile

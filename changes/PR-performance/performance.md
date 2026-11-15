@@ -1,0 +1,1 @@
+- The editor loads about 400 KB less JavaScript at startup, since the peer-to-peer room client now loads only when a room is joined.

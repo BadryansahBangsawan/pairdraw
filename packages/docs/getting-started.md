@@ -19,7 +19,7 @@ Pre-built binaries for macOS, Windows, and Linux are available on the [download 
 | Linux (x64) | `.AppImage` / `.deb` / `.rpm` / `.tar.gz` |
 | Linux (ARM64) | `.AppImage` / `.deb` / `.rpm` / `.tar.gz` |
 
-To check for a newer version of the desktop app, choose **Check for Updates…** in the **Help** menu on Windows and Linux, or in the application menu on macOS. The **About** item next to it shows the installed version.
+To check for a newer version of the desktop app, choose **Check for Updates…** in the **Help** menu on Windows and Linux, or in the application menu on macOS. The **About** item next to it shows the installed version. Only a release build that names an update feed checks for updates, and only when you choose the item; a build from source says updates aren't set up.
 
 ## System Requirements
 

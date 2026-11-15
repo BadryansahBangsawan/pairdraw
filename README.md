@@ -14,7 +14,7 @@ Open-source design editor. Opens `.fig` and `.pen` design files, includes built-
 
 ## Installation
 
-Download the desktop app for macOS, Windows, or Linux from the [releases page](https://github.com/BadryansahBangsawan/pairdraw/releases/latest), or run the web app from a checkout of this repository with `bun install` and `bun run dev` (see [CONTRIBUTING.md](CONTRIBUTING.md)).
+Download the desktop app for macOS, Windows, or Linux from the [releases page](https://github.com/BadryansahBangsawan/pairdraw/releases/latest), or run the web app from a checkout of this repository with `bun install` and `bun run dev` (see [CONTRIBUTING.md](CONTRIBUTING.md)). There is no hosted web app.
 
 Requires macOS 13 or later with current Safari updates, Windows 10 or later, or Linux with WebKitGTK 2.40+; the web app needs Chrome 111, Edge 111, Firefox 128, or Safari 16.4 or later. See [system requirements](packages/docs/getting-started.md#system-requirements).
 
@@ -23,9 +23,10 @@ Pairdraw sends no usage data: no daily ping, analytics, or usage statistics. The
 ## What it does
 
 - **Opens `.fig` and `.pen` files** — read and write native Figma files, open supported Pencil documents from the app or OS file browser, copy & paste nodes between apps
-- **AI builds designs** — describe what you want in chat, 100+ tools create and modify nodes. Bring your own key for the major providers or any compatible endpoint
+- **AI builds designs** — describe what you want in chat, on Home, or in the prompt at the bottom of the canvas, and 100+ tools create and modify nodes. Bring your own key for the major providers or any compatible endpoint, or let the chat use a coding agent already on your computer
+- **Goodies** — styles, design systems, scripts, and shaders to start from, one click from the top bar
 - **Built-in browser** — open `http` and `https` pages in a separate desktop window that shares nothing with the editor, import the whole page or one picked element as layers, place a screenshot on the canvas, and let the chat read the page, mark an element, and click, type, or scroll on it with approval
-- **Research on a board** — quote the page open in the built-in browser onto a board as a sticky note that keeps its address, title, quote, and read time ([Research on a board](packages/docs/user-guide/research.md))
+- **Research on a board** — on a board you already have (Pairdraw does not create new ones), quote the page open in the built-in browser as a sticky note that keeps its address, title, quote, and read time ([Research on a board](packages/docs/user-guide/research.md))
 - **Fully programmable** — headless CLI, XPath queries, Figma Plugin API plus a `pairdraw` API via `eval`, MCP server for AI agents, and agent integrations for Claude Code, Codex, Gemini CLI, and Pi in the desktop app and, through a local companion, the browser
 - **Lint, convert, and extract tokens** — inspect documents, lint naming/layout/accessibility, convert between supported formats, analyze colors/typography/spacing/clusters, and extract design tokens
 - **Components and variants** — create reusable components, group variants into component sets, insert local assets as instances, and switch variants from the inspector
@@ -36,8 +37,7 @@ Pairdraw sends no usage data: no daily ping, analytics, or usage statistics. The
 - **Design-to-code export** — export selections as JSX/Tailwind, generate token outputs, and map designs into component-oriented code workflows
 - **VS Code extension** — open and save `.fig` and `.pen` files in a VS Code custom editor that runs the web editor; it is not published to a marketplace, so build it from the repository ([VS Code extension](packages/docs/programmable/vscode.md))
 - **Vue SDK for custom editors** — headless components and composables for embedding Pairdraw into other apps or building workflow-specific editing surfaces. [Read the SDK docs →](packages/docs/programmable/sdk/index.md)
-- **Real-time collaboration** — share a peer-to-peer room over WebRTC with no server or account, or edit Cloud documents together. Cursors, presence, follow mode, voice calls
-- **Optional Cloud** — keep documents on your team's own [Pairdraw Cloud](packages/docs/user-guide/pairdraw-cloud.md) server and share them by invitation
+- **Optional Cloud** — keep documents on your team's own [Pairdraw Cloud](packages/docs/user-guide/pairdraw-cloud.md) server, share them by invitation or link, and edit them together with cursors, presence, and follow mode
 - **Plugins** — install plugin manifests, run a plugin's command from the command palette on the open document, and grant only the permissions it needs; one plugin runs at a time, and network access is refused ([Plugins](packages/docs/user-guide/plugins.md))
 - **Auto layout & CSS Grid** — flex and grid layout via Yoga WASM, with gap, padding, alignment, track sizing
 - **~15 MB desktop app** — Tauri v2 for macOS, Windows, Linux. Also runs in the browser as a PWA
@@ -80,7 +80,7 @@ pairdraw query design.fig "//SECTION//TEXT"        # Text inside sections
 
 ### Export, convert, and import
 
-Render to PNG, JPG, WEBP, SVG, PDF, PPTX, HTML, JSX, Storybook stories, or `.fig`, convert between document formats, and turn HTML/CSS into editable layers:
+Render to PNG, JPG, WEBP, SVG, PDF, PPTX, draw.io, HTML, JSX, Storybook stories, or `.fig`, convert between document formats, and turn HTML/CSS into editable layers:
 
 ```sh
 pairdraw export design.fig                  # PNG
@@ -134,7 +134,7 @@ Every command supports `--json`. See the [CLI reference](packages/docs/reference
 
 ### Built-in chat
 
-Press <kbd>⌘</kbd><kbd>J</kbd> (<kbd>Ctrl</kbd><kbd>J</kbd> on Windows and Linux) to open the AI assistant. It has 138 tools that can create shapes, set fills and strokes, manage auto-layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Bring your own API key for OpenRouter, Anthropic, OpenAI, Google AI, DeepSeek, Z.ai, MiniMax, xAI, Meta, Kimi For Coding, Moonshot AI, Together AI, Fireworks AI, OpenCode Zen and Go, or compatible endpoints. No backend, no account.
+Press <kbd>⌘</kbd><kbd>J</kbd> (<kbd>Ctrl</kbd><kbd>J</kbd> on Windows and Linux) to open the AI chat in its own column beside the properties panel. It has 138 tools that can create shapes, set fills and strokes, manage auto-layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Bring your own API key for OpenRouter, Anthropic, OpenAI, Google AI, DeepSeek, Z.ai, MiniMax, xAI, Meta, Kimi For Coding, Moonshot AI, Together AI, Fireworks AI, OpenCode Zen and Go, Amazon Bedrock, Google Vertex AI, or compatible endpoints. No backend, no account.
 
 Not every provider works in the browser, and not every model streams tool calls correctly. See [BYOK provider & model compatibility](packages/docs/programmable/byok-provider-compatibility.md) for measured results — contributions welcome.
 
@@ -142,7 +142,7 @@ Not every provider works in the browser, and not every model streams tool calls 
 
 Use Claude Code, Codex, Gemini CLI, or Pi as the design agent in the chat panel. It runs with your own subscription and reaches the canvas through the editor's MCP server. The desktop app runs them itself; in the web app, run `npx -p @pairdraw/mcp pairdraw-connect` and open the link it prints so a companion on your computer runs Claude Code, Codex, or Gemini CLI ([Coding agents in the browser](packages/docs/programmable/browser-agents.md)).
 
-Install the agent's ACP program and `@pairdraw/mcp`, then open **Settings → Models → Run guided setup**. It checks that both are installed, signs the agent in, and confirms a session reaches Pairdraw's tools. Pi runs through the `@pairdraw/harness` companion, which guided setup installs with one click. See [Coding agents](packages/docs/programmable/coding-agents.md) for each agent's install command.
+When no model is set up, the chat uses Claude Code, Codex, or Gemini CLI if one is already installed, and offers a sign-in or its connector with one button when the agent needs one. In the desktop app, **Connect** installs the agent's adapter and Pairdraw's MCP server, signs the agent in, and checks that it reaches Pairdraw's tools, showing each step; **Retry** continues from a step that failed. Pi runs through the `@pairdraw/harness` companion. See [Coding agents](packages/docs/programmable/coding-agents.md) for each agent's install command.
 
 ### MCP server
 
@@ -189,13 +189,7 @@ For documentation-aware agents, building the VitePress docs in `packages/docs` g
 
 ## Collaboration
 
-Share a link to co-edit in real time. No server, no account — peers connect directly via WebRTC.
-
-1. Click the share button in the top-right panel
-2. Share the generated link (`<web app address>/rooms/<room-id>`, or `pairdraw://join?room=<room-id>` from the desktop app)
-3. Collaborators see your cursor, selection, and edits in real time
-4. Click a peer's avatar to follow their viewport
-5. Click the headphones beside the avatars to start or join the room's voice call
+Pairdraw has no live peer-to-peer rooms: local documents have no Share link, and there is no joining by room link and no voice call. To edit together, keep the document on a [Pairdraw Cloud](packages/docs/user-guide/pairdraw-cloud.md) server your team runs ([self-hosting guide](packages/docs/reference/self-hosting-cloud.md)); everyone who opens it sees each other's cursors and edits live and can follow each other's view. AI agents show their cursors on the canvas in any document.
 
 ## Why
 
@@ -228,17 +222,13 @@ bun run tauri dev     # Desktop app (requires Rust)
 | Layout        | Yoga WASM (flex + grid via [fork](https://github.com/open-pencil/yoga/tree/grid)) |
 | UI            | Vue 3, Reka UI, Tailwind CSS 4                                                    |
 | File format   | Kiwi binary + Zstd + ZIP                                                          |
-| Collaboration | Trystero (WebRTC P2P) + Yjs (CRDT)                                                |
+| Collaboration | Yjs (CRDT), synced through a Pairdraw Cloud server                                |
 | Desktop       | Tauri v2                                                                          |
 | AI/MCP        | Vercel AI SDK (multi-provider BYOK), MCP SDK, Hono                                |
 
 ## Acknowledgments
 
-Thanks to [@sld0Ant](https://github.com/sld0Ant) (Anton Soldatov), who pushed for Pairdraw to be published, has backed and promoted it since, and built the first version of the [documentation site](packages/docs/).
-
-Thanks to everyone who has [contributed](https://github.com/BadryansahBangsawan/pairdraw/graphs/contributors) code, translations, bug reports, and feedback.
-
-Thanks to [Anthropic](https://www.anthropic.com) for supporting the project through its open source program, and to [CodeRabbit](https://www.coderabbit.ai) for reviewing every pull request for free.
+Pairdraw is based on [OpenPencil](https://github.com/open-pencil/open-pencil) by Danila Poyarkov and the OpenPencil contributors, and keeps its MIT license and copyright notice. Thanks to everyone who built OpenPencil, and to everyone who has [contributed](https://github.com/BadryansahBangsawan/pairdraw/graphs/contributors) to Pairdraw.
 
 ## License
 

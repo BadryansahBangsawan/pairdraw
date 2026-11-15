@@ -6,7 +6,7 @@ Comparaison entre les fonctions de Figma Design et l’état actuel de Pairdraw.
 ✅ Pris en charge — fonctionne de bout en bout · 🟡 Partiel — le comportement principal existe, mais certaines fonctions manquent · 🔲 Non implémenté
 :::
 
-**Couverture :** 128 fonctions sur 156 examinées — 112 ✅ complètes, 16 🟡 partielles et 28 🔲 en attente. Mise à jour : 2026-10-27.
+**Couverture :** 136 fonctions sur 156 examinées — 114 ✅ complètes, 22 🟡 partielles et 20 🔲 en attente. Mise à jour : 2026-11-15.
 
 ## Interface et navigation
 
@@ -44,7 +44,7 @@ Réseaux vectoriels, outils Plume et Crayon, opérations booléennes, aplatissem
 
 ## Couleurs, dégradés et images
 
-Sélecteur de couleur avec champs RGB, HSL, HSB et OkHCL, couleurs unies, dégradés linéaire, radial, angulaire et diamant, remplissages d’image, modes de fusion et couleurs de la sélection sont pris en charge. Les motifs importés s’affichent sans pouvoir être créés, l’import d’images exclut la vidéo et le recadrage n’a pas de poignées sur la zone de travail. Réglages d’image et pipette manquent encore.
+Sélecteur de couleur avec champs RGB, HSL, HSB et OkHCL, couleurs unies, dégradés linéaire, radial, angulaire et diamant, remplissages d’image, modes de fusion et couleurs de la sélection sont pris en charge. Les motifs importés s’affichent sans pouvoir être créés, l’import d’images exclut la vidéo et le recadrage n’a pas de poignées sur la zone de travail. Paramètres d’image et pipette manquent encore.
 
 ## Effets et propriétés
 

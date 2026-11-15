@@ -6,7 +6,7 @@ Confronto tra le funzioni di Figma Design e lo stato attuale di Pairdraw.
 ✅ Supportato · 🟡 Parziale · 🔲 Non implementato
 :::
 
-**Copertura:** 128 funzioni su 156 considerate — 112 complete, 16 parziali e 28 in attesa. Aggiornato: 2026-10-27.
+**Copertura:** 136 funzioni su 156 considerate — 114 complete, 22 parziali e 20 in attesa. Aggiornato: 2026-11-15.
 
 ## Interfaccia e navigazione
 

@@ -6,7 +6,7 @@ Vergleich der Funktionen von Figma Design mit dem aktuellen Stand von Pairdraw.
 ✅ Unterstützt — funktioniert vollständig · 🟡 Teilweise — Grundfunktion vorhanden, einzelne Teile fehlen · 🔲 Nicht umgesetzt
 :::
 
-**Abdeckung:** 128 von 156 Funktionen berücksichtigt — 112 ✅ vollständig, 16 🟡 teilweise und 28 🔲 nicht umgesetzt. Stand: 2026-10-27.
+**Abdeckung:** 136 von 156 Funktionen berücksichtigt — 114 ✅ vollständig, 22 🟡 teilweise und 20 🔲 nicht umgesetzt. Stand: 2026-11-15.
 
 ## Oberfläche und Navigation
 

@@ -6,7 +6,7 @@ Porównanie funkcji Figma Design z obecnymi możliwościami Pairdraw.
 ✅ Obsługiwane — działa w pełnym zakresie · 🟡 Częściowo — podstawowe działanie istnieje, ale brakuje części funkcji · 🔲 Brak
 :::
 
-**Pokrycie:** uwzględniono 128 ze 156 funkcji Figmy — 112 ✅ obsługiwanych, 16 🟡 częściowych i 28 🔲 niezaimplementowanych. Aktualizacja: 2026-10-27.
+**Pokrycie:** uwzględniono 136 ze 156 funkcji Figmy — 114 ✅ obsługiwanych, 22 🟡 częściowych i 20 🔲 niezaimplementowanych. Aktualizacja: 2026-11-15.
 
 ## Interfejs i nawigacja
 

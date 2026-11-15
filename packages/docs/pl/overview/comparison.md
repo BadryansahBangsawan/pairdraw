@@ -174,7 +174,7 @@ Penpot oferuje wtyczki wykonywane w izolacji, ale nie ma porównywalnego API dla
 | Programowanie | Pairdraw | TypeScript i Vue zamiast Clojure, Rust i Docker |
 | Aplikacja komputerowa | Pairdraw | Tauri |
 | Układ | Pairdraw | Yoga zamiast dwóch własnych implementacji |
-| Współpraca | Różne mocne strony | Penpot: serwer i kontrola dostępu; Pairdraw: P2P bez hostingu |
+| Współpraca | Różne mocne strony | Penpot: serwer i kontrola dostępu; Pairdraw: samodzielnie hostowany serwer chmury i agenci AI na obszarze roboczym |
 | Samodzielne wdrożenie | Penpot | Docker |
 | Dojrzałość | Penpot | Wieloletnie użycie produkcyjne |
 

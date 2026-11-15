@@ -18,7 +18,7 @@ Wbudowany asystent używa ponad 90 narzędzi. Opisz zadanie zwykłym językiem, 
 
 ## Współpraca
 
-Dokument jest synchronizowany bezpośrednio między uczestnikami przez WebRTC. Centralny serwer i konto nie są potrzebne. Kursory uczestników i tryb śledzenia pokazują ich obecność, a Yjs CRDT łączy równoczesne zmiany.
+Agenci AI pokazują swoje kursory na obszarze roboczym, a widok podąża za nimi podczas ich pracy. Wspólnie edytuje się dokumenty w chmurze przez serwer chmury Twojego zespołu, gdzie Yjs CRDT łączy równoczesne zmiany. Pokoje na żywo dla dokumentów lokalnych nie są częścią Pairdraw.
 
 [Współpraca →](./collaboration)
 

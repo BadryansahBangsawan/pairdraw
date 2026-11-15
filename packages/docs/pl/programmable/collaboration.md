@@ -1,61 +1,34 @@
 ---
 title: Współpraca
-description: Jednoczesna edycja bezpośrednio między uczestnikami przez WebRTC, bez osobnego serwera i konta.
+description: Śledzenie agentów AI na obszarze roboczym i wspólna edycja dokumentów w chmurze.
 ---
 
 # Współpraca
 
-Kilka osób może jednocześnie edytować jeden dokument. Uczestnicy łączą się bezpośrednio, dlatego centralny serwer nie przekazuje danych, a konto nie jest wymagane.
+Pokoje na żywo nie są częścią Pairdraw: dla dokumentów lokalnych nie ma okienka udostępniania, dołączania przez odnośnik lub identyfikator pokoju, rozmowy głosowej w pokoju ani nazwy do współpracy w ustawieniach. Dokumenty edytuje się wspólnie przez [Pairdraw Cloud](/user-guide/pairdraw-cloud#edit-together) na serwerze chmury Twojego zespołu. Warstwa obecności pozostaje, ponieważ to przez nią agenci AI pokazują swoje kursory.
 
-## Udostępnianie pokoju
+## Agenci na obszarze roboczym
 
-1. Kliknij przycisk „Udostępnij” w prawym górnym rogu.
-2. Kliknij **Udostępnij ten plik** — odnośnik (`<adres aplikacji internetowej>/rooms/<room-id>` w przeglądarce, `pairdraw://join?room=<room-id>` w aplikacji na komputer) zostanie skopiowany.
-3. Wyślij go innym uczestnikom.
+Wbudowany czat AI, czaty ACP i Pi harness oraz każdy połączony klient MCP pojawiają się jako kursory przy warstwach, które czytają lub edytują, a ich obrysowana etykieta zawiera iskrę i kryptonim, na przykład *Fern*. Gdy czat strumieniuje JSX, jego kursor przechodzi przez elementy w miarę ich pojawiania się i je obrysowuje. Agenci rysują kursor i obrys na fioletowo.
 
-Tylko udostępnienie umieszcza dokument w pokoju: karta, z której udostępniasz, staje się kartą pokoju i pozostaje powiązana ze swoim plikiem. Dołączyć może każda osoba znająca odnośnik.
+**Widok → Kursory wielu użytkowników** ukrywa i pokazuje kursory agentów oraz innych osób na obszarze roboczym.
 
-## Dołączanie do pokoju
+## Śledzenie agentów
 
-Otwórz odnośnik albo wklej go (lub sam identyfikator pokoju) w polu **Dołącz** w panelu udostępniania lub w **Dołącz do pokoju…** na ekranie startowym. Pokój otwiera się we własnej karcie, więc dokumenty, które masz już otwarte, się nie zmieniają. Na komputerze przeglądarka oferuje też **Otwórz w aplikacji na komputer**, co otwiera pokój w Pairdraw przez odnośnik `pairdraw://join`.
+Twoi agenci, czat AI i klienci MCP, tacy jak Claude Code czy Cursor, są śledzeni automatycznie podczas pracy, więc to, co edytują, pozostaje w widoku. Wyłączysz to przyciskiem **Śledź agentów podczas pracy** (celownik) w nagłówku czatu. Jeśli przestaniesz śledzić agenta w trakcie jego pracy, nie będzie śledzony do jej końca, a przy następnym uruchomieniu znów będzie.
 
-Dołączasz od razu pod wygenerowaną nazwą, na przykład *Teal Fox*. Własną nazwę ustawisz w panelu udostępniania lub w ustawieniach; będzie używana w każdym pokoju.
+Twój awatar pojawia się na górnym pasku tylko wtedy, gdy wyświetla Twoich agentów. Najedź na niego, aby zobaczyć każdego agenta, jego bieżące działanie i stronę, a następnie kliknij **Obserwuj** przy agencie, aby mieć w widoku stronę i warstwy, które edytuje; śledzenie trwa między jego odpowiedziami i kończy się, gdy agent odejdzie. Kliknij jednego ze swoich agentów, aby zmienić jego nazwę.
 
-Pokoje nie są przechowywane na serwerze: plik znajduje się na urządzeniach osób, które były w pokoju, więc karta pokoju otwiera dokument tylko wtedy, gdy któraś z nich jest online. Do tego czasu karta informuje, że czeka, wyjaśnia, dlaczego i otwiera plik, gdy tylko dołączy ktoś, kto go ma. Pokój, w którym już byłeś, otwiera się od razu z kopii na tym urządzeniu, a Twoje zmiany synchronizują się, gdy inni wrócą.
+## W dokumentach w chmurze
 
-**Opuść pokój** w panelu udostępniania kończy Twój udział w pokoju. Karta, która udostępniła swój dokument, znów staje się tym dokumentem; karta, która dołączyła, zachowuje plik pokoju jako lokalną, niezapisaną kopię, którą możesz zapisać. Każda karta pokoju ma własne połączenie, więc możesz być w kilku pokojach jednocześnie.
+Osoby, które mają otwarty ten sam dokument w chmurze, widzą nawzajem swoje kursory, zaznaczenia i agentów. Awatar pokazuje liczbę agentów uruchomionych przez daną osobę, a pasek „Obserwujesz: …” podaje osobę, która uruchomiła agenta, więc widać, czyj to agent. Udostępniane są tylko nazwa, rodzaj, model, stan, strona, położenie i edytowane warstwy agenta, nigdy prompty ani odpowiedzi.
 
-## Synchronizowane dane
-
-- **Dokument:** figury, tekst, właściwości i układ są aktualizowane po każdej zmianie.
-- **Kursory:** widoczne są położenie, nazwa i kolor każdego uczestnika.
-- **Zaznaczenie:** obiekty wybrane przez innych są widoczne dla wszystkich.
-- **Agenci:** wbudowany czat AI, czaty ACP i Pi harness oraz każdy połączony klient MCP pojawiają się jako kursory przy warstwach, które czytają lub edytują, a ich obrysowana etykieta zawiera iskrę i kryptonim, na przykład *Fern*. Gdy czat strumieniuje JSX, jego kursor przechodzi przez elementy w miarę ich pojawiania się i je obrysowuje. Agenci rysują kursor i obrys na fioletowo, a lista uczestników i pasek „Obserwujesz: …” podają osobę, która uruchomiła agenta, więc widać, czyj to agent. Udostępniane są tylko nazwa, rodzaj, model, stan, strona, położenie i edytowane warstwy agenta, nigdy prompty ani odpowiedzi.
-
-## Tryb śledzenia
-
-Kliknij awatar uczestnika na górnym pasku, aby śledzić jego widok. Położenie i skala obszaru roboczego będą odpowiadać jego widokowi, a ramka w kolorze uczestnika z paskiem „Obserwujesz: …” pokazuje, kogo śledzisz. Aby przestać, kliknij awatar ponownie, naciśnij <kbd>Esc</kbd> albo sam kliknij, przewiń, zmień powiększenie lub przełącz stronę.
-
-Twoi agenci, czat AI i klienci MCP, tacy jak Claude Code czy Cursor, są śledzeni automatycznie podczas pracy, więc to, co edytują, pozostaje w widoku. Wyłączysz to przyciskiem z celownikiem u góry panelu AI. Jeśli przestaniesz śledzić agenta w trakcie jego pracy, nie będzie śledzony do jej końca, a przy następnym uruchomieniu znów będzie.
-
-Awatar pokazuje liczbę agentów uruchomionych przez daną osobę. Najedź na niego, aby zobaczyć każdego agenta, jego bieżące działanie i stronę, a następnie kliknij **Obserwuj** przy agencie, aby mieć w widoku stronę i warstwy, które edytuje; śledzenie trwa między jego odpowiedziami i kończy się, gdy agent odejdzie. Przycisk za awatarami wyświetla wszystkich uczestników pokoju wraz z ich agentami i działa z klawiatury. Twój awatar wyświetla Twoich agentów — kliknij jednego, aby zmienić jego nazwę — i zawiera polecenie **Opuść pokój**.
-
-Panel udostępniania wyświetla wszystkich uczestników pokoju wraz z ich agentami, tym, co każdy z nich robi, i stroną, na której pracuje. Agenta śledzisz tak samo: strona i warstwy, które edytuje, pozostają w widoku; śledzenie trwa między jego odpowiedziami i kończy się, gdy agent odejdzie. Kliknij dwukrotnie własnego agenta, aby zmienić jego nazwę.
+Kliknij awatar osoby na górnym pasku, aby śledzić jej widok. Położenie i skala obszaru roboczego będą odpowiadać jej widokowi, a ramka w jej kolorze z paskiem „Obserwujesz: …” pokazuje, kogo śledzisz. Aby przestać, kliknij awatar ponownie, naciśnij <kbd>Esc</kbd> albo sam kliknij, przewiń, zmień powiększenie lub przełącz stronę.
 
 ## Jak to działa
 
-Uczestnicy łączą się bezpośrednio przez WebRTC, dlatego dane dokumentu są przesyłane między przeglądarkami bez centralnego serwera.
-
-Stan dokumentu jest synchronizowany przez Yjs CRDT, który automatycznie łączy równoczesne zmiany.
+Dokument w chmurze synchronizuje swój stan przez Yjs CRDT za pośrednictwem serwera chmury, a równoczesne zmiany są łączone automatycznie.
 
 Przenoszenie i zmiana kolejności warstw również się scalają. Każda warstwa pamięta każdego rodzica, do którego została przeniesiona, i swoje miejsce wśród rodzeństwa, a każdy uczestnik wyznacza z tej historii to samo drzewo warstw ([CRDT drzewa Evana Wallace’a](https://madebyevan.com/algos/crdt-mutable-tree-hierarchy/)). Przeniesienia, zmiany kolejności i nowe warstwy od różnych osób są stosowane; jeśli dwie osoby jednocześnie przeniosą tę samą warstwę, u wszystkich wygrywa to samo przeniesienie. Gdy równoczesne przeniesienia umieściłyby dwie warstwy jedna w drugiej, późniejsze przeniesienie jest cofane, a warstwa, której nowy rodzic został w międzyczasie usunięty, wraca na swoje miejsce.
 
-Wszyscy w pokoju potrzebują wersji Pairdraw, która zapisuje drzewo warstw w ten sam sposób; wersje zapisujące je inaczej nie widzą nawzajem swoich pokojów.
-
-IndexedDB przechowuje stan lokalny: po odświeżeniu strony automatycznie wracasz do pokoju z tym samym stanem.
-
-## Wskazówki
-
-- Współpraca działa w przeglądarce i aplikacji komputerowej.
-- Identyfikatory pokojów są tworzone z kryptograficznie bezpiecznych wartości losowych.
-- Kursory i informacje o obecności rozłączonych uczestników są automatycznie usuwane.
+Wszyscy, którzy wspólnie edytują dokument, potrzebują wersji Pairdraw, która zapisuje drzewo warstw w ten sam sposób.

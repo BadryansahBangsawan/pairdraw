@@ -21,7 +21,7 @@ Pairdraw otwiera i zapisuje pliki `.fig` bez wcześniejszej konwersji. Import i 
 
 ## Panel właściwości
 
-Zawartość kart „Design”, „Kod”, „AI” i „Sprawdź” zależy od zaznaczenia.
+Zawartość kart „Design”, „Kod” i „Sprawdź” zależy od zaznaczenia; czat AI ma własną kolumnę.
 
 - **Wygląd:** przezroczystość, wspólny lub osobny promień narożników i widoczność.
 - **Zalew:** kolor jednolity, gradient liniowy, radialny, kątowy lub diamentowy oraz obraz.
@@ -75,7 +75,7 @@ Wywołania narzędzi pojawiają się na zwijanej osi czasu. Do kontroli wizualne
 
 Strony `http` i `https` otwierają się we własnym oknie aplikacji komputerowej, które nie dzieli niczego z edytorem, i można je przenieść na obszar roboczy: zaimportować całą stronę lub wybrany element jako warstwy albo umieścić zrzut widoku, strony lub elementu. Czat może odczytać stronę, oznaczyć element w odpowiedzi i klikać, wpisywać tekst, naciskać klawisze, przewijać lub czekać na stronie, pytając najpierw o zgodę, gdy ustawienia tego wymagają.
 
-Na tablicy ta sama przeglądarka staje się badaniem: czat cytuje stronę w karteczce, która zachowuje adres, tytuł, cytat i czas odczytu ([Badanie na tablicy](/user-guide/research)).
+Na istniejącej tablicy ta sama przeglądarka staje się badaniem (Pairdraw nie oferuje tworzenia nowych tablic): czat cytuje stronę w karteczce, która zachowuje adres, tytuł, cytat i czas odczytu ([Badanie na tablicy](/user-guide/research)).
 
 ## Serwer MCP
 
@@ -98,9 +98,9 @@ pairdraw eval design.fig -c "..."     # Figma Plugin API
 
 Wszystkie polecenia obsługują `--json`. Instalacja: `npm install -g @pairdraw/cli` albo `bun add -g @pairdraw/cli`.
 
-## Współpraca w czasie rzeczywistym
+## Współpraca
 
-Połączenie równorzędne WebRTC nie wymaga centralnego serwera. Udostępnij odnośnik i edytuj dokument wspólnie z innymi osobami, korzystając z kursorów, informacji o obecności, trybu śledzenia i rozmów głosowych z osobami w pokoju.
+Agenci AI pokazują na obszarze roboczym swoje kursory i edytowane warstwy, a widok podąża za nimi podczas ich pracy. Dokumenty w chmurze edytuje wspólnie kilka osób przez samodzielnie hostowany serwer [Pairdraw Cloud](/user-guide/pairdraw-cloud), z kursorami, informacjami o obecności i śledzeniem widoku innej osoby. Pokoje na żywo dla dokumentów lokalnych, dołączanie przez odnośnik i rozmowy głosowe nie są częścią Pairdraw ([Współpraca](/pl/programmable/collaboration)).
 
 ## Wersja komputerowa i internetowa
 

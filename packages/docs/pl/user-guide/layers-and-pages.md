@@ -29,7 +29,7 @@ Każda strona ma własny kolor tła, położenie widoku i powiększenie.
 
 ## Panel slajdów
 
-Panel slajdów wyświetla ramki najwyższego poziomu strony jako numerowane miniatury slajdów, w kolejności warstw. Kliknij slajd, aby pokazać jego ramkę na obszarze roboczym, i przeciągnij slajd — albo naciśnij <kbd>Alt</kbd> ze strzałką w górę lub w dół — aby zmienić jego kolejność. **Eksportuj slajdy** zapisuje wszystkie slajdy, w tej kolejności, do jednego pliku PDF lub PowerPoint.
+Panel slajdów wyświetla ramki najwyższego poziomu strony jako numerowane miniatury slajdów, w kolejności warstw. Kliknij slajd, aby pokazać jego ramkę na obszarze roboczym, i przeciągnij slajd — albo naciśnij <kbd>Alt</kbd> ze strzałką w górę lub w dół — aby zmienić jego kolejność. **Eksportuj slajdy do PDF** zapisuje wszystkie slajdy, w tej kolejności, do jednego pliku PDF.
 
 ## Prezentacja
 

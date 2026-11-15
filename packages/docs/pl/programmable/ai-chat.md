@@ -9,7 +9,9 @@ Naciśnij <kbd>⌘</kbd><kbd>J</kbd> albo <kbd>Ctrl</kbd> + <kbd>J</kbd> lub kli
 
 ## Konfiguracja
 
-Przy pierwszym uruchomieniu konfiguracja z przewodnikiem pyta, w czym ma pomagać AI i z czego już korzystasz: z agenta programistycznego, takiego jak Claude Code, Codex lub Gemini CLI w aplikacji na komputer, z konta API albo z serwera lokalnego lub firmowego. Łączy ten dostęp i przypisuje go do ról **Design agent** i **Vision**, nie zmieniając ręcznej konfiguracji. W przypadku OpenRouter wystarczy się zalogować zamiast wklejać klucz API. Możesz ją pominąć i uruchomić ponownie w **Ustawienia → AI i agenci → Uruchom konfigurację z przewodnikiem**. Aby skonfigurować modele ręcznie:
+Przy pierwszym uruchomieniu Pairdraw nie otwiera okna konfiguracji. Dopóki żaden model nie jest skonfigurowany, szuka [agenta programistycznego](/programmable/coding-agents) zainstalowanego już na tym komputerze: najpierw Claude Code, potem Codex, potem Gemini CLI. Czat informuje, którego używa, i oferuje **Zmień**, aby wybrać inny model. Jeśli agent wymaga jeszcze zalogowania, swojego programu ACP lub serwera MCP, kolumna czatu pokazuje do tego przycisk; bez jego kliknięcia nic nie jest logowane ani instalowane. Model skonfigurowany przez Ciebie nigdy nie zostaje zastąpiony.
+
+Gdy Pairdraw nie znajdzie agenta, wysłanie promptu otwiera konfigurację z przewodnikiem. Pyta ona, w czym ma pomagać AI i z czego już korzystasz: z agenta programistycznego, takiego jak Claude Code, Codex lub Gemini CLI w aplikacji na komputer, z konta API albo z serwera lokalnego lub firmowego. Łączy ten dostęp i przypisuje go do ról **Design agent** i **Vision**, nie zmieniając ręcznej konfiguracji. W przypadku OpenRouter wystarczy się zalogować zamiast wklejać klucz API: aplikacja na komputer wraca z logowania przez port na tym komputerze, a aplikacja internetowa loguje się w wyskakującym oknie. Konfigurację możesz uruchomić ponownie w dowolnej chwili w **Ustawienia → Modele → Uruchom konfigurację z przewodnikiem**. Aby skonfigurować modele ręcznie:
 
 1. Otwórz panel czatu AI.
 2. Kliknij ikonę ustawień.

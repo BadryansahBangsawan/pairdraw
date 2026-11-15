@@ -156,7 +156,7 @@ Porównanie funkcji Figma Design z obecnymi możliwościami Pairdraw.
 
 ## Prototypowanie
 
-Połączenia, wyzwalacze, działania, animacje, nakładki, przewijanie, przepływy, zmienne i tryb prezentacji nie są jeszcze obsługiwane.
+W sekcji Prototyp warstwy otrzymują interakcje po kliknięciu i po opóźnieniu, które przechodzą do ramki, otwierają lub zamykają nakładkę albo wracają, z przejściem natychmiastowym lub przenikaniem; są zapisywane w `.fig` jako reakcje prototypu Figmy i można je odtworzyć na obszarze roboczym ([Odtwarzanie prototypu](/user-guide/playing-a-prototype)). Prezentacja pokazuje slajdy strony na pełnym ekranie. Przewijanie, przepływy, zmienne w prototypach i pozostałe animacje nie są jeszcze obsługiwane.
 
 ## Import i eksport
 
@@ -176,7 +176,7 @@ Połączenia, wyzwalacze, działania, animacje, nakładki, przewijanie, przepły
 |---------|------|-------|
 | `eval` | ✅ | JavaScript bez interfejsu z globalnym `figma` |
 | Komentarze | ✅ | Narzędzie Komentarz (<kbd>C</kbd>) przypina wątki do warstw, z odpowiedziami, rozwiązywaniem i filtrowaną listą; zapis w `.fig` |
-| Współpraca | ✅ | Pokoje P2P (Trystero i Yjs) z kursorami, trybem śledzenia, rozmowami głosowymi i kursorami agentów; bez serwera |
+| Współpraca | ✅ | Dokumenty w chmurze edytowane wspólnie przez serwer Pairdraw Cloud (Yjs) z kursorami, trybem śledzenia i kursorami agentów; brak pokojów na żywo dla plików lokalnych i rozmów głosowych |
 | Tryb programisty | 🟡 | Karta Kod pokazuje zaznaczenie jako design JSX, HTML, Vue lub React z CSS albo Tailwind; statusy Ready for dev; brak trybu inspekcji z wymiarami |
 | Tailwind CSS v4 | ✅ | HTML z klasami przez panel Kod, CLI lub API |
 | Serwer MCP | ✅ | `@pairdraw/mcp` ze stdio i HTTP; 138 podstawowych narzędzi oraz narzędzia dokumentu, historii i ustawień |

@@ -8,25 +8,22 @@ type ResizeObserverOptions = {
   resizeCanvas: (canvas: HTMLCanvasElement) => void
 }
 
+/**
+ * Resizes the canvas's buffer and draws it again as soon as its laid-out size changes. Resize
+ * observations arrive after layout and before the frame is painted, so the frame that shows the
+ * new size, such as a side panel opening, shows a drawing made for it. Waiting for the next
+ * animation frame would paint the old drawing stretched to the new size first.
+ */
 export function useCanvasResizeObserver({
   canvasRef,
   getCanvasKitValue,
   resizeCanvas
 }: ResizeObserverOptions) {
-  let resizeRaf = 0
-
-  function cancelResize() {
-    cancelAnimationFrame(resizeRaf)
-  }
-
-  useResizeObserver(canvasRef, () => {
+  const { stop } = useResizeObserver(canvasRef, () => {
     const canvas = canvasRef.value
-    if (!canvas || !getCanvasKitValue() || resizeRaf) return
-    resizeRaf = requestAnimationFrame(() => {
-      resizeRaf = 0
-      resizeCanvas(canvas)
-    })
+    if (!canvas || !getCanvasKitValue()) return
+    resizeCanvas(canvas)
   })
 
-  return { cancelResize }
+  return { cancelResize: stop }
 }

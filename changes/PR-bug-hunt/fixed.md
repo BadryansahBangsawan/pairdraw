@@ -25,3 +25,4 @@
 - `@pairdraw/dom-css/browser` declares its browser helpers, such as `browserJSXToSceneGraph`, so TypeScript sees them.
 - Reloading a document with nothing unsaved, such as one undone back to where it started, no longer offers to recover it.
 - A coding agent's model, reasoning, and mode controls in a narrow chat show their icons side by side instead of overlapping.
+- Opening or closing a side panel no longer shows the canvas stretched for a frame before it redraws.

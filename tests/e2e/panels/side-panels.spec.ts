@@ -54,6 +54,41 @@ test('the layers and properties panels close one at a time and the canvas takes 
   await expect.poll(() => widthOff(page, 'canvas-area', canvasBefore)).toBeLessThanOrEqual(1)
 })
 
+/**
+ * Toggles a side panel and reports, for each of the next frames, whether the canvas showed a
+ * drawing made for its size. A frame is read at the start of the one after it, once it was shown.
+ */
+async function framesAtCanvasSize(page: Page, toggle: string): Promise<boolean[]> {
+  return page.evaluate(async (testId) => {
+    const canvas = document.querySelector<HTMLCanvasElement>('[data-test-id="canvas-element"]')
+    const button = document.querySelector<HTMLElement>(`[data-test-id="${testId}"]`)
+    if (!canvas || !button) throw new Error('Missing canvas or panel toggle')
+    const nextFrame = () =>
+      new Promise<number>((resolve) => {
+        requestAnimationFrame(resolve)
+      })
+    button.click()
+    await nextFrame()
+    const shown: boolean[] = []
+    for (let frame = 0; frame < 3; frame++) {
+      await nextFrame()
+      shown.push(Math.round(canvas.width / devicePixelRatio) === canvas.clientWidth)
+    }
+    return shown
+  }, toggle)
+}
+
+test('the canvas never shows a stretched frame as a side panel opens or closes', async ({
+  page
+}) => {
+  await openEditor(page)
+  for (const toggle of ['editor-toggle-properties-panel', 'editor-toggle-layers-panel']) {
+    // Closing, then opening again.
+    expect(await framesAtCanvasSize(page, toggle)).toEqual([true, true, true])
+    expect(await framesAtCanvasSize(page, toggle)).toEqual([true, true, true])
+  }
+})
+
 test('a closed side panel stays closed after a reload', async ({ page }) => {
   await openEditor(page)
   await page.getByTestId('editor-toggle-properties-panel').click()

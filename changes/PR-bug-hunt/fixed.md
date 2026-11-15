@@ -22,3 +22,4 @@
 - Escape in the prompt at the bottom of the canvas returns to the canvas, so its shortcuts work again.
 - Home's Design systems lists the built-in Pairdraw Basics, as Goodies does, to start a new design with it turned on.
 - View → Multiplayer cursors (⌥⌘\) now hides and shows the cursors of AI agents and other people on the canvas; before, it changed nothing.
+- `@pairdraw/dom-css/browser` declares its browser helpers, such as `browserJSXToSceneGraph`, so TypeScript sees them.

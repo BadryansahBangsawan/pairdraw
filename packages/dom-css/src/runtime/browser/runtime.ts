@@ -1,11 +1,11 @@
-import { serializeHTML } from '../export/html'
+import { serializeHTML } from '#dom-css/export/html'
 import type {
   CSSComputeOptions,
   CSSRuntime,
   DesignDocument,
   DesignElement,
   DesignNode
-} from '../types'
+} from '#dom-css/types'
 
 export interface BrowserCSSRuntimeOptions {
   document?: Document

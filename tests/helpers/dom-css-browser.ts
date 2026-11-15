@@ -5,7 +5,7 @@ import { test, type Page } from '@playwright/test'
 import type { DesignDocument } from '@pairdraw/dom-css'
 import type { SceneNode } from '@pairdraw/scene-graph'
 
-const BROWSER_RUNTIME_MODULE = `/@fs${process.cwd()}/packages/dom-css/src/runtime/browser.ts`
+const BROWSER_RUNTIME_MODULE = `/@fs${process.cwd()}/packages/dom-css/src/runtime/browser/runtime.ts`
 const DOM_CSS_BROWSER_MODULE = '/@id/@pairdraw/dom-css/browser'
 
 async function ensureAppPage(page: Page) {

@@ -4,7 +4,7 @@ import { mergeCSSText } from './import/css-text'
 import { jsxToDesignDocumentCore, type JSXChild } from './import/jsx/core'
 import { designDocumentToSceneGraph, type ToSceneGraphOptions } from './import/scene-graph'
 import type { CompileTailwindCSSOptions } from './import/tailwind'
-import { createBrowserCSSRuntime, type BrowserCSSRuntimeOptions } from './runtime/browser'
+import { createBrowserCSSRuntime, type BrowserCSSRuntimeOptions } from './runtime/browser/runtime'
 import type { CSSComputeOptions, DesignDocument } from './types'
 
 export { Fragment, jsx, jsxs } from './import/jsx/core'

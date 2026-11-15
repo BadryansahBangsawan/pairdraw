@@ -10,6 +10,7 @@ import { carriesAttachableFile, isAttachableFile } from '@/app/ai/attachment/acc
 import { revokeImagePreviewURL } from '@/app/ai/attachment/image/prepare'
 import { chatDocumentId } from '@/app/ai/chat/history/document'
 import { sentPrompts } from '@/app/ai/chat/history/prompts'
+import { chatColumnOpen } from '@/app/ai/chat/panel'
 import { hasPendingPrompt, setPendingPrompt, takePendingPrompt } from '@/app/ai/chat/pending-prompt'
 import {
   clearQueuedMessages,
@@ -44,6 +45,7 @@ import ChatPermissionDialog from '@/components/chat/ChatPermissionDialog.vue'
 import ChatRunLocation from '@/components/chat/ChatRunLocation.vue'
 import ChatTranscript from '@/components/chat/ChatTranscript.vue'
 import ChatContextBar from '@/components/chat/context/ChatContextBar.vue'
+import { loadMarkdownContent } from '@/components/markdown/lazy'
 import { useImageDrop } from '@/components/ui/drop/useImageDrop'
 
 const { isConfigured, ensureChat, history, chatFailure, clearChatFailure, providerID } = useAIChat()
@@ -54,7 +56,9 @@ const runLocation = useChatRunLocation()
 const chat = shallowRef<Chat<UIMessage> | null>(null)
 const submission = useChatSubmission({
   chat,
-  ensureChat,
+  // Replies render as Markdown: a message waits for the renderer, which loads while the chat
+  // connects, so a reply never grows after it appears as the renderer arrives.
+  ensureChat: async () => (await Promise.all([ensureChat(), loadMarkdownContent()]))[0],
   flush: history.flush,
   clearFailure: clearChatFailure,
   getEditor: getActiveEditorStore,
@@ -192,6 +196,14 @@ async function initializeHistory() {
 void initializeHistory()
 
 const messages = computed(() => chat.value?.messages ?? history.messages.value)
+// The Markdown renderer starts loading once the chat is shown or holds a message.
+watch(
+  () => chatColumnOpen.value || messages.value.length > 0,
+  (needed) => {
+    if (needed) void loadMarkdownContent()
+  },
+  { immediate: true }
+)
 /** What was sent in this conversation, for Up and Down in the composer. */
 const prompts = computed(() => sentPrompts(messages.value))
 const historyOptions = computed(() => {

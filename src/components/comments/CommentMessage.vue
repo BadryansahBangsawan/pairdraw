@@ -1,12 +1,16 @@
 <script setup lang="ts">
+import { defineAsyncComponent } from 'vue'
+
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
-import MarkdownContent from '@/components/markdown/MarkdownContent.vue'
+import { loadMarkdownContent } from '@/components/markdown/lazy'
 import PersonAvatar from '@/components/presence/PersonAvatar.vue'
 
 import { useCommentAuthor } from './author'
 import CommentTime from './CommentTime.vue'
 import { comments } from './ui'
+
+const MarkdownContent = defineAsyncComponent(loadMarkdownContent)
 
 /** One message of a thread: who wrote it, when, and what. */
 const { author, color, at, text } = defineProps<{

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 
 import { IS_TAURI } from '@pairdraw/core/constants'
 
@@ -8,7 +8,9 @@ import { referenceComponents } from '@/app/ai/chat/references/link'
 import { markdownRenderKey, type MarkdownSurface } from '@/app/shell/markdown/state'
 import ChatFileLink from '@/components/chat/reference/ChatFileLink.vue'
 import ChatReferenceLink from '@/components/chat/reference/ChatReferenceLink.vue'
-import MarkdownContent from '@/components/markdown/MarkdownContent.vue'
+import { loadMarkdownContent } from '@/components/markdown/lazy'
+
+const MarkdownContent = defineAsyncComponent(loadMarkdownContent)
 
 const {
   content,

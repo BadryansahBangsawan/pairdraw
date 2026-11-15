@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 
 import { useAIMessages, useCommonMessages } from '@pairdraw/vue/i18n'
 
 import type { SelectedSkill } from '@/app/ai/skills/settings/use'
-import MarkdownContent from '@/components/markdown/MarkdownContent.vue'
+import { loadMarkdownContent } from '@/components/markdown/lazy'
 import SettingsGroup from '@/components/settings/layout/SettingsGroup.vue'
 import SettingsPage from '@/components/settings/layout/SettingsPage.vue'
 import SettingsRow from '@/components/settings/layout/SettingsRow.vue'
@@ -14,6 +14,8 @@ import AppAlert from '@/components/ui/feedback/AppAlert.vue'
 import AppSwitch from '@/components/ui/toggle/AppSwitch.vue'
 
 import { useSkillMessages } from './messages'
+
+const MarkdownContent = defineAsyncComponent(loadMarkdownContent)
 
 const { entry } = defineProps<{ entry: SelectedSkill }>()
 

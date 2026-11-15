@@ -57,8 +57,10 @@ describe('background page checks', () => {
     await settle()
 
     expect(checked.toSorted()).toEqual([second.id, third.id].toSorted())
-    expect(checks.counts.value.get(first.id)).toEqual({ error: 0, warning: 1, info: 0 })
-    expect(checks.counts.value.get(second.id)).toEqual({ error: 1, warning: 0, info: 0 })
+    expect(checks.results.value.get(first.id)?.map(({ nodeId }) => nodeId)).toEqual(['live'])
+    expect(checks.results.value.get(second.id)?.map(({ nodeId }) => nodeId)).toEqual([
+      `layer-on-${second.id}`
+    ])
     expect(checks.queued.value).toEqual([])
     checks.stop()
   })

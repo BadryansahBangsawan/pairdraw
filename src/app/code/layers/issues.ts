@@ -54,8 +54,8 @@ const CLASS_PROPS: Record<Exclude<CodeSource, 'design-jsx'>, readonly string[]> 
 }
 
 /**
- * Errors and warnings as code issues, matching the canvas markers: suggestions stay in the
- * Check panel so the editor does not underline most of a generated document.
+ * Errors and warnings as code issues: suggestions stay in the Lint panel so the editor does
+ * not underline most of a generated document.
  */
 export function codeLayerIssues(
   issues: readonly DesignIssue[],

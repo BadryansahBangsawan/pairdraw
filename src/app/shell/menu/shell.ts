@@ -5,10 +5,9 @@ import { useI18n } from '@pairdraw/vue/i18n'
 import { openTour } from '@/app/demo/document'
 import { requestAppExit } from '@/app/document/close/exit'
 import { openSettingsDialog } from '@/app/settings/dialog'
-import { setDesignIssuesOnCanvas, setSnappingPreference } from '@/app/settings/preferences/apply'
+import { setSnappingPreference } from '@/app/settings/preferences/apply'
 import {
   syncNativeCommentsMenu,
-  syncNativeDesignIssuesMenu,
   syncNativeSidePanelsMenu,
   syncNativeSnappingMenu
 } from '@/app/settings/preferences/native-menu'
@@ -48,12 +47,6 @@ export function useShellMenu() {
   void syncNativeSnappingMenu(appPreferences.value.editing.snapping).catch((error: unknown) => {
     console.error('[Menu] Failed to synchronize native snapping preferences:', error)
   })
-  void syncNativeDesignIssuesMenu(appPreferences.value.designCheck.showOnCanvas).catch(
-    (error: unknown) => {
-      console.error('[Menu] Failed to synchronize the native design issues menu:', error)
-    }
-  )
-
   void syncNativeCommentsMenu(appPreferences.value.comments.showOnCanvas).catch(
     (error: unknown) => {
       console.error('[Menu] Failed to synchronize the native comments menu:', error)
@@ -96,8 +89,6 @@ export function useShellMenu() {
       const current = appPreferences.value.editing.snapping.pixelGrid
       setSnappingPreference('pixelGrid', !current)
     },
-    'view-design-issues': () =>
-      setDesignIssuesOnCanvas(!appPreferences.value.designCheck.showOnCanvas),
     'view-layers-panel': toggleLayersPanel,
     'view-properties-panel': togglePropertiesPanel,
     'keyboard-shortcuts': openShortcutSheet,

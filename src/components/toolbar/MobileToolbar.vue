@@ -79,11 +79,7 @@ function navigationClass(disabled: boolean) {
 </script>
 
 <template>
-  <div
-    data-test-id="mobile-toolbar"
-    data-canvas-obstacle
-    :class="styles.mobileDock({ class: ui?.mobileDock })"
-  >
+  <div data-test-id="mobile-toolbar" :class="styles.mobileDock({ class: ui?.mobileDock })">
     <motion.button
       data-test-id="mobile-toolbar-prev"
       :aria-label="menu.previousToolbarCategory"

@@ -1,9 +1,7 @@
 import type { SnappingPreferences } from '@pairdraw/core'
 
 import { isTauri } from '@/app/tauri/env'
-import { DESIGN_ISSUES_ON_CANVAS_INCLUDED } from '@/constants'
 
-const DESIGN_ISSUES_MENU_ID = 'view-design-issues'
 const COMMENTS_MENU_ID = 'view-comments'
 const LAYERS_PANEL_MENU_ID = 'view-layers-panel'
 const PROPERTIES_PANEL_MENU_ID = 'view-properties-panel'
@@ -28,13 +26,6 @@ export async function syncNativeSnappingMenu(preferences: SnappingPreferences): 
       })
     )
   )
-}
-
-export async function syncNativeDesignIssuesMenu(showOnCanvas: boolean): Promise<void> {
-  // A build without the marks has no View → Design Issues item to check.
-  if (!isTauri() || !DESIGN_ISSUES_ON_CANVAS_INCLUDED) return
-  const { invoke } = await import('@tauri-apps/api/core')
-  await invoke('set_native_menu_checked', { id: DESIGN_ISSUES_MENU_ID, checked: showOnCanvas })
 }
 
 /** View → Comments, which Shift+C and the comment menus also toggle. */

@@ -67,13 +67,8 @@ export function useCanvas(
     })
   }
 
-  const {
-    hitTestSectionTitle,
-    hitTestComponentLabel,
-    hitTestFrameTitle,
-    hitTestIssueMarker,
-    hitTestStatusLabel
-  } = createCanvasHitTests(editor, surface.getRenderer)
+  const { hitTestSectionTitle, hitTestComponentLabel, hitTestFrameTitle, hitTestStatusLabel } =
+    createCanvasHitTests(editor, surface.getRenderer)
 
   return {
     render: surface.markDirty,
@@ -81,7 +76,6 @@ export function useCanvas(
     hitTestSectionTitle,
     hitTestComponentLabel,
     hitTestFrameTitle,
-    hitTestIssueMarker,
     hitTestStatusLabel
   }
 }

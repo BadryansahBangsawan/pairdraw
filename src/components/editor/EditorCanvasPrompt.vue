@@ -70,7 +70,6 @@ async function start(text: string): Promise<void> {
 <template>
   <div v-if="offered" :class="styles.root()">
     <section
-      data-canvas-obstacle
       :aria-label="ai.canvasPromptTitle"
       :class="styles.card()"
       @keydown.escape="returnToCanvas"
@@ -92,7 +91,6 @@ async function start(text: string): Promise<void> {
     </section>
     <ChatPromptExamples
       v-if="pageEmpty"
-      data-canvas-obstacle
       :disabled="starting"
       :class="styles.examples()"
       @pick="pickExample"

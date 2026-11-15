@@ -85,7 +85,6 @@ Values are read as JSON when they parse (`false`, `100`, `"auto"`) and as plain 
 | `chat.reasoningDisplay` | `collapsed`, `while-thinking`, `expanded` |
 | `chat.maxAgentSteps` | integer 1–1000 |
 | `chat.changePreviewSize` | `off`, `small`, `medium`, `large` |
-| `designCheck.showOnCanvas` | `true`, `false` |
 | `designCheck.preset` | `recommended`, `strict`, `accessibility` |
 | `designCheck.disabledRules` | JSON array of rule IDs, e.g. `["no-default-names"]`; see `pairdraw lint --list-rules` |
 

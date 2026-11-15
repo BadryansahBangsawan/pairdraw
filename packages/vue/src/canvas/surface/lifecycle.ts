@@ -171,14 +171,8 @@ export function createCanvasSurfaceManager({
     })
   }
 
-  /** UI floating over the canvas this frame, which edge-pinned overlays avoid. */
-  function overlayObstacles() {
-    return options?.getOverlayObstacles?.() ?? []
-  }
-
   function renderNow() {
     if (!state.renderer || isDestroyed()) return
-    state.renderer.overlayObstacles = overlayObstacles()
     const view = options?.getRenderState?.() ?? editor.state
     state.renderer.renderFromEditorState(
       view,

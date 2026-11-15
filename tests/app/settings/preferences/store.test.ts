@@ -55,11 +55,14 @@ describe('parseAppPreferences', () => {
     const { designCheck } = parseAppPreferences({
       designCheck: { preset: 'strict', disabledRules: ['contrast', 7, 'contrast', 'spacing'] }
     })
-    expect(designCheck).toEqual({
-      showOnCanvas: true,
-      preset: 'strict',
-      disabledRules: ['contrast', 'spacing']
+    expect(designCheck).toEqual({ preset: 'strict', disabledRules: ['contrast', 'spacing'] })
+  })
+
+  test('loads design check preferences saved with the removed canvas marks setting', () => {
+    const { designCheck } = parseAppPreferences({
+      designCheck: { showOnCanvas: false, preset: 'accessibility', disabledRules: ['spacing'] }
     })
+    expect(designCheck).toEqual({ preset: 'accessibility', disabledRules: ['spacing'] })
   })
 
   test('a fresh profile starts on the Pairdraw accent', () => {

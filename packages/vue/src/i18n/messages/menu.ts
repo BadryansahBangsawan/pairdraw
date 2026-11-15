@@ -49,7 +49,6 @@ export const menuMessageDefaults = {
   rulers: 'Rulers',
   pixelGrid: 'Pixel grid',
   multiplayerCursors: 'Multiplayer cursors',
-  designIssues: 'Design issues',
   comments: 'Comments',
   preferences: 'Preferences',
   snapToGeometry: 'Snap to geometry',

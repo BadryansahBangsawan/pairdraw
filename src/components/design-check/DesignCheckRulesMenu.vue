@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuItemIndicator,
@@ -16,16 +15,11 @@ import { computed } from 'vue'
 
 import { useDesignCheckMessages } from '@pairdraw/vue/i18n'
 
-import {
-  setDesignCheckPreset,
-  setDesignIssuesOnCanvas,
-  turnOnDesignCheckRules
-} from '@/app/settings/preferences/apply'
+import { setDesignCheckPreset, turnOnDesignCheckRules } from '@/app/settings/preferences/apply'
 import { appPreferences, DESIGN_CHECK_PRESETS } from '@/app/settings/preferences/store'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import { menuItem, useMenuUI } from '@/components/ui/menu/menu'
 import MenuScrollArea from '@/components/ui/menu/MenuScrollArea.vue'
-import { DESIGN_ISSUES_ON_CANVAS_INCLUDED } from '@/constants'
 
 import { usePresetLabels } from './usePresetLabels'
 
@@ -74,21 +68,6 @@ const presetModel = computed({
               {{ messages.turnOnRules({ count: preferences.disabledRules.length }) }}
             </DropdownMenuItem>
           </template>
-          <DropdownMenuSeparator
-            v-if="DESIGN_ISSUES_ON_CANVAS_INCLUDED"
-            :class="menuCls.separator"
-          />
-          <DropdownMenuCheckboxItem
-            v-if="DESIGN_ISSUES_ON_CANVAS_INCLUDED"
-            :model-value="preferences.showOnCanvas"
-            :class="itemCls"
-            @update:model-value="setDesignIssuesOnCanvas"
-          >
-            <DropdownMenuItemIndicator class="absolute left-2">
-              <icon-lucide-check class="size-3.5" />
-            </DropdownMenuItemIndicator>
-            {{ messages.showOnCanvas }}
-          </DropdownMenuCheckboxItem>
         </MenuScrollArea>
       </DropdownMenuContent>
     </DropdownMenuPortal>

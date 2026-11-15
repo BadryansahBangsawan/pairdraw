@@ -238,7 +238,6 @@ function closeCard() {
           :side-offset="CARD_GAP"
           :collision-padding="8"
           :class="draftAt ? draftCls.content : threadCls.content"
-          data-canvas-obstacle
           @open-auto-focus="onCardOpen"
           @escape-key-down="onCardEscape"
         >

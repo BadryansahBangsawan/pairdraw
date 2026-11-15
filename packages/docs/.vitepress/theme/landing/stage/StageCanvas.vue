@@ -2,14 +2,12 @@
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { PlayIslands, useCanvasInput } from '@pairdraw/vue/canvas'
-import { useCanvasIssueMarkers } from '@pairdraw/vue/canvas/issues'
 import { useCanvas } from '@pairdraw/vue/canvas/surface'
 import { useTextEdit } from '@pairdraw/vue/canvas/text-edit'
 import { toolCursor } from '@pairdraw/vue/editor/tool-cursor'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { useFollowView } from '@/app/presence/follow-view'
-import IssueMarkerTooltip from '@/components/design-check/IssueMarkerTooltip.vue'
 import PreparationOverlay from '@/components/preparation/canvas/PreparationOverlay.vue'
 import FollowFrame from '@/components/presence/FollowFrame.vue'
 
@@ -17,7 +15,7 @@ import FollowFrame from '@/components/presence/FollowFrame.vue'
  * One WebGL canvas per stage. The app's `EditorCanvas` splits the scene and its overlays
  * across two contexts, which is right for a full-window editor but would put a page of
  * stages past the browser's context limit. This is the SDK's single-canvas path with the
- * same input handling, preview islands, lint markers, follow frame, and loading overlay.
+ * same input handling, preview islands, follow frame, and loading overlay.
  */
 const emit = defineEmits<{
   /** The pointer moved over the canvas, in canvas coordinates, for a room's cursor. */
@@ -32,15 +30,18 @@ const shouldSuspendRender = () =>
   store.state.preparation.kind !== 'font-retry' &&
   store.state.preparation.phase !== 'preparing-render'
 
-const { hitTestSectionTitle, hitTestComponentLabel, hitTestFrameTitle, hitTestIssueMarker } =
-  useCanvas(canvasRef, store, {
+const { hitTestSectionTitle, hitTestComponentLabel, hitTestFrameTitle } = useCanvas(
+  canvasRef,
+  store,
+  {
     showRulers: false,
     shouldSuspendRender,
     onReady: store.markCanvasReady,
     onViewportResize: (width, height) => store.setViewportSize(width, height),
     onPresented: ({ sceneVersion }) =>
       store.preparationController.acknowledgePresentation(sceneVersion)
-  })
+  }
+)
 
 const { cursorOverride } = useCanvasInput(
   canvasRef,
@@ -52,24 +53,10 @@ const { cursorOverride } = useCanvasInput(
 )
 useTextEdit(canvasRef, store)
 
-// The same marker behaviour as the app's canvas, minus switching a properties tab: a stage's
-// lint panel is always the one beside it.
-const { detailMarker, cursor: issueMarkerCursor } = useCanvasIssueMarkers(canvasRef, store, {
-  hitTest: hitTestIssueMarker,
-  onHover: (marker) => store.designCheck.highlightMarker(marker?.nodeIds ?? null),
-  onActivate: (marker) => {
-    const nodeIds = marker.direction ? marker.nodeIds.slice(0, 1) : marker.nodeIds
-    store.designCheck.openMarker(nodeIds)
-    if (marker.direction) store.revealNodes(nodeIds)
-  }
-})
-
 // Following a person or an agent frames the canvas and says who, as in the app.
 const followView = useFollowView(useTemplateRef<HTMLElement>('area'), store)
 
-const cursor = computed(() =>
-  toolCursor(store.state.activeTool, issueMarkerCursor.value ?? cursorOverride.value)
-)
+const cursor = computed(() => toolCursor(store.state.activeTool, cursorOverride.value))
 </script>
 
 <template>
@@ -81,7 +68,6 @@ const cursor = computed(() =>
       class="absolute inset-0 block size-full touch-none outline-none"
     />
     <PlayIslands :view="store.state" :canvas="canvasRef" />
-    <IssueMarkerTooltip :marker="detailMarker" :canvas="canvasRef" />
     <FollowFrame
       v-if="followView.label.value"
       :followed="followView.label.value"

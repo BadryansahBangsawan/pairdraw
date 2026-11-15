@@ -3,7 +3,7 @@ import { toUint8Array } from 'js-base64'
 
 import type { SceneNode, SceneGraph, Fill, Stroke } from '@pairdraw/scene-graph'
 import type { RenderColorSpace, ResolvedRenderColor } from '@pairdraw/scene-graph/color'
-import type { Color, Rect, Vector } from '@pairdraw/scene-graph/primitives'
+import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 import { slotPropertyId } from '@pairdraw/scene-graph/slots'
 
 /* eslint-disable max-lines -- SkiaRenderer facade owns CanvasKit state and delegates domain drawing */
@@ -79,7 +79,6 @@ export interface PendingFontNode {
   keys: Set<string>
 }
 
-import type { PlacedIssueMarker } from './issues/types'
 import type { PlacedStatusLabel } from './labels/status'
 import { EffectRasterCache } from './renderer/effect-raster-cache'
 import { TiledSceneController } from './renderer/tiles'
@@ -226,12 +225,8 @@ export class SkiaRenderer {
   /** Selection chrome, set from editor state each frame through {@link setSelectionTheme}. */
   selectionTheme: SelectionTheme = DEFAULT_SELECTION_THEME
   pageId: string | null = null
-  /** Issue markers placed in the last overlay pass; hit testing reads the same layout. */
-  issueMarkers: PlacedIssueMarker[] = []
   /** Status labels drawn in the last label pass; clicks on them open the status menu. */
   statusLabels: PlacedStatusLabel[] = []
-  /** Screen rectangles of UI floating over this canvas, which overlays such as edge pins avoid. */
-  overlayObstacles: readonly Rect[] = []
 
   /**
    * The most device pixels this canvas draws per CSS pixel; a low-power canvas caps it at 1 so a

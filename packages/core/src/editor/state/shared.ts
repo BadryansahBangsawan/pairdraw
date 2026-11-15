@@ -13,7 +13,7 @@ export function createDefaultEditorSharedState(): EditorSharedState {
     imageEdit: null,
     presenceCursors: [],
     documentName: 'Untitled',
-    designIssues: null,
+    designIssueHighlight: null,
     codeFocusNodeId: null,
     rulerTheme: undefined,
     selectionTheme: undefined,

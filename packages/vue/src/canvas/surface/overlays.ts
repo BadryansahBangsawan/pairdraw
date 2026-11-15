@@ -1,5 +1,5 @@
 import type { Editor } from '@pairdraw/core'
-import { hitTestIssueMarkers, hitTestStatusLabels, type SkiaRenderer } from '@pairdraw/core/canvas'
+import { hitTestStatusLabels, type SkiaRenderer } from '@pairdraw/core/canvas'
 
 import { useViewportKind } from '#vue/editor/viewport-kind/use'
 
@@ -50,12 +50,6 @@ export function createCanvasHitTests(editor: Editor, getRenderer: () => SkiaRend
     )
   }
 
-  /** Issue marker under a point in canvas-element CSS pixels, from the last drawn frame. */
-  function hitTestIssueMarker(screenX: number, screenY: number) {
-    const renderer = getRenderer()
-    return renderer ? hitTestIssueMarkers(renderer.issueMarkers, screenX, screenY) : null
-  }
-
   /** Status pill or dot under a point in canvas-element CSS pixels, from the last drawn frame. */
   function hitTestStatusLabel(screenX: number, screenY: number) {
     const renderer = getRenderer()
@@ -66,7 +60,6 @@ export function createCanvasHitTests(editor: Editor, getRenderer: () => SkiaRend
     hitTestSectionTitle,
     hitTestComponentLabel,
     hitTestFrameTitle,
-    hitTestIssueMarker,
     hitTestStatusLabel
   }
 }

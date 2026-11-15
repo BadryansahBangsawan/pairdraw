@@ -3,7 +3,7 @@ import type { Color, Rect, Vector } from '@pairdraw/scene-graph/primitives'
 import type { SnapGuide } from '@pairdraw/scene-graph/snap'
 
 import type { GuideOverlayState } from '#core/canvas/guides/types'
-import type { DesignIssueOverlay } from '#core/canvas/issues/types'
+import type { DesignIssueHighlight } from '#core/canvas/issues/types'
 import type { ConnectorTarget } from '#core/editor/connectors/attach'
 import type { ShapeHandleHover, GradientEdit, ImageEdit, PencilState } from '#core/editor/types'
 import type { RotationPreview } from '#core/geometry'
@@ -121,6 +121,6 @@ export interface RenderOverlays {
     transformBox?: Vector[] | null
   } | null
   presenceCursors?: PresenceCursor[]
-  designIssues?: DesignIssueOverlay | null
+  designIssueHighlight?: DesignIssueHighlight | null
   codeFocusNodeId?: string | null
 }

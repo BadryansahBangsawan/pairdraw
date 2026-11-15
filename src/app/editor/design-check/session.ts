@@ -8,14 +8,7 @@ import { createLinter, type LintConfig, type LintFixRequest } from '@pairdraw/co
 import type { AppEditorState } from '@/app/editor/session/types'
 import { appPreferences, type DesignCheckPreset } from '@/app/settings/preferences/store'
 
-import {
-  highlightForIssue,
-  markersForIssues,
-  mostSevereIssue,
-  toDesignIssues,
-  type DesignIssue
-} from './issues'
-import { designIssuesOnCanvas } from './on-canvas'
+import { highlightForIssue, toDesignIssues, type DesignIssue } from './issues'
 import { createPageChecks, pageOf } from './pages'
 
 /** Quiet period after an edit before the page is checked again. */
@@ -35,10 +28,10 @@ function linterConfig(preset: DesignCheckPreset, disabledRules: readonly string[
 
 /**
  * Keeps the current page checked while the Lint panel or another view that shows issues, such
- * as the Code tab, is open, or while canvas markers are on.
+ * as the Code tab, is open.
  *
  * Checks run once edits settle and wait out interactive property edits, so a burst of changes
- * costs one check. Nothing runs while both surfaces are off.
+ * costs one check. Nothing runs while no such view is open.
  */
 export function createDesignCheck(editor: Editor, state: AppEditorState) {
   const scope = effectScope(true)
@@ -54,9 +47,7 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
   const preferences = computed(() => appPreferences.value.designCheck)
   /** Other views showing the page's issues while open, such as the Code tab's underlines. */
   const holders = ref(0)
-  const enabled = computed(
-    () => panelVisible.value || holders.value > 0 || designIssuesOnCanvas.value
-  )
+  const enabled = computed(() => panelVisible.value || holders.value > 0)
 
   /** Keeps the current page checked until the returned release is called, once. */
   function holdChecks(): () => void {
@@ -68,7 +59,7 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
       holders.value--
     }
   }
-  // Primitive keys keep unrelated preference changes, like toggling markers, from rebuilding rules.
+  // Primitive keys keep preference changes that leave the rules alone from rebuilding them.
   const preset = computed(() => preferences.value.preset)
   const disabledRules = computed(() => preferences.value.disabledRules.join('\n'))
   const linter = computed(() =>
@@ -83,10 +74,8 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
 
   /** Set while the Lint panel lists the whole document, which needs every page checked. */
   const documentScope = ref(false)
-  // Pages beyond the current one are checked for the page list and the Document scope.
-  const pagesNeeded = computed(
-    () => enabled.value && (designIssuesOnCanvas.value || documentScope.value)
-  )
+  // Pages beyond the current one are checked only for the Document scope.
+  const pagesNeeded = computed(() => enabled.value && documentScope.value)
   // Stopped in dispose, so it needs no effect scope of its own.
   const pages = createPageChecks({
     graph: () => editor.graph,
@@ -142,13 +131,6 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
     timer?.start()
   }
 
-  function publishMarkers() {
-    const current = snapshot.value
-    const show =
-      designIssuesOnCanvas.value && current !== null && current.pageId === state.currentPageId
-    editor.setDesignIssueMarkers(show ? markersForIssues(current.issues) : [])
-  }
-
   scope.run(() => {
     watch(
       enabled,
@@ -159,7 +141,7 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
         }
         cancel()
         snapshot.value = null
-        editor.clearDesignIssues()
+        editor.setDesignIssueHighlight(null)
       },
       { immediate: true }
     )
@@ -189,7 +171,6 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
         editor.setDesignIssueHighlight(null)
         const cached = enabled.value ? pages.fresh(pageId) : null
         if (cached) snapshot.value = { pageId, issues: [...cached] }
-        publishMarkers()
         if (enabled.value) schedule()
       }
     )
@@ -197,8 +178,6 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
       () => state.sceneVersion,
       () => enabled.value && schedule()
     )
-    // Immediate: the first check runs before this watcher exists, while `enabled` starts up.
-    watch([snapshot, designIssuesOnCanvas], publishMarkers, { immediate: true })
   })
 
   const unsubscribeGraph = editor.onEditorEvent('graph:replaced', () => {
@@ -211,26 +190,6 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
 
   function highlightIssue(issue: DesignIssue | null) {
     editor.setDesignIssueHighlight(issue ? highlightForIssue(issue) : null)
-  }
-
-  function issuesOn(nodeIds: readonly string[]): DesignIssue[] {
-    const ids = new Set(nodeIds)
-    return snapshot.value?.issues.filter((issue) => ids.has(issue.nodeId)) ?? []
-  }
-
-  /** Highlights the layer behind a hovered canvas marker; a merged marker leads with its first layer. */
-  function highlightMarker(nodeIds: readonly string[] | null) {
-    const issue =
-      nodeIds && nodeIds.length > 0 ? mostSevereIssue(issuesOn([nodeIds[0]])) : undefined
-    highlightIssue(issue ?? null)
-  }
-
-  /** Selects the layers behind a clicked marker and focuses their most severe issue. */
-  function openMarker(nodeIds: readonly string[]) {
-    const present = nodeIds.filter((id) => editor.graph.getNode(id))
-    if (present.length === 0) return
-    editor.select(present)
-    focusedIssueId.value = mostSevereIssue(issuesOn(present))?.id ?? null
   }
 
   /** Selects the issue's layer, on its page, keeps it in view and marks the row as focused. */
@@ -270,9 +229,7 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
     focusedIssueId,
     checkNow: run,
     highlightIssue,
-    highlightMarker,
     openIssue,
-    openMarker,
     applyFixes,
     dispose
   }

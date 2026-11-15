@@ -4,7 +4,6 @@ import { computed } from 'vue'
 
 import { stickyTopLevelRow, useLayerTree } from '@pairdraw/vue/primitives/LayerTree'
 
-import type { LayerIssueMark } from '@/app/editor/design-check/layers'
 import layerTreeTheme from '@/theme/layer-tree'
 
 import { LAYER_TREE_ROW_HEIGHT } from './geometry'
@@ -17,11 +16,9 @@ import { useLayerTreeUI } from './ui'
  * Figma (its layers panel pins `stickyTopLevelLayersPanelChildren` one at a time). It is the
  * row itself, so clicking, expanding, hiding and locking work as on the row in the list.
  */
-const { scrollTop, chrome, issueMarks } = defineProps<{
+const { scrollTop, chrome } = defineProps<{
   scrollTop: number
   chrome: LayerTreeChrome
-  /** Design issues by layer, so the pinned row keeps its mark as the list row does. */
-  issueMarks?: ReadonlyMap<string, LayerIssueMark> | null
 }>()
 
 const emit = defineEmits<{
@@ -78,7 +75,6 @@ function select(event: MouseEvent) {
       :expanded="true"
       :actions="actions"
       :chrome="chrome"
-      :issue="issueMarks?.get(pinned.row.node.id) ?? null"
       @rename-start="(id, name) => pinned && emit('renameStart', id, name, pinned.index)"
     />
   </div>

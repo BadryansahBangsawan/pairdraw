@@ -25,13 +25,6 @@ export const BOARD_INCLUDED: boolean = false
  */
 export const EXTRA_EXPORT_FORMATS_INCLUDED: boolean = false
 
-/**
- * Whether the design check marks issues on the canvas, beside layers, and beside pages. Off in
- * Pairdraw: those marks re-checked the whole document after every edit, which slowed long agent
- * runs. The Lint panel still checks the page while it is open.
- */
-export const DESIGN_ISSUES_ON_CANVAS_INCLUDED: boolean = false
-
 /** The node export formats `EXTRA_EXPORT_FORMATS_INCLUDED` leaves out of the Export section. */
 export const EXTRA_EXPORT_FORMAT_IDS: readonly ExportFormatId[] = ['pptx', 'drawio']
 

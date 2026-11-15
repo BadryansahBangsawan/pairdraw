@@ -29,7 +29,6 @@ import type { ViewportTransform } from '@pairdraw/core/geometry'
 import { colorToCSS } from '@pairdraw/scene-graph/color'
 import { PlayIslands, useCanvasInput } from '@pairdraw/vue/canvas'
 import { useCanvasDrop } from '@pairdraw/vue/canvas/drop'
-import { useCanvasIssueMarkers } from '@pairdraw/vue/canvas/issues'
 import { useCanvasLinks } from '@pairdraw/vue/canvas/links'
 import { useCanvasVirtualReference } from '@pairdraw/vue/canvas/overlays'
 import { useCanvasStatusLabels } from '@pairdraw/vue/canvas/statuses'
@@ -38,18 +37,15 @@ import { useTextEdit } from '@pairdraw/vue/canvas/text-edit'
 import { toolCursor } from '@pairdraw/vue/editor/tool-cursor'
 import { autoLayoutValueAnchor, type AutoLayoutValueField } from '@pairdraw/vue/shared/input'
 
-import { useAIChat } from '@/app/ai/chat/use'
 import { useEditorStore } from '@/app/editor/active-store'
 import { useCanvasCollaborationAwareness } from '@/app/editor/canvas/collaboration-awareness'
 import { createCanvasContextSelection } from '@/app/editor/canvas/context-selection'
-import { canvasOverlayObstacles } from '@/app/editor/canvas/obstacles'
 import { usePrototypeStage } from '@/app/editor/prototype/stage'
 import { usePluginPointerInput } from '@/app/plugins/pointer/input'
 import { useFollowView } from '@/app/presence/follow-view'
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { appPreferences } from '@/app/settings/preferences/store'
 import CommentsLayer from '@/components/comments/CommentsLayer.vue'
-import IssueMarkerTooltip from '@/components/design-check/IssueMarkerTooltip.vue'
 import PreparationOverlay from '@/components/preparation/canvas/PreparationOverlay.vue'
 import FollowFrame from '@/components/presence/FollowFrame.vue'
 import StatusLabelMenu from '@/components/statuses/StatusLabelMenu.vue'
@@ -135,26 +131,20 @@ useCanvas(sceneCanvasRef, store, {
     store.state.canvasPresentation = colorSpace
   }
 })
-const {
-  hitTestSectionTitle,
-  hitTestComponentLabel,
-  hitTestFrameTitle,
-  hitTestIssueMarker,
-  hitTestStatusLabel
-} = useCanvas(canvasRef, store, {
-  layer: 'overlays',
-  // Drawn at the scene canvas's density, so the two layers line up.
-  maxPixelRatio: appRuntimeConfig.maxPixelRatio,
-  // The scene canvas reports a canvas that cannot start.
-  onFailed: () => undefined,
-  get showRulers() {
-    return appRuntimeConfig.showRulers && store.state.showRulers && paneProfile.value.editChrome
-  },
-  getOverlayObstacles: () => canvasOverlayObstacles(canvasRef.value),
-  shouldSuspendRender,
-  getRenderState,
-  onViewportResize
-})
+const { hitTestSectionTitle, hitTestComponentLabel, hitTestFrameTitle, hitTestStatusLabel } =
+  useCanvas(canvasRef, store, {
+    layer: 'overlays',
+    // Drawn at the scene canvas's density, so the two layers line up.
+    maxPixelRatio: appRuntimeConfig.maxPixelRatio,
+    // The scene canvas reports a canvas that cannot start.
+    onFailed: () => undefined,
+    get showRulers() {
+      return appRuntimeConfig.showRulers && store.state.showRulers && paneProfile.value.editChrome
+    },
+    shouldSuspendRender,
+    getRenderState,
+    onViewportResize
+  })
 const {
   cursorOverride,
   canvasLabelEdit,
@@ -195,7 +185,6 @@ const {
   onPointerCancel: onPluginPointerCancel
 } = usePluginPointerInput(canvasRef, store)
 
-const { activeTab: propertiesTab } = useAIChat()
 const openStatusLabel = shallowRef<PlacedStatusLabel | null>(null)
 const { cursor: statusLabelCursor } = useCanvasStatusLabels(canvasRef, store, {
   hitTest: hitTestStatusLabel,
@@ -204,22 +193,6 @@ const { cursor: statusLabelCursor } = useCanvasStatusLabels(canvasRef, store, {
     openStatusLabel.value = label
   }
 })
-const { detailMarker: hoveredIssueMarker, cursor: issueMarkerCursor } = useCanvasIssueMarkers(
-  canvasRef,
-  store,
-  {
-    hitTest: hitTestIssueMarker,
-    onHover: (marker) => store.designCheck.highlightMarker(marker?.nodeIds ?? null),
-    onActivate: (marker) => {
-      activatePane()
-      propertiesTab.value = 'lint'
-      // An edge pin leads to its nearest issue; a marker opens every layer it covers.
-      const nodeIds = marker.direction ? marker.nodeIds.slice(0, 1) : marker.nodeIds
-      store.designCheck.openMarker(nodeIds)
-      if (marker.direction) store.revealNodes(nodeIds)
-    }
-  }
-)
 
 useTextEdit(canvasRef, store, { isEnabled: () => isActivePane.value })
 const { cursor: linkCursor } = useCanvasLinks(canvasRef, store, {
@@ -285,7 +258,7 @@ const valueEditorIcon = computed(() => {
 const cursor = computed(() =>
   toolCursor(
     store.state.activeTool,
-    issueMarkerCursor.value ?? statusLabelCursor.value ?? linkCursor.value ?? cursorOverride.value
+    statusLabelCursor.value ?? linkCursor.value ?? cursorOverride.value
   )
 )
 
@@ -367,7 +340,6 @@ const pageBackground = computed(() => ({ backgroundColor: colorToCSS(store.state
           }"
         />
         <AppDropOverlay :visible="isDraggingOver" />
-        <IssueMarkerTooltip :marker="hoveredIssueMarker" :canvas="canvasRef" />
         <StatusLabelMenu
           :label="openStatusLabel"
           :canvas="canvasRef"

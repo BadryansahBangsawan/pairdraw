@@ -8,7 +8,7 @@ import {
   ContextMenuPortal
 } from 'reka-ui'
 import { tv } from 'tailwind-variants'
-import { computed, nextTick, useAttrs, useTemplateRef, watch } from 'vue'
+import { nextTick, useAttrs, useTemplateRef, watch } from 'vue'
 
 import { useInlineRename } from '@pairdraw/vue/editor/inline-rename'
 import {
@@ -23,8 +23,6 @@ import {
 } from '@pairdraw/vue/primitives/LayerTree'
 
 import { useEditorStore } from '@/app/editor/active-store'
-import { layerIssueMarks } from '@/app/editor/design-check/layers'
-import { designIssuesOnCanvas } from '@/app/editor/design-check/on-canvas'
 import layerTreeTheme from '@/theme/layer-tree'
 
 import CanvasMenu from '../canvas/CanvasMenu.vue'
@@ -64,13 +62,6 @@ const viewport = useTemplateRef<HTMLElement>('viewport')
 const { y: scrollTop } = useScroll(viewport)
 const rename = useInlineRename((id, name) => store.renameNode(id, name))
 
-/** Issue marks follow the canvas markers' View → Design issues toggle. */
-const issueMarks = computed(() => {
-  const snapshot = store.designCheck.snapshot.value
-  if (!designIssuesOnCanvas.value) return null
-  if (!snapshot || snapshot.pageId !== store.state.currentPageId) return null
-  return layerIssueMarks(snapshot.issues, store.graph)
-})
 const renameControls = {
   commit: rename.commit,
   onKeydown: rename.onKeydown,
@@ -273,7 +264,6 @@ function onFocusOut(event: FocusEvent, actions: LayerTreeRootActions) {
                       :pad-left="padLeft"
                       :expanded="isExpanded"
                       :actions="actions"
-                      :issue="issueMarks?.get(node.id) ?? null"
                       :chrome="
                         chrome({
                           ...scope,

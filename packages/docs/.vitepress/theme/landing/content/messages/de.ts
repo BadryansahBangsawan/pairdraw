@@ -42,8 +42,8 @@ export const de: LandingMessages = {
     linting: {
       title: 'Linting',
       detail:
-        'Pairdraw prüft das Design, während du arbeitest: Kontrast, zu kleine Schrift, Standardnamen, versteckte und leere Ebenen, überflüssige Gruppen. Probleme werden auf der Arbeitsfläche markiert, viele lassen sich mit einem Klick beheben, und dieselben Regeln laufen in der CLI und für Agenten.',
-      hint: 'Klicke auf eine Markierung auf der Arbeitsfläche oder wende eine Korrektur aus der Liste an.'
+        'Pairdraw prüft das Design, während du arbeitest: Kontrast, zu kleine Schrift, Standardnamen, versteckte und leere Ebenen, überflüssige Gruppen. Der Tab „Prüfen“ listet jedes Problem auf, viele lassen sich mit einem Klick beheben, und dieselben Regeln laufen in der CLI und für Agenten.',
+      hint: 'Zeige auf ein Problem, um seine Ebene zu finden, oder wende eine Korrektur aus der Liste an.'
     },
     ai: {
       title: 'Gestalten mit KI, mit deinen Schlüsseln',

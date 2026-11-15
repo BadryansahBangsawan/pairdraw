@@ -18,7 +18,6 @@ import { useEditorStore } from '@/app/editor/active-store'
 import { toggleRemoteCursors } from '@/app/presence/cursor-motion'
 import {
   setCommentsOnCanvas,
-  setDesignIssuesOnCanvas,
   setSnappingPreference,
   togglePixelGrid
 } from '@/app/settings/preferences/apply'
@@ -27,7 +26,6 @@ import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
 import AppShortcutText from '@/components/ui/menu/AppShortcutText.vue'
 import { menuItem, useMenuUI } from '@/components/ui/menu/menu'
 import MenuScrollArea from '@/components/ui/menu/MenuScrollArea.vue'
-import { DESIGN_ISSUES_ON_CANVAS_INCLUDED } from '@/constants'
 import zoomDropdownTheme from '@/theme/zoom-dropdown'
 
 const store = useEditorStore()
@@ -208,17 +206,6 @@ watch(open, (v) => {
             <AppShortcutText>{{
               appMenuShortcutLabel('view-multiplayer-cursors')
             }}</AppShortcutText>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            v-if="DESIGN_ISSUES_ON_CANVAS_INCLUDED"
-            :class="itemCls"
-            @select.prevent="setDesignIssuesOnCanvas(!appPreferences.designCheck.showOnCanvas)"
-          >
-            <icon-lucide-check
-              v-if="appPreferences.designCheck.showOnCanvas"
-              class="absolute left-2 size-3.5"
-            />
-            <span class="flex-1">{{ menuText.designIssues }}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             :class="itemCls"

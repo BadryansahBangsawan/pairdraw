@@ -1,6 +1,3 @@
-import { motionStyles } from '@/theme/motion/styles'
-import { floatingSurface } from '@/theme/overlay'
-
 export const designCheckTheme = {
   slots: {
     root: 'flex min-h-0 flex-1 flex-col',
@@ -39,51 +36,5 @@ export const designCheckTheme = {
       'flex h-3.5 shrink-0 items-center rounded-[3px] px-[3px] text-[9px] leading-none font-semibold shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]',
     swatch: 'size-2.5 shrink-0 rounded-[3px] shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]',
     more: 'mb-1 ml-6'
-  }
-} as const
-
-/** The Layers panel mark: a severity icon on a layer, a dot on a collapsed layer holding issues. */
-export const layerIssueMarkTheme = {
-  slots: {
-    root: 'flex size-4 shrink-0 items-center justify-center',
-    dot: 'size-1.5 rounded-full'
-  },
-  variants: {
-    severity: {
-      error: { dot: 'bg-error' },
-      warning: { dot: 'bg-warning' },
-      info: { dot: 'bg-muted' }
-    }
-  }
-} as const
-
-/** The page list badge: the count of errors and warnings, in the most severe color. */
-export const pageIssueBadgeTheme = {
-  base: 'flex h-3.5 min-w-3.5 shrink-0 items-center justify-center rounded-full px-1 text-[9px] leading-none font-semibold tabular-nums',
-  variants: {
-    severity: {
-      error: 'bg-error-fill text-white',
-      warning: 'bg-warning text-panel'
-    }
-  }
-} as const
-
-export const issueTooltipTheme = {
-  slots: {
-    content: [
-      'pointer-events-none z-50 w-64 py-1.5 text-[11px]',
-      floatingSurface,
-      motionStyles.popup
-    ],
-    header: 'flex items-center gap-1.5 px-2.5 pt-0.5 pb-1 font-semibold',
-    headerIcon: 'size-3 shrink-0 text-muted',
-    headerText: 'min-w-0 truncate',
-    item: 'flex items-start gap-1.5 px-2.5 py-1',
-    itemIcon: 'mt-px',
-    itemBody: 'min-w-0 flex-1',
-    itemTitle: 'truncate',
-    itemDetail: 'truncate text-muted tabular-nums',
-    more: 'px-2.5 py-1 pl-7 text-muted',
-    hint: 'mt-1 border-t border-border px-2.5 pt-1.5 text-muted'
   }
 } as const

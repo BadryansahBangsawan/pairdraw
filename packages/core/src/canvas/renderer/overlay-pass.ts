@@ -3,8 +3,7 @@ import type { Canvas } from 'canvaskit-wasm'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { drawGuides } from '#core/canvas/guides/draw'
-import { drawIssueHighlight, drawIssueMarkers } from '#core/canvas/issues/draw'
-import { layoutIssueMarkers } from '#core/canvas/issues/layout'
+import { drawIssueHighlight } from '#core/canvas/issues/draw'
 import { drawComponentSetBorders } from '#core/canvas/overlays/component-sets'
 import { drawConnectorTarget } from '#core/canvas/overlays/connectors'
 import { drawDropTarget, drawEditingText } from '#core/canvas/overlays/feedback'
@@ -18,7 +17,6 @@ import { drawCodeFocus } from '#core/canvas/overlays/selection'
 import { drawShapeHandles } from '#core/canvas/overlays/shape-handles'
 import { drawSlotOutlines } from '#core/canvas/overlays/slots'
 import type { RenderOverlays, SkiaRenderer } from '#core/canvas/renderer'
-import { RULER_SIZE } from '#core/constants'
 import { editedGradient } from '#core/editor/gradient-edit'
 import { editedImage } from '#core/editor/image-edit'
 
@@ -49,49 +47,6 @@ export function drawLabelPass(
   profiler.beginPhase('render:componentLabels')
   r.drawComponentLabels(canvas, graph, overlays)
   profiler.endPhase('render:componentLabels')
-}
-
-function suppressedIssueIds(overlays: RenderOverlays): Set<string> {
-  const ids = new Set<string>()
-  if (overlays.editingTextId) ids.add(overlays.editingTextId)
-  if (overlays.nodeEditState) ids.add(overlays.nodeEditState.nodeId)
-  return ids
-}
-
-/**
- * Lays out markers for this frame and keeps them for hit testing, so the pointer always targets
- * what is drawn. Markers stay attached to their layers through edits and hide while drawing a path.
- */
-function updateIssueMarkers(r: SkiaRenderer, graph: SceneGraph, overlays: RenderOverlays): void {
-  const markers = overlays.designIssues?.markers
-  if (!markers || markers.length === 0 || overlays.penState) {
-    r.issueMarkers = []
-    return
-  }
-  const measureText = (text: string) => {
-    const font = r.sizeFont
-    if (!font) return 0
-    let width = 0
-    for (const glyph of font.getGlyphWidths(font.getGlyphIDs(text))) width += glyph
-    return width
-  }
-  const inset = r.showRulers ? RULER_SIZE : 0
-  r.issueMarkers = layoutIssueMarkers(graph, markers, {
-    pageId: r.pageId ?? '',
-    view: {
-      panX: r.panX,
-      panY: r.panY,
-      zoom: r.zoom,
-      width: r.viewportWidth,
-      height: r.viewportHeight,
-      insetTop: inset,
-      insetLeft: inset
-    },
-    suppressedIds: suppressedIssueIds(overlays),
-    preview: overlays.rotationPreview,
-    measureText,
-    obstacles: r.overlayObstacles
-  })
 }
 
 /**
@@ -137,7 +92,7 @@ export function drawOverlayPass(
   if (!measuring) drawLayoutOutlines(r, canvas, graph, selectedIds, hoveredNodeId, overlays)
   if (!measuring) drawPrototypeConnections(r, canvas, graph, selectedIds, overlays.rotationPreview)
   r.drawHoverHighlight(canvas, graph, hoveredNodeId, overlays.rotationPreview)
-  drawIssueHighlight(r, canvas, graph, overlays.designIssues?.highlight, overlays.rotationPreview)
+  drawIssueHighlight(r, canvas, graph, overlays.designIssueHighlight, overlays.rotationPreview)
   r.drawEnteredContainer(canvas, graph, overlays.enteredContainerId, overlays.rotationPreview)
   drawDropTarget(r, canvas, graph, overlays.dropTargetId, overlays.rotationPreview)
   drawConnectorTarget(r, canvas, graph, overlays.connectorTarget, overlays.rotationPreview)
@@ -171,8 +126,6 @@ export function drawOverlayPass(
   r.drawPenOverlay(canvas, overlays.penState)
   r.drawPencilOverlay(canvas, overlays.pencilState)
   r.drawSnapMarks(canvas, overlays.snapGuides)
-  updateIssueMarkers(r, graph, overlays)
-  drawIssueMarkers(r, canvas, r.issueMarkers, overlays.designIssues?.hoveredMarkerKey)
   r.drawPresenceCursors(canvas, graph, overlays.presenceCursors)
 }
 

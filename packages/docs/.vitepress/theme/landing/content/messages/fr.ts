@@ -42,8 +42,8 @@ export const fr: LandingMessages = {
     linting: {
       title: 'Linting',
       detail:
-        'Pairdraw vérifie le design pendant que vous travaillez : contraste, texte trop petit, noms par défaut, calques masqués et vides, groupes superflus. Les problèmes sont signalés sur le canevas, beaucoup se corrigent en un clic, et les mêmes règles tournent dans la CLI et pour les agents.',
-      hint: 'Cliquez sur un repère du canevas, ou appliquez une correction depuis la liste.'
+        'Pairdraw vérifie le design pendant que vous travaillez : contraste, texte trop petit, noms par défaut, calques masqués et vides, groupes superflus. L’onglet Vérifier liste chaque problème, beaucoup se corrigent en un clic, et les mêmes règles tournent dans la CLI et pour les agents.',
+      hint: 'Survolez un problème pour repérer son calque, ou appliquez une correction depuis la liste.'
     },
     ai: {
       title: 'Concevez avec l’AI, avec vos clés',

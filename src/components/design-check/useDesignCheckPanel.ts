@@ -177,7 +177,7 @@ export function useDesignCheckPanel(options: {
     check.highlightIssue(onCanvas ? row.issue : null)
   }
 
-  /** Shows a focused issue's row, such as after a canvas marker click: unfiltered, open, in view. */
+  /** Shows a focused issue's row unfiltered, open, and in view, such as after its page opens. */
   async function revealIssue(issueId: string) {
     const issue = check.snapshot.value?.issues.find(({ id }) => id === issueId)
     if (!issue) return

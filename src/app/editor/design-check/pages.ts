@@ -3,7 +3,7 @@ import { computed, ref, shallowRef } from 'vue'
 
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
-import { countIssues, type DesignIssue, type DesignIssueCounts } from './issues'
+import type { DesignIssue } from './issues'
 
 /** Pause after an edit before other pages are checked in the background. */
 const BACKGROUND_DELAY_MS = 800
@@ -28,8 +28,8 @@ export function pageOf(graph: SceneGraph, nodeId: string | null | undefined): st
 }
 
 /**
- * Keeps every loaded page checked, one page at a time while the editor is idle, so the page list
- * and the Document scope can show issues beyond the current page. The current page is checked
+ * Keeps every loaded page checked, one page at a time while the editor is idle, so the Document
+ * scope can show issues beyond the current page. The current page is checked
  * live by the session, which reports its results here. Pages not loaded yet are left out.
  */
 export function createPageChecks(options: PageChecksOptions) {
@@ -119,13 +119,6 @@ export function createPageChecks(options: PageChecksOptions) {
     results.value = new Map()
   }
 
-  /** Errors and warnings per checked page; suggestions stay in the Lint panel. */
-  const counts = computed(() => {
-    const byPage = new Map<string, DesignIssueCounts>()
-    for (const [pageId, issues] of results.value) byPage.set(pageId, countIssues(issues))
-    return byPage
-  })
-
   const unchecked = computed(() =>
     options
       .graph()
@@ -143,7 +136,6 @@ export function createPageChecks(options: PageChecksOptions) {
 
   return {
     results,
-    counts,
     queued,
     notLoaded,
     active,

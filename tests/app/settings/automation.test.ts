@@ -61,13 +61,9 @@ test('applies a nested partial update and keeps sibling settings', () => {
 test('changes design check settings and lists them', () => {
   const rule = Object.keys(allRules)[0]
   const after = updateAutomationSettings({
-    designCheck: { preset: 'strict', disabledRules: [rule], showOnCanvas: false }
+    designCheck: { preset: 'strict', disabledRules: [rule] }
   })
-  expect(after.designCheck).toEqual({
-    preset: 'strict',
-    disabledRules: [rule],
-    showOnCanvas: false
-  })
+  expect(after.designCheck).toEqual({ preset: 'strict', disabledRules: [rule] })
   expect(appPreferences.value.designCheck.disabledRules).toEqual([rule])
 })
 
@@ -76,7 +72,8 @@ test.each([
   [{ chat: { maxAgentSteps: 0 } }, 'chat.maxAgentSteps'],
   [{ editing: { snapping: { grid: true } } }, 'editing.snapping.grid'],
   [{ credentials: {} }, 'credentials'],
-  [{ designCheck: { disabledRules: ['not-a-rule'] } }, 'designCheck.disabledRules.0']
+  [{ designCheck: { disabledRules: ['not-a-rule'] } }, 'designCheck.disabledRules.0'],
+  [{ designCheck: { showOnCanvas: false } }, 'designCheck.showOnCanvas']
 ])('rejects %p without changing anything', (patch, path) => {
   const before = readAutomationSettings()
   expect(() => updateAutomationSettings(patch)).toThrow(`Invalid settings at "${path}"`)

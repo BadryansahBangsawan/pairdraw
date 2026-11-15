@@ -3,7 +3,6 @@ import type { NodeType, SceneNode, VectorNetwork } from '@pairdraw/scene-graph'
 import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
 import type { LayerNode, LayerOutline } from '@pairdraw/vue/primitives/LayerTree'
 
-import type { LayerIssueMark } from '@/app/editor/design-check/layers'
 import LayerTreeNodeRow from '@/components/LayerTree/LayerTreeNodeRow.vue'
 import LayerTreeRenameRow from '@/components/LayerTree/LayerTreeRenameRow.vue'
 import type {
@@ -95,30 +94,8 @@ const states: Array<{
   node: LayerNode
   selected: boolean
   chrome: LayerTreeChrome
-  issue?: LayerIssueMark
 }> = [
   { label: 'Normal', node: node('Normal'), selected: false, chrome: chrome() },
-  {
-    label: 'Own error',
-    node: node('Own error'),
-    selected: false,
-    chrome: chrome(),
-    issue: { severity: 'error', count: 2, own: true }
-  },
-  {
-    label: 'Selected own warning',
-    node: node('Selected own warning'),
-    selected: true,
-    chrome: chrome({ focused: true }),
-    issue: { severity: 'warning', count: 1, own: true }
-  },
-  {
-    label: 'Contains error',
-    node: node('Contains error'),
-    selected: false,
-    chrome: chrome(),
-    issue: { severity: 'error', count: 0, own: false }
-  },
   {
     label: 'Selected focused',
     node: node('Selected focused'),
@@ -269,7 +246,6 @@ const states: Array<{
           :expanded="state.label === 'Normal'"
           :actions="actions"
           :chrome="state.chrome"
-          :issue="state.issue"
         />
       </div>
       <div aria-label="Rename">

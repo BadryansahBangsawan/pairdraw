@@ -42,8 +42,8 @@ export const es: LandingMessages = {
     linting: {
       title: 'Linting',
       detail:
-        'Pairdraw revisa el diseño mientras trabajas: contraste, texto demasiado pequeño, nombres por defecto, capas ocultas y vacías, grupos sobrantes. Los problemas se marcan en el lienzo, muchos se corrigen con un clic, y las mismas reglas funcionan en la CLI y para los agentes.',
-      hint: 'Haz clic en una marca del lienzo o aplica una corrección de la lista.'
+        'Pairdraw revisa el diseño mientras trabajas: contraste, texto demasiado pequeño, nombres por defecto, capas ocultas y vacías, grupos sobrantes. La pestaña Revisar enumera cada problema, muchos se corrigen con un clic, y las mismas reglas funcionan en la CLI y para los agentes.',
+      hint: 'Pasa el puntero sobre un problema para ver su capa o aplica una corrección de la lista.'
     },
     ai: {
       title: 'Diseña con IA, con tus claves',

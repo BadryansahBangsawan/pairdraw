@@ -26,15 +26,10 @@ import type {
 
 import { openTour } from '@/app/demo/document'
 import { useEditorStore } from '@/app/editor/active-store'
-import { designIssuesOnCanvas } from '@/app/editor/design-check/on-canvas'
 import { textLinkTargets } from '@/app/editor/links'
 import { openVariablesDialog } from '@/app/editor/tokens/dialog'
 import { openSettingsDialog } from '@/app/settings/dialog'
-import {
-  setCommentsOnCanvas,
-  setDesignIssuesOnCanvas,
-  setSnappingPreference
-} from '@/app/settings/preferences/apply'
+import { setCommentsOnCanvas, setSnappingPreference } from '@/app/settings/preferences/apply'
 import { appPreferences } from '@/app/settings/preferences/store'
 import { openShortcutSheet } from '@/app/shell/keyboard/sheet'
 import { createSharedEditorMenuActions } from '@/app/shell/menu/actions/editor'
@@ -150,7 +145,6 @@ export function useAppMenu() {
     'view-rulers': 'rulers',
     'view-pixel-grid': 'pixelGrid',
     'view-multiplayer-cursors': 'multiplayerCursors',
-    'view-design-issues': 'designIssues',
     'view-comments': 'comments',
     'view-layers-panel': 'layersPanel',
     'view-properties-panel': 'propertiesPanel',
@@ -248,8 +242,6 @@ export function useAppMenu() {
         return store.state.showPixelGrid !== false
       case 'view-multiplayer-cursors':
         return store.state.showRemoteCursors
-      case 'view-design-issues':
-        return designIssuesOnCanvas.value
       case 'view-comments':
         return appPreferences.value.comments.showOnCanvas
       case 'view-layers-panel':
@@ -293,8 +285,6 @@ export function useAppMenu() {
         return (value: boolean) => {
           if (store.state.showRemoteCursors !== value) itemAction(item)?.()
         }
-      case 'view-design-issues':
-        return (value: boolean) => setDesignIssuesOnCanvas(value)
       case 'view-comments':
         return (value: boolean) => setCommentsOnCanvas(value)
       case 'view-layers-panel':

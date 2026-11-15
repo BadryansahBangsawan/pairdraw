@@ -8,8 +8,6 @@ import {
   groupIssuesByRule,
   highlightForIssue,
   issuesWithin,
-  markersForIssues,
-  mostSevereIssue,
   toDesignIssues
 } from '@/app/editor/design-check/issues'
 
@@ -41,7 +39,7 @@ describe('design issues', () => {
     expect(second).toEqual(first)
   })
 
-  test('mark each layer once, by its most severe problem, and leave suggestions to the panel', () => {
+  test('count by severity', () => {
     const issues = toDesignIssues(
       [
         message('consistent-spacing', 'card', 'warning'),
@@ -51,9 +49,7 @@ describe('design issues', () => {
       'page'
     )
 
-    expect(markersForIssues(issues)).toEqual([{ nodeId: 'card', severity: 'error', count: 2 }])
     expect(countIssues(issues)).toEqual({ error: 1, warning: 1, info: 1 })
-    expect(mostSevereIssue(issues)?.ruleId).toBe('color-contrast')
   })
 
   test('group by rule, most severe and most frequent first', () => {

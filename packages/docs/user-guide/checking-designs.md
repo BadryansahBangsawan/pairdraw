@@ -31,7 +31,7 @@ Binding colors and rounding pixels keep the design as it looks, so their groups 
 
 Other issues show the value that needs attention, such as a contrast ratio or a touch target size, so you can fix them in the Design panel.
 
-Pairdraw does not mark issues on the canvas, in the Layers panel, or in the page list: the Lint panel is the one place that lists them.
+Issues appear only in the Lint panel and as underlines in the Code tab. The canvas shows nothing for them beyond the highlight of the issue you hover, and the Layers panel and page list show none.
 
 ## In the Code Panel
 

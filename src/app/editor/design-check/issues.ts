@@ -1,9 +1,4 @@
-import {
-  issueSeverityRank,
-  type DesignIssueHighlight,
-  type DesignIssueMarker,
-  type DesignIssueSeverity
-} from '@pairdraw/core/canvas'
+import type { DesignIssueHighlight, DesignIssueSeverity } from '@pairdraw/core/canvas'
 import type { LintMessage } from '@pairdraw/core/lint'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
@@ -26,12 +21,14 @@ export type DesignIssueCounts = Record<DesignIssueSeverity, number>
 
 export const DESIGN_ISSUE_SEVERITIES: readonly DesignIssueSeverity[] = ['error', 'warning', 'info']
 
+const SEVERITY_RANK: Record<DesignIssueSeverity, number> = { error: 3, warning: 2, info: 1 }
+
 /** Sorts the most severe first. */
-export function compareIssueSeverity(
+function compareIssueSeverity(
   a: { severity: DesignIssueSeverity },
   b: { severity: DesignIssueSeverity }
 ): number {
-  return issueSeverityRank(b.severity) - issueSeverityRank(a.severity)
+  return SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity]
 }
 
 /**
@@ -52,27 +49,6 @@ export function countIssues(issues: readonly DesignIssue[]): DesignIssueCounts {
   const counts: DesignIssueCounts = { error: 0, warning: 0, info: 0 }
   for (const issue of issues) counts[issue.severity]++
   return counts
-}
-
-/**
- * One marker per layer with errors or warnings. Suggestions stay in the panel: they are
- * common enough that marking every one would bury the problems that need attention.
- */
-export function markersForIssues(issues: readonly DesignIssue[]): DesignIssueMarker[] {
-  const markers = new Map<string, DesignIssueMarker>()
-  for (const issue of issues) {
-    if (issue.severity === 'info') continue
-    const marker = markers.get(issue.nodeId)
-    if (!marker) {
-      markers.set(issue.nodeId, { nodeId: issue.nodeId, severity: issue.severity, count: 1 })
-      continue
-    }
-    marker.count++
-    if (compareIssueSeverity(issue, marker) < 0) {
-      marker.severity = issue.severity
-    }
-  }
-  return [...markers.values()]
 }
 
 /** Groups findings by rule, most severe and then most frequent first; rows keep layer order. */
@@ -123,12 +99,4 @@ export function highlightForIssue(issue: DesignIssue): DesignIssueHighlight {
     severity: issue.severity,
     minSize: minSize ? { width: minSize, height: minSize } : undefined
   }
-}
-
-export function mostSevereIssue(issues: readonly DesignIssue[]): DesignIssue | undefined {
-  let result: DesignIssue | undefined
-  for (const issue of issues) {
-    if (!result || compareIssueSeverity(issue, result) < 0) result = issue
-  }
-  return result
 }

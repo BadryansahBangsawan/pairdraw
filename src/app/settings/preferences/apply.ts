@@ -3,11 +3,7 @@ import type { SnappingPreferences } from '@pairdraw/core'
 import type { EditorStore } from '@/app/editor/active-store'
 import { getTabsSnapshot } from '@/app/tabs'
 
-import {
-  syncNativeCommentsMenu,
-  syncNativeDesignIssuesMenu,
-  syncNativeSnappingMenu
-} from './native-menu'
+import { syncNativeCommentsMenu, syncNativeSnappingMenu } from './native-menu'
 import {
   appPreferences,
   updateCommentPreferences,
@@ -48,13 +44,6 @@ export function setPixelGridShown(shown: boolean): void {
 /** Shift+', View → Pixel grid, and the zoom menu: the opposite of what `store` shows now. */
 export function togglePixelGrid(store: EditorStore): void {
   setPixelGridShown(store.state.showPixelGrid === false)
-}
-
-export function setDesignIssuesOnCanvas(showOnCanvas: boolean): void {
-  updateDesignCheckPreferences({ showOnCanvas })
-  void syncNativeDesignIssuesMenu(showOnCanvas).catch((error: unknown) => {
-    console.error('[Settings] Failed to synchronize the native design issues menu:', error)
-  })
 }
 
 export function setDesignCheckPreset(preset: DesignCheckPreset): void {

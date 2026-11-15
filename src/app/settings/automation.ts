@@ -5,7 +5,7 @@ import { allRules } from '@pairdraw/core/lint'
 import { AVAILABLE_LOCALES, locale, setLocale, type Locale } from '@pairdraw/vue/i18n'
 
 import { agentStepLimitSchema } from '@/app/ai/reply/schema'
-import { applySnappingPreferences, setDesignIssuesOnCanvas } from '@/app/settings/preferences/apply'
+import { applySnappingPreferences } from '@/app/settings/preferences/apply'
 import { nudgeDistanceSchema } from '@/app/settings/preferences/schema'
 import {
   ANIMATION_PREFERENCES,
@@ -86,7 +86,6 @@ const automationSettingsPatchSchema = v.strictObject({
   ),
   designCheck: v.optional(
     v.strictObject({
-      showOnCanvas: optionalBooleanSchema,
       preset: v.optional(v.picklist(DESIGN_CHECK_PRESETS)),
       disabledRules: v.optional(v.array(v.picklist(Object.keys(allRules))))
     })
@@ -141,10 +140,8 @@ export function updateAutomationSettings(input: unknown): AutomationSettings {
   }
   if (patch.editing?.snapping) applySnappingPreferences(patch.editing.snapping)
   if (patch.editing?.nudge) updateNudgePreferences(patch.editing.nudge)
-  const { showOnCanvas, ...designCheck } = patch.designCheck ?? {}
-  if (!isEmptyObject(designCheck)) updateDesignCheckPreferences(designCheck)
-  // Through the menu's setter, so the native View menu checkmark follows.
-  if (showOnCanvas !== undefined) setDesignIssuesOnCanvas(showOnCanvas)
+  if (patch.designCheck && !isEmptyObject(patch.designCheck))
+    updateDesignCheckPreferences(patch.designCheck)
 
   return readAutomationSettings()
 }

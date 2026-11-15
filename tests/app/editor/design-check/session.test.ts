@@ -5,7 +5,6 @@ import { nextTick, watch } from 'vue'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { createEditorStore } from '@/app/editor/session'
-import { DESIGN_ISSUES_ON_CANVAS_INCLUDED } from '@/constants'
 
 const stores: ReturnType<typeof createEditorStore>[] = []
 afterEach(() => {
@@ -13,11 +12,8 @@ afterEach(() => {
   jest.useRealTimers()
 })
 
-// These follow the checks the canvas marks keep running; the Lint panel's own checks are covered
-// by `tests/e2e/design-check/design-check.spec.ts`.
-
-/** Two pages, each with text small enough for the design check to mark on the canvas. */
-function twoPagesWithIssues() {
+/** Two pages, each with text small enough for the design check to report. */
+async function twoPagesWithIssues({ lintOpen = true } = {}) {
   const graph = new SceneGraph()
   const first = graph.getPages()[0]
   const second = graph.addPage('Second')
@@ -34,8 +30,17 @@ function twoPagesWithIssues() {
     },
     { flush: 'sync' }
   )
-  const markedNodes = () => (store.state.designIssues?.markers ?? []).map((m) => m.nodeId)
-  return { store, first, second, firstText, secondText, checkedPages, markedNodes }
+  store.designCheck.panelVisible.value = lintOpen
+  await nextTick()
+  /** Layers with small text in the current page's result, as the Lint panel lists them. */
+  const listedNodes = () => {
+    const snapshot = store.designCheck.snapshot.value
+    if (!snapshot || snapshot.pageId !== store.state.currentPageId) return []
+    return snapshot.issues
+      .filter((issue) => issue.ruleId === 'min-text-size')
+      .map((issue) => issue.nodeId)
+  }
+  return { store, first, second, firstText, secondText, checkedPages, listedNodes }
 }
 
 /** The editor's own switch; the app's adds a progress overlay with timers of its own. */
@@ -51,27 +56,37 @@ async function settleCheck() {
   await nextTick()
 }
 
-describe.skipIf(!DESIGN_ISSUES_ON_CANVAS_INCLUDED)('the design check across a page switch', () => {
+function smallTextIssue(store: ReturnType<typeof createEditorStore>, nodeId: string) {
+  const issue = store.designCheck.snapshot.value?.issues.find(
+    (candidate) => candidate.nodeId === nodeId && candidate.ruleId === 'min-text-size'
+  )
+  if (!issue) throw new Error('The check found no small text on the layer')
+  return issue
+}
+
+describe('the design check across a page switch', () => {
   test('checks the new page once, after the switch', async () => {
     jest.useFakeTimers()
-    const { store, first, second, firstText, secondText, checkedPages, markedNodes } =
-      twoPagesWithIssues()
+    const { store, first, second, firstText, secondText, checkedPages, listedNodes } =
+      await twoPagesWithIssues()
     expect(store.designCheck.snapshot.value?.pageId).toBe(first.id)
-    expect(markedNodes()).toEqual([firstText.id])
+    expect(listedNodes()).toEqual([firstText.id])
+    checkedPages.length = 0
 
     await switchPage(store, second.id)
-    // The previous page's markers would point at layers that are no longer shown.
-    expect(markedNodes()).toEqual([])
+    // The previous page's issues point at layers that are no longer shown.
+    expect(listedNodes()).toEqual([])
     expect(checkedPages).toEqual([])
 
     await settleCheck()
     expect(checkedPages).toEqual([second.id])
-    expect(markedNodes()).toEqual([secondText.id])
+    expect(listedNodes()).toEqual([secondText.id])
   })
 
   test('opening an issue on another page checks that page right away', async () => {
     jest.useFakeTimers()
-    const { store, second, secondText, checkedPages } = twoPagesWithIssues()
+    const { store, second, secondText, checkedPages } = await twoPagesWithIssues()
+    checkedPages.length = 0
     const issue = {
       id: `min-text-size:${secondText.id}:0`,
       ruleId: 'min-text-size',
@@ -92,10 +107,10 @@ describe.skipIf(!DESIGN_ISSUES_ON_CANVAS_INCLUDED)('the design check across a pa
   })
 })
 
-describe.skipIf(!DESIGN_ISSUES_ON_CANVAS_INCLUDED)('a page visited before', () => {
+describe('a page visited before', () => {
   test('shows its last result at once when nothing on it changed', async () => {
     jest.useFakeTimers()
-    const { store, first, second, secondText, markedNodes } = twoPagesWithIssues()
+    const { store, first, second, secondText, listedNodes } = await twoPagesWithIssues()
     await switchPage(store, second.id)
     await settleCheck()
     await switchPage(store, first.id)
@@ -104,12 +119,12 @@ describe.skipIf(!DESIGN_ISSUES_ON_CANVAS_INCLUDED)('a page visited before', () =
     await switchPage(store, second.id)
 
     // Before the check that follows the switch runs.
-    expect(markedNodes()).toEqual([secondText.id])
+    expect(listedNodes()).toEqual([secondText.id])
   })
 
   test('shows the first page checked at once too', async () => {
     jest.useFakeTimers()
-    const { store, first, second, firstText, markedNodes } = twoPagesWithIssues()
+    const { store, first, second, firstText, listedNodes } = await twoPagesWithIssues()
     await switchPage(store, second.id)
     // The second page's check replaces the first's result; the background checks wait longer.
     jest.advanceTimersByTime(300)
@@ -117,12 +132,12 @@ describe.skipIf(!DESIGN_ISSUES_ON_CANVAS_INCLUDED)('a page visited before', () =
 
     await switchPage(store, first.id)
 
-    expect(markedNodes()).toEqual([firstText.id])
+    expect(listedNodes()).toEqual([firstText.id])
   })
 
   test('waits for a new check when it changed while away', async () => {
     jest.useFakeTimers()
-    const { store, first, second, secondText, markedNodes } = twoPagesWithIssues()
+    const { store, first, second, secondText, listedNodes } = await twoPagesWithIssues()
     await switchPage(store, second.id)
     await settleCheck()
     await switchPage(store, first.id)
@@ -130,17 +145,17 @@ describe.skipIf(!DESIGN_ISSUES_ON_CANVAS_INCLUDED)('a page visited before', () =
     store.updateNode(secondText.id, { fontSize: 16 })
 
     await switchPage(store, second.id)
-    expect(markedNodes()).toEqual([])
+    expect(listedNodes()).toEqual([])
 
     await settleCheck()
-    expect(markedNodes()).toEqual([])
+    expect(listedNodes()).toEqual([])
   })
 })
 
-describe.skipIf(!DESIGN_ISSUES_ON_CANVAS_INCLUDED)('the focused issue', () => {
-  test('is dropped as soon as its layer is deleted', () => {
-    const { store, firstText } = twoPagesWithIssues()
-    store.designCheck.openMarker([firstText.id])
+describe('the focused issue', () => {
+  test('is dropped as soon as its layer is deleted', async () => {
+    const { store, firstText } = await twoPagesWithIssues()
+    await store.designCheck.openIssue(smallTextIssue(store, firstText.id))
     expect(store.designCheck.focusedIssueId.value).not.toBeNull()
 
     // Until the next check, the panel still lists the deleted layer's issue and would reveal it.
@@ -151,8 +166,8 @@ describe.skipIf(!DESIGN_ISSUES_ON_CANVAS_INCLUDED)('the focused issue', () => {
 
   test('is dropped once the check no longer finds it', async () => {
     jest.useFakeTimers()
-    const { store, firstText } = twoPagesWithIssues()
-    store.designCheck.openMarker([firstText.id])
+    const { store, firstText } = await twoPagesWithIssues()
+    await store.designCheck.openIssue(smallTextIssue(store, firstText.id))
 
     store.updateNode(firstText.id, { fontSize: 16 })
     await nextTick()
@@ -163,22 +178,49 @@ describe.skipIf(!DESIGN_ISSUES_ON_CANVAS_INCLUDED)('the focused issue', () => {
   })
 })
 
-describe('a view that shows issues', () => {
-  test('keeps the page checked while it is open, without marking the canvas', async () => {
+describe('the design check with nothing showing issues', () => {
+  test('checks nothing while neither the Lint panel nor another view is open', async () => {
     jest.useFakeTimers()
-    const { store, first, checkedPages } = twoPagesWithIssues()
+    const { store, firstText, checkedPages } = await twoPagesWithIssues({ lintOpen: false })
+    store.updateNode(firstText.id, { fontSize: 6 })
+    await settleCheck()
+
+    expect(store.designCheck.enabled.value).toBe(false)
+    expect(checkedPages).toEqual([])
+    expect(store.designCheck.snapshot.value).toBeNull()
+  })
+
+  test('stops checking and clears the highlight once the Lint panel closes', async () => {
+    jest.useFakeTimers()
+    const { store, firstText, checkedPages } = await twoPagesWithIssues()
+    store.designCheck.highlightIssue(smallTextIssue(store, firstText.id))
+    expect(store.state.designIssueHighlight?.nodeId).toBe(firstText.id)
+
     store.designCheck.panelVisible.value = false
+    await nextTick()
+    checkedPages.length = 0
+    store.updateNode(firstText.id, { fontSize: 6 })
+    await settleCheck()
+
+    expect(store.state.designIssueHighlight).toBeNull()
+    expect(store.designCheck.snapshot.value).toBeNull()
+    expect(checkedPages).toEqual([])
+  })
+})
+
+describe('a view that shows issues', () => {
+  test('keeps the page checked while it is open', async () => {
+    jest.useFakeTimers()
+    const { store, first, checkedPages } = await twoPagesWithIssues({ lintOpen: false })
     const release = store.designCheck.holdChecks()
     await settleCheck()
     expect(store.designCheck.enabled.value).toBe(true)
     expect(checkedPages).toContain(first.id)
     expect(store.designCheck.snapshot.value?.issues.length).toBeGreaterThan(0)
-    if (!DESIGN_ISSUES_ON_CANVAS_INCLUDED)
-      expect(store.state.designIssues?.markers ?? []).toEqual([])
 
     release()
     release()
     await nextTick()
-    expect(store.designCheck.enabled.value).toBe(DESIGN_ISSUES_ON_CANVAS_INCLUDED)
+    expect(store.designCheck.enabled.value).toBe(false)
   })
 })

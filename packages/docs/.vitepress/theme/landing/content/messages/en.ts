@@ -42,8 +42,8 @@ export const en: LandingMessages = {
     linting: {
       title: 'Linting',
       detail:
-        'Pairdraw checks the design as you work: contrast, text too small to read, default names, hidden and empty layers, stray groups. Problems are marked on the canvas, many come with a fix you apply in one click, and the same rules run in the CLI and for agents.',
-      hint: 'Click a marker on the canvas, or apply a fix from the list.'
+        'Pairdraw checks the design as you work: contrast, text too small to read, default names, hidden and empty layers, stray groups. The Lint tab lists every problem, many come with a fix you apply in one click, and the same rules run in the CLI and for agents.',
+      hint: 'Hover an issue to find its layer, or apply a fix from the list.'
     },
     ai: {
       title: 'Design with AI, on your keys',

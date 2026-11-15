@@ -42,8 +42,8 @@ export const it: LandingMessages = {
     linting: {
       title: 'Linting',
       detail:
-        'Pairdraw controlla il design mentre lavori: contrasto, testo troppo piccolo, nomi predefiniti, livelli nascosti e vuoti, gruppi superflui. I problemi sono segnati sulla tela, molti si correggono con un clic, e le stesse regole funzionano nella CLI e per gli agenti.',
-      hint: 'Fai clic su un indicatore sulla tela, oppure applica una correzione dall’elenco.'
+        'Pairdraw controlla il design mentre lavori: contrasto, testo troppo piccolo, nomi predefiniti, livelli nascosti e vuoti, gruppi superflui. La scheda Verifica elenca ogni problema, molti si correggono con un clic, e le stesse regole funzionano nella CLI e per gli agenti.',
+      hint: 'Passa sopra un problema per trovarne il livello, oppure applica una correzione dall’elenco.'
     },
     ai: {
       title: 'Progetta con l’AI, con le tue chiavi',

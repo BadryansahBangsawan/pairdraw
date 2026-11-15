@@ -58,7 +58,7 @@ defineSlots<{
 </script>
 
 <template>
-  <div data-canvas-obstacle :class="styles.dock({ class: ui?.dock })">
+  <div :class="styles.dock({ class: ui?.dock })">
     <div v-if="$slots.start" :class="styles.start()">
       <slot name="start" />
     </div>

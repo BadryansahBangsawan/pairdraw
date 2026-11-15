@@ -122,7 +122,7 @@ export function renderFromEditorState(
         ? { ...state.nodeEditState, pointsTransformable: state.activeTool === 'SELECT' }
         : null,
       presenceCursors: state.presenceCursors,
-      designIssues: state.designIssues,
+      designIssueHighlight: state.designIssueHighlight,
       codeFocusNodeId: state.codeFocusNodeId,
       autoLayoutHover: state.autoLayoutHover,
       shapeHandleHover: state.shapeHandleHover,

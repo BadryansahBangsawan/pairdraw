@@ -1,7 +1,7 @@
 import type { EditorCommandId } from '@pairdraw/vue/editor/commands'
 
 import { REMOVE_AUTO_LAYOUT_SHORTCUT } from '@/app/shell/keyboard/auto-layout'
-import { DESIGN_ISSUES_ON_CANVAS_INCLUDED, EXTRA_EXPORT_FORMATS_INCLUDED } from '@/constants'
+import { EXTRA_EXPORT_FORMATS_INCLUDED } from '@/constants'
 
 type AppMenuTarget = 'all' | 'browser' | 'native'
 
@@ -285,16 +285,6 @@ export const APP_MENU_SCHEMA = [
         checkbox: true,
         shortcut: 'ALT+MOD+\\'
       },
-      ...(DESIGN_ISSUES_ON_CANVAS_INCLUDED
-        ? [
-            {
-              id: 'view-design-issues',
-              label: 'Design Issues',
-              checkbox: true,
-              handler: 'shell'
-            } as const
-          ]
-        : []),
       { id: 'view-comments', label: 'Comments', checkbox: true, shortcut: 'SHIFT+C' },
       { type: 'separator' },
       // The top bar's panel buttons; each panel stays as left across documents and sessions.

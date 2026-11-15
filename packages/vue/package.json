@@ -19,11 +19,6 @@
       "import": "./dist/canvas/drop/index.js",
       "default": "./dist/canvas/drop/index.js"
     },
-    "./canvas/issues": {
-      "types": "./dist/canvas/issues/index.d.ts",
-      "import": "./dist/canvas/issues/index.js",
-      "default": "./dist/canvas/issues/index.js"
-    },
     "./canvas/labels": {
       "types": "./dist/canvas/labels/index.d.ts",
       "import": "./dist/canvas/labels/index.js",

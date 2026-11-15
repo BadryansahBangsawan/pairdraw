@@ -83,16 +83,13 @@ export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set([
   'validateEnteredContainer',
 
   // Canvas overlays that show without changing anything
-  'clearDesignIssues',
   'endImageEdit',
   'setAutoLayoutHover',
   'setDesignIssueHighlight',
-  'setDesignIssueMarkers',
   'setDropTarget',
   'setGuidePreview',
   'setGuideRedline',
   'setHoveredGuide',
-  'setHoveredIssueMarker',
   'setLayoutInsertIndicator',
   'setRenamingLabel',
   'setRotationPreview',

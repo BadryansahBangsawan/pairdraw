@@ -87,9 +87,8 @@ function frameNode(store: EditorStore, node: SceneNode, insets: FrameInsets = {}
  * hidden, since the landing says those things in its own words and language, and so are the other
  * chapters, which a stage that grows its subject would otherwise bring into view. Instances draw
  * from their own layers, so hiding the chapters that hold their main components changes nothing
- * they show. Other stages drop the Lint chapter, whose planted error would otherwise put a marker
- * at their canvas edge; it holds no component the rest of the tour uses. Like the tour's theme,
- * none of this is an edit, so the stage opens with nothing to undo or save.
+ * they show. Like the tour's theme, none of this is an edit, so the stage opens with nothing to
+ * undo or save.
  */
 function isolateChapter(store: EditorStore, tourChapter: TourChapter, subject: SceneNode): void {
   const { graph } = store
@@ -98,10 +97,8 @@ function isolateChapter(store: EditorStore, tourChapter: TourChapter, subject: S
   const others = graph
     .getChildren(store.state.currentPageId)
     .filter((node) => node.id !== section.id)
-  const lint = tourChapter === CHAPTERS.lint ? null : chapterSection(store, CHAPTERS.lint)
   graph.applyImportedStateDuring(() => {
     for (const node of [...around, ...others]) graph.updateNode(node.id, { visible: false })
-    if (lint) graph.deleteNode(lint.id)
   })
 }
 

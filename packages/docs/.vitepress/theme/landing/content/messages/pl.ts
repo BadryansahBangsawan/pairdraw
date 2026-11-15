@@ -42,8 +42,8 @@ export const pl: LandingMessages = {
     linting: {
       title: 'Linting',
       detail:
-        'Pairdraw sprawdza projekt w trakcie pracy: kontrast, zbyt mały tekst, domyślne nazwy, ukryte i puste warstwy, zbędne grupy. Problemy są oznaczane na obszarze roboczym, wiele z nich naprawisz jednym kliknięciem, a te same reguły działają w CLI i dla agentów.',
-      hint: 'Kliknij znacznik na obszarze roboczym albo zastosuj poprawkę z listy.'
+        'Pairdraw sprawdza projekt w trakcie pracy: kontrast, zbyt mały tekst, domyślne nazwy, ukryte i puste warstwy, zbędne grupy. Karta Sprawdź wymienia każdy problem, wiele z nich naprawisz jednym kliknięciem, a te same reguły działają w CLI i dla agentów.',
+      hint: 'Najedź na problem, aby znaleźć jego warstwę, albo zastosuj poprawkę z listy.'
     },
     ai: {
       title: 'Projektuj z AI, na własnych kluczach',

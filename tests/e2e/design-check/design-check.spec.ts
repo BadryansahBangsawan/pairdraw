@@ -1,25 +1,11 @@
 import type { Page } from '@playwright/test'
 
-import type { Vector } from '@pairdraw/scene-graph/primitives'
-
-import { DESIGN_ISSUES_ON_CANVAS_INCLUDED } from '@/constants'
-
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
-import { openAppMenu } from '#tests/helpers/menu'
 
 const editor = useEditorSetupWithClear('/?test&no-rulers')
 
-/** Skips a test of the marks this build leaves out (`DESIGN_ISSUES_ON_CANVAS_INCLUDED`). */
-const skipWithoutCanvasMarks = () =>
-  test.skip(!DESIGN_ISSUES_ON_CANVAS_INCLUDED, 'canvas issue marks are not included in this build')
-
 const CARD = { x: 80, y: 120, width: 320, height: 200 }
-/** Where the Close button's marker sits at zoom 1: just outside its top-right corner. */
 const CLOSE_BUTTON = { x: 340, y: 140, width: 24, height: 20 }
-const CLOSE_MARKER = {
-  x: CARD.x + CLOSE_BUTTON.x + CLOSE_BUTTON.width + 12,
-  y: CARD.y + CLOSE_BUTTON.y - 12
-}
 
 interface Scene {
   cardId: string
@@ -109,35 +95,8 @@ async function openLint(page: Page) {
 
 function highlightedNode(page: Page) {
   return page.evaluate(
-    () => window.pairdraw?.getStore?.().state.designIssues?.highlight?.nodeId ?? null
+    () => window.pairdraw?.getStore?.().state.designIssueHighlight?.nodeId ?? null
   )
-}
-
-/** Checks settle shortly after edits; markers exist once the check has published them. */
-async function waitForMarkers(page: Page) {
-  await expect
-    .poll(() =>
-      page.evaluate(() => window.pairdraw?.getStore?.().state.designIssues?.markers.length ?? 0)
-    )
-    .toBeGreaterThan(0)
-  await page.evaluate(() => new Promise(requestAnimationFrame))
-}
-
-/**
- * Markers are drawn a frame after the check publishes them, so the pointer keeps moving over the
- * marker, as a person's would, until the canvas reports it under the pointer.
- */
-async function hoverMarker(point: Vector) {
-  let nudge = 0
-  await expect
-    .poll(async () => {
-      nudge = nudge === 0 ? 1 : 0
-      await editor.canvas.hover(point.x + nudge, point.y)
-      return editor.page.evaluate(
-        () => window.pairdraw?.getStore?.().state.designIssues?.hoveredMarkerKey ?? null
-      )
-    })
-    .not.toBeNull()
 }
 
 function selectedIds(page: Page) {
@@ -252,106 +211,7 @@ test('A rule can be turned off from its group and turned back on from the rules 
   await expect(panel.getByText('Small touch target')).toBeVisible()
 })
 
-test('Canvas markers explain themselves on hover and open Lint on click', async () => {
-  skipWithoutCanvasMarks()
-  const scene = await buildScene(editor.page)
-  await waitForMarkers(editor.page)
-
-  await hoverMarker(CLOSE_MARKER)
-  const tooltip = editor.page.getByTestId('issue-marker-tooltip')
-  await expect(tooltip).toContainText('Close button')
-  await expect(tooltip).toContainText('Small touch target')
-  await expect.poll(() => highlightedNode(editor.page)).toBe(scene.closeId)
-  await editor.canvas.waitForRender()
-  const canvas = await editor.canvas.canvas.boundingBox()
-  if (!canvas) throw new Error('Canvas has no bounding box')
-  expect(
-    await editor.page.screenshot({
-      clip: { x: canvas.x + 60, y: canvas.y + 100, width: 640, height: 260 }
-    })
-  ).toMatchSnapshot('design-check-marker-hover.png')
-
-  await editor.canvas.click(CLOSE_MARKER.x, CLOSE_MARKER.y)
-  await expect(tooltip).toHaveCount(0)
-  await expect.poll(() => selectedIds(editor.page)).toEqual([scene.closeId])
-  await expect(editor.page.getByRole('tab', { name: /^Lint/ })).toHaveAttribute(
-    'aria-selected',
-    'true'
-  )
-  await expect(lintPanel(editor.page).locator(`[data-node-id="${scene.closeId}"]`)).toBeVisible()
-})
-
-/** Edge pins sit this far inside the canvas, leaving room for the chevron they point with. */
-const EDGE_PIN_INSET = 12
-
-/**
- * Where the edge pin for a layer off screen sits, following the canvas: the ray from the
- * viewport center toward the layer, where it leaves the inset viewport.
- */
-function edgePinCenter(width: number, height: number, target: Vector): Vector {
-  const center = { x: width / 2, y: height / 2 }
-  const dx = target.x - center.x
-  const dy = target.y - center.y
-  const length = Math.hypot(dx, dy)
-  const halfWidth = width / 2 - EDGE_PIN_INSET
-  const halfHeight = height / 2 - EDGE_PIN_INSET
-  const t = Math.min(
-    dx === 0 ? Infinity : (halfWidth * length) / Math.abs(dx),
-    dy === 0 ? Infinity : (halfHeight * length) / Math.abs(dy)
-  )
-  const point = { x: center.x + (dx / length) * t, y: center.y + (dy / length) * t }
-  // The pill is 16px wide and stays inside the inset viewport.
-  return {
-    x: Math.min(Math.max(point.x, EDGE_PIN_INSET + 8), width - EDGE_PIN_INSET - 8),
-    y: Math.min(Math.max(point.y, EDGE_PIN_INSET + 8), height - EDGE_PIN_INSET - 8)
-  }
-}
-
-test('Issues off screen are pinned to the canvas edge and lead to the nearest most severe one', async () => {
-  skipWithoutCanvasMarks()
-  const scene = await buildScene(editor.page)
-  await openLint(editor.page)
-  const canvas = await editor.canvas.canvas.boundingBox()
-  if (!canvas) throw new Error('Canvas has no bounding box')
-  // Pan the card off the left edge, low enough that its pin sits under the toolbar standing there;
-  // the caption's contrast error is the most severe issue.
-  const panX = -1000
-  const panY = 1080
-  await editor.page.evaluate(
-    ([x, y]) => {
-      const store = window.pairdraw?.getStore?.()
-      if (!store) throw new Error('Pairdraw store not initialized')
-      store.state.panX = x
-      store.state.panY = y
-      store.requestRender()
-    },
-    [panX, panY]
-  )
-  await waitForMarkers(editor.page)
-  const caption = { x: CARD.x + 24 + 100 + panX, y: CARD.y + 24 + 12 + panY }
-  const pin = edgePinCenter(canvas.width, canvas.height, caption)
-
-  await hoverMarker(pin)
-  const tooltip = editor.page.getByTestId('issue-marker-tooltip')
-  await expect(tooltip).toContainText('Off screen to the left')
-  await expect(tooltip).toContainText('Low text contrast')
-  await editor.canvas.waitForRender()
-  expect(
-    await editor.page.screenshot({
-      clip: { x: canvas.x, y: canvas.y + pin.y - 20, width: 33, height: 40 }
-    })
-  ).toMatchSnapshot('design-check-edge-pin-hover.png')
-
-  await editor.canvas.click(pin.x, pin.y)
-  await expect.poll(() => selectedIds(editor.page)).toEqual([scene.captionId])
-  await expect
-    .poll(() => editor.page.evaluate(() => window.pairdraw?.getStore?.().state.panX ?? 0))
-    .toBeGreaterThan(panX)
-  await expect(lintPanel(editor.page).locator(`[data-node-id="${scene.captionId}"]`)).toBeVisible()
-})
-
-test('Other pages are checked for the page list and the Document scope', async () => {
-  skipWithoutCanvasMarks()
+test('Other pages are checked for the Document scope', async () => {
   await buildScene(editor.page)
   const cartCaptionId = await editor.page.evaluate(() => {
     const store = window.pairdraw?.getStore?.()
@@ -377,13 +237,6 @@ test('Other pages are checked for the page list and the Document scope', async (
     }).id
   })
 
-  const checkoutBadge = editor.page
-    .getByTestId('pages-item')
-    .filter({ hasText: 'Checkout' })
-    .locator('[data-issue-severity="error"]')
-  await expect(checkoutBadge).toHaveText('1')
-  await expect(checkoutBadge).toHaveAccessibleName('Errors: 1')
-
   await openLint(editor.page)
   const panel = lintPanel(editor.page)
   await panel.getByRole('button', { name: 'Document' }).click()
@@ -402,38 +255,7 @@ test('Other pages are checked for the page list and the Document scope', async (
   await expect.poll(() => selectedIds(editor.page)).toEqual([cartCaptionId])
 })
 
-test('Canvas markers and Layers panel marks can be turned off from the View menu', async () => {
-  skipWithoutCanvasMarks()
-  await buildScene(editor.page)
-  await waitForMarkers(editor.page)
-  // The card is collapsed in the Layers panel, so it shows the error inside it as a dot.
-  const cardMark = editor.page
-    .getByTestId('layers-item')
-    .filter({ hasText: 'Card' })
-    .locator('[data-issue-severity="error"]')
-  await expect(cardMark).toBeVisible()
-  await expect(cardMark).toHaveAccessibleName('Contains errors or warnings')
-  const markerCount = () =>
-    editor.page.evaluate(
-      () => window.pairdraw?.getStore?.().state.designIssues?.markers.length ?? 0
-    )
-
-  await openAppMenu(editor.page, 'View')
-  const toggle = editor.page.getByRole('menuitemcheckbox', { name: 'Design issues' })
-  await expect(toggle).toHaveAttribute('aria-checked', 'true')
-  await toggle.click()
-  await expect.poll(markerCount).toBe(0)
-  await expect(cardMark).toHaveCount(0)
-
-  await editor.canvas.hover(CLOSE_MARKER.x + 1, CLOSE_MARKER.y)
-  await expect(editor.page.getByTestId('issue-marker-tooltip')).toHaveCount(0)
-
-  await openAppMenu(editor.page, 'View')
-  await editor.page.getByRole('menuitemcheckbox', { name: 'Design issues' }).click()
-  await expect.poll(markerCount).toBeGreaterThan(0)
-})
-
-/** Sixty small notes in a grid, far enough apart that each one's marker can be clicked. */
+/** Sixty small notes in a grid. */
 const NOTE = { columns: 6, gapX: 100, gapY: 50, width: 40, height: 10, left: 40, top: 60 }
 
 /** Adds the notes at zoom 1 and returns their ids in order; each is too small to read. */
@@ -459,27 +281,6 @@ function addNotes(page: Page): Promise<string[]> {
     )
   }, NOTE)
 }
-
-test('A marker opens an issue past the rows its group shows at first', async () => {
-  skipWithoutCanvasMarks()
-  const lastNoteId = (await addNotes(editor.page)).at(-1)
-  await waitForMarkers(editor.page)
-
-  // The sixtieth note's row is past the fifty its group lists at first.
-  const last = 59
-  const marker = {
-    x: NOTE.left + (last % NOTE.columns) * NOTE.gapX + NOTE.width + 12,
-    y: NOTE.top + Math.floor(last / NOTE.columns) * NOTE.gapY - 12
-  }
-  await hoverMarker(marker)
-  await editor.canvas.click(marker.x, marker.y)
-
-  await expect(editor.page.getByRole('tab', { name: /^Lint/ })).toHaveAttribute(
-    'aria-selected',
-    'true'
-  )
-  await expect(lintPanel(editor.page).locator(`[data-node-id="${lastNoteId}"]`)).toBeInViewport()
-})
 
 test('A group lists its first rows and shows the rest on request', async () => {
   await addNotes(editor.page)

@@ -45,8 +45,6 @@ export const DESIGN_CHECK_PRESETS = ['recommended', 'strict', 'accessibility'] a
 export type DesignCheckPreset = (typeof DESIGN_CHECK_PRESETS)[number]
 
 export interface DesignCheckPreferences {
-  /** Marks layers with errors and warnings on the canvas. */
-  showOnCanvas: boolean
   preset: DesignCheckPreset
   /** Rules turned off on top of the preset. */
   disabledRules: string[]
@@ -165,7 +163,7 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
   view: { pixelGrid: true },
   // The canvas starts on its own: the layers open from their toggle, the properties for a selection.
   workspace: { layersOpen: false, propertiesOpen: false },
-  designCheck: { showOnCanvas: true, preset: 'recommended', disabledRules: [] },
+  designCheck: { preset: 'recommended', disabledRules: [] },
   comments: {
     showOnCanvas: true,
     showResolved: false,
@@ -246,7 +244,6 @@ const appPreferencesSchema = section({
     propertiesOpen: v.fallback(v.boolean(), defaults.workspace.propertiesOpen)
   }),
   designCheck: section({
-    showOnCanvas: v.fallback(v.boolean(), defaults.designCheck.showOnCanvas),
     preset: v.fallback(v.picklist(DESIGN_CHECK_PRESETS), defaults.designCheck.preset),
     disabledRules: v.fallback(
       v.pipe(

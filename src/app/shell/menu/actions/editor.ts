@@ -9,7 +9,6 @@ import { openGoodies } from '@/app/goodies/actions'
 import { toggleRemoteCursors } from '@/app/presence/cursor-motion'
 import {
   setCommentsOnCanvas,
-  setDesignIssuesOnCanvas,
   setSnappingPreference,
   togglePixelGrid
 } from '@/app/settings/preferences/apply'
@@ -74,8 +73,6 @@ export function createSharedEditorMenuActions(
     },
     'view-pixel-grid': () => togglePixelGrid(store),
     'view-multiplayer-cursors': () => toggleRemoteCursors(store),
-    'view-design-issues': () =>
-      setDesignIssuesOnCanvas(!appPreferences.value.designCheck.showOnCanvas),
     'view-comments': () => setCommentsOnCanvas(!appPreferences.value.comments.showOnCanvas),
     'snap-geometry': () =>
       setSnappingPreference('geometry', !store.state.snappingPreferences.geometry),

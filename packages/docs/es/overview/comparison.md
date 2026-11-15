@@ -1,211 +1,290 @@
-# Pairdraw y Penpot: arquitectura y rendimiento
+# Pairdraw y Penpot: comparación de arquitectura y rendimiento
 
-Pairdraw y Penpot son herramientas de diseño de código abierto con objetivos y arquitecturas distintos.
+¿Por qué comparar? Pairdraw existe porque las plataformas de diseño cerradas controlan lo que es posible. Entender las diferencias de arquitectura muestra qué puede hacer de otro modo una alternativa abierta y local.
 
 ::: info Renderizador WASM de Penpot
-Penpot 2.x incluye el renderizador Rust/Skia WASM `render-wasm/v1`, que se activa mediante opciones del servidor o `?wasm=true`. El renderizador SVG sigue siendo el predeterminado. La comparación tiene en cuenta ambas opciones.
+Penpot 2.x incluye el renderizador Rust/Skia WASM `render-wasm/v1`, que se activa mediante opciones del servidor o el parámetro de URL `?wasm=true`. El antiguo renderizador SVG sigue siendo el predeterminado. Esta página tiene en cuenta ambos.
 :::
 
-## 1. Tamaño del código
+## 1. Escala y tamaño del código
 
 | Métrica | Pairdraw | Penpot |
-|---------|------------|--------|
-| Lines of code | **unas 26.000** | **unas 299.000** |
+|---------|----------|--------|
+| Líneas de código | **unas 26.000** | **unas 299.000** |
 | Archivos fuente | unos 143 | unos 2.900 |
-| Lenguajes | TypeScript, Vue | Clojure, ClojureScript, Rust, JavaScript, SQL, SCSS |
-| Renderizador | unas 3.200 líneas, TypeScript | 22.000 líneas, Rust/Skia WASM |
-| Interfaz | unas 4.500 líneas | unas 175.000 líneas, CLJS y SCSS |
-| Servidor | Ninguno, arquitectura local | 32.600 líneas y 151 archivos SQL |
-| Proporción | **1×** | **unas 11×** |
+| Lenguajes | TypeScript, Vue | Clojure, ClojureScript, Rust, JS, SQL, SCSS |
+| Motor de renderizado | unas 3.200 líneas (TS, 10 archivos) | 22.000 líneas (Rust/Skia WASM) |
+| Interfaz | unas 4.500 líneas | unas 175.000 líneas (CLJS y SCSS) |
+| Servidor | Ninguno (local primero) | 32.600 líneas y 151 archivos SQL |
+| Proporción de líneas | **1×** | **unas 11×** |
 
-Pairdraw es unas once veces más pequeño. La diferencia se debe sobre todo a la arquitectura, no únicamente al número de funciones.
+Pairdraw es **unas 11 veces más pequeño**, y precisamente de eso se trata. No es una simplificación, sino una arquitectura fundamentalmente distinta.
 
 ## 2. Arquitectura
 
-### Pairdraw: un solo proceso cliente
+### Pairdraw: cliente monolítico
 
-```text
+```
 ┌─────────────────────────────────┐
-│         Tauri native shell      │
+│         Tauri (native shell)    │
 │  ┌───────────────────────────┐  │
 │  │  Vue 3 + TypeScript       │  │
-│  │  Editor + Kiwi codec      │  │
-│  │  SceneGraph in TypeScript │  │
-│  │  CanvasKit + Yoga WASM    │  │
+│  │  ┌─────────┐ ┌──────────┐│  │
+│  │  │  Editor  │ │  Kiwi    ││  │
+│  │  │  Store   │ │  Codec   ││  │
+│  │  └────┬─────┘ └──────────┘│  │
+│  │       │                    │  │
+│  │  ┌────▼────────────────┐  │  │
+│  │  │  Scene Graph (TS)    │  │  │
+│  │  │  Map<string, Node>   │  │  │
+│  │  └────┬────────────────┘  │  │
+│  │       │                    │  │
+│  │  ┌────▼────┐ ┌──────────┐│  │
+│  │  │  Skia   │ │  Yoga    ││  │
+│  │  │CanvasKit│ │  Layout  ││  │
+│  │  │  (WASM) │ │  (WASM)  ││  │
+│  │  └─────────┘ └──────────┘│  │
 │  └───────────────────────────┘  │
 └─────────────────────────────────┘
 ```
 
-Editor, SceneGraph, códec de archivos y renderizador se ejecutan en el mismo proceso. No se necesita servidor, base de datos ni Docker. SceneGraph se almacena como `Map<string, SceneNode>`. TypeScript llama directamente a CanvasKit y Yoga WASM calcula la disposición de forma síncrona.
+**Todo en un solo proceso.** Sin servidor, sin base de datos y sin Docker. El grafo de escena es un `Map<string, SceneNode>` plano en TypeScript. El renderizado llama a Skia CanvasKit directamente desde TS, y la disposición la calcula Yoga WASM de forma síncrona.
 
-### Penpot: plataforma Client-Server
+### Penpot: cliente-servidor distribuido
 
-```text
+```
 ┌───────────────────────────────────────────────────────┐
-│                    Docker Compose                     │
-│  ClojureScript frontend │ Clojure/JVM backend        │
-│  Rust/Skia WASM         │ PostgreSQL, Valkey, MinIO  │
-│  Chromium exporter      │ MCP server                 │
+│                    Docker Compose                      │
+│  ┌──────────────┐  ┌─────────────┐  ┌──────────────┐ │
+│  │   Frontend    │  │   Backend   │  │   Exporter   │ │
+│  │  ClojureScript│  │   Clojure   │  │  (Chromium)  │ │
+│  │  shadow-cljs  │  │   JVM       │  │              │ │
+│  │  ┌─────────┐ │  │  ┌────────┐ │  └──────────────┘ │
+│  │  │render-  │ │  │  │Postgres│ │                    │
+│  │  │wasm     │ │  │  │Valkey  │ │  ┌──────────────┐ │
+│  │  │(Rust→   │ │  │  │ MinIO  │ │  │   MCP        │ │
+│  │  │ Skia    │ │  │  └────────┘ │  │   Server     │ │
+│  │  │ WASM)   │ │  │             │  └──────────────┘ │
+│  │  └─────────┘ │  │             │                    │
+│  └──────────────┘  └─────────────┘                    │
 └───────────────────────────────────────────────────────┘
 ```
 
-Un despliegue completo de Penpot incluye interfaz, servidor JVM, PostgreSQL, Valkey, MinIO y un exportador basado en Chromium sin interfaz. El entorno de desarrollo requiere Docker Compose, JVM, Node y las herramientas de Rust.
+**Un mínimo de 5 servicios.** PostgreSQL para la persistencia, Redis (Valkey) para publicación/suscripción y caché, MinIO para almacenar recursos, un servidor JVM, un exportador Node.js (Chromium sin interfaz para renderizar en el servidor) y la interfaz en ClojureScript. El entorno de desarrollo requiere Docker Compose con una red personalizada.
 
-Pairdraw evita latencia de red, serialización entre servicios, coordinación de contenedores y consultas de base de datos en las operaciones habituales. Penpot está pensado como plataforma multiusuario alojada en un servidor; Pairdraw prioriza la edición local con baja latencia.
+### Veredicto: arquitectura
+
+La arquitectura de un solo proceso de Pairdraw elimina:
+- la latencia de red entre interfaz y servidor;
+- el coste de serializar y deserializar en los límites entre servicios;
+- la complejidad de orquestar contenedores;
+- el coste de consultar la base de datos en cada operación.
+
+La arquitectura de Penpot está optimizada para **despliegues multiusuario alojados en un servidor**. Pairdraw está optimizado para un **rendimiento local inmediato**.
 
 ## 3. Proceso de renderizado
 
-### Pairdraw: TypeScript → CanvasKit WASM
+### Pairdraw: TS → CanvasKit WASM (directo)
 
 ```typescript
+// renderer.ts — direct CanvasKit calls from TypeScript
 renderSceneToCanvas(canvas, graph, pageId) {
+  // Iterate nodes, build Skia paths/paints, draw
   this.fillPaint.setColor(...)
   canvas.drawRRect(rrect, this.fillPaint)
 }
 ```
 
-- Paso directo de TypeScript a WASM.
-- SceneGraph permanece en el JavaScript heap y no se serializa antes del Rendering.
-- El renderizador contiene unas 3.200 líneas distribuidas en módulos especializados.
+- **1 cruce de límite:** TS → WASM (CanvasKit).
+- El grafo de escena vive en el heap de JS; no hay que serializar nada para renderizar.
+- Renderizador de unas 3.200 líneas (repartidas en 10 archivos especializados: escena, superposiciones, rellenos, contornos, formas, efectos, reglas y etiquetas).
 
-### Penpot: ClojureScript → Rust WASM → Skia
+### Penpot: JS (compilado desde CLJS) → Rust WASM → Skia
 
-Con el renderizador WASM activado:
+Penpot 2.x incluye un renderizador Rust/Skia WASM (`render-wasm/v1`) que se activa mediante opciones del servidor o `?wasm=true`. Cuando está activado, las formas se renderizan así:
 
-```text
-ClojureScript → JavaScript
-  → descomposición y Binary packing en WASM linear memory
-  → Rust WASM mediante Emscripten C FFI
-  → skia-safe
-  → Skia/WebGL
+```
+ClojureScript (compiled to JS)
+  → decompose to primitives + binary-pack into WASM linear memory
+  → Rust WASM (via Emscripten C FFI)
+  → skia-safe (Rust Skia bindings)
+  → Skia (WebGL)
 ```
 
-Sin WASM, cada Shape se renderiza como SVG DOM element mediante React/Reagent.
+Cuando está desactivado (lo predeterminado), las formas se renderizan como un árbol DOM de SVG mediante React/Reagent: cada forma es un elemento DOM.
 
-En modo WASM, cada UUID se divide en cuatro `u32`, cada transformación en seis `f32`, los rellenos y contornos se codifican en binario y las propiedades básicas de una forma ocupan una estructura de 104 bytes. El renderizador usa caché de teselas, áreas de interés, once superficies y estado global mutable mediante `unsafe { STATE.as_mut() }`.
+- **1 cruce de límite** (JS → WASM), igual que en Pairdraw, pero con un coste de serialización explícito: los UUID se dividen en 4×u32, las transformaciones en 6×f32, los rellenos y contornos se empaquetan en binario y las propiedades básicas se agrupan en una estructura de 104 bytes por forma.
+- Sistema de renderizado por teselas con áreas de interés.
+- 11 superficies de renderizado separadas (rellenos, contornos, sombras, etc.).
+- Estado global mutable mediante el patrón `unsafe { STATE.as_mut() }`.
+- Motor de renderizado en Rust de 22.000 líneas.
 
-El Tile system prepara zonas próximas al Viewport y almacena hasta 1.024 Textures. Pairdraw vuelve a renderizar toda la zona visible.
+El sistema de teselas de Penpot (`TileViewbox`, `TileTextureCache`, `TILE_SIZE_MULTIPLIER`) renderiza de antemano las teselas alrededor de la vista y almacena texturas en caché (hasta 1024 entradas).
+
+Pairdraw vuelve a renderizar toda la vista en cada fotograma, porque CanvasKit llamado directamente desde TS es lo bastante rápido como para no necesitar teselas.
+
+### Veredicto: renderizado
 
 | Aspecto | Pairdraw | Penpot |
-|---------|------------|--------|
-| JavaScript → WASM | Calls directos con objetos TypeScript | Structures codificadas en Binary |
-| Modelo | Render completo del Viewport visible | Tile cache |
-| Surfaces | 1 | 11 |
-| Caché adicional | Sin Tile cache | Hasta 1.024 Tiles |
-| Tamaño del renderizador | unas 3.200 líneas | 22.000 líneas |
-| Código no seguro | Ninguno | Estado global mediante `unsafe` |
+|---------|----------|--------|
+| Límite JS→WASM | Directo (objetos TS) | Empaquetado en binario (estructura de 104 bytes con las propiedades básicas) |
+| Modelo de renderizado | Inmediato, redibujado completo | Teselas en caché |
+| Gestión de superficies | 1 superficie | 11 superficies |
+| Coste de memoria | Bajo (sin caché de teselas) | Alto (caché de 1024 teselas) |
+| Complejidad del código | unas 3.200 líneas (10 archivos) | 22.000 líneas |
+| Código no seguro | Ninguno | Estado global `unsafe` |
 
-El Path directo de CanvasKit necesita menos procesamiento intermedio en documentos pequeños y medianos. El Tile system de Penpot puede resultar ventajoso en documentos con más de 100.000 Shapes cuando solo se muestra una zona reducida.
+Con el renderizador WASM de Penpot activado, ambos proyectos usan Skia mediante JS→WASM. Pairdraw llama a CanvasKit directamente con objetos TS. Penpot descompone los datos de ClojureScript en estructuras empaquetadas en binario, las escribe en la memoria lineal de WASM y renderiza con un motor Rust de 22.000 líneas. Con WASM desactivado (lo predeterminado), Penpot renderiza las formas como un árbol DOM de SVG. En documentos pequeños y medianos, la ruta directa de CanvasKit es más rápida. El sistema de teselas de Penpot puede ganar en lienzos extremadamente grandes (más de 100.000 formas) en los que solo se ve una zona pequeña, pero su coste es considerable.
 
-## 4. SceneGraph y modelo de datos
+## 4. Grafo de escena y modelo de datos
+
+### **Pairdraw**
 
 ```typescript
+// Flat map, O(1) lookup
 nodes: Map<string, SceneNode>
+// 29 node types from Figma's Kiwi schema
+// ~390 fields per NodeChange (Figma-compatible)
 ```
 
-Pairdraw ofrece:
+- Interfaces de TypeScript con tipos estrictos.
+- Los GUID siguen el formato `sessionID:localID` de Figma.
+- Acceso directo a las propiedades, sin capas de indirección.
 
-- búsqueda por identificador en O(1);
-- 29 tipos de objeto del esquema Kiwi de Figma;
-- unos 390 campos en `NodeChange`;
-- tipos estrictos de TypeScript;
-- GUID con formato `sessionID:localID` de Figma.
+### Penpot
 
-Penpot mantiene definiciones de tipos propias en Clojure/ClojureScript y Rust. Módulos distintos gestionan colores, componentes, contenedores, rellenos, Grid, modificadores, páginas y rutas. Malli valida esquemas en tiempo de ejecución y los datos de renderizado cruzan el límite CLJS → Rust.
+```clojure
+;; 20+ type definition files in common/src/app/common/types/
+;; shapes_builder.cljc, shapes_helpers.cljc
+;; Separate type systems for: color, component, container, fills,
+;; grid, modifiers, objects_map, page, path, etc.
+```
 
-Pairdraw utiliza directamente el esquema Kiwi. Penpot debe mantener sincronizado su modelo entre varios lenguajes.
+- Datos repartidos por `common/` (49.600 líneas de .cljc).
+- Módulos de geometría separados para la disposición flex (unos 6 archivos), la disposición en cuadrícula (unos 5 archivos), restricciones, límites, esquinas y efectos.
+- Validación de esquemas en tiempo de ejecución (Malli).
+- Los datos tienen que cruzar el límite CLJS→Rust para renderizarse.
+
+### Veredicto: modelo de datos
+
+Pairdraw reutiliza directamente en TypeScript el esquema probado de Figma (194 definiciones Kiwi), sin ninguna traducción. Penpot mantiene su propio sistema de tipos en Clojure, ClojureScript y Rust, y tiene que sincronizar a mano los tres.
 
 ## 5. Motor de disposición
 
-Pairdraw usa Yoga WASM de forma síncrona:
+### Pairdraw: Yoga WASM (314 líneas)
 
 ```typescript
 import Yoga from 'yoga-layout'
+// Direct mapping: Figma stack* fields → Yoga flex properties
 const root = Yoga.Node.create()
 root.setFlexDirection(FlexDirection.Row)
 root.calculateLayout()
 applyYogaLayout(graph, frame, yogaRoot)
 ```
 
-Penpot mantiene implementaciones propias de Flex y Grid en ClojureScript y Rust WASM. Ambos motores deben producir el mismo resultado.
+314 líneas en total. Síncrono y dentro del proceso.
 
-Pairdraw utiliza Yoga, incluida una variante con Grid. Penpot mantiene varios miles de líneas de código propio de disposición en dos lenguajes.
+### Penpot: doble implementación
 
-## 6. Formatos y Figma
+1. **ClojureScript** (common): `flex_layout/` (6 archivos), `grid_layout/` (más de 5 archivos), implementaciones propias.
+2. **Rust WASM**: `flex_layout.rs` (741 líneas), `grid_layout.rs` (843 líneas), reimplementadas desde cero.
 
-### Pairdraw
+Penpot mantiene **dos motores de disposición independientes** (CLJS y Rust) que deben producir resultados idénticos.
 
-- Formato Binary Kiwi nativo de Figma.
-- Import directo de `.fig`.
-- Paste de Kiwi binary data desde Figma Clipboard.
+### Veredicto: disposición
+
+Pairdraw delega en una biblioteca muy probada (Yoga, que React Native usa en miles de millones de dispositivos) con 314 líneas. Penpot mantiene más de 3.000 líneas de código de disposición propio duplicado en dos lenguajes.
+
+## 6. Formato de archivo y compatibilidad con Figma
+
+### **Pairdraw**
+
+- **Formato binario Kiwi nativo**: la misma serialización que Figma usa internamente.
+- Importación directa de archivos `.fig` mediante el códec Kiwi extraído (2.178 líneas de esquema y 551 de códec).
+- Pegado desde el portapapeles de Figma (lee el binario Kiwi de Figma desde el portapapeles).
 - El códec Kiwi cubre el esquema de mensajes multijugador de Figma (Pairdraw no se conecta a los servidores de Figma).
 
 ### Penpot
 
-- `.penpot` es un ZIP con JSON manifests, Document data, Binary assets y Thumbnails.
-- SVG renderer y Export predeterminados; WASM renderer opcional.
-- Sin Import nativo de `.fig`.
-- Varias Generations del formato con Migration system.
+- **Archivo ZIP** (archivos `.penpot`) con manifiestos JSON, datos JSON por archivo, recursos binarios y miniaturas (formato v3).
+- SVG para el renderizado y la exportación predeterminados (hay un renderizador WASM opcional).
+- Sin importación nativa de `.fig`.
+- Tres versiones del formato (v1 Transit heredado, v2 y v3 JSON dentro de ZIP) con un sistema de migración.
 
-Pairdraw lee `.fig` y Figma Clipboard directamente. Penpot necesita una vía de Import o Export separada.
+### Veredicto: formato de archivo
 
-## 7. Estado y deshacer
+Pairdraw tiene una ventaja importante: lee archivos de Figma de forma nativa e incluso pega datos del portapapeles de Figma. Penpot requiere exportar e importar a mano y no puede abrir archivos `.fig`.
 
-Pairdraw usa comandos inversos. Las funciones de avance y retroceso guardan solo el estado necesario; los lotes agrupan varias operaciones.
+## 7. Gestión del estado y deshacer
 
-Penpot usa Potok. `UpdateEvent` modifica el estado y `WatchEvent` ejecuta efectos secundarios mediante RxJS. Deshacer almacena vectores de cambios inversos, limita el historial a 50 entradas y agrupa cambios rápidos en transacciones.
+### **Pairdraw**
 
-Los cambios serializables encajan con la colaboración basada en servidor, pero aumentan la complejidad. El enfoque de Pairdraw es más directo para un editor de un solo proceso.
+```typescript
+// 110 LOC — inverse command pattern
+class UndoManager {
+  apply(entry: UndoEntry) { entry.forward(); this.undoStack.push(entry) }
+  undo() { entry.inverse(); this.redoStack.push(entry) }
+}
+```
 
-## 8. Desarrollo
+110 líneas. Funciones de avance y retroceso que capturan el estado mínimo. Admite lotes para operaciones de varios pasos.
+
+### Penpot
+
+La gestión del estado usa Potok (una biblioteca tipo Redux para átomos de ClojureScript). Los eventos implementan `UpdateEvent` (estado→estado puro) o `WatchEvent` (efectos secundarios mediante RxJS). Deshacer almacena vectores de cambios inversos (50 entradas como máximo), con transacciones que agrupan los cambios rápidos y caducan solas a los 20 segundos.
+
+### Veredicto: estado
+
+El enfoque de Pairdraw es más sencillo y cuesta menos. El de Penpot se adapta mejor a la colaboración (los cambios son serializables), pero a costa de más complejidad.
+
+## 8. Experiencia de desarrollo
 
 | Métrica | Pairdraw | Penpot |
-|---------|------------|--------|
-| Setup | `bun install && bun dev` | Docker Compose, JVM, Node y Rust |
-| HMR | Vite | shadow-cljs |
-| Types | Strict TypeScript | Malli runtime schemas |
-| Desktop | Tauri v2 | Browser |
-| Tecnologías principales | TypeScript y Vue | Clojure, ClojureScript, Rust y Docker |
+|---------|----------|--------|
+| Entorno de desarrollo | `bun install && bun dev` | Docker Compose + JVM + Node + herramientas de Rust |
+| Recarga en caliente | Vite HMR (~50 ms) | shadow-cljs (segundos) |
+| Comprobación de tipos | TypeScript (estricto) | En tiempo de ejecución (esquemas Malli) |
+| Tiempo de compilación | <5 s (Vite) | Minutos (arranque de la JVM + compilación CLJS + Rust WASM) |
+| Barrera para contribuir por primera vez | Baja (TS/Vue) | Alta (Clojure + Rust + Docker) |
+| Escritorio | Tauri v2 (instalador de unos 20 MB en macOS) | No disponible (solo navegador) |
+| Disponibilidad de desarrolladores | Enorme (desarrolladores TS/Vue) | Muy reducida (ClojureScript + Rust) |
 
-## 9. Rendimiento
+## 9. Características de rendimiento
 
 | Escenario | Pairdraw | Penpot |
-|-----------|------------|--------|
-| Arranque en frío | menos de 2 s con WASM | más de 10 s para servidor, cliente y WASM |
-| Operación habitual | Dentro de un proceso | Posible recorrido de red |
-| Fotograma | Llamada directa a Skia | CLJS → JS → WASM FFI → Skia |
-| Memoria base | unos 50 MB en la pestaña del navegador | JVM, base de datos, caché y navegador |
-| Sin conexión | Funcionamiento local completo | Requiere servidor |
-| 10.000 formas | Una pasada | Renderizador por teselas con once superficies |
+|-----------|----------|--------|
+| Arranque en frío | <2 s (carga de WASM) | más de 10 s (servidor + cliente + WASM) |
+| Latencia de una operación | <1 ms (dentro del proceso) | 10-50 ms (ida y vuelta por la red) |
+| Fotograma | Llamada directa a Skia | CLJS→JS→WASM FFI→Skia |
+| Memoria base | ~50 MB (pestaña del navegador) | más de ~300 MB (JVM + Postgres + Valkey + navegador) |
+| Funcionamiento sin conexión | Completo (local primero) | Ninguno (depende del servidor) |
+| Renderizado de 10.000 formas | Una pasada, sin caché | Por teselas con 11 superficies |
 
-## 10. Ventajas de Penpot
+## 10. Qué hace mejor Penpot
 
-1. **Colaboración mediante servidor:** cuentas, control de acceso y almacenamiento central a través de WebSockets.
-2. **Sistema de plugins:** ejecución aislada y API de plugins.
-3. **Variables de diseño:** compatibilidad integrada.
-4. **CSS Grid:** implementación propia; Pairdraw usa una variante de Yoga con Grid.
-5. **Alojamiento propio:** despliegue de una plataforma de equipo mediante Docker.
-6. **Madurez:** varios años de uso en producción.
+1. **Colaboración en el servidor:** edición multiusuario centralizada con WebSockets, cuentas de usuario y control de acceso, probada a escala (Pairdraw solo permite editar en conjunto mediante un servidor opcional y autoalojado de Pairdraw Cloud, y no tiene salas de igual a igual).
+2. **Sistema de plugins:** API de plugins completa con ejecución aislada y un ecosistema de plugins (los complementos de Pairdraw se ejecutan de uno en uno y sin acceso a la red).
+3. **Disposición con CSS Grid:** implementación propia (Pairdraw usa una variante de Yoga con soporte de Grid).
+4. **Alojamiento propio:** despliegue para equipos basado en Docker (Pairdraw Cloud es un único proceso Node, y más reciente).
+5. **Madurez:** años de uso en producción, probado a escala.
 
 ## 11. Scripts y extensibilidad
 
-El comando [`eval`](/programmable/cli/scripting) proporciona una API compatible con plugins de Figma para scripts sin interfaz, operaciones por lotes y pruebas automatizadas. Además, el chat con AI, el servidor MCP y la CLI ofrecen más de 130 herramientas para leer, crear, modificar, estructurar, gestionar variables, editar rutas vectoriales, analizar, comparar, ejecutar operaciones booleanas y ordenar.
-
-Penpot ofrece plugins aislados, pero no una API equivalente para scripting sin interfaz ni integración MCP.
+Pairdraw incluye un [comando `eval`](/programmable/cli/scripting) que ofrece una API de plugins compatible con Figma para scripts sin interfaz: operaciones por lotes, pruebas automatizadas y modificaciones guiadas por AI se ejecutan sin la interfaz gráfica. Además, **más de 130 herramientas de AI** están disponibles en el chat integrado, el servidor MCP (stdio + HTTP) y la CLI, y cubren lectura, creación, modificación, estructura, variables, rutas vectoriales, análisis (color, tipografía, espaciado, agrupaciones), comparación, operaciones booleanas y organización. Penpot tiene un sistema de plugins con ejecución aislada, pero no una API de scripts sin interfaz ni integración MCP.
 
 ## Resumen
 
-| Área | Ventaja | Motivo |
-|------|---------|--------|
-| Simplicidad | Pairdraw | Un proceso en lugar de varios servicios |
-| Renderizado | Pairdraw | Ruta directa a CanvasKit |
-| Código | Pairdraw | Unas 26.000 frente a 299.000 líneas |
-| Compatibilidad con Figma | Pairdraw | Kiwi y `.fig` nativos |
-| Desarrollo | Pairdraw | TypeScript y Vue frente a Clojure, Rust y Docker |
-| Aplicación de escritorio | Pairdraw | Tauri nativo |
-| Disposición | Pairdraw | Yoga frente a dos implementaciones propias |
-| Colaboración | Ventajas distintas | Penpot: servidor y control de acceso; Pairdraw: servidor de Cloud autoalojado y agentes de IA en el lienzo |
-| Alojamiento propio | Penpot | Despliegue con Docker |
-| Madurez del ecosistema | Penpot | Años de uso en producción |
+| Dimensión | Ganador | Motivo |
+|-----------|---------|--------|
+| **Simplicidad de la arquitectura** | **Pairdraw** | Un solo proceso frente a 5 o más servicios |
+| **Rendimiento de renderizado** | **Pairdraw** | CanvasKit directo frente a DOM de SVG (predeterminado) o WASM empaquetado en binario |
+| **Mantenibilidad del código** | **Pairdraw** | Unas 26.000 líneas en 1 lenguaje frente a 299.000 en 4 o más |
+| **Compatibilidad con Figma** | **Pairdraw** | Códec Kiwi nativo frente a ningún soporte de `.fig` |
+| **Incorporación de desarrolladores** | **Pairdraw** | TS/Vue frente a Clojure/Rust/Docker |
+| **Experiencia de escritorio** | **Pairdraw** | Tauri nativo frente a solo navegador |
+| **Motor de disposición** | **Pairdraw** | Yoga (probado) frente a doble implementación propia |
+| **Colaboración** | Penpot | Ambos basados en servidor con control de acceso; el servidor autoalojado de Cloud de Pairdraw es opcional y más reciente, y los documentos locales no se comparten en directo |
+| **Alojamiento propio** | Penpot | Listo para Docker frente a un servidor de Cloud de un solo proceso más reciente |
+| **Madurez del ecosistema** | Penpot | Años de producción frente a una fase temprana |
 
-Pairdraw es un editor compacto de un solo proceso con renderizador CanvasKit y compatibilidad nativa con `.fig`. Penpot es una plataforma cliente-servidor completa con Clojure, ClojureScript, Rust, bases de datos y servicios Docker. Ambos ofrecen colaboración con modelos diferentes. Penpot tiene un ecosistema de plugins; Pairdraw ofrece scripting sin interfaz compatible con Figma, más de 130 herramientas AI/MCP, exportación SVG y PDF, y una aplicación de escritorio.
+Pairdraw es más ligero en su arquitectura: un renderizador CanvasKit de un solo proceso en unas 26.000 líneas de TypeScript, compatible con Figma por diseño. Penpot es una plataforma completa con unas 299.000 líneas en Clojure, ClojureScript, Rust y SCSS, más una flota de servicios Docker. Ambos ofrecen colaboración en tiempo real mediante un servidor, que en Pairdraw es opcional. Penpot tiene un ecosistema de plugins; **Pairdraw** tiene scripts sin interfaz compatibles con Figma, **más de 130 herramientas de AI/MCP**, exportación SVG y PDF, y una aplicación de escritorio nativa.

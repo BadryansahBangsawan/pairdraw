@@ -5,7 +5,7 @@ description: Tworzenie prostokątów, elips, linii, ramek, sekcji, wielokątów 
 
 # Kształty
 
-Dolny pasek narzędzi zawiera narzędzia do tworzenia kształtów, ramek i sekcji. Wybierz narzędzie, a następnie kliknij i przeciągnij wskaźnik po obszarze roboczym.
+Pasek narzędzi po lewej stronie obszaru roboczego zawiera narzędzia do tworzenia kształtów, ramek i sekcji. Wybierz narzędzie, a następnie kliknij i przeciągnij wskaźnik po obszarze roboczym.
 
 ## Narzędzia
 

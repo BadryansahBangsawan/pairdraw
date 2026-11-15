@@ -71,7 +71,7 @@ Naciśnij <kbd>⌘</kbd><kbd>J</kbd>. Ponad 90 narzędzi tworzy figury, zmienia 
 
 Wywołania narzędzi pojawiają się na zwijanej osi czasu. Do kontroli wizualnej asystent eksportuje wynik i porównuje go z poleceniem. Wszystkie zmiany AI można cofnąć.
 
-Możesz patrzeć, jak agent rysuje: każda dodana warstwa rysuje się po kolei, ramki, w których pracuje, migoczą, a gdy skończy, powiadomienie podaje, co dodał i zmienił. **Animuj zmiany AI** w Ustawieniach wyłącza to ([Watching the assistant draw](/programmable/ai-chat#watching-the-assistant-draw)).
+Możesz patrzeć, jak agent rysuje: każda dodana warstwa rysuje się po kolei, ramki, w których pracuje, migoczą, a gdy skończy, powiadomienie podaje, co dodał i zmienił. **Animuj zmiany AI** w Ustawieniach wyłącza to ([Obserwowanie, jak asystent rysuje](/pl/programmable/ai-chat#watching-the-assistant-draw)).
 
 ## Wbudowana przeglądarka
 

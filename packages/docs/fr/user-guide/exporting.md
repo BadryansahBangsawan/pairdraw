@@ -9,7 +9,7 @@ description: Exporter la sélection en PNG, JPG, WEBP ou SVG et enregistrer des 
 
 Sélectionnez un objet et ouvrez **Exporter** dans le panneau des propriétés. Chaque réglage définit :
 
-- le format : PNG, JPG, WEBP, SVG, PDF, HTML, PPTX (PowerPoint) ou draw.io ;
+- le format : PNG, JPG, WEBP, SVG, PDF ou HTML ;
 - l’échelle ou une largeur explicite ;
 - le suffixe du nom ;
 - la qualité pour JPG et WEBP.
@@ -17,6 +17,8 @@ Sélectionnez un objet et ouvrez **Exporter** dans le panneau des propriétés. 
 Un objet peut avoir plusieurs réglages. L’aperçu apparaît sur un damier afin de vérifier la transparence.
 
 Vous pouvez aussi ouvrir **Exporter…** depuis le menu contextuel.
+
+L’application ne propose pas d’export PowerPoint (`.pptx`) ni draw.io. La [CLI](/reference/cli#export) exporte toujours les deux : `pairdraw export design.fig -f pptx` ou `-f drawio`.
 
 ## HTML, PDF et qualité
 

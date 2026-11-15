@@ -4,7 +4,7 @@ landing: true
 sidebar: false
 aside: false
 title: Pobierz Pairdraw
-description: Pobierz aplikację desktopową Pairdraw na macOS, Windows i Linux.
+description: Pobierz aplikację desktopową Pairdraw na macOS z Apple Silicon; w Windows, Linuksie i na komputerach Mac z procesorem Intel zbuduj ją ze źródeł.
 ---
 
 <script setup>

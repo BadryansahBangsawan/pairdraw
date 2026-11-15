@@ -89,11 +89,15 @@ Zaznacz warstwę i dodaj **Notatki dla AI** na dole panelu Projekt. **Kontekst**
 
 Po utworzeniu lub zmianie projektu asystent może wywołać `export_image`, uzyskać obraz wyniku i porównać go z pierwotnym poleceniem. Pozwala to wykryć problemy z układem, brakujące elementy i nieprawidłowe kolory. Domyślnie włączone `diff_visual` porównuje zmieniony obiekt z kopią wzorcową i zwraca zmienione piksele oraz obszar, dzięki czemu asystent może sprawdzić, że zmiana nie wyszła poza cel.
 
+## Obserwowanie, jak asystent rysuje {#watching-the-assistant-draw}
+
+Gdy agent edytuje otwartą stronę, czy to wbudowany czat, czy agent programistyczny przez MCP, płótno pokazuje jego pracę: każda dodana warstwa rysuje się po kolei, zmieniane warstwy błyskają, a ramki, w których pracuje, migoczą w fioletowym obrysie. Gdy skończy, błyskają raz, a powiadomienie podaje liczbę dodanych i zmienionych warstw; **Pokaż** zaznacza je i przybliża do nich widok. Animacja jest rysowana nad płótnem i nigdy nie zmienia dokumentu. Wyłączysz ją opcją **Animuj zmiany AI** w **Ustawienia → Modele → Czat**; pozostaje też wyłączona, gdy **Animacje** są wyłączone, system prosi o ograniczenie ruchu albo włączony jest tryb ultralekki, i wtedy zmiany po prostu się pojawiają.
+
 ## Wskazówki
 
 - Przed wysłaniem polecenia zaznacz odpowiednie obiekty: asystent widzi zaznaczenie.
 - Dokładnie podawaj kolory, rozmiary i położenie.
 - Jedna wiadomość może zmienić kilka obiektów.
-- Podczas odpowiedzi możesz przeglądać inne strony: asystent dalej pracuje na stronie, na której zaczęła się wiadomość, a jego podglądy pojawią się po powrocie. Gdy jesteś na innej stronie, czat pokazuje, nad którą pracuje asystent, i udostępnia przycisk **Przejdź do strony**. Jeśli asystent sam zmieni stronę, widok podąża za nim.
+- Podczas odpowiedzi możesz przeglądać inne strony: asystent dalej pracuje na stronie, na której zaczęła się wiadomość, a jego podglądy pojawią się po powrocie. Gdy jesteś na innej stronie, czat pokazuje, nad którą pracuje asystent, i udostępnia przycisk **Przejdź do strony**. Gdy włączona jest opcja **Śledź agentów podczas pracy**, widok podąża za asystentem także na inną stronę.
 - Wszystkie zmiany AI można cofnąć.
 - Po każdym wywołaniu narzędzia układ jest przeliczany automatycznie.

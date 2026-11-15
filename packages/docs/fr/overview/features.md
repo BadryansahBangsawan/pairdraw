@@ -71,7 +71,7 @@ pairdraw export design.fig -f jsx --style tailwind
 
 Les appels d’outils apparaissent sur une chronologie repliable. Pour vérifier les modifications, l’assistant rend le résultat et le compare à la demande. Toutes les modifications réalisées par l’AI peuvent être annulées.
 
-Vous pouvez regarder un agent dessiner : chaque calque qu’il ajoute se dessine l’un après l’autre, les cadres où il travaille scintillent et, une fois qu’il a fini, un avis compte ce qu’il a ajouté et modifié. **Animer les modifications de l’IA** dans les Réglages le désactive ([Watching the assistant draw](/programmable/ai-chat#watching-the-assistant-draw)).
+Vous pouvez regarder un agent dessiner : chaque calque qu’il ajoute se dessine l’un après l’autre, les cadres où il travaille scintillent et, une fois qu’il a fini, un avis compte ce qu’il a ajouté et modifié. **Animer les modifications de l’IA** dans les Réglages le désactive ([Regarder l’assistant dessiner](/fr/programmable/ai-chat#watching-the-assistant-draw)).
 
 ## Navigateur intégré
 

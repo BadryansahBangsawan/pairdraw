@@ -12,9 +12,11 @@ Pairdraw exportiert einzelne Objekte als Bilder oder SVG und speichert vollstän
 Wählen Sie ein Objekt und öffnen Sie im Eigenschaften-Panel den Bereich Export.
 
 - **Maßstab:** 0,5× bis 4×; bei SVG ausgeblendet.
-- **Format:** PNG und WEBP mit transparentem Hintergrund, JPG mit weißem Hintergrund, SVG, PDF, HTML, PPTX (PowerPoint) oder draw.io.
+- **Format:** PNG und WEBP mit transparentem Hintergrund, JPG mit weißem Hintergrund, SVG, PDF oder HTML.
 - Mehrere Exporteinstellungen pro Objekt sind möglich.
 - Eine Vorschau zeigt das Ergebnis auf einem Schachbrettmuster.
+
+Die App bietet keinen Export als PowerPoint (`.pptx`) oder draw.io. Die [CLI](/reference/cli#export) exportiert beides weiterhin: `pairdraw export design.fig -f pptx` oder `-f drawio`.
 
 ## HTML, PDF und Qualität
 

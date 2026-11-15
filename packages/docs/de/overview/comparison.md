@@ -138,7 +138,7 @@ Pairdraw nutzt die etablierte Bibliothek Yoga einschließlich einer Variante mit
 - Native Kiwi binary format von Figma.
 - Direkter Import von `.fig`.
 - Paste von Kiwi binary data aus Figmas Clipboard.
-- Wire compatibility mit Figmas Multiplayer protocol.
+- Der Kiwi-Codec deckt Figmas Multiplayer-Nachrichtenschema ab (Pairdraw verbindet sich nicht mit Figmas Servern).
 
 ### Penpot
 

@@ -5,7 +5,9 @@ description: Gestionar el árbol de capas, las páginas y el panel de propiedade
 
 # Capas y páginas
 
-El panel izquierdo muestra capas y páginas; el lienzo ocupa el centro y las propiedades aparecen a la derecha. Los paneles laterales se pueden redimensionar.
+El editor se abre solo con el lienzo. Las herramientas están a la izquierda del lienzo, con el botón del panel de capas encima, y el zoom en la esquina inferior derecha. El panel de capas se abre a la izquierda, el de propiedades a la derecha y el chat con AI en una columna a su lado; todos se redimensionan arrastrando sus bordes.
+
+Mientras el chat con AI está cerrado, una instrucción en la parte inferior del lienzo envía lo que escribes al chat; desactívala con **Instrucción en el lienzo** en **Ajustes → Modelos → Chat**. <kbd>Escape</kbd> en la instrucción vuelve al lienzo.
 
 ## Capas
 
@@ -34,7 +36,9 @@ Presentar muestra las diapositivas de la página a pantalla completa, de una en 
 
 ## Documentos y recuperación
 
-El espacio de trabajo Inicio lista los documentos locales recientes y los de los proveedores de almacenamiento configurados. Usa la vista de cuadrícula o de lista y ordena los archivos recientes por **Nombre**, **Último uso** o **Creación**. <kbd>⌘</kbd>/<kbd>Ctrl</kbd>-clic añade un archivo a la selección, <kbd>Shift</kbd>-clic selecciona un intervalo y <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+<kbd>A</kbd> selecciona todos los archivos de la lista; la barra de selección los abre después en pestañas del editor separadas, los quita de Recientes o borra los documentos almacenados. El menú <kbd>⋯</kbd> de un archivo o su menú contextual ofrece **Quitar de Recientes**, que olvida el archivo sin borrarlo, y **Guardar como…**, que guarda una copia en otro lugar. **Sistemas de diseño** lista las bibliotecas de componentes que has publicado; elegir una abre un nuevo diseño con esa biblioteca activada en el panel de recursos.
+Inicio empieza con una instrucción: elige encima qué crear (página de destino, app móvil, app web, diapositivas, panel u otra cosa), descríbelo y Pairdraw abre un nuevo diseño y envía la instrucción a su chat con AI junto con una guía para ese tipo; las instrucciones de ejemplo de debajo la rellenan con una idea que puedes editar. Debajo de la instrucción puedes empezar desde un archivo de Figma, desde una página del navegador integrado (aplicación de escritorio) o desde una captura que el agente recrea. Las pestañas cambian entre **Recientes**, **Borradores** y **Sistemas de diseño**, y el menú junto a ellas lista los lugares que añaden tu servidor de Cloud y tu bucket de almacenamiento. Un campo de búsqueda filtra la lista, **Abrir…** abre un archivo y **Diseño** empieza un diseño vacío.
+
+**Recientes** lista los documentos locales recientes. Usa la vista de cuadrícula o de lista y ordena los archivos recientes por **Nombre**, **Último uso** o **Creación**. <kbd>⌘</kbd>/<kbd>Ctrl</kbd>-clic añade un archivo a la selección, <kbd>Shift</kbd>-clic selecciona un intervalo y <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+<kbd>A</kbd> selecciona todos los archivos de la lista; la barra de selección los abre después en pestañas del editor separadas, los quita de Recientes o borra los documentos almacenados. El menú <kbd>⋯</kbd> de un archivo o su menú contextual ofrece **Quitar de Recientes**, que olvida el archivo sin borrarlo, y **Guardar como…**, que guarda una copia en otro lugar. **Sistemas de diseño** lista Pairdraw Basics, incluida en la aplicación, y las bibliotecas de componentes que has publicado; elegir una abre un nuevo diseño con esa biblioteca activada en el panel de recursos.
 
 Un diseño nuevo se conserva como borrador en este dispositivo mientras trabajas en él: cada cambio se escribe poco después de hacerlo, así que cerrar su pestaña no pregunta nada. **Borradores** en Inicio los lista con una vista previa; abre uno para continuar, o elige **Eliminar borrador** en su menú <kbd>⋯</kbd> o contextual para eliminarlo para siempre. Guardar un borrador en un archivo o en un almacenamiento, en el editor o con **Guardar como…** en Inicio, lo saca de Borradores. Los borradores viven solo en este perfil de navegador o instalación de escritorio y necesitan tener **Conservar automáticamente el trabajo sin guardar** activado y un navegador que conserve los datos del sitio.
 

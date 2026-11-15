@@ -31,4 +31,4 @@ Pairdraw es un editor de diseño local y de código abierto, compatible con Figm
 - [Disposición automática](./auto-layout) — distribución con Flexbox y CSS Grid;
 - [Componentes](./components) — componentes reutilizables, instancias y sustituciones;
 - [Variables](./variables) — variables de diseño, colecciones, modos y enlaces;
-- [Revisar diseños](/user-guide/checking-designs) — panel de revisión, marcadores de problemas en el lienzo y reglas de lint.
+- [Revisar diseños](/user-guide/checking-designs) — panel Revisar, correcciones con un clic y reglas de lint.

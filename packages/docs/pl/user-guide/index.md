@@ -35,4 +35,4 @@ W podręczniku używane są oznaczenia z macOS: <kbd>⌘</kbd> oznacza <kbd>Comm
 - [Automatyczny układ](./auto-layout) — rozmieszczanie obiektów za pomocą Flexbox i CSS Grid;
 - [Komponenty](./components) — komponenty, egzemplarze i nadpisania przeznaczone do ponownego użycia;
 - [Zmienne](./variables) — zmienne projektu, kolekcje, tryby i powiązania z zalewami;
-- [Checking Designs](/user-guide/checking-designs) — panel Sprawdź, znaczniki problemów na obszarze roboczym i reguły lintu.
+- [Checking Designs](/user-guide/checking-designs) — panel Sprawdź, poprawki jednym kliknięciem i reguły lintu.

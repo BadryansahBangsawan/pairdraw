@@ -70,7 +70,11 @@ L’assistente può verificare visivamente il proprio lavoro. Con `export_image`
 
 ## Lavorare su altre pagine
 
-Mentre una risposta è in corso puoi esplorare altre pagine: l’assistente continua a lavorare sulla pagina in cui è partito il messaggio e le sue anteprime compaiono al tuo ritorno. Quando non sei su quella pagina, la chat indica su quale sta lavorando, con **Vai alla pagina** per tornarci. Se è l’assistente a cambiare pagina, la tua vista lo segue.
+Mentre una risposta è in corso puoi esplorare altre pagine: l’assistente continua a lavorare sulla pagina in cui è partito il messaggio e le sue anteprime compaiono al tuo ritorno. Quando non sei su quella pagina, la chat indica su quale sta lavorando, con **Vai alla pagina** per tornarci. Con **Segui gli agenti mentre lavorano** attivo, la tua vista segue l’assistente anche su un’altra pagina.
+
+## Guardare l’assistente disegnare {#watching-the-assistant-draw}
+
+Mentre un agente modifica la pagina aperta, che sia la chat integrata o un agente di programmazione tramite MCP, la tela mostra il suo lavoro: ogni livello che aggiunge si disegna uno dopo l’altro, i livelli che modifica lampeggiano e i frame in cui lavora luccicano dentro un contorno viola. Quando si ferma, lampeggiano una volta e un avviso conta i livelli aggiunti e modificati; **Mostra** li seleziona e li inquadra. L’animazione è disegnata sopra la tela e non modifica mai il documento. Disattivala con **Anima le modifiche dell’IA** in **Impostazioni → Modelli → Chat**; resta disattivata anche quando **Animazioni** è disattivato, il sistema chiede di ridurre il movimento o la modalità ultraleggera è attiva, e allora le modifiche compaiono e basta.
 
 ## Privacy e costi
 

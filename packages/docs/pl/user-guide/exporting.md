@@ -14,15 +14,17 @@ Zaznacz obiekt i otwórz sekcję „Eksport” na panelu właściwości.
 ### Ustawienia
 
 - **Skala:** od 0,5× do 4×. Dla SVG nie jest wyświetlana, ponieważ grafika wektorowa nie zależy od rozdzielczości.
-- **Format:** PNG z przezroczystym tłem, JPG z białym tłem, WEBP z przezroczystym tłem, SVG, PDF, HTML, PPTX (PowerPoint) albo draw.io.
+- **Format:** PNG z przezroczystym tłem, JPG z białym tłem, WEBP z przezroczystym tłem, SVG, PDF albo HTML.
 
 Dla jednego obiektu można dodać kilka wariantów eksportu. Podgląd na tle szachownicy pokazuje przyszły wynik.
+
+Aplikacja nie oferuje eksportu do PowerPoint (`.pptx`) ani draw.io. [CLI](/reference/cli#export) nadal eksportuje oba formaty: `pairdraw export design.fig -f pptx` albo `-f drawio`.
 
 ### Sposoby eksportu
 
 | Sposób | macOS | Windows / Linux |
 |--------|-------|-----------------|
-| Skrót | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
+| Skrót (PNG) | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
 | Menu kontekstowe | Prawy przycisk → Eksport… | Prawy przycisk → Eksport… |
 | Panel właściwości | Przycisk Eksport | Przycisk Eksport |
 

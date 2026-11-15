@@ -5,7 +5,7 @@ description: Créer des rectangles, ellipses, lignes, cadres, sections, polygone
 
 # Dessiner des formes
 
-La barre inférieure contient les outils de création de formes, cadres et sections. Sélectionnez-en un, puis faites glisser la zone de travail.
+La barre d’outils à gauche de la zone de travail contient les outils de création de formes, cadres et sections. Sélectionnez-en un, puis faites glisser la zone de travail.
 
 ## Outils
 

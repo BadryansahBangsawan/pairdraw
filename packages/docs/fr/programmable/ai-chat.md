@@ -66,9 +66,13 @@ Sélectionnez un calque et ajoutez des **Notes pour l’IA** en bas du panneau D
 
 L’assistant peut vérifier visuellement son travail. Lorsque `export_image` est activé, il peut capturer une image après avoir créé ou modifié des designs et comparer le résultat à la demande initiale. Cela permet de repérer les problèmes de disposition, les éléments manquants et les écarts de couleur qu’une réponse purement textuelle laisserait passer. `diff_visual`, activé par défaut, compare un objet modifié à une copie de référence et renvoie les pixels et la zone modifiés ; l’assistant peut ainsi confirmer qu’une modification est restée dans sa cible.
 
+## Regarder l’assistant dessiner {#watching-the-assistant-draw}
+
+Pendant qu’un agent modifie la page ouverte, qu’il s’agisse du chat intégré ou d’un agent de code via MCP, le canevas montre son travail : chaque calque qu’il ajoute se dessine l’un après l’autre, les calques qu’il modifie clignotent et les cadres où il travaille scintillent dans un contour violet. Quand il s’arrête, ils clignotent une fois et un avis compte les calques ajoutés et modifiés ; **Afficher** les sélectionne et zoome dessus. L’animation est dessinée par-dessus le canevas et ne modifie jamais le document. Désactivez-la avec **Animer les modifications de l’IA** dans **Paramètres → Modèles → Discussion** ; elle reste aussi désactivée tant que **Animations** est désactivé, que le système demande de réduire les animations ou que le mode ultraléger est actif, et les modifications apparaissent alors simplement.
+
 ## Conseils
 
-- Vous pouvez consulter d’autres pages pendant qu’une réponse est générée : l’assistant continue de travailler sur la page où le message a été envoyé, et ses aperçus s’affichent à votre retour. Pendant votre absence, le chat indique la page sur laquelle il travaille, avec **Aller à la page** pour y revenir. Si l’assistant change lui-même de page, votre vue le suit.
+- Vous pouvez consulter d’autres pages pendant qu’une réponse est générée : l’assistant continue de travailler sur la page où le message a été envoyé, et ses aperçus s’affichent à votre retour. Pendant votre absence, le chat indique la page sur laquelle il travaille, avec **Aller à la page** pour y revenir. Avec **Suivre les agents pendant qu’ils travaillent** activé, votre vue suit l’assistant jusque sur une autre page.
 
 ## Confidentialité et coût
 

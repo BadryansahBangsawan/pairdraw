@@ -87,11 +87,15 @@ Wähle eine Ebene und füge unten im Design-Panel **Notizen für die KI** hinzu.
 
 Nach Änderungen kann der Assistent das Ergebnis mit `export_image` rendern und mit der Anfrage vergleichen. Dadurch werden Anordnungsfehler, fehlende Elemente und abweichende Farben sichtbar. `diff_visual`, standardmäßig aktiviert, vergleicht ein bearbeitetes Objekt mit einer Referenzkopie und liefert die geänderten Pixel und den betroffenen Bereich, sodass der Assistent prüfen kann, ob eine Änderung auf ihr Ziel beschränkt blieb.
 
+## Dem Assistenten beim Zeichnen zusehen {#watching-the-assistant-draw}
+
+Während ein Agent die geöffnete Seite bearbeitet, ob der integrierte Chat oder ein Coding-Agent über MCP, zeigt die Arbeitsfläche seine Arbeit: Jede Ebene, die er hinzufügt, zeichnet sich nacheinander ein, geänderte Ebenen blinken auf, und die Rahmen, in denen er arbeitet, schimmern in einem violetten Umriss. Hört er auf, blinken sie einmal, und ein Hinweis zählt die hinzugefügten und geänderten Ebenen; **Anzeigen** wählt sie aus und zoomt auf sie. Die Bewegung wird über die Arbeitsfläche gezeichnet und ändert das Dokument nie. Ausschalten lässt sie sich mit **KI-Änderungen animieren** unter **Einstellungen → Modelle → Chat**; sie bleibt auch aus, solange **Animationen** aus ist, das System reduzierte Bewegung verlangt oder der Ultralight-Modus an ist, und die Änderungen erscheinen dann einfach.
+
 ## Hinweise
 
 - Vor der Anfrage die betreffenden Objekte auswählen; der Assistent kennt die aktuelle Auswahl.
 - Farben, Größen und Positionen möglichst genau angeben.
 - Eine Nachricht kann mehrere Objekte ändern.
-- Während eine Antwort läuft, können Sie andere Seiten ansehen: Der Assistent arbeitet auf der Seite weiter, auf der die Nachricht begonnen hat, und seine Vorschauen erscheinen, sobald Sie zurückkehren. Solange Sie woanders sind, nennt der Chat die Seite, an der gearbeitet wird, mit **Zur Seite**, um dorthin zurückzukehren. Wechselt der Assistent selbst die Seite, folgt Ihre Ansicht.
+- Während eine Antwort läuft, können Sie andere Seiten ansehen: Der Assistent arbeitet auf der Seite weiter, auf der die Nachricht begonnen hat, und seine Vorschauen erscheinen, sobald Sie zurückkehren. Solange Sie woanders sind, nennt der Chat die Seite, an der gearbeitet wird, mit **Zur Seite**, um dorthin zurückzukehren. Ist **Agenten bei der Arbeit folgen** an, folgt Ihre Ansicht dem Assistenten auch auf eine andere Seite.
 - Änderungen durch AI können rückgängig gemacht werden.
 - Nach jedem Werkzeugaufruf wird die Anordnung neu berechnet.

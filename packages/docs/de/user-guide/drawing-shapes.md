@@ -5,7 +5,7 @@ description: Rechtecke, Ellipsen, Linien, Rahmen, Sektionen, Polygone und Sterne
 
 # Formen zeichnen
 
-Die untere Werkzeugleiste enthält Werkzeuge für Formen, Rahmen und Sektionen. Wählen Sie ein Werkzeug und ziehen Sie auf der Arbeitsfläche.
+Die Werkzeugleiste am linken Rand der Arbeitsfläche enthält Werkzeuge für Formen, Rahmen und Sektionen. Wählen Sie ein Werkzeug und ziehen Sie auf der Arbeitsfläche.
 
 ## Werkzeuge
 

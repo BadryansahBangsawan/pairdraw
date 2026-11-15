@@ -71,7 +71,7 @@ Premi <kbd>⌘</kbd><kbd>J</kbd>. Più di 90 strumenti creano forme, cambiano st
 
 Le chiamate degli strumenti appaiono in una sequenza comprimibile. Per la verifica visiva, l’assistente renderizza il risultato e lo confronta con la richiesta. Tutte le modifiche AI possono essere annullate.
 
-Puoi guardare un agente disegnare: ogni livello che aggiunge si disegna uno dopo l’altro, i frame in cui lavora luccicano e, quando ha finito, un avviso conta ciò che ha aggiunto e modificato. **Anima le modifiche dell’IA** nelle Impostazioni lo disattiva ([Watching the assistant draw](/programmable/ai-chat#watching-the-assistant-draw)).
+Puoi guardare un agente disegnare: ogni livello che aggiunge si disegna uno dopo l’altro, i frame in cui lavora luccicano e, quando ha finito, un avviso conta ciò che ha aggiunto e modificato. **Anima le modifiche dell’IA** nelle Impostazioni lo disattiva ([Guardare l’assistente disegnare](/it/programmable/ai-chat#watching-the-assistant-draw)).
 
 ## Browser integrato
 

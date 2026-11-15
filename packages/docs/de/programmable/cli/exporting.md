@@ -17,7 +17,7 @@ pairdraw export design.fig -f fig --page "Page 1"   # Seite als .fig
 pairdraw export design.fig -f html --css tailwind    # HTML mit Tailwind-Klassen
 ```
 
-`-f` wählt das Format (`png`, `jpg`, `webp`, `svg`, `pdf`, `pptx`, `jsx`, `html`, `fig`, `storybook`), `-s` den Maßstab, `-q` die Qualität und `-o` den Ausgabepfad. `--page` und `--node` begrenzen den Export.
+`-f` wählt das Format (`png`, `jpg`, `webp`, `svg`, `pdf`, `pptx`, `drawio`, `jsx`, `html`, `fig`, `storybook`), `-s` den Maßstab, `-q` die Qualität und `-o` den Ausgabepfad. `--page` und `--node` begrenzen den Export.
 
 ## JSX
 

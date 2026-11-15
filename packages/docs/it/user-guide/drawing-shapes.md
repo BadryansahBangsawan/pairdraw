@@ -5,7 +5,7 @@ description: Creare rettangoli, ellissi, linee, frame, sezioni, poligoni e stell
 
 # Disegnare forme
 
-La barra inferiore contiene gli strumenti per creare forme, frame e sezioni. Selezionane uno e trascina nell’area di lavoro.
+La barra degli strumenti a sinistra dell’area di lavoro contiene gli strumenti per creare forme, frame e sezioni. Selezionane uno e trascina nell’area di lavoro.
 
 ## Strumenti
 

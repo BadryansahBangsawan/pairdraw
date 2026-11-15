@@ -5,7 +5,7 @@ description: Crear rectángulos, elipses, líneas, marcos, secciones, polígonos
 
 # Dibujar formas
 
-La barra inferior contiene herramientas para crear formas, marcos y secciones. Selecciona una y arrastra sobre el lienzo.
+La barra de herramientas a la izquierda del lienzo contiene herramientas para crear formas, marcos y secciones. Selecciona una y arrastra sobre el lienzo.
 
 ## Herramientas
 

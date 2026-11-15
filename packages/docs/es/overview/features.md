@@ -71,7 +71,7 @@ pairdraw export design.fig -f jsx --style tailwind
 
 Las llamadas a herramientas aparecen en una cronología plegable. Para verificar visualmente los cambios, el asistente renderiza el resultado y lo compara con la solicitud. Todas las modificaciones realizadas por AI se pueden deshacer.
 
-Puedes ver cómo dibuja un agente: cada capa que añade se traza una tras otra, los marcos en los que trabaja brillan y, cuando termina, un aviso cuenta lo que añadió y cambió. **Animar las ediciones de la IA** en Ajustes lo desactiva ([Watching the assistant draw](/programmable/ai-chat#watching-the-assistant-draw)).
+Puedes ver cómo dibuja un agente: cada capa que añade se traza una tras otra, los marcos en los que trabaja brillan y, cuando termina, un aviso cuenta lo que añadió y cambió. **Animar las ediciones de la IA** en Ajustes lo desactiva ([Ver dibujar al asistente](/es/programmable/ai-chat#watching-the-assistant-draw)).
 
 ## Navegador integrado
 

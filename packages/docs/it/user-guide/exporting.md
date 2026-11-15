@@ -7,11 +7,13 @@ description: Esportare la selezione in PNG, JPG, WEBP o SVG e salvare file `.fig
 
 ## Esportazione di immagini
 
-Seleziona un oggetto e apri **Esporta** nel pannello delle proprietà. Ogni impostazione definisce formato (PNG, JPG, WEBP, SVG, PDF, HTML, PPTX o draw.io), scala o larghezza esplicita, suffisso del nome e qualità per JPG/WEBP.
+Seleziona un oggetto e apri **Esporta** nel pannello delle proprietà. Ogni impostazione definisce formato (PNG, JPG, WEBP, SVG, PDF o HTML), scala o larghezza esplicita, suffisso del nome e qualità per JPG/WEBP.
 
 Un oggetto può avere più impostazioni. L’anteprima appare su uno sfondo a scacchi per verificare la trasparenza.
 
 Puoi anche aprire **Esporta…** dal menu contestuale.
+
+L’app non offre l’esportazione in PowerPoint (`.pptx`) né in draw.io. La [CLI](/reference/cli#export) esporta ancora entrambi: `pairdraw export design.fig -f pptx` o `-f drawio`.
 
 ## HTML, PDF e qualità
 

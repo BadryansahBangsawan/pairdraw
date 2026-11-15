@@ -71,7 +71,7 @@ pairdraw export design.fig -f jsx --style tailwind
 
 Werkzeugaufrufe erscheinen als einklappbare Einträge auf einer Zeitleiste. Zur visuellen Prüfung stellt der Assistent seine Änderungen dar und vergleicht das Ergebnis mit der Anfrage. Sämtliche Änderungen durch AI können rückgängig gemacht werden.
 
-Sie können einem Agenten beim Zeichnen zusehen: Jede Ebene, die er hinzufügt, zeichnet sich nacheinander ein, die Rahmen, in denen er arbeitet, schimmern, und sobald er fertig ist, zählt ein Hinweis, was er hinzugefügt und geändert hat. **KI-Änderungen animieren** in den Einstellungen schaltet das aus ([Watching the assistant draw](/programmable/ai-chat#watching-the-assistant-draw)).
+Sie können einem Agenten beim Zeichnen zusehen: Jede Ebene, die er hinzufügt, zeichnet sich nacheinander ein, die Rahmen, in denen er arbeitet, schimmern, und sobald er fertig ist, zählt ein Hinweis, was er hinzugefügt und geändert hat. **KI-Änderungen animieren** in den Einstellungen schaltet das aus ([Dem Assistenten beim Zeichnen zusehen](/de/programmable/ai-chat#watching-the-assistant-draw)).
 
 ## Integrierter Browser
 

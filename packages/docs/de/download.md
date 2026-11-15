@@ -4,7 +4,7 @@ landing: true
 sidebar: false
 aside: false
 title: Pairdraw herunterladen
-description: Die Pairdraw-Desktop-App für macOS, Windows und Linux herunterladen.
+description: Die Pairdraw-Desktop-App für macOS mit Apple Silicon herunterladen; Windows, Linux und Intel-Macs erstellen sie aus dem Quellcode.
 ---
 
 <script setup>

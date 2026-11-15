@@ -5,7 +5,9 @@ description: Gestire l’albero dei livelli, le pagine e il pannello delle propr
 
 # Livelli e pagine
 
-Il pannello sinistro mostra livelli e pagine, l’area di lavoro occupa il centro e le proprietà appaiono a destra. I pannelli laterali sono ridimensionabili.
+L’editor si apre con la sola area di lavoro. Gli strumenti stanno a sinistra dell’area di lavoro, con il pulsante del pannello dei livelli sopra, e lo zoom nell’angolo in basso a destra. Il pannello dei livelli si apre a sinistra, quello delle proprietà a destra e la chat con AI in una colonna accanto; tutti si ridimensionano trascinandone i bordi.
+
+Mentre la chat con AI è chiusa, un prompt in fondo all’area di lavoro invia alla chat ciò che scrivi; disattivalo con **Prompt nell’area di lavoro** in **Impostazioni → Modelli → Chat**. <kbd>Escape</kbd> nel prompt torna all’area di lavoro.
 
 ## Livelli
 
@@ -34,7 +36,9 @@ Presenta mostra le slide della pagina a schermo intero, una alla volta. Avvialo 
 
 ## Documenti e recupero
 
-L’area di lavoro Home elenca i documenti locali recenti e quelli dei provider di archiviazione configurati. Usa la vista a griglia o a elenco e ordina i file recenti per **Nome**, **Ultimo uso** o **Creazione**. <kbd>⌘</kbd>/<kbd>Ctrl</kbd>-clic aggiunge un file alla selezione, <kbd>Shift</kbd>-clic seleziona un intervallo e <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+<kbd>A</kbd> seleziona tutti i file elencati; la barra di selezione li apre poi in schede dell’editor separate, li toglie da Recenti o elimina i documenti archiviati. Il menu <kbd>⋯</kbd> di un file o il suo menu contestuale offre **Rimuovi da Recenti**, che dimentica il file senza eliminarlo, e **Salva come…**, che salva una copia altrove. **Sistemi di design** elenca le librerie di componenti che hai pubblicato; sceglierne una apre un nuovo design con quella libreria attiva nel pannello delle risorse.
+Home si apre con un prompt: scegli sopra cosa creare (pagina di destinazione, app mobile, app web, diapositive, pannello di controllo o qualcos’altro), descrivilo e Pairdraw apre un nuovo design e invia il prompt alla sua chat con AI insieme a una guida per quel tipo; i prompt di esempio sotto lo riempiono con un’idea da modificare. Sotto il prompt puoi partire da un file Figma, da una pagina del browser integrato (app desktop) o da uno screenshot che l’agente ricrea. Le schede passano tra **Recenti**, **Bozze** e **Design system**, e il menu accanto elenca i luoghi aggiunti dal tuo server Cloud e dal tuo bucket di archiviazione. Un campo di ricerca filtra l’elenco, **Apri…** apre un file e **Design** avvia un design vuoto.
+
+**Recenti** elenca i documenti locali recenti. Usa la vista a griglia o a elenco e ordina i file recenti per **Nome**, **Ultimo uso** o **Creazione**. <kbd>⌘</kbd>/<kbd>Ctrl</kbd>-clic aggiunge un file alla selezione, <kbd>Shift</kbd>-clic seleziona un intervallo e <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+<kbd>A</kbd> seleziona tutti i file elencati; la barra di selezione li apre poi in schede dell’editor separate, li toglie da Recenti o elimina i documenti archiviati. Il menu <kbd>⋯</kbd> di un file o il suo menu contestuale offre **Rimuovi da Recenti**, che dimentica il file senza eliminarlo, e **Salva come…**, che salva una copia altrove. **Design system** elenca Pairdraw Basics, incluso nell’app, e le librerie di componenti che hai pubblicato; sceglierne una apre un nuovo design con quella libreria attiva nel pannello delle risorse.
 
 Un nuovo design resta conservato come bozza su questo dispositivo mentre ci lavori: ogni modifica viene scritta poco dopo averla fatta, quindi chiudere la sua scheda non chiede nulla. **Bozze** in Home le elenca con un’anteprima; aprine una per continuare, o scegli **Elimina bozza** dal suo menu <kbd>⋯</kbd> o contestuale per eliminarla per sempre. Salvare una bozza in un file o in un archivio, nell’editor o con **Salva come…** in Home, la toglie dalle Bozze. Le bozze vivono solo in questo profilo del browser o in questa installazione desktop, e richiedono che **Conserva automaticamente il lavoro non salvato** sia attivo e un browser che conserva i dati del sito.
 

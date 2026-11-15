@@ -138,7 +138,7 @@ Pairdraw utilise Yoga, avec une variante prenant Grid en charge. Penpot maintien
 - Format Binary Kiwi natif de Figma.
 - Import direct de `.fig`.
 - Paste de Kiwi binary data depuis Figma Clipboard.
-- Wire compatibility avec Figma Multiplayer protocol.
+- Le codec Kiwi couvre le schéma des messages multijoueur de Figma (Pairdraw ne se connecte pas aux serveurs de Figma).
 
 ### Penpot
 

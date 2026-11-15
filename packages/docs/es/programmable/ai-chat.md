@@ -68,9 +68,13 @@ El asistente puede comprobar su trabajo visualmente. Con `export_image` activada
 
 Las herramientas de inspección incluyen `get_jsx`, `diff_create` y `diff_jsx` para diferencias estructurales, `diff_visual` para diferencias de píxeles y `describe` para el rol semántico y la detección de problemas de diseño.
 
+## Ver dibujar al asistente {#watching-the-assistant-draw}
+
+Mientras un agente edita la página abierta, ya sea el chat integrado o un agente de programación por MCP, el lienzo muestra su trabajo: cada capa que añade se traza una tras otra, las capas que cambia destellan y los marcos en los que trabaja brillan dentro de un contorno violeta. Cuando se detiene, destellan una vez y un aviso cuenta las capas que añadió y cambió; **Mostrar** las selecciona y las encuadra. La animación se dibuja sobre el lienzo y nunca cambia el documento. Desactívala con **Animar las ediciones de la IA** en **Ajustes → Modelos → Chat**; también queda desactivada mientras **Animaciones** está desactivado, el sistema pide reducir el movimiento o el modo ultraligero está activo, y entonces las ediciones simplemente aparecen.
+
 ## Consejos
 
-- Puedes recorrer otras páginas mientras se genera una respuesta: el asistente sigue trabajando en la página donde empezó el mensaje y sus vistas previas aparecen al volver. Mientras estás en otra página, el chat indica en cuál trabaja y ofrece **Ir a la página** para volver. Si el asistente cambia de página por su cuenta, tu vista lo sigue.
+- Puedes recorrer otras páginas mientras se genera una respuesta: el asistente sigue trabajando en la página donde empezó el mensaje y sus vistas previas aparecen al volver. Mientras estás en otra página, el chat indica en cuál trabaja y ofrece **Ir a la página** para volver. Con **Seguir a los agentes mientras trabajan** activado, tu vista sigue al asistente también a otra página.
 
 ## Privacidad y costes
 

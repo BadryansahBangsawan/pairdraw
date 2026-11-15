@@ -117,7 +117,7 @@ Penpot utrzymuje własne implementacje Flex i Grid w ClojureScript i Rust WASM. 
 
 ## 6. Formaty i Figma
 
-Pairdraw używa binarnego formatu Kiwi Figma, bezpośrednio importuje `.fig`, odczytuje dane Kiwi ze schowka i jest zgodny z protokołem współpracy Figma.
+Pairdraw używa binarnego formatu Kiwi Figma, bezpośrednio importuje `.fig`, odczytuje dane Kiwi ze schowka, a jego kodek Kiwi obejmuje schemat wiadomości współpracy Figma (Pairdraw nie łączy się z serwerami Figma).
 
 Plik `.penpot` to archiwum ZIP z manifestami JSON, danymi dokumentu, zasobami binarnymi i miniaturami. Penpot nie importuje `.fig` bezpośrednio i obsługuje kilka generacji formatu przez migracje.
 

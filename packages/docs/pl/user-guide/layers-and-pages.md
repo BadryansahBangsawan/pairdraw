@@ -5,7 +5,9 @@ description: Praca z warstwami, stronami i panelem właściwości w Pairdraw.
 
 # Warstwy i strony
 
-Interfejs edytora składa się z warstw po lewej stronie, obszaru roboczego pośrodku i właściwości po prawej. Szerokość paneli bocznych można zmieniać przez przeciąganie separatorów.
+Edytor otwiera się z samym obszarem roboczym. Narzędzia znajdują się po lewej stronie obszaru roboczego, nad nimi przełącznik panelu warstw, a powiększenie w prawym dolnym rogu. Panel warstw otwiera się po lewej, panel właściwości po prawej, a czat AI w kolumnie obok; szerokość każdego z nich można zmieniać, przeciągając jego krawędź.
+
+Gdy czat AI jest zamknięty, pole polecenia u dołu obszaru roboczego wysyła to, co napiszesz, do czatu; wyłącza je opcja **Polecenie na obszarze roboczym** w **Ustawienia → Modele → Czat**. <kbd>Escape</kbd> w polu polecenia wraca do obszaru roboczego.
 
 ## Warstwy
 
@@ -37,7 +39,9 @@ Prezentacja pokazuje slajdy strony na pełnym ekranie, zawsze jeden naraz. Uruch
 
 ## Dokumenty i odzyskiwanie
 
-Obszar roboczy Start wyświetla ostatnie dokumenty lokalne oraz dokumenty z skonfigurowanych dostawców przechowywania. Korzystaj z widoku siatki lub listy i sortuj ostatnie pliki według **Nazwa**, **Ostatnio używane** lub **Utworzono**. <kbd>⌘</kbd>/<kbd>Ctrl</kbd>-klik dodaje plik do zaznaczenia, <kbd>Shift</kbd>-klik zaznacza zakres, a <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+<kbd>A</kbd> zaznacza wszystkie wylistowane pliki; pasek zaznaczenia otwiera je następnie w osobnych kartach edytora, usuwa z Ostatnio używanych lub usuwa zapisane dokumenty. Menu <kbd>⋯</kbd> pliku albo jego menu kontekstowe oferuje **Usuń z Ostatnio używanych**, które zapomina plik bez jego usuwania, oraz **Zapisz jako…**, które zapisuje kopię gdzie indziej. **Systemy projektowania** wyświetla biblioteki komponentów, które opublikowałeś; wybranie jednej z nich otwiera nowy projekt z tą biblioteką aktywną w panelu zasobów.
+Start zaczyna się od pola polecenia: wybierz nad nim, co utworzyć (strona docelowa, aplikacja mobilna, aplikacja internetowa, slajdy, panel albo coś innego), opisz to, a Pairdraw otworzy nowy projekt i wyśle polecenie do jego czatu AI razem z przewodnikiem dla tego rodzaju; przykładowe polecenia pod polem wypełniają je pomysłem do edycji. Pod polem możesz zacząć od pliku Figma, strony we wbudowanej przeglądarce (aplikacja na komputer) albo zrzutu ekranu, który agent odtworzy. Karty przełączają między **Ostatnie**, **Szkice** i **Systemy projektowe**, a menu obok wyświetla miejsca dodane przez Twój serwer chmury i zasobnik pamięci. Pole wyszukiwania filtruje listę, **Otwórz…** otwiera plik, a **Projekt** zaczyna pusty projekt.
+
+**Ostatnie** wyświetla ostatnie dokumenty lokalne. Korzystaj z widoku siatki lub listy i sortuj ostatnie pliki według **Nazwa**, **Ostatnio używane** lub **Utworzono**. <kbd>⌘</kbd>/<kbd>Ctrl</kbd>-klik dodaje plik do zaznaczenia, <kbd>Shift</kbd>-klik zaznacza zakres, a <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+<kbd>A</kbd> zaznacza wszystkie wylistowane pliki; pasek zaznaczenia otwiera je następnie w osobnych kartach edytora, usuwa z Ostatnio używanych lub usuwa zapisane dokumenty. Menu <kbd>⋯</kbd> pliku albo jego menu kontekstowe oferuje **Usuń z Ostatnio używanych**, które zapomina plik bez jego usuwania, oraz **Zapisz jako…**, które zapisuje kopię gdzie indziej. **Systemy projektowe** wyświetla wbudowaną bibliotekę Pairdraw Basics i biblioteki komponentów, które opublikowałeś; wybranie jednej z nich otwiera nowy projekt z tą biblioteką aktywną w panelu zasobów.
 
 Nowy projekt pozostaje zachowany jako szkic na tym urządzeniu podczas pracy nad nim: każda zmiana jest zapisywana krótko po jej wykonaniu, więc zamknięcie jego karty o nic nie pyta. **Szkice** na Starcie wyświetla je z podglądem; otwórz jeden, aby kontynuować, albo wybierz **Usuń szkic** z jego menu <kbd>⋯</kbd> lub menu kontekstowego, aby usunąć go na stałe. Zapisanie szkicu do pliku lub repozytorium, w edytorze albo przez **Zapisz jako…** na Starcie, usuwa go ze Szkiców. Szkice żyją tylko w tym profilu przeglądarki lub tej instalacji desktopowej i wymagają, aby **Automatycznie zachowuj niezapisaną pracę** było włączone, a przeglądarka zachowywała dane witryny.
 

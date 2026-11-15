@@ -17,7 +17,7 @@ Les deux consignes proposent des exemples sous forme de puces : **Page d’accue
 
 ## Envoyer du travail depuis le canevas
 
-- **Exécuter la note comme consigne**, dans le [menu contextuel](../user-guide/context-menu) du canevas, envoie le texte des notes adhésives sélectionnées, avec une référence à chacune.
+- **Exécuter la note comme consigne**, dans le [menu contextuel](../user-guide/context-menu#run-sticky-as-prompt) du canevas, envoie le texte des notes adhésives sélectionnées, avec une référence à chacune.
 - **Appliquer avec l’IA**, dans le menu d’un fil de commentaires, demande à l’assistant d’appliquer les remarques de ce fil, de répondre en disant ce qui a changé, puis de le résoudre. La consigne cite le commentaire et ses réponses et fait référence au calque auquel le fil est épinglé. **Appliquer les commentaires ouverts avec l’IA**, dans la liste des commentaires, fait de même pour chaque fil ouvert qu’elle affiche ; les fils résolus sont laissés de côté.
 
 Les deux envoient dans le chat du document, ne sont proposés que dans les documents que vous pouvez modifier et, si aucun modèle n’est configuré, en font d’abord configurer un comme la consigne de l’accueil. Les calques auxquels une consigne fait référence l’accompagnent comme références, comme lorsque vous les mentionnez dans le champ du chat.

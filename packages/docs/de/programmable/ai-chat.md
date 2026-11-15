@@ -17,7 +17,7 @@ Beide Prompts bieten Beispiel-Chips an: **Landingpage**, **Anmeldebildschirm**, 
 
 ## Arbeit von der Arbeitsfläche senden
 
-- **Haftnotiz als Prompt ausführen** im [Kontextmenü](/de/user-guide/context-menu) der Arbeitsfläche sendet den Text der ausgewählten Haftnotizen, mit einem Verweis auf jede Notiz.
+- **Haftnotiz als Prompt ausführen** im [Kontextmenü](/de/user-guide/context-menu#run-sticky-as-prompt) der Arbeitsfläche sendet den Text der ausgewählten Haftnotizen, mit einem Verweis auf jede Notiz.
 - **Mit KI umsetzen** im Menü eines Kommentar-Threads bittet den Assistenten, das Feedback dieses Threads umzusetzen, in einer Antwort zu sagen, was sich geändert hat, und den Thread aufzulösen. Der Prompt zitiert den Kommentar und seine Antworten und verlinkt die Ebene, an die der Thread geheftet ist. **Offene Kommentare mit KI umsetzen** in der Kommentarliste tut dasselbe für jeden offenen Thread, den sie zeigt; aufgelöste Threads bleiben außen vor.
 
 Beide senden in den Chat des Dokuments, stehen nur in Dokumenten zur Verfügung, die Sie bearbeiten dürfen, und richten wie der Prompt der Startseite zuerst ein Modell ein, wenn keines konfiguriert ist. Ebenen, die ein Prompt verlinkt, gehen als Referenzen mit, wie wenn Sie sie im Chatfeld erwähnen.

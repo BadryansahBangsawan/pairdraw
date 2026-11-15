@@ -25,7 +25,7 @@ Das Untermenü **Kopieren/Einfügen als** bietet weitere Formate für die Zwisch
 - **Als JSX kopieren:** kopiert die Pairdraw-JSX-Darstellung zur Verwendung mit `renderJsx()`.
 - **Als HTML kopieren:** kopiert ein HTML-Fragment mit Inline-Stilen und eingebetteten Bildern, bereit zum Einfügen in eine Seite oder E-Mail; das funktioniert auch in schreibgeschützten Dokumenten.
 
-## Haftnotiz als Prompt ausführen
+## Haftnotiz als Prompt ausführen {#run-sticky-as-prompt}
 
 Sind nur Haftnotizen ausgewählt und hat mindestens eine davon Text, schickt **Haftnotiz als Prompt ausführen** ihren Text an den [AI-Chat](/de/programmable/ai-chat) des Dokuments, mit einem Verweis auf jede Notiz, damit der Assistent weiß, woher der Text stammt. Die Aktion erscheint nur in Dokumenten, die Sie bearbeiten dürfen. Ist noch kein Modell eingerichtet, sucht Pairdraw zuerst nach einem Coding-Agenten auf Ihrem Computer, öffnet die geführte Einrichtung, wenn keiner gefunden wird, und schickt dann den Prompt.
 

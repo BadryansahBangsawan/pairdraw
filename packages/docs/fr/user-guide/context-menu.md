@@ -25,7 +25,7 @@ Le sous-menu **Copier/Coller en tant que** propose d’autres formats de presse-
 - **Copier en JSX** copie la représentation Pairdraw JSX, à utiliser avec `renderJsx()`.
 - **Copier en HTML** copie un fragment HTML avec styles en ligne et images intégrées, prêt à coller dans une page ou un courriel ; cela fonctionne aussi dans les documents en lecture seule.
 
-## Exécuter la note comme consigne
+## Exécuter la note comme consigne {#run-sticky-as-prompt}
 
 Quand seules des notes autocollantes sont sélectionnées et qu’au moins l’une contient du texte, **Exécuter la note comme consigne** envoie leur texte au [chat avec l’IA](/fr/programmable/ai-chat) du document, avec une référence à chaque note pour que l’assistant sache de quelles notes il provient. L’action n’apparaît que dans les documents que vous pouvez modifier. Si aucun modèle n’est encore configuré, Pairdraw cherche d’abord un agent de code sur votre ordinateur et ouvre la configuration guidée s’il n’en trouve aucun, puis envoie la consigne.
 

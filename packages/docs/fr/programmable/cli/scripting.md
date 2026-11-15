@@ -117,7 +117,7 @@ Utilisez `--quiet` ou `-q` pour masquer la sortie lorsque vous écrivez seulemen
 
 À côté de `figma`, les scripts disposent de `pairdraw` : ce que Pairdraw ajoute à l’API des plugins Figma, dans le même style. Le même objet global est disponible pour l’outil `eval` et pour l’automatisation de l’application en cours d’exécution.
 
-Un composant principal ou un ensemble de composants peut [se comporter comme un contrôle Reka UI](/fr/user-guide/components). Liez-le par ses propres noms de propriétés et d’emplacements :
+Un composant principal ou un ensemble de composants peut [se comporter comme un contrôle Reka UI](/fr/user-guide/components#behaviours-and-preview). Liez-le par ses propres noms de propriétés et d’emplacements :
 
 ```sh
 pairdraw eval design.fig -w -c '

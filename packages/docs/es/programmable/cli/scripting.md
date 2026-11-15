@@ -117,7 +117,7 @@ Usa `--quiet` / `-q` para suprimir la salida cuando solo escribes un archivo.
 
 Junto a `figma`, los scripts reciben `pairdraw`: lo que Pairdraw añade a la Plugin API de Figma, con el mismo estilo. El mismo objeto global está disponible en la herramienta `eval` y en la automatización de la app en ejecución.
 
-Un componente principal o un conjunto de componentes puede [comportarse como un control de Reka UI](/user-guide/components#behaviours-and-preview). Vincúlalo mediante los nombres de sus propias propiedades y ranuras:
+Un componente principal o un conjunto de componentes puede [comportarse como un control de Reka UI](/es/user-guide/components#behaviours-and-preview). Vincúlalo mediante los nombres de sus propias propiedades y ranuras:
 
 ```sh
 pairdraw eval design.fig -w -c '

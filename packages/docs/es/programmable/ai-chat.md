@@ -17,7 +17,7 @@ Ambos prompts muestran chips de ejemplo: **Página de aterrizaje**, **Pantalla d
 
 ## Enviar trabajo desde el lienzo
 
-- **Ejecutar nota adhesiva como instrucción**, en el [menú contextual](/user-guide/context-menu#run-sticky-as-prompt) del lienzo, envía el texto de las notas adhesivas seleccionadas con una referencia a cada nota.
+- **Ejecutar nota adhesiva como instrucción**, en el [menú contextual](/es/user-guide/context-menu#run-sticky-as-prompt) del lienzo, envía el texto de las notas adhesivas seleccionadas con una referencia a cada nota.
 - **Aplicar con IA**, en el menú de un hilo de comentarios, pide al asistente que aplique los comentarios de ese hilo, responda explicando qué cambió y lo resuelva. El prompt cita el comentario y sus respuestas y enlaza la capa a la que está fijado el hilo. **Aplicar comentarios abiertos con IA**, en la lista de comentarios, hace lo mismo con cada hilo abierto que muestra; los hilos resueltos quedan fuera.
 
 Ambos envían al chat del documento, solo se ofrecen en documentos que puedes editar y, si no hay ningún modelo configurado, configuran uno primero igual que el prompt de Inicio. Las capas que enlaza un prompt lo acompañan como referencias, igual que cuando las mencionas en el campo del chat.

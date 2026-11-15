@@ -141,7 +141,7 @@ Pairdraw has no live peer-to-peer rooms: there is no Share link for a local docu
 - Live cursors with colored arrows and name pills, for people in a Cloud document and for AI agents
 - Presence avatars; your own shows in the top bar only while it lists your AI agents or someone else has the Cloud document open
 - Follow mode — click a person or an agent to follow their viewport
-- **View → Multiplayer cursors** (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>\</kbd>) hides and shows the cursors
+- **View → Multiplayer cursors** (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>\\</kbd>) hides and shows the cursors
 
 ## Desktop & Web
 

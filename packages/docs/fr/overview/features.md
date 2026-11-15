@@ -31,7 +31,7 @@ Les onglets Design, Code et Vérifier s’adaptent à la sélection ; le chat av
 - **Disposition :** réglages de la disposition automatique.
 - **Export :** échelle, PNG/JPG/WEBP/SVG et aperçu.
 - **Code :** Design JSX et Tailwind JSX pour la sélection, avec édition bidirectionnelle en direct du Design JSX qui met à jour votre code à mesure que les calques changent ; l’élément situé sous le curseur met en évidence son calque sur la zone de travail, et les problèmes de design sont soulignés sur la propriété qui les cause.
-- **Vérifier :** analyse de design en direct pour la page ou la sélection : contraste insuffisant, cibles tactiles trop petites, couleurs non liées, espacements hors échelle, avec des repères de problèmes sur la zone de travail et une liaison à une variable en un clic ([Checking Designs](/user-guide/checking-designs)).
+- **Vérifier :** analyse de design en direct pour la page ou la sélection : contraste insuffisant, cibles tactiles trop petites, couleurs non liées, espacements hors échelle, vérifiée tant que l’onglet est ouvert, avec une liaison à une variable en un clic ([Checking Designs](/user-guide/checking-designs)).
 
 ## Rendu
 
@@ -71,6 +71,8 @@ pairdraw export design.fig -f jsx --style tailwind
 
 Les appels d’outils apparaissent sur une chronologie repliable. Pour vérifier les modifications, l’assistant rend le résultat et le compare à la demande. Toutes les modifications réalisées par l’AI peuvent être annulées.
 
+Vous pouvez regarder un agent dessiner : chaque calque qu’il ajoute se dessine l’un après l’autre, les cadres où il travaille scintillent et, une fois qu’il a fini, un avis compte ce qu’il a ajouté et modifié. **Animer les modifications de l’IA** dans les Réglages le désactive ([Watching the assistant draw](/programmable/ai-chat#watching-the-assistant-draw)).
+
 ## Navigateur intégré
 
 Les pages `http` et `https` s’ouvrent dans une fenêtre propre à l’application de bureau, qui ne partage rien avec l’éditeur, et peuvent être amenées sur la zone de travail : importez la page entière ou un élément choisi sous forme de calques, ou placez une capture de la vue, de la page ou d’un élément. Le chat peut lire la page, marquer un élément dans sa réponse et cliquer, saisir du texte, appuyer sur une touche, faire défiler ou attendre dessus ; il demande d’abord quand les paramètres demandent une confirmation avant les modifications.
@@ -106,7 +108,7 @@ Les agents IA affichent leur curseur et les calques qu’ils modifient sur la zo
 
 ## Bureau et Web
 
-**Bureau :** Tauri v2, programme d’installation d’environ 20 Mo sous macOS, pour macOS, Windows et Linux, avec menus natifs, fonctionnement hors ligne et enregistrement automatique.
+**Bureau :** Tauri v2, programme d’installation d’environ 20 Mo sous macOS ; les versions prêtes à l’emploi sont publiées pour macOS sur Apple Silicon, et Windows, Linux et les Mac Intel se compilent à partir des sources, avec menus natifs, fonctionnement hors ligne et enregistrement automatique.
 
 **Web :** dans le navigateur, depuis votre propre build ou un serveur Pairdraw Cloud, installable comme PWA et adapté aux écrans tactiles.
 

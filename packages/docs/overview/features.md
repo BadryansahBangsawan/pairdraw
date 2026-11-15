@@ -40,7 +40,7 @@ Context-sensitive Design and Code tabs, with Lint beside them:
 - **Layout** — auto-layout controls when enabled
 - **Export** — scale, format (PNG, JPG, WEBP, SVG, PDF, HTML), quality, live preview
 - **Code** — Design JSX, HTML, and Vue and React components for the selection, styled with CSS or Tailwind, with live two-way Design JSX editing that patches your code as layers change; the element around the cursor outlines its layer on the canvas, and design issues are underlined on the property that causes them
-- **Lint** — live design lint for the page or selection: low contrast, small touch targets, unbound colors, off-scale spacing, with issue markers on the canvas and one-click variable binding ([Checking Designs](/user-guide/checking-designs))
+- **Lint** — live design lint for the page or selection: low contrast, small touch targets, unbound colors, off-scale spacing, checked while the tab is open, with one-click variable binding ([Checking Designs](/user-guide/checking-designs))
 
 ## Rendering
 
@@ -83,6 +83,8 @@ CLI: `pairdraw export design.fig -f jsx --style tailwind`
 Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant in its own column beside the properties panel, or write in the prompt at the bottom of the canvas or on Home. With no model set up, the chat uses a coding agent already installed on this computer: Claude Code, Codex, or Gemini CLI. 138 tools that can create shapes, set styles, manage layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Connect Anthropic, OpenAI, Google AI, OpenRouter, any compatible endpoint, or the AI your [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud) server offers. Each provider, model, and agent shows its maker's logo.
 
 Tool calls display as collapsible timeline entries. Visual verification — the assistant renders its work and checks it against your request. Full undo support for all AI mutations.
+
+You can watch an agent draw: each layer it adds traces in, one after another, the frames it works in shimmer, and a notice counts what it added and changed once it stops. **Animate AI edits** in Settings turns this off ([Watching the assistant draw](/programmable/ai-chat#watching-the-assistant-draw)).
 
 See [AI Chat](/programmable/ai-chat) for setup and provider details.
 
@@ -145,7 +147,7 @@ Pairdraw has no live peer-to-peer rooms: there is no Share link for a local docu
 
 ## Desktop & Web
 
-**Desktop** — Tauri v2, with a macOS installer of about 20 MB. macOS, Windows, Linux. Native menus, offline, autosave.
+**Desktop** — Tauri v2, with a macOS installer of about 20 MB. Release builds are published for macOS on Apple Silicon; Windows, Linux, and Intel Macs build from source. Native menus, offline, autosave.
 
 **Web** — runs in the browser from your own build (`bun run dev`, or a deployment you host) or a Pairdraw Cloud server; there is no hosted copy. Installable as a PWA on mobile with touch-optimized UI.
 

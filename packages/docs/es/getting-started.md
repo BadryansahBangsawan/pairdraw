@@ -8,28 +8,25 @@ Si quieres crear un producto basado en Pairdraw en lugar de limitarte a la aplic
 
 ## Aplicación de escritorio
 
-Las versiones preparadas para macOS, Windows y Linux están disponibles en la [página de descargas](/es/download).
+La [página de descargas](/es/download) muestra los archivos de la última versión. Pairdraw 0.16.0 se publica para macOS con Apple Silicon:
 
-| Plataforma | Archivo |
-| --------------------- | -------------------- |
+| Plataforma            | Archivo                   |
+| --------------------- | ------------------------- |
 | macOS (Apple Silicon) | `.dmg` / `.zip` (aarch64) |
-| macOS (Intel) | `.dmg` / `.zip` (x64) |
-| Windows (x64) | `.msi` / `.exe` |
-| Windows (ARM) | `.msi` / `.exe` |
-| Linux (x64) | `.AppImage` / `.deb` / `.rpm` / `.tar.gz` |
-| Linux (ARM64) | `.AppImage` / `.deb` / `.rpm` / `.tar.gz` |
 
-Para buscar una versión más reciente de la aplicación de escritorio, elige **Check for Updates…** en el menú **Help** en Windows y Linux, o en el menú de la aplicación en macOS. La opción **About** de al lado muestra la versión instalada.
+Windows, Linux y los Mac con Intel aún no tienen versión preparada; compílala desde el código fuente como se describe más abajo. La versión de macOS todavía no está firmada ni notarizada, así que macOS bloquea el primer inicio: haz clic derecho en Pairdraw en Aplicaciones y elige **Abrir**, o permítelo en **Ajustes del Sistema → Privacidad y seguridad**. Cada versión incluye un archivo `SHA256SUMS` para comprobar las descargas.
+
+Para buscar una versión más reciente de la aplicación de escritorio, elige **Check for Updates…** en el menú **Help** en Windows y Linux, o en el menú de la aplicación en macOS. La opción **About** de al lado muestra la versión instalada. Pairdraw 0.16.0 no indica ningún canal de actualizaciones, así que instala la siguiente versión a mano desde la página de descargas.
 
 ## Requisitos del sistema {#system-requirements}
 
 Pairdraw dibuja con CanvasKit sobre WebGL y usa funciones recientes de la plataforma web, por lo que necesita un motor de navegador actual. La versión web admite Chrome 111, Edge 111, Firefox 128 y Safari 16.4 o posteriores; los navegadores basados en Chromium, como Brave u Opera, siguen la versión de Chrome en la que se basan. La aplicación de escritorio dibuja en el WebView del sistema, así que el mínimo depende del motor del sistema operativo:
 
-| Plataforma | Requisito |
-| ---------- | --------- |
-| macOS | macOS 13 Ventura o posterior con las actualizaciones actuales de Safari instaladas (Safari 16.4 se incluyó con macOS 13.3). |
-| Windows | Windows 10 o posterior con el runtime Evergreen de Microsoft Edge WebView2, que se actualiza solo. |
-| Linux | WebKitGTK 2.40 o posterior (`webkit2gtk-4.1`). |
+| Plataforma | Requisito                                                                                                                   |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------- |
+| macOS      | macOS 13 Ventura o posterior con las actualizaciones actuales de Safari instaladas (Safari 16.4 se incluyó con macOS 13.3). |
+| Windows    | Windows 10 o posterior con el runtime Evergreen de Microsoft Edge WebView2, que se actualiza solo.                          |
+| Linux      | WebKitGTK 2.40 o posterior (`webkit2gtk-4.1`).                                                                              |
 
 Si el motor es demasiado antiguo, Pairdraw muestra qué debes actualizar en lugar de una ventana en blanco. Si ves ese aviso en un sistema que cumple los requisitos, usa su enlace «Report a problem», que rellena de antemano los datos del navegador y del motor.
 
@@ -58,16 +55,16 @@ El editor estará disponible en `http://localhost:1420`.
 
 ### Comandos
 
-| Comando | Finalidad |
+| Comando                         | Finalidad                                                                             |
 | ------------------------------- | ------------------------------------------------------------------------------------- |
-| `bun run dev` | Inicia el servidor de desarrollo con HMR |
-| `bun run build` | Genera la versión de producción |
-| `bun run check` | Ejecuta oxlint y comprueba los tipos con TypeScript 7 |
-| `bun run test` | Ejecuta las pruebas E2E y de regresión visual con Playwright |
-| `bun run test:update` | Actualiza las capturas de referencia |
-| `bun run test:unit` | Ejecuta las pruebas unitarias con bun:test |
-| `bun run docs:dev` | Inicia el servidor de desarrollo de la documentación |
-| `bun run docs:build` | Genera rápidamente la documentación para verificarla en local |
+| `bun run dev`                   | Inicia el servidor de desarrollo con HMR                                              |
+| `bun run build`                 | Genera la versión de producción                                                       |
+| `bun run check`                 | Ejecuta oxlint y comprueba los tipos con TypeScript 7                                 |
+| `bun run test`                  | Ejecuta las pruebas E2E y de regresión visual con Playwright                          |
+| `bun run test:update`           | Actualiza las capturas de referencia                                                  |
+| `bun run test:unit`             | Ejecuta las pruebas unitarias con bun:test                                            |
+| `bun run docs:dev`              | Inicia el servidor de desarrollo de la documentación                                  |
+| `bun run docs:build`            | Genera rápidamente la documentación para verificarla en local                         |
 | `bun run docs:build:production` | Genera la documentación completa para su publicación, incluidos los archivos para LLM |
 
 ## Aplicación Tauri

@@ -31,7 +31,7 @@ Las pestañas Diseño, Código y Revisar se adaptan a la selección; el chat con
 - **Disposición:** controles de la disposición automática.
 - **Exportación:** escala, PNG/JPG/WEBP/SVG y vista previa.
 - **Código:** Design JSX y Tailwind JSX de la selección, con edición bidireccional en vivo de Design JSX que actualiza tu código a medida que cambian las capas; el elemento bajo el cursor resalta su capa en el lienzo y los problemas de diseño se subrayan en la propiedad que los causa.
-- **Revisar:** revisión de diseño en vivo de la página o la selección (bajo contraste, áreas táctiles pequeñas, colores sin variable, espaciados fuera de escala), con marcadores de problemas en el lienzo y enlace a variables con un clic ([Revisar diseños](/user-guide/checking-designs)).
+- **Revisar:** revisión de diseño en vivo de la página o la selección (bajo contraste, áreas táctiles pequeñas, colores sin variable, espaciados fuera de escala), revisada mientras la pestaña está abierta, con enlace a variables con un clic ([Revisar diseños](/user-guide/checking-designs)).
 
 ## Renderizado
 
@@ -71,6 +71,8 @@ pairdraw export design.fig -f jsx --style tailwind
 
 Las llamadas a herramientas aparecen en una cronología plegable. Para verificar visualmente los cambios, el asistente renderiza el resultado y lo compara con la solicitud. Todas las modificaciones realizadas por AI se pueden deshacer.
 
+Puedes ver cómo dibuja un agente: cada capa que añade se traza una tras otra, los marcos en los que trabaja brillan y, cuando termina, un aviso cuenta lo que añadió y cambió. **Animar las ediciones de la IA** en Ajustes lo desactiva ([Watching the assistant draw](/programmable/ai-chat#watching-the-assistant-draw)).
+
 ## Navegador integrado
 
 Las páginas `http` y `https` se abren en una ventana propia de la aplicación de escritorio que no comparte nada con el editor, y se pueden llevar al lienzo: importa la página entera o un elemento elegido como capas, o coloca una captura de la vista, de la página o de un elemento. El chat puede leer la página, marcar un elemento en su respuesta y hacer clic, escribir, pulsar una tecla, desplazarse o esperar en ella, y pregunta antes cuando los ajustes piden confirmación antes de los cambios.
@@ -106,7 +108,7 @@ Los agentes de IA muestran sus cursores y las capas que editan en el lienzo, y l
 
 ## Escritorio y web
 
-**Escritorio:** Tauri v2, instalador de unos 20 MB en macOS, para macOS, Windows y Linux, con menús nativos, uso sin conexión y guardado automático.
+**Escritorio:** Tauri v2, instalador de unos 20 MB en macOS; las versiones preparadas se publican para macOS con Apple Silicon, y Windows, Linux y los Mac con Intel se compilan desde el código fuente, con menús nativos, uso sin conexión y guardado automático.
 
 **Web:** en el navegador, desde tu propia compilación o un servidor de Pairdraw Cloud, instalable como PWA y adaptado a pantallas táctiles.
 

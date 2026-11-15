@@ -31,7 +31,7 @@ Zawartość kart „Design”, „Kod” i „Sprawdź” zależy od zaznaczenia
 - **Układ:** ustawienia automatycznego układu.
 - **Eksport:** skala, format PNG/JPG/WEBP/SVG i podgląd.
 - **Kod:** Design JSX i Tailwind JSX dla zaznaczenia; dwukierunkowa edycja Design JSX na żywo aktualizuje kod wraz ze zmianami warstw. Element pod kursorem obrysowuje swoją warstwę na obszarze roboczym, a problemy projektowe są podkreślone przy właściwości, która je powoduje.
-- **Sprawdź:** lint projektu na żywo dla strony lub zaznaczenia: niski kontrast, małe obszary dotykowe, niepowiązane kolory, odstępy spoza skali. Znaczniki problemów widać na obszarze roboczym, a zmienną można powiązać jednym kliknięciem ([Checking Designs](/user-guide/checking-designs)).
+- **Sprawdź:** lint projektu na żywo dla strony lub zaznaczenia: niski kontrast, małe obszary dotykowe, niepowiązane kolory, odstępy spoza skali. Sprawdzanie działa, gdy karta jest otwarta, a zmienną można powiązać jednym kliknięciem ([Checking Designs](/user-guide/checking-designs)).
 
 ## Renderowanie
 
@@ -71,6 +71,8 @@ Naciśnij <kbd>⌘</kbd><kbd>J</kbd>. Ponad 90 narzędzi tworzy figury, zmienia 
 
 Wywołania narzędzi pojawiają się na zwijanej osi czasu. Do kontroli wizualnej asystent eksportuje wynik i porównuje go z poleceniem. Wszystkie zmiany AI można cofnąć.
 
+Możesz patrzeć, jak agent rysuje: każda dodana warstwa rysuje się po kolei, ramki, w których pracuje, migoczą, a gdy skończy, powiadomienie podaje, co dodał i zmienił. **Animuj zmiany AI** w Ustawieniach wyłącza to ([Watching the assistant draw](/programmable/ai-chat#watching-the-assistant-draw)).
+
 ## Wbudowana przeglądarka
 
 Strony `http` i `https` otwierają się we własnym oknie aplikacji komputerowej, które nie dzieli niczego z edytorem, i można je przenieść na obszar roboczy: zaimportować całą stronę lub wybrany element jako warstwy albo umieścić zrzut widoku, strony lub elementu. Czat może odczytać stronę, oznaczyć element w odpowiedzi i klikać, wpisywać tekst, naciskać klawisze, przewijać lub czekać na stronie, pytając najpierw o zgodę, gdy ustawienia tego wymagają.
@@ -104,7 +106,7 @@ Agenci AI pokazują na obszarze roboczym swoje kursory i edytowane warstwy, a wi
 
 ## Wersja komputerowa i internetowa
 
-**Komputer:** Tauri v2, instalator około 20 MB w macOS, dla macOS, Windows i Linux, z menu systemowymi, pracą bez sieci i automatycznym zapisem.
+**Komputer:** Tauri v2, instalator około 20 MB w macOS; gotowe wersje są wydawane dla macOS na Apple Silicon, a Windows, Linux i komputery Mac z procesorem Intel buduje się ze źródeł, z menu systemowymi, pracą bez sieci i automatycznym zapisem.
 
 **Internet:** w przeglądarce, z własnej kompilacji lub serwera Pairdraw Cloud, możliwość instalacji jako PWA i interfejs dotykowy.
 

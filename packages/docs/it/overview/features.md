@@ -31,7 +31,7 @@ Le schede Design, Codice e Verifica cambiano in base alla selezione; la chat AI 
 - **Layout:** impostazioni della disposizione automatica.
 - **Export:** scala, PNG/JPG/WEBP/SVG e anteprima.
 - **Codice:** Design JSX e Tailwind JSX per la selezione, con modifica bidirezionale in tempo reale del Design JSX che aggiorna il codice al variare dei livelli; l’elemento sotto il cursore evidenzia il proprio livello nell’area di lavoro e i problemi di design sono sottolineati sulla proprietà che li causa.
-- **Verifica:** controllo di design in tempo reale per la pagina o la selezione (contrasto basso, aree di tocco piccole, colori non collegati, spaziature fuori scala), con indicatori dei problemi nell’area di lavoro e collegamento alle variabili con un clic ([Controllare i design](/user-guide/checking-designs)).
+- **Verifica:** controllo di design in tempo reale per la pagina o la selezione (contrasto basso, aree di tocco piccole, colori non collegati, spaziature fuori scala), controllato mentre la scheda è aperta, con collegamento alle variabili con un clic ([Controllare i design](/user-guide/checking-designs)).
 
 ## Rendering
 
@@ -71,6 +71,8 @@ Premi <kbd>⌘</kbd><kbd>J</kbd>. Più di 90 strumenti creano forme, cambiano st
 
 Le chiamate degli strumenti appaiono in una sequenza comprimibile. Per la verifica visiva, l’assistente renderizza il risultato e lo confronta con la richiesta. Tutte le modifiche AI possono essere annullate.
 
+Puoi guardare un agente disegnare: ogni livello che aggiunge si disegna uno dopo l’altro, i frame in cui lavora luccicano e, quando ha finito, un avviso conta ciò che ha aggiunto e modificato. **Anima le modifiche dell’IA** nelle Impostazioni lo disattiva ([Watching the assistant draw](/programmable/ai-chat#watching-the-assistant-draw)).
+
 ## Browser integrato
 
 Le pagine `http` e `https` si aprono in una finestra propria dell’app desktop, che non condivide nulla con l’editor, e si possono portare nell’area di lavoro: importa l’intera pagina o un elemento scelto come livelli, oppure inserisci uno screenshot della vista, della pagina o di un elemento. Il chat può leggere la pagina, contrassegnare un elemento nella risposta e fare clic, digitare, premere un tasto, scorrere o attendere su di essa, chiedendo prima conferma quando le impostazioni la chiedono per le modifiche.
@@ -104,7 +106,7 @@ Gli agenti AI mostrano sull’area di lavoro i loro cursori e i livelli che modi
 
 ## Desktop e Web
 
-**Desktop:** Tauri v2, programma di installazione di circa 20 MB su macOS, per macOS, Windows e Linux, con menu nativi, uso senza rete e salvataggio automatico.
+**Desktop:** Tauri v2, programma di installazione di circa 20 MB su macOS; le versioni pronte sono pubblicate per macOS su Apple Silicon, mentre Windows, Linux e i Mac Intel si compilano dal codice sorgente, con menu nativi, uso senza rete e salvataggio automatico.
 
 **Web:** nel browser, da una tua build o da un server Pairdraw Cloud, installabile come PWA e adattato agli schermi touch.
 

@@ -31,7 +31,7 @@ Die Registerkarten Design, Code und Prüfen passen sich der aktuellen Auswahl an
 - **Anordnung:** Einstellungen der automatischen Anordnung.
 - **Export:** Maßstab, PNG/JPG/WEBP/SVG und Vorschau.
 - **Code:** Design JSX und Tailwind JSX für die Auswahl, mit Design JSX live in beide Richtungen bearbeitbar: Der Code wird angepasst, wenn sich Ebenen ändern. Das Element an der Cursorposition umrandet seine Ebene auf der Arbeitsfläche, und Designprobleme werden an der Eigenschaft unterstrichen, die sie verursacht.
-- **Prüfen:** Live-Designprüfung für die Seite oder die Auswahl: geringer Kontrast, kleine Touch-Ziele, nicht gebundene Farben, Abstände außerhalb der Skala, mit Problemmarkierungen auf der Arbeitsfläche und Variablenbindung per Klick ([Designs prüfen](/user-guide/checking-designs)).
+- **Prüfen:** Live-Designprüfung für die Seite oder die Auswahl: geringer Kontrast, kleine Touch-Ziele, nicht gebundene Farben, Abstände außerhalb der Skala, geprüft, solange die Registerkarte offen ist, mit Variablenbindung per Klick ([Designs prüfen](/user-guide/checking-designs)).
 
 ## Darstellung
 
@@ -71,6 +71,8 @@ pairdraw export design.fig -f jsx --style tailwind
 
 Werkzeugaufrufe erscheinen als einklappbare Einträge auf einer Zeitleiste. Zur visuellen Prüfung stellt der Assistent seine Änderungen dar und vergleicht das Ergebnis mit der Anfrage. Sämtliche Änderungen durch AI können rückgängig gemacht werden.
 
+Sie können einem Agenten beim Zeichnen zusehen: Jede Ebene, die er hinzufügt, zeichnet sich nacheinander ein, die Rahmen, in denen er arbeitet, schimmern, und sobald er fertig ist, zählt ein Hinweis, was er hinzugefügt und geändert hat. **KI-Änderungen animieren** in den Einstellungen schaltet das aus ([Watching the assistant draw](/programmable/ai-chat#watching-the-assistant-draw)).
+
 ## Integrierter Browser
 
 `http`- und `https`-Seiten öffnen sich in einem eigenen Fenster der Desktop-App, das nichts mit dem Editor teilt, und lassen sich auf die Arbeitsfläche holen: die ganze Seite oder ein ausgewähltes Element als Ebenen importieren oder einen Screenshot der Ansicht, der Seite oder eines Elements ablegen. Der Chat kann die Seite lesen, ein Element in der Antwort markieren und darauf klicken, tippen, eine Taste drücken, scrollen oder warten; gefragt wird vorher, wenn die Einstellungen vor Änderungen fragen.
@@ -106,7 +108,7 @@ KI-Agenten zeigen ihre Zeiger und die Ebenen, die sie bearbeiten, auf der Arbeit
 
 ## Desktop und Web
 
-**Desktop:** Tauri v2, Installer rund 20 MB unter macOS, für macOS, Windows und Linux, mit nativen Menüs, Offlinebetrieb und automatischem Speichern.
+**Desktop:** Tauri v2, Installer rund 20 MB unter macOS; fertige Versionen erscheinen für macOS mit Apple Silicon, Windows, Linux und Intel-Macs werden aus dem Quellcode erstellt, mit nativen Menüs, Offlinebetrieb und automatischem Speichern.
 
 **Web:** im Browser aus einem eigenen Build oder von einem Pairdraw-Cloud-Server, als PWA installierbar und für Touch-Bedienung optimiert.
 

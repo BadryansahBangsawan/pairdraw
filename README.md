@@ -9,11 +9,11 @@ Open-source design editor. Opens `.fig` and `.pen` design files, includes built-
 
 **[Download](https://github.com/BadryansahBangsawan/pairdraw/releases/latest)** · [Documentation](packages/docs/) · [Roadmap](packages/docs/development/roadmap.md)
 
-![Pairdraw](packages/docs/public/screenshot.png)
+![Pairdraw editor: an AI agent designing a five-screen budgeting app on the canvas while the chat explains its work](packages/docs/public/screenshot.png)
 
 ## Installation
 
-Download the desktop app for macOS, Windows, or Linux from the [releases page](https://github.com/BadryansahBangsawan/pairdraw/releases/latest), or run the web app from a checkout of this repository with `bun install` and `bun run dev` (see [CONTRIBUTING.md](CONTRIBUTING.md)). There is no hosted web app.
+Download the desktop app for macOS on Apple Silicon (`.dmg` or `.zip`) from the [releases page](https://github.com/BadryansahBangsawan/pairdraw/releases/latest). The build is not signed or notarized yet, so open it the first time with right-click → **Open**. Windows, Linux, and Intel Macs build from source (see [Building from source](packages/docs/getting-started.md#building-from-source)), and the web app runs from a checkout of this repository with `bun install` and `bun run dev` (see [CONTRIBUTING.md](CONTRIBUTING.md)). There is no hosted web app.
 
 Requires macOS 13 or later with current Safari updates, Windows 10 or later, or Linux with WebKitGTK 2.40+; the web app needs Chrome 111, Edge 111, Firefox 128, or Safari 16.4 or later. See [system requirements](packages/docs/getting-started.md#system-requirements).
 
@@ -23,6 +23,7 @@ Pairdraw sends no usage data: no daily ping, analytics, or usage statistics. The
 
 - **Opens `.fig` and `.pen` files** — read and write native Figma files, open supported Pencil documents from the app or OS file browser, copy & paste nodes between apps
 - **AI builds designs** — describe what you want in chat, on Home, or in the prompt at the bottom of the canvas, and 100+ tools create and modify nodes. Bring your own key for the major providers or any compatible endpoint, or let the chat use a coding agent already on your computer
+- **Watch the AI draw** — layers an agent adds trace in one after another, the frames it works in shimmer, and a notice counts what it added and changed once it stops; turn it off in Settings ([Watching the assistant draw](packages/docs/programmable/ai-chat.md#watching-the-assistant-draw))
 - **Goodies** — styles, design systems, scripts, and shaders to start from, one click from the top bar
 - **Built-in browser** — open `http` and `https` pages in a separate desktop window that shares nothing with the editor, import the whole page or one picked element as layers, place a screenshot on the canvas, and let the chat read the page, mark an element, and click, type, or scroll on it with approval
 - **Research on a board** — on a board you already have (Pairdraw does not create new ones), quote the page open in the built-in browser as a sticky note that keeps its address, title, quote, and read time ([Research on a board](packages/docs/user-guide/research.md))
@@ -39,7 +40,7 @@ Pairdraw sends no usage data: no daily ping, analytics, or usage statistics. The
 - **Optional Cloud** — keep documents on your team's own [Pairdraw Cloud](packages/docs/user-guide/pairdraw-cloud.md) server, share them by invitation or link, and edit them together with cursors, presence, and follow mode
 - **Plugins** — install plugin manifests, run a plugin's command from the command palette on the open document, and grant only the permissions it needs; one plugin runs at a time, and network access is refused ([Plugins](packages/docs/user-guide/plugins.md))
 - **Auto layout & CSS Grid** — flex and grid layout via Yoga WASM, with gap, padding, alignment, track sizing
-- **Small desktop app** — Tauri v2 for macOS, Windows, and Linux, with a macOS installer of about 20 MB. Also runs in the browser as a PWA
+- **Small desktop app** — Tauri v2 for macOS, Windows, and Linux, with a macOS installer of about 20 MB; release builds are published for macOS on Apple Silicon so far. Also runs in the browser as a PWA
 
 ## CLI
 

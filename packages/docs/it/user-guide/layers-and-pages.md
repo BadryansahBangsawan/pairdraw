@@ -26,7 +26,7 @@ Il menu contestuale sposta la selezione in un’altra pagina. Al cambio di pagin
 
 ## Slide
 
-Il pannello delle slide elenca i frame di primo livello della pagina come miniature numerate, nell’ordine dei livelli. Fai clic su una slide per mostrare il suo frame sulla tela e trascina una slide — o premi <kbd>Alt</kbd> con una freccia su o giù — per riordinarla. **Esporta le slide** scrive tutte le slide, in ordine, in un unico file PDF o PowerPoint.
+Il pannello delle slide elenca i frame di primo livello della pagina come miniature numerate, nell’ordine dei livelli. Fai clic su una slide per mostrare il suo frame sulla tela e trascina una slide — o premi <kbd>Alt</kbd> con una freccia su o giù — per riordinarla. **Esporta diapositive in PDF** scrive tutte le slide, in ordine, in un unico file PDF.
 
 ## Presenta
 

@@ -45,7 +45,7 @@ In **Visualizza → Preferenze**, attiva **Aggancia alla geometria**, **Aggancia
 
 L’aggancio alla geometria e agli oggetti aiuta ad allineare i punti vettoriali, i livelli spostati e i bordi ridimensionati con la geometria, gli oggetti, le guide e i bordi dei frame vicini. Per questi obiettivi appaiono linee di allineamento; l’arrotondamento alla griglia di pixel non disegna una linea di allineamento per ogni pixel.
 
-Con **Aggancia agli oggetti** attivo, un livello spostato si aggancia anche allo spaziatura uguale: si centra tra i suoi due vicini, o si colloca alla stessa distanza da un vicino quanto quella tra altri due vicini della stessa riga o colonna. Ogni spazio di quella dimensione mostra un indicatore rosa con la sua misura. Il ridimensionamento non si aggancia allo spaziatura.
+Con **Aggancia agli oggetti** attivo, un livello spostato si aggancia anche alla spaziatura uguale: si centra tra i suoi due vicini, o si colloca alla stessa distanza da un vicino quanto quella tra altri due vicini della stessa riga o colonna. Ogni spazio di quella dimensione mostra un indicatore rosa con la sua misura. Il ridimensionamento non si aggancia alla spaziatura.
 
 Con **Aggancia alla griglia di pixel** attivo, i livelli spostati, i bordi ridimensionati e i livelli disegnati atterrano su pixel interi a qualsiasi zoom, anche se sono partiti tra i pixel. Un aggancio a un oggetto o a una guida vince sulla griglia. I movimenti con le frecce e i valori digitati nel pannello delle proprietà conservano le loro frazioni.
 

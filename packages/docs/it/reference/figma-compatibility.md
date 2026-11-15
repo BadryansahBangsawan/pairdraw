@@ -42,7 +42,7 @@ Componenti, insiemi, istanze, varianti, proprietà, sostituzioni, variabili di t
 
 ## Prototipazione
 
-Collegamenti, trigger, azioni, animazioni, sovrapposizioni, scorrimento, flussi, logica condizionale e modalità presentazione non sono ancora disponibili.
+Nella sezione Prototipo i livelli ricevono interazioni al clic o dopo un ritardo che portano a un frame, aprono o chiudono una sovrapposizione o tornano indietro, con transizione istantanea o in dissolvenza; vengono salvate in `.fig` come reazioni di prototipo di Figma e si riproducono sull’area di lavoro ([Riprodurre un prototipo](/user-guide/playing-a-prototype)). Presenta mostra a schermo intero le slide di una pagina. Scorrimento, flussi, logica condizionale con le variabili e le altre animazioni non sono ancora disponibili.
 
 ## Importazione ed esportazione
 
@@ -54,7 +54,7 @@ Importazione/esportazione `.fig`, salvataggio, appunti Figma ed esportazione in 
 
 ## Collaborazione e modalità sviluppo
 
-Commenti, collaborazione P2P con chiamate vocali, Tailwind, server MCP e CLI sono disponibili. La modalità sviluppo e gli snippet di codice sono parziali: design JSX, HTML, Vue e React con CSS o Tailwind, ma niente ispezione con quote né Swift, Kotlin o Compose. Chat del cursore, ramificazioni, Code Connect e Figma per VS Code mancano.
+Commenti, modifica condivisa dei documenti Cloud tramite un server Pairdraw Cloud, Tailwind, server MCP e CLI sono disponibili. La modalità sviluppo e gli snippet di codice sono parziali: design JSX, HTML, Vue e React con CSS o Tailwind, ma niente ispezione con quote né Swift, Kotlin o Compose. Chat del cursore, ramificazioni, Code Connect e Figma per VS Code mancano.
 
 ## Figma Draw
 

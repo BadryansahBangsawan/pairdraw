@@ -9,7 +9,9 @@ Premi <kbd>⌘</kbd><kbd>J</kbd> o <kbd>Ctrl</kbd><kbd>J</kbd>, oppure fai clic 
 
 ## Configurare i modelli
 
-Al primo avvio, la configurazione guidata chiede in cosa deve aiutarti l’IA e cosa usi già: un agente di programmazione come Claude Code, Codex o Gemini CLI nell’app desktop, un account API o un server locale o aziendale. Collega quell’accesso e lo assegna ai ruoli **Design agent** e **Vision**, lasciando invariato ciò che hai configurato a mano. Con OpenRouter puoi accedere invece di incollare una chiave API. Puoi saltarla e riavviarla da **Impostazioni → IA e agenti → Avvia la configurazione guidata**. Per configurare i modelli a mano:
+Al primo avvio Pairdraw non apre alcuna finestra di configurazione. Finché non è configurato nessun modello, cerca un [agente di programmazione](/programmable/coding-agents) già installato su questo computer: prima Claude Code, poi Codex, poi Gemini CLI. La chat dice quale usa e offre **Cambia** per scegliere un altro modello. Se a un agente servono ancora un accesso, il suo programma ACP o il server MCP, la colonna della chat mostra un pulsante per farlo; senza quel clic non viene effettuato alcun accesso né installato nulla. Un modello che hai configurato tu non viene mai sostituito.
+
+Se Pairdraw non trova alcun agente, l’invio di un prompt apre la configurazione guidata. Chiede in cosa deve aiutarti l’IA e cosa usi già: un agente di programmazione come Claude Code, Codex o Gemini CLI nell’app desktop, un account API o un server locale o aziendale. Collega quell’accesso e lo assegna ai ruoli **Design agent** e **Vision**, lasciando invariato ciò che hai configurato a mano. Con OpenRouter puoi accedere invece di incollare una chiave API: l’app desktop torna da OpenRouter attraverso una porta di questo computer, mentre l’app web accede in un popup. Puoi riavviarla in qualsiasi momento da **Impostazioni → Modelli → Avvia la configurazione guidata**. Per configurare i modelli a mano:
 
 1. Apri la chat.
 2. Seleziona l’icona delle impostazioni.

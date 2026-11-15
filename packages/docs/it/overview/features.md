@@ -21,7 +21,7 @@ Pairdraw apre e salva direttamente i file `.fig`. Import ed export usano lo stes
 
 ## Pannello Proprietà
 
-Le schede Design, Codice, AI e Verifica cambiano in base alla selezione.
+Le schede Design, Codice e Verifica cambiano in base alla selezione; la chat AI ha una colonna tutta sua.
 
 - **Aspetto:** opacità, raggio comune o per angolo e visibilità.
 - **Riempimento:** colore solido, gradienti lineare, radiale, angolare e diamante, immagini.
@@ -75,7 +75,7 @@ Le chiamate degli strumenti appaiono in una sequenza comprimibile. Per la verifi
 
 Le pagine `http` e `https` si aprono in una finestra propria dell’app desktop, che non condivide nulla con l’editor, e si possono portare nell’area di lavoro: importa l’intera pagina o un elemento scelto come livelli, oppure inserisci uno screenshot della vista, della pagina o di un elemento. Il chat può leggere la pagina, contrassegnare un elemento nella risposta e fare clic, digitare, premere un tasto, scorrere o attendere su di essa, chiedendo prima conferma quando le impostazioni la chiedono per le modifiche.
 
-Su una board lo stesso browser diventa ricerca: il chat cita la pagina in una nota adesiva che conserva indirizzo, titolo, citazione e ora di lettura ([Ricerca su una board](/user-guide/research)).
+In una board già esistente lo stesso browser diventa ricerca (Pairdraw non offre nuove board): la chat cita la pagina in una nota adesiva che conserva indirizzo, titolo, citazione e ora di lettura ([Ricerca su una board](/user-guide/research)).
 
 ## Server MCP
 
@@ -98,9 +98,9 @@ pairdraw eval design.fig -c "..."     # Figma Plugin API
 
 Tutti i comandi supportano `--json`. Installazione: `npm install -g @pairdraw/cli` oppure `bun add -g @pairdraw/cli`.
 
-## Collaborazione in tempo reale
+## Collaborazione
 
-La connessione peer-to-peer WebRTC non richiede un server centrale. Condividi un link e modifica il documento insieme agli altri partecipanti, con cursori, presenza, modalità di seguito e chiamate vocali con chi è nella stanza.
+Gli agenti AI mostrano sull’area di lavoro i loro cursori e i livelli che modificano, e la vista li segue mentre lavorano. Più persone modificano insieme i documenti Cloud attraverso un server [Pairdraw Cloud](/user-guide/pairdraw-cloud) ospitato in proprio, con cursori, presenza e modalità di seguito. Le stanze live per i documenti locali, l’accesso tramite link e le chiamate vocali non fanno parte di Pairdraw ([Collaborazione](/it/programmable/collaboration)).
 
 ## Desktop e Web
 

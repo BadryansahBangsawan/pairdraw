@@ -8,7 +8,9 @@ const HEADER =
 
 export const AUTHORING_REFERENCE_ARTIFACTS = {
   'skills/pairdraw/references/design-authoring.md': HEADER + JSX_REFERENCE,
-  'packages/docs/reference/design-authoring.md': HEADER + JSX_REFERENCE
+  // VitePress reads `{{ … }}` as a Vue expression, and examples such as `fontFeatures={{ tnum: true }}`
+  // are not valid ones, so the site page keeps the reference out of template compilation.
+  'packages/docs/reference/design-authoring.md': `${HEADER}::: v-pre\n\n${JSX_REFERENCE}\n:::\n`
 }
 
 export async function writeReferences(root: string): Promise<void> {

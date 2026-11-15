@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui'
 import { tv } from 'tailwind-variants'
-import { computed, useTemplateRef, type ComponentPublicInstance } from 'vue'
+import { computed, defineAsyncComponent, useTemplateRef, type ComponentPublicInstance } from 'vue'
 
 import { resolveEditorProfile } from '@pairdraw/core'
 import { formatShortcut } from '@pairdraw/vue/editor/commands'
@@ -36,7 +36,7 @@ import { SHELL_TOP_BAR_ACTIONS_ID } from '@/components/shell/top-bar'
 import SlidesPresentation from '@/components/slides/SlidesPresentation.vue'
 import StatusesDialog from '@/components/statuses/StatusesDialog.vue'
 import EditorToolbar from '@/components/toolbar/EditorToolbar.vue'
-import VariablesDialog from '@/components/variables/VariablesDialog.vue'
+import { useOpenedOnce } from '@/components/ui/overlay/opened'
 import workspaceTheme from '@/theme/editor/workspace'
 import splitterTheme from '@/theme/splitter'
 
@@ -57,6 +57,11 @@ const hasTopBar = !appRuntimeConfig.embed
 const { tab } = defineProps<{ tab: Tab }>()
 const store = tab.store
 provideTabEditorStore(store)
+// The variables window loads with its first opening, not with the document.
+const VariablesDialog = defineAsyncComponent(
+  () => import('@/components/variables/VariablesDialog.vue')
+)
+const variablesOpened = useOpenedOnce(() => store.state.variablesOpen)
 const { isMobile } = useViewportKind()
 const {
   layout: editorLayout,
@@ -275,7 +280,7 @@ const { pending: roomPending } = useRoomActions()
     </div>
   </div>
 
-  <VariablesDialog />
+  <VariablesDialog v-if="variablesOpened" />
   <StatusesDialog />
   <CommentDeleteDialog />
   <ComponentToFrameDialog />

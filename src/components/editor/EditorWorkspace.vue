@@ -36,7 +36,7 @@ import { SHELL_TOP_BAR_ACTIONS_ID } from '@/components/shell/top-bar'
 import SlidesPresentation from '@/components/slides/SlidesPresentation.vue'
 import StatusesDialog from '@/components/statuses/StatusesDialog.vue'
 import EditorToolbar from '@/components/toolbar/EditorToolbar.vue'
-import { useOpenedOnce } from '@/components/ui/overlay/opened'
+import LazyOverlay from '@/components/ui/overlay/LazyOverlay.vue'
 import workspaceTheme from '@/theme/editor/workspace'
 import splitterTheme from '@/theme/splitter'
 
@@ -61,7 +61,6 @@ provideTabEditorStore(store)
 const VariablesDialog = defineAsyncComponent(
   () => import('@/components/variables/VariablesDialog.vue')
 )
-const variablesOpened = useOpenedOnce(() => store.state.variablesOpen)
 const { isMobile } = useViewportKind()
 const {
   layout: editorLayout,
@@ -280,7 +279,7 @@ const { pending: roomPending } = useRoomActions()
     </div>
   </div>
 
-  <VariablesDialog v-if="variablesOpened" />
+  <LazyOverlay :open="store.state.variablesOpen"><VariablesDialog /></LazyOverlay>
   <StatusesDialog />
   <CommentDeleteDialog />
   <ComponentToFrameDialog />

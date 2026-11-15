@@ -98,6 +98,8 @@ async function addKeyInSettings(page: Page, service: 'Unsplash' | 'Pexels', labe
   await expect(page.getByTestId('photo-picker-key-needed')).toContainText(`Connect ${service}`)
   await picker.getByRole('button', { name: 'Open Settings' }).click()
   await expect(picker).toBeHidden()
+  // Settings takes over: the fill popover it was opened from closes rather than floating above it.
+  await expect(page.getByTestId('fill-picker-stock-photo')).toBeHidden()
   const media = page.getByTestId('settings-media-panel')
   await media.getByRole('button', { name: new RegExp(service) }).click()
   await page.getByLabel(label).fill(`${service.toLowerCase()}-key`)

@@ -3,6 +3,7 @@ import { DialogContent, DialogOverlay, DialogPortal, DialogRoot } from 'reka-ui'
 import { computed, useAttrs } from 'vue'
 
 import { useDialogUI, type DialogUI, type DialogVariants } from '@/components/ui/dialog/ui'
+import { useOverlayPortalled } from '@/components/ui/overlay/portal'
 
 defineOptions({ inheritAttrs: false })
 
@@ -28,11 +29,12 @@ const emit = defineEmits<{
 const open = defineModel<boolean>('open', { default: false })
 const attrs = useAttrs()
 const cls = computed(() => useDialogUI(ui, { size, height, surface }))
+const portalled = useOverlayPortalled()
 </script>
 
 <template>
   <DialogRoot v-model:open="open">
-    <DialogPortal>
+    <DialogPortal :disabled="portalled">
       <DialogOverlay data-slot="dialog-overlay" :class="cls.overlay" />
       <DialogContent
         v-bind="attrs"

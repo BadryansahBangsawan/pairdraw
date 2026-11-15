@@ -35,7 +35,7 @@ import RecoveryDialog from '@/components/recovery/RecoveryDialog.vue'
 import SaveToHost from '@/components/save-to/SaveToHost.vue'
 import AppShell from '@/components/shell/AppShell.vue'
 import AppToaster from '@/components/shell/AppToaster.vue'
-import { useOpenedOnce } from '@/components/ui/overlay/opened'
+import LazyOverlay from '@/components/ui/overlay/LazyOverlay.vue'
 import VoiceCallAudio from '@/components/voice-call/VoiceCallAudio.vue'
 import { APP_NAME } from '@/constants'
 
@@ -43,11 +43,9 @@ import { APP_NAME } from '@/constants'
 const SettingsDialog = defineAsyncComponent(
   () => import('@/components/settings/SettingsDialog.vue')
 )
-const settingsOpened = useOpenedOnce(settingsDialogOpen)
 const AISetupDialog = defineAsyncComponent(
   () => import('@/components/settings/ai-setup/AISetupDialog.vue')
 )
-const aiSetupOpened = useOpenedOnce(aiSetupDialogOpen)
 
 const { updates, locale } = useI18n()
 const router = useRouter()
@@ -86,8 +84,8 @@ onMounted(() => {
       <AppShell>
         <RouterView />
       </AppShell>
-      <SettingsDialog v-if="settingsOpened" />
-      <AISetupDialog v-if="aiSetupOpened" />
+      <LazyOverlay :open="settingsDialogOpen"><SettingsDialog /></LazyOverlay>
+      <LazyOverlay :open="aiSetupDialogOpen"><AISetupDialog /></LazyOverlay>
       <CompanionPairDialog />
       <PluginPermissionDialog />
       <SaveToHost />

@@ -1,17 +1,26 @@
 ---
 title: useViewportKind
-description: Reaktive Kennzeichen für mobile und Desktop-Ansicht einer eigenen Editoroberfläche.
+description: Grobe Kennzeichen für mobile und Desktop-Ansicht in responsiven Editoroberflächen lesen.
 ---
 
 # useViewportKind
 
-`useViewportKind()` gibt eine vereinfachte Einordnung der Ansichtsgröße zurück.
+`useViewportKind()` gibt einfache responsive Kennzeichen zurück, die die Editoroberfläche von Pairdraw verwendet.
 
-Verwenden Sie das Composable, wenn nur zwischen mobiler und Desktop-Ansicht unterschieden werden muss, ohne `useBreakpoints()` direkt zu konfigurieren.
+Verwenden Sie das Composable, wenn Ihre Oberfläche eine schlanke Abstraktion über Breakpoints benötigt, statt `useBreakpoints()` direkt einzurichten.
+
+## Verwendung
 
 ```ts
+import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
+
 const { isMobile, isDesktop } = useViewportKind()
 ```
+
+## Rückgabewerte
+
+- `isMobile`
+- `isDesktop`
 
 ## Siehe auch
 

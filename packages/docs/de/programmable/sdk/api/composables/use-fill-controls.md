@@ -1,11 +1,13 @@
 ---
 title: useFillControls
-description: Default value für einen neuen Fill im Properties-Panel.
+description: Composable für Füllungs-Panels mit Standardfüllung.
 ---
 
 # useFillControls
 
-`useFillControls()` stellt den Default fill bereit, den ein Fill-Panel beim Hinzufügen eines neuen Eintrags verwenden kann.
+`useFillControls()` ist das Composable für Füllungseigenschaften, das Oberflächen zum Bearbeiten von Füllungen verwenden.
+
+Es ergänzt einen wiederverwendbaren Standardwert für neue Füllungen.
 
 ## Verwendung
 
@@ -17,9 +19,13 @@ const fills = useFillControls()
 
 ## Rückgabewert
 
+Es stellt bereit:
+
 - `defaultFill`
 
-### Fill hinzufügen
+## Praktische Beispiele
+
+### Neue Füllungszeile hinzufügen
 
 ```ts
 propertyList.add(fills.defaultFill)

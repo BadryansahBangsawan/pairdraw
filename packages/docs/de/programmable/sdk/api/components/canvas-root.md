@@ -1,11 +1,13 @@
 ---
 title: CanvasRoot
-description: Komponente ohne vorgegebenes Erscheinungsbild für den Kontext der Pairdraw-Arbeitsfläche.
+description: Komponente ohne vorgegebenes Erscheinungsbild für die Arbeitsflächen von Pairdraw.
 ---
 
 # CanvasRoot
 
-`CanvasRoot` stellt seinen untergeordneten Komponenten den Kontext der Arbeitsfläche bereit. Das SDK verwaltet die Editoranbindung, die Anwendung Anordnung und Gestaltung.
+`CanvasRoot` ist die strukturelle Komponente für die Arbeitsfläche in `@pairdraw/vue` und stellt ihren untergeordneten Komponenten den Kontext der Arbeitsfläche bereit.
+
+Sie eignet sich, wenn Struktur und Kontext der Arbeitsfläche vom SDK kommen sollen, Anordnung und Gestaltung aber von der Anwendung.
 
 ## Siehe auch
 

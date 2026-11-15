@@ -1,13 +1,13 @@
 ---
 title: LayerTreeRoot
-description: Headless component für Structure und Actions eines Layer tree.
+description: Strukturelle Komponente ohne vorgegebenes Erscheinungsbild für Ebenenbäume.
 ---
 
 # LayerTreeRoot
 
-`LayerTreeRoot` stellt Tree items, Selection, Expanded state und Actions zur Navigation durch die Dokumenthierarchie bereit.
+`LayerTreeRoot` ist die Komponente des SDK, mit der sich ein Ebenenbaum mit eigenem Markup und eigener Gestaltung rendern lässt.
 
-Das SDK verwaltet Daten und Interactions. Die Anwendung rendert eigene Rows und bestimmt deren Styling.
+Sie eignet sich, wenn Baumstruktur und Interaktionen wiederverwendet werden sollen, ohne eine eingebaute Darstellung zu übernehmen. Das SDK verwaltet Daten und Interaktionen; die Anwendung rendert die Zeilen und bestimmt ihre Gestaltung.
 
 ## Siehe auch
 

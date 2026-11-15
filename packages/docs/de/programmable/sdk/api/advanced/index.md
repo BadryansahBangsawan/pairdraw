@@ -16,6 +16,7 @@ Diese APIs dienen engeren Integrationsaufgaben als die zentralen Komponenten und
 ## Auswahlfelder, Variablen, Sprache und Editorzustand
 
 - [useColorVariableBinding](./use-color-variable-binding)
+- [useColorBindingProvider](/programmable/sdk/api/advanced/use-color-binding-provider)
 - [useGradientStops](./use-gradient-stops)
 - [useFontPicker](./use-font-picker)
 - [useOkHCL](./use-okhcl)
@@ -39,3 +40,4 @@ Diese APIs dienen engeren Integrationsaufgaben als die zentralen Komponenten und
 - [useLayerTree](./use-layer-tree)
 - [useToolbar](./use-toolbar)
 - [usePropertyList](./use-property-list)
+- [useNumberField](/programmable/sdk/api/advanced/use-number-field)

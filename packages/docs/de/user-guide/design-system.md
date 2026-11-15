@@ -37,11 +37,11 @@ Das Stylesheet unter der Liste zeigt bereits das Ergebnis: die Light-Werte in `:
 1. Benennen Sie die Seite in `Components` um. Zeichnen Sie einen Frame, drücken Sie <kbd>⇧</kbd><kbd>A</kbd> für Auto-Layout und setzen Sie beide Achsen auf **An Inhalt anpassen**.
 2. Fügen Sie eine Textebene mit dem Text `Button` hinzu, in Inter Medium mit 14 px, und nennen Sie sie `Label`.
 3. Binden Sie die Token. Binden Sie unter **Füllung** mit **Variable anwenden** die Füllung des Frames an `color/primary` und die Füllung des Texts an `color/on-primary`. Zahlenfelder nehmen Variablen auf dieselbe Weise an: Binden Sie den Eckenradius an `radius/control` und den linken und rechten Innenabstand an `space/md`, und setzen Sie den oberen und unteren Innenabstand auf 10.
-4. Drücken Sie <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> (<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>K</kbd>), um daraus eine Komponente zu machen.
+4. Drücken Sie <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> (<kbd>Strg</kbd> + <kbd>Alt</kbd> + <kbd>K</kbd>), um daraus eine Komponente zu machen.
 5. Doppelklicken Sie in die Komponente und wählen Sie die Ebene Label. Erstellen Sie neben ihrem Text unter **Typografie** mit **Variable/Eigenschaft anwenden → Eigenschaft erstellen…** eine Texteigenschaft namens `Label`. Instanzen setzen ihre Beschriftung nun, ohne gelöst zu werden.
 6. Wählen Sie die Komponente und klicken Sie im Kopf des Panels auf **Variante hinzufügen**. Die Komponente wird zu einem Set mit zwei Varianten. Benennen Sie unter **Eigenschaften** die Varianteneigenschaft in `Variant` und ihre Werte in `Primary` und `Secondary` um, und nennen Sie das Set `Button`.
 7. Binden Sie in der Variante Secondary die Füllung an `color/secondary` und die Füllung der Beschriftung an `color/text`.
-8. Wählen Sie das Set, klicken Sie unter **Verhalten** auf **+** und wählen Sie **Button**. Die Vorschau (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>↩</kbd> / <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Enter</kbd>) führt ihn nun als echten Button aus.
+8. Wählen Sie das Set, klicken Sie unter **Verhalten** auf **+** und wählen Sie **Schaltfläche**. Die Vorschau (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>↩</kbd> / <kbd>Strg</kbd> + <kbd>Alt</kbd> + <kbd>Enter</kbd>) führt ihn nun als echten Button aus.
 
 ## 3. Die Card bauen
 
@@ -65,7 +65,7 @@ Die Slot-Einstellungen beschreiben einen Slot, begrenzen, wie viele Ebenen er au
 
 ## 5. Wie es weitergeht
 
-- **Als Bibliothek veröffentlichen.** Öffnen Sie **Elemente → Bibliotheken verwalten → Bibliothek veröffentlichen**, damit andere Dateien Button und Card verwenden und Aktualisierungen übernehmen können, wenn Sie sie ändern ([Komponentenbibliotheken](/user-guide/components#component-libraries)).
+- **Als Bibliothek veröffentlichen.** Öffnen Sie **Elemente → Bibliotheken verwalten → Bibliothek veröffentlichen**, damit andere Dateien Button und Card verwenden und Aktualisierungen übernehmen können, wenn Sie sie ändern ([Komponentenbibliotheken](./components#component-libraries)).
 - **Die Token an den Code übergeben.** `pairdraw tokens design-system.fig` gibt die Variablen als CSS Custom Properties aus, `--format tailwind` als Tailwind-v4-Theme und `--format dtcg --out tokens/` als W3C-Design-Token-Dateien. Der HTML-Export schreibt gebundene Werte als `var()`-Verweise auf dieselben Properties ([Exportieren](./exporting)).
 - **Prüfen.** [Designs prüfen](/user-guide/checking-designs) und `pairdraw lint design-system.fig --fix -o fixed.fig` finden Farben, die einem Token entsprechen, aber nicht daran gebunden sind, und binden sie.
 - **Änderungen verfolgen.** Legen Sie die Datei in Git ab und prüfen Sie Änderungen mit [`pairdraw diff files`](/de/programmable/cli/git).

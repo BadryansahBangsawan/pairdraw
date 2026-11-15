@@ -1,11 +1,13 @@
 ---
 title: PropertyListItem
-description: Ein Eintrag einer Liste von Füllungen, Konturen oder Effekten.
+description: Komponente ohne vorgegebenes Erscheinungsbild für eine einzelne Zeile mit Füllung, Kontur oder Effekt.
 ---
 
 # PropertyListItem
 
-`PropertyListItem` stellt Aktionen zum Ersetzen, teilweisen Aktualisieren, Entfernen und Ändern der Sichtbarkeit eines Eintrags bereit.
+`PropertyListItem` stellt Handler zum Ersetzen, teilweisen Aktualisieren, Entfernen und Ändern der Sichtbarkeit eines Array-Eintrags innerhalb von `PropertyListRoot` bereit.
+
+Verwenden Sie die Komponente für eigene Listenzeilen mit Füllungen, Konturen oder Effekten.
 
 ## Siehe auch
 

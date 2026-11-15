@@ -5,22 +5,29 @@ description: Seiten- und Ebenen-Panels mit PageListRoot, LayerTreeRoot und Auswa
 
 # Navigations-Panels
 
-Ein Seiten-Panel enthält häufig eine Seitenliste und den Ebenenbaum. Das Vue SDK stellt für beide Bereiche Komponenten ohne vorgegebenes Erscheinungsbild bereit.
+Seitenleisten in Pairdraw verbinden meist zwei Aufgaben:
 
-## Seiten
+- Navigation zwischen Seiten;
+- Navigation durch Ebenen.
+
+Das Vue SDK stellt für beide Bereiche Komponenten ohne vorgegebenes Erscheinungsbild bereit.
+
+## Seitennavigation
 
 Verwenden Sie `PageListRoot` oder `usePageList()`.
 
 ```vue
 <PageListRoot v-slot="{ pages, currentPageId, switchPage, addPage }">
-  <button v-for="page in pages" :key="page.id" @click="switchPage(page.id)">
-    {{ page.name }}
-  </button>
-  <button @click="addPage()">Neue Seite</button>
+  <div>
+    <button v-for="page in pages" :key="page.id" @click="switchPage(page.id)">
+      {{ page.name }}
+    </button>
+    <button @click="addPage()">New page</button>
+  </div>
 </PageListRoot>
 ```
 
-## Ebenen
+## Ebenennavigation
 
 Verwenden Sie `LayerTreeRoot`, wenn das SDK Baumstruktur und Verhalten verwalten soll, während die Anwendung Markup und Gestaltung bestimmt.
 
@@ -39,12 +46,15 @@ Verwenden Sie `LayerTreeRoot`, wenn das SDK Baumstruktur und Verhalten verwalten
 
 ## Typische Anordnung
 
-- Seiten oben;
+Ein verbreitetes Layout:
+
+- Seiten oben in der Seitenleiste;
 - Ebenen darunter;
-- Details und direkte Umbenennung in den Zeilenkomponenten.
+- Details oder Steuerelemente zum direkten Umbenennen in Ihren Zeilenkomponenten.
 
 ## Siehe auch
 
 - [usePageList](../api/composables/use-page-list)
 - [PageListRoot](../api/components/page-list-root)
 - [LayerTreeRoot](../api/components/layer-tree-root)
+- [useSelectionState](../api/composables/use-selection-state)

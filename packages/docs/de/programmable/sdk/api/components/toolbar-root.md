@@ -1,11 +1,13 @@
 ---
 title: ToolbarRoot
-description: Komponente ohne vorgegebene Gestaltung für Werkzeuge und aktives Werkzeug.
+description: Strukturelle Komponente ohne vorgegebenes Erscheinungsbild für Werkzeugleisten des Editors.
 ---
 
 # ToolbarRoot
 
-`ToolbarRoot` stellt die verfügbaren Werkzeuge, das aktive Werkzeug und die Aktion zum Wechseln bereit. Die Anwendung rendert eigene Schaltflächen und bestimmt Anordnung und Gestaltung.
+`ToolbarRoot` ist die Werkzeugleisten-Komponente ohne vorgegebenes Erscheinungsbild aus `@pairdraw/vue`. Sie stellt die verfügbaren Werkzeuge, das aktive Werkzeug und die Aktion zum Wechseln bereit.
+
+Sie eignet sich, wenn Struktur und Kontext der Werkzeugleiste wiederverwendet werden sollen, während die Anwendung eigene Schaltflächen rendert und Anordnung und Gestaltung bestimmt.
 
 ## Siehe auch
 

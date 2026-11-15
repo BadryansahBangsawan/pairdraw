@@ -5,9 +5,9 @@ description: Informationen über fehlende Fonts in einem Text object.
 
 # useNodeFontStatus
 
-`useNodeFontStatus(node)` prüft die Fonts des angegebenen Text object und gibt Informationen über nicht geladene Families und Styles zurück.
+`useNodeFontStatus(node)` gibt für eine Getter-Funktion eines Textobjekts Informationen über fehlende Schriften zurück.
 
-Das composable eignet sich für Typography panels und Warnungen über fehlende Fonts.
+Verwenden Sie das Composable in Typografie-Panels und Warnungen, die nicht verfügbare Schriftfamilien anzeigen sollen.
 
 ## Siehe auch
 

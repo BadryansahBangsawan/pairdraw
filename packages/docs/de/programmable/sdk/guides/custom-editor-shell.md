@@ -13,42 +13,55 @@ Eine Pairdraw-Anwendung mit Vue besteht typischerweise aus drei Schichten:
 
 ## Mögliche Anwendungen
 
-Die fertige Pairdraw-App ist nur eine mögliche Oberfläche. Mit dem SDK können beispielsweise ein in ein anderes Produkt eingebetteter Editor, ein internes Asset tool, ein Template editor, eine Annotation UI oder ein spezialisierter AI-assisted editor entwickelt werden.
+Die fertige Pairdraw-App ist nur eine mögliche Oberfläche.
+
+Für einen bestimmten Arbeitsablauf können Sie eine ganz andere entwickeln: einen in ein anderes Produkt eingebetteten Editor, ein internes Werkzeug für Assets, einen Vorlageneditor, eine Oberfläche für Anmerkungen oder eine KI-gestützte Bearbeitungsoberfläche mit eigenen Steuerelementen.
+
+Genau dafür gibt es das SDK.
 
 ## Empfohlene Struktur
 
 Eine typische Oberfläche:
 
 - ruft `provideEditor()` weit oben im Komponentenbaum auf;
-- platziert den Canvas in der Mitte;
-- zeigt Pages und Layers in einem Side panel;
-- zeigt Eigenschaften im gegenüberliegenden Panel;
-- steuert Menüs und Toolbars über composables.
+- platziert die Arbeitsfläche in der Mitte;
+- zeigt die Navigation für Seiten und Ebenen auf einer Seite;
+- zeigt Eigenschaften auf der gegenüberliegenden Seite;
+- steuert Menüs und Werkzeugleisten über Composables.
 
 ## Beispiel
 
 ```vue
 <script setup lang="ts">
-import { createEditor } from '@pairdraw/core'
+import { reactive } from 'vue'
+import { createDefaultEditorState, createEditor } from '@pairdraw/core'
+import { SceneGraph } from '@pairdraw/scene-graph'
 import { provideEditor } from '@pairdraw/vue'
 import { CanvasRoot, CanvasSurface } from '@pairdraw/vue/canvas'
 import { ToolbarRoot } from '@pairdraw/vue/primitives/Toolbar'
 import { PageListRoot } from '@pairdraw/vue/primitives/PageList'
-import { LayerTreeRoot } from '@pairdraw/vue/primitives/LayerTree'
 
-const editor = createEditor({ width: 1440, height: 900 })
+const graph = new SceneGraph()
+const page = graph.getPages()[0]
+if (!page) throw new Error('Expected an initial page')
+
+const editor = createEditor({
+  graph,
+  state: reactive(createDefaultEditorState(page.id)),
+  getViewportSize: () => ({ width: 1440, height: 900 }),
+})
 provideEditor(editor)
 </script>
 
 <template>
   <div class="grid h-screen grid-cols-[240px_1fr_320px] grid-rows-[48px_1fr]">
-    <ToolbarRoot v-slot="{ tools, activeTool, setTool }">
+    <ToolbarRoot v-slot="{ tools, activeTool, actions }">
       <header class="col-span-3 flex items-center gap-2 border-b px-3">
         <button
           v-for="tool in tools"
-          :key="tool.id"
-          :data-active="activeTool === tool.id"
-          @click="setTool(tool.id)"
+          :key="tool.key"
+          :data-active="activeTool === tool.key"
+          @click="actions.setTool(tool.key)"
         >
           {{ tool.label }}
         </button>
@@ -56,13 +69,13 @@ provideEditor(editor)
     </ToolbarRoot>
 
     <aside class="border-r">
-      <PageListRoot v-slot="{ pages, currentPageId, switchPage }">
+      <PageListRoot v-slot="{ pages, currentPageId, actions }">
         <nav>
           <button
             v-for="page in pages"
             :key="page.id"
             :data-active="page.id === currentPageId"
-            @click="switchPage(page.id)"
+            @click="actions.switch(page.id)"
           >
             {{ page.name }}
           </button>
@@ -77,13 +90,15 @@ provideEditor(editor)
     </main>
 
     <aside class="border-l">
-      Properties-Panel
+      Properties panel here
     </aside>
   </div>
 </template>
 ```
 
-## Zuständigkeiten
+Die festen Abmessungen des Viewports oben halten das Beispiel kurz. Geben Sie in einer Oberfläche mit veränderlicher Größe über `getViewportSize` die tatsächliche Größe des Canvas-Containers zurück, ohne umgebende Seitenleisten oder Werkzeugleiste. Installationsvoraussetzungen und Hinweise zur Migration finden Sie unter [Erste Schritte mit dem SDK](../getting-started).
+
+## Warum diese Aufteilung funktioniert
 
 - Das SDK übernimmt die Integration mit dem Editor und wiederverwendbare, gestaltungsunabhängige Logik.
 - Die Anwendung übernimmt Anordnung, Gestaltung und eigene Aktionen.

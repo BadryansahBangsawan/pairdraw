@@ -5,9 +5,9 @@ description: Unterstützte Image files aus einem ClipboardEvent lesen.
 
 # extractImageFilesFromClipboard
 
-`extractImageFilesFromClipboard(event)` gibt die Image files im Clipboard zurück und verwirft nicht unterstützte File types.
+`extractImageFilesFromClipboard(event)` filtert die Dateien in der Zwischenablage auf die Bildtypen, die auch das Ablegen auf der Arbeitsfläche akzeptiert.
 
-Die Function eignet sich zur Implementation von Paste für Images.
+Verwenden Sie die Funktion, um Bilder aus der Zwischenablage einzufügen.
 
 ## Siehe auch
 

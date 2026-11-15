@@ -46,6 +46,23 @@ Auf der Arbeitsfläche zeigt eine Ebene einen Modus, sobald sie auf ihn gesetzt 
 
 ## Variablen verwalten
 
+### Formelwerte
+
+Das Wertfeld einer Zahlenvariable nimmt eine Zahl, eine andere Variable oder eine Formel an. Beginnen Sie, den Namen einer Variable zu tippen, und wählen Sie sie aus der Liste, oder wählen Sie **Variable verwenden**: Sie erscheint als Etikett, und das Feld zeigt, was die Formel ergibt, etwa `= 16px`. Etiketten werden nach ID gespeichert, sodass die Formel nach dem Umbenennen einer Variable weiter funktioniert. Wahr/Falsch-, Text- und Farbvariablen behalten ihren Schalter, ihr Textfeld oder ihre Farbauswahl; wählen Sie daneben **Formel verwenden**, um stattdessen eine Formel zu schreiben.
+
+- Zahlen verwenden `+`, `-`, `*`, `/` und Klammern: `space/base * 4`.
+- Wahr/Falsch-Werte verwenden `and`, `or` und `not` und vergleichen Zahlen mit `==`, `!=`, `<`, `<=`, `>` und `>=`: `viewport > 1024 and not loading`. `==` und `!=` vergleichen auch Text.
+- Text steht in doppelten Anführungszeichen, und `+` verbindet ihn mit anderem Text, einer Zahl oder einem Wahr/Falsch-Wert: `"Hello, " + name`. `text(count)` schreibt eine Zahl wie Figma, mit zwei Nachkommastellen, sofern sie nicht ganzzahlig ist: `3`, `1.50`.
+- `if(condition, then, otherwise)` wählt zwischen zwei Zahlen, Texten, Wahr/Falsch-Werten oder Farben: `if(compact, 8, 16)`, `if(dark, gray/900, #FFFFFF)`. Farben werden als `#RRGGBB` geschrieben, mit Deckkraft als `#RRGGBBAA`.
+- `truthy(value)` ist falsch für `0`, leeren Text und die Wörter `false`, `no` und `off` und wahr für alles andere, so wie Figma sie liest.
+- Unbekannte Variablen, Zirkelbezüge, gemischte Typen und Division durch null werden beim Verlassen des Felds gemeldet, und der gespeicherte Wert bleibt unverändert.
+
+Das Ergebnis folgt den Variablenmodi jeder Ebene und aktualisiert gebundene Ebenen, wenn sich eine verwendete Variable ändert. Formeln rechnen mit gespeicherten Einheiten, Längen also in Pixeln. Die Liste zeigt das Ergebnis jeder Formel; fahren Sie über das Formelsymbol, um die Formel zu lesen.
+
+Im Stylesheet wird eine Zahlenformel als `calc()` über die verwendeten Variablen geschrieben, etwa `calc(var(--spacing-md) * 2 - var(--spacing-base))`, und in jedem Modus erneut deklariert, der eine davon ändert. Formeln mit `if()`, Text oder Wahr/Falsch-Werten haben keine CSS-Form und fehlen im Stylesheet. Ein **CSS-Ausdruck** ersetzt den Wert nur in CSS. Design-Token-Dateien enthalten das Ergebnis jeder Formel, mit der Formel unter `$extensions`. Formeln überstehen Kopieren und Einfügen, Teilen, Rückgängig und das Speichern als `.fig`, und Farb- und Deckkraftausdrücke aus Figma behalten ihre Variablenverweise.
+
+### Variablenliste
+
 Variablen sind nach den Ordnern in ihren Namen gruppiert (`Brand/Primary` erscheint als *Primary* unter *Brand*) und zeigen ihren CSS-Namen sowie einen Wert pro Modus.
 
 - **Variable erstellen:** auf **Variable erstellen** (oder **+**) klicken und einen Typ wählen; die neue Variable wird zur Bearbeitung geöffnet
@@ -62,7 +79,7 @@ Die Auswahl einer Variable bearbeitet:
 - **Name** und **CSS-Name:** den CSS-Namen leer lassen, damit er aus Name und Geltungsbereichen abgeleitet wird, etwa `--color-brand-primary`. Den Namen ohne `--` eingeben; ein Name, den CSS nicht verwenden kann, wird markiert und nicht gespeichert
 - **Einheit:** bei Zahlen `px`, `rem`, `%`, `ms`, `s`, `deg` oder keine; Werte werden in dieser Einheit eingegeben
 - **Wert** oder **Werte:** einer pro Modus; eine Farbe öffnet die Farbauswahl. Die Variablen-Schaltfläche (**Variable verwenden**) neben einem Wert lässt ihn auf eine andere Variable desselben Typs verweisen, ein Alias, der dieser Variable folgt; **Variable lösen** macht daraus wieder den Wert, den er zeigte
-- **CSS-Ausdruck:** bei Zahlen ein Wert wie `clamp(1rem, 4vw, 1.5rem)`, der in CSS anstelle der Zahl geschrieben wird, während die Arbeitsfläche weiterhin die Zahl zeichnet
+- **CSS-Ausdruck:** Wählen Sie bei Zahlen im Menü **⋯** eines Werts **CSS-Ausdruck hinzufügen**, um statt des Werts CSS wie `clamp(1rem, 4vw, var(--spacing-md))` zu schreiben, während die Arbeitsfläche weiterhin den Wert zeichnet. Token-Namen werden zu `var(--name)` ergänzt und als Etiketten angezeigt, die Variablen-Schaltfläche fügt eines ein, und eine nicht geschlossene Funktion, ein unbekanntes Token oder ein Wert, den die Einheit des Tokens nicht annimmt, wird beim Verlassen des Felds gemeldet. Der Ausdruck bleibt erhalten, wenn der Wert zwischen Zahl, Variable und Formel wechselt; entfernt wird er im selben Menü
 - **Geltungsbereiche:** für welche Eigenschaften die Variable angeboten wird
 - **Beschreibung**
 - **Von Veröffentlichung ausblenden:** Dateien, die diese Datei als Bibliothek verwenden, sehen die Variable nicht
@@ -75,8 +92,8 @@ Unten im Dialog wird die aktive Sammlung als CSS-Custom-Properties angezeigt. Di
 
 Variablen und Stile wandern als [W3C-Design-Tokens](https://www.designtokens.org/) zwischen Pairdraw, Figma und Code:
 
-- **Exportieren:** Wähle im Kopiermenü des Stylesheets **Als Design-Tokens exportieren**. Das ZIP enthält je Modus einer Sammlung eine Datei, die Figma als Modus importiert, Text- und Effektstile als Typografie- und Schatten-Tokens sowie einen Resolver, der alles für Werkzeuge wie Style Dictionary zusammenführt
-- **Importieren:** Klicke in der Werkzeugleiste auf **Design-Tokens importieren** und wähle Token-Dateien oder ein ZIP. Dateien aus Figma, ein Resolver mit den Dateien, die er nennt, und Tokens-Studio-Themes funktionieren
+- **Exportieren:** Wählen Sie im Kopiermenü des Stylesheets **Als Design-Tokens exportieren**. Das ZIP enthält je Modus einer Sammlung eine Datei, die Figma als Modus importiert, Text- und Effektstile als Typografie- und Schatten-Tokens sowie einen Resolver, der alles für Werkzeuge wie Style Dictionary zusammenführt
+- **Importieren:** Klicken Sie in der Werkzeugleiste auf **Design-Tokens importieren** und wählen Sie Token-Dateien oder ein ZIP. Dateien aus Figma, ein Resolver mit den Dateien, die er nennt, und Tokens-Studio-Themes funktionieren
 - **Kommandozeile:** `pairdraw tokens app.fig --import theme.css --write` liest die Custom Properties eines lokalen Stylesheets ohne geöffnete App ein; `:root` hält Standardwerte, andere Selektoren werden Modi
 - **Projektordner:** `pairdraw tokens app.fig --project ./app --write` importiert CSS-Variablen aus einem lokalen Projekt, einschließlich eines Tailwind-v4-`@theme` und eines shadcn/ui-Paars aus `:root` und `.dark` als Modi Light und Dark. Eine JavaScript-Konfiguration wie `tailwind.config.js` wird gemeldet und nicht ausgeführt
 - **Ziel wählen:** Bevor sich etwas ändert, zeigt der Dialog jede gefundene Sammlung und jeden Modus und wohin sie gehen: in eine neue Sammlung oder einen neuen Modus, in einen vorhandenen oder nirgendwohin. Variablen und Stile mit demselben Namen werden aktualisiert, der Rest wird hinzugefügt; nichts wird gelöscht. Er zählt, was hinzugefügt, aktualisiert und übersprungen wird, und nennt für jedes übersprungene Token den Grund
@@ -84,7 +101,7 @@ Variablen und Stile wandern als [W3C-Design-Tokens](https://www.designtokens.org
 
 ## Mit einem Stylesheet synchronisieren
 
-Custom Properties in einer CSS-Datei werden zu Variablen, und Variablen gehen zurück in die Datei. Klicke in der Variablen-Werkzeugleiste auf **Mit CSS synchronisieren**:
+Custom Properties in einer CSS-Datei werden zu Variablen, und Variablen gehen zurück in die Datei. Klicken Sie in der Variablen-Werkzeugleiste auf **Mit CSS synchronisieren**:
 
 - **CSS-Variablen importieren…** liest eine `.css`-Datei. `:root`, `html` und Tailwinds `@theme` enthalten die Standardwerte jeder Sammlung; `[data-theme="dark"]`, eine Klasse wie `.dark` und `:root`-Blöcke in `@media`, `@supports` oder `@container` werden zu Modi mit dieser Bedingung. Farben, Längen in `px` oder `rem`, Dauern, Zahlen, Text in Anführungszeichen und Schriftlisten werden zu Variablen, `var(--name)` wird zum Alias, und `calc()` oder `clamp()` behält sein CSS als CSS-Ausdruck. Derselbe Import-Dialog zeigt, wohin jede Sammlung und jeder Modus geht, bevor sich etwas ändert
 - **Aus … übernehmen** liest die verknüpfte Datei erneut und zeigt, was sich geändert hat. Ein aus dem Dokument exportiertes Stylesheet landet wieder auf denselben Variablen und Modi
@@ -97,7 +114,7 @@ Ebenen, die in einem geöffneten Dokument kopiert und in ein anderes eingefügt 
 
 - **Ja, importieren** — fügt die Variablen und Stile hinzu, sodass die eingefügten Ebenen mit ihnen verknüpft bleiben
 - **Unverändert einfügen** — fügt die Ebenen mit den Werten ein, die sie zeigten, ohne Verknüpfung zu Variablen oder Stilen
-- **Vorhandene verwenden** oder **Umbenannt hinzufügen** — hat dieses Dokument bereits eine Sammlung oder einen Stil mit demselben Namen, wählst du pro Zeile: die vorhandene verwenden, wobei Variablen nach Namen zugeordnet und fehlende ergänzt werden, oder die Kopie unter einem neuen Namen wie „Spacing 2“ hinzufügen
+- **Vorhandene verwenden** oder **Umbenannt hinzufügen** — hat dieses Dokument bereits eine Sammlung oder einen Stil mit demselben Namen, wählen Sie pro Zeile: die vorhandene verwenden, wobei Variablen nach Namen zugeordnet und fehlende ergänzt werden, oder die Kopie unter einem neuen Namen wie „Spacing 2“ hinzufügen
 
 Das Einfügen ist ein Schritt: **Rückgängig** entfernt die Ebenen und alles, was dabei hinzugefügt wurde. **Eigenschaften einfügen** verwendet gleichnamige Sammlungen und Stile auf dieselbe Weise.
 

@@ -1,20 +1,24 @@
 ---
 title: PageListRoot
-description: Headless component für Pages und die Actions einer Page list.
+description: Strukturelle Komponente ohne vorgegebenes Erscheinungsbild für Seitenlisten.
 ---
 
 # PageListRoot
 
-`PageListRoot` stellt über seinen Slot bereit:
+`PageListRoot` ist eine strukturelle Komponente ohne vorgegebenes Erscheinungsbild für Seitenlisten.
 
-- Pages;
-- ID der aktuellen Page;
-- Informationen über Separators;
-- Actions zum Erstellen, Wechseln, Umbenennen und Löschen von Pages.
+Sie stellt über ihren Slot bereit:
 
-Die Anwendung rendert die Liste und bestimmt ihr Styling.
+- die Seiten
+- die ID der aktuellen Seite
+- die Erkennung von Trennern
+- Seitenaktionen wie Hinzufügen, Wechseln, Umbenennen und Löschen
 
-## Beispiel
+## Verwendung
+
+Verwenden Sie die Komponente, wenn die Struktur der Seitenliste vom SDK kommen soll, Darstellung und Gestaltung aber von der Anwendung.
+
+## Einfaches Beispiel
 
 ```vue
 <PageListRoot v-slot="{ pages, currentPageId, switchPage }">

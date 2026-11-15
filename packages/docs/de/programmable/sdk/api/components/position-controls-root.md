@@ -1,13 +1,13 @@
 ---
 title: PositionControlsRoot
-description: Komponente ohne vorgegebene Gestaltung für Position, Größe, Ausrichtung und Transformation.
+description: Komponente ohne vorgegebenes Erscheinungsbild für Position, Größe, Ausrichtung und Transformation.
 ---
 
 # PositionControlsRoot
 
-`PositionControlsRoot` stellt Werte und Aktionen für Position, Größe, Drehung, Ausrichtung und Spiegelung der Auswahl bereit.
+`PositionControlsRoot` stellt Werte und Handler für Position, Größe, Drehung, Ausrichtung, Spiegelung und Drehen der aktuellen Auswahl bereit.
 
-Damit lassen sich eigene Felder und Schaltflächen erstellen, ohne die Editorvorgänge erneut anzubinden.
+Damit lassen sich eigene Felder und Schaltflächen für die Position erstellen, ohne die Editoranbindung neu zu implementieren.
 
 ## Siehe auch
 

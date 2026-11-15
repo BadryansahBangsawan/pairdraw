@@ -1,13 +1,13 @@
 ---
 title: TypographyControlsRoot
-description: Komponente ohne vorgegebene Gestaltung für Schrift, Ausrichtung und Textformatierung.
+description: Komponente ohne vorgegebenes Erscheinungsbild für Schrift, Ausrichtung und Textformatierung.
 ---
 
 # TypographyControlsRoot
 
-`TypographyControlsRoot` gibt Zustand und Aktionen aus `useTypography()` über seinen Slot weiter.
+`TypographyControlsRoot` gibt Zustand und Handler aus `useTypography()` als strukturelle Komponente über seinen Slot weiter.
 
-Eigene Steuerelemente können damit die Editoranbindung des SDK wiederverwenden.
+Eigene Steuerelemente für die Typografie können damit das vom SDK verwaltete Verhalten für Schriften und Formatierung wiederverwenden.
 
 ## Siehe auch
 

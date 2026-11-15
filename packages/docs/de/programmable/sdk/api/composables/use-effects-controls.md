@@ -1,17 +1,48 @@
 ---
 title: useEffectsControls
-description: Schatten und Unschärfen im Effekte-Panel verwalten.
+description: Hilfsfunktionen für Schatten, Unschärfen, aufgeklappte Einträge sowie Vorschau und Speichern im Effekte-Panel.
 ---
 
 # useEffectsControls
 
-`useEffectsControls()` stellt Standardwerte, Einstellungen für Schatten und Unschärfen, den Zustand aufgeklappter Einträge, Vorschau beim Ziehen und Speichern des Endwerts bereit.
+`useEffectsControls()` ist das Composable für Effekteigenschaften, das Effekte-Panels verwenden.
+
+Es bietet Hilfsfunktionen für:
+
+- Standardeffekte
+- die unterschiedliche Logik von Schatten und Unschärfen
+- den Zustand aufgeklappter Einträge
+- Vorschau beim Ziehen von Werten
+- Speichern nach Abschluss der Bearbeitung
+- Änderungen von Effekttyp und Farbe
+
+## Verwendung
 
 ```ts
-const { createDefaultEffect, scrubEffect, commitEffect } = useEffectsControls()
+import { useEffectsControls } from '@pairdraw/vue/controls/effects'
 
-scrubEffect(node, index, { radius: 12 })
-commitEffect(node, index, { radius: 12 })
+const effects = useEffectsControls()
+```
+
+## Einfaches Beispiel
+
+```ts
+const { effectOptions, createDefaultEffect, toggleExpand, scrubEffect, commitEffect } = useEffectsControls()
+```
+
+## Praktische Beispiele
+
+### Standardeffekt hinzufügen
+
+```ts
+const effect = effects.createDefaultEffect()
+```
+
+### Änderung beim Ziehen als Vorschau zeigen und anschließend speichern
+
+```ts
+effects.scrubEffect(node, index, { radius: 12 })
+effects.commitEffect(node, index, { radius: 12 })
 ```
 
 ## Siehe auch

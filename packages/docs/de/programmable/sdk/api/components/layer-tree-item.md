@@ -1,13 +1,13 @@
 ---
 title: LayerTreeItem
-description: Ein Item im Layer tree.
+description: Komponente ohne vorgegebenes Erscheinungsbild für eine einzelne Zeile im Ebenenbaum.
 ---
 
 # LayerTreeItem
 
-`LayerTreeItem` repräsentiert eine Row im Layer tree. Sein Default slot erhält State und Actions für Selection, Aufklappen der Children, Visibility, Lock und Inline rename.
+`LayerTreeItem` rendert eine Zeile im Ebenenbaum. Sein Standard-Slot stellt Handler für Auswahl, Aufklappen, Sichtbarkeit, Sperren und Umbenennen bereit.
 
-Die Anwendung kann so eigenes Row markup verwenden und die Interactions des SDK beibehalten.
+Die Anwendung kann so eigenes Markup für die Zeilen verwenden und das Verhalten des Ebenenbaums aus dem SDK beibehalten.
 
 ## Siehe auch
 

@@ -22,10 +22,10 @@ Das SDK bietet:
 ## Einstieg
 
 <SdkCardGroup>
-  <SdkCard title="Erste Schritte" to="/programmable/sdk/getting-started" description="Installieren Sie das Paket, erstellen Sie eine Editor-Instanz und binden Sie die grundlegenden Komponenten ein." />
-  <SdkCard title="Architektur" to="/programmable/sdk/architecture" description="Erfahren Sie, wie Composables, Komponenten und Editor-Kontext zusammenarbeiten." />
-  <SdkCard title="Anleitungen" to="/programmable/sdk/guides/custom-editor-shell" description="Erstellen Sie eigene Editor-Oberflächen, Eigenschaften- und Navigationspanels." />
-  <SdkCard title="API-Referenz" to="/programmable/sdk/api/" description="Informieren Sie sich über Komponenten, Composables und Low-Level-APIs." />
+  <SdkCard title="Erste Schritte" to="/de/programmable/sdk/getting-started" description="Installieren Sie das Paket, erstellen Sie eine Editor-Instanz und binden Sie die grundlegenden Komponenten ein." />
+  <SdkCard title="Architektur" to="/de/programmable/sdk/architecture" description="Erfahren Sie, wie Composables, Komponenten und Editor-Kontext zusammenarbeiten." />
+  <SdkCard title="Anleitungen" to="/de/programmable/sdk/guides/custom-editor-shell" description="Erstellen Sie eigene Editor-Oberflächen, Eigenschaften- und Navigationspanels." />
+  <SdkCard title="API-Referenz" to="/de/programmable/sdk/api/" description="Informieren Sie sich über Komponenten, Composables und Low-Level-APIs." />
 </SdkCardGroup>
 
 ## Wofür das SDK gedacht ist
@@ -34,6 +34,8 @@ Produkte und Teams benötigen unterschiedliche Bearbeitungsoberflächen.
 
 Das kann ein vollständiger Designeditor sein, eine kompakte Arbeitsfläche innerhalb einer anderen Anwendung, ein internes Werkzeug, ein Vorlageneditor oder eine spezialisierte, KI-gestützte Oberfläche.
 
+Das SDK ist die Ebene, die all das ermöglicht.
+
 ## Gestaltungsprinzipien
 
 - **Ohne vorgegebenes Erscheinungsbild:** Das SDK stellt Logik und Struktur bereit, schreibt aber keine Gestaltung der Anwendung vor.
@@ -41,7 +43,7 @@ Das kann ein vollständiger Designeditor sein, eine kompakte Arbeitsfläche inne
 - **Bewusst gestaltete öffentliche API:** Stabile Funktionen werden aus `packages/vue/src/index.ts` exportiert.
 - **Enge Vue-Integration:** Das SDK verbindet Vue mit den Funktionen von `@pairdraw/core`.
 
-## Zwei API-Ebenen
+## Wie das Paket aufgebaut ist
 
 Das SDK besteht aus zwei Hauptebenen:
 
@@ -52,6 +54,6 @@ Benötigen Sie lediglich Zustand und Aktionen, beginnen Sie mit den Composables.
 
 ## API-Bereiche
 
-- [Komponenten](/programmable/sdk/api/components/)
-- [Composables](/programmable/sdk/api/composables/)
-- [Low-Level-APIs](/programmable/sdk/api/advanced/)
+- [Komponenten](/de/programmable/sdk/api/components/)
+- [Composables](/de/programmable/sdk/api/composables/)
+- [Low-Level-APIs](/de/programmable/sdk/api/advanced/)

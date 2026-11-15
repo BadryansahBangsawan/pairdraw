@@ -5,7 +5,7 @@ description: Farben, Typografie, Abstände und wiederkehrende Strukturen in `.fi
 
 # Designs analysieren
 
-Die `analyze`-Befehle prüfen ein vollständiges Dokument im Terminal. Sie zeigen Farben und Textstile, Abweichungen bei Abständen und wiederkehrende Strukturen, die sich als Komponenten eignen könnten.
+Die `analyze`-Befehle prüfen ein ganzes Designsystem im Terminal: Sie finden Unstimmigkeiten, ermitteln die tatsächlich verwendete Farbpalette und zeigen Strukturen, die sich als Komponenten herauslösen ließen.
 
 ## Farben
 
@@ -13,7 +13,14 @@ Die `analyze`-Befehle prüfen ein vollständiges Dokument im Terminal. Sie zeige
 pairdraw analyze colors design.fig
 ```
 
-Zählt jede Farbe und zeigt ein Histogramm.
+Findet jede Farbe in der Datei, zählt ihre Verwendung und zeigt ein Histogramm:
+
+```
+#1d1b20  ██████████████████████████████ 17155×
+#49454f  ██████████████████████████████ 9814×
+#ffffff  ██████████████████████████████ 8620×
+#6750a4  ██████████████████████████████ 3967×
+```
 
 ## Typografie
 
@@ -21,7 +28,7 @@ Zählt jede Farbe und zeigt ein Histogramm.
 pairdraw analyze typography design.fig
 ```
 
-Listet Kombinationen aus Schriftfamilie, Größe und Schnitt mit ihrer Häufigkeit auf.
+Listet jede Kombination aus Schriftfamilie, Größe und Schnitt mit ihrer Häufigkeit auf. So fallen einmalig verwendete Textstile auf, die zusammengeführt werden sollten.
 
 ## Abstände
 
@@ -29,7 +36,7 @@ Listet Kombinationen aus Schriftfamilie, Größe und Schnitt mit ihrer Häufigke
 pairdraw analyze spacing design.fig
 ```
 
-Prüft Abstände und Innenabstände in Rahmen mit automatischer Anordnung. So wird beispielsweise ein einzelner Wert von `13px` zwischen üblichen `8/16/24` sichtbar.
+Prüft Abstände und Innenabstände in Rahmen mit automatischer Anordnung. So werden Unstimmigkeiten in der Abstandsskala sichtbar, beispielsweise ein einzelner Abstand von `13px` zwischen sonst üblichen `8/16/24`.
 
 ## Wiederkehrende Strukturen
 
@@ -37,8 +44,22 @@ Prüft Abstände und Innenabstände in Rahmen mit automatischer Anordnung. So wi
 pairdraw analyze clusters design.fig
 ```
 
-Sucht wiederkehrende Objektstrukturen, die als Komponenten zusammengefasst werden könnten.
+Sucht wiederkehrende Objektstrukturen, die als Komponenten herausgelöst werden könnten:
+
+```
+3771× frame "container" (100% match)
+     size: 40×40, structure: Frame > [Frame]
+
+2982× instance "Checkboxes" (100% match)
+     size: 48×48, structure: Instance > [Frame]
+```
 
 ## JSON-Ausgabe
 
-Alle Analysebefehle unterstützen `--json`. Die Ausgabe kann mit `jq`, in CI oder in Skripten für Designtoken verarbeitet werden.
+Alle Analysebefehle unterstützen `--json` für maschinenlesbare Ausgabe:
+
+```sh
+pairdraw analyze colors design.fig --json
+```
+
+Leiten Sie die Ausgabe an `jq` weiter, verwenden Sie sie in CI-Prüfungen oder in Skripten, die ein Budget für Design-Tokens durchsetzen.

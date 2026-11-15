@@ -1,13 +1,20 @@
 ---
 title: useI18n
-description: Lokalisierte Labels von Pairdraw lesen und das aktive SDK locale ändern.
+description: Lokalisierte Meldungen der Pairdraw-Oberfläche lesen und die aktive Sprache des SDK wechseln.
 ---
 
 # useI18n
 
-`useI18n()` gibt reaktive Translations und Functions zum Wechseln des Locale zurück.
+`useI18n()` ist ein Sammel-Composable aus Kompatibilitätsgründen, das reaktive Übersetzungsgruppen und Funktionen zum Sprachwechsel zurückgibt. Neue Komponenten sollten nur die Composables der Produktbereiche importieren, die sie tatsächlich brauchen, statt alle Kataloge zu abonnieren.
 
-Das composable stellt Labels für Menüs, Commands, Tools, Panels, Pages und Dialogs bereit und kann einen eigenen Locale picker versorgen.
+```ts twoslash
+import { useSettingsMessages, useRenameMessages } from '@pairdraw/vue/i18n'
+
+const settings = useSettingsMessages()
+const rename = useRenameMessages()
+```
+
+Jedes dieser Composables gibt eine reaktive Ref zurück. Im Skript lesen Sie `.value`; in Templates entpackt Vue den Wert automatisch. Wie sich die Sprache ohne das Sammel-Composable wechseln lässt, beschreibt die [Locale API](../advanced/locale-apis).
 
 ## Verwendung
 
@@ -17,20 +24,15 @@ import { useI18n } from '@pairdraw/vue/i18n'
 const { menu, commands, panels, locale, availableLocales, localeLabels, setLocale } = useI18n()
 ```
 
-## Values
+## Rückgabewert
 
-- `menu`
-- `commands`
-- `tools`
-- `panels`
-- `pages`
-- `dialogs`
-- `locale`
-- `availableLocales`
-- `localeLabels`
-- `setLocale`
+Übersetzungs-Refs: `ai`, `automation`, `code`, `collaboration`, `commands`, `common`, `credentials`, `diagnostics`, `editor`, `files`, `fonts`, `media`, `menu`, `pages`, `panels`, `recovery`, `rendering`, `rename`, `settings`, `storage`, `tools`, `updates`, `variables` und `variableTypes`.
 
-## Beispiel
+Sprachsteuerung: `locale`, `availableLocales`, `localeLabels` und `setLocale`.
+
+Die frühere Gruppe `dialogs`, `useDialogMessages()` und `dialogMessages` sind in der Entwicklungsversion nach v0.14.0 entfernt. Verwenden Sie den zuständigen Bereich, etwa `settings`, `rename` oder `recovery`, und passen Sie die entsprechenden Meldungsschlüssel an.
+
+## Einfaches Beispiel
 
 ```vue
 <script setup lang="ts">
@@ -53,8 +55,8 @@ const { menu, locale, availableLocales, localeLabels, setLocale } = useI18n()
 
 ## Hinweise
 
-- Ein Locale change aktualisiert alle Translation groups des SDK reaktiv.
-- Für direkten Zugriff auf den Store exportiert das SDK außerdem ein low-level Locale API.
+- Ein Sprachwechsel aktualisiert alle Meldungsgruppen des SDK reaktiv.
+- Für direkten Zugriff auf den Store exportiert das SDK außerdem einfachere Sprach-Primitive.
 
 ## Siehe auch
 

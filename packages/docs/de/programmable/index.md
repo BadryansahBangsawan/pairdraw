@@ -1,46 +1,60 @@
 ---
 layout: doc
 title: AI und Automatisierung
-description: Pairdraw über AI-Chat, CLI, JSX, MCP und APIs automatisieren.
+description: AI-Chat, CLI, JSX-Renderer, MCP-Server und weitere Automatisierungsschnittstellen auf Basis des Pairdraw-Editorkerns.
 ---
 
 # AI und Automatisierung
 
-Pairdraw behandelt Designdateien als strukturierte Daten. Vorgänge aus dem Editor — Formen erstellen, Füllungen ändern, automatische Anordnung konfigurieren oder Ressourcen exportieren — stehen auch über CLI, AI-Agenten und APIs zur Verfügung.
+Pairdraw behandelt Designdateien als Daten. Jeder Vorgang aus dem Editor — Formen erstellen, Füllungen ändern, automatische Anordnung konfigurieren oder Ressourcen exportieren — steht auch im Terminal, für AI-Agenten und im Code zur Verfügung. Keine Plugins zu installieren, keine API-Schlüssel, keine Warteliste.
 
-Editor und Automatisierung verwenden denselben Kern. Ein Vorgang verhält sich daher gleich, ob er über die Oberfläche, ein Skript oder einen Agenten ausgelöst wird.
+Editor und Automatisierung verwenden denselben Kern. Was sich per Klick erledigen lässt, lässt sich auch per Skript erledigen.
+
+## Die größere Idee
+
+Pairdraw soll nicht nur eine Design-App sein.
+
+Es soll auch ein Baukasten sein: etwas, das Sie in andere Produkte einbetten, mit einer eigenen Oberfläche versehen und für Bearbeitungsabläufe nutzen können, die zu Ihrem eigenen Fachgebiet passen.
+
+Deshalb sind die Automatisierungsschnittstellen wichtig. Die App, die CLI, die AI-Werkzeuge, der JSX-Renderer, der MCP-Server und das SDK bauen alle auf demselben Editor-Kern auf.
 
 ## AI-Chat
 
-Der integrierte Assistent kann mehr als 130 Werkzeuge ausführen. Eine Anweisung kann beispielsweise Schatten mehrerer Schaltflächen ändern, eine Komponente mit dunkler Variante erstellen oder alle Rahmen einer Seite im Maßstab 2× exportieren.
+Der integrierte Assistent hat Zugriff auf mehr als 130 Werkzeuge, die den gesamten Funktionsumfang des Editors abdecken. Beschreiben Sie in natürlicher Sprache, was Sie möchten — „füge allen Buttons einen Schlagschatten von 16 px hinzu“, „erstelle eine Kartenkomponente mit einer Variante für den dunklen Modus“, „exportiere jeden Rahmen auf dieser Seite in 2×“.
 
 [AI-Chat →](./ai-chat)
 
 ## Zusammenarbeit
 
-KI-Agenten zeigen ihre Zeiger auf der Arbeitsfläche, und die Ansicht folgt ihnen, während sie arbeiten. Gemeinsam bearbeitet werden Cloud-Dokumente über den Cloud-Server Ihres Teams, wo Yjs CRDT gleichzeitige Änderungen zusammenführt. Live-Räume für lokale Dokumente gehören nicht zu Pairdraw.
+KI-Agenten zeigen ihre Zeiger auf der Arbeitsfläche, während sie arbeiten, und die Ansicht folgt ihnen. Cloud-Dokumente auf einem selbst betriebenen Pairdraw-Cloud-Server bearbeiten alle, die sie öffnen, live, mit Zeigern, Folgemodus und CRDT-Synchronisierung. Peer-to-Peer-Räume sind in Pairdraw-Builds abgeschaltet.
 
 [Zusammenarbeit →](./collaboration)
 
+## Vue SDK
+
+Bauen Sie Editoren auf Pairdraw-Basis mit demselben Vue SDK, das die App intern verwendet. Das SDK stellt Editor-Kontext, Anbindung der Arbeitsfläche, Auswahlzustand, Befehlsmodelle, Composables für Eigenschaftspanels und Headless-Primitive bereit.
+
+[Vue SDK →](./sdk/)
+
 ## JSX-Renderer
 
-Eine Oberfläche kann deklarativ als JSX beschrieben werden. Ein Aufruf erstellt einen vollständigen Baum aus Rahmen, Text, automatischer Anordnung, Füllungen und Konturen.
+Beschreiben Sie eine Oberfläche als JSX — dieselbe Syntax, die Sprachmodelle bereits aus React kennen. Ein einziger Aufruf kann einen vollständigen Komponentenbaum aus Rahmen, Text, automatischer Anordnung, Füllungen und Konturen erstellen. Kompakt, deklarativ und vergleichbar.
 
-In der Gegenrichtung exportiert Pairdraw eine Auswahl als JSX oder HTML mit Tailwind-Klassen. Das Ergebnis kann als Ausgangspunkt für Umsetzung, Codeprüfung oder einen weiteren AI-Schritt dienen.
+In der Gegenrichtung exportiert Pairdraw jede Auswahl zurück als JSX mit Tailwind-Klassen — nützlich für die Übergabe an die Entwicklung oder um Designs wieder in ein Sprachmodell einzuspeisen.
 
 [JSX-Renderer →](./jsx-renderer)
 
 ## CLI
 
-Die CLI untersucht, exportiert und analysiert `.fig`-Dateien ohne geöffneten Editor. Sie listet Seiten und Objekte auf, sucht Inhalte, extrahiert Designtoken und rendert PNG. Für die Weiterverarbeitung steht eine JSON-Ausgabe zur Verfügung.
+Die CLI untersucht, prüft, exportiert und analysiert Designdokumente ohne geöffneten Editor. Sie listet Seiten auf, sucht Objekte, extrahiert Designtoken, findet Layout- und Barrierefreiheitsprobleme und rendert PNG — alles im Terminal mit maschinenlesbarer JSON-Ausgabe.
 
-Über RPC kann die CLI außerdem den laufenden Desktop-Editor steuern: Dokumente öffnen, speichern und wechseln, Änderungen rückgängig machen, Einstellungen ändern und jedes MCP-Werkzeug aufrufen.
+Über RPC verbindet sich die CLI außerdem mit der laufenden Desktop-App, sodass Sie den Editor skripten können, während Sie ihn benutzen: Dokumente öffnen, speichern und wechseln, Änderungen rückgängig machen, Einstellungen ändern und jedes MCP-Werkzeug aufrufen.
 
 [Dateien untersuchen](./cli/inspecting) · [Export](./cli/exporting) · [Designs analysieren](./cli/analyzing) · [Skripte](./cli/scripting) · [App steuern](/programmable/cli/app-control)
 
 ## MCP-Server
 
-Claude Code, Cursor, Windsurf und andere MCP-Clients können dieselben mehr als 130 Werkzeuge verwenden wie der integrierte AI-Chat. Der Server unterstützt stdio und HTTP mit Sitzungen.
+Verbinden Sie Claude Code, Cursor, Windsurf oder jeden anderen MCP-kompatiblen Client mit Pairdraw. Der Server stellt mehr als 130 Werkzeuge zum Lesen, Erstellen und Ändern von Designs bereit — dieselben, die der integrierte AI-Chat verwendet. Er läuft über stdio oder HTTP mit Sitzungsunterstützung.
 
 [MCP-Server →](/programmable/mcp-server)
 
@@ -64,12 +78,14 @@ Die Webversion nimmt denselben Link aus ihrer Adressleiste an:
 http://localhost:1420/?file=https://raw.githubusercontent.com/BadryansahBangsawan/pairdraw/master/tests/fixtures/pencil_button.pen&node=Button/Large/Default
 ```
 
-Hier ist `file` eine absolute `https:`-URL, die auf `.pen` oder `.fig` endet – die Webversion hat kein Dateisystem, daher werden ein relativer Pfad, eine `http:`-URL oder jede andere Endung mit einer Warnung in der Konsole und sonst ohne Folgen abgelehnt. Die Endung wird dem Pfad der URL entnommen, ein Query-String an der verlinkten Datei ändert also nichts. Ein Fragment wird vor dem Abruf entfernt: Es erreicht den Server nie, daher öffnen `…/hikyo.pen#a` und `…/hikyo.pen#b` einen Tab, nicht zwei. `node` verhält sich genau wie oben: dieselbe Auswahl nach exaktem Namen samt Zoom, derselbe Hinweis, wenn keine Ebene den Namen trägt. Beide Werte sind URL-kodiert, ein literales `+` muss als `%2B` gesendet werden, und bei einem wiederholten Schlüssel gilt der letzte Wert, wie in der Desktop-Anwendung. Der Link wird auf jeder Route verarbeitet, `/share/<room>?file=…` und `/demo?file=…` funktionieren also wie `/?file=…`.
+Hier ist `file` eine absolute `https:`-URL, die auf `.pen` oder `.fig` endet – die Webversion hat kein Dateisystem, daher werden ein relativer Pfad, eine `http:`-URL oder jede andere Endung mit einer Warnung in der Konsole und sonst ohne Folgen abgelehnt. Die Endung wird dem Pfad der URL entnommen, ein Query-String an der verlinkten Datei ändert also nichts. Ein Fragment wird vor dem Abruf entfernt: Es erreicht den Server nie, daher öffnen `…/hikyo.pen#a` und `…/hikyo.pen#b` einen Tab, nicht zwei. `node` verhält sich genau wie oben: dieselbe Auswahl nach exaktem Namen samt Zoom, derselbe Hinweis, wenn keine Ebene den Namen trägt. Beide Werte sind URL-kodiert, ein literales `+` muss als `%2B` gesendet werden, und bei einem wiederholten Schlüssel gilt der letzte Wert, wie in der Desktop-Anwendung. Der Link wird auf jeder Route verarbeitet, `/demo?file=…` funktioniert also wie `/?file=…`.
 
 Der Browser ruft die Datei Cross-Origin ab, der Host muss das daher erlauben: `raw.githubusercontent.com` sendet `Access-Control-Allow-Origin: *` und funktioniert. Die Anfrage enthält keine Zugangsdaten und folgt keinen Weiterleitungen, damit ein `https:`-Link nicht auf einen unverschlüsselten umgeleitet werden kann – eine URL der Form `https://github.com/<owner>/<repo>/raw/...` leitet auf `raw.githubusercontent.com` weiter und wird deshalb abgelehnt; verlinken Sie daher direkt den Raw-Host. `file` und `node` werden über den Router aus der Adressleiste entfernt, sobald sie gelesen wurden – vor dem Abruf und auch dann, wenn der Link abgelehnt wurde –, sodass ein Neuladen das Dokument nicht erneut öffnet und weder eine kopierte URL noch eine spätere Navigation in der App den Link enthält. Ein verlinktes Dokument ist auf 64 MiB begrenzt: Der Body wird beim Streamen mitgezählt, nicht aus `Content-Length` übernommen, und die Anfrage wird abgebrochen, sobald die Grenze überschritten ist; der Link meldet dann, dass die Datei 64 MiB überschreitet. Eine Bereitstellung, die die App mit einer Content-Security-Policy ausliefert, muss den verlinkten Host in `connect-src` erlauben, sonst wird der Abruf blockiert und der Link meldet, dass die Datei nicht geöffnet werden konnte.
 
 Unter macOS gehört das Schema dem installierten App-Bundle, Links erreichen daher einen installierten Build und keinen `tauri dev`-Prozess. Unter Windows und Linux kommt der Link über das Deep-Link-Plugin an, auch wenn die App noch nicht läuft: Der Link wird beim Start vorgemerkt und verarbeitet, sobald der Editor bereit ist; unter Linux reicht der mitgelieferte Desktop-Eintrag den Link über `%U` weiter.
 
-## Offene Plattform
+## Warum offen? {#why-open}
 
-Pairdraw steht unter der MIT-Lizenz, speichert Dokumente lokal und macht seine Vorgänge programmatisch zugänglich. `.fig`-Dateien können untersucht, umgewandelt, in CI verarbeitet oder als Kontext an ein Sprachmodell übergeben werden, ohne an einen bestimmten Hostinganbieter gebunden zu sein.
+Figma ist eine geschlossene Plattform. Sein MCP-Server kann nur lesen. Der Browserzugriff über CDP wurde mit Version 126 abgeschaltet. Designdateien liegen in einem proprietären Format auf fremden Servern. Die Plugin-Entwicklung erfordert eine eigene Laufzeitumgebung mit eingeschränkten APIs.
+
+Pairdraw ist die Alternative: Open Source, MIT-lizenziert, jeder Vorgang skriptbar, Daten lokal gespeichert. Ihre Designdateien gehören Ihnen — untersuchen Sie sie, wandeln Sie sie um, verarbeiten Sie sie in CI oder übergeben Sie sie einem Sprachmodell. Ohne um Erlaubnis zu fragen.

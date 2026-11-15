@@ -1,13 +1,13 @@
 ---
 title: ToolbarItem
-description: Ein Tool innerhalb der Editor toolbar.
+description: Komponente ohne vorgegebenes Erscheinungsbild für ein einzelnes Werkzeug der Werkzeugleiste.
 ---
 
 # ToolbarItem
 
-`ToolbarItem` stellt den Active state eines Tool bereit und behandelt seine Auswahl.
+`ToolbarItem` stellt den aktiven Zustand eines Werkzeugs bereit und behandelt seine Auswahl.
 
-Innerhalb von `ToolbarRoot` kann die Anwendung einen eigenen Button rendern und die gemeinsame Selection logic des SDK verwenden.
+Innerhalb von `ToolbarRoot` kann die Anwendung eigenes Markup für die Schaltfläche rendern und die gemeinsame Werkzeugauswahl des SDK verwenden.
 
 ## Siehe auch
 

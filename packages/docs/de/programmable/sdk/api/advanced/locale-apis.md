@@ -5,7 +5,7 @@ description: Low-level Locale stores und Metadata aus @pairdraw/vue.
 
 # Locale API
 
-Zusätzlich zu `useI18n()` exportiert das Vue SDK ein low-level API für direkten Zugriff auf Locale state:
+Zusätzlich zu `useI18n()` exportiert das Vue SDK Sprach-Grundbausteine auf niedriger Ebene für erweiterte Integrationen:
 
 - `locale`
 - `localeSetting`
@@ -13,7 +13,7 @@ Zusätzlich zu `useI18n()` exportiert das Vue SDK ein low-level API für direkte
 - `AVAILABLE_LOCALES`
 - `LOCALE_LABELS`
 
-Diese Exports eignen sich, wenn Locale Teil eines umfassenderen Application state ist oder die Liste der verfügbaren Sprachen ohne das vollständige `useI18n()` API benötigt wird.
+Verwenden Sie diese Exporte für direkten Zugriff auf die Stores, um den Sprachzustand in eine größere Anwendungsoberfläche einzubinden oder um Sprachmetadaten zu lesen, ohne das vollständige Rückgabeobjekt von `useI18n()` zu abonnieren.
 
 ## Verwendung
 
@@ -23,10 +23,10 @@ import { locale, localeSetting, setLocale, AVAILABLE_LOCALES, LOCALE_LABELS } fr
 
 ## Verhalten
 
-- `locale` enthält das nach Settings und Fallback tatsächlich verwendete Locale.
-- `localeSetting` speichert die Preference des Benutzer.
-- `setLocale()` aktualisiert Preference und aktives Locale.
-- `AVAILABLE_LOCALES` und `LOCALE_LABELS` dienen zum Aufbau eines eigenen Locale picker.
+- `locale` ist der Store mit der tatsächlich aktiven Sprache.
+- `localeSetting` ist der Store mit der gespeicherten Einstellung des Benutzers.
+- `setLocale()` aktualisiert Einstellung und aktive Sprache gemeinsam.
+- `AVAILABLE_LOCALES` und `LOCALE_LABELS` helfen beim Aufbau einer eigenen Sprachauswahl.
 
 ## Siehe auch
 

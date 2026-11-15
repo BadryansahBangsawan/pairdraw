@@ -7,7 +7,20 @@ description: Zeigereingabe, Ziehen, Auswahl, Größenänderung, Drehung und Werk
 
 `useCanvasInput()` verbindet Zeiger- und Mausereignisse mit der Arbeitsfläche des Editors.
 
-Es behandelt Auswahl, Ziehen, Größenänderung, Drehung, Verschieben der Ansicht, Zeichnen mit dem Zeichenstift, Textbearbeitung und Trefferprüfung unter Berücksichtigung der Ansicht.
+Es behandelt unter anderem:
+
+- Auswahl
+- Ziehen
+- Größenänderung
+- Drehung
+- Verschieben der Ansicht
+- Zeichnen mit Zeichenstift und Stift
+- Interaktion bei der Textbearbeitung
+- Trefferprüfung unter Berücksichtigung des aktuellen Bereichs
+
+## Verwendung
+
+Dieses Composable wird gewöhnlich mit `useCanvas()` und den Trefferprüfungsfunktionen des Renderers kombiniert.
 
 ```ts
 useCanvasInput(
@@ -18,6 +31,41 @@ useCanvasInput(
   hitTestFrameTitle,
 )
 ```
+
+## Einfaches Beispiel
+
+```ts
+const canvas = useCanvas(canvasRef, editor)
+
+useCanvasInput(
+  canvasRef,
+  editor,
+  canvas.hitTestSectionTitle,
+  canvas.hitTestComponentLabel,
+  canvas.hitTestFrameTitle,
+)
+```
+
+## Praktische Beispiele
+
+### Zeigerbewegung in Koordinaten der Arbeitsfläche verfolgen
+
+```ts
+useCanvasInput(
+  canvasRef,
+  editor,
+  hitTestSectionTitle,
+  hitTestComponentLabel,
+  hitTestFrameTitle,
+  (cx, cy) => {
+    console.log(cx, cy)
+  },
+)
+```
+
+## Hinweise
+
+Dieses Composable arbeitet auf einer tieferen Ebene als die meiste Panel-Logik. Es eignet sich vor allem für Editor-Shells und Container der Arbeitsfläche.
 
 ## Siehe auch
 

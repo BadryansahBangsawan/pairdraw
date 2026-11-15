@@ -5,9 +5,9 @@ description: Drag and drop von Image files auf den Canvas verarbeiten.
 
 # useCanvasDrop
 
-`useCanvasDrop(canvasRef, editor)` verbindet die Events `dragenter`, `dragover`, `dragleave` und `drop` mit dem Canvas. Unterstützte Image files werden an der passenden Position in das Dokument eingefügt.
+`useCanvasDrop(canvasRef, editor)` verbindet die Ereignisse `dragenter`, `dragover`, `dragleave` und `drop`, sodass auf der Arbeitsfläche abgelegte Bilddateien in die Szene eingefügt werden.
 
-Das composable in einem eigenen Canvas component verwenden, wenn Images per Drag and drop importiert werden sollen.
+Verwenden Sie das Composable in einer eigenen Arbeitsfläche, die das Ablegen von Bildern unterstützen soll.
 
 ## Siehe auch
 

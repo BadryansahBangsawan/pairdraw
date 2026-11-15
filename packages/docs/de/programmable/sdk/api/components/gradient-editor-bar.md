@@ -1,19 +1,19 @@
 ---
 title: GradientEditorBar
-description: Interaktiver Gradient bar zum Auswählen und Ziehen von Stops.
+description: Ziehbare Verlaufsleiste ohne vorgegebenes Erscheinungsbild für Verlaufspunkte.
 ---
 
 # GradientEditorBar
 
-`GradientEditorBar` stellt State und Pointer handlers zum Rendern eines Gradient bar bereit. Der Component behandelt Selection und Drag der Stops.
+`GradientEditorBar` ist die ziehbare Leiste, die innerhalb von Verlaufseditoren verwendet wird. Sie stellt Zustand und Zeigerereignis-Handler zum Rendern der Leiste bereit und übernimmt Auswahl und Ziehen der Verlaufspunkte.
 
 ## Props
 
 <SdkPropsTable
   :rows="[
-    { name: 'stops', type: 'GradientStop[]', description: 'Aktuelle Gradient stops.', required: true },
-    { name: 'activeStopIndex', type: 'number', description: 'Index des Active stop.', required: true },
-    { name: 'barBackground', type: 'string', description: 'CSS background des Bar.', required: true }
+    { name: 'stops', type: 'GradientStop[]', description: 'Aktuelle Verlaufspunkte.', required: true },
+    { name: 'activeStopIndex', type: 'number', description: 'Index des aktiven Verlaufspunkts.', required: true },
+    { name: 'barBackground', type: 'string', description: 'CSS-Hintergrund der Leiste.', required: true }
   ]"
 />
 
@@ -21,10 +21,33 @@ description: Interaktiver Gradient bar zum Auswählen und Ziehen von Stops.
 
 <SdkEventsTable
   :rows="[
-    { name: 'selectStop', payload: 'index: number', description: 'Wird bei Auswahl eines Stop ausgegeben.' },
-    { name: 'dragStop', payload: 'index: number, position: number', description: 'Wird während des Drag eines Stop ausgegeben.' }
+    { name: 'selectStop', payload: 'index: number', description: 'Wird ausgegeben, wenn ein Verlaufspunkt ausgewählt wird.' },
+    { name: 'dragStop', payload: 'index: number, position: number', description: 'Wird ausgegeben, während ein Verlaufspunkt gezogen wird.' }
   ]"
 />
+
+## Slots
+
+<SdkSlotsTable
+  :rows="[
+    { name: 'default', props: 'Zustand der Leiste + Zieh-Handler', description: 'Vollständiger Render-Vertrag der Verlaufsleiste.' }
+  ]"
+/>
+
+### Props des Standard-Slots
+
+```ts
+{
+  stops: GradientStop[]
+  activeStopIndex: number
+  barBackground: string
+  barRef: (el: unknown) => void
+  onStopPointerDown: (index: number, event: PointerEvent) => void
+  onPointerMove: (event: PointerEvent) => void
+  onPointerUp: () => void
+  draggingIndex: number | null
+}
+```
 
 ## Beispiel
 

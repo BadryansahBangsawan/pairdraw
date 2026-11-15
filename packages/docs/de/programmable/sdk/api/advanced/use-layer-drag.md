@@ -5,9 +5,9 @@ description: Drag and drop zum Ändern der Reihenfolge und des Parent von Layers
 
 # useLayerDrag
 
-`useLayerDrag(editor, indentPerLevel?)` verbindet `pragmatic-drag-and-drop` mit Rows des Layer tree und übersetzt Drop instructions in Änderungen an Reihenfolge oder Parent im SceneGraph.
+`useLayerDrag(editor, indentPerLevel?)` verbindet `pragmatic-drag-and-drop` mit den Zeilen des Ebenenbaums und übersetzt Ablageanweisungen in Umsortierungen im Editor.
 
-Das composable wird für einen eigenen Layer tree mit Drag and drop verwendet.
+Verwenden Sie das Composable, um das Ziehen im Ebenenbaum zu erweitern oder durch eine eigene Oberfläche zu ersetzen.
 
 ## Siehe auch
 

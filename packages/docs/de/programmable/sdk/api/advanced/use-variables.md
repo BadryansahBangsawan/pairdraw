@@ -1,12 +1,35 @@
 ---
 title: useVariables
-description: Variablensammlungen, Variablen, Modi und Werte lesen und ändern.
+description: Variablensammlungen, Variablen und Variablenwerte lesen und ändern.
 ---
 
 # useVariables
 
-`useVariables()` stellt Zustand und Aktionen eines Variableneditors auf niedriger Ebene bereit.
+`useVariables()` ist das Variablen-Composable auf niedriger Ebene hinter den übergeordneten Hilfsmitteln des Variableneditors.
 
-Verwenden Sie das Composable für die direkte Kontrolle über Sammlungen, aktive Modi, Filter und CRUD-Vorgänge ohne fertige Tabelle oder Dialog.
+Verwenden Sie das Composable für die direkte Kontrolle über Sammlungen, aktive Modi, Filter und CRUD-Vorgänge, ohne die vollständige Tabellen- und Dialogabstraktion zu übernehmen.
 
-Unter den Rückgabewerten befinden sich `collections`, `activeCollection`, `activeModes`, `variables`, `searchTerm` und Aktionen zum Erstellen, Umbenennen, Löschen und Aktualisieren.
+## Verwendung
+
+```ts
+import { useVariables } from '@pairdraw/vue/variables'
+
+const variables = useVariables()
+```
+
+## Rückgabewerte
+
+- `collections`
+- `activeCollectionId`
+- `activeCollection`
+- `activeModes`
+- `variables`
+- `searchTerm`
+- `setSearchTerm()`
+- `setActiveCollection()`
+- `addCollection()`
+- `renameCollection()`
+- `addVariable()`
+- `removeVariable()`
+- `renameVariable()`
+- `updateVariableValue()`

@@ -127,7 +127,8 @@ export const es: LandingMessages = {
         { title: 'Rellenos con shaders' },
         { title: 'Design tokens W3C' },
         { title: 'Un recorrido guiado por el editor' },
-        { title: 'Listas y estilos para cualquier tramo de texto' }
+        { title: 'Listas y estilos para cualquier tramo de texto' },
+        { title: 'Historial de versiones para documentos de Cloud' }
       ]
     },
     now: {
@@ -170,8 +171,9 @@ export const es: LandingMessages = {
       },
       entries: [
         {
-          title: 'Historial de versiones',
-          detail: 'Instantáneas automáticas, puntos de control con nombre y restauración.'
+          title: 'Retención y auditoría',
+          detail:
+            'Reglas de retención para versiones y un registro de los cambios en documentos y miembros.'
         }
       ],
       cloud: {

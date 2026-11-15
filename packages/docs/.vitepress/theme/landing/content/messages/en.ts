@@ -126,7 +126,8 @@ export const en: LandingMessages = {
         { title: 'Shader fills' },
         { title: 'W3C design tokens' },
         { title: 'A guided tour of the editor' },
-        { title: 'Lists and styles for any range of text' }
+        { title: 'Lists and styles for any range of text' },
+        { title: 'Version history for Cloud documents' }
       ]
     },
     now: {
@@ -166,8 +167,8 @@ export const en: LandingMessages = {
       },
       entries: [
         {
-          title: 'Version history',
-          detail: 'Automatic snapshots, named checkpoints, and restore.'
+          title: 'Retention and audit',
+          detail: 'Retention controls for versions and a record of document and membership changes.'
         }
       ],
       cloud: {

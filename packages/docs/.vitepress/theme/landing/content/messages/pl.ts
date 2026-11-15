@@ -127,7 +127,8 @@ export const pl: LandingMessages = {
         { title: 'Wypełnienia shaderami' },
         { title: 'Design tokeny W3C' },
         { title: 'Przewodnik po edytorze' },
-        { title: 'Listy i style dla dowolnego fragmentu tekstu' }
+        { title: 'Listy i style dla dowolnego fragmentu tekstu' },
+        { title: 'Historia wersji dokumentów w Cloud' }
       ]
     },
     now: {
@@ -170,8 +171,8 @@ export const pl: LandingMessages = {
       },
       entries: [
         {
-          title: 'Historia wersji',
-          detail: 'Automatyczne migawki, nazwane punkty kontrolne i przywracanie.'
+          title: 'Retencja i audyt',
+          detail: 'Zasady przechowywania wersji i rejestr zmian w dokumentach i członkostwach.'
         }
       ],
       cloud: {

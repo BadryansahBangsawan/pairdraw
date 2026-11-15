@@ -127,7 +127,8 @@ export const it: LandingMessages = {
         { title: 'Riempimenti con shader' },
         { title: 'Design token W3C' },
         { title: 'Un tour guidato dell’editor' },
-        { title: 'Elenchi e stili per qualsiasi porzione di testo' }
+        { title: 'Elenchi e stili per qualsiasi porzione di testo' },
+        { title: 'Cronologia delle versioni per i documenti Cloud' }
       ]
     },
     now: {
@@ -170,8 +171,9 @@ export const it: LandingMessages = {
       },
       entries: [
         {
-          title: 'Cronologia delle versioni',
-          detail: 'Istantanee automatiche, checkpoint con nome e ripristino.'
+          title: 'Conservazione e audit',
+          detail:
+            'Regole di conservazione delle versioni e un registro delle modifiche a documenti e membri.'
         }
       ],
       cloud: {

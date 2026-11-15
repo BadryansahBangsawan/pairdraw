@@ -76,7 +76,7 @@ See [AI chat](../programmable/ai-chat), [exporting](../user-guide/exporting), an
 - Support organizations and teams with invitations, viewer/editor/admin roles, link-sharing policies, service accounts, API tokens, and enterprise identity through standard OIDC/SSO integrations.
 - Publish documented backend APIs and webhooks for workspace, document, membership, comment, version, and automation events so Cloud and self-hosted deployments integrate with existing developer workflows.
 - Add workspace organization for projects, folders, templates, search, indexing, and server-generated previews while preserving stable document identity.
-- Add version history with automatic snapshots, named checkpoints, restore, retention controls, and an auditable record of important document and membership changes.
+- Extend Cloud version history, which already keeps autosaves and named versions with restore, with retention controls and an auditable record of important document and membership changes.
 - Provide a durable collaboration relay for deterministic initial sync, presence, reconnects, and restricted-network environments while keeping direct local/P2P workflows available where practical.
 - Publish a production-ready self-hosted deployment for teams that need their own storage, identity, network boundary, data location, and retention policy.
 - Make self-hosting maintainable with guided deployment, upgrades, backups, health monitoring, observability, and documented recovery procedures.

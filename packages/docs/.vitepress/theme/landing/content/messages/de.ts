@@ -127,7 +127,8 @@ export const de: LandingMessages = {
         { title: 'Shader-Füllungen' },
         { title: 'W3C-Design-Tokens' },
         { title: 'Eine geführte Tour durch den Editor' },
-        { title: 'Listen und Stile für beliebige Textbereiche' }
+        { title: 'Listen und Stile für beliebige Textbereiche' },
+        { title: 'Versionsverlauf für Cloud-Dokumente' }
       ]
     },
     now: {
@@ -170,8 +171,9 @@ export const de: LandingMessages = {
       },
       entries: [
         {
-          title: 'Versionsverlauf',
-          detail: 'Automatische Snapshots, benannte Checkpoints und Wiederherstellung.'
+          title: 'Aufbewahrung und Protokoll',
+          detail:
+            'Aufbewahrungsregeln für Versionen und ein Protokoll der Änderungen an Dokumenten und Mitgliedschaften.'
         }
       ],
       cloud: {

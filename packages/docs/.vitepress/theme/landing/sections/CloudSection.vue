@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import IconLibrary from '~icons/lucide/library'
+import IconHistory from '~icons/lucide/history'
 import IconMessageSquare from '~icons/lucide/message-square'
 import IconRefreshCw from '~icons/lucide/refresh-cw'
 import IconShieldCheck from '~icons/lucide/shield-check'
@@ -9,8 +9,8 @@ import { useLandingMessages } from '../content/messages'
 
 const messages = useLandingMessages()
 
-/** One per feature, in the order every locale lists them: sync, sharing, libraries, AI, admin. */
-const ICONS = [IconRefreshCw, IconMessageSquare, IconLibrary, IconSparkles, IconShieldCheck]
+/** One per feature, in the order every locale lists them: sync, sharing, version history, AI, admin. */
+const ICONS = [IconRefreshCw, IconMessageSquare, IconHistory, IconSparkles, IconShieldCheck]
 </script>
 
 <template>

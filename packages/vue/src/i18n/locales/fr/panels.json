@@ -552,8 +552,8 @@
   "photoService": "Service de photos",
   "photoCredit": "Photo de {photographer} sur {service}",
   "photoKeyHeading": "Connecter {service}",
-  "photoKeyDescription": "Les photos {service} sont gratuites. Ajoutez sa clé d'API gratuite dans les Réglages pour les rechercher ici.",
-  "photoKeyAction": "Ouvrir les Réglages",
+  "photoKeyDescription": "Les photos {service} sont gratuites. Ajoutez sa clé d'API gratuite dans les Paramètres pour les rechercher ici.",
+  "photoKeyAction": "Ouvrir les Paramètres",
   "iconResultCount": {
     "one": "{count} résultat",
     "many": "{count} résultats"

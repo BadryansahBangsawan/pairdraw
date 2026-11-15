@@ -38,7 +38,7 @@ Cliquez sur un segment pour le sélectionner. Faites-le glisser pour le courber 
 - <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + double-clic sur un segment retire ses poignées et le rend droit.
 - <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>J</kbd> joint deux extrémités sélectionnées : au même endroit, elles deviennent un seul point ; sinon, un segment droit les relie. Joindre les deux extrémités d’un tracé le ferme et le remplit. Pendant l’édition d’un tracé, ce raccourci n’ouvre pas le chat.
 - <kbd>Option</kbd>/<kbd>Alt</kbd> + glisser fait glisser une copie des points ou segments sélectionnés. La copie d’un point isolé reste reliée à lui.
-- Les flèches déplacent les points sélectionnés de la distance définie dans Réglages → Éditeur, et avec <kbd>Shift</kbd> de la grande distance.
+- Les flèches déplacent les points sélectionnés de la distance définie dans Paramètres → Éditeur, et avec <kbd>Shift</kbd> de la grande distance.
 - <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + glisser sur un segment le courbe pour que l’endroit saisi suive le pointeur. Une extrémité lisse reste lisse et son autre poignée tourne avec elle. Avec <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>Option</kbd>/<kbd>Alt</kbd>, les poignées des segments voisins ne bougent pas et les extrémités deviennent des angles.
 - Quand deux points ou segments sont sélectionnés, un cadre de transformation les entoure. Faites glisser un coin ou un bord pour mettre les points à l’échelle depuis le côté opposé ; avec <kbd>Shift</kbd> les proportions sont conservées, avec <kbd>Option</kbd>/<kbd>Alt</kbd> l’échelle part du centre. Faites glisser juste à l’extérieur d’un coin pour les faire pivoter autour du centre du cadre, par pas de 15° avec <kbd>Shift</kbd>. Chaque transformation s’annule en une seule étape.
 

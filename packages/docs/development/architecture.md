@@ -22,19 +22,20 @@ graph TB
                 Kiwi --- SVG[SVG export]
             end
         end
-        MCP["MCP Server (138 tools, stdio+HTTP)"]
-        Collab["P2P Collab (Trystero + Yjs)"]
+        MCP["MCP Server (139 tools, stdio+HTTP)"]
+        Collab["Collaboration (Yjs: Cloud relay, agent presence)"]
     end
 ```
 
 ## Editor Layout
 
-The UI follows Figma's UI3 layout — toolbar at the bottom, navigation on the left, properties on the right:
+The editor opens on the canvas alone, laid out as pen.dev's, with one top bar above it for the menus, document tabs, and the open document's actions:
 
-- **Navigation panel (left)** — Layers tree, pages panel
-- **Canvas (center)** — Infinite canvas with CanvasKit rendering, zoom/pan
-- **Properties panel (right)** — Context-sensitive sections: Appearance, Fill, Stroke, Typography, Layout, Position
-- **Toolbar (bottom)** — Tool selection: Select, Frame, Section, Rectangle, Ellipse, Line, Text, Pen, Hand
+- **Toolbar (canvas left)** — Tool selection: Select, Frame, Section, Rectangle, Ellipse, Line, Text, Pen, Hand, and the others the editor profile offers, with the layers panel's toggle above them
+- **Canvas (center)** — Infinite canvas with CanvasKit rendering, zoom/pan; the zoom sits in its bottom right corner and a prompt at its bottom sends what you write to the AI chat
+- **Layers panel (left)** — Layers tree and pages, opened from its toggle
+- **Properties panel (right)** — Context-sensitive sections such as Appearance, Fill, Stroke, Typography, Layout, Position, and Prototype; it comes with a selection and leaves with it unless opened from its toggle
+- **AI chat (right column)** — A resizable column beside the properties panel, opened with ⌘J or the top bar
 
 ## Components
 
@@ -101,19 +102,19 @@ Inverse-command pattern. Before applying any change, affected fields are snapsho
 
 Figma-compatible bidirectional clipboard. Encodes/decodes Kiwi binary (same format as .fig files) via native browser copy/paste events. Handles vector path scaling, instance children, component set detection, and override application.
 
-### P2P Collaboration
+### Collaboration
 
-Real-time peer-to-peer collaboration via Trystero (WebRTC) + Yjs CRDT. No server relay — signaling over MQTT public brokers, STUN/TURN for NAT traversal. Awareness protocol provides live cursors, selections, and presence. Local persistence via y-indexeddb.
+Yjs CRDT documents with the awareness protocol for live cursors, selections, and presence. Cloud documents sync through their server's relay ([Cloud Architecture](./cloud#live-collaboration)), and AI agents publish their cursors through the same presence layer. Peer-to-peer rooms over Trystero (WebRTC, signaling over MQTT public brokers, local persistence via y-indexeddb) stay in the code but are off in Pairdraw builds (`COLLABORATION_INCLUDED` in `src/constants.ts`).
 
 ### CLI-to-App RPC Bridge
 
-When the desktop app is running, CLI commands connect to it via WebSocket instead of requiring a .fig file. The automation server runs on `127.0.0.1:7600` (HTTP) and `127.0.0.1:7601` (WebSocket). Commands execute against the live editor state, enabling automation scripts and AI agents to interact with the running app.
+When the app is running, CLI commands given no file send RPC requests (`POST /rpc`) to its MCP server instead of reading a document. The CLI finds the server through its discovery file and prefers a private Unix domain socket on macOS and Linux, falling back to `127.0.0.1:7600`; the app is connected to that server over WebSocket. Commands execute against the live editor state, enabling automation scripts and AI agents to interact with the running app.
 
 ## What's Next
 
 ### Full figma-use Tool Set
 
-The MCP server currently exposes 138 tools; the reference implementation in [figma-use](https://github.com/dannote/figma-use) has 118. Tools figma-use has and Pairdraw lacks cover advanced layout constraints, prototype connections, advanced component property editing, and bulk document operations.
+The MCP server currently exposes 139 tools; the reference implementation in [figma-use](https://github.com/dannote/figma-use) has 118. Tools figma-use has and Pairdraw lacks cover advanced layout constraints, prototype connections, advanced component property editing, and bulk document operations.
 
 ### CI Design Tooling
 
@@ -121,7 +122,7 @@ The headless CLI already supports `analyze colors/typography/spacing/clusters`. 
 
 ### Prototyping
 
-Preview already runs components with behaviours as live controls. Next: reactions and variables that let controls drive the rest of a design, frame-to-frame transitions, interaction triggers, and overlays.
+Preview already runs components with behaviours as live controls, and the Prototype section plays click and after-delay interactions that navigate between frames, open and close overlays, or go back, with instant or dissolve transitions, stored as Figma prototype reactions. Next: variables that let controls drive the rest of a design, and more triggers and transitions.
 
 ### Windows Code Signing
 

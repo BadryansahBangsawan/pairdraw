@@ -10,13 +10,13 @@
 | **Styling** | Tailwind CSS 4 | Utility-first, fast iteration, dark theme |
 | **Layout** | Yoga WASM | CSS flexbox and grid engine from Meta, battle-tested in React Native |
 | **File Format** | Kiwi binary + Zstd | Figma's own format — compact, fast parsing, .fig compatible |
-| **Collaboration** | Trystero + Yjs | P2P WebRTC via MQTT signaling, CRDT sync, y-indexeddb persistence |
+| **Collaboration** | Yjs (+ Trystero) | CRDT sync and presence; Cloud documents sync through their server's relay, and the Trystero peer-to-peer rooms are off in Pairdraw builds |
 | **Color** | culori | Color space conversions (HSV, RGB, hex) |
-| **AI/MCP** | MCP SDK + Hono | 90+ tools for AI coding tools, stdio + HTTP transports |
+| **AI/MCP** | MCP SDK + Hono | 139 tools for AI coding tools, stdio + HTTP transports |
 | **JSX Transform** | Sucrase | Lightweight (201 KB) JSX → JS, synchronous, browser-compatible |
 | **Events** | nanoevents | 108 bytes, typed event emitter for SceneGraph mutations |
 | **Desktop** | Tauri v2 | ~5MB native app (vs Electron's ~100MB), Rust backend |
-| **Build** | Vite 7 | Fast HMR, native ES modules |
+| **Build** | Vite 8 | Fast HMR, native ES modules |
 | **Testing** | Playwright + bun:test | Visual regression (E2E) + fast unit tests |
 | **Linting** | oxlint | Rust-based, orders of magnitude faster than ESLint |
 | **Formatting** | oxfmt | Rust-based formatter |
@@ -27,11 +27,11 @@
 ```json
 {
   "canvaskit-wasm": "^0.41.1",
-  "vue": "^3.5.41",
+  "vue": "^3.5.43",
   "yoga-layout": "npm:@open-pencil/yoga-layout@3.3.0-grid.3",
   "nanoevents": "^9.1.0",
   "sucrase": "^3.35.1",
-  "reka-ui": "^2.10.3",
+  "reka-ui": "^2.10.5",
   "tailwindcss": "^4.3.3",
   "culori": "^4.0.2",
   "@hpcc-js/wasm-zstd": "^1.16.2",

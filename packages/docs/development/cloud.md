@@ -93,7 +93,7 @@ keeps on its own, and versions someone named (`document_version`, one per revisi
   editor keeps the address bar on the active tab's document and the version it shows when the
   document is on the server serving the editor, and a version's Copy link builds the address on the
   document's server. The address carries no secret: opening it signs in to the server at that
-  address, one the app already knows or the official one, and the server's access rules decide. Fetching a version returns the version with its download, so
+  address, one the app already knows or the hosted one a build names, and the server's access rules decide. Fetching a version returns the version with its download, so
   a link can show it without paging the history.
 - The cleanup worker compacts saves that are neither current nor a version once they are a day old,
   a batch at a time, and returns the bytes of files nothing else uses to the workspace's usage. A
@@ -374,7 +374,7 @@ forwards completions to one upstream with one key, and keeps one usage row per s
 workspace's monthly spend is the sum of its rows. It reads usage from the upstream's answer, asking
 streams for it with `stream_options.include_usage`, and keeps reading after the editor disconnects
 so a request is still charged. It admits a request while credits remain and charges it afterwards,
-so in-flight requests can overdraw an allowance; the official service reserves credits instead. An
+so in-flight requests can overdraw an allowance; a service that must not overdraw reserves credits instead. An
 answer ends only after its charge is recorded, so the wallet the editor reads once a reply ends
 includes it, and a refusal for lack of credits says when the allowance renews. It forwards only
 chat completion fields, so a router's fallback or provider fields cannot run a model outside the
@@ -522,7 +522,7 @@ and a version would still have to become a file to open, restore, or duplicate.
 
 **2026-10 · AI services verify Cloud-signed tokens instead of calling Cloud.** A service checks a
 token against a published key on every model request, with no round-trip to Cloud or its database,
-and the same check serves the official service and self-hosted ones. Entitlements are read when a
+and the same check serves every service, hosted or self-hosted. Entitlements are read when a
 token is signed, so a plan change reaches the service within one token lifetime; asking Cloud on
 every request would have made model calls depend on Cloud's database. Entitlements are pushed to
 Cloud rather than read from billing, so documents keep opening when billing is down.
@@ -575,3 +575,10 @@ same rule.
 `cloud_` prefix the rest never had; they lose it, and only a name Better Auth already uses gets a
 qualifier (`api_rate_limit` beside its `rate_limit`). Migrations that shipped before the rename
 type their queries against the names they ran with, so their SQL never changes.
+
+**2026-11 · Pairdraw has no hosted Cloud, so a build names one or offers none.** Pairdraw runs no
+official server and no waitlist: the waitlist card and its Worker are gone, and Settings → Cloud,
+the connect dialog, and invitations ask for a self-hosted server's address. A build that sets
+`VITE_PAIRDRAW_OFFICIAL_CLOUD_URL` offers that server first and asks it for its `listing` as before;
+a build that sets none, the default, contacts no server at startup and needs no listing. This
+supersedes the waitlist in Settings → Cloud and the entries that assumed an official server.

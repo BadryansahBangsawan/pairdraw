@@ -18,42 +18,31 @@ Pairdraw is moving toward production-grade Figma compatibility while keeping des
 
 ## Recently delivered
 
-v0.15.0 and v0.15.1 shipped work that earlier versions of this roadmap listed as in development:
+v0.16.0 shipped work that earlier versions of this roadmap listed as in development:
 
-- Editable ruler guides, snapping to geometry and guides, and Option/Alt distance measurements.
-- Multidimensional component variants and published component libraries with revision review and linked-instance updates.
-- Local recovery of unsaved documents, saved AI conversations, and CLI font diagnostics.
-- Opt-in browser WebMCP access, separate controls for the local MCP server and remote connections, and per-tool permissions.
-- `pairdraw://` and web links that open a document and select a layer.
+- Comments pinned to layers, saved in the `.fig` file and readable by scripts, the AI chat, and MCP clients.
+- AI agents shown on the canvas with labelled cursors, and follow mode for people and agents.
+- Slots, component properties and variants edited from the properties panel, and behaviours that make components run as Reka UI controls in Preview.
+- Shader fills, a Lint tab with canvas markers and one-click fixes, variable modes on layers and pages, a pencil tool, and Vue and React code of the selection in the Code tab.
+- Variables modelled as design tokens, AI chat turns that can be reverted and edited, visual diff and patch tools, Storybook, HTML, and Tailwind JSX export, and a faster `.fig` reader that saves only what an edit changed.
 
 ### Current development version
 
-Since v0.15.1, the development branch adds:
+Since v0.16.0, the development branch adds:
 
-- Behaviours and preview mode: components that run as Reka UI controls, with a Controls page in the demo and Storybook controls for them.
-- Variables modelled as design tokens, edited as tokens, imported and exported as W3C design tokens, written as a CSS token stylesheet, and used by name in exported code.
-- Live design checks: a Lint panel with canvas markers and one-click fixes.
-- AI agents shown on the canvas and to collaborators, with follow mode for people and agents, per-page presence, and MCP agents in rooms.
-- AI chat turns that can be reverted, regenerated, and edited, with tool calls summarised by what they changed and a thinking level per message.
-- The Code tab linked to canvas layers both ways, and visual diff and patch tools, including `pairdraw diff`.
-- Collaboration rooms that sync layer trees as a CRDT and open in their own tab.
-- Slots, progressive canvas previews while an AI provider streams JSX, Storybook export, HTML and Tailwind JSX export, and a faster occurrence-scoped `.fig` reader with wider override and variable export.
-- Comments pinned to layers and voice calls in shared rooms, with collaborators watching the AI chat's streamed JSX as it builds.
-- Vue and React components of the selection in the Code tab, with variants as props and Reka UI or Radix behaviour.
-- SVG and HTML imported as editable layers, with HTML and CSS laid out as a browser lays them out.
-- Shader fills from the open-source `shaders` library, on-canvas gradient and corner-radius handles, multi-selection editing, and accent colours with a customizable toolbar.
+- The editor and Home laid out as pen.dev's: the canvas alone with tools at its left and a prompt at its bottom, the AI chat in its own column, Home choosing what to create above the prompt, the dark theme by default, Goodies, and Find layers.
+- Coding agents found on the computer and used when no model is set up, a one-button Connect, and `pairdraw-connect`, which runs them for the web app.
+- Script layers that run JavaScript in a sandbox, shader code for fills and effects, mesh gradients, and fonts that travel inside the document.
+- A Prototype section with click and after-delay interactions played in place and kept as Figma prototype reactions, and a Slides panel with Present.
+- The Scale and Zoom tools, image cropping, text links, equal-spacing snapping, and a deeper vector edit mode.
+- Image generation, background removal, and SVG generation with your own keys; HTML import and export for agents; CSS custom properties imported as variables and linked stylesheets.
+- Embed mode, web capture with a Chrome extension, a built-in browser in the desktop app, plugins with granted capabilities, and a VS Code extension.
+- The Pairdraw Basics library, `.pen` export and `.pen` libraries, and the CLI's `shell`, `models`, `agent`, `tokens --import`, and `libraries seed`.
+- Cloud snapshot links, a Can comment role, and public profiles; drafts and recovery of unsaved changes.
 
-These changes are not part of v0.15.1; they ship with the next release.
+Pairdraw builds also leave out peer-to-peer rooms, new boards, PowerPoint and draw.io export in the app, and every usage ping or statistic.
 
 See [AI chat](../programmable/ai-chat), [exporting](../user-guide/exporting), and [components and libraries](../user-guide/components).
-
-### In development
-
-Work with open pull requests. It may change before it merges:
-
-- Storybook stories generated as Reka UI components for Vue and Radix UI components for React.
-- Component authoring: variant editing and canvas selection inside components.
-- The Pairdraw Cloud foundation.
 
 ## Near-term work
 
@@ -116,7 +105,7 @@ Work with open pull requests. It may change before it merges:
 - Improve deterministic CLI/MCP export and comparison tools for CI.
 - Add more design linting and migration helpers for batch `.fig` and `.pen` workflows.
 - Make `.pen` a first-class editable save target across app, CLI, MCP, and SDK workflows rather than an import-only or automation-specific format.
-- Extend HTML, CSS, Tailwind, and JSX support from editable import and web capture (the Chrome extension, the capturer SDK, and plain web HTML paste; `programmable/web-capture.md`) toward URL-based capture in an in-app browser, direct JSX paste/edit workflows, and component-aware design↔code updates that preserve intentional code structure instead of regenerating whole files.
+- Extend HTML, CSS, Tailwind, and JSX support from editable import and web capture (the Chrome extension, the capturer SDK, plain web HTML paste, and the desktop app's built-in browser; `programmable/web-capture.md`) toward direct JSX paste/edit workflows, and component-aware design↔code updates that preserve intentional code structure instead of regenerating whole files.
 - Provide an adapter contract for additional design sources such as Stitch and Pixso, prioritizing formats with documented or testable semantics over brittle UI scraping.
 - Package desktop-side MCP integration so local agent workflows do not require global installs.
 
@@ -129,7 +118,7 @@ Work with open pull requests. It may change before it merges:
 ### Interactive shader layers
 
 - Add Unicorn Studio-style shader scenes as first-class design layers: animated gradients, particles, noise fields, metaballs, lighting, displacement, and pointer-reactive backgrounds.
-- Provide a preset-first editor for common generative visuals before exposing raw shader code.
+- Keep the preset gallery in front for common generative visuals, beside the GLSL editor that shader fills and effects already offer.
 - Support timeline and interaction inputs such as time, pointer position, scroll, layer bounds, colors, variables, and imported image textures.
 - Render shader layers through CanvasKit/WebGL while keeping deterministic raster export for PNG/JPG/WEBP and thumbnails.
 - Store shader layer configuration in Pairdraw documents and export graceful fallbacks when a target format cannot preserve the live effect.
@@ -140,16 +129,15 @@ Work with open pull requests. It may change before it merges:
 
 - Expand the documented Vue SDK and core package platform with complete example applications for custom editor shells, embedded design surfaces, and automation-specific UIs.
 - Provide maintained examples for read-only previews, editable canvases, design review surfaces, and agent-controlled editors.
-- Ship an official VS Code/Cursor extension ([#81](https://github.com/BadryansahBangsawan/pairdraw/issues/81)) for previewing and opening `.fig`/`.pen` documents, connecting to the running editor, invoking CLI/MCP workflows, handing selections between code and canvas, and navigating between generated code and design nodes. Reuse the app, SDK, and automation bridge rather than implementing a second editor inside the extension.
+- Grow the VS Code extension (`extensions/vscode`, [VS Code](../programmable/vscode)), which opens `.fig` and `.pen` documents in a custom editor, toward connecting to the running editor, invoking CLI/MCP workflows, handing selections between code and canvas, and navigating between generated code and design nodes. Reuse the app, SDK, and automation bridge rather than implementing a second editor inside the extension.
 - Define public API stability and migration expectations across the reusable npm packages.
 - Keep the renderer, editor core, and tool registry framework-agnostic enough for headless and embedded use.
 
 ### Product depth
 
-- Prototyping: frame connections, triggers, overlays, transitions, preview mode, and AI/JSX-authorable interaction definitions.
+- Prototyping: flows and starting points, more triggers and actions, smart animate and easing, scroll-to, and AI/JSX-authorable interaction definitions on top of the Prototype section.
 - Motion: reusable code-authored animation presets, timelines, easing, and deterministic playback/export that compose with prototype interactions and shader inputs.
 - Tables and data grids: structured rows, columns, headers, resizing, merged cells, and normal scene nodes inside cells instead of drawing tables as unrelated rectangles.
-- Comments: pins, threads, resolution state, and collaboration-aware display.
 - Extend shared libraries beyond the existing component publish/consume/update workflow to broader style management and governance.
 - Platform asset libraries: use licensed system-native and third-party icon sources, including SF Symbols where platform and redistribution rules allow, alongside the existing Iconify/Lucide workflow.
 - Figma Slides (`.deck`) interoperability: import/export, slide editing, presentation, speaker notes, and filmstrip workflows. This ranks below core Figma Design fidelity, reliability, Cloud/self-hosting, and international-text work.
@@ -249,18 +237,18 @@ Figma's design documentation groups features into these areas:
 | Variables: collections/modes/aliases                 |     ✅ |      ◐ |       ◐ |                ✅ |      ✅ | Color/number/string/boolean model exists; inspector coverage is still incomplete.                                                                                                                                                                  |
 | Variables bound to fills/strokes                     |     ✅ |     ✅ |      ✅ |                ✅ |      ✅ | Common color bindings render and edit.                                                                                                                                                                                                             |
 | Variables bound to text/layout/visibility/effects    |      ◐ |      ◐ |       ◐ |                 ◐ |      ✅ | Text content and numeric layout bindings resolve on read; colour, numeric, text, font family, and visibility bindings also re-resolve when a variable or mode changes. Effect bindings are not modelled.                                                                                                                                                                                                         |
-| Variables in prototypes / expressions / conditionals |      — |      — |       — |                 — |       — | Depends on prototype system, which is not implemented.                                                                                                                                                                                             |
+| Variables in prototypes / expressions / conditionals |      — |      — |       — |                 — |       — | The prototype model has no variable actions or conditionals yet.                                                                                                                                                                                   |
 | Libraries / publish / update review                  |      ↩ |      — |       ◐ |                 ↩ |       — | Figma library metadata survives round-trip. Pairdraw supports its own component-library publishing, catalogs, revision previews, and linked-instance updates, not synchronization with Figma-hosted libraries.                                                                                                                                                                                         |
 | Prototype flows / starting points                    |      — |      — |       — |                 — |       — | Not modeled.                                                                                                                                                                                                                                       |
-| Prototype hotspots / triggers / actions              |      — |      — |       — |                 — |       — | Not modeled.                                                                                                                                                                                                                                       |
-| Prototype overlays / scroll-to                       |      — |      — |       — |                 — |       — | Not modeled.                                                                                                                                                                                                                                       |
-| Smart animate / easing / spring / duration           |      — |      — |       — |                 — |       — | Not modeled.                                                                                                                                                                                                                                       |
+| Prototype hotspots / triggers / actions              |      ◐ |      ◐ |       ◐ |                ✅ |       — | Click and after-delay triggers that navigate, open or close an overlay, or go back are edited in the Prototype section, drawn as connections, and played; fields the model does not read survive a round trip.                                    |
+| Prototype overlays / scroll-to                       |      ◐ |      ◐ |       ◐ |                ✅ |       — | Overlays open at a position and close; scroll-to is not modeled.                                                                                                                                                                                   |
+| Smart animate / easing / spring / duration           |      ↩ |      ◐ |       ◐ |                 ↩ |       — | Instant and dissolve transitions with a duration play; easing and smart-animate fields survive a round trip.                                                                                                                                       |
 | Interactive components                               |      — |      — |       — |                 — |       — | Figma's component-level prototype connections are not supported; Pairdraw's own behaviours make components run as Reka UI controls in preview.                                                                                                                                                                                           |
 | Dev Mode inspect / measurements / annotations        |      — |      ◐ |       ◐ |                 — |       ◐ | Pairdraw has CLI/MCP inspection and Option/Alt distance overlays, but not Figma Dev Mode annotations or its full UI.                                                                                                                                                                                      |
 | Code Connect / dev resources / ready-for-dev         |      — |      — |       — |                 — |       — | Not modeled.                                                                                                                                                                                                                                       |
-| Comments                                             |      — |      — |       — |                 — |       — | Not modeled.                                                                                                                                                                                                                                       |
-| Version history / branches                           |      — |      — |       — |                 — |       — | Not modeled.                                                                                                                                                                                                                                       |
-| Real-time collaboration                              |      — |     ✅ |      ✅ |                 — |       — | Pairdraw has its own P2P collaboration, not Figma-compatible metadata.                                                                                                                                                                           |
+| Comments                                             |      — |     ✅ |      ✅ |                 — |      ✅ | Pairdraw's own comment threads, kept in its plugin data on the document node so they travel in the `.fig` file; Figma's comments are not in `.fig` files.   |
+| Version history / branches                           |      — |      — |       ◐ |                 — |       — | Pairdraw Cloud keeps versions of Cloud documents; Figma's version history and branches are not read.                                                                                                                                              |
+| Real-time collaboration                              |      — |     ✅ |      ✅ |                 — |       — | Pairdraw's own CRDT sync for Cloud documents and agent presence, not Figma-compatible metadata; peer-to-peer rooms are off in Pairdraw builds.             |
 
 ## Raw Kiwi metadata coverage
 

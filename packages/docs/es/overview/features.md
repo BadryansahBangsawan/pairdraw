@@ -21,7 +21,7 @@ Pairdraw abre y guarda archivos `.fig` directamente. La importación y exportaci
 
 ## Panel de propiedades
 
-Las pestañas Diseño, Código, IA y Revisar se adaptan a la selección:
+Las pestañas Diseño, Código y Revisar se adaptan a la selección; el chat con AI tiene su propia columna:
 
 - **Apariencia:** opacidad, radio uniforme o por esquina y visibilidad.
 - **Relleno:** color sólido, degradados lineal, radial, angular y diamante, e imágenes.
@@ -75,7 +75,7 @@ Las llamadas a herramientas aparecen en una cronología plegable. Para verificar
 
 Las páginas `http` y `https` se abren en una ventana propia de la aplicación de escritorio que no comparte nada con el editor, y se pueden llevar al lienzo: importa la página entera o un elemento elegido como capas, o coloca una captura de la vista, de la página o de un elemento. El chat puede leer la página, marcar un elemento en su respuesta y hacer clic, escribir, pulsar una tecla, desplazarse o esperar en ella, y pregunta antes cuando los ajustes piden confirmación antes de los cambios.
 
-En un tablero, el mismo navegador se vuelve investigación: el chat cita la página en una nota adhesiva que conserva su dirección, título, cita y hora de lectura ([Investigación en un tablero](/user-guide/research)).
+En un tablero que ya tengas, el mismo navegador se vuelve investigación (Pairdraw no ofrece tableros nuevos): el chat cita la página en una nota adhesiva que conserva su dirección, título, cita y hora de lectura ([Investigación en un tablero](/user-guide/research)).
 
 ## Servidor MCP
 
@@ -100,9 +100,9 @@ pairdraw eval design.fig -c "..."     # Figma Plugin API
 
 Todos los comandos admiten `--json`. Instalación: `npm install -g @pairdraw/cli` o `bun add -g @pairdraw/cli`.
 
-## Colaboración en tiempo real
+## Colaboración
 
-La colaboración funciona directamente entre participantes mediante WebRTC y no necesita servidor central. Basta con compartir un enlace. Incluye cursores, presencia, seguimiento de la vista de otro participante y llamadas de voz con quienes están en la sala.
+Los agentes de IA muestran sus cursores y las capas que editan en el lienzo, y la vista los sigue mientras trabajan. Varias personas editan juntas los documentos de Cloud a través de un servidor de [Pairdraw Cloud](/user-guide/pairdraw-cloud) autoalojado, con cursores, presencia y seguimiento de la vista de otra persona. Las salas en directo para documentos locales, la unión mediante enlace y las llamadas de voz no forman parte de Pairdraw ([Colaboración](/es/programmable/collaboration)).
 
 ## Escritorio y web
 

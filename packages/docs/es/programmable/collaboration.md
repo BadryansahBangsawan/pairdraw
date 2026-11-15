@@ -1,46 +1,34 @@
 ---
 title: Colaboración
-description: Edición P2P en tiempo real mediante WebRTC y Yjs, sin servidor central.
+description: Sigue a los agentes de IA en el lienzo y edita documentos de Cloud entre varias personas.
 ---
 
 # Colaboración
 
-Pairdraw permite editar un documento entre varias personas en tiempo real. La conexión es P2P: los cambios viajan directamente entre participantes mediante WebRTC.
+Las salas en directo no forman parte de Pairdraw: para los documentos locales no hay menú para compartir, no se puede unir a una sala mediante enlace o identificador, no hay llamada de voz en la sala ni nombre de colaboración en los ajustes. Para editar un documento entre varias personas, usa [Pairdraw Cloud](/user-guide/pairdraw-cloud#edit-together) en el servidor de Cloud de tu equipo. La capa de presencia se mantiene, porque los agentes de IA muestran sus cursores a través de ella.
 
-## Iniciar una sesión
+## Agentes en el lienzo
 
-Abre el menú de colaboración, crea una sala y comparte el enlace. El identificador se genera con aleatoriedad criptográfica y no contiene datos del documento.
+El chat con AI integrado, los chats de ACP y Pi harness y cada cliente MCP conectado aparecen como cursores sobre las capas que leen o editan, con una etiqueta con contorno que muestra una chispa y un nombre en clave como *Fern*. Mientras el chat transmite JSX, su cursor recorre los elementos a medida que aparecen y los contornea. Los agentes dibujan su cursor y su contorno en violeta.
 
-Quien abre el enlace entra en la misma sala. El documento inicial se sincroniza automáticamente.
-
-## Datos compartidos
-
-- **Documento:** cambios en formas, texto, propiedades y disposición;
-- **Presencia:** nombre, color, selección y página activa;
-- **Cursores:** posición de cada participante;
-- **Vista:** posibilidad de seguir el encuadre de otra persona;
-- **Agentes:** el chat con AI integrado, los chats de ACP y Pi harness y cada cliente MCP conectado aparecen como cursores sobre las capas que leen o editan, con una etiqueta con contorno que muestra una chispa y un nombre en clave como *Fern*. Mientras el chat transmite JSX, su cursor recorre los elementos a medida que aparecen y los contornea. Los agentes dibujan su cursor y su contorno en violeta, y la lista de personas y la barra «Siguiendo a …» nombran a quien ejecuta cada uno, para que se sepa de quién es. Solo se comparten su nombre, tipo, modelo, estado, página, posición y capas editadas, nunca los prompts ni las respuestas.
+**Ver → Cursores multijugador** oculta y muestra en el lienzo los cursores de los agentes y de otras personas.
 
 ## Modo seguimiento
 
-Haz clic en el avatar de un participante en la barra superior para seguir su vista. Tu lienzo se desplaza y amplía para coincidir con la suya, y un marco de su color con una barra «Siguiendo a …» indica a quién sigues. Para dejar de seguir, vuelve a hacer clic en el avatar, pulsa <kbd>Esc</kbd>, o haz clic, desplázate, haz zoom o cambia de página por tu cuenta.
+Tus propios agentes, el chat de IA y clientes MCP como Claude Code o Cursor, se siguen automáticamente mientras trabajan, para mantener a la vista lo que editan. Desactívalo con el botón **Seguir a los agentes mientras trabajan** (la mira) en la cabecera del chat. Si dejas de seguir a un agente mientras trabaja, no se vuelve a seguir hasta que termine; en su siguiente ejecución se sigue de nuevo.
 
-Tus propios agentes, el chat de IA y clientes MCP como Claude Code o Cursor, se siguen automáticamente mientras trabajan, para mantener a la vista lo que editan. Desactívalo con el botón de la mira en la parte superior del panel de IA. Si dejas de seguir a un agente mientras trabaja, no se vuelve a seguir hasta que termine; en su siguiente ejecución se sigue de nuevo.
+Tu propio avatar aparece en la barra superior solo mientras enumera tus agentes. Pasa el cursor por encima para ver cada agente, qué hace y en qué página, y haz clic en **Seguir** junto a un agente para mantener a la vista la página y las capas que edita; el seguimiento continúa entre sus respuestas y termina cuando se va. Haz clic en uno de tus agentes para cambiarle el nombre.
 
-Un avatar cuenta los agentes que ejecuta esa persona. Pasa el cursor por encima para ver cada agente, qué hace y en qué página, y haz clic en **Seguir** junto a un agente para mantener a la vista la página y las capas que edita; el seguimiento continúa entre sus respuestas y termina cuando se va. El botón situado después de los avatares enumera a todos los presentes en la sala con sus agentes y funciona con el teclado. Tu propio avatar enumera tus agentes —haz clic en uno para cambiarle el nombre— y ofrece **Salir de la sala**.
+## En documentos de Cloud
 
-El panel para compartir enumera a todos los presentes en la sala con los agentes que ejecutan, qué hace cada uno y en qué página. Sigue a un agente del mismo modo para mantener a la vista la página y las capas que edita; el seguimiento continúa entre sus respuestas y termina cuando se va. Haz doble clic en uno de tus agentes para cambiarle el nombre.
+Quien tiene abierto un documento de Cloud ve los cursores, las selecciones y los agentes de las demás personas. Un avatar cuenta los agentes que ejecuta esa persona, y la barra «Siguiendo a …» nombra a quien ejecuta cada uno, para que se sepa de quién es. De un agente solo se comparten su nombre, tipo, modelo, estado, página, posición y capas editadas, nunca los prompts ni las respuestas.
+
+Haz clic en el avatar de una persona en la barra superior para seguir su vista. Tu lienzo se desplaza y amplía para coincidir con la suya, y un marco de su color con una barra «Siguiendo a …» indica a quién sigues. Para dejar de seguir, vuelve a hacer clic en el avatar, pulsa <kbd>Esc</kbd>, o haz clic, desplázate, haz zoom o cambia de página por tu cuenta.
 
 ## Arquitectura
 
-Yjs mantiene el estado compartido mediante CRDT. Trystero descubre participantes y establece las conexiones WebRTC. Un servidor de señalización ayuda a iniciar la conexión, pero no retransmite el documento.
+Un documento de Cloud sincroniza su estado con Yjs, un CRDT, a través del servidor de Cloud, que fusiona automáticamente los cambios simultáneos.
 
-No es necesario crear una cuenta ni desplegar una infraestructura propia. La calidad de conexión depende de la red y de la posibilidad de establecer WebRTC entre los participantes.
+Mover y reordenar capas también se fusiona. Cada capa recuerda cada elemento padre al que se ha movido y su posición entre sus hermanas, y cada participante deduce de ese historial el mismo árbol de capas ([el CRDT de árbol de Evan Wallace](https://madebyevan.com/algos/crdt-mutable-tree-hierarchy/)). Se aplican todos los movimientos, reordenaciones y capas nuevas de distintas personas; si dos personas mueven la misma capa a la vez, gana el mismo movimiento para todos. Cuando movimientos simultáneos meterían dos capas una dentro de la otra, se deshace el posterior, y una capa cuyo nuevo padre se eliminó entretanto vuelve a donde estaba.
 
-## Privacidad
-
-El contenido no se almacena en un servidor de Pairdraw. Cada participante conserva una copia local. Comparte el enlace solo con personas de confianza: quien conoce la sala puede intentar unirse mientras esté activa.
-
-## Finalizar
-
-Al cerrar la sesión se eliminan los participantes remotos y sus cursores. Los cambios ya sincronizados permanecen en el documento local.
+Todas las personas que editan un documento juntas necesitan una versión de Pairdraw que registre el árbol de capas de la misma manera.

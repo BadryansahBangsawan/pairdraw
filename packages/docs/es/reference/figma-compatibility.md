@@ -171,7 +171,7 @@ Comparación entre las funciones de Figma Design y el estado actual de Pairdraw.
 
 ## Prototipos
 
-Conexiones, activadores, acciones, animaciones, transiciones, superposiciones, desplazamiento, flujos, lógica condicional, curvas y presentación a pantalla completa aún no están disponibles.
+En la sección Prototipo, las capas reciben interacciones al hacer clic o tras un retraso que navegan a un marco, abren o cierran una superposición o vuelven atrás, con transición instantánea o disolución; se guardan como reacciones de prototipo de Figma en `.fig` y se reproducen en el lienzo ([Reproducir un prototipo](/user-guide/playing-a-prototype)). Presentar muestra las diapositivas de una página a pantalla completa. Aún faltan el desplazamiento, los flujos, la lógica condicional con variables y otras animaciones.
 
 ## Importación y exportación
 
@@ -198,7 +198,7 @@ Conexiones, activadores, acciones, animaciones, transiciones, superposiciones, d
 | Función | Estado | Notas |
 |---------|--------|-------|
 | Comentarios | ✅ | La herramienta Comentario (<kbd>C</kbd>) fija hilos a las capas, con respuestas, resolución y una lista filtrable; se guardan en `.fig` |
-| Multijugador | ✅ | Salas P2P (Trystero y Yjs) con cursores, seguimiento de vista, llamadas de voz y cursores de agentes; sin servidor |
+| Multijugador | ✅ | Los documentos de Cloud se editan juntos a través de un servidor de Pairdraw Cloud (Yjs), con cursores, seguimiento de vista y cursores de agentes; sin salas P2P ni llamadas de voz para documentos locales |
 | Chat de cursor | 🔲 | No hay burbujas en el lienzo |
 | Ramas y fusiones | 🔲 | No hay ramas de versión |
 | Modo de desarrollo | 🟡 | La pestaña Código muestra la selección como design JSX, HTML, Vue o React con CSS o Tailwind; estados Ready for dev; sin modo de inspección con cotas |

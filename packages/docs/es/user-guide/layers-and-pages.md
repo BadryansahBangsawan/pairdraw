@@ -26,7 +26,7 @@ El menú contextual mueve la selección a otra página. Al cambiar de página, P
 
 ## Diapositivas
 
-El panel de diapositivas lista los marcos del nivel superior de la página como miniaturas numeradas, en orden de capas. Haz clic en una diapositiva para mostrar su marco en el lienzo y arrastra una diapositiva — o pulsa <kbd>Alt</kbd> con una flecha arriba o abajo — para reordenarla. **Exportar diapositivas** escribe todas las diapositivas, en orden, en un único archivo PDF o PowerPoint.
+El panel de diapositivas lista los marcos del nivel superior de la página como miniaturas numeradas, en orden de capas. Haz clic en una diapositiva para mostrar su marco en el lienzo y arrastra una diapositiva — o pulsa <kbd>Alt</kbd> con una flecha arriba o abajo — para reordenarla. **Exportar diapositivas a PDF** escribe todas las diapositivas, en orden, en un único archivo PDF.
 
 ## Presentar
 

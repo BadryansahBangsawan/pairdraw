@@ -36,6 +36,8 @@ In the app, press <kbd>?</kbd> or click the keyboard button at the end of the to
 | <kbd>C</kbd> | Comment | ✅ |
 | <kbd>I</kbd> | Eyedropper | 🔲 |
 
+On a board you already have, <kbd>S</kbd> places a sticky note, <kbd>R</kbd> a shape, and <kbd>X</kbd> a connector, as in FigJam. Pairdraw does not create new boards.
+
 ## File
 
 | Shortcut | Action | Status |
@@ -45,28 +47,32 @@ In the app, press <kbd>?</kbd> or click the keyboard button at the end of the to
 | <kbd>⌘</kbd><kbd>O</kbd> | Open File | ✅ |
 | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd> | Place Image | ✅ |
 | <kbd>⌘</kbd><kbd>W</kbd> | Close Tab | ✅ |
+| <kbd>⌃</kbd><kbd>⇥</kbd> / <kbd>⌃</kbd><kbd>⇧</kbd><kbd>⇥</kbd> | Next / Previous Tab | ✅ |
 | <kbd>⌘</kbd><kbd>S</kbd> | Save | ✅ |
 | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>S</kbd> | Save As | ✅ |
-| <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | Export… | ✅ |
+| <kbd>⌥</kbd><kbd>⌘</kbd><kbd>S</kbd> | Save to Version History (Cloud documents) | ✅ |
+| <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | Export Selection as PNG | ✅ |
+| <kbd>⌘</kbd><kbd>,</kbd> | Settings | ✅ |
 
 ## Edit
 
 | Shortcut | Action | Status |
 |----------|--------|--------|
 | <kbd>⌘</kbd><kbd>Z</kbd> | Undo | ✅ |
-| <kbd>⇧</kbd><kbd>⌘</kbd><kbd>Z</kbd> | Redo | ✅ |
+| <kbd>⇧</kbd><kbd>⌘</kbd><kbd>Z</kbd> or <kbd>⌘</kbd><kbd>Y</kbd> | Redo | ✅ |
 | <kbd>⌘</kbd><kbd>X</kbd> | Cut | ✅ |
 | <kbd>⌘</kbd><kbd>C</kbd> | Copy | ✅ |
 | <kbd>⌘</kbd><kbd>V</kbd> | Paste | ✅ |
 | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>V</kbd> | Paste Over Selection | 🔲 |
 | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>R</kbd> | Paste to Replace | ✅ |
 | <kbd>⌘</kbd><kbd>D</kbd> | Duplicate | ✅ |
-| <kbd>⌫</kbd> | Delete | ✅ |
+| <kbd>⌫</kbd> or <kbd>Delete</kbd> | Delete | ✅ |
 | <kbd>⌘</kbd><kbd>A</kbd> | Select All | ✅ |
 | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>A</kbd> | Select Inverse | ✅ |
 | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>C</kbd> | Copy as PNG | ✅ |
 | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>C</kbd> | Copy Properties | ✅ |
 | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>V</kbd> | Paste Properties | ✅ |
+| <kbd>⌘</kbd><kbd>F</kbd> | Find Layers (by name, on the shown page) | ✅ |
 
 ## View
 
@@ -77,8 +83,10 @@ In the app, press <kbd>?</kbd> or click the keyboard button at the end of the to
 | <kbd>⌃</kbd><kbd>G</kbd> | Layout Guides | 🔲 |
 | <kbd>⇧</kbd><kbd>R</kbd> | Rulers | ✅ |
 | <kbd>⇧</kbd><kbd>C</kbd> | Show/Hide Comments | ✅ |
+| <kbd>⌥</kbd><kbd>⌘</kbd><kbd>\\</kbd> | Show/Hide Multiplayer Cursors (people's and AI agents') | ✅ |
 | <kbd>⌘</kbd><kbd>\\</kbd> | Show/Hide UI | ✅ |
 | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>↩</kbd> | Preview controls | ✅ |
+| <kbd>⌘</kbd><kbd>↩</kbd> | Present slides | ✅ |
 | <kbd>⌘</kbd><kbd>=</kbd> | Zoom In | ✅ |
 | <kbd>⌘</kbd><kbd>-</kbd> | Zoom Out | ✅ |
 | <kbd>+</kbd> / <kbd>-</kbd> | Zoom In / Out | ✅ |
@@ -116,7 +124,9 @@ In the app, press <kbd>?</kbd> or click the keyboard button at the end of the to
 | <kbd>⌘</kbd><kbd>G</kbd> | Group Selection | ✅ |
 | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>G</kbd> | Ungroup | ✅ |
 | <kbd>⇧</kbd><kbd>A</kbd> | Add Auto Layout | ✅ |
-| <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> | Create Component | ✅ |
+| <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> | Create Component; on a main component, Convert to Frame | ✅ |
+| — | Create Component Set (context menu; <kbd>⇧</kbd><kbd>⌘</kbd><kbd>K</kbd> is Place Image) | ✅ |
+| <kbd>⌥</kbd><kbd>⌘</kbd><kbd>M</kbd> (also <kbd>⌃</kbd><kbd>⌘</kbd><kbd>M</kbd> on macOS) | Use as Mask | ✅ |
 | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd> | Detach Instance | ✅ |
 | <kbd>⌥</kbd><kbd>⇧</kbd><kbd>R</kbd> | Replace Inside Instance | ✅ |
 | <kbd>⌘</kbd><kbd>R</kbd> | Rename Selection | ✅ |

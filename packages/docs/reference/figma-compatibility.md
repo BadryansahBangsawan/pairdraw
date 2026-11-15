@@ -6,13 +6,13 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 ✅ Supported — feature works end-to-end · 🟡 Partial — core behavior exists, some sub-features missing · 🔲 Not yet implemented
 :::
 
-**Coverage:** 128 of 156 Figma feature items addressed — 112 ✅ fully supported, 16 🟡 partial, 28 🔲 not yet. Last updated: 2026-10-27.
+**Coverage:** 136 of 156 Figma feature items addressed — 114 ✅ fully supported, 22 🟡 partial, 20 🔲 not yet. Last updated: 2026-11-15.
 
 ## Interface & Navigation
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Toolbar with design tools | ✅ | Bottom toolbar (UI3 style): Move, Frame/Section, shapes, Pen/Pencil, Text, Hand, Comment; customizable, with an icon picker |
+| Toolbar with design tools | ✅ | Toolbar at the canvas's left: Move, Frame/Section, shapes, Pen/Pencil, Text, Hand, Comment; customizable, with an icon picker |
 | Layers panel (left sidebar) | ✅ | Tree view with expand/collapse, drag reorder, visibility toggle; resizable width |
 | Pages panel | ✅ | Add, delete, rename pages; per-page viewport state |
 | Properties panel (right sidebar) | ✅ | Appearance, Fill, Stroke, Effects, Typography, Layout, Layout guides, Constraints, Position, Mask, Component properties, Selection colors, Export; resizable width |
@@ -22,8 +22,8 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 | Canvas guides | ✅ | Drag guides from rulers onto the canvas or frames; select, move, duplicate, delete, and undo; saved in `.fig` |
 | Actions menu / command palette | ✅ | <kbd>⌘</kbd><kbd>K</kbd> opens a searchable palette of editor and app actions |
 | Context menu | ✅ | Right-click with clipboard, z-order, grouping, component, visibility, lock, move-to-page actions |
-| Keyboard shortcuts | 🟡 | Tools, editing, booleans, flatten, masks, components, align, z-order, navigation, text formatting; Eyedropper (<kbd>I</kbd>), or zoom tool |
-| Find and replace | 🔲 | Text search/replace across document |
+| Keyboard shortcuts | 🟡 | Tools, zoom tool, editing, booleans, flatten, masks, components, align, z-order, navigation, text formatting; no Eyedropper (<kbd>I</kbd>) |
+| Find and replace | 🟡 | Find layers (<kbd>⌘</kbd><kbd>F</kbd>) searches the shown page's layers by name; no text search or replace |
 | Layer outlines view | 🔲 | Wireframe view of all layers |
 | Custom file thumbnails | 🔲 | Saved files preview their first page, as Figma's do without a Cover page; no thumbnail picker |
 | Nudge value settings | ✅ | Small and big nudge distances in **Settings → Editor**, 1 px and 10 px by default |
@@ -89,7 +89,7 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 | Text styles | 🟡 | Character-level styling while editing; applies named text styles from `.fig`, libraries, and design tokens; no UI to create or edit a style |
 | Text resizing modes (auto, fixed, hug) | ✅ | Auto width, Auto height, and Fixed size in Layout |
 | Bulleted & numbered lists | ✅ | Nested bulleted and numbered lists with list and paragraph spacing and hanging markers; <kbd>⇧</kbd><kbd>⌘</kbd><kbd>8</kbd> / <kbd>7</kbd> |
-| Links in text | 🟡 | Links on character ranges round-trip through `.fig`, the clipboard, HTML, and the plugin API; no panel control to add one |
+| Links in text | ✅ | Add, edit, or remove a web or email link on a whole text or a range from the Typography panel or the canvas menu; links round-trip through `.fig`, the clipboard, HTML, and the plugin API |
 | Emojis & smart symbols | ✅ | Color emoji draw with the system emoji font, edit as one character, and survive `.fig` and the clipboard |
 | OpenType features | 🟡 | Every feature a file sets renders and round-trips; the panel toggles only ligatures, contextual alternates, and kerning |
 | Variable fonts | ✅ | Named styles draw at their axis values and optical size follows the font size, as in Figma; the Typography section and the plugin API set any axis, and optical size can be set by hand |
@@ -174,17 +174,17 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Prototype connections | 🔲 | Not supported yet |
-| Triggers (click, hover, drag, etc.) | 🔲 | Not supported yet |
-| Actions (navigate, overlay, scroll, etc.) | 🔲 | Not supported yet |
-| Animations & transitions | 🔲 | Not supported yet |
+| Prototype connections | ✅ | The Prototype section adds interactions; the canvas draws a selected layer's connections as dashed arrows; saved as Figma prototype reactions |
+| Triggers (click, hover, drag, etc.) | 🟡 | On click and After delay; no hover, drag, press, or key triggers |
+| Actions (navigate, overlay, scroll, etc.) | 🟡 | Navigate to, Open overlay, Close overlay, and Back; no Change to, Scroll to, or Swap overlay |
+| Animations & transitions | 🟡 | Instant and Dissolve |
 | Smart animate | 🔲 | Auto-animate matching layers |
-| Overlays | 🔲 | Modal/popover prototyping |
+| Overlays | 🟡 | Open and close an overlay over the frame; always fitted to the window, with no position |
 | Scroll & overflow behavior | 🔲 | Scrollable frames in prototypes |
 | Prototype flows | 🔲 | Named starting points |
 | Variables in prototypes | 🔲 | Conditional logic with variables |
 | Easing & spring animations | 🔲 | Custom animation curves |
-| Present & play prototypes | 🔲 | Fullscreen prototype viewer |
+| Present & play prototypes | 🟡 | Play runs a prototype on the canvas; Present shows the page's frames as full-screen slides |
 
 ## Import & Export
 
@@ -196,7 +196,7 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 | Figma clipboard (paste) | ✅ | Decode Kiwi binary from Figma clipboard |
 | Figma clipboard (copy) | ✅ | Encode Kiwi binary that Figma can read |
 | Sketch file import | 🔲 | .sketch file parsing |
-| Image/SVG/PDF export | ✅ | PNG, JPG, WEBP, SVG, PDF with embedded fonts where their files can be embedded, PPTX, and draw.io |
+| Image/SVG/PDF export | ✅ | PNG, JPG, WEBP, SVG, PDF with embedded fonts where their files can be embedded, and HTML; PPTX and draw.io from the CLI only |
 | Version history | 🟡 | Pairdraw Cloud documents (in preview): save named versions, browse, preview, restore, and duplicate; not for local files |
 | Copy assets between tools | ✅ | Figma clipboard (Kiwi binary), Copy as text/SVG/PNG/JSX |
 
@@ -211,7 +211,7 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Comments (pin, thread, resolve) | ✅ | Comment tool (<kbd>C</kbd>) pins threads to layers with replies, resolving, and a filterable list; saved in `.fig` |
-| Real-time multiplayer | ✅ | Peer-to-peer rooms (Trystero + Yjs) with cursors, follow mode, voice calls, and agent cursors; no server required |
+| Real-time multiplayer | 🟡 | Cloud documents edit live through a self-hosted Pairdraw Cloud server, with cursors, follow mode, and AI agent cursors; no peer-to-peer rooms or voice calls for local documents |
 | Cursor chat | 🔲 | Inline chat bubbles at cursor |
 | Branching & merging | 🔲 | Version branches for design files |
 | Dev Mode (inspect) | 🟡 | Code tab shows the selection as design JSX, HTML, Vue, or React with CSS or Tailwind; Ready for dev statuses; no redline inspect mode |

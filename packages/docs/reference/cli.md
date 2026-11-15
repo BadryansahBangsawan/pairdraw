@@ -132,7 +132,7 @@ pairdraw tokens app.fig --project ./app --write
 
 ## export
 
-Export to PNG, JPG, WEBP, SVG, JSX, HTML, `.fig`, or Storybook stories.
+Export to PNG, JPG, WEBP, SVG, PDF, PowerPoint, draw.io, JSX, HTML, `.fig`, or Storybook stories. The app does not offer PowerPoint or draw.io export; the CLI does.
 
 ```sh
 pairdraw export [file] [options]
@@ -140,7 +140,7 @@ pairdraw export [file] [options]
 
 | Option | Alias | Description |
 |--------|-------|-------------|
-| `--format` | `-f` | `png` (default), `jpg`, `webp`, `svg`, `pdf`, `pptx`, `jsx`, `tailwind-jsx`, `html`, `fig`, `storybook` |
+| `--format` | `-f` | `png` (default), `jpg`, `webp`, `svg`, `pdf`, `pptx`, `drawio`, `jsx`, `tailwind-jsx`, `html`, `fig`, `storybook` |
 | `--output` | `-o` | Output file path (default: `<name>.<format>`); a directory for `storybook` (default: `<name>-stories`) |
 | `--scale` | `-s` | Export scale (default: 1) |
 | `--quality` | `-q` | Quality 0–100, JPG/WEBP only (default: 90) |
@@ -502,7 +502,7 @@ pairdraw convert <file> [options]
 | Option | Alias | Description |
 |--------|-------|-------------|
 | `--output` | `-o` | Output file path (default: `<name>.<format>`) |
-| `--format` | `-f` | Output format: `fig` (default), `png`, `jpg`, `webp`, `svg`, `pdf`, `pptx`, `jsx`, `tailwind-jsx`, `html`, `storybook` |
+| `--format` | `-f` | Output format: `fig` (default), `pen`, or `drawio` |
 | `--font-policy` | | When a font of the document is missing: `warn`, `strict` (fail without writing), or `allow` (default: `warn`) |
 
 ## agent

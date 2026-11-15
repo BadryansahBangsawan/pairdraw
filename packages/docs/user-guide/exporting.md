@@ -16,13 +16,15 @@ Select a node and use the Export section in the properties panel.
 - **Scale** — 0.5×, 0.75×, 1×, 1.5×, 2×, 3×, or 4× (hidden for SVG — vectors are resolution-independent)
 - **Format** — PNG (transparent background), JPG (white background), WEBP (transparent background), SVG (vector), PDF, HTML, PPTX (PowerPoint), or draw.io
 
+**File → Export Selection** exports the selection as PNG, SVG, or `.fig`, and <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> exports it as PNG at once. That menu and the Slides panel do not offer PowerPoint or draw.io.
+
 You can add multiple export settings to export the same node at different scales or formats in one go. A live preview with a checkerboard background shows what will be exported.
 
 ### Export Methods
 
 | Method | Mac | Windows / Linux |
 |--------|-----|-----------------|
-| Keyboard shortcut | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
+| Keyboard shortcut (PNG) | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
 | Context menu | Right-click <kbd>→</kbd> Export… | Right-click <kbd>→</kbd> Export… |
 | Properties panel | Click "Export" button | Click "Export" button |
 
@@ -90,7 +92,7 @@ Files exported from Pairdraw can be opened in Figma, and vice versa. The .fig fo
 
 | Action | Mac | Windows / Linux |
 |--------|-----|-----------------|
-| Export selection | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
+| Export selection as PNG | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
 | Copy as PNG | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>C</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>C</kbd> |
 | Open file | <kbd>⌘</kbd><kbd>O</kbd> | <kbd>Ctrl</kbd> + <kbd>O</kbd> |
 | Save | <kbd>⌘</kbd><kbd>S</kbd> | <kbd>Ctrl</kbd> + <kbd>S</kbd> |

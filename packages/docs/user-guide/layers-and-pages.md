@@ -5,7 +5,10 @@ description: Managing layers, pages, and the properties panel in Pairdraw.
 
 # Layers & Pages
 
-The editor interface has three main panels: layers (left), canvas (center), and properties (right). All panels are resizable by dragging the dividers.
+The editor opens on the canvas alone. The tools stand at the canvas's left, with the layers panel's toggle above them, and the zoom sits in the bottom right corner. The layers panel opens on the left, the properties panel on the right, and the AI chat in a column beside it; all of them are resizable by dragging their edges. See [Side Panels](./canvas-navigation#side-panels) for when each panel shows.
+
+While the AI chat is closed, a prompt at the bottom of the canvas sends what you write to the chat; turn it off with **Prompt on the canvas** in **Settings → Models → Chat**. <kbd>Escape</kbd> in the prompt returns to the canvas.
+
 ## Layers Panel
 
 The layers panel on the left displays the document hierarchy as a tree.
@@ -30,6 +33,10 @@ Double-click a layer name to rename it inline. Press <kbd>Enter</kbd> or click a
 
 Clicking a layer in the panel selects the corresponding node on the canvas, and vice versa.
 
+### Find Layers
+
+Press <kbd>⌘</kbd><kbd>F</kbd> (<kbd>Ctrl</kbd> + <kbd>F</kbd>), choose **Edit → Find Layers…**, or run it from the command palette to search the shown page's layers by name. Picking a result selects that layer and brings it into view.
+
 ## Pages Panel
 
 The pages panel shows all pages in the document.
@@ -43,7 +50,7 @@ Each page has its own canvas and viewport state.
 
 ## Slides Panel
 
-The slides panel lists the page's top-level frames as numbered slide thumbnails, in layer order. Click a slide to show its frame on the canvas, and drag a slide — or press <kbd>Alt</kbd> with an up or down arrow — to reorder it. **Export slides** writes every slide, in order, to one PDF or PowerPoint file.
+The slides panel lists the page's top-level frames as numbered slide thumbnails, in layer order. Click a slide to show its frame on the canvas, and drag a slide — or press <kbd>Alt</kbd> with an up or down arrow — to reorder it. **Export slides** writes every slide, in order, to one PDF file.
 
 ## Present Mode
 
@@ -51,7 +58,9 @@ Present shows the page's slides full screen, one at a time. Start it with <kbd>�
 
 ## Documents and Recovery
 
-The Home workspace lists recent local documents and documents from configured storage providers. Use grid or list view, and sort recent files by **Name**, **Last used**, or **Created**. <kbd>⌘</kbd>/<kbd>Ctrl</kbd>-click adds a file to the selection, <kbd>Shift</kbd>-click selects a range, and <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+<kbd>A</kbd> selects every listed file; the selection bar then opens them in separate editor tabs, removes them from Recents, or deletes stored documents. A file's <kbd>⋯</kbd> menu or right-click menu offers **Remove from Recents**, which forgets the file without deleting it, and **Save As…**, which saves a copy elsewhere. **Design systems** lists the built-in Pairdraw Basics and the component libraries you have published, as Goodies does; picking one opens a new design with that library turned on in the Assets panel.
+Home starts with a prompt: choose what to create above it (a landing page, mobile app, web app, slides, dashboard, or something else), describe it, and Pairdraw opens a new design and sends the prompt to its AI chat with a guide for that kind; example prompts under it fill the prompt with an idea to edit. Below the prompt you can start from a Figma file, from a page in the built-in browser (desktop app), or from a screenshot the agent rebuilds. Tabs switch between **Recent**, **Drafts**, and **Design systems**, and the menu beside them lists the places your Cloud server and storage bucket add. A search field filters the list, **Open…** opens a file, and **Design** starts an empty design.
+
+Recent lists recent local documents. Use grid or list view, and sort recent files by **Name**, **Last used**, or **Created**. <kbd>⌘</kbd>/<kbd>Ctrl</kbd>-click adds a file to the selection, <kbd>Shift</kbd>-click selects a range, and <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+<kbd>A</kbd> selects every listed file; the selection bar then opens them in separate editor tabs, removes them from Recents, or deletes stored documents. A file's <kbd>⋯</kbd> menu or right-click menu offers **Remove from Recents**, which forgets the file without deleting it, and **Save As…**, which saves a copy elsewhere. **Design systems** lists the built-in Pairdraw Basics and the component libraries you have published, as Goodies does; picking one opens a new design with that library turned on in the Assets panel.
 
 A new design is kept as a draft on this device while you work on it: each change is written shortly after you make it, so closing its tab asks nothing. **Drafts** on Home lists them with a preview; open one to continue it, or pick **Delete draft** from its <kbd>⋯</kbd> or right-click menu to remove it for good. Saving a draft to a file or to storage, in the editor or with **Save As…** on Home, takes it out of Drafts. Drafts live in this browser profile or desktop installation only, and need **Automatically preserve unsaved work** turned on and a browser that keeps site data.
 
@@ -61,9 +70,13 @@ A file you opened also keeps a backup of changes it has not been saved with yet,
 
 Disabling recovery stops automatic preservation and removes recovery copies owned by currently open documents. It does not bulk-delete snapshots from previously closed documents. Recovery is local to this installation/browser profile; it is not a replacement for saving a file, cloud synchronization, or a backup.
 
+## Goodies
+
+The gift button in the top bar, **Object → Goodies…**, or the command palette opens Goodies, a collection of things to start from: styles to pin to the AI chat, the design systems you can enable, scripts that land on the canvas as [script layers](./script-layers), and the gallery shaders, which fill the selected layers or a new rectangle.
+
 ## Properties Panel
 
-The properties panel on the right has Design, Code, and [Lint](./checking-designs) tabs. The AI chat opens in its own column beside it.
+The properties panel on the right switches between Design and Code, with [Lint](./checking-designs) as an icon tab beside them. The AI chat opens in its own column beside it.
 
 ### Design Tab
 
@@ -95,6 +108,7 @@ The [AI chat](../programmable/ai-chat) creates and changes design elements from 
 | Action | Mac | Windows / Linux |
 |--------|-----|-----------------|
 | Open or close the AI chat column | <kbd>⌘</kbd><kbd>J</kbd> | <kbd>Ctrl</kbd> + <kbd>J</kbd> |
+| Find layers | <kbd>⌘</kbd><kbd>F</kbd> | <kbd>Ctrl</kbd> + <kbd>F</kbd> |
 
 ## Mobile Layout
 

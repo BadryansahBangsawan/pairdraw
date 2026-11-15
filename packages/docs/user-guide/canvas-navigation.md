@@ -70,7 +70,7 @@ Zoomed in far enough that each document pixel covers eight screen pixels (800% o
 
 ## Side Panels
 
-The panel buttons at the end of the top bar close and reopen the layers panel and the properties panel one at a time. The canvas takes the room of a closed panel, which reopens at the width it had, and each panel stays open or closed between sessions. <kbd>⌘</kbd><kbd>\\</kbd> (<kbd>Ctrl</kbd> + <kbd>\\</kbd>) still hides every panel at once. The comments list and version history show in the properties panel, so the comment tool and version history open it while you use them and close it again afterwards.
+The layers panel's toggle sits above the tools at the canvas's left, and the properties panel's toggle is in the top bar. The properties panel comes when you select a layer and leaves with the selection; a panel you open from its toggle stays open until you close it, also between sessions. The canvas takes the room of a closed panel, which reopens at the width it had. **View → Layers Panel** and **View → Properties Panel** do the same. <kbd>⌘</kbd><kbd>\\</kbd> (<kbd>Ctrl</kbd> + <kbd>\\</kbd>) still hides every panel at once. The comments list and version history show in the properties panel, so the comment tool and version history open it while you use them and close it again afterwards.
 
 ## Ultralight Mode
 

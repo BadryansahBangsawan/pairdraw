@@ -19,7 +19,7 @@ The new window is empty and looks like any other: the same title and size, and t
 - A file that no window shows opens in the focused window. Before any window has focus, as at launch, it goes to `main`.
 - A file that arrives from outside the app — a file association, launching the app with a path, a recent file, or a file link — follows the same rule: the window that already shows it, else the focused window.
 - A relative file link goes to the window whose open file path ends with the link's path. When more than one window matches, the focused window decides if it is one of them; otherwise the usual rule applies rather than an arbitrary window.
-- Room links, cloud links, and OAuth callbacks go to the focused window only, so following one link never happens once per window.
+- Cloud links and sign-in callbacks that return through a `pairdraw://` link go to the focused window only, so following one link never happens once per window.
 
 Choosing **Open…** inside a window checks the other windows first, as any open does: if one already shows the file, it is focused instead.
 

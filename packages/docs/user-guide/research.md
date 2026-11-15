@@ -9,7 +9,7 @@ On a board, the chat can read the page you have open in the built-in browser and
 
 ## What It Needs
 
-- **A board document.** On Home, choose **Board**. In a design document the research tools are not offered at all.
+- **A board document.** Pairdraw opens boards you already have, such as a FigJam-style `.fig` file, but Home offers no new board. In a design document the research tools are not offered at all.
 - **The desktop app's built-in browser.** The page is read from that window, so a browser tab answers that the browser window is desktop only.
 - **A sticky note to cite from.** Select one sticky; the new note connects from it.
 
@@ -17,7 +17,7 @@ Research has no web search. The chat cannot look anything up on its own: it read
 
 ## Citing a Page
 
-1. Open a board, add a sticky note, and select it.
+1. Open a board you have, add a sticky note, and select it.
 2. Open the page in the built-in browser: the globe icon in the top bar, an address, **Open**.
 3. Ask the chat to cite it, for example "Cite this page." The chat passes the open page to its cite tool.
 

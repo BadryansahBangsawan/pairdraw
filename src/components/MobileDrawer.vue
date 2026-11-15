@@ -4,7 +4,7 @@ import { motion } from 'motion-v'
 import type { PanInfo } from 'motion-v'
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from 'reka-ui'
 import { tv } from 'tailwind-variants'
-import { computed, ref } from 'vue'
+import { computed, defineAsyncComponent, ref } from 'vue'
 
 import { useI18n } from '@pairdraw/vue/i18n'
 
@@ -21,11 +21,13 @@ import {
 } from '@/constants'
 import drawerTheme from '@/theme/mobile/drawer'
 
-import CodePanel from './CodePanel.vue'
 import CommentsPanel from './comments/CommentsPanel.vue'
 import DesignPanel from './DesignPanel.vue'
 import LayerTree from './LayerTree/LayerTree.vue'
 import PagesPanel from './PagesPanel.vue'
+
+// The code panel, with its exporters, loads the first time its tab opens.
+const CodePanel = defineAsyncComponent(() => import('./CodePanel.vue'))
 
 type Snap = 'closed' | 'half' | 'full'
 type DrawerTab = 'layers' | 'design' | 'code' | 'ai'

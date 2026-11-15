@@ -2,9 +2,14 @@ import { uniq } from 'es-toolkit/array'
 import { omit } from 'es-toolkit/object'
 import * as v from 'valibot'
 
+import type { ModelCredentialStore } from '@/app/ai/providers/types'
 import type { FetchFunction } from '@/app/http/types'
 
-import type { ChatGPTCredential } from './credential'
+import {
+  parseChatGPTCredential,
+  serializeChatGPTCredential,
+  type ChatGPTCredential
+} from './credential'
 import { CHATGPT_ORIGINATOR, ChatGPTTokenError, refreshChatGPTCredential } from './oauth'
 
 /** The Codex backend serves the Responses API to ChatGPT accounts. */
@@ -200,4 +205,20 @@ export function createCodexFetch(options: CodexFetchOptions): FetchFunction {
       headers: { 'content-type': 'application/json' }
     })
   }
+}
+
+/** A fetch signed by a stored ChatGPT sign-in, which keeps the tokens it refreshes. */
+export function chatGPTFetch(
+  credential: ChatGPTCredential,
+  store?: ModelCredentialStore,
+  fetchImpl?: FetchFunction,
+  promptCacheKey?: string
+): FetchFunction {
+  return createCodexFetch({
+    credential,
+    fetch: fetchImpl,
+    promptCacheKey,
+    load: store && (async () => parseChatGPTCredential((await store.load()) ?? '')),
+    save: store && ((next) => store.save(serializeChatGPTCredential(next)))
+  })
 }

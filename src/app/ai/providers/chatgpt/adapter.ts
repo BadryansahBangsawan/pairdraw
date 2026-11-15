@@ -3,31 +3,10 @@ import { defaultSettingsMiddleware, wrapLanguageModel } from 'ai'
 
 import { randomHex } from '@pairdraw/scene-graph/random'
 
-import type { ModelCredentialStore, ModelProviderAdapter } from '@/app/ai/providers/types'
-import type { FetchFunction } from '@/app/http/types'
+import type { ModelProviderAdapter } from '@/app/ai/providers/types'
 
-import {
-  parseChatGPTCredential,
-  serializeChatGPTCredential,
-  type ChatGPTCredential
-} from './credential'
-import { CHATGPT_CODEX_BASE_URL, ChatGPTSignInExpiredError, createCodexFetch } from './fetch'
-
-/** A fetch signed by a stored ChatGPT sign-in, which keeps the tokens it refreshes. */
-export function chatGPTFetch(
-  credential: ChatGPTCredential,
-  store?: ModelCredentialStore,
-  fetchImpl?: FetchFunction,
-  promptCacheKey?: string
-): FetchFunction {
-  return createCodexFetch({
-    credential,
-    fetch: fetchImpl,
-    promptCacheKey,
-    load: store && (async () => parseChatGPTCredential((await store.load()) ?? '')),
-    save: store && ((next) => store.save(serializeChatGPTCredential(next)))
-  })
-}
+import { parseChatGPTCredential } from './credential'
+import { CHATGPT_CODEX_BASE_URL, chatGPTFetch, ChatGPTSignInExpiredError } from './fetch'
 
 /** ChatGPT accounts reach their models through the Codex backend's Responses API. */
 export const chatGPTAdapter: ModelProviderAdapter = {

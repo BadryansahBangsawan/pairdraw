@@ -95,7 +95,7 @@ export class CloudAIUnavailableError extends Error {
   }
 }
 
-function pairdrawLanguageModel(resolved: ResolvedAIModelRole): LanguageModel {
+async function pairdrawLanguageModel(resolved: ResolvedAIModelRole): Promise<LanguageModel> {
   const client = cloudAIClient(resolved.connection.cloudWorkspaceId ?? '')
   if (!client) throw new CloudAIUnavailableError()
   const { config, runtime } = cloudModelConfig(client, resolved.profile.modelID)
@@ -125,7 +125,7 @@ export async function createAIModelRuntime(role: AIModelRole): Promise<AIModelRu
   }
 
   if (resolved.connection.providerID === PAIRDRAW_AI_PROVIDER) {
-    return { kind: 'direct', role: resolved, model: pairdrawLanguageModel(resolved) }
+    return { kind: 'direct', role: resolved, model: await pairdrawLanguageModel(resolved) }
   }
 
   const apiKey = await resolveModelConnectionAPIKey(resolved.connection.id)
@@ -139,7 +139,7 @@ export async function createAIModelRuntime(role: AIModelRole): Promise<AIModelRu
     kind: 'direct',
     role: resolved,
     minReasoningEffort: known?.minReasoningEffort,
-    model: createLanguageModel(
+    model: await createLanguageModel(
       {
         providerID: resolved.connection.providerID,
         apiKey,

@@ -5,9 +5,9 @@ import {
   resolveModelConnectionAPIKey
 } from '@/app/ai/models/runtime'
 import { aiModelSettings } from '@/app/ai/models/store'
-import { chatGPTFetch } from '@/app/ai/providers/chatgpt/adapter'
 import { fetchChatGPTModels } from '@/app/ai/providers/chatgpt/catalog'
 import { parseChatGPTCredential } from '@/app/ai/providers/chatgpt/credential'
+import { chatGPTFetch } from '@/app/ai/providers/chatgpt/fetch'
 import { isTauri } from '@/app/tauri/env'
 import { tauriFetch } from '@/app/tauri/http'
 

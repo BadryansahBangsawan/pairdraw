@@ -1,6 +1,6 @@
 # @pairdraw/cli
 
-Headless command line for [Pairdraw](https://github.com/BadryansahBangsawan/pairdraw) and `.fig` files: inspect documents and layers, query with XPath, export to PNG, JPG, WEBP, SVG, PDF, PPTX, JSX, HTML, or `.fig`, import HTML/CSS/Tailwind, lint design files, analyze and extract design tokens, and script documents through `eval` with a Figma Plugin API-compatible `figma` global and an `pairdraw` global for what Pairdraw adds, such as component behaviours and slots.
+Headless command line for [Pairdraw](https://github.com/BadryansahBangsawan/pairdraw) and `.fig` files: inspect documents and layers, query with XPath, export to PNG, JPG, WEBP, SVG, PDF, PPTX, JSX, HTML, or `.fig`, import HTML/CSS/Tailwind, lint design files, analyze and extract design tokens, and script documents through `eval` with a Figma Plugin API-compatible `figma` global and a `pairdraw` global for what Pairdraw adds, such as component behaviours and slots.
 
 ```sh
 npm install -g @pairdraw/cli   # or: bun add -g @pairdraw/cli

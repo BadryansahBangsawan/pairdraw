@@ -29,7 +29,7 @@ export type AIModelConnection = {
   customBaseURL: string
   customAPIType: 'completions' | 'responses'
   credentialProfileId: string
-  /** The Home Cloud workspace whose plan pays for an `pairdraw` connection. */
+  /** The Home Cloud workspace whose plan pays for a `pairdraw` connection. */
   cloudWorkspaceId?: string
 }
 

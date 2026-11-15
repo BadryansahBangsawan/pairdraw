@@ -51,7 +51,7 @@ Every client below starts the same command, `pairdraw-mcp`, from `npm install -g
 
 ### Set up from the desktop app {#client-setup}
 
-The desktop app can write the entry for you. Open **Settings → MCP → Other apps** and turn on each app you use: Claude Code, Claude Desktop, Codex, Gemini CLI, OpenCode, Kiro, Cursor, or VS Code. Turning a switch on adds an `pairdraw` entry that starts `pairdraw-mcp` to that app's own config file, the file this page names for it; turning it off removes the entry again. Everything else in the file, including comments and formatting, stays as it was, and before its first change the app keeps a copy of the file next to it with `.pairdraw.bak` appended to the name.
+The desktop app can write the entry for you. Open **Settings → MCP → Other apps** and turn on each app you use: Claude Code, Claude Desktop, Codex, Gemini CLI, OpenCode, Kiro, Cursor, or VS Code. Turning a switch on adds a `pairdraw` entry that starts `pairdraw-mcp` to that app's own config file, the file this page names for it; turning it off removes the entry again. Everything else in the file, including comments and formatting, stays as it was, and before its first change the app keeps a copy of the file next to it with `.pairdraw.bak` appended to the name.
 
 | App | File |
 |-----|------|

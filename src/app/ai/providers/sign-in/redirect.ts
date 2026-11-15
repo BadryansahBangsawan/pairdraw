@@ -6,11 +6,11 @@ import { WEB_APP_ORIGIN } from '@/constants'
 
 import type { SignInCallback } from './attempt'
 
-/** Emitted by the desktop shell for an `pairdraw://oauth/<provider>?…` link. */
+/** Emitted by the desktop shell for a `pairdraw://oauth/<provider>?…` link. */
 const OAUTH_CALLBACK_EVENT = 'oauth-callback'
 const POPUP_FEATURES = 'popup,width=520,height=720'
 
-/** What the desktop shell forwards from an `pairdraw://oauth/<provider>?…` link. */
+/** What the desktop shell forwards from a `pairdraw://oauth/<provider>?…` link. */
 const oauthCallbackSchema = v.object({ provider: v.string(), query: v.string() })
 
 /** How one attempt reads the redirect that comes back to it. */
@@ -74,7 +74,7 @@ export function desktopRedirectURL(provider: string, relayPath: string): string 
 }
 
 /**
- * The system browser, which returns through an `pairdraw://oauth/<provider>` link, directly or
+ * The system browser, which returns through a `pairdraw://oauth/<provider>` link, directly or
  * from the hosted relay page; the desktop shell forwards its query as an `oauth-callback` event.
  */
 export async function deepLinkRedirect<Outcome>(

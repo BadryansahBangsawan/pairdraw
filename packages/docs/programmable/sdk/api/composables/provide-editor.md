@@ -39,7 +39,7 @@ provideEditor(props.editor)
 
 ## Notes
 
-The current SDK uses `provideEditor()` and `useEditor()` directly. Some older examples and error messages still refer to an `PairdrawProvider` component, but the injection model is the real API surface to prefer in docs and app code.
+The current SDK uses `provideEditor()` and `useEditor()` directly. Some older examples and error messages still refer to a `PairdrawProvider` component, but the injection model is the real API surface to prefer in docs and app code.
 
 ## Related APIs
 

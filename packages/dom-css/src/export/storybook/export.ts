@@ -52,7 +52,7 @@ export interface ExportStorybookOptions {
    * page's name between when it has several. Without it, stories are titled by page.
    */
   document?: string
-  /** Repository-relative `.fig`/`.pen` path; adds an `pairdraw://` design link to stories. */
+  /** Repository-relative `.fig`/`.pen` path; adds a `pairdraw://` design link to stories. */
   linkPath?: string
   /** Renders a variant to PNG; each story then shows it next to the link as its design. */
   renderDesignImage?: (nodeId: string) => Promise<Uint8Array>

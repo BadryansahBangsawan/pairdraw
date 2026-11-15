@@ -1,7 +1,7 @@
 import { basename } from 'pathe'
 
 // The queue the desktop shell fills before the editor exists: a double-clicked
-// document, an `Open With`, an argv path, or an `pairdraw://` link. Rust tags each
+// document, an `Open With`, an argv path, or a `pairdraw://` link. Rust tags each
 // entry with its producer because the frontend cannot tell them apart from the path
 // alone — a link's path is repo-relative, but a canonicalized Windows path is verbatim
 // (`\\?\C:\…`) and an association path can be anything the filesystem allows.

@@ -54,7 +54,7 @@ function popupCallback(state: string): Promise<SignInCallback | { failure: 'bloc
   return Promise.resolve(callback ?? { failure: 'blocked' })
 }
 
-/** The system browser, which returns through an `pairdraw://oauth/openrouter` link. */
+/** The system browser, which returns through a `pairdraw://oauth/openrouter` link. */
 function deepLinkCallback(state: string): Promise<SignInCallback> {
   return deepLinkRedirect('openrouter', redirectReader(state))
 }

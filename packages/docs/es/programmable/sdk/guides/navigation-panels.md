@@ -1,15 +1,20 @@
 ---
 title: Paneles de navegación
-description: Paneles laterales de páginas y capas con PageListRoot, LayerTreeRoot y estado de selección.
+description: Crear barras laterales de páginas y capas con PageListRoot, LayerTreeRoot y el estado de la selección.
 ---
 
 # Paneles de navegación
 
-Un panel lateral suele incluir una lista de páginas y el árbol de capas. El SDK de Vue ofrece componentes sin estilos para ambas áreas.
+Las barras laterales de Pairdraw suelen combinar dos funciones:
 
-## Pages
+- la navegación por páginas
+- la navegación por capas
 
-Usa `PageListRoot` o `usePageList()`:
+El SDK de Vue ofrece primitivas sin estilos para ambas.
+
+## Navegación por páginas
+
+Use `PageListRoot` o `usePageList()`.
 
 ```vue
 <PageListRoot v-slot="{ pages, currentPageId, switchPage, addPage }">
@@ -17,14 +22,14 @@ Usa `PageListRoot` o `usePageList()`:
     <button v-for="page in pages" :key="page.id" @click="switchPage(page.id)">
       {{ page.name }}
     </button>
-    <button @click="addPage()">Nueva Page</button>
+    <button @click="addPage()">New page</button>
   </div>
 </PageListRoot>
 ```
 
-## Layers
+## Navegación por capas
 
-Usa `LayerTreeRoot` si quieres que el SDK gestione Tree structure e Interactions y que la aplicación defina el Markup y los Styles:
+Use `LayerTreeRoot` cuando quiera que el SDK gestione la estructura del árbol y que la presentación quede a cargo de la aplicación.
 
 ```vue
 <LayerTreeRoot v-slot="{ items, selectedIds, select, toggleExpand, getKey, getChildren }">
@@ -39,13 +44,15 @@ Usa `LayerTreeRoot` si quieres que el SDK gestione Tree structure e Interactions
 </LayerTreeRoot>
 ```
 
-## Disposición habitual
+## Patrón práctico
 
-- Pages en la parte superior del panel;
-- Layers debajo;
-- detalles y cambio de nombre directo dentro de los componentes de fila.
+Una disposición habitual es:
 
-## Consulta también
+- las páginas en la parte superior de la barra lateral
+- las capas debajo
+- los detalles o los controles de cambio de nombre en línea integrados en sus componentes de fila
+
+## Véase también
 
 - [usePageList](../api/composables/use-page-list)
 - [PageListRoot](../api/components/page-list-root)

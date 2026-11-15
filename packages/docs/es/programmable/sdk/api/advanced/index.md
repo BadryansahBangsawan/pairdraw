@@ -1,44 +1,43 @@
 ---
 title: API avanzadas
-description: Utilidades de nivel inferior para interfaces especializadas del editor.
+description: API de más bajo nivel y especializadas de @pairdraw/vue.
 ---
 
 # API avanzadas
 
-Estas funciones respaldan los componentes y composables públicos. Úselas cuando necesite una interfaz propia que no encaje en los controles de nivel superior.
+Estas API son públicas, pero están más especializadas que la superficie principal de componentes y composables. Úselas cuando necesite una interfaz propia que no encaje en los controles de nivel superior.
 
-## Lienzo y herramientas
-
-- [toolCursor](./tool-cursor)
-- [useCanvasContext](./use-canvas-context)
-- [useCanvasDrop](./use-canvas-drop)
-- [useToolbar](./use-toolbar)
-- [useToolbarState](./use-toolbar-state)
-- [useViewportKind](./use-viewport-kind)
-
-## Propiedades y color
+## Funciones de selección y de escena
 
 - [useNodeProps](./use-node-props)
+- [useSceneComputed](./use-scene-computed)
 - [usePropScrub](./use-prop-scrub)
-- [usePropertyList](./use-property-list)
+
+## Selectores, variables, configuración regional e internos del editor
+
 - [useColorVariableBinding](./use-color-variable-binding)
+- [useColorBindingProvider](/programmable/sdk/api/advanced/use-color-binding-provider)
 - [useGradientStops](./use-gradient-stops)
+- [useFontPicker](./use-font-picker)
 - [useOkHCL](./use-okhcl)
+- [useVariables](./use-variables)
+- [API de configuración regional](./locale-apis)
+- [useToolbarState](./use-toolbar-state)
+- [useNodeFontStatus](./use-node-font-status)
 
-## Navegación y edición
+## Utilidades para la carcasa del editor
 
-- [useLayerTree](./use-layer-tree)
 - [useLayerDrag](./use-layer-drag)
 - [useInlineRename](./use-inline-rename)
-- [useFontPicker](./use-font-picker)
-- [useNodeFontStatus](./use-node-font-status)
-- [useSceneComputed](./use-scene-computed)
-
-## Variables y configuración regional
-
-- [useVariables](./use-variables)
-- [API regionales](./locale-apis)
-
-## Portapapeles
-
+- [useCanvasDrop](./use-canvas-drop)
 - [extractImageFilesFromClipboard](./extract-image-files-from-clipboard)
+- [useViewportKind](./use-viewport-kind)
+- [toolCursor](./tool-cursor)
+
+## Funciones de contexto de las primitivas
+
+- [useCanvasContext](./use-canvas-context)
+- [useLayerTree](./use-layer-tree)
+- [useToolbar](./use-toolbar)
+- [usePropertyList](./use-property-list)
+- [useNumberField](/programmable/sdk/api/advanced/use-number-field)

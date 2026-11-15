@@ -1,17 +1,47 @@
 ---
 title: useTextEdit
-description: Conectar la edición directa de texto con un lienzo propio.
+description: Gestionar la edición de texto en el DOM, la composición, el formato y la sincronización de los objetos de texto del lienzo.
 ---
 
 # useTextEdit
 
-`useTextEdit(options)` coordina foco, entrada de texto, composición IME, selección, portapapeles y salida del modo de edición.
+`useTextEdit()` hace de puente entre la entrada de texto del DOM y el modelo de edición de texto del lienzo del editor.
 
-Úselo en el componente que contiene el lienzo, normalmente junto con `useCanvas()` y `useCanvasInput()`.
+Coordina:
 
-El editor conserva el texto y sus intervalos de estilo en una única operación de deshacer.
+- la entrada de texto basada en un textarea
+- la composición IME
+- el parpadeo del cursor
+- el comportamiento de Suprimir y Retroceso
+- comandos de formato como negrita, cursiva y subrayado
+- la sincronización de los cambios de texto con el grafo
+
+## Uso
+
+```ts
+useTextEdit(canvasRef, editor)
+```
+
+## Ejemplo básico
+
+Úselo en el componente propietario del lienzo junto con `useCanvas()` y `useCanvasInput()`.
+
+## Ejemplos prácticos
+
+### Admitir atajos de formato
+
+`useTextEdit()` ya gestiona las acciones de formato con el teclado, como negrita, cursiva y subrayado, mientras la edición de texto está activa.
+
+### Mantener sincronizados el lienzo y el editor de texto
+
+Actualiza el texto del grafo y los intervalos de estilo a medida que el usuario escribe o edita intervalos con formato.
+
+## Notas
+
+Es un composable de integración entre el lienzo y el editor, no un composable genérico para campos de texto.
 
 ## Véase también
 
+- [useCanvas](./use-canvas)
 - [useCanvasInput](./use-canvas-input)
-- [Edición de texto](/user-guide/text-editing)
+- [Edición de texto](/es/user-guide/text-editing)

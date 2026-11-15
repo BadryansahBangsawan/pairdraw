@@ -1,13 +1,13 @@
 ---
 title: useGradientStops
-description: Estado y acciones de los puntos de un degradado.
+description: Estado de los puntos de degradado y función de modificación para los editores de rellenos.
 ---
 
 # useGradientStops
 
-`useGradientStops(fill, onUpdate)` gestiona el punto activo, el tipo de degradado, el arrastre y los cambios de posición, color y opacidad.
+`useGradientStops(fill, onUpdate)` gestiona el estado del punto activo, el cambio de subtipo, el arrastre de puntos y las actualizaciones de color u opacidad de los rellenos de degradado.
 
-Use el composable para crear una interfaz de degradados sin duplicar esta lógica.
+Úselo al crear editores de degradados propios que vayan más allá de las primitivas incluidas.
 
 ## Véase también
 

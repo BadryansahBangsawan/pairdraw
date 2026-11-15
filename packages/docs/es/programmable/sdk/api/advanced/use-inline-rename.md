@@ -1,13 +1,13 @@
 ---
 title: useInlineRename
-description: Gestionar estado, foco y teclado al cambiar un nombre directamente.
+description: Estado del cambio de nombre en línea y función de gestión del foco.
 ---
 
 # useInlineRename
 
-`useInlineRename(onCommit)` gestiona edición, foco, clic fuera, confirmación y cancelación con Escape.
+`useInlineRename(onCommit)` gestiona el estado de edición, el foco, los clics fuera y el comportamiento del teclado en los flujos de cambio de nombre en línea.
 
-Úselo en listas de páginas, árboles de capas y otras interfaces donde el nombre se modifica sin abrir un diálogo.
+Úselo en listas de páginas, árboles de capas u otras interfaces propias donde el nombre se cambia en el sitio.
 
 ## Véase también
 

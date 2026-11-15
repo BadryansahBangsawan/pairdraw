@@ -1,15 +1,15 @@
 ---
 title: useNodeFontStatus
-description: Información sobre Fonts ausentes en un objeto de texto.
+description: Función de estado de las fuentes que faltan en los objetos de texto.
 ---
 
 # useNodeFontStatus
 
-`useNodeFontStatus(node)` comprueba los Fonts del objeto de texto indicado y devuelve información sobre Families y Styles que no se han cargado.
+`useNodeFontStatus(node)` devuelve información sobre las fuentes que faltan a partir de un getter de un objeto de texto.
 
-Usa el composable en paneles Typography y advertencias de Fonts ausentes.
+Úselo en paneles de tipografía y en avisos que deban señalar familias tipográficas no disponibles.
 
-## Consulta también
+## Véase también
 
 - [useTypography](../composables/use-typography)
 - [TypographyControlsRoot](../components/typography-controls-root)

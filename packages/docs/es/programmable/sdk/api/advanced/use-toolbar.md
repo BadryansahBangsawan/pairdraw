@@ -1,13 +1,13 @@
 ---
 title: useToolbar
-description: Acceder al contexto proporcionado por ToolbarRoot.
+description: Función de contexto de primitivas para los descendientes de ToolbarRoot.
 ---
 
 # useToolbar
 
-`useToolbar()` devuelve el contexto del `ToolbarRoot` más cercano.
+`useToolbar()` lee el contexto local de la barra de herramientas que proporciona `ToolbarRoot`.
 
-Úselo en componentes descendientes que necesiten herramientas, estado activo o la acción para cambiar de herramienta.
+Úselo dentro de descendientes de la barra que necesiten acceder a las herramientas, al estado activo o a las funciones para seleccionar herramientas.
 
 ## Véase también
 

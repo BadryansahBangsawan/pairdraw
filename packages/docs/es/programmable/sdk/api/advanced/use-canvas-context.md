@@ -1,13 +1,13 @@
 ---
 title: useCanvasContext
-description: Acceder al contexto proporcionado por CanvasRoot.
+description: Función de contexto de primitivas para los descendientes de CanvasRoot.
 ---
 
 # useCanvasContext
 
-`useCanvasContext()` devuelve el contexto del `CanvasRoot` más cercano.
+`useCanvasContext()` lee el contexto local del lienzo que proporciona `CanvasRoot`.
 
-Úselo en `CanvasSurface` o en componentes descendientes que necesiten referencias y estado del lienzo.
+Úselo dentro de descendientes como `CanvasSurface` o de sus propios componentes hijos del lienzo.
 
 ## Véase también
 

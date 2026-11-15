@@ -1,13 +1,13 @@
 ---
 title: useLayerTree
-description: Acceder al contexto proporcionado por LayerTreeRoot.
+description: Función de contexto de primitivas para los descendientes de LayerTreeRoot.
 ---
 
 # useLayerTree
 
-`useLayerTree()` devuelve el contexto del `LayerTreeRoot` más cercano.
+`useLayerTree()` lee el contexto local del árbol de capas que proporciona `LayerTreeRoot`.
 
-Úselo en componentes descendientes que necesiten elementos, selección, ramas desplegadas o acciones de fila.
+Úselo dentro de descendientes propios del árbol de capas que necesiten acceder a los elementos del árbol, el estado de la selección, el estado de despliegue o las acciones de fila.
 
 ## Véase también
 

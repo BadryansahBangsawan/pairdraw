@@ -1,15 +1,15 @@
 ---
 title: extractImageFilesFromClipboard
-description: Leer Image files compatibles de un ClipboardEvent.
+description: Utilidad del portapapeles para extraer los archivos de imagen admitidos.
 ---
 
 # extractImageFilesFromClipboard
 
-`extractImageFilesFromClipboard(event)` devuelve los Image files del Clipboard y descarta los File types no compatibles.
+`extractImageFilesFromClipboard(event)` filtra los archivos del portapapeles y deja solo los tipos de imagen admitidos que usa el flujo de soltar en el lienzo.
 
-Usa la Function para implementar Paste de Images.
+Úsela al implementar flujos para pegar imágenes desde el portapapeles.
 
-## Consulta también
+## Véase también
 
 - [useCanvasDrop](./use-canvas-drop)
 - [useCanvas](../composables/use-canvas)

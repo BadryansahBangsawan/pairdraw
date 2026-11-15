@@ -5,16 +5,16 @@ description: Componentes, composables y API avanzadas de @pairdraw/vue.
 
 # Referencia de la API
 
-La referencia del SDK de Vue se divide en tres áreas.
+La referencia del SDK de Vue se organiza en tres secciones.
 
 <SdkCardGroup>
-  <SdkCard title="Componentes" to="/programmable/sdk/api/components/" description="Componentes sin estilos como CanvasRoot, ToolbarRoot, FontPickerRoot y NumberField." />
-  <SdkCard title="Composables" to="/programmable/sdk/api/composables/" description="Estado y acciones para editor, lienzo, selección, comandos y paneles de propiedades." />
-  <SdkCard title="API avanzadas" to="/programmable/sdk/api/advanced/" description="Contextos de bajo nivel y funciones especializadas para integraciones propias." />
+  <SdkCard title="Componentes" to="/es/programmable/sdk/api/components/" description="Primitivas estructurales sin estilos como CanvasRoot, ToolbarRoot, FontPickerRoot y NumberFieldRoot." />
+  <SdkCard title="Composables" to="/es/programmable/sdk/api/composables/" description="Estado y acciones para editor, lienzo, selección, comandos y paneles de propiedades." />
+  <SdkCard title="API avanzadas" to="/es/programmable/sdk/api/advanced/" description="Contextos de bajo nivel y funciones especializadas para integraciones propias." />
 </SdkCardGroup>
 
-## Por dónde empezar
+## Recorrido recomendado
 
-- **Componentes** para estructuras y controles reutilizables de la interfaz.
-- **Composables** para estado y acciones del editor.
-- **API avanzadas** para integraciones que necesiten acceso directo a estado o contexto de bajo nivel.
+- Empiece por **Componentes** si crea primitivas de interfaz reutilizables para el editor.
+- Empiece por **Composables** si conecta el estado y las acciones del editor.
+- Use **API avanzadas** solo cuando necesite funciones de más bajo nivel o contextos de primitivas.

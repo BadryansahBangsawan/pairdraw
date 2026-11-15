@@ -13,7 +13,7 @@ La aplicación Pairdraw es solo una de las interfaces creadas con este conjunto 
 
 El SDK proporciona:
 
-- el contexto del editor mediante dependency injection de Vue;
+- el contexto del editor mediante la inyección de dependencias de Vue;
 - renderizado del lienzo con CanvasKit;
 - composables para la selección, los comandos, los menús, los paneles de propiedades y las variables;
 - componentes estructurales sin estilos como `PageListRoot`, `PropertyListRoot` y `ToolbarRoot`;
@@ -22,10 +22,10 @@ El SDK proporciona:
 ## Por dónde empezar
 
 <SdkCardGroup>
-  <SdkCard title="Primeros pasos" to="/programmable/sdk/getting-started" description="Instala el paquete, crea una instancia del editor y conecta los componentes principales." />
-  <SdkCard title="Arquitectura" to="/programmable/sdk/architecture" description="Descubre cómo se relacionan los composables, los componentes y el contexto del editor." />
-  <SdkCard title="Guías" to="/programmable/sdk/guides/custom-editor-shell" description="Crea interfaces de editor, paneles de propiedades y paneles de navegación personalizados." />
-  <SdkCard title="Referencia de la API" to="/programmable/sdk/api/" description="Consulta los componentes, los composables y las API de bajo nivel." />
+  <SdkCard title="Primeros pasos" to="/es/programmable/sdk/getting-started" description="Instala el paquete, crea una instancia del editor y conecta los componentes principales." />
+  <SdkCard title="Arquitectura" to="/es/programmable/sdk/architecture" description="Descubre cómo se relacionan los composables, los componentes y el contexto del editor." />
+  <SdkCard title="Guías" to="/es/programmable/sdk/guides/custom-editor-shell" description="Crea interfaces de editor, paneles de propiedades y paneles de navegación personalizados." />
+  <SdkCard title="Referencia de la API" to="/es/programmable/sdk/api/" description="Consulta los componentes, los composables y las API de bajo nivel." />
 </SdkCardGroup>
 
 ## Para qué sirve el SDK
@@ -33,6 +33,8 @@ El SDK proporciona:
 Cada producto y cada equipo necesita una experiencia de edición diferente.
 
 Puede tratarse de un editor de diseño completo, un lienzo integrado en otra aplicación, una herramienta interna, un editor de plantillas o una interfaz especializada con funciones de IA.
+
+El SDK es la capa que hace posible todo esto.
 
 ## Principios de diseño
 
@@ -52,6 +54,6 @@ Si solo necesitas el estado y las operaciones del editor, empieza por los compos
 
 ## Secciones de la API
 
-- [Componentes](/programmable/sdk/api/components/)
-- [Composables](/programmable/sdk/api/composables/)
-- [API de bajo nivel](/programmable/sdk/api/advanced/)
+- [Componentes](/es/programmable/sdk/api/components/)
+- [Composables](/es/programmable/sdk/api/composables/)
+- [API de bajo nivel](/es/programmable/sdk/api/advanced/)

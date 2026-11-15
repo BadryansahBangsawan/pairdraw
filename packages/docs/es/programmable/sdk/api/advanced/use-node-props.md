@@ -1,16 +1,17 @@
 ---
 title: useNodeProps
-description: API de nivel inferior para valores mixtos y cambios de propiedades.
+description: Función de bajo nivel de selección y valores mixtos para paneles de propiedades.
 ---
 
 # useNodeProps
 
-`useNodeProps()` sirve de base a `useAppearance`, `useLayout` y `useTypography`.
+`useNodeProps()` es la función de bajo nivel para paneles de propiedades en la que se basan composables de más alto nivel como `useAppearance`, `useLayout` y `useTypography`.
 
-Úselo cuando un panel propio deba detectar valores mixtos, actualizar una propiedad en varios objetos, modificar elementos de una matriz o separar vista previa y guardado con soporte de deshacer.
+Úselo cuando necesite detectar valores mixtos, actualizar varios objetos seleccionados, editar elementos de una matriz o confirmar propiedades teniendo en cuenta deshacer.
 
 ## Véase también
 
 - [useAppearance](../composables/use-appearance)
 - [useLayout](../composables/use-layout)
 - [useTypography](../composables/use-typography)
+- [PropertyListRoot](../components/property-list-root)

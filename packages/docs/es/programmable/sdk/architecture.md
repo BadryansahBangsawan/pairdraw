@@ -92,7 +92,7 @@ Ejemplos:
 
 ### No pases todo el contexto por una única ranura
 
-Pasa a la ranura únicamente las propiedades necesarias o utiliza el composable directamente. Los componentes controlados, como `PropertyListRoot`, emiten eventos semánticos. La conexión con la selección y el historial de deshacer debe estar en un adaptador o composable de control, no en el propio componente.
+Pasa a la ranura únicamente las propiedades necesarias o utiliza el composable directamente, en lugar de enormes cargas `v-slot="ctx"`. Los componentes controlados, como `PropertyListRoot`, emiten eventos semánticos. La conexión con la selección y el historial de deshacer debe estar en un adaptador o composable de control, no en el propio componente.
 
 ## Responsabilidades de la aplicación y el SDK
 

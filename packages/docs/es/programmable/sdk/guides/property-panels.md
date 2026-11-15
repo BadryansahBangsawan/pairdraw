@@ -27,7 +27,7 @@ Para propiedades en forma de lista:
 
 ## Enlaces con variables
 
-Cuando un campo pueda vincularse a una variable o un token de diseño externo, colócalo dentro de `BindableValueRoot`.
+Cuando un campo pueda vincularse a una variable o un token de diseño externo, colócalo dentro de `BindableValueRoot`. La primitiva no impone ninguna presentación, pero las interfaces que tienen en cuenta los vínculos deben mantener un foco no destructivo:
 
 - Sin edición activa, muestra el nombre de la variable; el valor calculado puede aparecer en una ayuda emergente.
 - El foco y la apertura del selector de variables no deben eliminar un enlace existente.
@@ -35,7 +35,7 @@ Cuando un campo pueda vincularse a una variable o un token de diseño externo, c
 - Es preferible incluir una acción explícita para eliminar el enlace dentro del selector que un botón fácil de pulsar por accidente junto al campo.
 - Agrupa cambios de enlace, separación durante la edición y actualizaciones de varios objetos en una sola operación por lotes del proveedor.
 
-La aplicación de Pairdraw muestra el nombre de la variable en morado cuando el campo está inactivo. Al empezar a editar, `NumberField` muestra el valor numérico calculado. Una interfaz propia puede presentar el mismo estado de otra forma.
+La apariencia de la aplicación Pairdraw muestra en reposo una etiqueta violeta con el nombre de la variable. Al empezar a editar, `NumberField` muestra el valor numérico calculado. Una interfaz propia puede presentar el mismo estado de otra forma.
 
 ## Ejemplo: posición y tamaño
 
@@ -79,10 +79,10 @@ const fills = useEditorPropertyList('fills')
   >
     <div v-for="(fill, index) in items" :key="index">
       {{ fill.type }}
-      <button @click="actions.remove(index)">Eliminar</button>
+      <button @click="actions.remove(index)">Remove</button>
     </div>
 
-    <button @click="actions.add(fillControls.defaultFill)">Añadir relleno</button>
+    <button @click="actions.add(fillControls.defaultFill)">Add fill</button>
   </PropertyListRoot>
 </template>
 ```
@@ -92,7 +92,7 @@ const fills = useEditorPropertyList('fills')
 - Composables para el estado y las acciones.
 - Componentes estructurales sin aspecto predefinido cuando lo principal sea coordinar listas, árboles o slots repetidos.
 
-## Consulta también
+## Véase también
 
 - [usePosition](../api/composables/use-position)
 - [useLayout](../api/composables/use-layout)

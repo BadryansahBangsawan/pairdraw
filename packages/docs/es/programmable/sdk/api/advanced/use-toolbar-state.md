@@ -1,15 +1,16 @@
 ---
 title: useToolbarState
-description: Estado reactivo de las herramientas disponibles y la herramienta activa.
+description: Función de estado de la barra de herramientas orientada a la presentación, para paginar categorías en móvil.
 ---
 
 # useToolbarState
 
-`useToolbarState()` devuelve la lista de herramientas, la activa y la acción para cambiarla.
+`useToolbarState()` devuelve el estado de paginación de categorías en móvil y funciones como `goPrev()` y `goNext()` para carcasas de barra de herramientas adaptables.
 
-Use este composable si necesita la lógica de la barra sin `ToolbarRoot`.
+Úselo al crear disposiciones de barra de herramientas sobre `ToolbarRoot`.
 
 ## Véase también
 
 - [ToolbarRoot](../components/toolbar-root)
+- [ToolbarItem](../components/toolbar-item)
 - [useToolbar](./use-toolbar)

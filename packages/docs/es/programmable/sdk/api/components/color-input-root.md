@@ -1,13 +1,46 @@
 ---
 title: ColorInputRoot
-description: Estado y acciones para un campo de color controlado.
+description: Ayudante sin estilos para entradas de color con análisis hexadecimal y funciones de actualización.
 ---
 
 # ColorInputRoot
 
-`ColorInputRoot` normaliza un valor de color, genera su representación hexadecimal y proporciona acciones para actualizarlo desde texto o desde un objeto `Color`.
+`ColorInputRoot` es un ayudante sin estilos para interfaces de entrada de color.
 
-La aplicación representa el campo mediante la ranura predeterminada. Los nombres exactos de sus propiedades de ranura —`color`, `editable`, `hex`, `updateFromHex` y `updateColor`— forman parte de la API.
+Deriva un valor hexadecimal a partir de un color y expone funciones de actualización para cambios desde el valor hexadecimal y desde el color completo.
+
+## Props
+
+<SdkPropsTable
+  :rows="[
+    { name: 'color', type: 'Color', description: 'Valor de color actual.', required: true },
+    { name: 'editable', type: 'boolean | undefined', description: 'Si el consumidor debe presentar el valor como editable.' }
+  ]"
+/>
+
+## Eventos
+
+<SdkEventsTable
+  :rows="[
+    { name: 'update', payload: 'color: Color', description: 'Se emite cuando cambia el color.' }
+  ]"
+/>
+
+## Ranuras
+
+<SdkSlotsTable
+  :rows="[
+    { name: 'default', props: '{ color: Color, editable: boolean, hex: string, updateFromHex: (value: string) => void, updateColor: (color: Color) => void }', description: 'Contrato principal para representar la entrada de color.' }
+  ]"
+/>
+
+## Ejemplo
+
+```vue
+<ColorInputRoot :color="color" @update="color = $event" v-slot="{ hex, updateFromHex }">
+  <input :value="hex" @input="updateFromHex(($event.target as HTMLInputElement).value)" />
+</ColorInputRoot>
+```
 
 ## Véase también
 

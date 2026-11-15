@@ -1,25 +1,74 @@
 ---
 title: useCanvasInput
-description: Conectar puntero, arrastre, selección, tamaño, giro y herramientas con el lienzo.
+description: Conectar la entrada del puntero en el lienzo, el arrastre, la selección, el redimensionado, el giro y el comportamiento de las herramientas.
 ---
 
 # useCanvasInput
 
-`useCanvasInput(options)` enlaza los eventos del elemento con el sistema de entrada del editor:
+`useCanvasInput()` conecta la interacción del puntero y del ratón con el lienzo del editor.
 
-- movimiento, pulsación y liberación del puntero;
-- selección y marco de selección;
-- desplazamiento y zoom;
-- arrastre de objetos;
-- redimensionado y giro;
-- herramientas de forma, Pluma, Texto y Mano;
-- edición vectorial y de texto.
+Se ocupa de aspectos de la interacción como:
 
-El composable convierte coordenadas de pantalla a coordenadas del lienzo y conserva la captura del puntero durante una interacción.
+- selección
+- arrastre
+- redimensionado
+- giro
+- desplazamiento de la vista
+- flujos de pluma y dibujo
+- interacción de edición de texto
+- detección de impactos según el ámbito
 
-Esta API de bajo nivel está pensada principalmente para componentes que contienen el lienzo de una interfaz propia.
+## Uso
+
+Este composable suele combinarse con `useCanvas()` y con las funciones de detección de impactos del renderizador.
+
+```ts
+useCanvasInput(
+  canvasRef,
+  editor,
+  hitTestSectionTitle,
+  hitTestComponentLabel,
+  hitTestFrameTitle,
+)
+```
+
+## Ejemplo básico
+
+```ts
+const canvas = useCanvas(canvasRef, editor)
+
+useCanvasInput(
+  canvasRef,
+  editor,
+  canvas.hitTestSectionTitle,
+  canvas.hitTestComponentLabel,
+  canvas.hitTestFrameTitle,
+)
+```
+
+## Ejemplos prácticos
+
+### Seguir el movimiento del cursor en el espacio del lienzo
+
+```ts
+useCanvasInput(
+  canvasRef,
+  editor,
+  hitTestSectionTitle,
+  hitTestComponentLabel,
+  hitTestFrameTitle,
+  (cx, cy) => {
+    console.log(cx, cy)
+  },
+)
+```
+
+## Notas
+
+Este composable es de más bajo nivel que la mayor parte de la lógica de los paneles. Es más adecuado para carcasas de editor y contenedores del lienzo.
 
 ## Véase también
 
 - [useCanvas](./use-canvas)
+- [useEditor](./use-editor)
 - [useTextEdit](./use-text-edit)

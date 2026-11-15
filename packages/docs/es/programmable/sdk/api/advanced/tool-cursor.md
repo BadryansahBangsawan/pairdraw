@@ -1,13 +1,13 @@
 ---
 title: toolCursor
-description: Obtener el cursor CSS correspondiente a la herramienta activa.
+description: Función que resuelve la cadena de cursor de una herramienta del editor.
 ---
 
 # toolCursor
 
-`toolCursor(tool, override?)` devuelve el cursor CSS de una herramienta. `override` puede sustituir el resultado.
+`toolCursor(tool, override?)` asigna a una herramienta del editor el cursor que debe usar el SDK, y sigue permitiendo una sustitución explícita.
 
-Use la función para mantener cursores coherentes en un lienzo o una barra propios.
+Úsela al crear carcasas de lienzo o interfaces de herramientas propias que necesiten un comportamiento de cursor coherente.
 
 ## Véase también
 

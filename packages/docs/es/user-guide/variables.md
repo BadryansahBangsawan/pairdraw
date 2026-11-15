@@ -46,6 +46,23 @@ En el lienzo, una capa muestra un modo cuando la estableces en él, sea cual sea
 
 ## Gestionar variables
 
+### Valores con fórmula
+
+El campo de valor de una variable numérica admite un número, otra variable o una fórmula. Empieza a escribir el nombre de una variable y elígela en la lista, o elige **Usar una variable**: aparece como una etiqueta, y el campo muestra el resultado de la fórmula, como `= 16px`. Las etiquetas se guardan por ID, así que renombrar una variable no rompe la fórmula. Las variables booleanas, de texto y de color conservan su interruptor, su campo de texto o su selector de color; elige **Usar una fórmula** junto a una para escribir una fórmula en su lugar.
+
+- Los números usan `+`, `-`, `*`, `/` y paréntesis: `space/base * 4`.
+- Los valores booleanos usan `and`, `or` y `not`, y comparan números con `==`, `!=`, `<`, `<=`, `>` y `>=`: `viewport > 1024 and not loading`. `==` y `!=` también comparan texto.
+- El texto se escribe entre comillas dobles, y `+` lo une con otro texto, un número o un valor booleano: `"Hello, " + name`. `text(count)` escribe un número como lo hace Figma, con dos decimales salvo que sea entero: `3`, `1.50`.
+- `if(condición, entonces, si no)` elige entre dos números, textos, valores booleanos o colores: `if(compact, 8, 16)`, `if(dark, gray/900, #FFFFFF)`. Los colores se escriben como `#RRGGBB`, o `#RRGGBBAA` con opacidad.
+- `truthy(valor)` es falso para `0`, el texto vacío y las palabras `false`, `no` y `off`, y verdadero para todo lo demás, como los lee Figma.
+- Las variables desconocidas, las referencias circulares, los tipos mezclados y la división por cero se informan al salir del campo, y el valor guardado se queda como estaba.
+
+El resultado sigue los modos de variable de cada capa y actualiza las capas vinculadas cuando cambia una variable que usa. Las fórmulas usan las unidades guardadas, así que las longitudes van en píxeles. La lista muestra el resultado de cada fórmula; pasa el puntero por el icono de fórmula para leerla.
+
+En la hoja de estilos, una fórmula numérica se escribe como `calc()` sobre las variables que usa, como `calc(var(--spacing-md) * 2 - var(--spacing-base))`, y se vuelve a declarar en cada modo que cambia una de ellas. Las fórmulas que usan `if()`, texto o valores booleanos no tienen forma CSS y se omiten de la hoja de estilos. Una **Expresión CSS** sustituye el valor solo en CSS. Los archivos de design tokens guardan el resultado de cada fórmula, con la fórmula en `$extensions`. Las fórmulas sobreviven a copiar y pegar, a compartir, a deshacer y a los guardados `.fig`, y las expresiones de color y opacidad de Figma conservan sus referencias a variables.
+
+### Lista de variables
+
 Las variables se agrupan según las carpetas de sus nombres (`Brand/Primary` aparece como *Primary* dentro de *Brand*), con su nombre CSS y un valor por modo.
 
 - **Crear una variable:** haz clic en **Crear variable** (o en **+**) y elige un tipo; la nueva variable se abre para editarla
@@ -62,7 +79,7 @@ Al seleccionar una variable se editan:
 - **Nombre** y **Nombre CSS:** deja el nombre CSS vacío para derivarlo del nombre y los ámbitos, por ejemplo `--color-brand-primary`. Escribe el nombre sin `--`; un nombre que CSS no puede usar se marca y no se guarda
 - **Unidad:** para números, `px`, `rem`, `%`, `ms`, `s`, `deg` o ninguna; los valores se introducen en esa unidad
 - **Valor** o **Valores:** uno por modo; un color abre el selector de color. El botón de variable (**Usar una variable**) junto a un valor lo hace apuntar a otra variable del mismo tipo, un alias que sigue a esa variable; **Desvincular variable** lo devuelve al valor que mostraba
-- **Expresión CSS:** para números, un valor como `clamp(1rem, 4vw, 1.5rem)` que se escribe en CSS en lugar del número, mientras el lienzo sigue dibujando el número
+- **Expresión CSS:** para números, elige **Añadir expresión CSS** en el menú **⋯** de un valor para escribir CSS como `clamp(1rem, 4vw, var(--spacing-md))` en lugar del valor, mientras el lienzo sigue dibujando el valor. Los nombres de token se completan como `var(--name)` y se muestran como etiquetas, el botón de variable inserta uno, y una función sin cerrar, un token desconocido o un valor que la unidad del token no admite se informan al salir del campo. La expresión se mantiene cuando el valor cambia entre un número, una variable y una fórmula; quítala desde el mismo menú (**Quitar la expresión CSS**)
 - **Ámbitos:** para qué propiedades se ofrece la variable
 - **Descripción**
 - **Ocultar al publicar:** los archivos que usan este como biblioteca no ven la variable

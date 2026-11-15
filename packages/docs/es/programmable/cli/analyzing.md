@@ -1,50 +1,67 @@
 ---
 title: Analizar documentos con la CLI
-description: Detectar colores, tipografías, espaciados y estructuras repetidas.
+description: Auditar colores, tipografía, espaciado y patrones repetidos en archivos .fig.
 ---
 
 # Analizar documentos con la CLI
 
-Los subcomandos `analyze` examinan el documento completo y ayudan a descubrir inconsistencias o candidatos a componentes.
+Los comandos `analyze` auditan un sistema de diseño completo desde el terminal: encuentran inconsistencias, extraen la paleta real y señalan los componentes que esperan a ser extraídos.
 
 ## Colores
 
 ```sh
-bun pairdraw analyze colors design.fig
+pairdraw analyze colors design.fig
 ```
 
-Agrupa los colores de rellenos y contornos, cuenta su uso y ayuda a detectar tonos casi idénticos.
+Encuentra todos los colores del archivo, cuenta su uso y muestra un histograma visual:
+
+```
+#1d1b20  ██████████████████████████████ 17155×
+#49454f  ██████████████████████████████ 9814×
+#ffffff  ██████████████████████████████ 8620×
+#6750a4  ██████████████████████████████ 3967×
+```
 
 ## Tipografía
 
 ```sh
-bun pairdraw analyze typography design.fig
+pairdraw analyze typography design.fig
 ```
 
-Enumera las combinaciones de familia, tamaño y estilo con su frecuencia. Así se identifican estilos aislados.
+Enumera cada combinación de familia, tamaño y peso con su número de usos. Sirve para detectar estilos de texto aislados que convendría unificar.
 
 ## Espaciado
 
 ```sh
-bun pairdraw analyze spacing design.fig
+pairdraw analyze spacing design.fig
 ```
 
-Examina separación y relleno en marcos con disposición automática. Permite detectar, por ejemplo, un valor de `13px` entre los habituales `8/16/24`.
+Audita los valores de separación y de margen interno en los marcos con auto layout. Ayuda a identificar inconsistencias en la escala de espaciado, por ejemplo una separación suelta de `13px` entre valores que por lo demás son `8/16/24`.
 
 ## Estructuras repetidas
 
 ```sh
-bun pairdraw analyze clusters design.fig
+pairdraw analyze clusters design.fig
 ```
 
-Busca jerarquías similares que podrían convertirse en componentes y muestra coincidencia, tamaño y estructura.
+Encuentra patrones de objetos repetidos que podrían extraerse como componentes:
+
+```
+3771× frame "container" (100% match)
+     size: 40×40, structure: Frame > [Frame]
+
+2982× instance "Checkboxes" (100% match)
+     size: 48×48, structure: Instance > [Frame]
+```
 
 ## Salida JSON
 
-Añade `--json` para procesar los resultados en CI, generar informes o aplicar reglas propias.
+Todos los comandos de análisis admiten `--json` para obtener una salida legible por máquinas:
 
 ```sh
-bun pairdraw analyze colors design.fig --json
+pairdraw analyze colors design.fig --json
 ```
+
+Pásala a `jq`, úsala en comprobaciones de CI o en scripts que impongan presupuestos de tokens de diseño.
 
 Estos análisis no modifican el archivo. Para transformaciones usa [`eval`](./scripting).

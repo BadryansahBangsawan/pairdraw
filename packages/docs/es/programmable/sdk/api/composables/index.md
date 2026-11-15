@@ -1,13 +1,13 @@
 ---
 title: Composables
-description: Estado y acciones reutilizables para crear interfaces de edición con Vue.
+description: API de composables principales de @pairdraw/vue.
 ---
 
 # Composables
 
-Estos composables proporcionan el estado y las acciones que suelen necesitar las interfaces propias basadas en Pairdraw.
+Estos son los composables principales que usarán la mayoría de los consumidores de `@pairdraw/vue`.
 
-## Editor y lienzo
+## Contexto y lienzo
 
 - [provideEditor](./provide-editor)
 - [useEditor](./use-editor)
@@ -24,16 +24,28 @@ Estos composables proporcionan el estado y las acciones que suelen necesitar las
 
 ## Paneles de propiedades
 
-- [useAppearance](./use-appearance)
 - [usePosition](./use-position)
 - [useLayout](./use-layout)
+- [useConstraints](/programmable/sdk/api/composables/use-constraints)
+- [useComponentProperties](/programmable/sdk/api/composables/use-component-properties)
+- [useAppearance](./use-appearance)
+- [useSharedStyleBinding](/programmable/sdk/api/composables/use-shared-style-binding)
+- [useColorModel](/programmable/sdk/api/composables/use-color-model)
+- [useMask](/programmable/sdk/api/composables/use-mask)
+- [useVariableModes](/programmable/sdk/api/composables/use-variable-modes)
 - [useTypography](./use-typography)
+- [useExport](./use-export)
 - [useFillControls](./use-fill-controls)
 - [useStrokeControls](./use-stroke-controls)
 - [useEffectsControls](./use-effects-controls)
+- [useSelectionLayout](/programmable/sdk/api/composables/use-selection-layout)
+- [useSelectionColors](/programmable/sdk/api/composables/use-selection-colors)
 
-## Documento
+## Espacios de trabajo de documentos
+
+- [useDocumentWorkspace](/programmable/sdk/api/composables/use-document-workspace)
+
+## Variables, navegación y localización
 
 - [usePageList](./use-page-list)
-- [useExport](./use-export)
 - [useI18n](./use-i18n)

@@ -1,18 +1,34 @@
 ---
 title: API de configuración regional
-description: Configurar idioma, mensajes personalizados y alternativas del SDK.
+description: Almacenes y metadatos de configuración regional de más bajo nivel que exporta @pairdraw/vue.
 ---
 
 # API de configuración regional
 
-Las API regionales permiten elegir el idioma del SDK y sustituir mensajes concretos.
+Además de `useI18n()`, el SDK de Vue exporta primitivas de configuración regional de más bajo nivel para integraciones avanzadas:
 
-- `locale` contiene la configuración regional efectiva después de aplicar preferencias y alternativa.
-- `messages` contiene el catálogo resuelto.
-- `t(key, params?)` traduce una clave.
-- la configuración de la aplicación puede proporcionar catálogos parciales propios.
+- `locale`
+- `localeSetting`
+- `setLocale()`
+- `AVAILABLE_LOCALES`
+- `LOCALE_LABELS`
 
-Los identificadores de claves y nombres de configuración permanecen en inglés porque forman parte de la API.
+Úselas cuando quiera acceder directamente al almacén, necesite integrar el estado de la configuración regional en una carcasa de aplicación más amplia o quiera los metadatos de configuración regional sin suscribirse a todo el objeto que devuelve `useI18n()`.
+
+## Uso
+
+```ts
+import { locale, localeSetting, setLocale, AVAILABLE_LOCALES, LOCALE_LABELS } from '@pairdraw/vue/i18n'
+```
+
+## Notas
+
+- `locale` es el almacén de la configuración regional activa ya resuelta
+- `localeSetting` es el almacén de la preferencia del usuario que se guarda
+- `setLocale()` actualiza a la vez la preferencia y la configuración regional activa
+- `AVAILABLE_LOCALES` y `LOCALE_LABELS` resultan útiles para selectores propios
+
+Los identificadores de claves y los nombres de configuración se mantienen en inglés porque forman parte de la API.
 
 ## Véase también
 

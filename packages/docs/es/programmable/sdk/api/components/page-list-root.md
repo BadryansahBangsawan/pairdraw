@@ -1,17 +1,39 @@
 ---
 title: PageListRoot
-description: Componente sin estilos para una lista de páginas y sus acciones.
+description: Primitiva estructural sin estilos para interfaces de lista de páginas.
 ---
 
 # PageListRoot
 
-`PageListRoot` proporciona mediante su ranura:
+`PageListRoot` es una primitiva estructural sin estilos para interfaces de lista de páginas.
 
-- páginas y página activa;
-- estado de cambio de nombre;
-- acciones para crear, cambiar, renombrar y eliminar páginas.
+Proporciona props de ranura para:
 
-La aplicación decide cómo representar la lista y sus menús.
+- las páginas
+- el identificador de la página actual
+- la detección de separadores
+- acciones de página como crear, cambiar, renombrar y eliminar
+
+## Uso
+
+Úselo cuando quiera la estructura de lista de páginas que proporciona el SDK con una representación y unos estilos propios de la aplicación.
+
+## Ejemplo básico
+
+```vue
+<PageListRoot v-slot="{ pages, currentPageId, switchPage }">
+  <ul>
+    <li v-for="page in pages" :key="page.id">
+      <button
+        :data-active="page.id === currentPageId"
+        @click="switchPage(page.id)"
+      >
+        {{ page.name }}
+      </button>
+    </li>
+  </ul>
+</PageListRoot>
+```
 
 ## Véase también
 

@@ -1,0 +1,1 @@
+- Standalone HTML exports wrap the design in a `pairdraw-stage` element instead of `op-stage`, and the collaboration name and online font settings are stored under Pairdraw keys, so they start from their defaults once after updating.

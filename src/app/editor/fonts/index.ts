@@ -31,9 +31,9 @@ if (typeof navigator !== 'undefined') {
 
 export type FontProviderSettings = Record<WebFontProviderId, boolean>
 
-export const onlineFontsEnabled = useLocalStorage('op-online-fonts-enabled', true)
+export const onlineFontsEnabled = useLocalStorage('pairdraw:online-fonts-enabled', true)
 export const fontProviderSettings = useLocalStorage<FontProviderSettings>(
-  'op-font-providers',
+  'pairdraw:font-providers',
   DEFAULT_WEB_FONT_PROVIDER_SETTINGS
 )
 

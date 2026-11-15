@@ -309,5 +309,5 @@ test('export CLI can write external standalone HTML assets', async () => {
   expect(html).toContain('<link rel="stylesheet" href="card-external.assets/pairdraw.css">')
   expect(html).not.toContain('<style>')
   expect(css).toContain('.flex')
-  expect(css).toContain('.op-stage')
+  expect(css).toContain('.pairdraw-stage')
 })

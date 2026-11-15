@@ -86,5 +86,5 @@ export function fontFaceFromFigmaFontName(fontName: {
 }
 
 export function fontFaceRenderFamily(family: string, style: string): string {
-  return `__op_font__${family.replace(/[^a-z0-9_-]+/giu, '_')}__${style.replace(/[^a-z0-9_-]+/giu, '_')}`
+  return `__pairdraw_font__${family.replace(/[^a-z0-9_-]+/giu, '_')}__${style.replace(/[^a-z0-9_-]+/giu, '_')}`
 }

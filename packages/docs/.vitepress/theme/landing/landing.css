@@ -8,7 +8,7 @@
  * A stage's UI uses the app's font, as `body` does in `src/app.css`. VitePress already loads
  * Inter, so panels look the same on every platform, and so do the stills captured of them.
  */
-.op-app {
+.pairdraw-app {
   font-family: Inter, system-ui, -apple-system, sans-serif;
 }
 

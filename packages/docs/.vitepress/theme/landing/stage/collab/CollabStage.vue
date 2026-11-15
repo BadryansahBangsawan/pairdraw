@@ -58,7 +58,7 @@ const { stop } = useIntersectionObserver(
       <!-- Typography and selection behaviour the app sets on `body` in `src/app.css`. -->
       <div
         ref="root"
-        class="op-app relative flex h-full overflow-hidden bg-canvas text-[13px] leading-normal text-surface select-none max-md:flex-col"
+        class="pairdraw-app relative flex h-full overflow-hidden bg-canvas text-[13px] leading-normal text-surface select-none max-md:flex-col"
       >
         <template v-if="mounted">
           <CollabPane

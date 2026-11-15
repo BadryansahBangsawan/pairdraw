@@ -387,7 +387,7 @@ async function exportStandaloneHTML(
 ): Promise<ExportHTMLBundle> {
   const size = standaloneSize(document)
   const doc = standaloneDocument(document, size)
-  const stageCSS = `.op-stage{position:relative;width:${size.width}px;height:${size.height}px;overflow:hidden;background:transparent}`
+  const stageCSS = `.pairdraw-stage{position:relative;width:${size.width}px;height:${size.height}px;overflow:hidden;background:transparent}`
   let body: string
   let css = `${RESET_CSS}${stageCSS}`
 
@@ -417,7 +417,7 @@ async function exportStandaloneHTML(
     ])
     body = extracted.html
     const cssPath = `${options.assetBasePath}/pairdraw.css`
-    const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${stylesheetLink(cssPath)}</head><body><main data-pairdraw-html="standalone" class="op-stage">${body}</main></body></html>`
+    const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${stylesheetLink(cssPath)}</head><body><main data-pairdraw-html="standalone" class="pairdraw-stage">${body}</main></body></html>`
     return {
       entrypoint: 'index.html',
       files: [
@@ -429,7 +429,7 @@ async function exportStandaloneHTML(
     }
   }
 
-  const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${styleTag(css)}</head><body><main data-pairdraw-html="standalone" class="op-stage">${body}</main></body></html>`
+  const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${styleTag(css)}</head><body><main data-pairdraw-html="standalone" class="pairdraw-stage">${body}</main></body></html>`
   return { entrypoint: 'index.html', files: [{ path: 'index.html', content: html }] }
 }
 

@@ -74,6 +74,29 @@ describe('publishPackageJSON', () => {
     ).toThrow('publishConfig must not rewrite exports')
   })
 
+  test('drops the bun conditions that point at source, which installed copies cannot run', () => {
+    const json = publishPackageJSON(
+      {
+        name: '@pairdraw/example',
+        version: '1.0.0',
+        exports: {
+          '.': { bun: './src/index.ts', types: './dist/index.d.ts', import: './dist/index.js' },
+          './built': { bun: './dist/built.js', import: './dist/built.js' }
+        },
+        imports: {
+          '#example/*': { types: './src/*.ts', bun: './src/*.ts', default: './dist/*.js' }
+        }
+      },
+      '1.0.0'
+    )
+
+    expect(json.exports).toEqual({
+      '.': { types: './dist/index.d.ts', import: './dist/index.js' },
+      './built': { bun: './dist/built.js', import: './dist/built.js' }
+    })
+    expect(json.imports).toEqual({ '#example/*': { types: './src/*.ts', default: './dist/*.js' } })
+  })
+
   test('rewrites workspace dependencies without changing runtime exports', () => {
     const exports = { '.': { bun: './dist/index.js', import: './dist/index.js' } }
     const json = publishPackageJSON(

@@ -46,6 +46,24 @@ const MIT_LICENSE_FILE = 'LICENSE-MIT'
  */
 const MIT_IDENTIFIER = /(?:^|[\s(])MIT\+?(?:$|[\s)])/i
 
+/**
+ * Resolution conditions without the `bun` ones that point at TypeScript source. The workspace runs
+ * its packages from source under Bun, but an installed copy cannot: source modules import each
+ * other through the package's `#` aliases, which name folders that only the workspace tsconfig
+ * resolves. Bun then reads the built files, as Node does.
+ */
+function withoutSourceConditions<T>(value: T): T {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return value
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(
+        ([key, target]) =>
+          !(key === 'bun' && typeof target === 'string' && target.startsWith('./src/'))
+      )
+      .map(([key, target]) => [key, withoutSourceConditions(target)])
+  ) as T
+}
+
 export function publishPackageJSON(source: PackageManifest, coreVersion: string): PackageManifest {
   if (source.publishConfig) {
     for (const [field, expected] of Object.entries(NPM_RELEASE_POLICY)) {
@@ -75,6 +93,8 @@ export function publishPackageJSON(source: PackageManifest, coreVersion: string)
     }
   }
 
+  if (json.exports) json.exports = withoutSourceConditions(json.exports)
+  if (json.imports) json.imports = withoutSourceConditions(json.imports)
   delete json.scripts
   delete json.devDependencies
 

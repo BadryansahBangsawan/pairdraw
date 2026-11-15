@@ -202,7 +202,7 @@ Pairdraw delegates to a battle-tested library (Yoga, used by React Native on bil
 - **Native Kiwi binary format** — same serialization as Figma uses internally
 - Direct `.fig` file import via extracted Kiwi codec (2,178 LOC schema + 551 LOC codec)
 - Figma clipboard paste support (reads Figma's Kiwi binary from the clipboard)
-- Wire-compatible with Figma's multiplayer protocol
+- Kiwi codec covers Figma's multiplayer message schema (Pairdraw does not connect to Figma's servers)
 
 ### Penpot
 

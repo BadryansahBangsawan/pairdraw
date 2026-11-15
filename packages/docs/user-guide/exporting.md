@@ -14,9 +14,11 @@ Select a node and use the Export section in the properties panel.
 ### Export Settings
 
 - **Scale** — 0.5×, 0.75×, 1×, 1.5×, 2×, 3×, or 4× (hidden for SVG — vectors are resolution-independent)
-- **Format** — PNG (transparent background), JPG (white background), WEBP (transparent background), SVG (vector), PDF, HTML, PPTX (PowerPoint), or draw.io
+- **Format** — PNG (transparent background), JPG (white background), WEBP (transparent background), SVG (vector), PDF, or HTML
 
-**File → Export Selection** exports the selection as PNG, SVG, or `.fig`, and <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> exports it as PNG at once. That menu and the Slides panel do not offer PowerPoint or draw.io.
+**File → Export Selection** exports the selection as PNG, SVG, or `.fig`, and <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> exports it as PNG at once.
+
+The app does not offer PowerPoint (`.pptx`) or draw.io export. The [CLI](/reference/cli#export) still exports both: `pairdraw export design.fig -f pptx` or `-f drawio`.
 
 You can add multiple export settings to export the same node at different scales or formats in one go. A live preview with a checkerboard background shows what will be exported.
 

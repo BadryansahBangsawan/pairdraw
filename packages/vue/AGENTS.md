@@ -34,6 +34,10 @@ The app's `DesignPanel` retains at most one selection-property subtree through `
 - `useEditorEvent(event, handler)` in `packages/vue/src/editor/events/use.ts` wraps the editor event bus.
 - i18n uses narrow product-domain catalogs under `packages/vue/src/i18n/messages/` with matching locale files; namespaces of one domain share a folder (`messages/cloud/editor.ts`, `locales/<locale>/cloud/editor.json`) mapped in `LOCALE_FILE_NAMES` (`tools/checks/i18n/src/check-locales.ts`). Inspect existing domains instead of adding generic UI/component namespaces; prefer narrow `use*Messages()` composables over aggregate `useI18n()`. `bun run check:i18n` enforces structure, placeholder parity, and reviewed translation baselines; remove stale baseline identities when fixing existing debt.
 
+## Build
+
+- `tsdown.config.ts` compiles SFCs with `vue({ isProduction: true })`; a development compile writes each component's absolute source path as `__file` into the published package (`packages/vue/tsdown.config.ts`).
+
 ## Documentation
 
 VitePress is the canonical public SDK documentation; Storybook is the internal state workshop. API tables are extracted from source and JSDoc with `vue-component-meta`, so keep descriptions next to public props, events, and slots, and keep examples valid against public exports (`packages/docs/AGENTS.md`). An example shared by Storybook and a docs page lives in `packages/vue/src/primitives/<Primitive>/examples/<Variant>.vue` (PascalCase variant, e.g. `States.vue`); the story renders it and the docs page imports it with `#vue/primitives/...`. Do not render Storybook stories inside VitePress pages: `@storybook/vue3` assigns `window.STORYBOOK_ENV` on import so it cannot be server-rendered, the docs bundle ships runtime-only Vue so runtime templates silently fail, and a client-only embed drops examples from the prerendered HTML while adding the Storybook preview runtime and `storybook/test` to the published docs.

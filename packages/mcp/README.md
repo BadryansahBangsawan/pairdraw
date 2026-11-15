@@ -6,6 +6,7 @@ Model Context Protocol server for [Pairdraw](https://github.com/BadryansahBangsa
 npm install -g @pairdraw/mcp
 pairdraw-mcp        # stdio transport for MCP clients
 pairdraw-mcp-http   # Streamable HTTP transport for browser extensions and scripts
+pairdraw-connect    # companion that runs Claude Code, Codex, or Gemini CLI for the web app
 ```
 
 On macOS and Linux, local clients prefer a private Unix domain socket; Windows and unavailable sockets fall back to localhost TCP. File access is limited to the effective MCP root.
@@ -13,6 +14,7 @@ On macOS and Linux, local clients prefer a private Unix domain socket; Windows a
 Streamable HTTP clients initialize with a POST, then open GET/SSE with the returned `Mcp-Session-Id`; DELETE ends the session. The server keeps at most 10 sessions and closes those idle for 15 minutes (`PAIRDRAW_MCP_SESSION_IDLE_TIMEOUT_MS`, `0` disables). Running requests keep a session alive, an open SSE stream alone does not, and an expired session ID returns 404.
 
 - Setup and client configuration: https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/programmable/mcp-server.md
+- Coding agents in the browser (`pairdraw-connect`): https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/programmable/browser-agents.md
 - Source and issues: https://github.com/BadryansahBangsawan/pairdraw
 
 MIT License.

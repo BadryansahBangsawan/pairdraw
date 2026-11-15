@@ -29,6 +29,8 @@ For macOS release builds with ad-hoc signing (no Apple Developer account, local 
 APPLE_SIGNING_IDENTITY=- bun run tauri build -c '{"bundle": { "createUpdaterArtifacts": false }}'
 ```
 
+Builds name no hosted services and send no usage data. Two build-time variables opt in to hosted endpoints you run yourself: `VITE_PAIRDRAW_OFFICIAL_CLOUD_URL` makes the connect dialog, Settings → Cloud, and invitations offer that Cloud server first, and `VITE_PAIRDRAW_WEB_APP_URL` names a hosted web app that desktop MCP sign-ins return through and that S3 bucket CORS rules allow. Leave both unset for a build that contacts no server of its own.
+
 ## Making a change
 
 - Before adding a helper, type, component, state mechanism, parser, or test utility, inspect the owning folder, nearby implementations, existing dependencies, and tests. Reuse or extend the established mechanism; extract genuinely shared logic instead of introducing a parallel implementation.

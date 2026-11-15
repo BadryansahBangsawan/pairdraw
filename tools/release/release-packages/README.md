@@ -13,6 +13,12 @@
 
 Workflow tooling is checked out separately in `.pipeline` and installed from its own frozen lockfile where it runs. Application dependency installation and builds remain owned by the tagged checkout; rebuilding an older tag must not accidentally execute its older release orchestration. Dependency installation is not frontend/package compilation.
 
+## npm manifests
+
+`src/publish-dirs.ts` prepares each package's publish directory from its workspace manifest. Workspace manifests point their `bun` export and import conditions at TypeScript source, so the workspace runs packages from `src`; an installed copy cannot, because source modules import each other through `#` aliases that only the workspace tsconfig resolves. `publishPackageJSON` therefore drops every `bun` condition whose target starts with `./src/`, so Bun reads the built `dist` files as Node does, and replaces `workspace:` ranges with the release version. The consumer checks then install the packed tarballs under Node and Bun.
+
+`@pairdraw/vue` compiles its components with the Vue plugin in production mode (`packages/vue/tsdown.config.ts`), so the published files carry no absolute source paths from the build machine.
+
 ## Update feed
 
 The checked-in `desktop/tauri.conf.json` names no update feed: its updater `endpoints` and `pubkey` are empty and `createUpdaterArtifacts` is off, so local and fork builds never check for updates and never offer Pairdraw releases. Only the release config adds a feed, from two repository variables read by `native/updater.ts`:

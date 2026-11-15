@@ -148,8 +148,6 @@ const config: KnipConfig = {
         'extensions/*/tests/**/*.test.ts',
         'extensions/*/src/**/*.d.ts',
         'steiger.config.ts',
-        // The repository's oxlint rules, which `oxlint.json` loads as a JS plugin.
-        'lint/plugin.js',
         ...tests,
         // Ambient declarations that tsconfig includes.
         'tests/**/*.d.ts',
@@ -184,9 +182,7 @@ const config: KnipConfig = {
         // Run by `tests/e2e/*` scripts as separate processes.
         'tests/e2e/*.ts',
         'tests/e2e/cloudflare/*.ts',
-        'deploy/cloudflare/*.ts',
-        // `build:standalone` passes it to tsdown with `--config`.
-        'tsdown.standalone.config.ts'
+        'deploy/cloudflare/*.ts'
       ]
     },
     'packages/docs': {

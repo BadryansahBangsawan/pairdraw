@@ -555,7 +555,6 @@
     },
     {
       "files": [
-        "**/kiwi/schema-runtime/**",
         "**/kiwi/src/schema-runtime/**"
       ],
       "rules": {
@@ -595,8 +594,7 @@
     {
       "files": [
         "tests/e2e/perf/basic.spec.ts",
-        "tests/e2e/viewport/zoom-pan.spec.ts",
-        "tests/engine/visual-*.ts"
+        "tests/e2e/viewport/zoom/pan.spec.ts"
       ],
       "rules": {
         "no-console": "off"
@@ -604,7 +602,6 @@
     },
     {
       "files": [
-        "scripts/**/*.ts",
         "tools/**/*.ts"
       ],
       "rules": {
@@ -631,7 +628,6 @@
       "files": [
         "packages/core/src/io/formats/fig/export/index.ts",
         "packages/core/src/io/formats/fig/export/worker.ts",
-        "packages/core/src/kiwi/fig/parse/worker.ts",
         "extensions/vscode/src/embed/client.ts",
         "extensions/vscode/src/fig/session.ts",
         "extensions/vscode/src/webview/main.ts",

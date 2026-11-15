@@ -3,7 +3,7 @@ import { useHead } from '@unhead/vue'
 import { useEventListener } from '@vueuse/core'
 import { MotionConfig } from 'motion-v'
 import { TooltipProvider } from 'reka-ui'
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, defineAsyncComponent, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { provideEditor } from '@pairdraw/vue'
@@ -13,6 +13,7 @@ import { startCloud } from '@/app/cloud/integration'
 import { useDocumentCloseProtection } from '@/app/document/close/use'
 import { useFollowingEditorStore } from '@/app/editor/active-store'
 import { appRuntimeConfig } from '@/app/runtime/config'
+import { settingsDialogOpen } from '@/app/settings/dialog'
 import { animationsEnabled } from '@/app/shell/motion'
 import { useAppTheme } from '@/app/shell/theme'
 import { toast } from '@/app/shell/ui'
@@ -32,11 +33,17 @@ import RecoveredChangesDialogHost from '@/components/recovery/RecoveredChangesDi
 import RecoveryDialog from '@/components/recovery/RecoveryDialog.vue'
 import SaveToHost from '@/components/save-to/SaveToHost.vue'
 import AISetupDialog from '@/components/settings/ai-setup/AISetupDialog.vue'
-import SettingsDialog from '@/components/settings/SettingsDialog.vue'
 import AppShell from '@/components/shell/AppShell.vue'
 import AppToaster from '@/components/shell/AppToaster.vue'
+import { useOpenedOnce } from '@/components/ui/overlay/opened'
 import VoiceCallAudio from '@/components/voice-call/VoiceCallAudio.vue'
 import { APP_NAME } from '@/constants'
+
+// Settings loads with its first opening, not with the editor.
+const SettingsDialog = defineAsyncComponent(
+  () => import('@/components/settings/SettingsDialog.vue')
+)
+const settingsOpened = useOpenedOnce(settingsDialogOpen)
 
 const { updates, locale } = useI18n()
 const router = useRouter()
@@ -75,7 +82,7 @@ onMounted(() => {
       <AppShell>
         <RouterView />
       </AppShell>
-      <SettingsDialog />
+      <SettingsDialog v-if="settingsOpened" />
       <AISetupDialog />
       <CompanionPairDialog />
       <PluginPermissionDialog />

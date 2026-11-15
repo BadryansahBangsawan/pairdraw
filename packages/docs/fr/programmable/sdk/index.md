@@ -22,17 +22,19 @@ Le SDK fournit :
 ## Par où commencer
 
 <SdkCardGroup>
-  <SdkCard title="Premiers pas" to="/programmable/sdk/getting-started" description="Installez le package, créez une instance de l'éditeur et connectez les composants principaux." />
-  <SdkCard title="Architecture" to="/programmable/sdk/architecture" description="Découvrez comment les composables, les composants et le contexte de l'éditeur s'articulent." />
-  <SdkCard title="Guides" to="/programmable/sdk/guides/custom-editor-shell" description="Créez une interface d'éditeur, des panneaux de propriétés et des panneaux de navigation sur mesure." />
-  <SdkCard title="Référence de l'API" to="/programmable/sdk/api/" description="Consultez les composants, les composables et les API de bas niveau." />
+  <SdkCard title="Premiers pas" to="/fr/programmable/sdk/getting-started" description="Installez le package, créez une instance de l'éditeur et connectez les composants principaux." />
+  <SdkCard title="Architecture" to="/fr/programmable/sdk/architecture" description="Découvrez comment les composables, les composants et le contexte de l'éditeur s'articulent." />
+  <SdkCard title="Guides" to="/fr/programmable/sdk/guides/custom-editor-shell" description="Créez une interface d'éditeur, des panneaux de propriétés et des panneaux de navigation sur mesure." />
+  <SdkCard title="Référence de l'API" to="/fr/programmable/sdk/api/" description="Consultez les composants, les composables et les API avancées." />
 </SdkCardGroup>
 
 ## À quoi sert le SDK
 
 Chaque produit et chaque équipe a besoin d'une expérience d'édition différente.
 
-Il peut s'agir d'un éditeur de design complet, d'une zone de travail intégrée à une autre application, d'un outil interne, d'un éditeur de modèles ou d'une interface spécialisée assistée par l'IA.
+Il peut s'agir d'un éditeur de design complet, d'une zone de travail intégrée à une autre application, d'un outil interne, d'un éditeur de modèles ou d'une interface spécialisée assistée par l'IA, conçue pour un cas d'usage précis.
+
+Le SDK est la couche qui rend tout cela possible.
 
 ## Principes de conception
 
@@ -52,6 +54,6 @@ Si vous avez uniquement besoin de l'état et des opérations de l'éditeur, comm
 
 ## Sections de l'API
 
-- [Composants](/programmable/sdk/api/components/)
-- [Composables](/programmable/sdk/api/composables/)
-- [API de bas niveau](/programmable/sdk/api/advanced/)
+- [Composants](/fr/programmable/sdk/api/components/)
+- [Composables](/fr/programmable/sdk/api/composables/)
+- [API avancées](/fr/programmable/sdk/api/advanced/)

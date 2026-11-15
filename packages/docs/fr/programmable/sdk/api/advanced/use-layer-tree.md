@@ -5,9 +5,9 @@ description: Accéder au contexte fourni par LayerTreeRoot.
 
 # useLayerTree
 
-`useLayerTree()` renvoie le contexte du `LayerTreeRoot` le plus proche.
+`useLayerTree()` lit le contexte local de l’arbre de calques fourni par `LayerTreeRoot`.
 
-Utilisez-le dans les descendants qui ont besoin des éléments, de la sélection, des branches dépliées ou des actions de ligne.
+Utilisez-le dans les descendants personnalisés de l’arbre qui ont besoin des éléments, de l’état de sélection, de l’état déplié ou des actions de ligne.
 
 ## Voir aussi
 

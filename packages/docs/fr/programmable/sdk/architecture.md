@@ -92,7 +92,7 @@ Exemples :
 
 ### Ne transmettez pas tout le contexte par un seul emplacement
 
-Ne transmettez à l’emplacement que les propriétés nécessaires ou utilisez directement le composable. Les composants contrôlés tels que `PropertyListRoot` émettent des événements sémantiques. La connexion à la sélection et à l’historique d’annulation doit se trouver dans un adaptateur ou un composable de contrôle, et non dans le composant lui-même.
+Ne transmettez à l’emplacement que les propriétés nécessaires ou utilisez directement le composable, plutôt qu’un énorme objet `v-slot="ctx"`. Les composants contrôlés tels que `PropertyListRoot` émettent des événements sémantiques. La connexion à la sélection et à l’historique d’annulation doit se trouver dans un adaptateur ou un composable de contrôle, et non dans le composant lui-même.
 
 ## Responsabilités de l'application et du SDK
 

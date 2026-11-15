@@ -5,16 +5,16 @@ description: Composants, composables et API avancées de @pairdraw/vue.
 
 # Référence de l’API
 
-La référence du SDK Vue se divise en trois domaines.
+La référence du SDK Vue se divise en trois sections.
 
 <SdkCardGroup>
-  <SdkCard title="Composants" to="/programmable/sdk/api/components/" description="Composants sans styles comme CanvasRoot, ToolbarRoot, FontPickerRoot et NumberField." />
-  <SdkCard title="Composables" to="/programmable/sdk/api/composables/" description="État et actions pour l’éditeur, la zone de travail, la sélection, les commandes et les propriétés." />
-  <SdkCard title="API avancées" to="/programmable/sdk/api/advanced/" description="Contextes de bas niveau et fonctions spécialisées pour les intégrations propres." />
+  <SdkCard title="Composants" to="/fr/programmable/sdk/api/components/" description="Composants structurels sans styles comme CanvasRoot, ToolbarRoot, FontPickerRoot et NumberFieldRoot." />
+  <SdkCard title="Composables" to="/fr/programmable/sdk/api/composables/" description="Composables de l’éditeur pour le contexte, la connexion de la zone de travail, la sélection, les commandes et les panneaux de propriétés." />
+  <SdkCard title="API avancées" to="/fr/programmable/sdk/api/advanced/" description="Fonctions de plus bas niveau, contextes des composants et API spécialisées pour les intégrations avancées." />
 </SdkCardGroup>
 
 ## Par où commencer
 
-- **Composants** pour les structures et contrôles réutilisables de l’interface.
-- **Composables** pour l’état et les actions de l’éditeur.
-- **API avancées** pour les intégrations qui nécessitent un accès direct à l’état ou au contexte de bas niveau.
+- Commencez par les **Composants** si vous créez des éléments d’interface d’éditeur réutilisables.
+- Commencez par les **Composables** si vous reliez l’état et les actions de l’éditeur.
+- N’utilisez les **API avancées** que si vous avez besoin de fonctions de plus bas niveau ou des contextes des composants.

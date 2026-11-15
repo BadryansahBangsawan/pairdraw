@@ -1,15 +1,16 @@
 ---
 title: useLayerDrag
-description: Gérer le réordonnancement et le changement de conteneur dans un arbre de calques.
+description: Relier le glisser-déposer au réordonnancement d’un arbre de calques.
 ---
 
 # useLayerDrag
 
-`useLayerDrag(options)` fournit l’état et les actions nécessaires au glissement des lignes.
+`useLayerDrag(editor, indentPerLevel?)` met en place le comportement de pragmatic-drag-and-drop pour les lignes d’un arbre de calques et traduit les instructions de dépôt en opérations de réordonnancement de l’éditeur.
 
-Il calcule la cible, la position avant/dans/après, la validité du changement et la mise à jour de la hiérarchie. Les positions visuelles sont conservées lorsqu’un objet change de conteneur.
+Utilisez-le pour étendre ou remplacer l’interface de glissement par défaut de l’arbre de calques.
 
 ## Voir aussi
 
 - [LayerTreeRoot](../components/layer-tree-root)
+- [LayerTreeItem](../components/layer-tree-item)
 - [useLayerTree](./use-layer-tree)

@@ -1,13 +1,13 @@
 ---
 title: extractImageFilesFromClipboard
-description: Lire les Image files compatibles d’un ClipboardEvent.
+description: Utilitaire du presse-papiers qui extrait les fichiers image acceptés.
 ---
 
 # extractImageFilesFromClipboard
 
-`extractImageFilesFromClipboard(event)` renvoie les Image files du Clipboard et ignore les File types non compatibles.
+`extractImageFilesFromClipboard(event)` filtre les fichiers du presse-papiers pour ne garder que les types d’image acceptés par le dépôt sur la zone de travail.
 
-Utilisez cette Function pour implémenter Paste d’Images.
+Utilisez cette fonction pour implémenter le collage d’images depuis le presse-papiers.
 
 ## Voir aussi
 

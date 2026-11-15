@@ -1,13 +1,13 @@
 ---
 title: useInlineRename
-description: Gérer état, focus et clavier lors d’un changement de nom direct.
+description: Gérer l’état et le focus lors d’un renommage sur place.
 ---
 
 # useInlineRename
 
-`useInlineRename(onCommit)` gère édition, focus, clic extérieur, validation et annulation avec Escape.
+`useInlineRename(onCommit)` gère l’état d’édition, le focus, les clics à l’extérieur et le comportement du clavier lors d’un renommage sur place.
 
-Utilisez-le dans les listes de pages, arbres de calques et autres interfaces où le nom change sans dialogue.
+Utilisez-le dans des listes de pages, des arbres de calques ou d’autres interfaces personnalisées où l’on renomme sans dialogue.
 
 ## Voir aussi
 

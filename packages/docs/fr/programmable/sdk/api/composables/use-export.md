@@ -1,16 +1,58 @@
 ---
 title: useExport
-description: Gérer l’échelle et le format d’exportation de la sélection actuelle.
+description: Gérer les réglages d’exportation, comme l’échelle et le format, de la sélection actuelle.
 ---
 
 # useExport
 
-`useExport()` fournit l’état et les actions d’un panneau d’exportation : sélection et réglages, format, échelle, suffixe, aperçu, création et modification des réglages, puis exécution.
+`useExport()` est le composable du panneau d’exportation pour les nœuds sélectionnés.
 
-Il expose aussi les échelles et formats pris en charge : `formats` (identifiants) et `formatOptions` (options avec libellé). Par exemple, `exportState.updateFormat(0, 'webp')`.
+Il gère :
 
-Utilisez-le pour construire une interface propre au-dessus du système d’exportation de l’éditeur.
+- les lignes de réglages d’exportation ;
+- les identifiants des nœuds sélectionnés ;
+- le libellé du nom d’exportation ;
+- les échelles et formats pris en charge (identifiants `formats` et options avec libellé `formatOptions`).
+
+## Utilisation
+
+```ts
+import { useExport } from '@pairdraw/vue/document/export'
+
+const exportState = useExport()
+```
+
+## Exemple simple
+
+```ts
+const {
+  settings,
+  nodeName,
+  scales,
+  formats,
+  formatOptions,
+  addSetting,
+  updateScale,
+  updateFormat,
+} = useExport()
+```
+
+## Exemples pratiques
+
+### Ajouter un autre préréglage d’exportation
+
+```ts
+exportState.addSetting()
+```
+
+### Passer la première exportation en WEBP 2x
+
+```ts
+exportState.updateScale(0, 2)
+exportState.updateFormat(0, 'webp')
+```
 
 ## Voir aussi
 
-- [Guide d’exportation](/user-guide/exporting)
+- [useSelectionState](./use-selection-state)
+- [useEditor](./use-editor)

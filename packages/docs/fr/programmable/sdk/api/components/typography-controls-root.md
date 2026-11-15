@@ -1,15 +1,16 @@
 ---
 title: TypographyControlsRoot
-description: Composant sans styles pour police, alignement et mise en forme du texte.
+description: Composant racine sans styles pour la police, l’alignement et la mise en forme du texte.
 ---
 
 # TypographyControlsRoot
 
-`TypographyControlsRoot` expose dans son emplacement l’état et les actions de `useTypography()`.
+`TypographyControlsRoot` expose sous forme de composant structurel l’état et les actions typographiques de `useTypography()`.
 
-Les contrôles propres à l’application peuvent réutiliser l’intégration du SDK avec l’éditeur.
+Utilisez-le pour créer des contrôles typographiques personnalisés, tandis que le SDK gère les polices et la mise en forme.
 
 ## Voir aussi
 
 - [useTypography](../composables/use-typography)
+- [FontPickerRoot](./font-picker-root)
 - [Panneaux de propriétés](../../guides/property-panels)

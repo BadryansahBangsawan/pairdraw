@@ -1,13 +1,13 @@
 ---
 title: PositionControlsRoot
-description: Composant sans styles pour position, taille, alignement et transformation.
+description: Composant racine sans styles pour la position, la taille, l’alignement et les transformations.
 ---
 
 # PositionControlsRoot
 
-`PositionControlsRoot` fournit les valeurs et actions de position, taille, rotation, alignement et symétrie pour la sélection actuelle.
+`PositionControlsRoot` expose les actions de position, de taille, de rotation, d’alignement, de symétrie et de pivotement pour la sélection actuelle.
 
-L’application fournit les champs et boutons.
+Utilisez-le pour créer des contrôles de position personnalisés sans réimplémenter le câblage avec l’éditeur.
 
 ## Voir aussi
 

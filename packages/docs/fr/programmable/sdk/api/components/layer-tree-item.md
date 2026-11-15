@@ -1,13 +1,16 @@
 ---
 title: LayerTreeItem
-description: Ligne individuelle d’un arbre de calques.
+description: Ligne sans styles pour un objet de l’arbre de calques.
 ---
 
 # LayerTreeItem
 
-`LayerTreeItem` représente une ligne de l’arbre. Son emplacement par défaut reçoit l’état et les actions pour la sélection, le dépliage des enfants, la visibilité, le verrouillage et le changement de nom direct.
+`LayerTreeItem` affiche une ligne de l’arbre de calques et expose par son emplacement par défaut les actions de sélection, de dépliage, de visibilité, de verrouillage et de changement de nom.
+
+Utilisez-le pour écrire le balisage des lignes dans l’application tout en réutilisant le comportement d’arbre de calques fourni par le SDK.
 
 ## Voir aussi
 
 - [LayerTreeRoot](./layer-tree-root)
 - [useLayerTree](../advanced/use-layer-tree)
+- [useLayerDrag](../advanced/use-layer-drag)

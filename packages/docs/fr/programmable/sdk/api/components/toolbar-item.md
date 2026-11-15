@@ -1,15 +1,16 @@
 ---
 title: ToolbarItem
-description: Outil individuel de la barre de l’éditeur.
+description: Élément sans styles pour un outil de la barre d’outils de l’éditeur.
 ---
 
 # ToolbarItem
 
-`ToolbarItem` fournit l’état actif d’un outil et gère sa sélection.
+`ToolbarItem` expose l’état actif et le comportement de sélection d’un outil de la barre d’outils.
 
-Dans `ToolbarRoot`, l’application peut afficher son propre bouton et réutiliser la logique partagée du SDK.
+Utilisez-le dans `ToolbarRoot` pour écrire votre propre balisage de bouton tout en partageant le câblage de sélection des outils.
 
 ## Voir aussi
 
 - [ToolbarRoot](./toolbar-root)
+- [useToolbar](../advanced/use-toolbar)
 - [useToolbarState](../advanced/use-toolbar-state)

@@ -1,13 +1,13 @@
 ---
 title: useNodeFontStatus
-description: Informations sur les Fonts manquants dans un objet texte.
+description: État des polices manquantes d’un objet texte.
 ---
 
 # useNodeFontStatus
 
-`useNodeFontStatus(node)` vérifie les Fonts de l’objet texte indiqué et renvoie des informations sur les Families et Styles non chargés.
+`useNodeFontStatus(node)` renvoie les informations sur les polices manquantes à partir d’un getter d’objet texte.
 
-Utilisez le composable dans les panneaux Typography et les avertissements de Fonts manquants.
+Utilisez-le dans les panneaux de typographie et les avertissements qui doivent signaler les familles de polices indisponibles.
 
 ## Voir aussi
 

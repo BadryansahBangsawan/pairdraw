@@ -1,13 +1,50 @@
 ---
 title: usePageList
-description: État et actions d’une liste de pages.
+description: Lire les pages et piloter le changement, la création, la suppression et le renommage de pages.
 ---
 
 # usePageList
 
-`usePageList()` fournit les pages, la page active, l’identifiant de la page en cours de renommage, les actions de création/changement/renommage/suppression et la gestion du focus.
+`usePageList()` est le composable de gestion des pages derrière les interfaces de liste de pages.
+
+Il fournit :
+
+- `pages`
+- `currentPageId`
+- `switchPage`
+- `addPage`
+- `deletePage`
+- `renamePage`
+
+## Utilisation
+
+```ts
+import { usePageList } from '@pairdraw/vue/primitives/PageList'
+
+const pageList = usePageList()
+```
+
+## Exemple simple
+
+```ts
+const { pages, currentPageId, switchPage, addPage } = usePageList()
+```
+
+## Exemples pratiques
+
+### Changer de page
+
+```ts
+switchPage(pageId)
+```
+
+### Créer une page
+
+```ts
+addPage()
+```
 
 ## Voir aussi
 
 - [PageListRoot](../components/page-list-root)
-- [useInlineRename](../advanced/use-inline-rename)
+- [useMenuModel](./use-menu-model)

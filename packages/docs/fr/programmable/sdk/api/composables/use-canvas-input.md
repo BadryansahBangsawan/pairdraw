@@ -1,25 +1,73 @@
 ---
 title: useCanvasInput
-description: Relier pointeur, glissement, sélection, taille, rotation et outils à la zone de travail.
+description: Relier pointeur, glissement, sélection, redimensionnement, rotation et outils à la zone de travail.
 ---
 
 # useCanvasInput
 
-`useCanvasInput(options)` relie les événements de l’élément au système de saisie de l’éditeur :
+`useCanvasInput()` relie les interactions du pointeur et de la souris à la zone de travail de l’éditeur.
 
-- mouvement, pression et relâchement du pointeur ;
-- sélection et rectangle de sélection ;
-- déplacement de la vue et zoom ;
-- glissement des objets ;
-- redimensionnement et rotation ;
-- outils de formes, Plume, Texte et Main ;
-- édition vectorielle et textuelle.
+Il prend en charge des interactions comme :
 
-Le composable convertit les coordonnées d’écran en coordonnées de la zone de travail et conserve la capture du pointeur pendant une interaction.
+- la sélection ;
+- le glissement ;
+- le redimensionnement ;
+- la rotation ;
+- le déplacement de la vue ;
+- les flux de la plume et du dessin ;
+- l’interaction avec l’édition de texte ;
+- la détection des objets touchés selon la portée active.
 
-Cette API de bas niveau est principalement destinée aux composants qui contiennent la zone de travail d’une interface propre.
+## Utilisation
+
+Ce composable est généralement associé à `useCanvas()` et aux fonctions de détection du moteur de rendu.
+
+```ts
+useCanvasInput(
+  canvasRef,
+  editor,
+  hitTestSectionTitle,
+  hitTestComponentLabel,
+  hitTestFrameTitle,
+)
+```
+
+## Exemple simple
+
+```ts
+const canvas = useCanvas(canvasRef, editor)
+
+useCanvasInput(
+  canvasRef,
+  editor,
+  canvas.hitTestSectionTitle,
+  canvas.hitTestComponentLabel,
+  canvas.hitTestFrameTitle,
+)
+```
+
+## Exemples pratiques
+
+### Suivre le curseur dans l’espace de la zone de travail
+
+```ts
+useCanvasInput(
+  canvasRef,
+  editor,
+  hitTestSectionTitle,
+  hitTestComponentLabel,
+  hitTestFrameTitle,
+  (cx, cy) => {
+    console.log(cx, cy)
+  },
+)
+```
+
+## Remarques
+
+Ce composable est de plus bas niveau que la plupart de la logique des panneaux. Il convient surtout aux interfaces d’éditeur et aux conteneurs de la zone de travail.
 
 ## Voir aussi
 
 - [useCanvas](./use-canvas)
-- [useTextEdit](./use-text-edit)
+- [useEditor](./use-editor)

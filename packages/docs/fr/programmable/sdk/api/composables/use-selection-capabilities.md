@@ -1,13 +1,59 @@
 ---
 title: useSelectionCapabilities
-description: Opérations disponibles pour la sélection actuelle.
+description: Dériver des booléens adaptés aux commandes pour les interfaces et actions qui dépendent de la sélection.
 ---
 
 # useSelectionCapabilities
 
-`useSelectionCapabilities()` calcule si la sélection peut être groupée, dégroupée, convertie en composant, combinée en variantes, détachée, ordonnée, supprimée ou modifiée par d’autres opérations.
+`useSelectionCapabilities()` fournit des booléens réactifs qui indiquent si les actions courantes de l’éditeur sont autorisées à cet instant.
 
-Utilisez ces indicateurs pour activer, masquer ou désactiver les commandes sans reproduire les règles de types.
+Utilisez-le pour construire :
+
+- des menus ;
+- des barres d’outils ;
+- des raccourcis clavier ;
+- des boutons d’action ;
+- des panneaux contextuels.
+
+## Utilisation
+
+```ts
+import { useSelectionCapabilities } from '@pairdraw/vue/editor/selection-capabilities'
+
+const caps = useSelectionCapabilities()
+```
+
+## Exemple simple
+
+```vue
+<script setup lang="ts">
+import { useSelectionCapabilities } from '@pairdraw/vue/editor/selection-capabilities'
+
+const { canDelete, canDuplicate, canCreateComponent } = useSelectionCapabilities()
+</script>
+
+<template>
+  <div class="flex gap-2">
+    <button :disabled="!canDuplicate">Duplicate</button>
+    <button :disabled="!canDelete">Delete</button>
+    <button :disabled="!canCreateComponent">Make component</button>
+  </div>
+</template>
+```
+
+## Exemples pratiques
+
+### Conditionner les entrées de menu
+
+```ts
+const { canMoveToPage, canGoToMainComponent } = useSelectionCapabilities()
+```
+
+### N’activer les commandes de zoom que lorsqu’elles servent
+
+```ts
+const { canZoomToSelection } = useSelectionCapabilities()
+```
 
 ## Voir aussi
 

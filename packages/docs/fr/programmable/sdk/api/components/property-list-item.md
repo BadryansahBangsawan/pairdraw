@@ -1,15 +1,16 @@
 ---
 title: PropertyListItem
-description: Élément d’une liste de remplissages, contours, effets ou autres propriétés.
+description: Élément sans styles pour une ligne de remplissage, de contour ou d’effet.
 ---
 
 # PropertyListItem
 
-`PropertyListItem` représente une ligne dans `PropertyListRoot`. Il fournit l’élément, son indice, sa visibilité et des actions pour le modifier, le remplacer ou le supprimer.
+`PropertyListItem` expose les actions de mise à jour, de modification partielle, de suppression et de visibilité pour un élément de tableau dans `PropertyListRoot`.
 
-L’application choisit l’affichage de la miniature, des contrôles et du menu de chaque ligne.
+Utilisez-le pour créer des lignes de liste personnalisées pour les remplissages, les contours ou les effets.
 
 ## Voir aussi
 
 - [PropertyListRoot](./property-list-root)
 - [usePropertyList](../advanced/use-property-list)
+- [useNodeProps](../advanced/use-node-props)

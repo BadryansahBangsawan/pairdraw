@@ -5,9 +5,9 @@ description: Accéder au contexte fourni par CanvasRoot.
 
 # useCanvasContext
 
-`useCanvasContext()` renvoie le contexte du `CanvasRoot` le plus proche.
+`useCanvasContext()` lit le contexte local de la zone de travail fourni par `CanvasRoot`.
 
-Utilisez-le dans `CanvasSurface` ou des composants descendants qui ont besoin des références et de l’état de la zone de travail.
+Utilisez-le dans les descendants comme `CanvasSurface` ou dans vos propres composants enfants de la zone de travail.
 
 ## Voir aussi
 

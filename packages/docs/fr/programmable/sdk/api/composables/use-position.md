@@ -1,21 +1,66 @@
 ---
 title: usePosition
-description: Lire et modifier position, taille, rotation, alignement et symétrie.
+description: Lire et modifier la position, la taille, la rotation, l’alignement et la symétrie des objets sélectionnés.
 ---
 
 # usePosition
 
-`usePosition()` fournit des valeurs calculées et des actions pour la sélection actuelle :
+`usePosition()` est un composable de contrôle pour les interfaces liées à la position.
 
-- `x`, `y`, largeur et hauteur ;
-- rotation ;
-- proportions verrouillées ;
-- alignement par rapport au conteneur ;
-- symétrie horizontale et verticale.
+Il fournit les valeurs de l’objet sélectionné, par exemple :
 
-Les valeurs mixtes sont conservées lorsque les objets sélectionnés diffèrent.
+- `x`
+- `y`
+- `width`
+- `height`
+- `rotation`
+
+`x`, `y` et `rotation` se lisent comme dans le panneau de propriétés de Figma : le coin supérieur gauche du cadre du calque pivoté sur la zone de travail, mesuré depuis son frame ou sa page, et son angle dans le sens antihoraire. `updateProp('x' | 'y' | 'rotation', value)` déplace ou fait pivoter chaque objet sélectionné pour qu’il affiche cette valeur, en tournant autour de son centre. `panelProp(key)` donne la valeur commune d’une sélection multiple, ou `MIXED`.
+
+Il fournit aussi des actions :
+
+- aligner ;
+- appliquer une symétrie ;
+- faire pivoter ;
+- faire glisser ou modifier les propriétés numériques.
+
+## Utilisation
+
+```ts
+import { usePosition } from '@pairdraw/vue/controls/position'
+
+const position = usePosition()
+```
+
+## Exemple simple
+
+```ts
+const { x, y, width, height, rotation, updateProp, commitProp } = usePosition()
+```
+
+## Exemples pratiques
+
+### Aligner les objets sélectionnés
+
+```ts
+position.align('horizontal', 'center')
+position.align('vertical', 'min')
+```
+
+### Appliquer une symétrie à la sélection
+
+```ts
+position.flip('horizontal')
+position.flip('vertical')
+```
+
+### Faire pivoter la sélection
+
+```ts
+position.rotate(90)
+```
 
 ## Voir aussi
 
-- [PositionControlsRoot](../components/position-controls-root)
-- [usePropScrub](../advanced/use-prop-scrub)
+- [useLayout](./use-layout)
+- [useAppearance](./use-appearance)

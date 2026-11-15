@@ -4,9 +4,9 @@
 
 Pairdraw fonctionne aussi dans le navigateur, mais aucune version n’est hébergée : lancez l’app web depuis une copie du dépôt comme indiqué dans [Compiler le code source](#building-from-source), ou [téléchargez l’application de bureau](/fr/download).
 
-Si vous souhaitez développer votre propre produit avec Pairdraw plutôt que vous limiter à l'application par défaut, consultez la section [Automatisation](/programmable/) et la documentation du [Vue SDK](/programmable/sdk/).
+Si vous souhaitez développer votre propre produit avec Pairdraw plutôt que vous limiter à l'application par défaut, consultez la section [Automatisation](/fr/programmable/) et la documentation du [Vue SDK](/fr/programmable/sdk/).
 
-## Application de bureau
+## Application de bureau {#download-desktop-app}
 
 La [page de téléchargement](/fr/download) liste les fichiers de la dernière version. Pairdraw 0.16.0 est publié pour macOS sur Apple Silicon :
 
@@ -16,7 +16,7 @@ La [page de téléchargement](/fr/download) liste les fichiers de la dernière v
 
 Windows, Linux et les Mac Intel n’ont pas encore de version prête à l’emploi ; compilez-les à partir des sources comme décrit plus bas. La version macOS n’est pas encore signée ni notarisée, donc macOS bloque le premier lancement : faites un clic droit sur Pairdraw dans Applications et choisissez **Ouvrir**, ou autorisez-le dans **Réglages Système → Confidentialité et sécurité**. Chaque version fournit un fichier `SHA256SUMS` pour vérifier les téléchargements.
 
-Pour rechercher une version plus récente de l’application de bureau, choisissez **Check for Updates…** dans le menu **Help** sous Windows et Linux, ou dans le menu de l’application sous macOS. L’élément **About** voisin affiche la version installée. Pairdraw 0.16.0 ne déclare aucun flux de mises à jour : installez donc la version suivante à la main depuis la page de téléchargement.
+Pour rechercher une version plus récente de l’application de bureau, choisissez **Check for Updates…** dans le menu **Help** sous Windows et Linux, ou dans le menu de l’application sous macOS. L’élément **About** voisin affiche la version installée. Seule une version prête à l’emploi qui déclare un flux de mises à jour en recherche, et uniquement quand vous choisissez cet élément ; une version compilée à partir des sources indique que les mises à jour ne sont pas configurées. Pairdraw 0.16.0 ne déclare aucun flux de mises à jour : installez donc la version suivante à la main depuis la page de téléchargement.
 
 ## Configuration requise {#system-requirements}
 

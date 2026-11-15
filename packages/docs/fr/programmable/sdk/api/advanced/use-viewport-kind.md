@@ -1,13 +1,13 @@
 ---
 title: useViewportKind
-description: Flags réactifs Mobile et Desktop pour une interface d’édition personnalisée.
+description: Indicateurs simples mobile et bureau pour une interface d’édition adaptative.
 ---
 
 # useViewportKind
 
-`useViewportKind()` renvoie une classification simplifiée de la Viewport size utilisée par l’UI responsive de Pairdraw.
+`useViewportKind()` renvoie les indicateurs adaptatifs simples utilisés par l’interface de l’éditeur Pairdraw.
 
-Utilisez le composable lorsqu’il suffit de distinguer Mobile et Desktop sans configurer directement `useBreakpoints()`.
+Utilisez-le lorsque votre interface a besoin d’une abstraction légère des points de rupture plutôt que de configurer directement `useBreakpoints()`.
 
 ## Utilisation
 
@@ -17,7 +17,7 @@ import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
 const { isMobile, isDesktop } = useViewportKind()
 ```
 
-## Values
+## Valeurs renvoyées
 
 - `isMobile`
 - `isDesktop`

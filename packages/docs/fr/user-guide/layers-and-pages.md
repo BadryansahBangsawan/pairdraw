@@ -1,44 +1,66 @@
 ---
 title: Calques et pages
-description: Gérer l’arbre des calques, les pages et le panneau des propriétés.
+description: Gérer les calques, les pages et le panneau des propriétés dans Pairdraw.
 ---
 
 # Calques et pages
 
-L’éditeur s’ouvre sur la zone de travail seule. Les outils se trouvent à gauche de la zone de travail, avec le bouton du panneau des calques au-dessus, et le zoom dans le coin inférieur droit. Le panneau des calques s’ouvre à gauche, celui des propriétés à droite et le chat avec l’AI dans une colonne à côté ; tous se redimensionnent en faisant glisser leurs bords.
+L’éditeur s’ouvre sur la zone de travail seule. Les outils se trouvent à gauche de la zone de travail, avec le bouton du panneau des calques au-dessus, et le zoom dans le coin inférieur droit. Le panneau des calques s’ouvre à gauche, celui des propriétés à droite et le chat avec l’IA dans une colonne à côté ; tous se redimensionnent en faisant glisser leurs bords. Voir [Panneaux latéraux](./canvas-navigation#side-panels) pour savoir quand chaque panneau s’affiche.
 
-Tant que le chat avec l’AI est fermé, une consigne en bas de la zone de travail envoie ce que vous écrivez au chat ; désactivez-la avec **Consigne sur le canevas** dans **Paramètres → Modèles → Discussion**. <kbd>Escape</kbd> dans la consigne revient à la zone de travail.
+Tant que le chat avec l’IA est fermé, une consigne en bas de la zone de travail envoie ce que vous écrivez au chat ; désactivez-la avec **Consigne sur le canevas** dans **Paramètres → Modèles → Discussion**. <kbd>Escape</kbd> dans la consigne revient à la zone de travail.
 
-## Calques
+## Panneau des calques
 
-Chaque objet apparaît dans l’arbre. Cadres, groupes et composants peuvent être dépliés pour afficher leurs enfants.
+Le panneau des calques, à gauche, affiche la hiérarchie du document sous forme d’arbre.
 
-- Faites glisser un calque pour modifier son ordre ou son conteneur.
-- Utilisez l’œil pour changer sa visibilité.
-- Utilisez le cadenas pour empêcher les modifications accidentelles.
-- Double-cliquez sur le nom pour le modifier ; confirmez avec <kbd>Enter</kbd> ou annulez avec <kbd>Escape</kbd>.
+### Arbre
 
-La sélection de l’arbre et celle de la zone de travail restent synchronisées. <kbd>Shift</kbd> permet de sélectionner plusieurs calques.
+Les objets apparaissent dans un arbre repliable. Cliquez sur le chevron à côté d’un cadre, d’un groupe ou d’un composant pour déplier ou replier ses enfants.
 
-## Pages
+### Réordonner par glisser-déposer
 
-La liste permet de créer, ouvrir, renommer et supprimer des pages. Chacune conserve sa position et son niveau de zoom.
+Faites glisser les calques pour modifier leur ordre ou leur conteneur. Les objets placés plus haut dans la liste s’affichent au-dessus.
 
-Le menu contextuel déplace la sélection vers une autre page. Lors d’un changement de page, Pairdraw restaure sa vue et sa sélection.
+### Visibilité
 
-## Diapositives
+Cliquez sur l’œil à côté d’un calque pour le masquer ou l’afficher sur la zone de travail. Les objets masqués restent dans l’arbre. Le cadenas empêche les modifications accidentelles.
 
-Le panneau des diapositives liste les cadres de premier niveau de la page sous forme de vignettes numérotées, dans l’ordre des calques. Cliquez sur une diapositive pour montrer son cadre sur le canevas, et faites glisser une diapositive — ou appuyez sur <kbd>Alt</kbd> avec une flèche haut ou bas — pour la réordonner. **Exporter les diapositives en PDF** écrit toutes les diapositives, dans l’ordre, dans un seul fichier PDF.
+### Renommer
 
-## Présenter
+Double-cliquez sur le nom d’un calque pour le renommer sur place. Appuyez sur <kbd>Enter</kbd> ou cliquez ailleurs pour valider, sur <kbd>Escape</kbd> pour annuler.
 
-Présenter montre les diapositives de la page en plein écran, une à la fois. Démarrez-le avec <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>Entrée</kbd>, **Affichage → Présenter** ou le bouton Présenter de la barre supérieure. Les flèches, <kbd>Espace</kbd>, <kbd>Entrée</kbd>, <kbd>Page précédente</kbd>/<kbd>Page suivante</kbd> et la molette font défiler les diapositives ; <kbd>Échap</kbd> quitte et rend le canevas et le focus clavier à leur état d’origine. Une diapositive plus haute que l’écran s’affiche à 100 % et peut être défilée.
+### Synchronisation de la sélection
+
+Cliquer sur un calque dans le panneau sélectionne l’objet correspondant sur la zone de travail, et inversement. <kbd>Shift</kbd> permet de sélectionner plusieurs calques.
+
+### Rechercher des calques
+
+Appuyez sur <kbd>⌘</kbd><kbd>F</kbd> (<kbd>Ctrl</kbd> + <kbd>F</kbd>), choisissez **Édition → Rechercher des calques…** ou lancez la commande depuis la palette de commandes pour chercher les calques de la page affichée par leur nom. Choisir un résultat sélectionne ce calque et l’amène dans la vue.
+
+## Panneau des pages
+
+Le panneau des pages affiche toutes les pages du document.
+
+- **Changer de page :** cliquez sur l’onglet d’une page pour l’activer. La zone de travail passe à cette page et restaure sa position d’affichage.
+- **Ajouter une page :** cliquez sur le bouton d’ajout pour créer une page.
+- **Supprimer une page :** retirez la page actuelle.
+- **Renommer une page :** double-cliquez sur son nom pour le modifier sur place. <kbd>Enter</kbd>, <kbd>Escape</kbd> ou un clic ailleurs valide le nouveau nom.
+
+Chaque page a sa propre zone de travail et son propre état d’affichage. Le menu contextuel déplace la sélection vers une autre page. Lors d’un changement de page, Pairdraw restaure sa vue et sa sélection.
+
+## Panneau des diapositives
+
+Le panneau des diapositives liste les cadres de premier niveau de la page sous forme de vignettes numérotées, dans l’ordre des calques. Cliquez sur une diapositive pour montrer son cadre sur la zone de travail, et faites glisser une diapositive — ou appuyez sur <kbd>Alt</kbd> avec une flèche haut ou bas — pour la réordonner. **Exporter les diapositives en PDF** écrit toutes les diapositives, dans l’ordre, dans un seul fichier PDF.
+
+## Mode présentation
+
+Présenter montre les diapositives de la page en plein écran, une à la fois. Démarrez-le avec <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>Entrée</kbd>, **Affichage → Présenter** ou le bouton Présenter de la barre supérieure. Les flèches, <kbd>Espace</kbd>, <kbd>Entrée</kbd>, <kbd>Page précédente</kbd>/<kbd>Page suivante</kbd> et la molette font défiler les diapositives ; <kbd>Échap</kbd> quitte et rend la zone de travail et le focus clavier à leur état d’origine. Une diapositive plus haute que l’écran s’affiche à 100 % et peut être défilée.
 
 ## Documents et récupération
 
-Accueil commence par une consigne : choisissez au-dessus ce qu’il faut créer (page d’accueil, app mobile, app web, diapositives, tableau de bord ou autre chose), décrivez-le, et Pairdraw ouvre un nouveau design et envoie la consigne à son chat avec l’AI, avec un guide pour ce type ; les exemples en dessous remplissent la consigne avec une idée à modifier. Sous la consigne, vous pouvez partir d’un fichier Figma, d’une page du navigateur intégré (application de bureau) ou d’une capture d’écran que l’agent recrée. Des onglets passent de **Récents** à **Brouillons** et **Systèmes de design**, et le menu à côté liste les emplacements qu’ajoutent votre serveur Cloud et votre bucket de stockage. Un champ de recherche filtre la liste, **Ouvrir…** ouvre un fichier et **Design** commence un design vide.
+Accueil commence par une consigne : choisissez au-dessus ce qu’il faut créer (page d’accueil, app mobile, app web, diapositives, tableau de bord ou autre chose), décrivez-le, et Pairdraw ouvre un nouveau design et envoie la consigne à son chat avec l’IA, avec un guide pour ce type ; les exemples en dessous remplissent la consigne avec une idée à modifier. Sous la consigne, vous pouvez partir d’un fichier Figma, d’une page du navigateur intégré (application de bureau) ou d’une capture d’écran que l’agent recrée. Des onglets passent de **Récents** à **Brouillons** et **Systèmes de design**, et le menu à côté liste les emplacements qu’ajoutent votre serveur Cloud et votre bucket de stockage. Un champ de recherche filtre la liste, **Ouvrir…** ouvre un fichier et **Design** commence un design vide.
 
-**Récents** liste les documents locaux récents. Utilisez la vue en grille ou en liste et triez les fichiers récents par **Nom**, **Dernière utilisation** ou **Création**. ⌘/<kbd>Ctrl</kbd>-clic ajoute un fichier à la sélection, Maj-clic sélectionne une plage, et <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+<kbd>A</kbd> sélectionne tous les fichiers listés ; la barre de sélection les ouvre ensuite dans des onglets d’éditeur séparés, les retire des Récents ou supprime les documents stockés. Le menu <kbd>⋯</kbd> d’un fichier ou son menu contextuel propose **Retirer des Récents**, qui oublie le fichier sans le supprimer, et **Enregistrer sous…**, qui enregistre une copie ailleurs. **Systèmes de design** liste Pairdraw Basics, fournie avec l’application, et les bibliothèques de composants que vous avez publiées, comme Goodies ; en choisir une ouvre un nouveau design avec cette bibliothèque activée dans le panneau des ressources.
+**Récents** liste les documents locaux récents. Utilisez la vue en grille ou en liste et triez les fichiers récents par **Nom**, **Dernière utilisation** ou **Création**. <kbd>⌘</kbd>/<kbd>Ctrl</kbd>-clic ajoute un fichier à la sélection, <kbd>Maj</kbd>-clic sélectionne une plage, et <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+<kbd>A</kbd> sélectionne tous les fichiers listés ; la barre de sélection les ouvre ensuite dans des onglets d’éditeur séparés, les retire des Récents ou supprime les documents stockés. Le menu <kbd>⋯</kbd> d’un fichier ou son menu contextuel propose **Retirer des Récents**, qui oublie le fichier sans le supprimer, et **Enregistrer sous…**, qui enregistre une copie ailleurs. **Systèmes de design** liste Pairdraw Basics, fournie avec l’application, et les bibliothèques de composants que vous avez publiées, comme Bonus ; en choisir une ouvre un nouveau design avec cette bibliothèque activée dans le panneau des ressources.
 
 Un nouveau design reste conservé comme brouillon sur cet appareil pendant que vous y travaillez : chaque modification est écrite peu après que vous l’avez faite, donc fermer son onglet ne demande rien. **Brouillons** sur Accueil les liste avec un aperçu ; ouvrez-en un pour continuer, ou choisissez **Supprimer le brouillon** dans son menu <kbd>⋯</kbd> ou contextuel pour le supprimer définitivement. Enregistrer un brouillon dans un fichier ou dans un stockage, dans l’éditeur ou avec **Enregistrer sous…** sur Accueil, le sort des Brouillons. Les brouillons ne vivent que dans ce profil de navigateur ou cette installation de bureau, et demandent que **Conserver automatiquement le travail non enregistré** soit activé et un navigateur qui garde les données du site.
 
@@ -48,8 +70,53 @@ Un fichier que vous avez ouvert garde aussi une copie de secours des modificatio
 
 Désactiver la récupération arrête la conservation automatique et retire les copies de récupération des documents actuellement ouverts. Elle ne supprime pas en masse les instantanés des documents fermés auparavant. La récupération est locale à cette installation ou à ce profil de navigateur ; elle ne remplace pas l’enregistrement d’un fichier, la synchronisation dans le cloud ni une copie de secours.
 
-## Propriétés
+## Bonus {#goodies}
 
-Le panneau droit affiche les contrôles adaptés à la sélection : position, taille, apparence, remplissages, contours, effets, typographie, disposition et exportation.
+Le bouton cadeau de la barre supérieure, **Objet → Bonus…** ou la palette de commandes ouvre Bonus, une collection de points de départ : des styles à épingler au chat avec l’IA, les systèmes de design que vous pouvez activer, des scripts qui arrivent sur la zone de travail sous forme de [calques de script](/user-guide/script-layers), et les shaders de la galerie, qui remplissent les calques sélectionnés ou un nouveau rectangle.
 
-Sans sélection, il affiche l’arrière-plan et les variables de la page actuelle.
+## Panneau des propriétés
+
+Le panneau des propriétés, à droite, passe de Design à Code, avec [Vérifier](/user-guide/checking-designs) sous forme d’onglet à icône à côté. Le chat avec l’IA s’ouvre dans sa propre colonne à côté.
+
+### Onglet Design
+
+Affiche les propriétés du ou des objets sélectionnés, organisées en sections :
+
+- **Apparence :** opacité, rayon des coins (avec bouton pour des coins indépendants) et visibilité.
+- **Remplissage :** couleur unie, dégradés (linéaire, radial, angulaire, diamant), remplissages d’image et liaisons de variables.
+- **Contour :** couleur, épaisseur, extrémités, jointures et motif de tirets.
+- **Effets :** ombre portée, ombre intérieure, flou de calque, flou d’arrière-plan et flou de premier plan.
+- **Typographie :** famille de police, taille, graisse et boutons de mise en forme G/I/S/B (visible pour les objets texte).
+- **Disposition :** réglages de la [disposition automatique](./auto-layout) (visible pour les cadres en disposition automatique).
+- **Export :** échelle, format et bouton d’export (voir [Exporter](./exporting)).
+
+Sans sélection, l’onglet Design affiche les propriétés de la page, dont la couleur d’arrière-plan de la zone de travail.
+
+### Onglet Code
+
+Affiche l’objet sélectionné sous forme de code, avec coloration syntaxique, numéros de ligne et bouton de copie. Un sélecteur de format bascule entre deux modes de sortie :
+
+- **Pairdraw JSX :** arbre de composants compatible avec `renderJSX()` pour un aller-retour par programme.
+- **Tailwind CSS v4 :** HTML avec classes utilitaires (`<div className="flex gap-4 p-3">`) prêt à coller dans des projets React ou Vue.
+
+## Colonne du chat avec l’IA
+
+Le [chat avec l’IA](/fr/programmable/ai-chat) crée et modifie des éléments de design à partir de demandes en langage naturel. Il s’ouvre dans sa propre colonne, à droite du panneau des propriétés, pour que l’onglet Design reste visible pendant qu’un agent travaille. Ouvrez-le et fermez-le avec le bouton à étincelles parmi les actions du document dans la barre supérieure ou avec <kbd>⌘</kbd><kbd>J</kbd> ; faites glisser son bord pour le redimensionner. La colonne reste ouverte ou fermée, à la largeur où vous l’avez laissée, d’un rechargement à l’autre. Configurez les modèles réutilisables et les connexions aux fournisseurs dans les Paramètres, et parcourez les conversations enregistrées localement depuis le menu d’historique du chat.
+
+## Raccourcis clavier
+
+| Action | Mac | Windows / Linux |
+|--------|-----|-----------------|
+| Ouvrir ou fermer la colonne du chat avec l’IA | <kbd>⌘</kbd><kbd>J</kbd> | <kbd>Ctrl</kbd> + <kbd>J</kbd> |
+| Rechercher des calques | <kbd>⌘</kbd><kbd>F</kbd> | <kbd>Ctrl</kbd> + <kbd>F</kbd> |
+
+## Disposition mobile
+
+Sur mobile et sur les petits écrans, les panneaux latéraux sont remplacés par un tiroir inférieur que l’on fait glisser. Des onglets en haut du tiroir passent des vues Calques, Propriétés, Design et Code à la vue IA. La barre d’outils se réduit à une bande horizontale compacte avec changement de catégorie.
+
+## Conseils
+
+- La largeur des panneaux, y compris celle de la colonne du chat avec l’IA, est enregistrée automatiquement et conservée d’un rechargement à l’autre.
+- Utilisez le panneau des calques pour trouver des objets superposés difficiles à atteindre sur la zone de travail.
+- Le [menu contextuel](./context-menu) propose d’autres actions pour les objets sélectionnés.
+- Voir [Sélection et transformation](./selection-and-manipulation) pour les raccourcis d’ordre d’empilement (<kbd>]</kbd>/<kbd>[</kbd>) et les boutons de visibilité et de verrouillage.

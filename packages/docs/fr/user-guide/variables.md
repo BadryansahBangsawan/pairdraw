@@ -46,6 +46,23 @@ Sur le canevas, un calque affiche un mode lorsque vous l’y réglez, quelle que
 
 ## Gérer les variables
 
+### Valeurs calculées par formule {#formula-values}
+
+Le champ de valeur d’une variable numérique accepte un nombre, une autre variable ou une formule. Commencez à taper le nom d’une variable et choisissez-la dans la liste, ou choisissez **Utiliser une variable** : elle apparaît sous forme de pastille, et le champ affiche le résultat de la formule, par exemple `= 16px`. Les pastilles sont enregistrées par identifiant : renommer une variable ne casse donc pas la formule. Les variables vrai/faux, texte et couleur gardent leur interrupteur, leur champ de texte ou leur sélecteur de couleur ; choisissez **Utiliser une formule** à côté pour écrire une formule à la place.
+
+- Les nombres utilisent `+`, `-`, `*`, `/` et les parenthèses : `space/base * 4`.
+- Les valeurs vrai/faux utilisent `and`, `or` et `not`, et comparent des nombres avec `==`, `!=`, `<`, `<=`, `>` et `>=` : `viewport > 1024 and not loading`. `==` et `!=` comparent aussi du texte.
+- Le texte s’écrit entre guillemets droits doubles, et `+` le joint à un autre texte, à un nombre ou à une valeur vrai/faux : `"Hello, " + name`. `text(count)` écrit un nombre comme le fait Figma, avec deux décimales sauf s’il est entier : `3`, `1.50`.
+- `if(condition, then, otherwise)` choisit entre deux nombres, textes, valeurs vrai/faux ou couleurs : `if(compact, 8, 16)`, `if(dark, gray/900, #FFFFFF)`. Les couleurs s’écrivent `#RRGGBB`, ou `#RRGGBBAA` avec opacité.
+- `truthy(value)` vaut faux pour `0`, un texte vide et les mots `false`, `no` et `off`, et vrai pour tout le reste, comme Figma les lit.
+- Les variables inconnues, les références circulaires, les types mélangés et la division par zéro sont signalés quand vous quittez le champ, et la valeur enregistrée reste inchangée.
+
+Le résultat suit les modes de variables de chaque calque et met à jour les calques liés quand une variable qu’il utilise change. Les formules utilisent les unités enregistrées : les longueurs sont donc en pixels. La liste affiche le résultat de chaque formule ; survolez l’icône de formule pour lire la formule.
+
+Dans la feuille de style, une formule numérique s’écrit sous forme de `calc()` sur les variables qu’elle utilise, par exemple `calc(var(--spacing-md) * 2 - var(--spacing-base))`, et est déclarée de nouveau dans chaque mode qui change l’une d’elles. Les formules qui utilisent `if()`, du texte ou des valeurs vrai/faux n’ont pas de forme CSS et sont omises de la feuille de style. Une **Expression CSS** remplace la valeur dans le CSS seulement. Les fichiers de design tokens contiennent le résultat de chaque formule, avec la formule sous `$extensions`. Les formules survivent au copier-coller, au partage, à l’annulation et aux enregistrements `.fig`, et les expressions de couleur et d’opacité de Figma conservent leurs références de variables.
+
+### Liste des variables {#variable-list}
+
 Les variables sont regroupées selon les dossiers de leurs noms (`Brand/Primary` apparaît comme *Primary* sous *Brand*), avec leur nom CSS et une valeur par mode.
 
 - **Créer une variable :** cliquez sur **Créer une variable** (ou sur **+**) et choisissez un type ; la nouvelle variable s’ouvre pour modification
@@ -62,7 +79,7 @@ La sélection d’une variable permet de modifier :
 - **Nom** et **Nom CSS** : laissez le nom CSS vide pour le déduire du nom et des portées, par exemple `--color-brand-primary`. Saisissez le nom sans son `--` ; un nom que CSS ne peut pas utiliser est signalé et n’est pas enregistré
 - **Unité** : pour les nombres, `px`, `rem`, `%`, `ms`, `s`, `deg` ou aucune ; les valeurs sont saisies dans cette unité
 - **Valeur** ou **Valeurs** : une par mode ; une couleur ouvre le sélecteur de couleur. Le bouton de variable (**Utiliser une variable**) à côté d’une valeur la fait pointer vers une autre variable du même type, un alias qui suit cette variable ; **Détacher la variable** la ramène à la valeur qu’elle affichait
-- **Expression CSS** : pour les nombres, une valeur comme `clamp(1rem, 4vw, 1.5rem)` écrite en CSS à la place du nombre, tandis que le canevas continue de dessiner le nombre
+- **Expression CSS** : pour les nombres, choisissez **Ajouter une expression CSS** dans le menu **⋯** d’une valeur pour écrire du CSS comme `clamp(1rem, 4vw, var(--spacing-md))` à la place de la valeur, tandis que le canevas continue de dessiner la valeur. Les noms de tokens se complètent en `var(--name)` et s’affichent sous forme de pastilles, le bouton de variable en insère un, et une fonction non fermée, un token inconnu ou une valeur que l’unité du token n’accepte pas sont signalés quand vous quittez le champ. L’expression reste quand la valeur passe d’un nombre à une variable ou à une formule ; supprimez-la depuis le même menu
 - **Portées** : les propriétés pour lesquelles la variable est proposée
 - **Description**
 - **Masquer de la publication** : les fichiers qui utilisent celui-ci comme bibliothèque ne voient pas la variable

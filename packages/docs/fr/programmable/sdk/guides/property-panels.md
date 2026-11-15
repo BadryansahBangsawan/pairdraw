@@ -5,7 +5,7 @@ description: Créer des panneaux de propriétés avec des composables et des com
 
 # Panneaux de propriétés
 
-`@pairdraw/vue` fournit principalement des composables pour les panneaux de propriétés.
+Les panneaux de propriétés de `@pairdraw/vue` misent volontairement d’abord sur les composables.
 
 Si un panneau utilise des valeurs calculées depuis la sélection et des actions pour les modifier, choisissez un composable. Pour une structure réutilisable de tableau ou de liste, utilisez un composant sans apparence imposée comme `PropertyListRoot`.
 
@@ -27,7 +27,7 @@ Pour les propriétés sous forme de listes :
 
 ## Liaisons avec des variables
 
-Lorsqu’un champ peut être lié à une variable ou à un jeton de design externe, placez-le dans `BindableValueRoot`.
+Lorsqu’un champ peut être lié à une variable ou à un jeton de design externe, placez-le dans `BindableValueRoot`. Le composant n’impose aucune présentation, mais une interface qui gère les liaisons doit garder le focus sans effet destructeur :
 
 - Hors édition, affichez le nom de la variable ; la valeur calculée peut apparaître dans une infobulle.
 - Le focus et l’ouverture du sélecteur de variable ne doivent pas supprimer une liaison existante.
@@ -79,10 +79,10 @@ const fills = useEditorPropertyList('fills')
   >
     <div v-for="(fill, index) in items" :key="index">
       {{ fill.type }}
-      <button @click="actions.remove(index)">Supprimer</button>
+      <button @click="actions.remove(index)">Remove</button>
     </div>
 
-    <button @click="actions.add(fillControls.defaultFill)">Ajouter un remplissage</button>
+    <button @click="actions.add(fillControls.defaultFill)">Add fill</button>
   </PropertyListRoot>
 </template>
 ```

@@ -65,7 +65,7 @@ Modifiez maintenant un token ou un composant principal, par exemple `radius/card
 
 ## 5. Aller plus loin
 
-- **Publiez-le comme bibliothèque.** Ouvrez **Ressources → Gérer les bibliothèques → Publier la bibliothèque** pour que d'autres fichiers utilisent le Button et la Card et acceptent les mises à jour quand vous les modifiez ([Bibliothèques de composants](/user-guide/components#component-libraries)).
+- **Publiez-le comme bibliothèque.** Ouvrez **Ressources → Gérer les bibliothèques → Publier la bibliothèque** pour que d'autres fichiers utilisent le Button et la Card et acceptent les mises à jour quand vous les modifiez ([Bibliothèques de composants](./components#component-libraries)).
 - **Transmettez les tokens au code.** `pairdraw tokens design-system.fig` affiche les variables sous forme de propriétés personnalisées CSS, `--format tailwind` sous forme de thème Tailwind v4 et `--format dtcg --out tokens/` sous forme de fichiers de design tokens W3C. L'export HTML écrit les valeurs liées comme des références `var()` à ces mêmes propriétés ([Exporter](./exporting)).
 - **Vérifiez-le.** [Vérifier les designs](/user-guide/checking-designs) et `pairdraw lint design-system.fig --fix -o fixed.fig` trouvent les couleurs qui correspondent à un token sans y être liées, et les lient.
 - **Suivez les modifications.** Gardez le fichier dans Git et examinez les modifications avec [`pairdraw diff files`](/fr/programmable/cli/git).

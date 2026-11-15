@@ -1,12 +1,35 @@
 ---
 title: useVariables
-description: Lire et modifier collections, variables, modes et valeurs.
+description: Lire et modifier les collections de variables, les variables et leurs valeurs.
 ---
 
 # useVariables
 
-`useVariables()` fournit l’état et les actions de bas niveau d’un éditeur de variables.
+`useVariables()` est le composable de bas niveau sur lequel reposent les outils de plus haut niveau de l’éditeur de variables.
 
-Utilisez-le pour contrôler directement collections, modes actifs, filtres et opérations de création, lecture, modification et suppression sans table ni dialogue préfabriqués.
+Utilisez-le pour contrôler directement les collections, les modes actifs, le filtrage et les opérations de création, modification et suppression, sans l’abstraction complète de table et de dialogue.
 
-Les valeurs renvoyées comprennent `collections`, `activeCollection`, `activeModes`, `variables` et `searchTerm`.
+## Utilisation
+
+```ts
+import { useVariables } from '@pairdraw/vue/variables'
+
+const variables = useVariables()
+```
+
+## Valeurs renvoyées
+
+- `collections`
+- `activeCollectionId`
+- `activeCollection`
+- `activeModes`
+- `variables`
+- `searchTerm`
+- `setSearchTerm()`
+- `setActiveCollection()`
+- `addCollection()`
+- `renameCollection()`
+- `addVariable()`
+- `removeVariable()`
+- `renameVariable()`
+- `updateVariableValue()`

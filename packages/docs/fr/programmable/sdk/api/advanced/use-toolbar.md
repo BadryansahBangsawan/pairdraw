@@ -5,9 +5,9 @@ description: Accéder au contexte fourni par ToolbarRoot.
 
 # useToolbar
 
-`useToolbar()` renvoie le contexte du `ToolbarRoot` le plus proche.
+`useToolbar()` lit le contexte local de la barre d’outils fourni par `ToolbarRoot`.
 
-Utilisez-le dans les descendants qui ont besoin des outils, de l’état actif ou de l’action de changement d’outil.
+Utilisez-le dans les descendants de la barre qui ont besoin des outils, de l’état actif ou des fonctions de sélection d’outil.
 
 ## Voir aussi
 

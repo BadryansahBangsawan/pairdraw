@@ -5,7 +5,12 @@ description: Panneaux latéraux de pages et de calques avec PageListRoot, LayerT
 
 # Panneaux de navigation
 
-Un panneau latéral contient souvent une liste de pages et l’arbre des calques. Le SDK Vue fournit des composants sans styles pour ces deux zones.
+Les panneaux latéraux de Pairdraw combinent généralement deux rôles :
+
+- la navigation entre les pages ;
+- la navigation dans les calques.
+
+Le SDK Vue fournit des composants sans styles pour ces deux zones.
 
 ## Pages
 
@@ -17,7 +22,7 @@ Utilisez `PageListRoot` ou `usePageList()` :
     <button v-for="page in pages" :key="page.id" @click="switchPage(page.id)">
       {{ page.name }}
     </button>
-    <button @click="addPage()">Nouvelle Page</button>
+    <button @click="addPage()">New page</button>
   </div>
 </PageListRoot>
 ```
@@ -40,6 +45,8 @@ Utilisez `LayerTreeRoot` lorsque le SDK doit gérer la structure de l’arbre et
 ```
 
 ## Disposition courante
+
+Une disposition fréquente comprend :
 
 - pages en haut du panneau ;
 - calques en dessous ;

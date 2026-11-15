@@ -1,13 +1,13 @@
 ---
 title: useGradientStops
-description: État et actions des points d’un dégradé.
+description: État et modification des points d’un dégradé dans les éditeurs de remplissage.
 ---
 
 # useGradientStops
 
-`useGradientStops(fill, onUpdate)` gère le point actif, le type de dégradé, le glissement et les changements de position, couleur et opacité.
+`useGradientStops(fill, onUpdate)` gère le point actif, le changement de type de dégradé, le glissement des points et les mises à jour de couleur ou d’opacité des remplissages en dégradé.
 
-Utilisez-le pour créer une interface de dégradés sans reproduire cette logique.
+Utilisez-le pour créer un éditeur de dégradés personnalisé qui va au-delà des primitives fournies.
 
 ## Voir aussi
 

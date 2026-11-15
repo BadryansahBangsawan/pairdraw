@@ -5,17 +5,17 @@ description: Configurer Git pour afficher des diffs lisibles des fichiers .fig a
 
 # Versionner des designs avec Git
 
-Un fichier `.fig` est binaire : `git diff` et `git log -p` indiquent seulement qu'il a changé. Avec la CLI `pairdraw` installée, Git peut montrer ce qui a changé : [`pairdraw diff files`](/programmable/cli/comparing#comparing-documents) compare deux versions page par page et affiche les modifications sous forme de patch.
+Un fichier `.fig` est binaire : `git diff` et `git log -p` indiquent seulement qu’il a changé. Avec la CLI `pairdraw` installée, Git peut montrer ce qui a changé : [`pairdraw diff files`](/programmable/cli/comparing#comparing-documents) compare deux versions page par page et affiche les modifications sous forme de patch.
 
-Il existe trois façons de l'intégrer. Les commandes ci-dessous configurent le dépôt courant ; ajoutez `--global` à `git config` pour configurer tous les dépôts.
+Il existe trois façons de l’intégrer. Les commandes ci-dessous configurent le dépôt courant ; ajoutez `--global` à `git config` pour configurer tous les dépôts.
 
 | Configuration | Utilisée par | Affiche |
 | --- | --- | --- |
-| [Pilote de diff](#diff-driver) | `git diff` ; `git log -p` et `git show` avec `--ext-diff` | le patch qu'affiche `diff files` |
-| [Textconv](#textconv) | `git log -p` et `git show` ; `git diff` sans pilote de diff | un diff ligne à ligne d'un plan des calques |
+| [Pilote de diff](#diff-driver) | `git diff` ; `git log -p` et `git show` avec `--ext-diff` | le patch qu’affiche `diff files` |
+| [Textconv](#textconv) | `git log -p` et `git show` ; `git diff` sans pilote de diff | un diff ligne à ligne d’un plan des calques |
 | [Difftool](#difftool) | `git difftool` | le patch, un fichier à la fois |
 
-Les trois partent d'une entrée de `.gitattributes`, à la racine du dépôt, qui donne aux fichiers `.fig` un pilote de diff nommé `fig` :
+Les trois partent d’une entrée de `.gitattributes`, à la racine du dépôt, qui donne aux fichiers `.fig` un pilote de diff nommé `fig` :
 
 ```text
 *.fig diff=fig
@@ -23,7 +23,7 @@ Les trois partent d'une entrée de `.gitattributes`, à la racine du dépôt, qu
 
 ## Pilote de diff {#diff-driver}
 
-Git lance la commande d'un pilote de diff avec sept arguments, `path old-file old-hex old-mode new-file new-hex new-mode`, et considère tout code de sortie autre que 0 comme un échec. `diff files` prend deux documents et, comme `diff(1)`, sort avec 1 quand ils diffèrent : un court script fait donc l'intermédiaire. Enregistrez-le sous le nom `git-diff-fig` dans un dossier de votre `PATH` et rendez-le exécutable :
+Git lance la commande d’un pilote de diff avec sept arguments, `path old-file old-hex old-mode new-file new-hex new-mode`, et considère tout code de sortie autre que 0 comme un échec. `diff files` prend deux documents et, comme `diff(1)`, sort avec 1 quand ils diffèrent : un court script fait donc l’intermédiaire. Enregistrez-le sous le nom `git-diff-fig` dans un dossier de votre `PATH` et rendez-le exécutable :
 
 ```sh
 #!/bin/sh
@@ -71,11 +71,11 @@ diff --pairdraw a/design-system.fig b/design-system.fig
 +size={20}
 ```
 
-`git log` et `git show` n'utilisent un pilote de diff que sur demande, par exemple `git log -p --ext-diff -- design.fig`. Le patch est celui que décrit [Comparer des designs](/programmable/cli/comparing#patches) : chaque bloc nomme un calque par son chemin et par son ID dans l'ancienne version, si bien que `pairdraw diff apply` peut appliquer le patch à cette version. Une page présente dans une seule version est signalée sur stderr.
+`git log` et `git show` n’utilisent un pilote de diff que sur demande, par exemple `git log -p --ext-diff -- design.fig`. Le patch est celui que décrit [Comparer des designs](/programmable/cli/comparing#patches) : chaque bloc nomme un calque par son chemin et par son ID dans l’ancienne version, si bien que `pairdraw diff apply` peut appliquer le patch à cette version. Une page présente dans une seule version est signalée sur stderr.
 
 ## Textconv {#textconv}
 
-Une commande textconv transforme une version d'un fichier en texte, que Git compare ligne à ligne. C'est ce qu'utilisent par défaut `git log -p` et `git show`, et Git peut la mettre en cache pour chaque version. Ce script affiche un plan de chaque page, un calque par ligne, avec son type, son nom, sa taille et son texte. Il utilise [`pairdraw eval`](./scripting) et [`jq`](https://jqlang.org) ; enregistrez-le sous le nom `fig-textconv` dans votre `PATH` :
+Une commande textconv transforme une version d’un fichier en texte, que Git compare ligne à ligne. C’est ce qu’utilisent par défaut `git log -p` et `git show`, et Git peut la mettre en cache pour chaque version. Ce script affiche un plan de chaque page, un calque par ligne, avec son type, son nom, sa taille et son texte. Il utilise [`pairdraw eval`](./scripting) et [`jq`](https://jqlang.org) ; enregistrez-le sous le nom `fig-textconv` dans votre `PATH` :
 
 ```sh
 #!/bin/sh
@@ -116,7 +116,7 @@ La même modification dans le plan :
 +      TEXT "Body" 272×17 "Pick a plan that fits your team."
 ```
 
-Si la `command` du pilote de diff est aussi définie, `git diff` utilise la commande, et le plan apparaît dans `git log -p` et partout où `--no-ext-diff` est indiqué. Adaptez le script à ce que votre équipe relit, comme les remplissages ou les propriétés de composant ; un plan stable donne un diff lisible. `cachetextconv` garde le plan de chaque version dans les notes de Git, si bien qu'un gros fichier n'est lu qu'une fois.
+Si la `command` du pilote de diff est aussi définie, `git diff` utilise la commande, et le plan apparaît dans `git log -p` et partout où `--no-ext-diff` est indiqué. Adaptez le script à ce que votre équipe relit, comme les remplissages ou les propriétés de composant ; un plan stable donne un diff lisible. `cachetextconv` garde le plan de chaque version dans les notes de Git, si bien qu’un gros fichier n’est lu qu’une fois.
 
 ## Difftool {#difftool}
 
@@ -131,10 +131,10 @@ git difftool --no-prompt --tool=pairdraw HEAD~1 -- '*.fig'
 git difftool -y -t pairdraw main...my-branch -- design.fig
 ```
 
-Le filtre de chemins écarte les autres fichiers. Un pilote de diff défini par `diff.fig.command` l'emporte sur un difftool pour les fichiers `.fig` : utilisez l'un ou l'autre. N'ajoutez pas `--trust-exit-code` : `diff files` sort avec 1 dès que les versions diffèrent.
+Le filtre de chemins écarte les autres fichiers. Un pilote de diff défini par `diff.fig.command` l’emporte sur un difftool pour les fichiers `.fig` : utilisez l’un ou l’autre. N’ajoutez pas `--trust-exit-code` : `diff files` sort avec 1 dès que les versions diffèrent.
 
 ## Remarques
 
-- La CLI lit chaque version qu'elle compare : comparer un gros fichier prend autant de temps que de l'ouvrir deux fois sans interface. `cachetextconv` épargne ce temps pour les versions déjà vues.
-- Les calques sont appariés d'une version à l'autre par leur chemin de noms : un calque renommé apparaît comme supprimé puis ajouté.
+- La CLI lit chaque version qu’elle compare : comparer un gros fichier prend autant de temps que de l’ouvrir deux fois sans interface. `cachetextconv` épargne ce temps pour les versions déjà vues.
+- Les calques sont appariés d’une version à l’autre par leur chemin de noms : un calque renommé apparaît comme supprimé puis ajouté.
 - Les fichiers `.pen` sont du JSON, que Git compare déjà comme du texte.

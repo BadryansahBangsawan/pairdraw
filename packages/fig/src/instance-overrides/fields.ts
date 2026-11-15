@@ -151,9 +151,6 @@ function rawFieldsOfKind<K extends OverrideField['kind']>(kind: K): RawFieldOfKi
   return entries.flatMap(([raw, field]) => (field.kind === kind ? [raw as RawFieldOfKind<K>] : []))
 }
 
-/** Scalars share one name on both sides and serialize verbatim. */
-const SCALAR_OVERRIDE_FIELDS: readonly RawFieldOfKind<'scalar'>[] = rawFieldsOfKind('scalar')
-
 /** Layout distances by scene field, mapped to the raw field uniform scale treats as a length. */
 export const LAYOUT_DISTANCE_FIELDS: Readonly<Record<string, RawFieldOfKind<'layout-distance'>>> =
   Object.fromEntries(

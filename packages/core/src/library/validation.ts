@@ -1,3 +1,5 @@
+import { omit } from 'es-toolkit'
+
 import { contentHash } from './hash'
 import { encodeStoredLibraryRevision } from './serialization'
 import { describeSnapshotAssets } from './snapshot'
@@ -84,7 +86,7 @@ export async function validateLibraryRevision(revision: ComponentLibraryRevision
     schemaVersion: manifest.schemaVersion,
     libraryId: manifest.libraryId,
     previousRevisionId: manifest.previousRevisionId,
-    assets: manifest.assets.map(({ thumbnail: _, sourceNodeId: __, ...asset }) => asset)
+    assets: manifest.assets.map((asset) => omit(asset, ['thumbnail', 'sourceNodeId']))
   })
   if (revisionId !== manifest.revisionId) integrityError('Component library revision hash mismatch')
 }

@@ -1,7 +1,6 @@
-import type { GUID } from '@pairdraw/kiwi/fig'
 import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 import { stringToGuid, UNSET_GUID } from '@pairdraw/kiwi/fig/guid'
-import type { CharacterStyleOverride, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type { CharacterStyleOverride, SceneNode } from '@pairdraw/scene-graph'
 
 import { exportedStyleReference, type SceneNodeToKiwiContext } from '../export/context'
 import { textRunVariableEntries } from '../variable/bindings'

@@ -1,3 +1,5 @@
+import { omit } from 'es-toolkit'
+
 import { contentHash } from './hash'
 import { assertLibraryId } from './identity'
 import { describeSnapshotAssets, extractLibrarySnapshot } from './snapshot'
@@ -18,7 +20,7 @@ export async function createLibraryRevision(
     schemaVersion: COMPONENT_LIBRARY_SCHEMA_VERSION,
     libraryId: input.libraryId,
     previousRevisionId: input.previousRevisionId ?? null,
-    assets: assets.map(({ thumbnail: _, sourceNodeId: __, ...asset }) => asset)
+    assets: assets.map((asset) => omit(asset, ['thumbnail', 'sourceNodeId']))
   })
   const manifest: ComponentLibraryManifest = {
     schemaVersion: COMPONENT_LIBRARY_SCHEMA_VERSION,

@@ -62,6 +62,7 @@ pub fn run() {
         .manage(launch::documents::OpenDocuments::default())
         .manage(ProxyHttpRequests::default())
         .manage(network::oauth::ChatGPTOAuthLoopback::default())
+        .manage(network::oauth::OpenRouterOAuthLoopback::default())
         .manage(agents::mcp_stdio::McpStdioProcesses::default())
         .manage(launch::PendingRooms::default())
         .manage(NativeMenuState::default())
@@ -74,6 +75,9 @@ pub fn run() {
             network::oauth::chatgpt_oauth_listen,
             network::oauth::chatgpt_oauth_wait,
             network::oauth::chatgpt_oauth_cancel,
+            network::oauth::openrouter_oauth_listen,
+            network::oauth::openrouter_oauth_wait,
+            network::oauth::openrouter_oauth_cancel,
             credential_read,
             credential_access_paused,
             credential_retry_access,

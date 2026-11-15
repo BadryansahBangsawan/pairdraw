@@ -535,10 +535,11 @@ export const aiMessageDefaults = {
   aiSetupChatGPTFailed: 'Couldn’t sign in to ChatGPT. Try again.',
   aiSetupChatGPTPortInUse:
     'Another sign-in, such as `codex login`, is using port 1455. Finish or close it, then try again.',
-  aiSetupChatGPTCallbackSignedIn:
-    'Signed in to ChatGPT. You can close this tab and return to Pairdraw.',
-  aiSetupChatGPTCallbackCancelled: 'ChatGPT sign-in was cancelled. You can close this tab.',
-  aiSetupChatGPTCallbackStale:
+  aiSetupCallbackSignedIn: params(
+    'Signed in to {provider}. You can close this tab and return to Pairdraw.'
+  ),
+  aiSetupCallbackCancelled: params('{provider} sign-in was cancelled. You can close this tab.'),
+  aiSetupCallbackStale:
     'This sign-in link belongs to an earlier attempt. Start again from Pairdraw.',
   aiSetupChatGPTUsage: 'Replies count toward your ChatGPT plan’s usage limits.',
   aiSetupSavedSignInHint: 'Your saved sign-in will be used.',

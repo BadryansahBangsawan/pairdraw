@@ -8,12 +8,8 @@ import {
   type SignInCallback,
   type SignInFailure
 } from '../sign-in/attempt'
-import {
-  deepLinkRedirect,
-  desktopRedirectURL,
-  popupRedirect,
-  type RedirectReader
-} from '../sign-in/redirect'
+import { loopbackRedirect } from '../sign-in/loopback'
+import { popupRedirect, type RedirectReader } from '../sign-in/redirect'
 import {
   exchangeOpenRouterCode,
   openRouterAuthorizationURL,
@@ -23,11 +19,8 @@ import {
 /** Served from `public/`; it relays the redirect to the editor over this channel. */
 const OPENROUTER_CALLBACK_PATH = '/oauth/openrouter.html'
 const OPENROUTER_CALLBACK_CHANNEL = 'pairdraw:openrouter-oauth'
-/**
- * Served from `public/` on a hosted web app, when a build names one; it hands the redirect to the
- * desktop app's deep link.
- */
-const OPENROUTER_DESKTOP_CALLBACK_PATH = '/oauth/openrouter-desktop.html'
+/** Where the desktop shell's loopback port reads the redirect (`desktop/src/network/oauth.rs`). */
+const OPENROUTER_LOOPBACK_PATH = '/oauth/openrouter'
 const POPUP_NAME = 'pairdraw-openrouter'
 
 export type OpenRouterSignInFailure = SignInFailure | 'blocked'
@@ -54,22 +47,24 @@ function popupCallback(state: string): Promise<SignInCallback | { failure: 'bloc
   return Promise.resolve(callback ?? { failure: 'blocked' })
 }
 
-/** The system browser, which returns through a `pairdraw://oauth/openrouter` link. */
-function deepLinkCallback(state: string): Promise<SignInCallback> {
-  return deepLinkRedirect('openrouter', redirectReader(state))
-}
-
 /** Signs in to OpenRouter with OAuth PKCE and returns a new API key for this app. */
 export function signInWithOpenRouter({
   signal,
   keyLabel
 }: OpenRouterSignInOptions): OpenRouterSignIn {
-  const callbackURL = IS_TAURI
-    ? desktopRedirectURL('openrouter', OPENROUTER_DESKTOP_CALLBACK_PATH)
-    : new URL(OPENROUTER_CALLBACK_PATH, window.location.origin).href
+  // The desktop app's system browser returns to a loopback port, which OpenRouter accepts on any
+  // port; the port is known once the desktop shell takes it, before the page opens.
+  let callbackURL = new URL(OPENROUTER_CALLBACK_PATH, window.location.origin).href
+  async function loopbackCallback(state: string): Promise<SignInCallback> {
+    const loopback = await loopbackRedirect('openrouter', 'OpenRouter', state)
+    // The system picks the port, so it is never one another program holds.
+    if (loopback === 'port-in-use') throw new Error('The OpenRouter sign-in port is in use')
+    callbackURL = `http://localhost:${loopback.port}${OPENROUTER_LOOPBACK_PATH}`
+    return loopback.callback
+  }
   return startSignIn({
     signal,
-    callback: IS_TAURI ? deepLinkCallback : popupCallback,
+    callback: IS_TAURI ? loopbackCallback : popupCallback,
     authorizationURL: (pkce) => openRouterAuthorizationURL(callbackURL, pkce, keyLabel),
     exchange: (code, verifier) => exchangeOpenRouterCode(code, verifier)
   })

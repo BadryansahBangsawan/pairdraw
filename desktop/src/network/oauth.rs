@@ -1,6 +1,7 @@
-//! Receives the ChatGPT sign-in redirect. OpenAI registers one redirect for the Codex client,
-//! `http://localhost:1455/auth/callback`, so the app listens there for the single request that
-//! carries the authorization code, then closes the port.
+//! Receives sign-in redirects on a loopback port, listening for the single request that carries
+//! the authorization code, then closing the port. OpenAI registers one redirect for the Codex
+//! client, `http://localhost:1455/auth/callback`, so ChatGPT returns there; OpenRouter accepts a
+//! localhost callback on any port, so it returns to a port the system picks.
 
 use std::io::{ErrorKind, Read, Write};
 use std::net::{TcpListener, TcpStream};
@@ -10,8 +11,22 @@ use std::time::{Duration, Instant};
 
 use url::Url;
 
-const CALLBACK_ADDRESS: &str = "127.0.0.1:1455";
-const CALLBACK_PATH: &str = "/auth/callback";
+/// Where a provider's redirect returns.
+#[derive(Debug, Clone, Copy)]
+struct Callback {
+    address: &'static str,
+    path: &'static str,
+}
+
+const CHATGPT_CALLBACK: Callback = Callback {
+    address: "127.0.0.1:1455",
+    path: "/auth/callback",
+};
+/// Port 0 lets the system pick a free port, which the redirect URL then names.
+const OPENROUTER_CALLBACK: Callback = Callback {
+    address: "127.0.0.1:0",
+    path: "/oauth/openrouter",
+};
 /// Codes expire after ten minutes; a sign-in left open longer has to start again.
 const WAIT_LIMIT: Duration = Duration::from_secs(10 * 60);
 const POLL_INTERVAL: Duration = Duration::from_millis(100);
@@ -31,18 +46,37 @@ pub struct CallbackPages {
 
 struct Pending {
     listener: TcpListener,
+    path: &'static str,
     state: String,
     pages: CallbackPages,
     cancelled: Arc<AtomicBool>,
 }
 
-/// The listener between `chatgpt_oauth_listen` and `chatgpt_oauth_wait`, and the flag that
+/// The listener between a provider's `*_oauth_listen` and `*_oauth_wait`, and the flag that
 /// cancels whichever wait is running.
-#[derive(Default)]
-pub struct ChatGPTOAuthLoopback {
+struct Loopback {
+    callback: Callback,
     pending: Mutex<Option<Pending>>,
     /// The attempt listening or waiting, by its state, and the flag that cancels it.
     current: Mutex<Option<(String, Arc<AtomicBool>)>>,
+}
+
+/// The ChatGPT sign-in's loopback, on the port OpenAI registers.
+pub struct ChatGPTOAuthLoopback(Loopback);
+
+impl Default for ChatGPTOAuthLoopback {
+    fn default() -> Self {
+        Self(Loopback::new(CHATGPT_CALLBACK))
+    }
+}
+
+/// The OpenRouter sign-in's loopback, on a port the system picks.
+pub struct OpenRouterOAuthLoopback(Loopback);
+
+impl Default for OpenRouterOAuthLoopback {
+    fn default() -> Self {
+        Self(Loopback::new(OPENROUTER_CALLBACK))
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, serde::Serialize)]
@@ -57,7 +91,7 @@ pub enum LoopbackOutcome {
 #[derive(Debug, PartialEq, Eq, serde::Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum LoopbackError {
-    /// Another program, usually `codex login`, holds port 1455.
+    /// Another program, usually `codex login`, holds ChatGPT's port 1455.
     PortInUse,
     NotListening,
     Failed,
@@ -72,11 +106,11 @@ enum CallbackRequest {
 }
 
 /// Reads the request target of a redirect: a code for this attempt, a refusal, or noise.
-fn callback_request(target: &str, state: &str) -> CallbackRequest {
+fn callback_request(target: &str, path: &str, state: &str) -> CallbackRequest {
     let Ok(url) = Url::parse(&format!("http://localhost{target}")) else {
         return CallbackRequest::Other;
     };
-    if url.path() != CALLBACK_PATH {
+    if url.path() != path {
         return CallbackRequest::Other;
     }
     let param = |name: &str| {
@@ -144,10 +178,10 @@ fn respond(stream: &mut TcpStream, status: &str, message: &str) {
     let _ = stream.write_all(response.as_bytes());
 }
 
-fn bind() -> Result<TcpListener, LoopbackError> {
+fn bind(address: &str) -> Result<TcpListener, LoopbackError> {
     let started = Instant::now();
     loop {
-        match TcpListener::bind(CALLBACK_ADDRESS) {
+        match TcpListener::bind(address) {
             Ok(listener) => return Ok(listener),
             Err(error) if error.kind() == ErrorKind::AddrInUse => {
                 if started.elapsed() >= REBIND_LIMIT {
@@ -163,6 +197,7 @@ fn bind() -> Result<TcpListener, LoopbackError> {
 fn wait(pending: Pending) -> Result<LoopbackOutcome, LoopbackError> {
     let Pending {
         listener,
+        path,
         state,
         pages,
         cancelled,
@@ -189,7 +224,7 @@ fn wait(pending: Pending) -> Result<LoopbackOutcome, LoopbackError> {
         let request = read_head(&mut stream)
             .as_deref()
             .and_then(request_target)
-            .map(|target| callback_request(target, &state))
+            .map(|target| callback_request(target, path, &state))
             .unwrap_or(CallbackRequest::Other);
         match request {
             CallbackRequest::Code(code) => {
@@ -206,62 +241,67 @@ fn wait(pending: Pending) -> Result<LoopbackOutcome, LoopbackError> {
     }
 }
 
-/// Takes the port before the browser opens, so a busy port is reported instead of a redirect
-/// that never arrives. A sign-in still waiting is cancelled.
-#[tauri::command]
-pub async fn chatgpt_oauth_listen(
-    loopback: tauri::State<'_, ChatGPTOAuthLoopback>,
-    state: String,
-    pages: CallbackPages,
-) -> Result<(), LoopbackError> {
-    let cancelled = Arc::new(AtomicBool::new(false));
-    if let Some((_, previous)) = loopback
-        .current
-        .lock()
-        .map_err(|_| LoopbackError::Failed)?
-        .replace((state.clone(), cancelled.clone()))
-    {
-        previous.store(true, Ordering::SeqCst);
+impl Loopback {
+    fn new(callback: Callback) -> Self {
+        Self {
+            callback,
+            pending: Mutex::new(None),
+            current: Mutex::new(None),
+        }
     }
-    // A listener taken but never waited on still holds the port.
-    loopback
-        .pending
-        .lock()
-        .map_err(|_| LoopbackError::Failed)?
-        .take();
-    let listener = tauri::async_runtime::spawn_blocking(bind)
-        .await
-        .map_err(|_| LoopbackError::Failed)??;
-    // Cancelled while binding: drop the port rather than hold it for an attempt that is over.
-    if cancelled.load(Ordering::SeqCst) {
-        return Err(LoopbackError::Failed);
+
+    /// Takes the port before the browser opens, so a busy port is reported instead of a redirect
+    /// that never arrives, and returns its number. A sign-in still waiting is cancelled.
+    async fn listen(&self, state: String, pages: CallbackPages) -> Result<u16, LoopbackError> {
+        let cancelled = Arc::new(AtomicBool::new(false));
+        if let Some((_, previous)) = self
+            .current
+            .lock()
+            .map_err(|_| LoopbackError::Failed)?
+            .replace((state.clone(), cancelled.clone()))
+        {
+            previous.store(true, Ordering::SeqCst);
+        }
+        // A listener taken but never waited on still holds the port.
+        self.pending
+            .lock()
+            .map_err(|_| LoopbackError::Failed)?
+            .take();
+        let address = self.callback.address;
+        let listener = tauri::async_runtime::spawn_blocking(move || bind(address))
+            .await
+            .map_err(|_| LoopbackError::Failed)??;
+        // Cancelled while binding: drop the port rather than hold it for an attempt that is over.
+        if cancelled.load(Ordering::SeqCst) {
+            return Err(LoopbackError::Failed);
+        }
+        let port = listener
+            .local_addr()
+            .map_err(|_| LoopbackError::Failed)?
+            .port();
+        *self.pending.lock().map_err(|_| LoopbackError::Failed)? = Some(Pending {
+            listener,
+            path: self.callback.path,
+            state,
+            pages,
+            cancelled,
+        });
+        Ok(port)
     }
-    *loopback.pending.lock().map_err(|_| LoopbackError::Failed)? = Some(Pending {
-        listener,
-        state,
-        pages,
-        cancelled,
-    });
-    Ok(())
-}
 
-/// Waits for the redirect on the port `chatgpt_oauth_listen` took, then releases it.
-#[tauri::command]
-pub async fn chatgpt_oauth_wait(
-    loopback: tauri::State<'_, ChatGPTOAuthLoopback>,
-) -> Result<LoopbackOutcome, LoopbackError> {
-    let pending = loopback
-        .pending
-        .lock()
-        .map_err(|_| LoopbackError::Failed)?
-        .take()
-        .ok_or(LoopbackError::NotListening)?;
-    tauri::async_runtime::spawn_blocking(move || wait(pending))
-        .await
-        .map_err(|_| LoopbackError::Failed)?
-}
+    /// Waits for the redirect on the port `listen` took, then releases it.
+    async fn wait(&self) -> Result<LoopbackOutcome, LoopbackError> {
+        let pending = self
+            .pending
+            .lock()
+            .map_err(|_| LoopbackError::Failed)?
+            .take()
+            .ok_or(LoopbackError::NotListening)?;
+        tauri::async_runtime::spawn_blocking(move || wait(pending))
+            .await
+            .map_err(|_| LoopbackError::Failed)?
+    }
 
-impl ChatGPTOAuthLoopback {
     /// Cancels the attempt with this state. A late cancel from an earlier attempt leaves a newer
     /// one alone.
     fn cancel(&self, state: &str) {
@@ -284,8 +324,46 @@ impl ChatGPTOAuthLoopback {
 }
 
 #[tauri::command]
+pub async fn chatgpt_oauth_listen(
+    loopback: tauri::State<'_, ChatGPTOAuthLoopback>,
+    state: String,
+    pages: CallbackPages,
+) -> Result<u16, LoopbackError> {
+    loopback.0.listen(state, pages).await
+}
+
+#[tauri::command]
+pub async fn chatgpt_oauth_wait(
+    loopback: tauri::State<'_, ChatGPTOAuthLoopback>,
+) -> Result<LoopbackOutcome, LoopbackError> {
+    loopback.0.wait().await
+}
+
+#[tauri::command]
 pub fn chatgpt_oauth_cancel(loopback: tauri::State<'_, ChatGPTOAuthLoopback>, state: String) {
-    loopback.cancel(&state);
+    loopback.0.cancel(&state);
+}
+
+/// Returns the port the redirect URL names, `http://localhost:<port>/oauth/openrouter`.
+#[tauri::command]
+pub async fn openrouter_oauth_listen(
+    loopback: tauri::State<'_, OpenRouterOAuthLoopback>,
+    state: String,
+    pages: CallbackPages,
+) -> Result<u16, LoopbackError> {
+    loopback.0.listen(state, pages).await
+}
+
+#[tauri::command]
+pub async fn openrouter_oauth_wait(
+    loopback: tauri::State<'_, OpenRouterOAuthLoopback>,
+) -> Result<LoopbackOutcome, LoopbackError> {
+    loopback.0.wait().await
+}
+
+#[tauri::command]
+pub fn openrouter_oauth_cancel(loopback: tauri::State<'_, OpenRouterOAuthLoopback>, state: String) {
+    loopback.0.cancel(&state);
 }
 
 #[cfg(test)]
@@ -295,7 +373,11 @@ mod tests {
     #[test]
     fn reads_the_code_for_this_attempt() {
         assert_eq!(
-            callback_request("/auth/callback?code=abc%2B1&state=s1", "s1"),
+            callback_request(
+                "/auth/callback?code=abc%2B1&state=s1",
+                CHATGPT_CALLBACK.path,
+                "s1"
+            ),
             CallbackRequest::Code("abc+1".into())
         );
     }
@@ -303,11 +385,15 @@ mod tests {
     #[test]
     fn rejects_another_attempts_state() {
         assert_eq!(
-            callback_request("/auth/callback?code=abc&state=old", "s1"),
+            callback_request(
+                "/auth/callback?code=abc&state=old",
+                CHATGPT_CALLBACK.path,
+                "s1"
+            ),
             CallbackRequest::Mismatch
         );
         assert_eq!(
-            callback_request("/auth/callback?code=abc", "s1"),
+            callback_request("/auth/callback?code=abc", CHATGPT_CALLBACK.path, "s1"),
             CallbackRequest::Mismatch
         );
     }
@@ -315,7 +401,11 @@ mod tests {
     #[test]
     fn treats_a_redirect_without_a_code_as_denied() {
         assert_eq!(
-            callback_request("/auth/callback?error=access_denied&state=s1", "s1"),
+            callback_request(
+                "/auth/callback?error=access_denied&state=s1",
+                CHATGPT_CALLBACK.path,
+                "s1"
+            ),
             CallbackRequest::Denied
         );
     }
@@ -323,22 +413,27 @@ mod tests {
     #[test]
     fn ignores_other_paths() {
         assert_eq!(
-            callback_request("/favicon.ico", "s1"),
+            callback_request("/favicon.ico", CHATGPT_CALLBACK.path, "s1"),
             CallbackRequest::Other
         );
         assert_eq!(
-            callback_request("/auth/callback/extra?code=a&state=s1", "s1"),
+            callback_request(
+                "/auth/callback/extra?code=a&state=s1",
+                CHATGPT_CALLBACK.path,
+                "s1"
+            ),
             CallbackRequest::Other
         );
     }
 
     #[test]
     fn a_late_cancel_leaves_a_newer_attempt_alone() {
-        let loopback = ChatGPTOAuthLoopback::default();
+        let loopback = Loopback::new(CHATGPT_CALLBACK);
         let newer = Arc::new(AtomicBool::new(false));
         *loopback.current.lock().unwrap() = Some(("s2".into(), newer.clone()));
         *loopback.pending.lock().unwrap() = Some(Pending {
             listener: TcpListener::bind("127.0.0.1:0").unwrap(),
+            path: CHATGPT_CALLBACK.path,
             state: "s2".into(),
             pages: CallbackPages {
                 signed_in: String::new(),
@@ -355,6 +450,32 @@ mod tests {
         loopback.cancel("s2");
         assert!(newer.load(Ordering::SeqCst));
         assert!(loopback.pending.lock().unwrap().is_none());
+    }
+
+    #[test]
+    fn reads_openrouter_redirects_on_their_own_path() {
+        assert_eq!(
+            callback_request(
+                "/oauth/openrouter?code=abc&state=s1",
+                OPENROUTER_CALLBACK.path,
+                "s1"
+            ),
+            CallbackRequest::Code("abc".into())
+        );
+        assert_eq!(
+            callback_request(
+                "/auth/callback?code=abc&state=s1",
+                OPENROUTER_CALLBACK.path,
+                "s1"
+            ),
+            CallbackRequest::Other
+        );
+    }
+
+    #[test]
+    fn openrouter_listens_on_a_port_the_system_picks() {
+        let listener = bind(OPENROUTER_CALLBACK.address).unwrap();
+        assert_ne!(listener.local_addr().unwrap().port(), 0);
     }
 
     #[test]

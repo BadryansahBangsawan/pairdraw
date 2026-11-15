@@ -15,9 +15,8 @@ ja:ai.aiSetupAgentPromptHint
 ja:ai.aiSetupAgentTools
 ja:ai.aiSetupAgentToolsFailed
 ja:ai.aiSetupAgentToolsHint
-ja:ai.aiSetupChatGPTCallbackCancelled
-ja:ai.aiSetupChatGPTCallbackSignedIn
-ja:ai.aiSetupChatGPTCallbackStale
+ja:ai.aiSetupCallbackSignedIn
+ja:ai.aiSetupCallbackStale
 ja:ai.aiSetupChatGPTFailed
 ja:ai.aiSetupChatGPTPortInUse
 ja:ai.aiSetupChatGPTSignIn
@@ -254,9 +253,8 @@ zh-cn:ai.aiSetupAgentPromptHint
 zh-cn:ai.aiSetupAgentTools
 zh-cn:ai.aiSetupAgentToolsFailed
 zh-cn:ai.aiSetupAgentToolsHint
-zh-cn:ai.aiSetupChatGPTCallbackCancelled
-zh-cn:ai.aiSetupChatGPTCallbackSignedIn
-zh-cn:ai.aiSetupChatGPTCallbackStale
+zh-cn:ai.aiSetupCallbackSignedIn
+zh-cn:ai.aiSetupCallbackStale
 zh-cn:ai.aiSetupChatGPTFailed
 zh-cn:ai.aiSetupChatGPTPortInUse
 zh-cn:ai.aiSetupChatGPTSignIn

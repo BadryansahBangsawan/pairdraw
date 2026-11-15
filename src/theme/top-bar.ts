@@ -22,7 +22,11 @@ export default {
           'cursor-pointer transition-colors hover:bg-hover focus-visible:ring-2 focus-visible:ring-panel-focus data-[state=open]:bg-hover'
       },
       false: { brand: 'cursor-default' }
+    },
+    // macOS draws the window's close, minimize, and zoom buttons over the bar's start.
+    windowControls: {
+      true: { root: 'ps-[84px]' }
     }
   },
-  defaultVariants: { interactive: false }
+  defaultVariants: { interactive: false, windowControls: false }
 }

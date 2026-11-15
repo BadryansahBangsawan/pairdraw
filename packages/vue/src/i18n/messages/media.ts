@@ -7,12 +7,6 @@ export const mediaMessageDefaults = {
   vectorizationDescription:
     'Send image layers to Recraft, fal.ai, or QuiverAI and return editable vectors. Provider charges may apply.',
   vectorizeProvider: 'Vectorization service',
-  pexelsAPIKey: 'Pexels API Key (stock photos)',
-  unsplashAccessKey: 'Unsplash Access Key',
-  stockPhotoToolOptional: 'Optional — for stock_photo tool',
-  pexelsAlternativeOptional: 'Optional — alternative to Pexels',
-  getPexelsAPIKey: 'Get free Pexels API key →',
-  getUnsplashAccessKey: 'Get free Unsplash access key →',
   photoKeyWorks: params('{service} accepted this key.'),
   photoKeyRejected: params('{service} refused this key. Check that you copied all of it.'),
   unsplashKeyRejected:

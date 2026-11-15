@@ -29,8 +29,6 @@ export const fontsMessageDefaults = {
   allowBrowserFontAccess: 'Allow browser font access when system fonts are missing.',
   onlineFontProviders: 'Online font providers',
   downloadMissingWebFonts: 'Download missing web fonts through enabled providers.',
-  webFontProvidersRequireDesktopApp:
-    'Online font provider catalogs are unavailable in the web app. Download the desktop app to browse and load provider fonts.',
   fallbackPacks: 'Fallback packs',
   downloadFallbackPacksDescription:
     'Download CJK and Arabic fallbacks before opening files that need them.',

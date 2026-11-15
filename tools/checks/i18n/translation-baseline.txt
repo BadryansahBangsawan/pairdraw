@@ -35,7 +35,6 @@ de:panels.chroma
 de:panels.code
 de:panels.colorFormatHsb
 de:panels.colorFormatHsl
-de:panels.colorFormatOkhcl
 de:panels.colorFormatRgb
 de:panels.componentPropertyBoolean
 de:panels.componentPropertyName
@@ -104,7 +103,6 @@ es:panels.blendModeColor
 es:panels.blendModeNormal
 es:panels.colorFormatHsb
 es:panels.colorFormatHsl
-es:panels.colorFormatOkhcl
 es:panels.colorFormatRgb
 es:panels.framePresetCategoryFigmaCommunity
 es:panels.kerning
@@ -163,7 +161,6 @@ fr:panels.chroma
 fr:panels.code
 fr:panels.colorFormatHsb
 fr:panels.colorFormatHsl
-fr:panels.colorFormatOkhcl
 fr:panels.colorFormatRgb
 fr:panels.compression
 fr:panels.description
@@ -215,7 +212,6 @@ fr:tools.ellipse
 fr:tools.rectangle
 fr:tools.section
 fr:variables.modes
-it:ai.aiSetupAgentAccount
 it:ai.chatSettings
 it:ai.completions
 it:ai.responses
@@ -241,7 +237,6 @@ it:panels.ai
 it:panels.auto
 it:panels.colorFormatHsb
 it:panels.colorFormatHsl
-it:panels.colorFormatOkhcl
 it:panels.colorFormatRgb
 it:panels.design
 it:panels.framePresetCategoryDesktop
@@ -279,7 +274,6 @@ ja:diagnostics.durationMs
 ja:panels.ai
 ja:panels.colorFormatHsb
 ja:panels.colorFormatHsl
-ja:panels.colorFormatOkhcl
 ja:panels.colorFormatRgb
 ja:panels.framePresetCategoryFigmaCommunity
 ja:panels.missingLibraryUsage
@@ -311,7 +305,6 @@ pl:panels.auto
 pl:panels.chroma
 pl:panels.colorFormatHsb
 pl:panels.colorFormatHsl
-pl:panels.colorFormatOkhcl
 pl:panels.colorFormatRgb
 pl:panels.design
 pl:panels.framePresetCategoryFigmaCommunity
@@ -341,7 +334,6 @@ ru:diagnostics.categoryMCP
 ru:panels.ai
 ru:panels.colorFormatHsb
 ru:panels.colorFormatHsl
-ru:panels.colorFormatOkhcl
 ru:panels.colorFormatRgb
 ru:panels.framePresetCategoryFigmaCommunity
 ru:panels.missingLibraryUsage
@@ -365,7 +357,6 @@ zh-cn:diagnostics.categoryMCP
 zh-cn:panels.ai
 zh-cn:panels.colorFormatHsb
 zh-cn:panels.colorFormatHsl
-zh-cn:panels.colorFormatOkhcl
 zh-cn:panels.colorFormatRgb
 zh-cn:panels.framePresetCategoryFigmaCommunity
 zh-cn:panels.maskTypeAlpha
@@ -454,7 +445,6 @@ fr:cloudPortal.productName
 fr:cloudPortal.providerGoogle
 fr:cloudPortal.providerApple
 fr:cloudPortal.sessions
-fr:cloudPortal.personSessions
 fr:cloudPortal.documents
 fr:cloudPortal.deploymentOfficial
 fr:cloudPortal.emailTransportSMTP

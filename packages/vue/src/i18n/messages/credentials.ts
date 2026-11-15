@@ -1,5 +1,3 @@
-import { params } from '@nanostores/i18n'
-
 import { i18n } from '#vue/i18n/create'
 
 export const credentialsMessageDefaults = {
@@ -11,11 +9,6 @@ export const credentialsMessageDefaults = {
   rememberDevice: 'Remember API keys on this device',
   sessionOnly: 'Keys are kept only until you close this session.',
   retryFailed: 'Could not reset credential access. Try again.',
-  storage: params('Credentials: {backend}'),
-  backendNative: 'system credential store',
-  backendBrowser: 'encrypted browser storage',
-  backendMemory: 'this session only',
-  remember: 'Remember credentials on this browser',
   savedReplace: 'Key saved — enter new to replace',
   apiKey: 'API key',
   accessKey: 'Access key',

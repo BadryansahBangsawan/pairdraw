@@ -254,8 +254,6 @@
   "copyInvitationLink": "Скопировать ссылку-приглашение",
   "membersLoading": "Загружаем участников…",
   "memberRole": "Роль: {name}",
-  "removeMember": "Удалить: {name}",
-  "pendingInvitations": "Ждут присоединения",
   "revokeInvitation": "Отозвать",
   "membersSections": "Рабочее пространство",
   "membersTab": "Участники",

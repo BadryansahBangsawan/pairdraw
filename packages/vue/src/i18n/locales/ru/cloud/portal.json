@@ -327,7 +327,6 @@
   "workspaceRoleAdmin": "Администратор",
   "workspaceRoleEditor": "Редактор",
   "workspaceRoleViewer": "Читатель",
-  "personSessions": "Сеансы",
   "noSessions": "Нигде не выполнен вход.",
   "personNotFound": "Такого аккаунта нет",
   "personNotFoundDescription": "Возможно, его удалили. Вернитесь к списку пользователей.",
@@ -341,7 +340,6 @@
   "signOutEverywhere": "Выйти на всех устройствах",
   "suspendAccount": "Заблокировать аккаунт",
   "restoreAccount": "Восстановить аккаунт",
-  "emailTo": "Кому: {recipient}",
   "attempts": {
     "one": "{count} попытка",
     "few": "{count} попытки",

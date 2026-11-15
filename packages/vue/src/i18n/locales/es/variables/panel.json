@@ -77,7 +77,6 @@
   "copyStylesheet": "Copiar hoja de estilos",
   "expand": "Expandir",
   "collapse": "Contraer",
-  "rowActions": "Acciones de {name}",
   "modeAttribute": "Atributo de cambio",
   "modeAttributeHint": "Los modos que se cambian manualmente se activan con {example}.",
   "modeAttributeInvalid": "Usa letras, dígitos, guiones y guiones bajos, empezando por una letra.",

@@ -251,8 +251,6 @@
   "copyInvitationLink": "Copiar enlace de invitación",
   "membersLoading": "Cargando miembros…",
   "memberRole": "Rol de {name}",
-  "removeMember": "Quitar a {name}",
-  "pendingInvitations": "Pendientes de unirse",
   "revokeInvitation": "Retirar",
   "membersSections": "Espacio de trabajo",
   "membersTab": "Miembros",

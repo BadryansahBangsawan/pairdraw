@@ -14,7 +14,6 @@
   "allowBrowserFontAccess": "Browser-Schriftzugriff erlauben, wenn Systemschriften fehlen.",
   "onlineFontProviders": "Online-Schriftanbieter",
   "downloadMissingWebFonts": "Fehlende Web-Schriften über aktivierte Anbieter herunterladen.",
-  "webFontProvidersRequireDesktopApp": "Online-Schriftanbieter-Kataloge sind in der Web-App nicht verfügbar. Lade die Desktop-App herunter, um Anbieter-Schriften zu durchsuchen und zu laden.",
   "fallbackPacks": "Fallback-Pakete",
   "downloadFallbackPacksDescription": "CJK- und Arabisch-Fallbacks vor dem Öffnen von Dateien herunterladen, die sie benötigen.",
   "localFontAccessEnabled": "Lokaler Schriftzugriff aktiviert.",

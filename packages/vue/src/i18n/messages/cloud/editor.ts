@@ -238,8 +238,6 @@ export const cloudMessageDefaults = {
   copyInvitationLink: 'Copy invitation link',
   membersLoading: 'Loading members…',
   memberRole: params('Role of {name}'),
-  removeMember: params('Remove {name}'),
-  pendingInvitations: 'Waiting to join',
   revokeInvitation: 'Withdraw',
   membersSections: 'Workspace',
   membersTab: 'Members',

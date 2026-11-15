@@ -19,7 +19,6 @@ export const commonMessageDefaults = {
   notRequested: 'Not requested',
   never: 'Never',
   allow: 'Allow',
-  requesting: 'Requesting…',
   enable: 'Enable',
   disable: 'Disable',
   download: 'Download',

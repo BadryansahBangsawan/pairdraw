@@ -13,7 +13,6 @@
   "allowBrowserFontAccess": "缺少系统字体时，允许浏览器访问字体。",
   "onlineFontProviders": "在线字体提供商",
   "downloadMissingWebFonts": "通过已启用的提供商下载缺失的网页字体。",
-  "webFontProvidersRequireDesktopApp": "网页版暂不支持在线字体提供商目录。请下载桌面应用来浏览和加载提供商字体。",
   "fallbackPacks": "后备字体包",
   "downloadFallbackPacksDescription": "在打开需要这些字体的文件前，下载 CJK 和阿拉伯语后备字体。",
   "localFontAccessEnabled": "本地字体访问已启用。",

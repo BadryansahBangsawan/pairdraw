@@ -319,7 +319,6 @@
   "workspaceRoleAdmin": "管理员",
   "workspaceRoleEditor": "编辑者",
   "workspaceRoleViewer": "查看者",
-  "personSessions": "会话",
   "noSessions": "未在任何地方登录。",
   "personNotFound": "没有这个账号",
   "personNotFoundDescription": "它可能已被移除。请返回成员列表。",
@@ -333,7 +332,6 @@
   "signOutEverywhere": "退出所有设备",
   "suspendAccount": "停用账号",
   "restoreAccount": "恢复账号",
-  "emailTo": "收件人：{recipient}",
   "attempts": {
     "many": "尝试 {count} 次"
   },

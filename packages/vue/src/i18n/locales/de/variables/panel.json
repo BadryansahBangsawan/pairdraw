@@ -77,7 +77,6 @@
   "copyStylesheet": "Stylesheet kopieren",
   "expand": "Erweitern",
   "collapse": "Einklappen",
-  "rowActions": "Aktionen für {name}",
   "modeAttribute": "Umschalt-Attribut",
   "modeAttributeHint": "Manuell umgeschaltete Modi werden mit {example} aktiviert.",
   "modeAttributeInvalid": "Verwenden Sie Buchstaben, Ziffern, Bindestriche und Unterstriche, beginnend mit einem Buchstaben.",

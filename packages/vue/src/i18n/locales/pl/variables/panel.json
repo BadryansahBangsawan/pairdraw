@@ -77,7 +77,6 @@
   "copyStylesheet": "Kopiuj arkusz stylów",
   "expand": "Rozwiń",
   "collapse": "Zwiń",
-  "rowActions": "Akcje dla {name}",
   "modeAttribute": "Atrybut przełączania",
   "modeAttributeHint": "Tryby przełączane ręcznie włącza się za pomocą {example}.",
   "modeAttributeInvalid": "Użyj liter, cyfr, łączników i podkreśleń, zaczynając od litery.",

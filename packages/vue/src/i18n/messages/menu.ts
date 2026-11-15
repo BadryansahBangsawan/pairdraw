@@ -54,7 +54,6 @@ export const menuMessageDefaults = {
   snapToGeometry: 'Snap to geometry',
   snapToObjects: 'Snap to objects',
   snapToPixelGrid: 'Snap to pixel grid',
-  checkUpdates: 'Check for updates…',
 
   moveToPage: 'Move to page',
   autoArrange: 'Auto arrange',

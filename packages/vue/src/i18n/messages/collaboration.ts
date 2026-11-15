@@ -11,7 +11,6 @@ export const collaborationMessageDefaults = {
   joinRoom: 'Join room',
   join: 'Join',
   roomLink: 'Room link',
-  joinCollaboration: 'Join collaboration',
   orJoinRoom: 'or join a room',
   pasteRoomLinkOrId: 'Paste room link or ID',
   connected: 'Connected',

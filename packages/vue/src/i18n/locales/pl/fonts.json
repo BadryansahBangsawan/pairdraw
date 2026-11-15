@@ -15,7 +15,6 @@
   "allowBrowserFontAccess": "Zezwól przeglądarce na dostęp do czcionek, gdy brakuje czcionek systemowych.",
   "onlineFontProviders": "Dostawcy czcionek online",
   "downloadMissingWebFonts": "Pobieraj brakujące czcionki webowe przez włączonych dostawców.",
-  "webFontProvidersRequireDesktopApp": "Katalogi dostawców czcionek online nie są dostępne w aplikacji webowej. Pobierz aplikację desktopową, aby przeglądać i ładować czcionki dostawców.",
   "fallbackPacks": "Pakiety zapasowe",
   "downloadFallbackPacksDescription": "Pobierz zapasowe czcionki CJK i arabskie przed otwarciem plików, które ich wymagają.",
   "localFontAccessEnabled": "Dostęp do lokalnych czcionek włączony.",

@@ -327,7 +327,6 @@
   "workspaceRoleAdmin": "Administrator",
   "workspaceRoleEditor": "Edytujący",
   "workspaceRoleViewer": "Przeglądający",
-  "personSessions": "Sesje",
   "noSessions": "Nigdzie niezalogowany.",
   "personNotFound": "Nie ma takiego konta",
   "personNotFoundDescription": "Mogło zostać usunięte. Wróć do listy użytkowników.",
@@ -341,7 +340,6 @@
   "signOutEverywhere": "Wyloguj ze wszystkich urządzeń",
   "suspendAccount": "Zawieś konto",
   "restoreAccount": "Przywróć konto",
-  "emailTo": "Do: {recipient}",
   "attempts": {
     "one": "{count} próba",
     "few": "{count} próby",

@@ -248,8 +248,6 @@
   "copyInvitationLink": "招待リンクをコピー",
   "membersLoading": "メンバーを読み込んでいます…",
   "memberRole": "{name} の役割",
-  "removeMember": "{name} を削除",
-  "pendingInvitations": "参加待ち",
   "revokeInvitation": "取り消す",
   "membersSections": "ワークスペース",
   "membersTab": "メンバー",

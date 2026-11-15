@@ -254,8 +254,6 @@
   "copyInvitationLink": "Kopiuj link zaproszenia",
   "membersLoading": "Wczytywanie członków…",
   "memberRole": "Rola: {name}",
-  "removeMember": "Usuń: {name}",
-  "pendingInvitations": "Oczekujące",
   "revokeInvitation": "Wycofaj",
   "membersSections": "Obszar roboczy",
   "membersTab": "Członkowie",

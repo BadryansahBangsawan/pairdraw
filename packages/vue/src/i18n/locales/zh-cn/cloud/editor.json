@@ -248,8 +248,6 @@
   "copyInvitationLink": "复制邀请链接",
   "membersLoading": "正在加载成员…",
   "memberRole": "{name} 的角色",
-  "removeMember": "移除 {name}",
-  "pendingInvitations": "等待加入",
   "revokeInvitation": "撤回",
   "membersSections": "工作区",
   "membersTab": "成员",

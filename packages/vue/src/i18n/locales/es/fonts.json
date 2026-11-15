@@ -14,7 +14,6 @@
   "allowBrowserFontAccess": "Permite el acceso a fuentes del navegador cuando falten fuentes del sistema.",
   "onlineFontProviders": "Proveedores de fuentes en línea",
   "downloadMissingWebFonts": "Descarga fuentes web faltantes mediante los proveedores activados.",
-  "webFontProvidersRequireDesktopApp": "Los catálogos de proveedores de fuentes en línea no están disponibles en la app web. Descarga la app de escritorio para explorar y cargar fuentes de proveedores.",
   "fallbackPacks": "Paquetes de respaldo",
   "downloadFallbackPacksDescription": "Descarga respaldos CJK y árabes antes de abrir archivos que los necesiten.",
   "localFontAccessEnabled": "Acceso a fuentes locales activado.",

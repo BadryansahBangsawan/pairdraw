@@ -319,7 +319,6 @@
   "workspaceRoleAdmin": "管理者",
   "workspaceRoleEditor": "編集者",
   "workspaceRoleViewer": "閲覧者",
-  "personSessions": "セッション",
   "noSessions": "どこにもサインインしていません。",
   "personNotFound": "このアカウントは存在しません",
   "personNotFoundDescription": "削除された可能性があります。ユーザーの一覧に戻ってください。",
@@ -333,7 +332,6 @@
   "signOutEverywhere": "すべての場所からサインアウト",
   "suspendAccount": "アカウントを停止",
   "restoreAccount": "アカウントを復元",
-  "emailTo": "宛先: {recipient}",
   "attempts": {
     "many": "{count} 回試行"
   },

@@ -14,7 +14,6 @@
   "allowBrowserFontAccess": "Autorisez l’accès du navigateur aux polices lorsque des polices système manquent.",
   "onlineFontProviders": "Fournisseurs de polices en ligne",
   "downloadMissingWebFonts": "Télécharger les polices web manquantes via les fournisseurs activés.",
-  "webFontProvidersRequireDesktopApp": "Les catalogues de fournisseurs de polices en ligne ne sont pas disponibles dans l’app web. Téléchargez l’app de bureau pour parcourir et charger les polices des fournisseurs.",
   "fallbackPacks": "Packs de secours",
   "downloadFallbackPacksDescription": "Téléchargez les polices de secours CJK et arabes avant d’ouvrir les fichiers qui en ont besoin.",
   "localFontAccessEnabled": "Accès aux polices locales activé.",

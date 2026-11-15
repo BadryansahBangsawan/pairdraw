@@ -3,13 +3,6 @@ import { count, params } from '@nanostores/i18n'
 import { i18n } from '#vue/i18n/create'
 
 export const filesMessageDefaults = {
-  importLabel: 'Import',
-  importHTMLCSS: 'Import HTML/CSS',
-  importHTMLCSSDescription: 'Paste HTML plus optional CSS or compiled Tailwind CSS.',
-  importFailed: 'Import failed. Check the HTML and CSS, then try again.',
-  importReplacesDocument: 'Import replaces the current document.',
-  importing: 'Importing…',
-  importToCanvas: 'Import to canvas',
   newTab: 'New tab',
   home: 'Home',
   closeTab: params('Close {name}'),

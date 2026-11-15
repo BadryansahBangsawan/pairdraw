@@ -84,7 +84,6 @@ export const variablesMessageDefaults = {
   copyStylesheet: 'Copy stylesheet',
   expand: 'Expand',
   collapse: 'Collapse',
-  rowActions: params('{name} actions'),
   modeAttribute: 'Switch attribute',
   modeAttributeHint: params('Modes switched manually are turned on with {example}.'),
   modeAttributeInvalid: 'Use letters, digits, hyphens and underscores, starting with a letter.',

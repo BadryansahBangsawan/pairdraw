@@ -323,7 +323,6 @@
   "workspaceRoleAdmin": "Administrator",
   "workspaceRoleEditor": "Bearbeiter",
   "workspaceRoleViewer": "Betrachter",
-  "personSessions": "Sitzungen",
   "noSessions": "Nirgends angemeldet.",
   "personNotFound": "Dieses Konto gibt es nicht",
   "personNotFoundDescription": "Es wurde möglicherweise entfernt. Kehre zur Personenliste zurück.",
@@ -337,7 +336,6 @@
   "signOutEverywhere": "Überall abmelden",
   "suspendAccount": "Konto sperren",
   "restoreAccount": "Konto entsperren",
-  "emailTo": "An {recipient}",
   "attempts": {
     "one": "{count} Versuch",
     "many": "{count} Versuche"

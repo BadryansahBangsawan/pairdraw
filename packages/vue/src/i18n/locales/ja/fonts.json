@@ -13,7 +13,6 @@
   "allowBrowserFontAccess": "システムフォントが見つからない場合にブラウザーのフォントアクセスを許可します。",
   "onlineFontProviders": "オンラインフォントプロバイダー",
   "downloadMissingWebFonts": "有効なプロバイダーから不足しているウェブフォントをダウンロードします。",
-  "webFontProvidersRequireDesktopApp": "オンラインフォントプロバイダーのカタログはウェブアプリでは利用できません。プロバイダーのフォントを参照して読み込むにはデスクトップアプリをダウンロードしてください。",
   "fallbackPacks": "フォールバックパック",
   "downloadFallbackPacksDescription": "必要なファイルを開く前に、CJKとアラビア語のフォールバックをダウンロードします。",
   "localFontAccessEnabled": "ローカルフォントアクセスを有効にしました。",

@@ -24,7 +24,8 @@ export const localeThemeConfig = (
     { text: nav.userGuide, link: `${prefix}/user-guide/` },
     { text: nav.programmable, link: `${prefix}/programmable/` },
     { text: nav.sdk, link: `${prefix}/programmable/sdk/` },
-    { text: nav.reference, link: `${prefix}/reference/keyboard-shortcuts` },
+    // No locale translates the shortcuts page, so the canonical one is linked.
+    { text: nav.reference, link: '/reference/keyboard-shortcuts' },
     { text: nav.development, link: '/development/contributing' },
   ],
   sidebar: {

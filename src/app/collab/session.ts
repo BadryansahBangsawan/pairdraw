@@ -119,6 +119,8 @@ export interface RoomSessionOptions {
 }
 
 function openIndexedDBCopy(roomId: string, ydoc: Y.Doc): RoomSavedCopy {
+  // The `op-` name comes from OpenPencil. Renaming the database would orphan edits that exist
+  // only in this local copy, so it keeps the name released builds wrote.
   return new IndexeddbPersistence(`op-room-${roomId}`, ydoc)
 }
 

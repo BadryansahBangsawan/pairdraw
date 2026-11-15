@@ -1,4 +1,5 @@
 import { useLocalStorage } from '@vueuse/core'
+import * as v from 'valibot'
 import { watch } from 'vue'
 
 import {
@@ -21,6 +22,7 @@ import {
   createTauriDownloadedFontCache,
   downloadedFontCacheSummary as tauriDownloadedFontCacheSummary
 } from '@/app/editor/fonts/cache'
+import { migrateRenamedSettingKey, type RenamedSettingKey } from '@/app/settings/renamed-keys'
 import { isTauri } from '@/app/tauri/env'
 import { tauriFetch } from '@/app/tauri/http'
 import { IS_TAURI } from '@/constants'
@@ -31,9 +33,43 @@ if (typeof navigator !== 'undefined') {
 
 export type FontProviderSettings = Record<WebFontProviderId, boolean>
 
-export const onlineFontsEnabled = useLocalStorage('pairdraw:online-fonts-enabled', true)
+const ONLINE_FONTS_STORAGE_KEY = 'pairdraw:online-fonts-enabled'
+const FONT_PROVIDERS_STORAGE_KEY = 'pairdraw:font-providers'
+
+const storedFontProvidersSchema = v.pipe(
+  v.string(),
+  v.parseJson(),
+  v.check((settings) => !Array.isArray(settings)),
+  v.record(v.string(), v.boolean())
+)
+
+// Pairdraw 0.16 stored both settings under the keys it inherited from OpenPencil.
+export const ONLINE_FONTS_KEY_RENAME: RenamedSettingKey = {
+  from: 'op-online-fonts-enabled',
+  to: ONLINE_FONTS_STORAGE_KEY,
+  read: (stored) => (stored === 'true' || stored === 'false' ? stored : null)
+}
+
+export const FONT_PROVIDERS_KEY_RENAME: RenamedSettingKey = {
+  from: 'op-font-providers',
+  to: FONT_PROVIDERS_STORAGE_KEY,
+  read: (stored) => {
+    const parsed = v.safeParse(storedFontProvidersSchema, stored)
+    if (!parsed.success) return null
+    const settings: FontProviderSettings = { ...DEFAULT_WEB_FONT_PROVIDER_SETTINGS }
+    for (const provider of WEB_FONT_PROVIDER_IDS) {
+      settings[provider] = parsed.output[provider] ?? settings[provider]
+    }
+    return JSON.stringify(settings)
+  }
+}
+
+migrateRenamedSettingKey(ONLINE_FONTS_KEY_RENAME)
+migrateRenamedSettingKey(FONT_PROVIDERS_KEY_RENAME)
+
+export const onlineFontsEnabled = useLocalStorage(ONLINE_FONTS_STORAGE_KEY, true)
 export const fontProviderSettings = useLocalStorage<FontProviderSettings>(
-  'pairdraw:font-providers',
+  FONT_PROVIDERS_STORAGE_KEY,
   DEFAULT_WEB_FONT_PROVIDER_SETTINGS
 )
 

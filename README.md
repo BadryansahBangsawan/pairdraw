@@ -2,7 +2,6 @@
 
 [![MIT license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![npm](https://img.shields.io/npm/v/@pairdraw/cli?label=%40pairdraw%2Fcli)](https://www.npmjs.com/package/@pairdraw/cli)
-[![GitHub Discussions](https://img.shields.io/github/discussions/BadryansahBangsawan/pairdraw?logo=github&label=Discussions)](https://github.com/BadryansahBangsawan/pairdraw/discussions)
 
 Open-source design editor. Opens `.fig` and `.pen` design files, includes built-in AI, and ships as a programmable toolkit with a headless Vue SDK for building custom editors.
 
@@ -201,8 +200,7 @@ See the [roadmap](packages/docs/development/roadmap.md) for product direction an
 
 ## Community
 
-- **[GitHub Discussions](https://github.com/BadryansahBangsawan/pairdraw/discussions)** — [Q&A](https://github.com/BadryansahBangsawan/pairdraw/discussions/categories/q-a) for help, [Ideas](https://github.com/BadryansahBangsawan/pairdraw/discussions/categories/ideas) for feature proposals, [Show and tell](https://github.com/BadryansahBangsawan/pairdraw/discussions/categories/show-and-tell) for what you built; maintainers post [Announcements](https://github.com/BadryansahBangsawan/pairdraw/discussions/categories/announcements) there
-- **[Issues](https://github.com/BadryansahBangsawan/pairdraw/issues)** — reproducible bugs; report security problems through a [private advisory](https://github.com/BadryansahBangsawan/pairdraw/security/advisories/new)
+- **[Issues](https://github.com/BadryansahBangsawan/pairdraw/issues)** — reproducible bugs, questions, and feature proposals; report security problems through a [private advisory](https://github.com/BadryansahBangsawan/pairdraw/security/advisories/new)
 
 ## Contributing
 

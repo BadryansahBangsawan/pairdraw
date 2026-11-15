@@ -1,6 +1,6 @@
 # Contributing
 
-Questions and ideas go to [GitHub Discussions](https://github.com/BadryansahBangsawan/pairdraw/discussions); open an issue for a reproducible bug. Report security problems through a [private advisory](https://github.com/BadryansahBangsawan/pairdraw/security/advisories/new), not a public issue or PR.
+Open an [issue](https://github.com/BadryansahBangsawan/pairdraw/issues) for a reproducible bug, a question, or an idea. Report security problems through a [private advisory](https://github.com/BadryansahBangsawan/pairdraw/security/advisories/new), not a public issue or PR.
 
 ## Where the rules live
 

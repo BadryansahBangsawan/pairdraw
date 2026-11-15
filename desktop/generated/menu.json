@@ -297,11 +297,6 @@
         "checkbox": true
       },
       {
-        "id": "view-design-issues",
-        "label": "Design Issues",
-        "checkbox": true
-      },
-      {
         "id": "view-comments",
         "label": "Comments",
         "accelerator": "Shift+C",

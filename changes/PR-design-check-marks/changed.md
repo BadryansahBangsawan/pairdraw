@@ -1,0 +1,1 @@
+- The design check no longer marks issues on the canvas, beside layers, or in the page list, and checks the page only while the Lint or Code tab is open, so editing, and long AI agent runs above all, no longer pause for a check after every change; View → Design issues is gone, and the Lint tab still lists every issue with its fixes.

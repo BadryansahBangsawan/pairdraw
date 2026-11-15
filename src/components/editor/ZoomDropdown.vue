@@ -27,6 +27,7 @@ import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
 import AppShortcutText from '@/components/ui/menu/AppShortcutText.vue'
 import { menuItem, useMenuUI } from '@/components/ui/menu/menu'
 import MenuScrollArea from '@/components/ui/menu/MenuScrollArea.vue'
+import { DESIGN_ISSUES_ON_CANVAS_INCLUDED } from '@/constants'
 import zoomDropdownTheme from '@/theme/zoom-dropdown'
 
 const store = useEditorStore()
@@ -209,6 +210,7 @@ watch(open, (v) => {
             }}</AppShortcutText>
           </DropdownMenuItem>
           <DropdownMenuItem
+            v-if="DESIGN_ISSUES_ON_CANVAS_INCLUDED"
             :class="itemCls"
             @select.prevent="setDesignIssuesOnCanvas(!appPreferences.designCheck.showOnCanvas)"
           >

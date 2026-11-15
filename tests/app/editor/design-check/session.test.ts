@@ -5,12 +5,16 @@ import { nextTick, watch } from 'vue'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { createEditorStore } from '@/app/editor/session'
+import { DESIGN_ISSUES_ON_CANVAS_INCLUDED } from '@/constants'
 
 const stores: ReturnType<typeof createEditorStore>[] = []
 afterEach(() => {
   for (const store of stores.splice(0)) store.dispose()
   jest.useRealTimers()
 })
+
+// These follow the checks the canvas marks keep running; the Lint panel's own checks are covered
+// by `tests/e2e/design-check/design-check.spec.ts`.
 
 /** Two pages, each with text small enough for the design check to mark on the canvas. */
 function twoPagesWithIssues() {
@@ -47,7 +51,7 @@ async function settleCheck() {
   await nextTick()
 }
 
-describe('the design check across a page switch', () => {
+describe.skipIf(!DESIGN_ISSUES_ON_CANVAS_INCLUDED)('the design check across a page switch', () => {
   test('checks the new page once, after the switch', async () => {
     jest.useFakeTimers()
     const { store, first, second, firstText, secondText, checkedPages, markedNodes } =
@@ -88,7 +92,7 @@ describe('the design check across a page switch', () => {
   })
 })
 
-describe('a page visited before', () => {
+describe.skipIf(!DESIGN_ISSUES_ON_CANVAS_INCLUDED)('a page visited before', () => {
   test('shows its last result at once when nothing on it changed', async () => {
     jest.useFakeTimers()
     const { store, first, second, secondText, markedNodes } = twoPagesWithIssues()
@@ -133,7 +137,7 @@ describe('a page visited before', () => {
   })
 })
 
-describe('the focused issue', () => {
+describe.skipIf(!DESIGN_ISSUES_ON_CANVAS_INCLUDED)('the focused issue', () => {
   test('is dropped as soon as its layer is deleted', () => {
     const { store, firstText } = twoPagesWithIssues()
     store.designCheck.openMarker([firstText.id])
@@ -156,5 +160,25 @@ describe('the focused issue', () => {
     await nextTick()
 
     expect(store.designCheck.focusedIssueId.value).toBeNull()
+  })
+})
+
+describe('a view that shows issues', () => {
+  test('keeps the page checked while it is open, without marking the canvas', async () => {
+    jest.useFakeTimers()
+    const { store, first, checkedPages } = twoPagesWithIssues()
+    store.designCheck.panelVisible.value = false
+    const release = store.designCheck.holdChecks()
+    await settleCheck()
+    expect(store.designCheck.enabled.value).toBe(true)
+    expect(checkedPages).toContain(first.id)
+    expect(store.designCheck.snapshot.value?.issues.length).toBeGreaterThan(0)
+    if (!DESIGN_ISSUES_ON_CANVAS_INCLUDED)
+      expect(store.state.designIssues?.markers ?? []).toEqual([])
+
+    release()
+    release()
+    await nextTick()
+    expect(store.designCheck.enabled.value).toBe(DESIGN_ISSUES_ON_CANVAS_INCLUDED)
   })
 })

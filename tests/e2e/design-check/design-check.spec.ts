@@ -2,10 +2,16 @@ import type { Page } from '@playwright/test'
 
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
+import { DESIGN_ISSUES_ON_CANVAS_INCLUDED } from '@/constants'
+
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
 import { openAppMenu } from '#tests/helpers/menu'
 
 const editor = useEditorSetupWithClear('/?test&no-rulers')
+
+/** Skips a test of the marks this build leaves out (`DESIGN_ISSUES_ON_CANVAS_INCLUDED`). */
+const skipWithoutCanvasMarks = () =>
+  test.skip(!DESIGN_ISSUES_ON_CANVAS_INCLUDED, 'canvas issue marks are not included in this build')
 
 const CARD = { x: 80, y: 120, width: 320, height: 200 }
 /** Where the Close button's marker sits at zoom 1: just outside its top-right corner. */
@@ -247,6 +253,7 @@ test('A rule can be turned off from its group and turned back on from the rules 
 })
 
 test('Canvas markers explain themselves on hover and open Lint on click', async () => {
+  skipWithoutCanvasMarks()
   const scene = await buildScene(editor.page)
   await waitForMarkers(editor.page)
 
@@ -301,6 +308,7 @@ function edgePinCenter(width: number, height: number, target: Vector): Vector {
 }
 
 test('Issues off screen are pinned to the canvas edge and lead to the nearest most severe one', async () => {
+  skipWithoutCanvasMarks()
   const scene = await buildScene(editor.page)
   await openLint(editor.page)
   const canvas = await editor.canvas.canvas.boundingBox()
@@ -343,6 +351,7 @@ test('Issues off screen are pinned to the canvas edge and lead to the nearest mo
 })
 
 test('Other pages are checked for the page list and the Document scope', async () => {
+  skipWithoutCanvasMarks()
   await buildScene(editor.page)
   const cartCaptionId = await editor.page.evaluate(() => {
     const store = window.pairdraw?.getStore?.()
@@ -394,6 +403,7 @@ test('Other pages are checked for the page list and the Document scope', async (
 })
 
 test('Canvas markers and Layers panel marks can be turned off from the View menu', async () => {
+  skipWithoutCanvasMarks()
   await buildScene(editor.page)
   await waitForMarkers(editor.page)
   // The card is collapsed in the Layers panel, so it shows the error inside it as a dot.
@@ -451,6 +461,7 @@ function addNotes(page: Page): Promise<string[]> {
 }
 
 test('A marker opens an issue past the rows its group shows at first', async () => {
+  skipWithoutCanvasMarks()
   const lastNoteId = (await addNotes(editor.page)).at(-1)
   await waitForMarkers(editor.page)
 

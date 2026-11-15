@@ -15,6 +15,7 @@ import {
   toDesignIssues,
   type DesignIssue
 } from './issues'
+import { designIssuesOnCanvas } from './on-canvas'
 import { createPageChecks, pageOf } from './pages'
 
 /** Quiet period after an edit before the page is checked again. */
@@ -33,7 +34,8 @@ function linterConfig(preset: DesignCheckPreset, disabledRules: readonly string[
 }
 
 /**
- * Keeps the current page checked while the Check panel is open or canvas markers are on.
+ * Keeps the current page checked while the Lint panel or another view that shows issues, such
+ * as the Code tab, is open, or while canvas markers are on.
  *
  * Checks run once edits settle and wait out interactive property edits, so a burst of changes
  * costs one check. Nothing runs while both surfaces are off.
@@ -50,7 +52,22 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
   })
 
   const preferences = computed(() => appPreferences.value.designCheck)
-  const enabled = computed(() => panelVisible.value || preferences.value.showOnCanvas)
+  /** Other views showing the page's issues while open, such as the Code tab's underlines. */
+  const holders = ref(0)
+  const enabled = computed(
+    () => panelVisible.value || holders.value > 0 || designIssuesOnCanvas.value
+  )
+
+  /** Keeps the current page checked until the returned release is called, once. */
+  function holdChecks(): () => void {
+    holders.value++
+    let held = true
+    return () => {
+      if (!held) return
+      held = false
+      holders.value--
+    }
+  }
   // Primitive keys keep unrelated preference changes, like toggling markers, from rebuilding rules.
   const preset = computed(() => preferences.value.preset)
   const disabledRules = computed(() => preferences.value.disabledRules.join('\n'))
@@ -68,7 +85,7 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
   const documentScope = ref(false)
   // Pages beyond the current one are checked for the page list and the Document scope.
   const pagesNeeded = computed(
-    () => enabled.value && (preferences.value.showOnCanvas || documentScope.value)
+    () => enabled.value && (designIssuesOnCanvas.value || documentScope.value)
   )
   // Stopped in dispose, so it needs no effect scope of its own.
   const pages = createPageChecks({
@@ -128,7 +145,7 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
   function publishMarkers() {
     const current = snapshot.value
     const show =
-      preferences.value.showOnCanvas && current !== null && current.pageId === state.currentPageId
+      designIssuesOnCanvas.value && current !== null && current.pageId === state.currentPageId
     editor.setDesignIssueMarkers(show ? markersForIssues(current.issues) : [])
   }
 
@@ -181,7 +198,7 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
       () => enabled.value && schedule()
     )
     // Immediate: the first check runs before this watcher exists, while `enabled` starts up.
-    watch([snapshot, () => preferences.value.showOnCanvas], publishMarkers, { immediate: true })
+    watch([snapshot, designIssuesOnCanvas], publishMarkers, { immediate: true })
   })
 
   const unsubscribeGraph = editor.onEditorEvent('graph:replaced', () => {
@@ -249,6 +266,7 @@ export function createDesignCheck(editor: Editor, state: AppEditorState) {
     documentScope,
     enabled,
     panelVisible,
+    holdChecks,
     focusedIssueId,
     checkNow: run,
     highlightIssue,

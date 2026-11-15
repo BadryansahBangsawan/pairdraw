@@ -24,7 +24,7 @@ import {
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { layerIssueMarks } from '@/app/editor/design-check/layers'
-import { appPreferences } from '@/app/settings/preferences/store'
+import { designIssuesOnCanvas } from '@/app/editor/design-check/on-canvas'
 import layerTreeTheme from '@/theme/layer-tree'
 
 import CanvasMenu from '../canvas/CanvasMenu.vue'
@@ -67,7 +67,7 @@ const rename = useInlineRename((id, name) => store.renameNode(id, name))
 /** Issue marks follow the canvas markers' View → Design issues toggle. */
 const issueMarks = computed(() => {
   const snapshot = store.designCheck.snapshot.value
-  if (!appPreferences.value.designCheck.showOnCanvas) return null
+  if (!designIssuesOnCanvas.value) return null
   if (!snapshot || snapshot.pageId !== store.state.currentPageId) return null
   return layerIssueMarks(snapshot.issues, store.graph)
 })

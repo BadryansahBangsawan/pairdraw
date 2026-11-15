@@ -26,6 +26,7 @@ import type {
 
 import { openTour } from '@/app/demo/document'
 import { useEditorStore } from '@/app/editor/active-store'
+import { designIssuesOnCanvas } from '@/app/editor/design-check/on-canvas'
 import { textLinkTargets } from '@/app/editor/links'
 import { openVariablesDialog } from '@/app/editor/tokens/dialog'
 import { openSettingsDialog } from '@/app/settings/dialog'
@@ -248,7 +249,7 @@ export function useAppMenu() {
       case 'view-multiplayer-cursors':
         return store.state.showRemoteCursors
       case 'view-design-issues':
-        return appPreferences.value.designCheck.showOnCanvas
+        return designIssuesOnCanvas.value
       case 'view-comments':
         return appPreferences.value.comments.showOnCanvas
       case 'view-layers-panel':

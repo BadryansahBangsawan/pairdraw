@@ -1,4 +1,4 @@
-import { computed, shallowRef, type Ref } from 'vue'
+import { computed, onScopeDispose, shallowRef, type Ref } from 'vue'
 
 import {
   designJSXElement,
@@ -23,6 +23,8 @@ export function useCodeLayers(source: Readonly<Ref<CodeSource>>) {
   const store = useEditorStore()
   const messages = useDesignCheckMessages()
   const links = shallowRef<LayerLinkSource | null>(null)
+  // The underlines need the page checked while the Code tab is open.
+  onScopeDispose(store.designCheck.holdChecks())
 
   const issues = computed(() => {
     const snapshot = store.designCheck.snapshot.value

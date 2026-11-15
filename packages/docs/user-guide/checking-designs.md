@@ -1,11 +1,11 @@
 ---
 title: Checking Designs
-description: Find accessibility, consistency, and structure issues with the Lint panel and canvas issue markers.
+description: Find accessibility, consistency, and structure issues with the Lint panel.
 ---
 
 # Checking Designs
 
-Pairdraw checks the current page as you work and points out layers that break common design rules: text that is hard to read, controls that are too small to tap, colors that should use a variable, and spacing off the scale.
+While the Lint tab is open, Pairdraw checks the current page as you work and points out layers that break common design rules: text that is hard to read, controls that are too small to tap, colors that should use a variable, and spacing off the scale. Nothing is checked while the Lint and Code tabs are closed, so a long agent run is not slowed down by checks after every edit.
 
 ## Lint Panel
 
@@ -31,23 +31,11 @@ Binding colors and rounding pixels keep the design as it looks, so their groups 
 
 Other issues show the value that needs attention, such as a contrast ratio or a touch target size, so you can fix them in the Design panel.
 
-## Canvas Markers
-
-Layers with errors and warnings carry a marker at their top-right corner: red for errors, amber for warnings. Suggestions appear only in the Lint panel.
-
-- Hover a marker to see its issues. Click it to select the layer and open its issues in the Lint panel.
-- Markers that would overlap merge into one showing their combined count.
-- When a layer is too small to see at the current zoom, its marker moves to the nearest enclosing layer large enough to point at.
-- Errors and warnings outside the visible canvas are pinned to its edge, pointing toward them. Hover a pin to see them; click it to bring the nearest of the most severe into view and open it in Lint.
-- Hidden layers and layers clipped out of view by a frame keep their issues in the panel but get no marker.
-
-Pages with errors or warnings show their count in the page list, checked in the background while you work. The Layers panel marks the same layers: a layer with errors or warnings shows the most severe as an icon, and a collapsed layer with issues inside it shows a dot.
-
-Turn markers and Layers panel marks on or off with **View → Design issues**, or with **Show issues on canvas** in the Lint panel's settings menu.
+Pairdraw does not mark issues on the canvas, in the Layers panel, or in the page list: the Lint panel is the one place that lists them.
 
 ## In the Code Panel
 
-The Code tab underlines errors and warnings on the Design JSX, HTML, Vue, or React of their layers, on the property that causes the issue when there is one, such as `size={10}` for small text, or the class that styles the layer. Hover the underline to read the issue. The underlines follow your edits while you change the code live.
+While it is open, the Code tab checks the page too and underlines errors and warnings on the Design JSX, HTML, Vue, or React of their layers, on the property that causes the issue when there is one, such as `size={10}` for small text, or the class that styles the layer. Hover the underline to read the issue. The underlines follow your edits while you change the code live.
 
 ## Rules
 

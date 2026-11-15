@@ -25,6 +25,7 @@ import { appPreferences, DESIGN_CHECK_PRESETS } from '@/app/settings/preferences
 import IconButton from '@/components/ui/button/IconButton.vue'
 import { menuItem, useMenuUI } from '@/components/ui/menu/menu'
 import MenuScrollArea from '@/components/ui/menu/MenuScrollArea.vue'
+import { DESIGN_ISSUES_ON_CANVAS_INCLUDED } from '@/constants'
 
 import { usePresetLabels } from './usePresetLabels'
 
@@ -73,8 +74,12 @@ const presetModel = computed({
               {{ messages.turnOnRules({ count: preferences.disabledRules.length }) }}
             </DropdownMenuItem>
           </template>
-          <DropdownMenuSeparator :class="menuCls.separator" />
+          <DropdownMenuSeparator
+            v-if="DESIGN_ISSUES_ON_CANVAS_INCLUDED"
+            :class="menuCls.separator"
+          />
           <DropdownMenuCheckboxItem
+            v-if="DESIGN_ISSUES_ON_CANVAS_INCLUDED"
             :model-value="preferences.showOnCanvas"
             :class="itemCls"
             @update:model-value="setDesignIssuesOnCanvas"

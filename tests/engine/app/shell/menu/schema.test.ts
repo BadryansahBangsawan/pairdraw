@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import type { AppMenuEntry } from '@/app/shell/menu/schema'
 import { APP_MENU_SCHEMA } from '@/app/shell/menu/schema'
+import { DESIGN_ISSUES_ON_CANVAS_INCLUDED } from '@/constants'
 
 function actionItems(entries: readonly AppMenuEntry[]): AppMenuEntry[] {
   const result: AppMenuEntry[] = []
@@ -53,7 +54,7 @@ describe('APP_MENU_SCHEMA', () => {
       'open-tour',
       'diagnostics',
       'settings',
-      'view-design-issues',
+      ...(DESIGN_ISSUES_ON_CANVAS_INCLUDED ? ['view-design-issues'] : []),
       'view-layers-panel',
       'view-properties-panel',
       'theme-light',

@@ -17,8 +17,8 @@ import { PageListRoot } from '@pairdraw/vue/primitives/PageList'
 import { useFlatReorderDrag } from '@pairdraw/vue/shared/drag'
 
 import { useActiveEditorStoreRef } from '@/app/editor/active-store'
+import { designIssuesOnCanvas } from '@/app/editor/design-check/on-canvas'
 import { presenceByPage } from '@/app/presence/registry'
-import { appPreferences } from '@/app/settings/preferences/store'
 import PageIssueBadge from '@/components/design-check/PageIssueBadge.vue'
 import PagePresenceHover from '@/components/presence/PagePresenceHover.vue'
 import PresenceMarkers from '@/components/presence/PresenceMarkers.vue'
@@ -53,7 +53,7 @@ const pagePresence = computed(() =>
 
 /** Errors and warnings per page, following the View → Design issues toggle like the markers. */
 function pageIssues(pageId: string) {
-  if (!appPreferences.value.designCheck.showOnCanvas) return null
+  if (!designIssuesOnCanvas.value) return null
   return storeRef.value?.designCheck.pages.counts.value.get(pageId) ?? null
 }
 

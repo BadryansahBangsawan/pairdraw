@@ -102,3 +102,14 @@ export const Narrow: Story = {
       '<div class="@container flex w-56 items-center rounded-card border border-border bg-panel p-2"><ChatAgentSessionControls v-bind="args" /></div>'
   })
 }
+
+/** Squeezed beside the model picker in a narrow chat: each control keeps its icon, none overlap. */
+export const Cramped: Story = {
+  args: { agentId: 'story-codex-cramped' },
+  render: (args) => ({
+    components: { ChatAgentSessionControls },
+    setup: () => ({ args }),
+    template:
+      '<div class="@container flex w-28 items-center rounded-card border border-border bg-panel p-2"><ChatAgentSessionControls v-bind="args" /></div>'
+  })
+}

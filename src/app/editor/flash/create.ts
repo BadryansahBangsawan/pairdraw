@@ -13,13 +13,6 @@ export function createFlashActions(editor: Editor) {
     flashRafId = requestAnimationFrame(pumpFlashes)
   }
 
-  function flashNodes(nodeIds: string[]) {
-    const renderer = editor.renderer
-    if (!renderer) return
-    for (const id of nodeIds) renderer.flashNode(id)
-    if (!flashRafId) pumpFlashes()
-  }
-
   function aiMarkActive(nodeIds: string[]) {
     if (!editor.renderer) return
     editor.renderer.aiMarkActive(nodeIds)
@@ -38,15 +31,22 @@ export function createFlashActions(editor: Editor) {
     if (!flashRafId) pumpFlashes()
   }
 
+  /** Traces in layers an agent added, one after another in the order given. */
+  function aiEnter(nodeIds: string[]) {
+    if (!editor.renderer || nodeIds.length === 0) return
+    editor.renderer.aiEnter(nodeIds)
+    if (!flashRafId) pumpFlashes()
+  }
+
   function aiClearAll() {
     editor.renderer?.aiClearAll()
   }
 
   return {
-    flashNodes,
     aiMarkActive,
     aiMarkDone,
     aiFlashDone,
+    aiEnter,
     aiClearAll
   }
 }

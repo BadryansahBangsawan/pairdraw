@@ -184,6 +184,10 @@ Your next message tells the assistant which of its edits you undid or redid, so 
 
 With **Follow agents** on, the crosshair button at the top of the AI chat, your view follows the assistant while it works, including to another page when it edits layers there. Following ends when the reply finishes, is stopped, or fails. Clicking, scrolling, zooming, switching pages, or Escape stops following yourself.
 
+## Watching the assistant draw
+
+While an agent edits the open page, whether the built-in chat or a coding agent over MCP, the canvas shows its work: each layer it adds traces in, one after another, layers it changes flash, and the frames it works in shimmer inside a violet outline. When it stops, they flash once and a notice counts the layers it added and changed; **Show** selects them and zooms to them. The motion is drawn over the canvas and never changes the document. Turn it off with **Animate AI edits** in **Settings → Models → Chat**; it also stays off while **Animations** is off, the system asks for reduced motion, or Ultralight mode is on, and the edits then simply appear.
+
 ## Notifications
 
 When an agent asks for permission and you have not answered for a few seconds, Pairdraw sends a system notification, so you can work in another app while it runs. **Settings → Notifications** also turns on notifications when a reply finishes or fails. They are sent only while Pairdraw is in the background or shows another document, and clicking one opens that document's chat. In the browser, click **Allow notifications** there first; the desktop app follows your system's notification settings.

@@ -2,6 +2,7 @@ import { executeAtomicTool, isEmptyDocumentChange, type DocumentChange } from '@
 import type { FigmaAPI } from '@pairdraw/core/figma-api'
 import { isAtomicTool, toolChangesDocument, toolFailure, type ToolDef } from '@pairdraw/core/tools'
 
+import { showAIEdit } from '@/app/ai/motion'
 import {
   AI_UNDO_PREFIX,
   markRunChange,
@@ -139,6 +140,10 @@ async function editAndRecord(call: EditorToolCall, reply: ReplyCall | null): Pro
   } finally {
     if (reply && recorded.change) {
       await recordReplyCall(call, reply, recorded.change, undoBefore, viewPageId)
+    }
+    // A late edit to a document that closed meanwhile is not drawn.
+    if (recorded.change && toolChangesDocument(def) && call.isLive?.() !== false) {
+      showAIEdit(store, recorded.change, reply)
     }
   }
 }

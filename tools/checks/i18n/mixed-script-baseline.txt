@@ -52,6 +52,11 @@ ja:ai.aiSetupPiSignIn
 ja:ai.aiSetupAgentUpdateMCP
 ja:ai.aiSetupConnectStepInstall
 ja:ai.aiSetupConnectStepTools
+ja:ai.animateEdits
+ja:ai.animateEditsHint
+ja:ai.editSummary
+ja:ai.editSummaryAdded
+ja:ai.editSummaryChanged
 ja:ai.apiKey
 ja:ai.apiType
 ja:ai.baseURL
@@ -292,6 +297,11 @@ zh-cn:ai.aiSetupConnectStepInstall
 zh-cn:ai.aiSetupConnectStepTools
 ja:variables.copyAsCSS
 ja:variables.copyAsTailwindTheme
+zh-cn:ai.animateEdits
+zh-cn:ai.animateEditsHint
+zh-cn:ai.editSummary
+zh-cn:ai.editSummaryAdded
+zh-cn:ai.editSummaryChanged
 zh-cn:ai.apiKey
 zh-cn:ai.apiType
 zh-cn:ai.baseURL

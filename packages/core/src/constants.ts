@@ -165,10 +165,20 @@ export const ISSUE_MARKER_RING_WIDTH = 1.5
 export const ISSUE_HIGHLIGHT_STROKE_WIDTH = 1.5
 export const ISSUE_HIGHLIGHT_FILL_ALPHA = 0.08
 
-export const AI_ACTIVE_COLOR = { r: 0.26, g: 0.52, b: 0.96 }
+/** The violet AI agents show in everywhere, the app's `--color-agent`. */
+export const AI_AGENT_COLOR = { r: 0.486, g: 0.361, b: 1 }
 export const AI_DONE_COLOR = { r: 0.16, g: 0.73, b: 0.36 }
-export const AI_PULSE_PERIOD_MS = 1500
 export const AI_DONE_DURATION_MS = 800
+/** How long a layer an agent adds takes to trace in, once its turn comes. */
+export const AI_ENTER_DURATION_MS = 480
+/** The pause between the layers of one edit, so they appear one after another. */
+export const AI_ENTER_STAGGER_MS = 45
+/** The last layer of an edit starts within this, however many layers the edit adds. */
+export const AI_ENTER_MAX_DELAY_MS = 900
+/** One sweep of the light over an area an agent is working in. */
+export const AI_SHIMMER_PERIOD_MS = 1600
+/** Width of the sweeping light, in screen pixels. */
+export const AI_SHIMMER_BAND = 120
 
 /** Opacity of the selection color behind selected text while editing. */
 export const TEXT_SELECTION_ALPHA = 0.3

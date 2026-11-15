@@ -79,13 +79,8 @@ export function createAITools(
       onAfterExecute: (def) => {
         if (def.mutates && !isAtomicTool(def)) store.requestRender()
       },
-      onFlashNodes: (nodeIds) => {
-        markRunWork(store, nodeIds)
-        store.renderer?.aiClearActive()
-        if (nodeIds.length > 0) {
-          store.aiFlashDone(nodeIds)
-        }
-      },
+      // `runEditorTool` shows the edit on the canvas; the result's layers place the agent.
+      onFlashNodes: (nodeIds) => markRunWork(store, nodeIds),
       onToolLog: (entry) => {
         recordToolCompleted(
           {

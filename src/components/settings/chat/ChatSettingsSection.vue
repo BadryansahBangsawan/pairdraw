@@ -4,6 +4,7 @@ import { computed } from 'vue'
 import { useAgentMessages, useI18n } from '@pairdraw/vue/i18n'
 
 import {
+  animateAIEdits,
   approveActions,
   canvasPrompt,
   changePreviewSize,
@@ -80,6 +81,13 @@ const previewOptions = computed(() => [
       </SettingsRow>
       <SettingsRow :label="ai.canvasPrompt" :description="ai.canvasPromptHint">
         <AppSwitch v-model="canvasPrompt" :label="ai.canvasPrompt" />
+      </SettingsRow>
+      <SettingsRow :label="ai.animateEdits" :description="ai.animateEditsHint">
+        <AppSwitch
+          v-model="animateAIEdits"
+          :label="ai.animateEdits"
+          data-test-id="settings-ai-animate-edits"
+        />
       </SettingsRow>
       <SettingsRow :label="agents.approveActions" :description="agents.approveActionsHint">
         <AppSwitch

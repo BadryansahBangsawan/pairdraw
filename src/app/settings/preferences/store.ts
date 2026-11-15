@@ -90,6 +90,8 @@ export interface AppPreferences {
     columnOpen: boolean
     /** Whether the canvas offers a prompt for the AI chat while the chat column is closed. */
     canvasPrompt: boolean
+    /** Whether layers an agent adds trace in and the frames it works in shimmer. */
+    animateEdits: boolean
     /** Whether the built-in chat asks before each tool call that changes the document. */
     approveActions: boolean
   }
@@ -146,6 +148,8 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
     columnOpen: false,
     // The canvas carries a prompt while the chat column is closed; Settings → AI turns it off.
     canvasPrompt: true,
+    // Edits play on the canvas unless the app's motion is off; Settings → AI turns them off.
+    animateEdits: true,
     // Edits are undoable and reviewable per reply, so asking before each one is opt-in.
     approveActions: false
   },
@@ -205,6 +209,7 @@ const appPreferencesSchema = section({
     followAgents: v.fallback(v.boolean(), defaults.chat.followAgents),
     columnOpen: v.fallback(v.boolean(), defaults.chat.columnOpen),
     canvasPrompt: v.fallback(v.boolean(), defaults.chat.canvasPrompt),
+    animateEdits: v.fallback(v.boolean(), defaults.chat.animateEdits),
     approveActions: v.fallback(v.boolean(), defaults.chat.approveActions)
   }),
   files: section({

@@ -1,5 +1,6 @@
 import type { SceneNode } from '@pairdraw/scene-graph'
 
+import { entranceDelays } from '#core/canvas/overlays/ai/motion'
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import { changesShaping } from '#core/canvas/text/paragraph/inputs'
 
@@ -80,15 +81,28 @@ export function aiFlashDone(r: SkiaRenderer, nodeIds: string[]): void {
   }
 }
 
-export function aiClearActive(r: SkiaRenderer): void {
-  r._aiActiveNodes.clear()
+export function aiEnter(r: SkiaRenderer, nodeIds: string[]): void {
+  const now = performance.now()
+  const entering = new Set(nodeIds)
+  // A layer added again before it finished tracing starts over rather than tracing twice.
+  r._aiEntrances = r._aiEntrances.filter((entrance) => !entering.has(entrance.nodeId))
+  const delays = entranceDelays(nodeIds.length)
+  nodeIds.forEach((nodeId, index) => {
+    r._aiEntrances.push({ nodeId, startTime: now + (delays[index] ?? 0) })
+  })
 }
 
 export function aiClearAll(r: SkiaRenderer): void {
   r._aiActiveNodes.clear()
   r._aiDoneFlashes = []
+  r._aiEntrances = []
 }
 
 export function hasActiveFlashes(r: SkiaRenderer): boolean {
-  return r._flashes.length > 0 || r._aiActiveNodes.size > 0 || r._aiDoneFlashes.length > 0
+  return (
+    r._flashes.length > 0 ||
+    r._aiActiveNodes.size > 0 ||
+    r._aiDoneFlashes.length > 0 ||
+    r._aiEntrances.length > 0
+  )
 }

@@ -116,8 +116,9 @@ function startProgress(
   }
 }
 
-function info(message: string, action?: ToastAction) {
-  push(message, 'default', action)
+/** The toast's id, which `remove` takes to replace a notice that is out of date. */
+function info(message: string, action?: ToastAction): number {
+  return push(message, 'default', action)
 }
 
 function warning(message: string) {

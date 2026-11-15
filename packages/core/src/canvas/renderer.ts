@@ -253,6 +253,8 @@ export class SkiaRenderer {
   _flashPaint: Paint | null = null
   _aiActiveNodes: Set<string> = new Set()
   _aiDoneFlashes: Array<{ nodeId: string; startTime: number }> = []
+  /** Layers an agent added, each tracing in from its start, which may still be ahead. */
+  _aiEntrances: Array<{ nodeId: string; startTime: number }> = []
 
   readonly DEFAULT_FONT_SIZE = DEFAULT_FONT_SIZE
   readonly COMPONENT_SET_BORDER_WIDTH = COMPONENT_SET_BORDER_WIDTH
@@ -529,8 +531,9 @@ export class SkiaRenderer {
     RendererState.aiFlashDone(this, nodeIds)
   }
 
-  aiClearActive(): void {
-    RendererState.aiClearActive(this)
+  /** Traces in layers an agent added, one after another in the order given. */
+  aiEnter(nodeIds: string[]): void {
+    RendererState.aiEnter(this, nodeIds)
   }
 
   aiClearAll(): void {

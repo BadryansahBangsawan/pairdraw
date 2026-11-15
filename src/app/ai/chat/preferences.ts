@@ -37,6 +37,17 @@ export const changePreviewSize = computed({
   }
 })
 
+/** Whether AI edits play on the canvas while the app's motion allows; Settings → AI turns them off. */
+export const animateAIEdits = computed({
+  get: () => appPreferences.value.chat.animateEdits,
+  set: (animateEdits: boolean) => {
+    appPreferences.value = {
+      ...appPreferences.value,
+      chat: { ...appPreferences.value.chat, animateEdits }
+    }
+  }
+})
+
 /** Whether an empty page offers a prompt over the canvas; Settings → AI turns it off. */
 export const canvasPrompt = computed({
   get: () => appPreferences.value.chat.canvasPrompt,

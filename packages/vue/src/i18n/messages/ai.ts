@@ -223,6 +223,14 @@ export const aiMessageDefaults = {
   canvasPrompt: 'Prompt on the canvas',
   canvasPromptHint:
     'Show a prompt at the bottom of the canvas while the chat is closed. What you write there goes to the chat.',
+  animateEdits: 'Animate AI edits',
+  animateEditsHint:
+    'Layers the AI adds trace in one after another, and the frames it works in shimmer until it finishes. Follows the Animations setting.',
+  /** The notice once an agent's run of edits ends; its action shows the layers it touched. */
+  editSummary: params('AI edits done · new layers: {added} · changed: {changed}'),
+  editSummaryAdded: params('AI edits done · new layers: {added}'),
+  editSummaryChanged: params('AI edits done · changed layers: {changed}'),
+  editSummaryShow: 'Show',
   changePreviewSmall: 'Small (240 px)',
   changePreviewMedium: 'Medium (480 px)',
   changePreviewLarge: 'Large (960 px)',

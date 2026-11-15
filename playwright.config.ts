@@ -38,8 +38,9 @@ const appDefaults = {
     baseURL: origin,
     // Tests start past the first-run AI setup offer, whose own spec clears this, and without the
     // prompt an empty page offers over the canvas, which `tests/e2e/chat/canvas-prompt.spec.ts`
-    // turns on. They draw in the blue accent the canvas snapshots were recorded in; the default
-    // Pairdraw accent is covered by `tests/app/settings/preferences/store.test.ts`. Both side panels
+    // turns on, and AI edits do not animate, so a canvas snapshot never catches one mid-way
+    // (`tests/app/ai/motion/edits.test.ts`). They draw in the blue accent the canvas snapshots
+    // were recorded in; the default Pairdraw accent is covered by `tests/app/settings/preferences/store.test.ts`. Both side panels
     // are kept open, as most specs read or edit through them; a fresh profile's canvas without
     // them is covered by `tests/e2e/panels/on-demand.spec.ts`.
     storageState: {
@@ -54,7 +55,7 @@ const appDefaults = {
                 version: 1,
                 appearance: { accent: { kind: 'preset', preset: 'blue' } },
                 onboarding: { aiSetup: 'done' },
-                chat: { canvasPrompt: false },
+                chat: { canvasPrompt: false, animateEdits: false },
                 workspace: { layersOpen: true, propertiesOpen: true }
               })
             }

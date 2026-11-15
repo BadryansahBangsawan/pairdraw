@@ -58,6 +58,8 @@ Two more notes describe the canvas, read as the message is sent so a queued mess
 
 The chat's agent is one presence entry per document (`presence/registry.ts`). It shows as thinking when the run starts and points at the layers each call changed, on whichever page they are. With Follow agents on, following starts with the run and ends when the agent rests and none of your other agents is at work. An agent you chose to follow keeps you with it while it rests.
 
+Every edit that `runEditorTool` records, from a reply or from an outside client, goes to `showAIEdit` (`src/app/ai/motion/`) with its `DocumentChange`: added layers trace in through the renderer's `aiEnter`, changed ones flash, and their top-level frames stay marked active until the edits pause, or until the reply ends when the edit belongs to one. The overlays live in `packages/core/src/canvas/overlays/ai/draw.ts` and draw on frames the flash pump asks for with `requestRepaint`.
+
 ## A tool call
 
 Every call of a Pairdraw tool, from the chat, a coding agent through MCP, or WebMCP, runs through `runEditorTool` (`tools/runner.ts`); `tools/index.ts` passes the chat's calls with their reply:

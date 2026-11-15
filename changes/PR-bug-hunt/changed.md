@@ -1,0 +1,1 @@
+- The top bar shows your own avatar only while it lists your AI agents, since Pairdraw has no live rooms to show it to.

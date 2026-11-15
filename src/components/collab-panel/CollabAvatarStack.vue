@@ -9,6 +9,7 @@ const collab = useCollabPanelContext()
 <template>
   <!-- On the top bar, so the rings parting the avatars take the window backdrop's color. -->
   <PresenceAvatars
+    v-if="collab.showsAvatars"
     data-surface="canvas"
     :rows="collab.presenceRows"
     :following="collab.following"

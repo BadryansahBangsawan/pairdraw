@@ -14,6 +14,7 @@ import { presenceOf, renameAgent } from '@/app/presence/registry'
 import type { FollowTarget } from '@/app/presence/types'
 import { toast } from '@/app/shell/ui'
 import { presenceRows as buildPresenceRows } from '@/components/presence/rows'
+import { COLLABORATION_INCLUDED } from '@/constants'
 
 function createCollabPanelContext() {
   const collab = useCollabInjected()
@@ -60,6 +61,16 @@ function createCollabPanelContext() {
       speaking
     )
   })
+  /**
+   * Whether the top bar shows the avatars. Without live rooms your own avatar alone says nothing,
+   * so it shows only once it carries your agents or someone else is there.
+   */
+  const showsAvatars = computed(
+    () =>
+      COLLABORATION_INCLUDED ||
+      presenceRows.value.length > 1 ||
+      presenceRows.value.some((row) => row.agents.length > 0)
+  )
   /** Everyone in the room's voice call, ourselves first. */
   const callRows = computed(() => presenceRows.value.filter((row) => row.voice))
   const shareURL = computed(() => (state.value.roomId ? getShareURL(state.value.roomId) : ''))
@@ -124,6 +135,7 @@ function createCollabPanelContext() {
     state,
     following,
     presenceRows,
+    showsAvatars,
     callRows,
     shareURL,
     copyLink,

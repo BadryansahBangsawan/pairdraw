@@ -1,6 +1,6 @@
 # Compatibilité avec Figma
 
-Comparaison entre les fonctions de Figma Design et l’état actuel d’Pairdraw.
+Comparaison entre les fonctions de Figma Design et l’état actuel de Pairdraw.
 
 ::: tip État
 ✅ Pris en charge — fonctionne de bout en bout · 🟡 Partiel — le comportement principal existe, mais certaines fonctions manquent · 🔲 Non implémenté
@@ -60,7 +60,7 @@ Composants, ensembles, instances, variantes, propriétés, surcharges, variables
 
 ## Prototypage
 
-Connexions, déclencheurs, actions, animations, superpositions, défilement, parcours, logique conditionnelle et mode de présentation ne sont pas encore disponibles.
+Dans la section Prototype, un calque reçoit des interactions au clic ou après un délai qui mènent à un cadre, ouvrent ou ferment une superposition ou reviennent en arrière, avec une transition instantanée ou en fondu ; elles sont enregistrées comme réactions de prototype Figma dans le `.fig` et se jouent sur la zone de travail ([Jouer un prototype](/user-guide/playing-a-prototype)). Présenter affiche les diapositives d’une page en plein écran. Le défilement, les parcours, la logique conditionnelle avec des variables et les autres animations ne sont pas encore disponibles.
 
 ## Importation et exportation
 
@@ -87,7 +87,7 @@ Connexions, déclencheurs, actions, animations, superpositions, défilement, par
 | Fonction | État | Notes |
 |----------|------|-------|
 | Commentaires | ✅ | L’outil Commentaire (<kbd>C</kbd>) épingle des fils aux calques, avec réponses, résolution et liste filtrable ; enregistrés dans le `.fig` |
-| Multijoueur | ✅ | Salles pair à pair (Trystero et Yjs) avec curseurs, suivi de vue, appels vocaux et curseurs d’agents ; sans serveur |
+| Multijoueur | ✅ | Documents Cloud modifiés ensemble via un serveur Pairdraw Cloud (Yjs), avec curseurs, suivi de vue et curseurs d’agents ; pas de salles pair à pair ni d’appels vocaux |
 | Chat de curseur | 🔲 | Pas de bulles dans la zone de travail |
 | Branches et fusions | 🔲 | Pas de branches de versions |
 | Mode développement | 🟡 | L’onglet Code affiche la sélection en design JSX, HTML, Vue ou React avec CSS ou Tailwind ; statuts « Prêt pour le dev » ; pas de mode d’inspection avec cotes |

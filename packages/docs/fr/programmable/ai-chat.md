@@ -9,7 +9,9 @@ Appuyez sur <kbd>⌘</kbd><kbd>J</kbd> ou <kbd>Ctrl</kbd><kbd>J</kbd>, ou clique
 
 ## Configurer les modèles
 
-Au premier lancement, la configuration guidée demande pour quoi l’IA doit vous aider et ce que vous utilisez déjà : un agent de code comme Claude Code, Codex ou Gemini CLI dans l’application de bureau, un compte API, ou un serveur local ou d’entreprise. Elle connecte cet accès et l’attribue aux rôles **Design agent** et **Vision**, sans toucher à ce que vous avez configuré à la main. Avec OpenRouter, il suffit de se connecter au lieu de coller une clé API. Vous pouvez la passer et la relancer depuis **Réglages → IA et agents → Lancer la configuration guidée**. Pour configurer les modèles à la main :
+Au premier lancement, Pairdraw n’ouvre aucune fenêtre de configuration. Tant qu’aucun modèle n’est configuré, il cherche un [agent de code](/programmable/coding-agents) déjà installé sur cet ordinateur : Claude Code, puis Codex, puis Gemini CLI. Le chat indique lequel il utilise et propose **Changer** pour choisir un autre modèle. Si un agent doit encore se connecter, ou s’il lui manque son programme ACP ou le serveur MCP, la colonne du chat affiche un bouton pour cela ; rien n’est connecté ni installé sans ce clic. Un modèle que vous avez configuré vous-même n’est jamais remplacé.
+
+Si Pairdraw ne trouve aucun agent, l’envoi d’une instruction ouvre la configuration guidée. Elle demande pour quoi l’IA doit vous aider et ce que vous utilisez déjà : un agent de code comme Claude Code, Codex ou Gemini CLI dans l’application de bureau, un compte API, ou un serveur local ou d’entreprise. Elle connecte cet accès et l’attribue aux rôles **Design agent** et **Vision**, sans toucher à ce que vous avez configuré à la main. Avec OpenRouter, il suffit de se connecter au lieu de coller une clé API : l’application de bureau revient pour cela par un port de cet ordinateur, et l’application web se connecte dans une fenêtre surgissante. Vous pouvez la relancer à tout moment depuis **Réglages → Modèles → Lancer la configuration guidée**. Pour configurer les modèles à la main :
 
 1. Ouvrez le chat.
 2. Sélectionnez l’icône des réglages.

@@ -21,7 +21,7 @@ Pairdraw ouvre et enregistre directement les fichiers `.fig`. L’import et l’
 
 ## Panneau de propriétés
 
-Les onglets Design, Code, IA et Vérifier s’adaptent à la sélection :
+Les onglets Design, Code et Vérifier s’adaptent à la sélection ; le chat avec l’IA a sa propre colonne :
 
 - **Apparence :** opacité, rayon uniforme ou par coin et visibilité.
 - **Remplissage :** couleur unie, dégradés linéaire, radial, angulaire et diamant, et images.
@@ -75,7 +75,7 @@ Les appels d’outils apparaissent sur une chronologie repliable. Pour vérifier
 
 Les pages `http` et `https` s’ouvrent dans une fenêtre propre à l’application de bureau, qui ne partage rien avec l’éditeur, et peuvent être amenées sur la zone de travail : importez la page entière ou un élément choisi sous forme de calques, ou placez une capture de la vue, de la page ou d’un élément. Le chat peut lire la page, marquer un élément dans sa réponse et cliquer, saisir du texte, appuyer sur une touche, faire défiler ou attendre dessus ; il demande d’abord quand les paramètres demandent une confirmation avant les modifications.
 
-Sur un tableau, le même navigateur devient de la recherche : le chat cite la page dans une note autocollante qui conserve son adresse, son titre, sa citation et l’heure de lecture ([Recherche sur un tableau](/user-guide/research)).
+Sur un tableau existant, le même navigateur devient de la recherche (Pairdraw ne propose pas de créer de nouveaux tableaux) : le chat cite la page dans une note autocollante qui conserve son adresse, son titre, sa citation et l’heure de lecture ([Recherche sur un tableau](/user-guide/research)).
 
 ## Serveur MCP
 
@@ -100,9 +100,9 @@ pairdraw eval design.fig -c "..."     # Figma Plugin API
 
 Toutes les commandes acceptent `--json`. Installation : `npm install -g @pairdraw/cli` ou `bun add -g @pairdraw/cli`.
 
-## Collaboration en temps réel
+## Collaboration
 
-La collaboration fonctionne directement entre participants via WebRTC et ne nécessite aucun serveur central. Il suffit de partager un lien. Elle comprend les curseurs, la présence, le suivi de la vue d’un autre participant et les appels vocaux avec les personnes présentes dans la salle.
+Les agents IA affichent leur curseur et les calques qu’ils modifient sur la zone de travail, et la vue les suit pendant qu’ils travaillent. Plusieurs personnes modifient ensemble les documents Cloud via un serveur [Pairdraw Cloud](/user-guide/pairdraw-cloud) auto-hébergé, avec curseurs, présence et suivi de la vue d’une personne. Les salles en direct pour les documents locaux, l’accès par lien et les appels vocaux ne font pas partie de Pairdraw ([Collaboration](/fr/programmable/collaboration)).
 
 ## Bureau et Web
 

@@ -26,7 +26,7 @@ Le menu contextuel déplace la sélection vers une autre page. Lors d’un chang
 
 ## Diapositives
 
-Le panneau des diapositives liste les cadres de premier niveau de la page sous forme de vignettes numérotées, dans l’ordre des calques. Cliquez sur une diapositive pour montrer son cadre sur le canevas, et faites glisser une diapositive — ou appuyez sur <kbd>Alt</kbd> avec une flèche haut ou bas — pour la réordonner. **Exporter les diapositives** écrit toutes les diapositives, dans l’ordre, dans un seul fichier PDF ou PowerPoint.
+Le panneau des diapositives liste les cadres de premier niveau de la page sous forme de vignettes numérotées, dans l’ordre des calques. Cliquez sur une diapositive pour montrer son cadre sur le canevas, et faites glisser une diapositive — ou appuyez sur <kbd>Alt</kbd> avec une flèche haut ou bas — pour la réordonner. **Exporter les diapositives en PDF** écrit toutes les diapositives, dans l’ordre, dans un seul fichier PDF.
 
 ## Présenter
 

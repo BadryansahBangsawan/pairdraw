@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -25,6 +26,7 @@ import {
 
 await Promise.all([ensureBrandAssets(['docs']), ensureDemoDocument()])
 
+const require = createRequire(import.meta.url)
 const configDir = dirname(fileURLToPath(import.meta.url))
 const docsRoot = dirname(configDir)
 const packagesRoot = dirname(docsRoot)
@@ -83,6 +85,9 @@ export default defineConfig({
           dir: resolve(configDir, 'cache/twoslash')
         }),
         twoslashOptions: {
+          // The workspace's `typescript` is the TypeScript 6 API package, which carries no
+          // `lib.*.d.ts`; Twoslash reads them from a full TypeScript 6 install instead.
+          tsLibDirectory: dirname(require.resolve('typescript-lib/lib/lib.d.ts')),
           compilerOptions: {
             baseUrl: repoRoot,
             paths: {
@@ -108,6 +113,7 @@ export default defineConfig({
       ]
     },
     define: appSource.define,
+    worker: appSource.worker,
     plugins: [...appSource.plugins, tailwindcss(), llmsPlugin]
   },
 

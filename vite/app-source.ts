@@ -4,10 +4,11 @@ import { fileURLToPath } from 'node:url'
 import IconsResolver from 'unplugin-icons/resolver'
 import Icons from 'unplugin-icons/vite'
 import Components from 'unplugin-vue-components/vite'
-import type { Alias, Plugin, PluginOption } from 'vite'
+import type { Alias, Plugin, PluginOption, UserConfig } from 'vite'
 
 import rootManifest from '../package.json' with { type: 'json' }
 import { createPairdrawAliases } from './aliases.ts'
+import { aiIconCollection } from './icons.ts'
 import { createImportPathTransform } from './import-path-transform.ts'
 import { inlineScriptPlugin } from './inline-script.ts'
 
@@ -48,12 +49,13 @@ export interface AppSourceConfig {
   alias: Alias[]
   define: Record<string, string>
   plugins: PluginOption[]
+  worker: NonNullable<UserConfig['worker']>
 }
 
 /**
  * What another Vite host needs to compile the app's components from source: the app's
- * aliases, its icon plugins, its text and inline-script imports, and the build-time constants it
- * reads. The
+ * aliases, its icon plugins, its text and inline-script imports, the build-time constants it
+ * reads, and how it bundles Core's workers. The
  * host has no local automation server, so those constants are empty.
  */
 export function appSourceConfig(): AppSourceConfig {
@@ -76,13 +78,16 @@ export function appSourceConfig(): AppSourceConfig {
     plugins: [
       appRawText(),
       inlineScriptPlugin(),
-      Icons({ compiler: 'vue3' }),
+      Icons({ compiler: 'vue3', customCollections: { ai: aiIconCollection() } }),
       Components({
         dirs: [],
         dts: false,
-        resolvers: [IconsResolver({ prefix: 'icon' })],
+        resolvers: [IconsResolver({ prefix: 'icon', customCollections: ['ai'] })],
         importPathTransform: createImportPathTransform(REPO_ROOT)
       })
-    ]
+    ],
+    // Core's workers are `type: 'module'` and use top-level await (harfbuzzjs), which the
+    // default `iife` worker format rejects; the app's own config sets the same.
+    worker: { format: 'es' }
   }
 }

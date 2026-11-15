@@ -39,7 +39,7 @@ Pairdraw sends no usage data: no daily ping, analytics, or usage statistics. The
 - **Optional Cloud** — keep documents on your team's own [Pairdraw Cloud](packages/docs/user-guide/pairdraw-cloud.md) server, share them by invitation or link, and edit them together with cursors, presence, and follow mode
 - **Plugins** — install plugin manifests, run a plugin's command from the command palette on the open document, and grant only the permissions it needs; one plugin runs at a time, and network access is refused ([Plugins](packages/docs/user-guide/plugins.md))
 - **Auto layout & CSS Grid** — flex and grid layout via Yoga WASM, with gap, padding, alignment, track sizing
-- **~15 MB desktop app** — Tauri v2 for macOS, Windows, Linux. Also runs in the browser as a PWA
+- **Small desktop app** — Tauri v2 for macOS, Windows, and Linux, with installers of about 15 MB on macOS and Windows. Also runs in the browser as a PWA
 
 ## CLI
 

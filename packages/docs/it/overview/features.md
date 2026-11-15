@@ -104,7 +104,7 @@ Gli agenti AI mostrano sull’area di lavoro i loro cursori e i livelli che modi
 
 ## Desktop e Web
 
-**Desktop:** Tauri v2, circa 7 MB, per macOS, Windows e Linux, con menu nativi, uso senza rete e salvataggio automatico.
+**Desktop:** Tauri v2, programmi di installazione di circa 15 MB su macOS e Windows, per macOS, Windows e Linux, con menu nativi, uso senza rete e salvataggio automatico.
 
 **Web:** nel browser, da una tua build o da un server Pairdraw Cloud, installabile come PWA e adattato agli schermi touch.
 

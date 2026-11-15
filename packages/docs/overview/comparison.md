@@ -246,7 +246,7 @@ Pairdraw's approach is simpler and lower overhead. Penpot's approach is more sui
 | Type checking | TypeScript (strict) | Runtime (Malli schemas) |
 | Build time | <5s (Vite) | Minutes (JVM startup + CLJS compile + Rust WASM) |
 | First contribution barrier | Low (TS/Vue) | High (Clojure + Rust + Docker) |
-| Desktop | Tauri v2 (~5MB) | N/A (browser-only) |
+| Desktop | Tauri v2 (installers about 15 MB on macOS and Windows) | N/A (browser-only) |
 | Hiring pool | Massive (TS/Vue devs) | Tiny (ClojureScript + Rust) |
 
 ## 9. Performance Characteristics

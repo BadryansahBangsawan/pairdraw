@@ -106,7 +106,7 @@ KI-Agenten zeigen ihre Zeiger und die Ebenen, die sie bearbeiten, auf der Arbeit
 
 ## Desktop und Web
 
-**Desktop:** Tauri v2, rund 7 MB, für macOS, Windows und Linux, mit nativen Menüs, Offlinebetrieb und automatischem Speichern.
+**Desktop:** Tauri v2, Installer rund 15 MB unter macOS und Windows, für macOS, Windows und Linux, mit nativen Menüs, Offlinebetrieb und automatischem Speichern.
 
 **Web:** im Browser aus einem eigenen Build oder von einem Pairdraw-Cloud-Server, als PWA installierbar und für Touch-Bedienung optimiert.
 

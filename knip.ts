@@ -110,21 +110,7 @@ const config: KnipConfig = {
         // Code the DOM/CSS export end-to-end specs generate imports these.
         'radix-ui',
         'react',
-        'react-dom',
-        // Imported by the workspace packages, which declare them too. The root copies stay until
-        // the app, Storybook, and docs builds are shown not to resolve them from here.
-        '@atlaskit/pragmatic-drag-and-drop',
-        '@atlaskit/pragmatic-drag-and-drop-hitbox',
-        '@chenglou/pretext',
-        '@hono/node-server',
-        '@types/culori',
-        '@xmldom/xmldom',
-        'culori',
-        'fuse.js',
-        'hono',
-        'jspdf',
-        'svg2pdf.js',
-        'yoga-layout'
+        'react-dom'
       ],
       entry: [
         // Pages beside `index.html`, which the Vite plugin reads on its own (`vite.config.ts`).

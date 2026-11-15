@@ -45,6 +45,7 @@ jobs:
         name: Resolve immutable source and native matrix
         env:
           RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+          RELEASE_BRANCH: ${{ github.event.repository.default_branch }}
         run: bun tools/release/release-packages/src/native/resolve.ts
 
   frontend:

@@ -17,8 +17,10 @@ const sourceCommit = v.parse(
   await git('rev-parse', '--verify', `refs/tags/${tag}^{commit}`)
 )
 
-// Release signing/publishing never checks out a caller-supplied arbitrary branch.
-await git('merge-base', '--is-ancestor', sourceCommit, 'origin/master')
+// Release signing/publishing never checks out a caller-supplied arbitrary branch: the source must
+// be on the repository's default branch, which only an administrator can change.
+const releaseBranch = v.parse(v.pipe(v.string(), v.nonEmpty()), process.env.RELEASE_BRANCH)
+await git('merge-base', '--is-ancestor', sourceCommit, `origin/${releaseBranch}`)
 
 const output = process.env.GITHUB_OUTPUT
 if (!output) throw new Error('Missing GITHUB_OUTPUT')

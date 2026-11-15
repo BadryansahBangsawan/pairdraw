@@ -5,7 +5,7 @@ description: Дерево объектов, поиск по имени и тип
 
 # Просмотр документов
 
-CLI позволяет изучать документы дизайна без запуска редактора. Те же команды работают с открытым настольным приложением, если не указывать файл.
+CLI позволяет изучать документы дизайна без запуска редактора. Все команды работают и с открытым настольным приложением — достаточно не указывать файл.
 
 ::: tip Установка
 
@@ -19,16 +19,41 @@ bun add -g @pairdraw/cli
 
 ## Общие сведения
 
-Количество страниц и объектов, используемые шрифты и размер файла:
+Краткий обзор — количество страниц, общее число объектов, используемые шрифты и размер файла:
 
 ```sh
 pairdraw info design.fig
 ```
 
+## Диагностика шрифтов {#font-diagnostics}
+
+Команда сообщает запрошенные начертания, доступные источники, замены и затронутые слои:
+
+```sh
+pairdraw fonts design.fig
+pairdraw fonts design.fig --json
+pairdraw fonts --document-id tab-123 --page-id 0:1
+```
+
+В режиме файла проверяются все страницы документа по шрифтам, доступным на компьютере с CLI, без загрузки онлайн-шрифтов. В режиме приложения проверяются выбранные документ и страница приложения, и загруженные там шрифты могут отличаться от шрифтов компьютера с CLI. Начертания получают статус `available`, `substituted` или `unresolved`; вывод JSON содержит `faithful`, `faces` и `issues`.
+
+[Политики шрифтов при экспорте](./exporting#font-substitution-policy) позволяют предупреждать о заменах или отклонять их при растровом экспорте и экспорте в PDF из файла.
+
 ## Дерево объектов
+
+Выводит всю иерархию объектов:
 
 ```sh
 pairdraw tree design.fig
+```
+
+```
+[0] [page] "Getting started" (0:46566)
+  [0] [section] "" (0:46567)
+    [0] [frame] "Body" (0:46568)
+      [0] [frame] "Introduction" (0:46569)
+        [0] [frame] "Introduction Card" (0:46570)
+          [0] [frame] "Guidance" (0:46571)
 ```
 
 ## Поиск объектов
@@ -45,7 +70,7 @@ pairdraw find design.fig --type TEXT
 pairdraw find design.fig --name "Button"
 ```
 
-Параметры можно использовать одновременно.
+Оба параметра можно сочетать, чтобы сузить результаты.
 
 ## Запросы XPath
 
@@ -55,7 +80,9 @@ pairdraw find design.fig --name "Button"
 pairdraw query design.fig "//FRAME"
 ```
 
-### По типу
+### Полезные шаблоны
+
+**По типу:**
 
 ```sh
 pairdraw query design.fig "//TEXT"                    # Все текстовые объекты
@@ -63,24 +90,24 @@ pairdraw query design.fig "//COMPONENT"               # Все компонен�
 pairdraw query design.fig "//INSTANCE"                # Все экземпляры
 ```
 
-### По атрибутам
+**По атрибутам:**
 
 ```sh
-pairdraw query design.fig "//FRAME[@width < 300]"     # Фреймы уже 300 пикселей
-pairdraw query design.fig "//*[@cornerRadius > 0]"    # Объекты со скруглёнными углами
-pairdraw query design.fig "//*[@visible = false]"     # Скрытые объекты
-pairdraw query design.fig "//TEXT[@fontSize >= 24]"   # Крупный текст
-pairdraw query design.fig "//*[@opacity < 1]"         # Объекты с неполной прозрачностью
+pairdraw query design.fig "//FRAME[@width < 300]"                # Фреймы уже 300 пикселей
+pairdraw query design.fig "//*[@cornerRadius > 0]"               # Скруглённые углы
+pairdraw query design.fig "//*[@visible = false]"                # Скрытые объекты
+pairdraw query design.fig "//TEXT[@fontSize >= 24]"              # Крупный текст
+pairdraw query design.fig "//*[@opacity < 1]"                    # Полупрозрачные объекты
 ```
 
-### По имени и содержимому
+**По имени и текстовому содержимому:**
 
 ```sh
-pairdraw query design.fig "//TEXT[contains(@name, 'Button')]"
-pairdraw query design.fig "//TEXT[contains(@text, 'Hello')]"
+pairdraw query design.fig "//TEXT[contains(@name, 'Button')]"    # Имя содержит 'Button'
+pairdraw query design.fig "//TEXT[contains(@text, 'Hello')]"     # Текст содержит 'Hello'
 ```
 
-### По иерархии
+**По иерархии:**
 
 ```sh
 pairdraw query design.fig "//SECTION//TEXT"            # Текст внутри секций
@@ -92,35 +119,58 @@ pairdraw query design.fig "//COMPONENT_SET//INSTANCE"  # Экземпляры в
 
 `name`, `width`, `height`, `x`, `y`, `visible`, `opacity`, `cornerRadius`, `fontSize`, `fontFamily`, `fontWeight`, `layoutMode`, `itemSpacing`, `paddingTop`, `paddingRight`, `paddingBottom`, `paddingLeft`, `strokeWeight`, `rotation`, `locked`, `blendMode`, `text`, `lineHeight`, `letterSpacing`
 
+### Пример вывода
+
+```
+  Found 5 nodes
+
+[0] [frame] "Logo  92×32" (0:9)
+[1] [frame] "logo-short-6  31×32" (0:10)
+[2] [frame] "wrapper  128×73" (0:20)
+[3] [frame] "pen-drawing  148×52" (0:21)
+[4] [frame] "surprised-emoji  32×32" (0:26)
+```
+
 ## Свойства объекта
+
+Показывает все свойства объекта по его идентификатору:
 
 ```sh
 pairdraw node design.fig --id 1:23
 ```
 
-## Страницы и переменные
+## Страницы
+
+Список всех страниц документа:
 
 ```sh
 pairdraw pages design.fig
+```
+
+## Переменные
+
+Список переменных дизайна и их коллекций:
+
+```sh
 pairdraw variables design.fig
 ```
 
 ## Работа с открытым приложением
 
-Если настольное приложение запущено, не указывайте путь к файлу. CLI подключится по RPC к открытому документу:
+Если настольное приложение запущено, не указывайте файл: CLI подключится по RPC и будет работать с открытым холстом:
 
 ```sh
-pairdraw documents list
-pairdraw tree
+pairdraw documents list    # список ID открытых документов и страниц
+pairdraw tree              # просмотр активного документа в приложении
 pairdraw tree --document-id tab-123 --page-id 0:1
 pairdraw eval --document-id tab-123 --page-id 0:1 -c "..."
 ```
 
-Для автоматизированных процессов сначала вызовите `pairdraw documents list --json`, а затем явно передавайте `--document-id` и `--page-id`, не полагаясь на видимую активную вкладку или страницу. Как открывать, сохранять, переключать и закрывать документы, отменять изменения, менять настройки и вызывать любые инструменты редактора, описано в [Controlling the App](/programmable/cli/app-control).
+В процессах с агентами сначала вызовите `pairdraw documents list --json`, а затем явно передавайте `--document-id` и `--page-id`, не полагаясь на видимую активную вкладку или страницу. Как открывать, сохранять, переключать и закрывать документы, отменять изменения, менять настройки и вызывать любые инструменты редактора, описано в разделе [Управление приложением](/programmable/cli/app-control).
 
 ## Проверка качества
 
-Проверка имён, компоновки, структуры и доступности:
+Проверка документов на проблемы с именами, компоновкой, структурой и доступностью:
 
 ```sh
 pairdraw lint design.fig
@@ -130,11 +180,11 @@ pairdraw lint design.fig --list-rules
 pairdraw lint design.fig --fix -o fixed.fig
 ```
 
-Добавьте `--json`, если результат будет обрабатывать другая программа: каждое сообщение содержит `fix` и `suggestions` в виде данных. `--fix` применяет безопасные исправления — привязывает цвета к подходящим переменным цвета и округляет геометрию до целых пикселей — и записывает результат в файл `.fig`, указанный в `-o`.
+Добавьте `--json`, чтобы получить машиночитаемый вывод: каждое сообщение содержит `fix` и `suggestions` в виде данных. `--fix` применяет безопасные исправления — привязывает цвета к подходящим переменным цвета и округляет геометрию до целых пикселей — и записывает результат в файл `.fig`, указанный в `-o`.
 
 ## Вывод JSON
 
-Все команды поддерживают `--json`. Результат можно передать `jq`, проверке CI или другой программе:
+Все команды поддерживают `--json` для машиночитаемого вывода — передавайте результат в `jq`, сценарии CI или другие программы:
 
 ```sh
 pairdraw tree design.fig --json | jq '.[] | .name'

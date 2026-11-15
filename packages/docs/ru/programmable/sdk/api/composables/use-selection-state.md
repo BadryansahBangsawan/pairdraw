@@ -33,10 +33,10 @@ const { hasSelection, selectedCount, isInstance } = useSelectionState()
 
 <template>
   <div class="text-xs text-muted">
-    <span v-if="!hasSelection">Нет выделения</span>
+    <span v-if="!hasSelection">No selection</span>
     <span v-else>
-      {{ selectedCount }} выделено
-      <span v-if="isInstance">· экземпляр</span>
+      {{ selectedCount }} selected
+      <span v-if="isInstance">· instance</span>
     </span>
   </div>
 </template>

@@ -5,12 +5,31 @@ description: Чтение и изменение коллекций, переме
 
 # useVariables
 
-`useVariables()` предоставляет низкоуровневое состояние и действия редактора переменных.
+`useVariables()` — низкоуровневый composable для переменных, на котором построены высокоуровневые вспомогательные функции редактора переменных.
 
-Используйте composable для прямого управления коллекциями, активными режимами, фильтрами и операциями создания, чтения, обновления и удаления без готовых таблицы или диалога.
+Используйте его для прямого управления коллекциями, активными режимами, фильтрами и операциями создания, чтения, обновления и удаления без готовых таблицы или диалога.
+
+## Использование
 
 ```ts
+import { useVariables } from '@pairdraw/vue/variables'
+
 const variables = useVariables()
 ```
 
-Среди возвращаемых значений — `collections`, `activeCollection`, `activeModes`, `variables`, `searchTerm` и действия для создания, переименования, удаления и обновления переменных и коллекций.
+## Возвращаемые значения
+
+- `collections`
+- `activeCollectionId`
+- `activeCollection`
+- `activeModes`
+- `variables`
+- `searchTerm`
+- `setSearchTerm()`
+- `setActiveCollection()`
+- `addCollection()`
+- `renameCollection()`
+- `addVariable()`
+- `removeVariable()`
+- `renameVariable()`
+- `updateVariableValue()`

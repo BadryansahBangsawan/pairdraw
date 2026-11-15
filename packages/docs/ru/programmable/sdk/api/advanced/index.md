@@ -16,6 +16,7 @@ description: Специализированные публичные API пак�
 ## Выбор значений, переменные, язык и состояние редактора
 
 - [useColorVariableBinding](./use-color-variable-binding)
+- [useColorBindingProvider](/programmable/sdk/api/advanced/use-color-binding-provider)
 - [useGradientStops](./use-gradient-stops)
 - [useFontPicker](./use-font-picker)
 - [useOkHCL](./use-okhcl)

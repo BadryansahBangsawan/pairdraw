@@ -1,11 +1,19 @@
 ---
 title: GradientEditorRoot
-description: Состояние и действия для редактирования точек градиента.
+description: Корневой компонент для редактирования точек градиента без встроенного оформления.
 ---
 
 # GradientEditorRoot
 
-`GradientEditorRoot` управляет активной точкой, типом градиента, добавлением, удалением и изменением точек, цветом активной точки и фоном полосы градиента.
+`GradientEditorRoot` — корневой компонент для редактирования градиента без встроенного оформления.
+
+Он отвечает за:
+
+- состояние активной точки;
+- переключение типа градиента;
+- добавление, удаление и изменение точек;
+- изменение цвета активной точки;
+- вычисленный фон полосы.
 
 Слот по умолчанию получает весь набор данных и действий, необходимый для собственного интерфейса редактора градиента.
 
@@ -24,6 +32,36 @@ description: Состояние и действия для редактиров�
     { name: 'update', payload: 'fill: Fill', description: 'Вызывается после изменения градиентной заливки.' }
   ]"
 />
+
+## Slots
+
+<SdkSlotsTable
+  :rows="[
+    { name: 'default', props: 'editor state + handlers', description: 'Полный контракт отрисовки редактора градиента.' }
+  ]"
+/>
+
+### Свойства слота по умолчанию
+
+```ts
+{
+  stops: GradientStop[]
+  subtype: GradientSubtype
+  subtypes: Array<{ value: GradientSubtype; label: string }>
+  activeStopIndex: number
+  activeColor: Color
+  barBackground: string
+  setSubtype: (type: GradientSubtype) => void
+  selectStop: (index: number) => void
+  addStop: () => void
+  removeStop: (index: number) => void
+  updateStopPosition: (index: number, position: number) => void
+  updateStopColor: (index: number, hex: string) => void
+  updateStopOpacity: (index: number, opacity: number) => void
+  updateActiveColor: (color: Color) => void
+  dragStop: (index: number, position: number) => void
+}
+```
 
 ## Пример
 

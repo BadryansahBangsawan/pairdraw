@@ -5,9 +5,16 @@ description: Получение переведённых сообщений ин
 
 # useI18n
 
-`useI18n()` возвращает реактивные группы переведённых сообщений и функции для выбора языка интерфейса.
+`useI18n()` — совместимый агрегат, который возвращает реактивные группы переводов и функции выбора языка. Новым компонентам лучше импортировать только нужные composables продуктовых областей, а не подписываться на все каталоги.
 
-Он нужен, если интерфейс использует подготовленные в SDK подписи для меню, команд, панелей, страниц и диалогов либо позволяет пользователю выбрать язык.
+```ts twoslash
+import { useSettingsMessages, useRenameMessages } from '@pairdraw/vue/i18n'
+
+const settings = useSettingsMessages()
+const rename = useRenameMessages()
+```
+
+Каждый composable области возвращает реактивный ref. В скрипте читайте `.value`; в шаблонах Vue разворачивает его сам. Выбор языка без агрегата описан в разделе [Locale APIs](../advanced/locale-apis).
 
 ## Использование
 
@@ -19,16 +26,11 @@ const { menu, commands, panels, locale, availableLocales, localeLabels, setLocal
 
 ## Возвращает
 
-- `menu`
-- `commands`
-- `tools`
-- `panels`
-- `pages`
-- `dialogs`
-- `locale`
-- `availableLocales`
-- `localeLabels`
-- `setLocale`
+Ref-ы переводов: `ai`, `automation`, `code`, `collaboration`, `commands`, `common`, `credentials`, `diagnostics`, `editor`, `files`, `fonts`, `media`, `menu`, `pages`, `panels`, `recovery`, `rendering`, `rename`, `settings`, `storage`, `tools`, `updates`, `variables` и `variableTypes`.
+
+Управление языком: `locale`, `availableLocales`, `localeLabels` и `setLocale`.
+
+Прежняя группа `dialogs`, `useDialogMessages()` и `dialogMessages` удалены в версии для разработки после v0.14.0. Используйте область-владельца, например `settings`, `rename` или `recovery`, и обновите соответствующие ключи сообщений.
 
 ## Базовый пример
 
@@ -54,7 +56,7 @@ const { menu, locale, availableLocales, localeLabels, setLocale } = useI18n()
 ## Примечания
 
 - при смене языка все группы сообщений SDK обновляются автоматически;
-- для прямого доступа к хранилищу SDK также экспортирует низкоуровневый locale API.
+- для прямого доступа к хранилищу SDK также экспортирует низкоуровневые примитивы языка.
 
 ## Связанные API
 

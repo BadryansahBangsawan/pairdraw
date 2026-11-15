@@ -5,7 +5,7 @@ description: Компонент выбора шрифта с поиском на
 
 # FontPickerRoot
 
-`FontPickerRoot` предоставляет поиск и асинхронный список семейств шрифтов без навязанного оформления. Компонент построен на Reka UI Combobox; приложение может заменить кнопку открытия, поле поиска, строки списка, отметку выбора и пустое состояние через слоты.
+`FontPickerRoot` — компонент выбора шрифта с поиском без встроенного оформления, построенный на примитивах Combobox из Reka UI. Приложение может заменить кнопку открытия, поле поиска, строки списка, отметку выбора и пустое состояние через слоты.
 
 ## Props
 
@@ -37,6 +37,18 @@ description: Компонент выбора шрифта с поиском на
 <SdkEventsTable
   :rows="[
     { name: 'select', payload: 'family: string', description: 'Вызывается после выбора семейства.' }
+  ]"
+/>
+
+## Slots
+
+<SdkSlotsTable
+  :rows="[
+    { name: 'trigger', props: '{ value: string, open: boolean }', description: 'Собственное содержимое кнопки открытия.' },
+    { name: 'search', props: '{ searchTerm: string, setInputRef: (el: HTMLInputElement | null) => void }', description: 'Собственное поле поиска.' },
+    { name: 'item', props: '{ family: string, selected: boolean }', description: 'Собственная отрисовка строки списка.' },
+    { name: 'indicator', props: '{ selected: boolean }', description: 'Собственная отметка выбора.' },
+    { name: 'empty', description: 'Показывается, когда шрифты недоступны.' }
   ]"
 />
 

@@ -1,18 +1,20 @@
 ---
 title: useAppearance
-description: Управление видимостью, прозрачностью и радиусом углов текущего выделения.
+description: Управление видимостью, прозрачностью, радиусом и сглаживанием углов текущего выделения.
 ---
 
 # useAppearance
 
-`useAppearance()` предоставляет панелям свойств состояние и действия, связанные с внешним видом выделенных объектов.
+`useAppearance()` — composable для элементов управления внешним видом в панелях свойств.
 
-С его помощью можно управлять:
+Он предоставляет вычисленное из выделения состояние интерфейса для:
 
-- видимости
-- прозрачности
-- радиуса углов
-- независимых радиусов углов
+- видимости;
+- прозрачности;
+- радиуса углов;
+- сглаживания углов в виде нормализованного процента;
+- независимых радиусов углов, включая импортированное состояние с разными углами;
+- режима наложения.
 
 ## Использование
 
@@ -29,6 +31,8 @@ const {
   visibilityState,
   opacityPercent,
   cornerRadiusValue,
+  cornerSmoothingPercent,
+  showIndependentCorners,
   toggleVisibility,
   toggleIndependentCorners,
 } = useAppearance()
@@ -48,6 +52,15 @@ appearance.toggleVisibility()
 appearance.updateCornerProp('topLeftRadius', 12)
 appearance.commitCornerProp('topLeftRadius', 12, 8)
 ```
+
+### Изменить сглаживание углов
+
+```ts
+appearance.updateCornerProp('cornerSmoothing', 0.75)
+appearance.commitCornerProp('cornerSmoothing', 0.75, 0)
+```
+
+Показывайте редактор отдельных углов по `showIndependentCorners`. Он учитывает и явный флаг объекта сцены, и импортированные объекты с разными значениями углов. Переключения и фиксация изменений при выделении нескольких объектов объединяются в одну запись отмены.
 
 ## Связанные API
 

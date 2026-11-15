@@ -12,7 +12,10 @@ description: Сохранение цветового замысла OkHCL для
 ## Использование
 
 ```ts
+import { useOkHCL } from '@pairdraw/vue/controls/okhcl'
+
 const okhcl = useOkHCL()
+
 const color = okhcl.getFillOkHCLColor(node, 0)
 okhcl.updateFillOkHCL(node, 0, { c: 0.2 })
 ```

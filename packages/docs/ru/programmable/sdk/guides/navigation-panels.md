@@ -22,7 +22,7 @@ Vue SDK предоставляет компоненты без встроенн�
     <button v-for="page in pages" :key="page.id" @click="switchPage(page.id)">
       {{ page.name }}
     </button>
-    <button @click="addPage()">Новая страница</button>
+    <button @click="addPage()">New page</button>
   </div>
 </PageListRoot>
 ```

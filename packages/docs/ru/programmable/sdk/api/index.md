@@ -8,9 +8,9 @@ description: Компоненты, composables и низкоуровневые A
 Справочник Vue SDK состоит из трёх разделов.
 
 <SdkCardGroup>
-  <SdkCard title="Компоненты" to="/programmable/sdk/api/components/" description="Структурные компоненты без предустановленных стилей: CanvasRoot, ToolbarRoot, FontPickerRoot, NumberFieldRoot и другие." />
-  <SdkCard title="Composables" to="/programmable/sdk/api/composables/" description="Composables для доступа к редактору, подключения холста, выделения, команд и панелей свойств." />
-  <SdkCard title="Низкоуровневые API" to="/programmable/sdk/api/advanced/" description="Вспомогательные функции, контексты компонентов и специализированные API для нестандартной интеграции." />
+  <SdkCard title="Компоненты" to="/ru/programmable/sdk/api/components/" description="Структурные компоненты без предустановленных стилей: CanvasRoot, ToolbarRoot, FontPickerRoot, NumberFieldRoot и другие." />
+  <SdkCard title="Composables" to="/ru/programmable/sdk/api/composables/" description="Composables для доступа к редактору, подключения холста, выделения, команд и панелей свойств." />
+  <SdkCard title="Низкоуровневые API" to="/ru/programmable/sdk/api/advanced/" description="Вспомогательные функции, контексты компонентов и специализированные API для нестандартной интеграции." />
 </SdkCardGroup>
 
 ## С чего начать

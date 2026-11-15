@@ -43,7 +43,7 @@ const fills = ref<Fill[]>([])
       v-slot="{ item }"
     >
       <span>{{ item?.type }}</span>
-      <PropertyListRemove prop-key="fills" :index="index">Удалить</PropertyListRemove>
+      <PropertyListRemove prop-key="fills" :index="index">Remove</PropertyListRemove>
     </PropertyListItem>
   </PropertyListRoot>
 </template>

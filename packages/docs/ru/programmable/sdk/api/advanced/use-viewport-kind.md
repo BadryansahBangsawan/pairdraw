@@ -9,9 +9,18 @@ description: Реактивные признаки мобильной и нас�
 
 Используйте composable, если достаточно различать мобильный и настольный режимы без прямой настройки `useBreakpoints()`.
 
+## Использование
+
 ```ts
+import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
+
 const { isMobile, isDesktop } = useViewportKind()
 ```
+
+## Возвращаемые значения
+
+- `isMobile`
+- `isDesktop`
 
 ## См. также
 

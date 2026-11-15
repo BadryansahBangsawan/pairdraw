@@ -15,7 +15,9 @@ description: Создание собственного интерфейса ре
 
 Готовое приложение Pairdraw — лишь один из возможных интерфейсов.
 
-На основе SDK можно создать встроенный редактор для другого продукта, внутренний инструмент для работы с ресурсами, редактор шаблонов, интерфейс аннотирования или специализированный редактор с поддержкой ИИ.
+Для узкой задачи можно создать совсем другой: встроенный редактор внутри другого продукта, внутренний инструмент для работы с ресурсами, редактор шаблонов, интерфейс аннотирования или поверхность для редактирования с ИИ и собственными элементами управления.
+
+Именно для этого SDK и существует.
 
 ## Рекомендуемая структура
 
@@ -31,26 +33,35 @@ description: Создание собственного интерфейса ре
 
 ```vue
 <script setup lang="ts">
-import { createEditor } from '@pairdraw/core'
+import { reactive } from 'vue'
+import { createDefaultEditorState, createEditor } from '@pairdraw/core'
+import { SceneGraph } from '@pairdraw/scene-graph'
 import { provideEditor } from '@pairdraw/vue'
 import { CanvasRoot, CanvasSurface } from '@pairdraw/vue/canvas'
 import { ToolbarRoot } from '@pairdraw/vue/primitives/Toolbar'
 import { PageListRoot } from '@pairdraw/vue/primitives/PageList'
-import { LayerTreeRoot } from '@pairdraw/vue/primitives/LayerTree'
 
-const editor = createEditor({ width: 1440, height: 900 })
+const graph = new SceneGraph()
+const page = graph.getPages()[0]
+if (!page) throw new Error('Expected an initial page')
+
+const editor = createEditor({
+  graph,
+  state: reactive(createDefaultEditorState(page.id)),
+  getViewportSize: () => ({ width: 1440, height: 900 }),
+})
 provideEditor(editor)
 </script>
 
 <template>
   <div class="grid h-screen grid-cols-[240px_1fr_320px] grid-rows-[48px_1fr]">
-    <ToolbarRoot v-slot="{ tools, activeTool, setTool }">
+    <ToolbarRoot v-slot="{ tools, activeTool, actions }">
       <header class="col-span-3 flex items-center gap-2 border-b px-3">
         <button
           v-for="tool in tools"
-          :key="tool.id"
-          :data-active="activeTool === tool.id"
-          @click="setTool(tool.id)"
+          :key="tool.key"
+          :data-active="activeTool === tool.key"
+          @click="actions.setTool(tool.key)"
         >
           {{ tool.label }}
         </button>
@@ -58,13 +69,13 @@ provideEditor(editor)
     </ToolbarRoot>
 
     <aside class="border-r">
-      <PageListRoot v-slot="{ pages, currentPageId, switchPage }">
+      <PageListRoot v-slot="{ pages, currentPageId, actions }">
         <nav>
           <button
             v-for="page in pages"
             :key="page.id"
             :data-active="page.id === currentPageId"
-            @click="switchPage(page.id)"
+            @click="actions.switch(page.id)"
           >
             {{ page.name }}
           </button>
@@ -79,13 +90,15 @@ provideEditor(editor)
     </main>
 
     <aside class="border-l">
-      Панель свойств
+      Properties panel here
     </aside>
   </div>
 </template>
 ```
 
-## Обязанности SDK и приложения
+Фиксированные размеры области просмотра выше сокращают пример. В интерфейсе с изменяемым размером возвращайте из `getViewportSize` фактический размер контейнера холста, без окружающих боковых панелей и панели инструментов. Требования к установке и заметки о переходе приведены в разделе [Начало работы с SDK](../getting-started).
+
+## Почему такое разделение работает
 
 - SDK отвечает за интеграцию с редактором и переиспользуемую логику без привязки к оформлению;
 - приложение отвечает за компоновку, оформление и действия, характерные для конкретного продукта;

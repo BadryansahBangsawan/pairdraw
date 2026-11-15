@@ -30,7 +30,7 @@ const color = ref<Color>({ r: 0.2, g: 0.5, b: 0.9, a: 1 })
     @cancel="console.log('cancel')"
   >
     <template #trigger="{ style }">
-      <button :style="style" aria-label="Изменить цвет" />
+      <button :style="style" aria-label="Edit color" />
     </template>
     <template #default="{ color: currentColor }">
       <output>{{ currentColor.r }}, {{ currentColor.g }}, {{ currentColor.b }}</output>

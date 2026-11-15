@@ -5,7 +5,7 @@ description: Основные composables пакета @pairdraw/vue.
 
 # Composables
 
-Ниже перечислены composables, которые чаще всего нужны при работе с `@pairdraw/vue`.
+Ниже перечислены основные composables, которые нужны большинству пользователей `@pairdraw/vue`.
 
 ## Контекст и холст
 
@@ -32,11 +32,14 @@ description: Основные composables пакета @pairdraw/vue.
 - [useSharedStyleBinding](/programmable/sdk/api/composables/use-shared-style-binding)
 - [useColorModel](/programmable/sdk/api/composables/use-color-model)
 - [useMask](/programmable/sdk/api/composables/use-mask)
+- [useVariableModes](/programmable/sdk/api/composables/use-variable-modes)
 - [useTypography](./use-typography)
 - [useExport](./use-export)
 - [useFillControls](./use-fill-controls)
 - [useStrokeControls](./use-stroke-controls)
 - [useEffectsControls](./use-effects-controls)
+- [useSelectionLayout](/programmable/sdk/api/composables/use-selection-layout)
+- [useSelectionColors](/programmable/sdk/api/composables/use-selection-colors)
 
 ## Рабочая область документа
 

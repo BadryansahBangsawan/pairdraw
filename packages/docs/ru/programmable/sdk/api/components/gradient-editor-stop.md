@@ -33,7 +33,7 @@ const stop: GradientStop = {
     :stop="stop"
     :index="0"
     active
-    label="Средняя точка градиента"
+    label="Middle gradient stop"
     @update-position="(_index, position) => console.log(position)"
   />
 </template>

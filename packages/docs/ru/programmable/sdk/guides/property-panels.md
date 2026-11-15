@@ -79,10 +79,10 @@ const fills = useEditorPropertyList('fills')
   >
     <div v-for="(fill, index) in items" :key="index">
       {{ fill.type }}
-      <button @click="actions.remove(index)">Удалить</button>
+      <button @click="actions.remove(index)">Remove</button>
     </div>
 
-    <button @click="actions.add(fillControls.defaultFill)">Добавить заливку</button>
+    <button @click="actions.add(fillControls.defaultFill)">Add fill</button>
   </PropertyListRoot>
 </template>
 ```

@@ -22,10 +22,10 @@ Pairdraw можно встроить в другой продукт, внутр�
 ## С чего начать
 
 <SdkCardGroup>
-  <SdkCard title="Начало работы" to="/programmable/sdk/getting-started" description="Установите пакет, создайте экземпляр редактора и подключите основные компоненты." />
-  <SdkCard title="Архитектура" to="/programmable/sdk/architecture" description="Узнайте, как связаны composables, компоненты и контекст редактора." />
-  <SdkCard title="Руководства" to="/programmable/sdk/guides/custom-editor-shell" description="Создайте собственный интерфейс редактора, панель свойств и панели навигации." />
-  <SdkCard title="Справочник API" to="/programmable/sdk/api/" description="Изучите компоненты, composables и низкоуровневые публичные API." />
+  <SdkCard title="Начало работы" to="/ru/programmable/sdk/getting-started" description="Установите пакет, создайте экземпляр редактора и подключите основные компоненты." />
+  <SdkCard title="Архитектура" to="/ru/programmable/sdk/architecture" description="Узнайте, как связаны composables, компоненты и контекст редактора." />
+  <SdkCard title="Руководства" to="/ru/programmable/sdk/guides/custom-editor-shell" description="Создайте собственный интерфейс редактора, панель свойств и панели навигации." />
+  <SdkCard title="Справочник API" to="/ru/programmable/sdk/api/" description="Изучите компоненты, composables и низкоуровневые публичные API." />
 </SdkCardGroup>
 
 ## Для чего нужен SDK
@@ -33,6 +33,8 @@ Pairdraw можно встроить в другой продукт, внутр�
 Разным продуктам и командам нужны разные интерфейсы редактирования.
 
 Одним нужен полноценный графический редактор, другим — компактный холст внутри приложения. SDK также подходит для внутренних инструментов, редакторов шаблонов и узкоспециализированных интерфейсов с поддержкой ИИ.
+
+SDK — тот уровень, который делает всё это возможным.
 
 ## Принципы устройства SDK
 

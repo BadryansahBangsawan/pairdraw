@@ -32,7 +32,7 @@ const pageId = computed(() => editor.state.currentPageId)
 </script>
 
 <template>
-  <div>Текущая страница: {{ pageId }}</div>
+  <div>Current page: {{ pageId }}</div>
 </template>
 ```
 

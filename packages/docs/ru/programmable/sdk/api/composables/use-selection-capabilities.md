@@ -34,9 +34,9 @@ const { canDelete, canDuplicate, canCreateComponent } = useSelectionCapabilities
 
 <template>
   <div class="flex gap-2">
-    <button :disabled="!canDuplicate">Дублировать</button>
-    <button :disabled="!canDelete">Удалить</button>
-    <button :disabled="!canCreateComponent">Создать компонент</button>
+    <button :disabled="!canDuplicate">Duplicate</button>
+    <button :disabled="!canDelete">Delete</button>
+    <button :disabled="!canCreateComponent">Make component</button>
   </div>
 </template>
 ```

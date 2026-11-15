@@ -1,76 +1,146 @@
 ---
 title: Edycja wektorów
-description: Edycja punktów, uchwytów Béziera i segmentów oraz używanie Pióra w trybie edycji.
+description: 'Edycja geometrii ścieżki wektorowej: punkty, uchwyty Béziera, modyfikatory i działania Pióra w trybie edycji.'
 ---
 
 # Edycja wektorów
 
-Tryb edycji wektorów pozwala zmieniać geometrię ścieżki: położenie punktów, kształt segmentów i uchwyty Béziera. Zamiast transformować cały obiekt, edytujesz samą ścieżkę.
+Tryb edycji wektorów pozwala zmieniać **geometrię** krzywej: położenie punktów, kształt segmentów i uchwyty Béziera.
+W tym trybie edytujesz samą ścieżkę, a nie zwykłe transformacje obiektu.
 
 ## Włączanie trybu edycji
 
-1. Wybierz obiekt wektorowy narzędziem Zaznaczenie.
-2. Kliknij dwukrotnie krzywą.
+- Zaznacz obiekt wektorowy narzędziem Przesuń.
+- **Kliknij dwukrotnie krzywą**.
 
-Aby zakończyć edycję, naciśnij <kbd>Escape</kbd> albo przejdź do innego trybu.
+Włącza to edycję geometrii zaznaczonego wektora.
 
-## Zachowanie interfejsu
+## Wychodzenie z trybu edycji
 
-- Ramka transformacji jest ukryta.
-- Można wybierać i zmieniać punkty, segmenty oraz uchwyty.
-- Narożniki ramki nie aktywują zmiany rozmiaru ani obrotu.
+- Naciśnij <kbd>Escape</kbd>.
+- Kliknij pusty obszar roboczy.
+- Albo przejdź do innego kontekstu edycji.
+
+## Co zmienia się w tym trybie
+
+- Zwykła ramka transformacji obiektu jest wyłączona.
+- Można edytować punkty, segmenty i uchwyty.
+- Kursor nie przełącza się na zmianę rozmiaru ani obrót w narożnikach ramki ograniczającej warstwy; przełącza się nad ramką transformacji zaznaczonych punktów (patrz [Transformacja zaznaczonych punktów](#transform-selected-points)).
 
 ## Podstawowe operacje
 
 ### Przesuwanie punktu
 
-Przeciągnij punkt. Połączone segmenty i kształt ścieżki zmieniają się podczas przeciągania.
+- Przeciągnij punkt.
+- Połączone segmenty i kształt ścieżki zmieniają się na żywo w podglądzie.
 
 ### Edycja uchwytu Béziera
 
-Przeciągnij uchwyt przy punkcie. Domyślne zachowanie zależy od aktualnego typu punktu.
+- Przeciągnij uchwyt przy punkcie.
+- Domyślne zachowanie zależy od bieżącego układu uchwytów punktu.
 
-## Modyfikatory uchwytów
+### Zaznaczanie i przesuwanie segmentu
 
-| Operacja | macOS | Windows / Linux |
-|----------|-------|-----------------|
-| Ciągły | <kbd>Cmd</kbd> + przeciągnięcie | <kbd>Ctrl</kbd> + przeciągnięcie |
-| Narożny, niezależne uchwyty | <kbd>Option</kbd> + przeciągnięcie | <kbd>Alt</kbd> + przeciągnięcie |
-| Zablokowany kierunek | <kbd>Shift</kbd> + przeciągnięcie | <kbd>Shift</kbd> + przeciągnięcie |
+- Kliknij segment, aby go zaznaczyć. Segment zmienia kolor na niebieski i pokazuje gałkę pośrodku; jego punkty pozostają niezaznaczone.
+- <kbd>Shift</kbd> + kliknięcie dodaje segment do zaznaczenia albo usuwa zaznaczony.
+- Przeciągnij segment, aby przesunąć dwa łączone przez niego punkty razem z resztą zaznaczenia.
 
-### Tryb ciągły
+### Zaznaczanie prostokątem
 
-Aktywny uchwyt pozostaje na jednej linii z drugim, zmienia się tylko jego długość, a krzywa zachowuje płynne przejście.
+- Przeciągnij po pustym miejscu, aby zaznaczyć punkty wewnątrz prostokąta i segmenty między nimi.
+- <kbd>Shift</kbd> + przeciąganie dodaje je do zaznaczenia.
 
-### Tryb narożny
+### Zaznaczanie obszaru
 
-Aktywny uchwyt zmienia się niezależnie, a drugi pozostaje na miejscu. Pozwala to utworzyć ostre przejście.
+- Umieść wskaźnik wewnątrz wypełnionego obszaru: obszar pod nim zostaje zakreskowany ukośnymi liniami.
+- Kliknij wewnątrz, aby zaznaczyć obszar i wszystkie jego punkty; przeciągnij, aby go przesunąć.
+- <kbd>Shift</kbd> + kliknięcie dodaje obszar do zaznaczenia.
 
-### Zablokowany kierunek
+### Usuwanie punktów i segmentów
 
-Dla punktów typu **Continuous** albo **Symmetric** przytrzymanie <kbd>Shift</kbd> blokuje kierunek zapisany przed rozpoczęciem przeciągania. Zmienia się tylko długość jednego lub obu uchwytów.
-
-## Zmiana wygięcia przez przeciągnięcie punktu
-
-Gdy przeciągasz punkt z wciśniętym <kbd>Cmd</kbd> albo <kbd>Ctrl</kbd>, edytor wybiera właściwy uchwyt na podstawie kierunku dołączonego segmentu, a nie odległości od najbliższego punktu.
-
-Działa to również dla rozgałęzionych punktów w sieci wektorowej. Po wybraniu docelowy uchwyt nie zmienia się do końca przeciągania.
+- Naciśnij <kbd>Delete</kbd> lub <kbd>Backspace</kbd>, aby usunąć zaznaczenie.
+- Usunięty punkt zabiera ze sobą swoje segmenty.
+- Usunięty segment zabiera tylko punkty, które pozostawia niepołączone, więc usunięcie środkowego segmentu ścieżki dzieli ją na dwie.
+- Usunięcie wszystkiego usuwa warstwę.
 
 ## Cięcie, łączenie i zmiana kształtu
 
-- <kbd>X</kbd> włącza narzędzie Nożyczki. Kliknij segment, aby go w tym miejscu przeciąć, albo punkt, aby rozdzielić spotykające się w nim segmenty. <kbd>X</kbd>, <kbd>Escape</kbd> lub klawisz innego narzędzia je wyłącza.
-- Dwukrotne kliknięcie punktu przełącza go między punktem gładkim a narożnym.
-- <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + dwukrotne kliknięcie segmentu usuwa jego uchwyty i prostuje go.
-- <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + <kbd>J</kbd> łączy dwa zaznaczone punkty końcowe: punkty w tym samym miejscu stają się jednym punktem, a odległe łączy prosty segment. Połączenie obu końców ścieżki zamyka ją i wypełnia. Podczas edycji ścieżki ten skrót nie otwiera czatu.
-- <kbd>Option</kbd>/<kbd>Alt</kbd> + przeciągnięcie przeciąga kopię zaznaczonych punktów lub segmentów. Kopia pojedynczego punktu pozostaje z nim połączona.
-- Klawisze strzałek przesuwają zaznaczone punkty o odległość z Ustawienia → Edytor, a z <kbd>Shift</kbd> o dużą odległość.
-- <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + przeciągnięcie segmentu wygina go tak, że chwycone miejsce podąża za wskaźnikiem. Gładki punkt końcowy pozostaje gładki, a jego drugi uchwyt obraca się razem z nim. Z <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + <kbd>Option</kbd>/<kbd>Alt</kbd> uchwyty sąsiednich segmentów zostają na miejscu, a punkty końcowe stają się narożnikami.
-- Gdy zaznaczone są dwa punkty lub segmenty, otacza je ramka transformacji. Przeciągnij róg lub krawędź, aby skalować punkty od przeciwnej strony; z <kbd>Shift</kbd> proporcje zostają zachowane, a z <kbd>Option</kbd>/<kbd>Alt</kbd> skalowanie odbywa się od środka. Przeciągnij tuż za rogiem, aby obrócić je wokół środka ramki, z <kbd>Shift</kbd> co 15°. Każdą transformację cofa się jednym krokiem.
+| Działanie | macOS | Windows / Linux |
+| --------- | ----- | --------------- |
+| Narzędzie cięcia | <kbd>X</kbd> | <kbd>X</kbd> |
+| Punkt gładki lub narożny | Dwukrotne kliknięcie punktu | Dwukrotne kliknięcie punktu |
+| Wyprostowanie segmentu | <kbd>Cmd</kbd> + dwukrotne kliknięcie | <kbd>Ctrl</kbd> + dwukrotne kliknięcie |
+| Wygięcie segmentu | <kbd>Cmd</kbd> + przeciągnięcie segmentu | <kbd>Ctrl</kbd> + przeciągnięcie segmentu |
+| Wygięcie z zachowaniem sąsiadów | <kbd>Cmd</kbd> + <kbd>Option</kbd> + przeciągnięcie | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + przeciągnięcie |
+| Połączenie dwóch punktów końcowych | <kbd>Cmd</kbd> + <kbd>J</kbd> | <kbd>Ctrl</kbd> + <kbd>J</kbd> |
+| Duplikowanie punktów | <kbd>Option</kbd> + przeciągnięcie | <kbd>Alt</kbd> + przeciągnięcie |
+| Przesuwanie punktów | Klawisze strzałek | Klawisze strzałek |
+
+- **Narzędzie cięcia:** naciśnij <kbd>X</kbd>, a potem kliknij segment, aby go w tym miejscu przeciąć, albo punkt, aby rozdzielić spotykające się w nim segmenty. Krzywe zachowują kształt, a przecięty kształt zamknięty przestaje być wypełniony. <kbd>X</kbd>, <kbd>Escape</kbd> lub klawisz innego narzędzia odkłada narzędzie.
+- **Punkt gładki lub narożny:** dwukrotne kliknięcie punktu narożnego daje mu uchwyty wzdłuż linii między sąsiadami, a dwukrotne kliknięcie punktu gładkiego usuwa jego uchwyty.
+- **Wyprostowanie:** <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + dwukrotne kliknięcie zakrzywionego segmentu usuwa oba jego uchwyty.
+- **Łączenie:** zaznacz dwa punkty końcowe i naciśnij <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + <kbd>J</kbd>. Punkty w tym samym miejscu stają się jednym punktem; odległe łączy prosty segment. Połączenie obu końców jednej ścieżki zamyka ją i wypełnia. Podczas edycji ścieżki ten skrót łączy punkty zamiast otwierać czat.
+- **Duplikowanie:** przytrzymaj <kbd>Option</kbd>/<kbd>Alt</kbd> i przeciągnij zaznaczone punkty lub segmenty, aby przeciągnąć kopię. Kopia pojedynczego punktu pozostaje z nim połączona, więc przeciąganie wydłuża ścieżkę.
+- **Przesuwanie strzałkami:** klawisze strzałek przesuwają zaznaczone punkty o odległość ustawioną w Ustawienia → Edytor, a <kbd>Shift</kbd> + strzałka o duże przesunięcie.
+- **Wyginanie:** <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + przeciągnięcie segmentu wygina go tak, że chwycone miejsce podąża za wskaźnikiem. Gładki punkt końcowy pozostaje gładki, a jego drugi uchwyt obraca się razem z nim. Dodaj <kbd>Option</kbd>/<kbd>Alt</kbd>, aby uchwyty sąsiednich segmentów zostały na miejscu; punkty końcowe stają się wtedy narożnikami.
+
+## Transformacja zaznaczonych punktów {#transform-selected-points}
+
+Gdy zaznaczone są dwa punkty lub segmenty, otacza je ramka transformacji.
+
+- Przeciągnij róg lub krawędź, aby skalować zaznaczone punkty od przeciwnej strony. Przytrzymaj <kbd>Shift</kbd>, aby zachować proporcje, i <kbd>Option</kbd>/<kbd>Alt</kbd>, aby skalować od środka.
+- Przeciągnij tuż za rogiem, aby obrócić je wokół środka ramki. Przytrzymaj <kbd>Shift</kbd>, aby obracać co 15°.
+- Punkty i segmenty pod wskaźnikiem można nadal przeciągać ponad ramką, a każdą transformację cofa się jednym krokiem.
+
+## Modyfikatory przeciągania uchwytów
+
+| Działanie | macOS | Windows / Linux |
+|-----------|-------|-----------------|
+| Ciągły (gładki / ciągły) | <kbd>Cmd</kbd> + przeciągnięcie | <kbd>Ctrl</kbd> + przeciągnięcie |
+| Narożny (niezależne uchwyty) | <kbd>Option</kbd> + przeciągnięcie | <kbd>Alt</kbd> + przeciągnięcie |
+| Zablokowany kierunek (tylko długość) | <kbd>Shift</kbd> + przeciągnięcie | <kbd>Shift</kbd> + przeciągnięcie |
+
+### Tryb ciągły: <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> + przeciągnięcie
+
+- Aktywny uchwyt pozostaje na jednej linii z uchwytem bliźniaczym.
+- Zmienia się tylko długość aktywnego uchwytu.
+- Służy do płynnych przejść bez załamania w narożniku.
+
+### Tryb narożny: <kbd>Option</kbd>/<kbd>Alt</kbd> + przeciągnięcie
+
+- Aktywny uchwyt jest edytowany niezależnie.
+- Uchwyt bliźniaczy pozostaje na miejscu.
+- Służy do tworzenia ostrego przejścia w narożniku.
+
+### Zablokowany kierunek: <kbd>Shift</kbd> + przeciągnięcie
+
+Dla punktów o układzie **Continuous** lub **Symmetric**:
+
+- kierunek uchwytu jest zablokowany na wartości sprzed **rozpoczęcia bieżącego przeciągania**;
+- przeciąganie zmienia tylko długość uchwytu (lub uchwytów, zależnie od układu).
+
+## Zmiana wygięcia przez przeciągnięcie punktu
+
+Gdy przeciągasz punkt z wciśniętym <kbd>Cmd</kbd>/<kbd>Ctrl</kbd>, edytor wybiera docelowy uchwyt na podstawie **kierunku dołączenia segmentu** w tym punkcie (a nie odległości od najbliższego sąsiedniego punktu).
+Działa to również dla rozgałęzionych punktów w sieci wektorowej: po wybraniu docelowy uchwyt pozostaje zablokowany do końca bieżącego przeciągania.
 
 ## Pióro w trybie edycji
 
-- Kliknij segment, aby dodać punkt i podzielić segment.
-- Kliknij punkt końcowy otwartej ścieżki, aby wznowić rysowanie.
-- Kliknij punkt z wciśniętym <kbd>Option</kbd> albo <kbd>Alt</kbd>, aby go usunąć, jeśli pozwala na to topologia.
+Gdy aktywne jest narzędzie Pióro:
+
+- **Kliknij segment**, aby wstawić nowy punkt (podzielić segment).
+- **Kliknij punkt końcowy otwartej ścieżki**, aby wznowić rysowanie od tego punktu.
+- **Option/Alt + kliknięcie punktu** usuwa go (jeśli pozwala na to topologia).
 
 Tworzenie i zamykanie ścieżek opisano na stronie [Narzędzie Pióro](./pen-tool.md).
+
+## Praktyczny przebieg pracy
+
+1. Narysuj kształt narzędziem Pióro.
+2. Kliknij dwukrotnie krzywą, aby włączyć tryb edycji wektorów.
+3. Przesuwaj punkty, aby dopracować sylwetkę.
+4. Przeciągaj uchwyty:
+   - z <kbd>Cmd</kbd>/<kbd>Ctrl</kbd> dla płynnych, ciągłych przejść,
+   - z <kbd>Option</kbd>/<kbd>Alt</kbd> dla niezależnej edycji,
+   - z <kbd>Shift</kbd> dla zmiany samej długości.
+5. Naciśnij <kbd>Escape</kbd>, aby wyjść.

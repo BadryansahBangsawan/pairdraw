@@ -1,17 +1,44 @@
 ---
 title: useTextEdit
-description: Obsługa wejścia tekstowego DOM, IME, formatowania i synchronizacji obiektów tekstowych.
+description: Obsługa edycji tekstu w DOM, kompozycji IME, formatowania i synchronizacji obiektów tekstowych na obszarze roboczym.
 ---
 
 # useTextEdit
 
-`useTextEdit()` łączy wejście DOM z edycją tekstu na obszarze roboczym. Zarządza `textarea`, IME, kursorem, Delete/Backspace, poleceniami pogrubienia, kursywy i podkreślenia oraz zapisem zmian w SceneGraph.
+`useTextEdit()` łączy wejście tekstowe DOM z modelem edycji tekstu na obszarze roboczym edytora.
+
+Koordynuje:
+
+- wprowadzanie tekstu przez ukryte pole `textarea`;
+- kompozycję IME;
+- miganie kursora tekstowego;
+- działanie klawiszy Delete i Backspace;
+- polecenia formatowania, takie jak pogrubienie, kursywa i podkreślenie;
+- zapisywanie zmian tekstu z powrotem w grafie.
+
+## Użycie
 
 ```ts
 useTextEdit(canvasRef, editor)
 ```
 
-Użyj go w komponencie zawierającym obszar roboczy, zwykle razem z `useCanvas()` i `useCanvasInput()`.
+## Podstawowy przykład
+
+Użyj go w komponencie, do którego należy obszar roboczy, razem z `useCanvas()` i `useCanvasInput()`.
+
+## Praktyczne przykłady
+
+### Skróty formatowania
+
+`useTextEdit()` sam obsługuje skróty klawiszowe formatowania, takie jak pogrubienie, kursywa i podkreślenie, gdy trwa edycja tekstu.
+
+### Synchronizacja obszaru roboczego z edytorem tekstu
+
+Podczas pisania lub edycji sformatowanych zakresów aktualizuje tekst w grafie i przebiegi stylów.
+
+## Uwagi
+
+To composable integrujący obszar roboczy z edytorem, a nie ogólny composable pola tekstowego.
 
 ## Zobacz też
 

@@ -1,14 +1,13 @@
 ---
 title: LayerTreeItem
-description: Pojedynczy element drzewa warstw.
+description: Wiersz bez narzuconego wyglądu dla pojedynczego obiektu drzewa warstw.
 ---
 
 # LayerTreeItem
 
-`LayerTreeItem` reprezentuje jeden row drzewa warstw. Domyślny slot otrzymuje state i actions związane z selection, rozwijaniem children, visibility, lock i zmianą nazwy.
+`LayerTreeItem` renderuje jeden wiersz drzewa warstw i przez slot domyślny udostępnia funkcje obsługi zaznaczenia, rozwijania, widoczności, blokady i zmiany nazwy.
 
-Użyj komponentu, aby zachować logikę SDK i samodzielnie zbudować markup wiersza.
-
+Użyj go, gdy kod HTML wiersza ma należeć do aplikacji, a zachowanie drzewa warstw ma zapewniać SDK.
 
 ## Zobacz też
 

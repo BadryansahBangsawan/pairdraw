@@ -15,7 +15,9 @@ Typowa aplikacja Pairdraw oparta na Vue składa się z trzech warstw:
 
 Gotowa aplikacja Pairdraw jest tylko jednym z możliwych interfejsów.
 
-Na podstawie SDK można utworzyć edytor osadzony w innym produkcie, wewnętrzne narzędzie do pracy z zasobami, edytor szablonów, interfejs do adnotacji albo wyspecjalizowany edytor z obsługą AI.
+Na podstawie SDK można utworzyć edytor osadzony w innym produkcie, wewnętrzne narzędzie do pracy z zasobami, edytor szablonów, interfejs do adnotacji albo wspomagany przez AI interfejs edycji z własnymi kontrolkami.
+
+To główny powód, dla którego istnieje SDK.
 
 ## Zalecana struktura
 
@@ -31,26 +33,35 @@ Wygodny interfejs zwykle:
 
 ```vue
 <script setup lang="ts">
-import { createEditor } from '@pairdraw/core'
+import { reactive } from 'vue'
+import { createDefaultEditorState, createEditor } from '@pairdraw/core'
+import { SceneGraph } from '@pairdraw/scene-graph'
 import { provideEditor } from '@pairdraw/vue'
 import { CanvasRoot, CanvasSurface } from '@pairdraw/vue/canvas'
 import { ToolbarRoot } from '@pairdraw/vue/primitives/Toolbar'
 import { PageListRoot } from '@pairdraw/vue/primitives/PageList'
-import { LayerTreeRoot } from '@pairdraw/vue/primitives/LayerTree'
 
-const editor = createEditor({ width: 1440, height: 900 })
+const graph = new SceneGraph()
+const page = graph.getPages()[0]
+if (!page) throw new Error('Expected an initial page')
+
+const editor = createEditor({
+  graph,
+  state: reactive(createDefaultEditorState(page.id)),
+  getViewportSize: () => ({ width: 1440, height: 900 }),
+})
 provideEditor(editor)
 </script>
 
 <template>
   <div class="grid h-screen grid-cols-[240px_1fr_320px] grid-rows-[48px_1fr]">
-    <ToolbarRoot v-slot="{ tools, activeTool, setTool }">
+    <ToolbarRoot v-slot="{ tools, activeTool, actions }">
       <header class="col-span-3 flex items-center gap-2 border-b px-3">
         <button
           v-for="tool in tools"
-          :key="tool.id"
-          :data-active="activeTool === tool.id"
-          @click="setTool(tool.id)"
+          :key="tool.key"
+          :data-active="activeTool === tool.key"
+          @click="actions.setTool(tool.key)"
         >
           {{ tool.label }}
         </button>
@@ -58,13 +69,13 @@ provideEditor(editor)
     </ToolbarRoot>
 
     <aside class="border-r">
-      <PageListRoot v-slot="{ pages, currentPageId, switchPage }">
+      <PageListRoot v-slot="{ pages, currentPageId, actions }">
         <nav>
           <button
             v-for="page in pages"
             :key="page.id"
             :data-active="page.id === currentPageId"
-            @click="switchPage(page.id)"
+            @click="actions.switch(page.id)"
           >
             {{ page.name }}
           </button>
@@ -79,13 +90,15 @@ provideEditor(editor)
     </main>
 
     <aside class="border-l">
-      Panel właściwości
+      Properties panel here
     </aside>
   </div>
 </template>
 ```
 
-## Odpowiedzialność SDK i aplikacji
+Stałe wymiary widoku w przykładzie skracają kod. W interfejsie o zmiennym rozmiarze `getViewportSize` powinno zwracać rzeczywisty rozmiar kontenera obszaru roboczego, bez otaczających paneli bocznych i paska narzędzi. Wymagania instalacyjne i uwagi o migracji opisuje strona [Pierwsze kroki z SDK](../getting-started).
+
+## Dlaczego ten podział działa
 
 - SDK odpowiada za integrację z edytorem i logikę niezależną od wyglądu, przeznaczoną do ponownego użycia.
 - Aplikacja odpowiada za układ, wygląd i operacje właściwe dla konkretnego produktu.

@@ -7,7 +7,20 @@ description: Podłączenie wskaźnika, przeciągania, zaznaczenia, zmiany rozmia
 
 `useCanvasInput()` łączy zdarzenia wskaźnika i myszy z obszarem roboczym edytora.
 
-Obsługuje zaznaczenie, przeciąganie, zmianę rozmiaru, obrót, przesuwanie widoku, rysowanie Piórem, edycję tekstu i wykrywanie obiektów z uwzględnieniem widoku.
+Obsługuje między innymi:
+
+- zaznaczanie;
+- przeciąganie;
+- zmianę rozmiaru;
+- obrót;
+- przesuwanie widoku;
+- rysowanie Piórem i inne tryby rysowania;
+- interakcję przy edycji tekstu;
+- wykrywanie obiektów z uwzględnieniem bieżącego zakresu.
+
+## Użycie
+
+Ten composable zwykle współpracuje z `useCanvas()` i funkcjami wykrywania trafień z renderera.
 
 ```ts
 useCanvasInput(
@@ -18,6 +31,41 @@ useCanvasInput(
   hitTestFrameTitle,
 )
 ```
+
+## Podstawowy przykład
+
+```ts
+const canvas = useCanvas(canvasRef, editor)
+
+useCanvasInput(
+  canvasRef,
+  editor,
+  canvas.hitTestSectionTitle,
+  canvas.hitTestComponentLabel,
+  canvas.hitTestFrameTitle,
+)
+```
+
+## Praktyczne przykłady
+
+### Śledzenie kursora we współrzędnych obszaru roboczego
+
+```ts
+useCanvasInput(
+  canvasRef,
+  editor,
+  hitTestSectionTitle,
+  hitTestComponentLabel,
+  hitTestFrameTitle,
+  (cx, cy) => {
+    console.log(cx, cy)
+  },
+)
+```
+
+## Uwagi
+
+Ten composable działa na niższym poziomie niż większość logiki paneli. Najlepiej sprawdza się w powłokach edytora i kontenerach obszaru roboczego.
 
 ## Zobacz też
 

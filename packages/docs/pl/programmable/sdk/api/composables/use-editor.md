@@ -19,7 +19,7 @@ import { useEditor } from '@pairdraw/vue'
 const editor = useEditor()
 ```
 
-## Przykład
+## Podstawowy przykład
 
 ```vue
 <script setup lang="ts">
@@ -36,14 +36,16 @@ const pageId = computed(() => editor.state.currentPageId)
 </template>
 ```
 
-## Zaznaczone obiekty
+## Praktyczne przykłady
+
+### Odczyt zaznaczonych obiektów
 
 ```ts
 const editor = useEditor()
 const selected = editor.getSelectedNodes()
 ```
 
-## Polecenia
+### Wywoływanie poleceń
 
 ```ts
 const editor = useEditor()
@@ -51,9 +53,11 @@ editor.zoomToFit()
 editor.undoAction()
 ```
 
-## Brak kontekstu
+## Zachowanie przy błędzie
 
-Jeśli `useEditor()` zostanie wywołane poza drzewem, w którym wykonano `provideEditor()`, function zgłosi czytelny błąd. Pozwala to natychmiast wykryć brak context edytora.
+Jeśli `useEditor()` zostanie wywołane poza drzewem, w którym wykonano `provideEditor()`, funkcja zgłosi błąd z czytelnym komunikatem.
+
+To celowe: przy braku kontekstu edytora to API ma kończyć się wyraźnym błędem.
 
 ## Zobacz też
 

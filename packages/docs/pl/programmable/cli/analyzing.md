@@ -5,7 +5,7 @@ description: Sprawdzanie kolorów, typografii, odstępów i powtarzających się
 
 # Analiza projektu
 
-Polecenia `analyze` sprawdzają dokument z terminala: znajdują niespójne wartości, wyodrębniają rzeczywistą paletę i wykrywają powtarzające się struktury, które można przekształcić w komponenty.
+Polecenia `analyze` sprawdzają cały system projektowy z terminala: znajdują niespójności, wyodrębniają rzeczywistą paletę i wykrywają struktury, które czekają na przekształcenie w komponenty.
 
 ## Kolory
 
@@ -13,7 +13,14 @@ Polecenia `analyze` sprawdzają dokument z terminala: znajdują niespójne warto
 pairdraw analyze colors design.fig
 ```
 
-Polecenie znajduje wszystkie kolory, liczy ich użycia i buduje histogram.
+Polecenie znajduje wszystkie kolory w pliku, liczy ich użycia i pokazuje histogram:
+
+```
+#1d1b20  ██████████████████████████████ 17155×
+#49454f  ██████████████████████████████ 9814×
+#ffffff  ██████████████████████████████ 8620×
+#6750a4  ██████████████████████████████ 3967×
+```
 
 ## Typografia
 
@@ -21,7 +28,7 @@ Polecenie znajduje wszystkie kolory, liczy ich użycia i buduje histogram.
 pairdraw analyze typography design.fig
 ```
 
-Wynik zawiera kombinacje rodziny, rozmiaru i odmiany czcionki oraz liczbę użyć każdej z nich. Pozwala to znaleźć przypadkowe style tekstu, które warto ujednolicić.
+Wynik zawiera wszystkie kombinacje rodziny, rozmiaru i grubości czcionki wraz z liczbą użyć. Pozwala to znaleźć jednorazowe style tekstu, które warto ujednolicić.
 
 ## Odstępy
 
@@ -29,7 +36,7 @@ Wynik zawiera kombinacje rodziny, rozmiaru i odmiany czcionki oraz liczbę uży�
 pairdraw analyze spacing design.fig
 ```
 
-Polecenie sprawdza odstępy i wypełnienie w ramkach z automatycznym układem. Pomaga na przykład zauważyć przypadkowy odstęp `13px` pośród wartości skali `8/16/24`.
+Polecenie sprawdza wartości odstępów i dopełnienia w ramkach z automatycznym układem. Pomaga wykryć niespójności skali odstępów — na przykład przypadkowy odstęp `13px` pośród wartości `8/16/24`.
 
 ## Powtarzające się struktury
 
@@ -37,8 +44,22 @@ Polecenie sprawdza odstępy i wypełnienie w ramkach z automatycznym układem. P
 pairdraw analyze clusters design.fig
 ```
 
-Polecenie znajduje powtarzające się struktury obiektów, które mogą stać się komponentami.
+Polecenie znajduje powtarzające się układy obiektów, które można przekształcić w komponenty:
+
+```
+3771× frame "container" (100% match)
+     size: 40×40, structure: Frame > [Frame]
+
+2982× instance "Checkboxes" (100% match)
+     size: 48×48, structure: Instance > [Frame]
+```
 
 ## Wyjście JSON
 
-Wszystkie polecenia `analyze` obsługują `--json`. Wynik można przekazać do `jq`, użyć w CI albo w skryptach kontrolujących tokeny projektu.
+Wszystkie polecenia `analyze` obsługują `--json`, które zwraca wynik do przetwarzania maszynowego:
+
+```sh
+pairdraw analyze colors design.fig --json
+```
+
+Przekaż wynik do `jq`, użyj go w testach CI albo w skryptach pilnujących budżetu tokenów projektu.

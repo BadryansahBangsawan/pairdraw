@@ -1,24 +1,32 @@
 ---
 layout: doc
 title: AI i automatyzacja
-description: Czat AI, CLI, JSX, serwer MCP i inne narzędzia automatyzacji oparte na silniku Pairdraw.
+description: Czat AI, CLI, renderer JSX, serwer MCP i inne narzędzia automatyzacji oparte na silniku edytora Pairdraw.
 ---
 
 # AI i automatyzacja
 
-Pairdraw pozwala traktować pliki projektowe jak dane. Wszystkie operacje edytora — tworzenie figur, ustawianie zalewów, zarządzanie automatycznym układem i eksport zasobów — są dostępne także z terminala, dla agentów AI i z kodu.
+Pairdraw pozwala traktować pliki projektowe jak dane. Wszystkie operacje edytora — tworzenie kształtów, ustawianie wypełnień, zarządzanie automatycznym układem i eksport zasobów — są dostępne także z terminala, dla agentów AI i z kodu. Bez instalowania wtyczek, bez kluczy API, bez listy oczekujących.
 
 Interfejs edytora i narzędzia automatyzacji korzystają z tego samego silnika. Każde działanie dostępne w interfejsie można również wykonać ze skryptu.
 
+## Szersza idea
+
+Pairdraw nie ma być wyłącznie aplikacją do projektowania.
+
+Ma być także zestawem narzędzi: czymś, co można osadzić w innych produktach, opakować własnym interfejsem i wykorzystać do budowy procesów edycji dopasowanych do własnej dziedziny.
+
+Dlatego narzędzia automatyzacji są tak ważne. Aplikacja, CLI, narzędzia AI, renderer JSX, serwer MCP i SDK opierają się na tym samym silniku edytora.
+
 ## Czat AI
 
-Wbudowany asystent używa ponad 130 narzędzi. Opisz zadanie zwykłym językiem, na przykład: „dodaj wszystkim przyciskom cień 16 px”, „utwórz komponent karty z wariantem ciemnym” albo „wyeksportuj wszystkie ramki na tej stronie w skali 2×”.
+Wbudowany asystent ma dostęp do ponad 130 narzędzi obejmujących pełne możliwości edytora. Opisz zadanie zwykłym językiem, na przykład: „dodaj wszystkim przyciskom cień 16 px”, „utwórz komponent karty z wariantem ciemnym” albo „wyeksportuj wszystkie ramki na tej stronie w skali 2×”.
 
 [Czat AI →](./ai-chat)
 
 ## Współpraca
 
-Agenci AI pokazują swoje kursory na obszarze roboczym, a widok podąża za nimi podczas ich pracy. Wspólnie edytuje się dokumenty w chmurze przez serwer chmury Twojego zespołu, gdzie Yjs CRDT łączy równoczesne zmiany. Pokoje na żywo dla dokumentów lokalnych nie są częścią Pairdraw.
+Agenci AI pokazują swoje kursory na obszarze roboczym, a widok podąża za nimi podczas ich pracy. Dokumenty w chmurze na samodzielnie hostowanym serwerze Pairdraw Cloud edytuje na żywo każdy, kto je otworzy, z kursorami, trybem śledzenia i synchronizacją CRDT. Pokoje peer-to-peer są w kompilacjach Pairdraw wyłączone.
 
 [Współpraca →](./collaboration)
 
@@ -28,25 +36,25 @@ Twórz edytory oparte na Pairdraw za pomocą tego samego Vue SDK, którego używ
 
 [Vue SDK →](./sdk/)
 
-## JSX
+## Renderer JSX
 
-Opisuj interfejs za pomocą JSX. Jedno wywołanie może utworzyć drzewo komponentów zawierające ramki, tekst, automatyczny układ, zalewy i obwiednie.
+Opisuj interfejs za pomocą JSX — tej samej składni, którą modele językowe znają z Reacta. Jedno wywołanie może utworzyć całe drzewo komponentów z ramkami, tekstem, automatycznym układem, wypełnieniami i obwiedniami. Zapis jest zwięzły, deklaratywny i łatwy do porównywania.
 
-W drugą stronę Pairdraw eksportuje zaznaczenie jako JSX albo HTML z klasami Tailwind. Wynik może służyć jako podstawa implementacji, przeglądu kodu lub kolejnego kroku z AI.
+W drugą stronę dowolne zaznaczenie można wyeksportować z powrotem do JSX z klasami Tailwind — to przydatne przy przekazywaniu projektu do implementacji albo przy przekazywaniu projektów z powrotem modelowi językowemu.
 
-[JSX →](./jsx-renderer)
+[Renderer JSX →](./jsx-renderer)
 
 ## CLI
 
-Przeglądaj, eksportuj i analizuj dokumenty bez uruchamiania edytora. CLI pozwala wyświetlać strony, znajdować obiekty, wydobywać tokeny projektu, wykrywać problemy układu i eksportować PNG. Wszystkie polecenia obsługują wyjście JSON.
+Przeglądaj, sprawdzaj lintem, eksportuj i analizuj dokumenty bez uruchamiania edytora. Wyświetlaj strony, szukaj obiektów, wydobywaj tokeny projektu, wykrywaj problemy z układem lub dostępnością i renderuj do PNG — wszystko z terminala, z wyjściem JSON do przetwarzania maszynowego.
 
-CLI łączy się również przez RPC z uruchomioną aplikacją komputerową i steruje otwartym dokumentem: pozwala otwierać, zapisywać i przełączać dokumenty, cofać zmiany, zmieniać ustawienia oraz wywoływać dowolne narzędzie MCP.
+CLI łączy się również przez RPC z uruchomioną aplikacją na komputer, więc możesz oskryptować edytor w trakcie pracy z nim: otwierać, zapisywać i przełączać dokumenty, cofać zmiany, zmieniać ustawienia oraz wywoływać dowolne narzędzie MCP.
 
-[Przeglądanie plików](./cli/inspecting) · [Eksport](./cli/exporting) · [Analiza](./cli/analyzing) · [Skrypty](./cli/scripting) · [Controlling the App](/programmable/cli/app-control)
+[Przeglądanie plików](./cli/inspecting) · [Eksport](./cli/exporting) · [Analiza](./cli/analyzing) · [Skrypty](./cli/scripting) · [Sterowanie aplikacją](/programmable/cli/app-control)
 
 ## Serwer MCP
 
-Claude Code, Cursor, Windsurf i inni klienci MCP mogą korzystać z tych samych ponad 130 narzędzi co czat AI. Serwer obsługuje stdio i HTTP z sesjami.
+Podłącz do Pairdraw Claude Code, Cursor, Windsurf lub dowolnego klienta zgodnego z MCP. Serwer udostępnia ponad 130 narzędzi do odczytu, tworzenia i zmieniania projektów — tych samych, których używa wbudowany czat AI. Działa przez stdio lub HTTP z obsługą sesji.
 
 [Serwer MCP →](/programmable/mcp-server)
 
@@ -70,12 +78,14 @@ Wersja internetowa przyjmuje taki sam odnośnik z własnego paska adresu:
 http://localhost:1420/?file=https://raw.githubusercontent.com/BadryansahBangsawan/pairdraw/master/tests/fixtures/pencil_button.pen&node=Button/Large/Default
 ```
 
-Tutaj `file` to bezwzględny adres `https:` kończący się na `.pen` lub `.fig` — wersja internetowa nie ma systemu plików, więc ścieżka względna, adres `http:` lub inne rozszerzenie są odrzucane z ostrzeżeniem w konsoli i niczym więcej. Rozszerzenie jest odczytywane ze ścieżki adresu, więc zapytanie w adresie pliku niczego nie zmienia. Fragment jest odcinany przed pobraniem: nigdy nie trafia na serwer, więc `…/hikyo.pen#a` i `…/hikyo.pen#b` otwierają jedną kartę, nie dwie. `node` działa dokładnie jak wyżej: to samo zaznaczanie po dokładnej nazwie i przybliżenie, to samo powiadomienie, gdy żadna warstwa nie ma takiej nazwy. Obie wartości są kodowane jako URL, dosłowny `+` trzeba wysłać jako `%2B`, a powtórzony klucz przyjmuje ostatnią wartość, tak jak na komputerze. Odnośnik jest obsługiwany na każdej trasie, więc `/share/<room>?file=…` i `/demo?file=…` działają jak `/?file=…`.
+Tutaj `file` to bezwzględny adres `https:` kończący się na `.pen` lub `.fig` — wersja internetowa nie ma systemu plików, więc ścieżka względna, adres `http:` lub inne rozszerzenie są odrzucane z ostrzeżeniem w konsoli i niczym więcej. Rozszerzenie jest odczytywane ze ścieżki adresu, więc zapytanie w adresie pliku niczego nie zmienia. Fragment jest odcinany przed pobraniem: nigdy nie trafia na serwer, więc `…/hikyo.pen#a` i `…/hikyo.pen#b` otwierają jedną kartę, nie dwie. `node` działa dokładnie jak wyżej: to samo zaznaczanie po dokładnej nazwie i przybliżenie, to samo powiadomienie, gdy żadna warstwa nie ma takiej nazwy. Obie wartości są kodowane jako URL, dosłowny `+` trzeba wysłać jako `%2B`, a powtórzony klucz przyjmuje ostatnią wartość, tak jak na komputerze. Odnośnik jest obsługiwany na każdej trasie, więc `/demo?file=…` działa jak `/?file=…`.
 
 Przeglądarka pobiera plik między domenami, więc host musi to dopuszczać: `raw.githubusercontent.com` wysyła `Access-Control-Allow-Origin: *` i działa. Żądanie nie niesie danych uwierzytelniających i odmawia podążania za przekierowaniami, co chroni przed przekierowaniem odnośnika `https:` na niezaszyfrowany — adres `https://github.com/<owner>/<repo>/raw/...` przekierowuje na `raw.githubusercontent.com`, więc jest odrzucany; podaj bezpośrednio adres hosta raw. `file` i `node` są usuwane z paska adresu przez router zaraz po odczycie — przed pobraniem, a także gdy odnośnik został odrzucony — więc przeładowanie nie otwiera dokumentu ponownie, a skopiowany adres ani późniejsza nawigacja w aplikacji nie niosą danych odnośnika. Dokument z odnośnika jest ograniczony do 64 MiB: treść jest liczona w trakcie strumieniowania, nie na podstawie `Content-Length`, a żądanie jest przerywane w chwili przekroczenia limitu, po czym odnośnik zgłasza, że plik przekracza 64 MiB. Wdrożenie udostępniające aplikację z Content-Security-Policy musi dopuścić host odnośnika w `connect-src`, inaczej pobranie jest blokowane, a odnośnik zgłasza, że nie udało się otworzyć pliku.
 
 W macOS schemat należy do zainstalowanego pakietu aplikacji, więc odnośniki trafiają do zainstalowanej wersji, a nie do procesu `tauri dev`. W Windows i Linuksie odnośnik dociera przez wtyczkę deep-link, także gdy aplikacja jeszcze nie działa: jest kolejkowany przy starcie i obsługiwany, gdy edytor jest gotowy; w Linuksie dołączony wpis pulpitu przekazuje odnośnik przez `%U`.
 
-## Otwarta platforma
+## Dlaczego otwartość?
 
-Pairdraw jest udostępniany na licencji MIT, przechowuje dokumenty lokalnie i zapewnia programowy dostęp do operacji. Pliki `.fig` można sprawdzać, przekształcać, przetwarzać w CI i przekazywać modelowi językowemu bez zależności od konkretnego dostawcy hostingu.
+Figma jest platformą zamkniętą. Jej serwer MCP działa tylko do odczytu. Dostęp do przeglądarki przez CDP został zablokowany w wersji 126. Pliki projektowe są przechowywane w zastrzeżonym formacie na cudzych serwerach. Tworzenie wtyczek wymaga osobnego środowiska uruchomieniowego z ograniczonym API.
+
+Pairdraw jest alternatywą: otwarte źródła, licencja MIT, każda operacja dostępna ze skryptu, dane przechowywane lokalnie. Twoje pliki projektowe należą do Ciebie — sprawdzaj je, przekształcaj, przetwarzaj w CI i przekazuj modelowi językowemu. Bez pytania o pozwolenie.

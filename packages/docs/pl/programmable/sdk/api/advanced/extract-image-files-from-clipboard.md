@@ -1,13 +1,13 @@
 ---
 title: extractImageFilesFromClipboard
-description: Pobieranie obsługiwanych plików graficznych z ClipboardEvent.
+description: Funkcja schowka wyodrębniająca obsługiwane pliki graficzne.
 ---
 
 # extractImageFilesFromClipboard
 
-`extractImageFilesFromClipboard(event)` zwraca pliki graficzne znajdujące się w danych clipboard i odrzuca nieobsługiwane file types.
+`extractImageFilesFromClipboard(event)` zawęża pliki ze schowka do obsługiwanych typów obrazów, tych samych, które przyjmuje upuszczanie na obszar roboczy.
 
-Użyj function podczas implementowania Paste dla obrazów.
+Użyj tej funkcji przy implementacji wklejania obrazów ze schowka.
 
 ## Zobacz też
 

@@ -1,60 +1,35 @@
 ---
 title: Renderer JSX
-description: Deklaratywne tworzenie projektu w JSX i eksport z powrotem do JSX lub HTML z Tailwind.
+description: Tworzenie edytowalnych projektów za pomocą tej samej deklaratywnej biblioteki, której używają agenci Pairdraw.
 ---
 
 # Renderer JSX
 
-Pairdraw używa JSX jako deklaratywnego języka tworzenia projektu. Nadaje się on do agentów AI, skryptów i powtarzalnego budowania interfejsów.
+Projektowy JSX w Pairdraw tworzy obiekty sceny, a nie DOM przeglądarki. Do budowy edytowalnych projektów możesz używać czytelnych drzew komponentów, wyrażeń JavaScript i funkcji wielokrotnego użytku.
 
-JSX służy też jako czytelna reprezentacja istniejącego projektu. Zmiany wyglądają jak zwykła różnica w kodzie, którą można sprawdzić i zachować w systemie kontroli wersji.
+## Tworzenie projektów
 
-## Tworzenie projektu
+Narzędzie `render` przyjmuje ciągi JSX w czacie AI i MCP. W kodzie aplikacji lub bibliotece działającej bez interfejsu zaimportuj `Frame`, `Text` i pozostałe elementy do tworzenia projektu z `@pairdraw/design-jsx`, a potem twórz obiekty przez `renderTree` lub `renderJSX` z `@pairdraw/core/design-jsx`, które dodają ikony, konwersję SVG i układ. Aby zapisywać drzewa jako TSX, ustaw w `tsconfig.json` `"jsxImportSource": "@pairdraw/design-jsx"` wraz z `"jsx": "react-jsx"` albo dodaj do pliku komentarz `/** @jsxImportSource @pairdraw/design-jsx */`. Środowisko skryptowe określa, które API są dostępne w `eval`; eksporty pakietów nie są tam automatycznie zmiennymi globalnymi.
 
-Narzędzie `render`, dostępne w czacie AI, MCP i `eval` CLI, przyjmuje JSX:
-
-```jsx
-<Frame name="Card" w={320} h="hug" flex="col" gap={16} p={24} bg="#FFF" rounded={16}>
-  <Text size={18} weight="bold">Card Title</Text>
-  <Text size={14} color="#666">Description text</Text>
-</Frame>
-```
-
-W MCP i czacie AI przekaż narzędziu `render` ciąg JSX. W kodzie aplikacji lub bibliotece działającej bez interfejsu zaimportuj `Frame`, `Text` i pozostałe elementy do tworzenia projektu z `@pairdraw/design-jsx`, a potem twórz obiekty przez `renderTree` lub `renderJSX` z `@pairdraw/core/design-jsx`, które dodają ikony, konwersję SVG i układ. Aby zapisywać drzewa jako TSX, ustaw w `tsconfig.json` `"jsxImportSource": "@pairdraw/design-jsx"` wraz z `"jsx": "react-jsx"` albo dodaj do pliku komentarz `/** @jsxImportSource @pairdraw/design-jsx */`. Środowisko skryptowe określa, które API są dostępne w `eval`; eksporty pakietów nie są tam automatycznie zmiennymi globalnymi. Do konwersji w drugą stronę użyj polecenia `export`.
+[Wspólna dokumentacja tworzenia projektów](/reference/design-authoring) zawiera wykonywalne przykłady, wskazówki dotyczące układu i spis obsługiwanej składni. Jest generowana z tego samego źródła, z którego korzystają czat, ACP, prompty generowania kodu i instalowalna umiejętność agenta.
 
 ## Elementy
 
-| Element | Tworzy | Alias |
-|---------|--------|-------|
-| `<Frame>` | Ramkę z automatycznym układem | `<View>` |
-| `<Rectangle>` | Prostokąt | `<Rect>` |
-| `<Ellipse>` | Elipsę lub koło | |
-| `<Text>` | Obiekt tekstowy; elementy potomne stają się treścią | |
-| `<Line>` | Linię | |
-| `<Star>` | Gwiazdę | |
-| `<Polygon>` | Wielokąt | |
-| `<Vector>` | Ścieżkę wektorową | |
-| `<Group>` | Grupę | |
-| `<Section>` | Sekcję | |
+Do kompozycji używaj ramek i tekstu, do grafiki obiektów kształtów, a do treści wielokrotnego użytku w edytorze prawdziwych komponentów i instancji. Sama funkcja JavaScript nie nadaje tożsamości komponentu. Zobacz [spis elementów](/reference/design-authoring#supported-syntax-inventory).
 
 ## Właściwości stylu
 
-Nazwy właściwości pozostają zgodne z API JSX, natomiast ich znaczenie jest następujące:
-
-- `flex`, `gap`, `wrap`, `justify`, `items` i skróty `p*` sterują układem i odstępami;
-- `w`, `h`, `minW`, `maxW`, `x` i `y` sterują rozmiarem i położeniem;
-- `bg`, `stroke`, `rounded`, `opacity`, `shadow`, `blur` i `blendMode` sterują wyglądem;
-- `fontFamily`, `fontSize`, `fontWeight`, `color` i `textAlign` sterują typografią.
+Do rozmiarów zależnych od treści używaj Hug/Fill oraz układu flex lub grid. Zamiast kopiować wartości, wiąż zmienne semantyczne. Zobacz [kompozycja i układ](/reference/design-authoring#composition-and-layout), [farba i tekst](/reference/design-authoring#paint-text-and-artwork) oraz [zmienne i komponenty](/reference/design-authoring#variables-and-components).
 
 ## Eksport do JSX
 
 ```sh
-pairdraw export design.fig -f jsx                   # Format Pairdraw
-pairdraw export design.fig -f jsx --style tailwind  # Klasy Tailwind
+pairdraw export design.fig -f jsx                   # Pairdraw format
+pairdraw export design.fig -f jsx --style tailwind  # Tailwind classes
 ```
 
-Wyeksportowany projekt można zmienić jak kod i ponownie wyrenderować. Eksport zapisuje ukryte i zablokowane warstwy, ograniczenia, limity rozmiaru, wielowarstwowe, gradientowe i obrazowe zalewy, obwiednie, efekty, maski oraz powiązania ze zmiennymi, więc renderowanie eksportu je odtwarza, a `diff_jsx` pokazuje zmiany każdego z nich. Tekst sformatowany wieloma stylami, ścieżki wektorowe, siatki układu, style współdzielone i definicje właściwości komponentów nie są jeszcze zapisywane. Egzemplarze są zapisywane jako ramki z zawartością, dzięki czemu wyeksportowany JSX jest samodzielny.
+Wyeksportowany JSX Pairdraw można edytować i ponownie wyrenderować w dokumencie. Eksport zapisuje ukryte i zablokowane warstwy, ograniczenia, limity rozmiaru, wielowarstwowe, gradientowe i obrazowe wypełnienia, obwiednie, efekty, maski oraz powiązania ze zmiennymi, więc renderowanie eksportu je odtwarza, a `diff_jsx` pokazuje zmiany każdego z nich. Tekst sformatowany wieloma stylami, ścieżki wektorowe, siatki układu, style współdzielone i definicje właściwości komponentów nie są jeszcze zapisywane. Instancje są zapisywane jako ramki z zawartością, dzięki czemu wyeksportowany JSX jest samodzielny. Zobacz [eksport w CLI](./cli/exporting).
 
-## Porównanie zmian
+## Porównywanie wizualne
 
-Różnica JSX może być sprawdzana w przeglądzie zmian i przechowywana w systemie kontroli wersji.
+JSX pozwala przeglądać strukturalne zmiany projektu jak kod. Użyj `get_jsx` i `diff_jsx`, aby sprawdzić zmiany, a potem zweryfikuj faktycznie wyrenderowany wynik; czysta różnica strukturalna nie dowodzi równoważności wizualnej.

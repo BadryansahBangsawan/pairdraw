@@ -34,6 +34,8 @@ Różne produkty i zespoły potrzebują różnych interfejsów do edycji.
 
 Może to być pełny edytor graficzny, niewielki obszar roboczy osadzony w innej aplikacji, narzędzie wewnętrzne, edytor szablonów albo wyspecjalizowany interfejs wspomagany przez AI.
 
+SDK to warstwa, która umożliwia budowę takich interfejsów.
+
 ## Zasady projektowe
 
 - **Bez narzuconego wyglądu:** SDK zapewnia logikę i strukturę, ale nie określa wyglądu aplikacji.

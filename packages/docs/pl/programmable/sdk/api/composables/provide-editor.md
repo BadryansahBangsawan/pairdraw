@@ -17,7 +17,7 @@ import { provideEditor } from '@pairdraw/vue'
 provideEditor(editor)
 ```
 
-## Przykład
+## Podstawowy przykład
 
 ```vue
 <script setup lang="ts">
@@ -39,7 +39,7 @@ provideEditor(props.editor)
 
 ## Uwagi
 
-Aktualne SDK używa bezpośrednio `provideEditor()` i `useEditor()`. Niektóre starsze przykłady i komunikaty błędów wspominają komponent `PairdrawProvider`, ale nie należy on do obecnego publicznego API.
+Aktualne SDK używa bezpośrednio `provideEditor()` i `useEditor()`. Niektóre starsze przykłady i komunikaty błędów wspominają komponent `PairdrawProvider`, ale w dokumentacji i kodzie aplikacji należy korzystać z modelu wstrzykiwania, który stanowi rzeczywiste API.
 
 ## Zobacz też
 

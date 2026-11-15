@@ -1,13 +1,20 @@
 ---
 title: useI18n
-description: Lokalizowane etykiety Pairdraw i zmiana aktywnego locale SDK.
+description: Odczyt zlokalizowanych komunikatów interfejsu Pairdraw i zmiana aktywnego języka SDK.
 ---
 
 # useI18n
 
-`useI18n()` zwraca reaktywne translations i functions zmiany locale dla własnego interfejsu edytora.
+`useI18n()` to zbiorczy composable zachowany dla zgodności, który zwraca reaktywne grupy tłumaczeń i funkcje sterowania językiem. Nowe komponenty powinny importować tylko te composables dziedzinowe, których potrzebują, zamiast subskrybować wszystkie katalogi.
 
-Użyj go, aby pobierać etykiety menu, commands, panels, pages i dialogs dostarczane przez SDK albo umożliwić użytkownikowi wybór języka.
+```ts twoslash
+import { useSettingsMessages, useRenameMessages } from '@pairdraw/vue/i18n'
+
+const settings = useSettingsMessages()
+const rename = useRenameMessages()
+```
+
+Każdy composable dziedzinowy zwraca reaktywny ref. W skrypcie odczytuj `.value`; w szablonach Vue rozpakowuje go sam. Zmianę języka bez zbiorczego composable opisuje strona [Locale API](../advanced/locale-apis).
 
 ## Użycie
 
@@ -19,18 +26,13 @@ const { menu, commands, panels, locale, availableLocales, localeLabels, setLocal
 
 ## Zwracane wartości
 
-- `menu`
-- `commands`
-- `tools`
-- `panels`
-- `pages`
-- `dialogs`
-- `locale`
-- `availableLocales`
-- `localeLabels`
-- `setLocale`
+Refy tłumaczeń: `ai`, `automation`, `code`, `collaboration`, `commands`, `common`, `credentials`, `diagnostics`, `editor`, `files`, `fonts`, `media`, `menu`, `pages`, `panels`, `recovery`, `rendering`, `rename`, `settings`, `storage`, `tools`, `updates`, `variables` i `variableTypes`.
 
-## Przykład
+Sterowanie językiem: `locale`, `availableLocales`, `localeLabels` i `setLocale`.
+
+Dawna grupa `dialogs`, `useDialogMessages()` i `dialogMessages` zostały usunięte w wersji rozwojowej po v0.14.0. Korzystaj z grupy właściwej dziedziny, na przykład `settings`, `rename` lub `recovery`, i zaktualizuj odpowiednie klucze komunikatów.
+
+## Podstawowy przykład
 
 ```vue
 <script setup lang="ts">
@@ -53,10 +55,10 @@ const { menu, locale, availableLocales, localeLabels, setLocale } = useI18n()
 
 ## Uwagi
 
-- Zmiana locale reaktywnie aktualizuje wszystkie groups translations SDK.
-- SDK eksportuje również low-level locale API do bezpośredniej pracy ze store.
+- Zmiana języka reaktywnie aktualizuje wszystkie grupy komunikatów SDK.
+- SDK eksportuje też niskopoziomowe funkcje języka, gdy potrzebny jest bezpośredni dostęp do magazynu stanu.
 
 ## Zobacz też
 
 - [useMenuModel](./use-menu-model)
-- [Locale API](../advanced/locale-apis)
+- [Locale API SDK](../advanced/locale-apis)

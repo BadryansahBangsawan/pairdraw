@@ -1,34 +1,36 @@
 ---
 title: Eksport i pliki
-description: Eksport obrazów, SVG i wybranych obiektów do .fig oraz otwieranie dokumentów .fig i .pen.
+description: Eksport obrazów, SVG i wybranych obiektów do .fig oraz otwieranie dokumentów .fig i .pen w Pairdraw.
 ---
 
 # Eksport i pliki
 
-Pairdraw eksportuje pojedyncze obiekty jako obrazy, SVG albo osobne dokumenty `.fig`. Edytor otwiera pełne dokumenty `.fig` i `.pen`.
+Pairdraw eksportuje pojedyncze obiekty jako obrazy albo osobne dokumenty `.fig` i otwiera pełne dokumenty `.fig` i `.pen`.
 
 ## Eksport obrazów
 
-Zaznacz obiekt i otwórz sekcję „Eksport” na panelu właściwości.
+Zaznacz obiekt i użyj sekcji Eksport w panelu właściwości.
 
-### Ustawienia
+### Ustawienia eksportu
 
-- **Skala:** od 0,5× do 4×. Dla SVG nie jest wyświetlana, ponieważ grafika wektorowa nie zależy od rozdzielczości.
-- **Format:** PNG z przezroczystym tłem, JPG z białym tłem, WEBP z przezroczystym tłem, SVG, PDF albo HTML.
+- **Skala:** 0,5×, 0,75×, 1×, 1,5×, 2×, 3× lub 4× (ukryta dla SVG — grafika wektorowa nie zależy od rozdzielczości).
+- **Format:** PNG (przezroczyste tło), JPG (białe tło), WEBP (przezroczyste tło), SVG (wektor), PDF albo HTML.
 
-Dla jednego obiektu można dodać kilka wariantów eksportu. Podgląd na tle szachownicy pokazuje przyszły wynik.
+**Plik → Eksportuj zaznaczenie…** eksportuje zaznaczenie jako PNG, SVG lub `.fig`, a <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> od razu eksportuje je jako PNG.
 
 Aplikacja nie oferuje eksportu do PowerPoint (`.pptx`) ani draw.io. [CLI](/reference/cli#export) nadal eksportuje oba formaty: `pairdraw export design.fig -f pptx` albo `-f drawio`.
+
+Można dodać kilka ustawień eksportu, aby jednym ruchem wyeksportować ten sam obiekt w różnych skalach lub formatach. Podgląd na żywo na tle szachownicy pokazuje, co zostanie wyeksportowane.
 
 ### Sposoby eksportu
 
 | Sposób | macOS | Windows / Linux |
 |--------|-------|-----------------|
-| Skrót (PNG) | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
+| Skrót klawiaturowy (PNG) | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
 | Menu kontekstowe | Prawy przycisk → Eksport… | Prawy przycisk → Eksport… |
-| Panel właściwości | Przycisk Eksport | Przycisk Eksport |
+| Panel właściwości | Przycisk „Eksport” | Przycisk „Eksport” |
 
-W aplikacji komputerowej ścieżkę wybiera się w oknie systemowym. W przeglądarce plik jest pobierany w zwykły sposób.
+Wyeksportowany plik zapisuje się przez systemowe okno dialogowe (aplikacja na komputer) albo jako pobranie w przeglądarce.
 
 ## HTML, PDF i jakość
 
@@ -38,9 +40,9 @@ W aplikacji komputerowej ścieżkę wybiera się w oknie systemowym. W przegląd
 - **HTML** zapisuje warstwę jako stronę internetową. Przycisk opcji obok formatu decyduje, czy dołączyć szkielet HTML (cała strona albo fragment do wklejenia), czy stylować przez CSS czy Tailwind, czy osadzić obrazy, czy zapisać je jako osobne pliki (razem w pliku `.zip`), oraz czy zapisywać jako atrybuty nazwy warstw (`data-name`, domyślnie włączone) i identyfikatory warstw (`data-pairdraw-node-id`, domyślnie wyłączone). Widok HTML panelu Kod eksportuje tak samo, ze stylowaniem, które pokazuje.
 - W panelu Kod komponenty Vue i React mogą brać ikony z Lucide, Heroicons lub Font Awesome zamiast z Iconify, a komponenty React także z React Icons; ikona, której pakiet nie ma, zostaje przy Iconify.
 
-## Kopiuj jako
+## Kopiuj/Wklej jako
 
-Menu kontekstowe umieszcza zaznaczenie w schowku w kilku formatach:
+Oprócz eksportu do pliku możesz skopiować zaznaczenie do schowka w kilku formatach przez menu kontekstowe (prawy przycisk → Kopiuj/Wklej jako):
 
 | Działanie | macOS | Windows / Linux |
 |-----------|-------|-----------------|
@@ -49,17 +51,24 @@ Menu kontekstowe umieszcza zaznaczenie w schowku w kilku formatach:
 | Kopiuj jako PNG | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>C</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>C</kbd> |
 | Kopiuj jako JSX | — | — |
 
-Tekst jest kopiowany z widocznej zawartości, SVG jako znaczniki, PNG w skali 2×, a JSX w formacie zgodnym z `renderJsx()`.
+- **Kopiuj jako tekst** — kopiuje widoczną treść tekstową zaznaczenia.
+- **Kopiuj jako SVG** — kopiuje zaznaczenie jako znaczniki SVG (do wklejenia w edytorach kodu, Inkscape itp.).
+- **Kopiuj jako PNG** — renderuje w skali 2× i kopiuje do schowka (gotowe do wklejenia w Slacku, Notion itp.).
+- **Kopiuj jako JSX** — kopiuje reprezentację Pairdraw JSX (zgodną z `renderJsx()`).
 
 ## Dokumenty .fig i .pen
 
-Pairdraw używa binarnego formatu `.fig` Figmy i otwiera również dokumenty `.pen`.
+Pairdraw używa formatu `.fig` dla pełnych dokumentów — tego samego formatu binarnego co Figma — i otwiera również dokumenty `.pen`.
 
 ### Otwieranie
 
 | Działanie | macOS | Windows / Linux |
 |-----------|-------|-----------------|
 | Otwórz plik | <kbd>⌘</kbd><kbd>O</kbd> | <kbd>Ctrl</kbd> + <kbd>O</kbd> |
+
+Otwiera się okno wyboru pliku z filtrem na pliki `.fig` i `.pen`. W aplikacji na komputer jest to systemowe okno dialogowe.
+
+Możesz też przeciągnąć na okno plik `.fig`, `.pen` lub inny obsługiwany dokument; otworzy się w nowej karcie. Obrazy i pliki SVG upuszczone na obszar roboczy są zamiast tego umieszczane w dokumencie, a każdy inny plik zgłasza, że nie można go otworzyć.
 
 Dokument `.pen`, który importuje biblioteki `.pen`, otwiera się z używanymi komponentami bibliotek, wczytanymi z plików wskazanych względem dokumentu. W dokumencie są to komponenty biblioteki tylko do odczytu; zmieniaj je w bibliotece. Przeglądarka nie może czytać plików obok dokumentu, więc tam te komponenty są przerywanymi symbolami zastępczymi, a komunikat podaje nazwy bibliotek; otwórz plik w aplikacji desktopowej lub w CLI, aby je wczytać. Aplikacja desktopowa czyta biblioteki najwyżej dwa foldery nad dokumentem, ale nigdy z folderu domowego ani wyżej i nie przez dowiązania; plik upuszczony na okno nie wczytuje żadnych, więc otwórz go przez Plik > Otwórz…. CLI czyta biblioteki w katalogu roboczym. Węzły skryptu i przeglądarki, których Pairdraw nie uruchamia, również otwierają się jako symbole zastępcze z zachowanym plikiem skryptu lub adresem strony.
 
@@ -70,18 +79,32 @@ Dokument `.pen`, który importuje biblioteki `.pen`, otwiera się z używanymi k
 | Zapisz | <kbd>⌘</kbd><kbd>S</kbd> | <kbd>Ctrl</kbd> + <kbd>S</kbd> |
 | Zapisz jako | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>S</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>S</kbd> |
 
-**Zapisz** nadpisuje bieżący plik, jeśli Pairdraw nadal ma uprawnienia do zapisu. **Zapisz jako** pozwala wybrać nową ścieżkę.
+- **Zapisz** nadpisuje bieżący plik bez okna dialogowego, jeśli Pairdraw nadal ma uprawnienia do zapisu.
+- **Zapisz jako** otwiera okno zapisu, w którym wybierasz nowe miejsce.
 
 W Chrome i Edge przeglądarka korzysta z File System Access API. Inne przeglądarki, w tym Safari, pobierają plik.
 
-Zapisany plik jest skompresowany i zawiera miniaturę widoczną w menedżerze plików.
+Zapisane pliki są skompresowane i zawierają miniaturę widoczną w menedżerach plików.
 
-### Zgodność z Figmą
+Gdy nic nie jest zaznaczone, sekcja **Dokument** w panelu Design określa stopień kompresji dokumentu. **Szybka** odpowiada zapisowi samej Figmy. **Mniejszy plik** i **Najmniejszy plik** zmniejszają plik, ale wydłużają zapis, co najbardziej widać w dużych dokumentach, a najmniej w plikach złożonych głównie z obrazów. Wybór jest zapisywany w pliku, a Figma otwiera wszystkie trzy warianty.
 
-Pliki wyeksportowane z Pairdraw można otworzyć w Figmie, a dokumenty Figmy — w Pairdraw. Format `.fig` zachowuje typy obiektów, właściwości, zalewy, obwiednie, efekty, dane wektorowe i parametry układu.
+### Zgodność w obie strony
+
+Pliki wyeksportowane z Pairdraw można otworzyć w Figmie i odwrotnie. Format `.fig` zachowuje wszystkie typy obiektów, właściwości, wypełnienia, obrysy, efekty, dane wektorowe i ustawienia układu.
+
+## Skróty klawiaturowe
+
+| Działanie | macOS | Windows / Linux |
+|-----------|-------|-----------------|
+| Eksportuj zaznaczenie jako PNG | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
+| Kopiuj jako PNG | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>C</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>C</kbd> |
+| Otwórz plik | <kbd>⌘</kbd><kbd>O</kbd> | <kbd>Ctrl</kbd> + <kbd>O</kbd> |
+| Zapisz | <kbd>⌘</kbd><kbd>S</kbd> | <kbd>Ctrl</kbd> + <kbd>S</kbd> |
+| Zapisz jako | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>S</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>S</kbd> |
 
 ## Wskazówki
 
-- Dla ekranów o dużej gęstości pikseli używaj skali 2× lub 3×.
-- JPG zawsze otrzymuje białe tło. Do przezroczystości wybierz PNG lub WEBP.
-- SVG nadaje się do dalszej edycji w Illustratorze, Inkscape lub kodzie.
+- Dla ekranów o dużej gęstości pikseli eksportuj w skali 2× lub 3×.
+- JPG zawsze ma białe tło — jeśli potrzebujesz przezroczystości, użyj PNG lub WEBP.
+- Eksport SVG przydaje się, gdy potrzebujesz formatu wektorowego do dalszej edycji w Illustratorze, Inkscape lub kodzie.
+- Miniatura w wyeksportowanych plikach `.fig` umożliwia podgląd w menedżerach plików i w oknie wyboru plików Figmy.

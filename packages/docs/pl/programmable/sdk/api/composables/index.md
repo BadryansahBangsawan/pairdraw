@@ -32,11 +32,14 @@ Poniżej znajdują się composables najczęściej używane podczas pracy z `@pai
 - [useSharedStyleBinding](/programmable/sdk/api/composables/use-shared-style-binding)
 - [useColorModel](/programmable/sdk/api/composables/use-color-model)
 - [useMask](/programmable/sdk/api/composables/use-mask)
+- [useVariableModes](/programmable/sdk/api/composables/use-variable-modes)
 - [useTypography](./use-typography)
 - [useExport](./use-export)
 - [useFillControls](./use-fill-controls)
 - [useStrokeControls](./use-stroke-controls)
 - [useEffectsControls](./use-effects-controls)
+- [useSelectionLayout](/programmable/sdk/api/composables/use-selection-layout)
+- [useSelectionColors](/programmable/sdk/api/composables/use-selection-colors)
 
 ## Obszar roboczy dokumentu
 

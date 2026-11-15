@@ -27,7 +27,7 @@ Do właściwości przedstawianych jako listy:
 
 ## Pola powiązane ze zmiennymi
 
-Jeśli wartość pola można powiązać ze zmienną albo zewnętrznym tokenem projektu, umieść pole wewnątrz `BindableValueRoot`.
+Jeśli wartość pola można powiązać ze zmienną albo zewnętrznym tokenem projektu, umieść pole wewnątrz `BindableValueRoot`. Sam komponent nie narzuca prezentacji, ale interfejsy obsługujące powiązania nie powinny niczego niszczyć przy samym ustawieniu fokusu:
 
 - Gdy pole nie jest edytowane, pokazuj nazwę zmiennej. Obliczoną wartość można wyświetlić na przykład w dymku.
 - Uzyskanie fokusu i otwarcie wyboru zmiennej nie powinny usuwać powiązania.

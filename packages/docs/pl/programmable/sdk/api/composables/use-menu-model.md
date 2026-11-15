@@ -1,13 +1,13 @@
 ---
 title: useMenuModel
-description: Modele menu aplikacji i obszaru roboczego zależne od aktualnego state edytora.
+description: Budowa modeli menu aplikacji i obszaru roboczego na podstawie bieżącego stanu edytora.
 ---
 
 # useMenuModel
 
-`useMenuModel()` tworzy gotowe do wyświetlenia menu na podstawie poleceń edytora i bieżącego selection.
+`useMenuModel()` buduje struktury menu wyższego poziomu na podstawie poleceń edytora i stanu zaznaczenia.
 
-Użyj go, jeśli nie chcesz samodzielnie składać menu z pojedynczych poleceń.
+Przydaje się, gdy potrzebujesz gotowych do wyświetlenia grup menu zamiast ręcznego składania poleceń.
 
 ## Użycie
 
@@ -17,7 +17,7 @@ import { useMenuModel } from '@pairdraw/vue/editor/menu-model'
 const { appMenu, canvasMenu, selectionLabelMenu } = useMenuModel()
 ```
 
-## Przykład
+## Podstawowy przykład
 
 ```ts
 const { canvasMenu } = useMenuModel()
@@ -25,25 +25,27 @@ const { canvasMenu } = useMenuModel()
 
 Przekaż `canvasMenu.value` do własnego komponentu menu kontekstowego.
 
-## Menu aplikacji
+## Praktyczne przykłady
+
+### Górne menu w stylu aplikacji
 
 `appMenu` grupuje pozycje w menu:
 
-- Edit;
-- View;
-- Object;
-- Arrange.
+- Edycja;
+- Widok;
+- Obiekt;
+- Rozmieszczenie.
 
-## Menu kontekstowe
+### Menu kontekstowe z przenoszeniem na strony
 
-`canvasMenu` zawiera pozycje zależne od state, na przykład Move to page z listą dostępnych stron.
+`canvasMenu` zawiera pozycje dynamiczne, takie jak „Przenieś na stronę”, zależne od bieżącego zaznaczenia i dostępnych stron.
 
-## Etykiety zależne od selection
+### Etykiety zależne od zaznaczenia
 
-`selectionLabelMenu` zwraca odpowiednią wersję etykiet:
+`selectionLabelMenu` udostępnia etykiety zależne od kontekstu, takie jak:
 
-- Hide albo Show;
-- Lock albo Unlock.
+- „Ukryj” / „Pokaż”;
+- „Zablokuj” / „Odblokuj”.
 
 ## Zobacz też
 

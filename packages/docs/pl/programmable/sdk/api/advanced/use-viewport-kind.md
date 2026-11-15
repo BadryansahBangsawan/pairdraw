@@ -1,17 +1,26 @@
 ---
 title: useViewportKind
-description: Reaktywne oznaczenia widoku mobilnego i komputerowego dla własnego interfejsu.
+description: Odczyt ogólnych flag widoku mobilnego i komputerowego dla responsywnych powłok edytora.
 ---
 
 # useViewportKind
 
-`useViewportKind()` zwraca uproszczoną klasyfikację rozmiaru widoku używaną przez responsywny interfejs Pairdraw.
+`useViewportKind()` zwraca proste flagi responsywności używane przez interfejs edytora Pairdraw.
 
-Użyj composable, jeśli wystarczy rozróżnienie widoku mobilnego i komputerowego bez bezpośredniej konfiguracji `useBreakpoints()`.
+Użyj go, gdy powłoka potrzebuje lekkiej abstrakcji nad punktami przełamania zamiast bezpośredniego podłączania `useBreakpoints()`.
+
+## Użycie
 
 ```ts
+import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
+
 const { isMobile, isDesktop } = useViewportKind()
 ```
+
+## Zwracane wartości
+
+- `isMobile`
+- `isDesktop`
 
 ## Zobacz też
 

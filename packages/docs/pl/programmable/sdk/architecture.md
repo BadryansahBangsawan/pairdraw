@@ -80,7 +80,7 @@ Jeśli kod przede wszystkim oblicza stan, zarządza nim lub wywołuje operacje e
 
 ### Twórz komponenty bez wyglądu tylko wtedy, gdy istotna jest struktura
 
-Komponent główny jest potrzebny, gdy koordynuje strukturę, elementy potomne, slots albo kontekst.
+Komponent główny jest potrzebny, gdy koordynuje strukturę, elementy potomne, sloty albo kontekst.
 
 Przykłady:
 
@@ -92,7 +92,7 @@ Przykłady:
 
 ### Nie przekazuj całego kontekstu przez jeden slot
 
-Przekazuj do slot tylko potrzebne props albo użyj composable bezpośrednio. Komponenty kontrolowane, takie jak `PropertyListRoot`, emitują zdarzenia opisujące wykonane operacje. Powiązanie z zaznaczeniem i historią cofania powinno znajdować się w adapterze lub composable sterującym, a nie w samym komponencie.
+Przekazuj do slotu tylko potrzebne właściwości albo użyj composable bezpośrednio, zamiast przekazywać ogromne obiekty `v-slot="ctx"`. Komponenty kontrolowane, takie jak `PropertyListRoot`, emitują zdarzenia opisujące wykonane operacje. Powiązanie z zaznaczeniem i historią cofania powinno znajdować się w adapterze lub composable sterującym, a nie w samym komponencie.
 
 ## Odpowiedzialność aplikacji i SDK
 

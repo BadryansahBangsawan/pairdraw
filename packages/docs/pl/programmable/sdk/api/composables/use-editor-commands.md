@@ -5,14 +5,14 @@ description: Tworzenie menu i innych elementów interfejsu na podstawie poleceń
 
 # useEditorCommands
 
-`useEditorCommands()` udostępnia wspólny interfejs do wykonywania poleceń edytora.
+`useEditorCommands()` udostępnia warstwę poleceń nad działaniami edytora.
 
 Przydaje się podczas tworzenia:
 
 - menu aplikacji;
 - menu kontekstowych;
 - pasków narzędzi;
-- obsługi skrótów;
+- adapterów poleceń klawiaturowych;
 - podmenu przenoszenia na stronę.
 
 ## Użycie
@@ -23,7 +23,7 @@ import { useEditorCommands } from '@pairdraw/vue/editor/commands'
 const { commands, menuItem, runCommand, moveSelectionToPage, otherPages } = useEditorCommands()
 ```
 
-## Przykład
+## Podstawowy przykład
 
 ```ts
 const { menuItem } = useEditorCommands()
@@ -36,6 +36,8 @@ const editMenu = [
 ]
 ```
 
+## Praktyczne przykłady
+
 ### Bezpośrednie wykonanie polecenia
 
 ```ts
@@ -43,7 +45,7 @@ const { runCommand } = useEditorCommands()
 runCommand('selection.duplicate')
 ```
 
-### Podmenu przenoszenia na stronę
+### Budowa podmenu „Przenieś na stronę”
 
 ```ts
 const { otherPages, moveSelectionToPage } = useEditorCommands()

@@ -1,16 +1,18 @@
 ---
 title: useExport
-description: Ustawienia scale i format eksportu bieżącego selection.
+description: Zarządzanie ustawieniami eksportu, takimi jak skala i format, dla bieżącego zaznaczenia.
 ---
 
 # useExport
 
-`useExport()` udostępnia state i actions panelu eksportu zaznaczonych obiektów:
+`useExport()` to composable panelu eksportu zaznaczonych obiektów.
 
-- ustawienia eksportu;
-- IDs zaznaczonych obiektów;
-- nazwę pliku wynikowego;
-- dostępne scales i formats (identyfikatory `formats` i opisane `formatOptions`).
+Zarządza:
+
+- wierszami ustawień eksportu;
+- identyfikatorami zaznaczonych obiektów;
+- nazwą eksportu;
+- obsługiwanymi skalami i formatami (identyfikatory `formats` i opisane `formatOptions`).
 
 ## Użycie
 
@@ -20,7 +22,7 @@ import { useExport } from '@pairdraw/vue/document/export'
 const exportState = useExport()
 ```
 
-## Przykład
+## Podstawowy przykład
 
 ```ts
 const {
@@ -35,13 +37,15 @@ const {
 } = useExport()
 ```
 
+## Praktyczne przykłady
+
 ### Dodatkowy wariant eksportu
 
 ```ts
 exportState.addSetting()
 ```
 
-### WEBP w skali 2×
+### Zmiana pierwszego eksportu na WEBP w skali 2×
 
 ```ts
 exportState.updateScale(0, 2)

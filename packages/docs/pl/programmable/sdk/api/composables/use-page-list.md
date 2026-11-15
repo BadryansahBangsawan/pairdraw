@@ -5,9 +5,9 @@ description: Odczytywanie stron oraz ich przełączanie, tworzenie, usuwanie i p
 
 # usePageList
 
-`usePageList()` udostępnia state i actions potrzebne interfejsowi listy stron.
+`usePageList()` to composable zarządzania stronami, na którym opierają się interfejsy listy stron.
 
-Zwraca:
+Udostępnia:
 
 - `pages`
 - `currentPageId`
@@ -24,11 +24,13 @@ import { usePageList } from '@pairdraw/vue/primitives/PageList'
 const pageList = usePageList()
 ```
 
-## Przykład
+## Podstawowy przykład
 
 ```ts
 const { pages, currentPageId, switchPage, addPage } = usePageList()
 ```
+
+## Praktyczne przykłady
 
 ### Przejście do strony
 

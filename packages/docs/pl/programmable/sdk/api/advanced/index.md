@@ -5,7 +5,7 @@ description: Wyspecjalizowane publiczne API pakietu @pairdraw/vue.
 
 # Niskopoziomowe API
 
-Te publiczne API służą do bardziej wyspecjalizowanych integracji niż podstawowe komponenty i composables.
+Te API są publiczne, ale bardziej wyspecjalizowane niż główny zestaw komponentów i composables.
 
 ## Zaznaczenie i SceneGraph
 
@@ -16,6 +16,7 @@ Te publiczne API służą do bardziej wyspecjalizowanych integracji niż podstaw
 ## Wybór wartości, zmienne, język i stan edytora
 
 - [useColorVariableBinding](./use-color-variable-binding)
+- [useColorBindingProvider](/programmable/sdk/api/advanced/use-color-binding-provider)
 - [useGradientStops](./use-gradient-stops)
 - [useFontPicker](./use-font-picker)
 - [useOkHCL](./use-okhcl)

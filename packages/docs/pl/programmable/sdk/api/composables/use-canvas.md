@@ -1,20 +1,20 @@
 ---
 title: useCanvas
-description: Podłączenie renderer opartego na CanvasKit do elementu canvas edytora Pairdraw.
+description: Podłączenie renderowania opartego na CanvasKit do elementu canvas edytora Pairdraw.
 ---
 
 # useCanvas
 
-`useCanvas()` łączy edytor z elementem `<canvas>`.
+`useCanvas()` łączy edytor z prawdziwym elementem `<canvas>`.
 
 Obsługuje:
 
 - inicjalizację CanvasKit;
-- tworzenie surface;
-- planowanie rendering;
+- tworzenie powierzchni rysowania;
+- planowanie renderowania;
 - zmianę rozmiaru;
-- opcjonalne rulers;
-- wywołanie function po przygotowaniu renderer.
+- opcjonalne wyświetlanie linijek;
+- wywołanie zwrotne po przygotowaniu renderera.
 
 ## Użycie
 
@@ -30,7 +30,7 @@ const editor = useEditor()
 useCanvas(canvasRef, editor)
 ```
 
-## Przykład
+## Podstawowy przykład
 
 ```vue
 <script setup lang="ts">
@@ -55,7 +55,9 @@ useCanvas(canvasRef, editor, {
 </template>
 ```
 
-### Wyłączenie rulers w osadzonym preview
+## Praktyczne przykłady
+
+### Wyłączenie linijek w osadzonym podglądzie
 
 ```ts
 useCanvas(canvasRef, editor, {
@@ -63,7 +65,7 @@ useCanvas(canvasRef, editor, {
 })
 ```
 
-### Zachowanie drawing buffer dla zrzutów
+### Zachowanie bufora rysowania na potrzeby zrzutów ekranu
 
 ```ts
 useCanvas(canvasRef, editor, {
@@ -73,8 +75,8 @@ useCanvas(canvasRef, editor, {
 
 ## Uwagi
 
-- `useCanvas()` pracuje z renderer i jest przeznaczone dla browser.
-- Zarządza działającym obszarem roboczym, ale nie otwieraniem ani zapisywaniem plików.
+- `useCanvas()` współpracuje bezpośrednio z rendererem i w praktyce działa tylko w przeglądarce.
+- Odpowiada za potok żywego obszaru roboczego, a nie za operacje na plikach na poziomie aplikacji.
 - Do obsługi działań użytkownika zwykle uzupełnia je `useCanvasInput()`.
 
 ## Zobacz też

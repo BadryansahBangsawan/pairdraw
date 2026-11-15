@@ -9,11 +9,11 @@ Pairdraw pozwala tworzyć obiekty tekstowe i edytować sformatowany tekst bezpo�
 
 ## Tworzenie tekstu
 
-Naciśnij <kbd>T</kbd>, a następnie kliknij obszar roboczy. Pojawi się pusty obiekt tekstowy z migającym kursorem — możesz od razu rozpocząć pisanie.
+Naciśnij <kbd>T</kbd>, aby włączyć narzędzie Tekst, a następnie kliknij obszar roboczy. Pojawi się pusty obiekt tekstowy z migającym kursorem — możesz od razu rozpocząć pisanie.
 
 ## Edycja na obszarze roboczym
 
-Kliknij dwukrotnie istniejący obiekt tekstowy. Niebieska ramka oznacza aktywny tryb edycji. Kliknij poza obiektem, aby zastosować zmiany i wyjść.
+Kliknij dwukrotnie istniejący obiekt tekstowy, aby przejść do edycji w miejscu. Niebieska ramka oznacza aktywny tryb edycji. Kliknij poza obiektem, aby zastosować zmiany i wyjść.
 
 Tekst jest wyświetlany bezpośrednio na obszarze roboczym; nie pojawia się osobne widoczne pole wprowadzania.
 
@@ -49,6 +49,8 @@ Przekreślenie włącza się przyciskiem **S** w sekcji „Typografia”. Nie ma
 
 Styl jest przechowywany dla każdego znaku. Tekst wpisywany między fragmentami pogrubionymi i zwykłymi dziedziczy styl poprzedniego fragmentu.
 
+Formatowanie stosują też przyciski **B / I / U / S** w sekcji „Typografia” panelu właściwości.
+
 ## Linki
 
 Tekst może zawierać link do strony internetowej lub adresu e-mail, w całym tekście lub w zaznaczonych znakach. Gdy warstwa jest zaznaczona, wybierz **Dodaj link** w sekcji „Typografia” panelu właściwości, w **Tekst → Dodaj link** w pasku menu lub w menu kontekstowym obszaru roboczego. Edytor linków otwiera się pod tekstem: wpisz adres — sama domena lub `nazwa@host` otrzyma swój `https://` lub `mailto:` — i naciśnij <kbd>Enter</kbd>, aby go zastosować, albo <kbd>Escape</kbd>, aby zamknąć bez zmian. Edytor służy też później do edycji linka i jego usuwania.
@@ -67,16 +69,24 @@ Tekst może zawierać link do strony internetowej lub adresu e-mail, w całym te
 
 ## Wybór czcionki
 
-Otwórz wybór czcionki w sekcji „Typografia”.
+Otwórz wybór czcionki w sekcji „Typografia” panelu właściwości, aby zmienić rodzinę czcionek. Wybór czcionki oferuje:
 
 - **Wyszukiwanie** zawęża listę podczas pisania.
 - **Podgląd** pokazuje nazwę każdej czcionki jej własnym krojem.
 - **Wirtualne przewijanie** sprawnie obsługuje duże katalogi.
 - Po otwarciu lista przewija się do bieżącej rodziny i ją wyróżnia.
 
+## Zmienne rodziny czcionek
+
+Rodzina czcionek może pochodzić ze zmiennej tekstowej. W sekcji „Typografia” wybierz **Zastosuj zmienną do rodziny czcionek** obok rodziny i wskaż zmienną, której wartością jest nazwa rodziny czcionek. Tekst podąża wtedy za zmienną: przełączenie trybu zmiennej lub zmiana jej wartości zmienia rodzinę, a edytor wczytuje czcionki nowej rodziny. Wybranie czcionki w wyborze czcionki odłącza zmienną i ustawia tę czcionkę bezpośrednio.
+
+## Tekst na ścieżce
+
+Zaimportowane z Figmy warstwy tekstu na ścieżce zachowują zakrzywiony układ znaków. Możesz edytować ich tekst i typografię, zmieniać ich rozmiar i je zaznaczać, a także zapisywać lub eksportować wynik z zachowanym układem na ścieżce. To obsługa istniejących, zaimportowanych warstw tekstu na ścieżce, a nie osobne narzędzie do umieszczania dowolnego tekstu na nowej ścieżce.
+
 ## Odmiana czcionki
 
-Dostępne odmiany zależą od rodziny, na przykład Regular, Medium, Bold i Black.
+Odmianę czcionki zmienisz w sekcji „Typografia” panelu właściwości. Dostępne odmiany zależą od wybranej rodziny, na przykład Regular, Medium, Bold i Black.
 
 ## Czcionki zmienne
 
@@ -86,8 +96,8 @@ Gdy czcionka jest zmienna, na przykład Inter, sekcja Typografia pokazuje jej os
 
 - **Domyślnie:** Inter jest ładowany automatycznie.
 - **Aplikacja komputerowa:** czcionki systemowe i włączone katalogi Google Fonts, Fontsource, Bunny Fonts oraz Fontshare.
-- **Przeglądarka:** czcionki systemowe są dostępne w Chrome i Edge; katalogi internetowe wymagają aplikacji komputerowej.
-- **Pobrane czcionki:** aplikacja zapisuje pobrane odmiany do ponownego użycia na tym komputerze.
+- **Przeglądarka:** czcionki systemowe są dostępne w Chrome i Edge po zezwoleniu na dostęp do lokalnych czcionek. Włączeni dostawcy Fontsource, Bunny Fonts i Fontshare mogą wczytywać czcionki online, o ile pozwala na to dostęp do sieci i reguły CORS przeglądarki; Google Fonts jest wyłączone w przeglądarkowej wersji Pairdraw.
+- **Pobrane czcionki:** aplikacja na komputer zapisuje pobrane odmiany do ponownego użycia na tym samym komputerze.
 
 Dostęp do czcionek systemowych i dostawców online ustawisz w **Ustawienia › Czcionki**, które otwiera koło zębate obok rodziny czcionek; w aplikacji desktopowej strona zarządza też pobranymi czcionkami i pakietami zastępczymi.
 
@@ -99,7 +109,7 @@ Upuść plik TTF, OTF, WOFF lub WOFF2 na płótno, aby dodać jego rodzinę do s
 
 Jeśli odpowiednia rodzina lub odmiana nie może zostać załadowana, Pairdraw pokazuje ostrzeżenie nad edytorem i nie przedstawia zastępczego wyglądu jako wiernego projektowi.
 
-Rozwiń ostrzeżenie, aby zobaczyć wszystkie brakujące odmiany i ich zamienniki. Przycisk **Wybierz warstwy** zaznacza odpowiednie obiekty tekstowe. Po zmianie dostępu do sieci, uprawnień do lokalnych czcionek lub ustawień dostawców naciśnij **Ponów ładowanie czcionek**.
+Rozwiń ostrzeżenie, aby zobaczyć wszystkie brakujące odmiany i ich zamienniki. Przycisk **Wybierz warstwy** odnajduje wszystkie obiekty tekstowe, których to dotyczy. Po zmianie dostępu do sieci, uprawnień do lokalnych czcionek lub ustawień dostawców naciśnij **Ponów ładowanie czcionek**.
 
 Odmiana może zostać utworzona na podstawie innej załadowanej odmiany tej samej rodziny. Jeśli brakuje całej rodziny, Pairdraw używa Inter, o ile jest dostępny.
 
@@ -108,4 +118,4 @@ Odmiana może zostać utworzona na podstawie innej załadowanej odmiany tej same
 - Lista czcionek jest ładowana podczas uruchamiania, dlatego panel otwiera się bez opóźnienia.
 - Obsługiwane jest wprowadzanie przez IME dla języka chińskiego, japońskiego i koreańskiego.
 - Formatowanie jest zachowywane podczas otwierania i zapisywania `.fig`.
-- Zastępowanie tekstu w egzemplarzach komponentów opisano na stronie [Komponenty](./components).
+- Nadpisywanie tekstu w instancjach komponentów opisano na stronie [Komponenty](./components).

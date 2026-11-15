@@ -1,6 +1,6 @@
 ---
 title: Zmienne
-description: Zmienne projektu, kolekcje, tryby i powiązania kolorów w Pairdraw.
+description: Zmienne projektu, kolekcje, tryby i powiązania z wypełnieniami w Pairdraw.
 ---
 
 # Zmienne
@@ -9,7 +9,7 @@ Zmienne przechowują tokeny projektu przeznaczone do ponownego użycia: kolory, 
 
 ## Otwieranie okna zmiennych
 
-Otwórz je z **Widok → Zmienne…**, wyszukując „Zmienne” w palecie poleceń albo, gdy żaden obiekt nie jest zaznaczony, z sekcji „Zmienne” na karcie „Projekt”. Przycisk **Rozwiń** w rogu okna daje mu większą część okna aplikacji.
+Otwórz je z **Widok → Zmienne…**, wyszukując „Zmienne” w palecie poleceń albo, gdy żaden obiekt nie jest zaznaczony, z sekcji „Zmienne” na karcie „Design”. Przycisk **Rozwiń** w rogu okna daje mu większą część okna aplikacji.
 
 Okno wyświetla po lewej zmienne aktywnej kolekcji, po prawej umożliwia edycję zaznaczonej zmiennej lub kolekcji, a poniżej pokazuje arkusz stylów, który z nich powstaje. W wąskim oknie lub na telefonie pokazuje jeden tryb naraz, a zmienna, ustawienia kolekcji albo arkusz stylów otwierają się nad listą z przyciskiem powrotu.
 
@@ -46,6 +46,21 @@ Na płótnie warstwa pokazuje tryb, gdy ustawisz ją na ten tryb, niezależnie o
 
 ## Praca ze zmiennymi
 
+### Wartości z formułą
+
+Pole wartości zmiennej liczbowej przyjmuje liczbę, inną zmienną albo formułę. Zacznij wpisywać nazwę zmiennej i wybierz ją z listy albo wybierz **Użyj zmiennej**: zmienna pojawia się jako etykieta, a pole pokazuje wynik formuły, np. `= 16px`. Etykiety są zapisywane według identyfikatora, więc zmiana nazwy zmiennej nie psuje formuły. Zmienne logiczne, tekstowe i kolorów zachowują swój przełącznik, pole tekstowe lub wybór koloru; wybierz obok **Użyj formuły**, aby zamiast tego wpisać formułę.
+
+- Liczby używają `+`, `-`, `*`, `/` i nawiasów: `space/base * 4`.
+- Wartości logiczne używają `and`, `or` i `not` oraz porównują liczby operatorami `==`, `!=`, `<`, `<=`, `>` i `>=`: `viewport > 1024 and not loading`. `==` i `!=` porównują też tekst.
+- Tekst zapisuje się w cudzysłowie podwójnym, a `+` łączy go z innym tekstem, liczbą lub wartością logiczną: `"Hello, " + name`. `text(count)` zapisuje liczbę tak jak Figma, z dwoma miejscami po przecinku, chyba że jest całkowita: `3`, `1.50`.
+- `if(warunek, wtedy, w_przeciwnym_razie)` wybiera jedną z dwóch liczb, tekstów, wartości logicznych lub kolorów: `if(compact, 8, 16)`, `if(dark, gray/900, #FFFFFF)`. Kolory zapisuje się jako `#RRGGBB` albo `#RRGGBBAA` z przezroczystością.
+- `truthy(value)` daje fałsz dla `0`, pustego tekstu oraz słów `false`, `no` i `off`, a prawdę dla wszystkiego innego, tak jak odczytuje je Figma.
+- Nieznane zmienne, odwołania cykliczne, mieszane typy i dzielenie przez zero są zgłaszane po opuszczeniu pola, a zapisana wartość pozostaje bez zmian.
+
+Wynik podąża za trybami zmiennych każdej warstwy i aktualizuje powiązane warstwy, gdy zmieni się używana w nim zmienna. Formuły używają zapisanych jednostek, więc długości są w pikselach. Lista pokazuje wynik każdej formuły; najedź na ikonę formuły, aby ją odczytać.
+
+W arkuszu stylów formuła liczbowa jest zapisywana jako `calc()` na używanych zmiennych, np. `calc(var(--spacing-md) * 2 - var(--spacing-base))`, i deklarowana ponownie w każdym trybie, który zmienia którąś z nich. Formuły z `if()`, tekstem lub wartościami logicznymi nie mają postaci CSS i są pomijane w arkuszu stylów. **Wyrażenie CSS** zastępuje wartość tylko w CSS. Pliki tokenów projektowych zawierają wynik każdej formuły, a samą formułę w `$extensions`. Formuły przetrwają kopiowanie i wklejanie, udostępnianie, cofanie i zapis `.fig`, a wyrażenia koloru i przezroczystości z Figmy zachowują odwołania do zmiennych.
+
 Zmienne są grupowane według folderów w ich nazwach (`Brand/Primary` jest widoczna jako *Primary* w folderze *Brand*) i pokazują nazwę CSS oraz jedną wartość dla każdego trybu.
 
 - **Tworzenie zmiennej:** kliknij **Utwórz zmienną** (lub **+**) i wybierz typ; nowa zmienna otworzy się do edycji
@@ -62,7 +77,7 @@ Zaznaczenie zmiennej pozwala edytować:
 - **Nazwa** i **Nazwa CSS:** pozostaw nazwę CSS pustą, aby utworzyć ją z nazwy i zakresów, na przykład `--color-brand-primary`. Wpisz nazwę bez `--`; nazwa, której CSS nie może użyć, jest oznaczana i nie jest zapisywana
 - **Jednostka:** dla liczb `px`, `rem`, `%`, `ms`, `s`, `deg` albo brak; wartości wpisuje się w tej jednostce
 - **Wartość** lub **Wartości:** po jednej dla każdego trybu; kolor otwiera wybór koloru. Przycisk zmiennej (**Użyj zmiennej**) obok wartości kieruje ją do innej zmiennej tego samego typu, czyli aliasu, który podąża za tą zmienną; **Odłącz zmienną** przywraca wartość, którą pokazywał
-- **Wyrażenie CSS:** dla liczb wartość taka jak `clamp(1rem, 4vw, 1.5rem)` zapisywana w CSS zamiast liczby, podczas gdy kanwa nadal rysuje liczbę
+- **Wyrażenie CSS:** dla liczb wybierz **Dodaj wyrażenie CSS** w menu **⋯** wartości, aby zamiast wartości zapisać CSS, np. `clamp(1rem, 4vw, var(--spacing-md))`, podczas gdy kanwa nadal rysuje wartość. Nazwy tokenów uzupełniają się jako `var(--name)` i są pokazywane jako etykiety, przycisk zmiennej wstawia jedną z nich, a niezamknięta funkcja, nieznany token lub wartość, której jednostka tokenu nie przyjmuje, są zgłaszane po opuszczeniu pola. Wyrażenie pozostaje, gdy wartość zmienia się między liczbą, zmienną i formułą; usuniesz je z tego samego menu
 - **Zakresy:** dla jakich właściwości zmienna jest proponowana
 - **Opis**
 - **Ukryj przy publikowaniu:** pliki, które używają tego jako biblioteki, nie widzą zmiennej
@@ -101,18 +116,18 @@ Warstwy skopiowane w jednym otwartym dokumencie i wklejone do innego mogą przen
 
 Wklejenie to jeden krok: **Cofnij** usuwa warstwy i wszystko, co zostało dodane. **Wklej właściwości** w ten sam sposób używa kolekcji i stylów o tej samej nazwie.
 
-## Powiązywanie zmiennych z zalewami
+## Powiązywanie zmiennych z wypełnieniami
 
-W sekcji „Zalew” panelu właściwości użyj wyboru zmiennej, aby powiązać zmienną koloru z zalewem obiektu.
+W sekcji „Wypełnienie” panelu właściwości użyj wyboru zmiennej, aby powiązać zmienną koloru z wypełnieniem obiektu.
 
-- **Powiązanie:** wybierz zmienną koloru z listy. Zalew pokazuje fioletową etykietę z nazwą zmiennej.
-- **Odłączenie:** kliknij przycisk odłączania na etykiecie, aby usunąć powiązanie. Zalew wraca do obliczonej wartości koloru.
+- **Powiązanie:** wybierz zmienną koloru z listy. Wypełnienie pokazuje fioletową etykietę z nazwą zmiennej.
+- **Odłączenie:** kliknij przycisk odłączania na etykiecie, aby usunąć powiązanie. Wypełnienie wraca do obliczonej wartości koloru.
 
-Gdy wartość zmiennej się zmienia (albo po przełączeniu trybu), wszystkie powiązane zalewy aktualizują się automatycznie.
+Gdy wartość zmiennej się zmienia (albo po przełączeniu trybu), wszystkie powiązane wypełnienia aktualizują się automatycznie.
 
 ## Wskazówki
 
 - Łącz powiązane tokeny w kolekcje, na przykład `Primitives` dla kolorów źródłowych, `Semantic` dla aliasów znaczeniowych i `Spacing` dla odstępów.
 - Tryby są przydatne do przełączania motywu: wartości Light i Dark można zdefiniować w tej samej kolekcji.
 - Zmienne obsługują aliasy: kolekcja `Semantic` może odwoływać się do wartości z kolekcji `Primitives`.
-- Zalewy i wybór koloru opisano na stronie [Kształty](./drawing-shapes).
+- Wypełnienia i wybór koloru opisano na stronie [Kształty](./drawing-shapes).

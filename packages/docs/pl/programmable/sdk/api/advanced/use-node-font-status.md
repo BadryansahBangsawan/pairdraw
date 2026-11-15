@@ -1,13 +1,13 @@
 ---
 title: useNodeFontStatus
-description: Informacje o brakujących fonts w obiekcie tekstowym.
+description: Informacja o brakujących czcionkach obiektów tekstowych.
 ---
 
 # useNodeFontStatus
 
-`useNodeFontStatus(node)` sprawdza fonts używane przez wskazany obiekt tekstowy i zwraca informacje o tych, których nie udało się załadować.
+`useNodeFontStatus(node)` zwraca informacje o brakujących czcionkach dla funkcji zwracającej obiekt tekstowy.
 
-Użyj composable w panelu typography albo komunikacie ostrzegającym o brakującym font family.
+Użyj go w panelach typografii i ostrzeżeniach, które mają pokazywać niedostępne rodziny czcionek.
 
 ## Zobacz też
 

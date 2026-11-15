@@ -1,14 +1,13 @@
 ---
 title: CanvasSurface
-description: Element canvas podłączony do najbliższego CanvasRoot.
+description: Komponent elementu canvas podłączany do kontekstu najbliższego CanvasRoot.
 ---
 
 # CanvasSurface
 
-`CanvasSurface` renderuje element `<canvas>` używany przez renderer SDK.
+`CanvasSurface` renderuje właściwy element `<canvas>` używany przez stos obszaru roboczego SDK.
 
-Umieść go wewnątrz `CanvasRoot`, aby SDK zarządzało refs i połączeniem z renderer, a aplikacja — układem i wyglądem.
-
+Umieść go wewnątrz `CanvasRoot`, gdy SDK ma zarządzać refami elementu canvas i integracją z rendererem, a układ i wygląd mają należeć do aplikacji.
 
 ## Zobacz też
 

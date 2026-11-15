@@ -4,7 +4,7 @@
 
 Pairdraw działa też w przeglądarce, ale nie ma wersji hostowanej: uruchom aplikację internetową z kopii repozytorium, jak opisano w sekcji [Budowanie ze źródeł](#building-from-source), albo [pobierz aplikację na komputer](/pl/download).
 
-Jeśli chcesz zbudować własny produkt na bazie Pairdraw, a nie tylko korzystać z gotowej aplikacji, przejdź do sekcji [Automatyzacja](/programmable/) lub dokumentacji [Vue SDK](/programmable/sdk/).
+Jeśli chcesz zbudować własny produkt na bazie Pairdraw, a nie tylko korzystać z gotowej aplikacji, przejdź do sekcji [Automatyzacja](/pl/programmable/) lub dokumentacji [Vue SDK](/pl/programmable/sdk/).
 
 ## Aplikacja na komputer
 
@@ -16,7 +16,7 @@ Jeśli chcesz zbudować własny produkt na bazie Pairdraw, a nie tylko korzysta�
 
 Windows, Linux i komputery Mac z procesorem Intel nie mają jeszcze gotowej wersji; zbuduj je ze źródeł, jak opisano niżej. Wersja dla macOS nie jest jeszcze podpisana ani poświadczona notarialnie, więc macOS blokuje pierwsze uruchomienie: kliknij Pairdraw w folderze Aplikacje prawym przyciskiem i wybierz **Otwórz** albo zezwól na to w **Ustawieniach systemowych → Prywatność i ochrona**. Każda wersja zawiera plik `SHA256SUMS` do sprawdzenia pobranych plików.
 
-Aby sprawdzić, czy jest nowsza wersja aplikacji na komputer, wybierz **Check for Updates…** w menu **Help** w systemach Windows i Linux albo w menu aplikacji w macOS. Pozycja **About** obok pokazuje zainstalowaną wersję. Pairdraw 0.16.0 nie wskazuje kanału aktualizacji, więc następną wersję zainstaluj ręcznie ze strony pobierania.
+Aby sprawdzić, czy jest nowsza wersja aplikacji na komputer, wybierz **Check for Updates…** w menu **Help** w systemach Windows i Linux albo w menu aplikacji w macOS. Pozycja **About** obok pokazuje zainstalowaną wersję. Aktualizacje sprawdza tylko wersja wydana, która wskazuje kanał aktualizacji, i tylko wtedy, gdy wybierzesz tę pozycję; wersja zbudowana ze źródeł informuje, że aktualizacje nie są skonfigurowane. Pairdraw 0.16.0 nie wskazuje kanału aktualizacji, więc następną wersję zainstaluj ręcznie ze strony pobierania.
 
 ## Wymagania systemowe {#system-requirements}
 

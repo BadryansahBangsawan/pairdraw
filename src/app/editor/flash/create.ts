@@ -1,6 +1,6 @@
-import type { Editor, EditorState } from '@pairdraw/core'
+import type { Editor } from '@pairdraw/core'
 
-export function createFlashActions(editor: Editor, state: EditorState) {
+export function createFlashActions(editor: Editor) {
   let flashRafId = 0
 
   function pumpFlashes() {
@@ -8,7 +8,8 @@ export function createFlashActions(editor: Editor, state: EditorState) {
       flashRafId = 0
       return
     }
-    state.renderVersion++
+    // The canvas draws a frame only when asked, so each flash frame asks for a repaint.
+    editor.requestRepaint()
     flashRafId = requestAnimationFrame(pumpFlashes)
   }
 

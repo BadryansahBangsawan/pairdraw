@@ -60,7 +60,7 @@ export function createEditorStoreModules(
   viewportSize: ViewportSize,
   preparationController: EditorPreparationController
 ) {
-  const flash = createFlashActions(editor, state)
+  const flash = createFlashActions(editor)
   const pen = createPenActions(editor, state)
   const vectorEdit = createVectorEditActions(editor, state)
   const documentIO = createDocumentIOActions(editor, state, viewportSize, preparationController)

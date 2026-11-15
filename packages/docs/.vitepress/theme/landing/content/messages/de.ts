@@ -266,7 +266,7 @@ export const de: LandingMessages = {
   },
   download: {
     title: 'Pairdraw herunterladen',
-    lede: 'Die Desktop-App für macOS, Windows und Linux. Kostenlos und quelloffen, ohne Anmeldung.',
+    lede: 'Die Desktop-App, kostenlos und quelloffen, ohne Anmeldung. Plattformen ohne fertige Version werden aus dem Quellcode erstellt.',
     version: 'Version {version}, veröffentlicht am {date}',
     forPlatform: 'Für {platform} herunterladen',
     moreFiles: 'Weitere Downloads für {platform}',

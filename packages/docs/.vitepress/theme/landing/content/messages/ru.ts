@@ -263,7 +263,7 @@ export const ru: LandingMessages = {
   },
   download: {
     title: 'Скачать Pairdraw',
-    lede: 'Настольное приложение для macOS, Windows и Linux. Бесплатное и с открытым кодом, без регистрации.',
+    lede: 'Настольное приложение, бесплатное и с открытым кодом, без регистрации. Для платформ без готовой версии его собирают из исходного кода.',
     version: 'Версия {version}, вышла {date}',
     forPlatform: 'Скачать для {platform}',
     moreFiles: 'Другие загрузки для {platform}',

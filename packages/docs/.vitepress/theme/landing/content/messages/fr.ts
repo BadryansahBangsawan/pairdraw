@@ -267,7 +267,7 @@ export const fr: LandingMessages = {
   },
   download: {
     title: 'Télécharger Pairdraw',
-    lede: 'L’app de bureau pour macOS, Windows et Linux. Gratuite et open source, sans inscription.',
+    lede: 'L’app de bureau, gratuite et open source, sans inscription. Les plateformes sans version prête à l’emploi se compilent à partir des sources.',
     version: 'Version {version}, publiée le {date}',
     forPlatform: 'Télécharger pour {platform}',
     moreFiles: 'Autres téléchargements pour {platform}',

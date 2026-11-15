@@ -267,7 +267,7 @@ export const it: LandingMessages = {
   },
   download: {
     title: 'Scarica Pairdraw',
-    lede: 'L’app desktop per macOS, Windows e Linux. Gratuita e open source, senza registrazione.',
+    lede: 'L’app desktop, gratuita e open source, senza registrazione. Le piattaforme senza una versione pronta si compilano dal codice sorgente.',
     version: 'Versione {version}, pubblicata il {date}',
     forPlatform: 'Scarica per {platform}',
     moreFiles: 'Altri download per {platform}',

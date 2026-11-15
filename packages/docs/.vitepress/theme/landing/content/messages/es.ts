@@ -266,7 +266,7 @@ export const es: LandingMessages = {
   },
   download: {
     title: 'Descargar Pairdraw',
-    lede: 'La app de escritorio para macOS, Windows y Linux. Gratuita y de código abierto, sin registro.',
+    lede: 'La app de escritorio, gratuita y de código abierto, sin registro. Las plataformas sin versión preparada se compilan desde el código fuente.',
     version: 'Versión {version}, publicada el {date}',
     forPlatform: 'Descargar para {platform}',
     moreFiles: 'Más descargas para {platform}',

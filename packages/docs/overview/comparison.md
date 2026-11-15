@@ -262,12 +262,11 @@ Pairdraw's approach is simpler and lower overhead. Penpot's approach is more sui
 
 ## 10. What Penpot Does Better
 
-1. **Server-side collaboration** — centralized multi-user editing with WebSockets, user accounts, and access control (Pairdraw uses P2P via Trystero + Yjs — no server, but also no access control or persistence beyond the session)
-2. **Plugin system** — full plugin API with sandboxed execution
-3. **Design tokens** — native design token support
-4. **CSS Grid layout** — custom implementation (Pairdraw uses Yoga fork with grid support)
-5. **Self-hosting** — Docker-based deployment for teams
-6. **Maturity** — years of production usage, battle-tested at scale
+1. **Server-side collaboration** — centralized multi-user editing with WebSockets, user accounts, and access control, proven at scale (Pairdraw edits together only through an optional, self-hosted Pairdraw Cloud server, and has no peer-to-peer rooms)
+2. **Plugin system** — full plugin API with sandboxed execution and an ecosystem of plugins (Pairdraw's plugins run one at a time, without network access)
+3. **CSS Grid layout** — custom implementation (Pairdraw uses Yoga fork with grid support)
+4. **Self-hosting** — Docker-based deployment for teams (Pairdraw Cloud is one Node process, and newer)
+5. **Maturity** — years of production usage, battle-tested at scale
 
 ## 11. Scripting & Extensibility
 
@@ -284,8 +283,8 @@ Pairdraw ships with an [`eval` command](/programmable/cli/scripting) that provid
 | **Developer onboarding** | **Pairdraw** | TS/Vue vs Clojure/Rust/Docker |
 | **Desktop experience** | **Pairdraw** | Tauri native vs browser-only |
 | **Layout engine** | **Pairdraw** | Yoga (proven) vs custom dual implementation |
-| **Collaboration** | Tie | Penpot: server-based with access control; Pairdraw: P2P via Trystero + Yjs, zero hosting |
-| **Self-hosting** | Penpot | Docker-ready vs desktop-only |
+| **Collaboration** | Penpot | Both server-based with access control; Pairdraw's self-hosted Cloud server is optional and newer, and local documents have no live sharing |
+| **Self-hosting** | Penpot | Docker-ready vs a newer single-process Cloud server |
 | **Ecosystem maturity** | Penpot | Years of production vs early stage |
 
-Pairdraw is architecturally leaner — a single-process CanvasKit renderer in ~26K LOC of TypeScript, Figma-compatible by design. Penpot is a full-stack platform with ~299K LOC across Clojure, ClojureScript, Rust, and SCSS, plus a Docker service fleet. Both now offer real-time collaboration (different architectures: P2P vs server). Penpot has a plugin ecosystem; **Pairdraw** has Figma-compatible headless scripting, **138 AI/MCP tools**, SVG and PDF export, and a native desktop app.
+Pairdraw is architecturally leaner — a single-process CanvasKit renderer in ~26K LOC of TypeScript, Figma-compatible by design. Penpot is a full-stack platform with ~299K LOC across Clojure, ClojureScript, Rust, and SCSS, plus a Docker service fleet. Both offer real-time collaboration through a server, which Pairdraw keeps optional. Penpot has a plugin ecosystem; **Pairdraw** has Figma-compatible headless scripting, **138 AI/MCP tools**, SVG and PDF export, and a native desktop app.

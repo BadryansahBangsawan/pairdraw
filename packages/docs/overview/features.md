@@ -21,9 +21,16 @@ Open and save native Figma files directly. The import/export pipeline uses the s
 - **Variables** — design tokens with collections, modes (Light/Dark), color/float/string/boolean types, variable binding
 - **Sections** — organizational containers with auto-adopting children and title pills
 
+## Editor Layout
+
+The editor opens on the canvas alone. The tools stand at the canvas's left, with the layers panel's toggle above them, and the zoom sits in the bottom right corner. The properties panel comes when a layer is selected and leaves with the selection; a panel opened from its toggle stays open. While the AI chat is closed, a prompt at the bottom of the canvas sends what you write to it. The app starts in the dark theme; **Settings → General → Theme** also offers Light and Auto.
+
+- **Find layers** — <kbd>⌘</kbd><kbd>F</kbd> searches the shown page's layers by name, selects the one you pick, and brings it into view
+- **Goodies** — the gift button in the top bar gathers things to start from: styles to pin to the AI chat, design systems to enable, scripts placed as code layers, and ready-made shaders
+
 ## Properties Panel
 
-Context-sensitive Design | Code | AI | Lint tabs:
+Context-sensitive Design and Code tabs, with Lint beside them:
 
 - **Appearance** — opacity, corner radius (uniform or per-corner), visibility
 - **Fill** — solid, gradient (linear/radial/angular/diamond/mesh), image
@@ -31,7 +38,7 @@ Context-sensitive Design | Code | AI | Lint tabs:
 - **Effects** — drop shadow, inner shadow, layer blur, background blur, foreground blur
 - **Typography** — font picker with virtual scroll and search, weight, size, alignment, style buttons
 - **Layout** — auto-layout controls when enabled
-- **Export** — scale, format (PNG/JPG/WEBP/SVG), live preview
+- **Export** — scale, format (PNG, JPG, WEBP, SVG, PDF, HTML, and more), quality, live preview
 - **Code** — Design JSX, HTML, and Vue and React components for the selection, styled with CSS or Tailwind, with live two-way Design JSX editing that patches your code as layers change; the element around the cursor outlines its layer on the canvas, and design issues are underlined on the property that causes them
 - **Lint** — live design lint for the page or selection: low contrast, small touch targets, unbound colors, off-scale spacing, with issue markers on the canvas and one-click variable binding ([Checking Designs](/user-guide/checking-designs))
 
@@ -64,6 +71,8 @@ Open multiple documents in tabs. <kbd>⌘</kbd><kbd>T</kbd> new tab, <kbd>⌘</k
 
 - **Image** — PNG, JPG, WEBP at configurable scale (0.5×–4×). Via panel, context menu, or <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd>
 - **SVG** — shapes, text with style runs, gradients, effects, blend modes
+- **PDF** — one layer per page, or **File → Export Frames to PDF…** for the page's frames
+- **HTML** — a page or fragment with plain CSS or Tailwind classes
 - **Tailwind JSX** — HTML with Tailwind v4 utility classes, ready for React or Vue
 - **Copy as** — text, SVG, PNG (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>C</kbd>), or JSX via context menu
 
@@ -71,7 +80,7 @@ CLI: `pairdraw export design.fig -f jsx --style tailwind`
 
 ## AI Chat
 
-Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant. 138 tools that can create shapes, set styles, manage layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Connect Anthropic, OpenAI, Google AI, OpenRouter, any compatible endpoint, or the AI your [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud) plan includes.
+Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant in its own column beside the properties panel, or write in the prompt at the bottom of the canvas or on Home. With no model set up, the chat uses a coding agent already installed on this computer: Claude Code, Codex, or Gemini CLI. 138 tools that can create shapes, set styles, manage layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Connect Anthropic, OpenAI, Google AI, OpenRouter, any compatible endpoint, or the AI your [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud) server offers. Each provider, model, and agent shows its maker's logo.
 
 Tool calls display as collapsible timeline entries. Visual verification — the assistant renders its work and checks it against your request. Full undo support for all AI mutations.
 
@@ -81,7 +90,7 @@ See [AI Chat](/programmable/ai-chat) for setup and provider details.
 
 Open `http` and `https` pages in their own desktop window, which shares nothing with the editor, and bring them onto the canvas: import the whole page or one picked element as layers, or place a screenshot of the view, the page, or an element. The chat can read the page, mark an element in its reply, and click, type, press a key, scroll, or wait on it, asking first when Settings asks before changes.
 
-On a board, the same browser becomes research: the chat quotes the page into a sticky note that keeps its address, title, quote, and read time ([Research on a board](/user-guide/research)).
+On a board you already have, the same browser becomes research: the chat quotes the page into a sticky note that keeps its address, title, quote, and read time ([Research on a board](/user-guide/research)). Pairdraw does not create new boards.
 
 ## MCP Server
 
@@ -125,22 +134,20 @@ pairdraw export -f png            # Screenshot canvas
 
 All commands support `--json`. Install: `npm install -g @pairdraw/cli` (or `bun add -g @pairdraw/cli`).
 
-## Real-Time Collaboration
+## Collaboration
 
-P2P via WebRTC — no server required. Share a link and edit together.
+Pairdraw has no live peer-to-peer rooms: there is no Share link for a local document, no joining by room ID, and no voice call. Documents on a [Pairdraw Cloud](/user-guide/pairdraw-cloud) server share through that server, and everyone who opens one edits it live.
 
-- Live cursors with colored arrows and name pills
-- Presence avatars
-- Follow mode — click a peer to follow their viewport
-- Voice calls — talk with the people in the room, peer to peer, with mute, microphone and speaker choice, and a ring on whoever is speaking
-- Local persistence via IndexedDB
-- Secure room IDs via `crypto.getRandomValues()`
+- Live cursors with colored arrows and name pills, for people in a Cloud document and for AI agents
+- Presence avatars; your own shows in the top bar only while it lists your AI agents or someone else has the Cloud document open
+- Follow mode — click a person or an agent to follow their viewport
+- **View → Multiplayer cursors** (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>\</kbd>) hides and shows the cursors
 
 ## Desktop & Web
 
-**Desktop** — Tauri v2, ~7 MB. macOS (signed & notarized), Windows, Linux. Native menus, offline, autosave.
+**Desktop** — Tauri v2, ~7 MB. macOS, Windows, Linux. Native menus, offline, autosave.
 
-**Web** — runs in the browser from your own build or a Pairdraw Cloud server, installable as a PWA on mobile with touch-optimized UI.
+**Web** — runs in the browser from your own build (`bun run dev`, or a deployment you host) or a Pairdraw Cloud server; there is no hosted copy. Installable as a PWA on mobile with touch-optimized UI.
 
 **VS Code** — a custom editor for `.fig` and `.pen` documents that runs the web editor in a webview and saves what it shows; it is not published to a marketplace, so build it from the repository ([VS Code extension](/programmable/vscode)).
 

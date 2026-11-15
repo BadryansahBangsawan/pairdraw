@@ -106,7 +106,7 @@ Les agents IA affichent leur curseur et les calques qu’ils modifient sur la zo
 
 ## Bureau et Web
 
-**Bureau :** Tauri v2, programmes d’installation d’environ 15 Mo sous macOS et Windows, pour macOS, Windows et Linux, avec menus natifs, fonctionnement hors ligne et enregistrement automatique.
+**Bureau :** Tauri v2, programme d’installation d’environ 20 Mo sous macOS, pour macOS, Windows et Linux, avec menus natifs, fonctionnement hors ligne et enregistrement automatique.
 
 **Web :** dans le navigateur, depuis votre propre build ou un serveur Pairdraw Cloud, installable comme PWA et adapté aux écrans tactiles.
 

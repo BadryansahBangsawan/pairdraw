@@ -145,7 +145,7 @@ Pairdraw has no live peer-to-peer rooms: there is no Share link for a local docu
 
 ## Desktop & Web
 
-**Desktop** — Tauri v2, with installers of about 15 MB on macOS and Windows. macOS, Windows, Linux. Native menus, offline, autosave.
+**Desktop** — Tauri v2, with a macOS installer of about 20 MB. macOS, Windows, Linux. Native menus, offline, autosave.
 
 **Web** — runs in the browser from your own build (`bun run dev`, or a deployment you host) or a Pairdraw Cloud server; there is no hosted copy. Installable as a PWA on mobile with touch-optimized UI.
 

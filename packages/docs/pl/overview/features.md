@@ -104,7 +104,7 @@ Agenci AI pokazują na obszarze roboczym swoje kursory i edytowane warstwy, a wi
 
 ## Wersja komputerowa i internetowa
 
-**Komputer:** Tauri v2, instalatory około 15 MB w macOS i Windows, dla macOS, Windows i Linux, z menu systemowymi, pracą bez sieci i automatycznym zapisem.
+**Komputer:** Tauri v2, instalator około 20 MB w macOS, dla macOS, Windows i Linux, z menu systemowymi, pracą bez sieci i automatycznym zapisem.
 
 **Internet:** w przeglądarce, z własnej kompilacji lub serwera Pairdraw Cloud, możliwość instalacji jako PWA i interfejs dotykowy.
 

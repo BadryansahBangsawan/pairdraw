@@ -15,7 +15,7 @@
 | **AI/MCP** | MCP SDK + Hono | 139 tools for AI coding tools, stdio + HTTP transports |
 | **JSX Transform** | Sucrase | Lightweight (201 KB) JSX → JS, synchronous, browser-compatible |
 | **Events** | nanoevents | 108 bytes, typed event emitter for SceneGraph mutations |
-| **Desktop** | Tauri v2 | Installers of about 15 MB on macOS and Windows (Electron bundles ~100MB of Chromium alone), Rust backend |
+| **Desktop** | Tauri v2 | A macOS installer of about 20 MB (Electron bundles ~100MB of Chromium alone), Rust backend |
 | **Build** | Vite 8 | Fast HMR, native ES modules |
 | **Testing** | Playwright + bun:test | Visual regression (E2E) + fast unit tests |
 | **Linting** | oxlint | Rust-based, orders of magnitude faster than ESLint |

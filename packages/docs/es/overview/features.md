@@ -106,7 +106,7 @@ Los agentes de IA muestran sus cursores y las capas que editan en el lienzo, y l
 
 ## Escritorio y web
 
-**Escritorio:** Tauri v2, instaladores de unos 15 MB en macOS y Windows, para macOS, Windows y Linux, con menús nativos, uso sin conexión y guardado automático.
+**Escritorio:** Tauri v2, instalador de unos 20 MB en macOS, para macOS, Windows y Linux, con menús nativos, uso sin conexión y guardado automático.
 
 **Web:** en el navegador, desde tu propia compilación o un servidor de Pairdraw Cloud, instalable como PWA y adaptado a pantallas táctiles.
 

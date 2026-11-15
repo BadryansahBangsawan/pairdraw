@@ -54,7 +54,7 @@ export const fr: LandingMessages = {
     collab: {
       title: 'Travailler ensemble, humains et agents',
       detail:
-        "Partagez un lien et tout le monde modifie le même document, de pair à pair, avec curseurs en direct, mode suivi, commentaires épinglés aux calques et appels vocaux. Les agents d'IA rejoignent la salle de la même façon : tout le monde les regarde construire pendant qu'ils diffusent.",
+        'Placez un document sur le serveur Cloud de votre équipe et tous ceux qui l’ouvrent le modifient en direct, avec curseurs, mode suivi et commentaires épinglés aux calques. Les agents d’IA affichent leur curseur sur le même canevas : vous les regardez construire pendant qu’ils diffusent.',
       hint: 'Les deux écrans sont à vous. Faites glisser un calque sur l’un et regardez-le bouger sur l’autre, puis sollicitez l’agent.'
     },
     code: {
@@ -100,7 +100,7 @@ export const fr: LandingMessages = {
       },
       {
         title: 'Formats ouverts',
-        detail: 'Exportez en .fig, PDF, PPTX, SVG, HTML et JSX. Partir reste toujours possible.'
+        detail: 'Exportez en .fig, PDF, SVG, HTML et JSX. Partir reste toujours possible.'
       },
       {
         title: 'Sous licence MIT',
@@ -121,7 +121,7 @@ export const fr: LandingMessages = {
         { title: 'Annuler, régénérer et modifier les échanges avec l’AI' },
         { title: 'Code relié aux calques' },
         { title: 'Diff visuel et correctifs' },
-        { title: 'Commentaires et appels vocaux dans les salles partagées' },
+        { title: 'Commentaires épinglés aux calques' },
         { title: "Composants Vue et React dans l'onglet Code" },
         { title: 'Import SVG et HTML en calques modifiables' },
         { title: 'Remplissages par shaders' },
@@ -177,7 +177,7 @@ export const fr: LandingMessages = {
       cloud: {
         title: 'Pairdraw Cloud',
         detail:
-          "L'espace hébergé pour les équipes : synchronisation en direct, partage, bibliothèques et IA, sans rien à faire tourner."
+          'Un serveur facultatif que vous faites tourner pour votre équipe : synchronisation en direct, partage, commentaires et bibliothèques d’équipe.'
       }
     },
     later: {
@@ -195,9 +195,9 @@ export const fr: LandingMessages = {
     }
   },
   cloud: {
-    badge: 'Accès anticipé',
+    badge: 'Auto-hébergé',
     title: 'Pairdraw Cloud',
-    lede: "L'espace de design de votre équipe, hébergé pour vous. Tout le monde modifie les mêmes fichiers en direct, les partage par lien et conçoit avec l'IA, sans rien à installer ni à faire tourner. Vos fichiers restent ouverts : exportez-les en .fig quand vous voulez.",
+    lede: 'L’espace de design de votre équipe, sur un serveur que vous faites tourner. Tout le monde modifie les mêmes fichiers en direct, les partage par invitation ou par lien et conçoit avec l’IA que propose votre serveur. Pairdraw ne l’héberge pas pour vous, et vos fichiers restent ouverts : exportez-les en .fig quand vous voulez.',
     features: [
       {
         title: "Synchronisation d'équipe en temps réel",
@@ -209,16 +209,19 @@ export const fr: LandingMessages = {
         detail: 'Envoyez un lien pour relire un design et en discuter directement sur le canevas.'
       },
       {
-        title: "Bibliothèques d'équipe",
-        detail: 'Publiez composants, styles et tokens une fois et utilisez-les dans chaque fichier.'
+        title: 'Historique des versions',
+        detail:
+          'Versions nommées et sauvegardes automatiques, avec restauration et un lien vers chaque version.'
       },
       {
-        title: 'IA hébergée',
-        detail: 'Des agents qui conçoivent avec vous, sans clés d’API à gérer.'
+        title: 'IA sur votre serveur',
+        detail:
+          'Les membres utilisent les modèles de votre serveur, avec des crédits plutôt que leurs propres clés.'
       },
       {
-        title: "SSO et contrôles d'administration",
-        detail: 'Authentification unique, rôles et contrôle de qui voit quoi.'
+        title: 'Comptes et rôles',
+        detail:
+          'Connexion par e-mail, Google ou Apple, validation des nouveaux comptes et rôles dans l’espace de travail.'
       }
     ]
   },

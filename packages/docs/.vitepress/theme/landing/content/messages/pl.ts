@@ -54,7 +54,7 @@ export const pl: LandingMessages = {
     collab: {
       title: 'Współpraca ludzi i agentów',
       detail:
-        'Udostępnij link, a wszyscy edytują ten sam dokument, peer-to-peer, z kursorami na żywo, trybem śledzenia, komentarzami przypiętymi do warstw i rozmowami głosowymi. Agenci AI dołączają tak samo: wszyscy w pokoju widzą, jak budują, gdy strumieniują.',
+        'Trzymaj dokument na serwerze Cloud swojego zespołu, a każdy, kto go otworzy, edytuje go na żywo, z kursorami, trybem śledzenia i komentarzami przypiętymi do warstw. Agenci AI pokazują swoje kursory na tym samym płótnie, więc widzisz, jak budują, gdy strumieniują.',
       hint: 'Oba ekrany są Twoje. Przeciągnij warstwę na jednym i zobacz, jak przesuwa się na drugim, a potem poproś agenta.'
     },
     code: {
@@ -100,7 +100,7 @@ export const pl: LandingMessages = {
       },
       {
         title: 'Otwarte formaty',
-        detail: 'Eksport do .fig, PDF, PPTX, SVG, HTML i JSX. Zawsze możesz odejść.'
+        detail: 'Eksport do .fig, PDF, SVG, HTML i JSX. Zawsze możesz odejść.'
       },
       {
         title: 'Licencja MIT',
@@ -121,7 +121,7 @@ export const pl: LandingMessages = {
         { title: 'Cofanie, ponowne generowanie i edycja tur AI' },
         { title: 'Kod powiązany z warstwami' },
         { title: 'Wizualny diff i łatki' },
-        { title: 'Komentarze i rozmowy głosowe we wspólnych pokojach' },
+        { title: 'Komentarze przypięte do warstw' },
         { title: 'Komponenty Vue i React w karcie Kod' },
         { title: 'Import SVG i HTML jako edytowalnych warstw' },
         { title: 'Wypełnienia shaderami' },
@@ -177,7 +177,7 @@ export const pl: LandingMessages = {
       cloud: {
         title: 'Pairdraw Cloud',
         detail:
-          'Hostowana przestrzeń dla zespołów: synchronizacja na żywo, udostępnianie, biblioteki i AI, bez utrzymywania czegokolwiek.'
+          'Opcjonalny serwer, który utrzymujesz dla zespołu: synchronizacja na żywo, udostępnianie, komentarze i biblioteki zespołu.'
       }
     },
     later: {
@@ -195,9 +195,9 @@ export const pl: LandingMessages = {
     }
   },
   cloud: {
-    badge: 'Wczesny dostęp',
+    badge: 'Własny serwer',
     title: 'Pairdraw Cloud',
-    lede: 'Przestrzeń projektowa Twojego zespołu, hostowana za Ciebie. Wszyscy edytują te same pliki na żywo, udostępniają je linkiem i projektują z AI, bez instalowania i utrzymywania czegokolwiek. Pliki pozostają otwarte: eksportuj je do .fig, kiedy chcesz.',
+    lede: 'Przestrzeń projektowa Twojego zespołu na serwerze, który sam utrzymujesz. Wszyscy edytują te same pliki na żywo, udostępniają je zaproszeniem lub linkiem i projektują z AI, które oferuje Twój serwer. Pairdraw go za Ciebie nie hostuje, a pliki pozostają otwarte: eksportuj je do .fig, kiedy chcesz.',
     features: [
       {
         title: 'Synchronizacja zespołu w czasie rzeczywistym',
@@ -208,16 +208,18 @@ export const pl: LandingMessages = {
         detail: 'Wyślij link do przeglądu projektu i omawiajcie go bezpośrednio na płótnie.'
       },
       {
-        title: 'Biblioteki zespołu',
-        detail: 'Opublikuj komponenty, style i tokeny raz i używaj ich w każdym pliku.'
+        title: 'Historia wersji',
+        detail: 'Nazwane wersje i automatyczne zapisy, z przywracaniem i linkiem do każdej wersji.'
       },
       {
-        title: 'Hostowane AI',
-        detail: 'Agenci, którzy projektują z Tobą, bez zarządzania kluczami API.'
+        title: 'AI na Twoim serwerze',
+        detail:
+          'Członkowie korzystają z modeli Twojego serwera, z kredytami zamiast własnych kluczy.'
       },
       {
-        title: 'SSO i kontrola administracyjna',
-        detail: 'Logowanie jednokrotne, role i kontrola nad tym, kto co widzi.'
+        title: 'Konta i role',
+        detail:
+          'Logowanie e-mailem, przez Google lub Apple, zatwierdzanie nowych kont i role w przestrzeni roboczej.'
       }
     ]
   },

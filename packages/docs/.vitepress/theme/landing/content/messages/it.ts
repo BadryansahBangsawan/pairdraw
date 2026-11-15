@@ -54,7 +54,7 @@ export const it: LandingMessages = {
     collab: {
       title: 'Lavorare insieme, persone e agenti',
       detail:
-        'Condividi un link e tutti modificano lo stesso documento, peer to peer, con cursori dal vivo, modalità segui, commenti fissati ai livelli e chiamate vocali. Gli agenti di IA entrano allo stesso modo: tutti nella stanza li guardano costruire mentre trasmettono.',
+        'Tieni un documento sul server Cloud del tuo team e chiunque lo apra lo modifica dal vivo, con cursori, modalità segui e commenti fissati ai livelli. Gli agenti di IA mostrano i loro cursori sulla stessa tela, così li guardi costruire mentre trasmettono.',
       hint: 'Entrambi gli schermi sono tuoi. Trascina un livello su uno e guardalo muoversi sull’altro, poi chiedi all’agente.'
     },
     code: {
@@ -100,7 +100,7 @@ export const it: LandingMessages = {
       },
       {
         title: 'Formati aperti',
-        detail: 'Esporta in .fig, PDF, PPTX, SVG, HTML e JSX. Andarsene è sempre possibile.'
+        detail: 'Esporta in .fig, PDF, SVG, HTML e JSX. Andarsene è sempre possibile.'
       },
       {
         title: 'Licenza MIT',
@@ -121,7 +121,7 @@ export const it: LandingMessages = {
         { title: 'Annulla, rigenera e modifica i turni dell’AI' },
         { title: 'Codice collegato ai livelli' },
         { title: 'Diff visivo e patch' },
-        { title: 'Commenti e chiamate vocali nelle stanze condivise' },
+        { title: 'Commenti fissati ai livelli' },
         { title: 'Componenti Vue e React nella scheda Codice' },
         { title: 'Importazione di SVG e HTML come livelli modificabili' },
         { title: 'Riempimenti con shader' },
@@ -177,7 +177,7 @@ export const it: LandingMessages = {
       cloud: {
         title: 'Pairdraw Cloud',
         detail:
-          'Lo spazio ospitato per i team: sincronizzazione in diretta, condivisione, librerie e IA, senza nulla da gestire.'
+          'Un server facoltativo che gestisci per il tuo team: sincronizzazione in diretta, condivisione, commenti e librerie del team.'
       }
     },
     later: {
@@ -195,9 +195,9 @@ export const it: LandingMessages = {
     }
   },
   cloud: {
-    badge: 'Accesso anticipato',
+    badge: 'Self-hosted',
     title: 'Pairdraw Cloud',
-    lede: 'Lo spazio di design del tuo team, ospitato per te. Tutti modificano gli stessi file in diretta, li condividono con un link e progettano con l’IA, senza nulla da installare o gestire. I tuoi file restano aperti: esportali come .fig quando vuoi.',
+    lede: 'Lo spazio di design del tuo team su un server che gestisci tu. Tutti modificano gli stessi file in diretta, li condividono con un invito o un link e progettano con l’IA offerta dal tuo server. Pairdraw non lo ospita per te, e i tuoi file restano aperti: esportali come .fig quando vuoi.',
     features: [
       {
         title: 'Sincronizzazione del team in tempo reale',
@@ -209,16 +209,19 @@ export const it: LandingMessages = {
         detail: 'Invia un link per rivedere un design e discuterne direttamente sulla tela.'
       },
       {
-        title: 'Librerie del team',
-        detail: 'Pubblica componenti, stili e token una volta e usali in ogni file.'
+        title: 'Cronologia delle versioni',
+        detail:
+          'Versioni con nome e salvataggi automatici, con ripristino e un link a ogni versione.'
       },
       {
-        title: 'IA ospitata',
-        detail: 'Agenti che progettano con te, senza chiavi API da gestire.'
+        title: 'IA sul tuo server',
+        detail:
+          'I membri usano i modelli offerti dal tuo server, con crediti invece delle proprie chiavi.'
       },
       {
-        title: 'SSO e controlli di amministrazione',
-        detail: 'Single sign-on, ruoli e controllo su chi vede cosa.'
+        title: 'Account e ruoli',
+        detail:
+          'Accesso con email, Google o Apple, approvazione dei nuovi account e ruoli nello spazio di lavoro.'
       }
     ]
   },

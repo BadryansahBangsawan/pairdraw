@@ -54,7 +54,7 @@ export const en: LandingMessages = {
     collab: {
       title: 'Work together, with people and agents',
       detail:
-        'Share a link and everyone edits the same document, peer to peer, with live cursors, follow mode, comments pinned to layers, and voice calls. AI agents join the same way: everyone in the room watches them build as they stream.',
+        'Keep a document on your team’s Cloud server and everyone who opens it edits it live, with cursors, follow mode, and comments pinned to layers. AI agents show their cursors on the same canvas, so you watch them build as they stream.',
       hint: 'Both screens are yours to use. Drag a layer on one and watch it move on the other, then ask the agent.'
     },
     code: {
@@ -99,7 +99,7 @@ export const en: LandingMessages = {
       },
       {
         title: 'Open formats',
-        detail: 'Export to .fig, PDF, PPTX, SVG, HTML, and JSX. Leaving is always possible.'
+        detail: 'Export to .fig, PDF, SVG, HTML, and JSX. Leaving is always possible.'
       },
       {
         title: 'MIT licensed',
@@ -120,7 +120,7 @@ export const en: LandingMessages = {
         { title: 'Revert, regenerate, and edit AI turns' },
         { title: 'Code linked to canvas layers' },
         { title: 'Visual diff and patch' },
-        { title: 'Comments and voice calls in shared rooms' },
+        { title: 'Comments pinned to layers' },
         { title: 'Vue and React components in the Code tab' },
         { title: 'SVG and HTML import as editable layers' },
         { title: 'Shader fills' },
@@ -173,7 +173,7 @@ export const en: LandingMessages = {
       cloud: {
         title: 'Pairdraw Cloud',
         detail:
-          'The hosted workspace for teams: live sync, sharing, libraries, and AI, with nothing to run.'
+          'An optional server you run for your team: live sync, sharing, comments, and team libraries.'
       }
     },
     later: {
@@ -188,9 +188,9 @@ export const en: LandingMessages = {
     }
   },
   cloud: {
-    badge: 'Early access',
+    badge: 'Self-hosted',
     title: 'Pairdraw Cloud',
-    lede: "Your team's design workspace, hosted for you. Everyone edits the same files live, shares them with a link, and designs with AI, with nothing to install or run. Your files stay open: export them as .fig whenever you like.",
+    lede: 'Your team’s design workspace on a server you run. Everyone edits the same files live, shares them by invitation or link, and designs with the AI your server offers. Pairdraw does not host it for you, and your files stay open: export them as .fig whenever you like.',
     features: [
       {
         title: 'Real-time team sync',
@@ -201,13 +201,16 @@ export const en: LandingMessages = {
         detail: 'Send a link to review a design and discuss it right on the canvas.'
       },
       {
-        title: 'Team libraries',
-        detail: 'Publish components, styles, and tokens once and use them in every file.'
+        title: 'Version history',
+        detail: 'Named versions and autosaves, with restore and a link to any version.'
       },
-      { title: 'Hosted AI', detail: 'Agents that design with you, with no API keys to manage.' },
       {
-        title: 'SSO and admin controls',
-        detail: 'Single sign-on, roles, and control over who sees what.'
+        title: 'AI on your server',
+        detail: 'Members use the models your server offers, with credits instead of their own keys.'
+      },
+      {
+        title: 'Accounts and roles',
+        detail: 'Email, Google, or Apple sign-in, approval of new accounts, and workspace roles.'
       }
     ]
   },

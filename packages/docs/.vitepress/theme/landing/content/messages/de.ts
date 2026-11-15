@@ -54,7 +54,7 @@ export const de: LandingMessages = {
     collab: {
       title: 'Gemeinsam arbeiten, mit Menschen und Agenten',
       detail:
-        'Teile einen Link, und alle bearbeiten dasselbe Dokument, Peer-to-Peer, mit Live-Cursorn, Folgemodus, an Ebenen gehefteten Kommentaren und Sprachanrufen. KI-Agenten kommen genauso dazu: Alle im Raum sehen zu, wie sie bauen, während sie streamen.',
+        'Lege ein Dokument auf den Cloud-Server deines Teams, und alle, die es öffnen, bearbeiten es live, mit Cursorn, Folgemodus und an Ebenen gehefteten Kommentaren. KI-Agenten zeigen ihre Cursor auf derselben Leinwand, sodass du zusiehst, wie sie bauen, während sie streamen.',
       hint: 'Beide Bildschirme gehören dir. Zieh auf einem eine Ebene und sieh zu, wie sie sich auf dem anderen bewegt; dann frag den Agenten.'
     },
     code: {
@@ -100,7 +100,7 @@ export const de: LandingMessages = {
       },
       {
         title: 'Offene Formate',
-        detail: 'Export nach .fig, PDF, PPTX, SVG, HTML und JSX. Ein Wechsel ist jederzeit möglich.'
+        detail: 'Export nach .fig, PDF, SVG, HTML und JSX. Ein Wechsel ist jederzeit möglich.'
       },
       {
         title: 'MIT-lizenziert',
@@ -121,7 +121,7 @@ export const de: LandingMessages = {
         { title: 'KI-Schritte zurücknehmen, neu erzeugen und bearbeiten' },
         { title: 'Code mit Ebenen verknüpft' },
         { title: 'Visueller Diff und Patch' },
-        { title: 'Kommentare und Sprachanrufe in geteilten Räumen' },
+        { title: 'An Ebenen geheftete Kommentare' },
         { title: 'Vue- und React-Komponenten im Code-Tab' },
         { title: 'SVG- und HTML-Import als bearbeitbare Ebenen' },
         { title: 'Shader-Füllungen' },
@@ -177,7 +177,7 @@ export const de: LandingMessages = {
       cloud: {
         title: 'Pairdraw Cloud',
         detail:
-          'Der gehostete Arbeitsbereich für Teams: Live-Synchronisierung, Freigabe, Bibliotheken und KI, ohne eigenen Betrieb.'
+          'Ein optionaler Server, den du für dein Team betreibst: Live-Synchronisierung, Freigabe, Kommentare und Team-Bibliotheken.'
       }
     },
     later: {
@@ -195,9 +195,9 @@ export const de: LandingMessages = {
     }
   },
   cloud: {
-    badge: 'Früher Zugang',
+    badge: 'Selbst gehostet',
     title: 'Pairdraw Cloud',
-    lede: 'Der Design-Arbeitsbereich deines Teams, für dich gehostet. Alle bearbeiten dieselben Dateien live, teilen sie per Link und gestalten mit KI, ohne etwas zu installieren oder zu betreiben. Deine Dateien bleiben offen: Exportiere sie jederzeit als .fig.',
+    lede: 'Der Design-Arbeitsbereich deines Teams auf einem Server, den du selbst betreibst. Alle bearbeiten dieselben Dateien live, teilen sie per Einladung oder Link und gestalten mit der KI, die dein Server anbietet. Pairdraw hostet ihn nicht für dich, und deine Dateien bleiben offen: Exportiere sie jederzeit als .fig.',
     features: [
       {
         title: 'Team-Synchronisierung in Echtzeit',
@@ -208,16 +208,19 @@ export const de: LandingMessages = {
         detail: 'Schick einen Link zur Durchsicht und diskutiert direkt auf der Leinwand.'
       },
       {
-        title: 'Team-Bibliotheken',
-        detail: 'Komponenten, Stile und Tokens einmal veröffentlichen und in jeder Datei nutzen.'
+        title: 'Versionsverlauf',
+        detail:
+          'Benannte Versionen und automatische Sicherungen, mit Wiederherstellung und einem Link zu jeder Version.'
       },
       {
-        title: 'Gehostete KI',
-        detail: 'Agenten, die mit dir gestalten, ohne API-Schlüssel zu verwalten.'
+        title: 'KI auf deinem Server',
+        detail:
+          'Mitglieder nutzen die Modelle deines Servers, mit Guthaben statt eigener Schlüssel.'
       },
       {
-        title: 'SSO und Admin-Steuerung',
-        detail: 'Single Sign-on, Rollen und Kontrolle darüber, wer was sieht.'
+        title: 'Konten und Rollen',
+        detail:
+          'Anmeldung per E-Mail, Google oder Apple, Freigabe neuer Konten und Rollen im Arbeitsbereich.'
       }
     ]
   },

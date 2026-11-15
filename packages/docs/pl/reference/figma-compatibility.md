@@ -51,7 +51,7 @@ Porównanie funkcji Figma Design, jedna po drugiej, z obecnym stanem implementac
 | Na wierzch / na spód | ✅ | Skróty ] i [; także w menu kontekstowym |
 | Przenoszenie na stronę | ✅ | Przenoszenie zaznaczonych obiektów między stronami z menu kontekstowego |
 | Ograniczenia (responsywna zmiana rozmiaru) | ✅ | Lewo, prawo, środek, rozciąganie i skalowanie w każdej osi w sekcji Ograniczenia; działają przy zmianie rozmiaru rodzica, także w instancjach |
-| Inteligentne zaznaczanie (rozmieszczanie i wyrównanie) | 🟡 | Wyrównywanie i rozmieszczanie z panelu i menu Rozmieszczenie; brak uchwytów odstępów inteligentnego zaznaczania i Tidy up |
+| Inteligentne zaznaczanie (rozmieszczanie i wyrównanie) | 🟡 | Wyrównywanie, rozmieszczanie i **Uporządkuj** (<kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>T</kbd>) z panelu i menu Rozmieszczenie; brak uchwytów odstępów inteligentnego zaznaczania |
 | Prowadnice układu (kolumny, wiersze, siatka) | ✅ | Siatki, kolumny i wiersze w ramkach z liczbą, typem, marginesem, odstępem i kolorem; style siatek; wiele ramek naraz |
 | Pomiar odległości między warstwami | ✅ | Przytrzymaj <kbd>⌥</kbd> i najedź kursorem, aby zobaczyć odległości od zaznaczenia |
 | Zbiorcza edycja obiektów | ✅ | Panel właściwości dla wielu obiektów: położenie, rozmiar, wygląd, wypełnienie, obrys i efekty na wielu obiektach naraz; wspólne wartości są wyświetlane normalnie, a różne jako „Mieszane” |

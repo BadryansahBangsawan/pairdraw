@@ -94,10 +94,13 @@ Ist nichts ausgewählt, zeigt die Registerkarte „Design“ Eigenschaften der S
 
 ### Registerkarte „Code“
 
-Zeigt das ausgewählte Objekt als Code mit Syntaxhervorhebung, Zeilennummern und einer Kopierschaltfläche. Ein Formatschalter wechselt zwischen zwei Ausgaben:
+Zeigt die Auswahl als Code mit Syntaxhervorhebung, Zeilennummern und einer Kopierschaltfläche. Wählen Sie die Ausgabe:
 
-- **Pairdraw JSX:** ein eigener Komponentenbaum, kompatibel mit `renderJSX()`, für den programmatischen Hin- und Rückweg.
-- **Tailwind CSS v4:** HTML mit Utility-Klassen (`<div className="flex gap-4 p-3">`), bereit zum Einfügen in React- oder Vue-Projekte.
+- **Design JSX:** der Komponentenbaum von Pairdraw, den `renderJSX()` zurückliest; live bearbeiten, und die Ebenen folgen.
+- **HTML:** Markup mit reinem CSS oder Tailwind-Klassen.
+- **Vue** und **React:** Komponenten für die Auswahl, mit CSS oder Tailwind gestaltet.
+
+Solange der Code-Tab offen ist, unterstreicht er außerdem Fehler und Warnungen der Designprüfung im Code ihrer Ebenen ([Designs prüfen](/user-guide/checking-designs#in-the-code-panel)).
 
 ## Spalte des AI-Chats
 

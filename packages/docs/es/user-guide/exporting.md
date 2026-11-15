@@ -27,7 +27,7 @@ Puedes añadir varios ajustes de exportación para exportar el mismo objeto a di
 | Método | Mac | Windows / Linux |
 |--------|-----|-----------------|
 | Atajo de teclado (PNG) | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
-| Menú contextual | Clic derecho <kbd>→</kbd> Exportar… | Clic derecho <kbd>→</kbd> Exportar… |
+| Menú Archivo | **Archivo → Exportar selección** (PNG, SVG o `.fig`) | **Archivo → Exportar selección** (PNG, SVG o `.fig`) |
 | Panel de propiedades | Botón «Exportar» | Botón «Exportar» |
 
 El archivo exportado se guarda mediante un diálogo nativo (escritorio) o una descarga del navegador.

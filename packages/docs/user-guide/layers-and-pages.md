@@ -94,10 +94,13 @@ When no nodes are selected, the Design tab shows page-level properties including
 
 ### Code Tab
 
-Displays the selected node as code with syntax highlighting, line numbers, and a copy button. A format toggle lets you switch between two output modes:
+Displays the selection as code with syntax highlighting, line numbers, and a copy button. Choose the output:
 
-- **Pairdraw JSX** — custom component tree compatible with `renderJSX()` for programmatic round-trip
-- **Tailwind CSS v4** — HTML with utility classes (`<div className="flex gap-4 p-3">`) ready to paste into React/Vue projects
+- **Design JSX** — Pairdraw's component tree, which `renderJSX()` reads back; edit it live and the layers follow
+- **HTML** — markup styled with plain CSS or Tailwind classes
+- **Vue** and **React** — components for the selection, styled with CSS or Tailwind
+
+While the Code tab is open, it also underlines the design check's errors and warnings on the code of their layers ([Checking Designs](./checking-designs#in-the-code-panel)).
 
 ## AI Chat Column
 

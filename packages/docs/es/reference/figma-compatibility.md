@@ -51,7 +51,7 @@ Comparación, función por función, de las capacidades de Figma Design con el e
 | Traer al frente / Enviar al fondo | ✅ | Atajos ] y [; también en el menú contextual |
 | Mover a página | ✅ | Traslada los objetos seleccionados entre páginas desde el menú contextual |
 | Restricciones (redimensionado adaptable) | ✅ | Izquierda, derecha, centro, estirar y escalar en cada eje desde la sección Restricciones; se aplican al cambiar el tamaño del contenedor, también en instancias |
-| Selección inteligente (distribuir/alinear) | 🟡 | Alinear y distribuir desde el panel y el menú Organizar; sin tiradores de espaciado ni Tidy up |
+| Selección inteligente (distribuir/alinear) | 🟡 | Alinear, distribuir y **Ordenar** (<kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>T</kbd>) desde el panel y el menú Organizar; sin tiradores de espaciado de la selección inteligente |
 | Guías de disposición (columnas, filas, cuadrícula) | ✅ | Cuadrículas, columnas y filas en marcos con número, tipo, margen, medianil y color; estilos de cuadrícula; varios marcos a la vez |
 | Medir distancias | ✅ | Mantén <kbd>⌥</kbd> y pasa el puntero para ver las distancias desde la selección |
 | Edición múltiple | ✅ | Panel de propiedades para selección múltiple: edita posición, tamaño, apariencia, relleno, contorno y efectos en varios objetos; los valores comunes se muestran normalmente y los distintos aparecen como «Mixto» |

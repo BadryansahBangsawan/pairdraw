@@ -94,10 +94,13 @@ Jeśli nic nie jest zaznaczone, karta Design pokazuje właściwości strony, w t
 
 ### Karta Kod
 
-Pokazuje zaznaczony obiekt jako kod z wyróżnianiem składni, numerami wierszy i przyciskiem kopiowania. Przełącznik formatu pozwala wybrać jeden z dwóch trybów:
+Pokazuje zaznaczenie jako kod z wyróżnianiem składni, numerami wierszy i przyciskiem kopiowania. Wybierz wynik:
 
-- **Pairdraw JSX** — własne drzewo komponentów zgodne z `renderJSX()`, do programowego przenoszenia w obie strony;
-- **Tailwind CSS v4** — HTML z klasami narzędziowymi (`<div className="flex gap-4 p-3">`), gotowy do wklejenia w projekty React lub Vue.
+- **Design JSX** — drzewo komponentów Pairdraw, które `renderJSX()` odczytuje z powrotem; edytuj je na żywo, a warstwy podążają za zmianami;
+- **HTML** — znaczniki ze zwykłym CSS lub klasami Tailwind;
+- **Vue** i **React** — komponenty dla zaznaczenia, stylowane CSS lub Tailwind.
+
+Gdy karta Kod jest otwarta, podkreśla też błędy i ostrzeżenia sprawdzania projektu w kodzie ich warstw ([Checking Designs](/user-guide/checking-designs#in-the-code-panel)).
 
 ## Kolumna czatu AI
 

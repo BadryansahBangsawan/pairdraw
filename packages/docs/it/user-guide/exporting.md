@@ -27,7 +27,7 @@ Puoi aggiungere più impostazioni di esportazione per esportare lo stesso oggett
 | Modo | Mac | Windows / Linux |
 |------|-----|-----------------|
 | Scorciatoia da tastiera (PNG) | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
-| Menu contestuale | Clic destro <kbd>→</kbd> Esporta… | Clic destro <kbd>→</kbd> Esporta… |
+| Menu File | **File → Esporta selezione** (PNG, SVG o `.fig`) | **File → Esporta selezione** (PNG, SVG o `.fig`) |
 | Pannello delle proprietà | Clic sul pulsante «Esporta» | Clic sul pulsante «Esporta» |
 
 Il file esportato si salva con una finestra nativa (app desktop) o come download del browser.

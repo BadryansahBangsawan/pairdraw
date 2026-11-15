@@ -27,7 +27,7 @@ Sie können mehrere Exporteinstellungen hinzufügen, um dasselbe Objekt in einem
 | Weg | macOS | Windows / Linux |
 |--------|-----|-----------------|
 | Tastenkürzel (PNG) | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Strg</kbd> + <kbd>E</kbd> |
-| Kontextmenü | Rechtsklick <kbd>→</kbd> Export… | Rechtsklick <kbd>→</kbd> Export… |
+| Menü Datei | **Datei → Auswahl exportieren** (PNG, SVG oder `.fig`) | **Datei → Auswahl exportieren** (PNG, SVG oder `.fig`) |
 | Eigenschaften-Panel | Schaltfläche „Export“ anklicken | Schaltfläche „Export“ anklicken |
 
 Die exportierte Datei wird über einen nativen Dialog (Desktop) oder als Browser-Download gespeichert.

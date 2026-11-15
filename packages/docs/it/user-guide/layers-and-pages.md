@@ -94,10 +94,13 @@ Senza selezione, la scheda Design mostra le proprietà della pagina, tra cui il 
 
 ### Scheda Codice
 
-Mostra l’oggetto selezionato come codice con evidenziazione della sintassi, numeri di riga e un pulsante di copia. Un selettore di formato passa tra due modalità di output:
+Mostra la selezione come codice con evidenziazione della sintassi, numeri di riga e un pulsante per copiare. Scegli l’output:
 
-- **Pairdraw JSX**: albero di componenti personalizzato compatibile con `renderJSX()`, per andata e ritorno programmatici.
-- **Tailwind CSS v4**: HTML con classi di utilità (`<div className="flex gap-4 p-3">`) pronto da incollare in progetti React/Vue.
+- **Design JSX**: l’albero di componenti di Pairdraw, che `renderJSX()` rilegge; modificalo dal vivo e i livelli lo seguono.
+- **HTML**: markup con CSS semplice o classi Tailwind.
+- **Vue** e **React**: componenti per la selezione, con CSS o Tailwind.
+
+Mentre la scheda Codice è aperta, sottolinea anche errori e avvisi del controllo di design nel codice dei loro livelli ([Controllare i design](/user-guide/checking-designs#in-the-code-panel)).
 
 ## Colonna della chat con AI
 

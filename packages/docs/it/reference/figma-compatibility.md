@@ -51,7 +51,7 @@ Confronto, funzionalità per funzionalità, tra le capacità di Figma Design e l
 | Porta in primo piano / Porta in fondo | ✅ | Scorciatoie ] e [; anche nel menu contestuale |
 | Sposta in un'altra pagina | ✅ | Sposta i nodi selezionati tra le pagine dal menu contestuale |
 | Vincoli (ridimensionamento adattivo) | ✅ | Sinistra, destra, centro, estendi e scala su ciascun asse nella sezione **Vincoli**; applicati quando il genitore viene ridimensionato, anche nelle istanze |
-| Selezione intelligente (distribuisci/allinea) | 🟡 | Allineamento e distribuzione dal pannello e dal menu **Disponi**; niente maniglie di spaziatura della selezione intelligente né Riordina |
+| Selezione intelligente (distribuisci/allinea) | 🟡 | Allinea, distribuisci e **Riordina** (<kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>T</kbd>) dal pannello e dal menu Disponi; nessuna maniglia di spaziatura della selezione intelligente |
 | Guide di layout (colonne, righe, griglia) | ✅ | Griglie, colonne e righe sui frame con numero, tipo, margine, canale e colore; stili di griglia; più frame alla volta |
 | Misurare le distanze tra i livelli | ✅ | Tieni premuto <kbd>⌥</kbd> e passa sopra con il puntatore per vedere le distanze dalla selezione |
 | Modificare oggetti in blocco | ✅ | Pannello delle proprietà per selezioni multiple: modifica posizione, dimensione, aspetto, riempimento, contorno ed effetti su più nodi; i valori comuni appaiono normalmente, quelli diversi mostrano **Misto** |

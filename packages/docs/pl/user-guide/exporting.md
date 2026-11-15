@@ -27,7 +27,7 @@ Można dodać kilka ustawień eksportu, aby jednym ruchem wyeksportować ten sam
 | Sposób | macOS | Windows / Linux |
 |--------|-------|-----------------|
 | Skrót klawiaturowy (PNG) | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
-| Menu kontekstowe | Prawy przycisk → Eksport… | Prawy przycisk → Eksport… |
+| Menu Plik | **Plik → Eksportuj zaznaczenie** (PNG, SVG lub `.fig`) | **Plik → Eksportuj zaznaczenie** (PNG, SVG lub `.fig`) |
 | Panel właściwości | Przycisk „Eksport” | Przycisk „Eksport” |
 
 Wyeksportowany plik zapisuje się przez systemowe okno dialogowe (aplikacja na komputer) albo jako pobranie w przeglądarce.

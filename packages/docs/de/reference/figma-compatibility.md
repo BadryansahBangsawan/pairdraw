@@ -51,7 +51,7 @@ Vergleich der Funktionen von Figma Design, Funktion für Funktion, mit dem aktue
 | In den Vordergrund / in den Hintergrund | ✅ | Tastenkürzel ] und [; auch im Kontextmenü |
 | Auf andere Seite verschieben | ✅ | Ausgewählte Objekte über das Kontextmenü zwischen Seiten verschieben |
 | Einschränkungen (responsive Größenänderung) | ✅ | Links, rechts, Mitte, Strecken und Skalieren je Achse im Abschnitt **Einschränkungen**; greifen bei Größenänderung des Elternobjekts, auch in Instanzen |
-| Intelligente Auswahl (Verteilen/Ausrichten) | 🟡 | Ausrichten und Verteilen über das Panel und das Menü **Anordnen**; keine Abstandsgriffe der intelligenten Auswahl und kein Aufräumen (Tidy up) |
+| Intelligente Auswahl (Verteilen/Ausrichten) | 🟡 | Ausrichten, Verteilen und **Aufräumen** (<kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>T</kbd>) über das Panel und das Menü **Anordnen**; keine Abstandsgriffe der intelligenten Auswahl |
 | Layout-Hilfslinien (Spalten, Zeilen, Raster) | ✅ | Raster, Spalten und Zeilen in Rahmen mit Anzahl, Typ, Rand, Spaltenabstand und Farbe; Rasterstile; mehrere Rahmen gleichzeitig |
 | Abstände zwischen Ebenen messen | ✅ | <kbd>⌥</kbd> halten und mit der Maus darüberfahren zeigt die Abstände zur Auswahl |
 | Objekte gemeinsam bearbeiten | ✅ | Eigenschaften-Panel für Mehrfachauswahl: Position, Größe, Darstellung, Füllung, Kontur und Effekte über mehrere Objekte hinweg bearbeiten; gemeinsame Werte erscheinen normal, abweichende als „Gemischt“ |

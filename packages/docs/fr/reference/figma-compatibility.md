@@ -51,7 +51,7 @@ Comparaison, fonction par fonction, entre les capacités de Figma Design et l’
 | Premier plan / arrière-plan | ✅ | Raccourcis ] et [ ; aussi dans le menu contextuel |
 | Déplacer vers une page | ✅ | Déplacer les objets sélectionnés d’une page à l’autre depuis le menu contextuel |
 | Contraintes (redimensionnement adaptatif) | ✅ | Gauche, droite, centre, étirement et échelle sur chaque axe dans la section Contraintes ; appliquées quand le parent est redimensionné, y compris dans les instances |
-| Sélection intelligente (répartir/aligner) | 🟡 | Aligner et répartir depuis le panneau et le menu Disposition ; pas de poignées d’espacement de la sélection intelligente ni de Tidy up |
+| Sélection intelligente (répartir/aligner) | 🟡 | Aligner, répartir et **Ranger** (<kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>T</kbd>) depuis le panneau et le menu Disposition ; pas de poignées d’espacement de la sélection intelligente |
 | Repères de mise en page (colonnes, lignes, grille) | ✅ | Grilles, colonnes et lignes sur les cadres, avec nombre, type, marge, gouttière et couleur ; styles de grille ; plusieurs cadres à la fois |
 | Mesurer les distances entre calques | ✅ | Maintenez <kbd>⌥</kbd> et survolez pour afficher les distances depuis la sélection |
 | Modifier des objets en masse | ✅ | Panneau Propriétés en sélection multiple : position, taille, apparence, remplissage, contour et effets modifiables sur plusieurs objets ; les valeurs communes s’affichent normalement, les valeurs différentes indiquent « Mixte » |

@@ -27,7 +27,7 @@ Vous pouvez ajouter plusieurs réglages d’export pour exporter le même objet 
 | Méthode | Mac | Windows / Linux |
 |---------|-----|-----------------|
 | Raccourci clavier (PNG) | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
-| Menu contextuel | Clic droit <kbd>→</kbd> Exporter… | Clic droit <kbd>→</kbd> Exporter… |
+| Menu Fichier | **Fichier → Exporter la sélection** (PNG, SVG ou `.fig`) | **Fichier → Exporter la sélection** (PNG, SVG ou `.fig`) |
 | Panneau des propriétés | Bouton « Export » | Bouton « Export » |
 
 Le fichier exporté est enregistré via une boîte de dialogue native (application de bureau) ou un téléchargement du navigateur.

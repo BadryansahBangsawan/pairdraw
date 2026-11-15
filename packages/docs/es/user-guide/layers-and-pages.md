@@ -94,10 +94,13 @@ Sin ningún objeto seleccionado, la pestaña Diseño muestra las propiedades de 
 
 ### Pestaña Código
 
-Muestra el objeto seleccionado como código con resaltado de sintaxis, números de línea y un botón para copiar. Un selector de formato cambia entre dos modos de salida:
+Muestra la selección como código con resaltado de sintaxis, números de línea y un botón de copiar. Elige la salida:
 
-- **Pairdraw JSX:** árbol de componentes propio, compatible con `renderJSX()` para ida y vuelta programática.
-- **Tailwind CSS v4:** HTML con clases de utilidad (`<div className="flex gap-4 p-3">`) listo para pegar en proyectos de React o Vue.
+- **Design JSX**: el árbol de componentes de Pairdraw, que `renderJSX()` vuelve a leer; edítalo en vivo y las capas lo siguen.
+- **HTML**: marcado con CSS simple o clases de Tailwind.
+- **Vue** y **React**: componentes para la selección, con CSS o Tailwind.
+
+Mientras la pestaña Código está abierta, también subraya los errores y avisos de la revisión de diseño en el código de sus capas ([Revisar diseños](/user-guide/checking-designs#in-the-code-panel)).
 
 ## Columna del chat con AI
 

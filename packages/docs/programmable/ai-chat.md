@@ -11,7 +11,7 @@ Press <kbd>⌘</kbd><kbd>J</kbd> (<kbd>Ctrl</kbd> + <kbd>J</kbd>), or click the 
 
 Home asks **What do you want to design?** above the search field. Describe a screen, a component, or a page and press <kbd>Enter</kbd> (<kbd>Shift</kbd> + <kbd>Enter</kbd> starts a new line): Pairdraw opens a new design where Home creates one, in your Cloud workspace or storage bucket when one is selected, opens its chat, and sends the prompt. When no model is set up yet, the prompt waits in the new design's chat while Pairdraw looks for a coding agent on your computer (see [Setup](#setup)), and is sent once one is connected. When none is found, guided setup opens first and the prompt is sent once it finishes; closing setup keeps the prompt on Home.
 
-An empty page of a design offers the same prompt over the canvas on desktop. It sends into that document's chat and leaves once the page has a layer or an agent starts working, and the canvas around it keeps working as usual. Close it to hide it for that document, or turn off **Prompt on empty pages** in **Settings → Models → Chat**. Boards and read-only documents do not show it.
+An empty page of a design offers the same prompt over the canvas on desktop. It sends into that document's chat and leaves once the page has a layer or an agent starts working, and the canvas around it keeps working as usual. Close it to hide it for that document, or turn off **Prompt on the canvas** in **Settings → Models → Chat**. Boards and read-only documents do not show it.
 
 Both prompts list example chips — **Landing page**, **Sign-in screen**, **Dashboard**, and **Pricing**. Picking one fills the prompt with a starting idea and focuses it so you can edit it before sending; nothing is sent until you press <kbd>Enter</kbd>.
 

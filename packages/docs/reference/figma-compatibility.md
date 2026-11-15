@@ -51,7 +51,7 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 | Bring to front / Send to back | ✅ | ] and [ keyboard shortcuts; also in context menu |
 | Move to page | ✅ | Move selected nodes between pages via context menu |
 | Constraints (responsive resize) | ✅ | Left, right, center, stretch, and scale on each axis in the Constraints section; applied when the parent resizes, in instances too |
-| Smart selection (distribute/align) | 🟡 | Align and distribute from the panel and Arrange menu; no smart selection spacing handles or Tidy up |
+| Smart selection (distribute/align) | 🟡 | Align, distribute, and **Tidy Up** (<kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>T</kbd>) from the panel and Arrange menu; no smart selection spacing handles |
 | Layout guides (columns, rows, grid) | ✅ | Grids, columns, and rows on frames with count, type, margin, gutter, and color; grid styles; several frames at once |
 | Measure distances between layers | ✅ | Hold <kbd>⌥</kbd> and hover to show distances from the selection |
 | Edit objects in bulk | ✅ | Multi-selection properties panel: edit position, size, appearance, fill, stroke, effects across multiple nodes; shared values display normally, differing values show "Mixed" |

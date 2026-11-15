@@ -27,7 +27,7 @@ You can add multiple export settings to export the same node at different scales
 | Method | Mac | Windows / Linux |
 |--------|-----|-----------------|
 | Keyboard shortcut (PNG) | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>E</kbd> | <kbd>Shift</kbd> + <kbd>Ctrl</kbd> + <kbd>E</kbd> |
-| Context menu | Right-click <kbd>→</kbd> Export… | Right-click <kbd>→</kbd> Export… |
+| File menu | **File → Export Selection** (PNG, SVG, or `.fig`) | **File → Export Selection** (PNG, SVG, or `.fig`) |
 | Properties panel | Click "Export" button | Click "Export" button |
 
 The exported file is saved via a native dialog (desktop) or browser download.

@@ -94,10 +94,13 @@ Sans sélection, l’onglet Design affiche les propriétés de la page, dont la 
 
 ### Onglet Code
 
-Affiche l’objet sélectionné sous forme de code, avec coloration syntaxique, numéros de ligne et bouton de copie. Un sélecteur de format bascule entre deux modes de sortie :
+Affiche la sélection sous forme de code avec coloration syntaxique, numéros de ligne et bouton de copie. Choisissez la sortie :
 
-- **Pairdraw JSX :** arbre de composants compatible avec `renderJSX()` pour un aller-retour par programme.
-- **Tailwind CSS v4 :** HTML avec classes utilitaires (`<div className="flex gap-4 p-3">`) prêt à coller dans des projets React ou Vue.
+- **Design JSX** : l’arbre de composants de Pairdraw, que `renderJSX()` relit ; modifiez-le en direct et les calques suivent.
+- **HTML** : du balisage stylé en CSS simple ou avec des classes Tailwind.
+- **Vue** et **React** : des composants pour la sélection, stylés en CSS ou avec Tailwind.
+
+Tant que l’onglet Code est ouvert, il souligne aussi les erreurs et avertissements de l’analyse de design dans le code de leurs calques ([Checking Designs](/user-guide/checking-designs#in-the-code-panel)).
 
 ## Colonne du chat avec l’IA
 

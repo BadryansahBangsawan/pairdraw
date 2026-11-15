@@ -2,6 +2,8 @@ import { test, expect, type Page } from '@playwright/test'
 
 import type { ExportSetting } from '@pairdraw/scene-graph'
 
+import { EXTRA_EXPORT_FORMATS_INCLUDED } from '@/constants'
+
 import { expectInViewport } from '#tests/e2e/fixtures'
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { propertyItems, propertySection } from '#tests/helpers/properties'
@@ -111,8 +113,14 @@ test('format selector changes to JPG', async () => {
   await expect(formatTrigger).toHaveAttribute('aria-label', 'Export format')
   await formatTrigger.click()
 
-  for (const label of ['PNG', 'JPG', 'WEBP', 'SVG', 'PDF', 'PPTX', 'draw.io']) {
+  for (const label of ['PNG', 'JPG', 'WEBP', 'SVG', 'PDF']) {
     await expect(page.locator('[role="option"]').filter({ hasText: label })).toBeVisible()
+  }
+  // The same formats the File menu offers: a build without the extra ones leaves them out.
+  for (const label of ['PPTX', 'draw.io']) {
+    await expect(page.locator('[role="option"]').filter({ hasText: label })).toHaveCount(
+      EXTRA_EXPORT_FORMATS_INCLUDED ? 1 : 0
+    )
   }
 
   const jpgOption = page.locator('[role="option"]').filter({ hasText: 'JPG' })
@@ -121,6 +129,20 @@ test('format selector changes to JPG', async () => {
   await canvas.waitForRender()
 
   await expect(formatTrigger).toHaveText('JPG')
+  canvas.assertNoErrors()
+})
+
+test('a setting from a file keeps the extra format it names', async () => {
+  test.skip(EXTRA_EXPORT_FORMATS_INCLUDED, 'every format is offered in this build')
+  await createRectangles(1, [[{ scale: 1, format: 'pptx' }]])
+
+  const formatTrigger = exportItems().first().getByRole('combobox', { name: 'Export format' })
+  await expect(formatTrigger).toHaveText('PPTX')
+  await formatTrigger.click()
+  await expect(page.locator('[role="option"]').filter({ hasText: 'PPTX' })).toHaveCount(1)
+  await expect(page.locator('[role="option"]').filter({ hasText: 'draw.io' })).toHaveCount(0)
+  await page.locator('[role="option"]').filter({ hasText: 'PNG' }).click()
+  await canvas.waitForRender()
   canvas.assertNoErrors()
 })
 

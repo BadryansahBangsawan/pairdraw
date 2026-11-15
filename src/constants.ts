@@ -1,5 +1,6 @@
 export { IS_BROWSER, IS_TAURI } from '@pairdraw/core/constants'
 
+import type { ExportFormatId } from '@pairdraw/scene-graph/export-format'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
 /**
@@ -23,6 +24,9 @@ export const BOARD_INCLUDED: boolean = false
  * images, PDF, SVG, HTML, and its own documents.
  */
 export const EXTRA_EXPORT_FORMATS_INCLUDED: boolean = false
+
+/** The node export formats `EXTRA_EXPORT_FORMATS_INCLUDED` leaves out of the Export section. */
+export const EXTRA_EXPORT_FORMAT_IDS: readonly ExportFormatId[] = ['pptx', 'drawio']
 
 /**
  * The collaboration namespace. It names the shared document format and how peers send it, so

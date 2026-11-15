@@ -22,6 +22,7 @@ import Tip from '@/components/ui/overlay/Tip.vue'
 import PanelItemRow from '@/components/ui/panel/PanelItemRow.vue'
 import PanelSection from '@/components/ui/panel/PanelSection.vue'
 import AppSelect from '@/components/ui/select/AppSelect.vue'
+import { EXTRA_EXPORT_FORMAT_IDS, EXTRA_EXPORT_FORMATS_INCLUDED } from '@/constants'
 import { CHECKERBOARD_BACKGROUND } from '@/theme/paint/checkerboard'
 
 const editorStore = useEditorStore()
@@ -46,6 +47,17 @@ const {
   scales,
   clampExportScale
 } = useExport()
+
+/**
+ * The formats a setting can switch to. A build without the extra formats leaves them out, except
+ * the one a setting from an opened file already names, so its row still says what it exports.
+ */
+function formatChoices(setting: ExportSetting) {
+  if (EXTRA_EXPORT_FORMATS_INCLUDED) return formatOptions
+  return formatOptions.filter(
+    (option) => option.value === setting.format || !EXTRA_EXPORT_FORMAT_IDS.includes(option.value)
+  )
+}
 
 const previewBlob = shallowRef<Blob | null>(null)
 const previewURL = useObjectUrl(previewBlob)
@@ -198,7 +210,7 @@ watch(previewKey, updatePreview, { flush: 'post' })
       </div>
       <AppSelect
         :model-value="setting.format"
-        :options="formatOptions"
+        :options="formatChoices(setting)"
         :label="panels.exportFormat"
         :ui="{ trigger: 'w-auto min-w-0 flex-1' }"
         data-property="export-format"

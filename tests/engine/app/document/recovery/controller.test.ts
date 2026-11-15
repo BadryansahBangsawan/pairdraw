@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
+import { promiseTimeout } from '@vueuse/core'
 import { reactive, ref } from 'vue'
 
 import { createEditor } from '@pairdraw/core'
@@ -313,6 +314,39 @@ describe('document recovery controller', () => {
       editor.createShape('RECTANGLE', 0, 0, 100, 100)
       await recovery.persistNow()
       expect((await store.read('recovery-1'))?.figBytes[0]).toBe(changes.capture())
+    } finally {
+      recovery.disposeRecovery()
+      changes.dispose()
+      editor.dispose()
+    }
+  })
+
+  test('keeps no copy of a document undone back to where it started', async () => {
+    const editor = createEditor()
+    const id = editor.graph.createNode('RECTANGLE', editor.state.currentPageId, { width: 10 }).id
+    const changes = createDocumentChanges(editor)
+    const store = createMemoryRecoveryStore()
+    const recovery = createDocumentRecovery({
+      state: { documentName: 'Draft' },
+      version: changes.capture,
+      hasChanges: changes.hasUnsavedChanges,
+      store,
+      recoveryId: 'recovery-1',
+      hasWritableSource: () => false,
+      buildFigFile: () => new Uint8Array([changes.capture()])
+    })
+    try {
+      editor.updateNodeWithUndo(id, { width: 20 }, 'Resize')
+      await promiseTimeout(0)
+      await recovery.persistNow()
+      expect(await store.list()).toHaveLength(1)
+
+      // Back where it started, as after a reload: nothing to recover, so the copy goes too.
+      editor.undoAction()
+      await promiseTimeout(0)
+      expect(changes.hasUnsavedChanges()).toBe(false)
+      await recovery.persistNow()
+      expect(await store.list()).toEqual([])
     } finally {
       recovery.disposeRecovery()
       changes.dispose()

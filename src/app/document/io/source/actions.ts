@@ -115,7 +115,8 @@ export function createDocumentSourceActions({
     hasWritableSource,
     fileSource: writableFile,
     autosaveCovers: () => state.autosaveEnabled && !isDiskChangePending(),
-    keptElsewhere: () => draft.keepsChanges()
+    keptElsewhere: () => draft.keepsChanges(),
+    hasChanges: changes.hasUnsavedChanges
   })
 
   /**

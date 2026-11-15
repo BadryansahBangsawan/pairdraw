@@ -21,6 +21,11 @@ interface DocumentRecoveryOptions {
   autosaveCovers?: () => boolean
   /** Whether the document keeps its changes elsewhere, such as in its draft, so it needs no copy. */
   keptElsewhere?: () => boolean
+  /**
+   * Whether the document differs from where it was saved or started. A revision that leaves it
+   * there, such as undoing back, leaves nothing to recover.
+   */
+  hasChanges?: () => boolean
   isEnabled?: () => boolean
   store?: RecoveryStore
   recoveryId?: string
@@ -43,6 +48,7 @@ export function createDocumentRecovery({
   fileSource = () => null,
   autosaveCovers = () => false,
   keptElsewhere = () => false,
+  hasChanges = () => true,
   isEnabled = () => true,
   store = getRecoveryStore(),
   recoveryId = createCanvasId()
@@ -69,7 +75,7 @@ export function createDocumentRecovery({
 
   async function runWrites(generation: number): Promise<void> {
     if (disposed || generation !== lifecycleGeneration || !isEnabled()) return
-    if (!copyTarget() || requestedVersion === protectedVersion) return
+    if (!copyTarget() || requestedVersion === protectedVersion || !hasChanges()) return
     const version = requestedVersion
     const bytes = await buildFigFile()
     const target = copyTarget()
@@ -91,6 +97,7 @@ export function createDocumentRecovery({
     if (disposed || !copyTarget() || !isEnabled()) return
     requestedVersion = currentVersion()
     if (requestedVersion === protectedVersion) return
+    if (!hasChanges()) return protect(requestedVersion)
     if (!writing) {
       const generation = lifecycleGeneration
       writing = runWrites(generation).finally(() => {
@@ -141,6 +148,17 @@ export function createDocumentRecovery({
     await Promise.all([writing, cleanup])
   }
 
+  /** The document as of `version` is kept elsewhere or needs no keeping: a copy up to it goes. */
+  async function protect(version: number): Promise<void> {
+    await invalidateActiveWrite()
+    protectedVersion = version
+    requestedVersion = currentVersion()
+    if (persistedVersion == null || persistedVersion <= version) {
+      await store.remove(id)
+      persistedVersion = null
+    }
+  }
+
   return {
     getRecoveryId: () => id,
     async adoptRecoverySnapshot(nextId) {
@@ -156,15 +174,7 @@ export function createDocumentRecovery({
       if (previousId !== nextId) await store.remove(previousId)
     },
     persistNow,
-    async markProtectedVersion(version) {
-      await invalidateActiveWrite()
-      protectedVersion = version
-      requestedVersion = currentVersion()
-      if (persistedVersion == null || persistedVersion <= version) {
-        await store.remove(id)
-        persistedVersion = null
-      }
-    },
+    markProtectedVersion: protect,
     async discardRecovery() {
       await invalidateActiveWrite()
       protectedVersion = currentVersion()

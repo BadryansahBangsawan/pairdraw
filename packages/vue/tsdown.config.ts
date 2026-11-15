@@ -160,7 +160,9 @@ export default defineConfig({
     neverBundle: [...external, /^node:/    ],
     onlyBundle: false
   },
-  plugins: [atlaskitSubpathResolver(), raw(), vue()],
+  // A production build, or the compiler writes each component's absolute source path as `__file`
+  // into the published package.
+  plugins: [atlaskitSubpathResolver(), raw(), vue({ isProduction: true })],
   inputOptions: {
     preserveEntrySignatures: 'allow-extension',
     checks: {

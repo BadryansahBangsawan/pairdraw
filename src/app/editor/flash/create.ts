@@ -2,9 +2,10 @@ import type { Editor } from '@pairdraw/core'
 
 export function createFlashActions(editor: Editor) {
   let flashRafId = 0
+  let disposed = false
 
   function pumpFlashes() {
-    if (!editor.renderer?.hasActiveFlashes) {
+    if (disposed || !editor.renderer?.hasActiveFlashes) {
       flashRafId = 0
       return
     }
@@ -14,26 +15,26 @@ export function createFlashActions(editor: Editor) {
   }
 
   function aiMarkActive(nodeIds: string[]) {
-    if (!editor.renderer) return
+    if (disposed || !editor.renderer) return
     editor.renderer.aiMarkActive(nodeIds)
     if (!flashRafId) pumpFlashes()
   }
 
   function aiMarkDone(nodeIds: string[]) {
-    if (!editor.renderer) return
+    if (disposed || !editor.renderer) return
     editor.renderer.aiMarkDone(nodeIds)
     if (!flashRafId) pumpFlashes()
   }
 
   function aiFlashDone(nodeIds: string[]) {
-    if (!editor.renderer) return
+    if (disposed || !editor.renderer) return
     editor.renderer.aiFlashDone(nodeIds)
     if (!flashRafId) pumpFlashes()
   }
 
   /** Traces in layers an agent added, one after another in the order given. */
   function aiEnter(nodeIds: string[]) {
-    if (!editor.renderer || nodeIds.length === 0) return
+    if (disposed || !editor.renderer || nodeIds.length === 0) return
     editor.renderer.aiEnter(nodeIds)
     if (!flashRafId) pumpFlashes()
   }
@@ -42,7 +43,15 @@ export function createFlashActions(editor: Editor) {
     editor.renderer?.aiClearAll()
   }
 
+  /** Stops the frame pump; flashes asked for later, as by a late timer, draw nothing. */
+  function disposeFlashes() {
+    disposed = true
+    if (flashRafId) cancelAnimationFrame(flashRafId)
+    flashRafId = 0
+  }
+
   return {
+    disposeFlashes,
     aiMarkActive,
     aiMarkDone,
     aiFlashDone,

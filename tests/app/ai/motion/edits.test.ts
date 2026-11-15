@@ -11,6 +11,7 @@ import {
   AI_EDIT_IDLE_MS,
   AI_EDIT_REPLY_SETTLE_MS,
   showAIEdit,
+  stopAIEditMotion,
   type AIEditMotionStore
 } from '@/app/ai/motion'
 import { appPreferences } from '@/app/settings/preferences/store'
@@ -170,6 +171,18 @@ describe('an AI edit on the canvas', () => {
     jest.advanceTimersByTime(AI_EDIT_IDLE_MS * 2)
 
     expect(calls).toEqual({ enter: [], active: [], done: [], flash: [], selected: [], zoomed: 0 })
+    expect(summaries()).toHaveLength(0)
+  })
+
+  test('stops without a flash or notice when its editor closes', () => {
+    const { graph, pageId, store, calls } = editor()
+    const card = graph.createNode('FRAME', pageId, { name: 'Card' })
+
+    showAIEdit(store, change([card]))
+    stopAIEditMotion(store)
+    jest.advanceTimersByTime(AI_EDIT_IDLE_MS * 2)
+
+    expect(calls.done).toEqual([])
     expect(summaries()).toHaveLength(0)
   })
 })

@@ -124,6 +124,13 @@ function schedule(store: AIEditMotionStore, session: EditSession, delay: number)
   }, delay)
 }
 
+/** Ends the editor's run of edits without its closing flash or notice, as when it closes. */
+export function stopAIEditMotion(store: AIEditMotionStore): void {
+  const session = sessions.get(store)
+  if (session?.timer) clearTimeout(session.timer)
+  sessions.delete(store)
+}
+
 /**
  * Shows one AI edit on the canvas. Layers it added trace in one after another, layers it
  * changed flash, and the frames it works in shimmer until its run of edits ends, which closes

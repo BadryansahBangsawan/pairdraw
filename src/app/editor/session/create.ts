@@ -5,6 +5,7 @@ import { BUILTIN_IO_FORMATS, IORegistry } from '@pairdraw/core/io'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import { createShaderRasterizer } from '@pairdraw/vue/canvas/surface'
 
+import { stopAIEditMotion } from '@/app/ai/motion'
 import { useCollabIdentity } from '@/app/collab/identity'
 import { recordPreparationOutcome } from '@/app/diagnostics'
 import { resolveFigmaClipboardImages } from '@/app/editor/clipboard/figma-images'
@@ -228,6 +229,7 @@ function buildEditorStore(initialGraph?: SceneGraph) {
     // App-specific overrides and additions
     ...modules,
     dispose() {
+      stopAIEditMotion(store)
       stopScriptLiveRuns()
       stopColorSpaceSync()
       recentPages.dispose()

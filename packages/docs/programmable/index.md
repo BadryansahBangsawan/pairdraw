@@ -20,7 +20,7 @@ That is why the automation surface matters. The app, the CLI, the AI tools, the 
 
 ## AI Chat
 
-The built-in assistant has access to 139 tools that cover the full surface of the editor. Describe what you want in natural language — "add a 16px drop shadow to all buttons", "create a card component with dark mode variant", "export every frame on this page at 2×".
+The built-in assistant has access to more than 130 tools that cover the full surface of the editor. Describe what you want in natural language — "add a 16px drop shadow to all buttons", "create a card component with dark mode variant", "export every frame on this page at 2×".
 
 [AI Chat →](./ai-chat)
 
@@ -54,7 +54,7 @@ The CLI also connects to the running desktop app via RPC, so you can script the 
 
 ## MCP Server
 
-Connect Claude Code, Cursor, Windsurf, or any MCP-compatible client to Pairdraw. The server exposes 139 tools for reading, creating, and modifying designs — the same tools the built-in AI chat uses. Runs over stdio or HTTP with session support.
+Connect Claude Code, Cursor, Windsurf, or any MCP-compatible client to Pairdraw. The server exposes more than 130 tools for reading, creating, and modifying designs — the same tools the built-in AI chat uses. Runs over stdio or HTTP with session support.
 
 [MCP Server →](./mcp-server)
 

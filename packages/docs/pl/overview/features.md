@@ -67,7 +67,7 @@ pairdraw export design.fig -f jsx --style tailwind
 
 ## Czat AI
 
-Naciśnij <kbd>⌘</kbd><kbd>J</kbd>. Ponad 90 narzędzi tworzy figury, zmienia style i układ, pracuje z komponentami i zmiennymi, wykonuje operacje logiczne, analizuje tokeny projektu i eksportuje zasoby. Można podłączyć Anthropic, OpenAI, Google AI, OpenRouter albo zgodny punkt końcowy.
+Naciśnij <kbd>⌘</kbd><kbd>J</kbd>. Ponad 130 narzędzi tworzy figury, zmienia style i układ, pracuje z komponentami i zmiennymi, wykonuje operacje logiczne, analizuje tokeny projektu i eksportuje zasoby. Można podłączyć Anthropic, OpenAI, Google AI, OpenRouter albo zgodny punkt końcowy.
 
 Wywołania narzędzi pojawiają się na zwijanej osi czasu. Do kontroli wizualnej asystent eksportuje wynik i porównuje go z poleceniem. Wszystkie zmiany AI można cofnąć.
 
@@ -81,7 +81,7 @@ Na istniejącej tablicy ta sama przeglądarka staje się badaniem (Pairdraw nie 
 
 ## Serwer MCP
 
-Claude Code, Cursor, Windsurf i inni klienci MCP mogą odczytywać i zmieniać `.fig` bez interfejsu. Dostępnych jest ponad 90 narzędzi oraz transporty stdio i HTTP.
+Claude Code, Cursor, Windsurf i inni klienci MCP mogą odczytywać i zmieniać `.fig` bez interfejsu. Dostępnych jest ponad 130 narzędzi oraz transporty stdio i HTTP.
 
 ```sh
 npm install -g @pairdraw/mcp

@@ -12,7 +12,7 @@
 | **File Format** | Kiwi binary + Zstd | Figma's own format — compact, fast parsing, .fig compatible |
 | **Collaboration** | Yjs (+ Trystero) | CRDT sync and presence; Cloud documents sync through their server's relay, and the Trystero peer-to-peer rooms are off in Pairdraw builds |
 | **Color** | culori | Color space conversions (HSV, RGB, hex) |
-| **AI/MCP** | MCP SDK + Hono | 139 tools for AI coding tools, stdio + HTTP transports |
+| **AI/MCP** | MCP SDK + Hono | More than 130 tools for AI coding tools, stdio + HTTP transports |
 | **JSX Transform** | Sucrase | Lightweight (201 KB) JSX → JS, synchronous, browser-compatible |
 | **Events** | nanoevents | 108 bytes, typed event emitter for SceneGraph mutations |
 | **Desktop** | Tauri v2 | A macOS installer of about 20 MB (Electron bundles ~100MB of Chromium alone), Rust backend |

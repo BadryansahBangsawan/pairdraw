@@ -189,7 +189,7 @@ Les changements sérialisables conviennent à la collaboration via serveur, mais
 
 ## 11. Scripts et extensibilité
 
-La commande [`eval`](/programmable/cli/scripting) fournit une API compatible avec les plugins Figma pour les scripts sans interface, les opérations par lots et les tests automatisés. Le chat AI, le serveur MCP et la CLI offrent aussi 138 outils pour lire, créer, modifier, structurer, gérer les variables, éditer les tracés, analyser, comparer, exécuter des opérations booléennes et organiser.
+La commande [`eval`](/programmable/cli/scripting) fournit une API compatible avec les plugins Figma pour les scripts sans interface, les opérations par lots et les tests automatisés. Le chat AI, le serveur MCP et la CLI offrent aussi plus de 130 outils pour lire, créer, modifier, structurer, gérer les variables, éditer les tracés, analyser, comparer, exécuter des opérations booléennes et organiser.
 
 Penpot propose des plugins isolés, mais pas d’API équivalente pour les scripts sans interface ni d’intégration MCP.
 
@@ -208,4 +208,4 @@ Penpot propose des plugins isolés, mais pas d’API équivalente pour les scrip
 | Auto-hébergement | Penpot | Déploiement Docker |
 | Maturité de l’écosystème | Penpot | Plusieurs années en production |
 
-Pairdraw est un éditeur compact à processus unique avec moteur CanvasKit et prise en charge native de `.fig`. Penpot est une plateforme client-serveur complète utilisant Clojure, ClojureScript, Rust, des bases de données et des services Docker. Les deux offrent la collaboration selon des modèles différents. Penpot propose un écosystème de plugins ; Pairdraw fournit des scripts sans interface compatibles Figma, 138 outils AI/MCP, l’export SVG et PDF, et une application de bureau.
+Pairdraw est un éditeur compact à processus unique avec moteur CanvasKit et prise en charge native de `.fig`. Penpot est une plateforme client-serveur complète utilisant Clojure, ClojureScript, Rust, des bases de données et des services Docker. Les deux offrent la collaboration selon des modèles différents. Penpot propose un écosystème de plugins ; Pairdraw fournit des scripts sans interface compatibles Figma, plus de 130 outils AI/MCP, l’export SVG et PDF, et une application de bureau.

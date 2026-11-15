@@ -276,7 +276,7 @@ The resources and the prompt stay available when `read_skill` is turned off in *
 
 ## Tools
 
-Pairdraw currently registers 100+ shared design tools, plus MCP-only document and prompt operations when applicable.
+Pairdraw currently registers more than 130 shared design tools, plus MCP-only document and prompt operations when applicable.
 
 ### Document
 

@@ -10,7 +10,7 @@ Pairdraw tratta i file di design come dati strutturati. Le operazioni dell’edi
 
 ## Chat con AI
 
-L’assistente integrato esegue oltre 90 strumenti. Un’istruzione può modificare le ombre di più pulsanti, creare un componente con variante scura o esportare tutti i frame di una pagina in scala 2×.
+L’assistente integrato esegue oltre 130 strumenti. Un’istruzione può modificare le ombre di più pulsanti, creare un componente con variante scura o esportare tutti i frame di una pagina in scala 2×.
 
 [Chat con AI →](./ai-chat)
 

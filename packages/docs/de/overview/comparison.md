@@ -189,7 +189,7 @@ Serialisierbare Änderungen passen gut zu Penpots serverbasierter Zusammenarbeit
 
 ## 11. Scripts und Erweiterbarkeit
 
-Der Befehl [`eval`](/programmable/cli/scripting) stellt eine Figma-kompatible Plugin API für Skripte ohne Oberfläche, Stapelvorgänge und automatisierte Tests bereit. Außerdem sind 138 AI-Werkzeuge über AI-Chat, MCP-Server und CLI verfügbar. Sie decken Lesen, Erstellen, Ändern, Struktur, Variablen, Vektorpfade, Analyse, Vergleiche, boolesche Operationen und Anordnung ab.
+Der Befehl [`eval`](/programmable/cli/scripting) stellt eine Figma-kompatible Plugin API für Skripte ohne Oberfläche, Stapelvorgänge und automatisierte Tests bereit. Außerdem sind mehr als 130 AI-Werkzeuge über AI-Chat, MCP-Server und CLI verfügbar. Sie decken Lesen, Erstellen, Ändern, Struktur, Variablen, Vektorpfade, Analyse, Vergleiche, boolesche Operationen und Anordnung ab.
 
 Penpot besitzt isoliert ausgeführte Plugins, aber keine vergleichbare Skript-API ohne Oberfläche oder MCP-Integration.
 
@@ -208,4 +208,4 @@ Penpot besitzt isoliert ausgeführte Plugins, aber keine vergleichbare Skript-AP
 | Selbsthosting | Penpot | Docker-Bereitstellung |
 | Ökosystemreife | Penpot | Mehrjährige Produktionserfahrung |
 
-Pairdraw ist ein kompakter Editor in einem Prozess mit CanvasKit-Renderer und nativer `.fig`-Unterstützung. Penpot ist eine vollständige Client-Server-Plattform mit Clojure, ClojureScript, Rust, Datenbanken und Docker-Diensten. Beide unterstützen Zusammenarbeit mit unterschiedlichen Modellen. Penpot bietet ein Plugin-Ökosystem; Pairdraw eine Figma-kompatible API ohne Oberfläche, 138 AI/MCP-Werkzeuge, SVG- und PDF-Export und eine Desktop-App.
+Pairdraw ist ein kompakter Editor in einem Prozess mit CanvasKit-Renderer und nativer `.fig`-Unterstützung. Penpot ist eine vollständige Client-Server-Plattform mit Clojure, ClojureScript, Rust, Datenbanken und Docker-Diensten. Beide unterstützen Zusammenarbeit mit unterschiedlichen Modellen. Penpot bietet ein Plugin-Ökosystem; Pairdraw eine Figma-kompatible API ohne Oberfläche, mehr als 130 AI/MCP-Werkzeuge, SVG- und PDF-Export und eine Desktop-App.

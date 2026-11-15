@@ -67,7 +67,7 @@ pairdraw export design.fig -f jsx --style tailwind
 
 ## AI-Chat
 
-<kbd>⌘</kbd><kbd>J</kbd> öffnet den Assistenten. Mehr als 90 Werkzeuge erstellen Formen, ändern Stile und Anordnungen, bearbeiten Komponenten und Variablen, führen boolesche Operationen aus, analysieren Designtoken und exportieren Ressourcen. Unterstützt werden Anthropic, OpenAI, Google AI, OpenRouter und kompatible Endpunkte.
+<kbd>⌘</kbd><kbd>J</kbd> öffnet den Assistenten. Mehr als 130 Werkzeuge erstellen Formen, ändern Stile und Anordnungen, bearbeiten Komponenten und Variablen, führen boolesche Operationen aus, analysieren Designtoken und exportieren Ressourcen. Unterstützt werden Anthropic, OpenAI, Google AI, OpenRouter und kompatible Endpunkte.
 
 Werkzeugaufrufe erscheinen als einklappbare Einträge auf einer Zeitleiste. Zur visuellen Prüfung stellt der Assistent seine Änderungen dar und vergleicht das Ergebnis mit der Anfrage. Sämtliche Änderungen durch AI können rückgängig gemacht werden.
 
@@ -81,7 +81,7 @@ In einem vorhandenen Board wird derselbe Browser zur Recherche (neue Boards biet
 
 ## MCP-Server
 
-Claude Code, Cursor, Windsurf und andere MCP-Clients können `.fig`-Dateien mit mehr als 90 Werkzeugen ohne grafische Oberfläche lesen und verändern. Als Übertragung stehen stdio und HTTP zur Verfügung.
+Claude Code, Cursor, Windsurf und andere MCP-Clients können `.fig`-Dateien mit mehr als 130 Werkzeugen ohne grafische Oberfläche lesen und verändern. Als Übertragung stehen stdio und HTTP zur Verfügung.
 
 ```sh
 npm install -g @pairdraw/mcp

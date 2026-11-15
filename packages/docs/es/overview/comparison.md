@@ -189,7 +189,7 @@ Los cambios serializables encajan con la colaboración basada en servidor, pero 
 
 ## 11. Scripts y extensibilidad
 
-El comando [`eval`](/programmable/cli/scripting) proporciona una API compatible con plugins de Figma para scripts sin interfaz, operaciones por lotes y pruebas automatizadas. Además, el chat con AI, el servidor MCP y la CLI ofrecen 138 herramientas para leer, crear, modificar, estructurar, gestionar variables, editar rutas vectoriales, analizar, comparar, ejecutar operaciones booleanas y ordenar.
+El comando [`eval`](/programmable/cli/scripting) proporciona una API compatible con plugins de Figma para scripts sin interfaz, operaciones por lotes y pruebas automatizadas. Además, el chat con AI, el servidor MCP y la CLI ofrecen más de 130 herramientas para leer, crear, modificar, estructurar, gestionar variables, editar rutas vectoriales, analizar, comparar, ejecutar operaciones booleanas y ordenar.
 
 Penpot ofrece plugins aislados, pero no una API equivalente para scripting sin interfaz ni integración MCP.
 
@@ -208,4 +208,4 @@ Penpot ofrece plugins aislados, pero no una API equivalente para scripting sin i
 | Alojamiento propio | Penpot | Despliegue con Docker |
 | Madurez del ecosistema | Penpot | Años de uso en producción |
 
-Pairdraw es un editor compacto de un solo proceso con renderizador CanvasKit y compatibilidad nativa con `.fig`. Penpot es una plataforma cliente-servidor completa con Clojure, ClojureScript, Rust, bases de datos y servicios Docker. Ambos ofrecen colaboración con modelos diferentes. Penpot tiene un ecosistema de plugins; Pairdraw ofrece scripting sin interfaz compatible con Figma, 138 herramientas AI/MCP, exportación SVG y PDF, y una aplicación de escritorio.
+Pairdraw es un editor compacto de un solo proceso con renderizador CanvasKit y compatibilidad nativa con `.fig`. Penpot es una plataforma cliente-servidor completa con Clojure, ClojureScript, Rust, bases de datos y servicios Docker. Ambos ofrecen colaboración con modelos diferentes. Penpot tiene un ecosistema de plugins; Pairdraw ofrece scripting sin interfaz compatible con Figma, más de 130 herramientas AI/MCP, exportación SVG y PDF, y una aplicación de escritorio.

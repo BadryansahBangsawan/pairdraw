@@ -28,7 +28,7 @@ Porównanie funkcji Figma Design z obecnymi możliwościami Pairdraw.
 | Własna miniatura | 🔲 | Zapisane pliki pokazują pierwszą stronę, jak w Figmie bez strony okładki; nie można wybrać innej miniatury |
 | Krok przesunięcia | 🔲 | Dostępne 1 i 10 pikseli; brak wartości własnych |
 | Menu aplikacji | ✅ | File, Edit, View, Object, Text i Arrange w przeglądarce; menu systemowe w Tauri |
-| Narzędzia AI | 🟡 | 138 narzędzi w czacie AI, agentach programistycznych (ACP) i MCP; zdjęcia stockowe, wektoryzacja obrazów oraz generowanie obrazów, usuwanie i zastępowanie tła i generowanie SVG z własnymi kluczami użytkownika do usług graficznych; brak wyszukiwania AI |
+| Narzędzia AI | 🟡 | Ponad 130 narzędzi w czacie AI, agentach programistycznych (ACP) i MCP; zdjęcia stockowe, wektoryzacja obrazów oraz generowanie obrazów, usuwanie i zastępowanie tła i generowanie SVG z własnymi kluczami użytkownika do usług graficznych; brak wyszukiwania AI |
 
 ## Warstwy i kształty
 
@@ -179,7 +179,7 @@ W sekcji Prototyp warstwy otrzymują interakcje po kliknięciu i po opóźnieniu
 | Współpraca | ✅ | Dokumenty w chmurze edytowane wspólnie przez serwer Pairdraw Cloud (Yjs) z kursorami, trybem śledzenia i kursorami agentów; brak pokojów na żywo dla plików lokalnych i rozmów głosowych |
 | Tryb programisty | 🟡 | Karta Kod pokazuje zaznaczenie jako design JSX, HTML, Vue lub React z CSS albo Tailwind; statusy Ready for dev; brak trybu inspekcji z wymiarami |
 | Tailwind CSS v4 | ✅ | HTML z klasami przez panel Kod, CLI lub API |
-| Serwer MCP | ✅ | `@pairdraw/mcp` ze stdio i HTTP; 138 podstawowych narzędzi oraz narzędzia dokumentu, historii i ustawień |
+| Serwer MCP | ✅ | `@pairdraw/mcp` ze stdio i HTTP; ponad 130 podstawowych narzędzi oraz narzędzia dokumentu, historii i ustawień |
 | CLI | ✅ | 24 polecenia, m.in. `info`, `tree`, `find`, `query`, `node`, `pages`, `variables`, `tokens`, `fonts`, `lint`, `analyze`, `export`, `import`, `convert`, `diff`, `eval` i `tool` |
 
 ## Figma Draw

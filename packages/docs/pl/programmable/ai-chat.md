@@ -1,6 +1,6 @@
 ---
 title: Czat AI
-description: Wbudowany asystent z ponad 90 narzędziami do tworzenia i zmieniania projektów.
+description: Wbudowany asystent z ponad 130 narzędziami do tworzenia i zmieniania projektów.
 ---
 
 # Czat AI
@@ -64,7 +64,7 @@ W wersji komputerowej każdy czat może dać swojemu agentowi programistycznemu 
 
 ## Możliwości
 
-Asystent korzysta z ponad 90 narzędzi do tworzenia, stylizowania, układu, komponentów, zmiennych, wyszukiwania, inspekcji, analizy, eksportu i operacji wektorowych. Do inspekcji należą `get_jsx` (widok JSX w obie strony), `diff_create` i `diff_jsx` (różnice strukturalne), `diff_visual` (różnice pikseli) oraz `describe` (rola semantyczna i wykrywanie problemów projektowych).
+Asystent korzysta z ponad 130 narzędzi do tworzenia, stylizowania, układu, komponentów, zmiennych, wyszukiwania, inspekcji, analizy, eksportu i operacji wektorowych. Do inspekcji należą `get_jsx` (widok JSX w obie strony), `diff_create` i `diff_jsx` (różnice strukturalne), `diff_visual` (różnice pikseli) oraz `describe` (rola semantyczna i wykrywanie problemów projektowych).
 
 ## Umiejętności
 

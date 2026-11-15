@@ -12,7 +12,7 @@ Interfejs edytora i narzędzia automatyzacji korzystają z tego samego silnika. 
 
 ## Czat AI
 
-Wbudowany asystent używa ponad 90 narzędzi. Opisz zadanie zwykłym językiem, na przykład: „dodaj wszystkim przyciskom cień 16 px”, „utwórz komponent karty z wariantem ciemnym” albo „wyeksportuj wszystkie ramki na tej stronie w skali 2×”.
+Wbudowany asystent używa ponad 130 narzędzi. Opisz zadanie zwykłym językiem, na przykład: „dodaj wszystkim przyciskom cień 16 px”, „utwórz komponent karty z wariantem ciemnym” albo „wyeksportuj wszystkie ramki na tej stronie w skali 2×”.
 
 [Czat AI →](./ai-chat)
 
@@ -46,7 +46,7 @@ CLI łączy się również przez RPC z uruchomioną aplikacją komputerową i st
 
 ## Serwer MCP
 
-Claude Code, Cursor, Windsurf i inni klienci MCP mogą korzystać z tych samych 138 narzędzi co czat AI. Serwer obsługuje stdio i HTTP z sesjami.
+Claude Code, Cursor, Windsurf i inni klienci MCP mogą korzystać z tych samych ponad 130 narzędzi co czat AI. Serwer obsługuje stdio i HTTP z sesjami.
 
 [Serwer MCP →](/programmable/mcp-server)
 

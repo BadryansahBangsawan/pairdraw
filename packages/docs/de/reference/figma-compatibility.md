@@ -28,7 +28,7 @@ Vergleich der Funktionen von Figma Design mit dem aktuellen Stand von Pairdraw.
 | Eigene Miniatur | 🔲 | Gespeicherte Dateien zeigen ihre erste Seite, wie Figma ohne Cover-Seite; keine eigene Auswahl |
 | Schrittweite | 🔲 | 1 px und 10 px, keine eigenen Werte |
 | Anwendungsmenü | ✅ | Browsermenü und native Tauri-Menüs |
-| AI-Werkzeuge | 🟡 | 138 Werkzeuge im AI-Chat, für Coding-Agents (ACP) und über MCP; Stockfotos, Bildvektorisierung sowie Bilderzeugung, Entfernen und Ersetzen von Hintergründen und SVG-Erzeugung mit den eigenen Schlüsseln für Bilddienste; keine AI-Suche |
+| AI-Werkzeuge | 🟡 | Mehr als 130 Werkzeuge im AI-Chat, für Coding-Agents (ACP) und über MCP; Stockfotos, Bildvektorisierung sowie Bilderzeugung, Entfernen und Ersetzen von Hintergründen und SVG-Erzeugung mit den eigenen Schlüsseln für Bilddienste; keine AI-Suche |
 
 ## Ebenen und Formen
 

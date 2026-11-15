@@ -270,7 +270,7 @@ Pairdraw's approach is simpler and lower overhead. Penpot's approach is more sui
 
 ## 11. Scripting & Extensibility
 
-Pairdraw ships with an [`eval` command](/programmable/cli/scripting) that provides a Figma-compatible Plugin API for headless scripting — batch operations, automated testing, and AI-driven modifications all run without the GUI. On top of that, **138 AI tools** are available via built-in chat, MCP server (stdio + HTTP), and the CLI — covering read, create, modify, structure, variables, vector path, analyze (color/typography/spacing/clusters), diff, boolean operations, and arrangement. Penpot has a plugin system with sandboxed execution but no headless scripting API or MCP integration.
+Pairdraw ships with an [`eval` command](/programmable/cli/scripting) that provides a Figma-compatible Plugin API for headless scripting — batch operations, automated testing, and AI-driven modifications all run without the GUI. On top of that, **more than 130 AI tools** are available via built-in chat, MCP server (stdio + HTTP), and the CLI — covering read, create, modify, structure, variables, vector path, analyze (color/typography/spacing/clusters), diff, boolean operations, and arrangement. Penpot has a plugin system with sandboxed execution but no headless scripting API or MCP integration.
 
 ## Summary
 
@@ -287,4 +287,4 @@ Pairdraw ships with an [`eval` command](/programmable/cli/scripting) that provid
 | **Self-hosting** | Penpot | Docker-ready vs a newer single-process Cloud server |
 | **Ecosystem maturity** | Penpot | Years of production vs early stage |
 
-Pairdraw is architecturally leaner — a single-process CanvasKit renderer in ~26K LOC of TypeScript, Figma-compatible by design. Penpot is a full-stack platform with ~299K LOC across Clojure, ClojureScript, Rust, and SCSS, plus a Docker service fleet. Both offer real-time collaboration through a server, which Pairdraw keeps optional. Penpot has a plugin ecosystem; **Pairdraw** has Figma-compatible headless scripting, **138 AI/MCP tools**, SVG and PDF export, and a native desktop app.
+Pairdraw is architecturally leaner — a single-process CanvasKit renderer in ~26K LOC of TypeScript, Figma-compatible by design. Penpot is a full-stack platform with ~299K LOC across Clojure, ClojureScript, Rust, and SCSS, plus a Docker service fleet. Both offer real-time collaboration through a server, which Pairdraw keeps optional. Penpot has a plugin ecosystem; **Pairdraw** has Figma-compatible headless scripting, **more than 130 AI/MCP tools**, SVG and PDF export, and a native desktop app.

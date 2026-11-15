@@ -1,6 +1,6 @@
 ---
 title: AI-Chat
-description: Integrierter AI-Assistent mit mehr als 90 Werkzeugen zum Erstellen und Bearbeiten von Designs.
+description: Integrierter AI-Assistent mit mehr als 130 Werkzeugen zum Erstellen und Bearbeiten von Designs.
 ---
 
 # AI-Chat
@@ -62,7 +62,7 @@ Auf dem Desktop kann jeder Chat seinem Coding-Agenten einen Projektordner zum Ar
 
 ## Werkzeuge
 
-Der Assistent verfügt über mehr als 90 Werkzeuge für Erstellung, Gestaltung, Anordnung, Komponenten, Variablen, Suche, Prüfung, Analyse, Export und Vektorbearbeitung.
+Der Assistent verfügt über mehr als 130 Werkzeuge für Erstellung, Gestaltung, Anordnung, Komponenten, Variablen, Suche, Prüfung, Analyse, Export und Vektorbearbeitung.
 
 ## Skills
 

@@ -22,7 +22,7 @@ graph TB
                 Kiwi --- SVG[SVG export]
             end
         end
-        MCP["MCP Server (139 tools, stdio+HTTP)"]
+        MCP["MCP Server (130+ tools, stdio+HTTP)"]
         Collab["Collaboration (Yjs: Cloud relay, agent presence)"]
     end
 ```
@@ -88,7 +88,7 @@ Tools are defined once in `packages/core/src/tools/`, split by domain: read, cre
 - **MCP server** — zod schemas, stdio + HTTP transports
 - **CLI** — available via the `eval` command, whose scripts get the `figma` Plugin API and the `pairdraw` API
 
-90+ core tools + 3 MCP file management tools. Includes XPath query (`query_nodes`), JSX inspection (`get_jsx`, `diff_jsx`), semantic description (`describe`), and vision-based verification (`export_image` returns images to the model).
+More than 130 core tools, plus MCP file management tools. Includes XPath query (`query_nodes`), JSX inspection (`get_jsx`, `diff_jsx`), semantic description (`describe`), and vision-based verification (`export_image` returns images to the model).
 
 ### Behaviours and Preview
 
@@ -114,7 +114,7 @@ When the app is running, CLI commands given no file send RPC requests (`POST /rp
 
 ### Full figma-use Tool Set
 
-The MCP server currently exposes 139 tools; the reference implementation in [figma-use](https://github.com/dannote/figma-use) has 118. Tools figma-use has and Pairdraw lacks cover advanced layout constraints, prototype connections, advanced component property editing, and bulk document operations.
+The MCP server currently exposes more than 130 tools; the reference implementation in [figma-use](https://github.com/dannote/figma-use) has 118. Tools figma-use has and Pairdraw lacks cover advanced layout constraints, prototype connections, advanced component property editing, and bulk document operations.
 
 ### CI Design Tooling
 

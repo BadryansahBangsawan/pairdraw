@@ -10,7 +10,7 @@ Pairdraw trata los archivos de diseño como datos estructurados. Las operaciones
 
 ## Chat con AI
 
-El asistente integrado puede ejecutar más de 90 herramientas. Una instrucción puede cambiar las sombras de varios botones, crear un componente con variante oscura o exportar todos los marcos de una página a escala 2×.
+El asistente integrado puede ejecutar más de 130 herramientas. Una instrucción puede cambiar las sombras de varios botones, crear un componente con variante oscura o exportar todos los marcos de una página a escala 2×.
 
 [Chat con AI →](./ai-chat)
 

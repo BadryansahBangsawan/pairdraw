@@ -12,7 +12,7 @@ Editor und Automatisierung verwenden denselben Kern. Ein Vorgang verhält sich d
 
 ## AI-Chat
 
-Der integrierte Assistent kann mehr als 90 Werkzeuge ausführen. Eine Anweisung kann beispielsweise Schatten mehrerer Schaltflächen ändern, eine Komponente mit dunkler Variante erstellen oder alle Rahmen einer Seite im Maßstab 2× exportieren.
+Der integrierte Assistent kann mehr als 130 Werkzeuge ausführen. Eine Anweisung kann beispielsweise Schatten mehrerer Schaltflächen ändern, eine Komponente mit dunkler Variante erstellen oder alle Rahmen einer Seite im Maßstab 2× exportieren.
 
 [AI-Chat →](./ai-chat)
 
@@ -40,7 +40,7 @@ Die CLI untersucht, exportiert und analysiert `.fig`-Dateien ohne geöffneten Ed
 
 ## MCP-Server
 
-Claude Code, Cursor, Windsurf und andere MCP-Clients können dieselben 138 Werkzeuge verwenden wie der integrierte AI-Chat. Der Server unterstützt stdio und HTTP mit Sitzungen.
+Claude Code, Cursor, Windsurf und andere MCP-Clients können dieselben mehr als 130 Werkzeuge verwenden wie der integrierte AI-Chat. Der Server unterstützt stdio und HTTP mit Sitzungen.
 
 [MCP-Server →](/programmable/mcp-server)
 

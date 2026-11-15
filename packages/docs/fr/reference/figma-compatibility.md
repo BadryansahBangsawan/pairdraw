@@ -28,7 +28,7 @@ Comparaison entre les fonctions de Figma Design et l’état actuel de Pairdraw.
 | Miniature personnalisée | 🔲 | Les fichiers enregistrés montrent leur première page, comme Figma sans page de couverture ; pas de choix de miniature |
 | Pas de déplacement | 🔲 | 1 px et 10 px ; pas de valeurs personnalisées |
 | Menu de l’application | ✅ | Menus dans le navigateur et menus natifs Tauri |
-| Outils AI | 🟡 | 138 outils dans le chat AI, les agents de code (ACP) et MCP ; photos libres de droits, vectorisation d’images, ainsi que génération d’images, suppression et remplacement d’arrière-plans et génération de SVG avec les clés de l’utilisateur pour ses services d’image ; pas de recherche AI |
+| Outils AI | 🟡 | Plus de 130 outils dans le chat AI, les agents de code (ACP) et MCP ; photos libres de droits, vectorisation d’images, ainsi que génération d’images, suppression et remplacement d’arrière-plans et génération de SVG avec les clés de l’utilisateur pour ses services d’image ; pas de recherche AI |
 
 ## Calques et formes
 
@@ -95,7 +95,7 @@ Dans la section Prototype, un calque reçoit des interactions au clic ou après 
 | Extraits de code | 🟡 | Design JSX, HTML, Vue et React avec CSS ou Tailwind et valeurs liées aux tokens ; pas de Swift, Kotlin ni Compose |
 | Tailwind CSS v4 | ✅ | HTML avec classes utilitaires depuis Code, la CLI ou l’API |
 | Figma pour VS Code | 🔲 | Pas d’intégration à l’extension de l’éditeur |
-| Serveur MCP | ✅ | `@pairdraw/mcp` avec stdio et HTTP ; 138 outils du cœur plus des outils de document, d’historique et de réglages |
+| Serveur MCP | ✅ | `@pairdraw/mcp` avec stdio et HTTP ; plus de 130 outils du cœur plus des outils de document, d’historique et de réglages |
 | CLI | ✅ | 24 commandes, dont `info`, `tree`, `find`, `query`, `node`, `pages`, `variables`, `tokens`, `fonts`, `lint`, `analyze`, `export`, `import`, `convert`, `diff`, `eval` et `tool` |
 
 ## Figma Draw

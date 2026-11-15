@@ -9,6 +9,7 @@ import { useRouter } from 'vue-router'
 import { provideEditor } from '@pairdraw/vue'
 import { useI18n } from '@pairdraw/vue/i18n'
 
+import { aiSetupDialogOpen } from '@/app/ai/models/settings/onboarding/dialog'
 import { startCloud } from '@/app/cloud/integration'
 import { useDocumentCloseProtection } from '@/app/document/close/use'
 import { useFollowingEditorStore } from '@/app/editor/active-store'
@@ -32,18 +33,21 @@ import PluginPermissionDialog from '@/components/plugins/PluginPermissionDialog.
 import RecoveredChangesDialogHost from '@/components/recovery/RecoveredChangesDialogHost.vue'
 import RecoveryDialog from '@/components/recovery/RecoveryDialog.vue'
 import SaveToHost from '@/components/save-to/SaveToHost.vue'
-import AISetupDialog from '@/components/settings/ai-setup/AISetupDialog.vue'
 import AppShell from '@/components/shell/AppShell.vue'
 import AppToaster from '@/components/shell/AppToaster.vue'
 import { useOpenedOnce } from '@/components/ui/overlay/opened'
 import VoiceCallAudio from '@/components/voice-call/VoiceCallAudio.vue'
 import { APP_NAME } from '@/constants'
 
-// Settings loads with its first opening, not with the editor.
+// Settings and guided AI setup load with their first opening, not with the editor.
 const SettingsDialog = defineAsyncComponent(
   () => import('@/components/settings/SettingsDialog.vue')
 )
 const settingsOpened = useOpenedOnce(settingsDialogOpen)
+const AISetupDialog = defineAsyncComponent(
+  () => import('@/components/settings/ai-setup/AISetupDialog.vue')
+)
+const aiSetupOpened = useOpenedOnce(aiSetupDialogOpen)
 
 const { updates, locale } = useI18n()
 const router = useRouter()
@@ -83,7 +87,7 @@ onMounted(() => {
         <RouterView />
       </AppShell>
       <SettingsDialog v-if="settingsOpened" />
-      <AISetupDialog />
+      <AISetupDialog v-if="aiSetupOpened" />
       <CompanionPairDialog />
       <PluginPermissionDialog />
       <SaveToHost />

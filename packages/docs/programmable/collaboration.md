@@ -1,59 +1,44 @@
 ---
 title: Collaboration
-description: Real-time collaborative editing via P2P WebRTC — no server, no account.
+description: AI agents' cursors and follow mode, and live editing of Cloud documents through a self-hosted Pairdraw Cloud server. Peer-to-peer rooms are off in Pairdraw builds.
 ---
 
 # Collaboration
 
-Edit designs together in real time. Peers connect directly — no server relays your data, no account required.
+::: info Peer-to-peer rooms are off in Pairdraw
+Pairdraw builds turn live peer-to-peer rooms off (`COLLABORATION_INCLUDED` in `src/constants.ts`). There is no Share popover for local documents, no joining by link or room ID, no room voice call, and no collaboration name in Settings.
 
-## Sharing a Room
+What stays: AI agents show their cursors on the canvas and can be followed, and Cloud documents are edited live by everyone who opens them through their own [Pairdraw Cloud server](../reference/self-hosting-cloud).
+:::
 
-1. Click the share button in the top-right corner
-2. Click **Share this file** — the link (`<web app address>/rooms/<room-id>` in the browser, `pairdraw://join?room=<room-id>` in the desktop app) is copied
-3. Send it to your collaborators
+## Agents on the canvas
 
-Only Share puts a document into a room: the tab you share from becomes the room's tab and stays tied to its file. Anyone with the link can join.
+The built-in AI chat, ACP and Pi harness chats, and every connected MCP client appear as cursors at the layers they read or edit, each outlined label showing a sparkle and a callsign such as *Fern*. While the chat streams JSX, its cursor moves through the elements as they appear and outlines them. Agents draw their cursors and outlines in violet.
 
-## Joining a Room
+Your own avatar shows in the top bar only while it lists your agents, or while someone else has the same Cloud document open. An avatar counts the agents that person runs; hover over it to see each agent, what it is doing, and on which page. Click one of your own agents to rename it.
 
-Open the link, or paste it (or just the room ID) into **Join** in the share panel or **Join room…** on Home. The room opens in a tab of its own, so the documents you already have open are never changed. On a computer, a browser also offers **Open in desktop app**, which opens the room in Pairdraw through a `pairdraw://join` link.
+**View → Multiplayer cursors** (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>\\</kbd>) hides and shows the cursors of agents and people.
 
-You join right away under a generated name such as *Teal Fox*; set your own in the share panel or in Settings, and it is used in every room.
+## Follow mode
 
-Rooms are not stored on a server: the file lives on the devices of the people who have been in the room, so a room tab opens its document only while one of them is online. Until then it says it is waiting, explains why, and opens the file as soon as someone who has it joins. A room you have been in before opens from this device's copy right away and syncs your changes when others return.
+Your own agents, the AI chat and MCP clients such as Claude Code or Cursor, are followed automatically while they work, so what they edit stays in view. Turn this off with the locate button in the chat's header. If you stop following an agent while it works, it is left alone until it finishes and followed again on its next run.
 
-**Leave room** in the share panel ends your part in the room. A tab that shared its document goes back to being that document; a tab that joined keeps the room's file as a local unsaved copy you can save. Each room tab keeps its own connection, so you can be in several rooms at once.
+Click **Follow** next to an agent in its avatar's list to keep the page and layers it is editing in view; following continues between its replies and stops when it leaves. In a Cloud document, click a person's avatar to follow their viewport: your canvas pans and zooms to match their view, and a frame in their color with a “Following …” bar shows whom you follow. Click the avatar again, press <kbd>Esc</kbd>, or click, scroll, zoom, or switch pages yourself to stop.
 
-## What Syncs
+Only an agent's name, kind, model, status, page, position, and edited layers are shared with others in a Cloud document, never prompts or replies.
 
-- **Document changes** — every edit (shapes, text, properties, layout) syncs instantly
-- **Cursors** — see where each collaborator is pointing, with their name and color
-- **Selections** — highlighted selections are visible to everyone
-- **Agents** — the built-in AI chat, ACP and Pi harness chats, and every connected MCP client appear as cursors at the layers they read or edit, each outlined label showing a sparkle and a callsign such as *Fern*. While the chat streams JSX, its cursor moves through the elements as they appear and outlines them. Agents draw their cursors and outlines in violet, and the people list and the “Following …” bar name the person running each one, so you can tell whose agent it is. Only its name, kind, model, status, page, position, and edited layers are shared, never prompts or replies.
+## Cloud documents
 
-## Follow Mode
+Opening a Cloud document joins its room on its server's relay, so everyone who has it open sees each other's edits, cursors, selections, and comments as they happen. **Share** on a Cloud document opens its share dialog, where the server decides who may open it: links that view, comment, or edit, invitations, and snapshot links to one saved version. See [Pairdraw Cloud](../user-guide/pairdraw-cloud) for the workflow and [Cloud Architecture](../development/cloud#live-collaboration) for the relay.
 
-Click a collaborator's avatar in the top bar to follow their viewport. Your canvas pans and zooms to match their view, and a frame in their color with a “Following …” bar shows whom you follow. Click the avatar again, press <kbd>Esc</kbd>, or click, scroll, zoom, or switch pages yourself to stop.
+## How sync works
 
-Your own agents, the AI chat and MCP clients such as Claude Code or Cursor, are followed automatically while they work, so what they edit stays in view. Turn this off with the crosshair button at the top of the AI panel. If you stop following an agent while it works, it is left alone until it finishes and followed again on its next run.
-
-An avatar counts the agents that person runs. Hover over it to see each agent, what it is doing, and on which page, and click **Follow** next to an agent to keep the page and layers it is editing in view; following continues between its replies and stops when it leaves. The button after the avatars lists everyone in the room with their agents, and works from the keyboard. Your own avatar lists your agents — click one to rename it — and has **Leave room**.
-
-The share panel lists everyone in the room with the agents they run, what each agent is doing, and on which page. Follow an agent the same way to keep the page and layers it is editing in view; following continues between its replies and stops when it leaves. Double-click one of your own agents to rename it.
-
-## How It Works
-
-Peers connect directly via WebRTC — your design data goes straight from browser to browser, never through a central server. The document state uses a CRDT (conflict-free replicated data type), so concurrent edits merge automatically without conflicts.
+The document state uses a CRDT (conflict-free replicated data type), so concurrent edits merge automatically without conflicts.
 
 Moving and reordering layers merges too. Each layer remembers every parent it has been moved into and its position among its siblings, and every peer works out the same layer tree from that history ([Evan Wallace's tree CRDT](https://madebyevan.com/algos/crdt-mutable-tree-hierarchy/)). Moves, reorders, and new layers from different people all apply; if two people move the same layer at once, one move wins on every peer. When moves made at the same time would put two layers inside each other, the later move is undone, and a layer whose new parent was deleted meanwhile returns to where it was.
 
-Everyone in a room needs a version of Pairdraw that records the layer tree the same way; versions that record it differently do not see each other's rooms.
+Everyone editing a document together needs a version of Pairdraw that records the layer tree the same way; versions that record it differently do not see each other's edits.
 
-The room persists locally — if you refresh the page, you rejoin it automatically with the same state.
+## Peer-to-peer rooms (not in Pairdraw builds)
 
-## Tips
-
-- Works in the browser and the desktop app
-- Room IDs are cryptographically random — only people with the link can join
-- Stale cursors are cleaned up automatically when someone disconnects
+The room code stays in `src/app/collab/**`, because Cloud documents and agent presence run on it. A build with `COLLABORATION_INCLUDED` set to `true` brings peer-to-peer rooms back: Share puts a local document into a room whose link (`/rooms/<room-id>` in the browser, `pairdraw://join?room=<room-id>` in the desktop app) anyone can open, peers connect directly over WebRTC through Trystero, and each device keeps its own copy of the room. Pairdraw does not ship or support such builds.

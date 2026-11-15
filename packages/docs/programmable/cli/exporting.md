@@ -1,11 +1,13 @@
 ---
 title: Exporting
-description: Export document content to images, PDF, PowerPoint, `.fig`, JSX, HTML, or Storybook stories, with font-substitution policies for raster and PDF output.
+description: Export document content to images, PDF, PowerPoint, draw.io, `.fig`, JSX, HTML, or Storybook stories, with font-substitution policies for raster and PDF output.
 ---
 
 # Exporting
 
-Export designs from the terminal — raster images, vectors, PDF, editable PowerPoint, `.fig` subsets, JSX code, HTML, or Storybook stories.
+Export designs from the terminal — raster images, vectors, PDF, editable PowerPoint, draw.io diagrams, `.fig` subsets, JSX code, HTML, or Storybook stories.
+
+The app in Pairdraw builds no longer offers PowerPoint or draw.io export; the CLI still writes both.
 
 ## Image Export
 
@@ -16,6 +18,7 @@ pairdraw export design.fig -f webp -s 3             # WEBP at 3×
 pairdraw export design.fig -f svg                   # SVG vector
 pairdraw export design.fig -f pdf                   # PDF
 pairdraw export design.fig -f pptx                  # editable PowerPoint
+pairdraw export design.fig -f drawio                # draw.io diagram
 pairdraw export design.fig -f fig --page "Page 1"   # export one page as .fig
 pairdraw export design.fig -f fig --node 1:23        # export one node as .fig
 pairdraw export design.fig -f html --css tailwind    # export an HTML fragment with Tailwind classes
@@ -23,7 +26,7 @@ pairdraw export design.fig -f html --css tailwind    # export an HTML fragment w
 
 Options:
 
-- `-f` — format: `png`, `jpg`, `webp`, `svg`, `pdf`, `pptx`, `jsx`, `html`, `fig`, `storybook`
+- `-f` — format: `png`, `jpg`, `webp`, `svg`, `pdf`, `pptx`, `drawio`, `jsx`, `tailwind-jsx`, `html`, `fig`, `storybook`
 - `-s` — export scale (default: `1`)
 - `-q` — quality: `0`–`100` (JPG/WEBP only)
 - `-o` — output path

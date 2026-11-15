@@ -1,6 +1,6 @@
 ---
 title: AI Chat
-description: Built-in AI assistant with 138 tools for creating and modifying designs.
+description: Built-in AI assistant with 139 tools for creating and modifying designs.
 ---
 
 # AI Chat
@@ -114,6 +114,8 @@ The xAI, Meta, Kimi For Coding, Moonshot AI, Together AI, Fireworks AI, and Open
 **Amazon Bedrock** reaches Claude through Bedrock's Messages API at `bedrock-mantle.<region>.api.aws`, under Bedrock's `anthropic.` model IDs; a custom model ID can name an inference profile such as `us.anthropic.claude-opus-5-5`. Choose the region, then sign in with a Bedrock API key or, in the desktop app, with an access key ID, secret access key, and optional session token, which sign each request with AWS Signature Version 4. Browsers do not let Bedrock's CORS answer cover the signature header, so the browser app takes API keys only.
 
 **Google Vertex AI** serves Claude through `:rawPredict` and Gemini through `:generateContent` in one Google Cloud project. Enter the project ID and a location (`global`, `us`, `eu`, or a single region; single regions serve only older Claude models), and paste an access token from `gcloud auth print-access-token`. Access tokens expire after an hour, so paste a new one when requests start failing. An API key without a project uses Vertex AI express mode, which serves Gemini models only.
+
+**OpenRouter** can be connected in guided setup by signing in instead of pasting a key: OpenRouter creates a key for Pairdraw, which is stored like any other key. In the desktop app the sign-in opens the system browser and returns to a port on this computer that the system picks (`http://localhost:<port>/oauth/openrouter`), so no web page outside your computer is involved; the browser app signs in in a popup, so allow popups for it.
 
 **ChatGPT** uses your ChatGPT plan instead of an API key, through the same backend and sign-in as OpenAI's Codex CLI. Signing in opens the browser and returns to the desktop app on `localhost:1455`, the only address OpenAI accepts for it, so close a running `codex login` first. The sign-in is stored like a key and refreshes itself; the model list comes from your account. The browser app does not offer it.
 

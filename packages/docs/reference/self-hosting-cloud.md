@@ -76,6 +76,8 @@ For a server only its members use, set `deployment.local_editor = false`: the we
 
 Links the server sends point at its own address: `/documents/<id>` for a document, `/share/<id>` for a shared link, and `/invitations/<id>` for an invitation. An editor at another address, such as a development build, can still connect when its origin is in `deployment.trusted_origins`; people sign in there by approving a code, as in the desktop app.
 
+Pairdraw runs no hosted Cloud server, so the desktop app and other editors ask for your server's address in **Settings → Cloud**. An editor you build yourself can offer your server first: set `VITE_PAIRDRAW_OFFICIAL_CLOUD_URL` to its address when building the app. Without it the editor contacts no Cloud server until someone connects one.
+
 ## Reverse proxy
 
 - Terminate TLS in front of the server and the object store, on stable hostnames.

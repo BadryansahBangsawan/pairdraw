@@ -124,6 +124,6 @@ The headless CLI already supports `analyze colors/typography/spacing/clusters`. 
 
 Preview already runs components with behaviours as live controls, and the Prototype section plays click and after-delay interactions that navigate between frames, open and close overlays, or go back, with instant or dissolve transitions, stored as Figma prototype reactions. Next: variables that let controls drive the rest of a design, and more triggers and transitions.
 
-### Windows Code Signing
+### Code Signing
 
-macOS binaries are signed and notarized since v0.6.0. Windows Authenticode signing via Azure Code Signing is planned to remove the SmartScreen warning.
+Pairdraw 0.16.0 is published for macOS on Apple Silicon only, and that build is not signed or notarized. Next: a signed and notarized macOS build, and Windows releases with Authenticode signing to remove the SmartScreen warning.

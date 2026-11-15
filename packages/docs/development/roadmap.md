@@ -40,7 +40,7 @@ Since v0.16.0, the development branch adds:
 - The Pairdraw Basics library, `.pen` export and `.pen` libraries, and the CLI's `shell`, `models`, `agent`, `tokens --import`, and `libraries seed`.
 - Cloud snapshot links, a Can comment role, and public profiles; drafts and recovery of unsaved changes.
 
-Pairdraw builds also leave out peer-to-peer rooms, new boards, PowerPoint and draw.io export in the app, and every usage ping or statistic.
+Pairdraw builds also leave out peer-to-peer rooms, new boards, PowerPoint and draw.io export in the app, design issue marks on the canvas and beside layers and pages, and every usage ping or statistic.
 
 See [AI chat](../programmable/ai-chat), [exporting](../user-guide/exporting), and [components and libraries](../user-guide/components).
 

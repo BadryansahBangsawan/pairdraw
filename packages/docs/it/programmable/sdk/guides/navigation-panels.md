@@ -9,20 +9,22 @@ Un pannello laterale di Pairdraw contiene spesso un elenco di pagine e l’alber
 
 ## Pagine
 
-Usa `PageListRoot` oppure `usePageList()`:
+Usa `PageListRoot` oppure `usePageList()`.
 
 ```vue
 <PageListRoot v-slot="{ pages, currentPageId, switchPage, addPage }">
-  <button v-for="page in pages" :key="page.id" @click="switchPage(page.id)">
-    {{ page.name }}
-  </button>
-  <button @click="addPage()">Nuova pagina</button>
+  <div>
+    <button v-for="page in pages" :key="page.id" @click="switchPage(page.id)">
+      {{ page.name }}
+    </button>
+    <button @click="addPage()">New page</button>
+  </div>
 </PageListRoot>
 ```
 
 ## Livelli
 
-Usa `LayerTreeRoot` se il SDK deve gestire struttura dell’albero e interazioni mentre l’applicazione definisce markup e stile.
+Usa `LayerTreeRoot` se l'SDK deve gestire struttura dell’albero e interazioni mentre l’applicazione definisce markup e stile.
 
 ```vue
 <LayerTreeRoot v-slot="{ items, selectedIds, select, toggleExpand, getKey, getChildren }">
@@ -37,7 +39,9 @@ Usa `LayerTreeRoot` se il SDK deve gestire struttura dell’albero e interazioni
 </LayerTreeRoot>
 ```
 
-## Disposizione comune
+## Schema pratico
+
+Una disposizione comune è:
 
 - pagine nella parte superiore del pannello;
 - livelli sotto;
@@ -48,3 +52,4 @@ Usa `LayerTreeRoot` se il SDK deve gestire struttura dell’albero e interazioni
 - [usePageList](../api/composables/use-page-list)
 - [PageListRoot](../api/components/page-list-root)
 - [LayerTreeRoot](../api/components/layer-tree-root)
+- [useSelectionState](../api/composables/use-selection-state)

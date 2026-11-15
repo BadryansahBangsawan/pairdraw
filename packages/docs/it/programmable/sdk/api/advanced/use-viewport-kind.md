@@ -1,17 +1,26 @@
 ---
 title: useViewportKind
-description: Indicatori reattivi per viewport mobile e desktop in un’interfaccia personalizzata.
+description: Leggere indicatori approssimativi di viewport mobile e desktop per contenitori dell'editor reattivi.
 ---
 
 # useViewportKind
 
-`useViewportKind()` restituisce una classificazione semplificata della dimensione del viewport usata dall’interfaccia reattiva di Pairdraw.
+`useViewportKind()` restituisce semplici indicatori reattivi usati dall'interfaccia dell'editor Pairdraw.
 
-Usalo quando basta distinguere mobile e desktop senza configurare direttamente `useBreakpoints()`.
+Usalo quando il tuo contenitore ha bisogno di una leggera astrazione sui breakpoint invece di collegare direttamente `useBreakpoints()`.
+
+## Uso
 
 ```ts
+import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
+
 const { isMobile, isDesktop } = useViewportKind()
 ```
+
+## Valori restituiti
+
+- `isMobile`
+- `isDesktop`
 
 ## Vedi anche
 

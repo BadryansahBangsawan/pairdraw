@@ -4,7 +4,7 @@
 
 Pairdraw funziona anche nel browser, ma non esiste una versione ospitata: avvia l’app web da una copia del repository come descritto in [Compilazione dal codice sorgente](#building-from-source), oppure [scarica l’applicazione desktop](/it/download).
 
-Se vuoi creare un prodotto basato su Pairdraw invece di utilizzare soltanto l'applicazione predefinita, consulta la sezione [Automazione](/programmable/) e la documentazione del [Vue SDK](/programmable/sdk/).
+Se vuoi creare un prodotto basato su Pairdraw invece di utilizzare soltanto l'applicazione predefinita, consulta la sezione [Automazione e API](/it/programmable/) e la documentazione del [Vue SDK](/it/programmable/sdk/).
 
 ## Applicazione desktop
 
@@ -16,7 +16,7 @@ La [pagina dei download](/it/download) elenca i file dell’ultima versione. Pai
 
 Windows, Linux e i Mac Intel non hanno ancora una versione pronta; compilali dal codice sorgente come descritto più sotto. La versione per macOS non è ancora firmata né notarizzata, quindi macOS ne blocca il primo avvio: fai clic destro su Pairdraw in Applicazioni e scegli **Apri**, oppure consentilo in **Impostazioni di Sistema → Privacy e sicurezza**. Ogni versione include un file `SHA256SUMS` per verificare i download.
 
-Per cercare una versione più recente dell’applicazione desktop, scegli **Check for Updates…** nel menu **Help** su Windows e Linux, o nel menu dell’applicazione su macOS. La voce **About** accanto mostra la versione installata. Pairdraw 0.16.0 non indica alcun canale di aggiornamento, quindi installa a mano la versione successiva dalla pagina dei download.
+Per cercare una versione più recente dell’applicazione desktop, scegli **Check for Updates…** nel menu **Help** su Windows e Linux, o nel menu dell’applicazione su macOS. La voce **About** accanto mostra la versione installata. Solo una versione pronta che indica un canale di aggiornamento cerca gli aggiornamenti, e solo quando scegli la voce; una versione compilata dal codice sorgente indica che gli aggiornamenti non sono configurati. Pairdraw 0.16.0 non indica alcun canale di aggiornamento, quindi installa a mano la versione successiva dalla pagina dei download.
 
 ## Requisiti di sistema {#system-requirements}
 

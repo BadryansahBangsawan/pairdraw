@@ -1,10 +1,16 @@
 ---
 title: CanvasRoot
-description: Componente senza stile che fornisce il contesto dell’area di lavoro.
+description: Componente senza stile per le superfici di rendering di Pairdraw.
 ---
 
 # CanvasRoot
 
-`CanvasRoot` fornisce il contesto ai componenti discendenti. L’SDK gestisce l’integrazione con l’editor; l’applicazione decide disposizione e stili.
+`CanvasRoot` è il componente strutturale dell'area di lavoro in `@pairdraw/vue`.
 
-Usa [CanvasSurface](./canvas-surface) al suo interno o accedi al contesto con [useCanvasContext](../advanced/use-canvas-context).
+Usalo quando vuoi la struttura e il contesto dell'area di lavoro forniti dall'SDK, lasciando all'applicazione disposizione e stili.
+
+## Vedi anche
+
+- [useCanvas](../composables/use-canvas)
+- [useCanvasInput](../composables/use-canvas-input)
+- [useTextEdit](../composables/use-text-edit)

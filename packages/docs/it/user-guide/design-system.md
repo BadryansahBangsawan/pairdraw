@@ -65,7 +65,7 @@ Ora modifica un token o un componente principale, per esempio `radius/card` o il
 
 ## 5. Andare oltre
 
-- **Pubblicalo come libreria.** Apri **Risorse → Gestire le librerie → Pubblica libreria** perché altri file possano usare Button e Card e accettare gli aggiornamenti quando li modifichi ([Librerie di componenti](/user-guide/components#component-libraries)).
+- **Pubblicalo come libreria.** Apri **Risorse → Gestire le librerie → Pubblica libreria** perché altri file possano usare Button e Card e accettare gli aggiornamenti quando li modifichi ([Librerie di componenti](./components#component-libraries)).
 - **Porta i token nel codice.** `pairdraw tokens design-system.fig` stampa le variabili come proprietà personalizzate CSS, `--format tailwind` come tema Tailwind v4 e `--format dtcg --out tokens/` come file di design token W3C. L'esportazione HTML scrive i valori collegati come riferimenti `var()` alle stesse proprietà ([Esportare](./exporting)).
 - **Verificalo.** [Verificare i design](/user-guide/checking-designs) e `pairdraw lint design-system.fig --fix -o fixed.fig` trovano i colori che corrispondono a un token ma non vi sono collegati, e li collegano.
 - **Tieni traccia delle modifiche.** Conserva il file in Git e rivedi le modifiche con [`pairdraw diff files`](/it/programmable/cli/git).

@@ -22,10 +22,10 @@ L'SDK fornisce:
 ## Da dove iniziare
 
 <SdkCardGroup>
-  <SdkCard title="Primi passi" to="/programmable/sdk/getting-started" description="Installa il pacchetto, crea un'istanza dell'editor e collega i componenti principali." />
-  <SdkCard title="Architettura" to="/programmable/sdk/architecture" description="Scopri come interagiscono composable, componenti e contesto dell'editor." />
-  <SdkCard title="Guide" to="/programmable/sdk/guides/custom-editor-shell" description="Crea interfacce dell'editor, pannelli delle proprietà e pannelli di navigazione personalizzati." />
-  <SdkCard title="Riferimento API" to="/programmable/sdk/api/" description="Consulta i componenti, i composable e le API di basso livello." />
+  <SdkCard title="Primi passi" to="/it/programmable/sdk/getting-started" description="Installa il pacchetto, crea un'istanza dell'editor e collega i componenti principali." />
+  <SdkCard title="Architettura" to="/it/programmable/sdk/architecture" description="Scopri come interagiscono composable, componenti e contesto dell'editor." />
+  <SdkCard title="Guide" to="/it/programmable/sdk/guides/custom-editor-shell" description="Crea interfacce dell'editor, pannelli delle proprietà e pannelli di navigazione personalizzati." />
+  <SdkCard title="Riferimento API" to="/it/programmable/sdk/api/" description="Consulta i componenti, i composable e le API di basso livello." />
 </SdkCardGroup>
 
 ## A cosa serve l'SDK
@@ -33,6 +33,8 @@ L'SDK fornisce:
 Prodotti e team diversi richiedono esperienze di editing diverse.
 
 Può trattarsi di un editor di design completo, di un'area di lavoro integrata in un'altra applicazione, di uno strumento interno, di un editor di template o di un'interfaccia specializzata con funzionalità di AI.
+
+L'SDK è il livello che rende possibili tutte queste soluzioni.
 
 ## Principi di progettazione
 
@@ -52,6 +54,6 @@ Se ti servono soltanto lo stato e le operazioni dell'editor, inizia dai composab
 
 ## Sezioni dell'API
 
-- [Componenti](/programmable/sdk/api/components/)
-- [Composable](/programmable/sdk/api/composables/)
-- [API di basso livello](/programmable/sdk/api/advanced/)
+- [Componenti](/it/programmable/sdk/api/components/)
+- [Composable](/it/programmable/sdk/api/composables/)
+- [API avanzate](/it/programmable/sdk/api/advanced/)

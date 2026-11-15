@@ -14,3 +14,4 @@ Usalo quando un pannello deve rilevare valori misti, aggiornare una proprietà s
 - [useAppearance](../composables/use-appearance)
 - [useLayout](../composables/use-layout)
 - [useTypography](../composables/use-typography)
+- [PropertyListRoot](../components/property-list-root)

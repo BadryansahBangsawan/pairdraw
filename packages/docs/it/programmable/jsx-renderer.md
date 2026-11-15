@@ -1,40 +1,35 @@
 ---
-title: Motore JSX
-description: Creare design da JSX ed esportare una selezione in JSX con Tailwind.
+title: Renderer JSX
+description: Creare design modificabili con la stessa libreria dichiarativa di authoring usata dagli agenti di Pairdraw.
 ---
 
-# Motore JSX
+# Renderer JSX
 
-Pairdraw converte JSX dichiarativo in un albero di design. Lo stesso sistema è disponibile nella chat AI, in MCP e in `eval`.
+Il JSX di design di Pairdraw crea nodi della scena, non DOM del browser. Puoi usare alberi di componenti leggibili, espressioni JavaScript e funzioni riutilizzabili per costruire design modificabili.
 
-```jsx
-<Frame flex="col" gap={16} p={24} w={320} bg="#ffffff" radius={16}>
-  <Text size={18} weight="bold">Card Title</Text>
-  <Text color="#667085">Description</Text>
-</Frame>
-```
+## Creare design
 
-Nel codice dell’applicazione o nelle librerie headless, importa `Frame`, `Text` e gli altri export di scrittura da `@pairdraw/design-jsx`, poi crea i nodi con `renderTree` o `renderJSX` da `@pairdraw/core/design-jsx`, che aggiungono icone, conversione SVG e disposizione. Per scrivere gli alberi come TSX, imposta `"jsxImportSource": "@pairdraw/design-jsx"` con `"jsx": "react-jsx"` in `tsconfig.json`, oppure aggiungi al file il commento `/** @jsxImportSource @pairdraw/design-jsx */`. L’ambiente di scripting determina quali API sono esposte a `eval`: gli export dei pacchetti non diventano automaticamente globali.
+Lo strumento `render` accetta stringhe JSX nella chat con AI e in MCP. Nel codice dell'applicazione o nelle librerie senza interfaccia, importa `Frame`, `Text` e gli altri export di authoring da `@pairdraw/design-jsx`, poi crea i nodi con `renderTree` o `renderJSX` da `@pairdraw/core/design-jsx`, che aggiungono icone, conversione SVG e layout. Per scrivere gli alberi come TSX, imposta `"jsxImportSource": "@pairdraw/design-jsx"` con `"jsx": "react-jsx"` in `tsconfig.json`, oppure aggiungi al file il commento `/** @jsxImportSource @pairdraw/design-jsx */`. L'ambiente di scripting determina quali API sono esposte a `eval`: lì gli export dei pacchetti non diventano automaticamente variabili globali.
+
+Il [riferimento condiviso per l'authoring dei design](/reference/design-authoring) contiene esempi eseguibili, indicazioni sul layout e l'elenco della sintassi supportata. Viene generato dalla stessa sorgente usata dalla chat, da ACP, dai prompt di generazione del codice e dalla skill installabile per gli agenti.
 
 ## Elementi
 
-`Frame`, `Text`, `Rectangle`, `Ellipse` e `Image` creano i rispettivi oggetti. I componenti registrati possono generare alberi riutilizzabili definiti dall’applicazione.
+Usa frame e testo per la composizione, nodi forma per la grafica, e veri componenti e istanze per i contenuti riutilizzabili dell'editor. Una funzione JavaScript da sola non crea l'identità di un componente. Vedi l'[elenco degli elementi](/reference/design-authoring#supported-syntax-inventory).
 
-## Disposizione
+## Proprietà di stile
 
-- `flex="row"` o `flex="col"` attiva la disposizione automatica.
-- `gap` regola la spaziatura.
-- `p`, `px`, `py`, `pt`, `pr`, `pb` e `pl` regolano i margini interni.
-- `align`, `justify` e `wrap` controllano allineamento e ritorno a capo.
-
-## Dimensioni e aspetto
-
-`w` e `h` accettano numeri, `"fill"` o `"hug"`; `x` e `y` definiscono la posizione fuori dal flusso. `bg`, `fill`, `color`, `stroke`, `opacity`, `radius` e `shadow` controllano l’aspetto.
-
-Le proprietà tipografiche come `size`, `font`, `weight`, `lineHeight` e `letterSpacing` mantengono il nome inglese perché fanno parte dell’API JSX.
+Usa Hug/Fill (nell'interfaccia **Adatta al contenuto** e **Riempi**) e flex o griglia per un dimensionamento guidato dal contenuto. Collega variabili semantiche invece di copiare i valori. Vedi [composizione e layout](/reference/design-authoring#composition-and-layout), [pittura e testo](/reference/design-authoring#paint-text-and-artwork) e [variabili e componenti](/reference/design-authoring#variables-and-components).
 
 ## Esportare in JSX
 
-**Copia come → JSX** converte la selezione in JSX e classi Tailwind. L’output prova a conservare gerarchia, disposizione, dimensioni, colori, tipografia e bordi come punto di partenza per l’implementazione.
+```sh
+pairdraw export design.fig -f jsx                   # Pairdraw format
+pairdraw export design.fig -f jsx --style tailwind  # Tailwind classes
+```
 
-Il JSX esportato può essere modificato e renderizzato di nuovo nel documento. L’esportazione scrive livelli nascosti e bloccati, vincoli, limiti di dimensione, riempimenti multipli, sfumati e immagine, contorni, effetti, maschere e collegamenti alle variabili, quindi renderizzare un export li riproduce e `diff_jsx` mostra le modifiche a ciascuno di essi. Testo formattato con stili misti, tracciati vettoriali, griglie di layout, stili condivisi e definizioni delle proprietà dei componenti non vengono ancora scritti. Le istanze sono scritte come frame con il loro contenuto, così il JSX esportato è autonomo. Vedi [esportazioni dalla CLI](./cli/exporting).
+Il JSX Pairdraw esportato può essere modificato e disegnato di nuovo nel documento. L'esportazione scrive livelli nascosti e bloccati, vincoli, limiti di dimensione, riempimenti sovrapposti, a sfumatura e immagine, contorni, effetti, maschere e collegamenti alle variabili, quindi disegnare un'esportazione li riproduce e `diff_jsx` mostra le modifiche a ciascuno di essi. Testo formattato con stili misti, tracciati vettoriali, griglie di layout, stili condivisi e definizioni delle proprietà dei componenti non vengono ancora scritti. Le istanze sono scritte come frame con il loro contenuto, così il JSX esportato è autonomo. Vedi [esportazioni dalla CLI](./cli/exporting).
+
+## Confronto visivo
+
+JSX rende le modifiche strutturali ai design revisionabili come codice. Usa `get_jsx` e `diff_jsx` per esaminare le modifiche, poi verifica il risultato effettivamente disegnato: un diff strutturale pulito non dimostra l'equivalenza visiva.

@@ -1,16 +1,14 @@
 ---
 title: LayerTreeRoot
-description: Componente senza stile per struttura e azioni di un albero dei livelli.
+description: Componente strutturale senza stile per le interfacce ad albero dei livelli.
 ---
 
 # LayerTreeRoot
 
-`LayerTreeRoot` fornisce elementi, selezione, rami espansi e azioni per navigare nella gerarchia del documento.
+`LayerTreeRoot` è il componente dell'SDK per disegnare un albero dei livelli con markup e stili decisi dall'applicazione.
 
-Abbinalo a `LayerTreeItem` o rappresenta righe personalizzate nel suo spazio.
+Usalo quando vuoi una struttura ad albero riutilizzabile e il collegamento delle interazioni, senza una presentazione integrata.
 
 ## Vedi anche
 
-- [LayerTreeItem](./layer-tree-item)
-- [useLayerTree](../advanced/use-layer-tree)
-- [useLayerDrag](../advanced/use-layer-drag)
+- [useSelectionState](../composables/use-selection-state)

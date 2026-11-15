@@ -1,14 +1,15 @@
 ---
 title: ToolbarRoot
-description: Componente senza stile per strumenti e strumento attivo.
+description: Componente strutturale senza stile per le barre degli strumenti dell'editor.
 ---
 
 # ToolbarRoot
 
-`ToolbarRoot` fornisce gli strumenti disponibili, quello attivo e l’azione per cambiarlo. L’applicazione rappresenta pulsanti propri e definisce disposizione e stili della barra.
+`ToolbarRoot` è il componente senza stile di `@pairdraw/vue` per la barra degli strumenti.
+
+Usalo quando vuoi una struttura e un contesto riutilizzabili per la barra, con pulsanti, stili e disposizione tuoi.
 
 ## Vedi anche
 
-- [ToolbarItem](./toolbar-item)
-- [useToolbar](../advanced/use-toolbar)
-- [useToolbarState](../advanced/use-toolbar-state)
+- [useEditorCommands](../composables/use-editor-commands)
+- [useSelectionCapabilities](../composables/use-selection-capabilities)

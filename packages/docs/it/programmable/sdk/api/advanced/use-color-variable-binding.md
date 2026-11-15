@@ -1,15 +1,19 @@
 ---
 title: useColorVariableBinding
-description: Collegare il colore di un riempimento o contorno a una variabile.
+description: Funzioni per collegare variabili negli editor del colore di riempimenti e contorni.
 ---
 
 # useColorVariableBinding
 
-`useColorVariableBinding(kind)` fornisce funzioni per cercare, impostare e rimuovere il collegamento di variabili colore nei riempimenti o contorni.
+`useColorVariableBinding(kind)` espone funzioni per cercare, collegare e scollegare le variabili colore usate dagli editor di riempimenti e contorni.
 
-Usa il composable nei controlli colore compatibili con le variabili di design.
+Usalo per costruire interfacce del colore che devono collegare riempimenti o contorni alle variabili di design.
+
+## Uso
 
 ```ts
+import { useColorVariableBinding } from '@pairdraw/vue/controls/color-variable-binding'
+
 const fillBinding = useColorVariableBinding('fills')
 const strokeBinding = useColorVariableBinding('strokes')
 ```
@@ -18,3 +22,4 @@ const strokeBinding = useColorVariableBinding('strokes')
 
 - [useFillControls](../composables/use-fill-controls)
 - [useStrokeControls](../composables/use-stroke-controls)
+- [FillRoot](/programmable/sdk/api/components/fill-root)

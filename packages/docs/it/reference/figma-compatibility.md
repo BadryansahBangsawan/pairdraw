@@ -1,61 +1,230 @@
-# Compatibilità con Figma
+# Matrice delle funzionalità di Figma
 
-Confronto tra le funzioni di Figma Design e lo stato attuale di Pairdraw.
+Confronto, funzionalità per funzionalità, tra le capacità di Figma Design e lo stato attuale dell'implementazione in Pairdraw.
 
-::: tip Stato
-✅ Supportato · 🟡 Parziale · 🔲 Non implementato
+::: tip Legenda degli stati
+✅ Supportato: la funzionalità funziona dall'inizio alla fine · 🟡 Parziale: il comportamento principale esiste, mancano alcune funzioni secondarie · 🔲 Non ancora implementato
 :::
 
-**Copertura:** 136 funzioni su 156 considerate — 114 complete, 22 parziali e 20 in attesa. Aggiornato: 2026-11-15.
+**Copertura:** 136 funzionalità di Figma su 156 affrontate: 114 ✅ supportate completamente, 22 🟡 parziali, 20 🔲 non ancora. Ultimo aggiornamento: 2026-11-15.
 
 ## Interfaccia e navigazione
 
-Barra degli strumenti personalizzabile, livelli, pagine, proprietà, zoom, spostamento, righelli, sfondo, guide trascinabili dai righelli, palette dei comandi (<kbd>⌘</kbd><kbd>K</kbd>), menu contestuale e menu dell’applicazione sono disponibili. Le scorciatoie sono parziali (mancano Scala, Freccia, Contagocce e lo strumento Zoom), così come gli strumenti AI, che generano immagini, rimuovono e sostituiscono gli sfondi e generano SVG con le chiavi dell’utente per i suoi servizi di immagini, ma non offrono ricerca AI. Ricerca e sostituzione, vista reticolare, miniatura personalizzata e passo di spostamento personalizzato mancano.
+| Funzionalità | Stato | Note |
+|---------|--------|-------|
+| Barra degli strumenti di design | ✅ | Barra a sinistra dell'area di lavoro: Sposta, Cornice/Sezione, forme, Penna/Matita, Testo, Mano, Commento; personalizzabile, con un selettore di icone |
+| Pannello dei livelli (barra laterale sinistra) | ✅ | Vista ad albero con espansione e compressione, riordino tramite trascinamento, interruttore di visibilità; larghezza ridimensionabile |
+| Pannello delle pagine | ✅ | Aggiunta, eliminazione e rinomina delle pagine; stato della vista per ogni pagina |
+| Pannello delle proprietà (barra laterale destra) | ✅ | Aspetto, Riempimento, Contorno, Effetti, Tipografia, Layout, Guide di layout, Vincoli, Posizione, Maschera, Proprietà del componente, Colori della selezione, Esporta; larghezza ridimensionabile |
+| Zoom e spostamento della vista | ✅ | <kbd>Ctrl</kbd> + scorrimento, pizzico, <kbd>⌘</kbd><kbd>+</kbd> / <kbd>⌘</kbd><kbd>−</kbd> / <kbd>⌘</kbd><kbd>0</kbd> (100%) / <kbd>⌘</kbd><kbd>1</kbd> (adatta) / <kbd>⌘</kbd><kbd>2</kbd> (selezione), <kbd>Spazio</kbd> + trascinamento, tasto centrale del mouse, strumento Mano (<kbd>H</kbd>) |
+| Righelli dell'area di lavoro | ✅ | Righelli in alto e a sinistra con bande che evidenziano la selezione ed etichette delle coordinate |
+| Colore di sfondo dell'area di lavoro | ✅ | Sfondo per pagina tramite il pannello delle proprietà |
+| Guide dell'area di lavoro | ✅ | Trascina le guide dai righelli sull'area di lavoro o sui frame; selezione, spostamento, duplicazione, eliminazione e annullamento; salvate in `.fig` |
+| Menu delle azioni / palette dei comandi | ✅ | <kbd>⌘</kbd><kbd>K</kbd> apre una palette ricercabile delle azioni dell'editor e dell'app |
+| Menu contestuale | ✅ | Clic destro con azioni di appunti, ordine di sovrapposizione, raggruppamento, componenti, visibilità, blocco e spostamento in un'altra pagina |
+| Scorciatoie da tastiera | 🟡 | Strumenti, strumento Zoom, modifica, operazioni booleane, appiattimento, maschere, componenti, allineamento, ordine di sovrapposizione, navigazione, formattazione del testo; manca il Contagocce (<kbd>I</kbd>) |
+| Trova e sostituisci | 🟡 | **Trova livelli** (<kbd>⌘</kbd><kbd>F</kbd>) cerca per nome tra i livelli della pagina mostrata; niente ricerca nel testo né sostituzione |
+| Vista dei contorni dei livelli | 🔲 | Vista a reticolo di tutti i livelli |
+| Miniature personalizzate dei file | 🔲 | I file salvati mostrano in anteprima la prima pagina, come fanno quelli di Figma senza una pagina di copertina; nessun selettore della miniatura |
+| Impostazioni del passo di spostamento | ✅ | Distanze di spostamento piccola e grande in **Impostazioni → Editor**, 1 px e 10 px per impostazione predefinita |
+| Menu dell'app (modalità browser) | ✅ | Menu File, Modifica, Visualizza, Oggetto, Testo, Disponi; Tauri usa i menu nativi |
+| Strumenti AI | 🟡 | Oltre 130 strumenti nella chat con AI, negli agenti di programmazione (ACP) e in MCP; foto stock, vettorizzazione delle immagini, generazione di immagini, rimozione e sostituzione dello sfondo e generazione di SVG con le chiavi dell'utente per i propri servizi di immagini; niente ricerca AI |
 
 ## Livelli e forme
 
-Forme di base, frame, gruppi, sezioni, archi, maschere, gerarchia, selezione, allineamento, copia/incolla, blocco, visibilità, ordine, spostamento tra pagine, vincoli, griglie di disposizione, misurazione delle distanze, modifica multipla e copia delle proprietà sono supportati. Il ridimensionamento proporzionale non ha uno strumento Scala (<kbd>K</kbd>) e la selezione intelligente si limita ad allineare e distribuire. Manca la ricerca di livelli simili.
+| Funzionalità | Stato | Note |
+|---------|--------|-------|
+| Strumenti forma (Rettangolo, Ellisse, Linea, Poligono, Stella) | ✅ | Tutti i tipi di forma di base; numero di lati del poligono e raggio interno della stella configurabili |
+| Frame | ✅ | Ritaglio del contenuto, sistema di coordinate indipendente e preimpostazioni di creazione e ridimensionamento come in Figma |
+| Gruppi | ✅ | <kbd>⌘</kbd><kbd>G</kbd> per raggruppare, <kbd>⇧</kbd><kbd>⌘</kbd><kbd>G</kbd> per separare |
+| Sezioni | ✅ | Etichette del titolo a pillola, adozione automatica dei nodi sovrapposti, testo che si adatta alla luminanza |
+| Strumento arco (archi, semicerchi, anelli) | ✅ | arcData con angolo iniziale e finale e raggio interno |
+| Maschere | ✅ | **Usa come maschera** (<kbd>⌥</kbd><kbd>⌘</kbd><kbd>M</kbd>); tipi di maschera alfa, vettoriale e di luminanza nella sezione **Maschera** |
+| Tipi e gerarchia dei livelli | ✅ | 19 tipi di nodo, Map piatta + albero genitore-figlio |
+| Selezionare i livelli | ✅ | Clic, clic con Maiusc, selezione a riquadro |
+| Allineamento e posizione | ✅ | Posizione, rotazione e dimensioni nel pannello delle proprietà |
+| Copiare e incollare oggetti | ✅ | Appunti standard + formato binario Kiwi di Figma; copia come testo/SVG/PNG/JSX |
+| Ridimensionare i livelli in proporzione | 🟡 | Il ridimensionamento con Maiusc e il blocco delle proporzioni mantengono le proporzioni; lo strumento Scala (<kbd>K</kbd>) ridimensiona contorni, effetti e testo |
+| Bloccare e sbloccare i livelli | ✅ | <kbd>⇧</kbd><kbd>⌘</kbd><kbd>L</kbd> attiva o disattiva il blocco; i nodi bloccati non possono essere selezionati o spostati dall'area di lavoro |
+| Mostrare e nascondere i livelli | ✅ | Icona a forma di occhio nel pannello dei livelli + scorciatoia <kbd>⇧</kbd><kbd>⌘</kbd><kbd>H</kbd> |
+| Rinominare i livelli | ✅ | Doppio clic per rinominare direttamente nel pannello dei livelli; <kbd>Invio</kbd>/<kbd>Esc</kbd>/perdita del focus per confermare |
+| Porta in primo piano / Porta in fondo | ✅ | Scorciatoie ] e [; anche nel menu contestuale |
+| Sposta in un'altra pagina | ✅ | Sposta i nodi selezionati tra le pagine dal menu contestuale |
+| Vincoli (ridimensionamento adattivo) | ✅ | Sinistra, destra, centro, estendi e scala su ciascun asse nella sezione **Vincoli**; applicati quando il genitore viene ridimensionato, anche nelle istanze |
+| Selezione intelligente (distribuisci/allinea) | 🟡 | Allineamento e distribuzione dal pannello e dal menu **Disponi**; niente maniglie di spaziatura della selezione intelligente né Riordina |
+| Guide di layout (colonne, righe, griglia) | ✅ | Griglie, colonne e righe sui frame con numero, tipo, margine, canale e colore; stili di griglia; più frame alla volta |
+| Misurare le distanze tra i livelli | ✅ | Tieni premuto <kbd>⌥</kbd> e passa sopra con il puntatore per vedere le distanze dalla selezione |
+| Modificare oggetti in blocco | ✅ | Pannello delle proprietà per selezioni multiple: modifica posizione, dimensione, aspetto, riempimento, contorno ed effetti su più nodi; i valori comuni appaiono normalmente, quelli diversi mostrano **Misto** |
+| Individuare oggetti corrispondenti | 🔲 | Trovare livelli simili |
+| Copiare e incollare le proprietà | ✅ | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>C</kbd> / <kbd>⌥</kbd><kbd>⌘</kbd><kbd>V</kbd> tramite gli appunti di sistema, verso e da Figma: riempimenti, contorni, effetti, angoli, stili, variabili, Auto-layout tra frame, stile del testo tra livelli di testo |
+| Relazioni genitore-figlio | ✅ | Gerarchia completa con parentIndex, cambio di genitore tramite trascinamento |
 
 ## Strumenti vettoriali
 
-Reti vettoriali, Penna, Matita, operazioni booleane, appiattimento e conversione di contorni o testo in tracciati sono supportati. La modifica dei vertici è parziale: mancano la simmetria per punto e i controlli degli angoli. Costruttore di forme, offset e semplificazione mancano.
+| Funzionalità | Stato | Note |
+|---------|--------|-------|
+| Reti vettoriali | ✅ | Modello compatibile con Figma, non semplici tracciati |
+| Strumento Penna | ✅ | Punti d'angolo, curve di Bézier, tracciati aperti e chiusi |
+| Strumento Matita | ✅ | Tratti a mano libera smussati in curve, <kbd>⇧</kbd> per linee rette |
+| Modificare i livelli vettoriali | 🟡 | Seleziona e trascina punti, maniglie, segmenti e regioni; <kbd>⌘</kbd> piega; Canc divide i tracciati; la penna li estende; niente simmetria per singolo punto né controlli degli angoli |
+| Operazioni booleane (Unione, Sottrazione, Intersezione, Esclusione) | ✅ | Menu **Oggetto** (<kbd>⌥</kbd><kbd>⇧</kbd><kbd>U</kbd> / <kbd>S</kbd> / <kbd>I</kbd> / <kbd>E</kbd>) e controllo nel pannello; i risultati restano livelli booleani modificabili |
+| Appiattire i livelli | ✅ | **Appiattisci** (<kbd>⌥</kbd><kbd>⇧</kbd><kbd>F</kbd>) dal menu **Oggetto** e dal menu dell'area di lavoro |
+| Convertire i contorni in tracciati | ✅ | **Converti traccia in contorno** sostituisce ogni livello con contorno con il suo riempimento e un vettore del contorno, mantenendo rotazione, opacità ed effetti |
+| Convertire il testo in tracciati | ✅ | **Converti testo in tracciato** trasforma il testo in vettori dei glifi ricavati dai contorni del font |
+| Strumento costruttore di forme | 🔲 | Strumento booleano interattivo |
+| Tracciato di offset | 🔲 | Restringere o allargare un tracciato vettoriale |
+| Semplificare un tracciato | 🔲 | Ridurre il numero di punti di un vettore |
 
 ## Testo e tipografia
 
-Modifica diretta, rendering CanvasKit Paragraph, font di sistema, famiglia, dimensione, interlinea, allineamento orizzontale e verticale, modalità di ridimensionamento, elenchi, emoji, CJK, RTL e font di icone funzionano. Funzionano anche i font variabili, con gli assi regolabili nel pannello. Il testo su tracciato è parziale, perché per modificarne i caratteri servono i contorni del font in locale. Lo sono anche stili di testo, link e funzioni OpenType, a cui mancano soprattutto i controlli nel pannello.
+| Funzionalità | Stato | Note |
+|---------|--------|-------|
+| Strumento Testo e modifica diretta | ✅ | Modifica nativa nell'area di lavoro, textarea invisibile, cursore, selezione e selezione di parole, trascinamento per selezionare, doppio e triplo clic, sequenze di stili del testo formattato (<kbd>⌘</kbd><kbd>B</kbd> / <kbd>I</kbd> / <kbd>U</kbd>, pulsante **S**) |
+| Testo su tracciato | 🟡 | Importa, disegna, seleziona, ridimensiona, modifica ed esporta il `TEXT_PATH` di Figma; la modifica dei caratteri richiede che i contorni del font indicato siano disponibili in locale |
+| Rendering del testo (Paragraph API) | ✅ | CanvasKit Paragraph per composizione, a capo e metriche |
+| Caricamento dei font (font di sistema) | ✅ | Inter predefinito, font-kit in Tauri con cache OnceLock + precaricamento, queryLocalFonts nel browser |
+| Famiglia e peso del font | ✅ | FontPicker con scorrimento virtuale, ricerca e anteprima CSS; scelta del peso nel pannello delle proprietà |
+| Dimensione del font e interlinea | ✅ | Modificabili nella sezione **Tipografia** |
+| Allineamento del testo | ✅ | A sinistra, al centro, a destra e giustificato; allineamento verticale in alto, al centro e in basso |
+| Stili di testo | 🟡 | Stili a livello di carattere durante la modifica; applica stili di testo con nome da `.fig`, librerie e token di design; nessuna interfaccia per creare o modificare uno stile |
+| Modalità di ridimensionamento del testo (automatica, fissa, adattata) | ✅ | **Larghezza automatica**, **Altezza automatica** e dimensione fissa in **Layout** |
+| Elenchi puntati e numerati | ✅ | Elenchi puntati e numerati annidati, con spaziatura tra elementi e paragrafi e indicatori sporgenti; <kbd>⇧</kbd><kbd>⌘</kbd><kbd>8</kbd> / <kbd>7</kbd> |
+| Link nel testo | ✅ | Aggiungi, modifica o rimuovi un link web o email su un intero testo o su un intervallo dal pannello **Tipografia** o dal menu dell'area di lavoro; i link si conservano tra `.fig`, appunti, HTML e API dei plugin |
+| Emoji e simboli intelligenti | ✅ | Le emoji a colori vengono disegnate con il font emoji di sistema, si modificano come un unico carattere e si conservano in `.fig` e negli appunti |
+| Funzionalità OpenType | 🟡 | Ogni funzionalità impostata da un file viene disegnata e conservata; il pannello attiva solo legature, alternative contestuali e crenatura |
+| Font variabili | ✅ | Gli stili con nome vengono disegnati con i valori dei loro assi e la dimensione ottica segue la dimensione del font, come in Figma; la sezione **Tipografia** e l'API dei plugin impostano qualsiasi asse, e la dimensione ottica può essere impostata a mano |
+| Supporto del testo CJK | ✅ | I font di ripiego CJK in base alla lingua vengono caricati prima del primo disegno, compreso il cinese tradizionale e i web font suddivisi |
+| Supporto del testo RTL | ✅ | Direzione del testo Auto, LTR o RTL con composizione dell'arabo; l'Auto-layout scorre da destra a sinistra |
+| Font di icone | ✅ | Material Symbols vengono disegnati dai font variabili di Google con qualsiasi peso, riempimento e grado; il selettore di icone aggiunge i set di Iconify e SF Symbols (macOS 14+) |
 
 ## Colori, sfumature e immagini
 
-Selettore colore con campi RGB, HSL, HSB e OkHCL, colori uniformi, sfumature lineari, radiali, angolari e a diamante, riempimenti immagine, metodi di fusione e colori della selezione sono supportati. I pattern importati si vedono ma non si possono creare, l’inserimento di immagini esclude i video e il ritaglio non ha maniglie sulla tela. Regolazioni delle immagini e contagocce mancano.
+| Funzionalità | Stato | Note |
+|---------|--------|-------|
+| Selettore colore (HSV) | ✅ | Area del colore, cursori di tonalità e alfa, valore esadecimale e campi RGB, HSL, HSB e OkHCL |
+| Riempimenti a tinta unita | ✅ | Colore esadecimale con opacità |
+| Sfumatura lineare | ✅ | Punti della sfumatura, maniglie di trasformazione |
+| Sfumatura radiale | ✅ | Disegnata tramite gli shader di CanvasKit |
+| Sfumatura angolare | ✅ | Supporto delle sfumature conica e ad arco |
+| Sfumatura a diamante | ✅ | Sfumatura a diamante a quattro punti |
+| Riempimenti immagine | ✅ | **Riempi**, **Adatta**, **Ritaglia** e **Affianca**, con scala della ripetizione e rotazione di 90° |
+| Riempimenti a motivo | 🟡 | I riempimenti a motivo importati da Figma vengono disegnati e conservati; nessun selettore per crearli o modificarli |
+| Metodi di fusione | ✅ | Metodi di fusione di livelli, riempimenti ed effetti, con pass-through per gruppi e frame |
+| Aggiungere immagini e video | 🟡 | Trascina o incolla PNG, JPEG, GIF, WebP, AVIF e SVG sull'area di lavoro; niente video |
+| Regolazione delle proprietà delle immagini | 🔲 | Esposizione, contrasto, saturazione e così via |
+| Ritagliare un'immagine | 🟡 | La modalità **Ritaglia** nel selettore del riempimento immagine conserva un ritaglio; niente maniglie di ritaglio sull'area di lavoro |
+| Strumento Contagocce | 🔲 | Campionare i colori dall'area di lavoro |
+| Modifica dei colori di una selezione mista | ✅ | **Colori della selezione** cambia un colore ovunque in una selezione multipla |
+| Modelli di colore (RGB, HSL, HSB, esadecimale) | ✅ | Campi esadecimale, RGB, HSL, HSB e OkHCL con avvisi sul gamut |
 
 ## Effetti e proprietà
 
-Ombre, sfocature, spessore del contorno, estremità, giunzioni, tratteggio, allineamento, raggi e smussatura continua degli angoli e più riempimenti/contorni per livello sono supportati.
+| Funzionalità | Stato | Note |
+|---------|--------|-------|
+| Ombra esterna | ✅ | Spostamento, raggio di sfocatura e colore tramite i filtri di CanvasKit |
+| Ombra interna | ✅ | Effetto di ombra interna |
+| Sfocatura del livello | ✅ | Sfocatura gaussiana sul livello |
+| Sfocatura dello sfondo | ✅ | Sfoca il contenuto dietro il livello |
+| Sfocatura in primo piano | ✅ | Sfocatura in primo piano |
+| Spessore del contorno | ✅ | Configurabile nel pannello delle proprietà |
+| Terminazione del contorno (arrotondata, quadrata, freccia) | ✅ | `NONE`, `ROUND`, `SQUARE`, `ARROW_LINES`, `ARROW_EQUILATERAL` |
+| Giunzione del contorno (spigolo, smussata, arrotondata) | ✅ | Tutti e tre i tipi di giunzione |
+| Tratteggi | ✅ | Motivo del contorno a tratti pieni e vuoti |
+| Allineamento del contorno | ✅ | Interno/Centro/Esterno con rendering basato sul ritaglio, come in Figma |
+| Spessore del contorno diverso per lato | ✅ | Sopra/Destra/Sotto/Sinistra con un menu a discesa per scegliere il lato |
+| Raggio degli angoli | ✅ | Raggio uniforme e per angolo con interruttore per gli angoli indipendenti nel pannello delle proprietà; maniglie sull'area di lavoro per rettangoli, poligoni e stelle |
+| Smussatura degli angoli (stile iOS) | ✅ | Cursore della smussatura degli angoli in **Aspetto**; gli angoli smussati vengono disegnati, tratteggiati e conservati come in Figma |
+| Più riempimenti/contorni per livello | ✅ | Aggiungi, rimuovi, nascondi e fondi qualsiasi numero di riempimenti e contorni; i contorni accettano sfumature e immagini |
 
-## Disposizione automatica
+## Auto-layout
 
-Flexbox, Grid, direzione, spaziatura, margini interni, allineamento, modalità di dimensionamento, ritorno a capo, disposizioni annidate, riordino tramite trascinamento e dimensioni minime e massime sono supportati. Lo spazio attorno esiste solo in Pairdraw; Figma mostra questi frame con spazio tra gli elementi.
+| Funzionalità | Stato | Note |
+|---------|--------|-------|
+| Flusso orizzontale e verticale | ✅ | Motore flexbox Yoga WASM |
+| Attivare l'Auto-layout (<kbd>⇧</kbd><kbd>A</kbd>) | ✅ | Attivazione su un frame o avvolgimento della selezione |
+| Spaziatura (tra i figli) | ✅ | Configurabile nel pannello delle proprietà |
+| Spaziatura interna (uniforme e per lato) | ✅ | Tutti e quattro i lati in modo indipendente |
+| Distribuzione del contenuto | ✅ | Inizio, centro, fine, space-between; space-around esiste solo in Pairdraw e Figma lo legge come space-between |
+| Allineamento degli elementi | ✅ | Inizio, centro, fine, estensione |
+| Dimensionamento dei figli (fisso, riempi, adatta al contenuto) | ✅ | Modalità di dimensionamento per ogni figlio |
+| A capo | ✅ | Flex wrap per layout su più righe |
+| Flusso dell'Auto-layout a griglia | ✅ | CSS Grid tramite un fork di Yoga: tracce di colonne e righe, spaziature, estensioni |
+| Flussi combinati (annidati) | ✅ | Frame con Auto-layout annidati con direzioni diverse |
+| Riordino tramite trascinamento nell'Auto-layout | ✅ | Indicatore visivo del punto di inserimento |
+| Larghezza e altezza minime e massime | ✅ | Larghezza e altezza minime e massime in **Layout**, collegabili a variabili numeriche |
 
-## Componenti e sistemi di design
+## Componenti e design system
 
-Componenti, insiemi, istanze, varianti, proprietà, sostituzioni, variabili di tutti e quattro i tipi con collezioni e modalità, e librerie sono supportati. Gli stili con nome si applicano e si scollegano, ma non c’è ancora un’interfaccia per crearli o modificarli.
+| Funzionalità | Stato | Note |
+|---------|--------|-------|
+| Creare componenti | ✅ | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>K</kbd> crea un componente da un frame o gruppo oppure avvolge la selezione; l'interfaccia delle proprietà del componente supporta testo, visibilità, sostituzione dell'istanza e varianti |
+| Set di componenti | ✅ | **Crea set di componenti** unisce i componenti; creazione di varianti multidimensionali sparse con controllo dei duplicati e variante predefinita in alto a sinistra |
+| Istanze dei componenti | ✅ | Esplorazione delle risorse, inserimento, proprietà del componente e sostituzioni modificabili, cambio di variante, sincronizzazione in tempo reale e revisione degli aggiornamenti |
+| Varianti | ✅ | Combinazioni multidimensionali sparse, creazione, cambio nelle istanze, controllo dei duplicati e ripiego sulla variante in alto a sinistra |
+| Proprietà del componente | ✅ | Proprietà booleane, di testo, di sostituzione dell'istanza e slot; esposizione delle istanze annidate e riordino dal pannello |
+| Propagazione delle sostituzioni | ✅ | Le modifiche al componente principale si propagano a tutte le istanze; le sostituzioni vengono conservate |
+| Variabili (colore, numero, stringa, booleano) | ✅ | Tutti e quattro i tipi nella finestra delle variabili, con alias, formule e valori per modalità; collegate a pitture, dimensionamento, spaziatura, tipografia, visibilità e testo |
+| Raccolte e modalità delle variabili | ✅ | Raccolte con modalità; applica una modalità, o Auto, a livelli e pagine da **Aspetto** |
+| Stili (colore, testo, effetto, layout) | 🟡 | Applica e scollega stili di riempimento, contorno, testo, effetto e griglia da `.fig`, librerie e token di design; nessuna interfaccia per creare o modificare stili |
+| Librerie (pubblicazione, condivisione, aggiornamento) | ✅ | Revisioni immutabili locali o in archivio, pubblicazione selettiva, attivazione, revisione mirata degli aggiornamenti, materializzazione offline e persistenza in `.fig` |
+| Scollegare un'istanza | ✅ | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd> riconverte l'istanza in frame |
+| Vai al componente principale | ✅ | Navigazione verso il componente di origine, anche su un'altra pagina |
 
 ## Prototipazione
 
-Nella sezione Prototipo i livelli ricevono interazioni al clic o dopo un ritardo che portano a un frame, aprono o chiudono una sovrapposizione o tornano indietro, con transizione istantanea o in dissolvenza; vengono salvate in `.fig` come reazioni di prototipo di Figma e si riproducono sull’area di lavoro ([Riprodurre un prototipo](/user-guide/playing-a-prototype)). Presenta mostra a schermo intero le slide di una pagina. Scorrimento, flussi, logica condizionale con le variabili e le altre animazioni non sono ancora disponibili.
+| Funzionalità | Stato | Note |
+|---------|--------|-------|
+| Connessioni del prototipo | ✅ | La sezione **Prototipo** aggiunge interazioni; l'area di lavoro disegna le connessioni del livello selezionato come frecce tratteggiate; salvate come reazioni di prototipo di Figma |
+| Attivatori (clic, hover, trascinamento, ecc.) | 🟡 | **Al clic** e **Dopo un ritardo**; niente attivatori di hover, trascinamento, pressione o tasto |
+| Azioni (navigazione, sovrapposizione, scorrimento, ecc.) | 🟡 | **Vai a**, **Apri sovrapposizione**, **Chiudi sovrapposizione** e **Indietro**; niente cambio di variante, scorrimento a un elemento o sostituzione della sovrapposizione |
+| Animazioni e transizioni | 🟡 | **Immediata** e **Dissolvenza** |
+| Animazione intelligente | 🔲 | Animazione automatica dei livelli corrispondenti |
+| Sovrapposizioni | 🟡 | Apri e chiudi una sovrapposizione sopra il frame; sempre adattata alla finestra, senza posizione |
+| Comportamento di scorrimento e overflow | 🔲 | Frame scorrevoli nei prototipi |
+| Flussi del prototipo | 🔲 | Punti di partenza con nome |
+| Variabili nei prototipi | 🔲 | Logica condizionale con le variabili |
+| Easing e animazioni a molla | 🔲 | Curve di animazione personalizzate |
+| Presentare e riprodurre i prototipi | 🟡 | **Riproduci** esegue un prototipo sull'area di lavoro; **Presenta** mostra i frame della pagina come slide a schermo intero |
 
 ## Importazione ed esportazione
 
-Importazione/esportazione `.fig`, salvataggio, appunti Figma ed esportazione in immagini, SVG, PDF, PPTX e draw.io funzionano. La cronologia delle versioni è parziale: esiste solo per i documenti Pairdraw Cloud (in anteprima), non per i file locali. Manca l’importazione Sketch.
+| Funzionalità | Stato | Note |
+|---------|--------|-------|
+| Importazione di file .fig | ✅ | Codec Kiwi completo: 605 definizioni di schema, circa 590 campi per `NodeChange` |
+| Esportazione di file .fig | ✅ | Codifica Kiwi + compressione Zstd + generazione della miniatura; `COMPONENT`/COMPONENT_SET mappati su `SYMBOL` per l'andata e ritorno |
+| Salva / Salva con nome | ✅ | <kbd>⌘</kbd><kbd>S</kbd> / <kbd>⇧</kbd><kbd>⌘</kbd><kbd>S</kbd>; finestre di dialogo native (Tauri), File System Access API (Chrome/Edge), download come ripiego (Safari) |
+| Appunti di Figma (incolla) | ✅ | Decodifica del binario Kiwi dagli appunti di Figma |
+| Appunti di Figma (copia) | ✅ | Codifica di un binario Kiwi leggibile da Figma |
+| Importazione di file Sketch | 🔲 | Lettura dei file .sketch |
+| Esportazione di immagini/SVG/PDF | ✅ | PNG, JPG, WEBP, SVG, PDF con font incorporati quando i loro file possono essere incorporati, e HTML; PPTX e draw.io solo dalla CLI |
+| Cronologia delle versioni | 🟡 | Documenti Pairdraw Cloud (in anteprima): salvataggio di versioni con nome, consultazione, anteprima, ripristino e duplicazione; non per i file locali |
+| Copiare risorse tra strumenti | ✅ | Appunti di Figma (binario Kiwi), copia come testo/SVG/PNG/JSX |
 
 ## API dei plugin e scripting
 
-`eval` esegue JavaScript senza interfaccia con un oggetto globale `figma` compatibile.
+| Funzionalità | Stato | Note |
+|---------|--------|-------|
+| Comando eval con la Figma Plugin API | ✅ | Esecuzione di JavaScript senza interfaccia con un oggetto globale `figma` che riproduce la superficie dei plugin di Figma |
 
-## Collaborazione e modalità sviluppo
+## Collaborazione e Dev Mode
 
-Commenti, modifica condivisa dei documenti Cloud tramite un server Pairdraw Cloud, Tailwind, server MCP e CLI sono disponibili. La modalità sviluppo e gli snippet di codice sono parziali: design JSX, HTML, Vue e React con CSS o Tailwind, ma niente ispezione con quote né Swift, Kotlin o Compose. Chat del cursore, ramificazioni, Code Connect e Figma per VS Code mancano.
+| Funzionalità | Stato | Note |
+|---------|--------|-------|
+| Commenti (fissare, discutere, risolvere) | ✅ | Lo strumento **Commento** (<kbd>C</kbd>) fissa discussioni sui livelli, con risposte, risoluzione e un elenco filtrabile; salvati in `.fig` |
+| Multiplayer in tempo reale | 🟡 | I documenti Cloud si modificano in tempo reale tramite un server Pairdraw Cloud ospitato da te, con cursori, modalità di inseguimento e cursori degli agenti AI; niente stanze peer-to-peer né chiamate vocali per i documenti locali |
+| Chat del cursore | 🔲 | Fumetti di chat in linea accanto al cursore |
+| Ramificazione e unione | 🔲 | Rami di versione per i file di design |
+| Dev Mode (ispezione) | 🟡 | La scheda **Codice** mostra la selezione come design JSX, HTML, Vue o React con CSS o Tailwind; stati **Pronto per lo sviluppo**; nessuna modalità di ispezione con quote |
+| Code Connect | 🔲 | Collegare i componenti di design al codice |
+| Snippet di codice | 🟡 | Design JSX, HTML, Vue e React con CSS o Tailwind e valori che tengono conto dei token; niente Swift, Kotlin o Compose |
+| Esportazione Tailwind CSS v4 | ✅ | Esportazione in HTML con classi di utilità Tailwind dal pannello **Codice**, dalla CLI o in modo programmatico |
+| Figma per VS Code | 🔲 | Integrazione come plugin dell'editor |
+| Server MCP | ✅ | `@pairdraw/mcp` con trasporti stdio + HTTP; oltre 130 strumenti principali più strumenti per documenti, cronologia e impostazioni |
+| Strumenti CLI | ✅ | 24 comandi, tra cui info, tree, find, query, node, pages, variables, tokens, fonts, lint, analyze, export, import, convert, diff, eval e tool |
 
 ## Figma Draw
 
-Gli strumenti specializzati di illustrazione e le trasformazioni dei pattern non sono ancora disponibili.
+| Funzionalità | Stato | Note |
+|---------|--------|-------|
+| Strumenti di illustrazione | 🔲 | Gli strumenti di disegno specializzati di Figma Draw |
+| Trasformazioni dei motivi | 🔲 | Creare motivi ripetuti con trasformazioni |

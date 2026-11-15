@@ -80,7 +80,7 @@ Se il codice serve principalmente a calcolare o gestire lo stato, oppure a esegu
 
 ### Componenti senza stile solo quando la struttura è significativa
 
-Un componente radice è utile quando coordina struttura, elementi figli, spazi o contesto.
+Un componente radice è utile quando coordina struttura, elementi figli, slot o contesto.
 
 Esempi:
 
@@ -90,9 +90,9 @@ Esempi:
 - `SegmentedControlRoot`
 - `ToolbarRoot`
 
-### Non passare l’intero contesto attraverso un solo spazio
+### Non passare l’intero contesto attraverso un solo slot
 
-Passa allo spazio soltanto le proprietà necessarie oppure usa direttamente il composable. I componenti controllati, come `PropertyListRoot`, emettono eventi semantici. Il collegamento con selezione e cronologia deve risiedere in un adattatore o composable di controllo, non nel componente stesso.
+Passa allo slot soltanto le proprietà necessarie oppure usa direttamente il composable. I componenti controllati, come `PropertyListRoot`, emettono eventi semantici. Il collegamento con selezione e cronologia deve risiedere in un adattatore o composable di controllo, non nel componente stesso.
 
 ## Responsabilità dell'applicazione e dell'SDK
 

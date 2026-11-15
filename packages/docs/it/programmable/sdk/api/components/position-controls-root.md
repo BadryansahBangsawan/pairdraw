@@ -1,13 +1,15 @@
 ---
 title: PositionControlsRoot
-description: Componente senza stile per posizione, dimensioni, allineamento e trasformazione.
+description: Componente radice senza stile per i controlli di posizione, dimensione, allineamento e trasformazione.
 ---
 
 # PositionControlsRoot
 
-`PositionControlsRoot` fornisce valori e azioni di posizione, dimensioni, rotazione, allineamento e riflessione per la selezione corrente.
+`PositionControlsRoot` espone per la selezione corrente i gestori di posizione, dimensione, rotazione, allineamento, capovolgimento e rotazione rapida.
+
+Usalo quando vuoi controlli di posizione personalizzati senza reimplementare il collegamento con l'editor.
 
 ## Vedi anche
 
 - [usePosition](../composables/use-position)
-- [Pannelli delle proprietà](../../guides/property-panels)
+- [Guida ai pannelli delle proprietà](../../guides/property-panels)

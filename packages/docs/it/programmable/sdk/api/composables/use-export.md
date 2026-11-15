@@ -1,15 +1,28 @@
 ---
 title: useExport
-description: Gestire scala e formato di esportazione della selezione corrente.
+description: Gestire impostazioni di esportazione come scala e formato per la selezione corrente.
 ---
 
 # useExport
 
-`useExport()` fornisce stato e azioni per impostazioni, oggetti selezionati, nome del file, scale, formati e anteprima, oltre all’esecuzione dell’esportazione.
+`useExport()` è il composable del pannello di esportazione per i nodi selezionati.
 
-Gestisce anche scale e formati supportati: gli ID in `formats` e le voci con etichetta in `formatOptions`.
+Gestisce:
 
-## Esempi
+- le righe delle impostazioni di esportazione
+- gli id dei nodi selezionati
+- il nome usato per l'esportazione
+- le scale e i formati supportati (gli id in `formats` e le voci con etichetta in `formatOptions`)
+
+## Uso
+
+```ts
+import { useExport } from '@pairdraw/vue/document/export'
+
+const exportState = useExport()
+```
+
+## Esempio di base
 
 ```ts
 const {
@@ -24,7 +37,15 @@ const {
 } = useExport()
 ```
 
-Per portare la prima esportazione a 2× in WEBP:
+## Esempi pratici
+
+### Aggiungere un'altra impostazione di esportazione
+
+```ts
+exportState.addSetting()
+```
+
+### Portare la prima esportazione a 2x in WEBP
 
 ```ts
 exportState.updateScale(0, 2)
@@ -33,4 +54,5 @@ exportState.updateFormat(0, 'webp')
 
 ## Vedi anche
 
-- [Guida all’esportazione](/user-guide/exporting)
+- [useSelectionState](./use-selection-state)
+- [useEditor](./use-editor)

@@ -1,30 +1,65 @@
 ---
-title: Analizzare documenti con la CLI
-description: Individuare colori, tipografie, spaziature e strutture ripetute.
+title: Analizzare i design
+description: Esaminare colori, tipografia, spaziature e strutture ripetute nei file .fig.
 ---
 
-# Analizzare documenti con la CLI
+# Analizzare i design
 
-I sottocomandi `analyze` esaminano l’intero documento e aiutano a trovare incoerenze o strutture candidate a diventare componenti.
+I comandi `analyze` esaminano un intero design system dal terminale: trovano le incoerenze, estraggono la palette reale e segnalano i componenti che aspettano di essere estratti.
 
 ## Colori
 
-`analyze colors` raggruppa i colori di riempimenti e contorni, ne conta gli utilizzi e rivela tonalità quasi identiche.
+```sh
+pairdraw analyze colors design.fig
+```
+
+Trova tutti i colori del file, ne conta gli utilizzi e mostra un istogramma visivo:
+
+```
+#1d1b20  ██████████████████████████████ 17155×
+#49454f  ██████████████████████████████ 9814×
+#ffffff  ██████████████████████████████ 8620×
+#6750a4  ██████████████████████████████ 3967×
+```
 
 ## Tipografia
 
-`analyze typography` elenca le combinazioni di famiglia, dimensione e stile con la relativa frequenza, così da individuare stili isolati.
+```sh
+pairdraw analyze typography design.fig
+```
+
+Elenca ogni combinazione di famiglia, dimensione e peso del font con il numero di utilizzi. È utile per individuare stili di testo isolati che andrebbero unificati.
 
 ## Spaziatura
 
-`analyze spacing` esamina spaziature e margini interni dei frame con disposizione automatica. Rende visibile, per esempio, un valore `13px` in una scala `8/16/24`.
+```sh
+pairdraw analyze spacing design.fig
+```
+
+Esamina i valori di spaziatura e di spaziatura interna nei frame con Auto-layout. Aiuta a trovare incoerenze nella scala delle spaziature, per esempio una spaziatura isolata di `13px` tra valori che altrimenti sono `8/16/24`.
 
 ## Strutture ripetute
 
-`analyze clusters` cerca gerarchie simili che potrebbero diventare componenti e mostra corrispondenza, dimensione e struttura.
+```sh
+pairdraw analyze clusters design.fig
+```
+
+Trova schemi di nodi ripetuti che potrebbero essere estratti in componenti:
+
+```
+3771× frame "container" (100% match)
+     size: 40×40, structure: Frame > [Frame]
+
+2982× instance "Checkboxes" (100% match)
+     size: 48×48, structure: Instance > [Frame]
+```
 
 ## Output JSON
 
-Aggiungi `--json` per elaborare i risultati in CI, generare report o applicare regole personalizzate.
+Tutti i comandi `analyze` supportano `--json` per un output leggibile dalle macchine:
 
-Queste analisi non modificano il file. Per le trasformazioni usa [`eval`](./scripting).
+```sh
+pairdraw analyze colors design.fig --json
+```
+
+Passalo a `jq`, usalo nei controlli di CI o in script che impongono un limite al numero di token di design.

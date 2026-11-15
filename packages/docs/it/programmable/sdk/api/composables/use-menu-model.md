@@ -1,15 +1,56 @@
 ---
 title: useMenuModel
-description: Creare modelli di menu dalle azioni dell’editor.
+description: Costruire i modelli dei menu dell'applicazione e dell'area di lavoro a partire dallo stato corrente dell'editor.
 ---
 
 # useMenuModel
 
-`useMenuModel()` trasforma il registro dei comandi in voci, separatori e sottomenu che l’applicazione può rappresentare con la propria libreria UI.
+`useMenuModel()` costruisce strutture di menu di livello più alto sopra i comandi dell'editor e lo stato della selezione.
 
-Etichette, scorciatoie, stato disabilitato ed esecuzione provengono da una fonte comune.
+È utile quando vuoi gruppi di menu pronti da disegnare invece di comporre i comandi a mano.
+
+## Uso
+
+```ts
+import { useMenuModel } from '@pairdraw/vue/editor/menu-model'
+
+const { appMenu, canvasMenu, selectionLabelMenu } = useMenuModel()
+```
+
+## Esempio di base
+
+```ts
+const { canvasMenu } = useMenuModel()
+```
+
+Disegna `canvasMenu.value` nel tuo componente di menu contestuale.
+
+## Esempi pratici
+
+### Menu superiore in stile applicazione
+
+`appMenu` raggruppa le voci in:
+
+- Modifica
+- Visualizza
+- Oggetto
+- Disponi
+
+### Menu contestuale con spostamento tra pagine
+
+`canvasMenu` include voci dinamiche come “Sposta nella pagina”, in base alla selezione corrente e alle pagine disponibili.
+
+### Etichette della selezione
+
+`selectionLabelMenu` espone etichette che dipendono dal contesto, come:
+
+- `Hide` / `Show`
+- `Lock` / `Unlock`
+
+Nell'interfaccia italiana queste etichette compaiono come «Nascondi» / «Mostra» e «Blocca» / «Sblocca».
 
 ## Vedi anche
 
 - [useEditorCommands](./use-editor-commands)
-- [Menu contestuale](/user-guide/context-menu)
+- [useSelectionState](./use-selection-state)
+- [useSelectionCapabilities](./use-selection-capabilities)

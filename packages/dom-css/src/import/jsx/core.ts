@@ -35,12 +35,37 @@ function styleObjectToDeclaration(style: JSXStyleObject): DesignStyleDeclaration
   return Object.fromEntries(entries)
 }
 
+/** Declarations split at `;` outside quotes and parentheses, so `url(data:…;base64,…)` stays whole. */
+function splitDeclarations(style: string): string[] {
+  const declarations: string[] = []
+  let depth = 0
+  let quote: string | null = null
+  let start = 0
+  for (let index = 0; index < style.length; index++) {
+    const character = style[index]
+    if (quote) {
+      if (character === '\\') index++
+      else if (character === quote) quote = null
+    } else if (character === '"' || character === "'") quote = character
+    else if (character === '(') depth++
+    else if (character === ')') depth = Math.max(0, depth - 1)
+    else if (character === ';' && depth === 0) {
+      declarations.push(style.slice(start, index))
+      start = index + 1
+    }
+  }
+  declarations.push(style.slice(start))
+  return declarations
+}
+
 function styleStringToDeclaration(style: string): DesignStyleDeclaration | undefined {
-  const entries = style
-    .split(';')
-    .map((declaration) => declaration.split(':'))
-    .filter((parts): parts is [string, string, ...string[]] => parts.length >= 2)
-    .map(([property, ...value]) => [property.trim().toLowerCase(), value.join(':').trim()] as const)
+  const entries = splitDeclarations(style)
+    .map((declaration) => {
+      const colon = declaration.indexOf(':')
+      if (colon === -1) return ['', ''] as const
+      const property = declaration.slice(0, colon).trim()
+      return [property.toLowerCase(), declaration.slice(colon + 1).trim()] as const
+    })
     .filter(([property, value]) => property.length > 0 && value.length > 0)
 
   if (entries.length === 0) return undefined

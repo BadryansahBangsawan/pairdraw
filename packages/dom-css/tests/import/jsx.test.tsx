@@ -35,6 +35,19 @@ describe('@pairdraw/dom-css JSX', () => {
     expect(serializeHTML(document)).toContain('Design with JSX-shaped DOM.')
   })
 
+  it('keeps semicolons inside url() and quoted strings of a style string', async () => {
+    const document = await jsxToDesignDocument(
+      <div style="background: url(data:image/png;base64,AAA); content: 'a;b'; color: red">x</div>
+    )
+    const element = document.children[0]
+
+    expect(element?.type === 'element' ? element.inlineStyle : undefined).toEqual({
+      background: 'url(data:image/png;base64,AAA)',
+      content: "'a;b'",
+      color: 'red'
+    })
+  })
+
   it('runs JSX through CSS runtime styles before scene graph conversion', async () => {
     const graph = await jsxToSceneGraph(
       <article class="card">

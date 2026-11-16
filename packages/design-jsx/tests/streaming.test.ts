@@ -90,7 +90,8 @@ describe('streaming Design JSX', () => {
     '<><Text>One</Text><Text>Two</Text></>',
     '<Frame><><Text>One</Text><Text>Two</Text></></Frame>',
     '<svg viewBox="0 0 24 24"><path d="M0 0L2 2" /></svg>',
-    '<Text><Paragraph list="ordered">Hello <Span weight={700}>bold</Span> world</Paragraph></Text>'
+    '<Text><Paragraph list="ordered">Hello <Span weight={700}>bold</Span> world</Paragraph></Text>',
+    '<Switch.Root name="s"><Switch.Thumb /></Switch.Root>'
   ]
 
   it.each(fixtures)('matches complete JSX semantics: %s', (source) => {

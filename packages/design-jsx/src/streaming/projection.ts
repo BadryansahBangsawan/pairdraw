@@ -134,9 +134,13 @@ export function projectPreview(root: SyntaxNode, source: string): JSXPreviewSnap
       defer(opening, 'incomplete')
       return null
     }
-    const tagName = opening.getChild('JSXIdentifier') ?? opening.getChild('JSXBuiltin')
+    // A Reka part such as `Switch.Root` is named by a member expression.
+    const tagName =
+      opening.getChild('JSXIdentifier') ??
+      opening.getChild('JSXBuiltin') ??
+      opening.getChild('JSXMemberExpression')
     const fragment = raw(opening) === '<>'
-    const name = tagName ? raw(tagName) : ''
+    const name = tagName ? raw(tagName).replace(/\s+/g, '') : ''
     const type = fragment
       ? FRAGMENT
       : (ELEMENT_TYPES.get(name) ?? (/^[a-z][\w-]*$/.test(name) ? name : null))

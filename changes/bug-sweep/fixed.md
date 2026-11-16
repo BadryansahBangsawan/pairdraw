@@ -19,3 +19,4 @@
 - Connectors brought back when a failed edit is rolled back keep following their layers.
 - Mermaid flowcharts whose labels nest HTML tags very deeply now import instead of failing.
 - draw.io SVG exports whose embedded diagram is percent-encoded or Base64 now open as draw.io files.
+- The streaming Design JSX preview now shows Reka parts such as `Switch.Root` while the JSX is still arriving.

@@ -383,6 +383,9 @@ export const aiMessageDefaults = {
   aiSetupAgentDescription: params(
     'Pairdraw starts {agent} when you send a message, with the account {agent} is signed in to.'
   ),
+  aiSetupAgentOwnCredentials: params(
+    'Pairdraw starts {agent} when you send a message, with the providers and model set up in {agent}.'
+  ),
   aiSetupAgentInstall: 'If it is not installed yet, run:',
   aiSetupAgentInstallSupported: 'Install the supported adapter:',
   aiSetupAgentChecking: 'Checking this computer…',

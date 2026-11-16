@@ -328,6 +328,14 @@ export function mcpServerSetupView(setup: MCPServerSetupState): MCPServerSetupVi
   }
 }
 
+/**
+ * Which sentence setup puts above an agent's card: the account it is signed in to, or, for an
+ * agent that brings its own credentials, the providers and model set up in it.
+ */
+export function agentDescriptionKind(agent: ACPAgentDef): 'own-credentials' | 'account' {
+  return agent.ownCredentials ? 'own-credentials' : 'account'
+}
+
 /** Pi's setup: the Harness companion, the MCP server, and what to run by hand. */
 export interface PiSetupView {
   companion: CompanionCheck
@@ -488,7 +496,6 @@ export function agentConnectView(agent: ACPAgentDef, setup: AgentSetupState): Ag
     connected: !running && steps.every(({ status }) => status === 'done' || status === 'manual'),
     failure,
     problem: connectProblem,
-    signInCommand:
-      agent.signIn || agent.ownCredentials ? null : (agent.cliCommand ?? agent.command)
+    signInCommand: agent.signIn || agent.ownCredentials ? null : (agent.cliCommand ?? agent.command)
   }
 }

@@ -8,7 +8,12 @@ import { useI18n } from '@pairdraw/vue/i18n'
 
 import { CLAUDE_CODE_CLOUD_NAMES } from '@/app/ai/agents/setup/external'
 import { codingAgentGuideURL, codingAgentSetupPrompt } from '@/app/ai/agents/setup/prompt'
-import { agentConnectView, agentSetupView, type AgentSetupState } from '@/app/ai/agents/setup/view'
+import {
+  agentConnectView,
+  agentDescriptionKind,
+  agentSetupView,
+  type AgentSetupState
+} from '@/app/ai/agents/setup/view'
 import SettingsLink from '@/components/settings/layout/SettingsLink.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import AppCopyField from '@/components/ui/input/AppCopyField.vue'
@@ -54,7 +59,11 @@ const connectLabel = computed(() => {
 
 <template>
   <p :class="styles.help()">
-    {{ ai.aiSetupAgentDescription({ agent: agent.name }) }}
+    {{
+      agentDescriptionKind(agent) === 'own-credentials'
+        ? ai.aiSetupAgentOwnCredentials({ agent: agent.name })
+        : ai.aiSetupAgentDescription({ agent: agent.name })
+    }}
     <SettingsLink :href="codingAgentGuideURL(agent.id)">{{ common.learnMore }}</SettingsLink>
   </p>
   <AgentSetupCompanion v-if="!IS_TAURI" />

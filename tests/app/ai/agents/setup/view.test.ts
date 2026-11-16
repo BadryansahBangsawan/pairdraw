@@ -5,7 +5,11 @@ import { ACP_AGENTS, type ACPAgentDef } from '@pairdraw/core/constants'
 import type { AgentAccount } from '@/app/ai/agents/setup/accounts'
 import type { AgentConnectState } from '@/app/ai/agents/setup/connect'
 import type { DetectedAgent } from '@/app/ai/agents/setup/discovery'
-import { agentConnectView, type AgentSetupState } from '@/app/ai/agents/setup/view'
+import {
+  agentConnectView,
+  agentDescriptionKind,
+  type AgentSetupState
+} from '@/app/ai/agents/setup/view'
 
 import { expectDefined } from '#tests/helpers/assert'
 
@@ -144,5 +148,12 @@ describe('agentConnectView', () => {
     expect(statuses(view)).toEqual({ detect: 'done', install: 'done' })
     expect(view.signInCommand).toBeNull()
     expect(view.connected).toBe(true)
+  })
+})
+
+describe('agentDescriptionKind', () => {
+  test('names the account an agent signs in to, and its own setup for one that has none', () => {
+    expect(agentDescriptionKind(agent('claude-code'))).toBe('account')
+    expect(agentDescriptionKind(agent('omp'))).toBe('own-credentials')
   })
 })

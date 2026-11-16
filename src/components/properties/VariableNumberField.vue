@@ -5,7 +5,11 @@ import {
   useNumberBindingProvider,
   type BindingTarget
 } from '@pairdraw/vue/controls/binding-provider'
-import type { NumberBindingPath } from '@pairdraw/vue/controls/number-variable-binding'
+import {
+  displayNumberFromStored,
+  storedNumberFromDisplay,
+  type NumberBindingPath
+} from '@pairdraw/vue/controls/number-variable-binding'
 import { useI18n } from '@pairdraw/vue/i18n'
 import { BindableValueRoot } from '@pairdraw/vue/primitives/BindableValue'
 
@@ -27,7 +31,8 @@ const {
   nodeIds,
   bindingPath,
   bindingPaths,
-  units
+  units,
+  displayScale = 1
 } = defineProps<{
   modelValue: number | symbol
   min?: number
@@ -45,6 +50,8 @@ const {
   bindingPaths?: readonly NumberBindingPath[]
   /** Units a typed value may end with; the commit reports the one typed. */
   units?: readonly string[]
+  /** Display units per stored unit, such as 100 for opacity shown in percent. */
+  displayScale?: number
 }>()
 
 const emit = defineEmits<{
@@ -66,22 +73,20 @@ const accessibleLabel = computed(() => {
   return typeof ariaLabel === 'string' ? ariaLabel : (label ?? bindingPath)
 })
 const bindingStyles = useBindingFieldUI()
+const storedValue = computed(() =>
+  typeof modelValue === 'number' ? storedNumberFromDisplay(modelValue, displayScale) : 0
+)
 
 function bindingTooltip(name: string, resolvedValue: unknown) {
   if (typeof resolvedValue !== 'number') return name
-  return `${name} · ${resolvedValue}${suffix ?? ''}`
+  return `${name} · ${displayNumberFromStored(resolvedValue, displayScale)}${suffix ?? ''}`
 }
 
 defineOptions({ inheritAttrs: false })
 </script>
 
 <template>
-  <BindableValueRoot
-    v-slot="binding"
-    :provider="provider"
-    :targets="targets"
-    :value="typeof modelValue === 'number' ? modelValue : 0"
-  >
+  <BindableValueRoot v-slot="binding" :provider="provider" :targets="targets" :value="storedValue">
     <NumberField
       v-bind="$attrs"
       :icon="icon"
@@ -129,7 +134,7 @@ defineOptions({ inheritAttrs: false })
             :detach-label="panels.detachVariable"
             :create-label="
               panels.createNumberVariable({
-                value: typeof modelValue === 'number' ? Math.round(modelValue) : 0
+                value: displayScale === 1 ? Math.round(storedValue) : storedValue
               })
             "
             :create-name-placeholder="panels.variableName"

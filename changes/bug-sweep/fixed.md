@@ -38,3 +38,4 @@
 - `convert --help` lists every output format it can write.
 - Changing a setting keeps preferences that a newer version of Pairdraw saved.
 - Design JSX keeps `<!-- … -->` written inside attribute values and string literals instead of removing it as a comment.
+- Creating a variable from the Opacity field keeps the layer's opacity instead of setting it to 100%.

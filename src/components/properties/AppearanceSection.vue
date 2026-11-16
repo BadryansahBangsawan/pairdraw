@@ -101,6 +101,7 @@ function blendModeGroups(value: BlendMode | typeof MIXED) {
             :model-value="opacityPercent"
             :min="0"
             :max="100"
+            :display-scale="100"
             :node-id="node.id"
             binding-path="opacity"
             @update:model-value="actions.updateProp('opacity', $event / 100)"

@@ -125,7 +125,8 @@ export const ConnectAgentAndFinish: Story = {
     await next()
     // Codex covers the design goal, so there is no pay-as-you-go question.
     await expect(page().getByRole('heading', { name: 'Connect your AI' })).toBeVisible()
-    await expect(page().getByText('npm i -g @agentclientprotocol/codex-acp')).toBeVisible()
+    // A browser tab cannot see the computer Codex runs on, so the companion installs it there.
+    await expect(page().queryByText(/codex-acp/)).toBeNull()
     await next()
     await expect(page().getByText('Codex · Model chosen by the agent')).toBeVisible()
     await userEvent.click(page().getByRole('button', { name: 'Finish setup' }))

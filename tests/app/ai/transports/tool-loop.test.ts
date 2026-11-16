@@ -331,3 +331,29 @@ test('a waiting message ends the run once the current tool calls finish', async 
     store.dispose()
   }
 })
+
+test('a reply that fails before it reaches the model resumes the design check', async () => {
+  const store = createEditorStore()
+  const hold = spyOn(store.designCheck, 'holdForAgent')
+  try {
+    const transport = createToolLoopTransport({
+      store,
+      providerID: 'anthropic',
+      model: replyModel(),
+      effectiveModelID: 'claude-test',
+      maxOutputTokens: 100,
+      thinkingLevel: () => 'default',
+      skills: {
+        refresh: async () => {
+          throw new Error('Skills could not be read')
+        },
+        enabled: () => []
+      }
+    })
+    await expect(send(transport)).rejects.toThrow('Skills could not be read')
+    expect(hold.mock.calls.at(-1)).toEqual([false])
+  } finally {
+    hold.mockRestore()
+    store.dispose()
+  }
+})

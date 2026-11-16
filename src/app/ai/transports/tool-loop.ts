@@ -268,17 +268,24 @@ export function createToolLoopTransport({
       // The run starts as the message is sent, so a Stop before the model is reached ends it.
       const started = startRun(store, maxAgentSteps.value, effectiveModelID)
       run = started
-      await skills.refresh()
-      offeredSkills = modelSkills()
-      const catalog = skillCatalog(offeredSkills)
-      instructions = catalog ? `${SYSTEM_PROMPT}\n\n${catalog}` : SYSTEM_PROMPT
       releaseExternalMCP()
       const heldExternalMCP = externalMCP.hold()
       releaseExternalMCP = heldExternalMCP
-      externalTools = await externalMCP.tools({
-        approve: approval.approveExternal,
-        signal: options.abortSignal
-      })
+      try {
+        await skills.refresh()
+        offeredSkills = modelSkills()
+        const catalog = skillCatalog(offeredSkills)
+        instructions = catalog ? `${SYSTEM_PROMPT}\n\n${catalog}` : SYSTEM_PROMPT
+        externalTools = await externalMCP.tools({
+          approve: approval.approveExternal,
+          signal: options.abortSignal
+        })
+      } catch (error) {
+        // A reply that fails before it reaches the model resumes the design check it paused.
+        endRun(store, started)
+        heldExternalMCP()
+        throw error
+      }
       historyTools = { ...mcpHistoryTools(options.messages), ...externalTools }
       const { sessionId, runId } = diagnosticContext
       const startedRecording =

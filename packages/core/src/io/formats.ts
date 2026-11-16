@@ -458,19 +458,15 @@ export const jsxFormat: IOFormatAdapter<'jsx'> = {
   category: 'code',
   extensions: ['jsx'],
   mimeTypes: ['text/plain', 'text/jsx'],
-  support: {
-    exportSelection: true,
-    exportNode: true
-  },
+  support: EXPORT_EVERY_TARGET,
   exportOptions: FIXED_SIZE_EXPORT,
   async exportContent(request): Promise<ExportResult> {
     const nodeId = ensureSingleNode(request.target)
+    // A page or a document exports its top-level layers, as Tailwind JSX does.
+    const target = nodeId ? null : resolveExportNodes(request)
     let data = ''
-    if (nodeId) {
-      data = sceneNodeToJSX(nodeId, request.graph)
-    } else if (request.target.scope === 'selection') {
-      data = selectionToJSX(request.target.nodeIds, request.graph)
-    }
+    if (nodeId) data = sceneNodeToJSX(nodeId, request.graph)
+    else if (target) data = selectionToJSX(target.nodeIds, request.graph)
     if (!data) throw new Error('Nothing to export')
     return {
       format: 'jsx',

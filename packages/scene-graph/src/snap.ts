@@ -1,4 +1,4 @@
-import { rotatedBBox } from './geometry'
+import { getNodeWorldBounds } from './coordinate'
 import type { Rect } from './primitives'
 import type { SceneNode } from './types'
 
@@ -25,8 +25,17 @@ export interface SnapResult {
   guides: SnapGuide[]
 }
 
+// A line turns around its start point and other layers around their centre, as they are drawn.
 function getEdges(node: SceneNode) {
-  return rotatedBBox(node.x, node.y, node.width, node.height, node.rotation)
+  const box = getNodeWorldBounds(node)
+  return {
+    left: box.x,
+    right: box.x + box.width,
+    top: box.y,
+    bottom: box.y + box.height,
+    centerX: box.x + box.width / 2,
+    centerY: box.y + box.height / 2
+  }
 }
 
 // Pairwise edge/center matching intentionally keeps both axes in one pass.
@@ -78,7 +87,8 @@ export function computeSnap(
             if (guides[i].axis === 'x') guides.splice(i, 1)
           }
         }
-        if (Math.abs(d) === Math.abs(bestDx)) {
+        // A tie in the other direction is not applied, so it draws no guide.
+        if (d === bestDx) {
           const minY = Math.min(m.top, t.top)
           const maxY = Math.max(m.bottom, t.bottom)
           guides.push({ axis: 'x', position: tVal, from: minY, to: maxY })
@@ -104,7 +114,7 @@ export function computeSnap(
           }
           bestDy = d
         }
-        if (Math.abs(d) === Math.abs(bestDy)) {
+        if (d === bestDy) {
           const minX = Math.min(m.left, t.left)
           const maxX = Math.max(m.right, t.right)
           guides.push({ axis: 'y', position: tVal, from: minX, to: maxX })

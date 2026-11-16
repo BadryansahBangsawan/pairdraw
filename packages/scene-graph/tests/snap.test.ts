@@ -4,6 +4,8 @@ import type { SceneNode } from '@pairdraw/scene-graph'
 import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
 import type { Rect } from '@pairdraw/scene-graph/primitives'
 import {
+  computeSelectionBounds,
+  computeSnap,
   computeSpacingGuides,
   computeSpacingSnap,
   spacingTargets
@@ -155,5 +157,27 @@ describe('spacing targets', () => {
     const targets = spacingTargets(MOVING, [box('b', 60, 0), box('moving', 0, 0), box('a', 0, 100)])
     expect(targets.x.map((span) => span.start)).toEqual([0, 60])
     expect(targets.y.map((span) => span.start)).toEqual([0, 100])
+  })
+})
+
+describe('edge snap guides', () => {
+  test('draw only the alignment the snap applies when two targets are equally near', () => {
+    // The moving layer spans 103..113: 100 is 3 to the left and 116 is 3 to the right.
+    const targets = [box('left', 100, 500), box('right', 116, 500)]
+    const result = computeSnap(MOVING, bounds(103, 0, 10, 10), targets, THRESHOLD)
+    expect(result.dx).toBe(-3)
+    const xGuides = result.guides.filter((guide) => guide.axis === 'x')
+    expect(xGuides.map((guide) => guide.position)).toEqual([100])
+  })
+})
+
+describe('rotated lines', () => {
+  test('turn around their start point, as they are drawn', () => {
+    const line = createDefaultNode(() => 'line', 'LINE', { width: 100, height: 0, rotation: 90 })
+    const result = computeSelectionBounds([line])
+    expect(result?.x).toBeCloseTo(0)
+    expect(result?.y).toBeCloseTo(0)
+    expect(result?.width).toBeCloseTo(0)
+    expect(result?.height).toBeCloseTo(100)
   })
 })

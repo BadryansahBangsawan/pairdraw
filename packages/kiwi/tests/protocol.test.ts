@@ -28,6 +28,8 @@ describe('Figma Kiwi protocol helpers', () => {
     expect(parseVarint(new Uint8Array([0]), 0)).toEqual([0, 1])
     expect(parseVarint(new Uint8Array([127]), 0)).toEqual([127, 1])
     expect(parseVarint(new Uint8Array([128, 1]), 0)).toEqual([128, 2])
+    expect(parseVarint(new Uint8Array([0xff, 0xff, 0xff, 0xff, 0x0f]), 0)).toEqual([0xffff_ffff, 5])
+    expect(parseVarint(new Uint8Array([0x80, 0x80, 0x80, 0x80, 0x08]), 0)).toEqual([0x8000_0000, 5])
   })
 
   test('handles fig-wire headers', () => {

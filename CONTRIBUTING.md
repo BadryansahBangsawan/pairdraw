@@ -23,11 +23,13 @@ The first Portless run creates and trusts a local HTTPS certificate. Linked Git 
 
 The repository also works in any [Dev Container](https://containers.dev/)-compatible tool: the container pins Bun, installs dependencies, and forwards port 1420; start with `bun run dev`. It covers the web editor, packages, CLI, and automated checks. Native Tauri development needs [Rust](https://rustup.rs/) and the [Tauri v2 prerequisites](https://v2.tauri.app/start/prerequisites/) on the host.
 
-For macOS release builds with ad-hoc signing (no Apple Developer account, local testing only):
+macOS bundles are signed ad-hoc by default (`signingIdentity` is `-` in `desktop/tauri.conf.json`), so a release build needs no Apple Developer account; skip the updater artifacts when you have no updater key:
 
 ```sh
-APPLE_SIGNING_IDENTITY=- bun run tauri build -c '{"bundle": { "createUpdaterArtifacts": false }}'
+bun run tauri build -c '{"bundle": { "createUpdaterArtifacts": false }}'
 ```
+
+To sign with a Developer ID instead, set `APPLE_SIGNING_IDENTITY` (and `APPLE_CERTIFICATE` with its password in CI). The Build workflow passes those secrets on only when the repository has them; without them it ships ad-hoc signed macOS bundles.
 
 Builds name no hosted services and send no usage data. Two build-time variables opt in to hosted endpoints you run yourself: `VITE_PAIRDRAW_OFFICIAL_CLOUD_URL` makes the connect dialog, Settings → Cloud, and invitations offer that Cloud server first, and `VITE_PAIRDRAW_WEB_APP_URL` names a hosted web app that desktop MCP sign-ins return through and that S3 bucket CORS rules allow. Leave both unset for a build that contacts no server of its own.
 

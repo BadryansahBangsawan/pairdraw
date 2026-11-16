@@ -13,7 +13,7 @@ Erhalten bleibt: KI-Agenten zeigen ihre Zeiger auf der Arbeitsfläche und lassen
 
 ## Agenten auf der Arbeitsfläche
 
-Der integrierte AI-Chat, ACP- und Pi-Harness-Chats und jeder verbundene MCP-Client erscheinen als Zeiger an den Ebenen, die sie lesen oder bearbeiten; ihre umrandete Beschriftung zeigt ein Funkelsymbol und einen Rufnamen wie *Fern*. Während der Chat JSX streamt, wandert sein Zeiger durch die Elemente, sobald sie erscheinen, und umrandet sie. Agenten zeichnen Zeiger und Umrandung in Violett.
+Der integrierte AI-Chat, ACP- und Pi-Harness-Chats und jeder verbundene MCP-Client erscheinen als Zeiger an den Ebenen, die sie lesen oder bearbeiten; ihre umrandete Beschriftung zeigt ein Funkelsymbol und einen Rufnamen wie _Fern_. Während der Chat JSX streamt, wandert sein Zeiger durch die Elemente, sobald sie erscheinen, und umrandet sie. Agenten zeichnen Zeiger und Umrandung in Violett.
 
 Ihr eigener Avatar erscheint in der oberen Leiste nur, solange er Ihre Agenten auflistet oder jemand anderes dasselbe Cloud-Dokument geöffnet hat. Ein Avatar zählt die Agenten, die die Person ausführt; beim Daraufzeigen sehen Sie jeden Agenten, seine Tätigkeit und die jeweilige Seite. Ein Klick auf einen Ihrer eigenen Agenten benennt ihn um.
 

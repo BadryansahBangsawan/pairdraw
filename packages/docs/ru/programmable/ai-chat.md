@@ -1,6 +1,6 @@
 ---
 title: Чат с ИИ
-description: Встроенный помощник с более чем 130 инструментами для создания и изменения дизайна.
+description: Встроенный помощник с 139 инструментами для создания и изменения дизайна.
 ---
 
 # Чат с ИИ
@@ -84,28 +84,28 @@ description: Встроенный помощник с более чем 130 ин
 
 ## Поставщики
 
-| Поставщик                   | Модели                                                                 | Настройка                                                                                                  |
-| --------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| **OpenRouter**              | Claude, GPT, Gemini, DeepSeek, Qwen и другие                           | Ключ API с [openrouter.ai](https://openrouter.ai)                                                          |
-| **Anthropic**               | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5 | Ключ API с [console.anthropic.com](https://console.anthropic.com)                                          |
-| **OpenAI**                  | GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna                                   | Ключ API с [platform.openai.com](https://platform.openai.com)                                              |
-| **ChatGPT**                 | Модели, которые ваш тариф ChatGPT предлагает в Codex, список загружается из аккаунта | Настольное приложение: **Войти через ChatGPT**. Ответы расходуют лимиты использования тарифа.  |
-| **Google AI**               | Gemini 3.8 Flash, Gemini 4 Argon                                       | Ключ API с [aistudio.google.dev](https://aistudio.google.dev)                                              |
-| **DeepSeek**                | DeepSeek Flash, DeepSeek V4 Pro                                        | Ключ API с [platform.deepseek.com](https://platform.deepseek.com/api_keys)                                 |
-| **Z.ai**                    | GLM-5.3, GLM-5.3-Flash, GLM-5.3-FlashX, GLM-5V-Turbo                   | Ключ API из [документации Z.ai](https://docs.z.ai/devpack/quick-start)                                     |
-| **MiniMax**                 | MiniMax-M3.1-Flash, MiniMax-M3                                         | Ключ API с [platform.minimax.io](https://platform.minimax.io/user-center/basic-information/interface-key)  |
-| **xAI**                     | Grok 4.7, Grok 4.6, Grok Build 0.1                                     | Ключ API с [console.x.ai](https://console.x.ai)                                                            |
-| **Meta**                    | Muse Spark 1.3, Muse Wonder                                            | Ключ API с [dev.meta.ai](https://dev.meta.ai)                                                              |
-| **Kimi For Coding**         | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi For Coding                | Ключ API подписки Kimi Code с [kimi.ai](https://www.kimi.ai/code/console). Только в настольном приложении. |
-| **Moonshot AI**             | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi K3                        | Ключ API с [platform.moonshot.ai](https://platform.moonshot.ai/console/api-keys)                           |
-| **Together AI**             | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Muse Spark Open                 | Ключ API с [together.ai](https://api.together.ai/settings/api-keys)                                        |
-| **Fireworks AI**            | Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, MiniMax-M3.1-Flash              | Ключ API с [fireworks.ai](https://app.fireworks.ai/settings/users/api-keys)                                |
-| **OpenCode Zen**            | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Big Pickle                      | Ключ API с [opencode.ai](https://opencode.ai/auth). Только в настольном приложении.                        |
-| **OpenCode Go**             | Kimi K3.1 Pro, MiniMax M3.1 Flash, GLM-5.3, DeepSeek V4.1 Flash        | Ключ API подписки Go с [opencode.ai](https://opencode.ai/auth). Только в настольном приложении.            |
-| **Совместимый с OpenAI**    | Любая конечная точка в формате OpenAI API                              | Собственные базовый URL и ключ; можно выбрать Completions API или Responses API                            |
-| **Совместимый с Anthropic** | Любая конечная точка в формате Anthropic API                           | Собственные базовый URL и ключ                                                                             |
-| **Amazon Bedrock**          | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5 | Регион и API-ключ Bedrock или ключи доступа AWS в настольном приложении                                    |
-| **Google Vertex AI**        | Claude Sonnet 5.5, Claude Opus 5.5, Gemini 3.8 Flash, Gemini 4 Argon   | Проект и расположение с токеном доступа; API-ключ подходит только для Gemini                               |
+| Поставщик                   | Модели                                                                               | Настройка                                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| **OpenRouter**              | Claude, GPT, Gemini, DeepSeek, Qwen и другие                                         | Ключ API с [openrouter.ai](https://openrouter.ai)                                                          |
+| **Anthropic**               | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5               | Ключ API с [console.anthropic.com](https://console.anthropic.com)                                          |
+| **OpenAI**                  | GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna                                                 | Ключ API с [platform.openai.com](https://platform.openai.com)                                              |
+| **ChatGPT**                 | Модели, которые ваш тариф ChatGPT предлагает в Codex, список загружается из аккаунта | Настольное приложение: **Войти через ChatGPT**. Ответы расходуют лимиты использования тарифа.              |
+| **Google AI**               | Gemini 3.8 Flash, Gemini 4 Argon                                                     | Ключ API с [aistudio.google.dev](https://aistudio.google.dev)                                              |
+| **DeepSeek**                | DeepSeek Flash, DeepSeek V4 Pro                                                      | Ключ API с [platform.deepseek.com](https://platform.deepseek.com/api_keys)                                 |
+| **Z.ai**                    | GLM-5.3, GLM-5.3-Flash, GLM-5.3-FlashX, GLM-5V-Turbo                                 | Ключ API из [документации Z.ai](https://docs.z.ai/devpack/quick-start)                                     |
+| **MiniMax**                 | MiniMax-M3.1-Flash, MiniMax-M3                                                       | Ключ API с [platform.minimax.io](https://platform.minimax.io/user-center/basic-information/interface-key)  |
+| **xAI**                     | Grok 4.7, Grok 4.6, Grok Build 0.1                                                   | Ключ API с [console.x.ai](https://console.x.ai)                                                            |
+| **Meta**                    | Muse Spark 1.3, Muse Wonder                                                          | Ключ API с [dev.meta.ai](https://dev.meta.ai)                                                              |
+| **Kimi For Coding**         | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi For Coding                              | Ключ API подписки Kimi Code с [kimi.ai](https://www.kimi.ai/code/console). Только в настольном приложении. |
+| **Moonshot AI**             | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi K3                                      | Ключ API с [platform.moonshot.ai](https://platform.moonshot.ai/console/api-keys)                           |
+| **Together AI**             | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Muse Spark Open                               | Ключ API с [together.ai](https://api.together.ai/settings/api-keys)                                        |
+| **Fireworks AI**            | Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, MiniMax-M3.1-Flash                            | Ключ API с [fireworks.ai](https://app.fireworks.ai/settings/users/api-keys)                                |
+| **OpenCode Zen**            | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Big Pickle                                    | Ключ API с [opencode.ai](https://opencode.ai/auth). Только в настольном приложении.                        |
+| **OpenCode Go**             | Kimi K3.1 Pro, MiniMax M3.1 Flash, GLM-5.3, DeepSeek V4.1 Flash                      | Ключ API подписки Go с [opencode.ai](https://opencode.ai/auth). Только в настольном приложении.            |
+| **Совместимый с OpenAI**    | Любая конечная точка в формате OpenAI API                                            | Собственные базовый URL и ключ; можно выбрать Completions API или Responses API                            |
+| **Совместимый с Anthropic** | Любая конечная точка в формате Anthropic API                                         | Собственные базовый URL и ключ                                                                             |
+| **Amazon Bedrock**          | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5               | Регион и API-ключ Bedrock или ключи доступа AWS в настольном приложении                                    |
+| **Google Vertex AI**        | Claude Sonnet 5.5, Claude Opus 5.5, Gemini 3.8 Flash, Gemini 4 Argon                 | Проект и расположение с токеном доступа; API-ключ подходит только для Gemini                               |
 
 Отдельный сервер не нужен: ваш ключ или вход обращается к поставщику напрямую. В браузере действуют правила CORS каждого поставщика, а разные развёртывания моделей по-разному надёжно передают вызовы инструментов в потоке. Результаты замеров и шаги для воспроизведения приведены в разделе [Совместимость поставщиков и моделей BYOK](/programmable/byok-provider-compatibility).
 

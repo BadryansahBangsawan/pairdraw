@@ -20,7 +20,7 @@ Dlatego narzędzia automatyzacji są tak ważne. Aplikacja, CLI, narzędzia AI, 
 
 ## Czat AI
 
-Wbudowany asystent ma dostęp do ponad 130 narzędzi obejmujących pełne możliwości edytora. Opisz zadanie zwykłym językiem, na przykład: „dodaj wszystkim przyciskom cień 16 px”, „utwórz komponent karty z wariantem ciemnym” albo „wyeksportuj wszystkie ramki na tej stronie w skali 2×”.
+Wbudowany asystent ma dostęp do 139 narzędzi obejmujących pełne możliwości edytora. Opisz zadanie zwykłym językiem, na przykład: „dodaj wszystkim przyciskom cień 16 px”, „utwórz komponent karty z wariantem ciemnym” albo „wyeksportuj wszystkie ramki na tej stronie w skali 2×”.
 
 [Czat AI →](./ai-chat)
 
@@ -54,7 +54,7 @@ CLI łączy się również przez RPC z uruchomioną aplikacją na komputer, wię
 
 ## Serwer MCP
 
-Podłącz do Pairdraw Claude Code, Cursor, Windsurf lub dowolnego klienta zgodnego z MCP. Serwer udostępnia ponad 130 narzędzi do odczytu, tworzenia i zmieniania projektów — tych samych, których używa wbudowany czat AI. Działa przez stdio lub HTTP z obsługą sesji.
+Podłącz do Pairdraw Claude Code, Cursor, Windsurf lub dowolnego klienta zgodnego z MCP. Serwer udostępnia 139 narzędzi do odczytu, tworzenia i zmieniania projektów — tych samych, których używa wbudowany czat AI. Działa przez stdio lub HTTP z obsługą sesji.
 
 [Serwer MCP →](/programmable/mcp-server)
 

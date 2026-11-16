@@ -1,6 +1,6 @@
 ---
 title: Chat con AI
-description: Assistente AI integrato con oltre 130 strumenti per creare e modificare design.
+description: Assistente AI integrato con 139 strumenti per creare e modificare design.
 ---
 
 # Chat con AI
@@ -84,28 +84,28 @@ Nelle impostazioni della chat accanto alla panoramica dei modelli, scegli se il 
 
 ## Provider supportati
 
-| Provider                 | Modelli                                                                | Configurazione                                                                                              |
-| ------------------------ | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **OpenRouter**           | Claude, GPT, Gemini, DeepSeek, Qwen e altri                            | Chiave API da [openrouter.ai](https://openrouter.ai)                                                        |
-| **Anthropic**            | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5 | Chiave API da [console.anthropic.com](https://console.anthropic.com)                                        |
-| **OpenAI**               | GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna                                   | Chiave API da [platform.openai.com](https://platform.openai.com)                                            |
-| **ChatGPT**              | I modelli che il tuo piano ChatGPT offre in Codex, elencati in tempo reale | App desktop: **Accedi con ChatGPT**. Le risposte contano per i limiti di utilizzo del piano.            |
-| **Google AI**            | Gemini 3.8 Flash, Gemini 4 Argon                                       | Chiave API da [aistudio.google.dev](https://aistudio.google.dev)                                            |
-| **DeepSeek**             | DeepSeek Flash, DeepSeek V4 Pro                                        | Chiave API da [platform.deepseek.com](https://platform.deepseek.com/api_keys)                               |
-| **Z.ai**                 | GLM-5.3, GLM-5.3-Flash, GLM-5.3-FlashX, GLM-5V-Turbo                   | Chiave API da [docs.z.ai](https://docs.z.ai/devpack/quick-start)                                            |
-| **MiniMax**              | MiniMax-M3.1-Flash, MiniMax-M3                                         | Chiave API da [platform.minimax.io](https://platform.minimax.io/user-center/basic-information/interface-key) |
-| **xAI**                  | Grok 4.7, Grok 4.6, Grok Build 0.1                                     | Chiave API da [console.x.ai](https://console.x.ai)                                                          |
-| **Meta**                 | Muse Spark 1.3, Muse Wonder                                            | Chiave API da [dev.meta.ai](https://dev.meta.ai)                                                            |
-| **Kimi For Coding**      | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi For Coding                | Chiave API del piano Kimi Code da [kimi.ai](https://www.kimi.ai/code/console). Solo app desktop.            |
-| **Moonshot AI**          | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi K3                        | Chiave API da [platform.moonshot.ai](https://platform.moonshot.ai/console/api-keys)                         |
-| **Together AI**          | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Muse Spark Open                 | Chiave API da [together.ai](https://api.together.ai/settings/api-keys)                                      |
-| **Fireworks AI**         | Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, MiniMax-M3.1-Flash              | Chiave API da [fireworks.ai](https://app.fireworks.ai/settings/users/api-keys)                              |
-| **OpenCode Zen**         | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Big Pickle                      | Chiave API da [opencode.ai](https://opencode.ai/auth). Solo app desktop.                                    |
-| **OpenCode Go**          | Kimi K3.1 Pro, MiniMax M3.1 Flash, GLM-5.3, DeepSeek V4.1 Flash        | Chiave API del piano Go da [opencode.ai](https://opencode.ai/auth). Solo app desktop.                       |
-| **OpenAI-compatible**    | Qualsiasi endpoint con il formato dell'API di OpenAI                   | URL di base personalizzato + chiave. Supporta la scelta tra API Completions e Responses.                    |
-| **Anthropic-compatible** | Qualsiasi endpoint con il formato dell'API di Anthropic                | URL di base personalizzato + chiave                                                                         |
-| **Amazon Bedrock**       | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5 | Regione più una chiave API di Bedrock, oppure chiavi di accesso AWS nell'app desktop                        |
-| **Google Vertex AI**     | Claude Sonnet 5.5, Claude Opus 5.5, Gemini 3.8 Flash, Gemini 4 Argon   | Progetto e posizione più un token di accesso; una chiave API raggiunge solo Gemini                          |
+| Provider                 | Modelli                                                                    | Configurazione                                                                                               |
+| ------------------------ | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **OpenRouter**           | Claude, GPT, Gemini, DeepSeek, Qwen e altri                                | Chiave API da [openrouter.ai](https://openrouter.ai)                                                         |
+| **Anthropic**            | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5     | Chiave API da [console.anthropic.com](https://console.anthropic.com)                                         |
+| **OpenAI**               | GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna                                       | Chiave API da [platform.openai.com](https://platform.openai.com)                                             |
+| **ChatGPT**              | I modelli che il tuo piano ChatGPT offre in Codex, elencati in tempo reale | App desktop: **Accedi con ChatGPT**. Le risposte contano per i limiti di utilizzo del piano.                 |
+| **Google AI**            | Gemini 3.8 Flash, Gemini 4 Argon                                           | Chiave API da [aistudio.google.dev](https://aistudio.google.dev)                                             |
+| **DeepSeek**             | DeepSeek Flash, DeepSeek V4 Pro                                            | Chiave API da [platform.deepseek.com](https://platform.deepseek.com/api_keys)                                |
+| **Z.ai**                 | GLM-5.3, GLM-5.3-Flash, GLM-5.3-FlashX, GLM-5V-Turbo                       | Chiave API da [docs.z.ai](https://docs.z.ai/devpack/quick-start)                                             |
+| **MiniMax**              | MiniMax-M3.1-Flash, MiniMax-M3                                             | Chiave API da [platform.minimax.io](https://platform.minimax.io/user-center/basic-information/interface-key) |
+| **xAI**                  | Grok 4.7, Grok 4.6, Grok Build 0.1                                         | Chiave API da [console.x.ai](https://console.x.ai)                                                           |
+| **Meta**                 | Muse Spark 1.3, Muse Wonder                                                | Chiave API da [dev.meta.ai](https://dev.meta.ai)                                                             |
+| **Kimi For Coding**      | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi For Coding                    | Chiave API del piano Kimi Code da [kimi.ai](https://www.kimi.ai/code/console). Solo app desktop.             |
+| **Moonshot AI**          | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi K3                            | Chiave API da [platform.moonshot.ai](https://platform.moonshot.ai/console/api-keys)                          |
+| **Together AI**          | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Muse Spark Open                     | Chiave API da [together.ai](https://api.together.ai/settings/api-keys)                                       |
+| **Fireworks AI**         | Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, MiniMax-M3.1-Flash                  | Chiave API da [fireworks.ai](https://app.fireworks.ai/settings/users/api-keys)                               |
+| **OpenCode Zen**         | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Big Pickle                          | Chiave API da [opencode.ai](https://opencode.ai/auth). Solo app desktop.                                     |
+| **OpenCode Go**          | Kimi K3.1 Pro, MiniMax M3.1 Flash, GLM-5.3, DeepSeek V4.1 Flash            | Chiave API del piano Go da [opencode.ai](https://opencode.ai/auth). Solo app desktop.                        |
+| **OpenAI-compatible**    | Qualsiasi endpoint con il formato dell'API di OpenAI                       | URL di base personalizzato + chiave. Supporta la scelta tra API Completions e Responses.                     |
+| **Anthropic-compatible** | Qualsiasi endpoint con il formato dell'API di Anthropic                    | URL di base personalizzato + chiave                                                                          |
+| **Amazon Bedrock**       | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5     | Regione più una chiave API di Bedrock, oppure chiavi di accesso AWS nell'app desktop                         |
+| **Google Vertex AI**     | Claude Sonnet 5.5, Claude Opus 5.5, Gemini 3.8 Flash, Gemini 4 Argon       | Progetto e posizione più un token di accesso; una chiave API raggiunge solo Gemini                           |
 
 Nessun backend: la tua chiave o il tuo accesso comunicano direttamente con il provider. Le richieste dal browser sono soggette alle regole CORS di ciascun provider, e i deployment dei modelli variano nell'affidabilità con cui trasmettono in streaming le chiamate agli strumenti. Vedi [Compatibilità di provider e modelli BYOK](/programmable/byok-provider-compatibility) per i risultati misurati e i passaggi per riprodurli.
 

@@ -13,7 +13,7 @@ Lo que se mantiene: los agentes de IA muestran sus cursores en el lienzo y se pu
 
 ## Agentes en el lienzo
 
-El chat con AI integrado, los chats de ACP y Pi harness y cada cliente MCP conectado aparecen como cursores sobre las capas que leen o editan, con una etiqueta con contorno que muestra una chispa y un nombre en clave como *Fern*. Mientras el chat transmite JSX, su cursor recorre los elementos a medida que aparecen y los contornea. Los agentes dibujan su cursor y su contorno en violeta.
+El chat con AI integrado, los chats de ACP y Pi harness y cada cliente MCP conectado aparecen como cursores sobre las capas que leen o editan, con una etiqueta con contorno que muestra una chispa y un nombre en clave como _Fern_. Mientras el chat transmite JSX, su cursor recorre los elementos a medida que aparecen y los contornea. Los agentes dibujan su cursor y su contorno en violeta.
 
 Tu propio avatar aparece en la barra superior solo mientras enumera tus agentes o mientras otra persona tiene abierto el mismo documento de Cloud. Un avatar cuenta los agentes que ejecuta esa persona; pasa el cursor por encima para ver cada agente, qué hace y en qué página. Haz clic en uno de tus propios agentes para cambiarle el nombre.
 

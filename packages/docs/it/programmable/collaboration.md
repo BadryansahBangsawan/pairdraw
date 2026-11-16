@@ -13,7 +13,7 @@ Cosa resta: gli agenti AI mostrano il loro cursore sull'area di lavoro e possono
 
 ## Agenti sull'area di lavoro
 
-La chat con AI integrata, le chat ACP e Pi harness e ogni client MCP collegato compaiono come cursori sui livelli che leggono o modificano, ciascuno con un'etichetta contornata che mostra una scintilla e un nome in codice come *Fern*. Mentre la chat trasmette JSX, il suo cursore percorre gli elementi man mano che compaiono e li contorna. Gli agenti disegnano cursore e contorni in viola.
+La chat con AI integrata, le chat ACP e Pi harness e ogni client MCP collegato compaiono come cursori sui livelli che leggono o modificano, ciascuno con un'etichetta contornata che mostra una scintilla e un nome in codice come _Fern_. Mentre la chat trasmette JSX, il suo cursore percorre gli elementi man mano che compaiono e li contorna. Gli agenti disegnano cursore e contorni in viola.
 
 Il tuo avatar compare nella barra superiore solo finché elenca i tuoi agenti, oppure mentre qualcun altro ha aperto lo stesso documento Cloud. Un avatar conta gli agenti eseguiti da quella persona; passaci sopra il puntatore per vedere ogni agente, cosa sta facendo e su quale pagina. Fai clic su uno dei tuoi agenti per rinominarlo.
 

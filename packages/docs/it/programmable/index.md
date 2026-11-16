@@ -20,7 +20,7 @@ Per questo l'automazione è importante. L'app, la CLI, gli strumenti di AI, il r
 
 ## Chat con AI
 
-L'assistente integrato ha accesso a oltre 130 strumenti che coprono l'intera superficie dell'editor. Descrivi ciò che vuoi in linguaggio naturale: "aggiungi un'ombra esterna di 16px a tutti i pulsanti", "crea un componente scheda con una variante per la modalità scura", "esporta ogni frame di questa pagina a 2×".
+L'assistente integrato ha accesso a 139 strumenti che coprono l'intera superficie dell'editor. Descrivi ciò che vuoi in linguaggio naturale: "aggiungi un'ombra esterna di 16px a tutti i pulsanti", "crea un componente scheda con una variante per la modalità scura", "esporta ogni frame di questa pagina a 2×".
 
 [Chat con AI →](./ai-chat)
 
@@ -54,7 +54,7 @@ La CLI si collega anche all'app desktop in esecuzione tramite RPC, quindi puoi a
 
 ## Server MCP
 
-Collega a Pairdraw Claude Code, Cursor, Windsurf o qualsiasi client compatibile con MCP. Il server espone oltre 130 strumenti per leggere, creare e modificare design, gli stessi usati dalla chat con AI integrata. Funziona tramite stdio o HTTP, con supporto alle sessioni.
+Collega a Pairdraw Claude Code, Cursor, Windsurf o qualsiasi client compatibile con MCP. Il server espone 139 strumenti per leggere, creare e modificare design, gli stessi usati dalla chat con AI integrata. Funziona tramite stdio o HTTP, con supporto alle sessioni.
 
 [Server MCP →](/programmable/mcp-server)
 

@@ -1,6 +1,6 @@
 ---
 title: Czat AI
-description: Wbudowany asystent AI z ponad 130 narzędziami do tworzenia i zmieniania projektów.
+description: Wbudowany asystent AI z 139 narzędziami do tworzenia i zmieniania projektów.
 ---
 
 # Czat AI

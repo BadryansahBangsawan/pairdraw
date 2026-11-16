@@ -1,6 +1,6 @@
 ---
 title: Chat avec l’AI
-description: Assistant intégré avec plus de 130 outils pour créer, modifier et analyser des designs.
+description: Assistant intégré avec 139 outils pour créer, modifier et analyser des designs.
 ---
 
 # Chat avec l’AI
@@ -84,28 +84,28 @@ Dans les réglages Discussion, à côté de la vue d’ensemble des modèles, ch
 
 ## Fournisseurs pris en charge
 
-| Fournisseur              | Modèles                                                                | Configuration                                                                                                       |
-| ------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| **OpenRouter**           | Claude, GPT, Gemini, DeepSeek, Qwen et d’autres                        | Clé API sur [openrouter.ai](https://openrouter.ai)                                                                  |
-| **Anthropic**            | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5 | Clé API sur [console.anthropic.com](https://console.anthropic.com)                                                  |
-| **OpenAI**               | GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna                                   | Clé API sur [platform.openai.com](https://platform.openai.com)                                                      |
+| Fournisseur              | Modèles                                                                  | Configuration                                                                                                     |
+| ------------------------ | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| **OpenRouter**           | Claude, GPT, Gemini, DeepSeek, Qwen et d’autres                          | Clé API sur [openrouter.ai](https://openrouter.ai)                                                                |
+| **Anthropic**            | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5   | Clé API sur [console.anthropic.com](https://console.anthropic.com)                                                |
+| **OpenAI**               | GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna                                     | Clé API sur [platform.openai.com](https://platform.openai.com)                                                    |
 | **ChatGPT**              | Les modèles que votre offre ChatGPT propose dans Codex, listés en direct | Application de bureau : **Se connecter avec ChatGPT**. Les réponses comptent dans les limites d’usage de l’offre. |
-| **Google AI**            | Gemini 3.8 Flash, Gemini 4 Argon                                       | Clé API sur [aistudio.google.dev](https://aistudio.google.dev)                                                      |
-| **DeepSeek**             | DeepSeek Flash, DeepSeek V4 Pro                                        | Clé API sur [platform.deepseek.com](https://platform.deepseek.com/api_keys)                                         |
-| **Z.ai**                 | GLM-5.3, GLM-5.3-Flash, GLM-5.3-FlashX, GLM-5V-Turbo                   | Clé API sur [docs.z.ai](https://docs.z.ai/devpack/quick-start)                                                      |
-| **MiniMax**              | MiniMax-M3.1-Flash, MiniMax-M3                                         | Clé API sur [platform.minimax.io](https://platform.minimax.io/user-center/basic-information/interface-key)          |
-| **xAI**                  | Grok 4.7, Grok 4.6, Grok Build 0.1                                     | Clé API sur [console.x.ai](https://console.x.ai)                                                                    |
-| **Meta**                 | Muse Spark 1.3, Muse Wonder                                            | Clé API sur [dev.meta.ai](https://dev.meta.ai)                                                                      |
-| **Kimi For Coding**      | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi For Coding                | Clé API de l’offre Kimi Code sur [kimi.ai](https://www.kimi.ai/code/console). Application de bureau uniquement.     |
-| **Moonshot AI**          | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi K3                        | Clé API sur [platform.moonshot.ai](https://platform.moonshot.ai/console/api-keys)                                   |
-| **Together AI**          | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Muse Spark Open                 | Clé API sur [together.ai](https://api.together.ai/settings/api-keys)                                                |
-| **Fireworks AI**         | Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, MiniMax-M3.1-Flash              | Clé API sur [fireworks.ai](https://app.fireworks.ai/settings/users/api-keys)                                        |
-| **OpenCode Zen**         | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Big Pickle                      | Clé API sur [opencode.ai](https://opencode.ai/auth). Application de bureau uniquement.                              |
-| **OpenCode Go**          | Kimi K3.1 Pro, MiniMax M3.1 Flash, GLM-5.3, DeepSeek V4.1 Flash        | Clé API de l’offre Go sur [opencode.ai](https://opencode.ai/auth). Application de bureau uniquement.                |
-| **OpenAI-compatible**    | Tout point d’accès au format de l’API OpenAI                           | URL de base personnalisée et clé. Bascule entre les API Completions et Responses.                                   |
-| **Anthropic-compatible** | Tout point d’accès au format de l’API Anthropic                        | URL de base personnalisée et clé                                                                                    |
-| **Amazon Bedrock**       | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5 | Région et clé API Bedrock, ou clés d’accès AWS dans l’application de bureau                                         |
-| **Google Vertex AI**     | Claude Sonnet 5.5, Claude Opus 5.5, Gemini 3.8 Flash, Gemini 4 Argon   | Projet et emplacement, plus un jeton d’accès ; une clé API n’atteint que Gemini                                     |
+| **Google AI**            | Gemini 3.8 Flash, Gemini 4 Argon                                         | Clé API sur [aistudio.google.dev](https://aistudio.google.dev)                                                    |
+| **DeepSeek**             | DeepSeek Flash, DeepSeek V4 Pro                                          | Clé API sur [platform.deepseek.com](https://platform.deepseek.com/api_keys)                                       |
+| **Z.ai**                 | GLM-5.3, GLM-5.3-Flash, GLM-5.3-FlashX, GLM-5V-Turbo                     | Clé API sur [docs.z.ai](https://docs.z.ai/devpack/quick-start)                                                    |
+| **MiniMax**              | MiniMax-M3.1-Flash, MiniMax-M3                                           | Clé API sur [platform.minimax.io](https://platform.minimax.io/user-center/basic-information/interface-key)        |
+| **xAI**                  | Grok 4.7, Grok 4.6, Grok Build 0.1                                       | Clé API sur [console.x.ai](https://console.x.ai)                                                                  |
+| **Meta**                 | Muse Spark 1.3, Muse Wonder                                              | Clé API sur [dev.meta.ai](https://dev.meta.ai)                                                                    |
+| **Kimi For Coding**      | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi For Coding                  | Clé API de l’offre Kimi Code sur [kimi.ai](https://www.kimi.ai/code/console). Application de bureau uniquement.   |
+| **Moonshot AI**          | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi K3                          | Clé API sur [platform.moonshot.ai](https://platform.moonshot.ai/console/api-keys)                                 |
+| **Together AI**          | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Muse Spark Open                   | Clé API sur [together.ai](https://api.together.ai/settings/api-keys)                                              |
+| **Fireworks AI**         | Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, MiniMax-M3.1-Flash                | Clé API sur [fireworks.ai](https://app.fireworks.ai/settings/users/api-keys)                                      |
+| **OpenCode Zen**         | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Big Pickle                        | Clé API sur [opencode.ai](https://opencode.ai/auth). Application de bureau uniquement.                            |
+| **OpenCode Go**          | Kimi K3.1 Pro, MiniMax M3.1 Flash, GLM-5.3, DeepSeek V4.1 Flash          | Clé API de l’offre Go sur [opencode.ai](https://opencode.ai/auth). Application de bureau uniquement.              |
+| **OpenAI-compatible**    | Tout point d’accès au format de l’API OpenAI                             | URL de base personnalisée et clé. Bascule entre les API Completions et Responses.                                 |
+| **Anthropic-compatible** | Tout point d’accès au format de l’API Anthropic                          | URL de base personnalisée et clé                                                                                  |
+| **Amazon Bedrock**       | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5   | Région et clé API Bedrock, ou clés d’accès AWS dans l’application de bureau                                       |
+| **Google Vertex AI**     | Claude Sonnet 5.5, Claude Opus 5.5, Gemini 3.8 Flash, Gemini 4 Argon     | Projet et emplacement, plus un jeton d’accès ; une clé API n’atteint que Gemini                                   |
 
 Aucun serveur intermédiaire : votre clé ou votre connexion communique directement avec le fournisseur. Les requêtes du navigateur sont soumises à la politique CORS de chaque fournisseur, et la fiabilité des appels d’outils en flux varie selon les déploiements de modèles. Consultez [Compatibilité des fournisseurs et modèles BYOK](/programmable/byok-provider-compatibility) pour les résultats mesurés et les étapes de reproduction.
 

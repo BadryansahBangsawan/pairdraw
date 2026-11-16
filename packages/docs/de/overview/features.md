@@ -80,7 +80,7 @@ CLI: `pairdraw export design.fig -f jsx --style tailwind`
 
 ## AI-Chat
 
-<kbd>⌘</kbd><kbd>J</kbd> öffnet den Assistenten in einer eigenen Spalte neben dem Eigenschaften-Panel; alternativ schreiben Sie in das Eingabefeld am unteren Rand der Arbeitsfläche oder auf der Startseite. Ist kein Modell eingerichtet, nutzt der Chat einen bereits auf diesem Computer installierten Coding-Agenten: Claude Code, Codex oder Gemini CLI. Mehr als 130 Werkzeuge erstellen Formen, ändern Stile, verwalten Layouts, bearbeiten Komponenten und Variablen, führen boolesche Operationen aus, analysieren Designtoken und exportieren Ressourcen. Verbinden lassen sich Anthropic, OpenAI, Google AI, OpenRouter, jeder kompatible Endpunkt oder die KI, die Ihr [Pairdraw-Cloud](/user-guide/pairdraw-cloud#ai-on-cloud)-Server anbietet. Jeder Anbieter, jedes Modell und jeder Agent zeigt das Logo seines Herstellers.
+<kbd>⌘</kbd><kbd>J</kbd> öffnet den Assistenten in einer eigenen Spalte neben dem Eigenschaften-Panel; alternativ schreiben Sie in das Eingabefeld am unteren Rand der Arbeitsfläche oder auf der Startseite. Ist kein Modell eingerichtet, nutzt der Chat einen bereits auf diesem Computer installierten Coding-Agenten: Claude Code, Codex oder Gemini CLI. 139 Werkzeuge erstellen Formen, ändern Stile, verwalten Layouts, bearbeiten Komponenten und Variablen, führen boolesche Operationen aus, analysieren Designtoken und exportieren Ressourcen. Verbinden lassen sich Anthropic, OpenAI, Google AI, OpenRouter, jeder kompatible Endpunkt oder die KI, die Ihr [Pairdraw-Cloud](/user-guide/pairdraw-cloud#ai-on-cloud)-Server anbietet. Jeder Anbieter, jedes Modell und jeder Agent zeigt das Logo seines Herstellers.
 
 Werkzeugaufrufe erscheinen als einklappbare Einträge auf einer Zeitleiste. Zur visuellen Prüfung stellt der Assistent seine Arbeit dar und vergleicht das Ergebnis mit Ihrer Anfrage. Sämtliche Änderungen durch AI können rückgängig gemacht werden.
 
@@ -96,7 +96,7 @@ In einem vorhandenen Board wird derselbe Browser zur Recherche: Der Chat zitiert
 
 ## MCP-Server
 
-Claude Code, Cursor, Windsurf und andere MCP-Clients können `.fig`-Dateien ohne grafische Oberfläche lesen und verändern. Mehr als 130 Werkzeuge. Als Übertragung stehen stdio und HTTP zur Verfügung.
+Claude Code, Cursor, Windsurf und andere MCP-Clients können `.fig`-Dateien ohne grafische Oberfläche lesen und verändern. 139 Werkzeuge. Als Übertragung stehen stdio und HTTP zur Verfügung.
 
 ```sh
 npm install -g @pairdraw/mcp

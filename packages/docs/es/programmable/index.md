@@ -20,7 +20,7 @@ Por eso importa la superficie de automatización. La aplicación, la CLI, las he
 
 ## Chat con AI
 
-El asistente integrado tiene acceso a más de 130 herramientas que cubren toda la superficie del editor. Describe lo que quieres en lenguaje natural: «añade una sombra de 16px a todos los botones», «crea un componente de tarjeta con una variante de modo oscuro», «exporta todos los marcos de esta página a 2×».
+El asistente integrado tiene acceso a 139 herramientas que cubren toda la superficie del editor. Describe lo que quieres en lenguaje natural: «añade una sombra de 16px a todos los botones», «crea un componente de tarjeta con una variante de modo oscuro», «exporta todos los marcos de esta página a 2×».
 
 [Chat con AI →](./ai-chat)
 
@@ -60,7 +60,7 @@ El comando `eval` ejecuta JavaScript con un objeto global `figma` compatible. Pe
 
 ## Servidor MCP
 
-Conecta Claude Code, Cursor, Windsurf o cualquier cliente compatible con MCP a Pairdraw. El servidor expone más de 130 herramientas para leer, crear y modificar diseños, las mismas que usa el chat con AI integrado. Funciona por stdio o HTTP con soporte de sesiones.
+Conecta Claude Code, Cursor, Windsurf o cualquier cliente compatible con MCP a Pairdraw. El servidor expone 139 herramientas para leer, crear y modificar diseños, las mismas que usa el chat con AI integrado. Funciona por stdio o HTTP con soporte de sesiones.
 
 [Servidor MCP →](/programmable/mcp-server)
 

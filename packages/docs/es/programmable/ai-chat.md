@@ -1,6 +1,6 @@
 ---
 title: Chat con AI
-description: Asistente integrado con más de 130 herramientas para crear y modificar diseños.
+description: Asistente integrado con 139 herramientas para crear y modificar diseños.
 ---
 
 # Chat con AI
@@ -84,28 +84,28 @@ En los ajustes de Chat, junto al resumen de modelos, elige si el razonamiento ap
 
 ## Proveedores admitidos
 
-| Proveedor                | Modelos                                                                | Configuración                                                                                                       |
-| ------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| **OpenRouter**           | Claude, GPT, Gemini, DeepSeek, Qwen y otros                            | Clave de API de [openrouter.ai](https://openrouter.ai)                                                              |
-| **Anthropic**            | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5 | Clave de API de [console.anthropic.com](https://console.anthropic.com)                                              |
-| **OpenAI**               | GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna                                   | Clave de API de [platform.openai.com](https://platform.openai.com)                                                  |
-| **ChatGPT**              | Los modelos que tu plan de ChatGPT ofrece en Codex, listados en directo | App de escritorio: **Iniciar sesión con ChatGPT**. Las respuestas cuentan para los límites de uso del plan.        |
-| **Google AI**            | Gemini 3.8 Flash, Gemini 4 Argon                                       | Clave de API de [aistudio.google.dev](https://aistudio.google.dev)                                                  |
-| **DeepSeek**             | DeepSeek Flash, DeepSeek V4 Pro                                        | Clave de API de [platform.deepseek.com](https://platform.deepseek.com/api_keys)                                     |
-| **Z.ai**                 | GLM-5.3, GLM-5.3-Flash, GLM-5.3-FlashX, GLM-5V-Turbo                   | Clave de API de [docs.z.ai](https://docs.z.ai/devpack/quick-start)                                                  |
-| **MiniMax**              | MiniMax-M3.1-Flash, MiniMax-M3                                         | Clave de API de [platform.minimax.io](https://platform.minimax.io/user-center/basic-information/interface-key)      |
-| **xAI**                  | Grok 4.7, Grok 4.6, Grok Build 0.1                                     | Clave de API de [console.x.ai](https://console.x.ai)                                                                |
-| **Meta**                 | Muse Spark 1.3, Muse Wonder                                            | Clave de API de [dev.meta.ai](https://dev.meta.ai)                                                                  |
-| **Kimi For Coding**      | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi For Coding                | Clave de API del plan Kimi Code de [kimi.ai](https://www.kimi.ai/code/console). Solo en la app de escritorio.       |
-| **Moonshot AI**          | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi K3                        | Clave de API de [platform.moonshot.ai](https://platform.moonshot.ai/console/api-keys)                               |
-| **Together AI**          | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Muse Spark Open                 | Clave de API de [together.ai](https://api.together.ai/settings/api-keys)                                            |
-| **Fireworks AI**         | Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, MiniMax-M3.1-Flash              | Clave de API de [fireworks.ai](https://app.fireworks.ai/settings/users/api-keys)                                    |
-| **OpenCode Zen**         | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Big Pickle                      | Clave de API de [opencode.ai](https://opencode.ai/auth). Solo en la app de escritorio.                              |
-| **OpenCode Go**          | Kimi K3.1 Pro, MiniMax M3.1 Flash, GLM-5.3, DeepSeek V4.1 Flash        | Clave de API del plan Go de [opencode.ai](https://opencode.ai/auth). Solo en la app de escritorio.                  |
-| **OpenAI-compatible**    | Cualquier extremo con el formato de la API de OpenAI                   | URL base personalizada + clave. Permite alternar entre las API Completions y Responses.                             |
-| **Anthropic-compatible** | Cualquier extremo con el formato de la API de Anthropic                | URL base personalizada + clave                                                                                      |
-| **Amazon Bedrock**       | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5 | Región más una clave de API de Bedrock, o claves de acceso de AWS en la app de escritorio                           |
-| **Google Vertex AI**     | Claude Sonnet 5.5, Claude Opus 5.5, Gemini 3.8 Flash, Gemini 4 Argon   | Proyecto y ubicación más un token de acceso; una clave de API solo llega a Gemini                                   |
+| Proveedor                | Modelos                                                                 | Configuración                                                                                                  |
+| ------------------------ | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **OpenRouter**           | Claude, GPT, Gemini, DeepSeek, Qwen y otros                             | Clave de API de [openrouter.ai](https://openrouter.ai)                                                         |
+| **Anthropic**            | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5  | Clave de API de [console.anthropic.com](https://console.anthropic.com)                                         |
+| **OpenAI**               | GPT-6.1 Sol, GPT-6 Astra, GPT-6 Luna                                    | Clave de API de [platform.openai.com](https://platform.openai.com)                                             |
+| **ChatGPT**              | Los modelos que tu plan de ChatGPT ofrece en Codex, listados en directo | App de escritorio: **Iniciar sesión con ChatGPT**. Las respuestas cuentan para los límites de uso del plan.    |
+| **Google AI**            | Gemini 3.8 Flash, Gemini 4 Argon                                        | Clave de API de [aistudio.google.dev](https://aistudio.google.dev)                                             |
+| **DeepSeek**             | DeepSeek Flash, DeepSeek V4 Pro                                         | Clave de API de [platform.deepseek.com](https://platform.deepseek.com/api_keys)                                |
+| **Z.ai**                 | GLM-5.3, GLM-5.3-Flash, GLM-5.3-FlashX, GLM-5V-Turbo                    | Clave de API de [docs.z.ai](https://docs.z.ai/devpack/quick-start)                                             |
+| **MiniMax**              | MiniMax-M3.1-Flash, MiniMax-M3                                          | Clave de API de [platform.minimax.io](https://platform.minimax.io/user-center/basic-information/interface-key) |
+| **xAI**                  | Grok 4.7, Grok 4.6, Grok Build 0.1                                      | Clave de API de [console.x.ai](https://console.x.ai)                                                           |
+| **Meta**                 | Muse Spark 1.3, Muse Wonder                                             | Clave de API de [dev.meta.ai](https://dev.meta.ai)                                                             |
+| **Kimi For Coding**      | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi For Coding                 | Clave de API del plan Kimi Code de [kimi.ai](https://www.kimi.ai/code/console). Solo en la app de escritorio.  |
+| **Moonshot AI**          | Kimi K3.1 Pro, Kimi K3.1 Pro Highspeed, Kimi K3                         | Clave de API de [platform.moonshot.ai](https://platform.moonshot.ai/console/api-keys)                          |
+| **Together AI**          | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Muse Spark Open                  | Clave de API de [together.ai](https://api.together.ai/settings/api-keys)                                       |
+| **Fireworks AI**         | Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, MiniMax-M3.1-Flash               | Clave de API de [fireworks.ai](https://app.fireworks.ai/settings/users/api-keys)                               |
+| **OpenCode Zen**         | Kimi K3, DeepSeek V4.1 Flash, GLM-5.3, Big Pickle                       | Clave de API de [opencode.ai](https://opencode.ai/auth). Solo en la app de escritorio.                         |
+| **OpenCode Go**          | Kimi K3.1 Pro, MiniMax M3.1 Flash, GLM-5.3, DeepSeek V4.1 Flash         | Clave de API del plan Go de [opencode.ai](https://opencode.ai/auth). Solo en la app de escritorio.             |
+| **OpenAI-compatible**    | Cualquier extremo con el formato de la API de OpenAI                    | URL base personalizada + clave. Permite alternar entre las API Completions y Responses.                        |
+| **Anthropic-compatible** | Cualquier extremo con el formato de la API de Anthropic                 | URL base personalizada + clave                                                                                 |
+| **Amazon Bedrock**       | Claude Sonnet 5.5, Claude Opus 5.5, Claude Fable 5.1, Claude Haiku 5.5  | Región más una clave de API de Bedrock, o claves de acceso de AWS en la app de escritorio                      |
+| **Google Vertex AI**     | Claude Sonnet 5.5, Claude Opus 5.5, Gemini 3.8 Flash, Gemini 4 Argon    | Proyecto y ubicación más un token de acceso; una clave de API solo llega a Gemini                              |
 
 Sin servidor intermedio: tu clave o tu inicio de sesión se comunica directamente con el proveedor. Las solicitudes desde el navegador están sujetas a la política CORS de cada proveedor, y los despliegues de modelos varían en la fiabilidad con la que transmiten llamadas de herramientas. Consulta [Compatibilidad de proveedores y modelos BYOK](/programmable/byok-provider-compatibility) para ver resultados medidos y pasos de reproducción.
 

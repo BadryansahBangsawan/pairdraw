@@ -15,8 +15,12 @@ Das Werkzeug `render` akzeptiert JSX-Zeichenketten im AI-Chat und über MCP:
 
 ```jsx
 <Frame name="Card" w={320} h="hug" flex="col" gap={16} p={24} bg="#FFF" rounded={16}>
-  <Text size={18} weight="bold">Card Title</Text>
-  <Text size={14} color="#666">Description text</Text>
+  <Text size={18} weight="bold">
+    Card Title
+  </Text>
+  <Text size={14} color="#666">
+    Description text
+  </Text>
 </Frame>
 ```
 

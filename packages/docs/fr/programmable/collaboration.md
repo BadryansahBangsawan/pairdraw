@@ -13,7 +13,7 @@ Ce qui reste : les agents IA affichent leur curseur sur la zone de travail et pe
 
 ## Agents sur la zone de travail
 
-Le chat IA intégré, les chats ACP et Pi harness et chaque client MCP connecté apparaissent sous la forme de curseurs sur les calques qu’ils lisent ou modifient, leur étiquette cerclée affichant une étincelle et un nom de code tel que *Fern*. Pendant que le chat diffuse du JSX, son curseur parcourt les éléments à mesure qu’ils apparaissent et les entoure. Les agents tracent leur curseur et leur contour en violet.
+Le chat IA intégré, les chats ACP et Pi harness et chaque client MCP connecté apparaissent sous la forme de curseurs sur les calques qu’ils lisent ou modifient, leur étiquette cerclée affichant une étincelle et un nom de code tel que _Fern_. Pendant que le chat diffuse du JSX, son curseur parcourt les éléments à mesure qu’ils apparaissent et les entoure. Les agents tracent leur curseur et leur contour en violet.
 
 Votre propre avatar n’apparaît dans la barre supérieure que tant qu’il énumère vos agents, ou qu’une autre personne a ouvert le même document Cloud. Un avatar compte les agents que cette personne utilise ; survolez-le pour voir chaque agent, ce qu’il fait et sur quelle page. Cliquez sur l’un de vos propres agents pour le renommer.
 

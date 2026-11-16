@@ -13,7 +13,7 @@ Pozostaje to, że agenci AI pokazują swoje kursory na obszarze roboczym i możn
 
 ## Agenci na obszarze roboczym
 
-Wbudowany czat AI, czaty ACP i Pi harness oraz każdy połączony klient MCP pojawiają się jako kursory przy warstwach, które czytają lub edytują, a ich obrysowana etykieta zawiera iskrę i kryptonim, na przykład *Fern*. Gdy czat strumieniuje JSX, jego kursor przechodzi przez elementy w miarę ich pojawiania się i je obrysowuje. Agenci rysują kursor i obrys na fioletowo.
+Wbudowany czat AI, czaty ACP i Pi harness oraz każdy połączony klient MCP pojawiają się jako kursory przy warstwach, które czytają lub edytują, a ich obrysowana etykieta zawiera iskrę i kryptonim, na przykład _Fern_. Gdy czat strumieniuje JSX, jego kursor przechodzi przez elementy w miarę ich pojawiania się i je obrysowuje. Agenci rysują kursor i obrys na fioletowo.
 
 Twój awatar pojawia się na górnym pasku tylko wtedy, gdy wyświetla Twoich agentów albo gdy ktoś inny ma otwarty ten sam dokument w chmurze. Awatar pokazuje liczbę agentów uruchomionych przez daną osobę; najedź na niego, aby zobaczyć każdego agenta, jego bieżące działanie i stronę. Kliknij jednego ze swoich agentów, aby zmienić jego nazwę.
 

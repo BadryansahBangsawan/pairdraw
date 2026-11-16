@@ -20,7 +20,7 @@ C’est pourquoi les interfaces d’automatisation comptent. L’application, la
 
 ## Chat avec l’AI
 
-L’assistant intégré a accès à plus de 130 outils qui couvrent toute la surface de l’éditeur. Décrivez ce que vous voulez en langage naturel : « ajoute une ombre portée de 16 px à tous les boutons », « crée un composant carte avec une variante sombre », « exporte tous les cadres de cette page à 2× ».
+L’assistant intégré a accès à 139 outils qui couvrent toute la surface de l’éditeur. Décrivez ce que vous voulez en langage naturel : « ajoute une ombre portée de 16 px à tous les boutons », « crée un composant carte avec une variante sombre », « exporte tous les cadres de cette page à 2× ».
 
 [Chat avec l’AI →](./ai-chat)
 
@@ -54,7 +54,7 @@ La CLI se connecte aussi à l’application de bureau en cours d’exécution vi
 
 ## Serveur MCP
 
-Connectez Claude Code, Cursor, Windsurf ou tout client compatible MCP à Pairdraw. Le serveur expose plus de 130 outils pour lire, créer et modifier des designs, les mêmes que ceux du chat IA intégré. Il fonctionne sur stdio ou HTTP, avec prise en charge des sessions.
+Connectez Claude Code, Cursor, Windsurf ou tout client compatible MCP à Pairdraw. Le serveur expose 139 outils pour lire, créer et modifier des designs, les mêmes que ceux du chat IA intégré. Il fonctionne sur stdio ou HTTP, avec prise en charge des sessions.
 
 [Serveur MCP →](/programmable/mcp-server)
 

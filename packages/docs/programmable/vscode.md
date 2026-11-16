@@ -46,7 +46,7 @@ Design Mode frames the web editor and hands it the file's bytes. The document is
 
 - **Pairdraw: Toggle Design Mode** switches the active `.fig` or `.pen` between Design Mode and VS Code's own editor; the tab you run it from decides the direction.
 - **Pairdraw: Open Pairdraw Editor** opens the configured editor URL in your system browser.
-- **Pairdraw: Export Selection as PNG** exports the layers selected in Design Mode to a PNG you pick; the suggested name replaces the document's extension. It needs a Design Mode tab whose editor has loaded.
+- **Pairdraw: Export as PNG** exports the layers selected in Design Mode, or the whole page when nothing is selected, to a PNG you pick; the suggested name replaces the document's extension. It needs a Design Mode tab whose editor has loaded.
 - The **Pairdraw** activity-bar view, **Actions**, holds those three commands as buttons.
 
 ## Limits

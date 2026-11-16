@@ -3,3 +3,5 @@
 - Pasting setup instructions for omp, which installs with Bun, no longer tells the agent to fix an npm permission error that cannot happen.
 - Guided setup's card for an agent that brings its own credentials, such as omp, says which providers and model it uses instead of claiming an account it was signed in to.
 - A browser tab no longer shows install commands for a computer it cannot see: the chat column and the agent cards leave those to the companion that runs the agents.
+- The Design panel reports a snapshot this build cannot refresh as information, not an error.
+- The VS Code extension names its export "Export as PNG", which is what it writes with no selection too.

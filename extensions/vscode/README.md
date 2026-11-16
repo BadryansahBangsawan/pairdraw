@@ -30,7 +30,7 @@ The extension needs a running Pairdraw web editor. `bun run dev` serves one at
 - **Toggle Design Mode** switches the active `.pen` or `.fig` between the webview and VS Code's own
   text editor; the same command goes either direction.
 - **Open Pairdraw Editor** opens the configured editor URL in the system browser.
-- **Export Selection as PNG** writes the layers selected in Design Mode to a PNG you pick.
+- **Export as PNG** writes the layers selected in Design Mode, or the whole page when nothing is selected, to a PNG you pick.
 - The **Pairdraw** activity-bar view holds those three commands as buttons.
 
 ## Manual check
@@ -41,7 +41,7 @@ The extension needs a running Pairdraw web editor. `bun run dev` serves one at
    and the file on disk changes while the tab's dirty dot clears.
 4. Run **Pairdraw: Toggle Design Mode**: the tab becomes the text editor with the archive bytes;
    run it again and Design Mode returns.
-5. Select a layer in Design Mode and run **Pairdraw: Export Selection as PNG**; the exported image
+5. Select a layer in Design Mode and run **Pairdraw: Export as PNG**; the exported image
    holds only that layer's pixels.
 6. Point `pairdraw.editorUrl` at a non-`http(s)` value: **Pairdraw: Open Pairdraw Editor** reports
    the bad URL instead of opening it.

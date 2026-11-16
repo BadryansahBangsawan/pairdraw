@@ -2,7 +2,18 @@
   "name": "@pairdraw/pen",
   "version": "0.16.0",
   "description": "Pencil.dev .pen document parser and SceneGraph adapter for Pairdraw.",
+  "keywords": [
+    "pairdraw",
+    "pen",
+    "design",
+    "parser"
+  ],
   "license": "MIT",
+  "author": "Badryansah Bangsawan",
+  "homepage": "https://github.com/BadryansahBangsawan/pairdraw/tree/main/packages/pen#readme",
+  "bugs": {
+    "url": "https://github.com/BadryansahBangsawan/pairdraw/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BadryansahBangsawan/pairdraw.git",

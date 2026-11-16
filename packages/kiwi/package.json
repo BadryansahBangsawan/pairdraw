@@ -2,7 +2,18 @@
   "name": "@pairdraw/kiwi",
   "version": "0.16.0",
   "description": "Kiwi schema, runtime, codecs, and containers for Figma-format files, without SceneGraph knowledge.",
+  "keywords": [
+    "pairdraw",
+    "kiwi",
+    "figma",
+    "binary-format"
+  ],
   "license": "MIT",
+  "author": "Badryansah Bangsawan",
+  "homepage": "https://github.com/BadryansahBangsawan/pairdraw/tree/main/packages/kiwi#readme",
+  "bugs": {
+    "url": "https://github.com/BadryansahBangsawan/pairdraw/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BadryansahBangsawan/pairdraw.git",

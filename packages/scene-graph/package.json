@@ -2,7 +2,18 @@
   "name": "@pairdraw/scene-graph",
   "version": "0.16.0",
   "description": "The framework-neutral Pairdraw design document model: node types, geometry, variables, instances, and hit testing.",
+  "keywords": [
+    "pairdraw",
+    "design",
+    "scene-graph",
+    "geometry"
+  ],
   "license": "MIT",
+  "author": "Badryansah Bangsawan",
+  "homepage": "https://github.com/BadryansahBangsawan/pairdraw/tree/main/packages/scene-graph#readme",
+  "bugs": {
+    "url": "https://github.com/BadryansahBangsawan/pairdraw/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BadryansahBangsawan/pairdraw.git",

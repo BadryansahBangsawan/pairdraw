@@ -2,7 +2,21 @@
   "name": "@pairdraw/core",
   "version": "0.16.0",
   "description": "Pairdraw editor engine: the CanvasKit renderer, Yoga layout, the framework-agnostic editor, the Figma Plugin API, and the AI/MCP tool definitions.",
+  "keywords": [
+    "pairdraw",
+    "design",
+    "editor",
+    "figma",
+    "canvaskit",
+    "skia",
+    "layout"
+  ],
   "license": "MIT",
+  "author": "Badryansah Bangsawan",
+  "homepage": "https://github.com/BadryansahBangsawan/pairdraw/tree/main/packages/core#readme",
+  "bugs": {
+    "url": "https://github.com/BadryansahBangsawan/pairdraw/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BadryansahBangsawan/pairdraw.git",

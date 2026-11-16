@@ -2,7 +2,18 @@
   "name": "@pairdraw/web-capture",
   "version": "0.16.0",
   "description": "Web pages captured with their computed styles, in the format Pairdraw imports as editable layers.",
+  "keywords": [
+    "pairdraw",
+    "web-capture",
+    "html",
+    "dom"
+  ],
   "license": "MIT",
+  "author": "Badryansah Bangsawan",
+  "homepage": "https://github.com/BadryansahBangsawan/pairdraw/tree/main/packages/web-capture#readme",
+  "bugs": {
+    "url": "https://github.com/BadryansahBangsawan/pairdraw/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BadryansahBangsawan/pairdraw.git",

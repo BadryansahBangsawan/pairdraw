@@ -2,7 +2,18 @@
   "name": "@pairdraw/emit",
   "version": "0.16.0",
   "description": "How Pairdraw exporters emit source: JavaScript, TypeScript, and JSX built as ESTree and printed with esrap.",
+  "keywords": [
+    "pairdraw",
+    "codegen",
+    "estree",
+    "jsx"
+  ],
   "license": "MIT",
+  "author": "Badryansah Bangsawan",
+  "homepage": "https://github.com/BadryansahBangsawan/pairdraw/tree/main/packages/emit#readme",
+  "bugs": {
+    "url": "https://github.com/BadryansahBangsawan/pairdraw/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BadryansahBangsawan/pairdraw.git",

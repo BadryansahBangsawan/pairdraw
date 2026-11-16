@@ -2,7 +2,18 @@
   "name": "@pairdraw/drawio",
   "version": "0.16.0",
   "description": "The draw.io file format for Pairdraw: its document model, and a reader and writer for .drawio and .dio files and diagrams embedded in draw.io exports.",
+  "keywords": [
+    "pairdraw",
+    "drawio",
+    "diagrams",
+    "parser"
+  ],
   "license": "MIT",
+  "author": "Badryansah Bangsawan",
+  "homepage": "https://github.com/BadryansahBangsawan/pairdraw/tree/main/packages/drawio#readme",
+  "bugs": {
+    "url": "https://github.com/BadryansahBangsawan/pairdraw/issues"
+  },
   "type": "module",
   "exports": {
     ".": {

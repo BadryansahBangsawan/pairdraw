@@ -2,7 +2,20 @@
   "name": "@pairdraw/mcp",
   "version": "0.16.0",
   "description": "Model Context Protocol server for Pairdraw: inspect and edit designs over stdio or HTTP, and run coding agents for the web app.",
+  "keywords": [
+    "pairdraw",
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "agents",
+    "design"
+  ],
   "license": "MIT",
+  "author": "Badryansah Bangsawan",
+  "homepage": "https://github.com/BadryansahBangsawan/pairdraw/tree/main/packages/mcp#readme",
+  "bugs": {
+    "url": "https://github.com/BadryansahBangsawan/pairdraw/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BadryansahBangsawan/pairdraw.git",

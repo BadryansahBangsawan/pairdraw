@@ -3,7 +3,18 @@
   "version": "0.16.0",
   "private": false,
   "license": "MIT",
+  "author": "Badryansah Bangsawan",
+  "homepage": "https://github.com/BadryansahBangsawan/pairdraw/tree/main/packages/harness#readme",
+  "bugs": {
+    "url": "https://github.com/BadryansahBangsawan/pairdraw/issues"
+  },
   "description": "Optional Pairdraw companion CLI for coding-agent Harness sessions",
+  "keywords": [
+    "pairdraw",
+    "ai",
+    "agent",
+    "pi"
+  ],
   "type": "module",
   "exports": {
     ".": {

@@ -2,7 +2,18 @@
   "name": "@pairdraw/mermaid",
   "version": "0.16.0",
   "description": "Mermaid flowchart diagrams read into a typed model of nodes, edges, subgraphs, and styles.",
+  "keywords": [
+    "pairdraw",
+    "mermaid",
+    "flowchart",
+    "parser"
+  ],
   "license": "MIT",
+  "author": "Badryansah Bangsawan",
+  "homepage": "https://github.com/BadryansahBangsawan/pairdraw/tree/main/packages/mermaid#readme",
+  "bugs": {
+    "url": "https://github.com/BadryansahBangsawan/pairdraw/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BadryansahBangsawan/pairdraw.git",

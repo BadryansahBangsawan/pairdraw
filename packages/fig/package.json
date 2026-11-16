@@ -2,7 +2,19 @@
   "name": "@pairdraw/fig",
   "version": "0.16.0",
   "description": "The .fig file format for Pairdraw: archive parsing, SceneGraph conversion, metadata policy, and the Figma clipboard format.",
+  "keywords": [
+    "pairdraw",
+    "figma",
+    "fig",
+    "kiwi",
+    "parser"
+  ],
   "license": "MIT",
+  "author": "Badryansah Bangsawan",
+  "homepage": "https://github.com/BadryansahBangsawan/pairdraw/tree/main/packages/fig#readme",
+  "bugs": {
+    "url": "https://github.com/BadryansahBangsawan/pairdraw/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BadryansahBangsawan/pairdraw.git",

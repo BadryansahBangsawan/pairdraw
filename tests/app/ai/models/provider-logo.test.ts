@@ -27,7 +27,7 @@ describe('provider logo', () => {
     expect(providerLogo('opencode-go')).toBe('opencode')
     expect(providerLogo('acp:claude-code')).toBe('claude-code')
     expect(providerLogo('acp:gemini-cli')).toBe('gemini-cli')
-    expect(providerLogo('acp:omp')).toBe('pi')
+    expect(providerLogo('acp:omp')).toBe('omp')
     expect(providerLogo(HARNESS_PROVIDER_ID)).toBe('pi')
     expect(providerLogo(PAIRDRAW_AI_PROVIDER)).toBe('pairdraw')
   })

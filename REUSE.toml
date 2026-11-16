@@ -53,3 +53,10 @@ path = [
 precedence = "override"
 SPDX-FileCopyrightText = "2014 - 2022 Knut Sveidqvist"
 SPDX-License-Identifier = "MIT"
+
+# omp's mark, from the oh-my-pi project's assets/icon.svg (MIT), recoloured to the text color.
+[[annotations]]
+path = "assets/ai-logos/omp-color.svg"
+precedence = "override"
+SPDX-FileCopyrightText = ["2025 Mario Zechner", "2025-2026 Can Bölük"]
+SPDX-License-Identifier = "MIT"

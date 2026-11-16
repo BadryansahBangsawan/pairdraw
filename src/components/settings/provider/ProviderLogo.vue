@@ -17,6 +17,7 @@ import IconMiniMax from '~icons/ai/minimax-color'
 import IconMistral from '~icons/ai/mistral-color'
 import IconMoonshot from '~icons/ai/moonshot'
 import IconOllama from '~icons/ai/ollama'
+import IconOmp from '~icons/ai/omp-color'
 import IconOpenAI from '~icons/ai/openai'
 import IconOpenCode from '~icons/ai/opencode'
 import IconOpenRouter from '~icons/ai/openrouter'
@@ -48,7 +49,8 @@ const styles = tv(providerLogoTheme)
 
 /**
  * The brand's colour mark where LobeHub has one that reads on both themes, otherwise its
- * monochrome mark, which draws in the text color. Anthropic shows Claude's mark: its own has no
+ * monochrome mark, which draws in the text color. omp's mark is its own artwork (`assets/ai-logos`),
+ * with the bars in the text color so it reads on both themes. Anthropic shows Claude's mark: its own has no
  * colour version. OpenRouter's lime and Kimi's white letter vanish on a light panel, so they stay
  * monochrome.
  */
@@ -76,6 +78,7 @@ const ICONS: Record<Exclude<ProviderLogoID, 'pairdraw'>, Component> = {
   'claude-code': IconClaudeCode,
   codex: IconCodex,
   'gemini-cli': IconGeminiCLI,
+  omp: IconOmp,
   pi: IconPi
 }
 

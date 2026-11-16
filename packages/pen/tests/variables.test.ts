@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { parsePenFile, type PenDocument, type PenNode } from '@pairdraw/pen'
+import { parsePenFile, writePenDocument, type PenDocument, type PenNode } from '@pairdraw/pen'
 
 import { expectDefined } from './helpers/assert'
 
@@ -165,6 +165,19 @@ test('keeps the collection of a document with themes but no variables', () => {
   )
   const collections = [...graph.variableCollections.values()]
   expect(collections.map((collection) => collection.name)).toEqual(['mode'])
+})
+
+test('reads number text too large for a double as 0, so the document saves and opens again', () => {
+  const graph = parsePenFile(
+    JSON.stringify({
+      version: '2.21',
+      variables: { big: { type: 'number', value: '1e999' } },
+      children: [{ id: 'frame', type: 'frame', width: '$big', height: 10 }]
+    } satisfies PenDocument)
+  )
+
+  expect(graph.getNode('frame')?.width).toBe(0)
+  expect(parsePenFile(writePenDocument(graph)).getNode('frame')?.width).toBe(0)
 })
 
 describe('parsePenFile — themes', () => {

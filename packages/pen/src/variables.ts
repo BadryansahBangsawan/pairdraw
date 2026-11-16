@@ -178,7 +178,10 @@ function sceneValue(
     return aliasId ? { aliasId } : emptyValue(type)
   }
   if (type === 'COLOR') return typeof raw === 'string' ? parseColor(raw) : emptyValue(type)
-  if (type === 'FLOAT') return typeof raw === 'number' ? raw : Number(raw) || 0
+  if (type === 'FLOAT') {
+    const value = Number(raw)
+    return Number.isFinite(value) ? value : 0
+  }
   if (type === 'BOOLEAN') return typeof raw === 'boolean' ? raw : raw === 'true'
   return String(raw)
 }

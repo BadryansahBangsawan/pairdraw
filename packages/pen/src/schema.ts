@@ -1,15 +1,19 @@
 import * as v from 'valibot'
 
+import { finiteNumberSchema } from '@pairdraw/scene-graph/primitives'
+
 import { stripJSONComments } from './jsonc'
 
 /**
  * The `.pen` document as pen.dev writes it (schema 2.21), plus the older forms still found in
  * files: the object `stroke` of 2.8 and `icon_font` nodes. Properties typed `…OrVariable` hold a
  * `$name` reference in place of the value. Enumerated values stay strings so a value this reader
- * does not know falls back to the default instead of rejecting the document.
+ * does not know falls back to the default instead of rejecting the document. Numbers must be
+ * finite: JSON reads a literal too large for a double, such as `1e999`, as Infinity and writes it
+ * back as `null`, so a document holding one would save as a file no reader opens.
  */
 
-const numSchema = v.union([v.number(), v.string()])
+const numSchema = v.union([finiteNumberSchema, v.string()])
 const boolSchema = v.union([v.boolean(), v.string()])
 const strSchema = v.string()
 const sidesSchema = v.looseObject({
@@ -35,7 +39,9 @@ const gradientPaintSchema = v.looseObject({
   ...paintBase,
   gradientType: v.optional(strSchema),
   opacity: v.optional(numSchema),
-  center: v.optional(v.looseObject({ x: v.optional(v.number()), y: v.optional(v.number()) })),
+  center: v.optional(
+    v.looseObject({ x: v.optional(finiteNumberSchema), y: v.optional(finiteNumberSchema) })
+  ),
   size: v.optional(
     v.looseObject({
       width: v.optional(numSchema),
@@ -53,7 +59,14 @@ const imagePaintSchema = v.looseObject({
   url: v.optional(strSchema),
   mode: v.optional(strSchema),
   transform: v.optional(
-    v.tuple([v.number(), v.number(), v.number(), v.number(), v.number(), v.number()])
+    v.tuple([
+      finiteNumberSchema,
+      finiteNumberSchema,
+      finiteNumberSchema,
+      finiteNumberSchema,
+      finiteNumberSchema,
+      finiteNumberSchema
+    ])
   )
 })
 
@@ -139,8 +152,8 @@ const nodeFields = {
    * as plugin data, so any value is read as it is rather than rejecting the document.
    */
   metadata: v.optional(v.unknown()),
-  x: v.optional(v.number()),
-  y: v.optional(v.number()),
+  x: v.optional(finiteNumberSchema),
+  y: v.optional(finiteNumberSchema),
   width: v.optional(sizeSchema),
   height: v.optional(sizeSchema),
   reusable: v.optional(v.boolean()),
@@ -177,7 +190,9 @@ const nodeFields = {
   polygonCount: v.optional(numSchema),
   geometry: v.optional(strSchema),
   fillRule: v.optional(strSchema),
-  viewBox: v.optional(v.tuple([v.number(), v.number(), v.number(), v.number()])),
+  viewBox: v.optional(
+    v.tuple([finiteNumberSchema, finiteNumberSchema, finiteNumberSchema, finiteNumberSchema])
+  ),
 
   content: v.optional(strSchema),
   textGrowth: v.optional(strSchema),
@@ -253,7 +268,7 @@ const nodeSchema: v.GenericSchema<unknown, PenNode> = v.looseObject({
   descendants: v.optional(v.record(strSchema, overrideSchema))
 })
 
-const variableScalarSchema = v.union([v.string(), v.number(), v.boolean()])
+const variableScalarSchema = v.union([v.string(), finiteNumberSchema, v.boolean()])
 
 const variableSchema = v.looseObject({
   type: strSchema,

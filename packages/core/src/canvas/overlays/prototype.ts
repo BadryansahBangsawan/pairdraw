@@ -4,7 +4,7 @@ import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
-import type { RotationPreview } from '#core/geometry'
+import type { LineSegment, RotationPreview } from '#core/geometry'
 import { nodeScreenBounds } from '#core/geometry/scene'
 
 /** A drawn connection's dash, in screen pixels, and its line weight. */
@@ -12,10 +12,7 @@ const CONNECTION_DASH = [6, 4] as const
 const CONNECTION_WEIGHT = 1.5
 
 /** One reaction's arrow, from a layer's edge to the edge of the frame it shows. */
-export interface PrototypeConnection {
-  from: Vector
-  to: Vector
-}
+export type PrototypeConnection = LineSegment
 
 function center(rect: Rect): Vector {
   return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 }

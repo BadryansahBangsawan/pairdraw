@@ -6,6 +6,7 @@ import { getNodeLocalMatrix, localTransformFromWorld } from '@pairdraw/scene-gra
 import { copyFills } from '@pairdraw/scene-graph/copy'
 import Matrix from '@pairdraw/scene-graph/matrix'
 import { parseSVGPath } from '@pairdraw/scene-graph/parse-path'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 import {
   baseShapePath,
@@ -56,12 +57,7 @@ function strokePaints(node: SceneNode): Fill[] {
   )
 }
 
-interface Box {
-  x: number
-  y: number
-  width: number
-  height: number
-}
+type Box = Rect
 
 function boundsOf(paths: readonly Path[]): Box | null {
   let [left, top, right, bottom] = [Infinity, Infinity, -Infinity, -Infinity]

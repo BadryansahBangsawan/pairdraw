@@ -3,12 +3,11 @@ import { promisify } from 'node:util'
 
 import { fromUint8Array } from 'js-base64'
 
+import type { Vector } from '@pairdraw/scene-graph/primitives'
+
 const execFileAsync = promisify(execFile)
 
-interface ClientPoint {
-  x: number
-  y: number
-}
+type ClientPoint = Vector
 
 type ElementClientGeometry = Pick<DOMRect, 'height' | 'width' | 'x' | 'y'>
 

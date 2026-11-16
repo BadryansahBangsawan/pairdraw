@@ -1,6 +1,8 @@
 import type { DerivedTextGlyph } from '@pairdraw/scene-graph'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
+import type { LineSegment } from '#core/geometry/types'
+
 /** How far the font reaches above and below the baseline, in ems. */
 export interface PathTextLineMetrics {
   ascent: number
@@ -23,10 +25,7 @@ interface PlacedGlyph {
 }
 
 /** A caret: a line square to the baseline from the descent to the ascent. */
-export interface PathTextCaret {
-  from: Vector
-  to: Vector
-}
+export type PathTextCaret = LineSegment
 
 function placedGlyphs(
   glyphs: readonly DerivedTextGlyph[],

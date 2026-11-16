@@ -1,5 +1,7 @@
 import { expect, test, type JSHandle, type Page } from '@playwright/test'
 
+import type { Rect } from '@pairdraw/scene-graph/primitives'
+
 import type { EditorStore } from '@/app/editor/session/create'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
@@ -69,12 +71,7 @@ function pluginCatalog(source = PLUGIN_SOURCE): string {
   })
 }
 
-interface LayerBox {
-  x: number
-  y: number
-  width: number
-  height: number
-}
+type LayerBox = Rect
 
 /** The page layer with this name, or `null` while the run that makes it has not finished. */
 function layerBox(page: Page, name: string): Promise<LayerBox | null> {

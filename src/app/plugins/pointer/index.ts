@@ -6,15 +6,14 @@
  */
 import { ref, shallowRef, type Ref } from 'vue'
 
+import type { Vector } from '@pairdraw/scene-graph/primitives'
+
 import { createDeferred } from '@/app/runtime/deferred'
 
 import { PLUGIN_POINTER_BUSY_MESSAGE, PLUGIN_POINTER_CANCELLED_MESSAGE } from '../messages'
 
 /** One point a pointer sequence reached, in document coordinates. */
-export interface PluginPointerPoint {
-  x: number
-  y: number
-}
+export type PluginPointerPoint = Vector
 
 /** What one run may ask of the canvas: its sequences end together when the user cancels one. */
 export interface PluginPointerAccess {

@@ -113,6 +113,12 @@ describe('parsePenFile — fills', () => {
     expectPoint(gradientPoint(transform, { x: 0.5, y: 1 }), 0.5, 0)
   })
 
+  test('reads a gradient of a type it does not know as a linear one', () => {
+    const fills = fillsOf({ type: 'gradient', gradientType: 'conic', colors: stops })
+    expect(fills.map((fill) => fill.type)).toEqual(['GRADIENT_LINEAR'])
+    expect(fills[0].gradientStops).toHaveLength(2)
+  })
+
   test('skips paints it cannot draw instead of painting them black', () => {
     expect(fillsOf([{ type: 'mesh_gradient', columns: 2 }, '#FF0000'])).toHaveLength(1)
   })

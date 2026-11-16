@@ -159,8 +159,9 @@ function convertPaint(
   }
   if (paint.type === 'gradient') {
     const gradient = paint as PenGradientPaint
-    const type = GRADIENT_TYPES[gradient.gradientType ?? 'linear']
-    if (!type) return null
+    // A gradient type this reader does not know falls back to the default, as other enumerated
+    // values do, instead of dropping the fill.
+    const type = GRADIENT_TYPES[gradient.gradientType ?? 'linear'] ?? 'GRADIENT_LINEAR'
     return {
       type,
       color: { ...TRANSPARENT },

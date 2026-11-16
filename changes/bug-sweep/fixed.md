@@ -5,3 +5,4 @@
 - A streamed render preview loads its fonts again after a failed load instead of drawing without them until the call ends.
 - Saving a `.pen` file keeps each layer's `metadata` instead of dropping it.
 - Opening a `.pen` file that repeats a layer ID keeps every layer instead of losing one or detaching its children.
+- A `.pen` gradient of an unknown type opens as a linear gradient instead of disappearing.

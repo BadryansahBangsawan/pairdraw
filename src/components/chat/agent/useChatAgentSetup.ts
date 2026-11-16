@@ -63,10 +63,10 @@ export function useChatAgentSetup(store: Readonly<Ref<EditorStore | undefined>>)
   const setup = computed((): AgentSetupState | null => {
     const candidate = state.candidate
     if (!candidate) return null
-    return {
-      ...setups.agentSetup(`acp:${candidate.agent.id}`),
-      connection: agentAutoConnect.connection(candidate.agent.id)
-    }
+    const setup = setups.agentSetup(`acp:${candidate.agent.id}`)
+    // Where agents cannot run, only the companion around the chat column sets them up.
+    if (!setup.supported) return null
+    return { ...setup, connection: agentAutoConnect.connection(candidate.agent.id) }
   })
 
   const waiting = computed(() => store.value !== undefined && hasPendingPrompt(store.value))

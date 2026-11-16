@@ -229,7 +229,6 @@ describe('agentSetupView', () => {
     expect(view.canInstallAdapter).toBe(false)
     expect(view.bridge.action).toBeNull()
     expect(view.problem).toBe('needs-npm')
-    expect(view.manualAgentCommand).toBe(claude.installCommand ?? null)
     expect(view.manualBridgeCommand).toBe('npm i -g @pairdraw/mcp@1.0.0')
   })
 
@@ -253,10 +252,13 @@ describe('agentSetupView', () => {
     expect(view.manualBridgeCommand).toBe('npm i -g @pairdraw/mcp@1.0.0')
   })
 
-  test('gives only instructions where agents cannot run', () => {
-    const view = agentSetupView(claude, agentState({ supported: false, bridge: false }))
-    expect(view.manualAgentCommand).toBe(claude.installCommand ?? null)
-    expect(view.manualBridgeCommand).toMatch(/@pairdraw\/mcp/)
+  test('names no command for a computer this browser tab cannot reach', () => {
+    // A browser tab has no PATH to check, so a missing agent looks like one to install.
+    for (const detected of [needsAdapter, { definition: claude, status: 'available' } as const]) {
+      const view = agentSetupView(claude, agentState({ supported: false, detected, bridge: false }))
+      expect(view.manualAgentCommand).toBeNull()
+      expect(view.manualBridgeCommand).toBeNull()
+    }
   })
 })
 
@@ -391,7 +393,6 @@ describe('agent account in setup', () => {
     )
     expect(view.adapterMismatch).toBe(true)
     expect(view.account).toBeNull()
-    expect(view.manualAgentCommand).toBe(claude.installCommand ?? null)
   })
 })
 

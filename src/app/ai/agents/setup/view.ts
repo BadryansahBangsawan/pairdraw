@@ -240,7 +240,10 @@ function adapterMismatch(agent: ACPAgentDef, setup: AgentSetupState): boolean {
 
 /** The agent's install command to run by hand, or null where one click installs its adapter. */
 function manualAgentCommand(agent: ACPAgentDef, setup: AgentSetupState): string | null {
-  if (!agent.installCommand || setup.detected?.status === 'available') return null
+  // In a browser tab the agent lives on another computer, which the person sets up elsewhere.
+  if (!setup.supported || !agent.installCommand || setup.detected?.status === 'available') {
+    return null
+  }
   const admin = setup.adapterNeedsAdmin === true
   const oneClick = setup.supported && setup.npm && !admin && setup.error !== 'install'
   if (oneClick && agent.adapterPackage) return null
@@ -251,7 +254,7 @@ function manualAgentCommand(agent: ACPAgentDef, setup: AgentSetupState): string 
 
 /** The MCP server's install command to run by hand, or null where one click installs it. */
 function manualBridgeCommand(setup: AgentSetupState, bridge: CompanionCheck): string | null {
-  if (!setup.supported) return MCP_INSTALL_COMMAND
+  if (!setup.supported) return null
   const oneClick =
     oneClickInstallable(setup.bridgeInstallable, setup.npm, setup.bridgeNeedsAdmin === true) &&
     setup.error !== 'canvas-install'
@@ -281,9 +284,10 @@ export function agentSetupView(agent: ACPAgentDef, setup: AgentSetupState): Agen
     canInstallAdapter: status === 'needs-adapter' && setup.npm && !adapterAdmin,
     busy: setup.installingAgent || setup.installingBridge,
     problem: setupProblem(setup.error, needsNpm, ['install', 'canvas-install'], needsAdmin),
-    manualAgentCommand: mismatch
-      ? (agent.installCommand ?? null)
-      : manualAgentCommand(agent, setup),
+    manualAgentCommand:
+      mismatch && setup.supported
+        ? (agent.installCommand ?? null)
+        : manualAgentCommand(agent, setup),
     manualBridgeCommand: manualBridgeCommand(setup, bridge),
     account: accountView(setup, mismatch),
     adapterMismatch: mismatch,

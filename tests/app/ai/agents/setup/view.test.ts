@@ -8,6 +8,7 @@ import type { DetectedAgent } from '@/app/ai/agents/setup/discovery'
 import {
   agentConnectView,
   agentDescriptionKind,
+  agentSetupView,
   type AgentSetupState
 } from '@/app/ai/agents/setup/view'
 
@@ -155,5 +156,16 @@ describe('agentDescriptionKind', () => {
   test('names the account an agent signs in to, and its own setup for one that has none', () => {
     expect(agentDescriptionKind(agent('claude-code'))).toBe('account')
     expect(agentDescriptionKind(agent('omp'))).toBe('own-credentials')
+  })
+})
+
+describe('agentSetupView', () => {
+  test('asks for sudo only for an npm install that needs it, never for a Bun install', () => {
+    // npm's global folder is root-owned here; Bun installs into the home folder regardless.
+    const setup = agentState({ adapterNeedsAdmin: true })
+    expect(agentSetupView(agent('omp'), setup).manualAgentCommand).toBe(
+      'bun i -g @oh-my-pi/pi-coding-agent'
+    )
+    expect(agentSetupView(agent('codex'), setup).manualAgentCommand).toStartWith('sudo npm')
   })
 })

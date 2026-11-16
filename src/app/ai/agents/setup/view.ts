@@ -15,6 +15,7 @@ import {
 } from './connect'
 import { type DetectedAgent, type DiscoveryError } from './discovery'
 import { externalConfigCloud, type ClaudeCodeCloud } from './external'
+import { installsWithBun } from './prompt'
 
 /** What setup knows about one coding agent and the MCP server it needs. */
 export interface AgentSetupState {
@@ -244,7 +245,8 @@ function manualAgentCommand(agent: ACPAgentDef, setup: AgentSetupState): string 
   if (!setup.supported || !agent.installCommand || setup.detected?.status === 'available') {
     return null
   }
-  const admin = setup.adapterNeedsAdmin === true
+  // Only npm's global folder can need administrator rights; Bun installs into the home folder.
+  const admin = setup.adapterNeedsAdmin === true && !installsWithBun(agent.installCommand)
   const oneClick = setup.npm && !admin && setup.error !== 'install'
   if (oneClick && agent.adapterPackage) return null
   return admin && !detectUserAgent().includes('Windows')

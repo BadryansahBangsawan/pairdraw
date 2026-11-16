@@ -13,6 +13,11 @@ const SIGN_IN: Record<ACPAgentID, string> = {
   omp: 'Make sure omp has a model I can use: run `omp` and use `/login`, or add a provider key.'
 }
 
+/** Whether an agent's install command runs Bun, which installs into the home folder, not npm's. */
+export function installsWithBun(command: string): boolean {
+  return /^bun\b/.test(command)
+}
+
 export function codingAgentGuideURL(agentID: ACPAgentID): string {
   return `${CODING_AGENTS_GUIDE_URL}#${agentID}`
 }
@@ -32,7 +37,7 @@ export function codingAgentSetupPrompt(agentID: ACPAgentID): string {
   if (!agent) return ''
   const install = agent.installCommand ?? `Install ${agent.name}`
   // An agent installed with Bun is not an npm install, so npm's permission advice would not apply.
-  const npm = !/^bun\b/.test(install)
+  const npm = !installsWithBun(install)
   const manager = npm ? 'npm' : 'npm or Bun, whichever this computer has'
   const faults = npm ? NPM_PERMISSIONS : ADMIN_RIGHTS
   return dedent`

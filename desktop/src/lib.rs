@@ -36,7 +36,6 @@ pub fn run() {
     {
         builder = builder
             .manage(system::opener::OpenedExternalUrls::default())
-            .manage(system::opener::RevealedLocalFiles::default())
             .plugin(tauri_plugin_wdio_webdriver::init());
     }
 
@@ -101,8 +100,6 @@ pub fn run() {
             #[cfg(feature = "native-test")]
             system::opener::take_native_test_opened_urls,
             system::opener::reveal_local_file,
-            #[cfg(feature = "native-test")]
-            system::opener::take_native_test_revealed_files,
             system::window::open_window,
             launch::paths::path_matches_suffix,
             list_system_fonts,

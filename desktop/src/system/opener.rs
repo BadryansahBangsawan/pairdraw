@@ -132,34 +132,12 @@ pub fn reveal_local_file<R: tauri::Runtime>(
         .map_err(|error| error.to_string())
 }
 
-/// Native-test builds record the files they would show, as they do links.
-#[cfg(feature = "native-test")]
-#[derive(Default)]
-pub struct RevealedLocalFiles(pub std::sync::Mutex<Vec<String>>);
-
+/// Native-test builds check the path but show nothing, so no file manager opens on the machine
+/// running the tests.
 #[cfg(feature = "native-test")]
 #[tauri::command]
-pub fn reveal_local_file(
-    state: tauri::State<RevealedLocalFiles>,
-    path: String,
-) -> Result<(), String> {
-    let path = local_file_path(&path)?;
-    state
-        .0
-        .lock()
-        .map_err(|_| "Native test opener state is unavailable".to_owned())?
-        .push(path.to_string_lossy().into_owned());
-    Ok(())
-}
-
-#[cfg(feature = "native-test")]
-#[tauri::command]
-pub fn take_native_test_revealed_files(state: tauri::State<RevealedLocalFiles>) -> Vec<String> {
-    state
-        .0
-        .lock()
-        .map(|mut paths| paths.drain(..).collect())
-        .unwrap_or_default()
+pub fn reveal_local_file(path: String) -> Result<(), String> {
+    local_file_path(&path).map(|_| ())
 }
 
 #[cfg(test)]

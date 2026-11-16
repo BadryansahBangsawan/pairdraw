@@ -260,6 +260,8 @@ export function computeVisualBounds(
       width: number
       height: number
       rotation?: number
+      flipX?: boolean
+      flipY?: boolean
       strokes?: Stroke[]
       strokeCap?: StrokeCap
       vectorNetwork?: VectorNetwork | null
@@ -367,16 +369,20 @@ export function geometryBlobBounds(paths: Array<{ commandsBlob: Uint8Array }>): 
 
 type TurnedBox = Pick<VisualBoundsNode, 'width' | 'height' | 'rotation' | 'flipX' | 'flipY'>
 
-/** Where a local point lands relative to the box's unturned top-left: flipped, then turned about the center. */
+/**
+ * Where a local point lands relative to the box's unturned top-left, turned about the center and
+ * then flipped about it, in the order `getNodeLocalMatrix` composes the same two steps.
+ */
 function transformLocalPoint(node: TurnedBox, point: Vector): Vector {
-  let x = node.flipX ? node.width - point.x : point.x
-  let y = node.flipY ? node.height - point.y : point.y
+  let { x, y } = point
   const rotation = node.rotation ?? 0
   if (rotation !== 0) {
     const rotated = rotatePoint(x, y, node.width / 2, node.height / 2, degToRad(rotation))
     x = rotated.x
     y = rotated.y
   }
+  if (node.flipX) x = node.width - x
+  if (node.flipY) y = node.height - y
   return { x, y }
 }
 
@@ -385,10 +391,8 @@ function transformLocalPoint(node: TurnedBox, point: Vector): Vector {
  * returns it) sits at `origin` after the rotation.
  */
 function unturnedTopLeft(node: TurnedBox, origin: Vector): Vector {
-  const offset = transformLocalPoint(
-    { width: node.width, height: node.height, rotation: node.rotation },
-    { x: 0, y: 0 }
-  )
+  // `getAbsolutePosition` maps the box's own origin through the world matrix, flips included.
+  const offset = transformLocalPoint(node, { x: 0, y: 0 })
   return { x: origin.x - offset.x, y: origin.y - offset.y }
 }
 

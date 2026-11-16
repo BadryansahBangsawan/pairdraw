@@ -74,3 +74,55 @@ describe('visual bounds from the graph position', () => {
     expect(bounds.maxY).toBeCloseTo(drawn.y + drawn.height)
   })
 })
+
+/** A closed rect as the command blob a layer's fill geometry holds: move, three lines, close. */
+function rectBlob(x: number, y: number, w: number, h: number): Uint8Array {
+  const points: Array<[number, number, number]> = [
+    [1, x, y],
+    [2, x + w, y],
+    [2, x + w, y + h],
+    [2, x, y + h],
+    [0, 0, 0]
+  ]
+  const bytes = new Uint8Array(points.length * 9 - 8)
+  const view = new DataView(bytes.buffer)
+  let offset = 0
+  for (const [command, px, py] of points) {
+    bytes[offset++] = command
+    if (command === 0) continue
+    view.setFloat32(offset, px, true)
+    view.setFloat32(offset + 4, py, true)
+    offset += 8
+  }
+  return bytes
+}
+
+// A turned or flipped layer draws where the world matrix puts it, so its visual bounds agree
+// with the axis-aligned box of that matrix for every combination.
+describe('visual bounds against the world matrix', () => {
+  for (const rotation of [0, 30, 90, -45]) {
+    for (const flipX of [false, true]) {
+      for (const flipY of [false, true]) {
+        test(`rotation ${rotation}, flipX ${flipX}, flipY ${flipY}`, () => {
+          const graph = new SceneGraph()
+          const node = graph.createNode('RECTANGLE', graph.getPages()[0].id, {
+            x: 40,
+            y: 25,
+            width: 120,
+            height: 60,
+            rotation,
+            flipX,
+            flipY,
+            fillGeometry: [{ commandsBlob: rectBlob(0, 0, 120, 60) }]
+          })
+          const bounds = nodeVisualBounds(node, (id) => graph.getAbsolutePosition(id))
+          const world = getAxisAlignedWorldBounds(node, graph)
+          expect(bounds.minX).toBeCloseTo(world.x, 6)
+          expect(bounds.minY).toBeCloseTo(world.y, 6)
+          expect(bounds.maxX).toBeCloseTo(world.x + world.width, 6)
+          expect(bounds.maxY).toBeCloseTo(world.y + world.height, 6)
+        })
+      }
+    }
+  }
+})

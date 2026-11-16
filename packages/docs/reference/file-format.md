@@ -15,15 +15,15 @@ Keep the original `.fig`, use **Save As** for a Pairdraw copy, and inspect the e
 
 A `.fig` file is a ZIP archive containing a Kiwi-encoded binary message:
 
-| Offset | Content |
-|--------|---------|
-| 0 | Magic header `fig-kiwi` (8 bytes) |
-| 8 | Version (4 bytes, uint32 LE) |
-| 12 | Schema length (4 bytes, uint32 LE) |
-| 16 | Compressed Kiwi schema |
-| … | Message length (4 bytes, uint32 LE) |
-| … | Compressed Kiwi message — `NodeChange[]` (entire document) |
-| … | Blob data — images, vector networks, fonts |
+| Offset | Content                                                    |
+| ------ | ---------------------------------------------------------- |
+| 0      | Magic header `fig-kiwi` (8 bytes)                          |
+| 8      | Version (4 bytes, uint32 LE)                               |
+| 12     | Schema length (4 bytes, uint32 LE)                         |
+| 16     | Compressed Kiwi schema                                     |
+| …      | Message length (4 bytes, uint32 LE)                        |
+| …      | Compressed Kiwi message — `NodeChange[]` (entire document) |
+| …      | Blob data — images, vector networks, fonts                 |
 
 ## Import Pipeline
 
@@ -49,12 +49,12 @@ Compression uses Zstd at the level the document asks for (see [Compression](#com
 
 The codec handles Figma's 605-definition Kiwi schema with `NodeChange` as the central type (~590 fields). Key components:
 
-| Module | Purpose |
-|--------|---------|
+| Module        | Purpose                                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------------------- |
 | `kiwi-schema` | Kiwi parser (from [evanw/kiwi](https://github.com/nicolo-ribaudo/kiwi)), patched for ESM and sparse field IDs |
-| `codec.ts` | Encode/decode messages using the Kiwi schema |
-| `protocol.ts` | Wire format parsing and message type detection |
-| `schema.ts` | 605 message/enum/struct definitions |
+| `codec.ts`    | Encode/decode messages using the Kiwi schema                                                                  |
+| `protocol.ts` | Wire format parsing and message type detection                                                                |
+| `schema.ts`   | 605 message/enum/struct definitions                                                                           |
 
 ### Sparse Field IDs
 
@@ -68,15 +68,17 @@ Export writes the message chunk with Zstd at a level set per document, stored as
 
 ## Supported Formats
 
-| Format | Open / Read | Save / Write | Export |
-|--------|-------------|--------------|--------|
-| `.fig` (Figma) | ✅ | ✅ | ✅ |
-| `.pen` (Pencil) | ✅ | — | — |
-| `.png` | — | — | ✅ |
-| `.jpg` | — | — | ✅ |
-| `.webp` | — | — | ✅ |
-| `.svg` | — | — | ✅ |
-| `.jsx` | — | — | ✅ |
+| Format                  | Open / Read | Save / Write | Export |
+| ----------------------- | ----------- | ------------ | ------ |
+| `.fig` (Figma)          | ✅          | ✅           | ✅     |
+| `.pen` (Pencil)         | ✅          | ✅           | —      |
+| `.drawio` (draw.io)     | ✅          | ✅           | ✅     |
+| `.mermaid`              | ✅          | —            | —      |
+| `.png`, `.jpg`, `.webp` | —           | —            | ✅     |
+| `.svg`, `.pdf`          | —           | —            | ✅     |
+| `.pptx`                 | —           | —            | ✅     |
+| `.html`                 | ✅          | —            | ✅     |
+| `.jsx`, Tailwind JSX    | —           | —            | ✅     |
 
 ## Clipboard Format
 

@@ -1,6 +1,6 @@
 import { mkdir } from 'node:fs/promises'
 import { availableParallelism } from 'node:os'
-import { isAbsolute, join } from 'node:path'
+import { basename, join } from 'node:path'
 
 import { mapAsync } from 'es-toolkit'
 
@@ -13,27 +13,17 @@ export interface PackedPackageSet {
   tarballs: string[]
 }
 
-function tarballFromOutput(output: string, directory: string): string {
-  const filename = output
-    .split('\n')
-    .map((line: string) => line.trim())
-    .reverse()
-    .find((line: string) => line.endsWith('.tgz'))
-  if (!filename) throw new Error(`Package manager did not report a tarball in ${directory}`)
-  return isAbsolute(filename) ? filename : join(directory, filename)
-}
-
-export async function packPublicPackages(
-  root: string,
+/**
+ * Packs the publish directories `preparePublishDirectories` wrote under `preparedRoot` with the
+ * `npm pack` the release uses, so the checks see the manifests npm receives rather than the
+ * workspace ones, whose `bun` conditions send an installed copy to its source.
+ */
+export async function packPublishDirectories(
+  preparedRoot: string,
   outputDirectory: string,
-  packages: WorkspacePackage[],
-  packageManager: 'bun' | 'npm'
+  packages: WorkspacePackage[]
 ): Promise<PackedPackageSet> {
   await mkdir(outputDirectory, { recursive: true })
-  const command =
-    packageManager === 'bun'
-      ? ['bun', 'pm', 'pack', '--ignore-scripts', '--destination', outputDirectory, '--quiet']
-      : ['npm', 'pack', '--json', '--ignore-scripts', '--pack-destination', outputDirectory]
   // Packing reads only its own package, so packages pack side by side; tarballs keep their order.
   // Every pack settles before a failure is reported, so none writes into a removed directory.
   const outcomes = await mapAsync(
@@ -41,14 +31,12 @@ export async function packPublicPackages(
     async (pkg) => {
       try {
         const result = await runCommand({
-          command: command[0] ?? packageManager,
-          args: command.slice(1),
-          cwd: join(root, pkg.directory),
+          command: 'npm',
+          args: ['pack', '--json', '--ignore-scripts', '--pack-destination', outputDirectory],
+          cwd: join(preparedRoot, basename(pkg.directory)),
           timeoutMs: 60_000
         })
-        return packageManager === 'bun'
-          ? tarballFromOutput(result.stdout, outputDirectory)
-          : npmTarballFromOutput(result.stdout, outputDirectory)
+        return join(outputDirectory, parseNpmPack(result.stdout).filename)
       } catch (error) {
         return error instanceof Error ? error : new Error(String(error))
       }
@@ -70,8 +58,4 @@ export async function packPublicPackages(
     )
   }
   return { inspections, packages, tarballs }
-}
-
-function npmTarballFromOutput(output: string, directory: string): string {
-  return join(directory, parseNpmPack(output).filename)
 }

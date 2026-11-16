@@ -9,7 +9,7 @@ import {
   npmPackFileList,
   preparePublishDirectories,
   publishPackageJSON
-} from '#release/publish-dirs'
+} from '#package-artifacts/publish/directories'
 
 async function fixtureRoot({
   rootLicense = true,

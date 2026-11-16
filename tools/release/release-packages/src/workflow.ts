@@ -11,17 +11,15 @@ import {
   validateRegistryVersion,
   readPackageManifest,
   runCommand,
+  discoverPublishPackages,
+  NPM_RELEASE_POLICY,
+  preparePublishDirectories,
+  type PackageFileLister,
   type WorkspacePackage
 } from '@pairdraw/package-artifacts-tools'
 import { inspectTarball, validatePackedTarballs } from '@pairdraw/package-artifacts-tools/tarball'
 import { verifyArtifactConsumers } from '@pairdraw/package-quality-tools/consumer'
 
-import { NPM_RELEASE_POLICY } from './policy'
-import {
-  discoverPublishPackages,
-  preparePublishDirectories,
-  type PackageFileLister
-} from './publish-dirs'
 import { isPrerelease, PRERELEASE_DIST_TAG } from './version'
 
 export interface PublicationPlanEntry {

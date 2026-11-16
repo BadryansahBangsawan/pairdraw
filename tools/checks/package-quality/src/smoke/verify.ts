@@ -4,13 +4,15 @@ import { join } from 'node:path'
 
 import {
   discoverPublicPackages,
-  orderPackagesByDependencies
+  orderPackagesByDependencies,
+  preparePublishDirectories,
+  readPackageManifest
 } from '@pairdraw/package-artifacts-tools'
 
 import { measurePhase } from '../timing'
 import { verifyArtifactConsumers } from './consumer'
 import { verifyPackagingGuards } from './guards'
-import { packPublicPackages } from './pack'
+import { packPublishDirectories } from './pack'
 
 export async function verifyPackedPackages(root: string): Promise<void> {
   const temporaryRoot = await mkdtemp(join(tmpdir(), 'pairdraw-package-smoke-'))
@@ -18,13 +20,20 @@ export async function verifyPackedPackages(root: string): Promise<void> {
     // Broken fixture manifests must fail before the same checks vouch for real packages.
     await measurePhase('packaging guards', () => verifyPackagingGuards())
     const packages = orderPackagesByDependencies(await discoverPublicPackages(root))
-    // Raw npm packing retains workspace:* dependencies. Inspect it without claiming
-    // installation compatibility; Bun packing normalizes those dependencies.
-    await measurePhase('npm packing', () =>
-      packPublicPackages(root, join(temporaryRoot, 'npm-tarballs'), packages, 'npm')
+    const { version } = await readPackageManifest(join(root, 'package.json'))
+    const preparedRoot = join(temporaryRoot, 'prepared')
+    // Pack what the release publishes: prepared manifests resolve dist under Bun and Node alike
+    // and depend on the packed versions instead of workspace ranges.
+    await measurePhase('publish preparation', () =>
+      preparePublishDirectories({
+        coreVersion: version,
+        packages: packages.map(({ directory }) => ({ directory })),
+        root,
+        outRoot: preparedRoot
+      })
     )
-    const packageSet = await measurePhase('Bun packing', () =>
-      packPublicPackages(root, join(temporaryRoot, 'bun-tarballs'), packages, 'bun')
+    const packageSet = await measurePhase('npm packing', () =>
+      packPublishDirectories(preparedRoot, join(temporaryRoot, 'tarballs'), packages)
     )
     await verifyArtifactConsumers(root, packageSet.tarballs)
   } finally {

@@ -2,15 +2,11 @@ import { existsSync } from 'node:fs'
 import { cp, mkdir, rm, writeFile } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 
-import {
-  discoverPublicPackages,
-  parseNpmPack,
-  readPackageManifest,
-  runCommand,
-  type PackageManifest,
-  type WorkspacePackage
-} from '@pairdraw/package-artifacts-tools'
-
+import { readPackageManifest } from '../manifest/read'
+import type { PackageManifest, WorkspacePackage } from '../manifest/types'
+import { parseNpmPack } from '../npm/pack'
+import { runCommand } from '../process'
+import { discoverPublicPackages } from '../workspace/catalog'
 import { NPM_RELEASE_POLICY } from './policy'
 
 export interface PackagePublishConfig {

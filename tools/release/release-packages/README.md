@@ -15,7 +15,7 @@ Workflow tooling is checked out separately in `.pipeline` and installed from its
 
 ## npm manifests
 
-`src/publish-dirs.ts` prepares each package's publish directory from its workspace manifest. Workspace manifests point their `bun` export and import conditions at TypeScript source, so the workspace runs packages from `src`; an installed copy cannot, because source modules import each other through `#` aliases that only the workspace tsconfig resolves. `publishPackageJSON` therefore drops every `bun` condition whose target starts with `./src/`, so Bun reads the built `dist` files as Node does, and replaces `workspace:` ranges with the release version. The consumer checks then install the packed tarballs under Node and Bun.
+`tools/release/package-artifacts/src/publish/directories.ts` prepares each package's publish directory from its workspace manifest. Workspace manifests point their `bun` export and import conditions at TypeScript source, so the workspace runs packages from `src`; an installed copy cannot, because source modules import each other through `#` aliases that only the workspace tsconfig resolves. `publishPackageJSON` therefore drops every `bun` condition whose target starts with `./src/`, so Bun reads the built `dist` files as Node does, and replaces `workspace:` ranges with the release version. The consumer checks then install the packed tarballs under Node and Bun; `bun run test:packages` packs the same prepared directories, so it verifies the manifests that npm receives.
 
 `@pairdraw/vue` compiles its components with the Vue plugin in production mode (`packages/vue/tsdown.config.ts`), so the published files carry no absolute source paths from the build machine.
 

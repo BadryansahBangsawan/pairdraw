@@ -220,7 +220,7 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 | Tailwind CSS v4 export          | ✅     | Export as HTML with Tailwind utility classes from Code panel, CLI, or programmatically                                                                                           |
 | Figma for VS Code               | 🔲     | Editor plugin integration                                                                                                                                                        |
 | MCP server                      | ✅     | `@pairdraw/mcp` with stdio + HTTP transports; 139 core tools plus document, history, and settings tools                                                                          |
-| CLI tools                       | ✅     | 24 commands, including info, tree, find, query, node, pages, variables, tokens, fonts, lint, analyze, export, import, convert, diff, eval, and tool                              |
+| CLI tools                       | ✅     | 27 commands, including info, tree, find, query, node, pages, variables, tokens, fonts, lint, analyze, export, import, convert, diff, eval, tool, and shell                       |
 
 ## Figma Draw
 

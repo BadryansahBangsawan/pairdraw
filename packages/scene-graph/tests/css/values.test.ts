@@ -22,6 +22,18 @@ describe('parseCSSNumber', () => {
 })
 
 describe('parseCSSColor', () => {
+  test('keeps out-of-range and wide-gamut colors inside sRGB', () => {
+    for (const value of ['rgb(300 0 0)', 'oklch(0.5 0.1 200)', 'color(display-p3 0 1 0)']) {
+      const color = parseCSSColor(value)
+      if (!color) throw new Error(`${value} did not parse`)
+      for (const channel of [color.r, color.g, color.b]) {
+        expect(channel).toBeGreaterThanOrEqual(0)
+        expect(channel).toBeLessThanOrEqual(1)
+      }
+    }
+    expect(parseCSSColor('rgb(300 0 0)')).toEqual({ r: 1, g: 0, b: 0, a: 1 })
+  })
+
   test('reads a color', () => {
     expect(parseCSSColor(' #ff0000 ')).toEqual({ r: 1, g: 0, b: 0, a: 1 })
   })

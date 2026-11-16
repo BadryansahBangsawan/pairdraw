@@ -1,4 +1,4 @@
-import { converter, formatCss, formatRgb, inGamut, parse, toGamut } from 'culori'
+import { clampGamut, converter, formatCss, formatRgb, inGamut, parse, toGamut } from 'culori'
 
 import type { Color } from '../primitives'
 import type { DocumentColorSpace, Fill, SceneNode, Stroke } from '../types'
@@ -28,6 +28,7 @@ const toP3 = converter('p3')
 const toDisplayableRGB = toGamut('rgb', 'oklch')
 const toDisplayableP3 = toGamut('p3', 'oklch')
 const isDisplayableRGB = inGamut('rgb')
+const clampToRGB = clampGamut('rgb')
 const isDisplayableP3 = inGamut('p3')
 
 function normalizeOkLCH(color: OkHCLColor) {
@@ -158,7 +159,12 @@ export function parseDisplayableColor(input: string): Color | null {
   const parsed = parse(input)
   if (!parsed) return null
   // Mapping through OKLCH shifts colors already in sRGB by float noise, so only map the rest.
-  const rgb = isDisplayableRGB(parsed) ? toRGB(parsed) : toDisplayableRGB(parsed)
+  // CSS clamps out-of-range sRGB channels and gamut-maps wider colors; clamping also removes the
+  // float noise gamut mapping can leave just outside 0..1.
+  const rgb = isDisplayableRGB(parsed)
+    ? toRGB(parsed)
+    : clampToRGB(parsed.mode === 'rgb' ? parsed : toDisplayableRGB(parsed))
+  if (!rgb) return null
   // culori leaves a `none` channel out, which normalizing reads as zero.
   return normalizeColor({ r: rgb.r, g: rgb.g, b: rgb.b, a: parsed.alpha })
 }

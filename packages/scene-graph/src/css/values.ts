@@ -1,6 +1,6 @@
 import valueParser from 'postcss-value-parser'
 
-import { tryParseColor } from '../color'
+import { parseDisplayableColor } from '../color'
 import type { Color } from '../primitives'
 
 /** Pixels in a rem, as browsers use by default. */
@@ -30,7 +30,8 @@ export function parseCSSNumber(value: string | undefined): number | null {
 /** A CSS color that paints something; null for an invalid or fully transparent one. */
 export function parseCSSColor(value: string | undefined): Color | null {
   if (!value) return null
-  const color = tryParseColor(value.trim())
+  // CSS clamps `rgb()` channels and maps wide-gamut colors into sRGB, as a stored color must be.
+  const color = parseDisplayableColor(value.trim())
   return color && color.a > 0 ? color : null
 }
 

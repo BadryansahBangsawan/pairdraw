@@ -56,3 +56,19 @@ test('inherits parent definition semantics without replacing local property iden
   expect(reader.readPage('1:6').children[0].children[0].mainComponentId).toBe('1:5')
   expect(changes).toEqual(before)
 })
+
+test('keeps a definition whose parent no ancestor defines instead of failing the read', () => {
+  const changes = [
+    {
+      guid: guid(2),
+      type: 'SYMBOL',
+      name: 'Button',
+      componentPropDefs: [{ id: guid(11), name: 'Label', type: 'TEXT', parentPropDefId: guid(99) }]
+    },
+    { guid: guid(6), type: 'CANVAS' }
+  ] as NodeChange[]
+  const reader = createDocumentReader(changes)
+  expect(reader.readComponent('1:2').properties.componentPropDefs).toEqual([
+    { id: guid(11), name: 'Label', type: 'TEXT', parentPropDefId: guid(99) }
+  ])
+})

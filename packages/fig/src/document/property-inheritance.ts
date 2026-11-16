@@ -13,6 +13,8 @@ interface LinkedPropertyDefinition {
 /**
  * A record's property definitions with each that names a parent definition completed from the
  * nearest ancestor holding it. `ancestors` run outward and have their own inheritance applied.
+ * A definition whose parent no ancestor holds stays as written, so one stale reference cannot
+ * fail the whole document.
  */
 export function inheritFromAncestors(node: NodeChange, ancestors: readonly NodeChange[]): void {
   const definitions = node.componentPropDefs as LinkedPropertyDefinition[] | undefined
@@ -27,7 +29,7 @@ export function inheritFromAncestors(node: NodeChange, ancestors: readonly NodeC
       if (matches.length > 1) throw new Error(`Ambiguous parent property ${id}`)
       if (matches.length === 1) return { ...structuredClone(matches[0]), ...definition }
     }
-    throw new Error(`Missing parent property ${id}`)
+    return definition
   })
 }
 

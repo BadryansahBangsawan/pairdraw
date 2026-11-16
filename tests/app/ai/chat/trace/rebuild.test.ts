@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto'
-import { afterEach, expect, spyOn, test } from 'bun:test'
+import { afterEach, expect, mock, spyOn, test } from 'bun:test'
 
 import { readUIMessageStream, simulateReadableStream } from 'ai'
 import type { UIMessage } from 'ai'
@@ -14,6 +14,8 @@ import { aiToolOverrides } from '@/app/ai/tools/preferences'
 import { createToolLoopTransport } from '@/app/ai/transports/tool-loop'
 import * as figmaFactory from '@/app/automation/bridge/figma-factory'
 import { createEditorStore } from '@/app/editor/session/create'
+
+type EditorStore = ReturnType<typeof createEditorStore>
 
 import { expectDefined } from '#tests/helpers/assert'
 import { memoryTraceStore } from '#tests/helpers/chat/trace-store'
@@ -51,12 +53,19 @@ const STEPS: StreamChunk[][] = [
 ]
 
 const previousTools = aiToolOverrides.value
+let opened: EditorStore | null = null
 afterEach(() => {
   aiToolOverrides.value = previousTools
+  // The reply's edits queue change previews; closing the document drops them, so they never
+  // render into a later file's spy on the preview renderer.
+  opened?.dispose()
+  opened = null
+  mock.restore()
 })
 
 test('every recorded step rebuilds from the conversation to the request the model received', async () => {
   const store = createEditorStore()
+  opened = store
   spyOn(figmaFactory, 'makeFigmaFromStore').mockImplementation((editor, pageId) => {
     const api = new FigmaAPI(editor.graph)
     api.currentPage = api.wrapNode(pageId ?? editor.state.currentPageId)

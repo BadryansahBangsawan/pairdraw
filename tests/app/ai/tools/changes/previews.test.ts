@@ -38,7 +38,9 @@ beforeEach(() => {
   open = true
   rendering = 0
   mostAtOnce = 0
-  render = spyOn(images, 'renderToolChangeImages').mockImplementation(async () => {
+  render = spyOn(images, 'renderToolChangeImages').mockImplementation(async (target) => {
+    // A document an earlier file left open may still be draining previews of its own.
+    if (target !== store) return null
     mostAtOnce = Math.max(mostAtOnce, ++rendering)
     await promiseTimeout(1)
     rendering--
@@ -51,6 +53,11 @@ afterEach(() => {
   clearToolChanges()
   if (open) store.dispose()
 })
+
+/** How many previews of this test's document rendered. */
+function renders(): number {
+  return render.mock.calls.filter(([target]) => target === store).length
+}
 
 function recorded(toolCallId: string): ToolChange {
   const change: ToolChange = {
@@ -81,12 +88,12 @@ test('renders previews one at a time, only once no call of the reply is editing'
   queue(recorded('second'))
 
   await promiseTimeout(CHANGE_PREVIEW_PAUSE_MS * 3)
-  expect(render).not.toHaveBeenCalled()
+  expect(renders()).toBe(0)
   expect(readToolChange('first')?.images).toBeUndefined()
 
   run.endTool()
   await changePreviewsDrained(store)
-  expect(render).toHaveBeenCalledTimes(2)
+  expect(renders()).toBe(2)
   expect(mostAtOnce).toBe(1)
   expect(readToolChange('first')?.images).toEqual(IMAGES)
   expect(readToolChange('second')?.images).toEqual(IMAGES)
@@ -102,6 +109,6 @@ test('drops the previews still waiting when the document closes', async () => {
   open = false
   run.endTool()
   await drained
-  expect(render).not.toHaveBeenCalled()
+  expect(renders()).toBe(0)
   expect(readToolChange('pending')?.images).toBeUndefined()
 })

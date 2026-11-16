@@ -4,3 +4,4 @@
 - Zooming to fit very large content stops at the 2% minimum zoom.
 - A streamed render preview loads its fonts again after a failed load instead of drawing without them until the call ends.
 - Saving a `.pen` file keeps each layer's `metadata` instead of dropping it.
+- Opening a `.pen` file that repeats a layer ID keeps every layer instead of losing one or detaching its children.

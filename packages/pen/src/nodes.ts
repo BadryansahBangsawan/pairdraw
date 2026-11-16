@@ -392,10 +392,13 @@ export function createSceneNode(pen: PenNode, parentId: string, build: Build): s
   const leaveTheme = fields.theme ? build.ctx.enterTheme(fields.theme) : undefined
   try {
     const type = instanceOf || iconInstance ? 'INSTANCE' : sceneType(fields, build.ctx)
+    // An ID a hand-edited file repeats gets a fresh one, so the layer does not replace the first
+    // layer with it or become its own parent.
+    const id = build.graph.getNode(pen.id) ? build.graph.entityIdMinter()() : pen.id
     const node =
       type === 'STICKY'
-        ? createAnnotation({ ...fields, id: pen.id }, parentId, build)
-        : build.graph.createNode(type, parentId, { id: pen.id })
+        ? createAnnotation({ ...fields, id }, parentId, build)
+        : build.graph.createNode(type, parentId, { id })
     applyPenProperties(node, fields, build)
     if (instanceOf) {
       node.componentId = instanceOf.id

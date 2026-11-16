@@ -34,15 +34,23 @@ function alignSingleNode(
   axis: 'horizontal' | 'vertical',
   align: 'min' | 'center' | 'max'
 ) {
+  // The layer's drawn box against the parent's, so a rotated layer's visible edge lands on the
+  // target as it does when several layers align together.
   const parent = node.parentId ? ctx.graph.getNode(node.parentId) : undefined
-  const pw = parent?.width ?? 0
-  const ph = parent?.height ?? 0
-
-  if (axis === 'horizontal') {
-    ctx.graph.updateNode(node.id, { x: computeAlignTarget(0, pw, node.width, align) })
-  } else {
-    ctx.graph.updateNode(node.id, { y: computeAlignTarget(0, ph, node.height, align) })
-  }
+  const target = parent
+    ? getAxisAlignedWorldBounds(parent, ctx.graph)
+    : { x: 0, y: 0, width: 0, height: 0 }
+  const box = getAxisAlignedWorldBounds(node, ctx.graph)
+  const worldDelta =
+    axis === 'horizontal'
+      ? { x: computeAlignTarget(target.x, target.x + target.width, box.width, align) - box.x, y: 0 }
+      : {
+          x: 0,
+          y: computeAlignTarget(target.y, target.y + target.height, box.height, align) - box.y
+        }
+  const localDelta = parentLocalDelta(ctx, node, worldDelta)
+  if (!localDelta) return
+  ctx.graph.updateNode(node.id, { x: node.x + localDelta.x, y: node.y + localDelta.y })
 }
 
 function alignMultipleNodes(

@@ -170,3 +170,33 @@ test('aligning left puts a rotated layer’s visible left edge on the target', (
     20
   )
 })
+
+// A single turned layer aligns by its drawn box too, as a group of layers already does.
+test('aligning one rotated layer puts its visible edge on the parent’s edge', () => {
+  const editor = createEditor()
+  const pageId = editor.state.currentPageId
+  const frame = editor.graph.createNode('FRAME', pageId, {
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 200
+  })
+  const turned = editor.graph.createNode('RECTANGLE', frame.id, {
+    x: 10,
+    y: 10,
+    width: 60,
+    height: 60,
+    rotation: 45
+  })
+
+  editor.alignNodes([turned.id], 'horizontal', 'min')
+
+  const parent = getAxisAlignedWorldBounds(getNodeOrThrow(editor.graph, frame.id), editor.graph)
+  const box = getAxisAlignedWorldBounds(getNodeOrThrow(editor.graph, turned.id), editor.graph)
+  expect(box.x).toBeCloseTo(parent.x)
+  // The drawn box overhangs the unturned one by 42.43 − 30 on each side.
+  expect(getNodeOrThrow(editor.graph, turned.id).x).toBeCloseTo(12.426, 3)
+
+  editor.alignNodes([turned.id], 'horizontal', 'min')
+  expect(getNodeOrThrow(editor.graph, turned.id).x).toBeCloseTo(12.426, 3)
+})

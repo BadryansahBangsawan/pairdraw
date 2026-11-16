@@ -44,3 +44,6 @@
 - A reply still running shows live again, with its Stop button, when you come back to its document from Home or another tab.
 - The design check resumes when an AI reply fails before it reaches the model.
 - Clicking where a mask hides part of a layer no longer selects that layer, and zero-width or zero-height layers can be clicked to select them.
+- Line height and letter spacing bound to a variable keep the unit they are set in, so a 120% line height stays a percentage of the font size instead of becoming 120 px.
+- Character-range variable bindings keep their own scale, so unbinding or deleting a variable no longer resets the size and spacing of that range.
+- Aligning a single rotated layer uses its drawn edge, so it lines up with its parent the way a group of layers does.

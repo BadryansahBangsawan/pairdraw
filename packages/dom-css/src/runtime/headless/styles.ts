@@ -18,7 +18,8 @@ interface HeadlessCSSRule {
   selector: string
   specificity: number
   order: number
-  style: DesignStyleDeclaration
+  /** Declared values with `var()` unresolved, so each element resolves them in its own scope. */
+  declarations: DesignStyleDeclaration
 }
 
 interface ParsedHeadlessCSS {
@@ -39,16 +40,38 @@ const INHERITED_PROPERTIES = new Set([
   'line-height'
 ])
 
-function styleToRecord(
-  style: CSSStyleDeclarationLike,
-  customProperties: DesignStyleDeclaration = {}
-): DesignStyleDeclaration {
+/** Declared values as written, before custom properties and shorthands are resolved. */
+function declarationsOf(style: CSSStyleDeclarationLike): DesignStyleDeclaration {
   const result: DesignStyleDeclaration = {}
   for (const property of Array.from({ length: style.length }, (_, index) => style[index])) {
-    const value = resolveCSSValue(style.getPropertyValue(property), customProperties)
+    const value = style.getPropertyValue(property).trim()
     if (property && value) result[property] = value
   }
-  return expandStyleShorthands(result)
+  return result
+}
+
+function resolveDeclarations(
+  declarations: DesignStyleDeclaration,
+  customProperties: DesignStyleDeclaration
+): DesignStyleDeclaration {
+  const resolved: DesignStyleDeclaration = {}
+  for (const [property, value] of Object.entries(declarations)) {
+    const resolvedValue = resolveCSSValue(value, customProperties)
+    if (resolvedValue) resolved[property] = resolvedValue
+  }
+  return expandStyleShorthands(resolved)
+}
+
+/** Adds the custom properties a declaration block sets, resolved against those already in scope. */
+function declareCustomProperties(
+  scope: DesignStyleDeclaration,
+  declarations: DesignStyleDeclaration
+): void {
+  for (const [name, value] of Object.entries(declarations)) {
+    if (!name.startsWith('--')) continue
+    const resolved = resolveCSSValue(value, scope)
+    if (resolved) scope[name] = resolved
+  }
 }
 
 function isStyleRule(rule: unknown): rule is CSSStyleRuleLike {
@@ -81,7 +104,7 @@ function parseRules(cssText: string): ParsedHeadlessCSS {
   const styleRules = collectStyleRules(sheet.cssRules)
   const customProperties = collectCustomProperties(styleRules)
   const rules = styleRules.flatMap((rule) => {
-    const style = styleToRecord(rule.style, customProperties)
+    const declarations = declarationsOf(rule.style)
     return rule.selectorText
       .split(',')
       .map((selector) => selector.trim())
@@ -90,7 +113,7 @@ function parseRules(cssText: string): ParsedHeadlessCSS {
         selector,
         specificity: selectorSpecificity(selector),
         order: order++,
-        style
+        declarations
       }))
   })
   return { rules, customProperties }
@@ -100,27 +123,31 @@ function collectCustomProperties(rules: CSSStyleRuleLike[]): DesignStyleDeclarat
   const customProperties: DesignStyleDeclaration = {}
   for (const rule of rules) {
     if (!rule.selectorText.split(',').some((selector) => selector.trim() === ':root')) continue
-    Object.assign(customProperties, styleToRecord(rule.style))
+    declareCustomProperties(customProperties, declarationsOf(rule.style))
   }
   return customProperties
 }
 
 function resolveCSSValue(value: string, customProperties: DesignStyleDeclaration): string {
-  const withVariables = value.replaceAll(/var\((--[\w-]+)(?:,[^)]+)?\)/g, (_, name: string) => {
-    return customProperties[name] ?? ''
-  })
+  const withVariables = value.replaceAll(
+    /var\(\s*(--[\w-]+)\s*(?:,([^)]*))?\)/g,
+    (_, name: string, fallback: string | undefined) =>
+      Object.hasOwn(customProperties, name) ? customProperties[name] : (fallback?.trim() ?? '')
+  )
   return resolveSimpleCalc(withVariables)
 }
 
+/** `calc()` of a product, with the length on either side, as pixels. */
 function resolveSimpleCalc(value: string): string {
-  const calc = value.match(/^calc\(([-\d.]+)(rem|px)?\s*\*\s*([-\d.]+)\)$/)
-  if (!calc?.[1] || !calc[3]) return value
+  const calc = /^calc\(\s*([-\d.]+)(rem|px)?\s*\*\s*([-\d.]+)(rem|px)?\s*\)$/.exec(value)
+  if (!calc?.[1] || !calc[3] || (calc[2] && calc[4])) return value
 
-  const base = Number.parseFloat(calc[1])
-  const multiplier = Number.parseFloat(calc[3])
-  const unit = calc.at(2) ?? 'px'
-  if (!Number.isFinite(base) || !Number.isFinite(multiplier)) return value
-  return `${unit === 'rem' ? base * multiplier * 16 : base * multiplier}px`
+  const left = Number.parseFloat(calc[1])
+  const right = Number.parseFloat(calc[3])
+  // An unmatched group is undefined at run time, though the match array types it as a string.
+  const unit = calc[2] || calc[4] || 'px'
+  if (!Number.isFinite(left) || !Number.isFinite(right)) return value
+  return `${unit === 'rem' ? left * right * 16 : left * right}px`
 }
 
 const BORDER_STYLES = new Set([
@@ -286,7 +313,8 @@ function applyComputedStyles(
   node: DesignNode,
   rules: HeadlessCSSRule[],
   parent: AncestorContext | null,
-  inheritedStyle: DesignStyleDeclaration
+  inheritedStyle: DesignStyleDeclaration,
+  inheritedCustomProperties: DesignStyleDeclaration
 ): DesignNode {
   if (node.type === 'text') return node
 
@@ -295,15 +323,22 @@ function applyComputedStyles(
     .filter((rule) => matchesSelector(node, rule.selector, parent))
     .sort((left, right) => left.specificity - right.specificity || left.order - right.order)
 
-  for (const rule of matchingRules) Object.assign(computedStyle, rule.style)
-  Object.assign(computedStyle, expandStyleShorthands(node.inlineStyle ?? {}))
+  // Custom properties cascade and inherit like any property, so `var()` resolves per element.
+  const customProperties = { ...inheritedCustomProperties }
+  for (const rule of matchingRules) declareCustomProperties(customProperties, rule.declarations)
+  declareCustomProperties(customProperties, node.inlineStyle ?? {})
+
+  for (const rule of matchingRules) {
+    Object.assign(computedStyle, resolveDeclarations(rule.declarations, customProperties))
+  }
+  Object.assign(computedStyle, resolveDeclarations(node.inlineStyle ?? {}, customProperties))
 
   const context = { element: node, parent }
   return {
     ...node,
     computedStyle: Object.keys(computedStyle).length > 0 ? computedStyle : undefined,
     children: node.children.map((child) =>
-      applyComputedStyles(child, rules, context, computedStyle)
+      applyComputedStyles(child, rules, context, computedStyle, customProperties)
     )
   }
 }
@@ -321,10 +356,17 @@ export function computeHeadlessStyles(document: DesignDocument, cssText = ''): D
   const stylesheetText = [document.stylesheets?.map((sheet) => sheet.cssText).join('\n'), cssText]
     .filter((text): text is string => !!text)
     .join('\n')
-  const { rules } = parseRules(stylesheetText)
+  const { rules, customProperties } = parseRules(stylesheetText)
+  // A fragment has no document element, so `:root` reaches its elements through inheritance only.
+  const rootStyle: DesignStyleDeclaration = {}
+  for (const rule of rules.filter(({ selector }) => selector === ':root')) {
+    Object.assign(rootStyle, resolveDeclarations(rule.declarations, customProperties))
+  }
 
   return {
     ...document,
-    children: document.children.map((child) => applyComputedStyles(child, rules, null, {}))
+    children: document.children.map((child) =>
+      applyComputedStyles(child, rules, null, rootStyle, customProperties)
+    )
   }
 }

@@ -10,3 +10,4 @@
 - AI setup no longer prefixes omp's Bun install command with sudo when npm's global folder needs administrator rights.
 - Saving by download in a browser without file access keeps the draft and recovery copy, so cancelling the download no longer loses the work.
 - Importing HTML names layers after their `data-name`, so a page exported to HTML and imported back keeps its layer names.
+- Imported HTML resolves CSS custom properties declared on any selector, uses `var()` fallbacks, inherits text styles set on `:root`, and resolves `calc()` products written with the number first.

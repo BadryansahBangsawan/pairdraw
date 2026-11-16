@@ -137,6 +137,67 @@ describe('@pairdraw/dom-css runtime', () => {
     expect(b?.type === 'element' ? b.computedStyle?.['padding-left'] : undefined).toBe('2px')
   })
 
+  it('falls back to the var() fallback when the custom property is undefined', async () => {
+    const runtime = createHeadlessCSSRuntime()
+    const parsed = runtime.parseHTML(
+      '<div class="a">A</div><div style="padding-left: var(--missing, 6px)">B</div>'
+    )
+    const document = await runtime.computeStyles(
+      parsed,
+      ':root { --known: 3px; } .a { padding-left: var(--missing, 8px); margin-left: var(--known, 9px); }'
+    )
+    const [a, b] = document.children
+    expect(a?.type === 'element' ? a.computedStyle?.['padding-left'] : undefined).toBe('8px')
+    expect(a?.type === 'element' ? a.computedStyle?.['margin-left'] : undefined).toBe('3px')
+    expect(b?.type === 'element' ? b.computedStyle?.['padding-left'] : undefined).toBe('6px')
+  })
+
+  it('resolves custom properties declared on any rule, scoped to the matching subtree', async () => {
+    const runtime = createHeadlessCSSRuntime()
+    const parsed = runtime.parseHTML(
+      '<span class="box">A</span><div class="light"><p class="t">B</p></div><div class="dark"><p class="t">C</p></div>'
+    )
+    const document = await runtime.computeStyles(
+      parsed,
+      `.box { --c: #ff0000; } .box { color: var(--c); }
+       .light { --fg: #ffffff; } .dark { --fg: #000000; } .t { color: var(--fg); }`
+    )
+    const [box, light, dark] = document.children
+    const textColor = (node: (typeof document.children)[number] | undefined) => {
+      const text = node?.type === 'element' ? node.children[0] : undefined
+      return text?.type === 'element' ? text.computedStyle?.color : undefined
+    }
+    expect(box?.type === 'element' ? box.computedStyle?.color : undefined).toBe('#ff0000')
+    expect(textColor(light)).toBe('#ffffff')
+    expect(textColor(dark)).toBe('#000000')
+  })
+
+  it('inherits :root properties without applying box properties to every top-level element', async () => {
+    const runtime = createHeadlessCSSRuntime()
+    const parsed = runtime.parseHTML('<div class="a">A</div><p>B</p>')
+    const document = await runtime.computeStyles(
+      parsed,
+      ':root { color: #ff0000; padding: 8px; } .a { color: #0000ff; }'
+    )
+    const [a, p] = document.children
+    expect(a?.type === 'element' ? a.computedStyle?.color : undefined).toBe('#0000ff')
+    expect(p?.type === 'element' ? p.computedStyle?.color : undefined).toBe('#ff0000')
+    expect(p?.type === 'element' ? p.computedStyle?.['padding-top'] : undefined).toBeUndefined()
+  })
+
+  it('resolves a calc() product whichever side carries the length', async () => {
+    const runtime = createHeadlessCSSRuntime()
+    const parsed = runtime.parseHTML('<div class="a">A</div>')
+    const document = await runtime.computeStyles(
+      parsed,
+      '.a { width: calc(2 * 10px); height: calc(10px * 3); min-width: calc(2 * 1rem); }'
+    )
+    const style = document.children[0]?.type === 'element' ? document.children[0].computedStyle : {}
+    expect(style?.width).toBe('20px')
+    expect(style?.height).toBe('30px')
+    expect(style?.['min-width']).toBe('32px')
+  })
+
   it('scores *.card like .card, so the later rule wins', async () => {
     const runtime = createHeadlessCSSRuntime()
     const parsed = runtime.parseHTML('<div class="card">A</div>')

@@ -374,8 +374,14 @@ function stylesheetLink(path: string): string {
   return `<link rel="stylesheet" href="${assetURL(path)}">`
 }
 
+/**
+ * A `<style>` element holding `css`. The HTML parser ends the element at the first `</style`
+ * in any letter case, whatever the CSS around it means, and style values can come from an
+ * imported document, so each one is written `<\/style`, which CSS strings and URLs read back
+ * as `</style`.
+ */
 function styleTag(css: string): string {
-  return css ? `<style>${css}</style>` : ''
+  return css ? `<style>${css.replace(/<\/(?=style)/gi, '<\\/')}</style>` : ''
 }
 
 type ResolvedBundleOptions = Required<Omit<ExportHTMLBundleOptions, 'loadTailwindStylesheet'>> &

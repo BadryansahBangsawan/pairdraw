@@ -1,0 +1,1 @@
+- Standalone HTML export keeps style values from imported documents inside the page's stylesheet, so they can no longer add markup to the page.

@@ -27,6 +27,25 @@ export function viewportMatrix(viewport: ViewportTransform) {
   )
 }
 
+/** A node's axis-aligned box on screen, around its corners as drawn. */
+export function nodeScreenBounds(
+  graph: SceneGraph,
+  node: SceneNode,
+  viewport: ViewportTransform,
+  preview?: RotationPreview | null
+): Rect {
+  const [x0, y0, x1, y1] = Matrix.mapPoints(
+    createSceneGeometry(graph, preview).screenMatrix(node, viewport),
+    [0, 0, node.width, node.height]
+  )
+  return {
+    x: Math.min(x0, x1),
+    y: Math.min(y0, y1),
+    width: Math.abs(x1 - x0),
+    height: Math.abs(y1 - y0)
+  }
+}
+
 /** A read-only view for one draw or input operation. Recreate when the preview changes. */
 export function createSceneGeometry(graph: SceneGraph, preview?: RotationPreview | null) {
   const node = (source: SceneNode) => projectedNode(source, preview)

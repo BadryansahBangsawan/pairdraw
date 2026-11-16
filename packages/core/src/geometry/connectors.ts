@@ -8,7 +8,7 @@ import {
 import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
-import { createSceneGeometry } from './scene'
+import { createSceneGeometry, nodeScreenBounds } from './scene'
 import type { RotationPreview, ViewportTransform } from './types'
 
 /** Where a connector's line starts and ends on screen, where its end handles sit. */
@@ -88,15 +88,5 @@ export function connectorScreenLabel(
 ): Rect | null {
   const parts = connectorSublayers(graph, connector)
   if (!parts || parts.label.text === '' || !parts.labelBackground.visible) return null
-  const plate = parts.labelBackground
-  const [x0, y0, x1, y1] = Matrix.mapPoints(
-    createSceneGeometry(graph, preview).screenMatrix(plate, viewport),
-    [0, 0, plate.width, plate.height]
-  )
-  return {
-    x: Math.min(x0, x1),
-    y: Math.min(y0, y1),
-    width: Math.abs(x1 - x0),
-    height: Math.abs(y1 - y0)
-  }
+  return nodeScreenBounds(graph, parts.labelBackground, viewport, preview)
 }

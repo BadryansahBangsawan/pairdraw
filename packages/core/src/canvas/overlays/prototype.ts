@@ -1,11 +1,11 @@
 import type { Canvas } from 'canvaskit-wasm'
 
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
-import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
-import { createSceneGeometry, type RotationPreview } from '#core/geometry'
+import type { RotationPreview } from '#core/geometry'
+import { nodeScreenBounds } from '#core/geometry/scene'
 
 /** A drawn connection's dash, in screen pixels, and its line weight. */
 const CONNECTION_DASH = [6, 4] as const
@@ -15,25 +15,6 @@ const CONNECTION_WEIGHT = 1.5
 export interface PrototypeConnection {
   from: Vector
   to: Vector
-}
-
-/** A node's axis-aligned box on screen. */
-function screenBox(
-  graph: SceneGraph,
-  node: SceneNode,
-  viewport: { panX: number; panY: number; zoom: number },
-  preview?: RotationPreview | null
-): Rect {
-  const [x0, y0, x1, y1] = Matrix.mapPoints(
-    createSceneGeometry(graph, preview).screenMatrix(node, viewport),
-    [0, 0, node.width, node.height]
-  )
-  return {
-    x: Math.min(x0, x1),
-    y: Math.min(y0, y1),
-    width: Math.abs(x1 - x0),
-    height: Math.abs(y1 - y0)
-  }
 }
 
 function center(rect: Rect): Vector {
@@ -70,13 +51,13 @@ export function prototypeConnections(
 ): PrototypeConnection[] {
   const connections: PrototypeConnection[] = []
   for (const node of nodes) {
-    const sourceBox = screenBox(graph, node, viewport, preview)
+    const sourceBox = nodeScreenBounds(graph, node, viewport, preview)
     for (const reaction of node.prototypeReactions) {
       for (const action of reaction.actions) {
         if (action.type !== 'NODE' || !action.nodeId) continue
         const target = graph.getNode(action.nodeId)
         if (!target || target.id === node.id) continue
-        const targetBox = screenBox(graph, target, viewport, preview)
+        const targetBox = nodeScreenBounds(graph, target, viewport, preview)
         connections.push({
           from: edgePoint(sourceBox, center(targetBox)),
           to: edgePoint(targetBox, center(sourceBox))

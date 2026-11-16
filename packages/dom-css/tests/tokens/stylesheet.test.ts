@@ -94,6 +94,20 @@ function designSystem(): SceneGraph {
 }
 
 describe('token stylesheet', () => {
+  test('keeps a collection or mode name inside its comment', async () => {
+    const graph = designSystem()
+    const theme = graph.variableCollections.get('theme')
+    if (!theme) throw new Error('Expected the Theme collection')
+    theme.name = 'Theme */ body { background: red } /*'
+
+    const { css } = await tokenStylesheet(graph, { format: 'css' })
+    // CSS ends a comment at the first `*/`, so this is the stylesheet without its comments.
+    const rules = css.replace(/\/\*[\s\S]*?\*\//g, '')
+
+    expect(css).toContain('/* Theme * / body { background: red } /*: Dark */')
+    expect(rules).not.toContain('background: red')
+  })
+
   test('writes defaults to :root and every other mode under its condition', async () => {
     const { css, issues } = await tokenStylesheet(designSystem(), { format: 'css' })
     expect(issues).toEqual([])

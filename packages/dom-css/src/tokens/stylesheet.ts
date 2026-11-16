@@ -132,8 +132,16 @@ function block(selector: string, declarations: Declaration[], indent = ''): stri
   return `${indent}${selector} {\n${body}\n${indent}}`
 }
 
+/**
+ * A comment naming `text`. Collection and mode names are the person's own text, so a `*` before
+ * a `/` in them is spaced apart, which keeps a name from ending the comment and writing rules.
+ */
+function cssComment(text: string): string {
+  return `/* ${text.replaceAll('*/', '* /')} */`
+}
+
 function modeBlock(scope: ModeScope): string {
-  const comment = `/* ${scope.collection.name}: ${scope.mode.name} */`
+  const comment = cssComment(`${scope.collection.name}: ${scope.mode.name}`)
   if (!isAtRuleCondition(scope.condition))
     return `${comment}\n${block(scope.condition, scope.declarations)}`
   return `${comment}\n${scope.condition} {\n${block(':root', scope.declarations, '  ')}\n}`

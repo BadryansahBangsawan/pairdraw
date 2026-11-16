@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import { toast, toastDuration } from '@/app/shell/ui'
 
@@ -8,10 +8,14 @@ function entryAt(index = 0) {
   return entry
 }
 
-// Toasts are app-wide; one left by an earlier file in the same process would take index 0.
-beforeEach(() => {
+function clearToasts() {
   for (const entry of toast.toasts.value) toast.remove(entry.id)
-})
+}
+
+// Toasts are app-wide and outlive a file: an earlier file's toast would take index 0 here, and
+// the toasts these tests raise would reach later files in the same process.
+beforeEach(clearToasts)
+afterEach(clearToasts)
 
 describe('toast progress', () => {
   test('keeps a reported-progress toast open until progress clears', () => {

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import { useI18n } from '@pairdraw/vue/i18n'
 
@@ -22,9 +22,16 @@ const AVAILABLE_UPDATE = {
   rawJson: '{}'
 }
 
+function clearToasts() {
+  for (const entry of toast.toasts.value) toast.remove(entry.id)
+}
+
+// Toasts are app-wide; the tests assert the whole list, so none may come from an earlier file.
+beforeEach(clearToasts)
+
 afterEach(async () => {
   await clearTauriMocks()
-  for (const entry of toast.toasts.value) toast.remove(entry.id)
+  clearToasts()
 })
 
 describe('checkForAppUpdate', () => {

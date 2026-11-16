@@ -12,7 +12,7 @@ import { MCP_AGENT_HEADER, MCP_CHAT_HEADER } from '@pairdraw/core/constants'
 import { createAgentBridge, type AgentBridge, type AgentBridgeOptions } from '#mcp/agents/index'
 import { bearerToken, isAuthorized, mcpRequestToken } from '#mcp/auth'
 import { createBrowserRPCBridge } from '#mcp/browser-rpc'
-import { MCP_CORS_HEADERS, MCP_CORS_METHODS, MCP_EXPOSED_HEADERS } from '#mcp/http-options'
+import * as httpOptions from '#mcp/http-options'
 import type { RPCJSONObject } from '#mcp/json'
 import { registerFileRoutes } from '#mcp/server/files'
 import { createMCPSessionManager, sessionOpener } from '#mcp/server/sessions'
@@ -151,9 +151,9 @@ function createHonoApp(options: {
       '*',
       cors({
         origin: [...corsOrigins],
-        allowMethods: MCP_CORS_METHODS,
-        allowHeaders: MCP_CORS_HEADERS,
-        exposeHeaders: MCP_EXPOSED_HEADERS
+        allowMethods: httpOptions.MCP_CORS_METHODS,
+        allowHeaders: httpOptions.MCP_CORS_HEADERS,
+        exposeHeaders: httpOptions.MCP_EXPOSED_HEADERS
       })
     )
   }
@@ -189,7 +189,7 @@ function createHonoApp(options: {
   }
 
   // Errors from sendToBrowser surface as 502, including a disconnected app (formerly 503).
-  app.post('/rpc', async (c) => {
+  app.post('/rpc', httpOptions.limitBody, async (c) => {
     const body = await c.req.json().catch(() => null)
     if (!body || typeof body !== 'object' || Array.isArray(body)) {
       return c.json({ error: 'Invalid request body' }, 400)
@@ -203,11 +203,12 @@ function createHonoApp(options: {
     }
   })
 
-  app.all('/mcp', async (c) => {
+  const requireMCPToken = async (c: Context, next: Next) => {
     const token = mcpRequestToken(c.req.header('authorization'), c.req.header('x-mcp-token'))
-    if (!verifyMCPToken(token)) {
-      return c.json({ error: 'Unauthorized' }, 401)
-    }
+    return verifyMCPToken(token) ? next() : c.json({ error: 'Unauthorized' }, 401)
+  }
+
+  app.all('/mcp', requireMCPToken, httpOptions.limitBody, async (c) => {
     if (!MCP_METHODS.includes(c.req.method)) {
       return c.json(
         { error: 'Method not allowed' },

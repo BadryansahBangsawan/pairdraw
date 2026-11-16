@@ -37,3 +37,4 @@
 - `export` reports the real file size of text exports that contain non-ASCII characters.
 - `convert --help` lists every output format it can write.
 - Changing a setting keeps preferences that a newer version of Pairdraw saved.
+- Design JSX keeps `<!-- … -->` written inside attribute values and string literals instead of removing it as a comment.

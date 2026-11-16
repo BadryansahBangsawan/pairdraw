@@ -30,8 +30,89 @@ const HELPER_BINDINGS = DESIGN_JSX_HELPERS.map(
   ({ name }) => `const ${name} = __helpers.${name}`
 ).join('\n')
 
+/** Where the scanner is: code (top level or `{…}`), JSX text, or an opening or closing tag. */
+type ScanFrame = 'code' | 'text' | 'open' | 'close'
+
+/** End (exclusive) of the string that opens at `start`; JSX attribute strings have no escapes. */
+function stringEnd(source: string, start: number, escapes: boolean): number {
+  const quote = source[start]
+  let i = start + 1
+  while (i < source.length && source[i] !== quote) i += escapes && source[i] === '\\' ? 2 : 1
+  return Math.min(i + 1, source.length)
+}
+
+/** End of the string or JS comment at `i`, copied as written, or -1 when none starts there. */
+function verbatimEnd(source: string, i: number, frame: ScanFrame): number {
+  const char = source.charAt(i)
+  if (frame === 'open' || frame === 'close') {
+    return /["']/.test(char) ? stringEnd(source, i, false) : -1
+  }
+  if (frame !== 'code') return -1
+  if (/["'`]/.test(char)) return stringEnd(source, i, true)
+  if (source.startsWith('//', i)) {
+    const end = source.indexOf('\n', i)
+    return end === -1 ? source.length : end
+  }
+  if (source.startsWith('/*', i)) {
+    const end = source.indexOf('*/', i + 2)
+    return end === -1 ? source.length : end + 2
+  }
+  return -1
+}
+
+/** Whether the `<` just copied to `before` opens a tag rather than comparing, as in `a<b`. */
+function startsTag(source: string, next: number, frame: ScanFrame, before: string): boolean {
+  const following = source.charAt(next)
+  if (frame === 'text') return /[A-Za-z_$/>]/.test(following)
+  if (!/[A-Za-z_$>]/.test(following)) return false
+  const previous = before.slice(0, -1).trimEnd()
+  return !/[\w$)\].]$/.test(previous) || /(?:^|[^\w$])return$/.test(previous)
+}
+
+/** Enter or leave a frame after copying the character just before `next`. */
+function updateFrames(stack: ScanFrame[], source: string, next: number, out: string): void {
+  const char = source.charAt(next - 1)
+  const frame = stack.at(-1) ?? 'code'
+  const inTag = frame === 'open' || frame === 'close'
+  if (char === '{') stack.push('code')
+  else if (char === '}' && frame === 'code' && stack.length > 1) stack.pop()
+  else if (char === '<' && !inTag && startsTag(source, next, frame, out)) {
+    stack.push(source.charAt(next) === '/' ? 'close' : 'open')
+  } else if (char === '>' && frame === 'open') {
+    if (source.charAt(next - 2) === '/') stack.pop()
+    else stack[stack.length - 1] = 'text'
+  } else if (char === '>' && frame === 'close') {
+    stack.pop()
+    if (stack.at(-1) === 'text') stack.pop()
+  }
+}
+
+/**
+ * Remove `<!-- … -->` written in JSX text or between statements. Markup inside an attribute
+ * string or a JS string literal is part of the value and stays.
+ */
 function stripHTMLComments(jsxString: string): string {
-  return jsxString.replace(/<!--[\s\S]*?-->/g, '')
+  const stack: ScanFrame[] = ['code']
+  let out = ''
+  let i = 0
+  while (i < jsxString.length) {
+    const frame = stack.at(-1) ?? 'code'
+    if (frame !== 'open' && frame !== 'close' && jsxString.startsWith('<!--', i)) {
+      const end = jsxString.indexOf('-->', i + 4)
+      i = end === -1 ? jsxString.length : end + 3
+      continue
+    }
+    const end = verbatimEnd(jsxString, i, frame)
+    if (end !== -1) {
+      out += jsxString.slice(i, end)
+      i = end
+      continue
+    }
+    out += jsxString.charAt(i)
+    i++
+    updateFrames(stack, jsxString, i, out)
+  }
+  return out
 }
 
 function unsupportedPropWarnings(graph: SceneGraph, tree: TreeNode): string[] {

@@ -1,6 +1,7 @@
 {
   "name": "@pairdraw/fig",
   "version": "0.16.0",
+  "description": "The .fig file format for Pairdraw: archive parsing, SceneGraph conversion, metadata policy, and the Figma clipboard format.",
   "license": "MIT",
   "repository": {
     "type": "git",

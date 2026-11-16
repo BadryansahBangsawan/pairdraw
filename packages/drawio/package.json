@@ -1,6 +1,7 @@
 {
   "name": "@pairdraw/drawio",
   "version": "0.16.0",
+  "description": "The draw.io file format for Pairdraw: its document model, and a reader and writer for .drawio and .dio files and diagrams embedded in draw.io exports.",
   "license": "MIT",
   "type": "module",
   "exports": {

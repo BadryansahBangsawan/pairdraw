@@ -1,6 +1,7 @@
 {
   "name": "@pairdraw/design-jsx",
   "version": "0.16.0",
+  "description": "Pairdraw design JSX: build editable scene trees with JSX elements, paint and effect helpers, and design variables.",
   "license": "MIT",
   "type": "module",
   "imports": {

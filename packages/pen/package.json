@@ -1,6 +1,7 @@
 {
   "name": "@pairdraw/pen",
   "version": "0.16.0",
+  "description": "Pencil.dev .pen document parser and SceneGraph adapter for Pairdraw.",
   "license": "MIT",
   "repository": {
     "type": "git",

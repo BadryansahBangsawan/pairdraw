@@ -1,6 +1,7 @@
 {
   "name": "@pairdraw/kiwi",
   "version": "0.16.0",
+  "description": "Kiwi schema, runtime, codecs, and containers for Figma-format files, without SceneGraph knowledge.",
   "license": "MIT",
   "repository": {
     "type": "git",

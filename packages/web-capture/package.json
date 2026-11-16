@@ -1,6 +1,7 @@
 {
   "name": "@pairdraw/web-capture",
   "version": "0.16.0",
+  "description": "Web pages captured with their computed styles, in the format Pairdraw imports as editable layers.",
   "license": "MIT",
   "repository": {
     "type": "git",

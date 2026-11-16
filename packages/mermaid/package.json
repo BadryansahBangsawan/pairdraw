@@ -1,6 +1,7 @@
 {
   "name": "@pairdraw/mermaid",
   "version": "0.16.0",
+  "description": "Mermaid flowchart diagrams read into a typed model of nodes, edges, subgraphs, and styles.",
   "license": "MIT",
   "repository": {
     "type": "git",

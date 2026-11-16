@@ -1,0 +1,1 @@
+- Creating a variable from a property field binds it to every selected layer and corner the field edits, not only the first.

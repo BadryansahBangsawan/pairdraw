@@ -3,6 +3,7 @@ import { watchImmediate } from '@vueuse/core'
 import { computed, onBeforeUnmount, onDeactivated, ref } from 'vue'
 
 import { useBindingProvider } from '#vue/controls/binding-provider/context'
+import { createBindingForTargets } from '#vue/controls/binding-provider/create'
 import { prepareBindingEdits } from '#vue/controls/binding-provider/prepare-edits'
 import type {
   BindingValueEdit,
@@ -105,9 +106,10 @@ function unbind() {
 }
 
 function create(name: string) {
-  const target = targets.value[0]
-  if (!target || !provider.create) return
-  runImmediate('Create and bind variable', () => provider.create?.(target, value.value, name))
+  if (!targets.value[0] || !provider.create) return
+  runImmediate('Create and bind variable', () =>
+    createBindingForTargets(provider, targets.value, value.value, name)
+  )
   open.value = false
 }
 

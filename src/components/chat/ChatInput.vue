@@ -19,6 +19,7 @@ import { useAIChat } from '@/app/ai/chat/use'
 import { exploreSetting, withExploreRequest } from '@/app/ai/explore/state'
 import { designModelProfile } from '@/app/ai/models'
 import { withSkillCommand } from '@/app/ai/skills/invoke'
+import { useEditorStore } from '@/app/editor/active-store'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import ChatAgentSessionControls from '@/components/chat/agent/ChatAgentSessionControls.vue'
 import ChatDraftFile from '@/components/chat/attachment/ChatDraftFile.vue'
@@ -122,9 +123,12 @@ function startWithSkill(name: string) {
   composer.value?.edit((text) => withSkillCommand(text, name))
 }
 
+/** This tab's document, whose chat holds the messages waiting for the agent. */
+const documentStore = useEditorStore()
+
 /** Up on the first line takes waiting messages back to edit, their attachments with them. */
 function takeBack(): string | null {
-  const taken = takeBackMessages()
+  const taken = takeBackMessages(documentStore)
   if (taken.length === 0) return null
   for (const submission of taken) restoreSubmission(submission)
   return taken.map((submission) => submission.displayText).join('\n')

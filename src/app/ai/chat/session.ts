@@ -259,7 +259,7 @@ export function createChatSessionManager({
       onError: captureProviderError,
       diagnosticContext,
       recorder: runRecorder,
-      yieldWhen: hasSteeringMessage
+      yieldWhen: () => hasSteeringMessage(store)
     })
   }
 

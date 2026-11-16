@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Chat } from '@ai-sdk/vue'
 import type { UIMessage } from 'ai'
-import { computed, nextTick, shallowRef, useTemplateRef, watch } from 'vue'
+import { computed, markRaw, nextTick, shallowRef, useTemplateRef, watch } from 'vue'
 
 import { useI18n } from '@pairdraw/vue/i18n'
 
@@ -29,7 +29,11 @@ import { useAIChat } from '@/app/ai/chat/use'
 import { openAISetup } from '@/app/ai/models/settings/onboarding/dialog'
 import { didHitStepLimit } from '@/app/ai/tools'
 import { cloudBillingURL } from '@/app/cloud/integration'
-import { getActiveEditorStore, useActiveEditorStoreRef } from '@/app/editor/active-store'
+import {
+  getActiveEditorStore,
+  useActiveEditorStoreRef,
+  useEditorStore
+} from '@/app/editor/active-store'
 import { useDateFormat } from '@/app/i18n/date'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { claimDroppedFiles } from '@/app/shell/document-drop'
@@ -114,6 +118,12 @@ async function submitMessage(message: ChatSubmission) {
 /** Set once the history holds the active document's conversation, which a waiting prompt joins. */
 let historyReady = false
 const activeStore = useActiveEditorStoreRef()
+/**
+ * This tab's document. The chat mounts again each time its tab shows, so what waits for the
+ * agent stays with the document, not with this chat.
+ */
+const documentStore = useEditorStore()
+const queued = computed(() => queuedMessages(documentStore))
 const agentSetup = useChatAgentSetup(activeStore)
 /** The coding agent the chat switched to on its own, while it is still the chat's model. */
 const autoAgent = computed(() => {
@@ -195,7 +205,20 @@ async function initializeHistory() {
     return
   }
   historyReady = true
+  await resumeQueue()
   sendPendingPrompt()
+}
+/**
+ * Takes up what waited in this document's chat when it shows again: the reply still running gets
+ * it once it ends, and with none running it goes now.
+ */
+async function resumeQueue() {
+  if (!queued.value.length) return
+  const generation = viewGeneration
+  const running = await history.ensureChat().catch(() => null)
+  if (generation !== viewGeneration) return
+  if (running && !chat.value) chat.value = markRaw(running)
+  if (status.value === 'ready') sendNextQueued()
 }
 void initializeHistory()
 
@@ -243,7 +266,7 @@ async function historyAction(action: () => Promise<unknown>) {
       // way, after it opened another, has left too; a switch that failed before keeps them.
       if (switched || history.current.value?.id !== left) {
         chat.value = null
-        clearQueuedMessages()
+        clearQueuedMessages(documentStore)
       } else if (status.value === 'ready') {
         // The stopped reply may have ended while the switch held the queue, which then waits
         // for no reply to end.
@@ -331,14 +354,14 @@ function sendOrQueue(message: ChatSubmission, afterWork: boolean) {
   // Writing again shows the person knows which agent answers.
   agentAutoConnect.dismissNotice()
   if (status.value === 'streaming' || status.value === 'submitted') {
-    enqueueMessage(message, afterWork ? 'follow-up' : 'steer')
+    enqueueMessage(documentStore, message, afterWork ? 'follow-up' : 'steer')
     return
   }
   void submitMessage(message)
 }
 // Once a reply ends, what waited goes next, one message per reply; a failed reply keeps them.
 function sendNextQueued() {
-  const next = takeNextMessage()
+  const next = takeNextMessage(documentStore)
   if (next) void submitMessage(next)
 }
 watch(status, (now, before) => {
@@ -393,8 +416,6 @@ function failureAction(failedId: string | undefined): { label: string; run: () =
 watch(
   () => [activeTab.value?.id, activeTab.value?.store.state.preparation] as const,
   async ([tabId, preparation], [previousTabId]) => {
-    // Another tab's waiting messages never go to this one, even one that opens still preparing.
-    if (tabId !== previousTabId) clearQueuedMessages()
     historyReady = false
     if (preparation) {
       viewGeneration++
@@ -490,9 +511,9 @@ function handleStop() {
         :messages="messages"
         :status="status"
         :show-continue="showContinue"
-        :queued="queuedMessages"
+        :queued="queued"
         :steers="!providerID.startsWith('acp:') && providerID !== 'harness:pi'"
-        @remove-queued="removeQueuedMessage"
+        @remove-queued="(id) => removeQueuedMessage(documentStore, id)"
         :nodes-live="!history.readOnly.value"
         :interactive="chat !== null && !submission.busy.value"
         @regenerate="submission.regenerate()"

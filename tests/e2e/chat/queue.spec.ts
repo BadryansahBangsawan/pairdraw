@@ -49,6 +49,60 @@ test('Up takes waiting messages back to edit', async ({ configuredChat: chat }) 
   await finishPausedReply(page)
 })
 
+test('a reply keeps running, and what waits for it, while another tab shows', async ({
+  configuredChat: chat
+}) => {
+  const { page } = chat
+  await chat.submit('paused short stream')
+  await expect(chat.assistantMessage()).toContainText('Line 1')
+  await chat.input.click()
+  await page.keyboard.type('Make it blue')
+  await page.keyboard.press('Enter')
+  const queued = page.getByTestId('chat-queued-message')
+  await expect(queued).toHaveCount(1)
+
+  // A New file tab shows no document, so nothing takes the chat from this one meanwhile.
+  await page.getByTestId('tabbar-new').click()
+  await expect(page.getByTestId('recent-files-home')).toBeVisible()
+  await page.getByTestId('tabbar-tab').first().click()
+  await expect(page.getByTestId('chat-stop-button')).toBeVisible()
+  await expect(queued).toHaveCount(1)
+
+  await finishPausedReply(page)
+  await expect(page.getByTestId('chat-message-user')).toHaveCount(2)
+  await expect(page.getByTestId('chat-message-user').nth(1)).toContainText('Make it blue')
+  await expect(queued).toHaveCount(0)
+})
+
+test("a waiting message stays with its document, and goes once that document's chat is back", async ({
+  configuredChat: chat
+}) => {
+  const { page } = chat
+  await chat.submit('paused short stream')
+  await expect(chat.assistantMessage()).toContainText('Line 1')
+  await chat.input.click()
+  await page.keyboard.type('Make it blue')
+  await page.keyboard.press('Enter')
+  const queued = page.getByTestId('chat-queued-message')
+  await expect(queued).toHaveCount(1)
+
+  // Another document takes the chat, which interrupts the first document's reply.
+  await page.getByTestId('tabbar-new').click()
+  await page.getByTestId('home-new-design').click()
+  await expect(page.getByTestId('tabbar-tab')).toHaveCount(2)
+  await expect(chat.input).toBeVisible()
+  await expect(queued).toHaveCount(0)
+  await chat.submit('Hello there')
+  await expect(chat.assistantMessage()).toContainText('Hello there')
+  await expect(page.getByTestId('chat-send-button')).toBeVisible()
+  await expect(page.getByTestId('chat-message-user')).toHaveCount(1)
+
+  await page.getByTestId('tabbar-tab').first().click()
+  await expect(page.getByTestId('chat-message-user')).toHaveCount(2)
+  await expect(page.getByTestId('chat-message-user').nth(1)).toContainText('Make it blue')
+  await expect(queued).toHaveCount(0)
+})
+
 test('Escape stops the reply and sends what waits at once', async ({ configuredChat: chat }) => {
   const { page } = chat
   await chat.submit('paused short stream')

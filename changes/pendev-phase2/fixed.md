@@ -1,4 +1,0 @@
-- Duplicating an instance keeps the overrides of its layers when its component changes later.
-- Pasting or pasting properties from another document no longer adds a duplicate collection or style each time when a same-named one exists.
-- Arrow keys, cut, and paste no longer move, delete, or add layers while a prototype preview or presentation is showing.
-- Loading placeholders on Home are announced to screen readers as status.

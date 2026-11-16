@@ -1,2 +1,0 @@
-- Find layers (Ctrl/Cmd+F, Edit → Find Layers…, or the command palette) searches the shown page's layers by name, selects the one you pick, and brings it into view.
-- Goodies (the gift button in the top bar, Object → Goodies…, or the command palette) gathers things to start from: six styles to pin to the AI chat, the design systems you can enable, five scripts placed on the canvas as code layers, and the nine gallery shaders, which fill the selected layers or a new rectangle.

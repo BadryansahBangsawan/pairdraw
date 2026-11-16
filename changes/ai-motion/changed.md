@@ -1,1 +1,0 @@
-- An agent's cursor glides at an even pace between its streamed moves instead of stopping and starting at each one.

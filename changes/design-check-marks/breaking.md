@@ -1,2 +1,0 @@
-- The `designCheck.showOnCanvas` setting is removed from `pairdraw settings` and the automation settings API, which now reject it; saved preferences that still hold it load without it.
-- `@pairdraw/vue/canvas/issues` and its `useCanvasIssueMarkers` are removed, along with `hitTestIssueMarker` from `useCanvas`, the `getOverlayObstacles` canvas option, and Core's issue marker layout, `setDesignIssueMarkers`, `setHoveredIssueMarker`, and `clearDesignIssues`; the editor state's `designIssues` overlay is now `designIssueHighlight`, set with `setDesignIssueHighlight`.

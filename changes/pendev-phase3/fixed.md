@@ -1,4 +1,0 @@
-- Diamond gradient fills in `.pen` files load again instead of disappearing on open.
-- A stroke with a different width on each side keeps a variable bound to any side when the document is saved.
-- Text font weight keeps a variable binding when a `.pen` document is saved, and follows that variable when its value changes.
-- Saved `.pen` files order their keys by Unicode code point, so the text stays the same on every machine.

@@ -1,1 +1,0 @@
-- `@pairdraw/core` replaces `state.play` and the `PlayState` type with `state.canvasView` (`CanvasView`, `{ id: 'edit' }` or `{ id: 'play', revision }`); read how a canvas behaves with `resolveEditorProfile(state)` rather than checking the view.

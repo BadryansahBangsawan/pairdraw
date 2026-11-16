@@ -1,2 +1,0 @@
-- `@pairdraw/core/io/formats/svg` no longer exports `vectorNetworkToSVGPaths`; import it from `@pairdraw/scene-graph/vector-network`.
-- `createDesignJSXRenderer` from `@pairdraw/design-jsx` takes a `vectorBounds(network)` service, which measures a `<Vector>`'s path; `@pairdraw/core/design-jsx` provides it.

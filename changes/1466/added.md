@@ -1,1 +1,0 @@
-- `pairdraw convert` reports a font it cannot load and takes `--font-policy`, as `export` does.

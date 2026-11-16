@@ -1,1 +1,0 @@
-- Self-hosted Pairdraw Cloud installs from npm: `npm install -g @pairdraw/cloud` provides the `pairdraw-cloud` server and the `pairdraw-ai-relay` AI relay commands.

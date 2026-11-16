@@ -1,1 +1,0 @@
-- Self-hosted Pairdraw Cloud runs from a published image, `ghcr.io/badryansahbangsawan/cloud`, with the server and the editor it serves, and `compose.self-hosted.yml` starts it on one machine with a database, storage, and email.

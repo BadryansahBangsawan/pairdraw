@@ -1,1 +1,0 @@
-- The MCP server refuses HTTP requests and WebSocket connections from pages of other websites, which could previously open its WebSocket from any origin.

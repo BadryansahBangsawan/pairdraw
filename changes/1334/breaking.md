@@ -1,1 +1,0 @@
-- `PairdrawBindingProviderOptions` in `@pairdraw/vue` takes `types`, a list of variable types, instead of `type`.

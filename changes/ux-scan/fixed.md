@@ -1,7 +1,0 @@
-- Opening a room link in a build without live rooms no longer edits a blank design under that link; the app goes back to Home and says the link needs a build with rooms.
-- A coding agent that runs on its own credentials, such as omp, no longer asks you to sign in to it when it finds nothing to use; the chat says what to set up in the agent instead.
-- Pasting setup instructions for omp, which installs with Bun, no longer tells the agent to fix an npm permission error that cannot happen.
-- Guided setup's card for an agent that brings its own credentials, such as omp, says which providers and model it uses instead of claiming an account it was signed in to.
-- A browser tab no longer shows install commands for a computer it cannot see: the chat column and the agent cards leave those to the companion that runs the agents.
-- The Design panel reports a snapshot this build cannot refresh as information, not an error.
-- The VS Code extension names its export "Export as PNG", which is what it writes with no selection too.

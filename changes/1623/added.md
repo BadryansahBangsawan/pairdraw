@@ -1,1 +1,0 @@
-- Pairdraw sends a system notification when an AI agent waits for your permission while Pairdraw is in the background or shows another document, and can also notify when a reply finishes or fails; clicking it opens that document's chat. Choose them under Settings › Notifications.

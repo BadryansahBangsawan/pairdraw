@@ -1,1 +1,0 @@
-- `pairdraw eval` and tool calls measure the text a script edits in the fonts the document uses.

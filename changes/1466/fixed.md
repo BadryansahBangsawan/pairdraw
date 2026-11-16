@@ -1,1 +1,0 @@
-- `pairdraw convert` measures the text of a `.pen` or draw.io file in its own fonts, so converted tags, buttons and labels keep their width.

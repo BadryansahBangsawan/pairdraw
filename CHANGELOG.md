@@ -2,6 +2,73 @@
 
 ## Unreleased
 
+## 0.16.1 — 2026-11-16
+
+Pairdraw 0.16.1 adds omp as a coding agent, updates itself from GitHub Releases, and shows an AI agent's edits as they land on the canvas. Install this release by hand once: 0.16.0 has no update feed.
+
+### Breaking changes
+
+- The `designCheck.showOnCanvas` setting is removed from `pairdraw settings` and the automation settings API, which now reject it; saved preferences that still hold it load without it.
+- `@pairdraw/vue/canvas/issues` and its `useCanvasIssueMarkers` are removed, along with `hitTestIssueMarker` from `useCanvas`, the `getOverlayObstacles` canvas option, and Core's issue marker layout, `setDesignIssueMarkers`, `setHoveredIssueMarker`, and `clearDesignIssues`; the editor state's `designIssues` overlay is now `designIssueHighlight`, set with `setDesignIssueHighlight`.
+
+### Added
+
+- omp can be the design agent: the desktop app and the browser companion start it through `omp acp`, guided setup shows its own mark and no sign-in step, since omp runs on the providers and model set up in it, and the chat says what to set up in omp when it finds none. **Settings → MCP** can add Pairdraw's server to omp's `mcp.json`.
+- The desktop app checks GitHub Releases for a new version at startup and from **Pairdraw → Check for Updates…**, and installs signed updates.
+- The canvas shows an AI agent drawing: layers it adds trace in one after another, layers it changes flash, the frames it works in shimmer until it stops, and a notice then counts what it added and changed, with **Show** to select them; **Animate AI edits** in Settings turns it off, and it follows the app's Animations, reduced motion, and Ultralight settings.
+
+### Changed
+
+- The top bar shows your own avatar only while it lists your AI agents, since Pairdraw has no live rooms to show it to.
+- In the desktop app, signing in to OpenRouter returns through a port on this computer, which OpenRouter accepts, instead of a hosted web page.
+- On macOS the desktop app has no title bar: the close, minimize, and zoom buttons sit in the top bar, whose empty parts move the window.
+- An agent's cursor glides at an even pace between its streamed moves instead of stopping and starting at each one.
+- The design check no longer marks issues anywhere outside the Lint and Code tabs: the canvas markers and off-screen edge pins, their hover card, the Layers panel marks, the page list badges, View → Design issues, and its preference are gone. Pages are checked only while the Lint or Code tab is open, so editing, and long AI agent runs above all, no longer pause for a check after every change; the Lint tab still lists every issue with its fixes and highlights a hovered issue's layer on the canvas.
+- Standalone HTML exports wrap the design in a `pairdraw-stage` element instead of `op-stage`.
+- The VS Code extension's export is named **Export as PNG**, since it writes the whole page when nothing is selected.
+
+### Fixed
+
+- The chat says in your language why more images than a message holds cannot be attached.
+- Reopening a document the app recovered no longer crashes the window, and the chat still finds the files it was given.
+- Screen readers announce an assistant reply as it streams in, instead of only reading it when you move to it.
+- Labels for calendar months, the canvas and split menus, the mobile toolbar, document preparation, and fill and stroke history follow the app's language, and the mobile toolbar's previous and next buttons are named for screen readers.
+- The image drop overlay's label stays readable in the light theme instead of blending into its background.
+- Canvas menus have names screen readers can read, and the initials on a person's avatar use a text colour that stays readable on their colour.
+- The follow frame darkens a person's colour enough for its text to stay readable once the colour is rounded.
+- Dropping a document and some files on the chat opens the document and attaches the files, instead of also reporting the files as documents it cannot open.
+- Home lists the libraries from storage when storage is the chosen catalog, before the library manager is opened.
+- A picker opened from the app menu, such as Insert Icon…, stays open instead of closing with the menu.
+- Muted and success text on tinted backgrounds meets WCAG AA, so helper text, chips, and a tool call's done icon are easier to read.
+- `pairdraw <command> --help` shows the command on its usage line, such as `pairdraw export [OPTIONS] [FILE]`, instead of the path of the script that runs the CLI.
+- A design started from Home or a New file tab starts on the dark page in the dark theme, as other new documents do, instead of the light one.
+- Home's places menu is wide enough for each place's name, such as Design systems and Storage workspace, instead of cutting them short.
+- The phone File menu names its items in the app's language, and its export item says it exports the selection as PNG.
+- On a phone, Share no longer puts a document into a live room in Pairdraw, where shared rooms are switched off; a Cloud document still shares through its server.
+- On a phone, Home's Design button spans the row under Open… instead of filling half of it.
+- Settings' Plugins and Skills panels are announced as the tab panels of their tabs, as every other settings panel is.
+- An export from the Export section that fails, such as one of an empty page, says why in a notice in the app's language instead of doing nothing.
+- The Code panel's HTML export and Export frames to PDF say why an export failed in the app's language when the reason is one Pairdraw knows, such as nothing to export.
+- The Text menu's Bold, Italic, and Underline are unavailable until a text is selected, as Add Link is.
+- Escape in the prompt at the bottom of the canvas returns to the canvas, so its shortcuts work again.
+- Home's Design systems lists the built-in Pairdraw Basics, as Goodies does, to start a new design with it turned on.
+- View → Multiplayer cursors (⌥⌘\) now hides and shows the cursors of AI agents and other people on the canvas; before, it changed nothing.
+- `@pairdraw/dom-css/browser` declares its browser helpers, such as `browserJSXToSceneGraph`, so TypeScript sees them.
+- Reloading a document with nothing unsaved, such as one undone back to where it started, no longer offers to recover it.
+- A coding agent's model, reasoning, and mode controls in a narrow chat show their icons side by side instead of overlapping.
+- Opening or closing a side panel no longer shows the canvas stretched for a frame before it redraws.
+- A failed Save As keeps saving to the file it saved to before, a failed open gives the reused Untitled tab its name back, and undoing a nudge also returns layers selected partway through it.
+- The highlight that marks layers an AI agent edited animates and fades as intended, instead of staying on the canvas until something else redrew it.
+- Opening a room link in a build without live rooms no longer edits a blank design under that link; the app goes back to Home and says the link needs a build with rooms.
+- A browser tab no longer shows install commands for a computer it cannot see: the chat column and the agent cards leave those to the companion that runs the agents.
+- The Design panel reports a snapshot this build cannot refresh as information, not an error.
+
+### Performance
+
+- An AI agent's cursor moves smoothly while it writes a design, and the live preview of what it writes updates about three times faster on long designs.
+- An AI agent editing a large page stalls the editor far less after each change: the change review copies and compares only the layers the call touched, its preview images render one at a time between the agent's calls, the chat saves at most every five seconds while the agent works, and the design check runs once the reply ends.
+- The editor loads about 2.6 MB less JavaScript at startup, since the peer-to-peer room client, Settings, guided AI setup, the variables window, the code panel, the Markdown renderer, the AI providers' SDKs, and the web font catalog client now load when first used.
+
 ## 0.16.0 — 2026-10-14
 
 Pairdraw 0.16 adds comments, shared rooms with voice calls and agents you can follow, slots, component properties, and components that behave like real controls in Preview, plus shader fills, a Lint tab, variable modes on layers, a pencil tool, and Vue and React code in the Code tab. `.fig` files open and save much closer to Figma, saving only what an edit changed, and selection, pasting, auto layout, text, and trackpad navigation follow Figma. The desktop app needs macOS 13 or later, and `pairdraw-mcp` must be updated together with the app.

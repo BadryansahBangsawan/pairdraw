@@ -1,1 +1,0 @@
-- The highlight that marks layers an AI agent edited animates and fades as intended, instead of staying on the canvas until something else redrew it.

@@ -1,1 +1,0 @@
-- Scripts bind variables with `pairdraw.bindVariable(node, field, variable)` and `pairdraw.unbindVariable(node, field)`, taking a variable from `figma.variables`; `figma.bindVariable` and `figma.unbindVariable` are removed, so `figma` keeps to Figma's Plugin API.

@@ -1,1 +1,0 @@
-- `@pairdraw/core` declares `ai` as an optional peer dependency: `toolsToAI` uses the `ai` you install instead of bundling a copy of its types.

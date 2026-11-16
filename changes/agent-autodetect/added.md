@@ -1,1 +1,0 @@
-- When no AI model is set up, the chat uses a coding agent already installed on this computer (Claude Code, Codex, or Gemini CLI) and says which one it uses; an agent that still needs a sign-in or its connector offers that with one button in the chat column, and nothing is installed without that click.

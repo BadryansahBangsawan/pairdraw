@@ -1,1 +1,0 @@
-- AI providers, models, and coding agents show their maker's own logo, in colour where the brand has one, in Settings, guided setup, and the chat's model picker; a model reached through OpenRouter or another router shows its maker's logo.

@@ -1,5 +1,0 @@
-- Documents can carry their own fonts: drop a TTF, OTF, WOFF, or WOFF2 file onto the canvas and its family appears in the font picker, travels inside the `.fig` file, and ships with web and Storybook exports.
-- An icon's glyph can follow a text variable, so switching a mode swaps the icon it draws.
-- Libraries ship a built-in original set, Pairdraw Basics: button, input, badge, card, and avatar. Seed it into any filesystem catalog with `pairdraw libraries seed`.
-- Import a local stylesheet's custom properties into a document's variables with `pairdraw tokens --import`.
-- Paint mesh gradients: a grid of colored points that blends across the layer, editable in the fill picker's Mesh tab, stored in `.fig` files, and imported from `.pen` documents.

@@ -1,1 +1,0 @@
-- The canvas shows an AI agent drawing: layers it adds trace in one after another, layers it changes flash, the frames it works in shimmer until it stops, and a notice then counts what it added and changed, with **Show** to select them; **Animate AI edits** in Settings turns it off, and it follows the app's Animations, reduced motion, and Ultralight settings.

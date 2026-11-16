@@ -1,1 +1,0 @@
-- `@pairdraw/dom-css`, `@pairdraw/design-jsx`, `@pairdraw/emit`, and `@pairdraw/cli` load under Bun 1.3 again, and so does `@pairdraw/core/io`, which imports Design JSX; their internal imports named files without an extension, which Bun 1.3 does not add (#1397).

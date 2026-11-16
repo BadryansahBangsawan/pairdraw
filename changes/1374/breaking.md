@@ -1,1 +1,0 @@
-- `lineArrowEndpoints` is removed from `@pairdraw/scene-graph/arrow-caps`; `lineStrokeEnds` gives the path a line's stroke runs along. `StrokeCorners` from `@pairdraw/scene-graph/geometry` is renamed `StrokeShape` and takes the layer's `type`.

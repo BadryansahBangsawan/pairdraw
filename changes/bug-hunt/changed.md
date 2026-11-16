@@ -1,3 +1,0 @@
-- The top bar shows your own avatar only while it lists your AI agents, since Pairdraw has no live rooms to show it to.
-- In the desktop app, signing in to OpenRouter returns through a port on this computer, which OpenRouter accepts, instead of a hosted web page.
-- On macOS the desktop app has no title bar: the close, minimize, and zoom buttons sit in the top bar, whose empty parts move the window.

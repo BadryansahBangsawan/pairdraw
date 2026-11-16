@@ -1,1 +1,0 @@
-- `useCanvas` in `@pairdraw/vue` takes an `onFailed` callback for a canvas that cannot start, as when CanvasKit fails to load.

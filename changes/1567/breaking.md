@@ -1,1 +1,0 @@
-- `clipPolygon` and `clipBoundsToPolygon` move from `@pairdraw/scene-graph/geometry` to `@pairdraw/scene-graph/clipping`.

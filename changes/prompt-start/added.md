@@ -1,1 +1,0 @@
-- Home offers a prompt that starts the AI chat: describe what to design, and Pairdraw opens the document's chat and sends it, running AI setup first when no model is configured; **Prompt on empty pages** in **Settings → Models → Chat** also offers one over an empty page of a design.

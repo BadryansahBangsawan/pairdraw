@@ -1,5 +1,0 @@
-- Shader fills can now draw code you write. Open a shader fill's picker, press the code button, and edit GLSL: the canvas draws it live, and a mistake leaves the last good version on screen with the error under the editor.
-- Shader effects: a layer can now run a shader over itself. The effect editor takes GLSL and inputs, samples the layer it sits on and the shape's distance field, and a compile error leaves the last good version on screen.
-- Shader inputs in the fill panel can be bound to document variables, so one number, colour, or switch drives every shader that reads it.
-- `@time` and `@resolution` inputs animate on the canvas while animations are on.
-- A `.pen` file's shader paints and shader effects now import with their source, and its shader files are listed as assets.

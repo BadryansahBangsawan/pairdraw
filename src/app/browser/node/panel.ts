@@ -1,5 +1,10 @@
 import type { Editor } from '@pairdraw/core'
-import { readBrowserNode, withBrowserNode } from '@pairdraw/scene-graph/browser-node'
+import type { SceneNode } from '@pairdraw/scene-graph'
+import {
+  readBrowserNode,
+  withBrowserNode,
+  type BrowserNodeRecord
+} from '@pairdraw/scene-graph/browser-node'
 
 import { IS_TAURI } from '@/constants'
 
@@ -13,6 +18,18 @@ const UNDO_LABEL = 'Edit browser snapshot'
 
 type SnapshotStore = Pick<Editor, 'graph' | 'updateNodeWithUndo'>
 
+/** The layer and the snapshot it stores, or why it has none to edit. */
+function storedSnapshot(
+  store: SnapshotStore,
+  nodeId: string
+): { ok: true; node: SceneNode; stored: BrowserNodeRecord } | { ok: false; error: string } {
+  const node = store.graph.getNode(nodeId)
+  if (!node) return { ok: false, error: BROWSER_NODE_FAILURE.missingLayer }
+  const stored = readBrowserNode(node)
+  if (!stored) return { ok: false, error: BROWSER_NODE_FAILURE.notSnapshot }
+  return { ok: true, node, stored }
+}
+
 /**
  * Writes a snapshot's address in one undo step. The same address, or one the window would
  * refuse, leaves the layer alone. Nothing here loads a page.
@@ -22,10 +39,9 @@ export function saveBrowserNodeAddress(
   nodeId: string,
   draft: string
 ): { ok: true } | { ok: false; error: string } {
-  const node = store.graph.getNode(nodeId)
-  if (!node) return { ok: false, error: BROWSER_NODE_FAILURE.missingLayer }
-  const stored = readBrowserNode(node)
-  if (!stored) return { ok: false, error: BROWSER_NODE_FAILURE.notSnapshot }
+  const snapshot = storedSnapshot(store, nodeId)
+  if (!snapshot.ok) return snapshot
+  const { node, stored } = snapshot
   const address = browserNodeAddress(draft)
   if (!address.ok) return address
   if (address.url === stored.url) return { ok: true }
@@ -47,10 +63,9 @@ export function saveBrowserNodePreset(
   preset: string,
   resize: (width: number, height: number) => Promise<void> = sizeBrowserWindow
 ): { ok: true } | { ok: false; error: string } {
-  const node = store.graph.getNode(nodeId)
-  if (!node) return { ok: false, error: BROWSER_NODE_FAILURE.missingLayer }
-  const stored = readBrowserNode(node)
-  if (!stored) return { ok: false, error: BROWSER_NODE_FAILURE.notSnapshot }
+  const snapshot = storedSnapshot(store, nodeId)
+  if (!snapshot.ok) return snapshot
+  const { node, stored } = snapshot
   const next = browserNodePreset(preset)
   if (next !== stored.preset) {
     const pluginData = withBrowserNode(node, { ...stored, preset: next })

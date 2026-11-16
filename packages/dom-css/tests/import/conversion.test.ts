@@ -198,6 +198,18 @@ describe('@pairdraw/dom-css conversion', () => {
     expect(card.effects[0]?.type).toBe('DROP_SHADOW')
   })
 
+  it('names a layer after the data-name the HTML export writes', async () => {
+    const graph = await htmlToSceneGraph(
+      '<div data-name="Preview Thumbnail" id="hero" style="width: 10px; height: 10px"></div>' +
+        '<div id="badge" style="width: 10px; height: 10px"></div>',
+      { runtime: createHeadlessCSSRuntime() }
+    )
+    const page = graph.getPages()[0]
+    const names = page ? graph.getChildren(page.id).map((node) => node.name) : []
+
+    expect(names).toEqual(['Preview Thumbnail', 'badge'])
+  })
+
   it('applies embedded HTML style blocks without creating style layers', async () => {
     const graph = await htmlToSceneGraph(
       `<!doctype html>

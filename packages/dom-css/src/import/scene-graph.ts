@@ -512,7 +512,8 @@ function createElementNode(
   }
 
   const node = graph.createNode('FRAME', parentId, {
-    name: element.attrs.id || element.attrs.class || element.tagName,
+    // The HTML export writes each layer's own name as `data-name`.
+    name: element.attrs['data-name'] || element.attrs.id || element.attrs.class || element.tagName,
     clipsContent: false
   })
   applyElementStyle(graph, node, element, style)

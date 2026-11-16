@@ -1,0 +1,1 @@
+- Publishing a library no longer counts a text component as changed when only its measured text height was recalculated.

@@ -19,6 +19,7 @@ const VOLATILE_NODE_FIELDS = new Set([
   'textPicture',
   'derivedTextGlyphs',
   'derivedLayout',
+  'derivedTextHeight',
   'librarySource'
 ])
 

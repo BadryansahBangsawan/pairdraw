@@ -1,9 +1,11 @@
-import { describe, expect, test } from 'bun:test'
+import { beforeAll, describe, expect, test } from 'bun:test'
 
 import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
 import { createLibraryRevision, discoverPublishableLibraryChanges } from '@pairdraw/core/library'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph } from '@pairdraw/scene-graph'
+
+import { registerTestFont } from '#tests/helpers/fonts/bundled'
 
 function source() {
   const graph = new SceneGraph()
@@ -17,6 +19,10 @@ function source() {
   graph.createNode('TEXT', component.id, { name: 'Label', text: 'Button', width: 60, height: 20 })
   return graph
 }
+
+// The app always has its fonts, and a FIG export measures text with them; the fonts' state in the
+// process-wide font manager must not decide what a round trip changes.
+beforeAll(() => registerTestFont())
 
 describe('library hash normalization', () => {
   test('ignores representation-only FIG round-trip changes', async () => {

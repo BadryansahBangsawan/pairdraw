@@ -4,7 +4,7 @@ import { computed, ref, useId, watch } from 'vue'
 
 import { useBrowserMessages } from '@pairdraw/vue/i18n'
 
-import { browserNodeFailureHeading } from '@/app/browser/node/failure'
+import { BROWSER_NODE_FAILURE, browserNodeFailureHeading } from '@/app/browser/node/failure'
 import { browserNodeRefreshedTime } from '@/app/browser/node/panel'
 import { BROWSER_DEVICES } from '@/app/browser/state'
 import { browserURLPolicy, type BrowserURLRejection } from '@/app/browser/url'
@@ -75,7 +75,12 @@ const refreshedLabel = computed(() => browserNodeRefreshedTime(refreshedAt))
 const notice = computed(() => {
   if (localError.value) return { tone: 'error' as const, heading: localError.value }
   if (error) {
-    return { tone: 'error' as const, heading: browserNodeFailureHeading(error, messages.value) }
+    // A webview this tab cannot control is expected here, not a failure: it says so.
+    const expected = error === BROWSER_NODE_FAILURE.desktopOnly
+    return {
+      tone: expected ? ('info' as const) : ('error' as const),
+      heading: browserNodeFailureHeading(error, messages.value)
+    }
   }
   if (!canRefresh) {
     return { tone: 'info' as const, heading: messages.value.snapshotCannotRefresh }

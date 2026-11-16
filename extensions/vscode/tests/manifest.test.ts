@@ -111,7 +111,7 @@ describe('VS Code extension manifest', () => {
       { command: 'pairdraw.openEditor', title: 'Open Pairdraw Editor', category: 'Pairdraw' },
       {
         command: 'pairdraw.exportSelection',
-        title: 'Export Selection as PNG',
+        title: 'Export as PNG',
         category: 'Pairdraw'
       }
     ])

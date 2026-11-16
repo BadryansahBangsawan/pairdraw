@@ -65,7 +65,7 @@
       },
       {
         "command": "pairdraw.exportSelection",
-        "title": "Export Selection as PNG",
+        "title": "Export as PNG",
         "category": "Pairdraw"
       }
     ],

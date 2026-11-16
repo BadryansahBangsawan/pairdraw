@@ -16,5 +16,5 @@ export interface SidebarAction {
 export const SIDEBAR_ACTIONS: readonly SidebarAction[] = [
   { command: COMMAND_IDS.openEditor, title: 'Open Pairdraw Editor' },
   { command: COMMAND_IDS.toggleDesignMode, title: 'Toggle Design Mode' },
-  { command: COMMAND_IDS.exportSelection, title: 'Export Selection as PNG' }
+  { command: COMMAND_IDS.exportSelection, title: 'Export as PNG' }
 ]

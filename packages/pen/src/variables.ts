@@ -79,7 +79,11 @@ export function resolveBoolean(
 ): boolean {
   if (value === undefined) return fallback
   if (typeof value === 'boolean') return value
-  return isVarRef(value) ? ctx.resolveBoolean(value) : value !== 'false'
+  if (isVarRef(value)) return ctx.resolveBoolean(value)
+  // Text other than true or false, such as `no` or `0`, reads as the default, as a missing
+  // value does.
+  const text = value.toLowerCase()
+  return text === 'true' || text === 'false' ? text === 'true' : fallback
 }
 
 /** A string, or the value of the string variable it references. */

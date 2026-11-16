@@ -6,3 +6,4 @@
 - Saving a `.pen` file keeps each layer's `metadata` instead of dropping it.
 - Opening a `.pen` file that repeats a layer ID keeps every layer instead of losing one or detaching its children.
 - A `.pen` gradient of an unknown type opens as a linear gradient instead of disappearing.
+- In `.pen` files, text such as `no` or `0` in a true/false field reads as the field's default instead of turning it on.

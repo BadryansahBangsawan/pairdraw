@@ -298,3 +298,22 @@ describe('parsePenFile — themes', () => {
     expect(graph.getNode('accent')?.variableModes[id]).toBeUndefined()
   })
 })
+
+describe('parsePenFile — boolean text', () => {
+  test('reads only true and false as booleans and other text as the default', () => {
+    const graph = parsePenFile(
+      JSON.stringify({
+        version: '2.21',
+        children: [
+          { id: 'no', type: 'frame', clip: 'no' },
+          { id: 'upper', type: 'frame', clip: 'TRUE', enabled: 'False' }
+        ]
+      })
+    )
+    const no = expectDefined(graph.getNode('no'), 'no')
+    expect(no.clipsContent).toBe(false)
+    const upper = expectDefined(graph.getNode('upper'), 'upper')
+    expect(upper.clipsContent).toBe(true)
+    expect(upper.visible).toBe(false)
+  })
+})

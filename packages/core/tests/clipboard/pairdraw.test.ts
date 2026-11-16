@@ -82,6 +82,55 @@ describe('Pairdraw clipboard parsing', () => {
   })
 })
 
+describe('Pairdraw clipboard fields the graph reads', () => {
+  const solid = { type: 'SOLID', color: { r: 1, g: 0, b: 0, a: 1 }, opacity: 1, visible: true }
+  const pasted = (fields: Record<string, unknown>) =>
+    parsePairdrawClipboard(
+      clipboardHTML(
+        JSON.stringify({
+          format: 'pairdraw/v1',
+          nodes: [{ id: '0:1', type: 'RECTANGLE', name: 'Card', x: 0, y: 0, ...fields }]
+        })
+      )
+    )?.nodes[0]
+
+  test.each([
+    ['fills', 5],
+    ['fills', [null]],
+    ['strokes', 5],
+    ['effects', 5],
+    ['source', 5],
+    ['source', { format: 'fig', id: null, orderKey: null, editedFields: 5, fig: {} }]
+  ])('drops malformed %s %j and keeps the layer', (key, value) => {
+    const node = pasted({ [key]: value, opacity: 0.5 })
+    expect(node).toMatchObject({ id: '0:1', name: 'Card', opacity: 0.5 })
+    expect(node && Object.hasOwn(node, key)).toBe(false)
+  })
+
+  test('keeps well-formed paints with their key order', () => {
+    const node = pasted({ fills: [solid], strokes: [solid], effects: [] })
+    expect<unknown>(node?.fills).toEqual([solid])
+    expect(node && Object.keys(node.fills[0])).toEqual(Object.keys(solid))
+    expect<unknown>(node?.strokes).toEqual([solid])
+  })
+
+  test('drops malformed fills inside geometry', () => {
+    const node = pasted({
+      type: 'VECTOR',
+      fillGeometry: [{ windingRule: 'NONZERO', commandsBlob: { 0: 1 }, fills: 5 }]
+    })
+    expect(node?.fillGeometry).toHaveLength(1)
+    expect(node && Object.hasOwn(node.fillGeometry[0], 'fills')).toBe(false)
+  })
+
+  test('gives strokes from older payloads without a type a solid type', () => {
+    const { type: _type, ...untyped } = solid
+    expect<unknown>(pasted({ strokes: [untyped] })?.strokes).toEqual([
+      { ...untyped, type: 'SOLID' }
+    ])
+  })
+})
+
 describe('Pairdraw clipboard and script nodes', () => {
   test('carries a script node source through copy and paste', () => {
     const graph = new SceneGraph()

@@ -1,3 +1,4 @@
+import { isPlainObject, omit } from 'es-toolkit'
 import { deflateSync, inflateSync } from 'fflate'
 import { fromUint8Array, isValid, toUint8Array } from 'js-base64'
 import * as v from 'valibot'
@@ -16,6 +17,7 @@ import {
   setInstanceOverride,
   type InstanceOverrideState
 } from '@pairdraw/scene-graph/instances/overrides'
+import { fillSchema } from '@pairdraw/scene-graph/paints'
 import type { JSONObject } from '@pairdraw/scene-graph/primitives'
 
 import type { ClipboardSnapshot } from '#core/editor/clipboard/copy'
@@ -93,6 +95,42 @@ const serializedClipboardNodeSchema: v.GenericSchema<unknown, SerializedClipboar
     children: v.optional(v.array(v.lazy(() => serializedClipboardNodeSchema)))
   })
 
+const paintsSchema = v.array(fillSchema)
+const effectsSchema = v.array(v.unknown())
+const sourceMetadataSchema = v.looseObject({
+  format: v.nullable(v.literal('fig')),
+  id: v.nullable(v.string()),
+  orderKey: v.nullable(v.string()),
+  editedFields: v.array(v.string()),
+  fig: v.looseObject({})
+})
+
+/**
+ * Fields the graph reads without checking. `v.is` checks them without parsing, which would reorder
+ * paint keys; a malformed field is dropped and the rest of the layer kept.
+ */
+const CHECKED_FIELDS: [string, v.GenericSchema][] = [
+  ['fills', paintsSchema],
+  ['strokes', paintsSchema],
+  ['effects', effectsSchema],
+  ['source', sourceMetadataSchema]
+]
+
+function malformedFields(fields: Record<string, unknown>, checked = CHECKED_FIELDS): string[] {
+  return checked
+    .filter(([key, schema]) => key in fields && !v.is(schema, fields[key]))
+    .map(([key]) => key)
+}
+
+/** Payloads from v0.15.1 and earlier wrote strokes without a paint type; they are solid. */
+function withStrokeTypes(fields: Record<string, unknown>): Record<string, unknown> {
+  if (!Array.isArray(fields.strokes)) return fields
+  const strokes = fields.strokes.map((stroke: unknown) =>
+    isPlainObject(stroke) && !Object.hasOwn(stroke, 'type') ? { ...stroke, type: 'SOLID' } : stroke
+  )
+  return { ...fields, strokes }
+}
+
 /** Clipboard HTML is writable by any application, so the payload is validated before paste. */
 const pairdrawClipboardSchema = v.pipe(
   v.string(),
@@ -154,10 +192,14 @@ function legacyInstanceOverrides(
 }
 
 function restoreGeometry(paths: SerializedGeometryPath[] | undefined): GeometryPath[] {
-  return (paths ?? []).map((path) => ({
-    ...path,
-    commandsBlob: Uint8Array.from(Object.values(path.commandsBlob))
-  }))
+  return (paths ?? []).map((path) => {
+    const { fills, ...rest } = path
+    return {
+      ...rest,
+      ...(v.is(paintsSchema, fills) ? { fills } : {}),
+      commandsBlob: Uint8Array.from(Object.values(path.commandsBlob))
+    }
+  })
 }
 
 /** Clipboard HTML comes from other applications, so its Base64 is checked before decoding. */
@@ -168,14 +210,16 @@ function clipboardBytes(value: string): Uint8Array {
 
 function restoreNodeData(nodes: SerializedClipboardNode[]): ClipboardNode[] {
   return nodes.map((node) => {
-    const { children, instanceOverrides, overrides, textPicture, ...rest } = node
+    const { children, instanceOverrides, overrides, textPicture, ...fields } = node
+    const typed = withStrokeTypes(fields)
+    const rest = { ...omit(typed, malformedFields(typed)), id: node.id, type: node.type }
     const overrideState = instanceOverrides
       ? deserializeInstanceOverrideState(instanceOverrides)
       : legacyInstanceOverrides(rest.id, overrides)
     return {
       ...rest,
-      fillGeometry: restoreGeometry(rest.fillGeometry),
-      strokeGeometry: restoreGeometry(rest.strokeGeometry),
+      fillGeometry: restoreGeometry(node.fillGeometry),
+      strokeGeometry: restoreGeometry(node.strokeGeometry),
       instanceOverrides: overrideState,
       textPicture: typeof textPicture === 'string' ? clipboardBytes(textPicture) : textPicture,
       ...(children ? { children: restoreNodeData(children) } : {})

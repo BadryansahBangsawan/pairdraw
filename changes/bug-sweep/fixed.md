@@ -30,3 +30,4 @@
 - Imported out-of-range and wide-gamut CSS colors are now clamped or mapped into sRGB, as browsers show them.
 - A `.fig` file with a nested color expression now opens with the variable kept unsupported instead of failing.
 - A message written while a chat reply runs now stays with its document across tab switches and is sent once that reply ends, instead of getting stuck or going to another document's chat.
+- Pasting a malformed Pairdraw clipboard payload no longer creates layers that break saving as `.fig` or copying them again, and strokes copied from older versions paste as solid strokes.

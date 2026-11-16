@@ -36,3 +36,4 @@
 - JSX export of a page or document now exports its top-level layers instead of failing with "Nothing to export".
 - `export` reports the real file size of text exports that contain non-ASCII characters.
 - `convert --help` lists every output format it can write.
+- Changing a setting keeps preferences that a newer version of Pairdraw saved.

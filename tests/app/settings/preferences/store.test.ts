@@ -6,6 +6,7 @@ import {
   appPreferences,
   DEFAULT_APP_PREFERENCES,
   parseAppPreferences,
+  updateAISetupState,
   updateCanvasRenderingMode,
   updateNavigationPreferences,
   updateRenderingPreferences,
@@ -176,6 +177,28 @@ describe('parseAppPreferences', () => {
       expect(appPreferences.value.rendering).toEqual({ canvasMode: 'tiled', ultralight: true })
     } finally {
       appPreferences.value = stored
+    }
+  })
+
+  test('keeps settings a newer build stored, so saving here does not erase them', () => {
+    const stored = {
+      chat: { followAgents: false, voiceInput: true },
+      onboarding: { aiSetup: 'pending', tour: 'seen' },
+      sync: { enabled: true }
+    }
+    expect(parseAppPreferences(stored)).toMatchObject(stored)
+    const saved = structuredClone(toRaw(appPreferences.value))
+    try {
+      appPreferences.value = parseAppPreferences(stored)
+      updateZoomSpeed(2)
+      updateAISetupState('done')
+      expect(appPreferences.value).toMatchObject({
+        chat: { voiceInput: true },
+        onboarding: { aiSetup: 'done', tour: 'seen' },
+        sync: { enabled: true }
+      })
+    } finally {
+      appPreferences.value = saved
     }
   })
 

@@ -178,9 +178,24 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
 
 const STORAGE_KEY = 'pairdraw:preferences:v1'
 
-/** An object whose fields each fall back to their default, and that is all defaults when absent. */
-function section<TEntries extends v.ObjectEntries>(entries: TEntries) {
-  const schema = v.object(entries)
+/** Keys earlier builds stored that this build removed; every other unknown key is kept for newer builds. */
+const REMOVED_KEYS = { root: ['sharing'], designCheck: ['showOnCanvas'] } as const
+
+/**
+ * An object whose fields each fall back to their default, and that is all defaults when absent.
+ * Keys it does not know stay, so a save here keeps what a newer build stored, except `removed`.
+ */
+function section<TEntries extends v.ObjectEntries>(
+  entries: TEntries,
+  removed: readonly string[] = []
+) {
+  const schema = v.pipe(
+    v.looseObject(entries),
+    v.transform((value) => {
+      for (const key of removed) Reflect.deleteProperty(value, key)
+      return value
+    })
+  )
   return v.fallback(schema, () => v.parse(schema, {}))
 }
 
@@ -189,98 +204,104 @@ const snapping = defaults.editing.snapping
 const nudge = defaults.editing.nudge
 
 /** Stored preferences, read field by field so one bad value keeps the rest. */
-const appPreferencesSchema = section({
-  appearance: section({
-    animations: v.fallback(v.picklist(ANIMATION_PREFERENCES), defaults.appearance.animations),
-    accent: v.fallback(accentPreferenceSchema, () => ({ ...DEFAULT_ACCENT }))
-  }),
-  chat: section({
-    reasoningDisplay: v.fallback(v.picklist(REASONING_DISPLAYS), defaults.chat.reasoningDisplay),
-    maxAgentSteps: v.fallback(
-      v.pipe(v.unknown(), v.transform(resolveAgentStepLimit)),
-      defaults.chat.maxAgentSteps
-    ),
-    changePreviewSize: v.fallback(
-      v.picklist(CHANGE_PREVIEW_SIZES),
-      defaults.chat.changePreviewSize
-    ),
-    followAgents: v.fallback(v.boolean(), defaults.chat.followAgents),
-    columnOpen: v.fallback(v.boolean(), defaults.chat.columnOpen),
-    canvasPrompt: v.fallback(v.boolean(), defaults.chat.canvasPrompt),
-    animateEdits: v.fallback(v.boolean(), defaults.chat.animateEdits),
-    approveActions: v.fallback(v.boolean(), defaults.chat.approveActions)
-  }),
-  files: section({
-    recentLimit: v.fallback(recentFilesLimitSchema, defaults.files.recentLimit)
-  }),
-  version: v.fallback(v.literal(1), 1),
-  recovery: section({ enabled: v.fallback(v.boolean(), defaults.recovery.enabled) }),
-  editing: section({
-    snapping: section({
-      geometry: v.fallback(v.boolean(), snapping.geometry),
-      objects: v.fallback(v.boolean(), snapping.objects),
-      pixelGrid: v.fallback(v.boolean(), snapping.pixelGrid),
-      halfPixel: v.fallback(v.boolean(), snapping.halfPixel ?? false)
+const appPreferencesSchema = section(
+  {
+    appearance: section({
+      animations: v.fallback(v.picklist(ANIMATION_PREFERENCES), defaults.appearance.animations),
+      accent: v.fallback(accentPreferenceSchema, () => ({ ...DEFAULT_ACCENT }))
     }),
-    nudge: section({
-      small: v.fallback(nudgeDistanceSchema, nudge.small),
-      large: v.fallback(nudgeDistanceSchema, nudge.large)
-    })
-  }),
-  navigation: section({
-    zoomSpeed: v.fallback(v.picklist(ZOOM_SPEEDS), defaults.navigation.zoomSpeed),
-    wheelZoom: v.fallback(v.boolean(), defaults.navigation.wheelZoom),
-    invertZoom: v.fallback(v.boolean(), defaults.navigation.invertZoom)
-  }),
-  rendering: section({
-    canvasMode: v.fallback(v.picklist(CANVAS_RENDERING_MODES), defaults.rendering.canvasMode),
-    ultralight: v.fallback(v.boolean(), defaults.rendering.ultralight)
-  }),
-  view: section({
-    pixelGrid: v.fallback(v.boolean(), defaults.view.pixelGrid)
-  }),
-  workspace: section({
-    layersOpen: v.fallback(v.boolean(), defaults.workspace.layersOpen),
-    propertiesOpen: v.fallback(v.boolean(), defaults.workspace.propertiesOpen)
-  }),
-  designCheck: section({
-    preset: v.fallback(v.picklist(DESIGN_CHECK_PRESETS), defaults.designCheck.preset),
-    disabledRules: v.fallback(
-      v.pipe(
-        v.array(v.unknown()),
-        v.transform((rules) => uniq(rules.filter((rule) => typeof rule === 'string')))
+    chat: section({
+      reasoningDisplay: v.fallback(v.picklist(REASONING_DISPLAYS), defaults.chat.reasoningDisplay),
+      maxAgentSteps: v.fallback(
+        v.pipe(v.unknown(), v.transform(resolveAgentStepLimit)),
+        defaults.chat.maxAgentSteps
       ),
-      () => []
-    )
-  }),
-  comments: section({
-    showOnCanvas: v.fallback(v.boolean(), defaults.comments.showOnCanvas),
-    showResolved: v.fallback(v.boolean(), defaults.comments.showResolved),
-    onlyPage: v.fallback(v.boolean(), defaults.comments.onlyPage),
-    onlyMine: v.fallback(v.boolean(), defaults.comments.onlyMine),
-    sort: v.fallback(v.picklist(COMMENT_SORTS), defaults.comments.sort)
-  }),
-  toolbar: v.fallback(
-    v.pipe(
-      v.object({
-        groups: v.fallback(v.array(v.array(v.unknown())), () =>
-          structuredClone(DEFAULT_TOOLBAR_LAYOUT.groups)
-        ),
-        hidden: v.fallback(v.array(v.unknown()), () => [])
+      changePreviewSize: v.fallback(
+        v.picklist(CHANGE_PREVIEW_SIZES),
+        defaults.chat.changePreviewSize
+      ),
+      followAgents: v.fallback(v.boolean(), defaults.chat.followAgents),
+      columnOpen: v.fallback(v.boolean(), defaults.chat.columnOpen),
+      canvasPrompt: v.fallback(v.boolean(), defaults.chat.canvasPrompt),
+      animateEdits: v.fallback(v.boolean(), defaults.chat.animateEdits),
+      approveActions: v.fallback(v.boolean(), defaults.chat.approveActions)
+    }),
+    files: section({
+      recentLimit: v.fallback(recentFilesLimitSchema, defaults.files.recentLimit)
+    }),
+    version: v.fallback(v.literal(1), 1),
+    recovery: section({ enabled: v.fallback(v.boolean(), defaults.recovery.enabled) }),
+    editing: section({
+      snapping: section({
+        geometry: v.fallback(v.boolean(), snapping.geometry),
+        objects: v.fallback(v.boolean(), snapping.objects),
+        pixelGrid: v.fallback(v.boolean(), snapping.pixelGrid),
+        halfPixel: v.fallback(v.boolean(), snapping.halfPixel ?? false)
       }),
-      v.transform(({ groups, hidden }) => normalizeToolbarLayout(groups, hidden))
+      nudge: section({
+        small: v.fallback(nudgeDistanceSchema, nudge.small),
+        large: v.fallback(nudgeDistanceSchema, nudge.large)
+      })
+    }),
+    navigation: section({
+      zoomSpeed: v.fallback(v.picklist(ZOOM_SPEEDS), defaults.navigation.zoomSpeed),
+      wheelZoom: v.fallback(v.boolean(), defaults.navigation.wheelZoom),
+      invertZoom: v.fallback(v.boolean(), defaults.navigation.invertZoom)
+    }),
+    rendering: section({
+      canvasMode: v.fallback(v.picklist(CANVAS_RENDERING_MODES), defaults.rendering.canvasMode),
+      ultralight: v.fallback(v.boolean(), defaults.rendering.ultralight)
+    }),
+    view: section({
+      pixelGrid: v.fallback(v.boolean(), defaults.view.pixelGrid)
+    }),
+    workspace: section({
+      layersOpen: v.fallback(v.boolean(), defaults.workspace.layersOpen),
+      propertiesOpen: v.fallback(v.boolean(), defaults.workspace.propertiesOpen)
+    }),
+    designCheck: section(
+      {
+        preset: v.fallback(v.picklist(DESIGN_CHECK_PRESETS), defaults.designCheck.preset),
+        disabledRules: v.fallback(
+          v.pipe(
+            v.array(v.unknown()),
+            v.transform((rules) => uniq(rules.filter((rule) => typeof rule === 'string')))
+          ),
+          () => []
+        )
+      },
+      REMOVED_KEYS.designCheck
     ),
-    () => structuredClone(DEFAULT_TOOLBAR_LAYOUT)
-  ),
-  onboarding: section({
-    aiSetup: v.fallback(v.picklist(AI_SETUP_STATES), defaults.onboarding.aiSetup)
-  }),
-  notifications: section({
-    agentNeedsInput: v.fallback(v.boolean(), defaults.notifications.agentNeedsInput),
-    agentFinished: v.fallback(v.boolean(), defaults.notifications.agentFinished),
-    agentFailed: v.fallback(v.boolean(), defaults.notifications.agentFailed)
-  })
-})
+    comments: section({
+      showOnCanvas: v.fallback(v.boolean(), defaults.comments.showOnCanvas),
+      showResolved: v.fallback(v.boolean(), defaults.comments.showResolved),
+      onlyPage: v.fallback(v.boolean(), defaults.comments.onlyPage),
+      onlyMine: v.fallback(v.boolean(), defaults.comments.onlyMine),
+      sort: v.fallback(v.picklist(COMMENT_SORTS), defaults.comments.sort)
+    }),
+    toolbar: v.fallback(
+      v.pipe(
+        v.object({
+          groups: v.fallback(v.array(v.array(v.unknown())), () =>
+            structuredClone(DEFAULT_TOOLBAR_LAYOUT.groups)
+          ),
+          hidden: v.fallback(v.array(v.unknown()), () => [])
+        }),
+        v.transform(({ groups, hidden }) => normalizeToolbarLayout(groups, hidden))
+      ),
+      () => structuredClone(DEFAULT_TOOLBAR_LAYOUT)
+    ),
+    onboarding: section({
+      aiSetup: v.fallback(v.picklist(AI_SETUP_STATES), defaults.onboarding.aiSetup)
+    }),
+    notifications: section({
+      agentNeedsInput: v.fallback(v.boolean(), defaults.notifications.agentNeedsInput),
+      agentFinished: v.fallback(v.boolean(), defaults.notifications.agentFinished),
+      agentFailed: v.fallback(v.boolean(), defaults.notifications.agentFailed)
+    })
+  },
+  REMOVED_KEYS.root
+)
 
 /** Reads stored preferences, keeping every valid field and defaulting the rest. */
 export function parseAppPreferences(value: unknown): AppPreferences {
@@ -314,7 +335,10 @@ export function updateRecoveryEnabled(enabled: boolean): void {
 }
 
 export function updateAISetupState(aiSetup: AISetupState): void {
-  appPreferences.value = { ...appPreferences.value, onboarding: { aiSetup } }
+  appPreferences.value = {
+    ...appPreferences.value,
+    onboarding: { ...appPreferences.value.onboarding, aiSetup }
+  }
 }
 
 export function updateNotificationPreferences(changes: Partial<NotificationPreferences>): void {

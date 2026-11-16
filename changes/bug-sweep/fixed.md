@@ -15,3 +15,4 @@
 - Damaged `.fig` files and Figma clipboard data fail with an error instead of freezing the app or loading wrong values, and text with an unpaired surrogate no longer loses the character after it when saved.
 - A raw `.fig` file that is cut short reports a corrupted file instead of a range error.
 - `parseVarint` from `@pairdraw/kiwi/fig` reads values of 2³¹ and above correctly.
+- Text whose characters bind a size or spacing to a variable keeps its scaled size after the Scale tool, and a bound font weight no longer changes with the scale.

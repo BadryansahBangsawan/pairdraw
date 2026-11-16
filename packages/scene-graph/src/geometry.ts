@@ -472,13 +472,14 @@ function collectDescendantVisualBounds(
     node.type === 'FRAME' || node.type === 'COMPONENT' || node.type === 'INSTANCE'
   let childClip = clip
   if (isClippableContainer && node.clipsContent) {
-    const abs = getAbsolutePosition(node.id)
-    const nodeClip = {
-      minX: abs.x,
-      minY: abs.y,
-      maxX: abs.x + node.width,
-      maxY: abs.y + node.height
-    }
+    // The frame's own drawn box, so a turned frame clips where it is drawn. For an unturned,
+    // unflipped frame this is the same box as its position and size give.
+    const abs = unturnedTopLeft(node, getAbsolutePosition(node.id))
+    const nodeClip = transformedLocalBounds(
+      node,
+      { x: 0, y: 0, width: node.width, height: node.height },
+      abs
+    )
     childClip = childClip ? intersectVisualBounds(childClip, nodeClip) : nodeClip
     if (!childClip) return bounds
   }

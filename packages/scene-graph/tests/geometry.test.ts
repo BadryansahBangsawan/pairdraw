@@ -2,7 +2,12 @@ import { describe, expect, test } from 'bun:test'
 
 import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
 import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
-import { nodeVisualBounds, type VisualBoundsNode } from '@pairdraw/scene-graph/geometry'
+import {
+  computeDescendantVisualBounds,
+  nodeVisualBounds,
+  type VisualBounds,
+  type VisualBoundsNode
+} from '@pairdraw/scene-graph/geometry'
 
 const at = () => ({ x: 10, y: 20 })
 
@@ -125,4 +130,38 @@ describe('visual bounds against the world matrix', () => {
       }
     }
   }
+})
+
+/** Whether an axis-aligned box holds a point. */
+function holds(box: VisualBounds, x: number, y: number): boolean {
+  return x >= box.minX && x <= box.maxX && y >= box.minY && y <= box.maxY
+}
+
+// A turned clipping frame clips where it is drawn, not by a box anchored at its turned origin.
+test('a rotated clipping frame clips to its drawn box', () => {
+  const graph = new SceneGraph()
+  const frame = graph.createNode('FRAME', graph.getPages()[0].id, {
+    x: 100,
+    y: 100,
+    width: 100,
+    height: 100,
+    rotation: 45,
+    clipsContent: true
+  })
+  graph.createNode('RECTANGLE', frame.id, { x: 0, y: 0, width: 200, height: 200 })
+
+  const bounds = computeDescendantVisualBounds(
+    [frame.id],
+    (id) => graph.getNode(id),
+    (id) => graph.getAbsolutePosition(id)
+  )
+  if (!bounds) throw new Error('Missing bounds')
+  const world = getAxisAlignedWorldBounds(frame, graph)
+
+  expect(bounds.minX).toBeCloseTo(world.x, 6)
+  expect(bounds.minY).toBeCloseTo(world.y, 6)
+  expect(bounds.maxX).toBeCloseTo(world.x + world.width, 6)
+  expect(bounds.maxY).toBeCloseTo(world.y + world.height, 6)
+  expect(holds(bounds, 150, 150)).toBe(true)
+  expect(holds(bounds, 235, 170)).toBe(false)
 })

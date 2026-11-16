@@ -48,3 +48,4 @@
 - Character-range variable bindings keep their own scale, so unbinding or deleting a variable no longer resets the size and spacing of that range.
 - Aligning a single rotated layer uses its drawn edge, so it lines up with its parent the way a group of layers does.
 - Visual bounds of a flipped layer follow its transform, so the area drawn or exported no longer shifts by the layer’s width.
+- A rotated clipping frame clips its contents to its drawn box instead of an unturned rectangle offset from its turned origin.

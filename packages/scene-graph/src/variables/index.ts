@@ -7,6 +7,7 @@ import { findInstanceAncestor } from '../instances'
 import { bindingOverrideField, setInstanceOverride } from '../instances/overrides'
 import { isShaderSourcePaint, shaderOfPaint, withShaderPaints } from '../shaders/model'
 import type {
+  SceneNode,
   Variable,
   VariableCollection,
   VariableCollectionMode,
@@ -27,8 +28,23 @@ import {
   uniformBindingTarget,
   VISIBILITY_VARIABLE_TYPES
 } from './fields'
+import { pinnedRunBindingScales } from './units'
 
 export * from './resolution'
+
+/**
+ * Gives the runs that bind `fields` the scale they resolve with as their own, before the layer's
+ * scale for those fields changes or goes, and the change to announce.
+ */
+function pinRunBindingScales(
+  node: SceneNode,
+  fields: readonly string[]
+): Pick<Partial<SceneNode>, 'styleRuns'> {
+  const styleRuns = pinnedRunBindingScales(node, fields)
+  if (!styleRuns) return {}
+  node.styleRuns = styleRuns
+  return { styleRuns }
+}
 
 export function addVariable(graph: SceneGraph, variable: Variable): void {
   graph.variables.set(variable.id, variable)
@@ -54,13 +70,15 @@ export function removeVariable(graph: SceneGraph, id: string): void {
       string,
       string
     >
-    node.variableBindingScales = omitBy(
-      node.variableBindingScales,
-      (_, field) => !(field in node.boundVariables)
+    const pruned = Object.keys(node.variableBindingScales).filter(
+      (field) => !(field in node.boundVariables)
     )
+    const runs = pinRunBindingScales(node, pruned)
+    node.variableBindingScales = omit(node.variableBindingScales, pruned)
     graph.emitter.emit('node:updated', node.id, {
       boundVariables: { ...node.boundVariables },
-      variableBindingScales: { ...node.variableBindingScales }
+      variableBindingScales: { ...node.variableBindingScales },
+      ...runs
     })
     markBoundVariablesOverrideOnInstance(graph, node.id)
   }
@@ -345,11 +363,13 @@ export function bindVariable(
   }
   graph.willChangeNode(node)
   node.boundVariables = { ...node.boundVariables, [field]: variableId }
+  const runs = pinRunBindingScales(node, [field])
   assignVariableBindingUnits(graph, node, field)
   markBoundVariablesOverrideOnInstance(graph, nodeId, field)
   graph.emitter.emit('node:updated', nodeId, {
     boundVariables: { ...node.boundVariables },
-    variableBindingScales: { ...node.variableBindingScales }
+    variableBindingScales: { ...node.variableBindingScales },
+    ...runs
   })
 }
 
@@ -359,11 +379,13 @@ export function unbindVariable(graph: SceneGraph, nodeId: string, field: string)
   if (!(field in node.boundVariables)) return
   graph.willChangeNode(node)
   node.boundVariables = omit(node.boundVariables, [field])
+  const runs = pinRunBindingScales(node, [field])
   node.variableBindingScales = omit(node.variableBindingScales, [field])
   markBoundVariablesOverrideOnInstance(graph, nodeId, field)
   graph.emitter.emit('node:updated', nodeId, {
     boundVariables: { ...node.boundVariables },
-    variableBindingScales: { ...node.variableBindingScales }
+    variableBindingScales: { ...node.variableBindingScales },
+    ...runs
   })
 }
 
@@ -397,4 +419,5 @@ export * from './formula/schema'
 export * from './schema'
 export * from './text'
 export * from './token'
+export * from './units'
 export * from './value'

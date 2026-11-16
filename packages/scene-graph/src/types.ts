@@ -429,6 +429,11 @@ export interface CharacterStyleOverride {
   fillStyleId?: string | null
   /** The characters' text field bindings, in place of the text's own. */
   boundVariables?: TextBoundVariables
+  /**
+   * The scale each number the characters bind resolves with, as a rescale left it; a field without
+   * one uses the layer's `variableBindingScales`, as runs did before they kept their own.
+   */
+  variableBindingScales?: Partial<Record<TextBindableField, number>>
 }
 
 export interface StyleRun {

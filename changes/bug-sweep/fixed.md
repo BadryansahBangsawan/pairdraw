@@ -53,3 +53,4 @@
 - Coding-agent connection errors appear in the interface language instead of English only.
 - Creating a layer in a parent that no longer exists, or restoring a layer with an id the document already has, now fails instead of leaving a detached layer or replacing the existing one.
 - S3 saves detect a document that changed elsewhere and report a conflict instead of overwriting it.
+- Character-range variable bindings keep their own scale after a rescale, so unbinding or rebinding the layer, or deleting a variable it binds, no longer resets the line height, letter spacing, or font size of those characters.

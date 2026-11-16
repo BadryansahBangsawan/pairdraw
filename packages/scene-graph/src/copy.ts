@@ -81,6 +81,8 @@ export function copyStyleRun(r: StyleRun): StyleRun {
   if (r.style.lineHeight) copy.style.lineHeight = { ...r.style.lineHeight }
   if (r.style.letterSpacing) copy.style.letterSpacing = { ...r.style.letterSpacing }
   if (r.style.boundVariables) copy.style.boundVariables = { ...r.style.boundVariables }
+  if (r.style.variableBindingScales)
+    copy.style.variableBindingScales = { ...r.style.variableBindingScales }
   return copy
 }
 

@@ -14,6 +14,7 @@ export type TextRunReferenceContext = Pick<
 
 function applyRunReferences(
   context: TextRunReferenceContext,
+  node: SceneNode,
   override: NodeChange,
   style: CharacterStyleOverride
 ): void {
@@ -32,11 +33,7 @@ function applyRunReferences(
       ? exportedStyleReference(context, style.fillStyleId)
       : { guid: { ...UNSET_GUID } }
   }
-  const entries = textRunVariableEntries(
-    style.boundVariables ?? {},
-    context.graph,
-    context.varIdToGuid
-  )
+  const entries = textRunVariableEntries(node, style, context.graph, context.varIdToGuid)
   // Figma writes a range's bindings as parameters only.
   if (entries.length > 0) override.parameterConsumptionMap = { entries }
 }
@@ -55,6 +52,6 @@ export function applyTextRunReferences(
   const styles = new Map(textStyleOverrides(node).map(({ id, style }) => [id, style]))
   for (const override of table) {
     const style = styles.get(override.styleID as number)
-    if (style) applyRunReferences(context, override, style)
+    if (style) applyRunReferences(context, node, override, style)
   }
 }

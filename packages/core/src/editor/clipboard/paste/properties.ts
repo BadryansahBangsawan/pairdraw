@@ -12,6 +12,7 @@ import {
   TEXT_STYLE_FIELDS
 } from '@pairdraw/scene-graph/fields'
 import { STYLE_LINK_FIELDS, sharedStyleRefKey } from '@pairdraw/scene-graph/shared-styles'
+import { withBoundBindingScales } from '@pairdraw/scene-graph/variables'
 
 import { parsePairdrawClipboard } from '#core/clipboard'
 import { importClipboardDependenciesWithUndo } from '#core/editor/clipboard/dependencies'
@@ -89,12 +90,13 @@ function pastedFields(source: SceneNode, target: SceneNode): PastedField[] {
 function runsWithout(runs: StyleRun[], fields: ReadonlySet<string>): StyleRun[] {
   const overrides = new Set([...fields].flatMap((field) => RUN_OVERRIDES[field] ?? [field]))
   return runs.flatMap((run) => {
-    const style = omitBy(run.style, (_, key) => overrides.has(key))
+    let style = omitBy(run.style, (_, key) => overrides.has(key))
     if (style.boundVariables) {
       const bound = omitBy(style.boundVariables, (_, key) => fields.has(key))
       if (Object.keys(bound).length > 0) style.boundVariables = bound
       else delete style.boundVariables
     }
+    style = withBoundBindingScales(style)
     return Object.keys(style).length > 0 ? [{ ...run, style }] : []
   })
 }

@@ -5,12 +5,18 @@ import type { GUID } from '@pairdraw/kiwi/fig'
 import type { VariableConsumptionEntry } from '@pairdraw/kiwi/fig/codec'
 import { guidToString, stringToGuid } from '@pairdraw/kiwi/fig/guid'
 import type {
+  CharacterStyleOverride,
   SceneNode,
   SceneGraph,
   TextBindableField,
   TextBoundVariables
 } from '@pairdraw/scene-graph'
-import { boundNumberValue, isNumericVariableBindingField } from '@pairdraw/scene-graph/variables'
+import {
+  boundNumberValue,
+  isNumericVariableBindingField,
+  runBindingScale,
+  SCALED_RUN_BINDING_FIELDS
+} from '@pairdraw/scene-graph/variables'
 
 import { cloneRecord } from '../clone'
 import { linearVariableExpression } from './expression'
@@ -136,28 +142,55 @@ export const TEXT_RUN_BINDING_FIELDS = {
 const TEXT_RUN_BINDING_FIELDS_INVERSE: Partial<Record<string, TextBindableField>> =
   invert(TEXT_RUN_BINDING_FIELDS)
 
-/** The entries a range of characters' bindings are written with, in its style override. */
+/**
+ * The entries a range of characters' bindings are written with, in its style override. A size or
+ * spacing the range resolves with a scale writes it as the multiplier of a scaled binding, as
+ * Figma writes one; a plain alias reads back with the layer's scale, as ranges saved before they
+ * kept their own still do, so a range whose scale differs from that one writes its multiplier
+ * even when it is 1.
+ */
 export function textRunVariableEntries(
-  bound: TextBoundVariables,
+  node: Pick<SceneNode, 'boundVariables' | 'variableBindingScales'>,
+  style: Pick<CharacterStyleOverride, 'boundVariables' | 'variableBindingScales'>,
   graph: SceneGraph,
   ids?: Map<string, GUID>
 ): VariableConsumptionEntry[] {
-  return Object.entries(bound).flatMap(([field, variableId]) => {
+  return Object.entries(style.boundVariables ?? {}).flatMap(([field, variableId]) => {
     const variableField = (TEXT_RUN_BINDING_FIELDS as Partial<Record<string, string>>)[field]
     if (!variableField || !variableId || !graph.variables.has(variableId)) return []
-    return [consumptionEntry(variableField, variableId, graph, ids)]
+    if (!SCALED_RUN_BINDING_FIELDS.has(field))
+      return [consumptionEntry(variableField, variableId, graph, ids)]
+    const multiplier = runBindingScale(node, style, field as TextBindableField)
+    // The file keeps the layer's scale only for a field the layer binds itself.
+    const fallback = node.boundVariables[field] ? (node.variableBindingScales[field] ?? 1) : 1
+    return [
+      consumptionEntry(variableField, variableId, graph, ids, multiplier, multiplier !== fallback)
+    ]
   })
 }
 
-/** The text fields a style override binds, by variable ID. */
-export function textRunVariableBindings(override: VariableConsumptionSource): TextBoundVariables {
-  const bound: TextBoundVariables = {}
+/**
+ * The text fields a style override binds, and the scale each scaled binding keeps. A plain alias
+ * keeps none, so the range resolves with the layer's scale, as one saved before ranges kept
+ * their own always did.
+ */
+export function textRunVariableBindings(
+  override: VariableConsumptionSource
+): Pick<CharacterStyleOverride, 'boundVariables' | 'variableBindingScales'> {
+  const boundVariables: TextBoundVariables = {}
+  const variableBindingScales: Partial<Record<TextBindableField, number>> = {}
   for (const entry of variableConsumptionEntries(override)) {
     const field = entry.variableField && TEXT_RUN_BINDING_FIELDS_INVERSE[entry.variableField]
-    const guid = field ? linearVariableExpression(entry.variableData)?.reference?.guid : undefined
-    if (field && guid) bound[field] = guidToString(guid)
+    if (!field) continue
+    const expression = linearVariableExpression(entry.variableData)
+    const guid = expression?.reference?.guid
+    if (!guid) continue
+    boundVariables[field] = guidToString(guid)
+    const scaled = entry.variableData?.value?.expressionValue?.expressionFunction === 'MULTIPLY'
+    if (scaled && SCALED_RUN_BINDING_FIELDS.has(field))
+      variableBindingScales[field] = expression.multiplier
   }
-  return bound
+  return { boundVariables, variableBindingScales }
 }
 
 /**

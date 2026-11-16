@@ -16,6 +16,7 @@ import {
   SHARED_TEXT_STYLE_FIELDS,
   styleDetachmentChanges
 } from '@pairdraw/scene-graph/shared-styles'
+import { withBoundBindingScales } from '@pairdraw/scene-graph/variables'
 
 /** A character's style: the text's own, with its run's overrides over it. */
 export type CharacterStyle = Required<
@@ -140,10 +141,13 @@ function withoutRedundantOverrides(node: SceneNode, runs: StyleRun[]): StyleRun[
   const base = nodeStyle(node)
   const result: StyleRun[] = []
   for (const run of runs) {
-    const style = omit(
-      run.style,
-      CHARACTER_STYLE_KEYS.filter(
-        (key) => run.style[key] !== undefined && isEqual(run.style[key], base[key])
+    // A range keeps a binding's scale only while it binds the number itself.
+    const style = withBoundBindingScales(
+      omit(
+        run.style,
+        CHARACTER_STYLE_KEYS.filter(
+          (key) => run.style[key] !== undefined && isEqual(run.style[key], base[key])
+        )
       )
     )
     if (Object.keys(style).length === 0) continue

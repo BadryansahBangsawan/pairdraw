@@ -11,7 +11,7 @@ import { pixelLength } from '../text/lengths'
 import type { Fill, SceneNode, Stroke, StyleRun, TextLength } from '../types'
 import { NUMERIC_FIELDS, isNumericVariableBindingField, paintBindingTarget } from './fields'
 import { variableFontFamily, variableText, variableTruthy } from './text'
-import { SCALED_RUN_BINDING_FIELDS } from './units'
+import { runBindingScale } from './units'
 import { variableValueReferences } from './value'
 export {
   ICON_BINDING_FIELDS,
@@ -138,8 +138,8 @@ const NUMERIC_RUN_FIELDS = ['fontSize', 'fontWeight', 'letterSpacing', 'lineHeig
 
 /**
  * The runs a text's character bindings resolve to in its mode, when a bound number or font family
- * differs from what its characters hold, a size or spacing in the layer's binding scale for the
- * field, as a rescale left it. Bound font styles are left as stored.
+ * differs from what its characters hold, a size or spacing in the run's binding scale for the
+ * field, as a rescale left it (`runBindingScale`). Bound font styles are left as stored.
  */
 export function resolvedRunBindings(
   graph: SceneGraph,
@@ -155,8 +155,7 @@ export function resolvedRunBindings(
       if (!variableId) continue
       const value = graph.resolveNumberVariableForNode(node.id, variableId, fallback)
       if (value === undefined || !Number.isFinite(value)) continue
-      const scale = SCALED_RUN_BINDING_FIELDS.has(field) ? node.variableBindingScales[field] : 1
-      const effective = value * (scale ?? 1)
+      const effective = value * runBindingScale(node, style, field)
       if (!Number.isFinite(effective)) continue
       const next = boundNumberValue(field, effective)
       if (isEqual(style[field], next)) continue

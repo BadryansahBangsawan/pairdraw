@@ -27,9 +27,15 @@ export function resolvedClipboardBindings(
 }
 
 function unlinkedRun(run: StyleRun): StyleRun {
-  const { boundVariables, textStyleId, fillStyleId } = run.style
-  if (!boundVariables && !textStyleId && !fillStyleId) return run
-  const { boundVariables: _variables, textStyleId: _text, fillStyleId: _fill, ...style } = run.style
+  const { boundVariables, variableBindingScales, textStyleId, fillStyleId } = run.style
+  if (!boundVariables && !variableBindingScales && !textStyleId && !fillStyleId) return run
+  const {
+    boundVariables: _variables,
+    variableBindingScales: _scales,
+    textStyleId: _text,
+    fillStyleId: _fill,
+    ...style
+  } = run.style
   return { ...run, style }
 }
 

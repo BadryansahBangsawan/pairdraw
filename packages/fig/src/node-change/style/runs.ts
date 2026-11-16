@@ -49,8 +49,10 @@ function applyRangeReferences(
     const id = styleRefId(override[field])
     if (id !== styleRefId(text[field])) style[key] = id
   }
-  const boundVariables = textRunVariableBindings(override)
-  if (!isEmptyObject(boundVariables)) style.boundVariables = boundVariables
+  const bindings = textRunVariableBindings(override)
+  if (!isEmptyObject(bindings.boundVariables)) style.boundVariables = bindings.boundVariables
+  if (!isEmptyObject(bindings.variableBindingScales))
+    style.variableBindingScales = bindings.variableBindingScales
 }
 
 function applyTextDecorationOverride(style: CharacterStyleOverride, override: NodeChange): void {

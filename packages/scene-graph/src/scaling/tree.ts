@@ -56,9 +56,10 @@ export function rescaleNodeTreeChanges(
 ): Map<string, Partial<SceneNode>> {
   const changes = new Map<string, Partial<SceneNode>>()
   for (const node of nodes) {
+    const scaled = scaleNodeChanges(node, scale, node.id !== rootId)
     changes.set(node.id, {
-      ...scaleNodeChanges(node, scale, node.id !== rootId),
-      ...scaleVariableBindingUnits(node, scale),
+      ...scaled,
+      ...scaleVariableBindingUnits(node, scale, scaled.styleRuns),
       componentScale: findInstanceAncestor(graph, node.id)
         ? node.componentScale * scale
         : node.componentScale

@@ -141,10 +141,11 @@ export function sourceInTargetCoordinates(source: SceneNode, targetScale: number
   const factor = targetScale / source.componentScale
   if (!Number.isFinite(factor) || factor <= 0) throw new Error('Invalid component coordinate scale')
   if (factor === 1) return source
+  const scaled = scaleNodeChanges(source, factor, true)
   return {
     ...source,
-    ...scaleNodeChanges(source, factor, true),
-    ...scaleVariableBindingUnits(source, factor)
+    ...scaled,
+    ...scaleVariableBindingUnits(source, factor, scaled.styleRuns)
   }
 }
 

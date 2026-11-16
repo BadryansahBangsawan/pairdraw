@@ -5,6 +5,7 @@ import { registerTestFont } from '#core-tests/helpers/figma-api'
 import { FigmaAPI } from '@pairdraw/core/figma-api'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import type { Color } from '@pairdraw/scene-graph/primitives'
+import { reconcileVariableBindings } from '@pairdraw/scene-graph/variables'
 
 beforeAll(async () => {
   await registerTestFont()
@@ -252,6 +253,28 @@ describe('bound variable ranges', () => {
       type: 'VARIABLE_ALIAS',
       id: family.id
     })
+  })
+
+  test('a range bound after a rescale starts at its variable, not the layer scale', () => {
+    const { api, text } = styledText()
+    const collection = api.variables.createVariableCollection('Type')
+    const wide = api.variables.createVariable('spacing/wide', collection, 'FLOAT')
+    wide.setValueForMode(collection.defaultModeId, 2)
+    const tight = api.variables.createVariable('spacing/tight', collection, 'FLOAT')
+    tight.setValueForMode(collection.defaultModeId, 3)
+    text.letterSpacing = { unit: 'PIXELS', value: 2 }
+    text.setBoundVariable('letterSpacing', wide)
+    text.rescale(2)
+
+    text.setRangeBoundVariable(0, 5, 'letterSpacing', tight)
+    // The range keeps its own scale, so the layer's later edits cannot move it.
+    const run = api.graph.getNode(text.id)?.styleRuns.find((entry) => entry.start === 0)
+    expect(run?.style.variableBindingScales?.letterSpacing).toBe(1)
+    expect(text.getRangeLetterSpacing(0, 5)).toEqual({ unit: 'PIXELS', value: 3 })
+
+    reconcileVariableBindings(api.graph)
+    expect(text.getRangeLetterSpacing(0, 5)).toEqual({ unit: 'PIXELS', value: 3 })
+    expect(text.getRangeLetterSpacing(5, 11)).toEqual({ unit: 'PIXELS', value: 4 })
   })
 
   test('bind paragraph spacing for the paragraphs of the range', () => {

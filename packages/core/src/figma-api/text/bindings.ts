@@ -11,10 +11,16 @@ import {
 } from '@pairdraw/scene-graph'
 import { copyFills } from '@pairdraw/scene-graph/copy'
 import { getSharedStyles, SHARED_TEXT_STYLE_FIELDS } from '@pairdraw/scene-graph/shared-styles'
+import {
+  boundNumberValue,
+  SCALED_RUN_BINDING_FIELDS,
+  variableBindingOwner
+} from '@pairdraw/scene-graph/variables'
 
 import { variableAlias, type FigmaVariableAlias } from '#core/figma-api/variables/values'
 import { styleRunsWithPatch } from '#core/text/character-style'
 import { faceForStyle } from '#core/text/font/names'
+import { getStyleAt } from '#core/text/style-runs'
 
 import { getStyledTextSegments } from './style'
 
@@ -77,12 +83,16 @@ function boundVariable(
   return found
 }
 
-/** What the characters show for a bound field: the variable's value in their mode. */
+/**
+ * What the characters show for a bound field: the variable's value in their mode, a number in
+ * the scale the characters' binding keeps.
+ */
 function boundValue(
   graph: SceneGraph,
   node: SceneNode,
   field: TextBindableField,
-  variable: Variable
+  variable: Variable,
+  scale: number
 ): CharacterStyleOverride {
   if (STRING_FIELDS.has(field)) {
     const value = graph.resolveVariableForNode(node.id, variable.id)
@@ -94,7 +104,7 @@ function boundValue(
   }
   const value = graph.resolveNumberVariableForNode(node.id, variable.id)
   if (value === undefined || !Number.isFinite(value) || isParagraphField(field)) return {}
-  return { [field]: value }
+  return { [field]: boundNumberValue(field, value * scale) }
 }
 
 /**
@@ -112,17 +122,25 @@ export function rangeBindingChanges(
 ): { styleRuns: StyleRun[]; paragraphValue: number | null } {
   const bound =
     variable === null ? null : boundVariable(graph, 'setRangeBoundVariable', field, variable)
-  const value = bound ? boundValue(graph, node, field, bound) : {}
+  // A new binding starts at the variable's number in the scope that declares it, as a layer's does
+  // (`assignVariableBindingUnits`), not at a scale a rescale left on the characters' old binding.
+  const scaled = SCALED_RUN_BINDING_FIELDS.has(field)
+  const scale = scaled
+    ? (variableBindingOwner(graph, node).variableAssignmentScales[field] ?? 1)
+    : 1
   let styleRuns = node.styleRuns
   // Characters bound apart keep their other bindings.
   for (const segment of getStyledTextSegments(node, ['boundVariables'], start, end)) {
     const aliases = (segment.boundVariables ?? {}) as Record<string, FigmaVariableAlias>
     const ids = mapValues(aliases, (alias) => alias.id)
     const boundVariables = bound ? { ...ids, [field]: bound.id } : omit(ids, [field])
-    styleRuns = styleRunsWithPatch({ ...node, styleRuns }, segment.start, segment.end, {
-      ...value,
-      boundVariables
-    })
+    const scales = getStyleAt(node.styleRuns, segment.start).variableBindingScales ?? {}
+    const patch: CharacterStyleOverride = bound
+      ? { ...boundValue(graph, node, field, bound, scale), boundVariables }
+      : { boundVariables }
+    // An unbound range's scale goes with its binding (`withBoundBindingScales`).
+    if (bound && scaled) patch.variableBindingScales = { ...scales, [field]: scale }
+    styleRuns = styleRunsWithPatch({ ...node, styleRuns }, segment.start, segment.end, patch)
   }
   const resolved = bound ? graph.resolveNumberVariableForNode(node.id, bound.id) : undefined
   const paragraphValue =

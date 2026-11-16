@@ -36,6 +36,9 @@ export async function prepareSharedFrontend(
       build: { beforeBuildCommand: null },
       bundle: {
         createUpdaterArtifacts: true,
+        // Ad-hoc, whatever the tag's own config names; a Developer ID in the
+        // APPLE_SIGNING_IDENTITY secret still overrides it.
+        macOS: { signingIdentity: '-' },
         ...(wixVersion && { windows: { wix: { version: wixVersion } } })
       },
       plugins: { updater: { endpoints: [feed.endpoint], pubkey: feed.pubkey } }

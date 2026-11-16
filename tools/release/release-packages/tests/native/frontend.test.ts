@@ -76,14 +76,18 @@ test.each([
       await operation
       expect(JSON.parse(await readFile(config, 'utf8'))).toEqual({
         build: { beforeBuildCommand: null },
-        bundle: { createUpdaterArtifacts: true },
+        bundle: { createUpdaterArtifacts: true, macOS: { signingIdentity: '-' } },
         plugins: { updater }
       })
     } else if (scenario === 'beta') {
       await operation
       expect(JSON.parse(await readFile(config, 'utf8'))).toEqual({
         build: { beforeBuildCommand: null },
-        bundle: { createUpdaterArtifacts: true, windows: { wix: { version: '0.16.0.2' } } },
+        bundle: {
+          createUpdaterArtifacts: true,
+          macOS: { signingIdentity: '-' },
+          windows: { wix: { version: '0.16.0.2' } }
+        },
         plugins: { updater }
       })
     } else {

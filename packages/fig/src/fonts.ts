@@ -16,9 +16,14 @@ export interface FigDocumentFont {
 }
 
 const FONT_EXTENSIONS = ['ttf', 'otf', 'woff', 'woff2'] as const
-type FontExtension = (typeof FONT_EXTENSIONS)[number]
+/** The file extension of a font format a document can carry. */
+export type FontFileExtension = (typeof FONT_EXTENSIONS)[number]
 
-function fontExtension(data: Uint8Array): FontExtension | null {
+/**
+ * A font file's extension, read from its signature: TrueType, OpenType, WOFF, or WOFF2. Null for
+ * bytes that are none of them.
+ */
+export function fontFileExtension(data: Uint8Array): FontFileExtension | null {
   if (data.byteLength < 4) return null
   const signature = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]
   switch (signature) {
@@ -45,7 +50,7 @@ export function figFontEntries(
 ): Array<FigFontEntry & { family: string; style: string }> {
   return fonts.flatMap(({ family, style, data }, index) => {
     const bytes = data instanceof Uint8Array ? data : new Uint8Array(data)
-    const extension = fontExtension(bytes)
+    const extension = fontFileExtension(bytes)
     if (!extension) return []
     return [{ name: `fonts/${index}.${extension}`, data: bytes, family, style }]
   })
@@ -77,7 +82,7 @@ export function resolveFigFonts(
     const data = files.get(file)
     if (!data) continue
     const view = new Uint8Array(data.buffer, data.byteOffset, data.byteLength)
-    if (fontExtension(view) !== file.slice(file.lastIndexOf('.') + 1)) continue
+    if (fontFileExtension(view) !== file.slice(file.lastIndexOf('.') + 1)) continue
     fonts.push({ family, style, data })
   }
   return fonts

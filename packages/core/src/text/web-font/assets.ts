@@ -1,6 +1,7 @@
 import type { RemoteFontSource, ResolveFontResult } from 'unifont'
 
 import type { WebFontFaceAsset, WebFontFaceRequest } from '@pairdraw/dom-css/export'
+import { fontFileExtension, type FontFileExtension } from '@pairdraw/fig'
 import { faceLoadKey } from '@pairdraw/scene-graph/font-style'
 
 import { documentFontData } from '#core/text/font/document'
@@ -15,6 +16,14 @@ import {
   type WebFontProviderId
 } from '#core/text/web-font/resolver'
 
+/** The `@font-face` format of each document font file. */
+const FONT_FACE_FORMATS: Record<FontFileExtension, WebFontFaceAsset['format']> = {
+  ttf: 'truetype',
+  otf: 'opentype',
+  woff: 'woff',
+  woff2: 'woff2'
+}
+
 /**
  * A document font's file extension and `@font-face` format, read from its signature: TrueType,
  * OpenType, WOFF, or WOFF2. Null for bytes no document font holds, which registration rejects.
@@ -22,21 +31,8 @@ import {
 function documentFontFile(
   data: Uint8Array
 ): { extension: string; format: WebFontFaceAsset['format'] } | null {
-  if (data.byteLength < 4) return null
-  const signature = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3]
-  switch (signature) {
-    case 0x00010000:
-    case 0x74727565:
-      return { extension: 'ttf', format: 'truetype' }
-    case 0x4f54544f:
-      return { extension: 'otf', format: 'opentype' }
-    case 0x774f4646:
-      return { extension: 'woff', format: 'woff' }
-    case 0x774f4632:
-      return { extension: 'woff2', format: 'woff2' }
-    default:
-      return null
-  }
+  const extension = fontFileExtension(data)
+  return extension ? { extension, format: FONT_FACE_FORMATS[extension] } : null
 }
 
 /**

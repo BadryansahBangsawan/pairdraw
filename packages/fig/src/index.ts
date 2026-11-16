@@ -31,9 +31,11 @@ export {
 export {
   figFontEntries,
   figFontsManifest,
+  fontFileExtension,
   resolveFigFonts,
   type FigDocumentFont,
-  type FigFontEntry
+  type FigFontEntry,
+  type FontFileExtension
 } from './fonts'
 export {
   figArchiveComponentUsePages,

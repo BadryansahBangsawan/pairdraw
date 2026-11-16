@@ -7,7 +7,7 @@ import type { PrototypeAction } from '@pairdraw/scene-graph'
 import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 
 import type { EditorStore } from '@/app/editor/active-store'
-import { letterboxRects, type StageRect } from '@/app/slides/letterbox'
+import { letterboxRects, nodeStageRect, type StageRect } from '@/app/slides/letterbox'
 
 import {
   reactionAt,
@@ -45,16 +45,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
   /** The frame the canvas fits and shows, which is the top overlay when one is open. */
   const shownRect = computed<StageRect | null>(() => {
     const shown = session.value
-    const node = shown ? store.graph.getNode(shownFrame(shown)) : undefined
-    if (!node) return null
-    const bounds = getAxisAlignedWorldBounds(node, store.graph)
-    const { panX, panY, zoom } = store.state
-    return {
-      left: bounds.x * zoom + panX,
-      top: bounds.y * zoom + panY,
-      width: bounds.width * zoom,
-      height: bounds.height * zoom
-    }
+    return shown ? nodeStageRect(store.graph, shownFrame(shown), store.state) : null
   })
 
   const letterbox = computed(() =>

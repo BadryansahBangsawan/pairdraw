@@ -1,9 +1,31 @@
+import type { ViewportTransform } from '@pairdraw/core/geometry'
+import type { SceneGraph } from '@pairdraw/scene-graph'
+import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
+
 /** A rectangle on the stage, in CSS pixels from its top-left corner. */
 export interface StageRect {
   left: number
   top: number
   width: number
   height: number
+}
+
+/** A layer's rectangle on the stage, following the canvas's pan and zoom; null once it is gone. */
+export function nodeStageRect(
+  graph: SceneGraph,
+  nodeId: string,
+  viewport: ViewportTransform
+): StageRect | null {
+  const node = graph.getNode(nodeId)
+  if (!node) return null
+  const bounds = getAxisAlignedWorldBounds(node, graph)
+  const { panX, panY, zoom } = viewport
+  return {
+    left: bounds.x * zoom + panX,
+    top: bounds.y * zoom + panY,
+    width: bounds.width * zoom,
+    height: bounds.height * zoom
+  }
 }
 
 /**

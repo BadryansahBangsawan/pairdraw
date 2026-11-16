@@ -2,14 +2,13 @@ import { useElementSize, useEventListener, useSwipe } from '@vueuse/core'
 import { computed, onMounted, watch, type Ref } from 'vue'
 
 import type { PresentationState } from '@pairdraw/core'
-import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { isButtonActivation, isEditing } from '@/app/shell/keyboard/focus'
 
 import { usePresentationFullscreen } from './fullscreen'
 import { presentationKeyAction, presentationScrollStep, type PresentationKeyAction } from './keys'
-import { letterboxRects, type StageRect } from './letterbox'
+import { letterboxRects, nodeStageRect, type StageRect } from './letterbox'
 import { createWheelStepper } from './wheel'
 
 /** WebKit's pinch events, which the DOM's event maps do not list. */
@@ -40,16 +39,7 @@ export function usePresentationStage(store: EditorStore, stage: Ref<HTMLElement 
   /** The slide's rectangle on the stage, following the canvas's pan and zoom. */
   const slideRect = computed<StageRect | null>(() => {
     const shown = presentation.value
-    const node = shown ? store.graph.getNode(shown.slideId) : undefined
-    if (!node) return null
-    const bounds = getAxisAlignedWorldBounds(node, store.graph)
-    const { panX, panY, zoom } = store.state
-    return {
-      left: bounds.x * zoom + panX,
-      top: bounds.y * zoom + panY,
-      width: bounds.width * zoom,
-      height: bounds.height * zoom
-    }
+    return shown ? nodeStageRect(store.graph, shown.slideId, store.state) : null
   })
 
   const letterbox = computed(() =>

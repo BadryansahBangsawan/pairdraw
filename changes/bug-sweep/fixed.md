@@ -1,3 +1,4 @@
 - Creating a variable from a property field binds it to every selected layer and corner the field edits, not only the first.
 - Opening a `.pen` file with a number too large to store now reports where it is, instead of opening and then saving a file that can't be reopened.
 - Undoing Move to page selects the moved layers again.
+- Zooming to fit very large content stops at the 2% minimum zoom.

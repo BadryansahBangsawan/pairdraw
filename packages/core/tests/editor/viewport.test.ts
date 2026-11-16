@@ -60,3 +60,16 @@ describe('zoomToArea', () => {
     expect({ ...center(editor), zoom: editor.state.zoom }).toEqual(before)
   })
 })
+
+describe('zoomToBounds', () => {
+  test('stops at the smallest zoom for content too large to fit, still centered', () => {
+    const editor = createEditor({ getViewportSize: () => VIEWPORT })
+
+    editor.zoomToBounds(0, 0, 100_000, 50_000)
+
+    expect(editor.state.zoom).toBe(0.02)
+    const { x, y } = center(editor)
+    expect(x).toBeCloseTo(50_000)
+    expect(y).toBeCloseTo(25_000)
+  })
+})

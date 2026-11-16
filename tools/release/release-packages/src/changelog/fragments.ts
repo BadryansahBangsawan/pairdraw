@@ -8,7 +8,7 @@ import { ALLOWED_CATEGORIES, headingText, sectionEnd } from './validate'
 
 type Category = (typeof ALLOWED_CATEGORIES)[number]
 
-/** Fragment file names, `changes/<PR>/<file>.md`, and the changelog heading each one fills. */
+/** Fragment file names, `changes/<folder>/<file>.md`, and the changelog heading each one fills. */
 export const FRAGMENT_CATEGORIES = {
   breaking: 'Breaking changes',
   added: 'Added',
@@ -20,8 +20,26 @@ export const FRAGMENT_CATEGORIES = {
 
 export type FragmentCategory = keyof typeof FRAGMENT_CATEGORIES
 
+/**
+ * A fragment folder is named after its pull request number, or after its topic in lowercase
+ * kebab-case (`omp-agent`) for work pushed without a pull request.
+ */
+const FRAGMENT_FOLDER = /^(?:[1-9]\d*|[a-z0-9]+(?:-[a-z0-9]+)*)$/
+
+const PULL_REQUEST_FOLDER = /^[1-9]\d*$/
+
+/** Pull request folders in number order, then topic folders in name order. */
+function compareFolders(a: string, b: string): number {
+  const aNumber = PULL_REQUEST_FOLDER.test(a)
+  const bNumber = PULL_REQUEST_FOLDER.test(b)
+  if (aNumber && bNumber) return Number(a) - Number(b)
+  if (aNumber !== bNumber) return aNumber ? -1 : 1
+  return a.localeCompare(b, 'en')
+}
+
 export interface ChangeFragment {
-  pullRequest: number
+  /** The folder under `changes/`: a pull request number or a topic name. */
+  folder: string
   category: FragmentCategory
   /** Each bullet's Markdown, starting with `- `, as it will appear in the changelog. */
   bullets: string[]
@@ -54,7 +72,7 @@ export function parseFragmentBullets(
   return { bullets, errors }
 }
 
-/** Reads every `changes/<PR>/<category>.md`; anything else under `changes/` is reported. */
+/** Reads every `changes/<folder>/<category>.md`; anything else under `changes/` is reported. */
 export async function readFragments(directory: string): Promise<FragmentReadResult> {
   const fragments: ChangeFragment[] = []
   const errors: string[] = []
@@ -65,11 +83,13 @@ export async function readFragments(directory: string): Promise<FragmentReadResu
   })
   for (const entry of entries) {
     if (entry.isFile() && entry.name === 'README.md') continue
-    if (!entry.isDirectory() || !/^[1-9]\d*$/.test(entry.name)) {
-      errors.push(`changes/${entry.name}: expected a folder named after its pull request number.`)
+    if (!entry.isDirectory() || !FRAGMENT_FOLDER.test(entry.name)) {
+      errors.push(
+        `changes/${entry.name}: expected a folder named after its pull request number or its topic in lowercase kebab-case.`
+      )
       continue
     }
-    const pullRequest = Number(entry.name)
+    const folder = entry.name
     for (const file of await readdir(join(directory, entry.name), { withFileTypes: true })) {
       const path = `changes/${entry.name}/${file.name}`
       const category = file.name.replace(/\.md$/, '')
@@ -87,10 +107,10 @@ export async function readFragments(directory: string): Promise<FragmentReadResu
       )
       errors.push(...parsed.errors)
       if (parsed.bullets.length > 0)
-        fragments.push({ pullRequest, category, bullets: parsed.bullets })
+        fragments.push({ folder, category, bullets: parsed.bullets })
     }
   }
-  fragments.sort((a, b) => a.pullRequest - b.pullRequest)
+  fragments.sort((a, b) => compareFolders(a.folder, b.folder))
   // Directory listings come in no fixed order; sorted errors read the same on every machine.
   return { fragments, errors: errors.toSorted() }
 }
@@ -159,7 +179,7 @@ export async function removeFragments(
   directory: string,
   fragments: ChangeFragment[]
 ): Promise<void> {
-  const folders = new Set(fragments.map((fragment) => String(fragment.pullRequest)))
+  const folders = new Set(fragments.map((fragment) => fragment.folder))
   await Promise.all(
     [...folders].map((folder) => rm(join(directory, folder), { recursive: true, force: true }))
   )

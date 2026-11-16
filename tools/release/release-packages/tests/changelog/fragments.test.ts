@@ -38,9 +38,9 @@ describe('changelog fragments', () => {
     const changelog =
       '# Changelog\n\n## Unreleased\n\n### Fixed\n\n- Keep user data.\n\n## 1.0.0 — 2026-01-01\n\n### Added\n\n- Ship it.\n'
     const assembled = assembleUnreleased(changelog, [
-      { pullRequest: 7, category: 'fixed', bullets: ['- Stop the crash.'] },
-      { pullRequest: 9, category: 'breaking', bullets: ['- Remove the old API.'] },
-      { pullRequest: 8, category: 'added', bullets: ['- Add export.', '- Add import.'] }
+      { folder: '7', category: 'fixed', bullets: ['- Stop the crash.'] },
+      { folder: '9', category: 'breaking', bullets: ['- Remove the old API.'] },
+      { folder: '8', category: 'added', bullets: ['- Add export.', '- Add import.'] }
     ])
 
     expect(assembled).toBe(
@@ -70,8 +70,8 @@ describe('changelog fragments', () => {
     const changelog =
       '# Changelog\n\n## Unreleased\n\n## 1.0.0 — 2026-01-01\n\n### Added\n\n- Ship it.\n'
     const assembled = assembleUnreleased(changelog, [
-      { pullRequest: 3, category: 'fixed', bullets: ['- Stop the crash.'] },
-      { pullRequest: 4, category: 'fixed', bullets: ['- Stop the crash.'] }
+      { folder: '3', category: 'fixed', bullets: ['- Stop the crash.'] },
+      { folder: '4', category: 'fixed', bullets: ['- Stop the crash.'] }
     ])
 
     expect(validateChangelog(assembled).errors).toEqual([
@@ -94,22 +94,25 @@ describe('readFragments', () => {
     await expect(readFragments(file)).rejects.toThrow()
   })
 
-  test('read pull request folders and report anything that does not fit', async () => {
+  test('read pull request and topic folders and report anything that does not fit', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'changes-'))
     await mkdir(join(directory, '42'))
     await writeFile(join(directory, '42', 'fixed.md'), '- Stop the crash.\n')
     await writeFile(join(directory, '42', 'notes.md'), '- Not a category.\n')
-    await mkdir(join(directory, 'draft'))
+    await mkdir(join(directory, 'omp-agent'))
+    await writeFile(join(directory, 'omp-agent', 'added.md'), '- Use omp as the design agent.\n')
+    await mkdir(join(directory, 'PR-draft'))
     await writeFile(join(directory, 'README.md'), '# Unreleased changes\n')
 
     const { fragments, errors } = await readFragments(directory)
 
     expect(fragments).toEqual([
-      { pullRequest: 42, category: 'fixed', bullets: ['- Stop the crash.'] }
+      { folder: '42', category: 'fixed', bullets: ['- Stop the crash.'] },
+      { folder: 'omp-agent', category: 'added', bullets: ['- Use omp as the design agent.'] }
     ])
     expect(errors).toEqual([
       expect.stringContaining('changes/42/notes.md: expected one of breaking.md'),
-      'changes/draft: expected a folder named after its pull request number.'
+      'changes/PR-draft: expected a folder named after its pull request number or its topic in lowercase kebab-case.'
     ])
   })
 })

@@ -1,7 +1,11 @@
 import { sumBy } from 'es-toolkit'
 
 import type { SceneNode } from '@pairdraw/scene-graph'
-import { getAbsolutePositionFull, getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import {
+  getAbsolutePositionFull,
+  getAxisAlignedWorldBounds,
+  getWorldMatrix
+} from '@pairdraw/scene-graph/coordinate'
 import { computeAbsoluteBounds } from '@pairdraw/scene-graph/geometry'
 import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
@@ -47,27 +51,20 @@ function alignMultipleNodes(
   axis: 'horizontal' | 'vertical',
   align: 'min' | 'center' | 'max'
 ) {
-  const absPositions = new Map<string, Vector>()
-  for (const n of nodes) absPositions.set(n.id, ctx.graph.getAbsolutePosition(n.id))
-
+  // Each layer's drawn box, so a rotated layer's visible edge lands on the target.
+  const boxes = new Map(nodes.map((n) => [n.id, getAxisAlignedWorldBounds(n, ctx.graph)]))
   const b = computeAbsoluteBounds(nodes, ctx.graph)
-  const minX = b.x
-  const minY = b.y
-  const maxX = b.x + b.width
-  const maxY = b.y + b.height
 
   for (const n of nodes) {
-    const abs = absPositions.get(n.id)
-    if (!abs) continue
-    const parentAbs = n.parentId ? ctx.graph.getAbsolutePosition(n.parentId) : { x: 0, y: 0 }
-
-    if (axis === 'horizontal') {
-      const target = computeAlignTarget(minX, maxX, n.width, align)
-      ctx.graph.updateNode(n.id, { x: target - parentAbs.x })
-    } else {
-      const target = computeAlignTarget(minY, maxY, n.height, align)
-      ctx.graph.updateNode(n.id, { y: target - parentAbs.y })
-    }
+    const box = boxes.get(n.id)
+    if (!box) continue
+    const worldDelta =
+      axis === 'horizontal'
+        ? { x: computeAlignTarget(b.x, b.x + b.width, box.width, align) - box.x, y: 0 }
+        : { x: 0, y: computeAlignTarget(b.y, b.y + b.height, box.height, align) - box.y }
+    const localDelta = parentLocalDelta(ctx, n, worldDelta)
+    if (!localDelta) continue
+    ctx.graph.updateNode(n.id, { x: n.x + localDelta.x, y: n.y + localDelta.y })
   }
 }
 

@@ -5,6 +5,7 @@ import { createRect, firstPageId } from '#core-tests/helpers/scene'
 
 import { createEditor } from '@pairdraw/core'
 import { SceneGraph } from '@pairdraw/scene-graph'
+import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 
 describe('single-node alignment to parent', () => {
   function setup() {
@@ -143,4 +144,29 @@ test('aligning auto layout children records no undo step', () => {
   editor.runLayoutForNode(row.id)
   editor.alignNodes([a.id, b.id], 'vertical', 'max')
   expect(editor.undo.canUndo).toBe(false)
+})
+
+// A turned layer aligns by its drawn box, not by its origin and unturned size.
+test('aligning left puts a rotated layer’s visible left edge on the target', () => {
+  const editor = createEditor()
+  const pageId = editor.state.currentPageId
+  const anchor = editor.graph.createNode('RECTANGLE', pageId, {
+    x: 20,
+    y: 0,
+    width: 40,
+    height: 40
+  })
+  const turned = editor.graph.createNode('RECTANGLE', pageId, {
+    x: 200,
+    y: 100,
+    width: 100,
+    height: 50,
+    rotation: 45
+  })
+  editor.alignNodes([anchor.id, turned.id], 'horizontal', 'min')
+  const box = getAxisAlignedWorldBounds(getNodeOrThrow(editor.graph, turned.id), editor.graph)
+  expect(box.x).toBeCloseTo(20)
+  expect(getAxisAlignedWorldBounds(getNodeOrThrow(editor.graph, anchor.id), editor.graph).x).toBe(
+    20
+  )
 })

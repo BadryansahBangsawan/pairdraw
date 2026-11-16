@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from 'bun:test'
 
 import { nextTick } from 'vue'
 
@@ -97,6 +97,8 @@ describe('a refused tab over time', () => {
 
   afterEach(() => {
     for (const server of cloudServers.value) removeCloudServer(server.id)
+    // Later files in the same process reach real servers through the global `fetch`.
+    mock.restore()
   })
 
   /** A tab showing a Cloud document of a signed-in server. */

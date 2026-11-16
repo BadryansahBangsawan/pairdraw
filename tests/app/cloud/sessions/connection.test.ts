@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from 'bun:test'
 
 import { addCloudServer, cloudServers, removeCloudServer } from '@/app/cloud/servers/store'
 import {
@@ -50,6 +50,8 @@ beforeEach(() => {
 
 afterEach(() => {
   for (const server of cloudServers.value) removeCloudServer(server.id)
+  // Later files in the same process reach real servers through the global `fetch`.
+  mock.restore()
 })
 
 async function server() {

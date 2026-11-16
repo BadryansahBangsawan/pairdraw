@@ -13,6 +13,7 @@ type AIChatFailureReason =
   | 'rate-limit'
   | 'request-failed'
   | 'sign-in-expired'
+  | 'agent-unconfigured'
   | 'plan-forbidden'
 
 export type AIChatFailure = {
@@ -88,8 +89,10 @@ function statusFailureReason(status: number | null): AIChatFailureReason | null 
 }
 
 function failureReason(error: unknown): AIChatFailureReason {
-  // A coding agent has no key: what it refuses is its own sign-in.
-  if (error instanceof AgentSignInRequiredError) return 'sign-in-expired'
+  // A coding agent has no key: what it refuses is its own sign-in, or its own missing setup.
+  if (error instanceof AgentSignInRequiredError) {
+    return error.unconfigured ? 'agent-unconfigured' : 'sign-in-expired'
+  }
   const statusReason = statusFailureReason(providerErrorStatus(error))
   if (statusReason) return statusReason
   if (isInsufficientCreditError(error)) return 'insufficient-credit'

@@ -12,14 +12,15 @@ import AppCopyField from '@/components/ui/input/AppCopyField.vue'
  * Names the coding agent the chat switched to on its own, with a way to pick another model. It
  * stays until the person dismisses it or writes their next message; the chat announces it from
  * a status region that stays mounted. `signedOut` says instead, as an alert, that the agent
- * refused a message because nobody is signed in to it, with the command that signs in to it and
- * a way to send the message again.
+ * refused a message for want of a sign-in, with the command that signs in to it, or where the
+ * agent has no sign-in of its own, a way to its setup, and a way to send the message again.
  */
 const {
   agent,
   provider,
   signedOut = false,
-  signInCommand = null
+  signInCommand = null,
+  unconfigured = false
 } = defineProps<{
   agent: string
   /** The agent's provider ID, such as `acp:codex`, whose logo the notice shows. */
@@ -28,6 +29,8 @@ const {
   signedOut?: boolean
   /** What to run in a terminal to sign in to the agent. */
   signInCommand?: string | null
+  /** The agent brings its own credentials and found nothing to use, so no sign-in is offered. */
+  unconfigured?: boolean
 }>()
 const emit = defineEmits<{ change: []; dismiss: []; retry: [] }>()
 const { ai, common } = useI18n()
@@ -36,7 +39,12 @@ const styles = chatAgentTheme()
 
 <template>
   <div v-if="signedOut" :class="styles.failure()" data-test-id="chat-agent-signed-out">
-    <AppAlert tone="warning" :heading="ai.chatAgentSignInNeeded({ agent })">
+    <AppAlert
+      tone="warning"
+      :heading="
+        unconfigured ? ai.chatAgentUnconfigured({ agent }) : ai.chatAgentSignInNeeded({ agent })
+      "
+    >
       <template v-if="signInCommand">{{ ai.aiSetupConnectSignInCommand }}</template>
       <template v-if="signInCommand" #details>
         <AppCopyField

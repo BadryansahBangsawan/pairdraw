@@ -69,6 +69,14 @@ describe('AI chat failures', () => {
     })
   })
 
+  test('reports an agent that brings its own credentials as unconfigured, not signed out', () => {
+    const unconfigured = new AgentSignInRequiredError(
+      'omp found no provider credentials to use.',
+      true
+    )
+    expect(classifyAIChatError(unconfigured)).toMatchObject({ reason: 'agent-unconfigured' })
+  })
+
   test('classifies provider errors reported after the stream started', () => {
     const streamError = new StreamProviderError({
       message: 'Too many requests',

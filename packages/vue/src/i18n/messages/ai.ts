@@ -62,6 +62,9 @@ export const aiMessageDefaults = {
   chatAgentUsing: params('Using {agent} from this computer.'),
   chatAgentChange: 'Change',
   chatAgentSignInNeeded: params('{agent} is on this computer but signed out.'),
+  chatAgentUnconfigured: params(
+    '{agent} found no provider credentials to use. Set one up in {agent}, then send your message again.'
+  ),
   chatAgentSignIn: params('Sign in to {agent}'),
   chatAgentInstallNeeded: params(
     '{agent} is on this computer. Pairdraw needs its connector ({package}) to talk to it.'

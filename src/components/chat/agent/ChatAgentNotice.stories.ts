@@ -8,6 +8,7 @@ interface Args {
   provider?: string
   signedOut?: boolean
   signInCommand?: string | null
+  unconfigured?: boolean
   onChange: () => void
   onDismiss: () => void
   onRetry: () => void
@@ -65,5 +66,24 @@ export const SignedOut: Story = {
     await expect(args.onRetry).toHaveBeenCalledOnce()
     await userEvent.click(canvas.getByRole('button', { name: 'Change' }))
     await expect(args.onChange).toHaveBeenCalledOnce()
+  }
+}
+
+/** omp brings its own credentials, so an agent with nothing set up there has no sign-in to run. */
+export const Unconfigured: Story = {
+  args: {
+    agent: 'omp',
+    provider: 'acp:omp',
+    signedOut: true,
+    signInCommand: null,
+    unconfigured: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole('alert')).toHaveTextContent(
+      'omp found no provider credentials to use.'
+    )
+    await expect(canvas.queryByText('To sign in, run this in a terminal')).toBeNull()
+    await expect(canvas.queryByText('omp')).toBeNull()
   }
 }

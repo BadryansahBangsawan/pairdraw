@@ -1,0 +1,1 @@
+- A coding agent that runs on its own credentials, such as omp, no longer asks you to sign in to it when it finds nothing to use; the chat says what to set up in the agent instead.

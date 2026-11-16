@@ -103,6 +103,9 @@ export function formatConnectionError(e: unknown, agentDef?: ACPAgentDef): strin
     return missingCommandMessage(agentDef)
   }
   if (isAuthRequiredError(e)) {
+    if (agentDef?.ownCredentials) {
+      return `${agentDef.name} found no provider credentials to use. Set one up in ${agentDef.name}, then try again.`
+    }
     return `${agentDef?.name ?? 'The agent'} is not signed in. Sign in from Set up AI, then try again.`
   }
   return msg
@@ -125,7 +128,9 @@ function startupError(error: unknown, agentDef: ACPAgentDef): Error {
   recordACPTransportFailure({ operation: 'start', ...describeDiagnosticError(error) })
   const message = formatConnectionError(error, agentDef)
   // The chat tells a signed-out agent apart, so it can show where to sign in.
-  return isAuthRequiredError(error) ? new AgentSignInRequiredError(message) : new Error(message)
+  return isAuthRequiredError(error)
+    ? new AgentSignInRequiredError(message, agentDef.ownCredentials === true)
+    : new Error(message)
 }
 
 export function buildCrashChunks(

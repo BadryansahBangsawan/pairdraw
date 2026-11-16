@@ -6,6 +6,7 @@ import { computed, nextTick, shallowRef, useTemplateRef, watch } from 'vue'
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import { agentAutoConnect } from '@/app/ai/agents/auto/session'
+import { agentSignInHelp } from '@/app/ai/agents/signed-out'
 import { carriesAttachableFile, isAttachableFile } from '@/app/ai/attachment/accept'
 import { revokeImagePreviewURL } from '@/app/ai/attachment/image/prepare'
 import { chatDocumentId } from '@/app/ai/chat/history/document'
@@ -137,11 +138,10 @@ const signedOutAgent = computed(() => {
   const reason = chatFailure.value?.reason
   return reason === 'sign-in-expired' || reason === 'authentication' ? connectedAgent.value : null
 })
-/** The command that signs in to an agent from a terminal: its own CLI, not its adapter. */
-const signedOutCommand = computed(() => {
-  const agent = signedOutAgent.value
-  return agent ? (agent.cliCommand ?? agent.command) : null
-})
+/** How to sign in to that agent, or what else it needs where it has no sign-in of its own. */
+const signedOutHelp = computed(() =>
+  signedOutAgent.value ? agentSignInHelp(signedOutAgent.value) : null
+)
 /**
  * Sends the prompt written for this document on Home, its empty canvas, or this chat before AI
  * was set up, once it can go.
@@ -522,7 +522,8 @@ function handleStop() {
       v-if="signedOutAgent"
       signed-out
       :agent="signedOutAgent.name"
-      :sign-in-command="signedOutCommand"
+      :sign-in-command="signedOutHelp?.command ?? null"
+      :unconfigured="signedOutHelp?.unconfigured ?? false"
       @retry="retrySignedOut"
       @change="chatInput?.openModels()"
       @dismiss="clearChatFailure()"

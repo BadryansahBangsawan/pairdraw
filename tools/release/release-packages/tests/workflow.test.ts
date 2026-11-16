@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import { join, relative, sep } from 'node:path'
 
 import {
+  assertPublicationStart,
   buildReleasePackages,
   createPublicationPlan,
   packReleasePackages,
@@ -100,6 +101,24 @@ describe('release workflow', () => {
       { name: '@fixture/library', status: 'published' },
       { name: '@fixture/app', status: 'unpublished' }
     ])
+  })
+
+  test('starts over published npm versions only after a maintainer reviewed them', () => {
+    const entry = (name: string, status: 'published' | 'unpublished') => ({
+      package: {
+        directory: `packages/${name}`,
+        manifest: { name: `@fixture/${name}`, version: '1.0.0' }
+      },
+      status
+    })
+    const fresh = [entry('library', 'unpublished'), entry('app', 'unpublished')]
+    const resumed = [entry('library', 'published'), entry('app', 'unpublished')]
+
+    expect(() => assertPublicationStart(fresh, false)).not.toThrow()
+    expect(() => assertPublicationStart(resumed, false)).toThrow(
+      /review provenance before recovery:\n {2}@fixture\/library@1\.0\.0\n.*npm_published_reviewed/
+    )
+    expect(() => assertPublicationStart(resumed, true)).not.toThrow()
   })
 
   test('rejects incomplete or stale artifact sets before publication', () => {

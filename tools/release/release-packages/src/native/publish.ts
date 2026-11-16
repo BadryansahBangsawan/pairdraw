@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { isPrerelease } from '#release/version'
-import { createPublicationPlan } from '#release/workflow'
+import { assertPublicationStart, createPublicationPlan } from '#release/workflow'
 import { isEqual } from 'es-toolkit'
 import * as v from 'valibot'
 
@@ -31,12 +31,14 @@ assertDraftReplacement(release, names, actualCommit, identity)
 
 if (process.argv[2] === 'check') {
   const plan = await createPublicationPlan(paths.root)
-  const published = plan.filter((entry) => entry.status === 'published')
-  if (published.length > 0) {
-    throw new Error('Release already has published npm packages; review provenance before recovery')
-  }
+  const reviewed =
+    v.parse(
+      v.optional(v.picklist(['true', 'false', '']), ''),
+      process.env.NPM_PUBLISHED_REVIEWED
+    ) === 'true'
+  assertPublicationStart(plan, reviewed)
 
-  console.log('Draft, unpublished npm versions and immutable tag verified before publication')
+  console.log('Draft, npm versions and immutable tag verified before publication')
   process.exit(0)
 }
 

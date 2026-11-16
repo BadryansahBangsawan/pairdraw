@@ -117,6 +117,28 @@ export async function createPublicationPlan(
   }))
 }
 
+/**
+ * Refuses a release whose npm versions already exist unless a maintainer reviewed them and
+ * dispatched the build saying so; publication then skips those versions instead of mixing them in.
+ */
+export function assertPublicationStart(
+  plan: PublicationPlanEntry[],
+  publishedVersionsReviewed: boolean
+): void {
+  const published = plan
+    .filter(({ status }) => status === 'published')
+    .map(({ package: pkg }) => `${pkg.manifest.name}@${pkg.manifest.version}`)
+  if (published.length === 0 || publishedVersionsReviewed) return
+
+  throw new Error(
+    [
+      'Release already has published npm packages; review provenance before recovery:',
+      ...published.map((key) => `  ${key}`),
+      'After review, dispatch Build for this tag with npm_published_reviewed set.'
+    ].join('\n')
+  )
+}
+
 export async function packReleasePackages(
   root: string,
   isPublished?: PackagePublicationLookup,

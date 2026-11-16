@@ -7,6 +7,11 @@ on:
         description: Existing release tag to rebuild without moving it (vX.Y.Z or vX.Y.Z-beta.N).
         required: true
         type: string
+      npm_published_reviewed:
+        description: This tag's npm versions are already published and were reviewed; publish skips them.
+        required: false
+        default: false
+        type: boolean
   push:
     tags:
       - 'v*'
@@ -251,6 +256,8 @@ jobs:
       - name: Verify all targets, digests and updater signatures
         run: bun .pipeline/tools/release/release-packages/src/native/assemble.ts
       - name: Refuse published releases or moved tags
+        env:
+          NPM_PUBLISHED_REVIEWED: ${{ inputs.npm_published_reviewed || false }}
         run: bun .pipeline/tools/release/release-packages/src/native/publish.ts check
       - name: Attest the complete binary set and source/workflow manifest
         id: provenance

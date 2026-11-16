@@ -1,1 +1,2 @@
 - Standalone HTML export keeps style values from imported documents inside the page's stylesheet, so they can no longer add markup to the page.
+- HTML export leaves out imported JSX attributes whose names would add other attributes to the element.

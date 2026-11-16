@@ -78,6 +78,12 @@ export function mergeClassNames(...values: Array<string | undefined>): string | 
   return className.length > 0 ? className : undefined
 }
 
+/**
+ * Characters that end an attribute name or quote one. Imported JSX props can have any name, and
+ * one holding these would write other attributes, so such a name is left out.
+ */
+const UNSAFE_ATTRIBUTE_NAME = /[\s"'/=>]/
+
 function serializeAttrs(node: DesignElement, options: SerializeHTMLOptions): string {
   const style = serializeStyle(node)
   const tailwindClass =
@@ -92,6 +98,7 @@ function serializeAttrs(node: DesignElement, options: SerializeHTMLOptions): str
   if (style && options.style !== 'tailwind') attrs.style = style
   const serialized = Object.entries(attrs)
     .filter((entry): entry is [string, string] => typeof entry[1] === 'string' && entry[1] !== '')
+    .filter(([name]) => name !== '' && !UNSAFE_ATTRIBUTE_NAME.test(name))
     .map(([name, value]) => `${name}="${escapeAttribute(value)}"`)
 
   if (serialized.length === 0) return ''

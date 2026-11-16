@@ -84,6 +84,16 @@ export function mergeClassNames(...values: Array<string | undefined>): string | 
  */
 const UNSAFE_ATTRIBUTE_NAME = /[\s"'/=>]/
 
+/**
+ * HTML, SVG, and custom element names. Imported JSX can name any tag, and one holding spaces or
+ * quotes would write attributes, so another name is written as a `div` with the same content.
+ */
+const SAFE_TAG_NAME = /^[a-z][\w.:-]*$/i
+
+function safeTagName(tagName: string): string {
+  return SAFE_TAG_NAME.test(tagName) ? tagName : 'div'
+}
+
 function serializeAttrs(node: DesignElement, options: SerializeHTMLOptions): string {
   const style = serializeStyle(node)
   const tailwindClass =
@@ -120,7 +130,7 @@ function serializeElement(
   depth: number
 ): string {
   // SVG names such as `linearGradient` keep their case, as an SVG parser needs them.
-  const tagName = node.tagName
+  const tagName = safeTagName(node.tagName)
   const attrs = serializeAttrs(node, options)
   if (VOID_ELEMENTS.has(tagName.toLowerCase())) return `<${tagName}${attrs}>`
   const children = [
@@ -150,7 +160,7 @@ export function serializeNode(
 export function serializedElements(document: DesignDocument): (DesignElement | null)[] {
   const visit = (node: DesignNode): (DesignElement | null)[] => {
     if (node.type === 'text') return []
-    if (VOID_ELEMENTS.has(node.tagName.toLowerCase())) return [node]
+    if (VOID_ELEMENTS.has(safeTagName(node.tagName).toLowerCase())) return [node]
     return [node, ...(node.shader?.frame ? [null] : []), ...node.children.flatMap(visit)]
   }
   return document.children.flatMap(visit)

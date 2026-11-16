@@ -21,6 +21,25 @@ describe('serializeHTML', () => {
     expect(attributeNames(html)).toEqual(['src', 'alt'])
   })
 
+  test('writes a tag name that would write attributes as a div with its content', () => {
+    const html = serializeHTML(
+      jsxToDesignDocumentCore(jsx('img src=x onerror=alert(1)', { title: 't', children: 'A' }))
+    )
+    const [element] = parseFragment(html).childNodes
+
+    expect(element?.nodeName).toBe('div')
+    expect(attributeNames(html)).toEqual(['title'])
+    expect(html).toContain('A</div>')
+  })
+
+  test('writes custom element and SVG tag names as they are', () => {
+    const html = serializeHTML(
+      jsxToDesignDocumentCore(jsx('my-widget', { children: jsx('linearGradient', {}) }))
+    )
+
+    expect(html).toBe('<my-widget><linearGradient></linearGradient></my-widget>')
+  })
+
   test('writes namespaced, data, and custom attribute names as they are', () => {
     const html = serializeHTML(
       jsxToDesignDocumentCore(jsx('use', { 'xlink:href': '#a', 'data-name': 'A', '@click': 'go' }))

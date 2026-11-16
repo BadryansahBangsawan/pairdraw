@@ -31,5 +31,5 @@ export default {
         (process.env.COMMITLINT_PR_TITLE !== '1' && isIgnored(message)))
   ],
   helpUrl:
-    'https://github.com/BadryansahBangsawan/pairdraw/blob/master/CONTRIBUTING.md#commit-messages'
+    'https://github.com/BadryansahBangsawan/pairdraw/blob/main/CONTRIBUTING.md#commit-messages'
 } satisfies UserConfig

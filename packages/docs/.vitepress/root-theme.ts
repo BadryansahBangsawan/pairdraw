@@ -35,7 +35,7 @@ export const rootThemeConfig = (): DefaultTheme.Config => ({
   socialLinks: [{ icon: 'github', link: 'https://github.com/BadryansahBangsawan/pairdraw' }],
 
   editLink: {
-    pattern: 'https://github.com/BadryansahBangsawan/pairdraw/edit/master/packages/docs/:path'
+    pattern: 'https://github.com/BadryansahBangsawan/pairdraw/edit/main/packages/docs/:path'
   },
 
   footer: {

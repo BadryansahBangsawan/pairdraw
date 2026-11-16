@@ -17,7 +17,7 @@ The SDK is headless by design: it provides logic and structure, while your app o
 bun add @pairdraw/vue @pairdraw/core @pairdraw/scene-graph canvaskit-wasm
 ```
 
-The current development version requires Vue `^3.5.41` and, when supplying the optional CanvasKit peer, `canvaskit-wasm >=0.41.1`. See [SDK Getting Started](https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/programmable/sdk/getting-started.md) for migration guidance; older releases may have different peer requirements.
+The current development version requires Vue `^3.5.41` and, when supplying the optional CanvasKit peer, `canvaskit-wasm >=0.41.1`. See [SDK Getting Started](https://github.com/BadryansahBangsawan/pairdraw/blob/main/packages/docs/programmable/sdk/getting-started.md) for migration guidance; older releases may have different peer requirements.
 
 ## Quick start
 

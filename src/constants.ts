@@ -82,7 +82,7 @@ export const NODE_DOWNLOAD_URL = 'https://nodejs.org/en/download'
  * includes a VitePress `{#id}`.
  */
 export function docsURL(path: string, anchor?: string): string {
-  const page = `https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/${path}.md`
+  const page = `https://github.com/BadryansahBangsawan/pairdraw/blob/main/packages/docs/${path}.md`
   return anchor ? `${page}#${anchor}` : page
 }
 

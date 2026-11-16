@@ -18,7 +18,7 @@ import {
 
 import { repoPath } from '#tests/helpers/paths'
 
-const DOCS_ON_GITHUB = 'https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/'
+const DOCS_ON_GITHUB = 'https://github.com/BadryansahBangsawan/pairdraw/blob/main/packages/docs/'
 
 /** The anchor GitHub gives a Markdown heading: its text, lowercased, punctuation dropped. */
 function githubAnchor(heading: string): string {

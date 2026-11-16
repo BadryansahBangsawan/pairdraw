@@ -63,7 +63,7 @@ interface ExportArgs {
 
 async function writeAndLog(path: string, content: string | Uint8Array) {
   await writeFile(path, content)
-  const size = typeof content === 'string' ? content.length : content.length
+  const size = typeof content === 'string' ? Buffer.byteLength(content, 'utf8') : content.length
   console.log(ok(`Exported ${path} (${(size / 1024).toFixed(1)} KB)`))
 }
 

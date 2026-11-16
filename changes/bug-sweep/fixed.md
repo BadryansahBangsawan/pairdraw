@@ -34,3 +34,4 @@
 - Converting a document to `.pen` keeps the content of instances whose component is not in the file, and a `.pen` file saved with an invalid number always reopens.
 - Imported HTML resolves `var()` fallbacks that hold parentheses or another `var()`, and matches selectors that mix child and descendant combinators, such as `.a > .b .c`.
 - JSX export of a page or document now exports its top-level layers instead of failing with "Nothing to export".
+- `export` reports the real file size of text exports that contain non-ASCII characters.

@@ -245,7 +245,7 @@ function manualAgentCommand(agent: ACPAgentDef, setup: AgentSetupState): string 
     return null
   }
   const admin = setup.adapterNeedsAdmin === true
-  const oneClick = setup.supported && setup.npm && !admin && setup.error !== 'install'
+  const oneClick = setup.npm && !admin && setup.error !== 'install'
   if (oneClick && agent.adapterPackage) return null
   return admin && !detectUserAgent().includes('Windows')
     ? `sudo ${agent.installCommand}`

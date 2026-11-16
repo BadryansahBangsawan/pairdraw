@@ -396,7 +396,8 @@ function matchLinkedChildren(
     if (!child || replacements.has(child.id)) continue
     const mappedComponentId = copiedComponentLayerId(overrides, instParentId, child)
     if (mappedComponentId && compChildIdSet.has(mappedComponentId)) {
-      if (replacements.has(instChildMap.get(mappedComponentId)?.id ?? '')) continue
+      // The first copy of a layer keeps it; a duplicate stays unmatched for the sync to remove.
+      if (instChildMap.has(mappedComponentId)) continue
       instChildMap.set(mappedComponentId, child)
       usedInstChildIds.add(child.id)
     }

@@ -25,3 +25,4 @@
 - Snapping measures a rotated line from its start point, where it is drawn, and no longer draws a guide for an equally near edge it did not snap to.
 - Layers with a corrupt parent cycle no longer freeze the editor.
 - A `.fig` file with a component property pointing to a missing parent property now opens instead of failing to load.
+- A duplicated layer inside an instance no longer keeps stale styles after its component changes.

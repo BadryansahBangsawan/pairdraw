@@ -5,6 +5,24 @@ import { SceneGraph } from '@pairdraw/scene-graph'
 import { recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 
 describe('instance synchronization child deduplication', () => {
+  test('a duplicate copy of one component layer does not stay stale after a sync', () => {
+    const graph = new SceneGraph()
+    const page = graph.addPage('Page')
+    const component = graph.createNode('COMPONENT', page.id, { name: 'Card' })
+    const compChild = graph.createNode('RECTANGLE', component.id, { name: 'Body' })
+    const instance = graph.createInstance(component.id, page.id)
+    if (!instance) throw new Error('instance not created')
+    graph.createNode('RECTANGLE', instance.id, { name: 'Body', componentId: compChild.id })
+    const green = { r: 0, g: 1, b: 0, a: 1 }
+    graph.updateNode(compChild.id, {
+      fills: [{ type: 'SOLID', color: green, opacity: 1, visible: true }]
+    })
+    graph.syncInstances(component.id)
+    const copies = graph.getChildren(instance.id)
+    expect(copies.length).toBe(1)
+    for (const copy of copies) expect(copy.fills[0]?.color).toEqual(green)
+  })
+
   test('syncInstances on instance with imported children without componentId does not duplicate children', () => {
     const graph = new SceneGraph()
     const page = graph.addPage('Page')

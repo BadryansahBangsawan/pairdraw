@@ -4,10 +4,12 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
     && apt-get install --yes --no-install-recommends \
+        build-essential \
         ca-certificates \
         curl \
         git \
         libappindicator3-dev \
+        libdbus-1-dev \
         librsvg2-dev \
         libwebkit2gtk-4.1-dev \
         pkg-config \

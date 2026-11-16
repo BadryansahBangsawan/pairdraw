@@ -121,12 +121,13 @@ export function createStructureActions(ctx: EditorContext) {
       .sort((a, b) => a.index - b.index)
     if (origins.length === 0) return
     const parentIds = new Set(origins.map((origin) => origin.parentId))
+    const prevSelection = new Set(ctx.state.selectedIds)
     const move = () => {
       for (const { id } of origins) ctx.graph.reparentNode(id, pageId)
       for (const parentId of parentIds) ctx.runLayoutForNode(parentId)
+      ctx.setSelectedIds(new Set())
     }
     move()
-    ctx.setSelectedIds(new Set())
     ctx.undo.push({
       label: 'Move to page',
       forward: move,
@@ -136,6 +137,7 @@ export function createStructureActions(ctx: EditorContext) {
           ctx.graph.updateNode(id, place)
         }
         for (const parentId of parentIds) ctx.runLayoutForNode(parentId)
+        ctx.setSelectedIds(new Set(prevSelection))
       }
     })
   }

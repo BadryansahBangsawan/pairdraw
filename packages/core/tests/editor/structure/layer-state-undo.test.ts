@@ -65,4 +65,18 @@ describe('layer state undo', () => {
     editor.undo.redo()
     expect(node(other).childIds).toEqual([a, c])
   })
+
+  test('undoing a move to another page selects the moved layers again', () => {
+    const { a, b, c } = setup()
+    const other = editor.addPage('Other')
+    editor.select([a, c])
+    editor.moveToPage(other)
+    expect([...editor.state.selectedIds]).toEqual([])
+    editor.undo.undo()
+    expect([...editor.state.selectedIds]).toEqual([a, c])
+    // Redo takes the layers off this page again, so they do not stay selected here.
+    editor.select([a, b])
+    editor.undo.redo()
+    expect([...editor.state.selectedIds]).toEqual([])
+  })
 })

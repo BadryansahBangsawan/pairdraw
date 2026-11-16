@@ -205,8 +205,14 @@ async function initializeHistory() {
     return
   }
   historyReady = true
+  takeUpRunningReply()
   await resumeQueue()
   sendPendingPrompt()
+}
+/** A reply still running in this document's chat shows live again, with its Stop button. */
+function takeUpRunningReply() {
+  const running = history.runningChat()
+  if (running && !chat.value) chat.value = markRaw(running)
 }
 /**
  * Takes up what waited in this document's chat when it shows again: the reply still running gets
@@ -439,6 +445,7 @@ watch(
     // A page switch keeps the document and its conversation, so a running chat stays attached.
     if (generation !== viewGeneration) return
     if (history.current.value?.id !== conversationId) chat.value = null
+    takeUpRunningReply()
     sendPendingPrompt()
   }
 )

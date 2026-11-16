@@ -36,7 +36,7 @@ export function createConversationHistory<TChat extends HistoryChat>(
   // Drafts left before anything saved them, kept so a reference still being described when the
   // person switched can save its draft. Few are kept: each switch away from a draft adds one.
   const leftDrafts = new Map<string, Conversation>()
-  const session = createHistorySession(() => runtime.resetChat())
+  const session = createHistorySession<TChat>(() => runtime.resetChat())
   const { flush, saveProfile, storageError } = createHistoryPersistence({
     store,
     current,
@@ -203,6 +203,15 @@ export function createConversationHistory<TChat extends HistoryChat>(
   function initialize() {
     return serialize(loadDocument)
   }
+
+  /**
+   * The chat still replying in the conversation this document shows, without starting a chat, so
+   * a chat view shown again takes up the reply it left.
+   */
+  function runningChat(): TChat | null {
+    if (readOnly.value || owner?.deref() !== runtime.getEditor()) return null
+    return session.replying
+  }
   function newChat() {
     return serialize(async () => {
       await detach()
@@ -282,6 +291,7 @@ export function createConversationHistory<TChat extends HistoryChat>(
     storageError,
     initialize,
     ensureChat,
+    runningChat,
     flush,
     newChat,
     open,

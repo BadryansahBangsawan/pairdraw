@@ -15,13 +15,15 @@ function replying(chat: HistoryChat): boolean {
 }
 
 /** Owns live subscriptions; a failed final save deliberately leaves the session attached. */
-export function createHistorySession(reset: () => Promise<void>) {
-  let live: HistoryChat | null = null
+export function createHistorySession<TChat extends HistoryChat = HistoryChat>(
+  reset: () => Promise<void>
+) {
+  let live: TChat | null = null
   let interrupted = false
   let generation = 0
   let stopWatch: (() => void) | undefined
 
-  function attach(next: HistoryChat, flush: () => Promise<void>): void {
+  function attach(next: TChat, flush: () => Promise<void>): void {
     if (live === next) return
     stopWatch?.()
     live = next
@@ -70,6 +72,10 @@ export function createHistorySession(reset: () => Promise<void>) {
     detach,
     get chat() {
       return live
+    },
+    /** The attached chat while it replies. */
+    get replying(): TChat | null {
+      return live && replying(live) ? live : null
     },
     get interrupted() {
       return interrupted || live?.status === 'submitted' || live?.status === 'streaming'

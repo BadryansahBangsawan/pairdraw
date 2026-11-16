@@ -13,6 +13,13 @@ const SCRIPT_WIDTH = 360
 const SCRIPT_HEIGHT = 240
 
 export function bindScriptToolHost(store: EditorStore): () => void {
+  async function run(id: string): ReturnType<ScriptToolHost['run']> {
+    const result = await runScriptNode(store.graph, id, store.state.currentPageId)
+    return result.ok
+      ? { id, ok: true, layers: result.nodeCount }
+      : { id, ok: false, error: result.error }
+  }
+
   const host: ScriptToolHost = {
     async create({ source, x = 0, y = 0 }) {
       const id = store.createShape(
@@ -23,20 +30,12 @@ export function bindScriptToolHost(store: EditorStore): () => void {
         SCRIPT_HEIGHT
       )
       setScriptSource(store, id, source)
-      const result = await runScriptNode(store.graph, id, store.state.currentPageId)
-      return result.ok
-        ? { id, ok: true, layers: result.nodeCount }
-        : { id, ok: false, error: result.error }
+      return run(id)
     },
     setSource(id, source) {
       setScriptSource(store, id, source)
     },
-    async run(id) {
-      const result = await runScriptNode(store.graph, id, store.state.currentPageId)
-      return result.ok
-        ? { id, ok: true, layers: result.nodeCount }
-        : { id, ok: false, error: result.error }
-    }
+    run
   }
   return registerScriptToolHost(store.graph, host)
 }

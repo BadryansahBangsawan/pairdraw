@@ -124,6 +124,10 @@ function decompressZstd(compressed: Uint8Array): Uint8Array {
   return wasmZstd.decompress(compressed)
 }
 
+/**
+ * The chunks of a raw `fig-kiwi` container, or null for other data or fewer than two chunks.
+ * Fewer than four trailing bytes declare no chunk; a chunk longer than the bytes left throws.
+ */
 export function parseFigKiwiChunks(binary: Uint8Array): Uint8Array[] | null {
   if (!figFileKind(binary)) return null
 
@@ -131,9 +135,13 @@ export function parseFigKiwiChunks(binary: Uint8Array): Uint8Array[] | null {
   let offset = 12
 
   const chunks: Uint8Array[] = []
-  while (offset < binary.length) {
+  while (offset + 4 <= binary.length) {
     const chunkLen = view.getUint32(offset, true)
     offset += 4
+    if (chunkLen > binary.length - offset)
+      throw new Error(
+        `Corrupted .fig file: chunk at offset ${offset - 4} declares length ${chunkLen} but only ${binary.length - offset} bytes remain`
+      )
     chunks.push(binary.slice(offset, offset + chunkLen))
     offset += chunkLen
   }

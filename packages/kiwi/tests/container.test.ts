@@ -123,6 +123,24 @@ describe('Figma FIG Kiwi container helpers', () => {
     expect(parseFigKiwiChunks(new TextEncoder().encode('not-fig-kiwi'))).toBeNull()
   })
 
+  /** A `fig-kiwi` header, version 0, then `tail` as the chunk table. */
+  const figKiwi = (...tail: number[]) =>
+    new Uint8Array([...new TextEncoder().encode('fig-kiwi'), 0, 0, 0, 0, ...tail])
+
+  test('finds no chunks in a container too short to declare one', () => {
+    expect(parseFigKiwiChunks(figKiwi(2, 0))).toBeNull()
+    expect(parseFigKiwiChunks(figKiwi(1, 0, 0, 0, 7, 1, 0, 0, 0, 8, 0))).toEqual([
+      new Uint8Array([7]),
+      new Uint8Array([8])
+    ])
+  })
+
+  test('rejects a chunk that declares more bytes than the container holds', () => {
+    expect(() => parseFigKiwiChunks(figKiwi(1, 0, 0, 0, 7, 10, 0, 0, 0, 8, 9, 10))).toThrow(
+      'Corrupted .fig file: chunk at offset 17 declares length 10 but only 3 bytes remain'
+    )
+  })
+
   // Figma's "Save local copy" of a FigJam board writes `fig-jam.` where a design has `fig-kiwi`.
   test('writes and reads a FigJam board under its own header', () => {
     const schema = new Uint8Array([1, 2, 3])

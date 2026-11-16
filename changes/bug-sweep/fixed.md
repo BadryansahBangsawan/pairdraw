@@ -13,3 +13,4 @@
 - Imported HTML resolves CSS custom properties declared on any selector, uses `var()` fallbacks, inherits text styles set on `:root`, and resolves `calc()` products written with the number first.
 - JSX style strings keep semicolons inside `url()` and quoted values, so data URLs import intact.
 - Damaged `.fig` files and Figma clipboard data fail with an error instead of freezing the app or loading wrong values, and text with an unpaired surrogate no longer loses the character after it when saved.
+- A raw `.fig` file that is cut short reports a corrupted file instead of a range error.

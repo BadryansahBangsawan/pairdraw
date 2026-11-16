@@ -153,7 +153,11 @@ export function swapInstanceComponent(
 
   const childIds = Array.from(instance.childIds)
   const slotContent = detachOwnedSlotContent(graph, instance)
-  for (const childId of childIds) graph.deleteNode(childId)
+  for (const childId of childIds) {
+    // The clones take new IDs, so what was recorded for the removed layers would never apply.
+    forgetOverridesOf(graph, childId)
+    graph.deleteNode(childId)
+  }
   graph.updateNode(instanceId, updates)
   cloneChildrenWithMapping(graph, componentId, instanceId)
   restoreOwnedSlotContent(graph, instance, slotContent)

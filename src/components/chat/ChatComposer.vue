@@ -101,7 +101,10 @@ defineExpose({ restoreDraft, prependDraft, edit, insert: editor.insert, focus: e
     <!-- The message box rests on the panel as a card, its shadow parting it from the messages. -->
     <div :class="ui.root()">
       <form class="relative" @submit="handleSubmit" @paste.stop="emit('paste', $event)">
-        <InputGroup :disabled="disabled" :ui="{ root: ui.group() }">
+        <InputGroup
+          :disabled="disabled"
+          :ui="{ root: ui.group(), toolbar: ui.composerToolbar(), model: ui.composerModel() }"
+        >
           <template v-if="$slots.attachment" #attachment><slot name="attachment" /></template>
 
           <div ref="host" class="min-w-0" @copy.stop @cut.stop />

@@ -308,7 +308,7 @@ const selectedProfileName = computed(
       <ChatExplorePicker v-model="exploreSetting" :disabled="disabled" />
     </template>
     <template #model>
-      <div class="@container flex min-w-0 items-center">
+      <div :class="ui.model()">
         <!-- A coding agent offers what its sessions advertise; Pi picks its own model. -->
         <ChatProfileSelect ref="profileSelect">
           <template #value>

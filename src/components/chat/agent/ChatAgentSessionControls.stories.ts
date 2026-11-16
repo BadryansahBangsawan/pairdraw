@@ -1,7 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { expect, fn, screen, userEvent, within } from 'storybook/test'
+import { TooltipProvider } from 'reka-ui'
+import { expect, fn, screen, userEvent, waitFor, within } from 'storybook/test'
+import IconCompass from '~icons/lucide/compass'
+import IconMousePointer from '~icons/lucide/mouse-pointer-2'
+import IconPaperclip from '~icons/lucide/paperclip'
+import IconSparkles from '~icons/lucide/sparkles'
 
 import { startAgentSessionControls } from '@/app/ai/agents/acp/session/store'
+import ChatComposer from '@/components/chat/ChatComposer.vue'
+import { chatInputTheme } from '@/components/chat/ui'
+import IconButton from '@/components/ui/button/IconButton.vue'
 
 import ChatAgentSessionControls from './ChatAgentSessionControls.vue'
 
@@ -11,12 +19,26 @@ interface Args {
   onError: (message: string) => void
 }
 
-/** What Codex's adapter advertises: a model and reasoning effort as config options, and modes. */
-async function advertise(agentId: string): Promise<void> {
+/**
+ * What Codex's adapter advertises: a model and reasoning effort as config options, and modes.
+ * `extra` adds options outside those categories, as agents such as omp advertise.
+ */
+async function advertise(agentId: string, extra = 0): Promise<void> {
   await startAgentSessionControls(
     agentId,
     {
       configOptions: [
+        ...Array.from({ length: extra }, (_, index) => ({
+          type: 'select' as const,
+          id: `option-${index}`,
+          name: `Option ${index + 1}`,
+          category: 'other',
+          currentValue: 'on',
+          options: [
+            { value: 'on', name: 'On' },
+            { value: 'off', name: 'Off' }
+          ]
+        })),
         {
           type: 'select',
           id: 'model',
@@ -112,4 +134,79 @@ export const Cramped: Story = {
     template:
       '<div class="@container flex w-28 items-center rounded-card border border-border bg-panel p-2"><ChatAgentSessionControls v-bind="args" /></div>'
   })
+}
+
+/** Two rectangles that share any area. */
+function overlaps(a: DOMRect, b: DOMRect): boolean {
+  return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom
+}
+
+/**
+ * In the composer of a chat narrowed beside the canvas, the controls of an agent that advertises
+ * five never run into each other or into the composer's settings and send buttons.
+ */
+export const InNarrowComposer: Story = {
+  args: { agentId: 'story-omp-composer' },
+  loaders: [({ args }) => advertise(args.agentId, 2)],
+  render: (args) => ({
+    components: {
+      ChatAgentSessionControls,
+      ChatComposer,
+      IconButton,
+      IconCompass,
+      IconMousePointer,
+      IconPaperclip,
+      IconSparkles,
+      TooltipProvider
+    },
+    setup: () => ({ args, ui: chatInputTheme() }),
+    template: `
+      <TooltipProvider>
+        <div v-for="width in [240, 300, 360, 420, 520, 640, 840]" :key="width" :style="{ width: width + 'px' }" class="bg-panel" data-test-id="narrow-composer">
+          <ChatComposer status="ready" :prompts="[]">
+            <template #leading>
+              <IconButton label="Mention selection" size="sm"><IconMousePointer class="size-4" /></IconButton>
+              <IconButton label="Attach files" size="sm"><IconPaperclip class="size-4" /></IconButton>
+              <IconButton label="Use a skill" size="sm"><IconSparkles class="size-4" /></IconButton>
+              <IconButton label="Explore" size="sm"><IconCompass class="size-4" /></IconButton>
+            </template>
+            <template #model>
+              <div :class="ui.model()">
+                <button type="button" class="flex min-w-0 items-center gap-1 px-1.5 text-[11px] text-muted"><span class="min-w-0 truncate">omp</span></button>
+                <ChatAgentSessionControls v-bind="args" />
+              </div>
+            </template>
+          </ChatComposer>
+        </div>
+      </TooltipProvider>`
+  }),
+  play: async ({ canvasElement }) => {
+    const composers = within(canvasElement).getAllByTestId('narrow-composer')
+    for (const composer of composers) {
+      const triggers = await waitFor(async () => {
+        const found = within(composer).getAllByRole('combobox')
+        await expect(found).toHaveLength(5)
+        return found
+      })
+      const actions = [
+        ...composer.querySelectorAll<HTMLElement>(
+          '[data-test-id="provider-settings-trigger"], button[type="submit"]'
+        )
+      ]
+      await expect(actions).toHaveLength(2)
+      const width = composer.style.width
+      const boxes = triggers.map((trigger) => trigger.getBoundingClientRect())
+      for (const [index, box] of boxes.entries()) {
+        for (const other of boxes.slice(index + 1)) {
+          await expect(overlaps(box, other), `controls overlap at ${width}`).toBe(false)
+        }
+        for (const action of actions) {
+          await expect(
+            overlaps(box, action.getBoundingClientRect()),
+            `a control covers ${action.getAttribute('aria-label') ?? 'an action'} at ${width}`
+          ).toBe(false)
+        }
+      }
+    }
+  }
 }

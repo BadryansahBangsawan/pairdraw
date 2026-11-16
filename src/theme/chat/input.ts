@@ -4,12 +4,20 @@
  */
 export default {
   slots: {
-    root: 'shrink-0 px-3 pt-1 pb-3',
+    root: '@container/composer shrink-0 px-3 pt-1 pb-3',
     /** Over the input group's own border, radius, and focus ring. */
     group: 'bg-panel elevation-card',
     /** The first prompt's field and the bar holding its send button, stacked unless inline. */
     control: '',
     toolbar: '',
+    /**
+     * The chat composer's toolbar wraps rather than letting its model area run under the buttons
+     * beside it; a narrow composer gives the model area a row of its own below them.
+     */
+    composerToolbar: 'h-auto min-h-7 flex-wrap gap-y-1',
+    composerModel: '@max-md/composer:order-last @max-md/composer:basis-full',
+    /** The model picker and what the chosen model or coding agent offers beside it. */
+    model: '@container flex min-w-0 items-center',
     /** A first prompt's text field, which grows with what is written up to its maximum. */
     field:
       'block max-h-60 min-h-16 w-full resize-none bg-transparent px-3 pt-2.5 text-sm leading-relaxed text-surface outline-none field-sizing-content placeholder:text-muted',

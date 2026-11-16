@@ -106,8 +106,7 @@ export async function readFragments(directory: string): Promise<FragmentReadResu
         path
       )
       errors.push(...parsed.errors)
-      if (parsed.bullets.length > 0)
-        fragments.push({ folder, category, bullets: parsed.bullets })
+      if (parsed.bullets.length > 0) fragments.push({ folder, category, bullets: parsed.bullets })
     }
   }
   fragments.sort((a, b) => compareFolders(a.folder, b.folder))

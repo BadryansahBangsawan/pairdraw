@@ -1,2 +1,3 @@
 - Opening a room link in a build without live rooms no longer edits a blank design under that link; the app goes back to Home and says the link needs a build with rooms.
 - A coding agent that runs on its own credentials, such as omp, no longer asks you to sign in to it when it finds nothing to use; the chat says what to set up in the agent instead.
+- Pasting setup instructions for omp, which installs with Bun, no longer tells the agent to fix an npm permission error that cannot happen.

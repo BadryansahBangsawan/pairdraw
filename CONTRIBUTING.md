@@ -70,10 +70,10 @@ Pull requests must be reviewable without guessing the author's intent.
 
 ### Stacked pull requests
 
-A stack is a chain of pull requests: the bottom one targets `master`, each one above targets the branch below. CI and branch protection treat every layer as targeting `master`.
+A stack is a chain of pull requests: the bottom one targets `main`, each one above targets the branch below. CI and branch protection treat every layer as targeting `main`.
 
 - Manage stacks with [`gh stack`](https://github.com/github/gh-stack) (`init`, `add`, `submit`, `sync`; add `--remote origin` with several remotes); a stacked pull request's base cannot be edited.
-- Keep it linear: when `master` or a lower branch moves, rebase the layers (`gh stack rebase` or the pull request's Rebase button) and push with `--force-with-lease`. Merging `master` in blocks the stack from merging.
+- Keep it linear: when `main` or a lower branch moves, rebase the layers (`gh stack rebase` or the pull request's Rebase button) and push with `--force-with-lease`. Merging `main` in blocks the stack from merging.
 - Merge from the top layer through the merge queue, in the UI or with `gh api -X PUT repos/{owner}/{repo}/pulls/<n>/merge-async -f merge_action=merge_queue`; it lands every layer below too. `gh pr merge` and auto-merge are unavailable for stacks.
 
 ### Reviewability
@@ -104,11 +104,11 @@ Use `type(optional-scope): short description`, for example `fix(MCP): preserve c
 
 PR titles follow the same convention because GitHub uses them as merge subjects. The separate **PR title** workflow checks new and updated PRs, including title edits, without rerunning the full CI suite. Title validation disables commitlint's default merge/revert exceptions. Release titles and commits retain the exact `Release vX.Y.Z` (or `-beta.N`) convention.
 
-Commit-range validation retains commitlint's default merge/revert exceptions, but they are not a naming convention. Preserve the validated PR title when merging via CLI/API (`gh pr merge --subject` must use it), and use explicit conventional subjects for branch updates, for example `chore: merge master into my-branch`. Do not rewrite published history solely to normalize messages. These checks validate structure and known AI co-author identities, not whether a description is meaningful or the type is appropriate.
+Commit-range validation retains commitlint's default merge/revert exceptions, but they are not a naming convention. Preserve the validated PR title when merging via CLI/API (`gh pr merge --subject` must use it), and use explicit conventional subjects for branch updates, for example `chore: merge main into my-branch`. Do not rewrite published history solely to normalize messages. These checks validate structure and known AI co-author identities, not whether a description is meaningful or the type is appropriate.
 
 ```sh
 bun run check:commits --last
-bun run check:commits --from origin/master --to HEAD --verbose
+bun run check:commits --from origin/main --to HEAD --verbose
 printf '%s\n' 'fix(MCP): preserve connection settings' | COMMITLINT_PR_TITLE=1 bun run check:commits
 ```
 

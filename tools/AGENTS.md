@@ -27,7 +27,7 @@ Private tooling lives under `tools/<role>/<domain>/{src,tests}`; Steiger enforce
 - Required checks must also run on `merge_group`, the merge queue's event; read base and head from `merge_group.base_sha`/`head_sha` there (`ci.yml`, `pr-title.yml`).
 - Path classification measures a pull request from its merge commit's first parent, the base as it is now; `pull_request.base.sha` lags when the base moves and would count the base's newer commits as the pull request's (`tools/ci/policy/tests/classify.test.ts`).
 - A passing pull request run records the tree it tested as the `CI verified tree` status on the PR head; a merge queue commit with that exact tree is classified `verified` and runs only the always-on checks. Any other tree, including a group with other PRs ahead, gets the full run (`tools/ci/policy/src/verified-tree/`).
-- The app production workflow runs on `v*` tags, and the docs workflow when a release is published, since the download page reads GitHub's releases at build time; both also run on `workflow_dispatch`, never on ordinary `master` pushes. `build.yml` checks the tooling out under `.pipeline/` and runs `tools/release/release-packages` from there.
+- The app production workflow, `.github/workflows/build.yml`, runs on `v*` tags or through `workflow_dispatch` with an existing tag, never on ordinary branch pushes. The docs site has no deploy workflow in this repository; `packages/docs` builds it locally or in the caller's own CI. `build.yml` checks the tooling out under `.pipeline/` and runs `tools/release/release-packages` from there.
 
 ## Releases
 
@@ -44,7 +44,7 @@ The `/demo` document is a tour of eight chapters on one page, each a section sta
 
 ## Landing posters
 
-`tools/generate/landing-posters/` captures WebP stills of every docs landing stage, per locale, theme, and layout, from a production docs build served locally in headless Chromium with software WebGL. `build:production` in `packages/docs` runs it after `vitepress build`; it reuses `.cache/landing-posters/<fingerprint>` when the inputs in `src/fingerprint.ts` are unchanged and copies the stills into `dist`, and `generate:landing-posters` forces a capture. The docs deploy workflow spreads the capture over runners: one job runs `build:site`, four run the generator with `--shard i/4`, and the deploy job gathers their stills and runs it with `--assemble`, which fails on any missing still; dispatching it with `dry-run` builds and captures without deploying and keeps the stills as an artifact. A stage that starts depending on a new source tree adds it to `LANDING_POSTER_INPUTS`.
+`tools/generate/landing-posters/` captures WebP stills of every docs landing stage, per locale, theme, and layout, from a production docs build served locally in headless Chromium with software WebGL. `build:production` in `packages/docs` runs it after `vitepress build`; it reuses `.cache/landing-posters/<fingerprint>` when the inputs in `src/fingerprint.ts` are unchanged and copies the stills into `dist`, and `generate:landing-posters` forces a capture. CI can spread one capture over runners: `--shard i/4` captures only that part of the pages into the cache, and `--assemble`, run once the parts are gathered, checks that every still is there before copying them into the build. A stage that starts depending on a new source tree adds it to `LANDING_POSTER_INPUTS`.
 
 ## Brand assets
 

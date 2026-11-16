@@ -25,11 +25,11 @@ bun --filter @pairdraw/cloud build:standalone && bun --filter @pairdraw/cloud st
 ```
 
 The server migrates the database before it accepts requests. The
-[self-hosting guide](https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/reference/self-hosting-cloud.md) covers building with the
+[self-hosting guide](https://github.com/BadryansahBangsawan/pairdraw/blob/main/packages/docs/reference/self-hosting-cloud.md) covers building with the
 portal, configuration, the editor address, operator commands, and upgrades;
 [`deploy/README.md`](./deploy/README.md) covers local development and end-to-end tests, and
 [`deploy/security.md`](./deploy/security.md) covers hardening. The design is described in
-[Cloud Architecture](https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/development/cloud.md).
+[Cloud Architecture](https://github.com/BadryansahBangsawan/pairdraw/blob/main/packages/docs/development/cloud.md).
 
 ## Tests
 

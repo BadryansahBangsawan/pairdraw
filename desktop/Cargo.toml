@@ -2,7 +2,7 @@
 name = "pairdraw"
 version = "0.16.0"
 description = "Pairdraw desktop app"
-authors = ["Danila Poyarkov"]
+authors = ["Badryansah Bangsawan"]
 edition = "2021"
 
 [features]

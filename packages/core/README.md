@@ -18,7 +18,7 @@ await compileScript(`
 `)(new FigmaAPI(graph))
 ```
 
-- Programmable overview and SDK docs: https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/programmable/index.md
+- Programmable overview and SDK docs: https://github.com/BadryansahBangsawan/pairdraw/blob/main/packages/docs/programmable/index.md
 - Source and issues: https://github.com/BadryansahBangsawan/pairdraw
 
 MIT License.

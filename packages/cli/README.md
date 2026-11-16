@@ -12,8 +12,8 @@ pairdraw libraries seed --root ./catalog
 
 `tokens --import` reads a local stylesheet's custom properties as document variables, and `libraries seed` publishes the built-in Pairdraw Basics set into a filesystem catalog. Inspection commands support `--json` for automation. The MCP server ships separately as `@pairdraw/mcp`.
 
-- CLI reference: https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/programmable/cli/inspecting.md
-- Scripting with the Plugin API: https://github.com/BadryansahBangsawan/pairdraw/blob/master/packages/docs/programmable/cli/scripting.md
+- CLI reference: https://github.com/BadryansahBangsawan/pairdraw/blob/main/packages/docs/programmable/cli/inspecting.md
+- Scripting with the Plugin API: https://github.com/BadryansahBangsawan/pairdraw/blob/main/packages/docs/programmable/cli/scripting.md
 - Source and issues: https://github.com/BadryansahBangsawan/pairdraw
 
 MIT License.

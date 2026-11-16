@@ -151,7 +151,8 @@ export class UndoManager {
 
   /**
    * Adds a change that the newest step caused, as one an editor makes in response to it, so undo
-   * and redo apply them together. Inside a batch it joins the batch. False with no step to join.
+   * and redo apply them together. Inside a batch it joins the batch. False with no step to join,
+   * including after an undo, when the newest step is on the redo stack and not applied.
    */
   extendLastStep(entry: UndoEntry): boolean {
     if (this.currentBatch) {
@@ -159,7 +160,7 @@ export class UndoManager {
       return true
     }
     const last = this.undoStack.at(-1)
-    if (!last) return false
+    if (!last || this.redoStack.length > 0) return false
     // The step keeps its identity, so callers that hold it still find it in the history.
     const { forward, inverse } = last
     last.forward = () => {

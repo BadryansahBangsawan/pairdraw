@@ -26,6 +26,28 @@ test('there is nothing to join before the first step', () => {
   expect(undo.extendLastStep({ label: 'Carry', forward: noop, inverse: noop })).toBe(false)
 })
 
+test('after an undo there is no newest applied step to join', () => {
+  const undo = new UndoManager()
+  let state = 0
+  const add = (label: string, amount: number) => ({
+    label,
+    forward: () => (state += amount),
+    inverse: () => (state -= amount)
+  })
+  const first = add('A', 1)
+  first.forward()
+  undo.push(first)
+  const second = add('B', 10)
+  second.forward()
+  undo.push(second)
+  undo.undo()
+  expect(undo.extendLastStep(add('C', 100))).toBe(false)
+  undo.redo()
+  undo.undo()
+  undo.undo()
+  expect(state).toBe(0)
+})
+
 test('undo and redo say they are replaying while a step runs', () => {
   const undo = new UndoManager()
   const seen: boolean[] = []

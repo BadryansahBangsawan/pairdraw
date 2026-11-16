@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
-import { captureEditCheckpoint } from '@pairdraw/scene-graph/checkpoint'
+import { captureEditCheckpoint, captureGraphCheckpoint } from '@pairdraw/scene-graph/checkpoint'
 
 function graphWithLayers() {
   const graph = new SceneGraph()
@@ -48,4 +48,32 @@ test('restoring puts back every layer object and its fields', () => {
   checkpoint.release()
   expect(graph.nodes).toEqual(before)
   for (const [id, node] of objects) expect(graph.getNode(id)).toBe(node)
+})
+
+test('restoring puts deleted connectors back in the connector index', () => {
+  for (const capture of [captureEditCheckpoint, captureGraphCheckpoint]) {
+    const { graph, frame, other } = graphWithLayers()
+    const pageId = graph.getPages()[0]?.id ?? graph.rootId
+    const connector = graph.createNode('CONNECTOR', pageId, {
+      connectorStart: { nodeId: frame.id, position: { x: 0, y: 0 }, magnet: 'AUTO' },
+      connectorEnd: { nodeId: other.id, position: { x: 0, y: 0 }, magnet: 'AUTO' }
+    })
+    const checkpoint = capture(graph)
+    graph.deleteNode(connector.id)
+
+    checkpoint.restore()
+    expect([...graph.connectorIds]).toEqual([connector.id])
+  }
+})
+
+test('restoring puts back the document kind, and a changed kind fails the property-only check', () => {
+  for (const capture of [captureEditCheckpoint, captureGraphCheckpoint]) {
+    const { graph } = graphWithLayers()
+    const checkpoint = capture(graph)
+    graph.documentKind = 'board'
+
+    expect(() => checkpoint.assertPropertiesOnly()).toThrow('document metadata')
+    checkpoint.restore()
+    expect<string>(graph.documentKind).toBe('design')
+  }
 })

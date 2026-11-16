@@ -5,8 +5,8 @@ import type { InstanceOverrideState } from './instances/overrides'
 import type { SceneNode } from './types'
 
 /**
- * The document state outside its layers, copied: variables, collections, modes, the instance
- * index, libraries, images, and document metadata, which a rollback restores in place.
+ * The document state outside its layers, copied: variables, collections, modes, the instance and
+ * connector indexes, libraries, images, and document metadata, which a rollback restores in place.
  */
 function captureTables(graph: SceneGraph) {
   const variableRefs = new Map(graph.variables)
@@ -16,8 +16,10 @@ function captureTables(graph: SceneGraph) {
     variableCollections: graph.variableCollections,
     activeMode: graph.activeMode,
     instanceIndex: graph.instanceIndex,
+    connectorIds: graph.connectorIds,
     enabledLibraries: graph.enabledLibraries,
     rootId: graph.rootId,
+    documentKind: graph.documentKind,
     figKiwiVersion: graph.figKiwiVersion,
     figSchemaDeflated: graph.figSchemaDeflated,
     documentColorSpace: graph.documentColorSpace
@@ -48,6 +50,7 @@ function captureTables(graph: SceneGraph) {
       images.size !== graph.images.size ||
       [...images].some(([id, bytes]) => graph.images.get(id) !== bytes) ||
       graph.rootId !== snapshot.rootId ||
+      graph.documentKind !== snapshot.documentKind ||
       graph.documentColorSpace !== snapshot.documentColorSpace ||
       graph.figKiwiVersion !== snapshot.figKiwiVersion ||
       !isEqual(graph.figSchemaDeflated, snapshot.figSchemaDeflated)
@@ -61,9 +64,12 @@ function captureTables(graph: SceneGraph) {
     restoreObjects(graph.variableCollections, snapshot.variableCollections, collectionRefs)
     restoreMap(graph.activeMode, structuredClone(snapshot.activeMode))
     restoreMap(graph.instanceIndex, structuredClone(snapshot.instanceIndex))
+    graph.connectorIds.clear()
+    for (const id of snapshot.connectorIds) graph.connectorIds.add(id)
     restoreMap(graph.enabledLibraries, structuredClone(snapshot.enabledLibraries))
     restoreMap(graph.images, images)
     graph.rootId = snapshot.rootId
+    graph.documentKind = snapshot.documentKind
     graph.figKiwiVersion = snapshot.figKiwiVersion
     graph.figSchemaDeflated = structuredClone(snapshot.figSchemaDeflated)
     graph.documentColorSpace = snapshot.documentColorSpace

@@ -23,3 +23,4 @@
 - Zoom to selection, ruler selection marks, and Align measure rotated layers by their visible corners, and the bounds of rotated underlined text follow the rotation.
 - The Scale tool scales text on a path together with its layer.
 - Snapping measures a rotated line from its start point, where it is drawn, and no longer draws a guide for an equally near edge it did not snap to.
+- Layers with a corrupt parent cycle no longer freeze the editor.

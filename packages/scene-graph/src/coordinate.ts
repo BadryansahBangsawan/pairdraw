@@ -6,9 +6,12 @@ import type { SceneNode } from './types'
 
 export function getWorldMatrix(node: SceneNode, graph: Pick<SceneGraph, 'getNode'>): Mat3 {
   const chain: SceneNode[] = []
+  const visited = new Set<string>()
   let current: SceneNode | undefined = node
 
-  while (current) {
+  // A parent cycle in bad data must end the walk instead of hanging it.
+  while (current && !visited.has(current.id)) {
+    visited.add(current.id)
     chain.unshift(current)
     if (!current.parentId) break
     current = graph.getNode(current.parentId)

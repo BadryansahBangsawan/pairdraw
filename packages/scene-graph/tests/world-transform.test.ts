@@ -350,3 +350,14 @@ describe('getWorldHandles — localRect override', () => {
     expect(h.n).toEqual({ x: 320, y: 230 })
   })
 })
+
+describe('world transform — parent cycles', () => {
+  test('a parent cycle in bad data ends the walk instead of hanging', () => {
+    const graph = new SceneGraph()
+    const a = graph.createNodeWithId('cycle-a', 'FRAME', 'cycle-b', { x: 10, y: 0 })
+    graph.createNodeWithId('cycle-b', 'FRAME', 'cycle-a', { x: 0, y: 20 })
+    const matrix = getWorldMatrix(a, graph)
+    expect(matrix).toHaveLength(9)
+    expect(matrix.every(Number.isFinite)).toBe(true)
+  })
+})

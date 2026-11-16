@@ -36,6 +36,7 @@ function agentState(overrides: Partial<AgentSetupState> = {}): AgentSetupState {
 describe('agentConnectView', () => {
   const claude = agent('claude-code')
   const gemini = agent('gemini-cli')
+  const omp = agent('omp')
   const installed = (definition: ACPAgentDef): DetectedAgent => ({
     definition,
     status: 'available',
@@ -136,5 +137,12 @@ describe('agentConnectView', () => {
     expect(statuses(view)).toEqual({ detect: 'done', install: 'done', 'sign-in': 'manual' })
     expect(view.signInCommand).toBe('gemini')
     expect(agentConnectView(claude, agentState()).signInCommand).toBeNull()
+  })
+
+  test('shows no sign-in for an agent that runs on its own configured credentials', () => {
+    const view = agentConnectView(omp, agentState({ detected: installed(omp) }))
+    expect(statuses(view)).toEqual({ detect: 'done', install: 'done' })
+    expect(view.signInCommand).toBeNull()
+    expect(view.connected).toBe(true)
   })
 })

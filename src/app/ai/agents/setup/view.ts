@@ -464,6 +464,7 @@ export function agentConnectView(agent: ACPAgentDef, setup: AgentSetupState): Ag
   const steps = AGENT_CONNECT_STEPS.filter((step) => {
     // Only a login setup reads tells whether a session reaches the tools.
     if (step === 'tools') return agent.signIn !== undefined
+    if (step === 'sign-in') return !agent.ownCredentials
     return step !== 'activate' || connection?.activates === true
   }).map((step) => {
     const recorded = connection?.steps[step] ?? 'pending'
@@ -487,6 +488,7 @@ export function agentConnectView(agent: ACPAgentDef, setup: AgentSetupState): Ag
     connected: !running && steps.every(({ status }) => status === 'done' || status === 'manual'),
     failure,
     problem: connectProblem,
-    signInCommand: agent.signIn ? null : (agent.cliCommand ?? agent.command)
+    signInCommand:
+      agent.signIn || agent.ownCredentials ? null : (agent.cliCommand ?? agent.command)
   }
 }

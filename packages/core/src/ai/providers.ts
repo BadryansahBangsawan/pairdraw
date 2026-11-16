@@ -22,6 +22,11 @@ export interface ACPAgentDef {
    * which the desktop shell scope pins under `<command>-sign-in`.
    */
   signIn?: { via: 'acp'; method: string } | { via: 'terminal'; method: string; args: string[] }
+  /**
+   * The agent runs on the providers and keys already set up in its own configuration and has no
+   * account to sign in to, so setup shows no sign-in step.
+   */
+  ownCredentials?: boolean
 }
 
 export const ACP_AGENTS: ACPAgentDef[] = [
@@ -65,7 +70,8 @@ export const ACP_AGENTS: ACPAgentDef[] = [
     command: 'omp',
     args: ['acp'],
     setupURL: 'https://omp.sh',
-    installCommand: 'bun i -g @oh-my-pi/pi-coding-agent'
+    installCommand: 'bun i -g @oh-my-pi/pi-coding-agent',
+    ownCredentials: true
   }
 ]
 

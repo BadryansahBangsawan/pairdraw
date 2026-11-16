@@ -64,7 +64,7 @@ Gemini CLI speaks ACP itself, so there is no separate program, and guided setup 
 bun install -g @oh-my-pi/pi-coding-agent
 ```
 
-omp needs [Bun](https://bun.sh) and speaks ACP itself (`omp acp`), so like Gemini CLI there is no separate program, and guided setup cannot install or sign in to it for you. omp uses the providers and default model you set up in it: run `omp` and use `/login`, or `omp login`. Its MCP servers live in `~/.omp/agent/mcp.json` (or `PI_CODING_AGENT_DIR/mcp.json`), which **Settings → MCP → Other apps** can add Pairdraw's server to.
+omp needs [Bun](https://bun.sh) and speaks ACP itself (`omp acp`), so like Gemini CLI there is no separate program, and guided setup cannot install it for you. There is no sign-in step: omp runs on the providers, keys, and default model already set up in `~/.omp`. If you have not set one up yet, run `omp login` once. Its MCP servers live in `~/.omp/agent/mcp.json` (or `PI_CODING_AGENT_DIR/mcp.json`), which **Settings → MCP → Other apps** can add Pairdraw's server to.
 
 ## Pi
 

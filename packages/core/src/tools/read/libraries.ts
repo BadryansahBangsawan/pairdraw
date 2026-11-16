@@ -1,7 +1,16 @@
+import { isPlainObject } from 'es-toolkit'
 import * as v from 'valibot'
 
 import { getComponentCatalog } from '#core/tools/component-catalog'
 import { toolNumber, defineTool } from '#core/tools/schema'
+
+const variantValuesSchema = v.pipe(
+  v.string(),
+  v.parseJson(),
+  // A record also takes an array, as its indices.
+  v.check(isPlainObject, 'Expected a JSON object'),
+  v.record(v.string(), v.string())
+)
 
 export const listLibraries = defineTool({
   name: 'list_libraries',
@@ -38,15 +47,13 @@ export const insertLibraryComponent = defineTool({
     if (!catalog) throw new Error('No component library catalog is configured')
     let variantValues: Record<string, string> | undefined
     if (args.variant_values) {
-      const parsed: unknown = JSON.parse(args.variant_values)
-      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-        throw new TypeError('variant_values must be a JSON object')
+      const parsed = v.safeParse(variantValuesSchema, args.variant_values)
+      if (!parsed.success) {
+        throw new TypeError(
+          `variant_values must be a JSON object of strings: ${v.summarize(parsed.issues)}`
+        )
       }
-      const entries = Object.entries(parsed)
-      if (entries.some(([, value]) => typeof value !== 'string')) {
-        throw new TypeError('variant_values values must be strings')
-      }
-      variantValues = Object.fromEntries(entries)
+      variantValues = parsed.output
     }
     return catalog.insertComponent({
       libraryId: args.library_id,

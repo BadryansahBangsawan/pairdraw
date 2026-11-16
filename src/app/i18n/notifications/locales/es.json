@@ -1,5 +1,4 @@
 {
-  "chatInitializationFailed": "No se pudo iniciar el chat: {error}",
   "linkCopied": "Enlace copiado al portapapeles.",
   "clipboardMissingDesignData": "El portapapeles no contiene datos de diseño.",
   "clipboardAccessBlocked": "El acceso al portapapeles está bloqueado en este contexto del navegador.",
@@ -37,7 +36,6 @@
   "imageAIBusy": "Todavía hay una solicitud de imagen en curso.",
   "operationFailed": "La operación falló: {error}",
   "storageConnected": "Conectado. El espacio de almacenamiento está listo.",
-  "storageConnectionFailed": "No se pudo conectar al almacenamiento: {error}",
   "nodeID": "ID de nodo",
   "nodeIDs": "ID de nodos",
   "xPath": "XPath",

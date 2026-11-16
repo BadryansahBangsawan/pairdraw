@@ -5,7 +5,6 @@ import { useStore } from '@nanostores/vue'
 import { locale, type Locale, type TranslatedLocale } from '@pairdraw/vue/i18n'
 
 const notificationMessageDefaults = {
-  chatInitializationFailed: params('Could not initialize chat: {error}'),
   linkCopied: 'Link copied to clipboard.',
   clipboardMissingDesignData: 'Clipboard does not contain design data.',
   clipboardAccessBlocked: 'Clipboard access is blocked in this browser context.',
@@ -61,7 +60,6 @@ const notificationMessageDefaults = {
   imageAIBusy: 'An image request is still running.',
   operationFailed: params('Operation failed: {error}'),
   storageConnected: 'Connected. Storage namespace is ready.',
-  storageConnectionFailed: params('Could not connect to storage: {error}'),
   deepLinkLocateFile: params('Locate “{file}” to follow this link.'),
   deepLinkPickerDismissed: 'Link cancelled: no file was chosen.',
   deepLinkCancelled: params('Link cancelled: expected a file ending in “{file}”.'),

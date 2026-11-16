@@ -1,5 +1,4 @@
 {
-  "chatInitializationFailed": "Chat konnte nicht initialisiert werden: {error}",
   "linkCopied": "Link in die Zwischenablage kopiert.",
   "clipboardMissingDesignData": "Die Zwischenablage enthält keine Designdaten.",
   "clipboardAccessBlocked": "Der Zugriff auf die Zwischenablage ist in diesem Browserkontext blockiert.",
@@ -37,7 +36,6 @@
   "imageAIBusy": "Eine Bildanfrage läuft noch.",
   "operationFailed": "Vorgang fehlgeschlagen: {error}",
   "storageConnected": "Verbunden. Der Speicher-Namensraum ist bereit.",
-  "storageConnectionFailed": "Verbindung zum Speicher fehlgeschlagen: {error}",
   "nodeID": "Knoten-ID",
   "nodeIDs": "Knoten-IDs",
   "xPath": "XPath",

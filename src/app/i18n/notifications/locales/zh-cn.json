@@ -1,5 +1,4 @@
 {
-  "chatInitializationFailed": "无法初始化聊天：{error}",
   "linkCopied": "链接已复制到剪贴板。",
   "clipboardMissingDesignData": "剪贴板中没有设计数据。",
   "clipboardAccessBlocked": "当前浏览器环境阻止了剪贴板访问。",
@@ -37,7 +36,6 @@
   "imageAIBusy": "仍有一个图像请求正在进行。",
   "operationFailed": "操作失败：{error}",
   "storageConnected": "已连接。存储命名空间已就绪。",
-  "storageConnectionFailed": "无法连接到存储：{error}",
   "nodeID": "节点 ID",
   "nodeIDs": "节点 ID",
   "xPath": "XPath",

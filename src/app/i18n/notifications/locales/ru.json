@@ -1,5 +1,4 @@
 {
-  "chatInitializationFailed": "Не удалось запустить чат: {error}",
   "linkCopied": "Ссылка скопирована в буфер обмена.",
   "clipboardMissingDesignData": "В буфере обмена нет данных дизайна.",
   "clipboardAccessBlocked": "Доступ к буферу обмена заблокирован в этом контексте браузера.",
@@ -37,7 +36,6 @@
   "imageAIBusy": "Запрос изображения ещё выполняется.",
   "operationFailed": "Не удалось выполнить операцию: {error}",
   "storageConnected": "Подключено. Пространство хранилища готово.",
-  "storageConnectionFailed": "Не удалось подключиться к хранилищу: {error}",
   "nodeID": "ID узла",
   "nodeIDs": "ID узлов",
   "xPath": "XPath",

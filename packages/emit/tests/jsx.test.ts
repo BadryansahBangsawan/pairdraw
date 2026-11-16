@@ -105,3 +105,16 @@ describe('numbers', () => {
     expect(() => es.number(Number.NaN)).toThrow()
   })
 })
+
+describe('JSX namespaced attributes', () => {
+  test('names `xlink:href` as a namespaced name, the node JSX parses it to', () => {
+    const attribute = jsx.attribute('xlink:href', es.string('#a'))
+
+    expect(attribute.name).toEqual({
+      type: 'JSXNamespacedName',
+      namespace: { type: 'JSXIdentifier', name: 'xlink' },
+      name: { type: 'JSXIdentifier', name: 'href' }
+    })
+    expect(card([attribute], [])).toBe('<Card xlink:href="#a" />')
+  })
+})

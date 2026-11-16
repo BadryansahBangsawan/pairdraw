@@ -47,11 +47,19 @@ export const spread = (argument: SyntaxNode): SyntaxNode => ({
 })
 
 /** An attribute; a null value prints the bare name, as for `true`. */
-export const attribute = (name: string, value: SyntaxNode | null): SyntaxNode => ({
-  type: 'JSXAttribute',
-  name: identifier(name),
-  value
-})
+/** An attribute. A name such as `xlink:href` is namespaced, as JSX parses it. */
+export function attribute(name: string, value: SyntaxNode | null): SyntaxNode {
+  const colon = name.indexOf(':')
+  const attributeName =
+    colon > 0
+      ? {
+          type: 'JSXNamespacedName',
+          namespace: identifier(name.slice(0, colon)),
+          name: identifier(name.slice(colon + 1))
+        }
+      : identifier(name)
+  return { type: 'JSXAttribute', name: attributeName, value }
+}
 
 /** Text content: plain JSX text when it survives as written, a string expression otherwise. */
 export function text(value: string): SyntaxNode {

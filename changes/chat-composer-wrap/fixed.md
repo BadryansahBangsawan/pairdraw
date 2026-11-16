@@ -1,1 +1,0 @@
-- In a narrow chat, a coding agent's model, reasoning, and mode pickers move to their own row below the composer's buttons instead of running under the settings and send buttons.

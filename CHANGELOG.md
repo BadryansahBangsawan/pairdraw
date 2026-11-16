@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.16.2 — 2026-11-16
+
+Pairdraw 0.16.2 fixes the chat composer in a narrow chat. Pairdraw 0.16.1 offers this release in the app.
+
+### Fixed
+
+- In a narrow chat, a coding agent's model, reasoning, and mode pickers move to their own row below the composer's buttons instead of running under the settings and send buttons.
+
 ## 0.16.1 — 2026-11-16
 
 Pairdraw 0.16.1 adds omp as a coding agent, updates itself from GitHub Releases, and shows an AI agent's edits as they land on the canvas. Install this release by hand once: 0.16.0 has no update feed.

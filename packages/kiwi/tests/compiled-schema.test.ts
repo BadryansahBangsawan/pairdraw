@@ -120,4 +120,33 @@ describe('compiled schema tables', () => {
       'Attempted to parse invalid message'
     )
   })
+
+  test('rejects a message cut short rather than decoding part of it', () => {
+    const tables = compileSchemaTables(schema)
+    const bytes = encodedDocument()
+    const document = tables.definition('Document')
+
+    for (const length of [1, 2, bytes.length >> 1, bytes.length - 1]) {
+      expect(() => tables.decode(document, new ByteBuffer(bytes.subarray(0, length)))).toThrow()
+    }
+  })
+
+  test('rejects an array that declares more items than bytes remain, before reading it', () => {
+    const tables = compileSchemaTables(schema)
+    const kinds = tables.definition('Document').byId[2]
+    if (!kinds) throw new Error('Document has no kinds field')
+    const declared = (length: number) => {
+      const bytes = new ByteBuffer()
+      bytes.writeVarUint(length)
+      bytes.writeVarUint(1)
+      return new ByteBuffer(bytes.toUint8Array())
+    }
+
+    expect(() => tables.read(kinds, declared(0xffff_ffff))).toThrow(
+      'Kiwi array declares 4294967295 items, more than the bytes left in the message (1)'
+    )
+    expect(() => tables.skip(kinds, declared(0xffff_ffff))).toThrow('Kiwi array declares')
+    expect(() => tables.read(kinds, declared(2))).toThrow('Kiwi array declares 2 items')
+    expect(tables.read(kinds, declared(1))).toEqual(['CARD'])
+  })
 })

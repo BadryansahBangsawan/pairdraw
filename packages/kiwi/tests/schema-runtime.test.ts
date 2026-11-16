@@ -10,6 +10,55 @@ import {
 } from '../src/schema-runtime'
 import type { RuntimeMessage } from '../src/schema-runtime/interpreter'
 
+describe('ByteBuffer reads', () => {
+  const end = 'Unexpected end of Kiwi message'
+  const bytes = (...values: number[]) => new ByteBuffer(new Uint8Array(values))
+
+  test('refuse to read past the end instead of returning a partial value', () => {
+    expect(() => bytes(172).readVarUint()).toThrow(end)
+    expect(() => bytes().readVarUint()).toThrow(end)
+    expect(() => bytes().readByte()).toThrow(end)
+    expect(() => bytes(0x7f, 1).readVarFloat()).toThrow(end)
+    expect(() => bytes(5, 1).readByteArray()).toThrow(end)
+    expect(() => bytes(5, 1).skipByteArray()).toThrow(end)
+    expect(() => bytes(0x80, 0x80).readVarUint64()).toThrow(end)
+  })
+
+  test('read values that end exactly at the end', () => {
+    expect(bytes(172, 2).readVarUint()).toBe(300)
+    expect(bytes(0xff, 0xff, 0xff, 0xff, 0x0f).readVarUint()).toBe(0xffff_ffff)
+    expect(bytes(0).readVarFloat()).toBe(0)
+    expect(bytes(2, 7, 8).readByteArray()).toEqual(new Uint8Array([7, 8]))
+  })
+
+  test('stop at the written length of a buffer being written', () => {
+    const buffer = new ByteBuffer()
+    buffer.writeByte(1)
+
+    expect(buffer.readByte()).toBe(1)
+    expect(() => buffer.readByte()).toThrow(end)
+    expect(() => buffer.readVarUint()).toThrow(end)
+    expect(() => buffer.readVarFloat()).toThrow(end)
+    expect(() => buffer.readString()).toThrow('Unterminated string in Kiwi message')
+  })
+})
+
+test('writes a lone surrogate as U+FFFD without taking the character after it', () => {
+  const roundTrip = (text: string) => {
+    const buffer = new ByteBuffer()
+    buffer.writeString(text)
+    return new ByteBuffer(buffer.toUint8Array()).readString()
+  }
+
+  expect(roundTrip('a\uD800b')).toBe('a\uFFFDb')
+  expect(roundTrip('a\uDC00b')).toBe('a\uFFFDb')
+  expect(roundTrip('end\uD83D')).toBe('end\uFFFD')
+  expect(roundTrip('smile \uD83D\uDE00')).toBe('smile \uD83D\uDE00')
+  const buffer = new ByteBuffer()
+  buffer.writeString('\uD800')
+  expect(buffer.toUint8Array()).toEqual(new Uint8Array([0xef, 0xbf, 0xbd, 0]))
+})
+
 test('rejects malformed byte fields without corrupting buffer length', () => {
   const buffer = new ByteBuffer()
   expect(() => Reflect.apply(buffer.writeByteArray, buffer, [{ 0: 42 }])).toThrow(

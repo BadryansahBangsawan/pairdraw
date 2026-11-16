@@ -152,6 +152,22 @@ function invalidMessage(): never {
   throw new Error('Attempted to parse invalid message')
 }
 
+/**
+ * An array's declared length, refused when more items are declared than bytes remain: every
+ * item takes at least a byte (only a struct with no fields takes none), so such an array cannot
+ * be in the message, and trusting its length would allocate and loop over it before any read
+ * found the end.
+ */
+function arrayLength(bb: ByteBuffer): number {
+  const length = bb.readVarUint()
+  const remaining = bb.length - bb.offset
+  if (length > remaining)
+    throw new Error(
+      `Kiwi array declares ${length} items, more than the bytes left in the message (${remaining})`
+    )
+  return length
+}
+
 function compileDefinitions(schema: Schema, headers?: HeaderFields): CompiledDefinition[] {
   const byName = new Map<string, Definition>()
   for (const definition of schema.definitions) byName.set(definition.name, definition)
@@ -266,7 +282,7 @@ export function compileSchemaTables(schema: Schema, headers?: HeaderFields): Com
   const read = (field: CompiledField, bb: ByteBuffer): RuntimeValue => {
     if (!field.isArray) return readValue(field, bb)
     if (field.type === TYPE.BYTE) return bb.readByteArray()
-    const length = bb.readVarUint()
+    const length = arrayLength(bb)
     const values: RuntimeValue[] = Array.from({ length })
     for (let i = 0; i < length; i++) values[i] = readValue(field, bb)
     return values
@@ -313,7 +329,7 @@ export function compileSchemaTables(schema: Schema, headers?: HeaderFields): Com
       bb.skipByteArray()
       return
     }
-    for (let length = bb.readVarUint(); length > 0; length--) skipValue(field, bb)
+    for (let length = arrayLength(bb); length > 0; length--) skipValue(field, bb)
   }
 
   const readInto = (field: CompiledField, bb: ByteBuffer, result: RuntimeMessage): void => {

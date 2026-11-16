@@ -2,6 +2,15 @@ let int32 = new Int32Array(1)
 let float32 = new Float32Array(int32.buffer)
 const textDecoder = new TextDecoder()
 
+/**
+ * A read that would pass the end of the bytes. A varint is checked once, after its last byte
+ * rather than at each: past its end a typed array yields `undefined`, which ends the varint, so
+ * one that ran over finishes past `length` and is refused before its value is used.
+ */
+function truncated(): never {
+  throw new Error('Unexpected end of Kiwi message')
+}
+
 export class ByteBuffer {
   private _data: Uint8Array
   private _index: number
@@ -42,18 +51,23 @@ export class ByteBuffer {
   }
 
   readByte(): number {
-    return this._data[this._index++]
+    const index = this._index
+    if (index >= this.length) truncated()
+    this._index = index + 1
+    return this._data[index]
   }
 
   readByteArray(): Uint8Array {
     const length = this.readVarUint()
     const start = this._index
+    if (length > this.length - start) truncated()
     this._index = start + length
     return this._data.slice(start, start + length)
   }
 
   skipByteArray(): void {
     const length = this.readVarUint()
+    if (length > this.length - this._index) truncated()
     this._index += length
   }
 
@@ -62,10 +76,12 @@ export class ByteBuffer {
     const data = this._data
     const first = data[index]
     if (first === 0) {
+      if (index >= this.length) truncated()
       this._index = index + 1
       return 0
     }
 
+    if (index + 4 > this.length) truncated()
     let bits = first | (data[index + 1] << 8) | (data[index + 2] << 16) | (data[index + 3] << 24)
     this._index = index + 4
     bits = (bits << 23) | (bits >>> 9)
@@ -78,32 +94,25 @@ export class ByteBuffer {
     let i = this._index
     let b = data[i++]
     let value = b & 127
-    if (b < 128) {
-      this._index = i
-      return value
+    if (b > 127) {
+      b = data[i++]
+      value |= (b & 127) << 7
+      if (b > 127) {
+        b = data[i++]
+        value |= (b & 127) << 14
+        if (b > 127) {
+          b = data[i++]
+          value |= (b & 127) << 21
+          if (b > 127) {
+            b = data[i++]
+            value = (value | ((b & 127) << 28)) >>> 0
+          }
+        }
+      }
     }
-    b = data[i++]
-    value |= (b & 127) << 7
-    if (b < 128) {
-      this._index = i
-      return value
-    }
-    b = data[i++]
-    value |= (b & 127) << 14
-    if (b < 128) {
-      this._index = i
-      return value
-    }
-    b = data[i++]
-    value |= (b & 127) << 21
-    if (b < 128) {
-      this._index = i
-      return value
-    }
-    b = data[i++]
-    value |= (b & 127) << 28
+    if (i > this.length) truncated()
     this._index = i
-    return value >>> 0
+    return value
   }
 
   readVarInt(): number {
@@ -146,9 +155,10 @@ export class ByteBuffer {
 
   private findStringTerminator(start: number): number {
     const data = this._data
+    const end = this.length
     let index = start
-    while (index < data.length && data[index] !== 0) index++
-    if (index >= data.length) throw new Error('Unterminated string in Kiwi message')
+    while (index < end && data[index] !== 0) index++
+    if (index >= end) throw new Error('Unterminated string in Kiwi message')
     return index
   }
 
@@ -245,13 +255,18 @@ export class ByteBuffer {
     let codePoint
 
     for (let i = 0; i < value.length; i++) {
-      // Decode UTF-16
+      // Decode UTF-16; a surrogate without its pair is U+FFFD, as `TextEncoder` writes it
       let a = value.charCodeAt(i)
-      if (i + 1 === value.length || a < 0xd800 || a >= 0xdc00) {
+      if (a < 0xd800 || a >= 0xe000) {
         codePoint = a
       } else {
-        let b = value.charCodeAt(++i)
-        codePoint = (a << 10) + b + (0x10000 - (0xd800 << 10) - 0xdc00)
+        let b = value.charCodeAt(i + 1)
+        if (a < 0xdc00 && b >= 0xdc00 && b < 0xe000) {
+          i++
+          codePoint = (a << 10) + b + (0x10000 - (0xd800 << 10) - 0xdc00)
+        } else {
+          codePoint = 0xfffd
+        }
       }
 
       // Strings are null-terminated

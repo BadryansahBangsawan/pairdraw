@@ -14,13 +14,16 @@ type HTMLNode = DefaultTreeAdapterTypes.ChildNode
 
 /** The text HTML shows: its text nodes, and a line break for each `<br>`. */
 function shownText(nodes: HTMLNode[]): string {
-  return nodes
-    .map((node) => {
-      if (node.nodeName === '#text' && 'value' in node) return node.value
-      if (node.nodeName === 'br') return '\n'
-      return 'childNodes' in node ? shownText(node.childNodes) : ''
-    })
-    .join('')
+  let text = ''
+  // A label can nest more tags than the call stack holds, so walk them with a stack of our own.
+  const stack = nodes.toReversed()
+  for (let node = stack.pop(); node; node = stack.pop()) {
+    if (node.nodeName === '#text' && 'value' in node) text += node.value
+    else if (node.nodeName === 'br') text += '\n'
+    else if ('childNodes' in node)
+      for (const child of node.childNodes.toReversed()) stack.push(child)
+  }
+  return text
 }
 
 /**

@@ -354,8 +354,11 @@ describe('getWorldHandles — localRect override', () => {
 describe('world transform — parent cycles', () => {
   test('a parent cycle in bad data ends the walk instead of hanging', () => {
     const graph = new SceneGraph()
-    const a = graph.createNodeWithId('cycle-a', 'FRAME', 'cycle-b', { x: 10, y: 0 })
-    graph.createNodeWithId('cycle-b', 'FRAME', 'cycle-a', { x: 0, y: 20 })
+    const a = graph.createNodeWithId('cycle-a', 'FRAME', null, { x: 10, y: 0 })
+    const b = graph.createNodeWithId('cycle-b', 'FRAME', null, { x: 0, y: 20 })
+    // Bad data on purpose: a layer cannot be created inside its own child.
+    a.parentId = b.id
+    b.parentId = a.id
     const matrix = getWorldMatrix(a, graph)
     expect(matrix).toHaveLength(9)
     expect(matrix.every(Number.isFinite)).toBe(true)

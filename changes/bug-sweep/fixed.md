@@ -51,3 +51,4 @@
 - A rotated clipping frame clips its contents to its drawn box instead of an unturned rectangle offset from its turned origin.
 - Clicking through an ellipse, rounded, or vector mask follows the mask’s outline instead of its bounding box.
 - Coding-agent connection errors appear in the interface language instead of English only.
+- Creating a layer in a parent that no longer exists, or restoring a layer with an id the document already has, now fails instead of leaving a detached layer or replacing the existing one.

@@ -425,10 +425,11 @@ export class SceneGraph {
   }
 
   createNode(type: NodeType, parentId: string, overrides: Partial<SceneNode> = {}): SceneNode {
-    const node = createDefaultNode(() => this.generateEntityId(), type, overrides)
     const parent = this.nodes.get(parentId)
+    if (!parent) throw new Error(`Parent "${parentId}" does not exist`)
+    const node = createDefaultNode(() => this.generateEntityId(), type, overrides)
     this.willChangeNode(parent)
-    parent?.childIds.push(node.id)
+    parent.childIds.push(node.id)
     return this.registerNode(node, parentId)
   }
   createNodeWithId(
@@ -437,10 +438,15 @@ export class SceneGraph {
     parentId: string | null,
     overrides: Partial<SceneNode> = {}
   ): SceneNode {
+    // A caller restoring or importing a layer must know it brings a new one: replacing a layer
+    // that already has the ID would drop it, and its children, from the document.
+    if (this.nodes.has(id)) throw new Error(`Node "${id}" already exists`)
+    if (parentId === id) throw new Error(`Node "${id}" cannot be its own parent`)
+    const parent = parentId === null ? undefined : this.nodes.get(parentId)
+    if (parentId !== null && !parent) throw new Error(`Parent "${parentId}" does not exist`)
     const node = createDefaultNode(() => id, type, overrides)
     // `overrides` may be another node's snapshot, ID included.
     node.id = id
-    const parent = parentId ? this.nodes.get(parentId) : undefined
     if (parent && !parent.childIds.includes(id)) {
       this.willChangeNode(parent)
       parent.childIds.push(id)

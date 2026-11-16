@@ -473,3 +473,42 @@ describe('SceneGraph', () => {
     expect(graph.getInstances(comp.id)).toHaveLength(0)
   })
 })
+
+describe('creation contract', () => {
+  test('createNode rejects a parent that does not exist', () => {
+    const graph = new SceneGraph()
+    const before = graph.nodes.size
+    expect(() => graph.createNode('RECTANGLE', 'missing')).toThrow(
+      'Parent "missing" does not exist'
+    )
+    expect(graph.nodes.size).toBe(before)
+  })
+
+  test('createNodeWithId rejects an id a layer already has', () => {
+    const graph = new SceneGraph()
+    const page = pageId(graph)
+    const existing = graph.createNode('RECTANGLE', page, { name: 'Existing' })
+
+    expect(() => graph.createNodeWithId(existing.id, 'ELLIPSE', page)).toThrow(
+      `Node "${existing.id}" already exists`
+    )
+
+    expect(getNodeOrThrow(graph, existing.id).type).toBe('RECTANGLE')
+    expect(getNodeOrThrow(graph, page).childIds.filter((id) => id === existing.id)).toHaveLength(1)
+  })
+
+  test('createNodeWithId rejects a layer as its own parent', () => {
+    const graph = new SceneGraph()
+    expect(() => graph.createNodeWithId('self', 'FRAME', 'self')).toThrow(
+      'Node "self" cannot be its own parent'
+    )
+    expect(graph.getNode('self')).toBeUndefined()
+  })
+
+  test('createNodeWithId keeps a root-level layer with no parent', () => {
+    const graph = new SceneGraph()
+    const node = graph.createNodeWithId('loose', 'FRAME', null)
+    expect(node.parentId).toBeNull()
+    expect(graph.getNode('loose')).toBeDefined()
+  })
+})

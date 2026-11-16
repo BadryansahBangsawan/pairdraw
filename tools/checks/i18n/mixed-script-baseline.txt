@@ -4,6 +4,7 @@ ja:ai.aiSetupAccessChatGPT
 ja:ai.aiSetupAccessServerDescription
 ja:ai.aiSetupAgentAdapterMismatch
 ja:ai.aiSetupAgentDescription
+ja:ai.aiSetupAgentOwnCredentials
 ja:ai.aiSetupAgentInstallMCP
 ja:ai.aiSetupAgentMCP
 ja:ai.aiSetupAgentMCPInstall
@@ -232,6 +233,7 @@ zh-cn:ai.aiSetupAccessChatGPT
 zh-cn:ai.aiSetupAccessServerDescription
 zh-cn:ai.aiSetupAgentAdapterMismatch
 zh-cn:ai.aiSetupAgentDescription
+zh-cn:ai.aiSetupAgentOwnCredentials
 zh-cn:ai.aiSetupAgentInstallMCP
 zh-cn:ai.aiSetupAgentMCP
 zh-cn:ai.aiSetupAgentMCPInstall

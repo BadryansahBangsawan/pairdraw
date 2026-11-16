@@ -26,6 +26,7 @@
   "agentIdle": "Bezczynny",
   "sharedFile": "Udostępniony plik",
   "invalidRoomLink": "To nie jest link ani identyfikator pokoju.",
+  "roomsUnavailable": "Linki do pokojów wymagają wersji z pokojami na żywo, a ta ich nie zawiera.",
   "joiningTitle": "Dołączanie do pokoju…",
   "connectingDescription": "Łączenie z serwerami pokoju.",
   "lookingDescription": "Szukanie osób w tym pokoju.",

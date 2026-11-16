@@ -26,6 +26,7 @@
   "agentIdle": "Inattivo",
   "sharedFile": "File condiviso",
   "invalidRoomLink": "Non è un link né un ID di stanza.",
+  "roomsUnavailable": "I link alle stanze richiedono una versione con stanze dal vivo, che questa non include.",
   "joiningTitle": "Accesso alla stanza…",
   "connectingDescription": "Connessione ai server della stanza.",
   "lookingDescription": "Ricerca delle persone in questa stanza.",

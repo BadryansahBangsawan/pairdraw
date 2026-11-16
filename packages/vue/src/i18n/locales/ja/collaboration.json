@@ -26,6 +26,7 @@
   "agentIdle": "待機中",
   "sharedFile": "共有ファイル",
   "invalidRoomLink": "ルームのリンクまたはIDではありません。",
+  "roomsUnavailable": "ルームへのリンクにはライブルームを含むビルドが必要ですが、このビルドには含まれていません。",
   "joiningTitle": "ルームに参加しています…",
   "connectingDescription": "ルームのサーバーに接続しています。",
   "lookingDescription": "このルームの参加者を探しています。",

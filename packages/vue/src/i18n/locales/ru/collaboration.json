@@ -26,6 +26,7 @@
   "agentIdle": "Неактивен",
   "sharedFile": "Общий файл",
   "invalidRoomLink": "Это не ссылка и не ID комнаты.",
+  "roomsUnavailable": "Ссылкам на комнаты нужна сборка с живыми комнатами, а в этой их нет.",
   "joiningTitle": "Подключение к комнате…",
   "connectingDescription": "Подключаемся к серверам комнаты.",
   "lookingDescription": "Ищем участников этой комнаты.",

@@ -26,6 +26,7 @@
   "agentIdle": "Inaktiv",
   "sharedFile": "Geteilte Datei",
   "invalidRoomLink": "Das ist kein Raumlink und keine Raum-ID.",
+  "roomsUnavailable": "Raum-Links brauchen einen Build mit Live-Räumen, und dieser enthält sie nicht.",
   "joiningTitle": "Raum wird betreten…",
   "connectingDescription": "Verbindung zu den Servern des Raums wird hergestellt.",
   "lookingDescription": "Personen in diesem Raum werden gesucht.",

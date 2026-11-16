@@ -26,6 +26,7 @@
   "agentIdle": "Inactivo",
   "sharedFile": "Archivo compartido",
   "invalidRoomLink": "Eso no es un enlace ni un ID de sala.",
+  "roomsUnavailable": "Los enlaces de sala necesitan una versión con salas en directo, y esta no las incluye.",
   "joiningTitle": "Entrando en la sala…",
   "connectingDescription": "Conectando con los servidores de la sala.",
   "lookingDescription": "Buscando personas en esta sala.",

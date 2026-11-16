@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import { stripVTControlCharacters } from 'node:util'
 
 import { type CommandDef, renderUsage, type Resolvable, type SubCommandsDef } from 'citty'
 
@@ -18,11 +19,14 @@ describe('command help', () => {
     const missing: string[] = []
     for (const [name, entry] of Object.entries(commands)) {
       const command = await resolve<CommandDef>(entry)
-      const usage = await renderUsage(command, ROOT)
+      // citty colours its help when the terminal allows it, as CI's does.
+      const usage = stripVTControlCharacters(await renderUsage(command, ROOT))
       if (!usage.includes(`USAGE \`pairdraw ${name} `)) missing.push(name)
       const subCommands = command.subCommands ? await resolve(command.subCommands) : {}
       for (const [subName, subEntry] of Object.entries(subCommands)) {
-        const subUsage = await renderUsage(await resolve<CommandDef>(subEntry), command)
+        const subUsage = stripVTControlCharacters(
+          await renderUsage(await resolve<CommandDef>(subEntry), command)
+        )
         if (!subUsage.includes(`USAGE \`${name} ${subName} `)) missing.push(`${name} ${subName}`)
       }
     }

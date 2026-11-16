@@ -123,6 +123,13 @@ describe('writePenDocument', () => {
     expect(site?.url).toBeDefined()
   })
 
+  test('writes metadata back as it was read', () => {
+    const graph = parseDocument([
+      { id: 'screen', type: 'frame', metadata: { type: 'screen', notes: 'keep me' } }
+    ])
+    expect(writtenNode(graph, 'screen').metadata).toEqual({ type: 'screen', notes: 'keep me' })
+  })
+
   test('writes a blend mode in the pen.dev name the reader accepts', async () => {
     const graph = parsePenFile(await readFixture('pen-oracles/probes.pen'))
     const written = parsePenDocument(writePenDocument(graph))

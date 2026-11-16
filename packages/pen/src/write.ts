@@ -38,6 +38,7 @@ const PEN_PLUGIN_FIELDS: Readonly<Partial<Record<string, string>>> = {
   'pen/ref': 'ref',
   'pen/generated': 'generated',
   'pen/context': 'context',
+  'pen/metadata': 'metadata',
   'pen/placeholder': 'placeholder',
   'pen/slot': 'slot',
   'pen/model': 'model',

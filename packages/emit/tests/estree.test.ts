@@ -16,3 +16,23 @@ describe('es.json', () => {
     expect(es.printExpression(es.json(() => 1))).toBe('null')
   })
 })
+
+describe('es.fill', () => {
+  test('inserts a hole node as given, so document text that reads like a hole stays text', () => {
+    const template = es.parseModule('const a = $x')
+    const filled = es.fill(template, { $x: es.string('$y'), $y: es.identifier('z') })
+
+    expect(es.printModule(filled)).toBe("const a = '$y';")
+  })
+})
+
+describe('es.fill with OMIT', () => {
+  test('removes an omitted hole from arrays, arguments, and string-literal properties', () => {
+    const template = es.parseModule(
+      "const a = [$x, 2];\nf($x, $y);\nconst o = { k: '$x', v: $x, w: 1 };"
+    )
+    const filled = es.fill(template, { $x: es.OMIT, $y: es.identifier('y') })
+
+    expect(es.printModule(filled)).toBe('const a = [2];\n\nf(y);\n\nconst o = { w: 1 };')
+  })
+})

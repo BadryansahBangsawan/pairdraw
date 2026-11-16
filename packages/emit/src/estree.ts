@@ -49,8 +49,10 @@ export function parseType(source: string): SyntaxNode {
 export const OMIT = Symbol('omit')
 
 /**
- * Replace `$name` placeholders — identifiers, type references, and string literals — with
- * nodes. A property whose value is filled with `OMIT` is removed.
+ * Replace the template's `$name` placeholders — identifiers, type references, and string
+ * literals — with nodes. A hole's node goes in as given: placeholders inside it are not filled,
+ * so a name or text from the document that reads like `$name` stays as written. Fill a nested
+ * template first. A list item filled with `OMIT` is removed, and so is a property whose value is.
  */
 export function fill<T extends SyntaxNode>(
   template: T,
@@ -63,8 +65,11 @@ export function fill<T extends SyntaxNode>(
     if (node.type === 'TSTypeReference') return hole(child(node, 'typeName')?.name)
     return undefined
   }
-  const omitted = (node: unknown) =>
-    isNode(node) && node.type === 'Property' && hole(child(node, 'value')?.name) === OMIT
+  // An `OMIT` hole leaves the list holding it, and takes the property it is the value of along.
+  const omitted = (node: unknown) => {
+    const value = isNode(node) && node.type === 'Property' ? child(node, 'value') : node
+    return isNode(value) && holeOf(value) === OMIT
+  }
   const replacement = (node: SyntaxNode): SyntaxNode | undefined => {
     const value = holeOf(node)
     if (!value || value === OMIT) return undefined

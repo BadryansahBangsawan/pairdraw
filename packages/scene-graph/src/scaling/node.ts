@@ -1,4 +1,5 @@
 import { scaleGeometryPaths } from '../copy'
+import { scaledPathTextChanges } from '../resize'
 import { scaledTextLength } from '../text/lengths'
 import { TEXT_PARAGRAPH_SPACING_FIELDS } from '../text/paragraphs'
 import {
@@ -163,6 +164,7 @@ export function scaleNodeChanges(
     layoutGrids: scaledLayoutGrids(node.layoutGrids, scale),
     vectorNetwork: scaledVectorNetwork(node, scale),
     fillGeometry: scaleGeometryPaths(node.fillGeometry, scale, scale),
-    strokeGeometry: scaleGeometryPaths(node.strokeGeometry, scale, scale)
+    strokeGeometry: scaleGeometryPaths(node.strokeGeometry, scale, scale),
+    ...scaledPathTextChanges(node, scale, scale)
   }
 }

@@ -314,29 +314,49 @@ export function scaledGeometryChanges(
   if (orig.strokeGeometry.length > 0) {
     changes.strokeGeometry = outlineOnly ? scaleGeometryPaths(orig.strokeGeometry, sx, sy) : []
   }
-  // Path text scales with its path, including baked path text that kept only rotated glyphs;
-  // other text reflows in the new box, so its glyphs are dropped.
-  const glyphs = orig.derivedTextGlyphs ?? []
-  const pathText =
-    !!orig.textPathData || !!orig.textPathBox || glyphs.some((glyph) => (glyph.rotation ?? 0) !== 0)
-  if (glyphs.length > 0 && pathText) {
-    changes.derivedTextGlyphs = scaleDerivedGlyphs(glyphs, sx, sy)
-    // Keep the layout/selection box in sync with the scaled glyphs. reflow
-    // overrides this when it applies; this covers the fallback where reflow
-    // returns null (no path data) so the box doesn't carry a stale size.
-    if (orig.textPathBox) {
-      changes.textPathBox = {
-        x: orig.textPathBox.x * sx,
-        y: orig.textPathBox.y * sy,
-        width: orig.textPathBox.width * sx,
-        height: orig.textPathBox.height * sy
-      }
-    }
-  }
+  Object.assign(changes, scaledPathTextChanges(orig, sx, sy))
   // Glyphs scaled as a picture take their strokes along; any other stroke keeps its weight, as
   // Figma reports it, even where only a scaled outline can draw it.
-  if (orig.strokes.length > 0 && glyphs.length > 0 && pathText) {
+  if (orig.strokes.length > 0 && isScaledPathText(orig)) {
     changes.strokes = scaleStrokes(orig.strokes, sx, sy)
+  }
+  return changes
+}
+
+type PathTextFields = Pick<SceneNode, 'derivedTextGlyphs' | 'textPathData' | 'textPathBox'>
+
+// Path text scales with its path, including baked path text that kept only rotated glyphs;
+// other text reflows in the new box, so its glyphs are dropped.
+function isScaledPathText(orig: PathTextFields): boolean {
+  const glyphs = orig.derivedTextGlyphs ?? []
+  return (
+    glyphs.length > 0 &&
+    (!!orig.textPathData ||
+      !!orig.textPathBox ||
+      glyphs.some((glyph) => (glyph.rotation ?? 0) !== 0))
+  )
+}
+
+/** The baked glyphs and layout box of path text, scaled with the layer; nothing for other text. */
+export function scaledPathTextChanges(
+  orig: PathTextFields,
+  sx: number,
+  sy: number
+): Pick<Partial<SceneNode>, 'derivedTextGlyphs' | 'textPathBox'> {
+  if (!isScaledPathText(orig)) return {}
+  const changes: Pick<Partial<SceneNode>, 'derivedTextGlyphs' | 'textPathBox'> = {
+    derivedTextGlyphs: scaleDerivedGlyphs(orig.derivedTextGlyphs, sx, sy)
+  }
+  // Keep the layout/selection box in sync with the scaled glyphs. reflow
+  // overrides this when it applies; this covers the fallback where reflow
+  // returns null (no path data) so the box doesn't carry a stale size.
+  if (orig.textPathBox) {
+    changes.textPathBox = {
+      x: orig.textPathBox.x * sx,
+      y: orig.textPathBox.y * sy,
+      width: orig.textPathBox.width * sx,
+      height: orig.textPathBox.height * sy
+    }
   }
   return changes
 }

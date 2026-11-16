@@ -21,3 +21,4 @@
 - draw.io SVG exports whose embedded diagram is percent-encoded or Base64 now open as draw.io files.
 - The streaming Design JSX preview now shows Reka parts such as `Switch.Root` while the JSX is still arriving.
 - Zoom to selection, ruler selection marks, and Align measure rotated layers by their visible corners, and the bounds of rotated underlined text follow the rotation.
+- The Scale tool scales text on a path together with its layer.

@@ -52,12 +52,31 @@ function xhrFetch(onUploadProgress: (progress: UploadProgress) => void): typeof 
       xhr.upload.onprogress = (e) => {
         onUploadProgress({ sentBytes: e.loaded, totalBytes: e.lengthComputable ? e.total : null })
       }
-      xhr.onload = () => resolve(new Response(xhr.responseText, { status: xhr.status }))
+      xhr.onload = () =>
+        resolve(
+          new Response(xhr.responseText, {
+            status: xhr.status,
+            headers: xhrHeaders(xhr.getAllResponseHeaders())
+          })
+        )
       // Same shape the fetch path throws so CORS/network detection keeps working
       xhr.onerror = () => reject(new TypeError('Failed to fetch'))
       xhr.send(body)
     })
   })
+}
+
+/** The headers an `XMLHttpRequest` received, for the `Response` its upload path builds. */
+export function xhrHeaders(raw: string): Headers {
+  const headers = new Headers()
+  for (const line of raw.split(/\r?\n/)) {
+    const separator = line.indexOf(':')
+    if (separator <= 0) continue
+    const name = line.slice(0, separator).trim()
+    const value = line.slice(separator + 1).trim()
+    if (name) headers.set(name, value)
+  }
+  return headers
 }
 
 async function send<Output>(
@@ -162,13 +181,13 @@ export async function putObject(
   contentType: string,
   onUploadProgress?: (progress: UploadProgress) => void,
   options?: LibraryObjectWriteOptions
-): Promise<void> {
+): Promise<{ etag: string | null }> {
   const bytes = typeof body === 'string' ? new TextEncoder().encode(body) : body
   const customFetch =
     onUploadProgress && typeof XMLHttpRequest !== 'undefined'
       ? xhrFetch(onUploadProgress)
       : storageFetch
-  await send(
+  const output = await send(
     config,
     (client, sdk) =>
       client.send(
@@ -183,6 +202,7 @@ export async function putObject(
       ),
     customFetch
   )
+  return { etag: output.ETag ?? null }
 }
 
 export async function getObjectValue(
@@ -232,12 +252,16 @@ export async function readDownloadStream(
   return out
 }
 
-export async function getObject(
+/**
+ * An object and the ETag it was read at, which a caller saves against as its base revision.
+ * Progress and abort work as they do for `getObject`.
+ */
+export async function getObjectWithValue(
   config: S3CompatibleConfig,
   key: string,
   onProgress?: (progress: DownloadProgress) => void,
   signal?: AbortSignal
-): Promise<Uint8Array | null> {
+): Promise<{ bytes: Uint8Array | null; etag: string | null }> {
   signal?.throwIfAborted()
   const output = await unlessMissing(
     send(config, (client, sdk) =>
@@ -246,10 +270,26 @@ export async function getObject(
       })
     )
   )
-  if (!output?.Body) return null
-  if (!onProgress) return output.Body.transformToByteArray()
+  if (!output?.Body) return { bytes: null, etag: null }
+  const etag = output.ETag ?? null
+  if (!onProgress) return { bytes: await output.Body.transformToByteArray(), etag }
   const totalBytes = output.ContentLength ? output.ContentLength : null
-  return readDownloadStream(output.Body.transformToWebStream(), totalBytes, onProgress, signal)
+  const bytes = await readDownloadStream(
+    output.Body.transformToWebStream(),
+    totalBytes,
+    onProgress,
+    signal
+  )
+  return { bytes, etag }
+}
+
+export async function getObject(
+  config: S3CompatibleConfig,
+  key: string,
+  onProgress?: (progress: DownloadProgress) => void,
+  signal?: AbortSignal
+): Promise<Uint8Array | null> {
+  return (await getObjectWithValue(config, key, onProgress, signal)).bytes
 }
 
 export async function deleteObject(config: S3CompatibleConfig, key: string): Promise<void> {

@@ -5,6 +5,7 @@ import { extractFigThumbnailFromReader } from '@pairdraw/fig'
 
 import { isTauri } from '@/app/tauri/env'
 
+import { StorageRevisionConflictError } from '../errors'
 import {
   NAMESPACE_MARKER_BODY,
   STORAGE_DOCUMENTS_PREFIX,
@@ -25,6 +26,7 @@ import {
   deleteObject,
   getObject,
   getObjectValue,
+  getObjectWithValue,
   getObjectRange,
   headObject,
   headObjectSize,
@@ -112,11 +114,32 @@ async function ensureNamespace(config: S3CompatibleConfig): Promise<void> {
   }
 }
 
+/**
+ * The error a failed document write reports: a conflict when the object moved past the revision
+ * the copy was edited from, else the provider's own error.
+ */
+async function documentWriteError(
+  config: S3CompatibleConfig,
+  id: string,
+  error: unknown
+): Promise<unknown> {
+  if (!(error instanceof S3HttpError) || (error.status !== 409 && error.status !== 412))
+    return error
+  const current = await getObjectWithValue(config, documentFigKey(id)).catch(() => ({
+    bytes: null,
+    etag: null
+  }))
+  return new StorageRevisionConflictError(current.etag)
+}
+
 export interface S3StorageAdapter extends StorageAdapter {
   testConnection(): Promise<S3ConnectionResult>
 }
 
 export function createS3StorageAdapter(runtime: StorageProviderRuntime): S3StorageAdapter {
+  // A provider that refuses conditional writes keeps working as before, newest save wins. The
+  // refusal is remembered for this storage so later saves do not retry the unsupported header.
+  let conditionalWritesUnsupported = false
   return {
     async testConnection() {
       const config = await resolveConfig(runtime)
@@ -188,7 +211,7 @@ export function createS3StorageAdapter(runtime: StorageProviderRuntime): S3Stora
       signal?.throwIfAborted()
       const config = await resolveConfig(runtime)
       signal?.throwIfAborted()
-      const bytes = await getObject(
+      const content = await getObjectWithValue(
         config,
         documentFigKey(id),
         onProgress
@@ -200,26 +223,42 @@ export function createS3StorageAdapter(runtime: StorageProviderRuntime): S3Stora
           : undefined,
         signal
       )
-      if (!bytes) throw new Error(`Document not found: ${id}`)
-      // Buckets do not record which version a copy came from, so S3 documents are last-writer-wins.
-      return { bytes, revision: null }
+      if (!content.bytes) throw new Error(`Document not found: ${id}`)
+      // The file's ETag is the revision the copy was read at, and what its next save writes against.
+      return { bytes: content.bytes, revision: content.etag }
     },
 
-    async putDocument(id, bytes, metadata, onProgress) {
+    async putDocument(id, bytes, metadata, onProgress, options) {
       const config = await resolveConfig(runtime)
-      await putObject(
-        config,
-        documentFigKey(id),
-        bytes,
-        'application/octet-stream',
-        onProgress
-          ? (progress) =>
-              onProgress({
-                transferredBytes: progress.sentBytes,
-                totalBytes: progress.totalBytes
-              })
-          : undefined
-      )
+      const baseRevision = options?.baseRevision ?? null
+      const writeDocument = (ifMatch: string | undefined) =>
+        putObject(
+          config,
+          documentFigKey(id),
+          bytes,
+          'application/octet-stream',
+          onProgress
+            ? (progress) =>
+                onProgress({
+                  transferredBytes: progress.sentBytes,
+                  totalBytes: progress.totalBytes
+                })
+            : undefined,
+          ifMatch ? { ifMatch } : undefined
+        )
+      const conditional = baseRevision !== null && !conditionalWritesUnsupported
+      let saved: { etag: string | null }
+      try {
+        saved = await writeDocument(conditional ? baseRevision : undefined)
+      } catch (error) {
+        const unsupported =
+          conditional &&
+          error instanceof S3HttpError &&
+          (error.status === 501 || error.status === 400)
+        if (!unsupported) throw await documentWriteError(config, id, error)
+        conditionalWritesUnsupported = true
+        saved = await writeDocument(undefined)
+      }
       await putObject(
         config,
         documentMetaKey(id),
@@ -229,7 +268,7 @@ export function createS3StorageAdapter(runtime: StorageProviderRuntime): S3Stora
         }),
         'application/json'
       )
-      return { revision: null }
+      return { revision: saved.etag }
     },
 
     async getDocumentMetadata(id) {

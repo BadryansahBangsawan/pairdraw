@@ -52,3 +52,4 @@
 - Clicking through an ellipse, rounded, or vector mask follows the mask’s outline instead of its bounding box.
 - Coding-agent connection errors appear in the interface language instead of English only.
 - Creating a layer in a parent that no longer exists, or restoring a layer with an id the document already has, now fails instead of leaving a detached layer or replacing the existing one.
+- S3 saves detect a document that changed elsewhere and report a conflict instead of overwriting it.

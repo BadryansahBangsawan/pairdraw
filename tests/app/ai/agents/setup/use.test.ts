@@ -254,7 +254,10 @@ describe('agentSetupView', () => {
 
   test('names no command for a computer this browser tab cannot reach', () => {
     // A browser tab has no PATH to check, so a missing agent looks like one to install.
-    for (const detected of [needsAdapter, { definition: claude, status: 'available' } as const]) {
+    for (const detected of [
+      needsAdapter,
+      { definition: claude, status: 'available', cliPath: null, adapterPath: null } as const
+    ]) {
       const view = agentSetupView(claude, agentState({ supported: false, detected, bridge: false }))
       expect(view.manualAgentCommand).toBeNull()
       expect(view.manualBridgeCommand).toBeNull()

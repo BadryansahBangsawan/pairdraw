@@ -130,13 +130,17 @@ const connectedAgent = computed(() => {
   return providerID.value === `acp:${candidate.agent.id}` ? candidate.agent : null
 })
 /**
- * That agent, when it refused the last message because nobody is signed in to it. An agent that
- * does not report its login is switched on without a click, so this is where its sign-in shows:
- * in the chat column, with the command that signs in, instead of a notice that leads elsewhere.
+ * That agent, when it refused the last message for want of a sign-in of its own. An agent that
+ * does not report its login is switched on without a click, so this is where that shows: in the
+ * chat column, with what it needs, instead of a notice that leads elsewhere.
  */
 const signedOutAgent = computed(() => {
   const reason = chatFailure.value?.reason
-  return reason === 'sign-in-expired' || reason === 'authentication' ? connectedAgent.value : null
+  return reason === 'sign-in-expired' ||
+    reason === 'agent-unconfigured' ||
+    reason === 'authentication'
+    ? connectedAgent.value
+    : null
 })
 /** How to sign in to that agent, or what else it needs where it has no sign-in of its own. */
 const signedOutHelp = computed(() =>
@@ -300,6 +304,8 @@ const failureMessage = computed(() => {
       return ai.value.chatRequestFailed
     case 'sign-in-expired':
       return ai.value.chatSignInExpired
+    case 'agent-unconfigured':
+      return null
     case 'plan-forbidden':
       return ai.value.chatPlanForbidden
     default:

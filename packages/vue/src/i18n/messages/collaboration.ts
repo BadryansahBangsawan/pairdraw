@@ -30,6 +30,7 @@ export const collaborationMessageDefaults = {
   agentIdle: 'Idle',
   sharedFile: 'Shared file',
   invalidRoomLink: 'That isn’t a room link or ID.',
+  roomsUnavailable: 'Room links need a build with live rooms, which this one leaves out.',
   joiningTitle: 'Joining the room…',
   connectingDescription: 'Connecting to the room’s servers.',
   lookingDescription: 'Looking for people in this room.',

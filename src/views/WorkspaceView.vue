@@ -13,6 +13,7 @@ import { startWebMCP } from '@/app/automation/webmcp/runtime'
 import { exposeCollaborationActions } from '@/app/browser/bridge'
 import { openingCloudLink, shownEditorStore, versionPreviewKey } from '@/app/cloud/integration'
 import { useJoinRoom } from '@/app/collab/join'
+import { roomArrival } from '@/app/collab/room/arrival'
 import { bindDesktopRoomLinks } from '@/app/collab/room/links'
 import { COLLAB_KEY, useCollab } from '@/app/collab/use'
 import { openDemoDocument } from '@/app/demo/document'
@@ -110,11 +111,20 @@ const joinRoomFromInput = useJoinRoom()
  */
 function openFirstTab(): Tab {
   if (embed) return createTab()
-  // Without shared rooms a room link opens what any other address does.
-  const roomId =
-    COLLABORATION_INCLUDED && typeof route.params.roomId === 'string' ? route.params.roomId : null
+  const arrival = roomArrival(
+    typeof route.params.roomId === 'string' ? route.params.roomId : undefined,
+    {
+      included: COLLABORATION_INCLUDED
+    }
+  )
+  // Without shared rooms a room link opens what any other address does, so the address goes.
+  if (arrival.action === 'unavailable') {
+    toast.info(collaboration.value.roomsUnavailable)
+    void router.replace({ path: '/' })
+  }
   if (pinHome) createHomeTab()
-  if (roomId) {
+  if (arrival.action === 'join') {
+    const { roomId } = arrival
     if (joinRoomFromInput(roomId) && activeTab.value) return activeTab.value
     toast.error(collaboration.value.invalidRoomLink)
     // A link that fails leaves the person on Home, not in an empty design.

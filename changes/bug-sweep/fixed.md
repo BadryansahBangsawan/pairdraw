@@ -54,3 +54,4 @@
 - Creating a layer in a parent that no longer exists, or restoring a layer with an id the document already has, now fails instead of leaving a detached layer or replacing the existing one.
 - S3 saves detect a document that changed elsewhere and report a conflict instead of overwriting it.
 - Character-range variable bindings keep their own scale after a rescale, so unbinding or rebinding the layer, or deleting a variable it binds, no longer resets the line height, letter spacing, or font size of those characters.
+- Creating a variable from a line height or letter spacing shown in percent gives the variable its pixels at the font size, so binding it keeps the text as it was instead of applying the percent as pixels.

@@ -14,7 +14,7 @@ const emit = defineEmits<{
   cancel: []
 }>()
 const { panels } = useI18n()
-const { value, suffix, length } = useTextLength(
+const { value, suffix, length, variableValue } = useTextLength(
   () => nodes,
   'letterSpacing',
   () => 0
@@ -34,6 +34,7 @@ function commit(current: number, previous: number, unit?: string) {
     :node-id="nodes.at(0)?.id ?? ''"
     :node-ids="nodes.map((node) => node.id)"
     :units="TEXT_LENGTH_UNITS"
+    :variable-value="variableValue"
     binding-path="letterSpacing"
     @update:model-value="(value, unit) => emit('update', length(value, unit))"
     @commit="commit"

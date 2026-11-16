@@ -32,7 +32,8 @@ const {
   bindingPath,
   bindingPaths,
   units,
-  displayScale = 1
+  displayScale = 1,
+  variableValue
 } = defineProps<{
   modelValue: number | symbol
   min?: number
@@ -52,6 +53,11 @@ const {
   units?: readonly string[]
   /** Display units per stored unit, such as 100 for opacity shown in percent. */
   displayScale?: number
+  /**
+   * The number a variable created from the field holds, when a binding applies it in another
+   * unit than the field shows, such as the pixels of a line height shown in percent.
+   */
+  variableValue?: number
 }>()
 
 const emit = defineEmits<{
@@ -76,6 +82,7 @@ const bindingStyles = useBindingFieldUI()
 const storedValue = computed(() =>
   typeof modelValue === 'number' ? storedNumberFromDisplay(modelValue, displayScale) : 0
 )
+const createdValue = computed(() => variableValue ?? storedValue.value)
 
 function bindingTooltip(name: string, resolvedValue: unknown) {
   if (typeof resolvedValue !== 'number') return name
@@ -86,7 +93,7 @@ defineOptions({ inheritAttrs: false })
 </script>
 
 <template>
-  <BindableValueRoot v-slot="binding" :provider="provider" :targets="targets" :value="storedValue">
+  <BindableValueRoot v-slot="binding" :provider="provider" :targets="targets" :value="createdValue">
     <NumberField
       v-bind="$attrs"
       :icon="icon"
@@ -134,7 +141,10 @@ defineOptions({ inheritAttrs: false })
             :detach-label="panels.detachVariable"
             :create-label="
               panels.createNumberVariable({
-                value: displayScale === 1 ? Math.round(storedValue) : storedValue
+                value:
+                  displayScale === 1 && variableValue === undefined
+                    ? Math.round(createdValue)
+                    : createdValue
               })
             "
             :create-name-placeholder="panels.variableName"

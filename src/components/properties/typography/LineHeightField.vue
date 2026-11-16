@@ -28,7 +28,11 @@ const isAutomatic = (node: SceneNode) => node.lineHeight == null && !node.boundV
 /** The pixels an automatic line height becomes when it is fixed. */
 const automaticPixels = (node: SceneNode) => Math.round((node.fontSize || 14) * 1.2)
 const automatic = computed(() => nodes.length > 0 && nodes.every(isAutomatic))
-const { value, suffix, length } = useTextLength(() => nodes, 'lineHeight', automaticPixels)
+const { value, suffix, length, variableValue } = useTextLength(
+  () => nodes,
+  'lineHeight',
+  automaticPixels
+)
 /** The panel commits what it previewed, so a typed unit is previewed first. */
 function commit(current: number, previous: number, unit?: string) {
   if (unit) emit('update', length(current, unit))
@@ -66,6 +70,7 @@ function setMode(mode: string) {
     :node-id="nodeId"
     :node-ids="nodeIds"
     :units="TEXT_LENGTH_UNITS"
+    :variable-value="variableValue"
     binding-path="lineHeight"
     @update:model-value="(value, unit) => emit('update', length(value, unit))"
     @commit="commit"

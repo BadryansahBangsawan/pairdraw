@@ -3,6 +3,7 @@ import { computed } from 'vue'
 
 import type { SceneNode, TextLength } from '@pairdraw/scene-graph'
 import { MIXED } from '@pairdraw/vue/controls/node-props'
+import { textLengthVariableValue } from '@pairdraw/vue/controls/number-variable-binding'
 
 type LengthField = 'lineHeight' | 'letterSpacing'
 
@@ -37,9 +38,18 @@ export function useTextLength(
     return first != null && values.every((current) => current === first) ? first : MIXED
   })
   const suffix = computed(() => (unit.value === 'PERCENT' ? '%' : 'px'))
+  /**
+   * The pixels a variable created from the field holds, a percent taken at the first layer's
+   * font size, since a binding applies the variable as pixels.
+   */
+  const variableValue = computed(() =>
+    typeof value.value === 'number'
+      ? textLengthVariableValue(value.value, unit.value, nodes().at(0)?.fontSize ?? 0)
+      : undefined
+  )
   const length = (value: number, typed?: string): TextLength => ({
     value,
     unit: (typed && TYPED_UNITS[typed.toLowerCase()]) || unit.value
   })
-  return { unit, value, suffix, length }
+  return { unit, value, suffix, length, variableValue }
 }

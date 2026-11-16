@@ -1,7 +1,8 @@
 import { describe, test, expect } from 'bun:test'
 
+import { SceneGraph } from '@pairdraw/scene-graph'
 import { computeAbsoluteBounds, computeBounds } from '@pairdraw/scene-graph/geometry'
-import type { Vector } from '@pairdraw/scene-graph/primitives'
+import type { Rect } from '@pairdraw/scene-graph/primitives'
 
 describe('computeBounds', () => {
   test('empty iterable returns zero rect', () => {
@@ -31,32 +32,28 @@ describe('computeBounds', () => {
 })
 
 describe('computeAbsoluteBounds', () => {
-  const idPos = (id: string) => {
-    const map: Record<string, Vector> = {
-      a: { x: 10, y: 20 },
-      b: { x: 50, y: 60 },
-      c: { x: 0, y: 0 }
-    }
-    return map[id] ?? { x: 0, y: 0 }
+  function graphWith(...rects: Rect[]) {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const nodes = rects.map((rect) => graph.createNode('RECTANGLE', pageId, rect))
+    return { graph, nodes }
   }
 
   test('empty iterable returns zero rect', () => {
-    expect(computeAbsoluteBounds([], idPos)).toEqual({ x: 0, y: 0, width: 0, height: 0 })
+    const { graph } = graphWith()
+    expect(computeAbsoluteBounds([], graph)).toEqual({ x: 0, y: 0, width: 0, height: 0 })
   })
 
   test('single node returns its bounds', () => {
-    const result = computeAbsoluteBounds([{ id: 'a', width: 30, height: 40 }], idPos)
-    expect(result).toEqual({ x: 10, y: 20, width: 30, height: 40 })
+    const { graph, nodes } = graphWith({ x: 10, y: 20, width: 30, height: 40 })
+    expect(computeAbsoluteBounds(nodes, graph)).toEqual({ x: 10, y: 20, width: 30, height: 40 })
   })
 
   test('multiple nodes returns union', () => {
-    const result = computeAbsoluteBounds(
-      [
-        { id: 'a', width: 30, height: 40 },
-        { id: 'b', width: 20, height: 20 }
-      ],
-      idPos
+    const { graph, nodes } = graphWith(
+      { x: 10, y: 20, width: 30, height: 40 },
+      { x: 50, y: 60, width: 20, height: 20 }
     )
-    expect(result).toEqual({ x: 10, y: 20, width: 60, height: 60 })
+    expect(computeAbsoluteBounds(nodes, graph)).toEqual({ x: 10, y: 20, width: 60, height: 60 })
   })
 })

@@ -34,7 +34,7 @@ function getSelectionScreenBounds(
   graph: SceneGraph,
   selNodes: SceneNode[]
 ): SelectionScreenBounds {
-  const b = computeAbsoluteBounds(selNodes, (id) => graph.getAbsolutePosition(id))
+  const b = computeAbsoluteBounds(selNodes, graph)
   return {
     sx1: b.x * r.zoom + r.panX,
     sx2: (b.x + b.width) * r.zoom + r.panX,

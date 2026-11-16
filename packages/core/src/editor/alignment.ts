@@ -50,8 +50,7 @@ function alignMultipleNodes(
   const absPositions = new Map<string, Vector>()
   for (const n of nodes) absPositions.set(n.id, ctx.graph.getAbsolutePosition(n.id))
 
-  const getPos = (id: string) => absPositions.get(id) ?? { x: 0, y: 0 }
-  const b = computeAbsoluteBounds(nodes, getPos)
+  const b = computeAbsoluteBounds(nodes, ctx.graph)
   const minX = b.x
   const minY = b.y
   const maxX = b.x + b.width

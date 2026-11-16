@@ -29,3 +29,20 @@ describe('text lines past a fixed-size box', () => {
     expect(nodeVisualBounds(text({ derivedTextHeight: 30 }), at).maxY).toBe(60)
   })
 })
+
+describe('text decoration past a turned box', () => {
+  test('reaches out along the turn, not below the canvas box', () => {
+    const turned = text({
+      width: 100,
+      height: 40,
+      rotation: 90,
+      fontSize: 20,
+      textDecoration: 'UNDERLINE'
+    })
+    const bounds = nodeVisualBounds(turned, () => ({ x: 0, y: 0 }))
+    // 3.6 offset + 1.25 thickness + 7 descent below the box, turned with it.
+    expect(bounds.maxY).toBeCloseTo(70)
+    expect(bounds.minY).toBeCloseTo(-30)
+    expect(bounds.maxX - bounds.minX).toBeCloseTo(51.85)
+  })
+})

@@ -147,7 +147,7 @@ export function createViewportActions(ctx: EditorContext) {
       .filter((n): n is NonNullable<typeof n> => n != null)
     if (nodes.length === 0) return
 
-    const b = computeAbsoluteBounds(nodes, (id) => ctx.graph.getAbsolutePosition(id))
+    const b = computeAbsoluteBounds(nodes, ctx.graph)
     zoomToBounds(b.x, b.y, b.x + b.width, b.y + b.height)
   }
 

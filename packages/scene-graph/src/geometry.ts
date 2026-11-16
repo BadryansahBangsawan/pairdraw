@@ -1,7 +1,9 @@
 import { arrowCapOverflow } from './arrow-caps'
+import { getAxisAlignedWorldBounds } from './coordinate'
+import type { SceneGraph } from './graph'
 import type { Rect, Vector } from './primitives'
 import { textLinesOverflow } from './text/overflow'
-import type { Effect, Stroke, StrokeCap, StrokeJoin, VectorNetwork } from './types'
+import type { Effect, SceneNode, Stroke, StrokeCap, StrokeJoin, VectorNetwork } from './types'
 
 export function degToRad(degrees: number): number {
   return (degrees * Math.PI) / 180
@@ -241,15 +243,13 @@ export function effectOverflow(effects?: Effect[]) {
   return { left, right, top, bottom }
 }
 
+/** Axis-aligned canvas box around the layers, through each one's rotation, flips, and ancestors. */
 export function computeAbsoluteBounds(
-  nodes: Iterable<{ id: string; width: number; height: number }>,
-  getAbsolutePosition: (id: string) => Vector
+  nodes: Iterable<SceneNode>,
+  graph: Pick<SceneGraph, 'getNode'>
 ): Rect {
   const bounds = createBoundsAccumulator()
-  for (const n of nodes) {
-    const abs = getAbsolutePosition(n.id)
-    includeRect(bounds, { x: abs.x, y: abs.y, width: n.width, height: n.height })
-  }
+  for (const n of nodes) includeRect(bounds, getAxisAlignedWorldBounds(n, graph))
   return boundsToRect(bounds)
 }
 
@@ -417,13 +417,13 @@ export function nodeVisualBounds(
     bounds = unionVisualBounds(bounds, transformedLocalBounds(node, localGeometry, abs)) ?? bounds
   }
 
-  const linesOverflow = textLinesOverflow(node)
-  if (linesOverflow > 0) {
-    const lines = { x: 0, y: 0, width: node.width, height: node.height + linesOverflow }
+  const linesOverflow = Math.max(textLinesOverflow(node), 0)
+  // An underline or strikethrough reaches below the last line, turning with the text.
+  const below = linesOverflow + textDecorationOverflow(node)
+  if (below > 0) {
+    const lines = { x: 0, y: 0, width: node.width, height: node.height + below }
     bounds = unionVisualBounds(bounds, transformedLocalBounds(node, lines, abs)) ?? bounds
   }
-
-  bounds.maxY += textDecorationOverflow(node)
 
   return bounds
 }

@@ -64,9 +64,15 @@ export function createJSXPreviewRecorder(ck: CanvasKit): JSXPreviewRecorder {
     const surface = ck.MakeSurface(1, 1)
     if (!surface) return null
     const created = new SkiaRenderer(ck, surface)
+    // Loading fonts drops every cache, so it happens once rather than before each record; a
+    // renderer whose fonts failed to load is not kept, so the next record tries again.
+    try {
+      await created.loadFonts()
+    } catch (error) {
+      created.destroy()
+      throw error
+    }
     renderer = created
-    // Loading fonts drops every cache, so it happens once rather than before each record.
-    await created.loadFonts()
     return created
   }
 

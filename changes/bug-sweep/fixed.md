@@ -2,3 +2,4 @@
 - Opening a `.pen` file with a number too large to store now reports where it is, instead of opening and then saving a file that can't be reopened.
 - Undoing Move to page selects the moved layers again.
 - Zooming to fit very large content stops at the 2% minimum zoom.
+- A streamed render preview loads its fonts again after a failed load instead of drawing without them until the call ends.

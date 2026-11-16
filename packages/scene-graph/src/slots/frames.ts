@@ -18,9 +18,9 @@ export function ownsSlotContent(
   propertyId = slotPropertyId(node)
 ): boolean {
   if (!propertyId) return false
-  let owner = node.parentId ? graph.nodes.get(node.parentId) : undefined
-  while (owner && owner.type !== 'INSTANCE')
-    owner = owner.parentId ? graph.nodes.get(owner.parentId) : undefined
+  const owner = node.parentId
+    ? graph.closest(node.parentId, (current) => current.type === 'INSTANCE')
+    : undefined
   return !!owner && Object.hasOwn(owner.componentPropertyAssignments, propertyId)
 }
 

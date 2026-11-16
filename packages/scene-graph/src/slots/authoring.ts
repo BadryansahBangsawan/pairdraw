@@ -15,13 +15,13 @@ export const DEFAULT_SLOT_SETTINGS: SlotSettings = {
  * instance are not authored there, so a layer under an instance has none.
  */
 export function slotOwner(graph: SceneGraph, node: SceneNode): SceneNode | undefined {
-  let current = node.parentId ? graph.getNode(node.parentId) : undefined
-  while (current && current.type !== 'CANVAS') {
-    if (current.type === 'COMPONENT') return current
-    if (current.type === 'INSTANCE') return undefined
-    current = current.parentId ? graph.getNode(current.parentId) : undefined
-  }
-  return undefined
+  if (!node.parentId) return undefined
+  const owner = graph.closest(
+    node.parentId,
+    (current) =>
+      current.type === 'COMPONENT' || current.type === 'INSTANCE' || current.type === 'CANVAS'
+  )
+  return owner?.type === 'COMPONENT' ? owner : undefined
 }
 
 /** Whether a frame inside a main component can become a slot. */

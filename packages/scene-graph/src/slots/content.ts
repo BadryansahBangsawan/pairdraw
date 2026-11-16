@@ -17,29 +17,23 @@ export type SlotScope =
   | { kind: 'slot'; frame: SceneNode; instance: SceneNode; propertyId: string }
   | { kind: 'locked'; owner: SceneNode }
 
-function parentOf(graph: SceneGraph, node: SceneNode): SceneNode | undefined {
-  return node.parentId ? graph.nodes.get(node.parentId) : undefined
-}
-
 function nearestInstance(graph: SceneGraph, node: SceneNode): SceneNode | undefined {
-  let current = parentOf(graph, node)
-  while (current && current.type !== 'INSTANCE') current = parentOf(graph, current)
-  return current
+  return node.parentId
+    ? graph.closest(node.parentId, (current) => current.type === 'INSTANCE')
+    : undefined
 }
 
 export function slotScope(graph: SceneGraph, parentId: string): SlotScope {
-  let current = graph.nodes.get(parentId)
-  while (current) {
-    const propertyId = slotPropertyId(current)
-    if (propertyId) {
-      const instance = nearestInstance(graph, current)
-      return instance ? { kind: 'slot', frame: current, instance, propertyId } : { kind: 'free' }
-    }
-    if (current.type === 'INSTANCE' || isGeneratedFrame(current))
-      return { kind: 'locked', owner: current }
-    current = parentOf(graph, current)
-  }
-  return { kind: 'free' }
+  const owner = graph.closest(
+    parentId,
+    (current) =>
+      !!slotPropertyId(current) || current.type === 'INSTANCE' || isGeneratedFrame(current)
+  )
+  if (!owner) return { kind: 'free' }
+  const propertyId = slotPropertyId(owner)
+  if (!propertyId) return { kind: 'locked', owner }
+  const instance = nearestInstance(graph, owner)
+  return instance ? { kind: 'slot', frame: owner, instance, propertyId } : { kind: 'free' }
 }
 
 /** Every layer below `node`; `enterInstances` also walks the layers of nested instances. */

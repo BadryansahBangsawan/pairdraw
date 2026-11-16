@@ -111,7 +111,7 @@ describe('hitTest with a mask shapes the click', () => {
 
   test('a vector mask cuts by its outline', () => {
     const { graph, content } = maskedBy('VECTOR', 200, 200, {
-      fillGeometry: [{ commandsBlob: triangleBlob(200, 200) }]
+      fillGeometry: [{ windingRule: 'NONZERO', commandsBlob: triangleBlob(200, 200) }]
     })
     expect(graph.hitTest(20, 20, pageId(graph))?.id).toBe(content)
     // Inside the triangle's box, outside the triangle.

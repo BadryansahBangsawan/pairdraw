@@ -118,7 +118,7 @@ describe('visual bounds against the world matrix', () => {
             rotation,
             flipX,
             flipY,
-            fillGeometry: [{ commandsBlob: rectBlob(0, 0, 120, 60) }]
+            fillGeometry: [{ windingRule: 'NONZERO', commandsBlob: rectBlob(0, 0, 120, 60) }]
           })
           const bounds = nodeVisualBounds(node, (id) => graph.getAbsolutePosition(id))
           const world = getAxisAlignedWorldBounds(node, graph)

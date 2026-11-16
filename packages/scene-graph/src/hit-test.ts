@@ -1,8 +1,9 @@
 import { hitsConnectorLine } from './connectors/hit'
 import { getAxisAlignedBoundsAt, getNodeLocalMatrix, getWorldMatrix } from './coordinate'
+import { geometryBlobPolylines } from './geometry'
 import type { SceneGraph } from './graph'
 import Matrix, { type Mat3 } from './matrix'
-import type { Rect } from './primitives'
+import type { Rect, Vector } from './primitives'
 import type { SceneNode, NodeType } from './types'
 
 const CONTAINER_TYPES = new Set<NodeType>([
@@ -57,6 +58,27 @@ function hasTransformedAncestor(
   return transformed
 }
 
+/**
+ * Where the point lies in the node's own coordinates: its offset from the position when nothing
+ * above it is turned, else through the inverse world matrix. Null when that cannot be inverted.
+ */
+function localPoint(
+  px: number,
+  py: number,
+  node: SceneNode,
+  graph: SceneGraph,
+  transformCache: Map<string, boolean>
+): Vector | null {
+  if (!hasTransformedAncestor(node, graph, transformCache)) {
+    const absolute = graph.getAbsolutePosition(node.id)
+    return { x: px - absolute.x, y: py - absolute.y }
+  }
+  const inv = Matrix.invert(getWorldMatrix(node, graph))
+  if (!inv) return null
+  const [x, y] = Matrix.mapPoints(inv, [px, py])
+  return { x, y }
+}
+
 /** Whether the point lies in the node's box, grown by `pad` canvas units on every side. */
 function containsPoint(
   px: number,
@@ -66,29 +88,74 @@ function containsPoint(
   transformCache: Map<string, boolean>,
   pad = 0
 ): boolean {
+  const local = localPoint(px, py, node, graph, transformCache)
+  if (!local) return false
   const padX = node.width > 0 ? pad : Math.max(pad, DEGENERATE_AXIS_SLOP)
   const padY = node.height > 0 ? pad : Math.max(pad, DEGENERATE_AXIS_SLOP)
-  if (!hasTransformedAncestor(node, graph, transformCache)) {
-    const absolute = graph.getAbsolutePosition(node.id)
-    return (
-      px >= absolute.x - padX &&
-      px <= absolute.x + node.width + padX &&
-      py >= absolute.y - padY &&
-      py <= absolute.y + node.height + padY
-    )
-  }
-
-  const m = getWorldMatrix(node, graph)
-
-  const inv = Matrix.invert(m)
-  if (!inv) return false
-
-  const [localX, localY] = Matrix.mapPoints(inv, [px, py])
   return (
-    localX >= -padX &&
-    localX <= node.width + padX &&
-    localY >= -padY &&
-    localY <= node.height + padY
+    local.x >= -padX &&
+    local.x <= node.width + padX &&
+    local.y >= -padY &&
+    local.y <= node.height + padY
+  )
+}
+
+/** Whether a rounded rectangle of `width` × `height` holds the point. */
+function roundedRectContains(
+  point: Vector,
+  width: number,
+  height: number,
+  radius: number
+): boolean {
+  if (point.x < 0 || point.y < 0 || point.x > width || point.y > height) return false
+  const r = Math.max(0, Math.min(radius, width / 2, height / 2))
+  const cx = Math.min(Math.max(point.x, r), width - r)
+  const cy = Math.min(Math.max(point.y, r), height - r)
+  return Math.hypot(point.x - cx, point.y - cy) <= r
+}
+
+/** Whether the point is inside a closed polyline, by the even-odd rule. */
+function insidePolyline(polyline: readonly Vector[], x: number, y: number): boolean {
+  let inside = false
+  for (let i = 0, j = polyline.length - 1; i < polyline.length; j = i++) {
+    const a = polyline[i]
+    const b = polyline[j]
+    if (a.y > y === b.y > y) continue
+    if (x < ((b.x - a.x) * (y - a.y)) / (b.y - a.y) + a.x) inside = !inside
+  }
+  return inside
+}
+
+/**
+ * Whether a mask lets the point through, by the outline it draws: an ellipse's curve, a rounded
+ * rectangle's corners, or a vector's filled path. Other shapes clip by their box.
+ */
+function maskContainsPoint(
+  px: number,
+  py: number,
+  mask: SceneNode,
+  graph: SceneGraph,
+  transformCache: Map<string, boolean>
+): boolean {
+  const outlined =
+    (mask.type === 'ELLIPSE' && mask.width > 0 && mask.height > 0) ||
+    (mask.type === 'RECTANGLE' && mask.cornerRadius > 0) ||
+    (mask.type === 'VECTOR' && mask.fillGeometry.length > 0)
+  if (!outlined) return containsPoint(px, py, mask, graph, transformCache)
+  const local = localPoint(px, py, mask, graph, transformCache)
+  if (!local) return false
+  if (mask.type === 'ELLIPSE') {
+    const rx = mask.width / 2
+    const ry = mask.height / 2
+    const dx = (local.x - rx) / rx
+    const dy = (local.y - ry) / ry
+    return dx * dx + dy * dy <= 1
+  }
+  if (mask.type === 'RECTANGLE') {
+    return roundedRectContains(local, mask.width, mask.height, mask.cornerRadius)
+  }
+  return geometryBlobPolylines(mask.fillGeometry).some((points) =>
+    insidePolyline(points, local.x, local.y)
   )
 }
 
@@ -168,7 +235,7 @@ function hitTestTransparentContainer(
   return null
 }
 
-/** Whether the masks that clip a layer leave the point outside every one of their boxes. */
+/** Whether the masks that clip a layer leave the point outside every one of their outlines. */
 function isMaskedOut(
   px: number,
   py: number,
@@ -178,7 +245,8 @@ function isMaskedOut(
 ): boolean {
   if (!masks) return false
   return (
-    masks.length > 0 && !masks.some((mask) => containsPoint(px, py, mask, graph, transformCache))
+    masks.length > 0 &&
+    !masks.some((mask) => maskContainsPoint(px, py, mask, graph, transformCache))
   )
 }
 

@@ -56,3 +56,65 @@ describe('hitTest of a zero-size layer', () => {
     expect(graph.hitTest(30, 8, pageId(graph))?.id).toBe(id)
   })
 })
+
+/** A triangle as the command blob a layer's fill geometry holds: move, two lines, close. */
+function triangleBlob(w: number, h: number): Uint8Array {
+  const values = [1, 0, 0, 2, w, 0, 2, 0, h, 0]
+  const bytes = new Uint8Array(1 + 8 + (1 + 8) * 2 + 1)
+  const view = new DataView(bytes.buffer)
+  let offset = 0
+  for (let index = 0; index < values.length; index += 3) {
+    bytes[offset++] = values[index]
+    if (values[index] === 0) break
+    view.setFloat32(offset, values[index + 1], true)
+    view.setFloat32(offset + 4, values[index + 2], true)
+    offset += 8
+  }
+  return bytes
+}
+
+// A mask cuts by the outline it draws, so a click inside its box but outside the shape passes
+// through the layers it masks.
+describe('hitTest with a mask shapes the click', () => {
+  function maskedBy(
+    type: 'ELLIPSE' | 'RECTANGLE' | 'VECTOR',
+    width: number,
+    height: number,
+    overrides: Parameters<SceneGraph['createNode']>[2] = {}
+  ) {
+    const graph = new SceneGraph()
+    const mask = graph.createNode(type, pageId(graph), {
+      name: 'Mask',
+      x: 0,
+      y: 0,
+      width,
+      height,
+      isMask: true,
+      ...overrides
+    })
+    const content = rect(graph, 'Content', 0, 0, 200, 200)
+    return { graph, mask, content }
+  }
+
+  test('an ellipse mask cuts by its curve', () => {
+    const { graph, content } = maskedBy('ELLIPSE', 200, 100)
+    expect(graph.hitTest(100, 50, pageId(graph))?.id).toBe(content)
+    // Inside the ellipse's box, outside the ellipse itself.
+    expect(graph.hitTest(5, 5, pageId(graph))?.id).not.toBe(content)
+  })
+
+  test('a rounded mask cuts by its corners', () => {
+    const { graph, content } = maskedBy('RECTANGLE', 200, 200, { cornerRadius: 50 })
+    expect(graph.hitTest(100, 2, pageId(graph))?.id).toBe(content)
+    expect(graph.hitTest(2, 2, pageId(graph))?.id).not.toBe(content)
+  })
+
+  test('a vector mask cuts by its outline', () => {
+    const { graph, content } = maskedBy('VECTOR', 200, 200, {
+      fillGeometry: [{ commandsBlob: triangleBlob(200, 200) }]
+    })
+    expect(graph.hitTest(20, 20, pageId(graph))?.id).toBe(content)
+    // Inside the triangle's box, outside the triangle.
+    expect(graph.hitTest(150, 150, pageId(graph))?.id).not.toBe(content)
+  })
+})

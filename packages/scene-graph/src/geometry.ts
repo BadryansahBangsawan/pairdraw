@@ -367,6 +367,109 @@ export function geometryBlobBounds(paths: Array<{ commandsBlob: Uint8Array }>): 
   return bounds.minX === Infinity ? null : boundsToRect(bounds)
 }
 
+/** How many straight steps a curve is sampled in when its outline is needed as points. */
+const OUTLINE_CURVE_STEPS = 8
+
+/**
+ * Points along a quad (`command` 3) or cubic (4) from `start`, sampled so the curve's outline can
+ * be tested without a path engine. The last coordinate pair is the curve's end.
+ */
+function curvePoints(
+  command: number,
+  start: Vector,
+  points: readonly Vector[],
+  steps: number
+): Vector[] {
+  const end = points[points.length - 1]
+  const sampled: Vector[] = []
+  for (let step = 1; step <= steps; step++) {
+    const t = step / steps
+    const u = 1 - t
+    if (command === 3) {
+      const control = points[0]
+      sampled.push({
+        x: u * u * start.x + 2 * u * t * control.x + t * t * end.x,
+        y: u * u * start.y + 2 * u * t * control.y + t * t * end.y
+      })
+      continue
+    }
+    const [first, second] = points
+    sampled.push({
+      x:
+        u * u * u * start.x +
+        3 * u * u * t * first.x +
+        3 * u * t * t * second.x +
+        t * t * t * end.x,
+      y:
+        u * u * u * start.y + 3 * u * u * t * first.y + 3 * u * t * t * second.y + t * t * t * end.y
+    })
+  }
+  return sampled
+}
+
+/** One blob's subpaths as polylines in the layer's own coordinates. */
+function blobPolylines(blob: Uint8Array, curveSteps: number): Vector[][] {
+  const polylines: Vector[][] = []
+  const view = new DataView(blob.buffer, blob.byteOffset, blob.byteLength)
+  let offset = 0
+  let current: Vector[] = []
+  let cursor: Vector = { x: 0, y: 0 }
+  const readPoint = (): Vector | null => {
+    if (offset + 8 > blob.length) return null
+    const point = { x: view.getFloat32(offset, true), y: view.getFloat32(offset + 4, true) }
+    offset += 8
+    return point
+  }
+  while (offset < blob.length) {
+    const command = blob[offset++]
+    const coords = geometryCommandCoordCount(command)
+    if (coords === null) break
+    if (command === 0) {
+      if (current.length > 0) polylines.push(current)
+      current = []
+      continue
+    }
+    const points: Vector[] = []
+    let complete = true
+    for (let index = 0; index < Math.max(coords, 1); index++) {
+      const point = readPoint()
+      if (!point) {
+        complete = false
+        break
+      }
+      points.push(point)
+    }
+    if (!complete) break
+    const end = points[points.length - 1]
+    if (command === 1) {
+      if (current.length > 0) polylines.push(current)
+      current = [end]
+    } else if (command === 2) {
+      if (current.length === 0) current.push(cursor)
+      current.push(end)
+    } else {
+      if (current.length === 0) current.push(cursor)
+      current.push(...curvePoints(command, cursor, points, curveSteps))
+    }
+    cursor = end
+  }
+  if (current.length > 0) polylines.push(current)
+  return polylines
+}
+
+/**
+ * The subpaths a layer's geometry blobs draw, as polylines in its own coordinates. Curves are
+ * sampled, so a caller can test a point against the outline without a path engine.
+ */
+export function geometryBlobPolylines(
+  paths: Array<{ commandsBlob: Uint8Array }>,
+  curveSteps = OUTLINE_CURVE_STEPS
+): Vector[][] {
+  const polylines: Vector[][] = []
+  for (const path of paths) polylines.push(...blobPolylines(path.commandsBlob, curveSteps))
+  return polylines
+}
+
 type TurnedBox = Pick<VisualBoundsNode, 'width' | 'height' | 'rotation' | 'flipX' | 'flipY'>
 
 /**

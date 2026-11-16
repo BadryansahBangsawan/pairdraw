@@ -127,6 +127,27 @@ test('a color composed from another expression is kept whole', () => {
   expect(value).toMatchObject({ expression: 'UNSUPPORTED', function: 'COMPOSE_COLOR' })
 })
 
+test('a color composed from an expression typed only by its resolved type is kept whole', () => {
+  const inner: VariableDataEntry = {
+    resolvedDataType: 'EXPRESSION',
+    value: {
+      expressionValue: {
+        expressionFunction: 'COMPOSE_COLOR',
+        expressionArguments: [
+          { dataType: 'COLOR', value: { colorValue: { r: 1, g: 0, b: 0, a: 1 } } },
+          { dataType: 'FLOAT', value: { floatValue: 0.5 } }
+        ]
+      }
+    }
+  }
+  const nested = {
+    ...expression('COMPOSE_COLOR', [inner, { dataType: 'FLOAT', value: { floatValue: 1 } }]),
+    resolvedDataType: 'COLOR'
+  }
+  const value = open(resources(nested)).variables.get(VARIABLE)?.valuesByMode[DEFAULT_MODE]
+  expect(value).toMatchObject({ expression: 'UNSUPPORTED', function: 'COMPOSE_COLOR' })
+})
+
 test.each([
   [
     'a variable the document lacks',

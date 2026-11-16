@@ -68,7 +68,7 @@ function expressionValue(
   const value = entry.value
   if (!value) throw new Error('Missing expression')
   if (value.expressionValue?.expressionFunction === 'COMPOSE_COLOR')
-    return colorExpression(entry, resolve)
+    return colorExpression(entry, resolve, depth)
   const expression = value.expressionValue
   const operator = formulaOperatorOfFigmaFunction(expression?.expressionFunction)
   if (!operator) {
@@ -116,7 +116,8 @@ function formulaOperand(operand: VariableValue): VariableFormulaNode {
 
 function colorExpression(
   entry: VariableDataEntry,
-  resolve: ReturnType<typeof createResourceResolver>
+  resolve: ReturnType<typeof createResourceResolver>,
+  depth: number
 ): VariableColorExpression {
   const expression = entry.value?.expressionValue
   const args = expression?.expressionArguments
@@ -125,10 +126,11 @@ function colorExpression(
       `Unsupported variable expression ${expression?.expressionFunction}`
     )
   // Only literal or alias operands are supported; other functions must not be flattened.
-  if (args.some((arg) => arg.dataType === 'EXPRESSION'))
+  // An argument may declare its type only through `resolvedDataType`, as `valueOf` reads it.
+  if (args.some((arg) => (arg.dataType ?? arg.resolvedDataType) === 'EXPRESSION'))
     throw new UnsupportedExpressionError('Unsupported nested color expression')
-  const color = valueOf(args[0], resolve)
-  const opacity = valueOf(args[1], resolve)
+  const color = valueOf(args[0], resolve, depth + 1)
+  const opacity = valueOf(args[1], resolve, depth + 1)
   return v.parse(variableColorExpressionSchema, { expression: 'COMPOSE_COLOR', color, opacity })
 }
 

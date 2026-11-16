@@ -28,3 +28,4 @@
 - A duplicated layer inside an instance no longer keeps stale styles after its component changes.
 - CSS colors with a `none` channel, such as `rgb(none 255 0)`, now import correctly.
 - Imported out-of-range and wide-gamut CSS colors are now clamped or mapped into sRGB, as browsers show them.
+- A `.fig` file with a nested color expression now opens with the variable kept unsupported instead of failing.

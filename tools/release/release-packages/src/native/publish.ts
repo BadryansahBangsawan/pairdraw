@@ -30,13 +30,19 @@ const names = (await readdir(paths.output)).sort()
 assertDraftReplacement(release, names, actualCommit, identity)
 
 if (process.argv[2] === 'check') {
-  const plan = await createPublicationPlan(paths.root)
-  const reviewed =
-    v.parse(
-      v.optional(v.picklist(['true', 'false', '']), ''),
-      process.env.NPM_PUBLISHED_REVIEWED
-    ) === 'true'
-  assertPublicationStart(plan, reviewed)
+  // A repository that publishes npm packages by hand leaves them out of this run entirely.
+  const npmPublishing = v.parse(
+    v.optional(v.picklist(['ci', 'manual', '']), ''),
+    process.env.NPM_PUBLISHING
+  )
+  if (npmPublishing !== 'manual') {
+    const reviewed =
+      v.parse(
+        v.optional(v.picklist(['true', 'false', '']), ''),
+        process.env.NPM_PUBLISHED_REVIEWED
+      ) === 'true'
+    assertPublicationStart(await createPublicationPlan(paths.root), reviewed)
+  }
 
   console.log('Draft, npm versions and immutable tag verified before publication')
   process.exit(0)

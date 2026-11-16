@@ -28,6 +28,10 @@ The checked-in `desktop/tauri.conf.json` names no update feed: its updater `endp
 
 Changing either after a release strands installed apps on the old feed or key, so generate the key once and keep the private half safe.
 
+## npm publishing
+
+The publish job publishes the npm packages through npm trusted publishing, which each package must name this repository and `build.yml` for on npmjs.com. A repository without that setup sets the `NPM_PUBLISHING` repository variable to `manual`: the run then neither checks nor publishes npm versions, and a maintainer publishes the same tag's packages from a clean checkout (`cli.ts build`, `prepare`, `pack`, then `npm publish` of each tarball). Those packages carry no npm provenance, and `release-manifest.json` lists the CI tarballs, not the published ones.
+
 ## Pre-releases
 
 A `vX.Y.Z-beta.N` tag runs the same workflow. npm packages publish under the `next` dist-tag, so `latest` stays on the last stable release, and the draft is marked pre-release and never latest. The desktop updater and download links follow GitHub's latest release, so neither picks up a beta. The changelog section is headed `## X.Y.Z-beta.N — YYYY-MM-DD` like any release.

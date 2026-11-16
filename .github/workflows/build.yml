@@ -258,6 +258,7 @@ jobs:
       - name: Refuse published releases or moved tags
         env:
           NPM_PUBLISHED_REVIEWED: ${{ inputs.npm_published_reviewed || false }}
+          NPM_PUBLISHING: ${{ vars.NPM_PUBLISHING }}
         run: bun .pipeline/tools/release/release-packages/src/native/publish.ts check
       - name: Attest the complete binary set and source/workflow manifest
         id: provenance
@@ -275,6 +276,7 @@ jobs:
               --signer-digest "$WORKFLOW_COMMIT" --deny-self-hosted-runners
           done
       - name: Publish verified npm artifacts with provenance
+        if: vars.NPM_PUBLISHING != 'manual'
         run: bun .pipeline/tools/release/release-packages/src/cli.ts publish
       - name: Replace and verify the entire draft asset set
         run: bun .pipeline/tools/release/release-packages/src/native/publish.ts upload

@@ -53,17 +53,17 @@ Every client below starts the same command, `pairdraw-mcp`, from `npm install -g
 
 The desktop app can write the entry for you. Open **Settings → MCP → Other apps** and turn on each app you use: Claude Code, Claude Desktop, Codex, Gemini CLI, OpenCode, Kiro, Cursor, VS Code, or omp. Turning a switch on adds a `pairdraw` entry that starts `pairdraw-mcp` to that app's own config file, the file this page names for it; turning it off removes the entry again. Everything else in the file, including comments and formatting, stays as it was, and before its first change the app keeps a copy of the file next to it with `.pairdraw.bak` appended to the name.
 
-| App | File |
-|-----|------|
-| Claude Code | `~/.claude.json` (in `CLAUDE_CONFIG_DIR` when set) |
-| Claude Desktop | `claude_desktop_config.json` in Claude's settings folder |
-| Codex | `~/.codex/config.toml` (in `CODEX_HOME` when set) |
-| Gemini CLI | `~/.gemini/settings.json` |
-| OpenCode | `~/.config/opencode/opencode.json`, or `opencode.jsonc` when only that exists |
-| Kiro | `~/.kiro/settings/mcp.json` |
-| Cursor | `~/.cursor/mcp.json` |
-| VS Code | `mcp.json` in your user profile |
-| omp | `~/.omp/agent/mcp.json` (in `PI_CODING_AGENT_DIR` when set) |
+| App            | File                                                                          |
+| -------------- | ----------------------------------------------------------------------------- |
+| Claude Code    | `~/.claude.json` (in `CLAUDE_CONFIG_DIR` when set)                            |
+| Claude Desktop | `claude_desktop_config.json` in Claude's settings folder                      |
+| Codex          | `~/.codex/config.toml` (in `CODEX_HOME` when set)                             |
+| Gemini CLI     | `~/.gemini/settings.json`                                                     |
+| OpenCode       | `~/.config/opencode/opencode.json`, or `opencode.jsonc` when only that exists |
+| Kiro           | `~/.kiro/settings/mcp.json`                                                   |
+| Cursor         | `~/.cursor/mcp.json`                                                          |
+| VS Code        | `mcp.json` in your user profile                                               |
+| omp            | `~/.omp/agent/mcp.json` (in `PI_CODING_AGENT_DIR` when set)                   |
 
 An app shows as not found until its settings folder exists, so run it once first. A switch stays locked when the file has syntax errors, or when the entry was written by hand in a form the app does not rewrite, such as a Codex inline table, or Codex keeps all its servers in one inline `mcp_servers = { … }` table; edit the file yourself in those cases. The desktop shell checks each write itself and refuses one that would change anything in the file beyond that entry. Restart the app, or reload its MCP servers, after a change. Apps started from the Dock or Start menu may not see the folder npm installs global commands into; if one cannot start `pairdraw-mcp`, set the entry's `command` to the full path that `which pairdraw-mcp` (or `where pairdraw-mcp` on Windows) prints.
 
@@ -165,7 +165,7 @@ Add the server under `mcp_servers` in `~/.hermes/config.yaml`:
 ```yaml
 mcp_servers:
   pairdraw:
-    command: "pairdraw-mcp"
+    command: 'pairdraw-mcp'
 ```
 
 Run `/reload-mcp` in a running session, or start a new one. Hermes also offers the server's resources and prompts as tools, so the agent can read the [design skill](#design-skill) through `read_skill` or the resources.
@@ -197,6 +197,7 @@ Or run from source without installing:
   }
 }
 ```
+
 ```json [Node.js]
 {
   "mcpServers": {
@@ -277,238 +278,238 @@ The resources and the prompt stay available when `read_skill` is turned off in *
 
 ## Tools
 
-Pairdraw currently registers more than 130 shared design tools, plus MCP-only document and prompt operations when applicable.
+Pairdraw currently registers 139 shared design tools, plus MCP-only document and prompt operations when applicable.
 
 ### Document
 
-| Tool | Description |
-|------|-------------|
-| `open_file` | Open a `.fig` file for editing |
-| `close_file` | Close an open document tab; `unsaved: "save"` or `"discard"` decides what happens to unsaved changes |
-| `save_file` | Save the current document to a `.fig` file |
-| `new_document` | Create a new empty document |
-| `list_documents` | List open app documents/tabs and their pages |
-| `list_recent_files` | List recently opened files inside the MCP root, newest first, up to the app's recent files limit |
-| `activate_document` | Bring a document tab to the front, optionally on a given page |
+| Tool                | Description                                                                                          |
+| ------------------- | ---------------------------------------------------------------------------------------------------- |
+| `open_file`         | Open a `.fig` file for editing                                                                       |
+| `close_file`        | Close an open document tab; `unsaved: "save"` or `"discard"` decides what happens to unsaved changes |
+| `save_file`         | Save the current document to a `.fig` file                                                           |
+| `new_document`      | Create a new empty document                                                                          |
+| `list_documents`    | List open app documents/tabs and their pages                                                         |
+| `list_recent_files` | List recently opened files inside the MCP root, newest first, up to the app's recent files limit     |
+| `activate_document` | Bring a document tab to the front, optionally on a given page                                        |
 
 ### History
 
-| Tool | Description |
-|------|-------------|
-| `undo` | Undo the newest change made through MCP or the CLI |
+| Tool   | Description                                          |
+| ------ | ---------------------------------------------------- |
+| `undo` | Undo the newest change made through MCP or the CLI   |
 | `redo` | Redo the newest change undone through MCP or the CLI |
 
 The history is shared with the person in the editor. `undo` and `redo` refuse when the newest step was made in the editor, so an agent never reverts the user's work. Each editing tool call is one undo step, wherever in the document its edits land, including those an `eval` script makes after switching `figma.currentPage`. A call that fails part way, such as an `eval` script that throws, is rolled back whole: the document is left as it was and no step is recorded. If someone else changed the document while the call ran, such as you in the editor or a collaborator, nothing is rolled back, so their work stays, and the failed call is kept as one undo step.
 
 ### Settings
 
-| Tool | Description |
-|------|-------------|
-| `get_settings` | Read editor settings: appearance, snapping, canvas rendering, recovery, AI chat, and design check preferences |
+| Tool              | Description                                                                                                   |
+| ----------------- | ------------------------------------------------------------------------------------------------------------- |
+| `get_settings`    | Read editor settings: appearance, snapping, canvas rendering, recovery, AI chat, and design check preferences |
 | `update_settings` | Change settings with a partial object shaped like `get_settings` output; invalid keys and values are rejected |
 
 Settings tools never expose credentials, AI models, MCP connections, storage, or tool access. The available keys are listed in [Controlling the App](/programmable/cli/app-control#settings).
 
 ### Read
 
-| Tool | Description |
-|------|-------------|
-| `get_selection` | Get the selected nodes, with their direct children by default; `depth` sets how many levels |
-| `get_page_tree` | Get the full node tree of the current page |
-| `get_current_page` | Get the current page name and ID |
-| `get_node` | Get detailed properties of a node by ID |
-| `find_nodes` | Find nodes by name pattern and/or type |
-| `get_components` | List the document's components and those of enabled libraries; a component with slots lists each slot's preferred components and whether it takes only those |
-| `list_pages` | List all pages |
-| `list_variables` | List design variables |
-| `list_collections` | List variable collections |
-| `list_fonts` | List fonts used in the current page |
-| `list_available_fonts` | List font families the current host can render |
-| `get_font_status` | Report requested faces, loaded sources, active substitutions, why an installed face could not be loaded, and affected nodes |
-| `page_bounds` | Get bounding box of all objects on the current page |
-| `find_empty_space` | Find a free spot of a given size for new content, beside everything on the page or next to `near_id`, optionally on one side (`direction`) with a `gap`; returns `x` and `y` ready for `render` or the create tools |
-| `node_bounds` | Get bounding box of a node |
-| `node_ancestors` | Get ancestor chain of a node |
-| `node_children` | Get direct children of a node |
-| `node_tree` | Get the subtree rooted at a node |
-| `node_bindings` | Get variable bindings on a node |
+| Tool                   | Description                                                                                                                                                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `get_selection`        | Get the selected nodes, with their direct children by default; `depth` sets how many levels                                                                                                                         |
+| `get_page_tree`        | Get the full node tree of the current page                                                                                                                                                                          |
+| `get_current_page`     | Get the current page name and ID                                                                                                                                                                                    |
+| `get_node`             | Get detailed properties of a node by ID                                                                                                                                                                             |
+| `find_nodes`           | Find nodes by name pattern and/or type                                                                                                                                                                              |
+| `get_components`       | List the document's components and those of enabled libraries; a component with slots lists each slot's preferred components and whether it takes only those                                                        |
+| `list_pages`           | List all pages                                                                                                                                                                                                      |
+| `list_variables`       | List design variables                                                                                                                                                                                               |
+| `list_collections`     | List variable collections                                                                                                                                                                                           |
+| `list_fonts`           | List fonts used in the current page                                                                                                                                                                                 |
+| `list_available_fonts` | List font families the current host can render                                                                                                                                                                      |
+| `get_font_status`      | Report requested faces, loaded sources, active substitutions, why an installed face could not be loaded, and affected nodes                                                                                         |
+| `page_bounds`          | Get bounding box of all objects on the current page                                                                                                                                                                 |
+| `find_empty_space`     | Find a free spot of a given size for new content, beside everything on the page or next to `near_id`, optionally on one side (`direction`) with a `gap`; returns `x` and `y` ready for `render` or the create tools |
+| `node_bounds`          | Get bounding box of a node                                                                                                                                                                                          |
+| `node_ancestors`       | Get ancestor chain of a node                                                                                                                                                                                        |
+| `node_children`        | Get direct children of a node                                                                                                                                                                                       |
+| `node_tree`            | Get the subtree rooted at a node                                                                                                                                                                                    |
+| `node_bindings`        | Get variable bindings on a node                                                                                                                                                                                     |
 
 ### Create
 
-| Tool | Description |
-|------|-------------|
-| `create_shape` | Create a shape (`FRAME`, `RECTANGLE`, `ELLIPSE`, `TEXT`, `LINE`, `STAR`, `POLYGON`, `SECTION`) |
-| `create_vector` | Create a vector node from a path string |
-| `create_slice` | Create an export slice |
-| `create_connector` | Join two layers, or a layer and a point, with a connector that follows them |
-| `create_page` | Create a new page |
-| `render` | Render JSX to design nodes — create entire component trees in one call |
-| `create_component` | Convert a frame/group into a component |
-| `create_instance` | Create an instance of a component |
-| `create_slot` | Make a frame inside a main component a slot, optionally with preferred components, only those allowed, and a child limit |
-| `insert_icon` | Insert icons by name; Material Symbols icons take `weight`, `fill`, `grade`, and `optical_size`, which they keep when swapped |
-| `import_html` | Import HTML and CSS as editable layers: `<style>` blocks apply, `css` adds a stylesheet, and `tailwind: true` compiles the Tailwind classes the markup uses; flex and grid become auto layout |
-| `set_behaviour` | Make a component behave as a Reka UI control, by its property and slot names; `null` removes it |
-| `get_behaviour` | Read a component's behaviour and what it still misses; without an ID, list every kind |
-| `node_to_component` | Convert an existing node into a component in-place |
+| Tool                | Description                                                                                                                                                                                   |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `create_shape`      | Create a shape (`FRAME`, `RECTANGLE`, `ELLIPSE`, `TEXT`, `LINE`, `STAR`, `POLYGON`, `SECTION`)                                                                                                |
+| `create_vector`     | Create a vector node from a path string                                                                                                                                                       |
+| `create_slice`      | Create an export slice                                                                                                                                                                        |
+| `create_connector`  | Join two layers, or a layer and a point, with a connector that follows them                                                                                                                   |
+| `create_page`       | Create a new page                                                                                                                                                                             |
+| `render`            | Render JSX to design nodes — create entire component trees in one call                                                                                                                        |
+| `create_component`  | Convert a frame/group into a component                                                                                                                                                        |
+| `create_instance`   | Create an instance of a component                                                                                                                                                             |
+| `create_slot`       | Make a frame inside a main component a slot, optionally with preferred components, only those allowed, and a child limit                                                                      |
+| `insert_icon`       | Insert icons by name; Material Symbols icons take `weight`, `fill`, `grade`, and `optical_size`, which they keep when swapped                                                                 |
+| `import_html`       | Import HTML and CSS as editable layers: `<style>` blocks apply, `css` adds a stylesheet, and `tailwind: true` compiles the Tailwind classes the markup uses; flex and grid become auto layout |
+| `set_behaviour`     | Make a component behave as a Reka UI control, by its property and slot names; `null` removes it                                                                                               |
+| `get_behaviour`     | Read a component's behaviour and what it still misses; without an ID, list every kind                                                                                                         |
+| `node_to_component` | Convert an existing node into a component in-place                                                                                                                                            |
 
 ### Image AI
 
 These run in the app on the services and keys set up in **Settings → Image services** (BYOK); elsewhere they answer that they are unavailable. Each result is one undo step, and a layer or image that changed while the service worked is left alone.
 
-| Tool | Description |
-|------|-------------|
-| `generate_image` | Generate an image from a prompt: with `id` it fills that layer, replacing the image it shows; without, it becomes a new rectangle at the image's size (or `width`), beside the page's content unless `x` and `y` are given. `orientation` is `square`, `landscape`, or `portrait`; `transparent` asks for a cut-out |
-| `remove_background` | Cut the subject of a layer's image out onto transparency, keeping the layer's size and crop |
-| `replace_background` | Replace the background of a layer's image with one a `prompt` describes, keeping the subject |
-| `generate_svg` | Generate vector art from a prompt with the vectorize service and import it as editable layers, as `import_svg` does |
+| Tool                 | Description                                                                                                                                                                                                                                                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `generate_image`     | Generate an image from a prompt: with `id` it fills that layer, replacing the image it shows; without, it becomes a new rectangle at the image's size (or `width`), beside the page's content unless `x` and `y` are given. `orientation` is `square`, `landscape`, or `portrait`; `transparent` asks for a cut-out |
+| `remove_background`  | Cut the subject of a layer's image out onto transparency, keeping the layer's size and crop                                                                                                                                                                                                                         |
+| `replace_background` | Replace the background of a layer's image with one a `prompt` describes, keeping the subject                                                                                                                                                                                                                        |
+| `generate_svg`       | Generate vector art from a prompt with the vectorize service and import it as editable layers, as `import_svg` does                                                                                                                                                                                                 |
 
 ### Modify
 
-| Tool | Description |
-|------|-------------|
-| `set_fill` | Set fill color (hex) |
-| `set_image_fill` | Fill a layer with an image from base64 `image_data` or a `url` (http, https, or data); `scale_mode` is `FILL` (default), `FIT`, `CROP`, `TILE`, or `STRETCH`, which stretches the whole image to the layer as the image fill panel's Stretch does |
+| Tool                          | Description                                                                                                                                                                                                                                                                           |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `set_fill`                    | Set fill color (hex)                                                                                                                                                                                                                                                                  |
+| `set_image_fill`              | Fill a layer with an image from base64 `image_data` or a `url` (http, https, or data); `scale_mode` is `FILL` (default), `FIT`, `CROP`, `TILE`, or `STRETCH`, which stretches the whole image to the layer as the image fill panel's Stretch does                                     |
 | `replace_matching_properties` | Swap fill, text, or stroke colors, stroke weights, corner radii, font families, styles, or sizes for others everywhere on the page, the selection, or given layers; keeps instance overrides, and returns the layers of read-only library components it left unchanged in `read_only` |
-| `set_stroke` | Set stroke color, weight, alignment |
-| `set_effects` | Add shadow or blur effects |
-| `update_node` | Update position, size, opacity, corner radius, text, font |
-| `set_layout` | Set auto-layout (flexbox) — direction, spacing, padding, alignment |
-| `set_constraints` | Set resize constraints |
-| `set_rotation` | Set rotation angle in degrees |
-| `set_opacity` | Set opacity (0–1) |
-| `set_radius` | Set corner radius (uniform or per-corner) |
-| `set_minmax` | Set min/max width and height constraints |
-| `set_text` | Set text content of a `TEXT` node |
-| `set_font` | Set font family and weight |
-| `set_font_range` | Set font properties, color, or a `hyperlink` on a character range |
-| `set_text_resize` | Set text auto-resize mode (fixed/auto-width/auto-height) |
-| `set_visible` | Show or hide a node |
-| `set_blend` | Set blend mode |
-| `set_locked` | Lock or unlock a node |
-| `set_stroke_align` | Set stroke alignment (inside/center/outside) |
-| `set_text_properties` | Set text layout: alignment, auto-resize, text case, decoration, truncation, and a `hyperlink` for the whole text. Links take http, https, and mailto addresses (`example.com` becomes `https://example.com`); `null` or `""` removes one |
-| `set_layout_child` | Configure auto-layout child: sizing, grow, alignment, absolute positioning |
-| `node_move` | Move a node to a new position |
-| `node_resize` | Resize a node |
-| `rescale` | Scale layers as the Scale tool (K) does, with their text, strokes, radii, effects, and spacing, around an `anchor` of their joint bounds (`top-left` by default); `factor` 2 doubles; locked layers and layers inside instances are listed in `skipped` |
-| `node_replace_with` | Replace a node with another node |
-| `arrange` | Spread overlapping layers apart, pack them, place them in a grid, row, or column, or lay them out along their connectors as a flow, tree, radial map, or network |
+| `set_stroke`                  | Set stroke color, weight, alignment                                                                                                                                                                                                                                                   |
+| `set_effects`                 | Add shadow or blur effects                                                                                                                                                                                                                                                            |
+| `update_node`                 | Update position, size, opacity, corner radius, text, font                                                                                                                                                                                                                             |
+| `set_layout`                  | Set auto-layout (flexbox) — direction, spacing, padding, alignment                                                                                                                                                                                                                    |
+| `set_constraints`             | Set resize constraints                                                                                                                                                                                                                                                                |
+| `set_rotation`                | Set rotation angle in degrees                                                                                                                                                                                                                                                         |
+| `set_opacity`                 | Set opacity (0–1)                                                                                                                                                                                                                                                                     |
+| `set_radius`                  | Set corner radius (uniform or per-corner)                                                                                                                                                                                                                                             |
+| `set_minmax`                  | Set min/max width and height constraints                                                                                                                                                                                                                                              |
+| `set_text`                    | Set text content of a `TEXT` node                                                                                                                                                                                                                                                     |
+| `set_font`                    | Set font family and weight                                                                                                                                                                                                                                                            |
+| `set_font_range`              | Set font properties, color, or a `hyperlink` on a character range                                                                                                                                                                                                                     |
+| `set_text_resize`             | Set text auto-resize mode (fixed/auto-width/auto-height)                                                                                                                                                                                                                              |
+| `set_visible`                 | Show or hide a node                                                                                                                                                                                                                                                                   |
+| `set_blend`                   | Set blend mode                                                                                                                                                                                                                                                                        |
+| `set_locked`                  | Lock or unlock a node                                                                                                                                                                                                                                                                 |
+| `set_stroke_align`            | Set stroke alignment (inside/center/outside)                                                                                                                                                                                                                                          |
+| `set_text_properties`         | Set text layout: alignment, auto-resize, text case, decoration, truncation, and a `hyperlink` for the whole text. Links take http, https, and mailto addresses (`example.com` becomes `https://example.com`); `null` or `""` removes one                                              |
+| `set_layout_child`            | Configure auto-layout child: sizing, grow, alignment, absolute positioning                                                                                                                                                                                                            |
+| `node_move`                   | Move a node to a new position                                                                                                                                                                                                                                                         |
+| `node_resize`                 | Resize a node                                                                                                                                                                                                                                                                         |
+| `rescale`                     | Scale layers as the Scale tool (K) does, with their text, strokes, radii, effects, and spacing, around an `anchor` of their joint bounds (`top-left` by default); `factor` 2 doubles; locked layers and layers inside instances are listed in `skipped`                               |
+| `node_replace_with`           | Replace a node with another node                                                                                                                                                                                                                                                      |
+| `arrange`                     | Spread overlapping layers apart, pack them, place them in a grid, row, or column, or lay them out along their connectors as a flow, tree, radial map, or network                                                                                                                      |
 
 ### Structure
 
-| Tool | Description |
-|------|-------------|
-| `delete_node` | Delete a node |
-| `clone_node` | Duplicate a node |
-| `rename_node` | Rename a node |
-| `reparent_node` | Move a node into a different parent |
-| `select_nodes` | Select nodes by ID |
-| `group_nodes` | Group nodes |
-| `ungroup_node` | Ungroup a group |
-| `flatten_nodes` | Flatten nodes into a single vector |
-| `boolean_union` | Boolean union of two or more nodes |
-| `boolean_subtract` | Boolean subtraction |
-| `boolean_intersect` | Boolean intersection |
-| `boolean_exclude` | Boolean exclusion |
+| Tool                | Description                         |
+| ------------------- | ----------------------------------- |
+| `delete_node`       | Delete a node                       |
+| `clone_node`        | Duplicate a node                    |
+| `rename_node`       | Rename a node                       |
+| `reparent_node`     | Move a node into a different parent |
+| `select_nodes`      | Select nodes by ID                  |
+| `group_nodes`       | Group nodes                         |
+| `ungroup_node`      | Ungroup a group                     |
+| `flatten_nodes`     | Flatten nodes into a single vector  |
+| `boolean_union`     | Boolean union of two or more nodes  |
+| `boolean_subtract`  | Boolean subtraction                 |
+| `boolean_intersect` | Boolean intersection                |
+| `boolean_exclude`   | Boolean exclusion                   |
 
 ### Vector Path
 
-| Tool | Description |
-|------|-------------|
-| `path_get` | Get the path data of a vector node |
-| `path_set` | Set the path data of a vector node |
-| `path_scale` | Scale a vector path |
-| `path_flip` | Flip a vector path horizontally or vertically |
-| `path_move` | Translate a vector path |
+| Tool              | Description                                                                                                                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `path_get`        | Get the path data of a vector node                                                                                                                                                          |
+| `path_set`        | Set the path data of a vector node                                                                                                                                                          |
+| `path_scale`      | Scale a vector path                                                                                                                                                                         |
+| `path_flip`       | Flip a vector path horizontally or vertically                                                                                                                                               |
+| `path_move`       | Translate a vector path                                                                                                                                                                     |
 | `vectorize_image` | Convert a layer's image fill into editable vector paths in a new frame beside it, keeping the image. Runs in the app with the vectorize service and key set up in Settings → Image services |
 
 ### Export
 
-| Tool | Description |
-|------|-------------|
-| `export_image` | Export nodes as PNG, JPG, or WEBP. Returns base64-encoded image data; `quality` (1–100, default 90) sets JPG and WEBP compression |
-| `export_html` | Export nodes as HTML: `style` `css` (default) or `tailwind`; `html` `fragment` (default) or `standalone`; `assets` `inline` (default) or `external`, which returns a standalone page's stylesheet, images, and web fonts as separate files; `layer_names` (default true) writes `data-name` and `layer_ids` (default false) writes each layer's ID |
-| `export_svg` | Export nodes as SVG markup |
+| Tool           | Description                                                                                                                                                                                                                                                                                                                                        |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `export_image` | Export nodes as PNG, JPG, or WEBP. Returns base64-encoded image data; `quality` (1–100, default 90) sets JPG and WEBP compression                                                                                                                                                                                                                  |
+| `export_html`  | Export nodes as HTML: `style` `css` (default) or `tailwind`; `html` `fragment` (default) or `standalone`; `assets` `inline` (default) or `external`, which returns a standalone page's stylesheet, images, and web fonts as separate files; `layer_names` (default true) writes `data-name` and `layer_ids` (default false) writes each layer's ID |
+| `export_svg`   | Export nodes as SVG markup                                                                                                                                                                                                                                                                                                                         |
 
 ### Viewport
 
-| Tool | Description |
-|------|-------------|
-| `viewport_get` | Get current viewport position and zoom level |
-| `viewport_set` | Set viewport position and zoom |
-| `viewport_zoom_to_fit` | Zoom viewport to fit specified nodes |
+| Tool                   | Description                                  |
+| ---------------------- | -------------------------------------------- |
+| `viewport_get`         | Get current viewport position and zoom level |
+| `viewport_set`         | Set viewport position and zoom               |
+| `viewport_zoom_to_fit` | Zoom viewport to fit specified nodes         |
 
 ### Variables
 
-| Tool | Description |
-|------|-------------|
-| `get_variable` | Get a variable by ID or name |
-| `find_variables` | Find variables by name pattern or type |
-| `create_variable` | Create a new variable in a collection |
-| `set_variable` | Set a variable value in a mode |
-| `delete_variable` | Delete a variable |
-| `bind_variable` | Bind a variable to a node property |
-| `get_collection` | Get a variable collection by ID or name |
-| `create_collection` | Create a new variable collection |
-| `delete_collection` | Delete a variable collection |
+| Tool                | Description                             |
+| ------------------- | --------------------------------------- |
+| `get_variable`      | Get a variable by ID or name            |
+| `find_variables`    | Find variables by name pattern or type  |
+| `create_variable`   | Create a new variable in a collection   |
+| `set_variable`      | Set a variable value in a mode          |
+| `delete_variable`   | Delete a variable                       |
+| `bind_variable`     | Bind a variable to a node property      |
+| `get_collection`    | Get a variable collection by ID or name |
+| `create_collection` | Create a new variable collection        |
+| `delete_collection` | Delete a variable collection            |
 
 ### Analyze
 
-| Tool | Description |
-|------|-------------|
-| `analyze_colors` | Analyze color palette usage across the document |
-| `analyze_typography` | Analyze font/size/weight distribution |
-| `analyze_spacing` | Analyze gap and padding values |
-| `analyze_clusters` | Detect repeated patterns (potential components) |
-| `lint` | Check accessibility and consistency issues, with fixes and suggestions |
-| `lint_fix` | Apply safe lint fixes, and optionally the first suggestion of each finding |
+| Tool                 | Description                                                                |
+| -------------------- | -------------------------------------------------------------------------- |
+| `analyze_colors`     | Analyze color palette usage across the document                            |
+| `analyze_typography` | Analyze font/size/weight distribution                                      |
+| `analyze_spacing`    | Analyze gap and padding values                                             |
+| `analyze_clusters`   | Detect repeated patterns (potential components)                            |
+| `lint`               | Check accessibility and consistency issues, with fixes and suggestions     |
+| `lint_fix`           | Apply safe lint fixes, and optionally the first suggestion of each finding |
 
 ### Diff
 
-| Tool | Description |
-|------|-------------|
-| `diff_create` | Patch that turns one node tree into another, as JSX attribute changes |
-| `diff_jsx` | Structural diff between two nodes as design JSX |
-| `diff_show` | Preview the patch that setting JSX attributes on a node would produce |
-| `diff_apply` | Apply a patch after checking the nodes still match its old values |
-| `diff_visual` | Pixel diff between two rendered nodes, returned as an image |
+| Tool           | Description                                                                                                                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `diff_create`  | Patch that turns one node tree into another, as JSX attribute changes                                                                                                                                                     |
+| `diff_jsx`     | Structural diff between two nodes as design JSX                                                                                                                                                                           |
+| `diff_show`    | Preview the patch that setting JSX attributes on a node would produce                                                                                                                                                     |
+| `diff_apply`   | Apply a patch after checking the nodes still match its old values                                                                                                                                                         |
+| `diff_visual`  | Pixel diff between two rendered nodes, returned as an image                                                                                                                                                               |
 | `diff_changes` | Patch of what changed on a node or the current page: call it with `mark: true` to record the page as it is, then again to see what changed since; in the AI chat it compares with the page before the run first edited it |
 
 ### Comments
 
-| Tool | Description |
-|------|-------------|
-| `get_comments` | Read the comments left on the canvas, open ones unless asked for resolved too, with their layer, page, and replies |
-| `add_comment` | Pin a comment on a layer or at a point of a page, in Markdown |
-| `reply_to_comment` | Answer a thread, which reopens it if it was resolved |
-| `resolve_comment` | Resolve a thread once its feedback is addressed, or reopen it |
+| Tool               | Description                                                                                                        |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `get_comments`     | Read the comments left on the canvas, open ones unless asked for resolved too, with their layer, page, and replies |
+| `add_comment`      | Pin a comment on a layer or at a point of a page, in Markdown                                                      |
+| `reply_to_comment` | Answer a thread, which reopens it if it was resolved                                                               |
+| `resolve_comment`  | Resolve a thread once its feedback is addressed, or reopen it                                                      |
 
 ### Statuses
 
-| Tool | Description |
-|------|-------------|
+| Tool           | Description                                                                                                                |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `get_statuses` | List the document's statuses and the sections, frames, components, and instances that show one, optionally only one status |
-| `set_status` | Give a layer one of the document's statuses by name, or clear it |
+| `set_status`   | Give a layer one of the document's statuses by name, or clear it                                                           |
 
 ### Navigation
 
-| Tool | Description |
-|------|-------------|
+| Tool          | Description                    |
+| ------------- | ------------------------------ |
 | `switch_page` | Switch to a page by name or ID |
 
 ### Guidance
 
-| Tool | Description |
-|------|-------------|
-| `read_skill` | Read the Pairdraw agent skill or its design authoring reference; see [Design skill over MCP](#design-skill) |
-| `get_codegen_prompt` | Get the design-to-code guidelines to follow before generating frontend code |
-| `get_style` | List curated style directions, best match first for a `query`, or get one by `id`: palette by role, font pairing, type scale, radii, spacing, elevation, and written guidance |
+| Tool                 | Description                                                                                                                                                                   |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `read_skill`         | Read the Pairdraw agent skill or its design authoring reference; see [Design skill over MCP](#design-skill)                                                                   |
+| `get_codegen_prompt` | Get the design-to-code guidelines to follow before generating frontend code                                                                                                   |
+| `get_style`          | List curated style directions, best match first for a `query`, or get one by `id`: palette by role, font pairing, type scale, radii, spacing, elevation, and written guidance |
 
 ### Escape Hatch
 
-| Tool | Description |
-|------|-------------|
+| Tool   | Description                                          |
+| ------ | ---------------------------------------------------- |
 | `eval` | Execute JavaScript with full Figma Plugin API access |
 
 Note: `eval` is available over stdio, but disabled in HTTP mode for security.

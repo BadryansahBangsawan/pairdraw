@@ -2,25 +2,25 @@
 
 ## Core Technologies
 
-| Layer | Technology | Why |
-|-------|-----------|-----|
-| **Rendering** | Skia CanvasKit WASM | Same engine as Figma — proven performance, GPU-accelerated, pixel-perfect |
-| **UI Framework** | Vue 3 + VueUse | Reactive composition API, excellent TypeScript support |
-| **Components** | Reka UI | Headless, accessible UI primitives (tree, slider, etc.) |
-| **Styling** | Tailwind CSS 4 | Utility-first, fast iteration, dark theme |
-| **Layout** | Yoga WASM | CSS flexbox and grid engine from Meta, battle-tested in React Native |
-| **File Format** | Kiwi binary + Zstd | Figma's own format — compact, fast parsing, .fig compatible |
-| **Collaboration** | Yjs (+ Trystero) | CRDT sync and presence; Cloud documents sync through their server's relay, and the Trystero peer-to-peer rooms are off in Pairdraw builds |
-| **Color** | culori | Color space conversions (HSV, RGB, hex) |
-| **AI/MCP** | MCP SDK + Hono | More than 130 tools for AI coding tools, stdio + HTTP transports |
-| **JSX Transform** | Sucrase | Lightweight (201 KB) JSX → JS, synchronous, browser-compatible |
-| **Events** | nanoevents | 108 bytes, typed event emitter for SceneGraph mutations |
-| **Desktop** | Tauri v2 | A macOS installer of about 20 MB (Electron bundles ~100MB of Chromium alone), Rust backend |
-| **Build** | Vite 8 | Fast HMR, native ES modules |
-| **Testing** | Playwright + bun:test | Visual regression (E2E) + fast unit tests |
-| **Linting** | oxlint | Rust-based, orders of magnitude faster than ESLint |
-| **Formatting** | oxfmt | Rust-based formatter |
-| **Type Checking** | TypeScript 7, vue-tsc | TypeScript 7 (the native Go compiler) checks `.ts`; vue-tsc checks `.vue` on the TypeScript 6 API |
+| Layer             | Technology            | Why                                                                                                                                       |
+| ----------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Rendering**     | Skia CanvasKit WASM   | Same engine as Figma — proven performance, GPU-accelerated, pixel-perfect                                                                 |
+| **UI Framework**  | Vue 3 + VueUse        | Reactive composition API, excellent TypeScript support                                                                                    |
+| **Components**    | Reka UI               | Headless, accessible UI primitives (tree, slider, etc.)                                                                                   |
+| **Styling**       | Tailwind CSS 4        | Utility-first, fast iteration, dark theme                                                                                                 |
+| **Layout**        | Yoga WASM             | CSS flexbox and grid engine, battle-tested in React Native                                                                                |
+| **File Format**   | Kiwi binary + Zstd    | Figma's own format — compact, fast parsing, .fig compatible                                                                               |
+| **Collaboration** | Yjs (+ Trystero)      | CRDT sync and presence; Cloud documents sync through their server's relay, and the Trystero peer-to-peer rooms are off in Pairdraw builds |
+| **Color**         | culori                | Color space conversions (HSV, RGB, hex)                                                                                                   |
+| **AI/MCP**        | MCP SDK + Hono        | More than 130 tools for AI coding tools, stdio + HTTP transports                                                                          |
+| **JSX Transform** | Sucrase               | Lightweight (201 KB) JSX → JS, synchronous, browser-compatible                                                                            |
+| **Events**        | nanoevents            | 108 bytes, typed event emitter for SceneGraph mutations                                                                                   |
+| **Desktop**       | Tauri v2              | A macOS installer of about 20 MB (Electron bundles ~100MB of Chromium alone), Rust backend                                                |
+| **Build**         | Vite 8                | Fast HMR, native ES modules                                                                                                               |
+| **Testing**       | Playwright + bun:test | Visual regression (E2E) + fast unit tests                                                                                                 |
+| **Linting**       | oxlint                | Rust-based, orders of magnitude faster than ESLint                                                                                        |
+| **Formatting**    | oxfmt                 | Rust-based formatter                                                                                                                      |
+| **Type Checking** | TypeScript 7, vue-tsc | TypeScript 7 (the native Go compiler) checks `.ts`; vue-tsc checks `.vue` on the TypeScript 6 API                                         |
 
 ## Key Dependencies
 
@@ -58,10 +58,10 @@ The project migrated from React to Vue 3 early in development. Vue's reactivity 
 
 ### Why not custom layout engine?
 
-Yoga is maintained by Meta, battle-tested across billions of React Native devices, and implements the CSS flexbox spec. Building a custom engine would be months of work to reach the same correctness level.
+Yoga implements the CSS flexbox spec and is battle-tested in React Native. Building a custom engine would be months of work to reach the same correctness level.
 
 ## Additional Technologies
 
-| Technology | Purpose | Status |
-|-----------|---------|--------|
-| CSS Grid in Yoga | Grid-based auto layout | Shipped via [Yoga fork](https://github.com/open-pencil/yoga/tree/grid) (`@open-pencil/yoga-layout`) |
+| Technology       | Purpose                | Status                                                                        |
+| ---------------- | ---------------------- | ----------------------------------------------------------------------------- |
+| CSS Grid in Yoga | Grid-based auto layout | Shipped through a Yoga fork with CSS Grid support, installed as `yoga-layout` |

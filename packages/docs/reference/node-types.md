@@ -5,59 +5,74 @@ description: Reference for Pairdraw scene graph node types, Figma Kiwi schema ma
 
 # Node Types
 
-The scene graph supports 28 node types from Figma's Kiwi schema. Each node is identified by a GUID (`sessionID:localID`) and has a parent reference via `parentIndex`. The Pairdraw engine's `NodeType` union currently uses 19 of these types.
+The scene graph supports 64 node types from Figma's Kiwi schema. Each node is identified by a GUID (`sessionID:localID`) and has a parent reference via `parentIndex`. The Pairdraw engine's `NodeType` union currently uses 19 of these types plus one of its own.
 
 ## Type Table
 
-28 Figma schema types + 1 synthetic engine type. Types marked ✅ are in the engine's `NodeType` union (19 total).
+The types below map 1:1 to Kiwi `NodeType` IDs up to `VARIABLE` (28), plus the synthetic `COMPONENT_SET`. Higher Kiwi IDs (29–64) name slide, code, and Figma-internal node kinds Pairdraw does not build. Types marked ✅ are in the engine's `NodeType` union (19 of them, plus the engine-only `SCRIPT`).
 
-| Type | ID | Description | Engine |
-|------|----|-------------|--------|
-| `DOCUMENT` | 1 | Root node, one per file | — |
-| `CANVAS` | 2 | Page | ✅ |
-| `GROUP` | 3 | Group container | ✅ |
-| `FRAME` | 4 | Primary container (artboard), supports auto-layout | ✅ |
-| `BOOLEAN_OPERATION` | 5 | Union/subtract/intersect/exclude result | ✅ |
-| `VECTOR` | 6 | Freeform vector path | ✅ |
-| `STAR` | 7 | Star shape | ✅ |
-| `LINE` | 8 | Line | ✅ |
-| `ELLIPSE` | 9 | Ellipse/circle, supports arc data | ✅ |
-| `RECTANGLE` | 10 | Rectangle | ✅ |
-| `REGULAR_POLYGON` | 11 | Regular polygon (3–12 sides, engine uses `POLYGON`) | ✅ |
-| `ROUNDED_RECTANGLE` | 12 | Rectangle with smooth corners | ✅ |
-| `TEXT` | 13 | Text with rich formatting | ✅ |
-| `SLICE` | 14 | Export region | |
-| `SYMBOL` | 15 | Component (main, engine uses `COMPONENT`) | ✅ |
-| `INSTANCE` | 16 | Component instance | ✅ |
-| `STICKY` | 17 | FigJam sticky note | ✅ |
-| `SHAPE_WITH_TEXT` | 18 | FigJam shape | ✅ |
-| `CONNECTOR` | 19 | Connector line between nodes | ✅ |
-| `CODE_BLOCK` | 20 | FigJam code block | |
-| `WIDGET` | 21 | Plugin widget | |
-| `STAMP` | 22 | FigJam stamp | |
-| `MEDIA` | 23 | Video/GIF | |
-| `HIGHLIGHT` | 24 | FigJam highlight | |
-| `SECTION` | 25 | Canvas section (organizational, top-level only) | ✅ |
-| `SECTION_OVERLAY` | 26 | Section overlay | |
-| `WASHI_TAPE` | 27 | FigJam washi tape | |
-| `VARIABLE` | 28 | Variable definition node | |
-| `COMPONENT_SET` | — | Variant group container (synthetic, mapped from `SYMBOL`) | ✅ |
+| Type                | ID  | Description                                               | Engine |
+| ------------------- | --- | --------------------------------------------------------- | ------ |
+| `DOCUMENT`          | 1   | Root node, one per file                                   | —      |
+| `CANVAS`            | 2   | Page                                                      | ✅     |
+| `GROUP`             | 3   | Group container                                           | ✅     |
+| `FRAME`             | 4   | Primary container (artboard), supports auto-layout        | ✅     |
+| `BOOLEAN_OPERATION` | 5   | Union/subtract/intersect/exclude result                   | ✅     |
+| `VECTOR`            | 6   | Freeform vector path                                      | ✅     |
+| `STAR`              | 7   | Star shape                                                | ✅     |
+| `LINE`              | 8   | Line                                                      | ✅     |
+| `ELLIPSE`           | 9   | Ellipse/circle, supports arc data                         | ✅     |
+| `RECTANGLE`         | 10  | Rectangle                                                 | ✅     |
+| `REGULAR_POLYGON`   | 11  | Regular polygon (3–12 sides, engine uses `POLYGON`)       | ✅     |
+| `ROUNDED_RECTANGLE` | 12  | Rectangle with smooth corners                             | ✅     |
+| `TEXT`              | 13  | Text with rich formatting                                 | ✅     |
+| `SLICE`             | 14  | Export region                                             |        |
+| `SYMBOL`            | 15  | Component (main, engine uses `COMPONENT`)                 | ✅     |
+| `INSTANCE`          | 16  | Component instance                                        | ✅     |
+| `STICKY`            | 17  | FigJam sticky note                                        | ✅     |
+| `SHAPE_WITH_TEXT`   | 18  | FigJam shape                                              | ✅     |
+| `CONNECTOR`         | 19  | Connector line between nodes                              | ✅     |
+| `CODE_BLOCK`        | 20  | FigJam code block                                         |        |
+| `WIDGET`            | 21  | Plugin widget                                             |        |
+| `STAMP`             | 22  | FigJam stamp                                              |        |
+| `MEDIA`             | 23  | Video/GIF                                                 |        |
+| `HIGHLIGHT`         | 24  | FigJam highlight                                          |        |
+| `SECTION`           | 25  | Canvas section (organizational, top-level only)           | ✅     |
+| `SECTION_OVERLAY`   | 26  | Section overlay                                           |        |
+| `WASHI_TAPE`        | 27  | FigJam washi tape                                         |        |
+| `VARIABLE`          | 28  | Variable definition node                                  |        |
+| `COMPONENT_SET`     | —   | Variant group container (synthetic, mapped from `SYMBOL`) | ✅     |
 
-### Engine NodeType Union (19 types)
+### Engine NodeType Union (20 types)
 
 The engine's `NodeType` uses simplified names. Some differ from the Kiwi schema:
+
 - `COMPONENT` → Kiwi `SYMBOL` (ID 15)
 - `COMPONENT_SET` → variant group container (no dedicated Kiwi ID, mapped from `SYMBOL` with variants)
 - `POLYGON` → Kiwi `REGULAR_POLYGON` (ID 11)
 
 ```typescript
 type NodeType =
-  | 'CANVAS' | 'FRAME' | 'RECTANGLE' | 'ROUNDED_RECTANGLE'
-  | 'ELLIPSE' | 'TEXT' | 'LINE' | 'STAR' | 'POLYGON'
-  | 'VECTOR' | 'BOOLEAN_OPERATION' | 'GROUP' | 'SECTION'
-  | 'COMPONENT' | 'COMPONENT_SET' | 'INSTANCE'
-  | 'CONNECTOR' | 'SHAPE_WITH_TEXT'
-| 'STICKY'
+  | 'CANVAS'
+  | 'FRAME'
+  | 'RECTANGLE'
+  | 'ROUNDED_RECTANGLE'
+  | 'ELLIPSE'
+  | 'TEXT'
+  | 'LINE'
+  | 'STAR'
+  | 'POLYGON'
+  | 'VECTOR'
+  | 'BOOLEAN_OPERATION'
+  | 'GROUP'
+  | 'SECTION'
+  | 'COMPONENT'
+  | 'COMPONENT_SET'
+  | 'INSTANCE'
+  | 'CONNECTOR'
+  | 'SHAPE_WITH_TEXT'
+  | 'STICKY'
+  | 'SCRIPT'
 ```
 
 ## Node Hierarchy
@@ -167,15 +182,20 @@ Variant component values remain separate in `componentPropertyValues`.
 
 ```typescript
 interface Fill {
-  type: 'SOLID' | 'GRADIENT_LINEAR' | 'GRADIENT_RADIAL' |
-        'GRADIENT_ANGULAR' | 'GRADIENT_DIAMOND' | 'IMAGE'
-  color: Color              // {r, g, b, a} 0–1 floats
-  opacity: number           // 0–1
+  type:
+    | 'SOLID'
+    | 'GRADIENT_LINEAR'
+    | 'GRADIENT_RADIAL'
+    | 'GRADIENT_ANGULAR'
+    | 'GRADIENT_DIAMOND'
+    | 'IMAGE'
+  color: Color // {r, g, b, a} 0–1 floats
+  opacity: number // 0–1
   visible: boolean
   blendMode?: BlendMode
-  gradientStops?: GradientStop[]     // for gradients
-  gradientTransform?: GradientTransform  // 2×3 matrix
-  imageHash?: string        // for image fills
+  gradientStops?: GradientStop[] // for gradients
+  gradientTransform?: GradientTransform // 2×3 matrix
+  imageHash?: string // for image fills
   imageScaleMode?: 'FILL' | 'FIT' | 'CROP' | 'TILE'
   imageTransform?: GradientTransform
 }
@@ -185,8 +205,7 @@ interface Fill {
 
 ```typescript
 interface Effect {
-  type: 'DROP_SHADOW' | 'INNER_SHADOW' | 'LAYER_BLUR' |
-        'BACKGROUND_BLUR' | 'FOREGROUND_BLUR'
+  type: 'DROP_SHADOW' | 'INNER_SHADOW' | 'LAYER_BLUR' | 'BACKGROUND_BLUR' | 'FOREGROUND_BLUR'
   color: Color
   offset: { x: number; y: number }
   radius: number

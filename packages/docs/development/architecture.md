@@ -63,20 +63,20 @@ A formula in `valuesByMode` is live document behavior. `expressions[modeId].css`
 
 ### Layout Engine (Yoga WASM)
 
-Meta's Yoga provides CSS flexbox and grid layout computation via a [fork](https://github.com/open-pencil/yoga/tree/grid) with CSS Grid support. A thin adapter maps Figma property names to Yoga equivalents:
+Yoga supplies CSS flexbox and grid layout computation, through a fork with CSS Grid support. A thin adapter maps Figma property names to Yoga equivalents:
 
-| Figma Property | Yoga Equivalent |
-|---|---|
-| `stackMode: HORIZONTAL` | `flexDirection: row` |
-| `stackMode: VERTICAL` | `flexDirection: column` |
-| `stackSpacing` | `gap` |
-| `stackPadding` | `padding` |
-| `stackJustify` | `justifyContent` |
-| `stackChildPrimaryGrow` | `flexGrow` |
+| Figma Property          | Yoga Equivalent         |
+| ----------------------- | ----------------------- |
+| `stackMode: HORIZONTAL` | `flexDirection: row`    |
+| `stackMode: VERTICAL`   | `flexDirection: column` |
+| `stackSpacing`          | `gap`                   |
+| `stackPadding`          | `padding`               |
+| `stackJustify`          | `justifyContent`        |
+| `stackChildPrimaryGrow` | `flexGrow`              |
 
 ### File Format (Kiwi Binary)
 
-Reuses Figma's Kiwi binary codec with 194 message/enum/struct definitions. Import: parse header → Zstd decompress → Kiwi decode → `NodeChange`[] → scene graph. Export reverses the process with thumbnail generation.
+Reuses Figma's Kiwi binary codec, whose schema holds 605 message, enum and struct definitions. Import: parse header → Zstd decompress → Kiwi decode → `NodeChange`[] → scene graph. Export reverses the process with thumbnail generation.
 
 See [File Format Reference](/reference/file-format) for details.
 
@@ -112,9 +112,9 @@ When the app is running, CLI commands given no file send RPC requests (`POST /rp
 
 ## What's Next
 
-### Full figma-use Tool Set
+### Full Tool Set
 
-The MCP server currently exposes more than 130 tools; the reference implementation in [figma-use](https://github.com/dannote/figma-use) has 118. Tools figma-use has and Pairdraw lacks cover advanced layout constraints, prototype connections, advanced component property editing, and bulk document operations.
+The MCP server exposes 139 tools. The gaps left against [figma-use](https://github.com/dannote/figma-use), a Figma MCP server kept as a reference, cover advanced layout constraints, prototype connections, advanced component property editing, and bulk document operations.
 
 ### CI Design Tooling
 

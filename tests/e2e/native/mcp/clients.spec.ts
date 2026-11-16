@@ -15,7 +15,8 @@ const CLIENTS = [
   'opencode',
   'kiro',
   'cursor',
-  'vs-code'
+  'vs-code',
+  'omp'
 ] as const
 
 const configSchema = v.object({

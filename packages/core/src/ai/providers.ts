@@ -2,7 +2,7 @@
 
 import { OPENAI_COMPATIBLE_PRESETS } from './presets'
 
-export type ACPAgentID = 'claude-code' | 'codex' | 'gemini-cli'
+export type ACPAgentID = 'claude-code' | 'codex' | 'gemini-cli' | 'omp'
 
 export interface ACPAgentDef {
   id: ACPAgentID
@@ -58,6 +58,14 @@ export const ACP_AGENTS: ACPAgentDef[] = [
     args: ['--acp'],
     setupURL: 'https://geminicli.com/docs/get-started/installation/',
     installCommand: 'npm i -g @google/gemini-cli'
+  },
+  {
+    id: 'omp',
+    name: 'omp',
+    command: 'omp',
+    args: ['acp'],
+    setupURL: 'https://omp.sh',
+    installCommand: 'bun i -g @oh-my-pi/pi-coding-agent'
   }
 ]
 

@@ -145,7 +145,8 @@ describe('local agent discovery', () => {
     expect(agents.map((agent) => [agent.definition.id, agent.status])).toEqual([
       ['claude-code', 'needs-adapter'],
       ['codex', 'available'],
-      ['gemini-cli', 'not-installed']
+      ['gemini-cli', 'not-installed'],
+      ['omp', 'not-installed']
     ])
   })
 
@@ -154,7 +155,8 @@ describe('local agent discovery', () => {
     expect(agents.map((agent) => [agent.definition.id, agent.status])).toEqual([
       ['claude-code', 'needs-adapter'],
       ['codex', 'needs-adapter'],
-      ['gemini-cli', 'not-installed']
+      ['gemini-cli', 'not-installed'],
+      ['omp', 'not-installed']
     ])
   })
 

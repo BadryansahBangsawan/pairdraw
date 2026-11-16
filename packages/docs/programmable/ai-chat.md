@@ -24,7 +24,7 @@ Both send into the document's chat, are offered only in documents you can edit, 
 
 ## Setup
 
-Pairdraw opens no setup dialog on first launch. While no model is set up, it looks for a [coding agent](./coding-agents) already on your computer: Claude Code, then Codex, then Gemini CLI. One that is installed and signed in becomes the design agent right away, and the chat says **Using Claude Code from this computer** with **Change** to pick another model. An agent that does not report whether it is signed in, such as Gemini CLI, is used too; if it turns out to be signed out, the chat shows the command that signs in to it. An agent that still needs a sign-in, or its ACP program or the MCP server installed, gets one button in the chat column, and nothing is signed in to or installed until you press it. A model you set up yourself is never replaced.
+Pairdraw opens no setup dialog on first launch. While no model is set up, it looks for a [coding agent](./coding-agents) already on your computer: Claude Code, then Codex, then Gemini CLI, then omp. One that is installed and signed in becomes the design agent right away, and the chat says **Using Claude Code from this computer** with **Change** to pick another model. An agent that does not report whether it is signed in, such as Gemini CLI or omp, is used too; if it turns out to be signed out, the chat shows the command that signs in to it. An agent that still needs a sign-in, or its ACP program or the MCP server installed, gets one button in the chat column, and nothing is signed in to or installed until you press it. A model you set up yourself is never replaced.
 
 When no agent is found, or agents cannot run here, as in the web app without its [companion](./browser-agents), sending a prompt opens guided setup. It asks what AI should help with and what you already use: a coding agent such as Claude Code, Codex, Gemini CLI, or Pi in the desktop app, an API account, or a local or company server. It connects that access and assigns it to the **Design agent** and **Vision** roles, keeping anything you configured by hand. With OpenRouter you can sign in instead of pasting an API key. Run it any time from **Settings → Models → Run guided setup**. To configure models by hand:
 
@@ -39,7 +39,7 @@ The chat composer grows with multiline prompts. Type `@` to mention a layer, pag
 
 ## Agent Sessions
 
-A coding agent runs its sessions with a model, a reasoning effort, and a mode. The composer offers the model, reasoning effort, and mode that Claude Code, Codex, and Gemini CLI advertise for their sessions. A choice applies to the running session at once and to later sessions with that agent, except modes that skip permission requests, which apply to one session only.
+A coding agent runs its sessions with a model, a reasoning effort, and a mode. The composer offers the model, reasoning effort, and mode that Claude Code, Codex, Gemini CLI, and omp advertise for their sessions. A choice applies to the running session at once and to later sessions with that agent, except modes that skip permission requests, which apply to one session only.
 
 On the desktop, each chat can give its coding agent a project folder to work in, chosen from the chat header and confirmed first. Sessions there start in the agent's default mode, and only the chosen model and reasoning effort carry over.
 

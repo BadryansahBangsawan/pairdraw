@@ -9,7 +9,8 @@ const SIGN_IN: Record<ACPAgentID, string> = {
   'claude-code':
     'Make sure I am signed in to Claude Code: run `claude` and use `/login` if it asks me to sign in.',
   codex: 'Make sure I am signed in to Codex: run `codex login` if I am not.',
-  'gemini-cli': 'Make sure I am signed in to Gemini CLI: run `gemini` and choose a sign-in method.'
+  'gemini-cli': 'Make sure I am signed in to Gemini CLI: run `gemini` and choose a sign-in method.',
+  omp: 'Make sure omp has a model I can use: run `omp` and use `/login`, or add a provider key.'
 }
 
 export function codingAgentGuideURL(agentID: ACPAgentID): string {

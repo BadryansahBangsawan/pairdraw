@@ -143,6 +143,7 @@
         },
         { "name": "codex-acp", "cmd": "codex-acp", "args": false },
         { "name": "gemini", "cmd": "gemini", "args": ["--acp"] },
+        { "name": "omp", "cmd": "omp", "args": ["acp"] },
         {
           "name": "npm",
           "cmd": "npm",
@@ -177,6 +178,7 @@
         },
         { "name": "cmd-codex-acp", "cmd": "cmd", "args": ["/c", "codex-acp"] },
         { "name": "cmd-gemini", "cmd": "cmd", "args": ["/c", "gemini", "--acp"] },
+        { "name": "cmd-omp", "cmd": "cmd", "args": ["/c", "omp", "acp"] },
         {
           "name": "cmd-npm",
           "cmd": "cmd",

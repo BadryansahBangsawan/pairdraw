@@ -27,7 +27,7 @@ pub enum EntryCheck {
 /// The JSON object a client keeps its servers in, and the entry it starts this server with.
 fn json_entry(client: McpClient) -> Option<(&'static str, Value)> {
     let entry = match client {
-        McpClient::ClaudeCode => (
+        McpClient::ClaudeCode | McpClient::Omp => (
             "mcpServers",
             json!({ "type": "stdio", "command": ENTRY_COMMAND, "args": [] }),
         ),

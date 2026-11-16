@@ -61,6 +61,8 @@ const PROVIDER_BRANDS: Readonly<Partial<Record<string, ProviderLogoID>>> = {
   'acp:claude-code': 'claude-code',
   'acp:codex': 'codex',
   'acp:gemini-cli': 'gemini-cli',
+  // omp (Oh My Pi) is a fork of Pi and marks itself with π; LobeHub has no omp mark.
+  'acp:omp': 'pi',
   [HARNESS_PROVIDER_ID]: 'pi',
   [PAIRDRAW_AI_PROVIDER]: 'pairdraw'
 }

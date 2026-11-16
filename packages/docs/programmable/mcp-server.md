@@ -51,7 +51,7 @@ Every client below starts the same command, `pairdraw-mcp`, from `npm install -g
 
 ### Set up from the desktop app {#client-setup}
 
-The desktop app can write the entry for you. Open **Settings → MCP → Other apps** and turn on each app you use: Claude Code, Claude Desktop, Codex, Gemini CLI, OpenCode, Kiro, Cursor, or VS Code. Turning a switch on adds a `pairdraw` entry that starts `pairdraw-mcp` to that app's own config file, the file this page names for it; turning it off removes the entry again. Everything else in the file, including comments and formatting, stays as it was, and before its first change the app keeps a copy of the file next to it with `.pairdraw.bak` appended to the name.
+The desktop app can write the entry for you. Open **Settings → MCP → Other apps** and turn on each app you use: Claude Code, Claude Desktop, Codex, Gemini CLI, OpenCode, Kiro, Cursor, VS Code, or omp. Turning a switch on adds a `pairdraw` entry that starts `pairdraw-mcp` to that app's own config file, the file this page names for it; turning it off removes the entry again. Everything else in the file, including comments and formatting, stays as it was, and before its first change the app keeps a copy of the file next to it with `.pairdraw.bak` appended to the name.
 
 | App | File |
 |-----|------|
@@ -63,6 +63,7 @@ The desktop app can write the entry for you. Open **Settings → MCP → Other a
 | Kiro | `~/.kiro/settings/mcp.json` |
 | Cursor | `~/.cursor/mcp.json` |
 | VS Code | `mcp.json` in your user profile |
+| omp | `~/.omp/agent/mcp.json` (in `PI_CODING_AGENT_DIR` when set) |
 
 An app shows as not found until its settings folder exists, so run it once first. A switch stays locked when the file has syntax errors, or when the entry was written by hand in a form the app does not rewrite, such as a Codex inline table, or Codex keeps all its servers in one inline `mcp_servers = { … }` table; edit the file yourself in those cases. The desktop shell checks each write itself and refuses one that would change anything in the file beyond that entry. Restart the app, or reload its MCP servers, after a change. Apps started from the Dock or Start menu may not see the folder npm installs global commands into; if one cannot start `pairdraw-mcp`, set the entry's `command` to the full path that `which pairdraw-mcp` (or `where pairdraw-mcp` on Windows) prints.
 

@@ -14,6 +14,7 @@ export const ONBOARDING_AGENTS = [
   'acp:claude-code',
   'acp:codex',
   'acp:gemini-cli',
+  'acp:omp',
   'harness:pi'
 ] as const
 /** Subscriptions Pairdraw's own agent signs in to; the sign-in needs the desktop app. */

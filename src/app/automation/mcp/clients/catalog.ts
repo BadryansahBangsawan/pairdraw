@@ -14,7 +14,8 @@ const MCP_CLIENT_IDS = [
   'opencode',
   'kiro',
   'cursor',
-  'vs-code'
+  'vs-code',
+  'omp'
 ] as const
 
 export type MCPClientID = (typeof MCP_CLIENT_IDS)[number]
@@ -93,6 +94,15 @@ export const MCP_CLIENTS: readonly MCPClient[] = [
       kind: 'json',
       container: 'servers',
       entry: { type: 'stdio', command: MCP_CLIENT_COMMAND }
+    }
+  },
+  {
+    id: 'omp',
+    name: 'omp',
+    format: {
+      kind: 'json',
+      container: MCP_SERVERS,
+      entry: { type: 'stdio', command: MCP_CLIENT_COMMAND, args: [] }
     }
   }
 ]

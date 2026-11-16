@@ -344,9 +344,10 @@ describe('coding agent availability in onboarding', () => {
       'acp:claude-code',
       'acp:codex',
       'acp:gemini-cli',
+      'acp:omp',
       'harness:pi'
     ])
-    for (const agent of ['acp:claude-code', 'acp:codex', 'acp:gemini-cli'] as const) {
+    for (const agent of ['acp:claude-code', 'acp:codex', 'acp:gemini-cli', 'acp:omp'] as const) {
       expect(isOnboardingAgent(agent)).toBe(true)
       expect(needsDesktop(agent)).toBe(false)
       expect(accessAvailable(agent, companion)).toBe(true)

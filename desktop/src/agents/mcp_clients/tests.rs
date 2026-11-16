@@ -24,6 +24,7 @@ impl Scratch {
             xdg_config: self.0.join(".config"),
             codex_home: None,
             claude_config_dir: None,
+            omp_agent_dir: None,
         }
     }
 }
@@ -55,11 +56,23 @@ fn resolves_each_client_inside_its_own_folder() {
         client_file(McpClient::VsCode, &at).path,
         home.join("app-config/Code/User/mcp.json")
     );
+    assert_eq!(
+        client_file(McpClient::Omp, &at),
+        ClientFile {
+            path: home.join(".omp/agent/mcp.json"),
+            marker: home.join(".omp"),
+        }
+    );
     let custom = Locations {
         codex_home: Some(home.join("codex-elsewhere")),
         claude_config_dir: Some(home.join("claude-elsewhere")),
+        omp_agent_dir: Some(home.join("omp-elsewhere")),
         ..at
     };
+    assert_eq!(
+        client_file(McpClient::Omp, &custom).path,
+        home.join("omp-elsewhere/mcp.json")
+    );
     assert_eq!(
         client_file(McpClient::Codex, &custom).path,
         home.join("codex-elsewhere/config.toml")

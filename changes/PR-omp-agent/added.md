@@ -1,0 +1,1 @@
+- The desktop app can use omp as its design agent through `omp acp`, and Settings → MCP can add Pairdraw's server to omp's `mcp.json`.

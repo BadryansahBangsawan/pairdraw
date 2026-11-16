@@ -1,6 +1,6 @@
 # Coding agents
 
-The Pairdraw desktop app can use a coding agent you already have — Claude Code, Codex, Gemini CLI, or [Pi](#pi) — as its design agent. The agent runs on your computer with your own subscription and chooses its own model; Pairdraw starts it when you send a message, through the [Agent Client Protocol](https://agentclientprotocol.com/) or, for Pi, its Harness companion, and gives it the canvas tools through Pairdraw's local [MCP server](./mcp-server).
+The Pairdraw desktop app can use a coding agent you already have — Claude Code, Codex, Gemini CLI, [omp](#omp), or [Pi](#pi) — as its design agent. The agent runs on your computer with your own subscription and chooses its own model; Pairdraw starts it when you send a message, through the [Agent Client Protocol](https://agentclientprotocol.com/) or, for Pi, its Harness companion, and gives it the canvas tools through Pairdraw's local [MCP server](./mcp-server).
 
 In the web app, a companion program on your computer starts them instead; see [Coding agents in the browser](./browser-agents). They take only the **Design agent** role. Visual review, plan reviews, and fast background work need an API model, which guided setup can add for you.
 
@@ -57,6 +57,14 @@ npm install -g @google/gemini-cli
 ```
 
 Gemini CLI speaks ACP itself, so there is no separate program, and guided setup cannot install or sign in to it for you. When it is missing, **Connect** stops at the install step with the command above; once it is installed, the card shows `gemini` to run once in a terminal to choose a sign-in method.
+
+## omp
+
+```sh
+bun install -g @oh-my-pi/pi-coding-agent
+```
+
+omp needs [Bun](https://bun.sh) and speaks ACP itself (`omp acp`), so like Gemini CLI there is no separate program, and guided setup cannot install or sign in to it for you. omp uses the providers and default model you set up in it: run `omp` and use `/login`, or `omp login`. Its MCP servers live in `~/.omp/agent/mcp.json` (or `PI_CODING_AGENT_DIR/mcp.json`), which **Settings → MCP → Other apps** can add Pairdraw's server to.
 
 ## Pi
 

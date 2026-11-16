@@ -1,6 +1,6 @@
 # Coding agents in the browser
 
-The web app can use Claude Code, Codex, or Gemini CLI as its design agent, like the [desktop app](./coding-agents). A web page cannot start programs on your computer, so a small companion program does it: it runs Pairdraw's [MCP server](./mcp-server) and starts the agents the chat asks for.
+The web app can use Claude Code, Codex, Gemini CLI, or omp as its design agent, like the [desktop app](./coding-agents). A web page cannot start programs on your computer, so a small companion program does it: it runs Pairdraw's [MCP server](./mcp-server) and starts the agents the chat asks for.
 
 ## Connect your computer
 

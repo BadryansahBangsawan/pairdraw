@@ -34,6 +34,7 @@ pub enum McpClient {
     Kiro,
     Cursor,
     VsCode,
+    Omp,
 }
 
 /// The folders the clients' files are resolved against.
@@ -49,6 +50,8 @@ pub struct Locations {
     codex_home: Option<PathBuf>,
     /// `CLAUDE_CONFIG_DIR`, when set.
     claude_config_dir: Option<PathBuf>,
+    /// `PI_CODING_AGENT_DIR`, omp's agent folder, when set.
+    omp_agent_dir: Option<PathBuf>,
 }
 
 fn env_dir(name: &str) -> Option<PathBuf> {
@@ -75,6 +78,7 @@ impl Locations {
             xdg_config,
             codex_home: env_dir("CODEX_HOME"),
             claude_config_dir: env_dir("CLAUDE_CONFIG_DIR"),
+            omp_agent_dir: env_dir("PI_CODING_AGENT_DIR"),
         })
     }
 }
@@ -154,6 +158,19 @@ fn client_file(client: McpClient, at: &Locations) -> ClientFile {
                 marker: dir,
             }
         }
+        McpClient::Omp => match &at.omp_agent_dir {
+            Some(dir) => ClientFile {
+                path: dir.join("mcp.json"),
+                marker: dir.clone(),
+            },
+            None => {
+                let dir = at.home.join(".omp");
+                ClientFile {
+                    path: dir.join("agent").join("mcp.json"),
+                    marker: dir,
+                }
+            }
+        },
     }
 }
 

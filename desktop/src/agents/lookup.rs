@@ -13,6 +13,7 @@ const EXECUTABLES: &[&str] = &[
     "codex",
     "codex-acp",
     "gemini",
+    "omp",
     "pairdraw-mcp-http",
     "pairdraw-harness",
     "npm",

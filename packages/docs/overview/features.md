@@ -80,7 +80,7 @@ CLI: `pairdraw export design.fig -f jsx --style tailwind`
 
 ## AI Chat
 
-Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant in its own column beside the properties panel, or write in the prompt at the bottom of the canvas or on Home. With no model set up, the chat uses a coding agent already installed on this computer: Claude Code, Codex, or Gemini CLI. More than 130 tools can create shapes, set styles, manage layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Connect Anthropic, OpenAI, Google AI, OpenRouter, any compatible endpoint, or the AI your [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud) server offers. Each provider, model, and agent shows its maker's logo.
+Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant in its own column beside the properties panel, or write in the prompt at the bottom of the canvas or on Home. With no model set up, the chat uses a coding agent already installed on this computer: Claude Code, Codex, Gemini CLI, or omp. More than 130 tools can create shapes, set styles, manage layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Connect Anthropic, OpenAI, Google AI, OpenRouter, any compatible endpoint, or the AI your [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud) server offers. Each provider, model, and agent shows its maker's logo.
 
 Tool calls display as collapsible timeline entries. Visual verification — the assistant renders its work and checks it against your request. Full undo support for all AI mutations.
 

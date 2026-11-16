@@ -26,7 +26,7 @@ if (process.argv.includes('--help') || process.argv.includes('-h')) {
   process.stdout.write(
     `pairdraw-connect\n\n` +
       `Connect Pairdraw in the browser to this computer, so its chat can run\n` +
-      `Claude Code, Codex, or Gemini CLI here and use Pairdraw's tools.\n\n` +
+      `Claude Code, Codex, Gemini CLI, or omp here and use Pairdraw's tools.\n\n` +
       `Starts Pairdraw's MCP server with an agent bridge and opens a one-time link\n` +
       `that pairs the browser tab. Keep it running while you use agents.\n\n` +
       `Options:\n` +

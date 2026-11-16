@@ -43,3 +43,4 @@
 - Visual bounds of rotated layers, such as the area exported for AI image changes, cover the layer where it is drawn.
 - A reply still running shows live again, with its Stop button, when you come back to its document from Home or another tab.
 - The design check resumes when an AI reply fails before it reaches the model.
+- Clicking where a mask hides part of a layer no longer selects that layer, and zero-width or zero-height layers can be clicked to select them.

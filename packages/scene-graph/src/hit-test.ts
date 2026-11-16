@@ -15,6 +15,11 @@ const CONTAINER_TYPES = new Set<NodeType>([
   'INSTANCE'
 ])
 const OPAQUE_CONTAINER_TYPES = new Set<NodeType>(['COMPONENT', 'INSTANCE'])
+/**
+ * How far from a zero-width or zero-height layer, in canvas units, a point still lands on it, so
+ * a flat line or an empty box stays clickable; matches a connector line's slop (`connectors/hit.ts`).
+ */
+const DEGENERATE_AXIS_SLOP = 4
 
 function hasVisibleFillOrStroke(node: SceneNode): boolean {
   return node.fills.some((f) => f.visible) || node.strokes.some((s) => s.visible)
@@ -61,13 +66,15 @@ function containsPoint(
   transformCache: Map<string, boolean>,
   pad = 0
 ): boolean {
+  const padX = node.width > 0 ? pad : Math.max(pad, DEGENERATE_AXIS_SLOP)
+  const padY = node.height > 0 ? pad : Math.max(pad, DEGENERATE_AXIS_SLOP)
   if (!hasTransformedAncestor(node, graph, transformCache)) {
     const absolute = graph.getAbsolutePosition(node.id)
     return (
-      px >= absolute.x - pad &&
-      px <= absolute.x + node.width + pad &&
-      py >= absolute.y - pad &&
-      py <= absolute.y + node.height + pad
+      px >= absolute.x - padX &&
+      px <= absolute.x + node.width + padX &&
+      py >= absolute.y - padY &&
+      py <= absolute.y + node.height + padY
     )
   }
 
@@ -78,8 +85,39 @@ function containsPoint(
 
   const [localX, localY] = Matrix.mapPoints(inv, [px, py])
   return (
-    localX >= -pad && localX <= node.width + pad && localY >= -pad && localY <= node.height + pad
+    localX >= -padX &&
+    localX <= node.width + padX &&
+    localY >= -padY &&
+    localY <= node.height + padY
   )
+}
+
+function isVisibleMask(node: SceneNode | undefined): node is SceneNode {
+  return node !== undefined && node.visible && node.isMask
+}
+
+/**
+ * The masks that clip each child, by index, as the renderer groups them (`core/canvas/masks.ts`):
+ * a run of visible masks clips the layers after it up to the next visible mask. Empty when the
+ * container has no visible mask.
+ */
+function clippingMasks(graph: SceneGraph, childIds: readonly string[]): SceneNode[][] {
+  const children = childIds.map((childId) => graph.nodes.get(childId))
+  if (!children.some(isVisibleMask)) return []
+  const result: SceneNode[][] = []
+  let run: SceneNode[] = []
+  let previousWasMask = false
+  for (const child of children) {
+    if (isVisibleMask(child)) {
+      run = previousWasMask ? [...run, child] : [child]
+      previousWasMask = true
+      result.push([])
+      continue
+    }
+    previousWasMask = false
+    result.push(run)
+  }
+  return result
 }
 
 function hitTestOpaqueContainer(
@@ -130,6 +168,20 @@ function hitTestTransparentContainer(
   return null
 }
 
+/** Whether the masks that clip a layer leave the point outside every one of their boxes. */
+function isMaskedOut(
+  px: number,
+  py: number,
+  masks: readonly SceneNode[] | undefined,
+  graph: SceneGraph,
+  transformCache: Map<string, boolean>
+): boolean {
+  if (!masks) return false
+  return (
+    masks.length > 0 && !masks.some((mask) => containsPoint(px, py, mask, graph, transformCache))
+  )
+}
+
 /**
  * The topmost layer under the point among a container's children. `pad`, in canvas units, grows
  * each leaf layer's box, as Figma takes a click a few screen pixels outside a shape.
@@ -150,10 +202,12 @@ function hitTestChildren(
     if (!containsPoint(px, py, parent, graph, transformCache)) return null
   }
 
+  const masks = clippingMasks(graph, parent.childIds)
   for (let i = parent.childIds.length - 1; i >= 0; i--) {
     const childId = parent.childIds[i]
     const child = graph.nodes.get(childId)
     if (!child || child.internalOnly || !child.visible) continue
+    if (isMaskedOut(px, py, masks[i], graph, transformCache)) continue
     if (CONTAINER_TYPES.has(child.type)) {
       if (OPAQUE_CONTAINER_TYPES.has(child.type) && !deep) {
         const hit = hitTestOpaqueContainer(graph, px, py, child, childId, deep, transformCache, pad)

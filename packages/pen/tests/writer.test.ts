@@ -1,8 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 
 import type { PenDocument, PenNode } from '@pairdraw/pen'
-import { parsePenDocument, parsePenFile, writePenDocument } from '@pairdraw/pen'
-import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import {
+  parsePenDocument,
+  parsePenFile,
+  penDocumentFromGraph,
+  writePenDocument
+} from '@pairdraw/pen'
+import { SceneGraph } from '@pairdraw/scene-graph'
+import type { SceneNode } from '@pairdraw/scene-graph'
 import { gradientPoint } from '@pairdraw/scene-graph/gradient'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 import { lineHeightPixels, percentLength, pixelLength } from '@pairdraw/scene-graph/text'
@@ -401,3 +407,60 @@ function writtenNode(graph: SceneGraph, id: string): PenNode {
   const document: PenDocument = parsePenDocument(writePenDocument(graph))
   return expectDefined(findNode(document.children, id), id)
 }
+
+describe('instance refs', () => {
+  function instanceGraph(componentWritten: boolean): { graph: SceneGraph; instanceId: string } {
+    const graph = new SceneGraph()
+    const page = expectDefined(graph.getPages()[0], 'page')
+    const component = graph.createNode('COMPONENT', page.id, {
+      name: 'Button',
+      width: 100,
+      height: 40,
+      internalOnly: !componentWritten
+    })
+    graph.createNode('TEXT', component.id, { name: 'Label', text: 'Go', width: 40, height: 20 })
+    const instance = expectDefined(graph.createInstance(component.id, page.id), 'instance')
+    return { graph, instanceId: instance.id }
+  }
+
+  test('writes an instance of a component the file lacks as a frame with its content', () => {
+    const { graph, instanceId } = instanceGraph(false)
+    const document = penDocumentFromGraph(graph)
+    const written = expectDefined(findNode(document.children, instanceId), 'instance')
+    expect(written.type).toBe('frame')
+    expect(written.ref).toBeUndefined()
+    expect(written.children?.map((child) => child.name)).toEqual(['Label'])
+    expect(refIds(document.children)).toEqual([])
+
+    const reread = parsePenFile(writePenDocument(graph))
+    const texts = [...reread.getAllNodes()].filter((node) => node.type === 'TEXT')
+    expect(texts.map((node) => node.text)).toEqual(['Go'])
+  })
+
+  test('keeps the ref when the component is written', () => {
+    const { graph, instanceId } = instanceGraph(true)
+    const written = expectDefined(
+      findNode(penDocumentFromGraph(graph).children, instanceId),
+      'instance'
+    )
+    expect(written.type).toBe('ref')
+    expect(written.children).toBeUndefined()
+  })
+})
+
+describe('non-finite numbers', () => {
+  test('writes a non-finite number as 0 so the file reopens', () => {
+    const graph = new SceneGraph()
+    const page = expectDefined(graph.getPages()[0], 'page')
+    const node = graph.createNode('RECTANGLE', page.id, {
+      width: 10,
+      height: Number.NaN,
+      opacity: Infinity
+    })
+    const text = writePenDocument(graph)
+    expect(text).not.toContain('null')
+    const written = expectDefined(findNode(parsePenDocument(text).children, node.id), 'node')
+    expect(written.height).toBe(0)
+    expect(written.opacity).toBe(0)
+  })
+})

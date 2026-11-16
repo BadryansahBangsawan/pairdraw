@@ -32,6 +32,7 @@ import type {
   PenVariable,
   PenVariableScalar
 } from './schema'
+import { writtenNodeIds } from './written-nodes'
 const PEN_VERSION = '2.21'
 const PEN_PLUGIN_FIELDS: Readonly<Partial<Record<string, string>>> = {
   'pen/type': 'type',
@@ -55,13 +56,16 @@ type PenWriteState = {
   graph: SceneGraph
   variables: ReadonlyMap<string, Variable>
   collections: ReadonlyMap<string, VariableCollection>
+  /** Nodes the document will contain, so an instance refs only a component that is written. */
+  writtenIds: ReadonlySet<string>
 }
 /** Snaps matrix values that are within floating-point noise of an integer. */
 function snapCoordinate(value: number): number {
   return Math.abs(value - Math.round(value)) < 1e-9 ? Math.round(value) : value
 }
+/** A non-finite number has no JSON form, so it is written as 0 to keep the file loadable. */
 function rounded(value: number): number {
-  return Number(value.toFixed(3))
+  return Number.isFinite(value) ? Number(value.toFixed(3)) : 0
 }
 function colorValue(value: Color): string {
   return value.a === 1 ? colorToHex(value) : colorToHex8(value)
@@ -522,7 +526,7 @@ function semanticNodeFields(state: PenWriteState, node: SceneNode, result: PenNo
   if (effects.length > 0)
     result.effect = effects.length === 1 ? effectOf(effects[0]) : effects.map(effectOf)
   if (node.type === 'COMPONENT' || node.type === 'COMPONENT_SET') result.reusable = true
-  if (node.type === 'INSTANCE' && node.componentId) {
+  if (node.type === 'INSTANCE' && node.componentId && state.writtenIds.has(node.componentId)) {
     result.type = 'ref'
     result.ref = node.componentId
     return true
@@ -570,7 +574,7 @@ export function penDocumentFromGraph(graph: SceneGraph): PenDocument {
   const collections = new Map<string, VariableCollection>()
   for (const collection of graph.variableCollections.values())
     collections.set(collection.id, collection)
-  const state: PenWriteState = { graph, variables, collections }
+  const state: PenWriteState = { graph, variables, collections, writtenIds: writtenNodeIds(graph) }
   const children = graph.getPages().flatMap((page) =>
     graph
       .getChildren(page.id)

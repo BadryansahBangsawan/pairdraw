@@ -44,7 +44,7 @@ export default defineCommand({
     format: {
       type: 'string',
       alias: 'f',
-      description: 'Output format: fig (default: fig)',
+      description: `Output format: ${writableFormatIds().join(', ')} (default: fig)`,
       default: 'fig'
     },
     'font-policy': {

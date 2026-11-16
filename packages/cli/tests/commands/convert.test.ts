@@ -5,9 +5,11 @@ import { join } from 'node:path'
 
 import { figThumbnailSize } from '#cli-tests/helpers/fig'
 import { CLI_ENTRY } from '#cli-tests/helpers/paths'
+import { renderUsage } from 'citty'
 
 import { getTextMeasurer } from '@pairdraw/core/layout'
 
+import convert from '#cli/commands/convert'
 import { loadDocument, measureDocumentText } from '#cli/headless'
 
 setDefaultTimeout(60_000)
@@ -22,6 +24,10 @@ async function cli(args: string[]) {
 }
 
 describe('convert CLI', () => {
+  test('lists every format it writes in its help', async () => {
+    expect(await renderUsage(convert)).toContain('Output format: fig, pen, drawio')
+  })
+
   test('saves a .pen document with its text measured in its own fonts', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'pairdraw-convert-'))
     const source = join(dir, 'tag.pen')

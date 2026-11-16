@@ -35,3 +35,4 @@
 - Imported HTML resolves `var()` fallbacks that hold parentheses or another `var()`, and matches selectors that mix child and descendant combinators, such as `.a > .b .c`.
 - JSX export of a page or document now exports its top-level layers instead of failing with "Nothing to export".
 - `export` reports the real file size of text exports that contain non-ASCII characters.
+- `convert --help` lists every output format it can write.

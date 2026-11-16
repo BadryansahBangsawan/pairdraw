@@ -732,3 +732,13 @@ zh-cn:cloud.shareSnapshotDescription
 zh-cn:cloud.downloadFig
 zh-cn:variables.cssSync
 zh-cn:variables.cssImport
+ja:ai.chatAcpInstallAndRestart
+ja:ai.chatAcpNotInstalled
+ja:ai.chatAcpNotRunning
+ja:ai.chatAcpSignInRequired
+ja:ai.chatAcpTimeout
+zh-cn:ai.chatAcpInstallAndRestart
+zh-cn:ai.chatAcpNotInstalled
+zh-cn:ai.chatAcpNotRunning
+zh-cn:ai.chatAcpSignInRequired
+zh-cn:ai.chatAcpTimeout

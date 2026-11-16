@@ -515,5 +515,11 @@
   "importFromFigma": "Figma から読み込む",
   "importFromBrowser": "ブラウザから読み込む",
   "recreateScreenshot": "スクリーンショットを再現",
-  "recreateScreenshotPrompt": "このスクリーンショットを編集可能なデザインとして再現してください。"
+  "recreateScreenshotPrompt": "このスクリーンショットを編集可能なデザインとして再現してください。",
+  "chatAcpNotRunning": "MCP サーバーが起動していません。エディターを開いていることを確認してください。",
+  "chatAcpTimeout": "MCP サーバーが時間内に応答しませんでした。",
+  "chatAcpNotInstalled": "ACP エージェントの CLI がインストールされていません。",
+  "chatAcpInstallAndRestart": "「{command}」がインストールされていません。インストールして Pairdraw を再起動してください。",
+  "chatAcpInstallWith": "「{command}」がインストールされていません。次のコマンドでインストールしてください: {installCommand}",
+  "chatAcpSignInRequired": "{agent} にサインインしていません。「AI をセットアップ」からサインインして、もう一度お試しください。"
 }

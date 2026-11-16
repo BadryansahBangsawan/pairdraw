@@ -11,6 +11,7 @@ import type { ChatTransport, UIMessage, UIMessageChunk } from 'ai'
 import * as v from 'valibot'
 
 import type { ACPAgentDef } from '@pairdraw/core/constants'
+import { aiMessages } from '@pairdraw/vue/i18n'
 
 import { AgentSignInRequiredError } from '@/app/ai/agents/acp/auth/required'
 import { parseAuthStatusUpdate } from '@/app/ai/agents/acp/auth/status'
@@ -80,33 +81,34 @@ function isMissingCommandError(message: string): boolean {
 }
 
 function missingCommandMessage(agentDef?: ACPAgentDef): string {
-  if (!agentDef) return 'ACP agent CLI is not installed.'
-  if (!agentDef.installCommand) {
-    return `"${agentDef.command}" is not installed. Install it and restart ${APP_NAME}.`
-  }
-  return `"${agentDef.command}" is not installed. Install it with: ${agentDef.installCommand}`
+  const ai = aiMessages.get()
+  if (!agentDef) return ai.chatAcpNotInstalled
+  if (!agentDef.installCommand) return ai.chatAcpInstallAndRestart({ command: agentDef.command })
+  return ai.chatAcpInstallWith({
+    command: agentDef.command,
+    installCommand: agentDef.installCommand
+  })
 }
 
 export function formatConnectionError(e: unknown, agentDef?: ACPAgentDef): string {
   const msg = e instanceof Error ? e.message : String(e)
+  const ai = aiMessages.get()
   if (
     msg.includes('ECONNREFUSED') ||
     msg.includes('fetch failed') ||
     msg.includes('Failed to fetch')
   ) {
-    return 'MCP server is not running. Make sure the editor is open.'
+    return ai.chatAcpNotRunning
   }
   if (msg.includes('timeout') || msg.includes('Timeout') || msg.includes('ETIMEDOUT')) {
-    return 'MCP server did not respond in time.'
+    return ai.chatAcpTimeout
   }
   if (isMissingCommandError(msg)) {
     return missingCommandMessage(agentDef)
   }
   if (isAuthRequiredError(e)) {
-    if (agentDef?.ownCredentials) {
-      return `${agentDef.name} found no provider credentials to use. Set one up in ${agentDef.name}, then try again.`
-    }
-    return `${agentDef?.name ?? 'The agent'} is not signed in. Sign in from Set up AI, then try again.`
+    if (agentDef?.ownCredentials) return ai.chatAgentUnconfigured({ agent: agentDef.name })
+    return ai.chatAcpSignInRequired({ agent: agentDef?.name ?? 'The agent' })
   }
   return msg
 }

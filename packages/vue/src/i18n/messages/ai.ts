@@ -70,6 +70,16 @@ export const aiMessageDefaults = {
     '{agent} is on this computer. Pairdraw needs its connector ({package}) to talk to it.'
   ),
   chatAgentInstall: 'Install and connect',
+  chatAcpNotRunning: 'MCP server is not running. Make sure the editor is open.',
+  chatAcpTimeout: 'MCP server did not respond in time.',
+  chatAcpNotInstalled: 'ACP agent CLI is not installed.',
+  chatAcpInstallAndRestart: params(
+    '"{command}" is not installed. Install it and restart Pairdraw.'
+  ),
+  chatAcpInstallWith: params('"{command}" is not installed. Install it with: {installCommand}'),
+  chatAcpSignInRequired: params(
+    '{agent} is not signed in. Sign in from Set up AI, then try again.'
+  ),
   chatAgentPromptWaiting: params('Your prompt is sent once {agent} is connected.'),
   chatAgentPromptWaitingSetup: 'Your prompt is sent once AI is set up.',
   chatAgentNoneFound: 'No coding agent found on this computer.',

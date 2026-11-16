@@ -1,9 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 
 import type { SessionUpdate } from '@agentclientprotocol/sdk'
+import { translationsLoading } from '@nanostores/i18n'
 import { readUIMessageStream, type UIMessage, type UIMessageChunk } from 'ai'
 
 import type { ACPAgentDef } from '@pairdraw/core/constants'
+import { aiMessages, i18n, locale, setLocale } from '@pairdraw/vue/i18n'
 
 import { createUpdateMapper } from '@/app/ai/agents/acp/events'
 import { agentTurnUsage, buildCrashChunks, formatConnectionError } from '@/app/ai/transports/acp'
@@ -312,6 +314,20 @@ describe('formatConnectionError', () => {
   test('timeout maps to timeout message', () => {
     const msg = formatConnectionError(new Error('Request timeout after 30s'))
     expect(msg).toBe('MCP server did not respond in time.')
+  })
+
+  test('a connection error follows the interface language', async () => {
+    const previous = locale.get()
+    setLocale('de')
+    await translationsLoading(i18n)
+    try {
+      const german = aiMessages.get().chatAcpNotRunning
+      expect(german).not.toBe('MCP server is not running. Make sure the editor is open.')
+      expect(formatConnectionError(new Error('connect ECONNREFUSED 127.0.0.1:7600'))).toBe(german)
+    } finally {
+      setLocale(previous)
+      await translationsLoading(i18n)
+    }
   })
 
   test('ENOENT maps to install instructions', () => {

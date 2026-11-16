@@ -515,5 +515,11 @@
   "importFromFigma": "从 Figma 导入",
   "importFromBrowser": "从浏览器导入",
   "recreateScreenshot": "重现截图",
-  "recreateScreenshotPrompt": "将这张截图重现为可编辑的设计。"
+  "recreateScreenshotPrompt": "将这张截图重现为可编辑的设计。",
+  "chatAcpNotRunning": "MCP 服务器未运行。请确认编辑器已打开。",
+  "chatAcpTimeout": "MCP 服务器未及时响应。",
+  "chatAcpNotInstalled": "尚未安装 ACP 代理 CLI。",
+  "chatAcpInstallAndRestart": "“{command}” 尚未安装。请安装后重新启动 Pairdraw。",
+  "chatAcpInstallWith": "“{command}” 尚未安装。请使用以下命令安装：{installCommand}",
+  "chatAcpSignInRequired": "{agent} 尚未登录。请在“设置 AI”中登录，然后重试。"
 }

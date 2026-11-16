@@ -515,5 +515,11 @@
   "importFromFigma": "Импорт из Figma",
   "importFromBrowser": "Импорт из браузера",
   "recreateScreenshot": "Воссоздать скриншот",
-  "recreateScreenshotPrompt": "Воссоздай этот скриншот как редактируемый дизайн."
+  "recreateScreenshotPrompt": "Воссоздай этот скриншот как редактируемый дизайн.",
+  "chatAcpNotRunning": "Сервер MCP не запущен. Убедитесь, что редактор открыт.",
+  "chatAcpTimeout": "Сервер MCP не ответил вовремя.",
+  "chatAcpNotInstalled": "CLI агента ACP не установлен.",
+  "chatAcpInstallAndRestart": "«{command}» не установлен. Установите его и перезапустите Pairdraw.",
+  "chatAcpInstallWith": "«{command}» не установлен. Установите его командой: {installCommand}",
+  "chatAcpSignInRequired": "{agent} не выполнил вход. Войдите в разделе «Настройка ИИ» и повторите попытку."
 }

@@ -515,5 +515,11 @@
   "importFromFigma": "Aus Figma importieren",
   "importFromBrowser": "Aus dem Browser importieren",
   "recreateScreenshot": "Screenshot nachbauen",
-  "recreateScreenshotPrompt": "Baue diesen Screenshot als bearbeitbares Design nach."
+  "recreateScreenshotPrompt": "Baue diesen Screenshot als bearbeitbares Design nach.",
+  "chatAcpNotRunning": "Der MCP-Server läuft nicht. Stelle sicher, dass der Editor geöffnet ist.",
+  "chatAcpTimeout": "Der MCP-Server hat nicht rechtzeitig geantwortet.",
+  "chatAcpNotInstalled": "Die ACP-Agent-CLI ist nicht installiert.",
+  "chatAcpInstallAndRestart": "„{command}“ ist nicht installiert. Installiere es und starte Pairdraw neu.",
+  "chatAcpInstallWith": "„{command}“ ist nicht installiert. Installiere es mit: {installCommand}",
+  "chatAcpSignInRequired": "{agent} ist nicht angemeldet. Melde dich unter „KI einrichten“ an und versuche es dann erneut."
 }

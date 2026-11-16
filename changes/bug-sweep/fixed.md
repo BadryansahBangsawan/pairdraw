@@ -26,3 +26,4 @@
 - Layers with a corrupt parent cycle no longer freeze the editor.
 - A `.fig` file with a component property pointing to a missing parent property now opens instead of failing to load.
 - A duplicated layer inside an instance no longer keeps stale styles after its component changes.
+- CSS colors with a `none` channel, such as `rgb(none 255 0)`, now import correctly.

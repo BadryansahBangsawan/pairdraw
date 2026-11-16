@@ -7,6 +7,7 @@ import { parse, formatHex, formatHex8, formatRgb, converter, differenceEuclidean
 
 import { BLACK } from '../constants'
 import type { Color } from '../primitives'
+import { normalizeColor } from './normalize'
 
 const toRGB = converter('rgb')
 
@@ -15,12 +16,8 @@ export function tryParseColor(input: string): Color | null {
   const parsed = parse(input)
   if (!parsed) return null
   const rgb = toRGB(parsed)
-  return {
-    r: rgb.r,
-    g: rgb.g,
-    b: rgb.b,
-    a: parsed.alpha ?? 1
-  }
+  // culori leaves a `none` channel out, which normalizing reads as zero.
+  return normalizeColor({ r: rgb.r, g: rgb.g, b: rgb.b, a: parsed.alpha })
 }
 
 /** A CSS color, or black when `input` is not one. */

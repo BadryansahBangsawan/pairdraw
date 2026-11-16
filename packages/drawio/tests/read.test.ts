@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import { deflateSync } from 'fflate'
-import { fromUint8Array } from 'js-base64'
+import { encode, fromUint8Array } from 'js-base64'
 
 import { MAX_INFLATED_BYTES, parseDrawIOFile, readDrawIOBytes } from '@pairdraw/drawio'
 
@@ -180,6 +180,20 @@ describe('reading the diagram a draw.io export embeds', () => {
     expect(
       readDrawIOBytes(new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"/>'))
     ).toBeNull()
+  })
+
+  test('from an SVG’s percent-encoded or Base64 content attribute', () => {
+    const svg = (content: string) =>
+      new TextEncoder().encode(
+        `<svg xmlns="http://www.w3.org/2000/svg" content="${content}"><rect/></svg>`
+      )
+    const mxfile = `<mxfile>${page('Vector ✓')}</mxfile>`
+    expect(readDrawIOBytes(svg(encodeURIComponent(mxfile)))?.pages[0]?.name).toBe('Vector ✓')
+    expect(readDrawIOBytes(svg(encode(mxfile)))?.pages[0]?.name).toBe('Vector ✓')
+    expect(readDrawIOBytes(svg(encode(encodeURIComponent(mxfile))))?.pages[0]?.name).toBe(
+      'Vector ✓'
+    )
+    expect(readDrawIOBytes(svg('not a diagram'))).toBeNull()
   })
 
   test('from a PNG’s compressed and international text chunks', () => {

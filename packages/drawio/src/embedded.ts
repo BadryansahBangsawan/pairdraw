@@ -1,5 +1,6 @@
 import type { Element } from '@xmldom/xmldom'
 import { imageSize } from 'image-size'
+import { decode, isValid } from 'js-base64'
 
 import { boundedInflate, percentDecoded, type InflateBudget } from './inflate'
 import { parseXML } from './xml'
@@ -88,7 +89,19 @@ export function drawioRoot(bytes: Uint8Array, budget: InflateBudget): Element | 
   const root = source === null ? null : parseXML(source)
   if (root?.localName !== 'svg') return root
   const content = root.getAttribute('content')
-  return content ? parseXML(content) : null
+  return content ? parseXML(svgContent(content)) : null
+}
+
+/**
+ * The diagram an SVG export keeps in its `content` attribute. draw.io writes it as XML, and also
+ * reads it percent-encoded or as Base64 of either form.
+ */
+function svgContent(content: string): string {
+  const text =
+    content.startsWith('<') || content.startsWith('%') || !isValid(content)
+      ? content
+      : decode(content)
+  return text.startsWith('%') ? percentDecoded(text) : text
 }
 
 /** Whether a file name is draw.io's for an editable export, such as `flow.drawio.png`. */

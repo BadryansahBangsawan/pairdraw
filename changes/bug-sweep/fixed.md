@@ -18,3 +18,4 @@
 - Text whose characters bind a size or spacing to a variable keeps its scaled size after the Scale tool, and a bound font weight no longer changes with the scale.
 - Connectors brought back when a failed edit is rolled back keep following their layers.
 - Mermaid flowcharts whose labels nest HTML tags very deeply now import instead of failing.
+- draw.io SVG exports whose embedded diagram is percent-encoded or Base64 now open as draw.io files.

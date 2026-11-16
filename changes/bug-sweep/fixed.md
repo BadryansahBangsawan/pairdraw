@@ -40,3 +40,4 @@
 - Design JSX keeps `<!-- … -->` written inside attribute values and string literals instead of removing it as a comment.
 - Creating a variable from the Opacity field keeps the layer's opacity instead of setting it to 100%.
 - Aligning rotated layers lines up their visible edges instead of shifting them off the target.
+- Visual bounds of rotated layers, such as the area exported for AI image changes, cover the layer where it is drawn.

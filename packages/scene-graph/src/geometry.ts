@@ -271,7 +271,7 @@ export function computeVisualBounds(
   const bounds = createBoundsAccumulator()
 
   for (const n of nodes) {
-    const abs = getAbsolutePosition(n.id)
+    const abs = unturnedTopLeft(n, getAbsolutePosition(n.id))
     const bbox = rotatedBBox(abs.x, abs.y, n.width, n.height, n.rotation ?? 0)
     const stroke = strokeOverflow(n.strokes, n.strokeCap, n.vectorNetwork, n)
     const effects = effectOverflow(n.effects)
@@ -365,7 +365,10 @@ export function geometryBlobBounds(paths: Array<{ commandsBlob: Uint8Array }>): 
   return bounds.minX === Infinity ? null : boundsToRect(bounds)
 }
 
-function transformLocalPoint(node: VisualBoundsNode, point: Vector): Vector {
+type TurnedBox = Pick<VisualBoundsNode, 'width' | 'height' | 'rotation' | 'flipX' | 'flipY'>
+
+/** Where a local point lands relative to the box's unturned top-left: flipped, then turned about the center. */
+function transformLocalPoint(node: TurnedBox, point: Vector): Vector {
   let x = node.flipX ? node.width - point.x : point.x
   let y = node.flipY ? node.height - point.y : point.y
   const rotation = node.rotation ?? 0
@@ -375,6 +378,18 @@ function transformLocalPoint(node: VisualBoundsNode, point: Vector): Vector {
     y = rotated.y
   }
   return { x, y }
+}
+
+/**
+ * The unturned top-left of a box whose origin (its own 0,0, as `SceneGraph.getAbsolutePosition`
+ * returns it) sits at `origin` after the rotation.
+ */
+function unturnedTopLeft(node: TurnedBox, origin: Vector): Vector {
+  const offset = transformLocalPoint(
+    { width: node.width, height: node.height, rotation: node.rotation },
+    { x: 0, y: 0 }
+  )
+  return { x: origin.x - offset.x, y: origin.y - offset.y }
 }
 
 function transformedLocalBounds(node: VisualBoundsNode, local: Rect, abs: Vector): VisualBounds {
@@ -397,7 +412,7 @@ export function nodeVisualBounds(
   node: VisualBoundsNode,
   getAbsolutePosition: (id: string) => Vector
 ): VisualBounds {
-  const abs = getAbsolutePosition(node.id)
+  const abs = unturnedTopLeft(node, getAbsolutePosition(node.id))
   const base = computeVisualBounds([node], getAbsolutePosition)
   let bounds: VisualBounds = {
     minX: base.x,

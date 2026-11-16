@@ -184,7 +184,7 @@
     },
     "packages/cli": {
       "name": "@pairdraw/cli",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "bin": {
         "pairdraw": "./bin/pairdraw.js",
       },
@@ -209,7 +209,7 @@
     },
     "packages/cloud": {
       "name": "@pairdraw/cloud",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "bin": {
         "pairdraw-ai-relay": "./dist/bin/ai-relay.mjs",
         "pairdraw-cloud": "./dist/bin/server.mjs",
@@ -266,7 +266,7 @@
     },
     "packages/core": {
       "name": "@pairdraw/core",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "dependencies": {
         "@chenglou/pretext": "^0.0.7",
         "@iconify/utils": "^3.1.4",
@@ -327,7 +327,7 @@
     },
     "packages/design-jsx": {
       "name": "@pairdraw/design-jsx",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "dependencies": {
         "@lezer/common": "^1.5.2",
         "@lezer/javascript": "^1.5.4",
@@ -385,7 +385,7 @@
     },
     "packages/dom-css": {
       "name": "@pairdraw/dom-css",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "dependencies": {
         "@acemir/cssom": "^0.9.31",
         "@pairdraw/emit": "workspace:*",
@@ -424,7 +424,7 @@
     },
     "packages/drawio": {
       "name": "@pairdraw/drawio",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "dependencies": {
         "@xmldom/xmldom": "^0.9.12",
         "fflate": "^0.8.3",
@@ -439,7 +439,7 @@
     },
     "packages/emit": {
       "name": "@pairdraw/emit",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "dependencies": {
         "@sveltejs/acorn-typescript": "^1.0.13",
         "acorn": "^8.18.0",
@@ -455,7 +455,7 @@
     },
     "packages/fig": {
       "name": "@pairdraw/fig",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "dependencies": {
         "es-toolkit": "^1.52.0",
         "fflate": "^0.8.3",
@@ -474,7 +474,7 @@
     },
     "packages/harness": {
       "name": "@pairdraw/harness",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "bin": {
         "pairdraw-harness": "./dist/stdio.mjs",
       },
@@ -494,7 +494,7 @@
     },
     "packages/kiwi": {
       "name": "@pairdraw/kiwi",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "dependencies": {
         "@hpcc-js/wasm-zstd": "^1.16.2",
         "fflate": "^0.8.3",
@@ -507,7 +507,7 @@
     },
     "packages/mcp": {
       "name": "@pairdraw/mcp",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "bin": {
         "pairdraw-mcp": "./dist/stdio.mjs",
         "pairdraw-mcp-http": "./dist/index.mjs",
@@ -532,7 +532,7 @@
     },
     "packages/mermaid": {
       "name": "@pairdraw/mermaid",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "dependencies": {
         "entities": "^8.0.0",
         "parse5": "^8.0.1",
@@ -547,7 +547,7 @@
     },
     "packages/pen": {
       "name": "@pairdraw/pen",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "dependencies": {
         "es-toolkit": "^1.52.0",
         "valibot": "^1.5.0",
@@ -564,7 +564,7 @@
     },
     "packages/scene-graph": {
       "name": "@pairdraw/scene-graph",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "dependencies": {
         "@noble/hashes": "^2.4.0",
         "culori": "^4.0.2",
@@ -585,7 +585,7 @@
     },
     "packages/vue": {
       "name": "@pairdraw/vue",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "dependencies": {
         "@atlaskit/pragmatic-drag-and-drop": "^1.8.1",
         "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.2.0",
@@ -617,7 +617,7 @@
     },
     "packages/web-capture": {
       "name": "@pairdraw/web-capture",
-      "version": "0.16.2",
+      "version": "0.17.0",
       "dependencies": {
         "entities": "^8.0.0",
         "es-toolkit": "^1.52.0",

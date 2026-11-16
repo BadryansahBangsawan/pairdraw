@@ -1,6 +1,6 @@
 {
   "name": "@pairdraw/cli",
-  "version": "0.16.2",
+  "version": "0.17.0",
   "description": "Headless command line for Pairdraw: inspect and query design documents, export images and code, lint, analyze tokens, and script the running editor.",
   "keywords": [
     "pairdraw",

@@ -2,6 +2,59 @@
 
 ## Unreleased
 
+## 0.17.0 — 2026-11-16
+
+Pairdraw 0.17.0 is a bug-fix and hardening release: imported HTML, `.fig`, `.pen`, draw.io, and Mermaid files open more faithfully, damaged files fail with an error instead of freezing the app, rotated layers measure, align, and snap where they are drawn, and HTML export can no longer be made to carry live markup. Pairdraw 0.16.1 and later offer this release in the app; 0.16.0 has no update feed, so install it by hand once.
+
+### Breaking changes
+
+- `computeAbsoluteBounds` from `@pairdraw/scene-graph/geometry` takes the graph (`computeAbsoluteBounds(nodes, graph)`) instead of a position lookup, so it can measure rotated and flipped layers.
+- `SceneGraph.createNode` and `createNodeWithId` throw when the parent does not exist, and `createNodeWithId` throws when the ID is already taken or names the layer as its own parent, instead of leaving a detached layer or replacing the existing one.
+
+### Security
+
+- Standalone HTML export keeps style values from imported documents inside the page's stylesheet, so they can no longer add markup to the page.
+- HTML export leaves out imported JSX attributes whose names would add other attributes to the element, and writes an imported layer whose tag name is not a valid element name as a `div`, so neither can add attributes such as event handlers.
+- Token stylesheets keep collection and mode names inside their comments, so a name can no longer add CSS rules.
+- The MCP server refuses `/rpc` and `/mcp` request bodies larger than 128 MiB instead of reading them whole.
+
+### Fixed
+
+- Damaged `.fig` files and Figma clipboard data fail with an error instead of freezing the app or loading wrong values; a raw `.fig` file that is cut short reports a corrupted file, and text with an unpaired surrogate no longer loses the character after it when saved.
+- A `.fig` file whose component property points to a missing parent property, or whose variable holds a nested color expression, now opens instead of failing to load.
+- `parseVarint` from `@pairdraw/kiwi/fig` reads values of 2³¹ and above correctly.
+- `.pen` files: a number too large to store is reported where it is instead of saving a file that cannot be reopened; layer `metadata` survives saving; a repeated layer ID keeps every layer; a gradient of an unknown type opens as linear; text such as `no` or `0` in a true/false field reads as the field's default; and converting a document to `.pen` keeps the content of instances whose component is not in the file.
+- Imported HTML names layers after their `data-name`, so a page exported to HTML and imported back keeps its layer names.
+- Imported HTML resolves CSS custom properties declared on any selector, `var()` fallbacks, including ones that hold parentheses or another `var()`, text styles set on `:root`, `calc()` products written with the number first, and selectors that mix child and descendant combinators, such as `.a > .b .c`.
+- CSS colors with a `none` channel, such as `rgb(none 255 0)`, import correctly, and out-of-range and wide-gamut colors are clamped or mapped into sRGB, as browsers show them.
+- JSX style strings keep semicolons inside `url()` and quoted values, so data URLs import intact.
+- Design JSX keeps `<!-- … -->` written inside attribute values and string literals instead of removing it as a comment, and the streaming preview shows Reka parts such as `Switch.Root` while the JSX is still arriving.
+- Mermaid flowcharts whose labels nest HTML tags very deeply import instead of failing.
+- draw.io SVG exports whose embedded diagram is percent-encoded or Base64 open as draw.io files.
+- JSX export of a page or document exports its top-level layers instead of failing with "Nothing to export".
+- The CLI's `export` reports the real file size of text exports that contain non-ASCII characters, and `convert --help` lists every output format it can write.
+- Rotated layers measure where they are drawn: zoom to selection, ruler selection marks, Align for one layer or several, visual bounds of flipped layers, the area exported for AI image changes, rotated clipping frames, and rotated underlined text all follow the drawn shape.
+- Snapping measures a rotated line from its start point, where it is drawn, and no longer draws a guide for an equally near edge it did not snap to.
+- Clicking where a mask hides part of a layer no longer selects that layer, following an ellipse, rounded, or vector mask's outline, and zero-width or zero-height layers can be clicked.
+- The Scale tool scales text on a path together with its layer.
+- Layers with a corrupt parent cycle no longer freeze the editor.
+- A duplicated layer inside an instance no longer keeps stale styles after its component changes.
+- Text whose characters bind a size or spacing to a variable keeps its scaled size after the Scale tool, and those characters keep their own scale when the layer is unbound or rebound or a variable it binds is deleted; a bound font weight no longer changes with the scale.
+- Creating a variable from a property field binds every selected layer and corner the field edits; from the Opacity field it keeps the layer's opacity instead of setting 100%; and from a line height or letter spacing shown in percent it holds the pixels at the font size, so binding it keeps the text as it was.
+- Undoing Move to page selects the moved layers again.
+- Zooming to fit very large content stops at the 2% minimum zoom.
+- Connectors brought back when a failed edit is rolled back keep following their layers.
+- Pasting a malformed Pairdraw clipboard payload no longer creates layers that break saving as `.fig` or copying them again, and strokes copied from older versions paste as solid strokes.
+- Saving by download in a browser without file access keeps the draft and recovery copy, so cancelling the download no longer loses the work.
+- Changing a setting keeps preferences that a newer version of Pairdraw saved.
+- S3 saves detect a document that changed elsewhere and report a conflict instead of overwriting it.
+- A message written while a chat reply runs stays with its document across tab switches and is sent once that reply ends, instead of getting stuck or going to another document's chat.
+- A reply still running shows live again, with its Stop button, when you come back to its document from Home or another tab.
+- The design check resumes when an AI reply fails before it reaches the model.
+- A streamed render preview loads its fonts again after a failed load instead of drawing without them until the call ends.
+- AI setup no longer prefixes omp's Bun install command with sudo when npm's global folder needs administrator rights.
+- Coding-agent connection errors appear in the interface language instead of English only.
+
 ## 0.16.2 — 2026-11-16
 
 Pairdraw 0.16.2 fixes the chat composer in a narrow chat. Pairdraw 0.16.1 offers this release in the app.

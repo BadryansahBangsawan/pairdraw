@@ -1,5 +1,0 @@
-- Standalone HTML export keeps style values from imported documents inside the page's stylesheet, so they can no longer add markup to the page.
-- HTML export leaves out imported JSX attributes whose names would add other attributes to the element.
-- Token stylesheets keep collection and mode names inside their comments, so a name can no longer add CSS rules.
-- The MCP server refuses `/rpc` and `/mcp` request bodies larger than 128 MiB instead of reading them whole.
-- HTML export writes an imported layer whose tag name is not a valid element name as a `div`, so the name can no longer add attributes such as event handlers.

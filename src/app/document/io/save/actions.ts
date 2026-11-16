@@ -18,7 +18,6 @@ type SaveActionsOptions = Omit<DocumentSourceAccess, 'getSavedVersion'> & {
   buildFigFile: () => Uint8Array | Promise<Uint8Array>
   startWatchingFile: () => void
   onWriteSuccess?: (version: number) => void | Promise<void>
-  onDownloadSuccess?: (version: number) => void | Promise<void>
 }
 
 export function createSaveActions({
@@ -38,8 +37,7 @@ export function createSaveActions({
   setSavedVersion,
   setLastWriteTime,
   startWatchingFile,
-  onWriteSuccess,
-  onDownloadSuccess
+  onWriteSuccess
 }: SaveActionsOptions) {
   const writeFile = createDocumentWriter({
     state,
@@ -68,9 +66,7 @@ export function createSaveActions({
       return wrote
     }
     if (downloadName) {
-      const { data, version } = await buildVersionedFigFile()
-      downloadBlob(new Uint8Array(data), downloadName, 'application/octet-stream')
-      await onDownloadSuccess?.(version)
+      downloadBlob(new Uint8Array(await buildFigFile()), downloadName, 'application/octet-stream')
       return true
     }
     return saveFigFileAs()
@@ -134,7 +130,7 @@ export function createSaveActions({
         // and forget the file, so the tab is not taken for it.
         setFileHandle(null)
         setSourceIdentity({ handle: null, path: null })
-        return downloadAs(handle.name, data, version)
+        return downloadAs(handle.name, data)
       }
     }
 
@@ -143,15 +139,14 @@ export function createSaveActions({
       getDownloadName() ?? documentFileName('Untitled', state.documentKind)
     )
     if (!filename) return false
-    return downloadAs(filename, data, version)
+    return downloadAs(filename, data)
   }
 
-  async function downloadAs(filename: string, data: Uint8Array, version: number) {
+  function downloadAs(filename: string, data: Uint8Array) {
     setStorageBinding(null)
     setDownloadName(filename)
     state.documentName = documentNameFromFigPath(filename)
     downloadBlob(new Uint8Array(data), filename, 'application/octet-stream')
-    await onDownloadSuccess?.(version)
     return true
   }
 

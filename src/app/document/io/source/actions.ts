@@ -152,8 +152,9 @@ export function createDocumentSourceActions({
     startWatchingFile: () => {
       void startWatchingFile()
     },
-    onWriteSuccess: afterSave,
-    onDownloadSuccess: afterSave
+    // A download is not confirmed (the person can cancel the browser's prompt), so the draft and
+    // recovery's copy stay until a save the app can confirm.
+    onWriteSuccess: afterSave
   })
 
   const autosave = createAutosave({

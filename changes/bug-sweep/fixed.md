@@ -8,3 +8,4 @@
 - A `.pen` gradient of an unknown type opens as a linear gradient instead of disappearing.
 - In `.pen` files, text such as `no` or `0` in a true/false field reads as the field's default instead of turning it on.
 - AI setup no longer prefixes omp's Bun install command with sudo when npm's global folder needs administrator rights.
+- Saving by download in a browser without file access keeps the draft and recovery copy, so cancelling the download no longer loses the work.

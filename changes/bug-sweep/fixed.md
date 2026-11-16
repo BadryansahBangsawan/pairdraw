@@ -32,3 +32,4 @@
 - A message written while a chat reply runs now stays with its document across tab switches and is sent once that reply ends, instead of getting stuck or going to another document's chat.
 - Pasting a malformed Pairdraw clipboard payload no longer creates layers that break saving as `.fig` or copying them again, and strokes copied from older versions paste as solid strokes.
 - Converting a document to `.pen` keeps the content of instances whose component is not in the file, and a `.pen` file saved with an invalid number always reopens.
+- Imported HTML resolves `var()` fallbacks that hold parentheses or another `var()`, and matches selectors that mix child and descendant combinators, such as `.a > .b .c`.

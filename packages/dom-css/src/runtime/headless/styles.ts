@@ -129,12 +129,42 @@ function collectCustomProperties(rules: CSSStyleRuleLike[]): DesignStyleDeclarat
 }
 
 function resolveCSSValue(value: string, customProperties: DesignStyleDeclaration): string {
-  const withVariables = value.replaceAll(
-    /var\(\s*(--[\w-]+)\s*(?:,([^)]*))?\)/g,
-    (_, name: string, fallback: string | undefined) =>
-      Object.hasOwn(customProperties, name) ? customProperties[name] : (fallback?.trim() ?? '')
-  )
-  return resolveSimpleCalc(withVariables)
+  return resolveSimpleCalc(resolveVariables(value, customProperties))
+}
+
+const CUSTOM_PROPERTY_NAME = /^--[\w-]+$/
+
+/** `var()` references as their values; a fallback can hold parentheses and other `var()`s. */
+function resolveVariables(value: string, customProperties: DesignStyleDeclaration): string {
+  let result = ''
+  let index = 0
+  for (;;) {
+    const start = value.indexOf('var(', index)
+    const end = start === -1 ? -1 : closingParenthesis(value, start + 3)
+    if (end === -1) return result + value.slice(index)
+    const inner = value.slice(start + 4, end)
+    const comma = inner.indexOf(',')
+    const name = (comma === -1 ? inner : inner.slice(0, comma)).trim()
+    const declared: string | undefined = Object.hasOwn(customProperties, name)
+      ? customProperties[name]
+      : undefined
+    const fallback = comma === -1 ? '' : inner.slice(comma + 1).trim()
+    result += value.slice(index, start)
+    result += CUSTOM_PROPERTY_NAME.test(name)
+      ? (declared ?? resolveVariables(fallback, customProperties))
+      : value.slice(start, end + 1)
+    index = end + 1
+  }
+}
+
+/** The index of the `)` closing the `(` at `open`, or -1 when it is never closed. */
+function closingParenthesis(value: string, open: number): number {
+  let depth = 0
+  for (let index = open; index < value.length; index++) {
+    if (value[index] === '(') depth++
+    else if (value[index] === ')' && --depth === 0) return index
+  }
+  return -1
 }
 
 /** `calc()` of a product, with the length on either side, as pixels. */
@@ -257,56 +287,62 @@ function matchesSimpleSelector(element: DesignElement, selector: string): boolea
   return tag.length === 0 || tag === '*' || element.tagName.toLowerCase() === tag.toLowerCase()
 }
 
+interface SelectorStep {
+  compound: string
+  /** How this compound relates to the one after it: `>` for a parent, ` ` for any ancestor. */
+  combinator: '>' | ' '
+}
+
+/** A complex selector as its compounds, rightmost last; `null` when a combinator lacks a side. */
+function selectorSteps(selector: string): SelectorStep[] | null {
+  const tokens = selector
+    .replaceAll('>', ' > ')
+    .split(/\s+/)
+    .filter((token) => token.length > 0)
+  const steps: SelectorStep[] = []
+  let pending: '>' | null = null
+  for (const token of tokens) {
+    if (token === '>') {
+      if (pending || steps.length === 0) return null
+      pending = '>'
+      continue
+    }
+    const previous = steps.at(-1)
+    if (previous) previous.combinator = pending ?? ' '
+    steps.push({ compound: token, combinator: ' ' })
+    pending = null
+  }
+  return pending ? null : steps
+}
+
 function matchesSelector(
   element: DesignElement,
   selector: string,
   parent: AncestorContext | null
 ): boolean {
-  const childParts = selector.split('>').map((part) => part.trim())
-  if (childParts.length > 1) return matchesChildSelector(element, childParts, parent)
-
-  const descendantParts = selector.split(/\s+/).filter((part) => part.length > 0)
-  if (descendantParts.length > 1) return matchesDescendantSelector(element, descendantParts, parent)
-
-  return matchesSimpleSelector(element, selector)
+  const steps = selectorSteps(selector)
+  return steps !== null && matchesSteps(element, steps, steps.length - 1, parent)
 }
 
-function matchesSelectorParts(
+/** Whether the element matches the compound at `index` and some ancestors match those before. */
+function matchesSteps(
   element: DesignElement,
-  parts: string[],
-  parent: AncestorContext | null,
-  directParentOnly: boolean
+  steps: SelectorStep[],
+  index: number,
+  parent: AncestorContext | null
 ): boolean {
-  const current = parts.at(-1)
-  if (!current || !matchesSimpleSelector(element, current)) return false
-
-  let ancestor = parent
-  for (const selector of parts.slice(0, -1).reverse()) {
-    if (!directParentOnly) {
-      while (ancestor && !matchesSimpleSelector(ancestor.element, selector)) {
-        ancestor = ancestor.parent
-      }
-    }
-    if (!ancestor || !matchesSimpleSelector(ancestor.element, selector)) return false
-    ancestor = ancestor.parent
+  const step = steps.at(index)
+  if (!step || !matchesSimpleSelector(element, step.compound)) return false
+  if (index === 0) return true
+  const previous = steps.at(index - 1)
+  if (!previous) return false
+  if (previous.combinator === '>') {
+    return parent !== null && matchesSteps(parent.element, steps, index - 1, parent.parent)
   }
-  return true
-}
-
-function matchesChildSelector(
-  element: DesignElement,
-  parts: string[],
-  parent: AncestorContext | null
-): boolean {
-  return matchesSelectorParts(element, parts, parent, true)
-}
-
-function matchesDescendantSelector(
-  element: DesignElement,
-  parts: string[],
-  parent: AncestorContext | null
-): boolean {
-  return matchesSelectorParts(element, parts, parent, false)
+  for (let ancestor = parent; ancestor; ancestor = ancestor.parent) {
+    if (matchesSteps(ancestor.element, steps, index - 1, ancestor.parent)) return true
+  }
+  return false
 }
 
 function applyComputedStyles(

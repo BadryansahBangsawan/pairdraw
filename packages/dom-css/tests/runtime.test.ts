@@ -152,6 +152,39 @@ describe('@pairdraw/dom-css runtime', () => {
     expect(b?.type === 'element' ? b.computedStyle?.['padding-left'] : undefined).toBe('6px')
   })
 
+  it('resolves a var() fallback that holds parentheses or another var()', async () => {
+    const runtime = createHeadlessCSSRuntime()
+    const parsed = runtime.parseHTML('<div class="a">A</div>')
+    const document = await runtime.computeStyles(
+      parsed,
+      ':root { --b: 4px; } .a { width: var(--a, calc(1px + 2px)); padding-left: var(--a, var(--c, 5px)); margin-left: var(--a, var(--b, 1px)); }'
+    )
+    const [a] = document.children
+    const style = a?.type === 'element' ? a.computedStyle : undefined
+    expect(style?.width).toBe('calc(1px + 2px)')
+    expect(style?.['padding-left']).toBe('5px')
+    expect(style?.['margin-left']).toBe('4px')
+  })
+
+  it('matches selectors that mix child and descendant combinators', async () => {
+    const runtime = createHeadlessCSSRuntime()
+    const parsed = runtime.parseHTML(
+      '<div class="a"><div class="b"><p><span class="c">A</span></p></div></div><div class="b"><span class="c">B</span></div>'
+    )
+    const document = await runtime.computeStyles(parsed, '.a > .b .c { margin-left: 7px; }')
+    const [a, b] = document.children
+    const inner = (node: (typeof document.children)[number] | undefined): string | undefined => {
+      let current = node
+      while (current?.type === 'element' && current.children.length > 0) {
+        if (current.attrs.class === 'c') return current.computedStyle?.['margin-left']
+        current = current.children.find((child) => child.type === 'element')
+      }
+      return undefined
+    }
+    expect(inner(a)).toBe('7px')
+    expect(inner(b)).toBeUndefined()
+  })
+
   it('resolves custom properties declared on any rule, scoped to the matching subtree', async () => {
     const runtime = createHeadlessCSSRuntime()
     const parsed = runtime.parseHTML(

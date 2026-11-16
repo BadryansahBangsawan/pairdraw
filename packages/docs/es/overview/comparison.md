@@ -246,26 +246,28 @@ El enfoque de Pairdraw es más sencillo y cuesta menos. El de Penpot se adapta m
 
 ## 8. Experiencia de desarrollo
 
-| Métrica                                 | Pairdraw                                     | Penpot                                                      |
-| --------------------------------------- | -------------------------------------------- | ----------------------------------------------------------- |
-| Entorno de desarrollo                   | `bun install && bun dev`                     | Docker Compose + JVM + Node + herramientas de Rust          |
-| Recarga en caliente                     | Vite HMR (~50 ms)                            | shadow-cljs (segundos)                                      |
-| Comprobación de tipos                   | TypeScript (estricto)                        | En tiempo de ejecución (esquemas Malli)                     |
-| Tiempo de compilación                   | <5 s (Vite)                                  | Minutos (arranque de la JVM + compilación CLJS + Rust WASM) |
-| Barrera para contribuir por primera vez | Baja (TS/Vue)                                | Alta (Clojure + Rust + Docker)                              |
-| Escritorio                              | Tauri v2 (instalador de unos 20 MB en macOS) | No disponible (solo navegador)                              |
-| Disponibilidad de desarrolladores       | Enorme (desarrolladores TS/Vue)              | Muy reducida (ClojureScript + Rust)                         |
+| Métrica                                 | Pairdraw                                     | Penpot                                             |
+| --------------------------------------- | -------------------------------------------- | -------------------------------------------------- |
+| Entorno de desarrollo                   | `bun install && bun dev`                     | Docker Compose + JVM + Node + herramientas de Rust |
+| Recarga en caliente                     | Vite HMR                                     | shadow-cljs                                        |
+| Comprobación de tipos                   | TypeScript (estricto)                        | En tiempo de ejecución (esquemas Malli)            |
+| Compilación                             | Vite y Cargo                                 | Arranque de la JVM + compilación CLJS + Rust WASM  |
+| Barrera para contribuir por primera vez | Baja (TS/Vue)                                | Alta (Clojure + Rust + Docker)                     |
+| Escritorio                              | Tauri v2 (instalador de unos 20 MB en macOS) | No disponible (solo navegador)                     |
+| Disponibilidad de desarrolladores       | Enorme (desarrolladores TS/Vue)              | Muy reducida (ClojureScript + Rust)                |
 
 ## 9. Características de rendimiento
 
-| Escenario                    | Pairdraw                       | Penpot                                               |
-| ---------------------------- | ------------------------------ | ---------------------------------------------------- |
-| Arranque en frío             | <2 s (carga de WASM)           | más de 10 s (servidor + cliente + WASM)              |
-| Latencia de una operación    | <1 ms (dentro del proceso)     | 10-50 ms (ida y vuelta por la red)                   |
-| Fotograma                    | Llamada directa a Skia         | CLJS→JS→WASM FFI→Skia                                |
-| Memoria base                 | ~50 MB (pestaña del navegador) | más de ~300 MB (JVM + Postgres + Valkey + navegador) |
-| Funcionamiento sin conexión  | Completo (local primero)       | Ninguno (depende del servidor)                       |
-| Renderizado de 10.000 formas | Una pasada, sin caché          | Por teselas con 11 superficies                       |
+Son diferencias de estructura, no mediciones: ningún editor se ha medido frente al otro.
+
+| Escenario                    | Pairdraw                                         | Penpot                                         |
+| ---------------------------- | ------------------------------------------------ | ---------------------------------------------- |
+| Arranque en frío             | Cargar los módulos WASM                          | Arrancar el servidor y luego el cliente y WASM |
+| Recorrido de una operación   | Dentro del proceso                               | Ida y vuelta por la red hasta el servidor      |
+| Fotograma                    | Llamada directa a Skia                           | CLJS→JS→WASM FFI→Skia                          |
+| Procesos en marcha           | Una pestaña del navegador o la app de escritorio | JVM + Postgres + Valkey + navegador            |
+| Funcionamiento sin conexión  | Completo (local primero)                         | Ninguno (depende del servidor)                 |
+| Renderizado de 10.000 formas | Una pasada, sin caché                            | Por teselas con 11 superficies                 |
 
 ## 10. Qué hace mejor Penpot
 

@@ -246,26 +246,28 @@ L’approccio di Pairdraw è più semplice e costa meno. Quello di Penpot si pre
 
 ## 8. Esperienza di sviluppo
 
-| Metrica                      | Pairdraw                                                   | Penpot                                             |
-| ---------------------------- | ---------------------------------------------------------- | -------------------------------------------------- |
-| Preparazione                 | `bun install && bun dev`                                   | Docker Compose + JVM + Node + strumenti Rust       |
-| Aggiornamento rapido         | Vite HMR (circa 50 ms)                                     | shadow-cljs (secondi)                              |
-| Controllo dei tipi           | TypeScript (rigoroso)                                      | Durante l’esecuzione (schemi Malli)                |
-| Tempo di compilazione        | meno di 5 s (Vite)                                         | Minuti (avvio JVM + compilazione CLJS + Rust WASM) |
-| Barriera al primo contributo | Bassa (TypeScript/Vue)                                     | Alta (Clojure + Rust + Docker)                     |
-| Desktop                      | Tauri v2 (programma di installazione macOS di circa 20 MB) | Non disponibile (solo browser)                     |
-| Bacino di sviluppatori       | Enorme (sviluppatori TypeScript/Vue)                       | Minimo (ClojureScript + Rust)                      |
+| Metrica                      | Pairdraw                                                   | Penpot                                       |
+| ---------------------------- | ---------------------------------------------------------- | -------------------------------------------- |
+| Preparazione                 | `bun install && bun dev`                                   | Docker Compose + JVM + Node + strumenti Rust |
+| Aggiornamento rapido         | Vite HMR                                                   | shadow-cljs                                  |
+| Controllo dei tipi           | TypeScript (rigoroso)                                      | Durante l’esecuzione (schemi Malli)          |
+| Compilazione                 | Vite e Cargo                                               | Avvio JVM + compilazione CLJS + Rust WASM    |
+| Barriera al primo contributo | Bassa (TypeScript/Vue)                                     | Alta (Clojure + Rust + Docker)               |
+| Desktop                      | Tauri v2 (programma di installazione macOS di circa 20 MB) | Non disponibile (solo browser)               |
+| Bacino di sviluppatori       | Enorme (sviluppatori TypeScript/Vue)                       | Minimo (ClojureScript + Rust)                |
 
 ## 9. Prestazioni
 
-| Scenario                  | Pairdraw                             | Penpot                                           |
-| ------------------------- | ------------------------------------ | ------------------------------------------------ |
-| Avvio a freddo            | meno di 2 s (caricamento WASM)       | oltre 10 s (server + client + WASM)              |
-| Latenza di un’operazione  | meno di 1 ms (nello stesso processo) | 10–50 ms (andata e ritorno di rete)              |
-| Fotogramma                | Chiamata diretta a Skia              | CLJS → JS → WASM FFI → Skia                      |
-| Memoria di base           | circa 50 MB (scheda del browser)     | oltre 300 MB (JVM + Postgres + Valkey + browser) |
-| Uso senza rete            | Completo (architettura locale)       | Nessuno (dipende dal server)                     |
-| Rendering di 10.000 forme | Una passata, senza cache             | A riquadri con 11 superfici                      |
+Sono differenze di struttura, non misurazioni: i due editor non sono stati misurati uno accanto all’altro.
+
+| Scenario                  | Pairdraw                               | Penpot                                   |
+| ------------------------- | -------------------------------------- | ---------------------------------------- |
+| Avvio a freddo            | Caricare i moduli WASM                 | Avviare il server, poi il client e WASM  |
+| Percorso di un’operazione | Nello stesso processo                  | Andata e ritorno di rete verso il server |
+| Fotogramma                | Chiamata diretta a Skia                | CLJS → JS → WASM FFI → Skia              |
+| Processi in esecuzione    | Una scheda del browser o l’app desktop | JVM + Postgres + Valkey + browser        |
+| Uso senza rete            | Completo (architettura locale)         | Nessuno (dipende dal server)             |
+| Rendering di 10.000 forme | Una passata, senza cache               | A riquadri con 11 superfici              |
 
 ## 10. Cosa fa meglio Penpot
 

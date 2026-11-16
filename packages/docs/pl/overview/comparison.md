@@ -249,23 +249,25 @@ Podejście Pairdraw jest prostsze i ma mniejszy narzut. Podejście Penpota lepie
 | Wskaźnik                 | Pairdraw                                    | Penpot                                           |
 | ------------------------ | ------------------------------------------- | ------------------------------------------------ |
 | Przygotowanie środowiska | `bun install && bun dev`                    | Docker Compose, JVM, Node i zestaw narzędzi Rust |
-| Szybkie odświeżanie      | Vite HMR (około 50 ms)                      | shadow-cljs (sekundy)                            |
+| Szybkie odświeżanie      | Vite HMR                                    | shadow-cljs                                      |
 | Sprawdzanie typów        | TypeScript (tryb ścisły)                    | Podczas działania (schematy Malli)               |
-| Czas budowania           | poniżej 5 s (Vite)                          | Minuty (start JVM, kompilacja CLJS i Rust WASM)  |
+| Budowanie                | Vite i Cargo                                | Start JVM, kompilacja CLJS i Rust WASM           |
 | Próg pierwszego wkładu   | Niski (TypeScript/Vue)                      | Wysoki (Clojure, Rust i Docker)                  |
 | Aplikacja komputerowa    | Tauri v2 (instalator dla macOS około 20 MB) | Brak (tylko przeglądarka)                        |
 | Dostępność programistów  | Ogromna (programiści TypeScript/Vue)        | Bardzo mała (ClojureScript i Rust)               |
 
 ## 9. Charakterystyka wydajności
 
-| Scenariusz                    | Pairdraw                                | Penpot                                              |
-| ----------------------------- | --------------------------------------- | --------------------------------------------------- |
-| Zimny start                   | poniżej 2 s (ładowanie WASM)            | ponad 10 s (serwer, klient i WASM)                  |
-| Opóźnienie operacji           | poniżej 1 ms (w tym samym procesie)     | 10–50 ms (wymiana sieciowa)                         |
-| Klatka                        | Bezpośrednie wywołanie Skia             | CLJS → JS → WASM FFI → Skia                         |
-| Pamięć bazowa                 | około 50 MB (karta przeglądarki)        | ponad 300 MB (JVM, Postgres, Valkey i przeglądarka) |
-| Praca bez sieci               | Pełna (architektura lokalna)            | Brak (zależność od serwera)                         |
-| Renderowanie 10 000 kształtów | Jedno przejście, bez pamięci podręcznej | Kafelki i 11 powierzchni                            |
+To różnice w budowie, nie pomiary: żadnego z edytorów nie zmierzono obok drugiego.
+
+| Scenariusz                    | Pairdraw                                          | Penpot                               |
+| ----------------------------- | ------------------------------------------------- | ------------------------------------ |
+| Zimny start                   | Wczytanie modułów WASM                            | Start serwera, potem klienta i WASM  |
+| Droga operacji                | W tym samym procesie                              | Wymiana sieciowa z serwerem          |
+| Klatka                        | Bezpośrednie wywołanie Skia                       | CLJS → JS → WASM FFI → Skia          |
+| Uruchomione procesy           | Jedna karta przeglądarki lub aplikacja desktopowa | JVM, Postgres, Valkey i przeglądarka |
+| Praca bez sieci               | Pełna (architektura lokalna)                      | Brak (zależność od serwera)          |
+| Renderowanie 10 000 kształtów | Jedno przejście, bez pamięci podręcznej           | Kafelki i 11 powierzchni             |
 
 ## 10. W czym Penpot jest lepszy
 

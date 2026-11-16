@@ -246,26 +246,28 @@ Pairdraws Ansatz ist einfacher und verursacht weniger Aufwand. Penpots Ansatz ei
 
 ## 8. Entwicklererfahrung
 
-| Metrik                       | Pairdraw                              | Penpot                                            |
-| ---------------------------- | ------------------------------------- | ------------------------------------------------- |
-| Einrichtung                  | `bun install && bun dev`              | Docker Compose, JVM, Node und Rust-Toolchain      |
-| Hot Reload                   | Vite HMR (rund 50 ms)                 | shadow-cljs (Sekunden)                            |
-| Typprüfung                   | TypeScript (strikt)                   | Zur Laufzeit (Malli-Schemas)                      |
-| Build-Zeit                   | unter 5 s (Vite)                      | Minuten (JVM-Start, CLJS-Kompilierung, Rust WASM) |
-| Hürde für den ersten Beitrag | Niedrig (TS/Vue)                      | Hoch (Clojure, Rust, Docker)                      |
-| Desktop                      | Tauri v2 (macOS-Installer rund 20 MB) | Keine (nur Browser)                               |
-| Bewerberpool                 | Riesig (TS/Vue-Entwickler)            | Winzig (ClojureScript und Rust)                   |
+| Metrik                       | Pairdraw                              | Penpot                                       |
+| ---------------------------- | ------------------------------------- | -------------------------------------------- |
+| Einrichtung                  | `bun install && bun dev`              | Docker Compose, JVM, Node und Rust-Toolchain |
+| Hot Reload                   | Vite HMR                              | shadow-cljs                                  |
+| Typprüfung                   | TypeScript (strikt)                   | Zur Laufzeit (Malli-Schemas)                 |
+| Build                        | Vite und Cargo                        | JVM-Start, CLJS-Kompilierung, Rust WASM      |
+| Hürde für den ersten Beitrag | Niedrig (TS/Vue)                      | Hoch (Clojure, Rust, Docker)                 |
+| Desktop                      | Tauri v2 (macOS-Installer rund 20 MB) | Keine (nur Browser)                          |
+| Bewerberpool                 | Riesig (TS/Vue-Entwickler)            | Winzig (ClojureScript und Rust)              |
 
 ## 9. Leistungsmerkmale
 
-| Szenario                  | Pairdraw                  | Penpot                                          |
-| ------------------------- | ------------------------- | ----------------------------------------------- |
-| Kaltstart                 | unter 2 s (WASM laden)    | über 10 s (Server, Client und WASM)             |
-| Latenz einer Operation    | unter 1 ms (im Prozess)   | 10–50 ms (Netzwerk-Roundtrip)                   |
-| Render-Frame              | Direkter Skia-Aufruf      | CLJS → JS → WASM-FFI → Skia                     |
-| Grundbedarf an Speicher   | rund 50 MB (Browser-Tab)  | über 300 MB (JVM, Postgres, Valkey und Browser) |
-| Offlinefähigkeit          | Vollständig (lokal)       | Keine (serverabhängig)                          |
-| Rendern von 10.000 Formen | Ein Durchgang, ohne Cache | Kachelbasiert mit 11 Flächen                    |
+Das sind strukturelle Unterschiede, keine Benchmarks: Beide Editoren wurden nicht nebeneinander gemessen.
+
+| Szenario                  | Pairdraw                             | Penpot                               |
+| ------------------------- | ------------------------------------ | ------------------------------------ |
+| Kaltstart                 | WASM-Module laden                    | Server starten, dann Client und WASM |
+| Weg einer Operation       | Im Prozess                           | Netzwerk-Roundtrip zum Backend       |
+| Render-Frame              | Direkter Skia-Aufruf                 | CLJS → JS → WASM-FFI → Skia          |
+| Laufende Prozesse         | Ein Browser-Tab oder die Desktop-App | JVM, Postgres, Valkey und Browser    |
+| Offlinefähigkeit          | Vollständig (lokal)                  | Keine (serverabhängig)               |
+| Rendern von 10.000 Formen | Ein Durchgang, ohne Cache            | Kachelbasiert mit 11 Flächen         |
 
 ## 10. Was Penpot besser macht
 

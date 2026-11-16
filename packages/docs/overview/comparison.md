@@ -246,26 +246,28 @@ Pairdraw's approach is simpler and lower overhead. Penpot's approach is more sui
 
 ## 8. Developer Experience
 
-| Metric                     | Pairdraw                               | Penpot                                           |
-| -------------------------- | -------------------------------------- | ------------------------------------------------ |
-| Dev setup                  | `bun install && bun dev`               | Docker Compose + JVM + Node + Rust toolchain     |
-| Hot reload                 | Vite HMR (~50ms)                       | shadow-cljs (seconds)                            |
-| Type checking              | TypeScript (strict)                    | Runtime (Malli schemas)                          |
-| Build time                 | <5s (Vite)                             | Minutes (JVM startup + CLJS compile + Rust WASM) |
-| First contribution barrier | Low (TS/Vue)                           | High (Clojure + Rust + Docker)                   |
-| Desktop                    | Tauri v2 (macOS installer about 20 MB) | N/A (browser-only)                               |
-| Hiring pool                | Massive (TS/Vue devs)                  | Tiny (ClojureScript + Rust)                      |
+| Metric                     | Pairdraw                               | Penpot                                       |
+| -------------------------- | -------------------------------------- | -------------------------------------------- |
+| Dev setup                  | `bun install && bun dev`               | Docker Compose + JVM + Node + Rust toolchain |
+| Hot reload                 | Vite HMR                               | shadow-cljs                                  |
+| Type checking              | TypeScript (strict)                    | Runtime (Malli schemas)                      |
+| Build                      | Vite and Cargo                         | JVM startup + CLJS compile + Rust WASM       |
+| First contribution barrier | Low (TS/Vue)                           | High (Clojure + Rust + Docker)               |
+| Desktop                    | Tauri v2 (macOS installer about 20 MB) | N/A (browser-only)                           |
+| Hiring pool                | Massive (TS/Vue devs)                  | Tiny (ClojureScript + Rust)                  |
 
 ## 9. Performance Characteristics
 
-| Scenario           | Pairdraw             | Penpot                                      |
-| ------------------ | -------------------- | ------------------------------------------- |
-| Cold start         | <2s (WASM load)      | 10s+ (server + client + WASM)               |
-| Operation latency  | <1ms (in-process)    | 10-50ms (network round-trip)                |
-| Render frame       | Direct Skia call     | CLJS→JS→WASM FFI→Skia                       |
-| Memory baseline    | ~50MB (browser tab)  | ~300MB+ (JVM + Postgres + Valkey + browser) |
-| Offline capability | Full (local-first)   | None (server-dependent)                     |
-| 10K shapes render  | One pass, no caching | Tile-based with 11 surfaces                 |
+These are structural differences, not benchmarks: neither editor has been measured side by side.
+
+| Scenario           | Pairdraw                           | Penpot                                     |
+| ------------------ | ---------------------------------- | ------------------------------------------ |
+| Cold start         | Load the WASM modules              | Start the server, then the client and WASM |
+| Operation path     | In-process                         | Network round trip to the backend          |
+| Render frame       | Direct Skia call                   | CLJS→JS→WASM FFI→Skia                      |
+| Processes to run   | One browser tab or the desktop app | JVM + Postgres + Valkey + browser          |
+| Offline capability | Full (local-first)                 | None (server-dependent)                    |
+| 10K shapes render  | One pass, no caching               | Tile-based with 11 surfaces                |
 
 ## 10. What Penpot Does Better
 

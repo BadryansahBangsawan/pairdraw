@@ -246,26 +246,28 @@ L’approche de Pairdraw est plus simple et moins coûteuse. Celle de Penpot con
 
 ## 8. Expérience de développement
 
-| Mesure                              | Pairdraw                                                  | Penpot                                                           |
-| ----------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------- |
-| Mise en place                       | `bun install && bun dev`                                  | Docker Compose, JVM, Node et outils Rust                         |
-| Rechargement à chaud                | Vite HMR (environ 50 ms)                                  | shadow-cljs (plusieurs secondes)                                 |
-| Vérification des types              | TypeScript (strict)                                       | À l’exécution (schémas Malli)                                    |
-| Temps de build                      | moins de 5 s (Vite)                                       | Plusieurs minutes (démarrage JVM, compilation CLJS et Rust WASM) |
-| Barrière à la première contribution | Faible (TS/Vue)                                           | Élevée (Clojure, Rust et Docker)                                 |
-| Bureau                              | Tauri v2 (programme d’installation macOS d’environ 20 Mo) | Aucun (navigateur uniquement)                                    |
-| Vivier de recrutement               | Immense (développeurs TS/Vue)                             | Minuscule (ClojureScript et Rust)                                |
+| Mesure                              | Pairdraw                                                  | Penpot                                       |
+| ----------------------------------- | --------------------------------------------------------- | -------------------------------------------- |
+| Mise en place                       | `bun install && bun dev`                                  | Docker Compose, JVM, Node et outils Rust     |
+| Rechargement à chaud                | Vite HMR                                                  | shadow-cljs                                  |
+| Vérification des types              | TypeScript (strict)                                       | À l’exécution (schémas Malli)                |
+| Build                               | Vite et Cargo                                             | Démarrage JVM, compilation CLJS et Rust WASM |
+| Barrière à la première contribution | Faible (TS/Vue)                                           | Élevée (Clojure, Rust et Docker)             |
+| Bureau                              | Tauri v2 (programme d’installation macOS d’environ 20 Mo) | Aucun (navigateur uniquement)                |
+| Vivier de recrutement               | Immense (développeurs TS/Vue)                             | Minuscule (ClojureScript et Rust)            |
 
 ## 9. Performances
 
-| Scénario                | Pairdraw                             | Penpot                                                       |
-| ----------------------- | ------------------------------------ | ------------------------------------------------------------ |
-| Démarrage à froid       | moins de 2 s (chargement WASM)       | plus de 10 s (serveur, client et WASM)                       |
-| Latence d’une opération | moins de 1 ms (dans le processus)    | 10 à 50 ms (aller-retour réseau)                             |
-| Rendu d’une image       | Appel direct à Skia                  | CLJS → JS → WASM FFI → Skia                                  |
-| Mémoire de base         | environ 50 Mo (onglet du navigateur) | plus de 300 Mo environ (JVM, Postgres, Valkey et navigateur) |
-| Hors ligne              | Complet (architecture locale)        | Aucun (dépend du serveur)                                    |
-| Rendu de 10 000 formes  | Une passe, sans cache                | Par tuiles, avec 11 surfaces                                 |
+Ce sont des différences de structure, pas des mesures : aucun des deux éditeurs n’a été mesuré face à l’autre.
+
+| Scénario               | Pairdraw                                           | Penpot                                      |
+| ---------------------- | -------------------------------------------------- | ------------------------------------------- |
+| Démarrage à froid      | Charger les modules WASM                           | Démarrer le serveur, puis le client et WASM |
+| Chemin d’une opération | Dans le processus                                  | Aller-retour réseau vers le serveur         |
+| Rendu d’une image      | Appel direct à Skia                                | CLJS → JS → WASM FFI → Skia                 |
+| Processus à lancer     | Un onglet du navigateur ou l’application de bureau | JVM, Postgres, Valkey et navigateur         |
+| Hors ligne             | Complet (architecture locale)                      | Aucun (dépend du serveur)                   |
+| Rendu de 10 000 formes | Une passe, sans cache                              | Par tuiles, avec 11 surfaces                |
 
 ## 10. Ce que Penpot fait mieux
 

@@ -581,7 +581,7 @@ export function penDocumentFromGraph(graph: SceneGraph): PenDocument {
       .filter((node) => !node.internalOnly)
       .map((node) => writeNode(state, node))
   )
-  const document: PenDocument = { version: PEN_VERSION, children }
+  const document: PenDocument = { version: PEN_VERSION, name: graph.getPages()[0]?.name, children }
   const variablesValue = variablesOf(state)
   if (variablesValue) document.variables = variablesValue
   const themes = themesOf(state)

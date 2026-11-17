@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { parsePenFile } from '@pairdraw/pen'
+import { parsePenFile, writePenDocument } from '@pairdraw/pen'
 
 import { parseDocument } from './helpers/document'
 import { FIXTURES } from './helpers/paths'
@@ -51,5 +51,17 @@ describe('parsePenFile', () => {
 
     expect(vectors.length).toBeGreaterThan(0)
     expect(vectors.some((node) => (node.vectorNetwork?.vertices.length ?? 0) > 0)).toBe(true)
+  })
+})
+
+describe('page name', () => {
+  test('keeps the page name through a write and a read', () => {
+    const graph = parseDocument([{ id: 'card', type: 'frame', width: 320, height: 200 }])
+    const page = graph.getPages()[0]
+    page.name = 'Card'
+
+    const reread = parsePenFile(writePenDocument(graph))
+
+    expect(reread.getPages()[0].name).toBe('Card')
   })
 })

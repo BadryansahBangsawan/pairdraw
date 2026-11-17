@@ -285,6 +285,8 @@ const variableSchema = v.looseObject({
 
 const penDocumentSchema = v.looseObject({
   version: v.optional(strSchema),
+  // The page's name. The format is single-page, so it belongs to the document.
+  name: v.optional(strSchema),
   themes: v.optional(v.record(strSchema, v.array(strSchema))),
   imports: v.optional(v.record(strSchema, strSchema)),
   variables: v.optional(v.record(strSchema, variableSchema)),

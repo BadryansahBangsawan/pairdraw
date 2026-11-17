@@ -119,7 +119,7 @@ export function buildPenGraph(doc: PenDocument, options: PenReadOptions = {}): S
   for (const imported of imports.values())
     collectComponents(imported.doc.children, build.components)
 
-  const page = graph.addPage(doc.children[0]?.name ?? 'Page 1')
+  const page = graph.addPage(doc.name ?? doc.children[0]?.name ?? 'Page 1')
   for (const child of doc.children) createSceneNode(child, page.id, build)
   const libraryRoots = createLibraryRoots(doc, imports, build, createSceneNode)
   populateInstances(build)

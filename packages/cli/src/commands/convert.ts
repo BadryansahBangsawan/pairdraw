@@ -1,4 +1,3 @@
-
 import { basename, extname, resolve } from 'node:path'
 
 import { defineCommand } from 'citty'

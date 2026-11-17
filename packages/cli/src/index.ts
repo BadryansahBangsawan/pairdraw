@@ -51,7 +51,8 @@ function refuseExtraPositionals(command: CommandDef<ArgsDef>): void {
   if (args && typeof args === 'object' && !(args instanceof Promise)) {
     const declared = Object.values(args).filter((arg) => arg.type === 'positional').length
     const meta = command.meta
-    const name = meta && !(meta instanceof Promise) && typeof meta !== 'function' ? meta.name : undefined
+    const name =
+      meta && !(meta instanceof Promise) && typeof meta !== 'function' ? meta.name : undefined
     const run = command.run
     if (run && name !== VARIADIC_COMMAND) {
       command.run = (context) => {

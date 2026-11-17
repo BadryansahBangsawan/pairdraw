@@ -44,7 +44,8 @@ export class IORegistry {
     return (
       this.adapters.find(
         (adapter) =>
-          !!adapter.support.writeDocument && adapter.extensions.some((ext) => lower.endsWith(`.${ext}`))
+          !!adapter.support.writeDocument &&
+          adapter.extensions.some((ext) => lower.endsWith(`.${ext}`))
       ) ?? null
     )
   }

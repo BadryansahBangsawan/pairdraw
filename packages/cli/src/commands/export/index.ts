@@ -5,22 +5,19 @@ import { defineCommand } from 'citty'
 import { toUint8Array } from 'js-base64'
 
 import { BUILTIN_IO_FORMATS, IORegistry, type ExportResult } from '@pairdraw/core/io'
-import {
-  headlessRenderThumbnail,
-  type RasterExportFormat
-} from '@pairdraw/core/io/formats/raster'
+import { headlessRenderThumbnail, type RasterExportFormat } from '@pairdraw/core/io/formats/raster'
 import type { AutomationDocumentSummary } from '@pairdraw/core/rpc'
 
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
 import { appTargetOptions, appTargetRPCArgs } from '#cli/app/target'
 import { ok, printError, warn } from '#cli/format'
-import { numberInRange } from '#cli/options'
 import {
   loadDocument,
   populateDocumentPage,
   populateWholeDocument,
   requirePage
 } from '#cli/headless'
+import { numberInRange } from '#cli/options'
 
 import { applyExportFontPolicy, exportFontRoots, FONT_POLICIES } from './font-policy'
 import { exportStorybookFromFile } from './storybook'

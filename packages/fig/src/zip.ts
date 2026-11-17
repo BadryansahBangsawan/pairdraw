@@ -50,7 +50,7 @@ function readCentralDirectory(bytes: Uint8Array): ZipEntry[] {
   }
 
   const entries: ZipEntry[] = []
-  for (let record = offset; entries.length < count; ) {
+  for (let record = offset; entries.length < count;) {
     if (record + 46 > bytes.byteLength) {
       throw new Error('Corrupted .fig file: the ZIP directory ends early')
     }

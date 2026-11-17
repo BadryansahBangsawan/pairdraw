@@ -1,5 +1,4 @@
 import type * as HappyDOM from 'happy-dom'
-
 import type { svg2pdf } from 'svg2pdf.js'
 
 import { IS_BROWSER } from '#core/constants'

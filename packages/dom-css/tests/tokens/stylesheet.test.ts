@@ -292,7 +292,13 @@ describe('token stylesheet', () => {
 describe('colliding custom property names', () => {
   test('say which variable took a numbered name', async () => {
     const graph = new SceneGraph()
-    graph.addCollection({ id: 'brand', name: 'Brand', modes: [{ modeId: 'default', name: 'Default' }], defaultModeId: 'default', variableIds: [] } as never)
+    graph.addCollection({
+      id: 'brand',
+      name: 'Brand',
+      modes: [{ modeId: 'default', name: 'Default' }],
+      defaultModeId: 'default',
+      variableIds: []
+    } as never)
     add(graph, 'brand', 'one', 'a b', 'COLOR', { default: BLUE_500 })
     add(graph, 'brand', 'two', 'a/b', 'COLOR', { default: BLUE_300 })
     add(graph, 'brand', 'three', 'a-b', 'COLOR', { default: WHITE })

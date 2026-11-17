@@ -9,7 +9,6 @@ import { compileScript } from '@pairdraw/core/tools'
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
 import { appTargetOptions, appTargetRPCArgs } from '#cli/app/target'
 import { printError, writeStdout } from '#cli/format'
-import { requireOutputDirectory } from '#cli/options'
 import {
   documentWriteOptions,
   editDocument,
@@ -18,6 +17,7 @@ import {
   populateWholeDocument,
   writeDocumentFile
 } from '#cli/headless'
+import { requireOutputDirectory } from '#cli/options'
 import { headlessPreview } from '#cli/session/open'
 import { appPreview, previewNotice, previewOptions, previewScale } from '#cli/session/preview'
 import { createHeadlessFigma } from '#cli/tool-data'

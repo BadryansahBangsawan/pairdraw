@@ -1,4 +1,4 @@
-import { isPlainObject } from 'es-toolkit'
+import { groupBy, isPlainObject } from 'es-toolkit'
 import * as v from 'valibot'
 
 import { getComponentCatalog } from '#core/tools/component-catalog'
@@ -14,14 +14,31 @@ const variantValuesSchema = v.pipe(
 
 export const listLibraries = defineTool({
   name: 'list_libraries',
-  description: 'List available published component libraries.',
+  description:
+    'List available published component libraries and each component asset key, name, and type. Pass a key to insert_library_component. A library does not have to be enabled to be listed.',
   execution: { kind: 'async', mutation: 'none' },
   exposure: { webmcp: false },
   input: v.strictObject({}),
   execute: async (figma) => {
     const catalog = getComponentCatalog(figma.graph)
-    const libraries = catalog ? await catalog.listLibraries() : []
-    return { count: libraries.length, libraries }
+    if (!catalog) return { count: 0, libraries: [] }
+    const [libraries, components] = await Promise.all([
+      catalog.listLibraries(),
+      // Enabled-only would hide the keys of a library the document has not turned on.
+      catalog.listComponents({ enabledOnly: false })
+    ])
+    const byLibrary = groupBy(components, (component) => component.libraryId)
+    return {
+      count: libraries.length,
+      libraries: libraries.map((library) => ({
+        ...library,
+        assets: (byLibrary[library.libraryId] ?? []).map((component) => ({
+          key: component.asset.key,
+          name: component.asset.name,
+          type: component.asset.type
+        }))
+      }))
+    }
   }
 })
 

@@ -1,0 +1,1 @@
+- Library listings include each component's asset key, so a component can be inserted without already knowing that key.

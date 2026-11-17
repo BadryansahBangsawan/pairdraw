@@ -2,7 +2,6 @@ import { mapValues, pick } from 'es-toolkit'
 import * as v from 'valibot'
 
 import type { Fill, NodeType, SceneNode } from '@pairdraw/scene-graph'
-import { tryParseColor } from '@pairdraw/scene-graph/color'
 import { copyStroke } from '@pairdraw/scene-graph/copy'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
@@ -12,7 +11,7 @@ import { editNode } from '#core/figma-api/accessor-utils'
 import type { FigmaFontNameInput } from '#core/figma-api/fonts/names'
 import { getStyledTextSegments } from '#core/figma-api/text/style'
 import { collectNodeFontFaces } from '#core/text/requirements/collect'
-import { defineTool, toolFailure, toolNumber } from '#core/tools/schema'
+import { defineTool, parseToolColor, toolFailure, toolNumber } from '#core/tools/schema'
 
 import { textFonts } from './text'
 
@@ -84,6 +83,13 @@ function channels(color: Color): string {
   return [color.r, color.g, color.b].map((value) => Math.round(value * 255)).join(',')
 }
 
+/** A colour as a tool reads it, so a bad value fails with the message other tools give. */
+function colorOf(value: string): Color {
+  const parsed = parseToolColor(value)
+  if ('error' in parsed) throw new Error(parsed.error)
+  return parsed
+}
+
 interface ColorSwap {
   match: (paint: Fill) => boolean
   apply: (paint: Fill) => Fill
@@ -91,10 +97,8 @@ interface ColorSwap {
 
 /** The swap a colour pair makes; throws on a value that is not a colour. */
 function colorSwap(pair: ColorPair): ColorSwap {
-  const from = tryParseColor(pair.from)
-  const to = tryParseColor(pair.to)
-  if (!from) throw new Error(`"${pair.from}" is not a color`)
-  if (!to) throw new Error(`"${pair.to}" is not a color`)
+  const from = colorOf(pair.from)
+  const to = colorOf(pair.to)
   const key = channels(from)
   const percent = (value: number) => Math.round(value * 100)
   return {

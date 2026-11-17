@@ -8,6 +8,8 @@
 import * as v from 'valibot'
 
 import type { SceneNode } from '@pairdraw/scene-graph'
+import { tryParseColor } from '@pairdraw/scene-graph/color'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { FigmaAPI, FigmaNodeProxy } from '#core/figma-api'
 import type { FigmaFontNameInput } from '#core/figma-api/fonts/names'
@@ -163,6 +165,32 @@ export function nodeToResult(node: FigmaNodeProxy, maxDepth?: number): Record<st
 
 export function nodeSummary(node: FigmaNodeProxy): { id: string; name: string; type: string } {
   return { id: node.id, name: node.name, type: node.type }
+}
+
+/**
+ * A tool colour, refusing text that would otherwise land as black: `set_fill { color: "#GGG" }`
+ * used to paint black and report success. Read through `tryParseColor`, since a published schema
+ * cannot express what the parser accepts.
+ */
+export function parseToolColor(value: string): Color | { error: string } {
+  return (
+    tryParseColor(value) ?? {
+      error: `"${value}" is not a color; use a hex value, a color name, or a color function`
+    }
+  )
+}
+
+/**
+ * A colour the caller may leave out. Missing stays missing; text that is not a colour is the
+ * same refusal `parseToolColor` gives, so each tool does not repeat that check.
+ */
+export function parseOptionalToolColor(
+  value: string | undefined
+): { color: Color | undefined } | { error: string } {
+  if (value === undefined) return { color: undefined }
+  const parsed = parseToolColor(value)
+  if ('error' in parsed) return parsed
+  return { color: parsed }
 }
 
 export const nodeIdInputSchema = v.pipe(v.string(), v.description('Node ID'))

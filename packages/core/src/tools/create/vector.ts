@@ -1,11 +1,16 @@
 import * as v from 'valibot'
 
 import type { VectorNetwork } from '@pairdraw/scene-graph'
-import { parseColor } from '@pairdraw/scene-graph/color'
 import { parseSVGPath } from '@pairdraw/scene-graph/parse-path'
 import { transformVectorNetwork } from '@pairdraw/scene-graph/vector-network'
 
-import { defineTool, nodeSummary, positionInputs, toolNumber } from '#core/tools/schema'
+import {
+  defineTool,
+  nodeSummary,
+  parseOptionalToolColor,
+  positionInputs,
+  toolNumber
+} from '#core/tools/schema'
 import { parseVectorNetworkJSON } from '#core/tools/vector/network'
 import { computeAccurateBounds } from '#core/vector/curve-math'
 
@@ -68,6 +73,11 @@ export const createVector = defineTool({
       if ('error' in parsed) return parsed
       parsedPath = parsed
     }
+    // Both colours are read before the node exists, so a bad one creates nothing.
+    const fill = parseOptionalToolColor(args.fill)
+    if ('error' in fill) return fill
+    const stroke = parseOptionalToolColor(args.stroke)
+    if ('error' in stroke) return stroke
 
     const node = figma.createVector()
     node.x = args.x
@@ -77,15 +87,15 @@ export const createVector = defineTool({
       if (parsedPath.size) node.resize(parsedPath.size.width, parsedPath.size.height)
       figma.graph.updateNode(node.id, { vectorNetwork: parsedPath.network })
     }
-    if (args.fill) {
-      node.fills = [{ type: 'SOLID', color: parseColor(args.fill) }]
+    if (fill.color) {
+      node.fills = [{ type: 'SOLID', color: fill.color }]
     }
-    if (args.stroke) {
+    if (stroke.color) {
       figma.graph.updateNode(node.id, {
         strokes: [
           {
             type: 'SOLID',
-            color: parseColor(args.stroke),
+            color: stroke.color,
             weight: args.stroke_weight ?? 1,
             opacity: 1,
             visible: true,

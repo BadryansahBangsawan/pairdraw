@@ -1,7 +1,7 @@
 import * as v from 'valibot'
 
 import type { VariableType } from '@pairdraw/scene-graph'
-import { parseColor } from '@pairdraw/scene-graph/color'
+import { tryParseColor } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { FigmaVariableValue } from '#core/figma-api'
@@ -14,8 +14,8 @@ function figmaValue(value: ToolValue): FigmaVariableValue {
 
 type ToolValue = Color | number | string | boolean
 
-function parseVariableValue(type: VariableType, value: string): ToolValue {
-  if (type === 'COLOR') return parseColor(value)
+function parseVariableValue(type: VariableType, value: string): ToolValue | null {
+  if (type === 'COLOR') return tryParseColor(value)
   if (type === 'FLOAT') return Number(value)
   if (type === 'BOOLEAN') return value === 'true'
   return value
@@ -41,6 +41,7 @@ export const createVariable = defineTool({
     const type = args.type
     // The value is checked first, so a value the variable cannot hold creates nothing.
     const value = args.value === undefined ? undefined : parseVariableValue(type, args.value)
+    if (value === null) return { error: `"${args.value}" is not a ${type} value` }
     if (typeof value === 'number' && !Number.isFinite(value))
       return { error: `"${args.value}" is not a number` }
     const variable = figma.variables.createVariable(args.name, args.collection_id, type)
@@ -66,6 +67,8 @@ export const setVariable = defineTool({
     const variable = figma.variables.getVariableById(args.id)
     if (!variable) return { error: `Variable "${args.id}" not found` }
     const parsedValue = parseVariableValue(variable.resolvedType, args.value)
+    if (parsedValue === null)
+      return { error: `"${args.value}" is not a ${variable.resolvedType} value` }
     variable.setValueForMode(args.mode, figmaValue(parsedValue))
     return { id: args.id, mode: args.mode, value: parsedValue }
   }

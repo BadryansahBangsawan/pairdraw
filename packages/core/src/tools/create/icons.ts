@@ -1,10 +1,9 @@
 import * as v from 'valibot'
 
-import { parseColor } from '@pairdraw/scene-graph/color'
 import { iconOptionsSchema, type IconOptions } from '@pairdraw/scene-graph/icons'
 
 import { placeIcon } from '#core/icons'
-import { toolNumber, defineTool } from '#core/tools/schema'
+import { defineTool, parseToolColor, toolNumber } from '#core/tools/schema'
 
 export const fetchIconsTool = defineTool({
   name: 'fetch_icons',
@@ -127,8 +126,8 @@ export const insertIcon = defineTool({
     if (names.length === 0) return { error: 'Provide "names" (array) or "name" (string)' }
 
     const size = args.size ?? 24
-    const color = args.color ?? '#000000'
-    const parsedColor = parseColor(color)
+    const parsedColor = parseToolColor(args.color ?? '#000000')
+    if ('error' in parsedColor) return parsedColor
     const options = iconOptions(args)
 
     let icons

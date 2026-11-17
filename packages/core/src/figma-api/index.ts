@@ -53,6 +53,12 @@ import { combineComponentsAsVariants } from './variants'
 
 const noop = () => undefined
 
+/** A view of the document: its centre point and its zoom. */
+export interface FigmaViewport {
+  center: Vector
+  zoom: number
+}
+
 /** What a host passes to `FigmaAPI` beyond the document. */
 export interface FigmaAPIOptions {
   /** Fetches the HTTP(S) URLs `figma.createImageAsync` loads; the global `fetch` by default. */
@@ -62,6 +68,21 @@ export interface FigmaAPIOptions {
    * owns which page is on screen, and a plugin that switches page expects to see it switched.
    */
   onPageChange?: (pageId: string) => void | Promise<void>
+  /**
+   * Runs when a script moves the viewport, so a host can show the same view. A host owns the
+   * viewport on screen, and a plugin that pans or zooms expects to see the result.
+   */
+  onViewportChange?: (viewport: FigmaViewport) => void
+  /**
+   * The page the host already shows. Seeded here rather than assigned after construction, so a
+   * plain tool call does not ask the host to switch to the page it is already on.
+   */
+  pageId?: string
+  /**
+   * The view the host already shows, seeded for the same reason: a tool that only reads or draws
+   * must not move the viewport of whoever is looking at the document.
+   */
+  viewport?: FigmaViewport
 }
 
 export { FigmaNodeProxy } from './proxy'
@@ -127,6 +148,7 @@ export class FigmaAPI implements NodeProxyHost {
   /** How `createImageAsync` fetches HTTP(S) URLs; a host passes one that gets past CORS. */
   readonly #fetch: images.ImageFetch
   readonly #onPageChange: ((pageId: string) => void | Promise<void>) | undefined
+  readonly #onViewportChange: ((viewport: FigmaViewport) => void) | undefined
   /** The last host page switch, so `setCurrentPageAsync` can wait for it. */
   #pageChange: Promise<void> = Promise.resolve()
 
@@ -134,10 +156,17 @@ export class FigmaAPI implements NodeProxyHost {
     this.graph = graph
     this.#fetch = options.fetch ?? ((input, init) => fetch(input, init))
     this.#onPageChange = options.onPageChange
+    this.#onViewportChange = options.onViewportChange
     this.variables = new FigmaVariablesAPI(graph)
     startPendingLayout(graph)
-    const pages = graph.getPages()
-    this._currentPageId = pages[0]?.id ?? graph.rootId
+    this._currentPageId = pageIdToStart(graph, options.pageId)
+    if (options.viewport) {
+      this._viewport = {
+        x: options.viewport.center.x,
+        y: options.viewport.center.y,
+        zoom: options.viewport.zoom
+      }
+    }
   }
 
   setRenderer(renderer: SkiaRenderer | null): void {
@@ -510,9 +539,7 @@ export class FigmaAPI implements NodeProxyHost {
 
   private _viewport = { x: 0, y: 0, zoom: 1 }
 
-  get viewport(): {
-    center: Vector
-    zoom: number
+  get viewport(): FigmaViewport & {
     scrollAndZoomIntoView: (nodes: readonly { absoluteBoundingBox: Rect }[]) => void
   } {
     return {
@@ -528,13 +555,26 @@ export class FigmaAPI implements NodeProxyHost {
         const viewW = IS_BROWSER ? window.innerWidth : 1280
         const viewH = IS_BROWSER ? window.innerHeight : 720
         const zoom = Math.min(viewW / contentW, viewH / contentH, 1)
+        // A script scrolling to its own result must not move the view someone else is looking at:
+        // only `viewport` and a page switch do that.
         this._viewport = { x: b.x + b.width / 2, y: b.y + b.height / 2, zoom }
       }
     }
   }
 
-  set viewport(v: { center: Vector; zoom: number }) {
-    this._viewport = { x: v.center.x, y: v.center.y, zoom: v.zoom }
+  set viewport(v: FigmaViewport) {
+    this._showViewport({ x: v.center.x, y: v.center.y, zoom: v.zoom })
+  }
+
+  /**
+   * Moves the viewport and puts the host on the same view. A tool that scrolls nodes into view
+   * does not call this: only a viewport a writer asks for moves the view of whoever is looking.
+   */
+  private _showViewport(next: { x: number; y: number; zoom: number }): void {
+    const current = this._viewport
+    this._viewport = next
+    if (current.x === next.x && current.y === next.y && current.zoom === next.zoom) return
+    this.#onViewportChange?.({ center: { x: next.x, y: next.y }, zoom: next.zoom })
   }
 
   createImage(data: Uint8Array): Image {
@@ -619,4 +659,10 @@ export class FigmaAPI implements NodeProxyHost {
   rasterCodec?: RasterCodec
   /** The document as it was before the current AI run first edited `pageId`, or null if unedited. */
   changeBaseline?: (pageId: string) => SceneGraph | null
+}
+
+/** The page an API starts on: the one the host shows, else the document's first page. */
+function pageIdToStart(graph: SceneGraph, pageId?: string): string {
+  const pages = graph.getPages()
+  return pageId ?? (pages.length > 0 ? pages[0].id : graph.rootId)
 }

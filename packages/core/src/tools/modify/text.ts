@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-import { parseColor } from '@pairdraw/scene-graph/color'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import type { FigmaAPI, FigmaNodeProxy } from '#core/figma-api'
 import type { FigmaFontName, FigmaFontNameInput } from '#core/figma-api/fonts/names'
@@ -9,6 +9,7 @@ import { PairdrawAPI } from '#core/pairdraw-api'
 import { normalizeLinkURL } from '#core/text/hyperlink'
 import { collectNodeFontFaces } from '#core/text/requirements/collect'
 import {
+  parseOptionalToolColor,
   toolNumber,
   nodeIdInputSchema,
   defineTool,
@@ -90,9 +91,11 @@ export const setText = defineTool({
 })
 
 /** Variable font axes a font tool can set, as Figma's `variationSettings`. */
+// An object with a value for every key rather than a record: a record publishes `propertyNames`,
+// which OpenAI refuses, and a JSON object's keys are strings anyway.
 const variationsInputSchema = v.optional(
   v.pipe(
-    v.record(v.pipe(v.string(), v.length(4)), v.number()),
+    v.objectWithRest({}, v.number()),
     v.description(
       'Variable font axis values by OpenType tag (e.g. {"wght": 550, "wdth": 75}); axes left out keep the style\'s values. Without a style, the nearest named style is picked.'
     )
@@ -162,6 +165,8 @@ export const setFont = defineTool({
   execute: (figma, args) => {
     const node = figma.getNodeById(args.id)
     if (!node) return nodeNotFound(args.id)
+    const badTag = badVariationTag(args.variations)
+    if (badTag) return badTag
     const font = requestedFont(node, args)
     try {
       if (font && 'whole' in font) node.fontName = font.whole
@@ -183,6 +188,46 @@ function rangeFont(
   const inText = args.start < node.characters.length
   const current = inText ? node.getRangeFontName(args.start, args.start + 1) : node.fontName
   return fontNameInput(args, typeof current === 'symbol' ? null : current)
+}
+
+type RangeEdit = {
+  hyperlink: { link: { type: 'URL'; value: string } | null } | null
+  color: Color | undefined
+}
+
+/** Why a variation setting cannot apply: an axis tag is not four letters. */
+function badVariationTag(variations: FigmaVariationSettings | undefined): { error: string } | null {
+  const tag = Object.keys(variations ?? {}).find((key) => key.length !== 4)
+  return tag === undefined ? null : { error: `"${tag}" is not a four-letter OpenType axis tag` }
+}
+
+/** What a range edit sets, or why it cannot run: nothing named, a bad colour, or a bad link. */
+function rangeEdit(args: {
+  family?: string
+  size?: number
+  style?: string
+  variations?: unknown
+  color?: string
+  hyperlink?: string | null
+}): RangeEdit | { error: string } {
+  if (
+    !args.family &&
+    !args.size &&
+    !args.style &&
+    !args.variations &&
+    !args.color &&
+    args.hyperlink === undefined
+  ) {
+    return {
+      error:
+        'set_font_range needs at least one of family, size, style, variations, color, or hyperlink'
+    }
+  }
+  const hyperlink = requestedHyperlink(args.hyperlink)
+  if (hyperlink && 'error' in hyperlink) return hyperlink
+  const color = parseOptionalToolColor(args.color)
+  if ('error' in color) return color
+  return { hyperlink: hyperlink ?? null, color: color.color }
 }
 
 export const setFontRange = defineTool({
@@ -213,30 +258,18 @@ export const setFontRange = defineTool({
     const node = figma.getNodeById(args.id)
     if (!node) return nodeNotFound(args.id)
     const { start, end } = args
-    if (
-      !args.family &&
-      !args.size &&
-      !args.style &&
-      !args.variations &&
-      !args.color &&
-      args.hyperlink === undefined
-    ) {
-      return {
-        error:
-          'set_font_range needs at least one of family, size, style, variations, color, or hyperlink'
-      }
-    }
-    const hyperlink = requestedHyperlink(args.hyperlink)
-    if (hyperlink && 'error' in hyperlink) return hyperlink
+    const badTag = badVariationTag(args.variations)
+    if (badTag) return badTag
+    const edit = rangeEdit(args)
+    if ('error' in edit) return edit
+    const { hyperlink, color } = edit
     // The range methods reject an empty range or one past the text, before changing anything.
     try {
       if (args.size) node.setRangeFontSize(start, end, args.size)
       if (args.family || args.style || args.variations) {
         node.setRangeFontName(start, end, rangeFont(node, args))
       }
-      if (args.color) {
-        node.setRangeFills(start, end, [{ type: 'SOLID', color: parseColor(args.color) }])
-      }
+      if (color) node.setRangeFills(start, end, [{ type: 'SOLID', color }])
       if (hyperlink) node.setRangeHyperlink(start, end, hyperlink.link)
     } catch (error) {
       return toolFailure(error)

@@ -35,8 +35,18 @@ export function makeFigmaFromStore(
 ): FigmaAPI {
   const api = new FigmaAPI(store.graph, {
     fetch: imageFetch,
-    // The editor owns the page on screen, so the page a tool switches to is the page it shows.
-    onPageChange: (id) => (id === store.state.currentPageId ? undefined : store.switchPage(id))
+    // The page and view the editor already shows are seeded, so a tool that only reads or draws
+    // leaves them alone; one that switches page or sets the viewport moves the editor.
+    pageId,
+    viewport: {
+      center: {
+        x: (-store.state.panX + window.innerWidth / 2) / store.state.zoom,
+        y: (-store.state.panY + window.innerHeight / 2) / store.state.zoom
+      },
+      zoom: store.state.zoom
+    },
+    onPageChange: (id) => (id === store.state.currentPageId ? undefined : store.switchPage(id)),
+    onViewportChange: ({ center, zoom }) => store.centerOn(center.x, center.y, zoom)
   })
   // `vectorize_image` runs on the service and key set up in Settings, which stay in the app.
   bindAgentImageVectorizer(store)
@@ -48,7 +58,6 @@ export function makeFigmaFromStore(
   api.setRenderer(store.renderer ?? null)
   api.icons = store.iconProvider
   api.theme = store.state.theme ?? 'light'
-  api.currentPage = api.wrapNode(pageId)
   // The user's selection belongs to the page on screen.
   api.currentPage.selection =
     pageId === store.state.currentPageId
@@ -56,13 +65,6 @@ export function makeFigmaFromStore(
           .map((id) => api.getNodeById(id))
           .filter((n): n is NonNullable<typeof n> => n !== null)
       : []
-  api.viewport = {
-    center: {
-      x: (-store.state.panX + window.innerWidth / 2) / store.state.zoom,
-      y: (-store.state.panY + window.innerHeight / 2) / store.state.zoom
-    },
-    zoom: store.state.zoom
-  }
   api.exportImage = async (nodeIds, opts) =>
     renderAutomationImage(
       store,

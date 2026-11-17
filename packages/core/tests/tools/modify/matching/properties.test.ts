@@ -222,15 +222,21 @@ describe('replace_matching_properties', () => {
     ).toEqual([other.id])
   })
 
-  test('reports a bad color or an empty request without changing anything', () => {
+  test('reports a bad color, an empty request, and a missing layer as different failures', () => {
     const { graph, figma, card } = setup()
-    expect(run(figma, { fill_color: [{ from: 'reddish', to: '#000' }] })).toEqual({
-      error: '"reddish" is not a color'
-    })
-    expect(run(figma, {})).toEqual({ error: 'Name at least one property to replace' })
-    expect(run(figma, { ids: ['9:9'], font_size: [{ from: 1, to: 2 }] })).toEqual({
-      error: 'Node "9:9" not found'
-    })
+    const badColor = run(figma, { fill_color: [{ from: 'reddish', to: '#000' }] })
+    const empty = run(figma, {})
+    const missing = run(figma, { ids: ['9:9'], font_size: [{ from: 1, to: 2 }] })
+
+    // Each failure names the input that caused it, so the three cannot pass as one shared error.
+    expect(badColor.error).toContain('reddish')
+    expect(badColor.error).not.toContain('9:9')
+    expect(missing.error).toContain('9:9')
+    expect(missing.error).not.toContain('reddish')
+    expect(empty.error).not.toContain('reddish')
+    expect(empty.error).not.toContain('9:9')
+    expect(new Set([badColor.error, empty.error, missing.error]).size).toBe(3)
+    for (const result of [badColor, empty, missing]) expect(result.ids).toBeUndefined()
     expect(graph.getNode(card.id)?.fills[0]?.color).toEqual(RED)
   })
 })

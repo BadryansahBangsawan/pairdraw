@@ -1,10 +1,10 @@
-import { FigmaAPI, type FigmaNodeProxy } from '@pairdraw/core/figma-api'
+import { FigmaAPI, type FigmaAPIOptions, type FigmaNodeProxy } from '@pairdraw/core/figma-api'
 import { fontManager } from '@pairdraw/core/text'
 import { SceneGraph, type Fill } from '@pairdraw/scene-graph'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
-export function createAPI(): FigmaAPI {
-  return new FigmaAPI(new SceneGraph())
+export function createAPI(options?: FigmaAPIOptions): FigmaAPI {
+  return new FigmaAPI(new SceneGraph(), options)
 }
 
 /**

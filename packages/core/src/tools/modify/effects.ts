@@ -1,10 +1,14 @@
 import * as v from 'valibot'
 
-import { parseColor } from '@pairdraw/scene-graph/color'
-
 import { DEFAULT_SHADOW_COLOR } from '#core/constants'
 import type { FigmaEffect } from '#core/figma-api/effects'
-import { toolNumber, nodeIdInputSchema, defineTool, nodeNotFound } from '#core/tools/schema'
+import {
+  defineTool,
+  nodeIdInputSchema,
+  nodeNotFound,
+  parseOptionalToolColor,
+  toolNumber
+} from '#core/tools/schema'
 
 export const setEffects = defineTool({
   name: 'set_effects',
@@ -30,6 +34,9 @@ export const setEffects = defineTool({
   execute: (figma, args) => {
     const node = figma.getNodeById(args.id)
     if (!node) return nodeNotFound(args.id)
+    const parsedColor = parseOptionalToolColor(args.color)
+    if ('error' in parsedColor) return parsedColor
+    const shadowColor = parsedColor.color ?? { ...DEFAULT_SHADOW_COLOR }
 
     const effect: FigmaEffect =
       args.type === 'FOREGROUND_BLUR' || args.type === 'BACKGROUND_BLUR'
@@ -41,7 +48,7 @@ export const setEffects = defineTool({
           }
         : {
             type: args.type,
-            color: args.color ? parseColor(args.color) : { ...DEFAULT_SHADOW_COLOR },
+            color: shadowColor,
             offset: { x: args.offset_x, y: args.offset_y },
             radius: args.radius,
             spread: args.spread,

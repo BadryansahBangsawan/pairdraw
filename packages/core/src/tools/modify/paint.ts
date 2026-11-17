@@ -1,12 +1,17 @@
 import { isValid, toUint8Array } from 'js-base64'
 import * as v from 'valibot'
 
-import { parseColor } from '@pairdraw/scene-graph/color'
 import { gradientTransformRows, linearGradientTransform } from '@pairdraw/scene-graph/gradient'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { storeImage } from '#core/figma-api/images'
-import { defineTool, nodeIdInputSchema, toolFailure, toolNumber } from '#core/tools/schema'
+import {
+  defineTool,
+  nodeIdInputSchema,
+  parseToolColor,
+  toolFailure,
+  toolNumber
+} from '#core/tools/schema'
 
 /**
  * Stretch as Figma's API writes it: a crop whose window is the whole image, which the image fill
@@ -40,10 +45,12 @@ export const setFill = defineTool({
     const node = figma.getNodeById(id)
     if (!node) return { error: `Node "${id}" not found` }
 
-    const c = parseColor(color)
+    const c = parseToolColor(color)
+    if ('error' in c) return c
 
     if (gradient && color_end) {
-      const cEnd = parseColor(color_end)
+      const cEnd = parseToolColor(color_end)
+      if ('error' in cEnd) return cEnd
       // Edge middles of the layer's unit square that each direction runs between.
       const ends: Record<string, [Vector, Vector]> = {
         'top-bottom': [
@@ -104,7 +111,8 @@ export const setStroke = defineTool({
     const node = figma.getNodeById(id)
     if (!node) return { error: `Node "${id}" not found` }
 
-    const c = parseColor(color)
+    const c = parseToolColor(color)
+    if ('error' in c) return c
     node.strokes = [{ type: 'SOLID', color: c }]
     node.strokeWeight = weight
     node.strokeAlign = align

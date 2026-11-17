@@ -163,8 +163,12 @@ export const exportImage = defineTool({
   exposure: { webmcp: false },
   input: v.strictObject({
     ...exportInputs,
+    // Letter case does not matter here, as it does not for the other tools' options.
     format: v.optional(
-      v.pipe(v.picklist(['PNG', 'JPG', 'WEBP']), v.description('Image format')),
+      v.pipe(
+        v.picklist(['PNG', 'JPG', 'WEBP', 'png', 'jpg', 'webp']),
+        v.description('Image format: PNG, JPG, or WEBP')
+      ),
       'PNG'
     ),
     quality: v.optional(

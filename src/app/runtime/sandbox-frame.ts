@@ -85,6 +85,13 @@ export function runInSandboxFrame<T>(frame: SandboxFrame, run: SandboxRun<T>): P
       frame.postMessage(run.request, '*')
       return
     }
+    // A flood of messages queues ahead of the timer, so the timer can run late. The next message
+    // after the deadline ends the run; a message that arrives while the user holds the pointer does
+    // not, because that wait is outside the deadline.
+    if (pauses === 0 && armedAt !== 0 && Date.now() - armedAt >= remaining) {
+      finish(run.timeoutResult)
+      return
+    }
     if (run.handle?.(data, (message) => frame.postMessage(message, '*'))) return
     const result = run.read(data)
     if (result !== null) finish(result)

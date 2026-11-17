@@ -641,6 +641,56 @@ describe('plugin run session', () => {
     expect(Date.now() - started).toBeGreaterThanOrEqual(20)
   })
 
+  test('delivers calls that arrive in time and stops the run when a later call is past the deadline', async () => {
+    const now = { value: 5_000 }
+    const originalNow = Date.now
+    Date.now = () => now.value
+    const calls: string[] = []
+    let handler: ((data: unknown) => void) | undefined
+    let disposed = false
+    const frame: SandboxFrame = {
+      postMessage() {
+        return undefined
+      },
+      listen(callback) {
+        handler = callback
+        queueMicrotask(() => callback({ type: PLUGIN_SANDBOX_READY }))
+        return () => {
+          handler = undefined
+        }
+      },
+      dispose() {
+        disposed = true
+      }
+    }
+    const host: PluginHost = {
+      call: (name) => {
+        calls.push(name)
+        return Promise.resolve(null)
+      },
+      finish() {
+        return undefined
+      }
+    }
+    const send = (callId: string) =>
+      handler?.({ type: PLUGIN_SANDBOX_CALL, callId, name: 'get_selection', args: {} })
+    try {
+      const run = runPluginInFrame(frame, 'return 1', { timeoutMs: 50, host })
+      await Promise.resolve()
+      now.value = 5_010
+      send('in-time')
+      expect(calls).toEqual(['get_selection'])
+      now.value = 5_050
+      send('late')
+      expect(calls).toEqual(['get_selection'])
+      expect(disposed).toBe(true)
+      const outcome = await run
+      expect(outcome.ok).toBe(false)
+    } finally {
+      Date.now = originalNow
+    }
+  })
+
   test('a plugin program awaits what its host call returns', async () => {
     const result = await runPluginProgram(
       request('const found = await plugin.call("get_selection", { depth: 0 }); return found.marks'),

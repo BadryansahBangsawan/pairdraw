@@ -275,3 +275,26 @@ describe('eval --write format', () => {
     expect((await cli(['info', pen])).exitCode).toBe(0)
   })
 })
+
+describe('eval --output', () => {
+  test('refuses a missing output directory before running the script', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-eval-out-'))
+    const html = join(dir, 'card.html')
+    const fig = join(dir, 'card.fig')
+    await writeFile(html, '<div style="width:100px;height:40px;background:#000"></div>')
+    expect((await cli(['import', html, '-o', fig])).exitCode).toBe(0)
+
+    const result = await cli([
+      'eval',
+      fig,
+      '-c',
+      'console.log("RAN")',
+      '-o',
+      join(dir, 'missing', 'out.fig')
+    ])
+
+    expect(result.exitCode).toBe(1)
+    expect(result.stdout).not.toContain('RAN')
+    expect(result.stderr).toContain('is not a directory')
+  })
+})

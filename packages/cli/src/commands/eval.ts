@@ -1,3 +1,4 @@
+import { resolve } from 'node:path'
 import { format } from 'node:util'
 
 import { defineCommand } from 'citty'
@@ -8,6 +9,7 @@ import { compileScript } from '@pairdraw/core/tools'
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
 import { appTargetOptions, appTargetRPCArgs } from '#cli/app/target'
 import { printError, writeStdout } from '#cli/format'
+import { requireOutputDirectory } from '#cli/options'
 import {
   documentWriteOptions,
   editDocument,
@@ -95,6 +97,8 @@ export default defineCommand({
       printError(error)
       process.exit(1)
     }
+    if (args.output) await requireOutputDirectory(resolve(args.output))
+
     const preview = args['preview-output']
 
     if (isAppMode(args.file)) {

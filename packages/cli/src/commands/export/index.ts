@@ -5,6 +5,10 @@ import { defineCommand } from 'citty'
 import { toUint8Array } from 'js-base64'
 
 import { BUILTIN_IO_FORMATS, IORegistry, type ExportResult } from '@pairdraw/core/io'
+import {
+  headlessRenderThumbnail,
+  type RasterExportFormat
+} from '@pairdraw/core/io/formats/raster'
 import type { AutomationDocumentSummary } from '@pairdraw/core/rpc'
 
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
@@ -29,6 +33,7 @@ const FORMAT_LIST = `${FORMAT_IDS.slice(0, -1).join(', ')}, or ${FORMAT_IDS.at(-
 function formatSupportsScale(format: string): boolean {
   return io.getFormat(format.toLowerCase())?.exportOptions?.scale ?? false
 }
+const THUMBNAIL_FORMATS = new Set(['PNG', 'JPG', 'WEBP'])
 const JSX_STYLES = new Set(['pairdraw', 'tailwind'])
 const HTML_STYLES = new Set(['inline', 'tailwind'])
 const HTML_MODES = new Set(['fragment', 'standalone'])
@@ -251,8 +256,26 @@ async function exportFromFile(format: string, args: ExportArgs) {
   )
 
   if (args.thumbnail) {
-    printError('Thumbnail export is not supported by the shared file export path yet.')
-    process.exit(1)
+    if (!THUMBNAIL_FORMATS.has(format)) {
+      printError(`--thumbnail writes PNG, JPG, or WEBP, not ${format.toLowerCase()}.`)
+      process.exit(1)
+    }
+    const image = await headlessRenderThumbnail(
+      graph,
+      page.id,
+      Number(args.width),
+      Number(args.height),
+      format as RasterExportFormat,
+      args.quality ? Number(args.quality) : 100
+    )
+    if (!image) {
+      printError('The page has nothing to draw as a thumbnail.')
+      process.exit(1)
+    }
+    const extension = io.getFormat(format.toLowerCase())?.extensions[0] ?? format.toLowerCase()
+    await writeAndLog(resolve(args.output ?? exportFileName(defaultName, extension)), image)
+    console.log(ok(`Target: ${targetLabel(args.page, args.node, wholeDocument)}`))
+    return
   }
 
   // `--style tailwind` keeps the JSX spelling of the Tailwind JSX format.

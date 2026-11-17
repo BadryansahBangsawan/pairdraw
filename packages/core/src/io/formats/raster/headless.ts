@@ -4,7 +4,12 @@ import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { SkiaRenderer } from '#core/canvas'
 
-import { renderNodesToImage, renderThumbnail, type ExportFormat } from './render'
+import {
+  renderNodesToImage,
+  renderThumbnail,
+  type ExportFormat,
+  type RasterExportFormat
+} from './render'
 
 let cachedCk: CanvasKit | null = null
 let cachedRenderer: SkiaRenderer | null = null
@@ -59,10 +64,12 @@ export async function headlessRenderThumbnail(
   graph: SceneGraph,
   pageId: string,
   width: number,
-  height: number
+  height: number,
+  format: RasterExportFormat = 'PNG',
+  quality = 100
 ): Promise<Uint8Array | null> {
   const { ck, renderer } = await getRenderer()
   renderer.invalidateAllPictures()
   await renderer.prepareForExport(graph, pageId, graph.getNode(pageId)?.childIds ?? [])
-  return renderThumbnail(ck, renderer, graph, pageId, width, height)
+  return renderThumbnail(ck, renderer, graph, pageId, width, height, format, quality)
 }

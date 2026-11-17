@@ -366,7 +366,9 @@ export function renderThumbnail(
   graph: SceneGraph,
   pageId: string,
   width: number,
-  height: number
+  height: number,
+  format: RasterExportFormat = 'PNG',
+  quality = 100
 ): Uint8Array<ArrayBuffer> | null {
   const frame = thumbnailFrame(graph, pageId, width, height)
   if (!frame) return null
@@ -374,7 +376,7 @@ export function renderThumbnail(
   // The page's own background, which the editor's page colour matches only while it is open.
   const background = getPageColor(graph.getNode(pageId))
 
-  return renderToSurface(ck, renderer, graph, pageId, pixelW, pixelH, 'PNG', 100, (canvas) => {
+  return renderToSurface(ck, renderer, graph, pageId, pixelW, pixelH, format, quality, (canvas) => {
     canvas.clear(ck.Color4f(background.r, background.g, background.b, 1))
     canvas.translate(-bounds.minX * scale, -bounds.minY * scale)
     canvas.scale(scale, scale)

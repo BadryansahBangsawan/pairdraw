@@ -137,12 +137,16 @@ async function createRectangle(name: string, session = sessionName): Promise<str
   return layerOf(created.result).id
 }
 
-beforeEach(() => {
+beforeEach(async () => {
   setupGlobals()
   sessionSerial += 1
   sessionName = `session-${sessionSerial}`
   vi.spyOn(layoutModule, 'computeAllLayouts').mockReturnValue(undefined)
   createHomeTab()
+  // App tests share one process, and the tab list is module state.
+  for (const tab of getTabsSnapshot()) {
+    if (tab.kind !== 'home') await closeTab(tab.id, 'discard')
+  }
 })
 
 afterEach(async () => {

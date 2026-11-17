@@ -5,6 +5,7 @@ import * as figModule from '@pairdraw/core/io/formats/fig'
 import * as layoutModule from '@pairdraw/core/layout'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
+import { answerClosePrompt, closePrompt } from '@/app/document/close/prompt'
 import { readDraft, writeDraft } from '@/app/document/drafts/store'
 import { getRecoveryStore, resetRecoveryStoreForTests } from '@/app/document/recovery'
 import { createMemoryRecoveryStore } from '@/app/document/recovery/memory'
@@ -21,10 +22,11 @@ import {
   getTabForStore,
   getTabsSnapshot,
   openNewFileTab,
+  prepareForClose,
   restoreRecoverySnapshot,
   tabCount
 } from '@/app/tabs'
-import { deleteDraftEverywhere, openDraftInTab } from '@/app/tabs/open/draft'
+import { deleteDraftEverywhere, openDraftInTab, saveDraftAs } from '@/app/tabs/open/draft'
 
 import { clearTabGlobals, settleTabs, setupTabGlobals } from '#tests/helpers/tabs/globals'
 
@@ -33,6 +35,12 @@ const exportFigFile = figModule.exportFigFile
 async function keepDraft(id: string): Promise<void> {
   const figBytes = await exportFigFile(createDocumentGraph('design'), { documentName: 'Kept' })
   await writeDraft({ id, name: 'Kept', figBytes })
+}
+
+function homeTab() {
+  const home = getTabsSnapshot().find((tab) => tab.kind === 'home')
+  if (!home) throw new Error('Home is missing')
+  return home
 }
 
 /** A tab showing the draft, as opening it from Home leaves it. */
@@ -150,6 +158,54 @@ describe('opening drafts', () => {
     expect(getActiveTabId()).toBe(tab.id)
     expect(tabCount()).toBe(count)
     expect(await readDraft('new-file-held')).not.toBeNull()
+  })
+
+  test('saving a draft Home is holding shows that document', async () => {
+    await keepDraft('home-held')
+    const home = homeTab()
+    home.store.adoptDraft('home-held')
+    vi.spyOn(home.store, 'saveFigFileAs').mockResolvedValue(true)
+
+    const saved = await saveDraftAs('home-held', 'Kept')
+
+    const shown = getTabForStore(home.store)
+    if (!shown) throw new Error('The draft has no tab')
+    expect(saved.status).toBe('saved')
+    expect(shown.kind).toBe('document')
+    expect(getActiveTabId()).toBe(shown.id)
+    expect(getTabsSnapshot().some((tab) => tab.kind === 'home' && tab.store !== home.store)).toBe(
+      true
+    )
+  })
+
+  test('deleting a draft Home is holding drops it from Home', async () => {
+    await keepDraft('home-held')
+    const home = homeTab()
+    home.store.adoptDraft('home-held')
+    const node = home.store.createShape('RECTANGLE', 0, 0, 10, 10)
+
+    await deleteDraftEverywhere('home-held')
+
+    const front = homeTab()
+    expect(await readDraft('home-held')).toBeNull()
+    expect(front.store).not.toBe(home.store)
+    expect(front.store.graph.getNode(node)).toBeUndefined()
+    expect(getTabsSnapshot().some((tab) => tab.store === home.store)).toBe(false)
+  })
+
+  test('quitting asks about unsaved work Home is holding', async () => {
+    for (const tab of getTabsSnapshot()) {
+      if (tab.kind !== 'home') await closeTab(tab.id, 'discard')
+    }
+    const home = homeTab()
+    home.store.createShape('RECTANGLE', 0, 0, 10, 10)
+    const pending = prepareForClose()
+    for (let attempt = 0; attempt < 20 && closePrompt.value === null; attempt += 1) {
+      await Promise.resolve()
+    }
+    expect(closePrompt.value).not.toBeNull()
+    answerClosePrompt('discard')
+    expect(await pending).toBe(true)
   })
 
   test('a document opening never takes the place of an unchanged draft', async () => {

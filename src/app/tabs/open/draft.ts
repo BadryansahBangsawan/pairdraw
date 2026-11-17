@@ -3,14 +3,9 @@ import { recoveryMessages } from '@pairdraw/vue/i18n'
 import { deleteDraft, readDraft, touchDraft } from '@/app/document/drafts'
 import type { EditorStore } from '@/app/editor/session'
 import { saveDocumentCopy, type DocumentCopyResult } from '@/app/home/save-copy'
-import {
-  closeTab,
-  getTabsSnapshot,
-  openKeptDocument,
-  showHeldDocument,
-  switchTab,
-  type Tab
-} from '@/app/tabs'
+import { closeTab, getTabsSnapshot, openKeptDocument, switchTab, type Tab } from '@/app/tabs'
+
+import { showHeldDocument } from './held'
 
 function findDraftTab(id: string): Tab | undefined {
   return getTabsSnapshot().find((tab) => tab.store.getDraftId() === id)
@@ -46,9 +41,11 @@ export async function openDraftInTab(id: string): Promise<EditorStore> {
 export async function deleteDraftEverywhere(id: string): Promise<void> {
   const open = findDraftTab(id)
   if (open) {
+    // Home cannot close, so the draft has to be a document tab before the tab goes.
+    const shown = showHeldDocument(open)
     // A draft write still in flight would bring the row back once it is deleted.
-    await open.store.discardDraft()
-    await closeTab(open.id, 'discard')
+    await shown.store.discardDraft()
+    await closeTab(shown.id, 'discard')
   }
   await deleteDraft(id)
 }
@@ -61,10 +58,11 @@ export async function deleteDraftEverywhere(id: string): Promise<void> {
 export async function saveDraftAs(id: string, name: string): Promise<DocumentCopyResult> {
   const open = findDraftTab(id)
   if (open) {
-    switchTab(open.id)
-    const saved = await open.store.saveFigFileAs()
+    const shown = showHeldDocument(open)
+    switchTab(shown.id)
+    const saved = await shown.store.saveFigFileAs()
     return saved
-      ? { status: 'saved', name: open.store.state.documentName }
+      ? { status: 'saved', name: shown.store.state.documentName }
       : { status: 'cancelled' }
   }
   const result = await saveDocumentCopy({ kind: 'draft', draftId: id, name })

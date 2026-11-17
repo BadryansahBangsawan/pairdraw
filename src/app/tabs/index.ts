@@ -180,25 +180,6 @@ export function createHomeTab(): Tab {
   return tab
 }
 
-/**
- * Shows the store a Home or New file tab is holding as a document. The tab keeps its id, so an
- * agent still editing that document keeps its target. Home stays pinned on a fresh store: the
- * pinned tab never becomes the design.
- */
-export function showHeldDocument(tab: Tab): Tab {
-  if (tab.kind === 'document') return tab
-  const wasHome = tab.kind === 'home'
-  const shown: Tab = { id: tab.id, store: tab.store, kind: 'document' }
-  tabsRef.value = tabsRef.value.map((entry) => (entry.id === tab.id ? shown : entry))
-  if (wasHome) {
-    tabsRef.value = [
-      { id: generateTabId(), store: createEditorStore(), kind: 'home' },
-      ...tabsRef.value
-    ]
-  }
-  return shown
-}
-
 export function showNewTab(): void {
   createHomeTab()
 }
@@ -719,7 +700,9 @@ export async function openKeptDocument(kept: KeptDocument): Promise<EditorStore>
 
 export async function prepareForClose(): Promise<boolean> {
   const documents = () =>
-    tabsRef.value.filter((tab) => tab.kind === 'document').map((tab) => tab.store)
+    tabsRef.value
+      .filter((tab) => tab.kind === 'document' || tab.store.hasUnsavedChanges())
+      .map((tab) => tab.store)
   await Promise.all(documents().map(persistDraftBeforeClose))
   return confirmAllDocuments(documents)
 }

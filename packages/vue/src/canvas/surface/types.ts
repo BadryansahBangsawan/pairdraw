@@ -73,4 +73,10 @@ export interface UseCanvasOptions {
    * Receives this canvas surface's CSS viewport size after creation and resize.
    */
   onViewportResize?: (width: number, height: number) => void
+  /**
+   * Runs when the browser takes this canvas's WebGL context away. A browser may never give a lost
+   * context back, and drawing into the lost one leaves the canvas blank, so the host replaces the
+   * canvas element and the surface is made again on the new one.
+   */
+  onContextLost?: () => void
 }

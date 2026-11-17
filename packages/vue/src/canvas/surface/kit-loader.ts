@@ -1,6 +1,5 @@
-import { whenever } from '@vueuse/core'
 import type { CanvasKit } from 'canvaskit-wasm'
-import { onScopeDispose } from 'vue'
+import { onScopeDispose, watch } from 'vue'
 import type { Ref } from 'vue'
 
 import { getCanvasKit } from '@pairdraw/core/canvaskit'
@@ -15,6 +14,11 @@ type CanvasKitLoaderOptions = {
   renderNow: () => void
   onReady?: () => void
   onFailed?: (error: unknown) => void
+  /**
+   * Loads CanvasKit. Tests pass a stand-in; the canvas uses the shared loader.
+   * A default keeps the unit test from downloading the WASM module.
+   */
+  loadCanvasKit?: () => Promise<CanvasKit>
 }
 
 export function useCanvasKitLoader({
@@ -25,40 +29,57 @@ export function useCanvasKitLoader({
   loadFonts,
   renderNow,
   onReady,
-  onFailed
+  onFailed,
+  loadCanvasKit = getCanvasKit
 }: CanvasKitLoaderOptions) {
   const isDestroyed = () => lifecycle.destroyed
+  // Bumped when a new element arrives, so a start still in flight cannot make a surface
+  // on a canvas that has already been replaced.
+  let generation = 0
 
-  async function init() {
-    const canvas = canvasRef.value
-    if (!canvas || isDestroyed()) return
+  async function init(canvas: HTMLCanvasElement, generationAtStart: number) {
+    const stillCurrent = () =>
+      !isDestroyed() && canvasRef.value === canvas && generation === generationAtStart
 
-    setCanvasKit(await getCanvasKit())
-    if (isDestroyed()) return
+    if (!stillCurrent()) return
+
+    setCanvasKit(await loadCanvasKit())
+    if (!stillCurrent()) return
 
     await new Promise((resolve) => {
       requestAnimationFrame(resolve)
     })
+    if (!stillCurrent()) return
     if (!createSurface(canvas)) throw new Error('WebGL is unavailable, so the canvas cannot draw')
     await loadFonts()
-    if (isDestroyed()) return
+    if (!stillCurrent()) return
     renderNow()
     onReady?.()
   }
 
-  // Start once there is a canvas: a CanvasSurface child hands its element over after the
-  // root has mounted, so waiting for mount alone would find none.
-  whenever(
+  function start(canvas: HTMLCanvasElement) {
+    const generationAtStart = ++generation
+    void init(canvas, generationAtStart).catch((error: unknown) => {
+      if (!onFailed) throw error
+      if (!isDestroyed() && generation === generationAtStart) onFailed(error)
+    })
+  }
+
+  // A CanvasSurface child hands its element over after the root has mounted, so waiting for
+  // mount alone would find none. The app replaces the element when the browser keeps a context
+  // lost, and that new element has to start too: watching once would leave it blank. The same
+  // element does not start again.
+  watch(
     canvasRef,
-    () =>
-      void init().catch((error: unknown) => {
-        if (!onFailed) throw error
-        if (!isDestroyed()) onFailed(error)
-      }),
-    { once: true, flush: 'post', immediate: true }
+    (canvas, previous) => {
+      if (!canvas || canvas === previous) return
+      start(canvas)
+    },
+    { flush: 'post', immediate: true }
   )
 
   onScopeDispose(() => {
     lifecycle.destroyed = true
+    generation += 1
   })
 }

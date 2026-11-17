@@ -99,6 +99,12 @@ const shouldSuspendRender = () =>
 /** The pan and zoom of the scene's last drawn frame, which preview islands follow. */
 const drawnView = shallowRef<ViewportTransform | null>(null)
 
+/**
+ * Bumped when the browser takes a WebGL context away. The canvases are keyed on it, so both are
+ * replaced with fresh elements: a context the browser keeps lost can never draw again.
+ */
+const canvasEpoch = ref(0)
+
 // The tab's scene is presented only here once the canvas can draw, so waiting for it times out
 // only while it is shown and drawing, not while the renderer and its fonts download.
 let detachCanvas: (() => void) | null = null
@@ -129,6 +135,9 @@ useCanvas(sceneCanvasRef, store, {
     store.preparationController.acknowledgePresentation(sceneVersion),
   onPresentation: (colorSpace) => {
     store.state.canvasPresentation = colorSpace
+  },
+  onContextLost: () => {
+    canvasEpoch.value += 1
   }
 })
 const { hitTestSectionTitle, hitTestComponentLabel, hitTestFrameTitle, hitTestStatusLabel } =
@@ -143,7 +152,10 @@ const { hitTestSectionTitle, hitTestComponentLabel, hitTestFrameTitle, hitTestSt
     },
     shouldSuspendRender,
     getRenderState,
-    onViewportResize
+    onViewportResize,
+    onContextLost: () => {
+      canvasEpoch.value += 1
+    }
   })
 const {
   cursorOverride,
@@ -282,6 +294,7 @@ const pageBackground = computed(() => ({ backgroundColor: colorToCSS(store.state
       >
         <canvas
           ref="sceneCanvasRef"
+          :key="`scene-${canvasEpoch}`"
           :data-pane-id="paneId"
           data-test-id="scene-canvas-element"
           aria-hidden="true"
@@ -289,6 +302,7 @@ const pageBackground = computed(() => ({ backgroundColor: colorToCSS(store.state
         />
         <canvas
           ref="canvasRef"
+          :key="`overlays-${canvasEpoch}`"
           :data-pane-id="paneId"
           data-test-id="canvas-element"
           tabindex="-1"

@@ -1,5 +1,5 @@
 import type { CanvasKit } from 'canvaskit-wasm'
-import { onScopeDispose } from 'vue'
+import { onScopeDispose, watch } from 'vue'
 import type { Ref } from 'vue'
 
 import type { Editor } from '@pairdraw/core'
@@ -273,6 +273,48 @@ export function createCanvasSurfaceManager({
   }
 }
 
+/**
+ * A browser takes a canvas's WebGL context away on a GPU reset, a driver update, or a tab that
+ * comes back from sleep. Ignoring the events leaves the canvas blank for good: the loss is
+ * prevented so the context can be given back. The app replaces the element, which starts again.
+ * An SDK canvas keeps its element, so the surface is made again on that same element once the
+ * browser gives the context back.
+ */
+function connectContextRecovery(
+  canvasRef: Ref<HTMLCanvasElement | null>,
+  lifecycle: { destroyed: boolean },
+  onContextLost: (() => void) | undefined,
+  recreateSurface: (canvas: HTMLCanvasElement) => void
+): void {
+  watch(
+    canvasRef,
+    (canvas, _previous, onCleanup) => {
+      if (!canvas) return
+      const onLost = (event: Event) => {
+        // The host may replace the canvas, because a context the browser keeps lost can never be
+        // drawn into again; a fresh element gets a fresh context.
+        event.preventDefault()
+        if (lifecycle.destroyed) return
+        onContextLost?.()
+      }
+      const onRestored = () => {
+        if (lifecycle.destroyed) return
+        // A host that already swapped in a new element must not have the old one's restore
+        // rebuild a surface for a canvas that is no longer shown.
+        if (canvasRef.value !== canvas) return
+        recreateSurface(canvas)
+      }
+      canvas.addEventListener('webglcontextlost', onLost)
+      canvas.addEventListener('webglcontextrestored', onRestored)
+      onCleanup(() => {
+        canvas.removeEventListener('webglcontextlost', onLost)
+        canvas.removeEventListener('webglcontextrestored', onRestored)
+      })
+    },
+    { flush: 'post' }
+  )
+}
+
 export function useCanvasSurfaceLifecycle({
   canvasRef,
   surface,
@@ -280,7 +322,9 @@ export function useCanvasSurfaceLifecycle({
   getCanvasKitValue,
   lifecycle,
   onReady,
-  onFailed
+  onFailed,
+  onContextLost,
+  loadCanvasKit
 }: {
   canvasRef: Ref<HTMLCanvasElement | null>
   surface: ReturnType<typeof createCanvasSurfaceManager>
@@ -289,6 +333,9 @@ export function useCanvasSurfaceLifecycle({
   lifecycle: { destroyed: boolean }
   onReady?: () => void
   onFailed?: (error: unknown) => void
+  onContextLost?: () => void
+  /** Loads CanvasKit. The canvas uses the shared loader; a test can pass a stand-in. */
+  loadCanvasKit?: () => Promise<CanvasKit>
 }) {
   useCanvasKitLoader({
     canvasRef,
@@ -298,7 +345,12 @@ export function useCanvasSurfaceLifecycle({
     loadFonts: () => surface.getRenderer()?.loadFonts(surface.renderNow),
     renderNow: surface.renderNow,
     onReady,
-    onFailed
+    onFailed,
+    loadCanvasKit
+  })
+
+  connectContextRecovery(canvasRef, lifecycle, onContextLost, (canvas) => {
+    surface.createSurface(canvas, { reloadFonts: true })
   })
 
   const { cancelResize } = useCanvasResizeObserver({

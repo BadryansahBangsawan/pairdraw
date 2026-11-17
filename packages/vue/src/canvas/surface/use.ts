@@ -50,7 +50,8 @@ export function useCanvas(
       ck = value
     },
     onReady: options?.onReady,
-    onFailed: options?.onFailed
+    onFailed: options?.onFailed,
+    onContextLost: options?.onContextLost
   })
 
   // The scene surface plays shaders in preview; an overlay surface draws none.

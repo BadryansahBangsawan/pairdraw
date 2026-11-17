@@ -6,6 +6,7 @@
   "copiedProperties": "已复制属性。",
   "pngClipboardUnavailable": "此浏览器不支持将 PNG 导出到剪贴板。",
   "openFileFailed": "无法打开“{name}”：{error}",
+  "saveFailed": "无法保存“{name}”。{error}",
   "importedLibrariesNeedDesktop": "浏览器无法打开“{name}”导入的库（{paths}），因此其组件显示为占位符。请在桌面应用中打开该文件以查看它们。",
   "importedLibrariesNeedOpenDialog": "拖入的文件无法打开“{name}”导入的库（{paths}），因此其组件显示为占位符。请通过“文件 > 打开…”打开它以查看。",
   "importedLibrariesUnreadable": "无法打开“{name}”导入的库（{paths}），因此其组件显示为占位符。",

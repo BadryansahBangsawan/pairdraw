@@ -3,6 +3,7 @@ import { describe, expect, test } from 'bun:test'
 import { reactive, ref } from 'vue'
 
 import { createAutosave } from '@/app/document/autosave/create'
+import { toast } from '@/app/shell/ui'
 
 function deferred() {
   let resolve: (() => void) | null = null
@@ -13,7 +14,15 @@ function deferred() {
 }
 
 function setup(saveCurrentDocument: (version: number) => Promise<void>) {
-  const state = reactive({ autosaveEnabled: true })
+  const state = reactive<{
+    autosaveEnabled: boolean
+    documentName: string
+    saveFailure: { error: string } | null
+  }>({
+    autosaveEnabled: true,
+    documentName: 'Card',
+    saveFailure: null
+  })
   const version = ref(0)
   let savedVersion = 0
   let writable = true
@@ -31,6 +40,7 @@ function setup(saveCurrentDocument: (version: number) => Promise<void>) {
     state,
     version,
     autosave,
+    getSavedVersion: () => savedVersion,
     setWritable: (value: boolean) => {
       writable = value
     }
@@ -117,6 +127,26 @@ describe('document autosave', () => {
     await Promise.resolve()
 
     expect(started).toEqual([1, 2])
+    autosave.disposeAutosave()
+  })
+
+  test('reports a swallowed save failure and leaves the document unsaved', async () => {
+    for (const entry of toast.toasts.value) toast.remove(entry.id)
+    const { state, version, autosave, getSavedVersion } = setup(async () => {
+      throw new Error('disk full')
+    })
+    version.value = 1
+    const first = autosave.requestSave(1)
+    version.value = 2
+    void autosave.requestSave(2)
+
+    await expect(first).rejects.toThrow('disk full')
+    await Promise.resolve()
+    await Promise.resolve()
+
+    expect(getSavedVersion()).toBe(0)
+    expect(toast.toasts.value).toHaveLength(0)
+    expect(state.saveFailure).toEqual({ error: 'disk full' })
     autosave.disposeAutosave()
   })
 })

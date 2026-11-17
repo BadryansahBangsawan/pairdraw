@@ -2,6 +2,7 @@ import { createDefaultEditorState, type EditorState } from '@pairdraw/core'
 import type { DocumentColorSpace } from '@pairdraw/scene-graph'
 import type { PresentationColorSpace } from '@pairdraw/vue/canvas/surface'
 
+import type { SaveFailure } from '@/app/document/save-failure'
 import type { EditorPreparation } from '@/app/editor/preparation/types'
 import type { NodeEditState } from '@/app/editor/vector/types'
 import { appPreferences } from '@/app/settings/preferences/store'
@@ -24,6 +25,7 @@ export function createInitialAppEditorState(pageId: string): AppEditorState {
     actionToast: null,
     mobileDrawerSnap: 'closed',
     autosaveEnabled: false,
+    saveFailure: null,
     cursorCanvasX: null,
     cursorCanvasY: null,
     nodeEditState: null,
@@ -50,6 +52,8 @@ export type AppEditorState = EditorState & {
   actionToast: string | null
   mobileDrawerSnap: 'closed' | 'half' | 'full'
   autosaveEnabled: boolean
+  /** Set when a save fails, and cleared by the next save that lands. */
+  saveFailure: SaveFailure | null
   cursorCanvasX: number | null
   cursorCanvasY: number | null
   nodeEditState: NodeEditState | null

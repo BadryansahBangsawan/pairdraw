@@ -11,11 +11,13 @@ import {
 import type { ViewportSize } from '@/app/document/io/types'
 import { createDiskChangeGuard } from '@/app/document/io/watch/guard'
 import { createFileWatcher } from '@/app/document/io/watch/watcher'
+import type { SaveFailure } from '@/app/document/save-failure'
 import type { EditorPreparationController } from '@/app/editor/preparation/controller'
 
 type DocumentIOState = EditorState & {
   documentName: string
   autosaveEnabled: boolean
+  saveFailure: SaveFailure | null
 }
 
 export function createDocumentIOActions(

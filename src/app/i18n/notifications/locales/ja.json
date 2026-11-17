@@ -6,6 +6,7 @@
   "copiedProperties": "プロパティをコピーしました。",
   "pngClipboardUnavailable": "このブラウザーでは PNG をクリップボードに書き出せません。",
   "openFileFailed": "「{name}」を開けませんでした: {error}",
+  "saveFailed": "「{name}」を保存できませんでした。{error}",
   "importedLibrariesNeedDesktop": "ブラウザでは「{name}」がインポートしているライブラリ（{paths}）を開けないため、そのコンポーネントはプレースホルダーとして表示されます。表示するにはデスクトップアプリでファイルを開いてください。",
   "importedLibrariesNeedOpenDialog": "ドロップしたファイルでは「{name}」がインポートしているライブラリ（{paths}）を開けないため、そのコンポーネントはプレースホルダーとして表示されます。表示するには「ファイル > 開く…」で開いてください。",
   "importedLibrariesUnreadable": "「{name}」がインポートしているライブラリ（{paths}）を開けなかったため、そのコンポーネントはプレースホルダーとして表示されます。",

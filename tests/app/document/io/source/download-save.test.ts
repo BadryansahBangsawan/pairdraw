@@ -18,7 +18,8 @@ function createDownloadOnlyDocument() {
   const state = reactive({
     ...createDefaultEditorState('page'),
     documentName: 'Untitled',
-    autosaveEnabled: false
+    autosaveEnabled: false,
+    saveFailure: null
   })
   const source = createDocumentSourceState()
   let savedVersion = 0

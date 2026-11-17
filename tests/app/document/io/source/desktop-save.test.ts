@@ -10,15 +10,21 @@ import {
 } from '@/app/document/io/source/actions'
 import { getRecoveryStore, resetRecoveryStoreForTests } from '@/app/document/recovery'
 import { createMemoryRecoveryStore } from '@/app/document/recovery/memory'
+import type { SaveFailure } from '@/app/document/save-failure'
 
 import { clearTauriMocks, mockTauriIPC } from '#tests/helpers/tauri/mocks'
+
+function noSaveFailure(): SaveFailure | null {
+  return null
+}
 
 function createDesktopDocument(startWatchingFile: () => Promise<void>) {
   const editor = createEditor()
   const state = reactive({
     ...createDefaultEditorState('page'),
     documentName: 'Document',
-    autosaveEnabled: false
+    autosaveEnabled: false,
+    saveFailure: noSaveFailure()
   })
   const source = createDocumentSourceState()
   const actions = createDocumentSourceActions({
@@ -30,7 +36,7 @@ function createDesktopDocument(startWatchingFile: () => Promise<void>) {
     getRenderer: () => null
   })
   source.setFilePath('/tmp/document.fig')
-  return { actions }
+  return { actions, state }
 }
 
 afterEach(async () => {
@@ -47,11 +53,13 @@ describe('saving a desktop document', () => {
       return null
     })
     const startWatchingFile = vi.fn(async () => undefined)
-    const { actions } = createDesktopDocument(startWatchingFile)
+    const { actions, state } = createDesktopDocument(startWatchingFile)
+    state.saveFailure = { error: 'disk full' }
 
     actions.markDocumentChanged()
     expect(await actions.saveFigFile()).toBe(true)
 
+    expect(state.saveFailure).toBeNull()
     expect(actions.hasUnsavedChanges()).toBe(false)
     expect(startWatchingFile).toHaveBeenCalledTimes(1)
   })
@@ -62,7 +70,8 @@ describe('saving a desktop document', () => {
       throw new Error('disk full')
     })
     const startWatchingFile = vi.fn(async () => undefined)
-    const { actions } = createDesktopDocument(startWatchingFile)
+    const { actions, state } = createDesktopDocument(startWatchingFile)
+    state.saveFailure = { error: 'disk full' }
 
     actions.markDocumentChanged()
     await actions.persistRecoveryNow()
@@ -70,6 +79,7 @@ describe('saving a desktop document', () => {
     expect(await getRecoveryStore().read(recoveryId)).not.toBeNull()
 
     await expect(actions.saveFigFile()).rejects.toThrow('disk full')
+    expect(state.saveFailure).toEqual({ error: 'disk full' })
     expect(actions.hasUnsavedChanges()).toBe(true)
     expect(await getRecoveryStore().read(recoveryId)).not.toBeNull()
     expect(startWatchingFile).not.toHaveBeenCalled()

@@ -41,6 +41,7 @@ import workspaceTheme from '@/theme/editor/workspace'
 import splitterTheme from '@/theme/splitter'
 
 import EditorCanvasPrompt from './EditorCanvasPrompt.vue'
+import EditorWorkspaceSaveFailure from './EditorWorkspaceSaveFailure.vue'
 import EditorWorkspaceTopBarActions from './EditorWorkspaceTopBarActions.vue'
 import { useEditorWorkspaceLayout } from './useEditorWorkspaceLayout'
 import WorkspacePill from './WorkspacePill.vue'
@@ -158,6 +159,7 @@ const { pending: roomPending } = useRoomActions()
       <SplitterPanel id="canvas" ref="canvasPanel" :order="2" :min-size="30" class="flex">
         <div :class="workspaceStyles.canvas()">
           <CanvasSplitRoot />
+          <EditorWorkspaceSaveFailure />
           <EditorCanvasPrompt />
           <ActiveRoomOverlay />
           <EditorToolbar />

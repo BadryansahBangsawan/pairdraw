@@ -1,7 +1,13 @@
 import { watchDebounced } from '@vueuse/core'
 
+import { reportSaveFailure, type SaveFailure } from '@/app/document/save-failure'
+
 type AutosaveOptions = {
-  state: { autosaveEnabled: boolean }
+  state: {
+    autosaveEnabled: boolean
+    documentName: string
+    saveFailure: SaveFailure | null
+  }
   /** The document's content revision; rendering and layout do not advance it. */
   version: () => number
   getSavedVersion: () => number
@@ -36,6 +42,7 @@ export function createAutosave({
 
   function reportFailure(error: unknown) {
     console.warn('Autosave failed:', error)
+    reportSaveFailure(state, error)
   }
 
   function requestSave(version: number): Promise<void> {

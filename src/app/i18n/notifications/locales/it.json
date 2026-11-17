@@ -6,6 +6,7 @@
   "copiedProperties": "Proprietà copiate.",
   "pngClipboardUnavailable": "L’esportazione PNG negli appunti non è disponibile in questo browser.",
   "openFileFailed": "Impossibile aprire «{name}»: {error}",
+  "saveFailed": "Impossibile salvare «{name}». {error}",
   "importedLibrariesNeedDesktop": "Il browser non può aprire le librerie importate da «{name}» ({paths}), quindi i loro componenti appaiono come segnaposto. Apri il file nell’app desktop per vederli.",
   "importedLibrariesNeedOpenDialog": "Un file trascinato non può aprire le librerie importate da «{name}» ({paths}), quindi i loro componenti appaiono come segnaposto. Aprilo con File > Apri… per vederli.",
   "importedLibrariesUnreadable": "Impossibile aprire le librerie importate da «{name}» ({paths}), quindi i loro componenti appaiono come segnaposto.",

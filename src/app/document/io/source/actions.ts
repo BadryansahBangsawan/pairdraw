@@ -18,6 +18,7 @@ import type { DocumentSourceAccess } from '@/app/document/io/types'
 import { createDocumentRecovery } from '@/app/document/recovery'
 import { removeFileBackups } from '@/app/document/recovery/backups'
 import { recoveryEnabled } from '@/app/document/recovery/preferences'
+import type { SaveFailure } from '@/app/document/save-failure'
 import { storageLocationOf } from '@/app/integrations/storage/location'
 import type { StorageDocumentBinding, StorageLocation } from '@/app/integrations/storage/types'
 import { createCanvasId } from '@/app/storage/id'
@@ -26,6 +27,7 @@ import { isTauri } from '@/app/tauri/env'
 type DocumentSourceState = EditorState & {
   documentName: string
   autosaveEnabled: boolean
+  saveFailure: SaveFailure | null
 }
 
 export { createDocumentSourceState }

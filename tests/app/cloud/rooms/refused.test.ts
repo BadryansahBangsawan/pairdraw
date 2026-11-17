@@ -12,6 +12,7 @@ import { addCloudServer, cloudServers, removeCloudServer } from '@/app/cloud/ser
 import { refreshCloudConnection } from '@/app/cloud/sessions/connection'
 import { CLOUD_STORAGE_PROVIDER_ID } from '@/app/cloud/sessions/token'
 import type { EditorStore } from '@/app/editor/session'
+import { toast } from '@/app/shell/ui'
 import { closeTab, createTab } from '@/app/tabs'
 
 import { cloudDiscoveryFixture } from '#tests/helpers/cloud/discovery'
@@ -53,6 +54,29 @@ describe('a tab the relay refused', () => {
     leaveRefusedRoom(guest.store, { permission: 'edit', canSave: false })
     expect(guest.calls.saves).toBe(0)
     expect(guest.store.state.autosaveEnabled).toBe(false)
+  })
+
+  test('tells the person when the save after a refusal fails', async () => {
+    for (const entry of toast.toasts.value) toast.remove(entry.id)
+    const state: {
+      autosaveEnabled: boolean
+      documentName: string
+      saveFailure: { error: string } | null
+    } = { autosaveEnabled: false, documentName: 'Card', saveFailure: null }
+    const store = asDouble<EditorStore>({
+      state,
+      getStorageBinding: () => ({ providerId: 'cloud', documentId: 'document' }),
+      setReadOnly: () => undefined,
+      saveFigFile: async () => {
+        throw new Error('disk full')
+      }
+    })
+    leaveRefusedRoom(store, { permission: 'edit', canSave: true })
+    await Promise.resolve()
+
+    expect(store.state.autosaveEnabled).toBe(true)
+    expect(toast.toasts.value).toHaveLength(0)
+    expect(state.saveFailure).toEqual({ error: 'disk full' })
   })
 
   test('forgets the refusal on rejoining, and a second refusal records it once', async () => {

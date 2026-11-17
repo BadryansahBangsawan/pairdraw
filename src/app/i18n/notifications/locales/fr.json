@@ -6,6 +6,7 @@
   "copiedProperties": "Propriétés copiées.",
   "pngClipboardUnavailable": "L’export PNG vers le presse-papiers n’est pas disponible dans ce navigateur.",
   "openFileFailed": "Impossible d’ouvrir « {name} » : {error}",
+  "saveFailed": "Impossible d’enregistrer « {name} ». {error}",
   "importedLibrariesNeedDesktop": "Le navigateur ne peut pas ouvrir les bibliothèques importées par « {name} » ({paths}) : leurs composants s’affichent comme des espaces réservés. Ouvrez le fichier dans l’app de bureau pour les voir.",
   "importedLibrariesNeedOpenDialog": "Un fichier déposé ne peut pas ouvrir les bibliothèques importées par « {name} » ({paths}) : leurs composants s’affichent comme des espaces réservés. Ouvrez-le avec Fichier > Ouvrir… pour les voir.",
   "importedLibrariesUnreadable": "Impossible d’ouvrir les bibliothèques importées par « {name} » ({paths}) : leurs composants s’affichent comme des espaces réservés.",

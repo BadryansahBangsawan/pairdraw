@@ -2,4 +2,4 @@
 - Saving a document into a folder that will not accept a new file fails and leaves the previous file unchanged.
 - Converting or exporting a document replaces the output file only after the new copy is fully written.
 - Saving a document through the browser’s MCP server replaces the file only after the new copy is fully written.
-- A failed save shows an error, and the document stays unsaved with its recovery copy kept.
+- A failed save stays on screen until the next successful save, and the document stays unsaved with its recovery copy kept.

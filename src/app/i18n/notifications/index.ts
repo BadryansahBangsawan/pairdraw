@@ -22,6 +22,7 @@ const notificationMessageDefaults = {
   xPaths: 'XPaths',
   pngClipboardUnavailable: 'PNG clipboard export is not available in this browser.',
   openFileFailed: params('Could not open “{name}”: {error}'),
+  saveFailed: params('Couldn’t save “{name}”. {error}'),
   importedLibrariesNeedDesktop: params(
     'The browser can’t open the libraries “{name}” imports ({paths}), so their components show as placeholders. Open the file in the desktop app to see them.'
   ),

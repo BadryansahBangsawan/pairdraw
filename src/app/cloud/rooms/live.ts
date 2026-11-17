@@ -14,6 +14,7 @@ import { leaveRoom, openDocumentRoom, roomForStore } from '@/app/collab/rooms'
 import type { RoomIdentity, RoomSession } from '@/app/collab/session'
 import type { JoinCollabRoom } from '@/app/collab/transport'
 import { createCloudRelayJoin } from '@/app/collab/transport/cloud'
+import { reportSaveFailure } from '@/app/document/save-failure'
 import type { EditorStore } from '@/app/editor/session'
 import { createStorageAdapter } from '@/app/integrations/storage'
 import { getLocalCanvasStore } from '@/app/storage/local-store'
@@ -327,7 +328,9 @@ export function leaveRefusedRoom(
   }
   if (!room.canSave || !store.getStorageBinding()) return
   store.state.autosaveEnabled = true
-  void store.saveFigFile().catch(() => undefined)
+  void store.saveFigFile().catch((error: unknown) => {
+    reportSaveFailure(store.state, error)
+  })
 }
 
 /**

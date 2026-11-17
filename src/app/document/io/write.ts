@@ -1,11 +1,15 @@
 import { describeDiagnosticError, recordDocumentFailure } from '@/app/diagnostics'
+import { clearSaveFailure, type SaveFailure } from '@/app/document/save-failure'
 import { storageLocationOf } from '@/app/integrations/storage/location'
 import type { StorageDocumentBinding } from '@/app/integrations/storage/types'
 import { persistStorageCanvasLocally } from '@/app/storage/sync/persist'
 import { isTauri } from '@/app/tauri/env'
 import { writeDesktopFile } from '@/app/tauri/files'
 
-type WriteDocumentState = { documentName: string }
+type WriteDocumentState = {
+  documentName: string
+  saveFailure?: SaveFailure | null
+}
 
 type DocumentWriterOptions = {
   state: WriteDocumentState
@@ -28,6 +32,7 @@ export function createDocumentWriter({
 }: DocumentWriterOptions) {
   async function finishWrite(version: number): Promise<true> {
     setSavedVersion(version)
+    clearSaveFailure(state)
     try {
       await onWriteSuccess?.(version)
     } catch (error) {

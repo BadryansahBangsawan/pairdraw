@@ -29,6 +29,7 @@ import { agentHost } from '@/app/ai/agents/host/current'
 import type { AgentHost, AgentStreams } from '@/app/ai/agents/host/types'
 import SYSTEM_PROMPT from '@/app/ai/chat/system-prompt'
 import { endRun, forgetAgentChat, startAgentRun } from '@/app/ai/reply/run'
+import { AgentStartupTimeoutError, raceStartup } from '@/app/ai/transports/deadline'
 import { describeDiagnosticError, recordACPTransportFailure } from '@/app/diagnostics'
 import type { EditorStore } from '@/app/editor/active-store'
 import { APP_NAME } from '@/constants'
@@ -128,6 +129,8 @@ function toolsUnreachableError(agentDef: ACPAgentDef, reason: string | null): Er
 
 function startupError(error: unknown, agentDef: ACPAgentDef): Error {
   recordACPTransportFailure({ operation: 'start', ...describeDiagnosticError(error) })
+  // A start that ran out of time is its own reason, which the chat names.
+  if (error instanceof AgentStartupTimeoutError) return error
   const message = formatConnectionError(error, agentDef)
   // The chat tells a signed-out agent apart, so it can show where to sign in.
   return isAuthRequiredError(error)
@@ -149,6 +152,12 @@ export function buildCrashChunks(
   return { chunks, shouldNullSession: true }
 }
 
+/** Reads the token the agent's MCP connection to Pairdraw uses. */
+async function readAutomationAuthToken(): Promise<string | null> {
+  const { getAutomationAuthToken } = await import('@/app/automation/mcp/spawn')
+  return getAutomationAuthToken()
+}
+
 export class ACPChatTransport implements ChatTransport<UIMessage> {
   private session: ACPSession | null = null
   private agentDef: ACPAgentDef
@@ -157,6 +166,8 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
   private projectFolder: boolean
   private sentContext = false
   private destroying = false
+  private readonly startupTimeoutMs: number | undefined
+  private readonly automationAuthToken: () => Promise<string | null>
   /** The agent while it starts, before it becomes the session, so destroying can stop it. */
   private starting: AgentStreams | null = null
   /** Where the agent runs, which starts it and hands over its stdio. */
@@ -175,6 +186,10 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     /** Told each turn's tokens, which the Usage settings count with the chat's other models. */
     onUsage?: (usage: AgentTurnUsage) => void
     host?: AgentHost
+    /** How long starting the agent may take; tests shorten it. */
+    startupTimeoutMs?: number
+    /** Pairdraw's automation token, which tests replace instead of running the MCP server. */
+    automationAuthToken?: () => Promise<string | null>
   }) {
     this.agentDef = options.agentDef
     this.host = options.host ?? agentHost()
@@ -182,6 +197,8 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     this.projectFolder = options.projectFolder ?? false
     this.store = options.store ?? null
     this.onUsage = options.onUsage ?? null
+    this.startupTimeoutMs = options.startupTimeoutMs
+    this.automationAuthToken = options.automationAuthToken ?? readAutomationAuthToken
   }
 
   async sendMessages({
@@ -368,18 +385,19 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
       throw new Error('The agent stopped while it was starting.')
     })
     stopped.catch(() => undefined)
-    const untilStopped = <T>(request: Promise<T>): Promise<T> => Promise.race([request, stopped])
-    const { getAutomationAuthToken } = await import('@/app/automation/mcp/spawn')
+    // Each startup request also gives up when the agent does not answer in time.
+    const startupRequest = <T>(request: Promise<T>): Promise<T> =>
+      raceStartup(request, stopped, this.startupTimeoutMs)
     let automationAuthToken: string | null
     try {
-      automationAuthToken = await getAutomationAuthToken()
+      automationAuthToken = await this.automationAuthToken()
     } catch (e) {
       await agent.close()
       throw startupError(e, this.agentDef)
     }
 
     try {
-      await untilStopped(
+      await startupRequest(
         connection.initialize({
           protocolVersion: PROTOCOL_VERSION,
           clientCapabilities: {}
@@ -403,7 +421,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
 
     let sessionResult
     try {
-      sessionResult = await untilStopped(
+      sessionResult = await startupRequest(
         connection.newSession({
           cwd: this.cwd,
           mcpServers: tools.mcpServers,
@@ -418,7 +436,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
 
     let outcome: Awaited<ReturnType<typeof tools.outcome>>
     try {
-      outcome = await untilStopped(tools.outcome())
+      outcome = await startupRequest(tools.outcome())
     } catch (e) {
       tools.stop()
       throw startupError(e, this.agentDef)
@@ -449,7 +467,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     )
     let endControls: () => void
     try {
-      endControls = await untilStopped(linking)
+      endControls = await startupRequest(linking)
     } catch (e) {
       // The agent stopped first; the link it would have made goes once it is made.
       void linking.then((end) => end()).catch(() => undefined)

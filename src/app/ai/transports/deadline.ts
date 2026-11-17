@@ -13,30 +13,18 @@ export class AgentStartupTimeoutError extends Error {
 }
 
 /** Races a startup request against the agent's exit and the startup deadline. */
-export function raceStartup<T>(
+export async function raceStartup<T>(
   request: Promise<T>,
   stopped: Promise<never>,
   timeoutMs = AGENT_STARTUP_TIMEOUT_MS
 ): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const finish = (): void => clearTimeout(timer)
-    const timer = setTimeout(() => {
-      finish()
-      reject(new AgentStartupTimeoutError(timeoutMs))
-    }, timeoutMs)
-    request.then(
-      (value) => {
-        finish()
-        resolve(value)
-      },
-      (error: unknown) => {
-        finish()
-        reject(error)
-      }
-    )
-    stopped.catch((error: unknown) => {
-      finish()
-      reject(error)
-    })
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new AgentStartupTimeoutError(timeoutMs)), timeoutMs)
   })
+  try {
+    return await Promise.race([request, stopped, deadline])
+  } finally {
+    clearTimeout(timer)
+  }
 }

@@ -334,6 +334,8 @@ export const aiMessageDefaults = {
   chatRequestFailed: 'The model request failed. Check the provider settings and try again.',
   chatProviderStalled: 'The provider stopped responding. Check your connection and try again.',
   chatEmptyReply: 'The model returned no reply. Try again.',
+  chatAgentStartTimeout:
+    'The coding agent did not start in time. Check that it runs on this computer and try again.',
   openProviderSettingsAction: 'Open settings',
   cloudWorkspace: 'Workspace',
   cloudWorkspaceHint: 'The workspace whose plan pays for these requests.',

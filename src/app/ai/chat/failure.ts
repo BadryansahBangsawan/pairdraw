@@ -1,6 +1,7 @@
 import { APICallError, StreamProviderError, type UIMessage } from 'ai'
 
 import { AgentSignInRequiredError } from '@/app/ai/agents/acp/auth/required'
+import { AgentStartupTimeoutError } from '@/app/ai/transports/deadline'
 import { ProviderStallError } from '@/app/ai/transports/stall'
 
 type AIChatFailureReason =
@@ -17,6 +18,7 @@ type AIChatFailureReason =
   | 'agent-unconfigured'
   | 'plan-forbidden'
   | 'timeout'
+  | 'agent-timeout'
   | 'empty-reply'
 
 export type AIChatFailure = {
@@ -91,13 +93,22 @@ function statusFailureReason(status: number | null): AIChatFailureReason | null 
   return null
 }
 
-function failureReason(error: unknown): AIChatFailureReason {
+/** The reasons a transport reports itself, which no provider status describes. */
+function transportFailureReason(error: unknown): AIChatFailureReason | null {
   // A coding agent has no key: what it refuses is its own sign-in, or its own missing setup.
   if (error instanceof AgentSignInRequiredError) {
     return error.unconfigured ? 'agent-unconfigured' : 'sign-in-expired'
   }
   // A stream the provider stopped feeding is reported by the transport's own watchdog.
   if (error instanceof ProviderStallError) return 'timeout'
+  // A coding agent that started but never answered, which has its own deadline.
+  if (error instanceof AgentStartupTimeoutError) return 'agent-timeout'
+  return null
+}
+
+function failureReason(error: unknown): AIChatFailureReason {
+  const transportReason = transportFailureReason(error)
+  if (transportReason) return transportReason
   const statusReason = statusFailureReason(providerErrorStatus(error))
   if (statusReason) return statusReason
   if (isInsufficientCreditError(error)) return 'insufficient-credit'

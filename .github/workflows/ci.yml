@@ -132,7 +132,7 @@ jobs:
     name: Package integrity
     needs: changes
     if: needs.changes.outputs.scope == 'code' || needs.changes.outputs.scope == 'cloud'
-    timeout-minutes: 10
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -150,6 +150,10 @@ jobs:
 
       - name: Build publishable packages
         run: bun run build:packages
+
+      # The cli unit shard only builds Core, so it cannot run the built CLI.
+      - name: Smoke-test the built CLI under Node
+        run: bun test packages/cli/tests/node/smoke.test.ts
 
       - name: Validate installed package artifacts with Node and Bun
         run: bun run test:packages

@@ -85,6 +85,7 @@ test('heavy unit test matcher excludes fixture-heavy tests', () => {
     true
   )
   expect(isHeavyUnitTest('tests/engine/dom-css/runtime.test.ts')).toBe(false)
+  expect(isHeavyUnitTest('packages/cli/tests/node/smoke.test.ts')).toBe(true)
 })
 
 test('quick unit test listing excludes heavy tests', async () => {

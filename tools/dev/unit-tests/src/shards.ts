@@ -92,7 +92,11 @@ export const HEAVY_UNIT_TEST_PATTERNS = [
   'tests/engine/io/fig/export/worker.test.ts',
   'tests/engine/io/fig/import/group-reclassify.test.ts',
   'tests/engine/layout/auto-layout/text/measurement.test.ts',
-  'tests/engine/render/canvas/cache.test.ts'
+  'tests/engine/render/canvas/cache.test.ts',
+  // Runs `node packages/cli/bin/pairdraw.js`, so it needs `bun run build:packages`.
+  // Quick shards only build Core. heavy-tests.yml builds packages first, and the
+  // package-quality job runs this file directly after that build.
+  'packages/cli/tests/node/smoke.test.ts'
 ] as const
 
 export function unitTestGroupNames(): UnitTestGroup[] {

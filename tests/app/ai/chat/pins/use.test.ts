@@ -63,6 +63,8 @@ function fixture(dependencies = vision()) {
     {
       getEditor: () => active,
       ensureChat: async () => chat,
+      resumeChat: () => null,
+      isDocumentOpen: () => true,
       resetChat: async () => undefined,
       profileId: () => null,
       restoreProfile: () => undefined,

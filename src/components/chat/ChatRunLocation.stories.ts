@@ -3,7 +3,7 @@ import { expect, fn, userEvent, within } from 'storybook/test'
 
 import ChatRunLocation from './ChatRunLocation.vue'
 
-type Args = { agent: string; page: string; onOpen: () => void }
+type Args = { agent: string; page?: string; document?: string; onOpen: () => void }
 
 const meta = {
   title: 'App/Chat/Run Location',
@@ -25,6 +25,16 @@ export const OnAnotherPage: Story = {
     const canvas = within(canvasElement)
     await expect(canvas.getByRole('status')).toHaveTextContent('Fern is working on “Checkout”')
     await userEvent.click(canvas.getByRole('button', { name: 'Go to page' }))
+    await expect(args.onOpen).toHaveBeenCalledOnce()
+  }
+}
+
+export const OnAnotherDocument: Story = {
+  args: { page: undefined, document: 'Shop' },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole('status')).toHaveTextContent('Fern is working in “Shop”')
+    await userEvent.click(canvas.getByRole('button', { name: 'Go to document' }))
     await expect(args.onOpen).toHaveBeenCalledOnce()
   }
 }

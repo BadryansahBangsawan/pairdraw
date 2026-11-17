@@ -29,6 +29,11 @@ export function createConversationHistory<TChat extends HistoryChat>(
   const conversations = ref<ConversationMeta[]>([])
   const readOnly = ref(false)
   const busy = ref(false)
+  /**
+   * The shown conversation belongs to another document and its reply runs on. The panel keeps it
+   * visible with a notice, and sending waits until its document shows again.
+   */
+  const away = ref(false)
   let ownerRecoveryId: string | null = null
   // Weak, so the history does not keep a closed document's editor alive.
   let owner: WeakRef<ChatDocumentEditor> | null = null
@@ -98,6 +103,23 @@ export function createConversationHistory<TChat extends HistoryChat>(
   async function detach() {
     const leaving = readOnly.value ? null : current.value
     await session.detach(flush)
+    away.value = false
+    rememberLeftDraft(leaving)
+  }
+
+  /**
+   * Leaves the conversation without stopping a reply or the chat runtime, so a reply keeps running
+   * while another document shows and its agent session waits for the document to show again.
+   */
+  async function release() {
+    const leaving = readOnly.value ? null : current.value
+    await session.release(flush)
+    away.value = false
+    rememberLeftDraft(leaving)
+  }
+
+  /** Keeps an unsaved, empty conversation of the document being left for a late pin. */
+  function rememberLeftDraft(leaving: Conversation | null) {
     const left = current.value
     if (!leaving || left?.id !== leaving.id || left.messages.length || hasPins(left.pins)) return
     if (left.titleSource !== 'fallback') return
@@ -105,6 +127,13 @@ export function createConversationHistory<TChat extends HistoryChat>(
     leftDrafts.set(left.id, left)
     const oldest = leftDrafts.keys().next().value
     if (leftDrafts.size > MAX_LEFT_DRAFTS && oldest !== undefined) leftDrafts.delete(oldest)
+  }
+
+  /** Takes back the chat the runtime kept for this conversation, as when its document shows again. */
+  function resumeLiveChat(conversation: Conversation) {
+    if (session.chat) return
+    const resumed = runtime.resumeChat(conversation.id)
+    if (resumed) session.attach(resumed, flush)
   }
 
   async function activate(conversation: Conversation) {
@@ -120,6 +149,7 @@ export function createConversationHistory<TChat extends HistoryChat>(
     if (conversation.messages.length || conversation.titleSource !== 'fallback') {
       await store.select(conversation.documentId, conversation.id)
     }
+    resumeLiveChat(conversation)
   }
 
   async function createDraft() {
@@ -159,17 +189,50 @@ export function createConversationHistory<TChat extends HistoryChat>(
     await refresh()
   }
 
+  /** Shows the conversation in front live again: the document showing now is its own. */
+  function focusDocument(editor: ChatDocumentEditor) {
+    readOnly.value = false
+    owner = new WeakRef(editor)
+    ownerRecoveryId = editor.getRecoveryId()
+    away.value = false
+    if (current.value) resumeLiveChat(current.value)
+  }
+
+  /**
+   * Whether the conversation in front keeps showing: its reply runs in a document whose tab is
+   * still open. A closed tab, like Stop, New chat, or another conversation, may end the reply.
+   */
+  function keepsReplyInFront(): boolean {
+    if (!session.replying || !current.value || readOnly.value) return false
+    const runningEditor = owner?.deref()
+    return !runningEditor || runtime.isDocumentOpen(runningEditor)
+  }
+
   async function loadDocument() {
     const editor = runtime.getEditor()
     const documentId = await resolveChatDocumentId(editor, store)
+    // Saved under a new identity, the same document keeps its conversation, even mid-reply.
     if (isIdentityChange(editor, documentId)) await reassignDocument(editor, documentId)
     if (current.value?.documentId === documentId) {
-      readOnly.value = false
-      owner = new WeakRef(editor)
-      ownerRecoveryId = editor.getRecoveryId()
+      focusDocument(editor)
       return
     }
-    await detach()
+    if (away.value) {
+      if (!session.replying) {
+        await endAway()
+        return
+      }
+      if (keepsReplyInFront()) return
+      away.value = false
+    }
+    // A reply in progress keeps its conversation and agent session while another document shows.
+    if (keepsReplyInFront()) {
+      away.value = true
+      return
+    }
+    const runningEditor = owner?.deref()
+    if (runningEditor && !runtime.isDocumentOpen(runningEditor)) await detach()
+    else await release()
     const id = await store.getSelected(documentId)
     const conversation = id ? await store.read(id) : null
     if (conversation?.documentId === documentId) await activate(conversation)
@@ -177,10 +240,21 @@ export function createConversationHistory<TChat extends HistoryChat>(
     await refresh()
   }
 
+  /**
+   * The running conversation's reply ended while another document showed: its panel returns to
+   * the document in front. The chat and agent session stay for when that conversation shows again.
+   */
+  async function endAway() {
+    away.value = false
+    await loadDocument()
+  }
+
   function ensureChat() {
     return serialize(async () => {
       if (readOnly.value && owner?.deref() === runtime.getEditor()) return null
       await loadDocument()
+      // A reply running in another document's chat keeps this document from taking the runtime.
+      if (away.value) return null
       // A restored transcript does not restore an external agent session.
       if (
         current.value?.messages.length &&
@@ -212,6 +286,27 @@ export function createConversationHistory<TChat extends HistoryChat>(
     if (readOnly.value || owner?.deref() !== runtime.getEditor()) return null
     return session.replying
   }
+  /**
+   * The live chat of the conversation showing, without starting one. While another document's
+   * reply runs it is that reply, so the panel can keep showing it stream.
+   */
+  function liveChat(): TChat | null {
+    if (readOnly.value && !away.value) return null
+    if (!away.value && owner?.deref() !== runtime.getEditor()) return null
+    return session.chat
+  }
+  /** The editor of the conversation showing, which while away is another document's. */
+  function documentEditor(): ChatDocumentEditor | null {
+    return owner?.deref() ?? null
+  }
+  // A reply that ends while another document shows hands its panel back to that document.
+  watch(
+    () => session.chat?.status,
+    (status) => {
+      if (!away.value || status === 'submitted' || status === 'streaming') return
+      void serialize(endAway).catch(() => undefined)
+    }
+  )
   function newChat() {
     return serialize(async () => {
       await detach()
@@ -287,11 +382,14 @@ export function createConversationHistory<TChat extends HistoryChat>(
     messages,
     conversations,
     readOnly,
+    away,
     busy,
     storageError,
     initialize,
     ensureChat,
     runningChat,
+    liveChat,
+    documentEditor,
     flush,
     newChat,
     open,

@@ -1,5 +1,5 @@
 import { useThrottleFn } from '@vueuse/core'
-import { watch } from 'vue'
+import { shallowRef, watch } from 'vue'
 
 import { toolChangesVersion } from '@/app/ai/tools/changes/store'
 
@@ -18,18 +18,19 @@ function replying(chat: HistoryChat): boolean {
 export function createHistorySession<TChat extends HistoryChat = HistoryChat>(
   reset: () => Promise<void>
 ) {
-  let live: TChat | null = null
+  const live = shallowRef<TChat | null>(null)
   let interrupted = false
   let generation = 0
   let stopWatch: (() => void) | undefined
 
   function attach(next: TChat, flush: () => Promise<void>): void {
-    if (live === next) return
+    if (live.value === next) return
     stopWatch?.()
-    live = next
+    live.value = next
     const activeGeneration = ++generation
     function save() {
-      if (live === next && generation === activeGeneration) void flush().catch(() => undefined)
+      if (live.value === next && generation === activeGeneration)
+        void flush().catch(() => undefined)
     }
     const saveSoon = useThrottleFn(
       save,
@@ -57,28 +58,42 @@ export function createHistorySession<TChat extends HistoryChat = HistoryChat>(
   }
 
   async function detach(flush: () => Promise<void>): Promise<void> {
-    interrupted ||= live?.status === 'submitted' || live?.status === 'streaming'
-    await live?.stop()
+    interrupted ||= live.value !== null && replying(live.value)
+    await live.value?.stop()
     await flush()
     generation++
     stopWatch?.()
     stopWatch = undefined
     await reset()
-    live = null
+    live.value = null
+  }
+
+  /**
+   * Saves the conversation and stops following it, without stopping a reply or its runtime, so
+   * another document can show while a reply keeps running and its agent session stays alive.
+   */
+  async function release(flush: () => Promise<void>): Promise<void> {
+    generation++
+    stopWatch?.()
+    stopWatch = undefined
+    await flush()
+    live.value = null
   }
 
   return {
     attach,
     detach,
+    release,
     get chat() {
-      return live
+      return live.value
     },
     /** The attached chat while it replies. */
     get replying(): TChat | null {
-      return live && replying(live) ? live : null
+      const attached = live.value
+      return attached && replying(attached) ? attached : null
     },
     get interrupted() {
-      return interrupted || live?.status === 'submitted' || live?.status === 'streaming'
+      return interrupted || (live.value !== null && replying(live.value))
     },
     restoreInterrupted(value: boolean) {
       interrupted = value

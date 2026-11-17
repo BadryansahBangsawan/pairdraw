@@ -1,0 +1,1 @@
+- A reply keeps running when you switch documents, and the chat shows which agent works in which document with a way back to it.

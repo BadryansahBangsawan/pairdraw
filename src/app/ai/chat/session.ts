@@ -114,6 +114,8 @@ export function createChatSessionManager({
   const failure = ref<AIChatFailure | null>(null)
   let transportDirty = false
   let currentChatStore: EditorStore | null = null
+  /** The conversation the live chat answers, which its document shows again to resume it. */
+  let currentChatSessionId: string | null = null
   const currentChatMessages = new WeakMap<EditorStore, UIMessage[]>()
   let chat: Chat<UIMessage> | null = null
   let acpTransportInstance: { destroy(): Promise<void> } | null = null
@@ -279,7 +281,12 @@ export function createChatSessionManager({
     if (chat && isACPProvider.value && chatProjectFolder(sessionId) !== acpProjectFolder) {
       transportDirty = true
     }
-    if (!chat || transportDirty || currentChatStore !== store) {
+    if (
+      !chat ||
+      transportDirty ||
+      currentChatStore !== store ||
+      currentChatSessionId !== sessionId
+    ) {
       const messages = initialMessages ?? currentChatMessages.get(store)
       const diagnosticContext: AIDiagnosticContext = { sessionId, runId: crypto.randomUUID() }
       // Failures belong to the provider this chat was created for, even if the profile changes.
@@ -342,8 +349,20 @@ export function createChatSessionManager({
       })
       chat = created
       currentChatStore = store
+      currentChatSessionId = sessionId
       transportDirty = false
     }
+    return chat
+  }
+
+  /**
+   * The live chat of a conversation whose document shows again, so a running reply and its agent
+   * session continue without starting a process. A chat another conversation or document needed
+   * has already replaced it, and this returns null.
+   */
+  function resumeChat(sessionId: string) {
+    if (!chat || currentChatSessionId !== sessionId) return null
+    if (currentChatStore !== getActiveEditorStore()) return null
     return chat
   }
 
@@ -353,6 +372,7 @@ export function createChatSessionManager({
     failure.value = null
     chat = null
     currentChatStore = null
+    currentChatSessionId = null
     transportDirty = false
   }
 
@@ -361,5 +381,13 @@ export function createChatSessionManager({
     markTransportDirty()
   }
 
-  return { ensureChat, resetChat, markTransportDirty, setOverrideTransport, failure, clearFailure }
+  return {
+    ensureChat,
+    resumeChat,
+    resetChat,
+    markTransportDirty,
+    setOverrideTransport,
+    failure,
+    clearFailure
+  }
 }

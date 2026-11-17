@@ -37,6 +37,7 @@ import {
   setUnsplashKey,
   setRememberCredentials
 } from '@/app/settings/credentials/media'
+import { getTabsSnapshot } from '@/app/tabs'
 
 const chatSession = createChatSessionManager({
   isConfigured,
@@ -61,7 +62,9 @@ const history = createConversationHistory({
   },
   getEditor: getActiveEditorStore,
   ensureChat: chatSession.ensureChat,
+  resumeChat: chatSession.resumeChat,
   resetChat: chatSession.resetChat,
+  isDocumentOpen: (editor) => getTabsSnapshot().some((tab) => tab.store === editor),
   backend: () => {
     if (isACPProvider.value) return 'acp'
     return isHarnessProvider.value ? 'harness' : 'direct'

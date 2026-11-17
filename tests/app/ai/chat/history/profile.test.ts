@@ -39,6 +39,8 @@ function fixture(profiles: readonly string[] = ['built-in', 'fast', 'agent']) {
     {
       getEditor: () => active,
       ensureChat: async () => chat,
+      resumeChat: () => null,
+      isDocumentOpen: () => true,
       resetChat: async () => undefined,
       profileId: () => profile.value,
       restoreProfile: (id) => {

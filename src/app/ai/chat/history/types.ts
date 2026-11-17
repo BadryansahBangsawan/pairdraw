@@ -12,7 +12,11 @@ export type HistoryChat = Pick<Chat<UIMessage>, 'messages' | 'status' | 'stop'>
 export interface HistoryRuntime<TChat extends HistoryChat> {
   getEditor(): ChatDocumentEditor
   ensureChat(messages?: UIMessage[], sessionId?: string): Promise<TChat | null>
+  /** The live chat already running this conversation, when its store is still the active one. */
+  resumeChat(sessionId: string): TChat | null
   resetChat(): Promise<void>
+  /** Whether the editor's document still has an open tab. A closed one may stop its reply. */
+  isDocumentOpen(editor: ChatDocumentEditor): boolean
   backend(): ConversationMeta['backend']
   profileId(): string | null
   /**

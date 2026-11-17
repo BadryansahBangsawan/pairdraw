@@ -79,6 +79,8 @@ describe('a chat’s project folder', () => {
           getStorageBinding: () => null
         }),
         ensureChat: async () => chat,
+        resumeChat: () => null,
+        isDocumentOpen: () => true,
         resetChat: async () => undefined,
         profileId: () => null,
         restoreProfile: () => undefined,

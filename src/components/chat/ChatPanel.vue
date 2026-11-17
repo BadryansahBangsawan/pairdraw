@@ -163,6 +163,8 @@ const signedOutHelp = computed(() =>
 function sendPendingPrompt() {
   const store = activeStore.value
   if (!historyReady || !store || store.state.preparation || !isConfigured.value) return
+  // A reply in another document's chat holds the runtime until it ends or its document shows.
+  if (history.away.value) return
   const prompt = takePendingPrompt(store)
   if (prompt) void submitMessage(prompt)
 }
@@ -205,14 +207,18 @@ async function initializeHistory() {
     return
   }
   historyReady = true
-  takeUpRunningReply()
+  takeUpLiveChat()
   await resumeQueue()
   sendPendingPrompt()
 }
-/** A reply still running in this document's chat shows live again, with its Stop button. */
-function takeUpRunningReply() {
-  const running = history.runningChat()
-  if (running && !chat.value) chat.value = markRaw(running)
+/**
+ * The conversation's live chat shows again, whether its reply still runs or ended: the same
+ * session, without starting an agent. A reply running in another document shows too, with a
+ * notice to go there.
+ */
+function takeUpLiveChat() {
+  const live = history.liveChat()
+  if (live && !chat.value) chat.value = markRaw(live)
 }
 /**
  * Takes up what waited in this document's chat when it shows again: the reply still running gets
@@ -284,6 +290,12 @@ async function historyAction(action: () => Promise<unknown>) {
   }
 }
 
+/** Opening the conversation already shown changes nothing, so it must not stop its reply. */
+function openConversation(id: string) {
+  if (id === history.current.value?.id) return
+  return historyAction(() => history.open(id))
+}
+
 async function renameConversation(id: string, title: string) {
   try {
     await history.rename(id, title)
@@ -353,6 +365,8 @@ const status = computed(() => chat.value?.status ?? 'ready')
  * takes in once the current tool calls finish, and Alt+Enter waits until all work is done.
  */
 function sendOrQueue(message: ChatSubmission, afterWork: boolean) {
+  // A reply running in another document's chat keeps the composer to its Stop button.
+  if (history.away.value) return
   if (!isConfigured.value) {
     void sendAfterSetup(message)
     return
@@ -445,7 +459,17 @@ watch(
     // A page switch keeps the document and its conversation, so a running chat stays attached.
     if (generation !== viewGeneration) return
     if (history.current.value?.id !== conversationId) chat.value = null
-    takeUpRunningReply()
+    takeUpLiveChat()
+    sendPendingPrompt()
+  }
+)
+// A reply in another document shows while it runs; when it ends there, that panel returns to
+// the document in front.
+watch(
+  () => history.away.value,
+  () => {
+    chat.value = null
+    takeUpLiveChat()
     sendPendingPrompt()
   }
 )
@@ -467,7 +491,7 @@ function handleStop() {
       :selected-id="history.current.value?.id"
       :disabled="history.busy.value"
       @create="historyAction(history.newChat)"
-      @select="historyAction(() => history.open($event))"
+      @select="openConversation"
       @rename="renameConversation"
       @save-trace="saveTrace"
       @delete="historyAction(() => history.remove($event))"
@@ -521,8 +545,8 @@ function handleStop() {
         :queued="queued"
         :steers="!providerID.startsWith('acp:') && providerID !== 'harness:pi'"
         @remove-queued="(id) => removeQueuedMessage(documentStore, id)"
-        :nodes-live="!history.readOnly.value"
-        :interactive="chat !== null && !submission.busy.value"
+        :nodes-live="!history.readOnly.value && !history.away.value"
+        :interactive="chat !== null && !submission.busy.value && !history.away.value"
         @regenerate="submission.regenerate()"
         @revert="(messageId) => submission.revert(messageId)"
         @restore="(messageId) => submission.restore(messageId)"
@@ -547,6 +571,7 @@ function handleStop() {
         v-if="runLocation"
         :agent="runLocation.agent"
         :page="runLocation.page"
+        :document="runLocation.document"
         @open="runLocation.open"
       />
 
@@ -570,7 +595,7 @@ function handleStop() {
       :dragging="draggingFiles"
       :dragged-types="draggedTypes"
       :prompts="prompts"
-      :disabled="submission.busy.value || history.busy.value"
+      :disabled="submission.busy.value || history.busy.value || history.away.value"
       @submit="sendOrQueue"
       @stop="handleStop"
       @interrupt="handleStop"

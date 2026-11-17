@@ -74,10 +74,11 @@ test('a reply keeps running, and what waits for it, while another tab shows', as
   await expect(queued).toHaveCount(0)
 })
 
-test("a waiting message stays with its document, and goes once that document's chat is back", async ({
+test("a waiting message stays with its document while another document's chat shows", async ({
   configuredChat: chat
 }) => {
   const { page } = chat
+  const tabs = page.getByTestId('tabbar-tab')
   await chat.submit('paused short stream')
   await expect(chat.assistantMessage()).toContainText('Line 1')
   await chat.input.click()
@@ -86,21 +87,48 @@ test("a waiting message stays with its document, and goes once that document's c
   const queued = page.getByTestId('chat-queued-message')
   await expect(queued).toHaveCount(1)
 
-  // Another document takes the chat, which interrupts the first document's reply.
+  // Another document shows; the first one's reply keeps running with its queue.
   await page.getByTestId('tabbar-new').click()
   await page.getByTestId('home-new-design').click()
-  await expect(page.getByTestId('tabbar-tab')).toHaveCount(2)
-  await expect(chat.input).toBeVisible()
+  await expect(tabs).toHaveCount(2)
+  await expect(page.getByTestId('chat-run-location')).toBeVisible()
+  await expect(page.getByTestId('chat-stop-button')).toBeVisible()
+  await expect(page.getByTestId('chat-send-button')).toHaveCount(0)
   await expect(queued).toHaveCount(0)
+
+  // Finished, the reply hands the panel over to the document in front.
+  await finishPausedReply(page)
+  await expect(page.getByTestId('chat-run-location')).toHaveCount(0)
   await chat.submit('Hello there')
   await expect(chat.assistantMessage()).toContainText('Hello there')
   await expect(page.getByTestId('chat-send-button')).toBeVisible()
   await expect(page.getByTestId('chat-message-user')).toHaveCount(1)
 
-  await page.getByTestId('tabbar-tab').first().click()
+  // Back on the first document, what waited for it goes and the queue empties.
+  await tabs.first().click()
   await expect(page.getByTestId('chat-message-user')).toHaveCount(2)
   await expect(page.getByTestId('chat-message-user').nth(1)).toContainText('Make it blue')
   await expect(queued).toHaveCount(0)
+})
+
+test('“Go to document” returns to the running reply’s document', async ({
+  configuredChat: chat
+}) => {
+  const { page } = chat
+  const tabs = page.getByTestId('tabbar-tab')
+  await chat.submit('paused short stream')
+  await expect(chat.assistantMessage()).toContainText('Line 1')
+
+  await page.getByTestId('tabbar-new').click()
+  await page.getByTestId('home-new-design').click()
+  await expect(tabs).toHaveCount(2)
+  await page.getByRole('button', { name: 'Go to document' }).click()
+
+  await expect(tabs.first()).toHaveAttribute('data-active', '')
+  await expect(page.getByTestId('chat-stop-button')).toBeVisible()
+  await expect(page.getByTestId('chat-run-location')).toHaveCount(0)
+  await expect(chat.userMessage()).toContainText('paused short stream')
+  await finishPausedReply(page)
 })
 
 test('Escape stops the reply and sends what waits at once', async ({ configuredChat: chat }) => {

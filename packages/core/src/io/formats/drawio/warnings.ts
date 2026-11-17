@@ -16,7 +16,7 @@ export function drawioDroppedWarnings(graph: SceneGraph): string[] {
   const names = [...graph.variableCollections.values()].map((collection) => collection.name)
   const dropped = `draw.io has no variables: ${counted(variables, 'variable', 'variables')} in ${counted(names.length, 'collection', 'collections')} (${names.join(', ')}) not written`
   const bound = [...graph.nodes.values()].filter(
-    (node) => node.boundVariables && Object.keys(node.boundVariables).length > 0
+    (node) => Object.keys(node.boundVariables).length > 0
   ).length
   if (bound === 0) return [dropped]
   const users =

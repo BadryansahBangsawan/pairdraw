@@ -1,6 +1,5 @@
 import { expect, setDefaultTimeout, test } from 'bun:test'
 import { existsSync } from 'node:fs'
-import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 import { corePackagePath } from '#core-tests/helpers/paths'

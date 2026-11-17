@@ -1,13 +1,14 @@
 import 'fake-indexeddb/auto'
 import { expect, spyOn, test } from 'bun:test'
 
-import { simulateReadableStream } from 'ai'
+import { dynamicTool, jsonSchema, simulateReadableStream } from 'ai'
 import { MockLanguageModelV4 } from 'ai/test'
 import * as v from 'valibot'
 
 import type { AIProviderID } from '@pairdraw/core/constants'
 import { FigmaAPI } from '@pairdraw/core/figma-api'
 
+import { classifyAIChatError } from '@/app/ai/chat/failure'
 import { createRunRecorder } from '@/app/ai/chat/trace/recorder'
 import type { ThinkingLevel } from '@/app/ai/models/types'
 import { modelProviderAdapter } from '@/app/ai/providers/registry'
@@ -22,6 +23,11 @@ import { skillFixture } from '#tests/helpers/chat/skills'
 import { memoryTraceStore } from '#tests/helpers/chat/trace-store'
 import { MOCK_USAGE } from '#tests/helpers/chat/usage'
 import { fetchStub } from '#tests/helpers/fetch'
+
+type StreamPart =
+  Awaited<ReturnType<MockLanguageModelV4['doStream']>>['stream'] extends ReadableStream<infer Part>
+    ? Part
+    : never
 
 function replyModel() {
   return new MockLanguageModelV4({
@@ -59,6 +65,110 @@ async function send(transport: ReturnType<typeof createToolLoopTransport>): Prom
     reader.releaseLock()
   }
 }
+
+test('ends a reply whose provider stops answering', async () => {
+  const store = createEditorStore()
+  // A provider that accepts the request and then sends nothing, without closing the stream.
+  const model = new MockLanguageModelV4({
+    doStream: async () => ({ stream: new ReadableStream() })
+  })
+  const errors: unknown[] = []
+  try {
+    const transport = createToolLoopTransport({
+      store,
+      providerID: 'anthropic',
+      model,
+      effectiveModelID: 'claude-test',
+      maxOutputTokens: 100,
+      thinkingLevel: () => 'default',
+      onError: (error) => errors.push(error),
+      timeouts: { firstChunkMs: 40, chunkMs: 40 }
+    })
+    await send(transport)
+    expect(errors).toHaveLength(1)
+    expect(classifyAIChatError(errors[0]).reason).toBe('timeout')
+  } finally {
+    store.dispose()
+  }
+})
+
+test('a slow tool does not trip the provider watchdog', async () => {
+  const store = createEditorStore()
+  let calls = 0
+  const model = new MockLanguageModelV4({
+    doStream: async () => {
+      calls++
+      const chunks: StreamPart[] =
+        calls === 1
+          ? [
+              {
+                type: 'tool-call',
+                toolCallId: 'slow-1',
+                toolName: 'mcp__test__slow',
+                input: '{}'
+              },
+              {
+                type: 'finish',
+                finishReason: { unified: 'tool-calls', raw: undefined },
+                usage: MOCK_USAGE
+              }
+            ]
+          : [
+              { type: 'text-start', id: 'reply' },
+              { type: 'text-delta', id: 'reply', delta: 'Done' },
+              { type: 'text-end', id: 'reply' },
+              {
+                type: 'finish',
+                finishReason: { unified: 'stop', raw: undefined },
+                usage: MOCK_USAGE
+              }
+            ]
+      return {
+        stream: simulateReadableStream({
+          initialDelayInMs: null,
+          chunkDelayInMs: null,
+          chunks
+        })
+      }
+    }
+  })
+  const errors: unknown[] = []
+  try {
+    const transport = createToolLoopTransport({
+      store,
+      providerID: 'anthropic',
+      model,
+      effectiveModelID: 'claude-test',
+      maxOutputTokens: 100,
+      thinkingLevel: () => 'default',
+      onError: (error) => errors.push(error),
+      // Shorter than the tool takes, so a watchdog that also times tools fails here.
+      timeouts: { firstChunkMs: 20, chunkMs: 20 },
+      externalMCP: {
+        tools: async () => ({
+          mcp__test__slow: dynamicTool({
+            description: 'Takes longer than the provider timeout',
+            inputSchema: jsonSchema({ type: 'object', properties: {} }),
+            execute: async () => {
+              await new Promise<void>((resolve) => {
+                setTimeout(resolve, 150)
+              })
+              return { content: [{ type: 'text', text: 'ok' }] }
+            }
+          })
+        }),
+        hold: () => () => undefined,
+        close: () => undefined
+      }
+    })
+    await send(transport)
+    // An abort is not an error. The model has to run again with the tool result.
+    expect(errors).toHaveLength(0)
+    expect(calls).toBe(2)
+  } finally {
+    store.dispose()
+  }
+})
 
 test('each message uses the thinking level chosen when it is sent', async () => {
   const store = createEditorStore()

@@ -1,6 +1,7 @@
 import { APICallError, StreamProviderError } from 'ai'
 
 import { AgentSignInRequiredError } from '@/app/ai/agents/acp/auth/required'
+import { ProviderStallError } from '@/app/ai/transports/stall'
 
 type AIChatFailureReason =
   | 'authentication'
@@ -15,6 +16,7 @@ type AIChatFailureReason =
   | 'sign-in-expired'
   | 'agent-unconfigured'
   | 'plan-forbidden'
+  | 'timeout'
 
 export type AIChatFailure = {
   reason: AIChatFailureReason
@@ -93,6 +95,8 @@ function failureReason(error: unknown): AIChatFailureReason {
   if (error instanceof AgentSignInRequiredError) {
     return error.unconfigured ? 'agent-unconfigured' : 'sign-in-expired'
   }
+  // A stream the provider stopped feeding is reported by the transport's own watchdog.
+  if (error instanceof ProviderStallError) return 'timeout'
   const statusReason = statusFailureReason(providerErrorStatus(error))
   if (statusReason) return statusReason
   if (isInsufficientCreditError(error)) return 'insufficient-credit'

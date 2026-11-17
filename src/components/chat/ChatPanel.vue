@@ -343,6 +343,8 @@ const failureMessage = computed(() => {
       return ai.value.chatRateLimited
     case 'request-failed':
       return ai.value.chatRequestFailed
+    case 'timeout':
+      return ai.value.chatProviderStalled
     case 'sign-in-expired':
       return ai.value.chatSignInExpired
     case 'agent-unconfigured':

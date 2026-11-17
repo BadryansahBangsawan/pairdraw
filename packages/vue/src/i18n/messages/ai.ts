@@ -332,6 +332,7 @@ export const aiMessageDefaults = {
   chatNetworkFailed: 'Pairdraw could not reach the provider. Check your connection and endpoint.',
   chatRateLimited: 'The provider rate limit was reached. Wait a moment and try again.',
   chatRequestFailed: 'The model request failed. Check the provider settings and try again.',
+  chatProviderStalled: 'The provider stopped responding. Check your connection and try again.',
   openProviderSettingsAction: 'Open settings',
   cloudWorkspace: 'Workspace',
   cloudWorkspaceHint: 'The workspace whose plan pays for these requests.',

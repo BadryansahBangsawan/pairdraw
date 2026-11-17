@@ -37,6 +37,8 @@ import { createAITools, currentRun, endRun, recordStep, startRun } from '@/app/a
 import { createActionApproval } from '@/app/ai/tools/approval'
 import { enabledAIToolDefinitions } from '@/app/ai/tools/catalog'
 import { aiToolOverrides } from '@/app/ai/tools/preferences'
+import { withStallTimeout } from '@/app/ai/transports/stall'
+import { providerTimeouts, type ProviderTimeouts } from '@/app/ai/transports/timeout'
 import { recordModelStepCompleted } from '@/app/diagnostics/events'
 import type { AIDiagnosticContext } from '@/app/diagnostics/events/ai'
 import type { getActiveEditorStore } from '@/app/editor/active-store'
@@ -77,6 +79,8 @@ export type ToolLoopTransportOptions = {
   browserActions?: BrowserChatActions
   /** The built-in browser window. Tests pass a fake; the desktop app uses its own. */
   researchWindow?: ResearchWindow
+  /** How long a reply waits on the provider; tests shorten it. */
+  timeouts?: ProviderTimeouts
 }
 
 function callSettings(
@@ -114,7 +118,8 @@ export function createToolLoopTransport({
   externalMCP = appExternalMCPTools(),
   offerBrowserTools = IS_TAURI,
   browserActions,
-  researchWindow = desktopResearchWindow()
+  researchWindow = desktopResearchWindow(),
+  timeouts = providerTimeouts
 }: ToolLoopTransportOptions) {
   // Each change waits for the person's approval while Settings → AI asks for it.
   // A page action remembers the site's host, not the tool name.
@@ -245,6 +250,14 @@ export function createToolLoopTransport({
     return 'The provider rejected the request.'
   }
   // History is checked and converted with these tools: the catalog plus the external ones.
+  // The reply's stall timer aborts this controller. It is not the caller's Stop signal:
+  // Stop ends the run, while a stall is a provider failure.
+  let stallAbort: AbortController | undefined
+  const providerSignal = (caller: AbortSignal | undefined): AbortSignal | undefined => {
+    const stall = stallAbort?.signal
+    if (stall && caller) return AbortSignal.any([caller, stall])
+    return stall ?? caller
+  }
   const chatAgent: Agent<never, ToolSet> = {
     version: 'agent-v1',
     get id() {
@@ -253,8 +266,14 @@ export function createToolLoopTransport({
     get tools() {
       return { ...tools, ...historyTools }
     },
-    generate: (options) => agent.generate(options),
-    stream: (options) => agent.stream(options)
+    // Stall timing belongs to withStallTimeout on the reply stream. The SDK's chunk
+    // timeout restarts on the tool-call chunk and keeps running while a tool executes
+    // or the person is deciding, so a slow tool or approval would abort the turn.
+    // The stall controller still aborts the provider request itself.
+    generate: (options) =>
+      agent.generate({ ...options, abortSignal: providerSignal(options.abortSignal) }),
+    stream: (options) =>
+      agent.stream({ ...options, abortSignal: providerSignal(options.abortSignal) })
   }
   const transport = new DirectChatTransport({
     agent: chatAgent,
@@ -318,7 +337,15 @@ export function createToolLoopTransport({
       // DirectChatTransport handles error chunks, but not a rejected underlying stream.
       return createUIMessageStream<UIMessage>({
         execute: async ({ writer }) => {
-          writer.merge(await transport.sendMessages(options))
+          // A provider that stops sending never rejects, so the stream is read against a timer.
+          // The timer aborts the provider request; cancelling the UI reader leaves it running.
+          const stall = new AbortController()
+          stallAbort = stall
+          try {
+            writer.merge(withStallTimeout(await transport.sendMessages(options), timeouts, stall))
+          } finally {
+            if (stallAbort === stall) stallAbort = undefined
+          }
         },
         onError: handleError
       })

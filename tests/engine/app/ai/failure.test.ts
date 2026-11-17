@@ -8,6 +8,7 @@ import {
   classifyAIChatFinish,
   isInsufficientCreditError
 } from '@/app/ai/chat/failure'
+import { ProviderStallError } from '@/app/ai/transports/stall'
 
 describe('AI chat failures', () => {
   test('recognizes provider credit and quota failures', () => {
@@ -88,6 +89,10 @@ describe('AI chat failures', () => {
       statusCode: 429,
       retryable: true
     })
+  })
+
+  test('reports a provider that stopped sending as a timeout', () => {
+    expect(classifyAIChatError(new ProviderStallError(60_000)).reason).toBe('timeout')
   })
 
   test('classifies provider messages without exposing them as presentation copy', () => {

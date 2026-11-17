@@ -4,3 +4,4 @@
 - Converting to draw.io and back keeps a frame a frame, a rectangle a rectangle, and every layer name.
 - A `.pen` roundtrip keeps the page name instead of replacing it with the first layer's.
 - Printing tokens says which variable took a numbered custom property name because another token's name collides with it.
+- `pairdraw variables` counts the variables its filters leave, not the whole document.

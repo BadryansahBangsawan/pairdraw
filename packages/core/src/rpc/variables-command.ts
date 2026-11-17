@@ -61,11 +61,7 @@ export const variablesCommand: RPCCommand<VariablesArgs, VariablesResult> = {
     const typeFilter = args.type?.toUpperCase()
     const collFilter = args.collection?.toLowerCase()
 
-    const result: VariablesResult = {
-      collections: [],
-      totalVariables: graph.variables.size,
-      totalCollections: graph.variableCollections.size
-    }
+    const result: VariablesResult = { collections: [], totalVariables: 0, totalCollections: 0 }
 
     for (const coll of graph.variableCollections.values()) {
       if (collFilter && !coll.name.toLowerCase().includes(collFilter)) continue
@@ -89,6 +85,11 @@ export const variablesCommand: RPCCommand<VariablesArgs, VariablesResult> = {
       })
     }
 
+    result.totalVariables = result.collections.reduce(
+      (count, collection) => count + collection.variables.length,
+      0
+    )
+    result.totalCollections = result.collections.length
     return result
   }
 }

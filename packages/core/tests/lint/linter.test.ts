@@ -25,3 +25,13 @@ describe('lintGraph roots', () => {
     expect(lint([inner.id, page.id])).toEqual(fromPage)
   })
 })
+
+describe('unknown settings', () => {
+  test('refuses a preset that does not exist', () => {
+    expect(() => createLinter({ preset: 'bogus' })).toThrow(/Unknown lint preset "bogus"/)
+  })
+
+  test('refuses a rule that does not exist', () => {
+    expect(() => createLinter({ rules: ['bogus'] })).toThrow(/Unknown lint rule "bogus"/)
+  })
+})

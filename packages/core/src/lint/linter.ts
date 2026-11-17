@@ -28,6 +28,16 @@ function effectiveTextStyles(node: SceneNode): { fontSize: number; fontWeight: n
   return covered < node.text.length || runs.length === 0 ? [base, ...runs] : runs
 }
 
+/** A preset's rules, refusing a name no preset has so a typo cannot silently disable linting. */
+function presetRules(id: string) {
+  const preset = presets[id]
+  if (!preset) {
+    const known = Object.keys(presets).sort().join(', ')
+    throw new Error(`Unknown lint preset "${id}". Known presets: ${known}`)
+  }
+  return preset.rules
+}
+
 export class Linter {
   private rules = new Map<string, Rule>()
   private ruleConfigs = new Map<string, { severity: Severity; options?: Record<string, unknown> }>()
@@ -46,17 +56,18 @@ export class Linter {
       string,
       Severity | { severity: Severity; options?: Record<string, unknown> }
     > = {}
-    if (options.preset) baseConfig = { ...presets[options.preset].rules }
+    if (options.preset) baseConfig = { ...presetRules(options.preset) }
     if (options.config?.extends) {
       const ids = Array.isArray(options.config.extends)
         ? options.config.extends
         : [options.config.extends]
-      for (const id of ids) baseConfig = { ...baseConfig, ...presets[id].rules }
+      for (const id of ids) baseConfig = { ...baseConfig, ...presetRules(id) }
     }
     if (options.config?.rules) baseConfig = { ...baseConfig, ...options.config.rules }
     const rulesToLoad = options.rules ?? Object.keys(baseConfig)
     for (const ruleId of rulesToLoad) {
       const rule = allRules[ruleId]
+      if (!rule) throw new Error(`Unknown lint rule "${ruleId}"`)
       const config = baseConfig[ruleId]
       if (config === 'off') continue
       this.rules.set(ruleId, rule)

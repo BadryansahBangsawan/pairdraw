@@ -15,7 +15,12 @@ import { createBrowserRPCBridge } from '#mcp/browser-rpc'
 import * as httpOptions from '#mcp/http-options'
 import type { RPCJSONObject } from '#mcp/json'
 import { registerFileRoutes } from '#mcp/server/files'
-import { createMCPSessionManager, sessionOpener } from '#mcp/server/sessions'
+import {
+  createMCPSessionManager,
+  MCP_SESSION_EVICT_IDLE_MS,
+  MCP_SESSION_LIMIT,
+  sessionOpener
+} from '#mcp/server/sessions'
 import { createServerInstructions } from '#mcp/skill/instructions'
 import { createToolDescriptors } from '#mcp/tool/manifest'
 import type { ToolDescriptor, ToolPolicy } from '#mcp/tool/metadata'
@@ -245,8 +250,14 @@ function createHonoApp(options: {
       if (transport.error === 'closed') {
         return c.json({ error: 'MCP server is shutting down' }, 503)
       }
+      // The refusal names what the caller ran into, so a client can tell why it was turned away
+      // and when to come back.
       return c.json(
-        { error: 'Too many active MCP sessions' },
+        {
+          error: `The server holds ${MCP_SESSION_LIMIT} MCP sessions at once; close one with DELETE, or wait for one left idle for ${MCP_SESSION_EVICT_IDLE_MS / 1000} seconds to be released.`,
+          limit: MCP_SESSION_LIMIT,
+          retryAfterSeconds: 5
+        },
         { status: 503, headers: { 'Retry-After': '5' } }
       )
     }

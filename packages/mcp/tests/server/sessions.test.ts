@@ -153,6 +153,39 @@ describe('MCP session lifecycle', () => {
     }
   })
 
+  test('a client that reconnects without closing takes the slot of a session left idle', async () => {
+    const ended: string[] = []
+    const instance = manager({
+      evictIdleMs: 0,
+      onSessionClosed: (id) => {
+        ended.push(id)
+      }
+    })
+    const ids: string[] = []
+    for (let i = 0; i < 12; i++) ids.push((await initialized(instance)).id)
+
+    expect(ids).toHaveLength(12)
+    expect(ended).toContain(ids[0])
+    expect(instance.getExistingTransport(ids[0])).toEqual({ error: 'not_found' })
+    expect(instance.getExistingTransport(ids[11])).not.toEqual({ error: 'not_found' })
+  })
+
+  test('a newcomer cannot take the slot of a session another client just used', async () => {
+    const instance = manager()
+    for (let i = 0; i < 10; i++) await initialized(instance)
+
+    expect(await instance.resolveTransport(undefined)).toEqual({ error: 'too_many' })
+  })
+
+  test('a session left idle long enough gives its slot to a newcomer', async () => {
+    const instance = manager({ evictIdleMs: 0 })
+    for (let i = 0; i < 10; i++) await initialized(instance)
+
+    const response = await (await transport(instance)).handleRequest(request(initialize))
+
+    expect(response.status).toBe(200)
+  })
+
   test('counts resources still closing until cleanup completes', async () => {
     const instance = manager()
     const connections = await Promise.all(Array.from({ length: 10 }, () => initialized(instance)))

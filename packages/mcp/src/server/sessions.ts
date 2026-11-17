@@ -5,6 +5,7 @@ import {
   McpServer,
   WebStandardStreamableHTTPServerTransport
 } from '@modelcontextprotocol/server'
+import { minBy } from 'es-toolkit'
 import { withTimeout } from 'es-toolkit/promise'
 
 import { createPendingRequests } from '#mcp/server/pending-requests'
@@ -44,9 +45,17 @@ type MCPSessionManagerOptions = {
   onSessionClosed?: (sessionId: string) => void
   /** Idle lifetime in ms; 0 disables expiration. Defaults to 15 minutes. */
   sessionIdleTimeoutMs?: number
+  /**
+   * How long a session must sit idle before a new client may take its slot at the cap. A session
+   * younger than this belongs to someone who may still be using it. Defaults to two minutes.
+   */
+  evictIdleMs?: number
 }
 
-const MAX_MCP_SESSIONS = 10
+/** How many sessions the server holds at once. */
+export const MCP_SESSION_LIMIT = 10
+/** How long a session must sit idle before a newcomer may take its slot. */
+export const MCP_SESSION_EVICT_IDLE_MS = 2 * 60_000
 /** App chat ids are random hex; anything else is ignored rather than forwarded. */
 const CHAT_ID = /^[0-9a-f]{16,64}$/
 
@@ -103,7 +112,8 @@ export function createMCPSessionManager({
   instructions,
   onSessionOpened,
   onSessionClosed,
-  sessionIdleTimeoutMs = MCP_SESSION_IDLE_TIMEOUT_MS
+  sessionIdleTimeoutMs = MCP_SESSION_IDLE_TIMEOUT_MS,
+  evictIdleMs = MCP_SESSION_EVICT_IDLE_MS
 }: MCPSessionManagerOptions) {
   const sessions = new Map<string, MCPSession>()
   const closing = new Map<string, Promise<void>>()
@@ -157,6 +167,29 @@ export function createMCPSessionManager({
 
   const creating = new Map<string, Promise<MCPTransport>>()
   let closed = false
+
+  /**
+   * A session whose slot a newcomer may take. A client may replace its own idle session, and any
+   * client may take the slot of one left idle long enough that nobody is using it. A session
+   * another client may still be working in is never taken, so no client can push another out;
+   * when live sessions are below the cap, the slots are held by ones still closing, and the
+   * caller waits for them.
+   */
+  function evictionCandidate(
+    opener: MCPSessionOpener
+  ): { id: string; session: MCPSession } | undefined {
+    if (sessions.size + creating.size < MCP_SESSION_LIMIT) return undefined
+    const idle = [...sessions]
+      .map(([id, session]) => ({ id, session }))
+      .filter((entry) => entry.session.activeRequests === 0)
+    if (idle.length === 0) return undefined
+    const own = opener.chat ? idle.filter((entry) => entry.session.agent.chat === opener.chat) : []
+    const now = Date.now()
+    const pool =
+      own.length > 0 ? own : idle.filter((entry) => now - entry.session.lastSeen >= evictIdleMs)
+    if (pool.length === 0) return undefined
+    return minBy(pool, (entry) => entry.session.lastSeen)
+  }
 
   async function createSession(id: string, opener: MCPSessionOpener): Promise<MCPTransport> {
     if (closed) throw new Error('Session manager is closed')
@@ -275,8 +308,11 @@ export function createMCPSessionManager({
         })
       }
     }
-    if (sessions.size + creating.size + closing.size >= MAX_MCP_SESSIONS) {
-      return Promise.resolve({ error: 'too_many' })
+    if (sessions.size + creating.size + closing.size >= MCP_SESSION_LIMIT) {
+      const victim = evictionCandidate(opener)
+      if (!victim) return Promise.resolve({ error: 'too_many' })
+      sessions.delete(victim.id)
+      void scheduleClose(victim.session, victim.id)
     }
     return createSession(sessionId ?? randomUUID(), opener).catch((e) => {
       // If the manager was closed during session creation, return the structured

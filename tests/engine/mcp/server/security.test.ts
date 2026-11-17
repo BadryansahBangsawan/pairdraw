@@ -10,6 +10,7 @@ import { toolNumber } from '@pairdraw/core/tools'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { startServer } from '#mcp/server'
+import { MCP_SESSION_LIMIT } from '#mcp/server/sessions'
 import { parseDiscoveryInfo } from '#mcp/transport/discovery'
 import {
   admittedOrigins,
@@ -402,7 +403,7 @@ describe('MCP auth boundary', () => {
 // ---------------------------------------------------------------------------
 
 describe('MCP session limits', () => {
-  test('server returns 503 when MAX_MCP_SESSIONS is exceeded', async () => {
+  test('a refused session is told the limit and when to come back', async () => {
     if (isUnix) await mkdir(SOCKET_DIR, { recursive: true })
     const handle = await startServer({
       httpPort: 0,
@@ -430,27 +431,25 @@ describe('MCP session limits', () => {
     }
 
     try {
-      // Open MAX_MCP_SESSIONS (10) sessions successfully
-      for (let i = 0; i < 10; i++) await openSession()
+      for (let i = 0; i < MCP_SESSION_LIMIT; i++) await openSession()
 
-      // The 11th must be rejected with 503. The MCP SDK wraps non-2xx
-      // responses in StreamableHTTPError, so we assert on the error text
-      // rather than on a successful return.
-      const overflow = new Client({ name: 'overflow', version: '0.0.0' })
-      const overflowTransport = new StreamableHTTPClientTransport(
-        new URL(`http://127.0.0.1:${httpPort}/mcp`),
-        { requestInit: { headers: { Authorization: `Bearer ${TEST_AUTH_TOKEN}` } } }
+      // One more client is turned away. The status and the limit are the refusal; the sentence
+      // around them is copy.
+      const refused = await fetch(`http://127.0.0.1:${httpPort}/mcp`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${TEST_AUTH_TOKEN}`,
+          'content-type': 'application/json',
+          accept: 'application/json, text/event-stream'
+        },
+        body: '{}'
+      })
+      expect(refused.status).toBe(503)
+      const parsed = v.safeParse(
+        v.pipe(v.string(), v.parseJson(), v.object({ limit: v.literal(MCP_SESSION_LIMIT) })),
+        await refused.text()
       )
-      let caught: unknown = null
-      try {
-        await overflow.connect(overflowTransport)
-        await overflow.listTools()
-      } catch (e) {
-        caught = e
-      }
-      expect(caught).toBeInstanceOf(Error)
-      expect((caught as Error).message).toContain('Too many active MCP sessions')
-      await overflow.close().catch(() => undefined)
+      expect(parsed.success).toBe(true)
     } finally {
       for (const s of sessions) await s.close().catch(() => undefined)
       await handle.close()

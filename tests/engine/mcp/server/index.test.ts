@@ -1004,6 +1004,23 @@ describe('MCP sessions as agents', () => {
     )
   })
 
+  test('a server without an explicit socket path listens inside the test runtime directory', async () => {
+    if (!isUnix) return
+    const handle = await startServer({
+      httpPort: 0,
+      withTcp: true,
+      socketPath: null,
+      authToken: TEST_AUTH_TOKEN,
+      mcpRoot: null
+    })
+    try {
+      const socketPath = expectDefined(handle.socketPath, 'socket path')
+      expect(socketPath.startsWith(tmpdir())).toBe(true)
+    } finally {
+      await handle.close()
+    }
+  })
+
   test('a chat header that is not a chat id is not forwarded', async () => {
     await withAgentClient(
       { [MCP_AGENT_HEADER]: 'acp', [MCP_CHAT_HEADER]: 'not hex' },

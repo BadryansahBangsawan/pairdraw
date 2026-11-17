@@ -4,29 +4,35 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 /**
- * Test preload: isolate the MCP discovery file so `bun test` runs never
- * clobber the real `~/Library/Application Support/Pairdraw/mcp.json`.
+ * Test preload: isolate the MCP runtime files so `bun test` runs never touch
+ * the real `~/Library/Application Support/Pairdraw/mcp.json` or `mcp.sock`.
  *
  * Deleting that file while the Pairdraw desktop app is running breaks every
  * MCP client: the discovery file is the only place the server's auth token is
  * published, so stdio bridges fall back to a null token and every /rpc call
- * returns 401 (surfacing as a spurious "auth issue"). The engine tests in
- * tests/engine/mcp/** call startServer()/handle.close() which writes and then
- * removes the discovery file — without isolation they did so at the real
- * platform path.
+ * returns 401 (surfacing as a spurious "auth issue"). A server started without
+ * an explicit socket path also binds and later removes `mcp.sock` at the same
+ * real path: while the app serves it the test dies with EADDRINUSE, and while
+ * the app is stopped the test deletes its socket file. The engine tests in
+ * tests/engine/mcp/** and packages/mcp/tests/** call startServer()/handle.close()
+ * without a socket path, so both files are isolated here.
  *
- * Honored via PAIRDRAW_MCP_DISCOVERY_PATH in getDiscoveryPath()
- * (packages/mcp/src/transport/paths.ts). Per-process temp path so parallel
- * bun workers don't collide. A crypto.randomUUID() suffix guarantees that
- * PID reuse after a crash cannot reuse a stale discovery dir from a prior
- * process that happened to recycle the same PID. An operator-provided value
- * is respected.
+ * Honored via PAIRDRAW_MCP_DISCOVERY_PATH in getDiscoveryPath() and
+ * PAIRDRAW_MCP_SOCKET in getSocketPath() (packages/mcp/src/transport/paths.ts).
+ * Per-process temp path so parallel bun workers don't collide. A
+ * crypto.randomUUID() suffix guarantees that PID reuse after a crash cannot
+ * reuse a stale discovery dir from a prior process that happened to recycle
+ * the same PID. An operator-provided value is respected.
  */
-const tmpDiscoveryDir = join(tmpdir(), `pairdraw-mcp-test-${process.pid}-${randomUUID()}`)
-let ownsDiscoveryPath = false
+const tmpRuntimeDir = join(tmpdir(), `pairdraw-mcp-test-${process.pid}-${randomUUID()}`)
+let ownsRuntimePaths = false
 if (!process.env.PAIRDRAW_MCP_DISCOVERY_PATH) {
-  process.env.PAIRDRAW_MCP_DISCOVERY_PATH = join(tmpDiscoveryDir, 'mcp.json')
-  ownsDiscoveryPath = true
+  process.env.PAIRDRAW_MCP_DISCOVERY_PATH = join(tmpRuntimeDir, 'mcp.json')
+  ownsRuntimePaths = true
+}
+if (!process.env.PAIRDRAW_MCP_SOCKET) {
+  process.env.PAIRDRAW_MCP_SOCKET = join(tmpRuntimeDir, 'mcp.sock')
+  ownsRuntimePaths = true
 }
 
 /**
@@ -77,7 +83,7 @@ export function isProcessAlive(pid: number): boolean {
  * whose owner PID is no longer alive. Live PIDs (concurrent runs) are skipped;
  * the current run's dir does not exist yet at this point so it is never touched.
  */
-if (ownsDiscoveryPath) {
+if (ownsRuntimePaths) {
   // Matches both the old format (pairdraw-mcp-test-<pid>) and the new
   // UUID-suffixed format (pairdraw-mcp-test-<pid>-<uuid>) so leftovers
   // from either naming convention are swept. The PID is always capture group 1.

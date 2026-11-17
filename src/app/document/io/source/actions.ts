@@ -303,6 +303,26 @@ export function createDocumentSourceActions({
     return saved
   }
 
+  /**
+   * Whether this is still the empty design its tab started with, which another document may take
+   * the place of: nothing was opened into it, saved, downloaded, or kept for it, and nobody
+   * edited or renamed it.
+   */
+  function isBlankDocument(): boolean {
+    return (
+      state.documentName === 'Untitled' &&
+      !editor.undo.canUndo &&
+      !changes.hasUnsavedChanges() &&
+      !hasWritableSource() &&
+      getFilePath() === null &&
+      getFileHandle() === null &&
+      getDownloadName() === null &&
+      getStorageBinding() === null &&
+      draft.getDraftId() === null &&
+      !recovery.hasAdoptedCopy()
+    )
+  }
+
   function startWatchingCurrentFile() {
     void startWatchingFile()
   }
@@ -325,6 +345,7 @@ export function createDocumentSourceActions({
     saveFigFileCopy: (write: (data: Uint8Array) => Promise<void>) =>
       saveAndTrack(() => saveFigFileCopy(write)),
     saveFigFileToStorage,
+    isBlankDocument,
     startWatchingCurrentFile,
     disposeDocumentIO,
     saveFigFile: () => saveAndTrack(saveFigFile),

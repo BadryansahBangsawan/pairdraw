@@ -298,16 +298,9 @@ type OpeningTab = {
 
 function reusableTabStore(): OpeningTab {
   const current = activeTab.value
-  const source = current?.store.getSourceIdentity()
-  const isUntouched =
-    current?.kind === 'document' &&
-    current.store.state.documentName === 'Untitled' &&
-    !current.store.undo.canUndo &&
-    current.store.getStorageBinding() === null &&
-    // A draft opened from Home is a document of its own, even before it changes.
-    current.store.getDraftId() === null &&
-    source?.path === null &&
-    source.handle === null
+  // The store knows every way it may hold a document: a path, a handle, a download name, storage,
+  // a draft, or a copy this device kept, and whether anyone edited or renamed it.
+  const isUntouched = current?.kind === 'document' && current.store.isBlankDocument()
   if (current && isUntouched) {
     return {
       store: current.store,

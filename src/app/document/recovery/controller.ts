@@ -33,6 +33,8 @@ interface DocumentRecoveryOptions {
 
 export interface DocumentRecoveryController {
   getRecoveryId(): string
+  /** Whether the document came from a copy this device kept, such as a restored recovery one. */
+  hasAdoptedCopy(): boolean
   adoptRecoverySnapshot(id: string): Promise<void>
   persistNow(): Promise<void>
   markProtectedVersion(version: number): Promise<void>
@@ -56,6 +58,8 @@ export function createDocumentRecovery({
   let id = recoveryId
   let protectedVersion = currentVersion()
   let persistedVersion: number | null = null
+  // A document opened from a kept copy is not the empty design its tab started with.
+  let adoptedCopy = false
   let requestedVersion = protectedVersion
   let lifecycleGeneration = 0
   let writing: Promise<void> | null = null
@@ -161,9 +165,11 @@ export function createDocumentRecovery({
 
   return {
     getRecoveryId: () => id,
+    hasAdoptedCopy: () => adoptedCopy,
     async adoptRecoverySnapshot(nextId) {
       const previousId = id
       await invalidateActiveWrite()
+      adoptedCopy = true
       id = nextId
       // The adopted snapshot holds the document as it is now.
       const version = currentVersion()

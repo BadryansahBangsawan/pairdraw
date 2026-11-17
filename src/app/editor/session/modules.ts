@@ -88,6 +88,8 @@ export function createEditorStoreModules(
     getViewportSize: documentIO.getViewportSize,
     fitCurrentPageToViewport: documentIO.fitCurrentPageToViewport,
     hasUnsavedChanges: documentIO.hasUnsavedChanges,
+    /** Whether the tab still holds the empty design it started with, so a document may take it. */
+    isBlankDocument: documentIO.isBlankDocument,
     renameDocument: documentIO.renameDocument,
     /** Calls back with each name the person gives the document. */
     onDocumentRenamed: documentIO.onDocumentRenamed,

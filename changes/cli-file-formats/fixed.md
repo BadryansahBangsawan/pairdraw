@@ -1,3 +1,4 @@
 - `pairdraw export --format pdf` writes the PDF when the CLI runs under Node, not only under Bun.
 - Converting to draw.io says which variables the file cannot hold, instead of dropping them silently.
 - Opening a file whose `.fig` archive is damaged or is not a ZIP fails with a clear error instead of decoding different content silently.
+- Converting to draw.io and back keeps a frame a frame, a rectangle a rectangle, and every layer name.

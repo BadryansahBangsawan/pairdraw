@@ -44,6 +44,11 @@ function style(names: string[], values: Record<string, string | undefined>): Dra
   }
 }
 
+/** A layer's name, which draw.io has no field of its own for, so it travels in the style. */
+function nameValues(node: SceneNode): Record<string, string> {
+  return { pairdrawName: encodeURIComponent(node.name) }
+}
+
 /** A layer's first visible solid fill, or the first stop of a gradient, as draw.io's colour. */
 function fillColor(node: SceneNode): string {
   const fill = node.fills.find((paint) => paint.visible)
@@ -296,6 +301,7 @@ class PageWriter {
           style: style(['text'], {
             html: '1',
             whiteSpace: 'wrap',
+            ...nameValues(node),
             ...placedValues(placement),
             ...fontValues(node)
           }),
@@ -349,6 +355,7 @@ class PageWriter {
           style: style([], {
             container: '1',
             html: '1',
+            ...nameValues(node),
             ...paintValues(node),
             ...placedValues(placement)
           }),
@@ -361,7 +368,10 @@ class PageWriter {
           kind: 'vertex',
           value: '',
           style: style(node.type === 'ELLIPSE' ? ['ellipse'] : [], {
+            ...(node.type === 'RECTANGLE' ? { pairdrawType: 'RECTANGLE' } : {}),
             rounded: node.cornerRadius > 0 ? '1' : undefined,
+            pairdrawCornerRadius: node.cornerRadius > 0 ? String(node.cornerRadius) : undefined,
+            ...nameValues(node),
             ...placedValues(placement),
             ...paintValues(node)
           }),
@@ -378,6 +388,7 @@ class PageWriter {
     const label = shapeWithTextLabel(this.graph, node)
     const values: Record<string, string | undefined> = {
       ...drawioShapeValues(node.shapeWithTextType),
+      ...nameValues(node),
       whiteSpace: 'wrap',
       html: '1',
       ...paintValues(node),

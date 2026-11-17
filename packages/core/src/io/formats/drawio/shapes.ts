@@ -1,12 +1,14 @@
 import type { DrawIOStyle } from '@pairdraw/drawio'
 import type { ShapeWithTextType } from '@pairdraw/scene-graph/shape-with-text'
 
-/** What a draw.io vertex becomes: a FigJam shape, text, a section around its cells, or a group. */
+/** What a draw.io vertex becomes: a shape, text, a frame or section around its cells, or a group. */
 export type VertexKind =
   /** A FigJam shape, turned clockwise by `rotation` degrees about its centre. */
   | { type: 'SHAPE_WITH_TEXT'; shape: ShapeWithTextType; rotation: number; stencil: boolean }
   | { type: 'TEXT' }
+  | { type: 'FRAME' }
   | { type: 'SECTION' }
+  | { type: 'RECTANGLE' }
   | { type: 'GROUP' }
 
 /**
@@ -82,18 +84,20 @@ const DIRECTION_TURN = new Map([
 ])
 
 /**
- * What a vertex becomes. Text stays text; a swimlane, or a vertex its style makes a container,
- * becomes a section holding its cells; a group stays a group. A shape draw.io turns by
- * `direction` keeps its turn. Any other shape, a stencil FigJam has no shape for among them,
- * becomes a rectangle, named after the stencil so it can be found.
+ * What a vertex becomes. Text stays text; a swimlane becomes a section holding its cells, and
+ * any other vertex its style makes a container becomes a frame, as Pairdraw writes one; a group
+ * stays a group. A style Pairdraw wrote says when it drew a rectangle, which draw.io has no
+ * style of its own for. A shape draw.io turns by `direction` keeps its turn. Any other shape, a
+ * stencil FigJam has no shape for among them, becomes a shape named after the stencil.
  */
 export function vertexKind(style: DrawIOStyle, hasChildren: boolean): VertexKind {
   const name = shapeName(style)
   if (name === 'text') return { type: 'TEXT' }
-  if (name === 'swimlane' || (hasChildren && style.values.container === '1')) {
-    return { type: 'SECTION' }
-  }
-  if (name === 'group' || (hasChildren && !SHAPES.has(name))) return { type: 'GROUP' }
+  if (style.values.pairdrawType === 'RECTANGLE') return { type: 'RECTANGLE' }
+  if (name === 'swimlane') return { type: 'SECTION' }
+  if (name === 'group') return { type: 'GROUP' }
+  if (style.values.container === '1') return { type: 'FRAME' }
+  if (hasChildren && !SHAPES.has(name)) return { type: 'GROUP' }
   let shape = SHAPES.get(name) ?? 'SQUARE'
   const direction = style.values.direction ?? 'east'
   let rotation = 0

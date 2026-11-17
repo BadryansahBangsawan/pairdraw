@@ -33,6 +33,25 @@ function nameOf(text: string, fallback: string): string {
   return text.split('\n')[0]?.trim() || fallback
 }
 
+/**
+ * The name Pairdraw wrote into a cell's style. draw.io has no field of its own for a layer whose
+ * cell draws no text, and a text cell's label is its content, so the name travels beside them.
+ */
+function writtenName(style: DrawIOStyle): string | undefined {
+  const value = style.values.pairdrawName
+  if (value === undefined) return undefined
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return undefined
+  }
+}
+
+/** A layer's name: the one Pairdraw wrote, else the first line of its label. */
+function layerName(style: DrawIOStyle, text: string, fallback: string): string {
+  return writtenName(style) ?? nameOf(text, fallback)
+}
+
 /** Builds one draw.io page's cells into `pageId`, in draw.io's drawing order. */
 class PageBuilder {
   /** The layer each draw.io cell or layer became. */
@@ -113,11 +132,27 @@ class PageBuilder {
       return graph.createNode('TEXT', parentId, {
         ...box,
         ...placementOf(cell.style),
-        name: nameOf(label.text, 'Text'),
+        name: layerName(cell.style, label.text, 'Text'),
         ...labelFields(cell.style, label.format),
         text: label.text,
         styleRuns: label.runs,
         textAutoResize: 'NONE'
+      })
+    }
+    if (kind.type === 'FRAME') {
+      return graph.createNode('FRAME', parentId, {
+        ...box,
+        ...shapePaint(cell.style),
+        name: layerName(cell.style, label.text, 'Frame')
+      })
+    }
+    if (kind.type === 'RECTANGLE') {
+      const radius = Number.parseFloat(cell.style.values.pairdrawCornerRadius ?? '')
+      return graph.createNode('RECTANGLE', parentId, {
+        ...box,
+        ...shapePaint(cell.style),
+        ...(radius > 0 ? { cornerRadius: radius } : {}),
+        name: layerName(cell.style, label.text, 'Rectangle')
       })
     }
     if (kind.type === 'SECTION') {

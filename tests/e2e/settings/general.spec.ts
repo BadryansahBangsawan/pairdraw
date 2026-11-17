@@ -1,6 +1,14 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
+
+/** Presses an option the way assistive technology does: a click with no pointer sequence. */
+async function pressRow(page: Page, name: string): Promise<void> {
+  await page.getByRole('option', { name, exact: true }).evaluate((row) => {
+    if (!(row instanceof HTMLElement)) throw new Error('The option is not an element')
+    row.click()
+  })
+}
 
 test('language can be changed from General settings and persists', async ({ page }) => {
   await page.goto('/?test')
@@ -26,6 +34,31 @@ test('language can be changed from General settings and persists', async ({ page
   await expect(page.getByTestId('app-settings-dialog')).toContainText('Settings')
   await expect(page.getByRole('combobox', { name: 'Theme', exact: true })).toHaveText('Dark')
   await expect(page.getByRole('combobox', { name: 'Animations' })).toHaveText('Follow system')
+})
+
+test('a theme row pressed without a pointer sequence changes the theme and persists', async ({
+  page
+}) => {
+  await page.goto('/?test')
+  const canvas = new CanvasHelper(page)
+  await canvas.waitForInit()
+
+  await page.getByTestId('app-settings-trigger').click()
+  const theme = page.getByRole('combobox', { name: 'Theme', exact: true })
+  await theme.click()
+  await pressRow(page, 'Light')
+  await expect(theme).toHaveText('Light')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+
+  await page.getByTestId('settings-language').click()
+  await pressRow(page, 'Русский')
+  await expect(page.getByTestId('app-settings-dialog')).toContainText('Настройки')
+
+  await page.reload()
+  await canvas.waitForInit()
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+  await page.getByTestId('app-settings-trigger').click()
+  await expect(page.getByTestId('settings-language')).toContainText('Русский')
 })
 
 test('general snapping preferences persist and apply to editor sessions', async ({ page }) => {

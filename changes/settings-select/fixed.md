@@ -1,0 +1,1 @@
+- A settings choice applies when it is made with an assistive press or a keyboard click, not only with a mouse.

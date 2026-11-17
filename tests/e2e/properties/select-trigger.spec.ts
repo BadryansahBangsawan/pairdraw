@@ -78,3 +78,58 @@ for (const custom of [false, true]) {
     }
   })
 }
+
+test('a row pressed with a click alone writes the value once and closes the menu', async ({
+  page
+}) => {
+  await page.goto('/?test')
+  await new CanvasHelper(page).waitForInit()
+  const fixture = await page.evaluateHandle(async () => {
+    const vuePath = '/node_modules/.vite/deps/vue.js'
+    const selectPath = '/src/components/ui/select/AppSelect.vue'
+    const { createApp, h, ref } = await import(vuePath)
+    const { default: AppSelect } = await import(selectPath)
+    const value = ref('first')
+    const writes = ref([])
+    const host = document.createElement('div')
+    host.dataset.slot = 'select-writes-fixture'
+    document.body.append(host)
+    const app = createApp(() =>
+      h(AppSelect, {
+        modelValue: value.value,
+        label: 'Choose style',
+        options: [
+          { value: 'first', label: 'First' },
+          { value: 'second', label: 'Second' },
+          { value: 'third', label: 'Third' }
+        ],
+        'onUpdate:modelValue': (next: string) => {
+          writes.value.push(next)
+          value.value = next
+        }
+      })
+    )
+    app.mount(host)
+    return {
+      writes: () => writes.value,
+      dispose() {
+        app.unmount()
+        host.remove()
+      }
+    }
+  })
+  try {
+    const trigger = page.getByRole('combobox', { name: 'Choose style' })
+    await trigger.click()
+    await page.getByRole('option', { name: 'Second', exact: true }).evaluate((row) => {
+      if (!(row instanceof HTMLElement)) throw new Error('The option is not an element')
+      row.click()
+    })
+    await expect.poll(() => fixture.evaluate((state) => state.writes())).toEqual(['second'])
+    await expect(trigger).toHaveText('Second')
+    await expect(page.getByRole('option')).toHaveCount(0)
+  } finally {
+    await fixture.evaluate((state) => state.dispose())
+    await fixture.dispose()
+  }
+})

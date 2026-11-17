@@ -1,0 +1,1 @@
+- `pairdraw export --format pdf` writes the PDF when the CLI runs under Node, not only under Bun.

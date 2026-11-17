@@ -1,5 +1,7 @@
 import type * as HappyDOM from 'happy-dom'
 
+import type { svg2pdf } from 'svg2pdf.js'
+
 import { IS_BROWSER } from '#core/constants'
 
 /** A page's SVG markup as the element svg2pdf draws, or null when it does not parse. */
@@ -97,5 +99,33 @@ async function withHappyDOM<T>(draw: (parse: SVGPageParser) => Promise<T>): Prom
       else removeGlobal(scope, name)
     }
     await dom.happyDOM.close()
+  }
+}
+
+/**
+ * Loads `svg2pdf.js`. Its package publishes a UMD build only, whose factory reads jsPDF from the
+ * global `jspdf` and, with no CommonJS `exports`, writes the function to the global `svg2pdf`; a
+ * bundler supplies both, a bare Node install supplies neither, and the module then fails on load.
+ * The two globals exist only while the import evaluates, and the function the module made keeps
+ * the jsPDF it read, so the rest of the export needs nothing from them.
+ */
+export async function loadSVG2PDF(jsPDF: unknown): Promise<typeof svg2pdf> {
+  const scope = globalThis as { jspdf?: unknown; svg2pdf?: { svg2pdf?: typeof svg2pdf } }
+  const previousJSPDF = Object.getOwnPropertyDescriptor(globalThis, 'jspdf')
+  const previousSVG2PDF = Object.getOwnPropertyDescriptor(globalThis, 'svg2pdf')
+  const set = (name: string, value: unknown): void => {
+    Object.defineProperty(globalThis, name, { value, configurable: true, writable: true })
+  }
+  set('jspdf', { jsPDF })
+  try {
+    const module = (await import('svg2pdf.js')) as { svg2pdf?: typeof svg2pdf }
+    const draw = module.svg2pdf ?? scope.svg2pdf?.svg2pdf
+    if (!draw) throw new Error('svg2pdf.js exported no svg2pdf function')
+    return draw
+  } finally {
+    if (previousJSPDF) Object.defineProperty(globalThis, 'jspdf', previousJSPDF)
+    else delete scope.jspdf
+    if (previousSVG2PDF) Object.defineProperty(globalThis, 'svg2pdf', previousSVG2PDF)
+    else delete scope.svg2pdf
   }
 }

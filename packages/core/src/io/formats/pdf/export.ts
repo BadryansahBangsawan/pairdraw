@@ -3,7 +3,7 @@ import type { SceneGraph } from '@pairdraw/scene-graph'
 import { computeContentBounds } from '#core/io/formats/raster'
 import { renderNodesToSVG, type SVGExportOptions, type SVGTextLayout } from '#core/io/formats/svg'
 
-import { withPDFDOM, type SVGPageParser } from './dom'
+import { loadSVG2PDF, withPDFDOM, type SVGPageParser } from './dom'
 import {
   cutFontInstances,
   embeddedFontAlias,
@@ -97,7 +97,8 @@ async function renderPages(
   if (prepared.length === 0) return null
   const first = prepared[0]
 
-  const [{ jsPDF }, { svg2pdf }] = await Promise.all([import('jspdf'), import('svg2pdf.js')])
+  const { jsPDF } = await import('jspdf')
+  const svg2pdf = await loadSVG2PDF(jsPDF)
 
   const doc = new jsPDF({
     orientation: orientationOf(first),

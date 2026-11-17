@@ -1,5 +1,5 @@
 import { describe, expect, setDefaultTimeout, test } from 'bun:test'
-import { mkdtemp, readFile } from 'node:fs/promises'
+import { copyFile, mkdtemp, readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -16,8 +16,12 @@ function parseJSON<T>(text: string, schema: v.GenericSchema<unknown, T>): T {
   return v.parse(v.pipe(v.string(), v.parseJson(), schema), text)
 }
 
-async function cli(args: string[]) {
-  const proc = Bun.spawn([process.execPath, CLI_ENTRY, ...args], { stdout: 'pipe', stderr: 'pipe' })
+async function cli(args: string[], stdin?: string) {
+  const proc = Bun.spawn([process.execPath, CLI_ENTRY, ...args], {
+    stdout: 'pipe',
+    stderr: 'pipe',
+    stdin: stdin === undefined ? undefined : Buffer.from(stdin)
+  })
   const [stdout, stderr] = await Promise.all([
     new Response(proc.stdout).text(),
     new Response(proc.stderr).text()
@@ -106,5 +110,22 @@ describe('tool CLI', () => {
     const read = await cli(['tool', 'call', 'list_pages', FIXTURE, '--preview-output', unchanged])
     expect(read.exitCode).toBe(0)
     expect(await Bun.file(unchanged).exists()).toBe(false)
+  })
+})
+
+describe('tool arguments from stdin', () => {
+  test('reads --args-file - from standard input', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-tool-stdin-'))
+    const file = join(dir, 'card.fig')
+    await copyFile(FIXTURE, file)
+
+    const result = await cli(
+      ['tool', 'call', 'create_shape', file, '--args-file', '-', '--json'],
+      '{"type":"RECTANGLE","x":0,"y":0,"width":30,"height":30}'
+    )
+
+    expect(result.exitCode).toBe(0)
+    const created = parseJSON(result.stdout, v.object({ type: v.literal('RECTANGLE') }))
+    expect(created.type).toBe('RECTANGLE')
   })
 })

@@ -2,6 +2,7 @@ export * from './contrast'
 export * from './management'
 export { normalizeColor } from './normalize'
 export * from './okhcl'
+export { colorSchema } from './schema'
 
 import { parse, formatHex, formatHex8, formatRgb, converter, differenceEuclidean } from 'culori'
 

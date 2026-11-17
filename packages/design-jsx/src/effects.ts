@@ -3,6 +3,8 @@ import { parseColor } from '@pairdraw/scene-graph/color'
 import { TRANSPARENT } from '@pairdraw/scene-graph/constants'
 import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 
+import { BLEND_MODE } from './enums'
+
 export type EffectColor = string | Color
 
 export interface ShadowEffectOptions {
@@ -13,7 +15,8 @@ export interface ShadowEffectOptions {
   radius?: number
   spread?: number
   visible?: boolean
-  blendMode?: BlendMode
+  /** Same spellings as a layer's `blendMode`, read case-insensitively. */
+  blendMode?: string
   showShadowBehindNode?: boolean
 }
 
@@ -30,6 +33,11 @@ function toColor(color: EffectColor | undefined): Color {
   return typeof color === 'string' ? parseColor(color) : color
 }
 
+/** A layer's `blendMode` spelling, or undefined when the helper omits it or names none. */
+function parsedBlendMode(blendMode: string | undefined): BlendMode | undefined {
+  return blendMode === undefined ? undefined : BLEND_MODE.parse(blendMode)
+}
+
 function shadowEffect(type: 'DROP_SHADOW' | 'INNER_SHADOW', options: ShadowEffectOptions): Effect {
   return {
     type,
@@ -38,7 +46,7 @@ function shadowEffect(type: 'DROP_SHADOW' | 'INNER_SHADOW', options: ShadowEffec
     radius: options.radius ?? DEFAULT_EFFECT_RADIUS,
     spread: options.spread ?? 0,
     visible: options.visible ?? true,
-    blendMode: options.blendMode,
+    blendMode: parsedBlendMode(options.blendMode),
     showShadowBehindNode: options.showShadowBehindNode
   }
 }

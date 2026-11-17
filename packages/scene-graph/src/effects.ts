@@ -1,8 +1,13 @@
 import type { Vector } from './primitives'
-import type { Effect, ShadowEffect } from './types'
+import type { Effect, ShaderEffect, ShadowEffect } from './types'
 
 const SHADOW_OFFSET: Vector = { x: 0, y: 4 }
 const BLUR_OFFSET: Vector = { x: 0, y: 0 }
+
+/** A shadow or blur whose offset may still be missing or only partly present. */
+type ShadowInput = Omit<ShadowEffect, 'offset'> & {
+  offset?: Partial<Vector> | null
+}
 
 function fallbackOffset(type: ShadowEffect['type']): Vector {
   return type === 'DROP_SHADOW' || type === 'INNER_SHADOW' ? SHADOW_OFFSET : BLUR_OFFSET
@@ -15,7 +20,7 @@ function component(offset: object, key: 'x' | 'y', fallback: number): number {
 }
 
 /** A new offset when `effect.offset` is missing or not finite; null when it can stay. */
-function finiteOffset(effect: ShadowEffect): Vector | null {
+function finiteOffset(effect: ShadowInput): Vector | null {
   const fallback = fallbackOffset(effect.type)
   const offset: unknown = effect.offset
   if (offset === null || typeof offset !== 'object') return { x: fallback.x, y: fallback.y }
@@ -25,9 +30,28 @@ function finiteOffset(effect: ShadowEffect): Vector | null {
   return { x, y }
 }
 
-function withFiniteOffset(effect: ShadowEffect): Effect {
+function isStoredShadow(effect: ShadowInput): effect is ShadowEffect {
+  const offset = effect.offset
+  return (
+    !!offset &&
+    typeof offset.x === 'number' &&
+    Number.isFinite(offset.x) &&
+    typeof offset.y === 'number' &&
+    Number.isFinite(offset.y)
+  )
+}
+
+function withFiniteOffset(effect: ShadowInput): Effect {
   const offset = finiteOffset(effect)
-  return offset ? { ...effect, offset } : effect
+  if (!offset) {
+    if (isStoredShadow(effect)) return effect
+    return { ...effect, offset: fallbackOffset(effect.type) }
+  }
+  return { ...effect, offset }
+}
+
+function isStoredEffect(effect: ShaderEffect | ShadowInput): effect is Effect {
+  return effect.type === 'SHADER' || isStoredShadow(effect)
 }
 
 /**
@@ -35,16 +59,18 @@ function withFiniteOffset(effect: ShadowEffect): Effect {
  * the same default as `dropShadow()` and `set_effects`; a blur uses `{x: 0, y: 0}`. Shader effects
  * are left alone. An array that is already valid is returned as itself.
  */
-export function normalizeEffects(effects: Effect[]): Effect[] {
+export function normalizeEffects(effects: (ShaderEffect | ShadowInput)[]): Effect[] {
   let next: Effect[] | null = null
   for (const [index, effect] of effects.entries()) {
     const normalized = effect.type === 'SHADER' ? effect : withFiniteOffset(effect)
     if (normalized === effect) {
-      next?.push(effect)
+      if (next && isStoredEffect(effect)) next.push(effect)
       continue
     }
-    next ??= effects.slice(0, index)
+    next ??= effects.slice(0, index).filter(isStoredEffect)
     next.push(normalized)
   }
-  return next ?? effects
+  if (next) return next
+  if (effects.every(isStoredEffect)) return effects
+  return effects.filter(isStoredEffect)
 }

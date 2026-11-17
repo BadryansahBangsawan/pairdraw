@@ -49,7 +49,17 @@ function pixel(x: number, y: number): { r: number; g: number; b: number } {
   }
 }
 
+const COLORLESS = `<Frame name="Card" w={160} h={80} effects={[{ type: "DROP_SHADOW", radius: 16, visible: true }]} />`
+
 describe('render tool effects', () => {
+  test('refuses a shadow that has no color and does not insert the layer', async () => {
+    const { graph, figma } = setupToolTest()
+    const page = expectDefined(graph.getPages()[0], 'page')
+    const before = page.childIds.length
+    await expect(runTool(figma, 'render', { jsx: COLORLESS })).rejects.toThrow(/color/i)
+    expect(graph.getPages()[0]?.childIds).toHaveLength(before)
+  })
+
   test('a drop shadow written without an offset still draws, and so does the layer beside it', async () => {
     const { graph, figma } = setupToolTest()
     const cardId = createdId(await runTool(figma, 'render', { jsx: CARD }))

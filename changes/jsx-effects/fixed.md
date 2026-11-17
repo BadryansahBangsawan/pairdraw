@@ -1,0 +1,2 @@
+- A design JSX shadow that is missing a color, an effect whose radius is not a number, or a type that is not an effect name is refused, and the error names that prop.
+- A design JSX blur may omit its color, which is stored as transparent.

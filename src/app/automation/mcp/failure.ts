@@ -26,6 +26,7 @@ export type MCPFailureCode =
   | 'outdated'
   | 'permission-denied'
   | 'exited'
+  | 'restart-exhausted'
   | 'timeout'
   | 'rejected'
   | 'malformed'
@@ -50,6 +51,7 @@ const MCP_FAILURE_DETAIL_LIMIT = 400
  */
 const RESTART_FIXES: ReadonlySet<MCPFailureCode> = new Set([
   'exited',
+  'restart-exhausted',
   'timeout',
   'rejected',
   'malformed',

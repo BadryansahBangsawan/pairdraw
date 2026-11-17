@@ -25,6 +25,9 @@ export const automationMessageDefaults = {
     'The system denied the command. Reinstall Pairdraw with its shell permissions, or start the server manually.',
   mcpFailureExited: 'MCP server stopped during startup',
   mcpFailureExitedHint: 'The process exited before it became ready.',
+  mcpFailureRestartExhausted: 'MCP server kept stopping',
+  mcpFailureRestartExhaustedHint:
+    'It was started again several times and did not stay running. Restart it from Settings, or restart the app.',
   mcpFailureTimeout: 'MCP server did not respond in time',
   mcpFailureTimeoutHint: 'It did not become ready within the startup timeout.',
   mcpFailureRejected: 'MCP server rejected the local connection',

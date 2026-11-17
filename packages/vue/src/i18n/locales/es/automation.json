@@ -73,6 +73,8 @@
   "mcpFailurePermissionHint": "El sistema denegó el comando. Reinstala Pairdraw con sus permisos de shell o inicia el servidor manualmente.",
   "mcpFailureExited": "El servidor MCP se detuvo durante el inicio",
   "mcpFailureExitedHint": "El proceso terminó antes de estar listo.",
+  "mcpFailureRestartExhausted": "El servidor MCP no se mantuvo en ejecución",
+  "mcpFailureRestartExhaustedHint": "Se inició de nuevo varias veces y no siguió en marcha. Reinícialo en Ajustes o reinicia la app.",
   "mcpFailureTimeout": "El servidor MCP no respondió a tiempo",
   "mcpFailureTimeoutHint": "No quedó listo dentro del tiempo de inicio.",
   "mcpFailureRejected": "El servidor MCP rechazó la conexión local",

@@ -7,6 +7,7 @@ describe('restartFixesMCPFailure', () => {
     ['rejected', true],
     ['timeout', true],
     ['exited', true],
+    ['restart-exhausted', true],
     ['malformed', true],
     ['unreachable', true],
     ['unknown', true],

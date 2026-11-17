@@ -96,6 +96,10 @@ const copy$ = computed(() => {
       description: messages.mcpFailurePermissionHint
     },
     exited: { heading: messages.mcpFailureExited, description: messages.mcpFailureExitedHint },
+    'restart-exhausted': {
+      heading: messages.mcpFailureRestartExhausted,
+      description: messages.mcpFailureRestartExhaustedHint
+    },
     timeout: { heading: messages.mcpFailureTimeout, description: messages.mcpFailureTimeoutHint },
     rejected: {
       heading: messages.mcpFailureRejected,
@@ -123,6 +127,7 @@ const copy$ = computed(() => {
 const EXPLAINED_REASONS: ReadonlySet<MCPFailureCode> = new Set([
   'outdated',
   'rejected',
+  'restart-exhausted',
   'unreachable'
 ])
 

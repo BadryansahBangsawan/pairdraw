@@ -1,8 +1,11 @@
-import { describe, expect, test } from 'bun:test'
+import { afterEach, describe, expect, test, vi } from 'bun:test'
 
 import type { ToolDescriptor } from '@pairdraw/mcp/tools'
 
 import { createMCPRuntimeService, type MCPRuntimeDependencies } from '@/app/automation/mcp/runtime'
+import type { EditorStore } from '@/app/editor/active-store'
+
+import { asDouble } from '#tests/helpers/doubles'
 
 function descriptor(name = 'get_page_tree'): ToolDescriptor {
   return {
@@ -40,7 +43,31 @@ function setup(overrides: Partial<MCPRuntimeDependencies> = {}) {
   return { calls, catalogs, service: createMCPRuntimeService(dependencies) }
 }
 
-const getStore = () => ({}) as never
+const getStore = () => asDouble<EditorStore>({})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
+
+/** Runs timers the runtime scheduled, then the promises those timers started. */
+async function advance(ms: number): Promise<void> {
+  vi.advanceTimersByTime(ms)
+  await Promise.resolve()
+  await Promise.resolve()
+  await Promise.resolve()
+  await Promise.resolve()
+}
+
+/** Waits for the runtime to reach a state, instead of guessing how long it takes. */
+async function waitFor(condition: () => boolean, timeoutMs = 3000): Promise<void> {
+  const deadline = Date.now() + timeoutMs
+  while (!condition()) {
+    if (Date.now() > deadline) throw new Error('the runtime did not reach the state in time')
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 5)
+    })
+  }
+}
 
 describe('MCP runtime service', () => {
   test('starts only after a healthy server response', async () => {
@@ -51,6 +78,169 @@ describe('MCP runtime service', () => {
     expect(service.state.version).toBe('0.14.0')
     expect(calls).toEqual(['connect'])
     expect(catalogs.at(-1)?.map((tool) => tool.name)).toEqual(['get_page_tree'])
+  })
+
+  test('restarts an app-owned server that stops, without a restart of the app', async () => {
+    let healthy = true
+    let spawns = 0
+    const { service } = setup({
+      watchIntervalMs: 20,
+      readHealth: async () =>
+        healthy ? { status: 'ok', version: '0.14.0', tools: [descriptor()] } : null,
+      spawn: async () => {
+        spawns += 1
+        // The server the app starts again answers health from then on.
+        healthy = true
+        return { authToken: 'token', managed: true, disconnect: () => undefined }
+      }
+    })
+
+    expect(await service.start(getStore)).toEqual({ ok: true })
+    expect(spawns).toBe(1)
+    healthy = false
+    await waitFor(() => spawns === 2)
+    // The watch queues its work behind the lifecycle; a refresh waits for it to finish.
+    await service.refresh()
+    expect(service.state.status).toBe('running')
+    expect(service.state.failure).toBeNull()
+    await service.stop()
+  })
+
+  test('leaves a server someone else runs alone', async () => {
+    let spawns = 0
+    const { service } = setup({
+      watchIntervalMs: 20,
+      readHealth: async () => null,
+      spawn: async () => {
+        spawns += 1
+        return { authToken: 'token', managed: false, disconnect: () => undefined }
+      }
+    })
+
+    await service.start(getStore)
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 60)
+    })
+    await service.refresh()
+    expect(spawns).toBe(1)
+    await service.stop()
+  })
+
+  test('a server that keeps dying is reported instead of started forever', async () => {
+    let healthy = true
+    let spawns = 0
+    const { service } = setup({
+      watchIntervalMs: 5,
+      restartPolicy: { baseMs: 1, attempts: 2 },
+      readHealth: async () =>
+        healthy ? { status: 'ok', version: '0.14.0', tools: [descriptor()] } : null,
+      spawn: async () => {
+        spawns += 1
+        return { authToken: 'token', managed: true, disconnect: () => undefined }
+      }
+    })
+
+    await service.start(getStore)
+    healthy = false
+    await waitFor(() => service.state.failure?.code === 'restart-exhausted')
+
+    expect(spawns).toBe(3)
+    expect(service.state.status).toBe('error')
+    await service.stop()
+  })
+
+  test('a server that comes back and dies again stops being restarted', async () => {
+    let healthy = true
+    let spawns = 0
+    const { service } = setup({
+      watchIntervalMs: 5,
+      restartPolicy: { baseMs: 1, attempts: 2 },
+      // Longer than this test, so a healthy start does not wipe the attempt count.
+      healthyResetMs: 60_000,
+      readHealth: async () =>
+        healthy ? { status: 'ok', version: '0.14.0', tools: [descriptor()] } : null,
+      spawn: async () => {
+        spawns += 1
+        healthy = true
+        return { authToken: 'token', managed: true, disconnect: () => undefined }
+      }
+    })
+
+    await service.start(getStore)
+    const kill = () => {
+      healthy = false
+    }
+    kill()
+    await waitFor(() => spawns === 2)
+    await waitFor(() => service.state.status === 'running')
+    kill()
+    await waitFor(() => spawns === 3)
+    await waitFor(() => service.state.status === 'running')
+    kill()
+    await waitFor(() => service.state.failure?.code === 'restart-exhausted')
+
+    expect(spawns).toBe(3)
+    await service.stop()
+  })
+
+  test('a start while a restart is waiting keeps the server that start brought up', async () => {
+    vi.useFakeTimers()
+    let healthy = true
+    let spawns = 0
+    const { calls, service } = setup({
+      watchIntervalMs: 5,
+      restartPolicy: { baseMs: 200, attempts: 3 },
+      readHealth: async () =>
+        healthy ? { status: 'ok', version: '0.14.0', tools: [descriptor()] } : null,
+      spawn: async () => {
+        spawns += 1
+        healthy = true
+        return {
+          authToken: 'token',
+          managed: true,
+          disconnect: () => {
+            calls.push('disconnect-server')
+          }
+        }
+      }
+    })
+
+    await service.start(getStore)
+    healthy = false
+    await advance(5)
+    expect(service.state.failure?.code).toBe('exited')
+    expect(spawns).toBe(1)
+
+    const started = await service.start(getStore)
+    // The restart that was waiting would have run on this delay. It must not.
+    await advance(200)
+
+    expect(started.ok).toBe(true)
+    expect(service.state.status).toBe('running')
+    expect(spawns).toBe(2)
+    expect(calls.filter((call) => call === 'disconnect-server')).toHaveLength(1)
+    await service.stop()
+  })
+
+  test('a restart closes the connection it replaces', async () => {
+    let healthy = true
+    const { calls, service } = setup({
+      watchIntervalMs: 5,
+      restartPolicy: { baseMs: 1, attempts: 3 },
+      readHealth: async () =>
+        healthy ? { status: 'ok', version: '0.14.0', tools: [descriptor()] } : null,
+      spawn: async () => {
+        healthy = true
+        return { authToken: 'token', managed: true, disconnect: () => undefined }
+      }
+    })
+
+    await service.start(getStore)
+    healthy = false
+    await waitFor(() => calls.filter((call) => call === 'connect').length === 2)
+
+    expect(calls).toEqual(['connect', 'disconnect-bridge', 'connect'])
+    await service.stop()
   })
 
   test('serializes refresh behind stop so stale health cannot restore running state', async () => {

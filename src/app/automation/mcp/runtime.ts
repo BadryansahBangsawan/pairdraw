@@ -1,7 +1,13 @@
+import { useIntervalFn } from '@vueuse/core'
 import { reactive, watch } from 'vue'
 
 import { connectAutomation } from '@/app/automation/bridge/server'
 import { companion } from '@/app/automation/companion/connection'
+import {
+  RESTART_HEALTHY_RESET_MS,
+  restartDelay,
+  type RestartPolicyOptions
+} from '@/app/automation/restart-policy'
 import type { EditorStore } from '@/app/editor/active-store'
 import { isTauri } from '@/app/tauri/env'
 
@@ -43,6 +49,15 @@ export interface MCPRuntimeDependencies {
   /** Diagnostics for the most recent spawn/health attempt. */
   getStartupFailure: () => MCPFailure | null
   getHealthFailure: () => MCPFailure | null
+  /** How often an app-owned server is checked for survival; 10 seconds unless a test says. */
+  watchIntervalMs?: number
+  /** How a server that stopped is started again; a growing wait and a limit on attempts. */
+  restartPolicy?: RestartPolicyOptions
+  /**
+   * How long a server must stay up before a later stop counts as the first one.
+   * Defaults to {@link RESTART_HEALTHY_RESET_MS}.
+   */
+  healthyResetMs?: number
 }
 
 /**
@@ -98,6 +113,102 @@ export function createMCPRuntimeService(dependencies: MCPRuntimeDependencies) {
     return next
   }
 
+  const SERVER_WATCH_MS = dependencies.watchIntervalMs ?? 10_000
+  const HEALTHY_RESET_MS = dependencies.healthyResetMs ?? RESTART_HEALTHY_RESET_MS
+  let restartAttempt = 0
+  /** Bumped when a pending restart is cancelled, so a timer that already fired does not run. */
+  let restartEpoch = 0
+  let restartTimer: ReturnType<typeof setTimeout> | undefined
+  let healthyResetTimer: ReturnType<typeof setTimeout> | undefined
+
+  /**
+   * Watches the server this app started. A server someone else runs, such as a development one or
+   * a paired companion, is not ours to restart, so it is left alone.
+   */
+  const serverWatch = useIntervalFn(
+    () => {
+      void enqueue(recoverStoppedServer)
+    },
+    SERVER_WATCH_MS,
+    { immediate: false }
+  )
+
+  function clearRestartTimer(): void {
+    restartEpoch += 1
+    if (restartTimer) clearTimeout(restartTimer)
+    restartTimer = undefined
+  }
+
+  function clearHealthyReset(): void {
+    if (healthyResetTimer) clearTimeout(healthyResetTimer)
+    healthyResetTimer = undefined
+  }
+
+  /** The attempt count returns to zero only after the server has stayed up. */
+  function armHealthyReset(): void {
+    if (healthyResetTimer) return
+    healthyResetTimer = setTimeout(() => {
+      healthyResetTimer = undefined
+      restartAttempt = 0
+    }, HEALTHY_RESET_MS)
+  }
+
+  function forgetRestartAttempts(): void {
+    restartAttempt = 0
+    clearHealthyReset()
+  }
+
+  function startWatching(): void {
+    if (!serverWatch.isActive.value) serverWatch.resume()
+    armHealthyReset()
+  }
+
+  function stopWatching(): void {
+    serverWatch.pause()
+    clearRestartTimer()
+    clearHealthyReset()
+  }
+
+  async function recoverStoppedServer(): Promise<void> {
+    if (state.status !== 'running' || state.externallyManaged) return
+    const health = await dependencies.readHealth(server?.authToken)
+    if (health) return
+    // The server is gone, so the health watch waits while the restarts take over, so a server
+    // that keeps dying is not started every second forever. A start that only just succeeded
+    // does not wipe the attempt count; that wait is `HEALTHY_RESET_MS`.
+    clearHealthyReset()
+    serverWatch.pause()
+    scheduleRestart()
+  }
+
+  function scheduleRestart(): void {
+    const delay = restartDelay(restartAttempt, dependencies.restartPolicy)
+    if (delay === null) {
+      state.status = 'error'
+      state.failure = mcpFailure('restart-exhausted')
+      return
+    }
+    restartAttempt += 1
+    state.failure = mcpFailure(
+      'exited',
+      `The MCP server stopped; starting it again (attempt ${restartAttempt}).`
+    )
+    const epoch = restartEpoch
+    restartTimer = setTimeout(() => {
+      restartTimer = undefined
+      if (epoch !== restartEpoch) return
+      void enqueue(async () => {
+        if (epoch !== restartEpoch) return
+        const result = await startOperation()
+        if (result.ok) {
+          startWatching()
+          return
+        }
+        scheduleRestart()
+      })
+    }, delay)
+  }
+
   function applyHealth(health: AutomationHealth): void {
     state.version = health.version ?? null
     state.agentSessionEvents = health.agentSessionEvents ?? false
@@ -143,6 +254,12 @@ export function createMCPRuntimeService(dependencies: MCPRuntimeDependencies) {
   }
 
   async function startOperation(): Promise<MCPRuntimeResult> {
+    // A restart that was already waiting must not close the server this start brings up.
+    clearRestartTimer()
+    // Whatever this replaces is closed first, so a restart does not leave a connection behind.
+    const staleError = await disconnectCurrentServer()
+    if (staleError)
+      console.warn('[MCP] Closing the previous connection failed:', staleError.message)
     state.endpoint = getMCPServerURL()
     state.status = 'starting'
     state.failure = null
@@ -158,6 +275,7 @@ export function createMCPRuntimeService(dependencies: MCPRuntimeDependencies) {
           disconnectAutomation = dependencies.connect(activeStore, server?.authToken ?? null)
         }
         applyHealth(health)
+        startWatching()
         return { ok: true }
       }
       failure = describeStartupFailure(dependencies, server)
@@ -181,6 +299,7 @@ export function createMCPRuntimeService(dependencies: MCPRuntimeDependencies) {
   }
 
   async function stopOperation(releaseStore: boolean): Promise<MCPRuntimeResult> {
+    stopWatching()
     const disconnectError = await disconnectCurrentServer()
     if (releaseStore) activeStore = null
     state.status = disconnectError ? 'error' : 'stopped'
@@ -198,12 +317,16 @@ export function createMCPRuntimeService(dependencies: MCPRuntimeDependencies) {
     started: () => activeStore !== null,
     refresh: () => enqueue(refreshOperation),
     start(getStore: () => EditorStore): Promise<MCPRuntimeResult> {
+      clearRestartTimer()
+      forgetRestartAttempts()
       activeStore = getStore
       return enqueue(startOperation)
     },
     stop: () => enqueue(() => stopOperation(true)),
     restart: () =>
       enqueue(async () => {
+        clearRestartTimer()
+        forgetRestartAttempts()
         const stopResult = await stopOperation(false)
         if (!stopResult.ok) return stopResult
         if (!activeStore) {

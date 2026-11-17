@@ -73,6 +73,8 @@
   "mcpFailurePermissionHint": "Система отклонила команду. Переустановите Pairdraw с правами оболочки или запустите сервер вручную.",
   "mcpFailureExited": "MCP-сервер остановился при запуске",
   "mcpFailureExitedHint": "Процесс завершился до готовности.",
+  "mcpFailureRestartExhausted": "MCP-сервер не оставался запущенным",
+  "mcpFailureRestartExhaustedHint": "Его несколько раз запускали снова, и он не продолжал работать. Перезапустите его в Настройках или перезапустите приложение.",
   "mcpFailureTimeout": "MCP-сервер не ответил вовремя",
   "mcpFailureTimeoutHint": "Он не стал готовым за отведённое время.",
   "mcpFailureRejected": "MCP-сервер отклонил локальное подключение",

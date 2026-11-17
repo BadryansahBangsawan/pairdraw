@@ -113,6 +113,8 @@ ja:automation.mcpFailurePermission
 ja:automation.mcpFailurePermissionHint
 ja:automation.mcpFailureRejected
 ja:automation.mcpFailureRejectedHint
+ja:automation.mcpFailureRestartExhausted
+ja:automation.mcpFailureRestartExhaustedHint
 ja:automation.mcpFailureTimeout
 ja:automation.mcpFailureUnknown
 ja:automation.mcpFailureUnreachable
@@ -344,6 +346,8 @@ zh-cn:automation.mcpFailurePermission
 zh-cn:automation.mcpFailurePermissionHint
 zh-cn:automation.mcpFailureRejected
 zh-cn:automation.mcpFailureRejectedHint
+zh-cn:automation.mcpFailureRestartExhausted
+zh-cn:automation.mcpFailureRestartExhaustedHint
 zh-cn:automation.mcpFailureTimeout
 zh-cn:automation.mcpFailureUnknown
 zh-cn:automation.mcpFailureUnreachable

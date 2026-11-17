@@ -73,6 +73,8 @@
   "mcpFailurePermissionHint": "系统拒绝了该命令。请重新安装 Pairdraw 以包含其命令行权限，或手动启动服务器。",
   "mcpFailureExited": "MCP 服务器在启动过程中停止",
   "mcpFailureExitedHint": "进程在就绪前已退出。",
+  "mcpFailureRestartExhausted": "MCP 服务器反复停止",
+  "mcpFailureRestartExhaustedHint": "已多次重新启动，但仍无法保持运行。请在设置中重新启动，或重新启动应用。",
   "mcpFailureTimeout": "MCP 服务器未及时响应",
   "mcpFailureTimeoutHint": "未在启动超时时间内就绪。",
   "mcpFailureRejected": "MCP 服务器拒绝了本地连接",

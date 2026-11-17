@@ -73,6 +73,8 @@
   "mcpFailurePermissionHint": "System odrzucił polecenie. Zainstaluj ponownie Pairdraw z uprawnieniami powłoki lub uruchom serwer ręcznie.",
   "mcpFailureExited": "Serwer MCP zatrzymał się podczas uruchamiania",
   "mcpFailureExitedHint": "Proces zakończył się, zanim był gotowy.",
+  "mcpFailureRestartExhausted": "Serwer MCP nie pozostał uruchomiony",
+  "mcpFailureRestartExhaustedHint": "Został uruchomiony ponownie kilka razy i nie działał dalej. Uruchom go ponownie w Ustawieniach albo uruchom ponownie aplikację.",
   "mcpFailureTimeout": "Serwer MCP nie odpowiedział na czas",
   "mcpFailureTimeoutHint": "Nie stał się gotowy w wyznaczonym czasie.",
   "mcpFailureRejected": "Serwer MCP odrzucił połączenie lokalne",

@@ -27,6 +27,7 @@ const reasons: Record<MCPFailureCode, MCPFailure> = {
     code: 'exited',
     detail: 'Error: listen EADDRINUSE: address already in use 127.0.0.1:7600'
   },
+  'restart-exhausted': { code: 'restart-exhausted' },
   timeout: { code: 'timeout', detail: TIMEOUT_DETAIL },
   rejected: { code: 'rejected', detail: 'HTTP 401' },
   malformed: { code: 'malformed', detail: 'HTTP 200' },

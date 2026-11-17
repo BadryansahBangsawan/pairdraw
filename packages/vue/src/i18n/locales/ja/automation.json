@@ -73,6 +73,8 @@
   "mcpFailurePermissionHint": "システムがコマンドを拒否しました。シェル権限を含めて Pairdraw を再インストールするか、サーバーを手動で起動してください。",
   "mcpFailureExited": "起動中に MCP サーバーが停止しました",
   "mcpFailureExitedHint": "準備完了になる前にプロセスが終了しました。",
+  "mcpFailureRestartExhausted": "MCP サーバーが起動し続けられませんでした",
+  "mcpFailureRestartExhaustedHint": "何度か再起動しましたが、起動したままになりませんでした。設定から再起動するか、アプリを再起動してください。",
   "mcpFailureTimeout": "MCP サーバーが時間内に応答しませんでした",
   "mcpFailureTimeoutHint": "起動タイムアウト内に準備完了になりませんでした。",
   "mcpFailureRejected": "MCP サーバーがローカル接続を拒否しました",

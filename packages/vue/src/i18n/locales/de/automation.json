@@ -73,6 +73,8 @@
   "mcpFailurePermissionHint": "Das System hat den Befehl abgelehnt. Pairdraw mit den Shell-Berechtigungen neu installieren oder den Server manuell starten.",
   "mcpFailureExited": "MCP-Server wurde beim Start beendet",
   "mcpFailureExitedHint": "Der Prozess endete, bevor er bereit war.",
+  "mcpFailureRestartExhausted": "MCP-Server blieb nicht laufen",
+  "mcpFailureRestartExhaustedHint": "Er wurde mehrmals neu gestartet und blieb nicht aktiv. Starte ihn in den Einstellungen neu oder starte die App neu.",
   "mcpFailureTimeout": "MCP-Server hat nicht rechtzeitig geantwortet",
   "mcpFailureTimeoutHint": "Er wurde nicht innerhalb des Startzeitlimits bereit.",
   "mcpFailureRejected": "MCP-Server hat die lokale Verbindung abgelehnt",

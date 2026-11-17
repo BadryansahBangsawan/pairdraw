@@ -1,0 +1,1 @@
+- Plugins cannot call asynchronous tools, including reads, so a read-only plugin cannot list system fonts or render an export.

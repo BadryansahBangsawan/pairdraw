@@ -223,3 +223,11 @@ test('a new run of the same plugin may take the pointer after a cancel', async (
   expect(await next).toEqual([])
   second.finish(false)
 })
+
+test('a read-only plugin cannot call a tool that runs asynchronously', async () => {
+  const host = createPluginHost(openDocument(), plugin(['document:read']), 'marks')
+  await expect(host.call('export_image', {})).rejects.toThrow(
+    'Plugins cannot call a tool that runs asynchronously.'
+  )
+  host.finish(false)
+})

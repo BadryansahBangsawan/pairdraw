@@ -16,15 +16,17 @@ const main = defineCommand({
 })
 
 /**
- * `--flag -` is how the CLI spells "read this value from stdin", and citty drops the lone `-`
- * after a flag. The value is folded into the flag so every command that documents stdin gets it.
+ * `--flag -` reads the value from stdin, and `--flag -5` is a negative number; citty takes both
+ * as a flag of their own and drops them. A value that starts with a dash and is not a value the
+ * CLI documents as a flag is folded into the flag before it.
  */
 export function withStdinValues(argv: string[]): string[] {
   const normalized: string[] = []
   for (const [index, value] of argv.entries()) {
     const flag = argv[index - 1]
-    if (value === '-' && flag?.startsWith('--') && !flag.includes('=')) {
-      normalized[normalized.length - 1] = `${flag}=-`
+    const isValue = value === '-' || /^-\d/.test(value)
+    if (isValue && flag?.startsWith('--') && !flag.includes('=')) {
+      normalized[normalized.length - 1] = `${flag}=${value}`
       continue
     }
     normalized.push(value)

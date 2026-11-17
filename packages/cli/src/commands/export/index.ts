@@ -14,6 +14,7 @@ import type { AutomationDocumentSummary } from '@pairdraw/core/rpc'
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
 import { appTargetOptions, appTargetRPCArgs } from '#cli/app/target'
 import { ok, printError, warn } from '#cli/format'
+import { numberInRange } from '#cli/options'
 import {
   loadDocument,
   populateDocumentPage,
@@ -219,8 +220,8 @@ function exportOptions(format: string, args: ExportArgs): unknown {
   if (formatSupportsScale(format))
     return {
       format,
-      scale: Number(args.scale),
-      quality: args.quality ? Number(args.quality) : undefined
+      scale: numberInRange('scale', Number(args.scale), 0.01, 16),
+      quality: args.quality ? numberInRange('quality', Number(args.quality), 0, 100) : undefined
     }
   return undefined
 }
@@ -263,10 +264,10 @@ async function exportFromFile(format: string, args: ExportArgs) {
     const image = await headlessRenderThumbnail(
       graph,
       page.id,
-      Number(args.width),
-      Number(args.height),
+      numberInRange('width', Number(args.width), 1, 8192),
+      numberInRange('height', Number(args.height), 1, 8192),
       format as RasterExportFormat,
-      args.quality ? Number(args.quality) : 100
+      args.quality ? numberInRange('quality', Number(args.quality), 0, 100) : 100
     )
     if (!image) {
       printError('The page has nothing to draw as a thumbnail.')

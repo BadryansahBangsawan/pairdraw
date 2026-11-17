@@ -4,6 +4,7 @@ import type { AnalyzeColorsResult } from '@pairdraw/core/rpc'
 
 import { appTargetOptions } from '#cli/app/target'
 import { bold, fmtHistogram, fmtList, fmtSummary } from '#cli/format'
+import { numberInRange } from '#cli/options'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
@@ -29,7 +30,7 @@ export default defineCommand({
       args.file,
       'analyze_colors',
       {
-        threshold: Number(args.threshold),
+        threshold: numberInRange('threshold', Number(args.threshold), 0, 50),
         similar: args.similar
       },
       args

@@ -1,0 +1,2 @@
+- Opening a document no longer takes the place of a recovered one, which keeps its recovery copy.
+- A coding agent closing a document leaves its draft and recovery copy behind, so the work stays recoverable from Home.

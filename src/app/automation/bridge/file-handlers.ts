@@ -93,7 +93,10 @@ export function createFileHandlers(files?: AutomationFiles) {
       }
       if (unsaved === 'save') await saveWithoutPrompt(store, path)
     }
-    await closeTab(target.documentId, unsaved === 'discard' ? 'discard' : 'save')
+    // Automation closes the tab without anyone to answer for its copies, so they stay for Home.
+    await closeTab(target.documentId, unsaved === 'discard' ? 'discard' : 'save', {
+      keepCopies: true
+    })
     return { ok: true, result: { closed: getTabById(target.documentId) === undefined } }
   }
 

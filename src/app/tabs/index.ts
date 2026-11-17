@@ -217,11 +217,25 @@ function disposeTabStore(store: EditorStore): void {
   store.dispose()
 }
 
+/** What closing a tab does beyond removing it. */
+export interface CloseOptions {
+  /**
+   * Leaves the document's draft and recovery copy behind, as automation must: nobody answered
+   * for them. A deletion the person asked for leaves this off, so the copies go with the tab.
+   */
+  keepCopies?: boolean
+}
+
 /**
  * Close a tab, asking whether to save unsaved changes. Pass `unsaved` to decide without
- * asking, as automation must: nobody may be there to answer.
+ * asking, as automation must: nobody may be there to answer. `keepCopies` keeps what the
+ * document kept of itself; a close the person asked for, even to delete the document, drops it.
  */
-export async function closeTab(tabId: string, unsaved?: 'save' | 'discard'): Promise<void> {
+export async function closeTab(
+  tabId: string,
+  unsaved?: 'save' | 'discard',
+  { keepCopies = false }: CloseOptions = {}
+): Promise<void> {
   const idx = tabsRef.value.findIndex((t) => t.id === tabId)
   if (idx === -1) return
 
@@ -232,16 +246,22 @@ export async function closeTab(tabId: string, unsaved?: 'save' | 'discard'): Pro
     removeTab(closingTab)
     return
   }
-  // A draft keeps the latest changes first, so a new document closes without asking.
-  if (unsaved !== 'discard') await persistDraftBeforeClose(closingTab.store)
+  // A draft keeps the latest changes first, so a new document closes without asking. Automation
+  // that discards takes the document as it is now first: the tab goes, what it kept does not.
+  if (unsaved === 'discard') {
+    if (keepCopies) await closingTab.store.persistRecoveryNow()
+  } else await persistDraftBeforeClose(closingTab.store)
   const choice = unsaved
     ? await confirmDocumentClose(closingTab.store, async () => unsaved)
     : await requestDocumentClose(closingTab.store, closingTab.store.state.documentName)
   if (choice === 'cancel') return
-  // Only changes the person chose not to keep go; a draft opened from Home keeps what it held.
+  // Only a close that keeps copies leaves them: automation closes the tab while Home keeps
+  // offering the draft or recovery copy, and everyone else decides for the document's own copies.
   if (choice === 'discard') {
-    await closingTab.store.discardRecovery()
-    await closingTab.store.discardDraft()
+    if (!keepCopies) {
+      await closingTab.store.discardRecovery()
+      await closingTab.store.discardDraft()
+    }
   } else await closingTab.store.persistRecoveryNow()
   if (!tabsRef.value.includes(closingTab)) return
   if (choice !== 'discard' && closingTab.store.hasUnsavedChanges()) return
@@ -314,14 +334,11 @@ function reusableTabStore(): OpeningTab {
 }
 
 /**
- * After a document failed to open, a tab opened for it closes and the tab in front before it, such
- * as Home, comes back; an empty design it reused stays. `keepRecovery` leaves the recovery copy,
- * as a failed restore must: that copy is the work being restored.
+ * After a document failed to open, the tab opened for it closes and the tab in front before it,
+ * such as Home, comes back; an empty design it reused stays. The tab held nothing to keep: a
+ * document with a copy this device kept is never reused, so no copy is discarded here.
  */
-async function releaseOpeningTab(
-  opening: OpeningTab,
-  { keepRecovery = false }: { keepRecovery?: boolean } = {}
-): Promise<void> {
+async function releaseOpeningTab(opening: OpeningTab): Promise<void> {
   if (!opening.created) {
     // The reused tab stays, so it gets back the name the failed open gave it.
     opening.store.state.documentName = opening.documentName
@@ -329,21 +346,9 @@ async function releaseOpeningTab(
   }
   const tab = getTabForStore(opening.store)
   if (!tab) return
-  // The tab goes even when the recovery copy stays behind, which the next start offers again;
-  // the open's own error is the one to report.
-  if (!keepRecovery) await discardFailedRecovery(tab.store)
   const wasActive = activeTabId.value === tab.id
   removeTab(tab)
   if (wasActive && opening.from && tabsRef.value.includes(opening.from)) activateTab(opening.from)
-}
-
-async function discardFailedRecovery(store: EditorStore): Promise<void> {
-  await store.discardRecovery().catch((error: unknown) => {
-    console.warn(
-      '[Tabs] Failed to discard the recovery copy of a document that failed to open',
-      error
-    )
-  })
 }
 
 async function showImportedGraph(
@@ -666,7 +671,7 @@ export async function openKeptDocument(kept: KeptDocument): Promise<EditorStore>
     return store
   } catch (error) {
     failPreparation(load, 'decode-failed', error)
-    await releaseOpeningTab(opening, { keepRecovery: true })
+    await releaseOpeningTab(opening)
     throw error
   } finally {
     if (succeeded) load.complete()

@@ -82,6 +82,23 @@ describe('closing a draft', () => {
     expect(getTabById(tab.id)).toBeUndefined()
     expect(await readDraft('kept')).toBeNull()
   })
+
+  test('deleting a draft also drops a recovery copy kept beside it', async () => {
+    await keepDraft('kept')
+    const tab = draftTab('kept')
+    tab.store.createShape('RECTANGLE', 0, 0, 10, 10)
+    const recoveryId = tab.store.getRecoveryId()
+    await getRecoveryStore().write({
+      id: recoveryId,
+      documentName: tab.store.state.documentName,
+      figBytes: new Uint8Array([1])
+    })
+
+    await deleteDraftEverywhere('kept')
+
+    expect(getTabById(tab.id)).toBeUndefined()
+    expect(await getRecoveryStore().read(recoveryId)).toBeNull()
+  })
 })
 
 describe('opening drafts', () => {

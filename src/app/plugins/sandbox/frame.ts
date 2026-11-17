@@ -10,12 +10,12 @@ import {
   PLUGIN_SANDBOX_CALL_RESULT,
   PLUGIN_SANDBOX_READY,
   PLUGIN_SANDBOX_RESULT,
-  PLUGIN_SANDBOX_RUN,
   pluginCallRequestSchema,
   pluginRunResultSchema,
   type PluginRunResult
 } from '@/app/plugins/sandbox/schema'
 
+import { readPluginHostMessage } from './parent-message'
 import workerSource from './worker/index.ts?script'
 
 const workerURL = URL.createObjectURL(new Blob([workerSource], { type: 'text/javascript' }))
@@ -45,15 +45,13 @@ function start(id: string, source: string): void {
 }
 
 addEventListener('message', (event: MessageEvent<unknown>) => {
-  const message = event.data as { type?: unknown } | null
+  const message = readPluginHostMessage(event.data, event.source, parent)
+  if (!message) return
   // The host's answer to a call the plugin made, for the worker that made it.
-  if (message?.type === PLUGIN_SANDBOX_CALL_RESULT) {
+  if (message.type === PLUGIN_SANDBOX_CALL_RESULT) {
     worker?.postMessage(message)
     return
   }
-  if (message?.type !== PLUGIN_SANDBOX_RUN) return
-  const { id, source } = message as { id: unknown; source: unknown }
-  if (typeof id !== 'string' || typeof source !== 'string') return
-  start(id, source)
+  start(message.id, message.source)
 })
 parent.postMessage({ type: PLUGIN_SANDBOX_READY }, '*')

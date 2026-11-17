@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test'
-import { access } from 'node:fs/promises'
+import { access, mkdtemp } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -9,6 +9,7 @@ import { startServer, type ServerHandle } from '#mcp/server'
 import { getDiscoveryPath } from '#mcp/transport/paths'
 
 import { connectMockBrowser, readHealth, type HealthResponse } from '#tests/helpers/mcp/server'
+import { repoPath } from '#tests/helpers/paths'
 
 // Issue #488: an MCP server spawned by the app but never claimed by one
 // (renderer crash, forced reload) used to squat its port forever with a
@@ -147,6 +148,34 @@ describe('MCP app-attach watchdog', () => {
       expect(data.status).toBe('ok')
     } finally {
       secondBrowser.close()
+    }
+  })
+
+  test('a server the app started exits when the watchdog closes it, instead of lingering', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'pairdraw-watchdog-exit-'))
+    const child = Bun.spawn([process.execPath, repoPath('packages/mcp/src/index.ts')], {
+      cwd: repoPath(),
+      env: {
+        ...process.env,
+        PORT: '0',
+        PAIRDRAW_MCP_AUTH_TOKEN: TEST_AUTH_TOKEN,
+        PAIRDRAW_MCP_SOCKET: join(directory, 'mcp.sock'),
+        PAIRDRAW_MCP_DISCOVERY_PATH: join(directory, 'mcp.json'),
+        PAIRDRAW_MCP_APP_TIMEOUT_MS: '200',
+        // What the app sets: its end of the child's stdin stays open for as long as the app runs.
+        PAIRDRAW_MCP_EXIT_ON_STDIN_CLOSE: '1'
+      },
+      stdin: 'pipe',
+      stdout: 'ignore',
+      stderr: 'pipe'
+    })
+    try {
+      const stderr = new Response(child.stderr).text()
+      const exit = await Promise.race([child.exited, sleep(3000).then(() => 'timeout' as const)])
+      expect(exit).toBe(0)
+      expect(await stderr).toContain('No app attached')
+    } finally {
+      child.kill()
     }
   })
 

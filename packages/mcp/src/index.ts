@@ -140,6 +140,9 @@ const handle = await startServer({
   })(),
   corsOrigin: resolveCORSOrigins(process.env.PAIRDRAW_MCP_CORS_ORIGIN),
   appAttachTimeoutMs,
+  // This process exists for the server it started, and resumed stdin keeps the event loop alive,
+  // so a watchdog shutdown must end it rather than leave a process with no listeners.
+  onAppAttachTimeout: () => process.exit(0),
   sessionIdleTimeoutMs,
   agents: agents ?? undefined
 })

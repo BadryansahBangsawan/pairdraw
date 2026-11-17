@@ -74,6 +74,13 @@ export interface ServerOptions {
    */
   appAttachTimeoutMs?: number
   /**
+   * Called once the app-attach watchdog has closed the server. A process that
+   * exists only for this server passes a shutdown, such as `process.exit`;
+   * without one, anything else still holding the event loop keeps it running
+   * with no listeners.
+   */
+  onAppAttachTimeout?: () => void
+  /**
    * How long an MCP session may sit without requests before it is closed.
    * Defaults to 15 minutes; 0 disables expiration. An open GET/SSE stream
    * does not count as activity.
@@ -392,7 +399,12 @@ export async function startServer(options: ServerOptions = {}): Promise<ServerHa
     startedAt
   )
 
-  armAppAttachWatchdog(options.appAttachTimeoutMs, ctx.browserRPC, handle)
+  armAppAttachWatchdog(
+    options.appAttachTimeoutMs,
+    ctx.browserRPC,
+    handle,
+    options.onAppAttachTimeout
+  )
 
   return handle
 }
@@ -418,7 +430,8 @@ function validateTimeoutOption(name: string, timeoutMs: number | undefined): voi
 function armAppAttachWatchdog(
   timeoutMs: number | undefined,
   browserRPC: ReturnType<typeof createBrowserRPCBridge>,
-  handle: ServerHandle
+  handle: ServerHandle,
+  onTimeout: (() => void) | undefined
 ): void {
   if (timeoutMs === undefined || timeoutMs === 0) return
 
@@ -436,9 +449,15 @@ function armAppAttachWatchdog(
       if (browserRPC.isConnected() || closing) return
       closing = true
       unsubscribe()
-      void handle.close().catch((e) => {
-        console.error('[MCP] Watchdog: failed to close orphaned (no_app) server:', e)
-      })
+      // The reason a server the app owned went away is otherwise invisible: it wrote nothing
+      // else to stderr, and its discovery file and socket are gone with it.
+      process.stderr.write(`[MCP] No app attached for ${timeoutMs} ms; closing the server.\n`)
+      void handle
+        .close()
+        .then(() => onTimeout?.())
+        .catch((e) => {
+          console.error('[MCP] Watchdog: failed to close orphaned (no_app) server:', e)
+        })
     }, timeoutMs)
     timer.unref()
   }

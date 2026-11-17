@@ -163,6 +163,7 @@ export async function writeDocumentFile(
   const result = await io.writeDocument(adapter.id, graph, {
     renderThumbnail: adapter.id === 'fig'
   })
+  for (const message of result.warnings ?? []) console.error(warn(message))
   const data = result.encoding === 'utf8' ? (result.data as string) : (result.data as Uint8Array)
   await writeFileAtomic(filePath, data, { symlink: 'follow' })
 }

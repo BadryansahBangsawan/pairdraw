@@ -1,5 +1,5 @@
 import { describe, expect, setDefaultTimeout, test } from 'bun:test'
-import { mkdtemp, readFile } from 'node:fs/promises'
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -113,5 +113,25 @@ describe('convert CLI', () => {
 
     const { width, height } = figThumbnailSize(await readFile(output))
     expect(width / height).toBeCloseTo(300 / 200, 2)
+  })
+})
+
+describe('convert warnings', () => {
+  test('says which variables a draw.io file cannot hold', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-convert-vars-'))
+    const fig = join(dir, 'vars.fig')
+    const html = join(dir, 'card.html')
+    await writeFile(html, '<div style="width:100px;height:40px;background:#000"></div>')
+    expect((await cli(['import', html, '-o', fig])).exitCode).toBe(0)
+    const script = `
+      const collection = figma.variables.createVariableCollection('Brand')
+      figma.variables.createVariable('primary', collection, 'COLOR')
+    `
+    expect((await cli(['eval', fig, '-c', script, '-w', '-q'])).exitCode).toBe(0)
+
+    const converted = await cli(['convert', fig, '-f', 'drawio', '-o', join(dir, 'vars.drawio')])
+
+    expect(converted.exitCode).toBe(0)
+    expect(converted.stderr).toContain('draw.io has no variables: 1 variable in 1 collection (Brand)')
   })
 })

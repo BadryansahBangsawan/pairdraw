@@ -9,7 +9,7 @@ import type { AutomationDocumentSummary } from '@pairdraw/core/rpc'
 
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
 import { appTargetOptions, appTargetRPCArgs } from '#cli/app/target'
-import { ok, printError } from '#cli/format'
+import { ok, printError, warn } from '#cli/format'
 import {
   loadDocument,
   populateDocumentPage,
@@ -269,6 +269,7 @@ async function exportFromFile(format: string, args: ExportArgs) {
     wholeDocument,
     basename(output)
   )
+  for (const message of result.warnings ?? []) console.error(warn(message))
   await writeExport(output, result)
   console.log(ok(`Target: ${targetLabel(args.page, args.node, wholeDocument)}`))
 }

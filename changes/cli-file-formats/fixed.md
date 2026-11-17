@@ -1,1 +1,2 @@
 - `pairdraw export --format pdf` writes the PDF when the CLI runs under Node, not only under Bun.
+- Converting to draw.io says which variables the file cannot hold, instead of dropping them silently.

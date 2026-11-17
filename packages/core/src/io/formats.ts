@@ -314,12 +314,14 @@ export const mermaidFormat: IOFormatAdapter<'mermaid'> = {
 async function writeDrawIO(graph: SceneGraph, target: DrawIOExportTarget): Promise<ExportResult> {
   const { writeDrawIOFile } = await import('@pairdraw/drawio')
   const { sceneGraphToDrawIO } = await import('./formats/drawio')
+  const { drawioDroppedWarnings } = await import('./formats/drawio/warnings')
   return {
     format: 'drawio',
     mimeType: 'application/vnd.jgraph.mxfile',
     extension: 'drawio',
     data: writeDrawIOFile(sceneGraphToDrawIO(graph, target)),
-    encoding: 'utf8'
+    encoding: 'utf8',
+    warnings: drawioDroppedWarnings(graph)
   }
 }
 

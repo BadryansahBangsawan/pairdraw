@@ -133,6 +133,8 @@ export interface ExportResult {
   encoding?: IOTextEncoding
   /** Extra files the main file refers to, such as external images and fonts. */
   assets?: ExportAsset[]
+  /** What the format could not hold, such as the variables draw.io has no model for. */
+  warnings?: string[]
 }
 
 export interface HTMLExportOptions {

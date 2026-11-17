@@ -30,6 +30,48 @@ async function cli(args: string[], stdin?: string) {
 }
 
 describe('tool CLI', () => {
+  test('a tool that reports an error fails the call and writes nothing', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-tool-call-'))
+    const file = join(dir, 'doc.fig')
+    await copyFile(FIXTURE, file)
+    const before = await readFile(file)
+
+    const result = await cli([
+      'tool',
+      'call',
+      'set_fill',
+      file,
+      '--args',
+      JSON.stringify({ id: '9:9', color: '#FF0000' }),
+      '--write'
+    ])
+
+    expect(result.exitCode).toBe(1)
+    expect(await readFile(file)).toEqual(before)
+  })
+
+  test('a headless tool call that works exits zero and writes with --write', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-tool-call-'))
+    const file = join(dir, 'doc.fig')
+    await copyFile(FIXTURE, file)
+
+    const before = await readFile(file)
+    const result = await cli([
+      'tool',
+      'call',
+      'create_page',
+      file,
+      '--args',
+      JSON.stringify({ name: 'From CLI' }),
+      '--write',
+      '--json'
+    ])
+
+    expect(result.exitCode).toBe(0)
+    expect(result.stdout).toContain('From CLI')
+    expect(await readFile(file)).not.toEqual(before)
+  })
+
   test('lists and describes tools with their effect and argument schema', async () => {
     const listed = await cli(['tool', 'list', '--json'])
     expect(listed.exitCode).toBe(0)

@@ -10,6 +10,7 @@ import { SceneGraph } from '@pairdraw/scene-graph'
 import { makeFigmaFromStore } from '@/app/automation/bridge/figma-factory'
 import { createAutomationCommandHandlers } from '@/app/automation/bridge/handlers'
 import type { AutomationTarget } from '@/app/automation/bridge/target'
+import type { ToolReply } from '@/app/automation/bridge/tool-reply'
 import { setImageAICredential } from '@/app/editor/image-ai/credentials'
 import { imageAIProviderID } from '@/app/editor/image-ai/preferences'
 import { createEditorStore, type EditorStore } from '@/app/editor/session/create'
@@ -67,10 +68,10 @@ function emptyDocument(): { store: EditorStore; target: AutomationTarget } {
 }
 
 function generateImage(target: AutomationTarget, args: Record<string, unknown>) {
-  return handleTargetCommand(target, 'tool', { name: 'generate_image', args }) as Promise<{
-    ok: boolean
-    result: Record<string, unknown>
-  }>
+  return handleTargetCommand(target, 'tool', {
+    name: 'generate_image',
+    args
+  }) as Promise<ToolReply>
 }
 
 describe('image AI tools through the app bridge', () => {
@@ -86,10 +87,11 @@ describe('image AI tools through the app bridge', () => {
     try {
       const { store, target } = emptyDocument()
       const response = await generateImage(target, { prompt: 'A red kite', width: 64 })
+      if (!response.ok) throw new Error(response.error)
 
       expect(response.result).toMatchObject({ type: 'RECTANGLE', name: 'A red kite' })
       expect(urls.some((url) => url.includes('/images/generations'))).toBe(true)
-      const layerId = String(response.result.id)
+      const layerId = String((response.result as { id: string }).id)
       expect(store.graph.getNode(layerId)).toMatchObject({ width: 64, height: 64 })
 
       store.undo.undo()
@@ -102,9 +104,10 @@ describe('image AI tools through the app bridge', () => {
   test('tell the agent to ask for a key when none is saved', async () => {
     const { store, target } = emptyDocument()
     const response = await generateImage(target, { prompt: 'A red kite' })
+    if (response.ok) throw new Error('a call without a key is a failed call')
 
-    expect(String(response.result.error)).toContain('Settings → Image services')
-    expect(String(response.result.error)).not.toContain('sk_')
+    expect(response.error).toContain('Settings → Image services')
+    expect(response.error).not.toContain('sk_')
     expect(store.graph.getChildren(target.pageId)).toHaveLength(0)
   })
 })

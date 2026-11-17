@@ -10,6 +10,7 @@ import { SceneGraph } from '@pairdraw/scene-graph'
 import { makeFigmaFromStore } from '@/app/automation/bridge/figma-factory'
 import { createAutomationCommandHandlers } from '@/app/automation/bridge/handlers'
 import type { AutomationTarget } from '@/app/automation/bridge/target'
+import type { ToolReply } from '@/app/automation/bridge/tool-reply'
 import { createEditorStore, type EditorStore } from '@/app/editor/session/create'
 import { setVectorizeCredential, vectorizeProviderID } from '@/app/editor/vectorize'
 
@@ -92,7 +93,7 @@ function vectorize(target: AutomationTarget, id: string) {
   return handleTargetCommand(target, 'tool', {
     name: 'vectorize_image',
     args: { id }
-  }) as Promise<{ ok: boolean; result: Record<string, unknown> }>
+  }) as Promise<ToolReply>
 }
 
 describe('vectorize_image through the app bridge', () => {
@@ -104,8 +105,9 @@ describe('vectorize_image through the app bridge', () => {
     try {
       const { store, target, imageId } = storeWithImage()
       const response = await vectorize(target, imageId)
+      if (!response.ok) throw new Error(response.error)
 
-      const frameId = String(response.result.id)
+      const frameId = String((response.result as { id: string }).id)
       expect(response.result).toMatchObject({ type: 'FRAME', source_id: imageId, paths: 1 })
       expect(store.graph.getChildren(target.pageId).map((node) => node.id)).toEqual([
         imageId,
@@ -122,8 +124,9 @@ describe('vectorize_image through the app bridge', () => {
   test('tells the agent to ask for a key when none is saved', async () => {
     const { store, target, imageId } = storeWithImage()
     const response = await vectorize(target, imageId)
+    if (response.ok) throw new Error('a call without a key is a failed call')
 
-    expect(String(response.result.error)).toContain(
+    expect(response.error).toContain(
       'No QuiverAI API key is saved. Ask the user to add one in Settings → Image services'
     )
     expect(store.graph.getChildren(target.pageId)).toHaveLength(1)

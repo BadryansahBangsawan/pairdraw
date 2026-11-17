@@ -127,6 +127,14 @@ const call = defineCommand({
       if (args.json) console.log(JSON.stringify(result, null, 2))
       else console.log(formatToolResult(result))
 
+      // A tool that answers with an error did not do its work: the call fails, and the document is
+      // left as it was rather than written back.
+      const failure = toolErrorMessage(result)
+      if (failure !== null) {
+        printError(new Error(failure))
+        process.exit(1)
+      }
+
       if (!toolChangesDocument(def)) return
       const outPath = args.output || (args.write ? args.file : undefined)
       if (session.graph && outPath) {

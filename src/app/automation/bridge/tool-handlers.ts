@@ -12,11 +12,15 @@ import {
 } from '@/app/automation/agents'
 import { limitToSelection } from '@/app/automation/bridge/selection-scope'
 import type { AutomationTarget } from '@/app/automation/bridge/target'
+import { toolReply } from '@/app/automation/bridge/tool-reply'
 import { useLibraryService } from '@/app/libraries'
 
 type FigmaFactory = (store: AutomationTarget['store'], pageId?: string) => FigmaAPI
 
-export function createAutomationToolHandler(makeFigma: FigmaFactory) {
+export function createAutomationToolHandler(
+  makeFigma: FigmaFactory,
+  run: typeof runEditorTool = runEditorTool
+) {
   return async function handleTool(target: AutomationTarget, args: unknown): Promise<unknown> {
     const toolName = (args as { name?: string }).name
     const requestedArgs = (args as { args?: Record<string, unknown> }).args ?? {}
@@ -39,7 +43,7 @@ export function createAutomationToolHandler(makeFigma: FigmaFactory) {
         edited: response.edited
       })
     }
-    return { ok: true, result: response.result }
+    return toolReply(response.result)
   }
 
   /**
@@ -65,7 +69,7 @@ export function createAutomationToolHandler(makeFigma: FigmaFactory) {
     libraryService.bindEditor(store)
     registerComponentCatalog(store.graph, libraryService)
     const figma = makeFigma(store, target.pageId)
-    const result = await runEditorTool({
+    const result = await run({
       store,
       figma,
       def,

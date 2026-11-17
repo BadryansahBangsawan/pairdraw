@@ -25,7 +25,8 @@ const TEXT_AUTO_RESIZE: Record<TextResizeMode, SceneNode['textAutoResize']> = {
 
 export function textResizeMode(node: SceneNode): TextResizeMode {
   if (node.textAutoResize === 'WIDTH_AND_HEIGHT') return 'AUTO_WIDTH'
-  if (node.textAutoResize === 'HEIGHT' || node.textAutoResize === 'TRUNCATE') return 'AUTO_HEIGHT'
+  // A truncating text keeps the size it has and ends its lines, so it is a fixed box here.
+  if (node.textAutoResize === 'HEIGHT') return 'AUTO_HEIGHT'
   return 'FIXED'
 }
 

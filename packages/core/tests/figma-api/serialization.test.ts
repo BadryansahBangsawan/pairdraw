@@ -29,6 +29,33 @@ describe('serialization', () => {
     expect(json.children?.length).toBe(1)
   })
 
+  test('an auto layout frame reports the insets and alignment it holds', () => {
+    const api = createAPI()
+    const frame = api.createFrame()
+    frame.layoutMode = 'VERTICAL'
+    frame.itemSpacing = 12
+    frame.paddingTop = 10
+    frame.paddingRight = 8
+    frame.paddingBottom = 6
+    frame.paddingLeft = 4
+    frame.primaryAxisAlignItems = 'CENTER'
+    frame.counterAxisAlignItems = 'MAX'
+
+    const json = frame.toJSON()
+
+    expect(json).toMatchObject({
+      layoutMode: 'VERTICAL',
+      itemSpacing: 12,
+      paddingTop: 10,
+      paddingRight: 8,
+      paddingBottom: 6,
+      paddingLeft: 4,
+      primaryAxisAlignItems: 'CENTER',
+      counterAxisAlignItems: 'MAX',
+      primaryAxisSizingMode: 'AUTO'
+    })
+  })
+
   test('toString returns readable string', () => {
     const api = createAPI()
     const frame = api.createFrame()

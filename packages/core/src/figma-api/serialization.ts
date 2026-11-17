@@ -65,9 +65,20 @@ export function nodeProxyToJSON(
     appendTextProps(obj, n)
   }
   if (n.layoutMode !== 'NONE') {
+    // An auto layout frame reports the insets and alignment a tool sets, so a caller can read back
+    // what it wrote instead of measuring the result.
+    const proxy = api.wrapNode(nodeId)
     obj.layoutMode = n.layoutMode
     obj.layoutDirection = n.layoutDirection
     obj.itemSpacing = n.itemSpacing
+    obj.paddingTop = proxy.paddingTop
+    obj.paddingRight = proxy.paddingRight
+    obj.paddingBottom = proxy.paddingBottom
+    obj.paddingLeft = proxy.paddingLeft
+    obj.primaryAxisAlignItems = proxy.primaryAxisAlignItems
+    obj.counterAxisAlignItems = proxy.counterAxisAlignItems
+    obj.primaryAxisSizingMode = proxy.primaryAxisSizingMode
+    obj.counterAxisSizingMode = proxy.counterAxisSizingMode
   }
   // Include variable bindings with resolved values
   const bindings = resolveBindings(graph, n)

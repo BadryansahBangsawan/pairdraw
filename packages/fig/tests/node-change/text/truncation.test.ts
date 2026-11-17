@@ -13,7 +13,7 @@ function textChange(fields: Partial<NodeChange>): NodeChange {
 }
 
 describe('@pairdraw/fig truncating text import', () => {
-  test('reads a fixed box with ENDING truncation as TRUNCATE', () => {
+  test('keeps a fixed box with ENDING truncation fixed, since the archive cannot say TRUNCATE', () => {
     const props = nodeChangeToProps(
       textChange({
         textData: { characters: 'truncated' },
@@ -22,7 +22,7 @@ describe('@pairdraw/fig truncating text import', () => {
       }),
       []
     )
-    expect(props.textAutoResize).toBe('TRUNCATE')
+    expect(props.textAutoResize).toBe('NONE')
     expect(props.textTruncation).toBe('ENDING')
   })
   test('keeps a fixed box that does not truncate as NONE', () => {

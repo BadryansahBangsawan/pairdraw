@@ -22,15 +22,16 @@ export const switchPage = defineTool({
   name: 'switch_page',
 
   description: 'Switch to a different page by name or ID.',
-  execution: { kind: 'sync', mutation: 'view' },
+  execution: { kind: 'async', mutation: 'view' },
   input: v.strictObject({
     page: v.pipe(v.string(), v.description('Page name or ID'))
   }),
-  execute: (figma, { page }) => {
+  execute: async (figma, { page }) => {
     const target =
       figma.root.children.find((candidate) => candidate.name === page) ?? figma.getNodeById(page)
     if (!target) return { error: `Page "${page}" not found` }
-    figma.currentPage = target
+    // The host shows the page, and the next tool call reads the page from the host.
+    await figma.setCurrentPageAsync(target)
     return { page: target.name, id: target.id }
   }
 })

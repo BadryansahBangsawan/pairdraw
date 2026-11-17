@@ -33,7 +33,11 @@ export function makeFigmaFromStore(
   store: EditorStore,
   pageId = store.state.currentPageId
 ): FigmaAPI {
-  const api = new FigmaAPI(store.graph, { fetch: imageFetch })
+  const api = new FigmaAPI(store.graph, {
+    fetch: imageFetch,
+    // The editor owns the page on screen, so the page a tool switches to is the page it shows.
+    onPageChange: (id) => (id === store.state.currentPageId ? undefined : store.switchPage(id))
+  })
   // `vectorize_image` runs on the service and key set up in Settings, which stay in the app.
   bindAgentImageVectorizer(store)
   // The image AI tools run on the image services and keys set up in Settings, as vectorizing does.

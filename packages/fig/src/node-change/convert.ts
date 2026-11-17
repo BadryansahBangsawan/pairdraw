@@ -462,8 +462,10 @@ function convertShapeWithTextProps(
  * box whose lines end (NONE plus textTruncation ENDING), since its enum has no TRUNCATE.
  */
 function textAutoResizeFrom(nc: NodeChange): TextAutoResize {
-  const mode = (nc.textAutoResize ?? 'NONE') as TextAutoResize
-  return mode === 'NONE' && nc.textTruncation === 'ENDING' ? 'TRUNCATE' : mode
+  // The archive's TextAutoResize has no TRUNCATE, so a stored NONE is a fixed box. A text that
+  // ends its lines is NONE with textTruncation ENDING, and calling it TRUNCATE would show a
+  // fixed-size text as if it grew with its text.
+  return (nc.textAutoResize ?? 'NONE') as TextAutoResize
 }
 
 function convertTextProps(nc: NodeChange, blobs: Uint8Array[]): TextProps {

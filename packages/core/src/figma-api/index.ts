@@ -57,6 +57,11 @@ const noop = () => undefined
 export interface FigmaAPIOptions {
   /** Fetches the HTTP(S) URLs `figma.createImageAsync` loads; the global `fetch` by default. */
   fetch?: images.ImageFetch
+  /**
+   * Runs when a script puts the API on another page, so a host can show that page too. The host
+   * owns which page is on screen, and a plugin that switches page expects to see it switched.
+   */
+  onPageChange?: (pageId: string) => void | Promise<void>
 }
 
 export { FigmaNodeProxy } from './proxy'
@@ -121,10 +126,14 @@ export class FigmaAPI implements NodeProxyHost {
 
   /** How `createImageAsync` fetches HTTP(S) URLs; a host passes one that gets past CORS. */
   readonly #fetch: images.ImageFetch
+  readonly #onPageChange: ((pageId: string) => void | Promise<void>) | undefined
+  /** The last host page switch, so `setCurrentPageAsync` can wait for it. */
+  #pageChange: Promise<void> = Promise.resolve()
 
   constructor(graph: SceneGraph, options: FigmaAPIOptions = {}) {
     this.graph = graph
     this.#fetch = options.fetch ?? ((input, init) => fetch(input, init))
+    this.#onPageChange = options.onPageChange
     this.variables = new FigmaVariablesAPI(graph)
     startPendingLayout(graph)
     const pages = graph.getPages()
@@ -178,7 +187,10 @@ export class FigmaAPI implements NodeProxyHost {
   }
 
   set currentPage(page: FigmaNodeProxy) {
-    this._currentPageId = page[INTERNAL_ID]
+    const pageId = page[INTERNAL_ID]
+    if (pageId === this._currentPageId) return
+    this._currentPageId = pageId
+    this.#pageChange = Promise.resolve(this.#onPageChange?.(pageId))
   }
 
   getNodeById(id: string): FigmaNodeProxy | null {
@@ -204,7 +216,8 @@ export class FigmaAPI implements NodeProxyHost {
       return Promise.reject(new Error('figma.setCurrentPageAsync expects a PageNode'))
     }
     this._currentPageId = this._nodeId(page)
-    return Promise.resolve()
+    this.#pageChange = Promise.resolve(this.#onPageChange?.(this._currentPageId))
+    return this.#pageChange
   }
 
   // --- Node Creation ---

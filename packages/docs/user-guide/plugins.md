@@ -80,6 +80,6 @@ The list belongs to the app, not to a document: it is saved in this machine's lo
 
 ## Limits
 
-- A program runs in an opaque-origin sandbox with no DOM. `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource`, and `importScripts` are blocked or absent, and the app's storage is out of reach, so a plugin reaches neither the network nor your files.
+- A program runs in an opaque-origin sandbox with no DOM. `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource`, `importScripts`, `Worker`, and `SharedWorker` are blocked or absent, and the app's storage is out of reach, so a plugin reaches neither the network nor your files.
 - A run's result crosses as JSON text of at most 64 KB; a larger one fails the run. A tool that runs asynchronously cannot be called.
 - Only `document:read` and `document:write` can be granted. There is no marketplace, no update check, no signature, and no per-document plugins.

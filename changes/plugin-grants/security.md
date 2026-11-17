@@ -4,3 +4,4 @@
 - Plugin network globals stay blocked if a program deletes them, a plugin cannot start a worker, and a plugin does not run when a network global cannot be blocked.
 - A sandbox frame ignores a message that is not from its parent page.
 - A plugin that floods the editor with calls stops when its run time is up.
+- Plugin network globals stay blocked if a program deletes them, and a plugin cannot start a worker.

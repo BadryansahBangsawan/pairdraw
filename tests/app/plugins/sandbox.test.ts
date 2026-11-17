@@ -15,7 +15,11 @@ import {
   runPluginInFrame
 } from '@/app/plugins/sandbox/evaluate'
 import type { PluginHost } from '@/app/plugins/sandbox/host'
-import { blockPluginNetwork, PLUGIN_NETWORK_UNAVAILABLE_ERROR } from '@/app/plugins/sandbox/network'
+import {
+  blockPluginNetwork,
+  PluginNetworkUnblockedError,
+  PLUGIN_NETWORK_UNAVAILABLE_ERROR
+} from '@/app/plugins/sandbox/network'
 import {
   PLUGIN_SANDBOX_CALL,
   PLUGIN_SANDBOX_CALL_RESULT,
@@ -187,6 +191,61 @@ describe('plugin worker', () => {
     expect(scope.WebSocket).toBeUndefined()
     expect(scope.EventSource).toBeUndefined()
     expect(() => (scope.importScripts as () => unknown)()).toThrow(PLUGIN_NETWORK_UNAVAILABLE_ERROR)
+  })
+
+  test('refuses to start when a network global cannot be replaced', () => {
+    function hostFetch() {
+      return 'reachable'
+    }
+    const scope: object = {}
+    Object.defineProperty(scope, 'fetch', {
+      value: hostFetch,
+      writable: false,
+      configurable: false
+    })
+    let reason: string | undefined
+    try {
+      blockPluginNetwork(scope)
+    } catch (error) {
+      if (!(error instanceof PluginNetworkUnblockedError)) throw error
+      reason = error.reason
+    }
+    expect(reason).toBe('network-global')
+    expect(Object.getOwnPropertyDescriptor(scope, 'fetch')?.value).toBe(hostFetch)
+    const proto: object = {}
+    Object.defineProperty(proto, 'Worker', {
+      value: hostFetch,
+      writable: false,
+      configurable: false
+    })
+    let prototypeReason: string | undefined
+    try {
+      blockPluginNetwork(Object.create(proto))
+    } catch (error) {
+      if (!(error instanceof PluginNetworkUnblockedError)) throw error
+      prototypeReason = error.reason
+    }
+    expect(prototypeReason).toBe('network-global')
+    const sealed: object = Object.preventExtensions(Object.create(null))
+    expect(() => blockPluginNetwork(sealed)).not.toThrow()
+    expect(Object.getOwnPropertyDescriptor(sealed, 'fetch')).toBeUndefined()
+  })
+
+  test('deleting a blocked network global does not restore it, and a worker cannot start', () => {
+    let started = false
+    function ProbeWorker(this: unknown) {
+      started = true
+    }
+    const proto = { fetch: () => 'reachable', Worker: ProbeWorker }
+    const scope: object = Object.create(proto)
+    blockPluginNetwork(scope)
+    expect(Reflect.deleteProperty(scope, 'fetch')).toBe(false)
+    const blockedScope = scope as { fetch: () => unknown; Worker: new () => unknown }
+    expect(() => blockedScope.fetch()).toThrow(PLUGIN_NETWORK_UNAVAILABLE_ERROR)
+    expect(() => new blockedScope.Worker()).toThrow()
+    expect(started).toBe(false)
+    const hostFetch = Object.getPrototypeOf(scope) as { fetch: () => unknown }
+    expect(() => hostFetch.fetch()).toThrow(PLUGIN_NETWORK_UNAVAILABLE_ERROR)
   })
 })
 

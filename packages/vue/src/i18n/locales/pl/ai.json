@@ -210,6 +210,8 @@
   "chatOutputLimit": "Model wyczerpał limit tokenów wyjściowych podczas rozumowania. Zwiększ maksymalną liczbę tokenów wyjściowych lub zmniejsz poziom rozumowania.",
   "chatRequestFailed": "Żądanie do modelu nie powiodło się. Sprawdź ustawienia dostawcy i spróbuj ponownie.",
   "chatProviderStalled": "Dostawca przestał odpowiadać. Sprawdź połączenie i spróbuj ponownie.",
+  "chatEmptyReply": "Model nie zwrócił odpowiedzi. Spróbuj ponownie.",
+  "chatAgentStartTimeout": "Agent kodujący nie uruchomił się na czas. Sprawdź, czy działa na tym komputerze, i spróbuj ponownie.",
   "visionModelUnavailable": "Przed dołączeniem obrazów wybierz model Vision w Ustawieniach.",
   "chatPiCompanionMissing": "Pi potrzebuje programu towarzyszącego Harness. Uruchom konfigurację z przewodnikiem, aby go zainstalować.",
   "chatPiCompanionOutdated": "Program towarzyszący Harness nie pasuje do tej wersji Pairdraw. Uruchom konfigurację z przewodnikiem, aby go zaktualizować.",

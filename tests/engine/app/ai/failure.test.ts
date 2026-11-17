@@ -6,6 +6,8 @@ import { AgentSignInRequiredError } from '@/app/ai/agents/acp/auth/required'
 import {
   classifyAIChatError,
   classifyAIChatFinish,
+  classifyEmptyReply,
+  isEmptyAIReply,
   isInsufficientCreditError
 } from '@/app/ai/chat/failure'
 import { ProviderStallError } from '@/app/ai/transports/stall'
@@ -16,6 +18,32 @@ describe('AI chat failures', () => {
     expect(isInsufficientCreditError(new Error('Insufficient balance. Please top up.'))).toBe(true)
     expect(isInsufficientCreditError(new Error('Quota exceeded for this account'))).toBe(true)
     expect(isInsufficientCreditError(new Error('Rate limit reached'))).toBe(false)
+  })
+
+  test('reports a reply that ended with neither text nor a tool call', () => {
+    expect(isEmptyAIReply({ parts: [] })).toBe(true)
+    expect(isEmptyAIReply({ parts: [{ type: 'text', text: '   ' }] })).toBe(true)
+    expect(isEmptyAIReply({ parts: [{ type: 'text', text: 'Done' }] })).toBe(false)
+    expect(
+      isEmptyAIReply({
+        parts: [
+          {
+            type: 'dynamic-tool',
+            toolName: 'create_shape',
+            toolCallId: 'call-1',
+            state: 'output-available',
+            input: {},
+            output: {}
+          }
+        ]
+      })
+    ).toBe(false)
+  })
+
+  test('names the output budget when it used up an empty reply', () => {
+    expect(classifyEmptyReply('length')).toEqual({ reason: 'output-limit' })
+    expect(classifyEmptyReply('stop')).toEqual({ reason: 'empty-reply' })
+    expect(classifyEmptyReply(undefined)).toEqual({ reason: 'empty-reply' })
   })
 
   test('classifies output-limit finishes', () => {

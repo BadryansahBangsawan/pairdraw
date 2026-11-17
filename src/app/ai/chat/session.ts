@@ -7,7 +7,12 @@ import { ACP_AGENTS, AI_PROVIDERS } from '@pairdraw/core/constants'
 import type { ACPAgentID, AIProviderID } from '@pairdraw/core/constants'
 
 import { AgentSetupError, assertAgentReady } from '@/app/ai/agents/setup/readiness'
-import { classifyAIChatError, type AIChatFailure } from '@/app/ai/chat/failure'
+import {
+  classifyAIChatError,
+  classifyEmptyReply,
+  isEmptyAIReply,
+  type AIChatFailure
+} from '@/app/ai/chat/failure'
 import { notifyReplyEnded } from '@/app/ai/chat/notifications'
 import { chatProjectFolder } from '@/app/ai/chat/project-folder'
 import { hasSteeringMessage } from '@/app/ai/chat/queue'
@@ -335,9 +340,13 @@ export function createChatSessionManager({
           handleChatFinish(diagnosticContext, event)
           // The reply is over, however it ended; its agent rests instead of waiting it out.
           if (agentKind) restAgents(agentKind)
-          if (event.isAbort || event.isDisconnect || event.isError) {
-            void settleEndedReply(created, store, event.message.id, event.isAbort)
+          const ended = event.isAbort || event.isDisconnect || event.isError
+          // An empty reply leaves a message nothing explains; the turn ends with a reason, and an
+          // output budget that ran out while reasoning is that cause rather than a missing reply.
+          if (!ended && isEmptyAIReply(event.message)) {
+            failure.value = classifyEmptyReply(event.finishReason)
           }
+          if (ended) void settleEndedReply(created, store, event.message.id, event.isAbort)
           // A reply stopped by the person, or cut off with its connection, ends unannounced.
           if (!event.isAbort && !event.isDisconnect)
             void notifyReplyEnded(

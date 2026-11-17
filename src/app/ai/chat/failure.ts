@@ -1,4 +1,4 @@
-import { APICallError, StreamProviderError } from 'ai'
+import { APICallError, StreamProviderError, type UIMessage } from 'ai'
 
 import { AgentSignInRequiredError } from '@/app/ai/agents/acp/auth/required'
 import { ProviderStallError } from '@/app/ai/transports/stall'
@@ -17,6 +17,7 @@ type AIChatFailureReason =
   | 'agent-unconfigured'
   | 'plan-forbidden'
   | 'timeout'
+  | 'empty-reply'
 
 export type AIChatFailure = {
   reason: AIChatFailureReason
@@ -120,8 +121,24 @@ function failureReason(error: unknown): AIChatFailureReason {
   return 'request-failed'
 }
 
+/**
+ * A reply the model ended with neither an answer nor a tool call: nothing happened, and the turn
+ * would otherwise end on an empty message with no explanation.
+ */
+export function isEmptyAIReply(message: Pick<UIMessage, 'parts'>): boolean {
+  return !message.parts.some((part) => {
+    if (part.type === 'text' || part.type === 'reasoning') return part.text.trim().length > 0
+    return part.type === 'dynamic-tool' || part.type.startsWith('tool-') || part.type === 'file'
+  })
+}
+
 export function classifyAIChatFinish(finishReason?: string): AIChatFailure | null {
   return finishReason === 'length' ? { reason: 'output-limit' } : null
+}
+
+/** Why a reply with no answer ended: its output budget, or a model that sent nothing at all. */
+export function classifyEmptyReply(finishReason?: string): AIChatFailure {
+  return classifyAIChatFinish(finishReason) ?? { reason: 'empty-reply' }
 }
 
 /** A provider signed in to has no key, so a refused credential is its sign-in or its plan. */

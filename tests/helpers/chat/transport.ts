@@ -6,6 +6,7 @@ export async function injectMockChatTransport(page: Page): Promise<void> {
     if (!setChatTransport) throw new Error('Transport override not available')
     let messageCounter = 0
     let flakyFailed = false
+    let emptyReplySent = false
 
     setChatTransport(() => ({
       async sendMessages({
@@ -35,6 +36,18 @@ export async function injectMockChatTransport(page: Page): Promise<void> {
         }
         if (normalized.includes('missing agent')) {
           throw new Error('Mock agent unavailable')
+        }
+        // Ends the first turn with no answer and no tool call, as a model that returns nothing.
+        if (normalized.includes('empty reply') && !emptyReplySent) {
+          emptyReplySent = true
+          return new ReadableStream({
+            start(controller) {
+              controller.enqueue({ type: 'start', messageId })
+              controller.enqueue({ type: 'finish-step' })
+              controller.enqueue({ type: 'finish', finishReason: 'stop' })
+              controller.close()
+            }
+          })
         }
         // Fails the first time only, before any reply, as a dropped connection does.
         if (normalized.includes('flaky request') && !flakyFailed) {

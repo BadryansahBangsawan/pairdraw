@@ -126,6 +126,18 @@ test('authentication errors explain the cause and link to Settings', async ({
   await expect(chat.page.getByTestId('app-settings-dialog')).toBeVisible()
 })
 
+test('a model that returns nothing ends the turn with a retry', async ({
+  configuredChat: chat
+}) => {
+  await chat.submit('Give an empty reply')
+  const toast = chat.page.locator('[data-slot="toast"]').filter({
+    hasText: 'The model returned no reply. Try again.'
+  })
+  await expect(toast).toBeVisible()
+  await toast.getByRole('button', { name: 'Retry' }).click()
+  await expect(chat.assistantMessage()).toContainText('mock response')
+})
+
 test('transport errors show a safe localized toast', async ({ configuredChat: chat }) => {
   await chat.submit('Trigger missing agent error')
   await expect(

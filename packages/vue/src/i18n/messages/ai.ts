@@ -333,6 +333,7 @@ export const aiMessageDefaults = {
   chatRateLimited: 'The provider rate limit was reached. Wait a moment and try again.',
   chatRequestFailed: 'The model request failed. Check the provider settings and try again.',
   chatProviderStalled: 'The provider stopped responding. Check your connection and try again.',
+  chatEmptyReply: 'The model returned no reply. Try again.',
   openProviderSettingsAction: 'Open settings',
   cloudWorkspace: 'Workspace',
   cloudWorkspaceHint: 'The workspace whose plan pays for these requests.',

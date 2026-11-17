@@ -216,6 +216,8 @@
   "chatOutputLimit": "Il modello ha esaurito i token di output durante il ragionamento. Aumenta i token di output massimi o riduci lo sforzo di ragionamento.",
   "chatRequestFailed": "La richiesta al modello non è riuscita. Controlla le impostazioni del provider e riprova.",
   "chatProviderStalled": "Il provider ha smesso di rispondere. Controlla la connessione e riprova.",
+  "chatEmptyReply": "Il modello non ha restituito alcuna risposta. Riprova.",
+  "chatAgentStartTimeout": "L’agente di codice non si è avviato in tempo. Verifica che sia in esecuzione su questo computer e riprova.",
   "visionModelUnavailable": "Scegli un modello Vision nelle Impostazioni prima di allegare immagini.",
   "chatPiCompanionMissing": "Pi richiede il companion Harness. Avvia la configurazione guidata per installarlo.",
   "chatPiCompanionOutdated": "Il companion Harness non corrisponde a questa versione di Pairdraw. Avvia la configurazione guidata per aggiornarlo.",

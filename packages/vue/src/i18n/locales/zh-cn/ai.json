@@ -216,6 +216,8 @@
   "chatOutputLimit": "模型在推理时耗尽了输出词元。请提高最大输出词元数或降低推理强度。",
   "chatRequestFailed": "模型请求失败。请检查提供商设置后重试。",
   "chatProviderStalled": "提供商停止响应。请检查网络连接后重试。",
+  "chatEmptyReply": "模型没有返回任何回复。请重试。",
+  "chatAgentStartTimeout": "编码代理未能及时启动。请确认它可以在此电脑上运行，然后重试。",
   "visionModelUnavailable": "附加图片前，请在设置中选择视觉模型。",
   "chatPiCompanionMissing": "Pi 需要 Harness 配套程序。运行引导式设置来安装它。",
   "chatPiCompanionOutdated": "Harness 配套程序与此版本的 Pairdraw 不匹配。运行引导式设置来更新它。",

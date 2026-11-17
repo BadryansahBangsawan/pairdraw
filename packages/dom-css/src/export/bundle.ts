@@ -1,4 +1,3 @@
-import type { CSSFontFaceRule } from '@acemir/cssom'
 import { isValid, toUint8Array } from 'js-base64'
 import { parseFragment, serialize, type DefaultTreeAdapterTypes } from 'parse5'
 
@@ -276,22 +275,21 @@ interface FontFaceCSSOptions {
   display?: string
 }
 
-function fontFaceCSS(
-  FontFaceRule: typeof CSSFontFaceRule,
-  asset: WebFontFaceAsset,
-  options: FontFaceCSSOptions
-): string {
-  const rule = new FontFaceRule()
-  rule.style.setProperty('font-family', JSON.stringify(asset.family))
-  rule.style.setProperty('src', fontSourceValue(asset, options.from))
-  rule.style.setProperty('font-weight', serializeFontWeight(asset.weight))
-  rule.style.setProperty('font-style', asset.style)
-  rule.style.setProperty('font-display', options.display ?? asset.display ?? 'swap')
-  if (asset.stretch) rule.style.setProperty('font-stretch', asset.stretch)
+function fontFaceCSS(asset: WebFontFaceAsset, options: FontFaceCSSOptions): string {
+  const declarations: [property: string, value: string][] = [
+    ['font-family', JSON.stringify(asset.family)],
+    ['src', fontSourceValue(asset, options.from)],
+    ['font-weight', serializeFontWeight(asset.weight)],
+    ['font-style', asset.style],
+    ['font-display', options.display ?? asset.display ?? 'swap']
+  ]
+  if (asset.stretch) declarations.push(['font-stretch', asset.stretch])
   if (asset.unicodeRange && asset.unicodeRange.length > 0) {
-    rule.style.setProperty('unicode-range', asset.unicodeRange.join(','))
+    declarations.push(['unicode-range', asset.unicodeRange.join(',')])
   }
-  return rule.cssText
+  // Written out rather than serialized by a CSS object model, which a browser bundle cannot load.
+  const body = declarations.map(([property, value]) => `  ${property}: ${value};`).join('\n')
+  return `@font-face {\n${body}\n}\n`
 }
 
 /** Every font face a document's text uses, once each. */
@@ -302,14 +300,12 @@ export function designFontRequests(document: DesignDocument): WebFontFaceRequest
 }
 
 /** `@font-face` rules for font files, as a stylesheet in the folder `options.from`. */
-export async function fontFaceStylesheet(
+export function fontFaceStylesheet(
   assets: readonly WebFontFaceAsset[],
   options: FontFaceCSSOptions
-): Promise<string> {
+): string {
   if (assets.length === 0) return ''
-  // Loaded only when fonts ship as files; the CSS object model is not bundled for browsers.
-  const cssom = await import('@acemir/cssom')
-  return assets.map((asset) => fontFaceCSS(cssom.CSSFontFaceRule, asset, options)).join('')
+  return assets.map((asset) => fontFaceCSS(asset, options)).join('')
 }
 
 async function fontFaceAssets(
@@ -320,7 +316,7 @@ async function fontFaceAssets(
   const assets = await options.fonts(designFontRequests(document), `${options.assetBasePath}/fonts`)
   // The page's stylesheet sits in the asset folder, beside the fonts' own folder.
   return {
-    css: await fontFaceStylesheet(assets, { from: options.assetBasePath }),
+    css: fontFaceStylesheet(assets, { from: options.assetBasePath }),
     files: assets
   }
 }

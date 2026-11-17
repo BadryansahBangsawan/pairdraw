@@ -339,7 +339,7 @@ async function storyFonts(
   if (requests.size === 0) return []
   const assets = await options.fonts([...requests.values()], `${folder}/fonts`)
   if (assets.length === 0) return []
-  const css = await fontFaceStylesheet(assets, { from: folder, display: 'block' })
+  const css = fontFaceStylesheet(assets, { from: folder, display: 'block' })
   return [...assets, { path: `${folder}/fonts.css`, content: css }]
 }
 

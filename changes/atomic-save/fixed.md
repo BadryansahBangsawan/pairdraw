@@ -1,0 +1,5 @@
+- Saving or exporting a document on the desktop replaces the file only after the new copy is fully written, so a crash or a full disk leaves the previous file in place.
+- Saving a document into a folder that will not accept a new file fails and leaves the previous file unchanged.
+- Converting or exporting a document replaces the output file only after the new copy is fully written.
+- Saving a document through the browser’s MCP server replaces the file only after the new copy is fully written.
+- A failed save shows an error, and the document stays unsaved with its recovery copy kept.

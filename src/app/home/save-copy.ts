@@ -110,8 +110,8 @@ async function saveCopyOnDesktop(
   })
   if (!path) return { status: 'cancelled' }
   const bytes = await documentBytes(source)
-  const { writeFile } = await import('@tauri-apps/plugin-fs')
-  await writeFile(path, bytes)
+  const { writeDesktopFile } = await import('@/app/tauri/files')
+  await writeDesktopFile(path, bytes)
   rememberRecentFile(path)
   return { status: 'saved', name: basename(path) }
 }

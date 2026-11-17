@@ -1,0 +1,1 @@
+- Saving a document cannot write the webview data folders the file-system scope already denies.

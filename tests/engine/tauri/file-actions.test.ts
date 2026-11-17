@@ -99,10 +99,10 @@ describe('Tauri file actions', () => {
       },
       options: undefined
     })
-    expect(calls[1]?.cmd).toBe('plugin:fs|write_file')
+    expect(calls[1]?.cmd).toBe('write_document_file')
     expect([...new Uint8Array(calls[1]?.args as ArrayBuffer)]).toEqual([1, 2, 3])
     expect(calls[1]?.options).toEqual({
-      headers: { path: '%2Ftmp%2Fexport.png', options: undefined }
+      headers: { path: '%2Ftmp%2Fexport.png' }
     })
   })
 

@@ -127,10 +127,15 @@ export function createDocumentSourceActions({
     await recovery.markProtectedVersion(version)
     await draft.release()
     const file = writableFile()
-    if (!file) return
-    await removeFileBackups(file, { except: recovery.getRecoveryId() }).catch((error: unknown) => {
-      console.warn('[Recovery] Deleting the saved file’s older backups failed:', error)
-    })
+    if (file) {
+      await removeFileBackups(file, { except: recovery.getRecoveryId() }).catch(
+        (error: unknown) => {
+          console.warn('[Recovery] Deleting the saved file’s older backups failed:', error)
+        }
+      )
+    }
+    // Rename replaces the inode. A watch started on the previous file does not see the new one.
+    if (file?.path) await startWatchingFile()
   }
 
   const { saveFigFile, saveFigFileAs, writeFile } = createSaveActions({

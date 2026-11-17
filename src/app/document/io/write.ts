@@ -3,6 +3,7 @@ import { storageLocationOf } from '@/app/integrations/storage/location'
 import type { StorageDocumentBinding } from '@/app/integrations/storage/types'
 import { persistStorageCanvasLocally } from '@/app/storage/sync/persist'
 import { isTauri } from '@/app/tauri/env'
+import { writeDesktopFile } from '@/app/tauri/files'
 
 type WriteDocumentState = { documentName: string }
 
@@ -52,8 +53,10 @@ export function createDocumentWriter({
       const filePath = getFilePath()
       const fileHandle = getFileHandle()
       if (filePath && isTauri()) {
-        const { writeFile: tauriWrite } = await import('@tauri-apps/plugin-fs')
-        await tauriWrite(filePath, data)
+        await writeDesktopFile(filePath, data)
+        // The rename lands after the call that opened the ignore window. Refresh it so the
+        // watch treats that replace as our own write.
+        setLastWriteTime(Date.now())
         return await finishWrite(version)
       }
       if (fileHandle) {

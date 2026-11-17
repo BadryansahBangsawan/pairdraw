@@ -71,6 +71,7 @@ pub fn run() {
             agents::lookup::agent_lookup,
             agents::lookup::agent_workspace,
             files::fig::build_fig_file,
+            files::write::write_document_file,
             network::oauth::chatgpt_oauth_listen,
             network::oauth::chatgpt_oauth_wait,
             network::oauth::chatgpt_oauth_cancel,

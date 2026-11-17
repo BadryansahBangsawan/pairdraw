@@ -29,7 +29,41 @@ describe('Tauri document IO helpers', () => {
     expect(document?.getPages().length).toBeGreaterThan(0)
   })
 
-  test('writes document bytes through plugin-fs', async () => {
+  test('an interrupted desktop write leaves the previous file and does not record a save', async () => {
+    const files = new Map<string, Uint8Array>([['/tmp/document.fig', new Uint8Array([9, 9, 9])]])
+    await mockTauriIPC((cmd, args, options) => {
+      const headers = (options as { headers?: { path?: string } } | undefined)?.headers
+      const path = decodeURIComponent(headers?.path ?? '')
+      // The fs plugin truncates the target before the write. A command that renames publishes
+      // nothing when it throws first.
+      if (cmd === 'plugin:fs|write_file') {
+        files.set(path, new Uint8Array())
+        throw new Error('disk full')
+      }
+      if (cmd === 'write_document_file') throw new Error('disk full')
+      return args
+    })
+    const savedVersions: number[] = []
+    let cleanedUp = false
+    const write = createDocumentWriter({
+      state: { documentName: 'Document' },
+      getFilePath: () => '/tmp/document.fig',
+      getFileHandle: () => null,
+      getStorageBinding: () => null,
+      setSavedVersion: (version) => savedVersions.push(version),
+      setLastWriteTime: () => undefined,
+      onWriteSuccess: () => {
+        cleanedUp = true
+      }
+    })
+
+    await expect(write(new Uint8Array([1, 2, 3]), 7)).rejects.toThrow('disk full')
+    expect([...(files.get('/tmp/document.fig') ?? [])]).toEqual([9, 9, 9])
+    expect(savedVersions).toEqual([])
+    expect(cleanedUp).toBe(false)
+  })
+
+  test('writes document bytes by replacing the file after it is fully written', async () => {
     const calls: Array<{ cmd: string; args: unknown; options: unknown }> = []
     await mockTauriIPC((cmd, args, options) => {
       calls.push({ cmd, args, options })
@@ -48,10 +82,10 @@ describe('Tauri document IO helpers', () => {
     await write(new Uint8Array([1, 2, 3]), 42)
 
     expect(calls).toHaveLength(1)
-    expect(calls[0]?.cmd).toBe('plugin:fs|write_file')
+    expect(calls[0]?.cmd).toBe('write_document_file')
     expect([...new Uint8Array(calls[0]?.args as ArrayBuffer)]).toEqual([1, 2, 3])
     expect(calls[0]?.options).toEqual({
-      headers: { path: '%2Ftmp%2Fdocument.fig', options: undefined }
+      headers: { path: '%2Ftmp%2Fdocument.fig' }
     })
     expect(savedVersions).toEqual([42])
   })

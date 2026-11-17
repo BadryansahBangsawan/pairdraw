@@ -177,8 +177,8 @@ async function chooseTauriExportPath(fileName: string, format: string, ext: stri
 }
 
 async function writeTauriExportFile(path: string, data: Uint8Array) {
-  const { writeFile: tauriWrite } = await import('@tauri-apps/plugin-fs')
-  await tauriWrite(path, data)
+  const { writeDesktopFile } = await import('@/app/tauri/files')
+  await writeDesktopFile(path, data)
 }
 
 /** Saves an exported file and reports whether it was saved; `false` means the person cancelled. */

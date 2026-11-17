@@ -19,7 +19,8 @@ export default defineCommand({
     },
     selector: {
       type: 'positional',
-      description: 'XPath selector (e.g., //FRAME[@width < 300], //TEXT[contains(@name, "Label")])',
+      description:
+        'XPath selector whose tag is a node type (e.g., //FRAME[@width < 300], //TEXT[contains(@name, "Label")])',
       required: true
     },
     page: { type: 'string', description: 'Page name (default: all pages)' },

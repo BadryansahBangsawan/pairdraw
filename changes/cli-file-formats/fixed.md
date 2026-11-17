@@ -11,3 +11,4 @@
 - `export --quality`, `export --scale`, `export --width`, `export --height`, and `analyze colors --threshold` refuse a value outside their range instead of using it.
 - Every command refuses an extra positional argument, instead of ignoring it or taking it for the output path.
 - `pairdraw eval --output` refuses a path whose directory does not exist before the script runs, instead of running the script and then failing to write.
+- The CLI reference lists the node types `pairdraw query` accepts as tags.

@@ -523,7 +523,11 @@ pairdraw agent list [--json]
 
 ## query
 
-Query nodes using XPath selectors.
+Query nodes using XPath selectors. A selector's tag is a node type, spelled as `find --type` spells
+it: `CANVAS`, `FRAME`, `RECTANGLE`, `ROUNDED_RECTANGLE`, `ELLIPSE`, `TEXT`, `LINE`, `STAR`,
+`POLYGON`, `VECTOR`, `BOOLEAN_OPERATION`, `GROUP`, `SECTION`, `COMPONENT`, `COMPONENT_SET`,
+`INSTANCE`, `CONNECTOR`, `SHAPE_WITH_TEXT`, `STICKY`, or `SCRIPT`. `//RECTANGLE` matches
+rectangles; `//RECT` matches nothing.
 
 ```sh
 pairdraw query [file] [selector] [options]

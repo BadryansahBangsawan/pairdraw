@@ -9,3 +9,4 @@
 - `pairdraw lint` refuses an unknown preset or rule with a clear error instead of crashing or passing silently.
 - `pairdraw export --thumbnail` writes a page thumbnail fitted to `--width` and `--height` for PNG, JPG, and WEBP, instead of always failing.
 - `export --quality`, `export --scale`, `export --width`, `export --height`, and `analyze colors --threshold` refuse a value outside their range instead of using it.
+- Every command refuses an extra positional argument, instead of ignoring it or taking it for the output path.

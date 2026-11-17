@@ -28,11 +28,20 @@ function skillParagraph(enabled: (name: string) => boolean): string {
   return `${lead}, read the ${SKILL_NAME} skill: call read_skill for SKILL.md, then read_skill with path "${REFERENCE_PATH}"${reference}. Clients without that tool can read the same files as the resources ${SKILL_FILE_URI} and ${REFERENCE_URI}.`
 }
 
+function closedRecovery(enabled: (name: string) => boolean): string {
+  const actions = compact([
+    enabled('new_document') && 'new_document',
+    enabled('open_file') && 'open_file'
+  ])
+  if (actions.length === 0) return ''
+  return ` After that document is closed, pass document_id from list_documents, or call ${actions.join(' or ')}.`
+}
+
 function usageParagraph(enabled: (name: string) => boolean, policy: ToolPolicy): string {
   const undo = enabled('undo')
   return compact([
     enabled('list_documents') &&
-      'When several documents may be open, call list_documents first and pass its document_id and page_id to later calls.',
+      `When several documents may be open, call list_documents first and pass its document_id and page_id to later calls. Each session keeps the document it edits. Home is not a document. Closing without document_id only closes a document this session opened.${closedRecovery(enabled)}`,
     policy.scope === 'document' &&
       enabled('export_image') &&
       'Check visual changes with export_image.',

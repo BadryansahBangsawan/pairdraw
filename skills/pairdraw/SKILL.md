@@ -243,8 +243,10 @@ pairdraw documents list --json                       # tab IDs, paths, pages
 pairdraw documents open designs/landing.fig          # new tab; --json returns target.documentId
 pairdraw documents new --path designs/draft.fig
 pairdraw documents activate tab-123 --page-id 0:4    # bring a tab to the front
+pairdraw documents save                               # the document this session is targeting, or the one in front
 pairdraw documents save --document-id tab-123
 pairdraw documents close --document-id tab-123 --save   # or --discard; fails on unsaved changes otherwise
+# close without --document-id only closes a document this CLI session opened
 pairdraw undo --document-id tab-123                  # also: redo
 pairdraw settings get --json
 pairdraw settings set editing.snapping.pixelGrid false
@@ -262,7 +264,11 @@ printf '%s\n' 'create_page {"name":"Icons"}' 'save()' | pairdraw shell design.fi
 pairdraw models --json                               # AI providers and their models
 ```
 
-Every command that reports structured data supports `--json` when appropriate.
+Every command that reports structured data supports `--json` when appropriate. Commands share one `cli` session. Set `PAIRDRAW_SESSION` to run a second CLI agent beside it:
+
+```bash
+PAIRDRAW_SESSION=agent-a pairdraw tool call create_shape --args '{"type":"RECTANGLE","x":0,"y":0,"width":40,"height":40}'
+```
 
 ## MCP Server
 
@@ -315,6 +321,8 @@ The CLI defaults the filesystem root to the home directory on Windows and the cu
 4. **Modify** — `render`, `batch_update`, `update_node`, `set_fill`, `set_layout`, `create_shape`, `import_svg`, etc. For a flowchart, write it as Mermaid and call `import_mermaid { mermaid }`: it lays out FigJam shapes, sections, and connectors without overlaps and returns each node's layer id, instead of placing shapes and connectors by hand. When layers you created overlap, call `arrange { ids }`: it spreads them apart and keeps each near where it was. `arrange` also packs screens (`mode: "pack"`) and lays shapes out along the connectors joining them (`mode: "flow"` for flows, `"tree"` for hierarchies, `"radial"` for mind maps, `"network"` for relationship maps).
 5. **Save/export** — `save_file`, `export_image`, `export_svg`, `export_pdf`, or CLI `export`.
 6. **Close** — `close_file { document_id, unsaved }` closes a document tab after the workflow. With unsaved changes it fails unless `unsaved` is `"save"` or `"discard"`; automation never prompts in the app.
+
+Each session keeps the document it edits, including after the person switches tabs. Home and a New file tab are not documents: an edit with none chosen yet opens a document tab and leaves the current tab in front. `open_file` owns a document only when that call opened it. `close_file` without `document_id` closes only a document this session opened. `save_file` without `document_id` saves the document this session is targeting, or the document in front. When that document has been closed, call `list_documents` and pass `document_id`, or call `new_document` or `open_file`. A new HTTP session starts with no document. An idle timeout of 15 minutes ends the previous session, and the next edit opens its own tab. Set `PAIRDRAW_SESSION` to run two CLI agents at once; otherwise CLI commands share one `cli` session.
 
 Use `undo` / `redo { document_id }` to step back your own changes. They refuse when the newest step was made by the user in the editor; never work around that. `get_settings` and `update_settings { settings }` read and change editor preferences such as theme, language, and snapping; they never expose credentials, models, or tool access.
 

@@ -3,7 +3,7 @@ import { mkdtemp, writeFile } from 'node:fs/promises'
 import { createServer, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { tmpdir } from 'node:os'
-import { join, resolve } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 
 import * as v from 'valibot'
 
@@ -24,6 +24,12 @@ const requestSchema = v.pipe(
   v.parseJson(),
   v.object({ command: v.string(), args: v.record(v.string(), v.unknown()) })
 )
+
+const agentSchema = v.object({
+  session: v.pipe(v.string(), v.minLength(1)),
+  kind: v.literal('mcp'),
+  client: v.literal('CLI')
+})
 
 type Request = v.InferOutput<typeof requestSchema>
 
@@ -75,11 +81,25 @@ beforeEach(() => {
   responses.clear()
 })
 
-async function cli(args: string[]) {
+/** The process session is not part of the command's own arguments. */
+function commandArgs(request: Request | undefined): Record<string, unknown> {
+  const args = request?.args ?? {}
+  const { agent: _agent, ...rest } = args
+  return rest
+}
+
+function expectProcessAgent(request: Request | undefined): v.InferOutput<typeof agentSchema> {
+  const parsed = v.safeParse(agentSchema, request?.args.agent)
+  expect(parsed.success).toBe(true)
+  if (!parsed.success) throw new Error('The app call had no session')
+  return parsed.output
+}
+
+async function cli(args: string[], env: Record<string, string> = {}) {
   const proc = Bun.spawn([process.execPath, CLI_ENTRY, ...args], {
     stdout: 'pipe',
     stderr: 'pipe',
-    env: { ...process.env, PAIRDRAW_MCP_DISCOVERY_PATH: discoveryPath }
+    env: { ...process.env, PAIRDRAW_MCP_DISCOVERY_PATH: discoveryPath, ...env }
   })
   const [stdout, stderr] = await Promise.all([
     new Response(proc.stdout).text(),
@@ -88,13 +108,61 @@ async function cli(args: string[]) {
   return { stdout: stdout.trim(), stderr: stderr.trim(), exitCode: await proc.exited }
 }
 
+describe('app session', () => {
+  test('one process sends the same session on every app call', async () => {
+    const proc = Bun.spawn(
+      [
+        process.execPath,
+        '-e',
+        "import { rpc } from '#cli/app/client'; await rpc('list_documents', {}); await rpc('tool', { name: 'get_selection', args: {} });"
+      ],
+      {
+        cwd: dirname(dirname(CLI_ENTRY)),
+        stdout: 'pipe',
+        stderr: 'pipe',
+        env: { ...process.env, PAIRDRAW_MCP_DISCOVERY_PATH: discoveryPath }
+      }
+    )
+    const stderr = await new Response(proc.stderr).text()
+    const exitCode = await proc.exited
+    expect(exitCode, stderr).toBe(0)
+
+    expect(requests.map((request) => request.command)).toEqual(['list_documents', 'tool'])
+    expect(commandArgs(requests[1])).toEqual({ name: 'get_selection', args: {} })
+    const first = expectProcessAgent(requests[0])
+    expect(first).toEqual({ session: 'cli', kind: 'mcp', client: 'CLI' })
+    expect(expectProcessAgent(requests[1])).toEqual(first)
+  })
+
+  test('uses PAIRDRAW_SESSION when it names a session, and cli otherwise', async () => {
+    await cli(['documents', 'list'])
+    expect(expectProcessAgent(requests[0])).toEqual({ session: 'cli', kind: 'mcp', client: 'CLI' })
+
+    requests.length = 0
+    await cli(['documents', 'list'], { PAIRDRAW_SESSION: '  side-by-side  ' })
+    expect(expectProcessAgent(requests[0])).toEqual({
+      session: 'side-by-side',
+      kind: 'mcp',
+      client: 'CLI'
+    })
+
+    requests.length = 0
+    await cli(['documents', 'list'], { PAIRDRAW_SESSION: 'x'.repeat(129) })
+    expect(expectProcessAgent(requests[0]).session).toBe('cli')
+
+    requests.length = 0
+    await cli(['documents', 'list'], { PAIRDRAW_SESSION: '   ' })
+    expect(expectProcessAgent(requests[0]).session).toBe('cli')
+  })
+})
+
 describe('documents CLI', () => {
   test('opens files by absolute path and reports the target document', async () => {
     const opened = await cli(['documents', 'open', 'designs/landing.fig', '--json'])
     expect(opened.exitCode).toBe(0)
-    expect(requests).toEqual([
-      { command: 'open_file', args: { path: resolve('designs/landing.fig') } }
-    ])
+    expect(requests.map((request) => request.command)).toEqual(['open_file'])
+    expect(commandArgs(requests[0])).toEqual({ path: resolve('designs/landing.fig') })
+    expectProcessAgent(requests[0])
     expect(JSON.parse(opened.stdout)).toEqual({ result: {}, target: TARGET })
   })
 
@@ -102,18 +170,29 @@ describe('documents CLI', () => {
     await cli(['documents', 'save', '--document-id', 'doc-2', '--path', 'out.fig'])
     await cli(['documents', 'close', '--document-id', 'doc-2', '--discard'])
     await cli(['documents', 'activate', 'doc-2', '--page-id', '0:1'])
-    expect(requests).toEqual([
-      { command: 'save_file', args: { document_id: 'doc-2', path: resolve('out.fig') } },
-      { command: 'close_file', args: { document_id: 'doc-2', unsaved: 'discard' } },
-      { command: 'activate_document', args: { document_id: 'doc-2', page_id: '0:1' } }
+    expect(requests.map((request) => request.command)).toEqual([
+      'save_file',
+      'close_file',
+      'activate_document'
     ])
+    expect(commandArgs(requests[0])).toEqual({
+      document_id: 'doc-2',
+      path: resolve('out.fig')
+    })
+    expect(commandArgs(requests[1])).toEqual({ document_id: 'doc-2', unsaved: 'discard' })
+    expect(commandArgs(requests[2])).toEqual({ document_id: 'doc-2', page_id: '0:1' })
+    const first = expectProcessAgent(requests[0])
+    // Separate processes share the cli session unless PAIRDRAW_SESSION names another.
+    expect(first.session).toBe('cli')
+    expect(expectProcessAgent(requests[1]).session).toBe('cli')
+    expect(expectProcessAgent(requests[2]).session).toBe('cli')
   })
 
   test('close --save forwards the save choice and an absolute path', async () => {
     await cli(['documents', 'close', '--save', '--path', 'draft.fig'])
-    expect(requests).toEqual([
-      { command: 'close_file', args: { unsaved: 'save', path: resolve('draft.fig') } }
-    ])
+    expect(requests.map((request) => request.command)).toEqual(['close_file'])
+    expect(commandArgs(requests[0])).toEqual({ unsaved: 'save', path: resolve('draft.fig') })
+    expectProcessAgent(requests[0])
     const both = await cli(['documents', 'close', '--save', '--discard'])
     expect(both.exitCode).toBe(1)
   })
@@ -125,7 +204,9 @@ describe('history CLI', () => {
     const undone = await cli(['undo', '--document-id', 'doc-2'])
     expect(undone.exitCode).toBe(0)
     expect(undone.stdout).toContain('Undid: Agent: set_opacity')
-    expect(requests).toEqual([{ command: 'undo', args: { document_id: 'doc-2' } }])
+    expect(requests.map((request) => request.command)).toEqual(['undo'])
+    expect(commandArgs(requests[0])).toEqual({ document_id: 'doc-2' })
+    expectProcessAgent(requests[0])
   })
 })
 
@@ -137,13 +218,16 @@ describe('settings CLI', () => {
     await cli(['settings', 'set', 'editing.snapping.pixelGrid', 'false'])
     const theme = await cli(['settings', 'set', 'appearance.theme', 'light'])
     expect(theme.exitCode).toBe(0)
-    expect(requests).toEqual([
-      {
-        command: 'update_settings',
-        args: { settings: { editing: { snapping: { pixelGrid: false } } } }
-      },
-      { command: 'update_settings', args: { settings: { appearance: { theme: 'light' } } } }
+    expect(requests.map((request) => request.command)).toEqual([
+      'update_settings',
+      'update_settings'
     ])
+    expect(commandArgs(requests[0])).toEqual({
+      settings: { editing: { snapping: { pixelGrid: false } } }
+    })
+    expect(commandArgs(requests[1])).toEqual({ settings: { appearance: { theme: 'light' } } })
+    expectProcessAgent(requests[0])
+    expectProcessAgent(requests[1])
   })
 
   test('reads one setting by dotted key and rejects unknown keys', async () => {

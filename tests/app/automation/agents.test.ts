@@ -3,8 +3,6 @@ import { afterEach, beforeEach, describe, expect, jest, test } from 'bun:test'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
 import {
-  MCP_AGENT_GONE_MS,
-  MCP_AGENT_IDLE_MS,
   agentFinished,
   agentSessionOpened,
   agentStarted,
@@ -15,6 +13,7 @@ import {
   type AgentSession,
   watchChatAgent
 } from '@/app/automation/agents'
+import { MCP_AGENT_GONE_MS, MCP_AGENT_IDLE_MS } from '@/app/automation/lifetime'
 import { createEditorStore, type EditorStore } from '@/app/editor/session'
 import { presenceOf } from '@/app/presence/registry'
 

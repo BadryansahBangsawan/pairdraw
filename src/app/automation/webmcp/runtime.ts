@@ -1,6 +1,6 @@
 import { runEditorTool } from '@/app/ai/tools/runner'
 import { makeFigmaFromStore } from '@/app/automation/bridge/figma-factory'
-import { resolveAutomationTarget } from '@/app/automation/bridge/target'
+import { resolveAutomationTarget, type AutomationTarget } from '@/app/automation/bridge/target'
 import { createAutomationToolHandler } from '@/app/automation/bridge/tool-handlers'
 import type { EditorStore } from '@/app/editor/active-store'
 import { getTabById } from '@/app/tabs'
@@ -11,6 +11,18 @@ import { createWebMCPRuntimeService } from './service'
 const service = createWebMCPRuntimeService()
 export const webmcpRuntime = service.state
 
+/**
+ * WebMCP follows the tab in front. It does not follow an MCP session's document, so Home still
+ * refuses the tools.
+ */
+export function requireWebMCPDocument(store: EditorStore): AutomationTarget {
+  const target = resolveAutomationTarget(store, undefined)
+  if (getTabById(target.documentId)?.kind !== 'document') {
+    throw new Error('Open a document before using WebMCP tools')
+  }
+  return target
+}
+
 /** Browser-native tools reuse the same editor targeting and handlers as remote MCP. */
 export function startWebMCP(getStore: () => EditorStore): () => void {
   const handleTool = createAutomationToolHandler(makeFigmaFromStore)
@@ -18,10 +30,7 @@ export function startWebMCP(getStore: () => EditorStore): () => void {
     typeof document === 'undefined' ? undefined : document.modelContext,
     webmcpMode,
     () => {
-      const target = resolveAutomationTarget(getStore(), undefined)
-      if (getTabById(target.documentId)?.kind !== 'document') {
-        throw new Error('Open a document before using WebMCP tools')
-      }
+      const target = requireWebMCPDocument(getStore())
       return {
         execute: async (def, args, signal) => {
           signal.throwIfAborted()

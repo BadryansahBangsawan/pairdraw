@@ -2,6 +2,13 @@ import * as v from 'valibot'
 
 import { parseToolArgs } from '@pairdraw/core/tools'
 
+import { readAgentSession } from '@/app/automation/agents'
+import {
+  isUnknownRecord,
+  markSessionDocumentClosed,
+  rememberSessionDocument,
+  sessionDocument
+} from '@/app/automation/bridge/session-document'
 import {
   resolveAutomationTarget,
   responseWithTarget,
@@ -10,7 +17,14 @@ import {
 import { resolveBrowserFileURL } from '@/app/document/io/browser'
 import { openBrowserFileFromURL } from '@/app/shell/menu/files'
 import { openFileFromPath } from '@/app/shell/menu/use'
-import { closeTab, createTab, getActiveStore, getTabById } from '@/app/tabs'
+import {
+  closeTab,
+  createTab,
+  getActiveStore,
+  getTabById,
+  getTabForStore,
+  getTabsSnapshot
+} from '@/app/tabs'
 import { isTauri } from '@/app/tauri/env'
 
 /** Where a browser app reads and writes the paths the file tools name: the MCP server's `/files/`. */
@@ -93,10 +107,15 @@ export function createFileHandlers(files?: AutomationFiles) {
       }
       if (unsaved === 'save') await saveWithoutPrompt(store, path)
     }
+    const session = isUnknownRecord(args) ? readAgentSession(args.agent) : null
+    const known = session ? sessionDocument(session.session) : 'none'
     // Automation closes the tab without anyone to answer for its copies, so they stay for Home.
     await closeTab(target.documentId, unsaved === 'discard' ? 'discard' : 'save', {
       keepCopies: true
     })
+    if (session && known !== 'none' && known !== 'closed' && known.tab.id === target.documentId) {
+      markSessionDocumentClosed(session.session)
+    }
     return { ok: true, result: { closed: getTabById(target.documentId) === undefined } }
   }
 
@@ -111,13 +130,18 @@ export function createFileHandlers(files?: AutomationFiles) {
         throw error
       }
     }
+    const session = isUnknownRecord(args) ? readAgentSession(args.agent) : null
+    if (session) rememberSessionDocument(session.session, tab.id, true)
     const target = resolveAutomationTarget(tab.store, { document_id: tab.id })
     return responseWithTarget({ ok: true, result: { created: true } }, target)
   }
 
   async function handleOpenFile(_target: AutomationTarget, args: unknown): Promise<unknown> {
-    const path = (args as { path?: string }).path
-    if (!path) throw new Error('Missing "path" in args')
+    if (!isUnknownRecord(args) || typeof args.path !== 'string' || args.path.length === 0) {
+      throw new Error('Missing "path" in args')
+    }
+    const path = args.path
+    const before = new Set(getTabsSnapshot().map((tab) => tab.id))
     if (isTauri()) {
       await openFileFromPath(path)
     } else if (files) {
@@ -127,7 +151,13 @@ export function createFileHandlers(files?: AutomationFiles) {
     } else {
       await openBrowserFileFromURL(resolveBrowserFileURL(path))
     }
-    const target = resolveAutomationTarget(getActiveStore(), undefined)
+    // A tab that was already open is only brought forward. Owning it would let this session
+    // discard the person's changes with an untargeted close.
+    const created = getTabsSnapshot().find((tab) => tab.kind === 'document' && !before.has(tab.id))
+    const opened = created ?? getTabForStore(getActiveStore())
+    const target = resolveAutomationTarget(opened?.store ?? getActiveStore(), undefined)
+    const session = readAgentSession(args.agent)
+    if (session && created) rememberSessionDocument(session.session, created.id, true)
     return responseWithTarget({ ok: true, result: { opened: true } }, target)
   }
 

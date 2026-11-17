@@ -1,7 +1,20 @@
 import type { Page } from '@playwright/test'
+import * as v from 'valibot'
 
 import { expect, test } from '#tests/e2e/fixtures'
 import { CanvasHelper } from '#tests/helpers/canvas'
+
+const listedDocumentsSchema = v.object({
+  ok: v.literal(true),
+  result: v.object({
+    documents: v.array(v.object({ id: v.string(), active: v.boolean() }))
+  })
+})
+
+const closeRefusalSchema = v.object({
+  closed: v.literal(false),
+  reason: v.string()
+})
 
 /** Test runs keep no drafts unless their URL asks for them. */
 const DRAFTS_URL = '/?test&drafts'
@@ -16,6 +29,45 @@ function automation(page: Page, command: string, args: unknown = {}) {
     command,
     args
   ] as const)
+}
+
+/** The document in front, as `list_documents` names it for a later `document_id`. */
+async function activeDocumentId(page: Page): Promise<string> {
+  const parsed = v.safeParse(listedDocumentsSchema, await automation(page, 'list_documents'))
+  if (!parsed.success) throw new Error('list_documents returned an unexpected shape')
+  const active = parsed.output.result.documents.find((document) => document.active)
+  if (!active) throw new Error('No document is in front')
+  return active.id
+}
+
+/**
+ * Anonymous close, with the refusal read inside the page. The reason does not survive the
+ * evaluate boundary on a thrown error.
+ */
+function refusedAnonymousClose(page: Page) {
+  return page.evaluate(async () => {
+    try {
+      await window.pairdraw?.test?.automation?.('close_file', { unsaved: 'discard' })
+      return { closed: true }
+    } catch (error) {
+      const reason =
+        typeof error === 'object' &&
+        error !== null &&
+        'reason' in error &&
+        typeof error.reason === 'string'
+          ? error.reason
+          : ''
+      return { closed: false, reason }
+    }
+  })
+}
+
+/** Closes the document in front by the id `list_documents` returned. */
+async function closeActiveDocument(page: Page) {
+  await automation(page, 'close_file', {
+    unsaved: 'discard',
+    document_id: await activeDocumentId(page)
+  })
 }
 
 async function addRectangle(page: Page, name: string) {
@@ -111,7 +163,15 @@ test('an agent closing an untitled document leaves its work in Drafts', async ({
   await addRectangle(page, 'Work kept for Home')
   await keepDraft(page)
 
-  await automation(page, 'close_file', { unsaved: 'discard' })
+  const tabs = page.getByTestId('tabbar-tab')
+  const openTabs = await tabs.count()
+  const refused = v.safeParse(closeRefusalSchema, await refusedAnonymousClose(page))
+  if (!refused.success) throw new Error('anonymous close was not refused')
+  expect(refused.output.reason).toBe('not-owned')
+  await expect(tabs).toHaveCount(openTabs)
+  await expect(page.getByText('Work kept for Home')).toBeVisible()
+
+  await closeActiveDocument(page)
 
   await expect(page.getByTestId('recent-files-home')).toBeVisible()
   await expect(page.getByTestId('tabbar-tab')).toHaveCount(1)
@@ -134,7 +194,7 @@ test('an agent closing a saved file leaves its unsaved work recoverable', async 
   })
   expect(await recoveryCopies(page)).toBe(1)
 
-  await automation(page, 'close_file', { unsaved: 'discard' })
+  await closeActiveDocument(page)
 
   await expect(page.getByTestId('recent-files-home')).toBeVisible()
   expect(await recoveryCopies(page)).toBe(1)

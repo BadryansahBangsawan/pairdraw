@@ -1,6 +1,8 @@
 import { request as httpRequest } from 'node:http'
 import type { IncomingMessage } from 'node:http'
 
+import { isPlainObject } from 'es-toolkit'
+
 import { readDiscoveryFile } from '@pairdraw/mcp/discovery'
 import type { DiscoveryInfo } from '@pairdraw/mcp/discovery'
 import { platformHasUnixSockets } from '@pairdraw/mcp/transport'
@@ -9,6 +11,24 @@ import type { AppTarget } from '#cli/app/target'
 
 /** Maximum time to wait for a single RPC request before giving up. */
 const RPC_TIMEOUT_MS = 30_000
+
+/**
+ * Commands are separate processes, so a random id per process would open a new document each
+ * time. PAIRDRAW_SESSION names one agent; otherwise every CLI command shares `cli`.
+ */
+const CLI_SESSION_ID = 'cli'
+const MAX_CLI_SESSION_ID = 128
+
+function processAgent(): { session: string; kind: 'mcp'; client: 'CLI' } {
+  const named = process.env.PAIRDRAW_SESSION?.trim() ?? ''
+  const session = named.length > 0 && named.length <= MAX_CLI_SESSION_ID ? named : CLI_SESSION_ID
+  return { session, kind: 'mcp', client: 'CLI' }
+}
+
+function withProcessAgent(args: unknown): unknown {
+  if (!isPlainObject(args) || args.agent) return args
+  return { ...args, agent: processAgent() }
+}
 
 let cachedInfo: DiscoveryInfo | null = null
 
@@ -159,11 +179,11 @@ export async function rpcResponse<T = unknown>(
   args: unknown = {}
 ): Promise<RPCResponse<T>> {
   try {
-    return await rpcWithFallback<T>(await resolveDiscovery(), command, args)
+    return await rpcWithFallback<T>(await resolveDiscovery(), command, withProcessAgent(args))
   } catch (error) {
     if (!(error instanceof UnauthorizedError) && !isSocketConnectionError(error)) throw error
     cachedInfo = null
-    return rpcWithFallback<T>(await resolveDiscovery(), command, args)
+    return rpcWithFallback<T>(await resolveDiscovery(), command, withProcessAgent(args))
   }
 }
 

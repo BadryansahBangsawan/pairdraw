@@ -5,6 +5,7 @@ import { toRaw } from 'vue'
 
 import * as layoutModule from '@pairdraw/core/layout'
 
+import { endAgentSession } from '@/app/automation/agents'
 import { makeFigmaFromStore } from '@/app/automation/bridge/figma-factory'
 import { createAutomationCommandHandlers } from '@/app/automation/bridge/handlers'
 import { automationFiles } from '@/app/automation/bridge/server'
@@ -18,12 +19,19 @@ import { windowDocumentId } from '@/app/window/identity'
 import { asDouble } from '#tests/helpers/doubles'
 import { testPath } from '#tests/helpers/paths'
 
+/** Frames queued by a test must not run after that test deletes the window. */
+let acceptFrames = true
+
 function setupGlobals() {
+  acceptFrames = true
   globalThis.window = asDouble<Window & typeof globalThis>({
     innerWidth: 1024,
     innerHeight: 768,
+    // A synchronous frame re-enters the agent cursor glide until the stack overflows.
     requestAnimationFrame: (callback: FrameRequestCallback) => {
-      callback(0)
+      setTimeout(() => {
+        if (acceptFrames) callback(performance.now())
+      }, 0)
       return 0
     },
     cancelAnimationFrame: vi.fn(),
@@ -33,7 +41,8 @@ function setupGlobals() {
     removeEventListener: vi.fn()
   })
   globalThis.document = asDouble<Document>({
-    fonts: { add: vi.fn(), ready: Promise.resolve() }
+    fonts: { add: vi.fn(), ready: Promise.resolve() },
+    querySelector: () => null
   })
   globalThis.requestAnimationFrame = window.requestAnimationFrame
   globalThis.cancelAnimationFrame = window.cancelAnimationFrame
@@ -71,11 +80,13 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  acceptFrames = false
   vi.restoreAllMocks()
   Reflect.deleteProperty(globalThis, 'window')
   Reflect.deleteProperty(globalThis, 'document')
   Reflect.deleteProperty(globalThis, 'requestAnimationFrame')
   Reflect.deleteProperty(globalThis, 'cancelAnimationFrame')
+  endAgentSession('anonymous')
 })
 
 describe('activate_document', () => {

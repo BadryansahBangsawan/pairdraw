@@ -1,6 +1,11 @@
 import { readFile } from 'node:fs/promises'
 
-import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/client'
+import {
+  Client,
+  SdkError,
+  SdkErrorCode,
+  StreamableHTTPClientTransport
+} from '@modelcontextprotocol/client'
 import type { Page } from '@playwright/test'
 import * as v from 'valibot'
 
@@ -18,6 +23,7 @@ import { expect, test } from '#tests/e2e/fixtures'
  */
 
 const LAYER = 'Sift — Dashboard'
+const LATER = 'Later mark'
 const OPEN_WAIT_MS = 4_000
 
 /** The finished design from the live app: seven large screens, each with text and a card. */
@@ -152,10 +158,7 @@ function screenJSX(name: string, y: number): string {
 </Frame>`
 }
 
-/**
- * Renders the seven screens onto whichever tab is in front. An agent designing while Home is
- * in front lands them on Home's store, which the tab bar does not show as a document.
- */
+/** Renders the seven screens with no document id, as an agent does while Home is in front. */
 async function designWhileHomeIsInFront(client: Client): Promise<void> {
   const jsx = `<>${SCREENS.map((name, index) => screenJSX(name, index * 1040)).join('\n')}</>`
   const rendered = await callTool(
@@ -172,10 +175,11 @@ async function designWhileHomeIsInFront(client: Client): Promise<void> {
   if (names.length !== SCREENS.length) throw new Error('The design did not render seven screens')
 }
 
-async function activeDocumentId(client: Client): Promise<string> {
-  const active = (await listDocuments(client)).find((document) => document.active)
-  if (!active) throw new Error('The agent edit has no document')
-  return active.id
+/** The document tab an untargeted edit opened while Home stayed in front. */
+async function backgroundDocumentId(client: Client): Promise<string> {
+  const held = (await listDocuments(client)).find((document) => !document.active)
+  if (!held) throw new Error('The edit opened no document tab')
+  return held.id
 }
 
 async function showDrafts(page: Page) {
@@ -228,7 +232,8 @@ async function leaveAndReturn(page: Page, layer: string): Promise<void> {
 
 async function closeClient(client: Client): Promise<void> {
   await client.close().catch((error: unknown) => {
-    if (!(error instanceof Error) || !/closed/i.test(error.message)) throw error
+    if (error instanceof SdkError && error.code === SdkErrorCode.ConnectionClosed) return
+    throw error
   })
 }
 
@@ -247,12 +252,27 @@ test('an agent editing while Home is in front lets the person open that draft', 
     await page.getByRole('tab', { name: 'Home' }).click()
     await expect(page.getByTestId('recent-files-home')).toBeVisible()
     await designWhileHomeIsInFront(client)
-    const editing = keepEditing(client, await activeDocumentId(client))
+    await expect(page.getByTestId('recent-files-home')).toBeVisible()
+    const tabs = page.getByTestId('tabbar-tab')
+    await expect(tabs).toHaveCount(2)
+    const editing = keepEditing(client, await backgroundDocumentId(client))
     await page.getByTestId('home-tab-drafts').click()
     const entry = page.getByTestId('home-drafts').getByRole('button', { name: /^Untitled/ })
     await expect(entry).toBeVisible({ timeout: 15_000 })
     await entry.click()
     await expectOpenDocument(page, LAYER)
+    await expectScreens(page)
+    await page.getByRole('tab', { name: 'Home' }).click()
+    await expect(page.getByTestId('recent-files-home')).toBeVisible()
+    await callTool(
+      client,
+      'create_shape',
+      { type: 'RECTANGLE', x: 48, y: 48, width: 72, height: 48, name: LATER },
+      v.object({ id: v.string() })
+    )
+    await expect(page.getByTestId('recent-files-home')).toBeVisible()
+    await tabs.nth(1).click()
+    await expectOpenDocument(page, LATER)
     await expectScreens(page)
     await leaveAndReturn(page, LAYER)
     await editing

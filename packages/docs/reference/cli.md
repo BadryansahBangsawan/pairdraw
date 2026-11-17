@@ -360,7 +360,7 @@ pairdraw diff files <before> <after> [options]
 
 ## documents
 
-Manage documents (tabs) in the running app. See [Controlling the App](/programmable/cli/app-control).
+Manage documents (tabs) in the running app. See [Controlling the App](/programmable/cli/app-control). Commands share one `cli` session unless `PAIRDRAW_SESSION` names another.
 
 ```sh
 pairdraw documents list [--json]
@@ -376,7 +376,7 @@ pairdraw documents activate <document-id> [--page-id <id>] [--json]
 | `--path` | `.fig` path to create or save to; relative to the current directory |
 | `--save` | `close`: save unsaved changes first |
 | `--discard` | `close`: close without saving; unsaved changes are lost |
-| `--document-id` | Target document; defaults to the active tab |
+| `--document-id` | Document to use. Save defaults to the document this CLI session is targeting, or the one in front. Close defaults only to a document this session opened |
 | `--page-id` | Page to switch the activated document to |
 | `--json` | Output the result and target document as JSON |
 

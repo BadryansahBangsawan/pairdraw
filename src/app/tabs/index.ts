@@ -113,10 +113,30 @@ export function getTabsSnapshot(): Tab[] {
   return [...tabsRef.value]
 }
 
-export function createTab(store?: EditorStore, initialGraph?: SceneGraph): Tab {
+/** Replaces the tab list. Callers that show a held document put Home first themselves. */
+export function replaceTabs(next: readonly Tab[]): void {
+  tabsRef.value = [...next]
+}
+
+/** A Home or New file tab that is not in the list yet. */
+export function detachedTab(kind: 'home' | 'new-file'): Tab {
+  return { id: generateTabId(), store: createEditorStore(), kind }
+}
+
+export type CreateTabOptions = {
+  /** When false, the new document stays behind the tab in front. */
+  active?: boolean
+}
+
+export function createTab(
+  store?: EditorStore,
+  initialGraph?: SceneGraph,
+  options?: CreateTabOptions
+): Tab {
   const s = store ?? createEditorStore(initialGraph)
   const tab: Tab = { id: generateTabId(), store: s, kind: 'document' }
   tabsRef.value = [...tabsRef.value, tab]
+  if (options?.active === false) return tab
   activateTab(tab)
   return tab
 }

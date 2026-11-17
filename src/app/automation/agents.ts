@@ -1,18 +1,17 @@
 import * as v from 'valibot'
 
-import { isUnknownRecord } from '@/app/automation/bridge/target'
+import {
+  forgetSessionDocument,
+  isUnknownRecord,
+  NODE_ID_FIELDS
+} from '@/app/automation/bridge/session-document'
+import { MCP_AGENT_GONE_MS, MCP_AGENT_IDLE_MS } from '@/app/automation/lifetime'
 import type { EditorStore } from '@/app/editor/active-store'
 import { addAgent, agentPlacement, type AgentHandle } from '@/app/presence/registry'
 import { MAX_NAME_LENGTH } from '@/app/presence/schema'
 import { createDeferred } from '@/app/runtime/deferred'
 
-/** After this long without a tool call, a session's agent rests and leaves the canvas. */
-export const MCP_AGENT_IDLE_MS = 20_000
-/** A session that never says goodbye, such as one whose client crashed, is dropped after this. */
-export const MCP_AGENT_GONE_MS = 10 * 60_000
 const MAX_SESSION_ID = 128
-/** Argument and result fields that name the layers a tool works on. */
-const NODE_ID_FIELDS = ['id', 'ids', 'node_id', 'node_ids', 'parent_id', 'root_id', 'target_id']
 const NODE_LIST_FIELDS = ['results', 'selection', 'nodes']
 
 const agentSessionSchema = v.object({
@@ -191,4 +190,6 @@ export function agentSessionOpened(args: unknown): void {
 export function endAgentSession(sessionId: string): void {
   // Removing entries while iterating a Map is safe: visited ones stay visited.
   for (const store of sessions.get(sessionId)?.keys() ?? []) remove(sessionId, store)
+  // The document it was editing ends with the session, including one already closed.
+  forgetSessionDocument(sessionId)
 }

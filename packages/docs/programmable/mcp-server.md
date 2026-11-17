@@ -247,9 +247,11 @@ Endpoints are available over both active transports:
 5. **Modify** — `set_fill`, `set_stroke`, `set_layout`, `update_node`, `set_effects`
 6. **Structure** — `reparent_node`, `group_nodes`, `clone_node`, `delete_node`
 7. **Save** — `save_file` to write back to `.fig`
-8. **Close** — `close_file` to close an open document tab. With unsaved changes it fails unless `unsaved` is `"save"` or `"discard"`; it never prompts in the app.
+8. **Close** — `close_file` to close an open document tab. With unsaved changes it fails unless `unsaved` is `"save"` or `"discard"`; it never prompts in the app. Without `document_id`, close changes only a document that this session opened. Save without `document_id` saves the document this session is targeting, or the document in front. Pass `document_id` to close or save any other open document. `open_file` owns a document only when that call opened it.
 
 `undo` and `redo` step back through the agent's own changes, and `activate_document` brings a tab to the front when the user should see it.
+
+Each session keeps the document it edits, including after the person switches tabs. `POST /rpc` calls that name no session share one `anonymous` document. Home and a New file tab are left out of `list_documents`. An edit with no document chosen, while one of those is in front, opens a document tab and leaves the current tab in front. When the session's document has been closed, the call fails until the session calls `list_documents` and passes `document_id`, or calls `new_document` or `open_file`. An HTTP session that sits idle for 15 minutes ends. The next session does not keep that document, so its first edit opens its own tab.
 
 Each MCP session shows in the app as an agent with a callsign, like the built-in chat: its cursor and outline sit on the layers each tool reads or changes, it rests after a quiet spell and leaves when the session ends, and people can follow it from their avatar. Collaborators in a shared room see it too.
 

@@ -484,6 +484,21 @@ describe('MCP server with mcpRoot', () => {
     }
   }
 
+  /** The app receives the MCP session on every command, not only on tool calls. */
+  function expectForwarded(value: unknown, fields: Record<string, unknown>): void {
+    expect(value).toMatchObject(fields)
+    if (!value || typeof value !== 'object' || !('agent' in value)) {
+      throw new Error('The call did not name its session')
+    }
+    const agent = value.agent
+    if (!agent || typeof agent !== 'object' || !('session' in agent) || !('kind' in agent)) {
+      throw new Error('The call did not name its session')
+    }
+    expect(typeof agent.session).toBe('string')
+    expect(agent.session).not.toBe('')
+    expect(agent.kind).toBe('mcp')
+  }
+
   test('a browser app reads and writes files inside mcpRoot through /files', async () => {
     await withMCPRootServer(TEST_MCP_ROOT, async (_client, _browser, _graph, httpPort) => {
       const path = join(TEST_MCP_ROOT, 'browser', 'saved.fig')
@@ -569,7 +584,7 @@ describe('MCP server with mcpRoot', () => {
         arguments: { document_id: 'doc-1', unsaved: 'discard' }
       })
       expect(result.isError).not.toBe(true)
-      expect(browser.requests.find((item) => item.command === 'close_file')?.args).toEqual({
+      expectForwarded(browser.requests.find((item) => item.command === 'close_file')?.args, {
         document_id: 'doc-1',
         unsaved: 'discard'
       })
@@ -594,7 +609,7 @@ describe('MCP server with mcpRoot', () => {
         arguments: { document_id: 'doc-2', page_id: '0:5' }
       })
       expect(activated.isError).not.toBe(true)
-      expect(browser.requests.find((item) => item.command === 'activate_document')?.args).toEqual({
+      expectForwarded(browser.requests.find((item) => item.command === 'activate_document')?.args, {
         document_id: 'doc-2',
         page_id: '0:5'
       })
@@ -602,7 +617,7 @@ describe('MCP server with mcpRoot', () => {
       const undone = await client.callTool({ name: 'undo', arguments: { document_id: 'doc-2' } })
       expect(undone.isError).not.toBe(true)
       expect(JSON.stringify(undone.content)).toContain('Agent: mock')
-      expect(browser.requests.find((item) => item.command === 'undo')?.args).toEqual({
+      expectForwarded(browser.requests.find((item) => item.command === 'undo')?.args, {
         document_id: 'doc-2'
       })
     })
@@ -613,7 +628,7 @@ describe('MCP server with mcpRoot', () => {
       const settings = { appearance: { theme: 'light' } }
       const result = await client.callTool({ name: 'update_settings', arguments: { settings } })
       expect(result.isError).not.toBe(true)
-      expect(browser.requests.find((item) => item.command === 'update_settings')?.args).toEqual({
+      expectForwarded(browser.requests.find((item) => item.command === 'update_settings')?.args, {
         settings
       })
       expect(JSON.stringify(result.content)).toContain('light')
@@ -636,7 +651,7 @@ describe('MCP server with mcpRoot', () => {
       const { realpath } = await import('node:fs/promises')
       const { dirname, basename } = await import('node:path')
       const canonicalPath = join(await realpath(dirname(savePath)), basename(savePath))
-      expect(request?.args).toEqual({ path: canonicalPath })
+      expectForwarded(request?.args, { path: canonicalPath })
     })
   })
 

@@ -9,6 +9,7 @@ import type {
 } from '@modelcontextprotocol/server'
 // eslint-disable-next-line pairdraw/no-mixed-case-acronym-identifiers -- Upstream export spelling.
 import { toStandardJsonSchema as toStandardJSONSchema } from '@valibot/to-json-schema'
+import { isPlainObject } from 'es-toolkit'
 import * as v from 'valibot'
 
 import { CODEGEN_PROMPT } from '@pairdraw/core/tools'
@@ -122,6 +123,12 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
     if (!agentSession.chat) return session
     return { ...session, chat: agentSession.chat, call: agentCallId(meta) }
   }
+  // Document commands travel the same socket as tool calls, so they carry the session too.
+  const sendToApp: RPCSender = (body) => {
+    const args = body.args
+    if (!agentSession || !isPlainObject(args) || args.agent) return sendRPC(body)
+    return sendRPC({ ...body, args: { ...args, agent: agent(undefined) } })
+  }
   const resolvedRoot = options.mcpRoot ? resolve(options.mcpRoot) : null
   const descriptors = descriptorByName(createToolDescriptors(resolvedRoot !== null))
   const register = <InputArgs extends v.GenericSchema>(
@@ -165,7 +172,7 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
           if (policy.scope === 'selection' && filePath !== null) {
             return fail(new Error(SELECTION_SCOPE_FILE_OUTPUT_ERROR))
           }
-          const result = await sendRPC({
+          const result = await sendToApp({
             command: 'tool',
             args: {
               ...target,
@@ -230,7 +237,7 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
     },
     async () => {
       try {
-        const result = await sendRPC({ command: 'list_documents', args: {} })
+        const result = await sendToApp({ command: 'list_documents', args: {} })
         const res = result as { ok?: boolean; result?: unknown; error?: string }
         if (res.ok === false) return fail(new Error(res.error))
         return ok(res.result ?? {})
@@ -266,7 +273,7 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
             ? await resolveSafePath(args.path, resolvedRoot)
             : undefined
         const { target } = splitAutomationTarget(args)
-        const result = await sendRPC({
+        const result = await sendToApp({
           command: 'save_file',
           args: { ...target, path: safePath?.realPath }
         })
@@ -300,7 +307,7 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
         try {
           const safe = await resolveSafePath(args.path, resolvedRoot)
           const { target } = splitAutomationTarget(args)
-          const result = await sendRPC({
+          const result = await sendToApp({
             command: 'open_file',
             args: { ...target, path: safe.realPath }
           })
@@ -317,7 +324,7 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
 
     register('list_recent_files', { inputSchema: v.strictObject({}) }, async () => {
       try {
-        const res = await sendCommand(sendRPC, 'list_recent_files', {})
+        const res = await sendCommand(sendToApp, 'list_recent_files', {})
         const { files } = v.parse(recentFilesResultSchema, res.result)
         const insideRoot = await Promise.all(
           files.map((file) =>
@@ -354,7 +361,7 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
           const safePath =
             args.path !== undefined ? await resolveSafePath(args.path, resolvedRoot) : undefined
           const { target } = splitAutomationTarget(args)
-          const result = await sendRPC({
+          const result = await sendToApp({
             command: 'new_document',
             args: { ...target, path: safePath?.realPath }
           })
@@ -415,7 +422,7 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
         const rpcArgs: Record<string, unknown> = { ...target }
         if (args.unsaved) rpcArgs.unsaved = args.unsaved
         if (safePath) rpcArgs.path = safePath.realPath
-        const res = await sendCommand(sendRPC, 'close_file', rpcArgs)
+        const res = await sendCommand(sendToApp, 'close_file', rpcArgs)
         const closed = (res.result as { closed?: boolean } | undefined)?.closed === true
         return ok(withTarget({ closed }, res))
       } catch (e) {
@@ -435,7 +442,7 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
     async (args: { document_id: string; page_id?: string }) => {
       try {
         const { target } = splitAutomationTarget(args)
-        const res = await sendCommand(sendRPC, 'activate_document', target)
+        const res = await sendCommand(sendToApp, 'activate_document', target)
         return ok(withTarget({ activated: true }, res))
       } catch (e) {
         return fail(e)
@@ -450,7 +457,7 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
       async (args) => {
         try {
           const { target } = splitAutomationTarget(args)
-          const res = await sendCommand(sendRPC, command, target)
+          const res = await sendCommand(sendToApp, command, target)
           return ok(withTarget({ ...(res.result as RPCJSONObject | undefined) }, res))
         } catch (e) {
           return fail(e)
@@ -461,7 +468,7 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
 
   register('get_settings', { inputSchema: v.strictObject({}) }, async () => {
     try {
-      const res = await sendCommand(sendRPC, 'get_settings', {})
+      const res = await sendCommand(sendToApp, 'get_settings', {})
       return ok(res.result ?? {})
     } catch (e) {
       return fail(e)
@@ -483,7 +490,7 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
     async (args: { settings: Record<string, unknown> }) => {
       try {
         // Echo only the applied patch: with get_settings disabled, writing must not read.
-        await sendCommand(sendRPC, 'update_settings', { settings: args.settings })
+        await sendCommand(sendToApp, 'update_settings', { settings: args.settings })
         return ok({ updated: args.settings })
       } catch (e) {
         return fail(e)
@@ -519,5 +526,5 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
     })
   )
 
-  registerBrowserTools(register, sendRPC)
+  registerBrowserTools(register, sendToApp)
 }

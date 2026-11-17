@@ -66,6 +66,11 @@ function layoutModeClaim(
     const hugs = value === 'HUG' && !fillsOwnSizingAxis(graph, target, raw)
     return { [raw]: hugs ? 'RESIZE_TO_FIT_WITH_IMPLICIT_SIZE' : 'FIXED' }
   }
+  if (raw === 'textAutoResize' && value === 'TRUNCATE') {
+    // The archive's TextAutoResize has no TRUNCATE: a truncating text is a fixed box whose lines
+    // end, which the payload records as NONE with textTruncation ENDING.
+    return { textAutoResize: 'NONE', textTruncation: 'ENDING' }
+  }
   return { [raw]: value }
 }
 

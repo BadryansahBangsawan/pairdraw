@@ -666,3 +666,21 @@ describe('Figma export order keys', () => {
     expectStrictlyIncreasing(positions)
   })
 })
+
+describe('@pairdraw/fig truncating text export', () => {
+  test('writes a TRUNCATE text node as textAutoResize NONE with textTruncation ENDING', () => {
+    const graph = new SceneGraph()
+    const page = graph.getPages()[0]
+    const node = graph.createNode('TEXT', page.id, {
+      text: 'truncated',
+      width: 80,
+      height: 20,
+      textAutoResize: 'TRUNCATE'
+    })
+    const changes = sceneNodeToKiwi(node, { sessionID: 1, localID: 1 }, 0, { value: 2 }, graph, [])
+    const change = expectDefined(changes.find((entry) => entry.textData))
+    // The .fig schema has no TRUNCATE: a truncating text is a fixed box that ends its lines.
+    expect(change.textAutoResize).toBe('NONE')
+    expect(change.textTruncation).toBe('ENDING')
+  })
+})

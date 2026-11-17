@@ -457,6 +457,15 @@ function convertShapeWithTextProps(
   }
 }
 
+/**
+ * The scene-graph text resize mode a `.fig` node holds. Figma stores a truncating text as a fixed
+ * box whose lines end (NONE plus textTruncation ENDING), since its enum has no TRUNCATE.
+ */
+function textAutoResizeFrom(nc: NodeChange): TextAutoResize {
+  const mode = (nc.textAutoResize ?? 'NONE') as TextAutoResize
+  return mode === 'NONE' && nc.textTruncation === 'ENDING' ? 'TRUNCATE' : mode
+}
+
 function convertTextProps(nc: NodeChange, blobs: Uint8Array[]): TextProps {
   const face = nc.fontName ? savedFace(nc, nc.fontName) : { fontWeight: 400, italic: false }
   return {
@@ -473,7 +482,7 @@ function convertTextProps(nc: NodeChange, blobs: Uint8Array[]): TextProps {
       | 'RIGHT'
       | 'JUSTIFIED',
     textAlignVertical: (nc.textAlignVertical ?? 'TOP') as TextAlignVertical,
-    textAutoResize: (nc.textAutoResize ?? 'NONE') as TextAutoResize,
+    textAutoResize: textAutoResizeFrom(nc),
     textCase: (nc.textCase ?? 'ORIGINAL') as TextCase,
     ...convertTextDecorationProps(nc),
     leadingTrim: (nc.leadingTrim ?? 'NONE') as SceneNode['leadingTrim'],

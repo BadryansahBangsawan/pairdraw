@@ -82,6 +82,22 @@ function serializeParagraphProps(node: SceneNode, nc: KiwiNodeChange): void {
   if (node.hangingList) nc.hangingList = true
 }
 
+/**
+ * `textAutoResize` as the archive stores it, or nothing to write. The schema has no TRUNCATE: a
+ * truncating text is a fixed box whose lines end, which Figma stores as NONE plus textTruncation
+ * ENDING. A node whose own file said NONE keeps that field only when it had one.
+ */
+function kiwiTextAutoResize(
+  node: SceneNode,
+  rawNodeFields: ReturnType<typeof effectiveFigmaRawNodeFields>
+): KiwiNodeChange['textAutoResize'] | undefined {
+  const autoResize = node.textAutoResize === 'TRUNCATE' ? 'NONE' : node.textAutoResize
+  if (!node.source.id || autoResize !== 'NONE' || 'textAutoResize' in rawNodeFields) {
+    return autoResize
+  }
+  return undefined
+}
+
 function serializeTextProps(
   node: SceneNode,
   nc: KiwiNodeChange,
@@ -107,11 +123,9 @@ function serializeTextProps(
     nc.fontVariations = node.fontVariations.map(fontVariationToKiwi)
   }
   if (!node.opticalSizeFromFontSize) nc.detachOpticalSizeFromFontSize = true
-  const autoResize = node.textAutoResize
   const rawNodeFields = effectiveFigmaRawNodeFields(node)
-  if (!node.source.id || autoResize !== 'NONE' || 'textAutoResize' in rawNodeFields) {
-    nc.textAutoResize = autoResize
-  }
+  const autoResize = kiwiTextAutoResize(node, rawNodeFields)
+  if (autoResize) nc.textAutoResize = autoResize
   nc.textAlignHorizontal = node.textAlignHorizontal
   nc.textAlignVertical = node.textAlignVertical
   nc.textUserLayoutVersion = 4
@@ -125,7 +139,9 @@ function serializeTextProps(
   // FigJam text draws Noto emoji; a file's own set is replayed from its raw fields.
   if (!('emojiImageSet' in rawNodeFields)) nc.emojiImageSet = 'APPLE'
   if (node.textCase !== 'ORIGINAL') nc.textCase = node.textCase
-  if (node.textTruncation === 'ENDING') nc.textTruncation = 'ENDING'
+  if (node.textTruncation === 'ENDING' || node.textAutoResize === 'TRUNCATE') {
+    nc.textTruncation = 'ENDING'
+  }
   if (node.maxLines != null) nc.maxLines = node.maxLines
   serializeParagraphProps(node, nc)
   if (fontDigestMap) {

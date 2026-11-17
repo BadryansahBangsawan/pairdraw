@@ -9,7 +9,14 @@ import { variableValueReferences } from '@pairdraw/scene-graph/variables'
 
 import { cssColor } from '../export/css'
 import { formulaToCSS } from './formula'
-import { collectionVariables, tokenSlug, variableCSSNames, variableNamespace } from './names'
+import {
+  collectionVariables,
+  deriveCSSName,
+  explicitCSSName,
+  tokenSlug,
+  variableCSSNames,
+  variableNamespace
+} from './names'
 import { createTokenValidator, parseWithBrowser, type TokenValidator } from './validate'
 import { tokenNumberToCSS, variableUnit } from './values'
 
@@ -170,6 +177,29 @@ function variantNames(scopes: ModeScope[]): string[] {
  * references, and number formulas `calc()` over them; both are declared again in each mode that
  * changes what they point to.
  */
+/**
+ * A name that took a numeric suffix is an alias nobody can read back from the stylesheet, so it
+ * is reported rather than left as a silent second spelling of another token.
+ */
+function numberedNameIssues(
+  variables: readonly Variable[],
+  names: Map<string, string>,
+  modeOf: (variable: Variable) => string
+): TokenStylesheetIssue[] {
+  const issues: TokenStylesheetIssue[] = []
+  for (const variable of variables) {
+    const name = names.get(variable.id)
+    const base = deriveCSSName(variable)
+    if (!name || explicitCSSName(variable) || name === base) continue
+    issues.push({
+      message: `"${variable.name}" is written --${name}: --${base} is taken`,
+      variableId: variable.id,
+      modeId: modeOf(variable)
+    })
+  }
+  return issues
+}
+
 export function buildTokenStylesheet(
   source: TokenSource,
   { format, include = () => true }: TokenStylesheetOptions,
@@ -204,6 +234,8 @@ export function buildTokenStylesheet(
     }
     return { name, value: css }
   }
+
+  issues.push(...numberedNameIssues(variables, names, defaultModeOf))
 
   const defaults = new Map<string, Declaration>()
   const theme: Declaration[] = []

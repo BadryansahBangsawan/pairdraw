@@ -3,3 +3,4 @@
 - Opening a file whose `.fig` archive is damaged or is not a ZIP fails with a clear error instead of decoding different content silently.
 - Converting to draw.io and back keeps a frame a frame, a rectangle a rectangle, and every layer name.
 - A `.pen` roundtrip keeps the page name instead of replacing it with the first layer's.
+- Printing tokens says which variable took a numbered custom property name because another token's name collides with it.

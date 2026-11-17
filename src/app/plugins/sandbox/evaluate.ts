@@ -10,8 +10,11 @@ import { IS_BROWSER } from '@pairdraw/core/constants'
 
 import type { EditorStore } from '@/app/editor/session/create'
 import {
+  PLUGIN_CALL_TOO_LARGE_MESSAGE,
   PLUGIN_CALL_UNAVAILABLE_MESSAGE,
   PLUGIN_DISABLED_MESSAGE,
+  PLUGIN_RESULT_INVALID_MESSAGE,
+  PLUGIN_RESULT_TOO_LARGE_MESSAGE,
   PLUGIN_RUN_RUNNING_MESSAGE,
   pluginRunMissingMessage
 } from '@/app/plugins/messages'
@@ -20,6 +23,7 @@ import {
   PLUGIN_SANDBOX_CALL,
   PLUGIN_SANDBOX_CALL_RESULT,
   PLUGIN_POINTER_CALL,
+  PLUGIN_RESULT_MAX_CHARS,
   PLUGIN_SANDBOX_READY,
   PLUGIN_SANDBOX_RUN,
   pluginFrameMessageSchema,
@@ -74,6 +78,24 @@ function parseResultText(text: string): unknown {
   return text === '' ? undefined : v.parse(v.pipe(v.string(), v.parseJson(), v.unknown()), text)
 }
 
+type PluginCrossing = { ok: true; text: string } | { ok: false; reason: 'too-large' | 'invalid' }
+
+/**
+ * JSON text for a value that can cross back to the plugin, or why it cannot.
+ * `undefined` crosses as empty text, the same as a program that returned nothing.
+ */
+function fitsPluginCrossing(value: unknown): PluginCrossing {
+  try {
+    const serialized: unknown = JSON.stringify(value)
+    if (serialized === undefined) return { ok: true, text: '' }
+    if (typeof serialized !== 'string') return { ok: false, reason: 'invalid' }
+    if (serialized.length > PLUGIN_RESULT_MAX_CHARS) return { ok: false, reason: 'too-large' }
+    return { ok: true, text: serialized }
+  } catch {
+    return { ok: false, reason: 'invalid' }
+  }
+}
+
 /** Run one plugin source in a fresh frame, with the host's deadline and its tool calls. */
 export function runPluginInFrame(
   frame: SandboxFrame,
@@ -105,25 +127,31 @@ export function runPluginInFrame(
         answer({ callId: call.callId, ok: false, error: PLUGIN_CALL_UNAVAILABLE_MESSAGE })
         return true
       }
+      // Arguments cross as JSON text too. An oversized call is refused before the tool runs,
+      // so the editor does not receive or stringify a payload the worker would drop.
+      if (call.args !== undefined && !fitsPluginCrossing(call.args).ok) {
+        answer({ callId: call.callId, ok: false, error: PLUGIN_CALL_TOO_LARGE_MESSAGE })
+        return true
+      }
       const waiting = call.name === PLUGIN_POINTER_CALL
       if (waiting) deadline?.pause()
       void (async () => {
         try {
           const result = await host.call(call.name, call.args)
           // A result that cannot cross as JSON text is a failed call, not a silent `undefined`.
-          let text: string
-          try {
-            const serialized: unknown = JSON.stringify(result)
-            text = typeof serialized === 'string' ? serialized : ''
-          } catch {
+          const crossing = fitsPluginCrossing(result)
+          if (!crossing.ok) {
             answer({
               callId: call.callId,
               ok: false,
-              error: 'This call returned an invalid result.'
+              error:
+                crossing.reason === 'too-large'
+                  ? PLUGIN_RESULT_TOO_LARGE_MESSAGE
+                  : PLUGIN_RESULT_INVALID_MESSAGE
             })
             return
           }
-          answer({ callId: call.callId, ok: true, result: text })
+          answer({ callId: call.callId, ok: true, result: crossing.text })
         } catch (error) {
           answer({
             callId: call.callId,

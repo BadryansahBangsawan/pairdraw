@@ -3,7 +3,12 @@ import { describe, expect, test } from 'bun:test'
 import * as v from 'valibot'
 
 import { installPlugin, setPluginEnabled } from '@/app/plugins/catalog'
-import { PLUGIN_CALL_UNAVAILABLE_MESSAGE } from '@/app/plugins/messages'
+import {
+  PLUGIN_CALL_TOO_LARGE_MESSAGE,
+  PLUGIN_CALL_UNAVAILABLE_MESSAGE,
+  PLUGIN_RESULT_INVALID_MESSAGE,
+  PLUGIN_RESULT_TOO_LARGE_MESSAGE
+} from '@/app/plugins/messages'
 import {
   beginPluginRun,
   runInstalledPlugin,
@@ -360,6 +365,127 @@ describe('plugin run session', () => {
       callId: 'c1',
       ok: true,
       result: '{"shapes":1}'
+    })
+    handler?.({
+      type: PLUGIN_SANDBOX_RESULT,
+      id: (sent[0] as { id: string }).id,
+      ok: true,
+      result: '"done"'
+    })
+    expect(await run).toEqual({ ok: true, result: 'done' })
+  })
+
+  test('a tool result larger than 64 KB is refused and is not delivered', async () => {
+    const sent: unknown[] = []
+    let handler: ((data: unknown) => void) | undefined
+    const frame: SandboxFrame = {
+      postMessage: (message) => {
+        sent.push(message)
+      },
+      listen(callback) {
+        handler = callback
+        queueMicrotask(() => callback({ type: PLUGIN_SANDBOX_READY }))
+        return () => undefined
+      },
+      dispose: () => undefined
+    }
+    const host: PluginHost = {
+      call: async () => 'x'.repeat(PLUGIN_RESULT_MAX_CHARS + 1),
+      finish: () => undefined
+    }
+    const run = runPluginInFrame(frame, 'return 1', { timeoutMs: 20, host })
+    await Promise.resolve()
+    handler?.({ type: PLUGIN_SANDBOX_CALL, callId: 'c1', name: 'get_selection', args: {} })
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(sent).toContainEqual({
+      type: PLUGIN_SANDBOX_CALL_RESULT,
+      callId: 'c1',
+      ok: false,
+      error: PLUGIN_RESULT_TOO_LARGE_MESSAGE
+    })
+    handler?.({
+      type: PLUGIN_SANDBOX_RESULT,
+      id: (sent[0] as { id: string }).id,
+      ok: true,
+      result: '"done"'
+    })
+    expect(await run).toEqual({ ok: true, result: 'done' })
+  })
+
+  test('a tool result that is not JSON is refused without being called too large', async () => {
+    const { frame, sent, send } = openFrame()
+    const host: PluginHost = {
+      call: () => {
+        const value: { self?: unknown } = {}
+        value.self = value
+        return Promise.resolve(value)
+      },
+      finish: () => undefined
+    }
+    const run = runPluginInFrame(frame, 'return 1', { timeoutMs: 20, host })
+    await Promise.resolve()
+    send({ type: PLUGIN_SANDBOX_CALL, callId: 'c1', name: 'get_selection', args: {} })
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(sent).toContainEqual({
+      type: PLUGIN_SANDBOX_CALL_RESULT,
+      callId: 'c1',
+      ok: false,
+      error: PLUGIN_RESULT_INVALID_MESSAGE
+    })
+    const runMessage = sent[0]
+    const runId =
+      typeof runMessage === 'object' && runMessage !== null && 'id' in runMessage
+        ? runMessage.id
+        : undefined
+    send({
+      type: PLUGIN_SANDBOX_RESULT,
+      id: runId,
+      ok: true,
+      result: '"done"'
+    })
+    expect(await run).toEqual({ ok: true, result: 'done' })
+  })
+
+  test('a call whose arguments exceed 64 KB never reaches the host', async () => {
+    const calls: unknown[] = []
+    const sent: unknown[] = []
+    let handler: ((data: unknown) => void) | undefined
+    const frame: SandboxFrame = {
+      postMessage: (message) => {
+        sent.push(message)
+      },
+      listen(callback) {
+        handler = callback
+        queueMicrotask(() => callback({ type: PLUGIN_SANDBOX_READY }))
+        return () => undefined
+      },
+      dispose: () => undefined
+    }
+    const host: PluginHost = {
+      call: async (_name, args) => {
+        calls.push(args)
+        return { shapes: 1 }
+      },
+      finish: () => undefined
+    }
+    const run = runPluginInFrame(frame, 'return 1', { timeoutMs: 20, host })
+    await Promise.resolve()
+    handler?.({
+      type: PLUGIN_SANDBOX_CALL,
+      callId: 'c1',
+      name: 'get_selection',
+      args: 'x'.repeat(PLUGIN_RESULT_MAX_CHARS + 1)
+    })
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(calls).toEqual([])
+    expect(sent).toContainEqual({
+      type: PLUGIN_SANDBOX_CALL_RESULT,
+      callId: 'c1',
+      ok: false,
+      error: PLUGIN_CALL_TOO_LARGE_MESSAGE
     })
     handler?.({
       type: PLUGIN_SANDBOX_RESULT,

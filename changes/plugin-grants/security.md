@@ -1,1 +1,6 @@
 - Plugins cannot call asynchronous tools, including reads, so a read-only plugin cannot list system fonts or render an export.
+- A plugin call or tool result larger than 64 KB is refused instead of being delivered to the editor.
+- A plugin call or tool result larger than 64 KB is refused instead of being delivered to the editor, and an oversized result says that it is too large.
+- Plugin network globals stay blocked if a program deletes them, a plugin cannot start a worker, and a plugin does not run when a network global cannot be blocked.
+- A sandbox frame ignores a message that is not from its parent page.
+- A plugin that floods the editor with calls stops when its run time is up.

@@ -48,6 +48,12 @@ export function pluginCallUnknownMessage(name: string): string {
 export const PLUGIN_CALL_UNAVAILABLE_MESSAGE =
   'This run has no document to call; a plugin can only reach tools in the app.'
 
+export const PLUGIN_CALL_TOO_LARGE_MESSAGE = 'This call is larger than 64 KB.'
+
+export const PLUGIN_RESULT_TOO_LARGE_MESSAGE = 'This result is larger than 64 KB.'
+
+export const PLUGIN_RESULT_INVALID_MESSAGE = 'This call returned an invalid result.'
+
 export const PLUGIN_POINTER_BUSY_MESSAGE = 'Another plugin is using the canvas pointer.'
 
 export const PLUGIN_POINTER_CANCELLED_MESSAGE =

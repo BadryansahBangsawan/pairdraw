@@ -158,7 +158,9 @@ function observedGlyphReadiness(r: TextRenderer, node: SceneNode): NodeFontReadi
       void fontResolver.demandForNode(demand, node.id, r.onFontResolutionSettled)
     }
   }
-  if (pending) return 'pending'
+  // An export draws once: a face that has not arrived by then is not coming, and the characters
+  // it would have covered keep the text's own fonts rather than leaving the layer blank.
+  if (pending) return r.exportFontsSettled ? 'substituted' : 'pending'
   // Once no fallback is left for a character, the text draws with the fonts it has, the font's
   // missing-glyph box standing in for that character, rather than not at all.
   return exhausted ? 'substituted' : 'ready'

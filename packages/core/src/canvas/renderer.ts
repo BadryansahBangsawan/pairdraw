@@ -126,6 +126,8 @@ export class SkiaRenderer {
   fontMgr: FontMgr | null = null
   fontProvider: TypefaceFontProvider | null = null
   fontsLoaded = false
+  /** Set once fonts are prepared for a one-shot export, so a pending face stops holding text back. */
+  exportFontsSettled = false
   fontGeneration = 0
   onFontResolutionSettled:
     | ((snapshot: FontResolutionSnapshot, nodeIds: readonly string[]) => void)

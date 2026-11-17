@@ -11,6 +11,8 @@ export interface FontReadinessRenderer {
   ck?: CanvasKit
   fontProvider?: TypefaceFontProvider | null
   fontsLoaded?: boolean
+  /** The renderer has finished preparing its fonts, so a face still pending will not arrive. */
+  exportFontsSettled?: boolean
   onFontResolutionSettled?: FontResolutionSettled
   trackFontDemand?: (node: SceneNode, key: string) => void
 }

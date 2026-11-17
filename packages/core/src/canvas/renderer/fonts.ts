@@ -162,7 +162,8 @@ export async function prepareForExport(
   nodeIds: string[]
 ): Promise<void> {
   const { computeAllLayouts } = await import('#core/layout')
-  await prepareGraphFonts(graph, nodeIds)
+  await prepareGraphFonts(graph, nodeIds, '', { settleUnavailable: true })
+  r.exportFontsSettled = true
   syncFontGeneration(r)
   withTextMeasurer(
     (node, maxWidth) => r.measureTextNode(node, maxWidth),

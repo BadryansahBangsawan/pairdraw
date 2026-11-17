@@ -83,6 +83,16 @@ export interface FigmaAPIOptions {
    * must not move the viewport of whoever is looking at the document.
    */
   viewport?: FigmaViewport
+  /**
+   * Runs when a script sets the page selection, so a host can select those layers too. The host
+   * owns which layers are selected on screen, and a plugin that selects expects to see them selected.
+   */
+  onSelectionChange?: (ids: readonly string[], pageId: string) => void
+  /**
+   * The selection the host already shows, seeded for the same reason as the page and the viewport:
+   * a tool that only reads must not reselect what is already selected.
+   */
+  selection?: readonly string[]
 }
 
 export { FigmaNodeProxy } from './proxy'
@@ -149,6 +159,7 @@ export class FigmaAPI implements NodeProxyHost {
   readonly #fetch: images.ImageFetch
   readonly #onPageChange: ((pageId: string) => void | Promise<void>) | undefined
   readonly #onViewportChange: ((viewport: FigmaViewport) => void) | undefined
+  readonly #onSelectionChange: ((ids: readonly string[], pageId: string) => void) | undefined
   /** The last host page switch, so `setCurrentPageAsync` can wait for it. */
   #pageChange: Promise<void> = Promise.resolve()
 
@@ -157,6 +168,7 @@ export class FigmaAPI implements NodeProxyHost {
     this.#fetch = options.fetch ?? ((input, init) => fetch(input, init))
     this.#onPageChange = options.onPageChange
     this.#onViewportChange = options.onViewportChange
+    this.#onSelectionChange = options.onSelectionChange
     this.variables = new FigmaVariablesAPI(graph)
     startPendingLayout(graph)
     this._currentPageId = pageIdToStart(graph, options.pageId)
@@ -167,6 +179,11 @@ export class FigmaAPI implements NodeProxyHost {
         zoom: options.viewport.zoom
       }
     }
+    // Seeded here, not assigned through the setter, so a tool that only reads does not ask the
+    // host to select the layers it is already showing.
+    this._selection = (options.selection ?? []).flatMap((id) =>
+      this.graph.getNode(id) ? [this.wrapNode(id)] : []
+    )
   }
 
   setRenderer(renderer: SkiaRenderer | null): void {
@@ -197,7 +214,12 @@ export class FigmaAPI implements NodeProxyHost {
       Object.defineProperty(proxy, 'selection', {
         get: () => this._selection,
         set: (nodes: FigmaNodeProxy[]) => {
+          const next = nodes.map((node) => node[INTERNAL_ID])
+          const current = this._selection.map((node) => node[INTERNAL_ID])
           this._selection = nodes
+          if (next.length === current.length && next.every((id, index) => id === current[index]))
+            return
+          this.#onSelectionChange?.(next, this._currentPageId)
         },
         enumerable: true,
         configurable: true

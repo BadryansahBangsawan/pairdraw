@@ -35,9 +35,11 @@ export function makeFigmaFromStore(
 ): FigmaAPI {
   const api = new FigmaAPI(store.graph, {
     fetch: imageFetch,
-    // The page and view the editor already shows are seeded, so a tool that only reads or draws
-    // leaves them alone; one that switches page or sets the viewport moves the editor.
+    // The page, view, and selection the editor already shows are seeded, so a tool that only
+    // reads or draws leaves them alone; one that switches page, sets the viewport, or selects
+    // layers moves the editor.
     pageId,
+    selection: pageId === store.state.currentPageId ? [...store.state.selectedIds] : [],
     viewport: {
       center: {
         x: (-store.state.panX + window.innerWidth / 2) / store.state.zoom,
@@ -46,7 +48,13 @@ export function makeFigmaFromStore(
       zoom: store.state.zoom
     },
     onPageChange: (id) => (id === store.state.currentPageId ? undefined : store.switchPage(id)),
-    onViewportChange: ({ center, zoom }) => store.centerOn(center.x, center.y, zoom)
+    onViewportChange: ({ center, zoom }) => store.centerOn(center.x, center.y, zoom),
+    onSelectionChange: (ids, selectedPageId) => {
+      // The selection on screen belongs to the page on screen. A call aimed at another page
+      // must not replace it.
+      if (selectedPageId !== store.state.currentPageId) return
+      store.select([...ids])
+    }
   })
   // `vectorize_image` runs on the service and key set up in Settings, which stay in the app.
   bindAgentImageVectorizer(store)
@@ -58,13 +66,6 @@ export function makeFigmaFromStore(
   api.setRenderer(store.renderer ?? null)
   api.icons = store.iconProvider
   api.theme = store.state.theme ?? 'light'
-  // The user's selection belongs to the page on screen.
-  api.currentPage.selection =
-    pageId === store.state.currentPageId
-      ? [...store.state.selectedIds]
-          .map((id) => api.getNodeById(id))
-          .filter((n): n is NonNullable<typeof n> => n !== null)
-      : []
   api.exportImage = async (nodeIds, opts) =>
     renderAutomationImage(
       store,

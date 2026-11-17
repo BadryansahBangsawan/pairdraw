@@ -48,8 +48,17 @@ heavy('fonts CLI', () => {
     expect(exitCode).toBe(0)
     const data: DocumentFontStatus = JSON.parse(stdout)
     expect(data.faithful).toBe(false)
-    expect(data.issues.length).toBeGreaterThan(0)
-    expect(data.issues.every((face) => face.status === 'unresolved')).toBe(true)
+    expect(data.issues).toEqual(data.faces)
+    // The host has bundled Inter, so a missing family is drawn with it rather than left unresolved.
+    expect(data.faces).toEqual([
+      expect.objectContaining({
+        family: 'Definitely Missing Font',
+        style: 'Regular',
+        status: 'substituted',
+        source: null,
+        substituteFamily: 'Inter'
+      })
+    ])
   })
   test('uses the standard human-readable formatter', async () => {
     const { stdout, stderr, exitCode } = await runPairdrawCLI(['fonts', GOLD])

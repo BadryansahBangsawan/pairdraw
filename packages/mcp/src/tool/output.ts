@@ -1,17 +1,11 @@
 import { constants } from 'node:fs'
-import {
-  lstat,
-  mkdir,
-  open,
-  readlink,
-  realpath,
-  writeFile,
-  type FileHandle
-} from 'node:fs/promises'
+import { lstat, mkdir, open, readlink, realpath, type FileHandle } from 'node:fs/promises'
 import { dirname, basename, isAbsolute, join, parse, resolve, sep as osSep } from 'node:path'
 
 import { compact } from 'es-toolkit/array'
 import { toUint8Array } from 'js-base64'
+
+import { writeFileAtomic } from '@pairdraw/core/node/fs'
 
 import { ok } from '#mcp/result'
 import type { MCPResult } from '#mcp/result'
@@ -257,8 +251,9 @@ export async function writeInsideRoot(
   const { resolved, realPath } = await resolveSafePath(filePath, root)
   // Use the canonical realPath for filesystem operations to prevent TOCTOU:
   // an attacker could swap a directory component with a symlink between
-  // resolveSafePath's validation and the writeFile call. Writing to the
-  // realpath-validated path ensures the write lands inside root.
+  // resolveSafePath's validation and the write. Writing to the
+  // realpath-validated path ensures the write lands inside root. The replace
+  // does not follow a symlink planted at that path after the check.
   const parentDir = dirname(realPath)
   await mkdir(parentDir, { recursive: true })
   // TOCTOU mitigation: re-verify the parent directory still resolves inside
@@ -266,7 +261,7 @@ export async function writeInsideRoot(
   // with a symlink between resolveSafePath and the write would be detected
   // here — realpath follows the ancestor symlink and resolves outside root.
   await resolveSafePath(parentDir, root)
-  await writeFile(realPath, content)
+  await writeFileAtomic(realPath, content)
   await resolveSafePath(realPath, root)
   const byteLength =
     typeof content === 'string' ? Buffer.byteLength(content, 'utf8') : content.byteLength

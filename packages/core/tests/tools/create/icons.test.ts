@@ -1,77 +1,47 @@
 import { describe, expect, test } from 'bun:test'
 
+import * as v from 'valibot'
+
 import { FigmaAPI } from '@pairdraw/core/figma-api'
-import { parseIconName, type IconProvider } from '@pairdraw/core/icons'
-import { ALL_TOOLS } from '@pairdraw/core/tools'
+import { buildIconData } from '@pairdraw/core/icons/svg'
 import { SceneGraph } from '@pairdraw/scene-graph'
-import { readIcon, type IconOptions } from '@pairdraw/scene-graph/icons'
 
-import { buildIconData } from '#core/icons/svg'
+import { insertIcon } from '#core/tools/create/icons'
 
-const insertIcon = ALL_TOOLS.find((tool) => tool.name === 'insert_icon')
-if (!insertIcon) throw new Error('insert_icon tool missing')
-
-/** A set that draws a square and keeps the options it was asked for, as Material Symbols does. */
-function recordingProvider(requests: Array<IconOptions | undefined>): IconProvider {
-  return {
-    search: async () => ({ icons: [], total: 0, collections: {} }),
+function icons() {
+  const figma = new FigmaAPI(new SceneGraph())
+  const icon = buildIconData({ body: '<path d="M2 2h8v8H2z"/>' }, 'test', 'square', 24, 24, 24)
+  figma.icons = {
+    icons: async (names: readonly string[]) => new Map(names.map((name) => [name, icon])),
+    previews: async () => new Map(),
     collections: async () => [],
     browse: async () => [],
-    previews: async () => new Map(),
-    async icons(names, size, options) {
-      requests.push(options)
-      const found = new Map()
-      for (const name of names) {
-        const parsed = parseIconName(name)
-        if (!parsed) continue
-        const icon = buildIconData(
-          { body: '<path fill="currentColor" d="M2 2h20v20H2z"/>' },
-          parsed.prefix,
-          parsed.iconName,
-          24,
-          24,
-          size
-        )
-        found.set(name, { ...icon, ...(options ? { options } : {}) })
-      }
-      return found
-    }
+    search: async () => ({ icons: [], total: 0, collections: {} })
   }
+  return { figma, icon }
 }
 
-describe('insert_icon options', () => {
-  test('passes weight, fill, grade, and optical size as the set’s axes and records them', async () => {
-    const requests: Array<IconOptions | undefined> = []
-    const graph = new SceneGraph()
-    const figma = new FigmaAPI(graph)
-    figma.icons = recordingProvider(requests)
+describe('insert_icon placement', () => {
+  test('places the icon where the caller asks', async () => {
+    const { figma } = icons()
 
-    const result = (await insertIcon.execute(figma, {
-      name: 'material-symbols-outlined:home',
-      weight: 600,
-      fill: true,
-      grade: 25,
-      optical_size: 40
-    })) as { id: string }
+    const result = await insertIcon.execute(
+      figma,
+      v.parse(insertIcon.input, { name: 'test:square', x: 120, y: 80 })
+    )
 
-    const options = { opsz: 40, wght: 600, FILL: 1, GRAD: 25 }
-    expect(requests).toEqual([options])
-    const frame = graph.getNode(result.id)
-    expect(frame && readIcon(frame)).toMatchObject({ options })
+    const id = (result as { id: string }).id
+    const frame = figma.graph.getNode(id)
+    expect(frame).toMatchObject({ x: 120, y: 80 })
   })
 
-  test('named options win over the same key in options, and none sends nothing', async () => {
-    const requests: Array<IconOptions | undefined> = []
-    const figma = new FigmaAPI(new SceneGraph())
-    figma.icons = recordingProvider(requests)
+  test('keeps the parent layout in charge when no position is given', async () => {
+    const { figma } = icons()
 
-    await insertIcon.execute(figma, {
-      name: 'test:square',
-      weight: 300,
-      options: { wght: 700, scale: 'large' }
-    })
-    await insertIcon.execute(figma, { name: 'test:square' })
+    const result = await insertIcon.execute(figma, v.parse(insertIcon.input, { name: 'test:square' }))
 
-    expect(requests).toEqual([{ wght: 300, scale: 'large' }, undefined])
+    const frame = figma.graph.getNode((result as { id: string }).id)
+    expect(frame?.x).toBe(0)
+    expect(frame?.y).toBe(0)
   })
 })

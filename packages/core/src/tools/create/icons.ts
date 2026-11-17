@@ -119,6 +119,8 @@ export const insertIcon = defineTool({
       v.pipe(v.string(), v.description('Icon color hex (replaces currentColor). Default: #000000'))
     ),
     parent_id: v.optional(v.pipe(v.string(), v.description('Parent node ID for all icons'))),
+    x: v.optional(toolNumber(v.pipe(v.number(), v.description('X position in the parent')))),
+    y: v.optional(toolNumber(v.pipe(v.number(), v.description('Y position in the parent')))),
     ...iconOptionInputs
   }),
   execute: async (figma, args) => {
@@ -147,7 +149,14 @@ export const insertIcon = defineTool({
         continue
       }
       const parentId = args.parent_id ?? figma.currentPage.id
-      const frame = placeIcon(figma.graph, parentId, icon, { size, color: parsedColor })
+      // A position puts the icon there; without one, its parent's layout places it.
+      const overrides =
+        args.x === undefined && args.y === undefined ? {} : { x: args.x ?? 0, y: args.y ?? 0 }
+      const frame = placeIcon(figma.graph, parentId, icon, {
+        size,
+        color: parsedColor,
+        overrides
+      })
       inserted.push({ id: frame.id, name: frame.name, icon: name })
     }
 

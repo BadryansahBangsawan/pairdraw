@@ -1,9 +1,11 @@
+import type { ChildProcess } from 'node:child_process'
 import { spawn } from 'node:child_process'
 import { createHash, randomUUID } from 'node:crypto'
 import { mkdir } from 'node:fs/promises'
 import type { IncomingMessage } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import type { Readable } from 'node:stream'
 
 import { delay } from 'es-toolkit'
 import type { Plugin } from 'vite'
@@ -18,7 +20,9 @@ import {
   parseDevMCPConfiguration,
   type DevMCPConfiguration
 } from '../mcp/dev-control'
+import type { RestartPolicyOptions } from '../restart-policy'
 import { waitForChildReady } from './child-ready'
+import { createRestartScheduler } from './restart-scheduler'
 
 /**
  * The tab session the development server gives the MCP server it starts and, through
@@ -153,6 +157,15 @@ export async function waitForAutomationHealth(
   throw new Error(`MCP server did not become healthy at ${healthURL}`)
 }
 
+/** `stdio` pipes stderr, which is how the plugin reads the readiness marker. */
+type SpawnedMCPProcess = ChildProcess & { stderr: Readable }
+
+type SpawnMCPProcess = (
+  command: string,
+  args: readonly string[],
+  options: { stdio: readonly ['ignore', 'inherit', 'pipe']; env: NodeJS.ProcessEnv }
+) => SpawnedMCPProcess
+
 interface AutomationPluginOptions {
   /** Kept for the plugin's lifetime, so a restarted server still accepts the tab's session. */
   agentSession?: DevAgentSession | null
@@ -161,6 +174,10 @@ interface AutomationPluginOptions {
   httpPort: number
   portlessServiceName: string | null
   runtimeId: string
+  /** Overrides the restart cadence. The dev server uses the shared default. */
+  restartPolicy?: RestartPolicyOptions
+  /** Replaces the process the plugin starts. Tests pass a stand-in; development uses `spawn`. */
+  spawnProcess?: SpawnMCPProcess
 }
 
 function safeRuntimeId(value: string): string {
@@ -204,6 +221,8 @@ export function automationPlugin(
     const running = child
     if (!running) return
     child = null
+    // A child this process stops on purpose is not one to bring back.
+    intentionalStops.add(running)
     const exited = new Promise<void>((resolve) => {
       running.once('exit', () => resolve())
     })
@@ -220,6 +239,35 @@ export function automationPlugin(
     }
   }
 
+  /**
+   * Starts the server again after it dies, with a growing wait and a limit. A development server
+   * that lost its child — a crash, a stray kill, an out-of-memory exit — would otherwise leave
+   * every client of the MCP URL with nothing to connect to until the whole dev server restarted.
+   */
+  const restarts = createRestartScheduler({
+    policy: options.restartPolicy,
+    retry: () => {
+      if (stopped || child) return
+      void enqueue(startChild).catch((error: unknown) => {
+        console.error(
+          `[MCP] Restart failed: ${error instanceof Error ? error.message : String(error)}`
+        )
+        restarts.afterCrash()
+      })
+    },
+    report: (_reason, attempts) => {
+      console.error(
+        `[MCP] Stopped restarting the development server after ${attempts} failed attempts.`,
+        { attempts }
+      )
+    }
+  })
+
+  function stopRestarting(): void {
+    stopped = true
+    restarts.stop()
+  }
+
   async function startChild(): Promise<void> {
     const runtimeDir = join(tmpdir(), 'pairdraw-mcp', safeRuntimeId(options.runtimeId))
     await mkdir(runtimeDir, { recursive: true, mode: 0o700 })
@@ -231,7 +279,10 @@ export function automationPlugin(
       ? ['run', '--name', options.portlessServiceName, ...command]
       : command.slice(1)
     const readyMarker = `pairdraw-ready:${randomUUID()}`
-    const spawned = spawn(spawnCommand, spawnArgs, {
+    const spawnOptions: {
+      stdio: ['ignore', 'inherit', 'pipe']
+      env: NodeJS.ProcessEnv
+    } = {
       stdio: ['ignore', 'inherit', 'pipe'],
       env: {
         ...createAutomationEnvironment({
@@ -246,7 +297,12 @@ export function automationPlugin(
         }),
         PAIRDRAW_MCP_READY_MARKER: readyMarker
       }
-    })
+    }
+    // Call `spawn` directly so its stdio overload keeps stderr as a stream. A stand-in
+    // returns the same shape. Combining the two functions first loses that overload.
+    const spawned = options.spawnProcess
+      ? options.spawnProcess(spawnCommand, spawnArgs, spawnOptions)
+      : spawn(spawnCommand, spawnArgs, spawnOptions)
     const ready = waitForChildReady(spawned, readyMarker)
     child = spawned
 
@@ -261,6 +317,7 @@ export function automationPlugin(
         console.error(
           `\x1b[31m[MCP] MCP bind failed (${options.browserURL}${socketPath ? ` or socket ${socketPath}` : ''}). Is another Pairdraw instance running?\x1b[0m`
         )
+        intentionalStops.add(spawned)
         spawned.kill()
         if (child === spawned) child = null
         return
@@ -271,6 +328,7 @@ export function automationPlugin(
     spawned.on('exit', (code) => {
       if (code && code !== 0) console.error(`[MCP] Server exited with code ${code}`)
       if (child === spawned) child = null
+      if (!intentionalStops.has(spawned)) restarts.afterCrash()
     })
 
     try {
@@ -286,6 +344,8 @@ export function automationPlugin(
         }
       }
     })
+    // A server that came up healthy gets the first delay again if it dies later.
+    restarts.afterSuccess()
   }
 
   async function restartChild(nextConfiguration: DevMCPConfiguration): Promise<void> {
@@ -294,6 +354,9 @@ export function automationPlugin(
     await stopChild()
     await startChild()
   }
+
+  const intentionalStops = new WeakSet<ChildProcess>()
+  let stopped = false
 
   return {
     name: 'pairdraw-automation',
@@ -329,6 +392,7 @@ export function automationPlugin(
       await enqueue(startChild)
     },
     async buildEnd() {
+      stopRestarting()
       await enqueue(stopChild)
     }
   }

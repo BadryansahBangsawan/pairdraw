@@ -246,6 +246,16 @@ function scheduleWake(ms: number) {
   }, ms)
 }
 
+/**
+ * Stops the drain a queued job scheduled, so a test that swaps the outbox out leaves nothing of
+ * the old one running: a wake that survives its file drains whatever outbox the next test has,
+ * and an unregistered provider there turns into a failure the next test is blamed for.
+ */
+export function stopSyncEngine(): void {
+  if (wakeTimer != null) clearTimeout(wakeTimer)
+  wakeTimer = null
+}
+
 function ensureOnlineListeners() {
   if (onlineBound || !IS_BROWSER) return
   onlineBound = true

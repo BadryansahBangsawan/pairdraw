@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir } from 'node:fs/promises'
 import { basename, dirname, extname, join, resolve } from 'node:path'
 
 import { defineCommand } from 'citty'
@@ -6,6 +6,7 @@ import { toUint8Array } from 'js-base64'
 
 import { BUILTIN_IO_FORMATS, IORegistry, type ExportResult } from '@pairdraw/core/io'
 import { headlessRenderThumbnail, type RasterExportFormat } from '@pairdraw/core/io/formats/raster'
+import { writeFileAtomic } from '@pairdraw/core/node/fs'
 import type { AutomationDocumentSummary } from '@pairdraw/core/rpc'
 
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
@@ -65,7 +66,7 @@ interface ExportArgs {
 }
 
 async function writeAndLog(path: string, content: string | Uint8Array) {
-  await writeFile(path, content)
+  await writeFileAtomic(path, content, { symlink: 'follow' })
   const size = typeof content === 'string' ? Buffer.byteLength(content, 'utf8') : content.length
   console.log(ok(`Exported ${path} (${(size / 1024).toFixed(1)} KB)`))
 }
@@ -173,7 +174,7 @@ async function writeExport(output: string, result: ExportResult) {
   for (const asset of assets) {
     const assetPath = join(dirname(output), asset.path)
     await mkdir(dirname(assetPath), { recursive: true })
-    await writeFile(assetPath, asset.content)
+    await writeFileAtomic(assetPath, asset.content, { symlink: 'follow' })
   }
   if (assets.length > 0) console.log(ok(`Assets: ${assets.length} files`))
 }

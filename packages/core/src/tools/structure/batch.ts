@@ -5,12 +5,17 @@ import { textFonts } from '#core/tools/modify/text'
 import { defineTool } from '#core/tools/schema'
 
 const batchOpsSchema = v.array(
-  v.object({ id: v.string(), props: v.record(v.string(), v.unknown()) })
+  v.object({ id: v.string(), props: v.objectWithRest({}, v.unknown()) })
 )
 type BatchOp = v.InferOutput<typeof batchOpsSchema>[number]
 
-/** The operations a call names, or why they cannot be read. */
-function parseOperations(operations: string): BatchOp[] | { error: string } {
+/** The operations a call names, as an array or as the JSON string a client may send. */
+function parseOperations(operations: BatchOp[] | string): BatchOp[] | { error: string } {
+  if (Array.isArray(operations)) {
+    return v.safeParse(batchOpsSchema, operations).success
+      ? operations
+      : { error: 'operations must be an array of {id, props}' }
+  }
   const json = v.safeParse(v.pipe(v.string(), v.parseJson()), operations)
   if (!json.success) return { error: 'Invalid JSON in operations' }
   const ops = v.safeParse(batchOpsSchema, json.output)
@@ -107,9 +112,9 @@ export const batchUpdate = defineTool({
   execution: { kind: 'sync', mutation: 'document' },
   input: v.strictObject({
     operations: v.pipe(
-      v.string(),
+      v.union([batchOpsSchema, v.string()]),
       v.description(
-        'JSON array: [{"id":"0:5","props":{"spacing":8}},{"id":"0:6","props":{"sizing_horizontal":"FILL","grow":1}}]'
+        'Array of {"id","props"}, or the same array as a JSON string: [{"id":"0:5","props":{"spacing":8}},{"id":"0:6","props":{"sizing_horizontal":"FILL","grow":1}}]'
       )
     )
   }),

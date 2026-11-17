@@ -132,11 +132,14 @@ test('Stop while another document shows ends the reply', async ({ configuredChat
   await expect(tabs).toHaveCount(2)
   await expect(page.getByTestId('chat-stop-button')).toBeVisible()
   await page.getByTestId('chat-stop-button').click()
-  await expect(page.locator(stoppedMarker)).toBeVisible()
+  // The reply ends, so nothing runs anywhere, and the panel hands itself back to the document in
+  // front: the stopped transcript belongs to the document that started the reply.
   await expect(page.getByTestId('chat-stop-button')).toHaveCount(0)
+  await expect(page.getByTestId('chat-run-location')).toHaveCount(0)
+  await expect(page.getByTestId('chat-message-user')).toHaveCount(0)
 
-  await finishPausedReply(page)
   await tabs.first().click()
+  await expect(chat.assistantMessage()).toContainText('Line 1')
   await expect(page.locator(stoppedMarker)).toBeVisible()
 })
 

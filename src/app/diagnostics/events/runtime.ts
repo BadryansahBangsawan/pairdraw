@@ -2,7 +2,7 @@ import { diagnosticErrorDetails } from '../error'
 import { recordDiagnostic } from '../recorder'
 
 /** Where an uncaught failure surfaced: the window, an unhandled rejection, or a Vue component. */
-export type RuntimeErrorSource = 'window' | 'rejection' | 'vue'
+export type RuntimeErrorSource = 'window' | 'rejection' | 'vue' | 'canvas'
 
 /**
  * A render loop can throw every frame, sometimes alternating between errors; one record per
@@ -28,8 +28,8 @@ function isRepeat(key: string, now: number): boolean {
 }
 
 /**
- * Record an uncaught error with its scrubbed message and stack. `info` is Vue's hint about
- * where a component error happened, such as `render function` or `watcher callback`.
+ * Record an uncaught error with its scrubbed message and stack. `info` separates two records
+ * that share a message: Vue's hint, such as `render function`, or the id of a skipped layer.
  */
 export function recordRuntimeError(
   error: unknown,
@@ -37,7 +37,7 @@ export function recordRuntimeError(
   info?: string
 ): void {
   const details = diagnosticErrorDetails(error)
-  const key = `${source}\n${details.errorName}\n${details.message ?? ''}\n${details.stack ?? ''}`
+  const key = `${source}\n${details.errorName}\n${details.message ?? ''}\n${details.stack ?? ''}\n${info ?? ''}`
   if (isRepeat(key, Date.now())) return
   recordDiagnostic({
     category: 'runtime',

@@ -8,6 +8,7 @@
  * no shared references between source and copy.
  */
 
+import { normalizeEffects } from './effects'
 import { geometryCommandCoordCount } from './geometry'
 import { cloneInstanceOverrideState } from './instances/overrides'
 import { createDefaultSourceMetadata } from './node-defaults'
@@ -55,10 +56,12 @@ export function copyStroke(s: Stroke): Stroke {
 
 export function copyEffect(e: Effect): Effect {
   if (e.type === 'SHADER') return structuredClone(e)
+  const normalized = normalizeEffects([e])[0] ?? e
+  if (normalized.type === 'SHADER') return structuredClone(normalized)
   return {
-    ...e,
-    color: { ...e.color },
-    offset: { ...e.offset }
+    ...normalized,
+    color: { ...normalized.color },
+    offset: { ...normalized.offset }
   }
 }
 

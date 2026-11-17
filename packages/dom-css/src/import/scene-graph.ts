@@ -10,6 +10,7 @@ import {
 } from '@pairdraw/scene-graph'
 import { TRANSPARENT } from '@pairdraw/scene-graph/constants'
 import { parseCSSAlignSelf, parseCSSNumber, parseCSSShadows } from '@pairdraw/scene-graph/css'
+import { normalizeEffects } from '@pairdraw/scene-graph/effects'
 import { computeImageHash } from '@pairdraw/scene-graph/images'
 
 import type { DesignDocument, DesignElement, DesignNode, DesignStyleDeclaration } from '../types'
@@ -328,7 +329,7 @@ function applyElementStyle(
   }
 
   const effects = parseCSSShadows(pickStyle(style, 'box-shadow'))
-  if (effects.length > 0) node.effects = effects
+  if (effects.length > 0) node.effects = normalizeEffects(effects)
 
   const opacity = parseCSSNumber(pickStyle(style, 'opacity'))
   if (opacity !== null) node.opacity = opacity
@@ -368,7 +369,7 @@ function applyTextStyle(node: SceneNode, style: DesignStyleDeclaration): void {
   if (opacity !== null) node.opacity = opacity
 
   const effects = parseCSSShadows(pickStyle(style, 'text-shadow'))
-  if (effects.length > 0) node.effects = effects
+  if (effects.length > 0) node.effects = normalizeEffects(effects)
 
   const textAlign = pickStyle(style, 'text-align')?.toUpperCase()
   if (textAlign === 'CENTER' || textAlign === 'RIGHT' || textAlign === 'JUSTIFIED') {

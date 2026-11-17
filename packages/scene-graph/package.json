@@ -122,6 +122,12 @@
       "import": "./dist/css/index.js",
       "default": "./dist/css/index.js"
     },
+    "./effects": {
+      "types": "./dist/effects.d.ts",
+      "bun": "./src/effects.ts",
+      "import": "./dist/effects.js",
+      "default": "./dist/effects.js"
+    },
     "./export-format": {
       "types": "./dist/export-format.d.ts",
       "bun": "./src/export-format.ts",

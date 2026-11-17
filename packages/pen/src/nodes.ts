@@ -6,6 +6,7 @@ import type {
   SceneGraph,
   SceneNode
 } from '@pairdraw/scene-graph'
+import { normalizeEffects } from '@pairdraw/scene-graph/effects'
 import { CORNER_FIELDS } from '@pairdraw/scene-graph/fields'
 import { fillSizingFields } from '@pairdraw/scene-graph/layout'
 import type { Color } from '@pairdraw/scene-graph/primitives'
@@ -323,7 +324,7 @@ export function applyPenProperties(node: SceneNode, pen: PenNode, build: Build):
   // A line layer has no inside or outside; its stroke is centred on it.
   if (node.type === 'LINE')
     node.strokes = node.strokes.map((paint) => ({ ...paint, align: 'CENTER' }))
-  node.effects = convertEffects(pen.effect, ctx, build.shaders)
+  node.effects = normalizeEffects(convertEffects(pen.effect, ctx, build.shaders))
   applyCornerRadius(node, pen.cornerRadius, ctx)
   applyPadding(node, pen.padding, ctx)
 

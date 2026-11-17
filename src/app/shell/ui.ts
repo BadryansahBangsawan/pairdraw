@@ -129,6 +129,19 @@ function error(message: string, action?: ToastAction): number {
   return push(message, 'error', action)
 }
 
+/**
+ * A render loop can throw the same error every frame. Diagnostics already keep one record;
+ * the toast stays at one too, while a deliberate `error()` of the same message still counts.
+ */
+function reportUncaught(message: string): void {
+  const text = message || 'An unexpected error occurred'
+  const visible = toasts.value.some(
+    (entry) => entry.message === text && entry.variant === 'error' && !entry.progress
+  )
+  if (visible) return
+  error(text)
+}
+
 function remove(id: number) {
   toasts.value = toasts.value.filter((t) => t.id !== id)
 }
@@ -144,7 +157,7 @@ function setupGlobalErrorHandler() {
       return
     }
     recordRuntimeError(e.error ?? e.message, 'window')
-    error(e.message || 'An unexpected error occurred')
+    reportUncaught(e.message)
   })
   useEventListener(window, 'unhandledrejection', (e) => {
     if (e.reason instanceof ReadOnlyDocumentError) {
@@ -153,7 +166,7 @@ function setupGlobalErrorHandler() {
     }
     recordRuntimeError(e.reason, 'rejection')
     const msg = e.reason instanceof Error ? e.reason.message : String(e.reason)
-    error(msg || 'An unexpected error occurred')
+    reportUncaught(msg)
   })
 }
 

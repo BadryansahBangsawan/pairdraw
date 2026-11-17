@@ -82,6 +82,7 @@ Canvas is CanvasKit (Skia WASM) on a WebGL surface, not DOM.
 - A gradient or image paint builds a Skia shader through `applyGradientFill` and `applyImageFill` (`packages/core/src/canvas/fills.ts`), which take the target `Paint`, so a stroke reuses them instead of a second shader path. Both say whether they set one; a caller skips the paint when they did not, since CanvasKit builds no gradient from a transform it cannot invert and an image may not be decoded yet (`packages/core/tests/canvas/paints.test.ts`).
 - `forVisibleStrokes` (`packages/core/src/canvas/scene.ts`) is where a stroke's shader is set and cleared; stroke draw helpers take an already-configured `strokePaint` and must not reset its shader.
 - Shadows are cast from what a layer draws, children included, through `drawSilhouette` (`packages/core/src/canvas/shadows/silhouette.ts`); a container's shadows are drawn by `renderLayerShadows` around its children, not by `renderShape`. A faster path for a shape must give the same pixels as its silhouette (`packages/core/tests/canvas/shadows.test.ts`).
+- A layer that throws while it is drawn is skipped for that frame. The canvas save stack is restored only then, the shared opacity and effect paints are reset, and the host is told once per layer and error message, so a successful layer does not pay for the restore and the rest of the page still draws (`packages/core/tests/canvas/effect-offset.test.ts`).
 
 ### Caches
 

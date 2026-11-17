@@ -324,6 +324,21 @@ function nodeIsolationLayerBounds(
   return r.ck.LTRBRect(bounds.minX, bounds.minY, bounds.maxX, bounds.maxY)
 }
 
+const reportedNodeDrawFailures = new WeakMap<SkiaRenderer, Set<string>>()
+
+function reportNodeDrawFailure(renderer: SkiaRenderer, nodeId: string, error: unknown): void {
+  const message = error instanceof Error ? error.message : String(error)
+  const key = `${nodeId}\0${message}`
+  let reported = reportedNodeDrawFailures.get(renderer)
+  if (!reported) {
+    reported = new Set()
+    reportedNodeDrawFailures.set(renderer, reported)
+  }
+  if (reported.has(key)) return
+  reported.add(key)
+  renderer.onNodeDrawFailure?.(nodeId, error)
+}
+
 /**
  * Whether the canvas draws a node itself: not hidden, a mask, blocked on fonts, drawn live by
  * node-edit mode, or left to a live island while the canvas previews.
@@ -358,52 +373,69 @@ export function renderNode(
     return
   }
 
-  canvas.save()
-  canvas.translate(node.x, node.y)
+  const depth = canvas.getSaveCount()
+  try {
+    canvas.save()
+    canvas.translate(node.x, node.y)
 
-  const needsNodeLayer = node.opacity < 1 || needsIsolatedBlendLayer(node.blendMode)
-  if (needsNodeLayer) {
-    const layerBounds = nodeIsolationLayerBounds(r, graph, node, overlays.rotationPreview)
-    r.opacityPaint.setAlphaf(node.opacity)
-    setPaintBlendMode(r, r.opacityPaint, node.blendMode)
-    canvas.saveLayer(r.opacityPaint, layerBounds)
-  }
+    const needsNodeLayer = node.opacity < 1 || needsIsolatedBlendLayer(node.blendMode)
+    if (needsNodeLayer) {
+      const layerBounds = nodeIsolationLayerBounds(r, graph, node, overlays.rotationPreview)
+      r.opacityPaint.setAlphaf(node.opacity)
+      setPaintBlendMode(r, r.opacityPaint, node.blendMode)
+      canvas.saveLayer(r.opacityPaint, layerBounds)
+    }
 
-  const layerBlur = node.effects.find(
-    (e): e is ShadowEffect => e.visible && (e.type === 'LAYER_BLUR' || e.type === 'FOREGROUND_BLUR')
-  )
-  if (layerBlur) {
-    // Entry guard: reset shared paint to known state
-    r.effectLayerPaint.setImageFilter(null)
-    r.effectLayerPaint.setColorFilter(null)
-    r.effectLayerPaint.setBlendMode(r.ck.BlendMode.SrcOver)
-
-    r.effectLayerPaint.setImageFilter(r.getCachedBlur(blurSigma(layerBlur.radius)))
-    const blurPadding = layerBlur.radius * 2
-    canvas.saveLayer(
-      r.effectLayerPaint,
-      viewportLayerBounds(r, graph, node, blurPadding, overlays.rotationPreview) ??
-        r.ck.LTRBRect(
-          -blurPadding,
-          -blurPadding,
-          node.width + blurPadding,
-          node.height + blurPadding
-        )
+    const layerBlur = node.effects.find(
+      (e): e is ShadowEffect =>
+        e.visible && (e.type === 'LAYER_BLUR' || e.type === 'FOREGROUND_BLUR')
     )
-  }
+    if (layerBlur) {
+      // Entry guard: reset shared paint to known state
+      r.effectLayerPaint.setImageFilter(null)
+      r.effectLayerPaint.setColorFilter(null)
+      r.effectLayerPaint.setBlendMode(r.ck.BlendMode.SrcOver)
 
-  applyNodeTransforms(canvas, node, overlays)
-  renderLayerShadows(r, canvas, graph, node, 'behind')
-  const shaderEffects = node.effects.filter(
-    (e): e is ShaderEffect => e.visible && e.type === 'SHADER'
-  )
-  if (shaderEffects.length > 0) {
-    drawShaderEffectChain(r, canvas, graph, node, shaderEffects, (target) => {
-      renderNodeContent(r, target, graph, node, overlays)
-      drawLayoutGrids(r, target, node)
+      r.effectLayerPaint.setImageFilter(r.getCachedBlur(blurSigma(layerBlur.radius)))
+      const blurPadding = layerBlur.radius * 2
+      canvas.saveLayer(
+        r.effectLayerPaint,
+        viewportLayerBounds(r, graph, node, blurPadding, overlays.rotationPreview) ??
+          r.ck.LTRBRect(
+            -blurPadding,
+            -blurPadding,
+            node.width + blurPadding,
+            node.height + blurPadding
+          )
+      )
+    }
+
+    applyNodeTransforms(canvas, node, overlays)
+    renderLayerShadows(r, canvas, graph, node, 'behind')
+    const shaderEffects = node.effects.filter(
+      (e): e is ShaderEffect => e.visible && e.type === 'SHADER'
+    )
+    if (shaderEffects.length > 0) {
+      drawShaderEffectChain(r, canvas, graph, node, shaderEffects, (target) => {
+        renderNodeContent(r, target, graph, node, overlays)
+        drawLayoutGrids(r, target, node)
+        renderChildren(
+          r,
+          target,
+          graph,
+          node,
+          overlays,
+          absX,
+          absY,
+          hasTransformedAncestor || hasNodeTransform(projectedNode(node, overlays.rotationPreview))
+        )
+      })
+    } else {
+      renderNodeContent(r, canvas, graph, node, overlays)
+      drawLayoutGrids(r, canvas, node)
       renderChildren(
         r,
-        target,
+        canvas,
         graph,
         node,
         overlays,
@@ -411,36 +443,33 @@ export function renderNode(
         absY,
         hasTransformedAncestor || hasNodeTransform(projectedNode(node, overlays.rotationPreview))
       )
-    })
-  } else {
-    renderNodeContent(r, canvas, graph, node, overlays)
-    drawLayoutGrids(r, canvas, node)
-    renderChildren(
-      r,
-      canvas,
-      graph,
-      node,
-      overlays,
-      absX,
-      absY,
-      hasTransformedAncestor || hasNodeTransform(projectedNode(node, overlays.rotationPreview))
-    )
-  }
-  renderLayerShadows(r, canvas, graph, node, 'front')
+    }
+    renderLayerShadows(r, canvas, graph, node, 'front')
 
-  if (layerBlur) {
+    if (layerBlur) {
+      canvas.restore()
+      // Exit guard: ensure shared paint is in clean state
+      r.effectLayerPaint.setImageFilter(null)
+      r.effectLayerPaint.setColorFilter(null)
+      r.effectLayerPaint.setBlendMode(r.ck.BlendMode.SrcOver)
+    }
+    if (needsNodeLayer) {
+      canvas.restore()
+      r.opacityPaint.setAlphaf(1)
+      r.opacityPaint.setBlendMode(r.ck.BlendMode.SrcOver)
+    }
     canvas.restore()
-    // Exit guard: ensure shared paint is in clean state
+  } catch (error) {
+    canvas.restoreToCount(depth)
+    // A throw skips the exit guards, so the next layer must not inherit their paints.
     r.effectLayerPaint.setImageFilter(null)
     r.effectLayerPaint.setColorFilter(null)
     r.effectLayerPaint.setBlendMode(r.ck.BlendMode.SrcOver)
-  }
-  if (needsNodeLayer) {
-    canvas.restore()
     r.opacityPaint.setAlphaf(1)
     r.opacityPaint.setBlendMode(r.ck.BlendMode.SrcOver)
+    r.opacityPaint.setImageFilter(null)
+    reportNodeDrawFailure(r, node.id, error)
   }
-  canvas.restore()
 }
 
 function makeNodeRRect(r: SkiaRenderer, node: SceneNode, radius: number): Float32Array {

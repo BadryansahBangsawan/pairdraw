@@ -145,6 +145,8 @@ export class SkiaRenderer {
   imageMemoryGraph: SceneGraph | null = null
   imageMemoryPage: string | null = null
   onImagePreviewReady: (() => void) | null = null
+  /** A layer this frame could not draw. Called once per layer and error message. */
+  onNodeDrawFailure: ((nodeId: string, error: unknown) => void) | null = null
   readonly imagePreviews = new ImagePreviewCache(() => this.onImagePreviewReady?.())
   nodePaths = new NodePathCaches()
   /** Path-text glyph silhouettes (stroke-and-union, font units) keyed by blob hash + relative weight. */

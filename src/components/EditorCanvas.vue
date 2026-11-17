@@ -40,6 +40,7 @@ import { autoLayoutValueAnchor, type AutoLayoutValueField } from '@pairdraw/vue/
 import { useEditorStore } from '@/app/editor/active-store'
 import { useCanvasCollaborationAwareness } from '@/app/editor/canvas/collaboration-awareness'
 import { createCanvasContextSelection } from '@/app/editor/canvas/context-selection'
+import { reportCanvasDrawFailure } from '@/app/editor/canvas/draw-failure'
 import { usePrototypeStage } from '@/app/editor/prototype/stage'
 import { usePluginPointerInput } from '@/app/plugins/pointer/input'
 import { useFollowView } from '@/app/presence/follow-view'
@@ -138,7 +139,8 @@ useCanvas(sceneCanvasRef, store, {
   },
   onContextLost: () => {
     canvasEpoch.value += 1
-  }
+  },
+  onNodeDrawFailure: reportCanvasDrawFailure
 })
 const { hitTestSectionTitle, hitTestComponentLabel, hitTestFrameTitle, hitTestStatusLabel } =
   useCanvas(canvasRef, store, {
@@ -155,7 +157,8 @@ const { hitTestSectionTitle, hitTestComponentLabel, hitTestFrameTitle, hitTestSt
     onViewportResize,
     onContextLost: () => {
       canvasEpoch.value += 1
-    }
+    },
+    onNodeDrawFailure: reportCanvasDrawFailure
   })
 const {
   cursorOverride,

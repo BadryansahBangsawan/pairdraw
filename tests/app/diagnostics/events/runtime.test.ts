@@ -37,6 +37,15 @@ test('records one of a burst of identical errors, and each distinct one', async 
   expect(messages.toSorted()).toEqual(['loop', 'other'])
 })
 
+test('records the same failure for two layers', async () => {
+  const error = new TypeError("undefined is not an object (evaluating 'effect.color.r')")
+  recordRuntimeError(error, 'canvas', 'node-a')
+  recordRuntimeError(error, 'canvas', 'node-b')
+
+  const infos = (await diagnostics.list()).map((event) => event.attributes.info)
+  expect(infos.toSorted()).toEqual(['node-a', 'node-b'])
+})
+
 test('records an alternating pair of repeating errors once each', async () => {
   const first = new Error('first')
   const second = new Error('second')

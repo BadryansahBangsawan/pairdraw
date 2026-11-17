@@ -79,4 +79,9 @@ export interface UseCanvasOptions {
    * canvas element and the surface is made again on the new one.
    */
   onContextLost?: () => void
+  /**
+   * A layer this canvas could not draw. The host records it; the renderer calls it once per
+   * layer and error message.
+   */
+  onNodeDrawFailure?: (nodeId: string, error: unknown) => void
 }

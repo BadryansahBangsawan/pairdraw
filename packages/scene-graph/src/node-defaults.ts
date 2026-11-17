@@ -4,6 +4,7 @@ import {
   DEFAULT_STROKE_MITER_LIMIT,
   DEFAULT_STROKE_WEIGHT
 } from './constants'
+import { normalizeEffects } from './effects'
 import { createInstanceOverrideState } from './instances/overrides'
 import { NO_LETTER_SPACING } from './text/lengths'
 import type { NodeType, SceneNode, SourceMetadata } from './types'
@@ -57,7 +58,7 @@ export function createDefaultNode(
   type: NodeType,
   overrides: Partial<SceneNode> = {}
 ): SceneNode {
-  return {
+  const node = {
     id: generateId(),
     type,
     name: type.charAt(0) + type.slice(1).toLowerCase(),
@@ -231,6 +232,8 @@ export function createDefaultNode(
     booleanOperation: undefined,
     ...overrides
   } satisfies CompleteNodeFields
+  node.effects = normalizeEffects(node.effects)
+  return node
 }
 
 /** Containers whose bounds follow their children and that set no coordinate space, as in Figma. */

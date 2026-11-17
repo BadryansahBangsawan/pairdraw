@@ -1,3 +1,4 @@
+import { normalizeEffects } from './effects'
 import { textCacheInvalidationChanges } from './text/picture'
 import type { SceneNode } from './types'
 import { normalizeVectorNetwork } from './vector-network'
@@ -72,6 +73,9 @@ export function updateNodePreview(
       ...normalizedChanges,
       vectorNetwork: normalizeVectorNetwork(changes.vectorNetwork)
     }
+  }
+  if (changes.effects) {
+    normalizedChanges = { ...normalizedChanges, effects: normalizeEffects(changes.effects) }
   }
   beforeUpdate?.(node, normalizedChanges)
   graph.positionPreviewVersion++

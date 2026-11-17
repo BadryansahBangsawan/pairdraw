@@ -40,6 +40,7 @@ function applyRenderOptions(renderer: SkiaRenderer, options: UseCanvasOptions | 
   // The canvas buffer is sized for this ratio, so the renderer must draw at the same one.
   renderer.maxPixelRatio = options?.maxPixelRatio ?? Number.POSITIVE_INFINITY
   renderer.reducedEffects = options?.reducedEffects ?? false
+  renderer.onNodeDrawFailure = options?.onNodeDrawFailure ?? null
 }
 
 export function createCanvasSurfaceManager({

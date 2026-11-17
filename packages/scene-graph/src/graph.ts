@@ -12,6 +12,7 @@ import {
   localTransformFromWorld
 } from './coordinate'
 import { cloneNodeProps, type NodeCloneMode } from './copy'
+import { normalizeEffects } from './effects'
 import { bindNodeEvents } from './events'
 import { LAYOUT_AFFECTING_KEYS } from './fields/layout'
 import { withGeneratedFrameSize } from './generated'
@@ -602,6 +603,9 @@ export class SceneGraph {
     }
     if (changes.vectorNetwork) {
       changes = { ...changes, vectorNetwork: normalizeVectorNetwork(changes.vectorNetwork) }
+    }
+    if (changes.effects) {
+      changes = { ...changes, effects: normalizeEffects(changes.effects) }
     }
     this.layoutWrites?.record(
       node,

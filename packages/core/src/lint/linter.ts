@@ -30,12 +30,11 @@ function effectiveTextStyles(node: SceneNode): { fontSize: number; fontWeight: n
 
 /** A preset's rules, refusing a name no preset has so a typo cannot silently disable linting. */
 function presetRules(id: string) {
-  const preset = presets[id]
-  if (!preset) {
+  if (!Object.hasOwn(presets, id)) {
     const known = Object.keys(presets).sort().join(', ')
     throw new Error(`Unknown lint preset "${id}". Known presets: ${known}`)
   }
-  return preset.rules
+  return presets[id].rules
 }
 
 export class Linter {
@@ -66,8 +65,8 @@ export class Linter {
     if (options.config?.rules) baseConfig = { ...baseConfig, ...options.config.rules }
     const rulesToLoad = options.rules ?? Object.keys(baseConfig)
     for (const ruleId of rulesToLoad) {
+      if (!Object.hasOwn(allRules, ruleId)) throw new Error(`Unknown lint rule "${ruleId}"`)
       const rule = allRules[ruleId]
-      if (!rule) throw new Error(`Unknown lint rule "${ruleId}"`)
       const config = baseConfig[ruleId]
       if (config === 'off') continue
       this.rules.set(ruleId, rule)

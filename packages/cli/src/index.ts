@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { defineCommand, runMain, type ArgsDef, type CommandDef } from 'citty'
+import { defineCommand, runMain, type CommandDef } from 'citty'
 
 import { COMMANDS } from './commands'
 
@@ -25,7 +25,7 @@ export function withStdinValues(argv: string[]): string[] {
   for (const [index, value] of argv.entries()) {
     const flag = argv[index - 1]
     const isValue = value === '-' || /^-\d/.test(value)
-    if (isValue && flag?.startsWith('--') && !flag.includes('=')) {
+    if (isValue && flag.startsWith('--') && !flag.includes('=')) {
       normalized[normalized.length - 1] = `${flag}=${value}`
       continue
     }
@@ -38,7 +38,7 @@ export function withStdinValues(argv: string[]): string[] {
 const VARIADIC_COMMAND = 'storybook'
 
 /** A command this file defines directly, rather than one a module resolves on demand. */
-function isCommand(value: unknown): value is CommandDef<ArgsDef> {
+function isCommand(value: unknown): value is CommandDef {
   return !!value && typeof value === 'object' && !(value instanceof Promise)
 }
 
@@ -46,7 +46,7 @@ function isCommand(value: unknown): value is CommandDef<ArgsDef> {
  * Refuses a positional no argument of the command claims, which citty would otherwise fold into
  * `args._` and drop: `tree a.fig b.fig` looked like it read one file.
  */
-function refuseExtraPositionals(command: CommandDef<ArgsDef>): void {
+function refuseExtraPositionals(command: CommandDef): void {
   const args = command.args
   if (args && typeof args === 'object' && !(args instanceof Promise)) {
     const declared = Object.values(args).filter((arg) => arg.type === 'positional').length

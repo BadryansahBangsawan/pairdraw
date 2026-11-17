@@ -1,4 +1,5 @@
-import { unzipSync, zipSync, type Unzipped, type Zippable } from 'fflate'
+import { omit } from 'es-toolkit/object'
+import { zipSync, type Unzipped, type Zippable } from 'fflate'
 import * as v from 'valibot'
 
 import type { FigPageManifestEntry } from '@pairdraw/kiwi/fig'
@@ -15,6 +16,7 @@ import type { Color, Rect, Size } from '@pairdraw/scene-graph/primitives'
 
 import { figArchiveMetaSchema, type FigArchiveMetaJSON } from './schema'
 import { isPNG } from './thumbnail'
+import { readVerifiedArchive } from './zip'
 
 export interface FigImageEntry {
   name: string
@@ -102,23 +104,18 @@ export function parseFigBuffer(
   const raw = parseRawFigKiwi(bytes, onPages, headers)
   if (raw) return raw
 
-  const canvasArchive = unzipSync(bytes, { filter: ({ name }) => isCanonicalCanvasEntry(name) })
-  let canvasData = findCanvasData(canvasArchive)
-  let archive: Unzipped
-  let decoded: ReturnType<typeof decodeFigKiwiCanvas>
-  if (canvasData) {
-    decoded = decodeFigKiwiCanvas(canvasData, onPages, headers)
-    archive = unzipSync(bytes, { filter: ({ name }) => !isCanonicalCanvasEntry(name) })
-  } else {
-    archive = unzipSync(bytes)
-    canvasData = findCanvasData(archive)
-    if (!canvasData) {
-      throw new Error(
-        `No canvas data found in .fig file. Entries: ${Object.keys(archive).join(', ')}`
-      )
-    }
-    decoded = decodeFigKiwiCanvas(canvasData, onPages, headers)
+  const entries = readVerifiedArchive(bytes)
+  const canvasData = findCanvasData(entries)
+  if (!canvasData) {
+    throw new Error(
+      `No canvas data found in .fig file. Entries: ${Object.keys(entries).join(', ')}`
+    )
   }
+  const decoded = decodeFigKiwiCanvas(canvasData, onPages, headers)
+  const archive: Unzipped = omit(
+    entries,
+    Object.keys(entries).filter((name) => isCanonicalCanvasEntry(name))
+  )
   const fontEntries = Object.entries(archive)
     .filter(([name]) => name.startsWith('fonts/') && name !== 'fonts/')
     .map(([name, data]) => [name.slice('fonts/'.length), data] as [string, Uint8Array])
@@ -183,12 +180,14 @@ export function readFigArchiveParts(buffer: ArrayBuffer): FigArchiveParts {
       metaJSON: null
     }
   }
-  const canvasArchive = unzipSync(bytes, { filter: ({ name }) => isCanonicalCanvasEntry(name) })
-  const canonical = findCanvasData(canvasArchive)
-  const archive = unzipSync(
-    bytes,
-    canonical ? { filter: ({ name }) => !isCanonicalCanvasEntry(name) } : undefined
-  )
+  const entries = readVerifiedArchive(bytes)
+  const canonical = findCanvasData(entries)
+  const archive: Unzipped = canonical
+    ? omit(
+        entries,
+        Object.keys(entries).filter((name) => isCanonicalCanvasEntry(name))
+      )
+    : entries
   const canvasData = canonical ?? findCanvasData(archive)
   if (!canvasData)
     throw new Error(
@@ -265,13 +264,13 @@ const storedMetaSchema = v.pipe(v.string(), v.parseJson(), v.record(v.string(), 
  */
 export function renameFigArchive(bytes: Uint8Array, fileName: string): Uint8Array | null {
   if (parseFigKiwiChunks(bytes)) return null
-  const stored = unzipSync(bytes, { filter: ({ name }) => name === 'meta.json' })
+  const stored = readVerifiedArchive(bytes)
   if (!Object.hasOwn(stored, 'meta.json')) return null
   const meta = v.safeParse(storedMetaSchema, new TextDecoder().decode(stored['meta.json']))
   if (!meta.success || typeof meta.output.file_name !== 'string') return null
   if (meta.output.file_name === fileName) return bytes
   const renamed: Zippable = {}
-  for (const [name, data] of Object.entries(unzipSync(bytes))) {
+  for (const [name, data] of Object.entries(stored)) {
     renamed[name] =
       name === 'meta.json'
         ? new TextEncoder().encode(JSON.stringify({ ...meta.output, file_name: fileName }))

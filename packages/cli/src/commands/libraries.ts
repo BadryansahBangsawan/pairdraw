@@ -9,7 +9,7 @@ import {
 } from '@pairdraw/core/library'
 
 import { bold, dim, fmtList, ok, printError } from '#cli/format'
-import { loadDocument, populateWholeDocument, writeFigDocument } from '#cli/headless'
+import { loadDocument, populateWholeDocument, writeDocumentFile } from '#cli/headless'
 import { FileSystemLibraryCatalog } from '#cli/library/catalog'
 
 const list = defineCommand({
@@ -79,7 +79,7 @@ const publish = defineCommand({
       previousRevisionId: args.previous || null
     })
     // Only once published: a failed publication leaves the source as it was.
-    if (args.write && assigned.length > 0) await writeFigDocument(graph, file)
+    if (args.write && assigned.length > 0) await writeDocumentFile(graph, file)
     if (args.json) {
       console.log(JSON.stringify(revision.manifest, null, 2))
       return

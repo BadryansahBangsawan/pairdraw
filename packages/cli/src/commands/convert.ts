@@ -1,4 +1,4 @@
-import { writeFile } from 'node:fs/promises'
+
 import { basename, extname, resolve } from 'node:path'
 
 import { defineCommand } from 'citty'
@@ -13,7 +13,7 @@ import {
   loadDocument,
   measureDocumentText,
   populateWholeDocument,
-  writeFigDocument
+  writeDocumentFile
 } from '#cli/headless'
 
 const io = new IORegistry(BUILTIN_IO_FORMATS)
@@ -81,13 +81,7 @@ export default defineCommand({
       )
     }
     const output = args.output ? resolve(args.output) : defaultOutput(file, format)
-    if (format === 'fig') await writeFigDocument(graph, output)
-    else {
-      const result = await io.writeDocument(format, graph)
-      const data =
-        result.encoding === 'utf8' ? (result.data as string) : (result.data as Uint8Array)
-      await writeFile(output, data)
-    }
+    await writeDocumentFile(graph, output, format)
     console.log(ok(`Converted ${file} → ${output}`))
   }
 })

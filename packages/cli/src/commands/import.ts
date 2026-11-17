@@ -7,7 +7,7 @@ import { readHTMLDocument, type ReadHTMLResult } from '@pairdraw/core/io/formats
 
 import { requireFile } from '#cli/app/client'
 import { fmtList, ok, printError } from '#cli/format'
-import { writeFigDocument } from '#cli/headless'
+import { writeDocumentFile } from '#cli/headless'
 
 const OUTPUT_FORMATS = new Set(['fig', 'json'])
 
@@ -68,7 +68,7 @@ async function writeOutput(args: ImportArgs, { styled, graph }: ReadHTMLResult) 
     return output
   }
 
-  await writeFigDocument(graph, output)
+  await writeDocumentFile(graph, output)
   return output
 }
 

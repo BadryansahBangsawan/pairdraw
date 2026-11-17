@@ -6,7 +6,7 @@ import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { rpc } from '#cli/app/client'
 import { appTargetRPCArgs, type AppTargetCLIArgs } from '#cli/app/target'
-import { writeFigDocument } from '#cli/headless'
+import { writeDocumentFile } from '#cli/headless'
 import { appPreview, PREVIEW_TOOL, previewArgs, previewImage } from '#cli/session/preview'
 import { findCLITool } from '#cli/session/tools'
 import {
@@ -60,7 +60,7 @@ export async function openHeadlessSession(file: string): Promise<ToolSession> {
     async save(path) {
       if (!path) throw new Error('A headless document needs a path to save to')
       flushPendingLayout(graph)
-      await writeFigDocument(graph, path)
+      await writeDocumentFile(graph, path)
     }
   }
 }

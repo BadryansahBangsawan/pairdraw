@@ -2,7 +2,7 @@ import { defineCommand } from 'citty'
 
 import { appTargetOptions } from '#cli/app/target'
 import { dim, entity, fail, fmtList, ok, printError, warn } from '#cli/format'
-import { documentWriteOptions, writeFigDocument } from '#cli/headless'
+import { documentWriteOptions, writeDocumentFile } from '#cli/headless'
 import { readTextSource } from '#cli/input'
 import { runToolData } from '#cli/tool-data'
 
@@ -78,7 +78,7 @@ export default defineCommand({
     if (graph && !dryRun && !failed) {
       const outPath = args.output || (args.write ? args.file : undefined)
       if (outPath) {
-        await writeFigDocument(graph, outPath)
+        await writeDocumentFile(graph, outPath)
         if (!args.json) console.error(dim(`Written to ${outPath}`))
       } else if (!args.json) {
         console.error(warn('Not saved; pass --write or --output to save the document'))

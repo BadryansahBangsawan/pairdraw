@@ -14,7 +14,7 @@ import {
   loadDocument,
   measureDocumentText,
   populateWholeDocument,
-  writeFigDocument
+  writeDocumentFile
 } from '#cli/headless'
 import { headlessPreview } from '#cli/session/open'
 import { appPreview, previewNotice, previewOptions, previewScale } from '#cli/session/preview'
@@ -143,7 +143,7 @@ export default defineCommand({
       const outPath = args.output ? args.output : file
       // A script's edits that nothing read yet are laid out before saving, as Figma saves them.
       flushPendingLayout(graph)
-      await writeFigDocument(graph, outPath)
+      await writeDocumentFile(graph, outPath)
       if (!args.quiet) {
         console.error(`Written to ${outPath}`)
       }

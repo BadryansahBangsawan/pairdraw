@@ -14,7 +14,7 @@ import {
 } from '@pairdraw/core/lint'
 
 import { bold, dim, fail, fmtList, ok, printError } from '#cli/format'
-import { loadDocument, populateWholeDocument, writeFigDocument } from '#cli/headless'
+import { loadDocument, populateWholeDocument, writeDocumentFile } from '#cli/headless'
 
 function formatSeverity(severity: LintMessage['severity']) {
   if (severity === 'error') return fail('error')
@@ -98,7 +98,7 @@ export default defineCommand({
       const applied = applyLintFixes(graphFixTarget(graph), safeFixes(result.messages))
       computeAllLayouts(graph)
       const output = resolve(args.output)
-      await writeFigDocument(graph, output)
+      await writeDocumentFile(graph, output)
       if (!args.json) console.log(ok(`Applied ${applied} fixes → ${output}`))
       result = linter.lintGraph(graph)
     }

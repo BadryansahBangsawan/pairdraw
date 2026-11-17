@@ -142,10 +142,29 @@ export const documentWriteOptions = {
   output: { type: 'string', alias: 'o', description: 'Write to a different file', required: false }
 } as const
 
-/** Save a headless document as `.fig`, with the thumbnail `export --format fig` renders. */
-export async function writeFigDocument(graph: SceneGraph, filePath: string): Promise<void> {
-  const result = await io.writeDocument('fig', graph, { renderThumbnail: true })
-  await writeFileAtomic(filePath, result.data, { symlink: 'follow' })
+/**
+ * Save a headless document in the format its file name names: a `.pen` document written back to
+ * its own path stays JSON, and `--output out.pen` converts. `format` overrides the name, so
+ * `convert --format` writes what it asked for.
+ */
+export async function writeDocumentFile(
+  graph: SceneGraph,
+  filePath: string,
+  format?: string
+): Promise<void> {
+  const adapter = format ? io.getFormat(format) : io.findWriter(filePath)
+  if (!adapter?.support.writeDocument) {
+    const writable = io
+      .listWritableFormats()
+      .map((candidate) => candidate.id)
+      .join(', ')
+    throw new Error(`Cannot write ${filePath}: its name asks for no document format (${writable})`)
+  }
+  const result = await io.writeDocument(adapter.id, graph, {
+    renderThumbnail: adapter.id === 'fig'
+  })
+  const data = result.encoding === 'utf8' ? (result.data as string) : (result.data as Uint8Array)
+  await writeFileAtomic(filePath, data, { symlink: 'follow' })
 }
 
 export function populateDocumentPage(graph: SceneGraph, pageId: string): boolean {

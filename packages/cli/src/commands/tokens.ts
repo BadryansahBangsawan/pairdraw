@@ -15,7 +15,7 @@ import type { TokensResult } from '@pairdraw/core/rpc'
 
 import { requireFile } from '#cli/app/client'
 import { fmtList, ok } from '#cli/format'
-import { loadDocument, populateWholeDocument, writeFigDocument } from '#cli/headless'
+import { loadDocument, populateWholeDocument, writeDocumentFile } from '#cli/headless'
 import { loadRPCData } from '#cli/rpc-data'
 
 import { variableCommandArgs } from './variables'
@@ -139,8 +139,8 @@ async function importStylesheet(
         { compact: true }
       )
     )
-  if (args.write) await writeFigDocument(graph, requireFile(file))
-  else if (args.output) await writeFigDocument(graph, args.output)
+  if (args.write) await writeDocumentFile(graph, requireFile(file))
+  else if (args.output) await writeDocumentFile(graph, args.output)
 }
 
 function designSystemIssueLine(issue: DesignSystemIssue): string {
@@ -217,6 +217,6 @@ async function importProject(
       )
     )
   }
-  if (args.write) await writeFigDocument(graph, requireFile(file))
-  else if (args.output) await writeFigDocument(graph, args.output)
+  if (args.write) await writeDocumentFile(graph, requireFile(file))
+  else if (args.output) await writeDocumentFile(graph, args.output)
 }

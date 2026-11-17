@@ -38,6 +38,17 @@ export class IORegistry {
     })
   }
 
+  /** The writable format a file name asks for, so a save keeps the document's own format. */
+  findWriter(fileName: string): IOFormatAdapter | null {
+    const lower = fileName.toLowerCase()
+    return (
+      this.adapters.find(
+        (adapter) =>
+          !!adapter.support.writeDocument && adapter.extensions.some((ext) => lower.endsWith(`.${ext}`))
+      ) ?? null
+    )
+  }
+
   findReader(fileName: string, mimeType?: string): IOFormatAdapter | null {
     return (
       this.adapters.find((adapter) => {

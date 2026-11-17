@@ -252,3 +252,26 @@ describe('eval CLI', () => {
     expect(parsed.success && parsed.output).toEqual([100, 80, 100, 80])
   })
 })
+
+describe('eval --write format', () => {
+  test('writes a .pen back as pen, not as a .fig archive', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-eval-pen-'))
+    const html = join(dir, 'card.html')
+    const fig = join(dir, 'card.fig')
+    const pen = join(dir, 'card.pen')
+    await writeFile(html, '<div style="width:100px;height:40px;background:#000"></div>')
+    expect((await cli(['import', html, '-o', fig])).exitCode).toBe(0)
+    expect((await cli(['convert', fig, '-f', 'pen', '-o', pen])).exitCode).toBe(0)
+
+    const script = `
+      const page = figma.currentPage
+      page.children[0].name = 'Renamed'
+    `
+    expect((await cli(['eval', pen, '--stdin', '-w', '-q'], script)).exitCode).toBe(0)
+
+    const written = await readFile(pen, 'utf-8')
+    expect(written.trimStart().startsWith('{')).toBe(true)
+    expect(written).toContain('Renamed')
+    expect((await cli(['info', pen])).exitCode).toBe(0)
+  })
+})

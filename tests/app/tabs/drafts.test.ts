@@ -16,7 +16,11 @@ import {
   closeTab,
   createHomeTab,
   createTab,
+  getActiveTabId,
   getTabById,
+  getTabForStore,
+  getTabsSnapshot,
+  openNewFileTab,
   restoreRecoverySnapshot,
   tabCount
 } from '@/app/tabs'
@@ -109,6 +113,43 @@ describe('opening drafts', () => {
     const count = tabCount()
     expect(await openDraftInTab('kept')).toBe(tab.store)
     expect(tabCount()).toBe(count)
+  })
+
+  test('opening a draft Home is holding shows that same document', async () => {
+    await keepDraft('home-held')
+    const home = getTabsSnapshot().find((tab) => tab.kind === 'home')
+    if (!home) throw new Error('Home is missing')
+    home.store.adoptDraft('home-held')
+    const count = tabCount()
+
+    const opened = await openDraftInTab('home-held')
+
+    const shown = getTabForStore(opened)
+    expect(opened).toBe(home.store)
+    expect(shown?.kind).toBe('document')
+    expect(shown?.id).toBe(home.id)
+    expect(getActiveTabId()).toBe(home.id)
+    expect(getTabsSnapshot().some((tab) => tab.kind === 'home')).toBe(true)
+    expect(tabCount()).toBe(count + 1)
+    expect(await readDraft('home-held')).not.toBeNull()
+
+    expect(await openDraftInTab('home-held')).toBe(opened)
+    expect(tabCount()).toBe(count + 1)
+  })
+
+  test('opening a draft a New file tab is holding shows that tab as the document', async () => {
+    await keepDraft('new-file-held')
+    const tab = openNewFileTab()
+    tab.store.adoptDraft('new-file-held')
+    const count = tabCount()
+
+    const opened = await openDraftInTab('new-file-held')
+
+    expect(opened).toBe(tab.store)
+    expect(getTabForStore(opened)?.kind).toBe('document')
+    expect(getActiveTabId()).toBe(tab.id)
+    expect(tabCount()).toBe(count)
+    expect(await readDraft('new-file-held')).not.toBeNull()
   })
 
   test('a document opening never takes the place of an unchanged draft', async () => {

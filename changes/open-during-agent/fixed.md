@@ -1,0 +1,1 @@
+- Opening a draft an agent edited while Home was in front shows that document, and the agent keeps editing the same tab.

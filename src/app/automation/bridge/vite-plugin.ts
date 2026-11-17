@@ -1,9 +1,8 @@
 import type { ChildProcess } from 'node:child_process'
 import { spawn } from 'node:child_process'
-import { createHash, randomUUID } from 'node:crypto'
+import { randomUUID } from 'node:crypto'
 import { mkdir } from 'node:fs/promises'
 import type { IncomingMessage } from 'node:http'
-import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { Readable } from 'node:stream'
 
@@ -22,6 +21,7 @@ import {
 } from '../mcp/dev-control'
 import type { RestartPolicyOptions } from '../restart-policy'
 import { waitForChildReady } from './child-ready'
+import { devMCPDiscoveryPath, devMCPRuntimeDirectory } from './discovery-path'
 import { createRestartScheduler } from './restart-scheduler'
 
 /**
@@ -180,10 +180,6 @@ interface AutomationPluginOptions {
   spawnProcess?: SpawnMCPProcess
 }
 
-function safeRuntimeId(value: string): string {
-  return createHash('sha256').update(value).digest('hex').slice(0, 16)
-}
-
 export function configurationsMatch(
   current: DevMCPConfiguration,
   next: DevMCPConfiguration
@@ -269,10 +265,10 @@ export function automationPlugin(
   }
 
   async function startChild(): Promise<void> {
-    const runtimeDir = join(tmpdir(), 'pairdraw-mcp', safeRuntimeId(options.runtimeId))
+    const runtimeDir = devMCPRuntimeDirectory(options.runtimeId)
     await mkdir(runtimeDir, { recursive: true, mode: 0o700 })
     const socketPath = platformHasUnixSockets() ? join(runtimeDir, 'mcp.sock') : null
-    const discoveryPath = join(runtimeDir, 'mcp.json')
+    const discoveryPath = devMCPDiscoveryPath(options.runtimeId)
     const command = ['bun', 'run', 'packages/mcp/src/index.ts']
     const spawnCommand = options.portlessServiceName ? 'portless' : command[0]
     const spawnArgs = options.portlessServiceName

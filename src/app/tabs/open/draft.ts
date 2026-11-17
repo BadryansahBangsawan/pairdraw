@@ -3,18 +3,30 @@ import { recoveryMessages } from '@pairdraw/vue/i18n'
 import { deleteDraft, readDraft, touchDraft } from '@/app/document/drafts'
 import type { EditorStore } from '@/app/editor/session'
 import { saveDocumentCopy, type DocumentCopyResult } from '@/app/home/save-copy'
-import { closeTab, getTabsSnapshot, openKeptDocument, switchTab, type Tab } from '@/app/tabs'
+import {
+  closeTab,
+  getTabsSnapshot,
+  openKeptDocument,
+  showHeldDocument,
+  switchTab,
+  type Tab
+} from '@/app/tabs'
 
 function findDraftTab(id: string): Tab | undefined {
   return getTabsSnapshot().find((tab) => tab.store.getDraftId() === id)
 }
 
-/** Opens a draft from Home, or switches to the tab already showing it. */
+/**
+ * Opens a draft from Home, or switches to the document tab already showing it. Home and a New
+ * file tab hold a store, but the canvas mounts only for a document tab, so a draft kept there
+ * is presented as one instead of switching back to a view with no editor.
+ */
 export async function openDraftInTab(id: string): Promise<EditorStore> {
   const open = findDraftTab(id)
   if (open) {
-    switchTab(open.id)
-    return open.store
+    const shown = showHeldDocument(open)
+    switchTab(shown.id)
+    return shown.store
   }
   const draft = await readDraft(id)
   if (!draft) throw new Error(recoveryMessages.get().draftUnavailable)

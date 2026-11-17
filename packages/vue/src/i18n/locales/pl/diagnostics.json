@@ -22,6 +22,7 @@
   "documentFailed": "Operacja dokumentu nie powiodła się",
   "acpFailed": "Transport ACP nie powiódł się",
   "mcpFailed": "Połączenie MCP nie powiodło się",
+  "mcpServerExited": "Serwer MCP zakończył działanie",
   "retention": "Retencja diagnostyki",
   "retentionDescription": "Zachowuj lokalnie do tej liczby ostatnich zdarzeń.",
   "description": "Zapisuj lokalnie zdarzenia techniczne, aby ułatwić rozwiązywanie problemów z Pairdraw. Prompty, zawartość projektu, dane logowania i klucze API są wykluczone.",

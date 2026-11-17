@@ -25,6 +25,7 @@ export type DiagnosticEventName =
   | 'document.operation.failed'
   | 'storage.operation.failed'
   | 'mcp.connection.failed'
+  | 'mcp.server.exited'
   | 'acp.transport.failed'
 
 export type DiagnosticEvent = {

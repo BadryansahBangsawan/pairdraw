@@ -73,6 +73,25 @@ describe('diagnostic event summaries', () => {
     ],
     [
       {
+        name: 'mcp.server.exited',
+        category: 'mcp' as const,
+        level: 'warning' as const,
+        attributes: { code: 0, signal: null, intentional: false }
+      },
+      'MCP server exited',
+      'code=0'
+    ],
+    [
+      {
+        name: 'mcp.server.exited',
+        category: 'mcp' as const,
+        attributes: { code: null, signal: 15, intentional: true }
+      },
+      'MCP server exited',
+      'stopped by the app'
+    ],
+    [
+      {
         name: 'runtime.error',
         category: 'runtime' as const,
         level: 'error' as const,

@@ -28,6 +28,24 @@ export function recordMCPConnectionFailure(input: v.InferOutput<typeof mcpFailur
   } satisfies DiagnosticEventInput)
 }
 
+const mcpServerExitSchema = v.object({
+  code: v.nullable(v.pipe(v.number(), v.integer())),
+  signal: v.nullable(v.pipe(v.number(), v.integer())),
+  /** Whether the app closed the server on purpose, such as while restarting it. */
+  intentional: v.boolean()
+})
+
+export function recordMCPServerExit(input: v.InferOutput<typeof mcpServerExitSchema>): void {
+  const parsed = v.safeParse(mcpServerExitSchema, input)
+  if (!parsed.success) return
+  recordDiagnostic({
+    category: 'mcp',
+    level: parsed.output.intentional ? 'info' : 'warning',
+    name: 'mcp.server.exited',
+    attributes: parsed.output
+  } satisfies DiagnosticEventInput)
+}
+
 export function recordACPTransportFailure(input: v.InferOutput<typeof acpFailureSchema>): void {
   const parsed = v.safeParse(acpFailureSchema, input)
   if (!parsed.success) return

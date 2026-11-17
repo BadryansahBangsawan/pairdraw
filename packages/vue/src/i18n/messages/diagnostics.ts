@@ -22,6 +22,7 @@ export const diagnosticsMessageDefaults = {
   documentFailed: 'Document operation failed',
   acpFailed: 'ACP transport failed',
   mcpFailed: 'MCP connection failed',
+  mcpServerExited: 'MCP server exited',
   modelStep: params('Model step · {model}'),
   modelStepTokens: params('{input} in · {output} out tokens'),
   toolCompleted: params('Tool: {tool}'),

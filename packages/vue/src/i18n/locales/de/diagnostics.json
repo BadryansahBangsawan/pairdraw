@@ -22,6 +22,7 @@
   "documentFailed": "Dokumentvorgang fehlgeschlagen",
   "acpFailed": "ACP-Transport fehlgeschlagen",
   "mcpFailed": "MCP-Verbindung fehlgeschlagen",
+  "mcpServerExited": "MCP-Server beendet",
   "retention": "Aufbewahrungsdauer der Diagnose",
   "retentionDescription": "Bis zu dieser Anzahl aktueller Ereignisse lokal speichern.",
   "description": "Technische Ereignisse lokal speichern, um Pairdraw zu unterstützen. Prompts, Designinhalte, Zugangsdaten und API-Schlüssel werden ausgeschlossen.",

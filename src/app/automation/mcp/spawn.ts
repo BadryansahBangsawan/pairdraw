@@ -12,6 +12,7 @@ import {
 import { randomHex } from '@pairdraw/scene-graph/random'
 
 import { companion, type CompanionConnection } from '@/app/automation/companion/connection'
+import { recordMCPServerExit } from '@/app/diagnostics/events'
 import { APP_VERSION } from '@/app/runtime/version'
 import { decodeTauriStderr } from '@/app/shell/ui'
 import { resolvePlatformCommand } from '@/app/tauri/command'
@@ -587,12 +588,21 @@ async function startMCPIfNeeded(timing: MCPStartupTiming): Promise<AutomationSer
   })
 
   let spawnedToken: string | null = null
+  /** Whether the app asked for this exit, such as when restarting or stopping the server. */
+  let stopping = false
+  /** Whether this child answered health, so a later exit is the server going away. */
+  let started = false
   let child: Awaited<ReturnType<typeof command.spawn>>
   const childClosed = new Promise<{ code: number | null; signal: number | null }>((resolve) => {
     command.on('close', (event) => {
       resolve(event)
       if (spawnedToken && runtimeAutomationAuthToken === spawnedToken) {
         runtimeAutomationAuthToken = null
+      }
+      // Without this, nothing records why the app's server went away: it cleans up its socket
+      // and discovery file, so a later investigation has no exit code or signal to start from.
+      if (started) {
+        recordMCPServerExit({ code: event.code, signal: event.signal, intentional: stopping })
       }
     })
   })
@@ -628,8 +638,10 @@ async function startMCPIfNeeded(timing: MCPStartupTiming): Promise<AutomationSer
       runtimeAutomationAuthToken = token
       runtimeAutomationStartupError = null
       runtimeAutomationStartupFailure = null
+      started = true
       return {
         disconnect: async () => {
+          stopping = true
           await child.kill().catch((e) => {
             console.error('[MCP] Failed to kill server:', e)
           })

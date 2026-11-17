@@ -1,3 +1,5 @@
+import { compact } from 'es-toolkit/array'
+
 import type { EditorPreparationKind } from '@/app/editor/preparation/types'
 
 import type {
@@ -29,6 +31,7 @@ export interface DiagnosticLabels {
   documentFailed: string
   acpFailed: string
   mcpFailed: string
+  mcpServerExited: string
   modelStep: (values: { model: string }) => string
   modelStepTokens: (values: { input: string; output: string }) => string
   toolCompleted: (values: { tool: string }) => string
@@ -50,6 +53,14 @@ export interface DiagnosticLabels {
 
 function text(value: DiagnosticValue | undefined): string | null {
   return value === undefined || value === null || value === '' ? null : String(value)
+}
+
+/** How the server stopped: the exit code, the signal, or that the app closed it on purpose. */
+function exitDetail(attributes: DiagnosticAttributes): string | null {
+  if (attributes.intentional === true) return 'stopped by the app'
+  const code = text(attributes.code)
+  const signal = text(attributes.signal)
+  return compact([code && `code=${code}`, signal && `signal=${signal}`]).join(' ') || null
 }
 
 /** `errorName: message`, or whichever of the two was recorded. */
@@ -143,7 +154,8 @@ const DESCRIBE: Record<DiagnosticEventName, Describe> = {
     errorDetail(attributes)
   ],
   'acp.transport.failed': (attributes, labels) => [labels.acpFailed, errorDetail(attributes)],
-  'mcp.connection.failed': (attributes, labels) => [labels.mcpFailed, errorDetail(attributes)]
+  'mcp.connection.failed': (attributes, labels) => [labels.mcpFailed, errorDetail(attributes)],
+  'mcp.server.exited': (attributes, labels) => [labels.mcpServerExited, exitDetail(attributes)]
 }
 
 function isRecordedEventName(name: string): name is DiagnosticEventName {

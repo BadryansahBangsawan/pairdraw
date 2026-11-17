@@ -7,6 +7,7 @@ import {
   readAutomationHealth,
   spawnMCPIfNeeded
 } from '@/app/automation/mcp/spawn'
+import { diagnostics } from '@/app/diagnostics'
 
 import { fetchStub } from '#tests/helpers/fetch'
 import { clearTauriMocks, installTauriMockWindow, mockTauriIPC } from '#tests/helpers/tauri/mocks'
@@ -356,5 +357,63 @@ describe('Tauri MCP spawning', () => {
       code: 'exited',
       detail: expect.stringContaining('code=3')
     })
+  })
+
+  test('records why an app-owned server exited after it came up', async () => {
+    installTauriMockWindow()
+    Object.assign(globalThis.window, { location: { origin: 'tauri://localhost' } })
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { platform: 'MacIntel', userAgent: 'Macintosh' }
+    })
+
+    let healthChecks = 0
+    vi.spyOn(globalThis, 'fetch').mockImplementation(
+      fetchStub(async () => {
+        healthChecks += 1
+        if (healthChecks === 1) return new Response('', { status: 404 })
+        return new Response(
+          JSON.stringify({
+            status: 'ok',
+            version: '0.0.0-test',
+            authRequired: true,
+            discoveryPath: DISCOVERY_PATH
+          }),
+          { status: 200 }
+        )
+      })
+    )
+
+    const spawned: { onEvent: ((event: unknown) => void) | null } = { onEvent: null }
+    await mockTauriIPC((cmd, args) => {
+      if (cmd === 'mcp_lookup')
+        return { available: true, path: '/mock/bin/pairdraw-mcp-http', searched: ['/mock/bin'] }
+      if (cmd === 'plugin:shell|spawn') {
+        spawned.onEvent = (
+          args as { onEvent: { onmessage: (event: unknown) => void } }
+        ).onEvent.onmessage
+        return 91
+      }
+      const pathArg = (args as { path?: string })?.path
+      if (cmd === 'plugin:fs|exists') return pathArg === DISCOVERY_PATH
+      if (cmd === 'plugin:fs|read_text_file') {
+        return pathArg === DISCOVERY_PATH ? new TextEncoder().encode(DISCOVERY_JSON) : null
+      }
+      if (cmd === 'plugin:path|resolve_directory') return '/mock/home'
+      return null
+    })
+
+    const handle = await spawnMCPIfNeeded({ earlyExitMs: 5, healthPollMs: 5 })
+    expect(handle).not.toBeNull()
+    const before = diagnostics.recent().length
+    spawned.onEvent?.({ event: 'Terminated', payload: { code: 0, signal: null } })
+    expect(diagnostics.recent().length).toBe(before + 1)
+    expect(diagnostics.recent()[0]).toMatchObject({
+      category: 'mcp',
+      name: 'mcp.server.exited',
+      level: 'warning',
+      attributes: { code: 0, signal: null, intentional: false }
+    })
+    await handle?.disconnect()
   })
 })

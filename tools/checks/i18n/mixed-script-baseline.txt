@@ -114,7 +114,6 @@ ja:automation.mcpFailurePermissionHint
 ja:automation.mcpFailureRejected
 ja:automation.mcpFailureRejectedHint
 ja:automation.mcpFailureRestartExhausted
-ja:automation.mcpFailureRestartExhaustedHint
 ja:automation.mcpFailureTimeout
 ja:automation.mcpFailureUnknown
 ja:automation.mcpFailureUnreachable
@@ -161,6 +160,7 @@ ja:diagnostics.chatStopped
 ja:diagnostics.description
 ja:diagnostics.eventCount
 ja:diagnostics.mcpFailed
+ja:diagnostics.mcpServerExited
 ja:diagnostics.preparationDomImport
 ja:diagnostics.usageDescription
 ja:diagnostics.usageHistoryDescription
@@ -347,7 +347,6 @@ zh-cn:automation.mcpFailurePermissionHint
 zh-cn:automation.mcpFailureRejected
 zh-cn:automation.mcpFailureRejectedHint
 zh-cn:automation.mcpFailureRestartExhausted
-zh-cn:automation.mcpFailureRestartExhaustedHint
 zh-cn:automation.mcpFailureTimeout
 zh-cn:automation.mcpFailureUnknown
 zh-cn:automation.mcpFailureUnreachable
@@ -394,6 +393,7 @@ zh-cn:diagnostics.chatStopped
 zh-cn:diagnostics.description
 zh-cn:diagnostics.eventCount
 zh-cn:diagnostics.mcpFailed
+zh-cn:diagnostics.mcpServerExited
 zh-cn:diagnostics.preparationDomImport
 zh-cn:diagnostics.usageDescription
 zh-cn:diagnostics.usageHistoryDescription

@@ -34,8 +34,11 @@ export function withStdinValues(argv: string[]): string[] {
   return normalized
 }
 
-/** The one subcommand that reads positionals no argument claims: `export storybook` takes files. */
-const VARIADIC_COMMAND = 'storybook'
+/**
+ * Commands that read positionals no argument claims: `export` takes several files for storybook,
+ * and `export storybook` is the subcommand that documents them. `export` checks its own extras.
+ */
+const VARIADIC_COMMANDS = new Set(['export', 'storybook'])
 
 /** A command this file defines directly, rather than one a module resolves on demand. */
 function isCommand(value: unknown): value is CommandDef {
@@ -54,7 +57,7 @@ function refuseExtraPositionals(command: CommandDef): void {
     const name =
       meta && !(meta instanceof Promise) && typeof meta !== 'function' ? meta.name : undefined
     const run = command.run
-    if (run && name !== VARIADIC_COMMAND) {
+    if (run && !VARIADIC_COMMANDS.has(name ?? '')) {
       command.run = (context) => {
         const extra = context.args._.slice(declared)
         if (extra.length > 0) {

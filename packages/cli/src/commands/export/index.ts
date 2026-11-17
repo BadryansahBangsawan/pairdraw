@@ -407,6 +407,10 @@ export default defineCommand({
   },
   async run({ args }) {
     const format = args.format.toUpperCase()
+    // Storybook takes the files a shell expanded; every other export writes one document.
+    if (format !== 'STORYBOOK' && args._.length > 1) {
+      throw new Error(`Unexpected argument: ${args._.slice(1).join(' ')}`)
+    }
     if (!ALL_FORMATS.has(format)) {
       printError(`Invalid format "${args.format}". Use ${FORMAT_LIST}.`)
       process.exit(1)

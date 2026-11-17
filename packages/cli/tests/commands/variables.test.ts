@@ -56,4 +56,16 @@ describe('variables', () => {
       totalCollections: 1
     })
   })
+
+  test('writes JSON when the document has no variables', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-variables-empty-'))
+    const html = join(dir, 'card.html')
+    const file = join(dir, 'card.fig')
+    await writeFile(html, '<div style="width:100px;height:40px;background:#000"></div>')
+    expect((await cli(['import', html, '-o', file])).exitCode).toBe(0)
+
+    const result = await cli(['variables', file, '--json'])
+
+    expect(parseJSON(result.stdout, totalsSchema)).toEqual({ totalVariables: 0, totalCollections: 0 })
+  })
 })

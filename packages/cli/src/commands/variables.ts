@@ -33,13 +33,13 @@ export default defineCommand({
       args
     )
 
-    if (data.totalVariables === 0) {
-      console.log('No variables found.')
+    if (args.json) {
+      console.log(JSON.stringify(data, null, 2))
       return
     }
 
-    if (args.json) {
-      console.log(JSON.stringify(data, null, 2))
+    if (data.totalVariables === 0) {
+      console.log('No variables found.')
       return
     }
 

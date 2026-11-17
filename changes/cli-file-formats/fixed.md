@@ -5,3 +5,4 @@
 - A `.pen` roundtrip keeps the page name instead of replacing it with the first layer's.
 - Printing tokens says which variable took a numbered custom property name because another token's name collides with it.
 - `pairdraw variables` counts the variables its filters leave, not the whole document.
+- `pairdraw variables --json` writes JSON for a document without variables instead of a sentence.

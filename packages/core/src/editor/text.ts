@@ -13,7 +13,7 @@ import { hasGlyphOutlines } from '#core/text/font/glyphs'
 
 import { applyBoundTextEdit } from './components/authoring/text-edit'
 import { fitEmptyLabelToPlaceholder } from './connectors/label-edit'
-import { applyGeneratedTextNameEdit } from './text/name'
+import { applyTextNameEdit } from './text/name'
 import { pathTextEditChanges } from './text/path-edit'
 import {
   createTextEditSession,
@@ -216,7 +216,7 @@ export function createTextActions(ctx: EditorContext) {
         if (node && 'text' in node.boundVariables)
           variableBindings.unbindVariable(result.nodeId, 'text')
         applyBoundTextEdit(ctx, result.nodeId, after.text)
-        applyGeneratedTextNameEdit(ctx, result.nodeId, after.text)
+        applyTextNameEdit(ctx, result.nodeId, after.text)
       }
     })
   }

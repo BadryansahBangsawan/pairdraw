@@ -15,6 +15,17 @@ describe('text', () => {
     expect(text.characters).toBe('Hello World')
   })
 
+  test('a text layer named by its characters stops following them once renamed', () => {
+    const api = createAPI()
+    const text = api.createText()
+    text.characters = '  Inside frame\nsecond line '
+    expect(text.name).toBe('Inside frame second line')
+    text.name = 'Heading'
+    expect(text.autoRename).toBe(false)
+    text.characters = 'Changed'
+    expect(text.name).toBe('Heading')
+  })
+
   test('fontSize get/set', () => {
     const api = createAPI()
     const text = api.createText()

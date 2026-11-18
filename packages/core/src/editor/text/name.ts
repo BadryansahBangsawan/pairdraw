@@ -1,3 +1,6 @@
+import { compact } from 'es-toolkit/array'
+
+import type { NodeType, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   generatedFrameKind,
   generatedFrameOwner,
@@ -8,23 +11,64 @@ import { defaultNodeName } from '#core/editor/structure/rename'
 import type { EditorContext } from '#core/editor/types'
 
 /**
- * Typing in the text a generated frame is named by, such as a sticky note's body or a shape's
- * label, renames a frame that was never renamed, as FigJam does; emptied, it takes its type's
- * name back. The caller records the text edit; this records the rename beside it.
+ * Whether a layer's name follows the text it holds: a text layer, or a frame a shape or sticky
+ * note is named by, as FigJam does.
  */
-export function applyGeneratedTextNameEdit(
+export function namedByText(node: SceneNode): boolean {
+  return node.type === 'TEXT' || (generatedFrameKind(node)?.namedByText ?? false)
+}
+
+/** The name a layer takes from its text, as Figma shows it: trimmed, on one line. */
+export function textLayerName(type: NodeType, text: string): string {
+  const lines = compact(text.split(/\r\n|\r|\n/).map((line) => line.trim()))
+  return lines.join(' ') || defaultNodeName(type)
+}
+
+/** The layer whose name a text edit to `nodeId` decides, or null when it decides none. */
+function textNamedLayer(graph: SceneGraph, nodeId: string): SceneNode | null {
+  const node = graph.getNode(nodeId)
+  if (!node) return null
+  const frame = generatedFrameOwner(graph, node)
+  if (frame) {
+    if (!generatedFrameKind(frame)?.namedByText) return null
+    return generatedFrameText(graph, frame)?.id === nodeId ? frame : null
+  }
+  return node.type === 'TEXT' ? node : null
+}
+
+/** The rename `text` gives the layer at `nodeId`, or null when the layer keeps its name. */
+function textRename(
+  graph: SceneGraph,
+  nodeId: string,
+  text: string
+): { id: string; name: string } | null {
+  const layer = textNamedLayer(graph, nodeId)
+  if (!layer?.autoRename) return null
+  const name = textLayerName(layer.type, text)
+  return name === layer.name ? null : { id: layer.id, name }
+}
+
+/**
+ * Typing in a text layer, or in the text a shape or sticky note is named by, renames that layer
+ * while it was never renamed, as Figma does; emptied, it takes its type's name back. The caller
+ * records the text edit; this records the rename beside it.
+ */
+export function applyTextNameEdit(
   ctx: Pick<EditorContext, 'graph' | 'undo'>,
   nodeId: string,
   text: string
 ): void {
-  const node = ctx.graph.getNode(nodeId)
-  const frame = node && generatedFrameOwner(ctx.graph, node)
-  if (!frame?.autoRename || !generatedFrameKind(frame)?.namedByText) return
-  if (generatedFrameText(ctx.graph, frame)?.id !== nodeId) return
-  const before = frame.name
-  const after = text.trim() === '' ? defaultNodeName(frame.type) : text
-  if (before === after) return
-  const rename = (name: string) => () => ctx.graph.updateNode(frame.id, { name })
-  rename(after)()
-  ctx.undo.push({ label: 'Rename', forward: rename(after), inverse: rename(before) })
+  const rename = textRename(ctx.graph, nodeId, text)
+  if (!rename) return
+  const before = ctx.graph.getNode(rename.id)?.name
+  if (before === undefined) return
+  const apply = (name: string) => () => ctx.graph.updateNode(rename.id, { name })
+  apply(rename.name)()
+  ctx.undo.push({ label: 'Rename', forward: apply(rename.name), inverse: apply(before) })
+}
+
+/** The same rename for a text set the way the Plugin API sets it, which records no undo step. */
+export function renameTextLayer(graph: SceneGraph, nodeId: string, text: string): void {
+  const rename = textRename(graph, nodeId, text)
+  if (rename) graph.updateNode(rename.id, { name: rename.name })
 }

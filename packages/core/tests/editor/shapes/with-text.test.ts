@@ -8,7 +8,7 @@ import { colorToHex } from '@pairdraw/scene-graph/color'
 import { shapeWithTextLabel } from '@pairdraw/scene-graph/generated'
 import { lineHeightPixels } from '@pairdraw/scene-graph/text'
 
-import { applyGeneratedTextNameEdit } from '#core/editor/text/name'
+import { applyTextNameEdit } from '#core/editor/text/name'
 
 function setup() {
   const editor = createEditor({ loadFont: () => Promise.resolve(null) })
@@ -55,9 +55,9 @@ describe('shapes with text in the editor', () => {
     const id = editor.createShape('SHAPE_WITH_TEXT', 0, 0, 176, 176, pageId)
     const shape = expectDefined(editor.graph.getNode(id))
     const label = expectDefined(shapeWithTextLabel(editor.graph, shape))
-    applyGeneratedTextNameEdit(editor, label.id, 'Valid?')
+    applyTextNameEdit(editor, label.id, 'Valid?')
     expect(editor.graph.getNode(id)?.name).toBe('Valid?')
-    applyGeneratedTextNameEdit(editor, label.id, '')
+    applyTextNameEdit(editor, label.id, '')
     expect(editor.graph.getNode(id)?.name).toBe('Shape with text')
   })
 

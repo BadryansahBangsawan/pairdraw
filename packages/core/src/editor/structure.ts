@@ -2,7 +2,6 @@ import { pick } from 'es-toolkit'
 
 import type { SceneNode } from '@pairdraw/scene-graph'
 import { TRANSFORM_FIELDS } from '@pairdraw/scene-graph/fields'
-import { generatedFrameKind } from '@pairdraw/scene-graph/generated'
 import { createsComponentCycle } from '@pairdraw/scene-graph/instances'
 
 import { acceptingParent, acceptsChildren, prepareSlotEdits } from '#core/editor/components/slots'
@@ -25,6 +24,7 @@ import {
 } from './structure/rename'
 import { createStructureReorderActions } from './structure/reorder'
 import { createStructureStateActions } from './structure/state'
+import { namedByText } from './text/name'
 import type { EditorContext } from './types'
 
 export function createStructureActions(ctx: EditorContext) {
@@ -155,17 +155,29 @@ export function createStructureActions(ctx: EditorContext) {
   function renameSelected(options: RenameSelectionOptions) {
     const nodes = selectedNodes()
     if (nodes.length === 0) return
-    const before = new Map(nodes.map((node) => [node.id, node.name]))
     const preview = previewRenamedNodes(nodes, options)
     if (preview.error) return
-    const applyNames = (names: ReadonlyMap<string, string>) => {
-      for (const [id, nextName] of names) ctx.graph.updateNode(id, { name: nextName })
+    const before = new Map(
+      nodes.map((node) => [node.id, { name: node.name, autoRename: node.autoRename }])
+    )
+    // A layer named by its text keeps the name it is given, as in Figma.
+    const names = new Map(
+      nodes.map((node) => [
+        node.id,
+        {
+          name: preview.names.get(node.id) ?? node.name,
+          autoRename: namedByText(node) ? false : node.autoRename
+        }
+      ])
+    )
+    const applyNames = (values: ReadonlyMap<string, { name: string; autoRename: boolean }>) => {
+      for (const [id, next] of values) ctx.graph.updateNode(id, next)
     }
 
-    applyNames(preview.names)
+    applyNames(names)
     ctx.undo.push({
       label: 'Rename selection',
-      forward: () => applyNames(preview.names),
+      forward: () => applyNames(names),
       inverse: () => applyNames(before)
     })
   }
@@ -176,9 +188,9 @@ export function createStructureActions(ctx: EditorContext) {
     const previous = { name: node.name, autoRename: node.autoRename }
     const next = name.trim() || defaultNodeName(node.type)
     if (next === previous.name) return
-    // A layer named by its text, as a sticky note is, keeps the name it is given, as in FigJam.
-    const namedByText = generatedFrameKind(node)?.namedByText ?? false
-    const renamed = { name: next, autoRename: namedByText ? false : node.autoRename }
+    // A layer named by its text, as a text layer or a sticky note is, keeps the name it is
+    // given, as in Figma.
+    const renamed = { name: next, autoRename: namedByText(node) ? false : node.autoRename }
     ctx.graph.updateNode(id, renamed)
     ctx.undo.push({
       label: 'Rename',

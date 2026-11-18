@@ -1,0 +1,1 @@
+- A text layer is named by its characters, trimmed to one line, until it is renamed; renaming it keeps that name through later edits, as in Figma.

@@ -6,7 +6,7 @@ import type { SceneNode } from '@pairdraw/scene-graph'
 import { STICKY_COLORS, stickySublayers } from '@pairdraw/scene-graph/generated'
 import { lineHeightPixels, percentLength } from '@pairdraw/scene-graph/text'
 
-import { applyGeneratedTextNameEdit } from '#core/editor/text/name'
+import { applyTextNameEdit } from '#core/editor/text/name'
 
 import { expectDefined } from '../helpers/assert'
 
@@ -110,12 +110,12 @@ describe('sticky notes', () => {
     const { editor, pageId } = setup()
     const sticky = editor.createStickyNote(pageId, { x: 0, y: 0 })
     const { body, author } = sublayers(editor, sticky)
-    applyGeneratedTextNameEdit(editor, body.id, 'Hello')
+    applyTextNameEdit(editor, body.id, 'Hello')
     expect(editor.graph.getNode(sticky.id)?.name).toBe('Hello')
-    applyGeneratedTextNameEdit(editor, author.id, 'Someone')
+    applyTextNameEdit(editor, author.id, 'Someone')
     expect(editor.graph.getNode(sticky.id)?.name).toBe('Hello')
     editor.renameNode(sticky.id, 'Kept')
-    applyGeneratedTextNameEdit(editor, body.id, 'Changed')
+    applyTextNameEdit(editor, body.id, 'Changed')
     expect(editor.graph.getNode(sticky.id)?.name).toBe('Kept')
     editor.undo.undo()
     expect(editor.graph.getNode(sticky.id)?.autoRename).toBe(true)

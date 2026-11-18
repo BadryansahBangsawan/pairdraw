@@ -16,6 +16,7 @@ import { rescaleNodeTree } from '@pairdraw/scene-graph/scaling'
 import { slotPropertyId } from '@pairdraw/scene-graph/slots'
 
 import { assertNodeEditable } from '#core/editor/capabilities'
+import { namedByText } from '#core/editor/text/name'
 import {
   prepareFollowedFieldEdit,
   fitGroupsAround,
@@ -112,7 +113,12 @@ export function installBasicNodeProxyAccessors(
         return raw(this, internals).name
       },
       set(this: ProxyThis, value: string) {
-        updateNode(this, internals, { name: value })
+        // Naming a layer whose name followed its text stops it following, as in Figma.
+        const node = raw(this, internals)
+        updateNode(this, internals, {
+          name: value,
+          ...(namedByText(node) ? { autoRename: false } : {})
+        })
         // A variant's name holds its values, which the set's value lists follow.
         syncVariantName(graph(this, internals), raw(this, internals))
       }

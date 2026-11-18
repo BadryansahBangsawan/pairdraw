@@ -5,8 +5,10 @@ import type {
   TextParagraphSpacingField
 } from '@pairdraw/scene-graph'
 
+import { renameTextLayer } from '#core/editor/text/name'
 import {
   graph,
+  nodeId,
   raw,
   updateNode,
   type NodeProxyInternals,
@@ -110,6 +112,8 @@ export function installTextNodeProxyAccessors(
         const textParagraphs = paragraphStylesForCharacters(raw(this, internals), value)
         const styleRuns = styleRunsForCharacters(raw(this, internals), value)
         updateNode(this, internals, { text: value, textParagraphs, styleRuns })
+        // A text layer that was never renamed follows its characters, as in Figma.
+        renameTextLayer(graph(this, internals), nodeId(this, internals), value)
       }
     },
     // The new font replaces every character's, so only it has to be loaded, as in Figma.

@@ -12,3 +12,8 @@ export const heavy = describe.if(runsHeavyTests)
 // Default per-test timeout in CI is often too short for fixture I/O tests that parse/export
 // real .fig files. Use this timeout for tests that are bounded by fixture parsing speed.
 export const HEAVY_TEST_TIMEOUT_MS = 30_000
+
+// Exporting or reopening a whole large document reads every page on both sides. That is the
+// budget `test:unit:heavy` gives each heavy file, so a test that does it has room under the
+// machine load of a shared run.
+export const HEAVY_DOCUMENT_TIMEOUT_MS = 180_000

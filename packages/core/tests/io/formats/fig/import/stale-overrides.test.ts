@@ -1,9 +1,13 @@
 import { afterEach, expect, test } from 'bun:test'
 
 import { readFixtureArrayBuffer } from '#core-tests/helpers/fig/fixtures'
-import { HEAVY_TEST_TIMEOUT_MS, runsHeavyTests } from '#core-tests/helpers/test-utils'
+import {
+  HEAVY_DOCUMENT_TIMEOUT_MS,
+  HEAVY_TEST_TIMEOUT_MS,
+  runsHeavyTests
+} from '#core-tests/helpers/test-utils'
 
-import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { exportFigFile } from '@pairdraw/core/io/formats/fig'
 import { parseFigBuffer } from '@pairdraw/fig'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
 
@@ -17,11 +21,16 @@ afterEach(() => {
 })
 
 // material3.fig retains overrides on 58114:20598 that address 57994:10133, a node the
-// archive no longer contains. Figma keeps such records; opening the file must not.
+// archive no longer contains. Figma keeps such records; opening the file must not. They are
+// recorded on the Examples page, so load that page rather than all thirty-three: reading the
+// whole document takes twenty seconds of fixture work to check three records.
 test.if(runsHeavyTests)(
   'opening a file skips overrides against deleted nodes and reports them',
   () => {
-    const reader = openReaderSession(readFixtureArrayBuffer('material3.fig'), 'all')
+    const reader = openReaderSession(readFixtureArrayBuffer('material3.fig'), 'none')
+    const page = reader.pages.find((candidate) => candidate.name === 'Examples')
+    if (!page) throw new Error('material3.fig has no Examples page')
+    reader.populate(page.sourceId)
     const stale = reader.diagnostics.filter(
       (entry) =>
         (entry.kind === 'property' || entry.kind === 'assignment') &&
@@ -48,9 +57,20 @@ async function exportEditedDocument(): Promise<{ bytes: Uint8Array; orphanCount:
   return { bytes, orphanCount: orphans.length }
 }
 
-async function reopenedPageNames(bytes: Uint8Array): Promise<string[]> {
-  const reopened = await parseFigFile(bytes.slice().buffer as ArrayBuffer)
-  return reopened.getPages().map((node) => node.name)
+// Reopening reads the page manifest and builds only the Internal Only Canvas, not the thirty-
+// three pages' graphs. That is the page whose instances of deleted components must survive.
+function reopenedDocument(bytes: Uint8Array): {
+  pageNames: string[]
+  orphanInstances: number
+} {
+  const reopened = openReaderSession(bytes.slice().buffer as ArrayBuffer, 'none')
+  const internal = reopened.pages.find((page) => page.internalOnly)
+  if (!internal) throw new Error('the export has no Internal Only Canvas')
+  reopened.populate(internal.sourceId)
+  const orphans = [...reopened.graph.getAllNodes()].filter(
+    (node) => node.type === 'INSTANCE' && node.componentId === null
+  )
+  return { pageNames: reopened.pages.map((page) => page.name), orphanInstances: orphans.length }
 }
 
 function exportedOrphanCount(bytes: Uint8Array): number {
@@ -64,10 +84,12 @@ test.if(runsHeavyTests)(
     const { bytes, orphanCount } = await exportEditedDocument()
     expect(orphanCount).toBeGreaterThan(0)
     Bun.gc(true)
-    expect(await reopenedPageNames(bytes)).toContain('Edited page')
+    const reopened = reopenedDocument(bytes)
+    expect(reopened.pageNames).toContain('Edited page')
+    // The instances of deleted components are still there, with no component to point at.
+    expect(reopened.orphanInstances).toBe(orphanCount)
     Bun.gc(true)
-    // Each orphan is still an instance record, with no component to point at.
     expect(exportedOrphanCount(bytes)).toBe(orphanCount)
   },
-  HEAVY_TEST_TIMEOUT_MS * 4
+  HEAVY_DOCUMENT_TIMEOUT_MS
 )

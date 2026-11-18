@@ -8,7 +8,7 @@ import type { JSONObject } from '@pairdraw/scene-graph/primitives'
 
 import { expectDefined } from '#tests/helpers/assert'
 import { parseFixture } from '#tests/helpers/fig/fixtures'
-import { runsHeavyTests } from '#tests/helpers/test-utils'
+import { HEAVY_DOCUMENT_TIMEOUT_MS, runsHeavyTests } from '#tests/helpers/test-utils'
 
 setDefaultTimeout(60_000)
 
@@ -353,23 +353,29 @@ describe('text node export', () => {
     expect(families).toContain('Regular')
   })
 
+  // The document graph takes gigabytes, so the round trip holds one at a time: export the
+  // text counts first, release it, then open the export.
+  async function exportMaterial3Text(): Promise<{ bytes: Uint8Array; textCount: number }> {
+    const original = await parseFixture('material3.fig')
+    const textCount = [...original.getAllNodes()].filter((n) => n.type === 'TEXT').length
+    return { bytes: await exportFigFile(original), textCount }
+  }
+
   test.if(runsHeavyTests)(
     'material3.fig text nodes have derivedTextData after round-trip',
     async () => {
-      const original = await parseFixture('material3.fig')
+      const { bytes, textCount } = await exportMaterial3Text()
+      expect(textCount).toBeGreaterThan(0)
+      Bun.gc(true)
 
-      const textNodes = [...original.getAllNodes()].filter((n) => n.type === 'TEXT')
-      expect(textNodes.length).toBeGreaterThan(0)
-
-      const exported = await exportFigFile(original)
-      const reimported = await parseFigFile(exported.buffer as ArrayBuffer)
-
+      const reimported = await parseFigFile(bytes.buffer as ArrayBuffer)
       const reimportedText = [...reimported.getAllNodes()].filter((n) => n.type === 'TEXT')
-      expect(reimportedText.length).toBe(textNodes.length)
+      expect(reimportedText.length).toBe(textCount)
 
       for (const node of reimportedText.slice(0, 10)) {
         expect(node.text.length).toBeGreaterThan(0)
       }
-    }
+    },
+    HEAVY_DOCUMENT_TIMEOUT_MS
   )
 })

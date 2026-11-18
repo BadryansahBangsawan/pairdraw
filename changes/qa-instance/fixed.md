@@ -1,0 +1,1 @@
+- An instance of a variant is named after its component set, as in Figma, and swapping the variant keeps that name.

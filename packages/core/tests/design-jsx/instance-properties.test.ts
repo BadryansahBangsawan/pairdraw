@@ -31,6 +31,12 @@ function layers(graph: SceneGraph, instance: { id: string }) {
   return graph.getChildren(instance.id).map((child) => [child.text, child.visible])
 }
 
+/** The name of the variant an instance shows. */
+function shownVariant(graph: SceneGraph, instanceId: string) {
+  const componentId = graph.getNode(instanceId)?.componentId
+  return componentId ? graph.getNode(componentId)?.name : undefined
+}
+
 test('sets component properties by name, like variants, after a .fig reload', async () => {
   const graph = await reopenedCard()
   const [instance] = await renderJSX(
@@ -38,7 +44,8 @@ test('sets component properties by name, like variants, after a .fig reload', as
     `<Instance of="Card" state="selected" Title="Hello" Badge={false} />`
   )
   expect(instance.warnings).toBeUndefined()
-  expect(graph.getNode(instance.id)?.name).toBe('state=selected')
+  expect(graph.getNode(instance.id)?.name).toBe('Card')
+  expect(shownVariant(graph, instance.id)).toBe('state=selected')
   expect(layers(graph, instance)).toEqual([
     ['Hello', true],
     ['New', false]
@@ -125,7 +132,7 @@ test('a variant property named Variant selects its variant', async () => {
     `<Instance of="Choice" Variant="Secondary" State="Default" />`
   )
   expect(instance.warnings).toBeUndefined()
-  expect(graph.getNode(instance.id)?.name).toBe('Variant=Secondary, State=Default')
+  expect(shownVariant(graph, instance.id)).toBe('Variant=Secondary, State=Default')
 })
 
 test('a name several components share warns and says how to pick one', async () => {
@@ -155,5 +162,8 @@ test('variant props pick the component set when a component shares its name', as
   )
   expect(instance.warnings?.join('\n')).toMatch(/names 2 components/)
   expect(instance.warnings?.join('\n')).not.toMatch(/Unsupported prop/)
-  expect(graph.getNode(instance.id)?.name).toBe('Variant=Secondary, State=Default')
+  expect(shownVariant(graph, instance.id)).toBe('Variant=Secondary, State=Default')
+  const shownParentId = graph.getNode(instance.id)?.componentId
+  const shownParent = shownParentId ? graph.getNode(shownParentId)?.parentId : null
+  expect(shownParent ? graph.getNode(shownParent)?.type : null).toBe('COMPONENT_SET')
 })

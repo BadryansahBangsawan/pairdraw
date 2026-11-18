@@ -54,6 +54,15 @@ export function copyInstanceComponentProps(component: SceneNode): Partial<SceneN
   return props
 }
 
+/**
+ * The name Figma gives a new instance of `component`: its component set's name for a variant,
+ * whose own name only says which variant it is, and the component's own name otherwise.
+ */
+function instanceComponentName(graph: SceneGraph, component: SceneNode): string {
+  const parent = component.parentId ? graph.nodes.get(component.parentId) : undefined
+  return parent?.type === 'COMPONENT_SET' ? parent.name : component.name
+}
+
 export function createInstance(
   graph: SceneGraph,
   componentId: string,
@@ -66,7 +75,7 @@ export function createInstance(
 
   const props: Partial<SceneNode> = {
     ...copyInstanceComponentProps(component),
-    name: component.name
+    name: instanceComponentName(graph, component)
   }
 
   // The component checked above is the one the instance shows, whatever `overrides` holds.
@@ -148,8 +157,11 @@ export function swapInstanceComponent(
   }
   syncVariableModeFields(instance, source, updates, overridden)
 
-  if (!keepName && (!previousComponent || instance.name === previousComponent.name))
-    updates.name = component.name
+  if (
+    !keepName &&
+    (!previousComponent || instance.name === instanceComponentName(graph, previousComponent))
+  )
+    updates.name = instanceComponentName(graph, component)
 
   const childIds = Array.from(instance.childIds)
   const slotContent = detachOwnedSlotContent(graph, instance)

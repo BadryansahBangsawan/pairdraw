@@ -66,18 +66,18 @@ describe('preview islands', () => {
     expect(instanceMainComponent(graph, instance)?.id).toBe(off.id)
   })
 
-  test('an instance named after its variant keeps its path through a state switch', () => {
+  test('an instance named after its component set keeps its path through a state switch', () => {
     const { graph, card, off, on } = switchCard()
-    // Left with its default name, which is its variant's, as instances placed from a set are.
+    // Left with its default name, its component set's, as instances placed from a set are.
     const instance = graph.createInstance(off.id, card.id)
     if (!instance) throw new Error('No instance')
     const path = layerPath(graph, card.id, instance.id)
-    expect(instance.name).toBe(off.name)
+    expect(instance.name).toBe('Switch')
 
     const shown = resolvePlayState(graph, card.id, new Map([[path, { variants: { State: 'On' } }]]))
     const copy = findLayerByPath(shown, card.id, path)
     expect(copy && instanceMainComponent(shown, copy)?.id).toBe(on.id)
-    expect(copy?.name).toBe(off.name)
+    expect(copy?.name).toBe('Switch')
     // The same path switches it back, so a control toggles both ways.
     const back = resolvePlayState(graph, card.id, new Map([[path, { variants: { State: 'Off' } }]]))
     const restored = findLayerByPath(back, card.id, path)

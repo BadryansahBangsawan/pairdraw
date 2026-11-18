@@ -129,8 +129,8 @@ test('a Switch behaviour flips in preview and leaves the document alone', async 
   await expect(editor.page.getByRole('button', { name: /^Preview/ })).toBeVisible()
 })
 
-test('a switch inside a frame, named after its variant, toggles both ways in preview', async () => {
-  // Its layer path includes its name, which a variant switch used to rename to State=On.
+test('a switch inside a frame, named after its component set, toggles both ways in preview', async () => {
+  // Its layer path includes its name, which a variant switch keeps as the set's name.
   const ids = await createSwitch({ nested: true })
   await editor.canvas.waitForRender()
   await addSwitchBehaviour()

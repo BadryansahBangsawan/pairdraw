@@ -29,7 +29,7 @@ import { toggleRemoteCursors } from '@/app/presence/cursor-motion'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { setSnappingPreference, togglePixelGrid } from '@/app/settings/preferences/apply'
 import { removeSelectionAutoLayout } from '@/app/shell/keyboard/auto-layout'
-import { isButtonActivation, isEditing } from '@/app/shell/keyboard/focus'
+import { isButtonActivation, isInputElement } from '@/app/shell/keyboard/focus'
 import { shortcutEvent } from '@/app/shell/keyboard/layout'
 import { openShortcutSheet, SHORTCUT_SHEET_KEYBINDINGS } from '@/app/shell/keyboard/sheet'
 import { bindSpaceHandTool } from '@/app/shell/keyboard/space-tool'
@@ -246,17 +246,57 @@ function editingTextHandles(options: KeyboardShortcutOptions, history: boolean) 
 function shouldIgnoreShortcut(
   event: KeyboardEvent,
   options: KeyboardShortcutOptions,
+  shortcutId: string,
   history = false
 ) {
   return (
     isButtonActivation(event) ||
     hasOpenDismissableLayer(history) ||
     originatedInOverlay(event, history) ||
-    isEditing(event) ||
-    options.inputFocused.value ||
+    fieldKeepsKey(event, shortcutId) ||
     editingTextHandles(options, history) ||
     !!options.store.state.numberFieldFocused
   )
+}
+
+/** A field in a panel or the page has focus; the canvas text editor types through its own field. */
+function plainTextFieldFocused(): boolean {
+  const active = document.activeElement
+  return isInputElement(active) && !isCanvasTextInput(active)
+}
+
+/**
+ * A focused text field keeps every key that acts on the document or the canvas: ⌘D would
+ * otherwise duplicate a layer from a rename field, and ⌘Z would undo the document instead of the
+ * typing. Only these application and file commands pass through, as the desktop menu's
+ * accelerators do, so ⌘O still opens a file while Home's search field has focus. Each is held
+ * with ⌘ or Ctrl: `?` types its character in a field rather than opening the shortcut sheet.
+ */
+const APP_LEVEL_SHORTCUTS: Readonly<Record<string, true>> = {
+  'open-file': true,
+  'new-design': true,
+  'open-settings': true,
+  save: true,
+  'save-as': true,
+  'toggle-ai': true,
+  'toggle-ui': true
+}
+
+/** Whether a focused text field keeps this key for itself rather than letting it run. */
+function fieldKeepsKey(event: KeyboardEvent, shortcutId: string): boolean {
+  if (!plainTextFieldFocused()) return false
+  if (!event.metaKey && !event.ctrlKey) return true
+  return !Object.hasOwn(APP_LEVEL_SHORTCUTS, shortcutId)
+}
+
+/** The shortcut each bound key runs, which decides whether a focused text field keeps that key. */
+function shortcutIdsByKeys(shortcuts: readonly ShortcutDefinition[]): Map<string, string> {
+  const ids = new Map<string, string>()
+  for (const shortcut of shortcuts) {
+    if (shortcut.global) continue
+    for (const keys of [shortcut.keys].flat()) ids.set(keys, shortcut.id)
+  }
+  return ids
 }
 
 function bindShortcut(
@@ -506,6 +546,7 @@ export function registerKeyboardShortcuts(options: KeyboardShortcutOptions) {
 
   const bindings: KeyBindingMap = {}
   const globalBindings: KeyBindingMap = {}
+  const shortcutIds = shortcutIdsByKeys(shortcuts)
   /** Keys that switch or leave the canvas's view, which every view keeps. */
   const viewKeys = new Set(
     shortcuts.filter((shortcut) => shortcut.view).flatMap((shortcut) => [shortcut.keys].flat())
@@ -529,7 +570,8 @@ export function registerKeyboardShortcuts(options: KeyboardShortcutOptions) {
       Object.entries(bindings).map(([keys, handler]) => [
         keys,
         (event: KeyboardEvent) => {
-          if (shouldIgnoreShortcut(event, options, historyKeys.has(keys))) return
+          const id = shortcutIds.get(keys) ?? ''
+          if (shouldIgnoreShortcut(event, options, id, historyKeys.has(keys))) return
           const { shortcuts: allowed } = resolveEditorProfile(options.store.state)
           if (allowed === 'view' && !viewKeys.has(keys)) return
           handler(event)

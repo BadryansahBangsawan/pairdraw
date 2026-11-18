@@ -4,10 +4,14 @@ import { DEFAULT_FONT_FAMILY } from '#core/constants'
 import {
   ARABIC_CHARACTER,
   cjkFallbackScriptForLanguage,
+  DEVANAGARI_CHARACTER,
   fontFallbackScriptForCharacter,
   HAN_CHARACTER,
   HANGUL_CHARACTER,
+  HEBREW_CHARACTER,
   KANA_CHARACTER,
+  LETTER_FALLBACK_SCRIPTS,
+  THAI_CHARACTER,
   TRADITIONAL_HAN_CHARACTER,
   type FontFallbackScript
 } from '#core/text/fallbacks'
@@ -20,6 +24,12 @@ function scriptCharRegex(script: FontFallbackScript): RegExp {
   switch (script) {
     case 'arabic':
       return ARABIC_CHARACTER
+    case 'hebrew':
+      return HEBREW_CHARACTER
+    case 'thai':
+      return THAI_CHARACTER
+    case 'devanagari':
+      return DEVANAGARI_CHARACTER
     case 'cjk-jp':
       return KANA_CHARACTER
     case 'cjk-kr':
@@ -32,7 +42,10 @@ function scriptCharRegex(script: FontFallbackScript): RegExp {
 }
 
 export function textHasFallbackScript(text: string): boolean {
-  return ARABIC_CHARACTER.test(text) || CJK_CHAR_RE.test(text)
+  return (
+    LETTER_FALLBACK_SCRIPTS.some((script) => scriptCharRegex(script).test(text)) ||
+    CJK_CHAR_RE.test(text)
+  )
 }
 
 function styleForCharacter(
@@ -87,7 +100,9 @@ export function textFallbackScriptsWithoutCoverage(node: SceneNode): FontFallbac
 
 export function textNeededFallbackScripts(node: SceneNode): FontFallbackScript[] {
   const scripts = new Set<FontFallbackScript>()
-  if (textNeedsFallbackScript(node, 'arabic')) scripts.add('arabic')
+  for (const script of LETTER_FALLBACK_SCRIPTS) {
+    if (textNeedsFallbackScript(node, script)) scripts.add(script)
+  }
 
   let missingIdeograph = false
   let missingTraditionalIdeograph = false

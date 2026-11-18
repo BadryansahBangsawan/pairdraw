@@ -16,6 +16,16 @@ describe('fallback scripts', () => {
     ])
   })
 
+  test('give Hebrew, Thai, and Devanagari a fallback of their own', () => {
+    // Alef, ko kai, ka, and a Hebrew presentation form.
+    expect(['א', 'ก', 'क', 'ﬠ'].map((char) => fontFallbackScriptForCharacter(char))).toEqual([
+      'hebrew',
+      'thai',
+      'devanagari',
+      'hebrew'
+    ])
+  })
+
   test('read 著 as Chinese, which Simplified writes too, not as Traditional only', () => {
     expect(fontFallbackScriptForCharacter('著')).toBe('cjk-sc')
   })
@@ -28,6 +38,19 @@ describe('fallback scripts', () => {
     })
     // A Traditional-only character draws in the Traditional Chinese fallback, so that one loads.
     expect(collectGraphFontRequirements(graph, [text.id]).scripts).toEqual(['cjk-tc'])
+  })
+
+  test('load fonts for Hebrew, Thai, and Devanagari text a Latin family cannot draw', () => {
+    const graph = new SceneGraph()
+    const page = graph.getPages()[0].id
+    const ids = ['שלום', 'สวัสดี', 'नमस्ते'].map(
+      (text) => graph.createNode('TEXT', page, { text, fontFamily: 'Inter' }).id
+    )
+    expect(collectGraphFontRequirements(graph, ids).scripts.toSorted()).toEqual([
+      'devanagari',
+      'hebrew',
+      'thai'
+    ])
   })
 
   test('read characters a run clears the language of without the text language', () => {

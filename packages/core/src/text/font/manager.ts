@@ -1,6 +1,7 @@
 /* eslint-disable max-lines -- font loading and registration share FontManager lifecycle state */
 
 import type { CanvasKit, TypefaceFontProvider } from 'canvaskit-wasm'
+import { uniq } from 'es-toolkit'
 
 import type { FontVariation, SceneGraph } from '@pairdraw/scene-graph'
 import {
@@ -12,7 +13,12 @@ import {
 } from '@pairdraw/scene-graph/font-style'
 
 import { DEFAULT_FONT_FAMILY, IS_BROWSER } from '#core/constants'
-import { fontFallbackEntry, type FontFallbackScript } from '#core/text/fallbacks'
+import {
+  fontFallbackEntry,
+  LETTER_FALLBACK_SCRIPTS,
+  type FontFallbackScript,
+  type LetterFallbackScript
+} from '#core/text/fallbacks'
 import { BundledFonts, type BundledFontLocator } from '#core/text/font/bundled'
 import { FamilyFaceCatalog, type HostFontFamily } from '#core/text/font/catalog'
 import { fontFaceRenderFamily, type FamilyFace } from '#core/text/font/faces'
@@ -89,8 +95,11 @@ export class FontManager {
   })
   private cjkFallbackFamilies: string[] = []
   private cjkFallbackPromise: Promise<string[]> | null = null
-  private arabicFallbackFamilies: string[] = []
-  private arabicFallbackPromise: Promise<string[]> | null = null
+  /** The fallbacks of each script written in letters: Arabic, Hebrew, Thai, Devanagari. */
+  private readonly letterFallbackFamilies = new Map<LetterFallbackScript, string[]>(
+    LETTER_FALLBACK_SCRIPTS.map((script) => [script, []])
+  )
+  private readonly letterFallbackPromises = new Map<LetterFallbackScript, Promise<string[]>>()
 
   attachProvider(canvasKit: CanvasKit, provider: TypefaceFontProvider): void {
     this.fontProviders.add(provider)
@@ -623,12 +632,29 @@ export class FontManager {
     }
   }
 
-  async ensureArabicFallback(): Promise<string[]> {
-    if (this.arabicFallbackFamilies.length > 0) return this.arabicFallbackFamilies
-    if (this.arabicFallbackPromise) return this.arabicFallbackPromise
+  private ensureLetterFallback(script: LetterFallbackScript): Promise<string[]> {
+    const families = this.letterFamilies(script)
+    if (families.length > 0) return Promise.resolve(families)
+    let pending = this.letterFallbackPromises.get(script)
+    if (!pending) {
+      pending = this.ensureFallbackFamilies(script, families)
+      this.letterFallbackPromises.set(script, pending)
+    }
+    return pending
+  }
 
-    this.arabicFallbackPromise = this.ensureFallbackFamilies('arabic', this.arabicFallbackFamilies)
-    return this.arabicFallbackPromise
+  private letterFamilies(script: LetterFallbackScript): string[] {
+    let families = this.letterFallbackFamilies.get(script)
+    if (!families) {
+      families = []
+      this.letterFallbackFamilies.set(script, families)
+    }
+    return families
+  }
+
+  /** The list a script's fallback families are kept in. */
+  private fallbackTarget(script: FontFallbackScript): string[] {
+    return isLetterFallbackScript(script) ? this.letterFamilies(script) : this.cjkFallbackFamilies
   }
 
   ensureFallbackPack(
@@ -649,11 +675,11 @@ export class FontManager {
     await Promise.all(
       scripts.map(async (script) => {
         signal?.throwIfAborted()
-        const target = script === 'arabic' ? this.arabicFallbackFamilies : this.cjkFallbackFamilies
+        const target = this.fallbackTarget(script)
         if (signal) {
           result[script] = await this.ensureFallbackFamilies(script, target, characters, signal)
-        } else if (script === 'arabic' && !characters) {
-          result[script] = await this.ensureArabicFallback()
+        } else if (isLetterFallbackScript(script) && !characters) {
+          result[script] = await this.ensureLetterFallback(script)
         } else if (script === 'cjk' && !characters) {
           result[script] = await this.ensureCJKFallback()
         } else {
@@ -665,14 +691,17 @@ export class FontManager {
     return result
   }
 
-  getArabicFallbackFamilies(): string[] {
-    return this.arabicFallbackFamilies
+  /**
+   * The fallbacks for scripts written in letters, Arabic first, in the order the renderer tries
+   * them: each covers its own script, and all come before the CJK fallbacks.
+   */
+  getLetterFallbackFamilies(): string[] {
+    return uniq(LETTER_FALLBACK_SCRIPTS.flatMap((script) => this.letterFamilies(script)))
   }
 
-  setArabicFallbackFamily(family: string): void {
-    if (!this.arabicFallbackFamilies.includes(family)) {
-      this.arabicFallbackFamilies.push(family)
-    }
+  setLetterFallbackFamily(script: LetterFallbackScript, family: string): void {
+    const families = this.letterFamilies(script)
+    if (!families.includes(family)) families.push(family)
   }
 
   private async ensureFallbackFamilies(
@@ -879,3 +908,7 @@ export class FontManager {
 }
 
 export const fontManager = new FontManager()
+
+function isLetterFallbackScript(script: FontFallbackScript): script is LetterFallbackScript {
+  return LETTER_FALLBACK_SCRIPTS.some((letter) => letter === script)
+}

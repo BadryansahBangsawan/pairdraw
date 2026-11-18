@@ -27,7 +27,7 @@ function laidOutEmojiCharacters(node: SceneNode): string {
   const faces = [
     ...collectNodeFontFaces(node),
     { family: DEFAULT_FONT_FAMILY, style: 'Regular' },
-    ...[...fontManager.getArabicFallbackFamilies(), ...fontManager.getCJKFallbackFamilies()].map(
+    ...[...fontManager.getLetterFallbackFamilies(), ...fontManager.getCJKFallbackFamilies()].map(
       (family) => ({ family, style: 'Regular' })
     )
   ]

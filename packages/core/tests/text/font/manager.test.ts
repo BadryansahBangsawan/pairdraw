@@ -226,3 +226,30 @@ test('lists families loaded from font files as document fonts', async () => {
     { family: 'Fonts Test Document', source: 'document' }
   ])
 })
+
+test('Hebrew, Thai, and Devanagari fallbacks load their own fonts, apart from the CJK ones', async () => {
+  const manager = offlineManager()
+  manager.setFallbackUserAgent('Windows')
+  manager.setHostFontLoader(async () => new ArrayBuffer(16))
+  const signal = new AbortController().signal
+
+  await manager.ensureFallbackPack(['cjk-sc'], '', signal)
+  const loaded = await manager.ensureFallbackPack(['hebrew', 'thai', 'devanagari'], '', signal)
+
+  expect(loaded).toEqual({
+    hebrew: ['Segoe UI', 'Arial', 'David'],
+    thai: ['Leelawadee UI', 'Tahoma'],
+    devanagari: ['Nirmala UI', 'Mangal']
+  })
+  // Letter scripts fall back before CJK, so a Chinese font never draws a Hebrew letter first.
+  expect(manager.getLetterFallbackFamilies()).toEqual([
+    'Segoe UI',
+    'Arial',
+    'David',
+    'Leelawadee UI',
+    'Tahoma',
+    'Nirmala UI',
+    'Mangal'
+  ])
+  expect(manager.getCJKFallbackFamilies()).not.toContain('Segoe UI')
+})

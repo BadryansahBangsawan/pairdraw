@@ -286,7 +286,7 @@ export function buildSkParagraph(
   const baseFontSize = node.fontSize || DEFAULT_FONT_SIZE
   const baseLineHeight = lineHeightPixels(node.lineHeight, baseFontSize)
   const cjkFallbacks = fontManager.getCJKFallbackFamilies()
-  const arabicFallbacks = fontManager.getArabicFallbackFamilies()
+  const letterFallbacks = fontManager.getLetterFallbackFamilies()
   const textDirection = resolveNodeTextDirection(node)
 
   const truncateOpts = block.truncation ?? buildTruncateOpts(node)
@@ -295,7 +295,7 @@ export function buildSkParagraph(
     resolveParagraphFontFamilies(
       primary,
       { weight: face.fontWeight, italic: face.italic, style: faceStyleKey(face) },
-      arabicFallbacks,
+      letterFallbacks,
       cjkFallbacks
     )
   const nodeKey = faceStyleKey(node)

@@ -96,19 +96,20 @@ export function loadedFace(
 
 /**
  * The families a paragraph's text falls back through, by their own names: its family, the
- * default family, the Arabic and CJK fallbacks, then emoji, so a character a script's font has
+ * default family, the fallbacks of scripts written in letters (Arabic, Hebrew, Thai,
+ * Devanagari) and CJK, then emoji, so a character a script's font has
  * stays in that font. Fonts are read by these names; CanvasKit is asked for them as
  * {@link resolveParagraphFontFamilies} names them.
  */
 export function paragraphSourceFamilies(
   primary: string,
-  arabicFallbacks: readonly string[] = fontManager.getArabicFallbackFamilies(),
+  letterFallbacks: readonly string[] = fontManager.getLetterFallbackFamilies(),
   cjkFallbacks: readonly string[] = fontManager.getCJKFallbackFamilies()
 ): string[] {
   return uniq([
     primary,
     ...(primary === DEFAULT_FONT_FAMILY ? [] : [DEFAULT_FONT_FAMILY]),
-    ...arabicFallbacks,
+    ...letterFallbacks,
     ...cjkFallbacks,
     EMOJI_METRICS_FAMILY
   ])
@@ -129,13 +130,13 @@ function renderFamilies(family: string, style: string): string[] {
 export function resolveParagraphFontFamilies(
   primary: string,
   face: { weight: number; italic: boolean; style: string },
-  arabicFallbacks: readonly string[] = fontManager.getArabicFallbackFamilies(),
+  letterFallbacks: readonly string[] = fontManager.getLetterFallbackFamilies(),
   cjkFallbacks: readonly string[] = fontManager.getCJKFallbackFamilies()
 ): string[] {
   // The face the family draws it in, which may be the nearest one loaded.
   const drawn = loadedFace(primary, face.weight, face.italic, face.style)
   const renderPrimary = renderFamilies(primary, drawn?.style ?? face.style)
-  const renderArabicFallbacks = arabicFallbacks.flatMap((family) =>
+  const renderLetterFallbacks = letterFallbacks.flatMap((family) =>
     renderFamilies(family, 'Regular')
   )
   const renderCJKFallbacks = cjkFallbacks.flatMap((family) => renderFamilies(family, 'Regular'))
@@ -143,7 +144,7 @@ export function resolveParagraphFontFamilies(
     primary,
     ...renderPrimary,
     '',
-    ...renderArabicFallbacks,
+    ...renderLetterFallbacks,
     '',
     ...renderCJKFallbacks
   ].join('\0')
@@ -152,7 +153,7 @@ export function resolveParagraphFontFamilies(
   const resolved = uniq([
     ...renderPrimary,
     ...(primary === DEFAULT_FONT_FAMILY ? [] : [DEFAULT_FONT_FAMILY]),
-    ...renderArabicFallbacks,
+    ...renderLetterFallbacks,
     ...renderCJKFallbacks,
     EMOJI_METRICS_FAMILY
   ])

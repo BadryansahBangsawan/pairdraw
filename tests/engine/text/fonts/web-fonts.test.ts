@@ -85,6 +85,9 @@ describe('web font coverage requests', () => {
     expect(webFontSubsetsForText('مرحبا')).toContain('arabic')
     expect(webFontSubsetsForText('한글')).toContain('korean')
     expect(webFontSubsetsForText('かな')).toContain('japanese')
+    expect(webFontSubsetsForText('שלום')).toContain('hebrew')
+    expect(webFontSubsetsForText('สวัสดี')).toContain('thai')
+    expect(webFontSubsetsForText('नमस्ते')).toContain('devanagari')
     expect(webFontSubsetsForText('你好')).toEqual(
       expect.arrayContaining(['chinese-simplified', 'chinese-traditional', 'japanese'])
     )

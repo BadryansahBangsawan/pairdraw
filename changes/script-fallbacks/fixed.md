@@ -1,0 +1,1 @@
+- Hebrew, Thai, and Devanagari text draws in an installed or Google Fonts fallback when its font lacks those letters, instead of empty boxes.

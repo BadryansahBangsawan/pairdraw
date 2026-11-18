@@ -6,9 +6,12 @@ import { parseFontStyle } from '@pairdraw/scene-graph/font-style'
 import { IS_BROWSER } from '#core/constants'
 import {
   ARABIC_CHARACTER,
+  DEVANAGARI_CHARACTER,
   HAN_CHARACTER,
   HANGUL_CHARACTER,
-  KANA_CHARACTER
+  HEBREW_CHARACTER,
+  KANA_CHARACTER,
+  THAI_CHARACTER
 } from '#core/text/fallbacks'
 import { standardFace, type FamilyFace } from '#core/text/font/faces'
 import { sfntFont } from '#core/text/font/woff2'
@@ -74,6 +77,9 @@ export function normalizedCoverageText(text: string): string {
 export function webFontSubsetsForText(text: string): string[] {
   const subsets = new Set(DEFAULT_WEB_FONT_SUBSETS)
   if (ARABIC_CHARACTER.test(text)) subsets.add('arabic')
+  if (HEBREW_CHARACTER.test(text)) subsets.add('hebrew')
+  if (THAI_CHARACTER.test(text)) subsets.add('thai')
+  if (DEVANAGARI_CHARACTER.test(text)) subsets.add('devanagari')
   if (HANGUL_CHARACTER.test(text)) subsets.add('korean')
   if (KANA_CHARACTER.test(text)) subsets.add('japanese')
   if (HAN_CHARACTER.test(text)) {

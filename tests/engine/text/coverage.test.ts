@@ -32,6 +32,20 @@ describe('font fallback coverage indexing', () => {
     expect(textNeededFallbackScripts(node)).toContain('cjk-sc')
   })
 
+  test('asks for the Hebrew, Thai, and Devanagari fallbacks a loaded Latin font misses', async () => {
+    const family = `LetterScripts_${Date.now()}`
+    const data = await Bun.file('packages/core/assets/InterVariable.ttf').arrayBuffer()
+    await fontManager.markLoaded(family, 'Regular', data)
+    const graph = new SceneGraph()
+    const node = graph.createNode('TEXT', pageId(graph), {
+      text: 'Hi שלום สวัสดี नमस्ते',
+      fontFamily: family,
+      fontWeight: 400
+    })
+
+    expect(textNeededFallbackScripts(node).toSorted()).toEqual(['devanagari', 'hebrew', 'thai'])
+  })
+
   test('uses BCP-47 language hints for Han fallback selection', async () => {
     const family = `LanguageHint_${Date.now()}`
     const data = await Bun.file('packages/core/assets/InterVariable.ttf').arrayBuffer()

@@ -127,12 +127,12 @@ function featuresOf(node: SceneNode, run: StyleRun | undefined): ShapingFeature[
 
 /**
  * The style a family of the paragraph is drawn in: the face its own family draws the asked style
- * in, and Regular for the Arabic and CJK fallbacks, as the paragraph asks CanvasKit for them.
+ * in, and Regular for the script fallbacks, as the paragraph asks CanvasKit for them.
  */
 function sourceStyle(family: string, font: ReturnType<typeof fontAt>): string | null {
   const scriptFallback =
     family !== font.family &&
-    (fontManager.getArabicFallbackFamilies().includes(family) ||
+    (fontManager.getLetterFallbackFamilies().includes(family) ||
       fontManager.getCJKFallbackFamilies().includes(family))
   if (scriptFallback) return fontManager.isStyleLoaded(family, 'Regular') ? 'Regular' : null
   return loadedStyle(family, font.drawn.weight, font.drawn.italic, font.drawn.style)

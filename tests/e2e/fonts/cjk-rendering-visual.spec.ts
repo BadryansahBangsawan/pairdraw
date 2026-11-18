@@ -145,7 +145,7 @@ test('international text is correct on its first visible paint', async ({ page }
     await fontManager.markLoaded('Noto Sans CJK SC', 'Regular', cjk)
     await fontManager.markLoaded('Noto Naskh Arabic', 'Regular', arabic)
     fontManager.setCJKFallbackFamily('Noto Sans CJK SC')
-    fontManager.setArabicFallbackFamily('Noto Naskh Arabic')
+    fontManager.setLetterFallbackFamily('arabic', 'Noto Naskh Arabic')
 
     await store.loadFontsForNodes(sampleIds)
     fontManager.unblockNodes(sampleIds)
@@ -322,7 +322,7 @@ test('typed and tool-created text repaint with the same resolved fallbacks', asy
     await fontManager.markLoaded('Noto Sans CJK SC', 'Regular', cjk)
     await fontManager.markLoaded('Noto Naskh Arabic', 'Regular', arabic)
     fontManager.setCJKFallbackFamily('Noto Sans CJK SC')
-    fontManager.setArabicFallbackFamily('Noto Naskh Arabic')
+    fontManager.setLetterFallbackFamily('arabic', 'Noto Naskh Arabic')
     store.commitTextEdit()
     await store.loadFontsForNodes(nodeIds)
     fontManager.unblockNodes(nodeIds)

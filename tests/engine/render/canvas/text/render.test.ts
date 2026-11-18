@@ -406,6 +406,39 @@ describe('renderText headless visual', () => {
     }
   })
 
+  test('draws Hebrew in Inter text through the Hebrew fallback, not as missing glyphs', async () => {
+    const ck = await initCanvasKit()
+    const fontProvider = ck.TypefaceFontProvider.Make()
+    fontManager.attachProvider(ck, fontProvider)
+    const interData = await Bun.file('packages/core/assets/InterVariable.ttf').arrayBuffer()
+    await fontManager.markLoaded('Inter', 'Regular', interData)
+    const hebrewPath = repoPath('tests/fixtures/fonts/NotoSansHebrew-Regular.ttf')
+    await fontManager.markLoaded(
+      'Noto Sans Hebrew',
+      'Regular',
+      await Bun.file(hebrewPath).arrayBuffer()
+    )
+    fontManager.setLetterFallbackFamily('hebrew', 'Noto Sans Hebrew')
+    const surface = expectDefined(ck.MakeSurface(200, 50), 'CanvasKit surface')
+
+    try {
+      const renderer = new SkiaRendererClass(ck, surface)
+      renderer.fontsLoaded = true
+      renderer.fontProvider = fontProvider
+      const text = 'Hi שלום'
+      const paragraph = buildParagraph(
+        renderer,
+        textNode({ text, fontFamily: 'Inter', fontWeight: 400 })
+      )
+      paragraph.layout(200)
+
+      expect(missingGlyphCharacters(text, paragraph.getShapedLines())).toEqual([])
+      paragraph.delete()
+    } finally {
+      surface.delete()
+    }
+  })
+
   test('requests a CJK fallback for text whose face is substituted', async () => {
     const ck = await initCanvasKit()
     const fontProvider = ck.TypefaceFontProvider.Make()
@@ -621,7 +654,7 @@ describe('renderText headless visual', () => {
     const arabicPath = repoPath('tests/fixtures/fonts/NotoNaskhArabic-Regular.ttf')
     const arabicData = await Bun.file(arabicPath).arrayBuffer()
     fontProvider.registerFont(arabicData, 'Noto Naskh Arabic')
-    fontManager.setArabicFallbackFamily('Noto Naskh Arabic')
+    fontManager.setLetterFallbackFamily('arabic', 'Noto Naskh Arabic')
 
     const graph = new SceneGraph()
     const page = graph.getPages()[0]

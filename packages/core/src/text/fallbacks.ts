@@ -5,10 +5,32 @@ import {
   CJK_GOOGLE_FONTS
 } from '#core/constants'
 
-export type FontFallbackScript = 'cjk' | 'cjk-sc' | 'cjk-tc' | 'cjk-jp' | 'cjk-kr' | 'arabic'
+export type FontFallbackScript =
+  | 'cjk'
+  | 'cjk-sc'
+  | 'cjk-tc'
+  | 'cjk-jp'
+  | 'cjk-kr'
+  | 'arabic'
+  | 'hebrew'
+  | 'thai'
+  | 'devanagari'
+
+/** The fallbacks for scripts written in letters, which the renderer tries before the CJK ones. */
+export const LETTER_FALLBACK_SCRIPTS = [
+  'arabic',
+  'hebrew',
+  'thai',
+  'devanagari'
+] as const satisfies readonly FontFallbackScript[]
+
+export type LetterFallbackScript = (typeof LETTER_FALLBACK_SCRIPTS)[number]
 
 /** Characters of the writing systems that need a fallback font, by their Unicode script. */
 export const ARABIC_CHARACTER = /\p{Script=Arabic}/u
+export const HEBREW_CHARACTER = /\p{Script=Hebrew}/u
+export const THAI_CHARACTER = /\p{Script=Thai}/u
+export const DEVANAGARI_CHARACTER = /\p{Script=Devanagari}/u
 export const HANGUL_CHARACTER = /\p{Script=Hangul}/u
 export const KANA_CHARACTER = /[\p{Script=Hiragana}\p{Script=Katakana}]/u
 export const HAN_CHARACTER = /\p{Script=Han}/u
@@ -23,6 +45,9 @@ export function fontFallbackScriptForCharacter(
   language?: string | null
 ): FontFallbackScript | null {
   if (ARABIC_CHARACTER.test(char)) return 'arabic'
+  if (HEBREW_CHARACTER.test(char)) return 'hebrew'
+  if (THAI_CHARACTER.test(char)) return 'thai'
+  if (DEVANAGARI_CHARACTER.test(char)) return 'devanagari'
   if (HANGUL_CHARACTER.test(char)) return 'cjk-kr'
   if (KANA_CHARACTER.test(char)) return 'cjk-jp'
   const languageScript = cjkFallbackScriptForLanguage(language)
@@ -72,7 +97,7 @@ export function cjkLocalFallbackFamilies(userAgent?: string): string[] {
   return [...CJK_FALLBACK_FAMILIES_LINUX]
 }
 
-function platformCJKFamilies(
+function platformFamilies(
   userAgent: string | undefined,
   families: Record<'mac' | 'windows' | 'linux', string[]>
 ): string[] {
@@ -88,29 +113,75 @@ function cjkScriptLocalFallbackFamilies(
 ): string[] {
   switch (script) {
     case 'cjk-tc':
-      return platformCJKFamilies(userAgent, {
+      return platformFamilies(userAgent, {
         mac: ['PingFang TC', 'Heiti TC', 'PingFang SC', 'Hiragino Sans'],
         windows: ['Microsoft JhengHei', 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimSun'],
         linux: ['Noto Sans CJK TC', 'Noto Sans CJK SC', 'Droid Sans Fallback']
       })
     case 'cjk-jp':
-      return platformCJKFamilies(userAgent, {
+      return platformFamilies(userAgent, {
         mac: ['Hiragino Sans', 'PingFang SC', 'PingFang TC'],
         windows: ['Yu Gothic', 'Microsoft YaHei', 'Microsoft JhengHei'],
         linux: ['Noto Sans CJK JP', 'Noto Sans CJK SC', 'Droid Sans Fallback']
       })
     case 'cjk-kr':
-      return platformCJKFamilies(userAgent, {
+      return platformFamilies(userAgent, {
         mac: ['Apple SD Gothic Neo', 'PingFang SC', 'Hiragino Sans'],
         windows: ['Malgun Gothic', 'Microsoft YaHei', 'Yu Gothic'],
         linux: ['Noto Sans CJK KR', 'Noto Sans CJK SC', 'Droid Sans Fallback']
       })
     default:
-      return platformCJKFamilies(userAgent, {
+      return platformFamilies(userAgent, {
         mac: ['PingFang SC', 'Heiti SC', 'PingFang TC', 'Hiragino Sans'],
         windows: ['Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'SimSun'],
         linux: ['Noto Sans CJK SC', 'WenQuanYi Micro Hei', 'Droid Sans Fallback']
       })
+  }
+}
+
+/**
+ * Installed fonts that draw Hebrew, Thai, and Devanagari on each system, then the Noto family
+ * Google Fonts serves for it, so text in these scripts draws without bundling their fonts.
+ */
+const LETTER_SCRIPT_FAMILIES: Record<
+  Exclude<LetterFallbackScript, 'arabic'>,
+  { local: Record<'mac' | 'windows' | 'linux', string[]>; remote: string[] }
+> = {
+  hebrew: {
+    local: {
+      mac: ['Arial Hebrew', 'Lucida Grande'],
+      windows: ['Segoe UI', 'Arial', 'David'],
+      linux: ['Noto Sans Hebrew', 'DejaVu Sans']
+    },
+    remote: ['Noto Sans Hebrew']
+  },
+  thai: {
+    local: {
+      mac: ['Thonburi', 'Sukhumvit Set', 'Ayuthaya'],
+      windows: ['Leelawadee UI', 'Tahoma'],
+      linux: ['Noto Sans Thai', 'Loma']
+    },
+    remote: ['Noto Sans Thai']
+  },
+  devanagari: {
+    local: {
+      mac: ['Kohinoor Devanagari', 'Devanagari Sangam MN', 'Devanagari MT'],
+      windows: ['Nirmala UI', 'Mangal'],
+      linux: ['Noto Sans Devanagari', 'Lohit Devanagari']
+    },
+    remote: ['Noto Sans Devanagari']
+  }
+}
+
+function letterScriptEntry(
+  script: Exclude<LetterFallbackScript, 'arabic'>,
+  userAgent?: string
+): FontFallbackManifestEntry {
+  const families = LETTER_SCRIPT_FAMILIES[script]
+  return {
+    script,
+    localFamilies: [...platformFamilies(userAgent, families.local)],
+    remoteFamilies: [...families.remote]
   }
 }
 
@@ -157,7 +228,10 @@ export function fontFallbackManifest(
       script: 'arabic',
       localFamilies: [...ARABIC_LOCAL_FALLBACK_FAMILIES],
       remoteFamilies: [...ARABIC_REMOTE_FALLBACK_FAMILIES]
-    }
+    },
+    hebrew: letterScriptEntry('hebrew', userAgent),
+    thai: letterScriptEntry('thai', userAgent),
+    devanagari: letterScriptEntry('devanagari', userAgent)
   }
 }
 

@@ -87,7 +87,7 @@ function resolvedGlyphStyle(style: TextStyle, char: string): TextStyle | null {
 }
 
 function fallbackFamilies(): string[] {
-  return [...fontManager.getCJKFallbackFamilies(), ...fontManager.getArabicFallbackFamilies()]
+  return [...fontManager.getCJKFallbackFamilies(), ...fontManager.getLetterFallbackFamilies()]
 }
 
 /** `style` in a script fallback family, which has none of the text family's named faces. */

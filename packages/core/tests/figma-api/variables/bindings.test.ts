@@ -205,12 +205,31 @@ describe('bindVariable validation continued', () => {
     return graph
   }
 
-  test('bindVariable rejects unknown field names', () => {
+  test('bindVariable rejects an unknown field name and lists the accepted ones', () => {
     const graph = setupGraph()
     const node = graph.createNode('RECTANGLE', pageId(graph), { name: 'Rect' })
-    expect(() => {
+    let message = ''
+    try {
       graph.bindVariable(node.id, 'customPluginField', 'v-float')
-    }).toThrow(/Unknown binding field/)
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error)
+    }
+    expect(message).toContain('Unknown binding field "customPluginField"')
+    // The forms the binder takes, as agents need them: scalars by name, paints by index.
+    for (const accepted of [
+      'opacity',
+      'gridColumnGap',
+      'text',
+      'fontFamily',
+      'visible',
+      'iconName',
+      'fills/<n>/color',
+      'strokes/<n>/color',
+      'fills/<n>/uniforms/<name>',
+      'strokes/<n>/uniforms/<name>'
+    ]) {
+      expect(message).toContain(accepted)
+    }
   })
 })
 

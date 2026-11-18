@@ -22,11 +22,13 @@ import {
 import {
   BOOLEAN_BINDING_FIELDS,
   ICON_BINDING_FIELDS,
+  NUMERIC_FIELDS,
   paintBindingTarget,
   STRING_BINDING_FIELDS,
   TEXT_CONTENT_VARIABLE_TYPES,
   uniformBindingTarget,
-  VISIBILITY_VARIABLE_TYPES
+  VISIBILITY_VARIABLE_TYPES,
+  type PaintBindingList
 } from './fields'
 import { pinnedRunBindingScales } from './units'
 
@@ -249,6 +251,20 @@ export function getVariablesByType(graph: SceneGraph, type: VariableType): Varia
   return [...graph.variables.values()].filter((v) => v.type === type)
 }
 
+const PAINT_BINDING_LISTS = ['fills', 'strokes'] as const satisfies readonly PaintBindingList[]
+
+/**
+ * Every field a binding takes, from the same sets `checkBindingFieldType` reads, so a refusal for
+ * an unknown one names what the caller can send instead of leaving them to guess.
+ */
+const ACCEPTED_BINDING_FIELDS: readonly string[] = [
+  ...NUMERIC_FIELDS,
+  ...STRING_BINDING_FIELDS,
+  ...BOOLEAN_BINDING_FIELDS,
+  ...ICON_BINDING_FIELDS,
+  ...PAINT_BINDING_LISTS.flatMap((list) => [`${list}/<n>/color`, `${list}/<n>/uniforms/<name>`])
+]
+
 /**
  * Throws when a variable of `type` cannot bind to `field`, or for a field no binding takes. A
  * paint target is checked by its caller, which also validates its index.
@@ -290,7 +306,9 @@ function checkBindingFieldType(field: string, type: VariableType): void {
     uniform !== null
 
   if (!isKnownField) {
-    throw new Error(`Unknown binding field "${field}"`)
+    throw new Error(
+      `Unknown binding field "${field}". Accepted: ${ACCEPTED_BINDING_FIELDS.join(', ')}`
+    )
   }
 }
 export function bindVariable(

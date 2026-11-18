@@ -221,7 +221,7 @@ describe('import_svg', () => {
 
   test('rejects a missing svg input before executing', () => {
     const nodeCount = graph.nodes.size
-    expect(() => importSVG.execute(figma, {})).toThrow('Expected "svg"')
+    expect(() => importSVG.execute(figma, {})).toThrow('Missing required argument "svg"')
     expect(graph.nodes.size).toBe(nodeCount)
   })
 

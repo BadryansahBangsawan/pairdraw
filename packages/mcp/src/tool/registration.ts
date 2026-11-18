@@ -12,7 +12,7 @@ import { toStandardJsonSchema as toStandardJSONSchema } from '@valibot/to-json-s
 import { isPlainObject } from 'es-toolkit'
 import * as v from 'valibot'
 
-import { CODEGEN_PROMPT } from '@pairdraw/core/tools'
+import { CODEGEN_PROMPT, parseToolArgs } from '@pairdraw/core/tools'
 
 import type { RPCJSONObject } from '#mcp/json'
 import { MAX_RESULT_BYTES, fail, ok, resultTooLargeMessage } from '#mcp/result'
@@ -139,17 +139,25 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
     const descriptor = descriptors.get(name)
     if (!descriptor) throw new Error(`Missing MCP tool descriptor for "${name}"`)
     if (!isToolEnabled(descriptor, policy)) return
+    const standard = toStandardJSONSchema(toolOptions.inputSchema)
+    // The toolkit validates this schema before the handler and words the failure itself — "Invalid
+    // key: Expected never but received 'width'" — naming neither the arguments nor the values a
+    // call takes. Its validation passes every call through instead, and `parseToolArgs` below
+    // refuses a wrong one with the sentence every other surface gives.
+    const inputSchema = {
+      '~standard': { ...standard['~standard'], validate: (value: unknown) => ({ value }) }
+    }
     mcpServer.registerTool(
       name,
       {
         description: toolOptions.description ?? descriptor.description,
-        inputSchema: toStandardJSONSchema(toolOptions.inputSchema),
+        inputSchema,
         annotations: toolAnnotations(descriptor.effect),
         _meta: { 'pairdraw/capabilities': descriptor.capabilities }
       },
       async (args, context) => {
         try {
-          return await handler(args, context)
+          return await handler(parseToolArgs(name, toolOptions.inputSchema, args), context)
         } finally {
           await options.onToolSettled?.(context)
         }

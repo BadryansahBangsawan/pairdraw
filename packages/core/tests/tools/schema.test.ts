@@ -29,9 +29,31 @@ describe('tool arguments', () => {
     expect(() => tool.execute(figma, { kind: 'CIRCLE', width: 0 })).toThrow(
       [
         'Invalid arguments for place_box:',
-        '× Invalid type: Expected ("FRAME" | "RECTANGLE") but received "CIRCLE"',
+        '× Invalid value "CIRCLE" for argument "kind". Accepted: "FRAME", "RECTANGLE"',
         '  → at kind',
         '× Invalid value: Expected >=1 but received 0',
+        '  → at width'
+      ].join('\n')
+    )
+  })
+
+  test('name the arguments a call does take', () => {
+    const figma = new FigmaAPI(new SceneGraph())
+    expect(() => tool.execute(figma, { kind: 'FRAME', width: 10, height: 10 })).toThrow(
+      [
+        'Invalid arguments for place_box:',
+        '× Unknown argument "height". Accepted: kind, width',
+        '  → at height'
+      ].join('\n')
+    )
+  })
+
+  test('name the argument a call left out', () => {
+    const figma = new FigmaAPI(new SceneGraph())
+    expect(() => tool.execute(figma, { kind: 'FRAME' })).toThrow(
+      [
+        'Invalid arguments for place_box:',
+        '× Missing required argument "width"',
         '  → at width'
       ].join('\n')
     )

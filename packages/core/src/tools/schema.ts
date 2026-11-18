@@ -92,10 +92,11 @@ export function defineTool<P extends v.ObjectEntries, R>(
 }
 
 /**
- * Every tool run goes through here, so a wrong call from AI chat, the CLI, or WebMCP names the
- * tool and lists each problem with its argument, as `v.summarize` formats them. MCP clients get
- * the MCP SDK's own report, which validates the same schema before the handler runs. Inputs are
- * strict objects, so a misspelled or mis-nested argument fails here instead of being dropped.
+ * Every tool run goes through here, so a wrong call from AI chat, the CLI, WebMCP, and MCP names
+ * the tool and lists each problem with its argument. An unknown or missing argument names the
+ * arguments the tool takes, and a picklist names the values it accepts, read from the schema, so
+ * the caller does not have to guess. Inputs are strict objects, so a misspelled or mis-nested
+ * argument fails here instead of being dropped.
  */
 export function parseToolArgs<S extends v.GenericSchema>(
   name: string,
@@ -104,7 +105,82 @@ export function parseToolArgs<S extends v.GenericSchema>(
 ): v.InferOutput<S> {
   const result = v.safeParse(schema, args)
   if (result.success) return result.output
-  throw new Error(`Invalid arguments for ${name}:\n${v.summarize(result.issues)}`)
+  throw new Error(formatToolArgumentError(name, schema, result.issues))
+}
+
+/** One refusal for every surface: the tool, then each problem with where it is. */
+function formatToolArgumentError(
+  name: string,
+  schema: v.GenericSchema,
+  issues: readonly v.BaseIssue<unknown>[]
+): string {
+  const problems = issues.map((issue) => {
+    const keys = issueKeys(issue)
+    const place = keys.length > 0 ? `\n  → at ${keys.join('.')}` : ''
+    return `× ${formatToolArgIssue(schema, issue)}${place}`
+  })
+  return `Invalid arguments for ${name}:\n${problems.join('\n')}`
+}
+
+/** The parts of a Valibot schema this module reads to name what a call should have sent. */
+type SchemaParts = {
+  readonly entries?: v.ObjectEntries
+  readonly item?: v.GenericSchema
+  readonly wrapped?: v.GenericSchema
+  readonly options?: readonly unknown[]
+}
+
+function schemaParts(schema: unknown): SchemaParts {
+  return typeof schema === 'object' && schema !== null ? schema : {}
+}
+
+/** The schema a wrapper such as `optional` or `pipe` holds, down to the one with the rules. */
+function unwrappedSchema(schema: v.GenericSchema): v.GenericSchema {
+  let current = schema
+  for (;;) {
+    const wrapped = schemaParts(current).wrapped
+    if (!wrapped) return current
+    current = wrapped
+  }
+}
+
+function issueKeys(issue: v.BaseIssue<unknown>): string[] {
+  return (issue.path ?? []).flatMap((item) => ('key' in item ? [String(item.key)] : []))
+}
+
+function schemaAtPath(root: v.GenericSchema, keys: readonly string[]): v.GenericSchema | null {
+  let current = unwrappedSchema(root)
+  for (const key of keys) {
+    const parts = schemaParts(current)
+    const next = parts.entries && key in parts.entries ? parts.entries[key] : parts.item
+    if (!next) return null
+    current = unwrappedSchema(next)
+  }
+  return current
+}
+
+function formatToolArgIssue(schema: v.GenericSchema, issue: v.BaseIssue<unknown>): string {
+  const keys = issueKeys(issue)
+  const key = keys.at(-1)
+  if (key !== undefined && (issue.type === 'object' || issue.type === 'strict_object')) {
+    if (issue.expected === 'never') {
+      const parent = schemaAtPath(schema, keys.slice(0, -1))
+      const accepted = parent ? Object.keys(schemaParts(parent).entries ?? {}) : []
+      return accepted.length > 0
+        ? `Unknown argument "${key}". Accepted: ${accepted.join(', ')}`
+        : `Unknown argument "${key}"`
+    }
+    if (issue.received === 'undefined') return `Missing required argument "${key}"`
+  }
+  if (issue.type === 'picklist' && key !== undefined) {
+    const resolved = schemaAtPath(schema, keys)
+    const options = resolved ? schemaParts(resolved).options : undefined
+    if (options && options.length > 0) {
+      const accepted = options.map((option) => JSON.stringify(option)).join(', ')
+      return `Invalid value ${issue.received} for argument "${key}". Accepted: ${accepted}`
+    }
+  }
+  return issue.message
 }
 
 export function toolChangesDocument(def: Pick<ToolDef, 'execution'>): boolean {

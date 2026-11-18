@@ -111,6 +111,13 @@ async function createTestClient(disabledTools: string[] = [], scope: MCPToolScop
   }
 }
 
+function resultText(result: { content: { type: string; text?: string }[] }): string {
+  return result.content
+    .filter((item) => item.type === 'text')
+    .map((item) => item.text ?? '')
+    .join('\n')
+}
+
 function parseResult(result: { content: { type: string; text?: string }[] }): unknown {
   const textContent = result.content.find((c) => c.type === 'text')
   return textContent?.text ? JSON.parse(textContent.text) : null
@@ -154,6 +161,7 @@ describe('startServer option validation', () => {
 
 describe('MCP server', () => {
   let client: Client
+  let browser: MockBrowser
   let graph: SceneGraph
   let cleanup: (() => Promise<void>) | null = null
 
@@ -161,6 +169,7 @@ describe('MCP server', () => {
     try {
       const ctx = await createTestClient()
       client = ctx.client
+      browser = ctx.browser
       graph = ctx.graph
       cleanup = ctx.close
     } catch (e) {
@@ -295,6 +304,66 @@ describe('MCP server', () => {
     })
     expect(update.isError).toBe(true)
     expect(graph.getNode(id)?.y).toBe(0)
+  })
+
+  test('names the accepted arguments when a call sends an unknown one', async () => {
+    const create = await client.callTool({
+      name: 'create_shape',
+      arguments: { type: 'RECTANGLE', x: 0, y: 0, width: 50, height: 50 }
+    })
+    const { id } = parseResult(create) as { id: string }
+
+    const stroke = await client.callTool({
+      name: 'set_stroke',
+      arguments: { id, color: '#000000', width: 2 }
+    })
+
+    expect(stroke.isError).toBe(true)
+    const text = resultText(stroke)
+    expect(text).toContain('Unknown argument "width"')
+    expect(text).toMatch(/Accepted: .*\bweight\b/)
+  })
+
+  test('names a missing required argument', async () => {
+    const node = await client.callTool({ name: 'get_node', arguments: {} })
+
+    expect(node.isError).toBe(true)
+    expect(resultText(node)).toContain('Missing required argument "id"')
+  })
+
+  test('names the values a picklist argument takes', async () => {
+    const create = await client.callTool({
+      name: 'create_shape',
+      arguments: { type: 'RECTANGLE', x: 0, y: 0, width: 50, height: 50 }
+    })
+    const { id } = parseResult(create) as { id: string }
+
+    const arranged = await client.callTool({
+      name: 'arrange',
+      arguments: { ids: [id], mode: 'Grid' }
+    })
+
+    expect(arranged.isError).toBe(true)
+    expect(resultText(arranged)).toMatch(
+      /Invalid value "Grid" for argument "mode"\. Accepted: .*"grid"/
+    )
+  })
+
+  test('sends the handler the arguments the schema parsed, defaults included', async () => {
+    const create = await client.callTool({
+      name: 'create_shape',
+      arguments: { type: 'RECTANGLE', x: 0, y: 0, width: 50, height: 50 }
+    })
+    const { id } = parseResult(create) as { id: string }
+
+    const stroke = await client.callTool({
+      name: 'set_stroke',
+      arguments: { id, color: '#000000' }
+    })
+    expect(stroke.isError).not.toBe(true)
+
+    const forwarded = browser.requests.findLast((request) => request.command === 'tool')
+    expect(forwarded?.args).toMatchObject({ name: 'set_stroke', args: { id, weight: 1 } })
   })
 
   test('get_page_tree returns page structure', async () => {

@@ -5,6 +5,7 @@ import type { RenderColorSpace } from '@pairdraw/scene-graph/color'
 import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
 import { computeDescendantVisualBounds, type VisualBounds } from '@pairdraw/scene-graph/geometry'
 import type { Mat3 } from '@pairdraw/scene-graph/matrix'
+import { resolvedVariableModes } from '@pairdraw/scene-graph/variables'
 
 import type { SkiaRenderer } from '#core/canvas'
 import { getPageColor } from '#core/figma-api/page-backgrounds'
@@ -253,6 +254,8 @@ export function prepareSelectionRenderGraph(
     if (sourceNode.parentId === pageId) continue
     const world = getWorldMatrix(sourceNode, source)
     node.parentId = pageId
+    // The page is now the parent, so the modes the ancestors set must stay on the node.
+    node.variableModes = resolvedVariableModes(source, nodeId)
     applyWorldTransform(node, world)
   }
   renderGraph.clearAbsPosCache()

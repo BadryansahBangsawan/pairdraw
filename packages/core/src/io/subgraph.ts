@@ -1,6 +1,6 @@
 import { SceneGraph } from '@pairdraw/scene-graph'
 import { styleRunReferences } from '@pairdraw/scene-graph/text'
-import { variableValueReferences } from '@pairdraw/scene-graph/variables'
+import { resolvedVariableModes, variableValueReferences } from '@pairdraw/scene-graph/variables'
 
 import type { ExportTarget } from './types'
 
@@ -100,6 +100,8 @@ function cloneIntoGraph(
     if (!node) continue
     if (!node.parentId || !ids.has(node.parentId)) {
       node.parentId = source.rootId
+      // The ancestor that set a mode is not in the copy, so the node keeps what it inherited.
+      node.variableModes = resolvedVariableModes(source, id)
     }
     node.childIds = node.childIds.filter((childId) => ids.has(childId))
   }

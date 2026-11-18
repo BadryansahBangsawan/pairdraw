@@ -1,0 +1,1 @@
+- Exporting a layer on its own keeps the variable mode its ancestors set, so the image matches the canvas.

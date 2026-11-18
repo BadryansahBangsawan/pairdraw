@@ -1,8 +1,25 @@
 import type { SceneGraph } from '../graph'
 import type { Color } from '../primitives'
-import type { Variable, VariableLiteral, VariableValue } from '../types'
+import type { SceneNode, Variable, VariableLiteral, VariableValue } from '../types'
 import { MAX_FORMULA_DEPTH, VariableFormulaError } from './formula/tree'
 import { resolveVariableValue } from './value'
+
+/**
+ * The modes a node draws in for every collection: its ancestors' explicit modes from the outside
+ * in, then its own. A copy that re-parents a node, such as an export of one layer, keeps this on
+ * the node so it still resolves its variables as the canvas does.
+ */
+export function resolvedVariableModes(graph: SceneGraph, nodeId: string): Record<string, string> {
+  const chain: SceneNode[] = []
+  let node = graph.nodes.get(nodeId)
+  while (node) {
+    chain.push(node)
+    node = node.parentId ? graph.nodes.get(node.parentId) : undefined
+  }
+  const modes: Record<string, string> = {}
+  for (const ancestor of chain.reverse()) Object.assign(modes, ancestor.variableModes)
+  return modes
+}
 
 export function getActiveModeId(graph: SceneGraph, collectionId: string): string {
   const mode = graph.activeMode.get(collectionId)

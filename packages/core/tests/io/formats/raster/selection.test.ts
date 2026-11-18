@@ -3,6 +3,7 @@ import { expect, test } from 'bun:test'
 import { expectDefined } from '#core-tests/helpers/assert'
 
 import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { renderJSX } from '@pairdraw/core/design-jsx'
 import { initCanvasKit, renderNodesToImage } from '@pairdraw/core/io/formats/raster'
 import { SceneGraph, type Effect } from '@pairdraw/scene-graph'
 
@@ -208,3 +209,28 @@ test('selection export draws a selected layer once when its frame is selected to
   expect(pixelAt(10, 10)[3]).toBe(128)
   expect(pixelAt(30, 30)[3]).toBe(0)
 })
+
+/** A frame in the Dark mode over a child whose colour is a variable in that collection. */
+const DARK_CHILD = `
+const palette = defineVars('Palette', { 'Gray/900': '#111111', 'Gray/50': '#FAFAFA' })
+const theme = defineVars('Theme', { Surface: palette['Gray/50'] }, { mode: 'Light' })
+const dark = defineMode(theme, 'Dark', { Surface: palette['Gray/900'] })
+return <Frame name="Parent" mode={dark} w={300} h={200}>
+  <Frame name="Child" bg={theme.Surface} w={60} h={60} />
+</Frame>`
+
+test('selection export keeps the variable mode the layer inherits from its ancestors', async () => {
+  const graph = new SceneGraph()
+  await renderJSX(graph, DARK_CHILD)
+  const page = expectDefined(graph.getPages()[0], 'page')
+  const child = expectDefined(
+    [...graph.nodes.values()].find((node) => node.name === 'Child'),
+    'child'
+  )
+
+  const pixelAt = exportedRgba(graph, page.id, child.id)
+
+  // The canvas shows the child Dark, so exporting it alone must too, not the Light default.
+  expect(pixelAt(10, 10)).toEqual([0x11, 0x11, 0x11, 255])
+})
+

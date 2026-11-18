@@ -424,6 +424,7 @@
   "aiSetupAgentMCPStartFailed": "MCP-сервер установлен, но не запустился. Перезапустите Pairdraw и проверьте снова.",
   "aiSetupAgentLookupFailed": "Не удалось проверить этот компьютер. Попробуйте снова.",
   "aiSetupProblemInstallNeeded": "Для {agent} сначала нужно установить коннектор.",
+  "chatAgentQuiet": "{agent} молчит с {since}. Возможно, он всё ещё работает.",
   "chatAgentWorkingIn": "{agent} работает над документом «{document}»",
   "chatAgentWorkingOn": "{agent} работает над «{page}»",
   "chatGoToDocument": "Перейти к документу",

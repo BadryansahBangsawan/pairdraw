@@ -23,7 +23,8 @@ describe('app runtime configuration', () => {
       collaborationRelayURL: 'ws://localhost:4000',
       viewportMotion: false,
       drafts: false,
-      embed: null
+      embed: null,
+      quietTurnMs: undefined
     })
   })
 
@@ -33,6 +34,13 @@ describe('app runtime configuration', () => {
     expect(embed.showChrome).toBe(false)
     expect(embed.drafts).toBe(false)
     expect(parseAppRuntimeConfig('?embed&chrome').showChrome).toBe(true)
+  })
+
+  test('reads a shortened quiet limit only from a usable value', () => {
+    expect(parseAppRuntimeConfig('?quiet-turn-ms=2000').quietTurnMs).toBe(2000)
+    expect(parseAppRuntimeConfig('?quiet-turn-ms=0').quietTurnMs).toBeUndefined()
+    expect(parseAppRuntimeConfig('?quiet-turn-ms=soon').quietTurnMs).toBeUndefined()
+    expect(parseAppRuntimeConfig('').quietTurnMs).toBeUndefined()
   })
 
   test('glides the viewport outside test runs, and in one that asks for it', () => {
@@ -91,7 +99,8 @@ describe('app runtime configuration', () => {
       collaborationRelayURL: null,
       viewportMotion: true,
       drafts: true,
-      embed: null
+      embed: null,
+      quietTurnMs: undefined
     })
   })
 })

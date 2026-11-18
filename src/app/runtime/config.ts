@@ -39,6 +39,11 @@ export interface AppRuntimeConfig {
    * `chrome`, and nothing is kept as a draft, since the host owns the document.
    */
   embed: EmbedParams | null
+  /**
+   * How long an agent may go without an event before its chat says so, from `?quiet-turn-ms`; a
+   * test run shortens the three minutes so it need not wait that long.
+   */
+  quietTurnMs: number | undefined
 }
 
 /**
@@ -71,8 +76,16 @@ export function parseAppRuntimeConfig(
     collaborationRelayURL: params.get('collabRelay'),
     viewportMotion: !params.has('test') || params.has('viewport-motion'),
     drafts: !embed && (!params.has('test') || params.has('drafts')),
-    embed
+    embed,
+    quietTurnMs: positiveMilliseconds(params.get('quiet-turn-ms'))
   }
+}
+
+/** A URL's milliseconds, or undefined when it names none or something unusable. */
+function positiveMilliseconds(value: string | null): number | undefined {
+  if (value === null) return undefined
+  const milliseconds = Number(value)
+  return Number.isFinite(milliseconds) && milliseconds > 0 ? milliseconds : undefined
 }
 
 export const appRuntimeConfig = parseAppRuntimeConfig(

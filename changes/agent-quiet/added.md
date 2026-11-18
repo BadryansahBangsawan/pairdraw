@@ -1,0 +1,1 @@
+- A coding agent that works silently for minutes says so in its chat, with how long it has been quiet and its Stop, instead of leaving the turn unexplained.

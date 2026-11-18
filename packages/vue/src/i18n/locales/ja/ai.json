@@ -424,6 +424,7 @@
   "aiSetupAgentMCPStartFailed": "MCP サーバーはインストール済みですが起動しませんでした。Pairdraw を再起動してから、もう一度確認してください。",
   "aiSetupAgentLookupFailed": "このコンピューターを確認できませんでした。もう一度お試しください。",
   "aiSetupProblemInstallNeeded": "{agent} を使うには、先にコネクタをインストールする必要があります。",
+  "chatAgentQuiet": "{agent} は {since} から応答していません。まだ作業中の可能性があります。",
   "chatAgentWorkingIn": "{agent}が「{document}」で作業中",
   "chatAgentWorkingOn": "{agent}が「{page}」で作業中",
   "chatGoToDocument": "ドキュメントへ移動",

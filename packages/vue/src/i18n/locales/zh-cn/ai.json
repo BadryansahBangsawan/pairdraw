@@ -424,6 +424,7 @@
   "aiSetupAgentMCPStartFailed": "MCP 服务器已安装但未能启动。请重启 Pairdraw，然后重新检查。",
   "aiSetupAgentLookupFailed": "无法检查这台电脑，请重试。",
   "aiSetupProblemInstallNeeded": "{agent} 需要先安装它的连接器。",
+  "chatAgentQuiet": "{agent} 自 {since} 起没有动静，可能仍在工作。",
   "chatAgentWorkingIn": "{agent} 正在处理文档“{document}”",
   "chatAgentWorkingOn": "{agent} 正在处理“{page}”",
   "chatGoToDocument": "转到文档",

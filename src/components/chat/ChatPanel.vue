@@ -5,6 +5,7 @@ import { computed, markRaw, nextTick, shallowRef, useTemplateRef, watch } from '
 
 import { useI18n } from '@pairdraw/vue/i18n'
 
+import { currentPermission } from '@/app/ai/agents/acp/permission'
 import { agentAutoConnect } from '@/app/ai/agents/auto/session'
 import { agentSignInHelp } from '@/app/ai/agents/signed-out'
 import { carriesAttachableFile, isAttachableFile } from '@/app/ai/attachment/accept'
@@ -20,12 +21,14 @@ import {
   removeQueuedMessage,
   takeNextMessage
 } from '@/app/ai/chat/queue'
+import { useQuietTurn } from '@/app/ai/chat/quiet'
 import { useChatRunLocation } from '@/app/ai/chat/run-location'
 import { ensureChatConfigured, joinWaitingPrompt } from '@/app/ai/chat/setup'
 import type { ChatSubmission } from '@/app/ai/chat/submission/types'
 import { useChatSubmission } from '@/app/ai/chat/submission/use'
 import { saveChatTrace } from '@/app/ai/chat/trace/export'
 import { useAIChat } from '@/app/ai/chat/use'
+import { modelProviderName } from '@/app/ai/models/provider-name'
 import { openAISetup } from '@/app/ai/models/settings/onboarding/dialog'
 import { didHitStepLimit } from '@/app/ai/tools'
 import { cloudBillingURL } from '@/app/cloud/integration'
@@ -47,6 +50,7 @@ import ChatFollowAgentsToggle from '@/components/chat/ChatFollowAgentsToggle.vue
 import ChatHistory from '@/components/chat/ChatHistory.vue'
 import ChatInput from '@/components/chat/ChatInput.vue'
 import ChatPermissionDialog from '@/components/chat/ChatPermissionDialog.vue'
+import ChatQuietNotice from '@/components/chat/ChatQuietNotice.vue'
 import ChatRunLocation from '@/components/chat/ChatRunLocation.vue'
 import ChatTranscript from '@/components/chat/ChatTranscript.vue'
 import ChatContextBar from '@/components/chat/context/ChatContextBar.vue'
@@ -367,6 +371,17 @@ const failureHasSettingsAction = computed(() =>
 const status = computed(() => chat.value?.status ?? 'ready')
 
 /**
+ * The agent may think or run a command for a long while without a word; past the quiet limit the
+ * chat says so, with its Stop, instead of ending the turn.
+ */
+const { quiet: quietTurn, silentSince: quietSinceAt } = useQuietTurn({
+  status,
+  messages,
+  waitingForPerson: computed(() => currentPermission.value !== null)
+})
+const quietSince = computed(() => (quietSinceAt.value ? dates.relative(quietSinceAt.value) : ''))
+
+/**
  * A message written while the agent works waits for it: Enter steers, which the built-in chat
  * takes in once the current tool calls finish, and Alt+Enter waits until all work is done.
  */
@@ -579,6 +594,13 @@ function handleStop() {
         :page="runLocation.page"
         :document="runLocation.document"
         @open="runLocation.open"
+      />
+
+      <ChatQuietNotice
+        v-if="quietTurn"
+        :agent="modelProviderName(providerID)"
+        :since="quietSince"
+        @stop="handleStop"
       />
 
       <ChatPermissionDialog />

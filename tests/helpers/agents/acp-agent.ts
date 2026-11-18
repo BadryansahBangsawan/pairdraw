@@ -95,6 +95,13 @@ function sessionNote(): string {
     : ''
 }
 
+/**
+ * A prompt naming this stays quiet: the agent streams one update and then waits, as a coding agent
+ * does while thinking or running a long command, until the person stops it.
+ */
+const QUIET_MARKER = 'stay-quiet'
+let finishQuiet: (() => void) | null = null
+
 const connection: AgentSideConnection = new AgentSideConnection(
   () => ({
     initialize: async () => ({
@@ -128,6 +135,19 @@ const connection: AgentSideConnection = new AgentSideConnection(
     authenticate: async () => ({}),
     prompt: async ({ sessionId, prompt }) => {
       const text = prompt.map((block) => (block.type === 'text' ? block.text : '')).join('')
+      if (text.includes(QUIET_MARKER)) {
+        await connection.sessionUpdate({
+          sessionId,
+          update: {
+            sessionUpdate: 'agent_message_chunk',
+            content: { type: 'text', text: 'working on it' }
+          }
+        })
+        await new Promise<void>((resolve) => {
+          finishQuiet = resolve
+        })
+        return { stopReason: 'cancelled' }
+      }
       await connection.sessionUpdate({
         sessionId,
         update: {
@@ -140,7 +160,10 @@ const connection: AgentSideConnection = new AgentSideConnection(
       })
       return { stopReason: 'end_turn' }
     },
-    cancel: async () => undefined
+    cancel: async () => {
+      finishQuiet?.()
+      finishQuiet = null
+    }
   }),
   stream
 )

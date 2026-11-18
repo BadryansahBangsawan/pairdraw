@@ -424,6 +424,7 @@
   "aiSetupAgentMCPStartFailed": "Il server MCP è installato ma non si è avviato. Riavvia Pairdraw e controlla di nuovo.",
   "aiSetupAgentLookupFailed": "Impossibile controllare questo computer. Riprova.",
   "aiSetupProblemInstallNeeded": "{agent} richiede prima l’installazione del suo connettore.",
+  "chatAgentQuiet": "{agent} è in silenzio da {since}. Potrebbe stare ancora lavorando.",
   "chatAgentWorkingIn": "{agent} sta lavorando nel documento «{document}»",
   "chatAgentWorkingOn": "{agent} sta lavorando su «{page}»",
   "chatGoToDocument": "Vai al documento",

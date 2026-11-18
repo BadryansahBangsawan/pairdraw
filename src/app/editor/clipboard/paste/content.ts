@@ -92,3 +92,16 @@ export async function pasteLayerText(
     (await pasteMermaidText(editor, text, cursorPos))
   )
 }
+
+/**
+ * Paste copied text: markup that draws layers of its own, or any other text as a text layer
+ * holding it, as Figma does; false when the text is blank.
+ */
+export async function pasteClipboardText(
+  editor: Editor,
+  text: string,
+  cursorPos?: Vector
+): Promise<boolean> {
+  if (await pasteLayerText(editor, text, cursorPos)) return true
+  return editor.pastePlainText(text, cursorPos?.x, cursorPos?.y)
+}

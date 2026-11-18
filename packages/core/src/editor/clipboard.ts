@@ -9,7 +9,7 @@ import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
 import { parsePairdrawClipboard } from '#core/clipboard'
 import { prepareClipboardImport } from '#core/clipboard/fig-import'
-import { computeAllLayouts } from '#core/layout'
+import { computeAllLayouts, layoutAuthoredNodes } from '#core/layout'
 import { reconcileVariableLayouts } from '#core/layout/variables'
 
 import { createClipboardAssetActions } from './clipboard/assets'
@@ -36,6 +36,7 @@ import { createStyledPasteActions } from './clipboard/styled'
 import { replaceableInstanceLayers, replaceInstanceLayersWith } from './components/replace'
 import { acceptsChildren, prepareSlotEdits } from './components/slots'
 import { collectSubtrees, restoreSubtree, snapshotSubtree } from './history/subtree'
+import { newLayerDefaults } from './shapes/defaults'
 import { loadBoundFonts } from './text/bound-fonts'
 import type { EditorContext } from './types'
 
@@ -258,6 +259,47 @@ export function createClipboardActions(ctx: EditorContext) {
       ])
       ctx.requestRender()
     }
+  }
+
+  /** The name Figma gives pasted text: its first line, as the layer lists it. */
+  const textLayerName = (text: string) => {
+    const firstLine = text.split('\n')[0]?.trim() ?? ''
+    return firstLine.length > 64 ? `${firstLine.slice(0, 63)}…` : firstLine
+  }
+
+  /**
+   * Paste plain text from another app as a text layer holding it, centred on the point and inside
+   * the selected frame, in one undo step; false when the text has nothing to show.
+   */
+  async function pastePlainText(text: string, cx?: number, cy?: number): Promise<boolean> {
+    const content = text.replace(/\r\n?/g, '\n')
+    const name = textLayerName(content)
+    if (!name) return false
+    const previousSelection = new Set(ctx.state.selectedIds)
+    const parentId = resolvePasteTarget(ctx)
+    if (!prepareSlotEdits(ctx, [parentId])) return false
+    const node = ctx.graph.createNode('TEXT', parentId, {
+      ...newLayerDefaults('TEXT', ctx.state.theme),
+      name,
+      text: content,
+      textAutoResize: 'WIDTH_AND_HEIGHT',
+      x: 0,
+      y: 0
+    })
+    // Measured with its font loaded, so it takes its content's size and centres on that.
+    await fontActions.loadFontsForNodes([node.id])
+    layoutAuthoredNodes(ctx.graph, [node.id])
+    const cursorPos = cx !== undefined && cy !== undefined ? { x: cx, y: cy } : undefined
+    placementActions.placeForeignPaste([node.id], parentId, cursorPos)
+    if (ctx.state.snappingPreferences.pixelGrid) {
+      const placed = ctx.graph.getNode(node.id)
+      if (placed)
+        ctx.graph.updateNode(node.id, { x: Math.round(placed.x), y: Math.round(placed.y) })
+    }
+    ctx.setSelectedIds(new Set([node.id]))
+    pushCreatedNodesUndo([node.id], previousSelection, 'Paste text')
+    ctx.requestRender()
+    return true
   }
 
   function pastePairdrawNodes(
@@ -487,6 +529,7 @@ export function createClipboardActions(ctx: EditorContext) {
     ...copyActions,
     pasteSnapshot,
     pasteFromHTML,
+    pastePlainText,
     warnMissingImages,
     deleteNodes,
     deleteSelected,

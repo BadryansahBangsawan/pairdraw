@@ -8,7 +8,11 @@ import {
   getInMemoryClipboardHTML,
   setInMemoryClipboardPayload
 } from '@/app/editor/clipboard/memory'
-import { pasteClipboardHTML, pasteLayerText } from '@/app/editor/clipboard/paste/content'
+import {
+  pasteClipboardHTML,
+  pasteClipboardText,
+  pasteLayerText
+} from '@/app/editor/clipboard/paste/content'
 import type { SystemClipboard } from '@/app/editor/clipboard/system/types'
 import {
   readTauriClipboardText,
@@ -46,12 +50,14 @@ async function pasteSelection(store: EditorStore, cursorPos?: Vector): Promise<b
       return true
     }
     if (text && (await pasteLayerText(store, text, cursorPos))) return true
+    // Our own copy's plain text holds the layers of a copy this app still remembers.
     const matchingMemoryHTML = getInMemoryClipboardHTML(text ?? '')
     if (matchingMemoryHTML && isDesignClipboardHTML(matchingMemoryHTML)) {
       await pasteClipboardHTML(store, matchingMemoryHTML, cursorPos)
       return true
     }
-    return false
+    // Any other text was copied in another app after this one's copy, so it is text to keep.
+    return text !== null && (await pasteClipboardText(store, text, cursorPos))
   } catch (error) {
     console.warn('Tauri clipboard paste failed', error)
     return false

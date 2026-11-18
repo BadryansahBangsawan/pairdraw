@@ -10,7 +10,11 @@ import {
   getInMemoryClipboardHTML,
   setInMemoryClipboardPayload
 } from '@/app/editor/clipboard/memory'
-import { pasteClipboardHTML, pasteLayerText } from '@/app/editor/clipboard/paste/content'
+import {
+  pasteClipboardHTML,
+  pasteClipboardText,
+  pasteLayerText
+} from '@/app/editor/clipboard/paste/content'
 import { pasteWebClipboardHTML } from '@/app/editor/clipboard/paste/web'
 import type {
   BrowserClipboardIO,
@@ -112,7 +116,10 @@ async function pasteSelection(
     }
     if (result.text !== null && (await pasteLayerText(store, result.text, cursorPos))) return true
     // A web page's clipboard fragment, which holds no layers of its own.
-    return result.html !== null && (await pasteWebClipboardHTML(store, result.html, cursorPos))
+    if (result.html !== null && (await pasteWebClipboardHTML(store, result.html, cursorPos))) {
+      return true
+    }
+    return result.text !== null && (await pasteClipboardText(store, result.text, cursorPos))
   }
 
   const memoryHTML = getInMemoryClipboardHTML()

@@ -9,6 +9,7 @@ import { getInMemoryClipboardHTML } from '@/app/editor/clipboard/memory'
 import {
   isLayerText,
   pasteClipboardHTML,
+  pasteClipboardText,
   pasteLayerText,
   pastePoint
 } from '@/app/editor/clipboard/paste/content'
@@ -106,10 +107,21 @@ export function bindEditorClipboard(store: EditorStore) {
       return
     }
 
+    // Copying text in another app replaces what a copy in this one put on the clipboard, so a
+    // paste of text becomes a text layer rather than the last copy made in the app.
+    if (text.trim()) {
+      void pasteClipboardText(store, text, cursorPos)
+      return
+    }
+
     if (isTauri()) {
       void tauriSystemClipboard.paste(store, undefined)
       return
     }
+
+    // Only a paste the browser could not read (no clipboard data at all) falls back to the copy
+    // the app still holds in memory.
+    if (e.clipboardData) return
 
     const memoryHTML = getInMemoryClipboardHTML()
     if (memoryHTML) {

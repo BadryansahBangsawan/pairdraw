@@ -3,6 +3,7 @@ export { rescale, setMinMax, setOpacity, setRadius, setRotation } from './modify
 export { setConstraints, setLayout, setLayoutChild } from './modify/layout'
 export { replaceMatchingProperties } from './modify/matching'
 export { setFill, setImageFill, setStroke } from './modify/paint'
+export { setReactions } from './modify/reactions'
 export { setBlend, setLocked, setStrokeAlign, setVisible } from './modify/state'
 export { setFont, setFontRange, setText, setTextProperties, setTextResize } from './modify/text'
 export { updateNode } from './modify/update'

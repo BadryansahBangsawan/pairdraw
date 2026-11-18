@@ -1,0 +1,1 @@
+- Agent tools can read and write prototype connections: `get_reactions` and `set_reactions` use Figma's plugin shape, keep a change undoable like the Prototype panel, and refuse a trigger, action, or destination the prototype play cannot run.

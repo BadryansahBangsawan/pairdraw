@@ -244,7 +244,7 @@ Endpoints are available over both active transports:
 2. **Open** — `open_file` to load an existing `.fig`, or `new_document` for a blank canvas. `list_recent_files` lists recently opened files inside the MCP root to reopen. These return target metadata for the opened or created document.
 3. **Read** — `get_page_tree`, `find_nodes`, `get_node`, `list_pages`
 4. **Create** — `create_shape`, `render` (JSX)
-5. **Modify** — `set_fill`, `set_stroke`, `set_layout`, `update_node`, `set_effects`
+5. **Modify** — `set_fill`, `set_stroke`, `set_layout`, `update_node`, `set_effects`, `set_reactions`
 6. **Structure** — `reparent_node`, `group_nodes`, `clone_node`, `delete_node`
 7. **Save** — `save_file` to write back to `.fig`
 8. **Close** — `close_file` to close an open document tab. With unsaved changes it fails unless `unsaved` is `"save"` or `"discard"`; it never prompts in the app. Without `document_id`, close changes only a document that this session opened. Save without `document_id` saves the document this session is targeting, or the document in front. Pass `document_id` to close or save any other open document. `open_file` owns a document only when that call opened it.
@@ -398,6 +398,15 @@ These run in the app on the services and keys set up in **Settings → Image ser
 | `rescale`                     | Scale layers as the Scale tool (K) does, with their text, strokes, radii, effects, and spacing, around an `anchor` of their joint bounds (`top-left` by default); `factor` 2 doubles; locked layers and layers inside instances are listed in `skipped`                               |
 | `node_replace_with`           | Replace a node with another node                                                                                                                                                                                                                                                      |
 | `arrange`                     | Spread overlapping layers apart, pack them, place them in a grid, row, or column, or lay them out along their connectors as a flow, tree, radial map, or network                                                                                                                      |
+
+### Prototype
+
+Connections use Figma's plugin shape, the same shape the layer's `reactions` exposes in scripts: `[{ trigger: { type: "ON_CLICK" } | { type: "AFTER_TIMEOUT", timeout }, actions: [{ type: "NODE", destinationId, navigation: "NAVIGATE" | "OVERLAY", transition: { type: "INSTANT" | "DISSOLVE", duration }, overlayRelativePosition }, { type: "BACK" }, { type: "CLOSE" }] }]`. A destination is a top-level frame on the layer's page; a trigger, action, transition, navigation or overlay spot the prototype play cannot run is refused with the reason.
+
+| Tool            | Description                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------- |
+| `get_reactions` | Read a layer's prototype connections, in Figma's plugin shape; empty when it connects to nothing              |
+| `set_reactions` | Replace a layer's prototype connections; one undo step, as the Prototype panel's edits are                    |
 
 ### Structure
 

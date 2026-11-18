@@ -21,6 +21,7 @@ import { prepareFollowedFieldEdit, fitGroupsAround } from './accessor-utils'
 import { installBasicNodeProxyAccessors } from './accessors/basic'
 import { installConnectorNodeProxyAccessors } from './accessors/connector'
 import { installLayoutNodeProxyAccessors } from './accessors/layout'
+import { installReactionAccessors } from './accessors/reactions'
 import { installShapeNodeProxyAccessors } from './accessors/shape'
 import { installStickyNodeProxyAccessors, pluginChildren } from './accessors/sticky'
 import { installStrokeNodeProxyAccessors } from './accessors/strokes'
@@ -44,6 +45,7 @@ import { installInstanceOverrideAccessors, type FigmaInstanceOverride } from './
 import { getPageBackgrounds, setPageBackgrounds } from './page-backgrounds'
 import { parseFigmaPaints, toFigmaPaint, type FigmaPaint } from './paints'
 import { installPluginDataMethods, type PluginDataMethods } from './plugin-data'
+import type { FigmaReaction } from './reactions'
 import { nodeProxyToJSON } from './serialization'
 import { installShapeWithTextAccessors } from './shape-with-text'
 import { installSlotAccessors, prepareSlotMove, prepareSlotRemoval } from './slots'
@@ -171,6 +173,8 @@ export class FigmaNodeProxy {
   declare readonly boundVariables: VariableNodeMembers['boundVariables']
   declare setBoundVariable: VariableNodeMembers['setBoundVariable']
   declare readonly overrides: FigmaInstanceOverride[] | undefined
+  /** Prototype connections, in Figma's plugin shape; refused when the play cannot run them. */
+  declare reactions: readonly FigmaReaction[]
   /** A sticky note's body or a shape's label, a sticky's author line, and whether it is wide. */
   declare readonly text: FigmaNodeProxy | undefined
   declare readonly authorName: string | undefined
@@ -561,6 +565,7 @@ installTextNodeProxyAccessors(FigmaNodeProxy.prototype, proxyInternals, MIXED)
 installTextRangeMethods(FigmaNodeProxy.prototype, proxyInternals, MIXED)
 installLayoutNodeProxyAccessors(FigmaNodeProxy.prototype, proxyInternals)
 installVariableModeNodeProxyAccessors(FigmaNodeProxy.prototype, proxyInternals)
+installReactionAccessors(FigmaNodeProxy.prototype, proxyInternals)
 installPluginDataMethods(FigmaNodeProxy.prototype, proxyInternals)
 installComponentPropertyAccessors(FigmaNodeProxy.prototype, proxyInternals)
 installInstanceOverrideAccessors(FigmaNodeProxy.prototype, proxyInternals)

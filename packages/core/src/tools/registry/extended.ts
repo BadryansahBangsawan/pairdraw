@@ -51,6 +51,7 @@ import {
   replaceMatchingProperties,
   rescale,
   setOpacity,
+  setReactions,
   setRotation,
   setStrokeAlign,
   setTextResize,
@@ -62,6 +63,7 @@ import {
   getCurrentPage,
   getFontStatus,
   getPageTree,
+  getReactions,
   insertLibraryComponent,
   listAvailableFonts,
   listFonts,
@@ -131,6 +133,7 @@ import {
 export const EXTENDED_TOOLS: ToolDef[] = [
   // Read (advanced)
   getPageTree,
+  getReactions,
   getCurrentPage,
   listPages,
   selectNodes,
@@ -179,6 +182,7 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   replaceBackground,
   // Modify (advanced)
   setEffects,
+  setReactions,
   setOpacity,
   setFont,
   setVisible,

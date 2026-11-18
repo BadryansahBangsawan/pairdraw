@@ -127,14 +127,18 @@ async function callMCPTool(name: string, args: Record<string, unknown>): Promise
   return null
 }
 
+async function openNewDocument(): Promise<string> {
+  const created = v.parse(createdSchema, await callMCPTool('new_document', {}))
+  return created.target.documentId
+}
+
 /**
  * The agent designs a new document over several seconds, as the owner's session did: it opens
  * one with `new_document`, then edits that document by its id while the chat's own document
  * stays in front.
  */
 async function designInNewDocument(): Promise<void> {
-  const created = v.parse(createdSchema, await callMCPTool('new_document', {}))
-  const documentId = created.target.documentId
+  const documentId = await openNewDocument()
   for (let index = 0; index < 12; index += 1) {
     await callMCPTool('create_shape', {
       document_id: documentId,
@@ -204,6 +208,15 @@ let finishQuiet: (() => void) | null = null
  */
 const DESIGN_MARKER = 'design-in-new-document'
 
+/**
+ * A prompt naming this works in a document of its own for a while and keeps saying so, so a test
+ * has time to press keys while the reply runs.
+ */
+const SLOW_MARKER = 'slow-reply'
+
+/** A prompt naming this works for a while in the document the chat belongs to. */
+const SLOW_HERE_MARKER = 'slow-here'
+
 const connection: AgentSideConnection = new AgentSideConnection(
   () => ({
     initialize: async () => ({
@@ -249,6 +262,70 @@ const connection: AgentSideConnection = new AgentSideConnection(
           finishQuiet = resolve
         })
         return { stopReason: 'cancelled' }
+      }
+      if (text.includes(SLOW_HERE_MARKER)) {
+        await connection.sessionUpdate({
+          sessionId,
+          update: {
+            sessionUpdate: 'agent_message_chunk',
+            content: { type: 'text', text: 'working here' }
+          }
+        })
+        for (let index = 0; index < 8; index += 1) {
+          await delay(1000)
+          await connection.sessionUpdate({
+            sessionId,
+            update: {
+              sessionUpdate: 'agent_message_chunk',
+              content: { type: 'text', text: ' still here' }
+            }
+          })
+        }
+        await connection.sessionUpdate({
+          sessionId,
+          update: {
+            sessionUpdate: 'agent_message_chunk',
+            content: { type: 'text', text: ' finished here' }
+          }
+        })
+        return { stopReason: 'end_turn' }
+      }
+      if (text.includes(SLOW_MARKER)) {
+        await connection.sessionUpdate({
+          sessionId,
+          update: {
+            sessionUpdate: 'agent_message_chunk',
+            content: { type: 'text', text: 'working slowly' }
+          }
+        })
+        const documentId = await openNewDocument()
+        for (let index = 0; index < 10; index += 1) {
+          await callMCPTool('create_shape', {
+            document_id: documentId,
+            type: 'RECTANGLE',
+            x: 24 + index * 40,
+            y: 24,
+            width: 32,
+            height: 32,
+            name: `Card ${index}`
+          })
+          await connection.sessionUpdate({
+            sessionId,
+            update: {
+              sessionUpdate: 'agent_message_chunk',
+              content: { type: 'text', text: ' still working' }
+            }
+          })
+          await delay(1000)
+        }
+        await connection.sessionUpdate({
+          sessionId,
+          update: {
+            sessionUpdate: 'agent_message_chunk',
+            content: { type: 'text', text: ' finished slowly' }
+          }
+        })
+        return { stopReason: 'end_turn' }
       }
       if (text.includes(DESIGN_MARKER)) {
         await connection.sessionUpdate({

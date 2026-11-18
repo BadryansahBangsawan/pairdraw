@@ -70,3 +70,76 @@ test('a coding agent editing a document it opened does not stop its own reply', 
     rmSync(dir, { recursive: true, force: true })
   }
 })
+
+test('Escape outside the reply’s own document does not stop it', async ({ page, baseURL }) => {
+  test.setTimeout(120_000)
+  const dir = mkdtempSync(join(tmpdir(), 'pairdraw-agent-escape-e2e-'))
+  const companion = await startCompanion(new URL('/?test', baseURL).href, dir)
+  try {
+    await connectClaudeCode(page, companion.link, companion.fingerprint)
+    const chat = new ChatHarness(page)
+    await chat.openChat()
+
+    await chat.input.fill('slow-reply please')
+    await chat.sendButton.click()
+    await expect(chat.assistantMessage()).toContainText('working slowly', { timeout: 60_000 })
+
+    // The agent works in a document of its own, and the chat panel in front only shows it.
+    await expect(page.getByTestId('tabbar-tab')).toHaveCount(2)
+    await expect(page.getByTestId('chat-run-location')).toBeVisible()
+
+    // Escape on the canvas only leaves what the canvas was doing.
+    await new CanvasHelper(page).click(400, 300)
+    await page.keyboard.press('Escape')
+    await expect(page.getByTestId('chat-run-location')).toBeVisible()
+    await expect(page.locator('[data-slot="chat-turn-stopped"]')).toHaveCount(0)
+
+    // Escape in the field that only shows the reply clears nothing and stops nothing.
+    await page.getByTestId('chat-input').click()
+    await page.keyboard.press('Escape')
+    await page.getByTestId('tabbar-tab').first().click()
+    await expect(page.getByTestId('chat-stop-button')).toBeVisible()
+    await expect(page.locator('[data-slot="chat-turn-stopped"]')).toHaveCount(0)
+
+    await expect(chat.assistantMessage()).toContainText('finished slowly', { timeout: 60_000 })
+    await expect(page.locator('[data-slot="chat-turn-stopped"]')).toHaveCount(0)
+  } finally {
+    companion.child.kill('SIGINT')
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('clicking the reply and queueing a note leaves it running', async ({ page, baseURL }) => {
+  test.setTimeout(120_000)
+  const dir = mkdtempSync(join(tmpdir(), 'pairdraw-agent-click-e2e-'))
+  const companion = await startCompanion(new URL('/?test', baseURL).href, dir)
+  try {
+    await connectClaudeCode(page, companion.link, companion.fingerprint)
+    const chat = new ChatHarness(page)
+    await chat.openChat()
+
+    await chat.input.fill('slow-here please')
+    await chat.sendButton.click()
+    await expect(chat.assistantMessage()).toContainText('working here', { timeout: 60_000 })
+
+    // A click on the reply stays a click: it moves no Stop under the pointer and ends nothing.
+    await chat.assistantMessage().click()
+    await expect(page.getByTestId('chat-stop-button')).toBeVisible()
+    await expect(page.locator('[data-slot="chat-turn-stopped"]')).toHaveCount(0)
+
+    // A note written while the agent works waits for it (Alt+Enter) instead of stopping it.
+    await chat.input.fill('a note while it works')
+    await page.keyboard.press('Alt+Enter')
+    await expect(page.getByTestId('chat-queued-message')).toBeVisible()
+    await expect(page.getByTestId('chat-stop-button')).toBeVisible()
+    await expect(page.locator('[data-slot="chat-turn-stopped"]')).toHaveCount(0)
+
+    await expect(
+      page.getByTestId('chat-message-assistant').filter({ hasText: 'finished here' })
+    ).toBeVisible({ timeout: 60_000 })
+    await expect(page.locator('[data-slot="chat-turn-stopped"]')).toHaveCount(0)
+  } finally {
+    companion.child.kill('SIGINT')
+    rmSync(dir, { recursive: true, force: true })
+  }
+})

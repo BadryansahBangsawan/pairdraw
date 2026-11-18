@@ -12,7 +12,8 @@ import {
 } from './render'
 
 let cachedCk: CanvasKit | null = null
-let cachedRenderer: SkiaRenderer | null = null
+/** One offscreen renderer per CanvasKit: the CLI's own, and the app's build when it passes one. */
+const renderers = new WeakMap<CanvasKit, Promise<SkiaRenderer>>()
 
 export async function initCanvasKit(): Promise<CanvasKit> {
   if (cachedCk) return cachedCk
@@ -24,9 +25,7 @@ export async function initCanvasKit(): Promise<CanvasKit> {
   return cachedCk
 }
 
-async function getRenderer(): Promise<{ ck: CanvasKit; renderer: SkiaRenderer }> {
-  const ck = await initCanvasKit()
-  if (cachedRenderer) return { ck, renderer: cachedRenderer }
+async function createRenderer(ck: CanvasKit): Promise<SkiaRenderer> {
   const surface = ck.MakeSurface(1, 1)
   if (!surface) throw new Error('Failed to create CanvasKit surface')
   const renderer = new SkiaRenderer(ck, surface)
@@ -34,8 +33,26 @@ async function getRenderer(): Promise<{ ck: CanvasKit; renderer: SkiaRenderer }>
   renderer.viewportHeight = 1
   renderer.dpr = 1
   await renderer.loadFonts()
-  cachedRenderer = renderer
-  return { ck, renderer }
+  return renderer
+}
+
+/**
+ * The offscreen renderer for `canvasKit`, made on first use. A browser host passes the build its
+ * canvas already uses; without one the export renderer loads its own.
+ */
+async function getRenderer(
+  canvasKit?: CanvasKit
+): Promise<{ ck: CanvasKit; renderer: SkiaRenderer }> {
+  const ck = canvasKit ?? (await initCanvasKit())
+  let pending = renderers.get(ck)
+  if (!pending) {
+    pending = createRenderer(ck)
+    renderers.set(ck, pending)
+    pending.catch(() => {
+      if (renderers.get(ck) === pending) renderers.delete(ck)
+    })
+  }
+  return { ck, renderer: await pending }
 }
 
 export async function headlessRenderNodes(
@@ -47,9 +64,10 @@ export async function headlessRenderNodes(
     format?: ExportFormat
     quality?: number
     trimTransparent?: boolean
-  } = {}
-): Promise<Uint8Array | null> {
-  const { ck, renderer } = await getRenderer()
+  } = {},
+  canvasKit?: CanvasKit
+): Promise<Uint8Array<ArrayBuffer> | null> {
+  const { ck, renderer } = await getRenderer(canvasKit)
   renderer.invalidateAllPictures()
   await renderer.prepareForExport(graph, pageId, nodeIds)
   return renderNodesToImage(ck, renderer, graph, pageId, nodeIds, {
@@ -66,9 +84,10 @@ export async function headlessRenderThumbnail(
   width: number,
   height: number,
   format: RasterExportFormat = 'PNG',
-  quality = 100
-): Promise<Uint8Array | null> {
-  const { ck, renderer } = await getRenderer()
+  quality = 100,
+  canvasKit?: CanvasKit
+): Promise<Uint8Array<ArrayBuffer> | null> {
+  const { ck, renderer } = await getRenderer(canvasKit)
   renderer.invalidateAllPictures()
   await renderer.prepareForExport(graph, pageId, graph.getNode(pageId)?.childIds ?? [])
   return renderThumbnail(ck, renderer, graph, pageId, width, height, format, quality)

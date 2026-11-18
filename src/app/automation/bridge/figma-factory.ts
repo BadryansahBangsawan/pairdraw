@@ -7,6 +7,7 @@ import {
 } from '@pairdraw/core/tools'
 
 import { renderAutomationImage } from '@/app/automation/bridge/export-handlers'
+import { automationRenderKit } from '@/app/automation/bridge/render-kit'
 import { styleHTMLInBrowser } from '@/app/code/html-styler'
 import { bindScriptToolHost } from '@/app/code/script/tool-host'
 import { loadTailwindStylesheet } from '@/app/document/export/html'
@@ -75,7 +76,10 @@ export function makeFigmaFromStore(
       opts.pageId ?? pageId,
       opts.quality
     )
-  if (store.renderer) api.rasterCodec = createCanvasKitRasterCodec(store.renderer.ck)
+  // A document in a background tab has no canvas; its codec comes from the app's CanvasKit, which
+  // `prepareAutomationRendering` has already loaded before a command runs.
+  const canvasKit = store.renderer?.ck ?? automationRenderKit()
+  if (canvasKit) api.rasterCodec = createCanvasKitRasterCodec(canvasKit)
   api.listAvailableFontsAsync = async () => {
     const [systemFonts, familyOptions] = await Promise.all([listFonts(), listFamilies()])
     const fonts = systemFonts.flatMap(({ family, faces }) =>

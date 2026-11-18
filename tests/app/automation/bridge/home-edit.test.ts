@@ -188,7 +188,8 @@ describe('an edit with no document while Home is in front', () => {
 
     const node = await settle(request('tool', { name: 'get_node', args: { id } }))
     const tree = await settle(request('tool', { name: 'get_page_tree', args: {} }))
-    // A missing layer is a failed tool result. Reaching the renderer means the id was on the page.
+    // A missing layer is a failed tool result. Exporting draws the layer's document offscreen,
+    // so it also shows the id was on that document's page.
     const image = settle(request('tool', { name: 'export_image', args: { ids: [id] } }))
 
     expect(node.ok).toBe(true)
@@ -199,7 +200,7 @@ describe('an edit with no document while Home is in front', () => {
     expect(
       tree.ok && children.success && children.output.children.some((child) => child.id === id)
     ).toBe(true)
-    await expect(image).rejects.toThrow()
+    await expect(image).resolves.toMatchObject({ ok: true })
     expect(tabCount()).toBe(2)
   })
 

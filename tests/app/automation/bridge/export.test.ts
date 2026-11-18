@@ -6,12 +6,13 @@ import { toUint8Array } from 'js-base64'
 import { SkiaRenderer } from '@pairdraw/core/canvas'
 import { BUILTIN_IO_FORMATS, IORegistry } from '@pairdraw/core/io'
 import { parseFigFile } from '@pairdraw/core/io/formats/fig'
-import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
+import { createCanvasKitRasterCodec, initCanvasKit } from '@pairdraw/core/io/formats/raster'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import { imageSize } from '@pairdraw/scene-graph/images'
 
 import { makeFigmaFromStore } from '@/app/automation/bridge/figma-factory'
 import { createAutomationCommandHandlers } from '@/app/automation/bridge/handlers'
+import { prepareAutomationRendering } from '@/app/automation/bridge/render-kit'
 import type { AutomationTarget } from '@/app/automation/bridge/target'
 import { createEditorStore, type EditorStore } from '@/app/editor/session/create'
 
@@ -171,17 +172,33 @@ describe('automation export of a page that is not on screen', () => {
 })
 
 describe('automation export without a canvas renderer', () => {
-  test('export_image says the document has no renderer', async () => {
+  test('export_image draws the document with the export renderer', async () => {
     const store = createEditorStore()
     stores.push(store)
     const pageId = store.state.currentPageId
     const frame = store.graph.createNode('FRAME', pageId, { width: 40, height: 30, fills: [RED] })
+    expect(store.renderer).toBeNull()
 
-    const response = handleTargetCommand(target(store, pageId), 'tool', {
+    const response = await handleTargetCommand(target(store, pageId), 'tool', {
       name: 'export_image',
       args: { ids: [frame.id] }
     })
 
-    await expect(response).rejects.toThrow('This document has no canvas renderer')
+    const bytes = resultBytes(response)
+    expect(imageSize(bytes)).toEqual({ width: 40, height: 30 })
+    const image = createCanvasKitRasterCodec(await initCanvasKit()).decode(bytes)
+    if (!image) throw new Error('The exported image did not decode')
+    // A filled corner, so an empty image does not pass for a render.
+    expect([...image.data.subarray(0, 4)]).toEqual([255, 0, 0, 255])
+  })
+
+  test('the Figma API a document without a canvas gets can decode what it exports', async () => {
+    const store = createEditorStore()
+    stores.push(store)
+    await prepareAutomationRendering(store)
+
+    const api = makeFigmaFromStore(store)
+
+    expect(api.rasterCodec).toBeDefined()
   })
 })

@@ -16,6 +16,7 @@ import { handleBrowserSnapshot } from '@/app/automation/bridge/browser-snapshot'
 import { createAutomationEvalHandler } from '@/app/automation/bridge/eval-handler'
 import { handleExport, handleExportJSX } from '@/app/automation/bridge/export-handlers'
 import { createFileHandlers, type AutomationFiles } from '@/app/automation/bridge/file-handlers'
+import { prepareAutomationRendering } from '@/app/automation/bridge/render-kit'
 import { handleRPCFallback } from '@/app/automation/bridge/rpc-handler'
 import { handleSelection } from '@/app/automation/bridge/selection-handler'
 import {
@@ -148,6 +149,9 @@ export function createAutomationCommandHandlers(makeFigma: FigmaFactory, files?:
     if (!(await target.store.preparePageNodes(target.pageId))) {
       throw new Error(`Page "${target.pageId}" was closed before it finished loading`)
     }
+    // A document that is not on screen renders through the export renderer; load it before the
+    // command, so the Figma API built for it can decode what it exports.
+    await prepareAutomationRendering(target.store)
     const handler = commandHandlers[command]
     const result = handler
       ? await handler(target, args)

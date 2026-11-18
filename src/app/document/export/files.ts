@@ -2,13 +2,18 @@ import { zipSync, type Zippable } from 'fflate'
 import { extname } from 'pathe'
 
 import type { Editor, EditorState } from '@pairdraw/core'
+import { getCanvasKit } from '@pairdraw/core/canvaskit'
 import {
   findPageId,
   type ExportRequest,
   type IOFormatAdapter,
   type IORegistry
 } from '@pairdraw/core/io'
-import { type RasterExportFormat, renderNodesToImage } from '@pairdraw/core/io/formats/raster'
+import {
+  headlessRenderNodes,
+  type RasterExportFormat,
+  renderNodesToImage
+} from '@pairdraw/core/io/formats/raster'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { htmlExportOptions } from '@/app/document/export/html'
@@ -134,7 +139,8 @@ export function getExportBytes(data: ExportData): Uint8Array {
 export function createExportTargetActions(editor: Editor, state: EditorState, io: IORegistry) {
   /**
    * Renders `nodeIds` on the page that holds them, which need not be the page on screen;
-   * without IDs, renders every layer of `pageId`.
+   * without IDs, renders every layer of `pageId`. A document that is not on screen has no
+   * canvas of its own, so the export renderer draws it offscreen, as the CLI's export does.
    */
   async function renderExportImage(
     nodeIds: string[],
@@ -143,11 +149,19 @@ export function createExportTargetActions(editor: Editor, state: EditorState, io
     pageId = state.currentPageId,
     quality?: number
   ): Promise<Uint8Array<ArrayBuffer> | null> {
-    const renderer = editor.renderer
-    if (!renderer) return null
     const ids = nodeIds.length > 0 ? nodeIds : editor.graph.getChildren(pageId).map((n) => n.id)
     if (ids.length === 0) return null
     const ownerPageId = findPageId(editor.graph, ids[0]) ?? pageId
+    const renderer = editor.renderer
+    if (!renderer) {
+      return headlessRenderNodes(
+        editor.graph,
+        ownerPageId,
+        ids,
+        { scale, format, quality },
+        await getCanvasKit()
+      )
+    }
     return renderNodesToImage(renderer.ck, renderer, editor.graph, ownerPageId, ids, {
       scale,
       format,

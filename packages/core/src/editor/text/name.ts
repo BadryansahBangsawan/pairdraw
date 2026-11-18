@@ -1,13 +1,11 @@
-import { compact } from 'es-toolkit/array'
-
-import type { NodeType, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import {
   generatedFrameKind,
   generatedFrameOwner,
   generatedFrameText
 } from '@pairdraw/scene-graph/generated'
+import { textLayerName } from '@pairdraw/scene-graph/node-defaults'
 
-import { defaultNodeName } from '#core/editor/structure/rename'
 import type { EditorContext } from '#core/editor/types'
 
 /**
@@ -16,12 +14,6 @@ import type { EditorContext } from '#core/editor/types'
  */
 export function namedByText(node: SceneNode): boolean {
   return node.type === 'TEXT' || (generatedFrameKind(node)?.namedByText ?? false)
-}
-
-/** The name a layer takes from its text, as Figma shows it: trimmed, on one line. */
-export function textLayerName(type: NodeType, text: string): string {
-  const lines = compact(text.split(/\r\n|\r|\n/).map((line) => line.trim()))
-  return lines.join(' ') || defaultNodeName(type)
 }
 
 /** The layer whose name a text edit to `nodeId` decides, or null when it decides none. */

@@ -3,6 +3,7 @@ import { omitBy } from 'es-toolkit/object'
 import type { NodeType, SceneGraph, SceneNode, VariableModeMap } from '@pairdraw/scene-graph'
 import { parseColor } from '@pairdraw/scene-graph/color'
 import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { textLayerName } from '@pairdraw/scene-graph/node-defaults'
 
 import type { RekaScope } from './behaviours'
 import { renderRekaNode } from './behaviours/render'
@@ -545,6 +546,10 @@ export function elementOverrides(
     const spanOverrides = (spanProps: Record<string, unknown>) =>
       propsToOverrides(preparePropsForRender(graph, spanProps, true, layer).props, true, 'NONE')
     Object.assign(overrides, textContentFields(tree, props, overrides, spanOverrides))
+    // As Figma does, a text layer follows its characters until a name is given, and keeps a given
+    // name through later edits.
+    if (overrides.name) overrides.autoRename = false
+    else if (overrides.text !== undefined) overrides.name = textLayerName('TEXT', overrides.text)
   }
   return { overrides, bindings }
 }

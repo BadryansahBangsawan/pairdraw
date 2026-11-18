@@ -12,6 +12,7 @@ import { TRANSPARENT } from '@pairdraw/scene-graph/constants'
 import { parseCSSAlignSelf, parseCSSNumber, parseCSSShadows } from '@pairdraw/scene-graph/css'
 import { normalizeEffects } from '@pairdraw/scene-graph/effects'
 import { computeImageHash } from '@pairdraw/scene-graph/images'
+import { textLayerName } from '@pairdraw/scene-graph/node-defaults'
 
 import type { DesignDocument, DesignElement, DesignNode, DesignStyleDeclaration } from '../types'
 import { colorToFillFromCSS, colorToStrokeFromCSS, mergedStyle, pickStyle } from './css-values'
@@ -397,7 +398,7 @@ function createRichTextNode(
   const base = pick(node, CHARACTER_FIELDS)
   const rich = blocks ? blockRichText(element, style, base) : inlineRichText(element, style, base)
   node.text = rich.text
-  node.name = rich.text.slice(0, 32) || 'Text'
+  node.name = textLayerName('TEXT', rich.text)
   node.styleRuns = rich.styleRuns
   if (blocks) applyParagraphs(node, rich)
   applyFlowSizing(graph, node, style, display, parentFlow)
@@ -429,7 +430,7 @@ function createTextNode(
   display: string,
   parentFlow: ParentFlow
 ) {
-  const node = graph.createNode('TEXT', parentId, { name: text.slice(0, 32) || 'Text', text })
+  const node = graph.createNode('TEXT', parentId, { name: textLayerName('TEXT', text), text })
   applyTextStyle(node, style)
   applyFlowSizing(graph, node, style, display, parentFlow)
   return node

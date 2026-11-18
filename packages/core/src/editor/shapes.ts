@@ -1,5 +1,6 @@
 import type { NodeType, SceneNode } from '@pairdraw/scene-graph'
 import { createShapeWithText } from '@pairdraw/scene-graph/generated'
+import { defaultNodeName } from '@pairdraw/scene-graph/node-defaults'
 
 import { prepareSlotEdits } from './components/slots'
 import { restoreSubtree, snapshotSubtree } from './history/subtree'
@@ -8,7 +9,7 @@ import { newLayerDefaults } from './shapes/defaults'
 import { createFramePresetActions } from './shapes/frame-presets'
 import { createPenActions, type UpdateNodeWithUndo } from './shapes/pen'
 import { createPencilActions } from './shapes/pencil'
-import { defaultNodeName, nextNumberedName } from './structure/rename'
+import { nextNumberedName } from './structure/rename'
 import type { EditorContext } from './types'
 export type { PenDragOptions } from './shapes/pen'
 

@@ -3,6 +3,7 @@ import { pick } from 'es-toolkit'
 import type { SceneNode } from '@pairdraw/scene-graph'
 import { TRANSFORM_FIELDS } from '@pairdraw/scene-graph/fields'
 import { createsComponentCycle } from '@pairdraw/scene-graph/instances'
+import { defaultNodeName } from '@pairdraw/scene-graph/node-defaults'
 
 import { acceptingParent, acceptsChildren, prepareSlotEdits } from '#core/editor/components/slots'
 import { fitEnclosingGroupsWithUndo } from '#core/editor/structure/group/bounds'
@@ -17,11 +18,7 @@ import { flattenSelected as flattenSelectedImpl } from './structure/flatten'
 import { ungroupSelected as ungroupImpl } from './structure/group/ungroup'
 import { createLayerTypeActions } from './structure/layer-type'
 import { outlineStrokeSelected as outlineStrokeSelectedImpl } from './structure/outline-stroke'
-import {
-  defaultNodeName,
-  previewRenamedNodes,
-  type RenameSelectionOptions
-} from './structure/rename'
+import { previewRenamedNodes, type RenameSelectionOptions } from './structure/rename'
 import { createStructureReorderActions } from './structure/reorder'
 import { createStructureStateActions } from './structure/state'
 import { namedByText } from './text/name'

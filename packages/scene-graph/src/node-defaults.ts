@@ -53,6 +53,27 @@ export function newStrokeGeometry(
   return { weight: first?.weight ?? node.strokeWeight, align: first?.align ?? node.strokeAlign }
 }
 
+/**
+ * The name a layer of `type` carries when nothing names it, as Figma writes a type's name: words
+ * of a compound type apart, so a shape with text is a "Shape with text".
+ */
+export function defaultNodeName(type: NodeType): string {
+  const words = type.toLowerCase().replaceAll('_', ' ')
+  return words.charAt(0).toUpperCase() + words.slice(1)
+}
+
+/**
+ * The name Figma gives a layer that follows its text: the characters trimmed, on one line, and
+ * the type's own name while they hold nothing.
+ */
+export function textLayerName(type: NodeType, text: string): string {
+  const lines = text
+    .split(/\r\n|\r|\n/)
+    .map((line) => line.trim())
+    .filter((line) => line !== '')
+  return lines.join(' ') || defaultNodeName(type)
+}
+
 export function createDefaultNode(
   generateId: () => string,
   type: NodeType,

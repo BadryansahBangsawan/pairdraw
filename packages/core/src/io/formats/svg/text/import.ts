@@ -4,6 +4,7 @@ import type { CharacterStyleOverride, SceneGraph, SceneNode, StyleRun } from '@p
 import { localTransformFromWorld } from '@pairdraw/scene-graph/coordinate'
 import { faceLoadKey } from '@pairdraw/scene-graph/font-style'
 import Matrix from '@pairdraw/scene-graph/matrix'
+import { textLayerName } from '@pairdraw/scene-graph/node-defaults'
 import { pixelLength } from '@pairdraw/scene-graph/text'
 
 import type { SVGElementLayer } from '#core/icons/types'
@@ -81,7 +82,7 @@ function createTextPiece(
   const scale = Math.hypot(matrix[0], matrix[3]) || 1
   const characters = piece.runs.map((run) => run.text).join('')
   const node = graph.createNode('TEXT', parentId, {
-    name: characters,
+    name: textLayerName('TEXT', characters),
     ...props,
     ...runStyle(piece.runs[0], scale),
     text: characters,

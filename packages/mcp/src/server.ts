@@ -433,7 +433,8 @@ export async function startServer(options: ServerOptions = {}): Promise<ServerHa
     options.appAttachTimeoutMs,
     ctx.browserRPC,
     handle,
-    options.onAppAttachTimeout
+    options.onAppAttachTimeout,
+    () => ctx.mcpSessions.hasClients()
   )
 
   return handle
@@ -456,12 +457,17 @@ function validateTimeoutOption(name: string, timeoutMs: number | undefined): voi
  * grace period. Registering an app cancels the pending shutdown; disconnecting
  * starts a fresh grace period so renderer reloads can reconnect without
  * leaving a permanently orphaned process behind.
+ *
+ * An agent's open session keeps the server: a renderer busy enough to miss the
+ * grace period would otherwise take the agent's session down with it, and the
+ * session's own idle timeout ends the server once that agent is gone.
  */
 function armAppAttachWatchdog(
   timeoutMs: number | undefined,
   browserRPC: ReturnType<typeof createBrowserRPCBridge>,
   handle: ServerHandle,
-  onTimeout: (() => void) | undefined
+  onTimeout: (() => void) | undefined,
+  hasClients: () => boolean
 ): void {
   if (timeoutMs === undefined || timeoutMs === 0) return
 
@@ -477,6 +483,10 @@ function armAppAttachWatchdog(
     timer = setTimeout(() => {
       timer = null
       if (browserRPC.isConnected() || closing) return
+      if (hasClients()) {
+        armTimer()
+        return
+      }
       closing = true
       unsubscribe()
       // The reason a server the app owned went away is otherwise invisible: it wrote nothing

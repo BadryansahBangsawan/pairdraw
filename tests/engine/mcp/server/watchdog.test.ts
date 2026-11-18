@@ -104,6 +104,40 @@ describe('MCP app-attach watchdog', () => {
     }
   })
 
+  test('keeps the server and its agent session when no app is attached', async () => {
+    handle = await startServer({
+      httpPort: 0,
+      withTcp: true,
+      socketPath: testSocketPath(),
+      authToken: TEST_AUTH_TOKEN,
+      enableEval: false,
+      mcpRoot: null,
+      appAttachTimeoutMs: 60
+    })
+    const port = handle.httpPort
+    const { Client, StreamableHTTPClientTransport } = await import('@modelcontextprotocol/client')
+    const client = new Client({ name: 'watchdog-agent', version: '0.0.0' })
+    const transport = new StreamableHTTPClientTransport(new URL(`http://127.0.0.1:${port}/mcp`), {
+      requestInit: { headers: { Authorization: `Bearer ${TEST_AUTH_TOKEN}` } }
+    })
+    await client.connect(transport)
+    let browser: Awaited<ReturnType<typeof connectMockBrowser>> | undefined
+    try {
+      // The app a busy renderer looks like: it is absent for longer than the grace period while
+      // the agent's session waits for its next call.
+      await sleep(200)
+      const health = await fetch(`http://127.0.0.1:${port}/health`)
+      expect(health.status).toBe(200)
+
+      browser = await connectMockBrowser(port, new SceneGraph(), TEST_AUTH_TOKEN)
+      const result = await client.callTool({ name: 'list_documents', arguments: {} })
+      expect(result.isError).not.toBe(true)
+    } finally {
+      browser?.close()
+      await client.close().catch(() => undefined)
+    }
+  })
+
   test('closes the server after a registered app disconnects for the grace period', async () => {
     handle = await startServer({
       httpPort: 0,

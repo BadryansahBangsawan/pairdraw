@@ -367,5 +367,13 @@ export function createMCPSessionManager({
     ])
   }
 
-  return { clear, deleteSession, getExistingTransport, notifyToolsChanged, resolveTransport }
+  return {
+    clear,
+    deleteSession,
+    getExistingTransport,
+    notifyToolsChanged,
+    resolveTransport,
+    /** Whether a client holds an initialized session, which keeps the server in use. */
+    hasClients: () => [...sessions.values()].some((session) => session.initialized)
+  }
 }

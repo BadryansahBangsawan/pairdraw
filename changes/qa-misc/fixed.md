@@ -1,0 +1,1 @@
+- A script's text sizes to its content on one line unless the script gives it a width.

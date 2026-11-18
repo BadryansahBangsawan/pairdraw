@@ -1,5 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 
+import * as v from 'valibot'
+
+import { SCRIPT_EXAMPLES } from '@pairdraw/core/tools'
 import { SceneGraph } from '@pairdraw/scene-graph'
 import { parseColor } from '@pairdraw/scene-graph/color'
 import { PAIRDRAW_PLUGIN_DATA, withPluginData } from '@pairdraw/scene-graph/plugin-data'
@@ -11,7 +14,9 @@ import {
   scriptChangeNeedsRun,
   scriptInputValues
 } from '@/app/code/script/run-node'
+import { scriptNodeSpecSchema } from '@/app/code/script/sandbox/schema'
 import type { ScriptNodeSpec } from '@/app/code/script/sandbox/spec'
+import { runScript } from '@/app/code/script/sandbox/worker/run'
 
 const { script: SCRIPT_FIELD } = PAIRDRAW_PLUGIN_DATA
 /** The error placeholder's text color, as the materializer draws it. */
@@ -258,3 +263,47 @@ function scriptSeedValue(nodeId: string, source: string): number {
   }
   return hash >>> 0
 }
+
+describe('script text sizing', () => {
+  test('text without a width hugs its content, and text with a width keeps it', () => {
+    const { graph, page, node } = scriptGraph('return []')
+    const result = materializeScriptOutput(
+      graph,
+      node.id,
+      [
+        { type: 'TEXT', text: 'A line wide enough to wrap at a hundred pixels', fontSize: 12 },
+        { type: 'TEXT', text: 'A line given a narrow width', width: 60, fontSize: 12 }
+      ],
+      page.id
+    )
+    const hugging = nodeOf(graph, result.rootIds[0])
+    expect(hugging.textAutoResize).toBe('WIDTH_AND_HEIGHT')
+    expect(hugging.width).toBeGreaterThan(100)
+    expect(hugging.height).toBeLessThan(30)
+    expect(nodeOf(graph, result.rootIds[1])).toMatchObject({
+      textAutoResize: 'HEIGHT',
+      width: 60
+    })
+  })
+
+  test('the stat card trend label stays on one line above its bar', () => {
+    const { graph, page, node } = scriptGraph('return []')
+    const run = runScript({
+      id: 'stat',
+      source: SCRIPT_EXAMPLES.stat_card,
+      inputs: {},
+      seed: 1
+    })
+    if (!run.ok) throw new Error(run.error)
+    const roots = v.parse(v.array(scriptNodeSpecSchema), run.roots)
+    const result = materializeScriptOutput(graph, node.id, roots, page.id)
+    const card = nodeOf(graph, result.rootIds[0])
+    const trend = card.childIds
+      .map((id) => nodeOf(graph, id))
+      .find((child) => child.text === '+12.4% vs last month')
+    if (!trend) throw new Error('The stat card has no trend label.')
+    expect(trend.textAutoResize).toBe('WIDTH_AND_HEIGHT')
+    expect(trend.width).toBeGreaterThan(100)
+    expect(trend.height).toBeLessThan(20)
+  })
+})

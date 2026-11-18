@@ -4,7 +4,7 @@
  * script node's render, not a document edit of its own, so it adds no undo step.
  */
 import { newLayerDefaults } from '@pairdraw/core'
-import { computeAllLayouts } from '@pairdraw/core/layout'
+import { computeAllLayouts, sizeAutoResizingText } from '@pairdraw/core/layout'
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { parseColor } from '@pairdraw/scene-graph/color'
 
@@ -31,7 +31,12 @@ function stroke(hex: string, weight: number): SceneNode['strokes'] {
 
 /** The text fields a TEXT spec asks for; anything left out keeps the node's default. */
 function textOverrides(spec: ScriptNodeSpec): Partial<SceneNode> {
-  const overrides: Partial<SceneNode> = { text: spec.text ?? '', textAutoResize: 'HEIGHT' }
+  const overrides: Partial<SceneNode> = {
+    text: spec.text ?? '',
+    // As Figma's createText(): without a width the text hugs its content on one line; a width
+    // wraps it and lets the height follow.
+    textAutoResize: spec.width === undefined ? 'WIDTH_AND_HEIGHT' : 'HEIGHT'
+  }
   if (spec.fontSize !== undefined) overrides.fontSize = spec.fontSize
   if (spec.fontWeight !== undefined) overrides.fontWeight = spec.fontWeight
   if (spec.align) overrides.textAlignHorizontal = spec.align
@@ -61,8 +66,10 @@ function createLayer(graph: SceneGraph, spec: ScriptNodeSpec, parentId: string, 
     ...newLayerDefaults(type),
     x: spec.x ?? 0,
     y: spec.y ?? 0,
-    width: spec.width ?? 100,
-    height: spec.height ?? 100,
+    // Text without a size starts at zero and is laid out to its content, as createText() does;
+    // other layers keep a square default.
+    width: spec.width ?? (type === 'TEXT' ? 0 : 100),
+    height: spec.height ?? (type === 'TEXT' ? 0 : 100),
     name: spec.name ?? type.charAt(0) + type.slice(1).toLowerCase()
   }
   if (type === 'TEXT') Object.assign(overrides, textOverrides(spec))
@@ -74,6 +81,9 @@ function createLayer(graph: SceneGraph, spec: ScriptNodeSpec, parentId: string, 
   if (spec.opacity !== undefined) overrides.opacity = spec.opacity
   if (spec.radius !== undefined) overrides.cornerRadius = spec.radius
   const node = graph.createNode(type, parentId, overrides)
+  // Text sizes to what it says the moment it is drawn, as createText() does; auto layout below
+  // then measures it in its own parent.
+  if (type === 'TEXT') sizeAutoResizingText(graph, node.id)
   // `createNode` appends; a run draws its layers in the order the script built them.
   graph.insertChildAt(node.id, parentId, index)
   return node

@@ -2,7 +2,7 @@ import { uniqBy } from 'es-toolkit'
 import { toValue, type MaybeRefOrGetter } from 'vue'
 
 import { agentAutoConnect, type AgentAutoConnect } from '@/app/ai/agents/auto/session'
-import { isConfigured } from '@/app/ai/chat/storage'
+import { isConfigured, credentialStatusSettled } from '@/app/ai/chat/storage'
 import type { ChatSubmission } from '@/app/ai/chat/submission/types'
 import { runAISetup } from '@/app/ai/models/settings/onboarding/dialog'
 
@@ -11,6 +11,11 @@ export interface ChatSetupGateOptions {
   isConfigured: MaybeRefOrGetter<boolean>
   /** Looks for a coding agent on this computer first. */
   autoConnect: Pick<AgentAutoConnect, 'detect'>
+  /**
+   * Resolves once the app knows whether the chat can send, such as a key lookup still running
+   * after a model switch. Without it a lookup in flight reads as no key and opens setup.
+   */
+  settle?: () => Promise<void>
   /** Guided setup, resolving once it closes, finished or not. */
   runSetup: () => Promise<void>
 }
@@ -23,9 +28,12 @@ export interface ChatSetupGateOptions {
 export function createChatSetupGate({
   isConfigured: configured,
   autoConnect,
+  settle,
   runSetup
 }: ChatSetupGateOptions) {
   return async function ensureChatConfigured(): Promise<boolean> {
+    if (toValue(configured)) return true
+    await settle?.()
     if (toValue(configured)) return true
     const outcome = await autoConnect.detect()
     if (toValue(configured)) return true
@@ -62,5 +70,6 @@ export function joinWaitingPrompt(
 export const ensureChatConfigured = createChatSetupGate({
   isConfigured,
   autoConnect: agentAutoConnect,
+  settle: credentialStatusSettled,
   runSetup: runAISetup
 })

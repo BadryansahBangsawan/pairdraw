@@ -39,6 +39,8 @@ export const maxOutputTokens = designMaxOutputTokens
 export const providerDef = designProviderDefinition
 
 export const apiKeyStatus = ref<CredentialStatus>('missing')
+/** The key lookup in flight, shared by every caller until it lands. */
+let statusLookup: Promise<void> | null = null
 const credentialRevision = ref(0)
 
 export const isACPProvider = computed(() => providerID.value.startsWith('acp:'))
@@ -74,10 +76,39 @@ function designCredentialReference(): CredentialRef | null {
 }
 
 export async function refreshAIProviderStatus(): Promise<void> {
-  const reference = designCredentialReference()
-  const status = reference ? await refreshStatus(reference) : 'missing'
-  // A connection chosen while the lookup ran owns the status now.
-  if (isEqual(designCredentialReference(), reference)) apiKeyStatus.value = status
+  statusLookup ??= lookUpProviderStatus().finally(() => {
+    statusLookup = null
+  })
+  await statusLookup
+}
+
+/**
+ * Reads the key status for the connection in force. A connection chosen while a read ran is read
+ * in its turn, so the status always describes the connection the chat sends with.
+ */
+async function lookUpProviderStatus(): Promise<void> {
+  let reference = designCredentialReference()
+  for (;;) {
+    const status = reference ? await refreshStatus(reference) : 'missing'
+    const current = designCredentialReference()
+    if (isEqual(current, reference)) {
+      apiKeyStatus.value = status
+      return
+    }
+    reference = current
+  }
+}
+
+/**
+ * Resolves once no key lookup is running, so a send can trust `isConfigured`: switching the
+ * design connection starts a lookup and leaves the previous status standing until it lands.
+ */
+export async function credentialStatusSettled(): Promise<void> {
+  let pending = statusLookup
+  while (pending) {
+    await pending
+    pending = statusLookup
+  }
 }
 
 // Startup checks metadata only. Secret migration/resolution belongs to explicit provider use.

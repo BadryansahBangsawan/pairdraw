@@ -1,0 +1,1 @@
+- Sending a message right after switching the chat's model no longer opens guided AI setup: the chat waits for the new model's key status instead of reading the previous model's.

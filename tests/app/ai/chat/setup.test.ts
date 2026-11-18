@@ -11,6 +11,8 @@ interface GateOptions {
   /** The lookup leaves the chat able to send. */
   detectConfigures?: boolean
   setupConfigures?: boolean
+  /** A key lookup the gate awaits before deciding, and what it finds. */
+  settle?: 'configures' | 'leaves'
 }
 
 /** A gate whose auto-connect ends with `outcome`, recording whether guided setup opened. */
@@ -19,11 +21,12 @@ function gate(
   {
     configured = false,
     detectConfigures = outcome === 'connected',
-    setupConfigures = false
+    setupConfigures = false,
+    settle
   }: GateOptions = {}
 ) {
   const isConfigured = ref(configured)
-  const opened = { detect: 0, setup: 0 }
+  const opened = { detect: 0, setup: 0, settled: 0 }
   const ensure = createChatSetupGate({
     isConfigured,
     autoConnect: {
@@ -33,6 +36,12 @@ function gate(
         return outcome
       }
     },
+    settle: settle
+      ? async () => {
+          opened.settled++
+          if (settle === 'configures') isConfigured.value = true
+        }
+      : undefined,
     async runSetup() {
       opened.setup++
       if (setupConfigures) isConfigured.value = true
@@ -49,14 +58,14 @@ describe('setting the chat up before it sends', () => {
   test('sends at once when a model is set up', async () => {
     const { ensure, opened } = gate('none', { configured: true })
     expect(await ensure()).toBe(true)
-    expect(opened).toEqual({ detect: 0, setup: 0 })
+    expect(opened).toEqual({ detect: 0, setup: 0, settled: 0 })
   })
 
   test('leaves the prompt to an agent on this computer without opening setup', async () => {
     for (const outcome of ['connected', 'action'] as const) {
       const { ensure, opened } = gate(outcome)
       expect(await ensure()).toBe(true)
-      expect(opened).toEqual({ detect: 1, setup: 0 })
+      expect(opened).toEqual({ detect: 1, setup: 0, settled: 0 })
     }
   })
 
@@ -64,7 +73,7 @@ describe('setting the chat up before it sends', () => {
     for (const outcome of ['none', 'unsupported'] as const) {
       const finished = gate(outcome, { setupConfigures: true })
       expect(await finished.ensure()).toBe(true)
-      expect(finished.opened).toEqual({ detect: 1, setup: 1 })
+      expect(finished.opened).toEqual({ detect: 1, setup: 1, settled: 0 })
 
       const dismissed = gate(outcome)
       expect(await dismissed.ensure()).toBe(false)
@@ -75,7 +84,19 @@ describe('setting the chat up before it sends', () => {
   test('opens guided setup when an agent connected but the chat still cannot send', async () => {
     const { ensure, opened } = gate('connected', { detectConfigures: false })
     expect(await ensure()).toBe(false)
-    expect(opened).toEqual({ detect: 1, setup: 1 })
+    expect(opened).toEqual({ detect: 1, setup: 1, settled: 0 })
+  })
+
+  test('waits for a key lookup already running before opening guided setup', async () => {
+    const { ensure, opened } = gate('none', { settle: 'configures' })
+    expect(await ensure()).toBe(true)
+    expect(opened).toEqual({ detect: 0, setup: 0, settled: 1 })
+  })
+
+  test('opens guided setup when the key lookup it waited for finds no key', async () => {
+    const { ensure, opened } = gate('none', { settle: 'leaves', setupConfigures: true })
+    expect(await ensure()).toBe(true)
+    expect(opened).toEqual({ detect: 1, setup: 1, settled: 1 })
   })
 })
 

@@ -1,1 +1,2 @@
 - Exporting a layer on its own keeps the variable mode its ancestors set, so the image matches the canvas.
+- A grid child's `colSpan` without a `colStart` spans its columns and is placed automatically, as CSS Grid does.

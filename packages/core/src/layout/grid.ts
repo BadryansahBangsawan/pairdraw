@@ -39,10 +39,20 @@ export function createGridChildNode(graph: SceneGraph, child: SceneNode): YogaNo
   } else {
     const pos = child.gridPosition
     if (pos) {
-      yogaChild.setGridColumnStart(pos.column)
-      yogaChild.setGridColumnEndSpan(pos.columnSpan)
-      yogaChild.setGridRowStart(pos.row)
-      yogaChild.setGridRowEndSpan(pos.rowSpan)
+      // A span from an explicit line ends N lines on; from an auto line it is CSS
+      // `grid-column: span N`, which Yoga places by itself.
+      if (pos.column > 0) {
+        yogaChild.setGridColumnStart(pos.column)
+        yogaChild.setGridColumnEndSpan(pos.columnSpan)
+      } else if (pos.columnSpan > 1) {
+        yogaChild.setGridColumnStartSpan(pos.columnSpan)
+      }
+      if (pos.row > 0) {
+        yogaChild.setGridRowStart(pos.row)
+        yogaChild.setGridRowEndSpan(pos.rowSpan)
+      } else if (pos.rowSpan > 1) {
+        yogaChild.setGridRowStartSpan(pos.rowSpan)
+      }
     }
     // Each axis fills its cell on its own, as in Figma: grow for width, stretch for height.
     if (layoutSizing(graph, child, 'HORIZONTAL') === 'FILL') yogaChild.setWidthStretch()

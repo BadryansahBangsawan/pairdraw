@@ -245,16 +245,18 @@ function applyGridOverrides(
 function applyGridChildOverrides(props: Record<string, unknown>, o: Partial<SceneNode>): void {
   const col = designJSXProp(props, 'colStart')
   const row = designJSXProp(props, 'rowStart')
-  const colSpan = (props.colSpan as number | undefined) ?? 1
-  const rowSpan = (props.rowSpan as number | undefined) ?? 1
+  const colSpan = designJSXProp(props, 'colSpan')
+  const rowSpan = designJSXProp(props, 'rowSpan')
 
-  if (col !== undefined || row !== undefined) {
-    o.gridPosition = {
-      column: (col as number | undefined) ?? 0,
-      row: (row as number | undefined) ?? 0,
-      columnSpan: colSpan,
-      rowSpan: rowSpan
-    }
+  // A span without a start is CSS `grid-column: span N`, which holds while auto placement picks
+  // the column; requiring a start here dropped `colSpan` alone.
+  if (col === undefined && row === undefined && colSpan === undefined && rowSpan === undefined)
+    return
+  o.gridPosition = {
+    column: (col as number | undefined) ?? 0,
+    row: (row as number | undefined) ?? 0,
+    columnSpan: (colSpan as number | undefined) ?? 1,
+    rowSpan: (rowSpan as number | undefined) ?? 1
   }
 }
 

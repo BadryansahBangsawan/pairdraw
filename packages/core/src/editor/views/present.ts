@@ -71,22 +71,23 @@ function currentCenter(ctx: EditorContext): ViewportCenter {
   return { x: (width / 2 - panX) / zoom, y: (height / 2 - panY) / zoom, zoom }
 }
 
-function currentPlace(ctx: EditorContext): ViewportPlace {
+/** Where the canvas looked before a view replaces it, as the place to return to. */
+export function currentPlace(ctx: EditorContext): ViewportPlace {
   const { panX, panY, zoom } = ctx.state
   return { panX, panY, zoom }
 }
 
 /**
- * Puts the canvas back where it looked before the presentation started: its pan and zoom, so the
+ * Puts the canvas back where it looked before a view took it elsewhere: its pan and zoom, so the
  * editor's canvas, back at its own size, shows what it showed.
  */
-export function returnFromPresentation(
+export function returnToPlace(
   ctx: EditorContext,
-  view: PresentView,
+  place: ViewportPlace,
   viewport: PresentationViewport
 ): void {
   const { width, height } = ctx.getViewportSize()
-  const { panX, panY, zoom } = view.returnTo
+  const { panX, panY, zoom } = place
   viewport.centerOn((width / 2 - panX) / zoom, (height / 2 - panY) / zoom, zoom)
 }
 

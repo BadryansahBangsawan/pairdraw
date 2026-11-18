@@ -62,5 +62,11 @@ test('a view that runs only its own keys, as Shader Mode does, moves no layer', 
     expect(nudgeForKey(shader, arrow(code), NUDGE)).toBeNull()
     expect(nudgeForKey(shader, arrow(code, true), NUDGE)).toBeNull()
   }
-  expect(nudgeForKey(selectedOn({ id: 'play', revision: 0 }), arrow('ArrowDown'), NUDGE)).toBeNull()
+  expect(
+    nudgeForKey(
+      selectedOn({ id: 'play', revision: 0, returnTo: { panX: 0, panY: 0, zoom: 1 } }),
+      arrow('ArrowDown'),
+      NUDGE
+    )
+  ).toBeNull()
 })

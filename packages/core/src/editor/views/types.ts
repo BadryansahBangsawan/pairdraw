@@ -42,6 +42,16 @@ export interface PresentView {
 }
 
 /**
+ * A preview: the design running, its controls responding to the pointer. It keeps the pan and
+ * zoom the canvas had before it fitted its frame, so leaving it returns there.
+ */
+export interface PlayView {
+  id: 'play'
+  revision: number
+  returnTo: ViewportPlace
+}
+
+/**
  * Shader Mode: one shader paint of a layer shown large on its own, to play, scrub, and tune. The
  * paint is named by its image, which stays with the shader however the layer's paints move.
  */
@@ -56,11 +66,7 @@ export interface ShaderView {
  * controls respond to the pointer, that preview presented a slide at a time, or one shader in
  * Shader Mode. Each pane has its own.
  */
-export type CanvasView =
-  | { id: 'edit' }
-  | { id: 'play'; revision: number }
-  | PresentView
-  | ShaderView
+export type CanvasView = { id: 'edit' } | PlayView | PresentView | ShaderView
 
 /**
  * How the editor behaves for a canvas, resolved from what the document is for and the view it

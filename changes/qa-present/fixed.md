@@ -1,0 +1,1 @@
+- Previewing a design and leaving it returns the editor to the pan and zoom it had.

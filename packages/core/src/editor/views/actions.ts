@@ -2,19 +2,27 @@ import type { EditorContext } from '#core/editor/types'
 
 import {
   createPresentationActions,
-  returnFromPresentation,
+  currentPlace,
+  returnToPlace,
   type PresentationViewport
 } from './present'
 import { EDIT_VIEW, resolveEditorProfile } from './profile'
 import { createShaderModeActions } from './shader'
-import type { CanvasView } from './types'
+import type { CanvasView, ViewportPlace } from './types'
+
+/** The place a view put the canvas aside from, for a view that fits or scrolls it. */
+function returnPlace(view: CanvasView): ViewportPlace | null {
+  if (view.id === 'present') return view.returnTo
+  return view.id === 'play' ? view.returnTo : null
+}
 
 export function createCanvasViewActions(ctx: EditorContext, viewport: PresentationViewport) {
   function setCanvasView(view: CanvasView): void {
     const left = ctx.state.canvasView
     ctx.state.canvasView = view
-    // However a presentation is left, the canvas returns to where it looked before it.
-    if (left.id === 'present' && view.id !== 'present') returnFromPresentation(ctx, left, viewport)
+    // However a preview or presentation is left, the canvas returns to where it looked before it.
+    const back = left.id === view.id ? null : returnPlace(left)
+    if (back) returnToPlace(ctx, back, viewport)
     ctx.requestRepaint()
   }
 
@@ -30,10 +38,10 @@ export function createCanvasViewActions(ctx: EditorContext, viewport: Presentati
   function startPlay(): void {
     if (ctx.state.canvasView.id === 'play') return
     ctx.state.hoveredNodeId = null
-    setCanvasView({ id: 'play', revision: 0 })
+    setCanvasView({ id: 'play', revision: 0, returnTo: currentPlace(ctx) })
   }
 
-  /** Go back to editing; the canvas draws every layer again. */
+  /** Go back to editing; the canvas draws every layer again where it looked before. */
   function stopPlay(): void {
     if (ctx.state.canvasView.id === 'play') setCanvasView(EDIT_VIEW)
   }
@@ -46,7 +54,9 @@ export function createCanvasViewActions(ctx: EditorContext, viewport: Presentati
   /** Put every control back as designed by running the islands afresh. */
   function resetPlay(): void {
     const view = ctx.state.canvasView
-    if (view.id === 'play') ctx.state.canvasView = { id: 'play', revision: view.revision + 1 }
+    if (view.id === 'play') {
+      ctx.state.canvasView = { id: 'play', revision: view.revision + 1, returnTo: view.returnTo }
+    }
   }
 
   // Another document's layers start from their designed state, not from the old islands'.

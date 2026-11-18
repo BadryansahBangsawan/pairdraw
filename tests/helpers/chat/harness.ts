@@ -43,11 +43,19 @@ export class ChatHarness {
   async open(): Promise<void> {
     // `/` opens Home; `?test` opens a fresh document, which the chat column belongs to.
     await this.page.goto('/?test')
-    await this.page.evaluate(async () => {
-      const themeModulePath = '/src/app/shell/theme.ts'
-      const themeModule = await import(themeModulePath)
-      themeModule.useAppTheme().setTheme('dark')
-    })
+    // The splash applies the stored theme before any module loads, and a fresh context starts
+    // dark. Importing the theme module to set it again replays the editor's module graph on the
+    // main thread, which can outlast the 15 s test timeout when Vite re-optimises its deps.
+    const alreadyDark = await this.page.evaluate(
+      () => document.documentElement.dataset.theme === 'dark'
+    )
+    if (!alreadyDark) {
+      await this.page.evaluate(async () => {
+        const themeModulePath = '/src/app/shell/theme.ts'
+        const themeModule = await import(themeModulePath)
+        themeModule.useAppTheme().setTheme('dark')
+      })
+    }
     await this.page.waitForFunction(() => document.documentElement.dataset.theme === 'dark')
   }
 

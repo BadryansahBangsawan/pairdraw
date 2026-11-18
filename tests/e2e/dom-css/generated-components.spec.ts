@@ -384,50 +384,64 @@ const PLAY_DEFAULT = [
 ].join('\n')
 
 /**
- * How each framework's app mounts the generated component with a caller's class, disabled,
- * and as the stories' Default story, whose play function it then runs.
+ * How each framework's app mounts the generated component with a caller's class and disabled,
+ * plus, only for the test that asks, the stories' Default story and the play function it runs.
+ * A play types into whichever input has focus, so it runs alone, never beside the control a
+ * test drives.
  */
 const APPS: Record<
   Framework,
   {
     entry: string
-    main: (component: string, stories: string) => string
+    main: (component: string, stories: string, withStory: boolean) => string
     plugin: () => PluginOption
   }
 > = {
   vue: {
     entry: 'main.ts',
-    main: (component, stories) =>
+    main: (component, stories, withStory) =>
       [
         "import { createApp, h } from 'vue'",
         `import Control from './${component}'`,
-        `import * as stories from './${stories}'`,
-        "import { playDefault } from './play'",
+        ...(withStory
+          ? [`import * as stories from './${stories}'`, "import { playDefault } from './play'"]
+          : []),
         "createApp({ render: () => [h('div', { id: 'enabled' }, h(Control, { class: 'custom' })), h('div', { id: 'disabled' }, h(Control, { disabled: true }))] }).mount('#app')",
-        "const story = document.getElementById('story')",
-        'if (story) {',
-        '  createApp({ render: () => h(Control, { ...stories.default.args, ...stories.Default.args }) }).mount(story)',
-        '  void playDefault(story, stories.Default.play)',
-        '}'
+        ...(withStory
+          ? [
+              "const story = document.getElementById('story')",
+              'if (story) {',
+              '  createApp({ render: () => h(Control, { ...stories.default.args, ...stories.Default.args }) }).mount(story)',
+              '  void playDefault(story, stories.Default.play)',
+              '}'
+            ]
+          : [])
       ].join('\n'),
     plugin: () => vue()
   },
   react: {
     entry: 'main.tsx',
-    main: (component, stories) =>
+    main: (component, stories, withStory) =>
       [
         "import { createRoot } from 'react-dom/client'",
         `import * as Module from './${component.replace(/\.tsx$/, '')}'`,
-        `import * as stories from './${stories}'`,
-        "import { playDefault } from './play'",
+        ...(withStory
+          ? [`import * as stories from './${stories}'`, "import { playDefault } from './play'"]
+          : []),
         'const Control = Object.values(Module)[0] as (props: Record<string, unknown>) => JSX.Element',
         "const app = document.getElementById('app')",
-        "const story = document.getElementById('story')",
-        'if (app && story) {',
+        'if (app) {',
         '  createRoot(app).render(<><div id="enabled"><Control className="custom" /></div><div id="disabled"><Control disabled /></div></>)',
-        '  createRoot(story).render(<Control {...stories.default.args} {...stories.Default.args} />)',
-        '  void playDefault(story, stories.Default.play)',
-        '}'
+        '}',
+        ...(withStory
+          ? [
+              "const story = document.getElementById('story')",
+              'if (story) {',
+              '  createRoot(story).render(<Control {...stories.default.args} {...stories.Default.args} />)',
+              '  void playDefault(story, stories.Default.play)',
+              '}'
+            ]
+          : [])
       ].join('\n'),
     plugin: () => react()
   }
@@ -436,13 +450,15 @@ const APPS: Record<
 /**
  * Exports `graph` to stories for `framework`, mounts the generated component in a Vite app
  * under the test's output folder, so it resolves `vue`, `reka-ui`, `react`, and `radix-ui`
- * from the repository as an app would, and serves it.
+ * from the repository as an app would, and serves it. `withStory` also mounts the Default
+ * story and runs its play function, which types into the focused input: ask for it only when
+ * the test checks the story, never beside a test that types.
  */
 async function serveComponent(
   graph: SceneGraph,
   framework: Framework,
   folder: string,
-  name?: string
+  { name, withStory = false }: { name?: string; withStory?: boolean } = {}
 ): Promise<ViteDevServer> {
   const files = await exportStorybook(graph, { framework })
   const named = (file: { path: string }) => !name || file.path.startsWith(`${name}.`)
@@ -455,7 +471,7 @@ async function serveComponent(
   await writeFile(join(folder, 'play.ts'), PLAY_DEFAULT)
   await writeFile(
     join(folder, app.entry),
-    app.main(component.path, stories.path.replace(/\.ts$/, ''))
+    app.main(component.path, stories.path.replace(/\.ts$/, ''), withStory)
   )
   await writeFile(
     join(folder, 'index.html'),
@@ -508,7 +524,9 @@ for (const framework of ['vue', 'react'] as const) {
     })
 
     test("the default story's play function turns the switch on", async ({ page }, info) => {
-      server = await serveComponent(switchGraph(), framework, info.outputPath('story'))
+      server = await serveComponent(switchGraph(), framework, info.outputPath('story'), {
+        withStory: true
+      })
       await page.goto(server.resolvedUrls?.local[0] ?? '')
       await expect(page.locator('#story')).toHaveAttribute('data-played', 'yes')
       await expect(page.locator('#story').getByRole('switch')).toHaveAttribute(
@@ -520,12 +538,9 @@ for (const framework of ['vue', 'react'] as const) {
     test('a switch in the content of a section is the generated switch, operable', async ({
       page
     }, info) => {
-      server = await serveComponent(
-        sectionGraph(),
-        framework,
-        info.outputPath('section'),
-        'Section'
-      )
+      server = await serveComponent(sectionGraph(), framework, info.outputPath('section'), {
+        name: 'Section'
+      })
       await page.goto(server.resolvedUrls?.local[0] ?? '')
       await page.locator('#enabled').getByRole('button').first().click()
       const nested = page.locator('#enabled').getByRole('switch')
@@ -541,7 +556,9 @@ for (const framework of ['vue', 'react'] as const) {
     test('a radio group chooses the radio clicked, starting on the one drawn chosen', async ({
       page
     }, info) => {
-      server = await serveComponent(radioGroupGraph(), framework, info.outputPath('plan'), 'Plan')
+      server = await serveComponent(radioGroupGraph(), framework, info.outputPath('plan'), {
+        name: 'Plan'
+      })
       await page.goto(server.resolvedUrls?.local[0] ?? '')
       const enabled = page.locator('#enabled')
       await expect(enabled.getByRole('radio', { name: 'Basic' })).toBeChecked()
@@ -551,7 +568,9 @@ for (const framework of ['vue', 'react'] as const) {
     })
 
     test('tabs show the panel of the tab clicked', async ({ page }, info) => {
-      server = await serveComponent(tabsGraph(), framework, info.outputPath('tabs'), 'Settings')
+      server = await serveComponent(tabsGraph(), framework, info.outputPath('tabs'), {
+        name: 'Settings'
+      })
       await page.goto(server.resolvedUrls?.local[0] ?? '')
       const enabled = page.locator('#enabled')
       await expect(enabled.getByText('Account settings')).toBeVisible()

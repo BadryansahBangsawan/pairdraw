@@ -105,3 +105,55 @@ test('rejects a property name that more than one property has', async () => {
     'Component property name Title is ambiguous; use one of the IDs: a, b'
   )
 })
+
+const CHOICE = `
+const label = property("Label", "Button")
+return <ComponentSet name="Choice">
+  <Component name="Variant=Primary, State=Default">
+    <Text text={label} />
+  </Component>
+  <Component name="Variant=Secondary, State=Default">
+    <Text text={label} />
+  </Component>
+</ComponentSet>`
+
+test('a variant property named Variant selects its variant', async () => {
+  const graph = new SceneGraph()
+  await renderJSX(graph, CHOICE)
+  const [instance] = await renderJSX(
+    graph,
+    `<Instance of="Choice" Variant="Secondary" State="Default" />`
+  )
+  expect(instance.warnings).toBeUndefined()
+  expect(graph.getNode(instance.id)?.name).toBe('Variant=Secondary, State=Default')
+})
+
+test('a name several components share warns and says how to pick one', async () => {
+  const graph = new SceneGraph()
+  const old = await renderJSX(graph, `<Component name="Button"><Text>Old</Text></Component>`)
+  const set = await renderJSX(
+    graph,
+    `<ComponentSet name="Button"><Component name="State=Default"><Text>New</Text></Component></ComponentSet>`
+  )
+  const [instance] = await renderJSX(graph, `<Instance of="Button" />`)
+  const warning = instance.warnings?.join('\n') ?? ''
+  expect(warning).toMatch(/names 2 components/)
+  expect(warning).toContain(old[0].id)
+  expect(warning).toContain(set[0].id)
+  expect(warning).toMatch(/by its ID/)
+  // Without variant props the component that already carried the name keeps the call.
+  expect(graph.getNode(instance.id)?.name).toBe('Button')
+})
+
+test('variant props pick the component set when a component shares its name', async () => {
+  const graph = new SceneGraph()
+  await renderJSX(graph, `<Component name="Button"><Text>Old</Text></Component>`)
+  await renderJSX(graph, CHOICE.replace('name="Choice"', 'name="Button"'))
+  const [instance] = await renderJSX(
+    graph,
+    `<Instance of="Button" Variant="Secondary" State="Default" />`
+  )
+  expect(instance.warnings?.join('\n')).toMatch(/names 2 components/)
+  expect(instance.warnings?.join('\n')).not.toMatch(/Unsupported prop/)
+  expect(graph.getNode(instance.id)?.name).toBe('Variant=Secondary, State=Default')
+})

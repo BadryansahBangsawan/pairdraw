@@ -283,11 +283,63 @@ function renderSVGNode<Artwork>(
   return placeArtwork(services, graph, artwork, props, size, parentId)
 }
 
-function findComponentByName(graph: SceneGraph, name: string): SceneNode | undefined {
+/** Every component or set the reference names: one by ID, or each one sharing the name. */
+function componentsNamed(graph: SceneGraph, ref: string): SceneNode[] {
+  const byId = graph.getNode(ref)
+  if (byId?.type === 'COMPONENT' || byId?.type === 'COMPONENT_SET') return [byId]
+  const components: SceneNode[] = []
+  const sets: SceneNode[] = []
   for (const node of graph.getAllNodes()) {
-    if (node.type === 'COMPONENT' && node.name === name) return node
+    if (node.name !== ref) continue
+    if (node.type === 'COMPONENT') components.push(node)
+    else if (node.type === 'COMPONENT_SET') sets.push(node)
   }
-  return undefined
+  return [...components, ...sets]
+}
+
+/** Whether `props` selects a variant of `set`, naming one of its variant properties. */
+function selectsVariant(set: SceneNode, props: Record<string, unknown>): boolean {
+  return Object.keys(props).some((key) =>
+    set.componentPropertyDefinitions.some(
+      (definition) => definition.type === 'VARIANT' && definition.name === key
+    )
+  )
+}
+
+/**
+ * The component or component set an element names. A name several of them share uses the set when
+ * the props select one of its variants, and the first otherwise; the warning from
+ * `componentReferenceWarnings` says so and how to pick one by ID.
+ */
+function namedComponent(graph: SceneGraph, props: Record<string, unknown>): SceneNode | undefined {
+  const ref = props.component ?? props.componentId ?? props.of
+  if (typeof ref !== 'string') return undefined
+
+  const matches = componentsNamed(graph, ref)
+  if (matches.length <= 1) return matches[0]
+  return (
+    matches.find((node) => node.type === 'COMPONENT_SET' && selectsVariant(node, props)) ??
+    matches[0]
+  )
+}
+
+/** A name several components or sets share, naming each candidate by its ID. */
+export function componentReferenceWarnings(
+  graph: SceneGraph,
+  props: Record<string, unknown>
+): string[] {
+  const ref = props.component ?? props.componentId ?? props.of
+  if (typeof ref !== 'string') return []
+  const matches = componentsNamed(graph, ref)
+  if (matches.length < 2) return []
+  const chosen = namedComponent(graph, props)
+  const choices = matches
+    .map((node) => `${node.id} (${node.type === 'COMPONENT_SET' ? 'component set' : 'component'})`)
+    .join(', ')
+  const joined = chosen?.type === 'COMPONENT_SET' ? 'the component set' : 'the first'
+  return [
+    `<Instance> of "${ref}" names ${matches.length} components and joins ${joined}; name the one you mean by its ID: ${choices}.`
+  ]
 }
 
 function findVariantInSet(
@@ -312,23 +364,6 @@ function findVariantInSet(
       )
     ) ?? variants[0]
   )
-}
-
-/** The component or component set an element names by id or name. */
-function namedComponent(graph: SceneGraph, props: Record<string, unknown>): SceneNode | undefined {
-  const ref = props.component ?? props.componentId ?? props.of
-  if (typeof ref !== 'string') return undefined
-
-  const byId = graph.getNode(ref)
-  if (byId?.type === 'COMPONENT' || byId?.type === 'COMPONENT_SET') return byId
-
-  const byName = findComponentByName(graph, ref)
-  if (byName) return byName
-
-  for (const node of graph.getAllNodes()) {
-    if (node.type === 'COMPONENT_SET' && node.name === ref) return node
-  }
-  return undefined
 }
 
 function resolveComponent(

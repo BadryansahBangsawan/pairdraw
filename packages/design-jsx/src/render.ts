@@ -7,7 +7,13 @@ import { elementBindings, elementProps, elementSchema } from './elements'
 import { ENUM_PROPS } from './enums'
 import { DESIGN_JSX_HELPERS, designJSXHelpers } from './helpers'
 import * as React from './mini-react'
-import { renderRoots, renderTree, componentPropNames, type RenderResult } from './renderer'
+import {
+  renderRoots,
+  renderTree,
+  componentPropNames,
+  componentReferenceWarnings,
+  type RenderResult
+} from './renderer'
 import { elementPropWarnings } from './schema'
 import type { DesignJSXServices } from './services'
 import { TEXT_CONTENT_NAMES } from './text-content'
@@ -128,6 +134,7 @@ function collectUnsupportedPropWarnings(
 ): void {
   const supported = elementProps(tree.type)
   // An instance sets its component's properties by name, such as `State="On"` or `Title="Hi"`.
+  if (tree.type === 'instance') warnings.push(...componentReferenceWarnings(graph, tree.props))
   const properties = componentPropNames(graph, tree.props)
   const element = TEXT_CONTENT_NAMES[tree.type] ?? tree.type
   const schema = elementSchema(tree.type)

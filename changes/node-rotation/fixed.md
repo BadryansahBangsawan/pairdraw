@@ -1,0 +1,1 @@
+- `get_node` reports a layer's rotation, so the angle `set_rotation` applied can be read back.

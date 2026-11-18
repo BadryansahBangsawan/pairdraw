@@ -58,6 +58,9 @@ export function nodeProxyToJSON(
   if (n.strokes.length > 0) obj.strokes = figmaStrokes(graph, n)
   if (n.effects.length > 0) obj.effects = n.effects
   if (n.opacity !== 1) obj.opacity = n.opacity
+  // The angle `set_rotation` writes, as the Figma API reports it. The scene stores the turn in
+  // the opposite direction and keeps floating-point noise, so read it through the proxy.
+  if (n.rotation !== 0) obj.rotation = api.wrapNode(nodeId).rotation
   if (n.cornerRadius > 0) obj.cornerRadius = n.cornerRadius
   if (!n.visible) obj.visible = false
   if (n.text) obj.characters = n.text

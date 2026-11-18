@@ -5,6 +5,7 @@ import type { Editor } from '@pairdraw/core'
 import { IMPORTABLE_RASTER_TYPES, isSVGFile } from '@pairdraw/scene-graph/images'
 
 import { cycleSafeTarget, findMoveDropTarget } from '#vue/shared/input/drop-target'
+import { gridRounding } from '#vue/shared/input/snap'
 
 const COMPONENT_MIME = 'application/x-pairdraw-component'
 
@@ -17,7 +18,12 @@ function dropPoint(e: DragEvent, canvas: HTMLCanvasElement, editor: Editor) {
   return editor.screenToCanvas(e.clientX - rect.left, e.clientY - rect.top)
 }
 
-function componentDropPlacement(componentId: string, cx: number, cy: number, editor: Editor) {
+export function componentDropPlacement(
+  componentId: string,
+  cx: number,
+  cy: number,
+  editor: Editor
+) {
   const component = editor.graph.getNode(componentId)
   if (component?.type !== 'COMPONENT') return null
 
@@ -29,10 +35,11 @@ function componentDropPlacement(componentId: string, cx: number, cy: number, edi
     parentId === editor.state.currentPageId
       ? { x: 0, y: 0 }
       : editor.graph.getAbsolutePosition(parentId)
+  const round = gridRounding(editor)
   return {
     parentId,
-    x: cx - parentOffset.x - component.width / 2,
-    y: cy - parentOffset.y - component.height / 2
+    x: round(cx - parentOffset.x - component.width / 2),
+    y: round(cy - parentOffset.y - component.height / 2)
   }
 }
 

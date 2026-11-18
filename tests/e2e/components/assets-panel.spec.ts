@@ -243,15 +243,24 @@ test('assets panel supports Figma-style views, component actions, and canvas dra
     .toEqual({ pageId: setup.secondPageId, selectedId: setup.componentId })
 
   await page.getByTestId('left-panel-assets-tab').click()
-  const canvasBox = expectDefined(await canvas.canvas.boundingBox(), 'canvas bounds')
   await page
     .locator(`[data-asset-id="${setup.componentId}"]`)
-    .dragTo(canvas.canvas, { targetPosition: { x: canvasBox.width / 2, y: canvasBox.height / 2 } })
+    .dragTo(canvas.canvas, { targetPosition: { x: 400.5, y: 300.5 } })
   await canvas.waitForRender()
 
   const inserted = await selectedNodeSnapshot(page)
   expect(inserted?.type).toBe('INSTANCE')
   expect(inserted?.componentId).toBe(setup.componentId)
+  // Snap to pixel grid is on, so the drop lands on whole pixels even from a fractional cursor.
+  const position = await page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
+    const selectedId = [...store.state.selectedIds][0]
+    const selected = selectedId ? store.graph.getNode(selectedId) : null
+    return { x: selected?.x, y: selected?.y }
+  })
+  expect(Number.isInteger(position.x)).toBe(true)
+  expect(Number.isInteger(position.y)).toBe(true)
   canvas.assertNoErrors()
 })
 

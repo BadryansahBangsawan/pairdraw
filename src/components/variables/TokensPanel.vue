@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useElementSize } from '@vueuse/core'
 import { tv } from 'tailwind-variants'
-import { computed, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import type { VariableTokenFields } from '@pairdraw/core'
 import type { TokenStylesheetFormat } from '@pairdraw/dom-css/export'
@@ -69,6 +69,8 @@ const actions = useTokenActions(editor, (name) => messages.value.duplicateName({
 
 const selectedIds = ref<string[]>([])
 const table = useTemplateRef<{ focus: () => void }>('table')
+/** The token whose name opens for editing, set when one is added. */
+const renameRequest = ref<string | null>(null)
 /** Tokens being put in a new group: the group name field opens for them. */
 const groupingIds = ref<string[] | null>(null)
 const groupFilter = ref<string | null>(null)
@@ -239,13 +241,16 @@ function closeDetail() {
   groupingIds.value = null
 }
 
-/** A new token is selected, with nothing hiding it, so its name is ready to edit. */
-function addToken(type: VariableType) {
+/** A new token is selected, with nothing hiding it, and its name opens for editing. */
+async function addToken(type: VariableType) {
   ctx.searchTerm.value = ''
   groupFilter.value = null
   typeFilter.value = []
   const id = ctx.addVariable(type)
-  if (id) selectedIds.value = [id]
+  if (!id) return
+  selectedIds.value = [id]
+  await nextTick()
+  renameRequest.value = id
 }
 
 function removeTokens(ids: readonly string[]) {
@@ -470,6 +475,7 @@ const groupOptions = computed(() => groupEntries.value.map((entry) => entry.path
         :group-options="groupOptions"
         :labels="tableLabels"
         :mode-ids="[shownModeId]"
+        :start-rename-id="renameRequest"
       />
     </PanelDrillIn>
 
@@ -528,6 +534,7 @@ const groupOptions = computed(() => groupEntries.value.map((entry) => entry.path
           :groups="groups"
           :group-options="groupOptions"
           :labels="tableLabels"
+          :start-rename-id="renameRequest"
         />
         <Transition v-bind="swapTransition" mode="out-in">
           <TokenBulkInspector v-if="bulkIds" key="bulk" v-bind="bulkInspector" />

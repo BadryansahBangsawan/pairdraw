@@ -4,8 +4,9 @@ export type AgentNoteField = 'context' | 'prompt'
 </script>
 
 <script setup lang="ts">
+import { templateRef } from '@vueuse/core'
 import { tv } from 'tailwind-variants'
-import { ref, useId, watch } from 'vue'
+import { onMounted, ref, useId, watch } from 'vue'
 
 import { useExploreMessages } from '@pairdraw/vue/i18n'
 
@@ -20,11 +21,14 @@ import agentNotesTheme from '@/theme/agent-notes'
 const {
   context = '',
   prompt = '',
-  disabled = false
+  disabled = false,
+  focusOnMount = false
 } = defineProps<{
   context?: string
   prompt?: string
   disabled?: boolean
+  /** Whether the form opened for the person to type its first field, as Add notes does. */
+  focusOnMount?: boolean
 }>()
 const emit = defineEmits<{
   commit: [field: AgentNoteField, value: string]
@@ -37,6 +41,11 @@ const contextId = useId()
 const promptId = useId()
 const contextDraft = ref(context)
 const promptDraft = ref(prompt)
+const contextField = templateRef<{ focus: () => void } | null>('contextField')
+
+onMounted(() => {
+  if (focusOnMount) contextField.value?.focus()
+})
 
 // What is stored replaces the drafts, such as after an undo or for another layer.
 watch(
@@ -61,6 +70,7 @@ function commit(field: AgentNoteField) {
       <label :for="contextId" :class="styles.label()">{{ messages.context }}</label>
       <AppTextarea
         :id="contextId"
+        ref="contextField"
         v-model="contextDraft"
         :rows="2"
         :disabled="disabled"

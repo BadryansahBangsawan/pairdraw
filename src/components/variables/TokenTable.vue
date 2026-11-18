@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ListboxContent, ListboxGroup, ListboxGroupLabel, ListboxItem, ListboxRoot } from 'reka-ui'
 import { tv } from 'tailwind-variants'
-import { computed, ref, useTemplateRef, type ComponentPublicInstance } from 'vue'
+import { computed, ref, useTemplateRef, watch, type ComponentPublicInstance } from 'vue'
 
 import {
   isLibraryCollection,
@@ -26,10 +26,19 @@ import { VARIABLE_TYPE_ICONS } from '@/components/variables/type-icons'
 import { useConditionLabels } from '@/components/variables/useConditionLabels'
 import tableTheme from '@/theme/variables/table'
 
-const { collection, groups, labels, modeIds, groupOptions } = defineProps<{
+const {
+  collection,
+  groups,
+  labels,
+  modeIds,
+  groupOptions,
+  startRenameId = null
+} = defineProps<{
   collection: VariableCollection
   groups: TokenGroup[]
   labels: { name: string; cssName: string; empty: string }
+  /** A token whose name opens for editing, as a just-added one does. */
+  startRenameId?: string | null
   /** Modes to show values for; every mode by default. */
   modeIds?: readonly string[]
   /** Groups the "Move to group" menu offers. */
@@ -125,6 +134,15 @@ function isEditing(id: string, modeId?: string) {
 function startRename(id: string) {
   editing.value = { id }
 }
+
+// The table may mount after the request, so the first read counts too.
+watch(
+  () => startRenameId,
+  (id) => {
+    if (id) startRename(id)
+  },
+  { immediate: true }
+)
 
 function commitName(row: TokenRow, text: string) {
   editing.value = null

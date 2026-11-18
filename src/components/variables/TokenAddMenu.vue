@@ -6,7 +6,7 @@ import {
   DropdownMenuRoot,
   DropdownMenuTrigger
 } from 'reka-ui'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import type { VariableType } from '@pairdraw/scene-graph'
 import { useI18n } from '@pairdraw/vue/i18n'
@@ -24,6 +24,18 @@ const emit = defineEmits<{ add: [type: VariableType] }>()
 
 const { panels, variableTypes: text } = useI18n()
 const menu = useMenuUI({ content: 'w-48', item: 'justify-start gap-2' })
+
+/** The type picked; it is added once the menu has returned focus, so its name field keeps it. */
+const picked = ref<VariableType | null>(null)
+
+/** Picked before the menu closes: the new name field takes focus as the menu lets go of it. */
+function addPicked(event: Event) {
+  event.preventDefault()
+  const type = picked.value
+  picked.value = null
+  // The field mounts once the menu has finished closing, so it keeps the focus it takes.
+  if (type) setTimeout(() => emit('add', type), 0)
+}
 
 const items = computed(() => {
   const labels: Record<VariableType, { label: string; hint: string }> = {
@@ -54,14 +66,20 @@ const items = computed(() => {
       </IconButton>
     </DropdownMenuTrigger>
     <DropdownMenuPortal>
-      <DropdownMenuContent side="bottom" :side-offset="4" align="end" :class="menu.content">
+      <DropdownMenuContent
+        side="bottom"
+        :side-offset="4"
+        align="end"
+        :class="menu.content"
+        @close-auto-focus="addPicked"
+      >
         <MenuScrollArea>
           <DropdownMenuItem
             v-for="item in items"
             :key="item.type"
             :class="menu.item"
             v-test-id="variablesAddTestId(item.type)"
-            @select="emit('add', item.type)"
+            @select="picked = item.type"
           >
             <component :is="item.icon" :class="menu.icon" />
             <span class="flex min-w-0 flex-1 flex-col">

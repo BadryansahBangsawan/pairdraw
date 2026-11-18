@@ -83,18 +83,25 @@ test('add variable menu creates non-color variable types', async () => {
 
   await editor.page.getByTestId('variables-add-variable').click()
   await editor.page.getByTestId(variablesAddTestId('FLOAT')).click()
+  // The new name opens for editing; Enter keeps it.
+  await expect(editor.page.getByTestId('variables-cell-input')).toBeFocused()
+  await editor.page.keyboard.press('Enter')
   await expect(
     editor.page.getByTestId('variable-row').filter({ hasText: 'New number' })
   ).toHaveCount(1)
 
   await editor.page.getByTestId('variables-add-variable').click()
   await editor.page.getByTestId(variablesAddTestId('STRING')).click()
+  await expect(editor.page.getByTestId('variables-cell-input')).toBeFocused()
+  await editor.page.keyboard.press('Enter')
   await expect(editor.page.getByTestId('variable-row').filter({ hasText: 'New text' })).toHaveCount(
     1
   )
 
   await editor.page.getByTestId('variables-add-variable').click()
   await editor.page.getByTestId(variablesAddTestId('BOOLEAN')).click()
+  await expect(editor.page.getByTestId('variables-cell-input')).toBeFocused()
+  await editor.page.keyboard.press('Enter')
   await expect(
     editor.page.getByTestId('variable-row').filter({ hasText: 'New boolean' })
   ).toHaveCount(1)
@@ -387,5 +394,27 @@ test('the add menu opens under its button after the dialog changes width', async
 
   await editor.page.keyboard.press('Escape')
   await editor.page.setViewportSize(viewport)
+  editor.canvas.assertNoErrors()
+})
+
+test('a new variable starts with its name ready to edit', async () => {
+  await createColorVariable('seed-color')
+
+  const dialog = editor.page.getByTestId('variables-dialog')
+  // The test before leaves the dialog open, so its trigger is behind it.
+  if (!(await dialog.isVisible())) await openVariables().click()
+  await expect(dialog).toBeVisible()
+  await dialog.getByRole('button', { name: 'Create variable' }).click()
+  await expect(editor.page.getByRole('menu')).toBeVisible()
+  await editor.page.getByTestId(variablesAddTestId('COLOR')).click()
+
+  const name = dialog.getByTestId('variables-cell-input')
+  await expect(name).toBeFocused()
+  await editor.page.keyboard.type('brand-color')
+  await editor.page.keyboard.press('Enter')
+
+  await expect(
+    dialog.getByTestId('variable-row').filter({ hasText: 'brand-color' }).first()
+  ).toBeVisible()
   editor.canvas.assertNoErrors()
 })

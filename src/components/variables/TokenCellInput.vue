@@ -15,11 +15,41 @@ const ui = tv(cellInputTheme)()
 const draft = ref(value)
 const input = useTemplateRef('input')
 let done = false
+let settleUntil = 0
 
 onMounted(() => {
-  input.value?.focus()
-  input.value?.select()
+  takeFocus()
+  // A menu closing as the field appears hands focus to its trigger or the dialog's scope for a
+  // frame or two; the field, opened by the person's choice, keeps it.
+  settleUntil = performance.now() + 250
+  requestAnimationFrame(settle)
 })
+
+/** While the field settles, takes focus back from anything that is not another field. */
+function settle() {
+  if (performance.now() > settleUntil) return
+  takeFocus()
+  requestAnimationFrame(settle)
+}
+
+function takeFocus() {
+  const field = input.value
+  const active = document.activeElement
+  if (!field || active === field) return
+  // Leave focus alone once the person has moved to another field.
+  if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return
+  field.focus()
+  field.select()
+}
+
+function onBlur() {
+  // A steal while the field settles is not the person leaving it.
+  if (performance.now() < settleUntil) {
+    requestAnimationFrame(takeFocus)
+    return
+  }
+  finish(true)
+}
 
 function finish(commit: boolean) {
   if (done) return
@@ -46,6 +76,6 @@ function onKeydown(event: KeyboardEvent) {
     @click.stop
     @dblclick.stop
     @pointerdown.stop
-    @blur="finish(true)"
+    @blur="onBlur"
   />
 </template>

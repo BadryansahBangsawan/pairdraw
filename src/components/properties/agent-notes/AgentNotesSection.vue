@@ -59,6 +59,7 @@ function clear() {
       v-if="hasNotes || adding"
       :context="notes?.context"
       :prompt="notes?.prompt"
+      :focus-on-mount="adding"
       @focusin="editingId = nodeId"
       @commit="commit"
       @run="runPrompt"

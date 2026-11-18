@@ -1,6 +1,7 @@
 import type { Editor } from '@pairdraw/core'
 import type { NodeType, SceneNode } from '@pairdraw/scene-graph'
 import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
+import { acceptsContent } from '@pairdraw/scene-graph/icons'
 import { cycleSafeParent } from '@pairdraw/scene-graph/instances'
 import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
@@ -14,8 +15,8 @@ function acceptingTarget(target: SceneNode | null, editor: Editor): SceneNode | 
   if (!target) return null
   // Only an instance's slots take layers; anywhere else in it drops into its parent.
   const accepting = editor.graph.getNode(editor.acceptingParent(target.id))
-  if (!accepting || accepting.type === 'CANVAS' || !editor.acceptsChildren(accepting.id))
-    return null
+  // An icon frame holds only its glyph, so a layer lands on the page instead.
+  if (!accepting || !acceptsContent(accepting) || !editor.acceptsChildren(accepting.id)) return null
   return accepting
 }
 

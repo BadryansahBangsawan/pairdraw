@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { createEditor, resolvePasteTarget as publicResolvePasteTarget } from '@pairdraw/core'
 import { SceneGraph } from '@pairdraw/scene-graph'
+import { withIcon } from '@pairdraw/scene-graph/icons'
 
 import { resolvePasteTarget } from '#core/editor/clipboard/paste/target'
 
@@ -96,5 +97,15 @@ describe('resolvePasteTarget', () => {
     const frame = graph.createNode('FRAME', pageId, { name: 'Frame', width: 100, height: 100 })
     editor.select([frame.id])
     expect(publicResolvePasteTarget(editor)).toBe(frame.id)
+  })
+
+  test('falls back to the page inside a selected icon, which holds only its glyph', () => {
+    const { graph, pageId, state } = setup()
+    const icon = graph.createNode('FRAME', pageId, { name: 'home', width: 24, height: 24 })
+    graph.updateNode(icon.id, {
+      pluginData: withIcon(icon, { name: 'material-symbols:home' })
+    })
+    state.selectedIds = new Set([icon.id])
+    expect(resolvePasteTarget({ graph, state })).toBe(pageId)
   })
 })

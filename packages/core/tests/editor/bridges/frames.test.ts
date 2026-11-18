@@ -1,8 +1,46 @@
 import { describe, expect, test } from 'bun:test'
 
 import { createEditor, pageSlides, slideMoveTarget } from '@pairdraw/core'
+import { withIcon } from '@pairdraw/scene-graph/icons'
 
 const VIEWPORT = { width: 800, height: 600 }
+
+describe('slides', () => {
+  test('an icon frame is not a slide, also when it sits in a section', () => {
+    const editor = createEditor({ getViewportSize: () => VIEWPORT })
+    const pageId = editor.state.currentPageId
+    const home = editor.graph.createNode('FRAME', pageId, {
+      name: 'Home',
+      width: 1440,
+      height: 900
+    })
+    expect(home.parentId).toBe(pageId)
+    const icon = editor.graph.createNode('FRAME', pageId, {
+      name: 'home',
+      width: 24,
+      height: 24
+    })
+    editor.graph.updateNode(icon.id, {
+      pluginData: withIcon(icon, { name: 'material-symbols:home' })
+    })
+    const section = editor.graph.createNode('SECTION', pageId, { x: 2000, y: 0, width: 300 })
+    const inSection = editor.graph.createNode('FRAME', section.id, {
+      name: 'details',
+      width: 24,
+      height: 24
+    })
+    editor.graph.updateNode(inSection.id, {
+      pluginData: withIcon(inSection, { name: 'material-symbols:details' })
+    })
+    editor.graph.createNode('FRAME', pageId, { name: 'Pricing', width: 1440, height: 900 })
+
+    expect(pageSlides(editor.graph, pageId).map((node) => node.name)).toEqual([
+      'Home',
+      'Pricing'
+    ])
+    expect(pageSlides(editor.graph, pageId).map((node) => node.id)).not.toContain(icon.id)
+  })
+})
 
 // Figma's N and Shift+N.
 describe('frame navigation', () => {

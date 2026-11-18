@@ -1,5 +1,5 @@
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
-import { CONTAINER_TYPES } from '@pairdraw/scene-graph/node-defaults'
+import { acceptsContent } from '@pairdraw/scene-graph/icons'
 
 import { acceptingParent } from '#core/editor/components/slots'
 import type { EditorContext } from '#core/editor/types'
@@ -18,7 +18,7 @@ function pasteTargetCandidate(ctx: Pick<EditorContext, 'graph' | 'state'>): stri
   if (ids.length !== 1) return ctx.state.currentPageId
   const node = ctx.graph.getNode(ids[0])
   if (!node) return ctx.state.currentPageId
-  if (CONTAINER_TYPES.has(node.type) && node.type !== 'CANVAS') return node.id
+  if (acceptsContent(node)) return node.id
   return node.parentId ?? ctx.state.currentPageId
 }
 

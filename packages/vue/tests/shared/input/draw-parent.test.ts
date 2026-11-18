@@ -2,6 +2,7 @@ import { afterEach, describe, expect, test } from 'bun:test'
 
 import { createEditor, type Editor, type Tool } from '@pairdraw/core'
 import type { SceneNode } from '@pairdraw/scene-graph'
+import { withIcon } from '@pairdraw/scene-graph/icons'
 
 import { handleDrawMove, startShapeDraw } from '#vue/shared/input/draw'
 import type { DragState } from '#vue/shared/input/types'
@@ -69,6 +70,15 @@ describe('drawing into containers', () => {
 
     node('FRAME', page, { x: 800, width: 200, height: 200, locked: true })
     expect(draw('RECTANGLE', [850, 50], [880, 80]).parentId).toBe(page)
+  })
+
+  test('skips an icon frame, which holds only its glyph', () => {
+    const page = setup()
+    const icon = node('FRAME', page, { x: 900, width: 24, height: 24 })
+    editor.graph.updateNode(icon.id, {
+      pluginData: withIcon(icon, { name: 'material-symbols:home' })
+    })
+    expect(draw('RECTANGLE', [905, 5], [915, 15]).parentId).toBe(page)
   })
 
   test('draws in the axes of a rotated frame', () => {

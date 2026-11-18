@@ -1,0 +1,1 @@
+- A layer dropped, drawn, or pasted onto an icon lands on the page instead of inside the icon, and an icon frame no longer counts as a slide in the Slides panel, presentation, or PDF and PowerPoint export.

@@ -1,4 +1,5 @@
 import type { SceneGraph, SceneNode, NodeType } from '@pairdraw/scene-graph'
+import { acceptsContent } from '@pairdraw/scene-graph/icons'
 
 import type { createSelectionActions } from '#core/editor/selection'
 import type { EditorContext } from '#core/editor/types'
@@ -11,15 +12,16 @@ const FRAME_TYPES = new Set<NodeType>(['FRAME', 'COMPONENT', 'COMPONENT_SET', 'I
 
 /**
  * The page's slides: its visible top-level frames, including frames placed in its sections, in
- * the page's layer order, bottom layer first. Present shows them in this order, and the app's
- * slide exports (PDF and PowerPoint) pass these ids in this order as their selection; the
- * generic page- and selection-scoped PPTX export does not consult it.
+ * the page's layer order, bottom layer first. An icon frame is not a slide; it draws one glyph.
+ * Present shows them in this order, and the app's slide exports (PDF and PowerPoint) pass these
+ * ids in this order as their selection; the generic page- and selection-scoped PPTX export does
+ * not consult it.
  */
 export function pageSlides(graph: SceneGraph, pageId: string): SceneNode[] {
   return graph.getChildren(pageId).flatMap((node) => {
     if (!node.visible) return []
     if (node.type === 'SECTION') return pageSlides(graph, node.id)
-    return FRAME_TYPES.has(node.type) ? [node] : []
+    return FRAME_TYPES.has(node.type) && acceptsContent(node) ? [node] : []
   })
 }
 

@@ -1,11 +1,21 @@
+import { CONTAINER_TYPES } from '../node-defaults'
 import { readPluginData, withPluginData } from '../plugin-data/field'
 import { PAIRDRAW_PLUGIN_DATA } from '../plugin-data/fields'
 import type { SceneNode } from '../types'
 import type { Icon, IconPaint } from './schema'
 
 /** The icon a frame draws, or null when it is not an icon or its data is unreadable. */
-export function readIcon(node: SceneNode): Icon | null {
+export function readIcon(node: Pick<SceneNode, 'pluginData'>): Icon | null {
   return readPluginData(node.pluginData, PAIRDRAW_PLUGIN_DATA.icon) ?? null
+}
+
+/**
+ * Whether a layer holds other layers. An icon frame does not: it draws one glyph at the
+ * proportions it was placed with, so a layer put inside would cover it, and a top-level icon
+ * would stand where a slide does.
+ */
+export function acceptsContent(node: Pick<SceneNode, 'type' | 'pluginData'>): boolean {
+  return node.type !== 'CANVAS' && CONTAINER_TYPES.has(node.type) && readIcon(node) === null
 }
 
 /** The node's plugin data with the icon set, or removed when null. */

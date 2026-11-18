@@ -78,18 +78,31 @@ function exportedOrphanCount(bytes: Uint8Array): number {
   return nodeChanges.filter((node) => node.type === 'INSTANCE' && !node.symbolData?.symbolID).length
 }
 
+// The export is the one phase that writes the whole document, and the reopen parses it again.
+// They run as two tests so each has its own wall-clock budget: one test spent the export's and
+// the reopen's time against a single budget, and a machine running the rest of the suite in
+// parallel pushed that sum past it. The bytes bridge them, and only one graph is alive at a time.
+let exported: { bytes: Uint8Array; orphanCount: number } | null = null
+
 test.if(runsHeavyTests)(
-  'an edited document with instances of deleted components exports and reopens',
+  'an edited document with instances of deleted components exports with them intact',
   async () => {
-    const { bytes, orphanCount } = await exportEditedDocument()
-    expect(orphanCount).toBeGreaterThan(0)
+    exported = await exportEditedDocument()
+    expect(exported.orphanCount).toBeGreaterThan(0)
     Bun.gc(true)
-    const reopened = reopenedDocument(bytes)
+    expect(exportedOrphanCount(exported.bytes)).toBe(exported.orphanCount)
+  },
+  HEAVY_DOCUMENT_TIMEOUT_MS
+)
+
+test.if(runsHeavyTests)(
+  'the export reopens with those instances intact',
+  () => {
+    if (!exported) throw new Error('the export test produced no document to reopen')
+    const reopened = reopenedDocument(exported.bytes)
     expect(reopened.pageNames).toContain('Edited page')
     // The instances of deleted components are still there, with no component to point at.
-    expect(reopened.orphanInstances).toBe(orphanCount)
-    Bun.gc(true)
-    expect(exportedOrphanCount(bytes)).toBe(orphanCount)
+    expect(reopened.orphanInstances).toBe(exported.orphanCount)
   },
   HEAVY_DOCUMENT_TIMEOUT_MS
 )

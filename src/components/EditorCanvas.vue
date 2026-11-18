@@ -70,7 +70,12 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 
 const isActivePane = computed(() => !paneId || store.activePaneId.value === paneId)
 const followView = useFollowView(useTemplateRef<HTMLElement>('area'))
-const { letterbox, scrim, dissolvingFrom } = usePrototypeStage(store, canvasRef)
+const {
+  letterbox,
+  scrim,
+  dissolvingFrom,
+  frameId: previewFrameId
+} = usePrototypeStage(store, canvasRef)
 
 function activatePane() {
   if (paneId) store.setActivePane(paneId)
@@ -84,6 +89,16 @@ const getRenderState = paneId ? () => store.getPaneRenderState(paneId) : undefin
 /** This pane's view: its pan, zoom, page, and whether it previews. */
 const paneView = computed(() => (paneId ? store.getPaneRenderState(paneId) : store.state))
 const paneProfile = computed(() => resolveEditorProfile(paneView.value))
+/**
+ * The one layer the canvas shows: the presented slide, or the frame a preview plays. Both draw
+ * only that layer and its descendants, as Figma does, instead of the whole page.
+ */
+const sceneScopeId = computed(() => {
+  void store.state.sceneVersion
+  void store.state.currentPageId
+  return store.getPresentation()?.slideId ?? previewFrameId.value ?? null
+})
+watch(sceneScopeId, () => store.requestRender())
 const onViewportResize = (width: number, height: number) => {
   if (paneId) store.resizePane(paneId, width, height)
   if (isActivePane.value) store.setViewportSize(width, height)
@@ -131,6 +146,7 @@ useCanvas(sceneCanvasRef, store, {
   shouldSuspendRender,
   showRulers: false,
   getRenderState,
+  getSceneScope: () => sceneScopeId.value,
   onViewportResize,
   onPresented: ({ sceneVersion }) =>
     store.preparationController.acknowledgePresentation(sceneVersion),

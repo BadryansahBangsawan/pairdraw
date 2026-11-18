@@ -64,6 +64,11 @@ export interface UseCanvasOptions {
    */
   getRenderState?: () => EditorState
   /**
+   * The page layer this canvas shows on its own, with its descendants, clipped to it, as a
+   * presentation shows only its slide. Null draws every layer of the page.
+   */
+  getSceneScope?: () => string | null
+  /**
    * Called after each frame this canvas draws, with the pan and zoom it was drawn at. DOM laid
    * over the canvas, such as preview islands, follows these to stay in step with the drawing
    * instead of running ahead of it while the canvas is still catching up.

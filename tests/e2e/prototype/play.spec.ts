@@ -1,4 +1,5 @@
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
+import { readScenePixels } from '#tests/helpers/canvas/pixels'
 
 // Play fits one frame to the canvas and runs the reaction under a click: the clicked layer's
 // nearest `ON_CLICK` reaction navigates to its target frame, and Escape returns to editing.
@@ -54,6 +55,7 @@ test('play follows a click reaction between frames and returns on Escape', async
     return { home, details, button }
   })
   await editor.canvas.waitForRender()
+  const beforePlay = await view(ids.home)
 
   const section = editor.page.getByRole('region', { name: 'Prototype', exact: true })
   await section.getByRole('button', { name: 'Play', exact: true }).click()
@@ -93,7 +95,14 @@ test('play follows a click reaction between frames and returns on Escape', async
 
   await editor.page.keyboard.press('Escape')
   await editor.canvas.waitForRender()
-  expect(await view(ids.details)).toMatchObject({ canvasView: 'edit' })
+  const afterPlay = await view(ids.details)
+  expect(afterPlay).toMatchObject({ canvasView: 'edit' })
+  // Preview fitted two frames meanwhile; leaving it returns the editor's own pan and zoom.
+  expect([afterPlay.panX, afterPlay.panY, afterPlay.zoom]).toEqual([
+    beforePlay.panX,
+    beforePlay.panY,
+    beforePlay.zoom
+  ])
   editor.canvas.assertNoErrors()
 })
 
@@ -250,5 +259,53 @@ test('a DISSOLVE transition crossfades the frame it leaves instead of cutting', 
   // It leaves once the transition is over and the target frame owns the stage.
   await expect(dissolve).toHaveCount(0, { timeout: 3000 })
   expect(await view(ids.details)).toMatchObject({ canvasView: 'play', fitsInside: true })
+  editor.canvas.assertNoErrors()
+})
+
+test('play draws only the played frame, not page layers over it', async () => {
+  await editor.page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
+    const solid = (color: { r: number; g: number; b: number }) => ({
+      type: 'SOLID' as const,
+      color: { ...color, a: 1 },
+      opacity: 1,
+      visible: true,
+      blendMode: 'NORMAL' as const
+    })
+    const home = store.createShape('FRAME', 0, 0, 400, 300)
+    store.graph.updateNode(home, { fills: [solid({ r: 0.1, g: 0.2, b: 0.9 })] })
+    // A page-level layer above the frame, overlapping it: Figma never shows it while playing.
+    const card = store.createShape('RECTANGLE', 200, 100, 200, 150)
+    store.graph.updateNode(card, { fills: [solid({ r: 0.9, g: 0.1, b: 0.1 })] })
+    store.select([home])
+    return { home, card }
+  })
+  await editor.canvas.waitForRender()
+
+  async function overlapPoint() {
+    return editor.page.evaluate(() => {
+      const store = window.pairdraw?.getStore?.()
+      if (!store) throw new Error('Pairdraw store not initialized')
+      const { zoom, panX, panY } = store.state
+      return { x: 250 * zoom + panX, y: 150 * zoom + panY }
+    })
+  }
+
+  // Editing shows the page layer over the frame, which is why the frame's pixels are the proof.
+  const [editing] = await readScenePixels(editor.page, [await overlapPoint()])
+  expect(editing[0]).toBeGreaterThan(200)
+
+  const section = editor.page.getByRole('region', { name: 'Prototype', exact: true })
+  await section.getByRole('button', { name: 'Play', exact: true }).click()
+  await editor.canvas.waitForRender()
+
+  const [playing] = await readScenePixels(editor.page, [await overlapPoint()])
+  expect(Math.abs(playing[0] - 26)).toBeLessThan(6)
+  expect(Math.abs(playing[1] - 51)).toBeLessThan(6)
+  expect(Math.abs(playing[2] - 230)).toBeLessThan(6)
+
+  await editor.page.keyboard.press('Escape')
+  await editor.canvas.waitForRender()
   editor.canvas.assertNoErrors()
 })

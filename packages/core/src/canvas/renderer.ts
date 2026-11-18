@@ -229,6 +229,11 @@ export class SkiaRenderer {
   /** Selection chrome, set from editor state each frame through {@link setSelectionTheme}. */
   selectionTheme: SelectionTheme = DEFAULT_SELECTION_THEME
   pageId: string | null = null
+  /**
+   * The one page layer this canvas shows, with its descendants, clipped to its bounds, as a
+   * presentation shows only its slide; null draws every layer of the page.
+   */
+  sceneScopeId: string | null = null
   /** Status labels drawn in the last label pass; clicks on them open the status menu. */
   statusLabels: PlacedStatusLabel[] = []
 

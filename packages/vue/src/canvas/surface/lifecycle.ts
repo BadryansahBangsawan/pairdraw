@@ -43,6 +43,11 @@ function applyRenderOptions(renderer: SkiaRenderer, options: UseCanvasOptions | 
   renderer.onNodeDrawFailure = options?.onNodeDrawFailure ?? null
 }
 
+/** Shows only the scope layer the canvas asks for, or the whole page when it asks for none. */
+function applySceneScope(renderer: SkiaRenderer, options: UseCanvasOptions | undefined) {
+  renderer.sceneScopeId = options?.getSceneScope?.() ?? null
+}
+
 export function createCanvasSurfaceManager({
   editor,
   canvasRef,
@@ -175,6 +180,7 @@ export function createCanvasSurfaceManager({
   function renderNow() {
     if (!state.renderer || isDestroyed()) return
     const view = options?.getRenderState?.() ?? editor.state
+    applySceneScope(state.renderer, options)
     state.renderer.renderFromEditorState(
       view,
       editor.graph,

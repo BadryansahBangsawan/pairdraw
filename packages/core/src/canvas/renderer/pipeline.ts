@@ -1,6 +1,7 @@
 import type { Canvas } from 'canvaskit-wasm'
 
 import type { SceneGraph } from '@pairdraw/scene-graph'
+import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 import { computeDescendantVisualBounds } from '@pairdraw/scene-graph/geometry'
 
 import { needsImagePreviews } from '#core/canvas/images/previews'
@@ -187,6 +188,7 @@ function getSceneRenderPolicy(
     graph.positionPreviewVersion !== r.scenePicturePositionPreviewVersion &&
     sceneVersion === r.scenePictureVersion
   const requiresUncachedSceneRender =
+    r.sceneScopeId !== null ||
     r.viewportImageRendering ||
     interactive ||
     hasPositionPreview ||
@@ -407,6 +409,19 @@ function renderPageChildren(
   graph: SceneGraph,
   overlays: RenderOverlays
 ): void {
+  const scope = r.sceneScopeId ? graph.getNode(r.sceneScopeId) : undefined
+  if (scope) {
+    const bounds = getAxisAlignedWorldBounds(scope, graph)
+    canvas.save()
+    canvas.clipRect(
+      r.ck.LTRBRect(bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height),
+      r.ck.ClipOp.Intersect,
+      true
+    )
+    r.renderNode(canvas, graph, scope.id, overlays)
+    canvas.restore()
+    return
+  }
   if (renderPageWithPreviews(r, canvas, graph, overlays)) return
   const pageNode = graph.getNode(r.pageId ?? graph.rootId)
   if (!pageNode) return

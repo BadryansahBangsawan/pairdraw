@@ -1,1 +1,2 @@
 - Previewing a design and leaving it returns the editor to the pan and zoom it had.
+- Presenting a slide or previewing a frame draws only that frame and its contents, without the page layers over it.

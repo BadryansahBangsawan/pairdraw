@@ -43,6 +43,12 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
   )
 
   /** The frame the canvas fits and shows, which is the top overlay when one is open. */
+  const frameId = computed(() => {
+    const shown = session.value
+    return shown ? shownFrame(shown) : null
+  })
+
+  /** Where that frame sits on the stage. */
   const shownRect = computed<StageRect | null>(() => {
     const shown = session.value
     return shown ? nodeStageRect(store.graph, shownFrame(shown), store.state) : null
@@ -189,5 +195,5 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     { capture: true }
   )
 
-  return { session, letterbox, frameRect: shownRect, scrim, dissolvingFrom }
+  return { session, letterbox, frameRect: shownRect, frameId, scrim, dissolvingFrom }
 }

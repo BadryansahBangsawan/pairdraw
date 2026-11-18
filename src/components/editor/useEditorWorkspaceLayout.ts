@@ -1,4 +1,3 @@
-import { unrefElement } from '@vueuse/core'
 import type { SplitterPanel } from 'reka-ui'
 import { watch, type ComponentPublicInstance, type Ref, type ShallowRef } from 'vue'
 
@@ -12,25 +11,23 @@ import {
 
 type PanelRef = Readonly<ShallowRef<InstanceType<typeof SplitterPanel> | null>>
 
-const SIDE_PANELS: readonly EditorSidePanel[] = ['layers', 'properties', 'chat']
+const SIDE_PANELS: readonly EditorSidePanel[] = ['layers', 'chat']
 /** How far apart two widths, in pixels, still count as one; the splitter rounds sizes finer. */
 const WIDTH_TOLERANCE = 0.5
 
 /**
- * The widths of the editor's side panels and the chat column that opens beside the properties
- * panel, and which of them are open. The splitter lays out in percent; the side panels are sized
- * in pixels, so they keep their width when the window changes and the canvas takes the
- * difference. A closed panel collapses to nothing and reopens as wide as it was.
+ * The widths of the editor's side panels and the chat column beside them, and which of them are
+ * open. The splitter lays out in percent; the side panels are sized in pixels, so they keep their
+ * width when the window changes and the canvas takes the difference. A closed panel collapses to
+ * nothing and reopens as wide as it was.
  */
 export function useEditorWorkspaceLayout(options: {
-  /** The splitter group, measured to turn the properties panel's pixels into the canvas's share. */
+  /** The splitter group, which reports the panels' sizes on every change. */
   group: Readonly<ShallowRef<ComponentPublicInstance | null>>
   layers: PanelRef
   canvas: PanelRef
-  properties: PanelRef
   chat: PanelRef
   layersOpen: Ref<boolean>
-  propertiesOpen: Ref<boolean>
   chatOpen: Ref<boolean>
 }) {
   /**
@@ -42,7 +39,6 @@ export function useEditorWorkspaceLayout(options: {
   let adjusting = false
   const openState: Record<EditorSidePanel, Ref<boolean>> = {
     layers: options.layersOpen,
-    properties: options.propertiesOpen,
     chat: options.chatOpen
   }
 
@@ -51,13 +47,12 @@ export function useEditorWorkspaceLayout(options: {
     return size >= EDITOR_PANEL_LIMITS[panel].min - WIDTH_TOLERANCE ? size : layout[panel]
   }
 
-  /** Saves the widths the panels were resized to: layers, canvas (percent), properties, chat. */
+  /** Saves the widths the panels were resized to: layers and the chat column, in pixels. */
   function saveResizedLayout(sizes: number[]) {
-    if (adjusting || sizes.length !== 4) return
-    const [layers, , properties, chat] = sizes
+    if (adjusting || sizes.length !== 3) return
+    const [layers, , chat] = sizes
     const next: EditorLayout = {
       layers: keptWidth('layers', layers),
-      properties: keptWidth('properties', properties),
       chat: keptWidth('chat', chat)
     }
     const changed = SIDE_PANELS.some(
@@ -85,21 +80,6 @@ export function useEditorWorkspaceLayout(options: {
     }
   }
 
-  /**
-   * Gives the properties panel its own width while it is open and none while it is closed, with
-   * the canvas paying for it. The canvas is the panel before it, so resizing the canvas moves
-   * only the edge between the two and leaves the chat column alone.
-   */
-  function fitPropertiesPanel() {
-    const canvas = options.canvas.value
-    const properties = options.properties.value
-    const groupWidth = unrefElement(options.group)?.getBoundingClientRect().width
-    if (!canvas || !properties || !groupWidth) return
-    const excess = properties.getSize() - (options.propertiesOpen.value ? layout.properties : 0)
-    if (Math.abs(excess) < WIDTH_TOLERANCE) return
-    canvas.resize(canvas.getSize() + (excess / groupWidth) * 100)
-  }
-
   /** Opens or closes the layers panel; the canvas beside it takes or gives the width. */
   function applyLayersPanel(open: boolean) {
     const layers = options.layers.value
@@ -110,29 +90,17 @@ export function useEditorWorkspaceLayout(options: {
     })
   }
 
-  function applyPropertiesPanel(open: boolean) {
-    const properties = options.properties.value
-    if (!properties || properties.isCollapsed !== open) return
-    adjust(fitPropertiesPanel)
-  }
-
-  /**
-   * Opens or closes the chat column with the canvas paying for it. The splitter takes a panel's
-   * room from its neighbour, here the properties panel, so that gets its width back from the
-   * canvas afterwards.
-   */
+  /** Opens or closes the chat column; the canvas beside it takes or gives the width. */
   function applyChatColumn(open: boolean) {
     const chat = options.chat.value
     if (!chat || chat.isCollapsed !== open) return
     adjust(() => {
       if (open) chat.resize(layout.chat)
       else chat.collapse()
-      fitPropertiesPanel()
     })
   }
 
   watch(options.layersOpen, applyLayersPanel, { flush: 'post' })
-  watch(options.propertiesOpen, applyPropertiesPanel, { flush: 'post' })
   watch(options.chatOpen, applyChatColumn, { flush: 'post' })
 
   return { layout, saveResizedLayout, setPanelOpen }

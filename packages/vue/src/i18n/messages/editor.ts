@@ -27,7 +27,6 @@ export const editorMessageDefaults = {
   /** Opens and closes the AI chat's column beside the properties panel. */
   toggleAIChat: params('AI chat ({shortcut})'),
   toggleLayersPanel: 'Layers panel',
-  togglePropertiesPanel: 'Properties panel',
   /** Goodies: styles, design systems, scripts and shaders to start from. */
   goodies: 'Goodies',
   goodiesDescription: 'Styles, design systems, scripts and shaders to start from.',

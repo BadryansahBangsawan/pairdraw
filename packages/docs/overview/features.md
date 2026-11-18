@@ -23,7 +23,7 @@ Open and save native Figma files directly. The import/export pipeline uses the s
 
 ## Editor Layout
 
-The editor opens on the canvas alone. The tools stand at the canvas's left, with the layers panel's toggle above them, and the zoom sits in the bottom right corner. The properties panel comes when a layer is selected and leaves with the selection; a panel opened from its toggle stays open. While the AI chat is closed, a prompt at the bottom of the canvas sends what you write to it. The app starts in the dark theme; **Settings → General → Theme** also offers Light and Auto.
+The editor opens on the canvas alone. The tools stand at the canvas's left, with the layers panel's toggle above them, and the zoom sits in the bottom right corner. The sidebar's tabs show Layers, Assets, Slides, and Design; the Design tab holds the properties panel, which follows the selection but never opens itself. While the AI chat is closed, a prompt at the bottom of the canvas sends what you write to it. The app starts in the dark theme; **Settings → General → Theme** also offers Light and Auto.
 
 - **Find layers** — <kbd>⌘</kbd><kbd>F</kbd> searches the shown page's layers by name, selects the one you pick, and brings it into view
 - **Goodies** — the gift button in the top bar gathers things to start from: styles to pin to the AI chat, design systems to enable, scripts placed as code layers, and ready-made shaders
@@ -80,7 +80,7 @@ CLI: `pairdraw export design.fig -f jsx --style tailwind`
 
 ## AI Chat
 
-Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant in its own column beside the properties panel, or write in the prompt at the bottom of the canvas or on Home. With no model set up, the chat uses a coding agent already installed on this computer: Claude Code, Codex, Gemini CLI, or omp. 139 tools can create shapes, set styles, manage layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Connect Anthropic, OpenAI, Google AI, OpenRouter, any compatible endpoint, or the AI your [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud) server offers. Each provider, model, and agent shows its maker's logo.
+Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant in its own column beside the canvas, or write in the prompt at the bottom of the canvas or on Home. With no model set up, the chat uses a coding agent already installed on this computer: Claude Code, Codex, Gemini CLI, or omp. 139 tools can create shapes, set styles, manage layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Connect Anthropic, OpenAI, Google AI, OpenRouter, any compatible endpoint, or the AI your [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud) server offers. Each provider, model, and agent shows its maker's logo.
 
 Tool calls display as collapsible timeline entries. Visual verification — the assistant renders its work and checks it against your request. Full undo support for all AI mutations.
 

@@ -14,28 +14,25 @@ async function bounds(page: Page, testId: string) {
   return expectDefined(await page.getByTestId(testId).boundingBox(), `${testId} bounds`)
 }
 
-test('the chat column opens beside the Design panel and the canvas makes room', async ({
-  page
-}) => {
+test('the chat column opens beside the sidebar and the canvas makes room', async ({ page }) => {
   const chat = await openEditor(page)
-  const before = await bounds(page, 'properties-panel')
+  const sidebarBefore = await bounds(page, 'layers-panel')
   const canvasBefore = await bounds(page, 'canvas-area')
 
   await chat.openChat()
   await expect(chat.chatToggle).toHaveAttribute('aria-pressed', 'true')
-  await expect(page.getByTestId('properties-tab-design')).toHaveAttribute('data-state', 'active')
 
-  const properties = await bounds(page, 'properties-panel')
+  const sidebar = await bounds(page, 'layers-panel')
   const column = await bounds(page, 'chat-column')
-  // Both are in view, the chat to the right of the design, and the properties keep their width.
-  expect(column.x).toBeGreaterThanOrEqual(properties.x + properties.width - 1)
-  expect(Math.abs(properties.width - before.width)).toBeLessThanOrEqual(1)
+  // Both are in view, the chat to the right of the sidebar, and the sidebar keeps its width.
+  expect(column.x).toBeGreaterThanOrEqual(sidebar.x + sidebar.width - 1)
+  expect(Math.abs(sidebar.width - sidebarBefore.width)).toBeLessThanOrEqual(1)
   const canvas = await bounds(page, 'canvas-area')
   expect(canvas.width).toBeLessThan(canvasBefore.width - column.width / 2)
 
   await chat.closeChat()
   expect(
-    Math.abs((await bounds(page, 'properties-panel')).width - before.width)
+    Math.abs((await bounds(page, 'layers-panel')).width - sidebarBefore.width)
   ).toBeLessThanOrEqual(1)
   expect(
     Math.abs((await bounds(page, 'canvas-area')).width - canvasBefore.width)

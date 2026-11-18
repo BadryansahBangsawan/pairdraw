@@ -181,15 +181,19 @@ test('an edited icon says so, asks before a swap discards the edit, and resets o
   const { page } = ctx
   await insertSquare(page)
   // Rotate the icon's path, as someone editing its artwork would, then select the icon again.
+  await page.getByTestId('left-panel-layers-tab').click()
   const iconRow = layerRow(page, 'square')
   await iconRow.locator('[data-slot="disclosure"]').click()
   await layerRow(page, 'path').click()
+  await page.getByTestId('left-panel-design-tab').click()
   const rotationField = propertyField(page, 'rotation')
   await rotationField.click()
   const rotation = rotationField.getByRole('spinbutton', { name: 'Rotation' })
   await rotation.fill('15')
   await rotation.press('Enter')
+  await page.getByTestId('left-panel-layers-tab').click()
   await iconRow.click()
+  await page.getByTestId('left-panel-design-tab').click()
   const section = propertySection(page, 'Icon')
   await expect(propertyField(page, 'icon-modified')).toBeVisible()
 

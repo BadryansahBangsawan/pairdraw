@@ -3,6 +3,7 @@ import type { Page } from '@playwright/test'
 import { SHADER_GALLERY } from '@pairdraw/vue/controls/shader'
 
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
+import { openDesignPanel } from '#tests/helpers/properties'
 
 // Shader Mode shows one shader paint large on its own: it plays, pauses, and scrubs through the
 // animation, its settings beside it change the paint as one undo step each, and Done or Escape
@@ -63,6 +64,7 @@ function selectedLayer(page: Page) {
 /** Draws a rectangle, makes its fill a shader, and opens it in Shader Mode from the picker. */
 async function openShaderMode(page: Page) {
   await ctx.canvas.drawRect(160, 160, 240, 120)
+  await openDesignPanel(page)
   await page.getByTestId('fill-picker-swatch').first().click()
   await page.getByTestId('fill-picker-tab-shader').click()
   await page.getByRole('button', { name: 'Open in Shader Mode' }).click()
@@ -86,7 +88,7 @@ test('opens a shader fill large on its own and leaves back to the editor', async
 
   await page.keyboard.press('Escape')
   await expect(stage).toBeHidden()
-  await expect(page.locator('#editor-properties-panel')).toBeVisible()
+  await expect(page.getByTestId('layers-panel')).toBeVisible()
   // The button that opened Shader Mode went with the editor; its paint's swatch takes focus.
   await expect(page.getByTestId('fill-picker-swatch').first()).toBeFocused()
 

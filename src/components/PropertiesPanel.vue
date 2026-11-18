@@ -47,7 +47,7 @@ const problemCount = computed(() => {
 </script>
 
 <template>
-  <aside data-test-id="properties-panel" :class="sideStyles.root()">
+  <div data-test-id="properties-panel" :class="sideStyles.root()">
     <CloudVersionHistory v-if="history" />
     <CommentsPanel v-else-if="commenting" />
     <TabsRoot
@@ -117,5 +117,5 @@ const problemCount = computed(() => {
         <DesignCheckPanel :active="activeTab === 'lint'" />
       </TabsContent>
     </TabsRoot>
-  </aside>
+  </div>
 </template>

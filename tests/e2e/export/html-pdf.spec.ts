@@ -6,7 +6,7 @@ import type { ExportSetting } from '@pairdraw/scene-graph'
 import type * as Locale from '@pairdraw/vue/i18n'
 
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
-import { propertyItems } from '#tests/helpers/properties'
+import { propertyItems, openDesignPanel } from '#tests/helpers/properties'
 
 const editor = useEditorSetupWithClear('/?test&no-rulers')
 
@@ -70,6 +70,7 @@ async function createCard(settings: ExportSetting[]) {
     { nodeSettings: settings, png: PIXEL_PNG }
   )
   await editor.canvas.waitForRender()
+  await openDesignPanel(editor.page)
 }
 
 test.beforeEach(async () => {
@@ -160,6 +161,7 @@ test('a PDF row exports several selected layers as one PDF in selection order', 
 
 test('the Code panel exports the selection as HTML', async () => {
   await createCard([])
+  await openDesignPanel(editor.page)
   await editor.page.getByTestId('properties-tab-code').click()
   await editor.page.getByTestId('code-panel-source').click()
   await editor.page.getByRole('option', { name: 'HTML' }).click()
@@ -190,6 +192,7 @@ test('Vue components draw icons from the chosen package', async () => {
     store.requestRender()
   })
   await editor.canvas.waitForRender()
+  await openDesignPanel(editor.page)
   await editor.page.getByTestId('properties-tab-code').click()
   await editor.page.getByTestId('code-panel-source').click()
   await editor.page.getByRole('option', { name: 'Vue' }).click()
@@ -206,6 +209,7 @@ test('Vue components draw icons from the chosen package', async () => {
 // Last, since the HTML settings it changes are remembered for every later export.
 test('HTML export options make a fragment with separate image files in a zip', async () => {
   await createCard([{ scale: 1, format: 'html' }])
+  await openDesignPanel(editor.page)
   await editor.page.getByTestId('properties-tab-design').click()
 
   await exportItems().first().getByTestId('html-export-options').click()

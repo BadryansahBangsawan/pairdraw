@@ -33,9 +33,8 @@ The editor opens on the canvas alone, laid out as pen.dev's, with one top bar ab
 
 - **Toolbar (canvas left)** — Tool selection: Select, Frame, Section, Rectangle, Ellipse, Line, Text, Pen, Hand, and the others the editor profile offers, with the layers panel's toggle above them
 - **Canvas (center)** — Infinite canvas with CanvasKit rendering, zoom/pan; the zoom sits in its bottom right corner and a prompt at its bottom sends what you write to the AI chat
-- **Layers panel (left)** — Layers tree and pages, opened from its toggle
-- **Properties panel (right)** — Context-sensitive sections such as Appearance, Fill, Stroke, Typography, Layout, Position, and Prototype; it comes with a selection and leaves with it unless opened from its toggle
-- **AI chat (right column)** — A resizable column beside the properties panel, opened with ⌘J or the top bar
+- **Sidebar (left)** — Tabs for the layers tree and pages, assets, slides, and the Design view: the context-sensitive properties sections such as Appearance, Fill, Stroke, Typography, Layout, Position, and Prototype. It opens from its toggle and never from a selection; the Design view follows the selection once it is showing
+- **AI chat (right column)** — A resizable column beside the canvas, opened with ⌘J or the top bar
 
 ## Components
 

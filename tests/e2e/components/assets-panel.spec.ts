@@ -175,6 +175,7 @@ test('assets panel groups component sets and inserts the default variant', async
   expect(inserted?.width).toBe(96)
   expect(inserted?.childTexts).toEqual(['Primary'])
 
+  await page.getByTestId('left-panel-design-tab').click()
   const variantSection = page.getByRole('region', { name: 'Variants' })
   await expect(variantSection).toBeVisible()
 

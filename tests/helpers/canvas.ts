@@ -4,6 +4,8 @@ import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { OFFICIAL_CLOUD_URL } from '@/constants'
 
+import { openDesignPanel } from './properties'
+
 /**
  * A build that names an official Cloud server asks it whether Cloud is open yet and carries on
  * without an answer, so a request to it that fails is the network's, not the app's.
@@ -41,7 +43,12 @@ export class CanvasHelper {
     await this.page.evaluate(() => new Promise(requestAnimationFrame))
   }
 
-  async waitForInit() {
+  /**
+   * Waits for the editor to be ready. Most specs drive the Design panel, so this opens it once
+   * the canvas is up; selecting a layer no longer does that for the person. Specs that test the
+   * sidebar's own behaviour pass `{ designPanel: false }` and control it themselves.
+   */
+  async waitForInit({ designPanel = true }: { designPanel?: boolean } = {}) {
     await this.page
       .getByTestId('canvas-element')
       .and(this.page.locator('[data-ready="1"]'))
@@ -49,6 +56,7 @@ export class CanvasHelper {
     await this.page.getByTestId('canvas-loading').waitFor({ state: 'hidden', timeout: 30000 })
     await this.page.locator('#loader').waitFor({ state: 'detached', timeout: 30000 })
     await this.useLightPage()
+    if (designPanel) await openDesignPanel(this.page)
   }
 
   /**

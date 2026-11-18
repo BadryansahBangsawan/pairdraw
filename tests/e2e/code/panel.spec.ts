@@ -8,6 +8,7 @@ import {
   waitForNode,
   waitForNodeNamed
 } from '#tests/helpers/code-panel'
+import { openDesignPanel } from '#tests/helpers/properties'
 
 const editor = useFreshEditor()
 
@@ -29,6 +30,7 @@ function codeEditor() {
 
 /** Opens the editor; with nothing selected that means choosing to write new Design JSX. */
 async function openCodePanel() {
+  await openDesignPanel(editor.page)
   await codeTab().click()
   const writeJSX = codePanel().getByRole('button', { name: 'Write JSX' })
   await expect(codeEditor().or(writeJSX)).toBeVisible()
@@ -42,6 +44,7 @@ async function selectSource(label: string) {
 }
 
 test('inactive Code tab defers JSX generation for large selections', async () => {
+  await openDesignPanel(editor.page)
   const selectionDuration = await editor.page.evaluate(async () => {
     const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Pairdraw store not initialized')

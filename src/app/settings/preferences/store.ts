@@ -125,7 +125,6 @@ export interface AppPreferences {
   /** Which side panels of the desktop editor are open. */
   workspace: {
     layersOpen: boolean
-    propertiesOpen: boolean
   }
   designCheck: DesignCheckPreferences
   comments: CommentPreferences
@@ -161,8 +160,8 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
   navigation: { zoomSpeed: 1, wheelZoom: false, invertZoom: false },
   rendering: { canvasMode: 'retained', ultralight: false },
   view: { pixelGrid: true },
-  // The canvas starts on its own: the layers open from their toggle, the properties for a selection.
-  workspace: { layersOpen: false, propertiesOpen: false },
+  // The canvas starts on its own: the sidebar opens from its toggle, on the view the person left.
+  workspace: { layersOpen: false },
   designCheck: { preset: 'recommended', disabledRules: [] },
   comments: {
     showOnCanvas: true,
@@ -255,10 +254,12 @@ const appPreferencesSchema = section(
     view: section({
       pixelGrid: v.fallback(v.boolean(), defaults.view.pixelGrid)
     }),
-    workspace: section({
-      layersOpen: v.fallback(v.boolean(), defaults.workspace.layersOpen),
-      propertiesOpen: v.fallback(v.boolean(), defaults.workspace.propertiesOpen)
-    }),
+    workspace: section(
+      {
+        layersOpen: v.fallback(v.boolean(), defaults.workspace.layersOpen)
+      },
+      ['propertiesOpen']
+    ),
     designCheck: section(
       {
         preset: v.fallback(v.picklist(DESIGN_CHECK_PRESETS), defaults.designCheck.preset),

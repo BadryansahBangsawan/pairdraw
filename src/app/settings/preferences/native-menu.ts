@@ -4,7 +4,7 @@ import { isTauri } from '@/app/tauri/env'
 
 const COMMENTS_MENU_ID = 'view-comments'
 const LAYERS_PANEL_MENU_ID = 'view-layers-panel'
-const PROPERTIES_PANEL_MENU_ID = 'view-properties-panel'
+const DESIGN_PANEL_MENU_ID = 'view-properties-panel'
 
 /** The snapping choices the native View menu checks; half-pixel snapping lives in Settings. */
 type NativeSnappingPreference = Exclude<keyof SnappingPreferences, 'halfPixel'>
@@ -35,15 +35,12 @@ export async function syncNativeCommentsMenu(shown: boolean): Promise<void> {
   await invoke('set_native_menu_checked', { id: COMMENTS_MENU_ID, checked: shown })
 }
 
-/** View → Layers panel and View → Properties panel, which the top bar's buttons also toggle. */
-export async function syncNativeSidePanelsMenu(
-  layers: boolean,
-  properties: boolean
-): Promise<void> {
+/** View → Layers panel and View → Design panel, which the left sidebar's tabs also switch. */
+export async function syncNativeSidePanelsMenu(layers: boolean, design: boolean): Promise<void> {
   if (!isTauri()) return
   const { invoke } = await import('@tauri-apps/api/core')
   await Promise.all([
     invoke('set_native_menu_checked', { id: LAYERS_PANEL_MENU_ID, checked: layers }),
-    invoke('set_native_menu_checked', { id: PROPERTIES_PANEL_MENU_ID, checked: properties })
+    invoke('set_native_menu_checked', { id: DESIGN_PANEL_MENU_ID, checked: design })
   ])
 }

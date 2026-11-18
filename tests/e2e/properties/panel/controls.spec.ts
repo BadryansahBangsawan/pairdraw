@@ -41,14 +41,14 @@ test('appearance fields share control height and show variable actions', async (
   await applyVariable.hover()
   await expect(applyVariable).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
 
-  // The shared picker opens beside the panel, to the left of its trigger, like Figma's.
+  // The shared picker opens beside the sidebar, to the right of its trigger, like Figma's.
   await applyVariable.click()
   const picker = editor.page.getByRole('dialog', { name: 'Apply variable' })
   await expect(picker).toBeVisible()
-  await expect(picker).toHaveAttribute('data-side', 'left')
+  await expect(picker).toHaveAttribute('data-side', 'right')
   const triggerBox = expectDefined(await applyVariable.boundingBox(), 'variable trigger bounds')
   const pickerBox = expectDefined(await picker.boundingBox(), 'variable picker bounds')
-  expect(pickerBox.x + pickerBox.width).toBeLessThanOrEqual(triggerBox.x)
+  expect(pickerBox.x).toBeGreaterThanOrEqual(triggerBox.x + triggerBox.width)
   // Escape closes the picker once it holds focus, as it does for a person.
   await expect(picker.getByRole('textbox', { name: 'Search…' })).toBeFocused()
   await editor.page.keyboard.press('Escape')

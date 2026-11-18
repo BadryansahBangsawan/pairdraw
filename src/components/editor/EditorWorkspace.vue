@@ -9,16 +9,11 @@ import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import { chatColumnOpen } from '@/app/ai/chat/panel'
-import { isVersionHistoryOpen } from '@/app/cloud/integration'
 import { provideTabEditorStore } from '@/app/editor/active-store'
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { EDITOR_PANEL_LIMITS } from '@/app/shell/layout-storage'
 import { appMenuShortcut } from '@/app/shell/menu/shortcut'
-import {
-  layersPanelOpen,
-  openPropertiesPanelWhile,
-  propertiesPanelOpen
-} from '@/app/shell/side-panels'
+import { layersPanelOpen } from '@/app/shell/side-panels'
 import type { Tab } from '@/app/tabs'
 import CanvasSplitRoot from '@/components/canvas/CanvasSplitRoot.vue'
 import ChatPanel from '@/components/chat/ChatPanel.vue'
@@ -29,7 +24,6 @@ import EditorCanvas from '@/components/EditorCanvas.vue'
 import LayersPanel from '@/components/LayersPanel.vue'
 import MobileDrawer from '@/components/MobileDrawer.vue'
 import MobileHud from '@/components/MobileHud/MobileHud.vue'
-import PropertiesPanel from '@/components/PropertiesPanel.vue'
 import ComponentToFrameDialog from '@/components/selection/ComponentToFrameDialog.vue'
 import ShaderModeStage from '@/components/shader-mode/ShaderModeStage.vue'
 import { SHELL_TOP_BAR_ACTIONS_ID } from '@/components/shell/top-bar'
@@ -71,27 +65,16 @@ const {
   group: useTemplateRef<ComponentPublicInstance>('splitterGroup'),
   layers: useTemplateRef('layersPanel'),
   canvas: useTemplateRef('canvasPanel'),
-  properties: useTemplateRef('propertiesPanel'),
   chat: useTemplateRef('chatPanel'),
   layersOpen: layersPanelOpen,
-  propertiesOpen: propertiesPanelOpen,
   chatOpen: chatColumnOpen
 })
-// The panel comes for a selection to edit, and for the comments list and version history, which
-// take its place.
-openPropertiesPanelWhile(
-  () =>
-    store.state.selectedIds.size > 0 ||
-    store.state.activeTool === 'COMMENT' ||
-    isVersionHistoryOpen(store)
-)
 // The handles sit on the cards' edges, which draw their own borders.
 const horizontalSplitterStyles = tv(splitterTheme)({ direction: 'horizontal', seam: true })
 const workspace = tv(workspaceTheme)
 const workspaceStyles = workspace()
 const cards = {
   layers: workspace({ side: 'layers' }).card(),
-  properties: workspace({ side: 'properties' }).card(),
   chat: workspace({ side: 'chat' }).card()
 }
 const topBarActions = `#${SHELL_TOP_BAR_ACTIONS_ID}`
@@ -169,33 +152,6 @@ const { pending: roomPending } = useRoomActions()
         </div>
       </SplitterPanel>
       <SplitterResizeHandle
-        v-show="propertiesPanelOpen"
-        data-test-id="right-splitter-handle"
-        :class="horizontalSplitterStyles.handle()"
-      >
-        <div :class="horizontalSplitterStyles.divider()" />
-      </SplitterResizeHandle>
-      <SplitterPanel
-        id="properties"
-        ref="propertiesPanel"
-        :order="3"
-        size-unit="px"
-        collapsible
-        :collapsed-size="0"
-        :default-size="propertiesPanelOpen ? editorLayout.properties : 0"
-        :min-size="EDITOR_PANEL_LIMITS.properties.min"
-        :max-size="EDITOR_PANEL_LIMITS.properties.max"
-        :class="workspaceStyles.dock()"
-        @collapse="setPanelOpen('properties', false)"
-        @expand="setPanelOpen('properties', true)"
-      >
-        <PropertiesPanel
-          id="editor-properties-panel"
-          :hidden="!propertiesPanelOpen"
-          :class="cards.properties"
-        />
-      </SplitterPanel>
-      <SplitterResizeHandle
         v-show="chatColumnOpen"
         data-test-id="chat-splitter-handle"
         :class="horizontalSplitterStyles.handle()"
@@ -209,7 +165,7 @@ const { pending: roomPending } = useRoomActions()
       <SplitterPanel
         id="chat"
         ref="chatPanel"
-        :order="4"
+        :order="3"
         size-unit="px"
         collapsible
         :collapsed-size="0"

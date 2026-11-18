@@ -1,5 +1,5 @@
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
-import { propertySection } from '#tests/helpers/properties'
+import { propertySection, openDesignPanel } from '#tests/helpers/properties'
 
 const editor = useEditorSetupWithClear()
 
@@ -16,6 +16,7 @@ test('property fields follow keyboard tab order', async () => {
     store.select([node.id])
   })
   await editor.canvas.waitForRender()
+  await openDesignPanel(editor.page)
 
   const position = propertySection(editor.page, 'Position')
   const x = position.getByRole('spinbutton', { name: 'X Axis' })

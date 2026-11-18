@@ -5,7 +5,7 @@ description: Managing layers, pages, and the properties panel in Pairdraw.
 
 # Layers & Pages
 
-The editor opens on the canvas alone. The tools stand at the canvas's left, with the layers panel's toggle above them, and the zoom sits in the bottom right corner. The layers panel opens on the left, the properties panel on the right, and the AI chat in a column beside it; all of them are resizable by dragging their edges. See [Side Panels](./canvas-navigation#side-panels) for when each panel shows.
+The editor opens on the canvas alone. The tools stand at the canvas's left, with the layers panel's toggle above them, and the zoom sits in the bottom right corner. The sidebar opens on the left, with tabs for Layers, Assets, Slides, and Design, and the AI chat opens in a column of its own on the right; all of them are resizable by dragging their edges. See [Side Panels](./canvas-navigation#side-panels) for when each panel shows.
 
 While the AI chat is closed, a prompt at the bottom of the canvas sends what you write to the chat; turn it off with **Prompt on the canvas** in **Settings → Models → Chat**. <kbd>Escape</kbd> in the prompt returns to the canvas.
 
@@ -76,7 +76,7 @@ The gift button in the top bar, **Object → Goodies…**, or the command palett
 
 ## Properties Panel
 
-The properties panel on the right switches between Design and Code, with [Lint](./checking-designs) as an icon tab beside them. The AI chat opens in its own column beside it.
+The **Design** tab of the left sidebar holds the properties panel, which switches between Design and Code, with [Lint](./checking-designs) as an icon tab beside them. It follows the selection while it is showing; selecting a layer never switches the sidebar to it.
 
 ### Design Tab
 
@@ -104,7 +104,7 @@ While the Code tab is open, it also underlines the design check's errors and war
 
 ## AI Chat Column
 
-The [AI chat](../programmable/ai-chat) creates and changes design elements from natural-language requests. It opens in a column of its own to the right of the properties panel, so the Design tab stays in view while an agent works. Open and close it with the sparkles button among the document's actions in the top bar or with <kbd>⌘</kbd><kbd>J</kbd>; drag its edge to resize it. The column stays open or closed, at the width you left it, across reloads. Configure reusable models and provider connections in Settings, and browse locally saved conversations from the chat's history menu.
+The [AI chat](../programmable/ai-chat) creates and changes design elements from natural-language requests. It opens in a column of its own on the right, so the Design tab stays in view while an agent works. Open and close it with the sparkles button among the document's actions in the top bar or with <kbd>⌘</kbd><kbd>J</kbd>; drag its edge to resize it. The column stays open or closed, at the width you left it, across reloads. Configure reusable models and provider connections in Settings, and browse locally saved conversations from the chat's history menu.
 
 ## Keyboard Shortcuts
 

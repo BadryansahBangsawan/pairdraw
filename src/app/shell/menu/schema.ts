@@ -287,9 +287,9 @@ export const APP_MENU_SCHEMA = [
       },
       { id: 'view-comments', label: 'Comments', checkbox: true, shortcut: 'SHIFT+C' },
       { type: 'separator' },
-      // The top bar's panel buttons; each panel stays as left across documents and sessions.
+      // The left sidebar's tabs; the sidebar stays as left across documents and sessions.
       { id: 'view-layers-panel', label: 'Layers Panel', checkbox: true, handler: 'shell' },
-      { id: 'view-properties-panel', label: 'Properties Panel', checkbox: true, handler: 'shell' },
+      { id: 'view-properties-panel', label: 'Design Panel', checkbox: true, handler: 'shell' },
       { type: 'separator' },
       {
         id: 'theme',

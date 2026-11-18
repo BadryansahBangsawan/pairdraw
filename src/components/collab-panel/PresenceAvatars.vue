@@ -10,6 +10,7 @@ import {
   PopoverTrigger
 } from 'reka-ui'
 import { tv } from 'tailwind-variants'
+import { ref } from 'vue'
 
 import { useI18n } from '@pairdraw/vue/i18n'
 
@@ -49,6 +50,16 @@ const emit = defineEmits<{
 
 const { common, collaboration: messages } = useI18n()
 const ui = presenceAvatars()
+/** The peer whose hover card is open; a followed peer's chip never opens one. */
+const openCardId = ref<number | null>(null)
+
+function cardOpen(clientId: number) {
+  return openCardId.value === clientId && !isFollowing(following, personTarget(clientId))
+}
+
+function setCardOpen(clientId: number | undefined, open: boolean) {
+  openCardId.value = open && clientId !== undefined ? clientId : null
+}
 
 function personTarget(clientId: number): FollowTarget {
   return { kind: 'person', clientId }
@@ -113,7 +124,13 @@ function toggleFollow(clientId: number) {
         </PopoverPortal>
       </PopoverRoot>
 
-      <HoverCardRoot v-else :open-delay="250" :close-delay="150">
+      <HoverCardRoot
+        v-else
+        :open-delay="250"
+        :close-delay="150"
+        :open="cardOpen(person.clientId)"
+        @update:open="(open: boolean) => setCardOpen(person.clientId, open)"
+      >
         <HoverCardTrigger as-child>
           <button
             type="button"

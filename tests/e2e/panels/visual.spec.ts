@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
+import { openDesignPanel } from '#tests/helpers/properties'
 
 let page: Page
 let canvas: CanvasHelper
@@ -25,6 +26,7 @@ async function reset() {
 
 test('single rectangle panel', async () => {
   await reset()
+  await openDesignPanel(page)
   await page.evaluate(() => {
     const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Pairdraw store not initialized')
@@ -44,6 +46,7 @@ test('single rectangle panel', async () => {
 
 test('text selection panel', async () => {
   await reset()
+  await openDesignPanel(page)
   await page.evaluate(() => {
     const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Pairdraw store not initialized')
@@ -64,6 +67,7 @@ test('text selection panel', async () => {
 
 test('mixed selection panel', async () => {
   await reset()
+  await openDesignPanel(page)
   await page.evaluate(() => {
     const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Pairdraw store not initialized')
@@ -87,6 +91,7 @@ test('mixed selection panel', async () => {
 
 test('instance panel', async () => {
   await reset()
+  await openDesignPanel(page)
   await page.evaluate(() => {
     const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Pairdraw store not initialized')
@@ -116,11 +121,13 @@ test('instance panel', async () => {
 
 test('empty canvas panel', async () => {
   await reset()
+  await openDesignPanel(page)
   await expect(page.getByTestId('design-panel-empty')).toHaveScreenshot('empty-canvas.png')
 })
 
 test('nested groups layer tree', async () => {
   await reset()
+  await page.getByTestId('left-panel-layers-tab').click()
   await page.evaluate(() => {
     const store = window.pairdraw?.getStore?.()
     if (!store) throw new Error('Pairdraw store not initialized')

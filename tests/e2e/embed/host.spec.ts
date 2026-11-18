@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import type { JSHandle, Page } from '@playwright/test'
 
 import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
+import { openDesignPanel } from '#tests/helpers/properties'
 
 /**
  * A host page embeds the editor in an iframe and drives it over the embed protocol. The host is
@@ -249,6 +250,7 @@ test.describe('embed mode', () => {
     await expect.poll(() => events(client, 'connected')).toHaveLength(1)
 
     await expect(frame.getByTestId('layers-panel')).toBeVisible()
+    await openDesignPanel(frame)
     await expect(frame.getByTestId('properties-panel')).toBeVisible()
     await expect(frame.locator('[data-slot="top-bar"]')).toHaveCount(0)
     // The document's top-bar actions are not teleported into a top bar that is not there.

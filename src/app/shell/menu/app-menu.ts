@@ -47,10 +47,11 @@ import { APP_MENU_SCHEMA } from '@/app/shell/menu/schema'
 import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
 import { openFileDialog } from '@/app/shell/menu/use'
 import {
+  designPanelOpen,
   layersPanelOpen,
-  propertiesPanelOpen,
-  toggleLayersPanel,
-  togglePropertiesPanel
+  showDesignPanel,
+  toggleDesignPanel,
+  toggleLayersPanel
 } from '@/app/shell/side-panels'
 import { useAppTheme } from '@/app/shell/theme'
 import { closeTab, activeTab, switchAdjacentTab } from '@/app/tabs'
@@ -147,7 +148,7 @@ export function useAppMenu() {
     'view-multiplayer-cursors': 'multiplayerCursors',
     'view-comments': 'comments',
     'view-layers-panel': 'layersPanel',
-    'view-properties-panel': 'propertiesPanel',
+    'view-properties-panel': 'designPanel',
     'keyboard-shortcuts': 'keyboardShortcuts',
     'remove-auto-layout': 'removeAutoLayout',
     'snap-geometry': 'snapToGeometry',
@@ -216,7 +217,7 @@ export function useAppMenu() {
     diagnostics: () => openSettingsDialog('diagnostics'),
     variables: () => openVariablesDialog(store),
     'view-layers-panel': toggleLayersPanel,
-    'view-properties-panel': togglePropertiesPanel,
+    'view-properties-panel': toggleDesignPanel,
     'keyboard-shortcuts': openShortcutSheet,
     'export-png': () => exportSelection('png'),
     'export-svg': () => exportSelection('svg'),
@@ -247,7 +248,7 @@ export function useAppMenu() {
       case 'view-layers-panel':
         return layersPanelOpen.value
       case 'view-properties-panel':
-        return propertiesPanelOpen.value
+        return designPanelOpen.value
       case 'snap-geometry':
         return store.state.snappingPreferences.geometry
       case 'snap-objects':
@@ -293,7 +294,8 @@ export function useAppMenu() {
         }
       case 'view-properties-panel':
         return (value: boolean) => {
-          propertiesPanelOpen.value = value
+          if (value) showDesignPanel()
+          else layersPanelOpen.value = false
         }
       case 'snap-geometry':
         return (value: boolean) => setSnappingPreference('geometry', value)

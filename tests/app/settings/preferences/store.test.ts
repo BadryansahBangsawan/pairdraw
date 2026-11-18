@@ -155,9 +155,10 @@ describe('parseAppPreferences', () => {
     })
     expect(preferences.view).toEqual({ pixelGrid: false })
     expect(preferences.rendering).toEqual({ canvasMode: 'retained', ultralight: true })
-    // An unreadable choice falls back to the default: the canvas starts without its side panels.
-    expect(preferences.workspace).toEqual({ layersOpen: true, propertiesOpen: false })
-    expect(parseAppPreferences({}).workspace).toEqual({ layersOpen: false, propertiesOpen: false })
+    // An unreadable choice falls back to the default: the canvas starts without its side panels,
+    // and a build that no longer has a properties panel drops its old key.
+    expect(preferences.workspace).toEqual({ layersOpen: true })
+    expect(parseAppPreferences({}).workspace).toEqual({ layersOpen: false })
     expect(parseAppPreferences({}).view.pixelGrid).toBe(true)
     expect(parseAppPreferences({}).rendering.ultralight).toBe(false)
   })

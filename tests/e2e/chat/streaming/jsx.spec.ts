@@ -130,6 +130,7 @@ test('keeps the run and its preview on their page while the user views another',
     // Away from the run's page: the chat says where it works, and the page list marks it.
     const location = chat.page.getByTestId('chat-run-location')
     await expect(location).toContainText('is working on “Page 1”')
+    await chat.page.getByTestId('left-panel-layers-tab').click()
     await expect(
       chat.page
         .getByTestId('pages-row')

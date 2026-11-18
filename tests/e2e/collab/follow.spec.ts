@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Locator } from '@playwright/test'
 
 import {
   collaborationErrors,
@@ -36,6 +36,21 @@ async function viewAt(peer: Peer, zoom: number) {
       return (await viewport(peer)).zoom
     })
     .toBe(zoom)
+}
+
+/** Whether the element at the control's centre is the control itself, not something over it. */
+async function expectHitTarget(peer: Peer, control: Locator) {
+  const box = await control.boundingBox()
+  if (!box) throw new Error('The control has no box')
+  const hit = await peer.page.evaluate(
+    ([x, y]) => {
+      const element = document.elementFromPoint(x as number, y as number)
+      const stop = element?.closest('[data-test-id="follow-stop"]')
+      return stop?.getAttribute('data-test-id') ?? element?.tagName ?? null
+    },
+    [box.x + box.width / 2, box.y + box.height / 2]
+  )
+  expect(hit).toBe('follow-stop')
 }
 
 async function followGuest(host: Peer) {
@@ -93,6 +108,8 @@ test('stopping following gives the canvas back at the view it had', async ({ bro
     await followAndReach(host, guest, 2.5)
     await expect(frame).toContainText('Following Guest')
 
+    // Nothing may cover the bar: the header's follow chip once did.
+    await expectHitTarget(host, frame.getByTestId('follow-stop'))
     await frame.getByTestId('follow-stop').click()
     await expect(frame).toHaveCount(0)
     await expect.poll(() => viewport(host)).toEqual(before)

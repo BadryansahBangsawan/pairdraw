@@ -16,10 +16,10 @@ import { openShortcutSheet } from '@/app/shell/keyboard/sheet'
 import { useNativeMenuEvents } from '@/app/shell/menu/native-events'
 import { APP_MENU_SCHEMA, type AppMenuEntry } from '@/app/shell/menu/schema'
 import {
+  designPanelOpen,
   layersPanelOpen,
-  propertiesPanelOpen,
-  toggleLayersPanel,
-  togglePropertiesPanel
+  toggleDesignPanel,
+  toggleLayersPanel
 } from '@/app/shell/side-panels'
 import { useAppTheme } from '@/app/shell/theme'
 import { checkForAppUpdate } from '@/app/shell/updater/check'
@@ -53,11 +53,11 @@ export function useShellMenu() {
     }
   )
 
-  // The top bar's buttons open and close the panels too, so the menu follows the preference.
+  // The sidebar's own tabs and the panels' state open and close it too, so the menu follows them.
   watch(
-    [layersPanelOpen, propertiesPanelOpen],
-    ([layers, properties]) => {
-      void syncNativeSidePanelsMenu(layers, properties).catch((error: unknown) => {
+    [layersPanelOpen, designPanelOpen],
+    ([layers, design]) => {
+      void syncNativeSidePanelsMenu(layers, design).catch((error: unknown) => {
         console.error('[Menu] Failed to synchronize the native panel menu:', error)
       })
     },
@@ -90,7 +90,7 @@ export function useShellMenu() {
       setSnappingPreference('pixelGrid', !current)
     },
     'view-layers-panel': toggleLayersPanel,
-    'view-properties-panel': togglePropertiesPanel,
+    'view-properties-panel': toggleDesignPanel,
     'keyboard-shortcuts': openShortcutSheet,
     'theme-light': () => setTheme('light'),
     'theme-dark': () => setTheme('dark'),

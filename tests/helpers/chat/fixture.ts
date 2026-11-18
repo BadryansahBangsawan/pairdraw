@@ -5,6 +5,7 @@ import { routeModelCatalog } from '#tests/helpers/chat/catalog'
 import { ChatHarness } from '#tests/helpers/chat/harness'
 import { injectMockChatTransport } from '#tests/helpers/chat/transport'
 import { routeVisionModel } from '#tests/helpers/chat/vision'
+import { openDesignPanel } from '#tests/helpers/properties'
 
 interface ChatFixtures {
   chat: ChatHarness
@@ -19,6 +20,7 @@ export const test = base.extend<ChatFixtures>({
     await harness.open()
     const canvas = new CanvasHelper(page)
     await canvas.waitForInit()
+    await openDesignPanel(page)
     await injectMockChatTransport(page)
     await use(harness)
   },
@@ -37,6 +39,7 @@ export async function openChatEditor(page: Page): Promise<ChatHarness> {
   await routeVisionModel(page)
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
+  await openDesignPanel(page)
   await injectMockChatTransport(page)
   return new ChatHarness(page)
 }

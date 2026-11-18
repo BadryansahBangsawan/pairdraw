@@ -63,28 +63,28 @@ test('Cmd+Backslash shows panels again', async () => {
   editor.canvas.assertNoErrors()
 })
 
-// The right panel opens at one width on any window, rather than as a share that grows with it.
-test('the properties panel reopens at one width on a narrow and a wide window', async ({
+// The sidebar opens at one width on any window, rather than as a share that grows with it.
+test('the sidebar reopens at one width on a narrow and a wide window', async ({
   browser,
   baseURL
 }) => {
   const context = await browser.newContext({ baseURL, viewport: { width: 1280, height: 900 } })
   try {
     const page = await context.newPage()
-    const panel = page.getByTestId('properties-panel')
+    const panel = page.getByTestId('layers-panel')
     const panelWidth = async () =>
-      expectDefined(await panel.boundingBox(), 'properties panel bounds').width
+      expectDefined(await panel.boundingBox(), 'layers panel bounds').width
 
     await page.goto('/?test')
     await expect(panel).toBeVisible()
     const narrow = await panelWidth()
-    expect(narrow).toBeGreaterThan(240)
-    expect(narrow).toBeLessThan(270)
+    expect(narrow).toBeGreaterThan(230)
+    expect(narrow).toBeLessThan(275)
 
     // Neither pressing a handle without moving it nor hiding and showing the panels resizes them.
     const handle = expectDefined(
-      await page.getByTestId('right-splitter-handle').boundingBox(),
-      'right splitter handle bounds'
+      await page.getByTestId('left-splitter-handle').boundingBox(),
+      'left splitter handle bounds'
     )
     await page.mouse.click(handle.x + handle.width / 2, handle.y + handle.height / 2)
     await page.keyboard.press('Meta+\\')

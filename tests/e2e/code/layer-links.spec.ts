@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test'
 
 import { expect, test, useFreshEditor } from '#tests/e2e/fixtures'
+import { openDesignPanel } from '#tests/helpers/properties'
 
 const editor = useFreshEditor('/?test&no-rulers')
 
@@ -62,6 +63,7 @@ function focusedLayer(page: Page) {
 }
 
 async function openCode(page: Page) {
+  await openDesignPanel(page)
   await page.getByTestId('properties-tab-code').click()
   await expect(codeLine(page, 'name="Swatch"')).toBeVisible()
 }

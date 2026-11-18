@@ -57,6 +57,7 @@ test('component shows its layer type menu in the design panel', async () => {
 })
 
 test('component visible in layers panel', async () => {
+  await editor.page.getByTestId('left-panel-layers-tab').click()
   const layers = editor.page.locator('[data-node-id]')
   const count = await layers.count()
   expect(count).toBeGreaterThan(0)
@@ -89,6 +90,7 @@ test('create instance from component (context menu)', async () => {
 })
 
 test('instance shows INSTANCE type in design panel', async () => {
+  await editor.page.getByTestId('left-panel-design-tab').click()
   const children = await getPageChildren()
   const instance = expectDefined(
     children.find((c) => c.type === 'INSTANCE'),

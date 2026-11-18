@@ -8,6 +8,7 @@ import type {
 
 import { expect, test, useFreshEditor } from '#tests/e2e/fixtures'
 import { openAppMenu } from '#tests/helpers/menu'
+import { openDesignPanel } from '#tests/helpers/properties'
 
 type PluginDataModule = {
   readPluginData: typeof ReadPluginData
@@ -16,6 +17,11 @@ type PluginDataModule = {
 }
 
 const editor = useFreshEditor()
+
+// The script layer's section lives in the Design view of the sidebar.
+test.beforeEach(async () => {
+  await openDesignPanel(editor.page)
+})
 
 /** Types of the selected script layer's children, as the canvas graph holds them. */
 function scriptOutputTypes(): Promise<string[]> {

@@ -312,7 +312,7 @@
       },
       {
         "id": "view-properties-panel",
-        "label": "Properties Panel",
+        "label": "Design Panel",
         "checkbox": true
       },
       {

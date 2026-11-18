@@ -7,7 +7,6 @@ import { useEditorStore } from '@/app/editor/active-store'
 import { openGoodies } from '@/app/goodies/actions'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { appMenuShortcut } from '@/app/shell/menu/shortcut'
-import { propertiesPanelOpen, togglePropertiesPanel } from '@/app/shell/side-panels'
 import { startPresentation } from '@/app/slides/present'
 import BrowserToolbar from '@/components/browser/BrowserToolbar.vue'
 import { CloudDocumentStatusHost } from '@/components/cloud/integration'
@@ -15,9 +14,9 @@ import CollabPanel from '@/components/collab-panel/CollabPanel.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 
 /**
- * The open document's end of the top bar: its cloud status, who is here, the properties panel and
- * the AI chat, preview, Settings, and Share last. The workspace teleports it into the bar, so it
- * stays bound to that workspace's tab.
+ * The open document's end of the top bar: its cloud status, who is here, the AI chat, preview,
+ * Settings, and Share last. The workspace teleports it into the bar, so it stays bound to that
+ * workspace's tab.
  */
 const store = useEditorStore()
 const { editor, settings } = useI18n()
@@ -30,19 +29,6 @@ const slides = useSlidesMessages()
     <CollabPanel>
       <BrowserToolbar />
       <!-- Open, a panel's raised pill takes a ring on the bar's backdrop, like the front tab. -->
-      <IconButton
-        :label="editor.togglePropertiesPanel"
-        size="sm"
-        side="bottom"
-        toggle
-        :active="propertiesPanelOpen"
-        aria-controls="editor-properties-panel"
-        data-test-id="editor-toggle-properties-panel"
-        class="data-[state=on]:ring-1 data-[state=on]:ring-border"
-        @click="togglePropertiesPanel"
-      >
-        <icon-lucide-panel-right class="size-4" />
-      </IconButton>
       <IconButton
         :label="editor.toggleAIChat({ shortcut: formatShortcut(CHAT_COLUMN_SHORTCUT) ?? '' })"
         size="sm"

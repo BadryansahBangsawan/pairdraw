@@ -193,6 +193,7 @@ test('library manager scopes populated updates and does not mutate on discovery'
     return ids
   })
   const instanceUpdate = page.getByRole('button', { name: 'Update selected instance' })
+  await page.getByTestId('left-panel-design-tab').click()
   await expect(instanceUpdate).toBeVisible()
   await instanceUpdate.click()
   const updateMenuItem = page.getByTestId('instance-update-selected')
@@ -286,6 +287,10 @@ test('library manager scopes populated updates and does not mutate on discovery'
   await page.getByTestId('left-panel-assets-tab').click()
   await page.getByRole('button', { name: /libraries|updates/i }).click()
   await manager.getByRole('tab', { name: /Updates/ }).click()
+  // The one remaining update belongs to the other page; this dialog opens scoped to the current
+  // page unless the switch is on.
+  const showAllUpdates = manager.getByRole('switch', { name: 'Show updates for all pages' })
+  if ((await showAllUpdates.getAttribute('aria-checked')) !== 'true') await showAllUpdates.click()
   await manager.getByRole('button', { name: 'Button updated' }).click()
   await expect(reviewDialog).toBeVisible()
   await page.keyboard.press('Escape')

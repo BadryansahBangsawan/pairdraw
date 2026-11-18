@@ -221,6 +221,7 @@ test('publishes, consumes, saves, and reopens a multidimensional library instanc
   const asset = page.getByTestId('asset-item').filter({ hasText: 'Button' })
   await asset.getByTestId('asset-insert').click()
   await canvas.waitForRender()
+  await page.getByTestId('left-panel-design-tab').click()
   const variants = page.getByRole('region', { name: 'Variants' })
   await variants.getByRole('combobox', { name: 'Size' }).click()
   await page.getByRole('option', { name: 'Large' }).click()

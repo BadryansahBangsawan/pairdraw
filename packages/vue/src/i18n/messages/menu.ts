@@ -115,7 +115,7 @@ export const menuMessageDefaults = {
   nextToolbarCategory: 'Next toolbar category',
   removeGuide: 'Remove guide',
   layersPanel: 'Layers panel',
-  propertiesPanel: 'Properties panel',
+  designPanel: 'Design panel',
   keyboardShortcuts: 'Keyboard shortcuts',
   removeAutoLayout: 'Remove auto layout',
   /** Opens Shader Mode on the selection's shader paint. */

@@ -56,7 +56,7 @@ const appDefaults = {
                 appearance: { accent: { kind: 'preset', preset: 'blue' } },
                 onboarding: { aiSetup: 'done' },
                 chat: { canvasPrompt: false, animateEdits: false },
-                workspace: { layersOpen: true, propertiesOpen: true }
+                workspace: { layersOpen: true }
               })
             }
           ]

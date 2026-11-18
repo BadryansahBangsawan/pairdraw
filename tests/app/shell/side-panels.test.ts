@@ -1,92 +1,69 @@
 import { afterEach, beforeEach, expect, test } from 'bun:test'
 
-import { effectScope, nextTick, ref, toRaw } from 'vue'
+import { toRaw } from 'vue'
 
 import { appPreferences } from '@/app/settings/preferences/store'
-import { openPropertiesPanelWhile, propertiesPanelOpen } from '@/app/shell/side-panels'
+import {
+  designPanelOpen,
+  layersPanelOpen,
+  leftPanelView,
+  showDesignPanel,
+  toggleDesignPanel
+} from '@/app/shell/side-panels'
 
 let stored: typeof appPreferences.value
 
 beforeEach(() => {
   stored = structuredClone(toRaw(appPreferences.value))
+  layersPanelOpen.value = false
+  leftPanelView.value = 'file'
 })
 
 afterEach(() => {
   appPreferences.value = stored
+  leftPanelView.value = 'file'
 })
 
-function watchSidebar(needed: () => boolean) {
-  const run = effectScope()
-  run.run(() => openPropertiesPanelWhile(needed))
-  return run
-}
+test('the design view opens the sidebar on its tab, and the same shortcut closes it', () => {
+  toggleDesignPanel()
 
-test('a selection, comments or history open a closed properties panel and close it again afterwards', async () => {
-  propertiesPanelOpen.value = false
-  const needed = ref(false)
-  const run = watchSidebar(() => needed.value)
+  expect(designPanelOpen.value).toBe(true)
+  // The sidebar is open where the person left it for the next start.
+  expect(appPreferences.value.workspace.layersOpen).toBe(true)
 
-  needed.value = true
-  await nextTick()
-  expect(propertiesPanelOpen.value).toBe(true)
-  // The panel is held open, not chosen: the next start does not find it open.
-  expect(appPreferences.value.workspace.propertiesOpen).toBe(false)
+  toggleDesignPanel()
 
-  needed.value = false
-  await nextTick()
-  expect(propertiesPanelOpen.value).toBe(false)
-  run.stop()
+  expect(layersPanelOpen.value).toBe(false)
+  // The view itself stays chosen, so reopening the sidebar returns to it.
+  expect(String(leftPanelView.value)).toBe('design')
 })
 
-test('a panel the person keeps open stays open when the need ends', async () => {
-  propertiesPanelOpen.value = true
-  const needed = ref(false)
-  const run = watchSidebar(() => needed.value)
+test('showing the design view switches a sidebar that is already open', () => {
+  layersPanelOpen.value = true
+  leftPanelView.value = 'assets'
 
-  needed.value = true
-  await nextTick()
-  needed.value = false
-  await nextTick()
-  expect(propertiesPanelOpen.value).toBe(true)
-  expect(appPreferences.value.workspace.propertiesOpen).toBe(true)
-  run.stop()
+  showDesignPanel()
+
+  expect(layersPanelOpen.value).toBe(true)
+  expect(String(leftPanelView.value)).toBe('design')
 })
 
-test('a panel closed by hand while it is needed stays closed until the next need', async () => {
-  propertiesPanelOpen.value = false
-  const needed = ref(false)
-  const run = watchSidebar(() => needed.value)
+test('the design view is showing only while the sidebar is open on it', () => {
+  showDesignPanel()
+  expect(designPanelOpen.value).toBe(true)
 
-  needed.value = true
-  await nextTick()
-  propertiesPanelOpen.value = false
-  await nextTick()
-  expect(propertiesPanelOpen.value).toBe(false)
+  layersPanelOpen.value = false
+  expect(designPanelOpen.value).toBe(false)
 
-  needed.value = false
-  await nextTick()
-  needed.value = true
-  await nextTick()
-  expect(propertiesPanelOpen.value).toBe(true)
-  run.stop()
+  leftPanelView.value = 'slides'
+  layersPanelOpen.value = true
+  expect(designPanelOpen.value).toBe(false)
 })
 
-test('a panel opened by hand while it is needed stays open once the need ends', async () => {
-  propertiesPanelOpen.value = false
-  const needed = ref(true)
-  const run = watchSidebar(() => needed.value)
+test('the view is not a preference: only the open sidebar is kept', () => {
+  leftPanelView.value = 'design'
+  layersPanelOpen.value = true
 
-  propertiesPanelOpen.value = true
-  await nextTick()
-  needed.value = false
-  await nextTick()
-  expect(propertiesPanelOpen.value).toBe(true)
-  run.stop()
-})
-
-test('opens at once when it is already needed', () => {
-  propertiesPanelOpen.value = false
-  const run = watchSidebar(() => true)
-  expect(propertiesPanelOpen.value).toBe(true)
-  run.stop()
+  expect('propertiesOpen' in appPreferences.value.workspace).toBe(false)
+  expect(Object.keys(appPreferences.value.workspace)).toEqual(['layersOpen'])
 })

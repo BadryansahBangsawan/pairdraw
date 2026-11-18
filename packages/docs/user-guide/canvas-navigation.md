@@ -70,7 +70,7 @@ Zoomed in far enough that each document pixel covers eight screen pixels (800% o
 
 ## Side Panels
 
-The layers panel's toggle sits above the tools at the canvas's left, and the properties panel's toggle is in the top bar. The properties panel comes when you select a layer and leaves with the selection; a panel you open from its toggle stays open until you close it, also between sessions. The canvas takes the room of a closed panel, which reopens at the width it had. **View → Layers Panel** and **View → Properties Panel** do the same. <kbd>⌘</kbd><kbd>\\</kbd> (<kbd>Ctrl</kbd> + <kbd>\\</kbd>) still hides every panel at once. The comments list and version history show in the properties panel, so the comment tool and version history open it while you use them and close it again afterwards.
+The layers panel's toggle sits above the tools at the canvas's left and opens the sidebar, whose tabs show Layers, Assets, Slides, and Design. The Design tab holds the properties panel, which follows the selection while it is showing but never opens itself: selecting a layer leaves the sidebar's tab as you left it. The sidebar stays open or closed, on the view you chose, until you change it, and the canvas takes the room of a closed sidebar, which reopens at the width it had. **View → Layers Panel** and **View → Design Panel** do the same. <kbd>⌘</kbd><kbd>\\</kbd> (<kbd>Ctrl</kbd> + <kbd>\\</kbd>) still hides every panel at once. The comments list and version history show in the Design tab, so the comment tool and version history switch to it while you use them.
 
 ## Ultralight Mode
 

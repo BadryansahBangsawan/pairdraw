@@ -38,6 +38,8 @@ interface Presence {
   declined: Set<string>
   /** The agent Follow agents started following, which ends when it rests; null for one picked. */
   autoFollowed: string | null
+  /** Where the view was when a person picked someone to follow, for stopping to return to it. */
+  returnTo: { pageId: string; panX: number; panY: number; zoom: number } | null
 }
 
 const presences = new WeakMap<EditorStore, Presence>()
@@ -53,7 +55,8 @@ export function presenceOf(store: EditorStore): Presence {
     switching: null,
     moving: false,
     declined: new Set(),
-    autoFollowed: null
+    autoFollowed: null,
+    returnTo: null
   }
   presences.set(store, presence)
   store.onEditorEvent('page:changed', () => {
@@ -63,7 +66,7 @@ export function presenceOf(store: EditorStore): Presence {
   // Zooming or fitting the view yourself, by any shortcut or menu, ends following. A page
   // switch restores that page's viewport without this event, so only centering is ours.
   store.onEditorEvent('viewport:changed', () => {
-    if (presence.following.value && !presence.moving) stopFollowing(store, true)
+    if (presence.following.value && !presence.moving) stopFollowing(store, true, false)
   })
   return presence
 }
@@ -196,7 +199,7 @@ function autoFollow(store: EditorStore): void {
     presence.followPage = store.state.currentPageId
   } else if (presence.autoFollowed !== null && target?.agentId === presence.autoFollowed) {
     presence.autoFollowed = null
-    stopFollowing(store, false)
+    stopFollowing(store, false, false)
   }
 }
 
@@ -223,7 +226,7 @@ function followedPoint(store: EditorStore, target: FollowTarget): PersonPoint | 
   return agent.status === 'idle' ? 'idle' : (agent.cursor ?? 'idle')
 }
 
-/** Move the view to the followed person or agent; stop when they are gone. */
+/** Move the view to the followed person or agent; give the view back when they are gone. */
 function keepFollowing(store: EditorStore): void {
   const presence = presenceOf(store)
   const target = presence.following.value
@@ -231,7 +234,8 @@ function keepFollowing(store: EditorStore): void {
   const point = followedPoint(store, target)
   if (point === 'idle') return
   if (!point) {
-    presence.following.value = null
+    // Leaving ends follow like its Stop following button does, not like taking the canvas back.
+    stopFollowing(store, false, true)
     return
   }
   // A peer's cursor can name a page this document does not have; wait as for a resting agent.
@@ -267,6 +271,7 @@ function stopIfLeftFollowedPage(store: EditorStore): void {
   if (presence.following.value && store.state.currentPageId !== presence.followPage) {
     declineFollowed(presence)
     presence.following.value = null
+    presence.returnTo = null
   }
 }
 
@@ -305,25 +310,64 @@ export function followedLabel(store: EditorStore): FollowedLabel | null {
   return null
 }
 
+/**
+ * Puts the view back where the person left it: the page following started on, at its pan and
+ * zoom. Following that carried the view to another page leaves that page's view alone, since the
+ * saved pan and zoom belong to the page the person was on.
+ */
+function returnToStart(store: EditorStore, presence: Presence): void {
+  const returnTo = presence.returnTo
+  presence.returnTo = null
+  if (!returnTo || returnTo.pageId !== store.state.currentPageId) return
+  const { panX, panY, zoom } = returnTo
+  presence.moving = true
+  try {
+    store.zoomToLevel(zoom)
+    store.pan(panX - store.state.panX, panY - store.state.panY)
+  } finally {
+    presence.moving = false
+  }
+}
+
 /** Stop following; a follow switch still loading is overtaken, so it does not land later. */
-function stopFollowing(store: EditorStore, byPerson: boolean): void {
+function stopFollowing(store: EditorStore, byPerson: boolean, restoreView: boolean): void {
   const presence = presenceOf(store)
   if (byPerson) declineFollowed(presence)
   presence.following.value = null
   stopViewGlide(store)
   if (presence.switching) {
+    // The switch still loading brings its own page's viewport, which a restore would undo.
     presence.switching = null
+    presence.returnTo = null
     void store.switchPage(store.state.currentPageId)
+  } else if (restoreView) {
+    // A view you moved yourself is the one you asked for; only stopping on purpose returns.
+    returnToStart(store, presence)
+  } else {
+    presence.returnTo = null
   }
 }
 
-/** Follow a person or an agent, or stop following with null. */
+/**
+ * The person took the canvas back — a click or a scroll — so following ends where the view is;
+ * a view they moved or asked for is the one they keep.
+ */
+export function releaseFollow(store: EditorStore): void {
+  stopFollowing(store, true, false)
+}
+
+/** Follow a person or an agent, or stop following with null, which gives the view back. */
 export function follow(store: EditorStore, target: FollowTarget | null): void {
   if (!target) {
-    stopFollowing(store, true)
+    stopFollowing(store, true, true)
     return
   }
   const presence = presenceOf(store)
+  if (!presence.following.value) {
+    // Where the person was, so stopping gives the canvas back as they left it.
+    const { panX, panY, zoom } = store.state
+    presence.returnTo = { pageId: store.state.currentPageId, panX, panY, zoom }
+  }
   presence.following.value = target
   // Picked by the person, so it keeps following an agent that rests.
   presence.autoFollowed = null

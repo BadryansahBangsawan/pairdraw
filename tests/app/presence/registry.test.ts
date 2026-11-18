@@ -7,6 +7,7 @@ import {
   AGENT_PRESENCE_COLOR,
   follow,
   followedLabel,
+  releaseFollow,
   presenceByPage,
   presenceOf,
   renameAgent,
@@ -186,6 +187,60 @@ test('zooming yourself stops following', () => {
   expect(presenceOf(store).following.value).toEqual({ kind: 'person', clientId: 4 })
   store.applyZoom(-100, 960, 540)
   expect(presenceOf(store).following.value).toBeNull()
+})
+
+/** Pan and zoom as one value, to compare a viewport before and after. */
+function viewport(store: ReturnType<typeof createEditorStore>) {
+  return { panX: store.state.panX, panY: store.state.panY, zoom: store.state.zoom }
+}
+
+test('stopping following returns the view to where you were', () => {
+  const { store, pageId } = setup()
+  store.centerOn(120, 80, 0.75)
+  const before = viewport(store)
+  const ana = { clientId: 4, name: 'Ana', color: red, agents: [] }
+  setPeers(store, [{ ...ana, cursor: { x: 900, y: 700, pageId, zoom: 3.78 } }])
+  follow(store, { kind: 'person', clientId: 4 })
+  expect(viewport(store).zoom).toBe(3.78)
+  follow(store, null)
+  expect(viewport(store)).toEqual(before)
+})
+
+test('following ends where you were when the person leaves', () => {
+  const { store, pageId } = setup()
+  store.centerOn(120, 80, 0.75)
+  const before = viewport(store)
+  const ana = { clientId: 4, name: 'Ana', color: red, agents: [] }
+  setPeers(store, [{ ...ana, cursor: { x: 900, y: 700, pageId, zoom: 3.78 } }])
+  follow(store, { kind: 'person', clientId: 4 })
+  expect(viewport(store).zoom).toBe(3.78)
+  setPeers(store, [])
+  expect(presenceOf(store).following.value).toBeNull()
+  expect(viewport(store)).toEqual(before)
+})
+
+test('a click on the canvas takes it back without moving the view', () => {
+  const { store, pageId } = setup()
+  store.centerOn(120, 80, 0.75)
+  const ana = { clientId: 4, name: 'Ana', color: red, agents: [] }
+  setPeers(store, [{ ...ana, cursor: { x: 900, y: 700, pageId, zoom: 3.78 } }])
+  follow(store, { kind: 'person', clientId: 4 })
+  releaseFollow(store)
+  expect(presenceOf(store).following.value).toBeNull()
+  expect(viewport(store).zoom).toBe(3.78)
+  expect(centered(store)).toEqual({ x: 900, y: 700 })
+})
+
+test('a view you moved yourself while following is not snapped back', () => {
+  const { store, pageId } = setup()
+  store.centerOn(120, 80, 0.75)
+  const ana = { clientId: 4, name: 'Ana', color: red, agents: [] }
+  setPeers(store, [{ ...ana, cursor: { x: 900, y: 700, pageId, zoom: 3.78 } }])
+  follow(store, { kind: 'person', clientId: 4 })
+  store.applyZoom(-100, 960, 540)
+  expect(presenceOf(store).following.value).toBeNull()
+  expect(viewport(store).zoom).not.toBe(0.75)
+  expect(centered(store).x).toBeCloseTo(900)
 })
 
 test('cursor updates while heading to a page do not restart the switch', async () => {

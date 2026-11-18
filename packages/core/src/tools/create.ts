@@ -4,6 +4,7 @@ export {
   combineAsVariants,
   createComponent,
   createInstance,
+  detachInstance,
   exposeInstanceSwap
 } from './create/components'
 export { fetchIconsTool, insertIcon, searchIconsTool } from './create/icons'

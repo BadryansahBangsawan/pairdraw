@@ -1,0 +1,1 @@
+- Agent tools can detach instances into plain frames, keeping their children, overrides, and position.

@@ -105,3 +105,36 @@ export const exposeInstanceSwap = defineTool({
     }
   }
 })
+
+export const detachInstance = defineTool({
+  name: 'detach_instance',
+
+  description:
+    'Detach instances into plain frames, keeping their children, overrides, and position.',
+  execution: { kind: 'sync', mutation: 'document' },
+  input: v.strictObject({
+    ids: v.pipe(v.array(v.string()), v.minLength(1), v.description('Instance node IDs to detach'))
+  }),
+  execute: (figma, { ids }) => {
+    // Validate every id before the first detach so a refused call changes nothing.
+    // A repeated id is detached once; detaching it again would hit a frame that
+    // no longer exists as an instance and fail halfway through the batch.
+    const instances: FigmaNodeProxy[] = []
+    const seen = new Set<string>()
+    for (const id of ids) {
+      if (seen.has(id)) continue
+      seen.add(id)
+      const node = figma.getNodeById(id)
+      if (!node) return { error: `Node "${id}" not found` }
+      if (node.type !== 'INSTANCE') {
+        return { error: `Node "${id}" is not an instance (${node.type})` }
+      }
+      instances.push(node)
+    }
+    try {
+      return { ids: instances.map((instance) => instance.detachInstance().id) }
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : String(error) }
+    }
+  }
+})

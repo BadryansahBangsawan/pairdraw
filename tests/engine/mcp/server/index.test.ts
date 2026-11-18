@@ -183,6 +183,11 @@ describe('MCP server', () => {
     expect(tools.map((tool) => tool.name).sort()).toEqual(expectedNames)
   })
 
+  test('exposes detach_instance to MCP clients', async () => {
+    const { tools } = await client.listTools()
+    expect(tools.some((tool) => tool.name === 'detach_instance')).toBe(true)
+  })
+
   test('describes effects, capabilities, and runtime availability independently', () => {
     const descriptors = createToolDescriptors(true)
     const byName = new Map(descriptors.map((tool) => [tool.name, tool] as const))

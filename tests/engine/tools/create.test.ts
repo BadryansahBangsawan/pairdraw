@@ -237,3 +237,71 @@ describe('create_vector', () => {
     }
   })
 })
+
+describe('detach_instance', () => {
+  test('turns instances into frames at their position, keeping children and overrides', () => {
+    const { figma } = setupToolTest()
+    const component = figma.createComponent()
+    component.resize(80, 40)
+    const shape = figma.createRectangle()
+    shape.name = 'Shape'
+    component.appendChild(shape)
+    const instance = component.createInstance()
+    instance.x = 200
+    instance.y = 64
+    const instanceShape = expectDefined(instance.children[0], 'instance child')
+    instanceShape.name = 'Overridden shape'
+
+    const result = getTool('detach_instance').execute(figma, {
+      ids: [instance.id]
+    }) as ToolResult
+
+    expect(result.error).toBeUndefined()
+    expect(result.ids).toEqual([instance.id])
+
+    const detached = expectDefined(figma.getNodeById(instance.id), 'detached frame')
+    expect(detached.type).toBe('FRAME')
+    expect(detached.mainComponent).toBeNull()
+    expect([detached.x, detached.y, detached.width, detached.height]).toEqual([200, 64, 80, 40])
+    expect(detached.children.map((child) => child.name)).toEqual(['Overridden shape'])
+  })
+
+  test('refuses a node that is not an instance and names it', () => {
+    const { figma } = setupToolTest()
+    const frame = figma.createFrame()
+
+    const result = getTool('detach_instance').execute(figma, {
+      ids: [frame.id]
+    }) as ToolResult
+
+    expect(result.error).toContain(frame.id)
+    expect(result.error).toContain('not an instance')
+    expect(figma.getNodeById(frame.id)?.type).toBe('FRAME')
+  })
+
+  test('refuses an id that does not exist', () => {
+    const { figma } = setupToolTest()
+    const result = getTool('detach_instance').execute(figma, {
+      ids: ['missing-node']
+    }) as ToolResult
+
+    expect(result.error).toContain('missing-node')
+    expect(result.error).toContain('not found')
+  })
+})
+
+describe('detach_instance batches', () => {
+  test('detaches a repeated id once instead of failing halfway', () => {
+    const { figma } = setupToolTest()
+    const component = figma.createComponent()
+    const instance = component.createInstance()
+
+    const result = getTool('detach_instance').execute(figma, {
+      ids: [instance.id, instance.id]
+    }) as ToolResult
+
+    expect(result.error).toBeUndefined()
+    expect(result.ids).toEqual([instance.id])
+    expect(figma.getNodeById(instance.id)?.type).toBe('FRAME')
+  })
+})

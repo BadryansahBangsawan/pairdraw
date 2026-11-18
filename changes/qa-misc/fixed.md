@@ -1,1 +1,2 @@
 - A script's text sizes to its content on one line unless the script gives it a width.
+- `pairdraw pages` and `pairdraw fonts` read every page of a file before reporting, so pages that were not loaded yet are counted.

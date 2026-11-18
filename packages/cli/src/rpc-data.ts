@@ -2,7 +2,7 @@ import { executeRPCCommand } from '@pairdraw/core/rpc'
 
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
 import { appTargetRPCArgs, type AppTargetCLIArgs } from '#cli/app/target'
-import { loadDocument, prepareDocumentForRPC } from '#cli/headless'
+import { loadDocument, populateWholeDocument, prepareDocumentForRPC } from '#cli/headless'
 
 type RPCArgs = { [key: string]: unknown }
 
@@ -23,5 +23,7 @@ export async function loadRPCData<Result>(
   }
   const graph = await loadDocument(requireFile(file))
   prepareDocumentForRPC(graph, command, args)
+  // A file loads its pages lazily and `pages` counts each page's layers, so load them first.
+  if (command === 'pages') populateWholeDocument(graph)
   return executeRPCCommand(graph, command, args) as Result
 }

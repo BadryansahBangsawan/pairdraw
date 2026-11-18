@@ -4,7 +4,7 @@ import { fontManager, prepareGraphFonts, type DocumentFontStatus } from '@pairdr
 
 import { appTargetOptions } from '#cli/app/target'
 import { bold, entity, fmtList, kv, printError } from '#cli/format'
-import { loadDocument } from '#cli/headless'
+import { loadDocument, populateWholeDocument } from '#cli/headless'
 import { loadRPCData } from '#cli/rpc-data'
 
 function statusLabel(status: DocumentFontStatus['faces'][number]['status']): string {
@@ -45,6 +45,8 @@ export default defineCommand({
         data = await loadRPCData<DocumentFontStatus>(args.file, 'font-status', undefined, args)
       } else {
         const graph = await loadDocument(args.file)
+        // Lazily imported pages hold text too, and its fonts belong in the report.
+        populateWholeDocument(graph)
         const pageIds = graph.getPages().map((page) => page.id)
         data = await prepareFontStatus(graph, pageIds.length > 0 ? pageIds : [graph.rootId])
       }

@@ -318,7 +318,7 @@ export function computeOverlaps(
   }
 
   return {
-    overlaps: trimmed,
+    overlaps: fitToBudget(trimmed),
     summary: {
       totalNodes,
       analyzedNodes,
@@ -329,10 +329,30 @@ export function computeOverlaps(
   }
 }
 
+/**
+ * What one reply may carry, in serialized characters. A page with thousands of findings would
+ * otherwise answer with hundreds of kilobytes: more than a client can put in its context, and
+ * more than the rest of the reply needs. The most severe findings come first, and the summary
+ * still counts every finding, so a caller narrows with filters when it wants the rest.
+ */
+const RESULT_CHAR_BUDGET = 64_000
+
+function fitToBudget(items: OverlapItem[]): OverlapItem[] {
+  let size = 2 // the brackets around the list
+  const kept: OverlapItem[] = []
+  for (const item of items) {
+    const itemSize = JSON.stringify(item).length + 1
+    if (kept.length > 0 && size + itemSize > RESULT_CHAR_BUDGET) break
+    kept.push(item)
+    size += itemSize
+  }
+  return kept
+}
+
 export const analyzeOverlaps = defineTool({
   name: 'analyze_overlaps',
   description:
-    'Detect visual overlaps and layout overflows across the current page. Useful for finding content that covers footers, text that bleeds outside frames, and accidental sibling overlaps.',
+    'Detect visual overlaps and layout overflows across the current page. Useful for finding content that covers footers, text that bleeds outside frames, and accidental sibling overlaps. Returns the most severe findings first, up to `limit` and 64 KB; the summary counts them all.',
   execution: { kind: 'sync', mutation: 'none' },
   exposure: { webmcp: false },
   input: v.strictObject({

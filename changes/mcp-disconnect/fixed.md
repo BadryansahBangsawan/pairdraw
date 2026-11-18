@@ -1,0 +1,3 @@
+- A coding agent keeps its MCP session while the app is briefly unavailable, so a busy document no longer takes the agent's tools away mid-run.
+- `analyze_overlaps` says how far a layer protrudes in pixels instead of printing an area as a distance.
+- `analyze_overlaps` keeps one reply under 64 KB and still counts every finding in its summary.

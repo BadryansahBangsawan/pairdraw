@@ -431,6 +431,22 @@ function makeOverlapItem(
   }
 }
 
+/**
+ * How far, in pixels, a child reaches past its parent's nearest edge. An area cannot say how
+ * far something protrudes, so the message quotes this distance instead.
+ */
+function overflowDistance(child: VisualBounds, parent: VisualBounds): number {
+  return Math.round(
+    Math.max(
+      0,
+      parent.minX - child.minX,
+      child.maxX - parent.maxX,
+      parent.minY - child.minY,
+      child.maxY - parent.maxY
+    )
+  )
+}
+
 export function buildParentOverflowResult(
   child: SceneNode,
   childBounds: VisualBounds,
@@ -447,7 +463,8 @@ export function buildParentOverflowResult(
 
   const outRatio = outArea / childArea
   const severity = parentOverflowSeverity(outRatio)
-  const message = `${child.type === 'TEXT' ? 'Text' : `Node`} "${child.name}" extends ${Math.round(outArea)}px outside parent "${parent.name}"`
+  const distance = overflowDistance(childBounds, parentBounds)
+  const message = `${child.type === 'TEXT' ? 'Text' : `Node`} "${child.name}" extends ${distance}px outside parent "${parent.name}"`
   const suggestion =
     child.type === 'TEXT'
       ? 'Set the parent to clip content or constrain text sizing (textAutoResize, maxLines).'

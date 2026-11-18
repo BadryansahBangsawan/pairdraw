@@ -67,6 +67,17 @@ describe('analyze overlaps', () => {
     expect(result.overlaps.some((o) => o.category === 'parent-overflow')).toBe(true)
   })
 
+  test('keeps one reply within a client-sized budget', () => {
+    const graph = new SceneGraph()
+    const page = pageId(graph)
+    for (let index = 0; index < 120; index++) rect(graph, `Card ${index}`, page, 0, 0, 100, 100)
+
+    const result = computeOverlaps(graph, { limit: 1000 })
+
+    expect(result.summary.overlapCount).toBeGreaterThan(result.overlaps.length)
+    expect(JSON.stringify(result.overlaps).length).toBeLessThanOrEqual(64_000)
+  })
+
   test('reports a child that is fully outside its non-clipping parent', () => {
     const graph = new SceneGraph()
     const page = pageId(graph)
@@ -79,6 +90,17 @@ describe('analyze overlaps', () => {
     expect(overflow.category).toBe('parent-overflow')
     expect(overflow.area).toBe(2500)
     expect(overflow.ratio).toBe(1)
+  })
+
+  test('names how far a child protrudes, in pixels rather than area', () => {
+    const graph = new SceneGraph()
+    const page = pageId(graph)
+    const parent = frame(graph, 'FAQ', page, 0, 0, 200, 200)
+    rect(graph, 'Items', parent.id, -1000, 0, 500, 500)
+
+    const result = computeOverlaps(graph, { category: 'parent-overflow' })
+    const overflow = result.overlaps.find((item) => item.nodeA.name === 'Items')
+    expect(overflow?.message).toBe('Node "Items" extends 1000px outside parent "FAQ"')
   })
 
   test('does not report overflow when parent clips content', () => {

@@ -15,6 +15,7 @@ import { useDocumentCloseProtection } from '@/app/document/close/use'
 import { useFollowingEditorStore } from '@/app/editor/active-store'
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { settingsDialogOpen } from '@/app/settings/dialog'
+import { installRecentFilesMenu } from '@/app/shell/menu/recent-files'
 import { animationsEnabled } from '@/app/shell/motion'
 import { useAppTheme } from '@/app/shell/theme'
 import { toast } from '@/app/shell/ui'
@@ -59,6 +60,8 @@ useHead({
 })
 
 provideEditor(useFollowingEditorStore())
+// The native menu belongs to the app, not to the editor view: Home changes the recent list too.
+installRecentFilesMenu()
 useAppTheme()
 useDocumentCloseProtection()
 useRestartApprovals()

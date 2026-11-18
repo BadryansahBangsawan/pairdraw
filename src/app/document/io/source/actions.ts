@@ -21,6 +21,7 @@ import { recoveryEnabled } from '@/app/document/recovery/preferences'
 import type { SaveFailure } from '@/app/document/save-failure'
 import { storageLocationOf } from '@/app/integrations/storage/location'
 import type { StorageDocumentBinding, StorageLocation } from '@/app/integrations/storage/types'
+import { rememberRecentFile } from '@/app/recent-files'
 import { createCanvasId } from '@/app/storage/id'
 import { isTauri } from '@/app/tauri/env'
 
@@ -129,6 +130,7 @@ export function createDocumentSourceActions({
     await recovery.markProtectedVersion(version)
     await draft.release()
     const file = writableFile()
+    if (file?.path) rememberRecentFile(file.path)
     if (file) {
       await removeFileBackups(file, { except: recovery.getRecoveryId() }).catch(
         (error: unknown) => {

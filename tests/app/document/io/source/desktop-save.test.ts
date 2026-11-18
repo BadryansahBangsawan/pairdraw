@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test, vi } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'bun:test'
 
 import { reactive } from 'vue'
 
@@ -11,6 +11,7 @@ import {
 import { getRecoveryStore, resetRecoveryStoreForTests } from '@/app/document/recovery'
 import { createMemoryRecoveryStore } from '@/app/document/recovery/memory'
 import type { SaveFailure } from '@/app/document/save-failure'
+import { recentDocuments } from '@/app/recent-files'
 
 import { clearTauriMocks, mockTauriIPC } from '#tests/helpers/tauri/mocks'
 
@@ -39,7 +40,16 @@ function createDesktopDocument(startWatchingFile: () => Promise<void>) {
   return { actions, state }
 }
 
+let beforeRecent: typeof recentDocuments.value
+
+beforeEach(() => {
+  // The recent list outlives a test; each one starts from none and leaves it as it found it.
+  beforeRecent = recentDocuments.value
+  recentDocuments.value = []
+})
+
 afterEach(async () => {
+  recentDocuments.value = beforeRecent
   await clearTauriMocks()
   resetRecoveryStoreForTests()
   vi.restoreAllMocks()
@@ -62,6 +72,17 @@ describe('saving a desktop document', () => {
     expect(state.saveFailure).toBeNull()
     expect(actions.hasUnsavedChanges()).toBe(false)
     expect(startWatchingFile).toHaveBeenCalledTimes(1)
+  })
+
+  test('lists the file it saved, so Home and Open Recent learn about it', async () => {
+    resetRecoveryStoreForTests(createMemoryRecoveryStore())
+    await mockTauriIPC(() => null)
+    const { actions } = createDesktopDocument(async () => undefined)
+
+    actions.markDocumentChanged()
+    expect(await actions.saveFigFile()).toBe(true)
+
+    expect(recentDocuments.value.map((document) => document.name)).toEqual(['document.fig'])
   })
 
   test('keeps the unsaved document and its recovery copy when the write fails', async () => {

@@ -147,6 +147,33 @@ describe('an AI edit on the canvas', () => {
     expect(calls.done).toEqual([[card.id]])
   })
 
+  test('names the document holding the layers and shows it before selecting them', () => {
+    const { graph, pageId, store, calls } = editor()
+    const card = graph.createNode('FRAME', pageId, { name: 'Card' })
+    const shown: string[] = []
+    const document = {
+      name: () => 'Company profile',
+      show: () => {
+        shown.push('shown')
+      }
+    }
+
+    showAIEdit(store, change([card]), null, document)
+    jest.advanceTimersByTime(AI_EDIT_IDLE_MS)
+
+    const [summary] = summaries()
+    const messages = aiMessages.get()
+    expect(summary?.message).toBe(
+      `${messages.editSummaryAdded({ added: 1 })} · ${messages.editSummaryIn({
+        document: 'Company profile'
+      })}`
+    )
+    summary?.action?.run()
+    expect(shown).toEqual(['shown'])
+    expect(calls.selected).toEqual([[card.id]])
+    expect(calls.zoomed).toBe(1)
+  })
+
   test('folds a run that follows soon after into the last notice', () => {
     const { graph, pageId, store } = editor()
     const card = graph.createNode('FRAME', pageId, { name: 'Card' })

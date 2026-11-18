@@ -3,7 +3,7 @@ import type { FigmaAPI } from '@pairdraw/core/figma-api'
 import { isAtomicTool, toolChangesDocument, toolFailure, type ToolDef } from '@pairdraw/core/tools'
 import type { SceneMutationImpact } from '@pairdraw/scene-graph/mutation-impact'
 
-import { showAIEdit } from '@/app/ai/motion'
+import { showAIEdit, type AIEditDocument } from '@/app/ai/motion'
 import {
   AI_UNDO_PREFIX,
   markRunChange,
@@ -20,8 +20,23 @@ import {
 import { noOutsideWritesSince } from '@/app/document/io/outside-writes'
 import type { EditorStore } from '@/app/editor/active-store'
 import { ensureGraphFonts } from '@/app/editor/fonts'
+import { activeTab, getTabForStore, switchTab } from '@/app/tabs'
 
 import { recordToolChange } from './changes/capture'
+
+/**
+ * Where an edit's document is: its notice names it while another document is in front, and Show
+ * brings it to front so the layers it selects and zooms are the ones the person then sees.
+ */
+function editDocument(store: EditorStore): AIEditDocument {
+  const tab = getTabForStore(store)
+  return {
+    name: () => (tab && activeTab.value?.id !== tab.id ? tab.store.state.documentName : null),
+    show: () => {
+      if (tab) switchTab(tab.id)
+    }
+  }
+}
 
 /** The reply a call belongs to: its run, and the call's id in the reply's transcript. */
 export interface ReplyCall {
@@ -158,7 +173,7 @@ async function editAndRecord(call: EditorToolCall, reply: ReplyCall | null): Pro
     }
     // A late edit to a document that closed meanwhile is not drawn.
     if (recorded.change && toolChangesDocument(def) && call.isLive?.() !== false) {
-      showAIEdit(store, recorded.change, reply)
+      showAIEdit(store, recorded.change, reply, editDocument(store))
     }
   }
 }

@@ -113,6 +113,7 @@
   "editSummary": "Ediciones de la IA listas · capas nuevas: {added} · cambiadas: {changed}",
   "editSummaryAdded": "Ediciones de la IA listas · capas nuevas: {added}",
   "editSummaryChanged": "Ediciones de la IA listas · capas cambiadas: {changed}",
+  "editSummaryIn": "en {document}",
   "editSummaryShow": "Mostrar",
   "changePreviewSmall": "Pequeñas (240 px)",
   "changePreviewMedium": "Medianas (480 px)",

@@ -113,6 +113,7 @@
   "editSummary": "Zmiany AI gotowe · nowe warstwy: {added} · zmienione: {changed}",
   "editSummaryAdded": "Zmiany AI gotowe · nowe warstwy: {added}",
   "editSummaryChanged": "Zmiany AI gotowe · zmienione warstwy: {changed}",
+  "editSummaryIn": "w {document}",
   "editSummaryShow": "Pokaż",
   "changePreviewSmall": "Małe (240 px)",
   "changePreviewMedium": "Średnie (480 px)",

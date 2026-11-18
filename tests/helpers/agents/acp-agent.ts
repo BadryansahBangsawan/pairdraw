@@ -4,7 +4,9 @@ import { setTimeout as delay } from 'node:timers/promises'
  * A stand-in ACP agent for tests that run one through the companion. It answers `initialize`,
  * opens a session, connects to the HTTP MCP servers the session names the way a real agent
  * does (so the app sees it reach Pairdraw's tools), and replies to each prompt by streaming
- * the prompt's last line back. The first argument names it, as an adapter names its package.
+ * the prompt's last line back. A prompt carrying `<pairdraw-tool>{"name","arguments"}</pairdraw-tool>`
+ * makes it call that Pairdraw tool first, as an agent designing does. The first argument names
+ * it, as an adapter names its package.
  * Like Codex and Claude's adapters, it advertises a model and reasoning effort as session config
  * options and a session mode; once any differs from its default, each reply names them.
  */
@@ -15,6 +17,7 @@ import {
   type McpServer,
   type SessionConfigOption
 } from '@agentclientprotocol/sdk'
+import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/client'
 import * as v from 'valibot'
 
 const name = process.argv[2] ?? 'fake-acp'
@@ -34,102 +37,104 @@ const stream = ndJsonStream(
   })
 )
 
-const servers = new Map<string, MCPServerSession>()
-
-/** An agent's open MCP session on one of the servers its ACP session named. */
-interface MCPServerSession {
-  url: string
-  headers: Record<string, string>
-  sessionId: string | null
-}
-
 /** Opens an MCP session on each HTTP server, as an agent does when its session starts. */
-async function connectMCP(serversNamed: McpServer[]): Promise<void> {
-  for (const server of serversNamed) {
+async function connectMCP(servers: McpServer[]): Promise<Client[]> {
+  const clients: Client[] = []
+  for (const server of servers) {
     if (!('type' in server) || server.type !== 'http') continue
     const headers = Object.fromEntries(server.headers.map(({ name, value }) => [name, value]))
-    const response = await fetch(server.url, {
-      method: 'POST',
-      headers: {
-        ...headers,
-        'content-type': 'application/json',
-        accept: 'application/json, text/event-stream'
-      },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'initialize',
-        params: {
-          protocolVersion: '2025-06-18',
-          capabilities: {},
-          clientInfo: { name: 'fake-acp', version: '1.0.0' }
-        }
-      })
-    }).catch(() => undefined)
-    if (!response) continue
-    await response.text().catch(() => undefined)
-    servers.set(server.url, {
-      url: server.url,
-      headers,
-      sessionId: response.headers.get('mcp-session-id')
-    })
+    const client = new Client({ name: 'fake-acp', version: '1.0.0' })
+    await client
+      .connect(
+        new StreamableHTTPClientTransport(new URL(server.url), {
+          requestInit: { headers }
+        })
+      )
+      .then(() => clients.push(client))
+      .catch(() => undefined)
   }
+  return clients
 }
 
-/** The JSON a Streamable HTTP reply carries, which arrives as JSON or as one SSE event. */
-function replyBody(text: string): unknown {
-  const trimmed = text.trim()
-  const raw =
-    trimmed.startsWith('event:') || trimmed.startsWith('data:')
-      ? trimmed
-          .split('\n')
-          .filter((line) => line.startsWith('data:'))
-          .map((line) => line.slice(5).trim())
-          .join('')
-      : trimmed
-  const parsed = v.safeParse(v.pipe(v.string(), v.parseJson()), raw)
-  return parsed.success ? parsed.output : null
-}
+/** A tool call the prompt asked for, and the text it answered with. */
+const callRequest = /<pairdraw-tool>([\s\S]*?)<\/pairdraw-tool>/g
 
-const textPartSchema = v.object({ type: v.literal('text'), text: v.string() })
-const toolReplySchema = v.object({
-  result: v.object({ content: v.array(v.unknown()) })
+const callSchema = v.object({
+  name: v.string(),
+  arguments: v.fallback(v.record(v.string(), v.unknown()), {})
 })
+
+/** The Pairdraw MCP sessions this agent's own session opened, as it starts. */
+let toolClients: Client[] = []
+/** The document the last call answered with, which a later `$target` argument names. */
+let lastTarget: string | null = null
+
+/** `$target` in a call's arguments, which names the document the previous call returned. */
+function substituteTarget(value: unknown): unknown {
+  if (value === '$target') return lastTarget ?? ''
+  if (Array.isArray(value)) return value.map(substituteTarget)
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [key, substituteTarget(entry)])
+    )
+  }
+  return value
+}
+
+/** The call's arguments with `$target` filled in. */
+function withTarget(args: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(args).map(([key, value]) => [key, substituteTarget(value)])
+  )
+}
+
+/** Calls each Pairdraw tool the prompt named, as an agent designing does, in its order. */
+async function callRequestedTools(prompt: string): Promise<string[]> {
+  const requests = [...prompt.matchAll(callRequest)].map((match) => match[1] ?? '')
+  const replies: string[] = []
+  for (const request of requests) {
+    const parsed = v.safeParse(v.pipe(v.string(), v.parseJson(), callSchema), request)
+    if (!parsed.success) {
+      replies.push('invalid tool request')
+      continue
+    }
+    if (toolClients.length === 0) {
+      replies.push('no Pairdraw tools')
+      continue
+    }
+    const { text, value } = await callPairdrawTool(
+      parsed.output.name,
+      withTarget(parsed.output.arguments)
+    )
+    const target = v.safeParse(
+      v.object({ target: v.optional(v.object({ documentId: v.string() })) }),
+      value
+    )
+    if (target.success) lastTarget = target.output.target?.documentId ?? lastTarget
+    replies.push(text)
+  }
+  return replies
+}
+
 const createdSchema = v.object({ target: v.object({ documentId: v.string() }) })
 
-/** Calls one Pairdraw tool over the MCP session, as the agent under test does. */
-async function callMCPTool(name: string, args: Record<string, unknown>): Promise<unknown> {
-  const server = [...servers.values()][0]
-  if (!server) throw new Error('The agent has no MCP server to call')
-  const response = await fetch(server.url, {
-    method: 'POST',
-    signal: AbortSignal.timeout(20_000),
-    headers: {
-      ...server.headers,
-      ...(server.sessionId ? { 'mcp-session-id': server.sessionId } : {}),
-      'content-type': 'application/json',
-      accept: 'application/json, text/event-stream'
-    },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id: 2,
-      method: 'tools/call',
-      params: { name, arguments: args }
-    })
-  })
-  const reply = v.safeParse(toolReplySchema, replyBody(await response.text()))
-  if (!reply.success) throw new Error(`MCP tool ${name} returned no content`)
-  for (const part of reply.output.result.content) {
-    if (!v.is(textPartSchema, part)) continue
-    const parsed = v.safeParse(v.pipe(v.string(), v.parseJson()), part.text)
-    return parsed.success ? parsed.output : part.text
-  }
-  return null
+/** Calls one Pairdraw tool on the session's own MCP connection, as a real agent does. */
+async function callPairdrawTool(
+  name: string,
+  args: Record<string, unknown>
+): Promise<{ text: string; value: unknown }> {
+  const client = toolClients[0]
+  if (!client) throw new Error('The agent has no Pairdraw server to call')
+  const result = await client.callTool({ name, arguments: args })
+  const part = result.content.find((entry) => entry.type === 'text')
+  const text = part && 'text' in part ? part.text : ''
+  const parsed = v.safeParse(v.pipe(v.string(), v.parseJson()), text)
+  return { text, value: parsed.success ? parsed.output : text }
 }
 
 async function openNewDocument(): Promise<string> {
-  const created = v.parse(createdSchema, await callMCPTool('new_document', {}))
-  return created.target.documentId
+  const created = await callPairdrawTool('new_document', {})
+  return v.parse(createdSchema, created.value).target.documentId
 }
 
 /**
@@ -140,7 +145,7 @@ async function openNewDocument(): Promise<string> {
 async function designInNewDocument(): Promise<void> {
   const documentId = await openNewDocument()
   for (let index = 0; index < 12; index += 1) {
-    await callMCPTool('create_shape', {
+    await callPairdrawTool('create_shape', {
       document_id: documentId,
       type: 'RECTANGLE',
       x: 24 + (index % 6) * 48,
@@ -151,7 +156,7 @@ async function designInNewDocument(): Promise<void> {
     })
     await delay(1500)
   }
-  await callMCPTool('render', {
+  await callPairdrawTool('render', {
     document_id: documentId,
     jsx: '<Frame name="Mockup" w={320} h={200} bg="#FFFFFF"><Text name="Title" size={24}>Mockup</Text></Frame>'
   })
@@ -225,7 +230,7 @@ const connection: AgentSideConnection = new AgentSideConnection(
       agentInfo: { name, version: '1.0.0' }
     }),
     newSession: async ({ mcpServers }) => {
-      await connectMCP(mcpServers)
+      toolClients = await connectMCP(mcpServers)
       return {
         sessionId: 'fake-session',
         configOptions: configOptions(),
@@ -250,6 +255,8 @@ const connection: AgentSideConnection = new AgentSideConnection(
     authenticate: async () => ({}),
     prompt: async ({ sessionId, prompt }) => {
       const text = prompt.map((block) => (block.type === 'text' ? block.text : '')).join('')
+      // A prompt naming a Pairdraw tool makes it call that first, as an agent designing does.
+      const called = await callRequestedTools(text)
       if (text.includes(QUIET_MARKER)) {
         await connection.sessionUpdate({
           sessionId,
@@ -300,7 +307,7 @@ const connection: AgentSideConnection = new AgentSideConnection(
         })
         const documentId = await openNewDocument()
         for (let index = 0; index < 10; index += 1) {
-          await callMCPTool('create_shape', {
+          await callPairdrawTool('create_shape', {
             document_id: documentId,
             type: 'RECTANGLE',
             x: 24 + index * 40,
@@ -351,7 +358,9 @@ const connection: AgentSideConnection = new AgentSideConnection(
           sessionUpdate: 'agent_message_chunk',
           content: {
             type: 'text',
-            text: `echo: ${text.split('\n').at(-1) ?? ''}${sessionNote()}`
+            text: `echo: ${text.split('\n').at(-1) ?? ''}${
+              called.length ? `\n${called.join('\n')}` : ''
+            }${sessionNote()}`
           }
         }
       })

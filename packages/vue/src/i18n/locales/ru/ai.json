@@ -113,6 +113,7 @@
   "editSummary": "Правки ИИ готовы · новые слои: {added} · изменено: {changed}",
   "editSummaryAdded": "Правки ИИ готовы · новые слои: {added}",
   "editSummaryChanged": "Правки ИИ готовы · изменённые слои: {changed}",
+  "editSummaryIn": "в {document}",
   "editSummaryShow": "Показать",
   "changePreviewSmall": "Маленькие (240 px)",
   "changePreviewMedium": "Средние (480 px)",

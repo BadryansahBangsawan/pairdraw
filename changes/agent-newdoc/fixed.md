@@ -1,0 +1,1 @@
+- The notice after an AI edit's Show brings the document holding those layers to front, and names it when another document is showing.

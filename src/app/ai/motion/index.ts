@@ -25,6 +25,16 @@ export interface AIEditReply {
   run: { active: boolean }
 }
 
+/**
+ * The document the edits are in, which its notice can name when it is not the one in front, and
+ * bring to front so its Show acts where the layers are.
+ */
+export interface AIEditDocument {
+  /** The document's name when another document is in front, otherwise null. */
+  name: () => string | null
+  show: () => void
+}
+
 /** A run of edits ends this long after the last one when no reply is behind it. */
 export const AI_EDIT_IDLE_MS = 2500
 /** After a reply's last edit, how long before its run of edits ends once the reply has. */
@@ -47,6 +57,7 @@ interface EditSession {
   added: Set<string>
   changed: Set<string>
   reply: AIEditReply | null
+  document: AIEditDocument | null
   timer: ReturnType<typeof setTimeout> | null
 }
 
@@ -101,10 +112,19 @@ function summarize(store: AIEditMotionStore, session: EditSession, now: number) 
   const changed = session.changed.size + (merge ? previous.changed : 0)
   const nodeIds = [...(merge ? previous.nodeIds : []), ...session.added, ...session.changed]
   const messages = aiMessages.get()
-  const toastId = toast.info(summaryMessage(messages, added, changed), {
-    label: messages.editSummaryShow,
-    run: () => showLayers(store, nodeIds)
-  })
+  // A notice over another document says which one holds the layers, since Show goes there.
+  const document = session.document?.name()
+  const summary = summaryMessage(messages, added, changed)
+  const toastId = toast.info(
+    document ? `${summary} · ${messages.editSummaryIn({ document })}` : summary,
+    {
+      label: messages.editSummaryShow,
+      run: () => {
+        session.document?.show()
+        showLayers(store, nodeIds)
+      }
+    }
+  )
   summaries.set(store, { toastId, added, changed, nodeIds, endedAt: now })
 }
 
@@ -139,7 +159,8 @@ export function stopAIEditMotion(store: AIEditMotionStore): void {
 export function showAIEdit(
   store: AIEditMotionStore,
   change: DocumentChange,
-  reply: AIEditReply | null = null
+  reply: AIEditReply | null = null,
+  document: AIEditDocument | null = null
 ): void {
   // A flash is motion too, so with motion off the edit simply appears.
   if (!aiEditsAnimate()) return
@@ -162,10 +183,12 @@ export function showAIEdit(
     added: new Set<string>(),
     changed: new Set<string>(),
     reply: null,
+    document: null,
     timer: null
   }
   sessions.set(store, session)
   session.reply = reply
+  session.document = document ?? session.document
   for (const id of added) session.added.add(id)
   for (const id of changed) if (!session.added.has(id)) session.changed.add(id)
   const areas = uniq([...added, ...changed].map((id) => areaOf(graph, id, pageId)))

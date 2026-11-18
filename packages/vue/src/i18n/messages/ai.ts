@@ -241,6 +241,8 @@ export const aiMessageDefaults = {
   editSummary: params('AI edits done · new layers: {added} · changed: {changed}'),
   editSummaryAdded: params('AI edits done · new layers: {added}'),
   editSummaryChanged: params('AI edits done · changed layers: {changed}'),
+  /** Names the other document the edits are in, which Show brings to front. */
+  editSummaryIn: params('in {document}'),
   editSummaryShow: 'Show',
   changePreviewSmall: 'Small (240 px)',
   changePreviewMedium: 'Medium (480 px)',

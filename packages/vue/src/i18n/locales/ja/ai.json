@@ -113,6 +113,7 @@
   "editSummary": "AI の編集が完了 · 新しいレイヤー: {added} · 変更: {changed}",
   "editSummaryAdded": "AI の編集が完了 · 新しいレイヤー: {added}",
   "editSummaryChanged": "AI の編集が完了 · 変更したレイヤー: {changed}",
+  "editSummaryIn": "{document} 内",
   "editSummaryShow": "表示",
   "changePreviewSmall": "小（240ピクセル）",
   "changePreviewMedium": "中（480ピクセル）",

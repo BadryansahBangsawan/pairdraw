@@ -113,6 +113,7 @@
   "editSummary": "Modifications de l’IA terminées · nouveaux calques : {added} · modifiés : {changed}",
   "editSummaryAdded": "Modifications de l’IA terminées · nouveaux calques : {added}",
   "editSummaryChanged": "Modifications de l’IA terminées · calques modifiés : {changed}",
+  "editSummaryIn": "dans {document}",
   "editSummaryShow": "Afficher",
   "changePreviewSmall": "Petits (240 px)",
   "changePreviewMedium": "Moyens (480 px)",

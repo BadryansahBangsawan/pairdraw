@@ -113,6 +113,7 @@
   "editSummary": "Modifiche dell’IA completate · nuovi livelli: {added} · modificati: {changed}",
   "editSummaryAdded": "Modifiche dell’IA completate · nuovi livelli: {added}",
   "editSummaryChanged": "Modifiche dell’IA completate · livelli modificati: {changed}",
+  "editSummaryIn": "in “{document}”",
   "editSummaryShow": "Mostra",
   "changePreviewSmall": "Piccole (240 px)",
   "changePreviewMedium": "Medie (480 px)",

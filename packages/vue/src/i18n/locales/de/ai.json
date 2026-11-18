@@ -113,6 +113,7 @@
   "editSummary": "KI-Änderungen fertig · neue Ebenen: {added} · geändert: {changed}",
   "editSummaryAdded": "KI-Änderungen fertig · neue Ebenen: {added}",
   "editSummaryChanged": "KI-Änderungen fertig · geänderte Ebenen: {changed}",
+  "editSummaryIn": "in „{document}“",
   "editSummaryShow": "Anzeigen",
   "changePreviewSmall": "Klein (240 px)",
   "changePreviewMedium": "Mittel (480 px)",

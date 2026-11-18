@@ -2,6 +2,7 @@ import * as v from 'valibot'
 
 import { parseToolArgs } from '@pairdraw/core/tools'
 
+import { agentChatDocument } from '@/app/ai/reply/run'
 import { readAgentSession } from '@/app/automation/agents'
 import {
   isUnknownRecord,
@@ -18,6 +19,7 @@ import { resolveBrowserFileURL } from '@/app/document/io/browser'
 import { openBrowserFileFromURL } from '@/app/shell/menu/files'
 import { openFileFromPath } from '@/app/shell/menu/use'
 import {
+  activeTab,
   closeTab,
   createTab,
   getActiveStore,
@@ -121,7 +123,13 @@ export function createFileHandlers(files?: AutomationFiles) {
 
   async function handleNewDocument(_target: AutomationTarget, args: unknown): Promise<unknown> {
     const { path } = parseToolArgs('new_document', saveArgsSchema, args)
-    const tab = createTab()
+    const session = isUnknownRecord(args) ? readAgentSession(args.agent) : null
+    // The app's own chat designing in the document in front shows what its agent opened, so the
+    // person watches it being made. A chat that moved away, and every other caller, keep the
+    // document in the background.
+    const chatDocument = agentChatDocument(session?.chat)
+    const behind = chatDocument !== undefined && chatDocument !== activeTab.value?.store
+    const tab = createTab(undefined, undefined, behind ? { active: false } : undefined)
     if (path) {
       try {
         await saveWithoutPrompt(tab.store, path)
@@ -130,7 +138,6 @@ export function createFileHandlers(files?: AutomationFiles) {
         throw error
       }
     }
-    const session = isUnknownRecord(args) ? readAgentSession(args.agent) : null
     if (session) rememberSessionDocument(session.session, tab.id, true)
     const target = resolveAutomationTarget(tab.store, { document_id: tab.id })
     return responseWithTarget({ ok: true, result: { created: true } }, target)

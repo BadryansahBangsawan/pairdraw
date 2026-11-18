@@ -136,13 +136,18 @@ export function forgetAgentChat(chat: string): void {
 }
 
 /**
- * The reply an ACP agent's tool call belongs to: its chat's run while the reply goes on, when
+/** The reply an ACP agent's tool call belongs to: its chat's run while the reply goes on, when
  * the call edits the chat's own document. A call elsewhere stays an ordinary agent edit.
  */
 export function agentReplyRun(store: EditorStore, chat: string | undefined): Run | null {
   if (!chat || agentChats.get(chat) !== store) return null
   const run = currentRun(store)
   return run.active ? run : null
+}
+
+/** The document a chat's coding agent works in, which a call opening one treats as its own. */
+export function agentChatDocument(chat: string | undefined): EditorStore | undefined {
+  return chat ? agentChats.get(chat) : undefined
 }
 
 /**

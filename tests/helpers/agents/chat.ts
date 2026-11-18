@@ -10,9 +10,7 @@ import { CanvasHelper } from '#tests/helpers/canvas'
 import { ChatHarness } from '#tests/helpers/chat/harness'
 
 /** A prompt asking the stand-in agent to call these Pairdraw tools before it replies. */
-export function askFor(
-  ...calls: { name: string; arguments?: Record<string, unknown> }[]
-): string {
+export function askFor(...calls: { name: string; arguments?: Record<string, unknown> }[]): string {
   return calls.map((call) => `<pairdraw-tool>${JSON.stringify(call)}</pairdraw-tool>`).join('\n')
 }
 
@@ -22,10 +20,7 @@ export interface AgentChat {
 }
 
 /** The web app paired with a companion running the stand-in agent, as the settings connect it. */
-export async function chatWithAgent(
-  page: Page,
-  baseURL: string | undefined
-): Promise<AgentChat> {
+export async function chatWithAgent(page: Page, baseURL: string | undefined): Promise<AgentChat> {
   const dir = mkdtempSync(join(tmpdir(), 'pairdraw-agent-document-'))
   const companion = await startCompanion(new URL('/?test', baseURL).href, dir)
   const stop = () => {

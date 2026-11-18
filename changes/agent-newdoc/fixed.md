@@ -1,1 +1,2 @@
 - The notice after an AI edit's Show brings the document holding those layers to front, and names it when another document is showing.
+- A document the chat's own coding agent starts opens in front while the reply that started it stays on screen.

@@ -265,6 +265,10 @@ export function createConversationHistory<TChat extends HistoryChat>(
       const editor = runtime.getEditor()
       const next = await runtime.ensureChat(messages.value, current.value?.id)
       if (runtime.getEditor() !== editor) {
+        // Another document came to the front while the chat was taken up. A reply already
+        // running is not this call's to end: it keeps going where it started, and the
+        // conversation showing it stays away until that document shows again.
+        if (next?.status === 'submitted' || next?.status === 'streaming') return null
         await next?.stop()
         await runtime.resetChat()
         return null

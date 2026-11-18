@@ -25,7 +25,7 @@ type RunningChat = {
   stop: () => Promise<void>
 }
 
-function fixture() {
+function fixture(hooks: { beforeEnsureReturns?: () => void } = {}) {
   let firstPath: string | null = null
   const first = editor(() => firstPath)
   const second = editor()
@@ -44,7 +44,12 @@ function fixture() {
     {
       getEditor: () => active,
       ensureChat: async (_messages, sessionId) => {
-        if (live.chat && live.sessionId === sessionId && live.editor === active) return live.chat
+        if (live.chat && live.sessionId === sessionId && live.editor === active) {
+          const running = live.chat
+          // Whatever the person opened while the chat was being taken up.
+          hooks.beforeEnsureReturns?.()
+          return running
+        }
         started++
         live.chat = chat
         live.sessionId = sessionId ?? null
@@ -192,6 +197,24 @@ describe('running chat', () => {
     await f.history.initialize()
     expect(f.history.liveChat()).toBe(f.chat)
     expect(f.started()).toBe(1)
+  })
+
+  test('a document opening while the chat is taken up does not stop its running reply', async () => {
+    let switchToSecond: () => void = () => undefined
+    const f = fixture({ beforeEnsureReturns: () => switchToSecond() })
+    await f.history.initialize()
+    await f.history.ensureChat()
+    f.chat.status = 'streaming'
+    switchToSecond = () => f.switchTo(f.second)
+
+    await f.history.ensureChat()
+    // The panel of the document now in front takes up its own conversation.
+    await f.history.initialize()
+
+    expect(f.stops()).toBe(0)
+    expect(f.resets()).toBe(0)
+    expect(f.history.away.value).toBe(true)
+    expect(f.history.liveChat()).toBe(f.chat)
   })
 
   test('closing the running conversation’s document stops the reply', async () => {

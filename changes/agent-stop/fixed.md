@@ -1,0 +1,1 @@
+- A reply that is already running keeps running when another document opens while the chat is being taken up.

@@ -1,3 +1,5 @@
+import { setTimeout as delay } from 'node:timers/promises'
+
 /**
  * A stand-in ACP agent for tests that run one through the companion. It answers `initialize`,
  * opens a session, connects to the HTTP MCP servers the session names the way a real agent
@@ -13,6 +15,7 @@ import {
   type McpServer,
   type SessionConfigOption
 } from '@agentclientprotocol/sdk'
+import * as v from 'valibot'
 
 const name = process.argv[2] ?? 'fake-acp'
 
@@ -31,12 +34,21 @@ const stream = ndJsonStream(
   })
 )
 
+const servers = new Map<string, MCPServerSession>()
+
+/** An agent's open MCP session on one of the servers its ACP session named. */
+interface MCPServerSession {
+  url: string
+  headers: Record<string, string>
+  sessionId: string | null
+}
+
 /** Opens an MCP session on each HTTP server, as an agent does when its session starts. */
-async function connectMCP(servers: McpServer[]): Promise<void> {
-  for (const server of servers) {
+async function connectMCP(serversNamed: McpServer[]): Promise<void> {
+  for (const server of serversNamed) {
     if (!('type' in server) || server.type !== 'http') continue
     const headers = Object.fromEntries(server.headers.map(({ name, value }) => [name, value]))
-    await fetch(server.url, {
+    const response = await fetch(server.url, {
       method: 'POST',
       headers: {
         ...headers,
@@ -54,7 +66,91 @@ async function connectMCP(servers: McpServer[]): Promise<void> {
         }
       })
     }).catch(() => undefined)
+    if (!response) continue
+    await response.text().catch(() => undefined)
+    servers.set(server.url, {
+      url: server.url,
+      headers,
+      sessionId: response.headers.get('mcp-session-id')
+    })
   }
+}
+
+/** The JSON a Streamable HTTP reply carries, which arrives as JSON or as one SSE event. */
+function replyBody(text: string): unknown {
+  const trimmed = text.trim()
+  const raw =
+    trimmed.startsWith('event:') || trimmed.startsWith('data:')
+      ? trimmed
+          .split('\n')
+          .filter((line) => line.startsWith('data:'))
+          .map((line) => line.slice(5).trim())
+          .join('')
+      : trimmed
+  const parsed = v.safeParse(v.pipe(v.string(), v.parseJson()), raw)
+  return parsed.success ? parsed.output : null
+}
+
+const textPartSchema = v.object({ type: v.literal('text'), text: v.string() })
+const toolReplySchema = v.object({
+  result: v.object({ content: v.array(v.unknown()) })
+})
+const createdSchema = v.object({ target: v.object({ documentId: v.string() }) })
+
+/** Calls one Pairdraw tool over the MCP session, as the agent under test does. */
+async function callMCPTool(name: string, args: Record<string, unknown>): Promise<unknown> {
+  const server = [...servers.values()][0]
+  if (!server) throw new Error('The agent has no MCP server to call')
+  const response = await fetch(server.url, {
+    method: 'POST',
+    signal: AbortSignal.timeout(20_000),
+    headers: {
+      ...server.headers,
+      ...(server.sessionId ? { 'mcp-session-id': server.sessionId } : {}),
+      'content-type': 'application/json',
+      accept: 'application/json, text/event-stream'
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'tools/call',
+      params: { name, arguments: args }
+    })
+  })
+  const reply = v.safeParse(toolReplySchema, replyBody(await response.text()))
+  if (!reply.success) throw new Error(`MCP tool ${name} returned no content`)
+  for (const part of reply.output.result.content) {
+    if (!v.is(textPartSchema, part)) continue
+    const parsed = v.safeParse(v.pipe(v.string(), v.parseJson()), part.text)
+    return parsed.success ? parsed.output : part.text
+  }
+  return null
+}
+
+/**
+ * The agent designs a new document over several seconds, as the owner's session did: it opens
+ * one with `new_document`, then edits that document by its id while the chat's own document
+ * stays in front.
+ */
+async function designInNewDocument(): Promise<void> {
+  const created = v.parse(createdSchema, await callMCPTool('new_document', {}))
+  const documentId = created.target.documentId
+  for (let index = 0; index < 12; index += 1) {
+    await callMCPTool('create_shape', {
+      document_id: documentId,
+      type: 'RECTANGLE',
+      x: 24 + (index % 6) * 48,
+      y: 24 + Math.floor(index / 6) * 48,
+      width: 32,
+      height: 32,
+      name: `Card ${index}`
+    })
+    await delay(1500)
+  }
+  await callMCPTool('render', {
+    document_id: documentId,
+    jsx: '<Frame name="Mockup" w={320} h={200} bg="#FFFFFF"><Text name="Title" size={24}>Mockup</Text></Frame>'
+  })
 }
 
 const DEFAULTS = { model: 'fake-fast', effort: 'medium', mode: 'ask' }
@@ -102,6 +198,12 @@ function sessionNote(): string {
 const QUIET_MARKER = 'stay-quiet'
 let finishQuiet: (() => void) | null = null
 
+/**
+ * A prompt naming this designs a new document, as a coding agent does when the person asks for
+ * one: it opens the document and keeps editing it while the chat's own document stays in front.
+ */
+const DESIGN_MARKER = 'design-in-new-document'
+
 const connection: AgentSideConnection = new AgentSideConnection(
   () => ({
     initialize: async () => ({
@@ -147,6 +249,24 @@ const connection: AgentSideConnection = new AgentSideConnection(
           finishQuiet = resolve
         })
         return { stopReason: 'cancelled' }
+      }
+      if (text.includes(DESIGN_MARKER)) {
+        await connection.sessionUpdate({
+          sessionId,
+          update: {
+            sessionUpdate: 'agent_message_chunk',
+            content: { type: 'text', text: 'opening a new document' }
+          }
+        })
+        await designInNewDocument()
+        await connection.sessionUpdate({
+          sessionId,
+          update: {
+            sessionUpdate: 'agent_message_chunk',
+            content: { type: 'text', text: 'finished the mockup' }
+          }
+        })
+        return { stopReason: 'end_turn' }
       }
       await connection.sessionUpdate({
         sessionId,

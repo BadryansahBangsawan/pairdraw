@@ -1,1 +1,0 @@
-- A tool call with an unknown or missing argument names the arguments the tool takes and the values it accepts, and an unknown variable binding field lists the fields a variable can bind to.

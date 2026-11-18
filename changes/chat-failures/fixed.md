@@ -1,7 +1,0 @@
-- A reply whose provider stops sending ends with a timeout notice instead of a spinner that never stops.
-- A tool call or an approval that takes longer than the gap between provider chunks still finishes, and the model continues the turn.
-- A model that thinks before its first token keeps the longer first-chunk wait after the stream has started.
-- A reply that times out also stops the provider request, so a tool call that arrives after the wait does not run.
-- A model that thinks again after a tool keeps the longer first-chunk wait for that step.
-- A model that returns neither an answer nor a tool call ends the turn with a retryable notice instead of an empty reply.
-- A coding agent that starts but never answers ends the wait with a start-timeout notice.

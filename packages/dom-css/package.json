@@ -1,6 +1,6 @@
 {
   "name": "@pairdraw/dom-css",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "DOM, CSS, HTML, JSX, and Tailwind projection between Pairdraw documents and SceneGraph, with browser and headless CSS runtimes.",
   "keywords": [
     "pairdraw",

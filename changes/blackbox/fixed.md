@@ -1,1 +1,0 @@
-- `select_nodes` selects those layers in the editor, so the canvas, the panels, and the next `get_selection` use that selection.

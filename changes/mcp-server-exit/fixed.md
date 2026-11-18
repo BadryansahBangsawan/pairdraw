@@ -1,2 +1,0 @@
-- The app's MCP server now ends when its app-attach watchdog closes it, instead of staying in memory without serving.
-- The diagnostics report records when and how the app's MCP server exited, so a server that vanished can be explained later.

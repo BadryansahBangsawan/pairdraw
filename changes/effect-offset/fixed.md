@@ -1,2 +1,0 @@
-- A shadow missing an offset no longer crashes the canvas every frame or stacks a repeated error toast. It is given an offset when it enters the document, and one bad layer does not blank the rest of the canvas.
-- A layer the canvas cannot draw is recorded once for that layer and that error.

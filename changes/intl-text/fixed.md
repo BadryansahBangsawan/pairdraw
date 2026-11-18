@@ -1,1 +1,0 @@
-- Text in a font that is not installed exports as the substitute face instead of an empty layer.

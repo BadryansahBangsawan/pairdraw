@@ -1,1 +1,0 @@
-- Stopping following returns the canvas to the pan and zoom it showed before you started following, whether you stop it or the person you follow leaves.

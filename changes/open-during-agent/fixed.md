@@ -1,5 +1,0 @@
-- Opening a draft an agent edited while Home was in front shows that document, and the agent keeps editing the same tab.
-- Saving or deleting a draft Home is holding shows that document, and quitting asks about unsaved changes held there.
-- An edit, including a page snapshot, goes on a document tab and leaves Home or a New file tab in front. Home and a New file tab are not documents an agent can edit.
-- Each agent stays on the document it edited. The CLI uses `PAIRDRAW_SESSION` when it is set, and otherwise one shared `cli` session. Calls that name no session share one anonymous document.
-- Closing a file without naming it only closes a document that agent opened. Saving without naming it saves the document that agent is targeting, or the document in front. Opening a file that is already open does not let that session discard it.

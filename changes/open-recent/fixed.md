@@ -1,1 +1,0 @@
-- File > Open Recent lists the file a save just wrote, and follows the recent list while Home is open.

@@ -2,6 +2,87 @@
 
 ## Unreleased
 
+## 0.18.0 — 2026-11-18
+
+Pairdraw 0.18.0 makes saves safe and agents dependable: a save or export replaces a file only after the new copy is fully written, each AI agent stays on the document it edits while you switch tabs, a reply whose provider stalls ends with a notice instead of spinning forever, MCP tools report failures as errors and name the arguments they accept, plugins run under tighter limits, and Hebrew, Thai, and Devanagari text draws through fallback fonts. Pairdraw 0.16.1 and later offer this release in the app.
+
+### Added
+
+- A coding agent that works silently for minutes says so in its chat, with how long it has been quiet and its Stop, instead of leaving the turn unexplained.
+- Agent tools can detach instances into plain frames, keeping their children, overrides, and position.
+- The diagnostics report records when and how the app's MCP server exited, so a server that vanished can be explained later.
+
+### Changed
+
+- A tool call with an unknown or missing argument names the arguments the tool takes and the values it accepts, and an unknown variable binding field lists the fields a variable can bind to.
+- Each agent stays on the document it edited. The CLI uses `PAIRDRAW_SESSION` when it is set, and otherwise one shared `cli` session. Calls that name no session share one anonymous document.
+- An edit, including a page snapshot, goes on a document tab and leaves Home or a New file tab in front. Home and a New file tab are not documents an agent can edit.
+
+### Security
+
+- Saving a document cannot write the webview data folders the file-system scope already denies.
+- Plugins cannot call asynchronous tools, including reads, so a read-only plugin cannot list system fonts or render an export.
+- A plugin call or tool result larger than 64 KB is refused instead of being delivered to the editor, and an oversized result says that it is too large.
+- Plugin network globals stay blocked if a program deletes them, a plugin cannot start a worker, and a plugin does not run when a network global cannot be blocked.
+- A sandbox frame ignores a message that is not from its parent page.
+- A plugin that floods the editor with calls stops when its run time is up.
+
+### Fixed
+
+#### Saving and documents
+
+- Saving or exporting a document on the desktop, converting or exporting with the CLI, and saving through the browser's MCP server replace the file only after the new copy is fully written, so a crash or a full disk leaves the previous file in place. A folder that will not accept a new file fails the save and leaves the previous file unchanged.
+- A failed save stays on screen until the next successful save, and the document stays unsaved with its recovery copy kept.
+- Opening a document no longer takes the place of a recovered one, which keeps its recovery copy, and a coding agent closing a document leaves its draft and recovery copy behind, so the work stays recoverable from Home.
+- Opening a draft an agent edited while Home was in front shows that document, and the agent keeps editing the same tab. Saving or deleting a draft Home is holding shows that document, and quitting asks about unsaved changes held there.
+- Closing a file without naming it only closes a document that agent opened. Saving without naming it saves the document that agent is targeting, or the document in front. Opening a file that is already open does not let that session discard it.
+- File > Open Recent lists the file a save just wrote, and follows the recent list while Home is open.
+
+#### AI chat
+
+- A reply keeps running when you switch documents, and the chat shows which agent works in which document with a way back to it.
+- A reply whose provider stops sending ends with a timeout notice instead of a spinner that never stops, and the timeout also stops the provider request, so a tool call that arrives after the wait does not run.
+- A tool call or an approval that takes longer than the gap between provider chunks still finishes, and the model continues the turn. A model that thinks before its first token, or again after a tool, keeps the longer first-chunk wait for that step.
+- A model that returns neither an answer nor a tool call ends the turn with a retryable notice instead of an empty reply, and a coding agent that starts but never answers ends the wait with a start-timeout notice.
+- Sending a message right after switching the chat's model no longer opens guided AI setup: the chat waits for the new model's key status instead of reading the previous model's.
+
+#### MCP and agent tools
+
+- An MCP tool call that fails now reports an error to the client, instead of an error message delivered as a successful result.
+- `switch_page`, `viewport_set`, and `select_nodes` move the editor, so the page, view, and selection a tool sets are what the canvas, the panels, and the next call use.
+- A color a tool does not understand, such as a mistyped hex value, is refused instead of painting the layer black.
+- `get_node` reports a layer's rotation and the padding and alignment of an auto layout frame.
+- `batch_update` takes the list of operations its schema describes, `export_image` accepts its formats in either letter case, and `insert_icon` places the icon at the x and y it is given.
+- Library listings include each component's asset key, so a component can be inserted without already knowing that key.
+- An MCP client that reconnects without closing its old session takes that session's slot back, and a session left idle for two minutes gives its slot to the next client; a session another client is using is never taken. A client refused for lack of a slot is told the server's limit and how long an idle session holds its slot.
+- The app starts its MCP server again after the server stops, and reports a server that keeps stopping after repeated attempts instead of starting it forever. The server also ends when its app-attach watchdog closes it, instead of staying in memory without serving.
+
+#### CLI and file formats
+
+- A headless `tool call` that fails exits with an error and leaves the document file unchanged.
+- `pairdraw export --format pdf` writes the PDF when the CLI runs under Node, not only under Bun, and `pairdraw export --thumbnail` writes a page thumbnail fitted to `--width` and `--height` for PNG, JPG, and WEBP, instead of always failing.
+- `export --quality`, `export --scale`, `export --width`, `export --height`, and `analyze colors --threshold` refuse a value outside their range, and every command refuses an extra positional argument instead of ignoring it or taking it for the output path.
+- `pairdraw eval --output` refuses a path whose directory does not exist before the script runs, instead of running the script and then failing to write.
+- `pairdraw lint` refuses an unknown preset or rule with a clear error instead of crashing or passing silently.
+- `pairdraw variables` counts the variables its filters leave, and `--json` writes JSON for a document without variables instead of a sentence.
+- The CLI reference lists the node types `pairdraw query` accepts as tags.
+- Opening a file whose `.fig` archive is damaged or is not a ZIP fails with a clear error instead of decoding different content silently.
+- Converting to draw.io and back keeps a frame a frame, a rectangle a rectangle, and every layer name, and converting to draw.io says which variables the file cannot hold instead of dropping them silently.
+- A `.pen` roundtrip keeps the page name instead of replacing it with the first layer's.
+- Printing tokens says which variable took a numbered custom property name because another token's name collides with it.
+
+#### Canvas, text, and export
+
+- A shadow missing an offset no longer crashes the canvas every frame or stacks a repeated error toast. It is given an offset when it enters the document, one bad layer does not blank the rest of the canvas, and a layer the canvas cannot draw is recorded once for that layer and that error.
+- The canvas draws the selection again after the browser takes its WebGL context away.
+- Hebrew, Thai, and Devanagari text draws in an installed or Google Fonts fallback when its font lacks those letters, instead of empty boxes, and text in a font that is not installed exports as the substitute face instead of an empty layer.
+- Saving text that truncates keeps it in a fixed box that ends its lines.
+- A page exported as standalone HTML keeps its fonts when images and fonts are saved beside the page.
+- A design JSX shadow that is missing a color, an effect whose radius is not a number, or a type that is not an effect name is refused, and the error names that prop. A design JSX blur may omit its color, which is stored as transparent.
+- Publishing a library no longer counts a text component as changed when only its measured text height was recalculated.
+- Stopping following returns the canvas to the pan and zoom it showed before you started following, whether you stop it or the person you follow leaves.
+- A settings choice applies when it is made with an assistive press or a keyboard click, not only with a mouse.
+
 ## 0.17.0 — 2026-11-16
 
 Pairdraw 0.17.0 is a bug-fix and hardening release: imported HTML, `.fig`, `.pen`, draw.io, and Mermaid files open more faithfully, damaged files fail with an error instead of freezing the app, rotated layers measure, align, and snap where they are drawn, and HTML export can no longer be made to carry live markup. Pairdraw 0.16.1 and later offer this release in the app; 0.16.0 has no update feed, so install it by hand once.

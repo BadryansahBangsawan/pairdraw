@@ -48,6 +48,8 @@ export interface MockBrowser {
   requests: MockBrowserRequest[]
   /** Results a test sets for app commands, sent instead of the mock's own. */
   results: Map<string, unknown>
+  /** How long the mock takes to answer a command, by command name. */
+  delays: Map<string, number>
   close: () => void
 }
 
@@ -275,6 +277,7 @@ export function connectMockBrowser(
     const ws = new WebSocket(`ws://127.0.0.1:${port}`)
     const requests: MockBrowserRequest[] = []
     const results = new Map<string, unknown>()
+    const delays = new Map<string, number>()
     const token = authToken ?? 'test-token-' + randomHex(8)
 
     let settled = false
@@ -295,6 +298,12 @@ export function connectMockBrowser(
 
         try {
           requests.push({ command: msg.command, args: msg.args })
+          const delay = delays.get(msg.command)
+          if (delay) {
+            await new Promise((done) => {
+              setTimeout(done, delay)
+            })
+          }
           const result = results.has(msg.command)
             ? results.get(msg.command)
             : await handleMockCommand(graph, msg.command, msg.args)
@@ -318,7 +327,7 @@ export function connectMockBrowser(
         // the browser as connected, causing race conditions.
         void waitForBrowserRegistration(port).then(
           () => {
-            resolve({ ws, graph, requests, results, close: () => ws.close() })
+            resolve({ ws, graph, requests, results, delays, close: () => ws.close() })
             return undefined
           },
           (err) => {

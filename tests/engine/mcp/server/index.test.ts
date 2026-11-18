@@ -10,7 +10,7 @@ import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/cli
 import { MCP_AGENT_HEADER, MCP_CHAT_HEADER } from '@pairdraw/core/constants'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
-import { startServer, type ServerHandle } from '#mcp/server'
+import { startServer, type ServerHandle, type ServerOptions } from '#mcp/server'
 import { createToolDescriptors, getMCPToolDefinitions } from '#mcp/tool/manifest'
 import type { MCPToolScope } from '#mcp/tool/scope'
 import { parseDiscoveryInfo } from '#mcp/transport/discovery'
@@ -39,7 +39,11 @@ function testSocketPath(): string | null {
   return join(SOCKET_DIR, `mcp-test-${process.pid}-${++testCounter}.sock`)
 }
 
-async function createTestClient(disabledTools: string[] = [], scope: MCPToolScope = 'document') {
+async function createTestClient(
+  disabledTools: string[] = [],
+  scope: MCPToolScope = 'document',
+  timeouts: Pick<ServerOptions, 'rpcTimeoutMs' | 'documentRPCTimeoutMs'> = {}
+) {
   if (isUnix) await mkdir(SOCKET_DIR, { recursive: true })
   const authToken = TEST_CLIENT_AUTH_TOKEN
   const handle = await startServer({
@@ -50,7 +54,8 @@ async function createTestClient(disabledTools: string[] = [], scope: MCPToolScop
     disabledTools,
     scope,
     enableEval: false,
-    mcpRoot: null
+    mcpRoot: null,
+    ...timeouts
   })
 
   const httpPort = handle.httpPort
@@ -1121,5 +1126,83 @@ describe('MCP sessions as agents', () => {
         expect(notice.args).not.toHaveProperty('chat')
       }
     )
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Deadlines: a document edit outlasting the read deadline
+// ---------------------------------------------------------------------------
+
+/** Waits until the mock browser has taken a request for `command`. */
+async function waitForRequest(browser: MockBrowser, command: string): Promise<void> {
+  for (let attempt = 0; attempt < 200; attempt++) {
+    if (browser.requests.some((request) => request.command === command)) return
+    await Bun.sleep(5)
+  }
+  throw new Error(`The app never received ${command}`)
+}
+
+describe('app call deadlines', () => {
+  test('an edit that outlasts the read deadline returns its result instead of a timeout', async () => {
+    const ctx = await createTestClient([], 'document', {
+      rpcTimeoutMs: 100,
+      documentRPCTimeoutMs: 5_000
+    })
+    try {
+      ctx.browser.delays.set('tool', 400)
+      const result = await ctx.client.callTool({
+        name: 'create_shape',
+        arguments: { type: 'RECTANGLE', x: 0, y: 0, width: 20, height: 20, name: 'Slow' }
+      })
+
+      expect(result.isError).not.toBe(true)
+      const data = parseResult(result) as { id: string }
+      // The edit landed, so reporting a timeout for it would have been a lie.
+      expect(ctx.graph.getNode(data.id)?.name).toBe('Slow')
+    } finally {
+      await ctx.close()
+    }
+  })
+
+  test('a read sent while an edit runs waits for it instead of timing out', async () => {
+    const ctx = await createTestClient([], 'document', {
+      rpcTimeoutMs: 100,
+      documentRPCTimeoutMs: 5_000
+    })
+    try {
+      ctx.browser.delays.set('tool', 400)
+      ctx.browser.delays.set('get_page_tree', 300)
+      const edit = ctx.client.callTool({
+        name: 'create_shape',
+        arguments: { type: 'RECTANGLE', x: 0, y: 0, width: 20, height: 20, name: 'Slow' }
+      })
+      await waitForRequest(ctx.browser, 'tool')
+
+      const read = await ctx.client.callTool({ name: 'get_page_tree', arguments: {} })
+      expect(read.isError).not.toBe(true)
+      expect((await edit).isError).not.toBe(true)
+    } finally {
+      await ctx.close()
+    }
+  })
+
+  test('a deadline that passes says the edit may still be applied', async () => {
+    const ctx = await createTestClient([], 'document', {
+      rpcTimeoutMs: 100,
+      documentRPCTimeoutMs: 100
+    })
+    try {
+      ctx.browser.delays.set('tool', 400)
+      const result = await ctx.client.callTool({
+        name: 'create_shape',
+        arguments: { type: 'RECTANGLE', x: 0, y: 0, width: 20, height: 20, name: 'Slow' }
+      })
+
+      expect(result.isError).toBe(true)
+      expect(resultText(result)).toContain('may still be applied')
+      expect(resultText(result)).toContain('get_page_tree')
+    } finally {
+      await ctx.close()
+    }
   })
 })

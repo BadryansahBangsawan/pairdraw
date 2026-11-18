@@ -8,6 +8,8 @@ import type { RPCJSONObject } from '#mcp/json'
 import type { PendingRequest } from '#mcp/rpc-types'
 
 const RPC_TIMEOUT = 20_000
+/** A document edit lays out and draws a whole page, which can outlast a read by a minute. */
+const DOCUMENT_RPC_TIMEOUT = 120_000
 const APP_WAIT_TIMEOUT = 10_000
 
 const APP_NOT_CONNECTED_MESSAGE =
@@ -20,6 +22,12 @@ type BrowserRPCBridgeOptions = {
   onConnectionChange: () => void
   /** How long an RPC waits for the app to register before failing with APP_NOT_CONNECTED. Defaults to 10 s. */
   appWaitTimeoutMs?: number
+  /** How long an ordinary app call may take. Defaults to 20 s. */
+  rpcTimeoutMs?: number
+  /** How long a document edit, or a call sent while one is running, may take. Defaults to 120 s. */
+  documentRPCTimeoutMs?: number
+  /** Whether a request edits the document, which lets it and the calls behind it keep waiting. */
+  writesDocument?: (body: RPCJSONObject) => boolean
 }
 
 type ConnectionListener = (connected: boolean) => void
@@ -73,6 +81,13 @@ function sendJSON(ws: WebSocket, body: Record<string, unknown>) {
   if (ws.readyState === ws.OPEN) ws.send(JSON.stringify(body))
 }
 
+/** Why a call gave up, saying whether the app may still be working on it. */
+function timeoutMessage(editing: boolean, limitMs: number): string {
+  const seconds = Math.round(limitMs / 1000)
+  if (!editing) return `RPC timeout (${seconds}s)`
+  return `RPC timeout (${seconds}s): the edit may still be applied. Do not retry it; call get_page_tree to see what the document now holds.`
+}
+
 function createSettler<T>(resolve: (value: T) => void, reject: (error: Error) => void) {
   let settled = false
   return {
@@ -94,10 +109,15 @@ export function createBrowserRPCBridge({
   authToken,
   authorize = (token) => isAuthorized(token, authToken),
   onConnectionChange,
-  appWaitTimeoutMs = APP_WAIT_TIMEOUT
+  appWaitTimeoutMs = APP_WAIT_TIMEOUT,
+  rpcTimeoutMs = RPC_TIMEOUT,
+  documentRPCTimeoutMs = DOCUMENT_RPC_TIMEOUT,
+  writesDocument = () => false
 }: BrowserRPCBridgeOptions) {
   const pending = new Map<string, PendingRequest & { ws: WebSocket }>()
   const clients = new Set<WebSocket>()
+  /** How many document edits each window is still working on. */
+  const editsRunning = new Map<WebSocket, number>()
   const connectionWaiters = new Set<PendingRequest>()
   // Track which WebSocket clients have authenticated via a valid
   // register message. Unauthenticated clients can only send register;
@@ -236,8 +256,9 @@ export function createBrowserRPCBridge({
     for (const client of clients) sendRegisterPrompt(client)
   }
 
-  function sendRPC(body: Record<string, unknown>): Promise<unknown> {
+  function sendRPC(body: RPCJSONObject): Promise<unknown> {
     if (bridgeClosed) return Promise.reject(new Error('Server shutting down'))
+    const editing = writesDocument(body)
     return new Promise((resolve, reject) => {
       const doSend = () => {
         const ws = targetBrowser()
@@ -247,16 +268,40 @@ export function createBrowserRPCBridge({
         }
         const id = randomUUID()
         const settle = createSettler(resolve, reject)
+        // A call sent while the window is still editing waits for that edit: the app lays out
+        // and draws on one thread, so a read cannot answer before the edit finishes.
+        const running = editsRunning.get(ws) ?? 0
+        const limit = editing || running > 0 ? documentRPCTimeoutMs : rpcTimeoutMs
+        if (editing) editsRunning.set(ws, running + 1)
+        const editFinished = () => {
+          if (!editing) return
+          const left = (editsRunning.get(ws) ?? 1) - 1
+          if (left > 0) editsRunning.set(ws, left)
+          else editsRunning.delete(ws)
+        }
         const timer = setTimeout(() => {
           pending.delete(id)
-          settle.reject(new Error(`RPC timeout (${Math.round(RPC_TIMEOUT / 1000)}s)`))
-        }, RPC_TIMEOUT)
-        pending.set(id, { resolve: settle.resolve, reject: settle.reject, timer, ws })
+          editFinished()
+          settle.reject(new Error(timeoutMessage(editing, limit)))
+        }, limit)
+        pending.set(id, {
+          resolve: (value) => {
+            editFinished()
+            settle.resolve(value)
+          },
+          reject: (error) => {
+            editFinished()
+            settle.reject(error)
+          },
+          timer,
+          ws
+        })
         try {
           ws.send(JSON.stringify({ ...body, type: 'request', id }))
         } catch (e) {
           clearTimeout(timer)
           pending.delete(id)
+          editFinished()
           if (!settle.isSettled()) {
             settle.reject(e instanceof Error ? e : new Error(String(e)))
           }

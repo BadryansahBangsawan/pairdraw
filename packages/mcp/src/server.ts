@@ -9,6 +9,7 @@ import { WebSocketServer } from 'ws'
 import { createAgentBridge, type AgentBridge, type AgentBridgeOptions } from '#mcp/agents/index'
 import { isAuthorized } from '#mcp/auth'
 import { createBrowserRPCBridge } from '#mcp/browser-rpc'
+import type { RPCJSONObject } from '#mcp/json'
 import { createHonoApp } from '#mcp/server/http-app'
 import { createMCPSessionManager } from '#mcp/server/sessions'
 import { createServerInstructions } from '#mcp/skill/instructions'
@@ -92,6 +93,16 @@ export interface ServerOptions {
    * before the desktop app still succeeds; tests shorten it.
    */
   appWaitTimeoutMs?: number
+  /**
+   * How long an ordinary app call may take before it is reported as timed out.
+   * Defaults to 20 s; tests shorten it.
+   */
+  rpcTimeoutMs?: number
+  /**
+   * How long a document edit, or a call sent while one runs, may take.
+   * Defaults to 120 s, because drawing a page can outlast a read by a minute.
+   */
+  documentRPCTimeoutMs?: number
   /**
    * Turns on the companion's agent bridge (`pairdraw-connect`): pairing with the web app, and
    * finding, installing, signing in to, and starting the coding agents in `ACP_AGENTS` for a
@@ -194,15 +205,32 @@ function buildServerContext(options: ServerOptions) {
       )
     }
   })
+  const toolDescriptors = applyToolPolicy(createToolDescriptors(mcpRoot !== null), toolPolicy)
+  // A tool that writes, and eval or a save, may draw a page, so it gets the longer deadline;
+  // a read sent while one runs waits with it rather than failing at the read deadline.
+  const writeTools = new Set(
+    toolDescriptors.filter((tool) => tool.effect === 'write').map((tool) => tool.name)
+  )
+  const writesDocument = (body: RPCJSONObject): boolean => {
+    const command = typeof body.command === 'string' ? body.command : ''
+    if (command === 'eval' || command === 'save_file') return true
+    if (command !== 'tool') return false
+    const args = body.args
+    const name =
+      args && typeof args === 'object' && !Array.isArray(args) ? Reflect.get(args, 'name') : null
+    return typeof name === 'string' && writeTools.has(name)
+  }
   const browserRPC = createBrowserRPCBridge({
     authToken,
     authorize: verifyToken,
     onConnectionChange: mcpSessions.notifyToolsChanged,
-    appWaitTimeoutMs: options.appWaitTimeoutMs
+    appWaitTimeoutMs: options.appWaitTimeoutMs,
+    rpcTimeoutMs: options.rpcTimeoutMs,
+    documentRPCTimeoutMs: options.documentRPCTimeoutMs,
+    writesDocument
   })
   // Every call into the app, from MCP sessions and /rpc alike, stays within the scope.
   const sendToBrowser = scopeRPC(browserRPC.sendRPC, toolPolicy.scope)
-  const toolDescriptors = applyToolPolicy(createToolDescriptors(mcpRoot !== null), toolPolicy)
 
   const app = createHonoApp({
     authToken,
@@ -340,6 +368,8 @@ function buildHandle(
 export async function startServer(options: ServerOptions = {}): Promise<ServerHandle> {
   validateTimeoutOption('appAttachTimeoutMs', options.appAttachTimeoutMs)
   validateTimeoutOption('appWaitTimeoutMs', options.appWaitTimeoutMs)
+  validateTimeoutOption('rpcTimeoutMs', options.rpcTimeoutMs)
+  validateTimeoutOption('documentRPCTimeoutMs', options.documentRPCTimeoutMs)
   validateTimeoutOption('sessionIdleTimeoutMs', options.sessionIdleTimeoutMs)
   const ctx = buildServerContext(options)
 

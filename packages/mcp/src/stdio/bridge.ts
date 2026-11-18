@@ -14,8 +14,9 @@ type StdioRPCBridgeOptions = {
   onReconnect?: () => void
 }
 
-// 35s gives a 5s margin over the worst case (10s app wait + 20s RPC timeout = 30s)
-const RPC_TIMEOUT = 35_000
+// 135s gives a 5s margin over the worst case (10s app wait + 120s document edit = 130s),
+// so a slow render arrives instead of being reported as a timeout the app then applies anyway.
+const RPC_TIMEOUT = 135_000
 const DISCONNECTED_MESSAGE =
   'Pairdraw app is not connected. ' +
   'STOP and tell the user: "The Pairdraw desktop app is not running or no document is open. ' +

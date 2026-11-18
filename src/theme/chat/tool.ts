@@ -12,6 +12,8 @@ export default {
     statusIcon: 'size-3',
     name: 'shrink-0 text-[11px] font-medium text-surface',
     summary: 'min-w-0 flex-1 truncate font-mono text-[10px] text-muted',
+    // The line a failed call ends on, such as an exit status, readable before opening the call.
+    errorLine: 'max-w-[45%] shrink-0 truncate font-mono text-[10px] text-error',
     undone: 'inline-flex shrink-0 items-center gap-1 text-[10px] text-muted',
     undoneIcon: 'size-3',
     chevron:

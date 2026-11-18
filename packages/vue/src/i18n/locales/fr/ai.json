@@ -69,6 +69,8 @@
   "toolUndone": "Annulé",
   "toolRunning": "Exécution…",
   "toolError": "Erreur",
+  "toolErrorShowAll": "Tout afficher",
+  "toolErrorShowLess": "Afficher moins",
   "toolInput": "Entrée",
   "toolOutput": "Sortie",
   "toolDetails": "Détails de l’appel d’outil",

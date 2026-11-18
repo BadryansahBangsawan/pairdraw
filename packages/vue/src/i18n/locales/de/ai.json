@@ -69,6 +69,8 @@
   "toolUndone": "Rückgängig gemacht",
   "toolRunning": "Wird ausgeführt…",
   "toolError": "Fehler",
+  "toolErrorShowAll": "Alles anzeigen",
+  "toolErrorShowLess": "Weniger anzeigen",
   "toolInput": "Eingabe",
   "toolOutput": "Ausgabe",
   "toolDetails": "Details des Werkzeugaufrufs",

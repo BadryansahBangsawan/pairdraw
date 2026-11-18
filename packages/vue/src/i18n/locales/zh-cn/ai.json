@@ -69,6 +69,8 @@
   "toolUndone": "已撤销",
   "toolRunning": "正在运行…",
   "toolError": "错误",
+  "toolErrorShowAll": "显示全部",
+  "toolErrorShowLess": "收起",
   "toolInput": "输入",
   "toolOutput": "输出",
   "toolDetails": "工具调用详情",

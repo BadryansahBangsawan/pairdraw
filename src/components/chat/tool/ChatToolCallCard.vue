@@ -21,6 +21,7 @@ import ChatToolNodeChips from '@/components/chat/tool/ChatToolNodeChips.vue'
 import { toolCallState } from '@/components/chat/tool/state'
 import { loadCodeViewer } from '@/components/code-editor/lazy'
 import CodeViewer from '@/components/code-editor/LazyCodeViewer.vue'
+import AppButton from '@/components/ui/button/AppButton.vue'
 import AppAlert from '@/components/ui/feedback/AppAlert.vue'
 import SegmentedControl from '@/components/ui/select/SegmentedControl.vue'
 import { collapsibleContentMotion } from '@/theme/collapsible/collapsible'
@@ -37,6 +38,28 @@ const name = computed(() => toolDisplayName(part))
 const summary = computed(() => toolSummary(part))
 const source = computed(() => toolSource(part))
 const error = computed(() => toolErrorText(part))
+// A failed command can print a whole file; the card shows its head and the line it failed on.
+const ERROR_PREVIEW_LINES = 6
+const ERROR_PREVIEW_CHARS = 400
+const errorPreview = computed(() => {
+  const text = error.value
+  if (!text) return null
+  const lines = text.split('\n')
+  const preview =
+    lines.length > ERROR_PREVIEW_LINES + 1
+      ? [...lines.slice(0, ERROR_PREVIEW_LINES), '…', lines.at(-1) ?? ''].join('\n')
+      : text
+  return preview.length > ERROR_PREVIEW_CHARS
+    ? `${preview.slice(0, ERROR_PREVIEW_CHARS)}…`
+    : preview
+})
+const errorClipped = computed(() => errorPreview.value !== error.value)
+const showAllError = ref(false)
+// The last line of a failure, which for a shell command is what went wrong.
+const errorLine = computed(() => {
+  const lines = error.value?.split('\n').filter((line) => line.trim() !== '') ?? []
+  return lines.at(-1) ?? null
+})
 const image = computed(() => toolImage(part))
 const nodeIds = computed(() => (state.value === 'pending' ? [] : toolNodeIds(part)))
 const hasInput = computed(() => toolHasInput(part))
@@ -104,6 +127,13 @@ function json(value: unknown): string {
       </span>
       <span :class="ui.name()">{{ name }}</span>
       <span :class="ui.summary()">{{ summary }}</span>
+      <span
+        v-if="errorLine && state === 'error'"
+        :class="ui.errorLine()"
+        data-slot="chat-tool-error-line"
+      >
+        {{ errorLine }}
+      </span>
       <span v-if="undone" :class="ui.undone()" data-slot="chat-tool-undone">
         <icon-lucide-undo-2 :class="ui.undoneIcon()" aria-hidden="true" />
         {{ ai.toolUndone }}
@@ -112,7 +142,16 @@ function json(value: unknown): string {
     </CollapsibleTrigger>
     <CollapsibleContent :class="collapsibleContentMotion">
       <div :class="ui.body()">
-        <AppAlert v-if="error" tone="error" :heading="ai.toolError" :description="error" />
+        <AppAlert v-if="error" tone="error" :heading="ai.toolError">
+          <span class="block whitespace-pre-wrap break-words" data-slot="chat-tool-error-text">
+            {{ showAllError ? error : errorPreview }}
+          </span>
+          <template v-if="errorClipped" #actions>
+            <AppButton size="xs" variant="ghost" @click="showAllError = !showAllError">
+              {{ showAllError ? ai.toolErrorShowLess : ai.toolErrorShowAll }}
+            </AppButton>
+          </template>
+        </AppAlert>
         <ChatToolNodeChips :ids="nodeIds" />
         <SegmentedControl
           v-if="views.length > 1"

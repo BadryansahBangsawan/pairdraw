@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect } from 'storybook/test'
 
 import type { ToolCallPart } from '@/app/ai/chat/tool-calls/display'
 
@@ -49,6 +50,20 @@ const failed = part({
   output: { error: 'Node "99:1" not found' }
 })
 
+/** A shell command that printed a whole file before failing, as a coding agent reports it. */
+const FAILED_TERMINAL_OUTPUT = [
+  ...Array.from({ length: 400 }, (_, line) => `README line ${line + 1}`),
+  '(eval):1: ====== not found'
+].join('\n')
+
+const failedTerminal = part({
+  type: 'tool-Terminal',
+  toolCallId: 'failed-terminal',
+  state: 'output-error',
+  input: { command: 'cat README.md && echo ====== && cat assets/brand/README.md' },
+  errorText: FAILED_TERMINAL_OUTPUT
+})
+
 const described = part({
   type: 'tool-describe',
   toolCallId: 'describe',
@@ -78,6 +93,20 @@ export const Rendered: Story = {}
 export const StreamingRender: Story = { args: { parts: [streaming] } }
 export const ExportedImage: Story = { args: { parts: [exported] } }
 export const Failed: Story = { args: { parts: [failed] } }
+
+/**
+ * A failed agent command keeps its long output out of the reply: the card stays closed, the line
+ * that failed shows without opening it, and its output stays clipped to a few lines.
+ */
+export const FailedLongOutput: Story = {
+  args: { parts: [failedTerminal] },
+  play: async ({ canvasElement }) => {
+    const card = canvasElement.querySelector('[data-slot="chat-tool-call"]')
+    await expect(card).toHaveAttribute('data-state', 'closed')
+    await expect(card).toHaveTextContent('====== not found')
+    await expect(card).not.toHaveTextContent('README line 400')
+  }
+}
 export const LongRun: Story = {
   args: { parts: [described, rendered, failed, exported, { ...streaming, toolCallId: 'last' }] }
 }

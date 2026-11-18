@@ -69,6 +69,8 @@
   "toolUndone": "Cofnięto",
   "toolRunning": "Uruchamianie…",
   "toolError": "Błąd",
+  "toolErrorShowAll": "Pokaż wszystko",
+  "toolErrorShowLess": "Pokaż mniej",
   "toolInput": "Wejście",
   "toolOutput": "Wyjście",
   "toolDetails": "Szczegóły wywołania narzędzia",

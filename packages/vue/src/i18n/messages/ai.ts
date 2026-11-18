@@ -167,6 +167,8 @@ export const aiMessageDefaults = {
   toolUndone: 'Undone',
   toolRunning: 'Running…',
   toolError: 'Error',
+  toolErrorShowAll: 'Show all',
+  toolErrorShowLess: 'Show less',
   toolInput: 'Input',
   toolOutput: 'Output',
   toolDetails: 'Tool call details',

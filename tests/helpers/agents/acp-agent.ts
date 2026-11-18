@@ -222,6 +222,42 @@ const SLOW_MARKER = 'slow-reply'
 /** A prompt naming this works for a while in the document the chat belongs to. */
 const SLOW_HERE_MARKER = 'slow-here'
 
+/**
+ * A prompt naming this runs a shell command that fails after printing a long file, as Claude's
+ * adapter reports a failed Bash call: a `tool_call`, then a `failed` update carrying the output.
+ */
+const FAILED_TOOL_MARKER = 'fail-tool'
+const FAILED_TOOL_LINES = 400
+
+function failedToolOutput(): string {
+  const lines = Array.from({ length: FAILED_TOOL_LINES }, (_, line) => `README line ${line + 1}`)
+  return [...lines, '(eval):1: ====== not found'].join('\n')
+}
+
+/** The failed shell call, as Claude's adapter reports it: started, then failed with its output. */
+async function reportFailedTool(sessionId: string): Promise<void> {
+  await connection.sessionUpdate({
+    sessionId,
+    update: {
+      sessionUpdate: 'tool_call',
+      toolCallId: 'failed-terminal',
+      title: 'Terminal',
+      kind: 'execute',
+      status: 'in_progress',
+      rawInput: { command: 'cat README.md && echo ====== && cat assets/brand/README.md' }
+    }
+  })
+  await connection.sessionUpdate({
+    sessionId,
+    update: {
+      sessionUpdate: 'tool_call_update',
+      toolCallId: 'failed-terminal',
+      status: 'failed',
+      content: [{ type: 'content', content: { type: 'text', text: failedToolOutput() } }]
+    }
+  })
+}
+
 const connection: AgentSideConnection = new AgentSideConnection(
   () => ({
     initialize: async () => ({
@@ -257,6 +293,10 @@ const connection: AgentSideConnection = new AgentSideConnection(
       const text = prompt.map((block) => (block.type === 'text' ? block.text : '')).join('')
       // A prompt naming a Pairdraw tool makes it call that first, as an agent designing does.
       const called = await callRequestedTools(text)
+      if (text.includes(FAILED_TOOL_MARKER)) {
+        await reportFailedTool(sessionId)
+        return { stopReason: 'end_turn' }
+      }
       if (text.includes(QUIET_MARKER)) {
         await connection.sessionUpdate({
           sessionId,

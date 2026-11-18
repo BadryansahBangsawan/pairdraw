@@ -69,6 +69,8 @@
   "toolUndone": "Отменено",
   "toolRunning": "Выполняется…",
   "toolError": "Ошибка",
+  "toolErrorShowAll": "Показать всё",
+  "toolErrorShowLess": "Показать меньше",
   "toolInput": "Вход",
   "toolOutput": "Результат",
   "toolDetails": "Подробности вызова инструмента",

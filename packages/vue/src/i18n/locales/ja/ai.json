@@ -69,6 +69,8 @@
   "toolUndone": "取り消し済み",
   "toolRunning": "実行中…",
   "toolError": "エラー",
+  "toolErrorShowAll": "すべて表示",
+  "toolErrorShowLess": "表示を減らす",
   "toolInput": "入力",
   "toolOutput": "出力",
   "toolDetails": "ツール呼び出しの詳細",

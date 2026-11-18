@@ -69,6 +69,8 @@
   "toolUndone": "Deshecho",
   "toolRunning": "Ejecutando…",
   "toolError": "Error",
+  "toolErrorShowAll": "Mostrar todo",
+  "toolErrorShowLess": "Mostrar menos",
   "toolInput": "Entrada",
   "toolOutput": "Salida",
   "toolDetails": "Detalles de la llamada a la herramienta",

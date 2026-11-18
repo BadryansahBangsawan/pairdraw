@@ -284,3 +284,50 @@ test('Zoom to fit via View menu works', async () => {
   const zoomAfter = await getStoreStateNumber('zoom')
   expect(zoomAfter).not.toBe(zoomBefore)
 })
+
+test('Edit and Arrange items wait for a selection that can use them', async () => {
+  await editor.canvas.clearCanvas()
+  async function expectItem(menu: string, name: string, disabled: boolean) {
+    await openAppMenu(editor.page, menu)
+    // A menu item's name carries its shortcut after it, so match the label at its start.
+    const label = new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`)
+    const item = editor.page.getByRole('menuitem', { name: label })
+    if (disabled) await expect(item).toHaveAttribute('data-disabled')
+    else await expect(item).not.toHaveAttribute('data-disabled')
+    await editor.page.keyboard.press('Escape')
+  }
+
+  const editItems = ['Paste to replace', 'Replace inside instance', 'Rename selection…']
+  const arrangeItems = [
+    'Remove auto layout',
+    'Align left',
+    'Align center',
+    'Align right',
+    'Align top',
+    'Align middle',
+    'Align bottom'
+  ]
+  for (const name of editItems) await expectItem('Edit', name, true)
+  for (const name of arrangeItems) await expectItem('Arrange', name, true)
+  await expectItem('Arrange', 'Auto arrange', true)
+
+  await editor.canvas.drawRect(200, 200, 100, 100)
+
+  await expectItem('Edit', 'Rename selection…', false)
+  for (const name of arrangeItems.slice(1)) await expectItem('Arrange', name, false)
+  // A plain rectangle has no auto layout to remove, and one layer has nothing to arrange.
+  await expectItem('Arrange', 'Remove auto layout', true)
+  await expectItem('Arrange', 'Auto arrange', true)
+
+  await editor.canvas.drawRect(400, 200, 100, 100)
+  await editor.page.keyboard.press('Meta+a')
+  await expectItem('Arrange', 'Auto arrange', false)
+
+  await editor.page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
+    for (const id of store.state.selectedIds) store.graph.deleteNode(id)
+    store.clearSelection()
+    store.undo.clear()
+  })
+})

@@ -1,0 +1,1 @@
+- Menu items that act on the selection, such as Paste to replace, Rename selection, Align, Remove Auto Layout and Auto arrange, are disabled while nothing that can use them is selected.

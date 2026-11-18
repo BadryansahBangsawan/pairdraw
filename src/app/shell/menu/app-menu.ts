@@ -329,6 +329,29 @@ export function useAppMenu() {
         void store.state.sceneVersion
         return textLinkTargets(store).length === 0
       }
+      // They act on the selected layers, so they wait for one, as Duplicate and Delete do.
+      case 'paste-to-replace':
+      case 'selection.rename':
+      case 'arrange.align-left':
+      case 'arrange.align-center':
+      case 'arrange.align-right':
+      case 'arrange.align-top':
+      case 'arrange.align-middle':
+      case 'arrange.align-bottom':
+        return store.state.selectedIds.size === 0
+      // It takes the place of a selected layer inside an instance, as Figma's item does.
+      case 'replace-in-instance':
+        void store.state.sceneVersion
+        return store.replaceableInstanceLayers(store.state.selectedIds).length === 0
+      // Only a selected frame with auto layout has one to remove.
+      case 'remove-auto-layout':
+        void store.state.sceneVersion
+        return ![...store.state.selectedIds].some(
+          (id) => store.graph.getNode(id)?.layoutMode !== 'NONE'
+        )
+      case 'arrange-layout':
+        void store.state.sceneVersion
+        return !store.canAutoArrangeNodes([...store.state.selectedIds])
       // They format the selected texts, so they wait for one, as Add Link does.
       case 'text.bold':
       case 'text.italic':

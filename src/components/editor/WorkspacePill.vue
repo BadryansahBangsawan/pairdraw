@@ -29,7 +29,7 @@ const { editor } = useI18n()
 
 <template>
   <div
-    class="absolute start-2.5 top-2.5 z-10 flex items-center gap-2 rounded-xl border border-border bg-panel py-1 ps-1.5 pe-1 elevation-card data-rulers:start-8.5 data-rulers:top-8.5"
+    class="absolute start-2.5 top-2.5 z-30 flex items-center gap-2 rounded-xl border border-border bg-panel py-1 ps-1.5 pe-1 elevation-card data-rulers:start-8.5 data-rulers:top-8.5"
     :data-mode="mode"
     :data-rulers="rulers || undefined"
   >

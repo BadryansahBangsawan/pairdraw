@@ -22,6 +22,29 @@ function click(x: number, y: number) {
   startPenInput({ altKey: false }, x, y, editor, mock(), ref<string | null>(null))
 }
 
+test('a pen point lands on the pixel grid', () => {
+  setup()
+  click(261.59375, 199.5)
+  expect(editor.state.penState?.vertices[0]).toMatchObject({ x: 262, y: 200 })
+})
+
+test('a path drawn from fractional clicks gets a whole-pixel layer', () => {
+  setup()
+  click(261.59375, 199.5)
+  click(320.25, 240.5)
+  editor.penCommit(false)
+  const id = [...editor.state.selectedIds][0]
+  const node = id ? editor.graph.getNode(id) : undefined
+  expect(node).toMatchObject({ x: 262, y: 200 })
+})
+
+test('a pen point keeps its place when Snap to pixel grid is off', () => {
+  setup()
+  editor.state.snappingPreferences.pixelGrid = false
+  click(261.59375, 199.5)
+  expect(editor.state.penState?.vertices[0]).toMatchObject({ x: 261.59375, y: 199.5 })
+})
+
 // Figma desktop 126 at 100%: the pen's next point lines up with the path's own vertices from 4
 // screen pixels away, not 5, and ignores other layers.
 describe('pen vertex snapping', () => {

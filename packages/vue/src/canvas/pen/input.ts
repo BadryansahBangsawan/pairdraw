@@ -3,14 +3,28 @@ import type { Ref } from 'vue'
 import type { Editor } from '@pairdraw/core'
 import { PEN_CLOSE_THRESHOLD } from '@pairdraw/core/constants'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
+import type { SnapGuide } from '@pairdraw/scene-graph/snap'
 
 import { createPenDrag, handlePenDragMove } from '#vue/canvas/pen/drag'
 import { PEN_CURSOR } from '#vue/editor/tool-cursor'
-import { resolveVertexSnap } from '#vue/shared/input/snap'
+import { gridRounding, resolveVertexSnap } from '#vue/shared/input/snap'
 import type { DragState } from '#vue/shared/input/types'
 import { handlePenNodeEditDown } from '#vue/shared/input/vector'
 
 type SetDrag = (drag: DragState) => void
+
+/**
+ * The point the pen records: on the pixel grid the shape tools land on, except on an axis a vertex
+ * already holds, which Figma leaves exactly where that vertex is.
+ */
+function penAnchor(point: Vector, guides: readonly SnapGuide[], editor: Editor): Vector {
+  const round = gridRounding(editor)
+  const snapped = new Set(guides.map((guide) => guide.axis))
+  return {
+    x: snapped.has('x') ? point.x : round(point.x),
+    y: snapped.has('y') ? point.y : round(point.y)
+  }
+}
 
 /** Whether a canvas point lies within the close threshold, in screen pixels, of the path's start. */
 function nearFirstVertex(cx: number, cy: number, first: Vector, editor: Editor) {
@@ -40,7 +54,8 @@ export function startPenInput(
   editor.state.penCursorX = null
   editor.state.penCursorY = null
 
-  const { point } = resolveVertexSnap({ x: cx, y: cy }, penSnapVertices(editor), editor)
+  const { point, guides } = resolveVertexSnap({ x: cx, y: cy }, penSnapVertices(editor), editor)
+  const anchor = penAnchor(point, guides, editor)
   editor.setSnapGuides([])
   if (editor.state.nodeEditState) {
     handlePenNodeEditDown(e, cx, cy, editor, point)
@@ -60,8 +75,8 @@ export function startPenInput(
   }
 
   editor.penSetPendingClose(false)
-  editor.penAddVertex(point.x, point.y)
-  setDrag(createPenDrag(point.x, point.y))
+  editor.penAddVertex(anchor.x, anchor.y)
+  setDrag(createPenDrag(anchor.x, anchor.y))
   cursorOverride.value = PEN_CURSOR
   return true
 }
@@ -72,8 +87,9 @@ export function updatePenHover(cx: number, cy: number, editor: Editor): boolean 
   const snap = resolveVertexSnap({ x: cx, y: cy }, penSnapVertices(editor), editor)
   editor.setSnapGuides(snap.guides)
   if (!editor.state.penState) return true
-  editor.state.penCursorX = snap.point.x
-  editor.state.penCursorY = snap.point.y
+  const anchor = penAnchor(snap.point, snap.guides, editor)
+  editor.state.penCursorX = anchor.x
+  editor.state.penCursorY = anchor.y
 
   const first = editor.state.penState.vertices[0]
   if (editor.state.penState.vertices.length > 2) {

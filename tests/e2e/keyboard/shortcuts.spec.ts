@@ -156,6 +156,33 @@ test.describe('selection shortcuts', () => {
     await openDesignPanel(editor.page)
   })
 
+  test('⌘R renames the layer in the design panel heading', async () => {
+    const id = await editor.page.evaluate(() => {
+      const store = window.pairdraw?.getStore?.()
+      if (!store) throw new Error('Pairdraw store not initialized')
+      const node = store.graph.createNode('RECTANGLE', store.state.currentPageId)
+      store.select([node.id])
+      return node.id
+    })
+
+    await editor.page.keyboard.press('Meta+r')
+
+    const input = editor.page.getByTestId('panel-name-input')
+    await expect(input).toBeFocused()
+    await input.fill('Renamed in design panel')
+    await input.press('Enter')
+    const child = (await getPageChildren()).find((node) => node.id === id)
+    expect(child?.name).toBe('Renamed in design panel')
+
+    // Escape leaves the name as it was.
+    await editor.page.keyboard.press('Meta+r')
+    await expect(editor.page.getByTestId('panel-name-input')).toBeFocused()
+    await editor.page.keyboard.type('Discarded')
+    await editor.page.keyboard.press('Escape')
+    const afterCancel = (await getPageChildren()).find((node) => node.id === id)
+    expect(afterCancel?.name).toBe('Renamed in design panel')
+  })
+
   test('⌘R opens bulk rename for multiple layers', async () => {
     const ids = await editor.page.evaluate(() => {
       const store = window.pairdraw?.getStore?.()

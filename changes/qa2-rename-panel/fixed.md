@@ -1,0 +1,1 @@
+- Pressing ⌘R, or double-clicking the name in the design panel, renames the selected layer in place instead of doing nothing while the Layers view is hidden.

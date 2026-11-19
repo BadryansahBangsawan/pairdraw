@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 
 import { getNodeEditCapability } from '@pairdraw/core'
 import { layerResizes, layerStrokesAndEffects } from '@pairdraw/scene-graph/generated'
 import { readIcon } from '@pairdraw/scene-graph/icons'
 import { isReplacedLayer } from '@pairdraw/scene-graph/instances'
 import { useEditorCommands } from '@pairdraw/vue/editor/commands'
+import { useInlineRename } from '@pairdraw/vue/editor/inline-rename'
 import { useSelectionState } from '@pairdraw/vue/editor/selection-state'
 import { useI18n } from '@pairdraw/vue/i18n'
 import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
@@ -85,6 +86,23 @@ const { getCommand } = useEditorCommands()
 const goToMainComponent = getCommand('selection.goToMainComponent')
 const detachInstance = getCommand('selection.detachInstance')
 const resetInstanceOverrides = getCommand('selection.resetInstanceOverrides')
+// ⌘R and a double-click rename the heading in place, as Figma's right panel does; the Layers view
+// renames its own rows from the same request.
+const rename = useInlineRename((id: string, name: string) => store.renameNode(id, name))
+watch(
+  () => store.state.renameNodeId,
+  (id) => {
+    if (!id) return
+    const selected = store.graph.getNode(id)
+    store.state.renameNodeId = null
+    if (selected) rename.start(selected.id, selected.name)
+  },
+  { immediate: true }
+)
+function startRename() {
+  const selected = node.value
+  if (selected) rename.start(selected.id, selected.name)
+}
 const isComponentType = computed(() => {
   const type = node.value?.type
   return type ? COMPONENT_TYPES.has(type) : false
@@ -122,7 +140,7 @@ const strokesAndEffects = useSceneComputed(() =>
 const showsScalePanel = useSceneComputed(
   () => activeTool.value === 'SCALE' && store.scaleSelectionBounds() !== null
 )
-const { panels } = useI18n()
+const { panels, rename: renameMessages } = useI18n()
 </script>
 
 <template>
@@ -201,9 +219,19 @@ const { panels } = useI18n()
             </span>
           </Tip>
         </template>
-        <span role="heading" aria-level="2" class="min-w-0">
+        <span role="heading" aria-level="2" class="min-w-0" @dblclick="startRename">
           <!-- A swap linked to a property shows the property in place of the layer, as Figma does. -->
           <PropertyBoundField v-if="swapLinked" field="INSTANCE_SWAP" compact />
+          <input
+            v-else-if="rename.editingId.value === node.id"
+            :ref="(input) => rename.focusInput(input as HTMLInputElement | null)"
+            data-test-id="panel-name-input"
+            :aria-label="renameMessages.layerName"
+            class="w-full min-w-0 rounded border border-accent bg-input px-1 py-0 text-xs font-semibold text-surface outline-none"
+            :value="node.name"
+            @blur="rename.commit(node.id, $event)"
+            @keydown.stop="rename.onKeydown"
+          />
           <template v-else>{{ node.name }}</template>
         </span>
         <template #actions>

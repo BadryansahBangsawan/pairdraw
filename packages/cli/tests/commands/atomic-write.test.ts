@@ -85,4 +85,26 @@ describe('convert and export replace the output file', () => {
     expect(await readFile(output, 'utf8')).not.toBe('ORIGINAL')
     expect((await readdir(dir)).filter((name) => name.includes('.tmp'))).toEqual([])
   })
+
+  test('export creates the folder an external-asset HTML export is written into', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-export-assets-'))
+    const source = join(dir, 'note.pen')
+    const output = join(dir, 'missing', 'page', 'index.html')
+    await writeFile(
+      source,
+      JSON.stringify({
+        version: '2.21',
+        children: [{ id: 'note', type: 'text', content: 'Hello' }]
+      })
+    )
+
+    await quietly(() =>
+      runCommand(exportCommand, {
+        rawArgs: [source, '-f', 'html', '--html', 'standalone', '--assets', 'external', '-o', output]
+      })
+    )
+
+    expect(await readFile(output, 'utf8')).toContain('<html')
+    expect(await readdir(join(dir, 'missing', 'page', 'index.assets'))).toContain('pairdraw.css')
+  })
 })

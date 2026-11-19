@@ -1,0 +1,1 @@
+- Exporting HTML with external assets creates the output folder when it does not exist yet.

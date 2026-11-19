@@ -6,6 +6,7 @@ import {
 } from '@pairdraw/scene-graph/mutation-impact'
 
 import { createLayoutRunner } from '#core/layout/mutations'
+
 import { flushPendingComponentSync } from './pending-sync'
 
 interface PendingLayout {

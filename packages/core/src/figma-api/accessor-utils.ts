@@ -9,9 +9,9 @@ import { styleDetachmentChanges } from '@pairdraw/scene-graph/shared-styles'
 import { claimSlotContent, slotScope } from '@pairdraw/scene-graph/slots'
 
 import { assertNodeEditable } from '#core/editor/capabilities'
+import { flushPendingComponentSync } from '#core/figma-api/pending-sync'
 import type { NodeProxyHost } from '#core/figma-api/proxy'
 import { textAutoResizeChanges } from '#core/layout/text-auto-resize'
-import { flushPendingComponentSync } from '#core/figma-api/pending-sync'
 
 export interface NodeProxyInternals {
   id: symbol

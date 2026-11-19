@@ -17,3 +17,4 @@
 - A slot made inside a variant is defined on its set, as Figma keeps it, and removing it drops the content of every variant's instances.
 - A script that edits a component and then reads an instance sees the edit at once, as in Figma: the Plugin API syncs pending component edits before reading or writing a layer inside an instance, and a failed sync is retried at the next read.
 - A binding change on a layer inside a nested instance claims only that binding, so the layer's other bindings keep following their component.
+- A synced bound number takes the value of the mode its copy sits in, not its component's, and a number the instance overrides keeps its own value through the sync.

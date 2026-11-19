@@ -1,5 +1,6 @@
 import type { NodeCloneMode } from '../copy'
 import type { SceneGraph } from '../graph'
+import { shapeGeometryChanges } from '../resize'
 import { slotScope } from '../slots/content'
 import { detachOwnedSlotContent, restoreOwnedSlotContent } from '../slots/frames'
 import { changesMoreThanStrokeLines } from '../strokes'
@@ -272,6 +273,18 @@ function syncInstancesOf(
         }
         // An instance that hugs its layers sizes to what it shows, not to the component.
         keepOwnContentSize(graph, updates, instance, source)
+        // A size that follows the component invalidates outlines the file saved on the instance;
+        // its live box draws them again.
+        if (updates.width !== undefined || updates.height !== undefined) {
+          Object.assign(
+            updates,
+            shapeGeometryChanges(
+              instance,
+              updates.width ?? instance.width,
+              updates.height ?? instance.height
+            )
+          )
+        }
         updateSyncedProps(graph, instance, updates, (key) =>
           isProtectedSyncField(instance, key, protectedField)
         )

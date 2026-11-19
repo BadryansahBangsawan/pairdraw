@@ -3,7 +3,7 @@ import type { Node as YogaNode } from 'yoga-layout'
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { enforcedAspectRatio } from '@pairdraw/scene-graph/layout'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
-import { layoutConstrainedChildRect } from '@pairdraw/scene-graph/resize'
+import { layoutConstrainedChildRect, shapeGeometryChanges } from '@pairdraw/scene-graph/resize'
 
 import { keepsSavedLayout, usesDetachedDerivedLayout } from './derived'
 import { laidOutFlowBox } from './flow-edges'
@@ -49,7 +49,13 @@ function writeLayoutGeometry(
     const value = geometry[key]
     if (value !== undefined && value !== node[key]) changes[key] = value
   }
-  if (Object.keys(changes).length > 0) graph.updateNode(id, changes)
+  const resized = changes.width !== undefined || changes.height !== undefined
+  const outlines = resized
+    ? shapeGeometryChanges(node, changes.width ?? node.width, changes.height ?? node.height)
+    : {}
+  if (Object.keys(changes).length + Object.keys(outlines).length > 0) {
+    graph.updateNode(id, { ...changes, ...outlines })
+  }
   if (!CONSTRAINT_PARENT_TYPES.has(node.type)) return
   // Laying out what a file holds, as a page opens or its fonts arrive, resizes a frame only where
   // our layout differs from the one the file saved; its children keep the places it saved.

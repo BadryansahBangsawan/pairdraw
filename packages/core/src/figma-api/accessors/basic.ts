@@ -10,6 +10,7 @@ import {
   computeConstrainedResizeChanges,
   createResizeSnapshot,
   scaledGeometryChanges,
+  shapeGeometryChanges,
   type ResizeSnapshot
 } from '@pairdraw/scene-graph/resize'
 import { rescaleNodeTree } from '@pairdraw/scene-graph/scaling'
@@ -278,12 +279,14 @@ function descendants(scene: SceneGraph, node: SceneNode): SceneNode[] {
 }
 
 /**
- * A vector's path scaled to its new size, as Figma's resize does. The stroke keeps its weight: with
- * a path to stroke, the saved stroke outline goes and the stroke draws from the scaled path, as
- * when the path is set; without one, the outline is all that draws the stroke, so it scales.
+ * A layer's geometry for its new size, as Figma's resize does. A vector's path scales to the new
+ * size; the stroke keeps its weight: with a path to stroke, the saved stroke outline goes and the
+ * stroke draws from the scaled path, as when the path is set; without one, the outline is all that
+ * draws the stroke, so it scales. Any other layer draws from its live box, so the saved outlines
+ * a file gave it follow the new box the same way.
  */
-function resizedVectorGeometry(node: SceneNode, width: number, height: number): Partial<SceneNode> {
-  if (node.type !== 'VECTOR') return {}
+function resizedNodeGeometry(node: SceneNode, width: number, height: number): Partial<SceneNode> {
+  if (node.type !== 'VECTOR') return shapeGeometryChanges(node, width, height)
   // A side at zero keeps the path along it, as in Figma, so the next resize scales the path from
   // its own extent and gets the shape back.
   const bounds = node.vectorNetwork ? computeAccurateBounds(node.vectorNetwork) : null
@@ -388,7 +391,7 @@ function resizeNode(
     constrained || node.type === 'INSTANCE'
       ? new Map(descendants(scene, node).map((child) => [child.id, createResizeSnapshot(child)]))
       : new Map<string, ResizeSnapshot>()
-  const geometry = resizedVectorGeometry(node, width, height)
+  const geometry = resizedNodeGeometry(node, width, height)
   // A locked ratio does not hold here; it takes the new size, as in Figma.
   const recaptured = recapturedAspectRatio(node, width, height)
   const changed = { width: width !== size.width, height: height !== size.height }

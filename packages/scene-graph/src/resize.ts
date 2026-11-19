@@ -338,6 +338,35 @@ export function scaledGeometryChanges(
   return changes
 }
 
+/**
+ * The saved outlines a size change invalidates on a layer drawn from its live box: its fill
+ * outline follows the box, and its saved stroke outline goes, so the stroke is drawn again at its
+ * weight through the live shape. A vector and text draw from outlines of their own, which scaling
+ * keeps. Without this, a layer that came from a `.fig` with frame outlines keeps drawing the old
+ * box after layout, the Plugin API or an instance sync resizes it.
+ */
+export function shapeGeometryChanges(
+  node: SceneNode,
+  width: number,
+  height: number
+): Pick<Partial<SceneNode>, 'fillGeometry' | 'strokeGeometry'> {
+  if (node.type === 'VECTOR' || node.type === 'TEXT') return {}
+  if (node.fillGeometry.length === 0 && node.strokeGeometry.length === 0) return {}
+  // A box with no extent has no outline to scale from; the live shape draws both again.
+  if (node.width <= 0 || node.height <= 0) return { fillGeometry: [], strokeGeometry: [] }
+  const changes = scaledGeometryChanges(
+    createResizeSnapshot(node),
+    node.width,
+    node.height,
+    width,
+    height
+  )
+  const geometry: Pick<Partial<SceneNode>, 'fillGeometry' | 'strokeGeometry'> = {}
+  if (changes.fillGeometry) geometry.fillGeometry = changes.fillGeometry
+  if (changes.strokeGeometry) geometry.strokeGeometry = changes.strokeGeometry
+  return geometry
+}
+
 type PathTextFields = Pick<SceneNode, 'derivedTextGlyphs' | 'textPathData' | 'textPathBox'>
 
 // Path text scales with its path, including baked path text that kept only rotated glyphs;

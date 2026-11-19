@@ -39,7 +39,7 @@ const SKIPPED_TAGS = new Set([
   'param'
 ])
 
-const KEPT_ATTRIBUTES = ['id', 'class', 'alt', 'title', 'role', 'aria-label', 'lang', 'dir']
+const KEPT_ATTRIBUTES = ['id', 'class', 'alt', 'title', 'type', 'role', 'aria-label', 'lang', 'dir']
 
 /** Input types whose value is text a person reads in the field. */
 const TEXT_INPUT_TYPES = new Set([

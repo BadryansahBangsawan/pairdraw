@@ -95,3 +95,53 @@ describe('reading a capture', () => {
     expect(parseWebCapture(text)).toEqual({ ok: false, error: 'invalid' })
   })
 })
+
+describe('background images in a capture', () => {
+  test('keeps background-image and its painting properties', () => {
+    const root = element('div', {
+      'background-image': 'linear-gradient(red, blue)',
+      'background-size': 'cover',
+      'background-position': 'center',
+      'background-repeat': 'no-repeat'
+    })
+    const result = readWebCapture(capture(root))
+    if (!result.ok) throw new Error(result.error)
+    expect(result.capture.root.computedStyle).toMatchObject({
+      'background-image': 'linear-gradient(red, blue)',
+      'background-size': 'cover',
+      'background-position': 'center',
+      'background-repeat': 'no-repeat'
+    })
+  })
+
+  test('keeps safe image urls and drops script or malformed ones', () => {
+    const root = element('div', {
+      'background-image': `url("${SCRIPT_URL}"), url("https://example.com/bg.png"), url("data:image/png;base64,AAAA")`
+    })
+    const result = readWebCapture(capture(root))
+    if (!result.ok) throw new Error(result.error)
+    const value = result.capture.root.computedStyle['background-image'] ?? ''
+    expect(value).not.toContain('javascript')
+    expect(value).toContain('https://example.com/bg.png')
+    expect(value).toContain('data:image/png;base64,AAAA')
+  })
+
+  test('drops a background-image whose every layer is unsafe', () => {
+    const root = element('div', { 'background-image': `url("${SCRIPT_URL}")` })
+    const result = readWebCapture(capture(root))
+    if (!result.ok) throw new Error(result.error)
+    expect(result.capture.root.computedStyle['background-image']).toBeUndefined()
+  })
+})
+
+describe('form control kinds in a capture', () => {
+  test('keeps the type attribute so an import can tell a checkbox from a text field', () => {
+    const root = element('div', {}, [
+      element('input', {}, [], { type: 'checkbox', name: 'remember', onclick: 'alert(1)' })
+    ])
+    const result = readWebCapture(capture(root))
+    if (!result.ok) throw new Error(result.error)
+    const child = result.capture.root.children[0]
+    expect(child?.type === 'element' && child.attrs).toEqual({ type: 'checkbox' })
+  })
+})

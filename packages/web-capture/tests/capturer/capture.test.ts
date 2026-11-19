@@ -122,6 +122,22 @@ describe('capturing an element', () => {
     if (!gone) throw new Error('fixture has a paragraph')
     await expect(captureElement(gone)).rejects.toThrow('not displayed')
   })
+
+  test('records a gradient background as the style an import paints', async () => {
+    const document = open(
+      '<div id="hero" style="background-image: linear-gradient(160deg, rgb(21, 28, 36), rgb(14, 20, 26)); color: rgb(255, 255, 255)">Hi</div>'
+    )
+    const hero = document.getElementById('hero')
+    if (!hero) throw new Error('fixture has a hero')
+
+    const capture = await captureElement(hero, { inlineImages: false })
+
+    expect(capture.root.tagName).toBe('div')
+    expect(capture.root.computedStyle['background-image']).toBe(
+      'linear-gradient(160deg, rgb(21, 28, 36), rgb(14, 20, 26))'
+    )
+    expect(capture.root.children).toEqual([{ type: 'text', text: 'Hi' }])
+  })
 })
 
 describe('capturing a page', () => {

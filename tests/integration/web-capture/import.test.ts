@@ -141,4 +141,35 @@ describe('importing a web capture', () => {
     editor.undoAction()
     expect(editor.graph.getChildren(editor.state.currentPageId)).toHaveLength(0)
   })
+
+  test('paints a captured gradient background as a gradient fill behind the text', () => {
+    const panel: WebCapture = {
+      ...CAPTURE,
+      root: {
+        ...element(
+          'section',
+          {
+            display: 'block',
+            'background-image': 'linear-gradient(160deg, rgb(21, 28, 36), rgb(14, 20, 26))',
+            color: 'rgb(255, 255, 255)'
+          },
+          [element('p', { display: 'block' }, [{ type: 'text', text: 'Welcome back' }])]
+        ),
+        box: { x: 0, y: 0, width: 420, height: 200 }
+      }
+    }
+    const read = readWebCaptureClipboard(encodeWebCaptureClipboard(panel).html)
+    if (!read?.ok) throw new Error('the capture survives the clipboard')
+
+    const graph = sceneGraphFromStyledHTML(webCaptureDesignDocument(read.capture))
+
+    const [frame] = graph.getChildren(graph.getPages()[0]?.id ?? '')
+    expect(frame?.fills.map((fill) => fill.type)).toEqual(['GRADIENT_LINEAR'])
+    const fill = frame?.fills[0]
+    if (fill?.type !== 'GRADIENT_LINEAR') throw new Error('Expected a linear gradient')
+    expect(fill.gradientStops?.[0]?.color).toMatchObject({ r: 21 / 255, g: 28 / 255, b: 36 / 255 })
+    const [paragraph] = graph.getChildren(frame?.id ?? '')
+    const [text] = graph.getChildren(paragraph?.id ?? '')
+    expect(text?.type).toBe('TEXT')
+  })
 })

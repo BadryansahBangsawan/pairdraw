@@ -19,7 +19,7 @@ const captureHeaderSchema = v.looseObject({
   version: v.number()
 })
 
-/** Attributes a layer can use: names, links, images, and accessible labels. */
+/** Attributes a layer can use: names, links, images, control kinds, and accessible labels. */
 const KEPT_ATTRIBUTES = new Set([
   'id',
   'class',
@@ -27,6 +27,7 @@ const KEPT_ATTRIBUTES = new Set([
   'src',
   'alt',
   'title',
+  'type',
   'role',
   'aria-label',
   'lang',
@@ -94,10 +95,62 @@ function keptAttributes(
   return kept
 }
 
-function keptStyle(style: Record<string, string>): Record<string, string> {
-  return Object.fromEntries(
-    Object.entries(style).filter(([property]) => isCapturedStyleProperty(property))
-  )
+/** The `url(...)` sources of a value, with the spans they occupy. */
+const BACKGROUND_URL = /url\(\s*(['"]?)(.*?)\1\s*\)/g
+
+/**
+ * A `background-image` list with every `url(...)` source limited to what an image layer may
+ * keep; a layer whose source is unsafe is dropped, and a list left empty paints nothing.
+ * Gradient layers carry no address and pass through as written.
+ */
+function keptBackgroundImage(value: string, base: string | undefined): string | null {
+  const layers: string[] = []
+  let cursor = 0
+  let dropped = false
+  for (const match of value.matchAll(BACKGROUND_URL)) {
+    const source = safeImageSource(match[2], base)
+    if (source) layers.push(value.slice(cursor, match.index) + `url("${source}")`)
+    else dropped = true
+    cursor = match.index + match[0].length
+  }
+  if (cursor === 0 && !dropped) return value
+  layers.push(value.slice(cursor))
+  // Split at top-level commas only: a gradient's own commas stay inside its parentheses.
+  const kept: string[] = []
+  let depth = 0
+  let current = ''
+  for (const character of layers.join('')) {
+    if (character === '(') depth++
+    else if (character === ')') depth--
+    if (character === ',' && depth === 0) {
+      kept.push(current)
+      current = ''
+      continue
+    }
+    current += character
+  }
+  kept.push(current)
+  const painted = kept
+    .map((layer) => layer.trim())
+    .filter((layer) => layer.length > 0 && layer !== 'none')
+  return painted.length > 0 ? painted.join(', ') : null
+}
+
+function keptStyle(
+  style: Record<string, string>,
+  base: string | undefined
+): Record<string, string> {
+  const kept: Record<string, string> = {}
+  for (const [property, value] of Object.entries(style)) {
+    if (!isCapturedStyleProperty(property)) continue
+    if (property === 'background-image') {
+      const image = keptBackgroundImage(value, base)
+      if (image) kept[property] = image
+      continue
+    }
+    kept[property] = value
+  }
+  return kept
 }
 
 function normalizeElement(
@@ -124,8 +177,8 @@ function normalizeElement(
     type: 'element',
     tagName: element.tagName,
     attrs: keptAttributes(element.attrs, base),
-    computedStyle: keptStyle(element.computedStyle),
     ...(element.box ? { box: element.box } : {}),
+    computedStyle: keptStyle(element.computedStyle, base),
     children
   }
 }

@@ -18,7 +18,7 @@ bun extensions/vscode/build.ts          # writes extensions/vscode/dist
 The extension's README gives two ways to load the built folder:
 
 - Development: `code --extensionDevelopmentPath="$PWD/extensions/vscode"` opens a window with the extension loaded from source.
-- Permanent, without publishing: copy `extensions/vscode` (with its `dist/` and `package.json`) into `~/.vscode/extensions/pairdraw-0.16.0` and restart VS Code. It then appears as **Pairdraw** in the Extensions view.
+- Permanent, without publishing: copy `extensions/vscode` (with its `dist/` and `package.json`) into `~/.vscode/extensions/pairdraw-<version>`, where `<version>` is the `version` field of the extension's `package.json`, and restart VS Code. It then appears as **Pairdraw** in the Extensions view.
 
 It needs VS Code 1.90 or newer.
 

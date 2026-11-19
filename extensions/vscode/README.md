@@ -15,7 +15,8 @@ Two ways to load the built folder:
 - Development: `code --extensionDevelopmentPath="$PWD/extensions/vscode"` opens a window with the
   extension loaded from source.
 - Permanent, without publishing: copy `extensions/vscode` (with its `dist/` and `package.json`)
-  into `~/.vscode/extensions/pairdraw-0.16.0` and restart VS Code. VS Code lists it as
+  into `~/.vscode/extensions/pairdraw-<version>`, where `<version>` is the `version` field of the
+  extension's `package.json`, and restart VS Code. VS Code lists it as
   **Pairdraw** in the Extensions view. It is not published to any marketplace.
 
 The extension needs a running Pairdraw web editor. `bun run dev` serves one at

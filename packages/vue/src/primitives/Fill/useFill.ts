@@ -3,6 +3,7 @@ import type { Ref } from 'vue'
 
 import type { Fill, GradientStop } from '@pairdraw/scene-graph'
 import { colorToCSS } from '@pairdraw/scene-graph/color'
+import { BLACK, TRANSPARENT } from '@pairdraw/scene-graph/constants'
 import {
   DEFAULT_GRADIENT_TRANSFORM,
   defaultGradientStops,
@@ -22,6 +23,14 @@ const FILL_CATEGORY: Partial<Record<Fill['type'], FillCategory>> = {
   IMAGE: 'IMAGE'
 }
 
+/**
+ * A non-solid fill carries no `color` at runtime even though the model types it as required,
+ * because image and shader paints have no colour; the swatch treats that as no colour paint.
+ */
+function fillColor(fill: Fill, fallback: Color): Color {
+  return (fill as { color?: Color }).color ?? fallback
+}
+
 function effectiveColor(color: Color, opacity: number): Color {
   return { ...color, a: color.a * opacity }
 }
@@ -39,10 +48,12 @@ export function fillCategory(fill: Fill): FillCategory {
 export function fillIsTransparent(fill: Fill): boolean {
   if (fill.opacity < 1) return true
   if (fillCategory(fill) === 'GRADIENT')
-    return fill.gradientStops?.some((stop) => stop.color.a < 1) ?? fill.color.a < 1
+    return (
+      fill.gradientStops?.some((stop) => stop.color.a < 1) ?? fillColor(fill, TRANSPARENT).a < 1
+    )
   if (fillCategory(fill) === 'MESH')
-    return fill.meshPoints?.some((point) => point.color.a < 1) ?? fill.color.a < 1
-  return fill.color.a < 1
+    return fill.meshPoints?.some((point) => point.color.a < 1) ?? fillColor(fill, TRANSPARENT).a < 1
+  return fillColor(fill, TRANSPARENT).a < 1
 }
 
 export function fillSwatchBackground(fill: Fill): string {
@@ -58,7 +69,7 @@ export function fillSwatchBackground(fill: Fill): string {
       .join(', ')
     return `linear-gradient(to right, ${stops})`
   }
-  return colorToCSS(effectiveColor(fill.color, fill.opacity))
+  return colorToCSS(effectiveColor(fillColor(fill, TRANSPARENT), fill.opacity))
 }
 
 /** Fill category state and immutable conversion actions without picker or popover behavior. */
@@ -70,7 +81,9 @@ export function useFill(fill: Ref<Fill>, onUpdate: (fill: Fill) => void) {
   function toSolid() {
     if (category.value === 'SOLID') return
     const color =
-      fill.value.gradientStops?.[0]?.color ?? fill.value.meshPoints?.[0]?.color ?? fill.value.color
+      fill.value.gradientStops?.[0]?.color ??
+      fill.value.meshPoints?.[0]?.color ??
+      fillColor(fill.value, BLACK)
     onUpdate({ ...fill.value, type: 'SOLID', color: { ...color } })
   }
 
@@ -78,7 +91,7 @@ export function useFill(fill: Ref<Fill>, onUpdate: (fill: Fill) => void) {
     if (category.value === 'GRADIENT') return
     const gradientStops = fill.value.gradientStops?.length
       ? structuredClone(fill.value.gradientStops)
-      : defaultGradientStops(fill.value.color)
+      : defaultGradientStops(fillColor(fill.value, BLACK))
     onUpdate({
       ...fill.value,
       type: 'GRADIENT_LINEAR',
@@ -89,7 +102,7 @@ export function useFill(fill: Ref<Fill>, onUpdate: (fill: Fill) => void) {
 
   function toMesh() {
     if (category.value === 'MESH') return
-    const color = fill.value.meshPoints?.[0]?.color ?? fill.value.color
+    const color = fill.value.meshPoints?.[0]?.color ?? fillColor(fill.value, BLACK)
     onUpdate({
       ...fill.value,
       type: 'MESH',

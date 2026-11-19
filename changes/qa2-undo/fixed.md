@@ -1,0 +1,1 @@
+- Image fills open their fill settings again, so Choose image and Replace swap the bytes while keeping the scale mode and crop, for every selected layer and as one undo step.

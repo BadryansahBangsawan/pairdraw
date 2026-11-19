@@ -1,0 +1,1 @@
+- Saving a `.fig` keeps the document when drawing its optional file preview fails: the save falls back to the placeholder thumbnail instead of rejecting.

@@ -7,6 +7,7 @@ import { newLayerDefaults } from '@pairdraw/core'
 import { computeAllLayouts, sizeAutoResizingText } from '@pairdraw/core/layout'
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { parseColor } from '@pairdraw/scene-graph/color'
+import { textLayerName } from '@pairdraw/scene-graph/node-defaults'
 
 import { countScriptNodes, type ScriptNodeSpec } from '@/app/code/script/sandbox/spec'
 
@@ -70,7 +71,12 @@ function createLayer(graph: SceneGraph, spec: ScriptNodeSpec, parentId: string, 
     // other layers keep a square default.
     width: spec.width ?? (type === 'TEXT' ? 0 : 100),
     height: spec.height ?? (type === 'TEXT' ? 0 : 100),
-    name: spec.name ?? type.charAt(0) + type.slice(1).toLowerCase()
+    // As canvas text and the Plugin API name a text layer: by its characters while unnamed.
+    name:
+      spec.name ??
+      (type === 'TEXT'
+        ? textLayerName(type, spec.text ?? '')
+        : type.charAt(0) + type.slice(1).toLowerCase())
   }
   if (type === 'TEXT') Object.assign(overrides, textOverrides(spec))
   if (spec.layout) Object.assign(overrides, layoutOverrides(spec))

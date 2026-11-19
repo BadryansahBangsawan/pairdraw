@@ -1,2 +1,3 @@
 - An instance offers Reset all changes in the canvas menu, the Object menu and its Design panel header, putting it and the instances inside it back over one undo step.
 - Add auto layout to a selection keeps the spacing its layers already have, so a row 20 px apart does not jump together.
+- Text a script draws without a name takes its characters as its layer name, as canvas text and the Plugin API do.

@@ -4,6 +4,8 @@ import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
+import { restoreDeletedEntries } from '#core/editor/clipboard/history'
+import { snapshotSubtree } from '#core/editor/history/subtree'
 import {
   getPageColor,
   setDefaultPageBackground,
@@ -244,18 +246,23 @@ export function createPageActions(ctx: EditorContext, drawing?: PageDrawing) {
     if (prepared.generation !== pageSwitchGeneration) return false
     const page = ctx.graph.getNode(prepared.pageId)
     if (page?.type !== 'CANVAS') return false
+    return showPage(prepared.pageId)
+  }
 
-    if (ctx.state.currentPageId !== prepared.pageId) {
-      ctx.emitEditorEvent('page:leaving', ctx.state.currentPageId, prepared.pageId)
+  /** Puts a page on screen with nothing selected, saving the viewport of the one it leaves. */
+  function showPage(pageId: string): boolean {
+    if (ctx.graph.getNode(pageId)?.type !== 'CANVAS') return false
+    if (ctx.state.currentPageId !== pageId) {
+      ctx.emitEditorEvent('page:leaving', ctx.state.currentPageId, pageId)
     }
     pageViewportStore.saveCurrentPageViewport()
     const previousPageId = ctx.state.currentPageId
-    ctx.state.currentPageId = prepared.pageId
+    ctx.state.currentPageId = pageId
     ctx.state.enteredContainerId = null
     ctx.setSelectedIds(new Set())
-    pageViewportStore.restorePageViewport(prepared.pageId)
-    if (previousPageId !== prepared.pageId) {
-      ctx.emitEditorEvent('page:changed', prepared.pageId, previousPageId)
+    pageViewportStore.restorePageViewport(pageId)
+    if (previousPageId !== pageId) {
+      ctx.emitEditorEvent('page:changed', pageId, previousPageId)
     }
     ctx.requestRender()
     return true
@@ -333,28 +340,72 @@ export function createPageActions(ctx: EditorContext, drawing?: PageDrawing) {
     pageViewportStore.clearPageViewports()
   }
 
+  /** Adds a page after the last one and shows it; one undo step, as in Figma. */
   function addPage(name?: string) {
     const pages = ctx.graph.getPages()
     const pageName = name ?? `Page ${pages.length + 1}`
     const page = ctx.graph.addPage(pageName)
     setDefaultPageBackground(ctx.graph, page, ctx.state.theme)
+    const previousPageId = ctx.state.currentPageId
+    const index = ctx.graph.getPages().findIndex((entry) => entry.id === page.id)
+    const entry = pageEntry(page.id, index)
     void switchPage(page.id)
+    ctx.undo.push({
+      label: 'Add page',
+      forward: () => {
+        restoreDeletedEntries(ctx, [entry])
+        showPage(page.id)
+      },
+      inverse: () => {
+        ctx.graph.deleteNode(page.id)
+        pageViewportStore.deletePageViewport(page.id)
+        showPage(previousPageId)
+      }
+    })
     return page.id
   }
 
-  function deletePage(pageId: string) {
-    const pages = ctx.graph.getPages()
-    if (pages.length <= 1) return
-    const idx = pages.findIndex((p) => p.id === pageId)
-    ctx.graph.deleteNode(pageId)
-    pageViewportStore.deletePageViewport(pageId)
-    if (ctx.state.currentPageId === pageId) {
-      const newIdx = Math.min(idx, pages.length - 2)
-      const remaining = ctx.graph.getPages()
-      void switchPage(remaining[newIdx].id)
+  /** A page, its layers and its place in the list, as undo restores them. */
+  function pageEntry(pageId: string, index: number) {
+    return {
+      id: pageId,
+      parentId: ctx.graph.rootId,
+      index,
+      subtree: snapshotSubtree(ctx.graph, pageId)
     }
   }
 
+  /**
+   * Deletes a page with its layers, showing the page after it. Undo brings the page back whole
+   * at its place in the list, and redo deletes it again. A page the reader has not loaded is
+   * loaded first, so its layers come back too.
+   */
+  async function deletePage(pageId: string) {
+    const pages = ctx.graph.getPages()
+    if (pages.length <= 1) return
+    const index = pages.findIndex((page) => page.id === pageId)
+    if (index === -1) return
+    if (isReaderPagePending(ctx.graph, pageId)) await loadPageNodes(pageId)
+    if (ctx.graph.getNode(pageId)?.type !== 'CANVAS') return
+    const entry = pageEntry(pageId, index)
+    const previousPageId = ctx.state.currentPageId
+    const remaining = pages.filter((page) => page.id !== pageId)
+    const nextPageId = remaining[Math.min(index, remaining.length - 1)].id
+    const remove = () => {
+      ctx.graph.deleteNode(pageId)
+      pageViewportStore.deletePageViewport(pageId)
+      if (ctx.state.currentPageId === pageId) showPage(nextPageId)
+    }
+    const restore = () => {
+      restoreDeletedEntries(ctx, [entry])
+      showPage(pageId)
+    }
+    remove()
+    ctx.undo.push({ label: 'Delete page', forward: remove, inverse: restore })
+    if (previousPageId !== pageId) showPage(previousPageId)
+  }
+
+  /** Moves a page in the list; one undo step back to its place. */
   function movePage(pageId: string, index: number) {
     const pages = ctx.graph.getPages()
     const currentIndex = pages.findIndex((page) => page.id === pageId)
@@ -363,11 +414,29 @@ export function createPageActions(ctx: EditorContext, drawing?: PageDrawing) {
     const nextIndex = Math.max(0, Math.min(index, pages.length - 1))
     if (nextIndex === currentIndex) return
 
-    ctx.graph.insertChildAt(pageId, ctx.graph.rootId, nextIndex)
+    const move = (to: number) => {
+      ctx.graph.insertChildAt(pageId, ctx.graph.rootId, to)
+      ctx.requestRender()
+    }
+    move(nextIndex)
+    ctx.undo.push({
+      label: 'Move page',
+      forward: () => move(nextIndex),
+      inverse: () => move(currentIndex)
+    })
   }
 
+  /** Renames a page; one undo step back to its name. */
   function renamePage(pageId: string, name: string) {
-    ctx.graph.updateNode(pageId, { name })
+    const previous = ctx.graph.getNode(pageId)?.name
+    if (previous === undefined || previous === name) return
+    const rename = (next: string) => ctx.graph.updateNode(pageId, { name: next })
+    rename(name)
+    ctx.undo.push({
+      label: 'Rename page',
+      forward: () => rename(name),
+      inverse: () => rename(previous)
+    })
   }
 
   function setPageColor(color: Color) {

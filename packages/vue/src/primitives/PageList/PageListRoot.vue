@@ -41,7 +41,7 @@ function handleRename(pageId: string, name: string) {
 }
 
 function handleDelete(pageId: string) {
-  deletePage(pageId)
+  void deletePage(pageId)
   emit('delete', pageId)
 }
 

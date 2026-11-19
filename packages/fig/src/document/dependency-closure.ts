@@ -54,17 +54,28 @@ function collectAncestors(
   }
 }
 
+/** Facts about the whole document a selection reuses, so it derives them once per document. */
+export interface SceneDependencyFacts {
+  resolveReference: ReturnType<typeof createResourceResolver>
+  /** Every source the document holds, for style references. */
+  availableIds: ReadonlySet<string>
+  /** The document's page headers, in record order, for selections that name pages. */
+  pageRecords: readonly NodeChange[]
+}
+
 /** Plan reachability without deleting records or expanding unrelated internal siblings. */
 export function collectSceneDependencies(
   changes: readonly NodeChange[],
   pageIds: ReadonlySet<string> | undefined,
   index: SourceIndex,
   /** The whole record for one of `changes`, when they are headers that leave fields out. */
-  whole: (record: NodeChange) => NodeChange = (record) => record
+  whole: (record: NodeChange) => NodeChange = (record) => record,
+  /** Whole-document facts already derived, so a page selection does not scan every record. */
+  facts?: SceneDependencyFacts
 ): SceneDependencyClosure {
-  const resolveReference = createResourceResolver(changes)
+  const resolveReference = facts?.resolveReference ?? createResourceResolver(changes)
   const { sources, children } = index
-  const availableIds = new Set(sources.keys())
+  const availableIds = facts?.availableIds ?? new Set(sources.keys())
   const contentIds = new Set<string>()
   const ancestorIds = new Set<string>()
   const externalPreferredKeys = new Set<string>()
@@ -74,7 +85,7 @@ export function collectSceneDependencies(
   const slotContentReferences = new Set<string>()
   const missingSlotContentIds = new Set<string>()
   validatePageSelection(sources, pageIds)
-  const pending = changes
+  const pending = (facts?.pageRecords ?? changes)
     .filter(
       (node) =>
         node.type === 'CANVAS' &&

@@ -2,6 +2,7 @@ import { expect, test } from 'bun:test'
 
 import { guid } from '#fig-tests/helpers/guid'
 import { collectSceneDependencies } from '#fig/document/dependency-closure'
+import { createResourceResolver } from '#fig/document/resource-reference'
 import { createSourceIndex } from '#fig/instance-overrides/source-index'
 
 import { materializeDocument } from '@pairdraw/fig'
@@ -83,4 +84,41 @@ test('includes component ownership without pulling in unrelated internal definit
   )
   expect([...reached.missingComponentIds]).toEqual(['1:99'])
   expect(reached.missingIds.size).toBe(0)
+})
+
+test('a page selection reuses document facts instead of scanning every record', () => {
+  const changes = [
+    { guid: guid(1), type: 'DOCUMENT' },
+    { guid: guid(2), type: 'CANVAS', parentIndex: { guid: guid(1), position: '!' } },
+    { guid: guid(3), type: 'CANVAS', parentIndex: { guid: guid(1), position: '"' } }
+  ] as NodeChange[]
+  for (let index = 0; index < 40; index++) {
+    const page = index % 2 === 0 ? 2 : 3
+    changes.push({
+      guid: guid(10 + index),
+      type: 'RECTANGLE',
+      parentIndex: { guid: guid(page), position: String.fromCharCode(33 + index) }
+    } as NodeChange)
+  }
+  const index = createSourceIndex(changes)
+  const pageRecords = changes.filter((change) => change.type === 'CANVAS')
+  const facts = {
+    resolveReference: createResourceResolver(changes),
+    availableIds: new Set(index.sources.keys()),
+    pageRecords
+  }
+  let reads = 0
+  const counted = new Proxy(changes, {
+    get(target, key, receiver) {
+      if (typeof key === 'string' && /^\d+$/.test(key)) reads++
+      return Reflect.get(target, key, receiver)
+    }
+  }) as readonly NodeChange[]
+
+  collectSceneDependencies(counted, new Set(['1:2']), index, undefined, facts)
+  expect(reads).toBe(0)
+
+  // Without the facts it derives them again, which is what made a page-by-page read quadratic.
+  collectSceneDependencies(counted, new Set(['1:2']), index)
+  expect(reads).toBeGreaterThan(changes.length)
 })

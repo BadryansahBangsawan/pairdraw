@@ -23,6 +23,7 @@ import { planComponentConstruction } from './components'
 import { DecodedMap } from './decoded-map'
 import { collectSceneDependencies } from './dependency-closure'
 import { inheritComponentPropertyDefinitions, inheritFromAncestors } from './property-inheritance'
+import { createResourceResolver } from './resource-reference'
 
 /** Indexed source document. Resources remain separate from scene occurrences. */
 export function createDocumentReader(source: readonly NodeChange[], pageIds?: ReadonlySet<string>) {
@@ -236,15 +237,72 @@ function archiveRecords(headers: readonly NodeChange[]): ReaderRecords {
 interface SharedReaderState {
   records: ReaderRecords
   sourceInterpreter: ReturnType<typeof createIndexedOccurrenceInterpreter>
+  /**
+   * What every page selection needs from the whole document. Deriving it per selected page
+   * scanned all of the document's records again for each page, which is quadratic over a
+   * document read page by page.
+   */
+  facts: DocumentFacts
+}
+
+/** Whole-document facts a scoped reader reuses, derived once per document. */
+interface DocumentFacts {
+  resources: readonly NodeChange[]
+  /** Every page in saved order, with the GUIDs the reader addresses pages by. */
+  pages: FigPageEntry[]
+  knownPageIds: ReadonlySet<string>
+  /** The page headers an unscoped read starts from. */
+  pageRecords: readonly NodeChange[]
+  /** Every source the document holds, for style references. */
+  availableIds: ReadonlySet<string>
+  resolveReference: ReturnType<typeof createResourceResolver>
+  /** A record's GUID as a string, so a page selection does not re-stringify every record. */
+  guids: readonly (string | undefined)[]
+}
+
+interface FigPageEntry {
+  id: string
+  name: string
+  position: number | null
+  internalOnly: boolean
+}
+
+function documentFacts(records: ReaderRecords, index: SourceIndex): DocumentFacts {
+  const resources = records.filter(isResource)
+  const pageRecords = records.filter((change) => change.type === 'CANVAS')
+  return {
+    resources,
+    pages: pageRecords.toSorted(bySavedPosition).map((page) => {
+      if (!page.guid) throw new Error('Page has no GUID')
+      return {
+        id: guidToString(page.guid),
+        name: page.name ?? '',
+        position: page.parentIndex?.position ?? null,
+        internalOnly: page.internalOnly === true
+      }
+    }),
+    knownPageIds: new Set(
+      pageRecords.flatMap((page) => (page.guid ? [guidToString(page.guid)] : []))
+    ),
+    pageRecords,
+    availableIds: new Set(index.sources.keys()),
+    resolveReference: createResourceResolver(records),
+    guids: records.map((change) => (change.guid ? guidToString(change.guid) : undefined))
+  }
 }
 
 function createSharedReaderState(records: ReaderRecords): SharedReaderState {
   let sourceInterpreter: SharedReaderState['sourceInterpreter'] | undefined
+  let facts: DocumentFacts | undefined
   return {
     records,
     get sourceInterpreter() {
       sourceInterpreter ??= createIndexedOccurrenceInterpreter(records.interpreterIndex())
       return sourceInterpreter
+    },
+    get facts() {
+      facts ??= documentFacts(records.records, records.index)
+      return facts
     }
   }
 }
@@ -257,36 +315,25 @@ function createScopedReader(
   const { records, index, bindingDiagnostics } = shared.records
   const changes = records
   const whole = shared.records.scope()
-  const resources = changes.filter(isResource)
-  const closure = collectSceneDependencies(changes, pageIds, index, whole)
+  const facts = shared.facts
+  const resources = facts.resources
+  const closure = collectSceneDependencies(changes, pageIds, index, whole, facts)
   // Deleted components are interpreted per instance; broken hierarchy is not recoverable.
   if (closure.missingIds.size)
     throw new Error(`Missing reachable sources: ${[...closure.missingIds].join(', ')}`)
-  const sceneChanges = changes
-    .filter(
-      (change) =>
-        !isResource(change) &&
-        (change.type === 'CANVAS' ||
-          (change.guid &&
-            (closure.contentIds.has(guidToString(change.guid)) ||
-              closure.ancestorIds.has(guidToString(change.guid)))))
-    )
-    .map(whole)
+  const sceneChanges: NodeChange[] = []
+  for (const [index, change] of changes.entries()) {
+    if (isResource(change)) continue
+    if (change.type !== 'CANVAS') {
+      const id = facts.guids[index]
+      if (!id || (!closure.contentIds.has(id) && !closure.ancestorIds.has(id))) continue
+    }
+    sceneChanges.push(whole(change))
+  }
   const sourceInterpreter = shared.sourceInterpreter
   const interpreter = createIndexedOccurrenceInterpreter(createSourceIndex(sceneChanges))
-  const pages = changes
-    .filter((change) => change.type === 'CANVAS')
-    .toSorted(bySavedPosition)
-    .map((page) => {
-      if (!page.guid) throw new Error('Page has no GUID')
-      return {
-        id: guidToString(page.guid),
-        name: page.name ?? '',
-        position: page.parentIndex?.position ?? null,
-        internalOnly: page.internalOnly === true
-      }
-    })
-  const knownPageIds = new Set(pages.map((page) => page.id))
+  const pages = facts.pages
+  const knownPageIds = facts.knownPageIds
   let recordIds: ReadonlySet<string> | undefined
   return {
     selectPages(ids: ReadonlySet<string>) {

@@ -1,1 +1,2 @@
 - Each press in a colour picker is now one undo step, and Escape keeps an edit such as a chosen paint type or a typed colour.
+- Groups now shrink to the layers left in them after a delete, a move to another page, or a layers-panel drag, and an auto layout around them makes room.

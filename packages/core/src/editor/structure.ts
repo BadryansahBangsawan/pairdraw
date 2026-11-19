@@ -175,17 +175,21 @@ export function createStructureActions(ctx: EditorContext) {
       ctx.setSelectedIds(new Set())
     }
     move()
-    ctx.undo.push({
-      label: 'Move to page',
-      forward: move,
-      inverse: () => {
-        for (const { id, parentId, index, place } of origins) {
-          ctx.graph.insertChildAt(id, parentId, index)
-          ctx.graph.updateNode(id, place)
+    // Groups the layers left shrink to the rest, or go when empty, in the same undo step.
+    ctx.undo.runBatch('Move to page', () => {
+      ctx.undo.push({
+        label: 'Move to page',
+        forward: move,
+        inverse: () => {
+          for (const { id, parentId, index, place } of origins) {
+            ctx.graph.insertChildAt(id, parentId, index)
+            ctx.graph.updateNode(id, place)
+          }
+          for (const parentId of parentIds) ctx.runLayoutForNode(parentId)
+          ctx.setSelectedIds(new Set(prevSelection))
         }
-        for (const parentId of parentIds) ctx.runLayoutForNode(parentId)
-        ctx.setSelectedIds(new Set(prevSelection))
-      }
+      })
+      fitEnclosingGroupsWithUndo(ctx, parentIds)
     })
   }
 

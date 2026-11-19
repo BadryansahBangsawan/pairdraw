@@ -5,6 +5,7 @@ import { createsComponentCycle } from '@pairdraw/scene-graph/instances'
 
 import { assertNodeEditable } from '#core/editor/capabilities'
 import { prepareSlotEdits } from '#core/editor/components/slots'
+import { fitEnclosingGroupsWithUndo } from '#core/editor/structure/group/bounds'
 import type { EditorContext } from '#core/editor/types'
 import { computeLayout } from '#core/layout'
 
@@ -40,21 +41,25 @@ export function createStructureReorderActions(ctx: EditorContext) {
 
     doReorderChild(nodeId, parentId, insertIndex)
 
-    ctx.undo.push({
-      label: 'Reorder',
-      forward: () => {
-        doReorderChild(nodeId, parentId, insertIndex)
-      },
-      inverse: () => {
-        ctx.graph.insertChildAt(nodeId, origParentId, origIndex >= 0 ? origIndex : 0)
-        ctx.graph.updateNode(nodeId, { x: origX, y: origY })
-        computeLayout(ctx.graph, origParentId)
-        ctx.runLayoutForNode(origParentId)
-        if (origParentId !== parentId) {
-          computeLayout(ctx.graph, parentId)
-          ctx.runLayoutForNode(parentId)
+    // A group the layer left shrinks to the rest, in the same undo step.
+    ctx.undo.runBatch('Reorder', () => {
+      ctx.undo.push({
+        label: 'Reorder',
+        forward: () => {
+          doReorderChild(nodeId, parentId, insertIndex)
+        },
+        inverse: () => {
+          ctx.graph.insertChildAt(nodeId, origParentId, origIndex >= 0 ? origIndex : 0)
+          ctx.graph.updateNode(nodeId, { x: origX, y: origY })
+          computeLayout(ctx.graph, origParentId)
+          ctx.runLayoutForNode(origParentId)
+          if (origParentId !== parentId) {
+            computeLayout(ctx.graph, parentId)
+            ctx.runLayoutForNode(parentId)
+          }
         }
-      }
+      })
+      fitEnclosingGroupsWithUndo(ctx, [origParentId])
     })
   }
 
@@ -83,15 +88,20 @@ export function createStructureReorderActions(ctx: EditorContext) {
     }
     place()
 
-    ctx.undo.push({
-      label: 'Reorder',
-      forward: place,
-      inverse: () => {
-        ctx.graph.insertChildAt(nodeId, origParentId, origIndex)
-        ctx.graph.updateNode(nodeId, origPlace)
-        ctx.runLayoutForNode(origParentId)
-        if (reparents) ctx.runLayoutForNode(newParentId)
-      }
+    // Groups the layer left or joined fit their layers, in the same undo step; one stacking
+    // change can move a group's box too, when a mask changes what it clips.
+    ctx.undo.runBatch('Reorder', () => {
+      ctx.undo.push({
+        label: 'Reorder',
+        forward: place,
+        inverse: () => {
+          ctx.graph.insertChildAt(nodeId, origParentId, origIndex)
+          ctx.graph.updateNode(nodeId, origPlace)
+          ctx.runLayoutForNode(origParentId)
+          if (reparents) ctx.runLayoutForNode(newParentId)
+        }
+      })
+      fitEnclosingGroupsWithUndo(ctx, [origParentId, newParentId])
     })
   }
 

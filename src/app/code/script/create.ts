@@ -78,9 +78,14 @@ export function insertScriptNode(store: EditorStore, source = SCRIPT_STARTER_SOU
   const { width, height } = store.getViewportSize()
   const x = (width / 2 - store.state.panX) / store.state.zoom - SCRIPT_WIDTH / 2
   const y = (height / 2 - store.state.panY) / store.state.zoom - SCRIPT_HEIGHT / 2
-  const id = store.createShape('SCRIPT', Math.round(x), Math.round(y), SCRIPT_WIDTH, SCRIPT_HEIGHT)
-  setScriptSource(store, id, source)
-  store.select([id])
+  let id = ''
+  // Placing the layer and writing its program are one insertion: one undo takes both back, as
+  // the Goodies shaders do. Without the batch, undo rewrites the program and leaves the layer.
+  store.undo.runBatch('Insert script', () => {
+    id = store.createShape('SCRIPT', Math.round(x), Math.round(y), SCRIPT_WIDTH, SCRIPT_HEIGHT)
+    setScriptSource(store, id, source)
+    store.select([id])
+  })
   void runScriptNode(store.graph, id, store.state.currentPageId)
   return id
 }

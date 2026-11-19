@@ -73,6 +73,25 @@ test('a script is placed on the canvas as a selected code layer', async ({ page 
   canvas.assertNoErrors()
 })
 
+test('a script insertion undoes in one step', async ({ page }) => {
+  await page.goto('/?test')
+  const canvas = new CanvasHelper(page)
+  await canvas.waitForInit()
+  const dialog = await openGoodies(page)
+
+  await page.getByTestId('goodies-tab-scripts').click()
+  await dialog
+    .locator('[data-goodie-script="calendar"]')
+    .getByRole('button', { name: 'Insert' })
+    .click()
+  await expect(dialog).toBeHidden()
+  await expect.poll(() => layerCount(page)).toBe(1)
+
+  await canvas.undo()
+  await expect.poll(() => layerCount(page)).toBe(0)
+  canvas.assertNoErrors()
+})
+
 test('a shader fills the selected layer, or a new rectangle that one undo takes away', async ({
   page
 }) => {

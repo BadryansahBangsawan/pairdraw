@@ -553,8 +553,8 @@ function materializeReaderInto(
   for (const { node, record } of linked) {
     generatedFrameCodec(node.type)?.link?.(graph, node, record, layerOf)
   }
-  // Syncing an edited graph's new instances can add layers, which every later pass must see.
-  const added = edited ? collectAdded() : pageNodes
+  // Replaced layers and instance syncing add layers of their own, which every later pass must see.
+  const added = collectAdded()
   // Layers and ranges name their styles by the styles' own IDs, which the records' GUIDs are,
   // so only links to other layers are renamed to the layers this page added.
   for (const node of added) {

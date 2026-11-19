@@ -31,6 +31,7 @@ import { setSnappingPreference, togglePixelGrid } from '@/app/settings/preferenc
 import { removeSelectionAutoLayout } from '@/app/shell/keyboard/auto-layout'
 import { isButtonActivation, isInputElement } from '@/app/shell/keyboard/focus'
 import { shortcutEvent } from '@/app/shell/keyboard/layout'
+import { overlayHoldsKeys } from '@/app/shell/keyboard/overlays'
 import { openShortcutSheet, SHORTCUT_SHEET_KEYBINDINGS } from '@/app/shell/keyboard/sheet'
 import { bindSpaceHandTool } from '@/app/shell/keyboard/space-tool'
 import type {
@@ -209,29 +210,6 @@ function siblingShortcut(
   }
 }
 
-const EDITOR_SHORTCUT_OVERLAY_SELECTOR =
-  '[data-picker-content], [role="dialog"], [role="listbox"], [role="menu"]'
-const PICKER_SELECTOR = '[data-picker-content]'
-const OPEN_LAYER_SELECTOR = '[data-dismissable-layer]:not([data-state="closed"])'
-
-function originatedInOverlay(event: KeyboardEvent, allowPickers = false) {
-  return event
-    .composedPath()
-    .some(
-      (target) =>
-        target instanceof Element &&
-        target.matches(EDITOR_SHORTCUT_OVERLAY_SELECTOR) &&
-        !(allowPickers && target.closest(PICKER_SELECTOR))
-    )
-}
-
-/** A popover, menu, or dialog that is open; one fading out after closing no longer counts. */
-function hasOpenDismissableLayer(allowPickers = false) {
-  return [...document.querySelectorAll(OPEN_LAYER_SELECTOR)].some(
-    (layer) => !(allowPickers && layer.closest(PICKER_SELECTOR))
-  )
-}
-
 /**
  * While text is edited its input handles the keys, undo and redo among them. Focus can leave it
  * for a panel field while the edit stays open, as after a typed font size; undo and redo then
@@ -254,8 +232,7 @@ function shouldIgnoreShortcut(
 ) {
   return (
     isButtonActivation(event) ||
-    hasOpenDismissableLayer(history) ||
-    originatedInOverlay(event, history) ||
+    overlayHoldsKeys(event, history) ||
     fieldKeepsKey(event, shortcutId) ||
     editingTextHandles(options, history) ||
     !!options.store.state.numberFieldFocused

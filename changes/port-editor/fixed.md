@@ -8,3 +8,4 @@
 - The Comment tool no longer covers the canvas, so the wheel, the middle button, and Space still pan while it is selected.
 - The marquee border is now one screen pixel wide at any zoom, as in Figma.
 - A selected layer no longer outlines its parent frames, however deeply nested, as in Figma.
+- Arrow keys no longer move the selection while a list, menu, or dialog is open; they go to it instead.

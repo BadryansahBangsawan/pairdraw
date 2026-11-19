@@ -5,6 +5,7 @@ import { resolveEditorProfile, type EditorProfileInputs, type EditorState } from
 import type { EditorStore } from '@/app/editor/active-store'
 import { appPreferences, type NudgePreferences } from '@/app/settings/preferences/store'
 import { isEditing } from '@/app/shell/keyboard/focus'
+import { nudgeBlocked } from '@/app/shell/keyboard/overlays'
 import { isReservedModShortcut } from '@/app/shell/keyboard/reserved'
 
 const NUDGE_DELTAS: Partial<Record<string, [number, number]>> = {
@@ -53,6 +54,7 @@ export function bindNudgeKeys(store: EditorStore) {
 
     const nudge = nudgeForKey(store.state, e)
     if (!nudge) return
+    if (nudgeBlocked(e)) return
     store.nudgeSelected(nudge[0], nudge[1])
     e.preventDefault()
   })

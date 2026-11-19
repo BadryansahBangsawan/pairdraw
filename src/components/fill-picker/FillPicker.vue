@@ -16,6 +16,7 @@ import { applySolidFillColor, type OkHCLControls } from '@pairdraw/vue/controls/
 import { DEFAULT_SHADER_PRESET } from '@pairdraw/vue/controls/shader'
 import { useI18n } from '@pairdraw/vue/i18n'
 import { useRetainedPopup } from '@pairdraw/vue/lifecycle/retention'
+import { usePickerGesture } from '@pairdraw/vue/primitives/ColorPicker'
 import { FillRoot } from '@pairdraw/vue/primitives/Fill'
 
 import ColorPickerPanel from '@/components/color-picker-panel/ColorPickerPanel.vue'
@@ -82,17 +83,30 @@ const emit = defineEmits<{
   /** Opens the paint's shader in Shader Mode, by the shader's image. */
   openShaderMode: [image: string]
   openChange: [open: boolean]
-  cancel: []
+  /** Ends the edit made so far as one undo step: a press's release, or a change with none held. */
+  commit: []
+  /** `press`: Escape during a press that changed the paint put that press's change back. */
+  cancel: [cause: 'press' | 'escape']
 }>()
 
 /** The inputs a shader's own code declares; a preset declares none. */
 const shaderUniforms = computed(() =>
   shader && !isShaderPresetPaint(shader) ? parseShaderUniforms(shader.source).uniforms : []
 )
-const { open: popupOpen, portalActive } = useRetainedPopup(undefined, () => {
-  emit('cancel')
-  emit('openChange', false)
+let pressFill: Fill = fill
+const gesture = usePickerGesture({
+  open: () => popupOpen.value,
+  // The paint the press found when it first changed it, so an earlier change is not put back.
+  beforeChange: () => {
+    pressFill = fill
+  },
+  commit: () => emit('commit'),
+  cancel: () => {
+    emit('update', pressFill)
+    emit('cancel', 'press')
+  }
 })
+const { open: popupOpen, portalActive } = useRetainedPopup(undefined, () => onOpenChange(false))
 const cls = usePopoverUI({
   content: 'max-h-(--reka-popover-content-available-height) w-60 overflow-y-auto p-2'
 })
@@ -109,15 +123,26 @@ function keepOpenOnFocus(event: FocusOutsideEvent) {
     event.preventDefault()
 }
 
-function cancelFromEscape(event: KeyboardEvent) {
-  event.stopPropagation()
-  emit('cancel')
+/** A press still held when the picker closes is put back, whichever way it closes. */
+function onOpenChange(open: boolean) {
+  if (!open) gesture.abort()
+  emit('openChange', open)
+}
+
+/** Every change a press makes until it ends is one step; with no press it is a step of its own. */
+function change(next: Fill) {
+  gesture.change(() => emit('update', next))
+}
+
+/** A change of its own, such as an image read from a file, waits for a held press to end. */
+function step(next: Fill) {
+  gesture.step(() => emit('update', next))
 }
 </script>
 
 <template>
-  <FillRoot :fill="fill" @update="emit('update', $event)" v-slot="root">
-    <PopoverRoot v-model:open="popupOpen" @update:open="emit('openChange', $event)">
+  <FillRoot :fill="fill" @update="change" v-slot="root">
+    <PopoverRoot v-model:open="popupOpen" @update:open="onOpenChange">
       <PopoverTrigger as-child>
         <button
           type="button"
@@ -143,7 +168,6 @@ function cancelFromEscape(event: KeyboardEvent) {
           :side-offset="4"
           side="left"
           data-picker-content
-          @escape-key-down="cancelFromEscape"
           @pointer-down-outside="keepOpenOnPress"
           @focus-outside="keepOpenOnFocus"
         >
@@ -209,21 +233,17 @@ function cancelFromEscape(event: KeyboardEvent) {
             v-if="root.category === 'SOLID'"
             :color="root.fill.color"
             :okhcl="okhcl"
-            @update="emit('update', applySolidFillColor(root.fill, $event))"
+            @update="change(applySolidFillColor(root.fill, $event))"
           />
 
           <GradientEditor
             v-if="root.category === 'GRADIENT'"
             v-model:active-stop="activeStop"
             :fill="root.fill"
-            @update="emit('update', $event)"
+            @update="change"
           />
 
-          <MeshEditor
-            v-if="root.category === 'MESH'"
-            :fill="root.fill"
-            @update="emit('update', $event)"
-          />
+          <MeshEditor v-if="root.category === 'MESH'" :fill="root.fill" @update="change" />
 
           <ShaderFillPicker
             v-if="shader"
@@ -249,7 +269,7 @@ function cancelFromEscape(event: KeyboardEvent) {
             :fill="root.fill"
             :layer-size="layerSize"
             :fill-index="fillIndex"
-            @update="emit('update', $event)"
+            @update="step"
           />
         </PopoverContent>
       </PopoverPortal>

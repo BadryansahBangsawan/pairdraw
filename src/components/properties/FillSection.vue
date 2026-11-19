@@ -203,6 +203,7 @@ function updateSolidColor(
                   "
                   @open-change="onPickerOpenChange(selectedNodeIds, index, $event, binding.actions)"
                   @cancel="cancelPaintMutation(binding.actions)"
+                  @commit="commitPaintMutation(binding.actions)"
                 />
               </template>
 

@@ -1,0 +1,1 @@
+- Each press in a colour picker is now one undo step, and Escape keeps an edit such as a chosen paint type or a typed colour.

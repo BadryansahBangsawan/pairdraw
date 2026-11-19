@@ -1,9 +1,11 @@
 import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
 import { expectDefined } from '#tests/helpers/assert'
+import { fillDriver } from '#tests/helpers/canvas/fill-driver'
 import { propertyField, propertyItems, propertySection } from '#tests/helpers/properties'
 import { getPageChildren, getSelectedNode } from '#tests/helpers/store'
 
 const editor = useEditorSetup()
+const fill = fillDriver(() => editor.page)
 
 test('property sections are always expanded (no collapse on title click)', async () => {
   await editor.canvas.clearCanvas()
@@ -326,7 +328,9 @@ test('fill color can bind an existing variable', async () => {
   editor.canvas.assertNoErrors()
 })
 
-test('bound fill picker opens non-destructively and Escape rolls back color edits', async () => {
+// Figma desktop 126: a colour picked for a bound fill detaches it, Escape closes the picker and keeps
+// the colour, and one undo puts the binding back.
+test('bound fill picker opens non-destructively, and Escape keeps a detaching color edit', async () => {
   await editor.canvas.clearCanvas()
   await editor.canvas.drawRect(200, 200, 80, 80)
 
@@ -353,29 +357,22 @@ test('bound fill picker opens non-destructively and Escape rolls back color edit
   await fillItem.getByTestId('fill-picker-swatch').click()
   await expect(fillItem.getByText('rollback-brand')).toBeVisible()
 
-  const opened = await editor.page.evaluate(() => {
-    const store = window.pairdraw?.getStore?.()
-    if (!store) throw new Error('Pairdraw store not initialized')
-    const id = [...store.state.selectedIds][0]
-    const node = id ? store.getNode(id) : null
-    return { color: node?.fills[0]?.color, binding: node?.boundVariables['fills/0/color'] }
-  })
-  expect(opened).toEqual(before)
+  expect(await fill.boundPaint()).toEqual(before)
 
   const area = editor.page.locator('.cursor-crosshair').first()
   const box = expectDefined(await area.boundingBox(), 'color area bounds')
   await editor.page.mouse.click(box.x + box.width - 8, box.y + 8)
-  await editor.page.keyboard.press('Escape')
-  await editor.canvas.waitForRender()
+  const edited = await fill.boundPaint()
+  expect(edited.binding).toBeUndefined()
+  expect(edited.color).not.toEqual(before.color)
 
-  const after = await editor.page.evaluate(() => {
-    const store = window.pairdraw?.getStore?.()
-    if (!store) throw new Error('Pairdraw store not initialized')
-    const id = [...store.state.selectedIds][0]
-    const node = id ? store.getNode(id) : null
-    return { color: node?.fills[0]?.color, binding: node?.boundVariables['fills/0/color'] }
-  })
-  expect(after).toEqual(before)
+  await editor.page.keyboard.press('Escape')
+  await expect(editor.page.locator('[data-picker-content]')).toBeHidden()
+  await editor.canvas.waitForRender()
+  expect(await fill.boundPaint()).toEqual(edited)
+
+  await editor.canvas.undo()
+  expect(await fill.boundPaint()).toEqual(before)
   await expect(fillItem.getByText('rollback-brand')).toBeVisible()
   editor.canvas.assertNoErrors()
 })

@@ -55,8 +55,9 @@ function onCustomColor(color: Color): void {
   accentPreference.value = { kind: 'custom', color: colorToHex(color) }
 }
 
-function onCancel(): void {
-  if (beforeEdit.value) accentPreference.value = beforeEdit.value
+function onCancel(cause: 'press' | 'escape'): void {
+  // A press Escape put back already returned its colour; only closing restores what it opened with.
+  if (cause === 'escape' && beforeEdit.value) accentPreference.value = beforeEdit.value
 }
 </script>
 
@@ -83,6 +84,7 @@ function onCancel(): void {
     <Tip :label="messages.accentCustom">
       <ColorPicker
         :color="customColor"
+        escape-reverts
         @update="onCustomColor"
         @open-change="onPickerOpenChange"
         @cancel="onCancel"

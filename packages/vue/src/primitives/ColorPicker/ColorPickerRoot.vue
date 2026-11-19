@@ -7,6 +7,8 @@ import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { useRetainedPopup } from '#vue/lifecycle/retention/popup'
 
+import { usePickerGesture, type PickerCancelCause } from './gesture'
+
 export interface ColorPickerUI {
   content?: string
   swatch?: string
@@ -15,33 +17,71 @@ export interface ColorPickerUI {
 const {
   color,
   label = 'Edit color',
-  ui
+  ui,
+  escapeReverts = false
 } = defineProps<{
   color: Color
   label?: string
   ui?: ColorPickerUI
+  /**
+   * For a colour with no undo history, such as a preference: Escape closing the picker puts back
+   * the colour it opened with. Otherwise Escape keeps the edit, as Figma's picker does.
+   */
+  escapeReverts?: boolean
 }>()
 
 const emit = defineEmits<{
   update: [color: Color]
   openChange: [open: boolean]
-  cancel: []
+  /** Ends the edit made so far as one undo step: a press's release, or a change with none held. */
+  commit: []
+  /**
+   * `press`: Escape during a press that changed the colour, or the picker closing during one; the
+   * colour from before the press has just come back through `update`. `escape`: with
+   * `escapeReverts`, Escape closed the picker after the colour it opened with came back.
+   */
+  cancel: [cause: PickerCancelCause]
 }>()
 
 const swatchBg = computed(() => colorToCSS(color))
-const { open: popupOpen, portalActive } = useRetainedPopup(undefined, () => {
-  emit('cancel')
-  emit('openChange', false)
+let pressColor: Color = { ...color }
+const gesture = usePickerGesture({
+  open: () => popupOpen.value,
+  // The colour the press found when it first changed it, so a change from elsewhere since the
+  // press began is not put back.
+  beforeChange: () => {
+    pressColor = { ...color }
+  },
+  commit: () => emit('commit'),
+  cancel: () => {
+    emit('update', pressColor)
+    emit('cancel', 'press')
+  }
 })
+const { open: popupOpen, portalActive } = useRetainedPopup(undefined, () => onOpenChange(false))
 
-function cancelFromEscape(event: KeyboardEvent) {
-  event.stopPropagation()
-  emit('cancel')
+let openColor: Color = { ...color }
+
+/** A press still held when the picker closes is put back, whichever way it closes. */
+function onOpenChange(open: boolean) {
+  if (open) openColor = { ...color }
+  if (!open) gesture.abort()
+  emit('openChange', open)
+}
+
+function update(next: Color) {
+  gesture.change(() => emit('update', next))
+}
+
+function onEscapeKeyDown() {
+  if (!escapeReverts) return
+  emit('update', openColor)
+  emit('cancel', 'escape')
 }
 </script>
 
 <template>
-  <PopoverRoot v-model:open="popupOpen" @update:open="emit('openChange', $event)">
+  <PopoverRoot v-model:open="popupOpen" @update:open="onOpenChange">
     <PopoverTrigger as-child>
       <slot name="trigger" :style="{ background: swatchBg }">
         <button
@@ -59,9 +99,9 @@ function cancelFromEscape(event: KeyboardEvent) {
         :side-offset="4"
         side="left"
         data-picker-content
-        @escape-key-down="cancelFromEscape"
+        @escape-key-down="onEscapeKeyDown"
       >
-        <slot :color="color" />
+        <slot :color="color" :update="update" />
       </PopoverContent>
     </PopoverPortal>
   </PopoverRoot>

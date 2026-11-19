@@ -91,8 +91,13 @@ test('mesh tab switches a fill, recoloring a point changes it, as one undo step'
 
   expect(pointAfterRecolor).not.toEqual(pointBeforeRecolor)
 
-  // The switch and the recolor share one edit, so one undo returns the fill to solid, as with the
-  // colour picker whose changes settle into one undo step (color-picker/history.spec.ts).
+  // The switch and the recolor are steps of their own, as a picker's discrete change and its press
+  // are (color-picker/history.spec.ts): the recolor undoes to the mesh's first point, then the
+  // switch returns the fill to solid.
+  await canvas.undo()
+  const reverted = await getSelectedFill()
+  expect(reverted?.type).toBe('MESH')
+  expect(reverted?.meshPoints?.[0]?.color).toEqual(pointBeforeRecolor)
   await canvas.undo()
   expect(await getSelectedFill()).toEqual(before)
   canvas.assertNoErrors()

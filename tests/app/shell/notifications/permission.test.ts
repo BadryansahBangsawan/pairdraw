@@ -46,7 +46,7 @@ describe('browser notification permission', () => {
 
   test('follows the site setting through onchange', async () => {
     const { browserNotificationPermission } = await import('@/app/shell/notifications/permission')
-    // The module queries the permission as it loads; the handler is set once that resolves.
+    // The first read starts the query; the handler is set once that resolves.
     for (let turn = 0; turn < 50 && status.onchange === null; turn++) await Promise.resolve()
     expect(status.onchange).toBeFunction()
     notificationDouble.permission = 'granted'

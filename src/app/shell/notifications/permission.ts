@@ -1,4 +1,4 @@
-import { readonly, shallowRef } from 'vue'
+import { computed, readonly, shallowRef } from 'vue'
 
 import { IS_TAURI } from '@pairdraw/core/constants'
 
@@ -12,7 +12,9 @@ function current(): BrowserNotificationPermission {
   return typeof Notification === 'undefined' ? 'unsupported' : Notification.permission
 }
 
-const permission = shallowRef(current())
+// Bumped when the site setting changes, so the computed below reads the new permission.
+const changed = shallowRef(0)
+let following = false
 
 // The person can change the site setting while the page is open. Follow it through the
 // status's `onchange`: Chromium's notifications PermissionStatus throws on addEventListener
@@ -22,7 +24,7 @@ async function followPermissionChanges(): Promise<void> {
   try {
     const status = await navigator.permissions.query({ name: 'notifications' })
     status.onchange = () => {
-      permission.value = current()
+      changed.value++
     }
   } catch (error) {
     // A browser that refuses the query keeps the permission it reported at load.
@@ -30,10 +32,22 @@ async function followPermissionChanges(): Promise<void> {
   }
 }
 
-void followPermissionChanges()
-
-/** The page's notification permission, kept current as the site setting changes. */
-export const browserNotificationPermission = readonly(permission)
+/**
+ * The permission reads live, and the query starts on the first read rather than at import,
+ * so a module loaded before the page has its globals does not freeze a stale answer.
+ */
+export const browserNotificationPermission = readonly(
+  computed(() => {
+    if (!following) {
+      following = true
+      void followPermissionChanges()
+    }
+    const permission = current()
+    // The counter is a dependency: a site-setting change recomputes the permission.
+    void changed.value
+    return permission
+  })
+)
 
 /**
  * Asks the browser for permission. It must run from a click: Firefox and Safari refuse requests
@@ -41,5 +55,6 @@ export const browserNotificationPermission = readonly(permission)
  */
 export async function requestBrowserNotificationPermission(): Promise<void> {
   if (typeof Notification === 'undefined') return
-  permission.value = await Notification.requestPermission()
+  await Notification.requestPermission()
+  changed.value++
 }

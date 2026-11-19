@@ -126,8 +126,10 @@ describe('saving a server-opened document without a path', () => {
     }
     const bytes = new Uint8Array(await Bun.file(testPath('fixtures', 'slots.fig')).arrayBuffer())
     // Bun's fetch type carries a static preconnect the mock does not need.
-    const fetchMock = vi.spyOn(globalThis, 'fetch')
-    fetchMock.mockImplementation((async () => new Response(bytes)) as unknown as typeof fetch)
+    const fetchDouble = Object.assign(async () => new Response(bytes), {
+      preconnect: () => undefined
+    })
+    vi.spyOn(globalThis, 'fetch').mockImplementation(fetchDouble)
     const agent = { session: 'cli', kind: 'mcp', client: 'CLI' }
     // The session opens two files, then closes the one it edits last; the first stays open.
     await settle(handleRequest(getActiveStore(), 'open_file', { path: '/root/slots.fig', agent }))

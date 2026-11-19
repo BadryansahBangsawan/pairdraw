@@ -13,7 +13,7 @@ import {
   type LintMessage
 } from '@pairdraw/core/lint'
 
-import { bold, dim, fail, fmtList, ok, printError } from '#cli/format'
+import { bold, dim, fail, fmtList, ok, printError, printJSON, writeStdout } from '#cli/format'
 import { loadDocument, populateWholeDocument, writeDocumentFile } from '#cli/headless'
 
 function formatSeverity(severity: LintMessage['severity']) {
@@ -104,19 +104,14 @@ export default defineCommand({
     }
 
     if (args.json) {
-      console.log(JSON.stringify(result, null, 2))
+      await printJSON(result)
     } else if (result.messages.length === 0) {
       console.log(ok('No lint issues found.'))
     } else {
-      console.log('')
-      console.log(
-        bold(
-          `Lint issues: ${result.errorCount} errors, ${result.warningCount} warnings, ${result.infoCount} info`
-        )
+      const header = bold(
+        `Lint issues: ${result.errorCount} errors, ${result.warningCount} warnings, ${result.infoCount} info`
       )
-      console.log('')
-      console.log(fmtList(result.messages.map(formatMessage)))
-      console.log('')
+      await writeStdout(`\n${header}\n\n${fmtList(result.messages.map(formatMessage))}\n\n`)
     }
 
     if (result.errorCount > 0) process.exit(1)

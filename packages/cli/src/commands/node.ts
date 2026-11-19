@@ -5,7 +5,7 @@ import { colorToHex } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { appTargetOptions } from '#cli/app/target'
-import { fmtNode, printError, formatType } from '#cli/format'
+import { fmtNode, printError, formatType, printJSON, writeStdout } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
@@ -36,7 +36,7 @@ export default defineCommand({
     }
 
     if (args.json) {
-      console.log(JSON.stringify(data, null, 2))
+      await printJSON(data)
       return
     }
 
@@ -74,8 +74,6 @@ export default defineCommand({
       details[`var:${field}`] = name
     }
 
-    console.log('')
-    console.log(fmtNode(nodeData, details))
-    console.log('')
+    await writeStdout(`\n${fmtNode(nodeData, details)}\n\n`)
   }
 })

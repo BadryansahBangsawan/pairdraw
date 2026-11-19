@@ -2,7 +2,7 @@ import { defineCommand } from 'citty'
 
 import { IORegistry } from '@pairdraw/core/io'
 
-import { bold, fmtList, kv } from '#cli/format'
+import { bold, fmtList, kv, printJSON } from '#cli/format'
 import { CLI_IO_FORMATS } from '#cli/headless'
 
 const io = new IORegistry(CLI_IO_FORMATS)
@@ -35,7 +35,7 @@ export default defineCommand({
     }))
 
     if (args.json) {
-      console.log(JSON.stringify(formats, null, 2))
+      await printJSON(formats)
       return
     }
 

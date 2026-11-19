@@ -3,7 +3,7 @@ import { defineCommand } from 'citty'
 import type { AnalyzeSpacingResult } from '@pairdraw/core/rpc'
 
 import { appTargetOptions } from '#cli/app/target'
-import { bold, kv, fmtHistogram, fmtSummary } from '#cli/format'
+import { bold, kv, fmtHistogram, fmtSummary, printJSON } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
@@ -28,7 +28,7 @@ export default defineCommand({
     const gridSize = Number(args.grid)
 
     if (args.json) {
-      console.log(JSON.stringify(data, null, 2))
+      await printJSON(data)
       return
     }
 

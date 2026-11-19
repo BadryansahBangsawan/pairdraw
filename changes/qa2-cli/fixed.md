@@ -4,3 +4,5 @@
 - The browser app starts on Chromium versions whose notification permission status refuses event listeners, instead of showing "Pairdraw couldn't start".
 - `pairdraw documents save` writes a browser document opened or created through the MCP server back to its file, instead of asking for a path it already has; `documents new --path` names the document after that file.
 - `pairdraw export` and `pairdraw convert` write their default output next to the input file and never over it: a `.fig` export of `design.fig` without `-o` now writes `design-export.fig` instead of replacing the document with the exported page or node.
+- Opening a file that is already open recovers an automation session whose document was closed, so untargeted CLI calls work again without passing `--document-id`.
+- Piped CLI output carries all of it: `pairdraw tree design.fig --json | jq` no longer truncates at 64 KB, and large human-readable results (lint, find, query, diff, node, tool) stream through the same path.

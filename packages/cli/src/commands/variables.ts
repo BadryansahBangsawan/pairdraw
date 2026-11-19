@@ -3,7 +3,7 @@ import { defineCommand } from 'citty'
 import type { VariablesResult } from '@pairdraw/core/rpc'
 
 import { appTargetOptions } from '#cli/app/target'
-import { bold, entity, fmtList, fmtSummary } from '#cli/format'
+import { bold, entity, fmtList, fmtSummary, printJSON } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 /** Document, filters, and output shared by the commands that read variables. */
@@ -34,7 +34,7 @@ export default defineCommand({
     )
 
     if (args.json) {
-      console.log(JSON.stringify(data, null, 2))
+      await printJSON(data)
       return
     }
 

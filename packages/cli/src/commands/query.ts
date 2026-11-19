@@ -3,7 +3,7 @@ import { defineCommand } from 'citty'
 import type { QueryNodeResult } from '@pairdraw/core/rpc'
 
 import { appTargetOptions } from '#cli/app/target'
-import { printNodeResults, printError } from '#cli/format'
+import { printNodeResults, printError, printJSON } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
@@ -46,11 +46,11 @@ export default defineCommand({
     }
 
     if (args.json) {
-      console.log(JSON.stringify(results, null, 2))
+      await printJSON(results)
       return
     }
 
-    printNodeResults(results, (n) => {
+    await printNodeResults(results, (n) => {
       const q = n as { width?: number; height?: number; name: string }
       return `${q.name}  ${q.width}×${q.height}`
     })

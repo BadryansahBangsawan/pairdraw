@@ -1,6 +1,6 @@
 import { rpcResponse } from '#cli/app/client'
 import type { AppTarget } from '#cli/app/target'
-import { entity, fmtList, printError } from '#cli/format'
+import { entity, fmtList, printError, printJSON } from '#cli/format'
 
 function targetDetails(target: AppTarget): Record<string, string> {
   return {
@@ -22,7 +22,7 @@ export async function runAppCommand(
   try {
     const response = await rpcResponse(command, args)
     if (options.json) {
-      console.log(JSON.stringify(response, null, 2))
+      await printJSON(response)
       return
     }
     const header = options.message(response.result)

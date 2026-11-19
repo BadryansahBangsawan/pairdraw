@@ -3,7 +3,7 @@ import { defineCommand } from 'citty'
 import type { FindNodeResult } from '@pairdraw/core/rpc'
 
 import { appTargetOptions } from '#cli/app/target'
-import { printNodeResults } from '#cli/format'
+import { printNodeResults, printJSON } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
@@ -35,10 +35,10 @@ export default defineCommand({
     )
 
     if (args.json) {
-      console.log(JSON.stringify(results, null, 2))
+      await printJSON(results)
       return
     }
 
-    printNodeResults(results)
+    await printNodeResults(results)
   }
 })

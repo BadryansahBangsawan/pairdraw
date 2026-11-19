@@ -3,7 +3,7 @@ import { defineCommand } from 'citty'
 import type { AnalyzeTypographyResult } from '@pairdraw/core/rpc'
 
 import { appTargetOptions } from '#cli/app/target'
-import { bold, fmtHistogram, fmtSummary } from '#cli/format'
+import { bold, fmtHistogram, fmtSummary, printJSON, writeStdout } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 function weightName(w: number): string {
@@ -45,7 +45,7 @@ export default defineCommand({
     const groupBy = args['group-by']
 
     if (args.json) {
-      console.log(JSON.stringify(data, null, 2))
+      await printJSON(data)
       return
     }
 
@@ -99,7 +99,7 @@ export default defineCommand({
         const lh = s.lineHeight !== 'auto' ? ` / ${s.lineHeight}` : ''
         return { label: `${s.family} ${s.size}px ${weightName(s.weight)}${lh}`, value: s.count }
       })
-      console.log(fmtHistogram(items))
+      await writeStdout(`${fmtHistogram(items)}\n`)
     }
 
     console.log('')

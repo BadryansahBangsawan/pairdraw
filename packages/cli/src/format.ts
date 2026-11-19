@@ -34,25 +34,22 @@ export {
   fmtSummary
 }
 
-export function printNodeResults(
+export async function printNodeResults(
   results: Array<{ type: string; name: string; id: string }>,
   formatLabel: (n: { type: string; name: string; id: string }) => string = (n) => n.name
-): void {
+): Promise<void> {
   if (results.length === 0) {
     console.log('No nodes found.')
     return
   }
-  console.log('')
-  console.log(bold(`  Found ${results.length} node${results.length > 1 ? 's' : ''}`))
-  console.log('')
-  console.log(
-    fmtList(
-      results.map((n) => ({
-        header: entity(formatType(n.type), formatLabel(n), n.id)
-      }))
-    )
+  const list = fmtList(
+    results.map((n) => ({
+      header: entity(formatType(n.type), formatLabel(n), n.id)
+    }))
   )
-  console.log('')
+  await writeStdout(
+    `\n${bold(`  Found ${results.length} node${results.length > 1 ? 's' : ''}`)}\n\n${list}\n\n`
+  )
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -87,6 +84,11 @@ export function writeStdout(text: string): Promise<void> {
   return new Promise((resolve, reject) => {
     process.stdout.write(text, (error) => (error ? reject(error) : resolve()))
   })
+}
+
+/** Writes a `--json` result through the stream, so a pipe takes all of it, not the first 64 KB. */
+export function printJSON(value: unknown): Promise<void> {
+  return writeStdout(`${JSON.stringify(value, null, 2)}\n`)
 }
 
 export function printError(error: unknown): void {

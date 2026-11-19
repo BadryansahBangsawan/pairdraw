@@ -8,7 +8,7 @@ import {
   publishBasicsLibrary
 } from '@pairdraw/core/library'
 
-import { bold, dim, fmtList, ok, printError } from '#cli/format'
+import { bold, dim, fmtList, ok, printError, printJSON } from '#cli/format'
 import { loadDocument, populateWholeDocument, writeDocumentFile } from '#cli/headless'
 import { FileSystemLibraryCatalog } from '#cli/library/catalog'
 
@@ -21,7 +21,7 @@ const list = defineCommand({
   async run({ args }) {
     const libraries = await new FileSystemLibraryCatalog(args.root).listLibraries()
     if (args.json) {
-      console.log(JSON.stringify(libraries, null, 2))
+      await printJSON(libraries)
       return
     }
     console.log('')
@@ -81,7 +81,7 @@ const publish = defineCommand({
     // Only once published: a failed publication leaves the source as it was.
     if (args.write && assigned.length > 0) await writeDocumentFile(graph, file)
     if (args.json) {
-      console.log(JSON.stringify(revision.manifest, null, 2))
+      await printJSON(revision.manifest)
       return
     }
     if (assigned.length > 0) {
@@ -113,7 +113,7 @@ const seed = defineCommand({
     if (existing.some((library) => library.libraryId === BUILTIN_LIBRARY_ID)) {
       const current = existing.find((library) => library.libraryId === BUILTIN_LIBRARY_ID)
       if (args.json) {
-        console.log(JSON.stringify({ seeded: false, ...current }, null, 2))
+        await printJSON({ seeded: false, ...current })
         return
       }
       console.log(ok(`Pairdraw Basics already in ${args.root}`))
@@ -121,7 +121,7 @@ const seed = defineCommand({
     }
     const revision = await publishBasicsLibrary(catalog)
     if (args.json) {
-      console.log(JSON.stringify({ seeded: true, ...revision.manifest }, null, 2))
+      await printJSON({ seeded: true, ...revision.manifest })
       return
     }
     console.log(ok(`Seeded Pairdraw Basics @ ${revision.manifest.revisionId}`))

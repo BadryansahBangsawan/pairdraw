@@ -2,7 +2,7 @@ import { defineCommand } from 'citty'
 import { flattenObject } from 'es-toolkit'
 
 import { rpc } from '#cli/app/client'
-import { bold, kv, ok, printError } from '#cli/format'
+import { bold, kv, ok, printError, printJSON } from '#cli/format'
 
 type Settings = Record<string, unknown>
 
@@ -52,7 +52,7 @@ const get = defineCommand({
       const { settings } = await rpc<{ settings: Settings }>('get_settings')
       const value = args.key ? readPath(settings, args.key) : settings
       if (args.json) {
-        console.log(JSON.stringify(value, null, 2))
+        await printJSON(value)
       } else if (value && typeof value === 'object') {
         printSettings(value as Settings)
       } else {
@@ -86,7 +86,7 @@ const set = defineCommand({
         settings: patchFor(args.key, parseValue(args.value))
       })
       if (args.json) {
-        console.log(JSON.stringify(settings, null, 2))
+        await printJSON(settings)
         return
       }
       console.log(ok(`${bold(args.key)} = ${JSON.stringify(readPath(settings, args.key))}`))

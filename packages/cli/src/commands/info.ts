@@ -3,7 +3,7 @@ import { defineCommand } from 'citty'
 import type { InfoResult } from '@pairdraw/core/rpc'
 
 import { appTargetOptions } from '#cli/app/target'
-import { bold, fmtHistogram, fmtSummary, kv } from '#cli/format'
+import { bold, fmtHistogram, fmtSummary, kv, printJSON } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
@@ -21,7 +21,7 @@ export default defineCommand({
     const data = await loadRPCData<InfoResult>(args.file, 'info', undefined, args)
 
     if (args.json) {
-      console.log(JSON.stringify(data, null, 2))
+      await printJSON(data)
       return
     }
 

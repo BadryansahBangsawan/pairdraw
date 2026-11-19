@@ -2,7 +2,7 @@ import { defineCommand } from 'citty'
 
 import { diffDocuments } from '@pairdraw/core/tools'
 
-import { bold, dim, ok, printError } from '#cli/format'
+import { bold, dim, ok, printError, printJSON } from '#cli/format'
 import { loadDocument, populateWholeDocument } from '#cli/headless'
 
 import { printUnifiedDiff } from './output'
@@ -36,14 +36,14 @@ export default defineCommand({
     }
 
     if (args.json) {
-      console.log(JSON.stringify(result, null, 2))
+      await printJSON(result)
     } else if (!result.changed) {
       console.log(ok('Documents match'))
     } else {
       for (const page of result.pages) {
         if (page.diff) {
           if (process.stdout.isTTY) console.log(bold(`\n  ${page.name} (${page.status})\n`))
-          printUnifiedDiff(page.diff)
+          await printUnifiedDiff(page.diff)
         } else if (page.status !== 'unchanged') {
           // On stderr, so piped output stays a patch; patches do not add or remove pages.
           console.error(dim(`Page "${page.name}" ${page.status}`))

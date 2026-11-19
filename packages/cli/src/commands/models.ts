@@ -3,7 +3,7 @@ import { compact, isEmptyObject } from 'es-toolkit'
 
 import { ACP_AGENTS, AI_PROVIDERS, type ModelOption } from '@pairdraw/core/constants'
 
-import { bold, dim, entity, fmtList, printError } from '#cli/format'
+import { bold, dim, entity, fmtList, printError, printJSON } from '#cli/format'
 
 const json = { type: 'boolean', description: 'Output as JSON' } as const
 
@@ -108,11 +108,11 @@ export default defineCommand({
     },
     json
   },
-  run({ args }) {
+  async run({ args }) {
     try {
       const catalog = modelCatalog(args.provider)
       if (args.json) {
-        console.log(JSON.stringify(catalog, null, 2))
+        await printJSON(catalog)
         return
       }
       console.log('')

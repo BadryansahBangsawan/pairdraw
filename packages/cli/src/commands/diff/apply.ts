@@ -1,7 +1,7 @@
 import { defineCommand } from 'citty'
 
 import { appTargetOptions } from '#cli/app/target'
-import { dim, entity, fail, fmtList, ok, printError, warn } from '#cli/format'
+import { dim, entity, fail, fmtList, ok, printError, warn, printJSON } from '#cli/format'
 import { documentWriteOptions, writeDocumentFile } from '#cli/headless'
 import { readTextSource } from '#cli/input'
 import { runToolData } from '#cli/tool-data'
@@ -71,7 +71,7 @@ export default defineCommand({
       args
     )
     const report = result as ApplyResult
-    if (args.json) console.log(JSON.stringify(report, null, 2))
+    if (args.json) await printJSON(report)
     else printApplyResult(report, dryRun)
 
     const failed = Boolean(report.error) || (report.failed ?? 0) > 0

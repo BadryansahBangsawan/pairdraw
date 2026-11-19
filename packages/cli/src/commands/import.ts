@@ -6,7 +6,7 @@ import { defineCommand } from 'citty'
 import { readHTMLDocument, type ReadHTMLResult } from '@pairdraw/core/io/formats/html/import'
 
 import { requireFile } from '#cli/app/client'
-import { fmtList, ok, printError } from '#cli/format'
+import { fmtList, ok, printError, printJSON } from '#cli/format'
 import { writeDocumentFile } from '#cli/headless'
 
 const OUTPUT_FORMATS = new Set(['fig', 'json'])
@@ -141,7 +141,7 @@ export default defineCommand({
     }
 
     if (args.json) {
-      console.log(JSON.stringify(summary, null, 2))
+      await printJSON(summary)
       return
     }
 

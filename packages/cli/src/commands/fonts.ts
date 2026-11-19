@@ -3,7 +3,7 @@ import { defineCommand } from 'citty'
 import { fontManager, prepareGraphFonts, type DocumentFontStatus } from '@pairdraw/core/text'
 
 import { appTargetOptions } from '#cli/app/target'
-import { bold, entity, fmtList, kv, printError } from '#cli/format'
+import { bold, entity, fmtList, kv, printError, printJSON } from '#cli/format'
 import { loadDocument, populateWholeDocument } from '#cli/headless'
 import { loadRPCData } from '#cli/rpc-data'
 
@@ -56,7 +56,7 @@ export default defineCommand({
     }
 
     if (args.json) {
-      console.log(JSON.stringify(data, null, 2))
+      await printJSON(data)
       return
     }
     if (data.faces.length === 0) {

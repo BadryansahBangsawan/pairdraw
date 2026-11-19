@@ -10,7 +10,7 @@ import {
   parseOverlapSeverity
 } from '@pairdraw/core/tools'
 
-import { bold, fail, fmtList, fmtSummary, kv } from '#cli/format'
+import { bold, fail, fmtList, fmtSummary, kv, printJSON } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 function validateScope(scope: string): string | undefined {
@@ -207,7 +207,7 @@ export default defineCommand({
     )
 
     if (args.json) {
-      console.log(JSON.stringify(data, null, 2))
+      await printJSON(data)
       return
     }
 

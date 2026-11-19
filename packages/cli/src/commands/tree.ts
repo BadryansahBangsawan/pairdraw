@@ -4,7 +4,7 @@ import { defineCommand } from 'citty'
 import type { TreeNodeResult, TreeResult } from '@pairdraw/core/rpc'
 
 import { appTargetOptions } from '#cli/app/target'
-import { fmtTree, printError, entity, formatType } from '#cli/format'
+import { fmtTree, printError, printJSON, entity, formatType, writeStdout } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 function toAgentfmtTree(node: TreeNodeResult, maxDepth: number, depth = 0): TreeNode {
@@ -48,7 +48,7 @@ export default defineCommand({
     }
 
     if (args.json) {
-      console.log(JSON.stringify(data.children, null, 2))
+      await printJSON(data.children)
       return
     }
 
@@ -57,8 +57,6 @@ export default defineCommand({
       children: data.children.map((c) => toAgentfmtTree(c, maxDepth))
     }
 
-    console.log('')
-    console.log(fmtTree(root, { maxDepth }))
-    console.log('')
+    await writeStdout(`\n${fmtTree(root, { maxDepth })}\n\n`)
   }
 })

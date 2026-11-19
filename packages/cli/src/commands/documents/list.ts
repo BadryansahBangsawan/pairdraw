@@ -3,7 +3,7 @@ import { defineCommand } from 'citty'
 import type { AutomationDocumentSummary } from '@pairdraw/core/rpc'
 
 import { rpc } from '#cli/app/client'
-import { bold, entity, fmtList, kv, printError } from '#cli/format'
+import { bold, entity, fmtList, kv, printError, printJSON } from '#cli/format'
 
 export default defineCommand({
   meta: { name: 'list', description: 'List open documents (tabs) in the running app' },
@@ -16,7 +16,7 @@ export default defineCommand({
       const documents = data.documents
 
       if (args.json) {
-        console.log(JSON.stringify(documents, null, 2))
+        await printJSON(documents)
         return
       }
 

@@ -7,7 +7,7 @@ import { resolveAgentRoot } from '#cli/agent/paths'
 import { agentToolDefinitions, parseToolNames } from '#cli/agent/policy'
 import { AGENT_PROFILES } from '#cli/agent/registry'
 import { DEFAULT_MAX_STEPS, MAX_MAX_STEPS, readAgentPrompt, runAgent } from '#cli/agent/run'
-import { bold, dim, fmtList, ok, printError } from '#cli/format'
+import { bold, dim, fmtList, ok, printError, printJSON } from '#cli/format'
 
 const json = { type: 'boolean', description: 'Output as JSON' } as const
 
@@ -98,7 +98,7 @@ const run = defineCommand({
         maxSteps
       })
       if (args.json) {
-        console.log(JSON.stringify(result, null, 2))
+        await printJSON(result)
         return
       }
       console.log('')
@@ -137,17 +137,13 @@ const tools = defineCommand({
   async run({ args }) {
     const definitions = agentToolDefinitions({ catalog: ALL_TOOLS })
     if (args.json) {
-      console.log(
-        JSON.stringify(
-          definitions.map((definition) => ({
-            name: definition.name,
-            effect: definition.execution.mutation === 'none' ? 'read' : 'write',
-            capabilities: definition.capabilities,
-            description: definition.description
-          })),
-          null,
-          2
-        )
+      await printJSON(
+        definitions.map((definition) => ({
+          name: definition.name,
+          effect: definition.execution.mutation === 'none' ? 'read' : 'write',
+          capabilities: definition.capabilities,
+          description: definition.description
+        }))
       )
       return
     }
@@ -172,19 +168,15 @@ const list = defineCommand({
   args: { json },
   async run({ args }) {
     if (args.json) {
-      console.log(
-        JSON.stringify(
-          AGENT_PROFILES.map((profile) => ({
-            id: profile.id,
-            description: profile.description,
-            readOnly: profile.readOnly,
-            only: profile.only ?? null,
-            deny: profile.deny,
-            maxSteps: profile.maxSteps ?? null
-          })),
-          null,
-          2
-        )
+      await printJSON(
+        AGENT_PROFILES.map((profile) => ({
+          id: profile.id,
+          description: profile.description,
+          readOnly: profile.readOnly,
+          only: profile.only ?? null,
+          deny: profile.deny,
+          maxSteps: profile.maxSteps ?? null
+        }))
       )
       return
     }

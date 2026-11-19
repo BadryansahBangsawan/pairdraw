@@ -3,7 +3,7 @@ import { defineCommand } from 'citty'
 import type { PageItem } from '@pairdraw/core/rpc'
 
 import { appTargetOptions } from '#cli/app/target'
-import { bold, fmtList, entity } from '#cli/format'
+import { bold, fmtList, entity, printJSON } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
@@ -21,7 +21,7 @@ export default defineCommand({
     const pages = await loadRPCData<PageItem[]>(args.file, 'pages', undefined, args)
 
     if (args.json) {
-      console.log(JSON.stringify(pages, null, 2))
+      await printJSON(pages)
       return
     }
 

@@ -14,7 +14,7 @@ import { importDesignSystemFolder } from '@pairdraw/core/node/design-system'
 import type { TokensResult } from '@pairdraw/core/rpc'
 
 import { requireFile } from '#cli/app/client'
-import { fmtList, ok } from '#cli/format'
+import { fmtList, ok, printJSON } from '#cli/format'
 import { loadDocument, populateWholeDocument, writeDocumentFile } from '#cli/headless'
 import { loadRPCData } from '#cli/rpc-data'
 
@@ -70,7 +70,7 @@ export default defineCommand({
     )
 
     if (args.json) {
-      console.log(JSON.stringify(data, null, 2))
+      await printJSON(data)
       return
     }
 
@@ -118,13 +118,11 @@ async function importStylesheet(
   const pageId = graph.getPages()[0]?.id ?? graph.rootId
   const result = importTokensIntoGraph(graph, pageId, plan)
   if (args.json) {
-    console.log(
-      JSON.stringify(
-        { collections: result.collectionIds, variables: result.variableIds, issues: bundle.issues },
-        null,
-        2
-      )
-    )
+    await printJSON({
+      collections: result.collectionIds,
+      variables: result.variableIds,
+      issues: bundle.issues
+    })
   } else {
     console.log(
       ok(
@@ -191,17 +189,11 @@ async function importProject(
   populateWholeDocument(graph)
   const result = await importDesignSystemFolder(graph, projectPath)
   if (args.json) {
-    console.log(
-      JSON.stringify(
-        {
-          collections: result.collectionIds,
-          variables: result.variableIds,
-          issues: result.issues
-        },
-        null,
-        2
-      )
-    )
+    await printJSON({
+      collections: result.collectionIds,
+      variables: result.variableIds,
+      issues: result.issues
+    })
   } else {
     console.log(
       ok(

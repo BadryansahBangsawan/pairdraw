@@ -32,6 +32,6 @@ export default defineCommand({
       { id: args.id, attributes: args.attributes },
       args
     )
-    printDiffResult(result as DiffResult, !!args.json)
+    await printDiffResult(result as DiffResult, !!args.json)
   }
 })

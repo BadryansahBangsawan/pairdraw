@@ -5,7 +5,7 @@ import type { AnalyzeClustersResult } from '@pairdraw/core/rpc'
 import { calcClusterConfidence } from '@pairdraw/core/tools'
 
 import { appTargetOptions } from '#cli/app/target'
-import { bold, fmtList, fmtSummary } from '#cli/format'
+import { bold, fmtList, fmtSummary, printJSON, writeStdout } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
 function formatSignature(sig: string): string {
@@ -52,7 +52,7 @@ export default defineCommand({
     )
 
     if (args.json) {
-      console.log(JSON.stringify(data, null, 2))
+      await printJSON(data)
       return
     }
 
@@ -94,7 +94,7 @@ export default defineCommand({
       }
     })
 
-    console.log(fmtList(items, { numbered: true }))
+    await writeStdout(`${fmtList(items, { numbered: true })}\n`)
 
     const clusteredNodes = sumBy(data.clusters, (c) => c.nodes.length)
     console.log('')

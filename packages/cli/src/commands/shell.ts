@@ -3,7 +3,7 @@ import { createInterface, type Completer, type Interface } from 'node:readline'
 import { defineCommand } from 'citty'
 
 import { appTargetOptions } from '#cli/app/target'
-import { dim, printError } from '#cli/format'
+import { dim, printError, writeStdout } from '#cli/format'
 import { openToolSession } from '#cli/session/open'
 import { previewOptions, previewScale } from '#cli/session/preview'
 import { CLI_TOOLS } from '#cli/session/tools'
@@ -105,7 +105,7 @@ export default defineCommand({
       }
       const session = await openToolSession(args.file, args)
       const output = {
-        out: (text: string) => console.log(text),
+        out: (text: string) => void writeStdout(`${text}\n`),
         err: (text: string) => console.error(text)
       }
       const options: ShellOptions = {

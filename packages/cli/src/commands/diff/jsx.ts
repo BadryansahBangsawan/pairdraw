@@ -17,6 +17,6 @@ export default defineCommand({
       { from: args.from, to: args.to },
       args
     )
-    printDiffResult(result as DiffResult, !!args.json)
+    await printDiffResult(result as DiffResult, !!args.json)
   }
 })

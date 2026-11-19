@@ -2,7 +2,7 @@ import { defineCommand } from 'citty'
 
 import { rpc } from '#cli/app/client'
 import { appTargetOptions, appTargetRPCArgs } from '#cli/app/target'
-import { bold, entity, fmtList, formatType, printError } from '#cli/format'
+import { bold, entity, fmtList, formatType, printError, printJSON } from '#cli/format'
 
 interface SelectionNode {
   id: string
@@ -24,7 +24,7 @@ export default defineCommand({
       const nodes = await rpc<SelectionNode[]>('selection', appTargetRPCArgs(args))
 
       if (args.json) {
-        console.log(JSON.stringify(nodes, null, 2))
+        await printJSON(nodes)
         return
       }
 

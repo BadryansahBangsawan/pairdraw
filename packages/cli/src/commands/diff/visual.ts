@@ -6,7 +6,7 @@ import { toUint8Array } from 'js-base64'
 
 import type { Rect } from '@pairdraw/scene-graph/primitives'
 
-import { dim, fmtSummary, kv, ok, printError } from '#cli/format'
+import { dim, fmtSummary, kv, ok, printError, printJSON } from '#cli/format'
 import { runToolData } from '#cli/tool-data'
 
 import { nodePairArgs } from './args'
@@ -62,7 +62,7 @@ export default defineCommand({
     // The image went to the file; keep the base64 payload out of the report.
     const summary = { ...result, base64: undefined }
     if (args.json) {
-      console.log(JSON.stringify({ ...summary, output: args.output }, null, 2))
+      await printJSON({ ...summary, output: args.output })
       return
     }
     console.log(ok(`Wrote ${args.output}`))

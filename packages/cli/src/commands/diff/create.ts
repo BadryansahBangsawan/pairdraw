@@ -18,6 +18,6 @@ export default defineCommand({
       { from: args.from, to: args.to, ...(args.depth ? { depth: Number(args.depth) } : {}) },
       args
     )
-    printDiffResult(result as DiffResult, !!args.json)
+    await printDiffResult(result as DiffResult, !!args.json)
   }
 })

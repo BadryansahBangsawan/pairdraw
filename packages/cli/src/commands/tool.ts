@@ -5,7 +5,7 @@ import { defineCommand } from 'citty'
 import { toolChangesDocument } from '@pairdraw/core/tools'
 
 import { appTargetOptions } from '#cli/app/target'
-import { bold, dim, entity, fmtList, printError, warn } from '#cli/format'
+import { bold, dim, entity, fmtList, printError, warn, printJSON, writeStdout } from '#cli/format'
 import { documentWriteOptions } from '#cli/headless'
 import { readTextSource } from '#cli/input'
 import { openToolSession } from '#cli/session/open'
@@ -25,14 +25,14 @@ const json = { type: 'boolean', description: 'Output as JSON' } as const
 const list = defineCommand({
   meta: { name: 'list', description: 'List the tools available to `tool call`' },
   args: { json },
-  run({ args }) {
+  async run({ args }) {
     if (args.json) {
       const rows = CLI_TOOLS.map((def) => ({
         name: def.name,
         effect: toolEffect(def),
         description: def.description
       }))
-      console.log(JSON.stringify(rows, null, 2))
+      await printJSON(rows)
       return
     }
     console.log('')
@@ -52,7 +52,7 @@ const describe = defineCommand({
     name: { type: 'positional', description: 'Tool name', required: true },
     json
   },
-  run({ args }) {
+  async run({ args }) {
     try {
       const def = findCLITool(args.name)
       const schema = toJSONSchema(def.input, { errorMode: 'ignore' })
@@ -63,7 +63,7 @@ const describe = defineCommand({
           description: def.description,
           schema
         }
-        console.log(JSON.stringify(info, null, 2))
+        await printJSON(info)
         return
       }
       const header = entity('tool', def.name)
@@ -73,7 +73,7 @@ const describe = defineCommand({
       )
       console.log('')
       console.log(bold('  Arguments (JSON Schema)'))
-      console.log(JSON.stringify(schema, null, 2))
+      await printJSON(schema)
       console.log('')
     } catch (error) {
       printError(error)
@@ -124,8 +124,8 @@ const call = defineCommand({
       const toolArgs = await readToolArgs(args)
       const session = await openToolSession(args.file, args)
       const result = await session.call(def, toolArgs)
-      if (args.json) console.log(JSON.stringify(result, null, 2))
-      else console.log(formatToolResult(result))
+      if (args.json) await printJSON(result)
+      else await writeStdout(`${formatToolResult(result)}\n`)
 
       // A tool that answers with an error did not do its work: the call fails, and the document is
       // left as it was rather than written back.

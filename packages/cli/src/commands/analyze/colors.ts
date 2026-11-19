@@ -3,7 +3,7 @@ import { defineCommand } from 'citty'
 import type { AnalyzeColorsResult } from '@pairdraw/core/rpc'
 
 import { appTargetOptions } from '#cli/app/target'
-import { bold, fmtHistogram, fmtList, fmtSummary } from '#cli/format'
+import { bold, fmtHistogram, fmtList, fmtSummary, printJSON } from '#cli/format'
 import { numberInRange } from '#cli/options'
 import { loadRPCData } from '#cli/rpc-data'
 
@@ -38,7 +38,7 @@ export default defineCommand({
     const limit = Number(args.limit)
 
     if (args.json) {
-      console.log(JSON.stringify(data, null, 2))
+      await printJSON(data)
       return
     }
 

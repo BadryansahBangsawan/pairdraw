@@ -1,1 +1,2 @@
 - Exporting HTML with external assets creates the output folder when it does not exist yet.
+- CLI commands reject misspelled options instead of silently ignoring them, so `pairdraw info file --jsonn` fails with `Unknown option: --jsonn` rather than printing human output a script cannot parse.

@@ -78,6 +78,20 @@ describe('buildCanvasContextMenu', () => {
     ).toContain('selection.detachInstance')
   })
 
+  test('offers Reset all changes ahead of the other instance actions', () => {
+    const ids = itemIds(
+      buildCanvasContextMenu(
+        options({ selection: selection({ isInstance: computed(() => true) }) })
+      )
+    )
+    expect(ids.indexOf('selection.resetInstanceOverrides')).toBeLessThan(
+      ids.indexOf('selection.goToMainComponent')
+    )
+    expect(itemIds(buildCanvasContextMenu(options()))).not.toContain(
+      'selection.resetInstanceOverrides'
+    )
+  })
+
   test('offers Create slot for layers of a main component', () => {
     const ids = itemIds(
       buildCanvasContextMenu(

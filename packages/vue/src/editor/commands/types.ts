@@ -21,6 +21,7 @@ export type EditorCommandId =
   | 'selection.detachInstance'
   | 'selection.detachIcon'
   | 'selection.goToMainComponent'
+  | 'selection.resetInstanceOverrides'
   | 'selection.createSlot'
   | 'selection.wrapInAutoLayout'
   | 'selection.toggleMask'

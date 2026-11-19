@@ -192,6 +192,17 @@ export function createSelectionCommands({
         })
       }
     },
+    'selection.resetInstanceOverrides': {
+      id: 'selection.resetInstanceOverrides',
+      get label() {
+        return t.value.resetAllChanges
+      },
+      enabled: capabilities.canResetInstanceOverrides,
+      run: () => {
+        const node = selection.selectedNode.value
+        if (node) editor.resetInstanceOverrides(node.id)
+      }
+    },
     'selection.goToMainComponent': {
       id: 'selection.goToMainComponent',
       get label() {

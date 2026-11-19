@@ -14,6 +14,7 @@
   "detachInstance": "Détacher l'instance",
   "detachIcon": "Détacher l'icône",
   "goToMainComponent": "Aller au composant principal",
+  "resetAllChanges": "Réinitialiser toutes les modifications",
   "addAutoLayout": "Ajouter un auto-layout",
   "bringToFront": "Mettre au premier plan",
   "sendToBack": "Mettre en arrière-plan",

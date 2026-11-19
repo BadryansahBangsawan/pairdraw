@@ -14,6 +14,7 @@
   "detachInstance": "Отвязать экземпляр",
   "detachIcon": "Отсоединить иконку",
   "goToMainComponent": "Перейти к компоненту",
+  "resetAllChanges": "Сбросить все изменения",
   "addAutoLayout": "Добавить авто-раскладку",
   "bringToFront": "На передний план",
   "sendToBack": "На задний план",

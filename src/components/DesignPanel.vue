@@ -84,6 +84,7 @@ const showBooleanOperations = computed(() => multiCount.value >= 2)
 const { getCommand } = useEditorCommands()
 const goToMainComponent = getCommand('selection.goToMainComponent')
 const detachInstance = getCommand('selection.detachInstance')
+const resetInstanceOverrides = getCommand('selection.resetInstanceOverrides')
 const isComponentType = computed(() => {
   const type = node.value?.type
   return type ? COMPONENT_TYPES.has(type) : false
@@ -244,6 +245,14 @@ const { panels } = useI18n()
           />
           <SelectionActionsControl />
           <template v-if="node.type === 'INSTANCE'">
+            <IconButton
+              :label="resetInstanceOverrides.label"
+              data-test-id="instance-reset-all-changes"
+              :disabled="!resetInstanceOverrides.enabled.value"
+              @click="resetInstanceOverrides.run()"
+            >
+              <icon-lucide-rotate-ccw class="size-3.5" />
+            </IconButton>
             <IconButton
               :label="goToMainComponent.label"
               data-test-id="instance-go-to-main"

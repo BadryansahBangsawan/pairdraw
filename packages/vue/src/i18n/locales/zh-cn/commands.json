@@ -14,6 +14,7 @@
   "detachInstance": "分离实例",
   "detachIcon": "分离图标",
   "goToMainComponent": "转到主组件",
+  "resetAllChanges": "重置所有更改",
   "addAutoLayout": "添加自动布局",
   "bringToFront": "置于顶层",
   "sendToBack": "置于底层",

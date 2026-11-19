@@ -73,6 +73,11 @@ export function useSelectionCapabilities() {
         editor.state.selectedIds.size === 1 && editor.canEditImage([...editor.state.selectedIds][0])
     ),
     canGoToMainComponent: computed(() => selection.isInstance.value),
+    // Figma leaves Reset all changes for an instance that holds an edit of its own.
+    canResetInstanceOverrides: useSceneComputed(() => {
+      const node = selectedNode.value
+      return node?.type === 'INSTANCE' && editor.instanceHasOverrides(node.id)
+    }),
     canCreateInstance: computed(() => selectedNode.value?.type === 'COMPONENT'),
     canConvertToFrame: selection.canConvertToFrame,
     canCreateSlot: selection.canCreateSlot,

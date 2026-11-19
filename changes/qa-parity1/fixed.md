@@ -1,0 +1,1 @@
+- An instance offers Reset all changes in the canvas menu, the Object menu and its Design panel header, putting it and the instances inside it back over one undo step.

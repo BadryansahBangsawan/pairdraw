@@ -473,6 +473,11 @@ export const APP_MENU_SCHEMA = [
         command: 'selection.detachInstance'
       },
       {
+        id: 'selection.resetInstanceOverrides',
+        label: 'Reset All Changes',
+        command: 'selection.resetInstanceOverrides'
+      },
+      {
         id: 'selection.detachIcon',
         label: 'Detach Icon',
         command: 'selection.detachIcon'

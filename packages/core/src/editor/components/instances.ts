@@ -6,7 +6,12 @@ import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { prepareSlotEdits } from '#core/editor/components/slots'
+import { recordSubtreeEdit } from '#core/editor/components/slots/history'
 import type { EditorContext } from '#core/editor/types'
+import {
+  instanceOverrides,
+  resetInstanceOverrides as resetInstanceOverridesInGraph
+} from '#core/figma-api/overrides'
 
 type InstanceCreateSnapshot = Partial<SceneNode> & { id: string }
 
@@ -134,5 +139,25 @@ export function createComponentInstanceActions(ctx: EditorContext) {
     })
   }
 
-  return { createInstanceFromComponent, detachInstance }
+  /** Whether `id` is an instance holding any edit of its own, so Reset all changes has work. */
+  function instanceHasOverrides(id: string): boolean {
+    const node = ctx.graph.getNode(id)
+    return node?.type === 'INSTANCE' && instanceOverrides(ctx.graph, node).length > 0
+  }
+
+  /** Figma's Reset all changes: the instance and the ones inside it go back to their components. */
+  function resetInstanceOverridesFromSelection(id: string): void {
+    const node = ctx.graph.getNode(id)
+    if (node?.type !== 'INSTANCE') return
+    recordSubtreeEdit(ctx, 'Reset all changes', id, () =>
+      resetInstanceOverridesInGraph(ctx.graph, node)
+    )
+  }
+
+  return {
+    createInstanceFromComponent,
+    detachInstance,
+    instanceHasOverrides,
+    resetInstanceOverrides: resetInstanceOverridesFromSelection
+  }
 }

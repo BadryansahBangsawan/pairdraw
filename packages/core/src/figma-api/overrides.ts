@@ -226,7 +226,7 @@ function withoutEdits(graph: SceneGraph, state: InstanceOverrideState): Instance
  * Figma's `resetOverrides`: the instance and every instance inside it go back to their
  * components, keeping the values their component properties set.
  */
-function resetInstanceOverrides(graph: SceneGraph, root: SceneNode): void {
+export function resetInstanceOverrides(graph: SceneGraph, root: SceneNode): void {
   // A layer put in place of a component's layer goes, and the sync brings that layer back.
   const replaced: string[] = []
   const collect = (node: SceneNode) => {

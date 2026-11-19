@@ -115,7 +115,11 @@ function componentSetItems({ commandMenuItem, selection }: CanvasMenuOptions): M
 
 function instanceItems({ commandMenuItem, selection }: CanvasMenuOptions): MenuEntry[] {
   return selection.isInstance.value
-    ? [commandMenuItem('selection.goToMainComponent'), commandMenuItem('selection.detachInstance')]
+    ? [
+        commandMenuItem('selection.resetInstanceOverrides'),
+        commandMenuItem('selection.goToMainComponent'),
+        commandMenuItem('selection.detachInstance')
+      ]
     : []
 }
 

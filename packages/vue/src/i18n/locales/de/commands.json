@@ -14,6 +14,7 @@
   "detachInstance": "Instanz lösen",
   "detachIcon": "Symbol lösen",
   "goToMainComponent": "Zur Hauptkomponente",
+  "resetAllChanges": "Alle Änderungen zurücksetzen",
   "addAutoLayout": "Auto-Layout hinzufügen",
   "bringToFront": "In den Vordergrund",
   "sendToBack": "In den Hintergrund",

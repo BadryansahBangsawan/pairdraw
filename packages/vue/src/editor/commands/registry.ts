@@ -43,6 +43,7 @@ export const EDITOR_COMMAND_METADATA = {
   'selection.detachInstance': { shortcut: 'MOD+ALT+B', keybinding: '$mod+Alt+KeyB' },
   'selection.detachIcon': {},
   'selection.goToMainComponent': {},
+  'selection.resetInstanceOverrides': {},
   'selection.createInstance': {},
   'selection.createSlot': { contextTestId: 'context-create-slot' },
   'selection.wrapInAutoLayout': { shortcut: 'SHIFT+A', keybinding: 'Shift+KeyA' },

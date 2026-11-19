@@ -27,6 +27,8 @@ export function createComponentBridge(
       ),
     createInstanceFromComponent: components.createInstanceFromComponent,
     detachInstance: () => components.detachInstance(selection.getSelectedNode()),
+    instanceHasOverrides: components.instanceHasOverrides,
+    resetInstanceOverrides: (id: string) => components.resetInstanceOverrides(id),
     canConvertToFrame: components.canConvertToFrame,
     componentInstanceCount: components.componentInstanceCount,
     requestComponentToFrame: components.requestComponentToFrame,

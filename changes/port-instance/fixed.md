@@ -1,0 +1,1 @@
+- Detaching an instance keeps the overrides its nested instances carry, under their own layers, so a saved detached copy reopens with the text and styles its component gave them; undoing the detach restores the nested instances as they were.

@@ -79,6 +79,11 @@ export class SceneGraph {
     componentDerived: 0
   }
   private previewObservers: NodePreviewObserver[] = []
+  /** Edited-field marks added since the last undo step, which that step takes back when undone. */
+  private pendingSourceMarks: Array<[string, string]> = []
+  private readonly observeSourceMark = (id: string, field: string) => {
+    this.pendingSourceMarks.push([id, field])
+  }
   private readonly changeObservers = new Set<NodeChangeObserver>()
   /** How many waits outside the edit each recorder is paused for. */
   private readonly outsideWaits = new Map<NodeChangeObserver, number>()
@@ -536,6 +541,28 @@ export class SceneGraph {
     return this.scopeDepths.sourceMetadata > 0
   }
 
+  /** The edited-field marks added since the last call, which that undo step takes back. */
+  takeSourceMarks(): Array<[string, string]> {
+    const marks = this.pendingSourceMarks
+    this.pendingSourceMarks = []
+    return marks
+  }
+
+  /** Marks fields as edited again, for redo of a step that marked them. */
+  addSourceMarks(id: string, fields: readonly string[]): void {
+    const node = this.nodes.get(id)
+    if (node) markSourceFieldsEdited(node, [...fields])
+  }
+
+  /** Takes back the marks a step added, for undo of that step. */
+  removeSourceMarks(id: string, fields: readonly string[]): void {
+    const node = this.nodes.get(id)
+    if (!node) return
+    const removed = new Set(fields)
+    const kept = node.source.editedFields.filter((field) => !removed.has(field))
+    if (kept.length !== node.source.editedFields.length) node.source.editedFields = kept
+  }
+
   applyImportedStateDuring<T>(fn: () => T, idGenerator?: () => string): T {
     const previousGenerator = this.importedIdGenerator
     this.importedIdGenerator = idGenerator ?? previousGenerator
@@ -600,7 +627,7 @@ export class SceneGraph {
     this.layoutWrites = null
     if (!writes) return
     for (const [node, changes, edited] of writes.updates((nodeId) => this.nodes.get(nodeId))) {
-      markSourceFieldsEdited(node, edited)
+      markSourceFieldsEdited(node, edited, this.observeSourceMark)
       this.emitter.emit('node:updated', node.id, changes)
     }
   }
@@ -673,7 +700,9 @@ export class SceneGraph {
     if (affectsLayout) this.absPosCache.clear()
     this.reindexInstance(node, changes)
     if (node.type === 'TEXT') invalidateTextCaches(node, changes)
-    this.markEdited(node, Object.keys(changes))
+    if (this.scopeDepths.sourceMetadata === 0 && !this.isApplyingLayout) {
+      markSourceFieldsEdited(node, Object.keys(changes), this.observeSourceMark)
+    }
     if (changes.vectorNetwork) {
       changes = { ...changes, vectorNetwork: normalizeVectorNetwork(changes.vectorNetwork) }
     }
@@ -698,7 +727,7 @@ export class SceneGraph {
   /** Marks fields an edit changed, unless metadata is being restored or layout is writing them. */
   private markEdited(node: SceneNode, keys: string[]): void {
     if (this.scopeDepths.sourceMetadata === 0 && !this.isApplyingLayout) {
-      markSourceFieldsEdited(node, keys)
+      markSourceFieldsEdited(node, keys, this.observeSourceMark)
     }
   }
 

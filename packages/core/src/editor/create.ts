@@ -91,7 +91,17 @@ function resolveViewportInsets(options?: EditorOptions): () => ViewportInsets {
 export function createEditor(options?: EditorOptions) {
   let _graph = options?.graph ?? new SceneGraph()
   const skipInitialGraphSetup = options?.skipInitialGraphSetup ?? false
-  const undo = new UndoManager({ onChange: () => emitEditorEvent('history:changed') })
+  const undo = new UndoManager({
+    onChange: () => emitEditorEvent('history:changed'),
+    // A step owns the edited-field marks its edit added, so undo takes them back and redo
+    // marks them again. The marks are the graph's, and the document can be replaced.
+    marks: {
+      take: () => _graph.takeSourceMarks(),
+      add: (id, fields) => _graph.addSourceMarks(id, fields),
+      remove: (id, fields) => _graph.removeSourceMarks(id, fields),
+      preserve: (run) => _graph.preserveSourceMetadataDuring(run)
+    }
+  })
   const _loadFont = options?.loadFont ?? fontManager.loadFont.bind(fontManager)
   const _getViewportSize =
     options?.getViewportSize ??

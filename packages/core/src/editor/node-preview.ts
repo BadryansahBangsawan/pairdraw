@@ -3,6 +3,7 @@ import { isEqual, pick, uniq } from 'es-toolkit'
 import type { SceneNode } from '@pairdraw/scene-graph'
 
 import { assertNodeEditable } from './capabilities'
+import { captureSources, restoreSources, type SourceSnapshots } from './history/sources'
 import type { EditorContext } from './types'
 
 export interface NodePreview {
@@ -29,7 +30,7 @@ export function createNodePreviewActions(
     const originals = new Map<string, Partial<SceneNode>>()
     const targets = new Set<string>()
     const layoutOnly = new Set<string>()
-    const editedBefore = new Map<string, string[]>()
+    const sourcesBefore: SourceSnapshots = new Map()
     let closed = false
     let endInteraction: (() => void) | undefined
     const subscriptions: Array<() => void> = []
@@ -52,7 +53,7 @@ export function createNodePreviewActions(
     // own layout stops keeping geometry a file saved; cancel takes the marks back.
     function markEdited(node: SceneNode, changes: Partial<SceneNode>) {
       if (graph.isPreservingSourceMetadata) return
-      if (!editedBefore.has(node.id)) editedBefore.set(node.id, node.source.editedFields)
+      if (!sourcesBefore.has(node.id)) sourcesBefore.set(node.id, structuredClone(node.source))
       node.source.editedFields = uniq([...node.source.editedFields, ...Object.keys(changes)])
     }
 
@@ -104,12 +105,17 @@ export function createNodePreviewActions(
         // Back to what the layers held, so the commit reports each to graph observers before it
         // changes them, as the other previews do; otherwise a saved .fig sees no change.
         for (const edit of edits) graph.updateNodePreview(edit.id, structuredClone(edit.before))
+        const sourcesAfter = captureSources(graph, sourcesBefore.keys())
         function apply(direction: 'before' | 'after') {
-          for (const edit of edits) {
-            const update = () => graph.updateNode(edit.id, structuredClone(edit[direction]))
-            if (layoutOnly.has(edit.id)) graph.withLayoutMutations(update)
-            else update()
-          }
+          // A replay restores a side as it stood, its edited-field marks included.
+          graph.preserveSourceMetadataDuring(() => {
+            for (const edit of edits) {
+              const update = () => graph.updateNode(edit.id, structuredClone(edit[direction]))
+              if (layoutOnly.has(edit.id)) graph.withLayoutMutations(update)
+              else update()
+            }
+          })
+          restoreSources(graph, direction === 'before' ? sourcesBefore : sourcesAfter)
           ctx.requestRender()
         }
         ctx.undo.push({ label, forward: () => apply('after'), inverse: () => apply('before') })
@@ -121,10 +127,7 @@ export function createNodePreviewActions(
         close()
         for (const [id, previous] of originals)
           graph.updateNodePreview(id, structuredClone(previous))
-        for (const [id, fields] of editedBefore) {
-          const node = graph.getNode(id)
-          if (node) node.source.editedFields = fields
-        }
+        restoreSources(graph, sourcesBefore)
         // Reconcile retained/tiled resources once; cancellation publishes no committed node edits.
         if (originals.size) ctx.requestRender()
       }

@@ -2,6 +2,7 @@ import { uniq } from 'es-toolkit/array'
 
 import type { CanvasGuide } from '@pairdraw/scene-graph/guides'
 
+import { captureSources, restoreSources } from './history/sources'
 import type { EditorContext } from './types'
 
 function owner(ctx: EditorContext, ownerId: string) {
@@ -29,13 +30,21 @@ export function createGuideActions(ctx: EditorContext) {
     const node = owner(ctx, ownerId)
     if (!node || !Number.isFinite(position)) return null
     const guide: CanvasGuide = { id: newGuideId(), axis, position }
+    const sourcesBefore = captureSources(ctx.graph, [ownerId])
     const before = structuredClone(node.guides)
     const after = [...before, guide]
     replaceGuides(ctx, ownerId, after)
+    const sourcesAfter = captureSources(ctx.graph, [ownerId])
     ctx.undo.push({
       label: 'Add guide',
-      forward: () => replaceGuides(ctx, ownerId, after),
-      inverse: () => replaceGuides(ctx, ownerId, before)
+      forward: () => {
+        replaceGuides(ctx, ownerId, after)
+        restoreSources(ctx.graph, sourcesAfter)
+      },
+      inverse: () => {
+        replaceGuides(ctx, ownerId, before)
+        restoreSources(ctx.graph, sourcesBefore)
+      }
     })
     return guide.id
   }
@@ -45,14 +54,22 @@ export function createGuideActions(ctx: EditorContext) {
     if (!node || !Number.isFinite(position)) return false
     const index = node.guides.findIndex((guide) => guide.id === guideId)
     if (index === -1 || node.guides[index].position === position) return false
+    const sourcesBefore = captureSources(ctx.graph, [ownerId])
     const before = structuredClone(node.guides)
     const after = structuredClone(node.guides)
     after[index].position = position
     replaceGuides(ctx, ownerId, after)
+    const sourcesAfter = captureSources(ctx.graph, [ownerId])
     ctx.undo.push({
       label: 'Move guide',
-      forward: () => replaceGuides(ctx, ownerId, after),
-      inverse: () => replaceGuides(ctx, ownerId, before)
+      forward: () => {
+        replaceGuides(ctx, ownerId, after)
+        restoreSources(ctx.graph, sourcesAfter)
+      },
+      inverse: () => {
+        replaceGuides(ctx, ownerId, before)
+        restoreSources(ctx.graph, sourcesBefore)
+      }
     })
     return true
   }

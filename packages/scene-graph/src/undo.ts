@@ -18,6 +18,21 @@ export interface UndoManagerOptions {
   limit?: number
   /** Called after recording, undoing, redoing, or clearing committed history. */
   onChange?: () => void
+  /**
+   * The edited-field marks an edit adds. A step takes its marks back when undone and puts them
+   * back when redone, so a layer ends a step exactly as it began one, marks included.
+   */
+  marks?: UndoSourceMarks
+}
+
+/** Marks an edit left on layers, kept by the graph for one undo step. */
+export interface UndoSourceMarks {
+  /** The marks added since the last step, which that step owns. */
+  take: () => Array<[nodeId: string, field: string]>
+  add: (nodeId: string, fields: readonly string[]) => void
+  remove: (nodeId: string, fields: readonly string[]) => void
+  /** Runs a replay that writes values only, so it marks no field of its own. */
+  preserve: (run: () => void) => void
 }
 
 interface UndoBatch {
@@ -38,10 +53,12 @@ export class UndoManager {
   private readonly settlers = new Set<() => void>()
   private readonly limit: number
   private readonly onChange: (() => void) | undefined
+  private readonly marks: UndoSourceMarks | undefined
 
   constructor(options: UndoManagerOptions = {}) {
     this.limit = options.limit ?? DEFAULT_HISTORY_LIMIT
     this.onChange = options.onChange
+    this.marks = options.marks
   }
 
   apply(entry: UndoEntry): void {
@@ -58,12 +75,43 @@ export class UndoManager {
   }
 
   record(entry: UndoEntry): void {
+    const marked = this.withSourceMarks(entry)
     const batch = this.currentBatch
     if (batch) {
-      batch.entries.push(entry)
+      batch.entries.push(marked)
       return
     }
-    this.pushUndoEntry(entry)
+    this.pushUndoEntry(marked)
+  }
+
+  /**
+   * The step's replay writes values without marking them, then the marks the edit added come
+   * back on redo and go with it on undo.
+   */
+  private withSourceMarks(entry: UndoEntry): UndoEntry {
+    const marks = this.marks
+    if (!marks) return entry
+    const taken = marks.take()
+    const byNode = new Map<string, string[]>()
+    for (const [id, field] of taken) {
+      const fields = byNode.get(id)
+      if (fields) fields.push(field)
+      else byNode.set(id, [field])
+    }
+    return {
+      ...entry,
+      forward: () => {
+        // Redo repeats the edit, marks its layout adds included, then keeps the marks the step
+        // owned even if the replay wrote fewer fields than the edit did.
+        entry.forward()
+        for (const [id, fields] of byNode) marks.add(id, fields)
+      },
+      inverse: () => {
+        // Undo puts a state back rather than editing, so it marks nothing of its own.
+        marks.preserve(() => entry.inverse())
+        for (const [id, fields] of byNode) marks.remove(id, fields)
+      }
+    }
   }
 
   /**
@@ -150,6 +198,7 @@ export class UndoManager {
     this.undoStack = []
     this.redoStack = []
     this.discardBatches()
+    this.marks?.take()
     this.onChange?.()
   }
 

@@ -1,14 +1,14 @@
 import { afterAll, describe, expect, test } from 'bun:test'
 
+import { expectDefined } from '#core-tests/helpers/assert'
+import { expectFigmaRow, renderRow } from '#core-tests/helpers/figma-rows'
+
 import { SkiaRenderer } from '@pairdraw/core/canvas'
 import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
 import type { SceneGraph, SceneNode, Stroke } from '@pairdraw/scene-graph'
 import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
 
 import { sideDashSpans, sideStrokeRRects } from '#core/canvas/strokes/sides'
-
-import { expectDefined } from '#core-tests/helpers/assert'
-import { expectFigmaRow, renderRow } from '#core-tests/helpers/figma-rows'
 
 const ck = await initCanvasKit()
 const renderer = new SkiaRenderer(ck, expectDefined(ck.MakeSurface(1, 1)))
@@ -23,25 +23,24 @@ const FIGMA = {
     255, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 255
   ],
   evenSharp: [
-    0, 0, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0,
-    255
+    0, 0, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 255
   ],
   evenRound: [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 144, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0,
-    0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-    0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 144, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0,
+    0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0,
+    0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0
   ],
   evenRoundInside: [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 16, 0, 239, 255, 128, 0, 0, 255, 255, 128, 0, 0,
-    255, 255, 128, 0, 0, 255, 255, 128, 0, 0, 255, 255, 128, 0, 0, 255, 255, 128, 0, 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 16, 0, 239, 255, 128, 0, 0, 255, 255, 128, 0, 0, 255,
+    255, 128, 0, 0, 255, 255, 128, 0, 0, 255, 255, 128, 0, 0, 255, 255, 128, 0, 0
   ],
   sidesRound: [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 144, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0,
-    0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-    0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 223, 0, 0, 0, 0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 144, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0,
+    0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0,
+    0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 223, 0, 0, 0, 0, 0, 0, 0, 0
   ]
 }
 
@@ -96,7 +95,8 @@ describe('strokes with sides of their own weights, as in Figma', () => {
       (graph, hostId) => {
         dashed(graph, hostId)
         const frame = graph.getNode(expectDefined(graph.getNode(hostId)).childIds[0])
-        if (frame) frame.strokes = frame.strokes.map((stroke) => ({ ...stroke, dashPattern: [20, 10] }))
+        if (frame)
+          frame.strokes = frame.strokes.map((stroke) => ({ ...stroke, dashPattern: [20, 10] }))
       },
       68,
       112,
@@ -133,8 +133,7 @@ describe('strokes with sides of their own weights, as in Figma', () => {
           rounded(graph, hostId)
           const frame = graph.getNode(expectDefined(graph.getNode(hostId)).childIds[0])
           if (!frame) return
-          frame.strokeCap = strokeCap
-          frame.strokes = frame.strokes.map((stroke) => ({ ...stroke, dashPattern: [20, 10] }))
+          graph.updateNode(frame.id, { strokeCap, dashPattern: [20, 10] })
         },
         70,
         160,
@@ -144,20 +143,24 @@ describe('strokes with sides of their own weights, as in Figma', () => {
   })
 
   test('draw nothing when no side has a weight', () => {
-    const empty = sidesFrame({
-      cornerRadius: 24,
-      borderTopWeight: 0,
-      borderRightWeight: 0,
-      borderBottomWeight: 0,
-      borderLeftWeight: 0
-    }, 1)
+    const empty = sidesFrame(
+      {
+        cornerRadius: 24,
+        borderTopWeight: 0,
+        borderRightWeight: 0,
+        borderBottomWeight: 0,
+        borderLeftWeight: 0
+      },
+      1
+    )
     const values = renderRow(
       ck,
       renderer,
       (graph, hostId) => {
         empty(graph, hostId)
         const frame = graph.getNode(expectDefined(graph.getNode(hostId)).childIds[0])
-        if (frame) frame.strokes = frame.strokes.map((stroke) => ({ ...stroke, dashPattern: [20, 10] }))
+        if (frame)
+          frame.strokes = frame.strokes.map((stroke) => ({ ...stroke, dashPattern: [20, 10] }))
       },
       70,
       112,
@@ -268,7 +271,8 @@ describe('dashed rectangles, as in Figma', () => {
       (graph, hostId) => {
         scene(graph, hostId)
         const frame = graph.getNode(expectDefined(graph.getNode(hostId)).childIds[0])
-        if (frame) frame.strokes = frame.strokes.map((stroke) => ({ ...stroke, dashPattern: [20, 10] }))
+        if (frame)
+          frame.strokes = frame.strokes.map((stroke) => ({ ...stroke, dashPattern: [20, 10] }))
       },
       70,
       112,

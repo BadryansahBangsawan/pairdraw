@@ -1,4 +1,4 @@
-import { describe, expect, setDefaultTimeout, test } from 'bun:test'
+import { beforeAll, describe, expect, setDefaultTimeout, test } from 'bun:test'
 
 import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
@@ -8,9 +8,16 @@ import type { JSONObject } from '@pairdraw/scene-graph/primitives'
 
 import { expectDefined } from '#tests/helpers/assert'
 import { parseFixture } from '#tests/helpers/fig/fixtures'
+import { registerTestFont } from '#tests/helpers/fonts/bundled'
 import { HEAVY_DOCUMENT_TIMEOUT_MS, runsHeavyTests } from '#tests/helpers/test-utils'
 
 setDefaultTimeout(60_000)
+
+// Shaped glyphs need the faces the text asks for; without them the writer saves no derived text.
+beforeAll(async () => {
+  await registerTestFont()
+  await registerTestFont('Roboto')
+})
 
 describe('text node export', () => {
   test('text nodes have derivedTextData and textUserLayoutVersion', async () => {

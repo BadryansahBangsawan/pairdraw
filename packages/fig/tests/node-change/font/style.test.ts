@@ -46,7 +46,32 @@ test('keeps the names a file gives its ranges', () => {
     []
   )
   expect(props.styleRuns).toMatchObject([{ start: 6, length: 4, style: { fontStyle: 'Book' } }])
-  const written = write(props)
+  // fontMetaData is written with the shaped glyphs; an unshaped node carries no derived text.
+  const shaped = {
+    glyphs: [
+      {
+        commands: [{ type: 'Z' as const }],
+        x: 0,
+        y: 12,
+        fontSize: 12,
+        firstCharacter: 0,
+        advance: 6
+      }
+    ],
+    baselines: [
+      {
+        firstCharacter: 0,
+        endCharacter: 10,
+        position: { x: 0, y: 12 },
+        width: 60,
+        lineY: 0,
+        lineHeight: 14,
+        lineAscent: 12
+      }
+    ],
+    logicalIndexToCharacterOffsetMap: Array.from({ length: 10 }, (_, index) => index * 6)
+  }
+  const written = write(props, { ...EMPTY_EXPORT_RUNTIME, shapeText: () => shaped })
   expect(written.fontName?.style).toBe('Roman')
   expect(written.textData?.styleOverrideTable?.[0]?.fontName?.style).toBe('Book')
   expect(written.derivedTextData?.fontMetaData?.map((meta) => meta.key?.style)).toEqual([

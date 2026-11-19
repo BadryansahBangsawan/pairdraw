@@ -1,1 +1,2 @@
 - Saving a `.fig` keeps the document when drawing its optional file preview fails: the save falls back to the placeholder thumbnail instead of rejecting.
+- Text whose glyphs cannot all be outlined, such as a script drawn in a substituted face, is saved without derived glyph data, so Figma lays it out with its own fonts instead of drawing holes.

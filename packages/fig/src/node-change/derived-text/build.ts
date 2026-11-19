@@ -285,8 +285,9 @@ function shapeOrNull(node: SceneNode, context: DerivedTextBuildContext): ShapedT
 
 /**
  * The `derivedTextData` a text node is written with. Glyphs the node already has (from Figma,
- * or placed along a path) are kept; other text is shaped at the node's width. Text that cannot
- * be shaped gets no glyphs, so readers lay it out themselves instead of drawing a guess.
+ * or placed along a path) are kept; other text is shaped at the node's width. Figma draws saved
+ * text only from these glyphs, so text that cannot be shaped, or whose glyphs have no outlines,
+ * is written without derived data at all: Figma lays it out itself instead of drawing holes.
  */
 export function buildNodeDerivedTextData(
   node: SceneNode,
@@ -304,12 +305,17 @@ export function buildNodeDerivedTextData(
     })
   }
   const shaped = node.textPathData ? null : shapeOrNull(node, context)
+  if (!shaped) return undefined
+  if (shaped.glyphs.some((glyph) => glyph.commands === null)) {
+    console.warn(`Writing "${node.name}" without derived text; some glyphs have no outline.`)
+    return undefined
+  }
   return buildDerivedTextData({
     node,
-    glyphs: shaped ? shapedGlyphRecords(shaped, context) : [],
-    decorations: shaped ? derivedDecorations(node, shaped.glyphs, context) : undefined,
+    glyphs: shapedGlyphRecords(shaped, context),
+    decorations: derivedDecorations(node, shaped.glyphs, context),
     fontMetaData: fonts,
-    baselines: shaped?.baselines ?? [],
-    logicalIndexToCharacterOffsetMap: shaped?.logicalIndexToCharacterOffsetMap ?? []
+    baselines: shaped.baselines,
+    logicalIndexToCharacterOffsetMap: shaped.logicalIndexToCharacterOffsetMap
   })
 }

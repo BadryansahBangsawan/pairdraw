@@ -31,7 +31,11 @@ export const script = defineTool({
     if (!host) throw new Error('Script layers are not available in this host.')
     if (args.action === 'create') {
       if (!args.source) throw new Error('create needs a source.')
-      return host.create({ source: args.source, x: args.x, y: args.y })
+      const result = await host.create({ source: args.source, x: args.x, y: args.y })
+      // The host drops a layer whose program could not draw; the caller gets the program's error
+      // and no id of a node that is no longer there.
+      if (!result.ok) throw new Error(result.error ?? 'The code layer did not draw.')
+      return result
     }
     if (!args.id) throw new Error(`${args.action} needs the code layer's id.`)
     if (args.action === 'set_source') {

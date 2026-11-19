@@ -22,15 +22,26 @@ export function bindScriptToolHost(store: EditorStore): () => void {
 
   const host: ScriptToolHost = {
     async create({ source, x = 0, y = 0 }) {
-      const id = store.createShape(
-        'SCRIPT',
-        Math.round(x),
-        Math.round(y),
-        SCRIPT_WIDTH,
-        SCRIPT_HEIGHT
-      )
-      setScriptSource(store, id, source)
-      return run(id)
+      // The layer exists only to carry the program: one that cannot draw is not a layer, and the
+      // caller is told what the program did wrong instead of being handed a broken node.
+      store.undo.beginBatch('Create code layer')
+      try {
+        const id = store.createShape(
+          'SCRIPT',
+          Math.round(x),
+          Math.round(y),
+          SCRIPT_WIDTH,
+          SCRIPT_HEIGHT
+        )
+        setScriptSource(store, id, source)
+        const result = await run(id)
+        if (result.ok) store.undo.commitBatch()
+        else store.undo.rollbackBatch()
+        return result
+      } catch (error) {
+        store.undo.rollbackBatch()
+        throw error
+      }
     },
     setSource(id, source) {
       setScriptSource(store, id, source)

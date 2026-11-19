@@ -64,6 +64,23 @@ test('create places a code layer through the host and run does not edit it', asy
   expect(getScriptToolHost(graph)).toBeUndefined()
 })
 
+test('a create that cannot draw refuses with the program error, not a new layer', async () => {
+  const graph = new SceneGraph()
+  const unregister = registerScriptToolHost(graph, {
+    ...fakeHost([]),
+    async create() {
+      return { id: 'script-1', ok: false, error: 'Script output is not a valid layer.' }
+    }
+  })
+  try {
+    await expect(
+      scriptTool.execute(figmaFor(graph), { action: 'create', source: 'rect()' })
+    ).rejects.toThrow('Script output is not a valid layer.')
+  } finally {
+    unregister()
+  }
+})
+
 test('set_source writes the program and runs the layer again', async () => {
   const graph = new SceneGraph()
   const calls: string[] = []

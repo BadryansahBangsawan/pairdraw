@@ -3,7 +3,7 @@ import { isEqual, pick, uniq } from 'es-toolkit'
 import type { SceneNode } from '@pairdraw/scene-graph'
 
 import { assertNodeEditable } from './capabilities'
-import { captureSources, restoreSources, type SourceSnapshots } from './history/sources'
+import { restoreSources, type SourceSnapshots } from './history/sources'
 import type { EditorContext } from './types'
 
 export interface NodePreview {
@@ -105,30 +105,32 @@ export function createNodePreviewActions(
         // Back to what the layers held, so the commit reports each to graph observers before it
         // changes them, as the other previews do; otherwise a saved .fig sees no change.
         for (const edit of edits) graph.updateNodePreview(edit.id, structuredClone(edit.before))
-        const sourcesAfter = captureSources(graph, sourcesBefore.keys())
         function apply(direction: 'before' | 'after') {
-          // A replay restores a side as it stood, its edited-field marks included.
-          graph.preserveSourceMetadataDuring(() => {
-            for (const edit of edits) {
-              const update = () => graph.updateNode(edit.id, structuredClone(edit[direction]))
-              if (layoutOnly.has(edit.id)) graph.withLayoutMutations(update)
-              else update()
-            }
-          })
-          restoreSources(graph, direction === 'before' ? sourcesBefore : sourcesAfter)
+          for (const edit of edits) {
+            const update = () => graph.updateNode(edit.id, structuredClone(edit[direction]))
+            if (layoutOnly.has(edit.id)) graph.withLayoutMutations(update)
+            else update()
+          }
+          // Undo gives the previewed layers the marks they had before it; redo marks them again
+          // as the commit did.
+          if (direction === 'before') restoreSources(graph, sourcesBefore)
           ctx.requestRender()
         }
-        ctx.undo.push({ label, forward: () => apply('after'), inverse: () => apply('before') })
-        // Publish the complete preview delta, including layout children and implicit edits.
+        // Publish the complete preview delta, including the layout children and implicit edits,
+        // before recording it, so the step owns the marks this commit adds.
         apply('after')
+        ctx.undo.push({ label, forward: () => apply('after'), inverse: () => apply('before') })
       },
       cancel() {
         if (closed) return
         close()
         for (const [id, previous] of originals)
           graph.updateNodePreview(id, structuredClone(previous))
-        restoreSources(graph, sourcesBefore)
-        // Reconcile retained/tiled resources once; cancellation publishes no committed node edits.
+        // The marks go back without a node update: cancelling publishes no committed node edits.
+        for (const [id, source] of sourcesBefore) {
+          const node = graph.getNode(id)
+          if (node) node.source = structuredClone(source)
+        }
         if (originals.size) ctx.requestRender()
       }
     }

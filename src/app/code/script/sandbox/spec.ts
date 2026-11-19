@@ -21,7 +21,7 @@ export interface ScriptNodeSpec {
   y?: number
   width?: number
   height?: number
-  /** `#rrggbb` or `#rrggbbaa`; the host makes the fill. */
+  /** Any CSS colour the renderer takes, such as `#f00`, `#ff0000aa`, `rgb()` or a name; stored as hex. */
   fill?: string
   stroke?: string
   strokeWeight?: number

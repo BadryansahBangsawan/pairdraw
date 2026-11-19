@@ -3,27 +3,25 @@
  * data. No DOM, so the runner is unit-tested directly; `pencil` is the only way it can reach the
  * document, and every call only describes a layer for the host to materialize.
  */
-import * as v from 'valibot'
-
 import type { ScriptInputValue } from '@pairdraw/scene-graph/script'
 
+import {
+  checkScriptRoots,
+  SCRIPT_INVALID_OUTPUT_ERROR,
+  SCRIPT_TOO_MANY_NODES_ERROR
+} from '@/app/code/script/sandbox/output'
 import { mulberry32 } from '@/app/code/script/sandbox/random'
+import { type ScriptRunRequest, type ScriptRunResult } from '@/app/code/script/sandbox/schema'
 import {
-  scriptNodeSpecSchema,
-  type ScriptRunRequest,
-  type ScriptRunResult
-} from '@/app/code/script/sandbox/schema'
-import {
-  countScriptNodes,
   SCRIPT_NODE_TYPES,
   type ScriptNodeSpec,
   type ScriptNodeType
 } from '@/app/code/script/sandbox/spec'
 import { SCRIPT_MAX_NODES } from '@/app/code/script/sandbox/types'
 
+export { SCRIPT_INVALID_OUTPUT_ERROR, SCRIPT_TOO_MANY_NODES_ERROR }
+
 export const SCRIPT_EMPTY_OUTPUT_ERROR = 'Script must return a layer or an array of layers.'
-export const SCRIPT_TOO_MANY_NODES_ERROR = `Script output exceeds ${SCRIPT_MAX_NODES} nodes.`
-export const SCRIPT_INVALID_OUTPUT_ERROR = 'Script output is not a valid layer.'
 
 const MAX_DEPTH = 100
 
@@ -91,13 +89,11 @@ export function runScript({ id, source, inputs, seed }: ScriptRunRequest): Scrip
       (root): root is ScriptNodeSpec => root != null && root !== false
     )
     if (roots.length === 0) throw new Error(SCRIPT_EMPTY_OUTPUT_ERROR)
-    for (const root of roots) {
-      const parsed = v.safeParse(scriptNodeSpecSchema, root)
-      if (!parsed.success) throw new Error(SCRIPT_INVALID_OUTPUT_ERROR)
-      if (depthOf(parsed.output) > MAX_DEPTH) throw new Error(SCRIPT_INVALID_OUTPUT_ERROR)
+    const checked = checkScriptRoots(roots)
+    for (const root of checked) {
+      if (depthOf(root) > MAX_DEPTH) throw new Error(SCRIPT_INVALID_OUTPUT_ERROR)
     }
-    if (countScriptNodes(roots) > SCRIPT_MAX_NODES) throw new Error(SCRIPT_TOO_MANY_NODES_ERROR)
-    return { id, ok: true, roots }
+    return { id, ok: true, roots: checked }
   } catch (error) {
     return { id, ok: false, error: error instanceof Error ? error.message : String(error) }
   }

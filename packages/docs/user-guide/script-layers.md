@@ -30,7 +30,7 @@ Each call returns a description of one layer, and the children array nests layer
 A layer takes:
 
 - **Placement and size**: `name`, `x`, `y`, `width`, `height`.
-- **Paint**: `fill` and `stroke` as `#rrggbb` or `#rrggbbaa`, `strokeWeight` (a stroke is drawn only when it is set), `opacity` from 0 to 1, and `radius` for rounded corners.
+- **Paint**: `fill` and `stroke` as any CSS colour the canvas takes, such as `#fff`, `#ffffff`, `#ffffffff`, `rgb(91 115 242)`, or a name, `strokeWeight` (a stroke is drawn only when it is set), `opacity` from 0 to 1, and `radius` for rounded corners.
 - **Text**, on `pencil.text`: `text`, `fontSize`, `fontWeight`, and `align` as `LEFT`, `CENTER`, or `RIGHT`.
 - **Layout**, on a frame or a shape: `layout` as `HORIZONTAL` or `VERTICAL`, with `gap` and `padding`, which sizes the layer to its children.
 

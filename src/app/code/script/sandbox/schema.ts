@@ -4,11 +4,25 @@
  */
 import * as v from 'valibot'
 
+import { colorToHex8, parseColor, tryParseColor } from '@pairdraw/scene-graph/color'
+
 import { SCRIPT_NODE_TYPES, type ScriptNodeSpec } from '@/app/code/script/sandbox/spec'
 
 const finiteSchema = v.pipe(v.number(), v.finite())
 const sizeSchema = v.pipe(finiteSchema, v.minValue(0))
-const hexColorSchema = v.pipe(v.string(), v.regex(/^#(?:[0-9a-f]{6}|[0-9a-f]{8})$/i))
+
+/**
+ * A fill or stroke: any CSS colour the renderer takes (short hex, `rgb()`, a name), stored as the
+ * hex the host materializes. Refusing text culori cannot read keeps a typo from painting black.
+ */
+const colorSchema = v.pipe(
+  v.string(),
+  v.check(
+    (value) => tryParseColor(value) !== null,
+    (issue) => `${JSON.stringify(issue.input)} is not a color`
+  ),
+  v.transform((value) => colorToHex8(parseColor(value)).toLowerCase())
+)
 
 /** A drawn layer, checked before it is materialized, from either side of the sandbox. */
 export const scriptNodeSpecSchema: v.GenericSchema<unknown, ScriptNodeSpec> = v.object({
@@ -18,8 +32,8 @@ export const scriptNodeSpecSchema: v.GenericSchema<unknown, ScriptNodeSpec> = v.
   y: v.optional(finiteSchema),
   width: v.optional(sizeSchema),
   height: v.optional(sizeSchema),
-  fill: v.optional(hexColorSchema),
-  stroke: v.optional(hexColorSchema),
+  fill: v.optional(colorSchema),
+  stroke: v.optional(colorSchema),
   strokeWeight: v.optional(sizeSchema),
   opacity: v.optional(v.pipe(finiteSchema, v.minValue(0), v.maxValue(1))),
   radius: v.optional(sizeSchema),

@@ -19,7 +19,6 @@ import {
 import { countScriptNodes, type ScriptNodeSpec } from '@/app/code/script/sandbox/spec'
 import {
   SCRIPT_EMPTY_OUTPUT_ERROR,
-  SCRIPT_INVALID_OUTPUT_ERROR,
   SCRIPT_TOO_MANY_NODES_ERROR,
   runScript
 } from '@/app/code/script/sandbox/worker/run'
@@ -66,6 +65,24 @@ describe('script runner', () => {
     expect(countScriptNodes(result.roots as ScriptNodeSpec[])).toBe(3)
   })
 
+  test('takes the CSS colours the renderer takes and stores their hex', () => {
+    const result = runScript(
+      request(`return [pencil.rect({ fill: '#f00' }), pencil.text({ text: 'A', fill: 'green' })]`)
+    )
+    if (!result.ok) throw new Error(result.error)
+    expect(result.roots).toMatchObject([{ fill: '#ff0000' }, { fill: '#008000' }])
+  })
+
+  test('names the layer field of output it cannot draw', () => {
+    expect(
+      runScript(request(`return [pencil.frame({}, [pencil.rect({ fill: '#zzz' })])]`))
+    ).toEqual({
+      id: 'run-1',
+      ok: false,
+      error: 'Script output is not a valid layer. roots[0].children[0].fill: "#zzz" is not a color'
+    })
+  })
+
   test('rejects components by name, invalid layers, and thrown errors', () => {
     expect(runScript(request(`return pencil.node('INSTANCE', {})`))).toEqual({
       id: 'run-1',
@@ -76,7 +93,8 @@ describe('script runner', () => {
     expect(runScript(request(`return pencil.rect({ width: -1 })`))).toEqual({
       id: 'run-1',
       ok: false,
-      error: SCRIPT_INVALID_OUTPUT_ERROR
+      error:
+        'Script output is not a valid layer. roots[0].width: Invalid value: Expected >=0 but received -1'
     })
     expect(runScript(request(`return 'not a layer'`)).ok).toBe(false)
     expect(runScript(request(`throw new Error('boom')`))).toEqual({
@@ -113,10 +131,11 @@ describe('script runner', () => {
   })
 
   test('keeps an oversized layer out of the host', () => {
-    expect(runScript(request(`return pencil.text({ text: 'x'.repeat(20_000) })`))).toEqual({
+    expect(runScript(request(`return pencil.text({ text: 'x'.repeat(20_000) })`))).toMatchObject({
       id: 'run-1',
       ok: false,
-      error: SCRIPT_INVALID_OUTPUT_ERROR
+      error:
+        'Script output is not a valid layer. roots[0].text: Invalid length: Expected <=10000 but received 20000'
     })
   })
 
@@ -163,10 +182,15 @@ describe('script sandbox messages', () => {
     expect(() => parse(scriptHostMessageSchema)({ type: SCRIPT_SANDBOX_RUN, id: 1 })).toThrow()
   })
 
-  test('rejects a layer with an unknown type or a bad color', () => {
+  test('rejects a layer with an unknown type or text that is not a color', () => {
     expect(() => parse(scriptNodeSpecSchema)({ type: 'COMPONENT' })).toThrow()
-    expect(() => parse(scriptNodeSpecSchema)({ type: 'RECTANGLE', fill: 'red' })).toThrow()
-    expect(parse(scriptNodeSpecSchema)({ type: 'RECTANGLE', fill: '#ff0000ff' })).toBeDefined()
+    expect(() => parse(scriptNodeSpecSchema)({ type: 'RECTANGLE', fill: '#zzz' })).toThrow()
+    expect(parse(scriptNodeSpecSchema)({ type: 'RECTANGLE', fill: 'red' })).toMatchObject({
+      fill: '#ff0000'
+    })
+    expect(parse(scriptNodeSpecSchema)({ type: 'RECTANGLE', fill: '#ff0000ff' })).toMatchObject({
+      fill: '#ff0000'
+    })
   })
 
   test('rejects a color input with a non-finite component', () => {
@@ -272,9 +296,10 @@ describe('script sandbox host', () => {
       },
       dispose: () => undefined
     }
-    expect(await runInFrame(frame, 'return pencil.rect({})')).toEqual({
-      ok: false,
-      error: 'Script output is not a valid layer.'
-    })
+    const result = await runInFrame(frame, 'return pencil.rect({})')
+    expect(result).toMatchObject({ ok: false })
+    expect(result.ok ? '' : result.error).toMatch(
+      /^Script output is not a valid layer\. roots\[0\]\.type: /
+    )
   })
 })

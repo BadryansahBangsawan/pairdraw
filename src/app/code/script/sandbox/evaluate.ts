@@ -8,17 +8,15 @@ import * as v from 'valibot'
 import { IS_BROWSER } from '@pairdraw/core/constants'
 import type { ScriptInputValue } from '@pairdraw/scene-graph/script'
 
+import { checkScriptRoots } from '@/app/code/script/sandbox/output'
 import {
   SCRIPT_SANDBOX_READY,
   SCRIPT_SANDBOX_RUN,
-  scriptFrameMessageSchema,
-  scriptNodeSpecSchema
+  scriptFrameMessageSchema
 } from '@/app/code/script/sandbox/schema'
-import { countScriptNodes, type ScriptNodeSpec } from '@/app/code/script/sandbox/spec'
 import {
   SCRIPT_DEFAULT_READY_TIMEOUT_MS,
   SCRIPT_DEFAULT_TIMEOUT_MS,
-  SCRIPT_MAX_NODES,
   type ScriptSandboxResult
 } from '@/app/code/script/sandbox/types'
 import { runInSandboxFrame, type SandboxFrame } from '@/app/runtime/sandbox-frame'
@@ -32,20 +30,6 @@ export interface ScriptEvaluateOptions {
   seed?: number
   timeoutMs?: number
   readyTimeoutMs?: number
-}
-
-function checkRoots(value: unknown): ScriptNodeSpec[] {
-  if (!Array.isArray(value)) throw new Error('Script output is not a valid layer.')
-  const roots: ScriptNodeSpec[] = []
-  for (const root of value) {
-    const parsed = v.safeParse(scriptNodeSpecSchema, root)
-    if (!parsed.success) throw new Error('Script output is not a valid layer.')
-    roots.push(parsed.output)
-  }
-  if (countScriptNodes(roots) > SCRIPT_MAX_NODES) {
-    throw new Error(`Script output exceeds ${SCRIPT_MAX_NODES} nodes.`)
-  }
-  return roots
 }
 
 /** Evaluate one script in a fresh frame, with the host's deadline and output checks. */
@@ -73,7 +57,7 @@ export function runInFrame(
       if (message.id !== request.id) return null
       if (!message.ok) return { ok: false, error: message.error }
       try {
-        return { ok: true, roots: checkRoots(message.roots) }
+        return { ok: true, roots: checkScriptRoots(message.roots) }
       } catch (error) {
         return { ok: false, error: error instanceof Error ? error.message : String(error) }
       }

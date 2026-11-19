@@ -37,6 +37,8 @@ const IMPORT_NAMED = es.parseModule(`import { $Component } from '$path'`)
 
 const STORY = es.parseModule(`export const $name: Story = $story`)
 
+const IMAGE = es.parseModule(`const $name = new URL($path, import.meta.url).href`)
+
 /**
  * What clicking a control does, as Reka marks it: the role to find it by, the element that
  * changes, and the `data-state` it ends in.
@@ -133,7 +135,12 @@ export interface ComponentStoriesData {
   generated: Pick<GeneratedComponent, 'entry' | 'valueArg' | 'valueList'>
   /** Design links for the whole file, as `parameters.design` entries. */
   design: { name: string; type: string; url: string }[]
+  /** Design image per story, by story name: the path relative to the story file. */
+  designs?: Map<string, string>
 }
+
+/** The prop values a story sets over the component's rest values. */
+export type StoryValues = Record<string, string | number | boolean>
 
 const FALSE = es.parseExpression('false')
 const TRUE = es.parseExpression('true')
@@ -217,20 +224,26 @@ function argTypes(component: ComponentModel, model: string | null, list: boolean
 }
 
 /** A story per state worth seeing: at rest, each boolean on, disabled, and each prop value. */
-function stories(
+export function componentStories(
   component: ComponentModel,
   model: string | null,
   list: boolean
-): { name: string; story: es.SyntaxNode }[] {
+): { name: string; values: StoryValues; story: es.SyntaxNode }[] {
   // Stories are named apart from the component the file imports and the module's own names.
   const taken = new Set([component.name, 'meta', 'Story'])
   let first = true
-  const story = (label: string, args: [string, es.SyntaxNode][], play?: es.SyntaxNode) => {
+  const story = (
+    label: string,
+    values: StoryValues,
+    args: [string, es.SyntaxNode][],
+    play?: es.SyntaxNode
+  ) => {
     // Every story after the first, Default, is another state, tagged so Storybook can hide it.
     const variant = !first
     first = false
     return {
       name: claimName(identifierName(label, 'Story'), taken),
+      values,
       story: es.object([
         ...(variant
           ? [['tags', es.array([es.string(VARIANT_TAG)])] as [string, es.SyntaxNode]]
@@ -243,8 +256,10 @@ function stories(
   const { range } = component
   const boolean = !component.choice && !range && !component.text
   return [
-    story('Default', [], playOf(component)),
-    ...(component.model && model && boolean ? [story(component.model, [[model, TRUE]])] : []),
+    story('Default', {}, [], playOf(component)),
+    ...(component.model && model && boolean
+      ? [story(component.model, { [model]: true }, [[model, TRUE]])]
+      : []),
     // A range gets a story at each end it does not start at.
     ...(range && model
       ? (
@@ -254,23 +269,25 @@ function stories(
           ] as const
         )
           .filter(([, value]) => value !== range.default)
-          .map(([label, value]) => story(label, [[model, numberArg(value, list)]]))
+          .map(([label, value]) =>
+            story(label, { [model]: value }, [[model, numberArg(value, list)]])
+          )
       : []),
     // A choice gets a story per option it does not start on, such as each other tab.
     ...(component.choice && model
       ? component.choice.options
           .filter((option) => option !== component.choice?.default)
-          .map((option) => story(option, [[model, es.string(option)]]))
+          .map((option) => story(option, { [model]: option }, [[model, es.string(option)]]))
       : []),
-    ...(component.disabled ? [story('Disabled', [['disabled', TRUE]])] : []),
+    ...(component.disabled ? [story('Disabled', { disabled: true }, [['disabled', TRUE]])] : []),
     ...component.props.flatMap((prop) =>
       prop.options
         .filter((option) => option !== prop.default)
-        .map((option) => story(option, [[prop.name, es.string(option)]]))
+        .map((option) => story(option, { [prop.name]: option }, [[prop.name, es.string(option)]]))
     ),
     // A boolean gets a story drawn the other way, such as an icon shown that is hidden at rest.
     ...component.booleans.map((prop) =>
-      story(`${prop.property} ${prop.default ? 'off' : 'on'}`, [
+      story(`${prop.property} ${prop.default ? 'off' : 'on'}`, { [prop.name]: !prop.default }, [
         [prop.name, prop.default ? FALSE : TRUE]
       ])
     )
@@ -312,10 +329,47 @@ export function printComponentStories(data: ComponentStoriesData): string {
     $Component: es.identifier(component.name),
     $path: es.string(entry.path)
   }).body
-  const all = stories(component, model, list)
-  const exported = (data.single ? all.slice(0, 1) : all).flatMap(
-    (item) => es.fill(STORY, { $name: es.identifier(item.name), $story: item.story }).body
-  )
+  const all = componentStories(component, model, list)
+  const kept = data.single ? all.slice(0, 1) : all
+  // Each story's design image is a URL const, so Vite bundles the file it points at.
+  const images = kept.flatMap((item, index) => {
+    const path = data.designs?.get(item.name)
+    return path
+      ? es.fill(IMAGE, { $name: es.identifier(`design${index}`), $path: es.string(path) }).body
+      : []
+  })
+  const exported = kept.flatMap((item, index) => {
+    const parameters = es.object([
+      [
+        'design',
+        es.array([
+          es.object([
+            ['name', es.string('Design')],
+            ['type', es.string('image')],
+            ['url', es.identifier(`design${index}`)]
+          ])
+        ])
+      ]
+    ])
+    const story = data.designs?.has(item.name)
+      ? {
+          ...item.story,
+          properties: [
+            ...es.children(item.story, 'properties'),
+            {
+              type: 'Property',
+              kind: 'init',
+              key: es.identifier('parameters'),
+              value: parameters,
+              computed: false,
+              method: false,
+              shorthand: false
+            }
+          ]
+        }
+      : item.story
+    return es.fill(STORY, { $name: es.identifier(item.name), $story: story }).body
+  })
   // Only a control with a play function uses `expect`.
   const [types, expectImport, ...rest] = body
   const imports = playOf(component) ? [types, expectImport] : [types]
@@ -327,6 +381,7 @@ export function printComponentStories(data: ComponentStoriesData): string {
       ...stylesheets(data.styles),
       ...componentImport,
       ...rest,
+      ...images,
       ...exported
     ])
   })

@@ -20,7 +20,7 @@ import type { ComponentStyling } from '../components/styling'
 import { vueComponent } from '../components/vue'
 import { serializeHTML, serializeNode } from '../html'
 import { sceneNodeToDesignDocument, type VectorElementRenderer } from '../projection'
-import { printComponentStories } from './component'
+import { componentStories, printComponentStories, type StoryValues } from './component'
 import { collectGroups, type StoryGroup } from './groups'
 import {
   printStoryModule,
@@ -272,6 +272,40 @@ function storyEntries(
 }
 
 /**
+ * The variant a generated component's story draws: the one whose variant property values match
+ * the story's args over the component's rest values. A state no single variant draws, such as
+ * a text field's words, has none.
+ */
+function variantForStory(
+  group: StoryGroup,
+  component: ComponentModel,
+  values: StoryValues
+): StoryGroup['variants'][number] | undefined {
+  const args = component.args
+  // The variant property values the component shows at rest, and with the story's args set.
+  const shown = (story: StoryValues): Record<string, string> => {
+    const record: Record<string, string> = {}
+    for (const prop of component.props)
+      record[prop.property] = String(story[prop.name] ?? prop.default)
+    for (const [property, boolean] of args.booleans)
+      record[property] = (story[boolean.name] ?? false) ? boolean.on : boolean.off
+    if (args.states)
+      record[args.states.property] =
+        story['disabled'] === true && args.states.disabled !== undefined
+          ? args.states.disabled
+          : args.states.rest
+    if (args.filled) record[args.filled.property] = args.filled.off
+    return record
+  }
+  const target = shown(values)
+  return group.variants.find((variant) =>
+    Object.entries(target).every(
+      ([property, value]) => variant.node.componentPropertyValues[property] === value
+    )
+  )
+}
+
+/**
  * The component each entry's set generates, by set id, built twice: first alone, so each
  * knows its props, then knowing all the others, so an instance of one uses it rather than
  * drawing its layers.
@@ -353,6 +387,63 @@ async function storyTokens(graph: SceneGraph, folder: string): Promise<ExportHTM
   return css ? [{ path: `${folder}/tokens.css`, content: css }] : []
 }
 
+/** What writing one generated component's stories needs from the export around it. */
+interface GeneratedContext {
+  options: ExportStorybookOptions
+  framework: StorybookFramework
+  uniqueNames: Set<string>
+  styles: string[]
+  add: (page: SceneNode, path: string, content: string | Uint8Array) => void
+  entry: StoryEntry
+}
+
+/** A generated component's files: its component, design images, and state stories. */
+async function addGeneratedStories(
+  component: ComponentModel,
+  generate: ComponentGenerator,
+  { options, framework, uniqueNames, styles, add, entry }: GeneratedContext
+): Promise<void> {
+  const { page, group, file, mode } = entry
+  const generated = await generate(component, { styling: options.styling })
+  for (const item of generated.files) add(page, item.path, item.content)
+  const design = designLink({ linkPath: options.linkPath, uniqueNames }, group.linkNode)
+  // Each state story shows the variant that draws it, as static stories show their own.
+  const states = componentStories(
+    component,
+    generated.valueArg,
+    generated.valueList ?? false
+  ).slice(0, mode === 'single' ? 1 : undefined)
+  const designs = new Map<string, string>()
+  const render = options.renderDesignImage
+  if (render) {
+    for (const state of states) {
+      const variant = variantForStory(group, component, state.values)
+      if (!variant) continue
+      const path = `${file}.design/${state.name}.png`
+      add(page, path, await render(variant.node.id))
+      designs.set(state.name, `./${path}`)
+    }
+  }
+  add(
+    page,
+    `${file}.stories.ts`,
+    printComponentStories({
+      storybook: STORYBOOK_PACKAGES[framework],
+      title: group.title,
+      tags: fileTags(group.page.name),
+      styles,
+      component,
+      generated,
+      // A gallery lays out static variants; a generated component's stories are its states.
+      single: mode === 'single',
+      design: design.flatMap((link) =>
+        link.type === 'link' ? [{ name: 'Pairdraw', type: 'link', url: link.url }] : []
+      ),
+      designs
+    })
+  )
+}
+
 /**
  * Generate one CSF3 `.stories.ts` file per component or component set, plus a
  * `<Name>.design/` folder of variant images when `renderDesignImage` is given.
@@ -380,29 +471,19 @@ export async function exportStorybook(
   const generate = GENERATORS[framework]
   const models = generate ? generatedModels(graph, entries, options.vectorElement) : new Map()
 
-  for (const { page, group, file, mode } of entries) {
+  for (const entry of entries) {
+    const { page, group, file, mode } = entry
     const component = group.set && models.get(group.set.id)
     if (generate && component) {
-      const generated = await generate(component, { styling: options.styling })
-      for (const item of generated.files) add(page, item.path, item.content)
-      const design = designLink({ linkPath: options.linkPath, uniqueNames }, group.linkNode)
-      add(
-        page,
-        `${file}.stories.ts`,
-        printComponentStories({
-          storybook: STORYBOOK_PACKAGES[framework],
-          title: group.title,
-          tags: fileTags(group.page.name),
-          styles,
-          component,
-          generated,
-          // A gallery lays out static variants; a generated component's stories are its states.
-          single: mode === 'single',
-          design: design.flatMap((entry) =>
-            entry.type === 'link' ? [{ name: 'Pairdraw', type: 'link', url: entry.url }] : []
-          )
-        })
-      )
+      const context: GeneratedContext = {
+        options,
+        framework,
+        uniqueNames,
+        styles,
+        add,
+        entry
+      }
+      await addGeneratedStories(component, generate, context)
       continue
     }
 

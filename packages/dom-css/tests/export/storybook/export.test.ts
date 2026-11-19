@@ -3,6 +3,7 @@ import { mkdtemp, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { switchSet } from '#dom-css-tests/behaviours/fixtures'
 import { BLUE_500, card, designSystem } from '#dom-css-tests/export/token-fixtures'
 import { exportStorybook } from '#dom-css/index'
 
@@ -476,5 +477,117 @@ describe('exportStorybook', () => {
     expect(content).toContain('node=Size%3DLarge')
     expect(content).not.toContain('node=Button')
     expect(content).not.toContain('node=Size%3DSmall')
+  })
+
+  it('writes a design image per generated-component story, as static stories get', async () => {
+    const { graph } = buttonGraph()
+    const rendered: string[] = []
+    const files = await exportStorybook(graph, {
+      framework: 'react',
+      linkPath: 'ui.fig',
+      renderDesignImage: async (nodeId) => {
+        rendered.push(nodeId)
+        return new Uint8Array([nodeId.length])
+      }
+    })
+
+    expect(files.map((file) => file.path)).toContain('Button.design/Default.png')
+    expect(files.map((file) => file.path)).toContain('Button.design/Large.png')
+    expect(rendered).toHaveLength(2)
+    // The stories import the generated React component, which this package's tests do not
+    // link; read the written module's syntax instead of loading it.
+    const content = String(files.find((file) => file.path === 'Button.stories.ts')?.content)
+    const program = es.parseModule(content)
+    const declarations = es
+      .children(program, 'body')
+      .flatMap((node) =>
+        node.type === 'ExportNamedDeclaration' ? [es.child(node, 'declaration')] : [node]
+      )
+      .filter((node) => node?.type === 'VariableDeclaration')
+      .flatMap((node) => es.children(node, 'declarations'))
+    const urlPaths = new Map(
+      declarations.flatMap((declaration) => {
+        const id = es.child(declaration, 'id')
+        // `new URL(path, import.meta.url).href` keeps the call under the member's object.
+        const init = es.child(declaration, 'init')
+        const call = init?.type === 'MemberExpression' ? es.child(init, 'object') : init
+        const args = es.children(call, 'arguments')
+        const path = args[0]?.value
+        return typeof id?.name === 'string' && typeof path === 'string'
+          ? [[id.name, path] as const]
+          : []
+      })
+    )
+    const storyDesign = (name: string) => {
+      const declaration = declarations.find((node) => es.child(node, 'id')?.name === name)
+      const properties = es.children(es.child(declaration, 'init'), 'properties')
+      const parameters = properties.find(
+        (property) => es.child(property, 'key')?.name === 'parameters'
+      )
+      const design = es
+        .children(es.child(parameters, 'value'), 'properties')
+        .find((property) => es.child(property, 'key')?.name === 'design')
+      return es.children(es.child(design, 'value'), 'elements').map((entry) => {
+        const fields = new Map(
+          es
+            .children(entry, 'properties')
+            .map((property) => [
+              String(es.child(property, 'key')?.name),
+              es.child(property, 'value')
+            ])
+        )
+        const url = fields.get('url')
+        return {
+          name: fields.get('name')?.value,
+          type: fields.get('type')?.value,
+          url: url?.type === 'Literal' ? url.value : urlPaths.get(String(url?.name))
+        }
+      })
+    }
+    expect(storyDesign('Default')).toEqual([
+      { name: 'Design', type: 'image', url: './Button.design/Default.png' }
+    ])
+    expect(storyDesign('Large')).toEqual([
+      { name: 'Design', type: 'image', url: './Button.design/Large.png' }
+    ])
+    // The Pairdraw link stays on the file, as static stories keep it.
+    expect(content).toContain('pairdraw://open?file=ui.fig&node=Button')
+  })
+
+  it('gives a behaviour component state story the variant that draws it', async () => {
+    const { graph, set } = switchSet()
+    const variantIds = new Map<string, string>(
+      graph.getChildren(set.id).map((variant) => [variant.name, variant.id])
+    )
+    const rendered: string[] = []
+    const files = await exportStorybook(graph, {
+      framework: 'vue',
+      renderDesignImage: async (nodeId) => {
+        rendered.push(nodeId)
+        return new Uint8Array([1])
+      }
+    })
+    // A switch's stories import `storybook/test` for their play functions, which this
+    // package's tests do not link; the written module shows the same parameters.
+    const content = String(files.find((file) => file.path === 'Switch.stories.ts')?.content)
+    // The checked story shows the State=On variant at rest interaction.
+    expect(rendered).toContain(variantIds.get('State=On, Interaction=Default') ?? 'missing')
+    expect(content).toContain('./Switch.design/Checked.png')
+    expect(rendered).toContain(variantIds.get('State=Off, Interaction=Disabled') ?? 'missing')
+    expect(content).toContain('./Switch.design/Disabled.png')
+    expect(files.map((file) => file.path)).toContain('Switch.design/Checked.png')
+    expect(files.map((file) => file.path)).toContain('Switch.design/Disabled.png')
+  })
+
+  it('renders only the Default image when a plan keeps the Default story alone', async () => {
+    const { graph } = buttonGraph()
+    const files = await exportStorybook(graph, {
+      framework: 'react',
+      plan: () => ({ stories: 'single' }),
+      renderDesignImage: async () => new Uint8Array([1])
+    })
+    expect(files.map((file) => file.path).filter((path) => path.endsWith('.png'))).toEqual([
+      'Button.design/Default.png'
+    ])
   })
 })

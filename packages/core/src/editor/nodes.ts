@@ -1,9 +1,14 @@
 import { pick } from 'es-toolkit/object'
 
 import type { SceneNode } from '@pairdraw/scene-graph'
-import { findInstanceAncestor, recordInstanceOverride } from '@pairdraw/scene-graph/instances'
+import {
+  findInstanceAncestor,
+  instanceOverrideFields,
+  recordInstanceOverride
+} from '@pairdraw/scene-graph/instances'
 import { cloneInstanceOverrideState } from '@pairdraw/scene-graph/instances/overrides'
 import { styleDetachmentChanges } from '@pairdraw/scene-graph/shared-styles'
+import { strokeLineChanges } from '@pairdraw/scene-graph/strokes'
 
 import { textAutoResizeChanges } from '#core/layout/text-auto-resize'
 import { reconcileVariableLayouts } from '#core/layout/variables'
@@ -49,11 +54,13 @@ export function createNodeActions(ctx: EditorContext) {
     // (path text is textAutoResize NONE so they don't collide today).
     const nextChanges = styleDetachmentChanges(node, {
       ...changes,
+      ...strokeLineChanges(node, changes),
       ...textAutoResizeChanges(node, changes),
       ...pathTextEditChanges(node, changes)
     })
+    const overridden = instanceOverrideFields(node, nextChanges)
     ctx.graph.updateNode(id, nextChanges)
-    recordInstanceOverride(ctx.graph, id, Object.keys(nextChanges))
+    recordInstanceOverride(ctx.graph, id, overridden)
     runChangedLayout(id, nextChanges)
   }
 
@@ -78,6 +85,7 @@ export function createNodeActions(ctx: EditorContext) {
     // Same ordering rationale as updateNode: reflowed path-text glyphs win.
     const nextChanges = styleDetachmentChanges(node, {
       ...changes,
+      ...strokeLineChanges(node, changes),
       ...textAutoResizeChanges(node, changes),
       ...pathTextEditChanges(node, changes)
     })
@@ -89,14 +97,15 @@ export function createNodeActions(ctx: EditorContext) {
       node,
       Object.keys(nextChanges) as (keyof SceneNode)[]
     ) as Partial<SceneNode>
+    const overridden = instanceOverrideFields(node, nextChanges)
     ctx.graph.updateNode(id, nextChanges)
-    recordInstanceOverride(ctx.graph, id, Object.keys(nextChanges))
+    recordInstanceOverride(ctx.graph, id, overridden)
     runChangedLayout(id, nextChanges)
     ctx.undo.push({
       label,
       forward: () => {
         ctx.graph.updateNode(id, nextChanges)
-        recordInstanceOverride(ctx.graph, id, Object.keys(nextChanges))
+        recordInstanceOverride(ctx.graph, id, overridden)
         runChangedLayout(id, nextChanges)
       },
       inverse: () => {

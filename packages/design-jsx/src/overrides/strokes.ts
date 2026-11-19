@@ -85,25 +85,27 @@ export function applyStrokeOverrides(props: Record<string, unknown>, o: Partial<
   if (nodeCap) o.strokeCap = nodeCap
   const nodeJoin = STROKE_JOIN.parse(props.strokeJoin)
   if (nodeJoin) o.strokeJoin = nodeJoin
-  // The node's own dash pattern, separate from the stroke-local dash `strokeDash` sets.
+  // The node's dash, which strokes without their own dash take, as strokes take its cap and join.
   const nodeDash = dashValue(props.dashPattern)
   if (nodeDash) o.dashPattern = nodeDash
+  const strokes = strokeValues(props).map((value) =>
+    toStroke({ ...value, dash: value.dash ?? nodeDash })
+  )
+  if (strokes.length > 0) o.strokes = strokes
+}
 
-  if (Array.isArray(props.strokes)) {
-    const strokes = props.strokes.filter(isStrokeValue).map(toStroke)
-    if (strokes.length > 0) o.strokes = strokes
-    return
-  }
-
+/** The strokes `strokes` lists, or the one `stroke` and its sibling props describe. */
+function strokeValues(props: Record<string, unknown>): StrokeValue[] {
+  if (Array.isArray(props.strokes)) return props.strokes.filter(isStrokeValue)
   const color = designJSXProp(props, 'stroke')
-  if (typeof color !== 'string' && !isColor(color)) return
-  o.strokes = [
-    toStroke({
+  if (typeof color !== 'string' && !isColor(color)) return []
+  return [
+    {
       color,
       weight:
         (props.strokeWidth as number | undefined) ?? (props.borderWidth as number | undefined),
       align: props.strokeAlign as string | undefined,
       dash: props.strokeDash as number[] | undefined
-    })
+    }
   ]
 }

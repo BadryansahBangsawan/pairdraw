@@ -808,6 +808,25 @@ function applySharedStyleProps(
   if (node.guides.length > 0) nc.guides = exportCanvasGuides(node.guides)
 }
 
+/**
+ * The dash a record writes: a layer's strokes draw with their own pattern, as they do with their
+ * weight and alignment, and a layer without strokes keeps its pattern for the next stroke.
+ */
+function nodeDashPattern(node: SceneNode): number[] {
+  if (node.strokes.length === 0) return node.dashPattern
+  return node.strokes[0].dashPattern ?? []
+}
+
+/** Writes the dash the layer's strokes draw, and clears one the raw fields still carry. */
+function applyDashPattern(
+  nc: NodeChange,
+  node: SceneNode,
+  rawNodeFields: Record<string, unknown>
+): void {
+  const dashPattern = nodeDashPattern(node)
+  if (dashPattern.length > 0 || 'dashPattern' in rawNodeFields) nc.dashPattern = dashPattern
+}
+
 function applyNodeVisualProps(
   context: SceneNodeToKiwiContext,
   node: SceneNode,
@@ -857,7 +876,7 @@ function applyNodeVisualProps(
   if (node.strokeMiterLimit !== DEFAULT_STROKE_MITER_LIMIT || 'miterLimit' in rawNodeFields) {
     nc.miterLimit = node.strokeMiterLimit
   }
-  if (node.dashPattern.length > 0) nc.dashPattern = node.dashPattern
+  applyDashPattern(nc, node, rawNodeFields)
   if (node.arcData) {
     nc.arcData = {
       startingAngle: node.arcData.startingAngle,

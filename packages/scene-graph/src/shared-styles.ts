@@ -1,6 +1,7 @@
 import { isEqual, omit } from 'es-toolkit'
 
 import type { SceneGraph } from './graph'
+import { STROKE_LINE_KEYS } from './strokes'
 import type {
   CharacterStyleOverride,
   SceneNode,
@@ -98,9 +99,6 @@ export function getSharedStyles(graph: SceneGraph, kind: SharedStyleKind): Share
   }
   return styles.sort((left, right) => left.name.localeCompare(right.name))
 }
-
-/** What a stroke draws along beside its paint: the layer's, not its stroke style's. */
-const STROKE_LINE_KEYS = ['weight', 'align', 'cap', 'join', 'dashPattern'] as const
 
 /**
  * Whether new strokes only change how their lines run, keeping every paint. A stroke style gives

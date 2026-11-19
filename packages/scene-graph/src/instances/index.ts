@@ -2,6 +2,7 @@ import type { NodeCloneMode } from '../copy'
 import type { SceneGraph } from '../graph'
 import { slotScope } from '../slots/content'
 import { detachOwnedSlotContent, restoreOwnedSlotContent } from '../slots/frames'
+import { changesMoreThanStrokeLines } from '../strokes'
 import type { SceneNode } from '../types'
 import { applyBoundPaintColorsIn, keepCopyBoundPaints } from '../variables/paints'
 import { keepOwnContentSize } from './content-size'
@@ -13,6 +14,7 @@ import {
   assignmentOverrideField,
   cloneInstanceOverrideState,
   copiedComponentLayerId,
+  cloneInstanceOverrideState,
   createInstanceOverrideState,
   getInstanceOverride,
   hasInstanceOverride as hasNodeInstanceOverride,
@@ -25,6 +27,7 @@ import { owningInstance, replacedLayerIn } from './replacements'
 import { walkInstanceSources } from './source-walk'
 import { captureInstanceOverrides, restoreInstanceOverrides } from './swap-overrides'
 import {
+  applySyncedStrokeLines,
   bindingProtection,
   cloneChildrenWithMapping,
   copyProp,
@@ -171,6 +174,7 @@ export function swapInstanceComponent(
     copyProp(updates, source, key)
   }
   syncVariableModeFields(instance, source, updates, overridden)
+  applySyncedStrokeLines(graph, instance, updates, overridden)
 
   if (
     !keepName &&
@@ -452,6 +456,16 @@ export function recordAssignmentOverride(
   graph.updateNode(outer.id, { instanceOverrides: outer.instanceOverrides })
 }
 
+/**
+ * The fields `changes` overrides on an instance layer. New strokes that change only what the
+ * layer's line fields say override those fields, not the paints (`changesMoreThanStrokeLines`).
+ */
+export function instanceOverrideFields(node: SceneNode, changes: Partial<SceneNode>): string[] {
+  const fields = Object.keys(changes)
+  if (!changes.strokes || changesMoreThanStrokeLines(node, changes)) return fields
+  return fields.filter((field) => field !== 'strokes')
+}
+
 export function recordInstanceOverride(
   graph: SceneGraph,
   nodeId: string,
@@ -471,11 +485,16 @@ export function recordInstanceOverride(
     )
   )
 
-  if (relevant.length === 0) return
+  const added = relevant.filter(
+    (field) => !hasNodeInstanceOverride(instance.instanceOverrides, instance.id, nodeId, field)
+  )
+  if (added.length === 0) return
 
-  for (const field of relevant)
-    setInstanceOverride(instance.instanceOverrides, instance.id, nodeId, field)
-  graph.updateNode(instance.id, { instanceOverrides: instance.instanceOverrides })
+  // A new state rather than an edit of the old one, so a preview that captured the old state
+  // puts it back on cancel.
+  const overrides = cloneInstanceOverrideState(instance.instanceOverrides)
+  for (const field of added) setInstanceOverride(overrides, instance.id, nodeId, field)
+  graph.updateNode(instance.id, { instanceOverrides: overrides })
 }
 
 /** Every layer at or below `rootId`. */

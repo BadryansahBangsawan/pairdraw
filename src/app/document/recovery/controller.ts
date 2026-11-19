@@ -121,6 +121,13 @@ export function createDocumentRecovery({
     { debounce: 3000, maxWait: 10000 }
   )
 
+  // Edits autosave had not written yet stay unsaved once it stops, so a file gets its backup now
+  // rather than at the next edit, which a crash may not allow.
+  const stopAutosaveWatch: WatchHandle = watch(autosaveCovers, (covering) => {
+    if (covering || !copyTarget()?.source) return
+    void persistNow().catch((error) => console.warn('[Recovery] Snapshot failed:', error))
+  })
+
   const stopEnabledWatch: WatchHandle = watch(
     isEnabled,
     (enabled) => {
@@ -192,6 +199,7 @@ export function createDocumentRecovery({
       disposed = true
       lifecycleGeneration++
       stopVersionWatch()
+      stopAutosaveWatch()
       stopEnabledWatch()
     }
   }

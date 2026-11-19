@@ -73,6 +73,19 @@ describe('file backups', () => {
     recovery.disposeRecovery()
   }, 10_000)
 
+  test('turning autosave off backs up the edits it had not written', async () => {
+    const { version, store, recovery, autosave } = setup()
+    version.value = 1
+    await promiseTimeout(3200)
+    // Autosave was writing the file within the same wait, so no backup was made.
+    expect(await store.list()).toEqual([])
+
+    autosave.value = false
+    await promiseTimeout(50)
+    expect((await store.read('backup-1'))?.figBytes[0]).toBe(1)
+    recovery.disposeRecovery()
+  }, 10_000)
+
   test('a document stored elsewhere or kept as a draft gets no copy', async () => {
     const { version, store, recovery, attached, draft, stored } = setup()
     draft.value = true

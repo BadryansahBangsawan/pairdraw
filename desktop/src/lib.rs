@@ -61,6 +61,12 @@ pub fn run() {
 
     builder = builder.plugin(tauri_plugin_deep_link::init());
 
+    #[cfg(target_os = "macos")]
+    {
+        builder = builder
+            .on_web_content_process_terminate(system::window::reload_after_page_process_ended);
+    }
+
     builder
         .manage(system::browser::BrowserWindowState::default())
         .manage(launch::PendingOpen::default())

@@ -6,6 +6,21 @@ use tauri::{Manager, WebviewWindow};
 pub const MAIN_WINDOW_LABEL: &str = "main";
 const EDITOR_LABEL_PREFIX: &str = "editor-";
 
+/// WebKit ended the editor's page process, as a crash in its JavaScript engine does: the page
+/// loads again, so the window is not left blank and the new page offers the work its recovery
+/// copies kept. Tauri's default handler does nothing when it finds its window table borrowed;
+/// this hook is handed the webview itself.
+#[cfg(target_os = "macos")]
+pub fn reload_after_page_process_ended<R: tauri::Runtime>(webview: &tauri::Webview<R>) {
+    eprintln!(
+        "[webview] the page process of {} ended; reloading",
+        webview.label()
+    );
+    if let Err(error) = webview.reload() {
+        eprintln!("[webview] could not reload {}: {error}", webview.label());
+    }
+}
+
 /// The first free `editor-<n>`, so a window closed and opened again keeps a small label.
 fn next_editor_label(taken: &[String]) -> String {
     let mut index = 2;

@@ -1,0 +1,2 @@
+- Unsaved edits to a file saved by hand get a recovery copy when autosave stops, so a WebView crash no longer loses them.
+- The editor reloads its page when the process backing it ends on macOS, instead of leaving a blank window.

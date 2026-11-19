@@ -1,12 +1,9 @@
 import {
-  Align,
   Direction,
   Display,
-  FlexDirection,
   Gutter,
   MeasureMode,
   Overflow,
-  Wrap,
   type Node as YogaNode
 } from 'yoga-layout'
 
@@ -24,6 +21,7 @@ import {
 } from './layout/axis-sizing'
 import { keepsSavedLayout, usesDetachedDerivedLayout } from './layout/derived'
 import { applyEffectiveGeneratedTextLayout } from './layout/effective-generated-text'
+import { insertFlowBox, setFlexFlow, setFlowEdges } from './layout/flow-edges'
 import { buildGridTree, createGridChildNode } from './layout/grid'
 import { sizeAutoResizingText } from './layout/text-auto-resize'
 export { sizeAutoResizingText } from './layout/text-auto-resize'
@@ -36,7 +34,6 @@ export {
 } from './layout/text-measurement'
 import type { LayoutSizing, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { connectorSublayers, layoutConnector } from '@pairdraw/scene-graph/connectors'
-import { isGeneratedFrame } from '@pairdraw/scene-graph/generated'
 import { layoutSizing } from '@pairdraw/scene-graph/layout'
 
 import { fitShapeWithTextFrame } from './layout/shape-with-text'
@@ -49,10 +46,8 @@ import {
   configureNonTextLeaf,
   createYogaNode,
   freeYogaTree,
-  mapAlign,
   mapAlignSelf,
   mapGridTrack,
-  mapJustify,
   parentStretchedAxis
 } from './layout/yoga-helpers'
 
@@ -187,6 +182,8 @@ function buildYogaTree(
   configureFlexContainer(root, frame, direction)
 
   const children = graph.getChildren(frame.id).map((child) => asLaidOutIn(graph, child, frame))
+  const box = insertFlowBox(root, frame)
+  const flow: YogaNode[] = []
   for (const child of children) {
     const yogaChild = createYogaNode()
 
@@ -194,17 +191,21 @@ function buildYogaTree(
       configureAbsoluteChild(yogaChild, child)
     } else if (!child.visible) {
       yogaChild.setDisplay(Display.None)
-    } else if (child.layoutMode === 'GRID') {
-      configureChildAsGrid(yogaChild, child, frame, graph, direction)
-    } else if (child.layoutMode !== 'NONE') {
-      configureChildAsAutoLayout(yogaChild, child, frame, graph, direction)
     } else {
-      configureChildAsLeaf(yogaChild, child, frame, graph)
+      if (child.layoutMode === 'GRID') {
+        configureChildAsGrid(yogaChild, child, frame, graph, direction)
+      } else if (child.layoutMode !== 'NONE') {
+        configureChildAsAutoLayout(yogaChild, child, frame, graph, direction)
+      } else {
+        configureChildAsLeaf(yogaChild, child, frame, graph)
+      }
+      flow.push(yogaChild)
     }
     applyStrokeMargins(yogaChild, child, frame)
 
-    root.insertChild(yogaChild, root.getChildCount())
+    box.insertChild(yogaChild, box.getChildCount())
   }
+  setFlowEdges(root, box, frame, flow, direction)
 
   return root
 }
@@ -215,32 +216,9 @@ function configureFlexContainer(
   direction: Exclude<SceneNode['layoutDirection'], 'AUTO'>
 ): void {
   yogaNode.setDirection(direction === 'RTL' ? Direction.RTL : Direction.LTR)
-  yogaNode.setFlexDirection(
-    node.layoutMode === 'HORIZONTAL' ? FlexDirection.Row : FlexDirection.Column
-  )
-  yogaNode.setFlexWrap(node.layoutWrap === 'WRAP' ? Wrap.Wrap : Wrap.NoWrap)
-  yogaNode.setJustifyContent(mapJustify(node.primaryAxisAlign))
-  yogaNode.setAlignItems(mapAlign(node.counterAxisAlign))
+  setFlexFlow(yogaNode, node)
   if (node.clipsContent) yogaNode.setOverflow(Overflow.Hidden)
-
-  if (node.layoutWrap === 'WRAP' && node.counterAxisAlignContent === 'SPACE_BETWEEN') {
-    yogaNode.setAlignContent(Align.SpaceBetween)
-  }
-
   applyContentInsets(yogaNode, node)
-
-  // Space between takes the place of the gap in Figma's auto layout. A generated frame keeps it
-  // as the least space between its sublayers, as a sticky note keeps its author clear of a long body.
-  const primaryGap =
-    node.primaryAxisAlign === 'SPACE_BETWEEN' && !isGeneratedFrame(node) ? 0 : node.itemSpacing
-  yogaNode.setGap(
-    Gutter.Column,
-    node.layoutMode === 'HORIZONTAL' ? primaryGap : node.counterAxisSpacing
-  )
-  yogaNode.setGap(
-    Gutter.Row,
-    node.layoutMode === 'HORIZONTAL' ? node.counterAxisSpacing : primaryGap
-  )
 
   applyMinMaxConstraints(yogaNode, node)
 }

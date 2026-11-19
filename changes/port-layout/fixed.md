@@ -1,0 +1,1 @@
+- Negative padding in an auto layout frame places its children past the frame edge, and a negative gap overlaps them, as Figma does.

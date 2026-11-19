@@ -6,3 +6,4 @@
 - Shift-dragging a selected layer now keeps it selected while it moves, and a Shift-click on it deselects it only when the press ends.
 - Right-clicking a frame, section, or component name now selects that layer, a locked one included, on the pane that was clicked.
 - The Comment tool no longer covers the canvas, so the wheel, the middle button, and Space still pan while it is selected.
+- The marquee border is now one screen pixel wide at any zoom, as in Figma.

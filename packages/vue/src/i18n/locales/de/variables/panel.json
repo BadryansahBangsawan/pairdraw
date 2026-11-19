@@ -123,6 +123,8 @@
   "importReasonMixedTypes": "seine Modi haben verschiedene Typen",
   "importInvalidFile": "{file} ist keine Design-Token-Datei",
   "importMissingFile": "{file}, auf die {from} verweist, wurde nicht ausgewählt",
+  "importMissingFilesHint": "Wähle den Ordner, in dem diese Dateien liegen, damit ein Resolver mit allen gelesen wird.",
+  "importChooseFolder": "Ordner wählen",
   "importNothing": "Diese Dateien enthalten keine Design-Tokens.",
   "importAction": "Importieren",
   "importUnsupportedCSS": "{file}: {rule} ist kein Modus und wurde ausgelassen",

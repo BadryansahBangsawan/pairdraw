@@ -123,6 +123,8 @@
   "importReasonMixedTypes": "各模式的类型不一致",
   "importInvalidFile": "{file} 不是设计令牌文件",
   "importMissingFile": "未选择 {from} 引用的 {file}",
+  "importMissingFilesHint": "选择这些文件所在的文件夹，以便连同所有文件一起读取解析器。",
+  "importChooseFolder": "选择文件夹",
   "importNothing": "这些文件中没有设计令牌。",
   "importAction": "导入",
   "importUnsupportedCSS": "{file}：{rule} 不是模式，已跳过",

@@ -123,6 +123,8 @@
   "importReasonMixedTypes": "le sue modalità hanno tipi diversi",
   "importInvalidFile": "{file} non è un file di design token",
   "importMissingFile": "{file}, a cui rimanda {from}, non è stato scelto",
+  "importMissingFilesHint": "Scegli la cartella in cui si trovano questi file, così un resolver viene letto con tutti.",
+  "importChooseFolder": "Scegli cartella",
   "importNothing": "Questi file non contengono design token.",
   "importAction": "Importa",
   "importUnsupportedCSS": "{file}: {rule} non è una modalità, quindi è stato escluso",

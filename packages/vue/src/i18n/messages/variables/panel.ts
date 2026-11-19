@@ -132,6 +132,9 @@ export const variablesMessageDefaults = {
   importReasonMixedTypes: 'its modes have different types',
   importInvalidFile: params('{file} isn’t a design token file'),
   importMissingFile: params('{file}, which {from} refers to, wasn’t picked'),
+  importMissingFilesHint:
+    'Choose the folder these files sit in, so a resolver is read with all of them.',
+  importChooseFolder: 'Choose folder',
   importNothing: 'These files hold no design tokens.',
   importAction: 'Import',
   importUnsupportedCSS: params('{file}: {rule} isn’t a mode, so it was left out'),

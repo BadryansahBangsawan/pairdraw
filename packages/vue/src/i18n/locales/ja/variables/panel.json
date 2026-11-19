@@ -123,6 +123,8 @@
   "importReasonMixedTypes": "モードごとに型が異なる",
   "importInvalidFile": "{file} はデザイントークンのファイルではありません",
   "importMissingFile": "{from} が参照する {file} が選ばれていません",
+  "importMissingFilesHint": "これらのファイルがあるフォルダーを選ぶと、リゾルバーをすべてのファイルと一緒に読み込めます。",
+  "importChooseFolder": "フォルダーを選ぶ",
   "importNothing": "これらのファイルにデザイントークンはありません。",
   "importAction": "読み込む",
   "importUnsupportedCSS": "{file}: {rule} はモードではないため除外しました",

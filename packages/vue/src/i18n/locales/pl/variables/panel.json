@@ -123,6 +123,8 @@
   "importReasonMixedTypes": "jego tryby mają różne typy",
   "importInvalidFile": "{file} nie jest plikiem tokenów projektowych",
   "importMissingFile": "Nie wybrano pliku {file}, do którego odwołuje się {from}",
+  "importMissingFilesHint": "Wybierz folder, w którym znajdują się te pliki, aby resolver został odczytany wraz z nimi wszystkimi.",
+  "importChooseFolder": "Wybierz folder",
   "importNothing": "Te pliki nie zawierają tokenów projektowych.",
   "importAction": "Importuj",
   "importUnsupportedCSS": "{file}: {rule} nie jest trybem, więc pominięto",

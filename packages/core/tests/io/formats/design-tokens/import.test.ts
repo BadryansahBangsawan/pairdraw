@@ -4,6 +4,7 @@ import { SceneGraph } from '@pairdraw/scene-graph'
 
 import {
   defaultTokenImportOptions,
+  exportDesignTokens,
   planTokenImport,
   readDesignTokens,
   type DesignTokenSourceFile
@@ -63,6 +64,34 @@ describe('reading token files', () => {
       ['light', false],
       ['dark', true]
     ])
+  })
+
+  test('every file an export wrote imports back as the collections it came from', () => {
+    const graph = new SceneGraph()
+    const primitives = graph.createCollection('Primitives')
+    graph.createVariable('Blue/500', 'COLOR', primitives.id, { r: 0, g: 0.4, b: 0.8, a: 1 })
+    const theme = graph.createCollection('Theme')
+    graph.renameMode(theme.id, theme.defaultModeId, 'Light')
+    const dark = graph.createMode(theme.id, 'Dark') ?? ''
+    const space = graph.createVariable('Space', 'FLOAT', theme.id, 24)
+    space.unit = 'rem'
+    space.valuesByMode[dark] = 32
+
+    const exported = exportDesignTokens(graph)
+    const bundle = readDesignTokens(
+      exported.files.map((file) => ({
+        path: file.path,
+        text: typeof file.content === 'string' ? file.content : JSON.stringify(file.content)
+      }))
+    )
+
+    expect(bundle.issues).toEqual([])
+    expect(bundle.collections.map((collection) => collection.name)).toEqual(['Primitives', 'Theme'])
+    expect(bundle.collections[0].modes[0].tokens.map((token) => token.name)).toEqual([
+      'Blue/500'
+    ])
+    expect(bundle.collections[1].modes.map((mode) => mode.name)).toEqual(['Light', 'Dark'])
+    expect(bundle.collections[1].modes[0].tokens.map((token) => token.name)).toEqual(['Space'])
   })
 
   test('a resolver finds files picked without their folders by name', () => {

@@ -74,6 +74,17 @@ tokenFiles.onChange((files) => {
   if (files?.length) importFiles([...files])
 })
 
+/** The same files picked as a folder, so a resolver's references arrive with their paths. */
+const tokenFolder = useFileDialog({
+  accept: DESIGN_TOKEN_FILE_ACCEPT,
+  multiple: true,
+  directory: true,
+  reset: true
+})
+tokenFolder.onChange((files) => {
+  if (files?.length) importFiles([...files])
+})
+
 // Token files dropped on the window come here through the document's pending import.
 const pendingImport = pendingTokenImport(store)
 watch(
@@ -129,6 +140,11 @@ function exportTokens() {
         <AppDialogClose :ariaLabel="common.close" />
       </template>
     </TokensPanel>
-    <TokenImportDialog v-if="importBundle" v-model:open="importOpen" :bundle="importBundle" />
+    <TokenImportDialog
+      v-if="importBundle"
+      v-model:open="importOpen"
+      :bundle="importBundle"
+      @choose-folder="tokenFolder.open()"
+    />
   </AppDialogRoot>
 </template>

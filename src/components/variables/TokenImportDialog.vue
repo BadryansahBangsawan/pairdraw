@@ -27,7 +27,7 @@ import AppSelect from '@/components/ui/select/AppSelect.vue'
 import AppCheckbox from '@/components/ui/toggle/AppCheckbox.vue'
 
 const { bundle } = defineProps<{ bundle: DesignTokenBundle | null }>()
-const emit = defineEmits<{ imported: [result: TokenImportResult] }>()
+const emit = defineEmits<{ imported: [result: TokenImportResult]; 'choose-folder': [] }>()
 const open = defineModel<boolean>('open', { default: false })
 
 const store = useEditorStore()
@@ -180,6 +180,10 @@ const changes = computed(() =>
 const empty = computed(
   () => !bundle || (bundle.collections.length === 0 && bundle.composites.length === 0)
 )
+/** Files a resolver refers to that were not picked, which only a folder pick can bring along. */
+const missingFiles = computed(
+  () => bundle?.issues.filter((issue) => issue.kind === 'missing-file').length ?? 0
+)
 
 function importTokens() {
   // Planned again against the document as it is now, not as it was when the plan was shown.
@@ -213,6 +217,21 @@ function importTokens() {
         tone="warning"
         :heading="issueText(issue)"
       />
+
+      <div
+        v-if="missingFiles > 0"
+        class="flex items-center justify-between gap-3 rounded-lg border border-border p-2"
+      >
+        <span class="text-muted">{{ variables.importMissingFilesHint }}</span>
+        <AppButton
+          color="neutral"
+          variant="solid"
+          data-test-id="variables-import-folder"
+          @click="emit('choose-folder')"
+        >
+          {{ variables.importChooseFolder }}
+        </AppButton>
+      </div>
 
       <div
         v-if="options && bundle?.collections.length"

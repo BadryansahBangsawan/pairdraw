@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useEventListener } from '@vueuse/core'
 import {
   ContextMenuContent,
   ContextMenuPortal,
@@ -12,7 +13,6 @@ import { computed, ref, useTemplateRef, watch } from 'vue'
 
 import type { ViewportTransform } from '@pairdraw/core/geometry'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
-import { toolCursor } from '@pairdraw/vue/editor/tool-cursor'
 import { useCommentMessages } from '@pairdraw/vue/i18n'
 
 import { useComments } from '@/app/comments/use'
@@ -126,14 +126,18 @@ const cardReference = computed(() => {
 })
 
 function placeDraft(event: PointerEvent) {
-  if (event.button !== 0 || !(event.currentTarget instanceof HTMLElement)) return
+  if (!commenting.value || event.button !== 0 || !canvasEl) return
+  event.preventDefault()
   // With a card open, a click on the canvas only closes it, as in Figma.
   if (comments.closeCard()) return
-  const rect = event.currentTarget.getBoundingClientRect()
+  const rect = canvasEl.getBoundingClientRect()
   const at = store.screenToCanvas(event.clientX - rect.left, event.clientY - rect.top)
   comments.startDraft({ pageId: store.state.currentPageId, ...at })
   draftText.value = ''
 }
+
+// The canvas places drafts itself, so its other buttons keep panning and opening the layer menu.
+useEventListener(() => canvasEl, 'pointerdown', placeDraft)
 
 // Scrolling and zooming keep working over pins and while placing comments, as in Figma.
 function forwardWheel(event: WheelEvent) {
@@ -175,15 +179,6 @@ function closeCard() {
   <!-- Right-clicks here belong to comments, not to the canvas layer menu underneath; scrolling
        and zooming over pins or while placing comments still reach the canvas. -->
   <div :class="ui.layer()" data-canvas-overlay="comments" @contextmenu.stop @wheel="forwardWheel">
-    <div
-      v-if="commenting"
-      :class="ui.capture()"
-      :style="{ cursor: toolCursor('COMMENT') }"
-      data-slot="comments-capture"
-      @pointerdown.prevent="placeDraft"
-      @contextmenu.prevent
-    />
-
     <div
       :class="ui.pins()"
       :style="{ transform: `translate(${placement.panX}px, ${placement.panY}px)` }"

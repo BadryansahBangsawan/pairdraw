@@ -5,3 +5,4 @@
 - A layer prop of the wrong kind, such as a name or a size that is not a number, is now reported and left out instead of reaching the layer, and one out of range is bounded.
 - Shift-dragging a selected layer now keeps it selected while it moves, and a Shift-click on it deselects it only when the press ends.
 - Right-clicking a frame, section, or component name now selects that layer, a locked one included, on the pane that was clicked.
+- The Comment tool no longer covers the canvas, so the wheel, the middle button, and Space still pan while it is selected.

@@ -4,7 +4,6 @@ import { expectDefined } from '#tests/helpers/assert'
 const editor = useEditorSetupWithClear('/?test&no-chrome&no-rulers')
 
 const canvasElement = () => editor.page.getByTestId('canvas-element')
-const commentsCapture = () => editor.page.locator('[data-slot="comments-capture"]')
 
 /** The hotspot and fallback after a cursor's image, e.g. `16 16, grab`. */
 async function cursorTail(cursor: Promise<string>) {
@@ -52,7 +51,7 @@ test('the pencil points with its tip while drawing', async () => {
 
 test('the comment tool shows a speech bubble pointing with its tail', async () => {
   await editor.page.keyboard.press('c')
-  const cursor = commentsCapture().evaluate((el) => (el as HTMLElement).style.cursor)
-  expect(await cursorTail(cursor)).toBe('5 24, crosshair')
+  // The canvas takes the comment press itself, so it shows the bubble.
+  expect(await canvasCursor()).toBe('5 24, crosshair')
   await editor.page.keyboard.press('v')
 })

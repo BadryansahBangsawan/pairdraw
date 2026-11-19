@@ -143,7 +143,9 @@ Jeder Modus einer Sammlung ist eine Datei, `Theme/Light.tokens.json` und `Theme/
 Token-Dateien importieren Sie mit dem Werkzeug `import_design_tokens` in ein Dokument, indem Sie Pfad und Text jeder Datei übergeben:
 
 ```sh
-pairdraw tool call import_design_tokens design.fig --args-file tokens.json --write
+jq -Rs --arg p tokens/Tokens/Default.tokens.json '{files:[{path:$p,text:.}]}' \
+  tokens/Tokens/Default.tokens.json > args.json
+pairdraw tool call import_design_tokens design.fig --args-file args.json --write
 ```
 
 Es liest eine Datei pro Modus, nach Ordnern gruppiert, einen Resolver mit den Dateien, auf die er verweist, oder eine Tokens-Studio-Datei mit `$themes`. Sammlungen und Modi mit vorhandenen Namen sowie Variablen und Stile mit gleichem Namen werden aktualisiert, der Rest wird hinzugefügt, und nichts wird gelöscht. Das Ergebnis listet, was hinzugefügt, aktualisiert und übersprungen wurde, mit dem Grund für jedes Überspringen.

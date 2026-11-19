@@ -140,10 +140,12 @@ pairdraw tokens design.fig --format dtcg --out tokens
 
 Each collection mode is one file, `Theme/Light.tokens.json` and `Theme/Dark.tokens.json`, in the shape Figma imports as a mode: lengths in `px`, times in `s`, booleans as numbers marked `com.figma.type`, and aliases to another collection naming it in `com.figma.aliasData`. Text and effect styles become typography and shadow tokens in `styles.tokens.json`, kept apart because Figma's import refuses composite tokens; a text style field bound to a variable is written as a reference to that variable's token and read back as a binding. Pairdraw also records which collection each bound field's variable is in, so a path two collections share reads back to the right one; the export warns about such references, because other tools can't tell them apart. `tokens.resolver.json` is a DTCG resolver that switches each collection's modes and layers the rest, for tools such as Style Dictionary. Pairdraw's own fields, such as a token's `rem` unit, CSS name, scopes, or `clamp()` expression, and each mode's condition, ride in `$extensions["dev.pairdraw"]`, so the export reads back exactly.
 
-Import token files into a document with the `import_design_tokens` tool, passing each file's path and text:
+Import token files into a document with the `import_design_tokens` tool, passing each file's path and text as the tool's arguments:
 
 ```sh
-pairdraw tool call import_design_tokens design.fig --args-file tokens.json --write
+jq -Rs --arg p tokens/Tokens/Default.tokens.json '{files:[{path:$p,text:.}]}' \
+  tokens/Tokens/Default.tokens.json > args.json
+pairdraw tool call import_design_tokens design.fig --args-file args.json --write
 ```
 
 It reads a file per mode grouped by folder, a resolver with the files it refers to, or a Tokens Studio file with `$themes`. Collections and modes with existing names, and variables and styles by name, are updated; the rest is added, and nothing is deleted. The result lists what was added, updated, and skipped, with the reason for each skip.

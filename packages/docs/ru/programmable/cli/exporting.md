@@ -143,7 +143,9 @@ pairdraw tokens design.fig --format dtcg --out tokens
 Импортируйте файлы токенов в документ инструментом `import_design_tokens`, передав путь и текст каждого файла:
 
 ```sh
-pairdraw tool call import_design_tokens design.fig --args-file tokens.json --write
+jq -Rs --arg p tokens/Tokens/Default.tokens.json '{files:[{path:$p,text:.}]}' \
+  tokens/Tokens/Default.tokens.json > args.json
+pairdraw tool call import_design_tokens design.fig --args-file args.json --write
 ```
 
 Он читает файлы по режимам, сгруппированные по папкам, резолвер с файлами, на которые он ссылается, или файл Tokens Studio с `$themes`. Коллекции и режимы с существующими именами, а также переменные и стили по имени обновляются; остальное добавляется, и ничего не удаляется. Результат перечисляет, что добавлено, обновлено и пропущено, с причиной каждого пропуска.

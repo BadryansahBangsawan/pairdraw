@@ -145,7 +145,9 @@ Ogni modalità di una raccolta è un file, `Theme/Light.tokens.json` e `Theme/Da
 Importa i file di token in un documento con lo strumento `import_design_tokens`, passando percorso e testo di ogni file:
 
 ```sh
-pairdraw tool call import_design_tokens design.fig --args-file tokens.json --write
+jq -Rs --arg p tokens/Tokens/Default.tokens.json '{files:[{path:$p,text:.}]}' \
+  tokens/Tokens/Default.tokens.json > args.json
+pairdraw tool call import_design_tokens design.fig --args-file args.json --write
 ```
 
 Legge un file per modalità raggruppato per cartella, un resolver con i file a cui fa riferimento oppure un file Tokens Studio con `$themes`. Raccolte e modalità con nomi già esistenti, e variabili e stili con lo stesso nome, vengono aggiornati; il resto viene aggiunto e nulla viene eliminato. Il risultato elenca ciò che è stato aggiunto, aggiornato e saltato, con il motivo di ogni elemento saltato.

@@ -145,7 +145,9 @@ Cada modo de colección es un archivo, `Theme/Light.tokens.json` y `Theme/Dark.t
 Importa archivos de tokens en un documento con la herramienta `import_design_tokens`, pasando la ruta y el texto de cada archivo:
 
 ```sh
-pairdraw tool call import_design_tokens design.fig --args-file tokens.json --write
+jq -Rs --arg p tokens/Tokens/Default.tokens.json '{files:[{path:$p,text:.}]}' \
+  tokens/Tokens/Default.tokens.json > args.json
+pairdraw tool call import_design_tokens design.fig --args-file args.json --write
 ```
 
 Lee un archivo por modo agrupado por carpetas, un resolver con los archivos a los que remite o un archivo de Tokens Studio con `$themes`. Las colecciones y los modos con nombres existentes, y las variables y los estilos por nombre, se actualizan; el resto se añade y no se elimina nada. El resultado enumera lo que se añadió, actualizó y omitió, con el motivo de cada omisión.

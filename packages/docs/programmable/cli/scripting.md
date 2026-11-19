@@ -158,7 +158,7 @@ Statuses mark where a section, frame, component, or instance stands, from the do
 ```sh
 pairdraw eval design.fig -w -c '
   const checkout = figma.currentPage.findOne(n => n.name === "Checkout")
-  pairdraw.setStatus(checkout, "Approved")
+  pairdraw.setStatus(checkout, "Ready for dev")
   pairdraw.statuses.map(status => status.name)
 '
 ```

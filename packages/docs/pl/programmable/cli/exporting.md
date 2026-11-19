@@ -143,7 +143,9 @@ Każdy tryb kolekcji to jeden plik, `Theme/Light.tokens.json` i `Theme/Dark.toke
 Pliki tokenów zaimportujesz do dokumentu narzędziem `import_design_tokens`, przekazując ścieżkę i treść każdego pliku:
 
 ```sh
-pairdraw tool call import_design_tokens design.fig --args-file tokens.json --write
+jq -Rs --arg p tokens/Tokens/Default.tokens.json '{files:[{path:$p,text:.}]}' \
+  tokens/Tokens/Default.tokens.json > args.json
+pairdraw tool call import_design_tokens design.fig --args-file args.json --write
 ```
 
 Narzędzie odczytuje plik na tryb pogrupowany w folderach, resolver z plikami, do których się odwołuje, albo plik Tokens Studio z `$themes`. Kolekcje i tryby o istniejących nazwach oraz zmienne i style o tych samych nazwach są aktualizowane; reszta jest dodawana, a nic nie jest usuwane. Wynik wymienia, co dodano, zaktualizowano i pominięto, z powodem każdego pominięcia.

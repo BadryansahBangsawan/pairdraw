@@ -158,7 +158,7 @@ Les statuts indiquent où en est une section, un cadre, un composant ou une inst
 ```sh
 pairdraw eval design.fig -w -c '
   const checkout = figma.currentPage.findOne(n => n.name === "Checkout")
-  pairdraw.setStatus(checkout, "Approved")
+  pairdraw.setStatus(checkout, "Ready for dev")
   pairdraw.statuses.map(status => status.name)
 '
 ```

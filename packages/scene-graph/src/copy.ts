@@ -42,6 +42,7 @@ export function copyFill<T extends Fill>(f: T): T {
     }))
   }
   if (f.patternSpacing) copy.patternSpacing = { ...f.patternSpacing }
+  if (f.filters) copy.filters = { ...f.filters }
   if (f.noiseSize) copy.noiseSize = { ...f.noiseSize }
   return copy
 }

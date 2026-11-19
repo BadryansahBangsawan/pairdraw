@@ -144,6 +144,22 @@ describe('copy helpers — mutation isolation', () => {
     expect(scaled[0]?.commandsBlob).not.toBe(original[0]?.commandsBlob)
   })
 
+  test('copyFill: image adjustments are deep copied', () => {
+    const original: Fill = {
+      type: 'IMAGE',
+      color: { r: 0, g: 0, b: 0, a: 1 },
+      opacity: 1,
+      visible: true,
+      imageHash: 'ab'.repeat(20),
+      filters: { exposure: 0.5, saturation: 0.75 }
+    }
+    const copy = copyFill(original)
+    expect(copy.filters).toEqual(original.filters)
+    expect(copy.filters).not.toBe(original.filters)
+    if (copy.filters) copy.filters.exposure = -1
+    expect(original.filters?.exposure).toBe(0.5)
+  })
+
   test('copyFills: array independence', () => {
     const originals: Fill[] = [
       { type: 'SOLID', color: { r: 1, g: 0, b: 0, a: 1 }, opacity: 1, visible: true },

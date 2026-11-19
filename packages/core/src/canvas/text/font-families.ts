@@ -83,6 +83,7 @@ export function loadedFace(
   italic: boolean,
   style = faceLoadKey(weight, italic)
 ): LoadedFace | null {
+  if (!fontManager.isLoaded(family)) return null
   if (fontManager.isStyleLoaded(family, style)) return { weight, italic, style }
   for (const slant of [italic, !italic]) {
     for (const candidate of fontWeightMatchOrder(weight)) {

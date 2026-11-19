@@ -4,7 +4,10 @@ import { expectDefined } from '#core-tests/helpers/assert'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
 
+import { getCanvasKit } from '#core/canvaskit'
+import { withFigExportRuntime } from '#core/canvas/text/shape'
 import { NOTO_COLOR_EMOJI_FAMILY } from '#core/text/emoji'
+import { glyphAdvanceSync, glyphOutlineSourceSync } from '#core/text/font/glyphs'
 import { fontManager } from '#core/text/font/manager'
 import { prepareGraphFonts } from '#core/text/prepare'
 
@@ -61,5 +64,60 @@ describe('emoji font preparation', () => {
     const { graph, nodeIds } = graphWithText('© 😀')
     await prepareGraphFonts(graph, nodeIds)
     expect(requested).toEqual(['😀'])
+  })
+})
+
+describe('fallback faces of a family found nowhere', () => {
+  beforeAll(async () => {
+    const inter = expectDefined(
+      await fontManager.fetchBundledFont('/InterVariable.ttf'),
+      'bundled Inter font'
+    )
+    await fontManager.markLoaded('Inter', 'Regular', inter)
+  })
+
+  /**
+   * Without the default family's italic, CanvasKit slants its upright face and the saved outlines
+   * stay upright; with it, both are the real italic, as for text set in that family.
+   */
+  test('draws and saves an italic in the default family’s italic', async () => {
+    const family = 'Prepare Missing Italic'
+    const load = fontManager.loadRemoteFont.bind(fontManager)
+    const spy = spyOn(fontManager, 'loadRemoteFont').mockImplementation(
+      async (requested, style, characters) =>
+        requested === family ? null : load(requested, style, characters)
+    )
+    try {
+      const text = 'lag'
+      const graph = new SceneGraph()
+      const node = graph.createNode('TEXT', graph.getPages()[0].id, {
+        text,
+        fontFamily: family,
+        italic: true,
+        fontSize: 13,
+        width: 200,
+        height: 20,
+        textAutoResize: 'NONE'
+      })
+      await prepareGraphFonts(graph, [node.id])
+      expect(fontManager.isStyleLoaded(family, 'Italic')).toBe(false)
+
+      const italic = expectDefined(glyphOutlineSourceSync('Inter', 'Regular Italic'))
+      const shaped = expectDefined(
+        await withFigExportRuntime(graph, await getCanvasKit(), async (runtime) =>
+          runtime.shapeText(node)
+        )
+      )
+      expect(shaped.glyphs).toHaveLength(text.length)
+      for (const glyph of shaped.glyphs) {
+        const index = expectDefined(glyph.firstCharacter)
+        const glyphId = italic.glyphOf(text[index])
+        const advance = expectDefined(glyphAdvanceSync('Inter', 'Regular Italic', glyphId, 13))
+        expect(glyph.advance).toBeCloseTo(advance, 2)
+        expect(glyph.commands).toEqual(italic.outline(glyphId, 13))
+      }
+    } finally {
+      spy.mockRestore()
+    }
   })
 })

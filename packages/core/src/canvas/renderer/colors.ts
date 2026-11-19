@@ -10,19 +10,38 @@ import {
   getStrokeOkHCL
 } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
+import { paintColorApplied } from '@pairdraw/scene-graph/variables'
 
-function resolvedVariableColor(
-  color: Color,
+/**
+ * A bound paint draws the color it stores once the graph has applied or recorded one for it, as
+ * Figma draws its cache; OkHCL data kept from before it was bound no longer describes it. A
+ * binding with no applied color, as a layer just imported or built with its bindings has, draws
+ * its variable's color for the layer until a write or refresh records one.
+ */
+function boundDrawnColor(
+  node: SceneNode,
+  list: 'fills' | 'strokes',
+  index: number,
   graph: SceneGraph,
   presentation: RenderColorSpace
-): ResolvedRenderColor {
+): ResolvedRenderColor | undefined {
+  const field = `${list}/${index}/color`
+  const variableId = node.boundVariables[field]
+  if (!variableId) return undefined
+  if (paintColorApplied(node, field)) return undefined
+  const resolved = graph.resolveColorVariableForNode(node.id, variableId)
+  if (!resolved) return undefined
   return {
-    ...resolveRGBAForPreview(color, {
+    ...resolveRGBAForPreview(resolved, {
       documentColorSpace: graph.documentColorSpace,
       colorSpace: presentation
     }),
     cssColor: ''
   }
+}
+
+function isBound(node: SceneNode, list: 'fills' | 'strokes', index: number): boolean {
+  return `${list}/${index}/color` in node.boundVariables
 }
 
 export function resolveFillColorInfo(
@@ -32,15 +51,11 @@ export function resolveFillColorInfo(
   graph: SceneGraph,
   presentation: RenderColorSpace
 ): ResolvedRenderColor {
-  const varId = node.boundVariables[`fills/${fillIndex}/color`]
-  if (varId) {
-    const resolved = graph.resolveColorVariableForNode(node.id, varId)
-    if (resolved) return resolvedVariableColor(resolved, graph, presentation)
-  }
-  return resolveNodeFillColor(fill, fillIndex, node, {
-    documentColorSpace: graph.documentColorSpace,
-    colorSpace: presentation
-  })
+  const options = { documentColorSpace: graph.documentColorSpace, colorSpace: presentation }
+  const drawn = boundDrawnColor(node, 'fills', fillIndex, graph, presentation)
+  if (drawn) return drawn
+  if (isBound(node, 'fills', fillIndex)) return resolveRGBAForPreview(fill.color, options)
+  return resolveNodeFillColor(fill, fillIndex, node, options)
 }
 
 export function resolveFillColor(
@@ -50,8 +65,10 @@ export function resolveFillColor(
   graph: SceneGraph,
   presentation: RenderColorSpace
 ): Color {
-  const varId = node.boundVariables[`fills/${fillIndex}/color`]
-  if (!varId && !getFillOkHCL(node, fillIndex)) return normalizeColor(fill.color)
+  const drawn = boundDrawnColor(node, 'fills', fillIndex, graph, presentation)
+  if (drawn) return drawn.color
+  if (isBound(node, 'fills', fillIndex) || !getFillOkHCL(node, fillIndex))
+    return normalizeColor(fill.color)
   return resolveFillColorInfo(fill, fillIndex, node, graph, presentation).color
 }
 
@@ -62,15 +79,11 @@ export function resolveStrokeColorInfo(
   graph: SceneGraph,
   presentation: RenderColorSpace
 ): ResolvedRenderColor {
-  const varId = node.boundVariables[`strokes/${strokeIndex}/color`]
-  if (varId) {
-    const resolved = graph.resolveColorVariableForNode(node.id, varId)
-    if (resolved) return resolvedVariableColor(resolved, graph, presentation)
-  }
-  return resolveNodeStrokeColor(stroke, strokeIndex, node, {
-    documentColorSpace: graph.documentColorSpace,
-    colorSpace: presentation
-  })
+  const options = { documentColorSpace: graph.documentColorSpace, colorSpace: presentation }
+  const drawn = boundDrawnColor(node, 'strokes', strokeIndex, graph, presentation)
+  if (drawn) return drawn
+  if (isBound(node, 'strokes', strokeIndex)) return resolveRGBAForPreview(stroke.color, options)
+  return resolveNodeStrokeColor(stroke, strokeIndex, node, options)
 }
 
 export function resolveStrokeColor(
@@ -80,7 +93,9 @@ export function resolveStrokeColor(
   graph: SceneGraph,
   presentation: RenderColorSpace
 ): Color {
-  const varId = node.boundVariables[`strokes/${strokeIndex}/color`]
-  if (!varId && !getStrokeOkHCL(node, strokeIndex)) return normalizeColor(stroke.color)
+  const drawn = boundDrawnColor(node, 'strokes', strokeIndex, graph, presentation)
+  if (drawn) return drawn.color
+  if (isBound(node, 'strokes', strokeIndex) || !getStrokeOkHCL(node, strokeIndex))
+    return normalizeColor(stroke.color)
   return resolveStrokeColorInfo(stroke, strokeIndex, node, graph, presentation).color
 }

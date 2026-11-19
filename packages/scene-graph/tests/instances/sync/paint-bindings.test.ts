@@ -4,7 +4,7 @@ import { SceneGraph, type Stroke } from '@pairdraw/scene-graph'
 import { colorToFill } from '@pairdraw/scene-graph/color'
 import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
 import type { Color } from '@pairdraw/scene-graph/primitives'
-import { resolvedPaintBindings } from '@pairdraw/scene-graph/variables'
+import { reconcileVariableBindings } from '@pairdraw/scene-graph/variables'
 
 function must<T>(value: T | null | undefined, what: string): T {
   if (value === null || value === undefined) throw new Error(`Missing ${what}`)
@@ -37,7 +37,7 @@ test.each(['fills', 'strokes'] as const)(
     graph.syncInstance(placed.id)
 
     expect(nested().boundVariables).toEqual({})
-    expect(resolvedPaintBindings(graph, nested())[list]).toBeUndefined()
+    reconcileVariableBindings(graph)
     expect(nested()[list][0].color).toEqual(literal[0].color)
   }
 )

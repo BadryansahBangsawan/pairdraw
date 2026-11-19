@@ -2,7 +2,7 @@ import type { SceneGraph } from '../graph'
 import type { Color } from '../primitives'
 import type { SceneNode, Variable, VariableLiteral, VariableValue } from '../types'
 import { MAX_FORMULA_DEPTH, VariableFormulaError } from './formula/tree'
-import { resolveVariableValue } from './value'
+import { resolveVariableValue, variableValueReferences } from './value'
 
 /**
  * The modes a node draws in for every collection: its ancestors' explicit modes from the outside
@@ -49,6 +49,29 @@ export function getNodeVariableModeId(
   if (fallback === 'default')
     return graph.variableCollections.get(collectionId)?.defaultModeId ?? ''
   return getActiveModeId(graph, collectionId)
+}
+
+/**
+ * The collections whose modes decide what these variables resolve to: their own, and those of the
+ * variables they alias, at any depth and in any mode.
+ */
+export function collectionsResolving(
+  graph: SceneGraph,
+  variableIds: Iterable<string>
+): Set<string> {
+  const pending = [...variableIds]
+  const seen = new Set<string>()
+  const collections = new Set<string>()
+  for (let id = pending.pop(); id !== undefined; id = pending.pop()) {
+    if (seen.has(id)) continue
+    seen.add(id)
+    const variable = graph.variables.get(id)
+    if (!variable) continue
+    collections.add(variable.collectionId)
+    for (const value of Object.values(variable.valuesByMode))
+      pending.push(...variableValueReferences(value))
+  }
+  return collections
 }
 
 export function resolveVariable(

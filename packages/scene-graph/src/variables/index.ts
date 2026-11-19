@@ -30,6 +30,7 @@ import {
   VISIBILITY_VARIABLE_TYPES,
   type PaintBindingList
 } from './fields'
+import { applyBoundPaintColor } from './paints'
 import { pinnedRunBindingScales } from './units'
 
 export * from './resolution'
@@ -326,7 +327,6 @@ export function bindVariable(
     throw new Error(`Variable "${variableId}" not found`)
   }
 
-  // Color fields require COLOR variable type
   const paint = paintBindingTarget(field)
   if (paint) {
     if (variable.type !== 'COLOR') {
@@ -341,6 +341,7 @@ export function bindVariable(
     }
     // Auto-remove top-level dead binding (e.g. 'fills') when setting indexed binding
     if (paint.list in node.boundVariables) {
+      graph.willChangeNode(node)
       node.boundVariables = omit(node.boundVariables, [paint.list])
     }
   }
@@ -389,6 +390,8 @@ export function bindVariable(
     variableBindingScales: { ...node.variableBindingScales },
     ...runs
   })
+  // A paint takes its variable's color, alpha as opacity, when it binds, as Figma's does.
+  if (paint) applyBoundPaintColor(graph, node, field)
 }
 
 export function unbindVariable(graph: SceneGraph, nodeId: string, field: string): void {
@@ -441,6 +444,7 @@ export * from './bindings'
 export * from './corners'
 export * from './formula'
 export * from './formula/schema'
+export * from './paints'
 export * from './schema'
 export * from './text'
 export * from './token'

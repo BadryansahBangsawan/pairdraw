@@ -1,5 +1,4 @@
 import type { SceneGraph } from '@pairdraw/scene-graph'
-import { paintBindingTarget, resolvedPaintBindings } from '@pairdraw/scene-graph/variables'
 
 import { reconcileVariableLayouts } from '#core/layout/variables'
 
@@ -34,8 +33,7 @@ export function unbindVariable(graph: SceneGraph, node: NodeRef, field: string):
   const target = nodeOf(graph, node)
   if (!(field in target.boundVariables))
     throw new Error(`${target.name} has no variable bound to ${field}`)
-  // A paint keeps the color its variable last gave it, as values do and as Figma's detach does.
-  if (paintBindingTarget(field)) graph.updateNode(target.id, resolvedPaintBindings(graph, target))
+  // A paint keeps the color it stores, which its variable last wrote, as Figma's detach does.
   graph.unbindVariable(target.id, field)
   reconcileVariableLayouts(graph, { subtrees: [target.id] })
 }

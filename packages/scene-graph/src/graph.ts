@@ -45,7 +45,13 @@ import type { VariableModeFallback } from './variables'
 import { normalizeVectorNetwork } from './vector-network'
 
 /** Scopes that graph methods check while a caller's callback runs; scopes nest. */
-type GraphScope = 'preview' | 'sourceMetadata' | 'importedState' | 'layout' | 'derivedLayout'
+type GraphScope =
+  | 'preview'
+  | 'sourceMetadata'
+  | 'importedState'
+  | 'layout'
+  | 'derivedLayout'
+  | 'componentDerived'
 
 export class SceneGraph {
   nodes = new Map<string, SceneNode>()
@@ -67,7 +73,8 @@ export class SceneGraph {
     sourceMetadata: 0,
     importedState: 0,
     layout: 0,
-    derivedLayout: 0
+    derivedLayout: 0,
+    componentDerived: 0
   }
   private previewObservers: NodePreviewObserver[] = []
   private readonly changeObservers = new Set<NodeChangeObserver>()
@@ -501,6 +508,19 @@ export class SceneGraph {
     this.withScope('derivedLayout', fn)
   }
 
+  /**
+   * Runs `fn` as values a copy takes from its component, such as the bound paints of a layer an
+   * instance copies, refreshed for it. Source metadata is preserved, and a save leaves them to the
+   * component rather than writing them as edits of the copy.
+   */
+  applyComponentDerivedDuring(fn: () => void): void {
+    this.withScope('componentDerived', () => this.preserveSourceMetadataDuring(fn))
+  }
+
+  get isApplyingComponentDerived(): boolean {
+    return this.scopeDepths.componentDerived > 0
+  }
+
   get isApplyingDerivedLayout(): boolean {
     return this.scopeDepths.derivedLayout > 0
   }
@@ -615,6 +635,9 @@ export class SceneGraph {
     Object.assign(node, changes)
     if (changes.fills) removeStaleBindings(node, 'fills', changes)
     if (changes.strokes) removeStaleBindings(node, 'strokes', changes)
+    // A bound paint written keeps what it was given until its variable's color changes.
+    if ((changes.fills || changes.strokes) && !this.isApplyingImportedState)
+      Variables.recordWrittenBoundPaints(this, node, changes)
     for (const key of absent) Reflect.deleteProperty(node, key)
     this.publishNodeUpdate(id, changes)
   }
@@ -660,6 +683,8 @@ export class SceneGraph {
     }
 
     this.emitter.emit('node:reparented', nodeId, oldParentId, newParentId)
+    // Bound paints show their variables in the modes the layer now sits in.
+    Variables.refreshMovedBoundPaints(this, nodeId, oldParentId)
   }
 
   /**
@@ -685,6 +710,8 @@ export class SceneGraph {
     node.parentId = parentId
     this.absPosCache.clear()
     this.emitter.emit('node:reordered', childId, parentId, at, previousParentId)
+    if (previousParentId !== parentId)
+      Variables.refreshMovedBoundPaints(this, childId, previousParentId)
   }
 
   deleteNode(id: string): void {
@@ -760,6 +787,8 @@ export class SceneGraph {
     const clone = this.cloneSubtree(sourceId, parentId, overrides, copies)
     // A copied instance records the overrides of its own layers, which are the cloned ones.
     Instances.retargetCopiedOverrides(this, copies)
+    // A copy placed in other modes than its source shows its bound paints there, as a move does.
+    if (clone) Variables.refreshMovedBoundPaints(this, clone.id, this.nodes.get(sourceId)?.parentId)
     return clone
   }
 
@@ -778,6 +807,7 @@ export class SceneGraph {
     // A copy is a new design nobody has reviewed: Figma's duplicate and clone() drop the status.
     props.status = null
     const clone = this.createNode(src.type, parentId, { ...props, ...overrides })
+    Variables.copyAppliedBoundPaints(src, clone)
     copies.set(src.id, clone.id)
     if (src.status) markSourceFieldsEdited(clone, ['status'])
 

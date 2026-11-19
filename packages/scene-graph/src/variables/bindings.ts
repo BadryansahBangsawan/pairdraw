@@ -1,15 +1,16 @@
 import { isEqual } from 'es-toolkit/predicate'
 
 import type { VariableModeFallback } from '.'
-import { copyFills, copyStrokes } from '../copy'
 import type { SceneGraph } from '../graph'
 import { readIcon } from '../icons/model'
 import { ICON_NAME } from '../icons/schema'
 import { hasInstanceOverride } from '../instances/overrides'
-import type { Color } from '../primitives'
 import { pixelLength } from '../text/lengths'
-import type { Fill, SceneNode, Stroke, StyleRun, TextLength } from '../types'
-import { NUMERIC_FIELDS, isNumericVariableBindingField, paintBindingTarget } from './fields'
+import type { SceneNode, StyleRun, TextLength } from '../types'
+import { NUMERIC_FIELDS, isNumericVariableBindingField } from './fields'
+import { refreshBoundPaints } from './paints'
+import { collectionsResolving } from './resolution'
+import { subtreeNodes } from './subtree'
 import { variableFontFamily, variableText, variableTruthy } from './text'
 import { runBindingScale } from './units'
 import { variableValueReferences } from './value'
@@ -188,43 +189,6 @@ function boundVariableIds(node: SceneNode): string[] {
 }
 
 /**
- * A bound paint takes its whole color from the variable, alpha included, the way Figma stores
- * it: the variable's RGB at full alpha, and its alpha as the paint's opacity.
- */
-function applyBoundColor(paint: Fill | Stroke, color: Color): void {
-  paint.color = { ...color, a: 1 }
-  paint.opacity = color.a
-}
-
-/** The fills and strokes a node's color bindings resolve to in its mode, when it has any. */
-export function resolvedPaintBindings(
-  graph: SceneGraph,
-  node: SceneNode,
-  fallback: VariableModeFallback = 'active'
-): Pick<Partial<SceneNode>, 'fills' | 'strokes'> {
-  // Most nodes bind nothing, so no copy is made until a paint binding is actually found.
-  const changes: Pick<Partial<SceneNode>, 'fills' | 'strokes'> = {}
-  for (const field in node.boundVariables) {
-    if (!field.endsWith('/color')) continue
-    const paint = paintBindingTarget(field)
-    if (!paint) continue
-    const color = graph.resolveColorVariableForNode(node.id, node.boundVariables[field], fallback)
-    const { index } = paint
-    if (!color) continue
-    if (paint.list === 'fills') {
-      if (!node.fills[index]) continue
-      changes.fills ??= copyFills(node.fills)
-      applyBoundColor(changes.fills[index], color)
-    } else {
-      if (!node.strokes[index]) continue
-      changes.strokes ??= copyStrokes(node.strokes)
-      applyBoundColor(changes.strokes[index], color)
-    }
-  }
-  return changes
-}
-
-/**
  * The layers a reconcile looks at: those bound to these variables, directly or through a variable
  * aliasing them, or the layers in these subtrees. Without a scope, every layer.
  */
@@ -250,36 +214,12 @@ export function variablesResolvingThrough(graph: SceneGraph, ids: Iterable<strin
   return found
 }
 
-function subtreeNodes(graph: SceneGraph, roots: Iterable<string>): SceneNode[] {
-  const nodes: SceneNode[] = []
-  const pending = [...roots]
-  for (let id = pending.pop(); id !== undefined; id = pending.pop()) {
-    const node = graph.getNode(id)
-    if (!node) continue
-    nodes.push(node)
-    pending.push(...node.childIds)
-  }
-  return nodes
-}
-
 /**
  * The collections whose variables the layers in these subtrees resolve: those they bind, and
  * those the bound variables alias, so a mode set on the subtrees can change what they show.
  */
 export function collectionsBoundIn(graph: SceneGraph, roots: Iterable<string>): Set<string> {
-  const pending = subtreeNodes(graph, roots).flatMap(boundVariableIds)
-  const seen = new Set<string>()
-  const collections = new Set<string>()
-  for (let id = pending.pop(); id !== undefined; id = pending.pop()) {
-    if (seen.has(id)) continue
-    seen.add(id)
-    const variable = graph.variables.get(id)
-    if (!variable) continue
-    collections.add(variable.collectionId)
-    for (const value of Object.values(variable.valuesByMode))
-      pending.push(...variableValueReferences(value))
-  }
-  return collections
+  return collectionsResolving(graph, subtreeNodes(graph, roots).flatMap(boundVariableIds))
 }
 
 /**
@@ -300,13 +240,17 @@ function scopedNodes(graph: SceneGraph, scope: BindingScope | undefined): Iterab
 }
 
 /**
- * Resolve live numeric, text, font family, and visibility bindings, numbers in scene units, without authoring
- * instance overrides. A scope limits it to the layers a change can reach, so layers whose saved
- * values differ from their bindings elsewhere in the document are left as saved.
+ * Resolve live numeric, text, font family, and visibility bindings, numbers in scene units, and
+ * refresh bound paints whose variable's color for the layer changed (`refreshBoundPaints`),
+ * without authoring instance overrides. A scope limits it to the layers a change can reach, so
+ * layers whose saved values differ from their bindings elsewhere in the document are left as
+ * saved.
  */
 export function reconcileVariableBindings(graph: SceneGraph, scope?: BindingScope): string[] {
   const changed: string[] = []
-  for (const node of scopedNodes(graph, scope)) {
+  const nodes = [...scopedNodes(graph, scope)]
+  for (const node of nodes) refreshBoundPaints(graph, node)
+  for (const node of nodes) {
     const updates = {
       ...resolvedNumericBindings(graph, node),
       ...resolvedValueBindings(graph, node),

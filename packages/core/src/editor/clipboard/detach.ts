@@ -2,9 +2,9 @@ import type { SceneGraph, SceneNode, StyleRun } from '@pairdraw/scene-graph'
 import { STYLE_LINK_FIELDS } from '@pairdraw/scene-graph/shared-styles'
 import {
   resolvedNumericBindings,
-  resolvedPaintBindings,
   resolvedRunBindings,
-  resolvedValueBindings
+  resolvedValueBindings,
+  shownPaintBindings
 } from '@pairdraw/scene-graph/variables'
 
 /**
@@ -21,7 +21,7 @@ export function resolvedClipboardBindings(
     ...resolvedNumericBindings(graph, node),
     ...resolvedValueBindings(graph, node),
     ...resolvedRunBindings(graph, node),
-    ...resolvedPaintBindings(graph, node)
+    ...shownPaintBindings(graph, node)
   }
   return Object.keys(resolved).length > 0 ? structuredClone(resolved) : undefined
 }

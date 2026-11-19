@@ -19,3 +19,4 @@
 - A binding change on a layer inside a nested instance claims only that binding, so the layer's other bindings keep following their component.
 - A synced bound number takes the value of the mode its copy sits in, not its component's, and a number the instance overrides keeps its own value through the sync.
 - A text style bound to a variable whose token path another collection shares reads back bound to the same variable: the export records each bound field's collection and variable, and warns about references other tools could misread.
+- A bound paint keeps an edit to its color or opacity until its variable's color for the layer changes, as in Figma: binding writes the variable's color, a value or mode change refreshes it, and readers, the canvas, copies, and saves use the stored paint.

@@ -2,72 +2,75 @@ import { expect, test } from 'bun:test'
 
 import { applyDocumentPaintBindings } from '#fig/document/bindings/paint'
 
-import { SceneGraph } from '@pairdraw/scene-graph'
+import { SceneGraph, type Fill } from '@pairdraw/scene-graph'
+import { setInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import { reconcileVariableBindings } from '@pairdraw/scene-graph/variables'
 
-function setup(alpha: number, opacity: number) {
+const BLACK_FILL: Fill = {
+  type: 'SOLID',
+  color: { r: 0, g: 0, b: 0, a: 1 },
+  opacity: 0.5,
+  visible: true,
+  blendMode: 'NORMAL'
+}
+
+function setup() {
   const graph = new SceneGraph()
+  const page = graph.getPages()[0].id
   const collection = graph.createCollection('Colors')
-  const variable = graph.createVariable('Accent', 'COLOR', collection.id, {
+  const accent = graph.createVariable('Accent', 'COLOR', collection.id, {
     r: 1,
     g: 1,
     b: 1,
-    a: alpha
+    a: 0.2
   })
-  const node = graph.createNode('RECTANGLE', graph.getPages()[0].id, {
-    fills: [{ type: 'SOLID', color: { r: 0, g: 0, b: 0, a: 1 }, opacity, visible: true }],
-    boundVariables: { 'fills/0/color': variable.id }
-  })
-  return { graph, node }
+  const boundFill = { fills: [BLACK_FILL], boundVariables: { 'fills/0/color': accent.id } }
+  const layer = graph.createNode('RECTANGLE', page, boundFill)
+  const instance = graph.createNode('INSTANCE', page)
+  const copy = graph.createNode('RECTANGLE', instance.id, boundFill)
+  return { graph, layer, instance, copy }
 }
 
-/** Drawing takes a solid fill's alpha from its opacity, so the variable has to own it. */
-test('a bound fill takes its alpha from the variable, not the paint', () => {
-  const { graph, node } = setup(0.2, 1)
-  applyDocumentPaintBindings(graph, [node])
-  expect(node.fills[0].color).toEqual({ r: 1, g: 1, b: 1, a: 1 })
-  expect(node.fills[0].opacity).toBeCloseTo(0.2)
+// An imported layer's saved cache has nothing vouching for it: it shows its variable's color,
+// alpha as opacity, as Figma shows an imported layer in its variables.
+test("an imported layer's bound paint takes its variable's color", () => {
+  const { graph, layer } = setup()
+  applyDocumentPaintBindings(graph, [layer])
+  expect(layer.fills[0].color).toEqual({ r: 1, g: 1, b: 1, a: 1 })
+  expect(layer.fills[0].opacity).toBeCloseTo(0.2)
 })
 
-/** An opacity left over from an override the binding supersedes must not survive. */
-test('a bound fill replaces a stale opacity rather than combining with it', () => {
-  const { graph, node } = setup(1, 0.5)
-  applyDocumentPaintBindings(graph, [node])
-  expect(node.fills[0].opacity).toBe(1)
+// Once import applied the variable's color, an edit to the paint sticks until that color changes.
+test('an edited paint stays through a reconcile until its variable changes', () => {
+  const { graph, layer } = setup()
+  applyDocumentPaintBindings(graph, [layer])
+  graph.updateNode(layer.id, { fills: [{ ...layer.fills[0], opacity: 0.5 }] })
+  const accent = layer.boundVariables['fills/0/color']
+  reconcileVariableBindings(graph, { variables: [accent] })
+  expect(layer.fills[0].opacity).toBe(0.5)
+  const variable = graph.variables.get(accent)
+  if (!variable) throw new Error('accent')
+  variable.valuesByMode[Object.keys(variable.valuesByMode)[0]] = { r: 0, g: 1, b: 0, a: 1 }
+  reconcileVariableBindings(graph, { variables: [accent] })
+  expect(layer.fills[0].color).toEqual({ r: 0, g: 1, b: 0, a: 1 })
+  expect(layer.fills[0].opacity).toBe(1)
 })
 
-test('a bound stroke follows the same rule', () => {
-  const graph = new SceneGraph()
-  const collection = graph.createCollection('Colors')
-  const variable = graph.createVariable('Line', 'COLOR', collection.id, {
-    r: 0,
-    g: 0,
-    b: 0,
-    a: 0.4
-  })
-  const node = graph.createNode('RECTANGLE', graph.getPages()[0].id, {
-    strokeStyleId: 'style:line',
-    strokes: [
-      {
-        type: 'SOLID',
-        color: { r: 1, g: 1, b: 1, a: 1 },
-        opacity: 1,
-        visible: true,
-        weight: 1,
-        align: 'INSIDE'
-      }
-    ],
-    boundVariables: { 'strokes/0/color': variable.id }
-  })
-  applyDocumentPaintBindings(graph, [node])
-  expect(node.strokes[0].color).toEqual({ r: 0, g: 0, b: 0, a: 1 })
-  expect(node.strokes[0].opacity).toBeCloseTo(0.4)
-  expect(node.strokeStyleId).toBe('style:line')
+test("an instance's copy takes its variable's color", () => {
+  const { graph, copy } = setup()
+  applyDocumentPaintBindings(graph, [copy])
+  expect(copy.fills[0].color).toEqual({ r: 1, g: 1, b: 1, a: 1 })
+  expect(copy.fills[0].opacity).toBeCloseTo(0.2)
 })
 
-test('resolving a bound color preserves the saved fill style assignment', () => {
-  const { graph, node } = setup(0.2, 1)
-  graph.updateNode(node.id, { fillStyleId: 'style:accent' })
-  applyDocumentPaintBindings(graph, [node])
-  expect(node.fills[0].opacity).toBeCloseTo(0.2)
-  expect(node.fillStyleId).toBe('style:accent')
+test('a copy whose fills the instance overrides shows its variable, then keeps its edits', () => {
+  const { graph, instance, copy } = setup()
+  setInstanceOverride(instance.instanceOverrides, instance.id, copy.id, 'fills', copy.fills)
+  applyDocumentPaintBindings(graph, [copy])
+  expect(copy.fills[0].color).toEqual({ r: 1, g: 1, b: 1, a: 1 })
+  expect(copy.fills[0].opacity).toBeCloseTo(0.2)
+  // The override is the copy's own paint: an edit to it sticks as any layer's edit does.
+  graph.updateNode(copy.id, { fills: [{ ...copy.fills[0], opacity: 0.5 }] })
+  reconcileVariableBindings(graph, { variables: [copy.boundVariables['fills/0/color']] })
+  expect(copy.fills[0].opacity).toBe(0.5)
 })

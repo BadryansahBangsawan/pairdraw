@@ -1,3 +1,4 @@
+import { propertyOwner } from '../components/properties'
 import type { SceneGraph } from '../graph'
 import { numberedName } from '../naming'
 import type { ComponentPropertyDefinition, SceneNode, SlotSettings } from '../types'
@@ -11,8 +12,9 @@ export const DEFAULT_SLOT_SETTINGS: SlotSettings = {
 }
 
 /**
- * The main component a layer belongs to, which defines the slots inside it. Layers of an
- * instance are not authored there, so a layer under an instance has none.
+ * The main component or set that defines the slots inside a layer: the component the layer
+ * belongs to, or that component's set. Layers of an instance are not authored there, so a
+ * layer under an instance has none.
  */
 export function slotOwner(graph: SceneGraph, node: SceneNode): SceneNode | undefined {
   if (!node.parentId) return undefined
@@ -21,7 +23,7 @@ export function slotOwner(graph: SceneGraph, node: SceneNode): SceneNode | undef
     (current) =>
       current.type === 'COMPONENT' || current.type === 'INSTANCE' || current.type === 'CANVAS'
   )
-  return owner?.type === 'COMPONENT' ? owner : undefined
+  return owner?.type === 'COMPONENT' ? propertyOwner(graph, owner) : undefined
 }
 
 /** Whether a frame inside a main component can become a slot. */

@@ -1,0 +1,1 @@
+- Pressing ⌘R with the sidebar closed now opens the design panel and renames the layer there, instead of doing nothing.

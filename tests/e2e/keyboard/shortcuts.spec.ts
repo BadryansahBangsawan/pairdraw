@@ -156,6 +156,30 @@ test.describe('selection shortcuts', () => {
     await openDesignPanel(editor.page)
   })
 
+  test('⌘R with the sidebar closed opens the design panel and renames there', async () => {
+    const id = await editor.page.evaluate(() => {
+      const store = window.pairdraw?.getStore?.()
+      if (!store) throw new Error('Pairdraw store not initialized')
+      const node = store.graph.createNode('RECTANGLE', store.state.currentPageId)
+      store.select([node.id])
+      return node.id
+    })
+
+    // The toggle closes the whole sidebar.
+    await editor.page.getByTestId('editor-toggle-layers-panel').click()
+    await expect(editor.page.getByTestId('layers-panel')).toBeHidden()
+
+    await editor.page.keyboard.press('Meta+r')
+
+    await expect(editor.page.getByTestId('layers-panel')).toBeVisible()
+    const input = editor.page.getByTestId('panel-name-input')
+    await expect(input).toBeFocused()
+    await input.fill('Renamed with sidebar closed')
+    await input.press('Enter')
+    const child = (await getPageChildren()).find((node) => node.id === id)
+    expect(child?.name).toBe('Renamed with sidebar closed')
+  })
+
   test('⌘R renames the layer in the design panel heading', async () => {
     const id = await editor.page.evaluate(() => {
       const store = window.pairdraw?.getStore?.()

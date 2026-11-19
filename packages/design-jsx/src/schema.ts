@@ -54,6 +54,73 @@ export const placedOwnLayerPropsSchema = v.object({
   position: v.optional(v.picklist(['absolute']))
 })
 
+const finiteNumberSchema = v.pipe(v.number(), v.finite())
+
+/** A length that cannot be negative, such as a size, radius, or stroke weight. */
+const layoutLengthSchema = v.pipe(
+  finiteNumberSchema,
+  v.transform((length) => Math.min(1_000_000, Math.max(0, length)))
+)
+
+/** A share from none to all, such as how much a corner is smoothed. */
+const shareSchema = v.pipe(
+  finiteNumberSchema,
+  v.transform((share) => Math.min(1, Math.max(0, share)))
+)
+
+/**
+ * The layer props every element reads by the same reader, under each name it is written by. A
+ * value of the wrong kind is reported and left out, so it never reaches a layer's fields; one out
+ * of range is bounded, as a bound variable's value is.
+ */
+export const layerPropsSchema = v.object({
+  name: v.optional(v.string()),
+  // An artwork's layer name, since its `name` names the icon.
+  label: v.optional(v.string()),
+  opacity: v.optional(finiteNumberSchema),
+  rotate: v.optional(finiteNumberSchema),
+  rotation: v.optional(finiteNumberSchema),
+  rounded: v.optional(layoutLengthSchema),
+  cornerRadius: v.optional(layoutLengthSchema),
+  borderRadius: v.optional(layoutLengthSchema),
+  roundedTL: v.optional(layoutLengthSchema),
+  roundedTR: v.optional(layoutLengthSchema),
+  roundedBL: v.optional(layoutLengthSchema),
+  roundedBR: v.optional(layoutLengthSchema),
+  cornerSmoothing: v.optional(shareSchema),
+  strokeWidth: v.optional(layoutLengthSchema),
+  borderWidth: v.optional(layoutLengthSchema),
+  maxLines: v.optional(v.pipe(v.number(), v.integer('expected a whole number'), v.minValue(1)))
+})
+
+/** An element's props with the layer props read by `layerPropsSchema`. */
+export type LayerProps = Record<string, unknown> & v.InferOutput<typeof layerPropsSchema>
+
+/**
+ * The layer props an inline `<svg>` reads itself. Its other props, such as `strokeWidth="2"`,
+ * are attributes of its markup's root, which the SVG service reads as SVG does.
+ */
+export const svgLayerPropsSchema = v.pick(layerPropsSchema, ['label'])
+
+/** `props` with each prop `schema` takes read by it, and every other prop as it is. */
+export function readKnownProps<S extends ElementPropsSchema>(
+  schema: S,
+  props: Readonly<Record<string, unknown>>
+): Record<string, unknown> & v.InferOutput<S> {
+  const read: Record<string, unknown> = { ...props }
+  for (const [key, entry] of Object.entries(schema.entries)) {
+    if (props[key] === undefined) continue
+    const parsed = v.safeParse(entry, props[key])
+    read[key] = parsed.success ? parsed.output : undefined
+  }
+  return read
+}
+
+/** `props` with its layer props read by `layerPropsSchema`, as every element reads them. */
+export function readLayerProps(props: Readonly<Record<string, unknown>>): LayerProps {
+  return readKnownProps(layerPropsSchema, props)
+}
+
 /** A colour as a string, or as the colour a `designVar()` resolves to. */
 const colorPropSchema = v.union(
   [

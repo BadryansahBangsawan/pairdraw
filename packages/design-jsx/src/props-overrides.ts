@@ -27,6 +27,7 @@ import { applyStateOverrides } from './overrides/state'
 import { applyStrokeOverrides } from './overrides/strokes'
 import { applyTextDetailOverrides, AUTO, textLengthProp } from './overrides/text'
 import { isShaderFill } from './paints'
+import { readLayerProps, type LayerProps } from './schema'
 
 const WEIGHT_MAP: Record<string, number> = {
   normal: 400,
@@ -128,9 +129,9 @@ function applyFillOverride(props: Record<string, unknown>, o: Partial<SceneNode>
   if (isFillValue(bg)) setFills([bg], o)
 }
 
-function applyCornerOverrides(props: Record<string, unknown>, o: Partial<SceneNode>): void {
-  const rounded = designJSXProp(props, 'rounded')
-  if (typeof rounded === 'number') o.cornerRadius = rounded
+function applyCornerOverrides(props: LayerProps, o: Partial<SceneNode>): void {
+  const rounded = props.rounded ?? props.cornerRadius ?? props.borderRadius
+  if (rounded !== undefined) o.cornerRadius = rounded
 
   if (
     props.roundedTL !== undefined ||
@@ -139,30 +140,30 @@ function applyCornerOverrides(props: Record<string, unknown>, o: Partial<SceneNo
     props.roundedBR !== undefined
   ) {
     o.independentCorners = true
-    if (props.roundedTL !== undefined) o.topLeftRadius = props.roundedTL as number
-    if (props.roundedTR !== undefined) o.topRightRadius = props.roundedTR as number
-    if (props.roundedBL !== undefined) o.bottomLeftRadius = props.roundedBL as number
-    if (props.roundedBR !== undefined) o.bottomRightRadius = props.roundedBR as number
+    if (props.roundedTL !== undefined) o.topLeftRadius = props.roundedTL
+    if (props.roundedTR !== undefined) o.topRightRadius = props.roundedTR
+    if (props.roundedBL !== undefined) o.bottomLeftRadius = props.roundedBL
+    if (props.roundedBR !== undefined) o.bottomRightRadius = props.roundedBR
   }
 
-  if (props.cornerSmoothing !== undefined) o.cornerSmoothing = props.cornerSmoothing as number
+  if (props.cornerSmoothing !== undefined) o.cornerSmoothing = props.cornerSmoothing
 }
 
-function applyVisualOverrides(props: Record<string, unknown>, o: Partial<SceneNode>): void {
+function applyVisualOverrides(props: LayerProps, o: Partial<SceneNode>): void {
   applyFillOverride(props, o)
   applyStrokeOverrides(props, o)
   applyCornerOverrides(props, o)
 
-  if (props.opacity !== undefined) o.opacity = props.opacity as number
+  if (props.opacity !== undefined) o.opacity = props.opacity
   applyTransformOverrides(props, o)
   const blendMode = BLEND_MODE.parse(props.blendMode)
   if (blendMode) o.blendMode = blendMode
   if (props.overflow === 'hidden') o.clipsContent = true
 }
 
-function applyTransformOverrides(props: Record<string, unknown>, o: Partial<SceneNode>): void {
-  const rotation = designJSXProp(props, 'rotate')
-  if (rotation !== undefined) o.rotation = rotation as number
+function applyTransformOverrides(props: LayerProps, o: Partial<SceneNode>): void {
+  const rotation = props.rotate ?? props.rotation
+  if (rotation !== undefined) o.rotation = rotation
   if (props.flipX !== undefined) o.flipX = props.flipX === true
   if (props.flipY !== undefined) o.flipY = props.flipY === true
 }
@@ -336,7 +337,7 @@ function applyLayoutOverrides(
   if (props.grow !== undefined) o.layoutGrow = props.grow as number
 }
 
-function applyTextStyleOverrides(props: Record<string, unknown>, o: Partial<SceneNode>): void {
+function applyTextStyleOverrides(props: LayerProps, o: Partial<SceneNode>): void {
   const fontSize = designJSXProp(props, 'size')
   if (typeof fontSize === 'number') o.fontSize = fontSize
 
@@ -367,7 +368,7 @@ function applyTextStyleOverrides(props: Record<string, unknown>, o: Partial<Scen
   const textCase = TEXT_CASE.parse(props.textCase)
   if (textCase) o.textCase = textCase
   if (props.maxLines !== undefined) {
-    o.maxLines = props.maxLines as number
+    o.maxLines = props.maxLines
     o.textTruncation = 'ENDING'
   }
   if (props.truncate) {
@@ -396,7 +397,8 @@ function applyTextAutoResize(
 ): void {
   const w = designJSXProp(props, 'w')
   const hasExplicitWidth = w !== undefined
-  const fillsParent = w === 'fill' || (props.grow as number) > 0
+  const grow = typeof props.grow === 'number' ? props.grow : undefined
+  const fillsParent = w === 'fill' || (grow !== undefined && grow > 0)
   const isInsideAutoLayout = parentLayout !== 'NONE'
 
   // DO NOT CHANGE these defaults without testing headless layout (no CanvasKit).
@@ -413,7 +415,7 @@ function applyTextAutoResize(
 }
 
 function applyTextOverrides(
-  props: Record<string, unknown>,
+  props: LayerProps,
   o: Partial<SceneNode>,
   parentLayout: SceneNode['layoutMode']
 ): void {
@@ -474,17 +476,18 @@ export function propsToOverrides(
   isText: boolean,
   parentLayout: SceneNode['layoutMode']
 ): Partial<SceneNode> {
-  props = normalizeStyleProps(props)
+  // Layer props are read once, after `style` gives the ones the props leave unset.
+  const layer = readLayerProps(normalizeStyleProps(props))
   const o: Partial<SceneNode> = {}
 
-  if (props.name) o.name = props.name as string
+  if (layer.name) o.name = layer.name
 
-  const { w, h } = applySizeOverrides(props, o, parentLayout)
-  applyVisualOverrides(props, o)
-  applyLayoutOverrides(props, o, w, h, isText, parentLayout)
-  if (isText) applyTextOverrides(props, o, parentLayout)
-  applyEffectOverrides(props, o)
-  applyStateOverrides(props, o)
+  const { w, h } = applySizeOverrides(layer, o, parentLayout)
+  applyVisualOverrides(layer, o)
+  applyLayoutOverrides(layer, o, w, h, isText, parentLayout)
+  if (isText) applyTextOverrides(layer, o, parentLayout)
+  applyEffectOverrides(layer, o)
+  applyStateOverrides(layer, o)
 
   return o
 }

@@ -230,7 +230,7 @@ function placeArtwork<Artwork>(
 ): SceneNode {
   const parentLayout = graph.getNode(parentId)?.layoutMode ?? 'NONE'
   const overrides: Partial<SceneNode> = {}
-  if (props.label) overrides.name = props.label as string
+  if (typeof props.label === 'string' && props.label) overrides.name = props.label
   applyIconSize(props, overrides, parentLayout, size)
   const modes = variableModes(graph, props.mode)
   if (modes) overrides.variableModes = modes

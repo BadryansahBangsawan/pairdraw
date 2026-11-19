@@ -1,3 +1,4 @@
+import { pickBy } from 'es-toolkit'
 import { uniq } from 'es-toolkit/array'
 
 import type { SceneGraph } from '@pairdraw/scene-graph'
@@ -8,6 +9,7 @@ import { elementBindings, elementProps, elementSchema } from './elements'
 import { ENUM_PROPS } from './enums'
 import { DESIGN_JSX_HELPERS, designJSXHelpers } from './helpers'
 import * as React from './mini-react'
+import { normalizeStyleProps } from './props-overrides'
 import {
   renderRoots,
   renderTree,
@@ -15,7 +17,7 @@ import {
   componentReferenceWarnings,
   type RenderResult
 } from './renderer'
-import { elementPropWarnings } from './schema'
+import { elementPropWarnings, layerPropsSchema, svgLayerPropsSchema } from './schema'
 import type { DesignJSXServices } from './services'
 import { TEXT_CONTENT_NAMES } from './text-content'
 import { transformDesignJSXExpression } from './transform'
@@ -157,6 +159,14 @@ function collectUnsupportedPropWarnings(
   const element = TEXT_CONTENT_NAMES[tree.type] ?? tree.type
   const schema = elementSchema(tree.type)
   if (schema) warnings.push(...elementPropWarnings(schema, tree.props, element))
+  // The layer props an element takes are read by one schema, which its own schema may restate,
+  // with the values its `style` gives where the props leave them unset, as rendering reads them.
+  const layerSchema = tree.type === 'svg' ? svgLayerPropsSchema : layerPropsSchema
+  const layerProps = pickBy(
+    normalizeStyleProps(tree.props),
+    (_, key) => supported.has(key) && !(schema && Object.hasOwn(schema.entries, key))
+  )
+  warnings.push(...elementPropWarnings(layerSchema, layerProps, element))
   for (const [key, value] of Object.entries(tree.props)) {
     if (!supported.has(key) && !properties.includes(key)) {
       warnings.push(`Unsupported prop "${key}" on <${element}> is ignored.`)

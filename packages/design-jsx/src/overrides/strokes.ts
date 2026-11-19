@@ -5,6 +5,8 @@ import type { SceneNode, Stroke } from '@pairdraw/scene-graph'
 import { parseColor } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
+import type { LayerProps } from '../schema'
+
 /** One entry of the `strokes` prop; enums are lowercase, as `blendMode` is. */
 export interface StrokeValue {
   color: string | Color
@@ -78,7 +80,7 @@ function applyStrokeWeights(value: unknown, o: Partial<SceneNode>): void {
 }
 
 /** `strokes` takes structured strokes; `stroke` and its sibling props describe a single one. */
-export function applyStrokeOverrides(props: Record<string, unknown>, o: Partial<SceneNode>): void {
+export function applyStrokeOverrides(props: LayerProps, o: Partial<SceneNode>): void {
   applyStrokeWeights(props.strokeWeights, o)
   // Node-level cap and join, which strokes without their own use.
   const nodeCap = STROKE_CAP.parse(props.strokeCap)
@@ -102,8 +104,7 @@ function strokeValues(props: Record<string, unknown>): StrokeValue[] {
   return [
     {
       color,
-      weight:
-        (props.strokeWidth as number | undefined) ?? (props.borderWidth as number | undefined),
+      weight: props.strokeWidth ?? props.borderWidth,
       align: props.strokeAlign as string | undefined,
       dash: props.strokeDash as number[] | undefined
     }

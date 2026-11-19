@@ -2,3 +2,4 @@
 - Groups now shrink to the layers left in them after a delete, a move to another page, or a layers-panel drag, and an auto layout around them makes room.
 - Duplicating a layer inside an auto layout now places the copy in the flow and resizes a hugging parent, with undo and redo doing the same.
 - Duplicating slot content, dragging a layer into a slot, or reordering it now claims the slot in the same undo step as the edit.
+- A layer prop of the wrong kind, such as a name or a size that is not a number, is now reported and left out instead of reaching the layer, and one out of range is bounded.

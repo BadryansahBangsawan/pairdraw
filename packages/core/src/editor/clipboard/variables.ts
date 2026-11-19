@@ -1,4 +1,9 @@
 import type { SceneGraph, SceneNode, Variable, VariableCollection } from '@pairdraw/scene-graph'
+import {
+  overriddenBindingField,
+  overriddenVariableModeCollection,
+  remapInstanceOverrideState
+} from '@pairdraw/scene-graph/instances/overrides'
 import { numberedName } from '@pairdraw/scene-graph/naming'
 import { remapStyleRunReferences, styleRunReferences } from '@pairdraw/scene-graph/text'
 import {
@@ -46,6 +51,16 @@ export function captureClipboardVariables(
   for (const node of nodes) {
     for (const id of Object.values(node.boundVariables)) visit(id)
     for (const id of styleRunReferences(node.styleRuns).variables) visit(id)
+    for (const id of Object.keys(node.variableModes)) capture(graph.variableCollections.get(id))
+    // An instance's overrides bind variables and pin modes on its layers too.
+    const { self, descendants } = node.instanceOverrides
+    for (const fields of [self, ...descendants.values()]) {
+      for (const [field, value] of fields) {
+        if (typeof value === 'string' && overriddenBindingField(field) !== null) visit(value)
+        const collection = overriddenVariableModeCollection(field)
+        if (collection !== null) capture(graph.variableCollections.get(collection))
+      }
+    }
   }
   const activeModes: Array<[string, string]> = []
   for (const collectionId of collections.keys()) {
@@ -234,5 +249,10 @@ export function remapClipboardVariableBindings(
   node.styleRuns = remapStyleRunReferences(node.styleRuns, {
     variable: (id) => variables.get(id) ?? id,
     style: (id) => styleIds.get(id) ?? id
+  })
+  node.instanceOverrides = remapInstanceOverrideState(node.instanceOverrides, {
+    node: (id) => id,
+    variable: (id) => variables.get(id) ?? id,
+    collection: (id) => collections.get(id) ?? id
   })
 }

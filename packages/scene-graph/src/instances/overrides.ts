@@ -157,6 +157,7 @@ export function cloneInstanceOverrideState(state: InstanceOverrideState): Instan
 export interface InstanceOverrideReferenceMapper {
   node: (id: string) => string
   variable: (id: string) => string
+  collection?: (id: string) => string | undefined
   property?: (id: string) => string | undefined
 }
 
@@ -177,7 +178,10 @@ export function remapInstanceOverrideState(
       const mapped = references.property(property)
       return mapped === undefined ? undefined : assignmentOverrideField(mapped)
     }
-    return field
+    const collection = overriddenVariableModeCollection(field)
+    if (collection === null || !references.collection) return field
+    const mapped = references.collection(collection)
+    return mapped === undefined ? undefined : variableModeOverrideField(mapped)
   }
   const fields = (entries: ReadonlyMap<string, unknown>) =>
     new Map(

@@ -13,3 +13,4 @@
 - A bound paint refreshes whenever the mode set for its layer changes, even to a mode giving the same color, as in Figma, and a paste keeps the paint edits it copied, counting from the colors applied when the copy was made.
 - A literal fill or stroke an outer instance sets on a layer inside a nested instance stays unbound through component sync, instead of taking the component's color binding back.
 - A sync that matches an instance's copy to a namesake replacing its component layer relinks the copy over the link a file recorded, and announces the change, so a reopened document saves and collaboration follows it.
+- A paste into another document keeps the mode an instance pins on a layer and the variables its overrides bind, remapped to the collections and variables the paste copies.

@@ -2,7 +2,7 @@ import { useIntervalFn } from '@vueuse/core'
 import type { ShallowRef } from 'vue'
 
 import type { Editor } from '@pairdraw/core'
-import { adjustRunsForDelete, adjustRunsForInsert } from '@pairdraw/core/text'
+import { adjustRunsForDelete, runsAfterTyping } from '@pairdraw/core/text'
 import type { SceneNode } from '@pairdraw/scene-graph'
 import { paragraphStylesAfterTextChange } from '@pairdraw/scene-graph/text'
 
@@ -162,13 +162,9 @@ export function createTextEditActions(store: Editor) {
     const editor = store.textEditor
     if (!editor) return
     const range = editor.getSelectionRange()
-    let runs = node.styleRuns
-    if (range) {
-      runs = adjustRunsForDelete(runs, range[0], range[1] - range[0])
-      runs = adjustRunsForInsert(runs, range[0], text.length)
-    } else {
-      runs = adjustRunsForInsert(runs, editor.state?.cursor ?? 0, text.length)
-    }
+    const start = range?.[0] ?? editor.state?.cursor ?? 0
+    const end = range?.[1] ?? start
+    const runs = runsAfterTyping(node.styleRuns, node.text.length, start, end, text.length)
     editor.insert(text, node)
     syncText(node.id, editor.state?.text ?? '', runs)
     const state = editor.state
@@ -218,8 +214,13 @@ export function createTextEditActions(store: Editor) {
     state.cursor = draft.start + text.length
     state.selectionAnchor = null
 
-    let runs = adjustRunsForDelete(draft.baseRuns, draft.start, draft.end - draft.start)
-    runs = adjustRunsForInsert(runs, draft.start, text.length)
+    const runs = runsAfterTyping(
+      draft.baseRuns,
+      draft.baseText.length,
+      draft.start,
+      draft.end,
+      text.length
+    )
     // Each update replaces the same base, so paragraphs an earlier update joined come back.
     const paragraphs =
       draft.baseParagraphs.length > 0

@@ -63,8 +63,14 @@ export function createSharedEditorMenuActions(
   setTheme: (theme: 'light' | 'dark' | 'auto') => void
 ) {
   return {
-    'zoom-in': () => store.applyZoom(-100, window.innerWidth / 2, window.innerHeight / 2),
-    'zoom-out': () => store.applyZoom(100, window.innerWidth / 2, window.innerHeight / 2),
+    'zoom-in': () => {
+      const middle = store.viewportCanvasCenter()
+      store.applyZoom(-100, middle.x, middle.y)
+    },
+    'zoom-out': () => {
+      const middle = store.viewportCanvasCenter()
+      store.applyZoom(100, middle.x, middle.y)
+    },
     'view-split-right': () => store.splitPane(store.activePaneId.value, 'horizontal'),
     'view-split-down': () => store.splitPane(store.activePaneId.value, 'vertical'),
     'view-rulers': () => {

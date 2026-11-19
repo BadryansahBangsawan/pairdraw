@@ -211,7 +211,14 @@ export function createViewportActions(ctx: EditorContext) {
     )
   }
 
+  /** The middle of the canvas the floating chrome leaves, in canvas pixels from its top-left. */
+  function viewportCanvasCenter(): Vector {
+    const area = visibleCanvas(ctx)
+    return { x: area.left + area.width / 2, y: area.top + area.height / 2 }
+  }
+
   return {
+    viewportCanvasCenter,
     revealNodes,
     screenToCanvas,
     setZoomAroundPoint,

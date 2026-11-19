@@ -34,6 +34,7 @@ export function makeFigmaFromStore(
   store: EditorStore,
   pageId = store.state.currentPageId
 ): FigmaAPI {
+  const middle = store.viewportCanvasCenter()
   const api = new FigmaAPI(store.graph, {
     fetch: imageFetch,
     // The page, view, and selection the editor already shows are seeded, so a tool that only
@@ -43,8 +44,8 @@ export function makeFigmaFromStore(
     selection: pageId === store.state.currentPageId ? [...store.state.selectedIds] : [],
     viewport: {
       center: {
-        x: (-store.state.panX + window.innerWidth / 2) / store.state.zoom,
-        y: (-store.state.panY + window.innerHeight / 2) / store.state.zoom
+        x: (middle.x - store.state.panX) / store.state.zoom,
+        y: (middle.y - store.state.panY) / store.state.zoom
       },
       zoom: store.state.zoom
     },

@@ -38,15 +38,12 @@ export async function pasteClipboardHTML(
   await editor.pasteSnapshot(snapshot, cursorPos, { ...options, dependencies })
 }
 
-/** Where a paste without a copied position goes: the cursor, else the middle of the view. */
+/** Where a paste without a copied position goes: the cursor, else the middle of the canvas. */
 export function pastePoint(editor: Editor, cursorPos?: Vector): Vector {
+  if (cursorPos) return cursorPos
+  const middle = editor.viewportCanvasCenter()
   const { panX, panY, zoom } = editor.state
-  return (
-    cursorPos ?? {
-      x: (-panX + window.innerWidth / 2) / zoom,
-      y: (-panY + window.innerHeight / 2) / zoom
-    }
-  )
+  return { x: (middle.x - panX) / zoom, y: (middle.y - panY) / zoom }
 }
 
 /** Paste SVG markup, such as Figma's Copy as SVG, as layers; false when the text is not SVG. */

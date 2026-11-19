@@ -13,12 +13,7 @@ export function createProfilerActions(editor: Editor) {
   }
 
   function viewportCanvasCenter() {
-    const canvas = activeCanvasElement()
-    if (canvas) {
-      const rect = canvas.getBoundingClientRect()
-      return { x: rect.width / 2, y: rect.height / 2 }
-    }
-    return { x: window.innerWidth / 2, y: window.innerHeight / 2 }
+    return editor.viewportCanvasCenter()
   }
 
   function toggleProfiler() {

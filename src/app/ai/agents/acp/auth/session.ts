@@ -80,7 +80,7 @@ async function openAuthSession(
   agent: ACPAgentDef,
   { spawn, initializeTimeoutMs = INITIALIZE_TIMEOUT_MS }: AuthSessionOptions
 ) {
-  const streams = await spawn(agent, { logId: `${agent.id} sign-in` })
+  const streams = await spawn(agent, { logId: `${agent.id} sign-in`, stderrLevel: 'debug' })
   const log = createStatusLog()
   let onUpdate: ((update: SessionUpdate) => void) | null = null
   const connection = new ClientSideConnection(

@@ -16,13 +16,14 @@ import type { AgentHost, AgentSignIn, AgentStreams } from './types'
 
 async function spawn(
   agent: ACPAgentDef,
-  { logId = agent.id, onExit }: Parameters<AgentHost['spawn']>[1] = {}
+  { logId = agent.id, stderrLevel = 'error', onExit }: Parameters<AgentHost['spawn']>[1] = {}
 ): Promise<AgentStreams> {
   let closing = false
   const { child, input, output } = await spawnACPProcess({
     command: agent.command,
     args: agent.args,
     logId,
+    stderrLevel,
     destroying: () => closing,
     onUnexpectedClose: () => onExit?.()
   })

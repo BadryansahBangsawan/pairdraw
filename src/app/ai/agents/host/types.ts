@@ -16,6 +16,12 @@ export interface AgentStreams {
 export interface AgentSpawnOptions {
   /** Names the agent's diagnostic output, such as its stderr in the console. */
   logId?: string
+  /**
+   * The console level for the agent's stderr. A sign-in probe writes its diagnostics there while
+   * it decides whether someone is signed in, so it passes `debug`; a running session passes its
+   * stderr through at `error`, the default.
+   */
+  stderrLevel?: 'error' | 'debug'
   /** Called when the agent exits before `close()` asked it to. */
   onExit?: () => void
 }

@@ -22,6 +22,9 @@ import * as v from 'valibot'
 
 const name = process.argv[2] ?? 'fake-acp'
 
+// Adapters write diagnostics to stderr as they start, as Claude's does during a sign-in probe.
+process.stderr.write(`[${name}] starting\n`)
+
 const stream = ndJsonStream(
   new WritableStream<Uint8Array>({
     write: (chunk) =>

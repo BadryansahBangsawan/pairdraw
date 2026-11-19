@@ -5,6 +5,7 @@ type ACPProcessOptions = {
   command: string
   args: string[]
   logId: string
+  stderrLevel?: 'error' | 'debug'
   destroying: () => boolean
   onUnexpectedClose: () => void
 }
@@ -13,6 +14,7 @@ export async function spawnACPProcess({
   command: commandName,
   args,
   logId,
+  stderrLevel = 'error',
   destroying,
   onUnexpectedClose
 }: ACPProcessOptions) {
@@ -40,7 +42,7 @@ export async function spawnACPProcess({
   })
 
   command.stderr.on('data', (raw: Uint8Array | number[] | string) => {
-    console.error(`[ACP ${logId}]`, decodeTauriStderr(raw))
+    console[stderrLevel](`[ACP ${logId}]`, decodeTauriStderr(raw))
   })
 
   command.on('close', () => {

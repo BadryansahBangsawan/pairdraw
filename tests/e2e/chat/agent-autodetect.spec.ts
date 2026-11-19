@@ -74,6 +74,26 @@ test('a prompt on Home runs the coding agent on this computer without setup', as
   await expect(page.getByRole('listbox')).toBeHidden()
 })
 
+test('looking for an agent keeps the sign-in probe’s diagnostics out of the error log', async ({
+  page,
+  baseURL
+}) => {
+  test.setTimeout(90_000)
+  const errors: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'error') errors.push(message.text())
+  })
+  const { prompt } = await openPaired(page, baseURL, { agent: true })
+  await page.getByRole('button', { name: 'Something else…' }).click()
+  await prompt.fill('A pricing page with three plans')
+  await prompt.press('Enter')
+
+  const chat = new ChatHarness(page)
+  await expect(chat.profileTrigger).toContainText('Claude Code', { timeout: 60_000 })
+  // The adapter's start-up lines are diagnostics of a probe that is expected to run, not errors.
+  expect(errors.filter((text) => text.includes('sign-in'))).toEqual([])
+})
+
 test('without an agent on this computer, a prompt on Home opens guided setup and keeps the prompt', async ({
   page,
   baseURL

@@ -143,7 +143,7 @@ export function createCompanionAgentHost(
 
   async function spawn(
     agent: ACPAgentDef,
-    { logId = agent.id, onExit }: AgentSpawnOptions = {}
+    { logId = agent.id, stderrLevel = 'error', onExit }: AgentSpawnOptions = {}
   ): Promise<AgentStreams> {
     let closing = false
     let output: ReadableStreamDefaultController<Uint8Array> | null = null
@@ -156,7 +156,7 @@ export function createCompanionAgentHost(
         return
       }
       const message = parseMessage(event.data)
-      if (message?.type === 'stderr') console.error(`[ACP ${logId}]`, message.text)
+      if (message?.type === 'stderr') console[stderrLevel](`[ACP ${logId}]`, message.text)
     })
     const closed = new Promise<void>((resolve) => {
       socket.addEventListener('close', () => {

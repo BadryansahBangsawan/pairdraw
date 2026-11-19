@@ -51,8 +51,8 @@ const visibleSizeLimits = computed(() =>
 
 <template>
   <PanelGrid :columns="1">
-    <SizeAxisField axis="width" icon="W" :label="panels.width" />
-    <SizeAxisField axis="height" icon="H" :label="panels.height" />
+    <SizeAxisField axis="width" icon="W" :label="panels.width" :disabled="!ctx.resizes" />
+    <SizeAxisField axis="height" icon="H" :label="panels.height" :disabled="!ctx.resizes" />
     <template v-if="ctx.aspectRatioLockable" #actions>
       <IconButton
         :label="panels.lockAspectRatio"

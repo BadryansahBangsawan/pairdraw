@@ -404,6 +404,14 @@ export function findInstanceAncestor(graph: SceneGraph, nodeId: string): SceneNo
 }
 
 /**
+ * Whether Figma lets this layer take a size of its own: a layer inside an instance shows its
+ * component's size and cannot be resized, while an instance nested in another may be.
+ */
+export function takesOwnSize(graph: SceneGraph, node: SceneNode): boolean {
+  return node.type === 'INSTANCE' || !node.parentId || !findInstanceAncestor(graph, node.parentId)
+}
+
+/**
  * True when a node field is protected from instance synchronization.
  */
 export function hasInstanceOverride(graph: SceneGraph, nodeId: string, field: string): boolean {

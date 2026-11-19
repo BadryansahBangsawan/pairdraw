@@ -20,6 +20,7 @@ const {
   y,
   rotation,
   rotates,
+  resizes,
   inAutoLayout,
   ignoresAutoLayout,
   toggleIgnoreAutoLayout
@@ -55,6 +56,7 @@ const actions = {
     :h-value="hValue"
     :rotation-value="rotationValue"
     :rotates="rotates"
+    :resizes="resizes"
     :in-auto-layout="inAutoLayout"
     :ignores-auto-layout="ignoresAutoLayout"
     :mixed="MIXED"

@@ -43,6 +43,7 @@ provideLayoutControls(
   <slot
     :editor="ctx.editor"
     :node="ctx.node.value"
+    :resizes="ctx.resizes.value"
     :layout-direction="ctx.layoutDirection.value"
     :gap-auto="ctx.gapAuto.value"
     :is-in-auto-layout="ctx.isInAutoLayout.value"

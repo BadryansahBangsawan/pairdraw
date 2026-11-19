@@ -1,3 +1,7 @@
+import { computed } from 'vue'
+
+import { takesOwnSize } from '@pairdraw/scene-graph/instances'
+
 import {
   createGridTrackActions,
   createLayoutActions,
@@ -51,9 +55,13 @@ export function useLayout() {
 
   const { updateGridTrack, addTrack, removeTrack } = createGridTrackActions(editor, node)
 
+  /** Whether Figma lets the selected layer take a size of its own; see `takesOwnSize`. */
+  const resizes = computed(() => (node.value ? takesOwnSize(editor.graph, node.value) : false))
+
   return {
     editor,
     node,
+    resizes,
     layoutDirection,
     gapAuto,
     isInAutoLayout,

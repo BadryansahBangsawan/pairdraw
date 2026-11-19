@@ -1,0 +1,1 @@
+- Layers inside an instance no longer resize: their corner handles are gone, their width and height fields are disabled, and a `.fig` export records no size for them, as in Figma; files that already carry such a size still open with it.

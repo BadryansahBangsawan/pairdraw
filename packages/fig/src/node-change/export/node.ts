@@ -517,7 +517,15 @@ function applyInstancePayload(
     node,
     instanceGuidResolver(context, localIdCounter),
     retainedGeometry,
-    (target) => ({ size: exportNodeSize(target), transform: exportNodeTransform(context, target) })
+    (target) => ({
+      // Figma gives a size of its own only to an instance inside an instance; other layers show
+      // their component's size, so a size here would be a claim Figma drops. A text keeps the size
+      // its characters laid it out to, which the reader sizes it with until it lays text out again.
+      ...(target.type === 'INSTANCE' || target.type === 'TEXT'
+        ? { size: exportNodeSize(target) }
+        : {}),
+      transform: exportNodeTransform(context, target)
+    })
   )
   if (node.source.fig.derivedSymbolDataLayoutVersion != null) {
     nc.derivedSymbolDataLayoutVersion = node.source.fig.derivedSymbolDataLayoutVersion

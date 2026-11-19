@@ -1,5 +1,6 @@
 import type { Editor } from '@pairdraw/core'
 import { layerResizes } from '@pairdraw/scene-graph/generated'
+import { takesOwnSize } from '@pairdraw/scene-graph/instances'
 import { enforcedAspectRatio } from '@pairdraw/scene-graph/layout'
 import { collectResizeDescendants, createResizeSnapshot } from '@pairdraw/scene-graph/resize'
 
@@ -10,8 +11,8 @@ export function tryStartResize(cx: number, cy: number, editor: Editor): DragResi
   for (const id of editor.state.selectedIds) {
     const node = editor.graph.getNode(id)
     // A sticky note only scales, from its corners; see `tryStartStickyScale`. A connector is
-    // shaped by its ends.
-    if (!node || node.locked || !layerResizes(node)) continue
+    // shaped by its ends. A layer inside an instance takes its component's size, as in Figma.
+    if (!node || node.locked || !layerResizes(node) || !takesOwnSize(editor.graph, node)) continue
     const handleResult = getHitHandleByMatrix(
       cx,
       cy,

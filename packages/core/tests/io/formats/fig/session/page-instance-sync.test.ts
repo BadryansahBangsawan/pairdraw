@@ -6,7 +6,7 @@ import { createFigDocumentSession } from '@pairdraw/fig'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
-test('loading a later page keeps the derived sizes of instances earlier pages placed', async () => {
+test('loading a later page keeps the sizes an earlier page placed', async () => {
   await initCodec()
   const source = new SceneGraph()
   const first = source.getPages()[0]
@@ -14,8 +14,8 @@ test('loading a later page keeps the derived sizes of instances earlier pages pl
   source.createNode('RECTANGLE', component.id, { name: 'Box', width: 100, height: 20 })
   const placed = source.createInstance(component.id, first.id)
   if (!placed) throw new Error('Missing instance')
-  // The instance's box is wider than the component's, as a fill child of a resized instance is;
-  // export saves that as the size Figma derived for it.
+  // A layer inside an instance takes its component's size, as Figma writes it, so the file keeps
+  // no size of its own for the box.
   const box = source.getChildren(placed.id)[0]
   source.updateNode(box.id, { width: 150 })
   source.createInstance(component.id, source.addPage('Second').id)
@@ -30,10 +30,12 @@ test('loading a later page keeps the derived sizes of instances earlier pages pl
     .find((node) => node.type === 'INSTANCE')
   if (!instance) throw new Error('Missing loaded instance')
   const loadedBox = () => session.graph.getChildren(instance.id)[0]
-  expect(loadedBox().width).toBe(150)
+  expect(instance.width).toBe(200)
+  expect(loadedBox().width).toBe(100)
 
   session.loadPage(session.pages[1].id)
-  expect(loadedBox().width).toBe(150)
+  expect(loadedBox().width).toBe(100)
+  expect(instance.width).toBe(200)
 })
 
 test('loading a later page keeps a live edit to a nested instance layer over its derived size', async () => {

@@ -8,6 +8,7 @@ import {
 } from '@pairdraw/core/geometry'
 import type { NumericNodeProperty, SceneNode } from '@pairdraw/scene-graph'
 import { layerRotates } from '@pairdraw/scene-graph/generated'
+import { takesOwnSize } from '@pairdraw/scene-graph/instances'
 
 import { MIXED, useNodeProps, type MixedValue } from '#vue/controls/node-props/use'
 import { usePropScrub } from '#vue/controls/prop-scrub/use'
@@ -26,6 +27,14 @@ export function usePosition() {
   const ids = computed(() => nodes.value.map((n) => n.id))
   /** Whether the selection turns and flips; a sticky note or connector stays upright. */
   const rotates = computed(() => nodes.value.every(layerRotates))
+  /**
+   * Whether every selected layer takes a size of its own: a layer inside an instance shows its
+   * component's size, as in Figma, while an instance nested in another may be resized.
+   */
+  const resizes = computed(
+    () =>
+      nodes.value.length > 0 && nodes.value.every((target) => takesOwnSize(editor.graph, target))
+  )
 
   // X, Y, and rotation read as Figma's panel shows them: the turned layer's box on the canvas and
   // its counterclockwise angle; see `panelPosition` and `panelRotation`.
@@ -125,6 +134,7 @@ export function usePosition() {
     height,
     rotation,
     rotates,
+    resizes,
     inAutoLayout,
     ignoresAutoLayout,
     toggleIgnoreAutoLayout,

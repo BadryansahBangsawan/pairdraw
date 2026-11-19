@@ -16,7 +16,12 @@ import { useSelectUI } from '@/components/ui/select/select'
 
 type SizeSelectValue = LayoutSizing | `add-${SizeLimitProp}` | `remove-${SizeLimitProp}`
 
-const { axis, icon, label } = defineProps<SizeAxisFieldProps>()
+const {
+  axis,
+  icon,
+  label,
+  disabled = false
+} = defineProps<SizeAxisFieldProps & { disabled?: boolean }>()
 
 const ctx = useLayoutControlsContext()
 const { open: popupOpen, portalActive } = useRetainedPopup()
@@ -76,6 +81,7 @@ function handleSelect(value: SizeSelectValue) {
       :aria-label="label"
       :model-value="Math.round(ctx.node[axis])"
       :min="0"
+      :disabled="disabled"
       :node-id="ctx.node.id"
       :binding-path="axis"
       @update:model-value="ctx.updateAxisSize(axis, $event)"

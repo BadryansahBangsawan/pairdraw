@@ -3,6 +3,7 @@ import type { Canvas } from 'canvaskit-wasm'
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { layerRotates } from '@pairdraw/scene-graph/generated'
 import { computeBounds, rotatedCorners } from '@pairdraw/scene-graph/geometry'
+import { takesOwnSize } from '@pairdraw/scene-graph/instances'
 import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
@@ -349,6 +350,8 @@ export function drawNodeSelection(
     rotation,
     graph,
     (x1, y1, x2, y2) => {
+      // A layer inside an instance takes its component's size, so Figma draws no handles on it.
+      if (!takesOwnSize(graph, node)) return
       drawBoundsHandles(
         r,
         canvas,

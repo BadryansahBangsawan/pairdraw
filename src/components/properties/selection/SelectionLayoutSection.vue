@@ -41,7 +41,7 @@ const { panels } = useI18n()
     <TextResizingControl v-if="layout.textResize.value !== undefined" />
     <div class="mt-2 mb-1 text-[11px] text-muted">{{ panels.dimensions }}</div>
 
-    <PositionControlsRoot v-slot="{ wValue, hValue, actions }">
+    <PositionControlsRoot v-slot="{ wValue, hValue, resizes, actions }">
       <PanelGrid :columns="2">
         <Tip :label="panels.width">
           <NumberField
@@ -50,6 +50,7 @@ const { panels } = useI18n()
             :aria-label="panels.width"
             :model-value="wValue"
             :min="1"
+            :disabled="!resizes"
             @update:model-value="actions.updateProp('width', $event)"
             @commit="(v: number, p: number) => actions.commitProp('width', v, p)"
             @cancel="actions.cancelProp('width')"
@@ -62,6 +63,7 @@ const { panels } = useI18n()
             :aria-label="panels.height"
             :model-value="hValue"
             :min="1"
+            :disabled="!resizes"
             @update:model-value="actions.updateProp('height', $event)"
             @commit="(v: number, p: number) => actions.commitProp('height', v, p)"
             @cancel="actions.cancelProp('height')"

@@ -12,16 +12,18 @@ export function detectTextDirection(text: string): Exclude<TextDirection, 'AUTO'
   return 'LTR'
 }
 
+/** A node exported without the field, or drawn from partial props, reads as `AUTO`. */
 export function resolveTextDirection(
-  direction: TextDirection,
+  direction: TextDirection | undefined,
   text: string
 ): Exclude<TextDirection, 'AUTO'> {
-  return direction === 'AUTO' ? detectTextDirection(text) : direction
+  return !direction || direction === 'AUTO' ? detectTextDirection(text) : direction
 }
 
-export function resolveNodeTextDirection(
-  node: Pick<SceneNode, 'textDirection' | 'text'>
-): 'LTR' | 'RTL' {
+export function resolveNodeTextDirection(node: {
+  textDirection?: TextDirection
+  text: string
+}): 'LTR' | 'RTL' {
   return resolveTextDirection(node.textDirection, node.text)
 }
 

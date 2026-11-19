@@ -1,0 +1,1 @@
+- Arabic and other right-to-left text now lays itself out right to left when its direction is unset.

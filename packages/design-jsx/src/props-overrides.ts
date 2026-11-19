@@ -418,7 +418,10 @@ function applyTextOverrides(
   parentLayout: SceneNode['layoutMode']
 ): void {
   applyTextStyleOverrides(props, o)
-  o.textDirection = parseDirection(props.dir) ?? o.textDirection
+  // Without `dir` the node keeps the style's own direction, which is auto by default; writing an
+  // undefined override would erase it and stop Arabic text from being detected as RTL.
+  const direction = parseDirection(props.dir)
+  if (direction) o.textDirection = direction
   applyTextAutoResize(props, o, parentLayout)
 }
 

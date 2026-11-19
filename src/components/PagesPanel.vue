@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { templateRef } from '@vueuse/core'
 import {
   ContextMenuContent,
   ContextMenuItem,
@@ -33,7 +32,6 @@ interface PageActions {
   move: (pageId: string, index: number) => void
 }
 
-const pageInput = templateRef<HTMLInputElement>('pageInput')
 const rename = useInlineRename((id, name) => pageActions.value?.rename(id, name))
 const { panels, pages: pageMessages } = useI18n()
 const menuCls = useMenuUI({
@@ -51,6 +49,8 @@ const pagePresence = computed(() =>
 
 const pageActions = ref<Pick<PageActions, 'rename'> | null>(null)
 const currentPages = ref<readonly PageItem[]>([])
+/** The page whose name opens once it renders, set when one is added. */
+const pendingRenameId = ref<string | null>(null)
 const currentMovePage = ref<PageActions['move'] | null>(null)
 const pageReorder = useFlatReorderDrag<PageItem>({
   items: () => currentPages.value,
@@ -61,14 +61,34 @@ function setPageActions(renamePage: (pageId: string, name: string) => void) {
   pageActions.value = { rename: renamePage }
 }
 
-watch(pageInput, (input) => {
-  if (input) void rename.focusInput(input)
-})
+/** Focuses the input as the row with the name being edited renders. */
+function setRenameInput(value: Element | ComponentPublicInstance | null, pg: PageItem) {
+  if (value instanceof HTMLInputElement && rename.editingId.value === pg.id) {
+    void rename.focusInput(value)
+  }
+}
 
 function startRename(pg: PageItem, renamePage: (pageId: string, name: string) => void) {
   setPageActions(renamePage)
   rename.start(pg.id, pg.name)
 }
+
+/** Adds a page and opens its name for editing, as Figma does. */
+function addAndRename(add: () => string | undefined, renamePage: PageActions['rename']) {
+  const pageId = add()
+  if (!pageId) return
+  pageActions.value = { rename: renamePage }
+  pendingRenameId.value = pageId
+}
+
+// The row renders on the next frame; naming it then puts the caret in its field.
+watch(currentPages, (pages) => {
+  const pageId = pendingRenameId.value
+  const page = pageId ? pages.find((entry) => entry.id === pageId) : undefined
+  if (!page) return
+  pendingRenameId.value = null
+  rename.start(page.id, page.name)
+})
 
 function pageDropPosition(pg: PageItem): 'before' | 'after' | undefined {
   if (pageReorder.instructionTargetId.value !== pg.id) return undefined
@@ -102,7 +122,11 @@ function setupPageRowRef(
     <div data-test-id="pages-panel" :class="baseStyles.panel()">
       <div :class="baseStyles.header()">
         <span data-test-id="pages-header" :class="baseStyles.title()">{{ panels.pages }}</span>
-        <IconButton :label="panels.addPage" data-test-id="pages-add" @click="actions.add()">
+        <IconButton
+          :label="panels.addPage"
+          data-test-id="pages-add"
+          @click="addAndRename(actions.add, actions.rename)"
+        >
           <icon-lucide-plus class="size-3.5" />
         </IconButton>
       </div>
@@ -130,7 +154,7 @@ function setupPageRowRef(
                 >
                   <icon-lucide-file :class="pageStyles(pg, currentPageId).icon()" />
                   <input
-                    ref="pageInput"
+                    :ref="(value) => setRenameInput(value, pg)"
                     data-test-id="pages-item-input"
                     :aria-label="pageMessages.pageNameLabel"
                     :class="pageStyles(pg, currentPageId).renameInput()"

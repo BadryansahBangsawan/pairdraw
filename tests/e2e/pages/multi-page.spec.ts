@@ -60,7 +60,11 @@ test('add page creates a second page', async () => {
   const pages = await getPages()
   expect(pages).toHaveLength(2)
 
-  expect(await pageItems().count()).toBe(2)
+  // The new page's row opens with its name in an input, so count rows, not name buttons.
+  await expect(pageRows()).toHaveCount(2)
+  // Enter keeps its default name, so the rows below are name buttons again.
+  await expect(editor.page.getByTestId('pages-item-input')).toBeFocused()
+  await editor.page.keyboard.press('Enter')
 })
 
 test('new page is auto-selected', async () => {
@@ -106,7 +110,10 @@ test('add a third page', async () => {
 
   const pages = await getPages()
   expect(pages).toHaveLength(3)
-  expect(await pageItems().count()).toBe(3)
+  // The new page's row opens with its name in an input, so count rows, not name buttons.
+  await expect(pageRows()).toHaveCount(3)
+  await expect(editor.page.getByTestId('pages-item-input')).toBeFocused()
+  await editor.page.keyboard.press('Enter')
 })
 
 test('delete current page switches to adjacent', async () => {
@@ -268,4 +275,44 @@ test('dragging a page row reorders pages', async () => {
   expect(currentAfterReorder).toBe(currentPageId)
 
   editor.canvas.assertNoErrors()
+})
+
+test('a new page opens its name for editing, and typing does not reach the canvas', async () => {
+  const pagesBefore = await getPages()
+  const toolBefore = await editor.page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
+    return store.state.activeTool
+  })
+
+  await addPageButton().click()
+  const input = editor.page.getByTestId('pages-item-input')
+  await expect(input).toBeFocused()
+  await editor.page.keyboard.type('Cover')
+  await expect(input).toHaveValue('Cover')
+
+  await editor.page.keyboard.press('Enter')
+
+  await expect(pageItems().last()).toContainText('Cover')
+  const pagesAfter = await getPages()
+  expect(pagesAfter).toHaveLength(pagesBefore.length + 1)
+  expect(pagesAfter.at(-1)?.name).toBe('Cover')
+  const toolAfter = await editor.page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
+    return store.state.activeTool
+  })
+  expect(toolAfter).toBe(toolBefore)
+})
+
+test('Escape keeps the default name of a new page', async () => {
+  const pagesBefore = await getPages()
+  await addPageButton().click()
+  await expect(editor.page.getByTestId('pages-item-input')).toBeFocused()
+
+  await editor.page.keyboard.press('Escape')
+
+  const pagesAfter = await getPages()
+  expect(pagesAfter).toHaveLength(pagesBefore.length + 1)
+  expect(pagesAfter.at(-1)?.name).toBe(`Page ${pagesBefore.length + 1}`)
 })

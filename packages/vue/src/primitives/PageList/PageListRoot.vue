@@ -9,7 +9,7 @@ const { dividerPattern: customDividerPattern } = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  add: []
+  add: [pageId: string]
   switch: [pageId: string]
   rename: [pageId: string, name: string]
   delete: [pageId: string]
@@ -26,8 +26,9 @@ function isDivider(page: { name: string; childIds: string[] }) {
 }
 
 function handleAdd() {
-  addPage()
-  emit('add')
+  const pageId = addPage()
+  emit('add', pageId)
+  return pageId
 }
 
 function handleSwitch(pageId: string) {

@@ -1,4 +1,4 @@
-import type { Component, ComputedRef, VNode } from 'vue'
+import type { Component, ComputedRef, Ref, VNode } from 'vue'
 
 import type { Effect, Fill, Stroke } from '@pairdraw/scene-graph'
 
@@ -12,6 +12,14 @@ export type PropertyListKey = keyof PropertyListItemMap
 export type PropertyListItemFor<K extends PropertyListKey> = PropertyListItemMap[K]
 export type PropertyListPatchFor<K extends PropertyListKey> = Partial<PropertyListItemFor<K>>
 export type PropertyListIdentity = string | number
+
+/** The row reorder drag a list root shares with its rows, when the list can be reordered. */
+export interface PropertyListDrag {
+  setupItem(element: HTMLElement | null, item: () => { id: string }): void
+  draggingId: Ref<string | null>
+  instructionTargetId: Ref<string | null>
+  instruction: Ref<{ operation: string } | null>
+}
 
 export interface PropertyListActions<K extends PropertyListKey> {
   add(item: PropertyListItemFor<K>): void
@@ -29,6 +37,7 @@ export interface PropertyListContext<K extends PropertyListKey = PropertyListKey
   disabled: ComputedRef<boolean>
   keyOf(item: PropertyListItemFor<K>, index: number): PropertyListIdentity
   actions: PropertyListActions<K>
+  drag?: PropertyListDrag
 }
 
 export interface PropertyListRootProps<K extends PropertyListKey> {

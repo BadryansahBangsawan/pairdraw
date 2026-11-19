@@ -7,6 +7,7 @@ export { usePropertyList } from '#vue/primitives/PropertyList/context'
 export type {
   PropertyListActions,
   PropertyListContext,
+  PropertyListDrag,
   PropertyListIdentity,
   PropertyListItemActions,
   PropertyListItemFor,

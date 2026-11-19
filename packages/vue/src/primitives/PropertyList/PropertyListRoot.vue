@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 
 import { providePropertyList } from '#vue/primitives/PropertyList/context'
+import { useFlatReorderDrag } from '#vue/shared/drag'
 
 import type {
   PropertyListActions,
@@ -59,7 +60,19 @@ const actions: PropertyListActions<K> = {
   }
 }
 
-providePropertyList({ propKey, items, isMixed, disabled, keyOf, actions })
+// Rows drag to reorder, as Figma's paint lists do; the drag lives here so every row of the list
+// shares one monitor and one drop instruction.
+const drag = useFlatReorderDrag({
+  items: () => items.value.map((item, index) => ({ id: String(keyOf(item, index)) })),
+  onMove: (sourceId, targetIndex) => {
+    const fromIndex = items.value.findIndex(
+      (item, index) => String(keyOf(item, index)) === sourceId
+    )
+    if (fromIndex !== -1) actions.reorder(fromIndex, targetIndex)
+  }
+})
+
+providePropertyList({ propKey, items, isMixed, disabled, keyOf, actions, drag })
 </script>
 
 <template>

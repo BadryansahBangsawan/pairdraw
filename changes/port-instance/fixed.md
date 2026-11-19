@@ -12,3 +12,4 @@
 - A bound paint keeps an edit to its color or opacity until its variable's color for the layer changes, as in Figma: binding writes the variable's color, a value or mode change refreshes it, and readers, the canvas, copies, and saves use the stored paint.
 - A bound paint refreshes whenever the mode set for its layer changes, even to a mode giving the same color, as in Figma, and a paste keeps the paint edits it copied, counting from the colors applied when the copy was made.
 - A literal fill or stroke an outer instance sets on a layer inside a nested instance stays unbound through component sync, instead of taking the component's color binding back.
+- A sync that matches an instance's copy to a namesake replacing its component layer relinks the copy over the link a file recorded, and announces the change, so a reopened document saves and collaboration follows it.

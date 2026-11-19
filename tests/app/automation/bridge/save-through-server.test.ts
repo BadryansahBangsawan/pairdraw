@@ -10,6 +10,7 @@ import { automationFiles } from '@/app/automation/bridge/server'
 import { createTab, getActiveStore, getTabsSnapshot } from '@/app/tabs'
 
 import { asDouble } from '#tests/helpers/doubles'
+import { testPath } from '#tests/helpers/paths'
 
 /**
  * A browser document opened through the MCP server's `/files/` route keeps that URL as its
@@ -105,5 +106,37 @@ describe('saving a server-opened document without a path', () => {
 
     expect(fetch.mock.calls[1]?.[0].toString()).toBe('http://mcp.test/files//root/draft.fig')
     expect(tab?.store.hasUnsavedChanges()).toBe(false)
+  })
+
+  test('opening a file again recovers a session whose document was closed', async () => {
+    // Page switches wait for the canvas to present; nothing renders here, so acknowledge it.
+    const idle = Symbol('idle')
+    const settle = async <T>(pending: Promise<T>): Promise<T> => {
+      for (const tab of getTabsSnapshot()) {
+        if (tab.store.state.preparation?.phase !== 'preparing-render') continue
+        tab.store.preparationController.acknowledgePresentation(tab.store.state.sceneVersion)
+      }
+      const result = await Promise.race([
+        pending,
+        new Promise<typeof idle>((resolve) => {
+          setTimeout(() => resolve(idle), 0)
+        })
+      ])
+      return result === idle ? settle(pending) : (result as T)
+    }
+    const bytes = new Uint8Array(await Bun.file(testPath('fixtures', 'slots.fig')).arrayBuffer())
+    // Bun's fetch type carries a static preconnect the mock does not need.
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+    fetchMock.mockImplementation((async () => new Response(bytes)) as unknown as typeof fetch)
+    const agent = { session: 'cli', kind: 'mcp', client: 'CLI' }
+    // The session opens two files, then closes the one it edits last; the first stays open.
+    await settle(handleRequest(getActiveStore(), 'open_file', { path: '/root/slots.fig', agent }))
+    await settle(handleRequest(getActiveStore(), 'open_file', { path: '/root/other.fig', agent }))
+    await settle(handleRequest(getActiveStore(), 'close_file', { unsaved: 'discard', agent }))
+
+    // Opening the still-open file again recovers the session; it edits without a document id.
+    await settle(handleRequest(getActiveStore(), 'open_file', { path: '/root/slots.fig', agent }))
+    const selection = await settle(handleRequest(getActiveStore(), 'selection', { agent }))
+    expect((selection as { ok: boolean }).ok).toBe(true)
   })
 })

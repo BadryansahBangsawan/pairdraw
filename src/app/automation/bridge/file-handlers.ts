@@ -196,7 +196,10 @@ export function createFileHandlers(files?: AutomationFiles) {
     const opened = created ?? getTabForStore(getActiveStore())
     const target = resolveAutomationTarget(opened?.store ?? getActiveStore(), undefined)
     const session = readAgentSession(args.agent)
-    if (session && created) rememberSessionDocument(session.session, created.id, true)
+    // An existing tab is brought forward without ownership, so an untargeted close cannot
+    // discard the person's changes; the session still edits it, recovering a closed session.
+    if (session && opened)
+      rememberSessionDocument(session.session, opened.id, created !== undefined)
     return responseWithTarget({ ok: true, result: { opened: true } }, target)
   }
 

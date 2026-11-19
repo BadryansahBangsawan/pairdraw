@@ -75,11 +75,35 @@ export function createFileHandlers(files?: AutomationFiles) {
     if (!response.ok) throw new Error(`Could not write ${path}: ${await response.text()}`)
   }
 
+  /**
+   * The file a browser document was opened from through this MCP server's `/files/` route,
+   * which the server can write back; a URL of any other origin is not this server's file.
+   */
+  function serverOpenedPath(store: AutomationTarget['store']): string | undefined {
+    if (!files || isTauri()) return undefined
+    const source = store.getDocumentFilePath()
+    if (!source) return undefined
+    let url: URL
+    try {
+      url = new URL(source)
+    } catch {
+      return undefined
+    }
+    const base = files.url('')
+    if (url.origin !== base.origin || !url.pathname.startsWith('/files/')) return undefined
+    return url.pathname.slice('/files/'.length).split('/').map(decodeURIComponent).join('/')
+  }
+
   // Automation never opens the Save dialog: nobody may be there to answer it.
   async function saveWithoutPrompt(store: AutomationTarget['store'], path?: string): Promise<void> {
     const name = store.state.documentName
-    if (!path && !store.hasWritableSource()) {
+    const openedFrom = path ? undefined : serverOpenedPath(store)
+    if (!path && !openedFrom && !store.hasWritableSource()) {
       throw new Error(`"${name}" has not been saved to a file yet; pass a path to save it`)
+    }
+    if (openedFrom && files) {
+      await store.saveFigFileCopy((data) => writeThroughServer(files, openedFrom, data))
+      return
     }
     if (path && files && !isTauri()) {
       await store.saveFigFileCopy((data) => writeThroughServer(files, path, data))

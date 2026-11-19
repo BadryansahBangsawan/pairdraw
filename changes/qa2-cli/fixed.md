@@ -2,3 +2,4 @@
 - CLI commands reject misspelled options instead of silently ignoring them, so `pairdraw info file --jsonn` fails with `Unknown option: --jsonn` rather than printing human output a script cannot parse.
 - Storybook exports with `--framework react` or `vue` write a `parameters.design` image for each generated component's state stories, showing the variant that draws the state, as static HTML stories already do.
 - The browser app starts on Chromium versions whose notification permission status refuses event listeners, instead of showing "Pairdraw couldn't start".
+- `pairdraw documents save` writes a browser document opened through the MCP server back to its file, instead of asking for a path it already has.

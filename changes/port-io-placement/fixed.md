@@ -1,0 +1,1 @@
+- An instance keeps the place its own record gives it in its parent rather than inheriting its component's alignment, grow, positioning, and constraints.

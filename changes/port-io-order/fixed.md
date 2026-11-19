@@ -1,0 +1,1 @@
+- A page opened for only some of its components keeps every sibling layer in the order the file saved it, including a reorder made before its other component pages load.

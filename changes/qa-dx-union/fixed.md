@@ -1,0 +1,1 @@
+- A tool argument that is a union reports the field of the branch the value matched instead of "Expected Object but received Object".

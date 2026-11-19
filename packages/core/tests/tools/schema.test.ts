@@ -37,6 +37,31 @@ describe('tool arguments', () => {
     )
   })
 
+  test('a union argument reports the branch its value matched', () => {
+    const unionTool = defineTool({
+      name: 'edit_layers',
+      description: 'Edits layers',
+      execution: { kind: 'sync', mutation: 'none' },
+      input: v.strictObject({
+        operations: v.array(
+          v.union([
+            v.strictObject({ type: v.literal('set'), props: v.record(v.string(), v.string()) }),
+            v.strictObject({ type: v.literal('remove'), id: v.string() })
+          ])
+        )
+      }),
+      execute: (_figma, args) => args
+    })
+    const figma = new FigmaAPI(new SceneGraph())
+    expect(() => unionTool.execute(figma, { operations: [{ type: 'set' }] })).toThrow(
+      [
+        'Invalid arguments for edit_layers:',
+        '× Missing required argument "props"',
+        '  → at operations[0].props'
+      ].join('\n')
+    )
+  })
+
   test('name the arguments a call does take', () => {
     const figma = new FigmaAPI(new SceneGraph())
     expect(() => tool.execute(figma, { kind: 'FRAME', width: 10, height: 10 })).toThrow(

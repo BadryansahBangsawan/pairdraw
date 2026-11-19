@@ -114,11 +114,12 @@ function formatToolArgumentError(
   schema: v.GenericSchema,
   issues: readonly v.BaseIssue<unknown>[]
 ): string {
-  const problems = issues.map((issue) => {
-    const keys = issueKeys(issue)
-    const place = keys.length > 0 ? `\n  → at ${keys.join('.')}` : ''
-    return `× ${formatToolArgIssue(schema, issue)}${place}`
-  })
+  const problems = issues
+    .flatMap((issue) => branchIssues(schema, issue))
+    .map(({ keys, issue }) => {
+      const place = keys.length > 0 ? `\n  → at ${placeOf(keys)}` : ''
+      return `× ${formatToolArgIssue(schema, keys, issue)}${place}`
+    })
   return `Invalid arguments for ${name}:\n${problems.join('\n')}`
 }
 
@@ -144,23 +145,66 @@ function unwrappedSchema(schema: v.GenericSchema): v.GenericSchema {
   }
 }
 
-function issueKeys(issue: v.BaseIssue<unknown>): string[] {
-  return (issue.path ?? []).flatMap((item) => ('key' in item ? [String(item.key)] : []))
+type ArgumentKey = string | number
+
+function issueKeys(issue: v.BaseIssue<unknown>): ArgumentKey[] {
+  const keys: ArgumentKey[] = []
+  for (const item of issue.path ?? []) {
+    if (!('key' in item)) continue
+    if (typeof item.key === 'string' || typeof item.key === 'number') keys.push(item.key)
+  }
+  return keys
 }
 
-function schemaAtPath(root: v.GenericSchema, keys: readonly string[]): v.GenericSchema | null {
+/** `operations[0].props`: an index reads as part of its array, a name follows a dot. */
+function placeOf(keys: readonly ArgumentKey[]): string {
+  return keys.reduce<string>((place, key) => {
+    if (typeof key === 'number') return `${place}[${key}]`
+    return place ? `${place}.${key}` : key
+  }, '')
+}
+
+/**
+ * `v.union` reports one issue for every branch, which reads as "Expected Object but received
+ * Object". Re-check the value against each branch and keep the one that got furthest: the branch
+ * whose own problems name the field the caller has to fix.
+ */
+function branchIssues(
+  schema: v.GenericSchema,
+  issue: v.BaseIssue<unknown>
+): { keys: ArgumentKey[]; issue: v.BaseIssue<unknown> }[] {
+  const keys = issueKeys(issue)
+  if (issue.type !== 'union') return [{ keys, issue }]
+  const union = schemaAtPath(schema, keys)
+  const options = union ? schemaParts(union).options : undefined
+  if (!options || options.length === 0) return [{ keys, issue }]
+  let best: readonly v.BaseIssue<unknown>[] | null = null
+  for (const option of options) {
+    const parsed = v.safeParse(option as v.GenericSchema, issue.input)
+    if (parsed.success) continue
+    if (!best || parsed.issues.length < best.length) best = parsed.issues
+  }
+  if (!best || best.length === 0) return [{ keys, issue }]
+  return best.map((nested) => ({ keys: [...keys, ...issueKeys(nested)], issue: nested }))
+}
+
+function schemaAtPath(root: v.GenericSchema, keys: readonly ArgumentKey[]): v.GenericSchema | null {
   let current = unwrappedSchema(root)
   for (const key of keys) {
     const parts = schemaParts(current)
-    const next = parts.entries && key in parts.entries ? parts.entries[key] : parts.item
+    const name = String(key)
+    const next = parts.entries && name in parts.entries ? parts.entries[name] : parts.item
     if (!next) return null
     current = unwrappedSchema(next)
   }
   return current
 }
 
-function formatToolArgIssue(schema: v.GenericSchema, issue: v.BaseIssue<unknown>): string {
-  const keys = issueKeys(issue)
+function formatToolArgIssue(
+  schema: v.GenericSchema,
+  keys: readonly ArgumentKey[],
+  issue: v.BaseIssue<unknown>
+): string {
   const key = keys.at(-1)
   if (key !== undefined && (issue.type === 'object' || issue.type === 'strict_object')) {
     if (issue.expected === 'never') {

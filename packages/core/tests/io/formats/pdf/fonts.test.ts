@@ -140,11 +140,12 @@ describe('PDF font embedding', () => {
     expect(await cutFontInstances(embedding)).toBe(true)
     expect(registerEmbeddedFonts(doc, embedding)).toBe(true)
     expect(embedding.report).toEqual({
+      // A family with no face loaded takes the text's weight on its axis, so 400 is pinned too.
       embedded: [
-        'PDF Variable Regular (opsz 16)',
-        'PDF Variable Regular (opsz 24)',
+        'PDF Variable Regular (opsz 16, wght 400)',
+        'PDF Variable Regular (opsz 24, wght 400)',
         'PDF Variable Regular (opsz 16, wght 650)',
-        'PDF Variable Regular (opsz 14)'
+        'PDF Variable Regular (opsz 14, wght 400)'
       ],
       fallback: []
     })
@@ -168,7 +169,7 @@ describe('PDF font embedding', () => {
     await cutFontInstances(embedding)
     expect(registerEmbeddedFonts(doc, embedding)).toBe(false)
     expect(embedding.report.fallback).toEqual([
-      { face: 'PDF Variable Regular (opsz 16)', reason: 'Unsupported font' }
+      { face: 'PDF Variable Regular (opsz 16, wght 400)', reason: 'Unsupported font' }
     ])
     expect(alias(font('PDF Variable', 'Regular'))).toBeNull()
   })

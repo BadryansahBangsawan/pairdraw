@@ -4,3 +4,4 @@
 - Characters typed at the edge of a styled run keep that run's colour, font, weight, decoration and variable bindings, whether typed at the end of a line, at the start of the text, over a selection, through an input method or pasted.
 - Text that sizes its own width wraps at its max width, raised to its min width as auto layout does, so a max width wraps or truncates it when the engine lays it out, not only in its saved glyphs.
 - Text set in a family that is missing everywhere draws and saves its italic from the default family's italic, so the canvas and the file agree instead of slanting the upright face.
+- Text set in a missing family draws in the default family at the text's own weight, and a weight the text sets explicitly still wins, so the canvas draws no faux bold at the wrong advances.

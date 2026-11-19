@@ -45,6 +45,11 @@ export function drawnFontVariations(font: DrawnFontAxes): FontVariation[] {
       ]
     : font.variations
   const axes = new Map([...named, ...set].map(({ axis, value }) => [axis, value]))
+  // A family with no face loaded is drawn in its fallbacks, and a variable fallback takes the
+  // text's weight on its axis unless the text sets one, rather than emboldening its default one.
+  if (!axes.has('wght') && !loadedFace(font.family, font.weight, font.italic, font.style)) {
+    axes.set('wght', font.weight)
+  }
   return [...axes].map(([axis, value]) => ({ axis, value }))
 }
 

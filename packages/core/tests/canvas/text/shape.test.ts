@@ -429,3 +429,61 @@ test('overlapping shaping calls share a provider until the last one finishes', a
   expect((await second)?.baselines).toHaveLength(1)
   expect(fontManager.providerFor(ck)).toBe(before)
 })
+
+describe('saved outlines use the same font file as the paragraph', () => {
+  test.each([400, 700])(
+    'draws and outlines an unloaded primary font’s fallback at weight %s',
+    async (weight) => {
+      const text = 'Missing'
+      const expected = expectDefined(
+        glyphOutlineSourceSync('Inter', 'Regular', [{ axis: 'wght', value: weight }])
+      )
+      const shaped = expectDefined(
+        await shape({ text, fontFamily: 'Unloaded Outline Primary', fontWeight: weight })
+      )
+      expect(shaped.glyphs).toHaveLength(text.length)
+      for (const glyph of shaped.glyphs) {
+        const index = expectDefined(glyph.firstCharacter)
+        expect(glyph.commands).toEqual(expected.outline(expected.glyphOf(text[index]), 13))
+      }
+    }
+  )
+
+  test('sets an unloaded primary font’s fallback at the text’s weight, not an emboldened default', async () => {
+    const text = 'Missing'
+    const regular = expectDefined(
+      await shape({ text, fontFamily: 'Unloaded Outline Primary', fontWeight: 400 })
+    )
+    const bold = expectDefined(
+      await shape({ text, fontFamily: 'Unloaded Outline Primary', fontWeight: 700 })
+    )
+    const advances = (shaped: typeof bold) => shaped.glyphs.map((glyph) => glyph.advance)
+
+    // A variable instance at 700 is wider than the 400 one; an emboldened default keeps its advances.
+    expect(advances(bold)[0]).toBeGreaterThan(advances(regular)[0])
+  })
+
+  test('keeps an explicit fallback weight when the unloaded primary requests another weight', async () => {
+    const text = 'Missing'
+    const expected = expectDefined(
+      glyphOutlineSourceSync('Inter', 'Regular', [{ axis: 'wght', value: 500 }])
+    )
+    const overridden = expectDefined(
+      glyphOutlineSourceSync('Inter', 'Regular', [{ axis: 'wght', value: 700 }])
+    )
+    const shaped = expectDefined(
+      await shape({
+        text,
+        fontFamily: 'Unloaded Outline Primary',
+        fontWeight: 700,
+        fontVariations: [{ axis: 'wght', value: 500 }]
+      })
+    )
+    expect(shaped.glyphs).toHaveLength(text.length)
+    for (const glyph of shaped.glyphs) {
+      const index = expectDefined(glyph.firstCharacter)
+      expect(glyph.commands).toEqual(expected.outline(expected.glyphOf(text[index]), 13))
+      expect(glyph.commands).not.toEqual(overridden.outline(overridden.glyphOf(text[index]), 13))
+    }
+  })
+})

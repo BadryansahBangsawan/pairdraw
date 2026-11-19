@@ -3,6 +3,10 @@ import type { TypefaceFontProvider } from 'canvaskit-wasm'
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
+
+import { settleFontWaiters } from './font-waiters'
+
+export { settleFontWaiters, waitForFonts } from './font-waiters'
 import {
   COMPONENT_LABEL_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
@@ -161,7 +165,7 @@ export async function loadFonts(
   }
 
   r.fontsLoaded = true
-  r.settleFontWaiters()
+  settleFontWaiters(r)
   syncFontGeneration(r)
   r.invalidateAllPictures()
 }

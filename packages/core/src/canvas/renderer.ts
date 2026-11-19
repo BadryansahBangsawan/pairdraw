@@ -137,8 +137,6 @@ export class SkiaRenderer {
   fontMgr: FontMgr | null = null
   fontProvider: TypefaceFontProvider | null = null
   fontsLoaded = false
-  /** What waits for this canvas's fonts, woken when they load or the canvas goes away first. */
-  private fontWaiters: (() => void)[] = []
   /** Set once fonts are prepared for a one-shot export, so a pending face stops holding text back. */
   exportFontsSettled = false
   fontGeneration = 0
@@ -451,17 +449,7 @@ export class SkiaRenderer {
    * before them: an export through it then has to use the headless renderer (`fontsLoaded`).
    */
   whenFontsLoaded(): Promise<void> {
-    if (this.fontsLoaded || this.destroyed) return Promise.resolve()
-    return new Promise((resolve) => {
-      this.fontWaiters.push(resolve)
-    })
-  }
-
-  /** Wakes everything waiting for fonts; loading them and going away both end that wait. */
-  settleFontWaiters(): void {
-    const waiters = this.fontWaiters
-    this.fontWaiters = []
-    for (const wake of waiters) wake()
+    return RendererFonts.waitForFonts(this)
   }
 
   async loadFonts(onFallbackFontsLoaded?: () => void): Promise<void> {

@@ -2,6 +2,8 @@ import type { SkiaRenderer } from '#core/canvas/renderer'
 import { clearSubtreePictureCache } from '#core/canvas/renderer/state'
 import { fontManager } from '#core/text/font/manager'
 
+import { settleFontWaiters } from './font-waiters'
+
 function clearRetainedSceneState(r: SkiaRenderer): void {
   r.scenePicture?.delete()
   r.sceneBacking?.image.delete()
@@ -39,7 +41,7 @@ function releaseRuntimeEffects(r: SkiaRenderer): void {
 export function destroyRenderer(r: SkiaRenderer): void {
   if (r.destroyed) return
   r.destroyed = true
-  r.settleFontWaiters()
+  settleFontWaiters(r)
   r.transientPreviews.clear()
 
   r.onImagePreviewReady = null

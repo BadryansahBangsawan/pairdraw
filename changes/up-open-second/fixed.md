@@ -1,0 +1,1 @@
+- Opening a second document over automation while another is still loading now answers both calls, instead of the first timing out after 20 seconds.

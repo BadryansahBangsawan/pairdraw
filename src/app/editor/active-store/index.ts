@@ -27,6 +27,14 @@ export function getActiveEditorStoreOrNull(): EditorStore | null {
   return storeRef.value ?? null
 }
 
+/**
+ * Whether this store is the tab in front, the one a canvas shows. A tab behind another has no
+ * canvas, so nothing there presents a scene until it is brought forward.
+ */
+export function isEditorStoreInFront(store: EditorStore): boolean {
+  return storeRef.value === store
+}
+
 const storeProxy = new Proxy({} as EditorStore, {
   get(_, prop) {
     return Reflect.get(getActiveEditorStore(), prop)

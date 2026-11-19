@@ -5,7 +5,8 @@
 - A layer prop of the wrong kind, such as a name or a size that is not a number, is now reported and left out instead of reaching the layer, and one out of range is bounded.
 - Shift-dragging a selected layer now keeps it selected while it moves, and a Shift-click on it deselects it only when the press ends.
 - Right-clicking a frame, section, or component name now selects that layer, a locked one included, on the pane that was clicked.
-- The Comment tool no longer covers the canvas, so the wheel, the middle button, and Space still pan while it is selected.
+- Panning with the wheel, the middle button, or Space still works while the Comment tool is selected.
 - The marquee border is now one screen pixel wide at any zoom, as in Figma.
 - A selected layer no longer outlines its parent frames, however deeply nested, as in Figma.
 - Arrow keys no longer move the selection while a list, menu, or dialog is open; they go to it instead.
+- ⌘S now saves while text is edited on the canvas or a field is being typed in, committing the field first.

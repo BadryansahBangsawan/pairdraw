@@ -39,6 +39,7 @@ import type {
   KeyboardShortcutRunOptions
 } from '@/app/shell/keyboard/types'
 import { bindZoomToolKey } from '@/app/shell/keyboard/zoom-tool'
+import { createSaveMenuActions } from '@/app/shell/menu/save-actions'
 import { appMenuTinykeysShortcut, shortcutTokenToTinykeys } from '@/app/shell/menu/shortcut'
 import { togglePresentation } from '@/app/slides/present'
 import { showsDocument } from '@/app/tabs'
@@ -314,6 +315,8 @@ export function registerKeyboardShortcuts(options: KeyboardShortcutOptions) {
     spaceTool
   })
 
+  // The menus' save actions, which commit a field being typed in before writing the file.
+  const saving = createSaveMenuActions(options.store)
   const shortcuts: ShortcutDefinition[] = [
     ...commandShortcuts(
       'selection.createComponent',
@@ -346,9 +349,8 @@ export function registerKeyboardShortcuts(options: KeyboardShortcutOptions) {
     {
       id: 'save-as',
       keys: appMenuTinykeysShortcut('save-as') ?? '$mod+Shift+KeyS',
-      run: ({ store }) => {
-        if (showsDocument()) void store.saveFigFileAs()
-      }
+      run: saving['save-as'],
+      global: true
     },
     {
       id: 'save-version',
@@ -482,9 +484,8 @@ export function registerKeyboardShortcuts(options: KeyboardShortcutOptions) {
     {
       id: 'save',
       keys: appMenuTinykeysShortcut('save') ?? '$mod+KeyS',
-      run: ({ store }) => {
-        if (showsDocument()) void store.saveFigFile()
-      }
+      run: saving.save,
+      global: true
     },
     {
       id: 'open-file',

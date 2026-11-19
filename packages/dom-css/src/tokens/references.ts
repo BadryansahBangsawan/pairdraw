@@ -54,6 +54,20 @@ function isColor(value: unknown): value is Color {
   return typeof value === 'object' && value !== null && 'r' in value && 'a' in value
 }
 
+/**
+ * A field's value as the number a token gives it. A text's letter spacing and line height are
+ * lengths: in pixels they match by their value, while a percent of the font size, or automatic
+ * line height, has no length token to match and stays literal.
+ */
+function drawnNumber(node: SceneNode, field: string): number | undefined {
+  if (field === 'letterSpacing' || field === 'lineHeight') {
+    const length = node[field]
+    return length?.unit === 'PIXELS' ? length.value : undefined
+  }
+  const value: unknown = Reflect.get(node, field)
+  return typeof value === 'number' ? value : undefined
+}
+
 /** Where an alias chain ends in the modes the canvas draws: a value, or a CSS expression. */
 type TokenChain = {
   ids: string[]
@@ -167,8 +181,8 @@ export class DesignTokens {
       if (!paint?.visible || paint.type !== 'SOLID' || !isColor(value)) return false
       return sameColor({ ...paint.color, a: paint.opacity }, value)
     }
-    const drawn: unknown = Reflect.get(node, field)
-    if (typeof drawn !== 'number' || typeof value !== 'number') return false
+    const drawn = drawnNumber(node, field)
+    if (drawn === undefined || typeof value !== 'number') return false
     if (Math.fround(drawn) !== Math.fround(value)) return false
     // An expression is the author's CSS for the value, whatever unit the token stores.
     if (field === 'opacity') return expression || variableUnit(end) === 'none'

@@ -1,0 +1,2 @@
+- The empty line a closing line break opens starts where the text ends, so its line metrics no longer overlap the line before it and a saved text no longer carries a baseline over the break.
+- Letter spacing and line height bound to a variable export as that variable's token when they are in pixels, while a percent of the font size stays literal.

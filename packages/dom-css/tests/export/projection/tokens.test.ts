@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { sceneNodeToDesignDocument, type DesignElement } from '#dom-css/export/index'
 
-import type { SceneGraph } from '@pairdraw/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 
 import { BLUE_300, BLUE_500, card, designSystem } from '../token-fixtures'
 
@@ -106,5 +106,48 @@ describe('token references in design-to-code', () => {
       'background-color': '#3B82F5',
       padding: '24px'
     })
+  })
+})
+
+describe('text lengths as tokens', () => {
+  function spacedText(
+    letterSpacing: SceneNode['letterSpacing'],
+    lineHeight: SceneNode['lineHeight']
+  ) {
+    const graph = designSystem()
+    graph.addVariable({
+      id: 'wide',
+      name: 'Wide',
+      type: 'FLOAT',
+      collectionId: 'space',
+      valuesByMode: { one: 2 },
+      description: '',
+      hiddenFromPublishing: false,
+      scopes: ['LETTER_SPACING']
+    })
+    const text = graph.createNode('TEXT', graph.getPages()[0].id, {
+      text: 'Hold',
+      fontFamily: 'Inter',
+      fontSize: 16,
+      width: 200,
+      height: 40,
+      textAutoResize: 'HEIGHT',
+      letterSpacing,
+      lineHeight,
+      boundVariables: { letterSpacing: 'wide', lineHeight: 'gutter' }
+    })
+    return element(graph, text.id).inlineStyle
+  }
+
+  test('writes letter spacing and line height in pixels as the tokens they are bound to', () => {
+    const style = spacedText({ value: 2, unit: 'PIXELS' }, { value: 24, unit: 'PIXELS' })
+    expect(style?.['letter-spacing']).toStartWith('var(--')
+    expect(style?.['line-height']).toBe('var(--spacing-gutter)')
+  })
+
+  test('keeps a percent of the font size literal, which no length token gives', () => {
+    const style = spacedText({ value: 2, unit: 'PERCENT' }, { value: 24, unit: 'PERCENT' })
+    expect(style?.['letter-spacing']).toBe('0.02em')
+    expect(style?.['line-height']).not.toStartWith('var(--')
   })
 })

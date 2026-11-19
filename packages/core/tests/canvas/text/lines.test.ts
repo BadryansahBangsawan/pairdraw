@@ -248,6 +248,18 @@ describe('lines of mixed sizes', () => {
     expect(larger.getLineMetrics()).toHaveLength(1)
     expect(larger.didExceedMaxLines()).toBe(true)
   })
+
+test('the empty line after a closing break starts where the text ends', () => {
+  const text = 'one\n'
+  const layout = layOut({ text })
+  const metrics = layout.getLineMetrics()
+
+  expect(metrics).toHaveLength(2)
+  // Skia starts that line at the break; it starts where the line before it ends, the break included.
+  expect(metrics[1].startIndex).toBe(text.length)
+  expect(metrics[1].endIndex).toBe(text.length)
+  expect(metrics[0].endIncludingNewline).toBe(text.length)
+})
 })
 
 /** Each line's baseline below the first. */

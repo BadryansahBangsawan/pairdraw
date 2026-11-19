@@ -1,5 +1,6 @@
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { styleRunReferences } from '@pairdraw/scene-graph/text'
+import { captureAppliedBoundPaints, type AppliedBoundPaints } from '@pairdraw/scene-graph/variables'
 
 import { resolvedClipboardBindings } from './detach'
 import { clipboardPlacement, type ClipboardPlacement } from './placement'
@@ -16,6 +17,8 @@ export interface ClipboardSnapshot {
   /** Where the copied layers sat on the canvas when they were copied. */
   placement: ClipboardPlacement
   images: Map<string, Uint8Array>
+  /** The colors the copied layers' bound paints were last given, so a paste counts from those. */
+  appliedBoundPaints: AppliedBoundPaints
   /**
    * By copied layer id, the values its variable bindings showed where it was copied, for the
    * fields whose stored value differs; a paste as is in another document writes them.
@@ -90,6 +93,10 @@ export function captureClipboardSnapshot(
     nodes,
     placement: clipboardPlacement(graph, roots),
     images,
+    appliedBoundPaints: captureAppliedBoundPaints(
+      graph,
+      capturedNodes.map((node) => node.id)
+    ),
     resolvedBindings
   }
 }

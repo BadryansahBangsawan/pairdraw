@@ -6,6 +6,7 @@ import { attachedConnectors } from '@pairdraw/scene-graph/connectors'
 import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
 import { cycleSafeParent } from '@pairdraw/scene-graph/instances'
 import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
+import { keepPastedBoundPaints, type AppliedBoundPaints } from '@pairdraw/scene-graph/variables'
 
 import { parsePairdrawClipboard } from '#core/clipboard'
 import { prepareClipboardImport } from '#core/clipboard/fig-import'
@@ -191,6 +192,8 @@ export function createClipboardActions(ctx: EditorContext) {
         dependencies.nodes,
         snapshot.placement,
         snapshot.images,
+        // Records from another document name its variables and modes, not the pasted ones.
+        snapshot.sourceRootId === ctx.graph.rootId ? snapshot.appliedBoundPaints : new Map(),
         dependencies.componentDependencies,
         cursorPos,
         { ...options, resolveBindings: dependencies.resolveBindings }
@@ -208,6 +211,7 @@ export function createClipboardActions(ctx: EditorContext) {
           pairdraw.nodes,
           clipboardPlacement(ctx.graph, pairdraw.nodes),
           pairdraw.images,
+          new Map(),
           [],
           cursorPos,
           options
@@ -306,6 +310,7 @@ export function createClipboardActions(ctx: EditorContext) {
     nodes: Array<SceneNode & { children?: SceneNode[] }>,
     placement: ClipboardPlacement,
     images: Map<string, Uint8Array>,
+    applied: AppliedBoundPaints,
     dependencies: Array<SceneNode & { children?: SceneNode[] }> = [],
     cursorPos?: Vector,
     options: PasteNodesOptions = {}
@@ -359,6 +364,7 @@ export function createClipboardActions(ctx: EditorContext) {
       }
       ctx.graph.updateNode(id, { componentId: componentId ?? node.componentId, instanceOverrides })
     }
+    keepPastedBoundPaints(ctx.graph, copiedIds, applied)
     // Variables of this document can give the layers other values than the copied ones.
     if (options.resolveBindings) {
       const subtrees = [...dependencyRootIds, ...created]

@@ -106,7 +106,7 @@ describe('bound paints', () => {
     expect(read()).toEqual(GREEN)
   })
 
-  test('a mode set or cleared on an ancestor refreshes the paint; the same mode again does not', () => {
+  test('a mode set or cleared on an ancestor refreshes the paint, even to the same color', () => {
     const { frame, light, dark, setMode, edit, read } = theme()
     edit(0.7)
     setMode(frame.id, dark)
@@ -116,9 +116,11 @@ describe('bound paints', () => {
     expect(read()).toEqual({ ...HALF_BLUE, a: 0.7 })
     setMode(frame.id, null)
     expect(read()).toEqual(RED)
+    // Setting the mode the layer already shows still refreshes it, as in Figma: what decides is
+    // the mode set for the layer, not the color it gives.
     edit(0.7)
     setMode(frame.id, light)
-    expect(read()).toEqual({ ...RED, a: 0.7 })
+    expect(read()).toEqual(RED)
   })
 
   test('moving into a frame in another mode refreshes the paint', () => {

@@ -211,6 +211,76 @@ function layoutOf(element: WebCaptureElement) {
   }
 }
 
+/** Input types Chrome paints as a small intrinsic glyph, whatever box `width` gives them. */
+const GLYPH_INPUT_TYPES: Record<string, true> = { checkbox: true, radio: true }
+
+/**
+ * A checkbox or radio wider than its glyph: Chrome honors the width for layout but paints only
+ * a small square centered in the box (`input { width: 100% }` in a flex label). Import the
+ * square at the glyph's size, centered in a box that keeps the room the wide element took, so
+ * following content stays where the page put it. Null when the box already fits the glyph.
+ */
+function glyphBox(
+  element: WebCaptureElement,
+  converted: WebCaptureDesignElement,
+  margins: Record<Side, number>,
+  parentBox: WebCaptureBox | undefined
+): WebCaptureDesignElement | null {
+  const box = element.box
+  if (
+    element.tagName !== 'input' ||
+    !Object.hasOwn(GLYPH_INPUT_TYPES, element.attrs.type) ||
+    !box ||
+    box.width <= 0 ||
+    box.height <= 0
+  ) {
+    return null
+  }
+  const side = Math.min(box.width, box.height)
+  if (box.width - side < 1) return null
+  const style = converted.computedStyle
+  // The wrapper takes the placement, so the square must not be positioned or margined itself.
+  const absolute = isAbsolute(style)
+  style.width = px(side)
+  style.height = px(side)
+  style['box-sizing'] = 'border-box'
+  delete style.position
+  delete style.left
+  delete style.top
+  delete style.right
+  delete style.bottom
+  const wrapper: Record<string, string> = {
+    display: 'flex',
+    'justify-content': 'center',
+    'align-items': 'center',
+    width: px(box.width),
+    height: px(box.height),
+    'box-sizing': 'border-box'
+  }
+  const alignSelf = ownValue(style, 'align-self')
+  if (alignSelf !== undefined) {
+    wrapper['align-self'] = alignSelf
+    delete style['align-self']
+  }
+  const wrapped: WebCaptureDesignElement = {
+    type: 'element',
+    tagName: 'div',
+    attrs: {},
+    computedStyle: wrapper,
+    children: [converted]
+  }
+  if (absolute) {
+    wrapper.position = element.computedStyle.position === 'fixed' ? 'fixed' : 'absolute'
+    for (const key of ['left', 'top']) {
+      const value = ownValue(element.computedStyle, key)
+      if (value !== undefined) wrapper[key] = value
+    }
+    placeAbsolute(wrapper, margins, box, parentBox)
+    return wrapped
+  }
+  return SIDES.some((side) => margins[side] > 0) ? marginBox(wrapped, margins) : wrapped
+}
+
 function convertElement(
   element: WebCaptureElement,
   parentBox?: WebCaptureBox
@@ -230,6 +300,8 @@ function convertElement(
     computedStyle: style,
     children
   }
+  const glyph = glyphBox(element, converted, margins, parentBox)
+  if (glyph) return glyph
   if (isAbsolute(style)) {
     placeAbsolute(style, margins, element.box, parentBox)
     return converted

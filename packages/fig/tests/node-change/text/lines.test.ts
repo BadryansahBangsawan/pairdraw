@@ -86,3 +86,28 @@ describe('paragraph spacing in lines', () => {
     expect(overrides).toEqual([])
   })
 })
+
+describe('text line direction', () => {
+  test('writes the stored direction rather than always auto', () => {
+    const rtl = exportTextLines({
+      text: 'الطاولة محجوزة لك',
+      textDirection: 'RTL',
+      textParagraphs: []
+    })
+    expect(rtl.lines[0]?.sourceDirectionality).toBe('RTL')
+
+    const auto = exportTextLines({
+      text: 'الطاولة محجوزة لك',
+      textDirection: 'AUTO',
+      textParagraphs: []
+    })
+    expect(auto.lines[0]?.sourceDirectionality).toBe('AUTO')
+
+    const ltr = exportTextLines({
+      text: 'Pick your table',
+      textDirection: 'LTR',
+      textParagraphs: []
+    })
+    expect(ltr.lines[0]?.sourceDirectionality).toBe('LTR')
+  })
+})

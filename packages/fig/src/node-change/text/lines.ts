@@ -62,7 +62,7 @@ export function importParagraphStyles(
  * name style override entries numbered from `firstStyleId`, returned in `overrides`.
  */
 export function exportTextLines(
-  node: Pick<SceneNode, 'text' | 'textParagraphs'>,
+  node: Pick<SceneNode, 'text' | 'textParagraphs'> & { textDirection?: SceneNode['textDirection'] },
   firstStyleId = 1
 ): { lines: TextLineData[]; overrides: NodeChange[] } {
   const starts = new Set(
@@ -94,7 +94,7 @@ export function exportTextLines(
       lineType: LINE_TYPES[style.listType],
       styleId: styleIdOf(style),
       indentationLevel: style.indentation,
-      sourceDirectionality: 'AUTO',
+      sourceDirectionality: node.textDirection ?? 'AUTO',
       listStartOffset: 0,
       isFirstLineOfList: starts.has(paragraph)
     }

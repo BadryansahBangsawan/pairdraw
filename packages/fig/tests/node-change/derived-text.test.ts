@@ -396,3 +396,32 @@ describe('derived text reader', () => {
     ])
   })
 })
+
+describe('derived text direction', () => {
+  test('labels saved lines with the direction the text is laid out in', () => {
+    const writer = context(twoLines(SQUARE))
+    const rtl = expectDefined(
+      buildNodeDerivedTextData(
+        textNode({ text: 'الطاولة محجوزة لك', textDirection: 'AUTO' }),
+        writer
+      ),
+      'derived text'
+    )
+    expect(rtl.derivedLines).toEqual([{ directionality: 'RTL' }])
+
+    const ltr = expectDefined(
+      buildNodeDerivedTextData(
+        textNode({ text: 'Pick your table', textDirection: 'AUTO' }),
+        writer
+      ),
+      'derived text'
+    )
+    expect(ltr.derivedLines).toEqual([{ directionality: 'LTR' }])
+
+    const explicit = expectDefined(
+      buildNodeDerivedTextData(textNode({ text: 'Pick your table', textDirection: 'RTL' }), writer),
+      'derived text'
+    )
+    expect(explicit.derivedLines).toEqual([{ directionality: 'RTL' }])
+  })
+})

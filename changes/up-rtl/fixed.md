@@ -1,1 +1,2 @@
 - Arabic and other right-to-left text now lays itself out right to left when its direction is unset.
+- Text copied into Figma now carries the direction its saved lines were laid out in, so right-to-left text keeps its glyphs.

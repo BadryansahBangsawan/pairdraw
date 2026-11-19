@@ -1,5 +1,6 @@
 import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 import type { SceneNode } from '@pairdraw/scene-graph'
+import { resolveNodeTextDirection } from '@pairdraw/scene-graph/text/direction'
 
 type DerivedTextData = NonNullable<NodeChange['derivedTextData']>
 
@@ -22,7 +23,8 @@ export function buildDerivedTextData(
     ...(options.decorations ? { decorations: options.decorations } : {}),
     fontMetaData: options.fontMetaData,
     logicalIndexToCharacterOffsetMap: options.logicalIndexToCharacterOffsetMap,
-    derivedLines: [{ directionality: 'LTR' }],
+    // Figma draws the saved glyphs in these lines, so the label must match their direction.
+    derivedLines: [{ directionality: resolveNodeTextDirection(options.node) }],
     truncationStartIndex: -1,
     truncatedHeight: -1
   }

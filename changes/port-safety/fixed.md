@@ -4,3 +4,4 @@
 - The plugin API refuses NaN and Infinity for positions, sizes, rotation, opacity, strokes, corner radii and auto layout spacing, as Figma does, so a non-finite number no longer breaks a layer's bounds.
 - Deeply nested layers and layers whose children link back to a parent flatten without overflowing the stack or repeating a subtree.
 - Diagnostics keep the file name of a built chunk, hash included, in a stack frame from the app's own origin, so an error report still finds its source map, while a chunk-shaped key elsewhere stays redacted.
+- Undo steps past the history limit are freed again, and a document that is never saved no longer pins its history, so a long session keeps its memory bounded.

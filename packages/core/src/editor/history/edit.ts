@@ -1,5 +1,5 @@
 import type { SceneGraph } from '@pairdraw/scene-graph'
-import type { UndoManager } from '@pairdraw/scene-graph/undo'
+import type { UndoEntry, UndoManager } from '@pairdraw/scene-graph/undo'
 
 import {
   applyDocumentChange,
@@ -54,6 +54,19 @@ function unchanged(pageId: string): DocumentChange {
     children: { before: [], after: [] },
     variables: [],
     collections: []
+  }
+}
+
+/**
+ * The undo step of a recorded change. Built outside the edit's own scope, so the step keeps only
+ * the change: not the edit's recording state, nor its options, whose `onRecorded` can hold the
+ * step before it and so every step back to the first, past the history limit.
+ */
+function changeStep(ctx: EditorContext, label: string, change: DocumentChange): UndoEntry {
+  return {
+    label,
+    forward: () => restoreDocumentChange(ctx, change, 'after'),
+    inverse: () => restoreDocumentChange(ctx, change, 'before')
   }
 }
 
@@ -162,11 +175,7 @@ function begin(ctx: EditorContext, options: RecordEditOptions, awaits = false) {
     }
     // An edit that changed nothing, such as a read-only script, leaves no empty step behind.
     if (options.push !== false && !empty) {
-      const entry = {
-        label: options.label,
-        forward: () => restoreDocumentChange(ctx, change, 'after'),
-        inverse: () => restoreDocumentChange(ctx, change, 'before')
-      }
+      const entry = changeStep(ctx, options.label, change)
       if (options.ownStep) ctx.undo.pushStep(entry)
       else ctx.undo.push(entry)
     }

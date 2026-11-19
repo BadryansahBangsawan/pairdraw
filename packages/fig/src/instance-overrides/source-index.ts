@@ -3,12 +3,19 @@ import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 import { guidToString, isUnsetGuid } from '@pairdraw/kiwi/fig/guid'
 import { compareOrderKeys } from '@pairdraw/scene-graph/order-keys'
 
+import {
+  assetIdsByKey,
+  createTextStyleLookup,
+  type TextStyleLookup
+} from '../node-change/style/lookup'
 import { findWithinBoundary, type TreeShape } from './tree'
 
 /** Archive records indexed by GUID, with children in saved order. */
 export interface SourceIndex {
   readonly sources: ReadonlyMap<string, NodeChange>
   readonly children: ReadonlyMap<string, readonly NodeChange[]>
+  /** A text style record a reference names, for the values an instance text inherits. */
+  readonly textStyle: TextStyleLookup
 }
 
 /** A record's archive identity, or undefined for the rare record without a GUID. */
@@ -35,6 +42,11 @@ export function bySavedPosition(a: NodeChange, b: NodeChange): number {
   return compareOrderKeys(a.parentIndex?.position ?? '', b.parentIndex?.position ?? '')
 }
 
+/** A record the file still lists, as opposed to one a later save removed. */
+export function isActiveRecord(record: NodeChange): boolean {
+  return record.phase !== 'REMOVED'
+}
+
 export function createSourceIndex(changes: readonly NodeChange[]): SourceIndex {
   const sources = new Map<string, NodeChange>()
   const children = new Map<string, NodeChange[]>()
@@ -50,7 +62,7 @@ export function createSourceIndex(changes: readonly NodeChange[]): SourceIndex {
     else children.set(parentId, [change])
   }
   for (const siblings of children.values()) siblings.sort(bySavedPosition)
-  return { sources, children }
+  return { sources, children, textStyle: createTextStyleLookup(sources, assetIdsByKey(changes)) }
 }
 
 export function sameGuid(left: GUID | undefined, right: GUID): boolean {

@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
 import { guid } from '#fig-tests/helpers/guid'
-import { STYLE_GOVERNED_FIELDS } from '#fig/instance-overrides/cleared-style'
 import { CLEARED_STYLE, SCENE_OVERRIDE_FIELDS } from '#fig/instance-overrides/fields'
 import { interpretInstance } from '#fig/instance-overrides/interpret'
+import { STYLE_GOVERNED_FIELDS } from '#fig/instance-overrides/style/cleared'
 import { staleFigmaRawFields } from '#fig/source-metadata'
 
 import type { NodeChange } from '@pairdraw/kiwi/fig/codec'

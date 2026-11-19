@@ -1,14 +1,16 @@
+import { cloneRecord } from '#fig/node-change/clone'
+import { mergeVariableConsumptionMaps } from '#fig/node-change/variable/bindings'
+
 import type { GUID } from '@pairdraw/kiwi/fig'
 import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 
-import { cloneRecord } from '#fig/node-change/clone'
-import { mergeVariableConsumptionMaps } from '#fig/node-change/variable/bindings'
 import { declareVariableBindingUnits } from '../bindings/variables'
 import { invalidateInheritedPluginData } from '../claimed-plugin-data'
-import { completeClearedStyleClaim } from '../cleared-style'
 import { applyDerivedEntry } from '../derived-symbol-data'
 import type { PropertyLayer } from '../layers'
 import { resolvesInSourceComponent, type SourceIndex } from '../source-index'
+import { completeClearedStyleClaim } from '../style/cleared'
+import { yieldToInheritedTextStyle } from '../style/inherited-text'
 import { invalidateInheritedTextData } from '../text-provenance'
 import type { DerivedSymbolOverride } from '../types'
 import { findSegment, isRootGuid, pathError, resolveOccurrencePath, SegmentError } from './path'
@@ -45,6 +47,7 @@ function applyPropertyClaim(
       return rank === undefined || rank >= ownerRank
     })
   )
+  yieldToInheritedTextStyle(target, retained, index.textStyle)
   if (Object.keys(retained).length === 0) return
   completeClearedStyleClaim(target, retained, index.sources.get(target.sourceId))
   declareVariableBindingUnits(target, retained)

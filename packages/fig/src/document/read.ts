@@ -13,7 +13,8 @@ import {
   type SourceIndex
 } from '../instance-overrides/source-index'
 import { symbolOverridesOf } from '../instance-overrides/types'
-import { applyStyleRefsToFields } from '../node-change/style/refs'
+import { createTextStyleLookup, type StyleChangeMap } from '../node-change/style/lookup'
+import { applyFillStyleRef, applyStyleRefsToFields } from '../node-change/style/refs'
 import {
   createBindingNormalizer,
   resolveDocumentBindingReferences,
@@ -103,6 +104,17 @@ function isResource(record: NodeChange): boolean {
   return record.type === 'VARIABLE' || record.type === 'VARIABLE_SET'
 }
 
+/** A text range that names a fill style draws in its paints, as the text's own fill does. */
+function paintTextRangesFromFillStyles(
+  styles: StyleChangeMap,
+  node: NodeChange,
+  assets: ReadonlyMap<string, string>
+): void {
+  for (const range of node.textData?.styleOverrideTable ?? []) {
+    applyFillStyleRef(styles, range, assets)
+  }
+}
+
 /** Records decoded whole up front, as clipboard fragments and in-memory documents are. */
 function wholeRecords(source: readonly NodeChange[]): ReaderRecords {
   const bindingDiagnostics: BindingReferenceDiagnostic[] = []
@@ -115,6 +127,7 @@ function wholeRecords(source: readonly NodeChange[]): ReaderRecords {
   const assets = assetIds(records)
   const resolveStyles = (node: NodeChange): void => {
     applyStyleRefsToFields(index.sources, node, assets)
+    paintTextRangesFromFillStyles(index.sources, node, assets)
     for (const override of symbolOverridesOf(node)) resolveStyles(override)
   }
   for (const node of records) resolveStyles(node)
@@ -179,6 +192,7 @@ function archiveRecords(headers: readonly NodeChange[]): ReaderRecords {
       inheritFromAncestors(record, ancestors)
       const resolveStyles = (node: NodeChange): void => {
         applyStyleRefsToFields(styles, node, assets)
+        paintTextRangesFromFillStyles(styles, node, assets)
         for (const override of symbolOverridesOf(node)) resolveStyles(override)
       }
       resolveStyles(record)
@@ -207,7 +221,8 @@ function archiveRecords(headers: readonly NodeChange[]): ReaderRecords {
           lists.set(list, whole)
         }
         return whole
-      })
+      }),
+      textStyle: createTextStyleLookup(styles, assets)
     }
   }
   return {

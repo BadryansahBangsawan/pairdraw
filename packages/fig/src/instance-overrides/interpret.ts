@@ -30,6 +30,7 @@ import {
   createSourceIndex,
   findStaticSegment,
   idOf,
+  isActiveRecord,
   readOverrideKey,
   recordMatches,
   resolvesInSourceComponent,
@@ -72,7 +73,7 @@ export function interpretComponent(
 
 /** One source index per document; evaluation state remains local to each call. */
 export function createOccurrenceInterpreter(changes: readonly NodeChange[]) {
-  return createIndexedOccurrenceInterpreter(createSourceIndex(changes))
+  return createIndexedOccurrenceInterpreter(createSourceIndex(changes.filter(isActiveRecord)))
 }
 
 /** An interpreter over an index built elsewhere, such as one that decodes records as read. */

@@ -73,6 +73,29 @@ test('the Present button starts from the selected slide and its controls step an
   canvas.assertNoErrors()
 })
 
+test('a click on the slide steps forward, and the controls step once', async ({ page }) => {
+  const { canvas, slides } = await openDeck(page, ['Cover', 'Agenda', 'Thanks'])
+  await page.keyboard.press('ControlOrMeta+Enter')
+  await expect(stage(page)).toBeVisible()
+
+  const viewport = page.viewportSize()
+  if (!viewport) throw new Error('Expected a viewport')
+  const center = { x: viewport.width / 2, y: viewport.height / 2 }
+  await page.mouse.click(center.x, center.y)
+  await expect.poll(() => slides.presentedSlide()).toBe('Agenda')
+  await page.mouse.click(center.x, center.y)
+  await expect.poll(() => slides.presentedSlide()).toBe('Thanks')
+  // The last slide stays put, as it does for the keys.
+  await page.mouse.click(center.x, center.y)
+  await expect.poll(() => slides.presentedSlide()).toBe('Thanks')
+
+  // A click on a control is the control's step alone, not a second one as well.
+  const controls = page.getByRole('toolbar', { name: 'Presentation' })
+  await controls.getByRole('button', { name: 'Previous slide' }).click()
+  await expect.poll(() => slides.presentedSlide()).toBe('Agenda')
+  canvas.assertNoErrors()
+})
+
 test('the area around the slide is blacked out and a click there does not select', async ({
   page
 }) => {

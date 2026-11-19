@@ -17,6 +17,13 @@ const WEBKIT_GESTURE_EVENTS: string[] = ['gesturestart', 'gesturechange', 'gestu
 /** Pixels a wheel line scrolls, for wheels that report lines rather than pixels. */
 const WHEEL_LINE_HEIGHT = 16
 
+/**
+ * What a click belongs to instead of the deck: the live controls, anything editable, and media a
+ * slide embeds, whose own click plays, opens, or follows it.
+ */
+const CLICK_KEEPS_TARGETS =
+  'a, button, input, select, textarea, [role="button"], [contenteditable="true"], iframe, video, audio'
+
 /** Runs `fn` once the canvas has taken its new size, which it does a frame after a resize. */
 function afterCanvasResize(fn: () => void) {
   requestAnimationFrame(() => requestAnimationFrame(fn))
@@ -110,9 +117,10 @@ export function usePresentationStage(store: EditorStore, stage: Ref<HTMLElement 
   })
 
   // The canvas only shows the slide: it neither pans, zooms, nor selects, nor opens its menu.
-  // A plain click still reaches it, where the play profile leaves it to links on the slide's text;
-  // the middle button, the Hand tool, and touches would pan. Live controls on the slide are
-  // elements of their own, so they keep the pointer.
+  // A plain click still reaches it, so it steps the deck forward (`step` below) unless the play
+  // profile took it for a link on the slide's text, which stops the event at the canvas; the
+  // middle button, the Hand tool, and touches would pan. Live controls on the slide are elements
+  // of their own, so they keep the pointer.
   useEventListener(
     stage,
     ['pointerdown', 'mousedown'],
@@ -124,6 +132,16 @@ export function usePresentationStage(store: EditorStore, stage: Ref<HTMLElement 
     },
     { capture: true }
   )
+
+  // A click steps forward, as Space and Enter do: it scrolls a slide shown at 100% to its end
+  // first, then goes to the next slide. The live controls and anything embedded in a slide keep
+  // their own clicks, and a link a click followed never reaches here.
+  useEventListener(stage, 'mousedown', (event: MouseEvent) => {
+    if (event.button !== 0) return
+    if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return
+    if (event.target instanceof Element && event.target.closest(CLICK_KEEPS_TARGETS)) return
+    step('forward', presentationScrollStep('Space', size.height.value))
+  })
   useEventListener(
     stage,
     ['touchstart', 'touchmove', 'touchend', 'touchcancel'],

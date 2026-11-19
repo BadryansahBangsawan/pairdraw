@@ -1,0 +1,1 @@
+- Clicking a presented slide steps to the next slide, as Space and Enter do, while links and the presentation's controls keep their own clicks.

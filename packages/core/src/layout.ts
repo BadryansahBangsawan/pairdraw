@@ -38,7 +38,13 @@ import { layoutSizing } from '@pairdraw/scene-graph/layout'
 
 import { fitShapeWithTextFrame } from './layout/shape-with-text'
 import { applyContentInsets, applyStrokeMargins, strokeRoom } from './layout/strokes'
-import { estimateTextSize, getTextMeasurer, measureTextForLayout } from './layout/text-measurement'
+import {
+  autoWidthWrapWidth,
+  estimateTextSize,
+  getTextMeasurer,
+  measureAutoWidthText,
+  measureTextForLayout
+} from './layout/text-measurement'
 import {
   applyMinMaxConstraints,
   applyLockedAspectRatio,
@@ -571,7 +577,7 @@ function configureTextLeaf(
       const cached = cache.get(cacheKey)
       if (cached) return cached
 
-      const result = measureTextForLayout(child, maxW)
+      const result = measureAutoWidthText(child, maxW ?? autoWidthWrapWidth(child))
       cache.set(cacheKey, result)
       return result
     })

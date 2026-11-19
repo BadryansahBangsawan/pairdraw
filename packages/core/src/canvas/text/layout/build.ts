@@ -30,6 +30,7 @@ import type { ParagraphNode } from '#core/canvas/text/paragraph/inputs'
 import type { TextRenderer } from '#core/canvas/text/renderer'
 import { utf8Length } from '#core/canvas/text/utf8'
 import { DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from '#core/constants'
+import { autoWidthWrapWidth } from '#core/layout/text-measurement'
 import { shownText } from '#core/text/case'
 import { glyphAdvanceSync } from '#core/text/font/glyphs'
 import { textFontFace } from '#core/text/requirements/collect'
@@ -145,12 +146,23 @@ function needsParagraphLayout(node: ParagraphNode): boolean {
 }
 
 function layoutForNode(layout: TextLayout, node: ParagraphNode): void {
-  if (node.textAutoResize === 'WIDTH_AND_HEIGHT') {
-    layout.layout(1e6)
-    layout.layout(Math.max(node.width || 1, Math.ceil(layout.getLongestLine())))
-  } else {
+  if (node.textAutoResize !== 'WIDTH_AND_HEIGHT') {
     layout.layout(resolveParagraphLayoutWidth(node))
+    return
   }
+  const wrapWidth = resolveParagraphLayoutWidth(node)
+  if (truncatesAtMaxWidth(node)) {
+    layout.layout(Math.min(node.width || wrapWidth, wrapWidth))
+    return
+  }
+  layout.layout(wrapWidth)
+  const widestLine = Math.ceil(layout.getLongestLine())
+  const width = Math.min(wrapWidth, Math.max(node.width || 1, widestLine))
+  if (width !== wrapWidth) layout.layout(width)
+}
+
+function truncatesAtMaxWidth(node: ParagraphNode): boolean {
+  return node.textTruncation === 'ENDING' && autoWidthWrapWidth(node) !== undefined
 }
 
 interface ListStyle {

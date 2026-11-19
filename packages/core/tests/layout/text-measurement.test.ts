@@ -54,10 +54,19 @@ describe('measureTextForLayout', () => {
     expect(measureTextForLayout(node, 100)).toEqual({ width: 42, height: 10 })
   })
 
-  test('estimates what the measurer cannot measure, or without one', () => {
-    const estimate = estimateTextSize(node, 100)
-    expect(measureTextForLayout(node, 100)).toEqual(estimate)
+  test('estimates without a measurer', () => {
+    expect(measureTextForLayout(node, 100)).toEqual(estimateTextSize(node, 100))
+  })
+
+  test('keeps a text with characters at its size while its fonts are not prepared', () => {
+    // The measurer answers null until the fonts are in; the text then keeps the size it has.
     setTextMeasurer(() => null)
-    expect(measureTextForLayout(node, 100)).toEqual(estimate)
+    expect(measureTextForLayout(node, 100)).toEqual({ width: node.width, height: node.height })
+  })
+
+  test('estimates an empty text, which needs no fonts beyond the default', () => {
+    const empty = graph.createNode('TEXT', graph.getPages()[0].id, { text: '', fontSize: 14 })
+    setTextMeasurer(() => null)
+    expect(measureTextForLayout(empty, 100)).toEqual(estimateTextSize(empty, 100))
   })
 })

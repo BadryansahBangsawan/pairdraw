@@ -176,8 +176,21 @@ function buildEditorStore(initialGraph?: SceneGraph) {
       if (prepared) {
         editor.commitPageSwitch(prepared)
         preparation.update({ phase: 'preparing-render', detail: page?.name ?? null })
-        if (isEditorStoreInFront(store))
-          await preparationController.waitForPresentation(preparation.id, editor.state.sceneVersion)
+        try {
+          if (isEditorStoreInFront(store))
+            await preparationController.waitForPresentation(
+              preparation.id,
+              editor.state.sceneVersion
+            )
+        } catch (error) {
+          preparation.signal.throwIfAborted()
+          // The page is in by now: a canvas that cannot show it fails the render, not the
+          // switch, so an open that waits on it keeps its document.
+          const message = error instanceof Error ? error.message : String(error)
+          preparation.fail({ code: 'render-failed', message, retryable: true })
+          toast.error(notificationMessages.get().operationFailed({ error: message }))
+          return
+        }
         preparation.signal.throwIfAborted()
       }
       succeeded = true
@@ -189,20 +202,11 @@ function buildEditorStore(initialGraph?: SceneGraph) {
         throw error
       }
       if (ownsPreparation) {
-        const presentationTimedOut =
-          error instanceof Error && error.message === 'The operation was timed out'
         preparation.fail({
-          code: presentationTimedOut ? 'render-failed' : 'layout-failed',
+          code: 'layout-failed',
           message: error instanceof Error ? error.message : String(error),
           retryable: true
         })
-        if (presentationTimedOut) {
-          toast.error(
-            notificationMessages.get().operationFailed({
-              error: error instanceof Error ? error.message : String(error)
-            })
-          )
-        }
       }
       throw error
     } finally {

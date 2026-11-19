@@ -18,7 +18,7 @@ import {
   populateWholeDocument,
   requirePage
 } from '#cli/headless'
-import { numberInRange } from '#cli/options'
+import { numberInRange, outputBesideInput } from '#cli/options'
 
 import { applyExportFontPolicy, exportFontRoots, FONT_POLICIES } from './font-policy'
 import { exportStorybookFromFile } from './storybook'
@@ -274,7 +274,13 @@ async function exportFromFile(format: string, args: ExportArgs) {
       process.exit(1)
     }
     const extension = io.getFormat(format.toLowerCase())?.extensions[0] ?? format.toLowerCase()
-    await writeAndLog(resolve(args.output ?? exportFileName(defaultName, extension)), image)
+    await writeAndLog(
+      outputBesideInput(
+        resolve(args.output ?? join(dirname(file), exportFileName(defaultName, extension))),
+        file
+      ),
+      image
+    )
     console.log(ok(`Target: ${targetLabel(args.page, args.node, wholeDocument)}`))
     return
   }
@@ -284,7 +290,10 @@ async function exportFromFile(format: string, args: ExportArgs) {
     format === 'JSX' && args.style === 'tailwind' ? 'tailwind-jsx' : format.toLowerCase()
   const scale = formatSupportsScale(format) ? Number(args.scale) : undefined
   const extension = io.getFormat(formatId)?.extensions[0] ?? formatId
-  const output = resolve(args.output ?? exportFileName(defaultName, extension, scale))
+  const output = outputBesideInput(
+    resolve(args.output ?? join(dirname(file), exportFileName(defaultName, extension, scale))),
+    file
+  )
   const result = await executeFileExport(
     formatId,
     graph,

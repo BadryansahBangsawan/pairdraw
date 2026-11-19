@@ -1,4 +1,4 @@
-import { basename, extname, resolve } from 'node:path'
+import { basename, dirname, extname, join, resolve } from 'node:path'
 
 import { defineCommand } from 'citty'
 
@@ -14,6 +14,7 @@ import {
   populateWholeDocument,
   writeDocumentFile
 } from '#cli/headless'
+import { outputBesideInput } from '#cli/options'
 
 const io = new IORegistry(BUILTIN_IO_FORMATS)
 
@@ -23,7 +24,7 @@ function writableFormatIds(): string[] {
 
 function defaultOutput(file: string, format: string): string {
   const base = basename(file, extname(file))
-  return resolve(`${base}.${format.toLowerCase()}`)
+  return resolve(join(dirname(file), `${base}.${format.toLowerCase()}`))
 }
 
 export default defineCommand({
@@ -79,7 +80,10 @@ export default defineCommand({
         graph.getPages(true).map((page) => page.id)
       )
     }
-    const output = args.output ? resolve(args.output) : defaultOutput(file, format)
+    const output = outputBesideInput(
+      args.output ? resolve(args.output) : defaultOutput(file, format),
+      file
+    )
     await writeDocumentFile(graph, output, format)
     console.log(ok(`Converted ${file} → ${output}`))
   }

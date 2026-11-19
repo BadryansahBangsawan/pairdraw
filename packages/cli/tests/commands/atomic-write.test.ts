@@ -107,4 +107,32 @@ describe('convert and export replace the output file', () => {
     expect(await readFile(output, 'utf8')).toContain('<html')
     expect(await readdir(join(dir, 'missing', 'page', 'index.assets'))).toContain('pairdraw.css')
   })
+
+  test('a fig export without -o keeps the input document intact', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-export-self-'))
+    const penSource = join(dir, 'card.pen')
+    await writeFile(penSource, pen)
+    await quietly(() => runCommand(convert, { rawArgs: [penSource, '-f', 'fig'] }))
+    const source = join(dir, 'card.fig')
+    const before = await readFile(source)
+
+    await quietly(() => runCommand(exportCommand, { rawArgs: [source, '-f', 'fig'] }))
+
+    expect(await readFile(source)).toEqual(before)
+    const written = (await readdir(dir)).filter((name) => name.endsWith('.fig'))
+    expect(written.sort()).toEqual(['card-export.fig', 'card.fig'])
+  })
+
+  test('a same-format convert without -o keeps the input document intact', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-convert-self-'))
+    const source = join(dir, 'card.pen')
+    await writeFile(source, pen)
+    const before = await readFile(source, 'utf8')
+
+    await quietly(() => runCommand(convert, { rawArgs: [source, '-f', 'pen'] }))
+
+    expect(await readFile(source, 'utf8')).toBe(before)
+    const written = (await readdir(dir)).filter((name) => name.endsWith('.pen'))
+    expect(written.sort()).toEqual(['card-export.pen', 'card.pen'])
+  })
 })

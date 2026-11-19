@@ -9,6 +9,7 @@ import {
   type NodeProxyInternals,
   type ProxyThis
 } from '#core/figma-api/accessor-utils'
+import { dashPatternValues, finiteNumber } from '#core/figma-api/finite'
 import {
   setIndependentStrokeWeight,
   setStrokeAlign,
@@ -25,13 +26,26 @@ function graph(target: ProxyThis, internals: NodeProxyInternals): SceneGraph {
   return target[internals.graph] as SceneGraph
 }
 
+/** The plugin API's name for each independent weight, which its refusals are worded with. */
+const WEIGHT_PROPERTIES: Record<IndependentWeightField, string> = {
+  borderTopWeight: 'strokeTopWeight',
+  borderRightWeight: 'strokeRightWeight',
+  borderBottomWeight: 'strokeBottomWeight',
+  borderLeftWeight: 'strokeLeftWeight'
+}
+
 function independentWeight(internals: NodeProxyInternals, field: IndependentWeightField) {
   return {
     get(this: ProxyThis): number {
       return raw(this, internals)[field]
     },
-    set(this: ProxyThis, value: number) {
-      setIndependentStrokeWeight(graph(this, internals), nodeId(this, internals), field, value)
+    set(this: ProxyThis, value: unknown) {
+      setIndependentStrokeWeight(
+        graph(this, internals),
+        nodeId(this, internals),
+        field,
+        finiteNumber(value, WEIGHT_PROPERTIES[field])
+      )
     }
   }
 }
@@ -46,8 +60,12 @@ export function installStrokeNodeProxyAccessors(
       get(this: ProxyThis): number {
         return newStrokeGeometry(raw(strokeOwner(this, internals), internals)).weight
       },
-      set(this: ProxyThis, value: number) {
-        setStrokeWeight(graph(this, internals), raw(strokeOwner(this, internals), internals), value)
+      set(this: ProxyThis, value: unknown) {
+        setStrokeWeight(
+          graph(this, internals),
+          raw(strokeOwner(this, internals), internals),
+          finiteNumber(value, 'strokeWeight')
+        )
       }
     },
     strokeAlign: {
@@ -62,8 +80,10 @@ export function installStrokeNodeProxyAccessors(
       get(this: ProxyThis): readonly number[] {
         return Object.freeze([...raw(strokeOwner(this, internals), internals).dashPattern])
       },
-      set(this: ProxyThis, value: readonly number[]) {
-        updateNode(strokeOwner(this, internals), internals, { dashPattern: [...value] })
+      set(this: ProxyThis, value: unknown) {
+        updateNode(strokeOwner(this, internals), internals, {
+          dashPattern: dashPatternValues(value)
+        })
       }
     },
     strokeCap: {
@@ -97,8 +117,8 @@ export function installStrokeNodeProxyAccessors(
       get(this: ProxyThis): number {
         return raw(this, internals).strokeMiterLimit
       },
-      set(this: ProxyThis, value: number) {
-        updateNode(this, internals, { strokeMiterLimit: value })
+      set(this: ProxyThis, value: unknown) {
+        updateNode(this, internals, { strokeMiterLimit: finiteNumber(value, 'strokeMiterLimit') })
       }
     },
     strokeTopWeight: independentWeight(internals, 'borderTopWeight'),

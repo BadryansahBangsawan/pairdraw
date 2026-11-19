@@ -1,3 +1,4 @@
 - Unsaved edits to a file saved by hand get a recovery copy when autosave stops, so a WebView crash no longer loses them.
 - The editor reloads its page when the process backing it ends on macOS, instead of leaving a blank window.
 - Reloading a document on desktop parses the file as it was read, without holding several copies of it in memory.
+- The plugin API refuses NaN and Infinity for positions, sizes, rotation, opacity, strokes, corner radii and auto layout spacing, as Figma does, so a non-finite number no longer breaks a layer's bounds.

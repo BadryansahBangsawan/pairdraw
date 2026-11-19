@@ -30,6 +30,7 @@ import {
   type ProxyThis
 } from '#core/figma-api/accessor-utils'
 import { invalid, numberProblem } from '#core/figma-api/accessors/text/messages'
+import { finiteNumber, finiteTransform } from '#core/figma-api/finite'
 import { flushPendingLayout, flushPendingLayoutBefore } from '#core/figma-api/pending-layout'
 import type { NodeProxyHost } from '#core/figma-api/proxy'
 import { computeAbsoluteRenderBounds } from '#core/figma-api/render-bounds'
@@ -138,14 +139,15 @@ export function installBasicNodeProxyAccessors(
         flushPendingLayout(graph(this, internals))
         return containerTransform(raw(this, internals), graph(this, internals))[2]
       },
-      set(this: ProxyThis, value: number) {
+      set(this: ProxyThis, value: unknown) {
+        const x = finiteNumber(value, 'x')
         prepareFollowedFieldEdit(
           graph(this, internals),
           raw(this, internals),
           'x',
           'relative-transform'
         )
-        setTransform(this, internals, (matrix) => withOrigin(matrix, value, matrix[5]))
+        setTransform(this, internals, (matrix) => withOrigin(matrix, x, matrix[5]))
       }
     },
     y: {
@@ -153,14 +155,15 @@ export function installBasicNodeProxyAccessors(
         flushPendingLayout(graph(this, internals))
         return containerTransform(raw(this, internals), graph(this, internals))[5]
       },
-      set(this: ProxyThis, value: number) {
+      set(this: ProxyThis, value: unknown) {
+        const y = finiteNumber(value, 'y')
         prepareFollowedFieldEdit(
           graph(this, internals),
           raw(this, internals),
           'y',
           'relative-transform'
         )
-        setTransform(this, internals, (matrix) => withOrigin(matrix, matrix[2], value))
+        setTransform(this, internals, (matrix) => withOrigin(matrix, matrix[2], y))
       }
     },
     width: {
@@ -185,14 +188,15 @@ export function installBasicNodeProxyAccessors(
         return figmaRotation(containerTransform(node, graph(this, internals)))
       },
       // Figma turns a node counterclockwise about its top-left corner.
-      set(this: ProxyThis, value: number) {
+      set(this: ProxyThis, value: unknown) {
+        const rotation = finiteNumber(value, 'rotation')
         prepareFollowedFieldEdit(
           graph(this, internals),
           raw(this, internals),
           'rotation',
           'relative-transform'
         )
-        setTransform(this, internals, (matrix) => withFigmaRotation(matrix, value))
+        setTransform(this, internals, (matrix) => withFigmaRotation(matrix, rotation))
       }
     },
     relativeTransform: {
@@ -215,15 +219,25 @@ export function installBasicNodeProxyAccessors(
         }
         return figmaTransform(containerTransform(node, scene))
       },
-      set(this: ProxyThis, value: FigmaTransform) {
+      set(this: ProxyThis, value: unknown) {
+        const { first, second } = finiteTransform(value)
         prepareFollowedFieldEdit(
           graph(this, internals),
           raw(this, internals),
           'relativeTransform',
           'relative-transform'
         )
-        const [[a, b, x], [c, d, y]] = value
-        setTransform(this, internals, () => [a, b, x, c, d, y, 0, 0, 1])
+        setTransform(this, internals, () => [
+          first[0],
+          first[1],
+          first[2],
+          second[0],
+          second[1],
+          second[2],
+          0,
+          0,
+          1
+        ])
       }
     },
     absoluteTransform: {
@@ -255,7 +269,8 @@ export function installBasicNodeProxyAccessors(
     resizeWithoutConstraints(this: ProxyThis, width: number, height: number): void {
       resizeNode(this, internals, width, height, false)
     },
-    rescale(this: ProxyThis, scale: number): void {
+    rescale(this: ProxyThis, value: unknown): void {
+      const scale = finiteNumber(value, 'scale', 'rescale')
       assertEditable(this, internals)
       const scene = graph(this, internals)
       const node = raw(this, internals)

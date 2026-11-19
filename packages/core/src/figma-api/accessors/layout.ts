@@ -21,6 +21,7 @@ import {
   type NodeProxyInternals,
   type ProxyThis
 } from '#core/figma-api/accessor-utils'
+import { finiteNumber, finiteOrNull, layoutGrowChoice } from '#core/figma-api/finite'
 
 /** A guide in Figma's plugin shape, whether it was set that way or read from a file. */
 function figmaLayoutGrid(grid: LayoutGrid): Readonly<LayoutGrid> {
@@ -77,8 +78,8 @@ export function installLayoutNodeProxyAccessors(
     },
     primaryAxisAlignItems: mappedAccessor(internals, 'primaryAxisAlign'),
     counterAxisAlignItems: mappedAccessor(internals, 'counterAxisAlign'),
-    itemSpacing: simpleAccessor(internals, 'itemSpacing'),
-    counterAxisSpacing: simpleAccessor(internals, 'counterAxisSpacing'),
+    itemSpacing: numberAccessor(internals, 'itemSpacing'),
+    counterAxisSpacing: numberAccessor(internals, 'counterAxisSpacing'),
     paddingTop: simpleAccessor(internals, 'paddingTop'),
     paddingRight: simpleAccessor(internals, 'paddingRight'),
     paddingBottom: simpleAccessor(internals, 'paddingBottom'),
@@ -103,7 +104,14 @@ export function installLayoutNodeProxyAccessors(
     itemReverseZIndex: simpleAccessor(internals, 'itemReverseZIndex'),
     strokesIncludedInLayout: simpleAccessor(internals, 'strokesIncludedInLayout'),
     layoutPositioning: mappedAccessor(internals, 'layoutPositioning'),
-    layoutGrow: simpleAccessor(internals, 'layoutGrow'),
+    layoutGrow: {
+      get(this: ProxyThis): number {
+        return raw(this, internals).layoutGrow
+      },
+      set(this: ProxyThis, value: unknown) {
+        updateNode(this, internals, { layoutGrow: layoutGrowChoice(value) })
+      }
+    },
     layoutAlign: {
       get(this: ProxyThis): string {
         const node = raw(this, internals)
@@ -134,10 +142,10 @@ export function installLayoutNodeProxyAccessors(
         })
       }
     },
-    minWidth: simpleAccessor(internals, 'minWidth'),
-    maxWidth: simpleAccessor(internals, 'maxWidth'),
-    minHeight: simpleAccessor(internals, 'minHeight'),
-    maxHeight: simpleAccessor(internals, 'maxHeight'),
+    minWidth: sizeLimitAccessor(internals, 'minWidth'),
+    maxWidth: sizeLimitAccessor(internals, 'maxWidth'),
+    minHeight: sizeLimitAccessor(internals, 'minHeight'),
+    maxHeight: sizeLimitAccessor(internals, 'maxHeight'),
     targetAspectRatio: {
       get(this: ProxyThis): Vector | null {
         const target = raw(this, internals).targetAspectRatio
@@ -214,6 +222,37 @@ function layoutSizingAccessor(
       const error = layoutSizingError(sceneGraph, node, value)
       if (error) throw new Error(`in set_${property}: ${error}`)
       updateNode(this, internals, layoutSizingUpdates(sceneGraph, node, axis, value))
+    }
+  }
+}
+
+type SizeLimitField = 'minWidth' | 'maxWidth' | 'minHeight' | 'maxHeight'
+
+type NumberField = 'itemSpacing' | 'counterAxisSpacing'
+
+/** A minimum or maximum size, which a layer may also leave unset. */
+function sizeLimitAccessor(
+  internals: NodeProxyInternals,
+  field: SizeLimitField
+): PropertyDescriptor {
+  return {
+    get(this: ProxyThis): number | null {
+      return raw(this, internals)[field]
+    },
+    set(this: ProxyThis, value: unknown) {
+      updateNode(this, internals, { [field]: finiteOrNull(value, field) })
+    }
+  }
+}
+
+/** A number field that refuses NaN and Infinity, as Figma's setters do. */
+function numberAccessor(internals: NodeProxyInternals, field: NumberField): PropertyDescriptor {
+  return {
+    get(this: ProxyThis): number {
+      return raw(this, internals)[field]
+    },
+    set(this: ProxyThis, value: unknown) {
+      updateNode(this, internals, { [field]: finiteNumber(value, field) })
     }
   }
 }

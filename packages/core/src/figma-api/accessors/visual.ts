@@ -11,6 +11,7 @@ import {
   type ProxyThis
 } from '#core/figma-api/accessor-utils'
 import { parseFigmaEffects, toFigmaEffect, type FigmaEffect } from '#core/figma-api/effects'
+import { finiteNumber } from '#core/figma-api/finite'
 import { parseFigmaPaints, toFigmaPaint, type FigmaPaint } from '#core/figma-api/paints'
 import { getTextStyle } from '#core/figma-api/text/style'
 import { paintBindings, setPaintBindings } from '#core/figma-api/variables/bindings'
@@ -134,8 +135,8 @@ export function installVisualNodeProxyAccessors(
       get(this: ProxyThis): number {
         return raw(this, internals).opacity
       },
-      set(this: ProxyThis, value: number) {
-        updateNode(this, internals, { opacity: value })
+      set(this: ProxyThis, value: unknown) {
+        updateNode(this, internals, { opacity: finiteNumber(value, 'opacity') })
       }
     },
     visible: {
@@ -181,14 +182,15 @@ export function installVisualNodeProxyAccessors(
         )
         return agree ? topLeftRadius : mixed
       },
-      set(this: ProxyThis, value: number | symbol) {
+      set(this: ProxyThis, value: unknown) {
         if (value === mixed) return
+        const radius = finiteNumber(value, 'cornerRadius')
         updateNode(this, internals, {
-          cornerRadius: value as number,
-          topLeftRadius: value as number,
-          topRightRadius: value as number,
-          bottomRightRadius: value as number,
-          bottomLeftRadius: value as number,
+          cornerRadius: radius,
+          topLeftRadius: radius,
+          topRightRadius: radius,
+          bottomRightRadius: radius,
+          bottomLeftRadius: radius,
           independentCorners: false
         })
       }
@@ -201,8 +203,8 @@ export function installVisualNodeProxyAccessors(
       get(this: ProxyThis): number {
         return raw(this, internals).cornerSmoothing
       },
-      set(this: ProxyThis, value: number) {
-        updateNode(this, internals, { cornerSmoothing: value })
+      set(this: ProxyThis, value: unknown) {
+        updateNode(this, internals, { cornerSmoothing: finiteNumber(value, 'cornerSmoothing') })
       }
     }
   })
@@ -216,10 +218,10 @@ function cornerAccessor(
     get(this: ProxyThis): number {
       return raw(this, internals)[field]
     },
-    set(this: ProxyThis, value: number) {
+    set(this: ProxyThis, value: unknown) {
       updateNode(this, internals, {
         ...independentCornerChanges(raw(this, internals)),
-        [field]: value
+        [field]: finiteNumber(value, field)
       })
     }
   }

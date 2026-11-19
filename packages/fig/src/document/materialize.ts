@@ -535,21 +535,30 @@ function materializeReaderInto(
   for (const page of pages) populateInstances(page)
   for (const instanceId of resync) graph.syncInstance(instanceId)
   if (resync.size > 0) restoreDerivedSizes(graph, derivedSizes)
+  // The layers this page added. Collecting them once, instead of spreading and filtering every
+  // node in the graph for each pass, keeps a page's cost to its own layers.
+  const collectAdded = (): SceneNode[] => {
+    const nodes: SceneNode[] = []
+    for (const node of graph.nodes.values()) if (!existingNodeIds.has(node.id)) nodes.push(node)
+    return nodes
+  }
+  const pageNodes = collectAdded()
   // Instances show the layers they replaced their components' with, before bindings resolve.
-  const added = [...graph.nodes.values()].filter((node) => !existingNodeIds.has(node.id))
-  applyStoredReplacedLayers({ graph, blobs, sources }, added)
+  applyStoredReplacedLayers({ graph, blobs, sources }, pageNodes)
   // Instances of a component that replaces a layer show the replacement from its definition.
-  if (syncInstancesOfReplacingComponents(graph, added)) restoreDerivedSizes(graph, derivedSizes)
+  if (syncInstancesOfReplacingComponents(graph, pageNodes)) restoreDerivedSizes(graph, derivedSizes)
   // Records name other layers by GUID, so links wait until every layer of the pass exists,
   // instances and the layers inside them included.
   const layerOf = (sourceId: string) => sources.get(sourceId)
   for (const { node, record } of linked) {
     generatedFrameCodec(node.type)?.link?.(graph, node, record, layerOf)
   }
+  // Syncing an edited graph's new instances can add layers, which every later pass must see.
+  const added = edited ? collectAdded() : pageNodes
   // Layers and ranges name their styles by the styles' own IDs, which the records' GUIDs are,
   // so only links to other layers are renamed to the layers this page added.
-  for (const node of graph.getAllNodes()) {
-    if (existingNodeIds.has(node.id) || node.styleRuns.length === 0) continue
+  for (const node of added) {
+    if (node.styleRuns.length === 0) continue
     node.styleRuns = remapStyleRunReferences(node.styleRuns, {
       variable: (id) => id,
       style: (id) => id,
@@ -557,7 +566,7 @@ function materializeReaderInto(
     })
   }
   // These passes apply to the nodes this page added, not to the whole graph.
-  const materialized = [...graph.nodes.values()].filter((node) => !existingNodeIds.has(node.id))
+  const materialized = added
   state.definitionTypes ??= seedDefinitionTypes(graph)
   linkComponentPropertyValues(graph, sources, materialized, state.definitionTypes)
   graph.preserveSourceMetadataDuring(() => {

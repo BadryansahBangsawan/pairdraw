@@ -9,7 +9,12 @@ import {
   type Stroke
 } from '@pairdraw/scene-graph'
 import { TRANSPARENT } from '@pairdraw/scene-graph/constants'
-import { parseCSSAlignSelf, parseCSSNumber, parseCSSShadows } from '@pairdraw/scene-graph/css'
+import {
+  parseCSSAlignSelf,
+  parseCSSBackgroundImages,
+  parseCSSNumber,
+  parseCSSShadows
+} from '@pairdraw/scene-graph/css'
 import { normalizeEffects } from '@pairdraw/scene-graph/effects'
 import { computeImageHash } from '@pairdraw/scene-graph/images'
 import { textLayerName } from '@pairdraw/scene-graph/node-defaults'
@@ -75,6 +80,43 @@ function firstCSSNumber(style: DesignStyleDeclaration, ...properties: string[]):
 
 function fillsFromStyle(style: DesignStyleDeclaration, property: string): Fill[] {
   return colorToFillFromCSS(pickStyle(style, property))
+}
+
+/**
+ * The `background-image` layers as fills, bottom-first as Pairdraw paints them: CSS paints the
+ * first layer on top, so the list reverses. A `url()` layer becomes an image fill when its
+ * bytes are inline; a remote address is skipped, as an unfetchable background paints nothing.
+ */
+function backgroundFills(
+  graph: SceneGraph,
+  node: SceneNode,
+  style: DesignStyleDeclaration
+): Fill[] {
+  const layers = parseCSSBackgroundImages(
+    pickStyle(style, 'background-image'),
+    node.width,
+    node.height
+  )
+  const fills: Fill[] = []
+  for (const layer of layers) {
+    if (layer.kind === 'gradient') {
+      fills.push(layer.fill)
+      continue
+    }
+    const bytes = bytesFromDataURL(layer.url)
+    if (!bytes) continue
+    const imageHash = computeImageHash(bytes)
+    graph.images.set(imageHash, bytes)
+    fills.push({
+      type: 'IMAGE',
+      imageHash,
+      imageScaleMode: 'FILL',
+      color: { ...TRANSPARENT },
+      opacity: 1,
+      visible: true
+    })
+  }
+  return fills.reverse()
 }
 
 function aspectRatioFromCSS(value: string | undefined): number | null {
@@ -312,7 +354,8 @@ function applyElementStyle(
   applyPadding(node, style)
 
   const fills = fillsFromStyle(style, 'background-color')
-  if (fills.length > 0) node.fills = fills
+  const background = backgroundFills(graph, node, style)
+  if (fills.length > 0 || background.length > 0) node.fills = [...fills, ...background]
   applyImageFill(graph, node, element, style)
 
   const strokes = colorToStrokeFromCSS(

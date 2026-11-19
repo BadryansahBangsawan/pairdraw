@@ -1,4 +1,5 @@
 export { parseCSSGridTracks } from './grid'
+export { parseCSSBackgroundImages, type CSSBackgroundLayer } from './gradient'
 export {
   parseCSSAlignItems,
   parseCSSAlignSelf,

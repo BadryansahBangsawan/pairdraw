@@ -6,6 +6,7 @@ import { resolveNodeTextDirection } from '@pairdraw/scene-graph/text/direction'
 import { drawnFontVariations } from '#core/canvas/text/font-families'
 import {
   formatColor,
+  formatSolidColor,
   type SVGExportContext,
   type SVGFontAlias,
   type SVGFontRequest
@@ -94,6 +95,27 @@ function spanFontAttrs(
 ): Record<string, string | number> {
   if (fontAlias) return aliasedFontAttrs(fontRequest(node, style, fallback), fontAlias)
   return fallback ? { 'font-family': fallback.family } : {}
+}
+
+/**
+ * A text layer's stroke, painted on the glyphs themselves. The canvas strokes an outside stroke at
+ * twice its weight and clips it to the outside of the glyphs; live text cannot be clipped in SVG,
+ * so the same band is painted behind the fill at twice the weight, which hides the inner half. An
+ * inside or centred stroke keeps its own weight over the fill.
+ */
+function textStrokeAttrs(
+  node: SceneNode,
+  colorSpace: 'srgb' | 'display-p3'
+): Record<string, string | number | undefined> {
+  const stroke = node.strokes.find((candidate) => candidate.visible)
+  if (!stroke) return {}
+  const attrs: Record<string, string | number | undefined> = {
+    stroke: formatSolidColor(stroke.color, 1, colorSpace),
+    'stroke-width': round(stroke.weight * (stroke.align === 'OUTSIDE' ? 2 : 1))
+  }
+  if (stroke.opacity < 1) attrs['stroke-opacity'] = round(stroke.opacity)
+  if (stroke.align === 'OUTSIDE') attrs['paint-order'] = 'stroke'
+  return attrs
 }
 
 /**
@@ -202,6 +224,7 @@ export function renderTextNode(
     'text-anchor': laidOut ? undefined : textAnchorForNode(node, direction),
     'text-decoration': textDecoration,
     'letter-spacing': letterSpacing ? round(letterSpacing) : undefined,
+    ...textStrokeAttrs(node, colorSpace),
     ...(fontAlias ? aliasedFontAttrs(fontRequest(node), fontAlias) : {})
   }
   const spanAttrs = (style: CharacterStyleOverride, fallback?: SVGFallbackFace) => ({

@@ -1,1 +1,2 @@
 - Pressing ⌘R with the sidebar closed now opens the design panel and renames the layer there, instead of doing nothing.
+- Text layers keep their stroke when exported to SVG, with an outside stroke painted behind the glyphs as the canvas draws it.

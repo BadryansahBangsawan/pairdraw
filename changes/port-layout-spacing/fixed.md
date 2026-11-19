@@ -1,0 +1,1 @@
+- A negative gap in an auto layout frame overlaps its children, and a row hugs to the width its overlapped children take.

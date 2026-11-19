@@ -1,0 +1,1 @@
+- Layers that ignore auto layout keep their place when the Hug frame around them is resized again, because layout places them from the size they were last placed for.

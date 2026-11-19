@@ -181,31 +181,7 @@ function buildYogaTree(
 
   configureFlexContainer(root, frame, direction)
 
-  const children = graph.getChildren(frame.id).map((child) => asLaidOutIn(graph, child, frame))
-  const box = insertFlowBox(root, frame)
-  const flow: YogaNode[] = []
-  for (const child of children) {
-    const yogaChild = createYogaNode()
-
-    if (child.layoutPositioning === 'ABSOLUTE') {
-      configureAbsoluteChild(yogaChild, child)
-    } else if (!child.visible) {
-      yogaChild.setDisplay(Display.None)
-    } else {
-      if (child.layoutMode === 'GRID') {
-        configureChildAsGrid(yogaChild, child, frame, graph, direction)
-      } else if (child.layoutMode !== 'NONE') {
-        configureChildAsAutoLayout(yogaChild, child, frame, graph, direction)
-      } else {
-        configureChildAsLeaf(yogaChild, child, frame, graph)
-      }
-      flow.push(yogaChild)
-    }
-    applyStrokeMargins(yogaChild, child, frame)
-
-    box.insertChild(yogaChild, box.getChildCount())
-  }
-  setFlowEdges(root, box, frame, flow, direction)
+  insertFlexChildren(root, frame, graph, direction)
 
   return root
 }
@@ -386,23 +362,42 @@ function configureChildAsAutoLayout(
   if (heldAxis === 'width' && widthSizing === 'HUG') yogaChild.setWidth(child.width)
   if (heldAxis === 'height' && heightSizing === 'HUG') yogaChild.setHeight(child.height)
 
-  const grandchildren = graph.getChildren(child.id).map((gc) => asLaidOutIn(graph, gc, child))
-  for (const gc of grandchildren) {
-    const yogaGC = createYogaNode()
-    if (gc.layoutPositioning === 'ABSOLUTE') {
-      configureAbsoluteChild(yogaGC, gc)
-    } else if (!gc.visible) {
-      yogaGC.setDisplay(Display.None)
-    } else if (gc.layoutMode === 'GRID') {
-      configureChildAsGrid(yogaGC, gc, child, graph, direction)
-    } else if (gc.layoutMode !== 'NONE') {
-      configureChildAsAutoLayout(yogaGC, gc, child, graph, direction)
+  insertFlexChildren(yogaChild, child, graph, direction)
+}
+
+/** Puts a frame's children into its Yoga node, through the flow box a negative edge needs. */
+function insertFlexChildren(
+  yogaParent: YogaNode,
+  parent: SceneNode,
+  graph: SceneGraph,
+  direction: 'LTR' | 'RTL'
+): void {
+  const box = insertFlowBox(yogaParent, parent)
+  const flow: YogaNode[] = []
+  for (const child of graph
+    .getChildren(parent.id)
+    .map((node) => asLaidOutIn(graph, node, parent))) {
+    const yogaChild = createYogaNode()
+
+    if (child.layoutPositioning === 'ABSOLUTE') {
+      configureAbsoluteChild(yogaChild, child)
+    } else if (!child.visible) {
+      yogaChild.setDisplay(Display.None)
     } else {
-      configureChildAsLeaf(yogaGC, gc, child, graph)
+      if (child.layoutMode === 'GRID') {
+        configureChildAsGrid(yogaChild, child, parent, graph, direction)
+      } else if (child.layoutMode !== 'NONE') {
+        configureChildAsAutoLayout(yogaChild, child, parent, graph, direction)
+      } else {
+        configureChildAsLeaf(yogaChild, child, parent, graph)
+      }
+      flow.push(yogaChild)
     }
-    applyStrokeMargins(yogaGC, gc, child)
-    yogaChild.insertChild(yogaGC, yogaChild.getChildCount())
+    applyStrokeMargins(yogaChild, child, parent)
+
+    box.insertChild(yogaChild, box.getChildCount())
   }
+  setFlowEdges(yogaParent, box, parent, flow, direction)
 }
 
 function derivedGrowingLeafFitsParent(

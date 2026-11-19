@@ -10,18 +10,12 @@ import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { prepareSlotEdits } from '#core/editor/components/slots'
 import { recordSubtreeEdit } from '#core/editor/components/slots/history'
+import { restoreSubtree, snapshotSubtree } from '#core/editor/history/subtree'
 import type { EditorContext } from '#core/editor/types'
 import {
   instanceOverrides,
   resetInstanceOverrides as resetInstanceOverridesInGraph
 } from '#core/figma-api/overrides'
-
-type InstanceCreateSnapshot = Partial<SceneNode> & { id: string }
-
-function createInstanceSnapshot(instance: SceneNode): InstanceCreateSnapshot {
-  const { childIds: _childIds, parentId: _parentId, type: _type, ...snapshot } = instance
-  return snapshot
-}
 
 /**
  * The overrides of the instances an instance holds, down to the first instance on each branch:
@@ -42,7 +36,6 @@ function nestedInstanceOverrides(
   visit(instanceId)
   return states
 }
-
 type DefaultInstancePlacement = {
   local: Vector
   world: Vector
@@ -110,13 +103,18 @@ export function createComponentInstanceActions(ctx: EditorContext) {
     }
 
     const instanceId = instance.id
-    const snapshot = createInstanceSnapshot(instance)
     ctx.setSelectedIds(new Set([instanceId]))
+    // Redo restores the layers the instance had, ids included, so overrides and links it took
+    // keep their targets; creating an instance again would make new ones.
+    const subtree = snapshotSubtree(ctx.graph, instanceId)
 
     ctx.undo.push({
       label: 'Create instance',
       forward: () => {
-        ctx.graph.createInstance(componentId, parentId, { ...snapshot })
+        if (!ctx.graph.getNode(instanceId)) {
+          const root = subtree.get(instanceId)
+          if (root) restoreSubtree(ctx.graph, root, parentId, subtree)
+        }
         ctx.setSelectedIds(new Set([instanceId]))
       },
       inverse: () => {

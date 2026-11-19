@@ -6,6 +6,7 @@ import { computeDescendantVisualBounds } from '@pairdraw/scene-graph/geometry'
 
 import { needsImagePreviews } from '#core/canvas/images/previews'
 import type { RenderOverlays, SkiaRenderer } from '#core/canvas/renderer'
+import { renderChildIds } from '#core/canvas/scene'
 import { playIslandRoots } from '#core/editor/play/islands'
 import type { EditorState } from '#core/editor/types'
 import { resolveEditorProfile } from '#core/editor/views/profile'
@@ -177,6 +178,17 @@ function canUseScenePicture(
   )
 }
 
+/** Whether the page has a visible mask among its own children, as a Figma file can. */
+function pageHasMask(r: SkiaRenderer, graph: SceneGraph): boolean {
+  const page = graph.getNode(r.pageId ?? graph.rootId)
+  return (
+    page?.childIds.some((childId) => {
+      const child = graph.getNode(childId)
+      return child?.visible === true && child.isMask
+    }) ?? false
+  )
+}
+
 function getSceneRenderPolicy(
   r: SkiaRenderer,
   graph: SceneGraph,
@@ -189,6 +201,7 @@ function getSceneRenderPolicy(
     sceneVersion === r.scenePictureVersion
   const requiresUncachedSceneRender =
     r.sceneScopeId !== null ||
+    pageHasMask(r, graph) ||
     r.viewportImageRendering ||
     interactive ||
     hasPositionPreview ||
@@ -425,9 +438,7 @@ function renderPageChildren(
   if (renderPageWithPreviews(r, canvas, graph, overlays)) return
   const pageNode = graph.getNode(r.pageId ?? graph.rootId)
   if (!pageNode) return
-  for (const childId of pageNode.childIds) {
-    r.renderNode(canvas, graph, childId, overlays)
-  }
+  renderChildIds(r, canvas, graph, pageNode.childIds, overlays, 0, 0, false)
 }
 
 function recordScenePicture(

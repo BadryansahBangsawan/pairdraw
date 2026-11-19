@@ -205,7 +205,7 @@ function opaqueFills(node: SceneNode): SceneNode {
   }
 }
 
-function renderChildIds(
+export function renderChildIds(
   r: SkiaRenderer,
   canvas: Canvas,
   graph: SceneGraph,

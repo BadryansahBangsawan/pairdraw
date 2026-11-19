@@ -1,0 +1,1 @@
+- Use as mask on several layers wraps them in a `Mask group` whose bottom layer masks the layers above it, at the page level as inside frames.

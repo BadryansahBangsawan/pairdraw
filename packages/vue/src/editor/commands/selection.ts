@@ -224,13 +224,7 @@ export function createSelectionCommands({
       },
       enabled: capabilities.canToggleMask,
       run: () => {
-        const target = selectedMaskTarget(editor.getSelectedNodes(), editor)
-        if (!target) return
-        editor.updateNodeWithUndo(
-          target.id,
-          { isMask: !target.isMask },
-          target.isMask ? 'Remove mask' : 'Use as mask'
-        )
+        editor.maskSelected()
       }
     },
     'selection.bringForward': {

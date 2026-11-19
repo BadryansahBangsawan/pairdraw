@@ -9,6 +9,7 @@ export function createStructureBridge(structure: StructureActions, selection: Se
   return {
     wrapInAutoLayout: () => structure.wrapInAutoLayout(selection.getSelectedNodes()),
     groupSelected: () => structure.groupSelected(selection.getSelectedNodes()),
+    maskSelected: () => structure.maskSelected(selection.getSelectedNodes()),
     frameSelection: () => structure.frameSelection(selection.getSelectedNodes()),
     booleanOperationSelected: (operation: 'UNION' | 'SUBTRACT' | 'INTERSECT' | 'EXCLUDE') =>
       structure.booleanOperationSelected(selection.getSelectedNodes(), operation),

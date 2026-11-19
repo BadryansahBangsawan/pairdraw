@@ -75,6 +75,56 @@ export function createStructureActions(ctx: EditorContext) {
     return wrapSelectionInContainer('GROUP', selectedNodes)
   }
 
+  /** How a mask toggles on one layer, as its own undo step. */
+  function toggleMask(node: SceneNode): void {
+    const next = !node.isMask
+    const changes = { isMask: next }
+    ctx.graph.updateNode(node.id, changes)
+    ctx.undo.push({
+      label: next ? 'Use as mask' : 'Remove mask',
+      forward: () => ctx.graph.updateNode(node.id, changes),
+      inverse: () => ctx.graph.updateNode(node.id, { isMask: !next })
+    })
+  }
+
+  /**
+   * Use as mask: one layer toggles its own mask; sibling layers are wrapped in a "Mask group"
+   * whose bottom layer masks the layers above it, as Figma does. One undo step.
+   */
+  function maskSelected(selectedNodes: SceneNode[]): boolean {
+    if (selectedNodes.length === 0) return false
+    if (selectedNodes.length === 1) {
+      toggleMask(selectedNodes[0])
+      return true
+    }
+    const parentId = selectedNodes[0]?.parentId
+    const parent = parentId ? ctx.graph.getNode(parentId) : undefined
+    const selected = new Set(selectedNodes.map((node) => node.id))
+    // The page's child order is the stack order, bottom first.
+    const stack = parent ? parent.childIds.filter((id) => selected.has(id)) : []
+    // Layers under different parents cannot share a group; the first one toggles, as before.
+    if (stack.length !== selectedNodes.length) {
+      toggleMask(selectedNodes[0])
+      return true
+    }
+    const [bottomId] = stack
+    const bottom = ctx.graph.getNode(bottomId)
+    if (!bottom) return false
+    // A mask already set on the bottom layer comes off, as the menu's Remove mask does.
+    if (bottom.isMask) {
+      toggleMask(bottom)
+      return true
+    }
+    let grouped = false
+    ctx.undo.runBatch('Use as mask', () => {
+      const group = wrapSelectionInContainer('GROUP', selectedNodes, { name: 'Mask group' })
+      if (!group) return
+      grouped = true
+      toggleMask(bottom)
+    })
+    return grouped
+  }
+
   /** Figma frames a selection without a fill or clipping, unlike a drawn frame. */
   function frameSelection(selectedNodes: SceneNode[]) {
     return wrapSelectionInContainer('FRAME', selectedNodes)
@@ -206,6 +256,7 @@ export function createStructureActions(ctx: EditorContext) {
     wrapSelectionInContainer,
     wrapInAutoLayout,
     groupSelected,
+    maskSelected,
     frameSelection,
     ...layerTypeActions,
     booleanOperationSelected,

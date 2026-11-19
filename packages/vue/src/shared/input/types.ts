@@ -131,6 +131,8 @@ export interface DragMove {
   selectOnClick?: string
   /** Where Control drops layers among an auto layout frame's children. */
   absoluteInsertIndex?: number
+  /** A selected layer a Shift-press on it deselects when it ends without a drag. */
+  clickDeselectsId?: string
 }
 
 export interface DragPan {

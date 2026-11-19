@@ -5,7 +5,7 @@ import { handleMoveMove, handleMoveUp } from '#vue/shared/input/move/drag'
 import {
   clickSelectsInside,
   createSelectionMoveDrag,
-  pressesSelection
+  selectedLayerHoldingPress
 } from '#vue/shared/input/select/move'
 
 import { createMoveHarness, type MoveHarness } from './harness'
@@ -166,7 +166,7 @@ describe('pressing inside the selection', () => {
     const nested = node('FRAME', outer.id, { x: 50, y: 50, width: 300, height: 300 })
     const child = node('RECTANGLE', nested.id, { x: 50, y: 50, width: 60, height: 60 })
     editor.select([nested.id])
-    expect(pressesSelection(child, 130, 130, editor)).toBe(true)
+    expect(selectedLayerHoldingPress(child, 130, 130, editor)).toBeDefined()
     // A click without dragging still selects the child of a frame.
     expect(clickSelectsInside(child, editor)).toBe(true)
   })
@@ -176,8 +176,8 @@ describe('pressing inside the selection', () => {
     const group = node('GROUP', page, { width: 160, height: 160 })
     const a = node('RECTANGLE', group.id, { width: 60, height: 60 })
     editor.select([a.id])
-    expect(pressesSelection(group, 20, 20, editor)).toBe(true)
-    expect(pressesSelection(group, 120, 120, editor)).toBe(false)
+    expect(selectedLayerHoldingPress(group, 20, 20, editor)).toBeDefined()
+    expect(selectedLayerHoldingPress(group, 120, 120, editor)).toBeUndefined()
     editor.select([group.id])
     expect(clickSelectsInside(a, editor)).toBe(false)
   })

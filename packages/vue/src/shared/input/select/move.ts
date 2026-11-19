@@ -3,7 +3,7 @@ import type { SceneNode } from '@pairdraw/scene-graph'
 
 import { duplicateAndDrag } from '#vue/shared/input/duplicate-drag'
 import { collectFlowDrags } from '#vue/shared/input/flow-reorder'
-import type { DragState } from '#vue/shared/input/types'
+import type { DragMove } from '#vue/shared/input/types'
 
 function isLockedInTree(id: string, editor: Editor) {
   for (
@@ -25,8 +25,8 @@ export function selectionIsLocked(editor: Editor) {
  * Whether pressing `hit` should drag the current selection, as in Figma: the hit lies inside a
  * selected layer, or a selected layer under the point lies inside the hit group or boolean.
  */
-export function pressesSelection(hit: SceneNode, cx: number, cy: number, editor: Editor) {
-  return [...editor.state.selectedIds].some((id) => {
+export function selectedLayerHoldingPress(hit: SceneNode, cx: number, cy: number, editor: Editor) {
+  return [...editor.state.selectedIds].find((id) => {
     if (id === hit.id) return false
     if (editor.graph.isDescendant(hit.id, id)) return true
     return editor.graph.isDescendant(id, hit.id) && editor.graph.isPointInNode(id, cx, cy)
@@ -113,7 +113,7 @@ export function createSelectionMoveDrag(
   sy: number,
   editor: Editor,
   duplicate: boolean
-): DragState {
+): DragMove {
   if (duplicate && editor.state.selectedIds.size > 0)
     return duplicateAndDrag(cx, cy, sx, sy, editor).drag
 
@@ -134,4 +134,16 @@ export function createSelectionMoveDrag(
     autoLayoutParentId: detectDragAutoLayoutParent(originals, editor),
     flows: collectFlowDrags(originals, editor)
   }
+}
+
+export function pressedSelectedLayer(
+  hit: SceneNode,
+  selects: boolean,
+  cx: number,
+  cy: number,
+  editor: Editor
+): string | undefined {
+  if (editor.state.selectedIds.has(hit.id)) return hit.id
+  if (selects) return undefined
+  return selectedLayerHoldingPress(hit, cx, cy, editor)
 }

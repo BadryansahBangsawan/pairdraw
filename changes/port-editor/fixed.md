@@ -3,3 +3,4 @@
 - Duplicating a layer inside an auto layout now places the copy in the flow and resizes a hugging parent, with undo and redo doing the same.
 - Duplicating slot content, dragging a layer into a slot, or reordering it now claims the slot in the same undo step as the edit.
 - A layer prop of the wrong kind, such as a name or a size that is not a number, is now reported and left out instead of reaching the layer, and one out of range is bounded.
+- Shift-dragging a selected layer now keeps it selected while it moves, and a Shift-click on it deselects it only when the press ends.

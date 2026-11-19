@@ -13,7 +13,8 @@ import { tryStartResize } from '#vue/shared/input/resize'
 import {
   createSelectionMoveDrag,
   clickSelectsInside,
-  pressesSelection,
+  pressedSelectedLayer,
+  selectedLayerHoldingPress,
   selectionIsLocked
 } from '#vue/shared/input/select/move'
 import { tryStartShapeHandleDrag } from '#vue/shared/input/shape-handles'
@@ -59,7 +60,7 @@ function startsDeepMarquee(
     !e.shiftKey &&
     !hit.locked &&
     !editor.state.selectedIds.has(hit.id) &&
-    !pressesSelection(hit, cx, cy, editor) &&
+    !selectedLayerHoldingPress(hit, cx, cy, editor) &&
     !hitTestLabel(cx, cy, fns) &&
     editor.graph.hitTestOpenContainer(cx, cy, scopeId)?.id === hit.id
   )
@@ -129,6 +130,44 @@ function selectInsideOnPress(hit: SceneNode, keepsSelection: boolean, editor: Ed
     editor.select([hit.id])
 }
 
+/** What a press on `hit` selects, and the drag it starts, as a layer press does. */
+function pressLayers(
+  hit: SceneNode,
+  e: MouseEvent,
+  cx: number,
+  cy: number,
+  sx: number,
+  sy: number,
+  editor: Editor,
+  setDrag: (d: DragState) => void
+): void {
+  const keepsSelection = !e.shiftKey && Boolean(selectedLayerHoldingPress(hit, cx, cy, editor))
+  // Shift-pressing a layer already selected keeps it selected to drag, and deselects it when the
+  // press ends without moving it, as in Figma.
+  const shiftPressedSelectedId = e.shiftKey
+    ? pressedSelectedLayer(hit, !keepsSelection, cx, cy, editor)
+    : undefined
+  if (!shiftPressedSelectedId) selectOnPress(hit, e.shiftKey, keepsSelection, editor)
+
+  if (!resolveEditorProfile(editor.state).edits) {
+    if (shiftPressedSelectedId) editor.select([shiftPressedSelectedId], true)
+    selectInsideOnPress(hit, keepsSelection, editor)
+    return
+  }
+  if (selectionIsLocked(editor)) {
+    if (shiftPressedSelectedId) editor.select([shiftPressedSelectedId], true)
+    return
+  }
+
+  const drag = createSelectionMoveDrag(cx, cy, sx, sy, editor, e.altKey)
+  drag.clickDeselectsId = shiftPressedSelectedId
+  // A click without dragging still selects a layer inside a selected frame; groups need a double-click.
+  if (keepsSelection && !editor.state.selectedIds.has(hit.id)) {
+    drag.selectOnClick = clickSelectsInside(hit, editor) ? hit.id : undefined
+  }
+  setDrag(drag)
+}
+
 export function handleSelectDown(
   e: MouseEvent,
   cx: number,
@@ -165,19 +204,5 @@ export function handleSelectDown(
     return
   }
 
-  const keepsSelection = !e.shiftKey && pressesSelection(hit, cx, cy, editor)
-  selectOnPress(hit, e.shiftKey, keepsSelection, editor)
-
-  if (!resolveEditorProfile(editor.state).edits) {
-    selectInsideOnPress(hit, keepsSelection, editor)
-    return
-  }
-  if (selectionIsLocked(editor)) return
-
-  const drag = createSelectionMoveDrag(cx, cy, sx, sy, editor, e.altKey)
-  // A click without dragging still selects a layer inside a selected frame; groups need a double-click.
-  if (drag.type === 'move' && keepsSelection && !editor.state.selectedIds.has(hit.id)) {
-    drag.selectOnClick = clickSelectsInside(hit, editor) ? hit.id : undefined
-  }
-  setDrag(drag)
+  pressLayers(hit, e, cx, cy, sx, sy, editor, setDrag)
 }

@@ -113,7 +113,6 @@ export function createReloadActions({
       const snapshot = captureReloadState(state)
       load.update({ phase: 'reading', detail: state.documentName })
       const imported = await readReloadSource({
-        documentName: state.documentName,
         filePath: getFilePath(),
         fileHandle: getFileHandle(),
         signal: load.signal

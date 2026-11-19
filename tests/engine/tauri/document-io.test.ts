@@ -21,7 +21,6 @@ describe('Tauri document IO helpers', () => {
     })
 
     const document = await readReloadSource({
-      documentName: 'document',
       filePath: '/tmp/document.fig',
       fileHandle: null
     })

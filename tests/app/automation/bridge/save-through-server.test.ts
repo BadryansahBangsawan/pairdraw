@@ -7,7 +7,7 @@ import { endAgentSession } from '@/app/automation/agents'
 import { makeFigmaFromStore } from '@/app/automation/bridge/figma-factory'
 import { createAutomationCommandHandlers } from '@/app/automation/bridge/handlers'
 import { automationFiles } from '@/app/automation/bridge/server'
-import { createTab, getActiveStore } from '@/app/tabs'
+import { createTab, getActiveStore, getTabsSnapshot } from '@/app/tabs'
 
 import { asDouble } from '#tests/helpers/doubles'
 
@@ -88,5 +88,22 @@ describe('saving a server-opened document without a path', () => {
     await expect(
       handleRequest(getActiveStore(), 'save_file', { document_id: tab.id })
     ).rejects.toThrow('has not been saved to a file yet')
+  })
+
+  test('a document created at a path keeps saving there without one', async () => {
+    const fetch = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('{}'))
+    await handleRequest(getActiveStore(), 'new_document', {
+      path: '/root/draft.fig'
+    })
+    expect(fetch.mock.calls[0]?.[0].toString()).toBe('http://mcp.test/files//root/draft.fig')
+
+    // The new document is the active tab; the reply's id names the window.
+    const tab = getTabsSnapshot().find((entry) => entry.store === getActiveStore())
+    expect(tab?.store.state.documentName).toBe('draft')
+    tab?.store.createShape('RECTANGLE', 0, 0, 10, 10)
+    await handleRequest(getActiveStore(), 'save_file', {})
+
+    expect(fetch.mock.calls[1]?.[0].toString()).toBe('http://mcp.test/files//root/draft.fig')
+    expect(tab?.store.hasUnsavedChanges()).toBe(false)
   })
 })

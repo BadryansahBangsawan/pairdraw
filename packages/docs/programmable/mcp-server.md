@@ -227,7 +227,7 @@ Security defaults:
 - Authentication is enabled by default with a generated token stored in the private discovery file.
 - `eval` is disabled.
 - File operations are limited to `PAIRDRAW_MCP_ROOT` (defaults to the current working directory) and reject symlink escapes.
-- The browser app reaches those files through the server: `open_file` reads one, and `save_file` or `new_document` with a path writes a copy, so a document opened in the browser keeps saving where it did before.
+- The browser app reaches those files through the server: `open_file` reads one, `save_file` with a path (or `new_document` with one) writes a copy there, and `save_file` without a path writes a document opened through the server back to its own file.
 - Only the desktop app's own origin (`tauri://localhost` and its `http(s)://tauri.localhost` variants) is allowed by default, so a server you start yourself works from the app without extra configuration. Set `PAIRDRAW_MCP_CORS_ORIGIN` to a comma-separated list to allow other origins, such as a worktree dev server.
 
 Set `PORT=0` to disable TCP on macOS and Linux. Windows requires TCP. Set `PAIRDRAW_MCP_SOCKET` to override the Unix socket path, or `PAIRDRAW_MCP_DISCOVERY_PATH` to override the discovery file location. To provide a stable token, set `PAIRDRAW_MCP_AUTH_TOKEN`; an explicitly empty value disables authentication and should only be used with a trusted local socket.

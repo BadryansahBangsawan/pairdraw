@@ -16,6 +16,7 @@ import {
   type AutomationTarget
 } from '@/app/automation/bridge/target'
 import { resolveBrowserFileURL } from '@/app/document/io/browser'
+import { documentNameFromFigPath } from '@/app/document/io/names'
 import { openBrowserFileFromURL } from '@/app/shell/menu/files'
 import { openFileFromPath } from '@/app/shell/menu/use'
 import {
@@ -157,6 +158,13 @@ export function createFileHandlers(files?: AutomationFiles) {
     if (path) {
       try {
         await saveWithoutPrompt(tab.store, path)
+        // A browser's copy does not retarget the source; a document created at a path keeps
+        // saving there, so adopt the server URL it was written to as its own.
+        if (files && !isTauri()) {
+          const name = documentNameFromFigPath(path)
+          tab.store.setDocumentSource(name, 'fig', undefined, files.url(path).href)
+          tab.store.state.documentName = name
+        }
       } catch (error) {
         await closeTab(tab.id, 'discard')
         throw error

@@ -1,0 +1,4 @@
+- Pen anchors land on the pixel grid like the shape tools, so a path drawn at a fractional point starts on a whole coordinate.
+- The prototype preview bar stays above the letterbox and the scrim, so its buttons can be clicked on a letterboxed frame.
+- An agent's `viewport_get` and `viewport_set`, a paste without a cursor, and the menu zoom use the canvas's middle instead of the window's.
+- A guide dragged from the ruler lands on a whole pixel.

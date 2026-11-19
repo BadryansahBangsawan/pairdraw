@@ -53,10 +53,11 @@ export function createGuideInput({
     return editor.state.currentPageId
   }
 
+  /** Where the guide lands: a whole canvas pixel, as Figma's guides do. */
   function positionFor(ownerId: string, axis: DragGuide['axis'], cx: number, cy: number) {
     const owner = editor.graph.getNode(ownerId)
     const local = owner && owner.type !== 'CANVAS' ? canvasToLocal(cx, cy, owner.id) : null
-    return axis === 'x' ? (local?.lx ?? cx) : (local?.ly ?? cy)
+    return Math.round(axis === 'x' ? (local?.lx ?? cx) : (local?.ly ?? cy))
   }
 
   function cursor(axis: DragGuide['axis']) {

@@ -36,7 +36,7 @@ import {
   type StorageDocument,
   type StorageLocation
 } from '@/app/integrations/storage'
-import type { RecentDocument } from '@/app/recent-files'
+import { isCancelledOpen, type RecentDocument } from '@/app/recent-files'
 import {
   matchingRecentFiles,
   openRecentDocument,
@@ -240,7 +240,9 @@ async function openEach<Document>(
     try {
       await open(document)
     } catch (error) {
-      failures.push(error instanceof Error ? error.message : String(error))
+      // A cancelled open is not a failure to report: its tab closed or its picker was dismissed.
+      if (!isCancelledOpen(error))
+        failures.push(error instanceof Error ? error.message : String(error))
     }
   }
   openError.value = failures.length ? failures.join('\n') : null

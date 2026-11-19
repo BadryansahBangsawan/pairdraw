@@ -12,6 +12,7 @@ import { openFileFromPath } from '@/app/shell/menu/use'
 import { activeStorageLocation, createStorageWorkspaceSource } from '@/app/storage/workspace/source'
 import { openStorageDocumentInNewTab } from '@/app/tabs'
 
+import { isCancelledOpen } from './failure'
 import { forgetRecentDocument, recentFiles, type RecentDocument } from './store'
 import { loadRecentFileThumbnail } from './thumbnails'
 
@@ -87,7 +88,7 @@ export async function openRecentDocument(
       location
     )
   } catch (error) {
-    forgetRecentDocument(document.id)
+    if (!isCancelledOpen(error)) forgetRecentDocument(document.id)
     throw error
   }
 }

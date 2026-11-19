@@ -1,0 +1,1 @@
+- A recent file stays in Recent files when opening it is cancelled, so it can be opened again.

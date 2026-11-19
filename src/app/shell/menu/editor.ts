@@ -1,7 +1,12 @@
 import { useEditorCommands, type EditorCommandId } from '@pairdraw/vue/editor/commands'
 
 import { useEditorStore } from '@/app/editor/active-store'
-import { clearRecentFiles, forgetRecentFile, recentLocalFileAt } from '@/app/recent-files'
+import {
+  clearRecentFiles,
+  forgetRecentFile,
+  recentLocalFileAt,
+  isCancelledOpen
+} from '@/app/recent-files'
 import { runFocusedCommand } from '@/app/shell/commands/focused'
 import { createSharedEditorMenuActions } from '@/app/shell/menu/actions/editor'
 import { createSelectionMenuActions } from '@/app/shell/menu/actions/selection'
@@ -81,7 +86,7 @@ export function useEditorMenu() {
       const path = Number.isInteger(index) ? recentLocalFileAt(index) : null
       if (path) {
         void openFileFromPath(path).catch((error) => {
-          forgetRecentFile(path)
+          if (!isCancelledOpen(error)) forgetRecentFile(path)
           console.warn('[Recent files] Failed to open file', error)
         })
       }

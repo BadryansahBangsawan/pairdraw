@@ -8,7 +8,7 @@ function clearRetainedSceneState(r: SkiaRenderer): void {
   r.scenePicture?.delete()
   r.sceneBacking?.image.delete()
   r.sceneBacking = null
-  r.sceneBackingBuild?.surface.delete()
+  r.sceneBackingBuild?.surface.dispose()
   r.sceneBackingBuild = null
 }
 
@@ -63,6 +63,7 @@ export function destroyRenderer(r: SkiaRenderer): void {
   r.valueFont?.delete()
   r.sectionTitleFont?.delete()
   r.componentLabelFont?.delete()
+  r.hudFont?.delete()
   r.fontMgr?.delete()
   const fontProvider = r.fontProvider
   r.fontProvider = null
@@ -94,5 +95,5 @@ export function destroyRenderer(r: SkiaRenderer): void {
   clearRetainedSceneState(r)
   r._flashPaint?.delete()
   r.profiler.destroy()
-  r.surface.delete()
+  r.surface.dispose()
 }

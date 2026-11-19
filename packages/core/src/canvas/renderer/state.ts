@@ -11,7 +11,7 @@ export function invalidateScenePicture(r: SkiaRenderer): void {
   r.scenePictureFontGeneration = -1
   r.sceneBacking?.image.delete()
   r.sceneBacking = null
-  r.sceneBackingBuild?.surface.delete()
+  r.sceneBackingBuild?.surface.dispose()
   r.sceneBackingBuild = null
 }
 

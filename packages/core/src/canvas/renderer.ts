@@ -134,6 +134,8 @@ export class SkiaRenderer {
   valueFont: Font | null = null
   sectionTitleFont: Font | null = null
   componentLabelFont: Font | null = null
+  /** The profiler HUD's text, made with the other chrome fonts and freed with them. */
+  hudFont: Font | null = null
   fontMgr: FontMgr | null = null
   fontProvider: TypefaceFontProvider | null = null
   fontsLoaded = false
@@ -476,7 +478,7 @@ export class SkiaRenderer {
     this.tiledScene.destroy()
     // Live textures belong to the old surface's context, so they go before it does.
     releaseLiveImages(this)
-    this.surface.delete()
+    this.surface.dispose()
     this.surface = surface
     this.sceneBackingAllocationFailed = false
     this.invalidateScenePicture()

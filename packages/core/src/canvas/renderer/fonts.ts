@@ -11,6 +11,7 @@ import {
   COMPONENT_LABEL_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  HUD_FONT_SIZE,
   LABEL_FONT_SIZE,
   SECTION_TITLE_FONT_FAMILY,
   SECTION_TITLE_FONT_SIZE,
@@ -149,17 +150,24 @@ export async function loadFonts(
   if (fontData) {
     const typeface = r.ck.Typeface.MakeFreeTypeFaceFromData(fontData)
     if (typeface) {
-      r.textFont?.delete()
-      r.labelFont?.delete()
-      r.sizeFont?.delete()
-      r.sectionTitleFont?.delete()
-      r.componentLabelFont?.delete()
-      r.textFont = new r.ck.Font(typeface, DEFAULT_FONT_SIZE)
-      r.labelFont = new r.ck.Font(typeface, LABEL_FONT_SIZE)
-      r.sizeFont = new r.ck.Font(typeface, SIZE_FONT_SIZE)
-      r.sectionTitleFont = new r.ck.Font(typeface, SECTION_TITLE_FONT_SIZE)
-      r.componentLabelFont = new r.ck.Font(typeface, COMPONENT_LABEL_FONT_SIZE)
-      r.profiler.setTypeface(typeface)
+      try {
+        r.textFont?.delete()
+        r.labelFont?.delete()
+        r.sizeFont?.delete()
+        r.sectionTitleFont?.delete()
+        r.componentLabelFont?.delete()
+        r.hudFont?.delete()
+        r.textFont = new r.ck.Font(typeface, DEFAULT_FONT_SIZE)
+        r.labelFont = new r.ck.Font(typeface, LABEL_FONT_SIZE)
+        r.sizeFont = new r.ck.Font(typeface, SIZE_FONT_SIZE)
+        r.sectionTitleFont = new r.ck.Font(typeface, SECTION_TITLE_FONT_SIZE)
+        r.componentLabelFont = new r.ck.Font(typeface, COMPONENT_LABEL_FONT_SIZE)
+        r.hudFont = new r.ck.Font(typeface, HUD_FONT_SIZE)
+        r.profiler.setFont(r.hudFont)
+      } finally {
+        // The fonts hold their own references to the face.
+        typeface.delete()
+      }
     }
     r.fontMgr = r.ck.FontMgr.FromData(fontData) ?? null
   }

@@ -44,6 +44,7 @@ function createRenderer() {
     sizeFont: deletable<Font>(),
     sectionTitleFont: deletable<Font>(),
     componentLabelFont: deletable<Font>(),
+    hudFont: deletable<Font>(),
     fontMgr: null,
     fontProvider: null,
     fontsLoaded: true,
@@ -71,7 +72,7 @@ function createRenderer() {
     labelParagraphCache: asDouble<SkiaRenderer['labelParagraphCache']>({ clear: mock() }),
     _flashPaint: null,
     profiler: { destroy: mock() } as Partial<SkiaRenderer['profiler']> as SkiaRenderer['profiler'],
-    surface: deletable<Surface>()
+    surface: asDouble<Surface>({ dispose: mock() })
   }
   return asRenderer(renderer)
 }
@@ -83,12 +84,12 @@ test('destroyRenderer releases tiled resources before deleting the main surface'
     teardown.push('text')
   })
   renderer.tiledScene.destroy = mock(() => teardown.push('tiled'))
-  renderer.surface.delete = mock(() => teardown.push('surface')) as typeof renderer.surface.delete
+  renderer.surface.dispose = mock(() => teardown.push('surface'))
 
   destroyRenderer(renderer)
 
   expect(renderer.tiledScene.destroy).toHaveBeenCalledTimes(1)
-  expect(renderer.surface.delete).toHaveBeenCalledTimes(1)
+  expect(renderer.surface.dispose).toHaveBeenCalledTimes(1)
   expect(teardown).toEqual(['text', 'tiled', 'surface'])
 })
 
@@ -96,6 +97,7 @@ test('destroyRenderer deletes all renderer-owned paints and label fonts', () => 
   const renderer = createRenderer()
   const sectionTitleFont = renderer.sectionTitleFont
   const componentLabelFont = renderer.componentLabelFont
+  const hudFont = renderer.hudFont
   const pencilStrokePaint = renderer.pencilStrokePaint
 
   destroyRenderer(renderer)
@@ -103,4 +105,5 @@ test('destroyRenderer deletes all renderer-owned paints and label fonts', () => 
   expect(pencilStrokePaint.delete).toHaveBeenCalled()
   expect(sectionTitleFont?.delete).toHaveBeenCalled()
   expect(componentLabelFont?.delete).toHaveBeenCalled()
+  expect(hudFont?.delete).toHaveBeenCalled()
 })

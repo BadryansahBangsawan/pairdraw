@@ -90,7 +90,7 @@ function resizeImage(
   const snapshot = surface.makeImageSnapshot()
   const encoded = encodePNG(ck, snapshot)
   snapshot.delete()
-  surface.delete()
+  surface.dispose()
   ck.Free(pixels)
   return encoded
 }

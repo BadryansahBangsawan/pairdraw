@@ -1,4 +1,4 @@
-import type { CanvasKit, Canvas, Paint, Font, Typeface } from 'canvaskit-wasm'
+import type { CanvasKit, Canvas, Paint, Font } from 'canvaskit-wasm'
 
 import type { FrameStats } from './frame/stats'
 
@@ -32,6 +32,8 @@ export class HudRenderer {
   private budgetLinePaint: Paint
   private graphBgPaint: Paint
   private hudFont: Font
+  /** Draws the HUD until the renderer lends it the chrome face. */
+  private readonly fallbackFont: Font
 
   constructor(private ck: CanvasKit) {
     this.bgPaint = new ck.Paint()
@@ -81,12 +83,13 @@ export class HudRenderer {
     this.graphBgPaint.setColor(ck.Color4f(0.05, 0.05, 0.05, 0.5))
     this.graphBgPaint.setAntiAlias(true)
 
-    this.hudFont = new ck.Font(null, 10)
+    this.fallbackFont = new ck.Font(null, 10)
+    this.hudFont = this.fallbackFont
   }
 
-  setTypeface(typeface: Typeface): void {
-    this.hudFont.delete()
-    this.hudFont = new this.ck.Font(typeface, 10)
+  /** Draws with `font`, which its owner deletes. */
+  setFont(font: Font): void {
+    this.hudFont = font
   }
 
   draw(canvas: Canvas, stats: FrameStats, phases: Map<string, number>, showRulers: boolean): void {
@@ -264,6 +267,6 @@ export class HudRenderer {
     this.gpuPaint.delete()
     this.budgetLinePaint.delete()
     this.graphBgPaint.delete()
-    this.hudFont.delete()
+    this.fallbackFont.delete()
   }
 }

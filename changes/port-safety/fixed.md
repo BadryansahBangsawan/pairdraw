@@ -5,3 +5,4 @@
 - Deeply nested layers and layers whose children link back to a parent flatten without overflowing the stack or repeating a subtree.
 - Diagnostics keep the file name of a built chunk, hash included, in a stack frame from the app's own origin, so an error report still finds its source map, while a chunk-shaped key elsewhere stays redacted.
 - Undo steps past the history limit are freed again, and a document that is never saved no longer pins its history, so a long session keeps its memory bounded.
+- Surfaces and the profiler's font are freed on replacement and teardown, so a long session that switches surfaces keeps handing their pixel buffers back.

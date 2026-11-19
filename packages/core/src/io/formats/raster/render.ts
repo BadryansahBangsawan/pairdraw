@@ -263,7 +263,7 @@ function renderToSurface(
     ck.Free(downsamplePixels)
     return resultBytes
   } finally {
-    surface.delete()
+    surface.dispose()
     ck.Free(pixels)
   }
 }

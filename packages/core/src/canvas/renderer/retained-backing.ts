@@ -404,7 +404,7 @@ function installSceneBackingImage(
 }
 
 function cancelSceneBackingBuild(r: SkiaRenderer): void {
-  r.sceneBackingBuild?.surface.delete()
+  r.sceneBackingBuild?.surface.dispose()
   r.sceneBackingBuild = null
 }
 
@@ -480,7 +480,7 @@ function stepSceneBackingBuild(r: SkiaRenderer, sceneVersion: number): boolean {
     build.surface.flush()
     image = build.surface.makeImageSnapshot()
   } finally {
-    build.surface.delete()
+    build.surface.dispose()
     r.sceneBackingBuild = null
   }
   installSceneBackingImage(r, image, build.sceneVersion, build.positionPreviewVersion, backing)
@@ -524,7 +524,7 @@ function recordSceneBacking(r: SkiaRenderer, graph: SceneGraph, sceneVersion: nu
       clamp(recordMs, 1, 1_000)
     )
   } finally {
-    surface.delete()
+    surface.dispose()
   }
 }
 
@@ -537,7 +537,7 @@ export function renderSceneBacking(
   if (r.sceneBackingAllocationFailed) return false
   const navigationActive = r.navigationPhase !== 'idle'
   if (navigationActive && r.sceneBacking) {
-    r.sceneBackingBuild?.surface.delete()
+    r.sceneBackingBuild?.surface.dispose()
     r.sceneBackingBuild = null
     r.sceneBackingNeedsCrispRender = true
     return drawSceneBacking(r, canvas, sceneVersion, true, graph.positionPreviewVersion)

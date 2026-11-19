@@ -7,7 +7,7 @@ import { SkiaRenderer } from '#core/canvas/renderer'
 import { asDouble, asRenderer } from './helpers'
 
 function surface() {
-  return { delete: mock() } as Surface & { delete: ReturnType<typeof mock> }
+  return asDouble<Surface>({ dispose: mock() })
 }
 
 describe('renderer surface replacement', () => {
@@ -34,7 +34,7 @@ describe('renderer surface replacement', () => {
     renderer.replaceSurface.call(asRenderer(renderer), next)
 
     expect(renderer.tiledScene.destroy).toHaveBeenCalledTimes(1)
-    expect(previous.delete).toHaveBeenCalledTimes(1)
+    expect(previous.dispose).toHaveBeenCalledTimes(1)
     expect(renderer.surface).toBe(next)
     expect(renderer.sceneBackingAllocationFailed).toBe(false)
     expect(renderer.invalidateScenePicture).toHaveBeenCalledTimes(1)

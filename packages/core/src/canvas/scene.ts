@@ -669,7 +669,7 @@ export function renderShape(
       }
       return
     } finally {
-      surface.delete()
+      surface.dispose()
     }
   }
 

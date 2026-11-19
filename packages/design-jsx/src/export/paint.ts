@@ -270,9 +270,14 @@ function effectShorthand(effects: ShadowEffect[]): JSXProp[] | null {
   return props
 }
 
+/** An effect JSX has a helper for; an imported one the modeller lacks, such as noise, has none. */
+function hasJSXHelper(effect: Effect): effect is ShadowEffect {
+  return Object.hasOwn(EFFECT_HELPERS, effect.type)
+}
+
 export function collectEffectProps(node: SceneNode, props: JSXProp[]): void {
-  // A shader effect has no JSX helper yet; leaving it out keeps the source importable.
-  const effects = node.effects.filter((effect): effect is ShadowEffect => effect.type !== 'SHADER')
+  // An effect without a helper cannot be written as JSX; leaving it out keeps the source importable.
+  const effects = node.effects.filter(hasJSXHelper)
   if (effects.length === 0) return
   props.push(...(effectShorthand(effects) ?? [['effects', effects.map(effectValue)]]))
 }

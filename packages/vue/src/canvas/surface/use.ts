@@ -74,6 +74,7 @@ export function useCanvas(
   return {
     render: surface.markDirty,
     renderNow: surface.renderNow,
+    getRenderer: surface.getRenderer,
     hitTestSectionTitle,
     hitTestComponentLabel,
     hitTestFrameTitle,

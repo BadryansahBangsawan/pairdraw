@@ -136,7 +136,6 @@ watch(
 )
 
 const { updateCursor } = useCanvasCollaborationAwareness(store)
-const { selectAtContextPoint } = createCanvasContextSelection(canvasRef, store)
 
 const shouldSuspendRender = () =>
   store.state.preparation !== null &&
@@ -189,24 +188,30 @@ useCanvas(sceneCanvasRef, store, {
   },
   onNodeDrawFailure: reportCanvasDrawFailure
 })
-const { hitTestSectionTitle, hitTestComponentLabel, hitTestFrameTitle, hitTestStatusLabel } =
-  useCanvas(canvasRef, store, {
-    layer: 'overlays',
-    // Drawn at the scene canvas's density, so the two layers line up.
-    maxPixelRatio: appRuntimeConfig.maxPixelRatio,
-    // The scene canvas reports a canvas that cannot start.
-    onFailed: () => undefined,
-    get showRulers() {
-      return appRuntimeConfig.showRulers && store.state.showRulers && paneProfile.value.editChrome
-    },
-    shouldSuspendRender,
-    getRenderState,
-    onViewportResize,
-    onContextLost: () => {
-      canvasEpoch.value += 1
-    },
-    onNodeDrawFailure: reportCanvasDrawFailure
-  })
+const {
+  getRenderer: getOverlayRenderer,
+  hitTestSectionTitle,
+  hitTestComponentLabel,
+  hitTestFrameTitle,
+  hitTestStatusLabel
+} = useCanvas(canvasRef, store, {
+  layer: 'overlays',
+  // Drawn at the scene canvas's density, so the two layers line up.
+  maxPixelRatio: appRuntimeConfig.maxPixelRatio,
+  // The scene canvas reports a canvas that cannot start.
+  onFailed: () => undefined,
+  get showRulers() {
+    return appRuntimeConfig.showRulers && store.state.showRulers && paneProfile.value.editChrome
+  },
+  shouldSuspendRender,
+  getRenderState,
+  onViewportResize,
+  onContextLost: () => {
+    canvasEpoch.value += 1
+  },
+  onNodeDrawFailure: reportCanvasDrawFailure
+})
+const { selectAtContextPoint } = createCanvasContextSelection(canvasRef, store, getOverlayRenderer)
 const {
   cursorOverride,
   canvasLabelEdit,

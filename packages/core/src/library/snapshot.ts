@@ -30,6 +30,15 @@ function assetKey(node: SceneNode): string {
   return key
 }
 
+/**
+ * The asset a reference to a component publishes as. A variant is part of its set's asset, never an
+ * asset of its own, so an instance of a variant depends on the set, as a Figma library records it.
+ */
+function referencedAssetKey(graph: SceneGraph, node: SceneNode): string {
+  const parent = node.parentId ? graph.getNode(node.parentId) : undefined
+  return assetKey(parent?.type === 'COMPONENT_SET' && !existingAssetKey(node) ? parent : node)
+}
+
 function collectNodeClosure(graph: SceneGraph, rootIds: string[]): Set<string> {
   const ids = new Set<string>()
   const pending = [...rootIds]
@@ -181,7 +190,7 @@ export function canonicalLibraryNode(
   const component = node.componentId ? graph.getNode(node.componentId) : undefined
   const dependencyKey =
     component?.type === 'COMPONENT' || component?.type === 'COMPONENT_SET'
-      ? assetKey(component)
+      ? referencedAssetKey(graph, component)
       : null
   const dependency =
     component && dependencyKey && !dependencyStack.has(component.id)

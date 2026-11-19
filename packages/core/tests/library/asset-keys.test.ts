@@ -31,4 +31,17 @@ describe('asset keys a library gives from component names', () => {
     ])
     expect(graph.getNode(figma.id)?.componentKey).toBeNull()
   })
+
+  test('gives a name key when the only identity is the file node id', () => {
+    const graph = new SceneGraph()
+    const page = graph.getPages()[0]
+    const set = graph.createNode('COMPONENT_SET', page.id, { name: 'Badge' })
+    graph.updateNode(set.id, { source: { ...set.source, id: set.id } })
+
+    const [assignment] = ensureLibraryAssetKeys(graph)
+
+    // A file node id names a node in one file, not the asset a revision publishes.
+    expect(assignment).toEqual({ nodeId: set.id, assetKey: 'badge', existing: false })
+    expect(graph.getNode(set.id)?.componentKey).toBe('badge')
+  })
 })

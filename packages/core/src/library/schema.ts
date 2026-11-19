@@ -12,7 +12,7 @@ const serializedNodeShapeSchema = v.looseObject({
   type: v.string(),
   parentId: v.nullable(v.string()),
   childIds: v.array(v.string()),
-  // Asset keys fall back to `source.id`, which is null for nodes that never came from a file.
+  // Nodes carry their file source, which is null for nodes that never came from a file.
   source: v.looseObject({ id: v.nullable(v.string()) })
 })
 

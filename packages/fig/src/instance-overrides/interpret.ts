@@ -4,7 +4,6 @@ import type { GUID } from '@pairdraw/kiwi/fig'
 import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 import { guidToString } from '@pairdraw/kiwi/fig/guid'
 
-import { cloneRecord } from '../node-change/clone'
 import { mergeVariableConsumptionMaps } from '../node-change/variable/bindings'
 import {
   bindSourceProperties,
@@ -13,14 +12,8 @@ import {
   type BoundPropertyClaim,
   type PropertyBinding
 } from './bindings/properties'
-import {
-  declareVariableBindingUnits,
-  declareSourceVariableBindingUnits
-} from './bindings/variables'
-import { invalidateInheritedPluginData } from './claimed-plugin-data'
-import { completeClearedStyleClaim } from './cleared-style'
-import { applyDerivedEntry } from './derived-symbol-data'
-import { COMPONENT_IDENTITY_FIELDS } from './fields'
+import { declareSourceVariableBindingUnits } from './bindings/variables'
+import { UNINHERITED_COMPONENT_FIELDS } from './fields'
 import {
   ownLayers,
   type AssignmentGroup,
@@ -28,13 +21,8 @@ import {
   type PropertyLayer,
   type StructuralLayer
 } from './layers'
-import {
-  findSegment,
-  isRootGuid,
-  pathError,
-  resolveOccurrencePath,
-  SegmentError
-} from './occurrence/path'
+import { applyDerivedBounds, applyPropertyClaims, createClaimContext } from './occurrence/claims'
+import { isRootGuid, pathError, SegmentError } from './occurrence/path'
 import type { InstanceOccurrence, InterpretInstanceOptions } from './occurrence/types'
 import { applyPlacedConstraints } from './resize'
 import { applyInstanceLayoutScale } from './scale/layout'
@@ -49,12 +37,7 @@ import {
   terminalComponent,
   type SourceIndex
 } from './source-index'
-import { invalidateInheritedTextData } from './text-provenance'
-import {
-  assignedSlotContent,
-  type ComponentPropAssignment,
-  type DerivedSymbolOverride
-} from './types'
+import { assignedSlotContent, type ComponentPropAssignment } from './types'
 
 /**
  * Figma's instance model reduces to three things: an instance expands its component's
@@ -112,10 +95,7 @@ function interpretRoot(
 ): InstanceOccurrence {
   const { sources, children } = index
   const expanding = new Set<string>()
-  /** Fields set by an owner's assignment, by the rank of that owner. */
-  const assignedFields = new WeakMap<InstanceOccurrence, Map<string, number>>()
-  /** Components an occurrence expanded before an outer decision replaced them. */
-  const replacedComponents = new WeakMap<InstanceOccurrence, readonly GUID[]>()
+  const claimContext = createClaimContext(index, options)
 
   const defaultInstanceName = (occurrence: InstanceOccurrence): string | undefined => {
     const source = sources.get(occurrence.sourceId)
@@ -236,90 +216,6 @@ function interpretRoot(
     return { effective, replaced, groups, descendant }
   }
 
-  const applyPropertyClaim = (
-    owner: InstanceOccurrence,
-    ownerRank: number,
-    target: InstanceOccurrence,
-    layer: PropertyLayer
-  ): void => {
-    // An outer owner's assignment supersedes this owner's explicit value for the same field.
-    const bound = assignedFields.get(target)
-    const retained = Object.fromEntries(
-      Object.entries(layer.props).filter(([field]) => {
-        const rank = bound?.get(field)
-        return rank === undefined || rank >= ownerRank
-      })
-    )
-    if (Object.keys(retained).length === 0) return
-    completeClearedStyleClaim(target, retained, sources.get(target.sourceId))
-    declareVariableBindingUnits(target, retained)
-    invalidateInheritedTextData(target.properties, retained)
-    invalidateInheritedPluginData(target.properties, retained)
-    Object.assign(
-      target.properties,
-      cloneRecord(retained),
-      mergeVariableConsumptionMaps(target.properties, retained as NodeChange)
-    )
-    if ('name' in retained) target.hasOwnName = true
-    owner.propertyClaims.push({
-      declaredBy: owner.sourceId,
-      path: structuredClone(layer.path),
-      properties: structuredClone(retained)
-    })
-  }
-
-  /**
-   * A claim that addressed a component an instance on its path no longer expands is
-   * stale, not wrong: some outer decision replaced that subtree after it was written.
-   */
-  const isRemovedTarget = (owner: InstanceOccurrence, path: readonly GUID[]): boolean => {
-    let current = owner
-    for (const [position, segment] of path.entries()) {
-      const rest = path.slice(position)
-      const replaced = replacedComponents.get(current) ?? []
-      if (replaced.some((component) => resolvesInSourceComponent(index, component, rest)))
-        return true
-      if (position === 0 && isRootGuid(current, segment)) continue
-      try {
-        current = findSegment(current, segment)
-      } catch (error) {
-        if (!(error instanceof SegmentError)) throw error
-        return false
-      }
-    }
-    return false
-  }
-
-  /** Resolve an owner's declared path in its built subtree, or decide how to skip it. */
-  const resolveClaimTarget = (
-    owner: InstanceOccurrence,
-    path: readonly GUID[]
-  ): InstanceOccurrence | undefined => {
-    try {
-      return resolveOccurrencePath(owner, path)
-    } catch (cause) {
-      if (!(cause instanceof SegmentError)) throw cause
-      const error = pathError(owner.sourceId, owner.mainComponentId, path, cause)
-      if (error.diagnostic.reason === 'missing-target' && isRemovedTarget(owner, path))
-        return undefined
-      if (!options.onUnresolvedProperty) throw error
-      options.onUnresolvedProperty(error.diagnostic)
-      return undefined
-    }
-  }
-
-  const applyDerivedBounds = (owner: InstanceOccurrence, source: NodeChange): void => {
-    if (!options.derivedBounds) return
-    const derived = source.derivedSymbolData as DerivedSymbolOverride[] | undefined
-    for (const entry of derived ?? []) {
-      const path = entry.guidPath?.guids
-      if (!path?.length) continue
-      const target = resolveClaimTarget(owner, path)
-      if (!target || target === owner) continue // Placed root bounds belong to its NodeChange.
-      applyDerivedEntry(target, entry)
-    }
-  }
-
   /** Bind the record's fields from the enclosing component scope, recording provenance. */
   const bindRecord = (
     raw: NodeChange,
@@ -387,8 +283,10 @@ function interpretRoot(
       else subtree = expandChildren(id, source, bindings, root.groups, root.descendant, rank)
       const occurrence = createOccurrence(id, raw, source, root, subtree, record.claims)
       if (record.slotContent) occurrence.slotContentId = record.slotContent
-      assignedFields.set(occurrence, record.bound)
-      if (subtree.base && root.replaced.length) replacedComponents.set(occurrence, root.replaced)
+      claimContext.assignedFields.set(occurrence, record.bound)
+      if (subtree.base && root.replaced.length) {
+        claimContext.replacedComponents.set(occurrence, root.replaced)
+      }
       declareSourceVariableBindingUnits(occurrence, source)
       const claims = subtree.dangling
         ? own.claims.filter(({ path }) => path.length === 1 && isRootGuid(occurrence, path[0]))
@@ -545,8 +443,8 @@ function interpretRoot(
       overrideKey: readOverrideKey(source.overrideKey),
       // The record is the top layer of its own root: its fields are placed state.
       properties: {
-        // The component's look carries over; its identity does not.
-        ...(base && omit(base.properties, COMPONENT_IDENTITY_FIELDS)),
+        // The component's look carries over; its identity and its place in its own parent do not.
+        ...(base && omit(base.properties, UNINHERITED_COMPONENT_FIELDS)),
         ...placed,
         ...(effective && source.symbolData
           ? { symbolData: { ...source.symbolData, symbolID: effective } }
@@ -576,10 +474,7 @@ function interpretRoot(
     rank: number,
     derived: boolean
   ): void => {
-    for (const claim of claims) {
-      const target = resolveClaimTarget(occurrence, claim.path)
-      if (target) applyPropertyClaim(occurrence, rank, target, claim)
-    }
+    applyPropertyClaims(claimContext, occurrence, rank, claims)
     applyInstanceLayoutScale(occurrence, source)
     applyPlacedConstraints(occurrence, base, source)
     if (source.type === 'INSTANCE' && source.size) {
@@ -589,7 +484,7 @@ function interpretRoot(
       // not replace.
       occurrence.derivedSize = structuredClone(source.size)
     }
-    if (derived) applyDerivedBounds(occurrence, source)
+    if (derived) applyDerivedBounds(claimContext, occurrence, source)
   }
 
   if (sources.get(rootId)?.type !== expectedType) {

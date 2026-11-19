@@ -3,10 +3,11 @@ import type { UndoManager } from '@pairdraw/scene-graph/undo'
 
 import {
   applyDocumentChange,
-  captureDocumentChange,
   isEmptyDocumentChange,
+  recordDocumentChange,
   restoreDocumentChange,
-  type DocumentChange
+  type DocumentChange,
+  type DocumentChangeRecorder
 } from '#core/editor/history/document-change'
 import type { EditorContext } from '#core/editor/types'
 
@@ -59,6 +60,40 @@ function unchanged(pageId: string): DocumentChange {
 /** How many edits that await are running in each history. */
 const runningEdits = new WeakMap<UndoManager, number>()
 
+/** The recorders of edits still open in each editor, which anyone else's edit waits outside. */
+const openRecorders = new WeakMap<EditorContext, Set<DocumentChangeRecorder>>()
+
+function keepOpenRecorder(ctx: EditorContext, recorder: DocumentChangeRecorder): void {
+  let recorders = openRecorders.get(ctx)
+  if (!recorders) {
+    recorders = new Set()
+    openRecorders.set(ctx, recorders)
+  }
+  recorders.add(recorder)
+}
+
+function releaseOpenRecorder(ctx: EditorContext, recorder: DocumentChangeRecorder): void {
+  const recorders = openRecorders.get(ctx)
+  if (!recorders) return
+  recorders.delete(recorder)
+  if (recorders.size === 0) openRecorders.delete(ctx)
+}
+
+/**
+ * Runs a separate edit, or an undo or redo, while the edits that are still open treat what it
+ * changes as someone else's: their steps leave it alone. The edit is synchronous, so nothing it
+ * runs interleaves with their awaits.
+ */
+function withOpenEditsPaused<T>(ctx: EditorContext, run: () => T, own?: DocumentChangeRecorder): T {
+  const recorders = [...(openRecorders.get(ctx) ?? [])].filter((recorder) => recorder !== own)
+  for (const recorder of recorders) recorder.pause()
+  try {
+    return run()
+  } finally {
+    for (const recorder of recorders) recorder.resume()
+  }
+}
+
 /**
  * Watches, while an edit awaits, for writes it does not own: a step recorded, undone, or redone,
  * another edit or a batch open, or text being edited. They land in the edit's change, so rolling
@@ -105,12 +140,14 @@ function rollBack(ctx: EditorContext, graph: SceneGraph, change: DocumentChange)
 function begin(ctx: EditorContext, options: RecordEditOptions, awaits = false) {
   const graph = ctx.graph
   const pageId = options.pageId ?? ctx.state.currentPageId
-  const finish = captureDocumentChange(graph, pageId)
+  const recorder = recordDocumentChange(graph, pageId)
+  if (awaits) keepOpenRecorder(ctx, recorder)
   // A synchronous edit runs alone; one that awaits shares the document while it waits.
   const othersWrote = awaits ? watchOtherWrites(ctx) : () => false
-  return (failed: boolean) => {
+  const finish = (failed: boolean) => {
+    if (awaits) releaseOpenRecorder(ctx, recorder)
     const others = othersWrote()
-    const change = finish()
+    const change = recorder.finish()
     const empty = isEmptyDocumentChange(change)
     if (
       failed &&
@@ -135,6 +172,7 @@ function begin(ctx: EditorContext, options: RecordEditOptions, awaits = false) {
     }
     options.onRecorded?.(change)
   }
+  return { finish, recorder }
 }
 
 /**
@@ -144,10 +182,11 @@ function begin(ctx: EditorContext, options: RecordEditOptions, awaits = false) {
  * edit, and joins a batch open around it.
  */
 export function recordEdit<T>(ctx: EditorContext, options: RecordEditOptions, run: () => T): T {
-  const finish = begin(ctx, options)
+  const { finish, recorder } = begin(ctx, options)
   let failed = true
   try {
-    const result = run()
+    // An edit that awaits meanwhile keeps what this one changes out of its step.
+    const result = withOpenEditsPaused(ctx, run, recorder)
     failed = false
     return result
   } finally {
@@ -171,7 +210,7 @@ export async function recordEditAsync<T>(
   run: () => Promise<T>
 ): Promise<T> {
   // Capturing can throw; the edit opens only once it has, so a failure never leaves it open.
-  const finish = begin(ctx, { ...options, ownStep: true }, true)
+  const { finish } = begin(ctx, { ...options, ownStep: true }, true)
   const close = ctx.undo.openEdit()
   let failed = true
   try {

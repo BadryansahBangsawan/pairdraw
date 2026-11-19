@@ -69,7 +69,11 @@ export async function applyPhoto(
 
   let results: StockPhotoResult[]
   try {
-    results = await provider.search(req.query, { perPage, orientation, targetDim })
+    // The download is not part of an enclosing edit: what someone else changes meanwhile stays
+    // out of its undo step.
+    results = await figma.graph.waitOutsideEdit(
+      provider.search(req.query, { perPage, orientation, targetDim })
+    )
   } catch (err) {
     return { id: req.id, error: err instanceof Error ? err.message : String(err) }
   }
@@ -79,9 +83,13 @@ export async function applyPhoto(
 
   let imageBytes: Uint8Array
   try {
-    const response = await fetch(photo.url)
-    if (!response.ok) return { id: req.id, error: `Download ${response.status}` }
-    imageBytes = new Uint8Array(await response.arrayBuffer())
+    imageBytes = await figma.graph.waitOutsideEdit(
+      (async () => {
+        const response = await fetch(photo.url)
+        if (!response.ok) throw new Error(`Download ${response.status}`)
+        return new Uint8Array(await response.arrayBuffer())
+      })()
+    )
   } catch (err) {
     return { id: req.id, error: `Download: ${err instanceof Error ? err.message : String(err)}` }
   }
@@ -89,7 +97,11 @@ export async function applyPhoto(
   const imageHash = storeImage(figma.graph, imageBytes)
   node.fills = [{ type: 'IMAGE', imageHash, scaleMode: 'FILL' }]
   // A missed report does not undo the photo the document already shows.
-  await provider.reportUse?.(photo).catch(() => undefined)
+  if (provider.reportUse) {
+    await figma.graph.waitOutsideEdit(
+      Promise.resolve(provider.reportUse(photo)).catch(() => undefined)
+    )
+  }
 
   return {
     id: node.id,

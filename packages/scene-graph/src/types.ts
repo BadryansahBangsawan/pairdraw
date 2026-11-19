@@ -41,6 +41,10 @@ export interface NodeChangeObserver {
   before: (node: SceneNode) => void
   /** A node was just added. */
   created: (node: SceneNode) => void
+  /** What changes from now until `resume` is someone else's; `waitOutsideEdit` calls this. */
+  pause?: () => void
+  /** The wait ended, and what changed meanwhile belongs outside the edit. */
+  resume?: () => void
 }
 
 export type DocumentColorSpace = 'srgb' | 'display-p3'

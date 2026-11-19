@@ -1,4 +1,4 @@
-import { compact, isEqual, uniq, xor } from 'es-toolkit'
+import { compact, isEqual, isPlainObject, uniq, xor } from 'es-toolkit'
 
 import type {
   FigmaSourcePayload,
@@ -244,13 +244,70 @@ function restoreRecords<T extends object>(
 }
 
 /**
- * Starts recording an edit made from `pageId`. Call the returned function once the edit is
- * done, also when it failed, to stop recording and get what the edit changed.
+ * A layer or record as it was before an edit, with what someone else changed on it while the edit
+ * waited, field by field: a field the edit had left alone takes the other writer's value, and one
+ * the edit had changed keeps the edit's, so its undo restores what it changed. Fields that map
+ * keys to values, such as variable bindings or a variable's values by mode, are adopted one level
+ * in, so independent entries of one field both survive.
+ */
+function adoptChanges<T extends object>(baseline: T, atPause: T, live: T, depth = 1): T {
+  const adopted = { ...baseline }
+  for (const key of new Set([...Object.keys(atPause), ...Object.keys(live)])) {
+    const paused: unknown = Reflect.get(atPause, key)
+    const now: unknown = Reflect.get(live, key)
+    const base: unknown = Reflect.get(baseline, key)
+    const pausedHas = Object.hasOwn(atPause, key)
+    const liveHas = Object.hasOwn(live, key)
+    if (pausedHas === liveHas && isEqual(paused, now)) continue
+    if (Object.hasOwn(baseline, key) === pausedHas && isEqual(base, paused)) {
+      if (liveHas) Reflect.set(adopted, key, structuredClone(now))
+      else Reflect.deleteProperty(adopted, key)
+    } else if (depth > 0 && isPlainObject(base) && isPlainObject(paused) && isPlainObject(now)) {
+      Reflect.set(adopted, key, adoptChanges(base, paused, now, depth - 1))
+    }
+  }
+  return adopted
+}
+
+/** As `adoptChanges` for a map of records, dropping a record someone else removed meanwhile. */
+function adoptRecords<T extends object>(
+  baseline: Map<string, T>,
+  atPause: Map<string, T>,
+  live: ReadonlyMap<string, T>
+): void {
+  for (const [id, paused] of atPause) {
+    const before = baseline.get(id)
+    if (!before) continue
+    const now = live.get(id)
+    if (!now) baseline.delete(id)
+    else if (isEqual(before, paused)) baseline.set(id, structuredClone(now))
+    else baseline.set(id, adoptChanges(before, paused, now))
+  }
+}
+
+/** What an edit changed in the document, once it is done; see `recordDocumentChange`. */
+export interface DocumentChangeRecorder {
+  /** Stops recording and returns what the edit changed. */
+  finish: () => DocumentChange
+  /** Treats what changes until `resume` as someone else's, as when the edit waits. */
+  pause: () => void
+  /** The wait ended: what changed meanwhile stays out of the edit's step. */
+  resume: () => void
+}
+
+/**
+ * Starts recording an edit made from `pageId`. Call `finish` once the edit is done, also when it
+ * failed, to stop recording and get what the edit changed.
  *
  * The page is copied up front, so values written into its layers in place are kept too. Another
  * page, or the document node, is copied the first time the edit is about to change it.
+ *
+ * While the edit waits (`pause`/`resume`, or `SceneGraph.waitOutsideEdit`), what changes is
+ * someone else's: a layer first touched meanwhile is not recorded, and one the edit had already
+ * copied is taken in from its new state field by field on resume, so an undo of the edit leaves
+ * the other writer's change alone.
  */
-export function captureDocumentChange(graph: SceneGraph, pageId: string): () => DocumentChange {
+export function recordDocumentChange(graph: SceneGraph, pageId: string): DocumentChangeRecorder {
   const captured = new Map<string, SceneNode>()
   const capturedPages = new Set([pageId])
   const created = new Set<string>()
@@ -259,9 +316,49 @@ export function captureDocumentChange(graph: SceneGraph, pageId: string): () => 
   const collections = structuredClone(graph.variableCollections)
   const impact = createSceneMutationImpact()
   const unbindEvents = recordSceneMutations(graph, impact)
+  let pausedDepth = 0
+  let layersAtPause = new Map<string, SceneNode>()
+  let variablesAtPause: Map<string, Variable> | null = null
+  let collectionsAtPause: Map<string, VariableCollection> | null = null
+
+  function pause(): void {
+    pausedDepth += 1
+    if (pausedDepth > 1) return
+    layersAtPause = new Map()
+    variablesAtPause = structuredClone(graph.variables)
+    collectionsAtPause = structuredClone(graph.variableCollections)
+  }
+
+  function resume(): void {
+    if (pausedDepth === 0) return
+    pausedDepth -= 1
+    if (pausedDepth > 0) return
+    for (const [id, atPause] of layersAtPause) {
+      const before = captured.get(id)
+      if (!before) continue
+      const live = graph.getNode(id)
+      // A layer someone else removed meanwhile is not the edit's to put back.
+      if (!live) captured.delete(id)
+      else captured.set(id, adoptChanges(before, atPause, live))
+    }
+    if (variablesAtPause) adoptRecords(variables, variablesAtPause, graph.variables)
+    if (collectionsAtPause) adoptRecords(collections, collectionsAtPause, graph.variableCollections)
+    layersAtPause = new Map()
+    variablesAtPause = null
+    collectionsAtPause = null
+  }
+
   const unobserve = graph.observeNodeChanges({
-    created: (node) => created.add(node.id),
+    created: (node) => {
+      if (pausedDepth === 0) created.add(node.id)
+    },
     before: (node) => {
+      // While the edit waits, layers belong to whoever else changes them.
+      if (pausedDepth > 0) {
+        const before = captured.get(node.id)
+        if (before && !layersAtPause.has(node.id)) layersAtPause.set(node.id, captureNode(node))
+        return
+      }
       if (captured.has(node.id) || created.has(node.id)) return
       const page = pageOf(graph.nodes, node.id)
       if (page && !capturedPages.has(page)) {
@@ -269,10 +366,14 @@ export function captureDocumentChange(graph: SceneGraph, pageId: string): () => 
         capturePage(graph, page, captured)
       }
       if (!captured.has(node.id)) captured.set(node.id, captureNode(node))
-    }
+    },
+    pause,
+    resume
   })
 
-  return () => {
+  const finish = (): DocumentChange => {
+    resume()
+    pausedDepth = 0
     unobserve()
     unbindEvents()
     const change: DocumentChange = {
@@ -312,6 +413,13 @@ export function captureDocumentChange(graph: SceneGraph, pageId: string): () => 
     change.children.before.sort(byDepth(captured))
     return change
   }
+
+  return { finish, pause, resume }
+}
+
+/** The change of one edit; `recordDocumentChange` when the edit can also wait. */
+export function captureDocumentChange(graph: SceneGraph, pageId: string): () => DocumentChange {
+  return recordDocumentChange(graph, pageId).finish
 }
 
 /** Where a layer sits: its page and the page's child holding it, null for a page or the root. */

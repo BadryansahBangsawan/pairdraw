@@ -80,6 +80,8 @@ export class SceneGraph {
   }
   private previewObservers: NodePreviewObserver[] = []
   private readonly changeObservers = new Set<NodeChangeObserver>()
+  /** How many waits outside the edit each recorder is paused for. */
+  private readonly outsideWaits = new Map<NodeChangeObserver, number>()
   private importedIdGenerator: (() => string) | undefined
   private layoutWrites: LayoutWrites | null = null
   positionPreviewVersion = 0
@@ -129,6 +131,7 @@ export class SceneGraph {
   }
 
   /**
+  /**
    * Runs `write`, a change someone else makes, such as a page the reader worker loaded or a
    * collaborator's arriving, outside every edit in progress: the recorders open now do not see
    * it, so none records it as its own. A recorder opened while the write runs is not paused.
@@ -140,6 +143,35 @@ export class SceneGraph {
       return write()
     } finally {
       for (const observer of paused) this.changeObservers.add(observer)
+    }
+  }
+
+  /**
+   * Waits for `promise`, such as a font or an image download an edit needs, outside the edit in
+   * progress: what changes meanwhile, such as the user's or a collaborator's edit, is not recorded
+   * as the waiting edit's. Only for code that writes nothing itself until the wait ends.
+   */
+  async waitOutsideEdit<T>(promise: Promise<T>): Promise<T> {
+    // A wait pauses the recorders open when it starts, and only those: a recorder opened by a
+    // later edit carries its own waits.
+    const waiting = [...this.changeObservers]
+    for (const observer of waiting) {
+      const waits = this.outsideWaits.get(observer) ?? 0
+      if (waits === 0) observer.pause?.()
+      this.outsideWaits.set(observer, waits + 1)
+    }
+    try {
+      return await promise
+    } finally {
+      for (const observer of waiting) {
+        const waits = (this.outsideWaits.get(observer) ?? 1) - 1
+        if (waits > 0) {
+          this.outsideWaits.set(observer, waits)
+          continue
+        }
+        this.outsideWaits.delete(observer)
+        if (this.changeObservers.has(observer)) observer.resume?.()
+      }
     }
   }
 

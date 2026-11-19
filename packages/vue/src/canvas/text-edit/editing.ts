@@ -171,6 +171,8 @@ export function createTextEditActions(store: Editor) {
     }
     editor.insert(text, node)
     syncText(node.id, editor.state?.text ?? '', runs)
+    const state = editor.state
+    if (state) store.captureInEditSnapshot(state)
   }
 
   type CompositionDraft = {
@@ -243,6 +245,12 @@ export function createTextEditActions(store: Editor) {
   }
 
   function finishComposition() {
+    // A committed composition is one typed change: record it as one undoable step, as insertText
+    // does for a keystroke. A cancelled one restored its base, which the last snapshot already holds.
+    const state = store.textEditor?.state
+    if (compositionDraft && state && state.text !== compositionDraft.baseText) {
+      store.captureInEditSnapshot(state)
+    }
     compositionDraft = null
   }
 
@@ -264,6 +272,8 @@ export function createTextEditActions(store: Editor) {
       editor.backspace(node)
     }
     syncText(node.id, editor.state?.text ?? '', runs)
+    const state = editor.state
+    if (state) store.captureInEditSnapshot(state)
   }
 
   return {

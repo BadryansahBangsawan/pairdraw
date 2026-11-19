@@ -1,0 +1,1 @@
+- Undo and redo work while editing text: ⌘Z steps back through the typing and restores the caret, ⇧⌘Z steps forward, an input method composition undoes as one step, and ⌘Z after leaving text edit reverts the whole edit as one step.

@@ -20,7 +20,8 @@ import {
   resizeTextNodeForEdit,
   snapshotTextNode,
   textSnapshotChanged,
-  type TextEditSession
+  type TextEditSession,
+  type TextEditSnapshot
 } from './text/session'
 import type { EditorContext } from './types'
 import { createVariableBindingActions } from './variable-bindings'
@@ -113,6 +114,75 @@ export function createTextActions(ctx: EditorContext) {
   const variableBindings = createVariableBindingActions(ctx)
 
   /**
+   * In-edit history for per-keystroke undo/redo while editing text.
+   * Stores full node state (text, styleRuns, textParagraphs, cursor, selectionAnchor).
+   */
+  let inEditHistory: (TextEditSnapshot & { cursor: number; selectionAnchor: number | null })[] = []
+  let inEditHistoryIndex = -1
+
+  function captureInEditSnapshot(textState: TextEditorState): void {
+    if (!activeSession) return
+    const node = ctx.graph.getNode(activeSession.nodeId)
+    if (!node) return
+    const snap = snapshotTextNode(node, textState.text)
+    const enriched = {
+      ...snap,
+      cursor: textState.cursor,
+      selectionAnchor: textState.selectionAnchor
+    }
+    if (inEditHistoryIndex < inEditHistory.length - 1) {
+      inEditHistory.splice(inEditHistoryIndex + 1)
+    }
+    inEditHistory.push(enriched)
+    inEditHistoryIndex = inEditHistory.length - 1
+    if (inEditHistory.length > 200) {
+      inEditHistory.shift()
+      inEditHistoryIndex--
+    }
+  }
+
+  /** Restores the snapshot the history index moved to, values and caret together. */
+  function restoreInEditSnapshot(): boolean {
+    const snap = inEditHistory[inEditHistoryIndex]
+    const nodeId = activeSession?.nodeId
+    if (!nodeId) return false
+    updateTextEditNode(nodeId, {
+      text: snap.text,
+      styleRuns: snap.styleRuns,
+      textParagraphs: snap.textParagraphs,
+      ...snap.size
+    })
+    const te = ctx.getTextEditor()
+    const node = ctx.graph.getNode(nodeId)
+    if (te && node) {
+      te.syncToNode(node)
+      const state = te.state
+      if (state) {
+        state.cursor = Math.min(snap.cursor, snap.text.length)
+        state.selectionAnchor = snap.selectionAnchor
+      }
+    }
+    return true
+  }
+
+  function undoInEdit(): boolean {
+    if (inEditHistoryIndex <= 0) return false
+    inEditHistoryIndex--
+    return restoreInEditSnapshot()
+  }
+
+  function redoInEdit(): boolean {
+    if (inEditHistoryIndex >= inEditHistory.length - 1) return false
+    inEditHistoryIndex++
+    return restoreInEditSnapshot()
+  }
+
+  function clearInEditHistory(): void {
+    inEditHistory = []
+    inEditHistoryIndex = -1
+  }
+
+  /**
    * Typing resizes auto-sized text and lays out its auto-layout ancestors as it goes, so a Hug
    * frame grows with its label while it is edited, as in Figma. A size in `changes`, measured
    * from the edit's own paragraph, wins over the measurement. A keystroke that leaves the text's
@@ -144,6 +214,8 @@ export function createTextActions(ctx: EditorContext) {
       te.setRenderer(ctx.getRenderer())
       te.start(node)
     }
+    clearInEditHistory()
+    if (te?.state) captureInEditSnapshot(te.state)
     ctx.requestRender()
   }
 
@@ -234,6 +306,7 @@ export function createTextActions(ctx: EditorContext) {
     const textState = te.state
     if (textState) recordTextEdit(textState)
     te.stop()
+    clearInEditHistory()
     ctx.state.editingTextId = null
     activeSession = null
     restore?.()
@@ -270,5 +343,14 @@ export function createTextActions(ctx: EditorContext) {
     ctx.requestRender()
   }
 
-  return { startTextEditing, updateTextEditNode, commitTextEdit, runTextEditStep }
+  return {
+    startTextEditing,
+    updateTextEditNode,
+    commitTextEdit,
+    runTextEditStep,
+    undoInEdit,
+    redoInEdit,
+    clearInEditHistory,
+    captureInEditSnapshot
+  }
 }

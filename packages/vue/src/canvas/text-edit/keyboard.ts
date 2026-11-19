@@ -31,6 +31,14 @@ export function createTextKeyDownHandler(options: TextKeyboardOptions) {
     KeyC: () => options.handleCopy(),
     KeyX: (node) => options.handleCut(node),
     KeyV: (node) => void options.handlePaste(node),
+    KeyZ: () => {
+      options.store.undoInEdit()
+      options.store.textSelectionChanged()
+    },
+    KeyY: () => {
+      options.store.redoInEdit()
+      options.store.textSelectionChanged()
+    },
     KeyB: (node) => options.toggleBold(node),
     KeyI: (node) => options.toggleItalic(node),
     KeyU: (node) => options.toggleUnderline(node)
@@ -38,6 +46,10 @@ export function createTextKeyDownHandler(options: TextKeyboardOptions) {
 
   // Figma's list shortcuts: ⌘⇧8 for bullets, ⌘⇧7 for numbers.
   const metaShiftKeyActions: Partial<Record<string, MetaAction>> = {
+    KeyZ: () => {
+      options.store.redoInEdit()
+      options.store.textSelectionChanged()
+    },
     Digit8: (node) => options.toggleListType(node, 'UNORDERED'),
     Digit7: (node) => options.toggleListType(node, 'ORDERED')
   }

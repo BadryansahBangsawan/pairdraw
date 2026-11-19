@@ -1,5 +1,5 @@
 import type { SceneGraph } from '../graph'
-import { findInstanceAncestor } from '../instances'
+import { findInstanceAncestor, recordAssignmentOverride } from '../instances'
 import { instanceMainComponent } from '../instances/main-component'
 import { setInstanceOverride } from '../instances/overrides'
 import { walkInstanceSources } from '../instances/source-walk'
@@ -163,12 +163,18 @@ export function applyComponentPropertyValue(
   } else if (target) {
     applyInstanceSwapProperty(graph, instance, targets, target)
   }
+  const previous = instance.componentPropertyAssignments[definition.id]
+  const assigned = definition.type === 'INSTANCE_SWAP' && target ? target.id : value
   graph.updateNode(instance.id, {
     componentPropertyAssignments: {
       ...instance.componentPropertyAssignments,
-      [definition.id]: definition.type === 'INSTANCE_SWAP' && target ? target.id : value
+      [definition.id]: assigned
     }
   })
+  // Assigning a nested instance's property is an edit of the instance above it, so it outranks
+  // a text override at that same level. Reapplying the value a property already has (a variant
+  // swap, a reload) is not an edit and records nothing.
+  if (previous !== assigned) recordAssignmentOverride(graph, instance.id, definition.id, value)
   return definition.type === 'INSTANCE_SWAP' ? target : instance
 }
 

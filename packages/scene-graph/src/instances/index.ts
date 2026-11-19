@@ -9,11 +9,13 @@ import { canCreateInstance, createsComponentCycle } from './cycles'
 import { INSTANCE_OVERRIDE_FIELDS, INSTANCE_SYNC_PROPS } from './fields'
 import { differingVariableModeCollections } from './modes'
 import {
+  assignmentOverrideField,
   cloneInstanceOverrideState,
   copiedComponentLayerId,
   createInstanceOverrideState,
   getInstanceOverride,
   hasInstanceOverride as hasNodeInstanceOverride,
+  overriddenAssignmentId,
   REPLACED_LAYER_OVERRIDE,
   setInstanceOverride,
   variableModeOverrideField
@@ -389,6 +391,30 @@ function overrideFieldsOf(
   ]
 }
 
+/**
+ * Records that an instance assigned one of its component properties, as an edit of the instance
+ * above it: the assignment is made through the outer instance, so a text override of the same
+ * level does not outrank it. A top-level instance has no outer instance to record it on.
+ */
+export function recordAssignmentOverride(
+  graph: SceneGraph,
+  instanceId: string,
+  propertyId: string,
+  value: string
+): void {
+  const parentId = graph.nodes.get(instanceId)?.parentId
+  const outer = parentId ? findInstanceAncestor(graph, parentId) : undefined
+  if (!outer) return
+  setInstanceOverride(
+    outer.instanceOverrides,
+    outer.id,
+    instanceId,
+    assignmentOverrideField(propertyId),
+    value
+  )
+  graph.updateNode(outer.id, { instanceOverrides: outer.instanceOverrides })
+}
+
 export function recordInstanceOverride(
   graph: SceneGraph,
   nodeId: string,
@@ -401,7 +427,11 @@ export function recordInstanceOverride(
     graph,
     instance,
     nodeId,
-    [...fields].filter((field) => (INSTANCE_OVERRIDE_FIELDS as readonly string[]).includes(field))
+    [...fields].filter(
+      (field) =>
+        (INSTANCE_OVERRIDE_FIELDS as readonly string[]).includes(field) ||
+        overriddenAssignmentId(field) !== null
+    )
   )
 
   if (relevant.length === 0) return

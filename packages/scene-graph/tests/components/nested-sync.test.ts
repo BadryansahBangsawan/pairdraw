@@ -1,8 +1,12 @@
 import { expect, test } from 'bun:test'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
+import { applyComponentPropertyValue } from '@pairdraw/scene-graph/components'
 import { recordInstanceOverride } from '@pairdraw/scene-graph/instances'
-import { deleteInstanceOverride } from '@pairdraw/scene-graph/instances/overrides'
+import {
+  deleteInstanceOverride,
+  setInstanceOverride
+} from '@pairdraw/scene-graph/instances/overrides'
 
 test('outer sync preserves a nested edit without blocking sibling or other-field inheritance', () => {
   const graph = new SceneGraph()
@@ -30,4 +34,64 @@ test('outer sync preserves a nested edit without blocking sibling or other-field
   deleteInstanceOverride(firstNested.instanceOverrides, firstNested.id, firstText.id, 'text')
   graph.syncInstances(outer.id)
   expect(firstText.text).toBe('Component edit')
+})
+
+/** A card whose badge the card's component assigns "Multiplier", and two instances of the card. */
+function cardWithAssignedBadge() {
+  const graph = new SceneGraph()
+  const page = graph.getPages()[0]
+  const badge = graph.createNode('COMPONENT', page.id, {
+    componentPropertyDefinitions: [
+      { id: 'badge-label', name: 'Label', type: 'TEXT', defaultValue: 'Default' }
+    ]
+  })
+  graph.createNode('TEXT', badge.id, {
+    text: 'Default',
+    componentPropertyReferences: [{ propertyId: 'badge-label', field: 'TEXT' }]
+  })
+  const card = graph.createNode('COMPONENT', page.id)
+  const sourceBadge = graph.createInstance(badge.id, card.id, {
+    componentPropertyAssignments: { 'badge-label': 'Multiplier' }
+  })
+  const instance = graph.createInstance(card.id, page.id)
+  const sibling = graph.createInstance(card.id, page.id)
+  if (!sourceBadge || !instance || !sibling) throw new Error('Missing instances')
+  const nested = graph.getChildren(instance.id)[0]
+  const label = graph.getChildren(nested.id)[0]
+  const siblingLabel = graph.getChildren(graph.getChildren(sibling.id)[0].id)[0]
+  // The card instance edits the label, as a Figma file records a text override on it.
+  graph.updateNode(label.id, { text: 'Bonus amount' })
+  setInstanceOverride(instance.instanceOverrides, instance.id, label.id, 'text')
+  return { graph, badge, card, instance, nested, label, siblingLabel }
+}
+
+test('a text edit in the outer instance outranks the assignment its component makes', () => {
+  const { graph, badge, card, instance, label, siblingLabel } = cardWithAssignedBadge()
+  graph.updateNode(graph.getChildren(badge.id)[0].id, { opacity: 0.5 })
+
+  for (const component of [card, badge, card]) {
+    graph.syncInstances(component.id)
+    expect(label.text).toBe('Bonus amount')
+    expect(siblingLabel.text).toBe('Multiplier')
+  }
+  expect(label.opacity).toBe(0.5)
+  deleteInstanceOverride(instance.instanceOverrides, instance.id, label.id, 'text')
+  graph.syncInstances(card.id)
+  expect(label.text).toBe('Multiplier')
+})
+
+test('an assignment made through an outer instance outranks the text edit at that level', () => {
+  const { graph, card, badge, instance, nested, label } = cardWithAssignedBadge()
+  const definition = badge.componentPropertyDefinitions?.[0]
+  if (!definition) throw new Error('Missing the badge label property')
+  // Changing the badge's label through the outer instance is an assignment at its level.
+  applyComponentPropertyValue(graph, nested.id, definition, 'Assigned')
+  // A text edit of the same label made through that instance is at that same level, and in
+  // Figma the assignment wins whatever order the two edits were made in.
+  graph.updateNode(label.id, { text: 'Bonus amount' })
+  setInstanceOverride(instance.instanceOverrides, instance.id, label.id, 'text', 'Bonus amount')
+
+  graph.syncInstances(card.id)
+
+  expect(label.text).toBe('Assigned')
 })

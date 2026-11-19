@@ -39,6 +39,7 @@ function releaseRuntimeEffects(r: SkiaRenderer): void {
 export function destroyRenderer(r: SkiaRenderer): void {
   if (r.destroyed) return
   r.destroyed = true
+  r.settleFontWaiters()
   r.transientPreviews.clear()
 
   r.onImagePreviewReady = null

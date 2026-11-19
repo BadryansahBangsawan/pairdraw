@@ -1,2 +1,3 @@
 - A dashed vector with several closed contours, such as a ring or a letter with a counter, dashes every contour instead of drawing all but the first solid.
 - SVG export clips a rounded frame's children to its rounded or smoothed corners, and fills smoothed rectangles and frames with their smoothed outline.
+- `export_image` and other image exports include text right after a document comes to the front, instead of leaving every text layer out until its canvas loads its fonts.

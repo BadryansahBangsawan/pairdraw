@@ -152,8 +152,11 @@ export function createExportTargetActions(editor: Editor, state: EditorState, io
     const ids = nodeIds.length > 0 ? nodeIds : editor.graph.getChildren(pageId).map((n) => n.id)
     if (ids.length === 0) return null
     const ownerPageId = findPageId(editor.graph, ids[0]) ?? pageId
+    // A canvas just put on screen draws no text until its fonts load, so its export waits for
+    // them; one gone meanwhile leaves the export to the headless renderer.
+    await editor.renderer?.whenFontsLoaded()
     const renderer = editor.renderer
-    if (!renderer) {
+    if (!renderer?.fontsLoaded) {
       return headlessRenderNodes(
         editor.graph,
         ownerPageId,

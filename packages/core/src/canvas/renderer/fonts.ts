@@ -161,6 +161,7 @@ export async function loadFonts(
   }
 
   r.fontsLoaded = true
+  r.settleFontWaiters()
   syncFontGeneration(r)
   r.invalidateAllPictures()
 }

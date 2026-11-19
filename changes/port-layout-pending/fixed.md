@@ -1,0 +1,1 @@
+- A script that edits layers and then moves or sizes one lays out the recorded edits first, so the layer lands where Figma puts it when its frame changed size.

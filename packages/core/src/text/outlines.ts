@@ -1,7 +1,7 @@
 import type { CharacterStyleOverride, FontVariation, SceneNode } from '@pairdraw/scene-graph'
 import { faceStyleKey } from '@pairdraw/scene-graph/font-style'
 import { rangeFontStyle } from '@pairdraw/scene-graph/shared-styles'
-import { lineHeightPixels, textLengthPixels } from '@pairdraw/scene-graph/text'
+import { lineHeightPixels, textLengthPixels, textVerticalOffset } from '@pairdraw/scene-graph/text'
 
 import { drawnFontVariations } from '#core/canvas/text/font-families'
 import {
@@ -259,17 +259,6 @@ function lineOffsetX(node: SceneNode, width: number): number {
   }
 }
 
-function verticalOffset(node: SceneNode, contentHeight: number): number {
-  switch (node.textAlignVertical) {
-    case 'CENTER':
-      return Math.max(0, (node.height - contentHeight) / 2)
-    case 'BOTTOM':
-      return Math.max(0, node.height - contentHeight)
-    default:
-      return 0
-  }
-}
-
 function lineGlyphs(
   node: SceneNode,
   line: TextLine,
@@ -306,7 +295,7 @@ export function textNodeToOutlineLayout(node: SceneNode): TextOutlineLayout | nu
   const lines = textLines(node)
   const lineH = lineHeight(node)
   const contentHeight = lines.length * lineH
-  const yOffset = verticalOffset(node, contentHeight)
+  const yOffset = textVerticalOffset(node, contentHeight)
   const glyphs: TextOutlineGlyph[] = []
   let maxWidth = 0
 

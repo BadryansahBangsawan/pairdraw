@@ -9,7 +9,7 @@ import {
 } from '@pairdraw/scene-graph/geometry'
 import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
-import { textLinesOverflow } from '@pairdraw/scene-graph/text'
+import { textLinesReach } from '@pairdraw/scene-graph/text'
 
 const INTRINSIC_CONTAINER_TYPES = new Set([
   'FRAME',
@@ -87,8 +87,15 @@ function ownRenderBounds(node: SceneNode, graph: SceneGraph): VisualBounds | nul
   if (!hasRenderableGeometry(node)) return null
 
   // Text lines past a fixed-size box draw, and cast their shadow, as in Figma.
-  const linesOverflow = textLinesOverflow(node)
-  const base = transformedRect(node, graph, 0, 0, node.width, node.height + linesOverflow)
+  const linesReach = textLinesReach(node)
+  const base = transformedRect(
+    node,
+    graph,
+    0,
+    linesReach.minY,
+    node.width,
+    linesReach.maxY - linesReach.minY
+  )
   const stroke = strokeOverflow(node.strokes, node.strokeCap, node.vectorNetwork, node)
   let bounds = transformedRect(
     node,
@@ -114,7 +121,9 @@ function ownRenderBounds(node: SceneNode, graph: SceneGraph): VisualBounds | nul
       ) ?? bounds
   }
 
-  if (linesOverflow > 0) bounds = unionVisualBounds(bounds, base) ?? bounds
+  if (linesReach.minY < 0 || linesReach.maxY > node.height) {
+    bounds = unionVisualBounds(bounds, base) ?? bounds
+  }
 
   for (const effect of node.effects) {
     if (!effect.visible) continue

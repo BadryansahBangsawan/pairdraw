@@ -1,2 +1,3 @@
 - The empty line a closing line break opens starts where the text ends, so its line metrics no longer overlap the line before it and a saved text no longer carries a baseline over the break.
 - Letter spacing and line height bound to a variable export as that variable's token when they are in pixels, while a percent of the font size stays literal.
+- Text taller than its box overflows on the side away from its vertical alignment, as in Figma: a bottom-aligned box draws its first line above it, and its blur, mask and saved file bounds cover it.

@@ -1,6 +1,7 @@
 import type { HyperlinkTarget, SceneNode } from '@pairdraw/scene-graph'
+import { textVerticalOffset } from '@pairdraw/scene-graph/text'
 
-import { textVerticalOffset, withTextParagraph } from '#core/canvas/text'
+import { withTextParagraph } from '#core/canvas/text'
 import { LAYER_HIT_PAD } from '#core/constants'
 import type { EditorContext } from '#core/editor/types'
 import { resolveEditorProfile } from '#core/editor/views'

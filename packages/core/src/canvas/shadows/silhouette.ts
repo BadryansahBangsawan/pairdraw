@@ -4,6 +4,7 @@ import type { Fill, NodeType, SceneGraph, SceneNode, Stroke } from '@pairdraw/sc
 import { strokeOverflow as strokeReach } from '@pairdraw/scene-graph/geometry'
 import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Rect } from '@pairdraw/scene-graph/primitives'
+import { textLinesReach } from '@pairdraw/scene-graph/text'
 
 import { paintBooleanOperation } from '#core/canvas/boolean'
 import { renderMaskedChildIds } from '#core/canvas/masks'
@@ -274,11 +275,12 @@ export function silhouetteBounds(
   includeChildren: boolean
 ): Rect | null {
   const overflow = strokeOverflow(node)
+  const lines = textLinesReach(node)
   const own: Rect = {
     x: -overflow,
-    y: -overflow,
+    y: lines.minY - overflow,
     width: node.width + overflow * 2,
-    height: node.height + overflow * 2
+    height: lines.maxY - lines.minY + overflow * 2
   }
   if (!includeChildren || !isLayerContainer(node)) return own
   return unionRect(own, childrenBounds(graph, node))

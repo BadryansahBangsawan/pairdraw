@@ -17,7 +17,7 @@ import {
 import { blurSigma } from '@pairdraw/scene-graph/geometry'
 import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Color } from '@pairdraw/scene-graph/primitives'
-import { textLinesOverflow } from '@pairdraw/scene-graph/text'
+import { textLinesReach, textVerticalOffset } from '@pairdraw/scene-graph/text'
 
 import { createSceneGeometry, nodeOrientationMatrix, projectedNode } from '#core/geometry'
 import { shownText } from '#core/text/case'
@@ -46,7 +46,7 @@ import {
 import { mapVisualBounds, subtreeVisualBounds } from './renderer/visual-bounds'
 import { drawShaderEffectChain } from './shaders/effect'
 import { isolatesInnerShadows, renderLayerShadows } from './shadows'
-import { isLayerContainer } from './shadows/silhouette'
+import { isLayerContainer, silhouetteBounds } from './shadows/silhouette'
 import {
   configureStrokePaint,
   drawArrowHeads,
@@ -61,7 +61,7 @@ import {
 import { drawLineStroke } from './strokes/line'
 import { drawOutlinedDashes } from './strokes/outlined-dashes'
 import { drawDashedRectStroke, strokeDashesByOutline, strokeSideWeights } from './strokes/sides'
-import { textVerticalOffset, withTextParagraph } from './text'
+import { withTextParagraph } from './text'
 import { drawTextLayout } from './text/decorations'
 import {
   canDrawSavedText,
@@ -109,11 +109,12 @@ function isCulled(
       node.clipsContent)
   if (!canCull || hasOverflowPathTextPaint(node)) return false
   // Text lines past a fixed-size box still draw, as in Figma.
-  const linesOverflow = textLinesOverflow(node)
+  const linesReach = textLinesReach(node)
+  const linesOutOfBox = linesReach.minY < 0 || linesReach.maxY > node.height
 
   const vp = r.worldViewport
   if (hasTransformedAncestor) {
-    if (linesOverflow > 0) return false
+    if (linesOutOfBox) return false
     const bounds = createSceneGeometry(graph, preview).bounds(node)
     return (
       bounds.x > vp.x + vp.w ||
@@ -123,7 +124,8 @@ function isCulled(
     )
   }
   const bw = node.width
-  const bh = node.height + linesOverflow
+  const bh =
+    node.height + Math.max(0, linesReach.maxY - node.height) + Math.max(0, -linesReach.minY) * 0
   if (projectedNode(node, preview).rotation !== 0) {
     const diag = Math.hypot(bw, bh)
     const { x: cx, y: cy } = createSceneGeometry(graph, preview).toWorld(node, {
@@ -181,12 +183,14 @@ function renderMaskNodeContent(
   const layered = node.opacity < 1 || blur !== undefined
   if (layered) {
     const padding = (blur?.radius ?? 0) * 2
+    // A fixed-size text's lines run past its box, and the mask covers them where they draw.
+    const reach = textLinesReach(node)
     r.opacityPaint.setAlphaf(node.opacity)
     r.opacityPaint.setBlendMode(r.ck.BlendMode.SrcOver)
     r.opacityPaint.setImageFilter(blur ? r.getCachedBlur(blurSigma(blur.radius)) : null)
     canvas.saveLayer(
       r.opacityPaint,
-      r.ck.LTRBRect(-padding, -padding, node.width + padding, node.height + padding)
+      r.ck.LTRBRect(-padding, reach.minY - padding, node.width + padding, reach.maxY + padding)
     )
     r.opacityPaint.setImageFilter(null)
   }
@@ -232,7 +236,19 @@ export function renderChildIds(
     (childId) => {
       const child = graph.getNode(childId)
       if (!child) return null
-      return { x: child.x, y: child.y, width: child.width, height: child.height }
+      // A mask covers what its silhouette does: a text's lines run past a fixed-size box.
+      const silhouette = silhouetteBounds(graph, child, false) ?? {
+        x: 0,
+        y: 0,
+        width: child.width,
+        height: child.height
+      }
+      return {
+        x: child.x + silhouette.x,
+        y: child.y + silhouette.y,
+        width: silhouette.width,
+        height: silhouette.height
+      }
     }
   )
 }
@@ -399,14 +415,16 @@ export function renderNode(
 
       r.effectLayerPaint.setImageFilter(r.getCachedBlur(blurSigma(layerBlur.radius)))
       const blurPadding = layerBlur.radius * 2
+      // A fixed-size box lets its lines run past it, and the blur covers them where they draw.
+      const linesReach = textLinesReach(node)
       canvas.saveLayer(
         r.effectLayerPaint,
         viewportLayerBounds(r, graph, node, blurPadding, overlays.rotationPreview) ??
           r.ck.LTRBRect(
             -blurPadding,
-            -blurPadding,
+            linesReach.minY - blurPadding,
             node.width + blurPadding,
-            node.height + blurPadding
+            linesReach.maxY + blurPadding
           )
       )
     }

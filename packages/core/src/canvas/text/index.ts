@@ -241,11 +241,3 @@ export function buildTextPicture(r: TextRenderer, node: SceneNode): Uint8Array |
   picture.delete()
   return bytes ?? null
 }
-
-/** Offset that places laid-out text of `contentHeight` in the node box by vertical alignment. */
-export function textVerticalOffset(node: SceneNode, contentHeight: number): number {
-  const available = Math.max(0, node.height - contentHeight)
-  if (node.textAlignVertical === 'CENTER') return available / 2
-  if (node.textAlignVertical === 'BOTTOM') return available
-  return 0
-}

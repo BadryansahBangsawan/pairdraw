@@ -9,8 +9,9 @@ import {
   type TextDecorationRecord
 } from '@pairdraw/fig/node-change'
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { textVerticalOffset } from '@pairdraw/scene-graph/text'
 
-import { buildParagraph, textVerticalOffset } from '#core/canvas/text'
+import { buildParagraph } from '#core/canvas/text'
 import { textDecorationRects, type DecoratedGlyph } from '#core/canvas/text/decorations'
 import { outlineInk, savedGlyphInk } from '#core/canvas/text/ink'
 import { COMBINING_KEYCAP, keycapFrame } from '#core/canvas/text/keycap'

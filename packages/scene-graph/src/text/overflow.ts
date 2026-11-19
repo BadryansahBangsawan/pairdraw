@@ -1,12 +1,35 @@
-import type { VisualBoundsNode } from '../geometry'
+type TextBoxNode = { height: number; textAlignVertical?: string }
+type TextBoundsNode = TextBoxNode & { type?: string; derivedTextHeight?: number | null }
 
-type TextBoundsNode = Pick<VisualBoundsNode, 'type' | 'height' | 'derivedTextHeight'>
+export type TextLinesReach = { minY: number; maxY: number }
 
 /**
- * How far a text's lines reach below its box: a fixed-size box does not clip them, as in Figma,
- * and the renderer starts them at its top.
+ * Where the top of laid-out lines `contentHeight` tall sits in a text's box, by its vertical
+ * alignment. Lines taller than the box overflow on the side away from the alignment, as Figma
+ * lays them out.
  */
-export function textLinesOverflow(node: TextBoundsNode): number {
-  if (node.type !== 'TEXT' || !node.derivedTextHeight) return 0
-  return Math.max(0, node.derivedTextHeight - node.height)
+export function textVerticalOffset(node: TextBoxNode, contentHeight: number): number {
+  const available = node.height - contentHeight
+  if (node.textAlignVertical === 'CENTER') {
+    return available / 2
+  }
+  if (node.textAlignVertical === 'BOTTOM') {
+    return available
+  }
+  return 0
+}
+
+/**
+ * The rows a text draws its lines over, in its own axes: its box, grown by the lines a fixed-size
+ * box lets run past it above or below, as in Figma.
+ */
+export function textLinesReach(node: TextBoundsNode): TextLinesReach {
+  if (node.type !== 'TEXT' || !node.derivedTextHeight) {
+    return { minY: 0, maxY: node.height }
+  }
+  const linesTop = textVerticalOffset(node, node.derivedTextHeight)
+  return {
+    minY: Math.min(0, linesTop),
+    maxY: Math.max(node.height, linesTop + node.derivedTextHeight)
+  }
 }

@@ -5,18 +5,13 @@ import { describe, test, expect, mock, spyOn } from 'bun:test'
 import { SkiaRenderer as SkiaRendererClass } from '@pairdraw/core/canvas'
 import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
 import { createDefaultNode } from '@pairdraw/scene-graph/node-defaults'
-import { pixelLength } from '@pairdraw/scene-graph/text'
+import { pixelLength, textVerticalOffset } from '@pairdraw/scene-graph/text'
 import { detectTextDirection, resolveTextDirection } from '@pairdraw/scene-graph/text/direction'
 
 import { initCanvasKit } from '#cli/headless'
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import { renderText } from '#core/canvas/scene'
-import {
-  buildParagraph,
-  isNodeFontLoaded,
-  nodeFontReadiness,
-  textVerticalOffset
-} from '#core/canvas/text'
+import { buildParagraph, isNodeFontLoaded, nodeFontReadiness } from '#core/canvas/text'
 import { createDerivedGlyphPathCache } from '#core/canvas/text/derived'
 import { transformTextCase } from '#core/text/case'
 import { fontManager } from '#core/text/font/manager'
@@ -141,7 +136,8 @@ describe('text case and vertical alignment', () => {
     expect(textVerticalOffset(textNode({ height: 100, textAlignVertical: 'TOP' }), 20)).toBe(0)
     expect(textVerticalOffset(textNode({ height: 100, textAlignVertical: 'CENTER' }), 20)).toBe(40)
     expect(textVerticalOffset(textNode({ height: 100, textAlignVertical: 'BOTTOM' }), 20)).toBe(80)
-    expect(textVerticalOffset(textNode({ height: 10, textAlignVertical: 'BOTTOM' }), 20)).toBe(0)
+    // Lines taller than the box overflow away from the alignment, as Figma lays them out.
+    expect(textVerticalOffset(textNode({ height: 10, textAlignVertical: 'BOTTOM' }), 20)).toBe(-10)
   })
 })
 

@@ -9,7 +9,7 @@ import {
   type VisualBounds
 } from '@pairdraw/scene-graph/geometry'
 import Matrix, { type Mat3 } from '@pairdraw/scene-graph/matrix'
-import { textLinesOverflow } from '@pairdraw/scene-graph/text'
+import { textLinesReach } from '@pairdraw/scene-graph/text'
 
 import { projectedNode, type RotationPreview } from '#core/geometry'
 
@@ -38,11 +38,12 @@ export function mapVisualBounds(matrix: Mat3, bounds: VisualBounds): VisualBound
 export function worldNodeVisualBounds(graph: SceneGraph, node: SceneNode): VisualBounds {
   const stroke = strokeOverflow(node.strokes, node.strokeCap, node.vectorNetwork, node)
   const effects = effectOverflow(node.effects)
+  const reach = textLinesReach(node)
   return mapVisualBounds(getWorldMatrix(node, graph), {
     minX: -stroke - effects.left,
-    minY: -stroke - effects.top,
+    minY: reach.minY - stroke - effects.top,
     maxX: node.width + stroke + effects.right,
-    maxY: node.height + textLinesOverflow(node) + stroke + effects.bottom
+    maxY: reach.maxY + stroke + effects.bottom
   })
 }
 
@@ -54,12 +55,12 @@ export function worldNodeVisualBounds(graph: SceneGraph, node: SceneNode): Visua
 function localVisualBounds(node: SceneNode): VisualBounds {
   const stroke = strokeOverflow(node.strokes, node.strokeCap, node.vectorNetwork, node)
   const effects = effectOverflow(node.effects)
+  const reach = textLinesReach(node)
   const box: VisualBounds = {
     minX: -stroke - effects.left,
-    minY: -stroke - effects.top,
+    minY: reach.minY - stroke - effects.top,
     maxX: node.width + stroke + effects.right,
-    maxY:
-      node.height + textLinesOverflow(node) + stroke + effects.bottom + textDecorationOverflow(node)
+    maxY: reach.maxY + stroke + effects.bottom + textDecorationOverflow(node)
   }
   const hasNonInsideStroke = node.strokes.some(
     (stroke) => stroke.visible && stroke.align !== 'INSIDE'

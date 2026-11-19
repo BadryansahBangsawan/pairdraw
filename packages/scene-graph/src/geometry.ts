@@ -2,7 +2,7 @@ import { arrowCapOverflow } from './arrow-caps'
 import { getAxisAlignedWorldBounds } from './coordinate'
 import type { SceneGraph } from './graph'
 import type { Rect, Vector } from './primitives'
-import { textLinesOverflow } from './text/overflow'
+import { textLinesReach } from './text/overflow'
 import type { Effect, SceneNode, Stroke, StrokeCap, StrokeJoin, VectorNetwork } from './types'
 
 export function degToRad(degrees: number): number {
@@ -322,6 +322,7 @@ export interface VisualBoundsNode {
   textUnderlineOffset?: number | null
   textDecorationThickness?: number | null
   derivedTextHeight?: number | null
+  textAlignVertical?: string
 }
 
 export function unionVisualBounds(
@@ -555,11 +556,13 @@ export function nodeVisualBounds(
     bounds = unionVisualBounds(bounds, transformedLocalBounds(node, localGeometry, abs)) ?? bounds
   }
 
-  const linesOverflow = Math.max(textLinesOverflow(node), 0)
-  // An underline or strikethrough reaches below the last line, turning with the text.
-  const below = linesOverflow + textDecorationOverflow(node)
-  if (below > 0) {
-    const lines = { x: 0, y: 0, width: node.width, height: node.height + below }
+  // A fixed-size box lets its lines run past it on the side away from the vertical alignment,
+  // and an underline or strikethrough reaches below the last line, turning with the text.
+  const reach = textLinesReach(node)
+  const above = Math.min(reach.minY, 0)
+  const below = Math.max(reach.maxY, node.height) + textDecorationOverflow(node)
+  if (above < 0 || below > node.height) {
+    const lines = { x: 0, y: above, width: node.width, height: below - above }
     bounds = unionVisualBounds(bounds, transformedLocalBounds(node, lines, abs)) ?? bounds
   }
 

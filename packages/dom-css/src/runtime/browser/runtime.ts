@@ -255,7 +255,9 @@ async function computeStylesInIframe(
     content.innerHTML = serializeHTML(designDocument)
     iframeDocument.body.append(content)
 
-    await requestFrame(iframeDocument)
+    // The sandbox sits offscreen, where WebKit never runs an animation frame of its own; the
+    // page's frame lays the iframe out too, and the page is visible whenever a person pastes.
+    await requestFrame(browserDocument)
     return copyComputedStyles(designDocument, content, options)
   } finally {
     iframe.remove()

@@ -1,0 +1,1 @@
+- Pasting web HTML now works in Safari and the desktop app's WebKit views.

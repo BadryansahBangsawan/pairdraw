@@ -98,6 +98,9 @@ function isSeparator(entry: AppMenuEntry): entry is Extract<AppMenuEntry, { type
   return entry.type === 'separator'
 }
 
+/** Items whose command edits the selected layers, so they wait for one, as Figma's do. */
+const MENU_ITEMS_NEEDING_SELECTION = new Set(['copy', 'cut'])
+
 export function useAppMenu() {
   const store = useEditorStore()
   const {
@@ -315,6 +318,8 @@ export function useAppMenu() {
   }
 
   function disabled(item: AppMenuActionItem): boolean | undefined {
+    // Copy and Cut act on the selected layers; Paste stays available with nothing selected.
+    if (MENU_ITEMS_NEEDING_SELECTION.has(item.id)) return store.state.selectedIds.size === 0
     switch (item.id) {
       case 'view-split-right':
       case 'view-split-down':

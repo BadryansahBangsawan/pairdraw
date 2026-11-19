@@ -297,7 +297,20 @@ test('Edit and Arrange items wait for a selection that can use them', async () =
     await editor.page.keyboard.press('Escape')
   }
 
-  const editItems = ['Paste to replace', 'Replace inside instance', 'Rename selection…']
+  const editItems = [
+    'Copy',
+    'Cut',
+    'Paste to replace',
+    'Replace inside instance',
+    'Rename selection…'
+  ]
+  // Figma leaves Paste available with nothing selected; it fills the page.
+  await openAppMenu(editor.page, 'Edit')
+  await expect(
+    editor.page.getByRole('menuitem').filter({ hasText: /^Paste(?!\s)/ })
+  ).not.toHaveAttribute('data-disabled')
+  await editor.page.keyboard.press('Escape')
+
   const arrangeItems = [
     'Remove auto layout',
     'Align left',

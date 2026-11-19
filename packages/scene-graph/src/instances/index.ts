@@ -23,6 +23,7 @@ import {
 } from './overrides'
 import { owningInstance, replacedLayerIn } from './replacements'
 import { walkInstanceSources } from './source-walk'
+import { captureInstanceOverrides, restoreInstanceOverrides } from './swap-overrides'
 import {
   bindingProtection,
   cloneChildrenWithMapping,
@@ -139,13 +140,20 @@ export interface SwapInstanceOptions {
    * such as preview, keeps names so layer paths stay the same.
    */
   keepName?: boolean
+  /**
+   * Keep the overrides the instance's layers record, matched to the layers of the new component
+   * that take their places, as Figma keeps them when a variant changes. A swap that only
+   * materializes a layer the caller re-applies itself, such as a pen icon's glyph, skips this:
+   * what the placeholder recorded is scaffolding, not a user's edit.
+   */
+  restoreOverrides?: boolean
 }
 
 export function swapInstanceComponent(
   graph: SceneGraph,
   instanceId: string,
   componentId: string,
-  { keepName = false }: SwapInstanceOptions = {}
+  { keepName = false, restoreOverrides = true }: SwapInstanceOptions = {}
 ): void {
   const instance = graph.nodes.get(instanceId)
   const component = graph.nodes.get(componentId)
@@ -173,8 +181,28 @@ export function swapInstanceComponent(
   keepCopyBoundPaints(graph, instance, updates)
   const childIds = Array.from(instance.childIds)
   const slotContent = detachOwnedSlotContent(graph, instance)
+  swapInstanceLayers(graph, instanceId, componentId, updates, childIds, restoreOverrides)
+  restoreOwnedSlotContent(graph, instance, slotContent)
+}
+
+/**
+ * Replaces the instance's layers with clones of its new component's and gives the recorded
+ * overrides back to the layers that take the old ones' places, matched by name path.
+ */
+function swapInstanceLayers(
+  graph: SceneGraph,
+  instanceId: string,
+  componentId: string,
+  updates: Partial<SceneNode>,
+  childIds: string[],
+  restoreOverrides: boolean
+): void {
+  // The clones take new IDs, so what was recorded for the removed layers only applies again once
+  // it is matched to the layers of the new component that take their places.
+  const capturedOverrides = restoreOverrides
+    ? captureInstanceOverrides(graph, graph.nodes.get(instanceId) as SceneNode)
+    : undefined
   for (const childId of childIds) {
-    // The clones take new IDs, so what was recorded for the removed layers would never apply.
     forgetOverridesOf(graph, childId)
     graph.deleteNode(childId)
   }
@@ -182,6 +210,8 @@ export function swapInstanceComponent(
   cloneChildrenWithMapping(graph, componentId, instanceId)
   applyBoundPaintColorsIn(graph, instanceId)
   restoreOwnedSlotContent(graph, instance, slotContent)
+  const swapped = graph.nodes.get(instanceId)
+  if (swapped && capturedOverrides) restoreInstanceOverrides(graph, swapped, capturedOverrides)
 }
 
 const syncingComponentsByGraph = new WeakMap<SceneGraph, Set<string>>()

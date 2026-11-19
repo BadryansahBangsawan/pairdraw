@@ -149,7 +149,7 @@ export function useIconComponent(node: SceneNode, pen: PenNode, build: Build): v
     graph.updateNode(node.id, { componentId })
     populateInstanceChildren(graph, node.id, componentId)
   } else if (instanceMainComponent(graph, node)?.id !== componentId) {
-    swapInstanceComponent(graph, node.id, componentId, { keepName: true })
+    swapInstanceComponent(graph, node.id, componentId, { keepName: true, restoreOverrides: false })
     // The layer keeps its own name rather than the icon's, which a saved file keeps as an override.
     recordInstanceOverride(graph, node.id, ['name'])
   } else if (showsReplacedGlyph(graph, node, node.componentId)) {

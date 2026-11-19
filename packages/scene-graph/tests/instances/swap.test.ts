@@ -41,19 +41,39 @@ describe('swapping an instance', () => {
     expect(graph.getNode(instance.id)?.componentId).toBe(on.id)
   })
 
-  test('forgets the overrides recorded for the layers it replaces', () => {
+  test('keeps the overrides of layers both components share', () => {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const off = graph.createNode('COMPONENT', pageId, { name: 'Off' })
+    graph.createNode('RECTANGLE', off.id, { name: 'Knob', opacity: 1 })
+    const on = graph.createNode('COMPONENT', pageId, { name: 'On' })
+    graph.createNode('RECTANGLE', on.id, { name: 'Knob', opacity: 1 })
+    const instance = graph.createInstance(off.id, pageId)
+    if (!instance) throw new Error('No instance')
+    const [knobId] = instance.childIds
+    graph.updateNode(knobId, { opacity: 0.4 })
+    recordInstanceOverride(graph, knobId, ['opacity'])
+    graph.swapInstanceComponent(instance.id, on.id)
+    const swapped = graph.getNode(instance.id)
+    const [newKnobId] = swapped?.childIds ?? []
+    expect(swapped?.instanceOverrides.descendants.has(knobId)).toBe(false)
+    expect(graph.getNode(newKnobId)?.opacity).toBe(0.4)
+    expect(swapped?.instanceOverrides.descendants.get(newKnobId)?.has('opacity')).toBe(true)
+  })
+
+  test('drops overrides for layers the new component has none of', () => {
     const graph = new SceneGraph()
     const pageId = graph.getPages()[0].id
     const off = graph.createNode('COMPONENT', pageId, { name: 'Off' })
     graph.createNode('RECTANGLE', off.id, { name: 'Knob' })
+    graph.createNode('RECTANGLE', off.id, { name: 'Track' })
     const on = graph.createNode('COMPONENT', pageId, { name: 'On' })
     graph.createNode('RECTANGLE', on.id, { name: 'Knob' })
     const instance = graph.createInstance(off.id, pageId)
     if (!instance) throw new Error('No instance')
-    const [knobId] = instance.childIds
-    recordInstanceOverride(graph, knobId, ['opacity'])
-    expect(instance.instanceOverrides.descendants.has(knobId)).toBe(true)
+    const trackId = instance.childIds.find((id) => graph.getNode(id)?.name === 'Track') as string
+    recordInstanceOverride(graph, trackId, ['opacity'])
     graph.swapInstanceComponent(instance.id, on.id)
-    expect(graph.getNode(instance.id)?.instanceOverrides.descendants.has(knobId)).toBe(false)
+    expect(graph.getNode(instance.id)?.instanceOverrides.descendants.size).toBe(0)
   })
 })

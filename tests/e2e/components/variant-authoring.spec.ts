@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
+import type { Color } from '@pairdraw/scene-graph'
+
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { selectNode } from '#tests/helpers/components/properties'
 import { propertySection } from '#tests/helpers/properties'
@@ -182,3 +184,86 @@ function variantNames(page: Page, componentId: string) {
     return setId ? (graph?.getChildren(setId).map((node) => node.name) ?? []) : []
   }, componentId)
 }
+
+test('switching an instance to another variant keeps the overrides its shared layers carry', async ({
+  page
+}) => {
+  const canvas = new CanvasHelper(page)
+  await page.goto('/?test')
+  await canvas.waitForInit()
+
+  const ids = await page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
+    const pageId = store.state.currentPageId
+    const set = store.graph.createNode('COMPONENT_SET', pageId, {
+      name: 'Switch',
+      componentPropertyDefinitions: [
+        {
+          id: '60:1',
+          name: 'State',
+          type: 'VARIANT',
+          defaultValue: 'Off',
+          variantOptions: ['Off', 'On']
+        }
+      ]
+    })
+    const variant = (name: string, fill: Color) => {
+      const component = store.graph.createNode('COMPONENT', set.id, {
+        name: `State=${name}`,
+        componentPropertyValues: { State: name }
+      })
+      store.graph.createNode('RECTANGLE', component.id, {
+        name: 'BG',
+        fills: [{ type: 'SOLID', color: fill, opacity: 1, visible: true, blendMode: 'NORMAL' }]
+      })
+      store.graph.createNode('TEXT', component.id, { name: 'Label', text: name })
+      return component
+    }
+    const off = variant('Off', { r: 0.2, g: 0.2, b: 0.2, a: 1 })
+    const on = variant('On', { r: 0.1, g: 0.6, b: 0.2, a: 1 })
+    const instance = store.graph.createInstance(off.id, pageId)
+    if (!instance) throw new Error('No instance')
+    const [bgId, labelId] = instance.childIds
+    store.updateNodeWithUndo(
+      bgId,
+      {
+        fills: [
+          {
+            type: 'SOLID',
+            color: { r: 1, g: 0, b: 0, a: 1 },
+            opacity: 1,
+            visible: true,
+            blendMode: 'NORMAL'
+          }
+        ]
+      },
+      'Override fill'
+    )
+    store.updateNodeWithUndo(labelId, { text: 'Left as is' }, 'Override text')
+    store.select([instance.id])
+    return { instanceId: instance.id, onId: on.id }
+  })
+  await canvas.waitForRender()
+
+  const variants = propertySection(page, 'Variants')
+  await variants.getByRole('combobox', { name: 'State' }).click()
+  await page.getByRole('option', { name: 'On' }).click()
+  await canvas.waitForRender()
+
+  const switched = await page.evaluate((instanceId) => {
+    const graph = window.pairdraw?.getStore?.()?.graph
+    const instance = graph?.getNode(instanceId)
+    const children = instance ? (graph?.getChildren(instanceId) ?? []) : []
+    return {
+      componentId: instance?.componentId,
+      fill: children.find((node) => node.name === 'BG')?.fills[0]?.color,
+      text: children.find((node) => node.name === 'Label')?.text
+    }
+  }, ids.instanceId)
+  expect(switched.componentId).toBe(ids.onId)
+  expect(switched.fill).toEqual({ r: 1, g: 0, b: 0, a: 1 })
+  expect(switched.text).toBe('Left as is')
+
+  canvas.assertNoErrors()
+})

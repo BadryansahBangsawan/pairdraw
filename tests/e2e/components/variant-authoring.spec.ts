@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import type { Color } from '@pairdraw/scene-graph'
+import type { Color } from '@pairdraw/scene-graph/primitives'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { selectNode } from '#tests/helpers/components/properties'

@@ -15,3 +15,5 @@
 - A sync that matches an instance's copy to a namesake replacing its component layer relinks the copy over the link a file recorded, and announces the change, so a reopened document saves and collaboration follows it.
 - A paste into another document keeps the mode an instance pins on a layer and the variables its overrides bind, remapped to the collections and variables the paste copies.
 - A slot made inside a variant is defined on its set, as Figma keeps it, and removing it drops the content of every variant's instances.
+- A script that edits a component and then reads an instance sees the edit at once, as in Figma: the Plugin API syncs pending component edits before reading or writing a layer inside an instance, and a failed sync is retried at the next read.
+- A binding change on a layer inside a nested instance claims only that binding, so the layer's other bindings keep following their component.

@@ -1,4 +1,4 @@
-import { partition } from 'es-toolkit/array'
+import { compact, partition, uniq } from 'es-toolkit/array'
 import { omit, omitBy } from 'es-toolkit/object'
 
 import { BLACK } from '../constants'
@@ -418,16 +418,23 @@ function markBoundVariablesOverrideOnInstance(
   const owner = variableBindingOwner(graph, node)
   if (owner.type !== 'INSTANCE') return
   const nearest = findInstanceAncestor(graph, nodeId)
+  const instances = uniq(compact([nearest, owner])).filter((x) => x.id !== nodeId)
+  for (const instance of instances) graph.willChangeNode(instance)
   if (nearest) setInstanceOverride(nearest.instanceOverrides, nearest.id, nodeId, 'boundVariables')
   setInstanceOverride(owner.instanceOverrides, owner.id, nodeId, 'boundVariables')
+  // Each instance claims the binding it changed alone, so the layer's other bindings keep
+  // following their components, as Figma claims only the paint or effect a script edits.
   if (field)
-    setInstanceOverride(
-      owner.instanceOverrides,
-      owner.id,
-      nodeId,
-      bindingOverrideField(field),
-      node.boundVariables[field] ?? null
-    )
+    for (const instance of instances)
+      setInstanceOverride(
+        instance.instanceOverrides,
+        instance.id,
+        nodeId,
+        bindingOverrideField(field),
+        node.boundVariables[field] ?? null
+      )
+  for (const instance of instances)
+    graph.updateNode(instance.id, { instanceOverrides: instance.instanceOverrides })
 }
 
 export * from './bindings'

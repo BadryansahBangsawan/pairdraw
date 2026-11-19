@@ -44,6 +44,7 @@ import type {
   FigmaVectorNode
 } from './node-types'
 import { startPendingLayout } from './pending-layout'
+import { flushPendingComponentSync, startPendingComponentSync } from './pending-sync'
 import { FigmaNodeProxy, INTERNAL_ID, MIXED, type FigmaFont, type NodeProxyHost } from './proxy'
 import { newShapeWithText } from './shape-with-text'
 import type { ExportImageOptions } from './types'
@@ -93,11 +94,18 @@ export interface FigmaAPIOptions {
    * a tool that only reads must not reselect what is already selected.
    */
   selection?: readonly string[]
+  /**
+   * Brings instances in line with the component edits made so far, for a host that syncs them
+   * after edits itself, as the editor does; reading a layer calls it first. Without one the API
+   * records edits and syncs their instances itself.
+   */
+  flushComponentSync?: () => void
 }
 
 export { FigmaNodeProxy } from './proxy'
 export { getPageBackgrounds, setPageBackgrounds } from './page-backgrounds'
 export { flushPendingLayout } from './pending-layout'
+export { flushPendingComponentSync } from './pending-sync'
 export type { FigmaEffect } from './effects'
 export type { ExportImageOptions } from './types'
 export {
@@ -171,6 +179,7 @@ export class FigmaAPI implements NodeProxyHost {
     this.#onSelectionChange = options.onSelectionChange
     this.variables = new FigmaVariablesAPI(graph)
     startPendingLayout(graph)
+    startPendingComponentSync(graph, options.flushComponentSync)
     this._currentPageId = pageIdToStart(graph, options.pageId)
     if (options.viewport) {
       this._viewport = {
@@ -245,6 +254,7 @@ export class FigmaAPI implements NodeProxyHost {
   }
 
   getNodeById(id: string): FigmaNodeProxy | null {
+    flushPendingComponentSync(this.graph)
     const node = this.graph.getNode(id)
     return node ? this.wrapNode(id) : null
   }

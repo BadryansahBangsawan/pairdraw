@@ -3,6 +3,7 @@ import { join } from 'node:path'
 
 import { FIXTURES } from '#cli-tests/helpers/paths'
 
+import { FigmaAPI } from '@pairdraw/core/figma-api'
 import { computeAllLayouts, getTextMeasurer } from '@pairdraw/core/layout'
 import { fontManager } from '@pairdraw/core/text'
 import { SceneGraph } from '@pairdraw/scene-graph'
@@ -63,4 +64,21 @@ test('brings the instances of a component an edit changes up to date with it', a
   expect([instance.width, instance.height]).toEqual([100, 80])
   const copy = graph.getNode(instance.childIds[0])
   expect([copy?.width, copy?.height]).toEqual([100, 80])
+})
+
+test('brings instances in line with the components a plugin edit changes, without a read', async () => {
+  const graph = new SceneGraph()
+  const figma = new FigmaAPI(graph)
+  const component = figma.createComponent()
+  const shape = figma.createRectangle()
+  component.appendChild(shape)
+  const instance = component.createInstance()
+  const copyId = graph.getNode(instance.id)?.childIds[0] ?? ''
+  const green = { r: 0, g: 1, b: 0, a: 1 }
+
+  await editDocument(graph, () => {
+    shape.fills = [{ type: 'SOLID', color: { r: 0, g: 1, b: 0 } }]
+  })
+
+  expect(graph.getNode(copyId)?.fills[0].color).toEqual(green)
 })

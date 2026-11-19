@@ -88,6 +88,31 @@ describe('bindVariable on instance child sets override flag', () => {
     ).toBe(true)
   })
 
+  test('a binding on a nested instance layer claims that binding alone on both instances', () => {
+    const graph = new SceneGraph()
+    setupFloatVars(graph, 'v1')
+    const page = pageId(graph)
+    const inner = graph.createNode('COMPONENT', page, { name: 'Inner' })
+    graph.createNode('RECTANGLE', inner.id, { name: 'Shape' })
+    const outer = graph.createNode('COMPONENT', page, { name: 'Outer' })
+    const nested = graph.createInstance(inner.id, outer.id)
+    const instance = graph.createInstance(outer.id, page)
+    if (!nested || !instance) throw new Error('No instance')
+    const nestedCopy = graph.getChildren(instance.id)[0]
+    const copy = graph.getChildren(nestedCopy.id)[0]
+
+    graph.bindVariable(copy.id, 'opacity', 'v1')
+
+    const claim = 'boundVariables/opacity'
+    for (const target of [nestedCopy, instance]) {
+      expect(
+        getInstanceOverride(target.instanceOverrides, target.id, copy.id, 'boundVariables')
+      ).toBe(true)
+      // Both claim this binding alone, so the layer's other bindings follow the component.
+      expect(getInstanceOverride(target.instanceOverrides, target.id, copy.id, claim)).toBe('v1')
+    }
+  })
+
   test('binding on instance child survives syncInstances', () => {
     const graph = new SceneGraph()
     setupColorVars(graph, 'v1', 'v2')

@@ -11,6 +11,7 @@ import { claimSlotContent, slotScope } from '@pairdraw/scene-graph/slots'
 import { assertNodeEditable } from '#core/editor/capabilities'
 import type { NodeProxyHost } from '#core/figma-api/proxy'
 import { textAutoResizeChanges } from '#core/layout/text-auto-resize'
+import { flushPendingComponentSync } from '#core/figma-api/pending-sync'
 
 export interface NodeProxyInternals {
   id: symbol
@@ -30,7 +31,9 @@ export function graph(target: ProxyThis, internals: NodeProxyInternals): SceneGr
 
 export function raw(target: ProxyThis, internals: NodeProxyInternals): SceneNode {
   const id = nodeId(target, internals)
-  const node = graph(target, internals).getNode(id)
+  const scene = graph(target, internals)
+  flushPendingComponentSync(scene, id)
+  const node = scene.getNode(id)
   if (!node) throw new Error(`Node ${id} has been removed`)
   return node
 }

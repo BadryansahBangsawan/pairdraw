@@ -60,6 +60,20 @@ function affectedPageIds(
 }
 
 /**
+ * Brings the instances of every component holding one of `ids` in line with it, inner components
+ * first, and returns those components. A removed layer is found through the parent it left.
+ */
+export function syncComponentsHolding(graph: SceneGraph, ids: Iterable<string>): Set<string> {
+  const componentIds = new Set<string>()
+  for (const id of ids) {
+    const component = graph.closest(id, isComponent)
+    if (component) componentIds.add(component.id)
+  }
+  graph.syncInstancesTogether(componentSyncOrder(graph, componentIds))
+  return componentIds
+}
+
+/**
  * Brings the instances of the components that contain `editedIds` up to date with them, nested
  * components first, and lays out the pages that changed. `editedIds` are the layers an edit
  * changed, plus the parents of those it removed or moved away. Returns whether any component
@@ -71,13 +85,8 @@ export function syncEditedComponents(
   computeLayouts: ComputeLayouts = computeAllLayouts
 ): boolean {
   const ids = [...editedIds]
-  const componentIds = new Set<string>()
-  for (const id of ids) {
-    const component = graph.closest(id, isComponent)
-    if (component) componentIds.add(component.id)
-  }
+  const componentIds = syncComponentsHolding(graph, ids)
   if (componentIds.size === 0) return false
-  graph.syncInstancesTogether(componentSyncOrder(graph, componentIds))
   const pageIds = affectedPageIds(graph, ids, componentIds)
   if (pageIds.size === 0) computeLayouts(graph)
   else for (const pageId of pageIds) computeLayouts(graph, pageId)
@@ -99,6 +108,12 @@ export function createComponentSyncScheduler(
     isFlushingComponentSync = true
     try {
       if (syncEditedComponents(getGraph(), ids, computeLayouts)) requestRender()
+    } catch (error) {
+      // A sync that throws leaves its edits unsynced; the next read tries them again rather
+      // than showing stale instance layers. The set was cleared at flush start and nothing can
+      // schedule during this synchronous sync, so the ids go straight back.
+      pendingComponentSync = ids
+      throw error
     } finally {
       isFlushingComponentSync = false
     }
@@ -118,5 +133,9 @@ export function createComponentSyncScheduler(
     pendingComponentSync.add(nodeId)
   }
 
-  return { scheduleComponentSync }
+  return {
+    scheduleComponentSync,
+    /** Brings instances in line with the component edits scheduled so far, now. */
+    flushComponentSync
+  }
 }

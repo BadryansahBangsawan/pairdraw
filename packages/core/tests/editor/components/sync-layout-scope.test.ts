@@ -111,6 +111,31 @@ describe('component sync layout scope', () => {
     expect(scopes).toEqual([])
   })
 
+  test('a flush that throws keeps its edits pending for the next read', async () => {
+    const { graph, label, component } = createGraph()
+    const sync = graph.syncInstancesTogether.bind(graph)
+    let attempts = 0
+    graph.syncInstancesTogether = (...args) => {
+      attempts++
+      if (attempts === 1) throw new Error('sync failed')
+      return sync(...args)
+    }
+    const { scheduleComponentSync, flushComponentSync } = createComponentSyncScheduler(
+      () => graph,
+      () => undefined,
+      computeAllLayouts
+    )
+    graph.updateNode(label.id, { text: 'Edited label' })
+    scheduleComponentSync(label.id)
+
+    expect(() => flushComponentSync()).toThrow('sync failed')
+    // The edit is still pending, so the host's next read syncs it instead of showing stale layers.
+    expect(() => flushComponentSync()).not.toThrow()
+    expect(attempts).toBe(2)
+    const componentLabel = graph.getChildren(component.id)[0]
+    expect(componentLabel?.type === 'TEXT' && componentLabel.text).toBe('Edited label')
+  })
+
   test('a cross-page instance still receives the component layout', async () => {
     const { graph, instance, component } = createGraph()
     const { scheduleComponentSync } = createComponentSyncScheduler(

@@ -21,7 +21,7 @@ test('a coding agent that goes quiet says so and can be stopped', async ({ page,
   const companion = await startCompanion(new URL('/?test&quiet-turn-ms=2000', baseURL).href, dir)
   try {
     await page.goto(companion.link)
-    await new CanvasHelper(page).waitForInit()
+    await new CanvasHelper(page).waitForInit({ designPanel: false })
     const dialog = page.getByRole('alertdialog')
     await expect(dialog).toContainText(companion.fingerprint)
     await dialog.getByRole('button', { name: 'Connect' }).click()

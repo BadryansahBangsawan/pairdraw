@@ -80,7 +80,7 @@ test('a closed sidebar stays closed after a reload', async ({ page }) => {
   await expect(page.getByTestId('layers-panel')).toBeHidden()
 
   await page.reload()
-  await new CanvasHelper(page).waitForInit()
+  await new CanvasHelper(page).waitForInit({ designPanel: false })
   await expect(page.getByTestId('layers-panel')).toBeHidden()
   await expect(page.getByTestId('editor-toggle-layers-panel')).toHaveAttribute(
     'aria-pressed',

@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test'
 
 import { expect, test } from '#tests/e2e/fixtures'
 import { CanvasHelper } from '#tests/helpers/canvas'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 /** Test runs keep no drafts unless their URL asks for them. */
 const DRAFTS_URL = '/?test&drafts'
@@ -35,6 +36,7 @@ async function showDrafts(page: Page) {
 test.beforeEach(async ({ page }) => {
   await page.goto(DRAFTS_URL)
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
 })
 
 test('a new design keeps its changes as a draft and closes without asking', async ({ page }) => {
@@ -63,6 +65,7 @@ test('a draft outlasts a reload and opens from Home without the recovery dialog'
 
   await page.reload()
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   await expect(page.getByRole('alertdialog', { name: 'Recover unsaved work' })).toBeHidden()
   await page.getByTestId('tabbar-new').click()
   const drafts = await showDrafts(page)
@@ -129,6 +132,7 @@ test('Save As on Home saves a closed draft to a file and takes it out of Drafts'
 test('a test run without the drafts flag keeps a new document unsaved', async ({ page }) => {
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   await addRectangle(page, 'Unsaved rectangle')
   await keepDraft(page)
   await expect(unsavedMark(page)).toBeVisible()

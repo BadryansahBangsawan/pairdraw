@@ -70,16 +70,20 @@ test('a drag with the zoom tool zooms to the dragged area', async () => {
   await editor.canvas.drag(100, 100, 300, 200)
   await editor.canvas.waitForRender()
   const after = await view(editor.page)
-  const size = await editor.page.evaluate(() => {
-    const canvas = document.querySelector('[data-test-id="canvas-element"]')
-    const box = canvas?.getBoundingClientRect()
-    return { width: box?.width ?? 0, height: box?.height ?? 0 }
+  const frame = await editor.page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
+    return { size: store.getViewportSize(), insets: store.getViewportInsets() }
   })
+  const visibleWidth = frame.size.width - frame.insets.left - frame.insets.right
+  const visibleHeight = frame.size.height - frame.insets.top - frame.insets.bottom
   // The viewport counts whole pixels and the pointer lands within half a pixel of each end.
-  expect(after.zoom).toBeCloseTo(Math.min(size.width / 200, size.height / 100), 1)
-  // The area's center lands at the canvas's center.
-  expect((size.width / 2 - after.panX) / after.zoom).toBeCloseTo(200, 0)
-  expect((size.height / 2 - after.panY) / after.zoom).toBeCloseTo(150, 0)
+  expect(after.zoom).toBeCloseTo(Math.min(visibleWidth / 200, visibleHeight / 100), 1)
+  // The area's center lands at the center of the room the floating chrome leaves.
+  const centerX = frame.insets.left + visibleWidth / 2
+  const centerY = frame.insets.top + visibleHeight / 2
+  expect((centerX - after.panX) / after.zoom).toBeCloseTo(200, 0)
+  expect((centerY - after.panY) / after.zoom).toBeCloseTo(150, 0)
 })
 
 test("the zoom tool sits in the Hand tool's flyout", async () => {

@@ -3,6 +3,7 @@ import { expect, test, type Page } from '@playwright/test'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 async function dragLayerAndObserveIndicator(
   page: Page,
@@ -33,6 +34,7 @@ test('layer reorder exposes a visible drop indicator before dropping', async ({ 
   await page.goto('/?test')
   const canvas = new CanvasHelper(page)
   await canvas.waitForInit()
+  await openLayersPanel(page)
   canvas.errors.length = 0
   await canvas.clearCanvas()
 
@@ -61,6 +63,7 @@ test('layer child drop exposes a visible container highlight before dropping', a
   await page.goto('/?test')
   const canvas = new CanvasHelper(page)
   await canvas.waitForInit()
+  await openLayersPanel(page)
   canvas.errors.length = 0
   await canvas.clearCanvas()
 

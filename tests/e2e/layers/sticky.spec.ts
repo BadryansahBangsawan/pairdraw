@@ -2,12 +2,14 @@ import { expect, test, type Page } from '@playwright/test'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { layerDriver } from '#tests/helpers/canvas/layers'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 /** A frame with enough children to scroll past its own row, expanded in the layers panel. */
 async function scrolledFrame(page: Page) {
   await page.goto('/?test')
   const canvas = new CanvasHelper(page)
   await canvas.waitForInit()
+  await openLayersPanel(page)
   canvas.errors.length = 0
   await canvas.clearCanvas()
 

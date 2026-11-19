@@ -1,6 +1,11 @@
 import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 const editor = useEditorSetup('/demo')
+
+test.beforeEach(async () => {
+  await openLayersPanel(editor.page)
+})
 
 function layerRows() {
   return editor.page.locator('[data-node-id]')

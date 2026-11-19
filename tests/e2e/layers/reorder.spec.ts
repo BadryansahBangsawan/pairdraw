@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { layerDriver } from '#tests/helpers/canvas/layers'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 async function layerOrder(page: Page, parentId?: string) {
   return page.evaluate((id) => {
@@ -15,6 +16,7 @@ test('dragging layers reorders scene nodes', async ({ page }) => {
   await page.goto('/?test')
   const canvas = new CanvasHelper(page)
   await canvas.waitForInit()
+  await openLayersPanel(page)
   canvas.errors.length = 0
   await canvas.clearCanvas()
 
@@ -46,6 +48,7 @@ test('an auto layout lists and reorders its layers in flow order', async ({ page
   await page.goto('/?test')
   const canvas = new CanvasHelper(page)
   await canvas.waitForInit()
+  await openLayersPanel(page)
   canvas.errors.length = 0
   await canvas.clearCanvas()
 
@@ -74,6 +77,7 @@ test('dragging a layer into a container expands it and shows the child', async (
   await page.goto('/?test')
   const canvas = new CanvasHelper(page)
   await canvas.waitForInit()
+  await openLayersPanel(page)
   canvas.errors.length = 0
   await canvas.clearCanvas()
 

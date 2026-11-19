@@ -27,7 +27,7 @@ test('a tab opened from the companion’s link pairs and chats with an agent on 
   const companion = await startCompanion(new URL('/?test', baseURL).href, dir)
   try {
     await page.goto(companion.link)
-    await new CanvasHelper(page).waitForInit()
+    await new CanvasHelper(page).waitForInit({ designPanel: false })
     // The one-time code leaves the address bar.
     await expect(page).not.toHaveURL(/connect=/)
     // Nothing pairs until the person confirms the characters the terminal printed.

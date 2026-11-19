@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 test('model editing keeps the Settings shell stable and isolates the form', async ({ page }) => {
   await page.goto('/?test')
@@ -83,6 +84,7 @@ for (const reducedMotion of ['reduce', 'no-preference'] as const) {
 test('page rows keep the same compact height while renaming', async ({ page }) => {
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   const row = page.getByTestId('pages-row').first()
   await expect(row).toHaveCSS('height', '26px')
   await row.getByRole('button').dblclick()

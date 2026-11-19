@@ -29,7 +29,7 @@ export async function chatWithAgent(page: Page, baseURL: string | undefined): Pr
   }
   try {
     await page.goto(companion.link)
-    await new CanvasHelper(page).waitForInit()
+    await new CanvasHelper(page).waitForInit({ designPanel: false })
     const dialog = page.getByRole('alertdialog')
     await expect(dialog).toContainText(companion.fingerprint)
     await dialog.getByRole('button', { name: 'Connect' }).click()

@@ -17,7 +17,7 @@ test.skip(process.platform === 'win32', 'The stand-in agent is a shell script')
 
 async function connectClaudeCode(page: Page, link: string, fingerprint: string): Promise<void> {
   await page.goto(link)
-  await new CanvasHelper(page).waitForInit()
+  await new CanvasHelper(page).waitForInit({ designPanel: false })
   const pairing = page.getByRole('alertdialog')
   await expect(pairing).toContainText(fingerprint)
   await pairing.getByRole('button', { name: 'Connect' }).click()

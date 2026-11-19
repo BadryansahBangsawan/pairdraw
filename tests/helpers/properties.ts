@@ -17,6 +17,23 @@ export async function openDesignPanel(page: PanelScope): Promise<void> {
   await page.getByTestId('left-panel-design-tab').click()
 }
 
+/**
+ * Shows the layers and pages view — the sidebar's File tab — opening the sidebar when it is closed.
+ * Specs that drive the layer tree or the page list ask for it; `waitForInit` leaves the Design view
+ * showing, because that is what most specs edit.
+ */
+export async function openLayersPanel(page: PanelScope): Promise<void> {
+  if (!(await page.getByTestId('layers-panel').isVisible())) {
+    const toggle = page.getByTestId('editor-toggle-layers-panel')
+    // Specs run without chrome (`?no-chrome`) have no sidebar to open, and no panel to ask for.
+    if (!(await toggle.isVisible())) return
+    await toggle.click()
+  }
+  await page.getByTestId('left-panel-layers-tab').click()
+  // The tab click leaves focus in the sidebar; shortcuts expect the canvas, as they get on start.
+  await page.getByTestId('canvas-element').focus()
+}
+
 export function propertySection(page: Page, name: string): Locator {
   return page.getByRole('region', { name, exact: true })
 }

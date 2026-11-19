@@ -1,11 +1,13 @@
 import { expect, test } from '@playwright/test'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 test('pages and layers panels scroll inside splitter panes', async ({ page }) => {
   await page.goto('/?test')
   const canvas = new CanvasHelper(page)
   await canvas.waitForInit()
+  await openLayersPanel(page)
   canvas.errors.length = 0
 
   // Adding a page opens it, so the layers go on the first page and the editor returns there.

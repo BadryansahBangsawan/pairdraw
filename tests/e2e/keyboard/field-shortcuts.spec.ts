@@ -1,7 +1,12 @@
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
+import { openLayersPanel } from '#tests/helpers/properties'
 import { getPageChildren } from '#tests/helpers/store'
 
 const editor = useEditorSetupWithClear()
+
+test.beforeEach(async () => {
+  await openLayersPanel(editor.page)
+})
 
 async function renameLayer() {
   await editor.canvas.drawRect(200, 200, 100, 100)

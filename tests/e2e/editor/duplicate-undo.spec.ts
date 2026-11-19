@@ -1,6 +1,11 @@
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 const editor = useEditorSetupWithClear('/?test')
+
+test.beforeEach(async () => {
+  await openLayersPanel(editor.page)
+})
 
 async function rectangleCount() {
   return editor.page.evaluate(() => {

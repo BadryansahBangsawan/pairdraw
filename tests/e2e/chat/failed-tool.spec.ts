@@ -24,7 +24,7 @@ test('a failed agent tool call with long output stays a compact card', async ({
   const companion = await startCompanion(new URL('/?test', baseURL).href, dir)
   try {
     await page.goto(companion.link)
-    await new CanvasHelper(page).waitForInit()
+    await new CanvasHelper(page).waitForInit({ designPanel: false })
     const dialog = page.getByRole('alertdialog')
     await expect(dialog).toContainText(companion.fingerprint)
     await dialog.getByRole('button', { name: 'Connect' }).click()

@@ -2,6 +2,7 @@ import * as v from 'valibot'
 
 import { expect, test, useEditorSetup } from '#tests/e2e/fixtures'
 import { expectDefined } from '#tests/helpers/assert'
+import { openDesignPanel, openLayersPanel } from '#tests/helpers/properties'
 
 const editor = useEditorSetup()
 
@@ -135,6 +136,7 @@ test.describe('selection shortcuts', () => {
   })
 
   test('⌘R starts inline rename for one layer', async () => {
+    await openLayersPanel(editor.page)
     const id = await editor.page.evaluate(() => {
       const store = window.pairdraw?.getStore?.()
       if (!store) throw new Error('Pairdraw store not initialized')
@@ -151,6 +153,7 @@ test.describe('selection shortcuts', () => {
     await input.press('Enter')
     const child = (await getPageChildren()).find((node) => node.id === id)
     expect(child?.name).toBe('Renamed rectangle')
+    await openDesignPanel(editor.page)
   })
 
   test('⌘R opens bulk rename for multiple layers', async () => {
@@ -422,8 +425,19 @@ test.describe('zoom shortcuts', () => {
       return { center, canvasPoint: store.screenToCanvas(center.x, center.y) }
     })
 
-    expect(centerBefore.center.x).toBeCloseTo(activeBounds.width / 2)
-    expect(centerBefore.center.y).toBeCloseTo(activeBounds.height / 2)
+    // Floating chrome (the toolbar and rulers) trims the room the centre is taken from.
+    const expectedCenter = await editor.page.evaluate(() => {
+      const store = window.pairdraw?.getStore?.()
+      if (!store) throw new Error('Pairdraw store not initialized')
+      const size = store.getViewportSize()
+      const insets = store.getViewportInsets()
+      return {
+        x: insets.left + (size.width - insets.left - insets.right) / 2,
+        y: insets.top + (size.height - insets.top - insets.bottom) / 2
+      }
+    })
+    expect(centerBefore.center.x).toBeCloseTo(expectedCenter.x)
+    expect(centerBefore.center.y).toBeCloseTo(expectedCenter.y)
 
     await editor.page.keyboard.press('Shift+Equal')
     await editor.canvas.waitForRender()

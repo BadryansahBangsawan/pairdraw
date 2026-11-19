@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import { expect, test, type Page } from '@playwright/test'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 /** Drops files on the canvas the way a drag from the desktop delivers them. */
 async function dropOnCanvas(page: Page, files: Array<{ name: string; bytes: number[] }>) {
@@ -26,6 +27,7 @@ async function dropOnCanvas(page: Page, files: Array<{ name: string; bytes: numb
 test('a document dropped on the canvas opens in a new tab', async ({ page }) => {
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   const tabs = page.getByRole('tablist').filter({ has: page.getByTestId('tabbar-tab') })
 
   const bytes = [...(await readFile('tests/fixtures/circle-text.fig'))]
@@ -40,6 +42,7 @@ test('a dropped file that is neither a document nor an image reports that it can
 }) => {
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   const tabs = page.getByRole('tablist').filter({ has: page.getByTestId('tabbar-tab') })
 
   await dropOnCanvas(page, [{ name: 'notes.txt', bytes: [...new TextEncoder().encode('hello')] }])
@@ -53,6 +56,7 @@ test('a dropped file that is neither a document nor an image reports that it can
 test('a design token file dropped on the canvas opens the variables import', async ({ page }) => {
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   const tokens = { color: { $type: 'color', brand: { $value: '#2563eb' } } }
 
   await dropOnCanvas(page, [
@@ -68,6 +72,7 @@ test('a design token file dropped on the canvas opens the variables import', asy
 test('an SVG dropped on the canvas is placed, not opened as a document', async ({ page }) => {
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   const tabs = page.getByRole('tablist').filter({ has: page.getByTestId('tabbar-tab') })
   const tabName = (await tabs.getByRole('tab').first().textContent()) ?? ''
   const svg = '<svg width="20" height="20"><rect width="20" height="20" fill="#f00"/></svg>'

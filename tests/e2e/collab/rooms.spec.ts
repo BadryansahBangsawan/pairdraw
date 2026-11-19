@@ -14,6 +14,7 @@ import {
   startRelay,
   type Peer
 } from '#tests/helpers/collab/room'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 // Sharing a room and its call are not part of Pairdraw; these run for a build that includes them.
 test.skip(!COLLABORATION_INCLUDED, 'shared rooms are not included in this build')
@@ -207,6 +208,7 @@ test("a guest's page list shows which page the sharer is on, and who is there on
     await share(host)
     guest = await createPeer(browser, 'Guest', relay.url, { path: roomLinkPath() })
     await expect(guest.page.getByTestId('room-screen')).toHaveCount(0, { timeout: 15_000 })
+    await openLayersPanel(guest.page)
 
     // A real pointer over the canvas, as people move it, not the test hook.
     const box = await host.canvas.canvas.boundingBox()

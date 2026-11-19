@@ -82,6 +82,8 @@ test('native WebMCP discovery, editing, validation and undo', async ({ page, bro
       'Browser agent page'
     )
     await page.getByRole('button', { name: 'Add page', exact: true }).click()
+    // The page list keeps focus after its button; shortcuts go to the canvas, as before the click.
+    await page.getByTestId('canvas-element').focus()
     const secondPage = v.parse(pageResultSchema, (await invoke('get_current_page')).output).result
     expect(secondPage.id).not.toBe(original.id)
     expect((await invoke('update_node', { id: original.id, name: 'Other page edit' })).status).toBe(

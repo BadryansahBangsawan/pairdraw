@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 const NODE_COUNT = 5000
 
@@ -8,6 +9,7 @@ test('large layer trees stay virtualized and scrollable', async ({ page }) => {
   const canvas = new CanvasHelper(page)
   await page.goto('/?test&no-rulers')
   await canvas.waitForInit()
+  await openLayersPanel(page)
 
   const replaceStartedAt = await page.evaluate((count: number) => {
     const store = window.pairdraw?.getStore?.()
@@ -114,6 +116,7 @@ test('layer tree supports range and additive selection', async ({ page }) => {
   const canvas = new CanvasHelper(page)
   await page.goto('/?test&no-rulers')
   await canvas.waitForInit()
+  await openLayersPanel(page)
 
   await page.evaluate(() => {
     const store = window.pairdraw?.getStore?.()

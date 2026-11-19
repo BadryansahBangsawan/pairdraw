@@ -3,6 +3,7 @@ import * as v from 'valibot'
 
 import { expect, test } from '#tests/e2e/fixtures'
 import { CanvasHelper } from '#tests/helpers/canvas'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 const listedDocumentsSchema = v.object({
   ok: v.literal(true),
@@ -154,12 +155,14 @@ async function showDrafts(page: Page) {
 async function reload(page: Page) {
   page.once('dialog', (dialog) => dialog.accept())
   await page.reload()
-  await new CanvasHelper(page).waitForInit()
+  // A reload starts on the File view; a recovery dialog may be up, so leave the panels alone.
+  await new CanvasHelper(page).waitForInit({ designPanel: false })
 }
 
 test('an agent closing an untitled document leaves its work in Drafts', async ({ page }) => {
   await page.goto(DRAFTS_URL)
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   await addRectangle(page, 'Work kept for Home')
   await keepDraft(page)
 
@@ -187,6 +190,7 @@ test('an agent closing a saved file leaves its unsaved work recoverable', async 
   test.setTimeout(90_000)
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   await saveToPrivateFile(page, CLOSED_FILE)
   await addRectangle(page, 'Unsaved in the closed file')
   await page.evaluate(async () => {
@@ -211,6 +215,7 @@ test('another document opens apart from one restored from Recover', async ({ pag
   test.setTimeout(90_000)
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   await addRectangle(page, 'Retained recovery rectangle')
   await page.evaluate(async () => {
     await window.pairdraw?.getStore?.().persistRecoveryNow()
@@ -254,6 +259,7 @@ test('the person’s Don’t Save drops the copy', async ({ page }) => {
   test.setTimeout(90_000)
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   await saveToPrivateFile(page, DISCARDED_FILE)
   await addRectangle(page, 'Discarded rectangle')
   await page.evaluate(async () => {
@@ -277,6 +283,7 @@ test('the person’s Don’t Save drops the copy', async ({ page }) => {
 test('deleting a draft from Home does not bring it back in Recover', async ({ page }) => {
   await page.goto(DRAFTS_URL)
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   await addRectangle(page, 'Deleted draft rectangle')
   await keepDraft(page)
 
@@ -297,6 +304,7 @@ test('deleting a draft from Home does not bring it back in Recover', async ({ pa
 test('a failed open keeps the previous tab and leaves no copy behind', async ({ page }) => {
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   await addRectangle(page, 'Survives a failed open')
   await page.evaluate(async () => {
     await window.pairdraw?.getStore?.().persistRecoveryNow()

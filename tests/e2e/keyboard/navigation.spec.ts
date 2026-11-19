@@ -1,6 +1,11 @@
 import { expect, test, useEditorSetupWithClear } from '#tests/e2e/fixtures'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 const editor = useEditorSetupWithClear()
+
+test.beforeEach(async () => {
+  await openLayersPanel(editor.page)
+})
 
 /** A frame with three children, the frame selected; ids listed bottom to top. */
 function createFrameWithChildren() {

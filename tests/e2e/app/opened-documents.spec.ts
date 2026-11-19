@@ -4,6 +4,7 @@ import type * as AppTabs from '@/app/tabs'
 
 import { CanvasHelper } from '#tests/helpers/canvas'
 import { testPath } from '#tests/helpers/paths'
+import { openLayersPanel } from '#tests/helpers/properties'
 
 async function openFixture(page: Page, fixture: string) {
   await page.route(`**/__fixtures/${fixture}`, (route) =>
@@ -11,6 +12,7 @@ async function openFixture(page: Page, fixture: string) {
   )
   await page.goto('/?test')
   await new CanvasHelper(page).waitForInit()
+  await openLayersPanel(page)
   await page.evaluate(async (name) => {
     const tabsURL = '/src/app/tabs/index.ts'
     const tabs: typeof AppTabs = await import(tabsURL)

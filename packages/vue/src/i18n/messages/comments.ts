@@ -29,6 +29,7 @@ export const commentMessageDefaults = {
   newestFirst: 'Newest first',
   oldestFirst: 'Oldest first',
   empty: 'No comments yet. Click the canvas to leave one.',
+  allResolved: 'All comments are resolved. Show resolved comments to read them.',
   noMatches: 'No comments match.',
   replyCount: params('Replies: {count}'),
   commentDeleted: 'Comment deleted',

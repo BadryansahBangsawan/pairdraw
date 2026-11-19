@@ -1,0 +1,1 @@
+- The comments list says that every comment is resolved when resolved threads are hidden, instead of claiming there are no comments.

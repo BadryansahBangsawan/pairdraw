@@ -24,6 +24,7 @@
   "newestFirst": "Neueste zuerst",
   "oldestFirst": "Älteste zuerst",
   "empty": "Noch keine Kommentare. Klicke auf die Arbeitsfläche, um einen zu hinterlassen.",
+  "allResolved": "Alle Kommentare sind erledigt. Zeige erledigte Kommentare, um sie zu lesen.",
   "noMatches": "Keine passenden Kommentare.",
   "replyCount": "Antworten: {count}",
   "commentDeleted": "Kommentar gelöscht",

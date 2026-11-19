@@ -60,6 +60,11 @@ const filtered = computed(
   () => listQuery.value.trim() !== '' || listOnlyMine.value || listOnlyPage.value
 )
 
+/** Threads exist and every one of them is resolved, so the empty list is not an empty document. */
+const allResolved = computed(
+  () => !listShowResolved.value && comments.threads.value.some((thread) => thread.resolved)
+)
+
 function pageName(pageId: string, fallback?: string) {
   return store.graph.getNode(pageId)?.name ?? fallback ?? ''
 }
@@ -157,7 +162,7 @@ function setSort(value: unknown) {
     <AppPlaceholder
       v-if="listed.length === 0"
       size="compact"
-      :label="filtered ? messages.noMatches : messages.empty"
+      :label="filtered ? messages.noMatches : allResolved ? messages.allResolved : messages.empty"
     />
     <ul v-else :class="ui.list()" :aria-label="messages.comments">
       <ContextMenuRoot v-for="thread in listed" :key="thread.id" :modal="false">

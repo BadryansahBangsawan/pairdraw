@@ -24,6 +24,7 @@
   "newestFirst": "最新优先",
   "oldestFirst": "最早优先",
   "empty": "还没有评论。点击画布即可留下评论。",
+  "allResolved": "所有评论均已解决。显示已解决的评论即可阅读。",
   "noMatches": "没有匹配的评论。",
   "replyCount": "回复：{count}",
   "commentDeleted": "评论已删除",

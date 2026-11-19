@@ -24,6 +24,7 @@
   "newestFirst": "Najnowsze najpierw",
   "oldestFirst": "Najstarsze najpierw",
   "empty": "Brak komentarzy. Kliknij obszar roboczy, aby dodać komentarz.",
+  "allResolved": "Wszystkie komentarze zostały rozwiązane. Pokaż rozwiązane komentarze, aby je przeczytać.",
   "noMatches": "Brak pasujących komentarzy.",
   "replyCount": "Odpowiedzi: {count}",
   "commentDeleted": "Usunięto komentarz",

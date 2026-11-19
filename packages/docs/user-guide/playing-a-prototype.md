@@ -30,7 +30,7 @@ Choose **Play** in the Prototype section's header, or toggle **Preview** from th
 
 The canvas then shows that frame alone: fitted to the window on its tighter axis, with the area around it in the page's color. The panels hide, and the canvas pans but does not select or edit.
 
-A pill at the top of the canvas shows **Previewing**, **Reset**, and **Leave preview**. **Reset** begins again from the frame play started on, and puts every live control back as it was designed. **Leave preview**, or Escape, returns to editing; the canvas stays fitted to the frame you were on.
+A pill at the top of the canvas shows **Previewing**, **Reset**, and **Leave preview**. **Reset** begins again from the frame play started on, and puts every live control back as it was designed. **Leave preview**, or Escape, returns to editing with the view you had before preview started.
 
 ## Clicking Through
 

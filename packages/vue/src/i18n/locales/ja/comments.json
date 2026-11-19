@@ -24,6 +24,7 @@
   "newestFirst": "新しい順",
   "oldestFirst": "古い順",
   "empty": "まだコメントはありません。キャンバスをクリックしてコメントを残せます。",
+  "allResolved": "すべてのコメントは解決済みです。解決済みのコメントを表示すると読めます。",
   "noMatches": "一致するコメントはありません。",
   "replyCount": "返信: {count}",
   "commentDeleted": "コメントを削除しました",

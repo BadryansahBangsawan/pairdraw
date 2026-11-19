@@ -24,6 +24,7 @@
   "newestFirst": "Plus récents d’abord",
   "oldestFirst": "Plus anciens d’abord",
   "empty": "Aucun commentaire pour l’instant. Cliquez sur le canevas pour en laisser un.",
+  "allResolved": "Tous les commentaires sont résolus. Affichez les commentaires résolus pour les lire.",
   "noMatches": "Aucun commentaire ne correspond.",
   "replyCount": "Réponses : {count}",
   "commentDeleted": "Commentaire supprimé",

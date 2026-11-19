@@ -24,6 +24,7 @@
   "newestFirst": "Prima i più recenti",
   "oldestFirst": "Prima i meno recenti",
   "empty": "Ancora nessun commento. Fai clic sulla tela per lasciarne uno.",
+  "allResolved": "Tutti i commenti sono risolti. Mostra i commenti risolti per leggerli.",
   "noMatches": "Nessun commento corrisponde.",
   "replyCount": "Risposte: {count}",
   "commentDeleted": "Commento eliminato",

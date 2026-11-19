@@ -1,0 +1,1 @@
+- Opening a large `.fig` document no longer re-derives the whole document for each page it reads, so a document with hundreds of thousands of layers opens faster.

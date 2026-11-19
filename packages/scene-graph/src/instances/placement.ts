@@ -17,7 +17,11 @@ export function placedByConstraints(
 ): SceneNode {
   const before = { width: compParent.width * factor, height: compParent.height * factor }
   if (before.width === instParent.width && before.height === instParent.height) return source
-  const rect = layoutConstrainedChildRect(
+  const {
+    flipsX: _flipsX,
+    flipsY: _flipsY,
+    ...rect
+  } = layoutConstrainedChildRect(
     source,
     before,
     instParent,

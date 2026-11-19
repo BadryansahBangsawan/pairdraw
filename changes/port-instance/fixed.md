@@ -11,3 +11,4 @@
 - A text style bound to a variable whose token path another collection shares reads back bound to the same variable: the export records each bound field's collection and variable, and warns about references other tools could misread.
 - A bound paint keeps an edit to its color or opacity until its variable's color for the layer changes, as in Figma: binding writes the variable's color, a value or mode change refreshes it, and readers, the canvas, copies, and saves use the stored paint.
 - A bound paint refreshes whenever the mode set for its layer changes, even to a mode giving the same color, as in Figma, and a paste keeps the paint edits it copied, counting from the colors applied when the copy was made.
+- A literal fill or stroke an outer instance sets on a layer inside a nested instance stays unbound through component sync, instead of taking the component's color binding back.

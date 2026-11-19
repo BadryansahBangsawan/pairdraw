@@ -15,6 +15,7 @@ import {
   dropShadowToCSS,
   effectsToCSS,
   fillToCSS,
+  gradientFillsToCSS,
   letterSpacingToCSS,
   lineHeightToCSS,
   strokeColorToCSS
@@ -321,6 +322,8 @@ function styleFromSceneNode(
   addSizeConstraints(style, node, css)
   const fill = fillToCSS(node.fills.at(0))
   if (fill) style['background-color'] = css('fills/0/color', fill)
+  const gradients = gradientFillsToCSS(node.fills, node.width, node.height)
+  if (gradients) style['background-image'] = gradients
   addImageStyle(style, node)
   addStroke(style, node, css)
   Object.assign(style, effectsToCSS(node.effects))

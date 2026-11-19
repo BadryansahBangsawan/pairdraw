@@ -1,3 +1,5 @@
+import { median } from 'es-toolkit'
+
 import type { LayoutMode, SceneNode } from '@pairdraw/scene-graph'
 import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
 import type { Rect } from '@pairdraw/scene-graph/primitives'
@@ -15,6 +17,29 @@ function captureGeometry(ctx: EditorContext, nodes: SceneNode[]): Map<string, Re
   }
   for (const node of nodes) visit(node)
   return geometry
+}
+
+/** The spacing the layers already have along `direction`, rounded, as Figma infers it. */
+function inferGap(ctx: EditorContext, nodes: SceneNode[], direction: LayoutMode): number {
+  const horizontal = direction === 'HORIZONTAL'
+  const placed = nodes
+    .map((node) => ({
+      position: ctx.graph.getAbsolutePosition(node.id),
+      size: horizontal ? node.width : node.height
+    }))
+    .sort((a, b) =>
+      horizontal
+        ? a.position.x - b.position.x || a.position.y - b.position.y
+        : a.position.y - b.position.y || a.position.x - b.position.x
+    )
+  const gaps = placed
+    .slice(1)
+    .map((item, index) =>
+      horizontal
+        ? item.position.x - (placed[index].position.x + placed[index].size)
+        : item.position.y - (placed[index].position.y + placed[index].size)
+    )
+  return gaps.length > 0 ? Math.round(median(gaps)) : 0
 }
 
 /**
@@ -43,6 +68,7 @@ export function wrapInAutoLayout(ctx: EditorContext, selectedNodes: SceneNode[])
     layoutMode: direction,
     primaryAxisSizing: 'HUG',
     counterAxisSizing: 'HUG',
+    itemSpacing: inferGap(ctx, selectedNodes, direction),
     primaryAxisAlign: 'MIN',
     counterAxisAlign: 'MIN',
     fills: []

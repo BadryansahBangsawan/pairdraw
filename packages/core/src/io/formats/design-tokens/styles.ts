@@ -1,3 +1,4 @@
+import { countBy } from 'es-toolkit/array'
 import { isEmptyObject, isPlainObject } from 'es-toolkit/predicate'
 
 import type { Effect, ShadowEffect, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
@@ -11,6 +12,40 @@ import { colorTokenValue, dimensionTokenValue, trimNumber } from './values'
 
 /** Where a variable's token sits, for references to it. */
 export type TokenReferences = ReadonlyMap<string, readonly string[]>
+
+/**
+ * The variable a bound style field points at, by collection and name, as Figma's
+ * `com.figma.aliasData` names an alias target, since a path alone can be in several collections.
+ */
+export interface BindingTarget {
+  targetVariableSetName: string
+  targetVariableName: string
+}
+
+/** The variables a style's bound fields point at, by field, for those a reference was written for. */
+function bindingTargets(
+  graph: SceneGraph,
+  node: SceneNode,
+  fields: Iterable<string>
+): Record<string, BindingTarget> {
+  const targets: Record<string, BindingTarget> = {}
+  for (const field of fields) {
+    const variable = graph.variables.get(node.boundVariables[field] ?? '')
+    const collection = variable && graph.variableCollections.get(variable.collectionId)
+    if (variable && collection)
+      targets[field] = { targetVariableSetName: collection.name, targetVariableName: variable.name }
+  }
+  return targets
+}
+
+/** The fields a style binds and how a file read back finds each: its reference and its target. */
+function ownBindings(graph: SceneGraph, node: SceneNode, bindings: Record<string, string>) {
+  const own: Record<string, unknown> = {}
+  if (isEmptyObject(bindings)) return own
+  own.bindings = bindings
+  own.aliasData = bindingTargets(graph, node, Object.keys(bindings))
+  return own
+}
 
 /** Figma's auto line height, written as the multiplier browsers use for `normal`. */
 const AUTO_LINE_HEIGHT = 1.2
@@ -57,7 +92,11 @@ export function typographyValue(
 }
 
 /** A text style as a typography token; its own fields ride along so Pairdraw reads it back exactly. */
-function typographyToken(node: SceneNode, references: TokenReferences): DesignToken {
+function typographyToken(
+  graph: SceneGraph,
+  node: SceneNode,
+  references: TokenReferences
+): DesignToken {
   const bound = bindingReferences(node, references)
   return {
     $type: 'typography',
@@ -74,7 +113,7 @@ function typographyToken(node: SceneNode, references: TokenReferences): DesignTo
           textDecoration: node.textDecoration,
           textCase: node.textCase
         },
-        ...(isEmptyObject(bound) ? {} : { bindings: bound })
+        ...ownBindings(graph, node, bound)
       }
     }
   }
@@ -136,6 +175,11 @@ function shadowToken(node: SceneNode): DesignToken | undefined {
   }
 }
 
+/** Whether a style's token writes a reference for this bound field. */
+function writesBinding(node: SceneNode, field: string): boolean {
+  return node.sharedStyleType === 'TEXT' && TEXT_BINDING_FIELDS.some((bound) => bound === field)
+}
+
 /** Text and effect styles as typography and shadow tokens, nested by their names. */
 export function styleTokens(
   graph: SceneGraph,
@@ -147,9 +191,15 @@ export function styleTokens(
       (node.sharedStyleType === 'TEXT' || node.sharedStyleType === 'EFFECT') &&
       node.source.id !== null
   )
+  // Another tool reads a reference to a path several collections hold as whichever comes last.
+  const shared = new Set(
+    Object.entries(countBy([...references.values()], (path) => tokenReference(path)))
+      .filter(([, count]) => count > 1)
+      .map(([reference]) => reference)
+  )
   const candidates = styles.flatMap((node) => {
     const token =
-      node.sharedStyleType === 'TEXT' ? typographyToken(node, references) : shadowToken(node)
+      node.sharedStyleType === 'TEXT' ? typographyToken(graph, node, references) : shadowToken(node)
     if (!token) {
       issues.push({ kind: 'unsupported-effect', style: node.name })
       return []
@@ -159,6 +209,13 @@ export function styleTokens(
   const { placed, duplicates } = placeTokens(candidates)
   for (const { node } of duplicates)
     issues.push({ kind: 'duplicate-path', collection: 'Styles', token: node.name })
+  for (const [{ node }] of placed) {
+    for (const [field, variableId] of Object.entries(node.boundVariables)) {
+      const path = writesBinding(node, field) ? references.get(variableId) : undefined
+      if (path && shared.has(tokenReference(path)))
+        issues.push({ kind: 'ambiguous-reference', style: node.name, field, token: pathName(path) })
+    }
+  }
   const tokens = [...placed].map(([{ node, token }, path]) => ({
     path,
     token: withOriginalName(token, node.name, path)

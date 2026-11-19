@@ -48,6 +48,7 @@
   "openQueuedFilesFailed": "Не удалось открыть файлы, переданные Pairdraw: {error}",
   "tokensLeftOut": "Не вошли в таблицу стилей: {names}.",
   "designTokensLeftOut": "Не вошли в дизайн-токены: {names}.",
+  "designTokensAmbiguous": "Эти стили ссылаются на переменную, путь которой есть и в другой коллекции, поэтому другие инструменты могут прочитать не ту: {names}.",
   "designTokensImported": "Импортировано дизайн-токенов: {count}.",
   "unsupportedVariableExpressions": "Pairdraw пока не умеет вычислять эти переменные, поэтому слои сохраняют значения из файла: {names}.",
   "placeImageUnsupported": "Выберите файл PNG, JPEG, WebP, GIF, AVIF или SVG, чтобы поместить его.",

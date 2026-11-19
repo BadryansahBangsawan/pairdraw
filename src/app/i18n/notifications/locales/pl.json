@@ -48,6 +48,7 @@
   "openQueuedFilesFailed": "Nie udało się otworzyć plików przekazanych do Pairdraw: {error}",
   "tokensLeftOut": "Pominięte w arkuszu stylów: {names}.",
   "designTokensLeftOut": "Pominięte w tokenach projektowych: {names}.",
+  "designTokensAmbiguous": "Te style odwołują się do zmiennej, której ścieżkę ma też inna kolekcja, więc inne narzędzia mogą odczytać niewłaściwą: {names}.",
   "designTokensImported": "Zaimportowano tokeny projektowe: {count}.",
   "unsupportedVariableExpressions": "Pairdraw nie potrafi jeszcze obliczyć tych zmiennych, więc warstwy zachowują wartości zapisane w pliku: {names}.",
   "placeImageUnsupported": "Wybierz plik PNG, JPEG, WebP, GIF, AVIF lub SVG do umieszczenia.",

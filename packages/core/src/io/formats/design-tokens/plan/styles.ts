@@ -39,6 +39,26 @@ const TEXT_BINDING_FIELDS: readonly TextBindingField[] = [
   'lineHeight'
 ]
 
+/** The collection and variable a bound style field points at, as Pairdraw records them. */
+const bindingTargetSchema = v.object({
+  targetVariableSetName: v.string(),
+  targetVariableName: v.string()
+})
+type BindingTarget = v.InferOutput<typeof bindingTargetSchema>
+
+/** Recorded targets by field; one that does not read is left out, not the whole extension. */
+const aliasDataSchema = v.pipe(
+  v.record(v.string(), v.unknown()),
+  v.transform((entries): Record<string, BindingTarget> =>
+    Object.fromEntries(
+      Object.entries(entries).flatMap(([field, entry]) => {
+        const target = v.safeParse(bindingTargetSchema, entry)
+        return target.success ? [[field, target.output]] : []
+      })
+    )
+  )
+)
+
 const ownTextSchema = v.object({
   text: v.object({
     fontFamily: v.string(),
@@ -50,7 +70,8 @@ const ownTextSchema = v.object({
     textDecoration: v.picklist(['NONE', 'UNDERLINE', 'STRIKETHROUGH']),
     textCase: v.picklist(['ORIGINAL', 'UPPER', 'LOWER', 'TITLE'])
   }),
-  bindings: v.optional(v.record(v.string(), v.string()))
+  bindings: v.optional(v.record(v.string(), v.string())),
+  aliasData: v.optional(v.fallback(aliasDataSchema, {}))
 })
 const ownEffectsSchema = v.object({ effects: v.array(v.unknown()) })
 
@@ -61,7 +82,8 @@ const STYLE_KINDS: Partial<Record<string, PlannedStyle['kind']>> = {
 }
 
 type Resolve = (path: readonly string[]) => ResolvedReference | undefined
-type Alias = (path: readonly string[]) => AliasTarget | undefined
+/** The variable a reference names; the collection and name a file records find it among same paths. */
+type Alias = (path: readonly string[], target?: BindingTarget) => AliasTarget | undefined
 
 /** A field's value: its own, or what the token it references holds, decoded the same way. */
 function fieldValue<T>(
@@ -134,11 +156,25 @@ function textBindings(token: ReadToken, alias: Alias): PlannedStyle['bindings'] 
   else if (isPlainObject(token.value)) references = token.value
   const bindings: PlannedStyle['bindings'] = {}
   for (const field of TEXT_BINDING_FIELDS) {
-    const path = referencePath(references[field])
-    const target = path && alias(path)
+    const reference = references[field]
+    const path = referencePath(reference)
+    const target = path && alias(path, recordedTarget(own, field, reference))
     if (target) bindings[field] = target
   }
   return bindings
+}
+
+/**
+ * The variable Pairdraw recorded for a bound field, while the field still holds the reference
+ * it wrote; another tool's edit to the reference goes by its path.
+ */
+function recordedTarget(
+  own: { bindings?: Record<string, string>; aliasData?: Record<string, BindingTarget> } | null,
+  field: string,
+  reference: unknown
+): BindingTarget | undefined {
+  if (!own || reference === undefined || own.bindings?.[field] !== reference) return undefined
+  return own.aliasData?.[field]
 }
 
 /** One shadow of a shadow token, or the shadows a referenced shadow token holds. */

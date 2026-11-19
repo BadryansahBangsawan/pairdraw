@@ -18,3 +18,4 @@
 - A script that edits a component and then reads an instance sees the edit at once, as in Figma: the Plugin API syncs pending component edits before reading or writing a layer inside an instance, and a failed sync is retried at the next read.
 - A binding change on a layer inside a nested instance claims only that binding, so the layer's other bindings keep following their component.
 - A synced bound number takes the value of the mode its copy sits in, not its component's, and a number the instance overrides keeps its own value through the sync.
+- A text style bound to a variable whose token path another collection shares reads back bound to the same variable: the export records each bound field's collection and variable, and warns about references other tools could misread.

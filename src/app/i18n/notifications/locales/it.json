@@ -48,6 +48,7 @@
   "openQueuedFilesFailed": "Impossibile aprire i file passati a Pairdraw: {error}",
   "tokensLeftOut": "Esclusi dal foglio di stile: {names}.",
   "designTokensLeftOut": "Esclusi dai design token: {names}.",
+  "designTokensAmbiguous": "Questi stili rimandano a una variabile il cui percorso esiste anche in un’altra collezione, quindi altri strumenti potrebbero leggere quella sbagliata: {names}.",
   "designTokensImported": "Importati {count} design token.",
   "unsupportedVariableExpressions": "Pairdraw non sa ancora valutare queste variabili, quindi i livelli mantengono i valori salvati nel file: {names}.",
   "placeImageUnsupported": "Scegli un file PNG, JPEG, WebP, GIF, AVIF o SVG da inserire.",

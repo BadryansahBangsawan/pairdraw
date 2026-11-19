@@ -106,7 +106,6 @@ export class SkiaRenderer {
   linearDodgeBlender: Blender | null = null
   declare strokePaint: Paint
   declare selectionPaint: Paint
-  declare parentOutlinePaint: Paint
   declare snapPaint: Paint
   declare auxFill: Paint
   declare auxStroke: Paint
@@ -271,7 +270,6 @@ export class SkiaRenderer {
   declare drawSelection: RendererDomainMethods['drawSelection']
   declare drawNodeSelection: RendererDomainMethods['drawNodeSelection']
   declare drawSelectionLabels: RendererDomainMethods['drawSelectionLabels']
-  declare drawParentFrameOutlines: RendererDomainMethods['drawParentFrameOutlines']
   declare drawNodeOutline: RendererDomainMethods['drawNodeOutline']
   declare drawGroupBounds: RendererDomainMethods['drawGroupBounds']
   declare getRotatedCorners: RendererDomainMethods['getRotatedCorners']

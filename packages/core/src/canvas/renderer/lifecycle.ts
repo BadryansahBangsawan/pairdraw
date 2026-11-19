@@ -50,7 +50,6 @@ export function destroyRenderer(r: SkiaRenderer): void {
   releaseRuntimeEffects(r)
   r.strokePaint.delete()
   r.selectionPaint.delete()
-  r.parentOutlinePaint.delete()
   r.snapPaint.delete()
   r.auxFill.delete()
   r.auxStroke.delete()

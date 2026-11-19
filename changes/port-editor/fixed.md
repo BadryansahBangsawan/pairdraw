@@ -7,3 +7,4 @@
 - Right-clicking a frame, section, or component name now selects that layer, a locked one included, on the pane that was clicked.
 - The Comment tool no longer covers the canvas, so the wheel, the middle button, and Space still pan while it is selected.
 - The marquee border is now one screen pixel wide at any zoom, as in Figma.
+- A selected layer no longer outlines its parent frames, however deeply nested, as in Figma.

@@ -77,15 +77,6 @@ const rendererMethods = {
     Overlays.drawSelectionLabels(this, canvas, graph, selectedIds, overlays)
   },
 
-  drawParentFrameOutlines(
-    canvas: Canvas,
-    graph: SceneGraph,
-    selectedIds: Set<string>,
-    preview?: RenderOverlays['rotationPreview']
-  ): void {
-    Overlays.drawParentFrameOutlines(this, canvas, graph, selectedIds, preview)
-  },
-
   drawNodeOutline(
     canvas: Canvas,
     node: SceneNode,

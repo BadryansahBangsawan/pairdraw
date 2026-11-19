@@ -2,7 +2,6 @@ import type { SkiaRenderer } from '#core/canvas/renderer'
 import {
   DEFAULT_FONT_SIZE,
   PARENT_OUTLINE_ALPHA,
-  PARENT_OUTLINE_DASH,
   PEN_PATH_STROKE_WIDTH,
   RULER_BG_COLOR,
   RULER_TEXT_COLOR,
@@ -25,14 +24,6 @@ export function initializeRendererPaints(r: SkiaRenderer): void {
   r.selectionPaint.setStyle(ck.PaintStyle.Stroke)
   r.selectionPaint.setStrokeWidth(1)
   r.selectionPaint.setAntiAlias(true)
-
-  r.parentOutlinePaint = new ck.Paint()
-  r.parentOutlinePaint.setStyle(ck.PaintStyle.Stroke)
-  r.parentOutlinePaint.setStrokeWidth(1)
-  r.parentOutlinePaint.setAntiAlias(true)
-  r.parentOutlinePaint.setPathEffect(
-    ck.PathEffect.MakeDash([PARENT_OUTLINE_DASH, PARENT_OUTLINE_DASH], 0)
-  )
 
   r.snapPaint = new ck.Paint()
   r.snapPaint.setStyle(ck.PaintStyle.Stroke)
@@ -117,7 +108,6 @@ export function initializeRendererPaints(r: SkiaRenderer): void {
 /** Colors the long-lived paints drawn in the selection color; rerun when that color changes. */
 export function initializeSelectionPaintColors(r: SkiaRenderer): void {
   r.selectionPaint.setColor(r.selColor())
-  r.parentOutlinePaint.setColor(r.selColor(PARENT_OUTLINE_ALPHA))
   r.penHandlePaint.setColor(r.selColor(PARENT_OUTLINE_ALPHA))
   r.penVertexStroke.setColor(r.selColor())
 }

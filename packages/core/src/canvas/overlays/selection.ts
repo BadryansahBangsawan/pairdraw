@@ -5,7 +5,6 @@ import { layerRotates } from '@pairdraw/scene-graph/generated'
 import { computeBounds, rotatedCorners } from '@pairdraw/scene-graph/geometry'
 import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
-import { slotPropertyId } from '@pairdraw/scene-graph/slots'
 
 import { drawConnectorHover, drawConnectorSelection } from '#core/canvas/overlays/connectors'
 import type { RenderOverlays, SkiaRenderer } from '#core/canvas/renderer'
@@ -143,8 +142,6 @@ export function drawSelection(
   if (selectedIds.size === 0) return
   const nodeEditId = overlays.nodeEditState?.nodeId ?? null
   const preview = overlays.rotationPreview
-
-  r.drawParentFrameOutlines(canvas, graph, selectedIds, preview)
 
   if (selectedIds.size === 1) {
     const id = [...selectedIds][0]
@@ -372,55 +369,6 @@ export function drawNodeSelection(
     },
     preview
   )
-}
-
-export function drawParentFrameOutlines(
-  r: SkiaRenderer,
-  canvas: Canvas,
-  graph: SceneGraph,
-  selectedIds: Set<string>,
-  preview?: RotationPreview | null
-): void {
-  const drawn = new Set<string>()
-  for (const id of selectedIds) {
-    const node = graph.getNode(id)
-    if (!node?.parentId) continue
-
-    const parent = graph.getNode(node.parentId)
-    if (!parent || parent.type === 'CANVAS') continue
-    if (drawn.has(parent.id) || selectedIds.has(parent.id)) continue
-    // Slots get their own dashed outline (overlays/slots.ts).
-    if (slotPropertyId(parent)) continue
-
-    const grandparent = parent.parentId ? graph.getNode(parent.parentId) : null
-    if (!grandparent || grandparent.type === 'CANVAS') continue
-
-    drawn.add(parent.id)
-
-    const m = createSceneGeometry(graph, preview).screenMatrix(parent, r)
-
-    const pts = Matrix.mapPoints(m, [
-      0,
-      0,
-      parent.width,
-      0,
-      parent.width,
-      parent.height,
-      0,
-      parent.height
-    ])
-
-    const path = new r.ck.PathBuilder()
-    path.moveTo(pts[0], pts[1])
-    path.lineTo(pts[2], pts[3])
-    path.lineTo(pts[4], pts[5])
-    path.lineTo(pts[6], pts[7])
-    path.close()
-
-    const immutablePath = path.detachAndDelete()
-    canvas.drawPath(immutablePath, r.parentOutlinePaint)
-    immutablePath.delete()
-  }
 }
 
 export function drawNodeOutline(

@@ -5,7 +5,6 @@ export {
   drawHoverHighlight,
   drawNodeOutline,
   drawNodeSelection,
-  drawParentFrameOutlines,
   drawSelection,
   getRotatedCorners
 } from './selection'

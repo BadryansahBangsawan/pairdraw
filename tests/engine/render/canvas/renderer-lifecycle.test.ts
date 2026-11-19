@@ -34,7 +34,6 @@ function createRenderer() {
     fillPaint: deletable<Paint>(),
     strokePaint: deletable<Paint>(),
     selectionPaint: deletable<Paint>(),
-    parentOutlinePaint: deletable<Paint>(),
     snapPaint: deletable<Paint>(),
     auxFill: deletable<Paint>(),
     auxStroke: deletable<Paint>(),
@@ -95,14 +94,12 @@ test('destroyRenderer releases tiled resources before deleting the main surface'
 
 test('destroyRenderer deletes all renderer-owned paints and label fonts', () => {
   const renderer = createRenderer()
-  const parentOutlinePaint = renderer.parentOutlinePaint
   const sectionTitleFont = renderer.sectionTitleFont
   const componentLabelFont = renderer.componentLabelFont
   const pencilStrokePaint = renderer.pencilStrokePaint
 
   destroyRenderer(renderer)
 
-  expect(parentOutlinePaint.delete).toHaveBeenCalled()
   expect(pencilStrokePaint.delete).toHaveBeenCalled()
   expect(sectionTitleFont?.delete).toHaveBeenCalled()
   expect(componentLabelFont?.delete).toHaveBeenCalled()

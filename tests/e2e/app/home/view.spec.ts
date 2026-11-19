@@ -67,3 +67,13 @@ test('without a model, a prompt on Home offers AI setup and stays when setup is 
   await expect(prompt).toHaveValue('A sign-in screen')
   await expect(page.getByTestId('tabbar-tab')).toHaveCount(2)
 })
+
+test('Tab on Home moves focus instead of stepping layers', async ({ page }) => {
+  await page.goto('/?recent-files')
+  const home = page.getByTestId('recent-files-home')
+  await expect(home).toBeVisible()
+  // No editor is open, so nothing should claim Tab for layer selection.
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
+  await page.keyboard.press('Tab')
+  await expect.poll(() => page.evaluate(() => document.activeElement === document.body)).toBe(false)
+})

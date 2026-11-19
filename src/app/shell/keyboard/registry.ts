@@ -186,11 +186,14 @@ function opacityBindings(): ShortcutDefinition[] {
 }
 
 /**
- * Tab steps through sibling layers only while nothing on the page holds focus, so it still
- * moves focus through the panels' controls.
+ * Tab steps through sibling layers only while nothing on the page holds focus and an editor pane is
+ * on screen, so it still moves focus through the panels' controls and through Home.
  */
 function isCanvasFocus(event: KeyboardEvent) {
-  return event.target === document.body || event.target instanceof HTMLCanvasElement
+  if (event.target instanceof HTMLCanvasElement) return true
+  return (
+    event.target === document.body && document.querySelector('[data-active-pane="true"]') !== null
+  )
 }
 
 function siblingShortcut(

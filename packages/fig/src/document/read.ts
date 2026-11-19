@@ -249,7 +249,7 @@ interface SharedReaderState {
 interface DocumentFacts {
   resources: readonly NodeChange[]
   /** Every page in saved order, with the GUIDs the reader addresses pages by. */
-  pages: FigPageEntry[]
+  pages: { id: string; name: string; position: string | null; internalOnly: boolean }[]
   knownPageIds: ReadonlySet<string>
   /** The page headers an unscoped read starts from. */
   pageRecords: readonly NodeChange[]
@@ -260,14 +260,7 @@ interface DocumentFacts {
   guids: readonly (string | undefined)[]
 }
 
-interface FigPageEntry {
-  id: string
-  name: string
-  position: number | null
-  internalOnly: boolean
-}
-
-function documentFacts(records: ReaderRecords, index: SourceIndex): DocumentFacts {
+function documentFacts(records: readonly NodeChange[], index: SourceIndex): DocumentFacts {
   const resources = records.filter(isResource)
   const pageRecords = records.filter((change) => change.type === 'CANVAS')
   return {

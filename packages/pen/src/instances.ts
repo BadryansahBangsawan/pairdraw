@@ -30,11 +30,17 @@ function sources(graph: SceneGraph, node: SceneNode): Set<string> {
   return found
 }
 
+/** The pen.dev layer a layer was built from, which a component swap stops naming. */
+function penLayerId(build: Build, node: SceneNode): string | undefined {
+  return build.effective.get(node.id)?.id
+}
+
 /** The copy in `root`'s layers made from the pen.dev layer `sourceId`, at any depth. */
-function findCopy(graph: SceneGraph, root: SceneNode, sourceId: string): SceneNode | undefined {
+function findCopy(build: Build, root: SceneNode, sourceId: string): SceneNode | undefined {
+  const { graph } = build
   const queue = graph.getChildren(root.id)
   for (const node of queue) {
-    if (sources(graph, node).has(sourceId)) return node
+    if (penLayerId(build, node) === sourceId || sources(graph, node).has(sourceId)) return node
     queue.push(...graph.getChildren(node.id))
   }
   return undefined
@@ -44,10 +50,10 @@ function findCopy(graph: SceneGraph, root: SceneNode, sourceId: string): SceneNo
  * The layer an override's key names: pen.dev IDs separated by `/`, each one inside the copy of the
  * instance the one before it names.
  */
-function resolvePath(graph: SceneGraph, instance: SceneNode, path: string): SceneNode | undefined {
+function resolvePath(build: Build, instance: SceneNode, path: string): SceneNode | undefined {
   let current: SceneNode | undefined = instance
   for (const id of path.split('/')) {
-    current = current ? findCopy(graph, current, id) : undefined
+    current = current ? findCopy(build, current, id) : undefined
   }
   return current
 }
@@ -217,7 +223,7 @@ function applyDescendants(
   populate: Populate
 ): void {
   for (const [path, override] of Object.entries(descendants ?? {})) {
-    const target = resolvePath(build.graph, instance, path)
+    const target = resolvePath(build, instance, path)
     if (!target) continue
     if (override.type) replaceLayer(build, target, override, populate)
     else overrideLayer(build, target, override, instance)

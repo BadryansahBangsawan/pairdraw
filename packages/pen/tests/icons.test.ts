@@ -171,3 +171,111 @@ describe('parsePenFile — icons in components', () => {
     }
   })
 })
+
+describe('parsePenFile — icons nested in a component', () => {
+  const iconButton: PenNode = {
+    id: 'iconButton',
+    type: 'frame',
+    reusable: true,
+    width: 32,
+    height: 32,
+    children: [
+      {
+        id: 'glyph',
+        type: 'icon',
+        library: 'lucide',
+        icon: 'plus',
+        width: 16,
+        height: 16,
+        fill: '#333333'
+      }
+    ]
+  }
+
+  const themeRow: PenNode = {
+    id: 'themeRow',
+    type: 'frame',
+    reusable: true,
+    layout: 'horizontal',
+    children: [
+      { id: 'sunButton', type: 'ref', ref: 'iconButton', descendants: { glyph: { icon: 'sun' } } },
+      { id: 'moonButton', type: 'ref', ref: 'iconButton', descendants: { glyph: { icon: 'moon' } } }
+    ]
+  }
+
+  /** The main component name of every icon instance inside `rootId`, in layer order. */
+  function iconNames(graph: SceneGraph, rootId: string): string[] {
+    const found: SceneNode[] = []
+    const queue = [...graph.getChildren(rootId)]
+    for (const node of queue) {
+      found.push(node)
+      queue.push(...graph.getChildren(node.id))
+    }
+    return found
+      .filter((node) => node.type === 'INSTANCE')
+      .map((node) => instanceMainComponent(graph, node)?.name ?? '')
+      .filter((name) => name.startsWith('lucide/'))
+  }
+
+  test('keeps the icon each nested instance sets when an outer instance copies it', () => {
+    const graph = parseDocument(
+      [iconButton, themeRow, { id: 'screen', type: 'ref', ref: 'themeRow' }],
+      {},
+      { icons }
+    )
+    expect(iconNames(graph, 'screen')).toEqual(['lucide/sun/16x16', 'lucide/moon/16x16'])
+  })
+
+  const toolbar: PenNode = {
+    id: 'toolbar',
+    type: 'frame',
+    reusable: true,
+    layout: 'horizontal',
+    children: [
+      { id: 'left', type: 'ref', ref: 'themeRow' },
+      { id: 'right', type: 'ref', ref: 'themeRow' }
+    ]
+  }
+
+  test('reaches an icon three instances deep by its path', () => {
+    const graph = parseDocument(
+      [
+        iconButton,
+        themeRow,
+        toolbar,
+        {
+          id: 'screen',
+          type: 'ref',
+          ref: 'toolbar',
+          descendants: { 'left/sunButton/glyph': { icon: 'star' } }
+        }
+      ],
+      {},
+      { icons }
+    )
+    expect(iconNames(graph, 'screen')).toEqual([
+      'lucide/star/16x16',
+      'lucide/moon/16x16',
+      'lucide/sun/16x16',
+      'lucide/moon/16x16'
+    ])
+  })
+
+  test('applies an outer instance override to a nested instance icon by its path', () => {
+    const graph = parseDocument(
+      [
+        iconButton,
+        themeRow,
+        {
+          id: 'screen',
+          type: 'ref',
+          ref: 'themeRow',
+          descendants: { 'sunButton/glyph': { icon: 'star' } }
+        }
+      ],
+      {},
+      { icons }
+    )
+    expect(iconNames(graph, 'screen')).toEqual(['lucide/star/16x16', 'lucide/moon/16x16'])
+  })
+})

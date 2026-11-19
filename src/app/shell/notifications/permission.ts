@@ -1,5 +1,4 @@
-import { usePermission } from '@vueuse/core'
-import { readonly, shallowRef, watch } from 'vue'
+import { readonly, shallowRef } from 'vue'
 
 import { IS_TAURI } from '@pairdraw/core/constants'
 
@@ -14,10 +13,24 @@ function current(): BrowserNotificationPermission {
 }
 
 const permission = shallowRef(current())
-// The person can change the site setting while the page is open.
-watch(usePermission('notifications'), () => {
-  permission.value = current()
-})
+
+// The person can change the site setting while the page is open. Follow it through the
+// status's `onchange`: Chromium's notifications PermissionStatus throws on addEventListener
+// (VueUse's usePermission registers one), which once failed the whole app boot.
+async function followPermissionChanges(): Promise<void> {
+  if (IS_TAURI || typeof navigator === 'undefined' || !('permissions' in navigator)) return
+  try {
+    const status = await navigator.permissions.query({ name: 'notifications' })
+    status.onchange = () => {
+      permission.value = current()
+    }
+  } catch (error) {
+    // A browser that refuses the query keeps the permission it reported at load.
+    console.warn('[Notifications] Permission query failed:', error)
+  }
+}
+
+void followPermissionChanges()
 
 /** The page's notification permission, kept current as the site setting changes. */
 export const browserNotificationPermission = readonly(permission)

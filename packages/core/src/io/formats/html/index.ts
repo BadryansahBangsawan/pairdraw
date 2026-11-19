@@ -2,7 +2,7 @@ import { filename } from 'pathe/utils'
 
 import {
   exportHTMLBundle,
-  sceneNodeToDesignDocument,
+  sceneNodesToDesignDocument,
   type DesignDocument
 } from '@pairdraw/dom-css/export'
 import type { SceneGraph } from '@pairdraw/scene-graph'
@@ -23,11 +23,7 @@ function designDocument(
     includeLayerNames: options.layerNames ?? true,
     includeSourceIds: options.layerIds ?? false
   }
-  return {
-    type: 'document',
-    sourceGraph: graph,
-    children: nodeIds.flatMap((id) => sceneNodeToDesignDocument(graph, id, projection).children)
-  }
+  return sceneNodesToDesignDocument(graph, nodeIds, projection)
 }
 
 /** `card.html` keeps its external files in `card.assets/` next to it, whatever the path style. */

@@ -578,14 +578,25 @@ export function sceneNodeToDesignDocument(
   nodeId: string,
   options: Omit<SceneGraphToDesignOptions, 'rootId'> = {}
 ): DesignDocument {
-  const node = graph.getNode(nodeId)
+  return sceneNodesToDesignDocument(graph, [nodeId], options)
+}
+
+/**
+ * Project several nodes, including each own box, through one token collector: the document then
+ * declares the tokens every root references, not only those of the last one.
+ */
+export function sceneNodesToDesignDocument(
+  graph: SceneGraph,
+  nodeIds: readonly string[],
+  options: Omit<SceneGraphToDesignOptions, 'rootId'> = {}
+): DesignDocument {
   const context = projectionContext(graph, options)
   const modes = context.tokens?.defaultModes() ?? new Map<string, string>()
-  const projected = node ? sceneNodeToDesignNode(context, node, modes, true) : null
-  return {
-    type: 'document',
-    sourceGraph: graph,
-    tokens: context.tokens,
-    children: projected ? [projected] : []
+  const children: DesignNode[] = []
+  for (const nodeId of nodeIds) {
+    const node = graph.getNode(nodeId)
+    const projected = node ? sceneNodeToDesignNode(context, node, modes, true) : null
+    if (projected) children.push(projected)
   }
+  return { type: 'document', sourceGraph: graph, tokens: context.tokens, children }
 }

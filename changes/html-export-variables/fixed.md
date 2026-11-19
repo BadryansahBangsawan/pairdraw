@@ -1,0 +1,1 @@
+- HTML exports now declare the design variables their styles reference, so colors, gradients, and spacing resolve when the page opens in a browser.

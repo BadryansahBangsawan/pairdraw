@@ -30,11 +30,31 @@ export function useNodePreview(editor: Editor) {
     }
   }
 
+  /** Previews a change for each named node, such as the layers a resize places. */
+  function updateNodes(changes: ReadonlyMap<string, Partial<SceneNode>>, label: string) {
+    if (!changes.size) return
+    if (!preview) {
+      targets = [...changes.keys()]
+      preview = editor.beginNodePreview(label)
+    }
+    try {
+      for (const [id, patch] of changes) preview.update(id, patch)
+    } catch (error) {
+      cancel()
+      throw error
+    }
+  }
+
   function takePreview() {
     const current = preview
     preview = undefined
     targets = []
     return current
+  }
+
+  /** Whether a preview is running, so a caller can tell an edit's first preview from its later ones. */
+  function isActive() {
+    return preview !== undefined
   }
 
   function commit() {
@@ -47,5 +67,5 @@ export function useNodePreview(editor: Editor) {
 
   tryOnScopeDispose(cancel)
   if (getCurrentInstance()) onDeactivated(cancel)
-  return { update, commit, cancel }
+  return { update, updateNodes, commit, cancel, isActive }
 }

@@ -136,3 +136,90 @@ describe('property previews', () => {
     }
   })
 })
+
+test('a width typed in the panel places constrained layers as the corner does', () => {
+  const editor = createEditor()
+  try {
+    const frame = editor.graph.createNode('FRAME', editor.state.currentPageId, {
+      width: 200,
+      height: 100
+    })
+    const pinned = editor.graph.createNode('RECTANGLE', frame.id, {
+      x: 20,
+      y: 20,
+      width: 20,
+      height: 20,
+      horizontalConstraint: 'MAX',
+      verticalConstraint: 'MIN'
+    })
+    const stretched = editor.graph.createNode('RECTANGLE', frame.id, {
+      x: 100,
+      y: 60,
+      width: 20,
+      height: 20,
+      horizontalConstraint: 'STRETCH',
+      verticalConstraint: 'MIN'
+    })
+    editor.select([frame.id])
+    const actions = createLayoutActions({ editor, node: computed(() => frame) })
+
+    actions.updateAxisSize('width', 300)
+    expect(pinned.x).toBe(120)
+    expect(stretched.width).toBe(120)
+    expect(stretched.x).toBe(100)
+
+    actions.commitAxisSize('width', 300, 200)
+    editor.undoAction()
+    expect([pinned.x, pinned.width, stretched.x, stretched.width]).toEqual([20, 20, 100, 20])
+  } finally {
+    editor.dispose()
+  }
+})
+
+test('a height typed in steps places constrained layers from where the edit began', () => {
+  const editor = createEditor()
+  try {
+    const frame = editor.graph.createNode('FRAME', editor.state.currentPageId, {
+      width: 280,
+      height: 250
+    })
+    const child = editor.graph.createNode('RECTANGLE', frame.id, {
+      x: 40,
+      y: 50,
+      width: 100,
+      height: 100,
+      horizontalConstraint: 'MAX',
+      verticalConstraint: 'SCALE'
+    })
+    editor.select([frame.id])
+    const actions = createLayoutActions({ editor, node: computed(() => frame) })
+    const rect = () => ({
+      x: child.x,
+      y: child.y,
+      width: child.width,
+      height: child.height
+    })
+
+    // Typing 375 previews 3, then 37, then 375; every preview must measure from 250, not from
+    // the size its own earlier keystroke gave.
+    for (const value of [3, 37, 375]) actions.updateAxisSize('height', value)
+    expect(rect()).toEqual({ x: 40, y: 75, width: 100, height: 150 })
+
+    // Typing 250 back returns the child exactly where it started.
+    for (const value of [250]) actions.updateAxisSize('height', value)
+    expect(rect()).toEqual({ x: 40, y: 50, width: 100, height: 100 })
+
+    // A cancelled edit puts the layers back where the edit began, not where its last preview left them.
+    actions.updateAxisSize('height', 300)
+    actions.cancelPreview()
+    expect(rect()).toEqual({ x: 40, y: 50, width: 100, height: 100 })
+
+    for (const value of [37, 375]) actions.updateAxisSize('height', value)
+    actions.commitAxisSize('height', 375, 250)
+    expect(rect()).toEqual({ x: 40, y: 75, width: 100, height: 150 })
+    editor.undoAction()
+    expect(rect()).toEqual({ x: 40, y: 50, width: 100, height: 100 })
+  } finally {
+    editor.dispose()
+  }
+})

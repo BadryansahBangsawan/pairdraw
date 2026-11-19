@@ -21,6 +21,11 @@ import {
   sizeKeepingAspectRatio,
   type LayoutSizingAxis
 } from '@pairdraw/scene-graph/layout'
+import {
+  collectResizeDescendants,
+  computeConstrainedResizeChanges,
+  type ResizeSnapshot
+} from '@pairdraw/scene-graph/resize'
 
 import { useNodePreview } from '#vue/controls/node-preview/use'
 import { useSelectedNodeState } from '#vue/editor/selection-state/nodes'
@@ -258,18 +263,67 @@ export function createLayoutActions({
       : axisSizingPatchForNode(editor.graph, n, axis, 'FIXED')
   }
 
+  /**
+   * What the size edit running in the preview started from. A size typed in the panel places the
+   * layers inside by their constraints, as a corner drag does in Figma, instead of leaving them
+   * pinned to their old offsets; every keystroke and scrub step of one edit previews the same
+   * frame, so a later value measures from where the edit began instead of from the size the
+   * previous keystroke already gave.
+   */
+  let sizeEditStart:
+    | {
+        nodeId: string
+        size: { width: number; height: number }
+        originals: ReadonlyMap<string, ResizeSnapshot>
+      }
+    | undefined
+
+  function startOfSizeEdit(n: SceneNode) {
+    if (!preview.isActive() || sizeEditStart?.nodeId !== n.id) {
+      sizeEditStart = {
+        nodeId: n.id,
+        size: { width: n.width, height: n.height },
+        originals: collectResizeDescendants(editor.graph, n.id) ?? new Map()
+      }
+    }
+    return sizeEditStart
+  }
+
+  function previewSize(
+    n: SceneNode,
+    size: { width: number; height: number },
+    label: string,
+    sizing: Partial<SceneNode>
+  ) {
+    const start = startOfSizeEdit(n)
+    const placed = computeConstrainedResizeChanges(
+      editor.graph,
+      n.id,
+      start.size,
+      size,
+      start.originals
+    )
+    preview.update([n.id], { ...sizing, ...size }, label)
+    preview.updateNodes(placed, label)
+  }
+
   // A locked layer keeps its ratio as either side is typed, as in Figma.
   function updateAxisSize(axis: LayoutAxis, value: number) {
     const n = node.value
     if (!n) return
     const ratio = enforcedAspectRatio(n)
     if (ratio === null) {
-      preview.update([n.id], { ...fixedAxisPatch(n, axis), [axis]: value }, `Change ${axis}`)
+      previewSize(
+        n,
+        { width: n.width, height: n.height, [axis]: value },
+        `Change ${axis}`,
+        fixedAxisPatch(n, axis)
+      )
       return
     }
     const size = sizeKeepingAspectRatio(ratio, axis, value)
-    const patch = { ...fixedAxisPatch(n, 'width'), ...fixedAxisPatch(n, 'height'), ...size }
-    preview.update([n.id], patch, `Change ${axis}`)
+    const sizing = { ...fixedAxisPatch(n, 'width'), ...fixedAxisPatch(n, 'height') }
+    previewSize(n, size, `Change ${axis}`, sizing)
   }
 
   function toggleAspectRatioLock() {

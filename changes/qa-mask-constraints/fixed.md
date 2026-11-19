@@ -1,1 +1,2 @@
 - Use as mask on several layers wraps them in a `Mask group` whose bottom layer masks the layers above it, at the page level as inside frames.
+- A width or height typed in the Design panel places the frame's layers by their constraints, as dragging its corner does.

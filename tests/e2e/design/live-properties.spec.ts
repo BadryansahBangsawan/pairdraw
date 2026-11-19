@@ -118,3 +118,39 @@ test('size fields follow resizing before the pointer is released', async () => {
     await editor.page.mouse.up()
   }
 })
+
+test('a height typed digit by digit places constrained children from the size the edit began at', async () => {
+  const ids = await editor.page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Editor unavailable')
+    const pageId = store.state.currentPageId
+    const frame = store.createShape('FRAME', 400, 100, 280, 250, pageId)
+    store.graph.updateNode(frame, { name: 'Card' })
+    const child = store.createShape('RECTANGLE', 40, 50, 100, 100, frame)
+    store.graph.updateNode(child, {
+      horizontalConstraint: 'MAX',
+      verticalConstraint: 'SCALE'
+    })
+    store.select([frame])
+    store.requestRender()
+    return { frame, child }
+  })
+  await editor.canvas.waitForRender()
+
+  const height = editor.page.getByRole('spinbutton', { name: 'Height', exact: true })
+  await expect(height).toHaveAttribute('aria-valuenow', '250')
+  await height.click()
+  await height.press('Meta+a')
+  await height.pressSequentially('375')
+
+  const placed = () =>
+    editor.page.evaluate((childId) => {
+      const node = window.pairdraw?.getStore?.().graph.getNode(childId)
+      return node ? { x: node.x, y: node.y, width: node.width, height: node.height } : null
+    }, ids.child)
+  await expect.poll(placed).toEqual({ x: 40, y: 75, width: 100, height: 150 })
+
+  await height.press('Enter')
+  await editor.canvas.undo()
+  await expect.poll(placed).toEqual({ x: 40, y: 50, width: 100, height: 100 })
+})

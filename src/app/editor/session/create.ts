@@ -42,6 +42,8 @@ function buildEditorStore(initialGraph?: SceneGraph) {
   const state = shallowReactive<AppEditorState>(createInitialAppEditorState(graph.getPages()[0].id))
 
   const viewportSize = { width: 0, height: 0 }
+  /** Where floating chrome covers the canvas; the canvas measures it as the layout changes. */
+  const viewportInsets = { top: 0, right: 0, bottom: 0, left: 0 }
   const editor = createEditor({
     graph,
     state,
@@ -51,6 +53,7 @@ function buildEditorStore(initialGraph?: SceneGraph) {
     resolveFigmaClipboardImages: IS_TAURI ? resolveFigmaClipboardImages : undefined,
     skipInitialGraphSetup: !!initialGraph,
     getUserName: () => useCollabIdentity().name.value,
+    getViewportInsets: () => viewportInsets,
     getViewportSize: () =>
       viewportSize.width > 0 && viewportSize.height > 0
         ? viewportSize
@@ -122,7 +125,14 @@ function buildEditorStore(initialGraph?: SceneGraph) {
     preparationLifecycle.delete(failure.id)
   })
   const preparationController = createEditorPreparationController(state, preparationEvents)
-  const modules = createEditorStoreModules(editor, state, io, viewportSize, preparationController)
+  const modules = createEditorStoreModules(
+    editor,
+    state,
+    io,
+    viewportSize,
+    viewportInsets,
+    preparationController
+  )
 
   // ─── Public API ───────────────────────────────────────────────
   // Spread all core Editor methods, then override getters and add app-specific.

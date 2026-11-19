@@ -1,0 +1,1 @@
+- Opening a document, Zoom to fit, and Zoom to selection keep the content clear of the tool rail and the controls floating over the canvas, fitting it into the room they leave.

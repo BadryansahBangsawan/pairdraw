@@ -73,3 +73,83 @@ describe('zoomToBounds', () => {
     expect(y).toBeCloseTo(25_000)
   })
 })
+
+/** Floating chrome over the canvas: a tool rail on the left, a pill at the bottom. */
+const INSETS = { top: 0, right: 0, bottom: 40, left: 60 }
+
+/** The visible canvas the chrome leaves, in screen pixels. */
+const AREA = { left: 60, top: 0, width: VIEWPORT.width - 60, height: VIEWPORT.height - 40 }
+
+describe('the canvas floating chrome leaves', () => {
+  test('zoomToBounds centres content in it, clear of the tool rail', () => {
+    const editor = createEditor({
+      getViewportSize: () => VIEWPORT,
+      getViewportInsets: () => INSETS
+    })
+
+    editor.zoomToBounds(100, 100, 300, 200)
+
+    const { panX, panY, zoom } = editor.state
+    expect(zoom).toBe(1)
+    expect(panX + 100 * zoom).toBe(AREA.left + (AREA.width - 200 * zoom) / 2)
+    expect(panY + 100 * zoom).toBe(AREA.top + (AREA.height - 100 * zoom) / 2)
+  })
+
+  test('zoomToArea fills it and centres on its middle', () => {
+    const editor = createEditor({
+      getViewportSize: () => VIEWPORT,
+      getViewportInsets: () => INSETS
+    })
+
+    editor.zoomToArea(0, 0, 100, 100)
+
+    expect(editor.state.zoom).toBe(5.6)
+    const { panX, panY, zoom } = editor.state
+    expect(panX + 50 * zoom).toBeCloseTo(AREA.left + AREA.width / 2)
+    expect(panY + 50 * zoom).toBeCloseTo(AREA.top + AREA.height / 2)
+  })
+
+  test('centerOn puts the point at the middle of the visible canvas', () => {
+    const editor = createEditor({
+      getViewportSize: () => VIEWPORT,
+      getViewportInsets: () => INSETS
+    })
+
+    editor.centerOn(300, 200, 2)
+
+    const { panX, panY, zoom } = editor.state
+    expect(panX + 300 * zoom).toBe(AREA.left + AREA.width / 2)
+    expect(panY + 200 * zoom).toBe(AREA.top + AREA.height / 2)
+  })
+
+  test('zoomToLevel keeps the visible middle where it was', () => {
+    const editor = createEditor({
+      getViewportSize: () => VIEWPORT,
+      getViewportInsets: () => INSETS
+    })
+    editor.state.zoom = 2
+    editor.state.panX = -300
+    editor.state.panY = 120
+    const before = {
+      x: (AREA.left + AREA.width / 2 - editor.state.panX) / editor.state.zoom,
+      y: (AREA.top + AREA.height / 2 - editor.state.panY) / editor.state.zoom
+    }
+
+    editor.zoomToLevel(0.5)
+
+    const { panX, panY, zoom } = editor.state
+    expect(panX + before.x * zoom).toBeCloseTo(AREA.left + AREA.width / 2)
+    expect(panY + before.y * zoom).toBeCloseTo(AREA.top + AREA.height / 2)
+  })
+
+  test('chrome that covers the whole canvas leaves the full viewport', () => {
+    const editor = createEditor({
+      getViewportSize: () => VIEWPORT,
+      getViewportInsets: () => ({ top: 0, right: 400, bottom: 0, left: 400 })
+    })
+
+    editor.centerOn(10, 10, 1)
+
+    expect(editor.state.panX).toBe(VIEWPORT.width / 2 - 10)
+  })
+})

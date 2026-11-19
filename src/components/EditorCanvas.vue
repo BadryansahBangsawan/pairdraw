@@ -7,7 +7,17 @@ import {
   PopoverPortal,
   PopoverRoot
 } from 'reka-ui'
-import { computed, onUnmounted, ref, shallowRef, useTemplateRef, watch, type Component } from 'vue'
+import {
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  shallowRef,
+  useTemplateRef,
+  watch,
+  type Component
+} from 'vue'
 import IconLucideAlignHorizontalSpaceBetween from '~icons/lucide/align-horizontal-space-between'
 import IconLucideAlignVerticalSpaceBetween from '~icons/lucide/align-vertical-space-between'
 import IconLucidePanelBottom from '~icons/lucide/panel-bottom'
@@ -35,9 +45,11 @@ import { useCanvasStatusLabels } from '@pairdraw/vue/canvas/statuses'
 import { useCanvas } from '@pairdraw/vue/canvas/surface'
 import { useTextEdit } from '@pairdraw/vue/canvas/text-edit'
 import { toolCursor } from '@pairdraw/vue/editor/tool-cursor'
+import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
 import { autoLayoutValueAnchor, type AutoLayoutValueField } from '@pairdraw/vue/shared/input'
 
 import { useEditorStore } from '@/app/editor/active-store'
+import { canvasChromeInsets } from '@/app/editor/canvas/chrome-insets'
 import { useCanvasCollaborationAwareness } from '@/app/editor/canvas/collaboration-awareness'
 import { createCanvasContextSelection } from '@/app/editor/canvas/context-selection'
 import { reportCanvasDrawFailure } from '@/app/editor/canvas/draw-failure'
@@ -65,11 +77,13 @@ const { paneId } = defineProps<{
 }>()
 
 const store = useEditorStore()
+const { isMobile } = useViewportKind()
 const sceneCanvasRef = ref<HTMLCanvasElement | null>(null)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 
 const isActivePane = computed(() => !paneId || store.activePaneId.value === paneId)
-const followView = useFollowView(useTemplateRef<HTMLElement>('area'))
+const area = useTemplateRef<HTMLElement>('area')
+const followView = useFollowView(area)
 const {
   letterbox,
   scrim,
@@ -99,10 +113,27 @@ const sceneScopeId = computed(() => {
   return store.getPresentation()?.slideId ?? previewFrameId.value ?? null
 })
 watch(sceneScopeId, () => store.requestRender())
+/**
+ * The room the floating chrome leaves over the canvas. Fitting a document to the whole element
+ * would put its left edge under the tool rail, so the editor fits into what is reported here.
+ */
+function reportChromeInsets() {
+  if (!area.value || !isActivePane.value) return
+  store.setViewportInsets(canvasChromeInsets(area.value))
+}
+
 const onViewportResize = (width: number, height: number) => {
   if (paneId) store.resizePane(paneId, width, height)
   if (isActivePane.value) store.setViewportSize(width, height)
+  reportChromeInsets()
 }
+
+onMounted(reportChromeInsets)
+// The rail moves with the rulers and leaves with the chrome; the layout settles a tick later.
+watch(
+  [() => store.state.showRulers, () => store.state.showUI, isMobile],
+  () => void nextTick(reportChromeInsets)
+)
 
 const { updateCursor } = useCanvasCollaborationAwareness(store)
 const { selectAtContextPoint } = createCanvasContextSelection(canvasRef, store)

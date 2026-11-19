@@ -23,3 +23,6 @@ export type DocumentSourceAccess = {
 }
 
 export type ViewportSize = { width: number; height: number }
+
+/** Space the floating chrome covers on each side of the canvas, in screen pixels. */
+export type { ViewportInsets } from '@pairdraw/core'

@@ -263,6 +263,14 @@ export interface EditorEvents extends SceneGraphEvents {
 
 export type EditorEventName = keyof EditorEvents
 
+/** Space the floating chrome covers on each side of the canvas, in screen pixels. */
+export interface ViewportInsets {
+  top: number
+  right: number
+  bottom: number
+  left: number
+}
+
 export interface EditorOptions {
   graph?: SceneGraph
   state?: EditorState
@@ -274,6 +282,8 @@ export interface EditorOptions {
   ) => Promise<ArrayBuffer | null>
   resolveFigmaClipboardImages?: FigmaClipboardImageResolver
   getViewportSize?: () => { width: number; height: number }
+  /** Space the floating chrome covers on the canvas's sides, in screen pixels. */
+  getViewportInsets?: () => ViewportInsets
   /** The name of whoever is editing, which a sticky note they place is signed with. */
   getUserName?: () => string
   /** Where icons are searched and fetched; defaults to Iconify. */
@@ -296,6 +306,7 @@ export interface EditorContext {
   ) => Promise<ArrayBuffer | null>
   resolveFigmaClipboardImages: FigmaClipboardImageResolver | null
   getViewportSize: () => { width: number; height: number }
+  getViewportInsets: () => ViewportInsets
   getUserName: () => string
   icons: IconProvider
   getCk: () => CanvasKit | null

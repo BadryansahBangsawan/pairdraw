@@ -3,7 +3,7 @@ import type { Rect, Size } from '@pairdraw/scene-graph/primitives'
 
 import { pageSlides } from '#core/editor/bridges/frames'
 import type { EditorContext } from '#core/editor/types'
-import type { createViewportActions } from '#core/editor/viewport'
+import { visibleCanvas, type createViewportActions } from '#core/editor/viewport'
 
 import type {
   CanvasView,
@@ -64,11 +64,15 @@ export function presentationViewport(
   }
 }
 
-/** The world point at the screen's center and the zoom, as `centerOn` takes them back. */
+/** The world point at the middle of the canvas the chrome leaves, as `centerOn` takes it back. */
 function currentCenter(ctx: EditorContext): ViewportCenter {
-  const { width, height } = ctx.getViewportSize()
+  const area = visibleCanvas(ctx)
   const { panX, panY, zoom } = ctx.state
-  return { x: (width / 2 - panX) / zoom, y: (height / 2 - panY) / zoom, zoom }
+  return {
+    x: (area.left + area.width / 2 - panX) / zoom,
+    y: (area.top + area.height / 2 - panY) / zoom,
+    zoom
+  }
 }
 
 /** Where the canvas looked before a view replaces it, as the place to return to. */
@@ -86,9 +90,13 @@ export function returnToPlace(
   place: ViewportPlace,
   viewport: PresentationViewport
 ): void {
-  const { width, height } = ctx.getViewportSize()
+  const area = visibleCanvas(ctx)
   const { panX, panY, zoom } = place
-  viewport.centerOn((width / 2 - panX) / zoom, (height / 2 - panY) / zoom, zoom)
+  viewport.centerOn(
+    (area.left + area.width / 2 - panX) / zoom,
+    (area.top + area.height / 2 - panY) / zoom,
+    zoom
+  )
 }
 
 /**

@@ -72,15 +72,21 @@ import type {
   EditorEventName,
   EditorEvents,
   EditorOptions,
-  EditorState
+  EditorState,
+  ViewportInsets
 } from './types'
 import { createUndoActions } from './undo'
 import { createVariableActions } from './variables'
 import { createVectorizeActions } from './vectorize'
-import { createViewportActions } from './viewport'
+import { createViewportActions, NO_VIEWPORT_INSETS } from './viewport'
 import { createCanvasViewActions, offeredTool, resolveEditorProfile } from './views'
 
 export { createDefaultEditorState } from './state'
+
+/** A canvas with no chrome reports nothing, which is the same as none covering it. */
+function resolveViewportInsets(options?: EditorOptions): () => ViewportInsets {
+  return options?.getViewportInsets ?? (() => NO_VIEWPORT_INSETS)
+}
 
 export function createEditor(options?: EditorOptions) {
   let _graph = options?.graph ?? new SceneGraph()
@@ -93,6 +99,7 @@ export function createEditor(options?: EditorOptions) {
       if (IS_BROWSER) return { width: window.innerWidth, height: window.innerHeight }
       return { width: 800, height: 600 }
     })
+  const _getViewportInsets = resolveViewportInsets(options)
   let _ck: CanvasKit | null = null
   let _renderer: SkiaRenderer | null = null
   const _renderers = new Set<SkiaRenderer>()
@@ -266,6 +273,7 @@ export function createEditor(options?: EditorOptions) {
     loadFont: _loadFont,
     resolveFigmaClipboardImages: options?.resolveFigmaClipboardImages ?? null,
     getViewportSize: _getViewportSize,
+    getViewportInsets: _getViewportInsets,
     getUserName: () => options?.getUserName?.() ?? '',
     icons: options?.icons ?? defaultIcons,
     getCk: () => _ck,

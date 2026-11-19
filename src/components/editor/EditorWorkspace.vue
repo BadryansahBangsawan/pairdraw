@@ -146,7 +146,7 @@ const { pending: roomPending } = useRoomActions()
           <EditorCanvasPrompt />
           <ActiveRoomOverlay />
           <EditorToolbar />
-          <div :class="workspaceStyles.zoom()">
+          <div :class="workspaceStyles.zoom()" data-canvas-inset="bottom right">
             <ZoomDropdown />
           </div>
         </div>

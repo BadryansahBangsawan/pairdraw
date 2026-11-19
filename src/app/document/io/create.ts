@@ -8,7 +8,7 @@ import {
   createDocumentSourceActions,
   createDocumentSourceState
 } from '@/app/document/io/source/actions'
-import type { ViewportSize } from '@/app/document/io/types'
+import type { ViewportInsets, ViewportSize } from '@/app/document/io/types'
 import { createDiskChangeGuard } from '@/app/document/io/watch/guard'
 import { createFileWatcher } from '@/app/document/io/watch/watcher'
 import type { SaveFailure } from '@/app/document/save-failure'
@@ -24,6 +24,7 @@ export function createDocumentIOActions(
   editor: Editor,
   state: DocumentIOState,
   viewportSize: ViewportSize,
+  viewportInsets: ViewportInsets,
   preparationController: EditorPreparationController
 ) {
   const sourceState = createDocumentSourceState()
@@ -62,8 +63,13 @@ export function createDocumentIOActions(
     diskChange.follow(null)
     watcher.stopWatchingFile()
   }
-  const { setViewportSize, getViewportSize, fitCurrentPageToViewport } =
-    createDocumentViewportActions(editor, viewportSize)
+  const {
+    setViewportSize,
+    getViewportSize,
+    setViewportInsets,
+    getViewportInsets,
+    fitCurrentPageToViewport
+  } = createDocumentViewportActions(editor, viewportSize, viewportInsets)
   const sourceActions = createDocumentSourceActions({
     editor,
     state,
@@ -94,6 +100,8 @@ export function createDocumentIOActions(
     downloadBlob,
     setViewportSize,
     getViewportSize,
+    setViewportInsets,
+    getViewportInsets,
     fitCurrentPageToViewport,
     getDocumentFilePath: sourceState.getFilePath,
     getSourceIdentity: sourceState.getSourceIdentity,

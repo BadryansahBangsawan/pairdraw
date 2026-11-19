@@ -123,5 +123,6 @@ export type {
   ShapeHandleHover,
   GradientEdit,
   ImageEdit,
-  Tool
+  Tool,
+  ViewportInsets
 } from './types'

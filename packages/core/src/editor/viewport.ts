@@ -4,10 +4,37 @@ import { computeBounds, computeAbsoluteBounds } from '@pairdraw/scene-graph/geom
 import { ZOOM_DIVISOR, ZOOM_SCALE_MAX, ZOOM_SCALE_MIN } from '#core/constants'
 import { emitNavigationTrace } from '#core/profiler'
 
-import type { EditorContext } from './types'
+import type { EditorContext, ViewportInsets } from './types'
 
 /** Space kept between revealed layers and the viewport edge. */
 const REVEAL_MARGIN = 48
+
+/** No floating chrome, for an editor whose canvas is bare. */
+export const NO_VIEWPORT_INSETS: ViewportInsets = { top: 0, right: 0, bottom: 0, left: 0 }
+
+/** The canvas the floating chrome leaves, in screen pixels, from its top-left corner. */
+export interface VisibleCanvas {
+  left: number
+  top: number
+  width: number
+  height: number
+}
+
+/**
+ * The part of the canvas no floating chrome covers. A rail on the left or a pill at the bottom sits
+ * above the canvas element, so fitting to the whole element hides content under it.
+ */
+export function visibleCanvas(ctx: EditorContext): VisibleCanvas {
+  const { width, height } = ctx.getViewportSize()
+  const insets = ctx.getViewportInsets()
+  const left = Math.min(Math.max(insets.left, 0), width)
+  const top = Math.min(Math.max(insets.top, 0), height)
+  const right = Math.min(Math.max(insets.right, 0), width - left)
+  const bottom = Math.min(Math.max(insets.bottom, 0), height - top)
+  const area = { left, top, width: width - left - right, height: height - top - bottom }
+  // Chrome that covers everything is no guide at all; the whole canvas is then the best guess.
+  return area.width > 0 && area.height > 0 ? area : { left: 0, top: 0, width, height }
+}
 
 export function createViewportActions(ctx: EditorContext) {
   function currentViewport() {
@@ -68,12 +95,12 @@ export function createViewportActions(ctx: EditorContext) {
     const w = maxX - minX + padding * 2
     const h = maxY - minY + padding * 2
 
-    const { width: viewW, height: viewH } = ctx.getViewportSize()
-    const zoom = Math.max(0.02, Math.min(viewW / w, viewH / h, 1))
+    const area = visibleCanvas(ctx)
+    const zoom = Math.max(0.02, Math.min(area.width / w, area.height / h, 1))
 
     ctx.state.zoom = zoom
-    ctx.state.panX = (viewW - w * zoom) / 2 - minX * zoom + padding * zoom
-    ctx.state.panY = (viewH - h * zoom) / 2 - minY * zoom + padding * zoom
+    ctx.state.panX = area.left + (area.width - w * zoom) / 2 - minX * zoom + padding * zoom
+    ctx.state.panY = area.top + (area.height - h * zoom) / 2 - minY * zoom + padding * zoom
     ctx.requestRepaint()
     emitViewportChanged(previous)
   }
@@ -88,11 +115,11 @@ export function createViewportActions(ctx: EditorContext) {
     const height = maxY - minY
     if (!(width > 0) || !(height > 0)) return
     const previous = currentViewport()
-    const { width: viewW, height: viewH } = ctx.getViewportSize()
-    const zoom = Math.max(0.02, Math.min(256, Math.min(viewW / width, viewH / height)))
+    const area = visibleCanvas(ctx)
+    const zoom = Math.max(0.02, Math.min(256, Math.min(area.width / width, area.height / height)))
     ctx.state.zoom = zoom
-    ctx.state.panX = viewW / 2 - (minX + width / 2) * zoom
-    ctx.state.panY = viewH / 2 - (minY + height / 2) * zoom
+    ctx.state.panX = area.left + area.width / 2 - (minX + width / 2) * zoom
+    ctx.state.panY = area.top + area.height / 2 - (minY + height / 2) * zoom
     ctx.requestRepaint()
     emitViewportChanged(previous)
   }
@@ -100,10 +127,10 @@ export function createViewportActions(ctx: EditorContext) {
   /** Put the world point (x, y) at the center of the viewport, at `zoom` (the current one by default). */
   function centerOn(x: number, y: number, zoom = ctx.state.zoom) {
     const previous = currentViewport()
-    const { width, height } = ctx.getViewportSize()
+    const area = visibleCanvas(ctx)
     const nextZoom = Math.max(0.02, Math.min(256, zoom))
-    const panX = width / 2 - x * nextZoom
-    const panY = height / 2 - y * nextZoom
+    const panX = area.left + area.width / 2 - x * nextZoom
+    const panY = area.top + area.height / 2 - y * nextZoom
     // Remote cursors are finite but unbounded; a point that overflows leaves the view alone.
     if (!Number.isFinite(panX) || !Number.isFinite(panY)) return
     ctx.state.zoom = nextZoom
@@ -122,15 +149,15 @@ export function createViewportActions(ctx: EditorContext) {
   }
 
   function zoomToLevel(level: number) {
-    const { width: viewW, height: viewH } = ctx.getViewportSize()
-    const centerX = (-ctx.state.panX + viewW / 2) / ctx.state.zoom
-    const centerY = (-ctx.state.panY + viewH / 2) / ctx.state.zoom
+    const area = visibleCanvas(ctx)
+    const centerX = (-ctx.state.panX + area.left + area.width / 2) / ctx.state.zoom
+    const centerY = (-ctx.state.panY + area.top + area.height / 2) / ctx.state.zoom
 
     const previous = currentViewport()
     ctx.state.zoom = Math.max(0.02, Math.min(256, level))
     // Keep the world point at the center of the viewport where it was.
-    ctx.state.panX = viewW / 2 - centerX * ctx.state.zoom
-    ctx.state.panY = viewH / 2 - centerY * ctx.state.zoom
+    ctx.state.panX = area.left + area.width / 2 - centerX * ctx.state.zoom
+    ctx.state.panY = area.top + area.height / 2 - centerY * ctx.state.zoom
     ctx.requestRepaint()
     emitViewportChanged(previous)
   }
@@ -159,10 +186,11 @@ export function createViewportActions(ctx: EditorContext) {
     const nodes = nodeIds.map((id) => ctx.graph.getNode(id)).filter((node) => node !== undefined)
     if (nodes.length === 0) return
     const bounds = computeBounds(nodes.map((node) => getAxisAlignedWorldBounds(node, ctx.graph)))
-    const { width, height } = ctx.getViewportSize()
+    const area = visibleCanvas(ctx)
     const { zoom, panX, panY } = ctx.state
     const fits =
-      bounds.width * zoom <= width - margin * 2 && bounds.height * zoom <= height - margin * 2
+      bounds.width * zoom <= area.width - margin * 2 &&
+      bounds.height * zoom <= area.height - margin * 2
     if (!fits) {
       zoomToBounds(bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height)
       return
@@ -172,9 +200,15 @@ export function createViewportActions(ctx: EditorContext) {
     const right = left + bounds.width * zoom
     const bottom = top + bounds.height * zoom
     const visible =
-      left >= margin && top >= margin && right <= width - margin && bottom <= height - margin
+      left >= area.left + margin &&
+      top >= area.top + margin &&
+      right <= area.left + area.width - margin &&
+      bottom <= area.top + area.height - margin
     if (visible) return
-    pan(width / 2 - (left + right) / 2, height / 2 - (top + bottom) / 2)
+    pan(
+      area.left + area.width / 2 - (left + right) / 2,
+      area.top + area.height / 2 - (top + bottom) / 2
+    )
   }
 
   return {

@@ -6,7 +6,7 @@ import { createSelectedNodeState } from '@pairdraw/vue/editor/selection-state'
 
 import { createDocumentExportActions } from '@/app/document/export'
 import { createDocumentIOActions } from '@/app/document/io'
-import type { ViewportSize } from '@/app/document/io/types'
+import type { ViewportInsets, ViewportSize } from '@/app/document/io/types'
 import { createDesignCheck } from '@/app/editor/design-check/session'
 import { createFlashActions } from '@/app/editor/flash'
 import { createMobileClipboardActions } from '@/app/editor/mobile-clipboard'
@@ -59,12 +59,19 @@ export function createEditorStoreModules(
   state: AppEditorState,
   io: IORegistry,
   viewportSize: ViewportSize,
+  viewportInsets: ViewportInsets,
   preparationController: EditorPreparationController
 ) {
   const { disposeFlashes, ...flash } = createFlashActions(editor)
   const pen = createPenActions(editor, state)
   const vectorEdit = createVectorEditActions(editor, state)
-  const documentIO = createDocumentIOActions(editor, state, viewportSize, preparationController)
+  const documentIO = createDocumentIOActions(
+    editor,
+    state,
+    viewportSize,
+    viewportInsets,
+    preparationController
+  )
   const documentExport = createDocumentExportActions(editor, state, io, documentIO.downloadBlob)
   const mobileClipboard = createMobileClipboardActions(editor)
   const profiler = createProfilerActions(editor)
@@ -86,6 +93,8 @@ export function createEditorStoreModules(
     importDOMText: documentIO.importDOMText,
     setViewportSize: documentIO.setViewportSize,
     getViewportSize: documentIO.getViewportSize,
+    setViewportInsets: documentIO.setViewportInsets,
+    getViewportInsets: documentIO.getViewportInsets,
     fitCurrentPageToViewport: documentIO.fitCurrentPageToViewport,
     hasUnsavedChanges: documentIO.hasUnsavedChanges,
     /** Whether the tab still holds the empty design it started with, so a document may take it. */

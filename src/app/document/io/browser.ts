@@ -1,4 +1,4 @@
-import type { ViewportSize } from '@/app/document/io/types'
+import type { ViewportInsets, ViewportSize } from '@/app/document/io/types'
 
 /**
  * Ceiling on a document fetched from a URL. Both the browser link and the automation
@@ -87,7 +87,11 @@ type ViewportEditor = {
   zoomToFit: () => void
 }
 
-export function createDocumentViewportActions(editor: ViewportEditor, viewportSize: ViewportSize) {
+export function createDocumentViewportActions(
+  editor: ViewportEditor,
+  viewportSize: ViewportSize,
+  viewportInsets: ViewportInsets
+) {
   function setViewportSize(width: number, height: number) {
     viewportSize.width = width
     viewportSize.height = height
@@ -98,12 +102,27 @@ export function createDocumentViewportActions(editor: ViewportEditor, viewportSi
     return { ...viewportSize }
   }
 
+  /** Where the floating chrome covers the canvas, as the canvas last measured it. */
+  function setViewportInsets(insets: ViewportInsets) {
+    Object.assign(viewportInsets, insets)
+  }
+
+  function getViewportInsets(): ViewportInsets {
+    return { ...viewportInsets }
+  }
+
   async function fitCurrentPageToViewport() {
     await yieldToUI()
     editor.zoomToFit()
   }
 
-  return { setViewportSize, getViewportSize, fitCurrentPageToViewport }
+  return {
+    setViewportSize,
+    getViewportSize,
+    setViewportInsets,
+    getViewportInsets,
+    fitCurrentPageToViewport
+  }
 }
 
 export function downloadBlob(data: Uint8Array, filename: string, mime: string) {

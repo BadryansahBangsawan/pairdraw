@@ -1,1 +1,0 @@
-- Desktop sign-in approval asks for the code the app shows instead of telling you to compare it.

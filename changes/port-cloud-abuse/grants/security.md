@@ -1,1 +1,0 @@
-- A document grant changes only access that starts from an accepted invitation, so a new grant cannot reach someone who has no access.

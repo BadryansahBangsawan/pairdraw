@@ -1,1 +1,0 @@
-- Someone removed from a workspace loses access to the documents they made there, though an invitation can still let them back in.

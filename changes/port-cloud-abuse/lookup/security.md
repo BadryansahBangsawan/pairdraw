@@ -1,1 +1,0 @@
-- The sharing API no longer answers whether an email address has a cloud account.

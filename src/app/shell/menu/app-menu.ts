@@ -19,10 +19,7 @@ import type { BuiltinIOFormatId } from '@pairdraw/core/io'
 import { shortcutPlatform, useEditorCommands } from '@pairdraw/vue/editor/commands'
 import type { MenuEntry } from '@pairdraw/vue/editor/menu-model'
 import { useI18n } from '@pairdraw/vue/i18n'
-import type {
-  CommandPaletteGroup,
-  CommandPaletteItem
-} from '@pairdraw/vue/primitives/CommandPalette'
+import type { CommandPaletteGroup } from '@pairdraw/vue/primitives/CommandPalette'
 
 import { openTour } from '@/app/demo/document'
 import { useEditorStore } from '@/app/editor/active-store'
@@ -34,6 +31,7 @@ import { openShortcutSheet } from '@/app/shell/keyboard/sheet'
 import { createSharedEditorMenuActions } from '@/app/shell/menu/actions/editor'
 import { createSelectionMenuActions } from '@/app/shell/menu/actions/selection'
 import { menuFeatureAvailable } from '@/app/shell/menu/features'
+import { buildPaletteEntries } from '@/app/shell/menu/palette'
 import { createSaveMenuActions } from '@/app/shell/menu/save-actions'
 import type {
   AppMenuActionItem,
@@ -43,6 +41,7 @@ import type {
   AppMenuIcon
 } from '@/app/shell/menu/schema'
 import { APP_MENU_SCHEMA } from '@/app/shell/menu/schema'
+import { MENU_ITEMS_NEEDING_SELECTION } from '@/app/shell/menu/selection-gate'
 import { appMenuShortcutLabel } from '@/app/shell/menu/shortcut'
 import { openFileDialog } from '@/app/shell/menu/use'
 import {
@@ -96,9 +95,6 @@ function isVisible(entry: { target?: string; feature?: AppMenuFeature }): boolea
 function isSeparator(entry: AppMenuEntry): entry is Extract<AppMenuEntry, { type: 'separator' }> {
   return entry.type === 'separator'
 }
-
-/** Items whose command edits the selected layers, so they wait for one, as Figma's do. */
-const MENU_ITEMS_NEEDING_SELECTION = new Set(['copy', 'cut'])
 
 export function useAppMenu() {
   const store = useEditorStore()
@@ -439,34 +435,6 @@ export function useAppMenu() {
     }
   }
 
-  function paletteEntries(
-    entry: MenuEntry,
-    category: string,
-    fallbackIcon?: Component
-  ): CommandPaletteItem[] {
-    if ('separator' in entry) return []
-    if (!entry.menuId)
-      return entry.sub?.flatMap((child) => paletteEntries(child, category, fallbackIcon)) ?? []
-
-    const item: CommandPaletteItem = {
-      id: entry.menuId,
-      label: entry.palette?.label ?? entry.label,
-      icon: entry.palette?.icon ?? fallbackIcon,
-      shortcut: entry.paletteShortcut
-        ? { keys: shortcutKeys(entry.paletteShortcut) ?? [] }
-        : undefined,
-      description: entry.palette?.description,
-      keywords: entry.palette?.keywords,
-      disabled: entry.disabled,
-      onSelect:
-        entry.action ??
-        (entry.onCheckedChange ? () => entry.onCheckedChange?.(!entry.checked) : undefined)
-    }
-    const children =
-      entry.sub?.flatMap((child) => paletteEntries(child, category, fallbackIcon)) ?? []
-    return [item, ...children]
-  }
-
   const topMenus = computed<AppMenuGroup[]>(() =>
     APP_MENU_SCHEMA.map(buildGroup).filter((group): group is AppMenuGroup => group !== null)
   )
@@ -475,7 +443,9 @@ export function useAppMenu() {
     topMenus.value.map((group) => ({
       id: group.label.toLowerCase(),
       label: group.label,
-      items: group.items.flatMap((entry) => paletteEntries(entry, group.label, group.paletteIcon))
+      items: group.items.flatMap((entry) =>
+        buildPaletteEntries(entry, group.paletteIcon, shortcutKeys)
+      )
     }))
   )
 

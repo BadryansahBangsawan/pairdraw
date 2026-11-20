@@ -1,0 +1,2 @@
+- The command palette's menu headings, such as Theme and Export Selection, open their choices instead of closing the palette and running nothing.
+- File › Export Selection and its formats stay disabled until layers are selected, instead of appearing to run and doing nothing.

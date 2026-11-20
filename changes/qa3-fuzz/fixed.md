@@ -16,3 +16,4 @@
 - Deleting a layer inside an instance drops the overrides that named it, instead of saving a claim for a layer the document no longer has.
 - Undoing a change of a frame's sizing puts the size it had back, which a fixed frame keeps.
 - Saving a document whose instance holds a copy of a component layer that no longer exists no longer fails; the rest of the document is written.
+- Binding a variable to an instance's fill records that fill as the instance's own, so reopening no longer shows an override the document never had.

@@ -1,6 +1,6 @@
 import type { SceneNode } from '@pairdraw/scene-graph'
 import { copyFills, copyStrokes } from '@pairdraw/scene-graph/copy'
-import { findInstanceAncestor } from '@pairdraw/scene-graph/instances'
+import { findInstanceAncestor, recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 import { cloneInstanceOverrideState } from '@pairdraw/scene-graph/instances/overrides'
 import {
   variableBindingOwner,
@@ -61,6 +61,10 @@ export function createVariableBindingActions(ctx: EditorContext) {
     const apply = () => {
       if (variableId === undefined) ctx.graph.unbindVariable(nodeId, path)
       else ctx.graph.bindVariable(nodeId, path, variableId)
+      // The field a path names (`fills/0/color` names `fills`) is an instance override, as the
+      // file records it: an instance that draws a variable's colour keeps it when its component
+      // changes, and the live document has to name that field too.
+      recordInstanceOverride(ctx.graph, nodeId, [path.split('/')[0] ?? path])
       refreshBindings(nodeId)
     }
     apply()

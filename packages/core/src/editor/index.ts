@@ -124,5 +124,6 @@ export type {
   GradientEdit,
   ImageEdit,
   Tool,
-  ViewportInsets
+  ViewportInsets,
+  VisibleCanvas
 } from './types'

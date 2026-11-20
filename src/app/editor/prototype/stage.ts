@@ -1,13 +1,14 @@
 import { useElementSize, useEventListener } from '@vueuse/core'
 import { computed, onScopeDispose, ref, watch, type Ref } from 'vue'
 
-import { resolveEditorProfile } from '@pairdraw/core'
+import { resolveEditorProfile, type VisibleCanvas } from '@pairdraw/core'
 import { renderNodesToImage } from '@pairdraw/core/io/formats/raster'
 import type { PrototypeAction } from '@pairdraw/scene-graph'
 import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 
 import type { EditorStore } from '@/app/editor/active-store'
-import { letterboxRects, nodeStageRect, type StageRect } from '@/app/slides/letterbox'
+
+import { letterboxRects, nodeStageRect } from '@/app/slides/letterbox'
 
 import {
   reactionAt,
@@ -32,7 +33,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
   const session = ref<PlaySession | null>(null)
   const size = useElementSize(area)
   /** The frame before a dissolve started, as the PNG the crossfade fades out over the canvas. */
-  const dissolvingFrom = ref<{ src: string; rect: StageRect } | null>(null)
+  const dissolvingFrom = ref<{ src: string; rect: VisibleCanvas } | null>(null)
 
   /**
    * How the canvas is behaving while a prototype plays. A slide presentation is live too, and it
@@ -49,7 +50,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
   })
 
   /** Where that frame sits on the stage. */
-  const shownRect = computed<StageRect | null>(() => {
+  const shownRect = computed<VisibleCanvas | null>(() => {
     const shown = session.value
     return shown ? nodeStageRect(store.graph, shownFrame(shown), store.state) : null
   })
@@ -80,7 +81,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
    * The previous frame drawn to a PNG the canvas crossfades from during a dissolve. A frame that
    * cannot be drawn leaves none, so the transition falls back to a cut instead of wrong pixels.
    */
-  function snapshotBefore(): StageRect | null {
+  function snapshotBefore(): VisibleCanvas | null {
     const shown = session.value
     if (!shown) return null
     const node = store.graph.getNode(shownFrame(shown))
@@ -98,7 +99,7 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     if (!bytes) return null
     const blob = new Blob([bytes], { type: 'image/png' })
     const { panX, panY, zoom } = store.state
-    const rect: StageRect = {
+    const rect: VisibleCanvas = {
       left: bounds.x * zoom + panX,
       top: bounds.y * zoom + panY,
       width: bounds.width * zoom,

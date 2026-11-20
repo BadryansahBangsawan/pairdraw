@@ -9,17 +9,10 @@ import type { ViewportInsets } from '@/app/document/io/types'
 /** The canvas sides a floating piece takes. */
 export type CanvasSide = 'top' | 'right' | 'bottom' | 'left'
 
-/** A box in screen pixels, as `getBoundingClientRect` reports it. */
-export interface ScreenRect {
-  left: number
-  top: number
-  right: number
-  bottom: number
-}
-
 /** One floating piece and the edges it sits against. */
 export interface ChromePiece {
-  rect: ScreenRect
+  /** A box in screen pixels, as `getBoundingClientRect` reports it. */
+  rect: ViewportInsets
   sides: readonly CanvasSide[]
 }
 
@@ -30,7 +23,7 @@ const SIDES: ReadonlySet<string> = new Set(['top', 'right', 'bottom', 'left'])
 
 /** The room the chrome leaves, measured from the canvas edges it sits against. */
 export function insetsFromChrome(
-  canvas: ScreenRect,
+  canvas: ViewportInsets,
   chrome: readonly ChromePiece[]
 ): ViewportInsets {
   const insets: ViewportInsets = { top: 0, right: 0, bottom: 0, left: 0 }

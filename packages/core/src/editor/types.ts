@@ -271,6 +271,14 @@ export interface ViewportInsets {
   left: number
 }
 
+/** The canvas the floating chrome leaves, in screen pixels, from its top-left corner. */
+export interface VisibleCanvas {
+  left: number
+  top: number
+  width: number
+  height: number
+}
+
 export interface EditorOptions {
   graph?: SceneGraph
   state?: EditorState

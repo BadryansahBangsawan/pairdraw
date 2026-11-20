@@ -4,16 +4,16 @@ import { Window, type Element as HappyElement } from 'happy-dom'
 
 import {
   canvasChromeInsets,
-  insetsFromChrome,
-  type ScreenRect
+  insetsFromChrome
 } from '@/app/editor/canvas/chrome-insets'
+import type { ViewportInsets } from '@/app/document/io/types'
 
 import { asDouble } from '#tests/helpers/doubles'
 
 const CANVAS = { left: 0, top: 0, right: 800, bottom: 600 }
 
 /** happy-dom asks for a full DOMRect, which only this test's layout answers. */
-function toDomRect(rect: ScreenRect): DOMRect {
+function toDomRect(rect: ViewportInsets): DOMRect {
   return asDouble<DOMRect>({
     ...rect,
     x: rect.left,
@@ -69,7 +69,7 @@ test('finds chrome above a canvas nested in a split view', () => {
       <div id="rail" data-canvas-inset="left"></div>
       <div id="split"><div id="pane"><div id="canvas-area"></div></div></div>
     </div>`
-  const rectangle = (element: HappyElement | null, rect: ScreenRect) => {
+  const rectangle = (element: HappyElement | null, rect: ViewportInsets) => {
     if (!element) throw new Error('Missing test element')
     element.getBoundingClientRect = () =>
       asDouble<ReturnType<HappyElement['getBoundingClientRect']>>(toDomRect(rect))

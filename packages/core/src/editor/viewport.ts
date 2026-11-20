@@ -5,21 +5,13 @@ import type { Vector } from '@pairdraw/scene-graph/primitives'
 import { ZOOM_DIVISOR, ZOOM_SCALE_MAX, ZOOM_SCALE_MIN } from '#core/constants'
 import { emitNavigationTrace } from '#core/profiler'
 
-import type { EditorContext, ViewportInsets } from './types'
+import type { EditorContext, ViewportInsets, VisibleCanvas } from './types'
 
 /** Space kept between revealed layers and the viewport edge. */
 const REVEAL_MARGIN = 48
 
 /** No floating chrome, for an editor whose canvas is bare. */
 export const NO_VIEWPORT_INSETS: ViewportInsets = { top: 0, right: 0, bottom: 0, left: 0 }
-
-/** The canvas the floating chrome leaves, in screen pixels, from its top-left corner. */
-export interface VisibleCanvas {
-  left: number
-  top: number
-  width: number
-  height: number
-}
 
 /**
  * The part of the canvas no floating chrome covers. A rail on the left or a pill at the bottom sits

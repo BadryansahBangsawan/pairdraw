@@ -1,14 +1,14 @@
 import { useElementSize, useEventListener, useSwipe } from '@vueuse/core'
 import { computed, onMounted, watch, type Ref } from 'vue'
 
-import type { PresentationState } from '@pairdraw/core'
+import type { PresentationState, VisibleCanvas } from '@pairdraw/core'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { isButtonActivation, isEditing } from '@/app/shell/keyboard/focus'
 
 import { usePresentationFullscreen } from './fullscreen'
 import { presentationKeyAction, presentationScrollStep, type PresentationKeyAction } from './keys'
-import { letterboxRects, nodeStageRect, type StageRect } from './letterbox'
+import { letterboxRects, nodeStageRect } from './letterbox'
 import { createWheelStepper } from './wheel'
 
 /** WebKit's pinch events, which the DOM's event maps do not list. */
@@ -44,7 +44,7 @@ export function usePresentationStage(store: EditorStore, stage: Ref<HTMLElement 
   const size = useElementSize(stage)
 
   /** The slide's rectangle on the stage, following the canvas's pan and zoom. */
-  const slideRect = computed<StageRect | null>(() => {
+  const slideRect = computed<VisibleCanvas | null>(() => {
     const shown = presentation.value
     return shown ? nodeStageRect(store.graph, shown.slideId, store.state) : null
   })

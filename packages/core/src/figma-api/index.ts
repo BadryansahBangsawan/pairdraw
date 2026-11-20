@@ -188,7 +188,7 @@ export class FigmaAPI implements NodeProxyHost {
   readonly #onSelectionChange: ((ids: readonly string[], pageId: string) => void) | undefined
   /** The last host page switch, so `setCurrentPageAsync` can wait for it. */
   #pageChange: Promise<void> = Promise.resolve()
-  /** The newest page switch asked for, so a superseded async switch does not move the page. */
+  /** Counts page switches, so a switch whose page loads after a later one does not undo it. */
   #pageSwitch = 0
 
   constructor(graph: SceneGraph, options: FigmaAPIOptions = {}) {
@@ -270,6 +270,7 @@ export class FigmaAPI implements NodeProxyHost {
 
   set currentPage(page: FigmaNodeProxy) {
     const pageId = page[INTERNAL_ID]
+    this.#pageSwitch++
     if (pageId === this._currentPageId) return
     this._currentPageId = pageId
     this.#pageChange = Promise.resolve(this.#onPageChange?.(pageId))
@@ -705,7 +706,7 @@ export class FigmaAPI implements NodeProxyHost {
     if (message) this.notify(message)
   }
 
-  /** Loads every page's layers, for a host that loads them as they are visited. */
+  /** Loads every page's layers, one after another, for a host that loads them as visited. */
   async loadAllPagesAsync(): Promise<void> {
     for (const page of this.graph.getPages()) await loadPage(this, page.id)
   }

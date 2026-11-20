@@ -41,6 +41,12 @@ export function makeFigmaFromStore(
     // reads or draws leaves them alone; one that switches page, sets the viewport, or selects
     // layers moves the editor.
     pageId,
+    // A page not yet visited has no layers until the editor prepares it, as it does a page it
+    // switches to: with its fonts and layout.
+    loadPage: async (id) => {
+      if (!(await store.preparePageNodes(id)))
+        throw new Error(`Page "${id}" was closed before it finished loading`)
+    },
     selection: pageId === store.state.currentPageId ? [...store.state.selectedIds] : [],
     viewport: {
       center: {

@@ -102,7 +102,11 @@ export const getPageTree = defineTool({
     const typeFilter = typeFilterOf(node_types)
     if (root_id !== undefined) {
       const root = figma.getNodeById(root_id)
-      return root ? { root: root.id, tree: nodeToTreeEntry(root, 1, depth, typeFilter) } : undefined
+      if (!root) return undefined
+      // A page root exists before its layers load; only the async path can answer it.
+      if (figma.graph.getNode(root.id)?.type === 'CANVAS') return undefined
+      return { root: root.id, tree: nodeToTreeEntry(root, 1, depth, typeFilter) }
+
     }
     return currentPageTree(figma, depth, typeFilter)
   },
@@ -113,6 +117,8 @@ export const getPageTree = defineTool({
     // A layer on a page not yet visited loads that page, as in Figma's dynamic-page mode.
     const loaded = root ?? (await figma.getNodeByIdAsync(root_id))
     if (!loaded) return { error: `Node "${root_id}" not found` }
+    // A page root exists before its layers load; read them first.
+    if (figma.graph.getNode(loaded.id)?.type === 'CANVAS') await loaded.loadAsync()
     return { root: loaded.id, tree: nodeToTreeEntry(loaded, 1, depth, typeFilter) }
   }
 })

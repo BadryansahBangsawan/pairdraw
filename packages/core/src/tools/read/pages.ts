@@ -22,15 +22,18 @@ export const switchPage = defineTool({
   name: 'switch_page',
 
   description: 'Switch to a different page by name or ID.',
-  execution: { kind: 'sync', mutation: 'view' },
+  execution: { kind: 'async', mutation: 'view' },
   input: v.strictObject({
     page: v.pipe(v.string(), v.description('Page name or ID'))
   }),
-  execute: (figma, { page }) => {
+  execute: async (figma, { page }) => {
     const target =
       figma.root.children.find((candidate) => candidate.name === page) ?? figma.getNodeById(page)
-    if (!target) return { error: `Page "${page}" not found` }
-    // The host shows the page from here, and reads it back on the next call.
+    if (!target || figma.graph.getNode(target.id)?.type !== 'CANVAS')
+      return { error: `Page "${page}" not found` }
+    // A page not yet visited has its layers loaded first, so the calls after see them. The host
+    // switch it may start is not waited for, since preparing the page on screen can take seconds.
+    await target.loadAsync()
     figma.currentPage = target
     return { page: target.name, id: target.id }
   }

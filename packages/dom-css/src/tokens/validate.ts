@@ -1,5 +1,6 @@
-import type { CSSStyleSheetLike } from '@acemir/cssom'
 import valueParser from 'postcss-value-parser'
+
+import type { CSSStyleSheetLike } from '../cssom/types'
 
 type Parse = (cssText: string) => CSSStyleSheetLike
 

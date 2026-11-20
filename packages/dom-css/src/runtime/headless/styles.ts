@@ -1,15 +1,15 @@
 import type {
+  CSSGroupingRuleLike,
+  CSSStyleDeclarationLike,
+  CSSStyleRuleLike
+} from '#dom-css/cssom/types'
+import type {
   DesignDocument,
   DesignElement,
   DesignNode,
   DesignStyleDeclaration
 } from '#dom-css/types'
-import {
-  parse,
-  type CSSGroupingRuleLike,
-  type CSSStyleDeclarationLike,
-  type CSSStyleRuleLike
-} from '@acemir/cssom'
+import { parse } from '@acemir/cssom'
 
 import { tryParseColor } from '@pairdraw/scene-graph/color'
 import { parseCSSNumber, splitCSSValue } from '@pairdraw/scene-graph/css'

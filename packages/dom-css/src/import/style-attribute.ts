@@ -1,6 +1,6 @@
 import { parse } from '@acemir/cssom'
-import type { CSSStyleRuleLike } from '@acemir/cssom'
 
+import type { CSSStyleRuleLike } from '../cssom/types'
 import type { DesignStyleDeclaration } from '../types'
 
 function firstStyleRule(cssText: string): CSSStyleRuleLike | null {

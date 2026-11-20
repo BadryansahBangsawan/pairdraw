@@ -1,1 +1,2 @@
 - @pairdraw/core's editor declarations name their viewport vector from the scene graph, so a consumer's type check resolves it.
+- @pairdraw/dom-css declares the CSS object model shapes it hands out, instead of borrowing them from the parser it loads at runtime.

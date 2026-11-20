@@ -175,3 +175,28 @@ describe('hitTest', () => {
     expect(graph.hitTest(50, 50, page)?.id).toBe(rectId)
   })
 })
+
+test('a reversed auto layout takes the click with the layer drawn on top', () => {
+  const graph = new SceneGraph()
+  const page = graph.getPages()[0]
+  const frame = graph.createNode('FRAME', page.id, {
+    width: 40,
+    height: 40,
+    layoutMode: 'HORIZONTAL',
+    primaryAxisSizing: 'FIXED',
+    counterAxisSizing: 'FIXED',
+    itemReverseZIndex: true
+  })
+  const first = graph.createNode('RECTANGLE', frame.id, {
+    width: 40,
+    height: 40,
+    layoutPositioning: 'ABSOLUTE'
+  })
+  graph.createNode('RECTANGLE', frame.id, {
+    width: 40,
+    height: 40,
+    layoutPositioning: 'ABSOLUTE'
+  })
+
+  expect(graph.hitTest(20, 20)?.id).toBe(first.id)
+})

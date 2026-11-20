@@ -15,6 +15,7 @@ import {
   trimArrowShafts
 } from '@pairdraw/scene-graph/arrow-caps'
 import { blurSigma } from '@pairdraw/scene-graph/geometry'
+import { drawnChildIds } from '@pairdraw/scene-graph/layout'
 import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import { textLinesReach, textVerticalOffset } from '@pairdraw/scene-graph/text'
@@ -266,13 +267,14 @@ function renderChildren(
   if (node.type === 'BOOLEAN_OPERATION') return
   const isClippableContainer =
     node.type === 'FRAME' || node.type === 'COMPONENT' || node.type === 'INSTANCE'
-  if (isClippableContainer && node.clipsContent && node.childIds.length > 0) {
+  const childIds = drawnChildIds(node)
+  if (isClippableContainer && node.clipsContent && childIds.length > 0) {
     canvas.save()
     r.clipNodeShape(canvas, node)
-    renderChildIds(r, canvas, graph, node.childIds, overlays, absX, absY, hasTransformedAncestor)
+    renderChildIds(r, canvas, graph, childIds, overlays, absX, absY, hasTransformedAncestor)
     canvas.restore()
   } else {
-    renderChildIds(r, canvas, graph, node.childIds, overlays, absX, absY, hasTransformedAncestor)
+    renderChildIds(r, canvas, graph, childIds, overlays, absX, absY, hasTransformedAncestor)
   }
 }
 export function renderNodeSelf(

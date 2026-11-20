@@ -1,4 +1,5 @@
 export * from './aspect-ratio'
+export * from './draw-order'
 export * from './guides'
 export * from './keywords'
 export * from './sizing'

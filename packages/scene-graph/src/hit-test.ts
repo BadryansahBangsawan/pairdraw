@@ -2,6 +2,7 @@ import { hitsConnectorLine } from './connectors/hit'
 import { getAxisAlignedBoundsAt, getNodeLocalMatrix, getWorldMatrix } from './coordinate'
 import { geometryBlobPolylines } from './geometry'
 import type { SceneGraph } from './graph'
+import { drawnChildIds } from './layout/draw-order'
 import Matrix, { type Mat3 } from './matrix'
 import type { Rect, Vector } from './primitives'
 import type { SceneNode, NodeType } from './types'
@@ -296,9 +297,11 @@ function hitTestChildren(
     if (!containsPoint(px, py, parent, graph, transformCache)) return null
   }
 
-  const masks = clippingMasks(graph, parent.childIds)
-  for (let i = parent.childIds.length - 1; i >= 0; i--) {
-    const childId = parent.childIds[i]
+  // Front to back, as the layers are drawn: a reversed auto layout puts the first child on top.
+  const drawn = drawnChildIds(parent)
+  const masks = clippingMasks(graph, drawn)
+  for (let i = drawn.length - 1; i >= 0; i--) {
+    const childId = drawn[i]
     const child = graph.nodes.get(childId)
     if (!takesClick(graph, px, py, child, masks[i], locked, transformCache)) continue
     if (CONTAINER_TYPES.has(child.type)) {

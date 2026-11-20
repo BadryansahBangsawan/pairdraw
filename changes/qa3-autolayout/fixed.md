@@ -1,0 +1,2 @@
+- A negative auto layout gap now overlaps the layers by it, in either direction.
+- A frame's "Reverse Z-index" draws and hit-tests its layers in the reverse order, so the first layer sits on top, as Figma's does.

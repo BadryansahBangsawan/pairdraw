@@ -16,6 +16,7 @@
         "width": 1280,
         "height": 800,
         "dragDropEnabled": false,
+        "backgroundThrottling": "disabled",
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
         "trafficLightPosition": { "x": 16, "y": 24 },

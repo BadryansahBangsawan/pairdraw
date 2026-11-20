@@ -163,7 +163,7 @@ function readEntryData(bytes: Uint8Array, entry: ZipEntry): Uint8Array<ArrayBuff
     if (entry.compressedSize !== entry.uncompressedSize) {
       throw new Error(`Corrupted .fig file: the stored entry "${entry.name}" has two sizes`)
     }
-    return compressed.slice()
+    return new Uint8Array(compressed)
   }
   if (entry.compression !== 8) {
     throw new Error(

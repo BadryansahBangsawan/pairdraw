@@ -35,6 +35,7 @@ import {
   readStrokeOkHCL,
   readTextDirection,
   writeFillOkHCL,
+  writeFontFeatures,
   writeLayoutDirection,
   writeStrokeOkHCL,
   writeTextDirection
@@ -238,5 +239,10 @@ export class PairdrawAPI {
 
   setTextDirection(node: NodeRef, direction: string): void {
     writeTextDirection(this.figma.graph, node, direction)
+  }
+
+  /** Merges OpenType feature toggles into the text's own, keeping the tags it does not name. */
+  setFontFeatures(node: NodeRef, features: Record<string, boolean>): void {
+    writeFontFeatures(this.figma.graph, node, features)
   }
 }

@@ -82,3 +82,21 @@ export function readTextDirection(graph: SceneGraph, ref: NodeRef): TextDirectio
 export function writeTextDirection(graph: SceneGraph, ref: NodeRef, value: string): void {
   editNode(graph, nodeOf(graph, ref), { textDirection: direction(value) })
 }
+
+/**
+ * Merges OpenType features into a text's own: the given tags replace their entries, the rest
+ * stay, as the panel's feature switches do. Figma's plugin API only reads a node's features;
+ * this is the write path the tools and the panel share.
+ */
+export function writeFontFeatures(
+  graph: SceneGraph,
+  ref: NodeRef,
+  features: Record<string, boolean>
+): void {
+  const node = nodeOf(graph, ref)
+  const merged = new Map(node.fontFeatures.map((feature) => [feature.tag, feature.enabled]))
+  for (const [tag, enabled] of Object.entries(features)) merged.set(tag.toUpperCase(), enabled)
+  editNode(graph, node, {
+    fontFeatures: [...merged].map(([tag, enabled]) => ({ tag, enabled }))
+  })
+}

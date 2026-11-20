@@ -102,6 +102,27 @@ const variationsInputSchema = v.optional(
   )
 )
 
+/** OpenType features a text tool sets, by tag; tags left out keep their state. */
+const fontFeaturesInputSchema = v.optional(
+  v.pipe(
+    v.objectWithRest({}, v.boolean()),
+    v.description(
+      'OpenType feature toggles by four-letter tag (e.g. {"TNUM": true, "LIGA": false, "SS02": true}); tags left out keep their state. Only features the font has take effect.'
+    )
+  )
+)
+
+/** Why a feature map cannot apply: a tag is not four letters, or a value is not a boolean. */
+function badFeatureEntry(features: Record<string, boolean> | undefined): { error: string } | null {
+  for (const [tag, enabled] of Object.entries(features ?? {})) {
+    if (tag.length !== 4) return { error: `"${tag}" is not a four-letter OpenType feature tag` }
+    if (typeof enabled !== 'boolean') {
+      return { error: `Feature "${tag}" needs a boolean value, received ${typeof enabled}` }
+    }
+  }
+  return null
+}
+
 /**
  * The font a font tool gives text: what it names, the rest from `current`. Axes without a style
  * leave the style out, for the nearest named style to be picked.
@@ -207,6 +228,7 @@ function rangeEdit(args: {
   size?: number
   style?: string
   variations?: unknown
+  font_features?: Record<string, boolean>
   color?: string
   hyperlink?: string | null
 }): RangeEdit | { error: string } {
@@ -215,12 +237,13 @@ function rangeEdit(args: {
     !args.size &&
     !args.style &&
     !args.variations &&
+    !args.font_features &&
     !args.color &&
     args.hyperlink === undefined
   ) {
     return {
       error:
-        'set_font_range needs at least one of family, size, style, variations, color, or hyperlink'
+        'set_font_range needs at least one of family, size, style, variations, font_features, color, or hyperlink'
     }
   }
   const hyperlink = requestedHyperlink(args.hyperlink)
@@ -233,7 +256,7 @@ function rangeEdit(args: {
 export const setFontRange = defineTool({
   name: 'set_font_range',
 
-  description: 'Set font properties, color, or a link for a text range.',
+  description: 'Set font properties, OpenType features, color, or a link for a text range.',
   execution: { kind: 'sync', mutation: 'properties' },
   input: v.strictObject({
     id: nodeIdInputSchema,
@@ -243,6 +266,7 @@ export const setFontRange = defineTool({
     size: v.optional(toolNumber(v.pipe(v.number(), v.minValue(1), v.description('Font size')))),
     style: v.optional(v.pipe(v.string(), v.description('Font style'))),
     variations: variationsInputSchema,
+    font_features: fontFeaturesInputSchema,
     color: v.optional(v.pipe(v.string(), v.description('Text color (hex)'))),
     hyperlink: hyperlinkInputSchema
   }),
@@ -251,7 +275,8 @@ export const setFontRange = defineTool({
     if (!node) return []
     const font = args.family || args.style || args.variations ? rangeFont(node, args) : null
     // A colour alone is a paint and lays nothing out, so text in a missing font can still take it.
-    const laysOut = font !== null || args.size !== undefined
+    // Features reshape glyphs, so they need the text's fonts as a size change does.
+    const laysOut = font !== null || args.size !== undefined || args.font_features !== undefined
     return [...(font ? [font] : []), ...(laysOut ? textFonts(figma, args.id) : [])]
   },
   execute: (figma, args) => {
@@ -260,6 +285,8 @@ export const setFontRange = defineTool({
     const { start, end } = args
     const badTag = badVariationTag(args.variations)
     if (badTag) return badTag
+    const badFeature = badFeatureEntry(args.font_features)
+    if (badFeature) return badFeature
     const edit = rangeEdit(args)
     if ('error' in edit) return edit
     const { hyperlink, color } = edit
@@ -271,6 +298,7 @@ export const setFontRange = defineTool({
       }
       if (color) node.setRangeFills(start, end, [{ type: 'SOLID', color }])
       if (hyperlink) node.setRangeHyperlink(start, end, hyperlink.link)
+      if (args.font_features) node.setRangeOpenTypeFeatures(start, end, args.font_features)
     } catch (error) {
       return toolFailure(error)
     }
@@ -307,7 +335,7 @@ export const setTextProperties = defineTool({
   name: 'set_text_properties',
 
   description:
-    'Set text layout properties: alignment, auto-resize, text case, decoration, truncation, and a link for the whole text.',
+    'Set text layout properties: alignment, auto-resize, text case, decoration, truncation, OpenType features, and a link for the whole text.',
   execution: { kind: 'sync', mutation: 'properties' },
   input: v.strictObject({
     id: v.pipe(v.string(), v.description('Text node ID')),
@@ -332,7 +360,8 @@ export const setTextProperties = defineTool({
     text_decoration: v.optional(
       v.pipe(v.picklist(['NONE', 'UNDERLINE', 'STRIKETHROUGH']), v.description('Text decoration'))
     ),
-    hyperlink: hyperlinkInputSchema
+    hyperlink: hyperlinkInputSchema,
+    font_features: fontFeaturesInputSchema
   }),
   fonts: (figma, { id }) => textFonts(figma, id),
   execute: (figma, args) => {
@@ -342,6 +371,8 @@ export const setTextProperties = defineTool({
     // Refused before anything changes, so a bad address leaves the text as it was.
     const hyperlink = requestedHyperlink(args.hyperlink)
     if (hyperlink && 'error' in hyperlink) return hyperlink
+    const badFeature = badFeatureEntry(args.font_features)
+    if (badFeature) return badFeature
     const updated: string[] = []
     if (args.align_horizontal !== undefined) {
       node.textAlignHorizontal = args.align_horizontal
@@ -362,6 +393,10 @@ export const setTextProperties = defineTool({
     if (args.text_decoration !== undefined) {
       node.textDecoration = args.text_decoration
       updated.push('textDecoration')
+    }
+    if (args.font_features) {
+      new PairdrawAPI(figma).setFontFeatures(node, args.font_features)
+      updated.push('fontFeatures')
     }
     if (hyperlink) {
       try {

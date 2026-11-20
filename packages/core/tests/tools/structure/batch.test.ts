@@ -7,12 +7,25 @@ import { SceneGraph } from '@pairdraw/scene-graph'
 
 import { batchUpdate } from '#core/tools/structure/batch'
 
-type BatchResult = { updated?: number; errors?: string[]; error?: string }
+type BatchResult = {
+  updated?: number
+  results?: Array<{ id: string; updated: string[] }>
+  errors?: string[]
+  error?: string
+}
 
 function frame() {
   const figma = new FigmaAPI(new SceneGraph())
   const node = figma.createFrame()
   return { figma, node }
+}
+
+/** A batch that renames the frame, then changes one prop of the layer named `id`. */
+function batch(frameId: string, id: string, props: Record<string, unknown>): string {
+  return JSON.stringify([
+    { id: frameId, props: { name: 'Renamed', opacity: 0.5 } },
+    { id, props }
+  ])
 }
 
 describe('batch_update operations', () => {
@@ -55,22 +68,69 @@ describe('batch_update operations', () => {
       v.parse(batchUpdate.input, { operations: 'not json' })
     ) as BatchResult
 
-    expect(result.error).toBe('Invalid JSON in operations')
+    expect(result.error).toStartWith('Invalid operations:')
   })
 
-  test('an operation for a missing node reports the node, not a failed call', () => {
+  test('applies every operation as one undo step', () => {
     const { figma, node } = frame()
-    const operations = [
-      { id: node.id, props: { spacing: 8 } },
-      { id: '9:9', props: { spacing: 2 } }
-    ]
+    const other = figma.createRectangle()
+    const operations = batch(node.id, other.id, { visible: false, corner_radius: 4 })
 
     const result = batchUpdate.execute(
       figma,
       v.parse(batchUpdate.input, { operations })
     ) as BatchResult
 
-    expect(result.updated).toBe(1)
-    expect(result.errors).toEqual(['Node "9:9" not found'])
+    expect(result).toEqual({
+      updated: 2,
+      results: [
+        { id: node.id, updated: ['name', 'opacity'] },
+        { id: other.id, updated: ['visible', 'corner_radius'] }
+      ]
+    })
+    expect([node.name, node.opacity, other.cornerRadius, other.visible]).toEqual([
+      'Renamed',
+      0.5,
+      4,
+      false
+    ])
   })
+
+  test.each([
+    ['a missing layer', 'missing', {}, 'Node "missing" not found'],
+    ['a value of the wrong type', 'self', { spacing: 'wide' }, 'at 1.props.spacing'],
+    [
+      'a value outside its options',
+      'self',
+      { counter_align: 'middle' },
+      'at 1.props.counter_align'
+    ],
+    ['a prop it does not take', 'self', { fill: '#f00' }, 'at 1.props.fill']
+  ])('changes nothing when one operation names %s', (_, target, props, message) => {
+    const { figma, node } = frame()
+    const id = target === 'self' ? node.id : target
+    const operations = batch(node.id, id, props)
+
+    const result = batchUpdate.execute(
+      figma,
+      v.parse(batchUpdate.input, { operations })
+    ) as BatchResult
+
+    expect(result.error).toContain(message)
+    expect([node.name, node.opacity]).toEqual(['Frame', 1])
+  })
+})
+
+test('a SPACE_AROUND batch applies, as set_layout accepts it', () => {
+  const { figma, node } = frame()
+  const operations = [{ id: node.id, props: { align: 'SPACE_AROUND' } }]
+
+  const result = batchUpdate.execute(
+    figma,
+    v.parse(batchUpdate.input, { operations })
+  ) as BatchResult
+
+  expect(result.error).toBeUndefined()
+  expect(result.updated).toBe(1)
+  expect(node.primaryAxisAlignItems).toBe('SPACE_AROUND')
 })

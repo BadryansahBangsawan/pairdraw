@@ -1,0 +1,2 @@
+- `batch_update` changes nothing when one of its operations names a missing layer or an invalid property, instead of applying the rest.
+- `batch_update` works on documents of any size again: it runs as a rolled-back document edit instead of the atomic property transaction that refused documents over 10,000 nodes, and a call costs what its operations touch, not a copy of the whole document. It is no longer exposed through WebMCP, which only runs atomic property tools.

@@ -113,3 +113,76 @@ test('a structural call that throws part way leaves the document as it was', asy
   expect(store.undo.peekUndo()).toBeUndefined()
   expect(store.hasUnsavedChanges()).toBe(false)
 })
+
+test('a batch edits a document larger than the atomic transaction limit', async () => {
+  const batchUpdate = expectDefined(
+    ALL_TOOLS.find((tool) => tool.name === 'batch_update'),
+    'batch_update'
+  )
+  const pageId = store.state.currentPageId
+  // Past MAX_TRANSACTION_NODES (10_000): the atomic path refuses the whole document.
+  for (let i = 0; i < 12_000; i++) {
+    store.graph.createNode('RECTANGLE', pageId, { name: `Layer ${i}`, width: 10, height: 10 })
+  }
+  const target = store.graph.createNode('FRAME', pageId, {
+    name: 'Card',
+    width: 100,
+    height: 60,
+    layoutMode: 'VERTICAL'
+  })
+  const figma = makeFigmaFromStore(store, pageId)
+
+  const result = (await runEditorTool({
+    store,
+    figma,
+    def: batchUpdate,
+    args: { operations: [{ id: target.id, props: { spacing: 8, opacity: 0.5 } }] },
+    source: 'MCP'
+  })) as { updated?: number; error?: string }
+
+  expect(result.error).toBeUndefined()
+  expect(result.updated).toBe(1)
+  const edited = store.graph.getNode(target.id)
+  expect(edited?.itemSpacing).toBe(8)
+  expect(edited?.opacity).toBe(0.5)
+})
+
+test('a batch that throws part way through leaves the large document as it was', async () => {
+  const batchUpdate = expectDefined(
+    ALL_TOOLS.find((tool) => tool.name === 'batch_update'),
+    'batch_update'
+  )
+  const pageId = store.state.currentPageId
+  for (let i = 0; i < 12_000; i++) {
+    store.graph.createNode('RECTANGLE', pageId, { name: `Layer ${i}`, width: 10, height: 10 })
+  }
+  const frame = store.graph.createNode('FRAME', pageId, { name: 'Card', width: 100, height: 60 })
+  // sizing_horizontal FILL on a rectangle whose parent is the page throws mid-apply: the first
+  // op (name) has already applied when the second one fails, so the whole batch must roll back.
+  const loose = store.graph.createNode('RECTANGLE', pageId, {
+    name: 'Loose',
+    width: 10,
+    height: 10
+  })
+  const figma = makeFigmaFromStore(store, pageId)
+  store.markDocumentSaved()
+  const before = store.snapshotPage(pageId)
+  const call = runEditorTool({
+    store,
+    figma,
+    def: batchUpdate,
+    args: {
+      operations: [
+        { id: frame.id, props: { name: 'Renamed' } },
+        { id: loose.id, props: { sizing_horizontal: 'FILL' } }
+      ]
+    },
+    source: 'MCP'
+  })
+
+  await expect(call).rejects.toThrow()
+  await Promise.resolve()
+  expect(store.snapshotPage(pageId)).toEqual(before)
+  expect(store.undo.peekUndo()).toBeUndefined()
+  expect(store.hasUnsavedChanges()).toBe(false)
+})

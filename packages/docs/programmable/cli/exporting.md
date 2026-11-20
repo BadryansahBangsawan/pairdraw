@@ -174,6 +174,17 @@ pairdraw tool call import_design_tokens design.fig --args-file args.json --write
 
 It reads a file per mode grouped by folder, a resolver with the files it refers to, or a Tokens Studio file with `$themes`. Collections and modes with existing names, and variables and styles by name, are updated; the rest is added, and nothing is deleted. The result lists what was added, updated, and skipped, with the reason for each skip.
 
+### Checking tokens against code
+
+`--check` compares the variables with a stylesheet or a project folder and lists every token that differs, without changing the document. It exits with status 1 when anything differs, so a CI job can fail when the design and the code drift apart:
+
+```sh
+pairdraw tokens design.fig --check src/app.css
+pairdraw tokens design.fig --check . --json
+```
+
+A folder is read as `--project` reads it: Tailwind v4 `@theme`, shadcn/ui `:root` and `.dark`, and the stylesheet `components.json` names. Each line names the collection, variable, and mode, the value in code and on the canvas, and whether the token changed in code, on the canvas, on both, is new in code, or is gone from code. The `token_drift` tool reports the same for files passed as its arguments.
+
 ## Storybook Export
 
 Generate one CSF3 `.stories.ts` file per component set or component:

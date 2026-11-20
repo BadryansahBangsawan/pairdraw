@@ -1,0 +1,1 @@
+- `pairdraw tokens --check` and the `token_drift` tool compare the variables with a stylesheet, a project folder, or W3C design token files and list every token that changed in code, on the canvas, or on both; the command exits with status 1 when anything differs.

@@ -1,16 +1,21 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
+import { basename, dirname, join } from 'node:path'
 
 import { defineCommand } from 'citty'
+import { compact } from 'es-toolkit/array'
 
 import {
   defaultTokenImportOptions,
   importTokensIntoGraph,
   planTokenImport,
+  planTokenSync,
   readCSSDesignTokens,
-  type DesignSystemIssue
+  readTokenSourceFiles,
+  type DesignSystemIssue,
+  type DesignTokenSourceFile,
+  type TokenDrift
 } from '@pairdraw/core/io/formats/design-tokens'
-import { importDesignSystemFolder } from '@pairdraw/core/node/design-system'
+import { importDesignSystemFolder, readDesignSystemFolder } from '@pairdraw/core/node/design-system'
 import type { TokensResult } from '@pairdraw/core/rpc'
 
 import { requireFile } from '#cli/app/client'
@@ -42,6 +47,12 @@ export default defineCommand({
       description:
         'Import CSS variables from a local project folder (Tailwind v4 @theme and shadcn/ui :root/.dark). Does not run JavaScript config'
     },
+    /** A local stylesheet or project folder the document's variables are compared with. */
+    check: {
+      type: 'string',
+      description:
+        'Compare the variables with a local stylesheet or project folder and list what differs; exits 1 when anything does'
+    },
     write: { type: 'boolean', description: 'Write changes back to the input file' },
     output: { type: 'string', description: 'Write to a different file', required: false },
     out: {
@@ -51,8 +62,12 @@ export default defineCommand({
     }
   },
   async run({ args }) {
-    if (args.import && args.project) {
-      throw new Error('Pass either --import or --project, not both.')
+    if (compact([args.import, args.project, args.check]).length > 1) {
+      throw new Error('Pass one of --import, --project, or --check, not both.')
+    }
+    if (args.check) {
+      await checkTokens(args.file, args.check, args)
+      return
     }
     // --out is where `--format dtcg` writes its files; an import writes the document itself.
     if (args.out && (args.import || args.project)) {
@@ -217,4 +232,58 @@ async function importProject(
   }
   if (args.write) await writeDocumentFile(graph, requireFile(file))
   else if (args.output) await writeDocumentFile(graph, args.output)
+}
+
+/** A stylesheet or token file as it is, or a project folder's stylesheets as an import reads them. */
+async function readTokenSource(
+  path: string
+): Promise<{ files: DesignTokenSourceFile[]; issues: DesignSystemIssue[] }> {
+  if ((await stat(path)).isDirectory()) return readDesignSystemFolder(path)
+  return { files: [{ path: basename(path), text: await readFile(path, 'utf8') }], issues: [] }
+}
+
+function driftLine(drift: TokenDrift): string {
+  const where = `${drift.collection} / ${drift.variable}${drift.mode ? ` (${drift.mode})` : ''}`
+  const values = [
+    drift.code === undefined ? undefined : `code ${drift.code}`,
+    drift.canvas === undefined ? undefined : `canvas ${drift.canvas}`
+  ].filter((part) => part !== undefined)
+  return `${where}: ${drift.kind}${values.length > 0 ? `, ${values.join(', ')}` : ''}`
+}
+
+/**
+ * Compares the document's variables with linked code and lists every token that differs, for a
+ * check in CI: the process exits 1 when anything does. The document is not changed.
+ */
+async function checkTokens(
+  file: string | undefined,
+  sourcePath: string,
+  args: { json?: boolean }
+): Promise<void> {
+  const graph = await loadDocument(requireFile(file))
+  populateWholeDocument(graph)
+  const source = await readTokenSource(sourcePath)
+  const { bundles, issues } = readTokenSourceFiles(graph, source.files)
+  issues.unshift(...source.issues)
+  const { drift } = planTokenSync(graph, bundles)
+  if (args.json) {
+    await printJSON({ in_sync: drift.length === 0, drift, issues })
+  } else if (drift.length === 0) {
+    console.log(ok(`Variables match ${sourcePath}`))
+  } else {
+    console.log(
+      fmtList(
+        drift.map((entry) => ({ header: driftLine(entry) })),
+        { compact: true }
+      )
+    )
+  }
+  if (issues.length > 0 && !args.json)
+    console.error(
+      fmtList(
+        issues.map((issue) => ({ header: designSystemIssueLine(issue) })),
+        { compact: true }
+      )
+    )
+  if (drift.length > 0) process.exit(1)
 }

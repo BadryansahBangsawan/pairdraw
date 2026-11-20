@@ -9,7 +9,12 @@ import {
   lint,
   lintFix
 } from '#core/tools/analyze'
-import { designToComponentMap, designToTokens, importDesignTokens } from '#core/tools/codegen'
+import {
+  designToComponentMap,
+  designToTokens,
+  importDesignTokens,
+  tokenDrift
+} from '#core/tools/codegen'
 import { addComment, getComments, replyToComment, resolveComment } from '#core/tools/comments'
 import {
   createComponent,
@@ -259,5 +264,6 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   // Codegen
   designToTokens,
   importDesignTokens,
+  tokenDrift,
   designToComponentMap
 ]

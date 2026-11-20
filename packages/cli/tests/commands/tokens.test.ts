@@ -106,3 +106,27 @@ describe('tokens --project', () => {
     expect(`${both.stdout}\n${both.stderr}`).toContain('not both')
   })
 })
+
+describe('tokens --check', () => {
+  test('exits cleanly while the document matches its stylesheet, and fails on drift', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-tokens-check-'))
+    const authored = join(dir, 'tokens.pen')
+    const source = join(dir, 'tokens.fig')
+    const css = join(dir, 'theme.css')
+    await writeFile(
+      authored,
+      JSON.stringify({ version: '2.21', children: [{ id: 'frame', type: 'frame', name: 'Page' }] })
+    )
+    await writeFile(css, ':root {\n  --brand: #2947ff;\n  --space: 8px;\n}\n')
+    expect((await cli(['convert', authored, '-o', source])).exitCode).toBe(0)
+    expect((await cli(['tokens', '--import', css, source, '--write'])).exitCode).toBe(0)
+
+    const clean = await cli(['tokens', '--check', css, source])
+    expect(clean.exitCode).toBe(0)
+
+    await writeFile(css, ':root {\n  --brand: #2947ff;\n  --space: 12px;\n}\n')
+    const drifted = await cli(['tokens', '--check', css, source, '--json'])
+    expect(drifted.exitCode).toBe(1)
+    expect(drifted.stdout).toContain('"variable": "space"')
+  })
+})

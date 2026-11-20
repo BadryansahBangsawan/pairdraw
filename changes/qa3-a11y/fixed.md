@@ -1,2 +1,3 @@
 - Icon-only controls in the code panel, the asset list, the boolean operations menu and the gradient editor announce what they do, in the interface language.
 - A tooltip describes the control it belongs to, so a screen reader hears what it says while it shows.
+- The layers panel is announced as a multi-select tree, its rows as tree items.

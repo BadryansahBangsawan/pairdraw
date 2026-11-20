@@ -19,8 +19,10 @@ import {
 } from '#vue/primitives/LayerTree/model'
 import { useLayerDrag } from '#vue/primitives/LayerTree/useLayerDrag'
 
-const { indentPerLevel = 16 } = defineProps<{
+const { indentPerLevel = 16, multiple = false } = defineProps<{
   indentPerLevel?: number
+  /** Whether the tree selects more than one layer at a time; Reka announces it to assistive tech. */
+  multiple?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -273,6 +275,7 @@ provideLayerTree({
     :items="items"
     :get-key="getKey"
     :get-children="getChildren"
+    :multiple="multiple"
   >
     <slot
       :items="items"

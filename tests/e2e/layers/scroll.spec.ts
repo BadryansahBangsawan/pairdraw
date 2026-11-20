@@ -47,3 +47,17 @@ test('pages and layers panels scroll inside splitter panes', async ({ page }) =>
   await expect.poll(() => layersScroller.evaluate((el) => el.scrollTop)).toBeGreaterThan(0)
   canvas.assertNoErrors()
 })
+
+test('the layers panel is one named multi-select tree', async ({ page }) => {
+  await page.goto('/?test')
+  const canvas = new CanvasHelper(page)
+  await canvas.waitForInit()
+  await openLayersPanel(page)
+
+  // The tree root owns the role, so a second one on the scroll viewport would leave it unnamed.
+  const trees = page.getByRole('tree')
+  await expect(trees).toHaveCount(1)
+  await expect(trees).toHaveAccessibleName('Layers')
+  await expect(trees).toHaveAttribute('aria-multiselectable', 'true')
+  canvas.assertNoErrors()
+})

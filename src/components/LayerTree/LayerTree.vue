@@ -11,6 +11,7 @@ import { tv } from 'tailwind-variants'
 import { nextTick, useAttrs, useTemplateRef, watch } from 'vue'
 
 import { useInlineRename } from '@pairdraw/vue/editor/inline-rename'
+import { useI18n } from '@pairdraw/vue/i18n'
 import {
   LayerTreeRoot,
   LayerTreeItem,
@@ -32,6 +33,8 @@ import LayerTreeRenameRow from './LayerTreeRenameRow.vue'
 import LayerTreeStickyRow from './LayerTreeStickyRow.vue'
 import { provideLayerTreeUI } from './ui'
 import type { LayerTreeUI } from './ui'
+
+const { panels } = useI18n()
 
 interface LayerTreeRootActions {
   select: (id: string, selection: boolean | LayerSelectionMode) => void
@@ -194,7 +197,12 @@ function onFocusOut(event: FocusEvent, actions: LayerTreeRootActions) {
 </script>
 
 <template>
-  <LayerTreeRoot v-slot="scope" :indent-per-level="INDENT">
+  <LayerTreeRoot
+    v-slot="scope"
+    :indent-per-level="INDENT"
+    multiple
+    :aria-label="panels.layers"
+  >
     <ContextMenuRoot :modal="false">
       <!-- The trigger covers the pinned row too, so right-clicking it opens the layer menu. -->
       <ContextMenuTrigger as-child @contextmenu="onLayerRightClick">

@@ -736,6 +736,23 @@ export class SceneGraph {
     if (!this.layoutWrites) this.emitter.emit('node:updated', id, changes)
   }
 
+  /** Whether moving `node` under `parentId` would put an instance inside the component it draws. */
+  private movesInstanceIntoItsComponent(node: SceneNode, parentId: string): boolean {
+    const stack = [node]
+    while (stack.length > 0) {
+      const current = stack.pop()
+      if (!current) continue
+      const componentId = current.componentId
+      if (componentId && this.closest(parentId, (candidate) => candidate.id === componentId))
+        return true
+      for (const childId of current.childIds) {
+        const child = this.nodes.get(childId)
+        if (child) stack.push(child)
+      }
+    }
+    return false
+  }
+
   reparentNode(nodeId: string, newParentId: string): void {
     const node = this.nodes.get(nodeId)
     if (!node || nodeId === this.rootId) return
@@ -745,6 +762,10 @@ export class SceneGraph {
     const newParent = this.nodes.get(newParentId)
     if (!newParent) return
     if (node.parentId === newParentId) return
+
+    // An instance inside the component it draws would sync itself forever, so Figma keeps it
+    // out: the move is refused, as a move into the layer's own subtree is.
+    if (this.movesInstanceIntoItsComponent(node, newParentId)) return
 
     const oldParentId = node.parentId
     this.willChangeNode(node)

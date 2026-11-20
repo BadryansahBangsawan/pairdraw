@@ -599,3 +599,35 @@ describe('flattenTree', () => {
     expect(graph.flattenTree(page)).toHaveLength(42)
   })
 })
+
+test('an instance does not move into its own component', () => {
+  const graph = new SceneGraph()
+  const component = graph.createNode('COMPONENT', pageId(graph), {
+    name: 'Button',
+    width: 100,
+    height: 40
+  })
+  const inner = graph.createNode('FRAME', component.id, { name: 'Inner', width: 40, height: 40 })
+  const instance = graph.createInstance(component.id, pageId(graph), { x: 200, y: 0 })
+  expect(instance).toBeDefined()
+  if (!instance) return
+
+  graph.reparentNode(instance.id, inner.id)
+
+  expect(graph.getNode(instance.id)?.parentId).not.toBe(inner.id)
+  expect(graph.getChildren(inner.id)).toHaveLength(0)
+})
+
+test('a frame holding the instance does not move into its component either', () => {
+  const graph = new SceneGraph()
+  const component = graph.createNode('COMPONENT', pageId(graph), { name: 'Button', width: 100 })
+  const instance = graph.createInstance(component.id, pageId(graph), { x: 200, y: 0 })
+  const holder = graph.createNode('FRAME', pageId(graph), { name: 'Holder', width: 80, height: 80 })
+  expect(instance).toBeDefined()
+  if (!instance) return
+
+  graph.reparentNode(instance.id, holder.id)
+  graph.reparentNode(holder.id, component.id)
+
+  expect(graph.getNode(holder.id)?.parentId).not.toBe(component.id)
+})

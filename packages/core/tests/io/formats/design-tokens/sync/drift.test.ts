@@ -10,7 +10,7 @@ import {
   planTokenSync,
   readCSSDesignTokens,
   readTokenSourceFiles,
-  syncTokensIntoGraph,
+  syncTokenFiles,
   tokenSnapshot,
   trackTokenDrift,
   type TokenDrift
@@ -238,15 +238,8 @@ describe('review findings', () => {
       { path: 'theme.css', text: ':root { --primary: #ff0000; }' },
       { path: 'dark.css', text: '.dark { --primary: #880000; }' }
     ]
-    const link = { id: 'styles', kind: 'folder' as const, name: 'styles' }
-    const sync = () => {
-      const { bundles } = readTokenSourceFiles(graph, files)
-      const resolution = planTokenSync(graph, bundles, readTokenSources(graph).at(0)).resolve()
-      syncTokensIntoGraph(graph, link, bundles, resolution)
-      return resolution
-    }
-    sync()
-    expect(sync().undecided).toEqual([])
+    syncTokenFiles(graph, files, { path: 'styles' })
+    expect(syncTokenFiles(graph, files, { path: 'styles' }).left).toEqual([])
     const base = readTokenSources(graph).at(0)
     expect(planTokenSync(graph, readTokenSourceFiles(graph, files).bundles, base).drift).toEqual([])
   })

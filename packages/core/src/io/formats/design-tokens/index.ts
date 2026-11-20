@@ -64,8 +64,10 @@ export {
 export { readTokenSourceFiles } from './sync/files'
 export {
   syncedTokenSources,
+  syncTokenFiles,
   syncTokensIntoGraph,
   tokenSourceForFiles,
+  type TokenFilesSync,
   type TokenSourceLink
 } from './sync/apply'
 export {

@@ -87,6 +87,7 @@ pairdraw variables --collection "Colors" --type COLOR
 pairdraw tokens design.fig --format tailwind > theme.css
 pairdraw tokens design.fig --format dtcg --out tokens  # W3C design tokens; import_design_tokens reads them back
 pairdraw tokens design.fig --check src/app.css  # list tokens that differ from code; exits 1 on drift
+pairdraw tokens design.fig --sync src/app.css --write  # bring code-only changes in; canvas edits are kept
 ```
 
 ### Search and XPath query

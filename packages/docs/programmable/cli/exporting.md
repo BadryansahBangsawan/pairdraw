@@ -185,6 +185,15 @@ pairdraw tokens design.fig --check . --json
 
 A folder is read as `--project` reads it: Tailwind v4 `@theme`, shadcn/ui `:root` and `.dark`, and the stylesheet `components.json` names. Each line names the collection, variable, and mode, the value in code and on the canvas, and whether the token changed in code, on the canvas, on both, is new in code, or is gone from code. The `token_drift` tool reports the same for files passed as its arguments.
 
+`--sync` brings the code's changes into the document and remembers the link, with its path from the document's folder, so later checks and syncs know which side changed:
+
+```sh
+pairdraw tokens design.fig --sync src/app.css --write
+pairdraw tokens design.fig --sync src/app.css --conflicts code --write
+```
+
+A value changed only in code, and a token new in code, always comes in. A value also changed on the canvas since the last sync is left as it is and listed, unless `--conflicts code` takes the code's value or `--conflicts canvas` keeps the canvas value. A token gone from code keeps its variable. The `sync_tokens` tool does the same for files passed as its arguments, and the variables dialog's Pull does it for a linked stylesheet, opening a review for the values only a person can decide.
+
 ## Storybook Export
 
 Generate one CSF3 `.stories.ts` file per component set or component:

@@ -13,6 +13,7 @@ import {
   designToComponentMap,
   designToTokens,
   importDesignTokens,
+  syncTokens,
   tokenDrift
 } from '#core/tools/codegen'
 import { addComment, getComments, replyToComment, resolveComment } from '#core/tools/comments'
@@ -265,5 +266,6 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   designToTokens,
   importDesignTokens,
   tokenDrift,
+  syncTokens,
   designToComponentMap
 ]

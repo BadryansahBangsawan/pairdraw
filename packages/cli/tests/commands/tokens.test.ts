@@ -130,3 +130,67 @@ describe('tokens --check', () => {
     expect(drifted.stdout).toContain('"variable": "space"')
   })
 })
+
+describe('tokens --sync', () => {
+  test('brings code-only changes in, then --check finds the document in sync', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-tokens-sync-'))
+    const authored = join(dir, 'tokens.pen')
+    const source = join(dir, 'tokens.fig')
+    const css = join(dir, 'theme.css')
+    await writeFile(
+      authored,
+      JSON.stringify({ version: '2.21', children: [{ id: 'frame', type: 'frame', name: 'Page' }] })
+    )
+    await writeFile(css, ':root {\n  --brand: #2947ff;\n}\n')
+    expect((await cli(['convert', authored, '-o', source])).exitCode).toBe(0)
+
+    const linked = await cli(['tokens', '--sync', css, source, '--write'])
+    expect(linked.exitCode).toBe(0)
+    expect(linked.stdout).toContain('Brought in 1 tokens')
+
+    await writeFile(css, ':root {\n  --brand: #00ff00;\n}\n')
+    expect((await cli(['tokens', '--sync', css, source, '--write'])).exitCode).toBe(0)
+    expect((await cli(['tokens', '--check', css, source])).exitCode).toBe(0)
+  })
+})
+
+describe('tokens --check through a pipe', () => {
+  test('a report longer than a pipe takes at once arrives whole', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pairdraw-tokens-pipe-'))
+    const authored = join(dir, 'tokens.pen')
+    const source = join(dir, 'tokens.fig')
+    const css = join(dir, 'theme.css')
+    const stylesheet = (offset: number) =>
+      `:root {\n${Array.from({ length: 2000 }, (_, i) => `  --space-${i}: ${i + offset}px;`).join('\n')}\n}\n`
+    await writeFile(
+      authored,
+      JSON.stringify({ version: '2.21', children: [{ id: 'frame', type: 'frame', name: 'Page' }] })
+    )
+    await writeFile(css, stylesheet(0))
+    expect((await cli(['convert', authored, '-o', source])).exitCode).toBe(0)
+    expect((await cli(['tokens', '--sync', css, source, '--write'])).exitCode).toBe(0)
+
+    await writeFile(css, stylesheet(1))
+    // Through a shell pipe, as CI captures it, not a stream this process drains at once.
+    const quote = (part: string) => `'${part.replaceAll("'", "'\\''")}'`
+    const command = [process.execPath, CLI_ENTRY, 'tokens', '--check', css, source]
+      .map(quote)
+      .join(' ')
+    const piped = Bun.spawn(['sh', '-c', `${command} | grep -c 'space-'`], {
+      stdout: 'pipe',
+      stderr: 'pipe'
+    })
+    const counted = (await new Response(piped.stdout).text()).trim()
+    await piped.exited
+    expect(Number(counted)).toBe(2000)
+
+    // A reader that stops early, such as `head`, ends the report quietly; drift still fails it.
+    const cut = Bun.spawn(['bash', '-c', `set -o pipefail; ${command} | head -n 1 > /dev/null`], {
+      stdout: 'pipe',
+      stderr: 'pipe'
+    })
+    const [errors, exitCode] = await Promise.all([new Response(cut.stderr).text(), cut.exited])
+    expect(errors).not.toMatch(/EPIPE|Error|at /)
+    expect(exitCode).toBe(1)
+  })
+})

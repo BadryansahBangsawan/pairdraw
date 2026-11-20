@@ -140,6 +140,18 @@ function removeEmptyGroup(graph: SceneGraph, group: SceneNode, fit: GroupFit) {
   graph.deleteNode(group.id)
 }
 
+/** Fits applied since the last reset, so a test can bound what one pass costs. */
+let groupFits = 0
+
+/** How many group fits have been applied since `resetGroupFitCount`. */
+export function groupFitCount(): number {
+  return groupFits
+}
+
+export function resetGroupFitCount(): void {
+  groupFits = 0
+}
+
 /**
  * Refits the groups and booleans around these parents to their children, keeping every child where
  * it is on the canvas, and removes groups left empty, as Figma does after a layer inside one moves,
@@ -153,6 +165,7 @@ export function fitEnclosingGroups(
 ): GroupFit | null {
   const fit: GroupFit = { before: new Map(), after: new Map(), removed: [] }
   for (const group of fittedAncestors(graph, parentIds)) {
+    groupFits += 1
     const children = graph.getChildren(group.id)
     if (children.length === 0) removeEmptyGroup(graph, group, fit)
     else fitGroup(graph, group, children, fit, options)

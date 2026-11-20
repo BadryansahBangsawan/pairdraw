@@ -119,7 +119,9 @@ class PageBuilder {
       for (const extra of bindEdge(graph, pending, layerOf)) this.edgeText(pending, extra)
     }
     // Groups fit around what they hold, the innermost first.
-    for (const id of this.groups.toReversed()) fitEnclosingGroups(graph, [id])
+    // One pass fits every group and its ancestors once; fitting per group walks the chain above
+    // that group again for each of them, which on a deep draw.io drawing is most of the import.
+    fitEnclosingGroups(graph, this.groups)
   }
 
   private vertex(cell: DrawIOCell, parentId: string, hasChildren: boolean): SceneNode {

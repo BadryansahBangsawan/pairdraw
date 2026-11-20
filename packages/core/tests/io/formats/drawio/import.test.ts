@@ -5,6 +5,7 @@ import { expectDefined } from '#core-tests/helpers/assert'
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { connectorSublayers } from '@pairdraw/scene-graph/connectors'
 import { shapeWithTextLabel } from '@pairdraw/scene-graph/generated'
+import { groupFitCount, resetGroupFitCount } from '@pairdraw/scene-graph/group-bounds'
 
 import { BUILTIN_IO_FORMATS, IORegistry } from '#core/io'
 
@@ -367,5 +368,27 @@ describe('draw.io pages and layers', () => {
     const layer = expectDefined(graph.getNode(expectDefined(connector.parentId)))
     const end = expectDefined(connector.connectorEnd).position
     expect([layer.x + end.x, layer.y + end.y]).toEqual([700, 700])
+  })
+
+  test('fits a deep group chain once per ancestor, not once per group and ancestor', async () => {
+    const cellsFor = (depth: number) =>
+      Array.from(
+        { length: depth },
+        (_, i) =>
+          vertex(`g${i}`, 'group;', [0, 0, 100, 100], `G${i}`, i === 0 ? '1' : `g${i - 1}`)
+      ).join('') + vertex('leaf', '', [1, 1, 20, 20], 'Leaf', `g${depth - 1}`)
+
+    // A fit walks the chain above its group, so one call per group refitted every ancestor again
+    // for each group above it. Counting the fits, on chains small enough to read, says which one
+    // the import does: as many as the chain is long, or as many as its square.
+    const refitsFor = async (depth: number) => {
+      resetGroupFitCount()
+      const graph = await read(file(cellsFor(depth)))
+      expect([...graph.getAllNodes()].filter((node) => node.type === 'GROUP')).toHaveLength(depth)
+      return groupFitCount()
+    }
+
+    expect(await refitsFor(50)).toBe(50)
+    expect(await refitsFor(100)).toBe(100)
   })
 })

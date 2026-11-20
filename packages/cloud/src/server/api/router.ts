@@ -25,6 +25,7 @@ import {
   createPublicDocumentRoutes,
   createPublicSharingRoutes
 } from '#cloud/server/sharing'
+import { workspaceParams } from '#cloud/server/validation'
 import type { WorkspaceMemberService, WorkspaceService } from '#cloud/server/workspaces'
 import { createWorkspaceRoutes } from '#cloud/server/workspaces'
 import { Hono } from 'hono'
@@ -65,13 +66,13 @@ export function createCloudAPIRouter(services: CloudAPIServices) {
   return new Hono<CloudAPIEnvironment>()
     .route('/', createPublicProfileSettingsRoutes(services.profiles))
     .route('/public', createPublicCloudAPIRouter(services))
-    .get('/workspaces/:workspaceId/entitlements', async (context) => {
+    .get('/workspaces/:workspaceId/entitlements', workspaceParams, async (context) => {
       if (!services.entitlements)
         return context.json({ error: { code: 'not_found' as const } }, 404)
       return context.json({
         entitlements: await services.entitlements.workspace(
           context.get('actor').userId,
-          context.req.param('workspaceId')
+          context.req.valid('param').workspaceId
         )
       })
     })

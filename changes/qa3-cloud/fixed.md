@@ -1,0 +1,1 @@
+- A malformed id in a Cloud URL answers 404 instead of a database error.

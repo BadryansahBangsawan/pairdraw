@@ -6,7 +6,7 @@ import {
 import type { CloudActor } from '#cloud/server/auth'
 import type { DocumentService } from '#cloud/server/documents'
 import { DocumentNotFoundError } from '#cloud/server/documents/errors'
-import { validatedJSON } from '#cloud/server/validation'
+import { documentParams, validatedJSON, workspaceParams } from '#cloud/server/validation'
 import { Hono, type Context } from 'hono'
 
 import {
@@ -64,16 +64,20 @@ export function createPublicProfileSettingsRoutes(service?: PublicProfileService
         })
       )
     )
-    .put('/workspaces/:workspaceId/public', validatedJSON(parsePublishWorkspace), (context) =>
-      profileRoute(context, async () =>
-        context.json({
-          profile: await required(service).publishWorkspace(
-            context.get('actor').userId,
-            context.req.param('workspaceId'),
-            context.req.valid('json').public
-          )
-        })
-      )
+    .put(
+      '/workspaces/:workspaceId/public',
+      workspaceParams,
+      validatedJSON(parsePublishWorkspace),
+      (context) =>
+        profileRoute(context, async () =>
+          context.json({
+            profile: await required(service).publishWorkspace(
+              context.get('actor').userId,
+              context.req.param('workspaceId'),
+              context.req.valid('json').public
+            )
+          })
+        )
     )
 }
 
@@ -93,7 +97,7 @@ export function createPublicProfileRoutes(
         return context.json({ profile })
       })
     )
-    .post('/documents/:documentId/document', (context) =>
+    .post('/documents/:documentId/document', documentParams, (context) =>
       profileRoute(context, async () => {
         const documentId = context.req.param('documentId')
         await required(service).requirePublicDocument(documentId)

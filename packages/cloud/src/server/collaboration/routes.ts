@@ -5,7 +5,7 @@ import type { CloudDatabase } from '#cloud/server/db'
 import { DocumentNotFoundError } from '#cloud/server/documents'
 import { CLOUD_RATE_LIMITS, createResourceRateLimiter } from '#cloud/server/rate-limit'
 import { DocumentShareInvalidError, DocumentShareSignInRequiredError } from '#cloud/server/sharing'
-import { validatedJSON } from '#cloud/server/validation'
+import { documentParams, shareParams, validatedJSON } from '#cloud/server/validation'
 import { Hono, type Context } from 'hono'
 import type { Kysely } from 'kysely'
 
@@ -37,17 +37,24 @@ export function createCollaborationRoutes(
       )
     )
   }
-  return router.post('/documents/:documentId/collaboration-ticket', async (context) => {
-    try {
-      return context.json({
-        ticket: await service.issueUserTicket(context.get('actor'), context.req.param('documentId'))
-      })
-    } catch (error) {
-      const response = notFound(context, error)
-      if (response) return response
-      throw error
+  return router.post(
+    '/documents/:documentId/collaboration-ticket',
+    documentParams,
+    async (context) => {
+      try {
+        return context.json({
+          ticket: await service.issueUserTicket(
+            context.get('actor'),
+            context.req.param('documentId')
+          )
+        })
+      } catch (error) {
+        const response = notFound(context, error)
+        if (response) return response
+        throw error
+      }
     }
-  })
+  )
 }
 
 export function createPublicCollaborationRoutes(
@@ -56,6 +63,7 @@ export function createPublicCollaborationRoutes(
 ) {
   return new Hono().post(
     '/shares/:shareId/collaboration-ticket',
+    shareParams,
     validatedJSON(parseResolveDocumentShare),
     async (context) => {
       try {

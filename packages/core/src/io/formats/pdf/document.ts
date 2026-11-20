@@ -1,5 +1,9 @@
+import type { CanvasKit } from 'canvaskit-wasm'
+
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
+import type { SkiaRenderer } from '#core/canvas/renderer'
+import { bakeAdjustedImages, hasAdjustedImagePaints } from '#core/io/formats/raster/adjusted-images'
 import { fontManager } from '#core/text/font/manager'
 
 import { renderPagesToPDFDetailed, type PDFExportResult } from './export'
@@ -21,14 +25,20 @@ export interface PDFDocumentOptions {
 export async function exportPDFDocument(
   graph: SceneGraph,
   specs: readonly PDFPageSpec[],
-  options: PDFDocumentOptions
+  options: PDFDocumentOptions,
+  canvasKit?: CanvasKit,
+  renderer?: SkiaRenderer
 ): Promise<PDFExportResult | null> {
+  const nodeIds = specs.flatMap((spec) => spec.nodeIds)
+  const baked = hasAdjustedImagePaints(graph, nodeIds)
+    ? await bakeAdjustedImages(graph, nodeIds, canvasKit, renderer)
+    : graph
   const status = options.layOutPages
-    ? await preparePagesForPDF(graph, specs)
-    : await preparePDFFonts(graph, specs)
+    ? await preparePagesForPDF(baked, specs)
+    : await preparePDFFonts(baked, specs)
   const fonts = options.embedFonts ? pdfFontFaces(status) : undefined
   return withPDFTextLayout((textLayout) =>
-    renderPagesToPDFDetailed(graph, specs, {
+    renderPagesToPDFDetailed(baked, specs, {
       fonts,
       textLayout,
       fallbackFile: (family, style, file) =>

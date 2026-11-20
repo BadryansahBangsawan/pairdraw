@@ -154,6 +154,11 @@ export class SkiaRenderer {
    * with the surface whose GL context holds its texture.
    */
   readonly liveImages = new Map<string, { image: Image; surface: Surface }>()
+  /**
+   * A raster export drawn finer than its pixels, and where world space lands on those pixels.
+   * An image that lands on them 1:1 is sampled nearest, as Figma keeps it sharp.
+   */
+  supersampledOutput: { outputFromWorld: number[] } | null = null
   viewportImageRendering = false
   imageMemoryGraph: SceneGraph | null = null
   imageMemoryPage: string | null = null

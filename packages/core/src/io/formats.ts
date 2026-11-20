@@ -347,10 +347,14 @@ export const svgFormat: IOFormatAdapter<'svg'> = {
     const booleanPath = needsBooleanPaths(request.graph)
       ? await booleanPathResolver(context?.canvasKit, context?.renderer)
       : undefined
-    const data = await renderNodesToLaidOutSVG(request.graph, target.pageId, target.nodeIds, {
-      ...options,
-      booleanPath
-    })
+    const data = await renderNodesToLaidOutSVG(
+      request.graph,
+      target.pageId,
+      target.nodeIds,
+      { ...options, booleanPath },
+      context?.canvasKit,
+      context?.renderer
+    )
     if (!data) throw new Error('Nothing to export')
     return {
       format: 'svg',
@@ -401,11 +405,19 @@ export const pdfFormat: IOFormatAdapter<'pdf'> = {
   mimeTypes: ['application/pdf'],
   support: EXPORT_EVERY_TARGET,
   exportOptions: FIXED_SIZE_EXPORT,
-  async exportContent(request, options?: PDFFormatExportOptions) {
+  async exportContent(request, options?: PDFFormatExportOptions, context?: IOContext) {
     const specs = await pdfPageSpecs(request, options)
     // Embedded, as Figma embeds every face its PDFs draw.
     const { exportPDFDocument } = await import('./formats/pdf/document')
-    const data = (await exportPDFDocument(request.graph, specs, { embedFonts: true }))?.data
+    const data = (
+      await exportPDFDocument(
+        request.graph,
+        specs,
+        { embedFonts: true },
+        context?.canvasKit,
+        context?.renderer
+      )
+    )?.data
     if (!data) throw new Error('Nothing to export')
     return {
       format: 'pdf',

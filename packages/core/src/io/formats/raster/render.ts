@@ -4,7 +4,7 @@ import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import type { RenderColorSpace } from '@pairdraw/scene-graph/color'
 import { getWorldMatrix } from '@pairdraw/scene-graph/coordinate'
 import { computeDescendantVisualBounds, type VisualBounds } from '@pairdraw/scene-graph/geometry'
-import type { Mat3 } from '@pairdraw/scene-graph/matrix'
+import Matrix, { type Mat3 } from '@pairdraw/scene-graph/matrix'
 import { resolvedVariableModes } from '@pairdraw/scene-graph/variables'
 
 import type { SkiaRenderer } from '#core/canvas'
@@ -168,10 +168,20 @@ function renderToSurface(
     throw new Error(`Could not allocate a ${renderWidth}×${renderHeight} export surface.`)
   }
 
+  const drawnFor = renderer.supersampledOutput
   try {
     const canvas = surface.getCanvas()
     canvas.scale(renderScale, renderScale)
     setup(canvas)
+    renderer.supersampledOutput =
+      renderScale > 1
+        ? {
+            outputFromWorld: Matrix.multiply(
+              Matrix.scaled(1 / renderScale, 1 / renderScale),
+              canvas.getTotalMatrix()
+            )
+          }
+        : null
     renderer.renderSceneToCanvas(canvas, renderGraph, pageId)
     surface.flush()
 
@@ -263,6 +273,7 @@ function renderToSurface(
     ck.Free(downsamplePixels)
     return resultBytes
   } finally {
+    renderer.supersampledOutput = drawnFor
     surface.dispose()
     ck.Free(pixels)
   }

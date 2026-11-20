@@ -14,8 +14,9 @@ const FIXTURE = join(FIXTURES, 'gold-preview.fig')
  */
 async function piped(args: string[]): Promise<{ text: string; exitCode: number }> {
   // A real OS pipe, as `| jq` gives: Bun.spawn's own pipe drains fast enough to hide the drop.
-  const command = [process.execPath, CLI_ENTRY, ...args].map((part) => `'${part}'`).join(' ')
-  const proc = Bun.spawn(['sh', '-c', `${command} | cat`], {
+  // The CLI's arguments arrive as positional parameters, so a path with a quote in it needs no
+  // quoting for the shell and cannot break the command.
+  const proc = Bun.spawn(['sh', '-c', '"$0" "$@" | cat', process.execPath, CLI_ENTRY, ...args], {
     stdout: 'pipe',
     stderr: 'pipe'
   })

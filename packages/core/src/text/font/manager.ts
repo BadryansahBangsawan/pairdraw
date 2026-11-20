@@ -14,7 +14,7 @@ import {
 
 import { DEFAULT_FONT_FAMILY, IS_BROWSER } from '#core/constants'
 import {
-  fallbackScriptCharacter,
+  fallbackDrawsCharacter,
   fontFallbackEntry,
   type FontFallbackManifestEntry,
   LETTER_FALLBACK_SCRIPTS,
@@ -770,9 +770,8 @@ export class FontManager {
   ): Promise<string[]> {
     signal?.throwIfAborted()
     const manifest = fontFallbackEntry(script, this.fallbackUserAgent)
-    const scriptCharacter = fallbackScriptCharacter(script)
     const needed = uniq(Array.from(characters)).filter((character) =>
-      scriptCharacter.test(character)
+      fallbackDrawsCharacter(script, character)
     )
     // Families only come in, so what one check resolved stays resolved.
     let pending = needed

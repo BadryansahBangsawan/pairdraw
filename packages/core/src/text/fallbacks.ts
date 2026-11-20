@@ -44,21 +44,27 @@ export const CJK_CHARACTER =
 export const CJK_FALLBACK_CHARACTER =
   /[\p{scx=Han}\p{scx=Hiragana}\p{scx=Katakana}\p{scx=Hangul}\p{scx=Bopomofo}\u3000\ufe10-\ufe1f\ufe30-\ufe4f\uff00-\uffef]/u
 
-/** The characters of `script`'s own writing system among a text's characters. */
-export function fallbackScriptCharacter(script: FontFallbackScript): RegExp {
+/**
+ * Whether `script`'s fallback is loaded to draw `character`: the text's characters of its
+ * writing system, and the Han, punctuation, and forms the CJK languages share, but not another
+ * language's letters, which that language's fallback loads for.
+ */
+export function fallbackDrawsCharacter(script: FontFallbackScript, character: string): boolean {
   switch (script) {
     case 'arabic':
-      return ARABIC_CHARACTER
+      return ARABIC_CHARACTER.test(character)
     case 'hebrew':
-      return HEBREW_CHARACTER
+      return HEBREW_CHARACTER.test(character)
     case 'thai':
-      return THAI_CHARACTER
+      return THAI_CHARACTER.test(character)
     case 'devanagari':
-      return DEVANAGARI_CHARACTER
-    default:
-      // A CJK face draws Han shared across the languages too, so each covers the text's CJK.
-      return CJK_FALLBACK_CHARACTER
+      return DEVANAGARI_CHARACTER.test(character)
   }
+  if (!CJK_FALLBACK_CHARACTER.test(character)) return false
+  if (script === 'cjk') return true
+  if (HANGUL_CHARACTER.test(character)) return script === 'cjk-kr'
+  if (KANA_CHARACTER.test(character)) return script === 'cjk-jp'
+  return true
 }
 
 // Common Traditional-only characters. This is a heuristic for fallback order, not language ID.

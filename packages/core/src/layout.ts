@@ -55,6 +55,14 @@ export function computeLayout(graph: SceneGraph, frameId: string): void {
   graph.withLayoutMutations(() => computeLayoutInternal(graph, frameId))
 }
 
+/**
+ * The deepest chain of auto-layout frames one layout pass may build. Yoga lays a tree out by
+ * recursing in its WebAssembly stack, which overruns at about 150 nested frames here; that throws
+ * an out-of-bounds memory error and leaves the shared Yoga instance unusable for every later
+ * layout. Refusing the pass before the call keeps the editor working.
+ */
+const MAX_LAYOUT_DEPTH = 128
+
 function computeLayoutInternal(graph: SceneGraph, frameId: string): void {
   const frame = graph.getNode(frameId)
   if (!frame || frame.layoutMode === 'NONE') return
@@ -181,7 +189,7 @@ function buildYogaTree(
 
   configureFlexContainer(root, frame, direction)
 
-  insertFlexChildren(root, frame, graph, direction)
+  insertFlexChildren(root, frame, graph, direction, 1)
 
   return root
 }
@@ -334,8 +342,14 @@ function configureChildAsAutoLayout(
   child: SceneNode,
   parent: SceneNode,
   graph: SceneGraph,
-  inheritedDirection: 'LTR' | 'RTL'
+  inheritedDirection: 'LTR' | 'RTL',
+  depth: number
 ): void {
+  if (depth > MAX_LAYOUT_DEPTH) {
+    throw new RangeError(
+      `Layers nest more than ${MAX_LAYOUT_DEPTH} auto-layout frames deep, which the layout engine cannot lay out.`
+    )
+  }
   const direction = resolveNodeLayoutDirection(child, inheritedDirection)
   const widthSizing = layoutSizing(graph, child, 'HORIZONTAL')
   const heightSizing = layoutSizing(graph, child, 'VERTICAL')
@@ -362,7 +376,7 @@ function configureChildAsAutoLayout(
   if (heldAxis === 'width' && widthSizing === 'HUG') yogaChild.setWidth(child.width)
   if (heldAxis === 'height' && heightSizing === 'HUG') yogaChild.setHeight(child.height)
 
-  insertFlexChildren(yogaChild, child, graph, direction)
+  insertFlexChildren(yogaChild, child, graph, direction, depth + 1)
 }
 
 /** Puts a frame's children into its Yoga node, through the flow box a negative edge needs. */
@@ -370,7 +384,8 @@ function insertFlexChildren(
   yogaParent: YogaNode,
   parent: SceneNode,
   graph: SceneGraph,
-  direction: 'LTR' | 'RTL'
+  direction: 'LTR' | 'RTL',
+  depth: number
 ): void {
   const box = insertFlowBox(yogaParent, parent)
   const flow: YogaNode[] = []
@@ -387,7 +402,7 @@ function insertFlexChildren(
       if (child.layoutMode === 'GRID') {
         configureChildAsGrid(yogaChild, child, parent, graph, direction)
       } else if (child.layoutMode !== 'NONE') {
-        configureChildAsAutoLayout(yogaChild, child, parent, graph, direction)
+        configureChildAsAutoLayout(yogaChild, child, parent, graph, direction, depth)
       } else {
         configureChildAsLeaf(yogaChild, child, parent, graph)
       }

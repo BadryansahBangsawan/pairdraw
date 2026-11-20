@@ -1,0 +1,1 @@
+- A pen path of two points closes into a shape when its first point is pressed, as in Figma.

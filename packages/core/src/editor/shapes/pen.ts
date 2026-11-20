@@ -8,7 +8,7 @@ import type {
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 import { cloneVectorNetwork } from '@pairdraw/scene-graph/vector-network'
 
-import { BLACK } from '#core/constants'
+import { BLACK, PEN_CLOSE_MIN_POINTS } from '#core/constants'
 import { createVectorFromNetwork, type CreateShape } from '#core/editor/shapes/vector'
 import type { EditorContext, ResumedPath } from '#core/editor/types'
 import { vectorChangesFromPagePath } from '#core/vector'
@@ -201,13 +201,16 @@ export function createPenActions(
       return
     }
 
-    if (closed && ps.pendingClose && ps.vertices.length > 2) {
+    if (closed && ps.vertices.length >= PEN_CLOSE_MIN_POINTS) {
       const prevIdx = ps.vertices.length - 1
+      // A press on the first point leaves the drag at the point being closed, which the closing
+      // segment arrives along; closing without one joins the points straight.
+      const drag = ps.pendingClose ? ps.dragTangent : null
       ps.segments.push({
         start: prevIdx,
         end: 0,
         tangentStart: { x: 0, y: 0 },
-        tangentEnd: ps.dragTangent ?? { x: 0, y: 0 }
+        tangentEnd: drag ? { x: -drag.x, y: -drag.y } : { x: 0, y: 0 }
       })
     }
 

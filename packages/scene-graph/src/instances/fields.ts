@@ -37,6 +37,11 @@ export const INSTANCE_SYNC_FIELD_OWNERS: Readonly<Partial<Record<string, string>
  */
 export const INSTANCE_FOLLOWED_FIELDS = [
   ...TRANSFORM_FIELDS,
+  // A size limit has no field of its own in the file, so an instance cannot keep one of its own.
+  'minWidth',
+  'maxWidth',
+  'minHeight',
+  'maxHeight',
   'horizontalConstraint',
   'verticalConstraint',
   'layoutPositioning',
@@ -60,6 +65,9 @@ export const INSTANCE_SYNC_PROPS: (keyof SceneNode)[] = difference(
     ...STROKE_FIELDS,
     ...CORNER_FIELDS,
     ...AUTO_LAYOUT_FIELDS,
+    // An instance frame and its component share one alignment in the file, so the instance
+    // follows the component's instead of keeping its own.
+    'layoutAlignSelf',
     'itemReverseZIndex',
     'gridPosition',
     'clipsContent',

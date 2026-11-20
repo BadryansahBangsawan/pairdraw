@@ -17,3 +17,5 @@
 - Undoing a change of a frame's sizing puts the size it had back, which a fixed frame keeps.
 - Saving a document whose instance holds a copy of a component layer that no longer exists no longer fails; the rest of the document is written.
 - Binding a variable to an instance's fill records that fill as the instance's own, so reopening no longer shows an override the document never had.
+- A size limit set on a layer inside an instance no longer claims to be that instance's own, since the file has no field for it and reopening dropped it.
+- An instance takes its component frame's alignment, as the file keeps one alignment for both.

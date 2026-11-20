@@ -113,6 +113,8 @@ export interface ModelOption {
   status?: 'active' | 'beta' | 'deprecated'
   /** Lowest reasoning effort the model accepts; lower thinking levels, Off included, use it. */
   minReasoningEffort?: ReasoningEffort
+  /** List price in US dollars per million tokens, when the catalog knows it; absent otherwise. */
+  pricing?: { inputPerMTok: number; outputPerMTok: number; cacheReadPerMTok?: number }
 }
 
 export interface AIProviderDef {

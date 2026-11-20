@@ -3,6 +3,7 @@ import { afterEach, describe, expect, test } from 'bun:test'
 import {
   listCatalogModels,
   resetModelsDevCatalogForTests,
+  resolveModelPricing,
   resolveModelsDevModel
 } from '@/app/ai/models/catalog'
 
@@ -212,5 +213,62 @@ describe('models.dev catalog', () => {
     expect(
       await resolveModelsDevModel('openai-compatible', 'local', catalogResponse({}))
     ).toBeNull()
+  })
+})
+
+describe('models.dev pricing', () => {
+  test('resolves a model price per million input and output tokens', async () => {
+    const pricing = await resolveModelPricing(
+      'anthropic',
+      'claude-sonnet-4-6',
+      catalogResponse({
+        anthropic: {
+          models: {
+            'claude-sonnet-4-6': {
+              name: 'Claude Sonnet 4.6',
+              cost: { input: 3, output: 15, cache_read: 0.3 }
+            }
+          }
+        }
+      })
+    )
+    expect(pricing).toEqual({ inputPerMTok: 3, outputPerMTok: 15, cacheReadPerMTok: 0.3 })
+  })
+
+  test('a model with no listed price resolves null', async () => {
+    expect(
+      await resolveModelPricing(
+        'openai',
+        'gpt-6.1-sol',
+        catalogResponse({ openai: { models: { 'gpt-6.1-sol': { name: 'GPT-6.1 Sol' } } } })
+      )
+    ).toBeNull()
+  })
+
+  test('a price missing its output rate resolves null rather than a half price', async () => {
+    expect(
+      await resolveModelPricing(
+        'openai',
+        'gpt-6.1-sol',
+        catalogResponse({
+          openai: { models: { 'gpt-6.1-sol': { name: 'GPT-6.1 Sol', cost: { input: 3 } } } }
+        })
+      )
+    ).toBeNull()
+  })
+
+  test('normalizeModel carries pricing onto the catalog model option', async () => {
+    const model = await resolveModelsDevModel(
+      'openai',
+      'gpt-6.1-sol',
+      catalogResponse({
+        openai: {
+          models: {
+            'gpt-6.1-sol': { name: 'GPT-6.1 Sol', cost: { input: 2.5, output: 10 } }
+          }
+        }
+      })
+    )
+    expect(model?.pricing).toEqual({ inputPerMTok: 2.5, outputPerMTok: 10 })
   })
 })

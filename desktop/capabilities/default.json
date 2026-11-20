@@ -60,7 +60,7 @@
     },
     {
       "identifier": "fs:allow-read-file",
-      "allow": [{ "path": "**" }]
+      "allow": [{ "path": "**" }, { "path": "$APPLOCALDATA/**" }]
     },
     {
       "identifier": "fs:allow-stat",
@@ -95,7 +95,7 @@
     },
     {
       "identifier": "fs:allow-write-file",
-      "allow": [{ "path": "**" }],
+      "allow": [{ "path": "**" }, { "path": "$APPLOCALDATA/**" }],
       "deny": [
         { "path": "$HOME/Library/Application Support/Pairdraw/mcp.json" },
         { "path": "$LOCALDATA/Pairdraw/mcp.json" },
@@ -115,11 +115,11 @@
     },
     {
       "identifier": "fs:allow-mkdir",
-      "allow": [{ "path": "**" }]
+      "allow": [{ "path": "**" }, { "path": "$APPLOCALDATA/**" }]
     },
     {
       "identifier": "fs:allow-remove",
-      "allow": [{ "path": "**" }],
+      "allow": [{ "path": "**" }, { "path": "$APPLOCALDATA/**" }],
       "deny": [
         { "path": "$HOME/Library/Application Support/Pairdraw/mcp.json" },
         { "path": "$LOCALDATA/Pairdraw/mcp.json" },

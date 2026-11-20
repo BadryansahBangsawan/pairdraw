@@ -874,8 +874,23 @@ export class SceneGraph {
       }
     }
 
-    for (const childId of Array.from(node.childIds)) {
-      this.deleteNode(childId)
+    this.deleteSubtree(node)
+  }
+
+  /**
+   * Deletes `node` and its layers, children first. Their parent goes with them, so its child
+   * list is emptied once instead of being filtered for each child, which kept deleting a frame
+   * of thousands of layers quadratic. The list is emptied before the children go, so a listener
+   * of a child's deletion never finds it still listed.
+   */
+  private deleteSubtree(node: SceneNode): void {
+    const { id, childIds } = node
+    node.childIds = []
+    for (const childId of childIds) {
+      const child = this.nodes.get(childId)
+      if (!child) continue
+      this.willChangeNode(child)
+      this.deleteSubtree(child)
     }
 
     if (node.type === 'INSTANCE' && node.componentId) this.unindexInstance(node.componentId, id)

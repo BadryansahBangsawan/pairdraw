@@ -1,1 +1,2 @@
 - Moving a selection with the arrow keys no longer lays out the whole subtree of every moved layer, nor does undo or redo, so nudging stays instant on large auto layout documents.
+- Deleting a large layer captures its subtree once instead of twice, halving the work of a big delete.

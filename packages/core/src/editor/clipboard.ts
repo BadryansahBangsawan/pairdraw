@@ -479,26 +479,25 @@ export function createClipboardActions(ctx: EditorContext) {
     const requested = [...nodeIds].filter(deletable)
     // Connectors go with a layer they attach to, as in FigJam; one that stays keeps them.
     const attached = attachedConnectors(ctx.graph, requested).map((node) => node.id)
-    const entries: Array<{
-      id: string
-      parentId: string
-      index: number
-      subtree: Map<string, SceneNode>
-    }> = []
+    const targets: Array<{ id: string; parentId: string; index: number }> = []
     for (const id of uniq([...requested, ...attached])) {
       const node = ctx.graph.getNode(id)
       if (!node || !deletable(id)) continue
       const parentId = node.parentId ?? ctx.state.currentPageId
       const parent = ctx.graph.getNode(parentId)
       const index = parent?.childIds.indexOf(id) ?? -1
-      entries.push({ id, parentId, index, subtree: snapshotSubtree(ctx.graph, id) })
+      targets.push({ id, parentId, index })
     }
-    if (entries.length === 0) return
+    if (targets.length === 0) return
     prepareSlotEdits(
       ctx,
-      entries.map((entry) => entry.parentId)
+      targets.map((entry) => entry.parentId)
     )
-    for (const entry of entries) entry.subtree = snapshotSubtree(ctx.graph, entry.id)
+    // The slot edits above may change what a layer's subtree holds, so it is captured once, after.
+    const entries = targets.map((entry) => ({
+      ...entry,
+      subtree: snapshotSubtree(ctx.graph, entry.id)
+    }))
 
     const relayoutParents = () => {
       for (const parentId of new Set(entries.map((entry) => entry.parentId))) {

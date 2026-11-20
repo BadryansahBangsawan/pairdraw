@@ -44,6 +44,7 @@ export const INSTANCE_FOLLOWED_FIELDS = [
   'maxHeight',
   'horizontalConstraint',
   'verticalConstraint',
+  'layoutPositioning',
   'counterAxisAlignContent',
   'isMask',
   'maskType',
@@ -64,10 +65,9 @@ export const INSTANCE_SYNC_PROPS: (keyof SceneNode)[] = difference(
     ...STROKE_FIELDS,
     ...CORNER_FIELDS,
     ...AUTO_LAYOUT_FIELDS,
-    // An instance frame and its component share one alignment and one positioning in the file, so
-    // the instance follows the component's instead of keeping its own.
+    // An instance frame and its component share one alignment in the file, so the instance
+    // follows the component's instead of keeping its own.
     'layoutAlignSelf',
-    'layoutPositioning',
     'itemReverseZIndex',
     'gridPosition',
     'clipsContent',
@@ -96,3 +96,16 @@ export const INSTANCE_SYNC_FIELDS = [
   ...INSTANCE_OVERRIDE_FIELDS,
   ...INSTANCE_FOLLOWED_FIELDS
 ] as const
+
+/**
+ * Fields an instance frame takes from its component frame, where the file keeps one value for
+ * both: a layer inside an instance has no field of its own for them.
+ */
+export const INSTANCE_FRAME_FOLLOWED_FIELDS: (keyof SceneNode)[] = [
+  'layoutPositioning',
+  'layoutGrow',
+  'minWidth',
+  'maxWidth',
+  'minHeight',
+  'maxHeight'
+]

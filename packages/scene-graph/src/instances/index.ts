@@ -9,7 +9,11 @@ import { applyBoundPaintColorsIn, keepCopyBoundPaints } from '../variables/paint
 import { keepOwnContentSize } from './content-size'
 import { createInstanceSyncContext, groupCopyRemovals, removeLeftoverCopies } from './copies'
 import { canCreateInstance, createsComponentCycle } from './cycles'
-import { INSTANCE_OVERRIDE_FIELDS, INSTANCE_SYNC_PROPS } from './fields'
+import {
+  INSTANCE_FRAME_FOLLOWED_FIELDS,
+  INSTANCE_OVERRIDE_FIELDS,
+  INSTANCE_SYNC_PROPS
+} from './fields'
 import { differingVariableModeCollections } from './modes'
 import {
   assignmentOverrideField,
@@ -60,7 +64,9 @@ export {
 
 export function copyInstanceComponentProps(component: SceneNode): Partial<SceneNode> {
   const props: Partial<SceneNode> = {}
-  for (const key of INSTANCE_SYNC_PROPS) copyProp(props, component, key)
+  // A new instance starts with the fields its component frame lends it, as resyncing one does.
+  for (const key of [...INSTANCE_SYNC_PROPS, ...INSTANCE_FRAME_FOLLOWED_FIELDS])
+    copyProp(props, component, key)
   return props
 }
 
@@ -270,6 +276,11 @@ function syncInstancesOf(
           if (key === 'boundVariables' || key === 'variableModes') continue
           if (isProtectedSyncField(instance, key, protectedField)) continue
           copyProp(updates, source, key)
+        }
+        // The file keeps one value for the instance frame and its component, so the frame takes
+        // those the layers inside an instance may not set.
+        for (const key of INSTANCE_FRAME_FOLLOWED_FIELDS) {
+          if (!isProtectedSyncField(instance, key, protectedField)) copyProp(updates, source, key)
         }
         // An instance that hugs its layers sizes to what it shows, not to the component.
         keepOwnContentSize(graph, updates, instance, source)

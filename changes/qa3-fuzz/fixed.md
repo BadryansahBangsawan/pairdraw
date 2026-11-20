@@ -21,3 +21,4 @@
 - An instance takes its component frame's alignment, as the file keeps one alignment for both.
 - An instance takes its component frame's positioning too, so absolute positioning in a component no longer reappears only after reopening.
 - A page can no longer be moved into a layer, which left the document holding a page inside a frame.
+- An instance frame takes its component frame's fill behaviour and size limits, which the file records once for both.

@@ -83,7 +83,10 @@ function assertAutomationSaveDestination(
 function unsavedDocumentError(store: AutomationTarget['store']): Error {
   const kind = store.state.documentKind
   const name = store.state.documentName
-  const source = store.getSourceIdentity().path
+  // A URL of another origin is not a file this app can write, so it leaves no path to save to;
+  // the same-origin files this server serves are saved through `serverOpenedPath`.
+  const path = store.getSourceIdentity().path
+  const source = path && !/^https?:/i.test(path) ? path : undefined
   if (!source) {
     return new Error(
       `"${name}" has not been saved to a file yet; ` +

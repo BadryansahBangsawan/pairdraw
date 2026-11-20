@@ -1,0 +1,1 @@
+- A rescaled instance draws its vector at the instance size after the file is reopened, instead of at the component's outline size.

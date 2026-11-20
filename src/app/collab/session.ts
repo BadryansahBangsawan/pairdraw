@@ -222,22 +222,50 @@ export function openRoomSession({
     }
   })
 
+  let followingRoom = false
+  /** Takes the room's copy of the document as this tab's, keeping edits made meanwhile. */
+  function takeRoom() {
+    const previousRoot = store.graph.rootId
+    followsRoom = true
+    suppressGraphSync = true
+    try {
+      // The room's copy is the document's own content, not an edit: applying it must not mark
+      // the tab unsaved, as the steady-state room writes already do through `adopt`.
+      adopt(() => {
+        sync.followRoom()
+        // What the person drew while the room loaded is theirs; the rest is the file's copy.
+        sync.syncHeldBackEdits()
+        sync.dropLayersOutsideRoom(previousRoot)
+      })
+    } finally {
+      suppressGraphSync = false
+    }
+    hasDocument.value = readRoot(meta) === store.graph.rootId
+  }
+
   function refreshDocument() {
     if (disposed) return
     const rootId = readRoot(meta)
+    // Two tabs can seed an empty room together. The root the room records wins, so a tab whose
+    // own root lost takes the room's whole document instead of staying on a separate graph.
+    // Adoption waits for the transaction that delivered the root to finish changing the room.
+    if (rootId !== undefined && store.graph.rootId !== rootId && ynodes.has(rootId)) {
+      if (!followingRoom) {
+        followingRoom = true
+        queueMicrotask(() => {
+          followingRoom = false
+          if (disposed) return
+          const winner = readRoot(meta)
+          if (winner !== undefined && ynodes.has(winner) && store.graph.rootId !== winner)
+            takeRoom()
+          refreshDocument()
+        })
+      }
+      return
+    }
     hasDocument.value = rootId === undefined ? holdsDocument : store.graph.rootId === rootId
     // The room's document is what a stored document's tab shows once the room holds it.
-    if (holdsDocument && hasDocument.value && rootId !== undefined && !followsRoom) {
-      followsRoom = true
-      suppressGraphSync = true
-      try {
-        // What the person drew while the room loaded is theirs; the rest is the file's copy.
-        sync.syncHeldBackEdits()
-        adopt(sync.dropLayersOutsideRoom)
-      } finally {
-        suppressGraphSync = false
-      }
-    }
+    if (holdsDocument && hasDocument.value && rootId !== undefined && !followsRoom) takeRoom()
     if (hasDocument.value) documentSync.follow()
     // Newcomers wait for someone who has the file, so peers say whether they do.
     if (awareness.getLocalState()?.hasFile !== hasDocument.value) {

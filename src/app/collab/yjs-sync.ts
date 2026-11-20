@@ -339,6 +339,25 @@ export function createYjsGraphSync({
     ensureCurrentPageExists(store)
   }
 
+  /**
+   * Takes the whole room, for a tab that opened its own copy before another tab seeded the room:
+   * its root, layers, and order all come from the room and its earlier copy is dropped after.
+   */
+  function followRoom() {
+    const store = getStore()
+    const ydoc = getYdoc()
+    const ynodes = getYnodes()
+    if (!ydoc || !ynodes) return
+    const ids = [...ynodes.keys()]
+    const roomRoot = readRoot(ydoc.getMap('meta'))
+    for (const nodeId of ids) {
+      const ynode = ynodes.get(nodeId)
+      if (ynode) applyYnodeToGraph(store.graph, nodeId, ynode, roomRoot)
+    }
+    applySharedTree(sharedTreeOf(ydoc), store.graph, ynodes, ydoc.getMap('meta'), ids, new Set())
+    ensureCurrentPageExists(store)
+  }
+
   /** Applies a layer's own fields; `applySharedTree` places it in the tree afterwards. */
   function applyYnodeToGraph(
     graph: SceneGraph,
@@ -415,10 +434,19 @@ export function createYjsGraphSync({
    * opened in several tabs numbers its layers afresh each time, so its copies of layers the room
    * already has would otherwise sit beside the room's own.
    */
-  function dropLayersOutsideRoom() {
+  function dropLayersOutsideRoom(previousRoot?: string) {
     const graph = getStore().graph
     const ynodes = getYnodes()
     if (!ynodes) return
+    // A tab that seeded the empty room keeps its own document beside the room's once it adopts
+    // the winner; that copy, and the layers only it held, are not part of the room.
+    if (previousRoot && previousRoot !== graph.rootId && !ynodes.has(previousRoot)) {
+      graph.deleteNode(previousRoot)
+    }
+    const orphaned = Array.from(graph.getAllNodes(), (node) => node.id).filter(
+      (id) => !ynodes.has(id)
+    )
+    for (const id of orphaned) graph.deleteNode(id)
     const outside: string[] = []
     const visit = (id: string) => {
       for (const childId of graph.getNode(id)?.childIds ?? []) {
@@ -437,6 +465,7 @@ export function createYjsGraphSync({
     syncLocalEdit,
     syncAllNodesToYjs,
     applyYjsToGraph,
+    followRoom,
     syncHeldBackEdits,
     dropLayersOutsideRoom
   }

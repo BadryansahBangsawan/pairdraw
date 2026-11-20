@@ -46,7 +46,11 @@ export async function startTestRelay() {
       documentId: string,
       name: string,
       permission: DocumentPermission,
-      kind: 'guest' | 'user' = 'guest'
+      kind: 'guest' | 'user' = 'guest',
+      options: {
+        createSocket?: (url: string) => WebSocket
+        reconnectDelayMs?: (attempt: number) => number
+      } = {}
     ) {
       const principal =
         kind === 'user'
@@ -67,7 +71,8 @@ export async function startTestRelay() {
             permission,
             roomEpoch: 0,
             relayURL: url
-          })
+          }),
+        ...options
       })
     },
     async close() {

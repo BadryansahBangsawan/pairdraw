@@ -636,3 +636,15 @@ test('a frame holding the instance does not move into its component either', () 
 
   expect(graph.getNode(holder.id)?.parentId).not.toBe(component.id)
 })
+
+test('refuses to move a layer into an instance, whose contents come from its component', () => {
+  const graph = new SceneGraph()
+  const page = graph.getPages()[0].id
+  const component = graph.createNode('COMPONENT', page, { width: 100, height: 40 })
+  const instance = graph.createInstance(component.id, page, { x: 200, y: 0 })
+  const layer = graph.createNode('RECTANGLE', page, { x: 0, y: 0, width: 10, height: 10 })
+
+  graph.reparentNode(layer.id, expectDefined(instance, 'instance').id)
+
+  expect(graph.getNode(layer.id)?.parentId).toBe(page)
+})

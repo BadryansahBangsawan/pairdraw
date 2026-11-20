@@ -25,6 +25,8 @@ import Matrix from './matrix'
 import { CONTAINER_TYPES, createDefaultNode } from './node-defaults'
 import { updateNodePreview, type NodePreviewObserver } from './preview'
 import type { Color, Rect, Vector } from './primitives'
+/* eslint-disable max-lines -- SceneGraph is the facade over the domain modules */
+import { slotPropertyId } from './slots/frames'
 import { markSourceFieldsEdited } from './source-metadata'
 import { strokeLineChanges } from './strokes'
 import { invalidateTextCaches } from './text/picture'
@@ -737,6 +739,16 @@ export class SceneGraph {
   }
 
   /** Whether moving `node` under `parentId` would put an instance inside the component it draws. */
+  private movesIntoInstanceOutsideSlot(parentId: string): boolean {
+    let current = this.nodes.get(parentId)
+    while (current) {
+      if (slotPropertyId(current)) return false
+      if (current.type === 'INSTANCE') return true
+      current = current.parentId ? this.nodes.get(current.parentId) : undefined
+    }
+    return false
+  }
+
   private movesInstanceIntoItsComponent(node: SceneNode, parentId: string): boolean {
     const stack = [node]
     while (stack.length > 0) {
@@ -766,6 +778,9 @@ export class SceneGraph {
     // An instance inside the component it draws would sync itself forever, so Figma keeps it
     // out: the move is refused, as a move into the layer's own subtree is.
     if (this.movesInstanceIntoItsComponent(node, newParentId)) return
+    // An instance's contents are its component's copies; only a slot takes the document's own
+    // layers, so a layer moved anywhere else inside one would have nothing to correspond to.
+    if (this.movesIntoInstanceOutsideSlot(newParentId)) return
 
     const oldParentId = node.parentId
     this.willChangeNode(node)

@@ -5,3 +5,14 @@
 - Taking auto layout off a frame clears the wrap and alignment it can no longer use, so reopening the file no longer shows settings the frame had dropped; adding auto layout to a group turns it into a frame, as Figma converts it.
 - A slot's contents inside an instance still delete outright, the way the document's own layers do, rather than being hidden with the component's.
 - Auto layout that comes off a frame takes its spacing and padding with it, so reopening the file no longer shows a frame that kept none.
+- Moving a layer into an instance of a component is refused unless it lands in a slot, so the instance keeps a layer nothing in its component answers to.
+- Moving a layer into an instance of a component is refused unless it lands in a slot, which keeps the instance from holding a layer nothing in its component answers to.
+- Binding a variable to an instance's fill records that fill as the instance's own, so reopening no longer shows an override the document never had.
+- A size limit set on a layer inside an instance no longer claims to be that instance's own, since the file has no field for it and reopening dropped it.
+- An instance takes its component frame's alignment, as the file keeps one alignment for both.
+- An instance takes its component frame's positioning too, so absolute positioning in a component no longer reappears only after reopening.
+- A page can no longer be moved into a layer, which left the document holding a page inside a frame.
+- An instance frame takes its component frame's fill behaviour and size limits, which the file records once for both.
+- Deleting a layer inside an instance drops the overrides that named it, instead of saving a claim for a layer the document no longer has.
+- Undoing a change of a frame's sizing puts the size it had back, which a fixed frame keeps.
+- Saving a document whose instance holds a copy of a component layer that no longer exists no longer fails; the rest of the document is written.

@@ -20,6 +20,7 @@ import { applyGradientTransform, invertGradientTransform } from '@pairdraw/scene
 import { layoutSizing } from '@pairdraw/scene-graph/layout'
 import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 
+import { networkToSVGPath } from './geometry'
 import { PEN_PLUGIN_DATA_NAMESPACE } from './plugin-data'
 import type {
   PenDocument,
@@ -537,6 +538,17 @@ function writeNode(state: PenWriteState, node: SceneNode): PenNode {
   const result: PenNode = { id: node.id, type: nodeType(node) }
   basicNodeFields(state, node, result)
   if (semanticNodeFields(state, node, result)) return result
+  // Written after the preserved pen fields, so a regenerated path wins over the source text.
+  if (node.type === 'VECTOR' && node.vectorNetwork && node.vectorNetwork.segments.length > 0) {
+    const geometry = networkToSVGPath(node.vectorNetwork)
+    if (geometry) {
+      result.geometry = geometry
+      // The written box is rounded; the view box names the same box, so the path maps onto it
+      // one to one rather than being scaled into a rounded height on the next read.
+      result.viewBox = [0, 0, rounded(node.width), rounded(node.height)]
+      if (node.vectorNetwork.regions[0]?.windingRule === 'EVENODD') result.fillRule = 'evenodd'
+    }
+  }
   const children =
     node.type === 'STICKY'
       ? []

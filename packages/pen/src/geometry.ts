@@ -69,3 +69,95 @@ export function lineNetwork(width: number, height: number): VectorNetwork {
     regions: []
   }
 }
+
+function pathNumber(value: number): string {
+  return String(Object.is(value, -0) ? 0 : value)
+}
+
+function directedSegment(
+  network: VectorNetwork,
+  index: number,
+  forward: boolean
+): { command: string; end: number } {
+  const segment = network.segments[index]
+  const from = forward ? segment.start : segment.end
+  const to = forward ? segment.end : segment.start
+  const start = network.vertices[from]
+  const end = network.vertices[to]
+  const tangentStart = forward ? segment.tangentStart : segment.tangentEnd
+  const tangentEnd = forward ? segment.tangentEnd : segment.tangentStart
+  if (tangentStart.x === 0 && tangentStart.y === 0 && tangentEnd.x === 0 && tangentEnd.y === 0) {
+    return { command: `L${pathNumber(end.x)} ${pathNumber(end.y)}`, end: to }
+  }
+  return {
+    command: `C${pathNumber(start.x + tangentStart.x)} ${pathNumber(
+      start.y + tangentStart.y
+    )} ${pathNumber(end.x + tangentEnd.x)} ${pathNumber(end.y + tangentEnd.y)} ${pathNumber(
+      end.x
+    )} ${pathNumber(end.y)}`,
+    end: to
+  }
+}
+
+/**
+ * A vector network as SVG path data, the form pen keeps a path in (`geometry`). Region loops are
+ * closed subpaths; the segments outside them are walked as open chains so joins stay joins.
+ */
+export function networkToSVGPath(network: VectorNetwork): string {
+  const parts: string[] = []
+  const inRegion = new Set<number>()
+  for (const region of network.regions) {
+    for (const loop of region.loops) {
+      if (loop.length === 0) continue
+      const first = network.segments[loop[0]]
+      let current: number
+      if (loop.length === 1) current = first.start
+      else {
+        const second = network.segments[loop[1]]
+        current = first.end === second.start || first.end === second.end ? first.start : first.end
+      }
+      const startVertex = network.vertices[current]
+      parts.push(`M${pathNumber(startVertex.x)} ${pathNumber(startVertex.y)}`)
+      for (const index of loop) {
+        const segment = network.segments[index]
+        const forward = segment.start === current
+        const drawn = directedSegment(network, index, forward)
+        parts.push(drawn.command)
+        current = drawn.end
+        inRegion.add(index)
+      }
+      parts.push('Z')
+    }
+  }
+  const used = new Set<number>(inRegion)
+  const degree = new Map<number, number[]>()
+  for (const [index, segment] of network.segments.entries()) {
+    if (inRegion.has(index)) continue
+    for (const vertex of [segment.start, segment.end]) {
+      const list = degree.get(vertex) ?? []
+      list.push(index)
+      degree.set(vertex, list)
+    }
+  }
+  let current: number
+  for (;;) {
+    const unused = [...degree.entries()].filter(([, indexes]) =>
+      indexes.some((index) => !used.has(index))
+    )
+    if (unused.length === 0) break
+    const start = (unused.find(([, indexes]) => indexes.length === 1) ?? unused[0])[0]
+    const vertex = network.vertices[start]
+    parts.push(`M${pathNumber(vertex.x)} ${pathNumber(vertex.y)}`)
+    current = start
+    for (;;) {
+      const next = (degree.get(current) ?? []).find((index) => !used.has(index))
+      if (next === undefined) break
+      const segment = network.segments[next]
+      used.add(next)
+      const drawn = directedSegment(network, next, segment.start === current)
+      parts.push(drawn.command)
+      current = drawn.end
+    }
+  }
+  return parts.join('')
+}

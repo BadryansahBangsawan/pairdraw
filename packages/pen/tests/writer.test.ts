@@ -464,3 +464,40 @@ describe('non-finite numbers', () => {
     expect(written.opacity).toBe(0)
   })
 })
+
+test('keeps a vector layer’s path geometry through write and read', () => {
+  const graph = new SceneGraph()
+  const page = graph.getPages()[0]
+  const vector = graph.createNode('VECTOR', page.id, {
+    name: 'Path',
+    x: 10,
+    y: 20,
+    width: 100,
+    height: 80,
+    vectorNetwork: {
+      vertices: [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 100, y: 80 },
+        { x: 0, y: 80 },
+        { x: 130, y: 0 },
+        { x: 160, y: 40 }
+      ],
+      segments: [
+        { start: 0, end: 1, tangentStart: { x: 0, y: 0 }, tangentEnd: { x: 0, y: 0 } },
+        { start: 1, end: 2, tangentStart: { x: 0, y: 0 }, tangentEnd: { x: 0, y: 0 } },
+        { start: 2, end: 3, tangentStart: { x: 0, y: 0 }, tangentEnd: { x: 0, y: 0 } },
+        { start: 3, end: 0, tangentStart: { x: 0, y: 0 }, tangentEnd: { x: 0, y: 0 } },
+        { start: 4, end: 5, tangentStart: { x: 20, y: -10 }, tangentEnd: { x: -10, y: 20 } }
+      ],
+      regions: [{ windingRule: 'NONZERO', loops: [[0, 1, 2, 3]] }]
+    }
+  })
+
+  const again = parsePenFile(writePenDocument(graph))
+  const path = expectDefined(again.getNode(vector.id), 'vector')
+  expect(path.vectorNetwork).toBeDefined()
+  expect(path.vectorNetwork?.regions).toHaveLength(1)
+  expect(path.vectorNetwork?.segments).toHaveLength(5)
+  expect(path.vectorNetwork?.vertices).toHaveLength(6)
+})

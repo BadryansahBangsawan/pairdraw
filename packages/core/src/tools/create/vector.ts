@@ -4,6 +4,7 @@ import type { VectorNetwork } from '@pairdraw/scene-graph'
 import { parseSVGPath } from '@pairdraw/scene-graph/parse-path'
 import { transformVectorNetwork } from '@pairdraw/scene-graph/vector-network'
 
+import { prepareSlotInsertion } from '#core/figma-api/slots'
 import {
   defineTool,
   nodeSummary,
@@ -78,6 +79,8 @@ export const createVector = defineTool({
     if ('error' in fill) return fill
     const stroke = parseOptionalToolColor(args.stroke)
     if ('error' in stroke) return stroke
+    const parent = args.parent_id ? figma.getNodeById(args.parent_id) : null
+    if (parent) prepareSlotInsertion(figma.graph, parent.id, 'create_vector')
 
     const node = figma.createVector()
     node.x = args.x
@@ -104,10 +107,7 @@ export const createVector = defineTool({
         ]
       })
     }
-    if (args.parent_id) {
-      const parent = figma.getNodeById(args.parent_id)
-      if (parent) parent.appendChild(node)
-    }
+    if (parent) parent.appendChild(node)
     return nodeSummary(node)
   }
 })

@@ -2,6 +2,7 @@ import * as v from 'valibot'
 
 import { iconOptionsSchema, type IconOptions } from '@pairdraw/scene-graph/icons'
 
+import { prepareSlotInsertion } from '#core/figma-api/slots'
 import { placeIcon } from '#core/icons'
 import { defineTool, parseToolColor, toolNumber } from '#core/tools/schema'
 
@@ -142,13 +143,14 @@ export const insertIcon = defineTool({
     const inserted: { id: string; name: string; icon: string }[] = []
     const notFound: string[] = []
 
+    const parentId = args.parent_id ?? figma.currentPage.id
+    prepareSlotInsertion(figma.graph, parentId, 'insert_icon')
     for (const name of names) {
       const icon = icons.get(name)
       if (!icon || icon.paths.length === 0) {
         notFound.push(name)
         continue
       }
-      const parentId = args.parent_id ?? figma.currentPage.id
       // A position puts the icon there; without one, its parent's layout places it.
       const overrides =
         args.x === undefined && args.y === undefined ? {} : { x: args.x ?? 0, y: args.y ?? 0 }

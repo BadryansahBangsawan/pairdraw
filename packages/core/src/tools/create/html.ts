@@ -5,6 +5,7 @@ import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
 import { applyGraphTransfer, prepareGraphTransfer } from '@pairdraw/scene-graph/transfer'
 
 import { flushPendingLayout } from '#core/figma-api'
+import { prepareSlotInsertion } from '#core/figma-api/slots'
 import { sceneGraphFromStyledHTML } from '#core/io/formats/html/layers'
 import { findPageId } from '#core/io/subgraph'
 import { layoutAuthoredNodes } from '#core/layout'
@@ -34,11 +35,12 @@ export const importHTML = defineTool({
   }),
   execute: async (figma, args) => {
     const graph = figma.graph
+    const parentId = args.parent_id ?? figma.currentPage.id
+    prepareSlotInsertion(graph, parentId, 'import_html')
     const host = getHTMLToolHost(graph)
     if (!host) {
       return { error: 'import_html needs a CSS runtime, which this environment does not provide' }
     }
-    const parentId = args.parent_id ?? figma.currentPage.id
     const parent = graph.getNode(parentId)
     if (!parent || (parent.type !== 'CANVAS' && !findPageId(graph, parentId))) {
       return { error: `Parent "${parentId}" not found` }

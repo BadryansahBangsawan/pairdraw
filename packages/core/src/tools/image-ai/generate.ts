@@ -5,6 +5,7 @@ import { imageSize } from '@pairdraw/scene-graph/images'
 import type { Size } from '@pairdraw/scene-graph/primitives'
 
 import { storeImage } from '#core/figma-api/images'
+import { prepareSlotInsertion } from '#core/figma-api/slots'
 import { importSVG } from '#core/tools/create/svg'
 import { defineTool, nodeNotFound, toolFailure, toolNumber } from '#core/tools/schema'
 import { vectorizableImageFill } from '#core/vector/vectorize'
@@ -131,6 +132,7 @@ export const generateImage = defineTool({
     }
     const parentId = args.parent_id ?? figma.currentPage.id
     if (!target && !graph.getNode(parentId)) return { error: `Parent "${parentId}" not found` }
+    if (!target) prepareSlotInsertion(graph, parentId, 'generate_image')
     const service = getImageAIService(graph)
     if (!service) return { error: IMAGE_AI_UNAVAILABLE }
 
@@ -170,6 +172,7 @@ export const generateSVG = defineTool({
     const graph = figma.graph
     const parentId = args.parent_id ?? figma.currentPage.id
     if (!graph.getNode(parentId)) return { error: `Parent "${parentId}" not found` }
+    prepareSlotInsertion(graph, parentId, 'generate_svg')
     const service = getImageAIService(graph)
     if (!service) return { error: IMAGE_AI_UNAVAILABLE }
 

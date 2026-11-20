@@ -466,17 +466,33 @@ describe('three editors through the Cloud relay', () => {
     const createSocket = (url: string) => {
       const socket = new WebSocket(url)
       sockets.push(socket)
-      if (offline) socket.close(1001, 'offline')
+      // A blackholed network: the socket opens, but nothing sent or received crosses it.
+      const send = socket.send.bind(socket)
+      Object.defineProperty(socket, 'send', {
+        value: (data: string | ArrayBufferLike | Blob | ArrayBufferView) => {
+          if (!offline) Reflect.apply(send, socket, [data])
+        }
+      })
+      socket.addEventListener('message', (event) => {
+        if (offline) event.stopImmediatePropagation()
+      })
       return socket
     }
     const host = openPeer(relay, documentId, 'Host')
+    const watcher = openPeer(relay, documentId, 'Watcher')
     const traveller = openPeer(relay, documentId, 'Traveller', {
       createSocket,
       reconnectDelayMs: () => 10
     })
-    cleanups.push(host.stop, traveller.stop)
+    cleanups.push(host.stop, watcher.stop, traveller.stop)
     await until(
-      () => host.room.session.roomHasDocument() && traveller.room.session.roomHasDocument()
+      () =>
+        host.room.session.roomHasDocument() &&
+        watcher.room.session.roomHasDocument() &&
+        traveller.room.session.roomHasDocument()
+    )
+    await until(() =>
+      [watcher, traveller].every((peer) => peer.store.graph.rootId === host.store.graph.rootId)
     )
     const page = pageOne(host.store)
     host.store.graph.createNode('RECTANGLE', page, { id: 'offline:shared', name: 'Shared' })
@@ -493,10 +509,18 @@ describe('three editors through the Cloud relay', () => {
       name: 'Online edit',
       x: 80
     })
+    await until(() => watcher.store.graph.getNode(online.id)?.name === 'Online edit')
     offline = false
+    sockets.at(-1)?.close(1000, 'back online')
     await until(() => traveller.store.graph.getNode(online.id)?.name === 'Online edit')
     await until(() => host.store.graph.getNode('offline:shared')?.name === 'Offline edit')
-    expectSame([host, traveller])
+    const peers = [host, watcher, traveller]
+    await until(() =>
+      peers.every(
+        (peer) => JSON.stringify(nodeFacts(peer.store)) === JSON.stringify(nodeFacts(host.store))
+      )
+    )
+    expectSame(peers)
   })
 
   test('undo does not bring back a layer another peer deleted', async () => {

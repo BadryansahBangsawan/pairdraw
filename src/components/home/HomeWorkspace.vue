@@ -337,6 +337,7 @@ async function startWithDesignSystem(library: LibrarySummary): Promise<void> {
         :cloud="CLOUD_INCLUDED"
         :active="places.active.value"
         :account="places.account.value"
+        :checking="places.checking.value"
         :workspaces="places.workspaces.value"
         :storage="sidebarStorage"
         @select="places.select"
@@ -347,6 +348,7 @@ async function startWithDesignSystem(library: LibrarySummary): Promise<void> {
     <HomeSearchActions
       v-model="query"
       :destination="newDesignTarget?.label ?? null"
+      :creating-disabled="places.settling.value"
       @new-document="newDocument"
     />
 

@@ -1,0 +1,1 @@
+- Home keeps the chosen workspace while Cloud checks the session, and creating a design waits a moment instead of putting a local file in its place.

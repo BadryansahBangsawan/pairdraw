@@ -8,7 +8,7 @@ import { autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/vue'
 import { defaultDocument, unrefElement, useEventListener, useTimeoutFn } from '@vueuse/core'
 import { Primitive } from 'reka-ui'
 import type { ComponentPublicInstance } from 'vue'
-import { computed, onDeactivated, ref, shallowRef, watch } from 'vue'
+import { computed, onDeactivated, ref, shallowRef, useId, watch } from 'vue'
 
 import {
   TOOLTIP_SKIP_DELAY_MS,
@@ -18,6 +18,9 @@ import {
 import { motionStyles } from '@/theme/motion/styles'
 
 const TOOLTIP_OPEN_DELAY_MS = 400
+
+/** Read by the control under the tooltip, so a screen reader hears what the tooltip says. */
+const tooltipId = `tooltip-${useId()}`
 const TOOLTIP_SIDE_OFFSET = 4
 const TOOLTIP_VIEWPORT_PADDING = 8
 const TOOLTIP_CLAIM_EVENT = 'pairdraw:tooltip-claim'
@@ -160,6 +163,7 @@ watch(
     :as-child="asChild"
     data-tooltip-trigger
     :data-as-child="asChild"
+    :aria-describedby="open && label ? tooltipId : undefined"
     class="data-[as-child=false]:contents"
     @pointerover="onPointerOver"
     @pointerout="onPointerOut"
@@ -173,6 +177,7 @@ watch(
   <Teleport v-if="open && label" to="body">
     <div
       ref="content"
+      :id="tooltipId"
       role="tooltip"
       :class="cls.content"
       class="pointer-events-none"

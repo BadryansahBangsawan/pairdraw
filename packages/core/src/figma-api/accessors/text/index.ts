@@ -190,6 +190,13 @@ export function installTextNodeProxyAccessors(
       mixed,
       (_node, textDecoration) => ({ textDecoration })
     ),
+    // Figma reads a text's explicitly set OpenType features; it has no setter for them, so
+    // this one is read-only and `pairdraw.setFontFeatures` writes them.
+    openTypeFeatures: {
+      get(this: ProxyThis): unknown {
+        return getTextStyle(raw(this, internals), 'openTypeFeatures', mixed)
+      }
+    },
     maxLines: field(internals, 'maxLines'),
     listSpacing: spacing(internals, 'listSpacing', mixed),
     paragraphSpacing: spacing(internals, 'paragraphSpacing', mixed),

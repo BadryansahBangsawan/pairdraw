@@ -5,9 +5,10 @@ import { characterStyles } from '#core/text/character-style'
 import { invalid, received } from './messages'
 
 /**
- * The style patch `setRangeOpenTypeFeatures` gives a range: the features its characters already
- * had, with the given tags replacing their own entries, as setRangeFontName keeps the axes it
- * does not name. A non-boolean value is refused before anything changes.
+ * The style patch a range's OpenType features take: the features its characters already had,
+ * with the given tags replacing their own entries, as setRangeFontName keeps the axes it does
+ * not name. A non-boolean value is refused before anything changes. Figma's plugin API has no
+ * range feature setter, so `pairdraw.setRangeFontFeatures` applies this patch.
  */
 export function openTypeFeaturesPatch(
   method: string,

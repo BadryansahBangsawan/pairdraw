@@ -37,6 +37,7 @@ import {
   writeFillOkHCL,
   writeFontFeatures,
   writeLayoutDirection,
+  writeRangeFontFeatures,
   writeStrokeOkHCL,
   writeTextDirection
 } from './nodes'
@@ -244,5 +245,15 @@ export class PairdrawAPI {
   /** Merges OpenType feature toggles into the text's own, keeping the tags it does not name. */
   setFontFeatures(node: NodeRef, features: Record<string, boolean>): void {
     writeFontFeatures(this.figma.graph, node, features)
+  }
+
+  /** Merges OpenType feature toggles into a text range's own, keeping its other features. */
+  setRangeFontFeatures(
+    node: NodeRef,
+    start: number,
+    end: number,
+    features: Record<string, boolean>
+  ): void {
+    writeRangeFontFeatures(this.figma.graph, node, start, end, features)
   }
 }

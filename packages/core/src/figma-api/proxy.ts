@@ -236,6 +236,7 @@ export class FigmaNodeProxy {
   declare textStyleId: string | symbol
   declare fillStyleId: string | symbol
   declare textDecoration: SceneNode['textDecoration'] | symbol
+  declare readonly openTypeFeatures: Record<string, boolean> | symbol
   declare maxLines: number | null
   declare listSpacing: number | symbol
   declare paragraphSpacing: number | symbol
@@ -271,7 +272,6 @@ export class FigmaNodeProxy {
   declare getRangeTextDecorationSkipInk: TextRangeMethods['getRangeTextDecorationSkipInk']
   declare setRangeTextDecorationSkipInk: TextRangeMethods['setRangeTextDecorationSkipInk']
   declare getRangeOpenTypeFeatures: TextRangeMethods['getRangeOpenTypeFeatures']
-  declare setRangeOpenTypeFeatures: TextRangeMethods['setRangeOpenTypeFeatures']
   declare getRangeListOptions: TextRangeMethods['getRangeListOptions']
   declare setRangeListOptions: TextRangeMethods['setRangeListOptions']
   declare getRangeIndentation: TextRangeMethods['getRangeIndentation']

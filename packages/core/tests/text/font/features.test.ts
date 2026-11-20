@@ -1,8 +1,8 @@
 import { expect, test } from 'bun:test'
 
-import { fontFeatureTags } from '#core/text/font/features'
+import { FIXTURES } from '#core-tests/helpers/paths'
 
-import { FIXTURES } from '../../helpers/paths'
+import { fontFeatureTags } from '#core/text/font/features'
 
 async function fontBytes(name: string): Promise<ArrayBuffer> {
   return Bun.file(`${FIXTURES}/fonts/${name}`).arrayBuffer()

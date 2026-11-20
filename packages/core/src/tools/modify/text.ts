@@ -298,7 +298,9 @@ export const setFontRange = defineTool({
       }
       if (color) node.setRangeFills(start, end, [{ type: 'SOLID', color }])
       if (hyperlink) node.setRangeHyperlink(start, end, hyperlink.link)
-      if (args.font_features) node.setRangeOpenTypeFeatures(start, end, args.font_features)
+      if (args.font_features) {
+        new PairdrawAPI(figma).setRangeFontFeatures(node, start, end, args.font_features)
+      }
     } catch (error) {
       return toolFailure(error)
     }

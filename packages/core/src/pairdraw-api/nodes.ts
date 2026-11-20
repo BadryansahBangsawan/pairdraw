@@ -12,6 +12,9 @@ import {
 import { recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 
 import { assertNodeEditable } from '#core/editor/capabilities'
+import { openTypeFeaturesPatch } from '#core/figma-api/accessors/text/opentype'
+import { assertTextRange } from '#core/figma-api/text/style'
+import { styleRunsWithPatch } from '#core/text/character-style'
 
 import { nodeOf, type NodeRef } from './behaviours'
 
@@ -99,4 +102,21 @@ export function writeFontFeatures(
   editNode(graph, node, {
     fontFeatures: [...merged].map(([tag, enabled]) => ({ tag, enabled }))
   })
+}
+
+/**
+ * Merges OpenType features into a text range's own, keeping the features its characters already
+ * had. Figma's plugin API has no range feature setter, so this lives on `pairdraw`.
+ */
+export function writeRangeFontFeatures(
+  graph: SceneGraph,
+  ref: NodeRef,
+  start: number,
+  end: number,
+  features: Record<string, boolean>
+): void {
+  const node = nodeOf(graph, ref)
+  assertTextRange('setRangeFontFeatures', node, start, end)
+  const patch = openTypeFeaturesPatch('setRangeFontFeatures', node, start, features)
+  editNode(graph, node, { styleRuns: styleRunsWithPatch(node, start, end, patch) })
 }

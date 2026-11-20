@@ -4,61 +4,42 @@ import type { panelMessages } from '@pairdraw/vue/i18n'
 
 type Panels = StoreValue<typeof panelMessages>
 
+/** The panel message each named OpenType feature tag reads, as Figma's type settings name it. */
+const FEATURE_LABEL_KEYS = {
+  LIGA: 'standardLigatures',
+  CALT: 'contextualAlternates',
+  DLIG: 'discretionaryLigatures',
+  HLIG: 'historicalLigatures',
+  KERN: 'kerning',
+  LNUM: 'liningFigures',
+  ONUM: 'oldstyleFigures',
+  PNUM: 'proportionalFigures',
+  TNUM: 'tabularFigures',
+  FRAC: 'fractions',
+  AFRC: 'stackedFractions',
+  ORDN: 'ordinals',
+  ZERO: 'slashedZero',
+  SMCP: 'smallCaps',
+  PCAP: 'petiteCaps',
+  C2SC: 'allSmallCaps',
+  C2PC: 'allPetiteCaps',
+  UNIC: 'unicase',
+  TITL: 'titling',
+  CASE: 'caseSensitiveForms',
+  SINF: 'scientificInferiors',
+  SUBS: 'subscript',
+  SUPS: 'superscript'
+} as const satisfies Record<string, keyof Panels>
+
 /** The label of one OpenType feature tag, as Figma's type settings name it. */
 export function featureLabel(panels: Panels, tag: string): string {
-  switch (tag) {
-    case 'LIGA':
-      return panels.standardLigatures
-    case 'CALT':
-      return panels.contextualAlternates
-    case 'DLIG':
-      return panels.discretionaryLigatures
-    case 'HLIG':
-      return panels.historicalLigatures
-    case 'KERN':
-      return panels.kerning
-    case 'LNUM':
-      return panels.liningFigures
-    case 'ONUM':
-      return panels.oldstyleFigures
-    case 'PNUM':
-      return panels.proportionalFigures
-    case 'TNUM':
-      return panels.tabularFigures
-    case 'FRAC':
-      return panels.fractions
-    case 'AFRC':
-      return panels.stackedFractions
-    case 'ORDN':
-      return panels.ordinals
-    case 'ZERO':
-      return panels.slashedZero
-    case 'SMCP':
-      return panels.smallCaps
-    case 'PCAP':
-      return panels.petiteCaps
-    case 'C2SC':
-      return panels.allSmallCaps
-    case 'C2PC':
-      return panels.allPetiteCaps
-    case 'UNIC':
-      return panels.unicase
-    case 'TITL':
-      return panels.titling
-    case 'CASE':
-      return panels.caseSensitiveForms
-    case 'SINF':
-      return panels.scientificInferiors
-    case 'SUBS':
-      return panels.subscript
-    case 'SUPS':
-      return panels.superscript
-    default: {
-      const set = /^SS(\d{2})$/.exec(tag)
-      if (set) return panels.stylisticSet({ number: Number(set[1]) })
-      const variant = /^CV(\d{2})$/.exec(tag)
-      if (variant) return panels.characterVariant({ number: Number(variant[1]) })
-      return panels.fontFeatureTag({ tag })
-    }
+  if (Object.hasOwn(FEATURE_LABEL_KEYS, tag)) {
+    const key = FEATURE_LABEL_KEYS[tag as keyof typeof FEATURE_LABEL_KEYS]
+    return panels[key]
   }
+  const set = /^SS(\d{2})$/.exec(tag)
+  if (set) return panels.stylisticSet({ number: Number(set[1]) })
+  const variant = /^CV(\d{2})$/.exec(tag)
+  if (variant) return panels.characterVariant({ number: Number(variant[1]) })
+  return panels.fontFeatureTag({ tag })
 }

@@ -23,9 +23,28 @@ import { loadPenImports, readImportedImage, UnresolvedImports, type OpenedImport
 const PEN_ICON_SIZE = 24
 
 /**
- * A file's bytes, such as an image's or a font's: a data URL decoded by the platform's own URL
- * handling, an imported document's file beside that document, and any other file through the
- * host; null when that fails.
+ * The path a percent-encoded image URL names, decoded one step at a time: a step that would become
+ * a separator or a parent keeps its escape, so a URL cannot name a file outside its folder.
+ */
+function decodeAssetPath(url: string): string {
+  return url
+    .split('/')
+    .map((segment) => {
+      let decoded: string
+      try {
+        decoded = decodeURIComponent(segment)
+      } catch {
+        return segment
+      }
+      if (decoded === '.' || decoded === '..') return segment
+      return decoded.replaceAll('/', '%2F').replaceAll('\\', '%5C')
+    })
+    .join('/')
+}
+
+/**
+ * An image's bytes: a data URL decoded by the platform's own URL handling, an imported document's
+ * file beside that document, and any other file through the host; null when that fails.
  */
 async function loadPenFile(
   url: string,
@@ -34,7 +53,8 @@ async function loadPenFile(
 ): Promise<Uint8Array | null> {
   try {
     if (parseImportedImageURL(url)) return await readImportedImage(opened, url)
-    if (!isDataURL(url)) return (await input.readAsset?.(url)) ?? null
+    // pen.dev writes the path percent-encoded, as `My%20Design-assets/…`.
+    if (!isDataURL(url)) return (await input.readAsset?.(decodeAssetPath(url))) ?? null
     // Through `URL`, which lowercases the scheme for runtimes that only fetch `data:`.
     return new Uint8Array(await (await fetch(new URL(url))).arrayBuffer())
   } catch {

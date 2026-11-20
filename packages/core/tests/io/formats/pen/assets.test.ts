@@ -193,6 +193,80 @@ describe("penFormat.readDocument — assets", () => {
   });
 });
 
+  test('reads a percent-encoded image path from the file it names', async () => {
+    // Pencil writes a folder named `My Design-assets` as `My%20Design-assets`.
+    const asked: string[] = [];
+    const { graph } = await io.readDocument(
+      {
+        name: "My Design.pen",
+        data: penBytes([
+          {
+            id: "encoded",
+            type: "rectangle",
+            width: 50,
+            height: 50,
+            fill: { type: "image", url: "My%20Design-assets/red.png" },
+          },
+        ]),
+        readAsset: async (path) => {
+          asked.push(path);
+          return path === "My Design-assets/red.png" ? PNG : null;
+        },
+      },
+      { icons: iconProvider([], []) },
+    );
+    expect(asked).toEqual(["My Design-assets/red.png"]);
+    expect(graph.getNode("encoded")?.fills[0]?.type).toBe("IMAGE");
+  });
+
+  test("reads an image path that is already the file name", async () => {
+    const asked: string[] = [];
+    const { graph } = await io.readDocument(
+      {
+        name: "My Design.pen",
+        data: penBytes([
+          {
+            id: "plain",
+            type: "rectangle",
+            width: 50,
+            height: 50,
+            fill: { type: "image", url: "My Design-assets/red.png" },
+          },
+        ]),
+        readAsset: async (path) => {
+          asked.push(path);
+          return path === "My Design-assets/red.png" ? PNG : null;
+        },
+      },
+      { icons: iconProvider([], []) },
+    );
+    expect(asked).toEqual(["My Design-assets/red.png"]);
+    expect(graph.getNode("plain")?.fills[0]?.type).toBe("IMAGE");
+  });
+
+  test("keeps an encoded slash inside the file name", async () => {
+    const asked: string[] = [];
+    await io.readDocument(
+      {
+        name: "slash.pen",
+        data: penBytes([
+          {
+            id: "slash",
+            type: "rectangle",
+            width: 50,
+            height: 50,
+            fill: { type: "image", url: "assets/a%2Fb%20c.png" },
+          },
+        ]),
+        readAsset: async (path) => {
+          asked.push(path);
+          return PNG;
+        },
+      },
+      { icons: iconProvider([], []) },
+    );
+    expect(asked).toEqual(["assets/a%2Fb c.png"]);
+  });
 describe("penFormat.readDocument — shader files", () => {
   const SOURCE =
     "@param color fill #FF0000\nhalf4 main(float2 uv) { return half4(1.0); }\n";
@@ -242,4 +316,5 @@ describe("penFormat.readDocument — shader files", () => {
     );
     expect(graph.getNode("shaded")?.fills).toEqual([]);
   });
+
 });

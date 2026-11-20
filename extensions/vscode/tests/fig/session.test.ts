@@ -48,9 +48,20 @@ function createPanel() {
 }
 
 /** The panel and document shapes the session reads; the editor types are not loadable here. */
-function openSession(onEdited: (document: unknown) => void = () => undefined) {
+function openSession(
+  onEdited: (document: unknown) => void = () => undefined,
+  source?: () => unknown,
+  onBackupConsumed?: () => void
+) {
   const fake = createPanel()
-  const session = new EditorSession(host, document as never, fake.panel as never, onEdited as never)
+  const session = new EditorSession(
+    host,
+    document as never,
+    fake.panel as never,
+    onEdited as never,
+    source as never,
+    onBackupConsumed as never
+  )
   return { ...fake, session }
 }
 
@@ -87,21 +98,90 @@ describe('editor session', () => {
     expect(files.get(destination.path)).toEqual(new Uint8Array([7]))
   })
 
-  test(
-    'a save the editor never answers fails instead of waiting forever',
-    async () => {
-      jest.useFakeTimers()
-      const { session } = openSession()
-      try {
-        const saving = session.save()
-        jest.advanceTimersByTime(60_000)
-        await expect(saving).rejects.toThrow(/did not answer/)
-      } finally {
-        jest.useRealTimers()
+  test('loads a restored backup instead of the file on disk', async () => {
+    files.set(uri.path, new Uint8Array([1]))
+    const backup = { scheme: 'file', path: '/workspace/.backup/drawing.fig' }
+    files.set(backup.path, new Uint8Array([9, 9]))
+    const { send, posted } = openSession(
+      () => undefined,
+      () => backup
+    )
+    send({ type: 'connected' })
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(messageOfType(posted, 'load')).toMatchObject({
+      type: 'load',
+      data: fromUint8Array(new Uint8Array([9, 9]))
+    })
+  })
+
+  test('after a save, a reconnecting editor reads the saved file, not the restored backup', async () => {
+    files.set(uri.path, new Uint8Array([1]))
+    const backup = { scheme: 'file', path: '/workspace/.backup/drawing.fig' }
+    files.set(backup.path, new Uint8Array([9, 9]))
+    // The document's backup id, as the provider holds it: a save clears it.
+    let restored: unknown = backup
+    const { session, send, posted } = openSession(
+      () => undefined,
+      () => restored,
+      () => {
+        restored = undefined
       }
-    },
-    2000
-  )
+    )
+    send({ type: 'connected' })
+    await Promise.resolve()
+    await Promise.resolve()
+
+    // VS Code removes the backup once the save lands, so a reconnect must read the file.
+    const saving = session.save()
+    send({
+      type: 'saved',
+      id: 1,
+      name: 'drawing.fig',
+      data: fromUint8Array(new Uint8Array([7]))
+    })
+    await saving
+    posted.length = 0
+    send({ type: 'connected' })
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(messageOfType(posted, 'load')).toMatchObject({
+      type: 'load',
+      data: fromUint8Array(new Uint8Array([7]))
+    })
+  })
+
+  test('revert reads the file on disk instead of the restored backup', async () => {
+    files.set(uri.path, new Uint8Array([1]))
+    const backup = { scheme: 'file', path: '/workspace/.backup/drawing.fig' }
+    files.set(backup.path, new Uint8Array([9, 9]))
+    let restored: unknown = backup
+    const { session, posted } = openSession(
+      () => undefined,
+      () => restored,
+      () => {
+        restored = undefined
+      }
+    )
+
+    await session.revert()
+    expect(messageOfType(posted, 'load')).toMatchObject({
+      type: 'load',
+      data: fromUint8Array(new Uint8Array([1]))
+    })
+  })
+
+  test('a save the editor never answers fails instead of waiting forever', async () => {
+    jest.useFakeTimers()
+    const { session } = openSession()
+    try {
+      const saving = session.save()
+      jest.advanceTimersByTime(60_000)
+      await expect(saving).rejects.toThrow(/did not answer/)
+    } finally {
+      jest.useRealTimers()
+    }
+  }, 2000)
 
   test('asks for pen text when the destination is a .pen file', async () => {
     const destination = { scheme: 'file', path: '/workspace/Card.PEN' }

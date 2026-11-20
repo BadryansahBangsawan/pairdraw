@@ -6,7 +6,7 @@ import { FIG_VIEW_TYPE, PEN_VIEW_TYPE, toggledViewType } from './fig/formats'
 import { FigEditorProvider } from './fig/provider'
 import type { EditorSession } from './fig/session'
 import { SidebarViewProvider } from './sidebar/view'
-import { vscodeHost } from './vscode-host'
+import { vscodeEditorHost, vscodeHost } from './vscode-host'
 import { DEFAULT_EDITOR_URL, parseEditorURL } from './webview/html'
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -18,7 +18,7 @@ export function activate(context: vscode.ExtensionContext): void {
   }
   const providers: FigEditorProvider[] = []
   for (const viewType of [FIG_VIEW_TYPE, PEN_VIEW_TYPE]) {
-    const provider = new FigEditorProvider(context.extensionUri)
+    const provider = new FigEditorProvider(context.extensionUri, vscodeEditorHost)
     providers.push(provider)
     context.subscriptions.push(
       provider,

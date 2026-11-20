@@ -40,7 +40,11 @@ export class EditorSession implements vscode.Disposable {
     private readonly host: ExtensionHost,
     private readonly document: vscode.CustomDocument,
     private readonly panel: vscode.WebviewPanel,
-    private readonly onEdited: (document: vscode.CustomDocument) => void
+    private readonly onEdited: (document: vscode.CustomDocument) => void,
+    /** Where the bytes come from: a restored backup while the document has one, else its file. */
+    private readonly source?: () => vscode.Uri | undefined,
+    /** Called once a save or a revert makes the backup no longer the document's source. */
+    private readonly onBackupConsumed?: () => void
   ) {
     this.disposables.push(panel.webview.onDidReceiveMessage((raw: unknown) => this.onMessage(raw)))
   }
@@ -58,9 +62,19 @@ export class EditorSession implements vscode.Disposable {
     this.panel.reveal()
   }
 
-  /** Loads the bytes on disk into the editor, replacing whatever it showed. */
+  /** Loads the restored backup while the document has one, else the file on disk. */
   async reload(): Promise<void> {
-    const bytes = await this.host.readFile(this.document.uri)
+    await this.load(this.source?.() ?? this.document.uri)
+  }
+
+  /** VS Code's Revert: discards a restored backup and shows the file on disk. */
+  async revert(): Promise<void> {
+    this.onBackupConsumed?.()
+    await this.load(this.document.uri)
+  }
+
+  private async load(uri: vscode.Uri): Promise<void> {
+    const bytes = await this.host.readFile(uri)
     this.panel.webview.postMessage({
       type: 'load',
       name: fileName(this.document.uri),
@@ -95,6 +109,9 @@ export class EditorSession implements vscode.Disposable {
       this.panel.webview.postMessage({ type: 'save', id, format: documentFormat(destination.path) })
     })
     await this.host.writeFile(destination, bytesFromEditor(message.data))
+    // VS Code deletes the backup once the save lands, so later loads must read the file, and a
+    // webview resolved again for this document starts a session that does the same.
+    this.onBackupConsumed?.()
     this.dirty = false
   }
 

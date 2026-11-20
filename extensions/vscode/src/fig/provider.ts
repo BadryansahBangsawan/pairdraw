@@ -1,34 +1,45 @@
 import { randomBytes } from 'node:crypto'
 
-import * as vscode from 'vscode'
+import type * as vscode from 'vscode'
 
-import type { ExtensionHost } from '../host'
-import { vscodeHost } from '../vscode-host'
+import type { EditorProviderHost } from '../host'
 import { embedWebviewHTML, parseEditorURL, DEFAULT_EDITOR_URL } from '../webview/html'
 import { EditorSession } from './session'
 
 export interface FigDocument extends vscode.CustomDocument {
   readonly uri: vscode.Uri
+  /**
+   * The backup holding the document's current bytes. An editor reads it instead of the file on
+   * disk, so it outlives the session that wrote it: a save or a revert clears it, and a new
+   * backup replaces it.
+   */
+  backupId?: string
 }
 
 /**
  * The `.fig` custom editor: the visual editor runs in a webview iframe, so the extension only
  * moves bytes between the workspace and the embed, and reports edits so VS Code saves on its own
  * save command.
+ *
+ * The provider takes the editor it runs against, so a test drives it through a stand-in instead of
+ * the `vscode` module; `extension.ts` supplies the real one.
  */
 export class FigEditorProvider implements vscode.CustomEditorProvider<FigDocument> {
   private readonly sessions = new Map<string, EditorSession>()
-  private readonly changes = new vscode.EventEmitter<vscode.CustomDocumentEditEvent<FigDocument>>()
+  private readonly changes: vscode.EventEmitter<vscode.CustomDocumentEditEvent<FigDocument>>
 
-  readonly onDidChangeCustomDocument = this.changes.event
+  readonly onDidChangeCustomDocument: vscode.Event<vscode.CustomDocumentEditEvent<FigDocument>>
 
   constructor(
     private readonly extensionURI: vscode.Uri,
-    private readonly host: ExtensionHost = vscodeHost
-  ) {}
+    private readonly host: EditorProviderHost
+  ) {
+    this.changes = host.createEventEmitter<vscode.CustomDocumentEditEvent<FigDocument>>()
+    this.onDidChangeCustomDocument = this.changes.event
+  }
 
-  openCustomDocument(uri: vscode.Uri): FigDocument {
-    return { uri, dispose: () => undefined }
+  openCustomDocument(uri: vscode.Uri, openContext: vscode.CustomDocumentOpenContext): FigDocument {
+    return { uri, backupId: openContext.backupId, dispose: () => undefined }
   }
 
   resolveCustomEditor(
@@ -36,12 +47,11 @@ export class FigEditorProvider implements vscode.CustomEditorProvider<FigDocumen
     panel: vscode.WebviewPanel,
     _token: vscode.CancellationToken
   ): void {
-    const configured =
-      vscode.workspace.getConfiguration('pairdraw').get<string>('editorUrl') ?? DEFAULT_EDITOR_URL
+    const configured = this.host.configuredEditorURL() ?? DEFAULT_EDITOR_URL
     const editorURL = parseEditorURL(configured)
     panel.webview.options = {
       enableScripts: true,
-      localResourceRoots: [vscode.Uri.joinPath(this.extensionURI, 'dist')]
+      localResourceRoots: [this.host.joinPath(this.extensionURI, 'dist')]
     }
     if (!editorURL) {
       panel.webview.html = errorHTML(`pairdraw.editorUrl is not an http(s) URL: ${configured}`)
@@ -51,18 +61,27 @@ export class FigEditorProvider implements vscode.CustomEditorProvider<FigDocumen
     panel.webview.html = embedWebviewHTML({
       cspSource: panel.webview.cspSource,
       scriptUri: panel.webview
-        .asWebviewUri(vscode.Uri.joinPath(this.extensionURI, 'dist', 'webview.js'))
+        .asWebviewUri(this.host.joinPath(this.extensionURI, 'dist', 'webview.js'))
         .toString(),
       editorUrl: editorURL.toString(),
       nonce
     })
-    const session = new EditorSession(this.host, document, panel, (edited: vscode.CustomDocument) =>
-      this.changes.fire({
-        document: edited,
-        label: 'Edit document',
-        undo: () => this.reveal(edited.uri),
-        redo: () => this.reveal(edited.uri)
-      })
+    const session = new EditorSession(
+      this.host,
+      document,
+      panel,
+      (edited: vscode.CustomDocument) =>
+        this.changes.fire({
+          document: edited,
+          label: 'Edit document',
+          undo: () => this.reveal(edited.uri),
+          redo: () => this.reveal(edited.uri)
+        }),
+      () => (document.backupId ? this.host.parseURI(document.backupId) : document.uri),
+      () => {
+        // The file on disk is current again, so no later session reads the backup VS Code deletes.
+        delete document.backupId
+      }
     )
     this.sessions.set(document.uri.toString(), session)
     panel.onDidDispose(() => {
@@ -80,7 +99,7 @@ export class FigEditorProvider implements vscode.CustomEditorProvider<FigDocumen
   }
 
   revertCustomDocument(document: FigDocument): Thenable<void> {
-    return this.sessions.get(document.uri.toString())?.reload() ?? Promise.resolve()
+    return this.sessions.get(document.uri.toString())?.revert() ?? Promise.resolve()
   }
 
   backupCustomDocument(
@@ -89,20 +108,19 @@ export class FigEditorProvider implements vscode.CustomEditorProvider<FigDocumen
     _token: vscode.CancellationToken
   ): Thenable<vscode.CustomDocumentBackup> {
     const session = this.sessions.get(document.uri.toString())
-    if (!session) {
-      return vscode.workspace.fs.copy(document.uri, context.destination).then(() => ({
+    const written = session
+      ? session.save(context.destination)
+      : this.host.copyFile(document.uri, context.destination).then(() => undefined)
+    return written.then(() => {
+      // A later editor for this document restores this backup, not the one it replaced.
+      document.backupId = context.destination.toString()
+      return {
         id: context.destination.toString(),
         delete: () => {
-          void vscode.workspace.fs.delete(context.destination)
+          void this.host.deleteFile(context.destination)
         }
-      }))
-    }
-    return session.save(context.destination).then(() => ({
-      id: context.destination.toString(),
-      delete: () => {
-        void vscode.workspace.fs.delete(context.destination)
       }
-    }))
+    })
   }
 
   /** The open session for a document, so commands can ask the editor for its selection. */

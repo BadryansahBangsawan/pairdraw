@@ -1,1 +1,2 @@
 - A save or export the editor never answers now fails with a message after a minute, instead of leaving the document saving forever.
+- A document reopened after VS Code restarted loads the backup hot exit wrote, instead of dropping the edits made before the restart.

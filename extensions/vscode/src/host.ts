@@ -10,3 +10,18 @@ export interface ExtensionHost {
   showError(message: string): void
   saveDialog(options: vscode.SaveDialogOptions): Thenable<vscode.Uri | undefined>
 }
+
+/**
+ * What the custom editor provider reaches for itself: URIs, the configuration it reads, the file
+ * system a backup is copied through, and the emitter it reports edits with. `vscode-host.ts` is the
+ * only module that binds these to VS Code, so the provider and its tests stay off the module.
+ */
+export interface EditorProviderHost extends ExtensionHost {
+  joinPath(base: vscode.Uri, ...parts: string[]): vscode.Uri
+  parseURI(value: string): vscode.Uri
+  /** The user's `pairdraw.editorUrl`, or undefined when they have not set one. */
+  configuredEditorURL(): string | undefined
+  copyFile(from: vscode.Uri, to: vscode.Uri): Thenable<void>
+  deleteFile(uri: vscode.Uri): Thenable<void>
+  createEventEmitter<T>(): vscode.EventEmitter<T>
+}

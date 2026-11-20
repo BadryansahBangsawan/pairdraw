@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 
-import type { ExtensionHost } from './host'
+import type { EditorProviderHost, ExtensionHost } from './host'
 
 /** The real editor behind `ExtensionHost`; only the extension host imports this module. */
 export const vscodeHost: ExtensionHost = {
@@ -10,4 +10,16 @@ export const vscodeHost: ExtensionHost = {
     void vscode.window.showErrorMessage(message)
   },
   saveDialog: (options) => vscode.window.showSaveDialog(options)
+}
+
+/** The real editor behind `EditorProviderHost`: the same host, plus what the provider reaches for. */
+export const vscodeEditorHost: EditorProviderHost = {
+  ...vscodeHost,
+  joinPath: (base, ...parts) => vscode.Uri.joinPath(base, ...parts),
+  parseURI: (value) => vscode.Uri.parse(value),
+  configuredEditorURL: () =>
+    vscode.workspace.getConfiguration('pairdraw').get<string>('editorUrl'),
+  copyFile: (from, to) => vscode.workspace.fs.copy(from, to),
+  deleteFile: (uri) => vscode.workspace.fs.delete(uri),
+  createEventEmitter: <T>() => new vscode.EventEmitter<T>()
 }

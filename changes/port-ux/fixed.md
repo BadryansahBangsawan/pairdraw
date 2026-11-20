@@ -3,3 +3,4 @@
 - A variable collection lists its modes by their sort position with the default first, so an imported collection shows its modes in Figma's order and a new default keeps that place through export.
 - A bound number field reads like any other field, its variable named by the variable button's tooltip; a binding with no value still shows the variable's name in the field.
 - Recent files leave the list from a file's own menu; the section header no longer clears the whole list at once.
+- The code panel leaves the menu's keys to the menu on every platform, and Tab or Shift-Tab indents; Undo and Redo from the menu reach the editor's own history.

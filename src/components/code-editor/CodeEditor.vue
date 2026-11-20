@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { closeBrackets, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete'
-import { defaultKeymap, history, historyKeymap, redo, undo } from '@codemirror/commands'
+import {
+  defaultKeymap,
+  history,
+  historyKeymap,
+  indentWithTab,
+  redo,
+  undo
+} from '@codemirror/commands'
 import { html } from '@codemirror/lang-html'
 import { javascript } from '@codemirror/lang-javascript'
 import { bracketMatching, foldGutter, foldKeymap, indentOnInput } from '@codemirror/language'
@@ -24,6 +31,7 @@ import { useI18n } from '@pairdraw/vue/i18n'
 import type { LayerIssue } from '@/app/code/layers/issues'
 import type { LayerLinkSource } from '@/app/code/layers/links'
 import { designJSXExtensions } from '@/components/code-editor/extensions'
+import { withoutMenuKeys } from '@/components/code-editor/keys'
 import type { LayerSnippet } from '@/components/code-editor/layers/context'
 import { layerIssueDiagnostics, setLayerIssues } from '@/components/code-editor/layers/issues'
 import {
@@ -110,17 +118,20 @@ const view = useCodeMirror(useTemplateRef('host'), {
     bracketMatching(),
     closeBrackets(),
     highlightActiveLine(),
-    keymap.of([
-      { key: 'Ctrl-z', run: undo },
-      { key: 'Ctrl-Shift-z', run: redo },
-      ...closeBracketsKeymap,
-      ...defaultKeymap,
-      ...searchKeymap,
-      ...historyKeymap,
-      ...foldKeymap,
-      ...completionKeymap,
-      ...lintKeymap
-    ]),
+    keymap.of(
+      withoutMenuKeys([
+        { key: 'Ctrl-z', run: undo },
+        { key: 'Ctrl-Shift-z', run: redo },
+        indentWithTab,
+        ...closeBracketsKeymap,
+        ...defaultKeymap,
+        ...searchKeymap,
+        ...historyKeymap,
+        ...foldKeymap,
+        ...completionKeymap,
+        ...lintKeymap
+      ])
+    ),
     layerLinksExtension({
       typeOf: (tagName) => RUNTIME_TYPES.get(tagName),
       onActive: (nodeIds) => emit('activeLayers', nodeIds),

@@ -1,6 +1,6 @@
 import { editorCommandMetadata, formatShortcut } from '@pairdraw/vue/editor/commands'
 
-import type { AppMenuActionItem, AppMenuEntry } from '@/app/shell/menu/schema'
+import type { AppMenuActionItem, AppMenuEntry, AppMenuGroupSchema } from '@/app/shell/menu/schema'
 import { APP_MENU_SCHEMA } from '@/app/shell/menu/schema'
 
 function isActionItem(entry: AppMenuEntry): entry is AppMenuActionItem {
@@ -19,6 +19,48 @@ function findShortcutInEntries(entries: readonly AppMenuEntry[], id: string): st
     if (shortcut) return shortcut
   }
   return undefined
+}
+
+/**
+ * The menu's edits a focused text field carries out itself (`runFocusedCommand`), whose keys the
+ * field keeps: undo and redo, select all, and the clipboard.
+ */
+const FIELD_EDIT_IDS = new Set([
+  'edit.undo',
+  'edit.redo',
+  'selection.selectAll',
+  'copy',
+  'cut',
+  'paste'
+])
+
+function collectShortcuts(
+  entries: readonly AppMenuEntry[],
+  shortcuts: string[],
+  keepFieldEdits: boolean
+): string[] {
+  for (const entry of entries) {
+    if (!isActionItem(entry)) continue
+    if (keepFieldEdits || !FIELD_EDIT_IDS.has(entry.id)) {
+      const shortcut =
+        entry.shortcut ??
+        (entry.command ? editorCommandMetadata(entry.command).shortcut : undefined)
+      if (shortcut) shortcuts.push(shortcut)
+    }
+    if (entry.sub) collectShortcuts(entry.sub, shortcuts, keepFieldEdits)
+  }
+  return shortcuts
+}
+
+/**
+ * Every shortcut the menu assigns on this platform, as stored (`MOD+SHIFT+K`), except the edits a
+ * focused field does itself. An editor drops its own bindings on these keys: a native menu takes
+ * the key first and then leaves it to the field, so the binding would never run.
+ */
+export function appMenuShortcuts(
+  groups: readonly AppMenuGroupSchema[] = APP_MENU_SCHEMA
+): string[] {
+  return groups.flatMap((group) => collectShortcuts(group.items, [], false))
 }
 
 export function appMenuShortcut(id: string): string | undefined {

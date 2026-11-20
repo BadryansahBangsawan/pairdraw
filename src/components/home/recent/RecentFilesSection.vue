@@ -8,7 +8,7 @@ import { useI18n } from '@pairdraw/vue/i18n'
 import { canSaveDocumentCopy, recentCopySource } from '@/app/home/save-copy'
 import { useDocumentSelection } from '@/app/home/selection'
 import { useDateFormat } from '@/app/i18n/date'
-import { clearRecentFiles, forgetRecentDocuments, type RecentDocument } from '@/app/recent-files'
+import { forgetRecentDocuments, type RecentDocument } from '@/app/recent-files'
 import { recentFilesSort, sortRecentDocuments } from '@/app/recent-files/sort'
 import type { RecentFilesWorkspace } from '@/app/recent-files/workspace'
 import DocumentEntry from '@/components/home/document/DocumentEntry.vue'
@@ -18,7 +18,6 @@ import { useDocumentEntryMenu } from '@/components/home/document/useDocumentEntr
 import { useDocumentListKeys } from '@/components/home/document/useDocumentListKeys'
 import RecentFilesSortMenu from '@/components/home/recent/RecentFilesSortMenu.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
-import IconButton from '@/components/ui/button/IconButton.vue'
 import SegmentedControl from '@/components/ui/select/SegmentedControl.vue'
 import documentsTheme from '@/theme/home/documents'
 
@@ -38,7 +37,7 @@ const emit = defineEmits<{
   saveAs: [document: RecentDocument]
 }>()
 const view = defineModel<'grid' | 'list'>('view', { required: true })
-const { panels, files, common, locale } = useI18n()
+const { panels, files, locale } = useI18n()
 const { isTouch } = useViewportKind()
 const dates = useDateFormat()
 const previewURL = workspace.previewURL
@@ -106,15 +105,6 @@ function removeSelected() {
           v-model="recentFilesSort"
           :size="isTouch ? 'lg' : 'sm'"
         />
-        <IconButton
-          v-if="hasRecentFiles"
-          :label="common.clear"
-          :size="isTouch ? 'lg' : 'sm'"
-          data-test-id="recent-files-clear"
-          @click="clearRecentFiles"
-        >
-          <icon-lucide-trash-2 class="size-3.5" />
-        </IconButton>
         <SegmentedControl
           v-model="view"
           required

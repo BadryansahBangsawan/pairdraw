@@ -331,6 +331,14 @@ export function detachInstance(graph: SceneGraph, instanceId: string): void {
     componentId: null,
     instanceOverrides: createInstanceOverrideState()
   })
+  // Its mirrored layers stand on their own: a component child id would name a layer of another
+  // node, which the format never stores and a later sync would read as a link back. An instance
+  // inside them keeps its own component: it draws that component still, as Figma leaves it.
+  for (const id of subtreeIds(graph, instanceId)) {
+    const mirrored = graph.nodes.get(id)
+    if (mirrored && mirrored.type !== 'INSTANCE' && mirrored.componentId)
+      graph.updateNode(id, { componentId: null })
+  }
 }
 
 // A swap's bookkeeping belongs to the instance enclosing the swapped one, never to the swapped one.

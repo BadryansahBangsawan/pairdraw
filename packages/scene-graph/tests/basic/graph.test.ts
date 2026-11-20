@@ -471,6 +471,11 @@ describe('SceneGraph', () => {
     expect(expectDefined(instance, 'instance').type).toBe('FRAME')
     expect(instance.componentId).toBeNull()
     expect(graph.getInstances(comp.id)).toHaveLength(0)
+    // The layers the instance mirrored are the document's own now, and no longer name a
+    // component child, which the `.fig` writer never stores for a plain layer.
+    expect(graph.getChildren(expectDefined(instance, 'instance').id).map((n) => n.componentId)).toEqual([
+      null
+    ])
   })
 })
 

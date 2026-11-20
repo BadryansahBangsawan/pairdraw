@@ -786,5 +786,12 @@
   "prototypeVideoNothingToFollow": "„{frame}” nie ma interakcji „Po opóźnieniu” do wykonania. Dodaj ją w panelu Prototyp albo zacznij od innej ramki.",
   "prototypeVideoFormatsHere": "Ta przeglądarka może nagrać {formats}.",
   "prototypeVideoExport": "Eksportuj",
-  "prototypeVideoRecording": "Nagrywanie klatki {done} z {total}"
+  "prototypeVideoRecording": "Nagrywanie klatki {done} z {total}",
+  "imageExposure": "Ekspozycja",
+  "imageContrast": "Kontrast",
+  "imageSaturation": "Nasycenie",
+  "imageTemperature": "Temperatura",
+  "imageTint": "Odcień",
+  "imageHighlights": "Światła",
+  "imageShadows": "Cienie"
 }

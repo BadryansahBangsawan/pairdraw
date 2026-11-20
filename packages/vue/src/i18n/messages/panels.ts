@@ -499,6 +499,13 @@ export const panelMessageDefaults = {
   imageURLUnsupported: 'That address serves no PNG, JPEG, GIF, or WebP image.',
   imageURLUnreachable:
     'The image could not be loaded. Check the address and your connection; in a browser, the server must also allow it.',
+  imageExposure: 'Exposure',
+  imageContrast: 'Contrast',
+  imageSaturation: 'Saturation',
+  imageTemperature: 'Temperature',
+  imageTint: 'Tint',
+  imageHighlights: 'Highlights',
+  imageShadows: 'Shadows',
   mixedFillsHelp: 'Click + to replace mixed fills',
   mixedStrokesHelp: 'Click + to replace mixed strokes',
   mixedEffectsHelp: 'Click + to replace mixed effects',

@@ -776,5 +776,12 @@
   "prototypeVideoNothingToFollow": "« {frame} » n’a aucune interaction « Après un délai » à suivre. Ajoutez-en une dans le panneau Prototype ou partez d’un autre cadre.",
   "prototypeVideoFormatsHere": "Ce navigateur peut enregistrer {formats}.",
   "prototypeVideoExport": "Exporter",
-  "prototypeVideoRecording": "Enregistrement de l’image {done} sur {total}"
+  "prototypeVideoRecording": "Enregistrement de l’image {done} sur {total}",
+  "imageExposure": "Exposition",
+  "imageContrast": "Contraste",
+  "imageSaturation": "Saturation",
+  "imageTemperature": "Température",
+  "imageTint": "Teinte",
+  "imageHighlights": "Hautes lumières",
+  "imageShadows": "Ombres"
 }

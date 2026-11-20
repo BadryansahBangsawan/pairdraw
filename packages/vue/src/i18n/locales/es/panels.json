@@ -776,5 +776,12 @@
   "prototypeVideoNothingToFollow": "«{frame}» no tiene ninguna interacción «Tras un retraso» que seguir. Añade una en el panel Prototipo o empieza desde otro marco.",
   "prototypeVideoFormatsHere": "Este navegador puede grabar {formats}.",
   "prototypeVideoExport": "Exportar",
-  "prototypeVideoRecording": "Grabando fotograma {done} de {total}"
+  "prototypeVideoRecording": "Grabando fotograma {done} de {total}",
+  "imageExposure": "Exposición",
+  "imageContrast": "Contraste",
+  "imageSaturation": "Saturación",
+  "imageTemperature": "Temperatura",
+  "imageTint": "Matiz",
+  "imageHighlights": "Iluminaciones",
+  "imageShadows": "Sombras"
 }

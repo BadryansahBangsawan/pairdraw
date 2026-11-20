@@ -766,5 +766,12 @@
   "prototypeVideoNothingToFollow": "“{frame}”没有可跟随的“延迟后”交互。请在原型面板中添加，或从其他画框开始。",
   "prototypeVideoFormatsHere": "此浏览器可以录制 {formats}。",
   "prototypeVideoExport": "导出",
-  "prototypeVideoRecording": "正在录制第 {done} 帧，共 {total} 帧"
+  "prototypeVideoRecording": "正在录制第 {done} 帧，共 {total} 帧",
+  "imageExposure": "曝光",
+  "imageContrast": "对比度",
+  "imageSaturation": "饱和度",
+  "imageTemperature": "色温",
+  "imageTint": "色调",
+  "imageHighlights": "高光",
+  "imageShadows": "阴影"
 }

@@ -786,5 +786,12 @@
   "prototypeVideoNothingToFollow": "У «{frame}» нет взаимодействия «После задержки». Добавьте его на панели «Прототип» или начните с другого фрейма.",
   "prototypeVideoFormatsHere": "Этот браузер может записать {formats}.",
   "prototypeVideoExport": "Экспортировать",
-  "prototypeVideoRecording": "Запись кадра {done} из {total}"
+  "prototypeVideoRecording": "Запись кадра {done} из {total}",
+  "imageExposure": "Экспозиция",
+  "imageContrast": "Контраст",
+  "imageSaturation": "Насыщенность",
+  "imageTemperature": "Температура",
+  "imageTint": "Оттенок",
+  "imageHighlights": "Света",
+  "imageShadows": "Тени"
 }

@@ -766,5 +766,12 @@
   "prototypeVideoNothingToFollow": "「{frame}」にはたどる「遅延後」のインタラクションがありません。プロトタイプパネルで追加するか、別のフレームから開始してください。",
   "prototypeVideoFormatsHere": "このブラウザで録画できる形式: {formats}",
   "prototypeVideoExport": "書き出す",
-  "prototypeVideoRecording": "{total} フレーム中 {done} を録画中"
+  "prototypeVideoRecording": "{total} フレーム中 {done} を録画中",
+  "imageExposure": "露出",
+  "imageContrast": "コントラスト",
+  "imageSaturation": "彩度",
+  "imageTemperature": "色温度",
+  "imageTint": "色かぶり補正",
+  "imageHighlights": "ハイライト",
+  "imageShadows": "シャドウ"
 }

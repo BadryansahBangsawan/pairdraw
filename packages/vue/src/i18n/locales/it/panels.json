@@ -776,5 +776,12 @@
   "prototypeVideoNothingToFollow": "«{frame}» non ha un’interazione «Dopo un ritardo» da seguire. Aggiungine una nel pannello Prototipo o parti da un’altra cornice.",
   "prototypeVideoFormatsHere": "Questo browser può registrare {formats}.",
   "prototypeVideoExport": "Esporta",
-  "prototypeVideoRecording": "Registrazione del fotogramma {done} di {total}"
+  "prototypeVideoRecording": "Registrazione del fotogramma {done} di {total}",
+  "imageExposure": "Esposizione",
+  "imageContrast": "Contrasto",
+  "imageSaturation": "Saturazione",
+  "imageTemperature": "Temperatura",
+  "imageTint": "Tinta",
+  "imageHighlights": "Luci",
+  "imageShadows": "Ombre"
 }

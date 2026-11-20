@@ -20,8 +20,13 @@ export const tokenDrift = defineTool({
   execute: async (figma, args) => {
     const { planTokenSync } = await import('#core/io/formats/design-tokens/sync/drift')
     const { readTokenSourceFiles } = await import('#core/io/formats/design-tokens/sync/files')
+    const { tokenSourceForFiles } = await import('#core/io/formats/design-tokens/sync/apply')
     const { bundles, issues } = readTokenSourceFiles(figma.graph, args.files)
-    const { drift } = planTokenSync(figma.graph, bundles)
+    const { drift } = planTokenSync(
+      figma.graph,
+      bundles,
+      tokenSourceForFiles(figma.graph, args.files)
+    )
     return {
       in_sync: drift.length === 0,
       total: drift.length,

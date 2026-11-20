@@ -392,6 +392,12 @@
       "import": "./dist/text/picture.js",
       "default": "./dist/text/picture.js"
     },
+    "./token-sources": {
+      "types": "./dist/token-sources/index.d.ts",
+      "bun": "./src/token-sources/index.ts",
+      "import": "./dist/token-sources/index.js",
+      "default": "./dist/token-sources/index.js"
+    },
     "./transfer": {
       "types": "./dist/transfer/index.d.ts",
       "bun": "./src/transfer/index.ts",

@@ -50,14 +50,24 @@ export {
 } from './project'
 export { patchTokenStylesheet, syncTokenStylesheet, type TokenStylesheetSync } from './css/sync'
 export {
+  driftNeedsChoice,
   planTokenSync,
   tokenSnapshot,
+  trackTokenDrift,
   type TokenDrift,
   type TokenDriftKind,
-  type TokenSnapshot,
-  type TokenSync
+  type TokenSync,
+  type TokenSyncBase,
+  type TokenSyncChoice,
+  type TokenSyncResolution
 } from './sync/drift'
 export { readTokenSourceFiles } from './sync/files'
+export {
+  syncedTokenSources,
+  syncTokensIntoGraph,
+  tokenSourceForFiles,
+  type TokenSourceLink
+} from './sync/apply'
 export {
   applyTokenImport,
   importTokensIntoGraph,

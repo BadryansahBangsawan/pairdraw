@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import { SceneGraph, type Variable } from '@pairdraw/scene-graph'
+import { readTokenSources } from '@pairdraw/scene-graph/token-sources'
 
 import {
   defaultTokenImportOptions,
@@ -8,7 +9,10 @@ import {
   planTokenImport,
   planTokenSync,
   readCSSDesignTokens,
+  readTokenSourceFiles,
+  syncTokensIntoGraph,
   tokenSnapshot,
+  trackTokenDrift,
   type TokenDrift
 } from '#core/io/formats/design-tokens'
 
@@ -80,7 +84,7 @@ describe('drift between linked code and the canvas', () => {
         canvas: '#FF0000'
       })
     ])
-    importTokensIntoGraph(graph, graph.getPages()[0].id, sync.importPlans()[0])
+    importTokensIntoGraph(graph, graph.getPages()[0].id, sync.resolve().plans[0])
     expect(variableNamed(graph, 'brand').valuesByMode[modeNamed(graph, 'Default')]).toMatchObject({
       g: 1
     })
@@ -92,10 +96,10 @@ describe('drift between linked code and the canvas', () => {
     const sync = planTokenSync(graph, [readCSSDesignTokens(graph, BASE)], snapshot)
     expect(brief(sync.drift)).toEqual([['canvas', 'brand', 'Default']])
 
-    importTokensIntoGraph(graph, graph.getPages()[0].id, sync.importPlans()[0])
+    importTokensIntoGraph(graph, graph.getPages()[0].id, sync.resolve().plans[0])
     expect(variableNamed(graph, 'brand').valuesByMode[modeNamed(graph, 'Default')]).toEqual(BLUE)
 
-    importTokensIntoGraph(graph, graph.getPages()[0].id, sync.importPlans(() => true)[0])
+    importTokensIntoGraph(graph, graph.getPages()[0].id, sync.resolve(() => 'code').plans[0])
     expect(variableNamed(graph, 'brand').valuesByMode[modeNamed(graph, 'Default')]).toMatchObject(
       RED
     )
@@ -114,8 +118,35 @@ describe('drift between linked code and the canvas', () => {
         canvas: '#0000FF'
       })
     ])
-    importTokensIntoGraph(graph, graph.getPages()[0].id, sync.importPlans()[0])
+    importTokensIntoGraph(graph, graph.getPages()[0].id, sync.resolve().plans[0])
     expect(variableNamed(graph, 'brand').valuesByMode[modeNamed(graph, 'Default')]).toEqual(BLUE)
+  })
+
+  test('a conflict nobody decides is reported again after the code-only changes come in', () => {
+    const { graph, snapshot } = linked()
+    editOnCanvas(graph, 'brand', 'Default', BLUE)
+    const css = BASE.replace('--brand: #ff0000', '--brand: #00ff00').replace(
+      '--brand: #880000',
+      '--brand: #440000'
+    )
+    const bundles = [readCSSDesignTokens(graph, css)]
+    const resolution = planTokenSync(graph, bundles, snapshot).resolve()
+    expect(brief(resolution.undecided)).toEqual([['conflict', 'brand', 'Default']])
+    for (const plan of resolution.plans) importTokensIntoGraph(graph, graph.getPages()[0].id, plan)
+    const next = tokenSnapshot(graph, bundles, snapshot, resolution.undecided)
+    expect(brief(planTokenSync(graph, bundles, next).drift)).toEqual([
+      ['conflict', 'brand', 'Default']
+    ])
+  })
+
+  test('a token gone from code stays marked until a side is picked for it', () => {
+    const { graph, snapshot } = linked()
+    const bundles = [readCSSDesignTokens(graph, BASE.replace('--space: 1rem;', ''))]
+    const sync = planTokenSync(graph, bundles, snapshot)
+    const kept = tokenSnapshot(graph, bundles, snapshot, sync.resolve().undecided)
+    expect(brief(planTokenSync(graph, bundles, kept).drift)).toEqual([['missing', 'space', null]])
+    const dropped = tokenSnapshot(graph, bundles, snapshot, sync.resolve(() => 'canvas').undecided)
+    expect(planTokenSync(graph, bundles, dropped).drift).toEqual([])
   })
 
   test('the same change on both sides is not drift', () => {
@@ -175,8 +206,68 @@ describe('drift between linked code and the canvas', () => {
       ['added', 'gap', null],
       ['missing', 'space', null]
     ])
-    importTokensIntoGraph(graph, graph.getPages()[0].id, sync.importPlans()[0])
+    importTokensIntoGraph(graph, graph.getPages()[0].id, sync.resolve().plans[0])
     expect(variableNamed(graph, 'gap').valuesByMode[modeNamed(graph, 'Default')]).toBe(8)
     expect(variableNamed(graph, 'space')).toBeDefined()
+  })
+})
+
+describe('review findings', () => {
+  test('a variable deleted on the canvas goes to review and stays deleted unless code is chosen', () => {
+    const { graph, snapshot } = linked()
+    graph.removeVariable(variableNamed(graph, 'space').id)
+    const bundles = [readCSSDesignTokens(graph, BASE)]
+    const sync = planTokenSync(graph, bundles, snapshot)
+    expect(brief(sync.drift)).toEqual([['deleted', 'space', null]])
+
+    const kept = sync.resolve()
+    expect(kept.applied).toBe(0)
+    for (const plan of kept.plans) importTokensIntoGraph(graph, graph.getPages()[0].id, plan)
+    expect([...graph.variables.values()].some((variable) => variable.name === 'space')).toBe(false)
+    const next = tokenSnapshot(graph, bundles, snapshot, kept.undecided)
+    expect(brief(planTokenSync(graph, bundles, next).drift)).toEqual([['deleted', 'space', null]])
+
+    const restored = planTokenSync(graph, bundles, next).resolve(() => 'code')
+    for (const plan of restored.plans) importTokensIntoGraph(graph, graph.getPages()[0].id, plan)
+    expect(variableNamed(graph, 'space').valuesByMode).toBeDefined()
+  })
+
+  test('light and dark values split across two stylesheets are in code right after a sync', () => {
+    const graph = new SceneGraph()
+    const files = [
+      { path: 'theme.css', text: ':root { --primary: #ff0000; }' },
+      { path: 'dark.css', text: '.dark { --primary: #880000; }' }
+    ]
+    const link = { id: 'styles', kind: 'folder' as const, name: 'styles' }
+    const sync = () => {
+      const { bundles } = readTokenSourceFiles(graph, files)
+      const resolution = planTokenSync(graph, bundles, readTokenSources(graph).at(0)).resolve()
+      syncTokensIntoGraph(graph, link, bundles, resolution)
+      return resolution
+    }
+    sync()
+    expect(sync().undecided).toEqual([])
+    const base = readTokenSources(graph).at(0)
+    expect(planTokenSync(graph, readTokenSourceFiles(graph, files).bundles, base).drift).toEqual([])
+  })
+
+  test('only values a sync writes count as applied', () => {
+    const { graph, snapshot } = linked()
+    editOnCanvas(graph, 'brand', 'Default', BLUE)
+    const sync = planTokenSync(graph, [readCSSDesignTokens(graph, BASE)], snapshot)
+    expect(sync.resolve(() => 'canvas').applied).toBe(0)
+    expect(sync.resolve(() => 'code').applied).toBe(1)
+  })
+})
+
+describe('tracking drift while values change', () => {
+  test('sees each edit without planning the code again', () => {
+    const { graph, snapshot } = linked()
+    const drift = trackTokenDrift(graph, [readCSSDesignTokens(graph, BASE)], snapshot)
+    expect(drift()).toEqual([])
+    editOnCanvas(graph, 'brand', 'Default', BLUE)
+    expect(brief(drift())).toEqual([['canvas', 'brand', 'Default']])
+    editOnCanvas(graph, 'brand', 'Default', RED)
+    expect(drift()).toEqual([])
   })
 })

@@ -211,7 +211,10 @@ describe('design token import', () => {
     importInto(graph, exported(source))
 
     const [style] = getSharedStyles(graph, 'text')
-    expect(graph.getNode(style.nodeId)).toMatchObject({ textCase: 'UPPER', lineHeight: pixelLength(40) })
+    expect(graph.getNode(style.nodeId)).toMatchObject({
+      textCase: 'UPPER',
+      lineHeight: pixelLength(40)
+    })
   })
 
   test('an edited shadow takes the place of the exact one, and the blur keeps its own', () => {
@@ -415,5 +418,37 @@ describe('style bindings to a path two collections share', () => {
     expect(exportDesignTokens(source).issues).toEqual([
       { kind: 'unsupported-effect', style: 'Glass' }
     ])
+  })
+})
+
+describe('syncing linked code', () => {
+  test('brings the code in and records the link as one undo step', async () => {
+    const { planTokenSync, readCSSDesignTokens, syncedTokenSources } =
+      await import('#core/io/formats/design-tokens')
+    const { readTokenSources } = await import('@pairdraw/scene-graph/token-sources')
+    const editor = createEditor()
+    const link = { id: 'app', kind: 'css' as const, name: 'app.css' }
+    const sync = (css: string) => {
+      const bundles = [readCSSDesignTokens(editor.graph, css)]
+      const snapshot = readTokenSources(editor.graph).at(0)
+      const resolution = planTokenSync(editor.graph, bundles, snapshot).resolve()
+      editor.syncDesignTokens(resolution.plans, (graph) =>
+        syncedTokenSources(graph, link, bundles, resolution)
+      )
+    }
+    const brand = () =>
+      [...editor.graph.variables.values()].find((variable) => variable.name === 'brand')
+
+    sync(':root { --brand: #ff0000; }')
+    expect(readTokenSources(editor.graph)).toEqual([
+      expect.objectContaining({ id: 'app', name: 'app.css' })
+    ])
+    sync(':root { --brand: #00ff00; }')
+    const id = brand()?.id ?? ''
+    expect(Object.values(readTokenSources(editor.graph)[0].snapshot[id] ?? {})).toEqual(['#00FF00'])
+
+    editor.undo.undo()
+    expect(Object.values(brand()?.valuesByMode ?? {})).toEqual([{ r: 1, g: 0, b: 0, a: 1 }])
+    expect(Object.values(readTokenSources(editor.graph)[0].snapshot[id] ?? {})).toEqual(['#FF0000'])
   })
 })

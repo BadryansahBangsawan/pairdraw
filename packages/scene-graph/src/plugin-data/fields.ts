@@ -13,6 +13,7 @@ import type { Color, Rect, Vector } from '../primitives'
 import { scriptNodeSchema } from '../script/schema'
 import { shaderPaintSchema } from '../shaders/schema'
 import { nodeStatusSchema, statusWorkflowSchema } from '../statuses/schema'
+import { tokenSourcesSchema } from '../token-sources/schema'
 import {
   MODE_ATTRIBUTE_PATTERN,
   TOKEN_UNITS,
@@ -249,6 +250,8 @@ export const PAIRDRAW_PLUGIN_DATA = {
   comments: jsonPluginDataField('comments', 'bookkeeping', commentThreadsSchema),
   /** The statuses layers can be in, on the DOCUMENT node. */
   statuses: jsonPluginDataField('statuses', 'bookkeeping', statusWorkflowSchema),
+  /** The code the document's variables are linked to, on the DOCUMENT node. */
+  tokenSources: jsonPluginDataField('tokenSources', 'bookkeeping', tokenSourcesSchema),
   /** How tightly the document's `.fig` data is compressed, on the DOCUMENT node. */
   figCompression: textPluginDataField('figCompression', 'bookkeeping', FIG_COMPRESSIONS),
   /** A layer's status, any state of the workflow; Figma's `sectionStatusInfo` knows only two. */

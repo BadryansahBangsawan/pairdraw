@@ -1,5 +1,5 @@
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
-import { basename, dirname, join } from 'node:path'
+import { basename, dirname, join, relative, sep } from 'node:path'
 
 import { defineCommand } from 'citty'
 import { compact } from 'es-toolkit/array'
@@ -11,6 +11,7 @@ import {
   planTokenSync,
   readCSSDesignTokens,
   readTokenSourceFiles,
+  tokenSourceForFiles,
   type DesignSystemIssue,
   type DesignTokenSourceFile,
   type TokenDrift
@@ -260,12 +261,16 @@ async function checkTokens(
   sourcePath: string,
   args: { json?: boolean }
 ): Promise<void> {
-  const graph = await loadDocument(requireFile(file))
+  const document = requireFile(file)
+  const graph = await loadDocument(document)
   populateWholeDocument(graph)
   const source = await readTokenSource(sourcePath)
   const { bundles, issues } = readTokenSourceFiles(graph, source.files)
   issues.unshift(...source.issues)
-  const { drift } = planTokenSync(graph, bundles)
+  // The link records its path from the document's folder; a stylesheet is also found by name.
+  const fromDocument = relative(dirname(document), sourcePath).split(sep).join('/')
+  const link = tokenSourceForFiles(graph, [{ path: fromDocument, text: '' }, ...source.files])
+  const { drift } = planTokenSync(graph, bundles, link)
   if (args.json) {
     await printJSON({ in_sync: drift.length === 0, drift, issues })
   } else if (drift.length === 0) {

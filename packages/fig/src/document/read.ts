@@ -13,7 +13,11 @@ import {
   type SourceIndex
 } from '../instance-overrides/source-index'
 import { symbolOverridesOf } from '../instance-overrides/types'
-import { createTextStyleLookup, type StyleChangeMap } from '../node-change/style/lookup'
+import {
+  assetIdsByKey,
+  createTextStyleLookup,
+  type StyleChangeMap
+} from '../node-change/style/lookup'
 import { applyFillStyleRef, applyStyleRefsToFields } from '../node-change/style/refs'
 import {
   createBindingNormalizer,
@@ -89,17 +93,6 @@ interface ReaderRecords {
   interpreterIndex(): SourceIndex
 }
 
-function assetIds(records: readonly NodeChange[]): Map<string, string> {
-  const assets = new Map<string, string>()
-  for (const node of records)
-    if (node.guid && typeof node.key === 'string') {
-      const id = guidToString(node.guid)
-      assets.set(node.key, id)
-      if (typeof node.version === 'string') assets.set(`${node.key}@${node.version}`, id)
-    }
-  return assets
-}
-
 function isResource(record: NodeChange): boolean {
   return record.type === 'VARIABLE' || record.type === 'VARIABLE_SET'
 }
@@ -124,7 +117,7 @@ function wholeRecords(source: readonly NodeChange[]): ReaderRecords {
   )
   const index = createSourceIndex(records)
   inheritComponentPropertyDefinitions(records, index.sources)
-  const assets = assetIds(records)
+  const assets = assetIdsByKey(records)
   const resolveStyles = (node: NodeChange): void => {
     applyStyleRefsToFields(index.sources, node, assets)
     paintTextRangesFromFillStyles(index.sources, node, assets)
@@ -164,7 +157,7 @@ function archiveRecords(headers: readonly NodeChange[]): ReaderRecords {
   const records = headers.filter((node) => node.phase !== 'REMOVED')
   const index = createSourceIndex(records)
   const normalize = createBindingNormalizer(records)
-  const assets = assetIds(records)
+  const assets = assetIdsByKey(records)
   const bindingDiagnostics: BindingReferenceDiagnostic[] = []
   for (const header of records)
     normalize(decodeRecord(header), (diagnostic) => bindingDiagnostics.push(diagnostic))

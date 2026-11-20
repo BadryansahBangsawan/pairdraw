@@ -8,7 +8,6 @@ import {
   ByteBuffer,
   compileSchema,
   decodeBinarySchema,
-  type CompiledDefinition,
   type RuntimeCodec,
   type RuntimeMessage
 } from '@pairdraw/kiwi/schema-runtime'
@@ -17,7 +16,12 @@ import { orderKeyBetween } from '@pairdraw/scene-graph/order-keys'
 import { readFigArchiveParts, writeFigArchive, type FigImageEntry } from '../archive'
 import { symbolDataOf, symbolOverridesOf } from '../instance-overrides/types'
 import { patchedRecord, type FigRecordFieldPatch } from './fields'
-import { nearestOfType, recordsById } from './record-pages'
+import {
+  nearestOfType,
+  recordsById,
+  scanRecord,
+  type RecordHead as SharedRecordHead
+} from './record-pages'
 
 export {
   entryPathKey,
@@ -306,11 +310,7 @@ export function patchFigRecords(
   return mergeRecords(archive.map(entryOf), patch, (record) => record).map((entry) => entry.value)
 }
 
-type RecordHead = Omit<RecordEntry<Uint8Array>, 'value'> & {
-  guid?: GUID
-  /** Read only when asked for: what an instance shows, for finding where components are used. */
-  symbolData?: unknown
-}
+type RecordHead = Omit<RecordEntry<Uint8Array>, 'value'> & SharedRecordHead
 type EncodedPart =
   | { kind: 'bytes'; bytes: Uint8Array }
   | { kind: 'records' | 'blobs'; fieldId: number; type: string }
@@ -321,39 +321,6 @@ interface ScannedMessage {
   records: Array<RecordHead & { value: Uint8Array }>
   blobs: Uint8Array[]
   hasBlobs: boolean
-}
-
-/** Reads a record's identity, place and type, and moves past everything else in it. */
-function scanRecord(
-  codec: RuntimeCodec,
-  record: CompiledDefinition,
-  bb: ByteBuffer,
-  readSymbolData: boolean
-): RecordHead {
-  const { schema } = codec
-  const head: RecordHead = {
-    id: undefined,
-    parent: undefined,
-    type: undefined,
-    parentIndex: undefined
-  }
-  for (let id = bb.readVarUint(); id !== 0; id = bb.readVarUint()) {
-    const field = record.byId[id]
-    if (!field) throw new Error('Attempted to parse invalid message')
-    const name = field.isArray ? '' : field.name
-    if (name === 'guid') {
-      head.guid = schema.read(field, bb) as GUID
-      head.id = key(head.guid)
-    } else if (name === 'parentIndex') {
-      const parentIndex = schema.read(field, bb) as NodeChange['parentIndex']
-      head.parentIndex = parentIndex
-      head.parent = key(parentIndex?.guid)
-    } else if (name === 'type') {
-      head.type = field.definition?.names[bb.readVarUint()]
-    } else if (name === 'symbolData' && readSymbolData) head.symbolData = schema.read(field, bb)
-    else schema.skip(field, bb)
-  }
-  return head
 }
 
 function scanMessage(
@@ -386,7 +353,15 @@ function scanMessage(
       const begin = bb.offset
       if (isRecords) {
         const head = scanRecord(codec, definition, bb, readSymbolData)
-        scanned.records.push({ ...head, value: data.subarray(begin, bb.offset) })
+        scanned.records.push({
+          id: head.id,
+          parent: head.parent,
+          type: head.type,
+          parentIndex: head.parentIndex,
+          guid: head.guid,
+          symbolData: head.symbolData,
+          value: data.subarray(begin, bb.offset)
+        })
       } else {
         schema.skip(element, bb)
         scanned.blobs.push(data.subarray(begin, bb.offset))

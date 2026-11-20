@@ -1,4 +1,4 @@
-import valueParser from 'postcss-value-parser'
+import valueParser, { type Node } from 'postcss-value-parser'
 
 import { parseDisplayableColor } from '../color'
 import type { Color } from '../primitives'
@@ -40,4 +40,30 @@ export function splitCSSValue(value: string): string[] {
   return valueParser(value)
     .nodes.filter((node) => node.type !== 'space' && node.type !== 'comment')
     .map((node) => valueParser.stringify(node))
+}
+
+/** The layers of a CSS value list, split at its top-level commas, spaces and comments dropped. */
+export function cssLayers(nodes: Node[]): Node[][] {
+  const layers: Node[][] = []
+  let current: Node[] = []
+  for (const node of nodes) {
+    if (node.type === 'div' && node.value === ',') {
+      layers.push(current)
+      current = []
+    } else if (node.type !== 'space' && node.type !== 'comment') {
+      current.push(node)
+    }
+  }
+  layers.push(current)
+  return layers
+}
+
+/** A word's finite number and lowercased unit, or null for anything that is not a dimension. */
+export function cssDimension(node: Node | undefined): { value: number; unit: string } | null {
+  if (node?.type !== 'word') return null
+  const dimension = valueParser.unit(node.value)
+  if (!dimension) return null
+  const value = Number(dimension.number)
+  if (!Number.isFinite(value)) return null
+  return { value, unit: dimension.unit.toLowerCase() }
 }

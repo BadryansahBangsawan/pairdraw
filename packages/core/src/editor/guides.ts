@@ -25,27 +25,38 @@ function newGuideId(): string {
   return `guide:${crypto.randomUUID()}`
 }
 
+/** Applies a guide edit and records its undo with the source marks each side captured. */
+function commitGuides(
+  ctx: EditorContext,
+  ownerId: string,
+  label: string,
+  before: CanvasGuide[],
+  after: CanvasGuide[]
+): void {
+  const sourcesBefore = captureSources(ctx.graph, [ownerId])
+  replaceGuides(ctx, ownerId, after)
+  const sourcesAfter = captureSources(ctx.graph, [ownerId])
+  ctx.undo.push({
+    label,
+    forward: () => {
+      replaceGuides(ctx, ownerId, after)
+      restoreSources(ctx.graph, sourcesAfter)
+    },
+    inverse: () => {
+      replaceGuides(ctx, ownerId, before)
+      restoreSources(ctx.graph, sourcesBefore)
+    }
+  })
+}
+
 export function createGuideActions(ctx: EditorContext) {
   function addGuide(ownerId: string, axis: CanvasGuide['axis'], position: number): string | null {
     const node = owner(ctx, ownerId)
     if (!node || !Number.isFinite(position)) return null
     const guide: CanvasGuide = { id: newGuideId(), axis, position }
-    const sourcesBefore = captureSources(ctx.graph, [ownerId])
     const before = structuredClone(node.guides)
     const after = [...before, guide]
-    replaceGuides(ctx, ownerId, after)
-    const sourcesAfter = captureSources(ctx.graph, [ownerId])
-    ctx.undo.push({
-      label: 'Add guide',
-      forward: () => {
-        replaceGuides(ctx, ownerId, after)
-        restoreSources(ctx.graph, sourcesAfter)
-      },
-      inverse: () => {
-        replaceGuides(ctx, ownerId, before)
-        restoreSources(ctx.graph, sourcesBefore)
-      }
-    })
+    commitGuides(ctx, ownerId, 'Add guide', before, after)
     return guide.id
   }
 
@@ -54,23 +65,10 @@ export function createGuideActions(ctx: EditorContext) {
     if (!node || !Number.isFinite(position)) return false
     const index = node.guides.findIndex((guide) => guide.id === guideId)
     if (index === -1 || node.guides[index].position === position) return false
-    const sourcesBefore = captureSources(ctx.graph, [ownerId])
     const before = structuredClone(node.guides)
     const after = structuredClone(node.guides)
     after[index].position = position
-    replaceGuides(ctx, ownerId, after)
-    const sourcesAfter = captureSources(ctx.graph, [ownerId])
-    ctx.undo.push({
-      label: 'Move guide',
-      forward: () => {
-        replaceGuides(ctx, ownerId, after)
-        restoreSources(ctx.graph, sourcesAfter)
-      },
-      inverse: () => {
-        replaceGuides(ctx, ownerId, before)
-        restoreSources(ctx.graph, sourcesBefore)
-      }
-    })
+    commitGuides(ctx, ownerId, 'Move guide', before, after)
     return true
   }
 

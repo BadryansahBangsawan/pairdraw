@@ -17,16 +17,19 @@ function key(guid: GUID | undefined): string | undefined {
   return guid ? guidToString(guid) : undefined
 }
 
-interface RecordHead {
+/** A record's identity, place and type, with the string keys the patch writer indexes by. */
+export interface RecordHead {
   guid?: GUID
+  id?: string
   parentIndex: NodeChange['parentIndex']
+  parent?: string
   type: string | undefined
   /** Read only when asked for: what an instance shows, for finding where components are used. */
   symbolData?: unknown
 }
 
 /** Reads a record's identity, place and type, and moves past everything else in it. */
-function scanRecord(
+export function scanRecord(
   codec: RuntimeCodec,
   record: CompiledDefinition,
   bb: ByteBuffer,
@@ -37,11 +40,13 @@ function scanRecord(
   for (let id = bb.readVarUint(); id !== 0; id = bb.readVarUint()) {
     const field = record.byId[id]
     if (!field) throw new Error('Attempted to parse invalid record')
-    const name = field.name
+    const name = field.isArray ? '' : field.name
     if (name === 'guid') {
       head.guid = schema.read(field, bb) as GUID
+      head.id = key(head.guid)
     } else if (name === 'parentIndex') {
       head.parentIndex = schema.read(field, bb) as NodeChange['parentIndex']
+      head.parent = key(head.parentIndex?.guid)
     } else if (name === 'type') {
       head.type = field.definition?.names[bb.readVarUint()]
     } else if (name === 'symbolData' && readSymbolData) head.symbolData = schema.read(field, bb)

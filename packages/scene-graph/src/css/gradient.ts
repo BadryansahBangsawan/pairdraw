@@ -5,6 +5,7 @@ import { TRANSPARENT } from '../constants'
 import { ellipticalGradientTransform, linearGradientTransform } from '../gradient'
 import type { Color, Vector } from '../primitives'
 import type { Fill, GradientStop } from '../types'
+import { cssDimension, cssLayers } from './values'
 
 /**
  * One `background-image` layer as CSS paints it: a gradient paint, or an image address the
@@ -12,30 +13,17 @@ import type { Fill, GradientStop } from '../types'
  */
 export type CSSBackgroundLayer = { kind: 'gradient'; fill: Fill } | { kind: 'image'; url: string }
 
-/** The layers of a value list, split at its top-level commas. */
+/** The gradient's argument layers; an empty layer paints nothing, so it is dropped. */
 function layersOf(nodes: Node[]): Node[][] {
-  const layers: Node[][] = []
-  let current: Node[] = []
-  for (const node of nodes) {
-    if (node.type === 'div' && node.value === ',') {
-      layers.push(current)
-      current = []
-    } else if (node.type !== 'space' && node.type !== 'comment') {
-      current.push(node)
-    }
-  }
-  layers.push(current)
-  return layers.filter((layer) => layer.length > 0)
+  return cssLayers(nodes).filter((layer) => layer.length > 0)
 }
 
 /** A CSS angle in degrees, or null for anything else. Unitless zero is allowed. */
 function angleOf(node: Node | undefined): number | null {
-  if (node?.type !== 'word') return null
-  const dimension = valueParser.unit(node.value)
+  const dimension = cssDimension(node)
   if (!dimension) return null
-  const value = Number(dimension.number)
-  if (!Number.isFinite(value)) return null
-  switch (dimension.unit.toLowerCase()) {
+  const { value, unit } = dimension
+  switch (unit) {
     case 'deg':
       return value
     case 'grad':
@@ -53,12 +41,10 @@ function angleOf(node: Node | undefined): number | null {
 
 /** A length in pixels or a percentage of `basis`; null for anything else. */
 function lengthOf(node: Node | undefined, basis: number): number | null {
-  if (node?.type !== 'word') return null
-  const dimension = valueParser.unit(node.value)
+  const dimension = cssDimension(node)
   if (!dimension) return null
-  const value = Number(dimension.number)
-  if (!Number.isFinite(value)) return null
-  switch (dimension.unit.toLowerCase()) {
+  const { value, unit } = dimension
+  switch (unit) {
     case 'px':
       return value
     case '%':
@@ -110,12 +96,10 @@ interface StopDraft {
 }
 
 function stopFraction(node: Node, pixelBasis: number | null): number | null {
-  if (node.type !== 'word') return null
-  const dimension = valueParser.unit(node.value)
+  const dimension = cssDimension(node)
   if (!dimension) return null
-  const value = Number(dimension.number)
-  if (!Number.isFinite(value)) return null
-  switch (dimension.unit.toLowerCase()) {
+  const { value, unit } = dimension
+  switch (unit) {
     case 'px':
       return pixelBasis === null || pixelBasis <= 0 ? null : value / pixelBasis
     case '%':

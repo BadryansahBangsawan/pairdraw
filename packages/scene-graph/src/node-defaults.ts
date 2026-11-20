@@ -74,6 +74,27 @@ export function textLayerName(type: NodeType, text: string): string {
   return lines.join(' ') || defaultNodeName(type)
 }
 
+/**
+ * The fields auto layout sets on the frame that holds it, with the value each holds when no frame
+ * lays anything out. A page holds layers; it is not one, so none of these apply to it and a page
+ * that took them would place its layers by a container nobody can see.
+ */
+export const FRAME_LAYOUT_DEFAULTS = {
+  layoutMode: 'NONE',
+  layoutDirection: 'AUTO',
+  layoutWrap: 'NO_WRAP',
+  primaryAxisAlign: 'MIN',
+  counterAxisAlign: 'MIN',
+  primaryAxisSizing: 'FIXED',
+  counterAxisSizing: 'FIXED',
+  itemSpacing: 0,
+  counterAxisSpacing: 0,
+  paddingTop: 0,
+  paddingRight: 0,
+  paddingBottom: 0,
+  paddingLeft: 0
+} as const satisfies Partial<SceneNode>
+
 export function createDefaultNode(
   generateId: () => string,
   type: NodeType,
@@ -127,19 +148,7 @@ export function createDefaultNode(
     leadingTrim: 'NONE',
     lineHeight: null,
     letterSpacing: NO_LETTER_SPACING,
-    layoutMode: 'NONE',
-    layoutDirection: 'AUTO',
-    layoutWrap: 'NO_WRAP',
-    primaryAxisAlign: 'MIN',
-    counterAxisAlign: 'MIN',
-    primaryAxisSizing: 'FIXED',
-    counterAxisSizing: 'FIXED',
-    itemSpacing: 0,
-    counterAxisSpacing: 0,
-    paddingTop: 0,
-    paddingRight: 0,
-    paddingBottom: 0,
-    paddingLeft: 0,
+    ...FRAME_LAYOUT_DEFAULTS,
     blendMode: 'PASS_THROUGH',
     layoutPositioning: 'AUTO',
     layoutGrow: 0,

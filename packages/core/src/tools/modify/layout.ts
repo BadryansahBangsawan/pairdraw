@@ -66,6 +66,11 @@ export const setLayout = defineTool({
     if (!node) return nodeNotFound(args.id)
 
     const raw = figma.graph.getNode(args.id)
+    // A page holds layers; it is not a frame, so nothing lays it out.
+    if (raw?.type === 'CANVAS')
+      return {
+        error: `A page cannot hold auto layout. Set it on a frame inside the page (${args.id}).`
+      }
     if (!args.direction && raw?.layoutMode === 'NONE') {
       return {
         error: 'Frame has no auto-layout. Pass direction ("HORIZONTAL" or "VERTICAL") to enable it.'

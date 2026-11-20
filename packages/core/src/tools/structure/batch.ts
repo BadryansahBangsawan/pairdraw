@@ -50,6 +50,20 @@ function parseOperations(operations: BatchOp[] | string): BatchOp[] | { error: s
   return { error: `Invalid operations:\n${v.summarize(result.issues)}` }
 }
 
+/** The props a frame's auto layout holds; a page holds no layout, so it takes none of them. */
+const LAYOUT_PROPS = [
+  'spacing',
+  'padding',
+  'padding_horizontal',
+  'padding_vertical',
+  'align',
+  'counter_align',
+  'sizing_horizontal',
+  'sizing_vertical',
+  'grow',
+  'direction'
+] as const satisfies readonly (keyof BatchProps)[]
+
 function applyBatchProps(node: FigmaNodeProxy, props: BatchProps): void {
   if (props.spacing !== undefined) node.itemSpacing = props.spacing
   if (props.padding !== undefined) {
@@ -113,6 +127,14 @@ export const batchUpdate = defineTool({
     for (const op of ops) {
       const node = figma.getNodeById(op.id)
       if (!node) return nodeNotFound(op.id)
+      // Refused before anything is written, so the batch stays all or nothing.
+      if (
+        figma.graph.getNode(op.id)?.type === 'CANVAS' &&
+        LAYOUT_PROPS.some((key) => op.props[key] !== undefined)
+      )
+        return {
+          error: `A page cannot hold auto layout. Set it on a frame inside the page (${op.id}).`
+        }
       targets.push({ node, props: op.props })
     }
 

@@ -29,6 +29,23 @@ function batch(frameId: string, id: string, props: Record<string, unknown>): str
 }
 
 describe('batch_update operations', () => {
+  test('refuses a page a layout prop and changes nothing else in the batch', () => {
+    const { figma, node } = frame()
+    const page = figma.graph.getPages()[0]
+    const operations = [
+      { id: node.id, props: { name: 'Renamed' } },
+      { id: page?.id ?? '', props: { spacing: 8 } }
+    ]
+
+    const parsed = v.safeParse(batchUpdate.input, { operations })
+    if (!parsed.success) throw new Error('the operations array is refused')
+    const result = batchUpdate.execute(figma, parsed.output) as BatchResult
+
+    expect(result.error).toMatch(/page cannot hold auto layout/i)
+    expect(node.name).not.toBe('Renamed')
+    expect(figma.graph.getNode(page?.id ?? '')?.itemSpacing).toBe(0)
+  })
+
   test('counts operations an agent sends as an array', () => {
     const { figma, node } = frame()
     const operations = [

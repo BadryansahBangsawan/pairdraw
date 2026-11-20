@@ -47,7 +47,10 @@ function writeLayoutGeometry(
   const changes: LayoutGeometry = {}
   for (const key of ['x', 'y', 'width', 'height'] as const) {
     const value = geometry[key]
-    if (value !== undefined && value !== node[key]) changes[key] = value
+    // A container whose size no arithmetic can use makes Yoga answer NaN for a child's place
+    // (BASELINE alignment in a wrap is one); the layer stays where it was.
+    if (value === undefined || !Number.isFinite(value) || value === node[key]) continue
+    changes[key] = value
   }
   const resized = changes.width !== undefined || changes.height !== undefined
   const outlines = resized

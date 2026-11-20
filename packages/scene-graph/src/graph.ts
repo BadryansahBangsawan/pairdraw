@@ -4,6 +4,7 @@ import { isEmptyObject, isUndefined } from 'es-toolkit/predicate'
 
 import { removeStaleBindings } from './bindings'
 import { BufferedSceneEmitter } from './buffered-events'
+import { assertPageLayout, finiteGeometry, pageLayoutOverrides } from './canvas-layout'
 import {
   getAbsolutePosition,
   getNodeLocalMatrix,
@@ -491,7 +492,11 @@ export class SceneGraph {
   createNode(type: NodeType, parentId: string, overrides: Partial<SceneNode> = {}): SceneNode {
     const parent = this.nodes.get(parentId)
     if (!parent) throw new Error(`Parent "${parentId}" does not exist`)
-    const node = createDefaultNode(() => this.generateEntityId(), type, overrides)
+    const node = createDefaultNode(
+      () => this.generateEntityId(),
+      type,
+      pageLayoutOverrides(type, overrides)
+    )
     Object.assign(node, strokeLineChanges(node, overrides))
     this.willChangeNode(parent)
     parent.childIds.push(node.id)
@@ -509,7 +514,7 @@ export class SceneGraph {
     if (parentId === id) throw new Error(`Node "${id}" cannot be its own parent`)
     const parent = parentId === null ? undefined : this.nodes.get(parentId)
     if (parentId !== null && !parent) throw new Error(`Parent "${parentId}" does not exist`)
-    const node = createDefaultNode(() => id, type, overrides)
+    const node = createDefaultNode(() => id, type, pageLayoutOverrides(type, overrides))
     // `overrides` may be another node's snapshot, ID included.
     node.id = id
     if (parent && !parent.childIds.includes(id)) {
@@ -641,7 +646,10 @@ export class SceneGraph {
   }
   updateNodePreview(id: string, changes: Partial<SceneNode>): void {
     const node = this.nodes.get(id)
-    if (node) changes = this.impliedChanges(node, changes)
+    if (node) {
+      assertPageLayout(node, changes)
+      changes = this.impliedChanges(node, finiteGeometry(changes))
+    }
     const appliedChanges = updateNodePreview(this, id, changes, (node, applied) => {
       for (const observe of this.previewObservers) observe(node, applied)
     })
@@ -660,7 +668,9 @@ export class SceneGraph {
 
     const node = this.nodes.get(id)
     if (!node) return
-    this.applyNodeChanges(node, this.impliedChanges(node, omitBy(changes, isUndefined)))
+    const given = finiteGeometry(omitBy(changes, isUndefined))
+    assertPageLayout(node, given)
+    this.applyNodeChanges(node, this.impliedChanges(node, given))
   }
 
   /**

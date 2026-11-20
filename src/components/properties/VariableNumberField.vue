@@ -6,7 +6,6 @@ import {
   type BindingTarget
 } from '@pairdraw/vue/controls/binding-provider'
 import {
-  displayNumberFromStored,
   storedNumberFromDisplay,
   type NumberBindingPath
 } from '@pairdraw/vue/controls/number-variable-binding'
@@ -84,11 +83,6 @@ const storedValue = computed(() =>
 )
 const createdValue = computed(() => variableValue ?? storedValue.value)
 
-function bindingTooltip(name: string, resolvedValue: unknown) {
-  if (typeof resolvedValue !== 'number') return name
-  return `${name} · ${displayNumberFromStored(resolvedValue, displayScale)}${suffix ?? ''}`
-}
-
 defineOptions({ inheritAttrs: false })
 </script>
 
@@ -121,19 +115,20 @@ defineOptions({ inheritAttrs: false })
       <template v-if="$slots.display" #display="display">
         <slot name="display" v-bind="display" />
       </template>
-      <template v-if="binding.variable || binding.state === 'unresolved'" #bound>
+      <!-- A bound number reads like any other, its variable named by the variable button's
+           tooltip; with no value to show, an unresolved binding names its variable. -->
+      <template v-if="binding.state === 'unresolved'" #bound>
         <BindingPill
-          :unresolved="binding.state === 'unresolved'"
+          unresolved
           :label="binding.variable?.name ?? binding.bindingId ?? panels.unresolvedVariable"
-          :tooltip="
-            binding.state === 'unresolved'
-              ? panels.unresolvedVariable
-              : bindingTooltip(binding.variable?.name ?? '', binding.resolvedValue)
-          "
+          :tooltip="panels.unresolvedVariable"
         />
       </template>
       <template #suffix>
-        <span :class="$slots['after-variable'] ? '' : 'pr-1'" class="flex items-center">
+        <!-- A field's own control, such as Hug or a mode menu, sits beside its value; the variable
+             button ends every field, so it lines up down the panel. -->
+        <slot name="after-variable" />
+        <span class="flex items-center pr-1">
           <VariableBindingPicker
             :trigger-label="panels.applyVariable"
             :search-placeholder="common.search"
@@ -151,7 +146,6 @@ defineOptions({ inheritAttrs: false })
             :create-submit-label="panels.create"
           />
         </span>
-        <slot name="after-variable" />
       </template>
     </NumberField>
   </BindableValueRoot>

@@ -102,8 +102,11 @@ for (const theme of ['light', 'dark']) {
       await expect(field.locator('[data-slot="pill"]')).toHaveAttribute('data-unresolved')
       await field.getByRole('button', { name: 'Apply variable' }).click()
       await page.getByRole('option', { name: 'Tracking/Replacement' }).click()
-      await expect(field).toContainText('Tracking/Replacement')
-      await expect(field.locator('[data-slot="pill"]')).not.toHaveAttribute('data-unresolved')
+      // A bound number reads like any other, and the variable button names its variable.
+      await expect(field).toContainText('6px')
+      await field.getByRole('button', { name: 'Apply variable' }).hover()
+      await expect(page.getByRole('tooltip')).toHaveText('Tracking/Replacement')
+      await expect(field.locator('[data-slot="pill"]')).toHaveCount(0)
     })
   })
 }

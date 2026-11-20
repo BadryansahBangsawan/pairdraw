@@ -1,3 +1,4 @@
 - A copy field's text reads left to right in a mirrored interface; its copy button still follows the reading direction.
 - Relative times count calendar days rather than 24-hour spans, so something from late the day before yesterday reads as two days ago, not yesterday.
 - A variable collection lists its modes by their sort position with the default first, so an imported collection shows its modes in Figma's order and a new default keeps that place through export.
+- A bound number field reads like any other field, its variable named by the variable button's tooltip; a binding with no value still shows the variable's name in the field.

@@ -17,6 +17,7 @@ import { downloadBlob } from '@/app/document/io/browser'
 import { isFileWriteRefused } from '@/app/document/io/capability'
 import { createFileWatcher } from '@/app/document/io/watch/watcher'
 import type { EditorStore } from '@/app/editor/active-store'
+import { markTokenCSSLinked } from '@/app/editor/tokens/follow'
 import {
   forgetTokenSourceLocation,
   readTokenSourceLocation,
@@ -135,6 +136,7 @@ export function setTokenCSSLink(store: EditorStore, link: TokenCSSLink | null): 
   const state = stateOf(store)
   stopWatching(state)
   state.link.value = link
+  if (link) markTokenCSSLinked(store)
 }
 
 function locationKey(store: EditorStore, linkId: string): string {

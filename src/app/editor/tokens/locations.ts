@@ -31,6 +31,12 @@ const tokenSourcesDatabase = connectAppDatabase(
   })
 )
 
+/**
+ * Locations kept this session as well, so a document reopened in another tab finds its file even
+ * where the browser cannot store a file handle, as in a private window.
+ */
+const sessionLocations = new Map<string, TokenSourceLocation>()
+
 export function tokenSourceLocationKey(documentId: string, sourceId: string): string {
   return `${documentId}:${sourceId}`
 }
@@ -39,6 +45,8 @@ export function tokenSourceLocationKey(documentId: string, sourceId: string): st
 export async function readTokenSourceLocation(
   key: string
 ): Promise<TokenSourceLocation | undefined> {
+  const kept = sessionLocations.get(key)
+  if (kept) return kept
   try {
     return await (await tokenSourcesDatabase.open()).get('locations', key)
   } catch {
@@ -48,6 +56,7 @@ export async function readTokenSourceLocation(
 
 /** Keeps the location; without storage the link lasts only while the document is open. */
 export async function writeTokenSourceLocation(location: TokenSourceLocation): Promise<void> {
+  sessionLocations.set(location.key, location)
   try {
     await (await tokenSourcesDatabase.open()).put('locations', location)
   } catch (error) {
@@ -57,6 +66,7 @@ export async function writeTokenSourceLocation(location: TokenSourceLocation): P
 }
 
 export async function forgetTokenSourceLocation(key: string): Promise<void> {
+  sessionLocations.delete(key)
   try {
     await (await tokenSourcesDatabase.open()).delete('locations', key)
   } catch (error) {

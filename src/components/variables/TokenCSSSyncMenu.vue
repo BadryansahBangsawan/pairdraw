@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from 'reka-ui'
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 
 import type { DesignTokenBundle } from '@pairdraw/core/io/formats/design-tokens'
 import { useI18n } from '@pairdraw/vue/i18n'
@@ -26,7 +26,6 @@ import {
   pickTokenCSSFile,
   pushTokenCSS,
   readTokenCSS,
-  restoreTokenCSSLink,
   resyncTokenCSS,
   setTokenCSSLink,
   tokenCSSLink,
@@ -119,11 +118,6 @@ function setWatching(watching: boolean) {
 function unlink() {
   unlinkTokenCSS(store)
 }
-
-// A document that recorded a stylesheet follows it again, from where this computer keeps it.
-onMounted(() => {
-  restoreTokenCSSLink(store).catch(reportFailure)
-})
 </script>
 
 <template>

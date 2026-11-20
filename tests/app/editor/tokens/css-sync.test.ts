@@ -13,7 +13,8 @@ import {
   tokenCSSDrift,
   tokenCSSLink,
   tokenDriftKey,
-  unlinkTokenCSS
+  unlinkTokenCSS,
+  watchTokenCSS
 } from '@/app/editor/tokens/css-sync'
 
 import { asDouble } from '#tests/helpers/doubles'
@@ -134,5 +135,53 @@ describe('a stylesheet linked to the document', () => {
     expect(tokenCSSLink(store).value).toBeNull()
     expect(readTokenSources(store.graph)).toEqual([])
     expect(variable(store, 'brand')).toBeDefined()
+  })
+})
+
+/** Waits for work the app starts without awaiting, such as reading a file, up to two seconds. */
+async function until(done: () => boolean) {
+  for (let attempt = 0; attempt < 200 && !done(); attempt++)
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 10)
+    })
+}
+
+describe('a document that records a linked stylesheet', () => {
+  /** A file the browser granted earlier and still lets the app read. */
+  function grantedHandle(text: string): FileSystemFileHandle {
+    return asDouble<FileSystemFileHandle>({
+      kind: 'file',
+      name: 'app.css',
+      getFile: async () => new File([text], 'app.css', { type: 'text/css' }),
+      queryPermission: async () => 'granted'
+    })
+  }
+
+  test('follows it again, watched, as soon as the document opens', async () => {
+    const first = createEditorStore()
+    stores.push(first)
+    const handle = grantedHandle(CSS)
+    setTokenCSSLink(first, { id: 'app', name: 'app.css', handle, text: CSS, watching: false })
+    await recordTokenCSSLink(first)
+    await watchTokenCSS(first, true)
+
+    const reopened = createEditorStore(first.graph)
+    stores.push(reopened)
+    expect(tokenCSSLink(reopened).value).toBeNull()
+    reopened.preparationController.begin({ kind: 'document-open', subject: 'app.fig' }).complete()
+
+    await until(() => tokenCSSLink(reopened).value !== null)
+    expect(tokenCSSLink(reopened).value).toMatchObject({
+      id: 'app',
+      name: 'app.css',
+      watching: true
+    })
+  })
+
+  test('a document without a link reads nothing when it opens', () => {
+    const store = createEditorStore()
+    stores.push(store)
+    store.preparationController.begin({ kind: 'document-open', subject: 'plain.fig' }).complete()
+    expect(tokenCSSLink(store).value).toBeNull()
   })
 })

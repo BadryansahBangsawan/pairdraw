@@ -31,6 +31,7 @@ import {
 import { presentCommittedPage } from '@/app/editor/session/presentation'
 import { scopedStoreFactory } from '@/app/editor/session/scope'
 import { createInitialAppEditorState, type AppEditorState } from '@/app/editor/session/types'
+import { followLinkedTokenCSS } from '@/app/editor/tokens/follow'
 import { createDeferred } from '@/app/runtime/deferred'
 import { IS_BROWSER, IS_TAURI } from '@/constants'
 
@@ -251,6 +252,7 @@ function buildEditorStore(initialGraph?: SceneGraph) {
   }
 
   defineEditorStoreAccessors(store, editor)
+  followLinkedTokenCSS(store)
 
   return store
 }

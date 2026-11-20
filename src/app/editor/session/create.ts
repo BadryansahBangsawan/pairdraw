@@ -29,10 +29,9 @@ import {
   defineEditorStoreAccessors
 } from '@/app/editor/session/modules'
 import { scopedStoreFactory } from '@/app/editor/session/scope'
+import { waitForCommittedPage } from '@/app/editor/session/presentation'
 import { createInitialAppEditorState, type AppEditorState } from '@/app/editor/session/types'
-import { notificationMessages } from '@/app/i18n/notifications'
 import { createDeferred } from '@/app/runtime/deferred'
-import { toast } from '@/app/shell/ui'
 import { IS_BROWSER, IS_TAURI } from '@/constants'
 
 export { TOOL_SHORTCUTS } from '@pairdraw/core'
@@ -176,21 +175,15 @@ function buildEditorStore(initialGraph?: SceneGraph) {
       if (prepared) {
         editor.commitPageSwitch(prepared)
         preparation.update({ phase: 'preparing-render', detail: page?.name ?? null })
-        try {
-          if (isEditorStoreInFront(store))
-            await preparationController.waitForPresentation(
-              preparation.id,
-              editor.state.sceneVersion
-            )
-        } catch (error) {
-          preparation.signal.throwIfAborted()
-          // The page is in by now: a canvas that cannot show it fails the render, not the
-          // switch, so an open that waits on it keeps its document.
-          const message = error instanceof Error ? error.message : String(error)
-          preparation.fail({ code: 'render-failed', message, retryable: true })
-          toast.error(notificationMessages.get().operationFailed({ error: message }))
-          return
-        }
+        const shown = await waitForCommittedPage(
+          () =>
+            isEditorStoreInFront(store)
+              ? preparationController.waitForPresentation(preparation.id, editor.state.sceneVersion)
+              : Promise.resolve(),
+          preparation,
+          preparation.signal
+        )
+        if (!shown) return
         preparation.signal.throwIfAborted()
       }
       succeeded = true

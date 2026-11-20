@@ -684,7 +684,7 @@ export const panelMessageDefaults = {
   gridSummaryRows: params('{count} rows'),
   gridSummaryGrid: params('Grid {size}px'),
   gridSummaryFixed: params('{summary} ({size}px)'),
-  searchFonts: 'Search fonts...',
+  searchFonts: 'Search fonts…',
   noFontsFound: 'No fonts found',
   searchIcons: 'Search icons...',
   searchingIcons: 'Searching…',

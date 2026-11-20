@@ -103,7 +103,7 @@ export const cloudPortalMessageDefaults = {
 
   deviceTitle: 'Sign in to the Pairdraw app?',
   deviceDescription: params('The Pairdraw app asks to use your account, {email}.'),
-  deviceCheckCode: 'Check that the app shows this code',
+  deviceEnterCode: 'Enter the code the app shows',
   deviceWarningTitle: 'Only approve a sign-in you started',
   deviceWarningDescription:
     'If you didn’t just sign in to Pairdraw on a computer, deny this request.',

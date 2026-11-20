@@ -1,0 +1,1 @@
+- Sending invitations is capped at 100 a day per sender and 5 a day to one address, counted across workspaces and documents, so they cannot be used to send spam.

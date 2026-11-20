@@ -150,16 +150,6 @@ describe('createCloudAPIClient', () => {
       fetch: async (input, init) => {
         const request = new Request(input, init)
         requests.push(request)
-        if (request.url.endsWith('/users/lookup')) {
-          return Response.json({
-            user: {
-              id: 'recipient-user',
-              name: 'Recipient',
-              email: 'recipient@example.com',
-              image: null
-            }
-          })
-        }
         if (request.url.endsWith('/preview')) {
           return Response.json({
             invitation: {
@@ -176,12 +166,6 @@ describe('createCloudAPIClient', () => {
       }
     })
 
-    expect(await client.lookupUser(documentId, { email: 'recipient@example.com' })).toEqual({
-      id: 'recipient-user',
-      name: 'Recipient',
-      email: 'recipient@example.com',
-      image: null
-    })
     expect(await client.previewInvitation(invitationId, { token: 't'.repeat(32) })).toMatchObject({
       documentName: 'Homepage',
       recipientHint: 're*******@example.com'
@@ -191,7 +175,6 @@ describe('createCloudAPIClient', () => {
       grant
     })
     expect(requests.map((request) => request.url)).toEqual([
-      `https://cloud.example.com/api/documents/${documentId}/users/lookup`,
       `https://cloud.example.com/api/invitations/${invitationId}/preview`,
       `https://cloud.example.com/api/invitations/${invitationId}/accept`
     ])

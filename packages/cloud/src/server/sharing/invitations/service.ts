@@ -12,6 +12,7 @@ import type { CloudActor } from '#cloud/server/auth'
 import type { CloudDatabase } from '#cloud/server/db'
 import { DocumentNotFoundError } from '#cloud/server/documents/errors'
 import type { InvitationDelivery, InvitationOutbox } from '#cloud/server/invitations'
+import { spendInvitationBudget } from '#cloud/server/invitations'
 import type { Kysely } from 'kysely'
 
 import { randomHex } from '@pairdraw/scene-graph/random'
@@ -161,6 +162,7 @@ export function createInvitationService(
             }
           : null
       const row = await database.transaction().execute(async (transaction) => {
+        await spendInvitationBudget(transaction, { senderId: userId, email: input.email })
         const inserted = await transaction
           .insertInto('documentInvitation')
           .values({

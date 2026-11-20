@@ -28,6 +28,7 @@ import * as accountActivity from './migrations/024_account_activity'
 import * as tableNames from './migrations/025_table_names'
 import * as userPicture from './migrations/026_user_picture'
 import * as sharingCommentsSnapshotsProfiles from './migrations/027_sharing_comments_snapshots_profiles'
+import * as invitationSends from './migrations/028_invitation_sends'
 import type { CloudDatabase } from './tables'
 
 const migrations: Record<string, Migration> = {
@@ -57,7 +58,8 @@ const migrations: Record<string, Migration> = {
   '024_account_activity': accountActivity,
   '025_table_names': tableNames,
   '026_user_picture': userPicture,
-  '027_sharing_comments_snapshots_profiles': sharingCommentsSnapshotsProfiles
+  '027_sharing_comments_snapshots_profiles': sharingCommentsSnapshotsProfiles,
+  '028_invitation_sends': invitationSends
 }
 
 class CloudMigrationProvider implements MigrationProvider {

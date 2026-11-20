@@ -1,0 +1,1 @@
+- Cloud pages carry a content security policy that lets only the site’s own scripts run, never frames or plugins.

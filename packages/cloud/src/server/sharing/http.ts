@@ -1,4 +1,5 @@
 import { DocumentForbiddenError, DocumentNotFoundError } from '#cloud/server/documents'
+import { InvitationLimitError } from '#cloud/server/invitations'
 import {
   DocumentShareInvalidError,
   DocumentShareKindError,
@@ -24,6 +25,9 @@ function sharingDomainError(context: Context, error: unknown): Response | null {
   }
   if (error instanceof InvitationDeliveryError) {
     return context.json({ error: { code: 'invitation_delivery_failed' as const } }, 502)
+  }
+  if (error instanceof InvitationLimitError) {
+    return context.json({ error: { code: 'rate_limited' as const } }, 429)
   }
   if (error instanceof DocumentForbiddenError) {
     return context.json({ error: { code: 'forbidden' as const } }, 403)

@@ -46,7 +46,9 @@ export async function resolveDocumentAccess(
 
   const sources: DocumentAccessSource[] = []
   const candidates: DocumentPermission[] = []
-  const owner = document.createdBy === userId
+  // Making a document gives access only while its maker is in the workspace: someone removed
+  // from it keeps no way back in.
+  const owner = document.createdBy === userId && document.workspaceRole !== null
   if (owner) {
     sources.push('owner')
     candidates.push('edit')
@@ -96,7 +98,7 @@ export async function canDeleteDocument(
     .executeTakeFirst()
   if (!document) return false
   return (
-    document.createdBy === userId ||
+    (document.createdBy === userId && document.workspaceRole !== null) ||
     document.workspaceRole === 'admin' ||
     document.workspaceRole === 'editor'
   )

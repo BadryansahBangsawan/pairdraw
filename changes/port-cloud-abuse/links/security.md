@@ -1,0 +1,1 @@
+- A share link stops working while whoever made the link or the document is banned.

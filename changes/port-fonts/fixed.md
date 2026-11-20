@@ -1,0 +1,1 @@
+- Text measured in a substitute font takes its own font's size, and its auto-layout frames follow, once a face of its family loads.

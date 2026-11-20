@@ -111,9 +111,11 @@ export function createEditor(options?: EditorOptions) {
     if (event === 'settled') pendingTextLayout.relayoutReady(_renderer)
     events.emit('font:resolution-changed', event, snapshot)
   })
-  const stopFontLoadEvents = fontManager.onFaceLoaded((family, style) =>
+  const stopFontLoadEvents = fontManager.onFaceLoaded((family, style) => {
+    // Text measured in a substitute takes its own face's size once a face of its family loads.
+    pendingTextLayout.relayoutSubstituted(_renderer, family)
     events.emit('font:loaded', family, style)
-  )
+  })
 
   void prefetchFigmaSchema()
 

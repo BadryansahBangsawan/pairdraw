@@ -38,9 +38,18 @@ function setup({ outside = false, text: values = {} }: { outside?: boolean; text
     ...values
   })
   let loaded = false
+  /** Whether the text's face was found nowhere, so it measures in the substitute it draws in. */
+  let substituted = false
   const renderer: PendingLayoutRenderer = {
     fontsLoaded: true,
-    measureTextNode: () => (loaded ? { width: 234, height: 29 } : null)
+    measureTextNode: () => {
+      if (loaded) return { width: 234, height: 29 }
+      return substituted ? { width: 180, height: 24 } : null
+    },
+    nodeFontReadiness: () => {
+      if (loaded) return 'ready'
+      return substituted ? 'substituted' : 'pending'
+    }
   }
   const { runLayoutForNode } = createLayoutRunner(() => graph)
   let renders = 0
@@ -59,7 +68,10 @@ function setup({ outside = false, text: values = {} }: { outside?: boolean; text
   const load = () => {
     loaded = true
     pending.relayoutReady(renderer)
+    pending.relayoutSubstituted(renderer, text.fontFamily)
   }
+  const findNowhere = () => (substituted = true)
+  const loadElsewhere = () => (loaded = true)
   return {
     editor,
     graph,
@@ -70,7 +82,9 @@ function setup({ outside = false, text: values = {} }: { outside?: boolean; text
     runLayoutForNode,
     load,
     relayouts,
-    renders: () => renders
+    renders: () => renders,
+    findNowhere,
+    loadElsewhere
   }
 }
 
@@ -142,4 +156,35 @@ test('text that keeps the glyphs its file saved keeps the size the file gave it'
   graph.applyDerivedLayoutDuring(() => textAutoResizeChanges(text, { text: text.text }))
   load()
   expect([text.width, text.height]).toEqual([120, 20])
+})
+
+test('text measured in a substitute is laid out in its own face once its family loads', () => {
+  const { frame, text, pending, renderer, runLayoutForNode, findNowhere, loadElsewhere, renders } =
+    setup({ text: { fontFamily: 'Pending Layout Substitute' } })
+  findNowhere()
+  runLayoutForNode(text.id)
+  expect([text.width, text.height]).toEqual([180, 24])
+
+  loadElsewhere()
+  // A face of a family it does not name leaves it as it is.
+  pending.relayoutSubstituted(renderer, 'Pending Layout Other')
+  expect(text.width).toBe(180)
+  expect(renders()).toBe(0)
+
+  pending.relayoutSubstituted(renderer, 'Pending Layout Substitute')
+  expect([text.width, text.height]).toEqual([234, 29])
+  expect([frame.width, frame.height]).toEqual([266, 53])
+  expect(renders()).toBe(1)
+})
+
+test('text that measures in its own face is no longer tracked as substituted', () => {
+  const { graph, text, pending, renderer, findNowhere, load, renders } = setup({ outside: true })
+  findNowhere()
+  edit(graph, text, { text: 'Heavier label' })
+  expect(text.width).toBe(180)
+  load()
+  expect(text.width).toBe(234)
+  const before = renders()
+  pending.relayoutSubstituted(renderer, 'Inter')
+  expect(renders()).toBe(before)
 })

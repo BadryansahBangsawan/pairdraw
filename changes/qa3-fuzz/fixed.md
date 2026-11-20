@@ -3,3 +3,5 @@
 - Detaching an instance leaves its layers without the component child ids they arrived with, so nothing reads them as still belonging to the component.
 - A group's box now follows a child that moves or resizes from the properties panel or the plugin API, not only one dragged on the canvas, and it goes back with the child on undo.
 - Taking auto layout off a frame clears the wrap and alignment it can no longer use, so reopening the file no longer shows settings the frame had dropped; adding auto layout to a group turns it into a frame, as Figma converts it.
+- A slot's contents inside an instance still delete outright, the way the document's own layers do, rather than being hidden with the component's.
+- Auto layout that comes off a frame takes its spacing and padding with it, so reopening the file no longer shows a frame that kept none.

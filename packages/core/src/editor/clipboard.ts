@@ -6,6 +6,7 @@ import { attachedConnectors } from '@pairdraw/scene-graph/connectors'
 import { getAxisAlignedBoundsInParent, getNodeLocalMatrix } from '@pairdraw/scene-graph/coordinate'
 import { cycleSafeParent, recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
+import { slotPropertyId } from '@pairdraw/scene-graph/slots'
 import { keepPastedBoundPaints, type AppliedBoundPaints } from '@pairdraw/scene-graph/variables'
 
 import { parsePairdrawClipboard } from '#core/clipboard'
@@ -482,13 +483,17 @@ export function createClipboardActions(ctx: EditorContext) {
     return acceptsChildren(ctx, node.parentId ?? ctx.state.currentPageId)
   }
 
-  /** Whether the layer is one an instance mirrors from its component. */
+  /**
+   * Whether the layer is one an instance mirrors from its component. A slot's contents are the
+   * document's own, placed in the instance, so they delete like any other layer.
+   */
   function insideInstance(id: string): boolean {
     let parentId = ctx.graph.getNode(id)?.parentId ?? null
     while (parentId) {
       const parent = ctx.graph.getNode(parentId)
       if (!parent) return false
       if (parent.type === 'INSTANCE') return true
+      if (slotPropertyId(parent)) return false
       parentId = parent.parentId
     }
     return false

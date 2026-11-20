@@ -2,11 +2,11 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
 
-import { initCanvasKit } from '#cli/headless'
+import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
+
 import { SkiaRenderer } from '#core/canvas'
 import { TiledSceneController } from '#core/canvas/renderer/tiles'
-
-import { expectDefined } from '#tests/helpers/assert'
+import { expectDefined } from '#core-tests/helpers/assert'
 
 let ck: Awaited<ReturnType<typeof initCanvasKit>>
 

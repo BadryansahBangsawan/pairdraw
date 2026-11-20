@@ -17,6 +17,15 @@ describe('SceneGraph source dirty tracking', () => {
     expect(node.source.editedFields).toEqual(['width', 'fills', 'opacity'])
   })
 
+  test('a rendered text picture is derived and does not count as an edit', () => {
+    const graph = new SceneGraph()
+    const node = graph.createNode('TEXT', firstPageId(graph))
+
+    graph.updateNode(node.id, { textPicture: new Uint8Array([1, 2, 3]) })
+
+    expect(node.source.editedFields).toEqual([])
+  })
+
   test('preservation scope suppresses import-time dirty tracking', () => {
     const graph = new SceneGraph()
     const node = graph.createNode('RECTANGLE', firstPageId(graph))

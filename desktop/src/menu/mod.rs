@@ -413,11 +413,14 @@ pub fn set_native_menu_checked<R: tauri::Runtime>(
         return Ok(());
     }
     let menu = editor_menu(&app).ok_or_else(|| "Application menu is unavailable".to_string())?;
-    let item = find_menu_item(menu.items().map_err(|error| error.to_string())?, &id)
-        .ok_or_else(|| format!("Menu item not found: {id}"))?;
-    match item {
-        MenuItemKind::Check(item) => item.set_checked(checked).map_err(|error| error.to_string()),
-        _ => Err(format!("Menu item is not checkable: {id}")),
+    match find_menu_item(menu.items().map_err(|error| error.to_string())?, &id) {
+        Some(MenuItemKind::Check(item)) => {
+            item.set_checked(checked).map_err(|error| error.to_string())
+        }
+        Some(_) => Err(format!("Menu item is not checkable: {id}")),
+        // A check item the menu hides now, such as Rulers on Home, takes the state when it
+        // shows again.
+        None => Ok(()),
     }
 }
 

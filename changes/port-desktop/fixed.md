@@ -3,3 +3,4 @@
 - On Linux, the desktop app caches recent file previews and downloaded fonts again, so they no longer load anew each time.
 - On Linux, the desktop app starts on NVIDIA Wayland sessions instead of being disconnected at its first paint.
 - The editor menu no longer appears in the Software Update window on Windows and Linux.
+- View settings keep their check state in the desktop menu while Home hides the items.

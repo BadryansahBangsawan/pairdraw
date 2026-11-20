@@ -92,6 +92,6 @@ En macOS el esquema pertenece al paquete de la aplicación instalada, por lo que
 
 ## ¿Por qué abierto?
 
-Figma es una plataforma cerrada. Su servidor MCP es de solo lectura. El acceso al navegador mediante CDP se eliminó en la versión 126. Los archivos de diseño viven en un formato propietario en los servidores de otro. El desarrollo de plugins exige un runtime propio con API limitadas.
+Figma es una plataforma cerrada. Su servidor MCP solo ofrece por ahora una beta que escribe en el lienzo mediante `use_figma`. El acceso al navegador mediante CDP se eliminó en la versión 126. Los archivos de diseño viven en un formato propietario en los servidores de otro. El desarrollo de plugins exige un runtime propio con API limitadas.
 
 Pairdraw es la alternativa: código abierto con licencia MIT, todas las operaciones automatizables y los datos guardados localmente. Tus archivos de diseño son tuyos: examínalos, transfórmalos, procésalos en CI o dáselos a un LLM. Sin pedir permiso.

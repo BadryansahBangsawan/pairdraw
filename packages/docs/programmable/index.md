@@ -86,6 +86,6 @@ On macOS the scheme belongs to the installed app bundle, so links reach an insta
 
 ## Why Open?
 
-Figma is a closed platform. Their MCP server is read-only. CDP browser access was killed in version 126. Design files live in a proprietary format on someone else's servers. Plugin development requires a custom runtime with limited APIs.
+Figma is a closed platform. Its MCP server still only offers a beta that writes to the canvas through `use_figma`; CDP browser access was killed in version 126. Design files live in a proprietary format on someone else's servers. Plugin development requires a custom runtime with limited APIs.
 
-Pairdraw is the alternative: open source, MIT licensed, every operation scriptable, data stored locally. Your design files are yours — inspect them, transform them, pipe them into CI, feed them to an LLM. No permission needed.
+Pairdraw is the alternative: open source, MIT licensed, local, with no seat or usage-based billing, works with any agent, reads and writes `.fig` files you own, and every operation is scriptable. Your design files are yours — inspect them, transform them, pipe them into CI, feed them to an LLM. No permission needed.

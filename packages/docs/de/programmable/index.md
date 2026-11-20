@@ -86,6 +86,6 @@ Unter macOS gehört das Schema dem installierten App-Bundle, Links erreichen dah
 
 ## Warum offen? {#why-open}
 
-Figma ist eine geschlossene Plattform. Sein MCP-Server kann nur lesen. Der Browserzugriff über CDP wurde mit Version 126 abgeschaltet. Designdateien liegen in einem proprietären Format auf fremden Servern. Die Plugin-Entwicklung erfordert eine eigene Laufzeitumgebung mit eingeschränkten APIs.
+Figma ist eine geschlossene Plattform. Sein MCP-Server bietet bisher nur eine Beta, die über `use_figma` in die Zeichenfläche schreibt. Der Browserzugriff über CDP wurde mit Version 126 abgeschaltet. Designdateien liegen in einem proprietären Format auf fremden Servern. Die Plugin-Entwicklung erfordert eine eigene Laufzeitumgebung mit eingeschränkten APIs.
 
 Pairdraw ist die Alternative: Open Source, MIT-lizenziert, jeder Vorgang skriptbar, Daten lokal gespeichert. Ihre Designdateien gehören Ihnen — untersuchen Sie sie, wandeln Sie sie um, verarbeiten Sie sie in CI oder übergeben Sie sie einem Sprachmodell. Ohne um Erlaubnis zu fragen.

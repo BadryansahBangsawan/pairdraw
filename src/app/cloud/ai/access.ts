@@ -2,8 +2,10 @@ import { compact } from 'es-toolkit'
 import { computed } from 'vue'
 
 import {
+  CloudAPIError,
   createCloudAIClient,
   type CloudAIClient,
+  type CloudAPIClient,
   type CloudAITokenSource
 } from '@pairdraw/cloud/client'
 import type { WorkspaceSummary } from '@pairdraw/cloud/contract'
@@ -53,6 +55,19 @@ export function cloudAIClient(workspaceId: string): CloudAIClient | null {
 }
 
 /**
+ * Whether a workspace's plan includes AI. A workspace the server no longer finds, one the account
+ * left or that was deleted since the workspace list was read, has none.
+ */
+async function includesAI(api: CloudAPIClient, workspaceId: string): Promise<boolean> {
+  try {
+    return (await api.getWorkspaceEntitlements(workspaceId)).features.cloudAI
+  } catch (error) {
+    if (error instanceof CloudAPIError && error.status === 404) return false
+    throw error
+  }
+}
+
+/**
  * The Home server's workspaces whose plan includes AI, in the order the server lists them. Rejects
  * when any check fails, since the failed workspace may be the one a profile already uses.
  */
@@ -61,10 +76,9 @@ export async function cloudAIWorkspaces(): Promise<CloudAIWorkspace[]> {
   if (!home) return []
   const api = cloudAPIClient(home.server, home.discovery)
   const checks = await Promise.allSettled(
-    home.connection.workspaces.map(async (workspace) => {
-      const entitlements = await api.getWorkspaceEntitlements(workspace.id)
-      return entitlements.features.cloudAI ? { id: workspace.id, name: workspace.name } : null
-    })
+    home.connection.workspaces.map(async (workspace) =>
+      (await includesAI(api, workspace.id)) ? { id: workspace.id, name: workspace.name } : null
+    )
   )
   const failure = checks.find((check) => check.status === 'rejected')
   if (failure) throw failure.reason

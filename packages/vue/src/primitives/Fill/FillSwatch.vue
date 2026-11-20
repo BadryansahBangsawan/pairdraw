@@ -9,15 +9,20 @@ import { useOptionalBindableValue } from '#vue/primitives/BindableValue/context'
 import type { FillSwatchProps, FillSwatchSlots } from './types'
 import { fillCategory, fillIsTransparent, fillSwatchBackground } from './useFill'
 
-const { fill, label, as = 'span', asChild = false } = defineProps<FillSwatchProps>()
+const {
+  fill,
+  label,
+  as = 'span',
+  asChild = false,
+  ignoreBinding = false
+} = defineProps<FillSwatchProps>()
 defineSlots<FillSwatchSlots>()
 defineOptions({ inheritAttrs: false })
 
 const binding = useOptionalBindableValue<Color>()
+const followsBinding = computed(() => !ignoreBinding && bindingState.value === 'bound')
 const bindingState = computed(() => binding?.state.value)
-const boundColor = computed(() =>
-  bindingState.value === 'bound' ? binding?.resolvedValue.value : undefined
-)
+const boundColor = computed(() => (followsBinding.value ? binding?.resolvedValue.value : undefined))
 const effectiveFill = computed(() =>
   fill.type === 'SOLID' && boundColor.value ? { ...fill, color: boundColor.value } : fill
 )

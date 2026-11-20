@@ -13,6 +13,8 @@ export interface FillSwatchProps {
   fill: Fill
   label?: string
   ui?: FillSwatchUI
+  /** Shows the fill as given inside a bound field; see `FillSwatchProps.ignoreBinding`. */
+  ignoreBinding?: boolean
 }
 
 export interface FillSwatchSlots {
@@ -28,7 +30,7 @@ import { FillSwatch as FillSwatchPrimitive } from '@pairdraw/vue/primitives/Fill
 
 import fillSwatchTheme from '@/theme/paint/fill-swatch'
 
-const { fill, label, ui } = defineProps<FillSwatchProps>()
+const { fill, label, ui, ignoreBinding = false } = defineProps<FillSwatchProps>()
 const attrs = useAttrs()
 const styles = computed(() => tv(fillSwatchTheme)())
 const forwardedAttrs = computed(() => {
@@ -45,6 +47,7 @@ defineOptions({ inheritAttrs: false })
     v-bind="forwardedAttrs"
     :fill="fill"
     :label="label"
+    :ignore-binding="ignoreBinding"
     :class="styles.root({ class: [ui?.root, normalizeClass(attrs.class)] })"
   >
     <slot v-bind="swatch">

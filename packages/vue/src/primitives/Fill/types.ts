@@ -32,6 +32,11 @@ export interface FillSwatchProps extends PrimitiveProps {
   fill: Fill
   /** Accessible name for the preview. */
   label?: string
+  /**
+   * Shows the fill as given, even inside a bound field: a variable picker's rows each preview their
+   * own variable rather than the one the field is bound to.
+   */
+  ignoreBinding?: boolean
 }
 
 export interface FillSwatchSlotProps {

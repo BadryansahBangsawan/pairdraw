@@ -120,8 +120,8 @@ describe('label paragraph reuse', () => {
       ...ck,
       ParagraphBuilder: {
         ...ck.ParagraphBuilder,
-        MakeFromFontProvider: (...args) => {
-          const created = ck.ParagraphBuilder.MakeFromFontProvider(...args)
+        MakeFromFontCollection: (...args) => {
+          const created = ck.ParagraphBuilder.MakeFromFontCollection(...args)
           builder = created
           if (stage === 'addText') created.addText = fail
           else {

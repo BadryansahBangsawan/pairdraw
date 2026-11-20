@@ -21,6 +21,7 @@ import {
 } from '#core/text/fallbacks'
 import { BundledFonts, type BundledFontLocator } from '#core/text/font/bundled'
 import { FamilyFaceCatalog, type HostFontFamily } from '#core/text/font/catalog'
+import { resetFontCollection } from '#core/text/font/collection'
 import { fontFaceRenderFamily, type FamilyFace } from '#core/text/font/faces'
 import { loadHarfBuzz } from '#core/text/font/harfbuzz'
 import { LocalFonts } from '#core/text/font/local'
@@ -80,6 +81,10 @@ export class FontManager {
   private providerCanvasKits = new WeakMap<TypefaceFontProvider, CanvasKit>()
   private registrationGeneration = 0
   private providerRegistrations = new WeakMap<TypefaceFontProvider, Map<string, Set<ArrayBuffer>>>()
+  private readonly sharedProviders = new Map<
+    CanvasKit,
+    { provider: TypefaceFontProvider; users: number }
+  >()
   private downloadedFontCache: DownloadedFontCache | null = null
   private fallbackUserAgent: string | undefined
   private hostFontLoader: HostFontLoader | null = null
@@ -101,6 +106,35 @@ export class FontManager {
   )
   private readonly letterFallbackPromises = new Map<LetterFallbackScript, Promise<string[]>>()
 
+  /**
+   * The provider every renderer and shaper of `canvasKit` draws from. They share one module's
+   * heap, and a provider holds its own copy of each font file, so a second provider would copy
+   * every face again: the scene and overlay canvases, and every CJK system font, alike. Each call
+   * is matched by {@link releaseProvider}; the last release deletes it.
+   */
+  acquireProvider(canvasKit: CanvasKit): TypefaceFontProvider {
+    const shared = this.sharedProviders.get(canvasKit)
+    if (shared) {
+      shared.users++
+      return shared.provider
+    }
+    const provider = canvasKit.TypefaceFontProvider.Make()
+    this.sharedProviders.set(canvasKit, { provider, users: 1 })
+    this.attachProvider(canvasKit, provider)
+    return provider
+  }
+
+  releaseProvider(provider: TypefaceFontProvider): void {
+    for (const [canvasKit, shared] of this.sharedProviders) {
+      if (shared.provider !== provider) continue
+      if (--shared.users > 0) return
+      this.sharedProviders.delete(canvasKit)
+      this.detachProvider(provider)
+      resetFontCollection(provider)
+      provider.delete()
+      return
+    }
+  }
   attachProvider(canvasKit: CanvasKit, provider: TypefaceFontProvider): void {
     this.fontProviders.add(provider)
     this.providerCanvasKits.set(provider, canvasKit)
@@ -120,6 +154,7 @@ export class FontManager {
   detachProvider(provider: TypefaceFontProvider): void {
     this.fontProviders.delete(provider)
     this.providerRegistrations.delete(provider)
+    resetFontCollection(provider)
     if (this.fontProvider === provider) {
       this.fontProvider = Array.from(this.fontProviders).at(-1) ?? null
     }
@@ -878,6 +913,7 @@ export class FontManager {
     if (registeredData?.has(data)) return true
     try {
       provider.registerFont(data, family)
+      resetFontCollection(provider)
       const familyRegistrations = registeredData ?? new Set<ArrayBuffer>()
       familyRegistrations.add(data)
       registrations.set(family, familyRegistrations)

@@ -9,6 +9,7 @@ import { resolveParagraphFontFamilies } from '#core/canvas/text/font-families'
 import { DEFAULT_FONT_FAMILY, SECTION_TITLE_FONT_FAMILY } from '#core/constants'
 import { textHasFallbackScript } from '#core/text/coverage'
 import { ELLIPSIS } from '#core/text/ellipsis'
+import { makeParagraphBuilder } from '#core/text/font/collection'
 import { missingGlyphOccurrences, type MissingGlyphOccurrence } from '#core/text/resolver'
 
 export type LabelParagraphMetrics = Readonly<Size>
@@ -80,7 +81,7 @@ function buildEntry(
       fontStyle: { weight: { value: fontWeight } }
     }
   })
-  const builder = ck.ParagraphBuilder.MakeFromFontProvider(style, provider)
+  const builder = makeParagraphBuilder(ck, style, provider)
   let paragraph: Paragraph
   try {
     builder.addText(text)

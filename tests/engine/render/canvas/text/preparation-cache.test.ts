@@ -69,11 +69,11 @@ describe('text preparation cache', () => {
       ...f.ck,
       ParagraphBuilder: {
         ...f.ck.ParagraphBuilder,
-        MakeFromFontProvider(
-          ...args: Parameters<typeof f.ck.ParagraphBuilder.MakeFromFontProvider>
+        MakeFromFontCollection(
+          ...args: Parameters<typeof f.ck.ParagraphBuilder.MakeFromFontCollection>
         ) {
           builds++
-          return f.ck.ParagraphBuilder.MakeFromFontProvider(...args)
+          return f.ck.ParagraphBuilder.MakeFromFontCollection(...args)
         }
       }
     }

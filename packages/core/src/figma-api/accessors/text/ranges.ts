@@ -64,6 +64,7 @@ import { textStyleName } from '#core/text/font/names'
 
 import { hyperlinkTarget } from './hyperlink'
 import { invalid, received } from './messages'
+import { openTypeFeaturesPatch } from './opentype'
 import { installTextReferenceMethods } from './references'
 
 const DECORATIONS = new Set<TextDecoration>(['NONE', 'UNDERLINE', 'STRIKETHROUGH'])
@@ -399,7 +400,9 @@ const RANGE_SETTERS: Record<string, RangeSetter> = {
   },
   setRangeHyperlink: (method, _node, _start, _end, value, graph) => ({
     hyperlink: hyperlinkTarget(method, value, graph)
-  })
+  }),
+  setRangeOpenTypeFeatures: (method, node, start, _end, value) =>
+    openTypeFeaturesPatch(method, node, start, value)
 }
 
 /** Range setters Figma takes with the text's fonts unloaded: paints and links, measured live. */
@@ -465,6 +468,7 @@ export interface TextRangeMethods {
   getRangeTextDecorationSkipInk: RangeGetter<boolean | null>
   setRangeTextDecorationSkipInk: RangeSetterMethod<boolean>
   getRangeOpenTypeFeatures: RangeGetter<Record<string, boolean>>
+  setRangeOpenTypeFeatures: RangeSetterMethod<Record<string, boolean>>
   getRangeTextCase: RangeGetter<TextCase>
   setRangeTextCase: RangeSetterMethod<TextCase>
   getRangeHyperlink: RangeGetter<HyperlinkTarget | null>

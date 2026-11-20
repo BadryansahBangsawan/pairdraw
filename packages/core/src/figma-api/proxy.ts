@@ -271,6 +271,7 @@ export class FigmaNodeProxy {
   declare getRangeTextDecorationSkipInk: TextRangeMethods['getRangeTextDecorationSkipInk']
   declare setRangeTextDecorationSkipInk: TextRangeMethods['setRangeTextDecorationSkipInk']
   declare getRangeOpenTypeFeatures: TextRangeMethods['getRangeOpenTypeFeatures']
+  declare setRangeOpenTypeFeatures: TextRangeMethods['setRangeOpenTypeFeatures']
   declare getRangeListOptions: TextRangeMethods['getRangeListOptions']
   declare setRangeListOptions: TextRangeMethods['setRangeListOptions']
   declare getRangeIndentation: TextRangeMethods['getRangeIndentation']

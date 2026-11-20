@@ -4,7 +4,7 @@ import { parseFigmaClipboard } from '@pairdraw/fig/clipboard'
 import { CommittedGraphEventError, type SceneNode } from '@pairdraw/scene-graph'
 import { attachedConnectors } from '@pairdraw/scene-graph/connectors'
 import { getAxisAlignedBoundsInParent, getNodeLocalMatrix } from '@pairdraw/scene-graph/coordinate'
-import { cycleSafeParent } from '@pairdraw/scene-graph/instances'
+import { cycleSafeParent, recordInstanceOverride } from '@pairdraw/scene-graph/instances'
 import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 import { keepPastedBoundPaints, type AppliedBoundPaints } from '@pairdraw/scene-graph/variables'
 
@@ -482,8 +482,37 @@ export function createClipboardActions(ctx: EditorContext) {
     return acceptsChildren(ctx, node.parentId ?? ctx.state.currentPageId)
   }
 
+  /** Whether the layer is one an instance mirrors from its component. */
+  function insideInstance(id: string): boolean {
+    let parentId = ctx.graph.getNode(id)?.parentId ?? null
+    while (parentId) {
+      const parent = ctx.graph.getNode(parentId)
+      if (!parent) return false
+      if (parent.type === 'INSTANCE') return true
+      parentId = parent.parentId
+    }
+    return false
+  }
+
   function deleteLayers(nodeIds: Iterable<string>, nextSelection?: ReadonlySet<string>) {
-    const requested = [...nodeIds].filter(deletable)
+    // Deleting a component child would take it out of every instance, so inside an instance it
+    // is a hide instead, recorded as an override: Figma reopens the file with it still hidden.
+    const requested: string[] = []
+    const hidden: Array<{ id: string; visible: boolean }> = []
+    for (const id of nodeIds) {
+      const node = ctx.graph.getNode(id)
+      if (!node || node.locked) continue
+      // No parent takes children inside an instance, but hiding one is the delete Figma offers.
+      if (insideInstance(id)) {
+        if (node.visible) hidden.push({ id, visible: node.visible })
+      } else if (deletable(id)) requested.push(id)
+    }
+    const hideLayers = () => {
+      for (const { id } of hidden) {
+        ctx.graph.updateNode(id, { visible: false })
+        recordInstanceOverride(ctx.graph, id, ['visible'])
+      }
+    }
     // Connectors go with a layer they attach to, as in FigJam; one that stays keeps them.
     const attached = attachedConnectors(ctx.graph, requested).map((node) => node.id)
     const targets: Array<{ id: string; parentId: string; index: number }> = []
@@ -495,7 +524,7 @@ export function createClipboardActions(ctx: EditorContext) {
       const index = parent?.childIds.indexOf(id) ?? -1
       targets.push({ id, parentId, index })
     }
-    if (targets.length === 0) return
+    if (targets.length === 0 && hidden.length === 0) return
     prepareSlotEdits(
       ctx,
       targets.map((entry) => entry.parentId)
@@ -511,6 +540,7 @@ export function createClipboardActions(ctx: EditorContext) {
         ctx.runLayoutForNode(parentId)
       }
     }
+    hideLayers()
 
     const prevSelection = new Set(ctx.state.selectedIds)
     for (const { id } of entries) ctx.graph.deleteNode(id)
@@ -522,11 +552,16 @@ export function createClipboardActions(ctx: EditorContext) {
       label: 'Delete',
       forward: () => {
         for (const { id } of entries) ctx.graph.deleteNode(id)
+        hideLayers()
         relayoutParents()
         ctx.setSelectedIds(new Set(selectionAfter))
       },
       inverse: () => {
         restoreDeletedEntries(ctx, entries)
+        for (const { id, visible } of hidden) {
+          ctx.graph.updateNode(id, { visible })
+          recordInstanceOverride(ctx.graph, id, ['visible'])
+        }
         relayoutParents()
         ctx.setSelectedIds(prevSelection)
       }

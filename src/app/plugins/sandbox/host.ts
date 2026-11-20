@@ -79,8 +79,18 @@ export function createPluginHost(
       typeof args === 'object' && args !== null ? Object.fromEntries(Object.entries(args)) : {}
     // Reads and writes share this check. Returning early for a tool that does not edit
     // skipped it, so an asynchronous read still ran.
-    if (def.execution.kind !== 'sync') refusal(new Error(PLUGIN_ASYNC_TOOL_MESSAGE))
-    if (!def.mutates) return def.execute(figma, values)
+    if (!def.mutates) {
+      // A read that can answer from memory answers at once; one that would load a page first
+      // is refused before any load starts, so no promise is left to reject unhandled.
+      if (def.executeSync) {
+        const answer = def.executeSync(figma, values)
+        if (answer !== undefined) return answer
+        refusal(new Error(PLUGIN_ASYNC_TOOL_MESSAGE))
+      }
+      if (def.execution.kind === 'async') refusal(new Error(PLUGIN_ASYNC_TOOL_MESSAGE))
+      return def.execute(figma, values)
+    }
+    if (def.execution.kind === 'async') refusal(new Error(PLUGIN_ASYNC_TOOL_MESSAGE))
     await def.loadFonts(figma, values)
     if (finished) refusal(new Error(PLUGIN_RUN_ENDED_MESSAGE))
     const pageId = store.state.currentPageId

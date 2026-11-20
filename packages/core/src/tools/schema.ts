@@ -52,6 +52,11 @@ export interface ToolDef extends ToolMetadata {
    */
   loadFonts: (figma: FigmaAPI, args: Record<string, unknown>) => Promise<void>
   execute: (figma: FigmaAPI, args: Record<string, unknown>) => unknown
+  /**
+   * The synchronous answer of a read whose `execute` may load a page first, or `undefined`
+   * when answering would load. Hosts that cannot wait refuse on `undefined` before any load.
+   */
+  executeSync?: (figma: FigmaAPI, args: Record<string, unknown>) => unknown
 }
 
 type ToolDefinitionMetadata = Omit<ToolMetadata, 'exposure' | 'capabilities' | 'availability'> &
@@ -67,6 +72,10 @@ export function defineTool<P extends v.ObjectEntries, R>(
       args: v.InferOutput<v.StrictObjectSchema<P, undefined>>
     ) => FigmaFontNameInput[]
     execute: (figma: FigmaAPI, args: v.InferOutput<v.StrictObjectSchema<P, undefined>>) => R
+    executeSync?: (
+      figma: FigmaAPI,
+      args: v.InferOutput<v.StrictObjectSchema<P, undefined>>
+    ) => unknown
   }
 ): ToolDef {
   const { fonts } = def
@@ -87,7 +96,10 @@ export function defineTool<P extends v.ObjectEntries, R>(
       if (!parsed.success) return
       for (const font of fonts(figma, parsed.output)) await figma.loadFontAsync(font)
     },
-    execute: (figma, args) => def.execute(figma, parseToolArgs(def.name, def.input, args))
+    execute: (figma, args) => def.execute(figma, parseToolArgs(def.name, def.input, args)),
+    executeSync: def.executeSync
+      ? (figma, args) => def.executeSync?.(figma, parseToolArgs(def.name, def.input, args))
+      : undefined
   }
 }
 

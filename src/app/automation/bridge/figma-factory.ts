@@ -58,7 +58,9 @@ export function makeFigmaFromStore(
       store.select([...ids])
     },
     // The editor syncs instances after edits; a script's reads sync them at once, as in Figma.
-    flushComponentSync: () => store.flushComponentSync()
+    flushComponentSync: () => store.flushComponentSync(),
+    loadPage: (id) => store.loadPageNodes(id),
+    pageOfNode: (id) => store.pageHoldingNode(id)
   })
   // `vectorize_image` runs on the service and key set up in Settings, which stay in the app.
   bindAgentImageVectorizer(store)

@@ -1,0 +1,1 @@
+- `get_node` and `get_page_tree` find a layer by its ID on a page that has not been opened yet, loading that page as Figma's dynamic-page mode does, and scripts can load pages with `page.loadAsync`, `setCurrentPageAsync`, and `loadAllPagesAsync`.

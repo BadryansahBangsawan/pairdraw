@@ -3,6 +3,7 @@ export { exportFigFile, compressFigData, type FigFileExtrasOptions } from './wri
 export { figThumbnailPageId } from './thumbnail-page'
 export {
   isReaderPagePending as isFigPagePending,
+  pendingReaderPageOfNode as pendingFigPageOfNode,
   populateFigPage,
   populateAllFigPages,
   readerDiagnostics

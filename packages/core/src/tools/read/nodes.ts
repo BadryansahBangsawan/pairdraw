@@ -1,6 +1,6 @@
 import * as v from 'valibot'
 
-import type { FigmaNodeProxy } from '#core/figma-api'
+import type { FigmaAPI, FigmaNodeProxy } from '#core/figma-api'
 import {
   toolNumber,
   nodeIdInputSchema,
@@ -48,11 +48,30 @@ function nodeToTreeEntry(
   return entry
 }
 
+/** The current page's tree; the answer that never needs a page load. */
+function currentPageTree(
+  figma: FigmaAPI,
+  depth: number | undefined,
+  typeFilter: Set<string> | undefined
+) {
+  const page = figma.currentPage
+  const children: TreeEntry[] = []
+  for (const child of page.children) {
+    const entry = nodeToTreeEntry(child, 1, depth, typeFilter)
+    if (entry) children.push(entry)
+  }
+  return { page: page.name, children }
+}
+
+function typeFilterOf(nodeTypes: readonly string[] | undefined): Set<string> | undefined {
+  return nodeTypes && nodeTypes.length > 0 ? new Set(nodeTypes) : undefined
+}
+
 export const getPageTree = defineTool({
   name: 'get_page_tree',
   description:
     'Get the node tree of the current page. Returns lightweight hierarchy: id, type, name, size, and text for TEXT nodes. Use depth, root_id, or node_types to keep large pages small. Use get_node for full properties of a specific node.',
-  execution: { kind: 'sync', mutation: 'none' },
+  execution: { kind: 'async', mutation: 'none' },
   input: v.strictObject({
     depth: v.optional(
       toolNumber(
@@ -79,22 +98,22 @@ export const getPageTree = defineTool({
       )
     )
   }),
-  execute: (figma, { depth, root_id, node_types }) => {
-    const typeFilter = node_types && node_types.length > 0 ? new Set(node_types) : undefined
-
+  executeSync: (figma, { depth, root_id, node_types }) => {
+    const typeFilter = typeFilterOf(node_types)
     if (root_id !== undefined) {
       const root = figma.getNodeById(root_id)
-      if (!root) return { error: `Node "${root_id}" not found` }
-      return { root: root.id, tree: nodeToTreeEntry(root, 1, depth, typeFilter) }
+      return root ? { root: root.id, tree: nodeToTreeEntry(root, 1, depth, typeFilter) } : undefined
     }
-
-    const page = figma.currentPage
-    const children: TreeEntry[] = []
-    for (const child of page.children) {
-      const entry = nodeToTreeEntry(child, 1, depth, typeFilter)
-      if (entry) children.push(entry)
-    }
-    return { page: page.name, children }
+    return currentPageTree(figma, depth, typeFilter)
+  },
+  execute: async (figma, { depth, root_id, node_types }) => {
+    const typeFilter = typeFilterOf(node_types)
+    if (root_id === undefined) return currentPageTree(figma, depth, typeFilter)
+    const root = figma.getNodeById(root_id)
+    // A layer on a page not yet visited loads that page, as in Figma's dynamic-page mode.
+    const loaded = root ?? (await figma.getNodeByIdAsync(root_id))
+    if (!loaded) return { error: `Node "${root_id}" not found` }
+    return { root: loaded.id, tree: nodeToTreeEntry(loaded, 1, depth, typeFilter) }
   }
 })
 
@@ -102,7 +121,7 @@ export const getNode = defineTool({
   name: 'get_node',
   description:
     'Get detailed properties of a node by ID. Use depth to limit child recursion (0 = node only, 1 = direct children, etc). Default: unlimited.',
-  execution: { kind: 'sync', mutation: 'none' },
+  execution: { kind: 'async', mutation: 'none' },
   input: v.strictObject({
     id: nodeIdInputSchema,
     depth: v.optional(
@@ -114,10 +133,15 @@ export const getNode = defineTool({
       )
     )
   }),
-  execute: (figma, { id, depth }) => {
+  executeSync: (figma, { id, depth }) => {
     const node = figma.getNodeById(id)
-    if (!node) return { error: `Node "${id}" not found` }
-    return nodeToResult(node, depth)
+    return node ? nodeToResult(node, depth) : undefined
+  },
+  execute: async (figma, { id, depth }) => {
+    const node = figma.getNodeById(id)
+    // A layer on a page not yet visited loads that page, as in Figma's dynamic-page mode.
+    const loaded = node ?? (await figma.getNodeByIdAsync(id))
+    return loaded ? nodeToResult(loaded, depth) : { error: `Node "${id}" not found` }
   }
 })
 

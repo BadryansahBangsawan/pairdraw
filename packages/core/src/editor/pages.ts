@@ -15,7 +15,11 @@ import {
   canUseFigPopulationWorker,
   createFigPopulationWorker
 } from '#core/kiwi/fig/population/client'
-import { isReaderPagePending, recoverReaderPage } from '#core/kiwi/fig/session/document-state'
+import {
+  isReaderPagePending,
+  pendingReaderPageOfNode,
+  recoverReaderPage
+} from '#core/kiwi/fig/session/document-state'
 import { computeAllLayouts } from '#core/layout'
 import { fontManager } from '#core/text/font/manager'
 import { collectGraphFontRequirements } from '#core/text/requirements/collect'
@@ -278,6 +282,13 @@ export function createPageActions(ctx: EditorContext, drawing?: PageDrawing) {
     if (ctx.graph.getNode(pageId)?.type === 'CANVAS') await populatePage(pageId, null)
   }
 
+  /** The page holding a layer not in the document yet because its page has not loaded. */
+  function pageHoldingNode(nodeId: string): Promise<string | null> {
+    return ctx.graph.getNode(nodeId)
+      ? Promise.resolve(null)
+      : pendingReaderPageOfNode(ctx.graph, nodeId)
+  }
+
   async function prepareOffscreenPage(graph: SceneGraph, page: SceneNode): Promise<boolean> {
     const populated = await populatePage(page.id, null)
     if (populated === null || graph !== ctx.graph) return false
@@ -458,6 +469,7 @@ export function createPageActions(ctx: EditorContext, drawing?: PageDrawing) {
 
   return {
     loadPageNodes,
+    pageHoldingNode,
     preparePageNodes,
     pageSwitchCount,
     preparePage,

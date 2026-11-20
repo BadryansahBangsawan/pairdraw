@@ -46,7 +46,16 @@ import type {
 } from './node-types'
 import { startPendingLayout } from './pending-layout'
 import { flushPendingComponentSync, startPendingComponentSync } from './pending-sync'
-import { FigmaNodeProxy, INTERNAL_ID, MIXED, type FigmaFont, type NodeProxyHost } from './proxy'
+import {
+  FigmaNodeProxy,
+  INTERNAL_ID,
+  loadPage,
+  MIXED,
+  pageOfNode,
+  setPageHost,
+  type FigmaFont,
+  type NodeProxyHost
+} from './proxy'
 import { newShapeWithText } from './shape-with-text'
 import type { ExportImageOptions } from './types'
 import { figmaUtil } from './util'
@@ -65,6 +74,14 @@ export interface FigmaViewport {
 export interface FigmaAPIOptions {
   /** Fetches the HTTP(S) URLs `figma.createImageAsync` loads; the global `fetch` by default. */
   fetch?: images.ImageFetch
+  /**
+   * Loads a page's layers, for a host that loads pages as they are visited, as the editor does a
+   * file it opens: `page.loadAsync`, `figma.loadAllPagesAsync`, and `setCurrentPageAsync` call
+   * it, as they load pages in Figma's dynamic-page mode. Without one every page is in memory.
+   */
+  loadPage?: (pageId: string) => Promise<void>
+  /** The page holding a layer not loaded yet, which `getNodeByIdAsync` loads to find it. */
+  pageOfNode?: (nodeId: string) => Promise<string | null>
   /**
    * Runs when a script puts the API on another page, so a host can show that page too. The host
    * owns which page is on screen, and a plugin that switches page expects to see it switched.
@@ -171,10 +188,14 @@ export class FigmaAPI implements NodeProxyHost {
   readonly #onSelectionChange: ((ids: readonly string[], pageId: string) => void) | undefined
   /** The last host page switch, so `setCurrentPageAsync` can wait for it. */
   #pageChange: Promise<void> = Promise.resolve()
+  /** The newest page switch asked for, so a superseded async switch does not move the page. */
+  #pageSwitch = 0
 
   constructor(graph: SceneGraph, options: FigmaAPIOptions = {}) {
     this.graph = graph
     this.#fetch = options.fetch ?? ((input, init) => fetch(input, init))
+    if (options.loadPage)
+      setPageHost(this, { load: options.loadPage, pageOfNode: options.pageOfNode })
     this.#onPageChange = options.onPageChange
     this.#onViewportChange = options.onViewportChange
     this.#onSelectionChange = options.onSelectionChange
@@ -260,8 +281,13 @@ export class FigmaAPI implements NodeProxyHost {
     return node ? this.wrapNode(id) : null
   }
 
-  /** The async lookup that Figma requires in dynamic-page mode; same result as getNodeById. */
+  /** As in Figma's dynamic-page mode, a layer on a page not loaded yet loads that page. */
   async getNodeByIdAsync(id: string): Promise<FigmaNodeProxy | null> {
+    const node = this.getNodeById(id)
+    if (node) return node
+    const pageId = await pageOfNode(this, id)
+    if (!pageId) return null
+    await loadPage(this, pageId)
     return this.getNodeById(id)
   }
 
@@ -277,9 +303,16 @@ export class FigmaAPI implements NodeProxyHost {
     if (this._rawNode(page).type !== 'CANVAS') {
       return Promise.reject(new Error('figma.setCurrentPageAsync expects a PageNode'))
     }
-    this._currentPageId = this._nodeId(page)
-    this.#pageChange = Promise.resolve(this.#onPageChange?.(this._currentPageId))
-    return this.#pageChange
+    const pageId = this._nodeId(page)
+    const pageSwitch = ++this.#pageSwitch
+    return loadPage(this, pageId).then(() => {
+      if (pageSwitch !== this.#pageSwitch) return undefined
+      if (this.graph.getNode(pageId)?.type !== 'CANVAS')
+        throw new Error('in setCurrentPageAsync: The page was removed while it loaded')
+      this._currentPageId = pageId
+      this.#pageChange = Promise.resolve(this.#onPageChange?.(pageId))
+      return this.#pageChange
+    })
   }
 
   // --- Node Creation ---
@@ -672,9 +705,9 @@ export class FigmaAPI implements NodeProxyHost {
     if (message) this.notify(message)
   }
 
-  /** Every page is already in memory. */
+  /** Loads every page's layers, for a host that loads them as they are visited. */
   async loadAllPagesAsync(): Promise<void> {
-    return undefined
+    for (const page of this.graph.getPages()) await loadPage(this, page.id)
   }
 
   commitUndo(): void {

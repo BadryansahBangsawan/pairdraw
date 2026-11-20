@@ -2,8 +2,12 @@ import 'fake-indexeddb/auto'
 import { afterEach, beforeEach, expect, spyOn, test } from 'bun:test'
 
 import { FigmaAPI } from '@pairdraw/core/figma-api'
+import { BUILTIN_IO_FORMATS, IORegistry } from '@pairdraw/core/io'
+import { parseFigFile } from '@pairdraw/core/io/formats/fig'
+import { SceneGraph } from '@pairdraw/scene-graph'
 
 import * as figmaFactory from '@/app/automation/bridge/figma-factory'
+import type { EditorStore } from '@/app/editor/session/create'
 import { createEditorStore } from '@/app/editor/session/create'
 import { installPlugin, removePlugin, setPluginEnabled } from '@/app/plugins/catalog'
 import { grantPlugin } from '@/app/plugins/grants'
@@ -91,6 +95,53 @@ test('a granted read answers with the tool result', async () => {
   const plugins = plugin(['document:read'])
   const host = createPluginHost(openDocument(), plugins, 'marks')
   expect(await host.call('get_selection', {})).toEqual({ selection: [] })
+  host.finish(false)
+})
+
+test('a plugin reads a loaded layer with get_node and get_page_tree', async () => {
+  const store = openDocument()
+  const frame = store.graph.createNode('FRAME', store.graph.getPages()[0].id, { name: 'Card' })
+  const host = createPluginHost(store, plugin(['document:read']), 'marks')
+  expect(await host.call('get_node', { id: frame.id, depth: 0 })).toMatchObject({
+    id: frame.id,
+    name: 'Card'
+  })
+  expect(await host.call('get_page_tree', { root_id: frame.id })).toMatchObject({
+    root: frame.id,
+    tree: { name: 'Card' }
+  })
+  host.finish(false)
+})
+
+test('a plugin read that would load a page is refused without starting the load', async () => {
+  const source = new SceneGraph()
+  const second = source.addPage('Second')
+  const frame = source.createNode('FRAME', second.id, { name: 'Later' })
+  const written = await new IORegistry(BUILTIN_IO_FORMATS).writeDocument('fig', source)
+  const graph = await parseFigFile((written.data as Uint8Array).slice().buffer, {
+    populate: 'first-page'
+  })
+  const store = createEditorStore(graph)
+  stores.push(store)
+  // The hooks the real factory passes, so a refusal that starts a load is observable.
+  factory.mockImplementation((editor: EditorStore, pageId?: string) => {
+    const api = new FigmaAPI(editor.graph, {
+      loadPage: (id) => editor.loadPageNodes(id),
+      pageOfNode: (id) => editor.pageHoldingNode(id)
+    })
+    api.currentPage = api.wrapNode(pageId ?? editor.state.currentPageId)
+    return api
+  })
+  const loads = spyOn(store, 'loadPageNodes')
+  const host = createPluginHost(store, plugin(['document:read']), 'marks')
+  await expect(host.call('get_node', { id: frame.id })).rejects.toThrow(
+    'Plugins cannot call a tool that runs asynchronously.'
+  )
+  await expect(host.call('get_page_tree', { root_id: frame.id })).rejects.toThrow(
+    'Plugins cannot call a tool that runs asynchronously.'
+  )
+  expect(loads).not.toHaveBeenCalled()
+  expect(graph.getChildren(second.id)).toHaveLength(0)
   host.finish(false)
 })
 

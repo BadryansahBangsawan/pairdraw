@@ -64,6 +64,31 @@ export const INTERNAL_ID = Symbol('id')
 export const INTERNAL_GRAPH = Symbol('graph')
 export const INTERNAL_API = Symbol('api')
 
+/** How a host loads pages as they are visited; see `FigmaAPIOptions`. */
+export interface PageHost {
+  load: (pageId: string) => Promise<void>
+  pageOfNode?: (nodeId: string) => Promise<string | null>
+}
+
+/**
+ * How each API loads a page's layers, a host's hook kept off `figma`, which has only Figma's
+ * members. Without one every page is in memory.
+ */
+const pageHosts = new WeakMap<NodeProxyHost, PageHost>()
+
+export function setPageHost(api: NodeProxyHost, host: PageHost): void {
+  pageHosts.set(api, host)
+}
+
+export function loadPage(api: NodeProxyHost, pageId: string): Promise<void> {
+  return pageHosts.get(api)?.load(pageId) ?? Promise.resolve()
+}
+
+/** The page holding a layer not loaded yet, which loading that page brings in. */
+export function pageOfNode(api: NodeProxyHost, nodeId: string): Promise<string | null> {
+  return pageHosts.get(api)?.pageOfNode?.(nodeId) ?? Promise.resolve(null)
+}
+
 export interface NodeProxyHost {
   wrapNode(id: string): FigmaNodeProxy
   readonly currentPageId: string
@@ -278,9 +303,9 @@ export class FigmaNodeProxy {
     if (type === 'VECTOR') installVectorNodeProxyAccessors(this, internals, MIXED)
     if (type) installShapeNodeProxyAccessors(this, internals, type)
     // Figma loads a page's layers on demand in dynamic-page mode and has `loadAsync` on pages
-    // alone; every page here is already loaded.
+    // alone, as the editor loads a page's layers when it is first visited.
     if (type === 'CANVAS')
-      Object.defineProperty(this, 'loadAsync', { value: () => Promise.resolve() })
+      Object.defineProperty(this, 'loadAsync', { value: () => loadPage(api, id) })
   }
 
   private _update(changes: Partial<SceneNode>): void {

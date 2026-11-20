@@ -17,6 +17,7 @@ import { orderKeyBetween } from '@pairdraw/scene-graph/order-keys'
 import { readFigArchiveParts, writeFigArchive, type FigImageEntry } from '../archive'
 import { symbolDataOf, symbolOverridesOf } from '../instance-overrides/types'
 import { patchedRecord, type FigRecordFieldPatch } from './fields'
+import { nearestOfType, recordsById } from './record-pages'
 
 export {
   entryPathKey,
@@ -24,6 +25,7 @@ export {
   type FigEntryPatch,
   type FigRecordFieldPatch
 } from './fields'
+export { figArchiveRecordPages, figRecordPages } from './record-pages'
 
 /**
  * What an edited document changes in the archive it was opened from: the records to write, by
@@ -512,7 +514,7 @@ export function figComponentUsePages(
   records: readonly NodeChange[],
   componentIds: readonly string[]
 ): string[] {
-  const byId = new Map<string, NodeChange>()
+  const byId = recordsById(records)
   const instancesOf = new Map<string, string[]>()
   const use = (componentId: string | undefined, instanceId: string) => {
     if (!componentId) return
@@ -522,24 +524,11 @@ export function figComponentUsePages(
   }
   for (const record of records) {
     const id = key(record.guid)
-    if (!id) continue
-    byId.set(id, record)
-    if (record.type !== 'INSTANCE') continue
+    if (!id || record.type !== 'INSTANCE') continue
     use(key(symbolDataOf(record)?.symbolID), id)
     for (const override of symbolOverridesOf(record)) use(key(override.overriddenSymbolID), id)
   }
-  const nearest = (id: string, type: string): string | undefined => {
-    const seen = new Set<string>()
-    for (let current = byId.get(id); current;) {
-      const currentId = key(current.guid)
-      if (!currentId || seen.has(currentId)) return undefined
-      seen.add(currentId)
-      if (current.type === type) return currentId
-      const parent = key(current.parentIndex?.guid)
-      current = parent ? byId.get(parent) : undefined
-    }
-    return undefined
-  }
+  const nearest = (id: string, type: string) => nearestOfType(byId, id, type)
   const pages = new Set<string>()
   const visited = new Set<string>()
   const pending = [...componentIds]

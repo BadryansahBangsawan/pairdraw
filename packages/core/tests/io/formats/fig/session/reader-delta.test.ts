@@ -121,3 +121,27 @@ test('new-reader page loads transfer through the worker delta contract', async (
   }
   expect(recoveryGraph.createNode('RECTANGLE', pageId).id).not.toMatch(/^0:/)
 })
+
+test('a page delta holds the worker graph own layers, which posting copies once', async () => {
+  await initCodec()
+  const source = new SceneGraph()
+  source.createNode('TEXT', source.getPages()[0].id, { text: 'Before', name: 'Label' })
+  const bytes = await exportFigFile(source)
+  const session = createFigDocumentSession(bytes.buffer as ArrayBuffer)
+  const pageId = session.graphPageId(session.pages[0].id)
+  if (!pageId) throw new Error('Missing graph page')
+  const journal = installFigMutationJournal(session.graph)
+  try {
+    session.loadPage(session.pages[0].id)
+    const delta = buildFigPopulationDelta(session.graph, journal, [pageId])
+    const created = delta.created[0]?.[1]
+    if (!created) throw new Error('Missing created layer')
+    // The worker's own layer, not a copy: posting the result copies it once.
+    expect(session.graph.getNode(created.id) ?? null).toBe(created)
+    const receiver = deserializeSceneGraph(serializeSceneGraph(session.graph))
+    applyFigPopulationDelta(receiver, structuredClone(delta))
+    expect(receiver.getNode(created.id)).not.toBe(created)
+  } finally {
+    journal.stop()
+  }
+})

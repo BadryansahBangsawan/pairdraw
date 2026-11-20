@@ -1,0 +1,1 @@
+- A large `.fig` page reaches the editor from the reader worker without a second deep copy of every layer, cutting the time and memory a big page load costs.

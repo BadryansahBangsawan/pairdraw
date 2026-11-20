@@ -102,7 +102,10 @@ describe('reopened instance overrides in a live editor', () => {
       const journal = installFigMutationJournal(workerGraph)
       try {
         expect(populateFigPage(workerGraph, page.id)).toBe(true)
-        applyFigPopulationDelta(graph, buildFigPopulationDelta(workerGraph, journal, [page.id]))
+        applyFigPopulationDelta(
+          graph,
+          structuredClone(buildFigPopulationDelta(workerGraph, journal, [page.id]))
+        )
       } finally {
         journal.stop()
       }

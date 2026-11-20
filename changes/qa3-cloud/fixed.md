@@ -1,2 +1,3 @@
 - A malformed id in a Cloud URL answers 404 instead of a database error.
 - A workspace the account is not in answers 404 for its entitlements instead of a server error.
+- A desktop sign-in page keeps getting fresh codes after a few reloads instead of being rate-limited for half an hour.

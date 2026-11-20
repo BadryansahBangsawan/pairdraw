@@ -156,6 +156,9 @@ export function createBetterAuthAdapter(
       customRules: {
         [devices.endpoints.deviceCode.path]: { window: 60, max: 10 },
         [devices.endpoints.deviceToken.path]: { window: 60, max: 60 },
+        // The plugin's own budget is 5 lookups per code lifetime (30 minutes), so reopening the
+        // sign-in page a few times turned away every new code for half an hour.
+        [devices.endpoints.deviceVerify.path]: { window: 60, max: 20 },
         [devices.endpoints.deviceApprove.path]: { window: 60, max: 10 },
         [devices.endpoints.deviceDeny.path]: { window: 60, max: 10 },
         [CORE_AUTH_PATHS.signInEmail]: { window: 10, max: 3 },

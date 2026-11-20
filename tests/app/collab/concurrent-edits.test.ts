@@ -285,4 +285,24 @@ describe('collab concurrent edits', () => {
       }
     )
   })
+
+  test('concurrent edits to different fields of one layer stay marked on both peers', async () => {
+    await withConcurrentEdits(
+      (graph, pageId) => {
+        graph.createNode('RECTANGLE', pageId, { id: 'rect:1' })
+      },
+      ({ hostStore, peerStore }) => {
+        hostStore.graph.updateNode('rect:1', { name: 'Renamed' })
+        peerStore.graph.updateNode('rect:1', { x: 40 })
+      },
+      ({ hostStore, peerStore }) => {
+        const host = getNodeOrThrow(hostStore.graph, 'rect:1').source.editedFields
+        const peer = getNodeOrThrow(peerStore.graph, 'rect:1').source.editedFields
+        // Whichever write the room keeps, neither peer loses the field the other edited.
+        expect(host).toEqual(expect.arrayContaining(['name', 'x']))
+        expect(peer).toEqual(expect.arrayContaining(['name', 'x']))
+        expect([...host].sort()).toEqual([...peer].sort())
+      }
+    )
+  })
 })

@@ -1,4 +1,5 @@
 import { isEmptyObject, isEqual, omit, pickBy } from 'es-toolkit'
+import { uniq } from 'es-toolkit/array'
 import * as Y from 'yjs'
 
 import type { SceneGraph } from '@pairdraw/scene-graph'
@@ -356,6 +357,18 @@ export function createYjsGraphSync({
       // picture is a cache the decoder clears, so it goes along only with a real change.
       const { textPicture, ...fields } = props
       const changes = pickBy(fields, (value, key) => !isEqual(Reflect.get(node, key), value))
+      // Two peers editing different fields of one layer each record their own edit; keeping both
+      // sets means the layer's provenance does not depend on which peer wrote last.
+      if (changes.source) {
+        changes.source = {
+          ...changes.source,
+          editedFields: uniq([
+            ...node.source.editedFields,
+            ...changes.source.editedFields,
+            ...Object.keys(changes).filter((key) => key !== 'source')
+          ]).sort()
+        }
+      }
       if (!isEmptyObject(changes)) graph.updateNode(nodeId, { ...changes, textPicture })
       return
     }

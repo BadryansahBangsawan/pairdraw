@@ -1,6 +1,7 @@
 import type { UIMessage } from 'ai'
 
 import {
+  appendDesignMemoryContext,
   appendExploreContext,
   appendLayerNotesContext,
   exploreContextOf,
@@ -11,6 +12,7 @@ import { mentionedNodes } from '@/app/ai/chat/references/nodes'
 import { exploreNote } from '@/app/ai/explore/note'
 import type { ExploreRequest } from '@/app/ai/explore/request'
 import { collectLayerNotes } from '@/app/ai/notes/collect'
+import { designMemoryNote } from '@/app/ai/notes/design-memory'
 import type { EditorStore } from '@/app/editor/active-store'
 
 /** What a request says about the canvas beyond its text. */
@@ -32,10 +34,10 @@ function messageText(message: UIMessage): string {
 }
 
 /**
- * Adds the canvas notes a request carries, read as it is sent: how to explore it, and the notes
- * left on the layers it concerns, which are the ones it names and the selection, or the whole
- * page when there are none. A layer's notes the conversation `earlier` already told the model,
- * unchanged, are not repeated.
+ * Adds the canvas notes a request carries, read as it is sent: how to explore it, the notes left
+ * on the layers it concerns, which are the ones it names and the selection, or the whole page
+ * when there are none, and the document's design memory. A layer's notes or a memory the
+ * conversation `earlier` already told the model, unchanged, are not repeated.
  */
 export function appendCanvasNotes(
   editor: EditorStore,
@@ -55,7 +57,12 @@ export function appendCanvasNotes(
     focus.map((node) => node.id)
   )
   const told = earlier.filter((message) => message.role === 'user').map(messageText)
-  return appendLayerNotesContext(appendExploreContext(source.modelText, explore), notes, told)
+  const withNotes = appendLayerNotesContext(
+    appendExploreContext(source.modelText, explore),
+    notes,
+    told
+  )
+  return appendDesignMemoryContext(withNotes, designMemoryNote(graph), told)
 }
 
 /**

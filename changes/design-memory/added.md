@@ -1,1 +1,2 @@
 - A document keeps a design memory that agents follow: the colors, fonts, font sizes, spacing, and corner radii they may use (the document's variables and styles plus values you allow), decisions written down, and frames pinned as examples. Create it from the Design panel with nothing selected, or learn it from a selected frame.
+- Agents read the design memory with `get_design_memory`, check values with `check_design_values`, and write decisions down with `record_design_decision`; `pairdraw.designMemory` reads it in scripts.

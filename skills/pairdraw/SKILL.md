@@ -225,6 +225,16 @@ pairdraw eval design.fig -w -c 'pairdraw.setStatus(figma.currentPage.findOne(n =
 
 `pairdraw.getStatus(node)` reads one. Over MCP the same is `get_statuses` and `set_status`.
 
+A document can keep a design memory: the colors, fonts, font sizes, spacing and corner radii its designs may use (its own variables and styles plus values the person allowed), decisions written down about them, and frames pinned as examples. Read it before you design in the document. An edit that uses a color or font it does not allow is undone, and the error names the nearest allowed values; sizes, spacing and radii off its scale go through with a warning in the result. Only the person changes what it allows; you can record a decision and pin an example:
+
+```bash
+pairdraw eval design.fig -c 'pairdraw.designMemory'
+pairdraw eval design.fig -c 'pairdraw.checkDesignValues({ colors: ["#FF00AA"], spacing: [13] })'
+pairdraw eval design.fig -w -c 'pairdraw.recordDesignDecision("Cards use 16 px padding.", figma.currentPage.findOne(n => n.name === "Card"))'
+```
+
+Over MCP the same is `get_design_memory`, `check_design_values`, and `record_design_decision`.
+
 ### Diff
 
 Compare nodes and documents, and apply patches:

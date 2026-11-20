@@ -40,6 +40,11 @@ import {
   setBehaviour
 } from '#core/tools/create'
 import {
+  checkDesignValuesTool,
+  getDesignMemory,
+  recordDesignDecisionTool
+} from '#core/tools/design-memory'
+import {
   generateImage,
   generateSVG,
   removeBackground,
@@ -157,6 +162,9 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   resolveComment,
   getStatuses,
   setStatus,
+  getDesignMemory,
+  checkDesignValuesTool,
+  recordDesignDecisionTool,
   getFontStatus,
   listFonts,
   listAvailableFonts,

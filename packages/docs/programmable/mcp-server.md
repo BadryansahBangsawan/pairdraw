@@ -528,6 +528,16 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | `get_statuses` | List the document's statuses and the sections, frames, components, and instances that show one, optionally only one status |
 | `set_status`   | Give a layer one of the document's statuses by name, or clear it                                                           |
 
+### Design memory
+
+| Tool                     | Description                                                                                                                       |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `get_design_memory`      | Read the colors, fonts, font sizes, spacing and radii the document allows, how each is enforced, its decisions and its examples |
+| `check_design_values`    | Check values before using them: each is ok, warned, refused or invalid, with the nearest allowed value                           |
+| `record_design_decision` | Write a decision down in the memory and optionally pin a frame that shows it; it cannot change what the memory allows             |
+
+An edit by an agent that brings in a color or font the design memory does not allow is undone, and its error names the nearest allowed values; so is a variable or style it creates or changes with such a value, and any change to the memory beyond appending decisions and pinning examples. Values kept on layers the call duplicates, groups, flattens or converts are not refused, and Pairdraw's defaults for new layers only warn; a value the call writes is judged even when the document already uses it elsewhere. A variable an agent rescopes is judged on what its new scopes let in. Off-scale font sizes, spacing and radii go through, and the result carries a `design_memory` warning. People's own edits, including CLI commands, are never refused; the Lint tab lists them.
+
 ### Navigation
 
 | Tool          | Description                    |

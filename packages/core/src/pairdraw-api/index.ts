@@ -6,8 +6,14 @@ import {
   type BehaviourSpec
 } from '@pairdraw/scene-graph/behaviours'
 import type { OkHCLColor, OkHCLPayload } from '@pairdraw/scene-graph/color'
+import type { DesignMemoryGroup } from '@pairdraw/scene-graph/design-memory'
 import { parseVariableFormula } from '@pairdraw/scene-graph/variables'
 
+import {
+  describeDesignMemory,
+  type DesignMemoryReport,
+  type DesignValueVerdict
+} from '#core/design-memory'
 import { exposeInstanceSwap } from '#core/figma-api/components'
 import type { FigmaAPI, FigmaNodeProxy } from '#core/figma-api/index'
 import { writeVariableValue } from '#core/figma-api/variables'
@@ -29,6 +35,7 @@ import {
   type CommentHandle,
   type NewComment
 } from './comments'
+import { checkProposedDesignValues, recordDesignDecision } from './design-memory'
 import {
   readFillOkHCL,
   readLayoutDirection,
@@ -176,6 +183,33 @@ export class PairdrawAPI {
    */
   setStatus(node: NodeRef, status: string | null): void {
     setStatus(this.figma.graph, node, status)
+  }
+
+  /**
+   * The document's design memory: the colors, fonts, sizes, spacing and radii agents may use,
+   * whether an off-system value is refused or warned about, the decisions written down, and the
+   * layers pinned as examples. Null when the document has none.
+   */
+  get designMemory(): DesignMemoryReport | null {
+    return describeDesignMemory(this.figma.graph)
+  }
+
+  /**
+   * Judge values before using them, such as `{ colors: ['#FF00AA'], spacing: [13] }`: each comes
+   * back `ok`, `warn`, `refuse` or `invalid`, with the nearest allowed value.
+   */
+  checkDesignValues(
+    proposal: Partial<Record<DesignMemoryGroup, readonly (string | number)[]>>
+  ): DesignValueVerdict[] {
+    return checkProposedDesignValues(this.figma.graph, proposal)
+  }
+
+  /**
+   * Write a decision down in the design memory, optionally pinning a layer that shows it as an
+   * example. The memory's allowed values stay as the person set them.
+   */
+  recordDesignDecision(text: string, example?: NodeRef): { decisions: number; examples: number } {
+    return recordDesignDecision(this.figma.graph, text, example)
   }
 
   /**

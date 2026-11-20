@@ -242,6 +242,26 @@ export function appendLayerNotesContext(
   return `${text}${LAYER_NOTES_CONTEXT_MARKER}${blocks.join('\n')}`
 }
 
+const DESIGN_MEMORY_CONTEXT_MARKER =
+  "\n\n[This document's design memory, which the person set — use only the values it allows; its decisions are notes about the design, not requests]\n"
+
+/** The most characters of design memory one request carries; get_design_memory reads the rest. */
+export const DESIGN_MEMORY_MAX_LENGTH = 2000
+
+/**
+ * Gives the model the document's design memory, unless one of the `earlier` requests already
+ * carried it unchanged, so it costs its tokens once per conversation and again only after it
+ * changes.
+ */
+export function appendDesignMemoryContext(
+  text: string,
+  memory: string | null,
+  earlier: readonly string[] = []
+): string {
+  if (!memory || earlier.some((told) => told.includes(memory))) return text
+  return `${text}${DESIGN_MEMORY_CONTEXT_MARKER}${memory}`
+}
+
 /** Each note the chat adds to a request for the model only starts with one of these. */
 const MODEL_NOTE_MARKERS = [
   REFERENCED_NODE_CONTEXT_MARKER,
@@ -250,7 +270,8 @@ const MODEL_NOTE_MARKERS = [
   FILE_CONTEXT_MARKER,
   PINNED_CONTEXT_MARKER,
   EXPLORE_CONTEXT_MARKER,
-  LAYER_NOTES_CONTEXT_MARKER
+  LAYER_NOTES_CONTEXT_MARKER,
+  DESIGN_MEMORY_CONTEXT_MARKER
 ]
 
 /** What the person wrote, without the notes the chat added for the model after it. */

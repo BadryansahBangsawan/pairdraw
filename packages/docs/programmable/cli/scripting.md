@@ -174,6 +174,9 @@ pairdraw eval design.fig -w -c '
 - `pairdraw.statuses` lists the document's statuses in order, each with `name`, `color` (`#RRGGBB`), and `figma`, the status Figma shows for it (`READY_FOR_DEV`, `COMPLETED`, or `null`).
 - `pairdraw.getStatus(node)` reads the name of the status a layer shows, or `null`, also while a section around it shows its own.
 - `pairdraw.setStatus(node, name)` sets one by name, and `null` clears it. Only sections, frames, components, component sets, and instances directly on a page or in a section take one; anything else fails with an error that says why, and an unknown name lists the statuses there are.
+- `pairdraw.designMemory` is the document's design memory, or `null`: for `colors`, `fonts`, `fontSizes`, `spacing`, and `radius`, the allowed values (its variables and styles plus values the person allowed, each with the variable's or style's `name`) and `enforce` (`refuse`, `warn`, or `off`), then `decisions` and the pinned `examples`.
+- `pairdraw.checkDesignValues({ colors, fonts, fontSizes, spacing, radius })` judges values before they are used; each comes back `ok`, `warn`, `refuse`, or `invalid`, with the `nearest` allowed value.
+- `pairdraw.recordDesignDecision(text, node?)` writes a decision down and pins `node` as an example. It never changes what the memory allows, and fails in a document without a memory.
 
 Layer features Figma's API has no member for:
 

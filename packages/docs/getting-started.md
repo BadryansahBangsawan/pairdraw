@@ -8,7 +8,7 @@ If you want to build on top of it instead of only using the default app, see the
 
 ## Download Desktop App
 
-The [download page](/download) lists the files of the latest release. Pairdraw 0.16.0 is published for macOS on Apple Silicon:
+The [download page](/download) lists the files of the latest release. Pairdraw 0.18.0 is published for macOS on Apple Silicon:
 
 | Platform              | Download                  |
 | --------------------- | ------------------------- |
@@ -16,7 +16,7 @@ The [download page](/download) lists the files of the latest release. Pairdraw 0
 
 Windows, Linux, and Intel Macs have no release build yet; build them from source as described below. The macOS build is not signed or notarized yet, so macOS blocks its first launch: right-click Pairdraw in Applications and choose **Open**, or allow it in **System Settings → Privacy & Security**. Each release lists a `SHA256SUMS` file to check downloads against.
 
-To check for a newer version of the desktop app, choose **Check for Updates…** in the **Help** menu on Windows and Linux, or in the application menu on macOS. The **About** item next to it shows the installed version. Only a release build that names an update feed checks for updates, and only when you choose the item; a build from source says updates aren't set up. Pairdraw 0.16.0 names no update feed, so install the next release from the download page by hand.
+To check for a newer version of the desktop app, choose **Check for Updates…** in the **Help** menu on Windows and Linux, or in the application menu on macOS. The **About** item next to it shows the installed version. Only a release build that names an update feed checks for updates, and only when you choose the item; a build from source says updates aren't set up. Pairdraw 0.18.0 names no update feed, so install the next release from the download page by hand.
 
 ## System Requirements
 

@@ -22,7 +22,7 @@ Il sottomenu **Copia/Incolla come** offre altri formati degli appunti per gli og
 - **Copia come testo**: copia il contenuto testuale visibile della selezione.
 - **Copia come SVG**: copia l’albero degli oggetti come markup SVG.
 - **Copia come PNG**: esegue il rendering a 2× e lo mette negli appunti di sistema (da incollare in Slack, Notion e simili).
-- **Copia come JSX**: copia la rappresentazione Pairdraw JSX da usare con `renderJsx()`.
+- **Copia come JSX**: copia la rappresentazione Pairdraw JSX da usare con `renderJSX()`.
 - **Copia come HTML**: copia un frammento HTML con stili in linea e immagini incorporate, pronto da incollare in una pagina o in un’email; funziona anche nei documenti di sola lettura.
 
 ## Esegui la nota come prompt

@@ -96,7 +96,7 @@ CLI: `pairdraw export design.fig -f jsx --style tailwind`
 
 ## Сервер MCP
 
-Claude Code, Cursor, Windsurf и другие клиенты MCP могут читать и изменять `.fig` без интерфейса. Доступно 139 инструментов и два транспорта: stdio и HTTP.
+Claude Code, Cursor, Windsurf и другие клиенты MCP читают и изменяют документ, открытый в запущенном редакторе. Доступно 139 инструментов и два транспорта: stdio и HTTP.
 
 ```sh
 npm install -g @pairdraw/mcp

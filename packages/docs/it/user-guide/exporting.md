@@ -54,7 +54,7 @@ Oltre all’esportazione su file, puoi copiare la selezione negli appunti in pi�
 - **Copia come testo**: copia il contenuto testuale visibile della selezione.
 - **Copia come SVG**: copia la selezione come markup SVG (da incollare in editor di codice, Inkscape e simili).
 - **Copia come PNG**: esegue il rendering a 2× e lo copia negli appunti (pronto da incollare in Slack, Notion e simili).
-- **Copia come JSX**: copia la rappresentazione Pairdraw JSX (compatibile con `renderJsx()`).
+- **Copia come JSX**: copia la rappresentazione Pairdraw JSX (compatibile con `renderJSX()`).
 
 ## Operazioni sui file .fig
 

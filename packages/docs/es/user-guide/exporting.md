@@ -54,7 +54,7 @@ Además de exportar a archivo, puedes copiar la selección al portapapeles en va
 - **Copiar como texto:** copia el contenido de texto visible de la selección.
 - **Copiar como SVG:** copia la selección como marcado SVG (para pegarlo en editores de código, Inkscape, etc.).
 - **Copiar como PNG:** la renderiza a 2× y la copia al portapapeles (lista para pegar en Slack, Notion, etc.).
-- **Copiar como JSX:** copia la representación Pairdraw JSX (compatible con `renderJsx()`).
+- **Copiar como JSX:** copia la representación Pairdraw JSX (compatible con `renderJSX()`).
 
 ## Operaciones con archivos `.fig`
 

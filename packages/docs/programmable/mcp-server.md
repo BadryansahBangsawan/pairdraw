@@ -524,4 +524,4 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | ------ | ---------------------------------------------------- |
 | `eval` | Execute JavaScript with full Figma Plugin API access |
 
-Note: `eval` is available over stdio, but disabled in HTTP mode for security.
+Note: `eval` is off by default over both transports; set `PAIRDRAW_MCP_EVAL=1` to expose it. The `pairdraw-connect` companion never exposes it, even with that variable set.

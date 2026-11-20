@@ -96,7 +96,7 @@ In einem vorhandenen Board wird derselbe Browser zur Recherche: Der Chat zitiert
 
 ## MCP-Server
 
-Claude Code, Cursor, Windsurf und andere MCP-Clients können `.fig`-Dateien ohne grafische Oberfläche lesen und verändern. 139 Werkzeuge. Als Übertragung stehen stdio und HTTP zur Verfügung.
+Claude Code, Cursor, Windsurf und andere MCP-Clients lesen und verändern das Dokument, das im laufenden Editor geöffnet ist. 139 Werkzeuge. Als Übertragung stehen stdio und HTTP zur Verfügung.
 
 ```sh
 npm install -g @pairdraw/mcp

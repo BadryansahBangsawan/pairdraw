@@ -9,7 +9,7 @@ Pairdraw Cloud is one Node 22+ process in front of PostgreSQL 15 or later and an
 
 ## Install
 
-Each release publishes an image, `ghcr.io/badryansahbangsawan/cloud`, with the server and the editor and pages it serves, for `linux/amd64` and `linux/arm64`. It is tagged with the version (`0.16.0`), the minor version (`0.16`), and `latest`; prereleases are tagged with their version and `next`. Give it the [configuration](#configure) through a mounted TOML file and the environment:
+Each release publishes an image, `ghcr.io/badryansahbangsawan/cloud`, with the server and the editor and pages it serves, for `linux/amd64` and `linux/arm64`. It is tagged with the version (`0.18.0`), the minor version (`0.18`), and `latest`; prereleases are tagged with their version and `next`. Give it the [configuration](#configure) through a mounted TOML file and the environment:
 
 ```sh
 docker run -p 8787:8787 \

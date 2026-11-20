@@ -22,7 +22,7 @@ El submenú **Copiar/Pegar como** ofrece formatos de portapapeles adicionales pa
 - **Copiar como texto:** copia el contenido de texto visible de la selección.
 - **Copiar como SVG:** copia el árbol de objetos como marcado SVG.
 - **Copiar como PNG:** lo renderiza a 2× y lo pone en el portapapeles del sistema (para pegarlo en Slack, Notion, etc.).
-- **Copiar como JSX:** copia la representación Pairdraw JSX para usarla con `renderJsx()`.
+- **Copiar como JSX:** copia la representación Pairdraw JSX para usarla con `renderJSX()`.
 - **Copiar como HTML:** copia un fragmento HTML con estilos en línea e imágenes incrustadas, listo para pegar en una página o un correo; también funciona en documentos de solo lectura.
 
 ## Ejecutar nota adhesiva como instrucción {#run-sticky-as-prompt}

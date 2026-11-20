@@ -9,7 +9,7 @@ You need [Node.js](https://nodejs.org/en/download), which includes `npx`.
 1. In the web app, open **Settings → Models**, choose a coding agent, and copy the `npx` command shown under its description. It names the companion at the app's version, for example:
 
    ```sh
-   npx -p @pairdraw/mcp@0.16.0 pairdraw-connect
+   npx -p @pairdraw/mcp@0.18.0 pairdraw-connect
    ```
 
 2. Run it in a terminal and keep it running while you work. It opens a link to the web app (`http://localhost:1420` unless `PAIRDRAW_CONNECT_APP_URL` names another) in your default browser and prints the same link, with six characters such as `3F9-A21`.

@@ -1,0 +1,3 @@
+- Correct the JSX copy reference to the exported `renderJSX()` name in every language.
+- State that the MCP server works with the document open in the running editor, and that `eval` is off by default over both transports rather than only HTTP.
+- Bring the documented release version to 0.18.0, including the Cloud image tags.

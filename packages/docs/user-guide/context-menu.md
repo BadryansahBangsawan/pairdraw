@@ -21,7 +21,7 @@ The **Copy/Paste as** submenu offers additional clipboard formats for the select
 - **Copy as text** — copies visible text content from the selection
 - **Copy as SVG** — copies the node tree as SVG markup
 - **Copy as PNG** — renders at 2× and places on the system clipboard (paste into Slack, Notion, etc.)
-- **Copy as JSX** — copies the Pairdraw JSX representation for use with `renderJsx()`
+- **Copy as JSX** — copies the Pairdraw JSX representation for use with `renderJSX()`
 - **Copy as HTML** — copies an HTML fragment with inline styles and images inlined, ready to paste into a page or an email; it also works in read-only documents
 
 ## Run sticky as prompt

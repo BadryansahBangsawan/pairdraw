@@ -22,7 +22,7 @@ Le sous-menu **Copier/Coller en tant que** propose d’autres formats de presse-
 - **Copier en texte** copie le contenu textuel visible de la sélection.
 - **Copier en SVG** copie l’arbre des objets sous forme de balisage SVG.
 - **Copier en PNG** effectue un rendu à 2× et le place dans le presse-papiers du système (à coller dans Slack, Notion, etc.).
-- **Copier en JSX** copie la représentation Pairdraw JSX, à utiliser avec `renderJsx()`.
+- **Copier en JSX** copie la représentation Pairdraw JSX, à utiliser avec `renderJSX()`.
 - **Copier en HTML** copie un fragment HTML avec styles en ligne et images intégrées, prêt à coller dans une page ou un courriel ; cela fonctionne aussi dans les documents en lecture seule.
 
 ## Exécuter la note comme consigne {#run-sticky-as-prompt}

@@ -54,7 +54,7 @@ In addition to file export, you can copy the selection to the clipboard in multi
 - **Copy as text** — copies visible text content from the selection
 - **Copy as SVG** — copies the selection as SVG markup (paste into code editors, Inkscape, etc.)
 - **Copy as PNG** — renders at 2× and copies to the clipboard (ready to paste into Slack, Notion, etc.)
-- **Copy as JSX** — copies the Pairdraw JSX representation (compatible with `renderJsx()`)
+- **Copy as JSX** — copies the Pairdraw JSX representation (compatible with `renderJSX()`)
 
 ## .fig File Operations
 

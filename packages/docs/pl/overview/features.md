@@ -100,7 +100,7 @@ Na istniejącej tablicy ta sama przeglądarka staje się badaniem: czat cytuje s
 
 ## Serwer MCP
 
-Claude Code, Cursor, Windsurf i inni klienci MCP mogą odczytywać i zmieniać pliki `.fig` bez interfejsu. Dostępnych jest 139 narzędzi oraz dwa transporty: stdio i HTTP.
+Claude Code, Cursor, Windsurf i inni klienci MCP odczytują i zmieniają dokument otwarty w działającym edytorze. Dostępnych jest 139 narzędzi oraz dwa transporty: stdio i HTTP.
 
 ```sh
 npm install -g @pairdraw/mcp

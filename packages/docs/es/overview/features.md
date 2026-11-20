@@ -98,7 +98,7 @@ En un tablero que ya tengas, el mismo navegador se vuelve investigación (Pairdr
 
 ## Servidor MCP
 
-Claude Code, Cursor, Windsurf y otros clientes MCP pueden leer y modificar archivos `.fig` sin interfaz con 139 herramientas. Están disponibles dos transportes: stdio y HTTP.
+Claude Code, Cursor, Windsurf y otros clientes MCP leen y modifican el documento abierto en el editor en ejecución con 139 herramientas. Están disponibles dos transportes: stdio y HTTP.
 
 ```sh
 npm install -g @pairdraw/mcp

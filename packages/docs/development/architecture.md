@@ -125,4 +125,4 @@ Preview already runs components with behaviours as live controls, and the Protot
 
 ### Code Signing
 
-Pairdraw 0.16.0 is published for macOS on Apple Silicon only, and that build is not signed or notarized. Next: a signed and notarized macOS build, and Windows releases with Authenticode signing to remove the SmartScreen warning.
+Pairdraw 0.18.0 is published for macOS on Apple Silicon only, and that build is not signed or notarized. Next: a signed and notarized macOS build, and Windows releases with Authenticode signing to remove the SmartScreen warning.

@@ -96,7 +96,7 @@ On a board you already have, the same browser becomes research: the chat quotes 
 
 ## MCP Server
 
-Connect Claude Code, Cursor, Windsurf, or any MCP client to read and write `.fig` files headlessly. 139 tools. Two transports: stdio and HTTP.
+Connect Claude Code, Cursor, Windsurf, or any MCP client to read and write the document open in the running editor. 139 tools. Two transports: stdio and HTTP.
 
 ```sh
 npm install -g @pairdraw/mcp

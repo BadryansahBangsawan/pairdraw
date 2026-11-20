@@ -22,7 +22,7 @@ Podmenu **Kopiuj/Wklej jako** udostępnia dodatkowe formaty schowka dla zaznaczo
 - **Kopiuj jako tekst** — kopiuje widoczną treść tekstową zaznaczenia.
 - **Kopiuj jako SVG** — kopiuje drzewo obiektów jako znaczniki SVG.
 - **Kopiuj jako PNG** — renderuje w skali 2× i umieszcza obraz w schowku systemowym (do wklejenia w Slacku, Notion itp.).
-- **Kopiuj jako JSX** — kopiuje reprezentację Pairdraw JSX do użycia z `renderJsx()`.
+- **Kopiuj jako JSX** — kopiuje reprezentację Pairdraw JSX do użycia z `renderJSX()`.
 - **Kopiuj jako HTML** — kopiuje fragment HTML ze stylami w atrybutach i osadzonymi obrazami, gotowy do wklejenia na stronę lub do wiadomości e-mail; działa także w dokumentach tylko do odczytu.
 
 ## Uruchom karteczkę jako polecenie {#run-sticky-as-prompt}

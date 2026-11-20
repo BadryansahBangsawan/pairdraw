@@ -146,7 +146,7 @@ When no model is set up, the chat uses Claude Code, Codex, Gemini CLI, or omp if
 
 ### MCP server
 
-Connect Claude Code, Cursor, Windsurf, or any MCP client to inspect, modify, and export design documents headlessly. [Full docs →](packages/docs/programmable/mcp-server.md)
+Connect Claude Code, Cursor, Windsurf, or any MCP client to inspect, modify, and export the document open in the running editor. [Full docs →](packages/docs/programmable/mcp-server.md)
 
 **Stdio** (Claude Code, Cursor, Windsurf):
 

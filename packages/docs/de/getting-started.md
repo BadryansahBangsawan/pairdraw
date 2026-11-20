@@ -8,7 +8,7 @@ Wenn Sie ein eigenes Produkt auf Pairdraw aufbauen möchten, lesen Sie den Berei
 
 ## Desktop-Anwendung
 
-Die [Download-Seite](/de/download) listet die Dateien der neuesten Version. Pairdraw 0.16.0 erscheint für macOS mit Apple Silicon:
+Die [Download-Seite](/de/download) listet die Dateien der neuesten Version. Pairdraw 0.18.0 erscheint für macOS mit Apple Silicon:
 
 | Plattform             | Datei                     |
 | --------------------- | ------------------------- |
@@ -16,7 +16,7 @@ Die [Download-Seite](/de/download) listet die Dateien der neuesten Version. Pair
 
 Für Windows, Linux und Intel-Macs gibt es noch keine fertige Version; erstellen Sie sie wie unten beschrieben aus dem Quellcode. Die macOS-Version ist noch nicht signiert oder notarisiert, daher blockiert macOS den ersten Start: Klicken Sie in „Programme“ mit der rechten Maustaste auf Pairdraw und wählen Sie **Öffnen**, oder erlauben Sie es unter **Systemeinstellungen → Datenschutz & Sicherheit**. Jede Version enthält eine Datei `SHA256SUMS`, mit der Sie Downloads prüfen können.
 
-Nach einer neueren Version der Desktop-Anwendung suchen Sie unter Windows und Linux im Menü **Help** mit **Check for Updates…**, unter macOS im Anwendungsmenü. Der Eintrag **About** daneben zeigt die installierte Version. Nur eine Release-Version, die einen Update-Feed nennt, sucht nach Updates, und zwar nur, wenn Sie den Eintrag wählen; eine aus dem Quellcode erstellte Version meldet, dass Updates nicht eingerichtet sind. Pairdraw 0.16.0 nennt keinen Update-Feed; installieren Sie die nächste Version daher von Hand über die Download-Seite.
+Nach einer neueren Version der Desktop-Anwendung suchen Sie unter Windows und Linux im Menü **Help** mit **Check for Updates…**, unter macOS im Anwendungsmenü. Der Eintrag **About** daneben zeigt die installierte Version. Nur eine Release-Version, die einen Update-Feed nennt, sucht nach Updates, und zwar nur, wenn Sie den Eintrag wählen; eine aus dem Quellcode erstellte Version meldet, dass Updates nicht eingerichtet sind. Pairdraw 0.18.0 nennt keinen Update-Feed; installieren Sie die nächste Version daher von Hand über die Download-Seite.
 
 ## Systemvoraussetzungen {#system-requirements}
 

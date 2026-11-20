@@ -22,7 +22,7 @@ Das Untermenü **Kopieren/Einfügen als** bietet weitere Formate für die Zwisch
 - **Als Text kopieren:** kopiert den sichtbaren Textinhalt der Auswahl.
 - **Als SVG kopieren:** kopiert den Objektbaum als SVG-Markup.
 - **Als PNG kopieren:** rendert im Maßstab 2× und legt das Bild in die Zwischenablage des Systems (zum Einfügen in Slack, Notion usw.).
-- **Als JSX kopieren:** kopiert die Pairdraw-JSX-Darstellung zur Verwendung mit `renderJsx()`.
+- **Als JSX kopieren:** kopiert die Pairdraw-JSX-Darstellung zur Verwendung mit `renderJSX()`.
 - **Als HTML kopieren:** kopiert ein HTML-Fragment mit Inline-Stilen und eingebetteten Bildern, bereit zum Einfügen in eine Seite oder E-Mail; das funktioniert auch in schreibgeschützten Dokumenten.
 
 ## Haftnotiz als Prompt ausführen {#run-sticky-as-prompt}

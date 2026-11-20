@@ -8,7 +8,7 @@ Si quieres crear un producto basado en Pairdraw en lugar de limitarte a la aplic
 
 ## Aplicación de escritorio
 
-La [página de descargas](/es/download) muestra los archivos de la última versión. Pairdraw 0.16.0 se publica para macOS con Apple Silicon:
+La [página de descargas](/es/download) muestra los archivos de la última versión. Pairdraw 0.18.0 se publica para macOS con Apple Silicon:
 
 | Plataforma            | Archivo                   |
 | --------------------- | ------------------------- |
@@ -16,7 +16,7 @@ La [página de descargas](/es/download) muestra los archivos de la última versi
 
 Windows, Linux y los Mac con Intel aún no tienen versión preparada; compílala desde el código fuente como se describe más abajo. La versión de macOS todavía no está firmada ni notarizada, así que macOS bloquea el primer inicio: haz clic derecho en Pairdraw en Aplicaciones y elige **Abrir**, o permítelo en **Ajustes del Sistema → Privacidad y seguridad**. Cada versión incluye un archivo `SHA256SUMS` para comprobar las descargas.
 
-Para buscar una versión más reciente de la aplicación de escritorio, elige **Check for Updates…** en el menú **Help** en Windows y Linux, o en el menú de la aplicación en macOS. La opción **About** de al lado muestra la versión instalada. Solo una versión publicada que indique un canal de actualizaciones busca actualizaciones, y solo cuando eliges esa opción; una versión compilada desde el código fuente indica que las actualizaciones no están configuradas. Pairdraw 0.16.0 no indica ningún canal de actualizaciones, así que instala la siguiente versión a mano desde la página de descargas.
+Para buscar una versión más reciente de la aplicación de escritorio, elige **Check for Updates…** en el menú **Help** en Windows y Linux, o en el menú de la aplicación en macOS. La opción **About** de al lado muestra la versión instalada. Solo una versión publicada que indique un canal de actualizaciones busca actualizaciones, y solo cuando eliges esa opción; una versión compilada desde el código fuente indica que las actualizaciones no están configuradas. Pairdraw 0.18.0 no indica ningún canal de actualizaciones, así que instala la siguiente versión a mano desde la página de descargas.
 
 ## Requisitos del sistema {#system-requirements}
 

@@ -8,7 +8,7 @@ Jeśli chcesz zbudować własny produkt na bazie Pairdraw, a nie tylko korzysta�
 
 ## Aplikacja na komputer
 
-[Strona pobierania](/pl/download) wymienia pliki najnowszej wersji. Pairdraw 0.16.0 jest wydany dla macOS na Apple Silicon:
+[Strona pobierania](/pl/download) wymienia pliki najnowszej wersji. Pairdraw 0.18.0 jest wydany dla macOS na Apple Silicon:
 
 | Platforma             | Plik                      |
 | --------------------- | ------------------------- |
@@ -16,7 +16,7 @@ Jeśli chcesz zbudować własny produkt na bazie Pairdraw, a nie tylko korzysta�
 
 Windows, Linux i komputery Mac z procesorem Intel nie mają jeszcze gotowej wersji; zbuduj je ze źródeł, jak opisano niżej. Wersja dla macOS nie jest jeszcze podpisana ani poświadczona notarialnie, więc macOS blokuje pierwsze uruchomienie: kliknij Pairdraw w folderze Aplikacje prawym przyciskiem i wybierz **Otwórz** albo zezwól na to w **Ustawieniach systemowych → Prywatność i ochrona**. Każda wersja zawiera plik `SHA256SUMS` do sprawdzenia pobranych plików.
 
-Aby sprawdzić, czy jest nowsza wersja aplikacji na komputer, wybierz **Check for Updates…** w menu **Help** w systemach Windows i Linux albo w menu aplikacji w macOS. Pozycja **About** obok pokazuje zainstalowaną wersję. Aktualizacje sprawdza tylko wersja wydana, która wskazuje kanał aktualizacji, i tylko wtedy, gdy wybierzesz tę pozycję; wersja zbudowana ze źródeł informuje, że aktualizacje nie są skonfigurowane. Pairdraw 0.16.0 nie wskazuje kanału aktualizacji, więc następną wersję zainstaluj ręcznie ze strony pobierania.
+Aby sprawdzić, czy jest nowsza wersja aplikacji na komputer, wybierz **Check for Updates…** w menu **Help** w systemach Windows i Linux albo w menu aplikacji w macOS. Pozycja **About** obok pokazuje zainstalowaną wersję. Aktualizacje sprawdza tylko wersja wydana, która wskazuje kanał aktualizacji, i tylko wtedy, gdy wybierzesz tę pozycję; wersja zbudowana ze źródeł informuje, że aktualizacje nie są skonfigurowane. Pairdraw 0.18.0 nie wskazuje kanału aktualizacji, więc następną wersję zainstaluj ręcznie ze strony pobierania.
 
 ## Wymagania systemowe {#system-requirements}
 

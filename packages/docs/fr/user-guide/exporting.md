@@ -54,7 +54,7 @@ En plus de l’export de fichiers, vous pouvez copier la sélection dans le pres
 - **Copier en texte** copie le contenu textuel visible de la sélection.
 - **Copier en SVG** copie la sélection sous forme de balisage SVG (à coller dans un éditeur de code, Inkscape, etc.).
 - **Copier en PNG** effectue un rendu à 2× et le copie dans le presse-papiers (prêt à coller dans Slack, Notion, etc.).
-- **Copier en JSX** copie la représentation Pairdraw JSX (compatible avec `renderJsx()`).
+- **Copier en JSX** copie la représentation Pairdraw JSX (compatible avec `renderJSX()`).
 
 ## Opérations sur les fichiers .fig
 

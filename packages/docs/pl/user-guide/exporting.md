@@ -54,7 +54,7 @@ Oprócz eksportu do pliku możesz skopiować zaznaczenie do schowka w kilku form
 - **Kopiuj jako tekst** — kopiuje widoczną treść tekstową zaznaczenia.
 - **Kopiuj jako SVG** — kopiuje zaznaczenie jako znaczniki SVG (do wklejenia w edytorach kodu, Inkscape itp.).
 - **Kopiuj jako PNG** — renderuje w skali 2× i kopiuje do schowka (gotowe do wklejenia w Slacku, Notion itp.).
-- **Kopiuj jako JSX** — kopiuje reprezentację Pairdraw JSX (zgodną z `renderJsx()`).
+- **Kopiuj jako JSX** — kopiuje reprezentację Pairdraw JSX (zgodną z `renderJSX()`).
 
 ## Dokumenty .fig i .pen
 

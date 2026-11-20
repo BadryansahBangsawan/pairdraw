@@ -54,7 +54,7 @@ Neben dem Export als Datei können Sie die Auswahl über das Kontextmenü (Recht
 - **Als Text kopieren:** kopiert den sichtbaren Textinhalt der Auswahl.
 - **Als SVG kopieren:** kopiert die Auswahl als SVG-Markup (zum Einfügen in Code-Editoren, Inkscape usw.).
 - **Als PNG kopieren:** rendert im Maßstab 2× und kopiert in die Zwischenablage (bereit zum Einfügen in Slack, Notion usw.).
-- **Als JSX kopieren:** kopiert die Pairdraw-JSX-Darstellung (kompatibel mit `renderJsx()`).
+- **Als JSX kopieren:** kopiert die Pairdraw-JSX-Darstellung (kompatibel mit `renderJSX()`).
 
 ## `.fig`-Dateien
 

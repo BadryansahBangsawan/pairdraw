@@ -1,2 +1,3 @@
 - A large `.fig` page reaches the editor from the reader worker without a second deep copy of every layer, cutting the time and memory a big page load costs.
 - Opening a `.fig` moves the file to the reader worker instead of copying it for the worker, the archive, and the recovery copy, cutting the peak memory of opening a large file; if the worker fails after taking the file, the file is read again.
+- Opening a `.fig` with many images keeps each unzipped image once instead of copying it into the document again, cutting the memory a large file needs.

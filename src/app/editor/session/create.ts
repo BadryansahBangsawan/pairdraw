@@ -8,7 +8,6 @@ import { createShaderRasterizer } from '@pairdraw/vue/canvas/surface'
 import { stopAIEditMotion } from '@/app/ai/motion'
 import { useCollabIdentity } from '@/app/collab/identity'
 import { recordPreparationOutcome } from '@/app/diagnostics'
-import { isEditorStoreInFront } from '@/app/editor/active-store'
 import { resolveFigmaClipboardImages } from '@/app/editor/clipboard/figma-images'
 import { loadFont } from '@/app/editor/fonts'
 import { appIcons } from '@/app/editor/icons/provider'
@@ -176,10 +175,7 @@ function buildEditorStore(initialGraph?: SceneGraph) {
         editor.commitPageSwitch(prepared)
         preparation.update({ phase: 'preparing-render', detail: page?.name ?? null })
         const shown = await waitForCommittedPage(
-          () =>
-            isEditorStoreInFront(store)
-              ? preparationController.waitForPresentation(preparation.id, editor.state.sceneVersion)
-              : Promise.resolve(),
+          () => preparationController.waitForPresentation(preparation.id, editor.state.sceneVersion),
           preparation,
           preparation.signal
         )

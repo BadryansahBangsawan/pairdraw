@@ -306,11 +306,16 @@ export class FigmaAPI implements NodeProxyHost {
   /** As in Figma's dynamic-page mode, a layer on a page not loaded yet loads that page. */
   async getNodeByIdAsync(id: string): Promise<FigmaNodeProxy | null> {
     const node = this.getNodeById(id)
-    if (node) return node
-    const pageId = await pageOfNode(this, id)
+    // A page asked for by id is its own holder, and one whose layers are not in yet loads first.
+    const unloadedPage = node?.type === 'CANVAS' && this.graph.getChildren(id).length === 0
+    if (node && !unloadedPage) return node
+    const pageId = node
+      ? id
+      : ((await pageOfNode(this, id)) ??
+        (this.graph.getPages().some((page) => page.id === id) ? id : null))
     if (!pageId) return null
     await loadPage(this, pageId)
-    return this.getNodeById(id)
+    return this.getNodeById(id) ?? node
   }
 
   /**

@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import { useI18n } from '@pairdraw/vue/i18n'
 
+import { createDeferred } from '@/app/runtime/deferred'
 import { toast } from '@/app/shell/ui'
 import { checkForAppUpdate } from '@/app/shell/updater/check'
 import { UPDATER_WINDOW_LABEL, UPDATER_WINDOW_URL } from '@/app/shell/updater/window'
@@ -53,6 +54,24 @@ describe('checkForAppUpdate', () => {
 
     await checkForAppUpdate({ messages })
 
+    expect(toast.toasts.value.map((entry) => entry.message)).toEqual([messages.value.upToDate])
+  })
+
+  test('shows the answer to Check for Updates asked while the launch check runs', async () => {
+    const { promise: pending, resolve: answer } = createDeferred<null>()
+    let asked = 0
+    await mockTauriIPC((cmd) => {
+      if (cmd !== 'plugin:updater|check') return null
+      asked += 1
+      return pending
+    })
+
+    const launch = checkForAppUpdate({ silent: true, messages })
+    const menu = checkForAppUpdate({ messages })
+    answer(null)
+    await Promise.all([launch, menu])
+
+    expect(asked).toBe(1)
     expect(toast.toasts.value.map((entry) => entry.message)).toEqual([messages.value.upToDate])
   })
 

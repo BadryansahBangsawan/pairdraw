@@ -6,3 +6,4 @@
 - View settings keep their check state in the desktop menu while Home hides the items.
 - On Linux, typing in a text field is no longer taken by menu shortcuts such as N or Backspace.
 - Windows fonts that list a width-named face as its own family load with the right weight and style.
+- Check for Updates reports its answer even when it joins the check the app runs at launch.

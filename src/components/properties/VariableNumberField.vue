@@ -101,6 +101,7 @@ defineOptions({ inheritAttrs: false })
       :max="max"
       :step="step"
       :units="units"
+      :round="panelNumber"
       :ui="{ root: bindingStyles.root }"
       :data-property="bindingPath"
       :aria-label="accessibleLabel"

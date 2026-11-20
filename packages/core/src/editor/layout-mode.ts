@@ -64,9 +64,14 @@ function layoutModeUpdates(
   if (mode === 'GRID' && node.layoutMode !== 'GRID') {
     applyGridDefaults(ctx, node, id, updates)
   } else if (mode === 'NONE') {
-    // Figma keeps the spacing and padding for when auto layout comes back, and drops the rest:
-    // a frame with no flow cannot wrap or align one.
+    // A frame with no flow cannot wrap, align or space one, and the format stores none of it, so
+    // the frame gives them all up rather than reopening with them dropped.
     Object.assign(updates, {
+      itemSpacing: 0,
+      paddingTop: 0,
+      paddingRight: 0,
+      paddingBottom: 0,
+      paddingLeft: 0,
       primaryAxisSizing: 'FIXED',
       counterAxisSizing: 'FIXED',
       layoutWrap: 'NO_WRAP',

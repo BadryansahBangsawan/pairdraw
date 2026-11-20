@@ -238,7 +238,12 @@ describe('removing auto layout', () => {
         height: 100,
         layoutMode: 'HORIZONTAL',
         layoutWrap: 'WRAP',
-        counterAxisAlign: 'MAX'
+        counterAxisAlign: 'MAX',
+        itemSpacing: 24,
+        paddingTop: 20,
+        paddingRight: 16,
+        paddingBottom: 12,
+        paddingLeft: 8
       })
 
       editor.setLayoutMode(frame.id, 'NONE')
@@ -248,6 +253,11 @@ describe('removing auto layout', () => {
       expect(cleared?.counterAxisAlign).toBe('MIN')
       expect(cleared?.primaryAxisSizing).toBe('FIXED')
       expect(cleared?.counterAxisSizing).toBe('FIXED')
+      expect(cleared?.itemSpacing).toBe(0)
+      expect(cleared?.paddingTop).toBe(0)
+      expect(cleared?.paddingRight).toBe(0)
+      expect(cleared?.paddingBottom).toBe(0)
+      expect(cleared?.paddingLeft).toBe(0)
     } finally {
       editor.dispose()
     }

@@ -4,7 +4,7 @@ import { defineCommand } from 'citty'
 
 import { toolChangesDocument } from '@pairdraw/core/tools'
 
-import { appTargetOptions } from '#cli/app/target'
+import { pageOptions } from '#cli/app/target'
 import { bold, dim, entity, fmtList, printError, warn, printJSON, writeStdout } from '#cli/format'
 import { documentWriteOptions } from '#cli/headless'
 import { readTextSource } from '#cli/input'
@@ -109,7 +109,7 @@ const call = defineCommand({
     },
     ...documentWriteOptions,
     ...previewOptions,
-    ...appTargetOptions,
+    ...pageOptions('current page'),
     json
   },
   async run({ args }) {

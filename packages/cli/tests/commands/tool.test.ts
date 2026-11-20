@@ -3,6 +3,7 @@ import { copyFile, mkdtemp, readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { writeFourPageFig } from '#cli-tests/helpers/fig'
 import { CLI_ENTRY, FIXTURES } from '#cli-tests/helpers/paths'
 import * as v from 'valibot'
 
@@ -30,6 +31,21 @@ async function cli(args: string[], stdin?: string) {
 }
 
 describe('tool CLI', () => {
+  test('runs a tool on the page --page-id names in a file', async () => {
+    const { path, pageIds } = await writeFourPageFig()
+    const page = await cli([
+      'tool',
+      'call',
+      'get_current_page',
+      path,
+      '--page-id',
+      pageIds[2],
+      '--json'
+    ])
+    expect(page.exitCode).toBe(0)
+    expect(JSON.parse(page.stdout)).toEqual({ id: pageIds[2], name: 'Page 3' })
+  })
+
   test('a tool that reports an error fails the call and writes nothing', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'pairdraw-tool-call-'))
     const file = join(dir, 'doc.fig')

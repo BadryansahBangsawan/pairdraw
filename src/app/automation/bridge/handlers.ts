@@ -218,7 +218,13 @@ export function createAutomationCommandHandlers(makeFigma: FigmaFactory, files?:
         keepIfChanged: provisional,
         namesNode: callNamesNode(command, callerArgs)
       },
-      (target) => handleTargetCommand(target, command, stripAutomationTargetArgs(callerArgs))
+      (target) => {
+        // A graph command such as `tree` reads the page it was asked for from its own arguments.
+        const commandArgs = commandHandlers[command]
+          ? stripAutomationTargetArgs(callerArgs)
+          : omit(callerArgs, ['document_id'])
+        return handleTargetCommand(target, command, commandArgs)
+      }
     )
   }
 

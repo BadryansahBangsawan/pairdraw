@@ -5,7 +5,7 @@ import type { ToolDef } from '@pairdraw/core/tools'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import { rpc } from '#cli/app/client'
-import { appTargetRPCArgs, type AppTargetCLIArgs } from '#cli/app/target'
+import { appPageTargetRPCArgs, type PageCLIArgs } from '#cli/app/target'
 import { writeDocumentFile } from '#cli/headless'
 import { appPreview, PREVIEW_TOOL, previewArgs, previewImage } from '#cli/session/preview'
 import { findCLITool } from '#cli/session/tools'
@@ -49,8 +49,11 @@ export async function headlessPreview(
  * Keeps `file` loaded and runs each call on the same Figma API, as `tool call` and the `diff`
  * commands run one.
  */
-export async function openHeadlessSession(file: string): Promise<ToolSession> {
-  const headless = await loadHeadlessToolDocument(file)
+export async function openHeadlessSession(
+  file: string,
+  pageArgs: PageCLIArgs = {}
+): Promise<ToolSession> {
+  const headless = await loadHeadlessToolDocument(file, pageArgs)
   const { graph } = headless
   return {
     label: basename(file),
@@ -66,8 +69,8 @@ export async function openHeadlessSession(file: string): Promise<ToolSession> {
 }
 
 /** Sends each call to the document the running app has open, or the one `target` names. */
-function openAppSession(target: AppTargetCLIArgs = {}): ToolSession {
-  const targetArgs = appTargetRPCArgs(target)
+async function openAppSession(target: PageCLIArgs = {}): Promise<ToolSession> {
+  const targetArgs = await appPageTargetRPCArgs(target)
   return {
     label: 'app',
     graph: null,
@@ -83,7 +86,7 @@ function openAppSession(target: AppTargetCLIArgs = {}): ToolSession {
 /** A headless session for `file`, or an app session when no file is given. */
 export function openToolSession(
   file: string | undefined,
-  target?: AppTargetCLIArgs
+  target: PageCLIArgs = {}
 ): Promise<ToolSession> {
-  return file ? openHeadlessSession(file) : Promise.resolve(openAppSession(target))
+  return file ? openHeadlessSession(file, target) : openAppSession(target)
 }

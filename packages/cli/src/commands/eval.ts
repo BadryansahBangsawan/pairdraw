@@ -3,24 +3,17 @@ import { format } from 'node:util'
 
 import { defineCommand } from 'citty'
 
-import { FigmaAPI, flushPendingLayout } from '@pairdraw/core/figma-api'
+import { flushPendingLayout } from '@pairdraw/core/figma-api'
 import { compileScript } from '@pairdraw/core/tools'
 
 import { isAppMode, requireFile, rpc } from '#cli/app/client'
-import { appTargetOptions, appTargetRPCArgs } from '#cli/app/target'
+import { appPageTargetRPCArgs, pageOptions } from '#cli/app/target'
 import { printError, writeStdout } from '#cli/format'
-import {
-  documentWriteOptions,
-  editDocument,
-  loadDocument,
-  measureDocumentText,
-  populateWholeDocument,
-  writeDocumentFile
-} from '#cli/headless'
+import { documentWriteOptions, editDocument, writeDocumentFile } from '#cli/headless'
 import { requireOutputDirectory } from '#cli/options'
 import { headlessPreview } from '#cli/session/open'
 import { appPreview, previewNotice, previewOptions, previewScale } from '#cli/session/preview'
-import { createHeadlessFigma } from '#cli/tool-data'
+import { createHeadlessFigma, openHeadlessFigma } from '#cli/tool-data'
 
 async function printResult(value: unknown, json: boolean) {
   if (json || !process.stdout.isTTY) {
@@ -72,7 +65,7 @@ export default defineCommand({
     stdin: { type: 'boolean', description: 'Read code from stdin' },
     ...documentWriteOptions,
     ...previewOptions,
-    ...appTargetOptions,
+    ...pageOptions('current page'),
     json: { type: 'boolean', description: 'Output as JSON' },
     quiet: { type: 'boolean', alias: 'q', description: 'Suppress output' }
   },
@@ -102,7 +95,7 @@ export default defineCommand({
     const preview = args['preview-output']
 
     if (isAppMode(args.file)) {
-      const target = appTargetRPCArgs(args)
+      const target = await appPageTargetRPCArgs(args)
       const result = await rpc('eval', { code, ...target })
       if (!args.quiet && result !== undefined && result !== null) {
         await printResult(result, !!args.json)
@@ -113,10 +106,7 @@ export default defineCommand({
     }
 
     const file = requireFile(args.file)
-    const graph = await loadDocument(file)
-    populateWholeDocument(graph)
-    await measureDocumentText(graph)
-    const figma = new FigmaAPI(graph)
+    const { graph, figma } = await openHeadlessFigma(file, args)
 
     let result: unknown
     try {

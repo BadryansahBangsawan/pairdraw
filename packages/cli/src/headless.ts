@@ -9,7 +9,12 @@ import {
   type ReadDocumentInput,
   type ReadDocumentWarning
 } from '@pairdraw/core/io'
-import { populateAllFigPages, populateFigPage } from '@pairdraw/core/io/formats/fig'
+import {
+  figThumbnailPageId,
+  pendingFigPageOfNode,
+  populateAllFigPages,
+  populateFigPage
+} from '@pairdraw/core/io/formats/fig'
 import { headlessHTMLReader } from '@pairdraw/core/io/formats/html/import'
 import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
 import { computeAllLayouts, installTextMeasurer, sizeAutoResizingText } from '@pairdraw/core/layout'
@@ -22,6 +27,7 @@ import {
   recordSceneMutations
 } from '@pairdraw/scene-graph/mutation-impact'
 
+import type { RequestedPage } from '#cli/app/target'
 import { printError, warn } from '#cli/format'
 
 export { initCanvasKit }
@@ -160,6 +166,11 @@ export async function writeDocumentFile(
       .join(', ')
     throw new Error(`Cannot write ${filePath}: its name asks for no document format (${writable})`)
   }
+  // The thumbnail draws the Cover page, which a script run on one page may not have loaded.
+  if (adapter.id === 'fig') {
+    const cover = figThumbnailPageId(graph.getPages())
+    if (cover) await loadDocumentPage(graph, cover)
+  }
   const result = await io.writeDocument(adapter.id, graph, {
     renderThumbnail: adapter.id === 'fig'
   })
@@ -174,10 +185,25 @@ export function populateDocumentPage(graph: SceneGraph, pageId: string): boolean
   return changed
 }
 
+/** Loads a page not loaded yet with the fonts its text uses, as the editor prepares a page. */
+export async function loadDocumentPage(graph: SceneGraph, pageId: string): Promise<void> {
+  if (populateDocumentPage(graph, pageId)) await prepareGraphFonts(graph, [pageId])
+}
+
 export function populateWholeDocument(graph: SceneGraph): boolean {
   const changed = populateAllFigPages(graph)
   if (changed) graph.applyDerivedLayoutDuring(() => computeAllLayouts(graph))
   return changed
+}
+
+/**
+ * Loads the page holding the layer `nodeId`, which the archive finds by the layer's record, and
+ * every page for a layer with no record of its own, such as one inside an instance.
+ */
+export async function populateNodePage(graph: SceneGraph, nodeId: string): Promise<void> {
+  const pageId = await pendingFigPageOfNode(graph, nodeId)
+  if (pageId) await loadDocumentPage(graph, pageId)
+  else if (!graph.getNode(nodeId)) populateWholeDocument(graph)
 }
 
 /** A string argument of an RPC command, such as its `page` or `format`. */
@@ -187,9 +213,22 @@ function stringArg(args: unknown, key: string): string | undefined {
   return typeof value === 'string' ? value : undefined
 }
 
-function populateRequestedPage(graph: SceneGraph, pageName?: string): void {
-  const pages = graph.getPages()
-  const page = pageName ? pages.find((candidate) => candidate.name === pageName) : pages[0]
+/** The page an RPC command's `page_id` or `page` names, as the command picks it. */
+function rpcPage(args: unknown): RequestedPage | undefined {
+  const id = stringArg(args, 'page_id')
+  if (id) return { id }
+  const name = stringArg(args, 'page')
+  return name ? { name } : undefined
+}
+
+function findPage(graph: SceneGraph, page: RequestedPage) {
+  return graph
+    .getPages()
+    .find((candidate) => ('id' in page ? candidate.id === page.id : candidate.name === page.name))
+}
+
+function populateRequestedPage(graph: SceneGraph, requested?: RequestedPage): void {
+  const page = requested ? findPage(graph, requested) : graph.getPages()[0]
   if (page) populateDocumentPage(graph, page.id)
 }
 
@@ -197,27 +236,31 @@ export function prepareDocumentForRPC(graph: SceneGraph, command: string, args?:
   if (command === 'pages' || command === 'variables') return
   // A stylesheet holds only variables, which load with the document; pages can take minutes.
   if (command === 'tokens' && stringArg(args, 'format') !== 'dtcg') return
-  if (command === 'tree') {
-    populateRequestedPage(graph, stringArg(args, 'page'))
+  if (command === 'tree' || command === 'analyze_overlaps') {
+    populateRequestedPage(graph, rpcPage(args))
     return
   }
   if (command === 'find' || command === 'query') {
-    const pageName = stringArg(args, 'page')
-    if (pageName) populateRequestedPage(graph, pageName)
+    const page = rpcPage(args)
+    if (page) populateRequestedPage(graph, page)
     else populateWholeDocument(graph)
     return
   }
   populateWholeDocument(graph)
 }
 
-export function requirePage(graph: SceneGraph, pageName?: string) {
+/** The page `--page` or `--page-id` names, or the first page without either. */
+export function requirePage(graph: SceneGraph, requested?: RequestedPage) {
   const pages = graph.getPages()
-  const page = pageName ? pages.find((p) => p.name === pageName) : pages[0]
+  const page = requested ? findPage(graph, requested) : pages[0]
   if (!page) {
-    const available = pages.map((p) => `"${p.name}"`).join(', ')
+    const label = requested && ('id' in requested ? requested.id : requested.name)
+    const available = pages
+      .map((candidate) => `"${requested && 'id' in requested ? candidate.id : candidate.name}"`)
+      .join(', ')
     printError(
-      pageName
-        ? `Page "${pageName}" not found. Available pages: ${available || 'none'}.`
+      label
+        ? `Page "${label}" not found. Available pages: ${available || 'none'}.`
         : 'Document has no pages.'
     )
     process.exit(1)

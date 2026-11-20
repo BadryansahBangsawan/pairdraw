@@ -116,6 +116,22 @@ describe('activate_document', () => {
   })
 })
 
+describe('graph commands', () => {
+  test('read the page page_id names rather than the first page', async () => {
+    const { store } = createTab()
+    const pageId = store.graph.addPage('Second').id
+    store.graph.createNode('FRAME', pageId, { name: 'On Second' })
+
+    const response = await settle(request('tree', { page_id: pageId }))
+
+    expect(response.result).toMatchObject({
+      page: { id: pageId, name: 'Second' },
+      children: [{ name: 'On Second' }]
+    })
+    expect(response.target).toMatchObject({ pageId })
+  })
+})
+
 describe('undo and redo', () => {
   test('step through automation changes and report their labels', async () => {
     const tab = createTab()

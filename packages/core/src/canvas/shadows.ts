@@ -1,13 +1,14 @@
 import type { Canvas, ImageFilter } from 'canvaskit-wasm'
 
 import type { BlendMode, ShadowEffect, SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { blurSigma } from '@pairdraw/scene-graph/geometry'
 import Matrix from '@pairdraw/scene-graph/matrix'
 
 import { nodeOrientationMatrix } from '#core/geometry'
 
 import { needsIsolatedBlendLayer, setPaintBlendMode } from './blend'
 import { makeBooleanOperationPath } from './boolean'
-import { blurSigma, renderNoiseEffects } from './effects'
+import { renderNoiseEffects } from './effects'
 import type { SkiaRenderer } from './renderer'
 import {
   castsFromOwnShape,

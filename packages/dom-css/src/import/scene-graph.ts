@@ -16,6 +16,7 @@ import {
   parseCSSShadows
 } from '@pairdraw/scene-graph/css'
 import { normalizeEffects } from '@pairdraw/scene-graph/effects'
+import { blurRadiusForSigma } from '@pairdraw/scene-graph/geometry'
 import { computeImageHash } from '@pairdraw/scene-graph/images'
 import { textLayerName } from '@pairdraw/scene-graph/node-defaults'
 
@@ -42,6 +43,16 @@ import {
 
 const DOM_CSS_PLUGIN_ID = 'pairdraw-dom-css'
 const IMAGE_SOURCE_URL_KEY = 'image-source-url'
+
+/**
+ * CSS shadows as the layer's effects, each blurred as the browser blurs it: CSS blurs a shadow
+ * by half its blur length, which the canvas draws from the radius that gives that sigma.
+ */
+function cssShadows(value: string | undefined) {
+  return parseCSSShadows(value).map((effect) =>
+    effect.type === 'SHADER' ? effect : { ...effect, radius: blurRadiusForSigma(effect.radius / 2) }
+  )
+}
 
 export interface DesignDocumentToSceneGraphOptions {
   pageName?: string
@@ -372,7 +383,7 @@ function applyElementStyle(
     setBorderWeights(node, style, strokes[0])
   }
 
-  const effects = parseCSSShadows(pickStyle(style, 'box-shadow'))
+  const effects = cssShadows(pickStyle(style, 'box-shadow'))
   if (effects.length > 0) node.effects = normalizeEffects(effects)
 
   const opacity = parseCSSNumber(pickStyle(style, 'opacity'))
@@ -412,7 +423,7 @@ function applyTextStyle(node: SceneNode, style: DesignStyleDeclaration): void {
   const opacity = parseCSSNumber(pickStyle(style, 'opacity'))
   if (opacity !== null) node.opacity = opacity
 
-  const effects = parseCSSShadows(pickStyle(style, 'text-shadow'))
+  const effects = cssShadows(pickStyle(style, 'text-shadow'))
   if (effects.length > 0) node.effects = normalizeEffects(effects)
 
   const textAlign = pickStyle(style, 'text-align')?.toUpperCase()

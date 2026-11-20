@@ -228,7 +228,8 @@ describe('@pairdraw/dom-css conversion', () => {
     // A color function in the `border` shorthand, and a shadow color after its lengths.
     expect(card.strokes[0]?.color).toEqual(parseColor(DOM_CSS_COLORS.slate200))
     expect(shadowEffectAt(card.effects).type).toBe('DROP_SHADOW')
-    expect(shadowEffectAt(card.effects).radius).toBe(24)
+    // A 24px CSS blur is a Gaussian of 12, which the canvas draws at 0.43 × radius.
+    expect(shadowEffectAt(card.effects).radius).toBeCloseTo(12 / 0.43, 6)
     expect(shadowEffectAt(card.effects).color).toEqual(parseColor(DOM_CSS_COLORS.slateShadow))
 
     const [title, description] = graph.getChildren(card.id)
@@ -499,7 +500,7 @@ describe('@pairdraw/dom-css conversion', () => {
     expect(dialog.maxWidth).toBe(420 + 2 * 24 + 2 * 1)
     expect(dialog.itemSpacing).toBe(16)
     expect(shadowEffectAt(dialog.effects).type).toBe('DROP_SHADOW')
-    expect(shadowEffectAt(dialog.effects).radius).toBe(40)
+    expect(shadowEffectAt(dialog.effects).radius).toBeCloseTo(20 / 0.43, 6)
 
     const [, , inputNode, buttonNode] = graph.getChildren(dialog.id)
     const input = expectFrame(inputNode)

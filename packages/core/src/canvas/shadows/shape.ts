@@ -1,9 +1,9 @@
 import type { Canvas, Path } from 'canvaskit-wasm'
 
 import type { BlendMode, ShadowEffect, SceneNode, Stroke } from '@pairdraw/scene-graph'
+import { blurSigma } from '@pairdraw/scene-graph/geometry'
 
 import { setPaintBlendMode } from '#core/canvas/blend'
-import { blurSigma } from '#core/canvas/effects'
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import { drawOutline, makeNodeShapePath, nodeHasRadius, withNodeOutline } from '#core/canvas/shapes'
 import { sideStrokeRRects, strokeAlignShare } from '#core/canvas/strokes/sides'

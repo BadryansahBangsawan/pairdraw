@@ -14,6 +14,7 @@ import {
   hasTrimmedShaft,
   trimArrowShafts
 } from '@pairdraw/scene-graph/arrow-caps'
+import { blurSigma } from '@pairdraw/scene-graph/geometry'
 import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import { textLinesOverflow } from '@pairdraw/scene-graph/text'
@@ -32,7 +33,7 @@ import { isOpenVectorNetwork } from '#core/vector/connectivity'
 
 import { needsIsolatedBlendLayer, setPaintBlendMode } from './blend'
 import { renderBooleanOperation } from './boolean'
-import { blurSigma, hasReducibleEffects } from './effects'
+import { hasReducibleEffects } from './effects'
 import { drawVectorMultiStyleFills, paintFills } from './fills'
 import { drawLayoutGrids } from './layout-grids'
 import { renderMaskedChildIds } from './masks'

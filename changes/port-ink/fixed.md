@@ -1,1 +1,2 @@
 - Lines space by their exact line height, landing each baseline on a whole pixel as Figma does.
+- HTML exported from a design blurs and shadows as the canvas draws them, and an imported CSS shadow keeps its blur.

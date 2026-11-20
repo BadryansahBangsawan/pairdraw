@@ -104,7 +104,8 @@ function strokeValues(props: Record<string, unknown>): StrokeValue[] {
   return [
     {
       color,
-      weight: props.strokeWidth ?? props.borderWidth,
+      weight:
+        (props.strokeWidth as number | undefined) ?? (props.borderWidth as number | undefined),
       align: props.strokeAlign as string | undefined,
       dash: props.strokeDash as number[] | undefined
     }

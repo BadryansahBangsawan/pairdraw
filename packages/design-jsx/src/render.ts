@@ -141,6 +141,23 @@ function stripHTMLComments(jsxString: string): string {
   return out
 }
 
+/** Why `value` cannot go into the layer field `key` names, or nothing when it can. */
+function valueKindWarning(
+  key: string,
+  value: unknown,
+  element: string,
+  type: TreeNode['type']
+): string | undefined {
+  // An `<svg>`'s attributes are passed to its markup as written, so a value of the wrong kind is
+  // the markup's to read: `fill="none"` and `strokeWidth="2"` are not layer fields.
+  if (type === 'svg') return undefined
+  if (SIZE_PROPS.has(key) && unreadableSize(value))
+    return `Invalid ${key} ${propValueText(value)} on <${element}> is ignored; expected a number, "hug", or "fill".`
+  if (PAINT_PROPS.has(key) && unreadablePaint(value))
+    return `Invalid ${key} ${propValueText(value)} on <${element}> is ignored; expected a colour or a paint.`
+  return undefined
+}
+
 function unsupportedPropWarnings(graph: SceneGraph, tree: TreeNode): string[] {
   const warnings: string[] = []
   collectUnsupportedPropWarnings(graph, tree, warnings)
@@ -175,16 +192,9 @@ function collectUnsupportedPropWarnings(
     // The element's schema already reported a prop it validates, in its own words; warning
     // again here would name the same value twice, as a connector's stroke once was.
     if (schema && key in schema.entries) continue
-    if (SIZE_PROPS.has(key) && unreadableSize(value)) {
-      warnings.push(
-        `Invalid ${key} ${propValueText(value)} on <${element}> is ignored; expected a number, "hug", or "fill".`
-      )
-      continue
-    }
-    if (PAINT_PROPS.has(key) && unreadablePaint(value)) {
-      warnings.push(
-        `Invalid ${key} ${propValueText(value)} on <${element}> is ignored; expected a colour or a paint.`
-      )
+    const kindWarning = valueKindWarning(key, value, element, tree.type)
+    if (kindWarning) {
+      warnings.push(kindWarning)
       continue
     }
     const values = ENUM_PROPS[key]

@@ -3,7 +3,7 @@ import { uniq } from 'es-toolkit'
 import { parseFigmaClipboard } from '@pairdraw/fig/clipboard'
 import { CommittedGraphEventError, type SceneNode } from '@pairdraw/scene-graph'
 import { attachedConnectors } from '@pairdraw/scene-graph/connectors'
-import { getAxisAlignedBoundsInParent } from '@pairdraw/scene-graph/coordinate'
+import { getAxisAlignedBoundsInParent, getNodeLocalMatrix } from '@pairdraw/scene-graph/coordinate'
 import { cycleSafeParent } from '@pairdraw/scene-graph/instances'
 import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 import { keepPastedBoundPaints, type AppliedBoundPaints } from '@pairdraw/scene-graph/variables'
@@ -261,6 +261,13 @@ export function createClipboardActions(ctx: EditorContext) {
         if (created.length === 0) return null
 
         if (replacementTargets.length > 0) {
+          // The clipboard holds each layer as drawn on its canvas, and the import keeps that as
+          // the layer's transform in the target's frame: turn it back, as the in-app paste does.
+          const copied = created.flatMap((id) => {
+            const node = ctx.graph.getNode(id)
+            return node ? [getNodeLocalMatrix(node)] : []
+          })
+          placementActions.keepCanvasTransforms(created, copied)
           replaceTargetsWithCreated(ctx, created, replacementTargets, prevSelection, operation)
         } else {
           placementActions.placeForeignPaste(created, pasteTarget, cursorPos)

@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 
 import type { SceneNode } from '@pairdraw/scene-graph'
+import { listBindingsAfterEdit } from '@pairdraw/scene-graph/variables'
 
 import { isNodeArrayMixed } from '#vue/controls/node-props/helpers'
 import { useNodeProps } from '#vue/controls/node-props/use'
@@ -13,7 +14,7 @@ import type {
   PropertyListPatchFor
 } from '#vue/primitives/PropertyList/types.ts'
 
-function moveItem<T>(items: T[], fromIndex: number, toIndex: number): T[] {
+function moveItem<T>(items: readonly T[], fromIndex: number, toIndex: number): readonly T[] {
   if (fromIndex === toIndex || fromIndex < 0 || fromIndex >= items.length) return items
   const next = [...items]
   const moved = next.splice(fromIndex, 1)[0]
@@ -54,9 +55,27 @@ export function useEditorPropertyList<K extends PropertyListKey>(propKey: K) {
     return own.length === 0 && !isMixed.value ? items.value : own
   }
 
-  /** A text's fills colour every character, as a layer's own fills do in Figma. */
-  function updateArray(node: SceneNode, value: PropertyListItemFor<K>[], label: string) {
-    editor.updateNodeWithUndo(node.id, editor.layerChanges(node.id, { [propKey]: value }), label)
+  /**
+   * A text's fills colour every character, as a layer's own fills do in Figma. `sources` gives
+   * the position each item had, or null for a new one, when the edit adds, removes, or moves
+   * items, so their bindings follow them in the same undo step.
+   */
+  function updateArray(
+    node: SceneNode,
+    value: PropertyListItemFor<K>[],
+    label: string,
+    sources?: readonly (number | null)[]
+  ) {
+    const changes: Partial<SceneNode> = { [propKey]: value }
+    if (sources) {
+      changes.boundVariables = listBindingsAfterEdit(node.boundVariables, propKey, sources)
+    }
+    editor.updateNodeWithUndo(node.id, editor.layerChanges(node.id, changes), label)
+  }
+
+  /** The positions of a list of `length` items, as `sources` for an edit that keeps them. */
+  function positions(length: number): number[] {
+    return Array.from({ length }, (_, index) => index)
   }
 
   function add(item: PropertyListItemFor<K>) {
@@ -66,8 +85,14 @@ export function useEditorPropertyList<K extends PropertyListKey>(propKey: K) {
     const apply = () => {
       for (const node of nodes) {
         const nextItem = structuredClone(item)
-        const next = isMulti.value ? [nextItem] : [...propArray(node), nextItem]
-        updateArray(node, next, label)
+        const replace = isMulti.value
+        const current = propArray(node)
+        updateArray(
+          node,
+          replace ? [nextItem] : [...current, nextItem],
+          label,
+          replace ? [null] : [...positions(current.length), null]
+        )
       }
     }
     if (nodes.length > 1) editor.undo.runBatch(label, apply)
@@ -80,10 +105,13 @@ export function useEditorPropertyList<K extends PropertyListKey>(propKey: K) {
     const label = `Remove ${propKey}`
     const apply = () => {
       for (const node of nodes) {
+        const current = propArray(node)
+        const kept = positions(current.length).filter((itemIndex) => itemIndex !== index)
         updateArray(
           node,
-          propArray(node).filter((_, itemIndex) => itemIndex !== index),
-          label
+          kept.map((itemIndex) => current[itemIndex]),
+          label,
+          kept
         )
       }
     }
@@ -146,7 +174,14 @@ export function useEditorPropertyList<K extends PropertyListKey>(propKey: K) {
     if (nodes.length === 0 || fromIndex === toIndex) return
     const apply = () => {
       for (const node of nodes) {
-        updateArray(node, moveItem(propArray(node), fromIndex, toIndex), `Reorder ${propKey}`)
+        const current = propArray(node)
+        const order = moveItem(positions(current.length), fromIndex, toIndex)
+        updateArray(
+          node,
+          order.map((itemIndex) => current[itemIndex]),
+          `Reorder ${propKey}`,
+          order
+        )
       }
     }
     if (nodes.length > 1) editor.undo.runBatch(`Reorder ${propKey}`, apply)

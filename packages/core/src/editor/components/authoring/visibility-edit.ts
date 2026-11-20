@@ -6,6 +6,10 @@ import {
   componentPropertyDefinitions,
   findComponentPropertyTargets
 } from '@pairdraw/scene-graph/components'
+import {
+  restoreAssignmentOverrideState,
+  takeAssignmentOverrideState
+} from '@pairdraw/scene-graph/instances'
 import { cloneInstanceOverrideState } from '@pairdraw/scene-graph/instances/overrides'
 
 import { refitGroupsAroundLayers } from '#core/editor/structure/group/bounds'
@@ -54,17 +58,21 @@ export function applyBoundVisibilityEdit(
     layers: layers.map((id) => [id, ctx.graph.getNode(id)?.visible ?? true] as const)
   })
   const before = snapshot()
+  const beforeAssignment = takeAssignmentOverrideState(ctx.graph, instance.id)
   applyComponentPropertyValue(ctx.graph, instance.id, definition, String(visible))
   const after = snapshot()
+  const afterAssignment = takeAssignmentOverrideState(ctx.graph, instance.id)
   // The property already had the value, as when another layer it drives was just shown.
   if (isEqual(before, after)) return true
   refitGroupsAroundLayers(ctx, layers)
-  const apply = (values: typeof before) => {
+  const apply = (values: typeof before, assignment: typeof beforeAssignment) => {
     ctx.graph.updateNode(instance.id, {
       componentPropertyAssignments: { ...values.componentPropertyAssignments },
       instanceOverrides: cloneInstanceOverrideState(values.instanceOverrides)
     })
     for (const [id, shown] of values.layers) ctx.graph.updateNode(id, { visible: shown })
+    // The edit recorded an override on the instance above this one; undo takes it back.
+    if (assignment) restoreAssignmentOverrideState(ctx.graph, assignment)
     refitGroupsAroundLayers(ctx, layers)
     ctx.runLayoutForNode(instance.id)
     ctx.requestRender()
@@ -72,8 +80,8 @@ export function applyBoundVisibilityEdit(
   ctx.runLayoutForNode(instance.id)
   ctx.undo.push({
     label: visible ? 'Show layer' : 'Hide layer',
-    forward: () => apply(after),
-    inverse: () => apply(before)
+    forward: () => apply(after, afterAssignment),
+    inverse: () => apply(before, beforeAssignment)
   })
   return true
 }

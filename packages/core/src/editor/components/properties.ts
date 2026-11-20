@@ -7,6 +7,10 @@ import {
   type ComponentPropertyTarget
 } from '@pairdraw/scene-graph/components'
 import {
+  restoreAssignmentOverrideState,
+  takeAssignmentOverrideState
+} from '@pairdraw/scene-graph/instances'
+import {
   cloneInstanceOverrideState,
   setInstanceOverride
 } from '@pairdraw/scene-graph/instances/overrides'
@@ -131,6 +135,9 @@ export function createComponentPropertyActions(
 
     const previousAssignments = { ...instance.componentPropertyAssignments }
     const previousOverrides = cloneInstanceOverrideState(instance.instanceOverrides)
+    // An assignment made through a nested instance records an override on the instance above
+    // it, so undo has to put that one back too.
+    const previousAssignmentOverride = takeAssignmentOverrideState(ctx.graph, instanceId)
 
     // A property can drive several layers; undo restores each one to what it showed.
     const assignedValue = instance.componentPropertyAssignments[propertyId]
@@ -158,6 +165,9 @@ export function createComponentPropertyActions(
             componentPropertyAssignments: previousAssignments,
             instanceOverrides: cloneInstanceOverrideState(previousOverrides)
           })
+          if (previousAssignmentOverride) {
+            restoreAssignmentOverrideState(ctx.graph, previousAssignmentOverride)
+          }
           restoredTargets.forEach((target, index) =>
             restoreTarget(live, target, previousValues[index] ?? '')
           )

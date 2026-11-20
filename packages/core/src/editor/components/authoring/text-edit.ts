@@ -6,6 +6,10 @@ import {
   componentPropertyDefinitions,
   findComponentPropertyTargets
 } from '@pairdraw/scene-graph/components'
+import {
+  restoreAssignmentOverrideState,
+  takeAssignmentOverrideState
+} from '@pairdraw/scene-graph/instances'
 import { cloneInstanceOverrideState } from '@pairdraw/scene-graph/instances/overrides'
 
 import type { EditorContext } from '#core/editor/types'
@@ -96,6 +100,7 @@ function setInstanceValue(ctx: EditorContext, node: SceneNode, propertyId: strin
     componentPropertyAssignments: { ...instance.componentPropertyAssignments },
     instanceOverrides: cloneInstanceOverrideState(instance.instanceOverrides)
   }
+  const beforeAssignment = takeAssignmentOverrideState(ctx.graph, instance.id)
   // Other layers the property drives in this instance change and resize with it, and undo with it.
   const others = findComponentPropertyTargets(ctx.graph, instance, propertyId).flatMap((target) =>
     target.node.id !== node.id && target.node.type === 'TEXT' ? [target.node] : []
@@ -112,10 +117,18 @@ function setInstanceValue(ctx: EditorContext, node: SceneNode, propertyId: strin
     componentPropertyAssignments: { ...instance.componentPropertyAssignments },
     instanceOverrides: cloneInstanceOverrideState(instance.instanceOverrides)
   }
+  const afterAssignment = takeAssignmentOverrideState(ctx.graph, instance.id)
   apply(after, othersAfter)
   ctx.undo.push({
     label: 'Edit text',
-    forward: () => apply(after, othersAfter),
-    inverse: () => apply(before, othersBefore)
+    forward: () => {
+      apply(after, othersAfter)
+      if (afterAssignment) restoreAssignmentOverrideState(ctx.graph, afterAssignment)
+    },
+    inverse: () => {
+      apply(before, othersBefore)
+      // The edit recorded an override on the instance above this one; undo takes it back.
+      if (beforeAssignment) restoreAssignmentOverrideState(ctx.graph, beforeAssignment)
+    }
   })
 }

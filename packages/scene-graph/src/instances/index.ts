@@ -22,6 +22,7 @@ import {
   createInstanceOverrideState,
   getInstanceOverride,
   hasInstanceOverride as hasNodeInstanceOverride,
+  type InstanceOverrideState,
   overriddenAssignmentId,
   REPLACED_LAYER_OVERRIDE,
   setInstanceOverride,
@@ -474,6 +475,43 @@ function overrideFieldsOf(
 }
 
 /**
+ * The instance above `instanceId` that records an assignment made through it: an assignment of a
+ * nested instance's property is an edit of the instance it sits in, not of the nested instance.
+ */
+export function assignmentOverrideOwner(
+  graph: SceneGraph,
+  instanceId: string
+): SceneNode | undefined {
+  const parentId = graph.nodes.get(instanceId)?.parentId
+  return parentId ? findInstanceAncestor(graph, parentId) : undefined
+}
+
+/** The overrides an assignment edit writes on the instance above it, for undo to restore. */
+export interface AssignmentOverrideState {
+  ownerId: string
+  overrides: InstanceOverrideState
+}
+
+export function takeAssignmentOverrideState(
+  graph: SceneGraph,
+  instanceId: string
+): AssignmentOverrideState | undefined {
+  const owner = assignmentOverrideOwner(graph, instanceId)
+  return owner
+    ? { ownerId: owner.id, overrides: cloneInstanceOverrideState(owner.instanceOverrides) }
+    : undefined
+}
+
+export function restoreAssignmentOverrideState(
+  graph: SceneGraph,
+  state: AssignmentOverrideState
+): void {
+  graph.updateNode(state.ownerId, {
+    instanceOverrides: cloneInstanceOverrideState(state.overrides)
+  })
+}
+
+/**
  * Records that an instance assigned one of its component properties, as an edit of the instance
  * above it: the assignment is made through the outer instance, so a text override of the same
  * level does not outrank it. A top-level instance has no outer instance to record it on.
@@ -484,8 +522,7 @@ export function recordAssignmentOverride(
   propertyId: string,
   value: string
 ): void {
-  const parentId = graph.nodes.get(instanceId)?.parentId
-  const outer = parentId ? findInstanceAncestor(graph, parentId) : undefined
+  const outer = assignmentOverrideOwner(graph, instanceId)
   if (!outer) return
   setInstanceOverride(
     outer.instanceOverrides,

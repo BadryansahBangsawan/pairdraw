@@ -1,6 +1,16 @@
-import { describe, expect, test } from 'bun:test'
+import { afterEach, describe, expect, test } from 'bun:test'
+
+import { expectDefined } from '#core-tests/helpers/assert'
 
 import { createEditor } from '@pairdraw/core'
+import { SkiaRenderer } from '@pairdraw/core/canvas'
+import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
+
+const cleanups: (() => void)[] = []
+
+afterEach(() => {
+  for (const cleanup of cleanups.splice(0)) cleanup()
+})
 
 function childByName(editor: ReturnType<typeof createEditor>, parentId: string, name: string) {
   return editor.graph.getChildren(parentId).find((node) => node.name === name)
@@ -182,6 +192,167 @@ describe('component property actions', () => {
     expect(nestedInstances[0].childIds.map((id) => editor.graph.getNode(id)?.name)).toEqual([
       'B shape'
     ])
+  })
+
+  test('undoing a nested assignment drops the override it recorded', () => {
+    const editor = createEditor()
+    const { graph } = editor
+    const page = editor.state.currentPageId
+    const badge = graph.createNode('COMPONENT', page, {
+      name: 'Badge',
+      componentPropertyDefinitions: [
+        { id: '30:1', name: 'Label', type: 'TEXT', defaultValue: 'Default' }
+      ]
+    })
+    graph.createNode('TEXT', badge.id, {
+      name: 'Label',
+      text: 'Default',
+      componentPropertyReferences: [{ propertyId: '30:1', field: 'TEXT' }]
+    })
+    const card = graph.createNode('COMPONENT', page, { name: 'Card' })
+    graph.createInstance(badge.id, card.id, { name: 'Badge' })
+    const instance = graph.createInstance(card.id, page, { name: 'Card' })
+    if (!instance) throw new Error('Expected card instance')
+    const nested = childByName(editor, instance.id, 'Badge')
+    if (!nested) throw new Error('Expected nested badge')
+    const definition = badge.componentPropertyDefinitions?.[0]
+    if (!definition) throw new Error('Expected the badge label property')
+
+    editor.setInstanceComponentProperty(nested.id, definition.id, 'Assigned')
+    expect(childByName(editor, nested.id, 'Label')?.text).toBe('Assigned')
+    expect(
+      instance.instanceOverrides.descendants
+        .get(nested.id)
+        ?.has(`componentPropertyAssignments/${definition.id}`)
+    ).toBe(true)
+
+    editor.undo.undo()
+    // Undo takes the override the edit recorded on the outer instance with it.
+    expect(
+      graph
+        .getNode(instance.id)
+        ?.instanceOverrides.descendants.get(nested.id)
+        ?.has(`componentPropertyAssignments/${definition.id}`) ?? false
+    ).toBe(false)
+    expect(graph.getNode(nested.id)?.componentPropertyAssignments[definition.id]).toBeUndefined()
+
+    // Redo puts both the assignment and the override the next undo has to take back.
+    editor.undo.redo()
+    expect(childByName(editor, nested.id, 'Label')?.text).toBe('Assigned')
+    expect(graph.getNode(nested.id)?.componentPropertyAssignments[definition.id]).toBe('Assigned')
+    expect(
+      graph
+        .getNode(instance.id)
+        ?.instanceOverrides.descendants.get(nested.id)
+        ?.has(`componentPropertyAssignments/${definition.id}`)
+    ).toBe(true)
+    editor.undo.undo()
+    expect(
+      graph
+        .getNode(instance.id)
+        ?.instanceOverrides.descendants.get(nested.id)
+        ?.has(`componentPropertyAssignments/${definition.id}`) ?? false
+    ).toBe(false)
+    expect(graph.getNode(nested.id)?.componentPropertyAssignments[definition.id]).toBeUndefined()
+  })
+
+  test('undoing a nested visibility edit drops the override it recorded', () => {
+    const editor = createEditor()
+    const { graph } = editor
+    const page = editor.state.currentPageId
+    const badge = graph.createNode('COMPONENT', page, {
+      name: 'Badge',
+      componentPropertyDefinitions: [
+        { id: '31:1', name: 'Shown', type: 'BOOLEAN', defaultValue: 'true' }
+      ]
+    })
+    graph.createNode('FRAME', badge.id, {
+      name: 'Dot',
+      componentPropertyReferences: [{ propertyId: '31:1', field: 'VISIBLE' }]
+    })
+    const card = graph.createNode('COMPONENT', page, { name: 'Card' })
+    graph.createInstance(badge.id, card.id, { name: 'Badge' })
+    const instance = graph.createInstance(card.id, page, { name: 'Card' })
+    if (!instance) throw new Error('Expected card instance')
+    const nested = childByName(editor, instance.id, 'Badge')
+    const dot = nested && childByName(editor, nested.id, 'Dot')
+    if (!nested || !dot) throw new Error('Expected the nested badge and its dot')
+    const recorded = () =>
+      graph
+        .getNode(instance.id)
+        ?.instanceOverrides.descendants.get(nested.id)
+        ?.has('componentPropertyAssignments/31:1') ?? false
+
+    editor.toggleNodeVisibility(dot.id)
+    expect(recorded()).toBe(true)
+    expect(graph.getNode(dot.id)?.visible).toBe(false)
+
+    editor.undo.undo()
+    expect(recorded()).toBe(false)
+    expect(graph.getNode(dot.id)?.visible).toBe(true)
+    expect(graph.getNode(nested.id)?.componentPropertyAssignments['31:1']).toBeUndefined()
+
+    editor.undo.redo()
+    expect(recorded()).toBe(true)
+    expect(graph.getNode(dot.id)?.visible).toBe(false)
+  })
+
+  test('undo and redo of a nested text edit keep its override in step', async () => {
+    const ck = await initCanvasKit()
+    const surface = expectDefined(ck.MakeSurface(200, 200), 'surface')
+    const renderer = new SkiaRenderer(ck, surface)
+    const editor = createEditor()
+    editor.setCanvasKit(ck, renderer)
+    await renderer.loadFonts()
+    cleanups.push(() => {
+      editor.dispose()
+      renderer.destroy()
+    })
+
+    const { graph } = editor
+    const page = editor.state.currentPageId
+    const badge = graph.createNode('COMPONENT', page, {
+      name: 'Badge',
+      componentPropertyDefinitions: [
+        { id: '32:1', name: 'Label', type: 'TEXT', defaultValue: 'Default' }
+      ]
+    })
+    graph.createNode('TEXT', badge.id, {
+      name: 'Label',
+      text: 'Default',
+      componentPropertyReferences: [{ propertyId: '32:1', field: 'TEXT' }]
+    })
+    const card = graph.createNode('COMPONENT', page, { name: 'Card' })
+    graph.createInstance(badge.id, card.id, { name: 'Badge' })
+    const instance = graph.createInstance(card.id, page, { name: 'Card' })
+    if (!instance) throw new Error('Expected card instance')
+    const nested = childByName(editor, instance.id, 'Badge')
+    const label = nested && childByName(editor, nested.id, 'Label')
+    if (!nested || !label) throw new Error('Expected the nested badge label')
+    const recorded = () =>
+      graph
+        .getNode(instance.id)
+        ?.instanceOverrides.descendants.get(nested.id)
+        ?.has('componentPropertyAssignments/32:1') ?? false
+
+    editor.startTextEditing(label.id)
+    const state = expectDefined(editor.textEditor?.state, 'text editor state')
+    state.text = 'Typed'
+    editor.commitTextEdit()
+    expect(graph.getNode(label.id)?.text).toBe('Typed')
+    expect(recorded()).toBe(true)
+
+    editor.undo.undo()
+    expect(graph.getNode(label.id)?.text).toBe('Default')
+    expect(recorded()).toBe(false)
+    expect(graph.getNode(nested.id)?.componentPropertyAssignments['32:1']).toBeUndefined()
+
+    // Redo puts the override back, so the undo after it takes it away again.
+    editor.undo.redo()
+    expect(graph.getNode(label.id)?.text).toBe('Typed')
+    expect(recorded()).toBe(true)
+    editor.undo.undo()
+    expect(recorded()).toBe(false)
   })
 
   test('reapplies non-variant assignments after variant swaps and undo', () => {

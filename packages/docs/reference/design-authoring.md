@@ -28,7 +28,7 @@ This reference describes scene creation, not React DOM output. Use the `render` 
 - `rounded` and `roundedTL`/`roundedTR`/`roundedBL`/`roundedBR` control corners. `strokeWidth`, `opacity`, `rotate`, and `blendMode` control appearance. `overflow="hidden"` clips content; do not hide accidental text overflow to make a broken layout appear correct.
 - `rotate` turns a layer by degrees, and `flipX` and `flipY` reflect it across its centre before it turns, as the canvas places it. `Star` takes `points` and `innerRadius` (0–1, how deep its points go); `Polygon` takes `points`. `Ellipse` draws an arc or a donut with `startAngle` and `endAngle` in degrees, clockwise from three o'clock (0 to 360 by default), and `innerRadius` (0–1, the hole): `<Ellipse w={80} h={80} startAngle={0} endAngle={270} innerRadius={0.6} />`.
 - `effects` accepts structured effects such as `dropShadow`, `innerShadow`, and `layerBlur`. `shadow` takes a CSS `box-shadow` list, such as `shadow="0 4 8 #0002, inset 0 1 0 #fff"`, and `blur` a layer blur radius; both are convenient shorthands. Effect helpers take `radius`, as Figma's effects do; when a JSX string is rendered, an option a paint or effect helper does not support is reported as a warning. A raw shadow needs an effect type, a numeric radius, and a color. A raw blur needs an effect type and a numeric radius, and a missing color is transparent. A shader needs `source`. Anything else is an error that names the prop.
-- Text content belongs inside `Text`. Use `size`, `font`, `weight`, `italic`, `lineHeight`, `letterSpacing`, `textAlign`, `textAlignVertical`, `textDecoration`, and `textCase`. Decorations take CSS's names and values: `textDecorationStyle` (`solid`, `dotted`, `wavy`), `textDecorationColor` (`currentColor` follows the text), `textDecorationThickness` and `textUnderlineOffset` (pixels or `auto`), and `textDecorationSkipInk`. `fontFeatures` turns OpenType features on or off by tag (`fontFeatures={{ tnum: true, liga: false }}`), `fontVariations` sets variable-font axes by tag (`fontVariations={{ wght: 650 }}`), and `lang` names the text's language (`lang="de"`) for shaping and font fallback. A variable font's optical size follows the font size unless `fontOpticalSizing="none"`, as in CSS; only then does an `opsz` in `fontVariations` apply. `lineHeight="auto"` follows the font, and `fills={[]}` paints no text. Verify fonts actually load before judging dimensions; do not assume every font is available.
+- Text content belongs inside `Text`. Use `size`, `font`, `weight`, `italic`, `lineHeight`, `letterSpacing`, `textAlign`, `textAlignVertical`, `textDecoration` (`underline` or `strikethrough`), and `textCase` (`original`, `upper`, `lower`, `title`). Decoration details take CSS's names and values: `textDecorationStyle` (`solid`, `dotted`, `wavy`), `textDecorationColor` (`currentColor` follows the text), `textDecorationThickness` and `textUnderlineOffset` (pixels or `auto`), and `textDecorationSkipInk`. `fontFeatures` turns OpenType features on or off by tag (`fontFeatures={{ tnum: true, liga: false }}`), `fontVariations` sets variable-font axes by tag (`fontVariations={{ wght: 650 }}`), and `lang` names the text's language (`lang="de"`) for shaping and font fallback. A variable font's optical size follows the font size unless `fontOpticalSizing="none"`, as in CSS; only then does an `opsz` in `fontVariations` apply. `lineHeight="auto"` follows the font, and `fills={[]}` paints no text. Verify fonts actually load before judging dimensions; do not assume every font is available.
 - `Span` styles some characters of a `Text` with `Text`'s own prop names: `size`, `font`, `weight`, `italic`, `color`, `fills`, `lineHeight`, `letterSpacing`, `textDecoration`, the decoration details, `fontFeatures`, `fontVariations`, `lang`, and `textCase`; a span's `fontFeatures` and `fontVariations` replace the text's rather than adding to them, and `fontOpticalSizing` is set on the `Text` for all of it. `href` links its characters to a URL without changing how they look. Spans nest; the inner one wins. `Paragraph` writes one paragraph: `list="ordered"` or `list="unordered"` makes it a list item nested at `level` 1–5, and `spacing`, `listSpacing`, and `indent` override the `Text`'s `paragraphSpacing`, `listSpacing`, and `paragraphIndent` for it; `hangingList` on the `Text` hangs list markers outside the text box. A `Text` holds only `Paragraph`s or none; without them, a line break in its text still starts a paragraph.
 - `Icon` uses an Iconify name, size, and color. Prefer icons to emoji when reliable vector output is needed. Image fills belong on appropriate leaf shapes, not containers whose children must remain visible.
 - Pick artwork by where it comes from. A known icon is an `Icon` by its Iconify name. A shape you draw yourself is a `Vector` with its path in SVG syntax, `<Vector d="M11 2L4 11h5l-1 7 7-9h-5z" bg={designVar(…)} />`: one layer, styled with the same props as any other, so its fills can use variables, stack, and take `strokeAlign` and `effects`. `fillRule="evenodd"` cuts holes. An open path with a `stroke` stays open, a line; with only a `bg` it fills as if closed. Given `w` and `h`, the path is drawn in that box as written, as an icon is in its view box; without them the layer fits the path. `paths` takes several paths as export writes them, each `{ windingRule, data }` with `NONZERO`, `EVENODD`, or `NONE` for an open path: `paths={[{ windingRule: "EVENODD", data: "M0 0L10 0L10 10Z" }]}`. Inline `<svg>` is for artwork copied from elsewhere: it draws the SVG's shapes, a frame with a layer per shape in the SVG's own colours, and leaves out its text, so do not use it for a shape you will style or bind, nor for text.
@@ -84,35 +84,87 @@ The examples below are executed by the authoring-reference tests. Create the nam
 
 ```jsx
 <Frame name="Review note" w={280} h="hug" flex="col" gap={8} p={16} bg="#FFFFFF">
-<Text name="Author" size={12} weight="medium" color="#252A31">June Lee</Text>
-<Text name="Message" w="fill" size={12} color="#6B7079">Give the date a little more room at the bottom.</Text>
+  <Text name="Author" size={12} weight="medium" color="#252A31">
+    June Lee
+  </Text>
+  <Text name="Message" w="fill" size={12} color="#6B7079">
+    Give the date a little more room at the bottom.
+  </Text>
 </Frame>
 ```
 
 ## Variable-bound spacing and typography
 
 ```jsx
-<Frame name="Bound note" w={280} h="hug" flex="col" gap={designVar('Space/small')} p={designVar('Space/medium')} bg="#FFFFFF">
-<Text name="Message" w="fill" size={designVar('Type/body')} lineHeight={designVar('Type/body-leading')} letterSpacing={designVar('Type/body-tracking')} color="#252A31">A note that grows with its content.</Text>
+<Frame
+  name="Bound note"
+  w={280}
+  h="hug"
+  flex="col"
+  gap={designVar('Space/small')}
+  p={designVar('Space/medium')}
+  bg="#FFFFFF"
+>
+  <Text
+    name="Message"
+    w="fill"
+    size={designVar('Type/body')}
+    lineHeight={designVar('Type/body-leading')}
+    letterSpacing={designVar('Type/body-tracking')}
+    color="#252A31"
+  >
+    A note that grows with its content.
+  </Text>
 </Frame>
 ```
 
 ## A theme with two modes
 
 ```jsx
-const theme = defineVars('Theme', { Surface: '#FFFFFF', Ink: '#252A31', Radius: 12 }, { mode: 'Light' })
+const theme = defineVars(
+  'Theme',
+  { Surface: '#FFFFFF', Ink: '#252A31', Radius: 12 },
+  { mode: 'Light' }
+)
 const dark = defineMode(theme, 'Dark', { Surface: '#1A1A20', Ink: '#F5F5F7' })
-return <Frame name="Dark note" mode={dark} w={280} h="hug" flex="col" gap={8} p={16} bg={theme.Surface} rounded={theme.Radius}>
-<Text name="Message" w="fill" size={12} color={theme.Ink}>Shown in the Dark mode of the Theme collection.</Text>
-</Frame>
+return (
+  <Frame
+    name="Dark note"
+    mode={dark}
+    w={280}
+    h="hug"
+    flex="col"
+    gap={8}
+    p={16}
+    bg={theme.Surface}
+    rounded={theme.Radius}
+  >
+    <Text name="Message" w="fill" size={12} color={theme.Ink}>
+      Shown in the Dark mode of the Theme collection.
+    </Text>
+  </Frame>
+)
 ```
 
 ## Component with text and visibility properties
 
 ```jsx
 <Component name="Comment" w={280} h="hug" flex="col" gap={8} p={16} bg="#FFFFFF">
-<Text name="Author" size={12} weight="medium" color="#252A31" text={property('Author', 'June Lee')} />
-<Text name="Message" w="fill" size={12} color="#6B7079" text={property('Message', 'Give the date more room.')} visible={property('Show message', true)} />
+  <Text
+    name="Author"
+    size={12}
+    weight="medium"
+    color="#252A31"
+    text={property('Author', 'June Lee')}
+  />
+  <Text
+    name="Message"
+    w="fill"
+    size={12}
+    color="#6B7079"
+    text={property('Message', 'Give the date more room.')}
+    visible={property('Show message', true)}
+  />
 </Component>
 ```
 
@@ -120,12 +172,26 @@ return <Frame name="Dark note" mode={dark} w={280} h="hug" flex="col" gap={8} p=
 
 ```jsx
 <Frame name="Release notes" w={280} h="hug" flex="col" gap={8} p={16} bg="#FFFFFF">
-<Text name="Notes" w="fill" size={12} color="#252A31" paragraphSpacing={4}>
-  <Paragraph spacing={8}>Version 2 is <Span weight="bold" color="#3B6CF6" textDecoration="underline" textDecorationStyle="wavy" textUnderlineOffset={2}>out now</Span>.</Paragraph>
-  <Paragraph list="unordered">Faster export</Paragraph>
-  <Paragraph list="unordered" level={2}>PDF and SVG</Paragraph>
-  <Paragraph list="ordered">Fewer clicks</Paragraph>
-</Text>
+  <Text name="Notes" w="fill" size={12} color="#252A31" paragraphSpacing={4}>
+    <Paragraph spacing={8}>
+      Version 2 is{' '}
+      <Span
+        weight="bold"
+        color="#3B6CF6"
+        textDecoration="underline"
+        textDecorationStyle="wavy"
+        textUnderlineOffset={2}
+      >
+        out now
+      </Span>
+      .
+    </Paragraph>
+    <Paragraph list="unordered">Faster export</Paragraph>
+    <Paragraph list="unordered" level={2}>
+      PDF and SVG
+    </Paragraph>
+    <Paragraph list="ordered">Fewer clicks</Paragraph>
+  </Text>
 </Frame>
 ```
 

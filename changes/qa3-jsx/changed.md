@@ -1,0 +1,1 @@
+- Name the `textDecoration` and `textCase` values in the authoring reference; decoration details, not the property itself, take CSS names.

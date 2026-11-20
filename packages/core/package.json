@@ -114,6 +114,11 @@
       "import": "./dist/library/index.js",
       "default": "./dist/library/index.js"
     },
+    "./design-memory": {
+      "types": "./dist/design-memory/index.d.ts",
+      "import": "./dist/design-memory/index.js",
+      "default": "./dist/design-memory/index.js"
+    },
     "./lint": {
       "types": "./dist/lint/index.d.ts",
       "import": "./dist/lint/index.js",

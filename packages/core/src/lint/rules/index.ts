@@ -22,6 +22,7 @@ import type { Rule } from '#core/lint/types'
 import colorContrast from './color-contrast'
 import consistentRadius from './consistent-radius'
 import consistentSpacing from './consistent-spacing'
+import { designMemoryRules } from './design-memory'
 import effectStyleRequired from './effect-style-required'
 import minTextSize from './min-text-size'
 import noDeeplyNested from './no-deeply-nested'
@@ -56,5 +57,6 @@ export const allRules: Record<string, Rule> = {
   'no-groups': noGroups,
   'effect-style-required': effectStyleRequired,
   'no-mixed-styles': noMixedStyles,
-  'no-detached-instances': noDetachedInstances
+  'no-detached-instances': noDetachedInstances,
+  ...designMemoryRules
 }

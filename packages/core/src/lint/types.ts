@@ -1,5 +1,7 @@
 import type { SharedStyleKind } from '@pairdraw/scene-graph'
 
+import type { DesignRules, DesignViolation } from '#core/design-memory'
+
 export type Severity = 'error' | 'warning' | 'info' | 'off'
 
 export type Category =
@@ -10,6 +12,7 @@ export type Category =
   | 'components'
   | 'design-tokens'
   | 'typography'
+  | 'design-memory'
 
 export interface RuleMeta {
   id: string
@@ -159,10 +162,19 @@ export type TokenNumberField =
   | 'paddingLeft'
   | 'fontSize'
 
+/** The document's design memory, for the rules that check layers against it. */
+export interface LintDesignMemory {
+  rules: DesignRules
+  /** The values on the layer that break the memory. */
+  violations(node: LintNode): readonly DesignViolation[]
+}
+
 export interface RuleContext {
   variables: LintVariables
   /** Whether `id`, a layer's style link, names a shared style of that kind in the document. */
   isSharedStyle(kind: SharedStyleKind, id: string | null): boolean
+  /** Absent or null when the document has no design memory. */
+  design?: LintDesignMemory | null
   report(issue: {
     node: LintNode
     message: string
@@ -170,6 +182,8 @@ export interface RuleContext {
     data?: LintMessageData
     fix?: LintFix
     suggestions?: LintFix[]
+    /** A milder severity for this finding than the rule's, never a harsher one. */
+    severity?: Exclude<Severity, 'off' | 'error'>
   }): void
   getConfig(): unknown
   getParent(node: LintNode): LintNode | null

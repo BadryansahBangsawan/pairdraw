@@ -5,6 +5,7 @@ import { behaviourSchema } from '../behaviours/schema'
 import { browserNodeSchema } from '../browser-node/schema'
 import type { OkHCLPayload } from '../color/okhcl'
 import { commentThreadsSchema } from '../comments/schema'
+import { designMemorySchema } from '../design-memory/schema'
 import { clampExportQuality, isExportFormatId, type ExportFormatId } from '../export-format'
 import { clampExportScale } from '../export-scale'
 import { FIG_COMPRESSIONS } from '../fig-compression'
@@ -252,6 +253,8 @@ export const PAIRDRAW_PLUGIN_DATA = {
   statuses: jsonPluginDataField('statuses', 'bookkeeping', statusWorkflowSchema),
   /** The code the document's variables are linked to, on the DOCUMENT node. */
   tokenSources: jsonPluginDataField('tokenSources', 'bookkeeping', tokenSourcesSchema),
+  /** The design rules agents follow in the document, on the DOCUMENT node. */
+  designMemory: jsonPluginDataField('designMemory', 'bookkeeping', designMemorySchema),
   /** How tightly the document's `.fig` data is compressed, on the DOCUMENT node. */
   figCompression: textPluginDataField('figCompression', 'bookkeeping', FIG_COMPRESSIONS),
   /** A layer's status, any state of the workflow; Figma's `sectionStatusInfo` knows only two. */

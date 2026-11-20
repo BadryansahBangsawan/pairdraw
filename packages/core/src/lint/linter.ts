@@ -4,11 +4,16 @@ import { variableNamespace } from '@pairdraw/dom-css/export'
 import type { SceneGraph, SceneNode, SharedStyleType } from '@pairdraw/scene-graph'
 import { colorToHex } from '@pairdraw/scene-graph/color'
 import { sharedStyleLayers, sharedStyleTypeForKind } from '@pairdraw/scene-graph/shared-styles'
+import { cachedDesignMemory, DESIGN_MEMORY_GROUPS } from '@pairdraw/scene-graph/design-memory'
+
+import { currentDesignRules, designViolations, type DesignViolation } from '#core/design-memory'
 
 import { presets } from './presets'
 import { allRules } from './rules'
+import { DESIGN_MEMORY_RULE_IDS, designMemoryRules } from './rules/design-memory'
 import type {
   LintConfig,
+  LintDesignMemory,
   LintVariables,
   LintMessage,
   LintNode,
@@ -31,6 +36,11 @@ function effectiveTextStyles(node: SceneNode): { fontSize: number; fontWeight: n
   return covered < node.text.length || runs.length === 0 ? [base, ...runs] : runs
 }
 
+type RuleSettings = { severity: Severity; options?: Record<string, unknown> }
+
+/** How mild each reported severity is, so a finding can only soften its rule's. */
+const SEVERITY_RANK: Record<Exclude<Severity, 'off'>, number> = { error: 0, warning: 1, info: 2 }
+
 /** A preset's rules, refusing a name no preset has so a typo cannot silently disable linting. */
 function presetRules(id: string) {
   if (!Object.hasOwn(presets, id)) {
@@ -42,7 +52,7 @@ function presetRules(id: string) {
 
 export class Linter {
   private rules = new Map<string, Rule>()
-  private ruleConfigs = new Map<string, { severity: Severity; options?: Record<string, unknown> }>()
+  private ruleConfigs = new Map<string, RuleSettings | undefined>()
   private messages: LintMessage[] = []
   private graph: SceneGraph | null = null
   /** The enabled rules with their contexts, made once per run rather than once per layer. */
@@ -54,6 +64,11 @@ export class Linter {
     numbersByField: new Map()
   }
   private sharedStyleTypes: ReadonlyMap<string, SharedStyleType> = new Map()
+  private design: LintDesignMemory | null = null
+  /** Rules the configuration names, which a document's design memory does not override. */
+  private configured = new Set<string>()
+  /** The only rules to run, when the caller named them. */
+  private only: ReadonlySet<string> | null = null
 
   constructor(options: { config?: LintConfig; preset?: string; rules?: string[] } = {}) {
     let baseConfig: Record<
@@ -68,6 +83,8 @@ export class Linter {
       for (const id of ids) baseConfig = { ...baseConfig, ...presetRules(id) }
     }
     if (options.config?.rules) baseConfig = { ...baseConfig, ...options.config.rules }
+    this.configured = new Set(Object.keys(options.config?.rules ?? {}))
+    this.only = options.rules ? new Set(options.rules) : null
     const rulesToLoad = options.rules ?? Object.keys(baseConfig)
     for (const ruleId of rulesToLoad) {
       if (!Object.hasOwn(allRules, ruleId)) throw new Error(`Unknown lint rule "${ruleId}"`)
@@ -86,11 +103,13 @@ export class Linter {
     this.graph = graph
     this.variables = describeVariables(graph)
     this.sharedStyleTypes = sharedStyleTypes(graph)
+    this.design = this.describeDesign(graph)
     this.checks = this.ruleChecks()
     const roots = rootIds && rootIds.length > 0 ? rootIds : graph.getPages().map((p) => p.id)
     for (const id of outermostRoots(graph, roots)) this.lintNode(id, undefined)
     this.graph = null
     this.checks = []
+    this.design = null
     return {
       messages: this.messages,
       errorCount: this.messages.filter((m) => m.severity === 'error').length,
@@ -177,11 +196,61 @@ export class Linter {
     }
   }
 
+  /**
+   * The document's design memory, which its own rules check layers against. A memory's group
+   * replaces the generic scale rule for the same values.
+   */
+  private describeDesign(graph: SceneGraph): LintDesignMemory | null {
+    const memory = cachedDesignMemory(graph)
+    if (!memory) return null
+    const rules = currentDesignRules(graph, memory)
+    const found = new Map<string, readonly DesignViolation[]>()
+    return {
+      rules,
+      violations: (node) => {
+        const cached = found.get(node.id)
+        if (cached) return cached
+        const raw = graph.getNode(node.id)
+        const violations = raw ? designViolations(rules, raw) : []
+        found.set(node.id, violations)
+        return violations
+      }
+    }
+  }
+
+  /** The rules this run checks with their settings: the configured ones and the memory's. */
+  private activeRules(): [string, Rule, RuleSettings][] {
+    const active: [string, Rule, RuleSettings][] = []
+    const rules = this.design?.rules
+    const superseded = new Set<string>()
+    if (rules && rules.spacing.enforce !== 'off') superseded.add('consistent-spacing')
+    if (rules && rules.radius.enforce !== 'off') superseded.add('consistent-radius')
+    for (const [ruleId, rule] of this.rules) {
+      if (ruleId in designMemoryRules && !rules) continue
+      if (superseded.has(ruleId) && !this.configured.has(ruleId)) continue
+      const config = this.ruleConfigs.get(ruleId)
+      if (config) active.push([ruleId, rule, config])
+    }
+    if (!rules) return active
+    for (const group of DESIGN_MEMORY_GROUPS) {
+      const ruleId = DESIGN_MEMORY_RULE_IDS[group]
+      if (this.ruleConfigs.get(ruleId) || this.configured.has(ruleId)) continue
+      if (this.only && !this.only.has(ruleId)) continue
+      const enforce = rules[group].enforce
+      if (enforce === 'off') continue
+      active.push([
+        ruleId,
+        designMemoryRules[ruleId],
+        { severity: enforce === 'refuse' ? 'error' : 'warning' }
+      ])
+    }
+    return active
+  }
+
   private ruleChecks(): { rule: Rule; context: RuleContext }[] {
     const checks: { rule: Rule; context: RuleContext }[] = []
-    for (const [ruleId, rule] of this.rules) {
-      const config = this.ruleConfigs.get(ruleId)
-      if (!config || config.severity === 'off') continue
+    for (const [ruleId, rule, config] of this.activeRules()) {
+      if (config.severity === 'off') continue
       const severity = config.severity
       checks.push({
         rule,
@@ -189,10 +258,12 @@ export class Linter {
           variables: this.variables,
           isSharedStyle: (kind, id) =>
             id !== null && this.sharedStyleTypes.get(id) === sharedStyleTypeForKind(kind),
-          report: ({ node, message, suggest, data, fix, suggestions }) => {
+          design: this.design,
+          report: ({ node, message, suggest, data, fix, suggestions, severity: milder }) => {
             this.messages.push({
               ruleId,
-              severity,
+              severity:
+                milder && SEVERITY_RANK[milder] > SEVERITY_RANK[severity] ? milder : severity,
               message,
               nodeId: node.id,
               nodeName: node.name,

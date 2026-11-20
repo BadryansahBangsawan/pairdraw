@@ -122,6 +122,12 @@
       "import": "./dist/css/index.js",
       "default": "./dist/css/index.js"
     },
+    "./design-memory": {
+      "types": "./dist/design-memory/index.d.ts",
+      "bun": "./src/design-memory/index.ts",
+      "import": "./dist/design-memory/index.js",
+      "default": "./dist/design-memory/index.js"
+    },
     "./effects": {
       "types": "./dist/effects.d.ts",
       "bun": "./src/effects.ts",

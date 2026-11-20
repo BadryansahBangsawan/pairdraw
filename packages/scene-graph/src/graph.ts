@@ -865,6 +865,12 @@ export class SceneGraph {
     }
 
     if (node.type === 'INSTANCE' && node.componentId) this.unindexInstance(node.componentId, id)
+    // An override names a layer of its instance: one left naming a deleted layer would be written
+    // as a claim for nothing, and reopening would restore a layer the document no longer has.
+    for (let owner = node.parentId ? this.nodes.get(node.parentId) : undefined; owner;) {
+      if (owner.type === 'INSTANCE') owner.instanceOverrides.descendants.delete(id)
+      owner = owner.parentId ? this.nodes.get(owner.parentId) : undefined
+    }
     this.connectorIds.delete(id)
     this.nodes.delete(id)
     this.emitter.emit('node:deleted', id, node.parentId)

@@ -8,6 +8,7 @@ import type {
 } from '@pairdraw/scene-graph'
 import { normalizeEffects } from '@pairdraw/scene-graph/effects'
 import { CORNER_FIELDS } from '@pairdraw/scene-graph/fields'
+import type { FontFamilyStyle } from '@pairdraw/scene-graph/font-style'
 import { fillSizingFields } from '@pairdraw/scene-graph/layout'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
@@ -58,6 +59,8 @@ export interface Build {
   /** Shader files the document's paints and effects name, by URL, as their source. */
   shaders: PenShaderSources | undefined
   icons: PenIconSource | undefined
+  /** The family and style of each font the document bundles, by the name its text gives it. */
+  fonts: ReadonlyMap<string, FontFamilyStyle>
   /** Reusable nodes by their pen.dev ID. */
   components: Map<string, PenNode>
   /** The pen.dev fields each layer was built from, its instance's and overrides' merged in. */
@@ -329,7 +332,7 @@ export function applyPenProperties(node: SceneNode, pen: PenNode, build: Build):
   applyPadding(node, pen.padding, ctx)
 
   // Text without a width resizes to its content, which laying out the document measures.
-  if (isTextLike) applyTextProps(node, pen, ctx)
+  if (isTextLike) applyTextProps(node, pen, ctx, build.fonts)
 
   if (pen.type === 'icon') drawIconLayer(node, pen, build)
   if (pen.type === 'ellipse') node.arcData = ellipseArc(pen, ctx)

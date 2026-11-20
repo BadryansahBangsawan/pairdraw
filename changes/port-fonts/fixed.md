@@ -2,3 +2,4 @@
 - Text without style runs wraps and outlines in the face it is drawn in, at its weight, letter spacing, and variable-font axes, instead of the browser's default font.
 - Paragraphs built from one font provider share one font collection, so a document of many CJK texts no longer copies a variable font's instance per paragraph and fills the heap while opening.
 - The Typography and Fill sections show the style a text's characters are drawn in and style every character when changed, as Figma's node setters do, so a range no longer hides a new size or colour; font-axis edits keep the other axes a range sets.
+- A `.pen` document's bundled fonts are read, so its text draws in them instead of being substituted, and `.fig` exports name the real family and style, such as Geist SemiBold.

@@ -16,16 +16,18 @@ import { defaultIcons, drawIcon, type IconData, type IconProvider } from '#core/
 import type { IOFormatAdapter, ReadDocumentInput } from '#core/io/types'
 import { layoutAuthoredNodes } from '#core/layout'
 
+import { loadPenFonts } from './fonts'
 import { loadPenImports, readImportedImage, UnresolvedImports, type OpenedImport } from './imports'
 
 /** The size icons are fetched at; each is scaled to the box it is drawn in. */
 const PEN_ICON_SIZE = 24
 
 /**
- * An image's bytes: a data URL decoded by the platform's own URL handling, an imported document's
- * file beside that document, and any other file through the host; null when that fails.
+ * A file's bytes, such as an image's or a font's: a data URL decoded by the platform's own URL
+ * handling, an imported document's file beside that document, and any other file through the
+ * host; null when that fails.
  */
-async function loadPenImage(
+async function loadPenFile(
   url: string,
   input: ReadDocumentInput,
   opened: ReadonlyMap<string, OpenedImport>
@@ -52,7 +54,7 @@ async function loadPenShaders(
   const shaders = new Map<string, string>()
   await Promise.all(
     urls.map(async (url) => {
-      const bytes = await loadPenImage(url, input, opened)
+      const bytes = await loadPenFile(url, input, opened)
       if (bytes) shaders.set(url, new TextDecoder().decode(bytes))
     })
   )
@@ -67,7 +69,7 @@ async function loadPenImages(
   const images = new Map<string, Uint8Array>()
   await Promise.all(
     urls.map(async (url) => {
-      const bytes = await loadPenImage(url, input, opened)
+      const bytes = await loadPenFile(url, input, opened)
       if (bytes) images.set(url, bytes)
     })
   )
@@ -129,10 +131,11 @@ export const penFormat: IOFormatAdapter<'pen'> = {
     const unresolved = new UnresolvedImports()
     const { imports, opened } = await loadPenImports(doc, input, unresolved)
     const assets = penAssets(withUsedImports(doc, imports))
-    const [images, shaders, icons] = await Promise.all([
+    const [images, shaders, icons, fonts] = await Promise.all([
       loadPenImages(assets.images, input, opened),
       loadPenShaders(assets.shaders, input, opened),
-      loadPenIcons(assets.icons, context?.icons ?? defaultIcons)
+      loadPenIcons(assets.icons, context?.icons ?? defaultIcons),
+      loadPenFonts(doc.fonts ?? [], (url) => loadPenFile(url, input, opened))
     ])
     // A .pen file stores its layout intent, not the sizes and positions it implies; the hidden
     // library page's components are laid out too, as instances of them copy their layers.
@@ -140,6 +143,7 @@ export const penFormat: IOFormatAdapter<'pen'> = {
       images,
       shaders,
       icons,
+      fonts,
       imports,
       layout: (target) =>
         layoutAuthoredNodes(

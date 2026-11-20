@@ -105,7 +105,7 @@ export function figmaLineBox(
       const runNatural = metric(rect[3] - rect[1])
       // A first-line indent is a placeholder with no height.
       if (runNatural <= 0) continue
-      height = Math.max(height, Math.round(run.lineHeight ?? runNatural))
+      height = Math.max(height, run.lineHeight ?? Math.round(runNatural))
       if (runNatural > natural) {
         natural = runNatural
         // The newline that makes an empty line stands on the line above, so its box is
@@ -260,16 +260,22 @@ export function placeLines<Block extends LineBlock>(
   const boxes = lineBoxes(ck, blocks, metrics)
   if (!boxes) return null
   const all = boxes.flat()
-  if (allSame(all.map((box) => box.height)) && allSame(all.map((box) => box.ascent))) return null
+  // A paragraph steps lines by whole pixels, so lines alike at a whole-pixel height already
+  // stand where Figma puts them.
+  const height = all[0].height
+  const alike = allSame(all.map((box) => box.height)) && allSame(all.map((box) => box.ascent))
+  if (alike && allSame([height, Math.round(height)])) return null
 
-  // Distances from the first baseline add up whole-pixel line heights, so they stay exact.
+  // Figma steps lines by their exact heights and puts each baseline on a whole pixel, so a
+  // baseline stands the whole pixels between those below the first (Figma desktop 126).
   const first = all[0]
   const last = all[all.length - 1]
+  const start = Math.round(first.ascent)
   let below = 0
   const baselines = blocks.map((block, index) =>
     boxes[index].map((box, line) => {
       if (index > 0 || line > 0) below += box.height + (line === 0 ? block.spaceBefore : 0)
-      return first.ascent + below
+      return first.ascent + Math.round(first.ascent + below) - start
     })
   )
   const placed = new Map<Block, BlockPlacement & { y: number }>()

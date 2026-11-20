@@ -1,6 +1,6 @@
 import type { SceneNode } from '@pairdraw/scene-graph'
 import { faceStyleKey } from '@pairdraw/scene-graph/font-style'
-import { lineHeightPixels } from '@pairdraw/scene-graph/text'
+import { lineStepPixels } from '@pairdraw/scene-graph/text'
 
 import { measureTextWithFont } from '#core/text/font/glyphs'
 
@@ -22,7 +22,7 @@ export function estimateTextSize(
   const style = faceStyleKey({ ...node, fontWeight: node.fontWeight || 400 })
   const text = node.text || ''
 
-  const ownLineH = lineHeightPixels(node.lineHeight, fontSize) ?? 0
+  const ownLineH = lineStepPixels(node.lineHeight, fontSize) ?? 0
   const explicitLineH = ownLineH > 0 ? ownLineH : undefined
   const measured = measureTextWithFont(text, fontSize, family, style, maxWidth, explicitLineH)
   if (measured) return measured

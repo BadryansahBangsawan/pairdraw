@@ -1,0 +1,1 @@
+- Lines space by their exact line height, landing each baseline on a whole pixel as Figma does.

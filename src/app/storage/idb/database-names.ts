@@ -8,6 +8,7 @@ export const APP_DATABASE_NAMES = {
   recovery: 'pairdraw-recovery',
   diagnostics: 'pairdraw-diagnostics',
   skills: 'pairdraw-skills',
+  tokenSources: 'pairdraw-token-sources',
   /** Written and deleted once per page, to learn whether the engine stores Blobs. */
   blobProbe: 'pairdraw-blob-probe'
 } as const

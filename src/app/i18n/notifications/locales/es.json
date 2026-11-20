@@ -53,6 +53,7 @@
   "designTokensLeftOut": "No incluidos en los design tokens: {names}.",
   "designTokensAmbiguous": "Estos estilos remiten a una variable cuya ruta también tiene otra colección, así que otras herramientas pueden leer la equivocada: {names}.",
   "designTokensImported": "Se importaron {count} design tokens.",
+  "designTokensNeedReview": "{count} tokens cambiaron en el lienzo o en ambos lados. Revísalos en Variables.",
   "unsupportedVariableExpressions": "Pairdraw aún no puede evaluar estas variables, así que las capas conservan los valores guardados en el archivo: {names}.",
   "placeImageUnsupported": "Elige un archivo PNG, JPEG, WebP, GIF, AVIF o SVG para colocarlo.",
   "placeImageFailed": "No se pudieron colocar los archivos: {error}",

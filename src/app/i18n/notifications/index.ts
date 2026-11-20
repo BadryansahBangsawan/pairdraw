@@ -16,6 +16,9 @@ const notificationMessageDefaults = {
     'These styles refer to a variable whose path another collection also has, so other tools may read the wrong one: {names}.'
   ),
   designTokensImported: params('Imported {count} design tokens.'),
+  designTokensNeedReview: params(
+    '{count} tokens changed on the canvas or in both places. Review them in Variables.'
+  ),
   unsupportedVariableExpressions: params(
     'Pairdraw can’t evaluate these variables yet, so layers keep the values saved in the file: {names}.'
   ),

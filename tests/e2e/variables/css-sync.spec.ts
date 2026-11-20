@@ -79,7 +79,7 @@ test('a stylesheet’s custom properties import as a collection with a mode per 
   await expect(dialog).toBeHidden()
 })
 
-test('pull shows what changed in the linked stylesheet, and push writes variables back in place', async () => {
+test('pull brings in what changed in the linked stylesheet, and push writes variables back in place', async () => {
   await stubStylesheet(STYLESHEET)
   const dialog = await openVariables()
   await dialog.getByTestId('variables-css-sync').click()
@@ -95,11 +95,9 @@ test('pull shows what changed in the linked stylesheet, and push writes variable
   })
   await dialog.getByTestId('variables-css-sync').click()
   await expect(editor.page.getByTestId('variables-css-linked')).toHaveText('Linked to globals.css')
+  // A change made only in the file comes in at once, without a preview.
   await editor.page.getByTestId('variables-css-pull').click()
-  await expect(importDialog.getByTestId('variables-import-summary')).toHaveText(
-    '0 to add · 2 to update · 0 skipped'
-  )
-  await importDialog.getByTestId('variables-import-confirm').click()
+  await expect(importDialog).toBeHidden()
   await expect(dialog.getByTestId('token-output')).toContainText(/--brand: #0066cc/i)
 
   // A variable the designer adds is written into the file's own :root block.

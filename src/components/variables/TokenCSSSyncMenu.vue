@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from 'reka-ui'
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 
 import type { DesignTokenBundle } from '@pairdraw/core/io/formats/design-tokens'
 import { useI18n } from '@pairdraw/vue/i18n'
@@ -26,9 +26,11 @@ import {
   pickTokenCSSFile,
   pushTokenCSS,
   readTokenCSS,
-  refreshTokenCSSLink,
+  restoreTokenCSSLink,
+  resyncTokenCSS,
   setTokenCSSLink,
   tokenCSSLink,
+  unlinkTokenCSS,
   watchTokenCSS,
   type TokenCSSLink
 } from '@/app/editor/tokens/css-sync'
@@ -84,8 +86,14 @@ function chooseFile() {
 
 function pull() {
   void (async () => {
-    const current = await refreshTokenCSSLink(store)
-    if (current) await preview(current)
+    const result = await resyncTokenCSS(store)
+    if (!result) return
+    const messages = notificationMessages.get()
+    if (result.applied > 0) toast.info(messages.designTokensImported({ count: result.applied }))
+    else if (result.review.length === 0)
+      toast.info(variables.value.cssPushNothing({ file: file.value }))
+    if (result.review.length > 0)
+      toast.warning(messages.designTokensNeedReview({ count: result.review.length }))
   })().catch(reportFailure)
 }
 
@@ -109,8 +117,13 @@ function setWatching(watching: boolean) {
 }
 
 function unlink() {
-  setTokenCSSLink(store, null)
+  unlinkTokenCSS(store)
 }
+
+// A document that recorded a stylesheet follows it again, from where this computer keeps it.
+onMounted(() => {
+  restoreTokenCSSLink(store).catch(reportFailure)
+})
 </script>
 
 <template>

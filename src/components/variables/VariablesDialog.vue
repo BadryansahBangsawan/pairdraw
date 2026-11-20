@@ -8,6 +8,7 @@ import { useI18n } from '@pairdraw/vue/i18n'
 
 import { useEditorStore } from '@/app/editor/active-store'
 import { createTokenCopy } from '@/app/editor/tokens/copy'
+import { recordTokenCSSLink } from '@/app/editor/tokens/css-sync'
 import {
   DESIGN_TOKEN_FILE_ACCEPT,
   exportDesignTokenArchive,
@@ -43,6 +44,8 @@ const TokenImportDialog = defineAsyncComponent(
 )
 const importBundle = shallowRef<DesignTokenBundle | null>(null)
 const importOpen = ref(false)
+/** Whether the preview is of the linked stylesheet, which the document records once imported. */
+const importFromLink = ref(false)
 
 function reportFailure(error: unknown) {
   toast.error(
@@ -62,6 +65,7 @@ function importFiles(files: readonly File[]) {
     const sources = await readDesignTokenFiles(files)
     const { readDesignTokens } = await import('@pairdraw/core/io/formats/design-tokens')
     if (request !== importRequest) return
+    importFromLink.value = false
     importBundle.value = readDesignTokens(sources)
     importOpen.value = true
   })().catch((error: unknown) => {
@@ -100,8 +104,13 @@ watch(
 /** A linked stylesheet's custom properties, previewed in the same import dialog. */
 function previewCSS(bundle: DesignTokenBundle) {
   importRequest++
+  importFromLink.value = true
   importBundle.value = bundle
   importOpen.value = true
+}
+
+function onImported() {
+  if (importFromLink.value) recordTokenCSSLink(store).catch(reportFailure)
 }
 
 function exportTokens() {
@@ -145,6 +154,7 @@ function exportTokens() {
       v-model:open="importOpen"
       :bundle="importBundle"
       @choose-folder="tokenFolder.open()"
+      @imported="onImported"
     />
   </AppDialogRoot>
 </template>

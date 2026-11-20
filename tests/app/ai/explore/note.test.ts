@@ -93,14 +93,34 @@ describe('the exploration note', () => {
     expect(exploreContextOf(sent)).not.toContain('layer-note')
   })
 
-  test('a variant starting from a layer names it as a reference the chat shows', () => {
+  test('variants of a layer that can be varied are versions in a set of variations', () => {
+    const { graph, pageId } = page()
+    const base = graph.createNode('FRAME', pageId, { name: 'Hero', width: 800, height: 400 })
+    const note = exploreNote(
+      graph,
+      pageId,
+      { kind: 'variants', count: 4, axis: 'style' },
+      { id: base.id, name: base.name, type: base.type },
+      () => true
+    )
+    expect(note.attributes).toEqual({ mode: 'variants', count: 4, axis: 'style', base: base.id })
+    expect(note.instructions).toContain(`pairdraw://node/${encodeURIComponent(base.id)}`)
+    expect(note.instructions).toContain(`\`create_variations\` once with id "${base.id}", count 4`)
+    expect(note.instructions).toContain('Use this')
+    // The tool places the copies, so the note gives no row of its own and no copying steps.
+    expect(note.instructions).not.toContain('.clone()')
+    expect(note.instructions).not.toContain('Variant N')
+  })
+
+  test('a variant starting from a layer that cannot be varied copies it by hand', () => {
     const { graph, pageId } = page()
     const base = graph.createNode('FRAME', pageId, { name: 'Hero', width: 800, height: 400 })
     const note = exploreNote(
       graph,
       pageId,
       { kind: 'variants', count: 2, axis: 'style' },
-      { id: base.id, name: base.name, type: base.type }
+      { id: base.id, name: base.name, type: base.type },
+      () => false
     )
     expect(note.instructions).toContain(`pairdraw://node/${encodeURIComponent(base.id)}`)
     // A top-level copy is already on the page.
@@ -116,7 +136,8 @@ describe('the exploration note', () => {
       graph,
       pageId,
       { kind: 'variants', count: 2, axis: 'layout' },
-      { id: card.id, name: card.name, type: card.type }
+      { id: card.id, name: card.name, type: card.type },
+      () => false
     )
     expect(note.instructions).toContain('figma.currentPage.appendChild(copy)')
     expect(note.instructions).toContain(`\`reparent_node\` with parent_id "${pageId}"`)

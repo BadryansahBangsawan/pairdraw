@@ -49,7 +49,9 @@ export function appendCanvasNotes(
   const selected = resolveReferencedNodes(graph, [...state.selectedIds])
   const focus = [...source.nodes, ...selected]
   const explore = source.explore
-    ? exploreNote(graph, pageId, source.explore, focus.at(0) ?? null)
+    ? exploreNote(graph, pageId, source.explore, focus.at(0) ?? null, (id) =>
+        editor.canCreateVariations(id)
+      )
     : null
   const notes = collectLayerNotes(
     graph,

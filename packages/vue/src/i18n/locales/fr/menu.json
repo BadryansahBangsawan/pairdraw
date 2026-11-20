@@ -50,6 +50,7 @@
   "copyAsJSX": "Copier en JSX",
   "copyAsHTML": "Copier en HTML",
   "runStickyAsPrompt": "Exécuter la note comme consigne",
+  "exploreVariations": "Déclinaisons…",
   "copyNodeId": "Copier l'ID du nœud",
   "copyXPath": "Copier le XPath",
   "convertToVector": "Convertir en vecteur",

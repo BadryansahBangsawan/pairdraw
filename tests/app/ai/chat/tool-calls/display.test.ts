@@ -39,6 +39,22 @@ describe('tool call display', () => {
     })
   })
 
+  test('summarizes made variations by the versions it made', () => {
+    const made = call({
+      type: 'tool-create_variations',
+      state: 'output-available',
+      input: { id: '1:1', count: 2 },
+      output: {
+        set_id: '3:1',
+        versions: [
+          { id: '3:2', name: 'V1 · Calmer' },
+          { id: '3:3', name: 'V2' }
+        ]
+      }
+    })
+    expect(toolSummary(made)).toBe('V1 · Calmer, V2')
+  })
+
   test('names a render call only by its root element, not by a named child', () => {
     const unnamedRoot = call({
       type: 'tool-render',
@@ -70,6 +86,17 @@ describe('tool call display', () => {
         })
       )
     ).toEqual(['1:1', '2:1', '2:2'])
+    // A set of variations and its versions, so the card shows them.
+    expect(
+      toolNodeIds(
+        call({
+          type: 'tool-create_variations',
+          state: 'output-available',
+          input: { id: '1:1', count: 2 },
+          output: { set_id: '3:1', original_id: '1:1', versions: [{ id: '3:2' }, { id: '3:3' }] }
+        })
+      )
+    ).toEqual(['1:1', '3:1', '3:2', '3:3'])
     expect(
       toolNodeIds(
         call({

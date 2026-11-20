@@ -77,10 +77,9 @@ test('a request carries the notes of the selection and how to explore it', () =>
     })
     expect(stripModelNotes(text)).toBe('Try other layouts')
     expect(text).toContain(`<layer-note id="${node.id}"`)
-    expect(text).toContain('<explore mode="variants" count="3" axis="layout"')
-    // The variants start from the selected design, right of it.
-    const start = Number(/ x="(-?\d+)"/.exec(text)?.[1])
-    expect(start).toBeGreaterThan(node.x + node.width)
+    // The variants are versions of the selected design, in its set of variations.
+    expect(text).toContain(`<explore mode="variants" count="3" axis="layout" base="${node.id}"`)
+    expect(text).toContain(`\`create_variations\` once with id "${node.id}", count 3`)
   } finally {
     store.dispose()
   }

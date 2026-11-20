@@ -50,6 +50,7 @@
   "copyAsJSX": "Kopiuj jako JSX",
   "copyAsHTML": "Kopiuj jako HTML",
   "runStickyAsPrompt": "Uruchom karteczkę jako polecenie",
+  "exploreVariations": "Wariacje…",
   "copyNodeId": "Kopiuj ID węzła",
   "copyXPath": "Kopiuj XPath",
   "convertToVector": "Konwertuj na wektor",

@@ -50,6 +50,7 @@
   "copyAsJSX": "复制为 JSX",
   "copyAsHTML": "复制为 HTML",
   "runStickyAsPrompt": "将便利贴作为提示运行",
+  "exploreVariations": "方案…",
   "copyNodeId": "复制节点 ID",
   "copyXPath": "复制 XPath",
   "convertToVector": "转换为矢量",

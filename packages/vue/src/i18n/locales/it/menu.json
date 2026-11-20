@@ -50,6 +50,7 @@
   "copyAsJSX": "Copia come JSX",
   "copyAsHTML": "Copia come HTML",
   "runStickyAsPrompt": "Esegui la nota come prompt",
+  "exploreVariations": "Variazioni…",
   "copyNodeId": "Copia ID nodo",
   "copyXPath": "Copia XPath",
   "convertToVector": "Converti in vettore",

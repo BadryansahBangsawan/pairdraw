@@ -30,7 +30,7 @@ Layers can carry notes for agents: a context note says what the layer means or d
 
 # Exploring
 
-A message can ask how to explore it in an `<explore>` note: several variants side by side as new top-level frames, or one design in a single pass. Follow that note for the message it comes with; it says where the variants go.
+A message can ask how to explore it in an `<explore>` note: several variants side by side, as versions in a set of variations when they start from a layer and as new top-level frames otherwise, or one design in a single pass. Follow that note for the message it comes with; it says where the variants go.
 
 # Variations
 

@@ -49,6 +49,20 @@ const SUMMARY_FIELDS = ['name', 'query', 'text', 'question', 'path', 'id'] as co
 
 /** A one-line description of what a call does, read from its (possibly partial) input. */
 export function toolSummary(part: ToolCallPart): string {
+  // Made versions read by their names, which say what each one tries.
+  if (
+    part.type === 'tool-create_variations' &&
+    part.state === 'output-available' &&
+    isRecord(part.output)
+  ) {
+    const { versions } = part.output
+    const names = Array.isArray(versions)
+      ? versions.flatMap((version) =>
+          isRecord(version) && typeof version.name === 'string' ? [version.name] : []
+        )
+      : []
+    if (names.length > 0) return truncate(names.join(', '))
+  }
   const input = part.input
   if (!isRecord(input)) return ''
   if (typeof input.jsx === 'string') return jsxSummary(input.jsx)
@@ -75,14 +89,14 @@ export function toolNodeIds(part: ToolCallPart): string[] {
   const ids = new Set<string>()
   const { input } = part
   if (isRecord(input)) {
-    for (const key of ['id', 'ids', 'replace_id', 'parent_id', 'parentId']) {
+    for (const key of ['id', 'ids', 'replace_id', 'parent_id', 'parentId', 'set_id']) {
       for (const id of stringIds(input[key])) ids.add(id)
     }
   }
   if (part.state === 'output-available' && isRecord(part.output)) {
     const { output } = part
     if (typeof output.deleted !== 'string') {
-      for (const key of ['id', 'ids', 'selection', 'results', 'created']) {
+      for (const key of ['id', 'ids', 'selection', 'results', 'created', 'set_id', 'versions']) {
         for (const id of stringIds(output[key])) ids.add(id)
       }
     }

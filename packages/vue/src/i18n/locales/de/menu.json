@@ -50,6 +50,7 @@
   "copyAsJSX": "Als JSX kopieren",
   "copyAsHTML": "Als HTML kopieren",
   "runStickyAsPrompt": "Haftnotiz als Prompt ausführen",
+  "exploreVariations": "Variationen…",
   "copyNodeId": "Knoten-ID kopieren",
   "copyXPath": "XPath kopieren",
   "convertToVector": "In Vektor umwandeln",

@@ -50,6 +50,7 @@
   "copyAsJSX": "Копировать как JSX",
   "copyAsHTML": "Копировать как HTML",
   "runStickyAsPrompt": "Выполнить стикер как запрос",
+  "exploreVariations": "Вариации…",
   "copyNodeId": "Копировать ID узла",
   "copyXPath": "Копировать XPath",
   "convertToVector": "Преобразовать в вектор",

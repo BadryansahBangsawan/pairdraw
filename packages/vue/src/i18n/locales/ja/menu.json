@@ -49,6 +49,7 @@
   "copyAsJSX": "JSXとしてコピー",
   "copyAsHTML": "HTMLとしてコピー",
   "runStickyAsPrompt": "付箋をプロンプトとして実行",
+  "exploreVariations": "バリエーション…",
   "copyNodeId": "ノードIDをコピー",
   "copyXPath": "XPathをコピー",
   "convertToVector": "ベクターに変換",

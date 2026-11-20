@@ -1,0 +1,1 @@
+- @pairdraw/core's editor declarations name their viewport vector from the scene graph, so a consumer's type check resolves it.

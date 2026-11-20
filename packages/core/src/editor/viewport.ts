@@ -1,5 +1,6 @@
 import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
 import { computeBounds, computeAbsoluteBounds } from '@pairdraw/scene-graph/geometry'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import { ZOOM_DIVISOR, ZOOM_SCALE_MAX, ZOOM_SCALE_MIN } from '#core/constants'
 import { emitNavigationTrace } from '#core/profiler'

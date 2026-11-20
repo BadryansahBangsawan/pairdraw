@@ -3,12 +3,7 @@ import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
 import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
-import {
-  useCloudMessages,
-  useCommonMessages,
-  useFileMessages,
-  useI18n
-} from '@pairdraw/vue/i18n'
+import { useCloudMessages, useCommonMessages, useFileMessages, useI18n } from '@pairdraw/vue/i18n'
 
 import { useDocumentSelection } from '@/app/home/selection'
 import { formatStorageBytes } from '@/app/storage/format-bytes'

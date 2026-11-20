@@ -125,7 +125,9 @@ const errors = computed(() => ({
           v-else-if="state.kind === 'error' && state.reason === 'too-large'"
           tone="error"
           :heading="t.saveTooLargeHeading"
-          :description="t.saveTooLargeDescription({ limit: formatStorageBytes(state.limitBytes, locale) })"
+          :description="
+            t.saveTooLargeDescription({ limit: formatStorageBytes(state.limitBytes, locale) })
+          "
         />
         <AppAlert
           v-else-if="state.kind === 'error'"

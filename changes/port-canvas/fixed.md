@@ -1,3 +1,4 @@
 - Text drawn from a file's saved glyphs is antialiased at every size, as in Figma.
 - Tiles repaint when the page colour changes without an edit, such as switching the app theme.
 - Text the canvas held back while its fonts loaded is drawn as soon as they arrive, without waiting for the next edit.
+- The canvas stays sharp when a panel leaves it a fraction of a pixel short of a whole one.

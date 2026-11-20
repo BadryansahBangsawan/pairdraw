@@ -1,6 +1,6 @@
-import { useResizeObserver } from '@vueuse/core'
+import { useDevicePixelRatio, useResizeObserver } from '@vueuse/core'
 import type { CanvasKit } from 'canvaskit-wasm'
-import type { Ref } from 'vue'
+import { watch, type Ref } from 'vue'
 
 type ResizeObserverOptions = {
   canvasRef: Ref<HTMLCanvasElement | null>
@@ -19,11 +19,26 @@ export function useCanvasResizeObserver({
   getCanvasKitValue,
   resizeCanvas
 }: ResizeObserverOptions) {
-  const { stop } = useResizeObserver(canvasRef, () => {
+  function scheduleResize() {
     const canvas = canvasRef.value
     if (!canvas || !getCanvasKitValue()) return
     resizeCanvas(canvas)
-  })
+  }
 
-  return { cancelResize: stop }
+  // The canvas holds a size pinned to whole pixels, so its container tells when the page resizes.
+  const { stop } = useResizeObserver(
+    [canvasRef, () => canvasRef.value?.parentElement],
+    scheduleResize
+  )
+  // A move to a screen with another pixel ratio leaves the box as it was, so no resize reports it;
+  // the bitmap is sized for the new ratio here instead of being stretched.
+  const { pixelRatio } = useDevicePixelRatio()
+  const stopPixelRatio = watch(pixelRatio, scheduleResize)
+
+  return {
+    cancelResize: () => {
+      stop()
+      stopPixelRatio()
+    }
+  }
 }

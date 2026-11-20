@@ -214,6 +214,18 @@ export class UndoManager {
     return history
   }
 
+  /**
+   * Adds a step to a history kept aside while another graph is open, and returns it. The step's
+   * marks stay in its own graph, which is not the open one, and nothing is announced: the open
+   * document's history does not change.
+   */
+  pushIntoParked(history: UndoHistory, entry: UndoEntry): UndoHistory {
+    const undo = [...history.undo, entry]
+    const overflow =
+      Number.isFinite(this.limit) && this.limit > 0 ? undo.length - this.limit : 0
+    return { undo: overflow > 0 ? undo.slice(overflow) : undo, redo: [] }
+  }
+
   /** Makes `history`, recorded on the graph now open, the committed one. */
   adoptHistory(history: UndoHistory | undefined): void {
     this.undoStack = history ? [...history.undo] : []

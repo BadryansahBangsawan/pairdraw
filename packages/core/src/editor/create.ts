@@ -3,7 +3,7 @@ import { createNanoEvents } from 'nanoevents'
 import type { Emitter } from 'nanoevents'
 
 import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
-import { UndoManager, type UndoHistory } from '@pairdraw/scene-graph/undo'
+import { UndoManager, type UndoEntry, type UndoHistory } from '@pairdraw/scene-graph/undo'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import { prefetchFigmaSchema } from '#core/clipboard'
@@ -294,6 +294,7 @@ export function createEditor(options?: EditorOptions) {
       _graph = g
     },
     undo,
+    parkStep,
     state,
     loadFont: _loadFont,
     resolveFigmaClipboardImages: options?.resolveFigmaClipboardImages ?? null,
@@ -429,6 +430,12 @@ export function createEditor(options?: EditorOptions) {
   /** Each graph's committed history, kept aside while another graph is open in this editor. */
   const histories = new WeakMap<SceneGraph, UndoHistory>()
 
+  /** A step recorded while its document was swapped away joins that document's own history. */
+  function parkStep(graph: SceneGraph, entry: UndoEntry) {
+    const history = histories.get(graph)
+    if (history) histories.set(graph, undo.pushIntoParked(history, entry))
+  }
+
   function replaceGraph(newGraph: SceneGraph) {
     nodes.cancelNodePreviews()
     if (newGraph !== _graph) {
@@ -496,6 +503,7 @@ export function createEditor(options?: EditorOptions) {
       return _textEditor
     },
     undo: guardUndo(undo, readsOnly),
+    parkStep,
     state,
 
     // Graph reads

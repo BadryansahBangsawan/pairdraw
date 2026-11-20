@@ -30,6 +30,7 @@ function setup() {
   const ctx: EditorContext = {
     graph,
     undo,
+    parkStep: () => undefined,
     state,
     requestRender: () => undefined,
     requestRefresh: () => undefined,

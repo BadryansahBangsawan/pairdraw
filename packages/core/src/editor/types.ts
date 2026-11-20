@@ -15,7 +15,7 @@ import type { SceneMutationImpact } from '@pairdraw/scene-graph/mutation-impact'
 import type { Color, Rect, Vector } from '@pairdraw/scene-graph/primitives'
 import type { ShapeWithTextType } from '@pairdraw/scene-graph/shape-with-text'
 import type { SnapGuide } from '@pairdraw/scene-graph/snap'
-import type { UndoManager } from '@pairdraw/scene-graph/undo'
+import type { UndoEntry, UndoManager } from '@pairdraw/scene-graph/undo'
 
 import type { GuideOverlayState } from '#core/canvas/guides/types'
 import type { DesignIssueHighlight } from '#core/canvas/issues/types'
@@ -305,6 +305,8 @@ export interface EditorContext {
   get graph(): SceneGraph
   set graph(g: SceneGraph)
   undo: UndoManager
+  /** Adds a step to the history of a graph that is not the open one, kept aside with it. */
+  parkStep: (graph: SceneGraph, entry: UndoEntry) => void
   state: EditorState
   loadFont: (
     family: string,

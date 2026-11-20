@@ -176,7 +176,11 @@ function begin(ctx: EditorContext, options: RecordEditOptions, awaits = false) {
     // An edit that changed nothing, such as a read-only script, leaves no empty step behind.
     if (options.push !== false && !empty) {
       const entry = changeStep(ctx, options.label, change)
-      if (options.ownStep) ctx.undo.pushStep(entry)
+      if (ctx.graph !== graph) {
+        // The document the edit began on was swapped away while it awaited: its step stays with
+        // that document, and the one now open never carries an edit it did not see.
+        ctx.parkStep(graph, entry)
+      } else if (options.ownStep) ctx.undo.pushStep(entry)
       else ctx.undo.push(entry)
     }
     options.onRecorded?.(change)

@@ -5,6 +5,7 @@ import { i18n } from '#vue/i18n/create'
 export const editorMessageDefaults = {
   toolOptions: params('{tool} options'),
   removeGradientStop: 'Remove gradient stop',
+  selectGradientStop: 'Select gradient stop',
   /** The word before a corner's radius in the label beside a dragged radius handle. */
   cornerRadius: 'Radius',
   /** The word before a polygon's or star's point count beside its dragged handle. */

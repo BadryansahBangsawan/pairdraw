@@ -475,6 +475,7 @@ watch(
           size="xs"
           shape="square"
           data-test-id="code-panel-copy-ref"
+          :aria-label="code.copyJSXReference"
           @click="copyReference(JSX_REFERENCE)"
         >
           <icon-lucide-check v-if="copiedReference" class="size-3 text-success" />

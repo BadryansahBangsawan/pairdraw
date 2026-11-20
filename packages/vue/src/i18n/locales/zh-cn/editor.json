@@ -52,5 +52,6 @@
   "embedWaiting": "正在等待宿主页面",
   "embedWaitingDescription": "嵌入此设计的页面连接后，设计就会打开。",
   "embedInvalidOrigin": "此嵌入无法连接",
-  "embedInvalidOriginDescription": "其链接必须指明嵌入页面的源，例如 https://example.com。"
+  "embedInvalidOriginDescription": "其链接必须指明嵌入页面的源，例如 https://example.com。",
+  "selectGradientStop": "选择渐变止点"
 }

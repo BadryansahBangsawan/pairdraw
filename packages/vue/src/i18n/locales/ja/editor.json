@@ -52,5 +52,6 @@
   "embedWaiting": "ホストページを待っています",
   "embedWaitingDescription": "このデザインを埋め込んでいるページが接続すると、デザインが開きます。",
   "embedInvalidOrigin": "この埋め込みは接続できません",
-  "embedInvalidOriginDescription": "リンクには、埋め込むページのオリジン（例: https://example.com）を指定する必要があります。"
+  "embedInvalidOriginDescription": "リンクには、埋め込むページのオリジン（例: https://example.com）を指定する必要があります。",
+  "selectGradientStop": "グラデーションの位置を選択"
 }

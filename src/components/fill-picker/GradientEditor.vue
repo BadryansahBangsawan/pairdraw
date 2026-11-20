@@ -123,6 +123,7 @@ function listStopClass(active: boolean) {
               <button
                 class="size-4 shrink-0 cursor-pointer rounded border border-border p-0"
                 :style="{ background: s.css }"
+                :aria-label="editor.selectGradientStop"
                 @click.stop="s.actions.select"
               />
             </template>

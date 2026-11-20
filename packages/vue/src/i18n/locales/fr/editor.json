@@ -52,5 +52,6 @@
   "embedWaiting": "En attente de la page hôte",
   "embedWaitingDescription": "Le design s’ouvrira dès que la page qui l’intègre se connectera.",
   "embedInvalidOrigin": "Cette intégration ne peut pas se connecter",
-  "embedInvalidOriginDescription": "Son lien doit indiquer l’origine de la page qui l’intègre, par exemple https://example.com."
+  "embedInvalidOriginDescription": "Son lien doit indiquer l’origine de la page qui l’intègre, par exemple https://example.com.",
+  "selectGradientStop": "Sélectionner un arrêt de dégradé"
 }

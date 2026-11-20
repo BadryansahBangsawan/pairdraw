@@ -52,5 +52,6 @@
   "embedWaiting": "Esperando a la página anfitriona",
   "embedWaitingDescription": "El diseño se abrirá cuando se conecte la página en la que está incrustado.",
   "embedInvalidOrigin": "Esta inserción no puede conectarse",
-  "embedInvalidOriginDescription": "Su enlace debe indicar el origen de la página que la incrusta, por ejemplo https://example.com."
+  "embedInvalidOriginDescription": "Su enlace debe indicar el origen de la página que la incrusta, por ejemplo https://example.com.",
+  "selectGradientStop": "Seleccionar parada de degradado"
 }

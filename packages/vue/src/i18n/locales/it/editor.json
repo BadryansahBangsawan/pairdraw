@@ -52,5 +52,6 @@
   "embedWaiting": "In attesa della pagina host",
   "embedWaitingDescription": "Il design si apre quando la pagina in cui è incorporato si collega.",
   "embedInvalidOrigin": "Questo incorporamento non può collegarsi",
-  "embedInvalidOriginDescription": "Il suo link deve indicare l’origine della pagina che lo incorpora, ad esempio https://example.com."
+  "embedInvalidOriginDescription": "Il suo link deve indicare l’origine della pagina che lo incorpora, ad esempio https://example.com.",
+  "selectGradientStop": "Seleziona punto di sfumatura"
 }

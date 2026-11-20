@@ -52,5 +52,6 @@
   "embedWaiting": "Oczekiwanie na stronę osadzającą",
   "embedWaitingDescription": "Projekt otworzy się, gdy połączy się strona, w której jest osadzony.",
   "embedInvalidOrigin": "To osadzenie nie może się połączyć",
-  "embedInvalidOriginDescription": "Jego link musi wskazywać źródło strony osadzającej, na przykład https://example.com."
+  "embedInvalidOriginDescription": "Jego link musi wskazywać źródło strony osadzającej, na przykład https://example.com.",
+  "selectGradientStop": "Wybierz punkt gradientu"
 }

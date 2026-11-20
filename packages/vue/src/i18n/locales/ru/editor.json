@@ -52,5 +52,6 @@
   "embedWaiting": "Ожидание страницы-хоста",
   "embedWaitingDescription": "Дизайн откроется, когда подключится страница, в которую он встроен.",
   "embedInvalidOrigin": "Это встраивание не может подключиться",
-  "embedInvalidOriginDescription": "Его ссылка должна указывать источник встраивающей страницы, например https://example.com."
+  "embedInvalidOriginDescription": "Его ссылка должна указывать источник встраивающей страницы, например https://example.com.",
+  "selectGradientStop": "Выбрать точку градиента"
 }

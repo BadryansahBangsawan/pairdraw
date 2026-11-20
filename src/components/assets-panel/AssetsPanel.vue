@@ -463,6 +463,7 @@ async function insertSelectedAsset() {
                     <AppButton
                       v-bind="insertButton"
                       data-test-id="asset-docs"
+                      :aria-label="panels.openDocumentation"
                       @pointerdown.stop
                       @click.stop="asset.docsURL ? openExternalLink(asset.docsURL) : undefined"
                     >
@@ -473,6 +474,7 @@ async function insertSelectedAsset() {
                     <AppButton
                       v-bind="insertButton"
                       data-test-id="asset-insert"
+                      :aria-label="commands.createInstance"
                       :disabled="insertingAssetId === asset.id"
                       @pointerdown.stop
                       @click.stop="insertAsset(asset)"

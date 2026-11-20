@@ -52,5 +52,6 @@
   "embedWaiting": "Warten auf die einbettende Seite",
   "embedWaitingDescription": "Das Design öffnet sich, sobald die Seite, in die es eingebettet ist, eine Verbindung herstellt.",
   "embedInvalidOrigin": "Diese Einbettung kann keine Verbindung herstellen",
-  "embedInvalidOriginDescription": "Ihr Link muss den Ursprung der einbettenden Seite nennen, zum Beispiel https://example.com."
+  "embedInvalidOriginDescription": "Ihr Link muss den Ursprung der einbettenden Seite nennen, zum Beispiel https://example.com.",
+  "selectGradientStop": "Farbverlaufspunkt auswählen"
 }

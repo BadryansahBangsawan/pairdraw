@@ -9,6 +9,9 @@ import { createServer, type ViteDevServer } from 'vite'
 
 const WATCH_TIMEOUT_MS = 5000
 
+/** Bun's own cap must outlast the budget above, or it stops a slow start from reporting which wait failed. */
+const TEST_TIMEOUT_MS = 30_000
+
 async function waitFor(check: () => boolean | Promise<boolean>, description: string) {
   const deadline = Date.now() + WATCH_TIMEOUT_MS
   while (!(await check())) {
@@ -64,4 +67,4 @@ test('Vite invalidates source inside an active worktree while excluding nested c
       await rm(directory, { recursive: true, force: true })
     }
   }
-})
+}, TEST_TIMEOUT_MS)

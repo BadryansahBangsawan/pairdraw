@@ -3,7 +3,7 @@ import { describe, expect, test } from 'bun:test'
 import { createEditor } from '@pairdraw/core'
 
 describe('variable mode undo', () => {
-  test('setting a default mode moves it first, and undo restores the order', () => {
+  test('setting a default mode lists it first, and undo restores the order', () => {
     const editor = createEditor()
     editor.graph.addCollection({
       id: 'theme',
@@ -16,15 +16,19 @@ describe('variable mode undo', () => {
       defaultModeId: 'light',
       variableIds: []
     })
-    const order = () => editor.graph.variableCollections.get('theme')?.modes.map((m) => m.modeId)
+    const collection = () => editor.graph.variableCollections.get('theme')
+    // Without sort positions the array is the order: the new default moves first in it,
+    // and undo puts the order back. (A collection with positions keeps its array; the
+    // scene-graph variables test pins that case.)
+    const order = () => collection()?.modes.map((m) => m.modeId)
 
     editor.setDefaultMode('theme', 'dark')
     expect(order()).toEqual(['dark', 'light', 'dim'])
-    expect(editor.graph.variableCollections.get('theme')?.defaultModeId).toBe('dark')
+    expect(collection()?.defaultModeId).toBe('dark')
 
     editor.undo.undo()
     expect(order()).toEqual(['light', 'dim', 'dark'])
-    expect(editor.graph.variableCollections.get('theme')?.defaultModeId).toBe('light')
+    expect(collection()?.defaultModeId).toBe('light')
 
     editor.undo.redo()
     expect(order()).toEqual(['dark', 'light', 'dim'])

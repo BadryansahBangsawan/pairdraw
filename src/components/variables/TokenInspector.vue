@@ -22,7 +22,11 @@ import {
 } from '@pairdraw/scene-graph'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import { randomHex } from '@pairdraw/scene-graph/random'
-import { tokenNumberFromUnit, tokenNumberInUnit } from '@pairdraw/scene-graph/variables'
+import {
+  modesInListedOrder,
+  tokenNumberFromUnit,
+  tokenNumberInUnit
+} from '@pairdraw/scene-graph/variables'
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import type {
@@ -373,7 +377,7 @@ function cssNameDone(event: KeyboardEvent) {
       <h3 v-if="!singleMode || !usesValueEditor(collection.defaultModeId)" :class="ui.title()">
         {{ singleMode ? variables.value : variables.values }}
       </h3>
-      <div v-for="mode in collection.modes" :key="mode.modeId" :class="ui.value()">
+      <div v-for="mode in modesInListedOrder(collection)" :key="mode.modeId" :class="ui.value()">
         <span
           v-if="!singleMode && (!usesValueEditor(mode.modeId) || unsupported(mode.modeId))"
           :class="ui.label()"

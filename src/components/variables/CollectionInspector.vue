@@ -16,6 +16,7 @@ import {
   isModeAttributeName,
   type VariableCollection
 } from '@pairdraw/scene-graph'
+import { modesInListedOrder } from '@pairdraw/scene-graph/variables'
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import {
@@ -125,6 +126,9 @@ function commitAttribute() {
 function mode(modeId: string) {
   return collection.modes.find((candidate) => candidate.modeId === modeId)
 }
+
+/** The modes as Figma lists them, by sort position; the saved array order stays the file's. */
+const listedModes = computed(() => modesInListedOrder(collection))
 
 function commitModeName(modeId: string) {
   const name = (draft.modeNames[modeId] ?? '').trim()
@@ -272,7 +276,7 @@ function attributeDone(event: KeyboardEvent) {
         </IconButton>
       </div>
       <div
-        v-for="item in collection.modes"
+        v-for="item in listedModes"
         :key="item.modeId"
         :class="ui.mode()"
         data-test-id="variables-mode"

@@ -1,4 +1,4 @@
-import { compact, partition, uniq } from 'es-toolkit/array'
+import { compact, partition, sortBy, uniq } from 'es-toolkit/array'
 import { omit, omitBy } from 'es-toolkit/object'
 
 import { BLACK } from '../constants'
@@ -9,6 +9,7 @@ import {
   setInstanceOverride,
   variableModeOverrideField
 } from '../instances/overrides'
+import { siblingOrderKeys } from '../order-keys'
 import { isShaderSourcePaint, shaderOfPaint, withShaderPaints } from '../shaders/model'
 import type {
   SceneNode,
@@ -215,7 +216,8 @@ export function removeMode(graph: SceneGraph, collectionId: string, modeId: stri
   if (!collection || collection.modes.length <= 1) return
   collection.modes = collection.modes.filter((m) => m.modeId !== modeId)
   if (collection.defaultModeId === modeId) {
-    collection.defaultModeId = collection.modes[0].modeId
+    // The next default is the next listed mode, as Figma picks it, not the next saved entry.
+    collection.defaultModeId = modesInListedOrder(collection)[0].modeId
   }
   for (const varId of collection.variableIds) {
     const variable = graph.variables.get(varId)
@@ -256,13 +258,41 @@ export function setDefaultMode(graph: SceneGraph, collectionId: string, modeId: 
   if (!collection) return
   if (!collection.modes.some((m) => m.modeId === modeId)) return
   collection.defaultModeId = modeId
-  collection.modes = modesDefaultFirst(collection)
+  if (collection.modes.every((mode) => !mode.sortPosition)) {
+    // No sort positions carry an order of their own: the array is the order, so the new
+    // default moves first in it, as a collection created here has always done.
+    collection.modes = modesDefaultFirst(collection)
+    return
+  }
+  // The saved array order stays the file's own; the new default sorts first by its sort
+  // position, so the listed order shows it first and a re-import reads it as the default.
+  const listed = modesDefaultFirst(collection)
+  const positions = siblingOrderKeys(listed.map((mode) => mode.sortPosition))
+  const byId = new Map(listed.map((mode, index) => [mode.modeId, positions[index]]))
+  collection.modes = collection.modes.map((mode) => ({
+    ...mode,
+    sortPosition: byId.get(mode.modeId) ?? mode.sortPosition
+  }))
 }
 
-/** Figma has no default-mode field: the first mode is the default. */
+/** Figma has no default-mode field: the first listed mode is the default. */
 export function modesDefaultFirst(collection: VariableCollection): VariableCollectionMode[] {
-  const [defaults, rest] = partition(collection.modes, (m) => m.modeId === collection.defaultModeId)
+  const [defaults, rest] = partition(
+    modesInListedOrder(collection),
+    (m) => m.modeId === collection.defaultModeId
+  )
   return [...defaults, ...rest]
+}
+
+/**
+ * The modes as Figma lists them: by `sortPosition`, modes without one following in saved order.
+ * The collection's own array keeps the file's saved order, which an export writes back as it was.
+ */
+export function modesInListedOrder(collection: VariableCollection): VariableCollectionMode[] {
+  return sortBy(collection.modes, [
+    (mode) => !mode.sortPosition,
+    (mode) => mode.sortPosition ?? ''
+  ])
 }
 
 export function getVariablesForCollection(graph: SceneGraph, collectionId: string): Variable[] {

@@ -1,6 +1,7 @@
 import { ref, computed, watch } from 'vue'
 
 import type { Variable } from '@pairdraw/scene-graph'
+import { modesInListedOrder } from '@pairdraw/scene-graph/variables'
 
 import { useEditor } from '#vue/editor/context'
 import { useSceneComputed } from '#vue/internal/scene-computed/use'
@@ -31,7 +32,11 @@ export function useVariables() {
   const activeCollection = computed(
     () => collections.value.find((collection) => collection.id === activeCollectionId.value) ?? null
   )
-  const activeModes = computed(() => activeCollection.value?.modes ?? [])
+  // The panel lists modes as Figma does, by sort position; the collection's array keeps the
+  // file's saved order for export.
+  const activeModes = computed(() =>
+    activeCollection.value ? modesInListedOrder(activeCollection.value) : []
+  )
 
   const variables = useSceneComputed(() => {
     if (!activeCollectionId.value) return [] as Variable[]

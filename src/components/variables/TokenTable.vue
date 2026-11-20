@@ -8,6 +8,7 @@ import {
   type VariableCollection,
   type VariableValue
 } from '@pairdraw/scene-graph'
+import { modesInListedOrder } from '@pairdraw/scene-graph/variables'
 import { useI18n } from '@pairdraw/vue/i18n'
 import { useFlatReorderDrag } from '@pairdraw/vue/shared/drag'
 
@@ -61,9 +62,11 @@ const ui = tv(tableTheme)()
 /** Figma does not show a variable the file adds to a library's collection; such a row says so. */
 const libraryCollection = computed(() => isLibraryCollection(collection))
 
-const modes = computed(() =>
-  modeIds ? collection.modes.filter((mode) => modeIds.includes(mode.modeId)) : collection.modes
-)
+const modes = computed(() => {
+  // Columns list modes as Figma does, by sort position; the saved array order stays the file's.
+  const listed = modesInListedOrder(collection)
+  return modeIds ? listed.filter((mode) => modeIds.includes(mode.modeId)) : listed
+})
 
 /** The grid itself follows the panel's container width; only the mode count comes from here. */
 const columns = computed(() => ({ '--token-modes': modes.value.length }))
@@ -80,7 +83,8 @@ function modeName(modeId: string) {
 }
 
 function shown<T extends { modeId: string }>(values: readonly T[]) {
-  return values.filter((value) => modes.value.some((mode) => mode.modeId === value.modeId))
+  // The cells follow the column order, which is the listed order, not the values' saved order.
+  return modes.value.flatMap((mode) => values.filter((value) => value.modeId === mode.modeId))
 }
 
 const content = useTemplateRef<ComponentPublicInstance>('content')

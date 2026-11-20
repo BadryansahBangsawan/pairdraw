@@ -22,7 +22,6 @@ import type {
 } from '@pairdraw/scene-graph'
 import { fractionalPosition, orderKeyBetween } from '@pairdraw/scene-graph/order-keys'
 import {
-  modesDefaultFirst,
   isUnsupportedVariableValue,
   foldFormula,
   formulaValueType,
@@ -257,13 +256,13 @@ export function appendVariableNodeChanges(
       phase: 'CREATED',
       strokeAlign: 'CENTER',
       strokeJoin: 'BEVEL',
-      variableSetModes: modeSortPositions(modesDefaultFirst(collection)).map(
-        ({ mode, sortPosition }) => ({
-          id: modes.get(mode.modeId) ?? stringToGuid(mode.modeId),
-          name: mode.name,
-          sortPosition
-        })
-      ),
+      // The saved array order is the file's own and round-trips as it was; the sort positions
+      // carry the listed order, which the reader shows and the default follows.
+      variableSetModes: modeSortPositions(collection.modes).map(({ mode, sortPosition }) => ({
+        id: modes.get(mode.modeId) ?? stringToGuid(mode.modeId),
+        name: mode.name,
+        sortPosition
+      })),
       pluginData: collectionPluginDataNodeChange(collection, modeKey),
       key: collection.key,
       version: collection.version

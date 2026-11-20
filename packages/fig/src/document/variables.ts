@@ -1,3 +1,4 @@
+import { sortBy } from 'es-toolkit/array'
 import * as v from 'valibot'
 
 import type { NodeChange, VariableDataEntry } from '@pairdraw/kiwi/fig/codec'
@@ -190,6 +191,16 @@ function modeValues(
   return values
 }
 
+type SavedMode = NonNullable<NodeChange['variableSetModes']>[number]
+
+/** Figma lists modes by `sortPosition`; modes without one follow, in saved order. */
+function modesInListedOrder(resource: NodeChange): SavedMode[] {
+  return sortBy(resource.variableSetModes ?? [], [
+    (mode) => !mode.sortPosition,
+    (mode) => mode.sortPosition ?? ''
+  ])
+}
+
 /** No invented values or fallback collections: unsupported resources remain explicit. */
 export function materializeVariableResources(
   graph: SceneGraph,
@@ -203,6 +214,9 @@ export function materializeVariableResources(
   }
   for (const resource of resources) {
     if (resource.type !== 'VARIABLE_SET') continue
+    // The saved array order is the file's own: an untouched collection must round-trip it
+    // exactly. The listed order (by sortPosition) is a view over it, and the default is the
+    // first listed mode, as Figma treats it.
     const modes = resource.variableSetModes ?? []
     if (!resource.guid || modes.length === 0) {
       report(resource, 'missing collection identity or modes')
@@ -222,7 +236,7 @@ export function materializeVariableResources(
           ...(mode.sortPosition ? { sortPosition: mode.sortPosition } : {})
         }
       }),
-      defaultModeId: guidToString(modes[0].id),
+      defaultModeId: guidToString(modesInListedOrder(resource)[0].id),
       variableIds: [],
       modeAttribute: readModeAttribute(resource),
       pluginData: pluginData.length > 0 ? pluginData : undefined,

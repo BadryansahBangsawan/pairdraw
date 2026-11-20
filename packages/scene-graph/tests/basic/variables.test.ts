@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
 import {
+  modesInListedOrder,
   reconcileVariableBindings,
   resolvedValueBindings
 } from '@pairdraw/scene-graph/variables'
@@ -374,5 +375,42 @@ describe('Variables', () => {
     })
 
     expect(graph.resolveColorVariable('v1')).toBeUndefined()
+  })
+
+  function collectionWithSortPositions(graph: SceneGraph, sortPositions: string[]): void {
+    graph.addCollection({
+      id: 'col1',
+      name: 'Theme',
+      modes: sortPositions.map((sortPosition, index) => ({
+        modeId: `m${index}`,
+        name: `Mode ${index}`,
+        sortPosition
+      })),
+      defaultModeId: 'm0',
+      variableIds: []
+    })
+  }
+
+  function listedModes(graph: SceneGraph) {
+    const collection = graph.variableCollections.get('col1')
+    return collection ? modesInListedOrder(collection) : []
+  }
+
+  test('a new default mode sorts first and the others keep their positions', () => {
+    const graph = new SceneGraph()
+    collectionWithSortPositions(graph, ['a', 'b', 'c'])
+
+    graph.setDefaultMode('col1', 'm2')
+
+    const modes = listedModes(graph)
+    expect(modes.map((mode) => mode.modeId)).toEqual(['m2', 'm0', 'm1'])
+    expect(modes.slice(1).map((mode) => mode.sortPosition)).toEqual(['a', 'b'])
+    expect((modes[0].sortPosition ?? '') < 'a').toBe(true)
+    // The saved array order stays the file's own, so an export writes it back unchanged.
+    expect(graph.variableCollections.get('col1')?.modes.map((mode) => mode.modeId)).toEqual([
+      'm0',
+      'm1',
+      'm2'
+    ])
   })
 })

@@ -10,7 +10,7 @@ import {
   type VariableType,
   type VariableValue
 } from '@pairdraw/scene-graph'
-import { updateTokenExpression } from '@pairdraw/scene-graph/variables'
+import { modesInListedOrder, updateTokenExpression } from '@pairdraw/scene-graph/variables'
 
 import { reconcileVariableLayouts } from '#core/layout/variables'
 
@@ -232,7 +232,8 @@ export class FigmaVariableCollection {
   }
 
   get modes(): Array<{ modeId: string; name: string }> {
-    return this.#collection.modes.map(({ modeId, name }) => ({ modeId, name }))
+    // Figma lists a collection's modes by sort position, not by their saved array order.
+    return modesInListedOrder(this.#collection).map(({ modeId, name }) => ({ modeId, name }))
   }
 
   get defaultModeId(): string {

@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'bun:test'
 
 import { toRaw } from 'vue'
 
+import { createDocumentGraph } from '@pairdraw/core'
 import * as layoutModule from '@pairdraw/core/layout'
 
 import { endAgentSession } from '@/app/automation/agents'
@@ -372,6 +373,32 @@ describe('close_file and save_file never prompt', () => {
       'has not been saved to a file yet'
     )
     expect(getTabById(tab.id)).toBeDefined()
+  })
+
+  test('a save to a path that is not a .fig file is refused, naming the .fig to use', async () => {
+    const tab = dirtyTab()
+    await expect(
+      request('save_file', { document_id: tab.id, path: '/root/notes.pen' })
+    ).rejects.toThrow('Save to "/root/notes.fig" instead')
+    expect(tab.store.getDocumentFilePath()).toBeNull()
+  })
+
+  test('a document opened from a .pen file is refused before it is overwritten', async () => {
+    const tab = dirtyTab()
+    tab.store.setDocumentSource('notes.pen', 'pen', undefined, '/root/notes.pen')
+    await expect(request('save_file', { document_id: tab.id })).rejects.toThrow(
+      'Save to "/root/notes.fig" instead'
+    )
+    // Nothing was written over the .pen file the document came from.
+    expect(tab.store.getSourceIdentity().path).toBe('/root/notes.pen')
+  })
+
+  test('a board saves as a .jam and refuses a .fig path', async () => {
+    const tab = createTab(undefined, createDocumentGraph('board'))
+    tab.store.createShape('STICKY', 0, 0, 10, 10)
+    await expect(
+      request('save_file', { document_id: tab.id, path: '/root/plan.fig' })
+    ).rejects.toThrow('Save to "/root/plan.jam" instead')
   })
 
   test('a failed save to a path keeps the document source it had', async () => {

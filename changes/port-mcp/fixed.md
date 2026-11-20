@@ -1,0 +1,1 @@
+- `save_file` and a save on close refuse a destination that is not the document's archive (`.fig`, or `.jam` for a board) before writing anything, and name the path to use instead.

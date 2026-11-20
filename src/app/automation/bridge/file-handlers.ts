@@ -1,6 +1,8 @@
 import * as v from 'valibot'
 
+import { DOCUMENT_EXTENSIONS } from '@pairdraw/core/io'
 import { parseToolArgs } from '@pairdraw/core/tools'
+import type { DocumentKind } from '@pairdraw/scene-graph'
 
 import { agentChatDocument } from '@/app/ai/reply/run'
 import { readAgentSession } from '@/app/automation/agents'
@@ -16,7 +18,7 @@ import {
   type AutomationTarget
 } from '@/app/automation/bridge/target'
 import { resolveBrowserFileURL } from '@/app/document/io/browser'
-import { documentNameFromFigPath } from '@/app/document/io/names'
+import { documentNameFromFigPath, documentPathFor } from '@/app/document/io/names'
 import { openBrowserFileFromURL } from '@/app/shell/menu/files'
 import { openFileFromPath } from '@/app/shell/menu/use'
 import {
@@ -37,6 +39,62 @@ export interface AutomationFiles {
 }
 
 const saveArgsSchema = v.object({ path: v.optional(v.string()) })
+
+/**
+ * Automation always writes a Figma archive: the destination is the path asked for, or else the
+ * file the save will write, which is a desktop path or the browser handle Save As installed.
+ * `open_file` reads a `.fig`/`.jam` as that archive and any other extension, such as `.pen`, as
+ * another format, so a mismatched destination is refused before a byte is written and the error
+ * names the path to retry with.
+ */
+function inPlaceSaveName(store: AutomationTarget['store']): string | null {
+  if (store.getStorageBinding()) return null
+  const { path, handle } = store.getSourceIdentity()
+  if (path && isTauri()) return path
+  return handle?.name ?? null
+}
+
+function hasDocumentExtension(path: string, kind: DocumentKind): boolean {
+  return path.toLowerCase().endsWith(`.${DOCUMENT_EXTENSIONS[kind]}`)
+}
+
+function assertAutomationSaveDestination(
+  store: AutomationTarget['store'],
+  path: string | undefined
+): void {
+  const kind = store.state.documentKind
+  const extension = DOCUMENT_EXTENSIONS[kind]
+  if (path) {
+    if (hasDocumentExtension(path, kind)) return
+    throw new Error(
+      `Cannot save to "${path}": only .${extension} files can be saved. ` +
+        `Save to "${documentPathFor(path, kind)}" instead.`
+    )
+  }
+  const current = inPlaceSaveName(store)
+  if (!current || hasDocumentExtension(current, kind)) return
+  throw new Error(
+    `"${store.state.documentName}" is open from "${current}", which cannot be saved: ` +
+      `only .${extension} files can be. Save to "${documentPathFor(current, kind)}" instead.`
+  )
+}
+
+/** Without a file to save to, point at a `.fig` beside the file the document came from. */
+function unsavedDocumentError(store: AutomationTarget['store']): Error {
+  const kind = store.state.documentKind
+  const name = store.state.documentName
+  const source = store.getSourceIdentity().path
+  if (!source) {
+    return new Error(
+      `"${name}" has not been saved to a file yet; ` +
+        `save it to a path ending in .${DOCUMENT_EXTENSIONS[kind]}`
+    )
+  }
+  return new Error(
+    `"${name}" was opened from "${source}", which cannot be saved. ` +
+      `Save to "${documentPathFor(source, kind)}" instead.`
+  )
+}
 
 const closeArgsSchema = v.object({
   path: v.optional(v.string()),
@@ -99,9 +157,9 @@ export function createFileHandlers(files?: AutomationFiles) {
   async function saveWithoutPrompt(store: AutomationTarget['store'], path?: string): Promise<void> {
     const name = store.state.documentName
     const openedFrom = path ? undefined : serverOpenedPath(store)
-    if (!path && !openedFrom && !store.hasWritableSource()) {
-      throw new Error(`"${name}" has not been saved to a file yet; pass a path to save it`)
-    }
+    // close_file with unsaved "save" uses this too, so an existing file is checked the same way.
+    assertAutomationSaveDestination(store, path || openedFrom)
+    if (!path && !openedFrom && !store.hasWritableSource()) throw unsavedDocumentError(store)
     if (openedFrom && files) {
       await store.saveFigFileCopy((data) => writeThroughServer(files, openedFrom, data))
       return

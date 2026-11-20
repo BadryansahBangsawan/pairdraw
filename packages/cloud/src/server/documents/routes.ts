@@ -16,7 +16,7 @@ import {
 } from '#cloud/server/documents/errors'
 import type { DocumentService } from '#cloud/server/documents/service'
 import { StorageQuotaExceededError } from '#cloud/server/quota'
-import { CLOUD_RATE_LIMITS, createResourceRateLimiter, createRouteRateLimiter } from '#cloud/server/rate-limit'
+import { CLOUD_RATE_LIMITS, createResourceRateLimiter } from '#cloud/server/rate-limit'
 import {
   documentParams,
   uploadParams,

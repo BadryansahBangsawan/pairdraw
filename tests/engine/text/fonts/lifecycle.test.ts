@@ -73,6 +73,21 @@ describe('font lifecycle', () => {
     expect(manager.isNodeBlocked('second')).toBe(true)
   })
 
+  test('reports the nodes whose block ended, for the canvas to draw them again', () => {
+    const manager = new FontManager()
+    const reports: Array<readonly string[]> = []
+    const stop = manager.onNodesUnblocked((nodeIds) => reports.push(nodeIds))
+    manager.blockNodesUntilFontsResolve(['first', 'second'])
+    manager.unblockNodes(['first', 'never-blocked'])
+    expect(reports).toEqual([['first']])
+    manager.unblockNodes(['second'])
+    expect(reports).toEqual([['first'], ['second']])
+    stop()
+    manager.blockNodesUntilFontsResolve(['first'])
+    manager.unblockNodes(['first'])
+    expect(reports).toHaveLength(2)
+  })
+
   test('rejects a text picture observed before the font generation changed', () => {
     const graph = new SceneGraph()
     const node = graph.createNode('TEXT', pageId(graph), {

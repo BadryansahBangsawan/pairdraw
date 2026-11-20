@@ -116,6 +116,18 @@ export function createEditor(options?: EditorOptions) {
     pendingTextLayout.relayoutSubstituted(_renderer, family)
     events.emit('font:loaded', family, style)
   })
+  // Text blocked while its fonts were prepared is missing from the tiles drawn meanwhile.
+  const stopUnblockEvents = fontManager.onNodesUnblocked((nodeIds) => {
+    let redrawn = false
+    for (const renderer of _renderers) {
+      for (const id of nodeIds) {
+        if (!_graph.getNode(id)) continue
+        renderer.invalidateNodePicture(id)
+        redrawn = true
+      }
+    }
+    if (redrawn) requestRender()
+  })
 
   void prefetchFigmaSchema()
 
@@ -451,6 +463,7 @@ export function createEditor(options?: EditorOptions) {
     interactiveEdits.clear()
     stopFontResolutionEvents()
     stopFontLoadEvents()
+    stopUnblockEvents()
     unsubscribeFromGraph()
   }
 

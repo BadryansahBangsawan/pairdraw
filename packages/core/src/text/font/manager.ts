@@ -93,6 +93,7 @@ export class FontManager {
   private readonly hostFontRequests = new SharedReads()
   private webFonts = new WebFontResolver()
   private readonly faceListeners = new Set<(family: string, style: string) => void>()
+  private readonly unblockListeners = new Set<(nodeIds: readonly string[]) => void>()
   private readonly bundled = new BundledFonts()
   private readonly localFonts = new LocalFonts()
   private readonly faces = new FamilyFaceCatalog({
@@ -192,7 +193,18 @@ export class FontManager {
   }
 
   unblockNodes(nodeIds: readonly string[]): void {
-    for (const nodeId of nodeIds) this.blockedNodeIds.delete(nodeId)
+    const shown: string[] = []
+    for (const nodeId of nodeIds) if (this.blockedNodeIds.delete(nodeId)) shown.push(nodeId)
+    if (shown.length > 0) for (const listener of this.unblockListeners) listener(shown)
+  }
+
+  /**
+   * Calls the listener with the layers whose block ended, which the canvas left out while blocked
+   * and draws again now.
+   */
+  onNodesUnblocked(listener: (nodeIds: readonly string[]) => void): () => void {
+    this.unblockListeners.add(listener)
+    return () => this.unblockListeners.delete(listener)
   }
 
   isNodeBlocked(nodeId: string): boolean {

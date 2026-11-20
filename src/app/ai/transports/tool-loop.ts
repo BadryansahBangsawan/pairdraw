@@ -28,6 +28,7 @@ import { notifyPermissionWaiting } from '@/app/ai/chat/notifications'
 import { maxAgentSteps } from '@/app/ai/chat/preferences'
 import { systemPrompt } from '@/app/ai/chat/system-prompt'
 import type { RunRecorder, RunRecording } from '@/app/ai/chat/trace/recorder'
+import { addTurnUsage, turnUsageFromReported, type TurnUsage } from '@/app/ai/chat/usage/aggregate'
 import { promptCachingOptions } from '@/app/ai/models/caching'
 import { modelProviderName } from '@/app/ai/models/provider-name'
 import { reasoningCallSettings, type AIProviderOptions } from '@/app/ai/models/reasoning/settings'
@@ -171,6 +172,8 @@ export function createToolLoopTransport({
   let instructions = systemPrompt()
   // The reply in progress; a transport sends one message at a time.
   let run = currentRun(store)
+  // The reply's tokens summed across its steps, which its message metadata carries for the meter.
+  let replyUsage: TurnUsage | null = null
   // While JSX streams, the chat's agent moves through the elements as they appear, here and
   // on the screens of everyone else in the room.
   const preview = createRunPreview(store)
@@ -239,6 +242,14 @@ export function createToolLoopTransport({
       preview.clear()
       recordStep(store)
       recording?.step(step)
+      const stepUsage = turnUsageFromReported({
+        inputTokens: usage.inputTokens,
+        outputTokens: usage.outputTokens,
+        cacheReadTokens: usage.inputTokenDetails.cacheReadTokens,
+        cacheWriteTokens: usage.inputTokenDetails.cacheWriteTokens,
+        reasoningTokens: usage.outputTokenDetails.reasoningTokens
+      })
+      if (stepUsage) replyUsage = replyUsage ? addTurnUsage(replyUsage, stepUsage) : stepUsage
       recordModelStepCompleted(
         {
           provider: providerID,
@@ -290,14 +301,16 @@ export function createToolLoopTransport({
   const transport = new DirectChatTransport({
     agent: chatAgent,
     onError: handleError,
-    // Each step's tokens, which the chat's context meter shows.
+    // Each step's context-window tokens, and the reply's summed usage for the token meter.
     messageMetadata: (options) => {
       const compacted = stepCompaction.metadataFor(options.part)
       if (compacted) return compacted
-      const usage = stepContextMetadata(options)
-      if (usage && firstRequestTokens !== undefined)
-        usage.context.firstRequestTokens = firstRequestTokens
-      return usage
+      if (options.part.type === 'start') replyUsage = null
+      const context = stepContextMetadata(options)
+      if (context && firstRequestTokens !== undefined)
+        context.context.firstRequestTokens = firstRequestTokens
+      if (options.part.type !== 'finish-step' || !replyUsage) return context
+      return { ...context, usage: replyUsage }
     }
   }) as ChatTransport<UIMessage>
   return resumableTransport({
@@ -310,6 +323,7 @@ export function createToolLoopTransport({
       // The run starts as the message is sent, so a Stop before the model is reached ends it.
       const started = startRun(store, maxAgentSteps.value, effectiveModelID, providerID)
       run = started
+      replyUsage = null
       releaseExternalMCP()
       const heldExternalMCP = externalMCP.hold()
       releaseExternalMCP = heldExternalMCP

@@ -105,12 +105,14 @@ describe('estimatedCostUsd', () => {
     expect(cost).toBeCloseTo(18, 6)
   })
 
-  test('cached input is priced at its own rate when given', () => {
+  test('cached input is priced at its own rate, the rest as fresh input', () => {
+    // inputTokens counts the cached part too, as the AI SDK and agents report it.
     const cost = estimatedCostUsd(
-      { inputTokens: 1_000_000, outputTokens: 0, cacheReadTokens: 1_000_000 },
+      { inputTokens: 1_000_000, outputTokens: 0, cacheReadTokens: 400_000 },
       { ...pricing, cacheReadPerMTok: 0.3 }
     )
-    expect(cost).toBeCloseTo(3.3, 6)
+    // 600k fresh at $3 + 400k cached at $0.30 = $1.80 + $0.12.
+    expect(cost).toBeCloseTo(1.92, 6)
   })
 
   test('no pricing means no cost', () => {

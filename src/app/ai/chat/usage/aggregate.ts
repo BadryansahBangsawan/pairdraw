@@ -88,14 +88,16 @@ const TOKENS_PER_MILLION = 1_000_000
 
 /**
  * What a turn's tokens cost in US dollars at the model's list price, or null when the catalog
- * holds no price for it. Cached input is priced at its own rate when given, else as fresh input.
+ * holds no price for it. Input counts the cached part too, so that part is priced at the cached
+ * rate when given and the rest as fresh input.
  */
 export function estimatedCostUsd(usage: TurnUsage, pricing: ModelPricing | null): number | null {
   if (!pricing) return null
-  const cacheRead = usage.cacheReadTokens ?? 0
+  const cacheRead = Math.min(usage.cacheReadTokens ?? 0, usage.inputTokens)
+  const freshInput = usage.inputTokens - cacheRead
   const cacheRate = pricing.cacheReadPerMTok ?? pricing.inputPerMTok
   return (
-    (usage.inputTokens * pricing.inputPerMTok +
+    (freshInput * pricing.inputPerMTok +
       usage.outputTokens * pricing.outputPerMTok +
       cacheRead * cacheRate) /
     TOKENS_PER_MILLION

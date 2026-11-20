@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { grantByInvitation, seedSharing } from '#cloud-tests/helpers/sharing'
 import { DocumentNotFoundError, DocumentShareInvalidError } from '#cloud/server'
+import { resolveDocumentAccess } from '#cloud/server/documents/access'
 
 describe('document sharing grants integration', () => {
   test('manages direct grants', async () => {
@@ -35,15 +36,19 @@ describe('document sharing grants integration', () => {
     }
   })
 
-  test('changes access only for someone who has it', async () => {
+  test('shows a document to no one the owner has not shared it with', async () => {
     const context = await seedSharing()
     try {
-      // Access comes from an accepted invitation, so a document never appears in a stranger's
-      // files unasked.
-      await expect(
-        context.sharing.putGrant('owner', context.documentId, 'stranger', { permission: 'view' })
-      ).rejects.toBeInstanceOf(DocumentNotFoundError)
-      expect(await context.sharing.listGrants('owner', context.documentId)).toEqual([])
+      // A stranger sees nothing until the owner shares the document with them, and the owner's
+      // direct grant is the share: no invitation has to come first.
+      expect(
+        await resolveDocumentAccess(context.runtime.database, 'stranger', context.documentId)
+      ).toBeUndefined()
+      await context.sharing.putGrant('owner', context.documentId, 'stranger', { permission: 'view' })
+      expect(
+        (await resolveDocumentAccess(context.runtime.database, 'stranger', context.documentId))
+          ?.permission
+      ).toBe('view')
     } finally {
       await context.runtime.close()
     }

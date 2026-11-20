@@ -27,12 +27,29 @@ export function createGrantService(database: Kysely<CloudDatabase>) {
       input: PutDocumentGrantInput
     ): Promise<DocumentGrant> {
       await requireSharingAccess(database, userId, documentId)
+      // A target with no grant row is granted now. One that already has a live grant is changed,
+      // and one whose grant was revoked stays revoked rather than coming back by itself, so the
+      // conflict branch touches nothing and the update returns no row.
       const row = await database
-        .updateTable('documentGrant')
-        .set({ permission: input.permission, createdBy: userId, updatedAt: new Date() })
-        .where('documentId', '=', documentId)
-        .where('userId', '=', targetUserId)
-        .where('revokedAt', 'is', null)
+        .insertInto('documentGrant')
+        .values({
+          id: crypto.randomUUID(),
+          documentId,
+          userId: targetUserId,
+          permission: input.permission,
+          createdBy: userId,
+          revokedAt: null
+        })
+        .onConflict((conflict) =>
+          conflict
+            .columns(['documentId', 'userId'])
+            .doUpdateSet({
+              permission: input.permission,
+              createdBy: userId,
+              updatedAt: new Date()
+            })
+            .where('documentGrant.revokedAt', 'is', null)
+        )
         .returning([
           'id',
           'documentId',

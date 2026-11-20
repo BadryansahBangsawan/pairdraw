@@ -1,2 +1,5 @@
 - On macOS 14 and later, agents can keep editing through MCP while the desktop app is hidden or the screen is locked, instead of every call timing out.
 - Fonts installed on the system are drawn by the page instead of being copied into it, so bold and italic text keeps its own face.
+- On Linux, the desktop app caches recent file previews and downloaded fonts again, so they no longer load anew each time.
+- On Linux, the desktop app starts on NVIDIA Wayland sessions instead of being disconnected at its first paint.
+- The editor menu no longer appears in the Software Update window on Windows and Linux.

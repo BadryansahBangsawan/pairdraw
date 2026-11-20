@@ -19,6 +19,9 @@ import {
   desktopBrowserActions,
   type BrowserChatActions
 } from '@/app/ai/browser/tools'
+import type { ContextLimits } from '@/app/ai/chat/compaction/limits'
+import { messagesSinceCompaction } from '@/app/ai/chat/compaction/marker'
+import { createStepCompaction } from '@/app/ai/chat/compaction/steps'
 import { stepContextMetadata } from '@/app/ai/chat/context-window/usage'
 import { resumableTransport } from '@/app/ai/chat/history/continuation'
 import { notifyPermissionWaiting } from '@/app/ai/chat/notifications'
@@ -81,6 +84,8 @@ export type ToolLoopTransportOptions = {
   researchWindow?: ResearchWindow
   /** How long a reply waits on the provider; tests shorten it. */
   timeouts?: ProviderTimeouts
+  /** The model's context limits, for compacting between steps; the Design model's by default. */
+  contextLimits?: () => Promise<ContextLimits | null>
 }
 
 function callSettings(
@@ -119,7 +124,8 @@ export function createToolLoopTransport({
   offerBrowserTools = IS_TAURI,
   browserActions,
   researchWindow = desktopResearchWindow(),
-  timeouts = providerTimeouts
+  timeouts = providerTimeouts,
+  contextLimits
 }: ToolLoopTransportOptions) {
   // Each change waits for the person's approval while Settings → AI asks for it.
   // A page action remembers the site's host, not the tool name.
@@ -176,6 +182,9 @@ export function createToolLoopTransport({
     preview.finish(toolCallId)
   const cacheProviderOptions = promptCachingOptions(providerID, effectiveModelID)
   let recording: RunRecording | undefined
+  // What the reply's first request held: the instructions and tools every request carries.
+  let firstRequestTokens: number | undefined
+  const stepCompaction = createStepCompaction(model, contextLimits)
   // Tools of the external MCP servers enabled in Settings, listed again for each message.
   // Those not marked read-only ask first too while Settings → AI asks before changes.
   let externalTools: ToolSet = {}
@@ -190,6 +199,7 @@ export function createToolLoopTransport({
     maxOutputTokens,
     // Kept only to fingerprint each step's request for its trace.
     include: { requestMessages: recorder !== undefined },
+    prepareStep: (step) => stepCompaction.prepareStep(step),
     prepareCall: (options) => {
       const enabledNames = new Set(
         enabledAIToolDefinitions(aiToolOverrides.value).map((tool) => tool.name)
@@ -224,6 +234,8 @@ export function createToolLoopTransport({
     },
     onStepFinish: (step) => {
       const { usage } = step
+      // A step without a count says nothing of what the request held, so the last counted stands.
+      if (usage.inputTokens !== undefined) firstRequestTokens ??= usage.inputTokens
       preview.clear()
       recordStep(store)
       recording?.step(step)
@@ -279,11 +291,22 @@ export function createToolLoopTransport({
     agent: chatAgent,
     onError: handleError,
     // Each step's tokens, which the chat's context meter shows.
-    messageMetadata: stepContextMetadata
+    messageMetadata: (options) => {
+      const compacted = stepCompaction.metadataFor(options.part)
+      if (compacted) return compacted
+      const usage = stepContextMetadata(options)
+      if (usage && firstRequestTokens !== undefined)
+        usage.context.firstRequestTokens = firstRequestTokens
+      return usage
+    }
   }) as ChatTransport<UIMessage>
   return resumableTransport({
     reconnectToStream: (options) => transport.reconnectToStream(options),
-    async sendMessages(options) {
+    async sendMessages(sent) {
+      // A compacted conversation reaches the model as its summary and what followed it.
+      const options = { ...sent, messages: messagesSinceCompaction(sent.messages) }
+      firstRequestTokens = undefined
+      await stepCompaction.begin(options.messages, options.abortSignal)
       // The run starts as the message is sent, so a Stop before the model is reached ends it.
       const started = startRun(store, maxAgentSteps.value, effectiveModelID, providerID)
       run = started

@@ -2,7 +2,12 @@ import { describe, expect, test } from 'bun:test'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
 
-import { commandCandidates, referenceCandidates } from '@/app/ai/chat/references/candidates'
+import {
+  agentCommandCandidates,
+  chatCommandCandidates,
+  referenceCandidates
+} from '@/app/ai/chat/references/candidates'
+import { commandLink } from '@/app/ai/chat/references/command'
 import { resolveReference } from '@/app/ai/chat/references/resolve'
 import type { Skill } from '@/app/ai/skills/types'
 
@@ -46,33 +51,33 @@ describe('reference candidates', () => {
     expect(found.map(({ reference }) => reference.id)).toEqual([footer.id])
   })
 
-  test('commands are an ACP agent’s own, or else the skills the user can run', () => {
+  test('commands are an ACP agent’s own, or else the chat’s and the skills the user can run', () => {
     const skills = [skillFixture(), skillFixture({ name: 'auto', userInvocable: false })]
-    expect(commandCandidates(null, skills).map((command) => command.insert)).toEqual([
-      '/skill:grid '
+    const compact = { name: 'compact', description: 'Compact', hint: null }
+    expect(chatCommandCandidates([compact], skills).map((command) => command.insert)).toEqual([
+      `${commandLink('compact')} `,
+      `${commandLink('skill:grid')} `
     ])
     expect(
-      commandCandidates([{ name: 'review', description: 'Review', hint: null }], skills).map(
+      agentCommandCandidates([{ name: 'review', description: 'Review', hint: null }]).map(
         (command) => command.insert
       )
-    ).toEqual(['/review '])
+    ).toEqual([`${commandLink('review')} `])
   })
 
   test('a skill command shows what the caller describes it as; an agent command its own', () => {
     const skills = [skillFixture({ name: 'dark-mode', source: 'builtin' })]
     const describe = (skill: Skill) => `Summary of ${skill.name}`
-    expect(commandCandidates(null, skills, describe).map((command) => command.detail)).toEqual([
+    expect(chatCommandCandidates([], skills, describe).map((command) => command.detail)).toEqual([
       'Summary of dark-mode'
     ])
-    expect(commandCandidates(null, skills).map((command) => command.detail)).toEqual([
+    expect(chatCommandCandidates([], skills).map((command) => command.detail)).toEqual([
       'Lay out pages on an eight-point grid.'
     ])
     expect(
-      commandCandidates(
-        [{ name: 'review', description: 'Review', hint: null }],
-        skills,
-        describe
-      ).map((command) => command.detail)
+      agentCommandCandidates([{ name: 'review', description: 'Review', hint: null }]).map(
+        (command) => command.detail
+      )
     ).toEqual(['Review'])
   })
 })

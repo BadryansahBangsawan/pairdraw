@@ -18,6 +18,22 @@ export interface ResolvedReference extends ChatReference {
   node: SceneNode | null
 }
 
+/** A citation resolves to the layer that carries it, named by the page it quotes. */
+function resolveCitation(
+  store: Pick<EditorStore, 'graph'> | null,
+  reference: ChatReference
+): ResolvedReference {
+  const node = store?.graph.getNode(reference.id) ?? null
+  const citation = node ? readWebCitation(node) : null
+  const present = Boolean(node && node.type !== 'CANVAS' && citation)
+  return {
+    ...reference,
+    name: citation?.title || reference.label,
+    present,
+    node: present ? node : null
+  }
+}
+
 /**
  * Resolves a reference against `store`, or only by its label when the conversation belongs to
  * another document (`store` is null) and its IDs are not this document's.
@@ -31,6 +47,9 @@ export function resolveReference(
     const present = skillNames.has(reference.id)
     return { ...reference, name: reference.id, present, node: null }
   }
+  // A command names nothing to show; it reads as written.
+  if (reference.kind === 'command')
+    return { ...reference, name: reference.label, present: true, node: null }
   if (reference.kind === 'element') {
     return {
       ...reference,
@@ -39,17 +58,7 @@ export function resolveReference(
       node: null
     }
   }
-  if (reference.kind === 'citation') {
-    const node = store?.graph.getNode(reference.id) ?? null
-    const citation = node ? readWebCitation(node) : null
-    const present = Boolean(node && node.type !== 'CANVAS' && citation)
-    return {
-      ...reference,
-      name: citation?.title || reference.label,
-      present,
-      node: present ? node : null
-    }
-  }
+  if (reference.kind === 'citation') return resolveCitation(store, reference)
   const node = store?.graph.getNode(reference.id)
   const fits = reference.kind === 'page' ? node?.type === 'CANVAS' : node && node.type !== 'CANVAS'
   if (!node || !fits) return { ...reference, name: reference.label, present: false, node: null }
@@ -67,6 +76,7 @@ export function resolveReference(
  */
 export async function openReference(store: EditorStore, reference: ChatReference): Promise<void> {
   if (reference.kind === 'element') return
+  if (reference.kind === 'command') return
   if (reference.kind === 'skill') requestSkillSettings(reference.id)
   else if (reference.kind === 'page') await store.switchPage(reference.id)
   else await focusNodesOnTheirPage(store, [reference.id])

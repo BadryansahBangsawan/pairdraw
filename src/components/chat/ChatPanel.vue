@@ -11,6 +11,7 @@ import { companionUpdate } from '@/app/ai/agents/setup/update'
 import { agentSignInHelp } from '@/app/ai/agents/signed-out'
 import { carriesAttachableFile, isAttachableFile } from '@/app/ai/attachment/accept'
 import { revokeImagePreviewURL } from '@/app/ai/attachment/image/prepare'
+import { useChatCompaction } from '@/app/ai/chat/compaction/use'
 import { chatDocumentId } from '@/app/ai/chat/history/document'
 import { sentPrompts } from '@/app/ai/chat/history/prompts'
 import { chatColumnOpen } from '@/app/ai/chat/panel'
@@ -23,6 +24,7 @@ import {
   takeNextMessage
 } from '@/app/ai/chat/queue'
 import { useQuietTurn } from '@/app/ai/chat/quiet'
+import { leadingCommand } from '@/app/ai/chat/references/command'
 import { useChatRunLocation } from '@/app/ai/chat/run-location'
 import { ensureChatConfigured, joinWaitingPrompt } from '@/app/ai/chat/setup'
 import type { ChatSubmission } from '@/app/ai/chat/submission/types'
@@ -72,6 +74,7 @@ const submission = useChatSubmission({
   flush: history.flush,
   clearFailure: clearChatFailure,
   getEditor: getActiveEditorStore,
+  prepare: (current, text) => compaction.compactIfFull(current, text),
   pins: () => history.pins.value,
   messages: computed(() => ({
     openSettings: ai.value.openProviderSettingsAction,
@@ -91,6 +94,8 @@ const submission = useChatSubmission({
   openModelSettings: () => openSettingsDialog('ai'),
   openSetup: () => openAISetup()
 })
+
+const compaction = useChatCompaction({ chat, ensureChat, flush: history.flush })
 
 const chatInput = useTemplateRef<{
   restoreDraft: (submission: ChatSubmission) => void
@@ -113,13 +118,48 @@ const { dragging: draggingFiles, types: draggedTypes } = useImageDrop(panel, {
 })
 let viewGeneration = 0
 
-/** Puts an unsent message back only in the conversation it was written in. */
+/**
+ * Puts an unsent message back only in the conversation it was written in. `/compact` compacts
+ * instead of sending, whether typed now or waiting in the queue, and what waits behind it goes
+ * next.
+ */
 async function submitMessage(message: ChatSubmission) {
   const generation = viewGeneration
+  const command = compactCommand(message)
+  if (command) {
+    const compacted = await compaction.compact({
+      trigger: 'manual',
+      instructions: command.rest || undefined
+    })
+    if (!compacted && generation === viewGeneration) chatInput.value?.restoreDraft(message)
+    if (compacted && status.value === 'ready') sendNextQueued()
+    return
+  }
   if (await submission.submit(message)) return
   if (generation === viewGeneration) chatInput.value?.restoreDraft(message)
   else for (const image of message.images) revokeImagePreviewURL(image.previewURL)
 }
+
+/**
+ * The command when `message` starts with `/compact`, and what to keep after it. An ACP agent's
+ * own `/compact` goes to it as written.
+ */
+function compactCommand(message: ChatSubmission) {
+  if (providerID.value.startsWith('acp:') || message.images.length > 0) return null
+  const command = leadingCommand(message.displayText)
+  return command?.name === 'compact' ? command : null
+}
+
+watch(
+  () => compaction.failed.value,
+  (failed) => {
+    if (failed)
+      toast.error(ai.value.compactionFailed, {
+        label: ai.value.retryRequest,
+        run: () => void compaction.retry()
+      })
+  }
+)
 /** Set once the history holds the active document's conversation, which a waiting prompt joins. */
 let historyReady = false
 const activeStore = useActiveEditorStoreRef()
@@ -345,6 +385,8 @@ const failureMessage = computed(() => {
       return ai.value.chatInsufficientCredit
     case 'cloud-credits-exhausted':
       return cloudCreditsMessage(chatFailure.value.resetsAt)
+    case 'context-limit':
+      return ai.value.chatContextLimit
     case 'model-not-found':
       return ai.value.chatModelNotFound
     case 'network':
@@ -457,6 +499,18 @@ function failureAction(failedId: string | undefined): { label: string; run: () =
   const billingURL = cloudBillingURL.value
   if (chatFailure.value?.reason === 'cloud-credits-exhausted' && billingURL) {
     return { label: ai.value.manageCloudPlanAction, run: () => void openExternalLink(billingURL) }
+  }
+  if (chatFailure.value?.reason === 'context-limit') {
+    return {
+      label: ai.value.compactAndRetry,
+      run: () => {
+        // The failed request stays after the summary, so Retry sends it again.
+        void compaction.compact({ trigger: 'manual', before: failedId }).then((compacted) => {
+          if (compacted) retryFailed(failedId)
+          return undefined
+        })
+      }
+    }
   }
   return failureHasSettingsAction.value
     ? { label: ai.value.openProviderSettingsAction, run: () => openSettingsDialog('ai') }
@@ -576,9 +630,15 @@ function handleStop() {
         :show-continue="showContinue"
         :queued="queued"
         :steers="!providerID.startsWith('acp:') && providerID !== 'harness:pi'"
+        :compacting="compaction.compacting.value"
         @remove-queued="(id) => removeQueuedMessage(documentStore, id)"
         :nodes-live="!history.readOnly.value && !history.away.value"
-        :interactive="chat !== null && !submission.busy.value && !history.away.value"
+        :interactive="
+          chat !== null &&
+          !submission.busy.value &&
+          !history.away.value &&
+          !compaction.compacting.value
+        "
         @regenerate="submission.regenerate()"
         @revert="(messageId) => submission.revert(messageId)"
         @restore="(messageId) => submission.restore(messageId)"

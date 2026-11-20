@@ -1,6 +1,7 @@
 import { tv, type VariantProps } from 'tailwind-variants'
 
 import agentTheme from '@/theme/chat/agent'
+import compactionTheme from '@/theme/chat/compaction'
 import explorePickerTheme from '@/theme/chat/explore-picker'
 import inputTheme from '@/theme/chat/input'
 import messageTheme from '@/theme/chat/message'
@@ -12,6 +13,7 @@ import thinkingTheme from '@/theme/chat/thinking'
 import transcriptTheme from '@/theme/chat/transcript'
 
 export const chatAgentTheme = tv(agentTheme)
+export const chatCompactionTheme = tv(compactionTheme)
 export const chatExplorePickerTheme = tv(explorePickerTheme)
 export const chatInputTheme = tv(inputTheme)
 export const chatMessageTheme = tv(messageTheme)

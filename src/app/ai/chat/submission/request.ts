@@ -8,6 +8,7 @@ import {
 } from '@/app/ai/chat/context'
 import { appendPinnedContext } from '@/app/ai/chat/pins/note'
 import type { ConversationPins } from '@/app/ai/chat/pins/types'
+import { commandsAsText } from '@/app/ai/chat/references/command'
 
 /** What follows the person's words in a request, for the model only. */
 export interface RequestNotes {
@@ -28,6 +29,7 @@ export function requestText(
   { skill, earlier, pins }: RequestNotes,
   files?: readonly AttachedFile[]
 ): string {
-  const noted = appendSkillContext(appendFileContext(text, files), skill)
+  // A command chosen from `/` reads as typed, as agents and models run it from the text.
+  const noted = appendSkillContext(appendFileContext(commandsAsText(text), files), skill)
   return pins ? appendPinnedContext(noted, earlier, pins()) : noted
 }

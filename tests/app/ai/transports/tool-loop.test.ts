@@ -8,15 +8,18 @@ import * as v from 'valibot'
 import type { AIProviderID } from '@pairdraw/core/constants'
 import { FigmaAPI } from '@pairdraw/core/figma-api'
 
+import { compactionMessage } from '@/app/ai/chat/compaction/marker'
 import { classifyAIChatError } from '@/app/ai/chat/failure'
 import { createRunRecorder } from '@/app/ai/chat/trace/recorder'
 import type { ThinkingLevel } from '@/app/ai/models/types'
 import { modelProviderAdapter } from '@/app/ai/providers/registry'
+import { currentRun } from '@/app/ai/reply/run'
 import type { Skill } from '@/app/ai/skills/types'
 import { aiToolOverrides } from '@/app/ai/tools/preferences'
 import { createToolLoopTransport } from '@/app/ai/transports/tool-loop'
 import * as figmaFactory from '@/app/automation/bridge/figma-factory'
 import { createEditorStore } from '@/app/editor/session/create'
+import { createDeferred } from '@/app/runtime/deferred'
 
 import { expectDefined } from '#tests/helpers/assert'
 import { skillFixture } from '#tests/helpers/chat/skills'
@@ -464,6 +467,95 @@ test('a reply that fails before it reaches the model resumes the design check', 
     expect(hold.mock.calls.at(-1)).toEqual([false])
   } finally {
     hold.mockRestore()
+    store.dispose()
+  }
+})
+
+test('a compacted conversation reaches the model as its summary and what followed it', async () => {
+  const store = createEditorStore()
+  let prompt: unknown
+  const model = new MockLanguageModelV4({
+    doStream: async (options) => {
+      prompt = options.prompt
+      return replyModel().doStream(options)
+    }
+  })
+  try {
+    const transport = createToolLoopTransport({
+      store,
+      providerID: 'anthropic',
+      model,
+      effectiveModelID: 'claude-test',
+      maxOutputTokens: 100,
+      thinkingLevel: () => 'default'
+    })
+    const marker = compactionMessage({
+      summary: 'Built the hero.',
+      trigger: 'manual',
+      tokensBefore: 5000
+    })
+    const stream = await transport.sendMessages({
+      trigger: 'submit-message',
+      chatId: 'compacted',
+      messageId: undefined,
+      abortSignal: undefined,
+      messages: [
+        { id: 'old', role: 'user', parts: [{ type: 'text', text: 'Make a hero section' }] },
+        { id: 'reply', role: 'assistant', parts: [{ type: 'text', text: 'Hero is done' }] },
+        marker,
+        { id: 'new', role: 'user', parts: [{ type: 'text', text: 'Now a footer' }] }
+      ]
+    })
+    const chunks: unknown[] = []
+    const reader = stream.getReader()
+    for (let read = await reader.read(); !read.done; read = await reader.read())
+      chunks.push(read.value)
+    const sent = JSON.stringify(prompt)
+    expect(sent).toContain('Built the hero.')
+    expect(sent).toContain('Now a footer')
+    expect(sent).not.toContain('Make a hero section')
+    expect(sent).not.toContain('Hero is done')
+    // The reply keeps what its requests held, for the context meter and the next compaction.
+    expect(chunks).toContainEqual(
+      expect.objectContaining({
+        type: 'message-metadata',
+        messageMetadata: {
+          context: { usedTokens: 2, inputTokens: 1, outputTokens: 1, firstRequestTokens: 1 }
+        }
+      })
+    )
+  } finally {
+    store.dispose()
+  }
+})
+
+test('Stop ends a reply whose context-limit lookup has not answered', async () => {
+  const store = createEditorStore()
+  try {
+    const transport = createToolLoopTransport({
+      store,
+      providerID: 'openai',
+      model: replyModel(),
+      effectiveModelID: 'test',
+      maxOutputTokens: 100,
+      thinkingLevel: () => 'default',
+      // The model catalog never answers.
+      contextLimits: () => createDeferred<null>().promise
+    })
+    const controller = new AbortController()
+    const sent = transport.sendMessages({
+      trigger: 'submit-message',
+      chatId: 'stalled',
+      messageId: undefined,
+      abortSignal: controller.signal,
+      messages: [{ id: 'user', role: 'user', parts: [{ type: 'text', text: 'Hello' }] }]
+    })
+    await Promise.resolve()
+    expect(currentRun(store).active).toBe(true)
+    controller.abort()
+    await sent
+    expect(currentRun(store).active).toBe(false)
+  } finally {
     store.dispose()
   }
 })

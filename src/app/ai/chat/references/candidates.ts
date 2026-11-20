@@ -3,9 +3,10 @@ import { compact } from 'es-toolkit'
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 
 import type { AgentCommand } from '@/app/ai/agents/acp/commands'
-import { runnableSkills } from '@/app/ai/skills/invoke'
+import { runnableSkills, skillCommand } from '@/app/ai/skills/invoke'
 import type { Skill } from '@/app/ai/skills/types'
 
+import { commandLink } from './command'
 import type { ChatReference } from './link'
 
 /** Matching layers past this many are left out of `@` completions; typing more narrows them. */
@@ -84,27 +85,38 @@ export function referenceCandidates(
   ]
 }
 
+/** A command as `/` offers it, from an ACP agent or the chat itself. */
+function commandCandidate(command: AgentCommand): CommandCandidate {
+  return {
+    kind: 'agent',
+    label: `/${command.name}`,
+    detail: command.description,
+    insert: `${commandLink(command.name)} `
+  }
+}
+
+/** What `/` offers with an ACP agent: its own commands, which run its own skills too. */
+export function agentCommandCandidates(commands: readonly AgentCommand[]): CommandCandidate[] {
+  return commands.map(commandCandidate)
+}
+
 /**
- * What `/` offers: an ACP agent's own commands, or else the skills the user can run, each
- * described by `describe`, which gives the built-in skills in the user's language.
+ * What `/` offers otherwise: the chat's own commands, such as `/compact`, then the skills the
+ * user can run, each described by `describe`, which gives the built-in skills in the user's
+ * language.
  */
-export function commandCandidates(
-  agentCommands: readonly AgentCommand[] | null,
+export function chatCommandCandidates(
+  commands: readonly AgentCommand[],
   skills: readonly Skill[],
   describe: (skill: Skill) => string = (skill) => skill.description
 ): CommandCandidate[] {
-  if (agentCommands) {
-    return agentCommands.map((command) => ({
-      kind: 'agent' as const,
-      label: `/${command.name}`,
-      detail: command.description,
-      insert: `/${command.name} `
+  return [
+    ...commands.map(commandCandidate),
+    ...runnableSkills(skills).map((skill) => ({
+      kind: 'skill' as const,
+      label: `/${skillCommand(skill.name)}`,
+      detail: describe(skill),
+      insert: `${commandLink(skillCommand(skill.name))} `
     }))
-  }
-  return runnableSkills(skills).map((skill) => ({
-    kind: 'skill' as const,
-    label: `/skill:${skill.name}`,
-    detail: describe(skill),
-    insert: `/skill:${skill.name} `
-  }))
+  ]
 }

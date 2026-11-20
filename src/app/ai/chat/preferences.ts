@@ -72,3 +72,14 @@ export const approveActions = computed({
     }
   }
 })
+
+/** Whether a long chat compacts itself before the context fills; Settings → AI turns it off. */
+export const compactAutomatically = computed({
+  get: () => appPreferences.value.chat.compactAutomatically,
+  set: (compactAutomatically: boolean) => {
+    appPreferences.value = {
+      ...appPreferences.value,
+      chat: { ...appPreferences.value.chat, compactAutomatically }
+    }
+  }
+})

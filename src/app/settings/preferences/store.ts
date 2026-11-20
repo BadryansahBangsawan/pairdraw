@@ -92,6 +92,8 @@ export interface AppPreferences {
     animateEdits: boolean
     /** Whether the built-in chat asks before each tool call that changes the document. */
     approveActions: boolean
+    /** Whether a long chat is compacted into a summary before the context fills up. */
+    compactAutomatically: boolean
   }
   files: { recentLimit: number }
   version: 1
@@ -148,7 +150,9 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
     // Edits play on the canvas unless the app's motion is off; Settings → AI turns them off.
     animateEdits: true,
     // Edits are undoable and reviewable per reply, so asking before each one is opt-in.
-    approveActions: false
+    approveActions: false,
+    // A long chat summarizes itself before the window fills; Settings → AI turns it off.
+    compactAutomatically: true
   },
   files: { recentLimit: DEFAULT_RECENT_FILES_LIMIT },
   version: 1,
@@ -223,7 +227,8 @@ const appPreferencesSchema = section(
       columnOpen: v.fallback(v.boolean(), defaults.chat.columnOpen),
       canvasPrompt: v.fallback(v.boolean(), defaults.chat.canvasPrompt),
       animateEdits: v.fallback(v.boolean(), defaults.chat.animateEdits),
-      approveActions: v.fallback(v.boolean(), defaults.chat.approveActions)
+      approveActions: v.fallback(v.boolean(), defaults.chat.approveActions),
+      compactAutomatically: v.fallback(v.boolean(), defaults.chat.compactAutomatically)
     }),
     files: section({
       recentLimit: v.fallback(recentFilesLimitSchema, defaults.files.recentLimit)

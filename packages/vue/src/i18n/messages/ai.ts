@@ -340,6 +340,19 @@ export const aiMessageDefaults = {
   chatRequestFailed: 'The model request failed. Check the provider settings and try again.',
   chatProviderStalled: 'The provider stopped responding. Check your connection and try again.',
   chatEmptyReply: 'The model returned no reply. Try again.',
+  chatContextLimit: 'The conversation is longer than the model can read.',
+  compactCommand: 'Summarize the conversation so far; text after it says what to keep',
+  compactAutomatically: 'Compact automatically',
+  compactAutomaticallyHint: 'Summarizes older messages when the context window fills up.',
+  compacting: 'Compacting the conversation…',
+  compactionFailed: 'The conversation could not be compacted. Nothing was changed.',
+  compactAndRetry: 'Compact and retry',
+  conversationCompacted: 'Conversation compacted',
+  compactionKeepsMessages:
+    'The model now gets this summary instead of the messages above; you still see them.',
+  agentCompactionKeepsMessages:
+    'The agent now works from its own summary of the messages above; you still see them.',
+  compactionTokens: params('{before} → {after} tokens'),
   chatAgentStartTimeout:
     'The coding agent did not start in time. Check that it runs on this computer and try again.',
   openProviderSettingsAction: 'Open settings',

@@ -21,6 +21,7 @@ import { prepareSubmittedImages } from '@/app/ai/chat/submission/images'
 import { appendCanvasNotes, appendEditedCanvasNotes } from '@/app/ai/chat/submission/notes'
 import { requestText, type RequestNotes } from '@/app/ai/chat/submission/request'
 import { chatToResend } from '@/app/ai/chat/submission/resend'
+import { sendText } from '@/app/ai/chat/submission/text'
 import type { ChatInstance, ChatSubmission } from '@/app/ai/chat/submission/types'
 import { restoreTurn, revertTurn } from '@/app/ai/reply/turns'
 import { useUndoRecords } from '@/app/ai/reply/undo'
@@ -33,6 +34,8 @@ interface SubmissionOptions extends SubmissionErrorOptions {
   flush?: () => Promise<void>
   clearFailure: () => void
   getEditor: () => EditorStore
+  /** Runs before the message is sent, such as compacting a conversation that is filling up. */
+  prepare?: (chat: ChatInstance, text: string) => Promise<void>
   /** What the conversation keeps pinned, which a request carries when it changed. */
   pins?: RequestNotes['pins']
 }
@@ -50,22 +53,6 @@ export function useChatSubmission(options: SubmissionOptions) {
       if (!readyChat() || !act(messageId)) return
       await options.flush?.().catch(() => undefined)
     }
-  }
-
-  async function sendText(
-    currentChat: ChatInstance,
-    submission: ChatSubmission,
-    dispatch: () => void
-  ): Promise<void> {
-    const previousIds = new Set(currentChat.messages.map((message) => message.id))
-    dispatch()
-    await withTurn(currentChat, () =>
-      currentChat.sendMessage({ text: submission.modelText }).catch(() => undefined)
-    )
-    const message = currentChat.messages.find(
-      (candidate) => candidate.role === 'user' && !previousIds.has(candidate.id)
-    )
-    if (message) setVisibleMessageText(message.id, submission.displayText)
   }
 
   /**
@@ -167,9 +154,11 @@ export function useChatSubmission(options: SubmissionOptions) {
       const note = undone.note(canvas, currentChat.messages)
       const notes = { skill, earlier: currentChat.messages, pins: options.pins }
       const noted = { ...submission, modelText: requestText(note.text, notes, submission.files) }
+      await options.prepare?.(currentChat, noted.modelText)
+      if (version !== operationVersion) return false
       const previousIds = new Set(currentChat.messages.map((message) => message.id))
       if (hasAttachments(submission)) await sendAttachments(currentChat, noted, version, dispatch)
-      else await sendText(currentChat, noted, dispatch)
+      else await sendText(currentChat, noted, dispatch, withTurn)
       const request = currentChat.messages.find(
         (message) => message.role === 'user' && !previousIds.has(message.id)
       )

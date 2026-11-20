@@ -12,5 +12,7 @@ export const contextUsageSchema = v.object({
   windowTokens: v.optional(tokenCountSchema),
   inputTokens: v.optional(tokenCountSchema),
   cachedInputTokens: v.optional(tokenCountSchema),
-  outputTokens: v.optional(tokenCountSchema)
+  outputTokens: v.optional(tokenCountSchema),
+  /** What the reply's first request held: the instructions and tools every request carries. */
+  firstRequestTokens: v.optional(tokenCountSchema)
 })

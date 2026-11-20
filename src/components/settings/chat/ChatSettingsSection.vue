@@ -6,6 +6,7 @@ import { useAgentMessages, useI18n } from '@pairdraw/vue/i18n'
 import {
   animateAIEdits,
   approveActions,
+  compactAutomatically,
   canvasPrompt,
   changePreviewSize,
   maxAgentSteps,
@@ -94,6 +95,13 @@ const previewOptions = computed(() => [
           v-model="approveActions"
           :label="agents.approveActions"
           data-test-id="settings-ai-approve-actions"
+        />
+      </SettingsRow>
+      <SettingsRow :label="ai.compactAutomatically" :description="ai.compactAutomaticallyHint">
+        <AppSwitch
+          v-model="compactAutomatically"
+          :label="ai.compactAutomatically"
+          data-test-id="settings-ai-compact-automatically"
         />
       </SettingsRow>
     </SettingsGroup>

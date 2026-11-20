@@ -45,6 +45,7 @@ const resolved = computed(() => {
 })
 
 const label = computed(() => {
+  if (reference.kind === 'command') return reference.label
   if (reference.kind === 'skill') return ai.value.openSkillSettings({ name: resolved.value.name })
   if (reference.kind === 'element') {
     const mark = parseElementMark(reference.id)
@@ -113,6 +114,11 @@ async function open() {
     />
     <icon-lucide-quote
       v-else-if="reference.kind === 'citation'"
+      :class="ui.icon()"
+      aria-hidden="true"
+    />
+    <icon-lucide-square-slash
+      v-else-if="reference.kind === 'command'"
       :class="ui.icon()"
       aria-hidden="true"
     />

@@ -165,6 +165,25 @@ export type { FigmaVariationSettings } from './fonts/variations'
 
 // TODO(figma-api): Implement the full official PluginAPI interface once our compatibility
 // layer covers all required node-specific return types and unsupported APIs are modeled explicitly.
+/** What a plugin keeps in `figma.clientStorage`: JSON values, copied in and out. */
+const clientStorageValues = new Map<string, unknown>()
+
+const clientStorage: ClientStorageAPI = {
+  async getAsync(key: string): Promise<unknown> {
+    const value = clientStorageValues.get(key)
+    return value === undefined ? undefined : structuredClone(value)
+  },
+  async setAsync(key: string, value: unknown): Promise<void> {
+    clientStorageValues.set(key, structuredClone(value))
+  },
+  async deleteAsync(key: string): Promise<void> {
+    clientStorageValues.delete(key)
+  },
+  async keysAsync(): Promise<string[]> {
+    return [...clientStorageValues.keys()]
+  }
+}
+
 export class FigmaAPI implements NodeProxyHost {
   readonly graph: SceneGraph
   private _currentPageId: string
@@ -180,6 +199,8 @@ export class FigmaAPI implements NodeProxyHost {
   readonly util: UtilAPI = figmaUtil
   /** The document's variables and collections, as Figma's `figma.variables`. */
   readonly variables: FigmaVariablesAPI
+  /** Values a plugin keeps for its next run, as Figma's `figma.clientStorage`. */
+  readonly clientStorage: ClientStorageAPI = clientStorage
 
   /** How `createImageAsync` fetches HTTP(S) URLs; a host passes one that gets past CORS. */
   readonly #fetch: images.ImageFetch

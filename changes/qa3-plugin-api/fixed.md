@@ -1,0 +1,1 @@
+- Plugin scripts can keep values between runs with figma.clientStorage.

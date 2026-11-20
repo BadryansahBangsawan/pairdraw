@@ -35,6 +35,8 @@ import { usePropertyBinding } from './properties/component-properties/usePropert
 import VariantAuthoringSection from './properties/component-properties/variant/VariantAuthoringSection.vue'
 import ConnectorSection from './properties/connector/ConnectorSection.vue'
 import ConstraintsSection from './properties/constraints/ConstraintsSection.vue'
+import DesignMemorySection from './properties/design-memory/DesignMemorySection.vue'
+import DesignMemorySelectionSection from './properties/design-memory/DesignMemorySelectionSection.vue'
 import DocumentSection from './properties/DocumentSection.vue'
 import EffectsSection from './properties/EffectsSection.vue'
 import ExportSection from './properties/ExportSection.vue'
@@ -348,6 +350,7 @@ const { panels, rename: renameMessages } = useI18n()
 
       <ExportSection />
       <AgentNotesSection />
+      <DesignMemorySelectionSection />
       <BrowserNodeSection />
     </div>
   </RetainedPanel>
@@ -360,6 +363,7 @@ const { panels, rename: renameMessages } = useI18n()
     <PageSection />
     <VariablesSection @open-dialog="openVariablesDialog(store)" />
     <StatusesSection />
+    <DesignMemorySection />
     <DocumentSection />
     <ExportSection />
   </div>

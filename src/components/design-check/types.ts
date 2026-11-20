@@ -1,6 +1,7 @@
 import type { Component } from 'vue'
 
 import type { LintFixRequest } from '@pairdraw/core/lint'
+import type { DesignMemoryGroup } from '@pairdraw/scene-graph/design-memory'
 
 import type { IssueAction, IssueSwatch } from '@/app/editor/design-check/format'
 import type { DesignIssue, DesignIssueSeverity } from '@/app/editor/design-check/issues'
@@ -12,6 +13,8 @@ export interface IssueRowView {
   detail: string | null
   swatch: IssueSwatch | null
   action: IssueAction | null
+  /** The value a design memory finding offers to allow. */
+  allowance: { group: DesignMemoryGroup; value: string | number } | null
   hidden: boolean
   missing: boolean
   selected: boolean

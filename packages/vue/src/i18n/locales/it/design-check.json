@@ -82,5 +82,15 @@
   "ruleNoMixedStyles": "Stili di testo misti",
   "ruleNoMixedStylesHelp": "Più stili in un solo livello di testo si rompono facilmente durante la modifica.",
   "ruleNoDetachedInstances": "Sembra un componente",
-  "ruleNoDetachedInstancesHelp": "Questa cornice sembra un elemento riutilizzabile. Usa un’istanza di componente."
+  "ruleNoDetachedInstancesHelp": "Questa cornice sembra un elemento riutilizzabile. Usa un’istanza di componente.",
+  "ruleDesignMemoryColors": "Colore fuori dalla memoria di design",
+  "ruleDesignMemoryColorsHelp": "Usa un colore consentito dalla memoria di design, o consenti questo.",
+  "ruleDesignMemoryFonts": "Font fuori dalla memoria di design",
+  "ruleDesignMemoryFontsHelp": "Usa un font consentito dalla memoria di design, o consenti questo.",
+  "ruleDesignMemoryFontSizes": "Dimensione del font fuori dalla memoria di design",
+  "ruleDesignMemoryFontSizesHelp": "Usa una dimensione del font della memoria di design, o consenti questa.",
+  "ruleDesignMemorySpacing": "Spaziatura fuori dalla memoria di design",
+  "ruleDesignMemorySpacingHelp": "Usa una spaziatura della memoria di design, o consenti questa.",
+  "ruleDesignMemoryRadius": "Raggio fuori dalla memoria di design",
+  "ruleDesignMemoryRadiusHelp": "Usa un raggio degli angoli della memoria di design, o consenti questo."
 }

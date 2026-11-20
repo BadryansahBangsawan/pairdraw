@@ -16,6 +16,7 @@ import { commentMessageDefaults, commentMessages } from '#vue/i18n/messages/comm
 import { commonMessageDefaults, commonMessages } from '#vue/i18n/messages/common'
 import { credentialsMessageDefaults, credentialsMessages } from '#vue/i18n/messages/credentials'
 import { designCheckMessageDefaults, designCheckMessages } from '#vue/i18n/messages/design-check'
+import { designMemoryMessageDefaults, designMemoryMessages } from '#vue/i18n/messages/design-memory'
 import { diagnosticsMessageDefaults, diagnosticsMessages } from '#vue/i18n/messages/diagnostics'
 import { editorMessageDefaults, editorMessages } from '#vue/i18n/messages/editor'
 import { exploreMessageDefaults, exploreMessages } from '#vue/i18n/messages/explore'
@@ -57,6 +58,7 @@ export {
   commonMessages,
   credentialsMessages,
   designCheckMessages,
+  designMemoryMessages,
   diagnosticsMessages,
   editorMessages,
   exploreMessages,
@@ -98,6 +100,7 @@ export const messageDefaults = {
   common: commonMessageDefaults,
   credentials: credentialsMessageDefaults,
   designCheck: designCheckMessageDefaults,
+  designMemory: designMemoryMessageDefaults,
   diagnostics: diagnosticsMessageDefaults,
   editor: editorMessageDefaults,
   explore: exploreMessageDefaults,

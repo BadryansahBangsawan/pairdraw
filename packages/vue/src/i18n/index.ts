@@ -14,6 +14,7 @@ export {
   useCommonMessages,
   useCredentialMessages,
   useDesignCheckMessages,
+  useDesignMemoryMessages,
   useDiagnosticsMessages,
   useEditorMessages,
   useExploreMessages,

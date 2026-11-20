@@ -23,6 +23,7 @@ de:code.styling
 de:code.stylingCSS
 de:code.stylingTailwind
 de:common.ok
+de:designMemory.byAgent
 de:diagnostics.categoryMCP
 de:diagnostics.categoryRenderer
 de:diagnostics.durationMs
@@ -153,6 +154,7 @@ fr:code.stylingCSS
 fr:code.stylingTailwind
 fr:collaboration.microphone
 fr:common.ok
+fr:designMemory.byAgent
 fr:diagnostics.categoryDocument
 fr:diagnostics.categoryMCP
 fr:diagnostics.durationMs
@@ -323,6 +325,7 @@ pl:code.sourceReact
 pl:code.stylingCSS
 pl:code.stylingTailwind
 pl:common.ok
+pl:designMemory.byAgent
 pl:diagnostics.categoryAI
 pl:diagnostics.categoryMCP
 pl:diagnostics.categoryRenderer

@@ -1,0 +1,77 @@
+{
+  "designMemory": "Design-Gedächtnis",
+  "editDesignMemory": "Design-Gedächtnis bearbeiten…",
+  "createFromDocument": "Aus diesem Dokument erstellen",
+  "emptyHint": "Farben, Schriften und Abstände, an die sich Agenten in diesem Dokument halten müssen.",
+  "colorCount": {
+    "one": "{count} Farbe",
+    "many": "{count} Farben"
+  },
+  "fontCount": {
+    "one": "{count} Schrift",
+    "many": "{count} Schriften"
+  },
+  "sizeCount": {
+    "one": "{count} Schriftgröße",
+    "many": "{count} Schriftgrößen"
+  },
+  "decisionCount": {
+    "one": "{count} Entscheidung",
+    "many": "{count} Entscheidungen"
+  },
+  "exampleCount": {
+    "one": "{count} Beispiel",
+    "many": "{count} Beispiele"
+  },
+  "rules": "Regeln",
+  "decisions": "Entscheidungen",
+  "examples": "Beispiele",
+  "colors": "Farben",
+  "fonts": "Schriften",
+  "fontSizes": "Schriftgrößen",
+  "spacing": "Abstände",
+  "radius": "Eckenradius",
+  "fromSystem": "Variablen und Stile einbeziehen",
+  "fromSystemCount": {
+    "one": "{count} Wert aus Variablen und Stilen",
+    "many": "{count} Werte aus Variablen und Stilen"
+  },
+  "enforcement": "Wenn ein Agent einen anderen Wert verwendet",
+  "refuse": "Änderung rückgängig machen",
+  "warn": "Warnen",
+  "off": "Aus",
+  "notChecked": "Noch nichts erlaubt, daher wird nichts geprüft",
+  "addValue": "Wert hinzufügen",
+  "pickColor": "Farbe wählen",
+  "moreValues": "+{count} weitere",
+  "removeValue": "{value} entfernen",
+  "newDecision": "Entscheidung notieren, der Agenten folgen sollen",
+  "addDecision": "Entscheidung hinzufügen",
+  "removeDecision": "Entscheidung entfernen",
+  "byAgent": "Agent",
+  "noDecisionsYet": "Noch keine Entscheidungen",
+  "noDecisions": "Notiere Entscheidungen für Agenten, etwa welche Farbe die Hauptaktion kennzeichnet.",
+  "editDecision": "Entscheidung bearbeiten",
+  "moveUp": "Nach oben",
+  "moveDown": "Nach unten",
+  "noExamplesYet": "Noch keine Beispiele",
+  "noExamples": "Wähle einen Rahmen, der das Design richtig zeigt, und hefte ihn als Beispiel an.",
+  "pinExample": "Als Beispiel anheften",
+  "unpinExample": "Beispiel lösen",
+  "showExample": "Zeigen",
+  "removeExample": "Beispiel entfernen",
+  "missingExample": "Nicht mehr im Dokument",
+  "learn": "Aus Auswahl lernen",
+  "learnHeading": "Werte, die die Auswahl verwendet",
+  "learnHint": "Nur einmal verwendete Werte sind nicht angehakt.",
+  "uses": {
+    "one": "{count}-mal verwendet",
+    "many": "{count}-mal verwendet"
+  },
+  "addChecked": "Angehakte Werte hinzufügen",
+  "nothingToLearn": "Die Auswahl verwendet keine Werte, die das Gedächtnis nicht schon erlaubt.",
+  "deleteMemory": "Design-Gedächtnis löschen",
+  "allow": "{value} erlauben",
+  "allowed": "{value} erlaubt",
+  "refused": "Vom Design-Gedächtnis rückgängig gemacht"
+}

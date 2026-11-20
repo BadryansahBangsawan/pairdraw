@@ -82,5 +82,15 @@
   "ruleNoMixedStyles": "Gemischte Textstile",
   "ruleNoMixedStylesHelp": "Mehrere Stile in einer Textebene gehen beim Bearbeiten leicht kaputt.",
   "ruleNoDetachedInstances": "Sieht wie eine Komponente aus",
-  "ruleNoDetachedInstancesHelp": "Dieser Rahmen sieht wie ein wiederverwendbares Element aus. Verwende eine Komponenteninstanz."
+  "ruleNoDetachedInstancesHelp": "Dieser Rahmen sieht wie ein wiederverwendbares Element aus. Verwende eine Komponenteninstanz.",
+  "ruleDesignMemoryColors": "Farbe außerhalb des Design-Gedächtnisses",
+  "ruleDesignMemoryColorsHelp": "Verwende eine Farbe, die das Design-Gedächtnis erlaubt, oder erlaube diese.",
+  "ruleDesignMemoryFonts": "Schrift außerhalb des Design-Gedächtnisses",
+  "ruleDesignMemoryFontsHelp": "Verwende eine Schrift, die das Design-Gedächtnis erlaubt, oder erlaube diese.",
+  "ruleDesignMemoryFontSizes": "Schriftgröße außerhalb des Design-Gedächtnisses",
+  "ruleDesignMemoryFontSizesHelp": "Verwende eine Schriftgröße aus dem Design-Gedächtnis oder erlaube diese.",
+  "ruleDesignMemorySpacing": "Abstand außerhalb des Design-Gedächtnisses",
+  "ruleDesignMemorySpacingHelp": "Verwende einen Abstand aus dem Design-Gedächtnis oder erlaube diesen.",
+  "ruleDesignMemoryRadius": "Radius außerhalb des Design-Gedächtnisses",
+  "ruleDesignMemoryRadiusHelp": "Verwende einen Eckenradius aus dem Design-Gedächtnis oder erlaube diesen."
 }

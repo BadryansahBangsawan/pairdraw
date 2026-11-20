@@ -53,10 +53,13 @@ const hasTopBar = !appRuntimeConfig.embed
 const { tab } = defineProps<{ tab: Tab }>()
 const store = tab.store
 provideTabEditorStore(store)
-// The variables window loads with its first opening, not with the document.
+// The variables and design memory windows load with their first opening, not with the document.
 // The video dialog loads the encoders, so it comes with its own chunk when first opened.
 const PrototypeVideoDialog = defineAsyncComponent(
   () => import('@/components/export/PrototypeVideoDialog.vue')
+)
+const DesignMemoryDialog = defineAsyncComponent(
+  () => import('@/components/design-memory/DesignMemoryDialog.vue')
 )
 const VariablesDialog = defineAsyncComponent(
   () => import('@/components/variables/VariablesDialog.vue')
@@ -245,6 +248,7 @@ const { pending: roomPending } = useRoomActions()
   <LazyOverlay :open="store.state.variablesOpen"><VariablesDialog /></LazyOverlay>
   <LazyOverlay :open="videoExportOpen(store).value"><PrototypeVideoDialog /></LazyOverlay>
   <StatusesDialog />
+  <LazyOverlay :open="store.state.designMemoryOpen"><DesignMemoryDialog /></LazyOverlay>
   <CommentDeleteDialog />
   <ComponentToFrameDialog />
 </template>

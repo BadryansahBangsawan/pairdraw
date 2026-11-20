@@ -94,7 +94,18 @@ export const designCheckMessageDefaults = {
   ruleNoMixedStyles: 'Mixed text styles',
   ruleNoMixedStylesHelp: 'Several styles in one text layer are easy to break when editing.',
   ruleNoDetachedInstances: 'Looks like a component',
-  ruleNoDetachedInstancesHelp: 'This frame looks like a reusable element. Use a component instance.'
+  ruleNoDetachedInstancesHelp:
+    'This frame looks like a reusable element. Use a component instance.',
+  ruleDesignMemoryColors: 'Color outside the design memory',
+  ruleDesignMemoryColorsHelp: 'Use a color the design memory allows, or allow this one.',
+  ruleDesignMemoryFonts: 'Font outside the design memory',
+  ruleDesignMemoryFontsHelp: 'Use a font the design memory allows, or allow this one.',
+  ruleDesignMemoryFontSizes: 'Font size outside the design memory',
+  ruleDesignMemoryFontSizesHelp: 'Use a font size from the design memory, or allow this one.',
+  ruleDesignMemorySpacing: 'Spacing outside the design memory',
+  ruleDesignMemorySpacingHelp: 'Use a spacing step from the design memory, or allow this one.',
+  ruleDesignMemoryRadius: 'Radius outside the design memory',
+  ruleDesignMemoryRadiusHelp: 'Use a corner radius from the design memory, or allow this one.'
 } as const
 
 export const designCheckMessages = i18n('designCheck', designCheckMessageDefaults)

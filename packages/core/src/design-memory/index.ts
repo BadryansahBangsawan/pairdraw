@@ -1,6 +1,7 @@
 export * from './check'
 export * from './document'
 export * from './describe'
+export * from './distil'
 export * from './refusal'
 export * from './rules'
 export * from './values'

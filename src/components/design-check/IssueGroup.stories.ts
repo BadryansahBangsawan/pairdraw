@@ -31,6 +31,7 @@ function row(overrides: Partial<IssueRowView> & Pick<IssueRowView, 'issue' | 'la
     detail: null,
     swatch: null,
     action: null,
+    allowance: null,
     hidden: false,
     missing: false,
     selected: false,
@@ -129,6 +130,27 @@ const radius: IssueGroupView = {
   ]
 }
 
+const memoryColors: IssueGroupView = {
+  ruleId: 'design-memory-colors',
+  severity: 'error',
+  title: 'Color outside the design memory',
+  help: 'Use a color the design memory allows, or allow this one.',
+  fixes: [],
+  bindsOnly: false,
+  count: 1,
+  rows: [
+    row({
+      issue: issue('design-memory-colors', 'badge', 'error'),
+      layerName: 'Sale badge',
+      layerIcon: IconSquare,
+      detail: '#FF00AA',
+      swatch: { kind: 'color', color: '#FF00AA' },
+      action: bindAction('badge'),
+      allowance: { group: 'colors', value: '#FF00AA' }
+    })
+  ]
+}
+
 interface IssueGroupStoryArgs {
   group: IssueGroupView
   open?: boolean
@@ -159,3 +181,5 @@ export const FixableColors: Story = { args: { group: colors } }
 export const Collapsed: Story = { args: { group: colors, open: false } }
 
 export const Suggestion: Story = { args: { group: radius } }
+
+export const DesignMemory: Story = { args: { group: memoryColors } }

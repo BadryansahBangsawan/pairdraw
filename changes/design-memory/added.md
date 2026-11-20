@@ -1,0 +1,1 @@
+- A document keeps a design memory that agents follow: the colors, fonts, font sizes, spacing, and corner radii they may use (the document's variables and styles plus values you allow), decisions written down, and frames pinned as examples. Create it from the Design panel with nothing selected, or learn it from a selected frame.

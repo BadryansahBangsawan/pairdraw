@@ -15,6 +15,7 @@ export const READ_ONLY_ACTIONS: ReadonlySet<string> = new Set([
   'canDistributeNodes',
   'canEditImage',
   'collectVariantOptions',
+  'designMemory',
   'componentInstanceCount',
   'figCompression',
   'findVariantByValues',

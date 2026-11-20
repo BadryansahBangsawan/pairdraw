@@ -82,5 +82,15 @@
   "ruleNoMixedStyles": "Смешанные стили текста",
   "ruleNoMixedStylesHelp": "Несколько стилей в одном текстовом слое легко сломать при редактировании.",
   "ruleNoDetachedInstances": "Похоже на компонент",
-  "ruleNoDetachedInstancesHelp": "Этот фрейм похож на переиспользуемый элемент. Используйте экземпляр компонента."
+  "ruleNoDetachedInstancesHelp": "Этот фрейм похож на переиспользуемый элемент. Используйте экземпляр компонента.",
+  "ruleDesignMemoryColors": "Цвет вне памяти дизайна",
+  "ruleDesignMemoryColorsHelp": "Используйте цвет, разрешённый памятью дизайна, или разрешите этот.",
+  "ruleDesignMemoryFonts": "Шрифт вне памяти дизайна",
+  "ruleDesignMemoryFontsHelp": "Используйте шрифт, разрешённый памятью дизайна, или разрешите этот.",
+  "ruleDesignMemoryFontSizes": "Размер шрифта вне памяти дизайна",
+  "ruleDesignMemoryFontSizesHelp": "Используйте размер шрифта из памяти дизайна или разрешите этот.",
+  "ruleDesignMemorySpacing": "Отступ вне памяти дизайна",
+  "ruleDesignMemorySpacingHelp": "Используйте отступ из памяти дизайна или разрешите этот.",
+  "ruleDesignMemoryRadius": "Радиус вне памяти дизайна",
+  "ruleDesignMemoryRadiusHelp": "Используйте радиус углов из памяти дизайна или разрешите этот."
 }

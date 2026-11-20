@@ -82,5 +82,15 @@
   "ruleNoMixedStyles": "Estilos de texto mezclados",
   "ruleNoMixedStylesHelp": "Varios estilos en una capa de texto se rompen fácilmente al editar.",
   "ruleNoDetachedInstances": "Parece un componente",
-  "ruleNoDetachedInstancesHelp": "Este marco parece un elemento reutilizable. Usa una instancia de componente."
+  "ruleNoDetachedInstancesHelp": "Este marco parece un elemento reutilizable. Usa una instancia de componente.",
+  "ruleDesignMemoryColors": "Color fuera de la memoria de diseño",
+  "ruleDesignMemoryColorsHelp": "Usa un color que permita la memoria de diseño, o permite este.",
+  "ruleDesignMemoryFonts": "Fuente fuera de la memoria de diseño",
+  "ruleDesignMemoryFontsHelp": "Usa una fuente que permita la memoria de diseño, o permite esta.",
+  "ruleDesignMemoryFontSizes": "Tamaño de fuente fuera de la memoria de diseño",
+  "ruleDesignMemoryFontSizesHelp": "Usa un tamaño de fuente de la memoria de diseño, o permite este.",
+  "ruleDesignMemorySpacing": "Espaciado fuera de la memoria de diseño",
+  "ruleDesignMemorySpacingHelp": "Usa un espaciado de la memoria de diseño, o permite este.",
+  "ruleDesignMemoryRadius": "Radio fuera de la memoria de diseño",
+  "ruleDesignMemoryRadiusHelp": "Usa un radio de esquina de la memoria de diseño, o permite este."
 }

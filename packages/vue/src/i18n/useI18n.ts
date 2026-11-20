@@ -18,6 +18,7 @@ import {
   commonMessages,
   credentialsMessages,
   designCheckMessages,
+  designMemoryMessages,
   diagnosticsMessages,
   editorMessages,
   exploreMessages,
@@ -62,6 +63,7 @@ export const useCommentMessages = () => useI18nNamespace(commentMessages)
 export const useCommonMessages = () => useI18nNamespace(commonMessages)
 export const useCredentialMessages = () => useI18nNamespace(credentialsMessages)
 export const useDesignCheckMessages = () => useI18nNamespace(designCheckMessages)
+export const useDesignMemoryMessages = () => useI18nNamespace(designMemoryMessages)
 export const useDiagnosticsMessages = () => useI18nNamespace(diagnosticsMessages)
 export const useEditorMessages = () => useI18nNamespace(editorMessages)
 export const useExploreMessages = () => useI18nNamespace(exploreMessages)

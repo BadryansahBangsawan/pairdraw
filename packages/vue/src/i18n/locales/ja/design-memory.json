@@ -1,0 +1,70 @@
+{
+  "designMemory": "デザインメモリー",
+  "editDesignMemory": "デザインメモリーを編集…",
+  "createFromDocument": "このドキュメントから作成",
+  "emptyHint": "このドキュメントでエージェントが守るべき色、フォント、間隔です。",
+  "colorCount": {
+    "many": "{count} 色"
+  },
+  "fontCount": {
+    "many": "{count} フォント"
+  },
+  "sizeCount": {
+    "many": "{count} 個のフォントサイズ"
+  },
+  "decisionCount": {
+    "many": "{count} 件の決定"
+  },
+  "exampleCount": {
+    "many": "{count} 件の例"
+  },
+  "rules": "ルール",
+  "decisions": "決定事項",
+  "examples": "例",
+  "colors": "色",
+  "fonts": "フォント",
+  "fontSizes": "フォントサイズ",
+  "spacing": "間隔",
+  "radius": "角の半径",
+  "fromSystem": "変数とスタイルを含める",
+  "fromSystemCount": {
+    "many": "変数とスタイルから {count} 個の値"
+  },
+  "enforcement": "エージェントが別の値を使ったとき",
+  "refuse": "編集を取り消す",
+  "warn": "警告する",
+  "off": "オフ",
+  "notChecked": "まだ何も許可されていないため、チェックしません",
+  "addValue": "値を追加",
+  "pickColor": "色を選ぶ",
+  "moreValues": "ほか {count} 件",
+  "removeValue": "{value} を削除",
+  "newDecision": "エージェントが守るべき決定を書く",
+  "addDecision": "決定を追加",
+  "removeDecision": "決定を削除",
+  "byAgent": "エージェント",
+  "noDecisionsYet": "まだ決定事項はありません",
+  "noDecisions": "主要なアクションにどの色を使うかなど、エージェントが守るべき選択を書き留めましょう。",
+  "editDecision": "決定を編集",
+  "moveUp": "上へ移動",
+  "moveDown": "下へ移動",
+  "noExamplesYet": "まだ例はありません",
+  "noExamples": "正しいデザインを示すフレームを選び、例としてピン留めしてください。",
+  "pinExample": "例としてピン留め",
+  "unpinExample": "例のピン留めを外す",
+  "showExample": "表示",
+  "removeExample": "例を削除",
+  "missingExample": "ドキュメントにもうありません",
+  "learn": "選択範囲から学習",
+  "learnHeading": "選択範囲で使われている値",
+  "learnHint": "一度しか使われていない値はチェックが外れています。",
+  "uses": {
+    "many": "{count} 回使用"
+  },
+  "addChecked": "チェックした値を追加",
+  "nothingToLearn": "選択範囲には、メモリーがまだ許可していない値はありません。",
+  "deleteMemory": "デザインメモリーを削除",
+  "allow": "{value} を許可",
+  "allowed": "{value} を許可しました",
+  "refused": "デザインメモリーにより取り消されました"
+}

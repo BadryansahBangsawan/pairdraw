@@ -2,6 +2,7 @@ import type { SceneGraph } from '@pairdraw/scene-graph'
 
 import {
   issueAction,
+  issueAllowance,
   issueDetail,
   issueSwatch,
   ruleHelp,
@@ -42,6 +43,7 @@ function issueRowView(issue: DesignIssue, context: RowContext): IssueRowView {
     detail: issueDetail(issue, messages),
     swatch: issueSwatch(issue),
     action: node ? issueAction(issue, messages) : null,
+    allowance: node ? issueAllowance(issue) : null,
     hidden: node ? isHidden(graph, node.id) : false,
     missing: !node,
     selected: context.selectedIds.has(issue.nodeId),

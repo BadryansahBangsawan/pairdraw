@@ -82,5 +82,15 @@
   "ruleNoMixedStyles": "混在したテキストスタイル",
   "ruleNoMixedStylesHelp": "1 つのテキストレイヤーに複数のスタイルがあると、編集時に崩れやすくなります。",
   "ruleNoDetachedInstances": "コンポーネントのようなフレーム",
-  "ruleNoDetachedInstancesHelp": "このフレームは再利用する要素に見えます。コンポーネントのインスタンスを使ってください。"
+  "ruleNoDetachedInstancesHelp": "このフレームは再利用する要素に見えます。コンポーネントのインスタンスを使ってください。",
+  "ruleDesignMemoryColors": "デザインメモリー外の色",
+  "ruleDesignMemoryColorsHelp": "デザインメモリーが許可する色を使うか、この色を許可してください。",
+  "ruleDesignMemoryFonts": "デザインメモリー外のフォント",
+  "ruleDesignMemoryFontsHelp": "デザインメモリーが許可するフォントを使うか、このフォントを許可してください。",
+  "ruleDesignMemoryFontSizes": "デザインメモリー外のフォントサイズ",
+  "ruleDesignMemoryFontSizesHelp": "デザインメモリーのフォントサイズを使うか、このサイズを許可してください。",
+  "ruleDesignMemorySpacing": "デザインメモリー外の間隔",
+  "ruleDesignMemorySpacingHelp": "デザインメモリーの間隔を使うか、この値を許可してください。",
+  "ruleDesignMemoryRadius": "デザインメモリー外の半径",
+  "ruleDesignMemoryRadiusHelp": "デザインメモリーの角の半径を使うか、この値を許可してください。"
 }

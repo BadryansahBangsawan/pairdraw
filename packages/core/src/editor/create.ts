@@ -39,6 +39,7 @@ import { createConnectorDrawActions, createConnectorEndpointActions } from './co
 import { createConnectorLineActions } from './connectors/line'
 import { createConnectorRouting } from './connectors/routing'
 import { createConnectorStyleActions } from './connectors/style'
+import { createDesignMemoryActions } from './design-memory'
 import { createDesignTokenActions } from './design-tokens'
 import { createDocumentSettingsActions } from './document-settings'
 import { createFigCompressionActions } from './fig-compression'
@@ -353,6 +354,7 @@ export function createEditor(options?: EditorOptions) {
   const shapesWithText = createShapeWithTextActions(ctx, nodes)
   const generatedText = createGeneratedTextActions(ctx, nodes)
   const statuses = createStatusActions(ctx)
+  const designMemory = createDesignMemoryActions(ctx)
   const figCompression = createFigCompressionActions(ctx)
   createConnectorRouting(ctx)
   const connectorDrawing = createConnectorDrawActions(ctx)
@@ -577,6 +579,7 @@ export function createEditor(options?: EditorOptions) {
     getShownStatus: statuses.getShownStatus,
     setStatus: statuses.setStatus,
     setStatusWorkflow: statuses.setStatusWorkflow,
+    ...designMemory,
     ...connectorDrawing,
     ...connectorEndpoints,
     ...connectorLines,

@@ -1,4 +1,5 @@
 import type { LintFix, LintFixRequest } from '@pairdraw/core/lint'
+import { DESIGN_MEMORY_GROUPS, type DesignMemoryGroup } from '@pairdraw/scene-graph/design-memory'
 import type { useDesignCheckMessages } from '@pairdraw/vue/i18n'
 
 import { formatNumber } from '@/app/i18n/number'
@@ -44,7 +45,18 @@ const RULE_COPY: Partial<Record<string, RuleCopy>> = {
   'no-detached-instances': {
     title: 'ruleNoDetachedInstances',
     help: 'ruleNoDetachedInstancesHelp'
-  }
+  },
+  'design-memory-colors': { title: 'ruleDesignMemoryColors', help: 'ruleDesignMemoryColorsHelp' },
+  'design-memory-fonts': { title: 'ruleDesignMemoryFonts', help: 'ruleDesignMemoryFontsHelp' },
+  'design-memory-font-sizes': {
+    title: 'ruleDesignMemoryFontSizes',
+    help: 'ruleDesignMemoryFontSizesHelp'
+  },
+  'design-memory-spacing': {
+    title: 'ruleDesignMemorySpacing',
+    help: 'ruleDesignMemorySpacingHelp'
+  },
+  'design-memory-radius': { title: 'ruleDesignMemoryRadius', help: 'ruleDesignMemoryRadiusHelp' }
 }
 
 const SPACING_DETAIL = {
@@ -138,6 +150,13 @@ export function issueDetail(issue: DesignIssue, messages: Messages): string | nu
       const depth = numberAt(issue, 'depth')
       return depth === undefined ? null : messages.detailDepth({ depth })
     }
+    case 'design-memory-colors':
+    case 'design-memory-fonts':
+      return stringAt(issue, 'value') ?? null
+    case 'design-memory-font-sizes':
+    case 'design-memory-spacing':
+    case 'design-memory-radius':
+      return px(numberAt(issue, 'value')) || null
     case 'pixel-perfect': {
       const parts = Object.entries(GEOMETRY_LABELS).flatMap(([key, label]) => {
         const value = numberAt(issue, key)
@@ -158,6 +177,10 @@ export type IssueSwatch =
 export function issueSwatch(issue: DesignIssue): IssueSwatch | null {
   if (issue.ruleId === 'no-hardcoded-colors') {
     const color = stringAt(issue, 'color')
+    return color ? { kind: 'color', color } : null
+  }
+  if (issue.ruleId === 'design-memory-colors') {
+    const color = stringAt(issue, 'value')
     return color ? { kind: 'color', color } : null
   }
   if (issue.ruleId === 'color-contrast') {
@@ -192,6 +215,21 @@ function fixLabel(fix: LintFix, messages: Messages): string {
   const [property, value] = changes[0]
   if (property === 'cornerRadius' && value === FULL_RADIUS) return messages.fixFullRadius
   return messages.fixUseValue({ value: `${formatNumber(value)} px` })
+}
+
+/** The design memory value a finding offers to allow, for the memory's own rules. */
+export function issueAllowance(
+  issue: DesignIssue
+): { group: DesignMemoryGroup; value: string | number } | null {
+  if (!issue.ruleId.startsWith('design-memory-')) return null
+  const group = stringAt(issue, 'group')
+  const value = issue.data?.value
+  if (!group || !isDesignMemoryGroup(group) || value === undefined) return null
+  return { group, value }
+}
+
+function isDesignMemoryGroup(value: string): value is DesignMemoryGroup {
+  return (DESIGN_MEMORY_GROUPS as readonly string[]).includes(value)
 }
 
 export function issueAction(issue: DesignIssue, messages: Messages): IssueAction | null {

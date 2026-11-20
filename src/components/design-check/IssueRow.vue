@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDesignCheckMessages } from '@pairdraw/vue/i18n'
+import { useDesignCheckMessages, useDesignMemoryMessages } from '@pairdraw/vue/i18n'
 
 import Tip from '@/components/ui/overlay/Tip.vue'
 
@@ -11,9 +11,11 @@ const emit = defineEmits<{
   open: []
   hover: [hovered: boolean]
   fix: []
+  allow: []
 }>()
 
 const messages = useDesignCheckMessages()
+const memoryMessages = useDesignMemoryMessages()
 const styles = designCheck()
 </script>
 
@@ -86,6 +88,21 @@ const styles = designCheck()
           aria-hidden="true"
         />
         <icon-lucide-wand-sparkles v-else class="size-3" aria-hidden="true" />
+      </button>
+    </Tip>
+    <Tip
+      v-if="row.allowance"
+      as-child
+      :label="memoryMessages.allow({ value: String(row.allowance.value) })"
+    >
+      <button
+        type="button"
+        :aria-label="memoryMessages.allow({ value: String(row.allowance.value) })"
+        :class="styles.rowAction()"
+        data-test-id="design-check-allow"
+        @click="emit('allow')"
+      >
+        <icon-lucide-check class="size-3" aria-hidden="true" />
       </button>
     </Tip>
   </li>

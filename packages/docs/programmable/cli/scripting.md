@@ -183,6 +183,7 @@ Layer features Figma's API has no member for:
 - `pairdraw.getLayoutDirection(node)` / `setLayoutDirection(node, direction)` and `getTextDirection(node)` / `setTextDirection(node, direction)` read and set which way an auto layout or a text runs: `AUTO`, `LTR`, or `RTL`.
 - `pairdraw.getFillOkHCL(node, index?)` / `setFillOkHCL(node, color, index?)` and the `Stroke` pair read and set a paint's color in OkHCL, `{ h, c, l, a? }`; its RGB follows in the document's color space.
 - `pairdraw.exposeInstanceSwap(instances, candidates, name?)` exposes swapping those instances as one instance swap property offering the candidate components, and returns the layer that holds it.
+- `pairdraw.createVariations(node, { count, labels? })` copies a layer 1 to 8 times into a section of variations beside it, each copy named `V2 · <label>`, and returns `{ set, versions }`; on a version, it copies that version into its set. `pairdraw.getVariations(node)` reads the set a layer belongs to, or `null`, and `pairdraw.variations` lists the sets on the current page. A set has `id`, `original`, `versions`, `use(version)`, which makes the original look like that version while it keeps its id, name, and place, and removes the set, and `discard()`.
 - `pairdraw.getFontStatus()` reports whether the current page's fonts are available: the faces asked for, where each loaded from, substitutions, and the layers affected.
 
 ## Supported API surface

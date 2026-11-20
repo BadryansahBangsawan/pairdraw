@@ -90,8 +90,10 @@ import { getStatuses, setStatus } from '#core/tools/statuses'
 import {
   arrangeNodes,
   cloneNode,
+  createVariationsTool,
   flattenNodes,
   groupNodes,
+  listVariations,
   nodeAncestors,
   nodeBindings,
   nodeBounds,
@@ -100,6 +102,7 @@ import {
   nodeReplaceWith,
   nodeToComponent,
   nodeTree,
+  pickVariation,
   renameNode,
   ungroupNode
 } from '#core/tools/structure'
@@ -227,6 +230,10 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   nodeBindings,
   nodeReplaceWith,
   arrangeNodes,
+  // Variations: versions of a layer side by side, one of which can replace it
+  createVariationsTool,
+  listVariations,
+  pickVariation,
   // Variables
   listVariables,
   listCollections,

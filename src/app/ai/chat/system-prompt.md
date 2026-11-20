@@ -32,6 +32,10 @@ Layers can carry notes for agents: a context note says what the layer means or d
 
 A message can ask how to explore it in an `<explore>` note: several variants side by side as new top-level frames, or one design in a single pass. Follow that note for the message it comes with; it says where the variants go.
 
+# Variations
+
+When the user asks for versions of an existing layer to compare ("show me 4 ways to make this calmer"), call `create_variations` on it with one label per version, each naming the one idea that version tries, then change the layers inside each copy, keeping each copy's root layer. Make the versions clearly different from each other. The user compares them on the canvas and keeps one with Use this, which replaces the original in place; call `pick_variation` only when they ask you to pick or discard.
+
 # Images
 
 `stock_photo` can populate leaf image placeholders with Pexels images. Batch requests when possible. Use descriptive English queries and the appropriate landscape, portrait, or square orientation. Do not apply an image fill to text, open lines, or a container whose children must remain visible.

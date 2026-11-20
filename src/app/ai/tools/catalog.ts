@@ -21,6 +21,10 @@ const defaultNames = new Set([
   'bind_variable',
   'lint',
   'lint_fix',
+  // Versions of a layer side by side for the person to compare and keep one.
+  'create_variations',
+  'list_variations',
+  'pick_variation',
   // Lets the model look at what it built.
   'export_image',
   'list_pages',

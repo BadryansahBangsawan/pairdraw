@@ -50,10 +50,17 @@ import {
 } from './nodes'
 import { getStatus, listStatuses, setStatus, type StatusInfo } from './statuses'
 import { bindVariable, unbindVariable, type VariableRef } from './variables'
+import {
+  createVariationSet,
+  getVariationSet,
+  listVariationSets,
+  type VariationSetHandle
+} from './variations'
 
 export { BehaviourHandle, type NodeRef } from './behaviours'
 export type { StatusInfo } from './statuses'
 export type { VariableRef } from './variables'
+export { VariationSetHandle, type VariationSetInfo } from './variations'
 export {
   CommentHandle,
   DEFAULT_COMMENT_AUTHOR,
@@ -210,6 +217,29 @@ export class PairdrawAPI {
    */
   recordDesignDecision(text: string, example?: NodeRef): { decisions: number; examples: number } {
     return recordDesignDecision(this.figma.graph, text, example)
+  }
+
+  /**
+   * Copy a layer `count` times (1 to 8) into a section of variations beside it, made the first
+   * time; `labels` name what each version tries, as in `V2 · Calmer palette`. On a version, it
+   * copies that version into its set. The original does not change.
+   */
+  createVariations(
+    node: NodeRef,
+    options: { count: number; labels?: readonly string[] }
+  ): { set: VariationSetHandle; versions: FigmaNodeProxy[] } {
+    const { set, created } = createVariationSet(this.figma, node, options)
+    return { set, versions: created }
+  }
+
+  /** The set of variations a layer belongs to, from its section, a version or a layer inside one. */
+  getVariations(node: NodeRef): VariationSetHandle | null {
+    return getVariationSet(this.figma, node)
+  }
+
+  /** The sets of variations on the current page. */
+  get variations(): VariationSetHandle[] {
+    return listVariationSets(this.figma, this.figma.currentPageId)
   }
 
   /**

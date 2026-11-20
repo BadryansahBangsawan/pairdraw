@@ -439,6 +439,14 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | `boolean_intersect` | Boolean intersection                |
 | `boolean_exclude`   | Boolean exclusion                   |
 
+### Variations
+
+| Tool                | Description |
+| ------------------- | ----------- |
+| `create_variations` | Copy a layer 1 to 8 times as labelled versions side by side in a section beside it, or copy a version into its set |
+| `list_variations`   | List the set holding a layer, or every set on the current page, with its original and versions |
+| `pick_variation`    | Keep one version in place of the original, which keeps its id, name, and place, or discard them all; only when the person asks |
+
 ### Vector Path
 
 | Tool              | Description                                                                                                                                                                                 |

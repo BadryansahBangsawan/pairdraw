@@ -366,6 +366,12 @@ Discover available tools and their arguments from the connected server or browse
 - **`export_html` / `import_html`** — layers to HTML with CSS or Tailwind (fragment or standalone, `layer_ids` to map markup back to layers), and HTML/CSS back into editable layers in the open document.
 - **`diff_changes`** — outside AI chat, call it with `mark: true`, then later without it to see what you or the designer changed since.
 - **`find_empty_space`** — a free spot of a given size beside existing content, before placing new frames.
+- **`create_variations` / `list_variations` / `pick_variation`** — versions of a layer to compare; the person keeps one with Use this, which replaces the original in place (same id, name, and spot). When asked for several versions of a layer:
+  1. Call `create_variations` once with the layer's id, a count from 1 to 8, and one short label per version naming the idea it tries.
+  2. Change each version in its own direction by editing the layers inside it: `batch_update`, `set_*`, or `render` with `parent_id` or `replace_id` inside the version.
+  3. Keep each version's root layer: a version whose root becomes another kind of layer (a frame where an instance was) cannot replace the original.
+  4. Check them together with one `export_image` of the set.
+  5. Leave the choice to the person; call `pick_variation` only when they ask you to pick or discard.
 - **`replace_matching_properties`** — swap a fill, text, or stroke color, stroke weight, radius, font family, style, or size everywhere on a page or selection; layers of read-only library components come back in `read_only`.
 - **`get_style`** — curated style directions for a design with no look yet, or when asked for a style or mood: call it with a `query` describing the request to list matches, then with an `id` for that direction's palette by role, font pairing, type scale, radii, spacing, elevation, and written guidance. Adapt it; do not copy it verbatim.
 - **`rescale`** — scale layers with their text sizes, stroke weights, radii, effects, and spacing, as the Scale tool (K) does, around an `anchor` of their joint bounds; locked layers and layers inside instances come back in `skipped`; `node_resize` changes only the box.

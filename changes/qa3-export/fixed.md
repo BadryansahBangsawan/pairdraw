@@ -1,1 +1,2 @@
 - A 4000×4000 frame exports at 3× without exhausting the renderer, and an export too large to draw fails with a clear message instead of aborting.
+- JPG exports fill transparent areas with white, as Figma does, instead of black.

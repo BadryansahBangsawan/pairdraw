@@ -3,7 +3,12 @@ import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
 import { useViewportKind } from '@pairdraw/vue/editor/viewport-kind'
-import { useCloudMessages, useCommonMessages, useFileMessages } from '@pairdraw/vue/i18n'
+import {
+  useCloudMessages,
+  useCommonMessages,
+  useFileMessages,
+  useI18n
+} from '@pairdraw/vue/i18n'
 
 import { useDocumentSelection } from '@/app/home/selection'
 import { formatStorageBytes } from '@/app/storage/format-bytes'
@@ -71,6 +76,7 @@ const emit = defineEmits<{
 const t = useCloudMessages()
 const common = useCommonMessages()
 const files = useFileMessages()
+const { locale } = useI18n()
 const { isTouch } = useViewportKind()
 const styles = tv(documentsTheme)()
 const loading = skeleton()
@@ -104,10 +110,10 @@ function deleteSelected() {
 const conflicts = computed(() => documents.filter((document) => document.sync === 'conflict'))
 const usageLabel = computed(() => {
   if (!usage) return null
-  const used = formatStorageBytes(usage.usedBytes)
+  const used = formatStorageBytes(usage.usedBytes, locale.value)
   return usage.totalBytes === null
     ? t.value.homeUsageUsed({ used })
-    : t.value.homeUsageOf({ used, total: formatStorageBytes(usage.totalBytes) })
+    : t.value.homeUsageOf({ used, total: formatStorageBytes(usage.totalBytes, locale.value) })
 })
 const metadata = (document: CloudDocumentRow) =>
   document.editedBy ? `${document.editedAt} · ${document.editedBy}` : document.editedAt

@@ -14,7 +14,7 @@ import { formatStorageBytes } from '@/app/storage/format-bytes'
 import { discardRecoverySnapshot, listRecoverySnapshots, restoreRecoverySnapshot } from '@/app/tabs'
 import AppButton from '@/components/ui/button/AppButton.vue'
 
-const { recovery, common } = useI18n()
+const { recovery, common, locale } = useI18n()
 const notifications = useNotificationMessages()
 const route = useRoute()
 const snapshots = ref<RecoverySnapshotMeta[]>([])
@@ -90,7 +90,7 @@ onMounted(async () => {
           <div class="min-w-0 flex-1">
             <p class="truncate text-xs font-medium text-surface">{{ snapshot.documentName }}</p>
             <p class="text-[11px] text-muted">
-              {{ updatedLabel(snapshot) }} · {{ formatStorageBytes(snapshot.byteLength) }}
+              {{ updatedLabel(snapshot) }} · {{ formatStorageBytes(snapshot.byteLength, locale) }}
             </p>
           </div>
           <AppButton

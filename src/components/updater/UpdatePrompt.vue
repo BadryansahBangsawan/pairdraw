@@ -43,7 +43,7 @@ const emit = defineEmits<{
   dismiss: []
 }>()
 
-const { updates: t, common } = useI18n()
+const { updates: t, common, locale } = useI18n()
 
 const release = computed(() => ('release' in state ? state.release : undefined))
 const progress = computed(() => {
@@ -52,7 +52,7 @@ const progress = computed(() => {
   const { downloaded, total } = state.progress
   return {
     amount: { value: downloaded, max: total },
-    label: downloadProgressLabel(t.value, state.progress)
+    label: downloadProgressLabel(t.value, state.progress, locale.value)
   }
 })
 const failure = computed(() =>

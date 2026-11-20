@@ -1,0 +1,1 @@
+- Sizes in storage, recovery, save and update messages write their numbers as the interface language does, so German reads 1,5 MB where English reads 1.5 MB.

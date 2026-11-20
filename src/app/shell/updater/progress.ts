@@ -1,3 +1,4 @@
+import { formatStorageBytes } from '@/app/storage/format-bytes'
 import { progressPercent } from '@/components/ui/feedback/progress'
 
 import type { UpdaterMessages } from './messages'
@@ -9,19 +10,15 @@ export interface DownloadProgress {
 
 export function downloadProgressLabel(
   messages: UpdaterMessages,
-  { downloaded, total }: DownloadProgress
+  { downloaded, total }: DownloadProgress,
+  locale: string
 ): string {
-  if (!total) return messages.downloadProgressUnknown({ downloaded: formatBytes(downloaded) })
+  if (!total) {
+    return messages.downloadProgressUnknown({ downloaded: formatStorageBytes(downloaded, locale) })
+  }
   return messages.downloadProgress({
     percent: progressPercent({ value: downloaded, max: total }) ?? 0,
-    downloaded: formatBytes(downloaded),
-    total: formatBytes(total)
+    downloaded: formatStorageBytes(downloaded, locale),
+    total: formatStorageBytes(total, locale)
   })
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  const kib = bytes / 1024
-  if (kib < 1024) return `${kib.toFixed(1)} KiB`
-  return `${(kib / 1024).toFixed(1)} MiB`
 }

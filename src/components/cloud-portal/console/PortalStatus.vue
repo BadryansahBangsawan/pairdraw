@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useCloudPortalMessages } from '@pairdraw/vue/i18n'
+import { useCloudPortalMessages, useI18n } from '@pairdraw/vue/i18n'
 
 import { formatStorageBytes } from '@/app/storage/format-bytes'
 import SettingsGroup from '@/components/settings/layout/SettingsGroup.vue'
@@ -15,6 +15,7 @@ import type { PortalServerStatus } from '../types'
 const { status } = defineProps<{ status: PortalServerStatus }>()
 const emit = defineEmits<{ open: [section: 'requests' | 'email'] }>()
 const messages = useCloudPortalMessages()
+const { locale } = useI18n()
 
 const deployment = computed(() =>
   status.deployment === 'official'
@@ -93,7 +94,7 @@ const email = computed(() => {
         </SettingsRow>
         <SettingsRow :label="messages.storedFiles">
           <span class="text-xs text-muted tabular-nums">{{
-            formatStorageBytes(status.storedBytes)
+            formatStorageBytes(status.storedBytes, locale)
           }}</span>
         </SettingsRow>
       </SettingsGroup>

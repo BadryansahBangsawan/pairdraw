@@ -4,7 +4,7 @@ import { RadioGroupItem, RadioGroupRoot } from 'reka-ui'
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
-import { useCloudMessages, useCommonMessages } from '@pairdraw/vue/i18n'
+import { useCloudMessages, useCommonMessages, useI18n } from '@pairdraw/vue/i18n'
 
 import { formatStorageBytes } from '@/app/storage/format-bytes'
 import AppButton from '@/components/ui/button/AppButton.vue'
@@ -38,6 +38,7 @@ const emit = defineEmits<{ save: []; cancel: [] }>()
 
 const ui = saveTo()
 const t = useCloudMessages()
+const { locale } = useI18n()
 const common = useCommonMessages()
 const saving = computed(() => state.kind === 'saving')
 const progress = computed(() =>
@@ -114,8 +115,8 @@ const errors = computed(() => ({
           <span :class="ui.progressText()">
             {{
               t.saveUploading({
-                sent: formatStorageBytes(state.sentBytes),
-                total: formatStorageBytes(state.totalBytes)
+                sent: formatStorageBytes(state.sentBytes, locale),
+                total: formatStorageBytes(state.totalBytes, locale)
               })
             }}
           </span>
@@ -124,7 +125,7 @@ const errors = computed(() => ({
           v-else-if="state.kind === 'error' && state.reason === 'too-large'"
           tone="error"
           :heading="t.saveTooLargeHeading"
-          :description="t.saveTooLargeDescription({ limit: formatStorageBytes(state.limitBytes) })"
+          :description="t.saveTooLargeDescription({ limit: formatStorageBytes(state.limitBytes, locale) })"
         />
         <AppAlert
           v-else-if="state.kind === 'error'"

@@ -52,6 +52,8 @@ export function createNudgeActions(ctx: EditorContext) {
   let nudgeOriginals: Map<string, Vector> | null = null
   let reorderOriginals: Map<string, string[]> | null = null
   let nudgeCommitTimer: ReturnType<typeof setTimeout> | null = null
+  /** Open from the first key press until the nudge records its step, which waits for a pause. */
+  let closeNudgeEdit: (() => void) | null = null
 
   function applyOrder(parentId: string, order: readonly string[]) {
     order.forEach((id, index) => ctx.graph.insertChildAt(id, parentId, index))
@@ -79,7 +81,16 @@ export function createNudgeActions(ctx: EditorContext) {
 
   function commitNudge() {
     nudgeCommitTimer = null
-    commitReorder()
+    try {
+      commitReorder()
+      commitMove()
+    } finally {
+      closeNudgeEdit?.()
+      closeNudgeEdit = null
+    }
+  }
+
+  function commitMove() {
     if (!nudgeOriginals) return
     const originals = nudgeOriginals
     nudgeOriginals = null
@@ -139,6 +150,10 @@ export function createNudgeActions(ctx: EditorContext) {
       if (node && !node.locked) movable.push(id)
     }
     if (movable.length === 0) return
+
+    // The step waits for the keys to pause: hold the edit open until then, so the unsaved-changes
+    // tracker takes the moves for that step's own.
+    closeNudgeEdit ??= ctx.undo.openEdit()
 
     const reordered = reorderInFlows(movable, dx, dy)
     const nudged = movable.filter((id) => !reordered.has(id))

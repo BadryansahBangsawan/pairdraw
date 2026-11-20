@@ -5,3 +5,4 @@
 - A document reloaded from disk shows the page it was on with its layers, instead of that page empty, and opening a file's metadata alone no longer counts as a change.
 - Each row of a variable picker previews its own variable's colour inside a bound fill field, instead of every row showing the bound variable's colour.
 - Undoing an edit inside a component returns the document to saved, instead of the instances that follow the component counting as a change made outside the history.
+- A nudge records its step when the arrow keys pause, and undoing it afterwards returns the document to saved instead of leaving it reported as changed.

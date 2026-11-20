@@ -369,3 +369,17 @@ test('instances following an undone component edit leave the document saved', as
     editor.dispose()
   }
 })
+
+test('a nudge, whose step waits for the keys to pause, undone back leaves the document saved', async () => {
+  await withSavedRectangle(async (editor, id, changes) => {
+    editor.select([id])
+    editor.nudgeSelected(1, 0)
+    await settle()
+    editor.flushNudge()
+    expect(changes.hasUnsavedChanges()).toBe(true)
+    editor.undoAction()
+    await settle()
+    expect(editor.graph.getNode(id)?.x).toBe(0)
+    expect(changes.hasUnsavedChanges()).toBe(false)
+  })
+})

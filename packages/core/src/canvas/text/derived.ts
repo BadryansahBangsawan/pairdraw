@@ -47,12 +47,6 @@ export function snapDerivedGlyphBaseline(y: number): number {
   return Math.round(y)
 }
 
-export function shouldUseHardDerivedGlyphCoverage(
-  node: Pick<SceneNode, 'fontSize' | 'fontWeight'>
-): boolean {
-  return node.fontSize === 20 && node.fontWeight === 400
-}
-
 /**
  * Path-text glyphs carry non-zero Figma `Glyph.rotation` (radians). Used to
  * disable axis-aligned assumptions (baseline snap, underline decorations).
@@ -349,15 +343,12 @@ export function drawDerivedText(
     const path = paintsLayerSpace ? layerSpaceGlyphPath(r, emPath, glyph, glyphY) : emPath
     canvas.save()
     if (!paintsLayerSpace) applyGlyphEmTransform(canvas, glyph, glyphY)
-    const shouldUseHardCoverage = shouldUseHardDerivedGlyphCoverage(node)
-    if (shouldUseHardCoverage) r.fillPaint.setAntiAlias(false)
     const character = glyph.firstCharacter ?? markerCharacters.get(index)
     const run =
       character === undefined
         ? undefined
         : node.styleRuns.find((run) => character >= run.start && character < run.start + run.length)
     drawGlyphOutline(r, canvas, path, savedTextEligible ? run?.style.fills : undefined)
-    if (shouldUseHardCoverage) r.fillPaint.setAntiAlias(true)
     if (path !== emPath) path.delete()
     canvas.restore()
   }

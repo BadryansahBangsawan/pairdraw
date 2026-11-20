@@ -1,0 +1,1 @@
+- Text drawn from a file's saved glyphs is antialiased at every size, as in Figma.

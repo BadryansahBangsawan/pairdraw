@@ -317,3 +317,26 @@ describe('parsePenFile — boolean text', () => {
     expect(upper.visible).toBe(false)
   })
 })
+
+test('keeps a layer’s theme when the document is written again', () => {
+  const source: PenDocument = {
+    version: '2.14',
+    themes: { Mode: ['Light', 'Dark'] },
+    variables: {
+      background: {
+        type: 'color',
+        value: [{ value: '#F2F3F0' }, { value: '#111111', theme: { Mode: 'Dark' } }]
+      }
+    },
+    children: [{ id: 'panel', type: 'frame', theme: { Mode: 'Dark' }, fill: '$background' }]
+  }
+  const dark = { r: 17 / 255, g: 17 / 255, b: 17 / 255, a: 1 }
+  const graph = parsePenFile(JSON.stringify(source))
+  expect(graph.getNode('panel')?.fills[0]?.color).toEqual(dark)
+
+  const written = JSON.parse(writePenDocument(graph))
+  expect(written.children[0].theme).toEqual({ Mode: 'Dark' })
+
+  const again = parsePenFile(JSON.stringify(written))
+  expect(again.getNode('panel')?.fills[0]?.color).toEqual(dark)
+})

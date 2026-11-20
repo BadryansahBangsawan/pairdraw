@@ -503,6 +503,8 @@ function basicNodeFields(state: PenWriteState, node: SceneNode, result: PenNode)
     result.rotation = rounded(node.flipX !== node.flipY ? node.rotation : -node.rotation)
   if (node.flipX) result.flipX = true
   if (node.flipY) result.flipY = true
+  const theme = themeFields(state, node)
+  if (theme) result.theme = theme
   const fill = paintsOf(state, node, 'fills', node.fills)
   if (fill !== undefined) result.fill = fill
   Object.assign(
@@ -513,6 +515,20 @@ function basicNodeFields(state: PenWriteState, node: SceneNode, result: PenNode)
     textFields(state, node)
   )
 }
+/**
+ * A layer's variable mode assignments, by the names pen writes: the collection's name and the
+ * mode's. A mode the document no longer holds is left out.
+ */
+function themeFields(state: PenWriteState, node: SceneNode): Record<string, string> | undefined {
+  const theme: Record<string, string> = {}
+  for (const [collectionId, modeId] of Object.entries(node.variableModes)) {
+    const collection = state.collections.get(collectionId)
+    const mode = collection?.modes.find((candidate) => candidate.modeId === modeId)
+    if (collection && mode) theme[collection.name] = mode.name
+  }
+  return Object.keys(theme).length > 0 ? theme : undefined
+}
+
 function semanticNodeFields(state: PenWriteState, node: SceneNode, result: PenNode): boolean {
   if (
     node.type === 'TEXT' &&

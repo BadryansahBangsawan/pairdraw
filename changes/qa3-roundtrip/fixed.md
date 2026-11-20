@@ -1,1 +1,2 @@
 - Converting a document to .pen keeps every vector layer's path geometry instead of writing empty paths.
+- Converting a document to .pen keeps each layer's variable mode (theme) instead of dropping back to the default one.

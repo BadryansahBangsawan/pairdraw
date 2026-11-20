@@ -1,5 +1,6 @@
 import { createTypographyActions, createTypographyState } from '#vue/controls/typography/actions'
 import { createTypographyAxes } from '#vue/controls/typography/axes'
+import { createTypographyFeatures } from '#vue/controls/typography/features'
 import { useEditor } from '#vue/editor/context'
 
 /**
@@ -26,11 +27,13 @@ export function useTypography(options: UseTypographyOptions = {}) {
   const typographyState = createTypographyState(editor)
   const actions = createTypographyActions({ editor, ...typographyState, options })
   const axes = createTypographyAxes(editor, typographyState.nodes)
+  const features = createTypographyFeatures(editor, typographyState.nodes)
 
   return {
     editor,
     ...typographyState,
     ...actions,
-    ...axes
+    ...axes,
+    features
   }
 }

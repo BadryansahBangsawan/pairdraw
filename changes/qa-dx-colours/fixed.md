@@ -1,1 +1,0 @@
-- A `script` layer accepts any CSS colour the canvas takes, such as `#f00` or `rgb(0 128 0)`, and a refused layer names the layer and field that is wrong, as in `roots[0].fill: "#zzz" is not a color`.

@@ -1,8 +1,0 @@
-- Exporting HTML with external assets creates the output folder when it does not exist yet.
-- CLI commands reject misspelled options instead of silently ignoring them, so `pairdraw info file --jsonn` fails with `Unknown option: --jsonn` rather than printing human output a script cannot parse.
-- Storybook exports with `--framework react` or `vue` write a `parameters.design` image for each generated component's state stories, showing the variant that draws the state, as static HTML stories already do.
-- The browser app starts on Chromium versions whose notification permission status refuses event listeners, instead of showing "Pairdraw couldn't start".
-- `pairdraw documents save` writes a browser document opened or created through the MCP server back to its file, instead of asking for a path it already has; `documents new --path` names the document after that file.
-- `pairdraw export` and `pairdraw convert` write their default output next to the input file and never over it: a `.fig` export of `design.fig` without `-o` now writes `design-export.fig` instead of replacing the document with the exported page or node.
-- Opening a file that is already open recovers an automation session whose document was closed, so untargeted CLI calls work again without passing `--document-id`.
-- Piped CLI output carries all of it: `pairdraw tree design.fig --json | jq` no longer truncates at 64 KB, and large human-readable results (lint, find, query, diff, node, tool) stream through the same path.

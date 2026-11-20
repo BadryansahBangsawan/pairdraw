@@ -1,1 +1,0 @@
-- Edits you make while an AI or MCP edit is waiting are now their own undo step and are no longer undone with it.

@@ -1,5 +1,0 @@
-- HTML import and paste paint CSS `background-image` gradients — linear, radial, and conic, with multiple layers and inline `url()` images — as gradient fills sized to the element, so gradient surfaces no longer import transparent.
-- Web captures keep `background-image` with its size, position, and repeat, dropping unsafe `url()` sources, so gradient surfaces arrive from the extension and the capturer SDK.
-- HTML export writes gradient fills as CSS `background-image` gradients, so exported code keeps gradient surfaces instead of only their bottom solid color.
-- A captured checkbox or radio imports as the small square the browser paints, centered where the page drew it, instead of a full-width bar when a stylesheet stretches its input.
-- A captured checkbox or radio imports as the small square the browser paints, centered where the page drew it, instead of a full-width bar when a stylesheet stretches its input; an absolutely positioned or margined one keeps its placement and the room its margins took.

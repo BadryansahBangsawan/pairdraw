@@ -1,2 +1,0 @@
-- Deleting a page is one undo step: undo brings the page back with its layers, its place in the list and its view, and redo deletes it again; adding, renaming and reordering a page undo too.
-- Adding a page opens its name for editing, so the first keystrokes name it instead of changing tools.

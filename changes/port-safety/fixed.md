@@ -1,9 +1,0 @@
-- Unsaved edits to a file saved by hand get a recovery copy when autosave stops, so a WebView crash no longer loses them.
-- The editor reloads its page when the process backing it ends on macOS, instead of leaving a blank window.
-- Reloading a document on desktop parses the file as it was read, without holding several copies of it in memory.
-- The plugin API refuses NaN and Infinity for positions, sizes, rotation, opacity, strokes, corner radii and auto layout spacing, as Figma does, so a non-finite number no longer breaks a layer's bounds.
-- Deeply nested layers and layers whose children link back to a parent flatten without overflowing the stack or repeating a subtree.
-- Diagnostics keep the file name of a built chunk, hash included, in a stack frame from the app's own origin, so an error report still finds its source map, while a chunk-shaped key elsewhere stays redacted.
-- Undo steps past the history limit are freed again, and a document that is never saved no longer pins its history, so a long session keeps its memory bounded.
-- Surfaces and the profiler's font are freed on replacement and teardown, so a long session that switches surfaces keeps handing their pixel buffers back.
-- A document whose page stops drawing before it is first shown stays open in its tab and reports the failure, instead of its tab closing with no message.

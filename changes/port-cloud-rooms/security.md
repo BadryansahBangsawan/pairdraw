@@ -1,1 +1,0 @@
-- A collaboration room stops taking edits once its document reaches the room size limit, while deletions that free space still go through.

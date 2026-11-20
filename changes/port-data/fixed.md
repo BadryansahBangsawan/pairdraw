@@ -1,1 +1,0 @@
-- A page added or moved among pages whose order keys Figma numbered, such as a shadcn/ui kit, is saved where it now sits instead of sorting into another place on reopen.

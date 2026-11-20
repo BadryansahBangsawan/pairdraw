@@ -1,1 +1,0 @@
-- Layers a frame places by hand keep their constraints in exported HTML: Right and Bottom sit on the end edges, Center keeps its offset, Left and Right and Scale size from the frame, and offsets are measured inside its border.

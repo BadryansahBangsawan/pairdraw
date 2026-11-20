@@ -1,1 +1,0 @@
-- An official cloud deployment requires MFA for deployment administrators.

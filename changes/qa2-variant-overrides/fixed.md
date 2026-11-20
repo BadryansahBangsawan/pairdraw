@@ -1,1 +1,0 @@
-- Switching an instance to another variant keeps the overrides its layers share, as Figma does, instead of resetting every layer to the new variant.

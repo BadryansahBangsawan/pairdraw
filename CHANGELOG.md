@@ -2,6 +2,288 @@
 
 ## Unreleased
 
+## 0.19.0-beta.1 — 2026-11-21
+
+This is a pre-release that lists changes since 0.18.0: npm packages are published under the `next` tag, and installed apps on the stable release do not update to it. Linux package managers see `0.19.0-beta.1` as newer than `0.19.0`, so `.deb` and `.rpm` users should remove the beta before installing the final 0.19.0.
+
+Pairdraw 0.19.0-beta.1 moves the properties panel into the left sidebar as the Design tab, opens large `.fig` files faster and in less memory, lets agents read and write prototype connections, hardens Cloud access, and fixes a long list of round-trip, layout, text, component, desktop, collaboration, CLI, and export problems.
+
+### Breaking changes
+
+- Layers inside an instance no longer resize: their corner handles are gone, their width and height fields are disabled, and a `.fig` export records no size for them, as in Figma; files that already carry such a size still open with it.
+
+### Added
+
+- `get_node` and `get_page_tree` find a layer by its ID on a page that has not been opened yet, loading that page as Figma's dynamic-page mode does, and scripts can load pages with `page.loadAsync`, `setCurrentPageAsync`, and `loadAllPagesAsync`.
+- Agent tools can read and write prototype connections: `get_reactions` and `set_reactions` use Figma's plugin shape, keep a change undoable like the Prototype panel, and refuse a trigger, action, or destination the prototype play cannot run.
+- Dragging a fill, stroke, or effect row onto another row reorders the list, as in Figma; undo restores the previous order.
+- An instance offers Reset all changes in the canvas menu, the Object menu, and its Design panel header, putting it and the instances inside it back over one undo step.
+- The design token import offers to pick the folder that holds a resolver's files when they were not picked with it.
+- Plugin scripts can keep values between runs with `figma.clientStorage`.
+
+### Changed
+
+- The properties panel now shows in the left sidebar as the fourth tab, Design, beside Layers, Assets, and Slides: selecting a layer no longer opens a panel or changes the sidebar's tab.
+- Desktop sign-in approval asks for the code the app shows instead of telling you to compare it.
+- `batch_update` changes nothing when one of its operations names a missing layer or an invalid property, instead of applying the rest.
+- The authoring reference names the `textDecoration` and `textCase` values; decoration details, not the property itself, take CSS names.
+- The MCP reference lists every shared design tool, and the docs state the current count.
+- The JSX copy reference names the exported `renderJSX()` in every language.
+- The docs state that the MCP server works with the document open in the running editor, and that `eval` is off by default over both transports rather than only HTTP.
+
+### Performance
+
+- Opening a large `.fig` no longer re-derives the whole document for each page it reads, and a page reaches the editor from the reader worker without a second deep copy of every layer, so a document with hundreds of thousands of layers opens faster and in less memory.
+- Opening a `.fig` moves the file to the reader worker instead of copying it for the worker, the archive, and the recovery copy, and keeps each unzipped image once instead of copying it into the document again, cutting the peak memory of opening a large file; if the worker fails after taking the file, the file is read again.
+- Moving a selection with the arrow keys no longer lays out the whole subtree of every moved layer, nor does undo or redo, so nudging stays instant on large auto layout documents.
+- Deleting a large layer captures its subtree once instead of twice, halving the work of a big delete.
+- Dragging an effect slider keeps a bounded number of cached filters, so a long session no longer grows with every value the drag passed.
+- The first Chinese, Japanese, or Korean text loads only the system fonts its characters need, keeps one copy of each face shared by every canvas, and no longer registers fallback faces as browser fonts, using hundreds of megabytes less memory.
+- Paragraphs built from one font provider share one font collection, so a document of many CJK texts no longer copies a variable font's instance per paragraph and fills the heap while opening.
+- Undo steps past the history limit are freed again, and a document that is never saved no longer pins its history, so a long session keeps its memory bounded.
+- Surfaces and the profiler's font are freed on replacement and teardown, so a long session that switches surfaces keeps handing their pixel buffers back.
+
+### Security
+
+- Someone removed from a workspace loses access to the documents they made there, though an invitation can still let them back in.
+- A document grant changes only access that starts from an accepted invitation, so a new grant cannot reach someone who has no access.
+- Sending invitations is capped at 100 a day per sender and 5 a day to one address, counted across workspaces and documents, so they cannot be used to send spam.
+- A per-document or per-workspace budget, such as invitations or uploads, no longer resets by naming another document or workspace: one account has a cap across all of them.
+- The sharing API no longer answers whether an email address has a cloud account.
+- A share link stops working while whoever made the link or the document is banned.
+- A collaboration room stops taking edits once its document reaches the room size limit, while deletions that free space still go through.
+- A Cloud API request over 8 MB is refused with a 413 at the body limit before the handler runs, and a query serving a request is cancelled after 30 seconds.
+- Cloud pages carry a content security policy that lets only the site's own scripts and Turnstile's run, keeps plugins off, and stops another site from framing them.
+- An official cloud deployment requires MFA for deployment administrators.
+- A crafted `.fig` archive can no longer make the app inflate unbounded data: entries and total size are capped.
+
+### Fixed
+
+#### Documents and files
+
+- A page added or moved among pages whose order keys Figma numbered, such as a shadcn/ui kit, is saved where it now sits instead of sorting into another place on reopen.
+- Documents opened from `.fig` files save and load pages again after a layer of a component is deleted, including when an instance sits inside a frame of that component.
+- A page opened for only some of its components keeps every sibling layer in the order the file saved it, including a reorder made before its other component pages load.
+- A layer from an opened `.fig` file that is grouped or moved into a frame keeps its place after the file is saved and reopened.
+- An instance keeps the place its own record gives it in its parent rather than inheriting its component's alignment, grow, positioning, and constraints.
+- Spreading a pile of layers gives the same result on every run instead of a different arrangement each time.
+- A rescaled instance draws its vector at the instance size after the file is reopened, instead of at the component's outline size.
+- Pasting a layer copied out of a component while it is bound to one of the component properties pastes it unbound instead of failing.
+- A fill, stroke, or effect bound to a variable keeps its binding when another entry in the list is added, removed, or moved.
+- The Plugin API `componentPropertyReferences` reports the bindings of any layer in a component or instance, not only frames, text, components, and instances.
+- Tools and scripts that read a page not yet opened load its layers first, and switch to the page that was asked for last instead of one that finished loading later.
+- Agent tools, including `render`, `import_svg`, `import_mermaid`, `import_html`, `insert_icon`, and `insert_library_component`, refuse a parent inside an instance instead of adding layers the document cannot save as `.fig`; layers added to an instance slot still save.
+- Pages of a large `.fig` keep loading in the reader worker after the document is edited, instead of falling back to a main-thread load that freezes the editor; a page that arrives while an edit is open stays out of that edit's undo step.
+- A large `.fig` page applies in pieces as it arrives from the reader worker, so the editor keeps responding instead of freezing for the whole page; a load that fails takes back only its own layers.
+- Saving a `.fig` keeps the document when drawing its optional file preview fails: the save falls back to the placeholder thumbnail instead of rejecting.
+- Text whose glyphs cannot all be outlined, such as a script drawn in a substituted face, is saved without derived glyph data, so Figma lays it out with its own fonts instead of drawing holes.
+- An image fill or stroke keeps its exposure, contrast, saturation, temperature, tint, highlights, and shadows adjustments when a `.fig` file is saved after that image is edited.
+- A dashed stroke keeps its dash pattern when a `.fig` file is saved and reopened, including on instance layers, where a stroke weight or dash set on the copy also survives a component edit or a variant swap.
+- An instance text draws the size, font, spacing, decoration, and case of the text style it inherits, including the style's variables, over values its own record claims, and a text range that names a fill style draws in that style's paints.
+- Converting a document to `.pen` keeps every vector layer's path geometry instead of writing empty paths, and keeps each layer's variable mode (theme) instead of dropping back to the default one.
+- `save_file` and a save on close refuse a destination that is not the document's archive (`.fig`, or `.jam` for a board) before writing anything, and name the path to use instead.
+- A `.pen` instance draws the children its `ref` passes in place of its component's layers, with or without a declared slot, and a `fit_content(N)` fallback holds only while the instance is empty.
+- A hugging `.pen` frame with `space_between` keeps the gap between its children instead of packing them together, and a `.pen` padding of four values is read as top, right, bottom, and left instead of dropping the bottom and left.
+- A `.pen` image whose path is percent-encoded, as pen.dev writes `My%20Design-assets/…`, now loads: the path is decoded a step at a time, keeping escapes that would name another folder.
+- Icons and other layers overridden through a `.pen` instance inside a component keep their override when that component is used, instead of falling back to the component's default.
+- Opening a second document over automation while another is still loading answers both calls, instead of the first timing out after 20 seconds.
+- Undo after another document replaced the open one no longer edits the new document's layers, and each document keeps its own history.
+- A document reloaded from disk shows the page it was on with its layers, instead of that page empty, and opening a file's metadata alone no longer counts as a change.
+- A recent file stays in Recent files when opening it is cancelled, so it can be opened again.
+- A save or export the VS Code editor never answers fails with a message after a minute instead of leaving the document saving forever, and a document reopened after VS Code restarts loads the backup hot exit wrote instead of dropping the edits made before the restart.
+
+#### Text and fonts
+
+- Text measured in a substitute font takes its own font's size, and its auto-layout frames follow, once a face of its family loads.
+- Text without style runs wraps and outlines in the face it is drawn in, at its weight, letter spacing, and variable-font axes, instead of the browser's default font.
+- Text set in a missing family draws in the default family at the text's own weight, a weight the text sets explicitly still wins, and its italic comes from the default family's italic, so the canvas and the file agree instead of slanting or faux-bolding the wrong face.
+- The Typography and Fill sections show the style a text's characters are drawn in and style every character when changed, as Figma's node setters do, so a range no longer hides a new size or colour; font-axis edits keep the other axes a range sets.
+- A `.pen` document's bundled fonts are read, so its text draws in them instead of being substituted, and `.fig` exports name the real family and style, such as Geist SemiBold.
+- `figma.listAvailableFontsAsync()` lists every style of installed and bundled families, and of online families once a font of theirs is loaded, instead of only Regular; in the CLI and the MCP server it lists the bundled and online families instead of none.
+- Browsers set to Chinese (`zh`, `zh-SG`, `zh-Hans`) open the app in Simplified Chinese instead of English, and Traditional-only Han is told apart by OpenCC's table instead of a hand-picked list that counted shared characters such as 警 as Traditional.
+- Arabic and other right-to-left text lays itself out right to left when its direction is unset, and text copied into Figma carries the direction its saved lines were laid out in, so right-to-left text keeps its glyphs.
+- The empty line a closing line break opens starts where the text ends, so its line metrics no longer overlap the line before it and a saved text no longer carries a baseline over the break.
+- Letter spacing and line height bound to a variable export as that variable's token when they are in pixels, while a percent of the font size stays literal.
+- Text taller than its box overflows on the side away from its vertical alignment, as in Figma: a bottom-aligned box draws its first line above it, and its blur, mask, and saved file bounds cover it.
+- Characters typed at the edge of a styled run keep that run's colour, font, weight, decoration, and variable bindings, whether typed at the end of a line, at the start of the text, over a selection, through an input method, or pasted.
+- Text that sizes its own width wraps at its max width, raised to its min width as auto layout does, so a max width wraps or truncates it when the engine lays it out, not only in its saved glyphs.
+- A text box set to truncate clips to the lines its height holds and ends the last with an ellipsis, instead of drawing every line past its box.
+- Lines space by their exact line height, landing each baseline on a whole pixel as Figma does.
+- A text layer is named by its characters, trimmed to one line, until it is renamed, whether it is typed on the canvas, drawn by a script, or written through design JSX, HTML, or SVG import; renaming it keeps that name through later edits, as in Figma.
+- A script's text sizes to its content on one line unless the script gives it a width.
+- A vector's corner radius rounds its fill as well as its stroke, whether the radius is set on a point or on the layer.
+- A pen path of two points closes into a shape when its first point is pressed, as in Figma.
+- Text layers keep their stroke when exported to SVG, with an outside stroke painted behind the glyphs as the canvas draws it.
+
+#### Canvas, layout, and export
+
+- Text drawn from a file's saved glyphs is antialiased at every size, as in Figma.
+- Tiles repaint when the page colour changes without an edit, such as switching the app theme.
+- Text the canvas held back while its fonts loaded is drawn as soon as they arrive, without waiting for the next edit.
+- The canvas stays sharp when a panel leaves it a fraction of a pixel short of a whole one.
+- Opening a document, Zoom to fit, and Zoom to selection keep the content clear of the tool rail and the controls floating over the canvas, fitting it into the room they leave.
+- Nested instances and other non-vector layers draw, export, and save their stroke at their current size after auto layout, a component sync, or a resize.
+- Negative padding in an auto layout frame places its children past the frame edge, as Figma does.
+- A negative gap in an auto layout frame overlaps its children by it, in either direction, and a row hugs to the width its overlapped children take.
+- A document whose layers nest more than 128 auto-layout frames deep is refused with a clear error instead of crashing the layout engine for the rest of the session.
+- Groups shrink to the layers left in them after a delete, a move to another page, or a layers-panel drag, and an auto layout around them makes room.
+- Duplicating a layer inside an auto layout places the copy in the flow and resizes a hugging parent, with undo and redo doing the same.
+- Add auto layout to a selection keeps the spacing its layers already have, so a row 20 px apart does not jump together.
+- A frame's "Reverse Z-index" draws and hit-tests its layers in the reverse order, so the first layer sits on top, as Figma's does.
+- Layers that ignore auto layout keep their place when the Hug frame around them is resized again, because layout places them from the size they were last placed for.
+- A constraint resize keeps a layer's fractional box, and Left & right shrunk past zero turns the layer over instead of clipping its size.
+- A width or height typed in the Design panel places the frame's layers by their constraints, as dragging its corner does.
+- A script that edits layers and then moves or sizes one lays out the recorded edits first, so the layer lands where Figma puts it when its frame changed size.
+- A grid child's `colSpan` without a `colStart` spans its columns and is placed automatically, as CSS Grid does.
+- Layers a frame places by hand keep their constraints in exported HTML: Right and Bottom sit on the end edges, Center keeps its offset, Left and Right and Scale size from the frame, and offsets are measured inside its border.
+- A dashed vector with several closed contours, such as a ring or a letter with a counter, dashes every contour instead of drawing all but the first solid.
+- SVG export clips a rounded frame's children to its rounded or smoothed corners, and fills smoothed rectangles and frames with their smoothed outline.
+- `export_image` and other image exports include text right after a document comes to the front, instead of leaving every text layer out until its canvas loads its fonts.
+- Exporting a layer on its own keeps the variable mode its ancestors set, so the image matches the canvas.
+- JSX export no longer fails for a layer with a Figma noise effect, or any effect JSX cannot express; those effects are left out of the source.
+- HTML, JSX, and Tailwind export lay letter-spaced text out as the canvas does: a line that fits stays on one line, right-aligned and centred lines line up with the box, and auto-width text takes no extra room for the spacing after its last letter; a span that changes the font size writes its percent spacing again.
+- HTML exported from a design blurs and shadows as the canvas draws them, and an imported CSS shadow keeps its blur; HTML exports declare the design variables their styles reference, so colors, gradients, and spacing resolve when the page opens in a browser.
+- HTML import and paste paint CSS `background-image` gradients — linear, radial, and conic, with multiple layers and inline `url()` images — as gradient fills sized to the element, and HTML export writes gradient fills back as `background-image` gradients; web captures keep the size, position, and repeat, dropping unsafe `url()` sources, so gradient surfaces arrive from the extension and the capturer SDK.
+- A captured checkbox or radio imports as the small square the browser paints, centered where the page drew it, instead of a full-width bar when a stylesheet stretches its input; an absolutely positioned or margined one keeps its placement and the room its margins took.
+- A 4000×4000 frame exports at 3× without exhausting the renderer, and an export too large to draw fails with a clear message instead of aborting.
+- JPG exports fill transparent areas with white, as Figma does, instead of black, and PDF exports embed image fills from the CLI and other hosts without a browser instead of leaving them out.
+
+#### Editing and layers
+
+- Each press in a colour picker is one undo step, and Escape keeps an edit such as a chosen paint type or a typed colour.
+- Image fills open their fill settings again, so Choose image and Replace swap the bytes while keeping the scale mode and crop, for every selected layer and as one undo step.
+- Shift-dragging a selected layer keeps it selected while it moves, and a Shift-click on it deselects it only when the press ends.
+- Right-clicking a frame, section, or component name selects that layer, a locked one included, on the pane that was clicked.
+- Pressing ⌘R, or double-clicking the name in the design panel, renames the selected layer in place instead of doing nothing while the Layers view is hidden, and with the sidebar closed ⌘R opens the design panel to rename the layer there.
+- Panning with the wheel, the middle button, or Space still works while the Comment tool is selected.
+- The marquee border is one screen pixel wide at any zoom, as in Figma.
+- A selected layer no longer outlines its parent frames, however deeply nested, as in Figma.
+- Arrow keys no longer move the selection while a list, menu, or dialog is open; they go to it instead, and a key pressed while a menu, dialog, list, or picker is still animating shut goes to the canvas, so Escape followed quickly by a tool key works.
+- ⌘S saves while text is edited on the canvas or a field is being typed in, committing the field first.
+- ⌘O, ⌘N, ⌘, and the other application and file shortcuts run while a text field has focus, as the desktop menu's accelerators do, while the field keeps every key that acts on the canvas.
+- Menu items that act on the selection, such as Paste to replace, Rename selection, Align, Remove Auto Layout, and Auto arrange, are disabled while nothing that can use them is selected, and Edit › Copy and Cut wait for a selection, as in Figma, while Paste stays available.
+- Text copied in another app pastes as a text layer with that text, instead of pasting the layers last copied in the app.
+- A layer dropped, drawn, or pasted onto an icon lands on the page instead of inside the icon, and an icon frame no longer counts as a slide in the Slides panel, presentation, or PDF and PowerPoint export.
+- Use as mask on several layers wraps them in a `Mask group` whose bottom layer masks the layers above it, at the page level as inside frames.
+- Pen anchors land on the pixel grid like the shape tools, so a path drawn at a fractional point starts on a whole coordinate, a guide dragged from the ruler lands on a whole pixel, and a component dropped from Assets lands on the pixel grid while Snap to pixel grid is on.
+- Deleting a page is one undo step: undo brings the page back with its layers, its place in the list, and its view, and redo deletes it again; adding, renaming, and reordering a page undo too.
+- Adding a page opens its name for editing, so the first keystrokes name it instead of changing tools, and adding notes for AI, or a variable, puts the cursor in the new field so the next keystrokes reach it.
+- Undo and redo work while editing text: ⌘Z steps back through the typing and restores the caret, ⇧⌘Z steps forward, an input method composition undoes as one step, and ⌘Z after leaving text edit reverts the whole edit as one step.
+- Undoing an edit takes back the edited-field marks it added, so a layer ends the step exactly as it began it.
+- Redoing an inserted instance restores the layers it had, ids included, so its overrides and links keep their targets.
+- A script inserted from Goodies or the Insert menu undoes in one step, instead of leaving the layer on the canvas.
+- Undoing an edit inside a component returns the document to saved, instead of the instances that follow the component counting as a change made outside the history, and a nudge records its step when the arrow keys pause, so undoing it also returns the document to saved.
+- Edits you make while an AI or MCP edit is waiting are their own undo step and are no longer undone with it.
+- Deleting a variable mode or a collection clears the mode a layer had chosen from it, so the layer no longer keeps a mode that is gone.
+
+#### Components and instances
+
+- Detaching an instance keeps the overrides its nested instances carry, under their own layers, so a saved detached copy reopens with the text and styles its component gave them; undoing the detach restores the nested instances as they were.
+- Detaching an instance leaves its layers without the component child ids they arrived with, so nothing reads them as still belonging to the component.
+- A text edit made in an outer instance survives component sync over the assignment its component makes, while an assignment wins a text override made at the same level, as in Figma; a paste remaps the property an assignment override is keyed by.
+- Undoing an assignment made through a nested instance drops the override the edit recorded on the instance above it, so redo and a second undo leave the same layers as the first, and an outer text override no longer beats an assignment it should lose to.
+- A literal fill or stroke an outer instance sets on a layer inside a nested instance stays unbound through component sync, instead of taking the component's color binding back.
+- A sync that matches an instance's copy to a namesake replacing its component layer relinks the copy over the link a file recorded, and announces the change, so a reopened document saves and collaboration follows it.
+- A paste into another document keeps the mode an instance pins on a layer and the variables its overrides bind, remapped to the collections and variables the paste copies.
+- A slot made inside a variant is defined on its set, as Figma keeps it, and removing it drops the content of every variant's instances; duplicating slot content, dragging a layer into a slot, or reordering it claims the slot in the same undo step as the edit.
+- A script that edits a component and then reads an instance sees the edit at once, as in Figma: the Plugin API syncs pending component edits before reading or writing a layer inside an instance, and a failed sync is retried at the next read.
+- A binding change on a layer inside a nested instance claims only that binding, so the layer's other bindings keep following their component.
+- A synced bound number takes the value of the mode its copy sits in, not its component's, and a number the instance overrides keeps its own value through the sync.
+- A text style bound to a variable whose token path another collection shares reads back bound to the same variable: the export records each bound field's collection and variable, and warns about references other tools could misread.
+- A bound paint keeps an edit to its color or opacity until its variable's color for the layer changes, as in Figma: binding writes the variable's color, a value or mode change refreshes it, and readers, the canvas, copies, and saves use the stored paint. It refreshes whenever the mode set for its layer changes, even to a mode giving the same color, and a paste keeps the paint edits it copied, counting from the colors applied when the copy was made.
+- Switching an instance to another variant keeps the overrides its layers share, as Figma does, instead of resetting every layer to the new variant.
+- An instance of a variant is named after its component set, as in Figma, and swapping the variant keeps that name.
+- Design JSX instances whose component name more than one component or component set shares warn with each candidate's ID, and variant props select the component set instead of an unrelated component of the same name.
+- Publishing a library no longer fails when a published component contains an instance of a variant: the variant resolves through its component set's asset key, and library assets keep a stable asset key across publications instead of taking a file node id for the key of a component that has none.
+- A layer that holds an instance can no longer be moved into the component that instance draws, which left the component sync looping on itself until the app threw, and moving a layer into an instance of a component is refused unless it lands in a slot, so the instance never holds a layer nothing in its component answers to.
+- Deleting a layer inside an instance hides it for that instance, as Figma does, instead of doing nothing or letting the layer come back when the file is reopened, and drops the overrides that named it; a slot's contents still delete outright.
+- A group's box follows a child that moves or resizes from the properties panel or the plugin API, not only one dragged on the canvas, and it goes back with the child on undo.
+- Taking auto layout off a frame clears the wrap, alignment, spacing, and padding it can no longer use, so reopening the file no longer shows settings the frame had dropped; adding auto layout to a group turns it into a frame, as Figma converts it, and undoing a change of a frame's sizing puts the size it had back.
+- Binding a variable to an instance's fill records that fill as the instance's own, and a size limit set on a layer inside an instance no longer claims to be that instance's own, so reopening no longer shows overrides the document never had.
+- An instance frame takes its component frame's alignment, positioning, fill behaviour, and size limits, which the file records once for both, so absolute positioning in a component no longer reappears only after reopening.
+- A page can no longer be moved into a layer, which left the document holding a page inside a frame.
+- Saving a document whose instance holds a copy of a component layer that no longer exists no longer fails; the rest of the document is written.
+
+#### AI chat and agents
+
+- The notice after an AI edit's Show brings the document holding those layers to front, and names it when another document is showing.
+- A document the chat's own coding agent starts opens in front while the reply that started it stays on screen.
+- A reply that is already running keeps running when another document opens while the chat is being taken up.
+- A failed agent tool call stays a compact card: the chat shows the line that failed and clips a long output to a few lines, with Show all for the rest.
+- Deleting a chat forgets its agent, so a late tool call from a deleted chat finds no reply and the document it worked on is not held open.
+- A coding agent keeps its MCP session while the app is briefly unavailable, so a busy document no longer takes the agent's tools away mid-run.
+- A slow edit, such as a render that draws a whole page, returns its result instead of a timeout the app then applies, and calls made while it runs wait for it instead of failing at the shorter read deadline.
+- Exporting an image or motion clip from an agent works for a document that is open behind the one on screen: it draws with the app's CanvasKit offscreen instead of reporting that the document has no renderer.
+- An agent's `viewport_get` and `viewport_set`, a paste without a cursor, and the menu zoom use the canvas's middle instead of the window's.
+- `analyze_overlaps` says how far a layer protrudes in pixels instead of printing an area as a distance, and keeps one reply under 64 KB while still counting every finding in its summary.
+- A `script` layer accepts any CSS colour the canvas takes, such as `#f00` or `rgb(0 128 0)`, and a refused layer names the layer and field that is wrong, as in `roots[0].fill: "#zzz" is not a color`.
+- Creating a code layer whose program cannot draw leaves no layer behind and answers with the program's error.
+- A tool argument that is a union reports the field of the branch the value matched instead of "Expected Object but received Object".
+- Design JSX refuses a layer inside `<Text>` instead of creating a child the JSX export drops, reports and leaves out a layer prop of the wrong kind, such as a name or a size that is not a number, bounds one out of range, and warns when an unreadable `w`/`h` or colour value is ignored, leaving an unreadable paint out instead of painting it black.
+- The plugin API refuses NaN and Infinity for positions, sizes, rotation, opacity, strokes, corner radii, and auto layout spacing, as Figma does, so a non-finite number no longer breaks a layer's bounds.
+
+#### CLI and MCP
+
+- CLI commands reject misspelled options instead of silently ignoring them, so `pairdraw info file --jsonn` fails with `Unknown option: --jsonn` rather than printing human output a script cannot parse.
+- Piped CLI output carries all of it: `pairdraw tree design.fig --json | jq` no longer truncates at 64 KB, and large human-readable results (lint, find, query, diff, node, tool) stream through the same path.
+- `pairdraw export` and `pairdraw convert` write their default output next to the input file and never over it: a `.fig` export of `design.fig` without `-o` writes `design-export.fig` instead of replacing the document with the exported page or node.
+- `pairdraw pages` and `pairdraw fonts` read every page of a file before reporting, so pages that were not loaded yet are counted.
+- Exporting HTML with external assets creates the output folder when it does not exist yet, and Storybook exports with `--framework react` or `vue` write a `parameters.design` image for each generated component's state stories, showing the variant that draws the state, as static HTML stories already do.
+- `pairdraw documents save` writes a browser document opened or created through the MCP server back to its file, instead of asking for a path it already has, and `documents new --path` names the document after that file.
+- Opening a file that is already open recovers an automation session whose document was closed, so untargeted CLI calls work again without passing `--document-id`.
+- `pairdraw tool describe` describes tool arguments as the input a caller writes, so a numeric argument's numeric-string form is valid instead of being reported as a number with a string pattern.
+- Deeply nested layers and layers whose children link back to a parent flatten without overflowing the stack or repeating a subtree.
+- Diagnostics keep the file name of a built chunk, hash included, in a stack frame from the app's own origin, so an error report still finds its source map, while a chunk-shaped key elsewhere stays redacted.
+
+#### Collaboration and Cloud
+
+- Several tabs opening the same empty Cloud room at once now share one document, so every peer receives the others' edits instead of each staying on its own graph.
+- Concurrent edits to different fields of one layer keep every field marked as edited on every peer, and rendering a text layer no longer records its picture cache as an edit.
+- A workspace the account is not in answers 404 for its entitlements instead of a server error.
+- A desktop sign-in page keeps getting fresh codes after a few reloads instead of being rate-limited for half an hour.
+- A malformed id in a Cloud URL answers 404 instead of a database error.
+- Signing out, or signing in to a server as another account, removes that account's Cloud documents from Recent and deletes its uploaded copies from this device, keeping any with changes not yet uploaded.
+- Home keeps the chosen workspace while Cloud checks the session, and creating a design waits a moment instead of putting a local file in its place.
+
+#### Desktop and browser
+
+- On macOS 14 and later, agents can keep editing through MCP while the desktop app is hidden or the screen is locked, instead of every call timing out.
+- Fonts installed on the system are drawn by the page instead of being copied into it, so bold and italic text keeps its own face.
+- On Linux, the desktop app caches recent file previews and downloaded fonts again, so they no longer load anew each time, and it starts on NVIDIA Wayland sessions instead of being disconnected at its first paint.
+- On Linux, typing in a text field is no longer taken by menu shortcuts such as N or Backspace.
+- The editor menu no longer appears in the Software Update window on Windows and Linux, and View settings keep their check state in the desktop menu while Home hides the items.
+- Windows fonts that list a width-named face as its own family load with the right weight and style.
+- Check for Updates reports its answer even when it joins the check the app runs at launch.
+- View → Variables… opens the variables dialog from the desktop menu as from the app menu.
+- Unsaved edits to a file saved by hand get a recovery copy when autosave stops, so a WebView crash no longer loses them, and the editor reloads its page when the process backing it ends on macOS instead of leaving a blank window.
+- Reloading a document on desktop parses the file as it was read, without holding several copies of it in memory, and a document whose page stops drawing before it is first shown stays open in its tab and reports the failure instead of its tab closing with no message.
+- The browser app starts on Chromium versions whose notification permission status refuses event listeners, instead of showing "Pairdraw couldn't start".
+- Pasting web HTML works in Safari and the desktop app's WebKit views.
+
+#### Interface, accessibility, and packages
+
+- Icon-only controls in the code panel, the asset list, the boolean operations menu, and the gradient editor announce what they do, in the interface language; a tooltip describes the control it belongs to, so a screen reader hears what it says while it shows, and the layers panel is announced as a multi-select tree, its rows as tree items.
+- The command palette's menu headings, such as Theme and Export Selection, open their choices instead of closing the palette and running nothing, and File › Export Selection and its formats stay disabled until layers are selected, instead of appearing to run and doing nothing.
+- The Design panel, the canvas size label, and the auto layout fields show X, Y, width, height, rotation, padding, gap, and size limits to two decimals, as Figma does, and a multi-selection's width and height no longer show a raw value. A selection's edges on the rulers read to three decimals at any zoom, with the two badges parting on a narrow selection instead of overlapping, and a size, limit, padding, or gap bound to a variable shows and edits from the two decimals the panel shows.
+- A press and hover pass through a locked layer and everything inside it to what lies under, while a right-click still selects it, so its menu can unlock it.
+- A copy field's text reads left to right in a mirrored interface; its copy button still follows the reading direction.
+- Relative times count calendar days rather than 24-hour spans, so something from late the day before yesterday reads as two days ago, not yesterday.
+- Sizes in storage, recovery, save, and update messages write their numbers as the interface language does, so German reads 1,5 MB where English reads 1.5 MB, and the font picker's search field asks for fonts in the interface language instead of always in English.
+- A variable collection lists its modes by their sort position with the default first, so an imported collection shows its modes in Figma's order and a new default keeps that place through export.
+- A bound number field reads like any other field, its variable named by the variable button's tooltip; a binding with no value still shows the variable's name in the field.
+- Each row of a variable picker previews its own variable's colour inside a bound fill field, instead of every row showing the bound variable's colour.
+- Recent files leave the list from a file's own menu; the section header no longer clears the whole list at once.
+- Tab moves focus on the Home screen instead of being captured for layer selection.
+- The code panel leaves the menu's keys to the menu on every platform, and Tab or Shift-Tab indents; Undo and Redo from the menu reach the editor's own history.
+- The comments list says that every comment is resolved when resolved threads are hidden, instead of claiming there are no comments.
+- Clicking a presented slide steps to the next slide, as Space and Enter do, while links and the presentation's controls keep their own clicks.
+- Presenting a slide or previewing a frame draws only that frame and its contents, without the page layers over it, and leaving a preview returns the editor to the pan and zoom it had.
+- The prototype preview bar stays above the letterbox and the scrim, so its buttons can be clicked on a letterboxed frame.
+- A library copy's text links point at the copy's layers rather than the source file's, so a link still jumps to its layer after the component is published, inserted, or updated, while duplicate and paste keep their links as they were.
+- A Figma paste-to-replace keeps the pasted layers as they were drawn instead of turning with the frame that holds them, while keeping the copied angle and the replaced layer's canvas position.
+- Iconify icons draw in the box their set gives them, at Iconify's default of 16 when it gives none, so Bootstrap Icons no longer draw at two thirds of the icon and Jam's own offset no longer shifts it; an alias draws its parent with the flip or turn it adds, and `currentColor` paints take the color an SVG element sets or inherits.
+- `@pairdraw/core`'s editor declarations name their viewport vector from the scene graph, so a consumer's type check resolves it, and `@pairdraw/dom-css` declares the CSS object model shapes it hands out instead of borrowing them from the parser it loads at runtime.
+
 ## 0.18.0 — 2026-11-18
 
 Pairdraw 0.18.0 makes saves safe and agents dependable: a save or export replaces a file only after the new copy is fully written, each AI agent stays on the document it edits while you switch tabs, a reply whose provider stalls ends with a notice instead of spinning forever, MCP tools report failures as errors and name the arguments they accept, plugins run under tighter limits, and Hebrew, Thai, and Devanagari text draws through fallback fonts. Pairdraw 0.16.1 and later offer this release in the app.

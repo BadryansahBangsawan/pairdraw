@@ -1,1 +1,0 @@
-- Nested instances and other non-vector layers now draw, export, and save their stroke at their current size after auto layout, a component sync, or a resize.

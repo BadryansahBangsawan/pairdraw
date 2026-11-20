@@ -1,2 +1,0 @@
-- Clicking a presented slide steps to the next slide, as Space and Enter do, while links and the presentation's controls keep their own clicks.
-- A document whose layers nest more than 128 auto-layout frames deep is refused with a clear error instead of crashing the layout engine for the rest of the session.

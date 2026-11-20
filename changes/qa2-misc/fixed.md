@@ -1,1 +1,0 @@
-- Tab moves focus on the Home screen instead of being captured for layer selection.

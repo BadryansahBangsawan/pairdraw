@@ -1,2 +1,0 @@
-- Publishing a library no longer fails when a published component contains an instance of a variant: the variant resolves through its component set's asset key.
-- Library assets keep a stable asset key across publications: a file node id is no longer taken for the key of a component that has none.

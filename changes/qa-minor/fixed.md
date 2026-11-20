@@ -1,4 +1,0 @@
-- Menu items that act on the selection, such as Paste to replace, Rename selection, Align, Remove Auto Layout and Auto arrange, are disabled while nothing that can use them is selected.
-- ⌘O, ⌘N, ⌘, and the other application and file shortcuts run while a text field has focus, as the desktop menu's accelerators do, while the field keeps every key that acts on the canvas.
-- A text layer written through design JSX, HTML or SVG import is named by its characters, on one line, until it is given a name.
-- Adding notes for AI, or a variable, puts the cursor in the new field so the next keystrokes reach it.

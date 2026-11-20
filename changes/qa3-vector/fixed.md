@@ -1,2 +1,0 @@
-- A pen path of two points closes into a shape when its first point is pressed, as in Figma.
-- A vector's corner radius rounds its fill as well as its stroke, whether the radius is set on a point or on the layer.

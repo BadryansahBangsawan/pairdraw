@@ -1,1 +1,0 @@
-- Exporting an image or motion clip from an agent works for a document that is open behind the one on screen: it draws with the app's CanvasKit offscreen instead of reporting that the document has no renderer.

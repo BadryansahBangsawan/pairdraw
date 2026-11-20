@@ -1,1 +1,0 @@
-- Design JSX instances whose component name more than one component or component set shares warn with each candidate’s ID, and variant props select the component set instead of an unrelated component of the same name.

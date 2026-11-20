@@ -1,1 +1,0 @@
-- Undo after another document replaced the open one no longer edits the new document’s layers, and each document keeps its own history.

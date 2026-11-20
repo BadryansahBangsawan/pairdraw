@@ -1,1 +1,0 @@
-- Pasting a layer copied out of a component while it is bound to one of the component properties pastes it unbound instead of failing.

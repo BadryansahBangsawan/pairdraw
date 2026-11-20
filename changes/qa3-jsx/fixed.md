@@ -1,2 +1,0 @@
-- Refuse a layer inside `<Text>` instead of creating a child the JSX export drops.
-- Warn when an unreadable `w`/`h` or colour value is ignored, and leave an unreadable paint out instead of painting it black.

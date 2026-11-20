@@ -1,1 +1,0 @@
-- An instance text draws the size, font, spacing, decoration, and case of the text style it inherits, including the style's variables, over values its own record claims, and a text range that names a fill style draws in that style's paints.

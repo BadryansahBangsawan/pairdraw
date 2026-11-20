@@ -1,1 +1,0 @@
-- Dragging a fill, stroke, or effect row onto another row reorders the list, as in Figma; undo restores the previous order.

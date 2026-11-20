@@ -1,1 +1,0 @@
-- Describe tool arguments in `pairdraw tool describe` as the input a caller writes, so a numeric argument's numeric-string form is valid instead of being reported as a number with a string pattern.

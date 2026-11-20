@@ -1,1 +1,0 @@
-- Deleting a variable mode or a collection clears the mode a layer had chosen from it, so the layer no longer keeps a mode that is gone.

@@ -1,1 +1,0 @@
-- A slow edit, such as a render that draws a whole page, returns its result instead of a timeout the app then applies, and calls made while it runs wait for it instead of failing at the shorter read deadline.

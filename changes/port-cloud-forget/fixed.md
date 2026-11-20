@@ -1,1 +1,0 @@
-- Signing out, or signing in to a server as another account, removes that account's Cloud documents from Recent and deletes its uploaded copies from this device, keeping any with changes not yet uploaded.

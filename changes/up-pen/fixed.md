@@ -1,1 +1,0 @@
-- Icons and other layers overridden through a `.pen` instance inside a component now keep their override when that component is used, instead of falling back to the component's default.

@@ -1,1 +1,0 @@
-- A constraint resize keeps a layer’s fractional box, and Left & right shrunk past zero turns the layer over instead of clipping its size.

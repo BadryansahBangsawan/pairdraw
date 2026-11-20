@@ -1,1 +1,0 @@
-- The properties panel now shows in the left sidebar as the fourth tab, Design, beside Layers, Assets, and Slides: selecting a layer no longer opens a panel or changes the sidebar's tab.

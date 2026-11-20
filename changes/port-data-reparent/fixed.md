@@ -1,1 +1,0 @@
-- A layer from an opened `.fig` file that is grouped or moved into a frame keeps its place after the file is saved and reopened.

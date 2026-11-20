@@ -1,1 +1,0 @@
-- Dragging an effect slider keeps a bounded number of cached filters, so a long session no longer grows with every value the drag passed.

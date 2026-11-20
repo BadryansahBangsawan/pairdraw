@@ -1,1 +1,0 @@
-- A fill, stroke, or effect bound to a variable keeps its binding when another entry in the list is added, removed, or moved.

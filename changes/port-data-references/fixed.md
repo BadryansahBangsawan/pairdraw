@@ -1,1 +1,0 @@
-- The Plugin API `componentPropertyReferences` reports the bindings of any layer in a component or instance, not only frames, text, components, and instances.

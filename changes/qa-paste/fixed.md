@@ -1,1 +1,0 @@
-- Text copied in another app pastes as a text layer with that text, instead of pasting the layers last copied in the app.

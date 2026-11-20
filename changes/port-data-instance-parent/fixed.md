@@ -1,1 +1,0 @@
-- Agent tools, including `render`, `import_svg`, `import_mermaid`, `import_html`, `insert_icon`, and `insert_library_component`, refuse a parent inside an instance instead of adding layers the document cannot save as `.fig`; layers added to an instance slot still save.

@@ -1,5 +1,0 @@
-- `save_file` and a save on close refuse a destination that is not the document's archive (`.fig`, or `.jam` for a board) before writing anything, and name the path to use instead.
-- A `.pen` instance draws the children its `ref` passes in place of its component's layers, with or without a declared slot, and a `fit_content(N)` fallback holds only while the instance is empty.
-- A hugging `.pen` frame with `space_between` keeps the gap between its children instead of packing them together.
-- A `.pen` padding of four values is read as top, right, bottom and left instead of dropping the bottom and left.
-- A `.pen` image whose path is percent-encoded, as pen.dev writes `My%20Design-assets/…`, now loads: the path is decoded a step at a time, keeping escapes that would name another folder.

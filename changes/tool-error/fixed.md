@@ -1,1 +1,0 @@
-- A failed agent tool call stays a compact card: the chat shows the line that failed and clips a long output to a few lines, with Show all for the rest.

@@ -1,2 +1,0 @@
-- Several tabs opening the same empty Cloud room at once now share one document, so every peer receives the others' edits instead of each staying on its own graph.
-- Concurrent edits to different fields of one layer keep every field marked as edited on every peer, and rendering a text layer no longer records its picture cache as an edit.

@@ -1,1 +1,0 @@
-- The design token import offers to pick the folder that holds a resolver's files when they were not picked with it.

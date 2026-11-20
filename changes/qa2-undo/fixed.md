@@ -1,3 +1,0 @@
-- Image fills open their fill settings again, so Choose image and Replace swap the bytes while keeping the scale mode and crop, for every selected layer and as one undo step.
-- Undoing an edit takes back the edited-field marks it added, so a layer ends the step exactly as it began it.
-- Redoing an inserted instance restores the layers it had, ids included, so its overrides and links keep their targets.

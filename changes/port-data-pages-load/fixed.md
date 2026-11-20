@@ -1,1 +1,0 @@
-- Tools and scripts that read a page not yet opened load its layers first, and switch to the page that was asked for last instead of one that finished loading later.

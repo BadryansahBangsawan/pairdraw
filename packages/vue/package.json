@@ -1,6 +1,6 @@
 {
   "name": "@pairdraw/vue",
-  "version": "0.18.0",
+  "version": "0.19.0-beta.1",
   "description": "Headless Vue 3 SDK for building Pairdraw-powered editors.",
   "keywords": [
     "pairdraw",

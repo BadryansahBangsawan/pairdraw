@@ -55,7 +55,7 @@ const describe = defineCommand({
   async run({ args }) {
     try {
       const def = findCLITool(args.name)
-      const schema = toJSONSchema(def.input, { errorMode: 'ignore' })
+      const schema = toJSONSchema(def.input, { errorMode: 'ignore', typeMode: 'input' })
       if (args.json) {
         const info = {
           name: def.name,

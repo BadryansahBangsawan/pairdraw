@@ -89,6 +89,16 @@ describe('tool CLI', () => {
       v.looseObject({ schema: v.looseObject({ properties: v.record(v.string(), v.unknown()) }) })
     )
     expect(info.schema.properties).toHaveProperty('name')
+
+    const shape = await cli(['tool', 'describe', 'create_shape', '--json'])
+    expect(shape.exitCode).toBe(0)
+    const shapeInfo = parseJSON(
+      shape.stdout,
+      v.looseObject({ schema: v.looseObject({ properties: v.record(v.string(), v.unknown()) }) })
+    )
+    expect(JSON.stringify(shapeInfo.schema.properties.x)).toMatch(
+      /"anyOf":\[[^\]]*"type":"string"[^\]]*"pattern":"\\\\S"/
+    )
   })
 
   test('calls a write tool headlessly and saves the result with --output', async () => {

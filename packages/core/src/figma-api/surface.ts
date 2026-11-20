@@ -13,6 +13,7 @@ export const FIGMA_API_HOST_MEMBERS = [
   'setRenderer',
   'theme',
   'exportImage',
+  'exportGraphImage',
   'icons',
   'rasterCodec',
   'changeBaseline'

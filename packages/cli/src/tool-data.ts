@@ -38,6 +38,8 @@ export async function createHeadlessFigma(graph: SceneGraph): Promise<FigmaAPI> 
   })
   figma.exportImage = (nodeIds, options) =>
     headlessRenderNodes(graph, options.pageId ?? figma.currentPageId, nodeIds, options)
+  figma.exportGraphImage = (target, pageId, nodeIds, options) =>
+    headlessRenderNodes(target, pageId, nodeIds, options)
   figma.rasterCodec = createCanvasKitRasterCodec(await initCanvasKit())
   // Bun has no WebCodecs, so MP4 and WebM go through an ffmpeg on the path when there is one.
   registerVideoEncoder(graph, createFFmpegEncoder())

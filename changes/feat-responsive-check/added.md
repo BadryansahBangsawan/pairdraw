@@ -1,0 +1,1 @@
+- Added `check_responsive`, which lays out a copy of a frame at several widths, such as phone, tablet, and desktop, and returns one render per width with the text overflow, layers outside the frame, and overlapping siblings found there, without changing the document.

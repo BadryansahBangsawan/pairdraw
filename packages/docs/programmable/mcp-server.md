@@ -496,6 +496,7 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | `lint`                    | Check accessibility and consistency issues, with fixes and suggestions                                          |
 | `lint_fix`                | Apply safe lint fixes, and optionally the first suggestion of each finding                                      |
 | `analyze_overlaps`        | Find layers that overlap or overflow, most severe first                                                         |
+| `check_responsive`        | Lay out a copy of a frame at several widths and report warnings, without changing the document                   |
 | `design_to_component_map` | List components with their variants, props, and instance counts, the screens, and how they depend on each other |
 
 ### Diff

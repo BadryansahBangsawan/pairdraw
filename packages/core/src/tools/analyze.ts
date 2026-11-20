@@ -14,6 +14,11 @@ export { evalCode } from './analyze/eval'
 export { lint, lintFix } from './analyze/lint'
 export { compileScript, wrapEvalCode } from './analyze/eval/wrap'
 export { analyzeOverlaps, computeOverlaps } from './analyze/overlaps'
+export { checkResponsive } from './analyze/responsive'
+export type {
+  ResponsiveWarning,
+  ResponsiveWarningKind
+} from './analyze/responsive'
 export type {
   AnalyzeOverlapsArgs,
   AnalyzeOverlapsResult,

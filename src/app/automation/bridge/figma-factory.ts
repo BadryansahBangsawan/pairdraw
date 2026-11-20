@@ -1,5 +1,5 @@
 import { FigmaAPI, MAX_IMAGE_FETCH_BYTES } from '@pairdraw/core/figma-api'
-import { createCanvasKitRasterCodec } from '@pairdraw/core/io/formats/raster'
+import { createCanvasKitRasterCodec, headlessRenderNodes } from '@pairdraw/core/io/formats/raster'
 import {
   registerHTMLToolHost,
   registerImageAIService,
@@ -90,6 +90,15 @@ export function makeFigmaFromStore(
   // `prepareAutomationRendering` has already loaded before a command runs.
   const canvasKit = store.renderer?.ck ?? automationRenderKit()
   if (canvasKit) api.rasterCodec = createCanvasKitRasterCodec(canvasKit)
+  // A resized copy renders through the same offscreen path, sharing the app's CanvasKit.
+  api.exportGraphImage = (target, targetPageId, nodeIds, opts) =>
+    headlessRenderNodes(
+      target,
+      targetPageId,
+      nodeIds,
+      { scale: opts.scale, format: opts.format, quality: opts.quality },
+      store.renderer?.ck ?? automationRenderKit() ?? undefined
+    )
   // The font manager lists the installed families once the host has read them.
   const listAvailableFonts = api.listAvailableFontsAsync.bind(api)
   api.listAvailableFontsAsync = async () => {

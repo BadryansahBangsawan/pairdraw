@@ -75,22 +75,30 @@ describe('draw creation previews', () => {
     }
   })
 
-  test('graph replacement discards pending draw batches without replaying or deleting history', () => {
+  test('graph replacement discards pending draw batches; history stays with its own graph', () => {
     const editor = createEditor()
     try {
       editor.createShape('RECTANGLE', 0, 0, 20, 20)
       const previousLabel = editor.undo.undoLabel
+      const original = editor.graph
       const drag = start(editor)
       const graph = new SceneGraph()
       const node = graph.createNode('RECTANGLE', graph.getPages()[0].id, { x: 10 })
       editor.replaceGraph(graph)
       expect(editor.undo.isBatching).toBe(false)
-      expect(editor.undo.undoLabel).toBe(previousLabel)
+      // The new graph starts with no history: the old graph's steps are parked, not carried over.
+      expect(editor.undo.undoLabel).toBeNull()
+      expect(editor.undo.canUndo).toBe(false)
+      // The abandoned draw neither replays nor records a step on the graph now open.
       drag.commit()
+      expect(editor.undo.canUndo).toBe(false)
       editor.updateNodeWithUndo(node.id, { x: 50 }, 'New graph move')
       expect(editor.undo.undoLabel).toBe('New graph move')
       editor.undoAction()
       expect(node.x).toBe(10)
+      expect(editor.undo.undoLabel).toBeNull()
+      // The original graph gets its own steps back when it returns.
+      editor.replaceGraph(original)
       expect(editor.undo.undoLabel).toBe(previousLabel)
     } finally {
       editor.dispose()

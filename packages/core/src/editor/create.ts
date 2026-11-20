@@ -3,7 +3,7 @@ import { createNanoEvents } from 'nanoevents'
 import type { Emitter } from 'nanoevents'
 
 import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
-import { UndoManager } from '@pairdraw/scene-graph/undo'
+import { UndoManager, type UndoHistory } from '@pairdraw/scene-graph/undo'
 
 import type { SkiaRenderer } from '#core/canvas/renderer'
 import { prefetchFigmaSchema } from '#core/clipboard'
@@ -406,9 +406,21 @@ export function createEditor(options?: EditorOptions) {
     if (_renderers.size === 0) releaseTextMeasurer()
   }
 
+  /** Each graph's committed history, kept aside while another graph is open in this editor. */
+  const histories = new WeakMap<SceneGraph, UndoHistory>()
+
   function replaceGraph(newGraph: SceneGraph) {
     nodes.cancelNodePreviews()
-    undo.discardBatches()
+    if (newGraph !== _graph) {
+      // Undo steps name layers by id and act on whichever graph is open, so history stays with
+      // the graph it was recorded on: a document opened in this editor starts with its own,
+      // instead of undoing the last document's layers that share an id.
+      histories.set(_graph, undo.takeHistory())
+      undo.adoptHistory(histories.get(newGraph))
+      // Menus show the new graph's history; a step still being recorded keeps its own notice,
+      // which is how it learns another write happened beside it.
+      if (!undo.isRecording) emitEditorEvent('history:changed')
+    }
     _graph = newGraph
     state.documentKind = _graph.documentKind
     setActiveTool(offeredTool(state, state.activeTool))

@@ -5,6 +5,15 @@ export interface UndoEntry {
   coalesceKey?: string
 }
 
+/**
+ * Committed history, kept aside while another graph is open so a document opened in the same
+ * editor never inherits the last one's steps.
+ */
+export interface UndoHistory {
+  readonly undo: readonly UndoEntry[]
+  readonly redo: readonly UndoEntry[]
+}
+
 export interface UndoManagerOptions {
   limit?: number
   /** Called after recording, undoing, redoing, or clearing committed history. */
@@ -142,6 +151,25 @@ export class UndoManager {
     this.redoStack = []
     this.discardBatches()
     this.onChange?.()
+  }
+
+  /**
+   * Takes the committed history out, for the graph it was recorded on, and leaves this one empty;
+   * `adoptHistory` puts it back when that graph opens again.
+   */
+  takeHistory(): UndoHistory {
+    const history = { undo: this.undoStack, redo: this.redoStack }
+    this.undoStack = []
+    this.redoStack = []
+    this.discardBatches()
+    return history
+  }
+
+  /** Makes `history`, recorded on the graph now open, the committed one. */
+  adoptHistory(history: UndoHistory | undefined): void {
+    this.undoStack = history ? [...history.undo] : []
+    this.redoStack = history ? [...history.redo] : []
+    this.discardBatches()
   }
 
   /** Whether undo or redo is replaying a step, whose changes are history rather than new edits. */

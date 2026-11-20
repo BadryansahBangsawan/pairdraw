@@ -340,11 +340,14 @@ describe('rollbackOnThrow', () => {
     expect(replacement.getChildren(replacementPage.id)).toEqual(opened)
     // The rollback fires nothing for the document on screen and records no step.
     expect(changes).toBe(0)
-    expect(editor.undo.undoLabel).toBe('Rename')
+    // History stays with the graph it was recorded on, so the opened document has none yet.
+    expect(editor.undo.undoLabel).toBeNull()
     expect(recorded.every(isEmptyDocumentChange)).toBe(true)
     editor.replaceGraph(original)
     expect(documentState(editor)).toEqual(renamed)
     expect(renamed).not.toEqual(before)
+    // The replaced-in document kept its own steps while the other was open.
+    expect(editor.undo.undoLabel).toBe('Rename')
     expect(editor.graph.getNode(pageId)).toBeDefined()
   })
 

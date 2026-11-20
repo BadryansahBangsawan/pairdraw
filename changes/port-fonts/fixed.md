@@ -5,3 +5,4 @@
 - A `.pen` document's bundled fonts are read, so its text draws in them instead of being substituted, and `.fig` exports name the real family and style, such as Geist SemiBold.
 - `figma.listAvailableFontsAsync()` lists every style of installed and bundled families, and of online families once a font of theirs is loaded, instead of only Regular; in the CLI and the MCP server it lists the bundled and online families instead of none.
 - The first Chinese, Japanese, or Korean text loads only the system fonts its characters need, keeps one copy of each face shared by every canvas, and no longer registers fallback faces as browser fonts, using hundreds of megabytes less memory.
+- Browsers set to Chinese (`zh`, `zh-SG`, `zh-Hans`) open the app in Simplified Chinese instead of English, and Traditional-only Han is told apart by OpenCC's table instead of a hand-picked list that counted shared characters such as 警 as Traditional.

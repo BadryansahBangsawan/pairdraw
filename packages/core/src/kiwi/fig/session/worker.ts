@@ -130,27 +130,29 @@ self.onmessage = async (event: MessageEvent<FigSessionOpenRequest>) => {
   port = request.port
   port.onmessage = (message: MessageEvent<FigSessionRequest>) => handleRequest(message.data)
   port.start()
-  // The worker copies the archive itself, so the main thread sends the file once.
-  const archiveBytes = request.buffer.slice(0)
   try {
     await loadFigDataDecompressor()
     const opened = openReaderSession(request.buffer, request.options?.populate)
     const archiveInfo = opened.session.archiveRecordInfo()
-    archive = createFigArchiveOperations(archiveBytes, () => archiveInfo)
+    archive = createFigArchiveOperations(request.buffer, () => archiveInfo)
     respond({ type: 'page-manifest', pages: opened.pages })
     const graph = serializeSceneGraph(opened.graph)
-    session =
+    const keepsSession =
       request.options?.populate === 'first-page' || request.options?.populate === 'none'
-        ? opened
-        : undefined
+    session = keepsSession ? opened : undefined
+    const mainThreadArchive = keepsSession ? request.buffer.slice(0) : undefined
     respond(
       {
         type: 'graph',
         graph,
         checkpoint: opened.checkpoint(),
-        archiveInfo
+        archiveInfo,
+        archive: mainThreadArchive
       },
-      serializedSceneGraphTransferList(graph)
+      [
+        ...serializedSceneGraphTransferList(graph),
+        ...(mainThreadArchive ? [mainThreadArchive] : [])
+      ]
     )
   } catch (error) {
     respond({ type: 'graph', error: error instanceof Error ? error.message : String(error) })

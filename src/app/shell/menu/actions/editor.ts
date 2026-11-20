@@ -5,6 +5,7 @@ import { getActiveEditorStore, useEditorStore } from '@/app/editor/active-store'
 import { openFindLayers } from '@/app/editor/layers/find'
 import { openTextLinkEditor } from '@/app/editor/links'
 import { openPlaceImageDialog } from '@/app/editor/place/dialog'
+import { openVariablesDialog } from '@/app/editor/tokens/dialog'
 import { openGoodies } from '@/app/goodies/actions'
 import { toggleRemoteCursors } from '@/app/presence/cursor-motion'
 import {
@@ -101,6 +102,7 @@ export function createSharedEditorMenuActions(
     'insert-icon': () => {
       store.state.iconPickerOpen = true
     },
+    variables: () => openVariablesDialog(store),
     'insert-script': () => {
       insertScriptNode(store)
     },

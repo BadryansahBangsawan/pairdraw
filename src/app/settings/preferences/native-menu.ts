@@ -1,6 +1,6 @@
-import type { SnappingPreferences } from '@pairdraw/core'
-
 import { watch, type Ref } from 'vue'
+
+import type { SnappingPreferences } from '@pairdraw/core'
 
 import { isTauri } from '@/app/tauri/env'
 

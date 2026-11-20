@@ -27,7 +27,6 @@ import type {
 import { openTour } from '@/app/demo/document'
 import { useEditorStore } from '@/app/editor/active-store'
 import { textLinkTargets } from '@/app/editor/links'
-import { openVariablesDialog } from '@/app/editor/tokens/dialog'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { setCommentsOnCanvas, setSnappingPreference } from '@/app/settings/preferences/apply'
 import { appPreferences } from '@/app/settings/preferences/store'
@@ -218,7 +217,6 @@ export function useAppMenu() {
     'next-tab': () => switchAdjacentTab(1),
     settings: openSettingsDialog,
     diagnostics: () => openSettingsDialog('diagnostics'),
-    variables: () => openVariablesDialog(store),
     'view-layers-panel': toggleLayersPanel,
     'view-properties-panel': toggleDesignPanel,
     'keyboard-shortcuts': openShortcutSheet,

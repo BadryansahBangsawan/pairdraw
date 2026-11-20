@@ -17,6 +17,7 @@ function selection(overrides: Partial<CanvasMenuOptions['selection']> = {}) {
     canCreateComponentSet: ref(false),
     canCreateSlot: ref(false),
     canConvertToFrame: ref(false),
+    canCreateVariations: ref(false),
     canAutoArrange: ref(false),
     ...overrides
   } as CanvasMenuOptions['selection']
@@ -65,6 +66,19 @@ describe('buildCanvasContextMenu', () => {
       '---',
       'selection.flipHorizontal',
       'selection.flipVertical'
+    ])
+  })
+
+  test('offers Duplicate as variation after Duplicate only for a layer that can be varied', () => {
+    const ids = itemIds(
+      buildCanvasContextMenu(
+        options({ selection: selection({ canCreateVariations: computed(() => true) }) })
+      )
+    )
+    expect(ids.slice(0, 3)).toEqual([
+      'selection.duplicate',
+      'selection.duplicateAsVariation',
+      'selection.delete'
     ])
   })
 

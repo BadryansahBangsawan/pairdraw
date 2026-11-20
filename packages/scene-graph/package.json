@@ -434,6 +434,12 @@
       "import": "./dist/variant-properties.js",
       "default": "./dist/variant-properties.js"
     },
+    "./variations": {
+      "types": "./dist/variations/index.d.ts",
+      "bun": "./src/variations/index.ts",
+      "import": "./dist/variations/index.js",
+      "default": "./dist/variations/index.js"
+    },
     "./vector-network": {
       "types": "./dist/vector-network.d.ts",
       "bun": "./src/vector-network.ts",

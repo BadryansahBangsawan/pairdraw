@@ -30,7 +30,8 @@ export interface EmptySpace extends Rect {
   direction: SpaceDirection | null
 }
 
-function overlaps(rect: Rect, obstacle: Rect, gap: number): boolean {
+/** Whether `rect` comes within `gap` of `obstacle`, or covers part of it when `gap` is 0. */
+export function rectsOverlap(rect: Rect, obstacle: Rect, gap: number): boolean {
   return (
     rect.x < obstacle.x + obstacle.width + gap &&
     rect.x + rect.width + gap > obstacle.x &&
@@ -67,7 +68,7 @@ function spaceToward(request: EmptySpaceRequest, anchor: Rect, direction: SpaceD
       : { x: anchor.x, y: offset, width, height }
   for (const offset of candidates) {
     const rect = place(offset)
-    if (!obstacles.some((obstacle) => overlaps(rect, obstacle, gap))) return rect
+    if (!obstacles.some((obstacle) => rectsOverlap(rect, obstacle, gap))) return rect
   }
   // Unreachable: the farthest candidate clears every obstacle along this axis.
   return place(candidates[candidates.length - 1] ?? start)

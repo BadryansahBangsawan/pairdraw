@@ -1,4 +1,5 @@
 export * from './appearance'
+export * from './components'
 export * from './geometry'
 export * from './layout'
 export * from './text'

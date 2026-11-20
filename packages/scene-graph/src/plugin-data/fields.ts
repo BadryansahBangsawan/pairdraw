@@ -27,6 +27,7 @@ import {
   type TextDirection,
   type TokenUnit
 } from '../types'
+import { variationSetSchema, variationStandInSchema } from '../variations/schema'
 import {
   jsonPluginDataField,
   textPluginDataField,
@@ -295,7 +296,17 @@ export const PAIRDRAW_PLUGIN_DATA = {
    * A snapshot of one page: its address, viewport, and when it was refreshed. The picture is
    * the layer's image fill. An address that is not an http or https page does not decode.
    */
-  browserNode: jsonPluginDataField('browserNode', 'content', browserNodeSchema)
+  browserNode: jsonPluginDataField('browserNode', 'content', browserNodeSchema),
+  /**
+   * On a section, that its children are variations of another layer: which one, and how that
+   * layer looked when they were made. A copy of the section is an ordinary section.
+   */
+  variationSet: jsonPluginDataField('variationSet', 'bookkeeping', variationSetSchema),
+  /**
+   * On a layer of a version, the main component or component set of the original it stands in
+   * for, so a pick keeps that component rather than pairing it by name.
+   */
+  variationStandIn: jsonPluginDataField('variationStandIn', 'bookkeeping', variationStandInSchema)
 } satisfies Record<string, PluginDataKey>
 
 const NOT_CONTENT = Object.values(PAIRDRAW_PLUGIN_DATA).filter((field) => field.role !== 'content')

@@ -38,6 +38,7 @@ import tools from './tools.json'
 import updates from './updates.json'
 import variables from './variables/panel.json'
 import variableTypes from './variables/types.json'
+import variations from './variations.json'
 
 export default {
   agents,
@@ -77,5 +78,6 @@ export default {
   tools,
   updates,
   variables,
-  variableTypes
+  variableTypes,
+  variations
 } satisfies ComponentsJSON

@@ -69,6 +69,7 @@ export default defineConfig({
     'variables/index': './src/variables/index.ts',
     'variant-name': './src/variant-name.ts',
     'variant-properties': './src/variant-properties.ts',
+    'variations/index': './src/variations/index.ts',
     'vector-network': './src/vector-network.ts'
   },
   platform: 'neutral',

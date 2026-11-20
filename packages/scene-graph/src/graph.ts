@@ -25,6 +25,8 @@ import * as Instances from './instances'
 import { LayoutWrites } from './layout/writes'
 import Matrix from './matrix'
 import { CONTAINER_TYPES, createDefaultNode } from './node-defaults'
+import { withPluginData } from './plugin-data/field'
+import { PAIRDRAW_PLUGIN_DATA } from './plugin-data/fields'
 import { updateNodePreview, type NodePreviewObserver } from './preview'
 import type { Color, Rect, Vector } from './primitives'
 /* eslint-disable max-lines -- SceneGraph is the facade over the domain modules */
@@ -961,6 +963,14 @@ export class SceneGraph {
     if (props.source) props.source = { ...props.source, id: null, orderKey: null }
     // A copy is a new design nobody has reviewed: Figma's duplicate and clone() drop the status.
     props.status = null
+    // A stand-in mark names one layer's place in a version of a design; a copy is not that.
+    if (props.pluginData) {
+      props.pluginData = withPluginData(
+        props.pluginData,
+        PAIRDRAW_PLUGIN_DATA.variationStandIn,
+        undefined
+      )
+    }
     const clone = this.createNode(src.type, parentId, { ...props, ...overrides })
     Variables.copyAppliedBoundPaints(src, clone)
     copies.set(src.id, clone.id)

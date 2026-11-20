@@ -1,0 +1,1 @@
+- Variations: Duplicate as variation copies a layer into a section beside it, and the Variations section flips through the versions, uses one in place of the original in one undo step, keeping its id, name, and place in its auto layout, or discards them all.

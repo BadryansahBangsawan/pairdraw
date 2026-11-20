@@ -39,7 +39,8 @@ export {
   useCloudMessages,
   useCloudPortalMessages,
   useVariableMessages,
-  useVariableTypeMessages
+  useVariableTypeMessages,
+  useVariationMessages
 } from '#vue/i18n/useI18n'
 export { i18n } from '#vue/i18n/create'
 export {

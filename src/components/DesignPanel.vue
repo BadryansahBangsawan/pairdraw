@@ -66,6 +66,7 @@ import TextContentControl from './properties/text-content/TextContentControl.vue
 import TextContentSection from './properties/text-content/TextContentSection.vue'
 import TypographySection from './properties/TypographySection.vue'
 import VariablesSection from './properties/VariablesSection.vue'
+import VariationsSection from './properties/variations/VariationsSection.vue'
 
 const store = useEditorStore()
 const libraryService = useLibraryService()
@@ -301,6 +302,7 @@ const { panels, rename: renameMessages } = useI18n()
         </template>
       </PanelHeader>
 
+      <VariationsSection />
       <TextContentSection v-if="node.type === 'TEXT'" :node-id="node.id" />
       <StatusSection />
       <ScriptSection v-if="node.type === 'SCRIPT'" :node-id="node.id" />

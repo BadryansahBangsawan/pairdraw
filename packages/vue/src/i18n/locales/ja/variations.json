@@ -1,0 +1,18 @@
+{
+  "variations": "バリエーション",
+  "variationsCount": "バリエーション · {count}",
+  "variationsOf": "{name} のバリエーション",
+  "previousVersion": "前のバージョン",
+  "nextVersion": "次のバージョン",
+  "useThis": "これを使う",
+  "useThisHint": "{name} をこのバージョンに置き換える",
+  "selectVersion": "使うバージョンを選択してください",
+  "goToOriginal": "元のレイヤーへ",
+  "discardAll": "すべて破棄",
+  "originalChanged": "作成後に元のレイヤーが変更されています。",
+  "originalMissing": "元のレイヤーがないため、どのバージョンでも置き換えられません。",
+  "originalInInstance": "元のレイヤーがインスタンス内にあるため、どのバージョンでも置き換えられません。",
+  "originalLocked": "元のレイヤーがロックされています。バージョンを使うにはロックを解除してください。",
+  "originalNotEditable": "元のレイヤーはライブラリに属しているため、ここではどのバージョンでも置き換えられません。",
+  "versionTypeDiffers": "このバージョンは元のレイヤーと種類が異なるため、置き換えられません。"
+}

@@ -26,6 +26,7 @@ function menuIds(isIcon: boolean, enabled: ReadonlySet<EditorCommandId> = new Se
       canCreateComponentSet: ref(false),
       canCreateSlot: ref(false),
       canConvertToFrame: ref(false),
+      canCreateVariations: ref(false),
       canAutoArrange: ref(false)
     } as CanvasMenuOptions['selection'],
     t: { moveToPage: 'Move to page', autoArrange: 'Auto arrange' }

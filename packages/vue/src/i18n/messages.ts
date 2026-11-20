@@ -43,6 +43,7 @@ import {
   variableTypeMessageDefaults,
   variableTypeMessages
 } from '#vue/i18n/messages/variables/types'
+import { variationMessageDefaults, variationMessages } from '#vue/i18n/messages/variations'
 
 export {
   agentMessages,
@@ -83,7 +84,8 @@ export {
   cloudMessages,
   cloudPortalMessages,
   variablesMessages,
-  variableTypeMessages
+  variableTypeMessages,
+  variationMessages
 }
 
 export const messageDefaults = {
@@ -125,5 +127,6 @@ export const messageDefaults = {
   cloud: cloudMessageDefaults,
   cloudPortal: cloudPortalMessageDefaults,
   variables: variablesMessageDefaults,
-  variableTypes: variableTypeMessageDefaults
+  variableTypes: variableTypeMessageDefaults,
+  variations: variationMessageDefaults
 } as const

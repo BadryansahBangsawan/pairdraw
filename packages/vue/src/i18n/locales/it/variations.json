@@ -1,0 +1,18 @@
+{
+  "variations": "Variazioni",
+  "variationsCount": "Variazioni · {count}",
+  "variationsOf": "Variazioni di {name}",
+  "previousVersion": "Versione precedente",
+  "nextVersion": "Versione successiva",
+  "useThis": "Usa questa",
+  "useThisHint": "Sostituisci {name} con questa versione",
+  "selectVersion": "Seleziona una versione per usarla",
+  "goToOriginal": "Vai all’originale",
+  "discardAll": "Scarta tutte",
+  "originalChanged": "L’originale è cambiato da quando sono state create.",
+  "originalMissing": "L’originale non c’è più, quindi nessuna versione può sostituirlo.",
+  "originalInInstance": "L’originale è dentro un’istanza, quindi nessuna versione può sostituirlo.",
+  "originalLocked": "L’originale è bloccato. Sbloccalo per usare una versione.",
+  "originalNotEditable": "L’originale appartiene a una libreria, quindi qui nessuna versione può sostituirlo.",
+  "versionTypeDiffers": "Questa versione è un tipo di livello diverso dall’originale, quindi non può sostituirlo."
+}

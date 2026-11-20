@@ -3,6 +3,7 @@
   "redo": "やり直し",
   "selectAll": "すべて選択",
   "duplicate": "複製",
+  "duplicateAsVariation": "バリエーションとして複製",
   "delete": "削除",
   "group": "グループ化",
   "ungroup": "グループ解除",

@@ -16,5 +16,7 @@
   "hand": "Mano",
   "comment": "Commento",
   "zoom": "Zoom",
-  "scale": "Ridimensiona in scala"
+  "scale": "Ridimensiona in scala",
+  "eyedropper": "Contagocce",
+  "eyedropperSample": "Preleva un colore dalla tela"
 }

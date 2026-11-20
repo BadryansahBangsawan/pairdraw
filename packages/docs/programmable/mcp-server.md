@@ -280,7 +280,7 @@ The resources and the prompt stay available when `read_skill` is turned off in *
 
 ## Tools
 
-Pairdraw currently registers 139 shared design tools, plus MCP-only document and prompt operations when applicable.
+Pairdraw currently registers 142 shared design tools, plus MCP-only document and prompt operations when applicable.
 
 ### Document
 
@@ -335,26 +335,37 @@ Settings tools never expose credentials, AI models, MCP connections, storage, or
 | `node_children`        | Get direct children of a node                                                                                                                                                                                       |
 | `node_tree`            | Get the subtree rooted at a node                                                                                                                                                                                    |
 | `node_bindings`        | Get variable bindings on a node                                                                                                                                                                                     |
+| `get_jsx`              | Get the compact JSX of a node and its children, the same syntax `render` takes                                                                                                                                      |
+| `query_nodes`          | Query nodes with XPath selectors, returning id, name, type, and text                                                                                                                                                |
+| `describe`             | Describe nodes semantically, with their roles and design issues                                                                                                                                                     |
+| `list_libraries`       | List published component libraries and each component's asset key, name, and type                                                                                                                                   |
 
 ### Create
 
-| Tool                | Description                                                                                                                                                                                   |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `create_shape`      | Create a shape (`FRAME`, `RECTANGLE`, `ELLIPSE`, `TEXT`, `LINE`, `STAR`, `POLYGON`, `SECTION`)                                                                                                |
-| `create_vector`     | Create a vector node from a path string                                                                                                                                                       |
-| `create_slice`      | Create an export slice                                                                                                                                                                        |
-| `create_connector`  | Join two layers, or a layer and a point, with a connector that follows them                                                                                                                   |
-| `create_page`       | Create a new page                                                                                                                                                                             |
-| `render`            | Render JSX to design nodes — create entire component trees in one call                                                                                                                        |
-| `create_component`  | Convert a frame/group into a component                                                                                                                                                        |
-| `create_instance`   | Create an instance of a component                                                                                                                                                             |
-| `detach_instance`   | Detach instances into plain frames, keeping their children, overrides, and position                                                                                                           |
-| `create_slot`       | Make a frame inside a main component a slot, optionally with preferred components, only those allowed, and a child limit                                                                      |
-| `insert_icon`       | Insert icons by name; Material Symbols icons take `weight`, `fill`, `grade`, and `optical_size`, which they keep when swapped                                                                 |
-| `import_html`       | Import HTML and CSS as editable layers: `<style>` blocks apply, `css` adds a stylesheet, and `tailwind: true` compiles the Tailwind classes the markup uses; flex and grid become auto layout |
-| `set_behaviour`     | Make a component behave as a Reka UI control, by its property and slot names; `null` removes it                                                                                               |
-| `get_behaviour`     | Read a component's behaviour and what it still misses; without an ID, list every kind                                                                                                         |
-| `node_to_component` | Convert an existing node into a component in-place                                                                                                                                            |
+| Tool                       | Description                                                                                                                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `create_shape`             | Create a shape (`FRAME`, `RECTANGLE`, `ELLIPSE`, `TEXT`, `LINE`, `STAR`, `POLYGON`, `SECTION`)                                                                                                |
+| `create_vector`            | Create a vector node from a path string                                                                                                                                                       |
+| `create_slice`             | Create an export slice                                                                                                                                                                        |
+| `create_connector`         | Join two layers, or a layer and a point, with a connector that follows them                                                                                                                   |
+| `create_page`              | Create a new page                                                                                                                                                                             |
+| `render`                   | Render JSX to design nodes — create entire component trees in one call                                                                                                                        |
+| `create_component`         | Convert a frame/group into a component                                                                                                                                                        |
+| `create_instance`          | Create an instance of a component                                                                                                                                                             |
+| `detach_instance`          | Detach instances into plain frames, keeping their children, overrides, and position                                                                                                           |
+| `create_slot`              | Make a frame inside a main component a slot, optionally with preferred components, only those allowed, and a child limit                                                                      |
+| `insert_icon`              | Insert icons by name; Material Symbols icons take `weight`, `fill`, `grade`, and `optical_size`, which they keep when swapped                                                                 |
+| `import_html`              | Import HTML and CSS as editable layers: `<style>` blocks apply, `css` adds a stylesheet, and `tailwind: true` compiles the Tailwind classes the markup uses; flex and grid become auto layout |
+| `set_behaviour`            | Make a component behave as a Reka UI control, by its property and slot names; `null` removes it                                                                                               |
+| `get_behaviour`            | Read a component's behaviour and what it still misses; without an ID, list every kind                                                                                                         |
+| `node_to_component`        | Convert an existing node into a component in-place                                                                                                                                            |
+| `import_svg`               | Import SVG markup as editable layers, as pasting it into Figma does                                                                                                                           |
+| `import_mermaid`           | Lay out a Mermaid flowchart as editable FigJam shapes, sections, and connectors                                                                                                               |
+| `combine_as_variants`      | Combine sibling components into a variant set, naming variant properties from their names                                                                                                     |
+| `script`                   | Create, edit, or run a code layer whose program draws its own layers, with controls declared in an `@schema` comment                                                                          |
+| `insert_library_component` | Insert a component from an enabled library by its asset key                                                                                                                                   |
+| `fetch_icons`              | Pre-fetch Iconify icons by set into the cache, one request per set                                                                                                                            |
+| `search_icons`             | Search Iconify for icons by keyword, several queries at once                                                                                                                                  |
 
 ### Image AI
 
@@ -366,6 +377,7 @@ These run in the app on the services and keys set up in **Settings → Image ser
 | `remove_background`  | Cut the subject of a layer's image out onto transparency, keeping the layer's size and crop                                                                                                                                                                                                                         |
 | `replace_background` | Replace the background of a layer's image with one a `prompt` describes, keeping the subject                                                                                                                                                                                                                        |
 | `generate_svg`       | Generate vector art from a prompt with the vectorize service and import it as editable layers, as `import_svg` does                                                                                                                                                                                                 |
+| `stock_photo`        | Search stock photos and apply them to image placeholders or closed shapes                                                                                                                                                                                                                                           |
 
 ### Modify
 
@@ -398,15 +410,17 @@ These run in the app on the services and keys set up in **Settings → Image ser
 | `rescale`                     | Scale layers as the Scale tool (K) does, with their text, strokes, radii, effects, and spacing, around an `anchor` of their joint bounds (`top-left` by default); `factor` 2 doubles; locked layers and layers inside instances are listed in `skipped`                               |
 | `node_replace_with`           | Replace a node with another node                                                                                                                                                                                                                                                      |
 | `arrange`                     | Spread overlapping layers apart, pack them, place them in a grid, row, or column, or lay them out along their connectors as a flow, tree, radial map, or network                                                                                                                      |
+| `batch_update`                | Update the position, size, layout, spacing, and name of many nodes with one layout recompute                                                                                                                                                                                          |
+| `expose_instance_swap`        | Expose nested instances as an instance-swap slot on their component                                                                                                                                                                                                                   |
 
 ### Prototype
 
 Connections use Figma's plugin shape, the same shape the layer's `reactions` exposes in scripts: `[{ trigger: { type: "ON_CLICK" } | { type: "AFTER_TIMEOUT", timeout }, actions: [{ type: "NODE", destinationId, navigation: "NAVIGATE" | "OVERLAY", transition: { type: "INSTANT" | "DISSOLVE", duration }, overlayRelativePosition }, { type: "BACK" }, { type: "CLOSE" }] }]`. A destination is a top-level frame on the layer's page; a trigger, action, transition, navigation or overlay spot the prototype play cannot run is refused with the reason.
 
-| Tool            | Description                                                                                                   |
-| --------------- | ------------------------------------------------------------------------------------------------------------- |
-| `get_reactions` | Read a layer's prototype connections, in Figma's plugin shape; empty when it connects to nothing              |
-| `set_reactions` | Replace a layer's prototype connections; one undo step, as the Prototype panel's edits are                    |
+| Tool            | Description                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------ |
+| `get_reactions` | Read a layer's prototype connections, in Figma's plugin shape; empty when it connects to nothing |
+| `set_reactions` | Replace a layer's prototype connections; one undo step, as the Prototype panel's edits are       |
 
 ### Structure
 
@@ -443,6 +457,7 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | `export_image` | Export nodes as PNG, JPG, or WEBP. Returns base64-encoded image data; `quality` (1–100, default 90) sets JPG and WEBP compression                                                                                                                                                                                                                  |
 | `export_html`  | Export nodes as HTML: `style` `css` (default) or `tailwind`; `html` `fragment` (default) or `standalone`; `assets` `inline` (default) or `external`, which returns a standalone page's stylesheet, images, and web fonts as separate files; `layer_names` (default true) writes `data-name` and `layer_ids` (default false) writes each layer's ID |
 | `export_svg`   | Export nodes as SVG markup                                                                                                                                                                                                                                                                                                                         |
+| `export_pdf`   | Export nodes as a vector PDF: `mode` `single` (default), one page per frame (`frames`), or one page per design page (`pages`); `embed_fonts` embeds each face the text uses so the text stays selectable                                                                                                                                           |
 
 ### Viewport
 
@@ -454,28 +469,33 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 
 ### Variables
 
-| Tool                | Description                             |
-| ------------------- | --------------------------------------- |
-| `get_variable`      | Get a variable by ID or name            |
-| `find_variables`    | Find variables by name pattern or type  |
-| `create_variable`   | Create a new variable in a collection   |
-| `set_variable`      | Set a variable value in a mode          |
-| `delete_variable`   | Delete a variable                       |
-| `bind_variable`     | Bind a variable to a node property      |
-| `get_collection`    | Get a variable collection by ID or name |
-| `create_collection` | Create a new variable collection        |
-| `delete_collection` | Delete a variable collection            |
+| Tool                   | Description                                                                                  |
+| ---------------------- | -------------------------------------------------------------------------------------------- |
+| `get_variable`         | Get a variable by ID or name                                                                 |
+| `find_variables`       | Find variables by name pattern or type                                                       |
+| `create_variable`      | Create a new variable in a collection                                                        |
+| `set_variable`         | Set a variable value in a mode                                                               |
+| `delete_variable`      | Delete a variable                                                                            |
+| `bind_variable`        | Bind a variable to a node property                                                           |
+| `get_collection`       | Get a variable collection by ID or name                                                      |
+| `create_collection`    | Create a new variable collection                                                             |
+| `delete_collection`    | Delete a variable collection                                                                 |
+| `unbind_variable`      | Remove a variable binding from a node property                                               |
+| `import_design_tokens` | Import W3C design token files as variables, text styles, and effect styles, updating by name |
+| `design_to_tokens`     | Write variables as CSS custom properties, a Tailwind v4 theme, or W3C design token files     |
 
 ### Analyze
 
-| Tool                 | Description                                                                |
-| -------------------- | -------------------------------------------------------------------------- |
-| `analyze_colors`     | Analyze color palette usage across the document                            |
-| `analyze_typography` | Analyze font/size/weight distribution                                      |
-| `analyze_spacing`    | Analyze gap and padding values                                             |
-| `analyze_clusters`   | Detect repeated patterns (potential components)                            |
-| `lint`               | Check accessibility and consistency issues, with fixes and suggestions     |
-| `lint_fix`           | Apply safe lint fixes, and optionally the first suggestion of each finding |
+| Tool                      | Description                                                                                                     |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `analyze_colors`          | Analyze color palette usage across the document                                                                 |
+| `analyze_typography`      | Analyze font/size/weight distribution                                                                           |
+| `analyze_spacing`         | Analyze gap and padding values                                                                                  |
+| `analyze_clusters`        | Detect repeated patterns (potential components)                                                                 |
+| `lint`                    | Check accessibility and consistency issues, with fixes and suggestions                                          |
+| `lint_fix`                | Apply safe lint fixes, and optionally the first suggestion of each finding                                      |
+| `analyze_overlaps`        | Find layers that overlap or overflow, most severe first                                                         |
+| `design_to_component_map` | List components with their variants, props, and instance counts, the screens, and how they depend on each other |
 
 ### Diff
 
@@ -517,6 +537,7 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | `read_skill`         | Read the Pairdraw agent skill or its design authoring reference; see [Design skill over MCP](#design-skill)                                                                   |
 | `get_codegen_prompt` | Get the design-to-code guidelines to follow before generating frontend code                                                                                                   |
 | `get_style`          | List curated style directions, best match first for a `query`, or get one by `id`: palette by role, font pairing, type scale, radii, spacing, elevation, and written guidance |
+| `calc`               | Evaluate arithmetic expressions, one or several at once, instead of doing mental math                                                                                         |
 
 ### Escape Hatch
 

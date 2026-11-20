@@ -1,0 +1,1 @@
+- The MCP reference lists every shared design tool, and the docs state the current count.

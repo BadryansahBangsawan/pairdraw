@@ -20,7 +20,7 @@ Deshalb sind die Automatisierungsschnittstellen wichtig. Die App, die CLI, die A
 
 ## AI-Chat
 
-Der integrierte Assistent hat Zugriff auf 139 Werkzeuge, die den gesamten Funktionsumfang des Editors abdecken. Beschreiben Sie in natürlicher Sprache, was Sie möchten — „füge allen Buttons einen Schlagschatten von 16 px hinzu“, „erstelle eine Kartenkomponente mit einer Variante für den dunklen Modus“, „exportiere jeden Rahmen auf dieser Seite in 2×“.
+Der integrierte Assistent hat Zugriff auf 142 Werkzeuge, die den gesamten Funktionsumfang des Editors abdecken. Beschreiben Sie in natürlicher Sprache, was Sie möchten — „füge allen Buttons einen Schlagschatten von 16 px hinzu“, „erstelle eine Kartenkomponente mit einer Variante für den dunklen Modus“, „exportiere jeden Rahmen auf dieser Seite in 2×“.
 
 [AI-Chat →](./ai-chat)
 
@@ -54,7 +54,7 @@ Die CLI untersucht, prüft, exportiert und analysiert Designdokumente ohne geöf
 
 ## MCP-Server
 
-Verbinden Sie Claude Code, Cursor, Windsurf oder jeden anderen MCP-kompatiblen Client mit Pairdraw. Der Server stellt 139 Werkzeuge zum Lesen, Erstellen und Ändern von Designs bereit — dieselben, die der integrierte AI-Chat verwendet. Er läuft über stdio oder HTTP mit Sitzungsunterstützung.
+Verbinden Sie Claude Code, Cursor, Windsurf oder jeden anderen MCP-kompatiblen Client mit Pairdraw. Der Server stellt 142 Werkzeuge zum Lesen, Erstellen und Ändern von Designs bereit — dieselben, die der integrierte AI-Chat verwendet. Er läuft über stdio oder HTTP mit Sitzungsunterstützung.
 
 [MCP-Server →](/programmable/mcp-server)
 

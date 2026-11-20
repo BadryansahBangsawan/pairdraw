@@ -1,6 +1,6 @@
 ---
 title: AI-Chat
-description: Integrierter AI-Assistent mit 139 Werkzeugen zum Erstellen und Bearbeiten von Designs.
+description: Integrierter AI-Assistent mit 142 Werkzeugen zum Erstellen und Bearbeiten von Designs.
 ---
 
 # AI-Chat
@@ -134,7 +134,7 @@ Entfernte Server müssen HTTPS verwenden; für lokale Entwicklung sind Loopback-
 
 ## Was der Assistent kann {#werkzeuge}
 
-Der konfigurierbare Werkzeugkatalog umfasst 139 Werkzeuge in diesen Kategorien; welche einem Modell angeboten werden, hängt von den Einstellungen unter Werkzeugzugriff ab:
+Der konfigurierbare Werkzeugkatalog umfasst 142 Werkzeuge in diesen Kategorien; welche einem Modell angeboten werden, hängt von den Einstellungen unter Werkzeugzugriff ab:
 
 - **Erstellen**: Rahmen, Formen, Text, Komponenten, Seiten. Rendert JSX für komplexe Layouts.
 - **Gestalten**: Füllungen, Konturen, Effekte, Deckkraft, Eckenradius, Mischmodi.

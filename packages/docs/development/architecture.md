@@ -113,7 +113,7 @@ When the app is running, CLI commands given no file send RPC requests (`POST /rp
 
 ### Full Tool Set
 
-The MCP server exposes 139 tools. The gaps left against [figma-use](https://github.com/dannote/figma-use), a Figma MCP server kept as a reference, cover advanced layout constraints, prototype connections, advanced component property editing, and bulk document operations.
+The MCP server exposes 142 tools. The gaps left against [figma-use](https://github.com/dannote/figma-use), a Figma MCP server kept as a reference, cover advanced layout constraints, prototype connections, advanced component property editing, and bulk document operations.
 
 ### CI Design Tooling
 

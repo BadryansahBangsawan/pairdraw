@@ -84,7 +84,7 @@ pairdraw export design.fig -f jsx --style tailwind
 
 ## Czat AI
 
-Naciśnij <kbd>⌘</kbd><kbd>J</kbd>, aby otworzyć asystenta AI we własnej kolumnie obok panelu właściwości, albo napisz w polu u dołu obszaru roboczego lub na ekranie startowym. Bez skonfigurowanego modelu czat korzysta z agenta programistycznego zainstalowanego już na tym komputerze: Claude Code, Codex lub Gemini CLI. 139 narzędzi tworzy figury, zmienia style i układ, pracuje z komponentami i zmiennymi, wykonuje operacje logiczne, analizuje tokeny projektu i eksportuje zasoby. Można podłączyć Anthropic, OpenAI, Google AI, OpenRouter, dowolny zgodny punkt końcowy albo AI oferowane przez Twój serwer [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud). Każdy dostawca, model i agent ma logo swojego twórcy.
+Naciśnij <kbd>⌘</kbd><kbd>J</kbd>, aby otworzyć asystenta AI we własnej kolumnie obok panelu właściwości, albo napisz w polu u dołu obszaru roboczego lub na ekranie startowym. Bez skonfigurowanego modelu czat korzysta z agenta programistycznego zainstalowanego już na tym komputerze: Claude Code, Codex lub Gemini CLI. 142 narzędzia tworzą figury, zmienia style i układ, pracuje z komponentami i zmiennymi, wykonuje operacje logiczne, analizuje tokeny projektu i eksportuje zasoby. Można podłączyć Anthropic, OpenAI, Google AI, OpenRouter, dowolny zgodny punkt końcowy albo AI oferowane przez Twój serwer [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud). Każdy dostawca, model i agent ma logo swojego twórcy.
 
 Wywołania narzędzi pojawiają się na zwijanej osi czasu. Kontrola wizualna: asystent renderuje swoją pracę i porównuje ją z poleceniem. Wszystkie zmiany AI można cofnąć.
 
@@ -100,7 +100,7 @@ Na istniejącej tablicy ta sama przeglądarka staje się badaniem: czat cytuje s
 
 ## Serwer MCP
 
-Claude Code, Cursor, Windsurf i inni klienci MCP odczytują i zmieniają dokument otwarty w działającym edytorze. Dostępnych jest 139 narzędzi oraz dwa transporty: stdio i HTTP.
+Claude Code, Cursor, Windsurf i inni klienci MCP mogą odczytywać i zmieniać pliki `.fig` bez interfejsu lub dokument otwarty w działającym edytorze. Dostępne są 142 narzędzia oraz dwa transporty: stdio i HTTP.
 
 ```sh
 npm install -g @pairdraw/mcp

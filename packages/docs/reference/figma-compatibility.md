@@ -28,7 +28,7 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 | Custom file thumbnails           | 🔲     | Saved files preview their first page, as Figma's do without a Cover page; no thumbnail picker                                                                                                                                                                   |
 | Nudge value settings             | ✅     | Small and big nudge distances in **Settings → Editor**, 1 px and 10 px by default                                                                                                                                                                               |
 | App menu (browser mode)          | ✅     | File, Edit, View, Object, Text, Arrange menus; Tauri uses native menus                                                                                                                                                                                          |
-| AI tools                         | 🟡     | 139 tools in the AI chat, coding agents (ACP), and MCP; stock photos, image vectorization, and image generation, background removal and replacement, and SVG generation with the user's own image service keys; no AI search                                    |
+| AI tools                         | 🟡     | 142 tools in the AI chat, coding agents (ACP), and MCP; stock photos, image vectorization, and image generation, background removal and replacement, and SVG generation with the user's own image service keys; no AI search                                    |
 
 ## Layers & Shapes
 
@@ -219,7 +219,7 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 | Code snippets                   | 🟡     | Design JSX, HTML, Vue, and React with CSS or Tailwind and token-aware values; no Swift, Kotlin, or Compose                                                                       |
 | Tailwind CSS v4 export          | ✅     | Export as HTML with Tailwind utility classes from Code panel, CLI, or programmatically                                                                                           |
 | Figma for VS Code               | 🔲     | Editor plugin integration                                                                                                                                                        |
-| MCP server                      | ✅     | `@pairdraw/mcp` with stdio + HTTP transports; 139 core tools plus document, history, and settings tools                                                                          |
+| MCP server                      | ✅     | `@pairdraw/mcp` with stdio + HTTP transports; 142 core tools plus document, history, and settings tools                                                                          |
 | CLI tools                       | ✅     | 27 commands, including info, tree, find, query, node, pages, variables, tokens, fonts, lint, analyze, export, import, convert, diff, eval, tool, and shell                       |
 
 ## Figma Draw

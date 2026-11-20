@@ -82,7 +82,7 @@ pairdraw export design.fig -f jsx --style tailwind
 
 ## Chat con AI
 
-<kbd>⌘</kbd><kbd>J</kbd> abre el asistente en su propia columna junto al panel de propiedades; también puedes escribir en el campo de la parte inferior del lienzo o en **Inicio**. Si no hay ningún modelo configurado, el chat usa un agente de programación ya instalado en este ordenador: Claude Code, Codex o Gemini CLI. 139 herramientas crean formas, modifican estilos y disposiciones, trabajan con componentes y variables, ejecutan operaciones booleanas, analizan variables de diseño y exportan recursos. Admite Anthropic, OpenAI, Google AI, OpenRouter, cualquier extremo compatible o la AI que ofrezca tu servidor de [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud). Cada proveedor, modelo y agente muestra el logotipo de su creador.
+<kbd>⌘</kbd><kbd>J</kbd> abre el asistente en su propia columna junto al panel de propiedades; también puedes escribir en el campo de la parte inferior del lienzo o en **Inicio**. Si no hay ningún modelo configurado, el chat usa un agente de programación ya instalado en este ordenador: Claude Code, Codex o Gemini CLI. 142 herramientas crean formas, modifican estilos y disposiciones, trabajan con componentes y variables, ejecutan operaciones booleanas, analizan variables de diseño y exportan recursos. Admite Anthropic, OpenAI, Google AI, OpenRouter, cualquier extremo compatible o la AI que ofrezca tu servidor de [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud). Cada proveedor, modelo y agente muestra el logotipo de su creador.
 
 Las llamadas a herramientas aparecen en una cronología plegable. Para verificar visualmente los cambios, el asistente renderiza el resultado y lo compara con la solicitud. Todas las modificaciones realizadas por AI se pueden deshacer.
 
@@ -98,7 +98,7 @@ En un tablero que ya tengas, el mismo navegador se vuelve investigación (Pairdr
 
 ## Servidor MCP
 
-Claude Code, Cursor, Windsurf y otros clientes MCP leen y modifican el documento abierto en el editor en ejecución con 139 herramientas. Están disponibles dos transportes: stdio y HTTP.
+Claude Code, Cursor, Windsurf y otros clientes MCP pueden leer y modificar archivos `.fig` sin interfaz o el documento abierto en el editor en ejecución con 142 herramientas. Están disponibles dos transportes: stdio y HTTP.
 
 ```sh
 npm install -g @pairdraw/mcp

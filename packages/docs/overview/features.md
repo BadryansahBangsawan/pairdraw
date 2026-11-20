@@ -80,7 +80,7 @@ CLI: `pairdraw export design.fig -f jsx --style tailwind`
 
 ## AI Chat
 
-Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant in its own column beside the canvas, or write in the prompt at the bottom of the canvas or on Home. With no model set up, the chat uses a coding agent already installed on this computer: Claude Code, Codex, Gemini CLI, or omp. 139 tools can create shapes, set styles, manage layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Connect Anthropic, OpenAI, Google AI, OpenRouter, any compatible endpoint, or the AI your [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud) server offers. Each provider, model, and agent shows its maker's logo.
+Press <kbd>⌘</kbd><kbd>J</kbd> to open the AI assistant in its own column beside the canvas, or write in the prompt at the bottom of the canvas or on Home. With no model set up, the chat uses a coding agent already installed on this computer: Claude Code, Codex, Gemini CLI, or omp. 142 tools can create shapes, set styles, manage layout, work with components and variables, run boolean operations, analyze design tokens, and export assets. Connect Anthropic, OpenAI, Google AI, OpenRouter, any compatible endpoint, or the AI your [Pairdraw Cloud](/user-guide/pairdraw-cloud#ai-on-cloud) server offers. Each provider, model, and agent shows its maker's logo.
 
 Tool calls display as collapsible timeline entries. Visual verification — the assistant renders its work and checks it against your request. Full undo support for all AI mutations.
 
@@ -96,7 +96,7 @@ On a board you already have, the same browser becomes research: the chat quotes 
 
 ## MCP Server
 
-Connect Claude Code, Cursor, Windsurf, or any MCP client to read and write the document open in the running editor. 139 tools. Two transports: stdio and HTTP.
+Connect Claude Code, Cursor, Windsurf, or any MCP client to read and write `.fig` files headlessly, or the document open in the running editor. 142 tools. Two transports: stdio and HTTP.
 
 ```sh
 npm install -g @pairdraw/mcp

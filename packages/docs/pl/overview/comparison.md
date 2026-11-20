@@ -279,7 +279,7 @@ To różnice w budowie, nie pomiary: żadnego z edytorów nie zmierzono obok dru
 
 ## 11. Skrypty i rozszerzanie
 
-Pairdraw zawiera [polecenie `eval`](/pl/programmable/cli/scripting), które udostępnia API wtyczek zgodne z Figmą do skryptów bez interfejsu — operacje grupowe, automatyczne testy i zmiany wprowadzane przez AI działają bez GUI. Do tego **139 narzędzi AI** jest dostępnych przez wbudowany czat, serwer MCP (stdio i HTTP) oraz CLI — obejmują odczyt, tworzenie, modyfikację, strukturę, zmienne, ścieżki wektorowe, analizę (kolory, typografia, odstępy, powtarzające się struktury), różnice, operacje logiczne i rozmieszczanie. Penpot ma system wtyczek z wykonaniem w izolacji, ale nie ma API do skryptów bez interfejsu ani integracji MCP.
+Pairdraw zawiera [polecenie `eval`](/pl/programmable/cli/scripting), które udostępnia API wtyczek zgodne z Figmą do skryptów bez interfejsu — operacje grupowe, automatyczne testy i zmiany wprowadzane przez AI działają bez GUI. Do tego **142 narzędzia AI** są dostępne przez wbudowany czat, serwer MCP (stdio i HTTP) oraz CLI — obejmują odczyt, tworzenie, modyfikację, strukturę, zmienne, ścieżki wektorowe, analizę (kolory, typografia, odstępy, powtarzające się struktury), różnice, operacje logiczne i rozmieszczanie. Penpot ma system wtyczek z wykonaniem w izolacji, ale nie ma API do skryptów bez interfejsu ani integracji MCP.
 
 ## Podsumowanie
 
@@ -296,4 +296,4 @@ Pairdraw zawiera [polecenie `eval`](/pl/programmable/cli/scripting), które udos
 | **Samodzielne wdrożenie**         | Penpot       | Gotowy do Dockera zamiast nowszego serwera Cloud działającego w jednym procesie                                                                                        |
 | **Dojrzałość ekosystemu**         | Penpot       | Lata użycia produkcyjnego zamiast wczesnego etapu rozwoju                                                                                                              |
 
-Pairdraw ma oszczędniejszą architekturę — renderer CanvasKit działający w jednym procesie, TypeScript i zgodność z Figmą od podstaw. Penpot to pełna platforma z około 299 tys. wierszy w Clojure, ClojureScript, Rust i SCSS oraz flotą usług Docker. Oba oferują współpracę w czasie rzeczywistym przez serwer, który w Pairdraw jest opcjonalny. Penpot ma ekosystem wtyczek; **Pairdraw** ma skrypty bez interfejsu zgodne z Figmą, **139 narzędzi AI/MCP**, eksport SVG i PDF oraz natywną aplikację na komputer.
+Pairdraw ma oszczędniejszą architekturę — renderer CanvasKit działający w jednym procesie, TypeScript i zgodność z Figmą od podstaw. Penpot to pełna platforma z około 299 tys. wierszy w Clojure, ClojureScript, Rust i SCSS oraz flotą usług Docker. Oba oferują współpracę w czasie rzeczywistym przez serwer, który w Pairdraw jest opcjonalny. Penpot ma ekosystem wtyczek; **Pairdraw** ma skrypty bez interfejsu zgodne z Figmą, **142 narzędzia AI/MCP**, eksport SVG i PDF oraz natywną aplikację na komputer.

@@ -28,7 +28,7 @@ Vergleich der Funktionen von Figma Design, Funktion für Funktion, mit dem aktue
 | Eigene Dateiminiaturen                    | 🔲     | Gespeicherte Dateien zeigen ihre erste Seite als Vorschau, wie Figma ohne Cover-Seite; keine Auswahl der Miniatur                                                                                                                                                                                 |
 | Einstellbare Schrittweite                 | ✅     | **Kleiner Schritt** und **Großer Schritt** unter **Einstellungen → Editor**, standardmäßig 1 px und 10 px                                                                                                                                                                                         |
 | Anwendungsmenü (Browser)                  | ✅     | Menüs Datei, Bearbeiten, Ansicht, Objekt, Text und Anordnen; Tauri verwendet native Menüs                                                                                                                                                                                                         |
-| AI-Werkzeuge                              | 🟡     | 139 Werkzeuge im AI-Chat, für Coding-Agents (ACP) und über MCP; Stockfotos, Bildvektorisierung sowie Bilderzeugung, Entfernen und Ersetzen von Hintergründen und SVG-Erzeugung mit den eigenen Schlüsseln für Bilddienste; keine AI-Suche                                                         |
+| AI-Werkzeuge                              | 🟡     | 142 Werkzeuge im AI-Chat, für Coding-Agents (ACP) und über MCP; Stockfotos, Bildvektorisierung sowie Bilderzeugung, Entfernen und Ersetzen von Hintergründen und SVG-Erzeugung mit den eigenen Schlüsseln für Bilddienste; keine AI-Suche                                                         |
 
 ## Ebenen und Formen
 
@@ -219,7 +219,7 @@ Vergleich der Funktionen von Figma Design, Funktion für Funktion, mit dem aktue
 | Code-Snippets                            | 🟡     | Design-JSX, HTML, Vue und React mit CSS oder Tailwind und Token-bewussten Werten; kein Swift, Kotlin oder Compose                                                                                                  |
 | Tailwind-CSS-v4-Export                   | ✅     | Export als HTML mit Tailwind-Utility-Klassen aus dem Code-Panel, der CLI oder programmatisch                                                                                                                       |
 | Figma for VS Code                        | 🔲     | Integration als Editor-Plugin                                                                                                                                                                                      |
-| MCP-Server                               | ✅     | `@pairdraw/mcp` mit stdio- und HTTP-Transport; 139 Core-Werkzeuge sowie Werkzeuge für Dokumente, Verlauf und Einstellungen                                                                                         |
+| MCP-Server                               | ✅     | `@pairdraw/mcp` mit stdio- und HTTP-Transport; 142 Core-Werkzeuge sowie Werkzeuge für Dokumente, Verlauf und Einstellungen                                                                                         |
 | CLI-Werkzeuge                            | ✅     | 27 Befehle, darunter info, tree, find, query, node, pages, variables, tokens, fonts, lint, analyze, export, import, convert, diff, eval und tool                                                                   |
 
 ## Figma Draw

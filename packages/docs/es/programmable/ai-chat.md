@@ -1,6 +1,6 @@
 ---
 title: Chat con AI
-description: Asistente integrado con 139 herramientas para crear y modificar diseños.
+description: Asistente integrado con 142 herramientas para crear y modificar diseños.
 ---
 
 # Chat con AI

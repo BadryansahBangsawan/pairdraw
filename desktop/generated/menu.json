@@ -530,6 +530,10 @@
         "accelerator": "CmdOrCtrl+Alt+B"
       },
       {
+        "id": "selection.resetInstanceOverrides",
+        "label": "Reset All Changes"
+      },
+      {
         "id": "selection.detachIcon",
         "label": "Detach Icon"
       },

@@ -66,6 +66,7 @@ export {
   type CloudListing
 } from './discovery'
 export {
+  CLOUD_API_MAX_BODY_BYTES,
   CLOUD_DOCUMENT_NAME_MAX_LENGTH,
   CLOUD_IMAGE_NAME_PATTERN,
   CLOUD_MAX_DOCUMENT_IMAGES,

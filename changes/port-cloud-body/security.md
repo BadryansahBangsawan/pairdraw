@@ -1,0 +1,1 @@
+- A Cloud API request larger than 8 MB is refused before it is read, and a query serving a request is cancelled after 30 seconds.

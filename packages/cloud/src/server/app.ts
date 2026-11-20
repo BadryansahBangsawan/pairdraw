@@ -9,6 +9,7 @@ import {
 } from '#cloud/admin'
 import {
   CLOUD_AI_JWKS_PATH,
+  CLOUD_API_MAX_BODY_BYTES,
   CLOUD_DISCOVERY_PATH,
   CLOUD_PROTOCOL_VERSION,
   type CloudDiscovery
@@ -61,6 +62,7 @@ import {
 import { createDocumentSharingService } from '#cloud/server/sharing'
 import { createWorkspaceMemberService, createWorkspaceService } from '#cloud/server/workspaces'
 import { Hono, type Context } from 'hono'
+import { bodyLimit } from 'hono/body-limit'
 import { cors } from 'hono/cors'
 import type { Kysely } from 'kysely'
 
@@ -322,6 +324,13 @@ export function createCloudApp(services: CloudServices) {
   return new Hono<CloudEnvironment>()
     .use(CLOUD_DISCOVERY_PATH, cloudCORS)
     .use('/api/*', cloudCORS)
+    .use(
+      '/api/*',
+      bodyLimit({
+        maxSize: CLOUD_API_MAX_BODY_BYTES,
+        onError: (context) => context.json({ error: { code: 'invalid_request' as const } }, 413)
+      })
+    )
     .use('*', async (context, next) => {
       await next()
       if (shouldPreventIndexing(context.req.path, services.config.indexingPolicy)) {

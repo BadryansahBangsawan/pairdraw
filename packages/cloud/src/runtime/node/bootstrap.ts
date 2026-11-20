@@ -15,8 +15,18 @@ export async function createMigratedNodeCloudDatabase(
   auth: ReturnType<typeof createBetterAuthAdapter>
 }> {
   const config = await loadNodeCloudServerConfig(environment)
+  // Migrations run on a connection of their own without the statement timeout, since one may
+  // rewrite a large table.
+  const migrating = createPostgresCloudDatabase({
+    connectionString: config.databaseURL,
+    statementTimeoutMs: null
+  })
+  try {
+    const auth = createBetterAuthAdapter(config, migrating)
+    await migrateCloudDatabase(migrating, { run: auth.migrate, schemaVersion: auth.schemaVersion })
+  } finally {
+    await migrating.destroy()
+  }
   const database = createPostgresCloudDatabase({ connectionString: config.databaseURL })
-  const auth = createBetterAuthAdapter(config, database)
-  await migrateCloudDatabase(database, { run: auth.migrate, schemaVersion: auth.schemaVersion })
-  return { config, database, auth }
+  return { config, database, auth: createBetterAuthAdapter(config, database) }
 }

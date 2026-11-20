@@ -40,7 +40,10 @@ function cloudServices(
   context: Pick<ExecutionContext, 'waitUntil'>
 ) {
   const { config } = prepared
-  const database = createPostgresCloudDatabase({ connectionString: config.databaseURL })
+  const database = createPostgresCloudDatabase({
+    connectionString: config.databaseURL,
+    statementTimeoutMs: null
+  })
   const objects = createS3ObjectStore(config)
   const transport = emailTransport(prepared, env)
   const queued = createTransactionalEmailService(database, {

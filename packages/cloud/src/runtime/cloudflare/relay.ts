@@ -97,7 +97,11 @@ export function createCloudflareRelayObject(
 
     #open(documentId: string) {
       this.#relay ??= prepare(this.env).then(({ config }) => {
-        const database = createPostgresCloudDatabase({ connectionString: config.databaseURL })
+        // Hyperdrive keeps no session settings and ends queries past its own limit.
+        const database = createPostgresCloudDatabase({
+          connectionString: config.databaseURL,
+          statementTimeoutMs: null
+        })
         this.#opened = createCollaborationRelay({
           authSecret: config.authSecret,
           documentId,

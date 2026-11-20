@@ -12,7 +12,7 @@ import { styleHTMLInBrowser } from '@/app/code/html-styler'
 import { bindScriptToolHost } from '@/app/code/script/tool-host'
 import { loadTailwindStylesheet } from '@/app/document/export/html'
 import type { EditorStore } from '@/app/editor/active-store'
-import { listFamilies, listFonts } from '@/app/editor/fonts'
+import { listFonts } from '@/app/editor/fonts'
 import { bindAgentImageAIService } from '@/app/editor/image-ai/agent'
 import { bindAgentImageVectorizer } from '@/app/editor/vectorize/agent'
 import { createTauriFetch } from '@/app/tauri/http'
@@ -83,16 +83,11 @@ export function makeFigmaFromStore(
   // `prepareAutomationRendering` has already loaded before a command runs.
   const canvasKit = store.renderer?.ck ?? automationRenderKit()
   if (canvasKit) api.rasterCodec = createCanvasKitRasterCodec(canvasKit)
+  // The font manager lists the installed families once the host has read them.
+  const listAvailableFonts = api.listAvailableFontsAsync.bind(api)
   api.listAvailableFontsAsync = async () => {
-    const [systemFonts, familyOptions] = await Promise.all([listFonts(), listFamilies()])
-    const fonts = systemFonts.flatMap(({ family, faces }) =>
-      faces.map(({ style }) => ({ fontName: { family, style } }))
-    )
-    const seenFamilies = new Set(systemFonts.map(({ family }) => family))
-    for (const { family } of familyOptions) {
-      if (!seenFamilies.has(family)) fonts.push({ fontName: { family, style: 'Regular' } })
-    }
-    return fonts
+    await listFonts()
+    return listAvailableFonts()
   }
   return api
 }

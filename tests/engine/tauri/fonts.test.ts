@@ -7,6 +7,9 @@ import { clearTauriMocks, mockTauriIPC } from '#tests/helpers/tauri/mocks'
 afterEach(async () => {
   await clearTauriMocks()
   vi.restoreAllMocks()
+  fontManager.setHostFontCatalog([])
+  // Importing the app's font module turns the online providers on; tests run offline.
+  fontManager.setOnlineFontProviders({})
 })
 
 /** As the desktop catalog lists a family: each face by its font's name, weight, and slant. */
@@ -22,10 +25,13 @@ describe('Tauri font helpers', () => {
       return [{ family: 'System UI', faces: SYSTEM_UI_FACES }]
     })
 
-    vi.spyOn(fontManager, 'listFamilyOptions').mockResolvedValue([])
+    vi.spyOn(fontManager, 'enabledOnlineFontProviders').mockReturnValue([])
     const { listFamilies, listFonts } = await import('@/app/editor/fonts')
 
-    await expect(listFamilies()).resolves.toEqual([{ family: 'System UI', source: 'local' }])
+    await expect(listFamilies()).resolves.toEqual([
+      { family: 'Inter', source: 'bundled' },
+      { family: 'System UI', source: 'local' }
+    ])
     await expect(listFonts()).resolves.toEqual([{ family: 'System UI', faces: SYSTEM_UI_FACES }])
   })
 

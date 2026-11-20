@@ -8,49 +8,54 @@ import { BLACK } from '#core/constants'
 
 import type { SkiaRenderer } from './renderer'
 
+/**
+ * CanvasKit's typings promise a filter, but a zero sigma hands back null; the filters are cached and
+ * the cache disposes what it holds, so the null has to stay out of it and out of any delete.
+ */
+function mayBeNull<T>(filter: T): T | null {
+  return filter
+}
+
 export function getCachedDropShadow(
   r: SkiaRenderer,
   dx: number,
   dy: number,
   sigma: number,
   color: Float32Array
-): ImageFilter {
+): ImageFilter | null {
   const key = `ds:${dx},${dy},${sigma},${color[0]},${color[1]},${color[2]},${color[3]}`
-  let filter = r.imageFilterCache.get(key)
-  if (!filter) {
-    filter = r.ck.ImageFilter.MakeDropShadowOnly(dx, dy, sigma, sigma, color, null)
-    r.imageFilterCache.set(key, filter)
-  }
-  return filter
+  const cached = r.imageFilterCache.get(key)
+  if (cached) return cached
+  // CanvasKit answers a zero sigma with null, and the cache disposes what it holds.
+  const made = mayBeNull(r.ck.ImageFilter.MakeDropShadowOnly(dx, dy, sigma, sigma, color, null))
+  if (made) r.imageFilterCache.set(key, made)
+  return made
 }
 
-export function getCachedBlur(r: SkiaRenderer, sigma: number): ImageFilter {
+export function getCachedBlur(r: SkiaRenderer, sigma: number): ImageFilter | null {
   const key = `blur:${sigma}`
-  let filter = r.imageFilterCache.get(key)
-  if (!filter) {
-    filter = r.ck.ImageFilter.MakeBlur(sigma, sigma, r.ck.TileMode.Clamp, null)
-    r.imageFilterCache.set(key, filter)
-  }
-  return filter
+  const cached = r.imageFilterCache.get(key)
+  if (cached) return cached
+  const made = mayBeNull(r.ck.ImageFilter.MakeBlur(sigma, sigma, r.ck.TileMode.Clamp, null))
+  if (made) r.imageFilterCache.set(key, made)
+  return made
 }
 
-export function getCachedDecalBlur(r: SkiaRenderer, sigma: number): ImageFilter {
+export function getCachedDecalBlur(r: SkiaRenderer, sigma: number): ImageFilter | null {
   const key = `dblur:${sigma}`
-  let filter = r.imageFilterCache.get(key)
-  if (!filter) {
-    filter = r.ck.ImageFilter.MakeBlur(sigma, sigma, r.ck.TileMode.Decal, null)
-    r.imageFilterCache.set(key, filter)
-  }
-  return filter
+  const cached = r.imageFilterCache.get(key)
+  if (cached) return cached
+  const made = mayBeNull(r.ck.ImageFilter.MakeBlur(sigma, sigma, r.ck.TileMode.Decal, null))
+  if (made) r.imageFilterCache.set(key, made)
+  return made
 }
 
-export function getCachedMaskBlur(r: SkiaRenderer, sigma: number): MaskFilter {
-  let filter = r.maskFilterCache.get(sigma)
-  if (!filter) {
-    filter = r.ck.MaskFilter.MakeBlur(r.ck.BlurStyle.Normal, sigma, true)
-    r.maskFilterCache.set(sigma, filter)
-  }
-  return filter
+export function getCachedMaskBlur(r: SkiaRenderer, sigma: number): MaskFilter | null {
+  const cached = r.maskFilterCache.get(sigma)
+  if (cached) return cached
+  const made = mayBeNull(r.ck.MaskFilter.MakeBlur(r.ck.BlurStyle.Normal, sigma, true))
+  if (made) r.maskFilterCache.set(sigma, made)
+  return made
 }
 
 /**

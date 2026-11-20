@@ -272,6 +272,9 @@ export const SECTION_DEFAULT_STROKE: Stroke = {
 
 export const SECTION_CORNER_RADIUS = 2
 
+/** Effect filters a renderer keeps: a slider drag would otherwise keep every value it passed. */
+export const EFFECT_FILTER_CACHE_ENTRIES = 64
+
 export const ZOOM_DIVISOR = 50
 export const ZOOM_SCALE_MIN = 0.75
 export const ZOOM_SCALE_MAX = 1.25

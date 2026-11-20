@@ -129,7 +129,8 @@ function drawSilhouetteDropShadow(
     canvas.restore()
     paint.delete()
     if (morphology) {
-      filter.delete()
+      // The filter built with the morphology is ours; a zero sigma hands back none.
+      filter?.delete()
       morphology.delete()
     }
   }

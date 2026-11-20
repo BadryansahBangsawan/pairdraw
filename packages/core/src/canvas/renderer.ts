@@ -6,6 +6,7 @@ import type { RenderColorSpace, ResolvedRenderColor } from '@pairdraw/scene-grap
 import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 import { slotPropertyId } from '@pairdraw/scene-graph/slots'
 
+import { ResourceCache } from '#core/cache/resource'
 /* eslint-disable max-lines -- SkiaRenderer facade owns CanvasKit state and delegates domain drawing */
 import {
   DEFAULT_SELECTION_THEME,
@@ -16,6 +17,7 @@ import {
   COMPONENT_SET_DASH,
   COMPONENT_SET_DASH_GAP,
   COMPONENT_SET_BORDER_WIDTH,
+  EFFECT_FILTER_CACHE_ENTRIES,
   IS_BROWSER
 } from '#core/constants'
 import type { EditorState } from '#core/editor/types'
@@ -111,8 +113,18 @@ export class SkiaRenderer {
   declare auxStroke: Paint
   declare opacityPaint: Paint
   declare effectLayerPaint: Paint
-  imageFilterCache = new Map<string, ImageFilter | null>()
-  maskFilterCache = new Map<number, MaskFilter | null>()
+  /**
+   * Effect filters by their parameters. Bounded: a blur or shadow slider emits a new value every
+   * step of a drag, and each filter holds a CanvasKit handle.
+   */
+  imageFilterCache = new ResourceCache<string, ImageFilter>({
+    maxEntries: EFFECT_FILTER_CACHE_ENTRIES,
+    dispose: (filter) => filter.delete()
+  })
+  maskFilterCache = new ResourceCache<number, MaskFilter>({
+    maxEntries: EFFECT_FILTER_CACHE_ENTRIES,
+    dispose: (filter) => filter.delete()
+  })
   _tmpColor = new Float32Array(4)
   _tmpRect = new Float32Array(4)
   textFont: Font | null = null

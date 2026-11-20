@@ -19,7 +19,6 @@ import {
   assignmentOverrideField,
   cloneInstanceOverrideState,
   copiedComponentLayerId,
-  cloneInstanceOverrideState,
   createInstanceOverrideState,
   getInstanceOverride,
   hasInstanceOverride as hasNodeInstanceOverride,
@@ -220,7 +219,6 @@ function swapInstanceLayers(
   graph.updateNode(instanceId, updates)
   cloneChildrenWithMapping(graph, componentId, instanceId)
   applyBoundPaintColorsIn(graph, instanceId)
-  restoreOwnedSlotContent(graph, instance, slotContent)
   const swapped = graph.nodes.get(instanceId)
   if (swapped && capturedOverrides) restoreInstanceOverrides(graph, swapped, capturedOverrides)
 }
@@ -343,13 +341,16 @@ export function detachInstance(graph: SceneGraph, instanceId: string): void {
     instanceOverrides: createInstanceOverrideState()
   })
   // Its mirrored layers stand on their own: a component child id would name a layer of another
-  // node, which the format never stores and a later sync would read as a link back. An instance
-  // inside them keeps its own component: it draws that component still, as Figma leaves it.
-  for (const id of subtreeIds(graph, instanceId)) {
-    const mirrored = graph.nodes.get(id)
-    if (mirrored && mirrored.type !== 'INSTANCE' && mirrored.componentId)
-      graph.updateNode(id, { componentId: null })
+  // node, which the format never stores and a later sync would read as a link back. A nested
+  // instance is not a mirror and keeps its own links, which its overrides are written through.
+  const detachLinks = (parentId: string): void => {
+    for (const child of graph.getChildren(parentId)) {
+      if (child.type === 'INSTANCE') continue
+      if (child.componentId) graph.updateNode(child.id, { componentId: null })
+      detachLinks(child.id)
+    }
   }
+  detachLinks(instanceId)
 }
 
 // A swap's bookkeeping belongs to the instance enclosing the swapped one, never to the swapped one.

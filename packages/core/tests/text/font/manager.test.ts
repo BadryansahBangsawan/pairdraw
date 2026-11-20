@@ -241,6 +241,8 @@ test('a fallback leaves another language its letters, which that language loads 
   } finally {
     manager.releaseProvider(provider)
   }
+})
+
 test('leaves installed faces to the page, which draws them by name', async () => {
   const manager = offlineManager()
   const registered: string[] = []

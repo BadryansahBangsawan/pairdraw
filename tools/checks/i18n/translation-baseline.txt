@@ -183,6 +183,8 @@ fr:panels.document
 fr:panels.documentation
 fr:panels.export
 fr:panels.framePresetCategoryFigmaCommunity
+fr:panels.fractions
+fr:panels.unicase
 fr:panels.image
 fr:panels.imageSaturation
 fr:panels.libraryDestination
@@ -273,6 +275,7 @@ it:panels.noiseDuo
 it:panels.noiseMono
 it:panels.noiseMulti
 it:panels.texture
+it:panels.unicase
 it:panels.shader
 it:panels.variableModeAuto
 it:panels.variableModeAutoMixed

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ListboxContent, ListboxGroup, ListboxGroupLabel, ListboxItem, ListboxRoot } from 'reka-ui'
 import { tv } from 'tailwind-variants'
-import { computed, ref, useTemplateRef, watch, type ComponentPublicInstance } from 'vue'
+import { computed, inject, ref, useTemplateRef, watch, type ComponentPublicInstance } from 'vue'
 
+import type { TokenDriftKind } from '@pairdraw/core/io/formats/design-tokens'
 import {
   isLibraryCollection,
   type VariableCollection,
@@ -21,6 +22,7 @@ import {
 import BindingPill from '@/components/ui/binding/BindingPill.vue'
 import Tip from '@/components/ui/overlay/Tip.vue'
 import FillSwatch from '@/components/ui/paint/FillSwatch.vue'
+import { TOKEN_DRIFT, useDriftLabels } from '@/components/variables/drift'
 import TokenCellInput from '@/components/variables/TokenCellInput.vue'
 import TokenRowMenu from '@/components/variables/TokenRowMenu.vue'
 import { VARIABLE_TYPE_ICONS } from '@/components/variables/type-icons'
@@ -59,6 +61,19 @@ const emit = defineEmits<{
 
 const { variables } = useI18n()
 const ui = tv(tableTheme)()
+
+/** How each token differs from the linked stylesheet; rows of tokens that match show nothing. */
+const drift = inject(TOKEN_DRIFT, null)
+const driftName = useDriftLabels()
+
+function driftKind(id: string): TokenDriftKind | undefined {
+  return drift?.value.get(id)
+}
+
+function driftLabel(id: string): string | undefined {
+  const kind = driftKind(id)
+  return kind && driftName(kind)
+}
 /** Figma does not show a variable the file adds to a library's collection; such a row says so. */
 const libraryCollection = computed(() => isLibraryCollection(collection))
 
@@ -270,6 +285,22 @@ function dropEdge(id: string) {
                   @cancel="editing = null"
                 />
                 <span v-else class="truncate">{{ row.label }}</span>
+                <Tip v-if="driftLabel(row.variable.id)" :label="driftLabel(row.variable.id) ?? ''">
+                  <span
+                    role="img"
+                    :aria-label="driftLabel(row.variable.id)"
+                    class="flex shrink-0 text-muted data-[kind=conflict]:text-warning"
+                    data-test-id="variable-sync-drift"
+                    :data-kind="driftKind(row.variable.id)"
+                  >
+                    <icon-lucide-unlink
+                      v-if="driftKind(row.variable.id) === 'missing'"
+                      class="size-3"
+                      aria-hidden="true"
+                    />
+                    <icon-lucide-git-compare-arrows v-else class="size-3" aria-hidden="true" />
+                  </span>
+                </Tip>
                 <Tip
                   v-if="libraryCollection && !row.variable.key"
                   :label="variables.addedToLibraryCollection"

@@ -124,3 +124,39 @@ test('pull brings in what changed in the linked stylesheet, and push writes vari
   expect(written).toContain('  --radius: 8px;\n}')
   expect(written).toContain('.dark {\n  --brand: #ffffff;\n}')
 })
+
+test('a value changed in the file and on the canvas opens for review, and code wins by default', async () => {
+  await stubStylesheet(STYLESHEET)
+  const dialog = await openVariables()
+  await dialog.getByTestId('variables-css-sync').click()
+  await editor.page.getByTestId('variables-css-import').click()
+  const importDialog = editor.page.getByTestId('variables-import-dialog')
+  await importDialog.getByTestId('variables-import-confirm').click()
+  await expect(importDialog).toBeHidden()
+
+  await editor.page.evaluate(() => {
+    const store = window.pairdraw?.getStore?.()
+    if (!store) throw new Error('Pairdraw store not initialized')
+    const brand = [...store.graph.variables.values()].find((entry) => entry.name === 'brand')
+    const [collection] = store.graph.variableCollections.values()
+    if (!brand || !collection) throw new Error('No brand')
+    store.updateVariableValue(brand.id, collection.defaultModeId, { r: 0, g: 0, b: 1, a: 1 })
+    const root = document.documentElement
+    root.dataset.cssSyncText = (root.dataset.cssSyncText ?? '').replace('#ff5b2e', '#00ff00')
+  })
+  // Until the file is read again, the row shows only the canvas edit.
+  await expect(dialog.getByTestId('variable-sync-drift').first()).toHaveAttribute(
+    'data-kind',
+    'canvas'
+  )
+
+  await dialog.getByTestId('variables-css-sync').click()
+  await editor.page.getByTestId('variables-css-pull').click()
+  const review = editor.page.getByTestId('variables-sync-review')
+  await expect(review.getByTestId('variables-sync-row')).toHaveCount(1)
+  await expect(review.getByTestId('variables-sync-row')).toHaveAttribute('data-kind', 'conflict')
+  await review.getByTestId('variables-sync-apply').click()
+  await expect(review).toBeHidden()
+  await expect(dialog.getByTestId('token-output')).toContainText(/--brand: #00ff00/i)
+  await expect(dialog.getByTestId('variables-sync-status')).toContainText('In sync')
+})

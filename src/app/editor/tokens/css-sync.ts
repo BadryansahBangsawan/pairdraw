@@ -5,7 +5,8 @@ import { shallowRef, triggerRef, type ShallowRef } from 'vue'
 import type {
   DesignTokenBundle,
   TokenDrift,
-  TokenSourceLink
+  TokenSourceLink,
+  TokenSyncChoice
 } from '@pairdraw/core/io/formats/design-tokens'
 import { TOKEN_UNIT_PROPERTY, type TokenStylesheetIssue } from '@pairdraw/dom-css/export'
 import type { TokenUnit } from '@pairdraw/scene-graph'
@@ -56,6 +57,8 @@ interface LinkState {
   /** Counts watch starts, so one that finishes after a newer start or a stop is undone. */
   watchGeneration: number
   lastWrite: number
+  /** The stylesheet as last read for the drift view, compared again on each ask. */
+  tracking: { key: string; drift: () => TokenDrift[] } | null
 }
 
 const states = new WeakMap<EditorStore, LinkState>()
@@ -67,7 +70,8 @@ function stateOf(store: EditorStore): LinkState {
       link: shallowRef<TokenCSSLink | null>(null),
       stopWatching: null,
       watchGeneration: 0,
-      lastWrite: 0
+      lastWrite: 0,
+      tracking: null
     }
     states.set(store, state)
   }
@@ -235,18 +239,23 @@ export interface TokenCSSResync {
  * one undo step, and records the link with what the code holds now. Values changed on the canvas
  * are never overwritten: they and conflicts are returned for review.
  */
-async function syncLink(store: EditorStore, link: TokenCSSLink): Promise<TokenCSSResync> {
+async function syncLink(
+  store: EditorStore,
+  link: TokenCSSLink,
+  choose?: (drift: TokenDrift) => TokenSyncChoice | undefined
+): Promise<TokenCSSResync> {
   const { planTokenSync, syncedTokenSources } =
     await import('@pairdraw/core/io/formats/design-tokens')
   const bundles = [await readTokenCSS(store, link)]
   const recorded = readTokenSources(store.graph).find((source) => source.id === link.id)
   const sync = planTokenSync(store.graph, bundles, recorded)
-  const resolution = sync.resolve()
+  const resolution = sync.resolve(choose)
   const linked = documentLink(store, link)
   const record = (graph: typeof store.graph) =>
     syncedTokenSources(graph, linked, bundles, resolution)
-  // Nothing to bring in can still move the snapshot on: a value changed alike in both places, or
-  // a push. Without that, the next change in code would look like a conflict.
+  // Nothing to bring in can still move the snapshot on: a value changed alike in both places, a
+  // push, or a side picked in review. Without that, the next change in code would look like a
+  // conflict.
   if (resolution.applied > 0 || !recorded || movesSnapshot(record(store.graph), recorded))
     store.syncDesignTokens(resolution.plans, record)
   return { applied: resolution.applied, review: resolution.undecided }
@@ -260,6 +269,67 @@ function movesSnapshot(sources: readonly TokenSource[], recorded: TokenSource): 
     !isEqual(next.snapshot, recorded.snapshot) ||
     !isEqual(next.names ?? {}, recorded.names ?? {})
   )
+}
+
+/** Names a token's drift across syncs: by variable and mode, or by name where it is new. */
+export function tokenDriftKey(drift: TokenDrift): string {
+  const variable = drift.variableId ?? `${drift.collection}/${drift.variable}`
+  return `${variable}:${drift.modeId ?? drift.mode ?? ''}`
+}
+
+/** How the linked stylesheet differs from the variables now, or null without a link. */
+/**
+ * What the drift view depends on besides values: the link and its text, what the document
+ * recorded at the last sync, and which variables, collections, and modes exist.
+ */
+function trackingKey(store: EditorStore, link: TokenCSSLink, recorded: TokenSource | undefined) {
+  const { graph } = store
+  let modes = 0
+  for (const collection of graph.variableCollections.values()) modes += collection.modes.length
+  return [
+    graph.rootId,
+    link.id,
+    link.text,
+    recorded?.syncedAt ?? '',
+    graph.variables.size,
+    graph.variableCollections.size,
+    modes
+  ].join('\n')
+}
+
+/**
+ * How the linked stylesheet differs from the variables now, or null without a link. The file is
+ * read and planned again only when it or the variables' structure changed, or when `reread`
+ * asks; an edit to a value only compares the values that changed since the last ask.
+ */
+export async function tokenCSSDrift(
+  store: EditorStore,
+  options: { reread?: boolean } = {}
+): Promise<TokenDrift[] | null> {
+  const state = stateOf(store)
+  const link = state.link.value
+  if (!link) return null
+  const recorded = readTokenSources(store.graph).find((source) => source.id === link.id)
+  const key = trackingKey(store, link, recorded)
+  if (options.reread || state.tracking?.key !== key) {
+    const { trackTokenDrift } = await import('@pairdraw/core/io/formats/design-tokens')
+    const bundle = await readTokenCSS(store, link)
+    state.tracking = { key, drift: trackTokenDrift(store.graph, [bundle], recorded) }
+  }
+  return state.tracking.drift()
+}
+
+/**
+ * Syncs with the linked stylesheet as last read, taking the side a person picked for each token
+ * by `tokenDriftKey`. It plans again first, so a change made while they chose is not lost.
+ */
+export async function applyTokenCSSReview(
+  store: EditorStore,
+  choices: ReadonlyMap<string, TokenSyncChoice>
+): Promise<TokenCSSResync | null> {
+  const link = stateOf(store).link.value
+  if (!link) return null
+  return syncLink(store, link, (drift) => choices.get(tokenDriftKey(drift)))
 }
 
 /** Records the linked stylesheet on the document, as synced now, and remembers where it is. */

@@ -41,7 +41,7 @@ import { menuItem, useMenuUI } from '@/components/ui/menu/menu'
 import MenuScrollArea from '@/components/ui/menu/MenuScrollArea.vue'
 
 /** A stylesheet read for the import dialog, which shows what it would change. */
-const emit = defineEmits<{ preview: [bundle: DesignTokenBundle] }>()
+const emit = defineEmits<{ preview: [bundle: DesignTokenBundle]; review: [] }>()
 
 const store = useEditorStore()
 const { variables } = useI18n()
@@ -92,8 +92,8 @@ function pull() {
     if (result.applied > 0) toast.info(messages.designTokensImported({ count: result.applied }))
     else if (result.review.length === 0)
       toast.info(variables.value.cssPushNothing({ file: file.value }))
-    if (result.review.length > 0)
-      toast.warning(messages.designTokensNeedReview({ count: result.review.length }))
+    // What only a person can decide opens for review.
+    if (result.review.length > 0) emit('review')
   })().catch(reportFailure)
 }
 

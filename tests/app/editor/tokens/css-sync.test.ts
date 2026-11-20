@@ -5,11 +5,14 @@ import { readTokenSources } from '@pairdraw/scene-graph/token-sources'
 
 import { createEditorStore } from '@/app/editor/session/create'
 import {
+  applyTokenCSSReview,
   pushTokenCSS,
   recordTokenCSSLink,
   resyncTokenCSS,
   setTokenCSSLink,
+  tokenCSSDrift,
   tokenCSSLink,
+  tokenDriftKey,
   unlinkTokenCSS
 } from '@/app/editor/tokens/css-sync'
 
@@ -19,7 +22,10 @@ const CSS = ':root { --brand: #ff0000; --gap: 8px; }'
 
 const stores: ReturnType<typeof createEditorStore>[] = []
 afterEach(() => {
-  for (const store of stores.splice(0)) store.dispose()
+  for (const store of stores.splice(0)) {
+    setTokenCSSLink(store, null)
+    store.dispose()
+  }
 })
 
 async function linkedStore() {
@@ -65,6 +71,20 @@ describe('a stylesheet linked to the document', () => {
 
     store.undo.undo()
     expect(Object.values(variable(store, 'gap').valuesByMode)).toEqual([8])
+  })
+
+  test('a review takes the side picked for each token', async () => {
+    const store = await linkedStore()
+    const brand = variable(store, 'brand')
+    const [modeId] = Object.keys(brand.valuesByMode)
+    store.updateVariableValue(brand.id, modeId, { r: 0, g: 0, b: 1, a: 1 })
+    changeCode(store, CSS.replace('#ff0000', '#00ff00'))
+
+    const drift = (await tokenCSSDrift(store)) ?? []
+    expect(drift).toEqual([expect.objectContaining({ kind: 'conflict', variable: 'brand' })])
+    await applyTokenCSSReview(store, new Map(drift.map((entry) => [tokenDriftKey(entry), 'code'])))
+    expect(variable(store, 'brand').valuesByMode[modeId]).toMatchObject({ r: 0, g: 1, b: 0 })
+    expect(await tokenCSSDrift(store)).toEqual([])
   })
 
   test('a value changed alike in both places, then in code, comes in by itself', async () => {

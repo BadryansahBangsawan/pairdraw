@@ -136,6 +136,8 @@ export function createComponentSyncScheduler(
   return {
     scheduleComponentSync,
     /** Brings instances in line with the component edits scheduled so far, now. */
-    flushComponentSync
+    flushComponentSync,
+    /** Instances are being brought in line with their components: results, not edits. */
+    isSyncingComponents: () => isFlushingComponentSync
   }
 }

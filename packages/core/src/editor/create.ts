@@ -263,7 +263,7 @@ export function createEditor(options?: EditorOptions) {
     runLayoutForNode,
     requestRender
   })
-  const { scheduleComponentSync, flushComponentSync } = createComponentSyncScheduler(
+  const { scheduleComponentSync, flushComponentSync, isSyncingComponents } = createComponentSyncScheduler(
     () => _graph,
     requestRender
   )
@@ -486,6 +486,8 @@ export function createEditor(options?: EditorOptions) {
     get graph() {
       return _graph
     },
+    /** Instances are being brought in line with their components: results, not edits. */
+    isSyncingComponents,
     get renderer() {
       return _renderer
     },

@@ -47,7 +47,11 @@ export function createDocumentChanges(editor: Editor) {
     outsideRevision = revision.value
   }
   const contentChanged = () => {
-    if (editor.graph.isApplyingImportedState || adopting > 0) return
+    // Instances following their components after an edit or an undo are that change's results,
+    // not edits of their own.
+    if (editor.graph.isApplyingImportedState || editor.isSyncingComponents() || adopting > 0) {
+      return
+    }
     revision.value++
     contentRevision = revision.value
     const at = contentRevision

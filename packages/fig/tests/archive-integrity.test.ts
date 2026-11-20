@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
+import { readVerifiedArchive } from '#fig/zip'
 import { zipSync } from 'fflate'
 
 import { parseFigBuffer } from '@pairdraw/fig'
@@ -42,5 +43,42 @@ describe('fig archive integrity', () => {
 
   test('leaves a whole archive to the canvas decoder', () => {
     expect(parse(archive(PAYLOAD))).not.toMatch(/checksum|ZIP signature/i)
+  })
+})
+
+describe('fig archive inflation bounds', () => {
+  test('refuses an entry that inflates past the archive limit', () => {
+    const bomb = zipSync({ 'canvas.fig': new Uint8Array(2_000_000) })
+
+    expect(() =>
+      readVerifiedArchive(bomb, {
+        maxEntries: 16,
+        maxEntryBytes: 1_000_000,
+        maxTotalBytes: 4_000_000
+      })
+    ).toThrow(/larger than 1000000 bytes/)
+  })
+
+  test('refuses an archive with more entries than allowed', () => {
+    const many = zipSync(
+      Object.fromEntries(Array.from({ length: 5 }, (_, index) => [`part${index}`, PAYLOAD]))
+    )
+
+    expect(() =>
+      readVerifiedArchive(many, { maxEntries: 3, maxEntryBytes: 1_000, maxTotalBytes: 10_000 })
+    ).toThrow(/more than 3 entries/)
+  })
+
+  test('refuses an entry that expands past the compression ratio', () => {
+    // 65 MiB of zeros compresses to tens of KiB: over the 64 MiB / 200:1 threshold.
+    const bomb = zipSync({ 'canvas.fig': new Uint8Array(65 * 1024 * 1024) })
+
+    expect(() => readVerifiedArchive(bomb)).toThrow(/expands .*over 200:1/)
+  })
+
+  test('reads an archive within the limits', () => {
+    const files = readVerifiedArchive(archive(PAYLOAD))
+
+    expect(new TextDecoder().decode(files['canvas.fig'])).toBe(new TextDecoder().decode(PAYLOAD))
   })
 })

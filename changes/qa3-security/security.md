@@ -1,0 +1,1 @@
+- A crafted `.fig` archive can no longer make the app inflate unbounded data: entries and total size are capped.

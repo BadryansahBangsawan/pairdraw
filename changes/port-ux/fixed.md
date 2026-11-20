@@ -1,0 +1,1 @@
+- A copy field's text reads left to right in a mirrored interface; its copy button still follows the reading direction.

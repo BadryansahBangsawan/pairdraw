@@ -31,7 +31,7 @@ const cls = computed(() => copyField({ look }))
 
 <template>
   <div data-slot="copy-field" :data-look="look" :class="cls.root({ class: ui?.root })">
-    <code :class="cls.value({ class: ui?.value })">{{ value }}</code>
+    <code dir="ltr" :class="cls.value({ class: ui?.value })">{{ value }}</code>
     <AppButton size="xs" :variant="look === 'plain' ? 'link' : 'ghost'" @click="copy(value)">
       <template #leading>
         <icon-lucide-check v-if="copied" class="size-3" />

@@ -47,10 +47,14 @@ class GeometryBlobBuilder implements PathSink {
  * with network regions positionally (fillGeometry[i] ↔ regions[i]); per-path
  * fills are preserved. Networks without regions (open chains) map to a
  * single fillGeometry entry.
+ *
+ * `cornerRadius` is the layer's radius, which rounds the corners of vertices that set none of
+ * their own, as the drawn path does.
  */
 export function regenerateFillGeometry(
   network: VectorNetwork,
-  existing: GeometryPath[]
+  existing: GeometryPath[],
+  cornerRadius = 0
 ): GeometryPath[] {
   if (existing.length === 0) return existing
   const { vertices, segments, regions } = network
@@ -59,14 +63,15 @@ export function regenerateFillGeometry(
     return existing.map((g, i) => {
       const region = regions[i]
       const builder = new GeometryBlobBuilder()
-      for (const loop of region.loops) addLoopToPath(builder, loop, segments, vertices)
+      for (const loop of region.loops)
+        addLoopToPath(builder, loop, segments, vertices, cornerRadius)
       return { ...g, windingRule: region.windingRule, commandsBlob: builder.toBlob() }
     })
   }
 
   if (regions.length === 0 && existing.length === 1) {
     const builder = new GeometryBlobBuilder()
-    addOpenSegmentsToPath(builder, segments, vertices)
+    addOpenSegmentsToPath(builder, segments, vertices, cornerRadius)
     return [{ ...existing[0], commandsBlob: builder.toBlob() }]
   }
 
@@ -77,13 +82,14 @@ export function regenerateFillGeometry(
   if (regions.length > 0) {
     return regions.map((region) => {
       const builder = new GeometryBlobBuilder()
-      for (const loop of region.loops) addLoopToPath(builder, loop, segments, vertices)
+      for (const loop of region.loops)
+        addLoopToPath(builder, loop, segments, vertices, cornerRadius)
       return { windingRule: region.windingRule, commandsBlob: builder.toBlob() }
     })
   }
   if (segments.length > 0) {
     const builder = new GeometryBlobBuilder()
-    addOpenSegmentsToPath(builder, segments, vertices)
+    addOpenSegmentsToPath(builder, segments, vertices, cornerRadius)
     return [{ windingRule: 'NONZERO' as const, commandsBlob: builder.toBlob() }]
   }
   return []

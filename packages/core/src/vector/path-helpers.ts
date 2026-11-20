@@ -43,7 +43,8 @@ export function addLoopToPath(
   path: PathSink,
   loop: number[],
   segments: VectorSegment[],
-  vertices: VectorVertex[]
+  vertices: VectorVertex[],
+  cornerRadius = 0
 ): void {
   if (loop.length === 0) return
 
@@ -64,15 +65,38 @@ export function addLoopToPath(
     }
   }
 
-  path.moveTo(vertices[current].x, vertices[current].y)
-
+  // The loop's vertices in drawing order, ending where it starts.
+  const order = [current]
   for (const segIdx of loop) {
     const seg = segments[segIdx]
-    const forward = seg.start === current
-    addSegmentDirected(path, seg, vertices, forward)
-    current = forward ? seg.end : seg.start
+    current = seg.start === current ? seg.end : seg.start
+    order.push(current)
   }
-
+  const cornerAt = (index: number): RoundedCorner | null => {
+    const incoming = segments[loop[(index - 1 + loop.length) % loop.length]]
+    const outgoing = segments[loop[index % loop.length]]
+    if (!isStraight(incoming) || !isStraight(outgoing)) return null
+    const corner = vertices[order[index]]
+    return roundedCorner(
+      vertices[order[(index - 1 + loop.length) % loop.length]],
+      corner,
+      vertices[order[(index + 1) % loop.length]],
+      corner.cornerRadius ?? cornerRadius
+    )
+  }
+  const wrap = cornerAt(loop.length)
+  const begin = wrap?.end ?? vertices[order[0]]
+  path.moveTo(begin.x, begin.y)
+  for (let index = 0; index < loop.length; index++) {
+    const last = index === loop.length - 1
+    const corner = last ? wrap : cornerAt(index + 1)
+    if (corner) {
+      drawCorner(path, corner)
+      continue
+    }
+    const seg = segments[loop[index]]
+    addSegmentDirected(path, seg, vertices, seg.start === order[index])
+  }
   path.close()
 }
 

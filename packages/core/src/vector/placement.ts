@@ -44,7 +44,7 @@ export function vectorChangesFromPagePath(
     height: bounds.height,
     vectorNetwork: relativeNetwork,
     // Fills draw from fillGeometry blobs when present, so rebuild them from the new path.
-    fillGeometry: regenerateFillGeometry(relativeNetwork, node.fillGeometry),
+    fillGeometry: regenerateFillGeometry(relativeNetwork, node.fillGeometry, node.cornerRadius),
     // Imported stroke outlines no longer match; strokes come from the path instead.
     strokeGeometry: []
   }

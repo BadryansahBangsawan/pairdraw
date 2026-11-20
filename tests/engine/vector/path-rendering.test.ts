@@ -119,6 +119,43 @@ describe('vectorNetworkToPath', () => {
     expect(paths[1]).toEqual({ operations: ['M50,50', 'L90,50'], fillType: null })
   })
 
+  test('rounds a filled region corner by its vertex radius', () => {
+    const { ck, paths } = createCanvasKit()
+    const network = mixedNetwork()
+    network.regions = [{ windingRule: 'NONZERO', loops: [[0, 1, 2, 3]] }]
+    network.vertices[0].cornerRadius = 4
+
+    vectorNetworkToPath(ck, network)
+
+    expect(paths[0].operations.filter((operation) => operation.startsWith('C'))).toHaveLength(1)
+    // The corner is cut from the square's edges instead of drawn through (0, 0).
+    expect(paths[0].operations).not.toContain('L0,0')
+  })
+
+  test('rounds a filled region corner by the layer radius when its vertex has none', () => {
+    const { ck, paths } = createCanvasKit()
+    const network = mixedNetwork()
+    network.regions = [{ windingRule: 'NONZERO', loops: [[0, 1, 2, 3]] }]
+
+    // A rounded layer: the radius sits on the layer, not on each vertex, and the stroke already
+    // follows it, so the fill has to round the same corners or it peeks out sharp underneath.
+    vectorNetworkToPath(ck, network, 4)
+
+    // The layer's radius reaches every corner, not just one vertex's.
+    expect(paths[0].operations.filter((operation) => operation.startsWith('C'))).toHaveLength(4)
+    expect(paths[0].operations).not.toContain('L0,0')
+  })
+
+  test('keeps a filled region’s corners sharp without a radius', () => {
+    const { ck, paths } = createCanvasKit()
+    const network = mixedNetwork()
+    network.regions = [{ windingRule: 'NONZERO', loops: [[0, 1, 2, 3]] }]
+
+    vectorNetworkToPath(ck, network)
+
+    expect(paths[0].operations.filter((operation) => operation.startsWith('C'))).toHaveLength(0)
+  })
+
   test('does not duplicate segments shared by multiple region loops', () => {
     const { ck, paths } = createCanvasKit()
     const network = mixedNetwork()

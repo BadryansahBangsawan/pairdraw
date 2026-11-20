@@ -133,7 +133,9 @@ function setGeometry(
     ? transformVectorNetwork([1, 0, -bounds.x, 0, 1, -bounds.y, 0, 0, 1], network)
     : structuredClone(EMPTY_NETWORK)
   const normalizedGeometry =
-    fillGeometry.length > 0 ? regenerateFillGeometry(normalized, fillGeometry) : []
+    fillGeometry.length > 0
+      ? regenerateFillGeometry(normalized, fillGeometry, node.cornerRadius)
+      : []
 
   updateNode(target, internals, {
     x: hasGeometry ? node.x + bounds.x : node.x,

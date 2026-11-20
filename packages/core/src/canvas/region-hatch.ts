@@ -33,7 +33,9 @@ export function drawRegionHatch(
   const vertices = editState.vertices.map((v) => ({
     ...v,
     x: v.x * r.zoom + r.panX,
-    y: v.y * r.zoom + r.panY
+    y: v.y * r.zoom + r.panY,
+    // A point's own radius is in the same units as its position, so it scales with them.
+    cornerRadius: v.cornerRadius === undefined ? undefined : v.cornerRadius * r.zoom
   }))
   const segments = editState.segments.map((s) => ({
     ...s,
@@ -56,7 +58,10 @@ export function drawRegionHatch(
     const region = editState.regions.at(index)
     if (!region) continue
     const builder = new r.ck.PathBuilder()
-    for (const loop of region.loops) addLoopToPath(builder, loop, segments, vertices)
+    // The vertices are in screen pixels, so the layer's radius scales with the zoom too; the hatch
+    // then covers the same rounded shape the fill draws.
+    for (const loop of region.loops)
+      addLoopToPath(builder, loop, segments, vertices, node.cornerRadius * r.zoom)
     const path = builder.detachAndDelete()
     // On the detached path: the builder's setFillType returns a copy that nothing deletes.
     path.setFillType(

@@ -76,6 +76,17 @@ describe('regenerateFillGeometry', () => {
     expect(decode(g.commandsBlob)).toContain('L 14,12')
   })
 
+  test('rounds a region by the layer radius when its vertices have none', () => {
+    const network = square()
+
+    // Fills draw from these blobs when present, so a rounded layer whose vertices carry no radius
+    // needs the layer's radius here too; otherwise the saved fill stays a sharp square.
+    const [g] = regenerateFillGeometry(network, [ENTRY], 4)
+    const cmds = decode(g.commandsBlob)
+    expect(cmds.some((cmd) => cmd.startsWith('C'))).toBe(true)
+    expect(cmds).not.toContain('L 0,0')
+  })
+
   test('curved segments emit cubics', () => {
     const network = square()
     network.segments[0].tangentStart = { x: 3, y: 4 }

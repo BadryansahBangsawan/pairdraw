@@ -73,7 +73,7 @@ export function vectorNetworkToPath(
       const regionPath = new ck.PathBuilder()
       for (const loop of region.loops) {
         for (const segmentIndex of loop) regionSegmentIndexes.add(segmentIndex)
-        addLoopToPath(regionPath, loop, segments, vertices)
+        addLoopToPath(regionPath, loop, segments, vertices, cornerRadius)
       }
       const path = regionPath.detachAndDelete()
       path.setFillType(fillType(ck, region.windingRule))

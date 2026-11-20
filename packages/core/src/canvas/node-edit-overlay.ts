@@ -174,7 +174,7 @@ function drawLiveShape(
   canvas.save()
   try {
     node.vectorNetwork = localNetwork
-    node.fillGeometry = regenerateFillGeometry(localNetwork, origFillGeometry)
+    node.fillGeometry = regenerateFillGeometry(localNetwork, origFillGeometry, node.cornerRadius)
     node.strokeGeometry = []
     r.invalidateVectorPath(nodeId)
     canvas.translate(r.panX, r.panY)
@@ -334,7 +334,8 @@ function drawTechStroke(
   const inverse = Matrix.invert(world)
   if (!inverse) return
   const localNetwork = transformVectorNetwork(inverse, { vertices, segments, regions })
-  const paths = vectorNetworkToPath(r.ck, localNetwork)
+  // The live shape rounds by the layer's radius, so its outline follows the same corners.
+  const paths = vectorNetworkToPath(r.ck, localNetwork, node.cornerRadius)
 
   // Keep the technical outline in the same coordinate space as the live shape.
   techStrokePaint.setStrokeWidth(1 / r.zoom)

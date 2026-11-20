@@ -87,8 +87,14 @@ export function snapshotInstanceGeometry(
       // of one, in an instance of the component that holds it, has no address either.
       if (showsReplacedLayer(graph, child)) continue
       const path = instanceExportAddress(graph, owner, child, resolveGuid)
-      if (!path)
-        throw new Error(`Missing instance geometry address for ${child.id} under ${owner.id}`)
+      if (!path) {
+        // A copy that outlived its component layer has no address to write under. Saving the rest
+        // of the document matters more than the one layer that cannot be named.
+        console.warn(
+          `Writing "${owner.name}" without the geometry of "${child.name}": no component layer`
+        )
+        continue
+      }
       const id = key(path)
       if (visited.has(id))
         throw new Error(`Ambiguous instance geometry address ${id} under ${owner.id}`)

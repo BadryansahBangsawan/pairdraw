@@ -24,3 +24,4 @@
 - An instance frame takes its component frame's fill behaviour and size limits, which the file records once for both.
 - Deleting a layer inside an instance drops the overrides that named it, instead of saving a claim for a layer the document no longer has.
 - Undoing a change of a frame's sizing puts the size it had back, which a fixed frame keeps.
+- Saving a document whose instance holds a copy of a component layer that no longer exists no longer fails; the rest of the document is written.

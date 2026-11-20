@@ -46,6 +46,27 @@ test('geometry snapshots reject ambiguous occurrence addresses', () => {
   ).toThrow('Ambiguous instance geometry address')
 })
 
+test('a copy whose component layer is gone is skipped, not saved as a crash', () => {
+  const { graph, source, owner } = fixture()
+  const live = expectDefined(
+    graph.createNode('RECTANGLE', owner.componentId ?? '', { width: 10, height: 20 })
+  )
+  const kept = expectDefined(graph.createNode('RECTANGLE', owner.id, { componentId: live.id }))
+  const doomed = expectDefined(graph.createNode('RECTANGLE', owner.id, { componentId: source.id }))
+  graph.deleteNode(source.id)
+  const orphan = doomed
+
+  // A document saved while a copy outlived its component layer still has to open and save: the
+  // orphan cannot be addressed, and the rest of the document must not be lost with it.
+  const entries = snapshotInstanceGeometry(graph, owner, stringToGuid, [], (node) => ({
+    size: { x: node.width, y: node.height }
+  }))
+
+  expect(entries.length).toBe(1)
+  expect(kept.componentId).toBe(live.id)
+  expect(orphan.componentId).toBe(source.id)
+})
+
 // Figma saves layers that have no override key with the unset GUID, so many siblings share it.
 test('layers saved with the unset override key keep distinct geometry addresses', () => {
   const at = (localID: number) => ({ sessionID: 1, localID })

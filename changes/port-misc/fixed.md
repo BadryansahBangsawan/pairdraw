@@ -1,0 +1,1 @@
+- A press and hover pass through a locked layer and everything inside it to what lies under, while a right-click still selects it, so its menu can unlock it.

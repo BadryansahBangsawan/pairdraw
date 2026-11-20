@@ -141,7 +141,7 @@ describe('hitTest', () => {
     expect(graph.hitTest(50, 50, page)).toBeNull()
   })
 
-  test('locked node IS hittable (selection behavior)', () => {
+  test('a locked node takes no plain click, but a right-click hits it', () => {
     const graph = new SceneGraph()
     const page = pageId(graph)
     const rectId = graph.createNode('RECTANGLE', page, {
@@ -153,8 +153,9 @@ describe('hitTest', () => {
       fills: [{ type: 'SOLID', color: { r: 1, g: 0, b: 0, a: 1 }, opacity: 1, visible: true }],
       locked: true
     }).id
-    // Locked nodes ARE returned by hit test (selection shows lock icon)
-    expect(graph.hitTest(50, 50, page)?.id).toBe(rectId)
+    // A press and hover pass through it to what lies under, as in Figma; a right-click hits it.
+    expect(graph.hitTest(50, 50, page)).toBeNull()
+    expect(graph.hitTestSelectable(50, 50, page, new Set(), 0, true)?.id).toBe(rectId)
   })
 
   test('zero-opacity node with visible fill IS hittable', () => {

@@ -10,6 +10,11 @@ export function createSelectionHitTestActions(
   clearSelection: () => void
 ) {
   function hitTestAtPoint(cx: number, cy: number, deep = false): SceneNode | null {
+    return hitAt(cx, cy, deep, false)
+  }
+
+  /** As `hitTestAtPoint`, with locked layers hit (`locked`), as a right-click hits them. */
+  function hitAt(cx: number, cy: number, deep: boolean, locked: boolean): SceneNode | null {
     const renderer = ctx.getRenderer()
     if (!renderer) return null
     const pad = LAYER_HIT_PAD / ctx.state.zoom
@@ -18,7 +23,7 @@ export function createSelectionHitTestActions(
     const scope = ctx.state.enteredContainerId ?? ctx.state.currentPageId
     return deep
       ? ctx.graph.hitTestDeep(cx, cy, scope, pad)
-      : ctx.graph.hitTestSelectable(cx, cy, scope, ctx.state.selectedIds, pad)
+      : ctx.graph.hitTestSelectable(cx, cy, scope, ctx.state.selectedIds, pad, locked)
   }
 
   /**
@@ -53,7 +58,7 @@ export function createSelectionHitTestActions(
     const scopeId = ctx.state.enteredContainerId ?? ctx.state.currentPageId
     const hit =
       (labels ? labelAt(labels, cx, cy) : null) ??
-      hitTestAtPoint(cx, cy) ??
+      hitAt(cx, cy, false, true) ??
       ctx.graph.hitTestOpenContainer(cx, cy, scopeId)
     if (hit) {
       if (!ctx.state.selectedIds.has(hit.id)) select([hit.id])

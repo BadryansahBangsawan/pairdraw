@@ -121,7 +121,7 @@ describe('hitTest — nested groups', () => {
 })
 
 describe('hitTest — locked nodes', () => {
-  test('locked container blocks enter (returns container, not child)', () => {
+  test('locked container is skipped with what is inside it, as a click skips it', () => {
     const graph = new SceneGraph()
     const page = pageId(graph)
     const frame = graph.createNode('FRAME', page, {
@@ -140,12 +140,16 @@ describe('hitTest — locked nodes', () => {
       height: 50
     })
 
-    const hit = graph.hitTestDeep(10, 10, page)
-    expect(hit).not.toBeNull()
-    expect(expectDefined(hit, 'hit node').name).toBe('LockedFrame')
+    // Figma leaves a locked layer out of a click and out of a deep select, and lets the press
+    // reach what is under it, which here is nothing.
+    expect(graph.hitTestDeep(10, 10, page)).toBeNull()
+    expect(graph.hitTest(10, 10, page)).toBeNull()
+    // A right-click still reaches it, through the hit that asks for locked layers.
+    const locked = graph.hitTestSelectable(10, 10, page, new Set<string>(), 0, true)
+    expect(expectDefined(locked, 'locked hit').name).toBe('LockedFrame')
   })
 
-  test('locked leaf node is still clickable', () => {
+  test('locked leaf node is skipped by a click and reached by a right-click', () => {
     const graph = new SceneGraph()
     const page = pageId(graph)
     graph.createNode('RECTANGLE', page, {
@@ -157,9 +161,9 @@ describe('hitTest — locked nodes', () => {
       locked: true
     })
 
-    const hit = graph.hitTest(25, 25, page)
-    expect(hit).not.toBeNull()
-    expect(expectDefined(hit, 'hit node').name).toBe('LockedRect')
+    expect(graph.hitTest(25, 25, page)).toBeNull()
+    const locked = graph.hitTestSelectable(25, 25, page, new Set<string>(), 0, true)
+    expect(expectDefined(locked, 'locked hit').name).toBe('LockedRect')
   })
 })
 

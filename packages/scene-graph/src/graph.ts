@@ -841,14 +841,18 @@ export class SceneGraph {
     return HitTest.hitTestDeep(this, px, py, scopeId, pad)
   }
 
+  /**
+   * The layer a press selects at the point; `locked` hits locked layers too, as a right-click does.
+   */
   hitTestSelectable(
     px: number,
     py: number,
     scopeId: string,
     selectedIds: ReadonlySet<string>,
-    pad = 0
+    pad = 0,
+    locked = false
   ): SceneNode | null {
-    return HitTest.hitTestSelectable(this, px, py, scopeId, selectedIds, pad)
+    return HitTest.hitTestSelectable(this, px, py, scopeId, selectedIds, pad, locked)
   }
 
   hitTestOpenContainer(px: number, py: number, scopeId: string): SceneNode | null {

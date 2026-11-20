@@ -195,14 +195,23 @@ function hitTestOpaqueContainer(
   childId: string,
   deep: boolean,
   transformCache: Map<string, boolean>,
-  pad: number
+  pad: number,
+  locked = false
 ): SceneNode | null {
   if (!containsPoint(px, py, child, graph, transformCache)) return null
-  const childHit = hitTestChildren(graph, px, py, childId, deep, transformCache, pad)
+  const childHit = hitTestChildren(graph, px, py, childId, deep, transformCache, pad, locked)
   if (childHit) return child
   if (hasVisibleFillOrStroke(child)) return child
   return null
 }
+/**
+ * What a hit inside a container reports: the container itself when it is locked (a locked layer,
+ * where one is hit at all, stands in for everything inside it) or the walk stops at containers.
+ */
+function standIn(container: SceneNode, hit: SceneNode, deep: boolean): SceneNode {
+  return container.locked || !deep ? container : hit
+}
+
 function hitTestTransparentContainer(
   graph: SceneGraph,
   px: number,
@@ -211,21 +220,19 @@ function hitTestTransparentContainer(
   childId: string,
   deep: boolean,
   transformCache: Map<string, boolean>,
-  pad: number
+  pad: number,
+  locked = false
 ): SceneNode | null {
   if (child.type === 'GROUP') {
     // A group fits its layers, so a padded click on one at its edge falls just outside it.
     if (!containsPoint(px, py, child, graph, transformCache, pad)) return null
-    const childHit = hitTestChildren(graph, px, py, childId, deep, transformCache, pad)
-    if (childHit) return deep ? childHit : child
+    const childHit = hitTestChildren(graph, px, py, childId, deep, transformCache, pad, locked)
+    if (childHit) return standIn(child, childHit, deep)
     return containsPoint(px, py, child, graph, transformCache) ? child : null
   }
 
-  const childHit = hitTestChildren(graph, px, py, childId, deep, transformCache, pad)
-  if (childHit) {
-    if (child.locked) return child
-    return childHit
-  }
+  const childHit = hitTestChildren(graph, px, py, childId, deep, transformCache, pad, locked)
+  if (childHit) return standIn(child, childHit, true)
 
   if (
     containsPoint(px, py, child, graph, transformCache) &&
@@ -254,6 +261,24 @@ function isMaskedOut(
  * The topmost layer under the point among a container's children. `pad`, in canvas units, grows
  * each leaf layer's box, as Figma takes a click a few screen pixels outside a shape.
  */
+/**
+ * Whether a layer under the point can take the click. A locked layer and everything in it are
+ * invisible to a press and to hover, as in Figma: a click falls through to what lies under it, and
+ * a drag from it draws a marquee.
+ */
+function takesClick(
+  graph: SceneGraph,
+  px: number,
+  py: number,
+  child: SceneNode | undefined,
+  mask: readonly SceneNode[] | undefined,
+  locked: boolean,
+  transformCache: Map<string, boolean>
+): child is SceneNode {
+  if (!child || child.internalOnly || !child.visible || (child.locked && !locked)) return false
+  return !isMaskedOut(px, py, mask, graph, transformCache)
+}
+
 function hitTestChildren(
   graph: SceneGraph,
   px: number,
@@ -261,7 +286,8 @@ function hitTestChildren(
   parentId: string,
   deep = false,
   transformCache = new Map<string, boolean>(),
-  pad = 0
+  pad = 0,
+  locked = false
 ): SceneNode | null {
   const parent = graph.nodes.get(parentId)
   if (!parent) return null
@@ -274,11 +300,20 @@ function hitTestChildren(
   for (let i = parent.childIds.length - 1; i >= 0; i--) {
     const childId = parent.childIds[i]
     const child = graph.nodes.get(childId)
-    if (!child || child.internalOnly || !child.visible) continue
-    if (isMaskedOut(px, py, masks[i], graph, transformCache)) continue
+    if (!takesClick(graph, px, py, child, masks[i], locked, transformCache)) continue
     if (CONTAINER_TYPES.has(child.type)) {
       if (OPAQUE_CONTAINER_TYPES.has(child.type) && !deep) {
-        const hit = hitTestOpaqueContainer(graph, px, py, child, childId, deep, transformCache, pad)
+        const hit = hitTestOpaqueContainer(
+          graph,
+          px,
+          py,
+          child,
+          childId,
+          deep,
+          transformCache,
+          pad,
+          locked
+        )
         if (hit) return hit
         continue
       }
@@ -291,7 +326,8 @@ function hitTestChildren(
         childId,
         deep,
         transformCache,
-        pad
+        pad,
+        locked
       )
       if (hit) return hit
       continue
@@ -348,12 +384,14 @@ function frameChildAt(
   graph: SceneGraph,
   container: SceneNode,
   px: number,
-  py: number
+  py: number,
+  locked = false
 ): SceneNode | null {
   const transformCache = new Map<string, boolean>()
   for (let i = container.childIds.length - 1; i >= 0; i--) {
     const child = graph.nodes.get(container.childIds[i])
     if (!child || child.internalOnly || !child.visible || child.type !== 'FRAME') continue
+    if (child.locked && !locked) continue
     // A board, such as a top-level frame in a section, keeps its empty area as background.
     if (opensByItself(graph, child) && !ownsItsEmptyArea(graph, child)) continue
     if (containsPoint(px, py, child, graph, transformCache)) return child
@@ -404,12 +442,14 @@ export function hitTestSelectable(
   py: number,
   scopeId: string,
   selectedIds: ReadonlySet<string>,
-  pad = 0
+  pad = 0,
+  /** Whether locked layers are hit, as a right-click hits them; see `hitTestAtPoint`. */
+  locked = false
 ): SceneNode | null {
-  const deepest = hitTestChildren(graph, px, py, scopeId, true, new Map(), pad)
+  const deepest = hitTestChildren(graph, px, py, scopeId, true, new Map(), pad, locked)
   if (!deepest) {
     const scope = graph.nodes.get(scopeId)
-    return scope ? frameChildAt(graph, scope, px, py) : null
+    return scope ? frameChildAt(graph, scope, px, py, locked) : null
   }
 
   const chain: SceneNode[] = []
@@ -421,13 +461,13 @@ export function hitTestSelectable(
   const opened = openedBySelection(graph, selectedIds, scopeId)
 
   for (const node of chain) {
-    // A locked layer stands in for everything inside it.
+    // A locked layer, hit only with `locked`, stands in for everything inside it.
     if (node.locked) return node
     if (!opened.has(node.id) && !opensByItself(graph, node)) return node
   }
   const last = chain.at(-1)
   if (!last) return null
-  const frame = frameChildAt(graph, last, px, py)
+  const frame = frameChildAt(graph, last, px, py, locked)
   if (frame) return frame
   if (ownsItsEmptyArea(graph, last)) return last
   return opened.has(last.id) && !opensByItself(graph, last) ? last : null

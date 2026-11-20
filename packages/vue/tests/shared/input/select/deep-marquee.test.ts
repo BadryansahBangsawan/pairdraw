@@ -118,10 +118,15 @@ describe('⌘ press on a board background', () => {
     expect([...editor.state.selectedIds]).toEqual([frame.id])
   })
 
-  test('on a locked board, keeps the usual press', () => {
+  test('on a locked board, marquees the page rather than the board', () => {
     const { frame, pressAt } = setup()
     editor.graph.updateNode(frame.id, { locked: true })
-    expect(pressAt(350, 50, { metaKey: true })?.type).not.toBe('marquee')
+    // A locked layer is skipped with everything inside it, so ⌘ does not enter the board: the
+    // press marquees the page, where the board and its siblings are selected.
+    expect(pressAt(350, 50, { metaKey: true })).toMatchObject({
+      type: 'marquee',
+      containerId: undefined
+    })
   })
 
   test("on a frame's label, keeps the usual press", () => {

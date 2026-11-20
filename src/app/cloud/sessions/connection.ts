@@ -94,7 +94,8 @@ export function cloudAPIClient(server: CloudServer, discovery: CloudDiscovery): 
 
 async function signedInConnection(
   server: CloudServer,
-  discovery: CloudDiscovery
+  discovery: CloudDiscovery,
+  current: () => boolean
 ): Promise<CloudConnection> {
   const portal = createCloudPortalClient({
     baseURL: new URL(discovery.apiURL).origin,
@@ -122,7 +123,7 @@ async function signedInConnection(
     email: status.user.email,
     image: status.user.image ?? null
   }
-  rememberCloudAccount(server.id, account)
+  if (current()) rememberCloudAccount(server.id, account)
   if (status.state !== 'active') {
     const state = status.state === 'pending' ? 'pending' : 'closed'
     return { ...INITIAL, state, discovery, account }
@@ -174,7 +175,11 @@ async function askServer(server: CloudServer, generation: number): Promise<Cloud
   let next: CloudConnection
   try {
     const discovery = await discoverCloudServer(server.url)
-    next = await signedInConnection(server, discovery)
+    next = await signedInConnection(
+      server,
+      discovery,
+      () => generations.get(server.id) === generation
+    )
   } catch (error) {
     next = {
       ...previous,

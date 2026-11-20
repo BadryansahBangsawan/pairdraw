@@ -121,6 +121,20 @@ export function forgetRecentStorageDocument(binding: StorageDocumentBinding): vo
   forgetRecentDocument(storageDocumentId(binding))
 }
 
+/** Forgets every recent document a provider keeps for one account, as when another signs in. */
+export function forgetRecentStorageProfile(providerId: string, profileId: string): void {
+  forgetRecentDocuments(
+    normalizedRecentDocuments()
+      .filter(
+        (document) =>
+          document.kind === 'storage' &&
+          document.providerId === providerId &&
+          (document.profileId ?? 'default') === profileId
+      )
+      .map((document) => document.id)
+  )
+}
+
 export async function clearRecentFiles(): Promise<void> {
   recentDocuments.value = []
   await clearRecentFileThumbnails()

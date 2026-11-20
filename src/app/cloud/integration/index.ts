@@ -4,6 +4,7 @@
  * stays out of that build; app code outside Cloud's folders imports Cloud only from here.
  */
 import { watchCloudRooms } from '../rooms/live'
+import { watchCloudAccountSwitches } from '../sessions/forget'
 import { startCloudSessions } from '../sessions/startup'
 
 export {
@@ -35,6 +36,10 @@ export const CLOUD_INCLUDED: boolean = true
 /** Starts Cloud sign-ins, links, and live rooms; returns what stops the room watcher. */
 export function startCloud(options: { leaveLinkAddress(): Promise<unknown> }): () => void {
   const stop = watchCloudRooms()
+  const stopAccountSwitches = watchCloudAccountSwitches()
   void startCloudSessions(options)
-  return stop
+  return () => {
+    stop()
+    stopAccountSwitches()
+  }
 }

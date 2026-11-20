@@ -3,6 +3,7 @@ export {
   forgetRecentDocuments,
   forgetRecentFile,
   forgetRecentStorageDocument,
+  forgetRecentStorageProfile,
   readStoredRecentDocuments,
   recentDocuments,
   recentFiles,

@@ -6,6 +6,7 @@ import { IS_CLOUD_SITE } from '@/constants'
 
 import { isCloudSiteServer, rememberCloudAccount } from '../servers/store'
 import { cloudServerFetch, forgetCloudConnection } from './connection'
+import { forgetCloudAccountCopies } from './forget'
 import { clearCloudSessionToken } from './token'
 
 export type CloudSignOutDependencies = {
@@ -30,6 +31,10 @@ export async function signOutOfCloud(
 ): Promise<void> {
   await dependencies.revoke(discovery, { fetch: cloudServerFetch(serverId) })
   await dependencies.clear(serverId)
+  // What this device kept of the account goes too; a copy that cannot be removed only warns.
+  await forgetCloudAccountCopies(serverId).catch((error: unknown) => {
+    console.warn('[Cloud] Could not forget the account on this device', error)
+  })
   rememberCloudAccount(serverId, null)
   forgetCloudConnection(serverId)
   if (IS_CLOUD_SITE && isCloudSiteServer(serverId)) leaveAfterSignOut(discovery.localEditor)

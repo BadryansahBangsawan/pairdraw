@@ -109,6 +109,8 @@ export interface LintNode {
    */
   textStyles?: { fontSize: number; fontWeight: number }[]
   styleRunCount: number
+  /** The text style the layer uses, which supplies its type values. */
+  textStyleId?: string
   boundVariables: Record<string, string>
   fills: Array<{
     type: string
@@ -139,7 +141,25 @@ export interface LintVariables {
   counts: Readonly<Record<'COLOR' | 'FLOAT' | 'STRING' | 'BOOLEAN', number>>
   /** Color variables by their resolved `#RRGGBB` value, for suggesting an exact match. */
   colorsByHex: ReadonlyMap<string, { id: string; name: string }>
+  /**
+   * Number variables by the layer field their kind of token sets (`cornerRadius` for a radius,
+   * the gap and padding for spacing, `fontSize` for text) and then by their resolved value.
+   */
+  numbersByField: ReadonlyMap<
+    TokenNumberField,
+    ReadonlyMap<number, ReadonlyArray<{ id: string; name: string }>>
+  >
 }
+
+/** Layer fields a number token can stand for. */
+export type TokenNumberField =
+  | 'cornerRadius'
+  | 'itemSpacing'
+  | 'paddingTop'
+  | 'paddingRight'
+  | 'paddingBottom'
+  | 'paddingLeft'
+  | 'fontSize'
 
 export interface RuleContext {
   variables: LintVariables

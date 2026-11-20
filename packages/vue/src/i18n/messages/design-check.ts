@@ -56,6 +56,9 @@ export const designCheckMessageDefaults = {
   ruleNoHardcodedColors: 'Unbound color',
   ruleNoHardcodedColorsHelp:
     'This color matches a color variable. Bind it so theme and palette changes reach this layer.',
+  ruleNoUnboundTokenValues: 'Unbound token value',
+  ruleNoUnboundTokenValuesHelp:
+    'This radius, spacing, or font size equals a token. Bind it so changes to the token reach this layer.',
   detailStrokeColor: params('Stroke: {variable}'),
   bindVariable: params('Bind to {variable}'),
   bindAll: params('Bind all {count}'),

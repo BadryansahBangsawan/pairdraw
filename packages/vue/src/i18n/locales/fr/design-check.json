@@ -48,6 +48,8 @@
   "ruleConsistentRadiusHelp": "Le rayon d’angle doit venir de l’échelle des rayons ou d’une variable.",
   "ruleNoHardcodedColors": "Couleur non liée",
   "ruleNoHardcodedColorsHelp": "Cette couleur correspond à une variable de couleur. Liez-la pour que les changements de thème et de palette atteignent ce calque.",
+  "ruleNoUnboundTokenValues": "Valeur de token non liée",
+  "ruleNoUnboundTokenValuesHelp": "Ce rayon, cet espacement ou cette taille de police correspond à un token. Liez-le pour que les changements du token atteignent ce calque.",
   "detailStrokeColor": "Contour : {variable}",
   "bindVariable": "Lier à {variable}",
   "bindAll": "Tout lier ({count})",

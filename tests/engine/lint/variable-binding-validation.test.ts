@@ -61,7 +61,8 @@ describe('bindVariable emits node:updated event', () => {
 /** Variables whose only color matches the tests' 50% gray paint. */
 const GRAY_VARIABLES = {
   counts: { COLOR: 1, FLOAT: 0, STRING: 0, BOOLEAN: 0 },
-  colorsByHex: new Map([['#808080', { id: 'v1', name: 'Gray' }]])
+  colorsByHex: new Map([['#808080', { id: 'v1', name: 'Gray' }]]),
+  numbersByField: new Map()
 }
 
 describe('no-hardcoded-colors lint checks indexed bindings', () => {

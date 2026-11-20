@@ -1,5 +1,6 @@
 import { uniq } from 'es-toolkit'
 
+import { variableNamespace } from '@pairdraw/dom-css/export'
 import type { SceneGraph, SceneNode, SharedStyleType } from '@pairdraw/scene-graph'
 import { colorToHex } from '@pairdraw/scene-graph/color'
 import { sharedStyleLayers, sharedStyleTypeForKind } from '@pairdraw/scene-graph/shared-styles'
@@ -14,7 +15,8 @@ import type {
   LintResult,
   Rule,
   RuleContext,
-  Severity
+  Severity,
+  TokenNumberField
 } from './types'
 import { getNodePath } from './utils'
 
@@ -48,7 +50,8 @@ export class Linter {
   private nodes = new Map<string, LintNode>()
   private variables: LintVariables = {
     counts: { COLOR: 0, FLOAT: 0, STRING: 0, BOOLEAN: 0 },
-    colorsByHex: new Map()
+    colorsByHex: new Map(),
+    numbersByField: new Map()
   }
   private sharedStyleTypes: ReadonlyMap<string, SharedStyleType> = new Map()
 
@@ -152,6 +155,7 @@ export class Linter {
       fontSize: raw.fontSize,
       textStyles: raw.type === 'TEXT' ? effectiveTextStyles(raw) : undefined,
       styleRunCount: raw.styleRuns.length,
+      textStyleId: raw.textStyleId ?? undefined,
       boundVariables: raw.boundVariables,
       fills: raw.fills.map((f, index) => ({
         type: f.type,
@@ -249,18 +253,41 @@ function sharedStyleTypes(graph: SceneGraph): ReadonlyMap<string, SharedStyleTyp
   return types
 }
 
+/** The layer fields each Tailwind namespace of number tokens sets. */
+const NAMESPACE_FIELDS: Readonly<Record<string, readonly TokenNumberField[]>> = {
+  radius: ['cornerRadius'],
+  spacing: ['itemSpacing', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'],
+  text: ['fontSize']
+}
+
 function describeVariables(graph: SceneGraph): LintVariables {
   const counts = { COLOR: 0, FLOAT: 0, STRING: 0, BOOLEAN: 0 }
   const colorsByHex = new Map<string, { id: string; name: string }>()
+  const numbersByField = new Map<TokenNumberField, Map<number, { id: string; name: string }[]>>()
   for (const variable of graph.variables.values()) {
     counts[variable.type]++
+    if (variable.type === 'FLOAT') {
+      const namespace = variableNamespace(variable)
+      const value = graph.resolveNumberVariable(variable.id)
+      if (!namespace || value === undefined) continue
+      for (const field of NAMESPACE_FIELDS[namespace] ?? []) {
+        const byValue =
+          numbersByField.get(field) ?? new Map<number, { id: string; name: string }[]>()
+        byValue.set(value, [
+          ...(byValue.get(value) ?? []),
+          { id: variable.id, name: variable.name }
+        ])
+        numbersByField.set(field, byValue)
+      }
+      continue
+    }
     if (variable.type !== 'COLOR') continue
     const color = graph.resolveColorVariable(variable.id)
     if (!color || color.a < 1) continue
     const hex = colorToHex(color)
     if (!colorsByHex.has(hex)) colorsByHex.set(hex, { id: variable.id, name: variable.name })
   }
-  return { counts, colorsByHex }
+  return { counts, colorsByHex, numbersByField }
 }
 
 export function createLinter(options?: { config?: LintConfig; preset?: string; rules?: string[] }) {

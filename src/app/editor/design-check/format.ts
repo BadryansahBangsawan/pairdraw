@@ -24,6 +24,10 @@ const RULE_COPY: Partial<Record<string, RuleCopy>> = {
   'consistent-spacing': { title: 'ruleConsistentSpacing', help: 'ruleConsistentSpacingHelp' },
   'consistent-radius': { title: 'ruleConsistentRadius', help: 'ruleConsistentRadiusHelp' },
   'no-hardcoded-colors': { title: 'ruleNoHardcodedColors', help: 'ruleNoHardcodedColorsHelp' },
+  'no-unbound-token-values': {
+    title: 'ruleNoUnboundTokenValues',
+    help: 'ruleNoUnboundTokenValuesHelp'
+  },
   'no-default-names': { title: 'ruleNoDefaultNames', help: 'ruleNoDefaultNamesHelp' },
   'prefer-auto-layout': { title: 'rulePreferAutoLayout', help: 'rulePreferAutoLayoutHelp' },
   'text-style-required': { title: 'ruleTextStyleRequired', help: 'ruleTextStyleRequiredHelp' },
@@ -121,6 +125,10 @@ export function issueDetail(issue: DesignIssue, messages: Messages): string | nu
       return stringAt(issue, 'paint') === 'stroke'
         ? messages.detailStrokeColor({ variable })
         : variable
+    }
+    case 'no-unbound-token-values': {
+      const name = stringAt(issue, 'variableName')
+      return name ? shortVariableName(name) : null
     }
     case 'prefer-auto-layout': {
       const children = numberAt(issue, 'children')

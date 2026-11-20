@@ -48,6 +48,8 @@
   "ruleConsistentRadiusHelp": "Радиус скругления должен браться из шкалы радиусов или переменной.",
   "ruleNoHardcodedColors": "Цвет без переменной",
   "ruleNoHardcodedColorsHelp": "Этот цвет совпадает с цветовой переменной. Привяжите его, чтобы изменения темы и палитры доходили до этого слоя.",
+  "ruleNoUnboundTokenValues": "Значение токена без переменной",
+  "ruleNoUnboundTokenValuesHelp": "Этот радиус, отступ или размер шрифта совпадает с токеном. Привяжите его, чтобы изменения токена доходили до этого слоя.",
   "detailStrokeColor": "Обводка: {variable}",
   "bindVariable": "Привязать к {variable}",
   "bindAll": "Привязать все ({count})",

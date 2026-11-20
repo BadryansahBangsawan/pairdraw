@@ -48,6 +48,8 @@
   "ruleConsistentRadiusHelp": "El radio de esquina debe salir de la escala de radios o de una variable.",
   "ruleNoHardcodedColors": "Color sin vincular",
   "ruleNoHardcodedColorsHelp": "Este color coincide con una variable de color. Vincúlalo para que los cambios de tema y paleta lleguen a esta capa.",
+  "ruleNoUnboundTokenValues": "Valor de token sin vincular",
+  "ruleNoUnboundTokenValuesHelp": "Este radio, espaciado o tamaño de fuente coincide con un token. Vincúlalo para que los cambios del token lleguen a esta capa.",
   "detailStrokeColor": "Trazo: {variable}",
   "bindVariable": "Vincular a {variable}",
   "bindAll": "Vincular las {count}",

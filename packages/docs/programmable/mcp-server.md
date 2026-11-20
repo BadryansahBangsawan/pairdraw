@@ -484,7 +484,7 @@ Connections use Figma's plugin shape, the same shape the layer's `reactions` exp
 | `unbind_variable`      | Remove a variable binding from a node property                                               |
 | `import_design_tokens` | Import W3C design token files as variables, text styles, and effect styles, updating by name |
 | `design_to_tokens`     | Write variables as CSS custom properties, a Tailwind v4 theme, or W3C design token files     |
-| `token_drift`          | Compare tokens in code with the variables, and optionally list layers with raw token colors  |
+| `token_drift`          | Compare tokens in code with the variables, and optionally list layers with raw token values  |
 | `sync_tokens`          | Bring changes from code into the variables and remember the link; canvas edits are kept      |
 
 ### Analyze

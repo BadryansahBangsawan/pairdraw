@@ -15,7 +15,7 @@ const sourceFilesSchema = v.pipe(
 export const tokenDrift = defineTool({
   name: 'token_drift',
   description:
-    'Compare design tokens in code with the document variables, without changing anything. Pass the stylesheets (CSS custom properties, Tailwind v4 @theme, shadcn/ui :root/.dark) or W3C design token files. Each finding names the collection, variable, and mode, the value in code and on the canvas, and its kind: code (changed in code since the last sync), canvas (changed on the canvas), conflict (changed on both, or never synced), added (new in code), missing (gone from code), or deleted (deleted on the canvas while the code still has it). With include_layers it also lists layers on the current page that use a raw color a token holds without being bound to it.',
+    'Compare design tokens in code with the document variables, without changing anything. Pass the stylesheets (CSS custom properties, Tailwind v4 @theme, shadcn/ui :root/.dark) or W3C design token files. Each finding names the collection, variable, and mode, the value in code and on the canvas, and its kind: code (changed in code since the last sync), canvas (changed on the canvas), conflict (changed on both, or never synced), added (new in code), missing (gone from code), or deleted (deleted on the canvas while the code still has it). With include_layers it also lists layers on the current page that use a raw color, radius, spacing, or font size a token holds without being bound to it.',
   execution: { kind: 'async', mutation: 'none' },
   input: v.strictObject({
     files: sourceFilesSchema,
@@ -49,8 +49,8 @@ export const tokenDrift = defineTool({
   }
 })
 
-/** The lint rules that find raw values a token holds. */
-const TOKEN_VALUE_RULES = ['no-hardcoded-colors']
+/** The lint rules that find raw values a token holds: colors, and radii, spacing, font sizes. */
+const TOKEN_VALUE_RULES = ['no-hardcoded-colors', 'no-unbound-token-values']
 
 /** Layers on the current page that hold a token's value without being bound to it. */
 async function unboundLayers(figma: FigmaAPI, limit: number) {

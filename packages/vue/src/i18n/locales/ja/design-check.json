@@ -48,6 +48,8 @@
   "ruleConsistentRadiusHelp": "角の半径は半径スケールまたは変数から選んでください。",
   "ruleNoHardcodedColors": "変数に紐づいていない色",
   "ruleNoHardcodedColorsHelp": "この色はカラー変数と一致します。変数に紐づけると、テーマやパレットの変更がこのレイヤーに反映されます。",
+  "ruleNoUnboundTokenValues": "変数に紐づいていないトークン値",
+  "ruleNoUnboundTokenValuesHelp": "この角丸、間隔、文字サイズはトークンと同じ値です。紐づけると、トークンの変更がこのレイヤーに反映されます。",
   "detailStrokeColor": "線: {variable}",
   "bindVariable": "{variable} に紐づける",
   "bindAll": "{count} 件すべて紐づける",

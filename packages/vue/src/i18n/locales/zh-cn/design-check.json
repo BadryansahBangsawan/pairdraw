@@ -48,6 +48,8 @@
   "ruleConsistentRadiusHelp": "圆角半径应取自圆角规范或变量。",
   "ruleNoHardcodedColors": "未绑定变量的颜色",
   "ruleNoHardcodedColorsHelp": "此颜色与某个颜色变量一致。绑定后，主题和色板的更改会同步到此图层。",
+  "ruleNoUnboundTokenValues": "未绑定变量的令牌值",
+  "ruleNoUnboundTokenValuesHelp": "这个圆角、间距或字号与某个令牌相同。绑定后，令牌的更改会同步到这个图层。",
   "detailStrokeColor": "描边：{variable}",
   "bindVariable": "绑定到 {variable}",
   "bindAll": "全部绑定（{count}）",

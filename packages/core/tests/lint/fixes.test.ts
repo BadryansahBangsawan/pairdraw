@@ -74,6 +74,35 @@ describe('safe fixes', () => {
     expect(getNodeOrThrow(graph, card.id).boundVariables['fills/0/color']).toBeUndefined()
   })
 
+  test('bind a number to the token it equals, unless it changed since the lint run', () => {
+    const graph = new SceneGraph()
+    graph.addCollection({
+      id: 'sizes',
+      name: 'Sizes',
+      modes: [{ modeId: 'base', name: 'Base' }],
+      defaultModeId: 'base',
+      variableIds: []
+    })
+    graph.addVariable({
+      id: 'radius-md',
+      name: 'radius/md',
+      type: 'FLOAT',
+      collectionId: 'sizes',
+      valuesByMode: { base: 8 },
+      description: '',
+      hiddenFromPublishing: false
+    })
+    const pageId = graph.getPages()[0].id
+    const card = graph.createNode('RECTANGLE', pageId, { cornerRadius: 8 })
+    const moved = graph.createNode('RECTANGLE', pageId, { cornerRadius: 8 })
+    const messages = lint(graph, 'no-unbound-token-values')
+    graph.updateNode(moved.id, { cornerRadius: 12 })
+
+    expect(applyLintFixes(graphFixTarget(graph), safeFixes(messages))).toBe(1)
+    expect(getNodeOrThrow(graph, card.id).boundVariables.cornerRadius).toBe('radius-md')
+    expect(getNodeOrThrow(graph, moved.id).boundVariables.cornerRadius).toBeUndefined()
+  })
+
   test('round only geometry that layout does not recompute', () => {
     const graph = new SceneGraph()
     const pageId = graph.getPages()[0].id

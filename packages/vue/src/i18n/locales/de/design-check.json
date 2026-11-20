@@ -48,6 +48,8 @@
   "ruleConsistentRadiusHelp": "Eckenradien sollten aus der Radiusskala oder einer Variablen stammen.",
   "ruleNoHardcodedColors": "Ungebundene Farbe",
   "ruleNoHardcodedColorsHelp": "Diese Farbe entspricht einer Farbvariablen. Binde sie, damit Änderungen an Theme und Palette diese Ebene erreichen.",
+  "ruleNoUnboundTokenValues": "Ungebundener Token-Wert",
+  "ruleNoUnboundTokenValuesHelp": "Dieser Radius, Abstand oder diese Schriftgröße entspricht einem Token. Binde ihn, damit Änderungen am Token diese Ebene erreichen.",
   "detailStrokeColor": "Kontur: {variable}",
   "bindVariable": "An {variable} binden",
   "bindAll": "Alle {count} binden",

@@ -649,3 +649,5 @@ zh-cn:panels.prototypeVideoFps
 es:settings.prompts
 de:settings.prompts
 fr:settings.prompts
+de:variables.syncKeepCode
+fr:variables.syncKeepCode

@@ -15,6 +15,7 @@ export { default as noGroups } from './no-groups'
 export { default as effectStyleRequired } from './effect-style-required'
 export { default as noMixedStyles } from './no-mixed-styles'
 export { default as noDetachedInstances } from './no-detached-instances'
+export { default as noUnboundTokenValues } from './no-unbound-token-values'
 
 import type { Rule } from '#core/lint/types'
 
@@ -31,6 +32,7 @@ import noGroups from './no-groups'
 import noHardcodedColors from './no-hardcoded-colors'
 import noHiddenLayers from './no-hidden-layers'
 import noMixedStyles from './no-mixed-styles'
+import noUnboundTokenValues from './no-unbound-token-values'
 import pixelPerfect from './pixel-perfect'
 import preferAutoLayout from './prefer-auto-layout'
 import textStyleRequired from './text-style-required'
@@ -38,6 +40,7 @@ import touchTargetSize from './touch-target-size'
 
 export const allRules: Record<string, Rule> = {
   'no-hardcoded-colors': noHardcodedColors,
+  'no-unbound-token-values': noUnboundTokenValues,
   'no-default-names': noDefaultNames,
   'prefer-auto-layout': preferAutoLayout,
   'consistent-spacing': consistentSpacing,

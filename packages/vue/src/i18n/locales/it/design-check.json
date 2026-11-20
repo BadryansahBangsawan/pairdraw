@@ -48,6 +48,8 @@
   "ruleConsistentRadiusHelp": "Il raggio d’angolo dovrebbe provenire dalla scala dei raggi o da una variabile.",
   "ruleNoHardcodedColors": "Colore non collegato",
   "ruleNoHardcodedColorsHelp": "Questo colore corrisponde a una variabile di colore. Collegalo perché le modifiche a tema e palette raggiungano questo livello.",
+  "ruleNoUnboundTokenValues": "Valore di token non collegato",
+  "ruleNoUnboundTokenValuesHelp": "Questo raggio, spaziatura o dimensione del testo corrisponde a un token. Collegalo così le modifiche al token raggiungono questo livello.",
   "detailStrokeColor": "Contorno: {variable}",
   "bindVariable": "Collega a {variable}",
   "bindAll": "Collega tutti ({count})",

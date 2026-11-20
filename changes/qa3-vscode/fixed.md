@@ -1,0 +1,1 @@
+- A save or export the editor never answers now fails with a message after a minute, instead of leaving the document saving forever.

@@ -16,6 +16,9 @@ interface PendingRequest<T> {
   reject: (error: Error) => void
 }
 
+/** How long a save or export waits for the editor, the same wait the embed bridge gives a request. */
+const REQUEST_TIMEOUT_MS = 60_000
+
 interface ExportOptions {
   format?: EmbedImageFormat
   scale?: number
@@ -74,7 +77,21 @@ export class EditorSession implements vscode.Disposable {
     if (this.pendingSave) throw new Error('A save is already running')
     const id = this.nextRequestId++
     const message = await new Promise<SavedMessage>((resolve, reject) => {
-      this.pendingSave = { id, resolve, reject }
+      const timer = setTimeout(() => {
+        this.pendingSave = null
+        reject(new Error('The editor did not answer the save. Reopen the editor and save again.'))
+      }, REQUEST_TIMEOUT_MS)
+      this.pendingSave = {
+        id,
+        resolve: (value) => {
+          clearTimeout(timer)
+          resolve(value)
+        },
+        reject: (error) => {
+          clearTimeout(timer)
+          reject(error)
+        }
+      }
       this.panel.webview.postMessage({ type: 'save', id, format: documentFormat(destination.path) })
     })
     await this.host.writeFile(destination, bytesFromEditor(message.data))
@@ -91,7 +108,21 @@ export class EditorSession implements vscode.Disposable {
     if (this.pendingExport) throw new Error('An export is already running')
     const id = this.nextRequestId++
     const message = await new Promise<ExportedMessage>((resolve, reject) => {
-      this.pendingExport = { id, resolve, reject }
+      const timer = setTimeout(() => {
+        this.pendingExport = null
+        reject(new Error('The editor did not answer the export. Reopen the editor and try again.'))
+      }, REQUEST_TIMEOUT_MS)
+      this.pendingExport = {
+        id,
+        resolve: (value) => {
+          clearTimeout(timer)
+          resolve(value)
+        },
+        reject: (error) => {
+          clearTimeout(timer)
+          reject(error)
+        }
+      }
       this.panel.webview.postMessage({ type: 'export', id, ...options })
     })
     this.pendingExport = null

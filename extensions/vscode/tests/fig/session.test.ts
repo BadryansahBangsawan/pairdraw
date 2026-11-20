@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from 'bun:test'
+import { beforeEach, describe, expect, jest, test } from 'bun:test'
 
 import { EditorSession, fileName } from '#vscode/fig/session'
 import type { ExtensionHost } from '#vscode/host'
@@ -86,6 +86,22 @@ describe('editor session', () => {
     await saving
     expect(files.get(destination.path)).toEqual(new Uint8Array([7]))
   })
+
+  test(
+    'a save the editor never answers fails instead of waiting forever',
+    async () => {
+      jest.useFakeTimers()
+      const { session } = openSession()
+      try {
+        const saving = session.save()
+        jest.advanceTimersByTime(60_000)
+        await expect(saving).rejects.toThrow(/did not answer/)
+      } finally {
+        jest.useRealTimers()
+      }
+    },
+    2000
+  )
 
   test('asks for pen text when the destination is a .pen file', async () => {
     const destination = { scheme: 'file', path: '/workspace/Card.PEN' }

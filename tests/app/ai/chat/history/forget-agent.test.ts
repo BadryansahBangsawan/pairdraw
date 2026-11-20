@@ -3,20 +3,20 @@ import { expect, test } from 'bun:test'
 
 import { createConversationHistory } from '@/app/ai/chat/history/controller'
 import { createConversationStore } from '@/app/ai/chat/history/idb'
-import type { HistoryChat } from '@/app/ai/chat/history/types'
+import type { HistoryChat, HistoryRuntime } from '@/app/ai/chat/history/types'
 import { agentChatDocument, startAgentRun } from '@/app/ai/reply/run'
 import { createEditorStore } from '@/app/editor/session/create'
 
 test('deleting a chat forgets its agent', async () => {
   const editor = createEditorStore()
   const chat: HistoryChat = { messages: [], status: 'ready', stop: async () => undefined }
-  const runtime = {
+  const runtime: HistoryRuntime<HistoryChat> = {
     getEditor: () => ({
       state: { documentName: 'Doc' },
-      getSourceIdentity: () => ({ handle: null }),
+      getSourceIdentity: () => ({ handle: null, path: null }),
       getStorageBinding: () => null,
       getDocumentFilePath: () => null,
-      getRecoveryId: () => null
+      getRecoveryId: () => ''
     }),
     ensureChat: async () => chat,
     resumeChat: () => null,

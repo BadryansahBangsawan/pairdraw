@@ -1,7 +1,5 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { TextNode } from '@figma/plugin-typings'
-
 import { asTextNode, createAPI, registerTestFont } from '#core-tests/helpers/figma-api'
 
 const RED = { type: 'SOLID' as const, color: { r: 1, g: 0, b: 0 }, opacity: 1, visible: true }
@@ -96,7 +94,7 @@ describe('Figma documented behaviour', () => {
   test('getRangeFontName returns the run font and mixed for differing runs', async () => {
     await registerTestFont()
     const figma = createAPI()
-    const text = asTextNode(figma.createText()) as TextNode
+    const text = asTextNode(figma.createText())
     text.fontName = { family: 'Inter', style: 'Regular' }
     text.characters = 'abcdef'
     text.setRangeFontName(0, 3, {

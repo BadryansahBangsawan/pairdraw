@@ -22,11 +22,6 @@ type Chunk =
     ? C
     : never
 
-const rectangle = (x = 0) => ({
-  toolName: 'create_shape',
-  input: { type: 'RECTANGLE', x, y: 0, width: 10, height: 10 }
-})
-
 /** A model that plays the given chunks per request, then stops. */
 function scriptedModel(chunksPerCall: Chunk[][]) {
   let call = 0

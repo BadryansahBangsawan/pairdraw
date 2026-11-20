@@ -263,10 +263,8 @@ export function createEditor(options?: EditorOptions) {
     runLayoutForNode,
     requestRender
   })
-  const { scheduleComponentSync, flushComponentSync, isSyncingComponents } = createComponentSyncScheduler(
-    () => _graph,
-    requestRender
-  )
+  const { scheduleComponentSync, flushComponentSync, isSyncingComponents } =
+    createComponentSyncScheduler(() => _graph, requestRender)
 
   const { subscribeToGraph, unsubscribeFromGraph } = createGraphEventSubscription({
     getGraph: () => _graph,

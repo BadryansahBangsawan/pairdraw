@@ -44,7 +44,9 @@ describe('document sharing grants integration', () => {
       expect(
         await resolveDocumentAccess(context.runtime.database, 'stranger', context.documentId)
       ).toBeUndefined()
-      await context.sharing.putGrant('owner', context.documentId, 'stranger', { permission: 'view' })
+      await context.sharing.putGrant('owner', context.documentId, 'stranger', {
+        permission: 'view'
+      })
       expect(
         (await resolveDocumentAccess(context.runtime.database, 'stranger', context.documentId))
           ?.permission

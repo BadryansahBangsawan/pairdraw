@@ -28,8 +28,8 @@ import {
   createEditorStoreModules,
   defineEditorStoreAccessors
 } from '@/app/editor/session/modules'
-import { scopedStoreFactory } from '@/app/editor/session/scope'
 import { waitForCommittedPage } from '@/app/editor/session/presentation'
+import { scopedStoreFactory } from '@/app/editor/session/scope'
 import { createInitialAppEditorState, type AppEditorState } from '@/app/editor/session/types'
 import { createDeferred } from '@/app/runtime/deferred'
 import { IS_BROWSER, IS_TAURI } from '@/constants'

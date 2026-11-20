@@ -1,5 +1,4 @@
 import type { EditorPreparationHandle } from '@/app/editor/preparation/types'
-
 import { notificationMessages } from '@/app/i18n/notifications'
 import { toast } from '@/app/shell/ui'
 

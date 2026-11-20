@@ -197,12 +197,7 @@ function onFocusOut(event: FocusEvent, actions: LayerTreeRootActions) {
 </script>
 
 <template>
-  <LayerTreeRoot
-    v-slot="scope"
-    :indent-per-level="INDENT"
-    multiple
-    :aria-label="panels.layers"
-  >
+  <LayerTreeRoot v-slot="scope" :indent-per-level="INDENT" multiple :aria-label="panels.layers">
     <ContextMenuRoot :modal="false">
       <!-- The trigger covers the pinned row too, so right-clicking it opens the layer menu. -->
       <ContextMenuTrigger as-child @contextmenu="onLayerRightClick">

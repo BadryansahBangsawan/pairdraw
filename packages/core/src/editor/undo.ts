@@ -2,10 +2,12 @@ import { isEqual } from 'es-toolkit'
 import { pick } from 'es-toolkit/object'
 
 import type { SceneNode } from '@pairdraw/scene-graph'
+import { fitEnclosingGroups, redoGroupFit, undoGroupFit } from '@pairdraw/scene-graph/group-bounds'
 import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 import { createResizeSnapshot, type ResizeSnapshot } from '@pairdraw/scene-graph/resize'
 import type { UndoEntry } from '@pairdraw/scene-graph/undo'
 
+import { groupFitOptions } from '#core/canvas/boolean'
 import { textAutoResizeChanges } from '#core/layout/text-auto-resize'
 
 import { assertNodeEditable } from './capabilities'
@@ -114,10 +116,27 @@ export function createUndoActions(ctx: EditorContext) {
       }
       for (const id of places.keys()) ctx.runLayoutForNode(id)
     }
+    // A group's box is its children's, so the drag moved it too; the step owns that box, or undo
+    // would take the layers back and leave the group where they were dropped.
+    const options = groupFitOptions(ctx.getRenderer(), ctx.graph)
+    const parents = new Set<string>()
+    for (const places of [originals, finals])
+      for (const place of places.values()) parents.add(place.parentId)
+    // A layer an auto layout frame places has no box of its own to give the groups above it.
+    const fits = [...parents]
+      .filter((parentId) => ctx.graph.getNode(parentId)?.layoutMode === 'NONE')
+      .map((parentId) => fitEnclosingGroups(ctx.graph, [parentId], options))
+      .filter((fit) => fit !== null)
     ctx.undo.push({
       label: 'Move',
-      forward: () => place(finals),
-      inverse: () => place(originals)
+      forward: () => {
+        place(finals)
+        for (const fit of fits) redoGroupFit(ctx.graph, fit)
+      },
+      inverse: () => {
+        for (const fit of fits) undoGroupFit(ctx.graph, fit)
+        place(originals)
+      }
     })
   }
 

@@ -1,6 +1,9 @@
 import { isEqual, pick, uniq } from 'es-toolkit'
 
-import type { SceneNode } from '@pairdraw/scene-graph'
+import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
+import { fitEnclosingGroups, redoGroupFit, undoGroupFit } from '@pairdraw/scene-graph/group-bounds'
+
+import { groupFitOptions } from '#core/canvas/boolean'
 
 import { assertNodeEditable } from './capabilities'
 import { restoreSources, type SourceSnapshots } from './history/sources'
@@ -11,6 +14,12 @@ export interface NodePreview {
   update: (id: string, changes: Partial<SceneNode>) => void
   commit: () => void
   cancel: () => void
+}
+
+/** Whether an auto layout frame places this layer, so the boxes of the groups above it are theirs. */
+function placedByParent(graph: SceneGraph, id: string): boolean {
+  const parent = graph.getNode(graph.getNode(id)?.parentId ?? '')
+  return parent !== undefined && parent.layoutMode !== 'NONE'
 }
 
 /** One owned numeric/property edit, including every node changed by its layout. */
@@ -119,7 +128,29 @@ export function createNodePreviewActions(
         // Publish the complete preview delta, including the layout children and implicit edits,
         // before recording it, so the step owns the marks this commit adds.
         apply('after')
-        ctx.undo.push({ label, forward: () => apply('after'), inverse: () => apply('before') })
+        // The preview moved the layers without fitting the groups around them, so the box each
+        // group takes follows here, inside the step that undo takes back.
+        const parents = uniq(
+          edits
+            .filter((edit) => !placedByParent(graph, edit.id))
+            .map((edit) => graph.getNode(edit.id)?.parentId ?? '')
+        ).filter((parentId) => parentId !== '')
+        const options = groupFitOptions(ctx.getRenderer(), graph)
+        const fits = parents
+          .map((parentId) => fitEnclosingGroups(graph, [parentId], options))
+          .filter((fit) => fit !== null)
+        for (const fit of fits) redoGroupFit(graph, fit)
+        ctx.undo.push({
+          label,
+          forward: () => {
+            apply('after')
+            for (const fit of fits) redoGroupFit(graph, fit)
+          },
+          inverse: () => {
+            for (const fit of fits) undoGroupFit(graph, fit)
+            apply('before')
+          }
+        })
       },
       cancel() {
         if (closed) return

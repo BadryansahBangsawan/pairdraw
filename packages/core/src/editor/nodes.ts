@@ -1,6 +1,7 @@
 import { pick } from 'es-toolkit/object'
 
 import type { SceneNode } from '@pairdraw/scene-graph'
+import { fitEnclosingGroups, redoGroupFit, undoGroupFit } from '@pairdraw/scene-graph/group-bounds'
 import {
   findInstanceAncestor,
   instanceOverrideFields,
@@ -10,6 +11,7 @@ import { cloneInstanceOverrideState } from '@pairdraw/scene-graph/instances/over
 import { styleDetachmentChanges } from '@pairdraw/scene-graph/shared-styles'
 import { strokeLineChanges } from '@pairdraw/scene-graph/strokes'
 
+import { groupFitOptions } from '#core/canvas/boolean'
 import { textAutoResizeChanges } from '#core/layout/text-auto-resize'
 import { reconcileVariableLayouts } from '#core/layout/variables'
 
@@ -32,6 +34,12 @@ export function opacityFromBuffer(buffer: string): number {
   return Math.min(100, Math.max(0, percent)) / 100
 }
 
+/** Whether an auto layout frame places this layer, so its own x and y do not stay where they are put. */
+function layOutByParent(ctx: EditorContext, id: string): boolean {
+  const parent = ctx.graph.getNode(ctx.graph.getNode(id)?.parentId ?? '')
+  return parent !== undefined && parent.layoutMode !== 'NONE'
+}
+
 export function createNodeActions(ctx: EditorContext) {
   // Function declarations below are hoisted, so the preview can wrap updateNode here.
   const previewActions = createNodePreviewActions(ctx, updateNode)
@@ -39,11 +47,14 @@ export function createNodeActions(ctx: EditorContext) {
   const nudgeActions = createNudgeActions(ctx)
   const variableBindingActions = createVariableBindingActions(ctx)
 
-  function runChangedLayout(id: string, changes: Partial<SceneNode>) {
+  function runChangedLayout(id: string, changes: Partial<SceneNode>, fitGroups = false) {
     // A layer's modes reach the layers inside it.
     if (changes.variableModes)
       loadBoundFonts(ctx, reconcileVariableLayouts(ctx.graph, { subtrees: [id] }))
     if (changes.visible !== undefined) refitGroupsAroundLayers(ctx, [id])
+    // A group's box is its children's, so it follows a child that moves or resizes in any way,
+    // the plugin API's included, not only a drag the canvas committed.
+    if (fitGroups && !layOutByParent(ctx, id)) refitGroupsAroundLayers(ctx, [id])
     ctx.runLayoutForNode(id)
   }
 
@@ -61,6 +72,8 @@ export function createNodeActions(ctx: EditorContext) {
     const overridden = instanceOverrideFields(node, nextChanges)
     ctx.graph.updateNode(id, nextChanges)
     recordInstanceOverride(ctx.graph, id, overridden)
+    // The groups around the layer fit in the step that records the edit, so undo takes the box
+    // back with the layer. This call changes no step: a drag writes here between its own steps.
     runChangedLayout(id, nextChanges)
   }
 
@@ -100,21 +113,33 @@ export function createNodeActions(ctx: EditorContext) {
     const overridden = instanceOverrideFields(node, nextChanges)
     ctx.graph.updateNode(id, nextChanges)
     recordInstanceOverride(ctx.graph, id, overridden)
-    runChangedLayout(id, nextChanges)
+    runChangedLayout(id, nextChanges, false)
+    // A group's box follows its children, so the fit goes in this step: it moves the layer's own
+    // coordinates too, and undo has to put both back. A layer an auto layout frame places is
+    // positioned by that layout, so its groups' boxes are theirs to settle.
+    const fit = layOutByParent(ctx, id)
+      ? null
+      : fitEnclosingGroups(
+          ctx.graph,
+          [node.parentId ?? id],
+          groupFitOptions(ctx.getRenderer(), ctx.graph)
+        )
     ctx.undo.push({
       label,
       forward: () => {
         ctx.graph.updateNode(id, nextChanges)
         recordInstanceOverride(ctx.graph, id, overridden)
-        runChangedLayout(id, nextChanges)
+        runChangedLayout(id, nextChanges, false)
+        if (fit) redoGroupFit(ctx.graph, fit)
       },
       inverse: () => {
+        if (fit) undoGroupFit(ctx.graph, fit)
         ctx.graph.updateNode(id, previous)
         if (owner && previousOverrides)
           ctx.graph.updateNode(owner.id, {
             instanceOverrides: cloneInstanceOverrideState(previousOverrides)
           })
-        runChangedLayout(id, nextChanges)
+        runChangedLayout(id, nextChanges, false)
       }
     })
     ctx.requestRender()

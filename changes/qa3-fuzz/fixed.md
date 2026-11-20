@@ -1,3 +1,4 @@
 - A layer that holds an instance can no longer be moved into the component that instance draws, which left the component sync looping on itself until the app threw.
 - Deleting a layer inside an instance now hides it for that instance, as Figma does, instead of doing nothing or letting the layer come back when the file is reopened.
 - Detaching an instance leaves its layers without the component child ids they arrived with, so nothing reads them as still belonging to the component.
+- A group's box now follows a child that moves or resizes from the properties panel or the plugin API, not only one dragged on the canvas, and it goes back with the child on undo.

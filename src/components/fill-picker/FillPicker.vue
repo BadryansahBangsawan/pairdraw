@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka-ui'
-import type { FocusOutsideEvent, PointerDownOutsideEvent } from 'reka-ui'
 import { tv } from 'tailwind-variants'
 import { computed } from 'vue'
 
@@ -16,10 +15,15 @@ import { applySolidFillColor, type OkHCLControls } from '@pairdraw/vue/controls/
 import { DEFAULT_SHADER_PRESET } from '@pairdraw/vue/controls/shader'
 import { useI18n } from '@pairdraw/vue/i18n'
 import { useRetainedPopup } from '@pairdraw/vue/lifecycle/retention'
-import { usePickerGesture } from '@pairdraw/vue/primitives/ColorPicker'
+import {
+  pickerOutsideHandlers,
+  usePickerGesture,
+  type PickerKeepOpen
+} from '@pairdraw/vue/primitives/ColorPicker'
 import { FillRoot } from '@pairdraw/vue/primitives/Fill'
 
 import ColorPickerPanel from '@/components/color-picker-panel/ColorPickerPanel.vue'
+import { useEyedropperKeepOpen } from '@/components/color-picker-panel/eyedropper'
 import GradientEditor from '@/components/fill-picker/GradientEditor.vue'
 import ImageFillPicker from '@/components/fill-picker/ImageFillPicker.vue'
 import MeshEditor from '@/components/fill-picker/MeshEditor.vue'
@@ -59,7 +63,7 @@ const {
   /** Names the trigger for a paint that is not a fill, such as a stroke. */
   label?: string
   /** Whether a press outside the picker should leave it open, such as on a gradient handle. */
-  keepOpen?: (event: PointerEvent) => boolean
+  keepOpen?: PickerKeepOpen
   /** The one layer the paint is on, which an image crop starts by covering. */
   layerSize?: { width: number; height: number } | null
   /** Where the paint sits in the layer's fills, when it is a fill rather than a stroke. */
@@ -112,16 +116,9 @@ const cls = usePopoverUI({
 })
 const { panels } = useI18n()
 
-/** Dragging a gradient handle on the canvas leaves the picker open, as in Figma. */
-function keepOpenOnPress(event: PointerDownOutsideEvent) {
-  if (keepOpen?.(event.detail.originalEvent)) event.preventDefault()
-}
-
-/** A press focuses the canvas before the press itself reaches the picker, so the press decides. */
-function keepOpenOnFocus(event: FocusOutsideEvent) {
-  if (keepOpen && event.detail.originalEvent.target instanceof HTMLCanvasElement)
-    event.preventDefault()
-}
+/** Dragging a gradient handle or sampling a color on the canvas leaves the picker open. */
+const keepPickerOpen = useEyedropperKeepOpen(() => keepOpen)
+const outside = pickerOutsideHandlers(() => keepPickerOpen)
 
 /** A press still held when the picker closes is put back, whichever way it closes. */
 function onOpenChange(open: boolean) {
@@ -168,8 +165,8 @@ function step(next: Fill) {
           :side-offset="4"
           side="left"
           data-picker-content
-          @pointer-down-outside="keepOpenOnPress"
-          @focus-outside="keepOpenOnFocus"
+          @pointer-down-outside="outside.onPointerDownOutside"
+          @focus-outside="outside.onFocusOutside"
         >
           <div class="mb-2 flex items-center gap-0.5">
             <Tip :label="panels.solid">
@@ -233,6 +230,7 @@ function step(next: Fill) {
             v-if="root.category === 'SOLID'"
             :color="root.fill.color"
             :okhcl="okhcl"
+            eyedropper
             @update="change(applySolidFillColor(root.fill, $event))"
           />
 

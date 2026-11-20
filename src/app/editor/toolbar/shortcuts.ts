@@ -30,7 +30,8 @@ const UNKEYED: Readonly<Record<Tool, string>> = {
   HAND: '',
   COMMENT: '',
   ZOOM: '',
-  SCALE: ''
+  SCALE: '',
+  EYEDROPPER: ''
 }
 
 /**

@@ -147,7 +147,11 @@ function listStopClass(active: boolean) {
         </GradientEditorStop>
       </div>
 
-      <ColorPickerPanel :color="root.activeColor" @update="root.actions.updateActiveColor" />
+      <ColorPickerPanel
+        :color="root.activeColor"
+        eyedropper
+        @update="root.actions.updateActiveColor"
+      />
     </div>
   </GradientEditorRoot>
 </template>

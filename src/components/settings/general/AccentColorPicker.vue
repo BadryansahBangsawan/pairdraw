@@ -85,6 +85,7 @@ function onCancel(cause: 'press' | 'escape'): void {
       <ColorPicker
         :color="customColor"
         escape-reverts
+        :eyedropper="false"
         @update="onCustomColor"
         @open-change="onPickerOpenChange"
         @cancel="onCancel"

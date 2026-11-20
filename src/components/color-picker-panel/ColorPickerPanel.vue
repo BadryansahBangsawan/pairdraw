@@ -8,9 +8,15 @@ import DocumentColorsSection from '@/components/color-picker-panel/DocumentColor
 import FormatControls from '@/components/color-picker-panel/FormatControls.vue'
 import HueAlphaSliders from '@/components/color-picker-panel/HueAlphaSliders.vue'
 
-const { color, okhcl = null } = defineProps<{
+const {
+  color,
+  okhcl = null,
+  eyedropper = false
+} = defineProps<{
   color: Color
   okhcl?: OkHCLControls | null
+  /** Offers sampling the canvas, for pickers that edit a document's colors. */
+  eyedropper?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -24,6 +30,9 @@ provideColorPickerPanel(
     },
     get okhcl() {
       return okhcl
+    },
+    get eyedropper() {
+      return eyedropper
     }
   },
   emit

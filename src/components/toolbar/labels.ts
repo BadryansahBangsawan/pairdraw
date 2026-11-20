@@ -28,7 +28,8 @@ export function useToolLabels() {
     HAND: tools.value.hand,
     COMMENT: tools.value.comment,
     ZOOM: tools.value.zoom,
-    SCALE: tools.value.scale
+    SCALE: tools.value.scale,
+    EYEDROPPER: tools.value.eyedropper
   }))
 }
 

@@ -40,6 +40,7 @@ import { DISSOLVE_EASING_CSS } from '@pairdraw/core/prototype'
 import { colorToCSS } from '@pairdraw/scene-graph/color'
 import { PlayIslands, useCanvasInput } from '@pairdraw/vue/canvas'
 import { useCanvasDrop } from '@pairdraw/vue/canvas/drop'
+import { useEyedropperLoupe } from '@pairdraw/vue/canvas/eyedropper'
 import { useCanvasLinks } from '@pairdraw/vue/canvas/links'
 import { useCanvasVirtualReference } from '@pairdraw/vue/canvas/overlays'
 import { useCanvasStatusLabels } from '@pairdraw/vue/canvas/statuses'
@@ -59,6 +60,7 @@ import { usePluginPointerInput } from '@/app/plugins/pointer/input'
 import { useFollowView } from '@/app/presence/follow-view'
 import { appRuntimeConfig } from '@/app/runtime/config'
 import { appPreferences } from '@/app/settings/preferences/store'
+import CanvasEyedropperLoupe from '@/components/canvas/CanvasEyedropperLoupe.vue'
 import CommentsLayer from '@/components/comments/CommentsLayer.vue'
 import PreparationOverlay from '@/components/preparation/canvas/PreparationOverlay.vue'
 import FollowFrame from '@/components/presence/FollowFrame.vue'
@@ -323,11 +325,16 @@ const valueEditorIcon = computed(() => {
     : IconLucideAlignHorizontalSpaceBetween
 })
 
+const eyedropperLoupe = useEyedropperLoupe(store, canvasRef, () => isActivePane.value)
+
+// The eyedropper's loupe stands in for the cursor while it shows.
 const cursor = computed(() =>
-  toolCursor(
-    store.state.activeTool,
-    statusLabelCursor.value ?? linkCursor.value ?? cursorOverride.value
-  )
+  eyedropperLoupe.visible.value
+    ? 'none'
+    : toolCursor(
+        store.state.activeTool,
+        statusLabelCursor.value ?? linkCursor.value ?? cursorOverride.value
+      )
 )
 
 /** The page's color, which the parts around the played frame take so they read as the page. */
@@ -413,6 +420,7 @@ const pageBackground = computed(() => ({ backgroundColor: colorToCSS(store.state
           }"
         />
         <AppDropOverlay :visible="isDraggingOver" />
+        <CanvasEyedropperLoupe :loupe="eyedropperLoupe" />
         <StatusLabelMenu
           :label="openStatusLabel"
           :canvas="canvasRef"

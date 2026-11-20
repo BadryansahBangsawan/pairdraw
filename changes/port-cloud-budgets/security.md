@@ -1,0 +1,1 @@
+- A per-document or per-workspace budget, such as invitations or uploads, no longer resets by naming another document or workspace: one account has a cap across all of them.

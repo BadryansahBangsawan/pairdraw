@@ -1,0 +1,1 @@
+- Pages of a large `.fig` keep loading in the reader worker after the document is edited, instead of falling back to a main-thread load that freezes the editor; a page that arrives while an edit is open stays out of that edit's undo step.

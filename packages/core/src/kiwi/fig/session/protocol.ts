@@ -9,6 +9,7 @@ import type { FigPageManifestEntry } from '@pairdraw/kiwi/fig'
 import type { ParseFigFileOptions } from '#core/io/formats/fig/read'
 import type { SerializedSceneGraph } from '#core/kiwi/fig/parse/transfer'
 import type { FigPopulationDelta } from '#core/kiwi/fig/population/delta'
+import type { FigGraphEdits } from '#core/kiwi/fig/population/edits'
 
 export interface FigSessionOpenRequest {
   type: 'open'
@@ -23,6 +24,12 @@ export interface FigSessionPopulateRequest {
   requestId: string
   baseRevision: number
   pageId: string
+}
+
+/** Edits made on the main thread since the last batch, for the worker's copy of the graph. */
+export interface FigSessionEditsRequest {
+  type: 'edits'
+  edits: FigGraphEdits
 }
 
 export interface FigSessionOriginalArchiveRequest {
@@ -65,6 +72,7 @@ export interface FigSessionDisposeRequest {
 
 export type FigSessionRequest =
   | FigSessionPopulateRequest
+  | FigSessionEditsRequest
   | FigSessionOriginalArchiveRequest
   | FigSessionArchiveInfoRequest
   | FigSessionComponentPagesRequest

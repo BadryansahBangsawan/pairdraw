@@ -4,6 +4,7 @@ import {
   serializeSceneGraph,
   serializedSceneGraphTransferList
 } from '#core/kiwi/fig/parse/transfer'
+import { applyFigGraphEdits } from '#core/kiwi/fig/population/edits'
 import { createFigArchiveOperations } from '#core/kiwi/fig/session/archive/access'
 import type {
   FigSessionOpenRequest,
@@ -94,6 +95,10 @@ function handleRequest(request: FigSessionRequest): void {
     if (request.type === 'cancel') return
     if (request.type === 'retire') {
       session = undefined
+      return
+    }
+    if (request.type === 'edits') {
+      if (session) applyFigGraphEdits(session.graph, request.edits)
       return
     }
     populate(request)

@@ -126,6 +126,21 @@ export class SceneGraph {
     return () => this.changeObservers.delete(observer)
   }
 
+  /**
+   * Runs `write`, a change someone else makes, such as a page the reader worker loaded or a
+   * collaborator's arriving, outside every edit in progress: the recorders open now do not see
+   * it, so none records it as its own. A recorder opened while the write runs is not paused.
+   */
+  runOutsideEdits<T>(write: () => T): T {
+    const paused = [...this.changeObservers]
+    for (const observer of paused) this.changeObservers.delete(observer)
+    try {
+      return write()
+    } finally {
+      for (const observer of paused) this.changeObservers.add(observer)
+    }
+  }
+
   /** Tells `observeNodeChanges` observers that `node` is about to change. */
   willChangeNode(node: SceneNode | undefined): void {
     if (!node) return

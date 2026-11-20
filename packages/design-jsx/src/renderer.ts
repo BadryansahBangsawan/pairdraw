@@ -627,9 +627,11 @@ async function renderNodeContent<Artwork>(
 
   for (const child of tree.children) {
     if (typeof child === 'string' || (node.type === 'TEXT' && isTextContent(child))) continue
-    if (isTreeNode(child)) {
-      await renderNode(services, graph, child, node.id, onNode, scope)
-    }
+    if (!isTreeNode(child)) continue
+    // Text holds characters and style runs, not layers: a child layer would exist in the graph but
+    // not in the text's export, so it is refused rather than silently lost.
+    if (node.type === 'TEXT') throw new Error(`<${child.type}> cannot be inside <Text>`)
+    await renderNode(services, graph, child, node.id, onNode, scope)
   }
 
   if (node.type === 'COMPONENT_SET') inferComponentSetProperties(graph, node.id)

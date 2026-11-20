@@ -1,6 +1,7 @@
 import { uniq } from 'es-toolkit/array'
 
 import type { SceneGraph } from '@pairdraw/scene-graph'
+import { tryParseColor } from '@pairdraw/scene-graph/color'
 
 import { REKA_ELEMENTS } from './behaviours'
 import { elementBindings, elementProps, elementSchema } from './elements'
@@ -20,6 +21,23 @@ import { TEXT_CONTENT_NAMES } from './text-content'
 import { transformDesignJSXExpression } from './transform'
 import { isTreeNode, resolveToTree, type TreeNode } from './tree'
 import type { RenderOptions as RenderJSXOptions } from './types'
+import { isVariable } from './variables'
+
+const SIZE_PROPS = new Set(['w', 'h'])
+const PAINT_PROPS = new Set(['bg', 'fill', 'stroke'])
+
+/** How a warning names a value it could not read. */
+function propValueText(value: unknown): string {
+  return typeof value === 'string' ? `"${value}"` : String(value)
+}
+
+function unreadableSize(value: unknown): boolean {
+  return !isVariable(value) && typeof value !== 'number' && value !== 'hug' && value !== 'fill'
+}
+
+function unreadablePaint(value: unknown): boolean {
+  return typeof value === 'string' && tryParseColor(value) === null
+}
 
 /** `const Switch = { Root: 'Switch.Root', … }`: each Reka namespace as element types. */
 const REKA_ALIASES = Object.entries(REKA_ELEMENTS)
@@ -142,6 +160,21 @@ function collectUnsupportedPropWarnings(
   for (const [key, value] of Object.entries(tree.props)) {
     if (!supported.has(key) && !properties.includes(key)) {
       warnings.push(`Unsupported prop "${key}" on <${element}> is ignored.`)
+      continue
+    }
+    // The element's schema already reported a prop it validates, in its own words; warning
+    // again here would name the same value twice, as a connector's stroke once was.
+    if (schema && key in schema.entries) continue
+    if (SIZE_PROPS.has(key) && unreadableSize(value)) {
+      warnings.push(
+        `Invalid ${key} ${propValueText(value)} on <${element}> is ignored; expected a number, "hug", or "fill".`
+      )
+      continue
+    }
+    if (PAINT_PROPS.has(key) && unreadablePaint(value)) {
+      warnings.push(
+        `Invalid ${key} ${propValueText(value)} on <${element}> is ignored; expected a colour or a paint.`
+      )
       continue
     }
     const values = ENUM_PROPS[key]

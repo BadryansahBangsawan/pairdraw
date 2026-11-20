@@ -493,6 +493,13 @@ describe('renderTree', () => {
     const tree = { type: 'foobar', props: {}, children: [] }
     expect(() => renderTree(g, tree)).toThrow('Unknown element: <foobar>')
   })
+
+  it('rejects a layer inside a text layer instead of creating one the export drops', async () => {
+    const g = makeSceneGraph()
+    await expect(renderJSX(g, '<Text>Hello<Frame w={10} h={10} /></Text>')).rejects.toThrow(
+      '<frame> cannot be inside <Text>'
+    )
+  })
 })
 
 describe('fragments', () => {
@@ -592,6 +599,23 @@ describe('renderJSX (string → scene graph)', () => {
     const [result] = await renderJSX(g, '<Frame name="Warn" w={50} h={50} mt={8} />')
 
     expect(result.warnings).toEqual(['Unsupported prop "mt" on <frame> is ignored.'])
+  })
+
+  it('warns when a size or paint value cannot be read, instead of silently replacing it', async () => {
+    const g = makeSceneGraph()
+    const [result] = await renderJSX(
+      g,
+      '<Frame w="abc" h="hug" bg="not-a-color"><Rectangle w={10} h={10} fill="nonsense" /></Frame>'
+    )
+
+    expect(result.warnings).toEqual([
+      'Invalid w "abc" on <frame> is ignored; expected a number, "hug", or "fill".',
+      'Invalid bg "not-a-color" on <frame> is ignored; expected a colour or a paint.',
+      'Invalid fill "nonsense" on <rectangle> is ignored; expected a colour or a paint.'
+    ])
+    const frame = getNodeOrThrow(g, result.id)
+    expect(frame.width).toBe(100)
+    expect(frame.fills).toEqual([])
   })
 
   it('points blur in effect helpers at radius, the name Figma uses', async () => {

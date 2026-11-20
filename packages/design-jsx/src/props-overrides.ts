@@ -1,5 +1,5 @@
 import type { Fill, SceneNode, ArcData, NodeType } from '@pairdraw/scene-graph'
-import { colorToFill } from '@pairdraw/scene-graph/color'
+import { colorToFill, tryParseColor } from '@pairdraw/scene-graph/color'
 import { parseCSSGridTracks, parseCSSNumber } from '@pairdraw/scene-graph/css'
 import {
   autoLayoutSizingFields,
@@ -96,7 +96,11 @@ export function applySizeOverrides(
  */
 function setFills(values: (string | Color | Fill)[], o: Partial<SceneNode>): void {
   const shaders: ShaderPaint[] = []
-  const fills = values.map((value) => {
+  // A colour string no parser reads would otherwise become black, opposite to leaving it out.
+  const usable = values.filter(
+    (value) => typeof value !== 'string' || tryParseColor(value) !== null
+  )
+  const fills = usable.map((value) => {
     const fill = fillFromValue(value)
     if (!isShaderFill(fill)) return fill
     const { shader, ...paint } = fill

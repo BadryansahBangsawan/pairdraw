@@ -17,3 +17,19 @@ test('an instance takes its component frame’s own alignment', () => {
 
   expect(graph.getNode(instance.id)?.layoutAlignSelf).toBe('MAX')
 })
+
+test('an instance takes its component frame’s positioning', () => {
+  const graph = new SceneGraph()
+  const page = graph.getPages()[0]
+  const component = graph.createNode('COMPONENT', page.id, { layoutPositioning: 'AUTO' })
+  graph.createNode('RECTANGLE', component.id, { width: 40, height: 24 })
+  const instance = graph.createInstance(component.id, page.id, { x: 0, y: 0 })
+  if (!instance) throw new Error('Missing instance')
+
+  // The file has one positioning for the instance and its component frame, so the live instance
+  // follows the component rather than keeping a value the file would overwrite.
+  graph.updateNode(component.id, { layoutPositioning: 'ABSOLUTE' })
+  graph.syncInstance(instance.id)
+
+  expect(graph.getNode(instance.id)?.layoutPositioning).toBe('ABSOLUTE')
+})

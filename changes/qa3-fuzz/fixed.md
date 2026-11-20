@@ -19,3 +19,5 @@
 - Binding a variable to an instance's fill records that fill as the instance's own, so reopening no longer shows an override the document never had.
 - A size limit set on a layer inside an instance no longer claims to be that instance's own, since the file has no field for it and reopening dropped it.
 - An instance takes its component frame's alignment, as the file keeps one alignment for both.
+- An instance takes its component frame's positioning too, so absolute positioning in a component no longer reappears only after reopening.
+- A page can no longer be moved into a layer, which left the document holding a page inside a frame.

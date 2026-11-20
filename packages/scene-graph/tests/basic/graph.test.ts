@@ -648,3 +648,15 @@ test('refuses to move a layer into an instance, whose contents come from its com
 
   expect(graph.getNode(layer.id)?.parentId).toBe(page)
 })
+
+test('refuses to move a page into a layer', () => {
+  const graph = new SceneGraph()
+  const page = graph.getPages()[0].id
+  const frame = graph.createNode('FRAME', page, { width: 100, height: 100 })
+
+  const parent = graph.getNode(page)?.parentId
+  graph.reparentNode(page, frame.id)
+
+  expect(graph.getNode(page)?.parentId).toBe(parent)
+  expect(graph.getChildren(frame.id)).toHaveLength(0)
+})

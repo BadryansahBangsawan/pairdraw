@@ -768,6 +768,8 @@ export class SceneGraph {
   reparentNode(nodeId: string, newParentId: string): void {
     const node = this.nodes.get(nodeId)
     if (!node || nodeId === this.rootId) return
+    // A page is never a layer: it holds the document's layers and cannot move inside one.
+    if (node.type === 'CANVAS') return
     if (this.isDescendant(newParentId, nodeId)) return
 
     const oldParent = node.parentId ? this.nodes.get(node.parentId) : undefined

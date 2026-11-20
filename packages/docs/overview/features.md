@@ -47,7 +47,7 @@ Context-sensitive Design and Code tabs, with Lint beside them:
 Skia (CanvasKit WASM) — the same rendering engine as Figma:
 
 - Gradient fills (linear, radial, angular, diamond)
-- Image fills with scale modes
+- Image fills with scale modes and adjustments (exposure, contrast, saturation, temperature, tint, highlights, shadows)
 - Effects with per-node caching
 - Arc data (partial ellipses, donuts)
 - Viewport culling and paint reuse

@@ -382,3 +382,61 @@ test('a shader paint draws its saved frame, and its live frame while one plays',
   await editor.canvas.waitForRender()
   await expectCanvas('shader-saved-frame')
 })
+
+test('image adjustments draw each setting and all seven together', async () => {
+  const bytes = await readFile('tests/fixtures/vectorize/pilot_avatar.png')
+  await editor.page.evaluate(
+    (data) => {
+      const store = window.pairdraw?.getStore?.()
+      if (!store) throw new Error('Pairdraw store not initialized')
+      const tiles = [
+        {},
+        { exposure: 0.6 },
+        { exposure: -0.6 },
+        { contrast: 1 },
+        { contrast: -1 },
+        { saturation: 1 },
+        { saturation: -1 },
+        { temperature: 1 },
+        { tint: -1 },
+        { highlights: -1 },
+        { shadows: 1 },
+        {
+          exposure: 0.25,
+          contrast: 0.3,
+          saturation: 0.4,
+          temperature: -0.3,
+          tint: 0.2,
+          highlights: -0.4,
+          shadows: 0.35
+        }
+      ]
+      const hash = store.storeImage(new Uint8Array(data))
+      tiles.forEach((filters, index) => {
+        store.graph.createNode('RECTANGLE', store.state.currentPageId, {
+          name: `Adjusted image ${index}`,
+          x: 40 + (index % 4) * 112,
+          y: 40 + Math.floor(index / 4) * 112,
+          width: 102,
+          height: 101,
+          fills: [
+            {
+              type: 'IMAGE',
+              imageHash: hash,
+              imageScaleMode: 'FIT',
+              color: { r: 0, g: 0, b: 0, a: 1 },
+              visible: true,
+              opacity: 1,
+              filters
+            }
+          ]
+        })
+      })
+      store.clearSelection()
+      store.requestRender()
+    },
+    [...bytes]
+  )
+  await editor.canvas.waitForRender()
+  await expectCanvas('image-adjustments')
+})

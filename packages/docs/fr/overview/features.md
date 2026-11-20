@@ -47,7 +47,7 @@ Les onglets Design et Code s’adaptent à la sélection, avec l’onglet Vérif
 Pairdraw utilise Skia via CanvasKit WASM, le même moteur graphique que Figma :
 
 - dégradés linéaires, radiaux, angulaires et diamant ;
-- remplissages d’image avec modes d’échelle ;
+- remplissages d’image avec modes d’échelle et réglages (exposition, contraste, saturation, température, teinte, hautes lumières, ombres) ;
 - effets avec cache par objet ;
 - données d’arc (ellipses partielles, anneaux) ;
 - exclusion des objets hors champ et réutilisation des peintures ;

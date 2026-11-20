@@ -47,7 +47,7 @@ Die Registerkarten Design und Code passen sich der aktuellen Auswahl an, daneben
 Skia über CanvasKit WASM ist dieselbe Grafik-Engine, die auch Figma verwendet. Pairdraw unterstützt unter anderem:
 
 - lineare, radiale, Winkel- und Diamantverläufe;
-- Bildfüllungen mit verschiedenen Skalierungsarten;
+- Bildfüllungen mit verschiedenen Skalierungsarten und Anpassungen (Belichtung, Kontrast, Sättigung, Temperatur, Tönung, Lichter, Tiefen);
 - Effekte mit Zwischenspeicherung pro Objekt;
 - Bögen, partielle Ellipsen und Ringe;
 - Auslassen nicht sichtbarer Objekte und Wiederverwenden von Zeichenwerkzeugen;

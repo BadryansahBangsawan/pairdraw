@@ -10,7 +10,8 @@ import {
   canvasPrompt,
   changePreviewSize,
   maxAgentSteps,
-  reasoningDisplay
+  reasoningDisplay,
+  showTokenUsage
 } from '@/app/ai/chat/preferences'
 import { AGENT_STEP_LIMIT_MIN, AGENT_STEP_LIMIT_MAX } from '@/app/ai/reply/schema'
 import { openToolAccessSettings } from '@/app/automation/tool-access/settings/use'
@@ -88,6 +89,13 @@ const previewOptions = computed(() => [
           v-model="animateAIEdits"
           :label="ai.animateEdits"
           data-test-id="settings-ai-animate-edits"
+        />
+      </SettingsRow>
+      <SettingsRow :label="ai.showTokenUsage" :description="ai.showTokenUsageHint">
+        <AppSwitch
+          v-model="showTokenUsage"
+          :label="ai.showTokenUsage"
+          data-test-id="settings-ai-show-token-usage"
         />
       </SettingsRow>
       <SettingsRow :label="agents.approveActions" :description="agents.approveActionsHint">

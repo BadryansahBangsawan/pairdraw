@@ -1,0 +1,16 @@
+{
+  "usageLabel": "Zużycie tokenów",
+  "turnTokens": "{tokens} tokenów",
+  "turnTokensCost": "{tokens} tokenów · {cost}",
+  "chatTokens": "{tokens} tokenów w tym czacie",
+  "chatTokensCost": "{tokens} tokenów · {cost} w tym czacie",
+  "usageInput": "Wejście",
+  "usageCachedInput": "Wejście z pamięci podręcznej",
+  "usageOutput": "Wyjście",
+  "usageReasoning": "Rozumowanie",
+  "usageCost": "Szacowany koszt",
+  "usageTurns": "{count} odpowiedzi",
+  "usageHint": "Liczone z tokenów zgłoszonych przez każdą odpowiedź. Koszt to szacunek według ceny katalogowej modelu.",
+  "usageNoCost": "Dla tego modelu nie podano ceny, więc wyświetlane są tylko tokeny.",
+  "usageAgentHint": "Liczone z tokenów zgłoszonych przez agenta. Agenci kodowania nie mają ceny w dolarach."
+}

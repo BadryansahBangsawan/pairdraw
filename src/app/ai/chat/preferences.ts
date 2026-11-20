@@ -83,3 +83,14 @@ export const compactAutomatically = computed({
     }
   }
 })
+
+/** Whether the chat shows each reply's tokens and the conversation's cost; Settings → AI turns it off. */
+export const showTokenUsage = computed({
+  get: () => appPreferences.value.chat.showTokenUsage,
+  set: (showTokenUsage: boolean) => {
+    appPreferences.value = {
+      ...appPreferences.value,
+      chat: { ...appPreferences.value.chat, showTokenUsage }
+    }
+  }
+})

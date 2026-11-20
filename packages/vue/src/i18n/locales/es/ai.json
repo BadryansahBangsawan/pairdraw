@@ -112,6 +112,8 @@
   "canvasPromptHint": "Muestra una instrucción en la parte inferior del lienzo mientras el chat está cerrado. Lo que escribes ahí va al chat.",
   "animateEdits": "Animar las ediciones de la IA",
   "animateEditsHint": "Las capas que añade la IA se dibujan una tras otra, y los marcos en los que trabaja brillan hasta que termina. Sigue el ajuste Animaciones.",
+  "showTokenUsage": "Mostrar uso de tokens y coste",
+  "showTokenUsageHint": "Muestra los tokens que gastó cada respuesta y el total acumulado de la conversación, con un coste estimado cuando se conoce el precio del modelo.",
   "editSummary": "Ediciones de la IA listas · capas nuevas: {added} · cambiadas: {changed}",
   "editSummaryAdded": "Ediciones de la IA listas · capas nuevas: {added}",
   "editSummaryChanged": "Ediciones de la IA listas · capas cambiadas: {changed}",

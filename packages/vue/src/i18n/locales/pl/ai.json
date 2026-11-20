@@ -112,6 +112,8 @@
   "canvasPromptHint": "Pokazuje polecenie u dołu obszaru roboczego, gdy czat jest zamknięty. To, co tam napiszesz, trafia do czatu.",
   "animateEdits": "Animuj zmiany AI",
   "animateEditsHint": "Warstwy dodane przez AI rysują się jedna po drugiej, a ramki, w których pracuje, migoczą, dopóki nie skończy. Działa zgodnie z ustawieniem Animacje.",
+  "showTokenUsage": "Pokaż zużycie tokenów i koszt",
+  "showTokenUsageHint": "Pokazuje tokeny zużyte przez każdą odpowiedź i bieżącą sumę rozmowy, z szacowanym kosztem, gdy znana jest cena modelu.",
   "editSummary": "Zmiany AI gotowe · nowe warstwy: {added} · zmienione: {changed}",
   "editSummaryAdded": "Zmiany AI gotowe · nowe warstwy: {added}",
   "editSummaryChanged": "Zmiany AI gotowe · zmienione warstwy: {changed}",

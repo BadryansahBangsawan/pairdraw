@@ -58,11 +58,9 @@ async function collect(transport: ChatTransport<UIMessage>): Promise<UIMessageCh
 function usageMetadata(chunks: UIMessageChunk[]): TurnUsage | null {
   for (const chunk of chunks) {
     const metadata =
-      chunk.type === 'message-metadata'
+      chunk.type === 'message-metadata' || chunk.type === 'finish'
         ? chunk.messageMetadata
-        : chunk.type === 'finish'
-          ? chunk.messageMetadata
-          : undefined
+        : undefined
     const usage = v.is(v.record(v.string(), v.unknown()), metadata) ? metadata.usage : undefined
     const parsed = v.safeParse(turnUsageSchema, usage)
     if (parsed.success) return parsed.output

@@ -21,6 +21,7 @@ const LOCALES_DIR = 'packages/vue/src/i18n/locales'
  */
 const LOCALE_FILE_NAMES: Record<string, string> = {
   chatContext: 'chat-context',
+  chatUsage: 'chat-usage',
   cloud: 'cloud/editor',
   cloudPortal: 'cloud/portal',
   designCheck: 'design-check',

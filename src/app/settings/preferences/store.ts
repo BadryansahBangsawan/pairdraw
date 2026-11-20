@@ -112,6 +112,8 @@ export interface AppPreferences {
     approveActions: boolean
     /** Whether a long chat is compacted into a summary before the context fills up. */
     compactAutomatically: boolean
+    /** Whether the chat shows each reply's token usage and the conversation's running cost. */
+    showTokenUsage: boolean
   }
   files: { recentLimit: number }
   version: 1
@@ -171,7 +173,9 @@ export const DEFAULT_APP_PREFERENCES: Readonly<AppPreferences> = {
     // Edits are undoable and reviewable per reply, so asking before each one is opt-in.
     approveActions: false,
     // A long chat summarizes itself before the window fills; Settings → AI turns it off.
-    compactAutomatically: true
+    compactAutomatically: true,
+    // The token and cost meter shows by default; Settings → AI turns it off.
+    showTokenUsage: true
   },
   files: { recentLimit: DEFAULT_RECENT_FILES_LIMIT },
   version: 1,
@@ -248,7 +252,8 @@ const appPreferencesSchema = section(
       canvasPrompt: v.fallback(v.boolean(), defaults.chat.canvasPrompt),
       animateEdits: v.fallback(v.boolean(), defaults.chat.animateEdits),
       approveActions: v.fallback(v.boolean(), defaults.chat.approveActions),
-      compactAutomatically: v.fallback(v.boolean(), defaults.chat.compactAutomatically)
+      compactAutomatically: v.fallback(v.boolean(), defaults.chat.compactAutomatically),
+      showTokenUsage: v.fallback(v.boolean(), defaults.chat.showTokenUsage)
     }),
     files: section({
       recentLimit: v.fallback(recentFilesLimitSchema, defaults.files.recentLimit)

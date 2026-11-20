@@ -4,8 +4,11 @@ import { computed } from 'vue'
 
 import { useI18n } from '@pairdraw/vue/i18n'
 
+import { showTokenUsage } from '@/app/ai/chat/preferences'
+import type { TurnUsage } from '@/app/ai/chat/usage/aggregate'
 import { turnEdits } from '@/app/ai/reply/turns'
 import { chatMessageTheme } from '@/components/chat/ui'
+import ChatUsageMeter from '@/components/chat/usage/ChatUsageMeter.vue'
 import AppButton from '@/components/ui/button/AppButton.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 
@@ -22,7 +25,9 @@ const {
   reverted = false,
   stopped = false,
   undone = 0,
-  edits = 0
+  edits = 0,
+  usage = null,
+  usageCostUsd = null
 } = defineProps<{
   messageId: string
   /** The reply's text, copied whole whatever parts it came in. */
@@ -39,6 +44,10 @@ const {
   edits?: number
   /** The user stopped the reply before it finished. */
   stopped?: boolean
+  /** The tokens this reply spent, or null when it reported none. */
+  usage?: TurnUsage | null
+  /** The reply's estimated cost in US dollars, or null when the model's price is unknown. */
+  usageCostUsd?: number | null
 }>()
 const emit = defineEmits<{ regenerate: []; revert: []; restore: [] }>()
 const { ai } = useI18n()
@@ -47,6 +56,8 @@ const ui = chatMessageTheme()
 const copied = refAutoReset(false, 1500)
 const { copy, isSupported: clipboardSupported } = useClipboard()
 const copyable = computed(() => !!text && clipboardSupported.value)
+
+const usageVisible = computed(() => showTokenUsage.value && !streaming && usage !== null)
 
 async function copyResponse(): Promise<void> {
   if (!copyable.value) return
@@ -66,7 +77,17 @@ const turnActions = computed(
 </script>
 
 <template>
-  <div v-if="turnActions || copyable" :class="ui.footer()" data-slot="chat-turn-actions">
+  <div
+    v-if="turnActions || copyable || usageVisible"
+    :class="ui.footer()"
+    data-slot="chat-turn-actions"
+  >
+    <ChatUsageMeter
+      v-if="usageVisible && usage"
+      :usage="usage"
+      :cost-usd="usageCostUsd"
+      scope="turn"
+    />
     <template v-if="turnActions">
       <span
         v-if="stopped"

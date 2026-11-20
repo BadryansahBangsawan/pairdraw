@@ -13,6 +13,7 @@ de:automation.status
 de:automation.version
 de:chatContext.styleKitFontsPlaceholder
 de:chatContext.styleKitName
+de:chatUsage.usageReasoning
 de:code.editorDesignLabel
 de:code.sourceDesignJSX
 de:code.sourceHTML
@@ -88,6 +89,8 @@ es:ai.notifyTitle
 es:automation.statusError
 es:chatContext.contextUsageTokens
 es:chatContext.styleKitFontsPlaceholder
+es:chatUsage.turnTokens
+es:chatUsage.turnTokensCost
 es:code.editorDesignLabel
 es:code.sourceDesignJSX
 es:code.sourceHTML
@@ -135,6 +138,8 @@ fr:automation.version
 fr:chatContext.styleKitColorNamePlaceholder
 fr:chatContext.styleKitFontsPlaceholder
 fr:chatContext.styleKitNotes
+fr:chatUsage.turnTokens
+fr:chatUsage.turnTokensCost
 fr:code.editorDesignLabel
 fr:code.sourceDesignJSX
 fr:code.sourceHTML
@@ -222,6 +227,8 @@ it:ai.notifyTitle
 it:chatContext.contextInput
 it:chatContext.contextOutput
 it:chatContext.styleKitFontsPlaceholder
+it:chatUsage.usageInput
+it:chatUsage.usageOutput
 it:code.editorDesignLabel
 it:code.sourceDesignJSX
 it:code.sourceHTML

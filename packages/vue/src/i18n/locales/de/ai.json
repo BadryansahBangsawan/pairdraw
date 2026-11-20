@@ -112,6 +112,8 @@
   "canvasPromptHint": "Zeigt unten auf der Arbeitsfläche einen Prompt, solange der Chat geschlossen ist. Was du dort schreibst, geht an den Chat.",
   "animateEdits": "KI-Änderungen animieren",
   "animateEditsHint": "Ebenen, die die KI hinzufügt, zeichnen sich nacheinander ein, und Rahmen, in denen sie arbeitet, schimmern, bis sie fertig ist. Folgt der Einstellung „Animationen“.",
+  "showTokenUsage": "Token-Nutzung und Kosten anzeigen",
+  "showTokenUsageHint": "Zeigt die Token, die jede Antwort verbraucht hat, und die laufende Summe des Gesprächs, mit geschätzten Kosten, wenn der Preis des Modells bekannt ist.",
   "editSummary": "KI-Änderungen fertig · neue Ebenen: {added} · geändert: {changed}",
   "editSummaryAdded": "KI-Änderungen fertig · neue Ebenen: {added}",
   "editSummaryChanged": "KI-Änderungen fertig · geänderte Ebenen: {changed}",

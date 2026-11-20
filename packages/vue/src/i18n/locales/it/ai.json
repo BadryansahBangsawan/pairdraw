@@ -112,6 +112,8 @@
   "canvasPromptHint": "Mostra un prompt in fondo all’area di lavoro mentre la chat è chiusa. Quello che scrivi lì va alla chat.",
   "animateEdits": "Anima le modifiche dell’IA",
   "animateEditsHint": "I livelli aggiunti dall’IA si disegnano uno dopo l’altro e i frame in cui lavora luccicano finché non ha finito. Segue l’impostazione Animazioni.",
+  "showTokenUsage": "Mostra uso dei token e costo",
+  "showTokenUsageHint": "Mostra i token consumati da ogni risposta e il totale progressivo della conversazione, con un costo stimato quando il prezzo del modello è noto.",
   "editSummary": "Modifiche dell’IA completate · nuovi livelli: {added} · modificati: {changed}",
   "editSummaryAdded": "Modifiche dell’IA completate · nuovi livelli: {added}",
   "editSummaryChanged": "Modifiche dell’IA completate · livelli modificati: {changed}",

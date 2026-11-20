@@ -240,6 +240,9 @@ export const aiMessageDefaults = {
   animateEdits: 'Animate AI edits',
   animateEditsHint:
     'Layers the AI adds trace in one after another, and the frames it works in shimmer until it finishes. Follows the Animations setting.',
+  showTokenUsage: 'Show token usage and cost',
+  showTokenUsageHint:
+    'Show the tokens each reply spent and the conversation’s running total, with an estimated cost when the model’s price is known.',
   /** The notice once an agent's run of edits ends; its action shows the layers it touched. */
   editSummary: params('AI edits done · new layers: {added} · changed: {changed}'),
   editSummaryAdded: params('AI edits done · new layers: {added}'),

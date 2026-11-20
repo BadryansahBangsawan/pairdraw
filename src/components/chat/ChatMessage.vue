@@ -12,6 +12,8 @@ import { undoOf, wasStopped } from '@/app/ai/chat/metadata'
 import { reasoningDisplay as preferredReasoningDisplay } from '@/app/ai/chat/preferences'
 import { visibleUserMessageText } from '@/app/ai/chat/presentation'
 import { groupMessageParts, type MessagePartGroup } from '@/app/ai/chat/tool-calls/display'
+import { estimatedCostUsd, turnUsageOf } from '@/app/ai/chat/usage/aggregate'
+import { useDesignModelPricing } from '@/app/ai/chat/usage/pricing'
 import type { ReasoningDisplay } from '@/app/settings/preferences/store'
 import ChatAttachmentList from '@/components/chat/attachment/ChatAttachmentList.vue'
 import ChatMarkdown from '@/components/chat/ChatMarkdown.vue'
@@ -50,6 +52,11 @@ const editing = ref(false)
 const { ai } = useI18n()
 const ui = chatMessageTheme()
 const markdownMode = computed(() => (streaming ? 'streaming' : 'static'))
+const turnUsage = computed(() => turnUsageOf(message))
+const modelPricing = useDesignModelPricing()
+const turnCostUsd = computed(() =>
+  turnUsage.value ? estimatedCostUsd(turnUsage.value, modelPricing.value) : null
+)
 const storedAttachments = attachmentsForMessage(message.id)
 const attachments = computed(() => presentation?.attachments ?? storedAttachments.value)
 const assistantText = computed(() =>
@@ -138,6 +145,8 @@ function groupKey(group: MessagePartGroup): string {
           :stopped="stopped"
           :undone="undoneCalls.size"
           :edits="undo?.edits.length ?? 0"
+          :usage="turnUsage"
+          :usage-cost-usd="turnCostUsd"
           @regenerate="emit('regenerate')"
           @revert="emit('revert')"
           @restore="emit('restore')"

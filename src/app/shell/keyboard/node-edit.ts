@@ -8,7 +8,7 @@ import type { VectorEditState } from '@/app/editor/vector/types'
 import { isButtonActivation, isEditing } from '@/app/shell/keyboard/focus'
 import { shortcutCode } from '@/app/shell/keyboard/layout'
 import { nudgeDistance } from '@/app/shell/keyboard/nudging'
-import { originatedInOverlay } from '@/app/shell/keyboard/overlay-guard'
+import { overlayHoldsKeys } from '@/app/shell/keyboard/overlays'
 
 const ARROW_DIRECTIONS: Partial<Record<string, [number, number]>> = {
   ArrowUp: [0, -1],
@@ -16,8 +16,6 @@ const ARROW_DIRECTIONS: Partial<Record<string, [number, number]>> = {
   ArrowLeft: [-1, 0],
   ArrowRight: [1, 0]
 }
-
-const OPEN_LAYER_SELECTOR = '[data-dismissable-layer]:not([data-state="closed"])'
 
 /** What the keys read and run: the edit state and the path actions of the editor store. */
 type NodeEditKeyStore = Pick<
@@ -29,13 +27,7 @@ type NodeEditKeyStore = Pick<
 
 /** A key meant for a field, a button, or an open menu, popover, or dialog rather than the path. */
 function isForOtherControl(event: KeyboardEvent, inputFocused: boolean) {
-  return (
-    inputFocused ||
-    isButtonActivation(event) ||
-    isEditing(event) ||
-    document.querySelector(OPEN_LAYER_SELECTOR) !== null ||
-    originatedInOverlay(event)
-  )
+  return inputFocused || isButtonActivation(event) || isEditing(event) || overlayHoldsKeys(event)
 }
 
 /** Whether the canvas has the keys, rather than a panel's tabs, tree, slider, or toggle group. */

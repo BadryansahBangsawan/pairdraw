@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test'
 
 import { Window } from 'happy-dom'
 
-import { originatedInOverlay } from '@/app/shell/keyboard/overlay-guard'
+import { originatedInOverlay } from '@/app/shell/keyboard/overlays'
 
 import { asDouble } from '#tests/helpers/doubles'
 

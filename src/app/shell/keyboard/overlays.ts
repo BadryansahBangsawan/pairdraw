@@ -9,7 +9,8 @@ function isClosing(element: Element): boolean {
   return element.closest('[data-state="closed"]') !== null
 }
 
-function originatedInOverlay(event: KeyboardEvent, allowPickers: boolean) {
+/** Whether the key was pressed inside a menu, list, or dialog that is still open. */
+export function originatedInOverlay(event: KeyboardEvent, allowPickers = false): boolean {
   return event
     .composedPath()
     .some(

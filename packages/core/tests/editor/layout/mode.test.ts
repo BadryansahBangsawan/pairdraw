@@ -173,3 +173,83 @@ test('the wrapper takes the slot of the topmost selected layer', () => {
     editor.dispose()
   }
 })
+
+describe('auto layout spacing', () => {
+  test('a negative gap overlaps the layers after it, as Figma lays them', () => {
+    const editor = createEditor()
+    try {
+      const frame = editor.graph.createNode('FRAME', editor.state.currentPageId, {
+        width: 200,
+        height: 100,
+        layoutMode: 'HORIZONTAL',
+        primaryAxisSizing: 'FIXED',
+        counterAxisSizing: 'FIXED'
+      })
+      const first = editor.graph.createNode('RECTANGLE', frame.id, { width: 60, height: 60 })
+      const second = editor.graph.createNode('RECTANGLE', frame.id, { width: 60, height: 60 })
+
+      editor.updateNode(frame.id, { itemSpacing: -20 })
+
+      expect(editor.graph.getNode(first.id)?.x).toBe(0)
+      expect(editor.graph.getNode(second.id)?.x).toBe(40)
+    } finally {
+      editor.dispose()
+    }
+  })
+})
+
+describe('a group and auto layout', () => {
+  test('turns into a frame when it takes auto layout, as Figma converts it', () => {
+    const editor = createEditor()
+    try {
+      const page = editor.state.currentPageId
+      const first = editor.graph.createNode('RECTANGLE', page, { x: 0, y: 0, width: 20, height: 20 })
+      const second = editor.graph.createNode('RECTANGLE', page, {
+        x: 40,
+        y: 0,
+        width: 20,
+        height: 20
+      })
+      editor.select([first.id, second.id])
+      editor.groupSelected()
+      const group = editor.graph.getChildren(page)[0]
+      expect(group?.type).toBe('GROUP')
+
+      editor.setLayoutMode(group.id, 'HORIZONTAL')
+
+      // A group is only its children's bounds; a layout needs a frame to own the flow.
+      const converted = editor.graph.getNode(group.id)
+      expect(converted?.type).toBe('FRAME')
+      expect(converted?.layoutMode).toBe('HORIZONTAL')
+      expect(converted?.width).toBe(40)
+    } finally {
+      editor.dispose()
+    }
+  })
+})
+
+describe('removing auto layout', () => {
+  test('clears the flow settings the frame can no longer use, as Figma does', () => {
+    const editor = createEditor()
+    try {
+      const page = editor.state.currentPageId
+      const frame = editor.graph.createNode('FRAME', page, {
+        width: 200,
+        height: 100,
+        layoutMode: 'HORIZONTAL',
+        layoutWrap: 'WRAP',
+        counterAxisAlign: 'MAX'
+      })
+
+      editor.setLayoutMode(frame.id, 'NONE')
+
+      const cleared = editor.graph.getNode(frame.id)
+      expect(cleared?.layoutWrap).toBe('NO_WRAP')
+      expect(cleared?.counterAxisAlign).toBe('MIN')
+      expect(cleared?.primaryAxisSizing).toBe('FIXED')
+      expect(cleared?.counterAxisSizing).toBe('FIXED')
+    } finally {
+      editor.dispose()
+    }
+  })
+})

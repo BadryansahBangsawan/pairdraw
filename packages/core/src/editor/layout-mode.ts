@@ -16,6 +16,8 @@ export function createLayoutModeActions(
     const node = ctx.graph.getNode(id)
     if (!node || node.layoutMode === mode) return
     const preview = beginNodePreview(mode === 'NONE' ? 'Remove auto layout' : 'Add auto layout')
+    // A group is only its children's bounds; a flow needs a frame to own it, as Figma converts.
+    if (node.type === 'GROUP' && mode !== 'NONE') preview.update(id, { type: 'FRAME' })
     preview.update(id, layoutModeUpdates(ctx, node, id, mode))
     preview.commit()
   }
@@ -61,7 +63,19 @@ function layoutModeUpdates(
   const updates: Partial<SceneNode> = { layoutMode: mode }
   if (mode === 'GRID' && node.layoutMode !== 'GRID') {
     applyGridDefaults(ctx, node, id, updates)
-  } else if (mode !== 'NONE' && node.layoutMode === 'NONE') {
+  } else if (mode === 'NONE') {
+    // Figma keeps the spacing and padding for when auto layout comes back, and drops the rest:
+    // a frame with no flow cannot wrap or align one.
+    Object.assign(updates, {
+      primaryAxisSizing: 'FIXED',
+      counterAxisSizing: 'FIXED',
+      layoutWrap: 'NO_WRAP',
+      primaryAxisAlign: 'MIN',
+      counterAxisAlign: 'MIN',
+      counterAxisSpacing: 0,
+      layoutDirection: 'AUTO'
+    })
+  } else if (node.layoutMode === 'NONE') {
     Object.assign(updates, autoLayoutDefaults())
   }
   return updates

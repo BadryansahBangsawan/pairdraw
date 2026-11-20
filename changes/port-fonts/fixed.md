@@ -1,1 +1,1 @@
-- Text measured in a substitute font takes its own font's size, and its auto-layout frames follow, once a face of its family loads.
+- Text measured in a substitute font takes its own font's size, and its auto-layout frames follow, once a face of its family loads.- Text without style runs wraps and outlines in the face it is drawn in, at its weight, letter spacing, and variable-font axes, instead of the browser's default font.

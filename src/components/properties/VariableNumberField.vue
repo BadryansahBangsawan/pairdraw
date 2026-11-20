@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue'
 
+import { panelNumber } from '@pairdraw/core/geometry'
 import {
   useNumberBindingProvider,
   type BindingTarget
@@ -138,7 +139,7 @@ defineOptions({ inheritAttrs: false })
               panels.createNumberVariable({
                 value:
                   displayScale === 1 && variableValue === undefined
-                    ? Math.round(createdValue)
+                    ? panelNumber(createdValue)
                     : createdValue
               })
             "

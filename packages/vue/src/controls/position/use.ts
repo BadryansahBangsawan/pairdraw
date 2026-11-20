@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 
 import {
+  panelNumber,
   panelPosition,
   panelPositionChange,
   panelRotation,
@@ -36,15 +37,19 @@ export function usePosition() {
       nodes.value.length > 0 && nodes.value.every((target) => takesOwnSize(editor.graph, target))
   )
 
-  // X, Y, and rotation read as Figma's panel shows them: the turned layer's box on the canvas and
-  // its counterclockwise angle; see `panelPosition` and `panelRotation`.
-  function shown(target: SceneNode, key: 'x' | 'y' | 'rotation'): number {
-    if (key === 'rotation') return Math.round(panelRotation(target, editor.graph))
-    return Math.round(panelPosition(target, editor.graph)[key])
+  type PanelProp = 'x' | 'y' | 'rotation' | 'width' | 'height'
+
+  // X, Y, rotation, width and height read as Figma's panel shows them: two decimals, the turned
+  // layer's box on the canvas and its counterclockwise angle; see `panelPosition` and
+  // `panelRotation`.
+  function shown(target: SceneNode, key: PanelProp): number {
+    if (key === 'rotation') return panelNumber(panelRotation(target, editor.graph))
+    if (key === 'x' || key === 'y') return panelNumber(panelPosition(target, editor.graph)[key])
+    return panelNumber(target[key])
   }
 
   /** The shown value of every selected node, or MIXED when they differ. */
-  function panelProp(key: 'x' | 'y' | 'rotation') {
+  function panelProp(key: PanelProp) {
     return computed<MixedValue<number>>(() => {
       const values = nodes.value.map((target) => shown(target, key))
       if (values.length === 0) return 0
@@ -55,8 +60,8 @@ export function usePosition() {
 
   const x = computed(() => (node.value ? shown(node.value, 'x') : 0))
   const y = computed(() => (node.value ? shown(node.value, 'y') : 0))
-  const width = computed(() => node.value?.width ?? 0)
-  const height = computed(() => node.value?.height ?? 0)
+  const width = computed(() => (node.value ? shown(node.value, 'width') : 0))
+  const height = computed(() => (node.value ? shown(node.value, 'height') : 0))
   const rotation = computed(() => (node.value ? shown(node.value, 'rotation') : 0))
 
   const {

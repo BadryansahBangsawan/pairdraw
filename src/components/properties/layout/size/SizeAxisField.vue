@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SelectRoot, SelectSeparator, SelectTrigger } from 'reka-ui'
 
+import { panelNumber } from '@pairdraw/core/geometry'
 import type { LayoutSizing } from '@pairdraw/scene-graph'
 import type { SizeLimitProp } from '@pairdraw/vue/controls/layout'
 import { useI18n } from '@pairdraw/vue/i18n'
@@ -79,7 +80,7 @@ function handleSelect(value: SizeSelectValue) {
     <VariableNumberField
       :icon="icon"
       :aria-label="label"
-      :model-value="Math.round(ctx.node[axis])"
+      :model-value="panelNumber(ctx.node[axis])"
       :min="0"
       :disabled="disabled"
       :node-id="ctx.node.id"

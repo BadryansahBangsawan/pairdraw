@@ -1,1 +1,2 @@
 - A press and hover pass through a locked layer and everything inside it to what lies under, while a right-click still selects it, so its menu can unlock it.
+- The Design panel, the canvas size label and the auto layout fields show X, Y, width, height, rotation, padding, gap and size limits to two decimals, as Figma does, and a multi-selection's width and height no longer show a raw value.

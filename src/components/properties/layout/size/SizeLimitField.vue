@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SelectRoot, SelectTrigger } from 'reka-ui'
 
+import { panelNumber } from '@pairdraw/core/geometry'
 import { useRetainedPopup } from '@pairdraw/vue/lifecycle/retention'
 import { useLayoutControlsContext } from '@pairdraw/vue/primitives/LayoutControls'
 
@@ -26,7 +27,7 @@ function handleSelect(value: string) {
     <VariableNumberField
       :icon="item.icon"
       :aria-label="item.label"
-      :model-value="Math.round(ctx.node[item.prop] ?? 0)"
+      :model-value="panelNumber(ctx.node[item.prop] ?? 0)"
       :min="0"
       :node-id="ctx.node.id"
       :binding-path="item.prop"

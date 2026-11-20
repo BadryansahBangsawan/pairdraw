@@ -359,14 +359,14 @@ function createTextLayout(
   color: Float32Array | undefined,
   options: ParagraphBuildOptions
 ): TextLayout {
-  return needsParagraphLayout(node)
-    ? buildBlocks(r, node, color, options)
-    : TextLayout.ofParagraph(
-        r.ck,
-        buildSkParagraph(r, node, color, options),
-        shownText(node).length,
-        paragraphLines(r, node, color, options)
-      )
+  if (needsParagraphLayout(node)) return buildBlocks(r, node, color, options)
+  const truncation = buildTruncateOpts(node)
+  return TextLayout.ofParagraph(
+    r.ck,
+    buildSkParagraph(r, node, color, options, truncation.ellipsis ? { truncation } : undefined),
+    shownText(node).length,
+    paragraphLines(r, node, color, options)
+  )
 }
 
 /** How many laid-out line boxes fit the fixed height, preserving the first line. */
@@ -384,8 +384,10 @@ export function buildParagraph(
   options: ParagraphBuildOptions = {}
 ): TextLayout {
   const layout = createTextLayout(r, node, color, options)
+  // A box set to truncate clips to the lines its height holds, which is the auto-resize mode a
+  // panel offers; an imported text may instead truncate only where `textTruncation` says so.
   const heightTruncation =
-    node.textTruncation === 'ENDING' &&
+    (node.textTruncation === 'ENDING' || node.textAutoResize === 'TRUNCATE') &&
     node.height > 0 &&
     (node.maxLines == null || node.maxLines <= 0)
   let fittingLines: number | undefined

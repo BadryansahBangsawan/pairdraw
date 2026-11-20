@@ -1,0 +1,1 @@
+- A text box set to truncate now clips to the lines its height holds and ends the last with an ellipsis, instead of drawing every line past its box.

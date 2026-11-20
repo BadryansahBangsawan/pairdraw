@@ -42,14 +42,19 @@ export function resolveParagraphLayoutWidth(node: ParagraphNode, maxWidth?: numb
   return node.width || 1e6
 }
 
+/**
+ * The lines a truncating box shows: what `maxLines` allows, else as many as its height holds, as
+ * Figma keeps the last and ends it with an ellipsis. A text box set to truncate truncates even
+ * where nothing turned on `textTruncation`, which is how the auto-resize mode is chosen.
+ */
 export function buildTruncateOpts(node: ParagraphNode): { maxLines?: number; ellipsis?: string } {
-  if (node.textTruncation !== 'ENDING') return {}
-
-  const opts: { maxLines?: number; ellipsis: string } = { ellipsis: ELLIPSIS }
-  if (node.maxLines != null && node.maxLines > 0) {
-    opts.maxLines = node.maxLines
+  if (node.textTruncation !== 'ENDING' && node.textAutoResize !== 'TRUNCATE') return {}
+  // A box that truncates only by its height is measured as it is, then capped by the lines that
+  // fit and built again with that count.
+  if (node.maxLines == null || node.maxLines <= 0) {
+    return node.textAutoResize === 'TRUNCATE' ? {} : { ellipsis: ELLIPSIS }
   }
-  return opts
+  return { maxLines: node.maxLines, ellipsis: ELLIPSIS }
 }
 
 function getParagraphTextAlign(

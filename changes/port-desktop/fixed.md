@@ -1,1 +1,2 @@
 - On macOS 14 and later, agents can keep editing through MCP while the desktop app is hidden or the screen is locked, instead of every call timing out.
+- Fonts installed on the system are drawn by the page instead of being copied into it, so bold and italic text keeps its own face.

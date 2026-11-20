@@ -153,6 +153,30 @@ export function createConversationHistory<TChat extends HistoryChat>(
     resumeLiveChat(conversation)
   }
 
+  /** The conversations a title was asked for, so each is named at most once. */
+  const named = new Set<string>()
+
+  /**
+   * Names the conversation after its first reply, unless it has a title of its own already. The
+   * title is asked for outside the serialized actions, so a slow answer holds nothing up, and is
+   * dropped when the conversation changed or was renamed meanwhile.
+   */
+  async function nameConversation(): Promise<void> {
+    const conversation = current.value
+    const chat = session.chat
+    if (!runtime.title || !conversation || !chat || readOnly.value) return
+    if (conversation.titleSource !== 'fallback' || named.has(conversation.id)) return
+    named.add(conversation.id)
+    const title = await runtime.title(chat.messages).catch(() => null)
+    if (!title) return
+    await serialize(async () => {
+      const latest = current.value
+      if (latest?.id !== conversation.id || latest.titleSource !== 'fallback') return
+      current.value = { ...latest, title, titleSource: 'generated' }
+      await flush()
+    })
+  }
+
   async function createDraft() {
     const editor = runtime.getEditor()
     const now = new Date().toISOString()
@@ -274,7 +298,7 @@ export function createConversationHistory<TChat extends HistoryChat>(
         await runtime.resetChat()
         return null
       }
-      if (next) session.attach(next, flush)
+      if (next) session.attach(next, flush, () => void nameConversation())
       return next
     })
   }

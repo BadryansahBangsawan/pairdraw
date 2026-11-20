@@ -4,6 +4,7 @@ import { contextUsageOf } from '@/app/ai/chat/context-window/usage'
 import { resolveModelContextWindow } from '@/app/ai/models/catalog'
 import { resolveLanguageModelID } from '@/app/ai/models/language-model'
 import { designModelConnection, designModelProfile } from '@/app/ai/models/store'
+import type { ResolvedAIModelRole } from '@/app/ai/models/types'
 
 import { compactionOf, messagesSinceCompaction } from './marker'
 
@@ -14,14 +15,15 @@ export interface ContextLimits {
 }
 
 /**
- * The Design model's limits, when the conversation runs on a model the chat calls itself and
- * its catalog gives a window. Agents keep their own context.
+ * A model's limits, when the chat calls it itself and its catalog gives a window. Agents keep
+ * their own context.
  */
-export async function designContextLimits(): Promise<ContextLimits | null> {
-  const profile = designModelProfile.value
-  const providerID = designModelConnection.value?.providerID
-  if (!profile || !providerID || providerID.startsWith('acp:') || providerID === 'harness:pi')
-    return null
+export async function contextLimitsOf({
+  connection,
+  profile
+}: Pick<ResolvedAIModelRole, 'connection' | 'profile'>): Promise<ContextLimits | null> {
+  const providerID = connection.providerID
+  if (providerID.startsWith('acp:') || providerID === 'harness:pi') return null
   const modelID = resolveLanguageModelID({
     providerID,
     modelID: profile.modelID,
@@ -29,6 +31,13 @@ export async function designContextLimits(): Promise<ContextLimits | null> {
   })
   const contextWindow = await resolveModelContextWindow(providerID, modelID)
   return contextWindow ? { contextWindow, maxOutputTokens: profile.maxOutputTokens } : null
+}
+
+/** The Design model's limits, which the conversation's requests fill. */
+export async function designContextLimits(): Promise<ContextLimits | null> {
+  const profile = designModelProfile.value
+  const connection = designModelConnection.value
+  return profile && connection ? contextLimitsOf({ connection, profile }) : null
 }
 
 /**

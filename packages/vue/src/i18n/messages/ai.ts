@@ -306,7 +306,7 @@ export const aiMessageDefaults = {
   modelRoleVision: 'Vision',
   modelRoleDesignDescription: 'AI chat and canvas edits',
   modelRoleReviewDescription: 'Explicit plan and design reviews',
-  modelRoleFastDescription: 'Low-cost background work',
+  modelRoleFastDescription: 'Chat titles and compaction summaries',
   modelRoleVisionDescription: 'Screenshots and image references',
   modelRoleUseDesign: 'Same as Design',
   noModel: 'None',

@@ -1,3 +1,4 @@
 - A press and hover pass through a locked layer and everything inside it to what lies under, while a right-click still selects it, so its menu can unlock it.
 - The Design panel, the canvas size label and the auto layout fields show X, Y, width, height, rotation, padding, gap and size limits to two decimals, as Figma does, and a multi-selection's width and height no longer show a raw value.
 - A selection's edges on the rulers read to three decimals at any zoom, with the two badges parting on a narrow selection instead of overlapping, and a size, limit, padding or gap bound to a variable shows and edits from the two decimals the panel shows.
+- A key pressed while a menu, dialog, list or picker is still animating shut goes to the canvas, so Escape followed quickly by a tool key works.

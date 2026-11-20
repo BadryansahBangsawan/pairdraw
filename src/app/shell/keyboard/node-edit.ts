@@ -8,6 +8,7 @@ import type { VectorEditState } from '@/app/editor/vector/types'
 import { isButtonActivation, isEditing } from '@/app/shell/keyboard/focus'
 import { shortcutCode } from '@/app/shell/keyboard/layout'
 import { nudgeDistance } from '@/app/shell/keyboard/nudging'
+import { originatedInOverlay } from '@/app/shell/keyboard/overlay-guard'
 
 const ARROW_DIRECTIONS: Partial<Record<string, [number, number]>> = {
   ArrowUp: [0, -1],
@@ -16,7 +17,6 @@ const ARROW_DIRECTIONS: Partial<Record<string, [number, number]>> = {
   ArrowRight: [1, 0]
 }
 
-const OVERLAY_SELECTOR = '[data-picker-content], [role="dialog"], [role="listbox"], [role="menu"]'
 const OPEN_LAYER_SELECTOR = '[data-dismissable-layer]:not([data-state="closed"])'
 
 /** What the keys read and run: the edit state and the path actions of the editor store. */
@@ -34,9 +34,7 @@ function isForOtherControl(event: KeyboardEvent, inputFocused: boolean) {
     isButtonActivation(event) ||
     isEditing(event) ||
     document.querySelector(OPEN_LAYER_SELECTOR) !== null ||
-    event
-      .composedPath()
-      .some((target) => target instanceof Element && target.matches(OVERLAY_SELECTOR))
+    originatedInOverlay(event)
   )
 }
 

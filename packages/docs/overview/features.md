@@ -86,6 +86,8 @@ Tool calls display as collapsible timeline entries. Visual verification — the 
 
 You can watch an agent draw: each layer it adds traces in, one after another, the frames it works in shimmer, and a notice counts what it added and changed once it stops. **Animate AI edits** in Settings turns this off ([Watching the assistant draw](/programmable/ai-chat#watching-the-assistant-draw)).
 
+Long chats compact themselves into a summary before the context window fills, and `/compact` does it on demand; the transcript keeps every message with a divider that opens the summary. A model assigned to **Fast tasks** names each conversation after its first reply and writes those summaries. `/review` asks the **Review** model to review the selection or page, with attached images as references; its findings arrive as a card with **Fix these**, and each AI edit's change preview offers **Review this change**. **Settings → Prompts** holds your own instructions for the chat and your own templates for reviews, titles, and summaries.
+
 See [AI Chat](/programmable/ai-chat) for setup and provider details.
 
 ## Built-in Browser

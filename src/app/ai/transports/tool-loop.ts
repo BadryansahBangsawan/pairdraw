@@ -26,7 +26,7 @@ import { stepContextMetadata } from '@/app/ai/chat/context-window/usage'
 import { resumableTransport } from '@/app/ai/chat/history/continuation'
 import { notifyPermissionWaiting } from '@/app/ai/chat/notifications'
 import { maxAgentSteps } from '@/app/ai/chat/preferences'
-import SYSTEM_PROMPT from '@/app/ai/chat/system-prompt'
+import { systemPrompt } from '@/app/ai/chat/system-prompt'
 import type { RunRecorder, RunRecording } from '@/app/ai/chat/trace/recorder'
 import { promptCachingOptions } from '@/app/ai/models/caching'
 import { modelProviderName } from '@/app/ai/models/provider-name'
@@ -168,7 +168,7 @@ export function createToolLoopTransport({
   // Only skills the model may load: one the user runs by name stays out of the listing and tools.
   const modelSkills = () => skills.enabled().filter((skill) => skill.modelInvocable)
   let offeredSkills = modelSkills()
-  let instructions = SYSTEM_PROMPT
+  let instructions = systemPrompt()
   // The reply in progress; a transport sends one message at a time.
   let run = currentRun(store)
   // While JSX streams, the chat's agent moves through the elements as they appear, here and
@@ -194,7 +194,7 @@ export function createToolLoopTransport({
   let releaseExternalMCP: () => void = () => undefined
   const agent = new ToolLoopAgent({
     model,
-    instructions: SYSTEM_PROMPT,
+    instructions,
     tools,
     maxOutputTokens,
     // Kept only to fingerprint each step's request for its trace.
@@ -317,7 +317,10 @@ export function createToolLoopTransport({
         await skills.refresh()
         offeredSkills = modelSkills()
         const catalog = skillCatalog(offeredSkills)
-        instructions = catalog ? `${SYSTEM_PROMPT}\n\n${catalog}` : SYSTEM_PROMPT
+        // The Design prompt is read once per reply, as agents read it, so a change in Settings
+        // applies to the next chat.
+        const prompt = systemPrompt()
+        instructions = catalog ? `${prompt}\n\n${catalog}` : prompt
         externalTools = await externalMCP.tools({
           approve: approval.approveExternal,
           signal: options.abortSignal

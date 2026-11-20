@@ -27,7 +27,7 @@ import {
 import { linkOwnTools } from '@/app/ai/agents/acp/tools'
 import { agentHost } from '@/app/ai/agents/host/current'
 import type { AgentHost, AgentStreams } from '@/app/ai/agents/host/types'
-import SYSTEM_PROMPT from '@/app/ai/chat/system-prompt'
+import { systemPrompt } from '@/app/ai/chat/system-prompt'
 import { endRun, forgetAgentChat, startAgentRun } from '@/app/ai/reply/run'
 import { AgentStartupTimeoutError, raceStartup } from '@/app/ai/transports/deadline'
 import { forgetChatAgent, nameChatAgent } from '@/app/automation/agents'
@@ -236,7 +236,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     }
 
     const carriesContext = !this.sentContext
-    const promptText = carriesContext ? `${SYSTEM_PROMPT}\n\n${text}` : text
+    const promptText = carriesContext ? `${systemPrompt()}\n\n${text}` : text
     this.sentContext = true
 
     const { connection, sessionId } = this.session

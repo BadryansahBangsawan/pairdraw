@@ -10,6 +10,7 @@ import type { AttachmentPresentation } from '@/app/ai/attachment/presentation/ty
 import { compactionOf } from '@/app/ai/chat/compaction/marker'
 import { contextUsageOf } from '@/app/ai/chat/context-window/usage'
 import type { QueuedMessage } from '@/app/ai/chat/queue'
+import { reviewOf } from '@/app/ai/review/message'
 import type { ReasoningDisplay } from '@/app/settings/preferences/store'
 import { CHAT_NODES_LIVE } from '@/components/chat/tool/context'
 import { chatTranscriptTheme } from '@/components/chat/ui'
@@ -21,6 +22,7 @@ import ChatMessage from './ChatMessage.vue'
 import { useScrollFollowing } from './transcript/useScrollFollowing'
 import ChatCompactionDivider from './turn/ChatCompactionDivider.vue'
 import ChatMessageQueued from './turn/ChatMessageQueued.vue'
+import ChatReviewCard from './turn/ChatReviewCard.vue'
 
 /** The typing indicator's dots, each bouncing a beat after the one before. */
 const DOT_STEPS = [0, 1, 2] as const
@@ -35,7 +37,9 @@ const {
   reasoningDisplay,
   queued = [],
   steers = false,
-  compacting = false
+  compacting = false,
+  reviewing = false,
+  reviewsActionable = false
 } = defineProps<{
   messages: UIMessage[]
   status: ChatStatus
@@ -53,6 +57,10 @@ const {
   steers?: boolean
   /** The conversation is being compacted, from a `/compact` or before a message goes. */
   compacting?: boolean
+  /** The Review model is reviewing the design, from a `/review`. */
+  reviewing?: boolean
+  /** Whether a review's findings can be sent on now, which needs no live chat. */
+  reviewsActionable?: boolean
 }>()
 const emit = defineEmits<{
   continue: []
@@ -61,6 +69,7 @@ const emit = defineEmits<{
   restore: [messageId: string]
   edit: [messageId: string, text: string]
   removeQueued: [id: string]
+  fixReview: [messageId: string]
 }>()
 const { ai } = useI18n()
 const ui = chatTranscriptTheme()
@@ -70,7 +79,7 @@ provide(
 )
 const running = computed(() => status === 'submitted' || status === 'streaming')
 const isThinking = computed(() => {
-  if (compacting) return true
+  if (compacting || reviewing) return true
   if (!running.value) return false
   const last = messages.at(-1)
   if (!last || last.role !== 'assistant') return true
@@ -93,13 +102,14 @@ const lastRequest = computed(() => {
 })
 /**
  * Each message with the compaction it marks, which the transcript draws as a divider, and what
- * the first reply after that compaction reported its request held.
+ * the first reply after that compaction reported its request held, or the design review it is.
  */
 const entries = computed(() =>
   messages.map((message, index) => {
     // A compaction within a reply is drawn by the reply, at the step where it ran.
     const compaction = message.role === 'user' ? compactionOf(message) : null
-    return { message, compaction, tokensAfter: compaction ? tokensAfter(index) : null }
+    const review = compaction ? null : reviewOf(message)
+    return { message, compaction, review, tokensAfter: compaction ? tokensAfter(index) : null }
   })
 )
 /** What the first reply after the compaction at `index` reported, before the next one. */
@@ -137,7 +147,7 @@ const { arrivedState, resumeFollowing } = useScrollFollowing(
   <ScrollAreaRoot :class="ui.root()">
     <ScrollAreaViewport ref="viewportComponent" :class="ui.viewport()">
       <AppPlaceholder
-        v-if="messages.length === 0"
+        v-if="messages.length === 0 && !reviewing"
         data-test-id="chat-empty-state"
         :label="ai.describeCreateOrChange"
         :ui="{ root: 'h-full' }"
@@ -159,12 +169,19 @@ const { arrivedState, resumeFollowing } = useScrollFollowing(
         :class="ui.liveRegion()"
       >
         <div ref="transcriptContent" data-test-id="chat-messages" :class="ui.list()">
-          <template v-for="({ message: msg, compaction, tokensAfter }, index) in entries">
+          <template v-for="({ message: msg, compaction, review, tokensAfter }, index) in entries">
             <ChatCompactionDivider
               v-if="compaction"
               :key="msg.id"
               :compaction="compaction"
               :tokens-after="tokensAfter"
+            />
+            <ChatReviewCard
+              v-else-if="review"
+              :key="msg.id"
+              :review="review"
+              :can-fix="reviewsActionable"
+              @fix="emit('fixReview', msg.id)"
             />
             <ChatMessage
               v-else
@@ -192,6 +209,19 @@ const { arrivedState, resumeFollowing } = useScrollFollowing(
               <span v-for="step in DOT_STEPS" :key="step" :class="ui.dot()" :data-step="step" />
             </span>
           </div>
+
+          <p
+            v-if="reviewing"
+            role="status"
+            class="flex items-center justify-center gap-1.5 py-1 text-xs text-muted"
+            data-test-id="chat-reviewing"
+          >
+            <icon-lucide-loader-circle
+              class="size-3 animate-spin motion-reduce:animate-none"
+              aria-hidden="true"
+            />
+            {{ ai.reviewing }}
+          </p>
 
           <ChatMessageQueued
             v-for="item in queued"

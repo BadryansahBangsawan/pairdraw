@@ -620,3 +620,6 @@ it:panels.prototypeVideoFps
 ja:panels.prototypeVideoFps
 pl:panels.prototypeVideoFormat
 zh-cn:panels.prototypeVideoFps
+es:settings.prompts
+de:settings.prompts
+fr:settings.prompts

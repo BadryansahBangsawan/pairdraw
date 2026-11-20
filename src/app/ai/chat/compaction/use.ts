@@ -2,7 +2,8 @@ import type { UIMessage } from 'ai'
 import { ref, type Ref } from 'vue'
 
 import { compactAutomatically } from '@/app/ai/chat/preferences'
-import type { ChatInstance } from '@/app/ai/chat/submission/types'
+import { leadingCommand } from '@/app/ai/chat/references/command'
+import type { ChatInstance, ChatSubmission } from '@/app/ai/chat/submission/types'
 import { createAIModelRuntime } from '@/app/ai/models/runtime'
 
 import {
@@ -161,4 +162,13 @@ export function useChatCompaction(options: CompactionOptions) {
   }
 
   return { compacting, failed, compact, compactIfFull, cancel, retry }
+}
+/**
+ * The command when `message` starts with `/compact`, and what to keep after it. An ACP agent's
+ * own `/compact` goes to it as written.
+ */
+export function compactCommand(message: ChatSubmission, providerID: string) {
+  if (providerID.startsWith('acp:') || message.images.length > 0) return null
+  const command = leadingCommand(message.displayText)
+  return command?.name === 'compact' ? command : null
 }

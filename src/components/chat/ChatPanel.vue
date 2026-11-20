@@ -8,10 +8,9 @@ import { useI18n } from '@pairdraw/vue/i18n'
 import { currentPermission } from '@/app/ai/agents/acp/permission'
 import { agentAutoConnect } from '@/app/ai/agents/auto/session'
 import { companionUpdate } from '@/app/ai/agents/setup/update'
-import { agentSignInHelp } from '@/app/ai/agents/signed-out'
 import { carriesAttachableFile, isAttachableFile } from '@/app/ai/attachment/accept'
 import { revokeImagePreviewURL } from '@/app/ai/attachment/image/prepare'
-import { useChatCompaction } from '@/app/ai/chat/compaction/use'
+import { compactCommand, useChatCompaction } from '@/app/ai/chat/compaction/use'
 import { chatDocumentId } from '@/app/ai/chat/history/document'
 import { sentPrompts } from '@/app/ai/chat/history/prompts'
 import { chatColumnOpen } from '@/app/ai/chat/panel'
@@ -24,7 +23,6 @@ import {
   takeNextMessage
 } from '@/app/ai/chat/queue'
 import { useQuietTurn } from '@/app/ai/chat/quiet'
-import { leadingCommand } from '@/app/ai/chat/references/command'
 import { useChatRunLocation } from '@/app/ai/chat/run-location'
 import { ensureChatConfigured, joinWaitingPrompt } from '@/app/ai/chat/setup'
 import type { ChatSubmission } from '@/app/ai/chat/submission/types'
@@ -33,21 +31,23 @@ import { saveChatTrace } from '@/app/ai/chat/trace/export'
 import { useAIChat } from '@/app/ai/chat/use'
 import { modelProviderName } from '@/app/ai/models/provider-name'
 import { openAISetup } from '@/app/ai/models/settings/onboarding/dialog'
+import { useChatReview } from '@/app/ai/review/use'
 import { didHitStepLimit } from '@/app/ai/tools'
-import { cloudBillingURL } from '@/app/cloud/integration'
 import {
   getActiveEditorStore,
+  getActiveEditorStoreOrNull,
   useActiveEditorStoreRef,
   useEditorStore
 } from '@/app/editor/active-store'
 import { useDateFormat } from '@/app/i18n/date'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { claimDroppedFiles } from '@/app/shell/document-drop'
-import { openExternalLink, toast } from '@/app/shell/ui'
+import { toast } from '@/app/shell/ui'
 import { activeTab } from '@/app/tabs'
 import ChatAgentNotice from '@/components/chat/agent/ChatAgentNotice.vue'
 import ChatAgentSetup from '@/components/chat/agent/ChatAgentSetup.vue'
 import ChatProjectFolder from '@/components/chat/agent/ChatProjectFolder.vue'
+import { useAgentNotices } from '@/components/chat/agent/useAgentNotices'
 import { useChatAgentSetup } from '@/components/chat/agent/useChatAgentSetup'
 import ChatFollowAgentsToggle from '@/components/chat/ChatFollowAgentsToggle.vue'
 import ChatHistory from '@/components/chat/ChatHistory.vue'
@@ -57,6 +57,8 @@ import ChatQuietNotice from '@/components/chat/ChatQuietNotice.vue'
 import ChatRunLocation from '@/components/chat/ChatRunLocation.vue'
 import ChatTranscript from '@/components/chat/ChatTranscript.vue'
 import ChatContextBar from '@/components/chat/context/ChatContextBar.vue'
+import { useFailureNotice } from '@/components/chat/failure/useFailureNotice'
+import { usePanelReview } from '@/components/chat/review/usePanelReview'
 import { loadMarkdownContent } from '@/components/markdown/lazy'
 import { useImageDrop } from '@/components/ui/drop/useImageDrop'
 
@@ -96,6 +98,13 @@ const submission = useChatSubmission({
 })
 
 const compaction = useChatCompaction({ chat, ensureChat, flush: history.flush })
+const review = useChatReview({
+  chat,
+  ensureChat,
+  store: getActiveEditorStoreOrNull,
+  generation: () => viewGeneration,
+  flush: history.flush
+})
 
 const chatInput = useTemplateRef<{
   restoreDraft: (submission: ChatSubmission) => void
@@ -125,7 +134,15 @@ let viewGeneration = 0
  */
 async function submitMessage(message: ChatSubmission) {
   const generation = viewGeneration
-  const command = compactCommand(message)
+  const reviewAsk = reviewCommand(message)
+  if (reviewAsk) {
+    const reviewed = await review.review({ focus: reviewAsk.rest, references: message.images })
+    if (!reviewed && generation === viewGeneration) chatInput.value?.restoreDraft(message)
+    else for (const image of message.images) revokeImagePreviewURL(image.previewURL)
+    if (reviewed && status.value === 'ready') sendNextQueued()
+    return
+  }
+  const command = compactCommand(message, providerID.value)
   if (command) {
     const compacted = await compaction.compact({
       trigger: 'manual',
@@ -140,15 +157,20 @@ async function submitMessage(message: ChatSubmission) {
   else for (const image of message.images) revokeImagePreviewURL(image.previewURL)
 }
 
-/**
- * The command when `message` starts with `/compact`, and what to keep after it. An ACP agent's
- * own `/compact` goes to it as written.
- */
-function compactCommand(message: ChatSubmission) {
-  if (providerID.value.startsWith('acp:') || message.images.length > 0) return null
-  const command = leadingCommand(message.displayText)
-  return command?.name === 'compact' ? command : null
-}
+const chatIdle = computed(
+  () =>
+    isConfigured.value &&
+    status.value === 'ready' &&
+    !submission.busy.value &&
+    !compaction.compacting.value &&
+    !history.readOnly.value
+)
+const { reviewCommand, fixReview, reviewReady } = usePanelReview({
+  review,
+  messages: computed(() => chat.value?.messages ?? history.messages.value),
+  chatIdle,
+  submit: (message) => void submitMessage(message)
+})
 
 watch(
   () => compaction.failed.value,
@@ -177,37 +199,7 @@ const companionNotice = computed(() => {
   if (state === 'updated') return ai.value.chatCompanionsUpdated
   return null
 })
-/** The coding agent the chat switched to on its own, while it is still the chat's model. */
-const autoAgent = computed(() => {
-  const agent = agentAutoConnect.state.notice
-  return agent && providerID.value === `acp:${agent.id}` ? agent : null
-})
-/**
- * The coding agent auto-connect set the chat up with, on its own or on a click, while it is still
- * the chat's model.
- */
-const connectedAgent = computed(() => {
-  const { phase, candidate } = agentAutoConnect.state
-  if (phase !== 'connected' || !candidate) return null
-  return providerID.value === `acp:${candidate.agent.id}` ? candidate.agent : null
-})
-/**
- * That agent, when it refused the last message for want of a sign-in of its own. An agent that
- * does not report its login is switched on without a click, so this is where that shows: in the
- * chat column, with what it needs, instead of a notice that leads elsewhere.
- */
-const signedOutAgent = computed(() => {
-  const reason = chatFailure.value?.reason
-  return reason === 'sign-in-expired' ||
-    reason === 'agent-unconfigured' ||
-    reason === 'authentication'
-    ? connectedAgent.value
-    : null
-})
-/** How to sign in to that agent, or what else it needs where it has no sign-in of its own. */
-const signedOutHelp = computed(() =>
-  signedOutAgent.value ? agentSignInHelp(signedOutAgent.value) : null
-)
+const { autoAgent, signedOutAgent, signedOutHelp } = useAgentNotices(providerID, chatFailure)
 /**
  * Sends the prompt written for this document on Home, its empty canvas, or this chat before AI
  * was set up, once it can go.
@@ -366,58 +358,6 @@ async function saveTrace(id: string) {
   }
 }
 
-/**
- * A Cloud that bills sells more credits; a self-hosted one has only the allowance its
- * administrator set, which renews or is raised.
- */
-function cloudCreditsMessage(resetsAt: string | undefined): string {
-  if (cloudBillingURL.value) return ai.value.chatCloudCreditsExhausted
-  if (!resetsAt) return ai.value.chatCloudAllowanceUsed
-  return ai.value.chatCloudAllowanceUsedUntil({ date: dates.format(resetsAt, 'dayTime') })
-}
-const failureMessage = computed(() => {
-  switch (chatFailure.value?.reason) {
-    case 'authentication':
-      return ai.value.chatAuthenticationFailed
-    case 'forbidden':
-      return ai.value.chatForbidden
-    case 'insufficient-credit':
-      return ai.value.chatInsufficientCredit
-    case 'cloud-credits-exhausted':
-      return cloudCreditsMessage(chatFailure.value.resetsAt)
-    case 'context-limit':
-      return ai.value.chatContextLimit
-    case 'model-not-found':
-      return ai.value.chatModelNotFound
-    case 'network':
-      return ai.value.chatNetworkFailed
-    case 'output-limit':
-      return ai.value.chatOutputLimit
-    case 'rate-limit':
-      return ai.value.chatRateLimited
-    case 'request-failed':
-      return ai.value.chatRequestFailed
-    case 'timeout':
-      return ai.value.chatProviderStalled
-    case 'agent-timeout':
-      return ai.value.chatAgentStartTimeout
-    case 'empty-reply':
-      return ai.value.chatEmptyReply
-    case 'sign-in-expired':
-      return ai.value.chatSignInExpired
-    case 'agent-unconfigured':
-      return null
-    case 'plan-forbidden':
-      return ai.value.chatPlanForbidden
-    default:
-      return null
-  }
-})
-const failureHasSettingsAction = computed(() =>
-  ['authentication', 'forbidden', 'model-not-found', 'sign-in-expired', 'plan-forbidden'].includes(
-    chatFailure.value?.reason ?? ''
-  )
-)
 const status = computed(() => chat.value?.status ?? 'ready')
 
 /**
@@ -467,55 +407,13 @@ const showContinue = computed(() => {
   return last.role === 'assistant' && didHitStepLimit()
 })
 
-// Asking again clears the failure, and its notice goes with it.
-let failureToast: number | null = null
-/** The message the last failure stopped, which Retry sends again. */
-let failedMessageId: string | undefined
-/** The notice outlives a switch to another tab, whose chat its Retry must not touch. */
-function retryFailed(messageId: string | undefined): void {
-  if (messageId && chat.value?.messages.at(-1)?.id === messageId) void submission.regenerate()
-}
-watch(
-  () => chatFailure.value?.reason,
-  (reason) => {
-    if (failureToast !== null) toast.remove(failureToast)
-    failureToast = null
-    if (!reason) return
-    const failedId = chat.value?.messages.at(-1)?.id
-    failedMessageId = failedId
-    // The chat column shows where to sign in to the agent itself.
-    if (signedOutAgent.value) return
-    failureToast = toast.error(
-      failureMessage.value ?? ai.value.chatRequestFailed,
-      failureAction(failedId)
-    )
-  }
-)
-/** Sends the message a signed-out agent refused again, once the person signed in. */
-function retrySignedOut(): void {
-  retryFailed(failedMessageId)
-}
-function failureAction(failedId: string | undefined): { label: string; run: () => void } {
-  const billingURL = cloudBillingURL.value
-  if (chatFailure.value?.reason === 'cloud-credits-exhausted' && billingURL) {
-    return { label: ai.value.manageCloudPlanAction, run: () => void openExternalLink(billingURL) }
-  }
-  if (chatFailure.value?.reason === 'context-limit') {
-    return {
-      label: ai.value.compactAndRetry,
-      run: () => {
-        // The failed request stays after the summary, so Retry sends it again.
-        void compaction.compact({ trigger: 'manual', before: failedId }).then((compacted) => {
-          if (compacted) retryFailed(failedId)
-          return undefined
-        })
-      }
-    }
-  }
-  return failureHasSettingsAction.value
-    ? { label: ai.value.openProviderSettingsAction, run: () => openSettingsDialog('ai') }
-    : { label: ai.value.retryRequest, run: () => retryFailed(failedId) }
-}
+const { retrySignedOut } = useFailureNotice({
+  chatFailure,
+  chat,
+  signedOutAgent,
+  compaction,
+  regenerate: () => submission.regenerate()
+})
 watch(
   () => [activeTab.value?.id, activeTab.value?.store.state.preparation] as const,
   async ([tabId, preparation], [previousTabId]) => {
@@ -631,6 +529,9 @@ function handleStop() {
         :queued="queued"
         :steers="!providerID.startsWith('acp:') && providerID !== 'harness:pi'"
         :compacting="compaction.compacting.value"
+        :reviewing="review.reviewing.value"
+        :reviews-actionable="reviewReady"
+        @fix-review="fixReview"
         @remove-queued="(id) => removeQueuedMessage(documentStore, id)"
         :nodes-live="!history.readOnly.value && !history.away.value"
         :interactive="

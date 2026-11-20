@@ -55,7 +55,10 @@ export function createStepCompaction(
   async function begin(sent: readonly UIMessage[], signal: AbortSignal | undefined) {
     const first = sent.at(0)
     limits = compactAutomatically.value
-      ? await unlessStopped(contextLimits().catch(() => null), signal)
+      ? await unlessStopped(
+          contextLimits().catch(() => null),
+          signal
+        )
       : null
     abortSignal = signal
     summaryFirst = first !== undefined && compactionOf(first) !== null

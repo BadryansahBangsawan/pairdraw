@@ -41,9 +41,19 @@ export function useComposerCompletions() {
   return [
     commandCompletion(() => {
       const agentId = acpAgentId()
-      if (agentId) return agentCommandCandidates(agentCommands.value[agentId] ?? [])
+      // `/review` asks the Review model whatever holds the chat, so it stands in for an agent's
+      // own command of that name.
+      const review = { name: 'review', description: ai.value.reviewCommand, hint: null }
+      if (agentId) {
+        const own = (agentCommands.value[agentId] ?? []).filter(({ name }) => name !== review.name)
+        return agentCommandCandidates([review, ...own])
+      }
       const compact = { name: 'compact', description: ai.value.compactCommand, hint: null }
-      return chatCommandCandidates([compact], enabledSkills.value, skillMessages.description)
+      return chatCommandCandidates(
+        [review, compact],
+        enabledSkills.value,
+        skillMessages.description
+      )
     }, sections),
     referenceCompletion((query) => {
       const store = getActiveEditorStoreOrNull()

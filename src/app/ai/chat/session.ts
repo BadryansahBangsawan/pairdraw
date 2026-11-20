@@ -16,7 +16,7 @@ import {
 import { notifyReplyEnded } from '@/app/ai/chat/notifications'
 import { chatProjectFolder } from '@/app/ai/chat/project-folder'
 import { hasSteeringMessage } from '@/app/ai/chat/queue'
-import SYSTEM_PROMPT from '@/app/ai/chat/system-prompt'
+import { systemPrompt } from '@/app/ai/chat/system-prompt'
 import { chatThinkingLevel } from '@/app/ai/chat/thinking'
 import { createAIModelRuntime, resolveModelConnectionAPIKey } from '@/app/ai/models'
 import { resolveLanguageModelID } from '@/app/ai/models/language-model'
@@ -230,7 +230,7 @@ export function createChatSessionManager({
           }),
           permissionMode: runtime.role.profile.harnessPermissionMode ?? 'allow-edits'
         },
-        instructions: SYSTEM_PROMPT,
+        instructions: systemPrompt(),
         mcpServers: await buildPiMCPServers(),
         skills: await harnessSkills()
       },

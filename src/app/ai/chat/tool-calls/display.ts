@@ -1,7 +1,10 @@
 import { getToolName, isToolUIPart } from 'ai'
 import type { UIDataTypes, UIMessagePart, UITools } from 'ai'
-import { isEmptyObject } from 'es-toolkit'
+import { isEmptyObject, uniqBy } from 'es-toolkit'
 import { isValid } from 'js-base64'
+import * as v from 'valibot'
+
+import { DESIGN_MEMORY_GROUPS, type DesignMemoryGroup } from '@pairdraw/scene-graph/design-memory'
 
 export type ChatMessagePart = UIMessagePart<UIDataTypes, UITools>
 export type ToolCallPart = Extract<ChatMessagePart, { toolCallId: string }>
@@ -92,6 +95,30 @@ export function toolErrorText(part: ToolCallPart): string | null {
   if (part.state !== 'output-available' || !isRecord(part.output)) return null
   const { error } = part.output
   return typeof error === 'string' ? error : null
+}
+
+const designRefusalSchema = v.object({
+  design_memory: v.object({
+    refused: v.array(
+      v.object({
+        group: v.picklist(DESIGN_MEMORY_GROUPS),
+        value: v.union([v.string(), v.number()])
+      })
+    )
+  })
+})
+
+/** The values the document's design memory refused in the call, each once, to offer to allow. */
+export function toolDesignRefusals(
+  part: ToolCallPart
+): { group: DesignMemoryGroup; value: string | number }[] {
+  if (part.state !== 'output-available') return []
+  const parsed = v.safeParse(designRefusalSchema, part.output)
+  if (!parsed.success) return []
+  return uniqBy(
+    parsed.output.design_memory.refused.map(({ group, value }) => ({ group, value })),
+    ({ group, value }) => `${group}:${value}`
+  )
 }
 
 /** An image the tool returned for the model, such as `export_image`, as a data URL. */

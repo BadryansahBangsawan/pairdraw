@@ -99,6 +99,7 @@ export const generateImage = defineTool({
   description:
     'Generate an image from a text prompt with the image service the user set up in Settings → Image services (BYOK). With id, the image fills that layer: it replaces the image the layer shows, or goes on top of its fills. Without id, it becomes a new rectangle layer at the image’s size (or the given width), beside the parent’s content unless x and y are given. It sends the prompt to that service with the user’s own key, costs them money, and takes a while, so call it only when the user asks for a generated image; prefer stock_photo for ordinary photography.',
   execution: { kind: 'async', mutation: 'document' },
+  content: 'imported',
   capabilities: ['document:write', 'network:access'],
   input: v.strictObject({
     prompt: promptInput('What the image shows, its style, and its mood, in English'),
@@ -163,6 +164,7 @@ export const generateSVG = defineTool({
   description:
     'Generate an illustration, icon, or logo mark from a text prompt as SVG with the vectorize service the user set up in Settings → Image services, and import it as editable vector layers, as import_svg does. The new frame goes beside the parent’s content unless x and y are given. It uses the user’s own key and takes a while, so call it only when the user asks for generated vector art; use insert_icon for standard icons.',
   execution: { kind: 'async', mutation: 'document' },
+  content: 'imported',
   capabilities: ['document:write', 'network:access'],
   input: v.strictObject({
     prompt: promptInput('What the artwork shows and its style, in English'),

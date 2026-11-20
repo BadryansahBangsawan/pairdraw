@@ -225,15 +225,15 @@ pairdraw eval design.fig -w -c 'pairdraw.setStatus(figma.currentPage.findOne(n =
 
 `pairdraw.getStatus(node)` reads one. Over MCP the same is `get_statuses` and `set_status`.
 
-A document can keep a design memory: the colors, fonts, font sizes, spacing and corner radii its designs may use (its own variables and styles plus values the person allowed), decisions written down about them, and frames pinned as examples. Read it before you design in the document. An edit that uses a color or font it does not allow is undone, and the error names the nearest allowed values; sizes, spacing and radii off its scale go through with a warning in the result. Only the person changes what it allows; you can record a decision and pin an example:
+A document can keep a design memory: the colors, fonts, font sizes, spacing and corner radii its designs may use (its own variables and styles plus values the person allowed), decisions written down about them, and frames pinned as examples. Read it before you design in the document. Through Pairdraw's agent surfaces (MCP, the app's chat and coding agents, `pairdraw agent`), an edit that brings in a color or font the memory does not allow is undone, and the error names the nearest allowed values; new sizes, spacing and radii off its scale go through with a warning in the result. A color you write is judged even when the document already uses it elsewhere; values kept on layers you duplicate, group, flatten or convert are not refused, and Pairdraw's defaults for new layers only warn, so give layers allowed colors rather than leaving the defaults. A variable or style you create, change or rescope is judged on every value it would let in, and the memory itself can only gain decisions and examples, so propose a new value with `record_design_decision` and let the person allow it:
 
 ```bash
-pairdraw eval design.fig -c 'pairdraw.designMemory'
+pairdraw design-memory design.fig
 pairdraw eval design.fig -c 'pairdraw.checkDesignValues({ colors: ["#FF00AA"], spacing: [13] })'
-pairdraw eval design.fig -w -c 'pairdraw.recordDesignDecision("Cards use 16 px padding.", figma.currentPage.findOne(n => n.name === "Card"))'
+pairdraw tool call record_design_decision design.fig --args '{"text": "Cards use 16 px padding."}' --write
 ```
 
-Over MCP the same is `get_design_memory`, `check_design_values`, and `record_design_decision`.
+Over MCP the same is `get_design_memory`, `check_design_values`, and `record_design_decision`. CLI commands such as `pairdraw tool call` and `pairdraw eval` count as the person running them: they only warn about values outside the memory, unless `pairdraw tool call --enforce-design-memory` asks to refuse.
 
 ### Diff
 

@@ -240,6 +240,14 @@ pairdraw eval [file] [options]
 | `--json` | | Output as JSON |
 | `--quiet` | `-q` | Suppress output |
 
+## design-memory
+
+Show the document's design memory: the colors, fonts, font sizes, spacing, and corner radii agents may use and how each is enforced, its decisions, and its examples. See [Analyzing Designs](/programmable/cli/analyzing#design-memory).
+
+```sh
+pairdraw design-memory [file] [--json]
+```
+
 ## analyze colors
 
 Analyze color palette usage across the document.
@@ -434,6 +442,7 @@ pairdraw tool call <name> [file] [options]
 |--------|-------|-------------|
 | `--args` | | Tool arguments as a JSON object |
 | `--args-file` | | Read arguments from a JSON file, or `-` for stdin |
+| `--enforce-design-memory` | | Fail the call and write nothing when it uses a color or font the document's design memory refuses; without it, such values are warnings in the result |
 | `--write` | `-w` | Headless: write changes back to the input file |
 | `--output` | `-o` | Headless: write changes to a different file |
 | `--preview-output` | | Write a PNG of the current page after the tool changes the document |

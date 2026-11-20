@@ -46,7 +46,19 @@ export function executeAtomicTool(
   figma: FigmaAPI,
   def: ToolDef,
   args: Record<string, unknown>,
-  options: { signal?: AbortSignal; isLive?: () => boolean; label?: string } = {}
+  options: {
+    signal?: AbortSignal
+    isLive?: () => boolean
+    label?: string
+    /**
+     * Judges the layer fields the call changed once it ran; an error it returns undoes the call
+     * and is thrown, as the document's design memory refuses an agent's off-system values.
+     */
+    verify?: (
+      nodes: readonly FieldChanges<SceneNode>[],
+      variables: readonly FieldChanges<Variable>[]
+    ) => Error | null
+  } = {}
 ): unknown {
   if (!isAtomicTool(def)) throw new Error(`Not an atomic tool: ${def.name}`)
   if (!resolveEditorProfile(editor.state).edits) throw new ReadOnlyDocumentError()
@@ -112,6 +124,7 @@ export function executeAtomicTool(
     )
     // Layout may change other layers too.
     const nodeChanges = changes(checkpoint.changedNodes(), graph.nodes, nodeCount)
+    rejectRefused(options.verify, nodeChanges, variableChanges)
     const contentChanged =
       variableChanges.length > 0 ||
       nodeChanges.some((change) => Object.keys(change.after).some((key) => key !== 'source'))
@@ -132,6 +145,21 @@ export function executeAtomicTool(
   } finally {
     checkpoint.release()
   }
+}
+
+/** Throws the error `verify` judges the changes with, which undoes the call. */
+function rejectRefused(
+  verify:
+    | ((
+        nodes: readonly FieldChanges<SceneNode>[],
+        variables: readonly FieldChanges<Variable>[]
+      ) => Error | null)
+    | undefined,
+  nodes: readonly FieldChanges<SceneNode>[],
+  variables: readonly FieldChanges<Variable>[]
+): void {
+  const refusal = verify ? verify(nodes, variables) : null
+  if (refusal) throw refusal
 }
 
 function layout(

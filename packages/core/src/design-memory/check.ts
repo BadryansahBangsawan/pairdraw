@@ -139,8 +139,8 @@ const keyOf = (value: DesignValue | SystemValue) => designValueKey(value.group, 
 
 /**
  * The values an edit brought to a layer: on a layer it created, all of them; on one it changed,
- * those in the fields it changed that the field did not hold before, so moving or renaming an
- * old layer judges nothing. A layer inside an instance shows its component's values, so only
+ * those in the fields it changed that the same field did not hold before, as a value that is
+ * judged in full, so moving or renaming an old layer judges nothing. A layer inside an instance shows its component's values, so only
  * the fields it overrides are its own.
  */
 function editedValues(
@@ -155,8 +155,11 @@ function editedValues(
   if (change) {
     const changed = new Set(Object.keys(change.after))
     values = values.filter((value) => changed.has(String(value.field)))
-    const previous = new Set(designValues({ ...node, ...change.before }).map(keyOf))
-    values = values.filter((value) => !previous.has(keyOf(value)))
+    // Held before means in the same field and as solid a value: a shadow or gradient stop that
+    // only warned never vouches for a fill or stroke of the same color.
+    const heldKey = (value: DesignValue) => `${String(value.field)}|${copiedValueKey(value)}`
+    const previous = new Set(designValues({ ...node, ...change.before }).map(heldKey))
+    values = values.filter((value) => !previous.has(heldKey(value)))
   }
   return values
 }

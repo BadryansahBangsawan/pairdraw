@@ -1,3 +1,4 @@
+import type { DesignMemoryMode } from '@pairdraw/core/design-memory'
 import type { FigmaAPI } from '@pairdraw/core/figma-api'
 import { ALL_TOOLS, registerComponentCatalog, isToolExposed } from '@pairdraw/core/tools'
 
@@ -34,7 +35,7 @@ export function createAutomationToolHandler(
     // A call from an MCP session shows as that session's agent, working where the call works.
     const session = readAgentSession((args as { agent?: unknown }).agent)
     const reply = session ? agentStarted(target.store, session, target.pageId) : 0
-    const response = await runTool(target, toolName, toolArgs, session)
+    const response = await runTool(target, toolName, toolArgs, session, designMemoryMode(args))
     if (session) {
       agentFinished(target.store, session, {
         reply,
@@ -44,6 +45,14 @@ export function createAutomationToolHandler(
       })
     }
     return toolReply(response.result)
+  }
+
+  /**
+   * How the design memory answers a call. Agents are refused; only the CLI, which a person runs,
+   * asks for `warn` beside the call. MCP clients cannot: the server builds that part of the call.
+   */
+  function designMemoryMode(args: unknown): DesignMemoryMode {
+    return (args as { designMemory?: unknown }).designMemory === 'warn' ? 'warn' : 'refuse'
   }
 
   /**
@@ -60,7 +69,8 @@ export function createAutomationToolHandler(
     target: AutomationTarget,
     toolName: string,
     toolArgs: Record<string, unknown>,
-    session: AgentSession | null
+    session: AgentSession | null,
+    designMemory: DesignMemoryMode
   ): Promise<{ result: unknown; edited: boolean }> {
     const def = ALL_TOOLS.find((t) => t.name === toolName && isToolExposed(t, 'mcp'))
     if (!def) throw new Error(`Unknown tool: ${toolName}`)
@@ -74,7 +84,8 @@ export function createAutomationToolHandler(
       figma,
       def,
       args: toolArgs,
-      reply: replyOf(target, session)
+      reply: replyOf(target, session),
+      designMemory
     })
     // `runEditorTool` shows the edit on the canvas.
     if (def.mutates) store.requestRender()

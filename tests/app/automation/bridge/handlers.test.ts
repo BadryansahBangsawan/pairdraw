@@ -5,6 +5,7 @@ import { toRaw } from 'vue'
 
 import { createDocumentGraph } from '@pairdraw/core'
 import * as layoutModule from '@pairdraw/core/layout'
+import { allowDesignValue, createDesignMemory } from '@pairdraw/scene-graph/design-memory'
 
 import { endAgentSession } from '@/app/automation/agents'
 import { makeFigmaFromStore } from '@/app/automation/bridge/figma-factory'
@@ -288,6 +289,26 @@ describe('undo and redo', () => {
     expect(graph.getNode(card.id)?.name).toBe('Renamed')
     expect(graph.getPages().map((page) => page.name)).toEqual(['Page 1', 'Renamed page', 'Added'])
     expect(graph.variables.size).toBe(1)
+  })
+
+  test("the CLI's eval keeps what breaks the design memory and warns about it", async () => {
+    const tab = createTab()
+    tab.store.setDesignMemory(allowDesignValue(createDesignMemory(), 'colors', '#1A73E8'))
+    const response = await request('eval', {
+      document_id: tab.id,
+      code: `
+        const card = figma.createRectangle()
+        card.name = 'Hot'
+        card.fills = [{ type: 'SOLID', color: { r: 0, g: 1, b: 0.5 } }]
+      `
+    })
+    expect(response).toMatchObject({
+      ok: true,
+      designMemory: { warnings: expect.stringContaining('#00FF80') }
+    })
+    expect(
+      tab.store.graph.getChildren(tab.store.state.currentPageId).map(({ name }) => name)
+    ).toContain('Hot')
   })
 
   test('a read-only eval leaves the history unchanged', async () => {

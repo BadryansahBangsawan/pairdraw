@@ -12,7 +12,8 @@ import { findCLITool } from '#cli/session/tools'
 import {
   loadHeadlessToolDocument,
   runHeadlessTool,
-  type HeadlessToolDocument
+  type HeadlessToolDocument,
+  type HeadlessToolOptions
 } from '#cli/tool-data'
 
 /**
@@ -51,14 +52,15 @@ export async function headlessPreview(
  */
 export async function openHeadlessSession(
   file: string,
-  pageArgs: PageCLIArgs = {}
+  pageArgs: PageCLIArgs = {},
+  options: HeadlessToolOptions = {}
 ): Promise<ToolSession> {
   const headless = await loadHeadlessToolDocument(file, pageArgs)
   const { graph } = headless
   return {
     label: basename(file),
     graph,
-    call: (def, args) => runHeadlessTool(headless, def, args),
+    call: (def, args) => runHeadlessTool(headless, def, args, options),
     preview: (scale) => headlessPreview(headless, scale),
     async save(path) {
       if (!path) throw new Error('A headless document needs a path to save to')
@@ -68,13 +70,20 @@ export async function openHeadlessSession(
   }
 }
 
-/** Sends each call to the document the running app has open, or the one `target` names. */
-async function openAppSession(target: PageCLIArgs = {}): Promise<ToolSession> {
+/**
+ * Sends each call to the document the running app has open, or the one `target` names. A
+ * person runs the CLI, so the app's design memory only warns unless `options` asks to refuse.
+ */
+async function openAppSession(
+  target: PageCLIArgs = {},
+  options: HeadlessToolOptions = {}
+): Promise<ToolSession> {
   const targetArgs = await appPageTargetRPCArgs(target)
+  const designMemory = options.designMemory ?? 'warn'
   return {
     label: 'app',
     graph: null,
-    call: (def, args) => rpc('tool', { ...targetArgs, name: def.name, args }),
+    call: (def, args) => rpc('tool', { ...targetArgs, name: def.name, args, designMemory }),
     preview: (scale) => appPreview(targetArgs, scale),
     async save(path) {
       // The app resolves paths against its own working directory, so send an absolute one.
@@ -86,7 +95,8 @@ async function openAppSession(target: PageCLIArgs = {}): Promise<ToolSession> {
 /** A headless session for `file`, or an app session when no file is given. */
 export function openToolSession(
   file: string | undefined,
-  target: PageCLIArgs = {}
+  target: PageCLIArgs = {},
+  options: HeadlessToolOptions = {}
 ): Promise<ToolSession> {
-  return file ? openHeadlessSession(file, target) : openAppSession(target)
+  return file ? openHeadlessSession(file, target, options) : openAppSession(target, options)
 }

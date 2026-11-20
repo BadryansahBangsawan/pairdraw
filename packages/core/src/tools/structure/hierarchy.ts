@@ -26,6 +26,7 @@ export const groupNodes = defineTool({
 
   description: 'Group selected nodes.',
   execution: { kind: 'sync', mutation: 'document' },
+  content: 'copied',
   input: v.strictObject({
     ids: v.pipe(v.array(v.string()), v.minLength(2), v.description('Node IDs to group'))
   }),
@@ -43,6 +44,7 @@ export const ungroupNode = defineTool({
 
   description: 'Ungroup a group node.',
   execution: { kind: 'sync', mutation: 'document' },
+  content: 'copied',
   input: v.strictObject({
     id: v.pipe(v.string(), v.description('Group node ID'))
   }),
@@ -59,6 +61,7 @@ export const flattenNodes = defineTool({
 
   description: 'Flatten nodes into a single vector.',
   execution: { kind: 'sync', mutation: 'document' },
+  content: 'copied',
   input: v.strictObject({
     ids: v.pipe(v.array(v.string()), v.minLength(1), v.description('Node IDs to flatten'))
   }),
@@ -74,6 +77,7 @@ export const nodeToComponent = defineTool({
 
   description: 'Convert one or more frames/groups into components.',
   execution: { kind: 'sync', mutation: 'document' },
+  content: 'copied',
   input: v.strictObject({
     ids: v.pipe(v.array(v.string()), v.minLength(1), v.description('Node IDs to convert'))
   }),

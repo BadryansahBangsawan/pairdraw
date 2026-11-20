@@ -1,3 +1,4 @@
+import type { RecordEditOptions } from '@pairdraw/core'
 import type { FigmaAPI } from '@pairdraw/core/figma-api'
 
 import { createMutex } from '@/app/ai/tools/mutex'
@@ -68,12 +69,13 @@ export async function executeWithDocumentUndo<T>(
   store: EditorStore,
   pageId: string,
   label: string,
-  run: () => Promise<T>
+  run: () => Promise<T>,
+  verify?: RecordEditOptions['verify']
 ): Promise<T> {
   const release = await acquireDocumentEdit(store)
   try {
     return await store.recordEditAsync(
-      { label, pageId, rollbackOnThrow: true, canRollBack: noOutsideWritesSince(store) },
+      { label, pageId, rollbackOnThrow: true, canRollBack: noOutsideWritesSince(store), verify },
       run
     )
   } finally {

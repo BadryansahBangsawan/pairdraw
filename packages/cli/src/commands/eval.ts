@@ -2,13 +2,16 @@ import { resolve } from 'node:path'
 import { format } from 'node:util'
 
 import { defineCommand } from 'citty'
+import * as v from 'valibot'
 
+import { recordDocumentChange } from '@pairdraw/core'
+import { createDesignGuard } from '@pairdraw/core/design-memory'
 import { flushPendingLayout } from '@pairdraw/core/figma-api'
 import { compileScript } from '@pairdraw/core/tools'
 
-import { isAppMode, requireFile, rpc } from '#cli/app/client'
+import { isAppMode, requireFile, rpcResponse } from '#cli/app/client'
 import { appPageTargetRPCArgs, pageOptions } from '#cli/app/target'
-import { printError, writeStdout } from '#cli/format'
+import { printError, warn, writeStdout } from '#cli/format'
 import { documentWriteOptions, editDocument, writeDocumentFile } from '#cli/headless'
 import { requireOutputDirectory } from '#cli/options'
 import { headlessPreview } from '#cli/session/open'
@@ -51,6 +54,14 @@ function serializeResult(value: unknown): unknown {
 
 function reportPreview(notice: string, args: { quiet?: boolean; json?: boolean }) {
   if (!args.quiet && !args.json) console.error(notice)
+}
+
+const designMemoryReportSchema = v.object({ designMemory: v.object({ warnings: v.string() }) })
+
+/** Tells the person what the script brought in that the document's design memory warns about. */
+function reportDesignMemory(response: unknown): void {
+  const parsed = v.safeParse(designMemoryReportSchema, response)
+  if (parsed.success) console.error(warn(parsed.output.designMemory.warnings))
 }
 
 export default defineCommand({
@@ -96,7 +107,9 @@ export default defineCommand({
 
     if (isAppMode(args.file)) {
       const target = await appPageTargetRPCArgs(args)
-      const result = await rpc('eval', { code, ...target })
+      const response = await rpcResponse('eval', { code, ...target })
+      const result = response.result
+      reportDesignMemory(response)
       if (!args.quiet && result !== undefined && result !== null) {
         await printResult(result, !!args.json)
       }
@@ -109,9 +122,15 @@ export default defineCommand({
     const { graph, figma } = await openHeadlessFigma(file, args)
 
     let result: unknown
+    // A person runs eval, so the design memory warns about what the script brought in.
+    const guard = createDesignGuard(graph, { mode: 'warn' })
+    const recorder = recordDocumentChange(graph, figma.currentPageId)
     try {
       result = await withStreamedLog(() => editDocument(graph, () => compileScript(code)(figma)))
+      guard.verifyChange(recorder.finish())
+      reportDesignMemory({ designMemory: guard.report() })
     } catch (err) {
+      recorder.finish()
       printError(err instanceof Error ? err.message : String(err))
       // Exiting at once would drop what the script logged that stdout has not taken yet.
       process.exitCode = 1

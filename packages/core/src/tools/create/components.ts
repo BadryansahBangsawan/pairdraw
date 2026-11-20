@@ -9,6 +9,7 @@ export const createComponent = defineTool({
 
   description: 'Convert a frame/group into a component.',
   execution: { kind: 'sync', mutation: 'document' },
+  content: 'copied',
   input: v.strictObject({
     id: v.pipe(v.string(), v.description('Node ID to convert'))
   }),
@@ -25,6 +26,7 @@ export const createInstance = defineTool({
 
   description: 'Create an instance of a component.',
   execution: { kind: 'sync', mutation: 'document' },
+  content: 'copied',
   input: v.strictObject({
     component_id: v.pipe(v.string(), v.description('Component node ID')),
     x: v.optional(toolNumber(v.pipe(v.number(), v.description('X position')))),
@@ -48,6 +50,7 @@ export const combineAsVariants = defineTool({
     'as Figma names variants, "State=On, Size=Large", get those variant properties; names like ' +
     '"Button/Primary" derive a Variant property from the segments after the first slash.',
   execution: { kind: 'sync', mutation: 'document' },
+  content: 'copied',
   input: v.strictObject({
     ids: v.pipe(v.array(v.string()), v.minLength(1), v.description('Component node IDs to combine'))
   }),
@@ -112,6 +115,7 @@ export const detachInstance = defineTool({
   description:
     'Detach instances into plain frames, keeping their children, overrides, and position.',
   execution: { kind: 'sync', mutation: 'document' },
+  content: 'copied',
   input: v.strictObject({
     ids: v.pipe(v.array(v.string()), v.minLength(1), v.description('Instance node IDs to detach'))
   }),

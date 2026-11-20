@@ -1,6 +1,7 @@
 import agent from './agent'
 import analyze from './analyze'
 import convert from './convert'
+import designMemory from './design-memory'
 import diff from './diff'
 import documents from './documents'
 import evalCmd from './eval'
@@ -33,6 +34,7 @@ export const COMMANDS = {
   agent,
   analyze,
   convert,
+  'design-memory': designMemory,
   diff,
   documents,
   eval: evalCmd,

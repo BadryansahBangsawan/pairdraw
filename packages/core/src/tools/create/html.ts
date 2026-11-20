@@ -18,6 +18,7 @@ export const importHTML = defineTool({
   description:
     'Import HTML and CSS as editable layers in the open document, styled as a browser styles them: flex and grid become auto layout, and text, fills, borders, radii, shadows, and images carry over. <style> blocks in the HTML apply; css adds a stylesheet; tailwind compiles the Tailwind classes the markup uses. Without x and y the layers go to the right of what the parent already holds. Returns the ids of the top-level layers.',
   execution: { kind: 'async', mutation: 'document' },
+  content: 'imported',
   input: v.strictObject({
     html: v.pipe(
       v.string(),

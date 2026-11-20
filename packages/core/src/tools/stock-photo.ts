@@ -17,6 +17,7 @@ export const stockPhoto = defineTool({
     'Pass a JSON array; each item is {id, query, index?, orientation?}. ' +
     'Containers with content, text, lines, and structural nodes are rejected.',
   execution: { kind: 'async', mutation: 'document' },
+  content: 'imported',
   capabilities: ['document:write', 'network:access'],
   input: v.strictObject({
     requests: v.pipe(

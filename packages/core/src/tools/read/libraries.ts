@@ -49,6 +49,7 @@ export const insertLibraryComponent = defineTool({
     'Insert a reusable component from an enabled library by stable library and asset identity.',
 
   execution: { kind: 'async', mutation: 'document' },
+  content: 'imported',
   input: v.strictObject({
     library_id: v.pipe(v.string(), v.description('Library ID')),
     revision_id: v.optional(v.pipe(v.string(), v.description('Pinned revision ID'))),

@@ -47,7 +47,9 @@ function usageParagraph(enabled: (name: string) => boolean, policy: ToolPolicy):
       'Check visual changes with export_image.',
     undo && `${enabled('redo') ? 'undo and redo step' : 'undo steps'} back only your own changes.`,
     enabled('get_codegen_prompt') &&
-      'Call get_codegen_prompt before turning a design into frontend code.'
+      'Call get_codegen_prompt before turning a design into frontend code.',
+    enabled('get_design_memory') &&
+      'Call get_design_memory before designing in a document: an edit with a color or font its design memory does not allow is undone, and the error names the allowed values to use instead.'
   ]).join(' ')
 }
 

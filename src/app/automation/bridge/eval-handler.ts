@@ -1,3 +1,4 @@
+import { createDesignGuard } from '@pairdraw/core/design-memory'
 import type { FigmaAPI } from '@pairdraw/core/figma-api'
 import { compileScript } from '@pairdraw/core/tools'
 
@@ -13,6 +14,9 @@ export function createAutomationEvalHandler(makeFigma: FigmaFactory) {
     if (!code) throw new Error('Missing "code" in args')
     const figma = makeFigma(target.store, target.pageId)
     const run = compileScript(code)
+    // A person runs `pairdraw eval`, so the design memory warns about what the script brought in
+    // rather than undoing it.
+    const guard = createDesignGuard(target.store.graph, { mode: 'warn' })
     const result = await executeWithDocumentUndo(
       target.store,
       target.pageId,
@@ -26,9 +30,13 @@ export function createAutomationEvalHandler(makeFigma: FigmaFactory) {
             if (page)
               await ensureGraphFonts(target.store.graph, page.childIds, target.store.renderer)
           }
-        )
+        ),
+      guard.verifyChange
     )
     target.store.requestRender()
-    return { ok: true, result: result ?? null }
+    const designMemory = guard.report()
+    return designMemory
+      ? { ok: true, result: result ?? null, designMemory }
+      : { ok: true, result: result ?? null }
   }
 }

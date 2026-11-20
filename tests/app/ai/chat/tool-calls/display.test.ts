@@ -5,6 +5,7 @@ import { fromUint8Array } from 'js-base64'
 import {
   displayedToolOutput,
   groupMessageParts,
+  toolDesignRefusals,
   toolErrorText,
   toolHasInput,
   toolImage,
@@ -153,5 +154,29 @@ describe('toolHasInput', () => {
     expect(toolHasInput(call({ type: 'tool-get_node', input: { id: '1:2' } }))).toBe(true)
     expect(toolHasInput(call({ type: 'tool-get_selection', input: {} }))).toBe(false)
     expect(toolHasInput(call({ type: 'tool-get_selection', input: undefined }))).toBe(false)
+  })
+
+  test('lists the values a design memory refused, each once, to offer to allow', () => {
+    const refused = call({
+      type: 'tool-set_fill',
+      state: 'output-available',
+      output: {
+        error: 'Refused by the document’s design memory',
+        design_memory: {
+          refused: [
+            { group: 'colors', value: '#FF00AA', nodeId: '1:2' },
+            { group: 'colors', value: '#FF00AA', nodeId: '1:3' },
+            { group: 'fonts', value: 'Papyrus', nodeId: '1:4' }
+          ]
+        }
+      }
+    })
+    expect(toolDesignRefusals(refused)).toEqual([
+      { group: 'colors', value: '#FF00AA' },
+      { group: 'fonts', value: 'Papyrus' }
+    ])
+    expect(
+      toolDesignRefusals(call({ type: 'tool-x', state: 'output-available', output: { ok: true } }))
+    ).toEqual([])
   })
 })

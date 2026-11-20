@@ -47,6 +47,14 @@ interface ToolMetadata {
   exposure: ToolExposure
   capabilities: readonly ToolCapability[]
   availability: 'default' | 'eval'
+  /**
+   * What a call's values come from, for the document's design memory:
+   * - `imported`: outside content, such as a web page, an SVG, a photo or a library component,
+   *   whose colors and type are its own, so the memory warns about them rather than refusing;
+   * - `copied`: the layers the call names, which it copies or converts with their values, such
+   *   as a clone, a group or a boolean, so values those layers already had are not new.
+   */
+  content?: 'imported' | 'copied'
 }
 
 export interface ToolDef extends ToolMetadata {

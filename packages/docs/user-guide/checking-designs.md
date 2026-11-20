@@ -48,3 +48,21 @@ The settings menu in the Lint panel switches between rule presets:
 Turn off a single rule from its group's menu. **Turn on turned-off rules** in the settings menu brings them back. Presets and turned-off rules are saved between sessions.
 
 The same rules run from the command line with `pairdraw lint`; see [Inspecting Files](/programmable/cli/inspecting).
+
+## Design Memory
+
+A design memory keeps a document's design rules for the agents that work in it: the colors, fonts, font sizes, spacing, and corner radii they may use, decisions written down about them, and frames pinned as examples to follow. With nothing selected, the **Design memory** section of the Design panel shows what it holds; **Create from this document** starts one that allows the document's variables and styles and proposes the values its pages use most.
+
+In the dialog, each group can include the document's variables and styles, add values of its own, and choose what happens when an agent uses another value:
+
+- **Undo the edit** — the agent's edit is put back and it is told the nearest allowed values, so it tries again. Colors and fonts start here.
+- **Warn** — the edit goes through and the agent is told which values are off. Font sizes, spacing, and radii start here, since they have real exceptions such as hairlines.
+- **Off** — the group is not checked.
+
+Your own edits are never undone. Values outside the memory show in the Lint panel, whoever made them, with a fix to the nearest allowed value and **Allow**, which adds the value to the memory. An edit an agent had undone shows the same **Allow** in the chat.
+
+Agents are judged on the values they write: a color or font outside the memory is undone even when your layers already use it. Duplicating, grouping, flattening, or converting layers that already exist keeps their values, and the colors Pairdraw gives a new layer by default only warn. A variable or style an agent creates, changes, or rescopes is judged on every value it would then let in, and an agent cannot change, switch off, or remove the memory itself.
+
+With a frame selected, the **Design memory** section learns values from it and pins it as an example. Agents read the memory in the chat, through MCP with `get_design_memory`, and from the command line with `pairdraw design-memory`; they can write decisions down and pin examples. This covers agents working through Pairdraw's chat, MCP server, and `pairdraw agent`. A program that writes through CLI commands such as `pairdraw tool call` or `pairdraw eval` counts as you and is only warned.
+
+The memory is kept in `.fig` files. Saving as `.pen` drops it, as Pencil.dev has no place for it.

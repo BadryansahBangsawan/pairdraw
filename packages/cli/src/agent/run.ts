@@ -174,7 +174,8 @@ export async function runAgent(options: AgentRunOptions): Promise<AgentRunResult
   const maxSteps = assertMaxSteps(parsed.maxSteps)
   const profiles = resolveAgentProfiles(parsed.agents)
   const root = await realpath(resolveAgentRoot(parsed.root))
-  const session = await openHeadlessSession(resolve(parsed.file))
+  // The model edits, so the design memory refuses its off-system values as the app's does.
+  const session = await openHeadlessSession(resolve(parsed.file), {}, { designMemory: 'refuse' })
   if (!session.graph) throw new Error('The headless agent needs a document file')
   const figma = await createHeadlessFigma(session.graph)
   const offered = agentToolDefinitions({

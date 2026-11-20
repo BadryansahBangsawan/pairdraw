@@ -38,7 +38,9 @@ export { createDefaultEditorState, createEditor } from './create'
 export { syncEditedComponents } from './component-sync'
 export { executeAtomicTool } from './history/atomic-tool'
 export {
+  applyDocumentChange,
   isEmptyDocumentChange,
+  recordDocumentChange,
   touchedTopLevelIds,
   type DocumentChange
 } from './history/document-change'

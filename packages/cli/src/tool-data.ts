@@ -1,3 +1,9 @@
+import { applyDocumentChange, recordDocumentChange } from '@pairdraw/core'
+import {
+  createDesignGuard,
+  DesignMemoryRefusalError,
+  type DesignMemoryMode
+} from '@pairdraw/core/design-memory'
 import { FigmaAPI } from '@pairdraw/core/figma-api'
 import { pendingFigPageOfNode } from '@pairdraw/core/io/formats/fig'
 import { headlessHTMLStyler } from '@pairdraw/core/io/formats/html/import'
@@ -82,14 +88,48 @@ export async function loadHeadlessToolDocument(
   return openHeadlessFigma(file, pageArgs)
 }
 
-/** Runs `tool` on a headless document: loads its fonts, then sizes the text it changes. */
+/**
+ * How a headless call answers to the document's design memory. A person's call, from `tool
+ * call`, `shell` or `eval`, is only warned unless they ask for enforcement; `pairdraw agent` runs
+ * an agent, whose off-system edit is refused and put back.
+ */
+export interface HeadlessToolOptions {
+  designMemory?: DesignMemoryMode
+}
+
+/**
+ * Runs `tool` on a headless document: loads its fonts, then sizes the text it changes. What it
+ * changed answers to the document's design memory: a refused edit is put back and the call
+ * answers with the refusal, as the app answers an agent; a warned one carries its warnings.
+ */
 export async function runHeadlessTool(
   headless: HeadlessToolDocument,
   tool: ToolDef,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
+  options: HeadlessToolOptions = {}
 ): Promise<unknown> {
   await tool.loadFonts(headless.figma, args)
-  return editDocument(headless.graph, () => tool.execute(headless.figma, args))
+  const { graph, figma } = headless
+  const recorder = tool.mutates ? recordDocumentChange(graph, figma.currentPageId) : null
+  const guard = createDesignGuard(graph, {
+    content: tool.content,
+    args,
+    mode: options.designMemory ?? 'warn'
+  })
+  let result: unknown
+  try {
+    result = await editDocument(graph, () => tool.execute(figma, args))
+  } catch (error) {
+    recorder?.finish()
+    throw error
+  }
+  const change = recorder?.finish()
+  const refusal = change ? guard.verifyChange(change) : null
+  if (change && refusal instanceof DesignMemoryRefusalError) {
+    applyDocumentChange(graph, change, 'before')
+    return refusal.toResult()
+  }
+  return guard.annotate(result)
 }
 
 /**
@@ -105,7 +145,11 @@ export async function runToolData(
 ): Promise<{ result: unknown; graph: SceneGraph | null }> {
   if (isAppMode(file)) {
     const target = await appPageTargetRPCArgs(targetArgs)
-    return { result: await rpc('tool', { ...target, name, args }), graph: null }
+    // A person runs these commands, so the design memory only warns.
+    return {
+      result: await rpc('tool', { ...target, name, args, designMemory: 'warn' }),
+      graph: null
+    }
   }
   const tool = ALL_TOOLS.find((candidate) => candidate.name === name)
   if (!tool) throw new Error(`Unknown tool: ${name}`)

@@ -107,6 +107,11 @@ const call = defineCommand({
       type: 'string',
       description: 'Read tool arguments from a JSON file, or - for stdin'
     },
+    'enforce-design-memory': {
+      type: 'boolean',
+      description:
+        "Fail the call, and write nothing, when it uses a color or font the document's design memory refuses (warned by default)"
+    },
     ...documentWriteOptions,
     ...previewOptions,
     ...pageOptions('current page'),
@@ -122,7 +127,9 @@ const call = defineCommand({
       const scale = previewScale(args['preview-scale'])
       const def = findCLITool(args.name)
       const toolArgs = await readToolArgs(args)
-      const session = await openToolSession(args.file, args)
+      const session = await openToolSession(args.file, args, {
+        designMemory: args['enforce-design-memory'] ? 'refuse' : 'warn'
+      })
       const result = await session.call(def, toolArgs)
       if (args.json) await printJSON(result)
       else await writeStdout(`${formatToolResult(result)}\n`)

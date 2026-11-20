@@ -1,5 +1,6 @@
 mod agents;
 mod credentials;
+mod explicit_sync;
 mod files;
 mod fonts;
 mod icons;
@@ -27,6 +28,11 @@ use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Before anything starts GTK or EGL, which read the variable once: WebKitGTK before 2.54.2
+    // crashes on Wayland with NVIDIA otherwise (`explicit_sync`).
+    #[cfg(target_os = "linux")]
+    explicit_sync::disable_nvidia_explicit_sync();
+
     let _ = fix_path_env::fix();
     agents::path::augment_process_path();
 
@@ -213,9 +219,7 @@ pub fn run() {
                 label,
                 event: tauri::WindowEvent::Focused(true),
                 ..
-            } if system::window::is_editor_label(&label) => {
-                menu::handle_window_focus(_app, &label)
-            }
+            } if system::window::is_editor_label(&label) => menu::handle_window_focus(_app, &label),
             tauri::RunEvent::WindowEvent {
                 label,
                 event: tauri::WindowEvent::Destroyed,

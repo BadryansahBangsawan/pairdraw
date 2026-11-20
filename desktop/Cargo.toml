@@ -71,6 +71,10 @@ objc2-web-kit = "0.3.2"
 objc2-core-foundation = { version = "0.3.2", default-features = false, features = ["std", "CFArray", "CFBase", "CFDictionary", "CFSet", "CFString", "CFURL"] }
 objc2-core-text = { version = "0.3.2", default-features = false, features = ["std", "CTFontDescriptor"] }
 
+# Tauri's own copy, to read the WebKitGTK version before the webview starts (`explicit_sync`).
+[target.'cfg(target_os = "linux")'.dependencies]
+webkit2gtk-sys = "2"
+
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
 tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
 

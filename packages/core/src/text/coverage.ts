@@ -3,6 +3,7 @@ import type { SceneNode } from '@pairdraw/scene-graph'
 import { DEFAULT_FONT_FAMILY } from '#core/constants'
 import {
   ARABIC_CHARACTER,
+  CJK_CHARACTER,
   cjkFallbackScriptForLanguage,
   DEVANAGARI_CHARACTER,
   fontFallbackScriptForCharacter,
@@ -17,8 +18,6 @@ import {
 } from '#core/text/fallbacks'
 import { fontGlyphCoverageSync } from '#core/text/font/glyphs'
 import { textFontFace } from '#core/text/requirements/collect'
-
-const CJK_CHAR_RE = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u
 
 function scriptCharRegex(script: FontFallbackScript): RegExp {
   switch (script) {
@@ -44,7 +43,7 @@ function scriptCharRegex(script: FontFallbackScript): RegExp {
 export function textHasFallbackScript(text: string): boolean {
   return (
     LETTER_FALLBACK_SCRIPTS.some((script) => scriptCharRegex(script).test(text)) ||
-    CJK_CHAR_RE.test(text)
+    CJK_CHARACTER.test(text)
   )
 }
 
@@ -108,7 +107,7 @@ export function textNeededFallbackScripts(node: SceneNode): FontFallbackScript[]
   let missingTraditionalIdeograph = false
   let index = 0
   for (const char of node.text) {
-    if (CJK_CHAR_RE.test(char)) {
+    if (CJK_CHARACTER.test(char)) {
       const { family, style, language } = styleForCharacter(node, index)
       if (fontGlyphCoverageSync(family, style, char) === 'missing') {
         if (HAN_CHARACTER.test(char)) {

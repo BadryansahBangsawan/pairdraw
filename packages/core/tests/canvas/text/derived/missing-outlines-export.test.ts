@@ -37,8 +37,11 @@ beforeAll(async () => {
 })
 
 afterAll(() => {
-  fontManager.detachProvider(provider)
-  provider.delete()
+  // The export's shaping shared this provider and released it, deleting it with its last share.
+  if (!provider.isDeleted()) {
+    fontManager.detachProvider(provider)
+    provider.delete()
+  }
 })
 
 test('saves text whose glyphs have no outlines without derived text', async () => {

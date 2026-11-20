@@ -4,3 +4,4 @@
 - The Typography and Fill sections show the style a text's characters are drawn in and style every character when changed, as Figma's node setters do, so a range no longer hides a new size or colour; font-axis edits keep the other axes a range sets.
 - A `.pen` document's bundled fonts are read, so its text draws in them instead of being substituted, and `.fig` exports name the real family and style, such as Geist SemiBold.
 - `figma.listAvailableFontsAsync()` lists every style of installed and bundled families, and of online families once a font of theirs is loaded, instead of only Regular; in the CLI and the MCP server it lists the bundled and online families instead of none.
+- The first Chinese, Japanese, or Korean text loads only the system fonts its characters need, keeps one copy of each face shared by every canvas, and no longer registers fallback faces as browser fonts, using hundreds of megabytes less memory.

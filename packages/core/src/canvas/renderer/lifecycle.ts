@@ -65,11 +65,8 @@ export function destroyRenderer(r: SkiaRenderer): void {
   const fontProvider = r.fontProvider
   r.fontProvider = null
   r.fontsLoaded = false
-  // Only its own provider: a renderer that never loaded fonts leaves the others' attached.
-  if (fontProvider) {
-    fontManager.detachProvider(fontProvider)
-    fontProvider.delete()
-  }
+  // Only its own share: a renderer that never loaded fonts leaves the others' provider alone.
+  if (fontProvider) fontManager.releaseProvider(fontProvider)
   r.rulerBgPaint.delete()
   r.rulerTickPaint.delete()
   r.rulerTextPaint.delete()

@@ -34,6 +34,32 @@ export const DEVANAGARI_CHARACTER = /\p{Script=Devanagari}/u
 export const HANGUL_CHARACTER = /\p{Script=Hangul}/u
 export const KANA_CHARACTER = /[\p{Script=Hiragana}\p{Script=Katakana}]/u
 export const HAN_CHARACTER = /\p{Script=Han}/u
+export const CJK_CHARACTER =
+  /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u
+/**
+ * What CJK text draws from its fallback: every character Unicode lists as used with a CJK script
+ * (its letters, punctuation, strokes, and Bopomofo), and the East Asian presentation forms, which
+ * it lists with none: vertical, compatibility, halfwidth and fullwidth forms.
+ */
+export const CJK_FALLBACK_CHARACTER =
+  /[\p{scx=Han}\p{scx=Hiragana}\p{scx=Katakana}\p{scx=Hangul}\p{scx=Bopomofo}\u3000\ufe10-\ufe1f\ufe30-\ufe4f\uff00-\uffef]/u
+
+/** The characters of `script`'s own writing system among a text's characters. */
+export function fallbackScriptCharacter(script: FontFallbackScript): RegExp {
+  switch (script) {
+    case 'arabic':
+      return ARABIC_CHARACTER
+    case 'hebrew':
+      return HEBREW_CHARACTER
+    case 'thai':
+      return THAI_CHARACTER
+    case 'devanagari':
+      return DEVANAGARI_CHARACTER
+    default:
+      // A CJK face draws Han shared across the languages too, so each covers the text's CJK.
+      return CJK_FALLBACK_CHARACTER
+  }
+}
 
 // Common Traditional-only characters. This is a heuristic for fallback order, not language ID.
 export const TRADITIONAL_HAN_CHARACTER =

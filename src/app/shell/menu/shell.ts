@@ -4,9 +4,11 @@ import { useI18n } from '@pairdraw/vue/i18n'
 
 import { openTour } from '@/app/demo/document'
 import { requestAppExit } from '@/app/document/close/exit'
+import { useActiveEditorStoreRef } from '@/app/editor/active-store'
 import { openSettingsDialog } from '@/app/settings/dialog'
 import { setSnappingPreference } from '@/app/settings/preferences/apply'
 import {
+  followNativeCanvasViewMenu,
   syncNativeCommentsMenu,
   syncNativeSidePanelsMenu,
   syncNativeSnappingMenu
@@ -63,6 +65,8 @@ export function useShellMenu() {
     },
     { immediate: true }
   )
+
+  followNativeCanvasViewMenu(useActiveEditorStoreRef())
 
   const { setTheme } = useAppTheme()
   const { updates } = useI18n()

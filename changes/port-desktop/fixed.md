@@ -4,3 +4,4 @@
 - On Linux, the desktop app starts on NVIDIA Wayland sessions instead of being disconnected at its first paint.
 - The editor menu no longer appears in the Software Update window on Windows and Linux.
 - View settings keep their check state in the desktop menu while Home hides the items.
+- On Linux, typing in a text field is no longer taken by menu shortcuts such as N or Backspace.

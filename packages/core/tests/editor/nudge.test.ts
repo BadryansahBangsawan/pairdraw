@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'bun:test'
 
 import { createEditor } from '@pairdraw/core'
+import { SceneGraph, type SceneNode } from '@pairdraw/scene-graph'
 
 import { getNodeOrThrow } from '../helpers/assert'
 
@@ -215,6 +216,155 @@ describe('arrow keys in an auto layout flow', () => {
     expect(editor.undo.canUndo).toBe(false)
     editor.redoAction()
     expect(order()).toBe('ACDB')
+    editor.dispose()
+  })
+})
+
+describe('nudging a layer with layout inside it', () => {
+  class CountingGraph extends SceneGraph {
+    reads = 0
+
+    override getNode(id: string): SceneNode | undefined {
+      this.reads++
+      return super.getNode(id)
+    }
+  }
+
+  test('moves the layer without laying out its untouched children', () => {
+    const graph = new CountingGraph()
+    const page = graph.getPages()[0]
+    const frame = graph.createNode('FRAME', page.id, {
+      name: 'Row',
+      width: 1200,
+      height: 400,
+      layoutMode: 'HORIZONTAL',
+      primaryAxisSizing: 'FIXED',
+      counterAxisSizing: 'FIXED'
+    })
+    const children = 300
+    for (let index = 0; index < children; index++) {
+      graph.createNode('RECTANGLE', frame.id, {
+        x: index * 4,
+        y: 0,
+        width: 4,
+        height: 400
+      })
+    }
+    const editor = createEditor({ graph })
+    editor.state.currentPageId = page.id
+    editor.select([frame.id])
+
+    const startX = frame.x
+    graph.reads = 0
+    editor.nudgeSelected(1, 0)
+
+    // A position change cannot change an auto layout; only the moved layer is read.
+    expect(graph.reads).toBeLessThan(2 * (children + 1))
+    expect(getNodeOrThrow(graph, frame.id).x).toBe(startX + 1)
+    editor.dispose()
+  })
+
+  test('undoes and redoes the move without laying the untouched children out again', () => {
+    const graph = new CountingGraph()
+    const page = graph.getPages()[0]
+    const frame = graph.createNode('FRAME', page.id, {
+      name: 'Row',
+      width: 1200,
+      height: 400,
+      layoutMode: 'HORIZONTAL',
+      primaryAxisSizing: 'FIXED',
+      counterAxisSizing: 'FIXED'
+    })
+    const children = 300
+    for (let index = 0; index < children; index++) {
+      graph.createNode('RECTANGLE', frame.id, { x: index * 4, y: 0, width: 4, height: 400 })
+    }
+    const editor = createEditor({ graph })
+    editor.state.currentPageId = page.id
+    editor.select([frame.id])
+    const startX = frame.x
+    editor.nudgeSelected(1, 0)
+    editor.flushNudge()
+
+    graph.reads = 0
+    editor.undo.undo()
+    expect(graph.reads).toBeLessThan(2 * (children + 1))
+    expect(getNodeOrThrow(graph, frame.id).x).toBe(startX)
+
+    graph.reads = 0
+    editor.undo.redo()
+    expect(graph.reads).toBeLessThan(2 * (children + 1))
+    expect(getNodeOrThrow(graph, frame.id).x).toBe(startX + 1)
+    editor.dispose()
+  })
+
+  test('keeps a flow child on its parent’s layout grid instead of moving it by a pixel', () => {
+    const graph = new CountingGraph()
+    const page = graph.getPages()[0]
+    const row = graph.createNode('FRAME', page.id, {
+      name: 'Row',
+      width: 400,
+      height: 40,
+      layoutMode: 'HORIZONTAL',
+      primaryAxisSizing: 'HUG',
+      counterAxisSizing: 'HUG',
+      itemSpacing: 10
+    })
+    const children = 50
+    const cells = Array.from({ length: children }, (_, index) =>
+      graph.createNode('RECTANGLE', row.id, { name: `Cell ${index}`, width: 10, height: 40 })
+    )
+    const editor = createEditor({ graph })
+    editor.state.currentPageId = page.id
+    // `createEditor` lays the row out, as opening a document does.
+    const second = children > 1 ? cells[1] : undefined
+    if (!second) throw new Error('Expected a second cell')
+    editor.select([second.id])
+    const slotX = getNodeOrThrow(graph, second.id).x
+    const slotY = getNodeOrThrow(graph, second.id).y
+
+    graph.reads = 0
+    editor.nudgeSelected(1, 0)
+
+    // The row reorders the child rather than moving it off the grid.
+    expect(getNodeOrThrow(graph, second.id).y).toBe(slotY)
+    expect(getNodeOrThrow(graph, second.id).x).not.toBe(slotX + 1)
+    editor.dispose()
+  })
+
+  test('moves an absolutely positioned child inside an auto layout without laying the row out', () => {
+    const graph = new CountingGraph()
+    const page = graph.getPages()[0]
+    const row = graph.createNode('FRAME', page.id, {
+      name: 'Row',
+      width: 1200,
+      height: 400,
+      layoutMode: 'HORIZONTAL',
+      primaryAxisSizing: 'FIXED',
+      counterAxisSizing: 'FIXED'
+    })
+    const children = 300
+    for (let index = 0; index < children; index++) {
+      graph.createNode('RECTANGLE', row.id, { x: index * 4, y: 0, width: 4, height: 400 })
+    }
+    const floating = graph.createNode('RECTANGLE', row.id, {
+      name: 'Floating',
+      x: 600,
+      y: 40,
+      width: 80,
+      height: 80,
+      layoutPositioning: 'ABSOLUTE'
+    })
+    const editor = createEditor({ graph })
+    editor.state.currentPageId = page.id
+    editor.select([floating.id])
+    const startX = floating.x
+
+    graph.reads = 0
+    editor.nudgeSelected(1, 0)
+
+    expect(getNodeOrThrow(graph, floating.id).x).toBe(startX + 1)
+    expect(graph.reads).toBeLessThan(2 * (children + 1))
     editor.dispose()
   })
 })

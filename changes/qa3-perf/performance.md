@@ -1,0 +1,1 @@
+- Moving a selection with the arrow keys no longer lays out the whole subtree of every moved layer, nor does undo or redo, so nudging stays instant on large auto layout documents.

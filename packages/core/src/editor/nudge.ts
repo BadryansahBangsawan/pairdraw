@@ -157,7 +157,6 @@ export function createNudgeActions(ctx: EditorContext) {
       const node = ctx.graph.getNode(id)
       if (!node) continue
       ctx.graph.updateNode(id, { x: node.x + dx, y: node.y + dy })
-      ctx.runLayoutForNode(id)
     }
 
     if (nudgeCommitTimer) clearTimeout(nudgeCommitTimer)

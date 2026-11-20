@@ -1,4 +1,4 @@
-import { iconToSVG } from '@iconify/utils'
+import { iconToSVG, type IconifyIcon } from '@iconify/utils'
 import { DOMImplementation, type Document as XMLDocument, type Element } from '@xmldom/xmldom'
 import svgpath from 'svgpath'
 
@@ -21,7 +21,6 @@ import { elementLayer, type Scope, type Traversal } from './svg/scope'
 import { textInfo } from './svg/text'
 import type {
   IconData,
-  IconifyIconEntry,
   IconPathInfo,
   SVGClipPathRegion,
   SVGElementLayer,
@@ -129,8 +128,8 @@ function appendShapePath(
   const strokeWidth = Number.parseFloat(presentation.strokeWidth)
   result.push({
     d: pathData,
-    fill: normalizeSVGPaint(presentation.fill),
-    stroke: normalizeSVGPaint(presentation.stroke),
+    fill: normalizeSVGPaint(presentation.fill, presentation.color),
+    stroke: normalizeSVGPaint(presentation.stroke, presentation.color),
     strokeWidth: Number.isFinite(strokeWidth) ? strokeWidth : 1,
     strokeCap: presentation.strokeCap,
     strokeJoin: presentation.strokeJoin,
@@ -330,31 +329,30 @@ export function extractPaths(svgBody: string): IconPathInfo[] {
   return extractSVGContent(svgBody).paths.filter(isSVGPathShown)
 }
 
+/**
+ * An Iconify icon at `size`. Iconify's own rendering applies its box, defaulting to 16, and any
+ * turn or flip, before the shapes are placed in the icon box as SVG import places them.
+ */
 export function buildIconData(
-  iconEntry: IconifyIconEntry,
+  icon: IconifyIcon,
   prefix: string,
   iconName: string,
-  defaultW: number,
-  defaultH: number,
   size: number
 ): IconData {
-  const rendered = iconToSVG({
-    body: iconEntry.body,
-    width: iconEntry.width ?? defaultW,
-    height: iconEntry.height ?? defaultH
-  })
-  const [, , viewBoxWidth, viewBoxHeight] = rendered.viewBox
-  const scaleX = size / viewBoxWidth
-  const scaleY = size / viewBoxHeight
-
-  const pathInfos = extractPaths(rendered.body)
+  const rendered = iconToSVG(icon)
+  const [x, y, width, height] = rendered.viewBox
+  // As a browser draws the SVG: one scale for both axes, centered in the icon box, and the box's
+  // own origin moved to the box's top-left.
+  const scale = Math.min(size / width, size / height)
+  const offsetX = -x * scale + (size - width * scale) / 2
+  const offsetY = -y * scale + (size - height * scale) / 2
 
   return {
     prefix,
     name: iconName,
     width: size,
     height: size,
-    paths: scalePathInfos(pathInfos, scaleX, scaleY)
+    paths: scalePathInfos(extractPaths(rendered.body), scale, scale, offsetX, offsetY)
   }
 }
 
@@ -381,7 +379,9 @@ function transformStrokeScale(transform: string | null | undefined): number {
 export function scalePathInfos(
   pathInfos: IconPathInfo[],
   scaleX: number,
-  scaleY: number
+  scaleY: number,
+  offsetX = 0,
+  offsetY = 0
 ): IconData['paths'] {
   return pathInfos.map((path) => {
     let transformedPath = svgpath(path.d)
@@ -389,6 +389,8 @@ export function scalePathInfos(
       transformedPath = transformedPath.transform(path.transform)
     }
     if (scaleX !== 1 || scaleY !== 1) transformedPath = transformedPath.scale(scaleX, scaleY)
+    if (offsetX !== 0 || offsetY !== 0)
+      transformedPath = transformedPath.translate(offsetX, offsetY)
     const scaledD = transformedPath.round(2).toString()
     const fill = normalizeSVGPaint(path.fill)
     const stroke = normalizeSVGPaint(path.stroke)

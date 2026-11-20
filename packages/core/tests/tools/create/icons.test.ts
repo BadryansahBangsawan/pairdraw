@@ -10,7 +10,7 @@ import { insertIcon } from '#core/tools/create/icons'
 
 function icons() {
   const figma = new FigmaAPI(new SceneGraph())
-  const icon = buildIconData({ body: '<path d="M2 2h8v8H2z"/>' }, 'test', 'square', 24, 24, 24)
+  const icon = buildIconData({ body: '<path d="M2 2h8v8H2z"/>', width: 24, height: 24 }, 'test', 'square', 24)
   figma.icons = {
     icons: async (names: readonly string[]) => new Map(names.map((name) => [name, icon])),
     previews: async () => new Map(),

@@ -8,3 +8,4 @@
 - A nudge records its step when the arrow keys pause, and undoing it afterwards returns the document to saved instead of leaving it reported as changed.
 - A library copy's text links point at the copy's layers rather than the source file's, so a link still jumps to its layer after the component is published, inserted or updated, while duplicate and paste keep their links as they were.
 - A Figma paste-to-replace keeps the pasted layers as they were drawn instead of turning with the frame that holds them, while keeping the copied angle and the replaced layer's canvas position.
+- Iconify icons draw in the box their set gives them, at Iconify's default of 16 when it gives none, so Bootstrap Icons no longer draw at two thirds of the icon and Jam's own offset no longer shifts it; an alias draws its parent with the flip or turn it adds, and `currentColor` paints take the color an SVG element sets or inherits.

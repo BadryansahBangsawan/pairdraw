@@ -32,7 +32,7 @@ function axesProvider() {
         if (!parsed) continue
         const width = Number(axes.wght) / 50
         const body = `<path fill="currentColor" d="M2 2h${width}v20H2z"/>`
-        const icon = buildIconData({ body }, parsed.prefix, parsed.iconName, 24, 24, size)
+        const icon = buildIconData({ body, width: 24, height: 24 }, parsed.prefix, parsed.iconName, size)
         found.set(name, { ...icon, options: axes })
       }
       return found

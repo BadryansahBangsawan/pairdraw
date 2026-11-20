@@ -30,7 +30,7 @@ const provider: IconProvider = {
       const parsed = parseIconName(name)
       const body = BODIES[name]
       if (parsed && body)
-        found.set(name, buildIconData({ body }, parsed.prefix, parsed.iconName, 24, 24, size))
+        found.set(name, buildIconData({ body, width: 24, height: 24 }, parsed.prefix, parsed.iconName, size))
     }
     return found
   }

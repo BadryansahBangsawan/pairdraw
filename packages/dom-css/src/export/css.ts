@@ -98,6 +98,8 @@ export function gradientFillsToCSS(
     if (css) layers.push(css)
   }
   return layers.length > 0 ? layers.join(', ') : undefined
+}
+
 export type BorderSide = 'top' | 'right' | 'bottom' | 'left'
 
 /**

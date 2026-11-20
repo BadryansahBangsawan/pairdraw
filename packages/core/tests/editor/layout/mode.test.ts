@@ -263,3 +263,34 @@ describe('removing auto layout', () => {
     }
   })
 })
+
+describe('undoing a sizing change', () => {
+  test('puts the frame’s own size back, which a fixed frame keeps', () => {
+    const editor = createEditor()
+    try {
+      const page = editor.state.currentPageId
+      const frame = editor.graph.createNode('FRAME', page, {
+        width: 169,
+        height: 180,
+        layoutMode: 'VERTICAL'
+      })
+      editor.graph.createNode('RECTANGLE', frame.id, { x: 0, y: 0, width: 160, height: 20 })
+      editor.graph.createNode('RECTANGLE', frame.id, { x: 0, y: 0, width: 40, height: 40 })
+      editor.updateNode(frame.id, { name: 'Card' })
+      expect(editor.graph.getNode(frame.id)?.height).toBe(180)
+
+      // A vertical frame hugs along its height; its width stays fixed.
+      editor.updateNodeWithUndo(frame.id, { primaryAxisSizing: 'HUG', itemSpacing: 12 })
+      expect(editor.graph.getNode(frame.id)?.height).toBe(72)
+      editor.undoAction()
+
+      // A fixed frame keeps its size, so the size is part of what the step changed.
+      const undone = editor.graph.getNode(frame.id)
+      expect(undone?.primaryAxisSizing).toBe('FIXED')
+      expect(undone?.width).toBe(169)
+      expect(undone?.height).toBe(180)
+    } finally {
+      editor.dispose()
+    }
+  })
+})

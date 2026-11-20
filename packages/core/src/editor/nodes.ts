@@ -34,6 +34,9 @@ export function opacityFromBuffer(buffer: string): number {
   return Math.min(100, Math.max(0, percent)) / 100
 }
 
+/** Fields whose change makes a frame take a new size of its own. */
+const SIZE_DEPENDENT_FIELDS = ['primaryAxisSizing', 'counterAxisSizing', 'layoutMode'] as const
+
 /** Whether an auto layout frame places this layer, so its own x and y do not stay where they are put. */
 function layOutByParent(ctx: EditorContext, id: string): boolean {
   const parent = ctx.graph.getNode(ctx.graph.getNode(id)?.parentId ?? '')
@@ -106,10 +109,13 @@ export function createNodeActions(ctx: EditorContext) {
     const previousOverrides = owner
       ? cloneInstanceOverrideState(owner.instanceOverrides)
       : undefined
-    const previous = pick(
-      node,
-      Object.keys(nextChanges) as (keyof SceneNode)[]
-    ) as Partial<SceneNode>
+    // A frame whose sizing changes takes its own size with it: fixed keeps the size it had, so
+    // undoing the sizing has to put that size back too.
+    const restoreSize = SIZE_DEPENDENT_FIELDS.some((field) => field in nextChanges)
+    const previous = pick(node, [
+      ...(Object.keys(nextChanges) as (keyof SceneNode)[]),
+      ...(restoreSize ? (['width', 'height'] as const) : [])
+    ]) as Partial<SceneNode>
     const overridden = instanceOverrideFields(node, nextChanges)
     ctx.graph.updateNode(id, nextChanges)
     recordInstanceOverride(ctx.graph, id, overridden)

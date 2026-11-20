@@ -4,3 +4,4 @@
 - A captured checkbox or radio imports as the small square the browser paints, centered where the page drew it, instead of a full-width bar when a stylesheet stretches its input.
 - HTML export writes gradient fills as CSS `background-image` gradients, so exported code keeps gradient surfaces instead of only their bottom solid color.
 - A captured checkbox or radio imports as the small square the browser paints, centered where the page drew it, instead of a full-width bar when a stylesheet stretches its input; an absolutely positioned or margined one keeps its placement and the room its margins took.
+- A captured checkbox or radio imports as the small square the browser paints, centered where the page drew it, instead of a full-width bar when a stylesheet stretches its input; an absolutely positioned or margined one keeps its placement and the room its margins took.

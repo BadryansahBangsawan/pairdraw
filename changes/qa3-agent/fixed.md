@@ -1,0 +1,1 @@
+- Deleting a chat forgets its agent, so a late tool call from a deleted chat finds no reply and the document it worked on is not held open.

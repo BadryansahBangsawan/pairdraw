@@ -3,6 +3,7 @@ import { computed, ref, shallowRef, watch } from 'vue'
 
 import { emptyPins, hasPins, type ConversationPins } from '@/app/ai/chat/pins/types'
 import { setChatProjectFolder } from '@/app/ai/chat/project-folder'
+import { forgetAgentChat } from '@/app/ai/reply/run'
 
 import { chatDocumentId, resolveChatDocumentId, type ChatDocumentEditor } from './document'
 import { createConversationStore } from './idb'
@@ -370,6 +371,8 @@ export function createConversationHistory<TChat extends HistoryChat>(
       }
       leftDrafts.delete(id)
       await store.remove(id)
+      // A deleted chat's agent belongs to no reply any more, so a late tool call finds none.
+      forgetAgentChat(id)
       // A deleted chat leaves no path to the person's project behind.
       setChatProjectFolder(id, null)
       if (!current.value) await createDraft()

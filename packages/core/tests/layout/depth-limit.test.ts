@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { computeLayout } from '@pairdraw/core/layout'
 import { SceneGraph } from '@pairdraw/scene-graph'
+import { liveYogaNodeCount } from '#core/layout/yoga-helpers'
 
 /** A vertical auto-layout chain `depth` frames deep, with one rectangle at its end. */
 function nested(depth: number) {
@@ -56,5 +57,16 @@ describe('layout depth limit', () => {
     const shallow = nested(2)
     expect(() => computeLayout(shallow.graph, shallow.outer)).not.toThrow()
     expect(shallow.graph.getNode(shallow.leaf)?.y).toBeGreaterThanOrEqual(0)
+  })
+
+  test('frees the Yoga nodes it built when it refuses a deeper chain', () => {
+    const before = liveYogaNodeCount()
+    const deep = nested(400)
+    expect(() => computeLayout(deep.graph, deep.outer)).toThrow(
+      /nest more than \d+ auto-layout frames deep/
+    )
+    // The refused pass built part of its tree before the depth check fired; every node of it is
+    // freed on the way out, so attempts cannot accumulate Yoga memory.
+    expect(liveYogaNodeCount()).toBe(before)
   })
 })

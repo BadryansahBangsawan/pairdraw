@@ -1,0 +1,1 @@
+- A layout pass the editor refuses, because frames nest deeper than the engine can lay out, no longer holds the layout nodes it had built.

@@ -77,13 +77,19 @@ function computeLayoutInternal(graph: SceneGraph, frameId: string): void {
 
   const rootDirection = resolveComputedLayoutDirection(graph, frame)
   const yogaDirection = rootDirection === 'RTL' ? Direction.RTL : Direction.LTR
-  const yogaRoot =
-    frame.layoutMode === 'GRID'
-      ? buildGridTree(graph, frame, rootDirection)
-      : buildYogaTree(graph, frame, rootDirection)
-  yogaRoot.calculateLayout(undefined, undefined, yogaDirection)
-  applyYogaLayout(graph, frame, yogaRoot, computeLayoutInternal)
-  freeYogaTree(yogaRoot)
+  // The tree is freed on every path, a refused pass included: Yoga's nodes are WebAssembly memory
+  // the caller owns, so a throw must not leave them behind.
+  let yogaRoot: YogaNode | null = null
+  try {
+    yogaRoot =
+      frame.layoutMode === 'GRID'
+        ? buildGridTree(graph, frame, rootDirection)
+        : buildYogaTree(graph, frame, rootDirection)
+    yogaRoot.calculateLayout(undefined, undefined, yogaDirection)
+    applyYogaLayout(graph, frame, yogaRoot, computeLayoutInternal)
+  } finally {
+    if (yogaRoot) freeYogaTree(yogaRoot)
+  }
 }
 function resolveComputedLayoutDirection(
   graph: SceneGraph,
@@ -195,7 +201,14 @@ function buildYogaTree(
 
   configureFlexContainer(root, frame, direction)
 
-  insertFlexChildren(root, frame, graph, direction, 1)
+  try {
+    insertFlexChildren(root, frame, graph, direction, 1)
+  } catch (error) {
+    // The depth check refuses a chain while the tree is half built; every node made so far hangs
+    // from the root, which has no other holder.
+    freeYogaTree(root)
+    throw error
+  }
 
   return root
 }
@@ -399,6 +412,9 @@ function insertFlexChildren(
     .getChildren(parent.id)
     .map((node) => asLaidOutIn(graph, node, parent))) {
     const yogaChild = createYogaNode()
+    // Attached before it is configured, so a child the depth check refuses still hangs from the
+    // root and is freed with it rather than left in WebAssembly memory.
+    box.insertChild(yogaChild, box.getChildCount())
 
     if (child.layoutPositioning === 'ABSOLUTE') {
       configureAbsoluteChild(yogaChild, child)
@@ -415,8 +431,6 @@ function insertFlexChildren(
       flow.push(yogaChild)
     }
     applyStrokeMargins(yogaChild, child, parent)
-
-    box.insertChild(yogaChild, box.getChildCount())
   }
   setFlowEdges(yogaParent, box, parent, flow, direction)
 }

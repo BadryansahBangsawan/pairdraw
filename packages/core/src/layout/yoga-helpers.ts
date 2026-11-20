@@ -13,7 +13,20 @@ import { enforcedAspectRatio, layoutSizingInParent } from '@pairdraw/scene-graph
 const yogaConfig = Yoga.Config.create()
 yogaConfig.setPointScaleFactor(0)
 
+/**
+ * Yoga nodes built and not freed yet. Yoga's nodes live in WebAssembly memory the caller owns, so a
+ * pass that leaves its tree behind holds that memory and the nodes it holds; a test reads this to
+ * see one freed on every path.
+ */
+let liveYogaNodes = 0
+
+/** Yoga nodes created and not yet freed by `freeYogaTree`. */
+export function liveYogaNodeCount(): number {
+  return liveYogaNodes
+}
+
 export function createYogaNode(): YogaNode {
+  liveYogaNodes += 1
   return Yoga.Node.create(yogaConfig)
 }
 
@@ -100,7 +113,11 @@ export function freeYogaTree(node: YogaNode): void {
   for (let i = node.getChildCount() - 1; i >= 0; i--) {
     freeYogaTree(node.getChild(i))
   }
-  if ('free' in node) (node as { free(): void }).free()
+  // Wasm-backed nodes carry `free`, which `yoga-layout`'s type leaves out.
+  if ('free' in node && typeof node.free === 'function') {
+    node.free()
+    liveYogaNodes -= 1
+  }
 }
 
 export function mapJustify(align: string): Justify {

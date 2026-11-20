@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import { FIXTURES } from '#core-tests/helpers/paths'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
+import { computeImageHash } from '@pairdraw/scene-graph/images'
+import { toUint8Array } from 'js-base64'
 
 import { exportPDFDocument } from '#core/io/formats/pdf'
 import { fontManager } from '#core/text/font/manager'
@@ -46,6 +48,39 @@ test('exports a PDF without a browser DOM, and leaves no DOM behind', async () =
   expect(result?.pages).toEqual([{ label: 'Card', width: 120, height: 80 }])
   expect('document' in globalThis).toBe(false)
   expect('CSSStyleSheet' in globalThis).toBe(false)
+})
+
+test('embeds an image fill without a browser Image, and leaves none behind', async () => {
+  // A 2×3 red PNG.
+  const png =
+    'iVBORw0KGgoAAAANSUhEUgAAAAIAAAADCAYAAAC56t6BAAAABHNCSVQICAgIfAhkiAAAAAFzUkdCAK7OHOkAAAAWSURBVAiZY/zPwPCfgYGBgYkBCuAMADE7AgSJG//xAAAAAElFTkSuQmCC'
+  const bytes = toUint8Array(png)
+  const graph = new SceneGraph()
+  const pageId = graph.getPages()[0].id
+  const hash = computeImageHash(bytes)
+  graph.images.set(hash, bytes)
+  const image = graph.createNode('RECTANGLE', pageId, {
+    width: 40,
+    height: 40,
+    fills: [
+      {
+        type: 'IMAGE',
+        color: { r: 0, g: 0, b: 0, a: 1 },
+        opacity: 1,
+        visible: true,
+        imageHash: hash,
+        imageScaleMode: 'FILL'
+      }
+    ]
+  })
+
+  const result = await exportPDFDocument(graph, [{ pageId, nodeIds: [image.id] }], {
+    embedFonts: false
+  })
+
+  const pdf = new TextDecoder('latin1').decode(result?.data)
+  expect(pdf).toContain('/Subtype /Image')
+  expect('Image' in globalThis).toBe(false)
 })
 
 test('exports several PDFs at once', async () => {

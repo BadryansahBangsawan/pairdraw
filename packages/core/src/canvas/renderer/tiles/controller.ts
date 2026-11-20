@@ -36,6 +36,8 @@ export class TiledSceneController {
   private index: RenderChunkIndex | null = null
   private pageId: string | null = null
   private contentGeneration = -1
+  /** The page colour under the cached tiles, which a theme or page background change replaces. */
+  private pageColor = ''
   private navigationGeneration = -1
   private navigationActive = false
   private cancelledJobs = 0
@@ -84,6 +86,12 @@ export class TiledSceneController {
   ): TiledSceneFrameResult {
     this.navigationGeneration = navigationGeneration
     this.navigationActive = this.isNavigationActive(renderer)
+    const { r, g, b, a } = renderer.pageColor
+    const pageColor = `${r},${g},${b},${a}`
+    if (pageColor !== this.pageColor) {
+      this.invalidate()
+      this.pageColor = pageColor
+    }
     this.prepareGeneration(renderer, graph, contentGeneration, navigationGeneration)
     const index = this.index
     if (!index || !renderer.pageId) return this.emptyResult()

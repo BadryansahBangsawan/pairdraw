@@ -1,4 +1,5 @@
 import type { DerivedSymbolOverride } from '#fig/instance-overrides/types'
+import { hasUnmodeledEffects } from '#fig/node-change/plugin-data'
 import { effectiveFigmaRawNodeFields, effectiveFigmaSourcePayload } from '#fig/source-metadata'
 import { compact } from 'es-toolkit/array'
 
@@ -753,30 +754,6 @@ function hasRawVectorPayload(node: SceneNode): boolean {
   return 'vectorData' in effectiveFigmaRawNodeFields(node)
 }
 
-const SUPPORTED_NORMALIZED_EFFECT_TYPES = new Set([
-  'DROP_SHADOW',
-  'INNER_SHADOW',
-  'LAYER_BLUR',
-  'BACKGROUND_BLUR',
-  'FOREGROUND_BLUR',
-  'NOISE',
-  'GRAIN'
-])
-
-function hasRawUnsupportedEffects(node: SceneNode): boolean {
-  const effects = effectiveFigmaRawNodeFields(node).effects
-  return (
-    Array.isArray(effects) &&
-    effects.some(
-      (effect) =>
-        effect &&
-        typeof effect === 'object' &&
-        'type' in effect &&
-        !SUPPORTED_NORMALIZED_EFFECT_TYPES.has(String(effect.type))
-    )
-  )
-}
-
 /** The `.fig` name of each effect type the export writes. */
 const KIWI_EFFECT_TYPE: Record<Exclude<Effect['type'], 'SHADER'>, KiwiEffect['type']> = {
   DROP_SHADOW: 'DROP_SHADOW',
@@ -929,7 +906,7 @@ function applyNodeVisualProps(
 
   // Figma has no shader effect, so exporting one would write a shadow it does not have.
   const effects = node.effects.filter((effect) => effect.type !== 'SHADER')
-  if (effects.length > 0 && !hasRawUnsupportedEffects(node)) {
+  if (effects.length > 0 && !hasUnmodeledEffects(node)) {
     nc.effects = effects.map((effect) => figmaEffect(context, effect))
   }
 

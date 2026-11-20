@@ -276,6 +276,12 @@ export const SECTION_CORNER_RADIUS = 2
 /** Effect filters a renderer keeps: a slider drag would otherwise keep every value it passed. */
 export const EFFECT_FILTER_CACHE_ENTRIES = 64
 
+/** Noise tiles a renderer keeps, each about 4 MB: a density or seed drag walks through many. */
+export const NOISE_TILE_CACHE_ENTRIES = 8
+
+/** Texture displacement tiles a renderer keeps, each 256 KB. */
+export const TEXTURE_NOISE_CACHE_ENTRIES = 16
+
 export const ZOOM_DIVISOR = 50
 export const ZOOM_SCALE_MIN = 0.75
 export const ZOOM_SCALE_MAX = 1.25

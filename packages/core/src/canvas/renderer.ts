@@ -18,6 +18,8 @@ import {
   COMPONENT_SET_DASH_GAP,
   COMPONENT_SET_BORDER_WIDTH,
   EFFECT_FILTER_CACHE_ENTRIES,
+  NOISE_TILE_CACHE_ENTRIES,
+  TEXTURE_NOISE_CACHE_ENTRIES,
   IS_BROWSER
 } from '#core/constants'
 import type { EditorState } from '#core/editor/types'
@@ -124,6 +126,21 @@ export class SkiaRenderer {
   maskFilterCache = new ResourceCache<number, MaskFilter>({
     maxEntries: EFFECT_FILTER_CACHE_ENTRIES,
     dispose: (filter) => filter.delete()
+  })
+  /**
+   * A noise effect's level and colour tiles, about 4 MB each. Bounded: a density or seed slider
+   * would otherwise keep a tile per step of a drag.
+   */
+  noiseTileCache = new ResourceCache<string, Image>({
+    maxEntries: NOISE_TILE_CACHE_ENTRIES,
+    dispose: (image) => image.delete()
+  })
+  /** The compiled grain shader, made on the first noise drawn. */
+  noiseGrainEffect: RuntimeEffect | null = null
+  /** A texture's displacement tiles, 256 KB each, kept by grain size and seed. */
+  textureNoiseCache = new ResourceCache<string, Image>({
+    maxEntries: TEXTURE_NOISE_CACHE_ENTRIES,
+    dispose: (image) => image.delete()
   })
   _tmpColor = new Float32Array(4)
   _tmpRect = new Float32Array(4)

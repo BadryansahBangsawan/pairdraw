@@ -2,6 +2,8 @@ import { afterAll, describe, expect, test } from 'bun:test'
 
 import { expectDefined } from '#core-tests/helpers/assert'
 
+import { NOISE_TILE_CACHE_ENTRIES } from '#core/constants'
+
 import { SkiaRenderer } from '@pairdraw/core/canvas'
 import { initCanvasKit } from '@pairdraw/core/io/formats/raster'
 import { SceneGraph, type Effect } from '@pairdraw/scene-graph'
@@ -80,5 +82,12 @@ describe('noise effects on the canvas', () => {
     const plain = reds(renderPixels([]))
     const none = reds(renderPixels([{ ...noise, noise: { ...noise.noise, density: 0 } }]))
     expect(none).toEqual(plain)
+  })
+
+  test('a seed sweep keeps only the bounded number of tiles', () => {
+    for (let seed = 0; seed < NOISE_TILE_CACHE_ENTRIES + 4; seed++) {
+      renderPixels([{ ...noise, noise: { ...noise.noise, seed } }])
+    }
+    expect(renderer.noiseTileCache.size).toBe(NOISE_TILE_CACHE_ENTRIES)
   })
 })

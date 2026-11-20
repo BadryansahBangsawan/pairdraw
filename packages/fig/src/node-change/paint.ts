@@ -248,9 +248,7 @@ export function convertStrokes(
 }
 
 /** The scene graph's name for each `.fig` effect type it models; it leaves the others out. */
-const MODELED_EFFECT_TYPES: Partial<
-  Record<KiwiEffect['type'], Exclude<Effect['type'], 'SHADER'>>
-> = {
+const MODELED_EFFECT_TYPES: Record<string, Exclude<Effect['type'], 'SHADER'>> = {
   DROP_SHADOW: 'DROP_SHADOW',
   INNER_SHADOW: 'INNER_SHADOW',
   LAYER_BLUR: 'LAYER_BLUR',
@@ -261,10 +259,8 @@ const MODELED_EFFECT_TYPES: Partial<
 }
 
 /** The scene graph's type for a `.fig` effect type, or null for one it does not model. */
-export function modeledEffectType(
-  type: KiwiEffect['type']
-): Exclude<Effect['type'], 'SHADER'> | null {
-  return MODELED_EFFECT_TYPES[type] ?? null
+export function modeledEffectType(type: string): Exclude<Effect['type'], 'SHADER'> | null {
+  return Object.hasOwn(MODELED_EFFECT_TYPES, type) ? MODELED_EFFECT_TYPES[type] : null
 }
 
 /**
@@ -272,9 +268,14 @@ export function modeledEffectType(
  * out, such as a repeat. Variable bindings name effects by this index, so every reader of a
  * record's effects must count the same way.
  */
-export function modeledEffectIndexes(effects: readonly KiwiEffect[]): (number | null)[] {
+export function modeledEffectIndexes(effects: readonly unknown[]): (number | null)[] {
   let next = 0
-  return effects.map((effect) => (modeledEffectType(effect.type) ? next++ : null))
+  return effects.map((effect) => {
+    const type =
+      effect !== null && typeof effect === 'object' && 'type' in effect ? effect.type : null
+    if (typeof type !== 'string') return null
+    return modeledEffectType(type) ? next++ : null
+  })
 }
 
 /**

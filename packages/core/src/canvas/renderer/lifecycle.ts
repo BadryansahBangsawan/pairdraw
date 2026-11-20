@@ -87,6 +87,10 @@ export function destroyRenderer(r: SkiaRenderer): void {
   r.effectLayerPaint.delete()
   r.imageFilterCache.clear()
   r.maskFilterCache.clear()
+  r.noiseTileCache.clear()
+  r.textureNoiseCache.clear()
+  r.noiseGrainEffect?.delete()
+  r.noiseGrainEffect = null
   for (const pic of r.nodePictureCache.values()) pic?.delete()
   r.nodePictureCache.clear()
   r.labelParagraphCache.clear()

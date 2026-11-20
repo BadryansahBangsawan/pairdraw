@@ -94,8 +94,9 @@ test.each(archiveOpens)(
       const hash = name.slice('images/'.length)
       const image = graph.images.get(hash)
       expect(image).toEqual(data)
+      // Unzipped once: the image is a view of the archive's own memory, not a copy of it.
       expect(image?.buffer).toBe(unzipped.get(hash)?.buffer)
-      expect(image?.byteLength).toBe(image?.buffer.byteLength)
+      expect(image?.buffer).toBe(bytes)
     }
   }
 )

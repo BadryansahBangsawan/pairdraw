@@ -163,7 +163,11 @@ function readEntryData(bytes: Uint8Array, entry: ZipEntry): Uint8Array<ArrayBuff
     if (entry.compressedSize !== entry.uncompressedSize) {
       throw new Error(`Corrupted .fig file: the stored entry "${entry.name}" has two sizes`)
     }
-    return new Uint8Array(compressed)
+    // A stored entry is already its own bytes in the archive, so a view over them costs no copy.
+    // Shared memory has no `ArrayBuffer` to build one on, and only there is a copy made.
+    if (bytes.buffer instanceof ArrayBuffer)
+      return new Uint8Array(bytes.buffer, bytes.byteOffset + start, entry.compressedSize)
+    return bytes.slice(start, end)
   }
   if (entry.compression !== 8) {
     throw new Error(

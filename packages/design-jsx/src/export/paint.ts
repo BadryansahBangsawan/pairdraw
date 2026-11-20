@@ -3,10 +3,11 @@ import type {
   Fill,
   GradientTransform,
   SceneNode,
-  ShadowEffect,
+  ShaderEffect,
   Stroke
 } from '@pairdraw/scene-graph'
 import { gradientTransformRows, isIdentityGradientTransform } from '@pairdraw/scene-graph/gradient'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 import { isShaderPresetPaint, shaderOfPaint } from '@pairdraw/scene-graph/shaders'
 
 import { STROKE_ALIGN, STROKE_CAP, STROKE_JOIN } from '../enums'
@@ -215,15 +216,22 @@ export function collectStrokeProps(node: SceneNode, props: JSXProp[]): void {
   }
 }
 
-const EFFECT_HELPERS: Record<ShadowEffect['type'], string> = {
+const EFFECT_HELPERS: Record<Exclude<Effect['type'], 'SHADER'>, string> = {
   DROP_SHADOW: 'dropShadow',
   INNER_SHADOW: 'innerShadow',
   LAYER_BLUR: 'layerBlur',
   BACKGROUND_BLUR: 'backgroundBlur',
-  FOREGROUND_BLUR: 'foregroundBlur'
+  FOREGROUND_BLUR: 'foregroundBlur',
+  NOISE: 'noise',
+  TEXTURE: 'texture'
 }
 
-function effectValue(effect: ShadowEffect): HelperCall {
+/** A grain size as one number when both axes match, as Figma's plugin API writes it. */
+function noiseSizeValue(size: Vector): JSXValue {
+  return size.x === size.y ? size.x : { x: size.x, y: size.y }
+}
+
+function effectValue(effect: Exclude<Effect, ShaderEffect>): HelperCall {
   const visible = effect.visible ? undefined : false
   if (effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW') {
     return helperCall(
@@ -237,6 +245,37 @@ function effectValue(effect: ShadowEffect): HelperCall {
         visible,
         blendMode: blendMode(effect.blendMode),
         showShadowBehindNode: effect.showShadowBehindNode
+      })
+    )
+  }
+  if (effect.type === 'NOISE') {
+    const grain = effect.noise
+    return helperCall(
+      EFFECT_HELPERS.NOISE,
+      options({
+        noiseType: grain.noiseType,
+        noiseSize: noiseSizeValue(grain.noiseSize),
+        density: grain.density,
+        color: formatColor(effect.color, effect.color.a),
+        secondaryColor: grain.secondaryColor
+          ? formatColor(grain.secondaryColor, grain.secondaryColor.a)
+          : undefined,
+        opacity: grain.opacity,
+        seed: grain.seed,
+        visible
+      })
+    )
+  }
+  if (effect.type === 'TEXTURE') {
+    const grain = effect.texture
+    return helperCall(
+      EFFECT_HELPERS.TEXTURE,
+      options({
+        noiseSize: noiseSizeValue(grain.noiseSize),
+        radius: effect.radius,
+        clipToShape: grain.clipToShape,
+        seed: grain.seed,
+        visible
       })
     )
   }
@@ -259,20 +298,22 @@ function plainDropShadow(effect: Effect): string | null {
  * `shadow` and `blur` describe a plain drop shadow followed by a layer blur, each optional,
  * in the order the renderer appends them; anything else needs `effects`.
  */
-function effectShorthand(effects: ShadowEffect[]): JSXProp[] | null {
+function effectShorthand(effects: Effect[]): JSXProp[] | null {
   if (effects.some((effect) => !effect.visible)) return null
   const shadow = effects.length > 0 ? plainDropShadow(effects[0]) : null
   const rest = shadow ? effects.slice(1) : effects
   if (rest.length > 1 || rest.some((effect) => effect.type !== 'LAYER_BLUR')) return null
   const props: JSXProp[] = []
   if (shadow) props.push(['shadow', shadow])
-  for (const blur of rest) props.push(['blur', blur.radius])
+  for (const blur of rest) {
+    if (blur.type === 'LAYER_BLUR') props.push(['blur', blur.radius])
+  }
   return props
 }
 
-/** An effect JSX has a helper for; an imported one the modeller lacks, such as noise, has none. */
-function hasJSXHelper(effect: Effect): effect is ShadowEffect {
-  return Object.hasOwn(EFFECT_HELPERS, effect.type)
+/** An effect JSX has a helper for; a shader effect is not written back as JSX source. */
+function hasJSXHelper(effect: Effect): effect is Exclude<Effect, ShaderEffect> {
+  return effect.type !== 'SHADER' && Object.hasOwn(EFFECT_HELPERS, effect.type)
 }
 
 export function collectEffectProps(node: SceneNode, props: JSXProp[]): void {

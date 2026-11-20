@@ -167,7 +167,7 @@ export class Linter {
       effects: raw.effects.map((effect) => ({
         type: effect.type,
         visible: effect.visible,
-        radius: effect.type === 'SHADER' ? 0 : effect.radius
+        radius: effect.type === 'SHADER' || effect.type === 'NOISE' ? 0 : effect.radius
       })),
       textStyleId: raw.textStyleId,
       effectStyleId: raw.effectStyleId

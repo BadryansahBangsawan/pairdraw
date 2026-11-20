@@ -1,5 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 
+import { collectAllNodes } from '#core-tests/helpers/fig/traversal'
+
 import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
 import { effectiveFigmaRawNodeFields, parseFigBuffer } from '@pairdraw/fig'
 import { initCodec } from '@pairdraw/kiwi/fig/codec'
@@ -477,15 +479,12 @@ describe('fig roundtrip source metadata', () => {
       ...rect.source.fig.rawNodeFields,
       effects: [
         {
-          type: 'NOISE',
+          type: 'REPEAT',
           visible: true,
           offset: { x: 0, y: 0 },
-          radius: 0,
+          radius: 3,
           spread: 0,
-          noiseSize: { x: 0.5, y: 0.5 },
-          noiseType: 'MONOTONE',
-          color: { r: 0, g: 0, b: 0, a: 1 },
-          density: 0.4
+          color: { r: 0, g: 0, b: 0, a: 1 }
         }
       ]
     }
@@ -495,11 +494,9 @@ describe('fig roundtrip source metadata', () => {
       (nodeChange) => nodeChange.guid && guidToString(nodeChange.guid) === '4:503'
     )
 
-    const noise = exported?.effects?.[0] as RawNoiseEffect | undefined
-    expect(noise?.type).toBe('NOISE')
-    expect(noise?.noiseType).toBe('MONOTONE')
-    expect(noise?.noiseSize).toEqual({ x: 0.5, y: 0.5 })
-    expect(noise?.density).toBeCloseTo(0.4)
+    const repeat = exported?.effects?.[0] as { type?: string; radius?: number } | undefined
+    expect(repeat?.type).toBe('REPEAT')
+    expect(repeat?.radius).toBe(3)
   })
 
   test('ignores raw unsupported effects when normalized effects are edited', () => {
@@ -512,15 +509,12 @@ describe('fig roundtrip source metadata', () => {
       ...rect.source.fig.rawNodeFields,
       effects: [
         {
-          type: 'NOISE',
+          type: 'REPEAT',
           visible: true,
           offset: { x: 0, y: 0 },
-          radius: 0,
+          radius: 3,
           spread: 0,
-          noiseSize: { x: 0.5, y: 0.5 },
-          noiseType: 'MONOTONE',
-          color: { r: 0, g: 0, b: 0, a: 1 },
-          density: 0.4
+          color: { r: 0, g: 0, b: 0, a: 1 }
         }
       ]
     }
@@ -540,6 +534,62 @@ describe('fig roundtrip source metadata', () => {
 
     expect(effectiveFigmaRawNodeFields(rect).effects).toBeUndefined()
     expect(rect.source.fig.rawNodeFields.effects).toBeDefined()
+  })
+
+  test('models an imported noise effect, so an edit writes its grain', async () => {
+    const graph = new SceneGraph()
+    const page = graph.getPages()[0]
+    const rect = graph.createNode('RECTANGLE', page.id, {
+      name: 'Noise modelled',
+      effects: [
+        {
+          type: 'NOISE',
+          color: { r: 0, g: 0, b: 0, a: 0.25 },
+          visible: true,
+          noise: { noiseType: 'MONOTONE', noiseSize: { x: 0.5, y: 0.5 }, density: 0.4 }
+        }
+      ]
+    })
+    rect.source.format = 'fig'
+    rect.source.id = '4:505'
+    rect.source.fig.rawNodeFields.effects = [
+      {
+        type: 'NOISE',
+        visible: true,
+        offset: { x: 0, y: 0 },
+        radius: 0,
+        spread: 0,
+        noiseSize: { x: 0.5, y: 0.5 },
+        noiseType: 'MONOTONE',
+        color: { r: 0, g: 0, b: 0, a: 1 },
+        density: 0.4
+      }
+    ]
+
+    graph.updateNode(rect.id, {
+      effects: [
+        {
+          type: 'NOISE',
+          color: { r: 0, g: 0, b: 0, a: 0.25 },
+          visible: true,
+          noise: { noiseType: 'MONOTONE', noiseSize: { x: 0.5, y: 0.5 }, density: 0.75 }
+        }
+      ]
+    })
+
+    const bytes = await exportFigFile(graph)
+    const exported = decodeExport(bytes).nodeChanges.find(
+      (nodeChange) => nodeChange.guid && guidToString(nodeChange.guid) === '4:505'
+    )
+    const noise = exported?.effects?.[0] as RawNoiseEffect | undefined
+    expect(noise?.type).toBe('NOISE')
+    expect(noise?.density).toBeCloseTo(0.75)
+
+    const restored = await parseFigFile(bytes.buffer as ArrayBuffer)
+    const reopened = collectAllNodes(restored).find((candidate) => candidate.name === 'Noise modelled')
+    expect(reopened?.effects).toMatchObject([
+      { type: 'NOISE', noise: { noiseType: 'MONOTONE', density: 0.75 } }
+    ])
   })
 
   test('ignores raw geometry payloads when independent stroke weights are edited', () => {

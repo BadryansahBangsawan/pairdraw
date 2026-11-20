@@ -3,6 +3,8 @@ import { describe, expect, test } from 'bun:test'
 import { FigmaAPI } from '@pairdraw/core/figma-api'
 import { SceneGraph } from '@pairdraw/scene-graph'
 
+import type { FigmaEffect } from '#core/figma-api/effects'
+
 // Accepted shapes, read-back values, and rejections were recorded by running the
 // same assignments against a rectangle in live Figma through figma-use.
 
@@ -137,9 +139,107 @@ describe('node.effects', () => {
   })
 
   test('reports Figma effects Pairdraw does not model yet', () => {
-    expect(() => assign([{ type: 'NOISE' }])).toThrow('NOISE effects are not supported')
+    expect(() => assign([{ type: 'GLASS' }])).toThrow('GLASS effects are not supported')
     expect(() =>
       assign([{ type: 'LAYER_BLUR', blurType: 'PROGRESSIVE', radius: 4, visible: true }])
     ).toThrow('Progressive blur is not supported')
+  })
+})
+
+const noise: FigmaEffect = {
+  type: 'NOISE',
+  visible: true,
+  boundVariables: {},
+  noiseType: 'MONOTONE',
+  noiseSize: 0.5,
+  noiseSizeVector: { x: 0.5, y: 0.5 },
+  color,
+  density: 1
+}
+
+const texture: FigmaEffect = {
+  type: 'TEXTURE',
+  visible: true,
+  radius: 4,
+  boundVariables: {},
+  noiseSize: 4,
+  noiseSizeVector: { x: 4, y: 4 },
+  clipToShape: false
+}
+
+const duotone: FigmaEffect = {
+  type: 'NOISE',
+  visible: true,
+  boundVariables: {},
+  noiseType: 'DUOTONE',
+  noiseSize: 0.5,
+  noiseSizeVector: { x: 0.5, y: 0.5 },
+  color,
+  density: 1,
+  secondaryColor: { r: 1, g: 1, b: 1, a: 1 }
+}
+
+const multitone: FigmaEffect = {
+  type: 'NOISE',
+  visible: true,
+  boundVariables: {},
+  noiseType: 'MULTITONE',
+  noiseSize: 0.5,
+  noiseSizeVector: { x: 0.5, y: 0.5 },
+  color,
+  density: 1,
+  opacity: 0.5
+}
+
+describe('noise and texture effects', () => {
+  test('reads a monotone noise back in Figma field order', () => {
+    const [read] = assign([noise]).effects
+    expect(read).toMatchObject(noise)
+  })
+
+  test('reads a duotone with its second colour', () => {
+    const [read] = assign([duotone]).effects
+    expect(read).toMatchObject(duotone)
+  })
+
+  test('reads a multitone with its opacity', () => {
+    const [read] = assign([multitone]).effects
+    expect(read).toMatchObject(multitone)
+  })
+
+  test('keeps a grain size and a texture radius at 100 rather than refusing them', () => {
+    const huge: FigmaEffect = {
+      ...texture,
+      radius: 250,
+      noiseSize: 250,
+      noiseSizeVector: { x: 250, y: 250 }
+    }
+    expect(assign([huge]).effects).toEqual([
+      { ...texture, radius: 100, noiseSize: 100, noiseSizeVector: { x: 100, y: 100 } }
+    ])
+  })
+
+  test('keeps only the first texture, as Figma does', () => {
+    const second: FigmaEffect = { ...texture, radius: 8 }
+    expect(assign([texture, second]).effects).toEqual([texture])
+  })
+
+  test('refuses a grain wider than tall whose noiseSize is not the vector’s x', () => {
+    const mismatch: FigmaEffect = {
+      ...noise,
+      noiseSize: 1,
+      noiseSizeVector: { x: 0.5, y: 2 }
+    }
+    expect(() => assign([mismatch])).toThrow('does not match noiseSizeVector.x')
+  })
+
+  test('refuses a density or opacity outside 0 to 1', () => {
+    expect(() => assign([{ ...noise, density: 2 }])).toThrow('at [0].density')
+    expect(() => assign([{ ...multitone, opacity: -1 }])).toThrow('at [0].opacity')
+  })
+
+  test('refuses a blend mode or seed Figma’s effects do not take', () => {
+    expect(() => assign([{ ...noise, blendMode: 'NORMAL' }])).toThrow('at [0]')
+    expect(() => assign([{ ...noise, seed: 1 }])).toThrow('at [0]')
   })
 })

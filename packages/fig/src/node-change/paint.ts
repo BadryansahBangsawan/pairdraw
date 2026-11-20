@@ -1,3 +1,4 @@
+import { clamp } from 'es-toolkit/math'
 import { invert, mapValues, pickBy } from 'es-toolkit/object'
 import { isEmptyObject } from 'es-toolkit/predicate'
 
@@ -12,11 +13,13 @@ import type {
   ImageFilters,
   ImageScaleMode,
   GradientTransform,
+  NoiseEffectParams,
   StrokeCap,
-  StrokeJoin
+  StrokeJoin,
+  TextureEffectParams
 } from '@pairdraw/scene-graph'
-import { BLACK } from '@pairdraw/scene-graph/constants'
-import type { Color, Matrix } from '@pairdraw/scene-graph/primitives'
+import { BLACK, UNSET_NOISE, UNSET_TEXTURE } from '@pairdraw/scene-graph/constants'
+import type { Color, Matrix, Vector } from '@pairdraw/scene-graph/primitives'
 
 import { hexToBytes } from './bytes'
 
@@ -244,16 +247,116 @@ export function convertStrokes(
   }))
 }
 
+/** The scene graph's name for each `.fig` effect type it models; it leaves the others out. */
+const MODELED_EFFECT_TYPES: Partial<
+  Record<KiwiEffect['type'], Exclude<Effect['type'], 'SHADER'>>
+> = {
+  DROP_SHADOW: 'DROP_SHADOW',
+  INNER_SHADOW: 'INNER_SHADOW',
+  LAYER_BLUR: 'LAYER_BLUR',
+  BACKGROUND_BLUR: 'BACKGROUND_BLUR',
+  FOREGROUND_BLUR: 'FOREGROUND_BLUR',
+  NOISE: 'NOISE',
+  GRAIN: 'TEXTURE'
+}
+
+/** The scene graph's type for a `.fig` effect type, or null for one it does not model. */
+export function modeledEffectType(
+  type: KiwiEffect['type']
+): Exclude<Effect['type'], 'SHADER'> | null {
+  return MODELED_EFFECT_TYPES[type] ?? null
+}
+
+/**
+ * Each `.fig` effect's index among the effects the scene graph keeps, and null for one it leaves
+ * out, such as a repeat. Variable bindings name effects by this index, so every reader of a
+ * record's effects must count the same way.
+ */
+export function modeledEffectIndexes(effects: readonly KiwiEffect[]): (number | null)[] {
+  let next = 0
+  return effects.map((effect) => (modeledEffectType(effect.type) ? next++ : null))
+}
+
+/**
+ * A record's effects as the scene graph models them. Types it does not model stay out of
+ * `effects`; the record's raw payload keeps them for `.fig` export.
+ */
 export function convertEffects(effects?: KiwiEffect[]): Effect[] {
   if (!effects) return []
-  return effects.map((e) => ({
-    type: e.type,
-    color: convertColor(e.color),
-    offset: e.offset ?? { x: 0, y: 0 },
-    radius: e.radius ?? 0,
-    spread: e.spread ?? 0,
-    visible: e.visible ?? true,
-    blendMode: (e.blendMode ?? 'NORMAL') as BlendMode,
-    showShadowBehindNode: e.showShadowBehindNode ?? true
-  }))
+  return effects.flatMap((e): Effect[] => {
+    const type = modeledEffectType(e.type)
+    if (!type) return []
+    const blendMode = (e.blendMode ?? 'NORMAL') as BlendMode
+    const visible = e.visible ?? true
+    if (type === 'NOISE') {
+      return [{ type, color: convertColor(e.color), visible, blendMode, noise: convertNoise(e) }]
+    }
+    if (type === 'TEXTURE') {
+      return [
+        {
+          type,
+          color: convertColor(e.color),
+          radius: e.radius ?? 0,
+          visible,
+          blendMode,
+          texture: convertTexture(e)
+        }
+      ]
+    }
+    return [
+      {
+        type,
+        color: convertColor(e.color),
+        offset: e.offset ?? { x: 0, y: 0 },
+        radius: e.radius ?? 0,
+        spread: e.spread ?? 0,
+        visible,
+        blendMode,
+        showShadowBehindNode: e.showShadowBehindNode ?? true
+      }
+    ]
+  })
+}
+
+/** A noise effect's grain; only a duotone keeps a second colour, only a multitone an opacity. */
+function convertNoise(e: KiwiEffect): NoiseEffectParams {
+  const noise: NoiseEffectParams = {
+    noiseType: e.noiseType ?? UNSET_NOISE.noiseType,
+    noiseSize: grainSize(e.noiseSize, UNSET_NOISE.noiseSize),
+    density: finiteWithin(e.density, UNSET_NOISE.density, 0, 1)
+  }
+  // A duotone without a second colour draws both tones in its first, as the renderer does.
+  if (noise.noiseType === 'DUOTONE')
+    noise.secondaryColor = convertColor(e.secondaryColor ?? e.color)
+  if (noise.noiseType === 'MULTITONE') noise.opacity = finiteWithin(e.opacity, 1, 0, 1)
+  if (e.seed !== undefined && Number.isFinite(e.seed)) noise.seed = e.seed
+  return noise
+}
+
+/** A grain effect's texture; its `radius` stays the effect's own. */
+function convertTexture(e: KiwiEffect): TextureEffectParams {
+  const texture: TextureEffectParams = {
+    noiseSize: grainSize(e.noiseSize, UNSET_TEXTURE.noiseSize),
+    clipToShape: e.clipToShape ?? UNSET_TEXTURE.clipToShape
+  }
+  if (e.seed !== undefined && Number.isFinite(e.seed)) texture.seed = e.seed
+  return texture
+}
+
+/** The most Figma lets a grain size be on either axis. */
+const MAX_GRAIN_SIZE = 100
+
+/**
+ * `value` held within Figma's range for it, or `fallback` where a file stores no number there:
+ * a damaged or hand-made record must not reach the renderer as NaN.
+ */
+function finiteWithin(value: number | undefined, fallback: number, min: number, max: number) {
+  return value !== undefined && Number.isFinite(value) ? clamp(value, min, max) : fallback
+}
+
+function grainSize(size: Vector | undefined, fallback: Vector): Vector {
+  return {
+    x: finiteWithin(size?.x, fallback.x, 0, MAX_GRAIN_SIZE),
+    y: finiteWithin(size?.y, fallback.y, 0, MAX_GRAIN_SIZE)
+  }
 }

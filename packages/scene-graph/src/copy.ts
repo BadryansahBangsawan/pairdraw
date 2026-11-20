@@ -56,9 +56,28 @@ export function copyStroke(s: Stroke): Stroke {
 }
 
 export function copyEffect(e: Effect): Effect {
-  if (e.type === 'SHADER') return structuredClone(e)
   const normalized = normalizeEffects([e])[0] ?? e
   if (normalized.type === 'SHADER') return structuredClone(normalized)
+  if (normalized.type === 'NOISE') {
+    return {
+      ...normalized,
+      color: { ...normalized.color },
+      noise: {
+        ...normalized.noise,
+        noiseSize: { ...normalized.noise.noiseSize },
+        secondaryColor: normalized.noise.secondaryColor
+          ? { ...normalized.noise.secondaryColor }
+          : undefined
+      }
+    }
+  }
+  if (normalized.type === 'TEXTURE') {
+    return {
+      ...normalized,
+      color: { ...normalized.color },
+      texture: { ...normalized.texture, noiseSize: { ...normalized.texture.noiseSize } }
+    }
+  }
   return {
     ...normalized,
     color: { ...normalized.color },

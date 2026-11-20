@@ -8,13 +8,13 @@ import { computeContentBounds } from '#core/io/formats/raster'
 import {
   nextDefId,
   formatSolidColor,
-  createFilterDef,
   resolveFill,
   solidFillOpacity,
   SVG_STROKE_CAP,
   SVG_STROKE_JOIN,
   SVG_BLEND_MODE
 } from './defs'
+import { createFilterDef } from './effects'
 import {
   round,
   geometryBlobToSVGPath,
@@ -347,7 +347,7 @@ function buildGroupAttrs(
     attrs.style = `mix-blend-mode: ${blend}`
   }
 
-  const filterDef = createFilterDef(node.effects, ctx)
+  const filterDef = createFilterDef(node, ctx)
   if (filterDef) {
     ctx.defs.push(filterDef.node)
     attrs.filter = `url(#${filterDef.id})`

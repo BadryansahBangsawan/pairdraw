@@ -54,6 +54,9 @@ de:panels.maskTypeAlpha
 de:panels.maxHeightShort
 de:panels.minHeightShort
 de:panels.missingLibraryUsage
+de:panels.noiseDuo
+de:panels.noiseMono
+de:panels.noiseMulti
 de:panels.position
 de:panels.radialGradient
 de:panels.radius
@@ -113,6 +116,7 @@ es:panels.framePresetCategoryFigmaCommunity
 es:panels.kerning
 es:panels.localLibraries
 es:panels.missingLibraryUsage
+es:panels.noiseMono
 es:panels.radialGradient
 es:panels.stickyColor
 es:panels.textCaseOriginal
@@ -188,6 +192,10 @@ fr:panels.maxHeightShort
 fr:panels.minHeightShort
 fr:panels.missingLibraryUsage
 fr:panels.nestedInstance
+fr:panels.noiseDuo
+fr:panels.noiseMono
+fr:panels.noiseMulti
+fr:panels.texture
 fr:panels.page
 fr:panels.pages
 fr:panels.position
@@ -261,6 +269,10 @@ it:panels.behaviourMax
 it:panels.behaviourStateHover
 it:panels.behaviourStateFocus
 it:panels.missingLibraryUsage
+it:panels.noiseDuo
+it:panels.noiseMono
+it:panels.noiseMulti
+it:panels.texture
 it:panels.shader
 it:panels.variableModeAuto
 it:panels.variableModeAutoMixed
@@ -325,6 +337,9 @@ pl:panels.framePresetCategoryTablet
 pl:panels.kerning
 pl:panels.behaviourMin
 pl:panels.missingLibraryUsage
+pl:panels.noiseDuo
+pl:panels.noiseMono
+pl:panels.noiseMulti
 pl:panels.shader
 pl:settings.mcp
 pl:settings.media

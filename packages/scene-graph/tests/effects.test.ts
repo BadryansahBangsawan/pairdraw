@@ -45,7 +45,9 @@ function layerBlurWithoutOffset(): Effect {
 const shader: Effect = { type: 'SHADER', source: 'void main() {}', visible: true }
 
 function storedOffset(effect: Effect | undefined): Vector | null {
-  if (!effect || effect.type === 'SHADER') return null
+  if (!effect) return null
+  // Shader, noise, and texture effects carry no offset of their own.
+  if (effect.type === 'SHADER' || effect.type === 'NOISE' || effect.type === 'TEXTURE') return null
   return effect.offset
 }
 
@@ -96,6 +98,6 @@ describe('effect offsets on the graph', () => {
 
   test('copying a drop shadow without an offset yields 0, 4', () => {
     const copy = copyEffect(dropShadow())
-    expect(copy.type === 'SHADER' ? null : copy.offset).toEqual({ x: 0, y: 4 })
+    expect(copy.type === 'DROP_SHADOW' ? copy.offset : null).toEqual({ x: 0, y: 4 })
   })
 })

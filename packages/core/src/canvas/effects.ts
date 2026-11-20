@@ -115,13 +115,36 @@ function rawNoiseEffects(node: SceneNode): RawNoiseEffect[] {
 }
 
 /**
- * Whether a node carries an effect a reduced-effects canvas leaves out, so a picture recorded on
- * one would not match an export.
+ * A layer's noise effects: the raw ones an imported file wrote, which keep their own fields, or
+ * the modeled ones a layer created here carries. A grain's `seed` picks its pattern; drawing is
+ * the reduced dot pattern both share, not Figma's own generator.
  */
+function noiseEffectsFor(node: SceneNode): RawNoiseEffect[] {
+  const raw = rawNoiseEffects(node)
+  if (raw.length > 0) return raw
+  return node.effects.flatMap((effect): RawNoiseEffect[] => {
+    if (!effect.visible || effect.type !== 'NOISE') return []
+    return [
+      {
+        type: 'NOISE',
+        color: effect.color,
+        secondaryColor: effect.noise.secondaryColor,
+        opacity: effect.noise.opacity,
+        density: effect.noise.density,
+        noiseSize: effect.noise.noiseSize,
+        noiseType: effect.noise.noiseType
+      }
+    ]
+  })
+}
+
+/** Whether a node carries an effect a reduced-effects canvas leaves out, so a picture recorded on
+ * one would not match an export. */
 export function hasReducibleEffects(node: SceneNode): boolean {
   return (
-    node.effects.some((effect) => effect.visible && effect.type === 'BACKGROUND_BLUR') ||
-    rawNoiseEffects(node).length > 0
+    node.effects.some(
+      (effect) => effect.visible && (effect.type === 'BACKGROUND_BLUR' || effect.type === 'NOISE')
+    ) || rawNoiseEffects(node).length > 0
   )
 }
 
@@ -165,9 +188,9 @@ function renderNoiseEffect(
   }
 }
 
-/** Draws the raw Figma noise effects a node carries, which the scene graph does not model. */
+/** Draws a layer's noise effects: raw fields for imported layers, modeled ones created here. */
 export function renderNoiseEffects(r: SkiaRenderer, canvas: Canvas, node: SceneNode): void {
-  for (const effect of rawNoiseEffects(node)) {
+  for (const effect of noiseEffectsFor(node)) {
     renderNoiseEffect(r, canvas, node, effect)
   }
 }

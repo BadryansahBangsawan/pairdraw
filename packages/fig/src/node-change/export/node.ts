@@ -2,21 +2,25 @@ import type { DerivedSymbolOverride } from '#fig/instance-overrides/types'
 import { effectiveFigmaRawNodeFields, effectiveFigmaSourcePayload } from '#fig/source-metadata'
 import { compact } from 'es-toolkit/array'
 
-import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
+import type { Effect as KiwiEffect, NodeChange } from '@pairdraw/kiwi/fig/codec'
 import { stringToGuid } from '@pairdraw/kiwi/fig/guid'
 import type {
   ComponentPropertyDefinition,
   ComponentPropertyReferenceField,
+  Effect,
   LayoutGrid,
+  NoiseEffectParams,
   SceneGraph,
-  SceneNode
+  SceneNode,
+  ShaderEffect,
+  TextureEffectParams
 } from '@pairdraw/scene-graph'
 import { DEFAULT_STROKE_MITER_LIMIT, DEFAULT_STROKE_WEIGHT } from '@pairdraw/scene-graph/constants'
 import { isGeneratedFrame } from '@pairdraw/scene-graph/generated'
 import { layoutGridCount } from '@pairdraw/scene-graph/layout'
 import { siblingOrderKeys } from '@pairdraw/scene-graph/order-keys'
 import { PAIRDRAW_PLUGIN_DATA, withPluginData } from '@pairdraw/scene-graph/plugin-data'
-import type { GUID, Matrix, Vector } from '@pairdraw/scene-graph/primitives'
+import type { Color, GUID, Matrix, Vector } from '@pairdraw/scene-graph/primitives'
 
 /* eslint-disable max-lines */
 import { bytesToHex } from '../bytes'
@@ -754,7 +758,9 @@ const SUPPORTED_NORMALIZED_EFFECT_TYPES = new Set([
   'INNER_SHADOW',
   'LAYER_BLUR',
   'BACKGROUND_BLUR',
-  'FOREGROUND_BLUR'
+  'FOREGROUND_BLUR',
+  'NOISE',
+  'GRAIN'
 ])
 
 function hasRawUnsupportedEffects(node: SceneNode): boolean {
@@ -769,6 +775,72 @@ function hasRawUnsupportedEffects(node: SceneNode): boolean {
         !SUPPORTED_NORMALIZED_EFFECT_TYPES.has(String(effect.type))
     )
   )
+}
+
+/** The `.fig` name of each effect type the export writes. */
+const KIWI_EFFECT_TYPE: Record<Exclude<Effect['type'], 'SHADER'>, KiwiEffect['type']> = {
+  DROP_SHADOW: 'DROP_SHADOW',
+  INNER_SHADOW: 'INNER_SHADOW',
+  LAYER_BLUR: 'FOREGROUND_BLUR',
+  BACKGROUND_BLUR: 'BACKGROUND_BLUR',
+  FOREGROUND_BLUR: 'FOREGROUND_BLUR',
+  NOISE: 'NOISE',
+  TEXTURE: 'GRAIN'
+}
+
+/**
+ * An effect as its record writes it, `.fig` naming a layer blur a foreground blur and a texture a
+ * grain, with the fields only a noise or texture effect has.
+ */
+function figmaEffect(
+  context: SceneNodeToKiwiContext,
+  effect: Exclude<Effect, ShaderEffect>
+): KiwiEffect {
+  const base: KiwiEffect = {
+    type: KIWI_EFFECT_TYPE[effect.type],
+    color: context.safeColor(effect.color),
+    visible: effect.visible,
+    blendMode: effect.blendMode ?? 'NORMAL'
+  }
+  if (effect.type === 'NOISE') {
+    return { ...base, ...kiwiNoiseFields(effect.noise, effect.color) }
+  }
+  if (effect.type === 'TEXTURE') {
+    return { ...base, radius: effect.radius, ...kiwiTextureFields(effect.texture) }
+  }
+  return {
+    ...base,
+    offset: effect.offset,
+    radius: effect.radius,
+    spread: effect.spread,
+    showShadowBehindNode: effect.showShadowBehindNode
+  }
+}
+
+/**
+ * A noise effect's grain as Figma writes it: a duotone's second colour, its first where it has
+ * none as the renderer draws it, and a multitone's opacity.
+ */
+function kiwiNoiseFields(noise: NoiseEffectParams, color: Color): Partial<KiwiEffect> {
+  const fields: Partial<KiwiEffect> = {
+    noiseType: noise.noiseType,
+    noiseSize: { ...noise.noiseSize },
+    density: noise.density
+  }
+  if (noise.noiseType === 'DUOTONE') fields.secondaryColor = { ...(noise.secondaryColor ?? color) }
+  if (noise.noiseType === 'MULTITONE') fields.opacity = noise.opacity ?? 1
+  if (noise.seed !== undefined) fields.seed = noise.seed
+  return fields
+}
+
+/** A texture's grain under the `.fig` names; its strength is the effect's `radius`. */
+function kiwiTextureFields(texture: TextureEffectParams): Partial<KiwiEffect> {
+  const fields: Partial<KiwiEffect> = {
+    noiseSize: { ...texture.noiseSize },
+    clipToShape: texture.clipToShape
+  }
+  if (texture.seed !== undefined) fields.seed = texture.seed
+  return fields
 }
 
 function nodeForGeometryExport(node: SceneNode): SceneNode {
@@ -858,16 +930,7 @@ function applyNodeVisualProps(
   // Figma has no shader effect, so exporting one would write a shadow it does not have.
   const effects = node.effects.filter((effect) => effect.type !== 'SHADER')
   if (effects.length > 0 && !hasRawUnsupportedEffects(node)) {
-    nc.effects = effects.map((effect) => ({
-      type: effect.type === 'LAYER_BLUR' ? 'FOREGROUND_BLUR' : effect.type,
-      color: context.safeColor(effect.color),
-      offset: effect.offset,
-      radius: effect.radius,
-      spread: effect.spread,
-      visible: effect.visible,
-      blendMode: effect.blendMode ?? 'NORMAL',
-      showShadowBehindNode: effect.showShadowBehindNode
-    }))
+    nc.effects = effects.map((effect) => figmaEffect(context, effect))
   }
 
   if (node.type === 'TEXT') serializeText(context, node, nc)

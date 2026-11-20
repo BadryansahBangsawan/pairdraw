@@ -424,8 +424,13 @@ export class SkiaRenderer {
   effectOverflow(node: SceneNode): number {
     let expand = 0
     for (const e of node.effects) {
-      // A shader effect has no radius, spread, or offset of its own.
-      if (!e.visible || e.type === 'SHADER') continue
+      // A shader effect has no radius, spread, or offset of its own, and a noise stays inside
+      // the layer. A clipped texture does too; an unclipped one moves the edges out by its radius.
+      if (!e.visible || e.type === 'SHADER' || e.type === 'NOISE') continue
+      if (e.type === 'TEXTURE') {
+        if (!e.texture.clipToShape) expand = Math.max(expand, e.radius)
+        continue
+      }
       const blur = e.radius
       const spread = e.spread
       const ox = Math.abs(e.offset.x)

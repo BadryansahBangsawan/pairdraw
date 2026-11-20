@@ -161,7 +161,22 @@ export interface Paint {
 }
 
 export interface Effect {
-  type: 'DROP_SHADOW' | 'INNER_SHADOW' | 'LAYER_BLUR' | 'BACKGROUND_BLUR' | 'FOREGROUND_BLUR'
+  /**
+   * Every type the schema's `EffectType` has. `LAYER_BLUR` is the plugin API's name for
+   * `FOREGROUND_BLUR`, and `GRAIN` its `TEXTURE`.
+   */
+  type:
+    | 'DROP_SHADOW'
+    | 'INNER_SHADOW'
+    | 'LAYER_BLUR'
+    | 'BACKGROUND_BLUR'
+    | 'FOREGROUND_BLUR'
+    | 'GLASS'
+    | 'NOISE'
+    | 'GRAIN'
+    | 'REPEAT'
+    | 'SYMMETRY'
+    | 'CUSTOM'
   color?: Color
   offset?: Vector
   radius?: number
@@ -169,6 +184,20 @@ export interface Effect {
   spread?: number
   blendMode?: string
   showShadowBehindNode?: boolean
+  /** A noise effect's kind: one tone, two, or many. */
+  noiseType?: 'MONOTONE' | 'DUOTONE' | 'MULTITONE'
+  /** A noise effect's second tone, which a duotone draws as the first when it has none. */
+  secondaryColor?: Color
+  /** A grain's size in px; Figma keeps it within 0 to 100. */
+  noiseSize?: Vector
+  /** How much of the layer a noise effect's grains cover, 0 to 1. */
+  density?: number
+  /** A multitone noise's grain opacity, 0 to 1. */
+  opacity?: number
+  /** The pattern's seed, which Figma's plugin API neither shows nor sets. */
+  seed?: number
+  /** Whether a texture keeps the roughened layer inside its own outline. */
+  clipToShape?: boolean
 }
 
 export interface VariableAnyValue {

@@ -6,3 +6,4 @@
 - Each row of a variable picker previews its own variable's colour inside a bound fill field, instead of every row showing the bound variable's colour.
 - Undoing an edit inside a component returns the document to saved, instead of the instances that follow the component counting as a change made outside the history.
 - A nudge records its step when the arrow keys pause, and undoing it afterwards returns the document to saved instead of leaving it reported as changed.
+- A library copy's text links point at the copy's layers rather than the source file's, so a link still jumps to its layer after the component is published, inserted or updated, while duplicate and paste keep their links as they were.

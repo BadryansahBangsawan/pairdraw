@@ -66,7 +66,7 @@ function markDefinitions(
   const descriptorsBySourceId = new Map(
     revision.manifest.assets.map((asset) => [asset.sourceNodeId, asset])
   )
-  remapCopiedReferences(graph, mappedIds)
+  remapCopiedReferences(graph, mappedIds, { followTextLinks: true })
   for (const [sourceId, targetId] of mappedIds) {
     const target = graph.getNode(targetId)
     if (!target) continue

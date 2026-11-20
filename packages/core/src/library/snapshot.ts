@@ -100,7 +100,7 @@ export function extractLibrarySnapshot(
   for (const root of closureRoots) addSnapshotNode(source, snapshot, root.id, page.id, mappedIds)
   for (const [sourceId, targetId] of mappedIds)
     if (sourceId === targetId) throw new Error('Snapshot IDs must be remapped')
-  remapCopiedReferences(snapshot, mappedIds)
+  remapCopiedReferences(snapshot, mappedIds, { followTextLinks: true })
 
   for (const imageHash of new Set(
     [...closure].flatMap((id) => {

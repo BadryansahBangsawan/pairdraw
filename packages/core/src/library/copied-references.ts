@@ -1,12 +1,19 @@
-import { mapValues } from 'es-toolkit'
+import { isEqual, mapValues } from 'es-toolkit'
 
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { remapInstanceOverrideState } from '@pairdraw/scene-graph/instances/overrides'
+import { remapStyleRunReferences } from '@pairdraw/scene-graph/text'
+
+/** Copies placed in another document, whose text links must follow the copy. */
+export interface CopiedReferenceOptions {
+  followTextLinks?: boolean
+}
 
 function remappedReferences(
   node: SceneNode,
   mapped: (id: string) => string,
-  swapProperties: ReadonlySet<string>
+  swapProperties: ReadonlySet<string>,
+  followTextLinks: boolean
 ): Partial<SceneNode> {
   const changes: Partial<SceneNode> = {}
   if (node.componentId && mapped(node.componentId) !== node.componentId)
@@ -31,6 +38,16 @@ function remappedReferences(
       (value, id) => (swapProperties.has(id) ? mapped(value) : value)
     )
   }
+  if (followTextLinks) {
+    // A text link names a layer of the document it was copied from, which the receiving document
+    // lacks; following the copy points it at the copy's layer.
+    const styleRuns = remapStyleRunReferences(node.styleRuns, {
+      variable: (id) => id,
+      style: (id) => id,
+      node: mapped
+    })
+    if (!isEqual(styleRuns, node.styleRuns)) changes.styleRuns = styleRuns
+  }
   return changes
 }
 
@@ -39,11 +56,13 @@ function remappedReferences(
  * paste: an instance's main component, the layers its overrides change and the components they
  * swap in, and the components an instance-swap property defaults to or is set to. `mappedIds`
  * maps each copied layer to its copy; a reference outside the copy stays as it is, and so do
- * variable IDs, since the copies keep their source's variables.
+ * variable IDs, since the copies keep their source's variables. Text links follow the copy only
+ * with `followTextLinks`: duplicate and paste keep them on the original layers, as Figma does.
  */
 export function remapCopiedReferences(
   graph: SceneGraph,
-  mappedIds: ReadonlyMap<string, string>
+  mappedIds: ReadonlyMap<string, string>,
+  options: CopiedReferenceOptions = {}
 ): void {
   const mapped = (id: string) => mappedIds.get(id) ?? id
   const copies = [...mappedIds.values()].flatMap((id) => graph.getNode(id) ?? [])
@@ -55,7 +74,12 @@ export function remapCopiedReferences(
     )
   )
   for (const node of copies) {
-    const changes = remappedReferences(node, mapped, swapProperties)
+    const changes = remappedReferences(
+      node,
+      mapped,
+      swapProperties,
+      options.followTextLinks === true
+    )
     if (Object.keys(changes).length > 0) graph.updateNode(node.id, changes)
   }
 }

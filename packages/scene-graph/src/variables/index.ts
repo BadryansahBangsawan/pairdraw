@@ -4,7 +4,11 @@ import { omit, omitBy } from 'es-toolkit/object'
 import { BLACK } from '../constants'
 import type { SceneGraph } from '../graph'
 import { findInstanceAncestor } from '../instances'
-import { bindingOverrideField, setInstanceOverride } from '../instances/overrides'
+import {
+  bindingOverrideField,
+  setInstanceOverride,
+  variableModeOverrideField
+} from '../instances/overrides'
 import { isShaderSourcePaint, shaderOfPaint, withShaderPaints } from '../shaders/model'
 import type {
   SceneNode,
@@ -158,6 +162,14 @@ export function removeCollection(graph: SceneGraph, id: string): void {
   }
   graph.variableCollections.delete(id)
   graph.activeMode.delete(id)
+  // A layer that chose one of its modes has nothing left to choose from.
+  for (const node of graph.nodes.values()) {
+    if (!(id in node.variableModes)) continue
+    const variableModes = omit(node.variableModes, [id])
+    graph.willChangeNode(node)
+    node.variableModes = variableModes
+    graph.emitter.emit('node:updated', node.id, { variableModes })
+  }
 }
 
 export function setActiveMode(graph: SceneGraph, collectionId: string, modeId: string): void {
@@ -208,6 +220,19 @@ export function removeMode(graph: SceneGraph, collectionId: string, modeId: stri
   for (const varId of collection.variableIds) {
     const variable = graph.variables.get(varId)
     if (variable) variable.valuesByMode = omit(variable.valuesByMode, [modeId])
+  }
+  // A layer that chose the mode goes back to the collection's default, and an instance keeps no
+  // override naming a mode that is gone, which would otherwise come back on a later sync.
+  const overrideField = variableModeOverrideField(collectionId)
+  for (const node of graph.nodes.values()) {
+    if (node.variableModes[collectionId] !== modeId) continue
+    const variableModes = omit(node.variableModes, [collectionId])
+    graph.willChangeNode(node)
+    node.variableModes = variableModes
+    node.instanceOverrides.self.delete(overrideField)
+    for (const overrides of node.instanceOverrides.descendants.values())
+      overrides.delete(overrideField)
+    graph.emitter.emit('node:updated', node.id, { variableModes })
   }
   if (graph.activeMode.get(collectionId) === modeId) {
     graph.activeMode.set(collectionId, collection.defaultModeId)

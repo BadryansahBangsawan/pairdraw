@@ -1,4 +1,4 @@
-import type { CanvasKit, Canvas } from 'canvaskit-wasm'
+import type { CanvasKit, Canvas, Image as CanvasImage } from 'canvaskit-wasm'
 
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import type { RenderColorSpace } from '@pairdraw/scene-graph/color'
@@ -20,6 +20,25 @@ interface RenderOptions {
   quality?: number
   colorSpace?: RenderColorSpace
   trimTransparent?: boolean
+}
+
+/** Pixels an export may hold before it is refused, keeping a large scale from aborting CanvasKit. */
+export const MAX_EXPORT_PIXELS = 150_000_000
+/** Intermediate pixels above which the 2× supersampling that sharpens small exports is dropped. */
+const SUPERSAMPLE_PIXELS = 150_000_000
+
+/** Throws when an export of `width`×`height` pixels is larger than the renderer may allocate. */
+export function assertExportSize(width: number, height: number): void {
+  if (width * height > MAX_EXPORT_PIXELS) {
+    throw new Error(
+      `Export is too large: ${width}×${height} pixels (limit ${MAX_EXPORT_PIXELS}). Reduce the scale.`
+    )
+  }
+}
+
+/** The scale an export renders at before downsampling: 2× while it stays within the budget. */
+export function exportRenderScale(width: number, height: number): number {
+  return width * height * 4 <= SUPERSAMPLE_PIXELS ? 2 : 1
 }
 
 function ensureSinglePageSelection(graph: SceneGraph, pageId: string, nodeIds: string[]): boolean {
@@ -92,6 +111,31 @@ function shouldTrimAlphaBounds(
   )
 }
 
+/** Encodes `image`, whose pixels are `width`×`height`, falling back to the host's encoder. */
+function encodeImage(
+  ck: CanvasKit,
+  renderer: SkiaRenderer,
+  image: CanvasImage,
+  width: number,
+  height: number,
+  format: ExportFormat,
+  quality: number
+): Uint8Array<ArrayBuffer> | null {
+  const encoded = image.encodeToBytes(ckImageFormat(ck, format), quality)
+  if (encoded) return new Uint8Array(encoded)
+  if (format !== 'JPG' && format !== 'WEBP') return null
+  const raw = image.readPixels(0, 0, {
+    alphaType: ck.AlphaType.Unpremul,
+    colorType: ck.ColorType.RGBA_8888,
+    colorSpace: ck.ColorSpace.SRGB,
+    width,
+    height
+  })
+  return raw instanceof Uint8Array
+    ? renderer.encodeRasterFallback(raw, width, height, format, quality)
+    : null
+}
+
 function renderToSurface(
   ck: CanvasKit,
   renderer: SkiaRenderer,
@@ -104,7 +148,7 @@ function renderToSurface(
   setup: (canvas: Canvas) => void,
   trimTransparent = false
 ): Uint8Array<ArrayBuffer> | null {
-  const renderScale = 2
+  const renderScale = exportRenderScale(width, height)
   const renderWidth = width * renderScale
   const renderHeight = height * renderScale
   const pixels = ck.Malloc(Uint8Array, renderWidth * renderHeight * 4)
@@ -121,7 +165,7 @@ function renderToSurface(
   )
   if (!surface) {
     ck.Free(pixels)
-    return null
+    throw new Error(`Could not allocate a ${renderWidth}×${renderHeight} export surface.`)
   }
 
   try {
@@ -132,6 +176,13 @@ function renderToSurface(
     surface.flush()
 
     const highResImage = surface.makeImageSnapshot()
+    // At the export's own scale the snapshot is already the output: encode it without a second
+    // full-size surface, which a large export would not have room for.
+    if (renderScale === 1 && !trimTransparent) {
+      const directBytes = encodeImage(ck, renderer, highResImage, width, height, format, quality)
+      highResImage.delete()
+      return directBytes
+    }
     const downsamplePixels = ck.Malloc(Uint8Array, width * height * 4)
     const downsampleSurface = ck.MakeRasterDirectSurface(
       {
@@ -147,7 +198,7 @@ function renderToSurface(
     if (!downsampleSurface) {
       ck.Free(downsamplePixels)
       highResImage.delete()
-      return null
+      throw new Error(`Could not allocate a ${width}×${height} export surface.`)
     }
     const downsampleCanvas = downsampleSurface.getCanvas()
     downsampleCanvas.clear(ck.TRANSPARENT)
@@ -303,6 +354,7 @@ export function renderNodesToImage(
   const pixelW = Math.ceil(contentW * options.scale)
   const pixelH = Math.ceil(contentH * options.scale)
   if (pixelW <= 0 || pixelH <= 0) return null
+  assertExportSize(pixelW, pixelH)
 
   // Figma exports a layer by itself, without the page behind it, even when it blends.
   const extracted = extractExportGraph(graph, { scope: 'selection', nodeIds })

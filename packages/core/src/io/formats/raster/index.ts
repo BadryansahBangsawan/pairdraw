@@ -1,5 +1,8 @@
 export {
+  assertExportSize,
   computeContentBounds,
+  exportRenderScale,
+  MAX_EXPORT_PIXELS,
   renderNodesToImage,
   renderThumbnail,
   thumbnailFrame,

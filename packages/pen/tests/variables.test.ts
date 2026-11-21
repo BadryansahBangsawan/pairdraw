@@ -449,3 +449,75 @@ describe('parsePenFile — independent theme axes (#1829)', () => {
     expect(modes).toHaveLength(36)
   })
 })
+
+describe('writing variable references', () => {
+  const spacingRef = '$rt-spacing'
+
+  test('keeps corner and padding references a document was read with', () => {
+    const graph = parseVariableDocument('rt-', [
+      {
+        id: 'card',
+        type: 'frame',
+        cornerRadius: spacingRef,
+        padding: spacingRef,
+        children: []
+      }
+    ])
+    const spacing = [...graph.variables.values()].find((variable) => variable.name === 'rt-spacing')
+    const before = graph.getNode('card')?.boundVariables
+    expect(before).toMatchObject({
+      cornerRadius: spacing?.id,
+      paddingTop: spacing?.id,
+      paddingRight: spacing?.id,
+      paddingBottom: spacing?.id,
+      paddingLeft: spacing?.id
+    })
+
+    const reread = parsePenFile(writePenDocument(graph))
+    const boundNames = Object.entries(reread.getNode('card')?.boundVariables ?? {}).map(
+      ([field, id]) => [field, reread.variables.get(id)?.name]
+    )
+
+    expect(boundNames).toEqual([
+      ['cornerRadius', spacing?.name],
+      ['paddingTop', spacing?.name],
+      ['paddingRight', spacing?.name],
+      ['paddingBottom', spacing?.name],
+      ['paddingLeft', spacing?.name]
+    ])
+    expect(reread.getNode('card')).toMatchObject({
+      cornerRadius: 24,
+      paddingTop: 24,
+      paddingRight: 24,
+      paddingBottom: 24,
+      paddingLeft: 24
+    })
+  })
+
+  test('keeps a reference on each independent corner', () => {
+    const graph = parseVariableDocument('rt-', [
+      {
+        id: 'card',
+        type: 'frame',
+        cornerRadius: [spacingRef, 0, spacingRef, 0],
+        children: []
+      }
+    ])
+    const spacing = [...graph.variables.values()].find((variable) => variable.name === 'rt-spacing')
+
+    const reread = parsePenFile(writePenDocument(graph))
+    const boundNames = Object.entries(reread.getNode('card')?.boundVariables ?? {}).map(
+      ([field, id]) => [field, reread.variables.get(id)?.name]
+    )
+
+    expect(boundNames).toEqual([
+      ['topLeftRadius', spacing?.name],
+      ['bottomRightRadius', spacing?.name]
+    ])
+    expect(reread.getNode('card')).toMatchObject({
+      independentCorners: true,
+      topLeftRadius: 24,
+      bottomRightRadius: 24
+    })
+  })
+})

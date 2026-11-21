@@ -298,11 +298,12 @@ function layoutFields(state: PenWriteState, node: SceneNode): Partial<PenNode> {
   else if (node.itemSpacing !== 0) fields.gap = rounded(node.itemSpacing)
   if (node.primaryAxisAlign !== 'MIN') fields.justifyContent = justify[node.primaryAxisAlign]
   if (node.counterAxisAlign !== 'MIN') fields.alignItems = align[node.counterAxisAlign]
-  const padding: [number, number, number, number] = [
-    node.paddingTop,
-    node.paddingRight,
-    node.paddingBottom,
-    node.paddingLeft
+  // A padding bound to a variable is written as its reference, as the reader binds it again.
+  const padding: [PenNumber, PenNumber, PenNumber, PenNumber] = [
+    variableOr(state, node, 'paddingTop', node.paddingTop),
+    variableOr(state, node, 'paddingRight', node.paddingRight),
+    variableOr(state, node, 'paddingBottom', node.paddingBottom),
+    variableOr(state, node, 'paddingLeft', node.paddingLeft)
   ]
   if (padding.some((value) => value !== 0)) fields.padding = padding
   if (node.clipsContent) fields.clip = true
@@ -415,19 +416,19 @@ function textFields(state: PenWriteState, node: SceneNode): Partial<PenNode> {
   return fields
 }
 
-function cornerFields(node: SceneNode): Partial<PenNode> {
+function cornerFields(state: PenWriteState, node: SceneNode): Partial<PenNode> {
   if (node.independentCorners) {
     return {
       cornerRadius: [
-        node.topLeftRadius,
-        node.topRightRadius,
-        node.bottomRightRadius,
-        node.bottomLeftRadius
+        variableOr(state, node, 'topLeftRadius', rounded(node.topLeftRadius)),
+        variableOr(state, node, 'topRightRadius', rounded(node.topRightRadius)),
+        variableOr(state, node, 'bottomRightRadius', rounded(node.bottomRightRadius)),
+        variableOr(state, node, 'bottomLeftRadius', rounded(node.bottomLeftRadius))
       ]
     }
   }
-  if (node.cornerRadius !== 0) return { cornerRadius: rounded(node.cornerRadius) }
-  return {}
+  const radius = variableOr(state, node, 'cornerRadius', rounded(node.cornerRadius))
+  return radius === 0 ? {} : { cornerRadius: radius }
 }
 
 function variableScalar(value: VariableValue | undefined, state: PenWriteState): PenVariableScalar {
@@ -511,7 +512,7 @@ function basicNodeFields(state: PenWriteState, node: SceneNode, result: PenNode)
     result,
     strokesOf(state, node),
     layoutFields(state, node),
-    cornerFields(node),
+    cornerFields(state, node),
     textFields(state, node)
   )
 }

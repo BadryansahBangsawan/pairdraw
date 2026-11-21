@@ -28,6 +28,7 @@ import {
   elementDisplay,
   flowOf,
   inheritedTextStyle,
+  type FlowKind,
   type ParentFlow
 } from './flow'
 import {
@@ -574,6 +575,41 @@ function hasContent(element: DesignElement): boolean {
   return element.children.some((child) => child.type !== 'text' || child.text.trim().length > 0)
 }
 
+/** Whether a child sits in a line of its parent's content or leaves it, rather than a block. */
+function isInLine(node: DesignNode): boolean {
+  if (node.type === 'text' || node.tagName.toLowerCase() === 'br') return true
+  const style = mergedStyle(node)
+  const display = elementDisplay(node, style)
+  const position = pickStyle(style, 'position')
+  return (
+    display.startsWith('inline') ||
+    display === 'none' ||
+    position === 'absolute' ||
+    position === 'fixed'
+  )
+}
+
+/**
+ * Whether a block holds inline content with boxes in it, such as a paragraph with a styled
+ * `<code>`, which CSS lays out in lines rather than stacking each run and box.
+ */
+function holdsInlineBoxes(element: DesignElement): boolean {
+  return (
+    element.children.some((child) => child.type === 'element') && element.children.every(isInLine)
+  )
+}
+
+/** The flow a box lays its children out in, and whether they are one text instead. */
+function containerFlow(element: DesignElement, display: string) {
+  // A box without content keeps its own size, as an image does, unless it declares a layout.
+  const own = hasContent(element) || flowOf(display) === 'flex' ? flowOf(display) : null
+  const richText = own !== 'flex' && holdsRichText(element)
+  // Inline content that cannot be one text runs in lines that wrap at the block's width.
+  const lines = own === 'block' && !richText && holdsInlineBoxes(element)
+  const flow: FlowKind | null = lines ? 'inline' : own
+  return { flow, richText, lines }
+}
+
 function createElementNode(
   graph: SceneGraph,
   parentId: string,
@@ -582,7 +618,8 @@ function createElementNode(
 ): SceneNode | null {
   const style = mergedStyle(element)
   const display = elementDisplay(element, style)
-  if (display === 'none') return null
+  // A line break between boxes draws nothing; rich text reads it as a new line.
+  if (display === 'none' || element.tagName.toLowerCase() === 'br') return null
   if (
     isTextLikeElement(element) &&
     !hasBoxStyle(style) &&
@@ -602,16 +639,16 @@ function createElementNode(
     clipsContent: false
   })
   applyElementStyle(graph, node, element, style)
-  // A box without content keeps its own size, as an image does, unless it declares a layout.
-  const flow = hasContent(element) || flowOf(display) === 'flex' ? flowOf(display) : null
+  const { flow, richText, lines } = containerFlow(element, display)
   if (flow) {
     applyContainerLayout(node, element, style, flow)
     if (flow === 'flex') applyFlexGap(node, style)
+    if (lines) node.layoutWrap = 'WRAP'
   }
   applyFlowSizing(graph, node, style, display, parentFlow)
 
   // Blocks of text in a box's own flow are one text; a flex box's children are items.
-  if (flow !== 'flex' && holdsRichText(element)) {
+  if (richText) {
     const textStyle = inheritedTextStyle(element, style)
     const textDisplay = flow === 'inline' ? 'inline' : 'block'
     createRichTextNode(graph, node.id, element, textStyle, textDisplay, flow ?? 'none')

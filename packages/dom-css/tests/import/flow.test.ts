@@ -52,6 +52,19 @@ describe('HTML flow as auto layout', () => {
     expect(textIn(graph, send).textAutoResize).toBe('WIDTH_AND_HEIGHT')
   })
 
+  it('lays inline content with boxes in it out in lines that wrap, without a box per break', async () => {
+    const { graph, byName } = await importHTML(
+      `<p id="line" style="width:300px">Names follow <code id="chip" style="background:#eee;padding:0 4px">Cell</code> from here.<br></p>`
+    )
+    const line = byName('line')
+    expect(line).toMatchObject({ layoutMode: 'HORIZONTAL', layoutWrap: 'WRAP' })
+    expect(graph.getChildren(line.id).map((child) => child.text || child.name)).toEqual([
+      'Names follow ',
+      'chip',
+      ' from here.'
+    ])
+  })
+
   it('stacks block children inside an inline-block, which sits in a line itself', async () => {
     const { byName, sizing } = await importHTML(
       `<div style="width:300px"><div id="chip" style="display:inline-block"><div>Title</div><div>Detail</div></div></div>`

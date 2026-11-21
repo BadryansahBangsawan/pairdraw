@@ -534,6 +534,10 @@
         "accelerator": "CmdOrCtrl+Alt+B"
       },
       {
+        "id": "selection.pushInstanceOverrides",
+        "label": "Push Changes to Main Component"
+      },
+      {
         "id": "selection.resetInstanceOverrides",
         "label": "Reset All Changes"
       },

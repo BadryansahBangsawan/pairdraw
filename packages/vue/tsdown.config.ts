@@ -73,6 +73,7 @@ export default defineConfig({
     'controls/component-props/index': './src/controls/component-props/index.ts',
     'controls/connector/index': './src/controls/connector/index.ts',
     'controls/constraints/index': './src/controls/constraints/index.ts',
+    'controls/document-colors/index': './src/controls/document-colors/index.ts',
     'controls/effects/index': './src/controls/effects/index.ts',
     'controls/fill/index': './src/controls/fill/index.ts',
     'controls/icon/index': './src/controls/icon/index.ts',

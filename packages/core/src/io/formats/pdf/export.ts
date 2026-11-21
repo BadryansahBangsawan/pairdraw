@@ -98,7 +98,7 @@ async function renderPages(
   const first = prepared[0]
 
   const { jsPDF } = await import('jspdf')
-  const svg2pdf = await loadSVG2PDF(jsPDF)
+  const svg2pdf = await loadSVG2PDF()
 
   const doc = new jsPDF({
     orientation: orientationOf(first),

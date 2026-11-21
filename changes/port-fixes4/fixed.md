@@ -1,0 +1,3 @@
+- Escape clears the selection at any depth and Enter keeps layers without children selected, as in Figma; a click takes the empty area of a component or instance whatever its fill, while a ⌘-click passes through a frame or instance whose fill does not show.
+- Picking a layer in the layers panel scopes canvas clicks as a click on that layer would, and no dashed outline marks the container.
+- PDF export works in the installed `pairdraw` CLI and MCP server, which run on Node.js, instead of failing with "Cannot read properties of undefined (reading 'jsPDF')".

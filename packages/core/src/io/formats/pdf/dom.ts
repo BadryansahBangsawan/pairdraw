@@ -201,23 +201,15 @@ async function withHappyDOM<T>(draw: (parse: SVGPageParser) => Promise<T>): Prom
  * The two globals exist only while the import evaluates, and the function the module made keeps
  * the jsPDF it read, so the rest of the export needs nothing from them.
  */
-export async function loadSVG2PDF(jsPDF: unknown): Promise<typeof svg2pdf> {
-  const scope = globalThis as { jspdf?: unknown; svg2pdf?: { svg2pdf?: typeof svg2pdf } }
-  const previousJSPDF = Object.getOwnPropertyDescriptor(globalThis, 'jspdf')
-  const previousSVG2PDF = Object.getOwnPropertyDescriptor(globalThis, 'svg2pdf')
-  const set = (name: string, value: unknown): void => {
-    Object.defineProperty(globalThis, name, { value, configurable: true, writable: true })
+/**
+ * svg2pdf.js's `main` is a UMD build in a `"type": "module"` package with no `exports`, so Node
+ * loads it as ESM and it throws for want of a global jsPDF. Its ES build, the `module` file
+ * bundlers and Bun already pick, loads everywhere.
+ */
+export async function loadSVG2PDF(): Promise<typeof svg2pdf> {
+  const module = (await import('svg2pdf.js/dist/svg2pdf.es.min.js')) as {
+    svg2pdf?: typeof svg2pdf
   }
-  set('jspdf', { jsPDF })
-  try {
-    const module = (await import('svg2pdf.js')) as { svg2pdf?: typeof svg2pdf }
-    const draw = module.svg2pdf ?? scope.svg2pdf?.svg2pdf
-    if (!draw) throw new Error('svg2pdf.js exported no svg2pdf function')
-    return draw
-  } finally {
-    if (previousJSPDF) Object.defineProperty(globalThis, 'jspdf', previousJSPDF)
-    else delete scope.jspdf
-    if (previousSVG2PDF) Object.defineProperty(globalThis, 'svg2pdf', previousSVG2PDF)
-    else delete scope.svg2pdf
-  }
+  if (!module.svg2pdf) throw new Error('svg2pdf.js exported no svg2pdf function')
+  return module.svg2pdf
 }

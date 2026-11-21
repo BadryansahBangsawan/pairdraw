@@ -1,1 +1,0 @@
-- Picking a layer in the layers panel scopes canvas clicks as a click on that layer would, and no dashed outline marks the container.

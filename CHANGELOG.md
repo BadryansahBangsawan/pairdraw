@@ -2,6 +2,104 @@
 
 ## Unreleased
 
+## 0.19.2 — 2026-11-21
+
+Pairdraw 0.19.2 makes imported web pages and HTML match the page much more closely, lets tabs switch a component set's variants, adds Figma's headless UI object and `hasMissingFont` for scripts, makes one-page CLI commands load only that page, and fixes a long list of export, layout, text, component, chat, and desktop problems. Pairdraw 0.16.1 and later offer this release in the app.
+
+### Added
+
+- Tabs may bind their choice to a component set's variant property: the property's options must be the trigger words, preview switches the variant with the chosen trigger, and exported Reka tabs use those options and drive the variant attribute.
+- A script run headless gets Figma's UI object, so calls to `figma.ui.postMessage`, `figma.showUI`, and the rest do nothing instead of throwing on a missing `figma.ui`.
+- Text layers report `hasMissingFont`, which scripts read to tell when a face needs loading or is absent from the document.
+
+### Changed
+
+- HTML that Pairdraw puts on the clipboard for other apps, such as document editors and email, is the layout the import uses: grids come out as placed boxes and tables and list items as plain blocks, so it looks the same in a browser but keeps no table structure.
+- Every CLI command that works on one page takes `--page` with a page name or `--page-id` with its ID from `pairdraw pages`, but not both, and means the same with a file and with the running app.
+- The Behaviour section labels the two variant values a control draws as on and off, so a set whose values read like the value itself, such as Checked and Unchecked, is clear to set up.
+
+### Fixed
+
+- Undo keeps an agent's step with the document it edited, so opening another document while the agent is still working no longer puts that step in the opened document's history.
+- A layout pass the editor refuses, because frames nest deeper than the engine can lay out, no longer holds the layout nodes it had built.
+- A page refuses auto layout, which it cannot hold, so its layers keep the places the document gives them.
+- Imported web captures and Tailwind HTML keep a paragraph's styled words in one text layer, instead of splitting every span into a layer of its own.
+- Imported web captures keep words a page boxes one by one, as streaming chat replies do, in one paragraph instead of breaking each word at its own width.
+- Imported HTML and web captures lay a paragraph with boxed runs in it, such as inline code, out in wrapping lines instead of stacking each piece, and no longer turn a line break into an empty box.
+- Web captures draw icons a page paints through a CSS mask, as Iconify and Tailwind icon classes do, as the icon in its color instead of a solid square.
+- Imported HTML and web captures keep text that the page does not wrap on one line, clipped by its box, instead of breaking it inside a narrow box and losing the end of a label.
+- Imported HTML and web captures place flex items in their CSS `order`.
+- Imported HTML and web captures lay content out inside its box's border, as CSS does, instead of over it.
+- A web capture imported as HTML, through `pairdraw import` or the `import_html` tool, builds the same layers as pasting the capture.
+- Imported HTML shows the value or placeholder of a text field as its text.
+- Copying a page whose document has no body, such as a frameset page, captures its document root instead of failing with a missing-element error.
+- A chat answers with the model chosen while its connection was still loading, instead of keeping the previous model until the next change.
+- A CLI command that names a page the document lacks reports it in the same words for `tree`, `find`, `query`, and `eval`, where `find` and `query` used to return no matches instead.
+- `pairdraw export --page` no longer ignores `--page-id`, and the app applies `--page-id` to `tree`, `find`, and `query` instead of dropping it before the command runs.
+- A page-scoped `.fig` save renders the Cover page's thumbnail, which it used to replace with the placeholder when the cover was not loaded.
+- Imported HTML picks a concrete family from a CSS font stack, so a stack that starts with `ui-monospace`, `system-ui`, or another generic keyword draws a mono or sans face instead of falling back to Inter.
+- `pairdraw node --json` and the `get_node` tool report per-corner radii when they differ, `isMask`/`maskType`, and a boolean layer’s `booleanOperation`, which the document already held, and still leave those fields out for a plain layer.
+- On macOS 26 in the dark icon style, the Dock shows the Pairdraw icon on its orange tile instead of a dark gray one.
+- Style lint accepts a layer linked to a shared effect or text style, so it no longer reports typography and shadows that already use a shared preset.
+- Text on a path keeps its path when the Scale tool scales it, so it no longer falls back to one flat line.
+- How far a fixed-size text's lines reach scales with the layer when the Scale tool scales it, so lines that overflow its box stay drawn.
+- Separate messages from a coding agent show as separate paragraphs in the chat instead of running together.
+- A finished chat reply keeps its Markdown in place instead of fading the whole text in again.
+- Interface text breaks into even lines, so centered notices and short messages no longer end on a stray word or split a phrase.
+- AI chat shows the Option key in the follow-up shortcut hint on macOS, instead of always naming Alt.
+- Saving a key while the system credential store is locked or out of reach explains how to fix it and retry, instead of showing the backend text.
+- AI setup plans a role again when its configured model cannot run in this app, instead of finishing setup on a model chat then refuses.
+- Each mode’s "Use a variable" button in the Variables dialog names its mode for screen readers.
+- A `.pen` document with many theme axes opens instead of hanging: each axis gets its own variable collection unless a variable combines it with others.
+- Escape clears the selection at any depth and Enter keeps layers without children selected, as in Figma; a click takes the empty area of a component or instance whatever its fill, while a ⌘-click passes through a frame or instance whose fill does not show.
+- Picking a layer in the layers panel scopes canvas clicks as a click on that layer would, and no dashed outline marks the container.
+- PDF export works in the installed `pairdraw` CLI and MCP server, which run on Node.js, instead of failing with "Cannot read properties of undefined (reading 'jsPDF')".
+- A Vue text field or textarea exported as code puts the attributes it is given, such as `name`, `required`, or `aria-invalid`, on its input rather than its wrapper, as the React components do.
+- In preview, a slider's range and a progress bar's indicator follow the value when they sit inside the track, as in the shadcn/ui kit's Slider.
+- The interface draws in Inter's own medium and semibold weights, and in Inter on Home, also on systems without Inter installed, such as most Linux desktops; once a document opened, every weight used to come from the regular face.
+- An inline SVG icon keeps its nearly closed circles when it is scaled, instead of drawing them as a dot.
+- Home shows previews of recent and stored files again instead of a placeholder icon.
+- A code edit's top-level elements preview together, so a connector can join layers another element draws and an instance can name a component written after it.
+- A rounded rectangle shape with text keeps its corners at 0.4 of its shorter side through resizes, as FigJam does, instead of a fixed 6 px radius.
+- A coding agent that exits mid-reply ends the reply with an error instead of leaving the chat waiting, and the next message starts a fresh agent.
+- A grid frame set to Hug takes the smallest size around its tracks and gaps, its fractional tracks take their content's size there, and its minimum and maximum apply.
+- A fixed auto layout frame keeps the room its padding and included inside strokes take once the user or a tool lays it out, instead of a size too small for them. A frame saved that way before this change keeps its size when the file opens and grows to its padding on the next edit.
+- `tree --depth`, `find --limit`, and `query --limit` refuse a value that is not a whole number in range instead of silently changing which nodes they show.
+- `export --thumbnail --node` refuses the pair instead of writing the whole page and reporting the node as its target.
+- A user error from `pairdraw` prints its message and exits 1 without a stack trace; `PAIRDRAW_DEBUG=1` keeps the stack for a crash.
+- `tokens --import` and `tokens --project` refuse `--out`, which writes dtcg files, and name `--write` or `--output` as what saves the import.
+- Tailwind export keeps a font size Tailwind does not name (40px, 28px) as an arbitrary value instead of writing a utility such as `text-10` that no stylesheet generates.
+- An instance of a component variant copied into another document brings its component set, so the pasted instance keeps its variant and set properties and can switch variants.
+- A component variant copied without its set selected lands as the whole set, so the pasted variants keep their variant properties and set properties.
+- Opening a document completes once its page is applied instead of waiting for the first painted frame, so an automation `open_file` no longer times out and leaves an empty tab when nothing draws the window.
+- HTML export keeps a layer’s blend mode as `mix-blend-mode`, as SVG export already did; linear dodge uses `plus-lighter`, while linear burn exports flat because Chrome, Edge, and Firefox do not implement `plus-darker`. Normal and pass-through add none.
+- Inserting a component from a pinned older library revision no longer moves the document’s library binding to that revision, so the document keeps its place in the update flow.
+- A `*` CORS origin is ignored while authentication is off, so a website cannot call an unauthenticated server even if the operator wrote `PAIRDRAW_MCP_CORS_ORIGIN=*`.
+- Starting a design from Home sends the words alone when the remembered creation kind is one this build no longer offers, instead of a guide naming `undefined`.
+- SVG and PDF export draw a pattern, noise or custom fill as the colour the canvas falls back to, instead of dropping the layer.
+- Converting the document colour space now converts mesh gradient points, gradient strokes, and gradient text style runs, not only solid fills and gradient fill stops.
+- SVG export writes a fill's blend mode on the element that draws it, so a stacked paint no longer composites as plain source-over.
+- SVG and PDF export reference a gradient stroke's gradient instead of painting it in the stroke's base colour.
+- SVG export turns an image fill by its rotation, as the canvas does, instead of drawing it upright.
+- Clicking a played frame's own background runs the frame's click reaction, as Figma's presentation does, instead of only reactions on layers inside it.
+- A pasted frame whose layer links to another pasted frame now keeps the link inside the copy, as Figma's paste does, instead of naming the copied frame by its original Figma id.
+- A truncating text keeps its box inside auto layout instead of collapsing to zero, so a hugging frame sizes to it.
+- Undoing the deletion of a variable or a collection gives layers back the bindings the deletion removed; undoing a collection delete also restores the mode each layer chose and the collection’s active mode.
+- Writing a `.pen` file keeps variable references on padding and corner radius, so they read back bound.
+- Editing a vector path with path_set, path_scale, path_flip, or path_move keeps the layer's box around the new path and rebuilds its saved fill geometry, so an imported vector's fill follows the edit instead of drawing the old shape.
+
+### Performance
+
+- Opening a draw.io drawing with deeply nested groups fits each group once, instead of refitting every group above it for every group below.
+- A CLI command that works on one page of a `.fig` loads only that page, so `eval`, `tool call`, and `export --node` no longer build every page before running on a large file.
+- Joining a room with many vector layers is much faster and lighter: each layer's geometry and glyph byte arrays are copied as their own bytes instead of the whole update they arrived in.
+- Deleting, hiding, reordering, or outlining a layer, or moving it to another page, no longer lays out every auto layout frame on its page, including on undo and redo.
+- Pages with many component instances load sooner and use less memory, as each copy shares its component's saved values instead of deep-copying them.
+
+### Security
+
+- The built-in browser refuses a page answer larger than its bound, removes its wait slots when a wait ends early, and caps an element screenshot to the same box as a full page, so a hostile page cannot exhaust memory through captures, picks, or snapshots.
+
 ## 0.19.1 — 2026-11-21
 
 Pairdraw 0.19.1 makes the built-in browser's screenshots and page imports work, updates installed CLI, MCP, and Harness companions together with the app, and shows each agent's logo. Pairdraw 0.16.1 and later offer this release in the app.

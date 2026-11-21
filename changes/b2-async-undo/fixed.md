@@ -1,1 +1,0 @@
-- Undo keeps an agent's step with the document it edited, so opening another document while the agent is still working no longer puts that step in the opened document's history.

@@ -1,1 +1,0 @@
-- Opening a draw.io drawing with deeply nested groups fits each group once, instead of refitting every group above it for every group below.

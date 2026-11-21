@@ -1,1 +1,0 @@
-- On macOS 26 in the dark icon style, the Dock shows the Pairdraw icon on its orange tile instead of a dark gray one.

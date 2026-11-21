@@ -1,1 +1,0 @@
-- A page refuses auto layout, which it cannot hold, so its layers keep the places the document gives them.

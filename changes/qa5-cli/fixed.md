@@ -1,4 +1,0 @@
-- `tree --depth`, `find --limit`, and `query --limit` refuse a value that is not a whole number in range instead of silently changing which nodes they show.
-- `export --thumbnail --node` refuses the pair instead of writing the whole page and reporting the node as its target.
-- A user error from `pairdraw` prints its message and exits 1 without a stack trace; `PAIRDRAW_DEBUG=1` keeps the stack for a crash.
-- `tokens --import` and `tokens --project` refuse `--out`, which writes dtcg files, and name `--write` or `--output` as what saves the import.

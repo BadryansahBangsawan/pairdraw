@@ -1,1 +1,0 @@
-- Every CLI command that works on one page takes `--page` with a page name or `--page-id` with its ID from `pairdraw pages`, but not both, and means the same with a file and with the running app.

@@ -1,6 +1,6 @@
 {
   "name": "@pairdraw/mermaid",
-  "version": "0.19.1",
+  "version": "0.19.2",
   "description": "Mermaid flowchart diagrams read into a typed model of nodes, edges, subgraphs, and styles.",
   "keywords": [
     "pairdraw",

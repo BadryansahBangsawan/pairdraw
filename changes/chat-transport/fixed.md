@@ -1,1 +1,0 @@
-- A chat answers with the model chosen while its connection was still loading, instead of keeping the previous model until the next change.

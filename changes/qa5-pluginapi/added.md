@@ -1,1 +1,0 @@
-- A script run headless gets Figma's UI object, so calls to `figma.ui.postMessage`, `figma.showUI`, and the rest do nothing instead of throwing on a missing `figma.ui`.

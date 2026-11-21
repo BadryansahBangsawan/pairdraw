@@ -1,1 +1,0 @@
-- Tabs may bind their choice to a component set's variant property: the property's options must be the trigger words, preview switches the variant with the chosen trigger, and exported Reka tabs use those options and drive the variant attribute.

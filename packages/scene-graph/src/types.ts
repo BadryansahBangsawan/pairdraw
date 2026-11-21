@@ -763,8 +763,14 @@ export type OverflowDirection = 'NONE' | 'HORIZONTAL' | 'VERTICAL' | 'BOTH'
  */
 export type ScrollBehavior = 'SCROLLS' | 'FIXED' | 'STICKY_SCROLLS'
 
-/** How a reaction animates between frames, as `TransitionType` keeps them. */
-export type PrototypeTransitionType = 'INSTANT' | 'DISSOLVE'
+/**
+ * How a reaction animates between frames, as `TransitionType` keeps them: a cut, a crossfade, or
+ * Smart animate, which moves the layers two frames share by name and fades the rest.
+ */
+export type PrototypeTransitionType = 'INSTANT' | 'DISSOLVE' | 'SMART_ANIMATE'
+
+/** How a transition eases, by the names Figma's plugin API gives its presets. */
+export type PrototypeEasingType = 'LINEAR' | 'EASE_IN' | 'EASE_OUT' | 'EASE_IN_AND_OUT'
 
 /** Where an overlay sits over the screen, as `OverlayPositionType`. */
 export type PrototypeOverlayPositionType =
@@ -776,10 +782,12 @@ export type PrototypeOverlayPositionType =
   | 'BOTTOM_CENTER'
   | 'BOTTOM_RIGHT'
 
-/** How a reaction animates, and how long it takes in seconds. */
+/** How a reaction animates, how long it takes in seconds, and how it eases. */
 export interface PrototypeTransition {
   type: PrototypeTransitionType
   duration: number
+  /** Absent eases as Figma's default does, `DEFAULT_PROTOTYPE_EASING`. */
+  easing?: PrototypeEasingType
 }
 
 /** A reaction's move to another frame, the overlay it opens, the variant or layer it shows. */

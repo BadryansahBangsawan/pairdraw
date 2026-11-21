@@ -74,6 +74,42 @@ describe('prototype reactions in the plugin shape', () => {
     expect(button.reactions[0]?.actions[0]?.type).toBe('NODE')
   })
 
+  test('reads and writes Smart animate with an easing, by the names Figma gives them', () => {
+    const { graph, details, button } = screen()
+    const smart = {
+      trigger: { type: 'ON_CLICK' as const },
+      actions: [
+        {
+          type: 'NODE' as const,
+          destinationId: details.id,
+          navigation: 'NAVIGATE' as const,
+          transition: {
+            type: 'SMART_ANIMATE' as const,
+            duration: 0.4,
+            easing: { type: 'EASE_IN_AND_OUT' as const }
+          },
+          overlayRelativePosition: 'CENTER' as const
+        }
+      ]
+    }
+
+    Reflect.set(button, 'reactions', [smart])
+
+    expect(button.reactions).toMatchObject([smart])
+    expect(graph.getNode(button.id)?.prototypeReactions[0]?.actions[0]).toMatchObject({
+      transition: { type: 'SMART_ANIMATE', duration: 0.4, easing: 'EASE_IN_AND_OUT' }
+    })
+  })
+
+  test('refuses an easing outside the presets play has', () => {
+    const { details, button } = screen()
+    const spring = clickTo(details.id)
+    const [action] = spring.actions
+    Reflect.set(action, 'transition', { ...action.transition, easing: { type: 'GENTLE' } })
+
+    expect(() => Reflect.set(button, 'reactions', [spring])).toThrow('easing')
+  })
+
   test('refuses a trigger the play cannot start from', () => {
     const { details, button } = screen()
 

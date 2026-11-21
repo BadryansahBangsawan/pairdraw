@@ -5,16 +5,23 @@ import { guidToString } from '@pairdraw/kiwi/fig/guid'
 import type {
   OverflowDirection,
   PrototypeAction,
+  PrototypeEasingType,
   PrototypeNavigationType,
+  PrototypeNodeAction,
   PrototypeOverlayPositionType,
   PrototypeReaction,
+  PrototypeTransition,
   PrototypeTransitionType,
   PrototypeTrigger,
   ScrollBehavior,
   PrototypeTriggerType,
   SceneNode
 } from '@pairdraw/scene-graph'
-import { OVERFLOW_DIRECTIONS } from '@pairdraw/scene-graph/constants'
+import {
+  DEFAULT_PROTOTYPE_EASING,
+  OVERFLOW_DIRECTIONS,
+  PROTOTYPE_EASING_CURVES
+} from '@pairdraw/scene-graph/constants'
 import type { GUID } from '@pairdraw/scene-graph/primitives'
 
 import type { KiwiNodeChange, SceneNodeToKiwiContext } from './export/context'
@@ -25,13 +32,14 @@ const vectorSchema = v.object({ x: v.number(), y: v.number() })
 
 /**
  * A `.fig` action, kept loose: fields this model does not read must survive an edit and come
- * back out unchanged (`easingType`, smart-animate flags, variable targets). Enums decode as the
+ * back out unchanged (a spring's `easingFunction`, smart-animate flags, variable targets). Enums decode as the
  * schema's names (`'DISSOLVE'`, not `1`).
  */
 const actionSchema = v.looseObject({
   transitionNodeID: v.optional(guidSchema),
   transitionType: v.optional(v.string()),
   transitionDuration: v.optional(v.number()),
+  easingType: v.optional(v.string()),
   connectionType: v.optional(v.string()),
   navigationType: v.optional(v.string()),
   overlayRelativePosition: v.optional(vectorSchema)
@@ -98,15 +106,65 @@ function isModeledTrigger(type: string | undefined): type is PrototypeTriggerTyp
 }
 
 /**
- * The animation play runs for a file's transition: a dissolve for Dissolve and for Smart animate,
- * the closest one play has, an eased scroll for Figma's animated scroll, and a cut for the rest.
- * Export keeps the file's own transition while the model still reads it this way, so Figma's
- * slides, Smart animate, and animated scrolls survive an edit.
+ * The animation play runs for a file's transition: Dissolve and Smart animate as themselves, an
+ * eased scroll for Figma's animated scroll, and a cut for the rest. Export keeps the file's own
+ * transition while the model still reads it this way, so Figma's slides and animated scrolls
+ * survive an edit.
  */
 function transitionFromFigma(type: string | undefined): PrototypeTransitionType {
-  return type === 'DISSOLVE' || type === 'SMART_ANIMATE' || type === 'SCROLL_ANIMATE'
-    ? 'DISSOLVE'
-    : 'INSTANT'
+  if (type === 'SMART_ANIMATE') return 'SMART_ANIMATE'
+  return type === 'DISSOLVE' || type === 'SCROLL_ANIMATE' ? 'DISSOLVE' : 'INSTANT'
+}
+
+/** Figma's easing presets by the `EasingType` a file names them with. */
+const EASING_FROM_FIGMA: Readonly<Record<string, PrototypeEasingType>> = {
+  LINEAR: 'LINEAR',
+  IN_CUBIC: 'EASE_IN',
+  OUT_CUBIC: 'EASE_OUT',
+  INOUT_CUBIC: 'EASE_IN_AND_OUT'
+}
+
+const EASING_TO_FIGMA: Readonly<Record<PrototypeEasingType, string>> = {
+  LINEAR: 'LINEAR',
+  EASE_IN: 'IN_CUBIC',
+  EASE_OUT: 'OUT_CUBIC',
+  EASE_IN_AND_OUT: 'INOUT_CUBIC'
+}
+
+/**
+ * A file's easing as a preset; a spring, a back curve, or a custom one plays as the default
+ * easing, and its record keeps it until the easing is changed here.
+ */
+function easingFromFigma(type: string | undefined): PrototypeEasingType | undefined {
+  return type !== undefined && Object.hasOwn(EASING_FROM_FIGMA, type)
+    ? EASING_FROM_FIGMA[type]
+    : undefined
+}
+
+/**
+ * The easing fields to write: none while the file's own easing still reads as `easing`, else the
+ * preset's type with its curve, which Figma stores beside it. An animation without an easing
+ * keeps a spring or custom curve the file has; one whose type was set here, with no easing in the
+ * file, gets the default written out. A Scroll to is written instant, so it takes none.
+ */
+function easingToFigma(
+  action: PrototypeNodeAction,
+  raw: FigmaAction
+): { easingType: string; easingFunction: number[] } | null {
+  const { type, easing } = action.transition
+  const typedHere =
+    raw.transitionType === undefined || transitionFromFigma(raw.transitionType) !== type
+  const fallback =
+    typedHere &&
+    raw.easingType === undefined &&
+    type !== 'INSTANT' &&
+    action.navigation !== 'SCROLL_TO'
+  const written = easing ?? (fallback ? DEFAULT_PROTOTYPE_EASING : undefined)
+  if (!written || easingFromFigma(raw.easingType) === written) return null
+  return {
+    easingType: EASING_TO_FIGMA[written],
+    easingFunction: [...PROTOTYPE_EASING_CURVES[written]]
+  }
 }
 
 /** True when the action is one the Prototype section edits: a node action, a back or a close. */
@@ -130,6 +188,15 @@ function triggerFromFigma(event: FigmaEvent): PrototypeTrigger {
   return { type, delay: DELAYED_TRIGGERS.has(type) ? (event.transitionTimeout ?? 0) : 0 }
 }
 
+function transitionOf(action: FigmaAction): PrototypeTransition {
+  const transition: PrototypeTransition = {
+    type: transitionFromFigma(action.transitionType),
+    duration: action.transitionDuration ?? 0
+  }
+  const easing = easingFromFigma(action.easingType)
+  return easing ? { ...transition, easing } : transition
+}
+
 function reactionFromFigma(interaction: FigmaInteraction): PrototypeReaction | null {
   if (!isModeledInteraction(interaction)) return null
   const id = interaction.id ? guidToString(interaction.id) : null
@@ -144,10 +211,7 @@ function reactionFromFigma(interaction: FigmaInteraction): PrototypeReaction | n
         type: 'NODE',
         nodeId: action.transitionNodeID ? guidToString(action.transitionNodeID) : null,
         navigation: NAVIGATION_FROM_FIGMA[action.navigationType ?? 'NAVIGATE'] ?? 'NAVIGATE',
-        transition: {
-          type: transitionFromFigma(action.transitionType),
-          duration: action.transitionDuration ?? 0
-        },
+        transition: transitionOf(action),
         // Figma records an overlay's placement on the destination frame, not on the action; the
         // write below puts it back there.
         overlayPosition: 'CENTER'
@@ -264,7 +328,7 @@ function transitionToFigma(
 ): string {
   if (raw !== undefined && transitionFromFigma(raw) === type) return raw
   if (navigation === 'SCROLL_TO') return 'INSTANT_TRANSITION'
-  return type === 'DISSOLVE' ? 'DISSOLVE' : 'INSTANT_TRANSITION'
+  return type === 'INSTANT' ? 'INSTANT_TRANSITION' : type
 }
 
 /** A `.fig` interaction, merged onto the raw action it came from so unknown fields survive. */
@@ -306,7 +370,8 @@ function interactionToFigma(
           base.transitionType,
           action.navigation
         ),
-        transitionDuration: action.transition.duration
+        transitionDuration: action.transition.duration,
+        ...easingToFigma(action, base)
       }
     ]
   })

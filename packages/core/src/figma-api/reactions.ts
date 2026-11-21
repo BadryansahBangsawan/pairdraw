@@ -6,12 +6,14 @@ import type {
   PrototypeNavigationType,
   PrototypeOverlayPositionType,
   PrototypeReaction,
+  PrototypeTransition,
   PrototypeTransitionType,
   PrototypeTriggerType,
   SceneGraph,
   SceneNode
 } from '@pairdraw/scene-graph'
 import { variantSetsAround } from '@pairdraw/scene-graph/components'
+import { PROTOTYPE_EASINGS } from '@pairdraw/scene-graph/constants'
 
 import { issuePath } from '#core/figma-api/effects'
 import { asInstanceEdit, sameReaction } from '#core/prototype/reactions'
@@ -49,9 +51,13 @@ const overlayPositionSchema = v.picklist([
   'BOTTOM_RIGHT'
 ] satisfies PrototypeOverlayPositionType[])
 
+/** Figma's easing presets, which play has; a spring or a custom curve is refused. */
+const easingSchema = v.strictObject({ type: v.picklist(PROTOTYPE_EASINGS) })
+
 const transitionSchema = v.strictObject({
-  type: v.picklist(['INSTANT', 'DISSOLVE'] satisfies PrototypeTransitionType[]),
-  duration: secondsSchema
+  type: v.picklist(['INSTANT', 'DISSOLVE', 'SMART_ANIMATE'] satisfies PrototypeTransitionType[]),
+  duration: secondsSchema,
+  easing: v.optional(easingSchema)
 })
 
 const nodeActionSchema = v.strictObject({
@@ -124,9 +130,25 @@ function toFigmaAction(action: PrototypeAction): FigmaReactionAction {
     type: 'NODE',
     destinationId: action.nodeId ?? '',
     navigation: action.navigation,
-    transition: { type: action.transition.type, duration: action.transition.duration },
+    transition: toFigmaTransition(action.transition),
     overlayRelativePosition: action.overlayPosition
   }
+}
+
+function toFigmaTransition({
+  type,
+  duration,
+  easing
+}: PrototypeTransition): v.InferOutput<typeof transitionSchema> {
+  return easing ? { type, duration, easing: { type: easing } } : { type, duration }
+}
+
+function fromFigmaTransition({
+  type,
+  duration,
+  easing
+}: v.InferOutput<typeof transitionSchema>): PrototypeTransition {
+  return easing ? { type, duration, easing: easing.type } : { type, duration }
 }
 
 /** The validation context: where the reactions live, and what they may point at. */
@@ -194,7 +216,7 @@ function toAction(
     type: 'NODE',
     nodeId: action.destinationId,
     navigation: action.navigation,
-    transition: action.transition,
+    transition: fromFigmaTransition(action.transition),
     // Only an overlay uses the spot; Figma keeps CENTER on a navigation.
     overlayPosition: action.navigation === 'OVERLAY' ? action.overlayRelativePosition : 'CENTER'
   }

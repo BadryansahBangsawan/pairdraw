@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { asInstanceEdit, framesOnPage, scrollsInPlay } from '@pairdraw/core/prototype'
 import type {
   OverflowDirection,
+  PrototypeEasingType,
   PrototypeReaction,
   PrototypeTransitionType,
   PrototypeTriggerType,
@@ -23,6 +24,7 @@ import {
   setTarget,
   setTransition,
   setTransitionDuration,
+  setTransitionEasing,
   setTriggerType,
   withReaction,
   withReactionChange,
@@ -151,7 +153,9 @@ export function usePrototype() {
     setTransition: (id: string, type: PrototypeTransitionType) =>
       edit((reaction) => setTransition(reaction, type), id),
     setTransitionDuration: (id: string, seconds: number) =>
-      edit((reaction) => setTransitionDuration(reaction, seconds), id)
+      edit((reaction) => setTransitionDuration(reaction, seconds), id),
+    setTransitionEasing: (id: string, easing: PrototypeEasingType) =>
+      edit((reaction) => setTransitionEasing(reaction, easing), id)
   }
 }
 

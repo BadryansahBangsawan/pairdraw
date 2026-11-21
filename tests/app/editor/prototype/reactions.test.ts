@@ -13,6 +13,7 @@ import {
   setTarget,
   setTransition,
   setTransitionDuration,
+  setTransitionEasing,
   setTriggerType,
   withReaction,
   withReactionChange,
@@ -113,6 +114,27 @@ describe('the animation', () => {
     const next = setTransition(reaction(), 'DISSOLVE')
     expect(primaryAction(next)).toMatchObject({
       transition: { type: 'DISSOLVE', duration: DEFAULT_TRANSITION_DURATION }
+    })
+  })
+
+  test('becomes Smart animate and keeps an easing it has, or has none, which plays as ease out', () => {
+    const smart = setTransition(reaction(), 'SMART_ANIMATE')
+    expect(primaryAction(smart)).toMatchObject({
+      transition: { type: 'SMART_ANIMATE', duration: DEFAULT_TRANSITION_DURATION }
+    })
+    // An easing the model does not read, such as a file's spring, stays in the file untouched.
+    const action = primaryAction(smart)
+    expect(action?.type === 'NODE' && 'easing' in action.transition).toBe(false)
+    const eased = setTransition(setTransitionEasing(smart, 'LINEAR'), 'DISSOLVE')
+    expect(primaryAction(eased)).toMatchObject({
+      transition: { type: 'DISSOLVE', easing: 'LINEAR' }
+    })
+  })
+
+  test('changes the easing and keeps the kind and duration', () => {
+    const next = setTransitionEasing(setTransition(reaction(), 'DISSOLVE'), 'EASE_IN')
+    expect(primaryAction(next)).toMatchObject({
+      transition: { type: 'DISSOLVE', duration: DEFAULT_TRANSITION_DURATION, easing: 'EASE_IN' }
     })
   })
 

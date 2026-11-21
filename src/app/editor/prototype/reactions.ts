@@ -2,6 +2,7 @@ import { primaryAction } from '@pairdraw/core/prototype'
 import type {
   PrototypeAction,
   PrototypeActionType,
+  PrototypeEasingType,
   PrototypeNavigationType,
   PrototypeNodeAction,
   PrototypeReaction,
@@ -135,9 +136,22 @@ export function setTransition(
 ): PrototypeReaction {
   const current = primaryAction(reaction)
   if (current?.type !== 'NODE') return reaction
+  // The easing stays as it is: none plays as Figma's default, and keeps a file's spring intact.
   return replaceAction(reaction, {
     ...current,
     transition: { ...current.transition, type }
+  })
+}
+
+export function setTransitionEasing(
+  reaction: PrototypeReaction,
+  easing: PrototypeEasingType
+): PrototypeReaction {
+  const current = primaryAction(reaction)
+  if (current?.type !== 'NODE') return reaction
+  return replaceAction(reaction, {
+    ...current,
+    transition: { ...current.transition, easing }
   })
 }
 

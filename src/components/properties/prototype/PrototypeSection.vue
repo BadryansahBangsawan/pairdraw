@@ -4,12 +4,14 @@ import { computed } from 'vue'
 import { primaryAction } from '@pairdraw/core/prototype'
 import type {
   OverflowDirection,
+  PrototypeEasingType,
   PrototypeNodeAction,
   PrototypeReaction,
   PrototypeTransitionType,
   PrototypeTriggerType,
   ScrollBehavior
 } from '@pairdraw/scene-graph'
+import { DEFAULT_PROTOTYPE_EASING } from '@pairdraw/scene-graph/constants'
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import { openVideoExport } from '@/app/document/export/video/open'
@@ -45,7 +47,8 @@ const {
   setDelay,
   setTarget,
   setTransition,
-  setTransitionDuration
+  setTransitionDuration,
+  setTransitionEasing
 } = usePrototype()
 
 /** One row per interaction, edited in place; the panel edits its first action, as Figma does. */
@@ -112,8 +115,22 @@ const scrollBehaviorOptions = computed<{ value: ScrollBehavior; label: string }[
 
 const transitionOptions = computed<{ value: PrototypeTransitionType; label: string }[]>(() => [
   { value: 'INSTANT', label: panels.value.prototypeAnimationInstant },
-  { value: 'DISSOLVE', label: panels.value.prototypeAnimationDissolve }
+  { value: 'DISSOLVE', label: panels.value.prototypeAnimationDissolve },
+  { value: 'SMART_ANIMATE', label: panels.value.prototypeAnimationSmartAnimate }
 ])
+
+const easingOptions = computed<{ value: PrototypeEasingType; label: string }[]>(() => [
+  { value: 'EASE_OUT', label: panels.value.prototypeEasingEaseOut },
+  { value: 'EASE_IN', label: panels.value.prototypeEasingEaseIn },
+  { value: 'EASE_IN_AND_OUT', label: panels.value.prototypeEasingEaseInAndOut },
+  { value: 'LINEAR', label: panels.value.prototypeEasingLinear }
+])
+
+/** Whether the interaction animates, which gives it a duration and an easing. */
+function animates(reaction: PrototypeReaction): boolean {
+  const type = node(reaction)?.transition.type
+  return type !== undefined && type !== 'INSTANT'
+}
 
 const frameOptions = computed(() =>
   targets.value.map((frame) => ({ value: frame.id, label: frame.name }))
@@ -260,7 +277,7 @@ function node(reaction: PrototypeReaction): PrototypeNodeAction | null {
             "
           />
           <NumberField
-            v-if="node(reaction)?.transition.type === 'DISSOLVE'"
+            v-if="animates(reaction)"
             :model-value="node(reaction)?.transition.duration ?? 0.3"
             :min="0"
             :step="0.1"
@@ -270,6 +287,16 @@ function node(reaction: PrototypeReaction): PrototypeNodeAction | null {
             @commit="(seconds: number) => setTransitionDuration(reaction.id, seconds)"
           />
         </div>
+        <AppSelect
+          v-if="animates(reaction)"
+          :model-value="node(reaction)?.transition.easing ?? DEFAULT_PROTOTYPE_EASING"
+          :options="easingOptions"
+          :label="panels.prototypeEasing"
+          data-property="prototype-easing"
+          @update:model-value="
+            (easing: PrototypeEasingType) => setTransitionEasing(reaction.id, easing)
+          "
+        />
       </template>
     </div>
 

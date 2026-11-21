@@ -2,6 +2,7 @@ import type { Color } from './primitives'
 import type {
   NoiseEffectParams,
   OverflowDirection,
+  PrototypeEasingType,
   ScrollBehavior,
   TextureEffectParams
 } from './types'
@@ -61,3 +62,27 @@ export const SCROLL_BEHAVIORS = [
   'FIXED',
   'STICKY_SCROLLS'
 ] as const satisfies readonly ScrollBehavior[]
+
+/** The easings a prototype transition takes, Figma's presets, in the order its menu lists them. */
+export const PROTOTYPE_EASINGS = [
+  'EASE_OUT',
+  'EASE_IN',
+  'EASE_IN_AND_OUT',
+  'LINEAR'
+] as const satisfies readonly PrototypeEasingType[]
+
+/** The easing a transition without one plays with, Figma's default. */
+export const DEFAULT_PROTOTYPE_EASING: PrototypeEasingType = 'EASE_OUT'
+
+/**
+ * Each easing as the control points of its cubic Bézier, `[x1, y1, x2, y2]`: what a `.fig` file
+ * stores as an action's `easingFunction` and CSS reads as `cubic-bezier()`.
+ */
+export const PROTOTYPE_EASING_CURVES: Readonly<
+  Record<PrototypeEasingType, readonly [number, number, number, number]>
+> = {
+  LINEAR: [0, 0, 1, 1],
+  EASE_IN: [0.42, 0, 1, 1],
+  EASE_OUT: [0, 0, 0.58, 1],
+  EASE_IN_AND_OUT: [0.42, 0, 0.58, 1]
+}

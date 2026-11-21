@@ -245,7 +245,6 @@ describe('prototype reactions in .fig records', () => {
       (record) => record.type === 'SYMBOL' && record.name === 'State=Closed'
     )
     if (!closed) throw new Error('fixture has no State=Closed variant')
-    // Figma's Smart animate plays as a dissolve, the closest animation play has.
     expect(extractPrototypeReactions(closed)).toEqual([
       {
         id: '11:87',
@@ -255,7 +254,11 @@ describe('prototype reactions in .fig records', () => {
             type: 'NODE',
             nodeId: '7:251',
             navigation: 'CHANGE_TO',
-            transition: { type: 'DISSOLVE', duration: 0.30000001192092896 },
+            transition: {
+              type: 'SMART_ANIMATE',
+              duration: 0.30000001192092896,
+              easing: 'EASE_OUT'
+            },
             overlayPosition: 'CENTER'
           }
         ]
@@ -327,7 +330,7 @@ describe('prototype reactions in .fig records', () => {
     })
     const [reaction] = graph.getNode(frame.id)?.prototypeReactions ?? []
     if (!reaction) throw new Error('no reaction')
-    // Only the duration changes; the action stays a dissolve-like Smart animate Change to.
+    // Only the duration changes; the action stays a Smart animate Change to.
     graph.updateNode(frame.id, {
       prototypeReactions: [
         {
@@ -608,5 +611,153 @@ describe('Scroll to animations in .fig records', () => {
       ]
     } as NodeChange)
     expect(reactions).toEqual([])
+  })
+})
+
+describe('Smart animate in .fig records', () => {
+  beforeAll(() => initCodec())
+
+  const navigate = (fields: Record<string, unknown>) => ({
+    id: { sessionID: 2, localID: 7 },
+    event: { interactionType: 'ON_CLICK' },
+    actions: [
+      {
+        transitionNodeID: { sessionID: 2, localID: 8 },
+        connectionType: 'INTERNAL_NODE',
+        navigationType: 'NAVIGATE',
+        transitionDuration: 0.4,
+        ...fields
+      }
+    ]
+  })
+
+  const transitionOf = (raw: ReturnType<typeof navigate>) => {
+    const action = importNode({ type: 'FRAME', prototypeInteractions: [raw] })
+      .prototypeReactions?.[0]?.actions[0]
+    return action?.type === 'NODE' ? action.transition : null
+  }
+
+  test("reads Smart animate and Figma's easing presets", () => {
+    const smart = (easingType: string) =>
+      transitionOf(navigate({ transitionType: 'SMART_ANIMATE', easingType }))
+    expect(smart('OUT_CUBIC')).toEqual({ type: 'SMART_ANIMATE', duration: 0.4, easing: 'EASE_OUT' })
+    expect(smart('IN_CUBIC')?.easing).toBe('EASE_IN')
+    expect(smart('INOUT_CUBIC')?.easing).toBe('EASE_IN_AND_OUT')
+    expect(smart('LINEAR')?.easing).toBe('LINEAR')
+    expect(transitionOf(navigate({ transitionType: 'DISSOLVE', easingType: 'IN_CUBIC' }))).toEqual({
+      type: 'DISSOLVE',
+      duration: 0.4,
+      easing: 'EASE_IN'
+    })
+  })
+
+  test('reads an easing outside the presets as the default one', () => {
+    expect(
+      transitionOf(navigate({ transitionType: 'SMART_ANIMATE', easingType: 'GENTLE_SPRING' }))
+    ).toEqual({ type: 'SMART_ANIMATE', duration: 0.4 })
+  })
+
+  test('writes a Smart animate made in Pairdraw with its easing type and curve', () => {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const target = graph.createNode('FRAME', pageId)
+    const button = graph.createNode('FRAME', pageId, {
+      prototypeReactions: [
+        {
+          id: '2:30',
+          trigger: { type: 'ON_CLICK', delay: 0 },
+          actions: [
+            {
+              type: 'NODE',
+              nodeId: target.id,
+              navigation: 'NAVIGATE',
+              transition: { type: 'SMART_ANIMATE', duration: 0.4, easing: 'EASE_IN_AND_OUT' },
+              overlayPosition: 'CENTER'
+            }
+          ]
+        }
+      ]
+    })
+    const [interaction] = (write(graph, button.id).prototypeInteractions ?? []) as {
+      actions: Record<string, unknown>[]
+    }[]
+    expect(interaction?.actions[0]).toMatchObject({
+      transitionType: 'SMART_ANIMATE',
+      transitionDuration: 0.4,
+      easingType: 'INOUT_CUBIC',
+      easingFunction: [0.42, 0, 0.58, 1]
+    })
+  })
+
+  test('writes the default easing for an animation made here without one', () => {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const target = graph.createNode('FRAME', pageId)
+    const button = graph.createNode('FRAME', pageId, {
+      prototypeReactions: [
+        {
+          id: '2:31',
+          trigger: { type: 'ON_CLICK', delay: 0 },
+          actions: [
+            {
+              type: 'NODE',
+              nodeId: target.id,
+              navigation: 'NAVIGATE',
+              transition: { type: 'SMART_ANIMATE', duration: 0.3 },
+              overlayPosition: 'CENTER'
+            }
+          ]
+        }
+      ]
+    })
+    const [interaction] = (write(graph, button.id).prototypeInteractions ?? []) as {
+      actions: Record<string, unknown>[]
+    }[]
+    expect(interaction?.actions[0]).toMatchObject({
+      transitionType: 'SMART_ANIMATE',
+      easingType: 'OUT_CUBIC',
+      easingFunction: [0, 0, 0.58, 1]
+    })
+  })
+
+  test('an easing changed here replaces the curve; a spring the model does not read stays', () => {
+    const { graph, frame } = importedGraph()
+    const raw = navigate({
+      transitionType: 'SMART_ANIMATE',
+      easingType: 'SPRING',
+      easingFunction: [1, 100, 15, 0]
+    })
+    const props = importNode({ type: 'FRAME', prototypeInteractions: [raw] })
+    graph.updateNode(frame.id, {
+      source: { ...frame.source, fig: props.source?.fig ?? frame.source.fig }
+    })
+    const [reaction] = props.prototypeReactions ?? []
+    if (!reaction) throw new Error('no reaction')
+    const withTransition = (transition: object) => ({
+      ...reaction,
+      actions: reaction.actions.map((action) =>
+        action.type === 'NODE'
+          ? { ...action, transition: { ...action.transition, ...transition } }
+          : action
+      )
+    })
+    graph.updateNode(frame.id, { prototypeReactions: [withTransition({ duration: 0.6 })] })
+    expect(write(graph, frame.id).prototypeInteractions).toEqual([
+      { ...raw, actions: [{ ...raw.actions[0], transitionDuration: 0.6 }] }
+    ])
+    // A new animation type alone leaves the spring as the file has it.
+    graph.updateNode(frame.id, { prototypeReactions: [withTransition({ type: 'DISSOLVE' })] })
+    expect(write(graph, frame.id).prototypeInteractions).toEqual([
+      { ...raw, actions: [{ ...raw.actions[0], transitionType: 'DISSOLVE' }] }
+    ])
+    graph.updateNode(frame.id, { prototypeReactions: [withTransition({ easing: 'LINEAR' })] })
+    const [interaction] = (write(graph, frame.id).prototypeInteractions ?? []) as {
+      actions: Record<string, unknown>[]
+    }[]
+    expect(interaction?.actions[0]).toMatchObject({
+      transitionType: 'SMART_ANIMATE',
+      easingType: 'LINEAR',
+      easingFunction: [0, 0, 1, 1]
+    })
   })
 })

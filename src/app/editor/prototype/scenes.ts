@@ -64,7 +64,7 @@ export function usePlayScenes(
     if (!current) return null
     // A Scroll to animates by easing its frames instead of crossfading.
     const scrolls = click.action.type === 'NODE' && click.action.navigation === 'SCROLL_TO'
-    if (click.transition?.type === 'DISSOLVE' && !scrolls) {
+    if (click.transition && click.transition.type !== 'INSTANT' && !scrolls) {
       options.beforeDissolve?.(rootId ?? shownFrame(current), transitionMs(click.action))
     }
     const result = scenes.run(current, click, rootId)

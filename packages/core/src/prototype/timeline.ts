@@ -90,7 +90,7 @@ const MAX_TIMELINE_STEPS = 10_000
 
 /** How long an action's transition runs, in milliseconds; a cut takes none. */
 export function transitionMs(action: PrototypeAction): number {
-  if (action.type !== 'NODE' || action.transition.type !== 'DISSOLVE') return 0
+  if (action.type !== 'NODE' || action.transition.type === 'INSTANT') return 0
   return Math.max(0, action.transition.duration * 1000)
 }
 
@@ -289,7 +289,7 @@ function advance(walk: Walk, event: WalkEvent & { action: PrototypeAction }, nex
     atMs,
     frameId: shownFrame(next),
     trigger: event.trigger,
-    transition: durationMs > 0 ? 'DISSOLVE' : 'INSTANT'
+    transition: durationMs > 0 && action.type === 'NODE' ? action.transition.type : 'INSTANT'
   })
   if (action.type === 'NODE' && action.navigation === 'OVERLAY' && action.nodeId) {
     walk.overlayPositions[action.nodeId] = action.overlayPosition

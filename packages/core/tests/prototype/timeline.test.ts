@@ -105,6 +105,24 @@ describe('a prototype timeline', () => {
   })
 })
 
+describe('a Smart animate step', () => {
+  test('takes its own duration, and the step names its transition', () => {
+    const { graph, ids } = frames(2)
+    const [a, b] = ids
+    react(graph, a, after(1, goTo(b, 'SMART_ANIMATE', 0.4)))
+
+    const timeline = planTimeline(graph, { startFrameId: a, maxMs: MAX_MS, tailMs: TAIL_MS })
+
+    expect(outline(timeline, graph).slice(0, 2)).toEqual([
+      'hold Hero 1 0–1000',
+      'dissolve Hero 1→Hero 2 1000–1400'
+    ])
+    expect(timeline.steps).toEqual([
+      { atMs: 1000, frameId: b, trigger: 'AFTER_TIMEOUT', transition: 'SMART_ANIMATE' }
+    ])
+  })
+})
+
 describe('the screen a timeline shows at a moment', () => {
   test('is the held frame, or both frames of a crossfade with the eased share of the new one', () => {
     const { graph, ids } = frames(2)

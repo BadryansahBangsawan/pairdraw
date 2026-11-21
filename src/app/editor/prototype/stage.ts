@@ -2,11 +2,11 @@ import { useElementSize, useEventListener } from '@vueuse/core'
 import { computed, onScopeDispose, ref, watch, type Ref } from 'vue'
 
 import { resolveEditorProfile, type VisibleCanvas } from '@pairdraw/core'
-import { renderNodesToImage } from '@pairdraw/core/io/formats/raster'
 import {
   reactionAt,
   restartSession,
   shownFrame,
+  snapshotPlayFrame,
   startFrame,
   startSession,
   step,
@@ -17,6 +17,7 @@ import {
 } from '@pairdraw/core/prototype'
 import type { PrototypeAction } from '@pairdraw/scene-graph'
 import { getAxisAlignedWorldBounds } from '@pairdraw/scene-graph/coordinate'
+import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { EditorStore } from '@/app/editor/active-store'
 import { letterboxRects, nodeStageRect } from '@/app/slides/letterbox'
@@ -24,7 +25,7 @@ import { letterboxRects, nodeStageRect } from '@/app/slides/letterbox'
 import { usePlayPointer } from './pointer'
 import { usePlayScenes } from './scenes'
 import { usePlayScroll } from './scroll'
-import { playFitArea } from './viewport'
+import { playFitArea, revealPan } from './viewport'
 
 /** How long the crossfade's snapshot outlives its animation, so its last frame is never cut. */
 const DISSOLVE_SETTLE_MS = 100
@@ -95,8 +96,22 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
     store.zoomToArea(area.x, area.y, area.x + area.width, area.y + area.height)
   }
 
+  /** Pans a screen that scrolls by panning so the layer a Scroll to reached meets its top. */
+  function reveal(point: Vector) {
+    const shown = session.value
+    const node = shown?.overlays.length === 0 ? store.graph.getNode(shown.frameId) : undefined
+    if (!node) return
+    const bounds = getAxisAlignedWorldBounds(node, store.graph)
+    const stage = { width: size.width.value, height: size.height.value }
+    const { dx, dy } = revealPan(bounds, point, node.overflowDirection, store.state, stage)
+    if (dx !== 0 || dy !== 0) store.pan(dx, dy)
+  }
+
   /** The frames play changed, which the canvas draws from their copies. */
-  const play = usePlayScenes(store, session, live)
+  const play = usePlayScenes(store, session, live, {
+    onReveal: reveal,
+    beforeDissolve: (rootId, durationMs) => snapshotBefore(durationMs, rootId)
+  })
   usePlayPointer(store, area, session, play, live)
   usePlayScroll(store, area, session, play)
 
@@ -104,25 +119,21 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
   const scrim = computed(() => (session.value?.overlays.length ?? 0) > 0)
 
   /**
-   * The previous frame drawn to a PNG the canvas crossfades from during a dissolve, from `graph`,
-   * the copy play shows of a frame it changed. A frame that cannot be drawn leaves none, so the
-   * transition falls back to a cut instead of wrong pixels.
+   * The previous frame drawn to a PNG the canvas crossfades from during a dissolve, as play shows
+   * it: from its copy of a frame it changed, scrolled as play scrolled it. A frame that cannot be
+   * drawn leaves none, so the transition falls back to a cut instead of wrong pixels.
    */
-  function snapshotBefore(durationMs: number, graph = store.graph): VisibleCanvas | null {
-    const shown = session.value
-    if (!shown) return null
-    const node = graph.getNode(shownFrame(shown))
-    if (!node || !store.renderer) return null
+  function snapshotBefore(durationMs: number, rootId: string): VisibleCanvas | null {
+    const graph = play.graphFor(rootId)
+    const node = graph.getNode(rootId)
+    if (!session.value || !node || !store.renderer) return null
     const bounds = getAxisAlignedWorldBounds(node, graph)
     const scale = Math.min(1, 640 / Math.max(bounds.width, bounds.height, 1))
-    const bytes = renderNodesToImage(
-      store.renderer.ck,
-      store.renderer,
-      graph,
-      store.state.currentPageId,
-      [node.id],
-      { scale, format: 'PNG' }
-    )
+    const bytes = snapshotPlayFrame(store.renderer, graph, node.id, {
+      scale,
+      scroll: play.scroll(),
+      touched: play.views().get(rootId)?.touched
+    })
     if (!bytes) return null
     const blob = new Blob([bytes], { type: 'image/png' })
     const { panX, panY, zoom } = store.state
@@ -146,20 +157,19 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
 
   /**
    * Runs a reaction from a click or a timeout with the transition it asks for: a dissolve
-   * crossfades for its own duration, and the next frame's timers wait until it ends. A Change to
-   * runs on play's copy of the frame instead of moving the session.
+   * crossfades for its own duration, and the next frame's timers wait until it ends.
    */
   function runAction(current: PlaySession, click: PlayClick) {
     const { action } = click
-    const durationMs = transitionMs(action)
-    if (action.type === 'NODE' && action.navigation === 'CHANGE_TO') {
-      if (durationMs > 0) snapshotBefore(durationMs, play.graphFor(shownFrame(current)))
+    // A Change to and a Scroll to run on play's copy of the frame, which crossfades or eases it.
+    if (action.type === 'NODE' && action.navigation !== 'NAVIGATE' && action.navigation !== 'OVERLAY') {
       play.run(click)
       return
     }
     const next = step(store.graph, current, action)
     if (next === current) return
-    if (durationMs > 0) snapshotBefore(durationMs)
+    const durationMs = transitionMs(action)
+    if (durationMs > 0) snapshotBefore(durationMs, shownFrame(current))
     enteringMs = durationMs
     session.value = next
   }

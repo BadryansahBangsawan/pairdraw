@@ -793,6 +793,7 @@
   "prototypeDestination": "Destinazione",
   "prototypeDestinationPlaceholder": "Seleziona un frame",
   "prototypeVariantPlaceholder": "Seleziona una variante",
+  "prototypeLayerPlaceholder": "Seleziona un livello",
   "prototypeInheritedInteractions": {
     "one": "{count} interazione dal componente principale",
     "many": "{count} interazioni dal componente principale"

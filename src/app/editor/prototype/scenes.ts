@@ -7,13 +7,18 @@ import {
   type PlaySession,
   type PlayStep,
   type PlayTimeout,
-  shownFrame
+  type ScrollChange,
+  shownFrame,
+  transitionMs
 } from '@pairdraw/core/prototype'
 import type { SceneGraph } from '@pairdraw/scene-graph'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
 import type { EditorStore } from '@/app/editor/active-store'
+
+/** How long an animated Scroll to eases, as long as a dissolve. */
+const SCROLL_ANIMATION_MS = 300
 
 /** What the stage reads of play: whether it runs, and the Reset count that starts it over. */
 type PlayLive = Readonly<Ref<{ revision: number } | null>>
@@ -23,12 +28,18 @@ type PlayLive = Readonly<Ref<{ revision: number } | null>>
  * its frame's private copy, which the canvas draws instead of the document. Reset, leaving play,
  * another document, and an edit inside a changed frame put it back as designed. The After delay
  * reactions of the instances on screen run here too, each counting from when its instance began
- * to show the variant whose reaction it is.
+ * to show the variant whose reaction it is. A Scroll to eases its frames when it animates, and
+ * `onReveal` brings the layer it scrolled to into view on a screen that scrolls by panning.
  */
 export function usePlayScenes(
   store: EditorStore,
   session: Ref<PlaySession | null>,
-  live: PlayLive
+  live: PlayLive,
+  options: {
+    onReveal?: (reveal: Vector) => void
+    /** Called before a dissolving reaction runs, to draw the frame as it was for the crossfade. */
+    beforeDissolve?: (rootId: string, durationMs: number) => void
+  } = {}
 ) {
   const scenes = createPlayScenes(() => store.graph)
   /** Grows whenever what play shows of a frame changes, so timers and the canvas follow. */
@@ -43,10 +54,44 @@ export function usePlayScenes(
   function run(click: PlayClick, rootId?: string): PlayStep | null {
     const current = session.value
     if (!current) return null
+    // A Scroll to animates by easing its frames instead of crossfading.
+    const scrolls = click.action.type === 'NODE' && click.action.navigation === 'SCROLL_TO'
+    if (click.transition?.type === 'DISSOLVE' && !scrolls) {
+      options.beforeDissolve?.(rootId ?? shownFrame(current), transitionMs(click.action))
+    }
     const result = scenes.run(current, click, rootId)
     session.value = result.session
     if (result.changed) changed()
+    if (result.scrolled?.length) {
+      if (click.transition && click.transition.type !== 'INSTANT') animate(result.scrolled)
+      else store.requestRepaint()
+    }
+    if (result.reveal) options.onReveal?.(result.reveal)
     return result
+  }
+
+  // An animated Scroll to eases each frame it moved from where it was to where it ends.
+  let tween: number | null = null
+  function stopTween(): void {
+    if (tween !== null) cancelAnimationFrame(tween)
+    tween = null
+  }
+  function animate(moves: readonly ScrollChange[]): void {
+    stopTween()
+    const started = performance.now()
+    const frame = (now: number) => {
+      const t = Math.min(1, (now - started) / SCROLL_ANIMATION_MS)
+      const eased = 1 - (1 - t) ** 3
+      for (const { id, from, to } of moves) {
+        scenes.setScroll(id, {
+          x: from.x + (to.x - from.x) * eased,
+          y: from.y + (to.y - from.y) * eased
+        })
+      }
+      store.requestRepaint()
+      tween = t < 1 ? requestAnimationFrame(frame) : null
+    }
+    frame(started)
   }
 
   /** Undoes a While hovering or While pressing reaction as the pointer leaves or lifts. */
@@ -65,12 +110,15 @@ export function usePlayScenes(
   function scrollBy(path: readonly string[], dx: number, dy: number): Vector {
     const current = session.value
     if (!current) return { x: dx, y: dy }
+    // The pointer takes over from an animated Scroll to.
+    stopTween()
     const rest = scenes.scrollBy(shownFrame(current), path, dx, dy)
     if (rest.x !== dx || rest.y !== dy) store.requestRepaint()
     return rest
   }
 
   function clear(): void {
+    stopTween()
     if (scenes.views.size === 0 && scenes.scroll.size === 0) return
     scenes.clear()
     changed()
@@ -104,10 +152,13 @@ export function usePlayScenes(
     const wanted = new Map<string, PlayTimeout & { rootId: string }>()
     if (current && live.value) {
       for (const rootId of [current.frameId, ...current.overlays]) {
-        scenes.instanceTimeouts(rootId).forEach((timeout, index) => {
-          const key = `${live.value?.revision}:${rootId}:${timeout.sourceId}:${timeout.variantId}:${index}`
+        for (const timeout of scenes.instanceTimeouts(rootId)) {
+          // By the reaction, not its place in the list, so another instance that stops counting
+          // does not start this one over.
+          const { sourceId, variantId, reactionId } = timeout
+          const key = `${live.value.revision}:${rootId}:${sourceId}:${variantId}:${reactionId}`
           wanted.set(key, { ...timeout, rootId })
-        })
+        }
       }
     }
     for (const [key, timer] of timers) {
@@ -124,7 +175,8 @@ export function usePlayScenes(
         // A timer that outlived its instance's variant, or its frame, runs nothing.
         if (!instance || instanceMainComponent(graph, instance)?.id !== timeout.variantId) return
         const { sourceId, action } = timeout
-        run({ sourceId, action, transition: null }, timeout.rootId)
+        const transition = action.type === 'NODE' ? action.transition : null
+        run({ sourceId, action, transition }, timeout.rootId)
       }, timeout.delayMs)
       timers.set(key, timer)
     }
@@ -141,6 +193,7 @@ export function usePlayScenes(
   )
 
   onScopeDispose(() => {
+    stopTween()
     for (const timer of timers.values()) window.clearTimeout(timer)
     timers.clear()
     stopFollowing()

@@ -75,7 +75,7 @@ function installTimerProbe() {
     realClear(id)
   }) as typeof window.clearTimeout
   return {
-    live: () => [...armed.values()].filter((entry) => entry.ms === DELAY_MS && !entry.cleared),
+    live: () => [...armed.values()].filter((entry) => entry.ms >= DELAY_MS && !entry.cleared),
     restore: () => {
       window.setTimeout = realSet
       window.clearTimeout = realClear
@@ -162,6 +162,203 @@ describe('play scenes on the stage', () => {
 
     store.graph.updateNode(instance.id, { name: 'Renamed' })
     expect(play.views().size).toBe(0)
+    scope.stop()
+    store.dispose()
+  })
+
+  test("an instance's After delay keeps counting when another instance switches before it", async () => {
+    const probe = installTimerProbe()
+    restore = probe.restore
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const set = graph.createNode('COMPONENT_SET', pageId, { y: 400 })
+    const quick = graph.createNode('COMPONENT', set.id, {
+      name: 'State=Quick',
+      width: 20,
+      height: 20
+    })
+    const slow = graph.createNode('COMPONENT', set.id, { name: 'State=Slow', x: 40 })
+    const done = graph.createNode('COMPONENT', set.id, { name: 'State=Done', x: 80 })
+    graph.updateNode(quick.id, { prototypeReactions: [changeTo(done.id, 'AFTER_TIMEOUT')] })
+    graph.updateNode(slow.id, {
+      prototypeReactions: [{ ...changeTo(done.id, 'AFTER_TIMEOUT'), id: 'slow-timeout' }]
+    })
+    const screen = graph.createNode('FRAME', pageId, { width: 100, height: 100 })
+    graph.createInstance(quick.id, screen.id)
+    graph.createInstance(slow.id, screen.id, { x: 40 })
+    const store = createEditorStore(graph)
+    const session = ref<PlaySession | null>(startSession(screen.id))
+    const scope = effectScope()
+    scope.run(() =>
+      usePlayScenes(
+        store,
+        session,
+        computed(() => ({ revision: 0 }))
+      )
+    )
+    await nextTick()
+    const [first, second] = probe.live()
+    if (!first || !second) throw new Error('both loaders should count')
+
+    first.fn()
+    await nextTick()
+    // The slow loader's timer runs on; nothing armed it again from zero.
+    expect(second.cleared).toBe(false)
+    expect(probe.live()).toEqual([second])
+    scope.stop()
+    store.dispose()
+  })
+
+  test('a dissolving Change to asks for the frame as it was first; an instant one and a Scroll to do not', () => {
+    const { graph, screen, instance, loading, done } = loaderDocument()
+    const store = createEditorStore(graph)
+    const session = ref<PlaySession | null>(startSession(screen.id))
+    const before: string[] = []
+    const scope = effectScope()
+    const play = scope.run(() =>
+      usePlayScenes(
+        store,
+        session,
+        computed(() => ({ revision: 0 })),
+        {
+          beforeDissolve: (rootId) => before.push(rootId)
+        }
+      )
+    )
+    if (!play) throw new Error('no play scenes')
+    const action = changeTo(loading.id, 'ON_CLICK').actions[0]
+    play.run({ sourceId: instance.id, action, transition: { type: 'DISSOLVE', duration: 0.3 } })
+    expect(before).toEqual([screen.id])
+    play.run({
+      sourceId: instance.id,
+      action: changeTo(done.id, 'ON_CLICK').actions[0],
+      transition: null
+    })
+    const scroll = {
+      type: 'NODE' as const,
+      nodeId: instance.id,
+      navigation: 'SCROLL_TO' as const,
+      transition: { type: 'DISSOLVE' as const, duration: 0.3 },
+      overlayPosition: 'CENTER' as const
+    }
+    play.run({ sourceId: instance.id, action: scroll, transition: scroll.transition })
+    expect(before).toEqual([screen.id])
+    scope.stop()
+    store.dispose()
+  })
+
+  test('an animated Scroll to stops at Reset and when the wheel scrolls', async () => {
+    const frames = new Map<number, (now: number) => void>()
+    let next = 1
+    const real = {
+      request: globalThis.requestAnimationFrame,
+      cancel: globalThis.cancelAnimationFrame
+    }
+    globalThis.requestAnimationFrame = (callback) => {
+      frames.set(next, callback)
+      return next++
+    }
+    globalThis.cancelAnimationFrame = (id) => {
+      frames.delete(id)
+    }
+    restore = () => {
+      globalThis.requestAnimationFrame = real.request
+      globalThis.cancelAnimationFrame = real.cancel
+    }
+    const flush = () => {
+      const pending = Array.from(frames.values())
+      frames.clear()
+      for (const callback of pending) callback(performance.now() + 1000)
+    }
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const screen = graph.createNode('FRAME', pageId, { width: 100, height: 100 })
+    const list = graph.createNode('FRAME', screen.id, {
+      width: 100,
+      height: 50,
+      clipsContent: true,
+      overflowDirection: 'VERTICAL'
+    })
+    graph.createNode('RECTANGLE', list.id, { width: 100, height: 50 })
+    const last = graph.createNode('RECTANGLE', list.id, { y: 100, width: 100, height: 50 })
+    const store = createEditorStore(graph)
+    const session = ref<PlaySession | null>(startSession(screen.id))
+    const revision = ref(0)
+    const scope = effectScope()
+    const play = scope.run(() =>
+      usePlayScenes(
+        store,
+        session,
+        computed(() => ({ revision: revision.value }))
+      )
+    )
+    if (!play) throw new Error('no play scenes')
+    const scrollTo = {
+      type: 'NODE' as const,
+      nodeId: last.id,
+      navigation: 'SCROLL_TO' as const,
+      transition: { type: 'DISSOLVE' as const, duration: 0.3 },
+      overlayPosition: 'CENTER' as const
+    }
+    play.run({ sourceId: screen.id, action: scrollTo, transition: scrollTo.transition })
+    revision.value += 1
+    await nextTick()
+    flush()
+    expect(play.scroll().size).toBe(0)
+
+    play.run({ sourceId: screen.id, action: scrollTo, transition: scrollTo.transition })
+    play.scrollBy([screen.id, list.id], 0, -100)
+    flush()
+    expect(play.scroll().get(list.id)).toEqual({ x: 0, y: 0 })
+    scope.stop()
+    store.dispose()
+  })
+
+  test("an instance's After delay crossfades when its Change to dissolves", async () => {
+    const probe = installTimerProbe()
+    restore = probe.restore
+    const { graph, screen, instance, loading, done } = loaderDocument()
+    graph.updateNode(loading.id, {
+      prototypeReactions: [
+        {
+          ...changeTo(done.id, 'AFTER_TIMEOUT'),
+          actions: [
+            {
+              type: 'NODE',
+              nodeId: done.id,
+              navigation: 'CHANGE_TO',
+              transition: { type: 'DISSOLVE', duration: 0.3 },
+              overlayPosition: 'CENTER'
+            }
+          ]
+        }
+      ]
+    })
+    const store = createEditorStore(graph)
+    const session = ref<PlaySession | null>(startSession(screen.id))
+    const before: string[] = []
+    const scope = effectScope()
+    const play = scope.run(() =>
+      usePlayScenes(
+        store,
+        session,
+        computed(() => ({ revision: 0 })),
+        {
+          beforeDissolve: (rootId) => before.push(rootId)
+        }
+      )
+    )
+    if (!play) throw new Error('no play scenes')
+    play.run({
+      sourceId: instance.id,
+      action: changeTo(loading.id, 'ON_CLICK').actions[0],
+      transition: null
+    })
+    await nextTick()
+    const [timer] = probe.live()
+    if (!timer) throw new Error('no timer')
+    timer.fn()
+    expect(before).toEqual([screen.id])
     scope.stop()
     store.dispose()
   })

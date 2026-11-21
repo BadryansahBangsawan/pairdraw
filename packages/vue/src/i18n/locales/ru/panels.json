@@ -803,6 +803,7 @@
   "prototypeDestination": "Назначение",
   "prototypeDestinationPlaceholder": "Выберите фрейм",
   "prototypeVariantPlaceholder": "Выберите вариант",
+  "prototypeLayerPlaceholder": "Выберите слой",
   "prototypeInheritedInteractions": {
     "one": "{count} взаимодействие из главного компонента",
     "few": "{count} взаимодействия из главного компонента",

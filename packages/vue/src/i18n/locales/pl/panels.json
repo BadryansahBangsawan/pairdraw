@@ -803,6 +803,7 @@
   "prototypeDestination": "Cel",
   "prototypeDestinationPlaceholder": "Wybierz ramkę",
   "prototypeVariantPlaceholder": "Wybierz wariant",
+  "prototypeLayerPlaceholder": "Wybierz warstwę",
   "prototypeInheritedInteractions": {
     "one": "{count} interakcja z komponentu głównego",
     "few": "{count} interakcje z komponentu głównego",

@@ -793,6 +793,7 @@
   "prototypeDestination": "Destino",
   "prototypeDestinationPlaceholder": "Selecciona un marco",
   "prototypeVariantPlaceholder": "Selecciona una variante",
+  "prototypeLayerPlaceholder": "Selecciona una capa",
   "prototypeInheritedInteractions": {
     "one": "{count} interacción del componente principal",
     "many": "{count} interacciones del componente principal"

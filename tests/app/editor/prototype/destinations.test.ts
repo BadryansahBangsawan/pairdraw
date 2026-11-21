@@ -2,7 +2,11 @@ import { describe, expect, test } from 'bun:test'
 
 import { SceneGraph } from '@pairdraw/scene-graph'
 
-import { inheritedReactionCount, variantDestinations } from '@/app/editor/prototype/destinations'
+import {
+  inheritedReactionCount,
+  scrollDestinations,
+  variantDestinations
+} from '@/app/editor/prototype/destinations'
 import {
   actionChoice,
   createReaction,
@@ -72,6 +76,14 @@ describe("an instance's interactions from its main component", () => {
     expect(inheritedReactionCount(graph, toggle.id)).toBe(1)
     expect(inheritedReactionCount(graph, off.id)).toBe(0)
   })
+
+  test("count Figma's copies of them on the instance, which play does not run as its own", () => {
+    const { graph, toggle, off, on } = components()
+    const click = setTarget(setActionChoice(createReaction(), 'CHANGE_TO'), on.id)
+    graph.updateNode(off.id, { prototypeReactions: [click] })
+    graph.updateNode(toggle.id, { prototypeReactions: [{ ...click }] })
+    expect(inheritedReactionCount(graph, toggle.id)).toBe(1)
+  })
 })
 
 describe('editing an interaction', () => {
@@ -95,5 +107,45 @@ describe('editing an interaction', () => {
       delay: 0.4
     })
     expect(setTriggerType(waited, 'ON_HOVER').trigger).toEqual({ type: 'ON_HOVER', delay: 0 })
+  })
+})
+
+describe('the layers a Scroll to can bring into view', () => {
+  /** A screen holding a button and a list that scrolls, with two rows and a hidden third. */
+  function screenWithList(overflow: 'VERTICAL' | 'NONE') {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const screen = graph.createNode('FRAME', pageId, { name: 'Screen' })
+    const button = graph.createNode('RECTANGLE', screen.id, { name: 'Jump' })
+    const list = graph.createNode('FRAME', screen.id, {
+      name: 'List',
+      clipsContent: true,
+      overflowDirection: overflow
+    })
+    const first = graph.createNode('FRAME', list.id, { name: 'Account' })
+    const deep = graph.createNode('TEXT', first.id, { name: 'Email' })
+    const second = graph.createNode('FRAME', list.id, { name: 'Privacy' })
+    graph.createNode('FRAME', list.id, { name: 'Hidden', visible: false })
+    return { graph, screen, button, first, deep, second }
+  }
+
+  test('are the visible layers inside frames that scroll on the same screen, indented by depth', () => {
+    const { graph, button, first, deep, second } = screenWithList('VERTICAL')
+    expect(scrollDestinations(graph, button.id)).toEqual([
+      { value: first.id, label: 'Account' },
+      { value: deep.id, label: '\u00a0\u00a0Email' },
+      { value: second.id, label: 'Privacy' }
+    ])
+  })
+
+  test('are none on a screen where nothing scrolls', () => {
+    const { graph, button } = screenWithList('NONE')
+    expect(scrollDestinations(graph, button.id)).toEqual([])
+  })
+
+  test("include a screen's own layers when the screen scrolls by panning", () => {
+    const { graph, screen, button } = screenWithList('NONE')
+    graph.updateNode(screen.id, { overflowDirection: 'VERTICAL' })
+    expect(scrollDestinations(graph, button.id).map((option) => option.label)).toContain('List')
   })
 })

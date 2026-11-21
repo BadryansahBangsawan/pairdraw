@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 
-import { framesOnPage } from '@pairdraw/core/prototype'
+import { asInstanceEdit, framesOnPage } from '@pairdraw/core/prototype'
 import type {
   OverflowDirection,
   PrototypeReaction,
@@ -13,7 +13,7 @@ import { useSceneComputed } from '@pairdraw/vue/internal/scene-computed'
 
 import { useEditorStore } from '@/app/editor/active-store'
 
-import { inheritedReactionCount, variantDestinations } from './destinations'
+import { inheritedReactionCount, scrollDestinations, variantDestinations } from './destinations'
 import type { ActionChoice } from './reactions'
 import {
   createReaction,
@@ -49,6 +49,12 @@ export function usePrototype() {
   const variantTargets = useSceneComputed(() => {
     const node = selectedNode.value
     return node ? variantDestinations(store.graph, node.id) : []
+  })
+
+  /** The layers a Scroll to on the selected layer can bring into view. */
+  const scrollTargets = useSceneComputed(() => {
+    const node = selectedNode.value
+    return node ? scrollDestinations(store.graph, node.id) : []
   })
 
   /** How many interactions the selected instance runs from its main component. */
@@ -92,14 +98,23 @@ export function usePrototype() {
     store.updateNodeWithUndo(node.id, { prototypeReactions: [...next] }, label)
   }
 
+  /**
+   * One edit to an interaction. On an instance, an edited copy of its main's interaction becomes
+   * the instance's own, which play runs instead of the main's.
+   */
   function edit(change: (reaction: PrototypeReaction) => PrototypeReaction, id: string) {
-    commit(withReactionChange(reactions.value, id, change), LABEL)
+    const node = selectedNode.value
+    const main = node?.type === 'INSTANCE' ? instanceMainComponent(store.graph, node) : undefined
+    const inherited = main?.prototypeReactions ?? []
+    const next = (reaction: PrototypeReaction) => asInstanceEdit(change(reaction), inherited)
+    commit(withReactionChange(reactions.value, id, next), LABEL)
   }
 
   return {
     reactions,
     targets,
     variantTargets,
+    scrollTargets,
     inheritedCount,
     selectMain,
     scrolls,

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { playFitArea } from '@/app/editor/prototype/viewport'
+import { playFitArea, revealPan } from '@/app/editor/prototype/viewport'
 
 const STAGE = { width: 800, height: 600 }
 const PHONE = { x: 100, y: 50, width: 390, height: 2400 }
@@ -11,7 +11,12 @@ describe('what play fits of a frame', () => {
   })
 
   test('is its width from the top when it scrolls vertically and is taller than the stage', () => {
-    expect(playFitArea(PHONE, 'VERTICAL', STAGE)).toEqual({ x: 100, y: 50, width: 390, height: 292.5 })
+    expect(playFitArea(PHONE, 'VERTICAL', STAGE)).toEqual({
+      x: 100,
+      y: 50,
+      width: 390,
+      height: 292.5
+    })
     // A frame no taller than the stage fits whole.
     const card = { x: 0, y: 0, width: 400, height: 200 }
     expect(playFitArea(card, 'VERTICAL', STAGE)).toEqual(card)
@@ -26,5 +31,24 @@ describe('what play fits of a frame', () => {
 
   test('is the whole frame on a stage with no size yet', () => {
     expect(playFitArea(PHONE, 'VERTICAL', { width: 0, height: 0 })).toEqual(PHONE)
+  })
+})
+
+describe('bringing a layer into view on a screen that pans', () => {
+  // The phone fitted across an 800×600 stage: zoom 800 / 390, its top at the stage's top.
+  const zoom = 800 / 390
+  const view = { panX: -PHONE.x * zoom, panY: -PHONE.y * zoom, zoom }
+
+  test('pans so the layer meets the top of the stage', () => {
+    expect(revealPan(PHONE, { x: 100, y: 1050 }, 'VERTICAL', view, STAGE)).toEqual({
+      dx: 0,
+      dy: -1000 * zoom
+    })
+  })
+
+  test('stops where the screen ends, and does not pan a screen that does not scroll', () => {
+    const end = revealPan(PHONE, { x: 100, y: 2440 }, 'VERTICAL', view, STAGE)
+    expect(end.dy).toBeCloseTo(STAGE.height - (PHONE.y + PHONE.height) * zoom - view.panY)
+    expect(revealPan(PHONE, { x: 100, y: 1050 }, 'NONE', view, STAGE)).toEqual({ dx: 0, dy: 0 })
   })
 })

@@ -813,6 +813,7 @@ export const panelMessageDefaults = {
   prototypeDestination: 'Destination',
   prototypeDestinationPlaceholder: 'Select a frame',
   prototypeVariantPlaceholder: 'Select a variant',
+  prototypeLayerPlaceholder: 'Select a layer',
   prototypeInheritedInteractions: count({
     one: '{count} interaction from the main component',
     many: '{count} interactions from the main component'

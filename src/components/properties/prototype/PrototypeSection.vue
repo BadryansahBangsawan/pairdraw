@@ -26,6 +26,7 @@ const {
   reactions,
   targets,
   variantTargets,
+  scrollTargets,
   inheritedCount,
   selectMain,
   scrolls,
@@ -63,26 +64,33 @@ const actionLabels = computed<Record<ActionChoice, string>>(() => ({
 }))
 
 /**
- * The actions offered for an interaction: Change to on a layer in a variant, and one read from a
- * file so it shows.
+ * The actions offered for an interaction: Change to on a layer in a variant, Scroll to on a screen
+ * with something to scroll to, and one read from a file so it shows.
  */
 function actionOptions(reaction: PrototypeReaction): { value: ActionChoice; label: string }[] {
   const current = actionChoice(reaction)
   const choices: ActionChoice[] = ['NAVIGATE', 'OVERLAY', 'BACK', 'CLOSE']
+  if (scrollTargets.value.length > 0) choices.splice(2, 0, 'SCROLL_TO')
   if (variantTargets.value.length > 0) choices.splice(2, 0, 'CHANGE_TO')
   if (!choices.includes(current)) choices.splice(2, 0, current)
   return choices.map((value) => ({ value, label: actionLabels.value[value] }))
 }
 
-/** What a node action can point at: frames for a navigation or overlay, variants for Change to. */
+/**
+ * What a node action can point at, and what its empty pick says: frames for a navigation or
+ * overlay, variants for Change to, and layers that can scroll into view for Scroll to.
+ */
 function destinationOptions(reaction: PrototypeReaction) {
-  return node(reaction)?.navigation === 'CHANGE_TO' ? variantTargets.value : frameOptions.value
+  const navigation = node(reaction)?.navigation
+  if (navigation === 'CHANGE_TO') return variantTargets.value
+  return navigation === 'SCROLL_TO' ? scrollTargets.value : frameOptions.value
 }
 
 function destinationPlaceholder(reaction: PrototypeReaction): string {
-  return node(reaction)?.navigation === 'CHANGE_TO'
-    ? panels.value.prototypeVariantPlaceholder
-    : panels.value.prototypeDestinationPlaceholder
+  const navigation = node(reaction)?.navigation
+  if (navigation === 'CHANGE_TO') return panels.value.prototypeVariantPlaceholder
+  if (navigation === 'SCROLL_TO') return panels.value.prototypeLayerPlaceholder
+  return panels.value.prototypeDestinationPlaceholder
 }
 
 const overflowOptions = computed<{ value: OverflowDirection; label: string }[]>(() => [

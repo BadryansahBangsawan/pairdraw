@@ -793,6 +793,7 @@
   "prototypeDestination": "Destination",
   "prototypeDestinationPlaceholder": "Sélectionner un cadre",
   "prototypeVariantPlaceholder": "Sélectionner une variante",
+  "prototypeLayerPlaceholder": "Sélectionner un calque",
   "prototypeInheritedInteractions": {
     "one": "{count} interaction du composant principal",
     "many": "{count} interactions du composant principal"

@@ -1,13 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 
-import type { RPCJSONObject } from '#mcp/json'
-import { scopeRPC } from '#mcp/tool/scope'
 import {
   isToolEnabled,
   narrowestScope,
   parseToolScope,
   type ToolDescriptor
 } from '@pairdraw/mcp/tools'
+
+import type { RPCJSONObject } from '#mcp/json'
+import { scopeRPC } from '#mcp/tool/scope'
 
 function tool(name: string): ToolDescriptor {
   return {

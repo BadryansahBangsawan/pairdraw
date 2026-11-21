@@ -2,8 +2,8 @@ import { uniq } from 'es-toolkit/array'
 import * as v from 'valibot'
 
 import { PairdrawAPI } from '#core/pairdraw-api'
-import { defineTool } from '#core/tools/schema'
 import { listDocumentFonts } from '#core/text/replace-fonts'
+import { defineTool } from '#core/tools/schema'
 
 export const getFontStatus = defineTool({
   name: 'get_font_status',

@@ -64,3 +64,66 @@ describe('a variant instance pasted into another document', () => {
     target.dispose()
   })
 })
+
+describe('a variant component copied without its set selected', () => {
+  test('lands as the whole set, with its variants and properties', async () => {
+    const source = createEditor()
+    const { on, caption } = variantSet(source)
+    source.select([on.id])
+    const snapshot = expectDefined((await source.prepareCopy()).snapshot, 'snapshot')
+    expect(snapshot.nodes.map((node) => node.type)).toEqual(['COMPONENT_SET'])
+
+    const target = createEditor()
+    await target.pasteSnapshot(structuredClone(snapshot))
+    const set = expectDefined(
+      target.graph.getNode([...target.state.selectedIds][0] ?? ''),
+      'pasted set'
+    )
+    expect(set.type).toBe('COMPONENT_SET')
+    expect(target.graph.getChildren(set.id).map((node) => node.name)).toEqual([
+      'State=Off',
+      'State=On'
+    ])
+    expect(
+      target.graph
+        .getNode(set.id)
+        ?.componentPropertyDefinitions.map((definition) => definition.name)
+    ).toEqual(['State', 'Caption'])
+
+    // Every component the paste made belongs to the set, and the set can still switch.
+    const components = [...target.graph.nodes.values()].filter((node) => node.type === 'COMPONENT')
+    expect(components.map((node) => node.parentId)).toEqual([set.id, set.id])
+    const instance = expectDefined(
+      target.graph.createInstance(components[1].id, target.state.currentPageId),
+      'instance'
+    )
+    const definitions = target.getInstanceComponentPropertyDefinitions(instance.id)
+    target.setInstanceComponentProperty(
+      instance.id,
+      expectDefined(definitions.find((d) => d.name === 'Caption'), 'caption').id,
+      'Copied cap'
+    )
+    target.switchInstanceVariant(instance.id, 'State', 'Off')
+    expect(target.graph.getNode(instance.id)?.componentId).toBe(components[0].id)
+    expect(caption).toBeDefined()
+    source.dispose()
+    target.dispose()
+  })
+
+  test('two selected variants bring one set', async () => {
+    const source = createEditor()
+    const { off, on } = variantSet(source)
+    source.select([off.id, on.id])
+    const snapshot = expectDefined((await source.prepareCopy()).snapshot, 'snapshot')
+    expect(snapshot.nodes.map((node) => node.type)).toEqual(['COMPONENT_SET'])
+
+    const target = createEditor()
+    await target.pasteSnapshot(structuredClone(snapshot))
+    expect([...target.state.selectedIds]).toHaveLength(1)
+    expect(
+      target.graph.getNode([...target.state.selectedIds][0] ?? '')?.type
+    ).toBe('COMPONENT_SET')
+    source.dispose()
+    target.dispose()
+  })
+})

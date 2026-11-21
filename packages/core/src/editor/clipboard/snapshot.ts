@@ -1,3 +1,5 @@
+import { uniqBy } from 'es-toolkit'
+
 import type { SceneGraph, SceneNode } from '@pairdraw/scene-graph'
 import { styleRunReferences } from '@pairdraw/scene-graph/text'
 import { captureAppliedBoundPaints, type AppliedBoundPaints } from '@pairdraw/scene-graph/variables'
@@ -65,7 +67,17 @@ export function captureClipboardSnapshot(
     }
     return { ...structuredClone(node), children: graph.getChildren(node.id).map(capture) }
   }
-  const nodes = roots.map(capture)
+  // A variant cannot stand without its set: its variant properties, the values each variant sets,
+  // and the properties the set defines live there. Copying selected variants brings the set, as
+  // Figma does, and two variants of one set bring it once.
+  const copiedRoots = uniqBy(
+    roots.map((node) => {
+      const parent = node.parentId ? graph.getNode(node.parentId) : undefined
+      return node.type === 'COMPONENT' && parent?.type === 'COMPONENT_SET' ? parent : node
+    }),
+    (node) => node.id
+  )
+  const nodes = copiedRoots.map(capture)
   const componentDependencies = new Map<string, ClipboardNodeTree>()
   function captureComponent(id: string) {
     if (componentDependencies.has(id) || selectedIds.has(id)) return
@@ -96,7 +108,7 @@ export function captureClipboardSnapshot(
     styleDefinitions,
     variableDependencies: captureClipboardVariables(graph, capturedNodes),
     nodes,
-    placement: clipboardPlacement(graph, roots),
+    placement: clipboardPlacement(graph, copiedRoots),
     images,
     appliedBoundPaints: captureAppliedBoundPaints(
       graph,

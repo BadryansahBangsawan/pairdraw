@@ -271,9 +271,8 @@ describe('interactive components and scrolling in the plugin shape', () => {
         }
       ]
     })
-    const read = await getReactions.execute(figma, { id: instance.id })
-    if (!('reactions' in read)) throw new Error('no reactions')
-    await setReactions.execute(figma, { id: instance.id, reactions: [...read.reactions] })
+    const read = figma.getNodeById(instance.id)?.reactions ?? []
+    await setReactions.execute(figma, { id: instance.id, reactions: [...read] })
 
     const held = graph.getNode(instance.id)
     expect(held?.prototypeReactions[0]?.id).toBe('9:1')

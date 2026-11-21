@@ -17,6 +17,7 @@ import {
   setModelRoleAssignment
 } from '@/app/ai/models'
 import type { ModelPickerLabels } from '@/app/ai/models/picker/options'
+import { settingsErrorMessage } from '@/app/settings/credentials/errors'
 import type { SettingsSaveResult } from '@/app/settings/save-result'
 
 import { useProfileConnection } from './connection'
@@ -121,7 +122,7 @@ export function useModelProfileEditor({ profileId, keyInput, labels: ai }: Profi
       saveResult.value = 'saved'
       return 'saved'
     } catch (reason) {
-      saveError.value = reason instanceof Error ? reason.message : String(reason)
+      saveError.value = settingsErrorMessage(reason)
       saveResult.value = persisted ? 'partial' : 'failed'
       return saveResult.value
     } finally {
@@ -149,7 +150,7 @@ export function useModelProfileEditor({ profileId, keyInput, labels: ai }: Profi
       await refreshAIProviderStatus()
       return modelProfile(profileId) === null
     } catch (reason) {
-      saveError.value = reason instanceof Error ? reason.message : String(reason)
+      saveError.value = settingsErrorMessage(reason)
       return false
     } finally {
       busy.value = false

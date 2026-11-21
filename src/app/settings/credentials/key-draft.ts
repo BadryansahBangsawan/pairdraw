@@ -1,6 +1,7 @@
 import { tryOnScopeDispose } from '@vueuse/core'
 import { ref, watch, type Ref } from 'vue'
 
+import { settingsErrorMessage } from '@/app/settings/credentials/errors'
 import type { CredentialStatus } from '@/app/settings/credentials/types'
 
 /** Reads and writes the saved key of one service among several, chosen by `ID`. */
@@ -33,7 +34,7 @@ export function useKeyCredential<ID>(
   })
 
   function failure(cause: unknown): string {
-    return cause instanceof Error ? cause.message : String(cause)
+    return settingsErrorMessage(cause)
   }
 
   async function refreshStatus(): Promise<void> {
@@ -106,7 +107,7 @@ export async function runCredentialSave(
   try {
     return (await action()) && !isDisposed()
   } catch (cause) {
-    if (!isDisposed()) saveError.value = cause instanceof Error ? cause.message : String(cause)
+    if (!isDisposed()) saveError.value = settingsErrorMessage(cause)
     return false
   } finally {
     busy.value = false

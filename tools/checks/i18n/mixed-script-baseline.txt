@@ -152,6 +152,7 @@ ja:comments.applyWithAI
 ja:credentials.apiKey
 ja:credentials.getAPIKey
 ja:credentials.rememberDevice
+ja:credentials.storeUnavailable
 ja:designCheck.ruleColorContrastHelp
 ja:designCheck.ruleMinTextSizeHelp
 ja:designCheck.ruleTouchTargetSizeHelp
@@ -387,6 +388,7 @@ zh-cn:comments.applyWithAI
 zh-cn:credentials.apiKey
 zh-cn:credentials.getAPIKey
 zh-cn:credentials.rememberDevice
+zh-cn:credentials.storeUnavailable
 zh-cn:designCheck.ruleColorContrastHelp
 zh-cn:designCheck.ruleMinTextSizeHelp
 zh-cn:designCheck.ruleTouchTargetSizeHelp

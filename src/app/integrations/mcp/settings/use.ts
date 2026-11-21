@@ -10,6 +10,7 @@ import {
   setMCPConnectionCredential,
   type MCPConnectionDraft
 } from '@/app/integrations/mcp'
+import { settingsErrorMessage } from '@/app/settings/credentials/errors'
 import type { CredentialStatus } from '@/app/settings/credentials/types'
 import type { SettingsSaveResult } from '@/app/settings/save-result'
 
@@ -110,7 +111,7 @@ export function useMCPConnectionSettings(
     } catch (cause) {
       if (!current(request)) return false
 
-      error.value = cause instanceof Error ? cause.message : String(cause)
+      error.value = settingsErrorMessage(cause)
       return true
     } finally {
       pending.value--
@@ -164,7 +165,7 @@ export function useMCPConnectionSettings(
     } catch (cause) {
       const result = progress.persisted ? 'partial' : 'failed'
       if (current(request)) {
-        error.value = cause instanceof Error ? cause.message : String(cause)
+        error.value = settingsErrorMessage(cause)
         saveResult.value = result
       }
       return result
@@ -204,7 +205,7 @@ export function useMCPConnectionSettings(
       await enqueueMCPConnectionMutation(id, () => services.remove(id))
       return current(request)
     } catch (cause) {
-      if (current(request)) error.value = cause instanceof Error ? cause.message : String(cause)
+      if (current(request)) error.value = settingsErrorMessage(cause)
       return false
     } finally {
       pending.value--

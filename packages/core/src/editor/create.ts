@@ -42,6 +42,7 @@ import { createDesignMemoryActions } from './design-memory'
 import { createDesignTokenActions } from './design-tokens'
 import { createDocumentSettingsActions } from './document-settings'
 import { createFigCompressionActions } from './fig-compression'
+import { createFontActions } from './fonts'
 import { createGraphEventSubscription } from './graph-events'
 import { createGraphReadActions } from './graph-reads'
 import { createGuideActions } from './guides'
@@ -281,6 +282,7 @@ export function createEditor(options?: EditorOptions) {
   const documentSettings = createDocumentSettingsActions(ctx)
   const undoActions = createUndoActions(ctx)
   const text = createTextActions(ctx)
+  const fonts = createFontActions(ctx)
   const nodes = createNodeActions(ctx)
   const shapes = createShapeActions(ctx, nodes.updateNodeWithUndo)
   const clipboardProperties = createClipboardPropertiesActions(
@@ -541,6 +543,7 @@ export function createEditor(options?: EditorOptions) {
 
     // Text editing
     ...text,
+    ...fonts,
     ...textHyperlinks,
 
     // Viewport

@@ -181,25 +181,27 @@ describe('brand generation', () => {
     if (!manifest) throw new Error('Missing icon.icon/icon.json')
     const orange = 'srgb:1.00000,0.35686,0.18039,1.00000'
     const white = 'srgb:1.00000,1.00000,1.00000,1.00000'
-    expect(JSON.parse(manifest.toString())).toMatchObject({
-      'fill-specializations': [
-        { value: { solid: orange } },
-        { appearance: 'dark', value: { solid: orange } }
-      ],
+    // The conservative shape real Icon Composer files use: a plain fill with a dark
+    // specialization, a white bitmap layer, and a neutral shadow at opacity 0. Xcode 26's
+    // actool crashed on the earlier manifest's `shadow.kind: "none"` (v0.19.1 release build).
+    expect(JSON.parse(manifest.toString())).toEqual({
+      fill: { solid: orange },
+      'fill-specializations': [{ appearance: 'dark', value: { solid: orange } }],
       groups: [
         {
           layers: [
             {
-              'image-name': 'mark.png',
+              fill: { solid: white },
               glass: false,
-              'fill-specializations': [
-                { value: { solid: white } },
-                { appearance: 'dark', value: { solid: white } }
-              ]
+              'image-name': 'mark.png',
+              name: 'mark'
             }
-          ]
+          ],
+          shadow: { kind: 'neutral', opacity: 0 },
+          translucency: { enabled: false, value: 0.5 }
         }
-      ]
+      ],
+      'supported-platforms': { squares: ['macOS'] }
     })
     const layer = desktop.get('icon.icon/Assets/mark.png')
     if (!layer) throw new Error('Missing icon.icon/Assets/mark.png')

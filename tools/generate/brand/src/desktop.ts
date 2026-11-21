@@ -21,27 +21,29 @@ function iconColor(hex: string): string {
  * Icon Composer manifest for macOS 26. Without a dark appearance of its own, the system segments
  * the ICNS and swaps its flat orange tile for a dark one; this keeps the tile and the white mark
  * in the default and dark appearances. Earlier macOS versions read `icon.icns`.
+ *
+ * Every field matches what real Icon Composer files ship: a plain `fill` with an appearance
+ * specialization, one flat bitmap layer, a `neutral` shadow, and no glass or translucency.
+ * Xcode 26's actool crashed on the first attempt's `shadow.kind: "none"` — a value no exported
+ * Icon Composer file uses — so the shadow stays neutral at opacity 0, which draws nothing.
  */
 function iconComposerManifest(artwork: typeof pairdraw): string {
-  const both = (color: string) => [
-    { value: { solid: iconColor(color) } },
-    { appearance: 'dark', value: { solid: iconColor(color) } }
-  ]
+  const fill = { solid: iconColor(artwork.background) }
   return `${JSON.stringify(
     {
-      'fill-specializations': both(artwork.background),
+      fill,
+      'fill-specializations': [{ appearance: 'dark', value: fill }],
       groups: [
         {
           layers: [
             {
-              'fill-specializations': both(artwork.tileMark),
+              fill: { solid: iconColor(artwork.tileMark) },
               glass: false,
               'image-name': 'mark.png',
-              name: 'mark',
-              position: { scale: 1, 'translation-in-points': [0, 0] }
+              name: 'mark'
             }
           ],
-          shadow: { kind: 'none', opacity: 0.5 },
+          shadow: { kind: 'neutral', opacity: 0 },
           translucency: { enabled: false, value: 0.5 }
         }
       ],

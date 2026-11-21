@@ -5,12 +5,14 @@ import { parseColor } from '@pairdraw/scene-graph/color'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 import { randomHex } from '@pairdraw/scene-graph/random'
 
+import type { ProviderLogoID } from '@/app/ai/models/provider-logo'
 import type { RemotePeer } from '@/app/collab/types'
 import type { EditorStore } from '@/app/editor/active-store'
 import { appPreferences } from '@/app/settings/preferences/store'
 
 import { pickCallsign } from './callsigns'
 import { glideViewTo, showCursors, stopViewGlide, type TrackedCursor } from './cursor-motion'
+import { agentLogo } from './logo'
 import { MAX_NAME_LENGTH } from './schema'
 import type { AgentKind, AgentPresence, FollowTarget, PersonPoint } from './types'
 
@@ -290,6 +292,8 @@ export interface FollowedLabel {
   /** For an agent, the person who runs it; undefined for our own agents. */
   owner?: string
   color: Color
+  /** For an agent, the logo of what it runs on; null when nothing identifies it. */
+  logo?: ProviderLogoID | null
 }
 
 export function followedLabel(store: EditorStore): FollowedLabel | null {
@@ -301,11 +305,18 @@ export function followedLabel(store: EditorStore): FollowedLabel | null {
     return peer ? { kind: 'person', name: peer.name, color: peer.color } : null
   }
   const own = agents.value.find((agent) => agent.id === target.agentId)
-  if (own) return { kind: 'agent', name: own.name, color: AGENT_PRESENCE_COLOR }
+  if (own)
+    return { kind: 'agent', name: own.name, color: AGENT_PRESENCE_COLOR, logo: agentLogo(own) }
   for (const peer of peers.value) {
     const agent = peer.agents.find((entry) => entry.id === target.agentId)
     if (agent)
-      return { kind: 'agent', name: agent.name, owner: peer.name, color: AGENT_PRESENCE_COLOR }
+      return {
+        kind: 'agent',
+        name: agent.name,
+        owner: peer.name,
+        color: AGENT_PRESENCE_COLOR,
+        logo: agentLogo(agent)
+      }
   }
   return null
 }
@@ -398,8 +409,16 @@ export interface AgentHandle {
   remove: () => void
 }
 
-/** Announce an agent working in this document under a callsign unique among visible agents. */
-export function addAgent(store: EditorStore, kind: AgentKind, model?: string): AgentHandle {
+/**
+ * Announce an agent working in this document under a callsign unique among visible agents, with
+ * the model and provider it runs on when they are known.
+ */
+export function addAgent(
+  store: EditorStore,
+  kind: AgentKind,
+  model?: string,
+  provider?: string
+): AgentHandle {
   const presence = presenceOf(store)
   const taken = new Set([
     ...presence.agents.value.map((agent) => agent.name),
@@ -410,6 +429,7 @@ export function addAgent(store: EditorStore, kind: AgentKind, model?: string): A
     name: pickCallsign(taken),
     kind,
     model,
+    provider,
     status: 'idle'
   }
   presence.agents.value = [...presence.agents.value, agent]

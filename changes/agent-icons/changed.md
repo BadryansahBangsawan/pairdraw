@@ -1,0 +1,2 @@
+- The people list and the Following bar show each agent with the logo of the model or coding agent it runs on, such as Claude Code or OpenAI, and keep the sparkle for an agent they cannot identify.
+- Claude Code's Agent, Fast mode, and Ultracode controls in the chat composer each have their own icon instead of the same sliders.

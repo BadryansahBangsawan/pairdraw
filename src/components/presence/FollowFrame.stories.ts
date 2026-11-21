@@ -36,3 +36,10 @@ export const FollowingAPerson: Story = {
 export const FollowingTheirAgent: Story = {
   args: { followed: { kind: 'agent', name: 'Orbit', owner: 'Ana', color: agent } }
 }
+
+/** An agent whose provider is known shows that brand's logo; one that is not keeps the sparkle. */
+export const FollowingTheirCodingAgent: Story = {
+  args: {
+    followed: { kind: 'agent', name: 'Orbit', owner: 'Ana', color: agent, logo: 'claude-code' }
+  }
+}

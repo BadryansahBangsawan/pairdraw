@@ -46,6 +46,19 @@ interface SessionAgent {
 /** Each session's agent in every document it works in; tool calls name their document. */
 const sessions = new Map<string, Map<EditorStore, SessionAgent>>()
 
+/** The provider each app chat's agent runs on, such as `acp:claude-code`, by chat id. */
+const chatProviders = new Map<string, string>()
+
+/** Names what an app chat's agent runs on, so people in the room see its logo. */
+export function nameChatAgent(chat: string, provider: string): void {
+  chatProviders.set(chat, provider)
+}
+
+/** The chat closed; an agent its session still shows keeps the provider it was named with. */
+export function forgetChatAgent(chat: string): void {
+  chatProviders.delete(chat)
+}
+
 function sessionAgent(store: EditorStore, session: AgentSession): SessionAgent {
   let agents = sessions.get(session.session)
   if (!agents) {
@@ -55,7 +68,12 @@ function sessionAgent(store: EditorStore, session: AgentSession): SessionAgent {
   let agent = agents.get(store)
   if (!agent) {
     agent = {
-      handle: addAgent(store, session.kind, session.client || undefined),
+      handle: addAgent(
+        store,
+        session.kind,
+        session.client || undefined,
+        session.chat ? chatProviders.get(session.chat) : undefined
+      ),
       kind: session.kind,
       replies: 0
     }

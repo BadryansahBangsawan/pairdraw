@@ -285,7 +285,7 @@ export function createToolLoopTransport({
     reconnectToStream: (options) => transport.reconnectToStream(options),
     async sendMessages(options) {
       // The run starts as the message is sent, so a Stop before the model is reached ends it.
-      const started = startRun(store, maxAgentSteps.value, effectiveModelID)
+      const started = startRun(store, maxAgentSteps.value, effectiveModelID, providerID)
       run = started
       releaseExternalMCP()
       const heldExternalMCP = externalMCP.hold()

@@ -104,14 +104,22 @@ function getRunState(store?: EditorStore): RunState {
   return created
 }
 
-/** Begin a run on the page the user is viewing, as a message is sent. */
-export function startRun(store: EditorStore, maxSteps: number, model?: string): Run {
+/**
+ * Begin a run on the page the user is viewing, as a message is sent. The model and its provider
+ * show other people what the chat's agent runs on.
+ */
+export function startRun(
+  store: EditorStore,
+  maxSteps: number,
+  model?: string,
+  provider?: string
+): Run {
   const state = getRunState(store)
   const pageId = store.state.currentPageId
   state.run = new Run(maxSteps, pageId)
   store.designCheck.holdForAgent(true)
   state.agent ??= addAgent(store, 'chat', model)
-  state.agent.update({ status: 'thinking', model, pageId })
+  state.agent.update({ status: 'thinking', model, provider, pageId })
   return state.run
 }
 

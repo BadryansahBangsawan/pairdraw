@@ -291,9 +291,15 @@ test('stopping while following heads to another page stays where you are', async
   expect(store.state.currentPageId).toBe(pageId)
 })
 
-test('labels a followed agent with the person who runs it', () => {
+test('labels a followed agent with the person who runs it, and the logo of what it runs on', () => {
   const { store, pageId } = setup()
-  const fern = { id: 'fern', name: 'Fern', kind: 'chat' as const, status: 'editing' as const }
+  const fern = {
+    id: 'fern',
+    name: 'Fern',
+    kind: 'acp' as const,
+    provider: 'acp:claude-code',
+    status: 'editing' as const
+  }
   setPeers(store, [
     { clientId: 4, name: 'Ana', color: red, agents: [{ ...fern, cursor: { x: 1, y: 1, pageId } }] }
   ])
@@ -302,7 +308,8 @@ test('labels a followed agent with the person who runs it', () => {
     kind: 'agent',
     name: 'Fern',
     owner: 'Ana',
-    color: AGENT_PRESENCE_COLOR
+    color: AGENT_PRESENCE_COLOR,
+    logo: 'claude-code'
   })
 })
 

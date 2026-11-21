@@ -38,6 +38,26 @@ describe('parsePeer', () => {
     expect(peer?.agents.map((entry) => entry.id)).toEqual(['a1'])
   })
 
+  test('reads the provider an agent runs on, and keeps an agent whose provider is malformed', () => {
+    const peer = parsePeer(7, {
+      user,
+      agents: [
+        { ...agent, provider: 'acp:claude-code' },
+        { ...agent, id: 'a2', provider: 'x'.repeat(500) },
+        { ...agent, id: 'a3', provider: 42 }
+      ]
+    })
+    expect(peer?.agents.map((entry) => [entry.id, entry.provider])).toEqual([
+      ['a1', 'acp:claude-code'],
+      ['a2', undefined],
+      ['a3', undefined]
+    ])
+  })
+
+  test('reads an agent from a peer that publishes no provider', () => {
+    expect(parsePeer(7, { user, agents: [agent] })?.agents[0]?.provider).toBeUndefined()
+  })
+
   test('bounds names and agent counts', () => {
     const tooMany = Array.from({ length: MAX_AGENTS_PER_PEER + 1 }, (_, i) => ({
       ...agent,

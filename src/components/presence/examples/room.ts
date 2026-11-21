@@ -16,15 +16,32 @@ export const room: PresencePersonRow[] = [
   {
     name: 'Dana',
     color: colors.you,
-    agents: [{ id: 'fern', name: 'Fern', status: 'editing', page: 'Checkout', renamable: true }]
+    agents: [
+      {
+        id: 'fern',
+        name: 'Fern',
+        status: 'editing',
+        page: 'Checkout',
+        renamable: true,
+        logo: 'claude-code'
+      }
+    ]
   },
   {
     clientId: 2,
     name: 'Ana',
     color: colors.ana,
     agents: [
-      { id: 'orbit', name: 'Orbit', status: 'thinking', page: 'Cover', renamable: false },
-      { id: 'pixel', name: 'Pixel', status: 'idle', renamable: false }
+      {
+        id: 'orbit',
+        name: 'Orbit',
+        status: 'thinking',
+        page: 'Cover',
+        renamable: false,
+        logo: 'openai'
+      },
+      // An agent nothing identifies, such as one from an older version, keeps the sparkle.
+      { id: 'pixel', name: 'Pixel', status: 'idle', renamable: false, logo: null }
     ]
   },
   { clientId: 3, name: 'Ben', color: colors.ben, agents: [] }

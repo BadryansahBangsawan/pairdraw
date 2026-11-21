@@ -206,7 +206,7 @@ test('a run falls back to the page on screen when its page is deleted', async ()
   })
 })
 
-test("shows the chat's agent where its tools work, then takes it off the canvas", async () => {
+test("shows the chat's agent, with what it runs on, where its tools work, then takes it off the canvas", async () => {
   await withStore(async (store, { a }) => {
     let during: ReturnType<typeof presenceOf>['agents']['value'] = []
     await runMessage(store, [
@@ -217,7 +217,13 @@ test("shows the chat's agent where its tools work, then takes it off the canvas"
     ])
     const [shape] = store.graph.getChildren(a)
     expect(during).toMatchObject([
-      { kind: 'chat', status: 'editing', cursor: { x: shape?.x, y: shape?.y, pageId: a } }
+      {
+        kind: 'chat',
+        provider: 'openai',
+        model: 'test',
+        status: 'editing',
+        cursor: { x: shape?.x, y: shape?.y, pageId: a }
+      }
     ])
     expect(presenceOf(store).agents.value).toMatchObject([
       { name: during[0]?.name, status: 'idle', cursor: undefined }

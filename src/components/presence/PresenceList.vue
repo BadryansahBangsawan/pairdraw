@@ -7,6 +7,7 @@ import { useI18n } from '@pairdraw/vue/i18n'
 
 import { initials } from '@/app/presence/initials'
 import type { FollowTarget } from '@/app/presence/types'
+import ProviderLogoMark from '@/components/settings/provider/ProviderLogoMark.vue'
 import IconButton from '@/components/ui/button/IconButton.vue'
 import presenceListTheme from '@/theme/collaboration/presence-list'
 
@@ -87,7 +88,8 @@ function followLabel(name: string, target: FollowTarget): string {
       </div>
       <ul v-if="person.agents.length > 0">
         <li v-for="agent in person.agents" :key="agent.id" data-slot="agent" :class="ui.agent()">
-          <icon-lucide-sparkle :class="ui.agentIcon()" />
+          <ProviderLogoMark v-if="agent.logo" :logo="agent.logo" :class="ui.agentLogo()" />
+          <icon-lucide-sparkle v-else :class="ui.agentIcon()" />
           <input
             v-if="rename.editingId.value === agent.id"
             :ref="focusRename"

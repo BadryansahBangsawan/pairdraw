@@ -1,6 +1,8 @@
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
+import type { ProviderLogoID } from '@/app/ai/models/provider-logo'
 import type { RemotePeer } from '@/app/collab/types'
+import { agentLogo } from '@/app/presence/logo'
 import { agentPage } from '@/app/presence/registry'
 import type { AgentPresence, AgentStatus, FollowTarget } from '@/app/presence/types'
 
@@ -11,6 +13,8 @@ export interface PresenceAgentRow {
   /** The page the agent works on, when it is working. */
   page?: string
   renamable: boolean
+  /** The logo of what the agent runs on; null when nothing identifies it. */
+  logo: ProviderLogoID | null
 }
 
 /** How a person takes part in the room's voice call. */
@@ -39,7 +43,8 @@ function agentRows(
     name: agent.name,
     status: agent.status,
     page: agent.status !== 'idle' && agent.cursor ? pageName(agent.cursor.pageId) : undefined,
-    renamable
+    renamable,
+    logo: agentLogo(agent)
   }))
 }
 

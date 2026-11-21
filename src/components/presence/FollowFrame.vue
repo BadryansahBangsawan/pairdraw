@@ -8,6 +8,7 @@ import { useI18n } from '@pairdraw/vue/i18n'
 
 import type { FollowedLabel } from '@/app/presence/registry'
 import { isEditing } from '@/app/shell/keyboard/focus'
+import ProviderLogoMark from '@/components/settings/provider/ProviderLogoMark.vue'
 import followFrameTheme from '@/theme/collaboration/follow-frame'
 
 const followFrame = tv(followFrameTheme)
@@ -37,7 +38,10 @@ useEventListener(window, 'keydown', (event: KeyboardEvent) => {
 <template>
   <div data-test-id="follow-frame" :class="ui.root()" :style="{ borderColor: color }">
     <div role="status" :class="ui.bar()" :style="{ background: color }">
-      <icon-lucide-sparkle v-if="followed.kind === 'agent'" :class="ui.icon()" />
+      <span v-if="followed.logo" :class="ui.logoTile()">
+        <ProviderLogoMark :logo="followed.logo" :class="ui.logo()" />
+      </span>
+      <icon-lucide-sparkle v-else-if="followed.kind === 'agent'" :class="ui.icon()" />
       <span :class="ui.label()">{{ text }}</span>
       <button type="button" data-test-id="follow-stop" :class="ui.stop()" @click="emit('stop')">
         {{ messages.stopFollowingShort }}

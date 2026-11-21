@@ -8,6 +8,8 @@ export default {
     person: 'flex h-7 min-w-0 items-center gap-2',
     agent: 'flex h-7 min-w-0 items-center gap-2 pl-8',
     agentIcon: 'size-3.5 shrink-0 text-agent',
+    /** What the agent runs on; a monochrome mark takes the text color, as in the model picker. */
+    agentLogo: 'size-3.5 shrink-0 text-surface',
     name: `${NAME} flex-1`,
     // An agent's callsign keeps its width; the status beside it truncates first.
     agentName: NAME,

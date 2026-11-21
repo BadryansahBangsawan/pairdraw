@@ -30,6 +30,7 @@ import type { AgentHost, AgentStreams } from '@/app/ai/agents/host/types'
 import SYSTEM_PROMPT from '@/app/ai/chat/system-prompt'
 import { endRun, forgetAgentChat, startAgentRun } from '@/app/ai/reply/run'
 import { AgentStartupTimeoutError, raceStartup } from '@/app/ai/transports/deadline'
+import { forgetChatAgent, nameChatAgent } from '@/app/automation/agents'
 import { describeDiagnosticError, recordACPTransportFailure } from '@/app/diagnostics'
 import type { EditorStore } from '@/app/editor/active-store'
 import { APP_NAME } from '@/constants'
@@ -215,6 +216,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
         .join('\n') ?? ''
 
     if (this.session?.dead) {
+      forgetChatAgent(this.session.chat)
       this.session = null
     }
 
@@ -227,6 +229,8 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
         throw new Error('The chat closed while its agent was starting.')
       }
       this.session = started
+      // Its MCP session shows as this chat's agent, with this coding agent's logo.
+      nameChatAgent(started.chat, `acp:${this.agentDef.id}`)
       this.starting = null
       this.sentContext = false
     }
@@ -312,6 +316,7 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
     await starting?.close()
     if (this.session) {
       forgetAgentChat(this.session.chat)
+      forgetChatAgent(this.session.chat)
       this.session.endControls()
       await this.session.agent.close()
       this.session = null
@@ -326,6 +331,8 @@ export class ACPChatTransport implements ChatTransport<UIMessage> {
         onExit: () => {
           if (!this.session) return
           this.session.endControls()
+          // The agent is gone, so the chat id it was named with cannot name anything again.
+          forgetChatAgent(this.session.chat)
           this.session.dead = true
           this.session = null
         }

@@ -7,6 +7,8 @@ import {
   agentSessionOpened,
   agentStarted,
   endAgentSession,
+  forgetChatAgent,
+  nameChatAgent,
   readAgentSession,
   restAgents,
   touchedNodeIds,
@@ -153,6 +155,23 @@ describe("the app's own ACP and Pi chats", () => {
     expect(status(pi)).toBe('thinking')
     agentFinished(store, pi, { pageId: pageId(), nodeIds: [card.id], edited: true, reply: next })
     expect(status(pi)).toBe('editing')
+  })
+
+  test("an ACP chat's agent shows which coding agent the chat runs, until the chat closes", () => {
+    const chat = '0123456789abcdef'
+    const session: AgentSession = { session: 'session-acp', kind: 'acp', chat }
+    try {
+      nameChatAgent(chat, 'acp:omp')
+      agentStarted(store, session, pageId())
+      expect(agents()[0]).toMatchObject({ kind: 'acp', provider: 'acp:omp' })
+      endAgentSession(session.session)
+
+      forgetChatAgent(chat)
+      agentStarted(store, session, pageId())
+      expect(agents()[0]?.provider).toBeUndefined()
+    } finally {
+      endAgentSession(session.session)
+    }
   })
 })
 

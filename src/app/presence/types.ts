@@ -25,7 +25,13 @@ export interface AgentPresence {
   /** A callsign, unique among the agents in a room, such as "Fern". */
   name: string
   kind: AgentKind
+  /** The chat's model, or for an MCP session the name its client introduced itself with. */
   model?: string
+  /**
+   * The provider or coding agent it runs on, by the ID model settings use (`anthropic`,
+   * `acp:claude-code`), so people see its logo. Agents from older versions leave it out.
+   */
+  provider?: string
   status: AgentStatus
   /** The page the agent works on, known before its first edit. */
   pageId?: string

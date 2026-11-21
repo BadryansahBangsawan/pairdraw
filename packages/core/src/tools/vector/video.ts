@@ -136,7 +136,7 @@ export const exportVideo = defineTool({
       )
     )
   }),
-  execute: async (figma, args) => {
+  execute: async (figma, args, signal) => {
     const [{ TimelineError }, video] = await Promise.all([
       import('#core/prototype'),
       import('#core/io/formats/video')
@@ -184,9 +184,11 @@ export const exportVideo = defineTool({
         clicks
       })
       recorded = await video.recordPrototypeVideo(graph, plan, render, {
-        host: getVideoEncoder(graph)
+        host: getVideoEncoder(graph),
+        signal
       })
     } catch (error) {
+      if (signal?.aborted) return { error: 'Video export was cancelled' }
       if (error instanceof TimelineError || error instanceof video.VideoFormatError) {
         return { error: error.message }
       }

@@ -29,6 +29,15 @@ const automationRequestSchema = v.pipe(
   })
 )
 
+const automationCancelSchema = v.pipe(
+  v.string(),
+  v.parseJson(),
+  v.object({
+    type: v.literal('cancel'),
+    id: v.pipe(v.string(), v.nonEmpty())
+  })
+)
+
 /**
  * The connections each MCP session's calls came over, across bridges: restarting MCP opens a new
  * bridge while the old socket is still closing, and that close must not end a session the new
@@ -58,14 +67,21 @@ export function connectAutomation(
   let ws: WebSocket | null = null
   let reconnectTimer: ReturnType<typeof setTimeout> | undefined
   let intentionalDisconnect = false
+  /** Calls this window is still running, so a cancelled MCP request can stop one. */
+  const activeRequests = new Map<string, AbortController>()
 
   const { handleRequest: handleAutomationRequest } = createAutomationCommandHandlers(
     makeFigmaFromStore,
     automationFiles(automationURL, token)
   )
 
-  async function handleRequest(_id: string, command: string, args: unknown): Promise<unknown> {
-    return handleAutomationRequest(getStore(), command, args)
+  async function handleRequest(
+    _id: string,
+    command: string,
+    args: unknown,
+    signal?: AbortSignal
+  ): Promise<unknown> {
+    return handleAutomationRequest(getStore(), command, args, signal)
   }
 
   function connect() {
@@ -98,6 +114,11 @@ export function connectAutomation(
 
     socket.onmessage = async (event) => {
       try {
+        const cancelled = v.safeParse(automationCancelSchema, event.data)
+        if (cancelled.success) {
+          activeRequests.get(cancelled.output.id)?.abort()
+          return
+        }
         const parsed = v.safeParse(automationRequestSchema, event.data)
         if (!parsed.success) {
           if (parsed.issues.some((issue) => issue.type === 'parse_json'))
@@ -111,8 +132,10 @@ export function connectAutomation(
           sockets.add(socket)
           sessionSockets.set(session.session, sockets)
         }
+        const controller = new AbortController()
+        activeRequests.set(msg.id, controller)
         try {
-          const result = await handleRequest(msg.id, msg.command, msg.args)
+          const result = await handleRequest(msg.id, msg.command, msg.args, controller.signal)
           if (socket.readyState !== WebSocket.OPEN) return
           socket.send(JSON.stringify({ type: 'response', id: msg.id, ...(result as object) }))
         } catch (e) {
@@ -125,6 +148,8 @@ export function connectAutomation(
               error: e instanceof Error ? e.message : String(e)
             })
           )
+        } finally {
+          activeRequests.delete(msg.id)
         }
       } catch (e) {
         console.warn('Failed to parse WebSocket message:', e)
@@ -142,6 +167,9 @@ export function connectAutomation(
         sessionSockets.delete(id)
         endAgentSession(id)
       }
+      // Work this connection started cannot answer it any more, so stop it rather than encode on.
+      for (const controller of activeRequests.values()) controller.abort()
+      activeRequests.clear()
       if (intentionalDisconnect || event.code === 1000) return
       console.warn('[Automation] WebSocket closed:', `code=${event.code} reason=${event.reason}`)
       scheduleReconnect()

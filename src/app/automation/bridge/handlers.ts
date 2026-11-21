@@ -53,7 +53,11 @@ import { IS_TAURI } from '@/constants'
 
 type FigmaFactory = (store: EditorStore, pageId?: string) => FigmaAPI
 
-type CommandHandler = (target: AutomationTarget, args: unknown) => Promise<unknown>
+type CommandHandler = (
+  target: AutomationTarget,
+  args: unknown,
+  signal?: AbortSignal
+) => Promise<unknown>
 
 function exposedTool(name: string) {
   return ALL_TOOLS.find((tool) => tool.name === name && isToolExposed(tool, 'mcp'))
@@ -144,7 +148,8 @@ export function createAutomationCommandHandlers(makeFigma: FigmaFactory, files?:
   async function handleTargetCommand(
     target: AutomationTarget,
     command: string,
-    args: UnknownRecord
+    args: UnknownRecord,
+    signal?: AbortSignal
   ): Promise<unknown> {
     if (!(await target.store.preparePageNodes(target.pageId))) {
       throw new Error(`Page "${target.pageId}" was closed before it finished loading`)
@@ -154,7 +159,7 @@ export function createAutomationCommandHandlers(makeFigma: FigmaFactory, files?:
     await prepareAutomationRendering(target.store)
     const handler = commandHandlers[command]
     const result = handler
-      ? await handler(target, args)
+      ? await handler(target, args, signal)
       : await handleRPCFallback(target, command, args)
     return responseWithTarget(result, target)
   }
@@ -162,7 +167,8 @@ export function createAutomationCommandHandlers(makeFigma: FigmaFactory, files?:
   async function handleRequest(
     store: EditorStore,
     command: string,
-    args: unknown
+    args: unknown,
+    signal?: AbortSignal
   ): Promise<unknown> {
     const callerArgs = attachCaller(args)
     if (command === 'list_documents') {
@@ -223,7 +229,7 @@ export function createAutomationCommandHandlers(makeFigma: FigmaFactory, files?:
         const commandArgs = commandHandlers[command]
           ? stripAutomationTargetArgs(callerArgs)
           : omit(callerArgs, ['document_id'])
-        return handleTargetCommand(target, command, commandArgs)
+        return handleTargetCommand(target, command, commandArgs, signal)
       }
     )
   }

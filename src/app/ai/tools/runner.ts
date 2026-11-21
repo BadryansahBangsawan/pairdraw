@@ -213,7 +213,7 @@ async function editAndRecord(call: EditorToolCall, reply: ReplyCall | null): Pro
  */
 export async function runEditorTool(call: EditorToolCall): Promise<unknown> {
   const { store, figma, def, args } = call
-  if (!def.mutates) return def.execute(figma, args)
+  if (!def.mutates) return def.execute(figma, args, call.signal)
   // Fonts load before the edit takes its turn, so an edit never waits on the network.
   try {
     await def.loadFonts(figma, args)

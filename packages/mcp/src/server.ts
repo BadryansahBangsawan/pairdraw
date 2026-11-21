@@ -214,6 +214,9 @@ function buildServerContext(options: ServerOptions) {
   // so they get the longer deadline; a read sent while one runs waits with it rather than failing
   // at the read deadline.
   const writeTools = new Set(
+    toolDescriptors.filter((tool) => tool.effect === 'write').map((tool) => tool.name)
+  )
+  const longTools = new Set(
     toolDescriptors.filter((tool) => tool.effect === 'write' || tool.long).map((tool) => tool.name)
   )
   const writesDocument = (body: RPCJSONObject): boolean => {
@@ -225,6 +228,13 @@ function buildServerContext(options: ServerOptions) {
       args && typeof args === 'object' && !Array.isArray(args) ? Reflect.get(args, 'name') : null
     return typeof name === 'string' && writeTools.has(name)
   }
+  const longRunning = (body: RPCJSONObject): boolean => {
+    if (typeof body.command !== 'string' || body.command !== 'tool') return false
+    const args = body.args
+    const name =
+      args && typeof args === 'object' && !Array.isArray(args) ? Reflect.get(args, 'name') : null
+    return typeof name === 'string' && longTools.has(name)
+  }
   const browserRPC = createBrowserRPCBridge({
     authToken,
     authorize: verifyToken,
@@ -232,7 +242,8 @@ function buildServerContext(options: ServerOptions) {
     appWaitTimeoutMs: options.appWaitTimeoutMs,
     rpcTimeoutMs: options.rpcTimeoutMs,
     documentRPCTimeoutMs: options.documentRPCTimeoutMs,
-    writesDocument
+    writesDocument,
+    longRunning
   })
   // Every call into the app, from MCP sessions and /rpc alike, stays within the scope.
   const sendToBrowser = scopeRPC(browserRPC.sendRPC, toolPolicy.scope)

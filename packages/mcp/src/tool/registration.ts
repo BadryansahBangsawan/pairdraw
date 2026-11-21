@@ -24,7 +24,7 @@ import { resolveSafePath, writeToolOutput, writesFileOutput } from '#mcp/tool/ou
 import { isToolEnabled } from '#mcp/tool/policy'
 import { SELECTION_SCOPE_FILE_OUTPUT_ERROR } from '#mcp/tool/scope'
 
-export type RPCSender = (body: Record<string, unknown>) => Promise<unknown>
+export type RPCSender = (body: Record<string, unknown>, signal?: AbortSignal) => Promise<unknown>
 export type MCPToolSettled = (context: ServerContext) => Promise<void>
 
 export const automationTargetSchema = {
@@ -180,17 +180,20 @@ export function registerTools(mcpServer: McpServer, options: RegisterToolsOption
           if (policy.scope === 'selection' && filePath !== null) {
             return fail(new Error(SELECTION_SCOPE_FILE_OUTPUT_ERROR))
           }
-          const result = await sendToApp({
-            command: 'tool',
-            args: {
-              ...target,
-              name: def.name,
-              args: toolArgs,
-              agent: agent(context.mcpReq._meta),
-              // A client limited to the selection says so, whatever the server's own scope.
-              ...(policy.scope === 'selection' ? { scope: policy.scope } : {})
-            }
-          })
+          const result = await sendToApp(
+            {
+              command: 'tool',
+              args: {
+                ...target,
+                name: def.name,
+                args: toolArgs,
+                agent: agent(context.mcpReq._meta),
+                // A client limited to the selection says so, whatever the server's own scope.
+                ...(policy.scope === 'selection' ? { scope: policy.scope } : {})
+              }
+            },
+            context.mcpReq.signal
+          )
           const res = result as { ok?: boolean; result?: unknown; error?: string }
           if (res.ok === false) return fail(new Error(res.error))
           const r = res.result as RPCJSONObject | undefined

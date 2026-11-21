@@ -11,6 +11,7 @@ import {
   initCanvasKit
 } from '@pairdraw/core/io/formats/raster'
 import { registerVideoEncoder } from '@pairdraw/core/tools'
+import { exportVideo } from '#core/tools/vector/video'
 import type { PrototypeReaction } from '@pairdraw/scene-graph'
 
 const ck = await initCanvasKit()
@@ -95,6 +96,25 @@ describe('export_video', () => {
     const bytes = toUint8Array(base64)
     expect(bytes.length).toBe(byteLength)
     expect(new TextDecoder().decode(bytes.subarray(0, 6))).toBe('GIF89a')
+  })
+
+  test('stops encoding and reports a cancelled export', async () => {
+    const { figma } = setup()
+    const controller = new AbortController()
+    const render = figma.exportImage
+    if (!render) throw new Error('Expected an image renderer')
+    figma.exportImage = (nodeIds, options) => {
+      controller.abort()
+      return render(nodeIds, options)
+    }
+
+    const result = await exportVideo.execute(
+      figma,
+      { start: 'Red', format: 'gif', fps: 10, tail: 0.2 },
+      controller.signal
+    )
+
+    expect(result).toEqual({ error: 'Video export was cancelled' })
   })
 
   test('fits the long edge into maxEdge', async () => {

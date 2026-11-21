@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
+import type { RPCJSONObject } from '#mcp/json'
+import { scopeRPC } from '#mcp/tool/scope'
 import {
   isToolEnabled,
   narrowestScope,
@@ -39,5 +41,20 @@ describe('MCP tool scope', () => {
     expect(narrowestScope('selection', 'document')).toBe('selection')
     expect(narrowestScope('document', 'selection')).toBe('selection')
     expect(narrowestScope('document', 'document')).toBe('document')
+  })
+
+  test('forwards the caller signal in both scopes', async () => {
+    const seen: Array<AbortSignal | undefined> = []
+    const send = async (_msg: RPCJSONObject, signal?: AbortSignal) => {
+      seen.push(signal)
+      return { ok: true }
+    }
+    const controller = new AbortController()
+    const body: RPCJSONObject = { command: 'tool', args: { name: 'get_selection' } }
+
+    await scopeRPC(send, 'document')(body, controller.signal)
+    await scopeRPC(send, 'selection')(body, controller.signal)
+
+    expect(seen).toEqual([controller.signal, controller.signal])
   })
 })

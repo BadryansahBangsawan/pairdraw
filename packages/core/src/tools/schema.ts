@@ -67,7 +67,8 @@ export interface ToolDef extends ToolMetadata {
    * synchronous tool still edits in one step.
    */
   loadFonts: (figma: FigmaAPI, args: Record<string, unknown>) => Promise<void>
-  execute: (figma: FigmaAPI, args: Record<string, unknown>) => unknown
+  /** `signal` aborts a caller's cancelled request, which a long export checks while it runs. */
+  execute: (figma: FigmaAPI, args: Record<string, unknown>, signal?: AbortSignal) => unknown
   /**
    * The synchronous answer of a read whose `execute` may load a page first, or `undefined`
    * when answering would load. Hosts that cannot wait refuse on `undefined` before any load.
@@ -87,7 +88,11 @@ export function defineTool<P extends v.ObjectEntries, R>(
       figma: FigmaAPI,
       args: v.InferOutput<v.StrictObjectSchema<P, undefined>>
     ) => FigmaFontNameInput[]
-    execute: (figma: FigmaAPI, args: v.InferOutput<v.StrictObjectSchema<P, undefined>>) => R
+    execute: (
+      figma: FigmaAPI,
+      args: v.InferOutput<v.StrictObjectSchema<P, undefined>>,
+      signal?: AbortSignal
+    ) => R
     executeSync?: (
       figma: FigmaAPI,
       args: v.InferOutput<v.StrictObjectSchema<P, undefined>>
@@ -112,7 +117,8 @@ export function defineTool<P extends v.ObjectEntries, R>(
       if (!parsed.success) return
       for (const font of fonts(figma, parsed.output)) await figma.loadFontAsync(font)
     },
-    execute: (figma, args) => def.execute(figma, parseToolArgs(def.name, def.input, args)),
+    execute: (figma, args, signal) =>
+      def.execute(figma, parseToolArgs(def.name, def.input, args), signal),
     executeSync: def.executeSync
       ? (figma, args) => def.executeSync?.(figma, parseToolArgs(def.name, def.input, args))
       : undefined

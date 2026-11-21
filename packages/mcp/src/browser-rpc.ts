@@ -28,6 +28,8 @@ type BrowserRPCBridgeOptions = {
   documentRPCTimeoutMs?: number
   /** Whether a request edits the document, which lets it and the calls behind it keep waiting. */
   writesDocument?: (body: RPCJSONObject) => boolean
+  /** Whether a read-only request may take as long as an edit, such as a video export. */
+  longRunning?: (body: RPCJSONObject) => boolean
 }
 
 type ConnectionListener = (connected: boolean) => void
@@ -82,10 +84,19 @@ function sendJSON(ws: WebSocket, body: Record<string, unknown>) {
 }
 
 /** Why a call gave up, saying whether the app may still be working on it. */
-function timeoutMessage(editing: boolean, limitMs: number): string {
+export function timeoutMessage(editing: boolean, longRunning: boolean, limitMs: number): string {
   const seconds = Math.round(limitMs / 1000)
-  if (!editing) return `RPC timeout (${seconds}s)`
-  return `RPC timeout (${seconds}s): the edit may still be applied. Do not retry it; call get_page_tree to see what the document now holds.`
+  if (editing) {
+    return `RPC timeout (${seconds}s): the edit may still be applied. Do not retry it; call get_page_tree to see what the document now holds.`
+  }
+  if (longRunning) {
+    return `RPC timeout (${seconds}s): the call may still be running. Do not retry it; check the result before starting it again.`
+  }
+  return `RPC timeout (${seconds}s)`
+}
+
+function abortError(): DOMException {
+  return new DOMException('Request cancelled', 'AbortError')
 }
 
 function createSettler<T>(resolve: (value: T) => void, reject: (error: Error) => void) {
@@ -112,7 +123,8 @@ export function createBrowserRPCBridge({
   appWaitTimeoutMs = APP_WAIT_TIMEOUT,
   rpcTimeoutMs = RPC_TIMEOUT,
   documentRPCTimeoutMs = DOCUMENT_RPC_TIMEOUT,
-  writesDocument = () => false
+  writesDocument = () => false,
+  longRunning = () => false
 }: BrowserRPCBridgeOptions) {
   const pending = new Map<string, PendingRequest & { ws: WebSocket }>()
   const clients = new Set<WebSocket>()
@@ -256,9 +268,11 @@ export function createBrowserRPCBridge({
     for (const client of clients) sendRegisterPrompt(client)
   }
 
-  function sendRPC(body: RPCJSONObject): Promise<unknown> {
+  function sendRPC(body: RPCJSONObject, signal?: AbortSignal): Promise<unknown> {
     if (bridgeClosed) return Promise.reject(new Error('Server shutting down'))
+    if (signal?.aborted) return Promise.reject(abortError())
     const editing = writesDocument(body)
+    const long = longRunning(body)
     return new Promise((resolve, reject) => {
       const doSend = () => {
         const ws = targetBrowser()
@@ -267,11 +281,23 @@ export function createBrowserRPCBridge({
           return
         }
         const id = randomUUID()
-        const settle = createSettler(resolve, reject)
+        let removeAbort: () => void = () => undefined
+        const settle = createSettler(
+          (value) => {
+            removeAbort()
+            editFinished()
+            resolve(value)
+          },
+          (error) => {
+            removeAbort()
+            editFinished()
+            reject(error)
+          }
+        )
         // A call sent while the window is still editing waits for that edit: the app lays out
         // and draws on one thread, so a read cannot answer before the edit finishes.
         const running = editsRunning.get(ws) ?? 0
-        const limit = editing || running > 0 ? documentRPCTimeoutMs : rpcTimeoutMs
+        const limit = editing || long || running > 0 ? documentRPCTimeoutMs : rpcTimeoutMs
         if (editing) editsRunning.set(ws, running + 1)
         const editFinished = () => {
           if (!editing) return
@@ -282,7 +308,7 @@ export function createBrowserRPCBridge({
         const timer = setTimeout(() => {
           pending.delete(id)
           editFinished()
-          settle.reject(new Error(timeoutMessage(editing, limit)))
+          settle.reject(new Error(timeoutMessage(editing, long, limit)))
         }, limit)
         pending.set(id, {
           resolve: (value) => {
@@ -296,6 +322,19 @@ export function createBrowserRPCBridge({
           timer,
           ws
         })
+        const onAbort = () => {
+          if (settle.isSettled()) return
+          pending.delete(id)
+          clearTimeout(timer)
+          sendJSON(ws, { type: 'cancel', id })
+          settle.reject(abortError())
+        }
+        removeAbort = () => signal?.removeEventListener('abort', onAbort)
+        if (signal?.aborted) {
+          onAbort()
+          return
+        }
+        signal?.addEventListener('abort', onAbort, { once: true })
         try {
           ws.send(JSON.stringify({ ...body, type: 'request', id }))
         } catch (e) {

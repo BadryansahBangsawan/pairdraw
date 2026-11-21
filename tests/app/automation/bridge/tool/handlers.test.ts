@@ -41,6 +41,22 @@ describe('the bridge tool handler', () => {
     expect(reply).toEqual({ ok: false, error: 'Node "9:9" not found' })
   })
 
+  test('passes a cancelled request signal to the tool', async () => {
+    const controller = new AbortController()
+    let seen: AbortSignal | undefined
+    const handler = createAutomationToolHandler(
+      () => asDouble<never>({}),
+      async (call) => {
+        seen = call.signal
+        return { id: '9:9' }
+      }
+    )
+
+    await handler(target(), { name: 'get_node', args: { id: '9:9' } }, controller.signal)
+
+    expect(seen).toBe(controller.signal)
+  })
+
   test('reports a tool answer as a successful call', async () => {
     const handler = createAutomationToolHandler(
       () => asDouble<never>({}),

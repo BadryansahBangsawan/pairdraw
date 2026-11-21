@@ -48,7 +48,7 @@ export function startWebMCP(getStore: () => EditorStore): () => void {
               })
             }
           }
-          return handleTool(target, { name: def.name, args })
+          return handleTool(target, { name: def.name, args }, signal)
         }
       }
     }

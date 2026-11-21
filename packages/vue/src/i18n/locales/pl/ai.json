@@ -23,7 +23,7 @@
   "sendMessage": "Wyślij wiadomość",
   "removeImageAttachment": "Usuń obraz {name}",
   "dropImagesToAttach": "Upuść obrazy, aby je dołączyć",
-  "queueMessage": "Pokieruj agentem… Alt+Enter czeka, aż skończy",
+  "queueMessage": "Pokieruj agentem… {shortcut} czeka, aż skończy",
   "queuedSteer": "Wyśle się po bieżącym kroku",
   "queuedFollowUp": "Wyśle się, gdy agent skończy",
   "removeQueuedMessage": "Usuń czekającą wiadomość",

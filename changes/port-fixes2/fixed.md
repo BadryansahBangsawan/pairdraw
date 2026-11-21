@@ -1,3 +1,4 @@
 - Separate messages from a coding agent show as separate paragraphs in the chat instead of running together.
 - A finished chat reply keeps its Markdown in place instead of fading the whole text in again.
 - Interface text breaks into even lines, so centered notices and short messages no longer end on a stray word or split a phrase.
+- AI chat shows the Option key in the follow-up shortcut hint on macOS, instead of always naming Alt.

@@ -4,6 +4,7 @@ import type { ChatStatus } from 'ai'
 import { TooltipProvider } from 'reka-ui'
 import { computed, useTemplateRef } from 'vue'
 
+import { formatShortcut } from '@pairdraw/vue/editor/commands'
 import { useI18n } from '@pairdraw/vue/i18n'
 
 import { createPromptRecall } from '@/app/ai/chat/history/prompts'
@@ -45,7 +46,10 @@ const host = useTemplateRef<HTMLDivElement>('host')
 const recall = createPromptRecall(() => prompts?.() ?? [])
 const editor = useChatEditor(host, {
   label: () => ai.value.describeChange,
-  placeholder: () => (working.value ? ai.value.queueMessage : ai.value.describeChange),
+  placeholder: () =>
+    working.value
+      ? ai.value.queueMessage({ shortcut: formatShortcut('ALT+Enter') ?? '' })
+      : ai.value.describeChange,
   editable: () => !disabled,
   attributes: { 'data-test-id': 'chat-input' },
   completions,

@@ -77,7 +77,7 @@ function outline(timeline: Timeline, graph: SceneGraph): string[] {
   return timeline.segments.map((segment) =>
     segment.kind === 'hold'
       ? `hold ${name(segment.session.frameId)} ${segment.startMs}–${segment.endMs}`
-      : `dissolve ${name(segment.from.frameId)}→${name(segment.to.frameId)} ${segment.startMs}–${segment.endMs}`
+      : `${segment.kind} ${name(segment.from.frameId)}→${name(segment.to.frameId)} ${segment.startMs}–${segment.endMs}`
   )
 }
 
@@ -131,11 +131,34 @@ describe('a Smart animate step', () => {
 
     expect(outline(timeline, graph).slice(0, 2)).toEqual([
       'hold Hero 1 0–1000',
-      'dissolve Hero 1→Hero 2 1000–1400'
+      'smart Hero 1→Hero 2 1000–1400'
     ])
     expect(timeline.steps).toEqual([
       { atMs: 1000, frameId: b, trigger: 'AFTER_TIMEOUT', transition: 'SMART_ANIMATE' }
     ])
+  })
+
+  test('shows how far through its time it is, which the animation eases itself', () => {
+    const { graph, ids } = frames(2)
+    const [a, b] = ids
+    react(graph, a, after(1, goTo(b, 'SMART_ANIMATE', 0.4)))
+    const timeline = planTimeline(graph, { startFrameId: a, maxMs: MAX_MS, tailMs: TAIL_MS })
+
+    const mid = frameAt(timeline, 1100)
+    if (!('smart' in mid)) throw new Error('1100 ms is not mid-animation')
+    expect(mid.progress).toBeCloseTo(0.25, 6)
+    expect(mid.smart.from.frameId).toBe(a)
+    expect(mid.smart.to.frameId).toBe(b)
+    expect(frameAt(timeline, 1400)).toEqual({ session: expect.objectContaining({ frameId: b }) })
+  })
+
+  test('crossfades when it opens an overlay', () => {
+    const { graph, ids } = frames(2)
+    const [a, b] = ids
+    react(graph, a, after(1, goTo(b, 'SMART_ANIMATE', 0.4, 'OVERLAY')))
+    const timeline = planTimeline(graph, { startFrameId: a, maxMs: MAX_MS, tailMs: TAIL_MS })
+
+    expect(outline(timeline, graph)[1]).toBe('dissolve Hero 1→Hero 1 1000–1400')
   })
 })
 
@@ -157,6 +180,23 @@ describe('the screen a timeline shows at a moment', () => {
     expect(mid.mix).toBeCloseTo(0.177555, 5)
     expect(frameAt(timeline, 1300)).toEqual({ session: expect.objectContaining({ frameId: b }) })
     expect(frameAt(timeline, 99_000)).toEqual({ session: expect.objectContaining({ frameId: b }) })
+  })
+})
+
+describe('a dissolve with an easing', () => {
+  test('mixes the new screen in along that easing', () => {
+    const { graph, ids } = frames(2)
+    const [a, b] = ids
+    const linear = {
+      ...goTo(b, 'DISSOLVE', 0.4),
+      transition: { type: 'DISSOLVE' as const, duration: 0.4, easing: 'LINEAR' as const }
+    }
+    react(graph, a, after(1, linear))
+    const timeline = planTimeline(graph, { startFrameId: a, maxMs: MAX_MS, tailMs: TAIL_MS })
+
+    const mid = frameAt(timeline, 1100)
+    if (!('mix' in mid)) throw new Error('1100 ms is not mid-crossfade')
+    expect(mid.mix).toBeCloseTo(0.25, 6)
   })
 })
 

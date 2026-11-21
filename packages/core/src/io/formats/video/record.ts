@@ -3,13 +3,29 @@ import type { Rect, Vector } from '@pairdraw/scene-graph/primitives'
 
 import { getPageColor } from '#core/figma-api/page-backgrounds'
 import { computeContentBounds, type RGBAImage } from '#core/io/formats/raster'
-import { frameAt, sessionDrawKey, type PlaySession, type Timeline } from '#core/prototype'
+import {
+  createSmartAnimation,
+  frameAt,
+  sessionDrawKey,
+  shownFrame,
+  type PlaySession,
+  type SmartAnimation,
+  type Timeline,
+  type TimelineSmartSegment
+} from '#core/prototype'
 
 import { crossfade, dim, drawOver, filledImage } from './composite'
 import type { VideoSink } from './sink'
 
-/** Draws one top-level frame at `scale` as pixels, or null when it cannot be drawn. */
-export type RenderFrame = (frameId: string, scale: number) => Promise<RGBAImage | null>
+/**
+ * Draws one top-level frame at `scale` as pixels, or null when it cannot be drawn: from the
+ * document, or from `graph`, a Smart animate's copy of the frame posed at one moment.
+ */
+export type RenderFrame = (
+  frameId: string,
+  scale: number,
+  graph?: SceneGraph
+) => Promise<RGBAImage | null>
 
 export interface RecordOptions {
   width: number
@@ -75,13 +91,19 @@ function createScreens(
   const background = getPageColor(startId ? pageOf(graph, startId) : undefined)
   const cache = new Map<string, RGBAImage>()
 
-  async function drawFrame(target: RGBAImage, frameId: string, scale: number, at: Vector) {
-    const image = await render(frameId, scale)
-    const node = graph.getNode(frameId)
+  async function drawFrame(
+    target: RGBAImage,
+    frameId: string,
+    scale: number,
+    at: Vector,
+    source = graph
+  ) {
+    const image = await render(frameId, scale, source === graph ? undefined : source)
+    const node = source.getNode(frameId)
     if (!image || !node) throw new Error(`'${node?.name ?? frameId}' could not be drawn`)
-    const box = graph.getAbsoluteBounds(frameId)
+    const box = source.getAbsoluteBounds(frameId)
     // A shadow or a layer past the frame's edge widens what is drawn; the frame stays in place.
-    const content = computeContentBounds(graph, [frameId]) ?? {
+    const content = computeContentBounds(source, [frameId]) ?? {
       minX: box.x,
       minY: box.y,
       maxX: box.x + box.width,
@@ -95,22 +117,23 @@ function createScreens(
     )
   }
 
-  async function compose(session: PlaySession): Promise<RGBAImage> {
+  /** The screen `session` shows, its base frame drawn from `base` when given. */
+  async function compose(session: PlaySession, base?: SceneGraph): Promise<RGBAImage> {
     const target = filledImage(width, height, background)
     const box = graph.getAbsoluteBounds(session.frameId)
     const scale = Math.min(width / box.width, height / box.height)
-    const base: Rect = {
+    const fitted: Rect = {
       x: (width - box.width * scale) / 2,
       y: (height - box.height * scale) / 2,
       width: box.width * scale,
       height: box.height * scale
     }
-    await drawFrame(target, session.frameId, scale, base)
+    await drawFrame(target, session.frameId, scale, fitted, base)
     if (session.overlays.length > 0) dim(target, OVERLAY_SCRIM)
     for (const overlayId of session.overlays) {
       const overlay = graph.getAbsoluteBounds(overlayId)
       const origin = overlayOrigin(
-        base,
+        fitted,
         overlay.width * scale,
         overlay.height * scale,
         timeline.overlayPositions[overlayId] ?? 'CENTER'
@@ -120,7 +143,21 @@ function createScreens(
     return target
   }
 
-  return async function screen(session: PlaySession): Promise<RGBAImage> {
+  // The Smart animate being recorded, made once and posed for each of its frames.
+  let animating: { segment: TimelineSmartSegment; animation: SmartAnimation } | null = null
+
+  /** A Smart animate `progress` of the way through its time, drawn from its posed copy. */
+  async function animated(segment: TimelineSmartSegment, progress: number): Promise<RGBAImage> {
+    if (animating?.segment !== segment) {
+      const from = { graph, rootId: shownFrame(segment.from) }
+      const to = { graph, rootId: segment.to.frameId }
+      animating = { segment, animation: createSmartAnimation(from, to, segment.easing) }
+    }
+    animating.animation.seek(progress)
+    return compose(segment.to, animating.animation.graph)
+  }
+
+  async function screen(session: PlaySession): Promise<RGBAImage> {
     const key = sessionDrawKey(session)
     const cached = cache.get(key)
     if (cached) {
@@ -137,12 +174,15 @@ function createScreens(
     }
     return drawn
   }
+
+  return { screen, animated }
 }
 
 /**
  * Records a planned timeline frame by frame at `fps` into `sink` and returns the file. Each screen
  * is drawn once and reused while it holds, so a held screen reaches the sink as the same image; a
- * crossfade blends its two screens per frame. Cancelling through `signal` stops before the next
+ * crossfade blends its two screens per frame, and a Smart animate draws its animation posed at
+ * each frame, as the player poses it. Cancelling through `signal` stops before the next
  * frame, and passing `maxBytes` stops with an error naming the limit.
  */
 export async function recordPrototype(
@@ -152,7 +192,7 @@ export async function recordPrototype(
   sink: VideoSink,
   options: RecordOptions
 ): Promise<RecordResult> {
-  const screen = createScreens(graph, timeline, render, options.width, options.height)
+  const { screen, animated } = createScreens(graph, timeline, render, options.width, options.height)
   const frameMs = 1000 / options.fps
   const frameCount = Math.max(1, Math.round(timeline.durationMs / frameMs))
   try {
@@ -161,10 +201,10 @@ export async function recordPrototype(
       // A clip that does not loop ends on its last screen, even one the flow leaves no time.
       const last = index === frameCount - 1 && !timeline.loops
       const shown = frameAt(timeline, last ? timeline.durationMs : index * frameMs)
-      const image =
-        'session' in shown
-          ? await screen(shown.session)
-          : crossfade(await screen(shown.from), await screen(shown.to), shown.mix)
+      let image: RGBAImage
+      if ('session' in shown) image = await screen(shown.session)
+      else if ('smart' in shown) image = await animated(shown.smart, shown.progress)
+      else image = crossfade(await screen(shown.from), await screen(shown.to), shown.mix)
       await sink.add(image, index * frameMs, frameMs)
       if (options.maxBytes !== undefined && sink.byteLength > options.maxBytes) {
         throw new Error(

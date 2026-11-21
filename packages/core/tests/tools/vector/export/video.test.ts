@@ -11,8 +11,9 @@ import {
   initCanvasKit
 } from '@pairdraw/core/io/formats/raster'
 import { registerVideoEncoder } from '@pairdraw/core/tools'
-import { exportVideo } from '#core/tools/vector/video'
 import type { PrototypeReaction } from '@pairdraw/scene-graph'
+
+import { exportVideo } from '#core/tools/vector/video'
 
 const ck = await initCanvasKit()
 
@@ -96,6 +97,46 @@ describe('export_video', () => {
     const bytes = toUint8Array(base64)
     expect(bytes.length).toBe(byteLength)
     expect(new TextDecoder().decode(bytes.subarray(0, 6))).toBe('GIF89a')
+  })
+
+  test('draws a Smart animate from its animation through the graph renderer', async () => {
+    const { graph, figma, red, green } = setup()
+    graph.createNode('RECTANGLE', red, { name: 'Dot', x: 0, width: 4, height: 4 })
+    graph.createNode('RECTANGLE', green, { name: 'Dot', x: 30, width: 4, height: 4 })
+    const [timeout] = after(0.2, green, 0.1).actions
+    if (timeout?.type !== 'NODE') throw new Error('no action')
+    graph.updateNode(red, {
+      prototypeReactions: [
+        {
+          id: 't-smart',
+          trigger: { type: 'AFTER_TIMEOUT', delay: 0.2 },
+          actions: [{ ...timeout, transition: { type: 'SMART_ANIMATE', duration: 0.2 } }]
+        }
+      ]
+    })
+    const posed: number[] = []
+    figma.exportGraphImage = (copy, pageId, nodeIds, options) => {
+      expect(copy).not.toBe(graph)
+      const dot = copy.getChildren(green).find((child) => child.name === 'Dot')
+      posed.push(dot?.x ?? -1)
+      return headlessRenderNodes(copy, pageId, nodeIds, options, ck)
+    }
+
+    const result = await runTool(figma, 'export_video', {
+      start: 'Red',
+      format: 'gif',
+      fps: 10,
+      tail: 0.2
+    })
+
+    expect(result).toMatchObject({
+      steps: [{ at: 0.2, frameId: green, transition: 'SMART_ANIMATE' }, { at: 0.6 }]
+    })
+    // Frames at 200 and 300 ms pose the Dot on its way from 0 to 30, eased out.
+    expect(posed).toHaveLength(2)
+    expect(posed[0]).toBe(0)
+    expect(posed[1]).toBeGreaterThan(15)
+    expect(posed[1]).toBeLessThan(30)
   })
 
   test('stops encoding and reports a cancelled export', async () => {

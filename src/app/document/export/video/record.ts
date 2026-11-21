@@ -1,5 +1,9 @@
 import { getCanvasKit } from '@pairdraw/core/canvaskit'
-import { createCanvasKitRasterCodec, type RasterCodec } from '@pairdraw/core/io/formats/raster'
+import {
+  createCanvasKitRasterCodec,
+  headlessRenderNodes,
+  type RasterCodec
+} from '@pairdraw/core/io/formats/raster'
 import {
   canRecordFormat,
   MAX_VIDEO_EDGE,
@@ -158,9 +162,13 @@ export async function exportPrototypeVideo(
   const pageId = store.state.currentPageId
   // CanvasKit loads only once there is something to draw, after the encoder has opened.
   let codec: RasterCodec | null = null
-  const render: RenderFrame = async (frameId, scale) => {
-    codec ??= createCanvasKitRasterCodec(store.renderer?.ck ?? (await getCanvasKit()))
-    const png = await store.renderExportImage([frameId], scale, 'PNG', pageId)
+  const render: RenderFrame = async (frameId, scale, copy) => {
+    const ck = store.renderer?.ck ?? (await getCanvasKit())
+    codec ??= createCanvasKitRasterCodec(ck)
+    // A Smart animate's posed copy draws offscreen, apart from the canvas's cached drawings.
+    const png = copy
+      ? await headlessRenderNodes(copy, pageId, [frameId], { scale, format: 'PNG' }, ck)
+      : await store.renderExportImage([frameId], scale, 'PNG', pageId)
     return png ? codec.decode(png) : null
   }
   const { bytes } = await recordPrototypeVideo(store.graph, plan(store, settings), render, options)

@@ -127,6 +127,49 @@ describe('recording a prototype', () => {
     ]).toEqual([0, 100, 100, 0])
   })
 
+  test('draws a Smart animate frame by frame from its animation, and the document after it', async () => {
+    const { graph, a, b } = setup()
+    graph.createNode('RECTANGLE', a, { name: 'Box', x: 0, width: 4, height: 4 })
+    graph.createNode('RECTANGLE', b, { name: 'Box', x: 10, width: 4, height: 4 })
+    graph.updateNode(a, {
+      prototypeReactions: [
+        after(0.3, {
+          type: 'NODE',
+          nodeId: b,
+          navigation: 'NAVIGATE',
+          transition: { type: 'SMART_ANIMATE', duration: 0.2, easing: 'LINEAR' },
+          overlayPosition: 'CENTER'
+        })
+      ]
+    })
+    const timeline = planTimeline(graph, { startFrameId: a, maxMs: 10_000, tailMs: 200 })
+    const drawnFrom: boolean[] = []
+    // Gray 100 plus ten per unit the Box sits from the frame's left, read from the graph drawn.
+    const render: RenderFrame = (frameId, scale, source = graph) => {
+      drawnFrom.push(source === graph)
+      const box = source.getChildren(frameId).find((child) => child.name === 'Box')
+      const value = 100 + (box?.x ?? 0) * 10
+      const bounds = source.getAbsoluteBounds(frameId)
+      return Promise.resolve(
+        filledImage(Math.ceil(bounds.width * scale), Math.ceil(bounds.height * scale), {
+          r: value / 255,
+          g: value / 255,
+          b: value / 255,
+          a: 1
+        })
+      )
+    }
+    const sink = recordingSink()
+
+    await recordPrototype(graph, timeline, render, sink, { width: 4, height: 2, fps: 10 })
+
+    // 300 ms starts the animation where A left the Box, 400 ms is half way, 500 ms is B itself.
+    expect(sink.frames.map((frame) => grayAt(frame.image, 1, 0))).toEqual([
+      100, 100, 100, 100, 150, 200, 200
+    ])
+    expect(drawnFrom).toEqual([true, false, false, true])
+  })
+
   test('dims the screen under an overlay and centres the overlay on it', async () => {
     const { graph, a, b } = setup()
     graph.updateNode(a, {

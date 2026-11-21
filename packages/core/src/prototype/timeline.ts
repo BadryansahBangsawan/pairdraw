@@ -1,5 +1,6 @@
 import type {
   PrototypeAction,
+  PrototypeEasingType,
   PrototypeOverlayPositionType,
   PrototypeTransitionType,
   SceneGraph,
@@ -34,18 +35,28 @@ export interface TimelineOptions {
   tailMs: number
 }
 
-/** A stretch of play: one screen held still, or a crossfade from one screen to the next. */
+/** A stretch of play that moves from one screen to the next over a transition's own length. */
+interface TimelineTransition {
+  from: PlaySession
+  to: PlaySession
+  startMs: number
+  endMs: number
+  /** The transition's own length, which keeps its pace when a later step cuts it short. */
+  fadeMs: number
+  easing?: PrototypeEasingType
+}
+
+/**
+ * A stretch of play: one screen held still, a crossfade from one screen to the next, or a Smart
+ * animate between them.
+ */
 export type TimelineSegment =
   | { kind: 'hold'; session: PlaySession; startMs: number; endMs: number }
-  | {
-      kind: 'dissolve'
-      from: PlaySession
-      to: PlaySession
-      startMs: number
-      endMs: number
-      /** The transition's own length, which keeps its pace when a later step cuts it short. */
-      fadeMs: number
-    }
+  | ({ kind: 'dissolve' } & TimelineTransition)
+  | ({ kind: 'smart' } & TimelineTransition)
+
+/** A Smart animate stretch of a timeline. */
+export type TimelineSmartSegment = Extract<TimelineSegment, { kind: 'smart' }>
 
 /** One step play took: when, the frame it shows afterwards, what started it, and how it moved. */
 export interface TimelineStep {
@@ -67,10 +78,14 @@ export interface Timeline {
   overlayPositions: Record<string, PrototypeOverlayPositionType>
 }
 
-/** What a timeline shows at a moment: one screen, or two mid-crossfade with `mix` of the second. */
+/**
+ * What a timeline shows at a moment: one screen, two mid-crossfade with `mix` of the second, or a
+ * Smart animate `progress` of the way through its time, which its animation eases.
+ */
 export type TimelineFrame =
   | { session: PlaySession }
   | { from: PlaySession; to: PlaySession; mix: number }
+  | { smart: TimelineSmartSegment; progress: number }
 
 /** Why a flow cannot be played: the start frame has nothing to follow, or anything else. */
 export type TimelineErrorReason = 'nothing-to-follow' | 'invalid'
@@ -273,19 +288,23 @@ function nextEventAt(walk: Walk): number {
 /** Runs `action` at `atMs`, recording the hold before it, its crossfade, and the step. */
 function advance(walk: Walk, event: WalkEvent & { action: PrototypeAction }, next: PlaySession) {
   const { atMs, action } = event
-  // A step while a crossfade still runs cuts it short where it is.
+  // A step while a transition still runs cuts it short where it is.
   const running = walk.segments.at(-1)
-  if (running?.kind === 'dissolve' && running.endMs > atMs) running.endMs = atMs
+  if (running && running.kind !== 'hold' && running.endMs > atMs) running.endMs = atMs
   hold(walk, atMs)
   const durationMs = transitionMs(action)
-  if (durationMs > 0) {
+  const animation = animationFor(walk.session, action)
+  if (animation !== 'cut') {
     walk.segments.push({
-      kind: 'dissolve',
+      kind: animation === 'smart' ? 'smart' : 'dissolve',
       from: walk.session,
       to: next,
       startMs: atMs,
       endMs: atMs + durationMs,
-      fadeMs: durationMs
+      fadeMs: durationMs,
+      ...(action.type === 'NODE' && action.transition.easing
+        ? { easing: action.transition.easing }
+        : {})
     })
   }
   walk.steps.push({
@@ -366,7 +385,8 @@ export function frameAt(timeline: Timeline, atMs: number): TimelineFrame {
     if (atMs >= segment.endMs) continue
     if (segment.kind === 'hold') return { session: segment.session }
     const progress = (atMs - segment.startMs) / segment.fadeMs
-    return { from: segment.from, to: segment.to, mix: dissolveEasing(progress) }
+    if (segment.kind === 'smart') return { smart: segment, progress }
+    return { from: segment.from, to: segment.to, mix: easingAt(segment.easing, progress) }
   }
   const last = timeline.segments.at(-1)
   if (!last) throw new TimelineError('The timeline is empty')

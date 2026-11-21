@@ -34,7 +34,7 @@ function seconds(ms: number): number {
 export const exportVideo = defineTool({
   name: 'export_video',
   description:
-    'Record a prototype as a video, as Play shows it: start at a top-level frame, follow its After delay interactions (and optional scripted clicks) with their Dissolve transitions on a virtual clock, and return the file as base64 with the steps it recorded. ' +
+    'Record a prototype as a video, as Play shows it: start at a top-level frame, follow its After delay interactions (and optional scripted clicks) with their Dissolve and Smart animate transitions on a virtual clock, and return the file as base64 with the steps it recorded. ' +
     'The clip ends when play returns to the start frame (loops: true), when nothing else happens (the last frame is held `tail` seconds), or at maxDuration (truncated: true). Pass path to write the file instead of returning it.',
   execution: { kind: 'async', mutation: 'none', long: true },
   exposure: { webmcp: false },
@@ -161,12 +161,17 @@ export const exportVideo = defineTool({
       if (!node) return { error: `No layer named or with ID '${click.node}' on this page` }
       clicks.push({ atMs: click.at * 1000, nodeId: node.id })
     }
-    const { exportImage, rasterCodec } = figma
+    const { exportImage, exportGraphImage, rasterCodec } = figma
     if (!exportImage || !rasterCodec) {
       return { error: 'Video export is not available in this environment' }
     }
+    // A Smart animate's posed copy keeps the document's ids, its page among them.
     const render = video.exportedFrameRenderer(
-      (frameId, scale) => exportImage([frameId], { scale, format: 'PNG', pageId }),
+      (frameId, scale, copy) =>
+        copy
+          ? (exportGraphImage?.(copy, pageId, [frameId], { scale, format: 'PNG' }) ??
+            Promise.resolve(null))
+          : exportImage([frameId], { scale, format: 'PNG', pageId }),
       rasterCodec
     )
 

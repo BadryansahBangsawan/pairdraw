@@ -64,5 +64,6 @@ export {
   type TimelineFrame,
   type TimelineOptions,
   type TimelineSegment,
+  type TimelineSmartSegment,
   type TimelineStep
 } from './timeline'

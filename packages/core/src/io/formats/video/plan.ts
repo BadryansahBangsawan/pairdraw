@@ -102,14 +102,15 @@ export async function recordPrototypeVideo(
 
 /**
  * Draws frames through a host's raster export, as PNG, and decodes them to pixels; the app and the
- * CLI each export through their own renderer.
+ * CLI each export through their own renderer. `graph`, when given, is a Smart animate's posed copy
+ * to draw the frame from instead of the document.
  */
 export function exportedFrameRenderer(
-  exportPNG: (frameId: string, scale: number) => Promise<Uint8Array | null>,
+  exportPNG: (frameId: string, scale: number, graph?: SceneGraph) => Promise<Uint8Array | null>,
   codec: RasterCodec
 ): RenderFrame {
-  return async (frameId, scale) => {
-    const png = await exportPNG(frameId, scale)
+  return async (frameId, scale, graph) => {
+    const png = await exportPNG(frameId, scale, graph)
     return png ? codec.decode(png) : null
   }
 }

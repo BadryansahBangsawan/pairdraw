@@ -1,4 +1,5 @@
 import { agentDiscovery } from './discovery'
+import { companionUpdate } from './update'
 
 /** What an agent chat needs before it can start, each fixed by guided setup. */
 export type AgentSetupProblem =
@@ -28,13 +29,16 @@ type AgentDiscovery = Pick<
 
 /**
  * Checks the companions an agent chat starts, so a missing or mismatched one fails with a fix
- * instead of an opaque process error. A failed lookup does not block the chat.
+ * instead of an opaque process error. A failed lookup does not block the chat. Companions
+ * updating with the app are checked once that update finished.
  */
 export async function assertAgentReady(
   agent: 'acp' | 'pi',
-  discovery: AgentDiscovery = agentDiscovery
+  discovery: AgentDiscovery = agentDiscovery,
+  update: Pick<typeof companionUpdate, 'settled'> = companionUpdate
 ): Promise<void> {
   if (!discovery.supported) return
+  await update.settled()
   await discovery.refresh(true)
   if (discovery.error.value === 'lookup') return
   if (agent === 'pi' && !discovery.harnessAvailable.value) {

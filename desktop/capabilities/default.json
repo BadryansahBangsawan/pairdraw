@@ -151,7 +151,7 @@
             "install",
             "--global",
             {
-              "validator": "^(@agentclientprotocol/(claude-agent-acp|codex-acp)|@pairdraw/(mcp|harness)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?)$"
+              "validator": "^(@agentclientprotocol/(claude-agent-acp|codex-acp)|@pairdraw/(mcp|harness|cli)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?)$"
             },
             "--registry=https://registry.npmjs.org"
           ]
@@ -163,7 +163,7 @@
             "add",
             "--global",
             {
-              "validator": "^@pairdraw/(mcp|harness)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?$"
+              "validator": "^@pairdraw/(mcp|harness|cli)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?$"
             },
             "--registry=https://registry.npmjs.org"
           ]
@@ -188,7 +188,7 @@
             "install",
             "--global",
             {
-              "validator": "^(@agentclientprotocol/(claude-agent-acp|codex-acp)|@pairdraw/(mcp|harness)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?)$"
+              "validator": "^(@agentclientprotocol/(claude-agent-acp|codex-acp)|@pairdraw/(mcp|harness|cli)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?)$"
             },
             "--registry=https://registry.npmjs.org"
           ]
@@ -202,7 +202,7 @@
             "add",
             "--global",
             {
-              "validator": "^@pairdraw/(mcp|harness)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?$"
+              "validator": "^@pairdraw/(mcp|harness|cli)@[0-9]+\\.[0-9]+\\.[0-9]+(-beta\\.[1-9][0-9]*)?$"
             },
             "--registry=https://registry.npmjs.org"
           ]

@@ -5,8 +5,9 @@ use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
 // Only inspect known executables. Discovery never launches an agent or reads credentials;
-// it runs only Pairdraw's own companions, and only to ask their version. Of Claude Code's
-// settings it reads only the switches that pick a cloud provider.
+// it runs only Pairdraw's own companions, and only to ask their version; the CLI's version comes
+// from its package. Of Claude Code's settings it reads only the switches that pick a cloud
+// provider.
 const EXECUTABLES: &[&str] = &[
     "claude",
     "claude-agent-acp",
@@ -16,6 +17,7 @@ const EXECUTABLES: &[&str] = &[
     "omp",
     "pairdraw-mcp-http",
     "pairdraw-harness",
+    "pairdraw",
     "npm",
     "bun",
 ];
@@ -24,7 +26,12 @@ const EXECUTABLES: &[&str] = &[
 const PACKAGES: &[(&str, &str)] = &[
     ("pairdraw-mcp-http", "@pairdraw/mcp"),
     ("pairdraw-harness", "@pairdraw/harness"),
+    ("pairdraw", CLI_PACKAGE),
 ];
+
+/// The CLI's package. Its program, `pairdraw`, is also the desktop app's own on Linux, so the
+/// CLI is never run to ask its version; the package it was installed from says.
+const CLI_PACKAGE: &str = "@pairdraw/cli";
 
 #[derive(serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -62,6 +69,35 @@ fn companion_version(executable: &Path, search_path: &str, timeout: Duration) ->
         search_path,
         timeout,
     )?)
+}
+
+/// The version of the CLI package `executable` comes from, or `None` when it is another program.
+/// npm and Bun link the program to the package's script on macOS and Linux; on Windows they write
+/// a shim beside npm's global packages, or in Bun's `bin` beside its `install` folder.
+fn cli_version(executable: &Path) -> Option<String> {
+    let mut candidates: Vec<PathBuf> = Vec::new();
+    if let Ok(script) = std::fs::canonicalize(executable) {
+        candidates.extend(script.ancestors().skip(1).take(2).map(Path::to_path_buf));
+    }
+    if let Some(bin) = executable.parent() {
+        let package = Path::new("node_modules").join("@pairdraw").join("cli");
+        candidates.push(bin.join(&package));
+        candidates.push(bin.join("..").join("install").join("global").join(&package));
+    }
+    candidates
+        .iter()
+        .find_map(|dir| cli_package_version(&dir.join("package.json")))
+}
+
+fn cli_package_version(path: &Path) -> Option<String> {
+    #[derive(serde::Deserialize)]
+    struct Package {
+        name: String,
+        version: String,
+    }
+    let package: Package = serde_json::from_str(&std::fs::read_to_string(path).ok()?).ok()?;
+    (package.name == CLI_PACKAGE && semver::Version::parse(&package.version).is_ok())
+        .then_some(package.version)
 }
 
 /// Runs a discovered program without a window and returns what it printed, or `None` when it
@@ -146,7 +182,7 @@ fn npm_global_writable(npm: &Path, search_path: &str, timeout: Duration) -> Opti
 fn lookup_with(
     search_path: String,
     resolve: impl Fn(&str) -> Option<PathBuf>,
-    version: impl Fn(&Path) -> Option<String>,
+    version: impl Fn(&str, &Path) -> Option<String>,
     npm_writable: impl Fn(&Path) -> Option<bool>,
 ) -> AgentLookup {
     let resolved: BTreeMap<&str, Option<PathBuf>> = EXECUTABLES
@@ -174,7 +210,10 @@ fn lookup_with(
             .iter()
             .map(|(command, package)| {
                 let path = resolved.get(command).cloned().flatten();
-                ((*package).to_owned(), path.and_then(|path| version(&path)))
+                (
+                    (*package).to_owned(),
+                    path.and_then(|path| version(package, &path)),
+                )
             })
             .collect(),
         search_path,
@@ -191,7 +230,13 @@ pub async fn agent_lookup() -> Result<AgentLookup, String> {
         let mut lookup = lookup_with(
             search_path.clone(),
             |command| which::which_in(command, Some(&search_path), &cwd).ok(),
-            |executable| companion_version(executable, &search_path, VERSION_TIMEOUT),
+            |package, executable| {
+                if package == CLI_PACKAGE {
+                    cli_version(executable)
+                } else {
+                    companion_version(executable, &search_path, VERSION_TIMEOUT)
+                }
+            },
             |npm| npm_global_writable(npm, &search_path, VERSION_TIMEOUT),
         );
         lookup.claude_code_cloud = super::claude_cloud::claude_code_cloud();
@@ -230,7 +275,7 @@ mod tests {
                 }
                 _ => None,
             },
-            |_| Some("0.15.1".to_owned()),
+            |_, _| Some("0.15.1".to_owned()),
             |_| Some(false),
         );
         assert_eq!(result.npm_global_writable, Some(false));
@@ -248,7 +293,7 @@ mod tests {
 
     #[test]
     fn checks_npm_only_when_npm_is_found() {
-        let result = lookup_with("/bin".to_owned(), |_| None, |_| None, |_| Some(true));
+        let result = lookup_with("/bin".to_owned(), |_| None, |_, _| None, |_| Some(true));
         assert_eq!(result.npm_global_writable, None);
     }
 
@@ -290,6 +335,82 @@ mod tests {
         );
         assert_eq!(parse_version("1.2\n"), None);
         assert_eq!(parse_version(""), None);
+    }
+
+    fn write_package(dir: &Path, name: &str, version: &str) {
+        std::fs::create_dir_all(dir).unwrap();
+        std::fs::write(
+            dir.join("package.json"),
+            format!(r#"{{"name":"{name}","version":"{version}"}}"#),
+        )
+        .unwrap();
+    }
+
+    fn scratch(name: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!("pairdraw-cli-{name}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn reads_the_cli_version_from_the_package_its_program_links_to() {
+        let prefix = scratch("linked");
+        let package = prefix.join("lib/node_modules/@pairdraw/cli");
+        write_package(&package, "@pairdraw/cli", "0.18.0");
+        std::fs::create_dir_all(package.join("bin")).unwrap();
+        std::fs::write(package.join("bin/pairdraw.js"), "").unwrap();
+        std::fs::create_dir_all(prefix.join("bin")).unwrap();
+        std::os::unix::fs::symlink(package.join("bin/pairdraw.js"), prefix.join("bin/pairdraw"))
+            .unwrap();
+        assert_eq!(
+            cli_version(&prefix.join("bin/pairdraw")),
+            Some("0.18.0".to_owned())
+        );
+        std::fs::remove_dir_all(&prefix).unwrap();
+    }
+
+    #[test]
+    fn reads_the_cli_version_beside_a_windows_shim() {
+        let prefix = scratch("shim");
+        std::fs::write(prefix.join("pairdraw.cmd"), "").unwrap();
+        write_package(
+            &prefix.join("node_modules").join("@pairdraw").join("cli"),
+            "@pairdraw/cli",
+            "0.18.0",
+        );
+        assert_eq!(
+            cli_version(&prefix.join("pairdraw.cmd")),
+            Some("0.18.0".to_owned())
+        );
+        std::fs::remove_dir_all(&prefix).unwrap();
+    }
+
+    #[test]
+    fn finds_no_cli_in_another_program_named_pairdraw() {
+        // On Linux the desktop app's own program is `pairdraw`.
+        let bin = scratch("other");
+        std::fs::write(bin.join("pairdraw"), "").unwrap();
+        assert_eq!(cli_version(&bin.join("pairdraw")), None);
+        write_package(
+            &bin.join("node_modules").join("@pairdraw").join("cli"),
+            "pairdraw-something-else",
+            "0.18.0",
+        );
+        assert_eq!(cli_version(&bin.join("pairdraw")), None);
+        std::fs::remove_dir_all(&bin).unwrap();
+    }
+
+    #[test]
+    fn reports_the_cli_version_under_its_package() {
+        let result = lookup_with(
+            "/bin".to_owned(),
+            |command| (command == "pairdraw").then(|| PathBuf::from("/bin/pairdraw")),
+            |package, _| (package == "@pairdraw/cli").then(|| "0.18.0".to_owned()),
+            |_| None,
+        );
+        assert_eq!(result.versions["@pairdraw/cli"], Some("0.18.0".to_owned()));
     }
 
     #[cfg(unix)]

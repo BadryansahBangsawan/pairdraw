@@ -4,8 +4,10 @@ import type { Channel } from '@tauri-apps/api/core'
 
 import { ACP_AGENTS } from '@pairdraw/core/constants'
 
+import { tauriAgentHost } from '@/app/ai/agents/host/tauri'
 import { installAgentAdapter, lookupAgents } from '@/app/ai/agents/setup/native'
 import { createDeferred } from '@/app/runtime/deferred'
+import { APP_VERSION } from '@/app/runtime/version'
 
 import { expectDefined } from '#tests/helpers/assert'
 import { clearTauriMocks, mockTauriIPC } from '#tests/helpers/tauri/mocks'
@@ -93,4 +95,32 @@ test('cleans up an installer that reports an error before its process handle arr
   await expect(installAgentAdapter(codex, '/bin')).rejects.toThrow('Adapter installation failed.')
   spawned.resolve(42)
   await killed.promise
+})
+
+test('updates the CLI with the package manager that installed it', async () => {
+  const spawns: { program: string; args: string[] }[] = []
+  await mockTauriIPC((command, args) => {
+    expect(command).toBe('plugin:shell|spawn')
+    const spawn = args as { program: string; args: string[]; onEvent: Channel }
+    spawns.push({ program: spawn.program, args: spawn.args })
+    queueMicrotask(() =>
+      spawn.onEvent.onmessage({ event: 'Terminated', payload: { code: 0, signal: null } })
+    )
+    return 42
+  })
+  await tauriAgentHost.install(
+    { kind: 'companion', companion: 'cli' },
+    { searchPath: '/home/me/.bun/bin', manager: 'bun' }
+  )
+  expect(spawns).toEqual([
+    {
+      program: 'bun',
+      args: [
+        'add',
+        '--global',
+        `@pairdraw/cli@${APP_VERSION}`,
+        '--registry=https://registry.npmjs.org'
+      ]
+    }
+  ])
 })

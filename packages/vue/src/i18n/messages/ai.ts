@@ -369,6 +369,8 @@ export const aiMessageDefaults = {
     'The Harness companion doesn’t match this version of Pairdraw. Run guided setup to update it.',
   chatMCPOutdated:
     'Pairdraw’s MCP server doesn’t match this version of Pairdraw. Run guided setup to update it.',
+  chatCompanionsUpdating: 'Updating Pairdraw’s command-line tools to match this version…',
+  chatCompanionsUpdated: 'Pairdraw’s command-line tools now match this version.',
   chatPiSignIn:
     'Pi isn’t signed in to a provider. Run pi in a terminal and type /login, or add an AI Gateway key.',
   chatPiModel:

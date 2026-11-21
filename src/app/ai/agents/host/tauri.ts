@@ -7,6 +7,7 @@ import {
   agentWorkspace,
   installAgentAdapter,
   installCanvasBridge,
+  installCLI,
   installHarnessCompanion,
   lookupAgents
 } from '@/app/ai/agents/setup/native'
@@ -59,6 +60,7 @@ export const tauriAgentHost: AgentHost = {
   async install(target, { searchPath, manager }) {
     if (target.kind === 'adapter') return installAgentAdapter(target.agent, searchPath)
     if (target.companion === 'mcp') return installCanvasBridge(searchPath, manager)
+    if (target.companion === 'cli') return installCLI(searchPath, manager)
     return installHarnessCompanion(searchPath, manager)
   },
   signIn,

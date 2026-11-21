@@ -219,6 +219,8 @@
   "chatPiCompanionMissing": "Pi a besoin du compagnon Harness. Lancez la configuration guidée pour l’installer.",
   "chatPiCompanionOutdated": "Le compagnon Harness ne correspond pas à cette version de Pairdraw. Lancez la configuration guidée pour le mettre à jour.",
   "chatMCPOutdated": "Le serveur MCP de Pairdraw ne correspond pas à cette version de Pairdraw. Lancez la configuration guidée pour le mettre à jour.",
+  "chatCompanionsUpdating": "Mise à jour des outils en ligne de commande de Pairdraw pour cette version…",
+  "chatCompanionsUpdated": "Les outils en ligne de commande de Pairdraw correspondent maintenant à cette version.",
   "chatPiSignIn": "Pi n’est connecté à aucun fournisseur. Lancez pi dans un terminal et tapez /login, ou ajoutez une clé AI Gateway.",
   "chatPiModel": "Pi n’a aucun modèle. Lancez pi dans un terminal et tapez /model, ou choisissez-en un dans les réglages.",
   "completions": "Completions",

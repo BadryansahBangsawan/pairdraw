@@ -225,6 +225,8 @@
   "chatPiCompanionMissing": "Pi 需要 Harness 配套程序。运行引导式设置来安装它。",
   "chatPiCompanionOutdated": "Harness 配套程序与此版本的 Pairdraw 不匹配。运行引导式设置来更新它。",
   "chatMCPOutdated": "Pairdraw 的 MCP 服务器与此版本的 Pairdraw 不匹配。运行引导式设置来更新它。",
+  "chatCompanionsUpdating": "正在将 Pairdraw 的命令行工具更新到此版本…",
+  "chatCompanionsUpdated": "Pairdraw 的命令行工具现已与此版本匹配。",
   "chatPiSignIn": "Pi 尚未登录任何提供商。请在终端中运行 pi 并输入 /login，或添加 AI Gateway 密钥。",
   "chatPiModel": "Pi 没有可用的模型。请在终端中运行 pi 并输入 /model，或在设置中选择一个。",
   "completions": "Completions",

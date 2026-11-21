@@ -1,0 +1,1 @@
+- When the desktop app updates itself, it also updates the Pairdraw MCP server, CLI, and Harness companion already installed on the computer to its own version, once per version, with the package manager that installed each; a failed update still offers guided setup.

@@ -357,4 +357,53 @@ describe('Harness companion setup', () => {
     await failing.setupHarness()
     expect(failing.error.value).toBe('harness-install')
   })
+
+  test('waits for a running companion update before installing an adapter', async () => {
+    const updating = createDeferred<undefined>()
+    const settle = mock(() => updating.promise)
+    let installed = false
+    const install = mock(async (_agent: ACPAgentDef, _searchPath: string) => {
+      installed = true
+    })
+    const discovery = createAgentDiscovery({
+      enabled: true,
+      lookup: async () => lookup('claude', 'npm', ...(installed ? ['claude-agent-acp'] : [])),
+      settle,
+      install
+    })
+    await discovery.refresh()
+    const operation = discovery.install('claude-code')
+    await Promise.resolve()
+    expect(settle).toHaveBeenCalledTimes(1)
+    expect(install).not.toHaveBeenCalled()
+    updating.resolve(undefined)
+    await operation
+    expect(install).toHaveBeenCalledTimes(1)
+    expect(discovery.error.value).toBeNull()
+  })
+
+  test('waits for a running companion update before installing the canvas bridge', async () => {
+    const updating = createDeferred<undefined>()
+    const settle = mock(() => updating.promise)
+    let installed = false
+    const installBridge = mock(async () => {
+      installed = true
+    })
+    const discovery = createAgentDiscovery({
+      enabled: true,
+      lookup: async () => lookup('npm', ...(installed ? ['pairdraw-mcp-http'] : [])),
+      settle,
+      install: async () => undefined,
+      installBridge,
+      restartBridge: async () => undefined
+    })
+    await discovery.refresh()
+    const operation = discovery.setupCanvasBridge()
+    await Promise.resolve()
+    expect(installBridge).not.toHaveBeenCalled()
+    updating.resolve(undefined)
+    await operation
+    expect(installBridge).toHaveBeenCalledTimes(1)
+    expect(discovery.canvasBridgeAvailable.value).toBe(true)
+  })
 })

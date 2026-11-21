@@ -1,5 +1,10 @@
 import { APP_VERSION } from '@/app/runtime/version'
 
+/** Pairdraw's command-line tool; `pairdraw` is also the desktop app's own program on Linux. */
+export const CLI_EXECUTABLE = 'pairdraw'
+export const CLI_PACKAGE = '@pairdraw/cli'
+export const CLI_INSTALL_TARGET = `${CLI_PACKAGE}@${APP_VERSION}`
+
 function majorMinor(version: string): string | null {
   const match = /^(\d+)\.(\d+)/.exec(version)
   return match ? `${match[1]}.${match[2]}` : null
@@ -17,6 +22,9 @@ export function isOutdatedCompanion(
   if (!version) return true
   return majorMinor(version) !== majorMinor(appVersion)
 }
+
+/** Pairdraw's packages installed beside the app: the MCP server, the CLI, and the Harness. */
+export type Companion = 'mcp' | 'cli' | 'harness'
 
 const BUN_GLOBAL_BIN = /[\\/]\.bun[\\/]/
 

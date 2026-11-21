@@ -83,6 +83,8 @@ ja:ai.provider
 ja:ai.chatPiCompanionMissing
 ja:ai.chatPiCompanionOutdated
 ja:ai.chatMCPOutdated
+ja:ai.chatCompanionsUpdating
+ja:ai.chatCompanionsUpdated
 ja:ai.chatPiSignIn
 ja:ai.chatPiModel
 ja:ai.piModelHint
@@ -316,6 +318,8 @@ zh-cn:ai.provider
 zh-cn:ai.chatPiCompanionMissing
 zh-cn:ai.chatPiCompanionOutdated
 zh-cn:ai.chatMCPOutdated
+zh-cn:ai.chatCompanionsUpdating
+zh-cn:ai.chatCompanionsUpdated
 zh-cn:ai.chatPiSignIn
 zh-cn:ai.chatPiModel
 zh-cn:ai.piModelHint

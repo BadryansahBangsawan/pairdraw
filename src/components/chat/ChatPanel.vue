@@ -7,6 +7,7 @@ import { useI18n } from '@pairdraw/vue/i18n'
 
 import { currentPermission } from '@/app/ai/agents/acp/permission'
 import { agentAutoConnect } from '@/app/ai/agents/auto/session'
+import { companionUpdate } from '@/app/ai/agents/setup/update'
 import { agentSignInHelp } from '@/app/ai/agents/signed-out'
 import { carriesAttachableFile, isAttachableFile } from '@/app/ai/attachment/accept'
 import { revokeImagePreviewURL } from '@/app/ai/attachment/image/prepare'
@@ -129,6 +130,13 @@ const activeStore = useActiveEditorStoreRef()
 const documentStore = useEditorStore()
 const queued = computed(() => queuedMessages(documentStore))
 const agentSetup = useChatAgentSetup(activeStore)
+/** Pairdraw's command-line tools updating with the app, said quietly; a failure is not. */
+const companionNotice = computed(() => {
+  const state = companionUpdate.state.value
+  if (state === 'updating') return ai.value.chatCompanionsUpdating
+  if (state === 'updated') return ai.value.chatCompanionsUpdated
+  return null
+})
 /** The coding agent the chat switched to on its own, while it is still the chat's model. */
 const autoAgent = computed(() => {
   const agent = agentAutoConnect.state.notice
@@ -541,6 +549,9 @@ function handleStop() {
       @release-focus="focusComposer"
     />
 
+    <p v-if="companionNotice" role="status" class="px-3.5 py-2 text-xs text-muted">
+      {{ companionNotice }}
+    </p>
     <!-- Stays mounted, so the notice is read out when it appears with the chat's model. -->
     <div role="status">
       <ChatAgentNotice

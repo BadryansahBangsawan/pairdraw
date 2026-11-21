@@ -7,6 +7,7 @@ import { ACP_AGENTS } from '@pairdraw/core/constants'
 
 import { signInScope } from '@/app/ai/agents/acp/auth/terminal'
 import { HARNESS_PACKAGE } from '@/app/ai/agents/pi/companion'
+import { CLI_PACKAGE } from '@/app/ai/agents/setup/companions'
 import { bunInstallArgs, npmInstallArgs } from '@/app/ai/agents/setup/native'
 import { MCP_PACKAGE_NAME } from '@/app/automation/mcp/failure'
 import { resolvePlatformCommand, resolveScopedCommand } from '@/app/tauri/command'
@@ -119,7 +120,8 @@ describe('shell scope', () => {
   const installs = [
     ...ACP_AGENTS.flatMap((agent) => (agent.adapterPackage ? [agent.adapterPackage] : [])),
     `${MCP_PACKAGE_NAME}@${rootPackage.version}`,
-    `${HARNESS_PACKAGE}@${rootPackage.version}`
+    `${HARNESS_PACKAGE}@${rootPackage.version}`,
+    `${CLI_PACKAGE}@${rootPackage.version}`
   ]
   // Agents' terminal sign-ins run the agent under a scope entry of their own.
   const signIns = ACP_AGENTS.flatMap((agent): [string, string, string[]][] =>
@@ -133,7 +135,8 @@ describe('shell scope', () => {
     // Bun updates the companions it installed; agent adapters always come from npm.
     ...[
       `${MCP_PACKAGE_NAME}@${rootPackage.version}`,
-      `${HARNESS_PACKAGE}@${rootPackage.version}`
+      `${HARNESS_PACKAGE}@${rootPackage.version}`,
+      `${CLI_PACKAGE}@${rootPackage.version}`
     ].map((target): [string, string[]] => ['bun', bunInstallArgs(target)])
   ]
 

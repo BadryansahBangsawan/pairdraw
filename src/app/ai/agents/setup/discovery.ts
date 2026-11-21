@@ -64,6 +64,11 @@ export function createAgentDiscovery(options: {
   enabled: boolean | (() => boolean)
   /** Whether the host runs Pi, through the desktop app's Harness companion; defaults to true. */
   runsPi?: boolean
+  /**
+   * Resolves once the companions updating with the app finished. Setup waits here, so two package
+   * managers never reify into the same global prefix.
+   */
+  settle?: () => Promise<void>
   lookup: () => Promise<AgentLookup>
   install: (agent: ACPAgentDef, searchPath: string) => Promise<void>
   installBridge?: (searchPath: string, manager: PackageManager) => Promise<void>
@@ -181,6 +186,7 @@ export function createAgentDiscovery(options: {
     installing.value = id
     error.value = null
     try {
+      await options.settle?.()
       await options.install(agent.definition, snapshot.value.searchPath)
       await refresh(true)
       if (
@@ -211,6 +217,7 @@ export function createAgentDiscovery(options: {
     installing.value = 'canvas'
     error.value = null
     try {
+      await options.settle?.()
       if (!installed) {
         if (!options.installBridge) throw new Error('Canvas bridge setup is unavailable.')
         await options.installBridge(snapshot.value.searchPath, manager)
@@ -242,6 +249,7 @@ export function createAgentDiscovery(options: {
     installing.value = 'harness'
     error.value = null
     try {
+      await options.settle?.()
       if (!options.installHarness) throw new Error('Harness companion setup is unavailable.')
       await options.installHarness(snapshot.value.searchPath, manager)
       await refresh(true)
@@ -290,11 +298,13 @@ export function createHostedAgentDiscovery(
     enabled: boolean | (() => boolean)
     runsPi?: boolean
     restartBridge?: () => Promise<void>
+    settle?: () => Promise<void>
   }
 ) {
   return createAgentDiscovery({
     enabled: options.enabled,
     runsPi: options.runsPi,
+    settle: options.settle,
     lookup: () => host.detect(),
     // Agent adapters always come from npm.
     install: (agent, searchPath) =>
@@ -307,12 +317,17 @@ export function createHostedAgentDiscovery(
   })
 }
 
+/** Restarts the app's own MCP server, so one just installed or updated is the one that runs. */
+export async function restartAppMCPServer(): Promise<void> {
+  const { restartMCPRuntime } = await import('@/app/automation/mcp/runtime')
+  const result = await restartMCPRuntime()
+  if (!result.ok) throw result.error
+}
+
 export const agentDiscovery = createHostedAgentDiscovery(agentHost(), {
   enabled: agentHostAvailable,
   runsPi: piHostAvailable,
-  async restartBridge() {
-    const { restartMCPRuntime } = await import('@/app/automation/mcp/runtime')
-    const result = await restartMCPRuntime()
-    if (!result.ok) throw result.error
-  }
+  restartBridge: restartAppMCPServer,
+  // Imported here so the update, which reads this discovery, is not a module-level cycle.
+  settle: () => import('./update').then(({ companionUpdate }) => companionUpdate.settled())
 })

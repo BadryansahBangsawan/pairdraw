@@ -225,6 +225,8 @@
   "chatPiCompanionMissing": "Pi には Harness コンパニオンが必要です。ガイド付きセットアップを実行してインストールしてください。",
   "chatPiCompanionOutdated": "Harness コンパニオンがこのバージョンの Pairdraw と一致しません。ガイド付きセットアップを実行して更新してください。",
   "chatMCPOutdated": "Pairdraw の MCP サーバーがこのバージョンの Pairdraw と一致しません。ガイド付きセットアップを実行して更新してください。",
+  "chatCompanionsUpdating": "Pairdraw のコマンドラインツールをこのバージョンに更新しています…",
+  "chatCompanionsUpdated": "Pairdraw のコマンドラインツールがこのバージョンと一致しました。",
   "chatPiSignIn": "Pi はどのプロバイダーにもサインインしていません。ターミナルで pi を実行して /login と入力するか、AI Gateway キーを追加してください。",
   "chatPiModel": "Pi に使用するモデルがありません。ターミナルで pi を実行して /model と入力するか、設定で選択してください。",
   "completions": "入力補完",

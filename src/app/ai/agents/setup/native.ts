@@ -6,7 +6,7 @@ import { HARNESS_INSTALL_TARGET } from '@/app/ai/agents/pi/companion'
 import { MCP_INSTALL_TARGET } from '@/app/automation/mcp/failure'
 import { resolvePlatformCommand } from '@/app/tauri/command'
 
-import type { PackageManager } from './companions'
+import { CLI_INSTALL_TARGET, type PackageManager } from './companions'
 import { agentLookupSchema } from './schema'
 
 export type AgentLookup = v.InferOutput<typeof agentLookupSchema>
@@ -41,6 +41,10 @@ export async function installHarnessCompanion(
   manager: PackageManager = 'npm'
 ): Promise<void> {
   await installPackage(HARNESS_INSTALL_TARGET, searchPath, manager)
+}
+
+export async function installCLI(searchPath: string, manager: PackageManager): Promise<void> {
+  await installPackage(CLI_INSTALL_TARGET, searchPath, manager)
 }
 
 // These are public packages; a user's private project registry may not mirror them.

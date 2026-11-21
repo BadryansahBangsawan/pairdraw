@@ -2,7 +2,7 @@ import type { ACPAgentDef } from '@pairdraw/core/constants'
 
 import type { AgentAuthCheck } from '@/app/ai/agents/acp/auth/session'
 import type { AgentAuthStatus } from '@/app/ai/agents/acp/auth/status'
-import type { PackageManager } from '@/app/ai/agents/setup/companions'
+import type { Companion, PackageManager } from '@/app/ai/agents/setup/companions'
 import type { AgentLookup } from '@/app/ai/agents/setup/native'
 
 /** An agent process's stdio, which the ACP connection reads and writes, and the way to stop it. */
@@ -29,7 +29,7 @@ export interface AgentSpawnOptions {
 /** What a host may install: an agent's ACP adapter or one of Pairdraw's companions. */
 type AgentInstallTarget =
   | { kind: 'adapter'; agent: ACPAgentDef }
-  | { kind: 'companion'; companion: 'mcp' | 'harness' }
+  | { kind: 'companion'; companion: Companion }
 
 interface AgentInstallOptions {
   /** The search path the last detection reported, so the package manager finds its tools. */

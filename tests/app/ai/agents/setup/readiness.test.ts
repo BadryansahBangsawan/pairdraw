@@ -3,6 +3,7 @@ import { describe, expect, test } from 'bun:test'
 import { createAgentDiscovery } from '@/app/ai/agents/setup/discovery'
 import type { AgentLookup } from '@/app/ai/agents/setup/native'
 import { AgentSetupError, assertAgentReady } from '@/app/ai/agents/setup/readiness'
+import { createDeferred } from '@/app/runtime/deferred'
 
 function discovery(lookup: () => Promise<AgentLookup>, enabled = true) {
   return createAgentDiscovery({ enabled, lookup, install: async () => undefined })
@@ -58,5 +59,19 @@ describe('assertAgentReady', () => {
       })
     ).toBeNull()
     await assertAgentReady('pi', discovery(installed(), false))
+  })
+
+  test('waits for the companions updating with the app instead of calling them outdated', async () => {
+    let version = '0.12.0'
+    const updating = createDeferred<undefined>()
+    const ready = assertAgentReady(
+      'acp',
+      discovery(() => installed({ '@pairdraw/mcp': version }, 'pairdraw-mcp-http')()),
+      { settled: () => updating.promise }
+    )
+    // The lookup reads the version only once the update finished.
+    version = '0.0.0-test'
+    updating.resolve(undefined)
+    await ready
   })
 })

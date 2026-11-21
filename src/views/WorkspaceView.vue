@@ -6,6 +6,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useI18n } from '@pairdraw/vue/i18n'
 
+import { companionUpdate } from '@/app/ai/agents/setup/update'
 import { detectAgentsOnFirstRun } from '@/app/ai/models/settings/onboarding/dialog'
 import { exposeAutomationTestRequests } from '@/app/automation/bridge/test-hooks'
 import { startMCPRuntime, stopMCPRuntime } from '@/app/automation/mcp/runtime'
@@ -255,6 +256,8 @@ onMounted(async () => {
   if (!embed) {
     stopWebMCP = startWebMCP(getActiveStore)
     await startMCPRuntime(getActiveStore)
+    // After the server started, so updating it can restart it; nothing waits for the update.
+    void companionUpdate.run()
   }
 
   try {

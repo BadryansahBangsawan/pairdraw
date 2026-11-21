@@ -185,7 +185,7 @@ test('the variable picker shows the numeric value of the edited mode', async ({ 
   await dense.fill('{base} * 2')
   await expect(dense.locator('[data-reference]')).toHaveText('base')
   await expect(inspector.getByText('= 4px', { exact: true })).toBeVisible()
-  await inspector.getByRole('button', { name: 'Use a variable', exact: true }).last().click()
+  await inspector.getByRole('button', { name: 'Dense: Use a variable', exact: true }).click()
   await expect(page.getByRole('option', { name: 'base 2px', exact: true })).toBeVisible()
   canvas.assertNoErrors()
 })

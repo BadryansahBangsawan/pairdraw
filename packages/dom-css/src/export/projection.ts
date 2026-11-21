@@ -296,6 +296,30 @@ function addBoxSizing(style: DesignStyleDeclaration): void {
   if (sized && boxed) style['box-sizing'] = 'border-box'
 }
 
+/**
+ * The CSS keyword for a blend mode, where one paints the same mode. Linear burn would need
+ * `plus-darker`, which Chrome, Edge, and Firefox do not implement, so it gains no keyword and
+ * exports flat. A normal layer or an unscoped pass-through needs none either.
+ */
+const CSS_BLEND_MODES: Partial<Record<SceneNode['blendMode'], string>> = {
+  DARKEN: 'darken',
+  MULTIPLY: 'multiply',
+  COLOR_BURN: 'color-burn',
+  LIGHTEN: 'lighten',
+  SCREEN: 'screen',
+  LINEAR_DODGE: 'plus-lighter',
+  COLOR_DODGE: 'color-dodge',
+  OVERLAY: 'overlay',
+  SOFT_LIGHT: 'soft-light',
+  HARD_LIGHT: 'hard-light',
+  DIFFERENCE: 'difference',
+  EXCLUSION: 'exclusion',
+  HUE: 'hue',
+  SATURATION: 'saturation',
+  COLOR: 'color',
+  LUMINOSITY: 'luminosity'
+}
+
 function styleFromSceneNode(
   node: SceneNode,
   parent: SceneNode | undefined,
@@ -313,6 +337,8 @@ function styleFromSceneNode(
   addStroke(style, node, css)
   Object.assign(style, effectsToCSS(node.effects))
   if (node.opacity < 1) style.opacity = css('opacity', String(node.opacity))
+  const blend = CSS_BLEND_MODES[node.blendMode]
+  if (blend) style['mix-blend-mode'] = blend
   addCornerRadii(style, node, css)
   if (node.clipsContent) style.overflow = 'hidden'
   const alignSelf = alignToCSS(node.layoutAlignSelf)

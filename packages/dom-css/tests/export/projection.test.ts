@@ -224,4 +224,45 @@ describe('DOM projection sizes', () => {
     expect(title.inlineStyle?.height).toBeUndefined()
     expect(dot.inlineStyle).toMatchObject({ width: '20px', 'border-radius': '50%' })
   })
+
+  test('a layer blend mode reaches the style, where CSS paints the same one', () => {
+    const graph = new SceneGraph()
+    const page = graph.getPages()[0]
+    const card = graph.createNode('FRAME', page.id, {
+      name: 'Card',
+      width: 100,
+      height: 80,
+      blendMode: 'COLOR_DODGE'
+    })
+    const root = element(sceneNodeToDesignDocument(graph, card.id).children[0])
+    expect(root.inlineStyle).toMatchObject({ 'mix-blend-mode': 'color-dodge' })
+  })
+
+  test('linear dodge uses the plus-lighter keyword every baseline engine implements', () => {
+    const graph = new SceneGraph()
+    const page = graph.getPages()[0]
+    const card = graph.createNode('FRAME', page.id, {
+      name: 'Card',
+      width: 100,
+      height: 80,
+      blendMode: 'LINEAR_DODGE'
+    })
+    const root = element(sceneNodeToDesignDocument(graph, card.id).children[0])
+    expect(root.inlineStyle).toMatchObject({ 'mix-blend-mode': 'plus-lighter' })
+  })
+
+  test('normal, pass-through, and linear burn add no blend mode', () => {
+    const graph = new SceneGraph()
+    const page = graph.getPages()[0]
+    for (const blendMode of ['NORMAL', 'PASS_THROUGH', 'LINEAR_BURN'] as const) {
+      const card = graph.createNode('FRAME', page.id, {
+        name: blendMode,
+        width: 10,
+        height: 10,
+        blendMode
+      })
+      const root = element(sceneNodeToDesignDocument(graph, card.id).children[0])
+      expect(root.inlineStyle?.['mix-blend-mode']).toBeUndefined()
+    }
+  })
 })

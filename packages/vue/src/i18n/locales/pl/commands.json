@@ -16,6 +16,7 @@
   "detachIcon": "Odłącz ikonę",
   "goToMainComponent": "Przejdź do komponentu",
   "resetAllChanges": "Zresetuj wszystkie zmiany",
+  "pushChangesToMainComponent": "Wypchnij zmiany do komponentu głównego",
   "addAutoLayout": "Dodaj auto-layout",
   "bringToFront": "Przenieś na wierzch",
   "sendToBack": "Przenieś na spód",

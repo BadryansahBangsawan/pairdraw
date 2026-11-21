@@ -16,6 +16,7 @@
   "detachIcon": "Détacher l'icône",
   "goToMainComponent": "Aller au composant principal",
   "resetAllChanges": "Réinitialiser toutes les modifications",
+  "pushChangesToMainComponent": "Envoyer les modifications au composant principal",
   "addAutoLayout": "Ajouter un auto-layout",
   "bringToFront": "Mettre au premier plan",
   "sendToBack": "Mettre en arrière-plan",

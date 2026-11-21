@@ -167,6 +167,7 @@ Feature-by-feature comparison of Figma Design capabilities with Pairdraw's curre
 | Variable collections & modes               | ✅     | Collections with modes; apply a mode, or Auto, to layers and pages from Appearance                                                                               |
 | Styles (color, text, effect, layout)       | 🟡     | Apply and detach fill, stroke, text, effect, and grid styles from `.fig`, libraries, and design tokens; no UI to create or edit styles                           |
 | Libraries (publish, share, update)         | ✅     | Immutable local/storage revisions, selective publication, enablement, scoped update review, offline materialization, and `.fig` persistence                      |
+| Push changes to main component             | ✅     | Applies an instance's overrides to its main component and clears them from the instance                                                                         |
 | Detach instance                            | ✅     | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd> converts instance back to frame                                                                                             |
 | Go to main component                       | ✅     | Navigate to source component, cross-page                                                                                                                         |
 

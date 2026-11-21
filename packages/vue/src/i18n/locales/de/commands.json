@@ -16,6 +16,7 @@
   "detachIcon": "Symbol lösen",
   "goToMainComponent": "Zur Hauptkomponente",
   "resetAllChanges": "Alle Änderungen zurücksetzen",
+  "pushChangesToMainComponent": "Änderungen an Hauptkomponente übertragen",
   "addAutoLayout": "Auto-Layout hinzufügen",
   "bringToFront": "In den Vordergrund",
   "sendToBack": "In den Hintergrund",

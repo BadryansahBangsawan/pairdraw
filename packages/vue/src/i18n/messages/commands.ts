@@ -21,6 +21,7 @@ export const commandMessageDefaults = {
   detachIcon: 'Detach icon',
   goToMainComponent: 'Go to main component',
   resetAllChanges: 'Reset all changes',
+  pushChangesToMainComponent: 'Push changes to main component',
   addAutoLayout: 'Add auto layout',
   useAsMask: 'Use as mask',
   removeMask: 'Remove mask',

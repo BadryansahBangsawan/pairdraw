@@ -78,6 +78,11 @@ export function useSelectionCapabilities() {
       const node = selectedNode.value
       return node?.type === 'INSTANCE' && editor.instanceHasOverrides(node.id)
     }),
+    // A library's main component is read-only, so its instances cannot push changes to it.
+    canPushInstanceOverrides: useSceneComputed(() => {
+      const node = selectedNode.value
+      return node?.type === 'INSTANCE' && editor.canPushInstanceOverrides(node.id)
+    }),
     canCreateInstance: computed(() => selectedNode.value?.type === 'COMPONENT'),
     canConvertToFrame: selection.canConvertToFrame,
     canCreateSlot: selection.canCreateSlot,

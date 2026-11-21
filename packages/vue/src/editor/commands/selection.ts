@@ -203,6 +203,17 @@ export function createSelectionCommands({
         if (node) editor.resetInstanceOverrides(node.id)
       }
     },
+    'selection.pushInstanceOverrides': {
+      id: 'selection.pushInstanceOverrides',
+      get label() {
+        return t.value.pushChangesToMainComponent
+      },
+      enabled: capabilities.canPushInstanceOverrides,
+      run: () => {
+        const node = selection.selectedNode.value
+        if (node) editor.pushInstanceOverrides(node.id)
+      }
+    },
     'selection.goToMainComponent': {
       id: 'selection.goToMainComponent',
       get label() {

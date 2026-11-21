@@ -89,6 +89,7 @@ const { getCommand } = useEditorCommands()
 const goToMainComponent = getCommand('selection.goToMainComponent')
 const detachInstance = getCommand('selection.detachInstance')
 const resetInstanceOverrides = getCommand('selection.resetInstanceOverrides')
+const pushInstanceOverrides = getCommand('selection.pushInstanceOverrides')
 // ⌘R and a double-click rename the heading in place, as Figma's right panel does; the Layers view
 // renames its own rows from the same request.
 const rename = useInlineRename((id: string, name: string) => store.renameNode(id, name))
@@ -276,6 +277,14 @@ const { panels, rename: renameMessages } = useI18n()
           />
           <SelectionActionsControl />
           <template v-if="node.type === 'INSTANCE'">
+            <IconButton
+              :label="pushInstanceOverrides.label"
+              data-test-id="instance-push-to-main"
+              :disabled="!pushInstanceOverrides.enabled.value"
+              @click="pushInstanceOverrides.run()"
+            >
+              <icon-lucide-upload class="size-3.5" />
+            </IconButton>
             <IconButton
               :label="resetInstanceOverrides.label"
               data-test-id="instance-reset-all-changes"

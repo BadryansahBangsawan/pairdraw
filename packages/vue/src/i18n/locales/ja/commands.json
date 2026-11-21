@@ -16,6 +16,7 @@
   "detachIcon": "アイコンを切り離す",
   "goToMainComponent": "メインコンポーネントに移動",
   "resetAllChanges": "すべての変更をリセット",
+  "pushChangesToMainComponent": "変更をメインコンポーネントにプッシュ",
   "addAutoLayout": "オートレイアウトを追加",
   "bringToFront": "最前面へ移動",
   "sendToBack": "最背面へ移動",

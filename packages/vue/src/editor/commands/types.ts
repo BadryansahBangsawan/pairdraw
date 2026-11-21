@@ -23,6 +23,7 @@ export type EditorCommandId =
   | 'selection.detachIcon'
   | 'selection.goToMainComponent'
   | 'selection.resetInstanceOverrides'
+  | 'selection.pushInstanceOverrides'
   | 'selection.createSlot'
   | 'selection.wrapInAutoLayout'
   | 'selection.toggleMask'

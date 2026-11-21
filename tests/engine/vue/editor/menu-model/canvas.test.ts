@@ -92,17 +92,23 @@ describe('buildCanvasContextMenu', () => {
     ).toContain('selection.detachInstance')
   })
 
-  test('offers Reset all changes ahead of the other instance actions', () => {
+  test('offers Push and Reset all changes ahead of the other instance actions', () => {
     const ids = itemIds(
       buildCanvasContextMenu(
         options({ selection: selection({ isInstance: computed(() => true) }) })
       )
+    )
+    expect(ids.indexOf('selection.pushInstanceOverrides')).toBeLessThan(
+      ids.indexOf('selection.resetInstanceOverrides')
     )
     expect(ids.indexOf('selection.resetInstanceOverrides')).toBeLessThan(
       ids.indexOf('selection.goToMainComponent')
     )
     expect(itemIds(buildCanvasContextMenu(options()))).not.toContain(
       'selection.resetInstanceOverrides'
+    )
+    expect(itemIds(buildCanvasContextMenu(options()))).not.toContain(
+      'selection.pushInstanceOverrides'
     )
   })
 

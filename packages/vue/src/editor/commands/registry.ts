@@ -45,6 +45,7 @@ export const EDITOR_COMMAND_METADATA = {
   'selection.detachIcon': {},
   'selection.goToMainComponent': {},
   'selection.resetInstanceOverrides': {},
+  'selection.pushInstanceOverrides': {},
   'selection.createInstance': {},
   'selection.createSlot': { contextTestId: 'context-create-slot' },
   'selection.wrapInAutoLayout': { shortcut: 'SHIFT+A', keybinding: 'Shift+KeyA' },

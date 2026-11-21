@@ -140,6 +140,12 @@ A layer inside an instance can override its name, text, styled ranges, and font,
 
 Overrides in a `.fig` file come back as overrides when you open it, and are saved the way Figma writes them.
 
+### Pushing Changes to the Main Component
+
+Select an instance, then choose **Push changes to main component** from its header, its context menu, or **Object › Push Changes to Main Component**. The instance's overrides move to the main component, every other instance follows, and this instance stops overriding those fields. Another instance that overrides the same field keeps its value. One undo step restores the main component and every instance.
+
+A nested instance's changes move to its own main component, and the enclosing component picks them up through sync. An instance of a library component cannot push changes: the published main component is read-only, so edit the source library instead.
+
 ### New Children
 
 When you add a child to a component, all existing instances gain a cloned copy automatically. Child order in instances always matches the component.

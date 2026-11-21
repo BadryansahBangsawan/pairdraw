@@ -84,6 +84,8 @@ Component actions are displayed in purple to match the component color theme.
 | Create component set | — | — | 2+ selected components |
 | Create instance | — | — | Components (no shortcut) |
 | Go to main component | — | — | Instances |
+| Push changes to main component | — | — | Instances with overrides |
+| Reset all changes | — | — | Instances with overrides |
 | Detach instance | <kbd>⌥</kbd><kbd>⌘</kbd><kbd>B</kbd> | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>B</kbd> | Instances |
 
 See [Components](./components) for details on the component workflow.

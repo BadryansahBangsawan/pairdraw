@@ -482,6 +482,11 @@ export const APP_MENU_SCHEMA = [
         command: 'selection.detachInstance'
       },
       {
+        id: 'selection.pushInstanceOverrides',
+        label: 'Push Changes to Main Component',
+        command: 'selection.pushInstanceOverrides'
+      },
+      {
         id: 'selection.resetInstanceOverrides',
         label: 'Reset All Changes',
         command: 'selection.resetInstanceOverrides'

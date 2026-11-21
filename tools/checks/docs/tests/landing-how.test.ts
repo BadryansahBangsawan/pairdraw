@@ -14,8 +14,8 @@ describe('the Goals card follows its catalog', () => {
 
   test('reads edited figures instead of the ones it shipped with', () => {
     expect(savedFraction('$1,000', 'of $4,000 saved')).toBe(0.25)
-    expect(goalFills([{ title: 'x', detail: '$300 / $1,200' }])).toEqual([0.25])
-    expect(goalFills([{ title: 'x', detail: '$2,000 / $1,000' }])).toEqual([1])
-    expect(goalFills([{ title: 'x', detail: 'no amount' }])).toEqual([0])
+    expect(goalFills([{ detail: '$300 / $1,200' }])).toEqual([0.25])
+    expect(goalFills([{ detail: '$2,000 / $1,000' }])).toEqual([1])
+    expect(goalFills([{ detail: 'no amount' }])).toEqual([0])
   })
 })

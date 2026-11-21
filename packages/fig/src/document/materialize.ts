@@ -66,13 +66,29 @@ export function materializeDocument(
   return materializeReader(createDocumentReader(changes, options.pageIds), blobs, options)
 }
 
+/**
+ * A saved Figma archive keeps override records whose target node was deleted. Reading a page
+ * skips those records and still refuses an ambiguous path, so eager assembly of an archive
+ * follows the same rule; callers that want the diagnostics pass their own handlers.
+ */
+function archiveOpenOptions(options: DocumentAssemblyOptions): DocumentAssemblyOptions {
+  return {
+    onUnresolvedProperty: () => undefined,
+    onUnresolvedAssignment: () => undefined,
+    onUnresolvedBinding: () => undefined,
+    onMissingComponent: () => undefined,
+    onMissingSlotContent: () => undefined,
+    ...options
+  }
+}
+
 /** Own parsed archive records; do not create a second full source tree. */
 export function materializeFigArchive(
   bytes: ArrayBuffer,
   options: DocumentAssemblyOptions = {}
 ): AssemblyState {
   const { reader, blobs, images } = createArchiveDocumentReader(bytes, options.pageIds)
-  return materializeReader(reader, blobs, withArchiveImages(options, images))
+  return materializeReader(reader, blobs, withArchiveImages(archiveOpenOptions(options), images))
 }
 
 interface ReaderAssemblyOptions extends DocumentAssemblyOptions {

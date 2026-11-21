@@ -1,0 +1,1 @@
+- Opening a Figma file with an override for a layer that was deleted from a nested component no longer fails; the stale record is skipped, as Figma does, while an ambiguous path still refuses the file.

@@ -97,6 +97,14 @@ function printReadWarnings(filePath: string, warnings: readonly ReadDocumentWarn
       )
       continue
     }
+    if (warning.kind === 'unknown-node') {
+      console.error(
+        warn(
+          `${filePath}: uses node types it does not know (${warning.types.join(', ')}); they read as placeholder frames.`
+        )
+      )
+      continue
+    }
     console.error(
       warn(
         `${filePath}: could not open the libraries it imports (${warning.paths.join(', ')}); their components read as placeholders.`

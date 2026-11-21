@@ -55,7 +55,31 @@ describe('penFormat warnings', () => {
     expect(warnings).toContainEqual({ kind: 'missing-image', urls: ['./gone.png'] })
   })
 
+  test('names a node type the reader does not know', async () => {
+    const { graph, warnings } = await read({
+      children: [{ id: 'future', type: 'future-widget', width: 40, height: 40 }]
+    })
 
+    // It still reads as the placeholder frame it always did.
+    expect(graph.getNode('future')?.type).toBe('FRAME')
+    expect(warnings).toContainEqual({ kind: 'unknown-node', types: ['future-widget'] })
+  })
+
+  test('does not warn on the annotation types it reads as stickies', async () => {
+    const { graph, warnings } = await read({
+      children: [
+        { id: 'n', type: 'note', width: 200, height: 120 },
+        { id: 'p', type: 'prompt', width: 200, height: 120 },
+        { id: 'c', type: 'context', width: 200, height: 120 }
+      ]
+    })
+
+    // note, prompt, and context are the reader's own sticky cards, not unknown types.
+    expect(graph.getNode('n')?.type).toBe('STICKY')
+    expect(graph.getNode('p')?.type).toBe('STICKY')
+    expect(graph.getNode('c')?.type).toBe('STICKY')
+    expect(warnings ?? []).toEqual([])
+  })
 
   test('deduplicates names and caps a long list', async () => {
     const children = Array.from({ length: 30 }, (_, index) => ({

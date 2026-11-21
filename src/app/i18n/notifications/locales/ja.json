@@ -12,6 +12,7 @@
   "importedLibrariesUnreadable": "「{name}」がインポートしているライブラリ（{paths}）を開けなかったため、そのコンポーネントはプレースホルダーとして表示されます。",
   "unknownVariables": "レイヤーがドキュメントで定義されていない変数を参照しています（{names}）。フォールバック値が使われます。",
   "missingImages": "ドキュメントが指定した画像ファイルが見つかりません（{names}）。その塗りは省略されます。",
+  "unknownNodeTypes": "レイヤーが Pairdraw の知らないノード種別を使用しています（{names}）。プレースホルダーとして表示されます。",
   "viewDiagnostics": "診断を表示",
   "importedDOMCSS": "DOM/CSS ドキュメントをインポートしました。",
   "importDOMCSSFailed": "DOM/CSS をインポートできませんでした: {error}",

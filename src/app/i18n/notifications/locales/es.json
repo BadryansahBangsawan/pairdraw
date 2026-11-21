@@ -12,6 +12,7 @@
   "importedLibrariesUnreadable": "No se pudieron abrir las bibliotecas que importa «{name}» ({paths}), así que sus componentes se muestran como marcadores de posición.",
   "unknownVariables": "Las capas hacen referencia a variables que el documento no define ({names}); usan sus valores de reserva.",
   "missingImages": "Faltan archivos de imagen que el documento menciona ({names}); sus rellenos se omiten.",
+  "unknownNodeTypes": "Las capas usan tipos de nodo que Pairdraw no conoce ({names}); se muestran como marcadores de posición.",
   "viewDiagnostics": "Ver diagnóstico",
   "importedDOMCSS": "Documento DOM/CSS importado.",
   "importDOMCSSFailed": "No se pudo importar DOM/CSS: {error}",

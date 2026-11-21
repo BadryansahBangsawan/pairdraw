@@ -67,6 +67,12 @@ export type ReadDocumentWarning =
       /** The URLs as the document writes them. */
       urls: string[]
     }
+  | {
+      /** Node types this reader does not know, which read as placeholder frames. */
+      kind: 'unknown-node'
+      /** The type names as the document writes them. */
+      types: string[]
+    }
 
 export interface ReadDocumentResult {
   graph: SceneGraph

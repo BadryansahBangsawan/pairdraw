@@ -165,6 +165,7 @@ export const penFormat: IOFormatAdapter<'pen'> = {
     // cannot read draws as placeholders the warnings tell the host about.
     const unresolved = new UnresolvedImports()
     const unknownVariables = new Set<string>()
+    const unknownNodes = new Set<string>()
     const { imports, opened } = await loadPenImports(doc, input, unresolved)
     const importsIncomplete = unresolved.warnings().length > 0
     const assets = penAssets(withUsedImports(doc, imports))
@@ -187,6 +188,7 @@ export const penFormat: IOFormatAdapter<'pen'> = {
         if (name.includes(':') && importsIncomplete) return
         unknownVariables.add(name)
       },
+      onUnknownNodeType: (type) => unknownNodes.add(type),
       layout: (target) =>
         layoutAuthoredNodes(
           target,
@@ -196,7 +198,8 @@ export const penFormat: IOFormatAdapter<'pen'> = {
     const warnings: ReadDocumentWarning[] = [
       ...unresolved.warnings(),
       ...warningList('unknown-variable', 'names', unknownVariables),
-      ...warningList('missing-image', 'urls', missing)
+      ...warningList('missing-image', 'urls', missing),
+      ...warningList('unknown-node', 'types', unknownNodes)
     ]
     return warnings.length > 0
       ? { graph, sourceFormat: 'pen', warnings }

@@ -12,6 +12,7 @@
   "importedLibrariesUnreadable": "无法打开“{name}”导入的库（{paths}），因此其组件显示为占位符。",
   "unknownVariables": "图层引用了文档未定义的变量（{names}）；将使用回退值。",
   "missingImages": "文档指定的图像文件缺失（{names}）；相应填充将被省略。",
+  "unknownNodeTypes": "图层使用了 Pairdraw 无法识别的节点类型（{names}）；将以占位符显示。",
   "viewDiagnostics": "查看诊断",
   "importedDOMCSS": "已导入 DOM/CSS 文档。",
   "importDOMCSSFailed": "无法导入 DOM/CSS：{error}",

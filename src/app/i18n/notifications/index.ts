@@ -41,6 +41,9 @@ const notificationMessageDefaults = {
   missingImages: params(
     'Image files the document names are missing ({names}); their fills are left out.'
   ),
+  unknownNodeTypes: params(
+    'Layers use node types Pairdraw does not know ({names}); they show as placeholders.'
+  ),
   viewDiagnostics: 'View diagnostics',
   importedDOMCSS: 'Imported DOM/CSS document.',
   importDOMCSSFailed: params('Could not import DOM/CSS: {error}'),

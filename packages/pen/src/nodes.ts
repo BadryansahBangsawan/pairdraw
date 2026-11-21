@@ -12,7 +12,7 @@ import type { FontFamilyStyle } from '@pairdraw/scene-graph/font-style'
 import { fillSizingFields } from '@pairdraw/scene-graph/layout'
 import type { Color } from '@pairdraw/scene-graph/primitives'
 
-import { applyAnnotation, createAnnotation, isAnnotation } from './annotations'
+import { ANNOTATION_TYPES, applyAnnotation, createAnnotation, isAnnotation } from './annotations'
 import { convertEffects } from './effects'
 import { ellipseArc } from './geometry'
 import { drawIcon, insideComponent, useIconComponent } from './icons'
@@ -71,6 +71,8 @@ export interface Build {
   placements: Map<string, PenPlacement>
   /** Groups in reading order. */
   groupIds: Set<string>
+  /** Called with a node type the reader does not know. */
+  onUnknownNodeType?: (type: string) => void
   /** The components icons in components are instances of, by glyph and size. */
   iconComponents: Map<string, string>
   /** The page those components are on, added with the first one. */
@@ -98,7 +100,25 @@ function isFlatLine(pen: PenNode, ctx: VarContext): boolean {
   return height.sizing === 'FIXED' && height.value === 0
 }
 
-function sceneType(pen: PenNode, ctx: VarContext): NodeType {
+const KNOWN_PEN_TYPES = new Set([
+  'frame',
+  'line',
+  'rectangle',
+  'ellipse',
+  'polygon',
+  'group',
+  'text',
+  'icon_font',
+  'path',
+  'icon',
+  'sticky',
+  'ref',
+  // The annotation cards read as stickies; they are known types, not placeholders.
+  ...ANNOTATION_TYPES
+])
+
+function sceneType(pen: PenNode, ctx: VarContext, warn?: (type: string) => void): NodeType {
+  if (!KNOWN_PEN_TYPES.has(pen.type)) warn?.(pen.type)
   if (pen.type === 'frame') return pen.reusable ? 'COMPONENT' : 'FRAME'
   if (pen.type === 'line') return isFlatLine(pen, ctx) ? 'LINE' : 'VECTOR'
   if (isAnnotation(pen)) return 'STICKY'
@@ -400,7 +420,7 @@ export function createSceneNode(pen: PenNode, parentId: string, build: Build): s
   const iconInstance = fields.type === 'icon' && insideComponent(build.graph, parentId)
   const leaveTheme = fields.theme ? build.ctx.enterTheme(fields.theme) : undefined
   try {
-    const type = instanceOf || iconInstance ? 'INSTANCE' : sceneType(fields, build.ctx)
+    const type = instanceOf || iconInstance ? 'INSTANCE' : sceneType(fields, build.ctx, build.onUnknownNodeType)
     // An ID a hand-edited file repeats gets a fresh one, so the layer does not replace the first
     // layer with it or become its own parent.
     const id = build.graph.getNode(pen.id) ? build.graph.entityIdMinter()() : pen.id

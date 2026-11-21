@@ -7,7 +7,6 @@ import { createShaderRasterizer } from '@pairdraw/vue/canvas/surface'
 
 import { stopAIEditMotion } from '@/app/ai/motion'
 import { useCollabIdentity } from '@/app/collab/identity'
-import { recordPreparationOutcome } from '@/app/diagnostics'
 import { isEditorStoreInFront } from '@/app/editor/active-store'
 import { resolveFigmaClipboardImages } from '@/app/editor/clipboard/figma-images'
 import { loadFont } from '@/app/editor/fonts'
@@ -20,6 +19,7 @@ import {
   type EditorPreparationEventName,
   type EditorPreparationEvents
 } from '@/app/editor/preparation/events'
+import { recordPreparationOutcomes } from '@/app/editor/preparation/outcomes'
 import { pageProgressUnit, type EditorPreparationHandle } from '@/app/editor/preparation/types'
 import { bindEditorServices } from '@/app/editor/session/bindings'
 import { installDocumentWiring } from '@/app/editor/session/document-wiring'
@@ -80,51 +80,7 @@ function buildEditorStore(initialGraph?: SceneGraph) {
   const recentPages = createRecentPages(editor)
 
   const preparationEvents = createEditorPreparationEvents()
-  const preparationLifecycle = new Map<
-    number,
-    {
-      kind: NonNullable<AppEditorState['preparation']>['kind']
-      phase: NonNullable<AppEditorState['preparation']>['phase']
-      startedAt: number
-    }
-  >()
-  preparationEvents.on('preparation:started', (preparation) => {
-    preparationLifecycle.set(preparation.id, {
-      kind: preparation.kind,
-      phase: preparation.phase,
-      startedAt: preparation.startedAt
-    })
-  })
-  preparationEvents.on('preparation:updated', (preparation) => {
-    const lifecycle = preparationLifecycle.get(preparation.id)
-    if (lifecycle) lifecycle.phase = preparation.phase
-  })
-  preparationEvents.on('preparation:finished', (result) => {
-    const lifecycle = preparationLifecycle.get(result.id)
-    if (!lifecycle) return
-    recordPreparationOutcome({
-      kind: result.kind,
-      outcome: result.status,
-      cancellationReason: result.status === 'cancelled' ? result.reason : null,
-      failureCode: null,
-      terminalPhase: lifecycle.phase,
-      durationMs: performance.now() - lifecycle.startedAt
-    })
-    preparationLifecycle.delete(result.id)
-  })
-  preparationEvents.on('preparation:failed', (failure) => {
-    const lifecycle = preparationLifecycle.get(failure.id)
-    if (!lifecycle) return
-    recordPreparationOutcome({
-      kind: failure.kind,
-      outcome: 'failed',
-      cancellationReason: null,
-      failureCode: failure.code,
-      terminalPhase: lifecycle.phase,
-      durationMs: performance.now() - lifecycle.startedAt
-    })
-    preparationLifecycle.delete(failure.id)
-  })
+  recordPreparationOutcomes(preparationEvents)
   const preparationController = createEditorPreparationController(state, preparationEvents)
   const modules = createEditorStoreModules(
     editor,

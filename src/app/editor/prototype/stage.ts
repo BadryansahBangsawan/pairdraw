@@ -162,7 +162,11 @@ export function usePrototypeStage(store: EditorStore, area: Ref<HTMLCanvasElemen
   function runAction(current: PlaySession, click: PlayClick) {
     const { action } = click
     // A Change to and a Scroll to run on play's copy of the frame, which crossfades or eases it.
-    if (action.type === 'NODE' && action.navigation !== 'NAVIGATE' && action.navigation !== 'OVERLAY') {
+    if (
+      action.type === 'NODE' &&
+      action.navigation !== 'NAVIGATE' &&
+      action.navigation !== 'OVERLAY'
+    ) {
       play.run(click)
       return
     }

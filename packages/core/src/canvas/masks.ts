@@ -31,7 +31,7 @@ function unionBounds(bounds: Array<Rect | null>): Rect | null {
 export function renderMaskedChildIds(
   r: SkiaRenderer,
   canvas: Canvas,
-  childIds: string[],
+  childIds: readonly string[],
   getVisibleMaskType: (childId: string) => MaskType | null,
   renderChild: (childId: string) => void,
   renderMask: (childId: string) => void,

@@ -836,5 +836,9 @@
   "prototypeOverflowVertical": "Vertical",
   "prototypeOverflowHorizontal": "Horizontal",
   "prototypeOverflowBoth": "Ambas direcciones",
-  "prototypeOverflowNeedsClip": "Activa Recortar contenido para que este marco se desplace al reproducir."
+  "prototypeOverflowNeedsClip": "Activa Recortar contenido para que este marco se desplace al reproducir.",
+  "prototypeScrollBehavior": "Posición al desplazar",
+  "prototypeScrollBehaviorScrolls": "Desplazar con el padre",
+  "prototypeScrollBehaviorFixed": "Fijo",
+  "prototypeScrollBehaviorSticky": "Pegajoso"
 }

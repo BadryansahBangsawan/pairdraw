@@ -847,5 +847,9 @@
   "prototypeOverflowVertical": "Pionowo",
   "prototypeOverflowHorizontal": "Poziomo",
   "prototypeOverflowBoth": "W obu kierunkach",
-  "prototypeOverflowNeedsClip": "Włącz Przytnij zawartość, aby ta ramka przewijała się podczas odtwarzania."
+  "prototypeOverflowNeedsClip": "Włącz Przytnij zawartość, aby ta ramka przewijała się podczas odtwarzania.",
+  "prototypeScrollBehavior": "Pozycja podczas przewijania",
+  "prototypeScrollBehaviorScrolls": "Przewijaj z rodzicem",
+  "prototypeScrollBehaviorFixed": "Stała",
+  "prototypeScrollBehaviorSticky": "Przyklejona"
 }

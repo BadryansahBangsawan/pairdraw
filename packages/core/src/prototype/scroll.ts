@@ -10,7 +10,7 @@ const NO_SCROLL: Vector = { x: 0, y: 0 }
  * Whether play scrolls a frame's content inside it: a frame, component, or instance with overflow
  * scrolling that clips, as Figma needs for a frame inside another. A rotated one does not scroll.
  */
-function scrolls(node: SceneNode): boolean {
+export function scrollsInPlay(node: SceneNode): boolean {
   return (
     (node.type === 'FRAME' || node.type === 'COMPONENT' || node.type === 'INSTANCE') &&
     node.overflowDirection !== 'NONE' &&
@@ -25,7 +25,7 @@ function scrolls(node: SceneNode): boolean {
  */
 export function scrollRange(graph: SceneGraph, nodeId: string): Vector {
   const node = graph.getNode(nodeId)
-  if (!node || !scrolls(node)) return NO_SCROLL
+  if (!node || !scrollsInPlay(node)) return NO_SCROLL
   const frame = getAxisAlignedWorldBounds(node, graph)
   let right = 0
   let bottom = 0
@@ -125,4 +125,64 @@ export function scrollIntoView(
     return frame.id === rootId
   })
   return { scrolled, reveal: { x: place.x - shiftX, y: place.y - shiftY } }
+}
+
+/**
+ * How far a layer is counter-shifted when it opts out of its frame's scroll: all of the offset
+ * for a fixed layer, and only the part past its own start for a sticky one, so it scrolls until
+ * it reaches the frame's top or left edge and then stays there.
+ */
+function scrollShift(
+  node: Pick<SceneNode, 'scrollBehavior' | 'x' | 'y'>,
+  scroll: Vector | undefined,
+  axis: 'x' | 'y'
+): number {
+  if (!scroll || node.scrollBehavior === 'SCROLLS') return 0
+  if (node.scrollBehavior === 'FIXED') return scroll[axis]
+  return Math.max(0, scroll[axis] - node[axis])
+}
+
+export function scrollShiftX(
+  node: Pick<SceneNode, 'scrollBehavior' | 'x' | 'y'>,
+  scroll: Vector | undefined
+): number {
+  return scrollShift(node, scroll, 'x')
+}
+
+export function scrollShiftY(
+  node: Pick<SceneNode, 'scrollBehavior' | 'x' | 'y'>,
+  scroll: Vector | undefined
+): number {
+  return scrollShift(node, scroll, 'y')
+}
+
+/**
+ * The children of a frame play scrolled, in the order they draw: the layers that scroll with the
+ * content first, then the fixed and sticky ones above them, as Figma lifts fixed children over the
+ * scrolling content. Each group keeps its layer order. A mask and the layers it masks are never
+ * lifted, so a mask run stays together; without an offset, or with nothing to lift, the order is
+ * the one given.
+ */
+export function liftedChildIds(
+  graph: SceneGraph,
+  childIds: readonly string[],
+  scroll: Vector | undefined
+): readonly string[] {
+  if (!scroll) return childIds
+  const nodes = childIds.map((id) => graph.getNode(id))
+  const lifts = nodes.map((node) => node !== undefined && !node.isMask && node.scrollBehavior !== 'SCROLLS')
+  if (!lifts.some(Boolean)) return childIds
+  // A mask belongs to the layers after it until the next mask; a lifted layer inside a mask run
+  // stays in the run so the mask still clips it.
+  let masked = false
+  const lift = nodes.map((node, index) => {
+    if (node?.isMask) masked = true
+    return lifts[index] && !masked
+  })
+  const scrolling: string[] = []
+  const staying: string[] = []
+  for (let index = 0; index < childIds.length; index++) {
+    ;(lift[index] ? staying : scrolling).push(childIds[index])
+  }
+  return [...scrolling, ...staying]
 }

@@ -825,5 +825,9 @@
   "prototypeOverflowVertical": "縦",
   "prototypeOverflowHorizontal": "横",
   "prototypeOverflowBoth": "両方向",
-  "prototypeOverflowNeedsClip": "再生中にこのフレームをスクロールするには「コンテンツをクリップ」をオンにしてください。"
+  "prototypeOverflowNeedsClip": "再生中にこのフレームをスクロールするには「コンテンツをクリップ」をオンにしてください。",
+  "prototypeScrollBehavior": "スクロール時の位置",
+  "prototypeScrollBehaviorScrolls": "親と一緒にスクロール",
+  "prototypeScrollBehaviorFixed": "固定",
+  "prototypeScrollBehaviorSticky": "スティッキー"
 }

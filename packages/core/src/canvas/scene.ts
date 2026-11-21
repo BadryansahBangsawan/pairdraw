@@ -17,10 +17,11 @@ import {
 import { blurSigma } from '@pairdraw/scene-graph/geometry'
 import { drawnChildIds } from '@pairdraw/scene-graph/layout'
 import Matrix from '@pairdraw/scene-graph/matrix'
-import type { Color } from '@pairdraw/scene-graph/primitives'
+import type { Color, Vector } from '@pairdraw/scene-graph/primitives'
 import { textLinesReach, textVerticalOffset } from '@pairdraw/scene-graph/text'
 
 import { createSceneGeometry, nodeOrientationMatrix, projectedNode } from '#core/geometry'
+import { liftedChildIds, scrollShiftX, scrollShiftY } from '#core/prototype/scroll'
 import { shownText } from '#core/text/case'
 import { mayHoldEmoji } from '#core/text/emoji'
 import { fontManager } from '#core/text/font/manager'
@@ -221,24 +222,62 @@ export function renderChildIds(
   overlays: RenderOverlays,
   absX: number,
   absY: number,
-  hasTransformedAncestor: boolean
+  hasTransformedAncestor: boolean,
+  scroll?: Vector
 ): void {
   renderMaskedChildIds(
     r,
     canvas,
-    childIds,
+    liftedChildIds(graph, childIds, scroll),
     (childId) => {
       const child = graph.getNode(childId)
       return child?.visible && child.isMask ? child.maskType : null
     },
-    (childId) => r.renderNode(canvas, graph, childId, overlays, absX, absY, hasTransformedAncestor),
     (childId) => {
       const child = graph.getNode(childId)
-      if (child) renderMaskNodeContent(r, canvas, graph, child, overlays, absX, absY)
+      const shiftX = child ? scrollShiftX(child, scroll) : 0
+      const shiftY = child ? scrollShiftY(child, scroll) : 0
+      if (shiftX !== 0 || shiftY !== 0) {
+        canvas.save()
+        canvas.translate(shiftX, shiftY)
+      }
+      r.renderNode(
+        canvas,
+        graph,
+        childId,
+        overlays,
+        absX + shiftX,
+        absY + shiftY,
+        hasTransformedAncestor
+      )
+      if (shiftX !== 0 || shiftY !== 0) canvas.restore()
+    },
+    (childId) => {
+      const child = graph.getNode(childId)
+      if (child) {
+        const shiftX = scrollShiftX(child, scroll)
+        const shiftY = scrollShiftY(child, scroll)
+        if (shiftX !== 0 || shiftY !== 0) {
+          canvas.save()
+          canvas.translate(shiftX, shiftY)
+        }
+        renderMaskNodeContent(
+          r,
+          canvas,
+          graph,
+          child,
+          overlays,
+          absX + shiftX,
+          absY + shiftY
+        )
+        if (shiftX !== 0 || shiftY !== 0) canvas.restore()
+      }
     },
     (childId) => {
       const child = graph.getNode(childId)
       if (!child) return null
+      const shiftX = scrollShiftX(child, scroll)
+      const shiftY = scrollShiftY(child, scroll)
       // A mask covers what its silhouette does: a text's lines run past a fixed-size box.
       const silhouette = silhouetteBounds(graph, child, false) ?? {
         x: 0,
@@ -247,8 +286,8 @@ export function renderChildIds(
         height: child.height
       }
       return {
-        x: child.x + silhouette.x,
-        y: child.y + silhouette.y,
+        x: child.x + silhouette.x + shiftX,
+        y: child.y + silhouette.y + shiftY,
         width: silhouette.width,
         height: silhouette.height
       }
@@ -278,7 +317,17 @@ function renderChildren(
     if (scrolled) canvas.translate(-scrolled.x, -scrolled.y)
     const contentX = absX - (scrolled?.x ?? 0)
     const contentY = absY - (scrolled?.y ?? 0)
-    renderChildIds(r, canvas, graph, childIds, overlays, contentX, contentY, hasTransformedAncestor)
+    renderChildIds(
+      r,
+      canvas,
+      graph,
+      childIds,
+      overlays,
+      contentX,
+      contentY,
+      hasTransformedAncestor,
+      scrolled
+    )
     canvas.restore()
   } else {
     renderChildIds(r, canvas, graph, childIds, overlays, absX, absY, hasTransformedAncestor)

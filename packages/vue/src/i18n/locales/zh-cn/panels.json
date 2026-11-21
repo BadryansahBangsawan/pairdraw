@@ -825,5 +825,9 @@
   "prototypeOverflowVertical": "垂直",
   "prototypeOverflowHorizontal": "水平",
   "prototypeOverflowBoth": "双向",
-  "prototypeOverflowNeedsClip": "开启“裁剪内容”后，此画框才能在播放时滚动。"
+  "prototypeOverflowNeedsClip": "开启“裁剪内容”后，此画框才能在播放时滚动。",
+  "prototypeScrollBehavior": "滚动时位置",
+  "prototypeScrollBehaviorScrolls": "随父级滚动",
+  "prototypeScrollBehaviorFixed": "固定",
+  "prototypeScrollBehaviorSticky": "粘性"
 }

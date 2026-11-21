@@ -33,6 +33,7 @@ An **After delay** on a variant runs on each instance once it shows that variant
 Select a frame, component, or instance, and set **Overflow scrolling** in the Prototype section to **Vertical**, **Horizontal**, or **Both directions**.
 
 - A frame inside a screen scrolls when its content reaches past its edge and it clips its content. With **Clip content** off, the section says so.
+- A layer inside a scrolling frame has **Position when scrolling** in the Prototype section: **Scroll with parent** (the default), **Fixed** to stay in the frame, or **Sticky** to scroll until it reaches the frame's top or left edge and stay there. A layer in an instance can carry its own behavior as an override.
 - A screen that scrolls vertically and is taller than the window plays fitted to its width, and the canvas pans through the rest; one that scrolls sideways and is wider plays fitted to its height.
 
 In play the wheel, or a drag, scrolls the innermost frame under the pointer that can move that way, then the next one out; what none of them can take pans the canvas. A drag that scrolled runs no click. Ctrl or ⌘ with the wheel still zooms.
@@ -73,7 +74,7 @@ A click that hits no interaction, or lands outside the frame, does nothing. A la
 - An overlay always opens fitted to the window, like a frame. The panel offers no corner position, and play ignores the position a file stores.
 - A While hovering that navigates is not undone: the frame stays until Back, as the new frame covers the layer the pointer would leave.
 - Dissolve is the only animation besides Instant. Smart animate from a Figma file plays as a dissolve and is kept when the file is saved, as is Figma's animated scroll on a Scroll to. A Scroll to set to Dissolve in Pairdraw eases in play but is saved to `.fig` as instant, since which animation Figma reads for one is not confirmed.
-- Fixed and sticky layers in a scrolling frame scroll with it, and Scroll to ignores the offset a Figma file stores.
+- Scroll to ignores the offset a Figma file stores.
 - A frame that holds live controls is drawn by Preview, so a Change to or scrolling inside it does not show.
 - Navigating to the frame already shown, or opening it as an overlay over itself, does nothing.
 

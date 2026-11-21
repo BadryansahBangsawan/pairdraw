@@ -18,7 +18,7 @@ export {
   type PlayScene,
   type PlaySceneView
 } from './scene'
-export { scrollRange, type ScrollChange } from './scroll'
+export { scrollRange, scrollsInPlay, type ScrollChange } from './scroll'
 export { snapshotPlayFrame } from './snapshot'
 export {
   PLAY_SCENE_LIMIT,

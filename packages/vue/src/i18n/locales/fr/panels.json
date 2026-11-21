@@ -836,5 +836,9 @@
   "prototypeOverflowVertical": "Vertical",
   "prototypeOverflowHorizontal": "Horizontal",
   "prototypeOverflowBoth": "Les deux directions",
-  "prototypeOverflowNeedsClip": "Activez Rogner le contenu pour faire défiler ce cadre pendant la lecture."
+  "prototypeOverflowNeedsClip": "Activez Rogner le contenu pour faire défiler ce cadre pendant la lecture.",
+  "prototypeScrollBehavior": "Position au défilement",
+  "prototypeScrollBehaviorScrolls": "Défiler avec le parent",
+  "prototypeScrollBehaviorFixed": "Fixe",
+  "prototypeScrollBehaviorSticky": "Collant"
 }

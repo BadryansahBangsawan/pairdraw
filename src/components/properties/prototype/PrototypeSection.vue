@@ -7,7 +7,8 @@ import type {
   PrototypeNodeAction,
   PrototypeReaction,
   PrototypeTransitionType,
-  PrototypeTriggerType
+  PrototypeTriggerType,
+  ScrollBehavior
 } from '@pairdraw/scene-graph'
 import { useI18n } from '@pairdraw/vue/i18n'
 
@@ -33,6 +34,9 @@ const {
   overflow,
   scrollNeedsClip,
   setOverflow,
+  scrollPositionable,
+  scrollBehavior,
+  setScrollBehavior,
   play,
   add,
   remove,
@@ -100,6 +104,12 @@ const overflowOptions = computed<{ value: OverflowDirection; label: string }[]>(
   { value: 'BOTH', label: panels.value.prototypeOverflowBoth }
 ])
 
+const scrollBehaviorOptions = computed<{ value: ScrollBehavior; label: string }[]>(() => [
+  { value: 'SCROLLS', label: panels.value.prototypeScrollBehaviorScrolls },
+  { value: 'FIXED', label: panels.value.prototypeScrollBehaviorFixed },
+  { value: 'STICKY_SCROLLS', label: panels.value.prototypeScrollBehaviorSticky }
+])
+
 const transitionOptions = computed<{ value: PrototypeTransitionType; label: string }[]>(() => [
   { value: 'INSTANT', label: panels.value.prototypeAnimationInstant },
   { value: 'DISSOLVE', label: panels.value.prototypeAnimationDissolve }
@@ -158,6 +168,20 @@ function node(reaction: PrototypeReaction): PrototypeNodeAction | null {
       <p v-if="scrollNeedsClip" class="px-2 text-[11px] text-muted">
         {{ panels.prototypeOverflowNeedsClip }}
       </p>
+    </div>
+
+    <div v-if="scrollPositionable" class="flex min-w-0 items-center gap-1.5 pb-1.5">
+      <span class="shrink-0 px-2 text-[11px] text-muted">
+        {{ panels.prototypeScrollBehavior }}
+      </span>
+      <AppSelect
+        :model-value="scrollBehavior"
+        :options="scrollBehaviorOptions"
+        :label="panels.prototypeScrollBehavior"
+        data-property="prototype-scroll-behavior"
+        class="min-w-0 flex-1"
+        @update:model-value="(value: ScrollBehavior) => setScrollBehavior(value)"
+      />
     </div>
 
     <button

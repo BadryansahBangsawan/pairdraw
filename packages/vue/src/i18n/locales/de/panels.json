@@ -836,5 +836,9 @@
   "prototypeOverflowVertical": "Vertikal",
   "prototypeOverflowHorizontal": "Horizontal",
   "prototypeOverflowBoth": "Beide Richtungen",
-  "prototypeOverflowNeedsClip": "Aktiviere „Inhalt zuschneiden“, damit dieser Frame beim Abspielen scrollt."
+  "prototypeOverflowNeedsClip": "Aktiviere „Inhalt zuschneiden“, damit dieser Frame beim Abspielen scrollt.",
+  "prototypeScrollBehavior": "Position beim Scrollen",
+  "prototypeScrollBehaviorScrolls": "Mit übergeordnetem Frame scrollen",
+  "prototypeScrollBehaviorFixed": "Fixiert",
+  "prototypeScrollBehaviorSticky": "Haftend"
 }

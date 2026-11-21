@@ -852,7 +852,11 @@ export const panelMessageDefaults = {
   prototypeOverflowVertical: 'Vertical',
   prototypeOverflowHorizontal: 'Horizontal',
   prototypeOverflowBoth: 'Both directions',
-  prototypeOverflowNeedsClip: 'Turn on Clip content to scroll this frame in play.'
+  prototypeOverflowNeedsClip: 'Turn on Clip content to scroll this frame in play.',
+  prototypeScrollBehavior: 'Position when scrolling',
+  prototypeScrollBehaviorScrolls: 'Scroll with parent',
+  prototypeScrollBehaviorFixed: 'Fixed',
+  prototypeScrollBehaviorSticky: 'Sticky'
 } as const
 
 export const panelMessages = i18n('panels', panelMessageDefaults)

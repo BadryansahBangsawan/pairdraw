@@ -8,6 +8,8 @@ import {
 import { drawnChildIds } from '@pairdraw/scene-graph/layout'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
+import { liftedChildIds, scrollShiftX, scrollShiftY } from '#core/prototype/scroll'
+
 const NOT_SCROLLED: ReadonlyMap<string, Vector> = new Map()
 
 /** Every layer may take the pointer. */
@@ -46,20 +48,23 @@ function deepestIn(
   takes: (node: SceneNode) => boolean
 ): SceneNode | null {
   if (parent.clipsContent && !isPointInNode(graph, parent.id, x, y)) return null
-  // The layers of a scrolled frame are drawn moved up and left by its offset.
+  // The layers of a scrolled frame are drawn moved up and left by its offset, except the ones
+  // that stay put; their point moves with the offset they skip.
   const offset = scroll.get(parent.id)
   const innerX = x + (offset?.x ?? 0)
   const innerY = y + (offset?.y ?? 0)
-  const drawn = drawnChildIds(parent)
+  const drawn = liftedChildIds(graph, drawnChildIds(parent), offset)
   const masks = clippingMasks(graph, drawn)
   for (let index = drawn.length - 1; index >= 0; index--) {
     const child = graph.getNode(drawn[index])
     if (!child?.visible || child.internalOnly || child.isMask) continue
     if (isPointMaskedOut(graph, masks[index], innerX, innerY)) continue
-    const hit = deepestIn(graph, child, innerX, innerY, scroll, takes)
+    const childX = innerX - scrollShiftX(child, offset)
+    const childY = innerY - scrollShiftY(child, offset)
+    const hit = deepestIn(graph, child, childX, childY, scroll, takes)
     if (hit) return hit
     const captures = takes(child) || showsPaint(child)
-    if (captures && isPointInNode(graph, child.id, innerX, innerY)) return child
+    if (captures && isPointInNode(graph, child.id, childX, childY)) return child
   }
   return null
 }

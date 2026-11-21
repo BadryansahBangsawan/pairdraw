@@ -145,6 +145,81 @@ describe('a frame play scrolled', () => {
     // The red row moved above the list, where the list clips it away.
     expect(colorAt(graph, frame.id, scenes, 50, 10)).toEqual([255, 255, 255])
   })
+
+  test('keeps fixed and sticky layers in place over scrolled content', () => {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const frame = graph.createNode('FRAME', pageId, {
+      width: 100,
+      height: 100,
+      fills: [solid(1, 1, 1)]
+    })
+    const list = graph.createNode('FRAME', frame.id, {
+      width: 100,
+      height: 100,
+      clipsContent: true,
+      overflowDirection: 'VERTICAL',
+      fills: []
+    })
+    graph.createNode('RECTANGLE', list.id, { width: 100, height: 200, fills: [solid(1, 0, 0)] })
+    graph.createNode('RECTANGLE', list.id, {
+      width: 50,
+      height: 10,
+      fills: [solid(0, 0, 1)],
+      scrollBehavior: 'FIXED'
+    })
+    graph.createNode('RECTANGLE', list.id, {
+      x: 50,
+      width: 50,
+      height: 10,
+      y: 60,
+      fills: [solid(0, 1, 0)],
+      scrollBehavior: 'STICKY_SCROLLS'
+    })
+    const scenes = createPlayScenes(() => graph)
+    scenes.scrollBy(frame.id, [frame.id, list.id], 0, 100)
+    expect(colorAt(graph, frame.id, scenes, 20, 5)).toEqual([0, 0, 255])
+    expect(colorAt(graph, frame.id, scenes, 70, 5)).toEqual([0, 255, 0])
+    expect(colorAt(graph, frame.id, scenes, 70, 60)).toEqual([255, 0, 0])
+  })
+
+  test('draws fixed and sticky layers above the content that scrolls under them', () => {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const frame = graph.createNode('FRAME', pageId, {
+      width: 100,
+      height: 100,
+      fills: [solid(1, 1, 1)]
+    })
+    const list = graph.createNode('FRAME', frame.id, {
+      width: 100,
+      height: 100,
+      clipsContent: true,
+      overflowDirection: 'VERTICAL',
+      fills: []
+    })
+    // The header comes first in the layer list, the content after it, as a person builds a screen.
+    graph.createNode('RECTANGLE', list.id, {
+      width: 50,
+      height: 10,
+      fills: [solid(0, 0, 1)],
+      scrollBehavior: 'FIXED'
+    })
+    graph.createNode('RECTANGLE', list.id, {
+      x: 50,
+      width: 50,
+      height: 10,
+      y: 60,
+      fills: [solid(0, 1, 0)],
+      scrollBehavior: 'STICKY_SCROLLS'
+    })
+    graph.createNode('RECTANGLE', list.id, { width: 100, height: 200, fills: [solid(1, 0, 0)] })
+    const scenes = createPlayScenes(() => graph)
+    scenes.scrollBy(frame.id, [frame.id, list.id], 0, 100)
+    expect(colorAt(graph, frame.id, scenes, 20, 5)).toEqual([0, 0, 255])
+    expect(colorAt(graph, frame.id, scenes, 70, 5)).toEqual([0, 255, 0])
+    expect(colorAt(graph, frame.id, scenes, 70, 60)).toEqual([255, 0, 0])
+  })
 })
 
 /** The colour at (x, y) of a PNG, as [r, g, b]. */

@@ -1,11 +1,12 @@
 import { computed } from 'vue'
 
-import { asInstanceEdit, framesOnPage } from '@pairdraw/core/prototype'
+import { asInstanceEdit, framesOnPage, scrollsInPlay } from '@pairdraw/core/prototype'
 import type {
   OverflowDirection,
   PrototypeReaction,
   PrototypeTransitionType,
-  PrototypeTriggerType
+  PrototypeTriggerType,
+  ScrollBehavior
 } from '@pairdraw/scene-graph'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 import { useSelectionState } from '@pairdraw/vue/editor/selection-state'
@@ -85,6 +86,19 @@ export function usePrototype() {
     store.updateNodeWithUndo(node.id, { overflowDirection }, 'Change overflow scrolling')
   }
 
+  /** Whether this layer sits in a frame play scrolls, where its own scroll behavior matters. */
+  const scrollPositionable = useSceneComputed(() => {
+    const node = selectedNode.value
+    const parent = node ? store.graph.getNode(node.parentId ?? '') : undefined
+    return parent !== undefined && scrollsInPlay(parent)
+  })
+
+  function setScrollBehavior(scrollBehavior: ScrollBehavior) {
+    const node = selectedNode.value
+    if (!node || node.scrollBehavior === scrollBehavior) return
+    store.updateNodeWithUndo(node.id, { scrollBehavior }, 'Change position when scrolling')
+  }
+
   /** Selects the main component of the selected instance, where its inherited interactions live. */
   function selectMain() {
     const node = selectedNode.value
@@ -121,6 +135,9 @@ export function usePrototype() {
     overflow: computed(() => selectedNode.value?.overflowDirection ?? 'NONE'),
     scrollNeedsClip,
     setOverflow,
+    scrollPositionable,
+    scrollBehavior: computed(() => selectedNode.value?.scrollBehavior ?? 'SCROLLS'),
+    setScrollBehavior,
     play: () => store.startPlay(),
     add: () => commit(withReaction(reactions.value, createReaction()), 'Add interaction'),
     remove: (id: string) => commit(withoutReaction(reactions.value, id), 'Remove interaction'),

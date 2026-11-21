@@ -836,5 +836,9 @@
   "prototypeOverflowVertical": "Verticale",
   "prototypeOverflowHorizontal": "Orizzontale",
   "prototypeOverflowBoth": "Entrambe le direzioni",
-  "prototypeOverflowNeedsClip": "Attiva Ritaglia contenuto per far scorrere questo frame durante la riproduzione."
+  "prototypeOverflowNeedsClip": "Attiva Ritaglia contenuto per far scorrere questo frame durante la riproduzione.",
+  "prototypeScrollBehavior": "Posizione durante lo scorrimento",
+  "prototypeScrollBehaviorScrolls": "Scorri con il genitore",
+  "prototypeScrollBehaviorFixed": "Fisso",
+  "prototypeScrollBehaviorSticky": "Appiccicoso"
 }

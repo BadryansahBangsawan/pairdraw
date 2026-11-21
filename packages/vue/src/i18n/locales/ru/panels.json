@@ -847,5 +847,9 @@
   "prototypeOverflowVertical": "По вертикали",
   "prototypeOverflowHorizontal": "По горизонтали",
   "prototypeOverflowBoth": "В обоих направлениях",
-  "prototypeOverflowNeedsClip": "Включите «Обрезать содержимое», чтобы этот фрейм прокручивался при воспроизведении."
+  "prototypeOverflowNeedsClip": "Включите «Обрезать содержимое», чтобы этот фрейм прокручивался при воспроизведении.",
+  "prototypeScrollBehavior": "Положение при прокрутке",
+  "prototypeScrollBehaviorScrolls": "Прокручивать с родителем",
+  "prototypeScrollBehaviorFixed": "Фиксировано",
+  "prototypeScrollBehaviorSticky": "Прилипает"
 }

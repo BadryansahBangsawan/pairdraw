@@ -6,6 +6,7 @@ import {
   pointerPath,
   reactionAt,
   scrollRange,
+  scrollsInPlay,
   startSession
 } from '@pairdraw/core/prototype'
 import { SceneGraph, type OverflowDirection } from '@pairdraw/scene-graph'
@@ -71,6 +72,22 @@ describe('scroll ranges', () => {
     graph.updateNode(list.id, { overflowDirection: 'BOTH', clipsContent: false })
     expect(scrollRange(graph, list.id)).toEqual({ x: 0, y: 0 })
   })
+
+  test('a frame scrolls in play only when it clips, is unrotated, and can hold content', () => {
+    const { graph, list } = listScreen()
+    const node = () => {
+      const found = graph.getNode(list.id)
+      if (!found) throw new Error('list missing')
+      return found
+    }
+    expect(scrollsInPlay(node())).toBe(true)
+    graph.updateNode(list.id, { clipsContent: false })
+    expect(scrollsInPlay(node())).toBe(false)
+    graph.updateNode(list.id, { clipsContent: true, rotation: 15 })
+    expect(scrollsInPlay(node())).toBe(false)
+    graph.updateNode(list.id, { rotation: 0, overflowDirection: 'NONE' })
+    expect(scrollsInPlay(node())).toBe(false)
+  })
 })
 
 describe('scrolling in play', () => {
@@ -112,6 +129,81 @@ describe('scrolling in play', () => {
     expect(
       reactionAt(graph, startSession(screen.id), 150, 60, 'ON_CLICK', scenes.scroll)?.sourceId
     ).toBe(rows[2].id)
+  })
+
+  test('finds fixed and sticky layers where they are drawn', () => {
+    const { graph, screen, list } = listScreen()
+    const nav = graph.createNode('RECTANGLE', list.id, {
+      name: 'Nav',
+      y: 0,
+      width: 100,
+      height: 20,
+      scrollBehavior: 'FIXED'
+    })
+    const title = graph.createNode('RECTANGLE', list.id, {
+      name: 'Title',
+      x: 100,
+      y: 60,
+      width: 100,
+      height: 20,
+      scrollBehavior: 'STICKY_SCROLLS'
+    })
+    const scenes = createPlayScenes(() => graph)
+    scenes.scrollBy(screen.id, [screen.id, list.id], 0, 100)
+    // The nav stays over the list's top edge; the title sticks once its own top reaches it.
+    expect(playHitTest(graph, screen.id, 50, 55, scenes.scroll)?.id).toBe(nav.id)
+    expect(playHitTest(graph, screen.id, 150, 55, scenes.scroll)?.id).toBe(title.id)
+    // Below the sticky title the scrolled rows keep their usual places.
+    expect(playHitTest(graph, screen.id, 150, 120, scenes.scroll)?.id).toBeDefined()
+  })
+
+  test('a scrolling row does not move a fixed layer inside it', () => {
+    const { graph, screen, list } = listScreen()
+    const nav = graph.createNode('RECTANGLE', list.id, {
+      width: 200,
+      height: 20,
+      scrollBehavior: 'FIXED'
+    })
+    const scenes = createPlayScenes(() => graph)
+    scenes.scrollBy(screen.id, [screen.id, list.id], 0, 80)
+    expect(playHitTest(graph, screen.id, 150, 55, scenes.scroll)?.id).toBe(nav.id)
+  })
+
+  test('finds a fixed or sticky header over the rows that scroll under it', () => {
+    const graph = new SceneGraph()
+    const pageId = graph.getPages()[0].id
+    const screen = graph.createNode('FRAME', pageId, { name: 'Screen', width: 200, height: 300 })
+    const list = graph.createNode('FRAME', screen.id, {
+      name: 'List',
+      y: 50,
+      width: 200,
+      height: 100,
+      clipsContent: true,
+      overflowDirection: 'VERTICAL'
+    })
+    // The header is the first layer, the rows come after it, as a person builds a screen.
+    const nav = graph.createNode('RECTANGLE', list.id, {
+      name: 'Nav',
+      width: 100,
+      height: 20,
+      scrollBehavior: 'FIXED'
+    })
+    const title = graph.createNode('RECTANGLE', list.id, {
+      name: 'Title',
+      x: 100,
+      y: 60,
+      width: 100,
+      height: 20,
+      scrollBehavior: 'STICKY_SCROLLS'
+    })
+    const rows = [0, 1, 2, 3, 4].map((index) =>
+      graph.createNode('FRAME', list.id, { name: `Row ${index}`, y: index * 40, width: 200, height: 40 })
+    )
+    const scenes = createPlayScenes(() => graph)
+    scenes.scrollBy(screen.id, [screen.id, list.id], 0, 100)
+    expect(playHitTest(graph, screen.id, 50, 55, scenes.scroll)?.id).toBe(nav.id)
+    expect(playHitTest(graph, screen.id, 150, 55, scenes.scroll)?.id).toBe(title.id)
+    expect(playHitTest(graph, screen.id, 150, 120, scenes.scroll)?.id).toBe(rows[4].id)
   })
 
   test('Reset puts every frame back at the top', () => {

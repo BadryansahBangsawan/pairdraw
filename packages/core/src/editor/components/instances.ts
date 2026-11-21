@@ -8,12 +8,16 @@ import {
 import Matrix from '@pairdraw/scene-graph/matrix'
 import type { Vector } from '@pairdraw/scene-graph/primitives'
 
+import { getNodeEditCapability } from '#core/editor/capabilities'
 import { prepareSlotEdits } from '#core/editor/components/slots'
 import { recordSubtreeEdit } from '#core/editor/components/slots/history'
+import { recordEdit } from '#core/editor/history/edit'
 import { restoreSubtree, snapshotSubtree } from '#core/editor/history/subtree'
 import type { EditorContext } from '#core/editor/types'
 import {
+  canPushInstanceOverrides as canPushInstanceOverridesInGraph,
   instanceOverrides,
+  pushInstanceOverrides as pushInstanceOverridesInGraph,
   resetInstanceOverrides as resetInstanceOverridesInGraph
 } from '#core/figma-api/overrides'
 
@@ -179,10 +183,37 @@ export function createComponentInstanceActions(ctx: EditorContext) {
     )
   }
 
+  /** Whether a library owns the main component, whose changes only its library can take. */
+  function mainComponentEditable(componentId: string): boolean {
+    return getNodeEditCapability(ctx.graph, componentId).editable
+  }
+
+  /**
+   * Figma's Push changes to main component: the instance's edits move to its main component,
+   * and the instance follows them. A library's main component cannot take them.
+   */
+  function canPushInstanceOverrides(id: string): boolean {
+    const node = ctx.graph.getNode(id)
+    return (
+      node?.type === 'INSTANCE' &&
+      canPushInstanceOverridesInGraph(ctx.graph, node, mainComponentEditable)
+    )
+  }
+
+  function pushInstanceOverridesFromSelection(id: string): boolean {
+    const node = ctx.graph.getNode(id)
+    if (node?.type !== 'INSTANCE' || !canPushInstanceOverrides(id)) return false
+    return recordEdit(ctx, { label: 'Push changes to main component' }, () =>
+      pushInstanceOverridesInGraph(ctx.graph, node, mainComponentEditable)
+    )
+  }
+
   return {
     createInstanceFromComponent,
     detachInstance,
     instanceHasOverrides,
+    canPushInstanceOverrides,
+    pushInstanceOverrides: pushInstanceOverridesFromSelection,
     resetInstanceOverrides: resetInstanceOverridesFromSelection
   }
 }

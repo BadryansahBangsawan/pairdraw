@@ -9,7 +9,10 @@ import type {
 } from '@pairdraw/scene-graph'
 import { findInstanceAncestor, isReplacedLayer } from '@pairdraw/scene-graph/instances'
 import {
+  overriddenAssignmentId,
+  overriddenBindingField,
   overriddenVariableModeCollection,
+  REPLACED_LAYER_OVERRIDE,
   type InstanceOverrideState
 } from '@pairdraw/scene-graph/instances/overrides'
 
@@ -150,11 +153,79 @@ function figmaFields(fields: Iterable<string>, skipped: Set<string>): string[] {
  * instance links to the component's instance it copies, until a swap points it at a component;
  * the enclosing instance then keeps the layer it copied.
  */
-function componentLayer(graph: SceneGraph, node: SceneNode, owner: SceneNode | undefined) {
+function componentLayer(
+  graph: SceneGraph,
+  node: SceneNode,
+  owner: SceneNode | undefined
+): SceneNode | undefined {
   const linked = node.componentId ? graph.getNode(node.componentId) : undefined
-  if (node.type !== 'INSTANCE' || linked?.type === 'INSTANCE') return linked
+  if (node.type !== 'INSTANCE' || linked?.type === 'INSTANCE') {
+    return linked ? resolveCopiedLayer(graph, linked) : linked
+  }
   const source = owner?.instanceOverrides.descendants.get(node.id)?.get('sourceComponentId')
-  return typeof source === 'string' ? graph.getNode(source) : undefined
+  if (typeof source === 'string') return graph.getNode(source)
+  return componentLayerByName(graph, node, owner)
+}
+
+/**
+ * A copy inside a nested instance links to the enclosing component's copy, which in turn links
+ * to the nested component's layer. Follow that chain to the layer an edit belongs to.
+ */
+function resolveCopiedLayer(graph: SceneGraph, linked: SceneNode): SceneNode {
+  let target = linked
+  for (let depth = 0; depth < 32 && target.componentId; depth++) {
+    const parent = target.parentId ? graph.getNode(target.parentId) : undefined
+    if (parent?.type !== 'INSTANCE') break
+    const next = graph.getNode(target.componentId)
+    if (!next) break
+    target = next
+  }
+  return target
+}
+
+/**
+ * A copy made by cloning carries no link to its source, so match the path from its instance to
+ * the instance's component by sibling position and name.
+ */
+function componentLayerByName(
+  graph: SceneGraph,
+  node: SceneNode,
+  owner: SceneNode | undefined
+): SceneNode | undefined {
+  if (owner?.type !== 'INSTANCE' || !owner.componentId) return undefined
+  const path: SceneNode[] = []
+  let current: SceneNode | undefined = node
+  while (current && current.id !== owner.id) {
+    path.unshift(current)
+    current = current.parentId ? graph.getNode(current.parentId) : undefined
+  }
+  if (!current) return undefined
+  let source = graph.getNode(owner.componentId)
+  // A nested instance copies the enclosing component's nested instance, so follow its link to
+  // the component that instance actually shows.
+  while (source?.type === 'INSTANCE' && source.componentId)
+    source = graph.getNode(source.componentId)
+  for (const step of path) {
+    if (!source) return undefined
+    source = matchingComponentChild(graph, source, step)
+  }
+  return source
+}
+
+/** The component child a copy at the same place shows, preferring its sibling position. */
+function matchingComponentChild(
+  graph: SceneGraph,
+  source: SceneNode,
+  step: SceneNode
+): SceneNode | undefined {
+  const siblings = graph.getChildren(source.id)
+  const index = step.parentId ? graph.getNode(step.parentId)?.childIds.indexOf(step.id) : -1
+  const atIndex = index !== undefined && index >= 0 ? siblings[index] : undefined
+  if (atIndex?.type === step.type) return atIndex
+  return (
+    siblings.find((sibling) => sibling.type === step.type && sibling.name === step.name) ??
+    siblings.find((sibling) => sibling.type === step.type)
+  )
 }
 
 /** Figma keeps stroke weight and alignment on the layer, so a paint differs by its colour alone. */
@@ -220,6 +291,227 @@ function withoutEdits(graph: SceneGraph, state: InstanceOverrideState): Instance
       .filter(([, fields]) => fields.size > 0)
   )
   return { self: new Map(), descendants }
+}
+
+/** Every instance at or below `root`, deepest first, as pushing each one's edits needs them. */
+function instancesDeepestFirst(graph: SceneGraph, root: SceneNode): SceneNode[] {
+  const result: SceneNode[] = []
+  const visit = (node: SceneNode): void => {
+    for (const child of graph.getChildren(node.id)) visit(child)
+    if (node.type === 'INSTANCE') result.push(node)
+  }
+  visit(root)
+  return result
+}
+
+/** The main component an instance's own edits belong to, if it can take them. */
+function pushableMainComponent(
+  graph: SceneGraph,
+  instance: SceneNode,
+  canEditMain: ((componentId: string) => boolean) | undefined
+): SceneNode | null {
+  let component = instance.componentId ? graph.getNode(instance.componentId) : undefined
+  // A nested copy's link points at the enclosing component's nested instance, not at the
+  // component that instance shows, so follow it to the main component the edits belong to.
+  while (component?.type === 'INSTANCE' && component.componentId) {
+    component = graph.getNode(component.componentId)
+  }
+  if (component?.type !== 'COMPONENT') return null
+  if (canEditMain && !canEditMain(component.id)) return null
+  return component
+}
+
+/**
+ * Applies one recorded override field from an instance layer to the component layer it copies.
+ * Returns whether the field was a text pushed into a component property's default.
+ */
+function pushOverrideField(
+  graph: SceneGraph,
+  target: SceneNode,
+  source: SceneNode,
+  field: string
+): boolean {
+  // A source link is bookkeeping for sync; a replaced layer is a structural edit, not a field.
+  if (field === 'sourceComponentId' || field === REPLACED_LAYER_OVERRIDE) return false
+  // Assigning a component property belongs to the instance, not to the main component.
+  if (overriddenAssignmentId(field) !== null) return false
+  const collection = overriddenVariableModeCollection(field)
+  if (collection !== null) {
+    const modes = Object.hasOwn(source.variableModes, collection)
+      ? { ...target.variableModes, [collection]: source.variableModes[collection] }
+      : omit(target.variableModes, [collection])
+    graph.updateNode(target.id, { variableModes: modes })
+    return false
+  }
+  const binding = overriddenBindingField(field)
+  if (binding !== null) {
+    const bindings = Object.hasOwn(source.boundVariables, binding)
+      ? {
+          ...target.boundVariables,
+          [binding]: structuredClone(source.boundVariables[binding])
+        }
+      : omit(target.boundVariables, [binding])
+    graph.updateNode(target.id, { boundVariables: bindings })
+    return false
+  }
+  const value = Reflect.get(source, field)
+  if (value === undefined) return false
+  const defaulted =
+    field === 'text' && typeof value === 'string'
+      ? pushBoundTextDefault(graph, target, value)
+      : false
+  graph.updateNode(target.id, { [field]: structuredClone(value) })
+  return defaulted
+}
+
+/** The override state after a push: property values stay, but a text pushed as a default goes. */
+function clearedAfterPush(
+  graph: SceneGraph,
+  state: InstanceOverrideState,
+  defaulted: Set<string>
+): InstanceOverrideState {
+  const cleared = withoutEdits(graph, state)
+  const descendants = new Map(cleared.descendants)
+  for (const nodeId of defaulted) {
+    const fields = descendants.get(nodeId)
+    if (!fields) continue
+    fields.delete('text')
+    if (fields.size === 0) descendants.delete(nodeId)
+  }
+  return { self: cleared.self, descendants }
+}
+
+/**
+ * A text layer bound to a text property shows the property's default on the main component.
+ * Pushing the edit moves that default with it, so the canvas and the property panel agree.
+ * Returns whether the field was pushed as a default.
+ */
+function pushBoundTextDefault(graph: SceneGraph, target: SceneNode, text: string): boolean {
+  const propertyId = target.componentPropertyReferences.find(
+    (reference) => reference.field === 'TEXT'
+  )?.propertyId
+  if (!propertyId) return false
+  const owner = graph.closest(
+    target.parentId ?? target.id,
+    (node) =>
+      (node.type === 'COMPONENT' || node.type === 'COMPONENT_SET') &&
+      node.componentPropertyDefinitions.some((definition) => definition.id === propertyId)
+  )
+  const definition = owner?.componentPropertyDefinitions.find((item) => item.id === propertyId)
+  if (!owner || !definition) return false
+  if (definition.defaultValue !== text)
+    graph.updateNode(owner.id, {
+      componentPropertyDefinitions: owner.componentPropertyDefinitions.map((item) =>
+        item.id === propertyId ? { ...item, defaultValue: text } : item
+      )
+    })
+  // Every other definition layer the property drives follows the new default, as editing the
+  // default does. A nested instance's copies belong to their own component and are left to sync.
+  const visit = (node: SceneNode): void => {
+    for (const child of graph.getChildren(node.id)) {
+      if (child.type === 'INSTANCE') continue
+      if (
+        child.type === 'TEXT' &&
+        child.componentPropertyReferences.some(
+          (reference) => reference.propertyId === propertyId && reference.field === 'TEXT'
+        )
+      )
+        graph.updateNode(child.id, { text })
+      visit(child)
+    }
+  }
+  visit(owner)
+  return true
+}
+
+/**
+ * Whether pushing `root`'s changes can reach every main component they belong to. Pushing is
+ * refused for a library component, whose main is read-only.
+ */
+export function canPushInstanceOverrides(
+  graph: SceneGraph,
+  root: SceneNode,
+  canEditMain?: (componentId: string) => boolean
+): boolean {
+  if (root.type !== 'INSTANCE') return false
+  let found = false
+  for (const instance of instancesDeepestFirst(graph, root)) {
+    if (
+      instance.instanceOverrides.self.size === 0 &&
+      instance.instanceOverrides.descendants.size === 0
+    )
+      continue
+    if (!pushableMainComponent(graph, instance, canEditMain)) return false
+    found = true
+  }
+  return found
+}
+
+/**
+ * Figma's Push changes to main component: writes the edits of `root` and the instances inside
+ * it to their own main components, then clears those edits so every instance follows. A
+ * nested instance's edits go to its nested main; the outer main then picks them up by sync.
+ * Returns false, changing nothing, when a main component is missing or read-only.
+ */
+export function pushInstanceOverrides(
+  graph: SceneGraph,
+  root: SceneNode,
+  canEditMain?: (componentId: string) => boolean
+): boolean {
+  if (!canPushInstanceOverrides(graph, root, canEditMain)) return false
+  const instances = instancesDeepestFirst(graph, root).filter(
+    (instance) =>
+      instance.instanceOverrides.self.size > 0 || instance.instanceOverrides.descendants.size > 0
+  )
+  const components: string[] = []
+  const defaulted = new Set<string>()
+  for (const instance of instances) {
+    const main = pushableMainComponent(graph, instance, canEditMain)
+    if (!main) return false
+    if (!components.includes(main.id)) components.push(main.id)
+    const state = instance.instanceOverrides
+    for (const [field] of state.self) {
+      pushOverrideField(graph, main, instance, field)
+    }
+    for (const [nodeId, fields] of state.descendants) {
+      const node = graph.getNode(nodeId)
+      if (!node) continue
+      const owner = node.parentId ? findInstanceAncestor(graph, node.parentId) : undefined
+      const target = componentLayer(graph, node, owner)
+      if (!target) continue
+      for (const [field] of fields) {
+        if (pushOverrideField(graph, target, node, field)) defaulted.add(nodeId)
+      }
+    }
+  }
+  for (const instance of instances) {
+    graph.updateNode(instance.id, {
+      instanceOverrides: clearedAfterPush(graph, instance.instanceOverrides, defaulted)
+    })
+  }
+  // Deepest main first, then every component holding an instance of one: an outer main syncs
+  // the nested instance the inner main changed, and so on up to the page.
+  graph.syncInstancesTogether(followingComponents(graph, components))
+  return true
+}
+
+/** The pushed mains and every component whose instances show one of them, deepest first. */
+function followingComponents(graph: SceneGraph, components: string[]): string[] {
+  const order: string[] = []
+  const seen = new Set<string>()
+  const visit = (id: string): void => {
+    if (seen.has(id)) return
+    seen.add(id)
+    order.push(id)
+    for (const instance of graph.getInstances(id)) {
+      const holder = instance.parentId
+        ? graph.closest(instance.parentId, (node) => node.type === 'COMPONENT')
+        : undefined
+      if (holder) visit(holder.id)
+    }
+  }
+  for (const id of components) visit(id)
+  return order
 }
 
 /**

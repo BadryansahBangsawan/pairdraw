@@ -1,7 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { spawnSync } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
+import { once } from 'node:events'
 import { readdir } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
+import { pathToFileURL } from 'node:url'
+
+import { corePackagePath } from '#core-tests/helpers/paths'
 
 import { ALL_FORMATS, BufferSource, EncodedPacketSink, Input } from 'mediabunny'
 
@@ -98,6 +102,42 @@ describe('the ffmpeg encoder', () => {
       process.off('warning', onWarning)
     }
     expect(warnings).not.toContain('MaxListenersExceededWarning')
+  })
+
+  test('removes an active folder when the process is interrupted', async () => {
+    const leftovers = async () =>
+      (await readdir(tmpdir())).filter((name) => name.startsWith('pairdraw-ffmpeg-'))
+    const before = new Set(await leftovers())
+    const source = pathToFileURL(corePackagePath('src/node/video.ts')).href
+    const script = `import { createFFmpegEncoder } from ${JSON.stringify(source)}
+await createFFmpegEncoder('pairdraw-no-such-ffmpeg').create('mp4', {
+  width: 64,
+  height: 32,
+  fps: 10,
+  loops: false
+})
+console.log('ready')
+await new Promise(() => undefined)`
+    const child = spawn(process.execPath, ['-e', script], {
+      stdio: ['ignore', 'pipe', 'pipe']
+    })
+    let stderr = ''
+    child.stderr.setEncoding('utf8')
+    child.stderr.on('data', (chunk: string) => {
+      stderr += chunk
+    })
+    await new Promise<void>((resolve, reject) => {
+      child.stdout.setEncoding('utf8')
+      child.stdout.once('data', () => resolve())
+      child.once('error', reject)
+      child.once('exit', () => reject(new Error(`The child exited before it was ready: ${stderr}`)))
+    })
+    child.kill('SIGINT')
+    const [code, signal] = (await once(child, 'exit')) as [number | null, string | null]
+    expect(code).toBeNull()
+    expect(signal).toBe('SIGINT')
+    const after = (await leftovers()).filter((name) => !before.has(name))
+    expect(after).toEqual([])
   })
 
   test('says ffmpeg failed and leaves no folder when it stops mid-recording', async () => {

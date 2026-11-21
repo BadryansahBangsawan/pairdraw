@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process'
 import { once } from 'node:events'
+import { rmSync } from 'node:fs'
 import { mkdtemp, readFile, rm, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -17,6 +18,51 @@ const ENCODERS = {
 
 /** The tail of ffmpeg's error output a failure reports. */
 const STDERR_TAIL = 2000
+
+/** Folders of ffmpeg sinks still running in this process, removed when it is interrupted. */
+const temporaryDirs = new Set<string>()
+let cleanupInstalled = false
+
+function cleanupTemporaryDirs(): void {
+  for (const dir of temporaryDirs) rmSync(dir, { recursive: true, force: true })
+  temporaryDirs.clear()
+  removeCleanupListeners()
+}
+
+function interrupted(signal: 'SIGINT' | 'SIGTERM'): void {
+  cleanupTemporaryDirs()
+  // With our listener gone, the same signal takes its default path, so the exit code stays.
+  process.kill(process.pid, signal)
+}
+
+const onInterrupt = () => interrupted('SIGINT')
+const onTerminate = () => interrupted('SIGTERM')
+
+function installCleanupListeners(): void {
+  if (cleanupInstalled) return
+  cleanupInstalled = true
+  process.once('exit', cleanupTemporaryDirs)
+  process.once('SIGINT', onInterrupt)
+  process.once('SIGTERM', onTerminate)
+}
+
+function removeCleanupListeners(): void {
+  if (!cleanupInstalled) return
+  cleanupInstalled = false
+  process.off('exit', cleanupTemporaryDirs)
+  process.off('SIGINT', onInterrupt)
+  process.off('SIGTERM', onTerminate)
+}
+
+function trackTemporaryDir(dir: string): void {
+  temporaryDirs.add(dir)
+  installCleanupListeners()
+}
+
+function releaseTemporaryDir(dir: string): void {
+  temporaryDirs.delete(dir)
+  if (temporaryDirs.size === 0) removeCleanupListeners()
+}
 
 /** The encoders `command` lists, or none when it cannot run. */
 function listEncoders(command: string): Promise<string> {
@@ -51,6 +97,7 @@ export function createFFmpegEncoder(command = 'ffmpeg'): VideoHostEncoder {
     async create(format, options): Promise<VideoSink> {
       if (format === 'gif') throw new Error('ffmpeg records MP4 and WebM, not GIF')
       const dir = await mkdtemp(join(tmpdir(), 'pairdraw-ffmpeg-'))
+      trackTemporaryDir(dir)
       const output = join(dir, `video.${format}`)
       let byteLength = 0
       const state = {
@@ -127,6 +174,7 @@ export function createFFmpegEncoder(command = 'ffmpeg'): VideoHostEncoder {
             return new Uint8Array(await readFile(output))
           } finally {
             await rm(dir, { recursive: true, force: true })
+            releaseTemporaryDir(dir)
           }
         },
         async cancel() {
@@ -137,6 +185,7 @@ export function createFFmpegEncoder(command = 'ffmpeg'): VideoHostEncoder {
           await exited
           // Whatever ended the recording, its folder goes with it.
           await rm(dir, { recursive: true, force: true })
+          releaseTemporaryDir(dir)
         },
         get byteLength() {
           return byteLength

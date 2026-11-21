@@ -119,7 +119,29 @@ function normalizeSourceMetadata(source: unknown): SourceMetadata {
       derivedSymbolData: arrayOrEmpty(fig.derivedSymbolData),
       derivedSymbolDataLayoutVersion: numberOrNull(fig.derivedSymbolDataLayoutVersion),
       uniformScaleFactor: numberOrNull(fig.uniformScaleFactor)
+    },
+    drawio: normalizeDrawioEdge(source.drawio)
+  }
+}
+
+/** The edge cell a draw.io connector was read from, as a shared document carries it. */
+function normalizeDrawioEdge(value: unknown): SourceMetadata['drawio'] {
+  if (!isPlainObject(value)) return null
+  const styleValues: Record<string, string> = {}
+  if (isPlainObject(value.styleValues)) {
+    for (const [key, item] of Object.entries(value.styleValues)) {
+      if (typeof item === 'string') styleValues[key] = item
     }
+  }
+  return {
+    styleNames: stringArray(value.styleNames),
+    styleValues,
+    labelX: typeof value.labelX === 'number' && Number.isFinite(value.labelX) ? value.labelX : 0,
+    points: Array.isArray(value.points)
+      ? value.points.map(normalizeVector).filter((point): point is Vector => point !== null)
+      : [],
+    sourcePoint: normalizeVector(value.sourcePoint),
+    targetPoint: normalizeVector(value.targetPoint)
   }
 }
 

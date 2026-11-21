@@ -9,7 +9,13 @@ import type {
   DrawIOPoint,
   DrawIOStyle
 } from '@pairdraw/drawio'
-import type { ConnectorEndpoint, SceneGraph, SceneNode, StrokeCap } from '@pairdraw/scene-graph'
+import type {
+  ConnectorEndpoint,
+  DrawIOEdgeSource,
+  SceneGraph,
+  SceneNode,
+  StrokeCap
+} from '@pairdraw/scene-graph'
 import { colorToHex } from '@pairdraw/scene-graph/color'
 import {
   connectorRoute,
@@ -29,6 +35,7 @@ import type { Vector } from '@pairdraw/scene-graph/primitives'
 import { computeContentBounds } from '#core/io/formats/raster'
 import { renderNodesToSVG } from '#core/io/formats/svg'
 
+import { keptEdge } from './edges'
 import { DEFAULT_FONT_FAMILY } from './paint'
 import { EMPTY_GEOMETRY, placed, placedValues, round, type Placed } from './placement'
 import { drawioShapeValues } from './shapes'
@@ -488,28 +495,44 @@ class PageWriter {
     // A connector without its line and label is not one draw.io could draw.
     const parts = connectorSublayers(this.graph, node)
     if (!parts) return
+    const kept = keptEdge(this.graph, node)
+    const drawnGeometry = this.edgeGeometry(node, parent)
     const startId = node.connectorStart?.nodeId
     const endId = node.connectorEnd?.nodeId
     const lineType = node.connectorLineType
     this.push(node, parent, {
       kind: 'edge',
       value: parts.label.text ? labelHTML(parts.label) : '',
-      style: style([], {
-        edgeStyle: lineType === 'ELBOWED' ? 'orthogonalEdgeStyle' : undefined,
-        rounded: lineType === 'ELBOWED' ? '1' : undefined,
-        curved: lineType === 'CURVED' ? '1' : undefined,
-        html: '1',
-        startArrow: ARROWS[node.connectorStartCap],
-        endArrow: ARROWS[node.connectorEndCap],
-        ...lineValues(parts.line),
-        ...this.end(node.connectorStart, 'exit'),
-        ...this.end(node.connectorEnd, 'entry'),
-        ...fontValues(parts.label)
-      }),
-      geometry: this.edgeGeometry(node, parent),
+      style: kept
+        ? { names: [...kept.styleNames], values: { ...kept.styleValues } }
+        : style([], {
+            edgeStyle: lineType === 'ELBOWED' ? 'orthogonalEdgeStyle' : undefined,
+            rounded: lineType === 'ELBOWED' ? '1' : undefined,
+            curved: lineType === 'CURVED' ? '1' : undefined,
+            html: '1',
+            startArrow: ARROWS[node.connectorStartCap],
+            endArrow: ARROWS[node.connectorEndCap],
+            ...lineValues(parts.line),
+            ...this.end(node.connectorStart, 'exit'),
+            ...this.end(node.connectorEnd, 'entry'),
+            ...fontValues(parts.label)
+          }),
+      geometry: kept ? this.keptGeometry(kept) : drawnGeometry,
       source: startId ? (this.ids.get(startId) ?? null) : null,
       target: endId ? (this.ids.get(endId) ?? null) : null
     })
+  }
+
+  /** The geometry the edge was read with, still in the parent's axes it was read in. */
+  private keptGeometry(kept: DrawIOEdgeSource): DrawIOGeometry {
+    return {
+      ...EMPTY_GEOMETRY,
+      relative: true,
+      x: kept.labelX,
+      points: kept.points.map((point) => ({ ...point })),
+      sourcePoint: kept.sourcePoint ? { ...kept.sourcePoint } : null,
+      targetPoint: kept.targetPoint ? { ...kept.targetPoint } : null
+    }
   }
 
   /**

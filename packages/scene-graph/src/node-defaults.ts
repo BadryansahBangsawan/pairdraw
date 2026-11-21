@@ -26,7 +26,8 @@ export function createDefaultSourceMetadata(): SourceMetadata {
       derivedSymbolData: EMPTY_LIST,
       derivedSymbolDataLayoutVersion: null,
       uniformScaleFactor: null
-    }
+    },
+    drawio: null
   }
 }
 

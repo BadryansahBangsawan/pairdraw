@@ -64,12 +64,31 @@ export interface FigmaSourcePayload {
   uniformScaleFactor: number | null
 }
 
+/**
+ * An edge as its draw.io file wrote it: the style pairs and geometry the author set. A connector
+ * read from a file keeps them so saving an unedited edge writes back what draw.io had, instead of
+ * re-routing it.
+ */
+export interface DrawIOEdgeSource {
+  /** The style's names and its pairs, in the order the file wrote them. */
+  styleNames: string[]
+  styleValues: Partial<Record<string, string>>
+  /** The label's place along the edge, as the geometry's `x`. */
+  labelX: number
+  /** Bend points and free ends, in the edge's parent's axes. */
+  points: Vector[]
+  sourcePoint: Vector | null
+  targetPoint: Vector | null
+}
+
 export interface SourceMetadata {
   format: 'fig' | null
   id: string | null
   orderKey: string | null
   editedFields: string[]
   fig: FigmaSourcePayload
+  /** The edge cell a connector was read from, kept until the connector is edited. */
+  drawio?: DrawIOEdgeSource | null
 }
 
 export type HandleMirroring = 'NONE' | 'ANGLE' | 'ANGLE_AND_LENGTH'

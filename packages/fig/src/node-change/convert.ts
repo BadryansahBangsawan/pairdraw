@@ -1173,6 +1173,7 @@ function extractSourceMetadata(nc: NodeChange, blobs: Uint8Array[]): SceneNode['
     id: nc.guid ? guidToString(nc.guid) : null,
     orderKey: nc.parentIndex?.position ?? null,
     editedFields: [],
+    drawio: null,
     fig: {
       ...extractFigmaRawGeometry(nc, blobs),
       ...extractFigmaSymbolMetadata(nc, blobs),

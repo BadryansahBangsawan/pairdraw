@@ -234,6 +234,8 @@ export function drawioToSceneGraph(file: DrawIOFile): SceneGraph {
     if (index === 0) graph.updateNode(pageNode.id, { name: page.name })
     new PageBuilder(graph, page, pageNode.id).build()
   }
+  // The file wrote every layer as it stands, so nothing built here is an edit of the document.
+  for (const node of graph.getAllNodes()) node.source.editedFields = []
   return graph
 }
 

@@ -236,5 +236,70 @@ export function bindEdge(
   }
   layoutConnector(graph, connector)
   bendConnectorThrough(graph, connector, edge.geometry.points)
+  rememberEdge(graph, connector, edge)
   return extra
+}
+
+/**
+ * Keeps the edge cell a connector was read from on its source metadata, so a write can return
+ * the route and style the author set while nothing about the connector was edited.
+ */
+function rememberEdge(graph: SceneGraph, connector: SceneNode, edge: DrawIOCell): void {
+  const live = graph.getNode(connector.id)
+  if (!live) return
+  live.source.drawio = {
+    styleNames: [...edge.style.names],
+    styleValues: { ...edge.style.values },
+    labelX: edge.geometry.x,
+    points: edge.geometry.points.map((point) => ({ ...point })),
+    sourcePoint: edge.geometry.sourcePoint ? { ...edge.geometry.sourcePoint } : null,
+    targetPoint: edge.geometry.targetPoint ? { ...edge.geometry.targetPoint } : null
+  }
+}
+
+/**
+ * The edge cell a connector was read from, while nothing shaping it has been edited since: its
+ * own route, its line and label, or an end's layer and the layers that place it. Null once any
+ * of those changed, so the writer routes the connector from its live state.
+ */
+export function keptEdge(
+  graph: SceneGraph,
+  connector: SceneNode
+): NonNullable<SceneNode['source']['drawio']> | null {
+  const kept = connector.source.drawio
+  if (!kept) return null
+  const parts = connectorSublayers(graph, connector)
+  if (!parts) return null
+  // Layout and its derived fields move or size a connector and its parts without the author
+  // touching the edge itself; only a change to what the edge draws or says counts as an edit.
+  const appearsEdited = (node: SceneNode) =>
+    node.source.editedFields.some((field) => !isDerivedField(field) && !isPlacementField(field))
+  if (appearsEdited(connector) || appearsEdited(parts.line) || appearsEdited(parts.label))
+    return null
+  for (const endpoint of [connector.connectorStart, connector.connectorEnd]) {
+    let layer = endpoint?.nodeId ? graph.getNode(endpoint.nodeId) : undefined
+    while (layer && layer.type !== 'CANVAS') {
+      if (layer.source.editedFields.some((field) => !isDerivedField(field))) return null
+      layer = layer.parentId ? graph.getNode(layer.parentId) : undefined
+    }
+  }
+  return kept
+}
+
+/** Fields the layout pass computes; writing them is not an edit of the document. */
+function isDerivedField(field: string): boolean {
+  return field.startsWith('derived') || field === 'textPicture'
+}
+
+/** A part's box, placed by its connector rather than set by hand. */
+const PLACEMENT_FIELDS: Record<string, true> = {
+  x: true,
+  y: true,
+  width: true,
+  height: true,
+  rotation: true
+}
+
+function isPlacementField(field: string): boolean {
+  return Object.hasOwn(PLACEMENT_FIELDS, field)
 }

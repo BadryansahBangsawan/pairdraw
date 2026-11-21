@@ -4,6 +4,7 @@ import type { FindNodeResult } from '@pairdraw/core/rpc'
 
 import { pageOptions } from '#cli/app/target'
 import { printNodeResults, printJSON } from '#cli/format'
+import { requireIntegerOption } from '#cli/options'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
@@ -21,13 +22,14 @@ export default defineCommand({
     json: { type: 'boolean', description: 'Output as JSON' }
   },
   async run({ args }) {
+    const limit = requireIntegerOption('limit', args.limit, 1)
     const results = await loadRPCData<FindNodeResult[]>(
       args.file,
       'find',
       {
         name: args.name,
         type: args.type,
-        limit: args.limit ? Number(args.limit) : undefined
+        limit
       },
       args
     )

@@ -3,7 +3,8 @@ import { defineCommand } from 'citty'
 import type { QueryNodeResult } from '@pairdraw/core/rpc'
 
 import { pageOptions } from '#cli/app/target'
-import { printNodeResults, printError, printJSON } from '#cli/format'
+import { printError, printNodeResults, printJSON } from '#cli/format'
+import { requireIntegerOption } from '#cli/options'
 import { loadRPCData } from '#cli/rpc-data'
 
 export default defineCommand({
@@ -28,12 +29,13 @@ export default defineCommand({
     json: { type: 'boolean', description: 'Output as JSON' }
   },
   async run({ args }) {
+    const limit = requireIntegerOption('limit', args.limit, 1)
     const results = await loadRPCData<QueryNodeResult[] | { error: string }>(
       args.file,
       'query',
       {
         selector: args.selector,
-        limit: args.limit ? Number(args.limit) : undefined
+        limit
       },
       args
     )

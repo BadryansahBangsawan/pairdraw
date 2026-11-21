@@ -1,0 +1,1 @@
+- `tree --depth`, `find --limit`, and `query --limit` refuse a value that is not a whole number in range instead of silently changing which nodes they show.

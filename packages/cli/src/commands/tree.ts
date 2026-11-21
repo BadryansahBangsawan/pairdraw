@@ -4,6 +4,7 @@ import { defineCommand } from 'citty'
 import type { TreeNodeResult, TreeResult } from '@pairdraw/core/rpc'
 
 import { pageOptions } from '#cli/app/target'
+import { integerOptionError } from '#cli/options'
 import { fmtTree, printError, printJSON, entity, formatType, writeStdout } from '#cli/format'
 import { loadRPCData } from '#cli/rpc-data'
 
@@ -30,6 +31,11 @@ export default defineCommand({
     json: { type: 'boolean', description: 'Output as JSON' }
   },
   async run({ args }) {
+    const depthError = args.depth ? integerOptionError('depth', args.depth, 0) : undefined
+    if (depthError) {
+      printError(depthError)
+      process.exit(1)
+    }
     const data = await loadRPCData<TreeResult | { error: string }>(
       args.file,
       'tree',

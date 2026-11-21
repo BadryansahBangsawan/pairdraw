@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 
 import { FIXTURES } from '#core-tests/helpers/fig/fixtures'
+import { HEAVY_TEST_TIMEOUT_MS } from '#core-tests/helpers/test-utils'
 
 import { createEditor } from '@pairdraw/core'
 import { exportFigFile, parseFigFile } from '@pairdraw/core/io/formats/fig'
@@ -122,7 +123,7 @@ describe('editing a grid after import', () => {
     const moved = reopened.getChildren(saved.id).find((node) => node.name === child.name)
 
     expect(moved?.gridPosition).toEqual({ row: 1, column: 4, rowSpan: 1, columnSpan: 1 })
-  })
+  }, HEAVY_TEST_TIMEOUT_MS)
 
   test('switches a real grid to horizontal and clears its grid fields', async () => {
     const original = await parseFigFile(

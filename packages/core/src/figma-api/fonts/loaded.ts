@@ -38,6 +38,15 @@ function textFaces(node: SceneNode): DescribedFace[] {
   return uniqBy(faces, (face) => `${face.family}\0${face.loadStyle}`)
 }
 
+/** Whether every face the text draws in is one the document can use, loaded or from a known family. */
+export function textHasMissingFont(node: SceneNode): boolean {
+  return textFaces(node).some((face) => {
+    if (isLoaded(face)) return false
+    const known = fontManager.familyFacesSync(face.family) ?? []
+    return !known.some((faceOfFamily) => faceOfFamily.style === face.loadStyle)
+  })
+}
+
 /**
  * Figma refuses an edit that lays text out again until every font the text uses is loaded, so
  * the text is never measured in a stand-in font. Paints and links need no font. Callers check

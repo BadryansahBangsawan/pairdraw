@@ -1,0 +1,1 @@
+- Text layers report `hasMissingFont`, which scripts read to tell when a face needs loading or is absent from the document.

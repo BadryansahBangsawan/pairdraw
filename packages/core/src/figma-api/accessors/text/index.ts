@@ -14,7 +14,11 @@ import {
   type NodeProxyInternals,
   type ProxyThis
 } from '#core/figma-api/accessor-utils'
-import { assertFontLoaded, assertTextFontsLoaded } from '#core/figma-api/fonts/loaded'
+import {
+  assertFontLoaded,
+  assertTextFontsLoaded,
+  textHasMissingFont
+} from '#core/figma-api/fonts/loaded'
 import type { FigmaFontNameInput } from '#core/figma-api/fonts/names'
 import {
   getParagraphSpacing,
@@ -147,6 +151,11 @@ export function installTextNodeProxyAccessors(
     textAlignHorizontal: field(internals, 'textAlignHorizontal'),
     textAlignVertical: field(internals, 'textAlignVertical'),
     textAutoResize: field(internals, 'textAutoResize'),
+    hasMissingFont: {
+      get(this: ProxyThis): boolean {
+        return textHasMissingFont(raw(this, internals))
+      }
+    },
     // Figma's plugin API reads and writes these as { unit, value }; a bare object stored on the
     // node instead of pixels would leave the text unmeasurable.
     letterSpacing: characterStyle<FigmaLetterSpacing | number>(

@@ -56,6 +56,46 @@ function networkElements(
   return [...regions, ...openPathElements(node, network, common, looseSegments)]
 }
 
+/** Paints one path's fill stack; a blended fill draws its stroke as a separate path. */
+function vectorFillElements(
+  attrs: Record<string, string | number | undefined>,
+  visibleFills: Fill[],
+  strokeAttrs: Record<string, string | number | undefined>,
+  common: Record<string, string | number | undefined>,
+  node: SceneNode,
+  ctx: SVGExportContext
+): SVGNode[] {
+  const elements: SVGNode[] = []
+  for (const [index, fill] of visibleFills.entries()) {
+    const fillAttr = resolveFill(fill, node, ctx)
+    if (!fillAttr) continue
+    const style = paintBlendStyle(fill)
+    const last = index === visibleFills.length - 1
+    const splitStroke = style !== undefined && last && common.stroke !== 'none'
+    const stroke = last && !splitStroke ? common.stroke : 'none'
+    elements.push(
+      svg('path', {
+        ...attrs,
+        fill: fillAttr,
+        'fill-opacity': solidFillOpacity(fill, ctx.colorSpace),
+        style,
+        stroke
+      })
+    )
+    if (splitStroke) {
+      elements.push(
+        svg('path', {
+          d: attrs.d,
+          'fill-rule': attrs['fill-rule'],
+          fill: 'none',
+          ...strokeAttrs
+        })
+      )
+    }
+  }
+  return elements
+}
+
 function vectorShapeElements(
   node: SceneNode,
   common: Record<string, string | number | undefined>,
@@ -83,18 +123,7 @@ function vectorShapeElements(
         elements.push(svg('path', { ...attrs, fill: 'none' }))
         continue
       }
-      for (const [index, fill] of visibleFills.entries()) {
-        const fillAttr = resolveFill(fill, node, ctx)
-        if (!fillAttr) continue
-        elements.push(
-          svg('path', {
-            ...attrs,
-            fill: fillAttr,
-            'fill-opacity': solidFillOpacity(fill, ctx.colorSpace),
-            stroke: index === visibleFills.length - 1 ? common.stroke : 'none'
-          })
-        )
-      }
+      elements.push(...vectorFillElements(attrs, visibleFills, strokeAttrs, common, node, ctx))
     }
   } else if (node.vectorNetwork) {
     elements.push(...networkElements(node, node.vectorNetwork, common))
@@ -309,6 +338,41 @@ function buildSVGStrokeAttrs(
   return attrs
 }
 
+/** The blend CSS a paint adds, when the canvas would not composite it source-over. */
+function paintBlendStyle(fill: Fill | undefined): string | undefined {
+  const blend = fill?.blendMode ? SVG_BLEND_MODE[fill.blendMode] : undefined
+  return blend && blend !== 'normal' ? `mix-blend-mode: ${blend}` : undefined
+}
+
+/** Adds a paint's blend mode to the elements that draw it. */
+function withPaintBlend(elements: SVGNode[], fill: Fill | undefined): SVGNode[] {
+  const style = paintBlendStyle(fill)
+  if (style) for (const element of elements) element.attrs.style = style
+  return elements
+}
+
+/**
+ * Draws the fill and the stroke as separate elements when the fill blends, so the stroke keeps the
+ * source-over canvas gives it instead of inheriting the fill's blend mode.
+ */
+function shapeWithPaint(
+  node: SceneNode,
+  fillAttr: string | null,
+  fillOpacity: number | undefined,
+  strokeAttrs: Record<string, string | number | undefined>,
+  fill: Fill | undefined,
+  ctx: SVGExportContext
+): SVGNode[] {
+  const blends = paintBlendStyle(fill) !== undefined
+  if (!blends || !strokeAttrs.stroke) {
+    return withPaintBlend(nodeShapeElements(node, fillAttr, fillOpacity, strokeAttrs, ctx), fill)
+  }
+  return [
+    ...withPaintBlend(nodeShapeElements(node, fillAttr, fillOpacity, {}, ctx), fill),
+    ...nodeShapeElements(node, null, undefined, strokeAttrs, ctx)
+  ]
+}
+
 function hasPathLevelFills(node: SceneNode): boolean {
   return node.type === 'VECTOR' && node.fillGeometry.some((geometry) => geometry.fills?.length)
 }
@@ -367,11 +431,12 @@ function fillAndStrokeElements(
       const ref = resolveFill(fill, node, ctx)
       if (ref) {
         elements.push(
-          ...nodeShapeElements(
+          ...shapeWithPaint(
             node,
             ref,
             solidFillOpacity(fill, ctx.colorSpace),
             fill === visibleFills[visibleFills.length - 1] ? strokeAttrs : {},
+            fill,
             ctx
           )
         )
@@ -382,7 +447,14 @@ function fillAndStrokeElements(
 
   const hasFillOrStroke = fillAttr || visibleStrokeCount > 0
   if (hasFillOrStroke && !isGroupLike(node)) {
-    return nodeShapeElements(node, fillAttr, fillOpacity, strokeAttrs, ctx)
+    return shapeWithPaint(
+      node,
+      fillAttr,
+      fillOpacity,
+      strokeAttrs,
+      visibleFills.length === 1 ? visibleFills[0] : undefined,
+      ctx
+    )
   }
 
   return []

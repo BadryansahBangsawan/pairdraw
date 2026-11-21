@@ -1,2 +1,3 @@
 - SVG and PDF export draw a pattern, noise or custom fill as the colour the canvas falls back to, instead of dropping the layer.
 - Converting the document colour space now converts mesh gradient points, gradient strokes, and gradient text style runs, not only solid fills and gradient fill stops.
+- SVG export writes a fill's blend mode on the element that draws it, so a stacked paint no longer composites as plain source-over.

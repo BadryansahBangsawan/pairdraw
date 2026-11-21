@@ -1,0 +1,1 @@
+- Imported web captures and Tailwind HTML keep a paragraph's styled words in one text layer, instead of splitting every span into a layer of its own.

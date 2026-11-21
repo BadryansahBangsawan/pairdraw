@@ -85,6 +85,23 @@ describe('rich text import', () => {
     expect(text?.paragraphSpacing).toBe(12)
   })
 
+  test('joins runs whose borders and padding a reset sets to nothing', async () => {
+    // Tailwind's preflight gives every element a solid border of no width and no padding.
+    const reset = '* { border: 0 solid; border-width: 0; border-style: solid; padding: 0 }'
+    const [text, ...rest] = await texts(
+      `<style>${reset}</style><p>Hello <span style="color: #ff0000">red</span> and <strong>bold</strong> words.</p>`
+    )
+    expect(rest).toHaveLength(0)
+    expect(text?.text).toBe('Hello red and bold words.')
+  })
+
+  test('keeps a run with a border it draws as a box of its own', async () => {
+    const found = await texts(
+      '<p>Hello <span style="border: 1px solid #000">boxed</span> words.</p>'
+    )
+    expect(found.map((node) => node.text)).toEqual(['Hello ', 'boxed', ' words.'])
+  })
+
   test('keeps the items of a flex container apart', async () => {
     const found = await texts(
       '<div style="display: flex; flex-direction: column; gap: 8px"><h2>Title</h2><p>Body</p></div>'

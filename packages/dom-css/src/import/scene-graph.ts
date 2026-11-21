@@ -498,47 +498,76 @@ function linkText(node: SceneNode, element: DesignElement): void {
   }
 }
 
+const BOX_PROPERTIES = [
+  'aspect-ratio',
+  'background-color',
+  'border-radius',
+  'box-shadow',
+  'display',
+  'height',
+  'width',
+  'min-width',
+  'max-width',
+  'min-height',
+  'max-height',
+  'object-fit',
+  'overflow',
+  'position',
+  'top',
+  'right',
+  'bottom',
+  'left',
+  'flex-wrap',
+  'align-self'
+]
+
+const PADDING_PROPERTIES = [
+  'padding',
+  'padding-top',
+  'padding-right',
+  'padding-bottom',
+  'padding-left',
+  'padding-block',
+  'padding-inline'
+]
+
+const BORDER_SIDES = ['top', 'right', 'bottom', 'left'] as const
+
+/** Whether every length of a value is zero, as `0`, `0px`, and `0 0` are. */
+function isZeroLength(value: string): boolean {
+  return value
+    .trim()
+    .split(/\s+/)
+    .every((part) => parseCSSNumber(part) === 0)
+}
+
+/** Whether any side's border draws: it has a style other than none and a width other than zero. */
+function drawsBorder(style: DesignStyleDeclaration): boolean {
+  return BORDER_SIDES.some((side) => {
+    const borderStyle = pickStyle(style, `border-${side}-style`) ?? pickStyle(style, 'border-style')
+    if (borderStyle === undefined || borderStyle === 'none' || borderStyle === 'hidden')
+      return false
+    // A styled border without a width is CSS's medium one.
+    const width = pickStyle(style, `border-${side}-width`) ?? pickStyle(style, 'border-width')
+    return width === undefined || !isZeroLength(width)
+  })
+}
+
+/**
+ * Whether the element is a box rather than a run of the text around it. Padding and borders of
+ * no size, which resets such as Tailwind's give every element, leave it a run.
+ */
 function hasBoxStyle(style: DesignStyleDeclaration): boolean {
-  return [
-    'aspect-ratio',
-    'background-color',
-    'border-color',
-    'border-style',
-    'border-width',
-    'border-top-style',
-    'border-top-width',
-    'border-right-style',
-    'border-right-width',
-    'border-bottom-style',
-    'border-bottom-width',
-    'border-left-style',
-    'border-left-width',
-    'border-radius',
-    'box-shadow',
-    'display',
-    'height',
-    'padding',
-    'padding-top',
-    'padding-right',
-    'padding-bottom',
-    'padding-left',
-    'padding-block',
-    'padding-inline',
-    'width',
-    'min-width',
-    'max-width',
-    'min-height',
-    'max-height',
-    'object-fit',
-    'overflow',
-    'position',
-    'top',
-    'right',
-    'bottom',
-    'left',
-    'flex-wrap',
-    'align-self'
-  ].some((property) => pickStyle(style, property) !== undefined)
+  if (BOX_PROPERTIES.some((property) => pickStyle(style, property) !== undefined)) return true
+  if (
+    PADDING_PROPERTIES.some((property) => {
+      const value = pickStyle(style, property)
+      return value !== undefined && !isZeroLength(value)
+    })
+  ) {
+    return true
+  }
+  return drawsBorder(style)
 }
 
 function hasContent(element: DesignElement): boolean {

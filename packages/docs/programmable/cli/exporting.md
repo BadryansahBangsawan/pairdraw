@@ -94,6 +94,8 @@ Standalone Tailwind output is compiled during export; it does not depend on the 
 
 HTML export writes each layer's name as a `data-name` attribute. `--no-layer-names` leaves the names out, and `--layer-ids` adds each layer's ID as `data-pairdraw-node-id` for tools that link markup back to the document.
 
+A font size Tailwind does not name as a step (such as 40px or 28px) exports as an arbitrary value, `text-[40px]`, rather than a utility like `text-10` that no stylesheet generates. Named steps and token-bound sizes keep their class.
+
 HTML export is available in file mode.
 
 ### Tokens in exported code

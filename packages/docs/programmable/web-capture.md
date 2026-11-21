@@ -9,6 +9,8 @@ A web capture is a page, or one element of it, recorded with the styles the brow
 
 Captures come from the Chrome extension in `extensions/chrome` or from your own code through `@pairdraw/web-capture`. Plain HTML copied from any page pastes as styled layers too, without a capture: the editor styles the fragment the clipboard holds, after removing scripts, event handlers, frames, and script links.
 
+The HTML Pairdraw puts on the clipboard for other apps, such as document editors and email, is the layout the import uses: grids come out as placed boxes and tables and list items as plain blocks. It looks the same in a browser but keeps no table structure.
+
 ## The Chrome extension
 
 The extension is not in the Chrome Web Store. Build it and load it unpacked:

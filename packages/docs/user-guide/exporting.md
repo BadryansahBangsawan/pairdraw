@@ -38,6 +38,7 @@ The exported file is saved via a native dialog (desktop) or browser download.
 - **PDF** with several layers selected makes one PDF with a page per layer, in the order you selected them, each the size of its layer.
 - **File › Export Frames to PDF…** saves the page's frames as one PDF, a page per frame in layer order, each the size of its frame. Frames inside sections count; loose shapes, text, and groups do not. With layers selected, only those are exported.
 - **HTML** writes the layer as a web page. The options button next to the format chooses whether to include the HTML scaffold (a whole page, or a fragment to paste into one), CSS or Tailwind styling, embedded images or separate files (saved together in a `.zip`), and whether layer names (`data-name`, on by default) and layer IDs (`data-pairdraw-node-id`, off by default) are written as attributes. The Code panel's HTML view exports the same way, with the styling it shows.
+- HTML export carries a layer's blend mode as `mix-blend-mode`, as SVG export already does. Linear dodge maps to `plus-lighter`; linear burn exports flat, because Chrome, Edge, and Firefox do not implement `plus-darker`. Normal and pass-through add no blend mode.
 - In the Code panel, Vue and React components can take icons from Lucide, Heroicons, or Font Awesome instead of Iconify, and React components also from React Icons; an icon the package lacks stays with Iconify.
 
 ## Copy/Paste as

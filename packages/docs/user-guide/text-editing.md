@@ -66,6 +66,16 @@ Text can link to a web page or an email address, on the whole text or on selecte
 | Copy | <kbd>⌘</kbd><kbd>C</kbd> | <kbd>Ctrl</kbd> + <kbd>C</kbd> |
 | Paste | <kbd>⌘</kbd><kbd>V</kbd> | <kbd>Ctrl</kbd> + <kbd>V</kbd> |
 
+## Resizing and Truncation
+
+The **Resizing** control in the Layout section sets how the text box follows its content:
+
+- **Auto width** — the box grows to fit each line on one line (Figma's width-and-height auto-resize).
+- **Auto height** — the width stays fixed and the box grows taller as the text wraps.
+- **Fixed size** — the box keeps the size you give it.
+
+**Truncation** in the Typography section clips text that overflows the box: **Ending** adds an ellipsis, and **Maximum lines** caps how many lines draw before it truncates. A truncating text keeps its box inside auto layout, so a hugging frame sizes to that box instead of collapsing to zero.
+
 ## Font Picker
 
 Open the font picker in the Typography section of the properties panel to change the font family. The picker features:

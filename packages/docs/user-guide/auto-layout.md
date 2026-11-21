@@ -64,6 +64,8 @@ Each child in an auto-layout frame can have its own sizing mode:
 
 By default an auto layout frame lays its content out as if no layer had a stroke, as Figma does. Turn on **Include strokes in layout** in the Layout section to make room for strokes: the frame's own stroke pushes its content inward, and the outside strokes of its children take up space between them.
 
+A fixed auto-layout frame is never smaller than the room its padding takes, plus the inside strokes it counts when **Include strokes in layout** is on. Setting it smaller grows it to that room, as Figma does. A frame saved smaller than its padding before this change keeps its saved size when the file opens, and grows to its padding on the next edit.
+
 ## Drag Reordering
 
 Within an auto-layout frame, drag a child to reorder it among its siblings. A visual insertion indicator shows where the child will be dropped. Dragging a node from elsewhere into an auto-layout frame inserts it the same way; in a wrapping frame, it goes into the line under the cursor. Drawing inside an auto-layout frame adds the new node to the end of its flow.
@@ -97,6 +99,8 @@ Define column and row tracks with three sizing modes:
 - **auto** — sizes to fit content
 
 Example: three columns of `1fr 200px 1fr` creates a layout with a fixed center column and flexible sides.
+
+Set a grid frame to **Hug** to size it to its tracks and gaps. On a hugged axis a fractional (`fr`) track takes its content's size instead of sharing space, and the frame's minimum and maximum still apply.
 
 ### Grid Gaps
 

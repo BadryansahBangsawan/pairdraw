@@ -204,7 +204,7 @@ describe('draw.io edges', () => {
     const graph = await read(
       file(
         shapes +
-          `<mxCell id="e" style="edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="b" target="c"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="600" y="90"/><mxPoint x="600" y="290"/></Array></mxGeometry></mxCell>`
+          `<mxCell id="e" style="edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="b" target="c"><mxGeometry relative="1" as="geometry"><mxArray as="points"><mxPoint x="600" y="90"/><mxPoint x="600" y="290"/></mxArray></mxGeometry></mxCell>`
       )
     )
     const connector = expectDefined(onPage(graph).find((node) => node.type === 'CONNECTOR'))
@@ -226,7 +226,7 @@ describe('draw.io edges', () => {
     const graph = await read(
       file(
         shapes +
-          `<mxCell id="e" style="curved=1;" edge="1" parent="1" source="b" target="c"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="600" y="190"/></Array></mxGeometry></mxCell>`
+          `<mxCell id="e" style="curved=1;" edge="1" parent="1" source="b" target="c"><mxGeometry relative="1" as="geometry"><mxArray as="points"><mxPoint x="600" y="190"/></mxArray></mxGeometry></mxCell>`
       )
     )
     const connector = expectDefined(onPage(graph).find((node) => node.type === 'CONNECTOR'))
@@ -243,7 +243,7 @@ describe('draw.io edges', () => {
         vertex('a', 'whiteSpace=wrap;', [40, 60, 120, 60], 'A') +
           vertex('g', 'group;', [300, 200, 300, 200], '') +
           vertex('c', 'whiteSpace=wrap;', [100, 60, 120, 60], 'C', 'g') +
-          `<mxCell id="e" style="curved=1;" edge="1" parent="1" source="a" target="c"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="460" y="160"/></Array></mxGeometry></mxCell>`
+          `<mxCell id="e" style="curved=1;" edge="1" parent="1" source="a" target="c"><mxGeometry relative="1" as="geometry"><mxArray as="points"><mxPoint x="460" y="160"/></mxArray></mxGeometry></mxCell>`
       )
     )
     const connector = expectDefined(

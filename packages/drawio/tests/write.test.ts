@@ -7,7 +7,7 @@ const MODEL = `<mxGraphModel grid="1"><root>
   <mxCell id="notes" value="Notes" style="locked=1;" parent="0" visible="0"/>
   <mxCell id="a" value="A &amp; B" style="ellipse;fillColor=#fff2cc;" vertex="1" parent="1">
     <mxGeometry x="40" y="60" width="120" height="60" as="geometry">
-      <Array as="points"><mxPoint x="10" y="20"/></Array>
+      <mxArray as="points"><mxPoint x="10" y="20"/></mxArray>
     </mxGeometry>
   </mxCell>
   <UserObject label="Linked" link="https://example.com" placeholders="1" id="b">
@@ -18,7 +18,7 @@ const MODEL = `<mxGraphModel grid="1"><root>
   <mxCell id="e" value="" style="edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="a">
     <mxGeometry relative="1" as="geometry">
       <mxPoint x="500" y="90" as="targetPoint"/>
-      <Array as="points"><mxPoint x="240" y="90"/></Array>
+      <mxArray as="points"><mxPoint x="240" y="90"/></mxArray>
     </mxGeometry>
   </mxCell>
   <mxCell id="l" value="next" style="edgeLabel;" vertex="1" parent="e">

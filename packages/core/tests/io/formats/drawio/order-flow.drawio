@@ -8,7 +8,7 @@
 <mxCell id="note" value="Checked nightly" style="text;html=1;align=left;fontStyle=2;fontColor=#666666;" vertex="1" parent="1"><mxGeometry x="40" y="250" width="160" height="30" as="geometry"/></mxCell>
 <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="start" target="check"><mxGeometry relative="1" as="geometry"/></mxCell>
 <mxCell id="e2" value="yes" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="check" target="ship"><mxGeometry relative="1" as="geometry"/></mxCell>
-<mxCell id="e3" value="no" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="check" target="back"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="420" y="160"/><mxPoint x="530" y="160"/></Array></mxGeometry></mxCell>
+<mxCell id="e3" value="no" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="check" target="back"><mxGeometry relative="1" as="geometry"><mxArray as="points"><mxPoint x="420" y="160"/><mxPoint x="530" y="160"/></mxArray></mxGeometry></mxCell>
 <mxCell id="e4" style="endArrow=none;dashed=1;html=1;" edge="1" parent="1" source="check" target="db"><mxGeometry relative="1" as="geometry"/></mxCell>
-<mxCell id="e5" style="curved=1;endArrow=open;html=1;strokeColor=#b85450;" edge="1" parent="1" source="back" target="ship"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="680" y="170"/></Array></mxGeometry></mxCell>
+<mxCell id="e5" style="curved=1;endArrow=open;html=1;strokeColor=#b85450;" edge="1" parent="1" source="back" target="ship"><mxGeometry relative="1" as="geometry"><mxArray as="points"><mxPoint x="680" y="170"/></mxArray></mxGeometry></mxCell>
 </root></mxGraphModel></diagram></mxfile>

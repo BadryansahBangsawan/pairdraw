@@ -40,7 +40,7 @@ const NO_GEOMETRY: DrawIOGeometry = {
 function readGeometry(cell: Element): DrawIOGeometry {
   const geometry = childElements(cell, 'mxGeometry').at(0)
   if (!geometry) return structuredClone(NO_GEOMETRY)
-  const points = childElements(geometry, 'Array').find((e) => e.getAttribute('as') === 'points')
+  const points = childElements(geometry, 'mxArray').find((e) => e.getAttribute('as') === 'points')
   const point = (as: string) => {
     const found = childElements(geometry, 'mxPoint').find((p) => p.getAttribute('as') === as)
     return found ? pointOf(found) : null

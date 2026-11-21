@@ -25,7 +25,7 @@ const MODEL = `<mxGraphModel dx="1018" dy="616" grid="1" gridSize="10" backgroun
     </UserObject>
     <mxCell id="e" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="a" target="b">
       <mxGeometry relative="1" as="geometry">
-        <Array as="points"><mxPoint x="240" y="90"/><mxPoint x="240" y="240"/></Array>
+        <mxArray as="points"><mxPoint x="240" y="90"/><mxPoint x="240" y="240"/></mxArray>
       </mxGeometry>
     </mxCell>
     <mxCell id="l" value="next" style="edgeLabel;html=1;align=center;" vertex="1" connectable="0" parent="e">

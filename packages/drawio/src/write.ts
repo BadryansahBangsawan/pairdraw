@@ -29,7 +29,7 @@ function geometry(document: Document, value: DrawIOGeometry): Element {
   if (value.sourcePoint) element.appendChild(point(document, value.sourcePoint, 'sourcePoint'))
   if (value.targetPoint) element.appendChild(point(document, value.targetPoint, 'targetPoint'))
   if (value.points.length > 0) {
-    const points = document.createElement('Array')
+    const points = document.createElement('mxArray')
     points.setAttribute('as', 'points')
     for (const at of value.points) points.appendChild(point(document, at))
     element.appendChild(points)

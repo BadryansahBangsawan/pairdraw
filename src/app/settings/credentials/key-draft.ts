@@ -33,17 +33,13 @@ export function useKeyCredential<ID>(
     keyDraft.value = ''
   })
 
-  function failure(cause: unknown): string {
-    return settingsErrorMessage(cause)
-  }
-
   async function refreshStatus(): Promise<void> {
     const request = ++version
     try {
       const status = await services.status(credentialID.value)
       if (!isDisposed() && version === request) keyStatus.value = status
     } catch (cause) {
-      if (!isDisposed() && version === request) error.value = failure(cause)
+      if (!isDisposed() && version === request) error.value = settingsErrorMessage(cause)
     }
   }
 
@@ -61,7 +57,7 @@ export function useKeyCredential<ID>(
       await refreshStatus()
       return !isDisposed()
     } catch (cause) {
-      if (!isDisposed() && version === request) error.value = failure(cause)
+      if (!isDisposed() && version === request) error.value = settingsErrorMessage(cause)
       return false
     }
   }

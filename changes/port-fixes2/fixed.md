@@ -3,3 +3,4 @@
 - Interface text breaks into even lines, so centered notices and short messages no longer end on a stray word or split a phrase.
 - AI chat shows the Option key in the follow-up shortcut hint on macOS, instead of always naming Alt.
 - Saving a key while the system credential store is locked or out of reach explains how to fix it and retry, instead of showing the backend text.
+- AI setup plans a role again when its configured model cannot run in this app, instead of finishing setup on a model chat then refuses.

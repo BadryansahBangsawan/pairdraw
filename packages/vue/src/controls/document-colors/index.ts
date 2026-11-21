@@ -1,0 +1,1 @@
+export { useDocumentColors } from './use'

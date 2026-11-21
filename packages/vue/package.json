@@ -163,6 +163,11 @@
       "import": "./dist/controls/property-list/index.js",
       "default": "./dist/controls/property-list/index.js"
     },
+    "./controls/document-colors": {
+      "types": "./dist/controls/document-colors/index.d.ts",
+      "import": "./dist/controls/document-colors/index.js",
+      "default": "./dist/controls/document-colors/index.js"
+    },
     "./controls/selection-colors": {
       "types": "./dist/controls/selection-colors/index.d.ts",
       "import": "./dist/controls/selection-colors/index.js",

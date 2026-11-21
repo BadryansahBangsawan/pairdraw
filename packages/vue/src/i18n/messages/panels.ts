@@ -159,6 +159,7 @@ export const panelMessageDefaults = {
 
   page: 'Page',
   selectionColors: 'Selection colors',
+  documentColors: 'Document colors',
   frame: 'Frame',
   group: 'Group',
   layerType: 'Layer type',

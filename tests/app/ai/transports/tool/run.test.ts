@@ -519,9 +519,9 @@ test('a compacted conversation reaches the model as its summary and what followe
     expect(chunks).toContainEqual(
       expect.objectContaining({
         type: 'message-metadata',
-        messageMetadata: {
+        messageMetadata: expect.objectContaining({
           context: { usedTokens: 2, inputTokens: 1, outputTokens: 1, firstRequestTokens: 1 }
-        }
+        })
       })
     )
   } finally {

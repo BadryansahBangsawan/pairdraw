@@ -23,7 +23,7 @@ import { generateId } from './ids'
 import * as Instances from './instances'
 import { LayoutWrites } from './layout/writes'
 import Matrix from './matrix'
-import { CONTAINER_TYPES, createDefaultNode } from './node-defaults'
+import { CONTAINER_TYPES, createDefaultNode, shareEmptyNodeValues } from './node-defaults'
 import { updateNodePreview, type NodePreviewObserver } from './preview'
 import type { Color, Rect, Vector } from './primitives'
 /* eslint-disable max-lines -- SceneGraph is the facade over the domain modules */
@@ -727,6 +727,7 @@ export class SceneGraph {
       this.scopeDepths.sourceMetadata === 0 && !this.isApplyingDerivedLayout
     )
     Object.assign(node, changes)
+    shareEmptyNodeValues(node, Object.keys(changes))
     if (changes.fills) removeStaleBindings(node, 'fills', changes)
     if (changes.strokes) removeStaleBindings(node, 'strokes', changes)
     // A bound paint written keeps what it was given until its variable's color changes.

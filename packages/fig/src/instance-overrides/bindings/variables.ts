@@ -63,13 +63,14 @@ export function declareVariableBindingUnits(
   for (const entry of variableConsumptionEntries(patch)) {
     const field = entry.variableField && VARIABLE_BINDING_FIELDS_INVERSE[entry.variableField]
     if (!field) continue
-    target.variableBindingScales ??= {}
     const expression = linearVariableExpression(entry.variableData)
     const multiplier = expression?.reference ? expression.multiplier : 1
     const unit = field === 'opacity' ? 0.01 : 1
     const expressionInPlacedUnits =
       entry.variableData?.value?.expressionValue && field !== 'opacity' && field !== 'rotation'
-    target.variableBindingScales[field] =
-      (multiplier * unit) / (expressionInPlacedUnits ? ownScale : 1)
+    target.variableBindingScales = {
+      ...target.variableBindingScales,
+      [field]: (multiplier * unit) / (expressionInPlacedUnits ? ownScale : 1)
+    }
   }
 }

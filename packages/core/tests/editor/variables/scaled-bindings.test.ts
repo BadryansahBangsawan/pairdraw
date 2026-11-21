@@ -87,9 +87,13 @@ test('clones isolate conversion metadata and unbinding undo restores it', () => 
   frame.variableAssignmentScales = { paddingLeft: 0.5 }
   const clone = graph.cloneTree(frame.id, graph.getPages()[0].id)
   if (!clone) throw new Error('Missing clone')
-  clone.variableAssignmentScales.paddingLeft = 0.75
+  expect(clone.variableAssignmentScales).toEqual({ paddingLeft: 0.5 })
+  expect(clone.variableAssignmentScales).not.toBe(frame.variableAssignmentScales)
+  expect(clone.variableBindingScales).toEqual(frame.variableBindingScales)
+  expect(clone.variableBindingScales).not.toBe(frame.variableBindingScales)
+  clone.variableAssignmentScales = { ...clone.variableAssignmentScales, paddingLeft: 0.75 }
+  clone.variableBindingScales = { ...clone.variableBindingScales, paddingLeft: 0.5 }
   expect(frame.variableAssignmentScales.paddingLeft).toBe(0.5)
-  clone.variableBindingScales.paddingLeft = 0.5
   expect(frame.variableBindingScales.paddingLeft).toBe(0.25)
   editor.unbindVariable(frame.id, 'paddingLeft')
   expect(frame.variableBindingScales).toEqual({})

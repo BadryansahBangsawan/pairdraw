@@ -674,6 +674,7 @@
       },
       "devDependencies": {
         "@pairdraw/package-artifacts-tools": "workspace:*",
+        "@pairdraw/scene-graph": "workspace:*",
       },
     },
     "tools/checks/package-quality": {

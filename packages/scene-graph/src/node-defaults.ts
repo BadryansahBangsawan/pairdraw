@@ -1,3 +1,5 @@
+import { isEmptyObject } from 'es-toolkit'
+
 import {
   BLACK,
   DEFAULT_FONT_FAMILY,
@@ -26,6 +28,47 @@ export function createDefaultSourceMetadata(): SourceMetadata {
       derivedSymbolDataLayoutVersion: null,
       uniformScaleFactor: null
     }
+  }
+}
+
+/**
+ * The empty list and record every layer holds until a field gets a value of its own. All layers
+ * share them, so they are frozen: a field is replaced, never written into, and a write into one
+ * throws instead of reaching every layer of every document.
+ */
+const EMPTY_LIST: never[] = Object.freeze<never[]>([]) as never[]
+const EMPTY_RECORD: Record<string, never> = Object.freeze({})
+
+/** The child list is the graph's to grow in place, so every layer keeps its own. */
+const OWN_LIST_FIELDS: ReadonlySet<string> = new Set<keyof SceneNode>(['childIds'])
+
+/** Fields keyed by name, such as bindings and property values, that start empty. */
+const RECORD_FIELDS: ReadonlySet<string> = new Set<keyof SceneNode>([
+  'componentPropertyAssignments',
+  'componentPropertyValues',
+  'boundVariables',
+  'variableBindingScales',
+  'variableAssignmentScales',
+  'variableModes'
+])
+
+function sharedEmptyValue(field: string, value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.length === 0 && !OWN_LIST_FIELDS.has(field) ? EMPTY_LIST : value
+  }
+  if (!RECORD_FIELDS.has(field) || value === null || typeof value !== 'object') return value
+  return isEmptyObject(value) ? EMPTY_RECORD : value
+}
+
+/**
+ * Swap the `fields` of `node` that hold an empty list or record for the shared ones. Writing
+ * known keys keeps the shape every layer shares.
+ */
+export function shareEmptyNodeValues(node: SceneNode, fields: Iterable<string>): void {
+  for (const field of fields) {
+    const value: unknown = Reflect.get(node, field)
+    const shared = sharedEmptyValue(field, value)
+    if (shared !== value) Reflect.set(node, field, shared)
   }
 }
 
@@ -114,11 +157,13 @@ export function createDefaultNode(
     source: createDefaultSourceMetadata(),
     derivedLayout: null,
     fills:
-      type === 'TEXT' ? [{ type: 'SOLID' as const, color: BLACK, opacity: 1, visible: true }] : [],
-    strokes: [],
-    effects: [],
-    layoutGrids: [],
-    guides: [],
+      type === 'TEXT'
+        ? [{ type: 'SOLID' as const, color: BLACK, opacity: 1, visible: true }]
+        : EMPTY_LIST,
+    strokes: EMPTY_LIST,
+    effects: EMPTY_LIST,
+    layoutGrids: EMPTY_LIST,
+    guides: EMPTY_LIST,
     fillStyleId: null,
     strokeStyleId: null,
     textStyleId: null,
@@ -155,8 +200,8 @@ export function createDefaultNode(
     layoutAlignSelf: 'AUTO',
     vectorNetwork: null,
     handleMirroring: 'NONE',
-    fillGeometry: [],
-    strokeGeometry: [],
+    fillGeometry: EMPTY_LIST,
+    strokeGeometry: EMPTY_LIST,
     arcData: null,
     textAlignVertical: 'TOP',
     textAutoResize: 'NONE',
@@ -164,24 +209,24 @@ export function createDefaultNode(
     textDecoration: 'NONE',
     textDecorationStyle: 'SOLID',
     textDecorationThickness: null,
-    textDecorationFills: [],
+    textDecorationFills: EMPTY_LIST,
     textDecorationSkipInk: true,
     textUnderlineOffset: null,
     maxLines: null,
-    textParagraphs: [],
+    textParagraphs: EMPTY_LIST,
     listSpacing: 0,
     paragraphSpacing: 0,
     paragraphIndent: 0,
     hangingList: false,
-    styleRuns: [],
-    fontVariations: [],
+    styleRuns: EMPTY_LIST,
+    fontVariations: EMPTY_LIST,
     opticalSizeFromFontSize: true,
-    fontFeatures: [],
+    fontFeatures: EMPTY_LIST,
     horizontalConstraint: 'MIN',
     verticalConstraint: 'MIN',
     strokeCap: 'NONE',
     strokeJoin: 'MITER',
-    dashPattern: [],
+    dashPattern: EMPTY_LIST,
     borderTopWeight: 0,
     borderRightWeight: 0,
     borderBottomWeight: 0,
@@ -200,14 +245,14 @@ export function createDefaultNode(
     connectorLineType: 'ELBOWED',
     connectorStartCap: 'ROUND',
     connectorEndCap: 'ARROW_LINES',
-    connectorControlPoints: [],
+    connectorControlPoints: EMPTY_LIST,
     connectorCurveHandles: null,
     connectorLabelPosition: null,
     isMask: false,
     maskType: 'ALPHA',
     maskIsOutline: false,
-    gridTemplateColumns: [],
-    gridTemplateRows: [],
+    gridTemplateColumns: EMPTY_LIST,
+    gridTemplateRows: EMPTY_LIST,
     gridColumnGap: 0,
     gridRowGap: 0,
     gridPosition: null,
@@ -224,10 +269,10 @@ export function createDefaultNode(
     shapeTruncates: false,
     componentId: null,
     instanceOverrides: createInstanceOverrideState(),
-    componentPropertyDefinitions: [],
-    componentPropertyReferences: [],
-    componentPropertyAssignments: {},
-    componentPropertyValues: {},
+    componentPropertyDefinitions: EMPTY_LIST,
+    componentPropertyReferences: EMPTY_LIST,
+    componentPropertyAssignments: EMPTY_RECORD,
+    componentPropertyValues: EMPTY_RECORD,
     componentKey: null,
     sourceLibraryKey: null,
     publishId: null,
@@ -239,18 +284,18 @@ export function createDefaultNode(
     isSymbolPublishable: false,
     isExposedInstance: false,
     symbolDescription: '',
-    symbolLinks: [],
-    variantPropSpecs: [],
-    boundVariables: {},
-    variableBindingScales: {},
-    variableAssignmentScales: {},
+    symbolLinks: EMPTY_LIST,
+    variantPropSpecs: EMPTY_LIST,
+    boundVariables: EMPTY_RECORD,
+    variableBindingScales: EMPTY_RECORD,
+    variableAssignmentScales: EMPTY_RECORD,
     componentScale: 1,
-    variableModes: {},
-    exportSettings: [],
+    variableModes: EMPTY_RECORD,
+    exportSettings: EMPTY_LIST,
     status: null,
-    pluginData: [],
-    pluginRelaunchData: [],
-    prototypeReactions: [],
+    pluginData: EMPTY_LIST,
+    pluginRelaunchData: EMPTY_LIST,
+    prototypeReactions: EMPTY_LIST,
     internalOnly: false,
     flipX: false,
     flipY: false,
@@ -263,6 +308,7 @@ export function createDefaultNode(
     ...overrides
   } satisfies CompleteNodeFields
   node.effects = normalizeEffects(node.effects)
+  shareEmptyNodeValues(node, Object.keys(overrides))
   return node
 }
 

@@ -62,9 +62,8 @@ describe('applyStrokePaint', () => {
   test('does not share the dash pattern with the stroke it came from', () => {
     const original = solidStroke()
     const next = applyStrokePaint(original, GRADIENT)
-    next.dashPattern?.push(99)
-
-    expect(original.dashPattern).toEqual([4, 2])
+    expect(next.dashPattern).toEqual([4, 2])
+    expect(next.dashPattern).not.toBe(original.dashPattern)
   })
 
   test('leaves cap and join unset when the stroke had none', () => {

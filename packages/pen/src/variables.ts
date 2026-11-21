@@ -50,7 +50,7 @@ function varName(ref: string): string {
 export function bindIfVar(node: SceneNode, field: string, val: unknown, ctx: VarContext): void {
   if (!isVarRef(val)) return
   const variable = ctx.byName.get(varName(val))
-  if (variable) node.boundVariables[field] = variable.id
+  if (variable) node.boundVariables = { ...node.boundVariables, [field]: variable.id }
 }
 
 /** A number, or the value of the number variable it references. */

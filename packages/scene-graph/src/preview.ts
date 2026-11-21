@@ -1,4 +1,5 @@
 import { normalizeEffects } from './effects'
+import { shareEmptyNodeValues } from './node-defaults'
 import { textCacheInvalidationChanges } from './text/picture'
 import type { SceneNode } from './types'
 import { normalizeVectorNetwork } from './vector-network'
@@ -80,5 +81,6 @@ export function updateNodePreview(
   beforeUpdate?.(node, normalizedChanges)
   graph.positionPreviewVersion++
   Object.assign(node, normalizedChanges)
+  shareEmptyNodeValues(node, Object.keys(normalizedChanges))
   return normalizedChanges
 }

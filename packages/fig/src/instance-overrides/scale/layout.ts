@@ -1,3 +1,5 @@
+import { mapValues } from 'es-toolkit'
+
 import type { NodeChange } from '@pairdraw/kiwi/fig/codec'
 
 import { LAYOUT_DISTANCE_FIELDS } from '../fields'
@@ -67,9 +69,10 @@ export function applyInstanceLayoutScale(root: InstanceOccurrence, source: NodeC
   if (factor === 1) return
   for (const node of occurrences(root)) {
     node.layoutScale = (node.layoutScale ?? 1) * factor
-    for (const field of Object.keys(node.variableBindingScales ?? {})) {
-      if (node.variableBindingScales && field !== 'opacity' && field !== 'rotation')
-        node.variableBindingScales[field] *= factor
+    if (node.variableBindingScales) {
+      node.variableBindingScales = mapValues(node.variableBindingScales, (scale, field) =>
+        field === 'opacity' || field === 'rotation' ? scale : scale * factor
+      )
     }
     const props = node.properties
     scaleTextLayout(props, factor)

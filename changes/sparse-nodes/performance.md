@@ -1,0 +1,1 @@
+- Layers share one copy of their empty lists and records, so an open document takes less memory: material3.fig (158,513 layers) uses 172 MiB less heap after its first save.

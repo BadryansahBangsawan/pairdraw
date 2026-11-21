@@ -1,1 +1,2 @@
 - Each mode’s "Use a variable" button in the Variables dialog names its mode for screen readers.
+- A `.pen` document with many theme axes opens instead of hanging: each axis gets its own variable collection unless a variable combines it with others.

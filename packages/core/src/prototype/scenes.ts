@@ -1,6 +1,7 @@
 import type { PrototypeAction, SceneGraph } from '@pairdraw/scene-graph'
 import { instanceMainComponent } from '@pairdraw/scene-graph/instances'
 
+import type { PlayRevert } from './pointer'
 import { effectiveReactions } from './reactions'
 import {
   changeTarget,
@@ -43,6 +44,11 @@ export interface PlayScenes {
   readonly views: ReadonlyMap<string, PlaySceneView>
   /** Runs a reaction of a layer in `rootId`, the shown frame unless a timer names another. */
   run(session: PlaySession, click: PlayClick, rootId?: string): PlayStep
+  /**
+   * Undoes a While hovering or While pressing reaction, unless play moved on from what it did: an
+   * instance that shows another variant by now, or an overlay or frame no longer shown.
+   */
+  revert(session: PlaySession, revert: PlayRevert): PlayStep
   /** The After delay reactions of the instances `rootId` shows, by the variants they show now. */
   instanceTimeouts(rootId: string): PlayTimeout[]
   /** Drops the copies of frames that hold any of these document layers, after an edit to them. */
@@ -83,6 +89,23 @@ export function createPlayScenes(
         const changed = action.nodeId ? changeIn(rootId, sourceId, action.nodeId) : null
         return { session, changed }
       }
+      return { session: step(getDocument(), session, action), changed: null }
+    },
+    revert(session, revert) {
+      if (revert.kind === 'change') {
+        const graph = graphFor(revert.rootId)
+        const instance = graph.getNode(revert.instanceId)
+        if (!instance || instanceMainComponent(graph, instance)?.id !== revert.to) {
+          return { session, changed: null }
+        }
+        return { session, changed: changeIn(revert.rootId, revert.instanceId, revert.from) }
+      }
+      const shown =
+        revert.kind === 'overlay'
+          ? session.overlays.at(-1) === revert.frameId
+          : session.frameId === revert.frameId
+      if (!shown) return { session, changed: null }
+      const action = { type: revert.kind === 'overlay' ? 'CLOSE' : 'BACK' } as const
       return { session: step(getDocument(), session, action), changed: null }
     },
     instanceTimeouts(rootId) {

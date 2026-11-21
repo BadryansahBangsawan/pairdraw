@@ -1,4 +1,13 @@
 export { framesOnPage } from './frames'
+export {
+  hasPointerTriggers,
+  pathChanges,
+  pointerPath,
+  pointerReactions,
+  revertFor,
+  type PlayPointerReaction,
+  type PlayRevert
+} from './pointer'
 export { effectiveReactions, sameReaction } from './reactions'
 export {
   changeTarget,

@@ -109,8 +109,6 @@ export interface LintNode {
    */
   textStyles?: { fontSize: number; fontWeight: number }[]
   styleRunCount: number
-  /** The text style the layer uses, which supplies its type values. */
-  textStyleId?: string
   boundVariables: Record<string, string>
   fills: Array<{
     type: string

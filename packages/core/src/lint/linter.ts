@@ -155,7 +155,6 @@ export class Linter {
       fontSize: raw.fontSize,
       textStyles: raw.type === 'TEXT' ? effectiveTextStyles(raw) : undefined,
       styleRunCount: raw.styleRuns.length,
-      textStyleId: raw.textStyleId ?? undefined,
       boundVariables: raw.boundVariables,
       fills: raw.fills.map((f, index) => ({
         type: f.type,

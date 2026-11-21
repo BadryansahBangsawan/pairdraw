@@ -654,11 +654,21 @@ function createElementNode(
     createRichTextNode(graph, node.id, element, textStyle, textDisplay, flow ?? 'none')
     return node
   }
-  for (const child of element.children) {
+  const children = flow === 'flex' ? element.children.toSorted(byFlexOrder) : element.children
+  for (const child of children) {
     createDesignNode(graph, node.id, child, flow ?? 'none', inheritedTextStyle(element, style))
   }
 
   return node
+}
+
+function flexOrder(node: DesignNode): number {
+  return node.type === 'element' ? (parseCSSNumber(pickStyle(mergedStyle(node), 'order')) ?? 0) : 0
+}
+
+/** Flex items in the order CSS places them: by `order`, then as written. */
+function byFlexOrder(a: DesignNode, b: DesignNode): number {
+  return flexOrder(a) - flexOrder(b)
 }
 
 function createDesignNode(

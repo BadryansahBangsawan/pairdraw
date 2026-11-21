@@ -75,6 +75,17 @@ describe('HTML flow as auto layout', () => {
     expect(byName('name').clipsContent).toBe(true)
   })
 
+  it('places flex items in their CSS order', async () => {
+    const { graph, byName } = await importHTML(
+      `<div id="row" style="display:flex;flex-wrap:wrap"><div id="picker" style="order:2;width:80px;height:8px"></div><div id="send" style="width:20px;height:8px"></div><div id="first" style="order:-1;width:20px;height:8px"></div></div>`
+    )
+    expect(graph.getChildren(byName('row').id).map((child) => child.name)).toEqual([
+      'first',
+      'send',
+      'picker'
+    ])
+  })
+
   it('stacks block children inside an inline-block, which sits in a line itself', async () => {
     const { byName, sizing } = await importHTML(
       `<div style="width:300px"><div id="chip" style="display:inline-block"><div>Title</div><div>Detail</div></div></div>`

@@ -1,0 +1,1 @@
+- Starting a design from Home sends the words alone when the remembered creation kind is one this build no longer offers, instead of a guide naming `undefined`.

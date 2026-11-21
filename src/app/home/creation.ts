@@ -58,6 +58,9 @@ export function promptForCreationKind(
   messages: AIMessages = aiMessages.get()
 ): string {
   if (!kind || kind === 'other') return text
+  // Stored between visits, so a kind an earlier build offered may no longer exist.
+  const guide: string | undefined = KIND_GUIDES[kind]
+  if (!guide) return text
   const heading = messages.creationGuide({ kind: messages[KIND_LABELS[kind]] })
-  return `${text}\n\n${heading}\n${KIND_GUIDES[kind]}`
+  return `${text}\n\n${heading}\n${guide}`
 }

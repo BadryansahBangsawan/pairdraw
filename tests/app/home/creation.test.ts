@@ -2,7 +2,12 @@ import { describe, expect, test } from 'bun:test'
 
 import { aiMessages } from '@pairdraw/vue/i18n'
 
-import { CREATION_KIND_IDS, creationKinds, promptForCreationKind } from '@/app/home/creation'
+import {
+  CREATION_KIND_IDS,
+  creationKinds,
+  promptForCreationKind,
+  type CreationKindId
+} from '@/app/home/creation'
 
 const messages = aiMessages.get()
 
@@ -22,6 +27,12 @@ describe('what Home offers to create', () => {
   test('something else, or no choice, sends the words alone', () => {
     expect(promptForCreationKind('A poster', 'other', messages)).toBe('A poster')
     expect(promptForCreationKind('A poster', null, messages)).toBe('A poster')
+  })
+
+  test('a kind this build no longer offers sends the words alone', () => {
+    expect(promptForCreationKind('A poster', 'removed' as CreationKindId, messages)).toBe(
+      'A poster'
+    )
   })
 
   test('each kind has a guide of its own', () => {

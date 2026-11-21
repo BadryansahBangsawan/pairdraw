@@ -155,7 +155,21 @@ export class LibraryService implements ComponentCatalog {
     const revisionId =
       input.revisionId ?? editor.graph.enabledLibraries.get(input.libraryId)?.revisionId
     if (!revisionId) throw new Error(`Library is not enabled: ${input.libraryId}`)
-    const materialized = await this.materialize(editor, input.libraryId, revisionId, input.assetKey)
+    const binding = editor.graph.enabledLibraries.get(input.libraryId)
+    const restoreBinding = () => {
+      // A pinned revision adds that definition; it does not move the revision the document's
+      // library binding names, which later inserts and the update flow read. Materialization
+      // writes the binding before it can fail, so restore it whether it succeeded or threw.
+      if (binding && binding.revisionId !== revisionId) {
+        editor.updateEnabledLibraries((bindings) => bindings.set(input.libraryId, binding))
+      }
+    }
+    const materialized = await this.materialize(
+      editor,
+      input.libraryId,
+      revisionId,
+      input.assetKey
+    ).finally(restoreBinding)
     let componentId = materialized.componentId
     if (input.variantValues && materialized.componentSetId) {
       const match = editor.findVariantByValues(materialized.componentSetId, input.variantValues)

@@ -1,0 +1,1 @@
+- Inserting a component from a pinned older library revision no longer moves the document’s library binding to that revision, so the document keeps its place in the update flow.

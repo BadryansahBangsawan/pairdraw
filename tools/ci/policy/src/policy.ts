@@ -53,6 +53,23 @@ export const CODE_JOBS = [
 export const CLOUD_JOBS = ['cloud-tests', 'cloud-storage'] as const
 export const DOCS_JOB = 'documentation'
 export const ALWAYS_JOBS = ['commit-messages'] as const
+export const ICON_GUARD_JOB = 'macos-icon'
+/**
+ * What the macOS icon guard compiles: the brand generator and its artwork masters, the desktop
+ * icon wiring, and the workflow that runs actool. A directory input covers everything below it.
+ */
+export const ICON_GUARD_INPUTS = [
+  'tools/generate/brand/',
+  'assets/brand/',
+  'desktop/tauri.conf.json',
+  '.github/workflows/ci.yml'
+] as const
+
+/** Whether a change reaches the macOS icon guard's inputs (`touchesInput`). */
+export function touchesIconGuard(paths: readonly string[]): boolean {
+  return paths.some((path) => touchesInput(path, ICON_GUARD_INPUTS))
+}
+
 /** The jobs each scope runs besides `ALWAYS_JOBS`; a verified tree runs none of them. */
 const SELECTED_JOBS = new Map<string, readonly string[]>([
   ['docs', [DOCS_JOB]],
@@ -74,8 +91,17 @@ export function gateErrors(needs: Partial<Record<string, JobStatus>>): string[] 
   const scope = detection.outputs?.scope
   const selected = scope ? SELECTED_JOBS.get(scope) : undefined
   if (!selected) return ['Invalid or missing change scope']
-  const required: readonly string[] = [...ALWAYS_JOBS, ...selected]
-  const excluded = [...CODE_JOBS, ...CLOUD_JOBS, DOCS_JOB].filter((job) => !required.includes(job))
+  // The icon guard follows its own inputs, not the scope: a docs-classified change to the brand
+  // README still compiles the icon, and a verified tree already passed it.
+  const iconRequired = detection.outputs?.icon === 'true' && scope !== 'verified'
+  const required: readonly string[] = [
+    ...ALWAYS_JOBS,
+    ...selected,
+    ...(iconRequired ? [ICON_GUARD_JOB] : [])
+  ]
+  const excluded = [...CODE_JOBS, ...CLOUD_JOBS, DOCS_JOB, ICON_GUARD_JOB].filter(
+    (job) => !required.includes(job)
+  )
   const errors = required
     .filter((job) => needs[job]?.result !== 'success')
     .map((job) => `${job} did not succeed`)

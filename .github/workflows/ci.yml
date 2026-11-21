@@ -27,6 +27,7 @@ jobs:
       statuses: read
     outputs:
       scope: ${{ steps.classify.outputs.scope }}
+      icon: ${{ steps.classify.outputs.icon }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -255,6 +256,70 @@ jobs:
       - name: Compile native-test Tauri feature
         run: cargo check --manifest-path desktop/Cargo.toml --features native-test
 
+  macos-icon:
+    name: macOS icon catalog
+    needs: changes
+    # Compiles the Icon Composer icon with the release runners' actool whenever its inputs change
+    # (tools/ci/policy/src/policy.ts, ICON_GUARD_INPUTS), so a manifest Xcode cannot compile fails
+    # here instead of in a release build. A verified tree already passed it.
+    if: needs.changes.outputs.icon == 'true' && needs.changes.outputs.scope != 'verified'
+    # The release build's macOS image (build.yml native matrix, macos-latest = macos-26).
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-bun
+
+      - name: Generate desktop brand assets
+        run: bun run generate:icons --target desktop
+
+      - name: Compile the icon catalog with actool
+        run: |
+          set -euo pipefail
+          actool --version
+          work="$(mktemp -d)"
+          # The same copy-and-compile tauri-bundler does (macos/icon.rs, create_assets_car_file).
+          cp -R desktop/icons/icon.icon "$work/Icon.icon"
+          mkdir "$work/out"
+          # actool can exit 0 yet print a catalog-error block; tee the output (pipefail keeps
+          # actool's own exit status) and fail on the block or any error: line, not only the exit.
+          actool "$work/Icon.icon" \
+            --compile "$work/out" \
+            --output-format human-readable-text \
+            --notices --warnings \
+            --output-partial-info-plist "$work/out/assetcatalog_generated_info.plist" \
+            --app-icon Icon \
+            --include-all-app-icons \
+            --accent-color AccentColor \
+            --enable-on-demand-resources NO \
+            --development-region en \
+            --target-device mac \
+            --minimum-deployment-target 26.0 \
+            --platform macosx 2>&1 | tee "$work/actool.log"
+          if grep -qE 'com\.apple\.actool\.errors|error:' "$work/actool.log"; then
+            echo "::error title=macOS icon::actool reported catalog errors"
+            cat "$work/actool.log"
+            exit 1
+          fi
+          test -f "$work/out/Assets.car"
+          echo "ICON_CAR=$work/out/Assets.car" >> "$GITHUB_ENV"
+
+      - name: Assert the catalog carries the light and dark appearances
+        run: |
+          set -euo pipefail
+          assetutil --info "$ICON_CAR" > "$RUNNER_TEMP/icon-assets.json"
+          cat "$RUNNER_TEMP/icon-assets.json"
+          for appearance in Aqua DarkAqua; do
+            # assetutil names appearances NSAppearanceNameAqua and NSAppearanceNameDarkAqua.
+            if ! grep -q "\"NSAppearanceName$appearance\"" "$RUNNER_TEMP/icon-assets.json"; then
+              echo "::error title=macOS icon::Assets.car has no $appearance appearance"
+              exit 1
+            fi
+          done
+
   unit-tests:
     needs: changes
     if: needs.changes.outputs.scope == 'code' || needs.changes.outputs.scope == 'cloud'
@@ -349,7 +414,7 @@ jobs:
 
   result:
     name: CI result
-    needs: [changes, commit-messages, documentation, source-quality, package-quality, repository-quality, storybook, native-test-contracts, unit-tests, cloud-tests, cloud-storage]
+    needs: [changes, commit-messages, documentation, source-quality, package-quality, repository-quality, storybook, native-test-contracts, macos-icon, unit-tests, cloud-tests, cloud-storage]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 3

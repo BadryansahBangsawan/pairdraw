@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process'
 import { appendFile } from 'node:fs/promises'
 
 import { cloudInputs } from './cloud-inputs'
-import { classifyPaths } from './policy'
+import { classifyPaths, touchesIconGuard } from './policy'
 import { isVerifiedTree } from './verified-tree/status'
 
 const base = comparisonBase()
@@ -25,7 +25,10 @@ const inputs = await cloudInputs(process.cwd()).catch((error: unknown) => {
 })
 const scope = (await queuedTreeVerified()) ? 'verified' : classifyPaths(paths, inputs)
 await appendFile(output, `scope=${scope}\n`)
-console.log(`Selected ${scope} checks for ${paths.length} changed paths`)
+// The macOS icon guard follows its own inputs, so it also runs for docs-classified brand changes.
+const icon = touchesIconGuard(paths)
+await appendFile(output, `icon=${icon}\n`)
+console.log(`Selected ${scope} checks for ${paths.length} changed paths; icon guard: ${icon}`)
 
 /**
  * The commit a change is measured from. A pull request checks out GitHub's merge of it into the

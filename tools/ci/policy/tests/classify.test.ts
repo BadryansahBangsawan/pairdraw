@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test'
-import { mkdtemp, readFile, rename, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -37,14 +37,14 @@ test('classifier reads real Git deletions and renames without losing the origina
   })
   expect(result.exitCode).toBe(0)
   // This repository has no manifests to read the Cloud inputs from, so every check runs.
-  expect(await readFile(output, 'utf8')).toBe('scope=cloud\n')
+  expect(await readFile(output, 'utf8')).toBe('scope=cloud\nicon=false\n')
 
   const failed = Bun.spawnSync([process.execPath, command], {
     cwd: root,
     env: { ...process.env, CI_BASE_SHA: 'invalid', GITHUB_OUTPUT: output }
   })
   expect(failed.exitCode).not.toBe(0)
-  expect(await readFile(output, 'utf8')).toBe('scope=cloud\n')
+  expect(await readFile(output, 'utf8')).toBe('scope=cloud\nicon=false\n')
 })
 
 test('a pull request is measured from the base its merge commit merges into', async () => {
@@ -73,8 +73,30 @@ test('a pull request is measured from the base its merge commit merges into', as
     })
 
   expect(classify('pull_request').exitCode).toBe(0)
-  expect(await readFile(output, 'utf8')).toBe('scope=docs\n')
+  expect(await readFile(output, 'utf8')).toBe('scope=docs\nicon=false\n')
   // The merge queue's base is exact, so it is used as given.
   expect(classify('merge_group').exitCode).toBe(0)
-  expect(await readFile(output, 'utf8')).toBe('scope=docs\nscope=cloud\n')
+  expect(await readFile(output, 'utf8')).toBe('scope=docs\nicon=false\nscope=cloud\nicon=false\n')
+})
+
+test('a brand change asks for the macOS icon guard beside its scope', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'pairdraw-ci-'))
+  roots.push(root)
+  git(root, 'init')
+  await writeFile(join(root, 'runtime.ts'), 'export const version = 1\n')
+  git(root, 'add', '.')
+  git(root, 'commit', '-m', 'base')
+  const base = git(root, 'rev-parse', 'HEAD')
+  await mkdir(join(root, 'tools/generate/brand/src'), { recursive: true })
+  await writeFile(join(root, 'tools/generate/brand/src/desktop.ts'), 'export const x = 1\n')
+  git(root, 'add', '.')
+  git(root, 'commit', '-m', 'icon')
+  const output = join(root, 'output')
+  const command = fileURLToPath(import.meta.resolve('#ci/classify'))
+  const result = Bun.spawnSync([process.execPath, command], {
+    cwd: root,
+    env: { ...process.env, CI_BASE_SHA: base, GITHUB_OUTPUT: output }
+  })
+  expect(result.exitCode).toBe(0)
+  expect(await readFile(output, 'utf8')).toBe('scope=cloud\nicon=true\n')
 })

@@ -7,6 +7,9 @@ import {
   CODE_JOBS,
   DOCS_JOB,
   gateErrors,
+  ICON_GUARD_INPUTS,
+  ICON_GUARD_JOB,
+  touchesIconGuard,
   type ChangeScope,
   type JobStatus
 } from '#ci/policy'
@@ -88,14 +91,29 @@ test('both sides of a rename affect classification', () => {
   expect(classifyPaths(['packages/docs/old.md', 'packages/docs/new.md'], CLOUD_INPUTS)).toBe('docs')
 })
 
+test('the macOS icon guard runs for the brand generator and the desktop icon wiring', () => {
+  for (const path of [
+    'tools/generate/brand/src/desktop.ts',
+    'assets/brand/main.svg',
+    'desktop/tauri.conf.json',
+    '.github/workflows/ci.yml'
+  ]) {
+    expect(touchesIconGuard([path])).toBe(true)
+  }
+  for (const path of ['src/editor.ts', 'desktop/src/main.rs', 'tools/generate/demo/src/x.ts']) {
+    expect(touchesIconGuard([path])).toBe(false)
+  }
+  expect(ICON_GUARD_INPUTS).toContain('tools/generate/brand/')
+})
+
 function selectedJobs(scope: 'docs' | 'code' | 'cloud'): string[] {
   if (scope === 'docs') return [DOCS_JOB]
   return scope === 'cloud' ? [...CODE_JOBS, ...CLOUD_JOBS] : [...CODE_JOBS]
 }
 
-function results(scope: ChangeScope): Record<string, JobStatus> {
+function results(scope: ChangeScope, icon = false): Record<string, JobStatus> {
   return {
-    changes: { result: 'success', outputs: { scope } },
+    changes: { result: 'success', outputs: { scope, icon: icon ? 'true' : 'false' } },
     ...Object.fromEntries(ALWAYS_JOBS.map((job) => [job, { result: 'success' }])),
     [DOCS_JOB]: { result: scope === 'docs' ? 'success' : 'skipped' },
     ...Object.fromEntries(
@@ -106,7 +124,10 @@ function results(scope: ChangeScope): Record<string, JobStatus> {
     ),
     ...Object.fromEntries(
       CLOUD_JOBS.map((job) => [job, { result: scope === 'cloud' ? 'success' : 'skipped' }])
-    )
+    ),
+    [ICON_GUARD_JOB]: {
+      result: icon && scope !== 'verified' ? 'success' : 'skipped'
+    }
   }
 }
 
@@ -167,4 +188,22 @@ test('a verified tree runs only the checks every change runs', () => {
   for (const job of ALWAYS_JOBS) {
     expect(gateErrors({ ...results('verified'), [job]: { result: 'skipped' } })).not.toEqual([])
   }
+})
+
+test('the icon guard is required exactly when its inputs changed', () => {
+  for (const scope of ['docs', 'code', 'cloud'] as const) {
+    expect(gateErrors(results(scope, true))).toEqual([])
+    for (const result of ['failure', 'cancelled', 'skipped'] as const) {
+      expect(gateErrors({ ...results(scope, true), [ICON_GUARD_JOB]: { result } })).not.toEqual([])
+    }
+    // Running it without its inputs is unexpected execution, as the Cloud suites are.
+    expect(gateErrors({ ...results(scope), [ICON_GUARD_JOB]: { result: 'success' } })).not.toEqual(
+      []
+    )
+  }
+  // A verified tree already passed the guard with the rest of its checks.
+  expect(gateErrors(results('verified'))).toEqual([])
+  expect(
+    gateErrors({ ...results('verified'), [ICON_GUARD_JOB]: { result: 'success' } })
+  ).not.toEqual([])
 })

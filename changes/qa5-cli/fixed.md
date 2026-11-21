@@ -1,1 +1,2 @@
 - `tree --depth`, `find --limit`, and `query --limit` refuse a value that is not a whole number in range instead of silently changing which nodes they show.
+- `export --thumbnail --node` refuses the pair instead of writing the whole page and reporting the node as its target.

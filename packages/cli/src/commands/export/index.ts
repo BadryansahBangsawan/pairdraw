@@ -74,8 +74,15 @@ async function writeAndLog(path: string, content: string | Uint8Array) {
   console.log(ok(`Exported ${path} (${(size / 1024).toFixed(1)} KB)`))
 }
 
-/** Exits when `--node` comes with `--page` or `--page-id`, which name what to export too. */
+/**
+ * Exits when `--node` comes with `--page` or `--page-id`, which name what to export too, or with
+ * `--thumbnail`, which always renders the page.
+ */
 function rejectNodeWithPage(args: ExportArgs) {
+  if (args.thumbnail && args.node) {
+    printError('--thumbnail and --node cannot be used together.')
+    process.exit(1)
+  }
   if (!args.node || !requestedPage(args)) return
   printError(`${args.page ? '--page' : '--page-id'} and --node cannot be used together.`)
   process.exit(1)

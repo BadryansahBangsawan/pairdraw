@@ -550,6 +550,57 @@ function exportedFill(
   }
 }
 
+/**
+ * A mask layer's definition: an alpha or luminance `<mask>`, or a `<clipPath>` for an outline
+ * mask. The rendered layer carries its own position, opacity, and filters into the mask.
+ */
+function maskWire(
+  mask: SceneNode,
+  ctx: SVGExportContext
+): { attribute: 'mask' | 'clip-path'; id: string } {
+  const content = renderNode(mask, ctx)
+  if (mask.maskType === 'VECTOR') {
+    const id = nextDefId(ctx, 'clip')
+    ctx.defs.push(
+      svg('clipPath', { id, clipPathUnits: 'userSpaceOnUse' }, content ?? undefined)
+    )
+    return { attribute: 'clip-path', id }
+  }
+  const id = nextDefId(ctx, 'mask')
+  const attrs: Record<string, string | number | undefined> = {
+    id,
+    maskContentUnits: 'userSpaceOnUse'
+  }
+  if (mask.maskType === 'ALPHA') attrs['mask-type'] = 'alpha'
+  ctx.defs.push(svg('mask', attrs, content ?? undefined))
+  return { attribute: 'mask', id }
+}
+
+/**
+ * The children as the canvas draws them: a run of visible masks masks the siblings that follow
+ * it, until the next mask, and the mask layers themselves never draw on their own.
+ */
+function maskedChildNodes(childNodes: SceneNode[], ctx: SVGExportContext): SVGNode[] {
+  const content: SVGNode[] = []
+  let masks: Array<{ attribute: 'mask' | 'clip-path'; id: string }> = []
+  let afterMask = false
+  for (const child of childNodes) {
+    if (child.visible && child.isMask) {
+      const wire = maskWire(child, ctx)
+      masks = afterMask ? [...masks, wire] : [wire]
+      afterMask = true
+      continue
+    }
+    const rendered = renderNode(child, ctx)
+    afterMask = false
+    if (!rendered) continue
+    let wrapped = rendered
+    for (const wire of masks) wrapped = svg('g', { [wire.attribute]: `url(#${wire.id})` }, wrapped)
+    content.push(wrapped)
+  }
+  return content
+}
+
 function renderNode(node: SceneNode, ctx: SVGExportContext): SVGNode | null {
   if (!node.visible) return null
 
@@ -589,12 +640,7 @@ function renderNode(node: SceneNode, ctx: SVGExportContext): SVGNode | null {
     ctx
   )
 
-  const childNodes = ctx.graph.getChildren(node.id)
-  const childContent: SVGNode[] = []
-  for (const child of childNodes) {
-    const rendered = renderNode(child, ctx)
-    if (rendered) childContent.push(rendered)
-  }
+  const childContent = maskedChildNodes(ctx.graph.getChildren(node.id), ctx)
 
   if (clipId && childContent.length > 0) {
     children.push(svg('g', { 'clip-path': `url(#${clipId})` }, ...childContent))
